@@ -1,0 +1,252 @@
+//
+// Created by chris on 7/6/20.
+//
+
+#include "AstNode.h"
+
+FunctionNode*
+i_fun(std::string name, VectorOfStrings parameter_names, VectorOfTypes parameter_types, TypeNode* return_type,
+      VectorOfNodes body) {
+    return new FunctionNode(name, parameter_names, parameter_types, return_type, body);
+}
+
+DeclarationNode* i_decl(std::string name, AstNode* expression) {
+    return new DeclarationNode(name, NULL, expression);
+}
+
+DeclarationNode* i_decl_type(std::string name, TypeNode* type, AstNode* expression) {
+    return new DeclarationNode(name, type, expression);
+}
+
+ClassNode* i_class(std::string name, VectorOfStrings template_parameters, VectorOfTypes inherited,
+                   std::vector<DeclarationNode*> fields, std::vector<FunctionNode*> methods) {
+    return new ClassNode(name, template_parameters, inherited, fields, methods);
+}
+
+IfNode* i_if(AstNode* condition, VectorOfNodes then) {
+    return new IfNode(condition, then);
+}
+
+TypeNode* i_type(std::string name, VectorOfTypes type_parameters) {
+    return new TypeNode(name, type_parameters);
+}
+
+
+bool equal(VectorOfStrings a, VectorOfStrings b) {
+    if (a.size() != b.size()) return false;
+    for (int i = 0; i < a.size(); i++) {
+        if (a[i] != b[i]) return false;
+    }
+    return true;
+}
+
+bool equal(VectorOfNodes a, VectorOfNodes b) {
+    if (a.size() != b.size()) return false;
+    for (int i = 0; i < a.size(); i++) {
+        if (not equal(a[i], b[i])) return false;
+    }
+    return true;
+}
+
+bool compare(VectorOfTypes a, VectorOfTypes b) {
+    if (a.size() != b.size()) return false;
+    for (int i = 0; i < a.size(); i++) {
+        if (not equal(a[i], b[i])) return false;
+    }
+    return true;
+}
+
+bool equal(TypeNode* a, TypeNode* b) {
+    if (a == NULL and b == NULL) {
+        return true;
+    }
+    if (a->name != b->name) return false;
+    if (a->type_parameters.size() != b->type_parameters.size()) return false;
+    for (int i = 0; i < a->type_parameters.size(); i++) {
+        if (not equal(a->type_parameters[i], b->type_parameters[i])) return false;
+    }
+    return true;
+}
+
+bool compare(MemberNode* a, MemberNode* b) {
+    if (a == NULL and b == NULL) {
+        return true;
+    }
+    return equal(a->parent, b->parent) and (a->child == b->child);
+}
+
+std::string ast_string(AstType type) {
+    switch (type) {
+
+        case AstType::RETURN:
+            return "RETURN";
+            break;
+        case AstType::LIST:
+            return "LIST";
+        case AstType::CLASS:
+            return "CLASS";
+        case AstType::IF:
+            return "IF";
+        case AstType::FUNCTION:
+            return "FUNCTION";
+        case AstType::MEMBER:
+            return "MEMBER";
+        case AstType::ASSIGNMENT:
+            return "ASSIGNMENT";
+        case AstType::BINOP:
+            return "BINOP";
+        case AstType::IDENTIFIER:
+            return "IDENTIFIER";
+        case AstType::DECLARATION:
+            return "DECLARATION";
+        case AstType::TYPE:
+            return "TYPE";
+    }
+}
+
+bool compare(ListNode* a, ListNode* b) {
+    if (a == NULL and b == NULL) {
+        return true;
+    }
+    if (a->elements.size() != b->elements.size())return false;
+    for (int i = 0; i < a->elements.size(); i++) {
+        if (not equal(a->elements[i], b->elements[i])) return false;
+    }
+    return true;
+}
+bool equal(DeclarationNode* a, DeclarationNode* b) {
+    if (a == NULL and b == NULL) {
+        return true;
+    }
+    return (a->identifier == b->identifier) and equal(a->type, b->type) and equal(a->expression, b->expression);
+}
+bool compare(IdentifierNode* a, IdentifierNode* b) {
+    if (a == NULL and b == NULL) {
+        return true;
+    }
+    std::cout << "Comparing identifier " << a->name << " and " << b->name << std::endl;
+    return a->name == b->name;
+}
+
+bool compare(BinopNode* a, BinopNode* b) {
+    if (a == NULL and b == NULL) {
+        return true;
+    }
+    if (a->op != b->op) {
+        std::cout << "comparison between operators returned false" << std::endl;
+        return false;
+    }
+    std::cout << "They have the same operator " << int(a->op) << std::endl;
+    if (not equal(a->left, b->left)) {
+        std::cout << "comparison between left returned false" << std::endl;
+        return false;
+    }
+    std::cout << "comparison between left returned true" << std::endl;
+    if (not equal(a->right, b->right)) {
+        std::cout << "comparison between right returned false" << std::endl;
+        return false;
+    }
+    std::cout << "comparison between right returned true" << std::endl;
+    return true;
+}
+
+bool equal(IfNode* a, IfNode* b) {
+    if (a == NULL and b == NULL) {
+        return true;
+    }
+    if (not equal(a->condition, b->condition))return false;
+    for (int i = 0; i < a->then.size(); i++) { if (not equal(a->then[i], b->then[i])) return false; }
+    return true;
+}
+bool equal(FunctionNode* a, FunctionNode* b) {
+    if (a == NULL and b == NULL) {
+        return true;
+    }
+    bool name_matches = a->name == b->name;
+    bool return_type_matches = equal(a->return_type, b->return_type);
+    bool parameter_names_match = equal(a->parameter_names, b->parameter_names);
+    bool parameter_types_match = compare(a->parameter_types, b->parameter_types);
+    bool body_matches = equal(a->body, b->body);
+    return name_matches and return_type_matches and parameter_names_match and parameter_types_match and body_matches;
+}
+
+bool equal(ClassNode* a, ClassNode* b) {
+    if (a == NULL and b == NULL) {
+        return true;
+    }
+
+    bool name_match = a->name == b->name;
+    if (not name_match) { return false; }
+
+    bool template_parameters_match = equal(a->template_parameters, b->template_parameters);
+    if (not template_parameters_match) return false;
+
+    bool inherited_length_match = a->inherited.size() == b->inherited.size();
+    if (not inherited_length_match) { return false; }
+    for (int i = 0; i < a->inherited.size(); i++) {
+        if (not equal(a->inherited[i], b->inherited[i])) { return false; }
+    }
+
+    bool fields_length_match = a->fields.size() == b->fields.size();
+    if (not fields_length_match) { return false; }
+    for (int i = 0; i < a->fields.size(); i++) {
+        if (not equal(a->fields[i], b->fields[i])) { return false; }
+    }
+
+    bool methods_length_match = a->methods.size() == b->methods.size();
+    if (not methods_length_match) return false;
+    for (int i = 0; i < a->methods.size(); i++) {
+        if (not equal(a->methods[i], b->methods[i])) { return false; }
+    }
+
+    return true;
+}
+bool compare(ReturnNode* a, ReturnNode* b) {
+    if (a == NULL and b == NULL) {
+        return true;
+    }
+    return equal(a->expression, b->expression);
+}
+
+bool compare(AssignmentNode* a, AssignmentNode* b) {
+    if (a == NULL and b == NULL) {
+        return true;
+    }
+    return equal(a->lvalue, b->lvalue) and equal(a->rvalue, b->rvalue);
+}
+
+
+bool equal(AstNode* a, AstNode* b) {
+    if (a == NULL and b == NULL) {
+        return true;
+    }
+    std::cout << "comparison between a type is " << ast_string(a->type);
+    std::cout << "and b type is " << ast_string(b->type) << std::endl;
+
+    if (a->type != b->type) {
+        return false;
+    }
+    switch (a->type) {
+        case AstType::ASSIGNMENT:
+            return compare(a->ast_assignment, b->ast_assignment);
+        case AstType::RETURN:
+            return compare(a->ast_return, b->ast_return);
+        case AstType::LIST:
+            return compare(a->ast_list, b->ast_list);
+        case AstType::CLASS:
+            return equal(a->ast_class, b->ast_class);
+        case AstType::IF:
+            return equal(a->ast_if, b->ast_if);
+        case AstType::FUNCTION:
+            return equal(a->ast_function, b->ast_function);
+        case AstType::MEMBER:
+            return compare(a->ast_member, b->ast_member);
+        case AstType::BINOP:
+            return compare(a->ast_binop, b->ast_binop);
+        case AstType::IDENTIFIER:
+            return compare(a->ast_identifier, b->ast_identifier);
+        case AstType::DECLARATION:
+            return equal(a->ast_declaration, b->ast_declaration);
+    }
+    return false;
+}
