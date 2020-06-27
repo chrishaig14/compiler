@@ -57,50 +57,6 @@ TEST(scanner_test, test_identifier_complex) {
     EXPECT_EQ(cmp_token_value(token, st_ID("_32hello")), true);
 }
 
-
-TEST(scanner_test, test_fun) {
-    std::string text = "fun";
-    Scanner scanner(text);
-    Token token = scanner.get_next();
-    EXPECT_EQ(cmp_token_value(token, st_FUN), true);
-}
-
-TEST(scanner_test, test_class) {
-    std::string text = "class";
-    Scanner scanner(text);
-    Token token = scanner.get_next();
-    EXPECT_EQ(cmp_token_value(token, st_CLASS), true);
-}
-
-TEST(scanner_test, test_interface) {
-    std::string text = "interface";
-    Scanner scanner(text);
-    Token token = scanner.get_next();
-    EXPECT_EQ(cmp_token_value(token, st_INTERFACE), true);
-}
-
-TEST(scanner_test, test_if) {
-    std::string text = "if";
-    Scanner scanner(text);
-    Token token = scanner.get_next();
-    EXPECT_EQ(cmp_token_value(token, st_IF), true);
-}
-
-TEST(scanner_test, test_else) {
-    std::string text = "else";
-    Scanner scanner(text);
-    Token token = scanner.get_next();
-    EXPECT_EQ(cmp_token_value(token, st_ELSE), true);
-}
-
-
-TEST(scanner_test, test_var) {
-    std::string text = "var";
-    Scanner scanner(text);
-    Token token = scanner.get_next();
-    EXPECT_EQ(cmp_token_value(token, st_VAR), true);
-}
-
 TEST(scanner_test, test_number) {
     std::string text = "123";
     Scanner scanner(text);
@@ -110,6 +66,15 @@ TEST(scanner_test, test_number) {
 
 TEST(scanner_test, test_all_special) {
     for (auto i: TOKEN_SPECIAL) {
+        std::string text = i.first;
+        Scanner scanner(text);
+        Token token = scanner.get_next();
+        EXPECT_EQ(cmp_token_value(token, Token(i.second, -1, -1)), true);
+    }
+}
+
+TEST(scanner_test, test_all_keywords) {
+    for (auto i: TOKEN_KEYWORDS) {
         std::string text = i.first;
         Scanner scanner(text);
         Token token = scanner.get_next();
@@ -177,9 +142,7 @@ TEST(scanner_test, test_scan_all) {
     }
 }
 
-bool cmp_token_type_value(Token a, Token b) {
-    return a.type == b.type and a.str == b.str and a.num == b.num;
-}
+
 
 TEST(scanner_test, test_line_number) {
     std::string text = "foo";
