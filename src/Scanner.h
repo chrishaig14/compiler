@@ -32,6 +32,7 @@ public:
 class Scanner {
 
     std::string text;
+    int line, column;
 public:
 
     Scanner(const std::string &text);

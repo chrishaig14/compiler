@@ -70,15 +70,23 @@ Scanner::Scanner(const std::string &text) {
     initialize_token_strings();
     this->text = text;
     this->current = 0;
+    this->line = 0;
+    this->column = 0;
 }
 
 Token Scanner::get_next() {
     if (this->current >= this->text.size()) {
-        return Token(TokenType::END, -1, -1);
+        return Token(TokenType::END, this->line, this->column);
     }
     char c = this->text[this->current];
     while (isspace(c)) {
         this->current++;
+        if (c == '\n') {
+            this->line++;
+            this->column = 0;
+        } else {
+            this->column++;
+        }
         c = this->text[this->current];
     }
     if (isalpha(c) || c == '_') {
@@ -93,6 +101,8 @@ Token Scanner::get_next() {
 }
 
 Token Scanner::scan_other() {
+    int start_l = this->line;
+    int start_c = this->column;
     char c = this->text[this->current];
     std::string str;
     str.push_back(c);
@@ -101,24 +111,29 @@ Token Scanner::scan_other() {
         std::string tstr = str;
         tstr.push_back(this->text[p]);
         if (TOKEN_SPECIAL.count(tstr) == 1) {
-            this->current+= 2;
-            return Token(TOKEN_SPECIAL[tstr], -1, -1);
+            this->current += 2;
+            this->column += 2;
+            return Token(TOKEN_SPECIAL[tstr], start_l, start_c);
         }
     }
     if (TOKEN_SPECIAL.count(str) == 1) {
         this->current++;
-        return Token(TOKEN_SPECIAL[str], -1, -1);
+        this->column++;
+        return Token(TOKEN_SPECIAL[str], start_l, start_c);
     }
     throw UnexpectedCharacter(c, this->current);
 }
 
 Token Scanner::scan_keyword_or_identifier() {
+    int start_l = this->line;
+    int start_c = this->column;
     char c = this->text[this->current];
     std::string str;
     while (isalnum(c) or c == '_') {
         str += c;
         this->current++;
         if (this->current < this->text.size()) {
+            this->column++;
             c = this->text[this->current];
         } else {
             break;
@@ -127,26 +142,29 @@ Token Scanner::scan_keyword_or_identifier() {
 
     if (TOKEN_KEYWORDS.count(str) == 1) {
 //      it's a keyword
-        Token token = Token(TOKEN_KEYWORDS[str], -1, -1);
+        Token token = Token(TOKEN_KEYWORDS[str], start_l, start_c);
         return token;
     }
 //  it's an identifier
-    return Token(TokenType::ID, str, -1, -1);
+    return Token(TokenType::ID, str, start_l, start_c);
 }
 
 Token Scanner::scan_number() {
+    int start_l = this->line;
+    int start_c = this->column;
     char c = this->text[this->current];
     std::string str;
     while (isdigit(c)) {
         str += c;
         this->current++;
         if (this->current < this->text.size()) {
+            this->column++;
             c = this->text[this->current];
         } else {
             break;
         }
     }
-    return Token(TokenType::NUM, std::stoi(str), -1, -1);
+    return Token(TokenType::NUM, std::stoi(str), start_l, start_c);
 }
 
 bool UnexpectedCharacter::operator==(const UnexpectedCharacter &other) const {
