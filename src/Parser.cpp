@@ -345,21 +345,19 @@ ClassNode* Parser::parse_class_definition() {
     }
 
     this->expect_token(TokenType::LCURLY);
-    if (!this->match(TokenType::RCURLY)) {
-        while (true) {
-            if (this->match(TokenType::VAR)) {
-                DeclarationNode* field = this->parse_variable_declaration();
-                this->expect_token(TokenType::SEMICOLON);
-                fields.push_back(field);
-            } else if (this->match(TokenType::FUN)) {
-                FunctionNode* method = this->parse_function_definition();
-                methods.push_back(method);
-            } else {
-                break;
-            }
+    while (true) {
+        if (this->match(TokenType::VAR)) {
+            DeclarationNode* field = this->parse_variable_declaration();
+            this->expect_token(TokenType::SEMICOLON);
+            fields.push_back(field);
+        } else if (this->match(TokenType::FUN)) {
+            FunctionNode* method = this->parse_function_definition();
+            methods.push_back(method);
+        } else {
+            break;
         }
-        this->expect_token(TokenType::RCURLY);
     }
+    this->expect_token(TokenType::RCURLY);
     ClassNode* node = new ClassNode(identifier_token.str, template_parameters, inherited, fields, methods);
     return node;
 }
