@@ -135,6 +135,10 @@ AstNode* Parser::parse_factor() {
             break;
         }
         case TokenType::NUM: {
+            ast_node->type=AstType::NUMBER;
+            NumberNode* number_node = new NumberNode(this->token.num);
+            ast_node->ast_number = number_node;
+            this->next();
             break;
         }
         case TokenType::STRING: {
