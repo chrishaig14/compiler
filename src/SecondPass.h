@@ -102,6 +102,30 @@ public:
             case AstType::IDENTIFIER:
                 this->analyze(n->ast_identifier);
                 break;
+            case AstType::IF:
+                this->analyze(n->ast_if);
+                break;
+            case AstType::RETURN:
+                this->analyze(n->ast_return);
+                break;
+            case AstType::LIST:
+                break;
+            case AstType::CLASS:
+                break;
+            case AstType::MEMBER:
+                break;
+            case AstType::ASSIGNMENT:
+                break;
+            case AstType::BINOP:
+                this->analyze(n->ast_binop);
+                break;
+            case AstType::DECLARATION:
+                this->analyze(n->ast_declaration);
+                break;
+            case AstType::TYPE:
+                break;
+            case AstType::NUMBER:
+                break;
         }
     }
 
