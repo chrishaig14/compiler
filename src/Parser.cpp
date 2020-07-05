@@ -180,10 +180,24 @@ AstNode* Parser::parse_add_or_sub_expression() {
     return left;
 }
 
-AstNode* Parser::parse_and_expression() {
+AstNode* Parser::parse_bool_expression() {
     AstNode* left = this->parse_add_or_sub_expression();
-    if (this->match(TokenType::AND)) {
+    if (this->match(TokenType::EQ)) {
+        this->next();
         AstNode* right = this->parse_add_or_sub_expression();
+        AstNode* ast_node = new AstNode;
+        ast_node->type = AstType::BINOP;
+        BinopNode* node = new BinopNode(BinopType::EQ, left, right);
+        ast_node->ast_binop = node;
+        return ast_node;
+    }
+    return left;
+}
+
+AstNode* Parser::parse_and_expression() {
+    AstNode* left = this->parse_bool_expression();
+    if (this->match(TokenType::AND)) {
+        AstNode* right = this->parse_bool_expression();
         AstNode* ast_node = new AstNode;
         ast_node->type = AstType::BINOP;
         BinopNode* node = new BinopNode(BinopType::AND, left, right);
