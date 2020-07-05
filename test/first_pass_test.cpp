@@ -23,9 +23,9 @@ TEST(semantic_test, fun_foo) {
     VectorOfNodes tree = get_tree(text);
     FirstPass fp;
     fp.analyze(tree);
-    GeneralInfo* ginfo = fp.globals["foo"];
+    SymbolInfo* ginfo = fp.globals->get("foo");
     FunctionInfo* finfo = ginfo->function_info;
-    EXPECT_EQ(ginfo->type, GINFO::FUNCTION);
+    EXPECT_EQ(ginfo->type, SINFO::FUNCTION);
 }
 
 TEST(semantic_test, fun_foo_eq) {
@@ -33,8 +33,8 @@ TEST(semantic_test, fun_foo_eq) {
     VectorOfNodes tree = get_tree(text);
     FirstPass fp;
     fp.analyze(tree);
-    GeneralInfo* ginfo = fp.globals["foo"];
-    EXPECT_EQ(ginfo->type, GINFO::FUNCTION);
+    SymbolInfo* ginfo = fp.globals->get("foo");
+    EXPECT_EQ(ginfo->type, SINFO::FUNCTION);
     FunctionInfo* finfo = ginfo->function_info;
     EXPECT_EQ(finfo->parameter_types.size(), 0);
     EXPECT_EQ(finfo->return_type, nullptr);
@@ -45,9 +45,9 @@ TEST(semantic_test, fun_foo_complete) {
     VectorOfNodes tree = get_tree(text);
     FirstPass fp;
     fp.analyze(tree);
-    GeneralInfo* ginfo = fp.globals["foo"];
+    SymbolInfo* ginfo = fp.globals->get("foo");
     FunctionInfo* finfo = ginfo->function_info;
-    EXPECT_EQ(ginfo->type, GINFO::FUNCTION);
+    EXPECT_EQ(ginfo->type, SINFO::FUNCTION);
 
     EXPECT_EQ(finfo->parameter_types.size(), 2);
     SimpleInfo* yinfo = finfo->parameter_types[0];
@@ -66,8 +66,8 @@ TEST(semantic_test, class_foo) {
     VectorOfNodes tree = get_tree(text);
     FirstPass fp;
     fp.analyze(tree);
-    GeneralInfo* ginfo = fp.globals["Foo"];
-    EXPECT_EQ(ginfo->type, GINFO::CLASS);
+    SymbolInfo* ginfo = fp.globals->get("Foo");
+    EXPECT_EQ(ginfo->type, SINFO::CLASS);
 }
 
 TEST(semantic_test, class_foo_eq) {
@@ -75,7 +75,7 @@ TEST(semantic_test, class_foo_eq) {
     VectorOfNodes tree = get_tree(text);
     FirstPass fp;
     fp.analyze(tree);
-    GeneralInfo* ginfo = fp.globals["Foo"];
+    SymbolInfo* ginfo = fp.globals->get("Foo");
     ClassInfo* cinfo = ginfo->class_info;
     EXPECT_EQ(cinfo->methods.size(), 0);
     EXPECT_EQ(cinfo->fields.size(), 0);
@@ -86,7 +86,7 @@ TEST(semantic_test, class_foo_with_field) {
     VectorOfNodes tree = get_tree(text);
     FirstPass fp;
     fp.analyze(tree);
-    GeneralInfo* ginfo = fp.globals["Foo"];
+    SymbolInfo* ginfo = fp.globals->get("Foo");
     ClassInfo* cinfo = ginfo->class_info;
     EXPECT_EQ(cinfo->methods.size(), 0);
     EXPECT_EQ(cinfo->fields.size(), 1);
@@ -100,7 +100,7 @@ TEST(semantic_test, class_foo_with_method) {
     VectorOfNodes tree = get_tree(text);
     FirstPass fp;
     fp.analyze(tree);
-    GeneralInfo* ginfo = fp.globals["Foo"];
+    SymbolInfo* ginfo = fp.globals->get("Foo");
     ClassInfo* cinfo = ginfo->class_info;
     EXPECT_EQ(cinfo->methods.size(), 1);
     EXPECT_EQ(cinfo->fields.size(), 0);
