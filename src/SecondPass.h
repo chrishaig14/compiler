@@ -8,44 +8,30 @@
 #include <map>
 #include "FirstPass.h"
 
-class Scope {
-    Scope* parent;
-    std::map<std::string, GeneralInfo*> table;
+
+
+
+class ScopeError : public std::runtime_error {
 public:
-    Scope(Scope* parent) {
-        this->parent = parent;
+    ScopeError(std::string name) : runtime_error("Name " + name + "not found in current scope") {
     }
-
-    Scope* enter_scope() {
-        Scope* child_scope = new Scope(this);
-        return child_scope;
-    };
-
-    Scope* leave_scope() {
-        return this->parent;
-    }
-
-    GeneralInfo* get(std::string name) {
-        if (this->table.count(name) == 1) {
-            return this->table[name];
-        } else {
-            if (this->parent != NULL) {
-                return this->parent->get(name);
-            }
-            return NULL;
-        }
-    }
-
-    void set(std::string name, GeneralInfo* info) {
-        this->table[name] = info;
+    bool operator==(const ScopeError& other) const{
+        std::cout << "COMPARING ERRORS" << std::endl;
+        std::string a=this->what();
+        std::string b=other.what();
+        bool t = a==b;
+        return t;
     }
 };
 
-class ScopeError{
-    std::string msg;
+class RedeclareError : public std::runtime_error {
 public:
-    ScopeError(std::string name){
-        this->msg = "Name " + name + "not found in current scope";
+    RedeclareError(std::string name) : runtime_error("Name " + name + "already declared in current scope") {
+    }
+    bool operator==(const RedeclareError& other) const{
+        std::string a=this->what();
+        std::string b=other.what();
+        return a==b;
     }
 };
 
