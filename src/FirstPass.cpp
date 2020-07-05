@@ -12,17 +12,17 @@ void FirstPass::analyze(ClassNode* node) {
     for (auto m: node->methods) {
         c->methods[m->name] = new FunctionInfo(m->parameter_types, m->return_type);
     }
-    GeneralInfo* ginfo = new GeneralInfo;
-    ginfo->type = GINFO::CLASS;
-    ginfo->class_info = c;
-    this->globals[node->name] = ginfo;
+    SymbolInfo* symbol_info = new SymbolInfo;
+    symbol_info->type = SINFO::CLASS;
+    symbol_info->class_info = c;
+    this->globals->set(node->name, symbol_info);
 }
 
 void FirstPass::analyze(FunctionNode* node) {
-    GeneralInfo* ginfo = new GeneralInfo;
-    ginfo->type = GINFO::FUNCTION;
+    SymbolInfo* ginfo = new SymbolInfo;
+    ginfo->type = SINFO::FUNCTION;
     ginfo->function_info = new FunctionInfo(node->parameter_types, node->return_type);
-    this->globals[node->name] = ginfo;
+    this->globals->set(node->name, ginfo);
 }
 
 void FirstPass::analyze(VectorOfNodes program) {
