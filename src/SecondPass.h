@@ -71,6 +71,28 @@ public:
         }
     }
 
+    void analyze(DeclarationNode* n) {
+        if (this->scope->declared(n->identifier)) {
+            throw RedeclareError(n->identifier);
+        }
+        this->scope->set(n->identifier, NULL);
+    }
+
+    void analyze(IfNode* n) {
+        this->analyze(n->condition);
+        this->enter_scope("if");
+        this->analyze(n->then);
+        this->leave_scope();
+    }
+
+    void analyze(BinopNode* n) {
+        this->analyze(n->left);
+        this->analyze(n->right);
+    }
+
+    void analyze(ReturnNode* n) {
+        this->analyze(n->expression);
+    }
 
     void analyze(AstNode* n) {
         switch (n->type) {
@@ -88,6 +110,8 @@ public:
             this->analyze(n);
         }
     }
+
+    std::map<std::string, SymbolTable*> scopes;
 };
 
 #endif //UNTITLED1_SECONDPASS_H
