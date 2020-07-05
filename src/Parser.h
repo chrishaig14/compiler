@@ -40,10 +40,12 @@ public:
 
     AstNode* parse_top_level_statement();
 
-    /*
-     * Matches the expected token type to the current token. If it doesn't match, throws an UnexpectedToken exception.
-     * If it matches, advances the current token, and returns the matched token.
-     */
+    AstNode* parse_bool_expression();
+
+        /*
+         * Matches the expected token type to the current token. If it doesn't match, throws an UnexpectedToken exception.
+         * If it matches, advances the current token, and returns the matched token.
+         */
     Token expect_token(TokenType token);
 
     FunctionNode* parse_function_definition();
