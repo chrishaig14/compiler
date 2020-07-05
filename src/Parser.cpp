@@ -272,9 +272,18 @@ AstNode* Parser::parse_common_statement() {
     if (this->match(TokenType::VAR)) {
         ast_node->type = AstType::DECLARATION;
         ast_node->ast_declaration = this->parse_variable_declaration();
+        this->expect_token(TokenType::SEMICOLON);
         return ast_node;
     }
-    return this->parse_assignment_or_expression();
+    if(this->match(TokenType::RETURN)){
+        ast_node->type=AstType::RETURN;
+        ast_node->ast_return = this->parse_return();
+        this->expect_token(TokenType::SEMICOLON);
+        return ast_node;
+    }
+    AstNode* node =this->parse_assignment_or_expression();
+    this->expect_token(TokenType::SEMICOLON);
+    return node;
 }
 
 AstNode* Parser::parse_interface_definition() {
@@ -389,7 +398,6 @@ VectorOfNodes Parser::parse_possibly_empty_block() {
         }
         AstNode* statement = this->parse_common_statement();
         block.push_back(statement);
-        this->expect_token(TokenType::SEMICOLON);
     }
     return block;
 }
