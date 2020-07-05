@@ -26,6 +26,7 @@ void initialize_tokens() {
     TOKEN_KEYWORDS["for"] = TokenType::FOR;
     TOKEN_KEYWORDS["interface"] = TokenType::INTERFACE;
     TOKEN_KEYWORDS["var"] = TokenType::VAR;
+    TOKEN_KEYWORDS["return"] = TokenType::RETURN;
 
 
     TOKEN_SPECIAL[";"] = TokenType::SEMICOLON;
