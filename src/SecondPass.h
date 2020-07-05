@@ -36,24 +36,37 @@ public:
 };
 
 class SecondPass {
-    Scope* scope;
+    SymbolTable* scope;
 public:
-    SecondPass(std::map<std::string, GeneralInfo*> globals) {
-        this->scope = new Scope(NULL);
-        for (auto it: globals) {
-            this->scope->set(it.first, it.second);
-        }
+    SecondPass(SymbolTable* globals) {
+        this->scope = globals;
+        this->scopes["global"] = this->scope;
+    }
+
+    void enter_scope(std::string name) {
+        std::string new_scope_name = this->scope->name + "." + name;
+        this->scope = new SymbolTable(new_scope_name, this->scope);
+        this->scopes[new_scope_name] = this->scope;
+    }
+
+    void leave_scope() {
+        this->scope = this->scope->parent;
     }
 
     void analyze(FunctionNode* n) {
-        this->scope = this->scope->enter_scope();
+        this->enter_scope(n->name);
+        for (int i = 0; i < n->parameter_names.size(); i++) {
+            SymbolInfo* sinfo = new SymbolInfo();
+            sinfo->type = SINFO::SIMPLE;
+            sinfo->simple_info = new SimpleInfo(n->parameter_types[i]);
+            this->scope->set(n->parameter_names[i], sinfo);
+        }
         this->analyze(n->body);
-        this->scope->leave_scope();
+        this->leave_scope();
     }
 
-
     void analyze(IdentifierNode* n) {
-        if (this->scope->get(n->name) == NULL) {
+        if (!this->scope->has(n->name)) {
             throw ScopeError(n->name);
         }
     }
