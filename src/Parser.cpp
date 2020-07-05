@@ -15,8 +15,7 @@ VectorOfNodes Parser::parse_program() {
 ReturnNode* Parser::parse_return() {
     this->expect_token(TokenType::RETURN);
     AstNode* expression = this->parse_expression();
-    ReturnNode* node;
-    node->expression = expression;
+    ReturnNode* node = new ReturnNode(expression);
     return node;
 }
 
