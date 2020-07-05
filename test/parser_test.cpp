@@ -77,6 +77,16 @@ TEST(parser_test, binop_a_plus_b) {
     EXPECT_EQ(equal(node, expected_node), true);
 }
 
+TEST(parser_test, binop_a_eq_b) {
+    std::string text = "a==b";
+    Scanner scanner(text);
+    std::vector<Token> tokens = scanner.scan_all();
+    Parser parser(tokens);
+    AstNode* node = parser.parse_expression();
+    AstNode* expected_node = w_bop(BinopType::EQ,w_id("a"),w_id("b"));
+    EXPECT_EQ(equal(node, expected_node), true);
+}
+
 TEST(parser_test, exp_identifier) {
     std::string text = "foo";
     Scanner scanner(text);
