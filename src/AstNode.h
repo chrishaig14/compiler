@@ -10,11 +10,11 @@
 
 
 enum class BinopType {
-    AND, OR, PLUS, MINUS, TIMES, DIV
+    AND, OR, PLUS, MINUS, TIMES, DIV, EQ
 };
 
 enum class AstType {
-    RETURN, LIST, CLASS, IF, FUNCTION, MEMBER, ASSIGNMENT, BINOP, IDENTIFIER, DECLARATION, TYPE
+    RETURN, LIST, CLASS, IF, FUNCTION, MEMBER, ASSIGNMENT, BINOP, IDENTIFIER, DECLARATION, TYPE, NUMBER
 };
 
 std::string ast_string(AstType type);
@@ -24,6 +24,8 @@ class ReturnNode;
 class FunctionNode;
 
 class ClassNode;
+
+class NumberNode;
 
 class IfNode;
 
@@ -56,6 +58,7 @@ public:
         MemberNode* ast_member;
         DeclarationNode* ast_declaration;
         TypeNode* ast_type;
+        NumberNode* ast_number;
     };
     AstType type;
 };
@@ -120,6 +123,15 @@ public:
     IfNode(AstNode* condition, VectorOfNodes then) {
         this->condition = condition;
         this->then = then;
+    }
+};
+
+class NumberNode {
+public:
+    int num;
+
+    NumberNode(int num) {
+        this->num = num;
     }
 };
 
