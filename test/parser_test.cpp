@@ -15,12 +15,7 @@ typedef std::vector<TypeNode*> VectorOfTypes;
 typedef std::vector<std::string> VectorOfStrings;
 typedef std::vector<AstNode*> VectorOfNodes;
 
-AstNode* w_id(std::string name) {
-    AstNode* ast_node = new AstNode;
-    ast_node->type = AstType::IDENTIFIER;
-    ast_node->ast_identifier = new IdentifierNode(name);
-    return ast_node;
-}
+
 
 AstNode* w_asn(AstNode* lvalue, AstNode* rvalue) {
     AstNode* ast_node = new AstNode;
@@ -57,6 +52,9 @@ AstNode* w_bop(BinopType op, AstNode* left, AstNode* right) {
     return ast_node;
 }
 
+
+
+
 AstNode* n_a_plus_b = w_bop(BinopType::PLUS, w_id("a"), w_id("b"));
 
 DeclarationNode* n_decl_x = new DeclarationNode("x", NULL, NULL);
@@ -81,7 +79,7 @@ TEST(parser_test, binop_a_eq_b) {
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
     AstNode* node = parser.parse_expression();
-    AstNode* expected_node = w_bop(BinopType::EQ,w_id("a"),w_id("b"));
+    AstNode* expected_node = w_bop(BinopType::EQ, w_id("a"), w_id("b"));
     EXPECT_EQ(equal(node, expected_node), true);
 }
 
@@ -271,7 +269,7 @@ TEST(parser_test, class_foo_empty) {
     Parser parser(tokens);
     ClassNode* node = parser.parse_class_definition();
     EXPECT_EQ(
-            equal(node, i_class("Foo", {}, {}, {})),true);
+            equal(node, i_class("Foo", {}, {}, {})), true);
 }
 
 TEST(parser_test, class_foo_with_fields) {
@@ -282,7 +280,7 @@ TEST(parser_test, class_foo_with_fields) {
     ClassNode* node = parser.parse_class_definition();
     EXPECT_EQ(
             equal(node, i_class("Foo", {}, {i_decl_type("x", t_string(), NULL),
-                                                i_decl_type("y", t_integer(), NULL)}, {})),
+                                            i_decl_type("y", t_integer(), NULL)}, {})),
             true);
 }
 
@@ -299,7 +297,7 @@ TEST(parser_test, class_foo_with_method) {
 
 std::string complete_foo_class_string = "class Foo{var x: String; var y: Integer;" + fun_foo_string + "}";
 ClassNode* complete_foo_class_node = i_class("Foo", {}, {i_decl_type("x", t_string(), NULL),
-                                                             i_decl_type("y", t_integer(), NULL)},
+                                                         i_decl_type("y", t_integer(), NULL)},
                                              {fun_foo_node});
 
 TEST(parser_test, template_class_foo_empty) {
@@ -321,5 +319,53 @@ TEST(parser_test, class_foo_with_fields_and_method) {
     ClassNode* node = parser.parse_class_definition();
     EXPECT_EQ(
             equal(node, complete_foo_class_node),
+            true);
+}
+
+TEST(parser_test, simple_member) {
+    std::string text = "a.b";
+    Scanner scanner(text);
+    std::vector<Token> tokens = scanner.scan_all();
+    Parser parser(tokens);
+    AstNode* node = parser.parse_expression();
+    AstNode* member_node = w_member(w_id("a"), "b");
+    EXPECT_EQ(
+            equal(node, member_node),
+            true);
+}
+
+TEST(parser_test, simple_id) {
+    std::string text = "a";
+    Scanner scanner(text);
+    std::vector<Token> tokens = scanner.scan_all();
+    Parser parser(tokens);
+    AstNode* node = parser.parse_expression();
+    AstNode* expected_node = w_id("a");
+    EXPECT_EQ(
+            equal(node, expected_node),
+            true);
+}
+
+TEST(parser_test, simple_call) {
+    std::string text = "a()";
+    Scanner scanner(text);
+    std::vector<Token> tokens = scanner.scan_all();
+    Parser parser(tokens);
+    AstNode* node = parser.parse_expression();
+    AstNode* expected_node = w_call(w_id("a"), {});
+    EXPECT_EQ(
+            equal(node, expected_node),
+            true);
+}
+
+TEST(parser_test, simple_subscript) {
+    std::string text = "a[1]";
+    Scanner scanner(text);
+    std::vector<Token> tokens = scanner.scan_all();
+    Parser parser(tokens);
+    AstNode* node = parser.parse_expression();
+    AstNode* expected_node = w_sub(w_id("a"), w_num(1));
+    EXPECT_EQ(
+            equal(node, expected_node),
             true);
 }
