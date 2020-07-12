@@ -250,7 +250,7 @@ TEST(parser_test, function_with_params_and_body) {
             true);
 }
 
-std::string fun_foo_string = "fun foo(x:String[List[Integer]]):List[Integer]{" + body_1_string + "}";
+std::string fun_foo_string = "fun foo(x:String[List[Integer]])->List[Integer]{" + body_1_string + "}";
 FunctionNode* fun_foo_node = i_fun("foo", {"x"}, {n_complex_type_1}, i_type("List", {t_integer()}),
                                    body_1_node);
 TEST(parser_test, function_with_params_return_type_and_body) {

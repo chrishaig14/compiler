@@ -417,7 +417,7 @@ FunctionNode* Parser::parse_function_definition() {
     }
     // Parse return
     TypeNode* return_type = NULL;
-    if (this->match(TokenType::COLON)) {
+    if (this->match(TokenType::RARROW)) {
         this->next();
         return_type = this->parse_type_node();
     }

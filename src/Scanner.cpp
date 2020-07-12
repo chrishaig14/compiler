@@ -61,7 +61,7 @@ void initialize_tokens() {
     TOKEN_SPECIAL["!"] = TokenType::NOT;
     TOKEN_SPECIAL["&&"] = TokenType::AND;
     TOKEN_SPECIAL["||"] = TokenType::OR;
-    TOKEN_SPECIAL["=>"] = TokenType::RARROW;
+    TOKEN_SPECIAL["->"] = TokenType::RARROW;
     TOKEN_SPECIAL["++"] = TokenType::INC;
     TOKEN_SPECIAL["--"] = TokenType::DEC;
 }
