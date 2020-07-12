@@ -31,6 +31,26 @@ IfNode* Parser::parse_if() {
     return node;
 }
 
+
+ListNode* Parser::parse_list_literal() {
+    this->expect_token(TokenType::LSQUARE);
+    VectorOfNodes elements;
+    if (this->match(TokenType::RSQUARE)) {
+        // empty list
+        this->next();
+    } else {
+        while (true) {
+            AstNode* element = this->parse_expression();
+            if (!this->match(TokenType::COMMA)) { break; }
+            elements.push_back(element);
+        }
+        this->expect_token(TokenType::RSQUARE);
+    }
+    ListNode* node;
+    node->elements = elements;
+    return node;
+}
+
 CallNode* Parser::parse_call() {
     AstNode* function = this->parse_expression();
     this->expect_token(TokenType::LPAREN);
@@ -53,31 +73,47 @@ CallNode* Parser::parse_call() {
     return node;
 }
 
-ListNode* Parser::parse_list_literal() {
-    this->expect_token(TokenType::LSQUARE);
-    VectorOfNodes elements;
-    if (this->match(TokenType::RSQUARE)) {
-        // empty list
-        this->next();
-    } else {
-        while (true) {
-            AstNode* element = this->parse_expression();
-            if (!this->match(TokenType::COMMA)) { break; }
-            elements.push_back(element);
+VectorOfNodes Parser::parse_list_of_expressions() {
+    VectorOfNodes result;
+    while (true) {
+        result.push_back(this->parse_expression());
+        if (this->match(TokenType::COMMA)) {
+            this->next();
+        } else {
+            break;
         }
-        this->expect_token(TokenType::RSQUARE);
     }
-    ListNode* node;
-    node->elements = elements;
+    return result;
+}
+
+AstNode* Parser::parse_id_call_or_subscript() {
+    Token token = this->expect_token(TokenType::ID);
+    AstNode* node = new AstNode;
+    if (this->match(TokenType::LPAREN)) {
+        this->next();
+        VectorOfNodes arguments = this->parse_list_of_expressions();
+        this->expect_token(TokenType::RPAREN);
+        CallNode* call_node = new CallNode(w_id(token.str), arguments);
+        node->type = AstType::CALL;
+        node->ast_call = call_node;
+    } else if (this->match(TokenType::LSQUARE)) {
+        this->next();
+        AstNode* value = this->parse_expression();
+        this->expect_token(TokenType::RSQUARE);
+        node->type = AstType::SUB;
+        node->ast_sub = new SubscriptNode(w_id(token.str), value);
+    }
     return node;
 }
 
-MemberNode* Parser::parse_member() {
-    MemberNode* node;
-    node->parent = this->parse_expression();
-    this->expect_token(TokenType::DOT);
-    Token child = this->expect_token(TokenType::ID);
-    node->child = child.str;
+AstNode* Parser::parse_member_or_other() {
+    AstNode* node = new AstNode;
+    AstNode* parent = this->parse_expression();
+    while (this->match(TokenType::DOT)) {
+        this->next();
+        Token child = this->expect_token(TokenType::ID);
+//        node->child = child.str;
+    }
     return node;
 }
 
@@ -116,27 +152,22 @@ AstNode* Parser::parse_function_expression() {
     return NULL;
 }
 
-AstNode* Parser::parse_factor() {
-    AstNode* ast_node = new AstNode;
+AstNode* Parser::parse_id_or_literal() {
+    AstNode* node;
     switch (this->token.type) {
         case TokenType::LPAREN: {
             this->next();
-            AstNode* expression = this->parse_expression();
-            this->next();
-            return expression;
+            node = this->parse_expression();
+            this->expect_token(TokenType::RPAREN);
+            break;
         }
         case TokenType::ID: {
-            std::cout << "Its an identifier " << std::endl;
-            ast_node->type = AstType::IDENTIFIER;
-            IdentifierNode* node = new IdentifierNode(this->token.str);
-            ast_node->ast_identifier = node;
+            node = w_id(this->token.str);
             this->next();
             break;
         }
         case TokenType::NUM: {
-            ast_node->type=AstType::NUMBER;
-            NumberNode* number_node = new NumberNode(this->token.num);
-            ast_node->ast_number = number_node;
+            node = w_num(this->token.num);
             this->next();
             break;
         }
@@ -147,7 +178,45 @@ AstNode* Parser::parse_factor() {
             return this->parse_function_expression();
         }
     }
-    return ast_node;
+    return node;
+}
+
+AstNode* Parser::parse_call_or_subscript_chain(AstNode* parent) {
+    AstNode* node = parent;
+    while (this->match(TokenType::LPAREN) or this->match(TokenType::LSQUARE)) {
+        if (this->match(TokenType::LPAREN)) {
+//                 function call
+            this->next();
+            VectorOfNodes arguments;
+            if (!this->match(TokenType::RPAREN)) {
+                arguments = this->parse_list_of_expressions();
+            }
+            node = w_call(node, arguments);
+            this->expect_token(TokenType::RPAREN);
+        } else if (this->match(TokenType::LSQUARE)) {
+//                subscript
+            this->next();
+            if(this->match(TokenType::RSQUARE)){
+                throw std::runtime_error("Empty subscript error!");
+            }
+            AstNode* value = this->parse_expression();
+            node = w_sub(node, value);
+            this->expect_token(TokenType::RSQUARE);
+        }
+    }
+    return node;
+}
+
+AstNode* Parser::parse_factor() {
+    AstNode* parent = this->parse_id_or_literal();
+    parent = this->parse_call_or_subscript_chain(parent);
+    while (this->match(TokenType::DOT)) {
+        this->next();
+        Token id = this->expect_token(TokenType::ID);
+        parent = w_member(parent, id.str);
+        parent = this->parse_call_or_subscript_chain(parent);
+    }
+    return parent;
 }
 
 AstNode* Parser::parse_mul_or_div_expression() {
@@ -276,13 +345,13 @@ AstNode* Parser::parse_common_statement() {
         this->expect_token(TokenType::SEMICOLON);
         return ast_node;
     }
-    if(this->match(TokenType::RETURN)){
-        ast_node->type=AstType::RETURN;
+    if (this->match(TokenType::RETURN)) {
+        ast_node->type = AstType::RETURN;
         ast_node->ast_return = this->parse_return();
         this->expect_token(TokenType::SEMICOLON);
         return ast_node;
     }
-    AstNode* node =this->parse_assignment_or_expression();
+    AstNode* node = this->parse_assignment_or_expression();
     this->expect_token(TokenType::SEMICOLON);
     return node;
 }
@@ -493,12 +562,13 @@ Parser::Parser(std::vector<Token> &tokens) {
     this->current = 0;
 }
 
-UnexpectedToken::UnexpectedToken(Token token, const std::vector<TokenType> &expected_tokens):std::runtime_error(this->make_message(token, expected_tokens)) {
+UnexpectedToken::UnexpectedToken(Token token, const std::vector<TokenType> &expected_tokens) : std::runtime_error(
+        this->make_message(token, expected_tokens)) {
     this->token = token;
     this->expected_tokens = expected_tokens;
 }
 
-std::string UnexpectedToken::make_message(Token token, const std::vector<TokenType> &expected_tokens){
+std::string UnexpectedToken::make_message(Token token, const std::vector<TokenType> &expected_tokens) {
     std::string message;
     std::string expected_strings;
     for (int i = 0; i < expected_tokens.size() - 1; i++) {
@@ -506,7 +576,7 @@ std::string UnexpectedToken::make_message(Token token, const std::vector<TokenTy
     }
     expected_strings +=
             " or " + TOKEN_STRINGS[expected_tokens[expected_tokens.size() - 1]];
-    message =  "UnexpectedToken: got " + TOKEN_STRINGS[token.type] + ", expected " + expected_strings;
+    message = "UnexpectedToken: got " + TOKEN_STRINGS[token.type] + ", expected " + expected_strings;
     return message;
 }
 
@@ -520,4 +590,39 @@ std::ostream &operator<<(std::ostream &os, const UnexpectedToken &unexpected_tok
     os << "UnexpectedToken: got " << TOKEN_STRINGS[unexpected_token.token.type] << ", expected "
        << expected_strings;
     return os;
+}
+
+AstNode* w_id(std::string name) {
+    AstNode* ast_node = new AstNode;
+    ast_node->type = AstType::IDENTIFIER;
+    ast_node->ast_identifier = new IdentifierNode(name);
+    return ast_node;
+}
+
+AstNode* w_num(int value) {
+    AstNode* ast_node = new AstNode;
+    ast_node->type = AstType::NUMBER;
+    ast_node->ast_number = new NumberNode(value);
+    return ast_node;
+}
+
+AstNode* w_call(AstNode* parent, VectorOfNodes arguments) {
+    AstNode* ast_node = new AstNode;
+    ast_node->type = AstType::CALL;
+    ast_node->ast_call = new CallNode(parent, arguments);
+    return ast_node;
+}
+
+AstNode* w_sub(AstNode* parent, AstNode* sub) {
+    AstNode* ast_node = new AstNode;
+    ast_node->type = AstType::SUB;
+    ast_node->ast_sub = new SubscriptNode(parent, sub);
+    return ast_node;
+}
+
+AstNode* w_member(AstNode* parent, std::string child) {
+    AstNode* ast_node = new AstNode;
+    ast_node->type = AstType::MEMBER;
+    ast_node->ast_member = new MemberNode(parent, child);
+    return ast_node;
 }

@@ -15,15 +15,26 @@ typedef std::vector<TypeNode*> VectorOfTypes;
 typedef std::vector<std::string> VectorOfStrings;
 typedef std::vector<AstNode*> VectorOfNodes;
 
-class UnexpectedToken: public std::runtime_error{
+class UnexpectedToken : public std::runtime_error {
     Token token;
     std::vector<TokenType> expected_tokens;
 public:
     UnexpectedToken(Token token, const std::vector<TokenType> &expected_tokens);
+
     std::string make_message(Token token, const std::vector<TokenType> &expected_tokens);
+
     friend std::ostream &operator<<(std::ostream &os, const UnexpectedToken &unexpected_token);
 };
 
+AstNode* w_id(std::string name);
+
+AstNode* w_call(AstNode* parent, VectorOfNodes arguments);
+
+AstNode* w_num(int value);
+
+AstNode* w_sub(AstNode* parent, AstNode* sub);
+
+AstNode* w_member(AstNode* parent, std::string child);
 
 class Parser {
     std::vector<Token> tokens;
@@ -31,6 +42,10 @@ class Parser {
     size_t current;
 public:
     Parser(std::vector<Token> &tokens);
+    AstNode* parse_id_or_literal();
+    VectorOfNodes parse_list_of_expressions();
+
+    AstNode* parse_call_or_subscript_chain(AstNode* parent);
 
     void expect_one_of(std::vector<TokenType> expected_tokens);
 
@@ -66,6 +81,8 @@ public:
 
     AstNode* parse_and_expression();
 
+    AstNode* parse_id_call_or_subscript();
+
     AstNode* parse_add_or_sub_expression();
 
     AstNode* parse_mul_or_div_expression();
@@ -76,7 +93,7 @@ public:
 
     FunctionSignatureNode* parse_function_signature();
 
-    MemberNode* parse_member();
+    AstNode* parse_member_or_other();
 
     ListNode* parse_list_literal();
 
