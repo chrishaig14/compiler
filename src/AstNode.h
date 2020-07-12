@@ -14,7 +14,7 @@ enum class BinopType {
 };
 
 enum class AstType {
-    RETURN, LIST, CLASS, IF, FUNCTION, MEMBER, ASSIGNMENT, BINOP, IDENTIFIER, DECLARATION, TYPE, NUMBER
+    RETURN, LIST, CLASS, IF, FUNCTION, MEMBER, ASSIGNMENT, BINOP, IDENTIFIER, DECLARATION, TYPE, NUMBER, CALL, SUB
 };
 
 std::string ast_string(AstType type);
@@ -43,6 +43,9 @@ class MemberNode;
 
 class TypeNode;
 
+class CallNode;
+
+class SubscriptNode;
 
 class AstNode {
 public:
@@ -59,6 +62,8 @@ public:
         DeclarationNode* ast_declaration;
         TypeNode* ast_type;
         NumberNode* ast_number;
+        CallNode* ast_call;
+        SubscriptNode* ast_sub;
     };
     AstType type;
 };
@@ -73,9 +78,15 @@ bool equal(TypeNode* a, TypeNode* b);
 
 bool compare(AssignmentNode* a, AssignmentNode* b);
 
+bool equal(NumberNode* a, NumberNode* b);
+
 bool compare(ReturnNode* a, ReturnNode* b);
 
 bool equal(ClassNode* a, ClassNode* b);
+
+bool equal(CallNode* a, CallNode* b);
+
+bool equal(SubscriptNode* a, SubscriptNode* b);
 
 bool equal(FunctionNode* a, FunctionNode* b);
 
@@ -147,6 +158,19 @@ public:
 };
 
 //CallNode* mk_call(AstNode* function, )
+
+
+
+class SubscriptNode {
+public:
+    AstNode* parent;
+    AstNode* sub;
+
+    SubscriptNode(AstNode* parent, AstNode* sub) {
+        this->parent = parent;
+        this->sub = sub;
+    }
+};
 
 
 class BinopNode {
@@ -256,6 +280,11 @@ class MemberNode {
 public:
     AstNode* parent;
     std::string child;
+
+    MemberNode(AstNode* parent, std::string child) {
+        this->parent = parent;
+        this->child = child;
+    }
 };
 
 

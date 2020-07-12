@@ -55,6 +55,9 @@ bool compare(VectorOfTypes a, VectorOfTypes b) {
     }
     return true;
 }
+bool equal(NumberNode* a, NumberNode* b) {
+    return a->num==b->num;
+}
 
 bool equal(TypeNode* a, TypeNode* b) {
     if (a == NULL and b == NULL) {
@@ -79,7 +82,6 @@ std::string ast_string(AstType type) {
     switch (type) {
         case AstType::RETURN:
             return "RETURN";
-            break;
         case AstType::LIST:
             return "LIST";
         case AstType::CLASS:
@@ -100,8 +102,14 @@ std::string ast_string(AstType type) {
             return "DECLARATION";
         case AstType::TYPE:
             return "TYPE";
+        case AstType::NUMBER:
+            return "NUMBER";
+        case AstType::CALL:
+            return "CALL";
+        case AstType::SUB:
+            return "SUBSCRIPT";
         default:
-            throw "Unknown AstType";
+            throw std::runtime_error("Unknown AstType in ast_string");
     }
 }
 
@@ -115,12 +123,14 @@ bool compare(ListNode* a, ListNode* b) {
     }
     return true;
 }
+
 bool equal(DeclarationNode* a, DeclarationNode* b) {
     if (a == NULL and b == NULL) {
         return true;
     }
     return (a->identifier == b->identifier) and equal(a->type, b->type) and equal(a->expression, b->expression);
 }
+
 bool compare(IdentifierNode* a, IdentifierNode* b) {
     if (a == NULL and b == NULL) {
         return true;
@@ -128,6 +138,15 @@ bool compare(IdentifierNode* a, IdentifierNode* b) {
     std::cout << "Comparing identifier " << a->name << " and " << b->name << std::endl;
     return a->name == b->name;
 }
+
+bool equal(CallNode* a, CallNode* b) {
+    return equal(a->function, b->function) && equal(a->arguments, b->arguments);
+}
+
+bool equal(SubscriptNode* a, SubscriptNode* b) {
+    return equal(a->parent, b->parent) && equal(a->sub, b->sub);
+}
+
 
 bool compare(BinopNode* a, BinopNode* b) {
     if (a == NULL and b == NULL) {
@@ -159,6 +178,7 @@ bool equal(IfNode* a, IfNode* b) {
     for (int i = 0; i < a->then.size(); i++) { if (not equal(a->then[i], b->then[i])) return false; }
     return true;
 }
+
 bool equal(FunctionNode* a, FunctionNode* b) {
     if (a == NULL and b == NULL) {
         return true;
@@ -196,6 +216,7 @@ bool equal(ClassNode* a, ClassNode* b) {
 
     return true;
 }
+
 bool compare(ReturnNode* a, ReturnNode* b) {
     if (a == NULL and b == NULL) {
         return true;
@@ -215,7 +236,7 @@ bool equal(AstNode* a, AstNode* b) {
     if (a == NULL and b == NULL) {
         return true;
     }
-    std::cout << "comparison between a type is " << ast_string(a->type);
+    std::cout << "comparison between a type is " << ast_string(a->type) << " -- ";
     std::cout << "and b type is " << ast_string(b->type) << std::endl;
 
     if (a->type != b->type) {
@@ -242,6 +263,19 @@ bool equal(AstNode* a, AstNode* b) {
             return compare(a->ast_identifier, b->ast_identifier);
         case AstType::DECLARATION:
             return equal(a->ast_declaration, b->ast_declaration);
+        case AstType::CALL:
+            return equal(a->ast_call, b->ast_call);
+        default:
+            throw std::runtime_error("Unknown AstType in equal: " + ast_string(a->type));
+//        case AstType::TYPE:
+//            break;
+        case AstType::NUMBER:
+            return equal(a->ast_number, a->ast_number);
+
+        case AstType::SUB:
+            return equal(a->ast_sub, b->ast_sub);
+
+            break;
     }
     return false;
 }
