@@ -77,7 +77,6 @@ bool compare(MemberNode* a, MemberNode* b) {
 
 std::string ast_string(AstType type) {
     switch (type) {
-
         case AstType::RETURN:
             return "RETURN";
             break;
@@ -101,6 +100,8 @@ std::string ast_string(AstType type) {
             return "DECLARATION";
         case AstType::TYPE:
             return "TYPE";
+        default:
+            throw "Unknown AstType";
     }
 }
 

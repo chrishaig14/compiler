@@ -77,6 +77,7 @@ public:
                 return this->parent->get(name);
             }
         }
+        throw "Symbol" + name + "not found in scope";
     }
 
     bool declared(std::string name) {

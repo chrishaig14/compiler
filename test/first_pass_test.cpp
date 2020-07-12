@@ -3,11 +3,11 @@
 #include <Parser.h>
 #include <FirstPass.h>
 
-bool eq_si(SimpleInfo* t1, SimpleInfo* t2) {
+void assert_eq_si(SimpleInfo* t1, SimpleInfo* t2) {
     EXPECT_EQ(t1->parent, t2->parent);
     EXPECT_EQ(t1->type_parameters.size(), t2->type_parameters.size());
     for (int i = 0; i < t1->type_parameters.size(); i++) {
-        EXPECT_EQ(eq_si(t1->type_parameters[i], t2->type_parameters[i]), true);
+        assert_eq_si(t1->type_parameters[i], t2->type_parameters[i]);
     }
 }
 
