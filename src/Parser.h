@@ -15,12 +15,12 @@ typedef std::vector<TypeNode*> VectorOfTypes;
 typedef std::vector<std::string> VectorOfStrings;
 typedef std::vector<AstNode*> VectorOfNodes;
 
-class UnexpectedToken {
+class UnexpectedToken: public std::runtime_error{
     Token token;
     std::vector<TokenType> expected_tokens;
 public:
     UnexpectedToken(Token token, const std::vector<TokenType> &expected_tokens);
-
+    std::string make_message(Token token, const std::vector<TokenType> &expected_tokens);
     friend std::ostream &operator<<(std::ostream &os, const UnexpectedToken &unexpected_token);
 };
 

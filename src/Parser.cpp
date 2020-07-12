@@ -260,6 +260,7 @@ DeclarationNode* Parser::parse_variable_declaration() {
         DeclarationNode* node = new DeclarationNode(identifier.str, type, expression);
         return node;
     }
+    return NULL;
 }
 
 AstNode* Parser::parse_common_statement() {
@@ -492,9 +493,21 @@ Parser::Parser(std::vector<Token> &tokens) {
     this->current = 0;
 }
 
-UnexpectedToken::UnexpectedToken(Token token, const std::vector<TokenType> &expected_tokens) {
+UnexpectedToken::UnexpectedToken(Token token, const std::vector<TokenType> &expected_tokens):std::runtime_error(this->make_message(token, expected_tokens)) {
     this->token = token;
     this->expected_tokens = expected_tokens;
+}
+
+std::string UnexpectedToken::make_message(Token token, const std::vector<TokenType> &expected_tokens){
+    std::string message;
+    std::string expected_strings;
+    for (int i = 0; i < expected_tokens.size() - 1; i++) {
+        expected_strings += TOKEN_STRINGS[expected_tokens[i]];
+    }
+    expected_strings +=
+            " or " + TOKEN_STRINGS[expected_tokens[expected_tokens.size() - 1]];
+    message =  "UnexpectedToken: got " + TOKEN_STRINGS[token.type] + ", expected " + expected_strings;
+    return message;
 }
 
 std::ostream &operator<<(std::ostream &os, const UnexpectedToken &unexpected_token) {
