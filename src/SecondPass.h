@@ -9,17 +9,16 @@
 #include "FirstPass.h"
 
 
-
-
 class ScopeError : public std::runtime_error {
 public:
     ScopeError(std::string name) : runtime_error("Name " + name + "not found in current scope") {
     }
-    bool operator==(const ScopeError& other) const{
+
+    bool operator==(const ScopeError &other) const {
         std::cout << "COMPARING ERRORS" << std::endl;
-        std::string a=this->what();
-        std::string b=other.what();
-        bool t = a==b;
+        std::string a = this->what();
+        std::string b = other.what();
+        bool t = a == b;
         return t;
     }
 };
@@ -28,10 +27,11 @@ class RedeclareError : public std::runtime_error {
 public:
     RedeclareError(std::string name) : runtime_error("Name " + name + "already declared in current scope") {
     }
-    bool operator==(const RedeclareError& other) const{
-        std::string a=this->what();
-        std::string b=other.what();
-        return a==b;
+
+    bool operator==(const RedeclareError &other) const {
+        std::string a = this->what();
+        std::string b = other.what();
+        return a == b;
     }
 };
 
@@ -94,6 +94,24 @@ public:
         this->analyze(n->expression);
     }
 
+    void analyze(ClassNode* n) {
+//        for (int i = 0; i < n->fields.size(); i++) {
+//            this->analyze(n->fields[i]);
+//        }
+        for (int i = 0; i < n->methods.size(); i++) {
+            this->enter_scope(n->methods[i]->name);
+            SymbolInfo* this_info = new SymbolInfo;
+            this_info->type = SINFO::SIMPLE;
+            TypeNode* type_node = new TypeNode(n->name, {});
+
+            SimpleInfo* simple_info = new SimpleInfo(type_node);
+            this_info->simple_info = simple_info;
+            this->scope->set("this", this_info);
+            this->leave_scope();
+            this->analyze(n->methods[i]);
+        }
+    }
+
     void analyze(AstNode* n) {
         switch (n->type) {
             case AstType::FUNCTION:
@@ -111,6 +129,7 @@ public:
             case AstType::LIST:
                 break;
             case AstType::CLASS:
+                this->analyze(n->ast_class);
                 break;
             case AstType::MEMBER:
                 break;

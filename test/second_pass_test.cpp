@@ -107,3 +107,8 @@ TEST(semantic_test, x_declare_in_inner_scope_and_use_outside_error) {
     std::string text = "fun foo(y: Foo){if(y==1){if(y==2){var x:Integer;return x;}}return x;}";
     ASSERT_THROWS_NOT_FOUND_ERROR("x");
 }
+
+TEST(semantic_test, member_without_this_error) {
+    std::string text = "class Foo{var x: String; fun foo(){return x;}}";
+    ASSERT_THROWS_NOT_FOUND_ERROR("x");
+}
