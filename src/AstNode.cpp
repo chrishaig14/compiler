@@ -18,9 +18,9 @@ DeclarationNode* i_decl_type(std::string name, TypeNode* type, AstNode* expressi
     return new DeclarationNode(name, type, expression);
 }
 
-ClassNode* i_class(std::string name, VectorOfStrings template_parameters, VectorOfTypes inherited,
+ClassNode* i_class(std::string name, VectorOfStrings template_parameters,
                    std::vector<DeclarationNode*> fields, std::vector<FunctionNode*> methods) {
-    return new ClassNode(name, template_parameters, inherited, fields, methods);
+    return new ClassNode(name, template_parameters, fields, methods);
 }
 
 IfNode* i_if(AstNode* condition, VectorOfNodes then) {
@@ -180,12 +180,6 @@ bool equal(ClassNode* a, ClassNode* b) {
 
     bool template_parameters_match = equal(a->template_parameters, b->template_parameters);
     if (not template_parameters_match) return false;
-
-    bool inherited_length_match = a->inherited.size() == b->inherited.size();
-    if (not inherited_length_match) { return false; }
-    for (int i = 0; i < a->inherited.size(); i++) {
-        if (not equal(a->inherited[i], b->inherited[i])) { return false; }
-    }
 
     bool fields_length_match = a->fields.size() == b->fields.size();
     if (not fields_length_match) { return false; }

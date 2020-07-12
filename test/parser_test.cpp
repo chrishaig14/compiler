@@ -57,11 +57,9 @@ AstNode* w_bop(BinopType op, AstNode* left, AstNode* right) {
     return ast_node;
 }
 
-
 AstNode* n_a_plus_b = w_bop(BinopType::PLUS, w_id("a"), w_id("b"));
 
 DeclarationNode* n_decl_x = new DeclarationNode("x", NULL, NULL);
-
 
 AstNode* n_asn_x(AstNode* rvalue) {
     return w_asn(w_id("x"), rvalue);
@@ -140,7 +138,6 @@ TEST(parser_test, empty_block) {
     VectorOfNodes node = parser.parse_possibly_empty_block();
     EXPECT_EQ(node.size(), 0);
 }
-
 
 TEST(parser_test, non_empty_block) {
     std::string text = "{x = a + b; x = y;}";
@@ -274,8 +271,7 @@ TEST(parser_test, class_foo_empty) {
     Parser parser(tokens);
     ClassNode* node = parser.parse_class_definition();
     EXPECT_EQ(
-            equal(node, i_class("Foo", {}, {}, {}, {})),
-            true);
+            equal(node, i_class("Foo", {}, {}, {})),true);
 }
 
 TEST(parser_test, class_foo_with_fields) {
@@ -285,7 +281,7 @@ TEST(parser_test, class_foo_with_fields) {
     Parser parser(tokens);
     ClassNode* node = parser.parse_class_definition();
     EXPECT_EQ(
-            equal(node, i_class("Foo", {}, {}, {i_decl_type("x", t_string(), NULL),
+            equal(node, i_class("Foo", {}, {i_decl_type("x", t_string(), NULL),
                                                 i_decl_type("y", t_integer(), NULL)}, {})),
             true);
 }
@@ -297,12 +293,12 @@ TEST(parser_test, class_foo_with_method) {
     Parser parser(tokens);
     ClassNode* node = parser.parse_class_definition();
     EXPECT_EQ(
-            equal(node, i_class("Foo", {}, {}, {}, {fun_foo_node})),
+            equal(node, i_class("Foo", {}, {}, {fun_foo_node})),
             true);
 }
 
 std::string complete_foo_class_string = "class Foo{var x: String; var y: Integer;" + fun_foo_string + "}";
-ClassNode* complete_foo_class_node = i_class("Foo", {}, {}, {i_decl_type("x", t_string(), NULL),
+ClassNode* complete_foo_class_node = i_class("Foo", {}, {i_decl_type("x", t_string(), NULL),
                                                              i_decl_type("y", t_integer(), NULL)},
                                              {fun_foo_node});
 
@@ -313,23 +309,9 @@ TEST(parser_test, template_class_foo_empty) {
     Parser parser(tokens);
     ClassNode* node = parser.parse_class_definition();
     EXPECT_EQ(
-            equal(node, i_class("Foo", {"T", "X"}, {}, {}, {})),
+            equal(node, i_class("Foo", {"T", "X"}, {}, {})),
             true);
 }
-
-TEST(parser_test, template_class_with_inherited_foo_empty) {
-    std::string text = "class Foo[T, X]:Bar[T], Fizz[X]{}";
-    Scanner scanner(text);
-    std::vector<Token> tokens = scanner.scan_all();
-    Parser parser(tokens);
-    ClassNode* node = parser.parse_class_definition();
-    EXPECT_EQ(
-            equal(node,
-                  i_class("Foo", {"T", "X"}, {i_type("Bar", {i_type("T", {})}), i_type("Fizz", {i_type("X", {})})}, {},
-                          {})),
-            true);
-}
-
 
 TEST(parser_test, class_foo_with_fields_and_method) {
     std::string text = complete_foo_class_string;

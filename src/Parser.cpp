@@ -352,23 +352,8 @@ ClassNode* Parser::parse_class_definition() {
         }
         this->expect_token(TokenType::RSQUARE);
     }
-    if (this->match(TokenType::COLON)) {
-        //
-    }
-    VectorOfTypes inherited;
     std::vector<DeclarationNode*> fields;
     std::vector<FunctionNode*> methods;
-
-    if (this->match(TokenType::COLON)) {
-        this->next();
-        while (true) {
-            TypeNode* type = this->parse_type_node();
-            inherited.push_back(type);
-            if (!this->match(TokenType::COMMA)) {
-                break;
-            } else { this->next(); }
-        }
-    }
 
     this->expect_token(TokenType::LCURLY);
     while (true) {
@@ -384,7 +369,7 @@ ClassNode* Parser::parse_class_definition() {
         }
     }
     this->expect_token(TokenType::RCURLY);
-    ClassNode* node = new ClassNode(identifier_token.str, template_parameters, inherited, fields, methods);
+    ClassNode* node = new ClassNode(identifier_token.str, template_parameters, fields, methods);
     return node;
 }
 

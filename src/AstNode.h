@@ -231,18 +231,15 @@ public:
     VectorOfStrings template_parameters;
     std::vector<DeclarationNode*> fields;
     std::vector<FunctionNode*> methods;
-    VectorOfTypes inherited;
 
     ClassNode(std::string name,
               VectorOfStrings template_parameters,
-              VectorOfTypes inherited,
               std::vector<DeclarationNode*> fields,
               std::vector<FunctionNode*> methods) {
         this->name = name;
         this->template_parameters = template_parameters;
         this->fields = fields;
         this->methods = methods;
-        this->inherited = inherited;
     }
 };
 
@@ -271,7 +268,6 @@ DeclarationNode* i_decl_type(std::string name, TypeNode* type, AstNode* expressi
 
 ClassNode* i_class(std::string name,
                    VectorOfStrings template_parameters,
-                   VectorOfTypes inherited,
                    std::vector<DeclarationNode*> fields,
                    std::vector<FunctionNode*> methods);
 

@@ -41,10 +41,10 @@ TEST(replacer_test, replace_recursive_type) {
 }
 
 TEST(replacer_test, replace_template_class) {
-    ClassNode* node = i_class("Foo", {"T"}, {}, {i_decl_type("x", i_type("T", {}), NULL)}, {});
+    ClassNode* node = i_class("Foo", {"T"}, {i_decl_type("x", i_type("T", {}), NULL)}, {});
     TypeNode* r_type_1 = t_list(t_integer());
     replace_types(node, {"T"}, {r_type_1});
-    EXPECT_EQ(equal(node, i_class("Foo", {"T"}, {}, {i_decl_type("x", i_type("T", {}), NULL)}, {})), true);
+    EXPECT_EQ(equal(node, i_class("Foo", {"T"}, {i_decl_type("x", i_type("T", {}), NULL)}, {})), true);
 }
 
 
