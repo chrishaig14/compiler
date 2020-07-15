@@ -41,7 +41,7 @@ TEST(semantic_test, fun_foo_eq) {
 }
 
 TEST(semantic_test, fun_foo_complete) {
-    std::string text = "fun foo(y: Integer, x: String): Boolean{}";
+    std::string text = "fun foo(y: Integer, x: String)-> Boolean{}";
     VectorOfNodes tree = get_tree(text);
     FirstPass fp;
     fp.analyze(tree);
@@ -96,7 +96,7 @@ TEST(semantic_test, class_foo_with_field) {
 }
 
 TEST(semantic_test, class_foo_with_method) {
-    std::string text = "class Foo{fun foo(x:Integer):String{}}";
+    std::string text = "class Foo{fun foo(x:Integer)->String{}}";
     VectorOfNodes tree = get_tree(text);
     FirstPass fp;
     fp.analyze(tree);
