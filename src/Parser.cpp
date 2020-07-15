@@ -196,7 +196,7 @@ AstNode* Parser::parse_call_or_subscript_chain(AstNode* parent) {
         } else if (this->match(TokenType::LSQUARE)) {
 //                subscript
             this->next();
-            if(this->match(TokenType::RSQUARE)){
+            if (this->match(TokenType::RSQUARE)) {
                 throw std::runtime_error("Empty subscript error!");
             }
             AstNode* value = this->parse_expression();
@@ -221,13 +221,19 @@ AstNode* Parser::parse_factor() {
 
 AstNode* Parser::parse_mul_or_div_expression() {
     AstNode* left = this->parse_factor();
-    if (this->match(TokenType::TIMES)) {
+    std::cout << "Token after left in add_or_sub is" << TOKEN_STRINGS[this->token.type] << std::endl;
+    BinopType op;
+    while (this->match(TokenType::TIMES) || this->match(TokenType::DIV)) {
+        if (this->match(TokenType::TIMES)) {
+            this->next();
+            op = BinopType::TIMES;
+        } else if (this->match(TokenType::DIV)) {
+            this->next();
+            op = BinopType::DIV;
+        }
         AstNode* right = this->parse_factor();
-        AstNode* ast_node = new AstNode;
-        ast_node->type = AstType::BINOP;
-        BinopNode* node = new BinopNode(BinopType::TIMES, left, right);
-        ast_node->ast_binop = node;
-        return ast_node;
+        std::cout << "Right returned " << ast_string(right->type) << std::endl;
+        left = w_bop(op, left, right);
     }
     return left;
 }
@@ -235,16 +241,18 @@ AstNode* Parser::parse_mul_or_div_expression() {
 AstNode* Parser::parse_add_or_sub_expression() {
     AstNode* left = this->parse_mul_or_div_expression();
     std::cout << "Token after left in add_or_sub is" << TOKEN_STRINGS[this->token.type] << std::endl;
-    if (this->match(TokenType::PLUS)) {
-        this->next();
-        std::cout << "Matches plus" << std::endl;
+    BinopType op;
+    while (this->match(TokenType::PLUS) || this->match(TokenType::MINUS)) {
+        if (this->match(TokenType::PLUS)) {
+            this->next();
+            op = BinopType::PLUS;
+        } else if (this->match(TokenType::MINUS)) {
+            this->next();
+            op = BinopType::MINUS;
+        }
         AstNode* right = this->parse_mul_or_div_expression();
         std::cout << "Right returned " << ast_string(right->type) << std::endl;
-        AstNode* ast_node = new AstNode;
-        ast_node->type = AstType::BINOP;
-        BinopNode* node = new BinopNode(BinopType::PLUS, left, right);
-        ast_node->ast_binop = node;
-        return ast_node;
+        left = w_bop(op, left, right);
     }
     return left;
 }
@@ -624,5 +632,12 @@ AstNode* w_member(AstNode* parent, std::string child) {
     AstNode* ast_node = new AstNode;
     ast_node->type = AstType::MEMBER;
     ast_node->ast_member = new MemberNode(parent, child);
+    return ast_node;
+}
+
+AstNode* w_bop(BinopType op, AstNode* left, AstNode* right) {
+    AstNode* ast_node = new AstNode;
+    ast_node->type = AstType::BINOP;
+    ast_node->ast_binop = new BinopNode(op, left, right);
     return ast_node;
 }

@@ -35,7 +35,7 @@ AstNode* w_num(int value);
 AstNode* w_sub(AstNode* parent, AstNode* sub);
 
 AstNode* w_member(AstNode* parent, std::string child);
-
+AstNode* w_bop(BinopType op, AstNode* left, AstNode* right);
 class Parser {
     std::vector<Token> tokens;
     Token token;

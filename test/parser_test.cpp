@@ -16,7 +16,6 @@ typedef std::vector<std::string> VectorOfStrings;
 typedef std::vector<AstNode*> VectorOfNodes;
 
 
-
 AstNode* w_asn(AstNode* lvalue, AstNode* rvalue) {
     AstNode* ast_node = new AstNode;
     ast_node->type = AstType::ASSIGNMENT;
@@ -42,13 +41,6 @@ AstNode* w_fun(FunctionNode* node) {
     AstNode* ast_node = new AstNode;
     ast_node->type = AstType::FUNCTION;
     ast_node->ast_function = node;
-    return ast_node;
-}
-
-AstNode* w_bop(BinopType op, AstNode* left, AstNode* right) {
-    AstNode* ast_node = new AstNode;
-    ast_node->type = AstType::BINOP;
-    ast_node->ast_binop = new BinopNode(op, left, right);
     return ast_node;
 }
 
@@ -365,6 +357,211 @@ TEST(parser_test, simple_subscript) {
     Parser parser(tokens);
     AstNode* node = parser.parse_expression();
     AstNode* expected_node = w_sub(w_id("a"), w_num(1));
+    EXPECT_EQ(
+            equal(node, expected_node),
+            true);
+}
+
+TEST(parser_test, literal_number_expression) {
+    std::string text = "1";
+    Scanner scanner(text);
+    std::vector<Token> tokens = scanner.scan_all();
+    Parser parser(tokens);
+    AstNode* node = parser.parse_expression();
+    AstNode* expected_node = w_num(7);
+    EXPECT_EQ(
+            equal(node, expected_node),
+            true);
+}
+
+TEST(parser_test, simple_parenthesized_expression) {
+    std::string text = "(1)";
+    Scanner scanner(text);
+    std::vector<Token> tokens = scanner.scan_all();
+    Parser parser(tokens);
+    AstNode* node = parser.parse_expression();
+    AstNode* expected_node = w_num(1);
+    EXPECT_EQ(
+            equal(node, expected_node),
+            true);
+}
+
+TEST(parser_test, plus_parenthesized_expression) {
+    std::string text = "(1+a)";
+    Scanner scanner(text);
+    std::vector<Token> tokens = scanner.scan_all();
+    Parser parser(tokens);
+    AstNode* node = parser.parse_expression();
+    AstNode* expected_node = w_bop(BinopType::PLUS, w_num(1), w_id("a"));
+    EXPECT_EQ(
+            equal(node, expected_node),
+            true);
+}
+
+TEST(parser_test, more_complex_expression) {
+    std::string text = "(1+a)+b";
+    Scanner scanner(text);
+    std::vector<Token> tokens = scanner.scan_all();
+    Parser parser(tokens);
+    AstNode* node = parser.parse_expression();
+    AstNode* expected_node = w_bop(BinopType::PLUS, w_bop(BinopType::PLUS, w_num(1), w_id("a")), w_id("b"));
+    EXPECT_EQ(
+            equal(node, expected_node),
+            true);
+}
+
+TEST(parser_test, more_complex_expression_2) {
+    std::string text = "b*(1+a)";
+    Scanner scanner(text);
+    std::vector<Token> tokens = scanner.scan_all();
+    Parser parser(tokens);
+    AstNode* node = parser.parse_expression();
+    AstNode* expected_node = w_bop(BinopType::TIMES, w_id("b"), w_bop(BinopType::PLUS, w_num(1), w_id("a")));
+    EXPECT_EQ(
+            equal(node, expected_node),
+            true);
+}
+
+TEST(parser_test, plus_expression) {
+    std::string text = "1+a";
+    Scanner scanner(text);
+    std::vector<Token> tokens = scanner.scan_all();
+    Parser parser(tokens);
+    AstNode* node = parser.parse_add_or_sub_expression();
+    AstNode* expected_node = w_bop(BinopType::PLUS, w_num(1), w_id("a"));
+    EXPECT_EQ(
+            equal(node, expected_node),
+            true);
+}
+
+TEST(parser_test, minus_expression) {
+    std::string text = "a-1";
+    Scanner scanner(text);
+    std::vector<Token> tokens = scanner.scan_all();
+    Parser parser(tokens);
+    AstNode* node = parser.parse_add_or_sub_expression();
+    AstNode* expected_node = w_bop(BinopType::MINUS, w_id("a"), w_num(1));
+    EXPECT_EQ(
+            equal(node, expected_node),
+            true);
+}
+
+TEST(parser_test, plus_or_minus_with_multiple_terms_expression) {
+    std::string text = "a+b-c";
+    Scanner scanner(text);
+    std::vector<Token> tokens = scanner.scan_all();
+    Parser parser(tokens);
+    AstNode* node = parser.parse_add_or_sub_expression();
+    AstNode* expected_node = w_bop(BinopType::MINUS, w_bop(BinopType::PLUS, w_id("a"), w_id("b")), w_id("c"));
+    EXPECT_EQ(
+            equal(node, expected_node),
+            true);
+}
+
+TEST(parser_test, mul_or_div_with_multiple_factors_expression) {
+    std::string text = "a/b*c";
+    Scanner scanner(text);
+    std::vector<Token> tokens = scanner.scan_all();
+    Parser parser(tokens);
+    AstNode* node = parser.parse_add_or_sub_expression();
+    AstNode* expected_node = w_bop(BinopType::TIMES, w_bop(BinopType::DIV, w_id("a"), w_id("b")), w_id("c"));
+    EXPECT_EQ(
+            equal(node, expected_node),
+            true);
+}
+
+TEST(parser_test, times_expression) {
+    std::string text = "foo*bar";
+    Scanner scanner(text);
+    std::vector<Token> tokens = scanner.scan_all();
+    Parser parser(tokens);
+    AstNode* node = parser.parse_mul_or_div_expression();
+    AstNode* expected_node = w_bop(BinopType::TIMES, w_id("foo"), w_id("bar"));
+    EXPECT_EQ(
+            equal(node, expected_node),
+            true);
+}
+
+TEST(parser_test, div_expression) {
+    std::string text = "foo/1";
+    Scanner scanner(text);
+    std::vector<Token> tokens = scanner.scan_all();
+    Parser parser(tokens);
+    AstNode* node = parser.parse_mul_or_div_expression();
+    AstNode* expected_node = w_bop(BinopType::DIV, w_id("foo"), w_num(1));
+    EXPECT_EQ(
+            equal(node, expected_node),
+            true);
+}
+
+TEST(parser_test, complex_div_expression) {
+    std::string text = "foo/(1)+a";
+    Scanner scanner(text);
+    std::vector<Token> tokens = scanner.scan_all();
+    Parser parser(tokens);
+    AstNode* node = parser.parse_add_or_sub_expression();
+    AstNode* expected_node = w_bop(BinopType::PLUS, w_bop(BinopType::DIV, w_id("foo"), w_num(1)), w_id("a"));
+    EXPECT_EQ(
+            equal(node, expected_node),
+            true);
+}
+
+TEST(parser_test, complex_expression) {
+    std::string text = "1-(7)*8-(9*(1-3)/7-8+4)+8";
+    Scanner scanner(text);
+    std::vector<Token> tokens = scanner.scan_all();
+    Parser parser(tokens);
+    AstNode* node = parser.parse_expression();
+    AstNode* expected_node = w_bop(BinopType::PLUS, w_bop(BinopType::MINUS, w_bop(BinopType::MINUS, w_num(1),
+                                                                                  w_bop(BinopType::TIMES, w_num(7),
+                                                                                        w_num(8))),
+                                                          w_bop(BinopType::PLUS, w_bop(BinopType::MINUS,
+                                                                                       w_bop(BinopType::DIV,
+                                                                                             w_bop(BinopType::TIMES,
+                                                                                                   w_num(9),
+                                                                                                   w_bop(BinopType::MINUS,
+                                                                                                         w_num(1),
+                                                                                                         w_num(3))),
+                                                                                             w_num(7)), w_num(8)),
+                                                                w_num(4))), w_num(8));
+    EXPECT_EQ(
+            equal(node, expected_node),
+            true);
+}
+
+
+TEST(parser_test, complex_chain) {
+    std::string text = "a[1][b].c(1,d[5][0].e).f.g[h][2]()[3][5].i";
+    Scanner scanner(text);
+    std::vector<Token> tokens = scanner.scan_all();
+    Parser parser(tokens);
+    AstNode* node = parser.parse_expression();
+    AstNode* expected_node =
+            w_member(
+                    w_sub(
+                            w_sub(
+                                    w_call(
+                                            w_sub(
+                                                    w_sub(
+                                                            w_member(
+                                                                    w_member(
+                                                                            w_call(
+                                                                                    w_member(
+                                                                                            w_sub(
+                                                                                                    w_sub(
+                                                                                                            w_id("a"),
+                                                                                                            w_num(1)),
+                                                                                                    w_id("b")),
+                                                                                            "c"),
+                                                                                    {w_num(1), w_member(
+                                                                                            w_sub(w_sub(
+                                                                                                    w_id("d"),
+                                                                                                    w_num(5)),
+                                                                                                  w_num(0)),
+                                                                                            "e")}), "f"), "g"),
+                                                            w_id("h")),
+                                                    w_num(2)), {}), w_num(3)), w_num(5)),
+                    "i");
     EXPECT_EQ(
             equal(node, expected_node),
             true);
