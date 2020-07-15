@@ -45,8 +45,6 @@ AstNode* w_fun(FunctionNode* node) {
 }
 
 
-
-
 AstNode* n_a_plus_b = w_bop(BinopType::PLUS, w_id("a"), w_id("b"));
 
 DeclarationNode* n_decl_x = new DeclarationNode("x", NULL, NULL);
@@ -562,6 +560,42 @@ TEST(parser_test, complex_chain) {
                                                             w_id("h")),
                                                     w_num(2)), {}), w_num(3)), w_num(5)),
                     "i");
+    EXPECT_EQ(
+            equal(node, expected_node),
+            true);
+}
+
+TEST(parser_test, super_expression) {
+    std::string text = "1-(a*c()[0]+7/d.a.x(7))*v*c/a+v.x.y[0][1][a+c*7](4,1,b+c)";
+    Scanner scanner(text);
+    std::vector<Token> tokens = scanner.scan_all();
+    Parser parser(tokens);
+    AstNode* node = parser.parse_expression();
+    AstNode* expected_node = w_bop(BinopType::PLUS,
+                                   w_bop(BinopType::MINUS, w_num(1), w_bop(BinopType::DIV, w_bop(BinopType::TIMES,
+                                                                                                 w_bop(BinopType::TIMES,
+                                                                                                       w_bop(BinopType::PLUS,
+                                                                                                             w_bop(BinopType::TIMES,
+                                                                                                                   w_id("a"),
+                                                                                                                   w_sub(w_call(
+                                                                                                                           w_id("c"),
+                                                                                                                           {}),
+                                                                                                                         w_num(
+                                                                                                                                 0))),
+                                                                                                             w_bop(BinopType::DIV,
+                                                                                                                   w_num(7),
+                                                                                                                   w_call(w_member(
+                                                                                                                           w_member(
+                                                                                                                                   w_id("d"),
+                                                                                                                                   "a"),
+                                                                                                                           "x"),
+                                                                                                                          {w_num(7)}))),
+                                                                                                       w_id("v")),
+                                                                                                 w_id("c")),
+                                                                           w_id("a"))), w_call(
+                    w_sub(w_sub(w_sub(w_member(w_member(w_id("v"), "x"), "y"), w_num(0)), w_num(1)),
+                          w_bop(BinopType::PLUS, w_id("a"), w_bop(BinopType::TIMES, w_id("c"), w_num(7)))),
+                    {w_num(4), w_num(1), w_bop(BinopType::PLUS, w_id("b"), w_id("c"))}));
     EXPECT_EQ(
             equal(node, expected_node),
             true);
