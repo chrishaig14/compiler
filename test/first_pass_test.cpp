@@ -136,6 +136,14 @@ TypeNode* typenode_integer = i_type("Integer", {});
 TypeNode* typenode_string = i_type("String", {});
 TypeNode* typenode_boolean = i_type("Boolean", {});
 
+TypeNode* typenode_list(TypeNode* el) {
+    return i_type("List", {el});
+}
+
+TypeNode* typenode_dict(TypeNode* k, TypeNode* v) {
+    return i_type("Dict", {k, v});
+}
+
 TEST(semantic_test, fun_foo_eq) {
     std::string text = "fun foo(){}";
     VectorOfNodes tree = get_tree(text);
@@ -192,4 +200,20 @@ TEST(semantic_test, class_foo_with_method) {
     MapStringToFunction methods;
     methods["foo"] = f_info({typenode_integer}, typenode_string);
     EXPECT_TRUE(equal(ginfo, w_cinfo(MapStringToSimple(), methods)));
+}
+
+TEST(semantic_test, class_foo_complete) {
+    std::string text = "class Foo{var y: String; var z: Integer; fun foo(x:Integer)->String{} fun bar(w: List[String], t: Dict[String, Integer])->Integer{}}";
+    VectorOfNodes tree = get_tree(text);
+    FirstPass fp;
+    fp.analyze(tree);
+    SymbolInfo* ginfo = fp.globals->get("Foo");
+    MapStringToFunction methods;
+    methods["foo"] = f_info({typenode_integer}, typenode_string);
+    methods["bar"] = f_info({typenode_list(typenode_string), typenode_dict(typenode_string, typenode_integer)},
+                            typenode_integer);
+    MapStringToSimple fields;
+    fields["y"] = s_info(typenode_string);
+    fields["z"] = s_info(typenode_integer);
+    EXPECT_TRUE(equal(ginfo, w_cinfo(fields, methods)));
 }
