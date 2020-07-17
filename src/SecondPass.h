@@ -11,148 +11,64 @@
 
 class ScopeError : public std::runtime_error {
 public:
-    ScopeError(std::string name) : runtime_error("Name " + name + "not found in current scope") {
-    }
+    ScopeError(std::string name);
 
-    bool operator==(const ScopeError &other) const {
-        std::cout << "COMPARING ERRORS" << std::endl;
-        std::string a = this->what();
-        std::string b = other.what();
-        bool t = a == b;
-        return t;
-    }
+    bool operator==(const ScopeError &other) const;
 };
+
+SymbolInfo* wrap_simple_info(SimpleInfo* sinfo);
+
+SymbolInfo* wrap_function_info(FunctionInfo* finfo);
 
 class RedeclareError : public std::runtime_error {
 public:
-    RedeclareError(std::string name) : runtime_error("Name " + name + "already declared in current scope") {
-    }
+    RedeclareError(std::string name);
 
-    bool operator==(const RedeclareError &other) const {
-        std::string a = this->what();
-        std::string b = other.what();
-        return a == b;
-    }
+    bool operator==(const RedeclareError &other) const;
 };
+
+SimpleInfo* s_info(TypeNode* type);
+
+FunctionInfo* f_info(VectorOfTypes parameter_types, TypeNode* return_type);
+
+
+SymbolInfo* w_sinfo(std::string type);
+
+SymbolInfo* w_finfo(VectorOfTypes parameter_types, TypeNode* return_type);
+typedef std::map<std::string, SimpleInfo*> MapStringToSimple;
+typedef std::map<std::string, FunctionInfo*> MapStringToFunction;
+
+SymbolInfo* w_cinfo(MapStringToSimple fields, MapStringToFunction methods);
+
 
 class SecondPass {
     SymbolTable* scope;
 public:
-    SecondPass(SymbolTable* globals) {
-        this->scope = globals;
-        this->scopes["global"] = this->scope;
-    }
+    SecondPass(SymbolTable* globals);
 
-    void enter_scope(std::string name) {
-        std::string new_scope_name = this->scope->name + "." + name;
-        this->scope = new SymbolTable(new_scope_name, this->scope);
-        this->scopes[new_scope_name] = this->scope;
-    }
+    void enter_scope(std::string name);
 
-    void leave_scope() {
-        this->scope = this->scope->parent;
-    }
+    void leave_scope();
 
-    void analyze(FunctionNode* n) {
-        this->enter_scope(n->name);
-        for (int i = 0; i < n->parameter_names.size(); i++) {
-            SymbolInfo* sinfo = new SymbolInfo();
-            sinfo->type = SINFO::SIMPLE;
-            sinfo->simple_info = new SimpleInfo(n->parameter_types[i]);
-            this->scope->set(n->parameter_names[i], sinfo);
-        }
-        this->analyze(n->body);
-        this->leave_scope();
-    }
+    SymbolInfo* analyze(FunctionNode* n);
 
-    void analyze(IdentifierNode* n) {
-        if (!this->scope->has(n->name)) {
-            throw ScopeError(n->name);
-        }
-    }
+    SymbolInfo* analyze(IdentifierNode* n);
 
-    void analyze(DeclarationNode* n) {
-        if (this->scope->declared(n->identifier)) {
-            throw RedeclareError(n->identifier);
-        }
-        this->scope->set(n->identifier, NULL);
-    }
+    SymbolInfo* analyze(DeclarationNode* n);
 
-    void analyze(IfNode* n) {
-        this->analyze(n->condition);
-        this->enter_scope("if");
-        this->analyze(n->then);
-        this->leave_scope();
-    }
+    SymbolInfo* analyze(MemberNode* n);
 
-    void analyze(BinopNode* n) {
-        this->analyze(n->left);
-        this->analyze(n->right);
-    }
+    SymbolInfo* analyze(IfNode* n);
 
-    void analyze(ReturnNode* n) {
-        this->analyze(n->expression);
-    }
+    SymbolInfo* analyze(BinopNode* n);
 
-    void analyze(ClassNode* n) {
-//        for (int i = 0; i < n->fields.size(); i++) {
-//            this->analyze(n->fields[i]);
-//        }
-        for (int i = 0; i < n->methods.size(); i++) {
-            this->enter_scope(n->methods[i]->name);
-            SymbolInfo* this_info = new SymbolInfo;
-            this_info->type = SINFO::SIMPLE;
-            TypeNode* type_node = new TypeNode(n->name, {});
+    SymbolInfo* analyze(ReturnNode* n);
 
-            SimpleInfo* simple_info = new SimpleInfo(type_node);
-            this_info->simple_info = simple_info;
-            this->scope->set("this", this_info);
-            this->leave_scope();
-            this->analyze(n->methods[i]);
-        }
-    }
+    SymbolInfo* analyze(ClassNode* n);
 
-    void analyze(AstNode* n) {
-        switch (n->type) {
-            case AstType::FUNCTION:
-                this->analyze(n->ast_function);
-                break;
-            case AstType::IDENTIFIER:
-                this->analyze(n->ast_identifier);
-                break;
-            case AstType::IF:
-                this->analyze(n->ast_if);
-                break;
-            case AstType::RETURN:
-                this->analyze(n->ast_return);
-                break;
-            case AstType::LIST:
-                break;
-            case AstType::CLASS:
-                this->analyze(n->ast_class);
-                break;
-            case AstType::MEMBER:
-                break;
-            case AstType::ASSIGNMENT:
-                break;
-            case AstType::BINOP:
-                this->analyze(n->ast_binop);
-                break;
-            case AstType::DECLARATION:
-                this->analyze(n->ast_declaration);
-                break;
-            case AstType::TYPE:
-                break;
-            case AstType::NUMBER:
-                break;
-        }
-    }
+    SymbolInfo* analyze(AstNode* n);
 
-    void analyze(VectorOfNodes program) {
-        for (auto n: program) {
-            this->analyze(n);
-        }
-    }
+    SymbolInfo* analyze(VectorOfNodes program);
 
     std::map<std::string, SymbolTable*> scopes;
 };

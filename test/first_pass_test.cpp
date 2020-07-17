@@ -2,7 +2,7 @@
 #include <Scanner.h>
 #include <Parser.h>
 #include <FirstPass.h>
-
+#include <SecondPass.h>
 void assert_eq_si(SimpleInfo* t1, SimpleInfo* t2) {
     EXPECT_EQ(t1->parent, t2->parent);
     EXPECT_EQ(t1->type_parameters.size(), t2->type_parameters.size());
@@ -76,44 +76,11 @@ bool equal(SymbolInfo* a, SymbolInfo* b) {
     return false;
 }
 
-SimpleInfo* s_info(TypeNode* type) {
-    return new SimpleInfo(type);
-}
-
-FunctionInfo* f_info(VectorOfTypes parameter_types, TypeNode* return_type) {
-    return new FunctionInfo(parameter_types, return_type);
-}
 
 
-SymbolInfo* w_sinfo(std::string type) {
-    SymbolInfo* ginfo = new SymbolInfo;
-    ginfo->type = SINFO::SIMPLE;
-    SimpleInfo* sinfo = new SimpleInfo(i_type(type, {}));
-    ginfo->simple_info = sinfo;
-    return ginfo;
-}
-
-SymbolInfo* w_finfo(VectorOfTypes parameter_types, TypeNode* return_type) {
-    SymbolInfo* ginfo = new SymbolInfo;
-    ginfo->type = SINFO::FUNCTION;
-    FunctionInfo* finfo = new FunctionInfo(parameter_types, return_type);
-    ginfo->function_info = finfo;
-    return ginfo;
-}
-
-typedef std::map<std::string, SimpleInfo*> MapStringToSimple;
-typedef std::map<std::string, FunctionInfo*> MapStringToFunction;
 
 
-SymbolInfo* w_cinfo(MapStringToSimple fields, MapStringToFunction methods) {
-    SymbolInfo* ginfo = new SymbolInfo;
-    ginfo->type = SINFO::CLASS;
-    ClassInfo* cinfo = new ClassInfo;
-    cinfo->methods = methods;
-    cinfo->fields = fields;
-    ginfo->class_info = cinfo;
-    return ginfo;
-}
+
 
 VectorOfNodes get_tree(std::string text) {
     Scanner scanner(text);

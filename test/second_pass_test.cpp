@@ -112,3 +112,13 @@ TEST(semantic_test, member_without_this_error) {
     std::string text = "class Foo{var x: String; fun foo(){return x;}}";
     ASSERT_THROWS_NOT_FOUND_ERROR("x");
 }
+
+TEST(semantic_test, member_with_this_no_error) {
+    std::string text = "class Foo{var x: String; fun foo(){return this.x;}}";
+    ASSERT_OK();
+}
+
+TEST(semantic_test, member_not_found_error) {
+    std::string text = "class Foo{var x: String; fun foo(){return this.y;}}";
+    ASSERT_THROWS_NOT_FOUND_ERROR("y");
+}
