@@ -34,11 +34,11 @@ bool equal(SimpleInfo* a, SimpleInfo* b) {
 bool equal(FunctionInfo* a, FunctionInfo* b) {
     if (both_null(a, b)) return true;
     if (one_null(a, b)) return false;
-    if (equal(a->return_type, b->return_type)) {
-        if (a->parameter_types.size() != b->parameter_types.size()) return false;
-        for (int i = 0; i < a->parameter_types.size(); i++) {
-            if (!equal(a->parameter_types[i], b->parameter_types[i]))return false;
-        }
+    if (!equal(a->return_type, b->return_type)) return false;
+
+    if (a->parameter_types.size() != b->parameter_types.size()) return false;
+    for (int i = 0; i < a->parameter_types.size(); i++) {
+        if (!equal(a->parameter_types[i], b->parameter_types[i]))return false;
     }
     return true;
 }
@@ -190,6 +190,6 @@ TEST(semantic_test, class_foo_with_method) {
     fp.analyze(tree);
     SymbolInfo* ginfo = fp.globals->get("Foo");
     MapStringToFunction methods;
-    methods["foo"] = f_info({typenode_integer}, {});
+    methods["foo"] = f_info({typenode_integer}, typenode_string);
     EXPECT_TRUE(equal(ginfo, w_cinfo(MapStringToSimple(), methods)));
 }
