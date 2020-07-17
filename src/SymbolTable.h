@@ -34,6 +34,7 @@ class ClassInfo {
 public:
     std::map<std::string, SimpleInfo*> fields;
     std::map<std::string, FunctionInfo*> methods;
+
 };
 
 enum class SINFO {
@@ -77,7 +78,7 @@ public:
                 return this->parent->get(name);
             }
         }
-        throw "Symbol" + name + "not found in scope";
+        throw std::runtime_error("Symbol " + name + " not found in scope");
     }
 
     bool declared(std::string name) {
