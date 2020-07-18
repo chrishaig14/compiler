@@ -10,13 +10,26 @@
 #include "AstNode.h"
 #include "SymbolTable.h"
 
+void assert_eq_si(SimpleInfo* t1, SimpleInfo* t2);
+
+bool both_null(void* a, void* b);
+
+bool one_null(void* a, void* b);
+
+bool equal(SimpleInfo* a, SimpleInfo* b);
+
+bool equal(FunctionInfo* a, FunctionInfo* b);
+
+bool equal(ClassInfo* a, ClassInfo* b);
+
+
+bool equal(SymbolInfo* a, SymbolInfo* b);
 
 class FirstPass {
 public:
     SymbolTable* globals;
-    FirstPass(){
-        this->globals = new SymbolTable("global",NULL);
-    }
+
+    FirstPass();
 
     void analyze(ClassNode* node);
 
