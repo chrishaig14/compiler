@@ -61,6 +61,19 @@ bool RedeclareError::operator==(const RedeclareError &other) const {
     return a == b;
 }
 
+bool ReturnError::operator==(const ReturnError &other) const {
+    std::cout << "COMPARING ERRORS" << std::endl;
+    std::string a = this->what();
+    std::string b = other.what();
+    bool t = a == b;
+    return t;
+}
+
+ReturnError::ReturnError(std::string actual_type, std::string expected_type) : runtime_error(
+        "Expected to return " + expected_type + ", actual: " + actual_type) {
+
+}
+
 bool ScopeError::operator==(const ScopeError &other) const {
     std::cout << "COMPARING ERRORS" << std::endl;
     std::string a = this->what();

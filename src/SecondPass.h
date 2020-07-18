@@ -8,6 +8,12 @@
 #include <map>
 #include "FirstPass.h"
 
+class ReturnError : public std::runtime_error {
+public:
+    ReturnError(std::string actual_type, std::string expected_type);
+
+    bool operator==(const ReturnError &other) const;
+};
 
 class ScopeError : public std::runtime_error {
 public:
