@@ -11,10 +11,6 @@ void assert_eq_si(SimpleInfo* t1, SimpleInfo* t2) {
     }
 }
 
-
-
-
-
 VectorOfNodes get_tree(std::string text) {
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
@@ -23,7 +19,7 @@ VectorOfNodes get_tree(std::string text) {
 }
 
 TEST(semantic_test, fun_foo) {
-    std::string text = "fun foo(){}";
+    std::string text = "fun foo()->None{}";
     VectorOfNodes tree = get_tree(text);
     FirstPass fp;
     fp.analyze(tree);
@@ -45,12 +41,12 @@ TypeNode* typenode_dict(TypeNode* k, TypeNode* v) {
 }
 
 TEST(semantic_test, fun_foo_eq) {
-    std::string text = "fun foo(){}";
+    std::string text = "fun foo()->String{}";
     VectorOfNodes tree = get_tree(text);
     FirstPass fp;
     fp.analyze(tree);
     SymbolInfo* ginfo = fp.globals->get("foo");
-    EXPECT_TRUE(equal(ginfo, w_finfo({}, nullptr)));
+    EXPECT_TRUE(equal(ginfo, w_finfo({}, typenode_string)));
 }
 
 TEST(semantic_test, fun_foo_complete) {

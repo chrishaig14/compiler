@@ -495,10 +495,8 @@ FunctionNode* Parser::parse_function_definition() {
     }
     // Parse return
     TypeNode* return_type = NULL;
-    if (this->match(TokenType::RARROW)) {
-        this->next();
-        return_type = this->parse_type_node();
-    }
+    this->expect_token(TokenType::RARROW);
+    return_type = this->parse_type_node();
     std::cout << "Gonna parse function body" << std::endl;
 //        this->expect_token(TokenType::LCURLY);
     // Parse function body
