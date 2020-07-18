@@ -132,7 +132,12 @@ TEST(semantic_test, member_not_found_error) {
     ASSERT_THROWS_NOT_FOUND_ERROR("y");
 }
 
-TEST(semantic_test, assign_class_ok) {
+TEST(semantic_test, function_return_type_error) {
     std::string text = "fun foo()->String{} fun main()->Integer{return foo();}";
     ASSERT_THROWS_RETURN_TYPE_ERROR("main", "String", "Integer");
+}
+
+TEST(semantic_test, function_return_type_ok) {
+    std::string text = "fun foo()->String{} fun main()->String{return foo();}";
+    ASSERT_OK();
 }
