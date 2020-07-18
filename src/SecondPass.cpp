@@ -113,6 +113,7 @@ SymbolInfo* SecondPass::analyze(FunctionNode* n) {
         sinfo->simple_info = new SimpleInfo(n->parameter_types[i]);
         this->scope->set(n->parameter_names[i], sinfo);
     }
+    this->scope->set("__return__", wrap_simple_info(new SimpleInfo(n->return_type)));
     this->analyze(n->body);
     this->leave_scope();
     return nullptr;
@@ -166,8 +167,23 @@ SymbolInfo* SecondPass::analyze(BinopNode* n) {
 }
 
 SymbolInfo* SecondPass::analyze(ReturnNode* n) {
-    this->analyze(n->expression);
+    SymbolInfo* symbol_info = this->analyze(n->expression);
+    SymbolInfo* return_type = this->scope->get("__return__");
+    if (!equal(symbol_info, return_type)) {
+        throw ReturnError(symbol_info->simple_info->parent, return_type->simple_info->parent);
+    }
     return nullptr;
+}
+
+SymbolInfo* SecondPass::analyze(CallNode* n) {
+    SymbolInfo* function_info = this->analyze(n->function);
+    if (function_info->type != SINFO::FUNCTION){
+        throw std::runtime_error("Expected a function! Got something else!");
+    }
+    return wrap_simple_info(function_info->function_info->return_type);
+//    this->analyze(n->left);
+//    this->analyze(n->right);
+//    return this->scope->get("Integer"); //TODO transform all binary operations into function calls
 }
 
 SymbolInfo* SecondPass::analyze(ClassNode* n) {
@@ -220,6 +236,10 @@ SymbolInfo* SecondPass::analyze(AstNode* n) {
             break;
         case AstType::NUMBER:
             break;
+        case AstType::CALL:
+            return this->analyze(n->ast_call);
+        default:
+            throw std::runtime_error("Dont know what to do with node: " + ast_string(n->type));
     }
     return nullptr;
 }

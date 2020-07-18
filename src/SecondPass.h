@@ -77,6 +77,8 @@ public:
     SymbolInfo* analyze(VectorOfNodes program);
 
     std::map<std::string, SymbolTable*> scopes;
+
+    SymbolInfo* analyze(CallNode* n);
 };
 
 #endif //UNTITLED1_SECONDPASS_H
