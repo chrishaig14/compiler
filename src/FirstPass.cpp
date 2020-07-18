@@ -76,6 +76,7 @@ bool equal(SimpleInfo* a, SimpleInfo* b) {
         for (int i = 0; i < a->type_parameters.size(); i++) {
             if (!equal(a->type_parameters[i], b->type_parameters[i]))return false;
         }
+        return true;
     }
     return false;
 }
