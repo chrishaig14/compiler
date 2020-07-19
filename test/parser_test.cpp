@@ -206,35 +206,35 @@ TEST(parser_test, decl_with_type_and_value) {
 }
 
 TEST(parser_test, function_no_params_empty_body) {
-    std::string text = "fun foo(){}";
+    std::string text = "fun foo()->String{}";
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
     FunctionNode* node = parser.parse_function_definition();
-    EXPECT_EQ(equal(node, i_fun("foo", {}, {}, NULL, {})), true);
+    EXPECT_EQ(equal(node, i_fun("foo", {}, {}, i_type("String", {}), {})), true);
 }
 
 TypeNode* n_complex_type_1 = i_type("String", {i_type("List", {t_integer()})});
 
 TEST(parser_test, function_with_params_empty_body) {
-    std::string text = "fun foo(x:String[List[Integer]]){}";
+    std::string text = "fun foo(x:String[List[Integer]])->Integer{}";
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
     FunctionNode* node = parser.parse_function_definition();
     EXPECT_EQ(
-            equal(node, i_fun("foo", {"x"}, {n_complex_type_1}, NULL, {})),
+            equal(node, i_fun("foo", {"x"}, {n_complex_type_1}, i_type("Integer",{}), {})),
             true);
 }
 
 TEST(parser_test, function_with_params_and_body) {
-    std::string text = "fun foo(x:String[List[Integer]]){" + body_1_string + "}";
+    std::string text = "fun foo(x:String[List[Integer]])->String{" + body_1_string + "}";
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
     FunctionNode* node = parser.parse_function_definition();
     EXPECT_EQ(
-            equal(node, i_fun("foo", {"x"}, {n_complex_type_1}, NULL, body_1_node)),
+            equal(node, i_fun("foo", {"x"}, {n_complex_type_1}, i_type("String",{}), body_1_node)),
             true);
 }
 
