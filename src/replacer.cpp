@@ -69,4 +69,3 @@ void replace_types(AstNode* node, VectorOfStrings params, VectorOfTypes replacem
     }
 }
 
-void replace_types(ClassNode* node, VectorOfStrings params, VectorOfTypes replacements) {}
