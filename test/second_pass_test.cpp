@@ -14,7 +14,7 @@ VectorOfNodes get_treeA(std::string text) {
 
 #define ASSERT_THROWS_NOT_FOUND_ERROR(NAME) VectorOfNodes tree = get_treeA(text);       \
                                             FirstPass fp;fp.analyze(tree);              \
-                                            SecondPass sp(fp.globals);                  \
+                                            SecondPass sp(fp.globals, fp.class_table);                  \
                                             try {                                       \
                                                 sp.analyze(tree);                       \
                                                 FAIL() << "Expected ScopeError thrown"; \
@@ -24,7 +24,7 @@ VectorOfNodes get_treeA(std::string text) {
 
 #define ASSERT_THROWS_REDECLARED_ERROR(NAME) VectorOfNodes tree = get_treeA(text);       \
                                             FirstPass fp;fp.analyze(tree);              \
-                                            SecondPass sp(fp.globals);                  \
+                                            SecondPass sp(fp.globals, fp.class_table);                  \
                                             try {                                       \
                                                 sp.analyze(tree);                       \
                                                 FAIL() << "Expected RedeclareError thrown"; \
@@ -34,7 +34,7 @@ VectorOfNodes get_treeA(std::string text) {
 
 #define ASSERT_THROWS_RETURN_TYPE_ERROR(NAME, ACTUAL_TYPE, EXPECTED_TYPE) VectorOfNodes tree = get_treeA(text);       \
                                             FirstPass fp;fp.analyze(tree);              \
-                                            SecondPass sp(fp.globals);                  \
+                                            SecondPass sp(fp.globals, fp.class_table);                  \
                                             try {                                       \
                                                 sp.analyze(tree);                       \
                                                 FAIL() << "Expected ReturnError thrown"; \
@@ -43,7 +43,7 @@ VectorOfNodes get_treeA(std::string text) {
 
 #define ASSERT_OK() VectorOfNodes tree = get_treeA(text);   \
                     FirstPass fp;fp.analyze(tree);          \
-                    SecondPass sp(fp.globals);              \
+                    SecondPass sp(fp.globals, fp.class_table);              \
                     sp.analyze(tree);
 
 TEST(semantic_test, fun_foo_cAomplete) {
@@ -51,7 +51,7 @@ TEST(semantic_test, fun_foo_cAomplete) {
     VectorOfNodes tree = get_treeA(text);
     FirstPass fp;
     fp.analyze(tree);
-    SecondPass sp(fp.globals);
+    SecondPass sp(fp.globals, fp.class_table);
     sp.analyze(tree);
     SymbolTable* foo_scope = sp.scopes["global.foo"];
     SymbolInfo* sinfo = foo_scope->get("y");
@@ -90,11 +90,10 @@ TEST(semantic_test, FOFOaOa) {
     VectorOfNodes tree = get_treeA(text);
     FirstPass fp;
     fp.analyze(tree);
-    SecondPass sp(fp.globals);
+    SecondPass sp(fp.globals, fp.class_table);
     sp.analyze(tree);
     EXPECT_TRUE(sp.scopes["global.foo"]->declared("x"));
 }
-
 
 
 TEST(semantic_test, z_not_found_error) {

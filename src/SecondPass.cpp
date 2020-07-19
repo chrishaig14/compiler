@@ -85,7 +85,8 @@ bool ScopeError::operator==(const ScopeError &other) const {
 ScopeError::ScopeError(std::string name) : runtime_error("Name " + name + "not found in current scope") {
 }
 
-SecondPass::SecondPass(SymbolTable* globals) {
+SecondPass::SecondPass(SymbolTable* globals, ClassTable* class_table) {
+    this->class_table = class_table;
     this->scope = globals;
     this->scopes["global"] = this->scope;
     this->scope->set("Integer", w_cinfo(MapStringToSimple(), MapStringToFunction()));
@@ -140,7 +141,7 @@ SymbolInfo* SecondPass::analyze(MemberNode* n) {
         throw std::runtime_error("Accessing member " + n->child + " of non object");
     }
     SimpleInfo* simple_info = symbol_info->simple_info;
-    ClassInfo* class_info = this->scope->get(simple_info->parent)->class_info;
+    ClassInfo* class_info = this->class_table->get(simple_info->parent);
     if (class_info->fields.count(n->child) == 1) {
         // It's a field
         return wrap_simple_info(class_info->fields[n->child]);
@@ -177,7 +178,7 @@ SymbolInfo* SecondPass::analyze(ReturnNode* n) {
 
 SymbolInfo* SecondPass::analyze(CallNode* n) {
     SymbolInfo* function_info = this->analyze(n->function);
-    if (function_info->type != SINFO::FUNCTION){
+    if (function_info->type != SINFO::FUNCTION) {
         throw std::runtime_error("Expected a function! Got something else!");
     }
     return wrap_simple_info(function_info->function_info->return_type);
@@ -206,32 +207,24 @@ SymbolInfo* SecondPass::analyze(AstNode* n) {
     switch (n->type) {
         case AstType::FUNCTION:
             return this->analyze(n->ast_function);
-            break;
         case AstType::IDENTIFIER:
             return this->analyze(n->ast_identifier);
-            break;
         case AstType::IF:
             return this->analyze(n->ast_if);
-            break;
         case AstType::RETURN:
             return this->analyze(n->ast_return);
-            break;
         case AstType::LIST:
             break;
         case AstType::CLASS:
             return this->analyze(n->ast_class);
-            break;
         case AstType::MEMBER:
             return this->analyze(n->ast_member);
-            break;
         case AstType::ASSIGNMENT:
             break;
         case AstType::BINOP:
             return this->analyze(n->ast_binop);
-            break;
         case AstType::DECLARATION:
             return this->analyze(n->ast_declaration);
-            break;
         case AstType::TYPE:
             break;
         case AstType::NUMBER:

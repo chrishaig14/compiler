@@ -49,8 +49,9 @@ SymbolInfo* w_cinfo(MapStringToSimple fields, MapStringToFunction methods);
 
 class SecondPass {
     SymbolTable* scope;
+    ClassTable* class_table;
 public:
-    SecondPass(SymbolTable* globals);
+    SecondPass(SymbolTable* globals, ClassTable* class_table);
 
     void enter_scope(std::string name);
 
