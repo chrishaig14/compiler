@@ -106,48 +106,6 @@ AstNode* Parser::parse_id_call_or_subscript() {
     return node;
 }
 
-AstNode* Parser::parse_member_or_other() {
-    AstNode* node = new AstNode;
-    AstNode* parent = this->parse_expression();
-    while (this->match(TokenType::DOT)) {
-        this->next();
-        Token child = this->expect_token(TokenType::ID);
-//        node->child = child.str;
-    }
-    return node;
-}
-
-FunctionSignatureNode* Parser::parse_function_signature() {
-    this->expect_token(TokenType::FUN);
-    Token matched_token = this->expect_token(TokenType::ID);
-    std::string identifier = matched_token.str;
-    this->expect_token(TokenType::LPAREN);
-    if (this->match(TokenType::RPAREN)) {
-    } else {
-        this->next();
-        // Parse parameter list
-        VectorOfTypes parameter_types;
-        while (true) {
-            TypeNode* parameter_type = this->parse_type_node();
-            parameter_types.push_back(parameter_type);
-            if (this->match(TokenType::COMMA)) {
-                this->next();
-            } else {
-                break;
-            }
-        }
-        this->expect_token(TokenType::RPAREN);
-    }
-    this->expect_token(TokenType::COLON);
-    TypeNode* return_type = this->parse_type_node();
-//        FunctionSignatureNode* node = new FunctionSignatureNode(identifier;
-//
-//        node->return_type = return_type;
-
-//        return node;
-    return nullptr;
-}
-
 AstNode* Parser::parse_function_expression() {
     return NULL;
 }
