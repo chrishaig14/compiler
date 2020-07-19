@@ -26,7 +26,7 @@ AstNode* w_asn(AstNode* lvalue, AstNode* rvalue) {
 AstNode* w_decl(std::string name, AstNode* expression) {
     AstNode* ast_node = new AstNode;
     ast_node->type = AstType::DECLARATION;
-    ast_node->ast_declaration = new DeclarationNode(name, NULL, NULL);
+    ast_node->ast_declaration = new DeclarationNode(name, NULL, expression);
     return ast_node;
 }
 
@@ -492,6 +492,18 @@ TEST(parser_test, div_expression) {
             true);
 }
 
+TEST(parser_test, parse_top_level) {
+    std::string text = "var x = 9*7;";
+    Scanner scanner(text);
+    std::vector<Token> tokens = scanner.scan_all();
+    Parser parser(tokens);
+    AstNode* node = parser.parse_top_level_statement();
+    AstNode* expected_node = w_decl("x", w_bop(BinopType::TIMES, w_num(9), w_num(7)));
+    EXPECT_EQ(
+            equal(node, expected_node),
+            true);
+}
+
 TEST(parser_test, complex_div_expression) {
     std::string text = "foo/(1)+a";
     Scanner scanner(text);
@@ -564,6 +576,7 @@ TEST(parser_test, complex_chain) {
             equal(node, expected_node),
             true);
 }
+
 
 TEST(parser_test, super_expression) {
     std::string text = "1-(a*c()[0]+7/d.a.x(7))*v*c/a+v.x.y[0][1][a+c*7](4,1,b+c)";

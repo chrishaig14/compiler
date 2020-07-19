@@ -494,6 +494,7 @@ AstNode* Parser::parse_top_level_statement() {
 //                return this->parse_interface_definition();
             break;
         default:
+            return this->parse_common_statement();
             throw UnexpectedToken(this->token, {TokenType::FUN, TokenType::CLASS, TokenType::INTERFACE});
     }
     return ast_node;
