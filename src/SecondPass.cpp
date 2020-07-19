@@ -134,7 +134,7 @@ SymbolInfo* SecondPass::analyze(DeclarationNode* n) {
     if (n->expression != nullptr and n->type != nullptr) {
         SymbolInfo* expression_type = this->analyze(n->expression);
         if (!equal(wrap_simple_info(new SimpleInfo(n->type)), expression_type)) {
-            throw ReturnError(n->type->name, expression_type->simple_info->parent);
+            throw ReturnError(expression_type->simple_info->parent, n->type->name);
         }
     }
     this->scope->set(n->identifier, wrap_simple_info(new SimpleInfo(n->type)));
@@ -243,10 +243,14 @@ SymbolInfo* SecondPass::analyze(AstNode* n) {
             break;
         case AstType::NUMBER:
             return w_sinfo("Integer");
+        case AstType::STRING:
+            return w_sinfo("String");
         case AstType::CALL:
             return this->analyze(n->ast_call);
         default:
             throw std::runtime_error("Dont know what to do with node: " + ast_string(n->type));
+        case AstType::SUB:
+            break;
     }
     return nullptr;
 }
