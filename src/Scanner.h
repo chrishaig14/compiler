@@ -14,19 +14,11 @@
 extern std::map<std::string, TokenType> TOKEN_KEYWORDS;
 extern std::map<std::string, TokenType> TOKEN_SPECIAL;
 
-class UnexpectedCharacter {
-    char c;
-    size_t position;
+class UnexpectedCharacter:std::runtime_error {
 public:
     UnexpectedCharacter(char c, size_t position);
 
     bool operator==(const UnexpectedCharacter &other) const;
-
-    friend std::ostream &operator<<(std::ostream &os, const UnexpectedCharacter &e) {
-//        std::cout << "token type : " << token.type;
-        os << "Unexpected character " << e.c << " at position " << e.position;
-        return os;
-    }
 };
 
 class Scanner {

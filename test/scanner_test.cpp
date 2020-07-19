@@ -23,6 +23,10 @@ Token st_NUM(int s) {
     return Token(TokenType::NUM, s, -1, -1);
 }
 
+Token st_STRING(std::string s) {
+    return Token(TokenType::STRING, s, -1, -1);
+}
+
 Token t_ID(std::string s, int line, int column) {
     return Token(TokenType::ID, s, line, column);
 }
@@ -104,6 +108,22 @@ TEST(scanner_test, test_number) {
     Scanner scanner(text);
     Token token = scanner.get_next();
     EXPECT_EQ(cmp_token_value(token, st_NUM(123)), true);
+}
+
+TEST(scanner_test, test_string_literal) {
+    std::string text = "\"hello\"";
+    Scanner scanner(text);
+    Token token = scanner.get_next();
+    EXPECT_EQ(cmp_token_value(token, st_STRING("hello")), true);
+}
+
+TEST(scanner_test, test_string_full) {
+    std::string text = "123\n443\"hello\"";
+    Scanner scanner(text);
+    Token token = scanner.get_next();
+    token = scanner.get_next();
+    token = scanner.get_next();
+    EXPECT_EQ(token, Token(TokenType::STRING, "hello", 1, 3));
 }
 
 TEST(scanner_test, test_all_special) {
@@ -335,12 +355,12 @@ TEST(scanner_test, test_token_position_complex) {
     std::vector<Token> tokens = scanner.scan_all();
     std::vector<Token> expected_tokens = {
             t_CLASS(0, 0), t_ID("Foo", 0, 6), t_LCURLY(0, 10), t_VAR(1, 0),
-                                          t_ID("x", 1, 4), t_COLON(1, 5),
-                                          t_ID("String", 1, 7), t_SEMICOLON(1, 13), t_FUN(2, 0), t_ID("foo", 2, 4),
-                                          t_LPAREN(2, 7),
-                                          t_ID("y", 2, 8), t_COLON(2, 9), t_ID("Integer", 2, 11),
-                                          t_RPAREN(2, 18), t_LCURLY(2, 20),
-                                          t_RCURLY(3, 0), t_RCURLY(4, 0), t_END(4, 1)};
+            t_ID("x", 1, 4), t_COLON(1, 5),
+            t_ID("String", 1, 7), t_SEMICOLON(1, 13), t_FUN(2, 0), t_ID("foo", 2, 4),
+            t_LPAREN(2, 7),
+            t_ID("y", 2, 8), t_COLON(2, 9), t_ID("Integer", 2, 11),
+            t_RPAREN(2, 18), t_LCURLY(2, 20),
+            t_RCURLY(3, 0), t_RCURLY(4, 0), t_END(4, 1)};
     EXPECT_EQ(tokens.size(), expected_tokens.size());
     for (int i = 0; i < tokens.size(); i++) {
         Token token = tokens[i];

@@ -98,6 +98,24 @@ Token Scanner::get_next() {
 //        std::cout << HCYN << "Gonna scan for number" << reset << std::endl;
         return this->scan_number();
     }
+    if (c == '\"') {
+        std::string str;
+        int start_l = this->line;
+        int start_c = this->column;
+        this->current++;
+        char c = this->text[this->current];
+        while (c != '\"') {
+            str += c;
+            this->current++;
+            if (this->current < this->text.size()) {
+                this->column++;
+                c = this->text[this->current];
+            } else {
+                break;
+            }
+        }
+        return Token(TokenType::STRING, str, start_l, start_c);
+    }
     return this->scan_other();
 }
 
@@ -168,11 +186,6 @@ Token Scanner::scan_number() {
     return Token(TokenType::NUM, std::stoi(str), start_l, start_c);
 }
 
-bool UnexpectedCharacter::operator==(const UnexpectedCharacter &other) const {
-    return this->c == other.c && this->position == other.position;
-}
-
-UnexpectedCharacter::UnexpectedCharacter(char c, size_t position) {
-    this->c = c;
-    this->position = position;
+UnexpectedCharacter::UnexpectedCharacter(char c, size_t position) : std::runtime_error(
+        std::string("unexpected character ") + c + " at position " + std::to_string(position)) {
 }
