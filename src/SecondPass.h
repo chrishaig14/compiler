@@ -8,6 +8,13 @@
 #include <map>
 #include "FirstPass.h"
 
+class BadArguments : public std::runtime_error {
+public:
+    BadArguments();
+
+    bool operator==(const BadArguments &other) const;
+};
+
 class ReturnError : public std::runtime_error {
 public:
     ReturnError(std::string actual_type, std::string expected_type);
@@ -41,6 +48,7 @@ FunctionInfo* f_info(VectorOfTypes parameter_types, TypeNode* return_type);
 SymbolInfo* w_sinfo(std::string type);
 
 SymbolInfo* w_finfo(VectorOfTypes parameter_types, TypeNode* return_type);
+
 typedef std::map<std::string, SimpleInfo*> MapStringToSimple;
 typedef std::map<std::string, FunctionInfo*> MapStringToFunction;
 

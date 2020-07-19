@@ -41,6 +41,15 @@ VectorOfNodes get_treeA(std::string text) {
                                             } catch(const ReturnError& se){              \
                                                 EXPECT_EQ(se,ReturnError(ACTUAL_TYPE, EXPECTED_TYPE))  << se.what();       }\
 
+#define ASSERT_THROWS_BAD_ARGUMENTS() VectorOfNodes tree = get_treeA(text);       \
+                                            FirstPass fp;fp.analyze(tree);              \
+                                            SecondPass sp(fp.globals, fp.class_table);                  \
+                                            try {                                       \
+                                                sp.analyze(tree);                       \
+                                                FAIL() << "Expected BadArguments thrown"; \
+                                            } catch(const BadArguments& se){              \
+                                                EXPECT_EQ(se,BadArguments())  << se.what();       }\
+
 #define ASSERT_OK() VectorOfNodes tree = get_treeA(text);   \
                     FirstPass fp;fp.analyze(tree);          \
                     SecondPass sp(fp.globals, fp.class_table);              \
@@ -139,4 +148,14 @@ TEST(semantic_test, function_return_type_error) {
 TEST(semantic_test, function_return_type_ok) {
     std::string text = "fun foo()->String{} fun main()->String{return foo();}";
     ASSERT_OK();
+}
+
+TEST(semantic_test, function_argument_type_ok){
+    std::string text = "fun foo(x: Integer) -> Integer {return x;} fun bar()->Integer{var y: Integer; return foo(y);}";
+    ASSERT_OK();
+}
+
+TEST(semantic_test, function_argument_type_error){
+    std::string text = "fun foo(x: Integer) -> Integer {return x;} fun bar()->Integer{var y: String; return foo(y);}";
+    ASSERT_THROWS_BAD_ARGUMENTS();
 }

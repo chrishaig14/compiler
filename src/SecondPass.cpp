@@ -182,6 +182,14 @@ SymbolInfo* SecondPass::analyze(CallNode* n) {
     if (function_info->type != SINFO::FUNCTION) {
         throw std::runtime_error("Expected a function! Got something else!");
     }
+    if (n->arguments.size() != function_info->function_info->parameter_types.size()) throw BadArguments();
+
+    for (int i = 0; i < n->arguments.size(); i++) {
+        SymbolInfo* arg = this->analyze(n->arguments[i]);
+        if (!equal(arg->simple_info, function_info->function_info->parameter_types[i])) {
+            throw BadArguments();
+        }
+    }
     return wrap_simple_info(function_info->function_info->return_type);
 //    this->analyze(n->left);
 //    this->analyze(n->right);
@@ -243,4 +251,11 @@ SymbolInfo* SecondPass::analyze(VectorOfNodes program) {
         this->analyze(n);
     }
     return nullptr;
+}
+
+bool BadArguments::operator==(const BadArguments &other) const {
+    return true;
+}
+
+BadArguments::BadArguments() : std::runtime_error("Bad Arguments") {
 }
