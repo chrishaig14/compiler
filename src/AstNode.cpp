@@ -3,6 +3,7 @@
 //
 
 #include "AstNode.h"
+#include "FirstPass.h"
 
 FunctionNode*
 i_fun(std::string name, VectorOfStrings parameter_names, VectorOfTypes parameter_types, TypeNode* return_type,
@@ -55,8 +56,9 @@ bool compare(VectorOfTypes a, VectorOfTypes b) {
     }
     return true;
 }
+
 bool equal(NumberNode* a, NumberNode* b) {
-    return a->num==b->num;
+    return a->num == b->num;
 }
 
 bool equal(TypeNode* a, TypeNode* b) {
@@ -149,9 +151,8 @@ bool equal(SubscriptNode* a, SubscriptNode* b) {
 
 
 bool compare(BinopNode* a, BinopNode* b) {
-    if (a == NULL and b == NULL) {
-        return true;
-    }
+    if (both_null(a, b)) return true;
+    if (one_null(a, b)) return false;
     if (a->op != b->op) {
         std::cout << "comparison between operators returned false" << std::endl;
         return false;
@@ -171,18 +172,16 @@ bool compare(BinopNode* a, BinopNode* b) {
 }
 
 bool equal(IfNode* a, IfNode* b) {
-    if (a == NULL and b == NULL) {
-        return true;
-    }
+    if (both_null(a, b)) return true;
+    if (one_null(a, b)) return false;
     if (not equal(a->condition, b->condition))return false;
     for (int i = 0; i < a->then.size(); i++) { if (not equal(a->then[i], b->then[i])) return false; }
     return true;
 }
 
 bool equal(FunctionNode* a, FunctionNode* b) {
-    if (a == NULL and b == NULL) {
-        return true;
-    }
+    if (both_null(a, b)) return true;
+    if (one_null(a, b)) return false;
     bool name_matches = a->name == b->name;
     bool return_type_matches = equal(a->return_type, b->return_type);
     bool parameter_names_match = equal(a->parameter_names, b->parameter_names);
@@ -192,10 +191,8 @@ bool equal(FunctionNode* a, FunctionNode* b) {
 }
 
 bool equal(ClassNode* a, ClassNode* b) {
-    if (a == NULL and b == NULL) {
-        return true;
-    }
-
+    if (both_null(a, b)) return true;
+    if (one_null(a, b)) return false;
     bool name_match = a->name == b->name;
     if (not name_match) { return false; }
 
@@ -218,24 +215,21 @@ bool equal(ClassNode* a, ClassNode* b) {
 }
 
 bool compare(ReturnNode* a, ReturnNode* b) {
-    if (a == NULL and b == NULL) {
-        return true;
-    }
+    if (both_null(a, b)) return true;
+    if (one_null(a, b)) return false;
     return equal(a->expression, b->expression);
 }
 
 bool compare(AssignmentNode* a, AssignmentNode* b) {
-    if (a == NULL and b == NULL) {
-        return true;
-    }
+    if (both_null(a, b)) return true;
+    if (one_null(a, b)) return false;
     return equal(a->lvalue, b->lvalue) and equal(a->rvalue, b->rvalue);
 }
 
 
 bool equal(AstNode* a, AstNode* b) {
-    if (a == NULL and b == NULL) {
-        return true;
-    }
+    if (both_null(a, b)) return true;
+    if (one_null(a, b)) return false;
     std::cout << "comparison between a type is " << ast_string(a->type) << " -- ";
     std::cout << "and b type is " << ast_string(b->type) << std::endl;
 
@@ -265,17 +259,11 @@ bool equal(AstNode* a, AstNode* b) {
             return equal(a->ast_declaration, b->ast_declaration);
         case AstType::CALL:
             return equal(a->ast_call, b->ast_call);
-        default:
-            throw std::runtime_error("Unknown AstType in equal: " + ast_string(a->type));
-//        case AstType::TYPE:
-//            break;
         case AstType::NUMBER:
             return equal(a->ast_number, a->ast_number);
-
         case AstType::SUB:
             return equal(a->ast_sub, b->ast_sub);
-
-            break;
+        default:
+            throw std::runtime_error("Unknown AstType in equal: " + ast_string(a->type));
     }
-    return false;
 }
