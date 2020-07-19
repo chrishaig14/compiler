@@ -223,7 +223,7 @@ TEST(parser_test, function_with_params_empty_body) {
     Parser parser(tokens);
     FunctionNode* node = parser.parse_function_definition();
     EXPECT_EQ(
-            equal(node, i_fun("foo", {"x"}, {n_complex_type_1}, i_type("Integer",{}), {})),
+            equal(node, i_fun("foo", {"x"}, {n_complex_type_1}, i_type("Integer", {}), {})),
             true);
 }
 
@@ -234,7 +234,7 @@ TEST(parser_test, function_with_params_and_body) {
     Parser parser(tokens);
     FunctionNode* node = parser.parse_function_definition();
     EXPECT_EQ(
-            equal(node, i_fun("foo", {"x"}, {n_complex_type_1}, i_type("String",{}), body_1_node)),
+            equal(node, i_fun("foo", {"x"}, {n_complex_type_1}, i_type("String", {}), body_1_node)),
             true);
 }
 
