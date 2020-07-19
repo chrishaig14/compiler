@@ -131,7 +131,8 @@ SymbolInfo* SecondPass::analyze(DeclarationNode* n) {
     if (this->scope->declared(n->identifier)) {
         throw RedeclareError(n->identifier);
     }
-    this->scope->set(n->identifier, NULL);
+
+    this->scope->set(n->identifier, wrap_simple_info(new SimpleInfo(n->type)));
     return nullptr;
 }
 
