@@ -3,6 +3,7 @@
 #include <Parser.h>
 #include <FirstPass.h>
 #include <SecondPass.h>
+
 void assert_eq_si(SimpleInfo* t1, SimpleInfo* t2) {
     EXPECT_EQ(t1->parent, t2->parent);
     EXPECT_EQ(t1->type_parameters.size(), t2->type_parameters.size());
@@ -24,7 +25,6 @@ TEST(semantic_test, fun_foo) {
     FirstPass fp;
     fp.analyze(tree);
     SymbolInfo* ginfo = fp.globals->get("foo");
-    FunctionInfo* finfo = ginfo->function_info;
     EXPECT_EQ(ginfo->type, SINFO::FUNCTION);
 }
 
@@ -63,8 +63,7 @@ TEST(semantic_test, class_foo) {
     VectorOfNodes tree = get_tree(text);
     FirstPass fp;
     fp.analyze(tree);
-    SymbolInfo* ginfo = fp.globals->get("Foo");
-    EXPECT_EQ(ginfo->type, SINFO::CLASS);
+    ClassInfo* ginfo = fp.class_table->get("Foo");
 }
 
 TEST(semantic_test, class_foo_eq) {
@@ -72,8 +71,11 @@ TEST(semantic_test, class_foo_eq) {
     VectorOfNodes tree = get_tree(text);
     FirstPass fp;
     fp.analyze(tree);
-    SymbolInfo* ginfo = fp.globals->get("Foo");
-    EXPECT_TRUE(equal(ginfo, w_cinfo(MapStringToSimple(), MapStringToFunction())));
+//    ClassInfo* ginfo = fp.class_table->get("Foo");
+//    ClassInfo* expected = new ClassInfo;
+//    expected->fields = MapStringToSimple();
+//    expected->methods = MapStringToFunction();
+//    EXPECT_TRUE(equal(ginfo, expected));
 }
 
 TEST(semantic_test, class_foo_with_field) {
@@ -81,10 +83,13 @@ TEST(semantic_test, class_foo_with_field) {
     VectorOfNodes tree = get_tree(text);
     FirstPass fp;
     fp.analyze(tree);
-    SymbolInfo* ginfo = fp.globals->get("Foo");
+    ClassInfo* ginfo = fp.class_table->get("Foo");
     MapStringToSimple fields;
     fields["x"] = s_info(typenode_string);
-    EXPECT_TRUE(equal(ginfo, w_cinfo(fields, MapStringToFunction())));
+    ClassInfo* class_info = new ClassInfo;
+    class_info->fields = fields;
+    class_info->methods;
+    EXPECT_TRUE(equal(ginfo, class_info));
 }
 
 TEST(semantic_test, class_foo_with_method) {
@@ -92,10 +97,12 @@ TEST(semantic_test, class_foo_with_method) {
     VectorOfNodes tree = get_tree(text);
     FirstPass fp;
     fp.analyze(tree);
-    SymbolInfo* ginfo = fp.globals->get("Foo");
+    ClassInfo* ginfo = fp.class_table->get("Foo");
     MapStringToFunction methods;
     methods["foo"] = f_info({typenode_integer}, typenode_string);
-    EXPECT_TRUE(equal(ginfo, w_cinfo(MapStringToSimple(), methods)));
+    ClassInfo* expected = new ClassInfo;
+    expected->methods = methods;
+    EXPECT_TRUE(equal(ginfo, expected));
 }
 
 TEST(semantic_test, class_foo_complete) {
@@ -103,7 +110,7 @@ TEST(semantic_test, class_foo_complete) {
     VectorOfNodes tree = get_tree(text);
     FirstPass fp;
     fp.analyze(tree);
-    SymbolInfo* ginfo = fp.globals->get("Foo");
+    ClassInfo* ginfo = fp.class_table->get("Foo");
     MapStringToFunction methods;
     methods["foo"] = f_info({typenode_integer}, typenode_string);
     methods["bar"] = f_info({typenode_list(typenode_string), typenode_dict(typenode_string, typenode_integer)},
@@ -111,5 +118,8 @@ TEST(semantic_test, class_foo_complete) {
     MapStringToSimple fields;
     fields["y"] = s_info(typenode_string);
     fields["z"] = s_info(typenode_integer);
-    EXPECT_TRUE(equal(ginfo, w_cinfo(fields, methods)));
+    ClassInfo* expected = new ClassInfo;
+    expected->fields = fields;
+    expected->methods = methods;
+    EXPECT_TRUE(equal(ginfo, expected));
 }

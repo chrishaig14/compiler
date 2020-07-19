@@ -5,17 +5,14 @@
 #include "FirstPass.h"
 
 void FirstPass::analyze(ClassNode* node) {
-    ClassInfo* c = new ClassInfo;
+    ClassInfo* class_info = new ClassInfo;
     for (auto f: node->fields) {
-        c->fields[f->identifier] = new SimpleInfo(f->type);
+        class_info->fields[f->identifier] = new SimpleInfo(f->type);
     }
     for (auto m: node->methods) {
-        c->methods[m->name] = new FunctionInfo(m->parameter_types, m->return_type);
+        class_info->methods[m->name] = new FunctionInfo(m->parameter_types, m->return_type);
     }
-    SymbolInfo* symbol_info = new SymbolInfo;
-    symbol_info->type = SINFO::CLASS;
-    symbol_info->class_info = c;
-    this->globals->set(node->name, symbol_info);
+    this->class_table->set(node->name, class_info);
 }
 
 void FirstPass::analyze(FunctionNode* node) {
@@ -38,6 +35,7 @@ void FirstPass::analyze(VectorOfNodes program) {
 
 FirstPass::FirstPass() {
     this->globals = new SymbolTable("global", NULL);
+    this->class_table = new ClassTable();
 }
 
 FunctionInfo::FunctionInfo(std::vector<TypeNode*> parameter_types, TypeNode* return_type) {
@@ -57,7 +55,6 @@ SimpleInfo::SimpleInfo(TypeNode* n) {
         this->type_parameters.push_back(new SimpleInfo(t));
     }
 }
-
 
 
 bool both_null(void* a, void* b) {

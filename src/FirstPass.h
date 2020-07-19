@@ -9,6 +9,7 @@
 #include <map>
 #include "AstNode.h"
 #include "SymbolTable.h"
+#include "ClassTable.h"
 
 void assert_eq_si(SimpleInfo* t1, SimpleInfo* t2);
 
@@ -28,6 +29,7 @@ bool equal(SymbolInfo* a, SymbolInfo* b);
 class FirstPass {
 public:
     SymbolTable* globals;
+    ClassTable* class_table;
 
     FirstPass();
 
