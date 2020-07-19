@@ -34,15 +34,21 @@ AstNode* w_num(int value);
 
 AstNode* w_sub(AstNode* parent, AstNode* sub);
 
+AstNode* w_string(std::string value);
+
 AstNode* w_member(AstNode* parent, std::string child);
+
 AstNode* w_bop(BinopType op, AstNode* left, AstNode* right);
+
 class Parser {
     std::vector<Token> tokens;
     Token token;
     size_t current;
 public:
     Parser(std::vector<Token> &tokens);
+
     AstNode* parse_id_or_literal();
+
     VectorOfNodes parse_list_of_expressions();
 
     AstNode* parse_call_or_subscript_chain(AstNode* parent);

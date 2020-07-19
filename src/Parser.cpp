@@ -130,6 +130,8 @@ AstNode* Parser::parse_id_or_literal() {
             break;
         }
         case TokenType::STRING: {
+            node = w_string(this->token.str);
+            this->next();
             break;
         }
         case TokenType::FUN: {
@@ -568,6 +570,13 @@ AstNode* w_num(int value) {
     AstNode* ast_node = new AstNode;
     ast_node->type = AstType::NUMBER;
     ast_node->ast_number = new NumberNode(value);
+    return ast_node;
+}
+
+AstNode* w_string(std::string value) {
+    AstNode* ast_node = new AstNode;
+    ast_node->type = AstType::STRING;
+    ast_node->ast_string = new StringNode(value);
     return ast_node;
 }
 
