@@ -141,6 +141,15 @@ SymbolInfo* SecondPass::analyze(DeclarationNode* n) {
     return nullptr;
 }
 
+SymbolInfo* SecondPass::analyze(AssignmentNode* n) {
+    SymbolInfo* linfo = this->analyze(n->lvalue);
+    SymbolInfo* expression_type = this->analyze(n->rvalue);
+    if (!equal(linfo, expression_type)) {
+        throw ReturnError(expression_type->simple_info->parent, linfo->simple_info->parent);
+    }
+    return nullptr;
+}
+
 SymbolInfo* SecondPass::analyze(MemberNode* n) {
     SymbolInfo* symbol_info = this->analyze(n->parent);
     if (symbol_info->type != SINFO::SIMPLE) {
@@ -234,6 +243,7 @@ SymbolInfo* SecondPass::analyze(AstNode* n) {
         case AstType::MEMBER:
             return this->analyze(n->ast_member);
         case AstType::ASSIGNMENT:
+            return this->analyze(n->ast_assignment);
             break;
         case AstType::BINOP:
             return this->analyze(n->ast_binop);

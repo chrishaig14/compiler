@@ -160,12 +160,22 @@ TEST(semantic_test, function_argument_type_error) {
     ASSERT_THROWS_BAD_ARGUMENTS();
 }
 
-TEST(semantic_test, assignment_type_error_1) {
+TEST(semantic_test, declaration_type_error_1) {
     std::string text = "var x: String = 5;";
     ASSERT_THROWS_RETURN_TYPE_ERROR("", "Integer", "String");
 }
 
-TEST(semantic_test, assignment_type_error_2) {
+TEST(semantic_test, declaration_type_error_2) {
     std::string text = "var x: Integer = \"Hello\";";
+    ASSERT_THROWS_RETURN_TYPE_ERROR("", "String", "Integer");
+}
+
+TEST(semantic_test, assignment_type_error_1) {
+    std::string text = "var x: String; x = 5;";
+    ASSERT_THROWS_RETURN_TYPE_ERROR("", "Integer", "String");
+}
+
+TEST(semantic_test, assignment_type_error_2) {
+    std::string text = "var x: Integer;x = \"Hello\";";
     ASSERT_THROWS_RETURN_TYPE_ERROR("", "String", "Integer");
 }

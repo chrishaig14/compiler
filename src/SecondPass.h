@@ -88,6 +88,8 @@ public:
     std::map<std::string, SymbolTable*> scopes;
 
     SymbolInfo* analyze(CallNode* n);
+
+    SymbolInfo* analyze(AssignmentNode* n);
 };
 
 #endif //UNTITLED1_SECONDPASS_H
