@@ -14,7 +14,8 @@ enum class BinopType {
 };
 
 enum class AstType {
-    RETURN, LIST, CLASS, IF, FUNCTION, MEMBER, ASSIGNMENT, BINOP, IDENTIFIER, DECLARATION, TYPE, NUMBER, CALL, SUB
+    RETURN, LIST, CLASS, IF, FUNCTION, MEMBER, ASSIGNMENT, BINOP, IDENTIFIER, DECLARATION, TYPE, NUMBER, CALL, SUB,
+    STRING
 };
 
 std::string ast_string(AstType type);
@@ -26,6 +27,8 @@ class FunctionNode;
 class ClassNode;
 
 class NumberNode;
+
+class StringNode;
 
 class IfNode;
 
@@ -55,6 +58,7 @@ public:
         ClassNode* ast_class;
         IfNode* ast_if;
         BinopNode* ast_binop;
+        StringNode* ast_string;
         AssignmentNode* ast_assignment;
         ListNode* ast_list;
         IdentifierNode* ast_identifier;
@@ -79,6 +83,8 @@ bool equal(TypeNode* a, TypeNode* b);
 bool compare(AssignmentNode* a, AssignmentNode* b);
 
 bool equal(NumberNode* a, NumberNode* b);
+
+bool equal(StringNode* a, StringNode* b);
 
 bool compare(ReturnNode* a, ReturnNode* b);
 
@@ -143,6 +149,15 @@ public:
 
     NumberNode(int num) {
         this->num = num;
+    }
+};
+
+class StringNode {
+public:
+    std::string str;
+
+    StringNode(std::string str) {
+        this->str = str;
     }
 };
 

@@ -61,6 +61,10 @@ bool equal(NumberNode* a, NumberNode* b) {
     return a->num == b->num;
 }
 
+bool equal(StringNode* a, StringNode* b) {
+    return a->str == b->str;
+}
+
 bool equal(TypeNode* a, TypeNode* b) {
     if (a == NULL and b == NULL) {
         return true;
@@ -110,8 +114,12 @@ std::string ast_string(AstType type) {
             return "CALL";
         case AstType::SUB:
             return "SUBSCRIPT";
+        case AstType::STRING:
+            return "STRING";
+            break;
         default:
             throw std::runtime_error("Unknown AstType in ast_string");
+
     }
 }
 
@@ -263,7 +271,11 @@ bool equal(AstNode* a, AstNode* b) {
             return equal(a->ast_number, a->ast_number);
         case AstType::SUB:
             return equal(a->ast_sub, b->ast_sub);
+        case AstType::STRING:
+            return equal(a->ast_string, b->ast_string);
+            break;
         default:
             throw std::runtime_error("Unknown AstType in equal: " + ast_string(a->type));
+
     }
 }
