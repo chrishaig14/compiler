@@ -150,12 +150,17 @@ TEST(semantic_test, function_return_type_ok) {
     ASSERT_OK();
 }
 
-TEST(semantic_test, function_argument_type_ok){
+TEST(semantic_test, function_argument_type_ok) {
     std::string text = "fun foo(x: Integer) -> Integer {return x;} fun bar()->Integer{var y: Integer; return foo(y);}";
     ASSERT_OK();
 }
 
-TEST(semantic_test, function_argument_type_error){
+TEST(semantic_test, function_argument_type_error) {
     std::string text = "fun foo(x: Integer) -> Integer {return x;} fun bar()->Integer{var y: String; return foo(y);}";
     ASSERT_THROWS_BAD_ARGUMENTS();
+}
+
+TEST(semantic_test, assignment_type_error) {
+    std::string text = "var x: String = 5;";
+    ASSERT_THROWS_RETURN_TYPE_ERROR("", "String", "Integer");
 }

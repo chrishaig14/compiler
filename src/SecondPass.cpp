@@ -131,7 +131,12 @@ SymbolInfo* SecondPass::analyze(DeclarationNode* n) {
     if (this->scope->declared(n->identifier)) {
         throw RedeclareError(n->identifier);
     }
-
+    if (n->expression != nullptr and n->type != nullptr) {
+        SymbolInfo* expression_type = this->analyze(n->expression);
+        if (!equal(wrap_simple_info(new SimpleInfo(n->type)), expression_type)) {
+            throw ReturnError(n->type->name, expression_type->simple_info->parent);
+        }
+    }
     this->scope->set(n->identifier, wrap_simple_info(new SimpleInfo(n->type)));
     return nullptr;
 }
@@ -237,7 +242,7 @@ SymbolInfo* SecondPass::analyze(AstNode* n) {
         case AstType::TYPE:
             break;
         case AstType::NUMBER:
-            break;
+            return w_sinfo("Integer");
         case AstType::CALL:
             return this->analyze(n->ast_call);
         default:
