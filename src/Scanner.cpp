@@ -114,6 +114,10 @@ Token Scanner::get_next() {
                 break;
             }
         }
+        this->current++;
+        if (this->current < this->text.size()) {
+            this->column++;
+        }
         return Token(TokenType::STRING, str, start_l, start_c);
     }
     return this->scan_other();

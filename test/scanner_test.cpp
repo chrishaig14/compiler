@@ -115,6 +115,9 @@ TEST(scanner_test, test_string_literal) {
     Scanner scanner(text);
     Token token = scanner.get_next();
     EXPECT_EQ(cmp_token_value(token, st_STRING("hello")), true);
+    token = scanner.get_next();
+
+    EXPECT_EQ(token.type, TokenType::END) << TOKEN_STRINGS[token.type];
 }
 
 TEST(scanner_test, test_string_full) {
