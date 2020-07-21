@@ -13,17 +13,15 @@ TEST(vm_test, inst_push) {
     Value* value = new Value(Integer(7));
     PushInst* inst = new PushInst(value);
     f.run_inst(inst);
-    Value* a = stack.top();
-    EXPECT_TRUE(equal(a, value));
+    EXPECT_TRUE(equal(stack.top(), value));
 }
 
 TEST(vm_test, inst_pop) {
     ValueStack stack;
     Frame f(std::vector<Inst*>(), &stack);
     Value* value = new Value(Integer(7));
-    PushInst* inst = new PushInst(value);
+    stack.push(value);
+    PopInst* inst = new PopInst();
     f.run_inst(inst);
-    Value* a = stack.pop();
-    EXPECT_TRUE(equal(a, value));
     EXPECT_TRUE(stack.empty());
 }

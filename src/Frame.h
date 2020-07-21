@@ -29,8 +29,7 @@ public:
     }
 
     void run_inst(PopInst* pop) {
-
-
+        this->stack->pop();
     }
 
     void run_inst(CallInst* call) {}
