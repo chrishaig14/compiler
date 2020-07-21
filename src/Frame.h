@@ -1,0 +1,62 @@
+//
+// Created by chris on 20/7/20.
+//
+
+#ifndef UNTITLED1_FRAME_H
+#define UNTITLED1_FRAME_H
+
+
+#include <vector>
+#include <stack>
+#include <stdexcept>
+#include "Inst.h"
+#include "Value.h"
+#include "ValueStack.h"
+
+
+class Frame {
+public:
+
+    std::vector<Inst*> code;
+    size_t inst_ptr;
+    ValueStack* stack;
+
+    void run() {
+        while (inst_ptr < code.size()) {
+            Inst* inst = this->code[this->inst_ptr];
+            this->run_inst(inst);
+        }
+    }
+
+    void run_inst(PopInst* pop) {
+
+
+    }
+
+    void run_inst(CallInst* call) {}
+
+    void run_inst(Inst* inst) {
+        switch (inst->type) {
+            case InstType::PUSH:
+                this->run_inst(inst->push);
+                break;
+            case InstType::POP:
+                this->run_inst(inst->pop);
+                break;
+            case InstType::CALL:
+                this->run_inst(inst->call);
+                break;
+        }
+    }
+
+    Frame(std::vector<Inst*> code, ValueStack* stack) {
+        this->stack = stack;
+    }
+
+    void run_inst(PushInst* push) {
+        this->stack->push(push->value);
+    }
+};
+
+
+#endif //UNTITLED1_FRAME_H
