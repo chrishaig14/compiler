@@ -13,7 +13,8 @@ enum class InstType {
     POP,
     CALL,
     LOAD,
-    STORE
+    STORE,
+    DECLARE
 };
 
 class PushInst {
@@ -40,6 +41,16 @@ public:
     }
 };
 
+
+class DeclareInst {
+public:
+    std::string name;
+    DeclareInst(std::string
+    name){
+        this->name = name;
+    }
+};
+
 class StoreInst {
 public:
     std::string name;
@@ -58,6 +69,7 @@ public:
     PushInst* push;
     PopInst* pop;
     CallInst* call;
+    DeclareInst* declare;
 };
 
 #endif //UNTITLED1_INST_H

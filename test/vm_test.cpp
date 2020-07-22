@@ -25,3 +25,11 @@ TEST(vm_test, inst_pop) {
     f.run_inst(inst);
     EXPECT_TRUE(stack.empty());
 }
+
+TEST(vm_test, inst_declare) {
+    ValueStack stack;
+    Frame f(std::vector<Inst*>(), &stack);
+    DeclareInst* inst = new DeclareInst("a");
+    f.run_inst(inst);
+    EXPECT_TRUE(f.env->is_declared("a"));
+}

@@ -50,8 +50,13 @@ public:
         }
     }
 
+    void run_inst(DeclareInst* declare) {
+        this->env->declare(declare->name);
+    }
+
     Frame(std::vector<Inst*> code, ValueStack* stack) {
         this->stack = stack;
+        this->env = new Environment(nullptr);
     }
 
     void run_inst(PushInst* push) {

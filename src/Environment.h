@@ -17,6 +17,10 @@ public:
 
     void set(std::string name, Value* value);
 
+    bool is_declared(std::string name) {
+        return this->table.count(name);
+    }
+
     Value* get(std::string name);
 
     void declare(std::string name);
