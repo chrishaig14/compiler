@@ -33,3 +33,17 @@ TEST(vm_test, inst_declare) {
     f.run_inst(inst);
     EXPECT_TRUE(f.env->is_declared("a"));
 }
+
+TEST(vm_test, inst_store) {
+    ValueStack stack;
+    Frame f(std::vector<Inst*>(), &stack);
+    Value* value = new Value(Integer(7));
+    PushInst* push_inst = new PushInst(value);
+    DeclareInst* declare_inst = new DeclareInst("a");
+    StoreInst* store_inst = new StoreInst("a");
+    f.run_inst(declare_inst);
+    f.run_inst(push_inst);
+    f.run_inst(store_inst);
+    EXPECT_TRUE(equal(f.env->get("a"), value));
+    EXPECT_TRUE(stack.empty());
+}

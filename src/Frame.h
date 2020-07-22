@@ -62,6 +62,11 @@ public:
     void run_inst(PushInst* push) {
         this->stack->push(push->value);
     }
+
+    void run_inst(StoreInst* store) {
+        Value* value = this->stack->pop();
+        this->env->set(store->name, value);
+    }
 };
 
 
