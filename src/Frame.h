@@ -12,6 +12,7 @@
 #include "Inst.h"
 #include "Value.h"
 #include "ValueStack.h"
+#include "Environment.h"
 
 
 class Frame {
@@ -20,6 +21,7 @@ public:
     std::vector<Inst*> code;
     size_t inst_ptr;
     ValueStack* stack;
+    Environment* env;
 
     void run() {
         while (inst_ptr < code.size()) {
