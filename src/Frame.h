@@ -51,8 +51,10 @@ public:
                 this->run_inst(inst->load);
                 break;
             case InstType::STORE:
+                this->run_inst(inst->store);
                 break;
             case InstType::DECLARE:
+                this->run_inst(inst->declare);
                 break;
         }
     }
