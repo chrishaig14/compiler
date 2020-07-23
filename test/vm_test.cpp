@@ -47,3 +47,21 @@ TEST(vm_test, inst_store) {
     EXPECT_TRUE(equal(f.env->get("a"), value));
     EXPECT_TRUE(stack.empty());
 }
+
+TEST(vm_test, inst_load) {
+    ValueStack stack;
+    Frame f(std::vector<Inst*>(), &stack);
+    Value* value_7 = new Value(Integer(7));
+    Value* value_9 = new Value(Integer(9));
+    PushInst* push_inst_7 = new PushInst(value_7);
+    PushInst* push_inst_9 = new PushInst(value_9);
+    DeclareInst* declare_inst = new DeclareInst("a");
+    StoreInst* store_inst = new StoreInst("a");
+    LoadInst* load_inst = new LoadInst("a");
+    f.run_inst(declare_inst);
+    f.run_inst(push_inst_7);
+    f.run_inst(store_inst);
+    f.run_inst(push_inst_9);
+    f.run_inst(load_inst);
+    EXPECT_TRUE(equal(stack.top(), value_7));
+}

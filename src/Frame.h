@@ -47,6 +47,13 @@ public:
             case InstType::CALL:
                 this->run_inst(inst->call);
                 break;
+            case InstType::LOAD:
+                this->run_inst(inst->load);
+                break;
+            case InstType::STORE:
+                break;
+            case InstType::DECLARE:
+                break;
         }
     }
 
@@ -66,6 +73,11 @@ public:
     void run_inst(StoreInst* store) {
         Value* value = this->stack->pop();
         this->env->set(store->name, value);
+    }
+
+    void run_inst(LoadInst* load) {
+        Value* value = this->env->get(load->name);
+        this->stack->push(value);
     }
 };
 
