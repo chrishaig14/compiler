@@ -9,7 +9,6 @@
 #include <stack>
 #include <stdexcept>
 #include "Inst.h"
-#include "Value.h"
 
 class ValueStackElement {
 public:

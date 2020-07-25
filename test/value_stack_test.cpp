@@ -4,20 +4,20 @@
 
 #include <gtest/gtest.h>
 #include "ValueStack.h"
-
+#include "Value.h"
+static Value* value_7 = new Value(new Integer(7));
 
 TEST(vm_test, stack_push) {
     ValueStack stack;
-    Value* value = new Value(Integer(7));
-    stack.push(value);
+    stack.push(value_7);
     Value* a = stack.top();
-    EXPECT_TRUE(equal(a, value));
+    EXPECT_TRUE(equal(a, value_7));
     EXPECT_FALSE(stack.empty());
 }
 
 TEST(vm_test, stack_pop) {
     ValueStack stack;
-    Value* value = new Value(Integer(7));
+    Value* value = new Value(new Integer(7));
     stack.push(value);
     Value* a = stack.pop();
     EXPECT_TRUE(equal(a, value));
@@ -31,11 +31,11 @@ TEST(vm_test, stack_empty_is_empty) {
 
 TEST(vm_test, stack_integration) {
     ValueStack stack;
-    Value* value_4 = new Value(Integer(4));
-    Value* value_5 = new Value(Integer(5));
-    Value* value_2 = new Value(Integer(2));
-    Value* value_3 = new Value(Integer(3));
-    Value* value_1 = new Value(Integer(1));
+    Value* value_4 = new Value(new Integer(4));
+    Value* value_5 = new Value(new Integer(5));
+    Value* value_2 = new Value(new Integer(2));
+    Value* value_3 = new Value(new Integer(3));
+    Value* value_1 = new Value(new Integer(1));
     stack.push(value_1); // 1
     stack.push(value_2); // 1 2
     stack.pop(); // 1

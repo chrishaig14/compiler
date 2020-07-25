@@ -5,8 +5,24 @@
 #ifndef UNTITLED1_VALUE_H
 #define UNTITLED1_VALUE_H
 
+#include "ValueStack.h"
+#include "Inst.h"
 enum class ValueType {
-    INTEGER
+    INTEGER, CODE
+};
+
+class Inst;
+class Integer;
+class Code;
+class Value {
+public:
+    Integer* integer;
+    Code* code;
+    ValueType type;
+
+    Value(Integer* integer);
+
+    Value(Code* code);
 };
 
 class Integer {
@@ -18,12 +34,41 @@ public:
     int value;
 };
 
-class Value {
+class CodeBuiltin {
 public:
-    Integer integer;
-    ValueType type;
+    virtual void run(ValueStack* stack) = 0;
+};
 
-    Value(Integer integer);
+class BuiltinSum : public CodeBuiltin {
+public:
+    void run(ValueStack* stack);
+};
+
+class CodeUser {
+public:
+    std::vector<Inst*> code;
+
+    CodeUser(std::vector<Inst*> code);
+
+    Inst* get(int i);
+
+    size_t size();
+};
+
+enum class CodeType {
+    BUILTIN, USER
+};
+
+class Code {
+    union {
+        CodeUser* user;
+    };
+
+public:
+    Code(CodeBuiltin* builtin);
+
+    CodeType type;
+    CodeBuiltin* builtin;
 };
 
 bool equal(Value* a, Value* b);

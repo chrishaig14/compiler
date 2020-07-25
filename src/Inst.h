@@ -6,8 +6,7 @@
 #define UNTITLED1_INST_H
 
 #include <string>
-#include "Value.h"
-
+class Value;
 enum class InstType {
     PUSH,
     POP,

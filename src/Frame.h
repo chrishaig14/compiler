@@ -18,14 +18,14 @@
 class Frame {
 public:
 
-    std::vector<Inst*> code;
+    CodeUser* code;
     size_t inst_ptr;
     ValueStack* stack;
     Environment* env;
 
     void run() {
-        while (inst_ptr < code.size()) {
-            Inst* inst = this->code[this->inst_ptr];
+        while (inst_ptr < code->size()) {
+            Inst* inst = this->code->get(this->inst_ptr);
             this->run_inst(inst);
         }
     }
@@ -34,7 +34,19 @@ public:
         this->stack->pop();
     }
 
-    void run_inst(CallInst* call) {}
+    void run_inst(CallInst* call) {
+        Value* value = this->stack->pop();
+        if (value->type != ValueType::CODE) {
+            throw std::runtime_error("Trying to call something that's not code!");
+        }
+        Code* code = value->code;
+        if(code->type == CodeType::BUILTIN){
+            code->builtin->run(this->stack);
+        } else {
+            throw std::runtime_error("Trying to run user code!");
+        }
+//        throw std::runtime_error("Unimplemented call instruction!");
+    }
 
     void run_inst(Inst* inst) {
         switch (inst->type) {
