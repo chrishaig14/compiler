@@ -3,4 +3,4 @@ project(untitled1)
 
 set(CMAKE_CXX_STANDARD 11)
 
-add_library(srcLib lib.cpp Scanner.cpp Scanner.h Token.cpp Token.h color_codes.h Parser.cpp Parser.h AstNode.cpp AstNode.h replacer.cpp replacer.h FirstPass.cpp FirstPass.h SecondPass.cpp SecondPass.h SymbolTable.cpp SymbolTable.h ClassTable.cpp ClassTable.h VirtualMachine.cpp VirtualMachine.h Frame.cpp Frame.h Inst.cpp Inst.h Value.cpp Value.h ValueStack.h ValueStack.cpp Environment.cpp Environment.h)
+add_library(srcLib lib.cpp Scanner.cpp Scanner.h Token.cpp Token.h color_codes.h Parser.cpp Parser.h AstNode.cpp AstNode.h replacer.cpp replacer.h FirstPass.cpp FirstPass.h SecondPass.cpp SecondPass.h SymbolTable.cpp SymbolTable.h ClassTable.cpp ClassTable.h VirtualMachine.cpp VirtualMachine.h Frame.cpp Frame.h Inst.cpp Inst.h Object.cpp Object.h ObjectStack.h ObjectStack.cpp Environment.cpp Environment.h)

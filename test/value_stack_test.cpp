@@ -3,39 +3,39 @@
 //
 
 #include <gtest/gtest.h>
-#include "ValueStack.h"
-#include "Value.h"
-static Value* value_7 = new Value(new Integer(7));
+#include "ObjectStack.h"
+#include "Object.h"
+static Object* value_7 = new Object(new Integer(7));
 
 TEST(vm_test, stack_push) {
-    ValueStack stack;
+    ObjectStack stack;
     stack.push(value_7);
-    Value* a = stack.top();
+    Object* a = stack.top();
     EXPECT_TRUE(equal(a, value_7));
     EXPECT_FALSE(stack.empty());
 }
 
 TEST(vm_test, stack_pop) {
-    ValueStack stack;
-    Value* value = new Value(new Integer(7));
+    ObjectStack stack;
+    Object* value = new Object(new Integer(7));
     stack.push(value);
-    Value* a = stack.pop();
+    Object* a = stack.pop();
     EXPECT_TRUE(equal(a, value));
     EXPECT_TRUE(stack.empty());
 }
 
 TEST(vm_test, stack_empty_is_empty) {
-    ValueStack stack;
+    ObjectStack stack;
     EXPECT_TRUE(stack.empty());
 }
 
 TEST(vm_test, stack_integration) {
-    ValueStack stack;
-    Value* value_4 = new Value(new Integer(4));
-    Value* value_5 = new Value(new Integer(5));
-    Value* value_2 = new Value(new Integer(2));
-    Value* value_3 = new Value(new Integer(3));
-    Value* value_1 = new Value(new Integer(1));
+    ObjectStack stack;
+    Object* value_4 = new Object(new Integer(4));
+    Object* value_5 = new Object(new Integer(5));
+    Object* value_2 = new Object(new Integer(2));
+    Object* value_3 = new Object(new Integer(3));
+    Object* value_1 = new Object(new Integer(1));
     stack.push(value_1); // 1
     stack.push(value_2); // 1 2
     stack.pop(); // 1

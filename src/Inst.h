@@ -6,7 +6,7 @@
 #define UNTITLED1_INST_H
 
 #include <string>
-class Value;
+class Object;
 enum class InstType {
     PUSH,
     POP,
@@ -18,9 +18,9 @@ enum class InstType {
 
 class PushInst {
 public:
-    Value* value;
+    Object* value;
 
-    PushInst(Value* value) {
+    PushInst(Object* value) {
         this->value = value;
     }
 };

@@ -4,11 +4,11 @@
 
 #include <gtest/gtest.h>
 #include <Frame.h>
-#include "ValueStack.h"
+#include "ObjectStack.h"
 
-static Value* value_7 = new Value(new Integer(7));
+static Object* value_7 = new Object(new Integer(7));
 TEST(vm_test, inst_push) {
-    ValueStack stack;
+    ObjectStack stack;
     Frame f(std::vector<Inst*>(), &stack);
     PushInst* inst = new PushInst(value_7);
     f.run_inst(inst);
@@ -16,7 +16,7 @@ TEST(vm_test, inst_push) {
 }
 
 TEST(vm_test, inst_pop) {
-    ValueStack stack;
+    ObjectStack stack;
     Frame f(std::vector<Inst*>(), &stack);
     stack.push(value_7);
     PopInst* inst = new PopInst();
@@ -25,7 +25,7 @@ TEST(vm_test, inst_pop) {
 }
 
 TEST(vm_test, inst_declare) {
-    ValueStack stack;
+    ObjectStack stack;
     Frame f(std::vector<Inst*>(), &stack);
     DeclareInst* inst = new DeclareInst("a");
     f.run_inst(inst);
@@ -33,7 +33,7 @@ TEST(vm_test, inst_declare) {
 }
 
 TEST(vm_test, inst_store) {
-    ValueStack stack;
+    ObjectStack stack;
     Frame f(std::vector<Inst*>(), &stack);
     PushInst* push_inst = new PushInst(value_7);
     DeclareInst* declare_inst = new DeclareInst("a");
@@ -46,9 +46,9 @@ TEST(vm_test, inst_store) {
 }
 
 TEST(vm_test, inst_load) {
-    ValueStack stack;
+    ObjectStack stack;
     Frame f(std::vector<Inst*>(), &stack);
-    Value* value_9 = new Value(new Integer(9));
+    Object* value_9 = new Object(new Integer(9));
     PushInst* push_inst_7 = new PushInst(value_7);
     PushInst* push_inst_9 = new PushInst(value_9);
     DeclareInst* declare_inst = new DeclareInst("a");
@@ -63,13 +63,13 @@ TEST(vm_test, inst_load) {
 }
 
 TEST(vm_test, inst_call) {
-    ValueStack stack;
+    ObjectStack stack;
     Frame f(std::vector<Inst*>(), &stack);
     std::vector<Inst*> code_vector = {new Inst()};
     BuiltinSum builtinSum;
-    Value* builtin_sum = new Value(new Code(&builtinSum));
-    Value* value_9 = new Value(new Integer(9));
-    Value* value_16 = new Value(new Integer(16));
+    Object* builtin_sum = new Object(new Code(&builtinSum));
+    Object* value_9 = new Object(new Integer(9));
+    Object* value_16 = new Object(new Integer(16));
     PushInst* push_sum_value = new PushInst(builtin_sum);
     PushInst* push_inst_9 = new PushInst(value_9);
     PushInst* push_inst_7 = new PushInst(value_7);

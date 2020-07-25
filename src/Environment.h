@@ -6,22 +6,22 @@
 #define UNTITLED1_ENVIRONMENT_H
 
 #include <map>
-#include "Value.h"
+#include "Object.h"
 
 class Environment {
-    std::map<std::string, Value*> table;
+    std::map<std::string, Object*> table;
 
     Environment* parent;
 public:
     Environment(Environment* parent);
 
-    void set(std::string name, Value* value);
+    void set(std::string name, Object* value);
 
     bool is_declared(std::string name) {
         return this->table.count(name);
     }
 
-    Value* get(std::string name);
+    Object* get(std::string name);
 
     void declare(std::string name);
 

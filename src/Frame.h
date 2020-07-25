@@ -10,8 +10,8 @@
 #include <stack>
 #include <stdexcept>
 #include "Inst.h"
-#include "Value.h"
-#include "ValueStack.h"
+#include "Object.h"
+#include "ObjectStack.h"
 #include "Environment.h"
 
 
@@ -20,7 +20,7 @@ public:
 
     CodeUser* code;
     size_t inst_ptr;
-    ValueStack* stack;
+    ObjectStack* stack;
     Environment* env;
 
     void run() {
@@ -35,7 +35,7 @@ public:
     }
 
     void run_inst(CallInst* call) {
-        Value* value = this->stack->pop();
+        Object* value = this->stack->pop();
         if (value->type != ValueType::CODE) {
             throw std::runtime_error("Trying to call something that's not code!");
         }
@@ -75,7 +75,7 @@ public:
         this->env->declare(declare->name);
     }
 
-    Frame(std::vector<Inst*> code, ValueStack* stack) {
+    Frame(std::vector<Inst*> code, ObjectStack* stack) {
         this->stack = stack;
         this->env = new Environment(nullptr);
     }
@@ -85,12 +85,12 @@ public:
     }
 
     void run_inst(StoreInst* store) {
-        Value* value = this->stack->pop();
+        Object* value = this->stack->pop();
         this->env->set(store->name, value);
     }
 
     void run_inst(LoadInst* load) {
-        Value* value = this->env->get(load->name);
+        Object* value = this->env->get(load->name);
         this->stack->push(value);
     }
 };

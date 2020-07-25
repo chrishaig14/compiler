@@ -8,7 +8,7 @@ Environment::Environment(Environment* parent) {
     this->parent = parent;
 }
 
-void Environment::set(std::string name, Value* value) {
+void Environment::set(std::string name, Object* value) {
     if (this->table.count(name) == 0) {
         if (this->parent != nullptr) {
             this->parent->set(name, value);
@@ -19,7 +19,7 @@ void Environment::set(std::string name, Value* value) {
     this->table[name] = value;
 }
 
-Value* Environment::get(std::string name) {
+Object* Environment::get(std::string name) {
     if (this->table.count(name) == 0) {
         if (this->parent != nullptr) {
             return this->parent->get(name);

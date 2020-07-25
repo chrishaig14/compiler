@@ -2,20 +2,20 @@
 // Created by chris on 20/7/20.
 //
 
-#include "Value.h"
+#include "Object.h"
 #include "FirstPass.h"
 
-Value::Value(Integer* integer) {
+Object::Object(Integer* integer) {
     this->integer = integer;
     this->type = ValueType::INTEGER;
 }
 
-Value::Value(Code* code) {
+Object::Object(Code* code) {
     this->code = code;
     this->type = ValueType::CODE;
 }
 
-bool equal(Value* a, Value* b) {
+bool equal(Object* a, Object* b) {
     if (both_null(a, b)) return true;
     if (one_null(a, b)) return false;
     if (a->type != b->type) return false;
@@ -35,11 +35,11 @@ Integer::Integer(int value) {
     this->value = value;
 }
 
-void BuiltinSum::run(ValueStack* stack) {
-    Value* value_a = stack->pop();
-    Value* value_b = stack->pop();
+void BuiltinSum::run(ObjectStack* stack) {
+    Object* value_a = stack->pop();
+    Object* value_b = stack->pop();
     if (value_a->type == ValueType::INTEGER and value_b->type == ValueType::INTEGER) {
-        stack->push(new Value(new Integer(value_a->integer->value + value_b->integer->value)));
+        stack->push(new Object(new Integer(value_a->integer->value + value_b->integer->value)));
     }
 }
 

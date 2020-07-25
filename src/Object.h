@@ -2,10 +2,10 @@
 // Created by chris on 20/7/20.
 //
 
-#ifndef UNTITLED1_VALUE_H
-#define UNTITLED1_VALUE_H
+#ifndef UNTITLED1_OBJECT_H
+#define UNTITLED1_OBJECT_H
 
-#include "ValueStack.h"
+#include "ObjectStack.h"
 #include "Inst.h"
 enum class ValueType {
     INTEGER, CODE
@@ -14,15 +14,15 @@ enum class ValueType {
 class Inst;
 class Integer;
 class Code;
-class Value {
+class Object {
 public:
     Integer* integer;
     Code* code;
     ValueType type;
 
-    Value(Integer* integer);
+    Object(Integer* integer);
 
-    Value(Code* code);
+    Object(Code* code);
 };
 
 class Integer {
@@ -36,12 +36,12 @@ public:
 
 class CodeBuiltin {
 public:
-    virtual void run(ValueStack* stack) = 0;
+    virtual void run(ObjectStack* stack) = 0;
 };
 
 class BuiltinSum : public CodeBuiltin {
 public:
-    void run(ValueStack* stack);
+    void run(ObjectStack* stack);
 };
 
 class CodeUser {
@@ -71,7 +71,7 @@ public:
     CodeBuiltin* builtin;
 };
 
-bool equal(Value* a, Value* b);
+bool equal(Object* a, Object* b);
 
 
-#endif //UNTITLED1_VALUE_H
+#endif //UNTITLED1_OBJECT_H
