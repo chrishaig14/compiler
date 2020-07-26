@@ -116,7 +116,6 @@ std::string ast_string(AstType type) {
             return "SUBSCRIPT";
         case AstType::STRING:
             return "STRING";
-            break;
         default:
             throw std::runtime_error("Unknown AstType in ast_string");
 
@@ -273,7 +272,6 @@ bool equal(AstNode* a, AstNode* b) {
             return equal(a->ast_sub, b->ast_sub);
         case AstType::STRING:
             return equal(a->ast_string, b->ast_string);
-            break;
         default:
             throw std::runtime_error("Unknown AstType in equal: " + ast_string(a->type));
 
