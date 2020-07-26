@@ -105,7 +105,7 @@ AstNode* Parser::parse_id_call_or_subscript() {
 }
 
 AstNode* Parser::parse_function_expression() {
-    return NULL;
+    return nullptr;
 }
 
 AstNode* Parser::parse_id_or_literal() {
@@ -275,12 +275,12 @@ DeclarationNode* Parser::parse_variable_declaration() {
     if (this->match(TokenType::VAR)) {
         this->next();
         Token identifier = this->expect_token(TokenType::ID);
-        TypeNode* type = NULL;
+        TypeNode* type = nullptr;
         if (this->match(TokenType::COLON)) {
             this->next();
             type = this->parse_type_node();
         }
-        AstNode* expression = NULL;
+        AstNode* expression = nullptr;
         if (this->match(TokenType::EQQ)) {
             this->next();
             expression = this->parse_expression();
@@ -288,7 +288,7 @@ DeclarationNode* Parser::parse_variable_declaration() {
         DeclarationNode* node = new DeclarationNode(identifier.str, type, expression);
         return node;
     }
-    return NULL;
+    return nullptr;
 }
 
 AstNode* Parser::parse_common_statement() {
@@ -338,7 +338,7 @@ AstNode* Parser::parse_interface_definition() {
     }
     this->expect_token(TokenType::LCURLY);
     this->expect_token(TokenType::RCURLY);
-    return NULL;
+    return nullptr;
 }
 
 TypeNode* Parser::parse_type_node() {
@@ -445,7 +445,7 @@ FunctionNode* Parser::parse_function_definition() {
         this->expect_token(TokenType::RPAREN);
     }
     // Parse return
-    TypeNode* return_type = NULL;
+    TypeNode* return_type = nullptr;
     this->expect_token(TokenType::RARROW);
     return_type = this->parse_type_node();
 //        this->expect_token(TokenType::LCURLY);

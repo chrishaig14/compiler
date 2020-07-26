@@ -34,7 +34,7 @@ void FirstPass::analyze(VectorOfNodes program) {
 }
 
 FirstPass::FirstPass() {
-    this->globals = new SymbolTable("global", NULL);
+    this->globals = new SymbolTable("global", nullptr);
     this->class_table = new ClassTable();
 }
 
@@ -42,8 +42,8 @@ FunctionInfo::FunctionInfo(std::vector<TypeNode*> parameter_types, TypeNode* ret
     for (auto n: parameter_types) {
         this->parameter_types.push_back(new ObjectInfo(n));
     }
-    if (return_type == NULL) {
-        this->return_type = NULL;
+    if (return_type == nullptr) {
+        this->return_type = nullptr;
     } else {
         this->return_type = new ObjectInfo(return_type);
     }

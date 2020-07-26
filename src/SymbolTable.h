@@ -70,7 +70,7 @@ public:
         if (this->table.count(name) == 1) {
             return true;
         } else {
-            if (this->parent != NULL) {
+            if (this->parent != nullptr) {
                 return this->parent->has(name);
             }
             return false;
@@ -81,7 +81,7 @@ public:
         if (this->table.count(name) == 1) {
             return this->table[name];
         } else {
-            if (this->parent != NULL) {
+            if (this->parent != nullptr) {
                 return this->parent->get(name);
             }
         }

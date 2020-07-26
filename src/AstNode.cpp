@@ -12,7 +12,7 @@ i_fun(std::string name, VectorOfStrings parameter_names, VectorOfTypes parameter
 }
 
 DeclarationNode* i_decl(std::string name, AstNode* expression) {
-    return new DeclarationNode(name, NULL, expression);
+    return new DeclarationNode(name, nullptr, expression);
 }
 
 DeclarationNode* i_decl_type(std::string name, TypeNode* type, AstNode* expression) {
@@ -123,7 +123,7 @@ std::string ast_string(AstType type) {
 }
 
 bool compare(ListNode* a, ListNode* b) {
-    if (a == NULL and b == NULL) {
+    if (a == nullptr and b == nullptr) {
         return true;
     }
     if (a->elements.size() != b->elements.size())return false;
@@ -134,14 +134,14 @@ bool compare(ListNode* a, ListNode* b) {
 }
 
 bool equal(DeclarationNode* a, DeclarationNode* b) {
-    if (a == NULL and b == NULL) {
+    if (a == nullptr and b == nullptr) {
         return true;
     }
     return (a->identifier == b->identifier) and equal(a->type, b->type) and equal(a->expression, b->expression);
 }
 
 bool compare(IdentifierNode* a, IdentifierNode* b) {
-    if (a == NULL and b == NULL) {
+    if (a == nullptr and b == nullptr) {
         return true;
     }
     return a->name == b->name;

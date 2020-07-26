@@ -26,7 +26,7 @@ AstNode* w_asn(AstNode* lvalue, AstNode* rvalue) {
 AstNode* w_decl(std::string name, AstNode* expression) {
     AstNode* ast_node = new AstNode;
     ast_node->type = AstType::DECLARATION;
-    ast_node->ast_declaration = new DeclarationNode(name, NULL, expression);
+    ast_node->ast_declaration = new DeclarationNode(name, nullptr, expression);
     return ast_node;
 }
 
@@ -47,7 +47,7 @@ AstNode* w_fun(FunctionNode* node) {
 
 AstNode* n_a_plus_b = w_bop(BinopType::PLUS, w_id("a"), w_id("b"));
 
-DeclarationNode* n_decl_x = new DeclarationNode("x", NULL, NULL);
+DeclarationNode* n_decl_x = new DeclarationNode("x", nullptr, nullptr);
 
 AstNode* n_asn_x(AstNode* rvalue) {
     return w_asn(w_id("x"), rvalue);
@@ -193,7 +193,7 @@ TEST(parser_test, decl_with_type) {
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
     DeclarationNode* node = parser.parse_variable_declaration();
-    EXPECT_EQ(equal(node, i_decl_type("x", n_complex_type, NULL)), true);
+    EXPECT_EQ(equal(node, i_decl_type("x", n_complex_type, nullptr)), true);
 }
 
 TEST(parser_test, decl_with_type_and_value) {
@@ -269,8 +269,8 @@ TEST(parser_test, class_foo_with_fields) {
     Parser parser(tokens);
     ClassNode* node = parser.parse_class_definition();
     EXPECT_EQ(
-            equal(node, i_class("Foo", {}, {i_decl_type("x", t_string(), NULL),
-                                            i_decl_type("y", t_integer(), NULL)}, {})),
+            equal(node, i_class("Foo", {}, {i_decl_type("x", t_string(), nullptr),
+                                            i_decl_type("y", t_integer(), nullptr)}, {})),
             true);
 }
 
@@ -286,8 +286,8 @@ TEST(parser_test, class_foo_with_method) {
 }
 
 std::string complete_foo_class_string = "class Foo{var x: String; var y: Integer;" + fun_foo_string + "}";
-ClassNode* complete_foo_class_node = i_class("Foo", {}, {i_decl_type("x", t_string(), NULL),
-                                                         i_decl_type("y", t_integer(), NULL)},
+ClassNode* complete_foo_class_node = i_class("Foo", {}, {i_decl_type("x", t_string(), nullptr),
+                                                         i_decl_type("y", t_integer(), nullptr)},
                                              {fun_foo_node});
 
 TEST(parser_test, template_class_foo_empty) {
