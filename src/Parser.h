@@ -97,10 +97,6 @@ public:
 
     AstNode* parse_function_expression();
 
-    FunctionSignatureNode* parse_function_signature();
-
-    AstNode* parse_member_or_other();
-
     ListNode* parse_list_literal();
 
     CallNode* parse_call();
