@@ -137,6 +137,8 @@ AstNode* Parser::parse_id_or_literal() {
         case TokenType::FUN: {
             return this->parse_function_expression();
         }
+        default:
+            throw std::runtime_error("parsing id or literal, unknown token type: " + TOKEN_STRINGS[token.type]);
     }
     return node;
 }
