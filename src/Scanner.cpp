@@ -91,11 +91,9 @@ Token Scanner::get_next() {
         c = this->text[this->current];
     }
     if (isalpha(c) || c == '_') {
-//        std::cout << HCYN << "Gonna scan for keyword or identifier" << reset << std::endl;
         return this->scan_keyword_or_identifier();
     }
     if (isdigit(c)) {
-//        std::cout << HCYN << "Gonna scan for number" << reset << std::endl;
         return this->scan_number();
     }
     if (c == '\"') {

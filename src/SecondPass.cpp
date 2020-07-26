@@ -4,15 +4,7 @@
 
 #include "SecondPass.h"
 
-SymbolInfo* w_cinfo(MapStringToSimple fields, MapStringToFunction methods) {
-    SymbolInfo* ginfo = new SymbolInfo;
-    ginfo->type = SINFO::CLASS;
-    ClassInfo* cinfo = new ClassInfo;
-    cinfo->methods = methods;
-    cinfo->fields = fields;
-    ginfo->class_info = cinfo;
-    return ginfo;
-}
+
 
 SymbolInfo* w_finfo(VectorOfTypes parameter_types, TypeNode* return_type) {
     SymbolInfo* ginfo = new SymbolInfo;
@@ -62,7 +54,6 @@ bool RedeclareError::operator==(const RedeclareError &other) const {
 }
 
 bool ReturnError::operator==(const ReturnError &other) const {
-    std::cout << "COMPARING ERRORS" << std::endl;
     std::string a = this->what();
     std::string b = other.what();
     bool t = a == b;
@@ -75,7 +66,6 @@ ReturnError::ReturnError(std::string actual_type, std::string expected_type) : r
 }
 
 bool ScopeError::operator==(const ScopeError &other) const {
-    std::cout << "COMPARING ERRORS" << std::endl;
     std::string a = this->what();
     std::string b = other.what();
     bool t = a == b;
@@ -89,7 +79,8 @@ SecondPass::SecondPass(SymbolTable* globals, ClassTable* class_table) {
     this->class_table = class_table;
     this->scope = globals;
     this->scopes["global"] = this->scope;
-    this->scope->set("Integer", w_cinfo(MapStringToSimple(), MapStringToFunction()));
+    this->class_table->set("Integer", new ClassInfo(MapStringToSimple(), std::map<std::string, FunctionInfo*>()));
+//    this->scope->set("Integer", w_cinfo());
 }
 
 void SecondPass::enter_scope(std::string name) {

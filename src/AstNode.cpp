@@ -144,7 +144,6 @@ bool compare(IdentifierNode* a, IdentifierNode* b) {
     if (a == NULL and b == NULL) {
         return true;
     }
-    std::cout << "Comparing identifier " << a->name << " and " << b->name << std::endl;
     return a->name == b->name;
 }
 
@@ -161,20 +160,14 @@ bool compare(BinopNode* a, BinopNode* b) {
     if (both_null(a, b)) return true;
     if (one_null(a, b)) return false;
     if (a->op != b->op) {
-        std::cout << "comparison between operators returned false" << std::endl;
         return false;
     }
-    std::cout << "They have the same operator " << int(a->op) << std::endl;
     if (not equal(a->left, b->left)) {
-        std::cout << "comparison between left returned false" << std::endl;
         return false;
     }
-    std::cout << "comparison between left returned true" << std::endl;
     if (not equal(a->right, b->right)) {
-        std::cout << "comparison between right returned false" << std::endl;
         return false;
     }
-    std::cout << "comparison between right returned true" << std::endl;
     return true;
 }
 
@@ -237,8 +230,6 @@ bool compare(AssignmentNode* a, AssignmentNode* b) {
 bool equal(AstNode* a, AstNode* b) {
     if (both_null(a, b)) return true;
     if (one_null(a, b)) return false;
-    std::cout << "comparison between a type is " << ast_string(a->type) << " -- ";
-    std::cout << "and b type is " << ast_string(b->type) << std::endl;
 
     if (a->type != b->type) {
         return false;

@@ -23,9 +23,7 @@ IfNode* Parser::parse_if() {
     this->expect_token(TokenType::IF);
     this->expect_token(TokenType::LPAREN);
     AstNode* condition = this->parse_expression();
-    std::cout << "The condition expression is " << ast_string(condition->type) << std::endl;
     this->expect_token(TokenType::RPAREN);
-    std::cout << "Gonna parse possibly empty block" << std::endl;
     VectorOfNodes body = this->parse_possibly_empty_block();
     IfNode* node = new IfNode(condition, body);
     return node;
@@ -183,7 +181,6 @@ AstNode* Parser::parse_factor() {
 
 AstNode* Parser::parse_mul_or_div_expression() {
     AstNode* left = this->parse_factor();
-    std::cout << "Token after left in add_or_sub is" << TOKEN_STRINGS[this->token.type] << std::endl;
     BinopType op;
     while (this->match(TokenType::TIMES) || this->match(TokenType::DIV)) {
         if (this->match(TokenType::TIMES)) {
@@ -194,7 +191,6 @@ AstNode* Parser::parse_mul_or_div_expression() {
             op = BinopType::DIV;
         }
         AstNode* right = this->parse_factor();
-        std::cout << "Right returned " << ast_string(right->type) << std::endl;
         left = w_bop(op, left, right);
     }
     return left;
@@ -202,7 +198,6 @@ AstNode* Parser::parse_mul_or_div_expression() {
 
 AstNode* Parser::parse_add_or_sub_expression() {
     AstNode* left = this->parse_mul_or_div_expression();
-    std::cout << "Token after left in add_or_sub is" << TOKEN_STRINGS[this->token.type] << std::endl;
     BinopType op;
     while (this->match(TokenType::PLUS) || this->match(TokenType::MINUS)) {
         if (this->match(TokenType::PLUS)) {
@@ -213,7 +208,6 @@ AstNode* Parser::parse_add_or_sub_expression() {
             op = BinopType::MINUS;
         }
         AstNode* right = this->parse_mul_or_div_expression();
-        std::cout << "Right returned " << ast_string(right->type) << std::endl;
         left = w_bop(op, left, right);
     }
     return left;
@@ -265,16 +259,13 @@ AstNode* Parser::parse_expression() {
 
 AstNode* Parser::parse_assignment_or_expression() {
     AstNode* lvalue = this->parse_expression();
-    std::cout << "lvalue is of type " << ast_string(lvalue->type) << std::endl;
     if (this->match(TokenType::EQQ)) {
         this->next();
         AstNode* rvalue = this->parse_expression();
-        std::cout << "rvalue is of type " << ast_string(rvalue->type) << std::endl;
         AstNode* ast_node = new AstNode;
         ast_node->type = AstType::ASSIGNMENT;
         AssignmentNode* node = new AssignmentNode(lvalue, rvalue);
         ast_node->ast_assignment = node;
-        std::cout << "returning" << std::endl;
         return ast_node;
     }
     return lvalue;
@@ -283,9 +274,7 @@ AstNode* Parser::parse_assignment_or_expression() {
 DeclarationNode* Parser::parse_variable_declaration() {
     if (this->match(TokenType::VAR)) {
         this->next();
-        std::cout << "Matched token VAR" << std::endl;
         Token identifier = this->expect_token(TokenType::ID);
-        std::cout << "Found identifier " << identifier.str << std::endl;
         TypeNode* type = NULL;
         if (this->match(TokenType::COLON)) {
             this->next();
@@ -459,11 +448,9 @@ FunctionNode* Parser::parse_function_definition() {
     TypeNode* return_type = NULL;
     this->expect_token(TokenType::RARROW);
     return_type = this->parse_type_node();
-    std::cout << "Gonna parse function body" << std::endl;
 //        this->expect_token(TokenType::LCURLY);
     // Parse function body
     VectorOfNodes body = this->parse_possibly_empty_block();
-    std::cout << "Finished parsing function body" << std::endl;
 
     FunctionNode* node = new FunctionNode(identifier, parameter_names, parameter_types, return_type, body);
     return node;

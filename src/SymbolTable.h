@@ -35,6 +35,14 @@ public:
     std::map<std::string, ObjectInfo*> fields;
     std::map<std::string, FunctionInfo*> methods;
 
+    ClassInfo(std::map<std::string, ObjectInfo*> fields,
+              std::map<std::string, FunctionInfo*> methods) {
+        this->fields = fields;
+        this->methods = methods;
+    }
+
+    ClassInfo() {}
+
 };
 
 enum class SINFO {
@@ -44,7 +52,6 @@ enum class SINFO {
 class SymbolInfo {
 public:
     union {
-        ClassInfo* class_info;
         FunctionInfo* function_info;
         ObjectInfo* object_info;
     };

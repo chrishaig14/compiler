@@ -39,9 +39,6 @@ bool Token::operator==(const Token &other) const {
 }
 
 std::ostream &operator<<(std::ostream &os, const Token &token) {
-//        std::cout << "token type : " << token.type;
-    std::cout << "size of tokens: " << TOKEN_STRINGS.size();
-    std::cout << "token: " << TOKEN_STRINGS[token.type];
     os << TOKEN_STRINGS[token.type] << ", num: " << token.num << ", str: " << token.str << " pos: l" << token.line << ":c" << token.column;
     return os;
 }

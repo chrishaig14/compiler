@@ -113,11 +113,10 @@ bool equal(SymbolInfo* a, SymbolInfo* b) {
         switch (a->type) {
             case SINFO::FUNCTION:
                 return equal(a->function_info, b->function_info);
-            case SINFO::CLASS:
-                return equal(a->class_info, b->class_info);
             case SINFO::SIMPLE:
                 return equal(a->object_info, b->object_info);
         }
     }
     return false;
 }
+
