@@ -16,9 +16,8 @@ void FirstPass::analyze(ClassNode* node) {
 }
 
 void FirstPass::analyze(FunctionNode* node) {
-    SymbolInfo* ginfo = new SymbolInfo;
-    ginfo->type = SINFO::FUNCTION;
-    ginfo->function_info = new FunctionInfo(node->parameter_types, node->return_type);
+    FunctionInfo* function_info = new FunctionInfo(node->parameter_types, node->return_type);
+    SymbolInfo* ginfo = new SymbolInfo(function_info);
     this->globals->set(node->name, ginfo);
 }
 

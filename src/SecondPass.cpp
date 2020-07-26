@@ -7,18 +7,16 @@
 
 
 SymbolInfo* w_finfo(VectorOfTypes parameter_types, TypeNode* return_type) {
-    SymbolInfo* ginfo = new SymbolInfo;
-    ginfo->type = SINFO::FUNCTION;
+//    ginfo->type = SINFO::FUNCTION;
     FunctionInfo* finfo = new FunctionInfo(parameter_types, return_type);
-    ginfo->function_info = finfo;
+//    ginfo->function_info = finfo;
+    SymbolInfo* ginfo = new SymbolInfo(finfo);
     return ginfo;
 }
 
 SymbolInfo* w_sinfo(std::string type) {
-    SymbolInfo* ginfo = new SymbolInfo;
-    ginfo->type = SINFO::SIMPLE;
     ObjectInfo* sinfo = new ObjectInfo(i_type(type, {}));
-    ginfo->object_info = sinfo;
+    SymbolInfo* ginfo = new SymbolInfo(sinfo);
     return ginfo;
 }
 
@@ -31,16 +29,16 @@ ObjectInfo* s_info(TypeNode* type) {
 }
 
 SymbolInfo* wrap_function_info(FunctionInfo* finfo) {
-    SymbolInfo* ginfo = new SymbolInfo;
-    ginfo->type = SINFO::FUNCTION;
-    ginfo->function_info = finfo;
+//    ginfo->type = SINFO::FUNCTION;
+//    ginfo->function_info = finfo;
+    SymbolInfo* ginfo = new SymbolInfo(finfo);
     return ginfo;
 }
 
 SymbolInfo* wrap_simple_info(ObjectInfo* sinfo) {
-    SymbolInfo* ginfo = new SymbolInfo;
-    ginfo->type = SINFO::SIMPLE;
-    ginfo->object_info = sinfo;
+//    ginfo->type = SINFO::SIMPLE;
+//    ginfo->object_info = sinfo;
+    SymbolInfo* ginfo = new SymbolInfo(sinfo);
     return ginfo;
 }
 
@@ -100,9 +98,8 @@ void SecondPass::leave_scope() {
 SymbolInfo* SecondPass::analyze(FunctionNode* n) {
     this->enter_scope(n->name);
     for (int i = 0; i < n->parameter_names.size(); i++) {
-        SymbolInfo* sinfo = new SymbolInfo();
-        sinfo->type = SINFO::SIMPLE;
-        sinfo->object_info = new ObjectInfo(n->parameter_types[i]);
+        ObjectInfo* object_info = new ObjectInfo(n->parameter_types[i]);
+        SymbolInfo* sinfo = new SymbolInfo(object_info);
         this->scope->set(n->parameter_names[i], sinfo);
     }
     this->scope->set("__return__", wrap_simple_info(new ObjectInfo(n->return_type)));
@@ -204,12 +201,9 @@ SymbolInfo* SecondPass::analyze(CallNode* n) {
 SymbolInfo* SecondPass::analyze(ClassNode* n) {
     for (int i = 0; i < n->methods.size(); i++) {
         this->enter_scope(n->methods[i]->name);
-        SymbolInfo* this_info = new SymbolInfo;
-        this_info->type = SINFO::SIMPLE;
         TypeNode* type_node = new TypeNode(n->name, {});
-
         ObjectInfo* simple_info = new ObjectInfo(type_node);
-        this_info->object_info = simple_info;
+        SymbolInfo* this_info = new SymbolInfo(simple_info);
         this->scope->set("this", this_info);
         this->leave_scope();
         this->analyze(n->methods[i]);

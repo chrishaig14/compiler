@@ -56,6 +56,19 @@ public:
         ObjectInfo* object_info;
     };
     SINFO type;
+
+    SymbolInfo(FunctionInfo* function_info) : function_info(function_info) {
+        this->type = SINFO::FUNCTION;
+    }
+
+    SymbolInfo(ObjectInfo* object_info) : object_info(object_info) {
+        this->type = SINFO::SIMPLE;
+    }
+
+    bool is_function() { return this->type == SINFO::FUNCTION; }
+
+    bool is_object() { return this->type == SINFO::SIMPLE; }
+
 };
 
 class SymbolTable {
