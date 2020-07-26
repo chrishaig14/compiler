@@ -29,7 +29,7 @@ public:
     bool operator==(const ScopeError &other) const;
 };
 
-SymbolInfo* wrap_simple_info(SimpleInfo* sinfo);
+SymbolInfo* wrap_simple_info(ObjectInfo* sinfo);
 
 SymbolInfo* wrap_function_info(FunctionInfo* finfo);
 
@@ -40,7 +40,7 @@ public:
     bool operator==(const RedeclareError &other) const;
 };
 
-SimpleInfo* s_info(TypeNode* type);
+ObjectInfo* s_info(TypeNode* type);
 
 FunctionInfo* f_info(VectorOfTypes parameter_types, TypeNode* return_type);
 
@@ -49,7 +49,7 @@ SymbolInfo* w_sinfo(std::string type);
 
 SymbolInfo* w_finfo(VectorOfTypes parameter_types, TypeNode* return_type);
 
-typedef std::map<std::string, SimpleInfo*> MapStringToSimple;
+typedef std::map<std::string, ObjectInfo*> MapStringToSimple;
 typedef std::map<std::string, FunctionInfo*> MapStringToFunction;
 
 SymbolInfo* w_cinfo(MapStringToSimple fields, MapStringToFunction methods);

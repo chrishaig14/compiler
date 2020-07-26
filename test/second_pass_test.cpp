@@ -65,7 +65,7 @@ TEST(semantic_test, fun_foo_cAomplete) {
     SymbolTable* foo_scope = sp.scopes["global.foo"];
     SymbolInfo* sinfo = foo_scope->get("y");
     EXPECT_EQ(sinfo->type, SINFO::SIMPLE);
-    EXPECT_EQ(sinfo->simple_info->parent, "Foo");
+    EXPECT_EQ(sinfo->object_info->parent, "Foo");
 }
 
 TEST(semantic_test, tee) {

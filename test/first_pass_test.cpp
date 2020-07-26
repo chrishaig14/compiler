@@ -4,7 +4,7 @@
 #include <FirstPass.h>
 #include <SecondPass.h>
 
-void assert_eq_si(SimpleInfo* t1, SimpleInfo* t2) {
+void assert_eq_si(ObjectInfo* t1, ObjectInfo* t2) {
     EXPECT_EQ(t1->parent, t2->parent);
     EXPECT_EQ(t1->type_parameters.size(), t2->type_parameters.size());
     for (int i = 0; i < t1->type_parameters.size(); i++) {

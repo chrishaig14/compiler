@@ -11,13 +11,13 @@
 #include "SymbolTable.h"
 #include "ClassTable.h"
 
-void assert_eq_si(SimpleInfo* t1, SimpleInfo* t2);
+void assert_eq_si(ObjectInfo* t1, ObjectInfo* t2);
 
 bool both_null(void* a, void* b);
 
 bool one_null(void* a, void* b);
 
-bool equal(SimpleInfo* a, SimpleInfo* b);
+bool equal(ObjectInfo* a, ObjectInfo* b);
 
 bool equal(FunctionInfo* a, FunctionInfo* b);
 

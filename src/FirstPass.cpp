@@ -7,7 +7,7 @@
 void FirstPass::analyze(ClassNode* node) {
     ClassInfo* class_info = new ClassInfo;
     for (auto f: node->fields) {
-        class_info->fields[f->identifier] = new SimpleInfo(f->type);
+        class_info->fields[f->identifier] = new ObjectInfo(f->type);
     }
     for (auto m: node->methods) {
         class_info->methods[m->name] = new FunctionInfo(m->parameter_types, m->return_type);
@@ -40,19 +40,19 @@ FirstPass::FirstPass() {
 
 FunctionInfo::FunctionInfo(std::vector<TypeNode*> parameter_types, TypeNode* return_type) {
     for (auto n: parameter_types) {
-        this->parameter_types.push_back(new SimpleInfo(n));
+        this->parameter_types.push_back(new ObjectInfo(n));
     }
     if (return_type == NULL) {
         this->return_type = NULL;
     } else {
-        this->return_type = new SimpleInfo(return_type);
+        this->return_type = new ObjectInfo(return_type);
     }
 }
 
-SimpleInfo::SimpleInfo(TypeNode* n) {
+ObjectInfo::ObjectInfo(TypeNode* n) {
     this->parent = n->name;
     for (auto t: n->type_parameters) {
-        this->type_parameters.push_back(new SimpleInfo(t));
+        this->type_parameters.push_back(new ObjectInfo(t));
     }
 }
 
@@ -65,7 +65,7 @@ bool one_null(void* a, void* b) {
     return a == nullptr or b == nullptr;
 }
 
-bool equal(SimpleInfo* a, SimpleInfo* b) {
+bool equal(ObjectInfo* a, ObjectInfo* b) {
     if (both_null(a, b)) return true;
     if (one_null(a, b)) return false;
     if (a->parent == b->parent) {
@@ -116,7 +116,7 @@ bool equal(SymbolInfo* a, SymbolInfo* b) {
             case SINFO::CLASS:
                 return equal(a->class_info, b->class_info);
             case SINFO::SIMPLE:
-                return equal(a->simple_info, b->simple_info);
+                return equal(a->object_info, b->object_info);
         }
     }
     return false;

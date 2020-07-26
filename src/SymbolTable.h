@@ -10,29 +10,29 @@
 #include <map>
 #include "AstNode.h"
 
-class SimpleInfo;
+class ObjectInfo;
 
 class FunctionInfo;
 
-class SimpleInfo {
+class ObjectInfo {
 public:
     std::string parent;
-    std::vector<SimpleInfo*> type_parameters;
+    std::vector<ObjectInfo*> type_parameters;
 
-    SimpleInfo(TypeNode* n);
+    ObjectInfo(TypeNode* n);
 };
 
 class FunctionInfo {
 public:
-    std::vector<SimpleInfo*> parameter_types;
-    SimpleInfo* return_type;
+    std::vector<ObjectInfo*> parameter_types;
+    ObjectInfo* return_type;
 
     FunctionInfo(std::vector<TypeNode*> parameter_types, TypeNode* return_type);
 };
 
 class ClassInfo {
 public:
-    std::map<std::string, SimpleInfo*> fields;
+    std::map<std::string, ObjectInfo*> fields;
     std::map<std::string, FunctionInfo*> methods;
 
 };
@@ -46,7 +46,7 @@ public:
     union {
         ClassInfo* class_info;
         FunctionInfo* function_info;
-        SimpleInfo* simple_info;
+        ObjectInfo* object_info;
     };
     SINFO type;
 };

@@ -25,8 +25,8 @@ SymbolInfo* w_finfo(VectorOfTypes parameter_types, TypeNode* return_type) {
 SymbolInfo* w_sinfo(std::string type) {
     SymbolInfo* ginfo = new SymbolInfo;
     ginfo->type = SINFO::SIMPLE;
-    SimpleInfo* sinfo = new SimpleInfo(i_type(type, {}));
-    ginfo->simple_info = sinfo;
+    ObjectInfo* sinfo = new ObjectInfo(i_type(type, {}));
+    ginfo->object_info = sinfo;
     return ginfo;
 }
 
@@ -34,8 +34,8 @@ FunctionInfo* f_info(VectorOfTypes parameter_types, TypeNode* return_type) {
     return new FunctionInfo(parameter_types, return_type);
 }
 
-SimpleInfo* s_info(TypeNode* type) {
-    return new SimpleInfo(type);
+ObjectInfo* s_info(TypeNode* type) {
+    return new ObjectInfo(type);
 }
 
 SymbolInfo* wrap_function_info(FunctionInfo* finfo) {
@@ -45,10 +45,10 @@ SymbolInfo* wrap_function_info(FunctionInfo* finfo) {
     return ginfo;
 }
 
-SymbolInfo* wrap_simple_info(SimpleInfo* sinfo) {
+SymbolInfo* wrap_simple_info(ObjectInfo* sinfo) {
     SymbolInfo* ginfo = new SymbolInfo;
     ginfo->type = SINFO::SIMPLE;
-    ginfo->simple_info = sinfo;
+    ginfo->object_info = sinfo;
     return ginfo;
 }
 
@@ -111,10 +111,10 @@ SymbolInfo* SecondPass::analyze(FunctionNode* n) {
     for (int i = 0; i < n->parameter_names.size(); i++) {
         SymbolInfo* sinfo = new SymbolInfo();
         sinfo->type = SINFO::SIMPLE;
-        sinfo->simple_info = new SimpleInfo(n->parameter_types[i]);
+        sinfo->object_info = new ObjectInfo(n->parameter_types[i]);
         this->scope->set(n->parameter_names[i], sinfo);
     }
-    this->scope->set("__return__", wrap_simple_info(new SimpleInfo(n->return_type)));
+    this->scope->set("__return__", wrap_simple_info(new ObjectInfo(n->return_type)));
     this->analyze(n->body);
     this->leave_scope();
     return nullptr;
@@ -133,11 +133,11 @@ SymbolInfo* SecondPass::analyze(DeclarationNode* n) {
     }
     if (n->expression != nullptr and n->type != nullptr) {
         SymbolInfo* expression_type = this->analyze(n->expression);
-        if (!equal(wrap_simple_info(new SimpleInfo(n->type)), expression_type)) {
-            throw ReturnError(expression_type->simple_info->parent, n->type->name);
+        if (!equal(wrap_simple_info(new ObjectInfo(n->type)), expression_type)) {
+            throw ReturnError(expression_type->object_info->parent, n->type->name);
         }
     }
-    this->scope->set(n->identifier, wrap_simple_info(new SimpleInfo(n->type)));
+    this->scope->set(n->identifier, wrap_simple_info(new ObjectInfo(n->type)));
     return nullptr;
 }
 
@@ -145,7 +145,7 @@ SymbolInfo* SecondPass::analyze(AssignmentNode* n) {
     SymbolInfo* linfo = this->analyze(n->lvalue);
     SymbolInfo* expression_type = this->analyze(n->rvalue);
     if (!equal(linfo, expression_type)) {
-        throw ReturnError(expression_type->simple_info->parent, linfo->simple_info->parent);
+        throw ReturnError(expression_type->object_info->parent, linfo->object_info->parent);
     }
     return nullptr;
 }
@@ -155,7 +155,7 @@ SymbolInfo* SecondPass::analyze(MemberNode* n) {
     if (symbol_info->type != SINFO::SIMPLE) {
         throw std::runtime_error("Accessing member " + n->child + " of non object");
     }
-    SimpleInfo* simple_info = symbol_info->simple_info;
+    ObjectInfo* simple_info = symbol_info->object_info;
     ClassInfo* class_info = this->class_table->get(simple_info->parent);
     if (class_info->fields.count(n->child) == 1) {
         // It's a field
@@ -186,7 +186,7 @@ SymbolInfo* SecondPass::analyze(ReturnNode* n) {
     SymbolInfo* symbol_info = this->analyze(n->expression);
     SymbolInfo* return_type = this->scope->get("__return__");
     if (!equal(symbol_info, return_type)) {
-        throw ReturnError(symbol_info->simple_info->parent, return_type->simple_info->parent);
+        throw ReturnError(symbol_info->object_info->parent, return_type->object_info->parent);
     }
     return nullptr;
 }
@@ -200,7 +200,7 @@ SymbolInfo* SecondPass::analyze(CallNode* n) {
 
     for (int i = 0; i < n->arguments.size(); i++) {
         SymbolInfo* arg = this->analyze(n->arguments[i]);
-        if (!equal(arg->simple_info, function_info->function_info->parameter_types[i])) {
+        if (!equal(arg->object_info, function_info->function_info->parameter_types[i])) {
             throw BadArguments();
         }
     }
@@ -217,8 +217,8 @@ SymbolInfo* SecondPass::analyze(ClassNode* n) {
         this_info->type = SINFO::SIMPLE;
         TypeNode* type_node = new TypeNode(n->name, {});
 
-        SimpleInfo* simple_info = new SimpleInfo(type_node);
-        this_info->simple_info = simple_info;
+        ObjectInfo* simple_info = new ObjectInfo(type_node);
+        this_info->object_info = simple_info;
         this->scope->set("this", this_info);
         this->leave_scope();
         this->analyze(n->methods[i]);
