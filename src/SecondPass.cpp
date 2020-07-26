@@ -5,11 +5,8 @@
 #include "SecondPass.h"
 
 
-
 SymbolInfo* w_finfo(VectorOfTypes parameter_types, TypeNode* return_type) {
-//    ginfo->type = SINFO::FUNCTION;
     FunctionInfo* finfo = new FunctionInfo(parameter_types, return_type);
-//    ginfo->function_info = finfo;
     SymbolInfo* ginfo = new SymbolInfo(finfo);
     return ginfo;
 }
@@ -29,15 +26,11 @@ ObjectInfo* s_info(TypeNode* type) {
 }
 
 SymbolInfo* wrap_function_info(FunctionInfo* finfo) {
-//    ginfo->type = SINFO::FUNCTION;
-//    ginfo->function_info = finfo;
     SymbolInfo* ginfo = new SymbolInfo(finfo);
     return ginfo;
 }
 
 SymbolInfo* wrap_simple_info(ObjectInfo* sinfo) {
-//    ginfo->type = SINFO::SIMPLE;
-//    ginfo->object_info = sinfo;
     SymbolInfo* ginfo = new SymbolInfo(sinfo);
     return ginfo;
 }
@@ -140,7 +133,7 @@ SymbolInfo* SecondPass::analyze(AssignmentNode* n) {
 
 SymbolInfo* SecondPass::analyze(MemberNode* n) {
     SymbolInfo* symbol_info = this->analyze(n->parent);
-    if (symbol_info->type != SINFO::SIMPLE) {
+    if (!symbol_info->is_object()) {
         throw std::runtime_error("Accessing member " + n->child + " of non object");
     }
     ObjectInfo* simple_info = symbol_info->object_info;
@@ -181,7 +174,7 @@ SymbolInfo* SecondPass::analyze(ReturnNode* n) {
 
 SymbolInfo* SecondPass::analyze(CallNode* n) {
     SymbolInfo* function_info = this->analyze(n->function);
-    if (function_info->type != SINFO::FUNCTION) {
+    if (!function_info->is_function()) {
         throw std::runtime_error("Expected a function! Got something else!");
     }
     if (n->arguments.size() != function_info->function_info->parameter_types.size()) throw BadArguments();
