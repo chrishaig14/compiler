@@ -18,7 +18,7 @@ public:
     void set(std::string name, Object* value);
 
     bool is_declared(std::string name) {
-        return this->table.count(name);
+        return this->table.count(name) == 1;
     }
 
     Object* get(std::string name);
