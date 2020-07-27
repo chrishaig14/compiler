@@ -56,6 +56,8 @@ SymbolInfo* w_cinfo(MapStringToSimple fields, MapStringToFunction methods);
 
 struct SemanticInfo {
     SymbolInfo* symbol_info;
+    std::map<std::string, int> declared_variables;
+    std::map<std::string, int> free_variables;
 };
 
 class SecondPass {

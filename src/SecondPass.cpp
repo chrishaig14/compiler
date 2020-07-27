@@ -96,9 +96,23 @@ SemanticInfo* SecondPass::analyze(FunctionNode* n) {
         this->scope->set(n->parameter_names[i], sinfo);
     }
     this->scope->set("__return__", wrap_simple_info(new ObjectInfo(n->return_type)));
-    this->analyze(n->body);
+    SemanticInfo* body_info = this->analyze(n->body);
     this->leave_scope();
-    return nullptr;
+    SemanticInfo* semantic_info = new SemanticInfo;
+//    semantic_info->symbol_info = ;
+    for (auto fv: body_info->free_variables) {
+        bool is_a_param = false;
+        for (auto p: n->parameter_names) {
+            if (fv.first == p) {
+                is_a_param = true;
+                break;
+            }
+        }
+        if (!is_a_param) {
+            semantic_info->free_variables[fv.first] = 1;
+        }
+    }
+    return semantic_info;
 }
 
 SemanticInfo* SecondPass::analyze(IdentifierNode* n) {
@@ -114,14 +128,18 @@ SemanticInfo* SecondPass::analyze(DeclarationNode* n) {
     if (this->scope->declared(n->identifier)) {
         throw RedeclareError(n->identifier);
     }
+    SemanticInfo* semantic_info = new SemanticInfo;
+    semantic_info->declared_variables[n->identifier] = 1;
+
     if (n->expression != nullptr and n->type != nullptr) {
         SemanticInfo* expression_info = this->analyze(n->expression);
         if (!equal(wrap_simple_info(new ObjectInfo(n->type)), expression_info->symbol_info)) {
             throw ReturnError(expression_info->symbol_info->object_info->parent, n->type->name);
         }
+        semantic_info->free_variables = expression_info->free_variables;
     }
     this->scope->set(n->identifier, wrap_simple_info(new ObjectInfo(n->type)));
-    return nullptr;
+    return semantic_info;
 }
 
 SemanticInfo* SecondPass::analyze(AssignmentNode* n) {
@@ -130,7 +148,12 @@ SemanticInfo* SecondPass::analyze(AssignmentNode* n) {
     if (!equal(linfo->symbol_info, expression_type->symbol_info)) {
         throw ReturnError(expression_type->symbol_info->object_info->parent, linfo->symbol_info->object_info->parent);
     }
-    return nullptr;
+    SemanticInfo* semantic_info = new SemanticInfo;
+    semantic_info->free_variables = expression_type->free_variables;
+    for (auto fv: linfo->free_variables) {
+        semantic_info->free_variables[fv.first] = 1;
+    }
+    return semantic_info;
 }
 
 SemanticInfo* SecondPass::analyze(MemberNode* n) {
@@ -154,18 +177,27 @@ SemanticInfo* SecondPass::analyze(MemberNode* n) {
 }
 
 SemanticInfo* SecondPass::analyze(IfNode* n) {
-    this->analyze(n->condition);
+    SemanticInfo* semantic_info = new SemanticInfo;
+    SemanticInfo* condition_info = this->analyze(n->condition);
     this->enter_scope("if");
-    this->analyze(n->then);
+    SemanticInfo* then_info = this->analyze(n->then);
     this->leave_scope();
-    return nullptr;
+    semantic_info->free_variables = condition_info->free_variables;
+    for (auto fv: then_info->free_variables) {
+        semantic_info->free_variables[fv.first] = 1;
+    }
+    return semantic_info;
 }
 
 SemanticInfo* SecondPass::analyze(BinopNode* n) {
-    this->analyze(n->left);
-    this->analyze(n->right);
+    SemanticInfo* left_info = this->analyze(n->left);
+    SemanticInfo* right_info = this->analyze(n->right);
     SemanticInfo* semantic_info = new SemanticInfo;
-    semantic_info->symbol_info = this->scope->get("Integer"); //TODO transform all binary operations into function calls
+    semantic_info->symbol_info = wrap_simple_info(new ObjectInfo(new TypeNode("Integer", {})));
+    semantic_info->free_variables = left_info->free_variables;
+    for (auto fv: right_info->free_variables) {
+        semantic_info->free_variables[fv.first] = 1;
+    }
     return semantic_info;
 }
 
@@ -175,7 +207,9 @@ SemanticInfo* SecondPass::analyze(ReturnNode* n) {
     if (!equal(expression_info->symbol_info, return_type)) {
         throw ReturnError(expression_info->symbol_info->object_info->parent, return_type->object_info->parent);
     }
-    return nullptr;
+    SemanticInfo* semantic_info = new SemanticInfo;
+    semantic_info->free_variables = expression_info->free_variables;
+    return semantic_info;
 }
 
 SemanticInfo* SecondPass::analyze(CallNode* n) {
@@ -208,7 +242,7 @@ SemanticInfo* SecondPass::analyze(ClassNode* n) {
         this->leave_scope();
         this->analyze(n->methods[i]);
     }
-    return nullptr;
+    return new SemanticInfo;
 }
 
 SemanticInfo* SecondPass::analyze(AstNode* n) {
@@ -257,10 +291,19 @@ SemanticInfo* SecondPass::analyze(AstNode* n) {
 }
 
 SemanticInfo* SecondPass::analyze(VectorOfNodes program) {
+    SemanticInfo* semantic_info = new SemanticInfo;
     for (auto n: program) {
-        this->analyze(n);
+        SemanticInfo* node_info = this->analyze(n);
+        for (auto fv: node_info->free_variables) {
+            if (semantic_info->declared_variables.count(fv.first) == 0) {
+                semantic_info->free_variables[fv.first] = 1;
+            }
+        }
+        for (auto fv: node_info->declared_variables) {
+            semantic_info->declared_variables[fv.first] = 1;
+        }
     }
-    return nullptr;
+    return semantic_info;
 }
 
 bool BadArguments::operator==(const BadArguments &other) const {

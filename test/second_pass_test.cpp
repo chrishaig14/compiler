@@ -111,7 +111,7 @@ TEST(semantic_test, z_not_found_error) {
 }
 
 TEST(semantic_test, x_redeclare_in_inner_scope_ok) {
-    std::string text = "fun foo(y: Foo)->Integer{var x:Integer;if(y==1){if(y==2){var x:Integer; return x;}}}";
+    std::string text = "fun foo(y: Integer)->Integer{var x:Integer;if(y==1){if(y==2){var x:Integer; return x;}}}";
     ASSERT_OK();
 }
 

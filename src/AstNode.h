@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include <vector>
+#include <map>
 
 
 enum class BinopType {
@@ -253,6 +254,7 @@ public:
     std::string name;
     TypeNode* return_type;
     VectorOfNodes body;
+    std::map<std::string, int> free_variables;
 
     FunctionNode(std::string name, VectorOfStrings parameter_names, VectorOfTypes parameter_types,
                  TypeNode* return_type, VectorOfNodes body) {
