@@ -54,6 +54,9 @@ typedef std::map<std::string, FunctionInfo*> MapStringToFunction;
 
 SymbolInfo* w_cinfo(MapStringToSimple fields, MapStringToFunction methods);
 
+struct SemanticInfo {
+    SymbolInfo* symbol_info;
+};
 
 class SecondPass {
     SymbolTable* scope;
@@ -65,31 +68,31 @@ public:
 
     void leave_scope();
 
-    SymbolInfo* analyze(FunctionNode* n);
+    SemanticInfo* analyze(FunctionNode* n);
 
-    SymbolInfo* analyze(IdentifierNode* n);
+    SemanticInfo* analyze(IdentifierNode* n);
 
-    SymbolInfo* analyze(DeclarationNode* n);
+    SemanticInfo* analyze(DeclarationNode* n);
 
-    SymbolInfo* analyze(MemberNode* n);
+    SemanticInfo* analyze(MemberNode* n);
 
-    SymbolInfo* analyze(IfNode* n);
+    SemanticInfo* analyze(IfNode* n);
 
-    SymbolInfo* analyze(BinopNode* n);
+    SemanticInfo* analyze(BinopNode* n);
 
-    SymbolInfo* analyze(ReturnNode* n);
+    SemanticInfo* analyze(ReturnNode* n);
 
-    SymbolInfo* analyze(ClassNode* n);
+    SemanticInfo* analyze(ClassNode* n);
 
-    SymbolInfo* analyze(AstNode* n);
+    SemanticInfo* analyze(AstNode* n);
 
-    SymbolInfo* analyze(VectorOfNodes program);
+    SemanticInfo* analyze(VectorOfNodes program);
 
     std::map<std::string, SymbolTable*> scopes;
 
-    SymbolInfo* analyze(CallNode* n);
+    SemanticInfo* analyze(CallNode* n);
 
-    SymbolInfo* analyze(AssignmentNode* n);
+    SemanticInfo* analyze(AssignmentNode* n);
 };
 
 #endif //UNTITLED1_SECONDPASS_H
