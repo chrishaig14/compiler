@@ -79,6 +79,9 @@ public:
         this->parent = parent;
     }
 
+    SymbolTable(){};
+
+
     bool has(std::string name) {
         if (this->table.count(name) == 1) {
             return true;

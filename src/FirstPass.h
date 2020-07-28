@@ -28,14 +28,14 @@ bool equal(SymbolInfo* a, SymbolInfo* b);
 
 class FirstPass {
 public:
-    SymbolTable* globals;
-    ClassTable* class_table;
+    SymbolTable globals;
+    ClassTable class_table;
 
     FirstPass();
 
-    void analyze(ClassNode* node);
+    void analyze(ClassNode& node);
 
-    void analyze(FunctionNode* node);
+    void analyze(FunctionNode& node);
 
     void analyze(VectorOfNodes program);
 

@@ -4,37 +4,37 @@
 
 #include "FirstPass.h"
 
-void FirstPass::analyze(ClassNode* node) {
+void FirstPass::analyze(ClassNode& node) {
     ClassInfo* class_info = new ClassInfo;
-    for (auto f: node->fields) {
+    for (auto f: node.fields) {
         class_info->fields[f->identifier] = new ObjectInfo(f->type);
     }
-    for (auto m: node->methods) {
+    for (auto m: node.methods) {
         class_info->methods[m->name] = new FunctionInfo(m->parameter_types, m->return_type);
     }
-    this->class_table->set(node->name, class_info);
+    this->class_table.set(node.name, class_info);
 }
 
-void FirstPass::analyze(FunctionNode* node) {
-    FunctionInfo* function_info = new FunctionInfo(node->parameter_types, node->return_type);
+void FirstPass::analyze(FunctionNode& node) {
+    FunctionInfo* function_info = new FunctionInfo(node.parameter_types, node.return_type);
     SymbolInfo* ginfo = new SymbolInfo(function_info);
-    this->globals->set(node->name, ginfo);
+    this->globals.set(node.name, ginfo);
 }
 
 void FirstPass::analyze(VectorOfNodes program) {
     for (auto n: program) {
         if (n->type == AstType::CLASS) {
-            this->analyze(n->ast_class);
+            this->analyze(*n->ast_class);
         }
         if (n->type == AstType::FUNCTION) {
-            this->analyze(n->ast_function);
+            this->analyze(*n->ast_function);
         }
     }
 }
 
 FirstPass::FirstPass() {
-    this->globals = new SymbolTable("global", nullptr);
-    this->class_table = new ClassTable();
+    this->globals = SymbolTable("global", nullptr);
+    this->class_table = ClassTable();
 }
 
 FunctionInfo::FunctionInfo(std::vector<TypeNode*> parameter_types, TypeNode* return_type) {

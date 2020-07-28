@@ -24,7 +24,7 @@ TEST(semantic_test, fun_foo) {
     VectorOfNodes tree = get_tree(text);
     FirstPass fp;
     fp.analyze(tree);
-    SymbolInfo* ginfo = fp.globals->get("foo");
+    SymbolInfo* ginfo = fp.globals.get("foo");
     EXPECT_EQ(ginfo->type, SINFO::FUNCTION);
 }
 
@@ -45,7 +45,7 @@ TEST(semantic_test, fun_foo_eq) {
     VectorOfNodes tree = get_tree(text);
     FirstPass fp;
     fp.analyze(tree);
-    SymbolInfo* ginfo = fp.globals->get("foo");
+    SymbolInfo* ginfo = fp.globals.get("foo");
     EXPECT_TRUE(equal(ginfo, w_finfo({}, typenode_string)));
 }
 
@@ -54,7 +54,7 @@ TEST(semantic_test, fun_foo_complete) {
     VectorOfNodes tree = get_tree(text);
     FirstPass fp;
     fp.analyze(tree);
-    SymbolInfo* ginfo = fp.globals->get("foo");
+    SymbolInfo* ginfo = fp.globals.get("foo");
     EXPECT_TRUE(equal(ginfo, w_finfo({typenode_integer, typenode_string}, typenode_boolean)));
 }
 
@@ -63,7 +63,7 @@ TEST(semantic_test, class_foo) {
     VectorOfNodes tree = get_tree(text);
     FirstPass fp;
     fp.analyze(tree);
-    ClassInfo* ginfo = fp.class_table->get("Foo");
+    ClassInfo* ginfo = fp.class_table.get("Foo");
 }
 
 TEST(semantic_test, class_foo_eq) {
@@ -83,7 +83,7 @@ TEST(semantic_test, class_foo_with_field) {
     VectorOfNodes tree = get_tree(text);
     FirstPass fp;
     fp.analyze(tree);
-    ClassInfo* ginfo = fp.class_table->get("Foo");
+    ClassInfo* ginfo = fp.class_table.get("Foo");
     MapStringToSimple fields;
     fields["x"] = s_info(typenode_string);
     ClassInfo* class_info = new ClassInfo;
@@ -97,7 +97,7 @@ TEST(semantic_test, class_foo_with_method) {
     VectorOfNodes tree = get_tree(text);
     FirstPass fp;
     fp.analyze(tree);
-    ClassInfo* ginfo = fp.class_table->get("Foo");
+    ClassInfo* ginfo = fp.class_table.get("Foo");
     MapStringToFunction methods;
     methods["foo"] = f_info({typenode_integer}, typenode_string);
     ClassInfo* expected = new ClassInfo;
@@ -110,7 +110,7 @@ TEST(semantic_test, class_foo_complete) {
     VectorOfNodes tree = get_tree(text);
     FirstPass fp;
     fp.analyze(tree);
-    ClassInfo* ginfo = fp.class_table->get("Foo");
+    ClassInfo* ginfo = fp.class_table.get("Foo");
     MapStringToFunction methods;
     methods["foo"] = f_info({typenode_integer}, typenode_string);
     methods["bar"] = f_info({typenode_list(typenode_string), typenode_dict(typenode_string, typenode_integer)},
