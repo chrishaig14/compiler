@@ -64,6 +64,71 @@ TEST(semantic_test, fun_foo_cAomplete) {
     sp.analyze(tree);
     SymbolTable* foo_scope = sp.scopes["global.foo"];
     SymbolInfo* sinfo = foo_scope->get("y");
+    EXPECT_TRUE(tree[0]->ast_function->free_variables.size() == 0);
+    EXPECT_EQ(sinfo->type, SINFO::SIMPLE);
+    EXPECT_EQ(sinfo->object_info->parent, "Foo");
+}
+
+TEST(semantic_test, free_variable_test_1) {
+    std::string text = "var x: Integer; fun foo(y: Foo)->Integer{return x;}";
+    VectorOfNodes tree = get_treeA(text);
+    FirstPass fp;
+    fp.analyze(tree);
+    SecondPass sp(fp.globals, fp.class_table);
+    sp.analyze(tree);
+    EXPECT_TRUE(sp.scopes["global"]->has("x"));
+    SymbolTable* foo_scope = sp.scopes["global.foo"];
+    SymbolInfo* sinfo = foo_scope->get("y");
+    EXPECT_TRUE(tree[1]->ast_function->free_variables.size() == 1);
+    EXPECT_TRUE(tree[1]->ast_function->free_variables.count("x") == 1);
+    EXPECT_EQ(sinfo->type, SINFO::SIMPLE);
+    EXPECT_EQ(sinfo->object_info->parent, "Foo");
+}
+
+
+TEST(semantic_test, free_variable_test_2) {
+    std::string text = "var x: Integer; fun foo(y: Foo)->Integer{var z: Integer = 1 + x;}";
+    VectorOfNodes tree = get_treeA(text);
+    FirstPass fp;
+    fp.analyze(tree);
+    SecondPass sp(fp.globals, fp.class_table);
+    sp.analyze(tree);
+    EXPECT_TRUE(sp.scopes["global"]->has("x"));
+    SymbolTable* foo_scope = sp.scopes["global.foo"];
+    SymbolInfo* sinfo = foo_scope->get("y");
+    EXPECT_TRUE(tree[1]->ast_function->free_variables.size() == 1);
+    EXPECT_TRUE(tree[1]->ast_function->free_variables.count("x") == 1);
+    EXPECT_EQ(sinfo->type, SINFO::SIMPLE);
+    EXPECT_EQ(sinfo->object_info->parent, "Foo");
+}
+
+TEST(semantic_test, free_variable_test_3) {
+    std::string text = "var x: Integer; fun foo(y: Foo)->Integer{if(y == 3){var z: Integer = 1 + x;}}";
+    VectorOfNodes tree = get_treeA(text);
+    FirstPass fp;
+    fp.analyze(tree);
+    SecondPass sp(fp.globals, fp.class_table);
+    sp.analyze(tree);
+    EXPECT_TRUE(sp.scopes["global"]->has("x"));
+    SymbolTable* foo_scope = sp.scopes["global.foo"];
+    SymbolInfo* sinfo = foo_scope->get("y");
+    EXPECT_TRUE(tree[1]->ast_function->free_variables.size() == 1);
+    EXPECT_TRUE(tree[1]->ast_function->free_variables.count("x") == 1);
+    EXPECT_EQ(sinfo->type, SINFO::SIMPLE);
+    EXPECT_EQ(sinfo->object_info->parent, "Foo");
+}
+
+TEST(semantic_test, free_variable_test_4) {
+    std::string text = "var x: Integer; fun foo(y: Foo)->Integer{if(y == 3){var z: Integer = 1 + y;}}";
+    VectorOfNodes tree = get_treeA(text);
+    FirstPass fp;
+    fp.analyze(tree);
+    SecondPass sp(fp.globals, fp.class_table);
+    sp.analyze(tree);
+    EXPECT_TRUE(sp.scopes["global"]->has("x"));
+    SymbolTable* foo_scope = sp.scopes["global.foo"];
+    SymbolInfo* sinfo = foo_scope->get("y");
+    EXPECT_TRUE(tree[1]->ast_function->free_variables.size() == 0);
     EXPECT_EQ(sinfo->type, SINFO::SIMPLE);
     EXPECT_EQ(sinfo->object_info->parent, "Foo");
 }
