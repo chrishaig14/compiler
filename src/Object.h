@@ -7,13 +7,17 @@
 
 #include "ObjectStack.h"
 #include "Inst.h"
+
 enum class ValueType {
     INTEGER, CODE
 };
 
 class Inst;
+
 class Integer;
+
 class Code;
+
 class Object {
 public:
     Integer* integer;

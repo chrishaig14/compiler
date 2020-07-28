@@ -512,19 +512,19 @@ void Parser::expect_one_of(std::vector<TokenType> expected_tokens) {
     throw UnexpectedToken(this->token, expected_tokens);
 }
 
-Parser::Parser(std::vector<Token> &tokens) {
+Parser::Parser(std::vector<Token>& tokens) {
     this->tokens = tokens;
     this->token = this->tokens[0];
     this->current = 0;
 }
 
-UnexpectedToken::UnexpectedToken(Token token, const std::vector<TokenType> &expected_tokens) : std::runtime_error(
+UnexpectedToken::UnexpectedToken(Token token, const std::vector<TokenType>& expected_tokens) : std::runtime_error(
         this->make_message(token, expected_tokens)) {
     this->token = token;
     this->expected_tokens = expected_tokens;
 }
 
-std::string UnexpectedToken::make_message(Token token, const std::vector<TokenType> &expected_tokens) {
+std::string UnexpectedToken::make_message(Token token, const std::vector<TokenType>& expected_tokens) {
     std::string message;
     std::string expected_strings;
     for (int i = 0; i < expected_tokens.size() - 1; i++) {
@@ -536,7 +536,7 @@ std::string UnexpectedToken::make_message(Token token, const std::vector<TokenTy
     return message;
 }
 
-std::ostream &operator<<(std::ostream &os, const UnexpectedToken &unexpected_token) {
+std::ostream& operator<<(std::ostream& os, const UnexpectedToken& unexpected_token) {
     std::string expected_strings;
     for (int i = 0; i < unexpected_token.expected_tokens.size() - 1; i++) {
         expected_strings += TOKEN_STRINGS[unexpected_token.expected_tokens[i]];

@@ -73,9 +73,9 @@ public:
 
     Token(TokenType type, int num, int line, int column);
 
-    bool operator==(const Token &other) const;
+    bool operator==(const Token& other) const;
 
-    friend std::ostream &operator<<(std::ostream &os, const Token &token);
+    friend std::ostream& operator<<(std::ostream& os, const Token& token);
 
     std::string to_string();
 };

@@ -6,7 +6,9 @@
 #define UNTITLED1_INST_H
 
 #include <string>
+
 class Object;
+
 enum class InstType {
     PUSH,
     POP,
@@ -44,8 +46,9 @@ public:
 class DeclareInst {
 public:
     std::string name;
+
     DeclareInst(std::string
-    name){
+                name) {
         this->name = name;
     }
 };

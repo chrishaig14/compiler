@@ -34,12 +34,14 @@ Token::Token(TokenType type, int line, int column) {
     this->column = column;
 }
 
-bool Token::operator==(const Token &other) const {
-    return this->type == other.type && this->str == other.str && this->num == other.num && this->line == other.line && this->column == other.column;
+bool Token::operator==(const Token& other) const {
+    return this->type == other.type && this->str == other.str && this->num == other.num && this->line == other.line &&
+           this->column == other.column;
 }
 
-std::ostream &operator<<(std::ostream &os, const Token &token) {
-    os << TOKEN_STRINGS[token.type] << ", num: " << token.num << ", str: " << token.str << " pos: l" << token.line << ":c" << token.column;
+std::ostream& operator<<(std::ostream& os, const Token& token) {
+    os << TOKEN_STRINGS[token.type] << ", num: " << token.num << ", str: " << token.str << " pos: l" << token.line
+       << ":c" << token.column;
     return os;
 }
 

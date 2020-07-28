@@ -66,7 +66,7 @@ void initialize_tokens() {
     TOKEN_SPECIAL["--"] = TokenType::DEC;
 }
 
-Scanner::Scanner(const std::string &text) {
+Scanner::Scanner(const std::string& text) {
     initialize_tokens();
     initialize_token_strings();
     this->text = text;

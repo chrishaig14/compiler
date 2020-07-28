@@ -35,7 +35,7 @@ TEST(vm_test, inst_declare) {
 TEST(vm_test, inst_store) {
     ObjectStack stack;
     Frame f(std::vector<Inst*>(), &stack);
-    PushInst push_inst (value_7);
+    PushInst push_inst(value_7);
     DeclareInst declare_inst("a");
     StoreInst store_inst("a");
     f.run_inst(declare_inst);
@@ -49,10 +49,10 @@ TEST(vm_test, inst_load) {
     ObjectStack stack;
     Frame f(std::vector<Inst*>(), &stack);
     Object* value_9 = new Object(new Integer(9));
-    PushInst push_inst_7 (value_7);
+    PushInst push_inst_7(value_7);
     PushInst push_inst_9(value_9);
-    DeclareInst declare_inst ("a");
-    StoreInst store_inst ("a");
+    DeclareInst declare_inst("a");
+    StoreInst store_inst("a");
     LoadInst load_inst("a");
     f.run_inst(declare_inst);
     f.run_inst(push_inst_7);
@@ -71,7 +71,7 @@ TEST(vm_test, inst_call) {
     Object* value_9 = new Object(new Integer(9));
     Object* value_16 = new Object(new Integer(16));
     PushInst push_sum_value(builtin_sum);
-    PushInst push_inst_9 (value_9);
+    PushInst push_inst_9(value_9);
     PushInst push_inst_7(value_7);
     DeclareInst declare_sum("__sum__");
     StoreInst store_sum("__sum__");

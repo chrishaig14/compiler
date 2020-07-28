@@ -5,6 +5,7 @@
 #include <gtest/gtest.h>
 #include "ObjectStack.h"
 #include "Object.h"
+
 static Object* value_7 = new Object(new Integer(7));
 
 TEST(vm_test, stack_push) {

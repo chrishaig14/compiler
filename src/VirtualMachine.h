@@ -9,7 +9,7 @@
 #include "Frame.h"
 
 class VirtualMachine {
-        std::stack<Frame> frame_stack;
+    std::stack<Frame> frame_stack;
 
 };
 

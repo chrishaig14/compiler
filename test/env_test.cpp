@@ -12,7 +12,7 @@ TEST(env_test, env_test_1) {
     try {
         env.set("a", value_7);
         FAIL() << "Error not thrown!";
-    } catch (const std::runtime_error &e) {
+    } catch (const std::runtime_error& e) {
     }
 }
 
@@ -22,7 +22,7 @@ TEST(env_test, env_test_2) {
     try {
         env.get("a");
         FAIL() << "Error not thrown!";
-    } catch (const std::runtime_error &e) {
+    } catch (const std::runtime_error& e) {
     }
 }
 
@@ -39,7 +39,7 @@ TEST(env_test, env_test_4) {
     try {
         env.declare("a");
         FAIL() << "Error not thrown!";
-    } catch (const std::runtime_error &e) {
+    } catch (const std::runtime_error& e) {
 
     }
 }
@@ -60,7 +60,7 @@ TEST(env_test, env_test_6) {
     try {
         env.get("a");
         FAIL() << "Error not thrown";
-    } catch (const std::runtime_error &e) {
+    } catch (const std::runtime_error& e) {
 
     }
 }
@@ -92,7 +92,7 @@ TEST(env_test, env_test_9) {
     try {
         env->set("a", value_7);
         FAIL() << "Error not thrown";
-    } catch (const std::runtime_error &e) {
+    } catch (const std::runtime_error& e) {
 
     }
 }
@@ -128,7 +128,7 @@ TEST(env_test, env_test_11) {
     try {
         env->get("b");
         FAIL() << "Error not thrown";
-    } catch (const std::runtime_error &e) {
+    } catch (const std::runtime_error& e) {
 
     }
 }

@@ -38,13 +38,13 @@ SymbolInfo* wrap_simple_info(ObjectInfo* sinfo) {
 RedeclareError::RedeclareError(std::string name) : runtime_error("Name " + name + "already declared in current scope") {
 }
 
-bool RedeclareError::operator==(const RedeclareError &other) const {
+bool RedeclareError::operator==(const RedeclareError& other) const {
     std::string a = this->what();
     std::string b = other.what();
     return a == b;
 }
 
-bool ReturnError::operator==(const ReturnError &other) const {
+bool ReturnError::operator==(const ReturnError& other) const {
     std::string a = this->what();
     std::string b = other.what();
     bool t = a == b;
@@ -56,7 +56,7 @@ ReturnError::ReturnError(std::string actual_type, std::string expected_type) : r
 
 }
 
-bool ScopeError::operator==(const ScopeError &other) const {
+bool ScopeError::operator==(const ScopeError& other) const {
     std::string a = this->what();
     std::string b = other.what();
     bool t = a == b;
@@ -308,7 +308,7 @@ SemanticInfo* SecondPass::analyze(VectorOfNodes program) {
     return semantic_info;
 }
 
-bool BadArguments::operator==(const BadArguments &other) const {
+bool BadArguments::operator==(const BadArguments& other) const {
     return true;
 }
 

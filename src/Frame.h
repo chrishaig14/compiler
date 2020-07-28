@@ -80,7 +80,7 @@ public:
         this->env = new Environment(nullptr);
     }
 
-    void run_inst(PushInst &push) {
+    void run_inst(PushInst& push) {
         this->stack->push(push.value);
     }
 

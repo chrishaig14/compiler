@@ -12,21 +12,21 @@ class BadArguments : public std::runtime_error {
 public:
     BadArguments();
 
-    bool operator==(const BadArguments &other) const;
+    bool operator==(const BadArguments& other) const;
 };
 
 class ReturnError : public std::runtime_error {
 public:
     ReturnError(std::string actual_type, std::string expected_type);
 
-    bool operator==(const ReturnError &other) const;
+    bool operator==(const ReturnError& other) const;
 };
 
 class ScopeError : public std::runtime_error {
 public:
     ScopeError(std::string name);
 
-    bool operator==(const ScopeError &other) const;
+    bool operator==(const ScopeError& other) const;
 };
 
 SymbolInfo* wrap_simple_info(ObjectInfo* sinfo);
@@ -37,7 +37,7 @@ class RedeclareError : public std::runtime_error {
 public:
     RedeclareError(std::string name);
 
-    bool operator==(const RedeclareError &other) const;
+    bool operator==(const RedeclareError& other) const;
 };
 
 ObjectInfo* s_info(TypeNode* type);

@@ -19,11 +19,11 @@ class UnexpectedToken : public std::runtime_error {
     Token token;
     std::vector<TokenType> expected_tokens;
 public:
-    UnexpectedToken(Token token, const std::vector<TokenType> &expected_tokens);
+    UnexpectedToken(Token token, const std::vector<TokenType>& expected_tokens);
 
-    std::string make_message(Token token, const std::vector<TokenType> &expected_tokens);
+    std::string make_message(Token token, const std::vector<TokenType>& expected_tokens);
 
-    friend std::ostream &operator<<(std::ostream &os, const UnexpectedToken &unexpected_token);
+    friend std::ostream& operator<<(std::ostream& os, const UnexpectedToken& unexpected_token);
 };
 
 AstNode* w_id(std::string name);
@@ -45,7 +45,7 @@ class Parser {
     Token token;
     size_t current;
 public:
-    Parser(std::vector<Token> &tokens);
+    Parser(std::vector<Token>& tokens);
 
     AstNode* parse_id_or_literal();
 
