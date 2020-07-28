@@ -10,7 +10,7 @@ static Object* value_7 = new Object(new Integer(7));
 TEST(vm_test, inst_push) {
     ObjectStack stack;
     Frame f(std::vector<Inst*>(), &stack);
-    PushInst* inst = new PushInst(value_7);
+    PushInst inst(value_7);
     f.run_inst(inst);
     EXPECT_TRUE(equal(stack.top(), value_7));
 }
@@ -19,7 +19,7 @@ TEST(vm_test, inst_pop) {
     ObjectStack stack;
     Frame f(std::vector<Inst*>(), &stack);
     stack.push(value_7);
-    PopInst* inst = new PopInst();
+    PopInst inst;
     f.run_inst(inst);
     EXPECT_TRUE(stack.empty());
 }
@@ -27,7 +27,7 @@ TEST(vm_test, inst_pop) {
 TEST(vm_test, inst_declare) {
     ObjectStack stack;
     Frame f(std::vector<Inst*>(), &stack);
-    DeclareInst* inst = new DeclareInst("a");
+    DeclareInst inst("a");
     f.run_inst(inst);
     EXPECT_TRUE(f.env->is_declared("a"));
 }
@@ -35,9 +35,9 @@ TEST(vm_test, inst_declare) {
 TEST(vm_test, inst_store) {
     ObjectStack stack;
     Frame f(std::vector<Inst*>(), &stack);
-    PushInst* push_inst = new PushInst(value_7);
-    DeclareInst* declare_inst = new DeclareInst("a");
-    StoreInst* store_inst = new StoreInst("a");
+    PushInst push_inst (value_7);
+    DeclareInst declare_inst("a");
+    StoreInst store_inst("a");
     f.run_inst(declare_inst);
     f.run_inst(push_inst);
     f.run_inst(store_inst);
@@ -49,11 +49,11 @@ TEST(vm_test, inst_load) {
     ObjectStack stack;
     Frame f(std::vector<Inst*>(), &stack);
     Object* value_9 = new Object(new Integer(9));
-    PushInst* push_inst_7 = new PushInst(value_7);
-    PushInst* push_inst_9 = new PushInst(value_9);
-    DeclareInst* declare_inst = new DeclareInst("a");
-    StoreInst* store_inst = new StoreInst("a");
-    LoadInst* load_inst = new LoadInst("a");
+    PushInst push_inst_7 (value_7);
+    PushInst push_inst_9(value_9);
+    DeclareInst declare_inst ("a");
+    StoreInst store_inst ("a");
+    LoadInst load_inst("a");
     f.run_inst(declare_inst);
     f.run_inst(push_inst_7);
     f.run_inst(store_inst);
@@ -70,13 +70,13 @@ TEST(vm_test, inst_call) {
     Object* builtin_sum = new Object(new Code(&builtinSum));
     Object* value_9 = new Object(new Integer(9));
     Object* value_16 = new Object(new Integer(16));
-    PushInst* push_sum_value = new PushInst(builtin_sum);
-    PushInst* push_inst_9 = new PushInst(value_9);
-    PushInst* push_inst_7 = new PushInst(value_7);
-    DeclareInst* declare_sum = new DeclareInst("__sum__");
-    StoreInst* store_sum = new StoreInst("__sum__");
-    LoadInst* load_sum = new LoadInst("__sum__");
-    CallInst* call_inst = new CallInst();
+    PushInst push_sum_value(builtin_sum);
+    PushInst push_inst_9 (value_9);
+    PushInst push_inst_7(value_7);
+    DeclareInst declare_sum("__sum__");
+    StoreInst store_sum("__sum__");
+    LoadInst load_sum("__sum__");
+    CallInst call_inst;
     f.run_inst(declare_sum);
     f.run_inst(push_sum_value);
     f.run_inst(store_sum);
