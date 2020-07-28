@@ -112,6 +112,7 @@ SemanticInfo* SecondPass::analyze(FunctionNode* n) {
             semantic_info->free_variables[fv.first] = 1;
         }
     }
+    n->free_variables = semantic_info->free_variables;
     return semantic_info;
 }
 
@@ -121,6 +122,7 @@ SemanticInfo* SecondPass::analyze(IdentifierNode* n) {
     }
     SemanticInfo* semantic_info = new SemanticInfo;
     semantic_info->symbol_info = this->scope->get(n->name);
+    semantic_info->free_variables[n->name] = 1;
     return semantic_info;
 }
 
