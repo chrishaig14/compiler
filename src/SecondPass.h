@@ -70,31 +70,31 @@ public:
 
     void leave_scope();
 
-    SemanticInfo* analyze(FunctionNode* n);
+    SemanticInfo* analyze(FunctionNode& n);
 
-    SemanticInfo* analyze(IdentifierNode* n);
+    SemanticInfo* analyze(IdentifierNode& n);
 
-    SemanticInfo* analyze(DeclarationNode* n);
+    SemanticInfo* analyze(DeclarationNode& n);
 
-    SemanticInfo* analyze(MemberNode* n);
+    SemanticInfo* analyze(MemberNode& n);
 
-    SemanticInfo* analyze(IfNode* n);
+    SemanticInfo* analyze(IfNode& n);
 
-    SemanticInfo* analyze(BinopNode* n);
+    SemanticInfo* analyze(BinopNode& n);
 
-    SemanticInfo* analyze(ReturnNode* n);
+    SemanticInfo* analyze(ReturnNode& n);
 
-    SemanticInfo* analyze(ClassNode* n);
+    SemanticInfo* analyze(ClassNode& n);
 
-    SemanticInfo* analyze(AstNode* n);
+    SemanticInfo* analyze(AstNode& n);
 
     SemanticInfo* analyze(VectorOfNodes program);
 
     std::map<std::string, SymbolTable*> scopes;
 
-    SemanticInfo* analyze(CallNode* n);
+    SemanticInfo* analyze(CallNode& n);
 
-    SemanticInfo* analyze(AssignmentNode* n);
+    SemanticInfo* analyze(AssignmentNode& n);
 };
 
 #endif //UNTITLED1_SECONDPASS_H
