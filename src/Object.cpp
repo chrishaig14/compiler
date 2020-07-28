@@ -35,11 +35,11 @@ Integer::Integer(int value) {
     this->value = value;
 }
 
-void BuiltinSum::run(ObjectStack* stack) {
-    Object* value_a = stack->pop();
-    Object* value_b = stack->pop();
+void BuiltinSum::run(ObjectStack& stack) {
+    Object* value_a = stack.pop();
+    Object* value_b = stack.pop();
     if (value_a->type == ValueType::INTEGER and value_b->type == ValueType::INTEGER) {
-        stack->push(new Object(new Integer(value_a->integer->value + value_b->integer->value)));
+        stack.push(new Object(new Integer(value_a->integer->value + value_b->integer->value)));
     }
 }
 

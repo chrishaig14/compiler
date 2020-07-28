@@ -20,7 +20,7 @@ public:
 
     CodeUser* code;
     size_t inst_ptr;
-    ObjectStack* stack;
+    ObjectStack& stack;
     Environment* env;
 
     void run() {
@@ -31,11 +31,11 @@ public:
     }
 
     void run_inst(PopInst& pop) {
-        this->stack->pop();
+        this->stack.pop();
     }
 
     void run_inst(CallInst& call) {
-        Object* value = this->stack->pop();
+        Object* value = this->stack.pop();
         if (value->type != ValueType::CODE) {
             throw std::runtime_error("Trying to call something that's not code!");
         }
@@ -75,23 +75,22 @@ public:
         this->env->declare(declare.name);
     }
 
-    Frame(std::vector<Inst*> code, ObjectStack* stack) {
-        this->stack = stack;
+    Frame(std::vector<Inst>& code, ObjectStack& stack) : stack(stack) {
         this->env = new Environment(nullptr);
     }
 
     void run_inst(PushInst& push) {
-        this->stack->push(push.value);
+        this->stack.push(push.value);
     }
 
     void run_inst(StoreInst& store) {
-        Object* value = this->stack->pop();
+        Object* value = this->stack.pop();
         this->env->set(store.name, value);
     }
 
     void run_inst(LoadInst& load) {
         Object* value = this->env->get(load.name);
-        this->stack->push(value);
+        this->stack.push(value);
     }
 };
 

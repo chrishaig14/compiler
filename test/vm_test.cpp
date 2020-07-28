@@ -9,7 +9,8 @@
 static Object* value_7 = new Object(new Integer(7));
 TEST(vm_test, inst_push) {
     ObjectStack stack;
-    Frame f(std::vector<Inst*>(), &stack);
+    std::vector<Inst> code;
+    Frame f(code, stack);
     PushInst inst(value_7);
     f.run_inst(inst);
     EXPECT_TRUE(equal(stack.top(), value_7));
@@ -17,7 +18,8 @@ TEST(vm_test, inst_push) {
 
 TEST(vm_test, inst_pop) {
     ObjectStack stack;
-    Frame f(std::vector<Inst*>(), &stack);
+    std::vector<Inst> code;
+    Frame f(code, stack);
     stack.push(value_7);
     PopInst inst;
     f.run_inst(inst);
@@ -26,7 +28,8 @@ TEST(vm_test, inst_pop) {
 
 TEST(vm_test, inst_declare) {
     ObjectStack stack;
-    Frame f(std::vector<Inst*>(), &stack);
+    std::vector<Inst> code;
+    Frame f(code, stack);
     DeclareInst inst("a");
     f.run_inst(inst);
     EXPECT_TRUE(f.env->is_declared("a"));
@@ -34,7 +37,8 @@ TEST(vm_test, inst_declare) {
 
 TEST(vm_test, inst_store) {
     ObjectStack stack;
-    Frame f(std::vector<Inst*>(), &stack);
+    std::vector<Inst> code;
+    Frame f(code, stack);
     PushInst push_inst(value_7);
     DeclareInst declare_inst("a");
     StoreInst store_inst("a");
@@ -47,7 +51,8 @@ TEST(vm_test, inst_store) {
 
 TEST(vm_test, inst_load) {
     ObjectStack stack;
-    Frame f(std::vector<Inst*>(), &stack);
+    std::vector<Inst> code;
+    Frame f(code, stack);
     Object* value_9 = new Object(new Integer(9));
     PushInst push_inst_7(value_7);
     PushInst push_inst_9(value_9);
@@ -64,7 +69,8 @@ TEST(vm_test, inst_load) {
 
 TEST(vm_test, inst_call) {
     ObjectStack stack;
-    Frame f(std::vector<Inst*>(), &stack);
+    std::vector<Inst> code;
+    Frame f(code, stack);
     std::vector<Inst*> code_vector = {new Inst()};
     BuiltinSum builtinSum;
     Object* builtin_sum = new Object(new Code(&builtinSum));

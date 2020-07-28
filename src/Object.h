@@ -40,12 +40,12 @@ public:
 
 class CodeBuiltin {
 public:
-    virtual void run(ObjectStack* stack) = 0;
+    virtual void run(ObjectStack& stack) = 0;
 };
 
 class BuiltinSum : public CodeBuiltin {
 public:
-    void run(ObjectStack* stack);
+    void run(ObjectStack& stack);
 };
 
 class CodeUser {
