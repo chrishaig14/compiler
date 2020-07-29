@@ -25,7 +25,7 @@ IfNode* Parser::parse_if() {
     AstNode* condition = this->parse_expression();
     this->expect_token(TokenType::RPAREN);
     VectorOfNodes body = this->parse_possibly_empty_block();
-    IfNode* node = new IfNode(condition, body);
+    IfNode* node = new IfNode(*condition, body);
     return node;
 }
 

@@ -24,7 +24,7 @@ ClassNode* i_class(std::string name, VectorOfStrings template_parameters,
     return new ClassNode(name, template_parameters, fields, methods);
 }
 
-IfNode* i_if(AstNode* condition, VectorOfNodes then) {
+IfNode* i_if(AstNode condition, VectorOfNodes then) {
     return new IfNode(condition, then);
 }
 
@@ -174,7 +174,7 @@ bool compare(BinopNode* a, BinopNode* b) {
 bool equal(IfNode* a, IfNode* b) {
     if (both_null(a, b)) return true;
     if (one_null(a, b)) return false;
-    if (not equal(a->condition, b->condition))return false;
+    if (not equal(&a->condition, &b->condition))return false;
     for (int i = 0; i < a->then.size(); i++) { if (not equal(a->then[i], b->then[i])) return false; }
     return true;
 }

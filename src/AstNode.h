@@ -135,10 +135,10 @@ public:
 
 class IfNode {
 public:
-    AstNode* condition;
+    AstNode condition;
     VectorOfNodes then;
 
-    IfNode(AstNode* condition, VectorOfNodes then) {
+    IfNode(AstNode condition, VectorOfNodes then) {
         this->condition = condition;
         this->then = then;
     }
@@ -317,7 +317,7 @@ ClassNode* i_class(std::string name,
                    std::vector<DeclarationNode*> fields,
                    std::vector<FunctionNode*> methods);
 
-IfNode* i_if(AstNode* condition, VectorOfNodes then);
+IfNode* i_if(AstNode condition, VectorOfNodes then);
 
 TypeNode* i_type(std::string name, VectorOfTypes type_parameters);
 

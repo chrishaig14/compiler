@@ -144,7 +144,7 @@ TEST(parser_test, if_empty_then) {
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
     IfNode* node = parser.parse_if();
-    EXPECT_EQ(equal(node, i_if(w_id("x"), VectorOfNodes())), true);
+    EXPECT_EQ(equal(node, i_if(*w_id("x"), VectorOfNodes())), true);
 }
 
 std::string body_1_string = "x = a + b; x = y;";
@@ -155,7 +155,7 @@ TEST(parser_test, if_non_empty_then) {
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
     IfNode* node = parser.parse_if();
-    EXPECT_EQ(equal(node, i_if(w_id("x"), body_1_node)), true);
+    EXPECT_EQ(equal(node, i_if(*w_id("x"), body_1_node)), true);
 }
 
 TEST(parser_test, simple_type) {

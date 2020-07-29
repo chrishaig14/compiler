@@ -180,7 +180,7 @@ SemanticInfo SecondPass::analyze(MemberNode& n) {
 
 SemanticInfo SecondPass::analyze(IfNode& n) {
     SemanticInfo semantic_info;
-    SemanticInfo condition_info = this->analyze(*n.condition);
+    SemanticInfo condition_info = this->analyze(n.condition);
     this->enter_scope("if");
     SemanticInfo then_info = this->analyze(n.then);
     this->leave_scope();
