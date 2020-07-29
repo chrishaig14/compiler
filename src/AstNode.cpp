@@ -152,7 +152,7 @@ bool equal(CallNode* a, CallNode* b) {
 }
 
 bool equal(SubscriptNode* a, SubscriptNode* b) {
-    return equal(a->parent, b->parent) && equal(a->sub, b->sub);
+    return equal(&a->parent, &b->parent) && equal(&a->sub, &b->sub);
 }
 
 

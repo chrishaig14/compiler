@@ -179,10 +179,10 @@ public:
 
 class SubscriptNode {
 public:
-    AstNode* parent;
-    AstNode* sub;
+    AstNode parent;
+    AstNode sub;
 
-    SubscriptNode(AstNode* parent, AstNode* sub) {
+    SubscriptNode(AstNode parent, AstNode sub) {
         this->parent = parent;
         this->sub = sub;
     }

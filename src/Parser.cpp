@@ -99,7 +99,7 @@ AstNode* Parser::parse_id_call_or_subscript() {
         AstNode* value = this->parse_expression();
         this->expect_token(TokenType::RSQUARE);
         node->type = AstType::SUB;
-        node->ast_sub = new SubscriptNode(w_id(token.str), value);
+        node->ast_sub = new SubscriptNode(*w_id(token.str), *value);
     }
     return node;
 }
@@ -579,7 +579,7 @@ AstNode* w_call(AstNode* parent, VectorOfNodes arguments) {
 AstNode* w_sub(AstNode* parent, AstNode* sub) {
     AstNode* ast_node = new AstNode;
     ast_node->type = AstType::SUB;
-    ast_node->ast_sub = new SubscriptNode(parent, sub);
+    ast_node->ast_sub = new SubscriptNode(*parent, *sub);
     return ast_node;
 }
 
