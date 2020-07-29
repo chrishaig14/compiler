@@ -6,7 +6,11 @@
 #include <Frame.h>
 #include "ObjectStack.h"
 
-static Object* value_7 = new Object(new Integer(7));
+Object v7(new Integer(7));
+Object v9(new Integer(9));
+static Object* value_7 = &v7;
+static Object* value_9 = &v9;
+
 TEST(vm_test, inst_push) {
     ObjectStack stack;
     std::vector<Inst> code;
@@ -53,7 +57,6 @@ TEST(vm_test, inst_load) {
     ObjectStack stack;
     std::vector<Inst> code;
     Frame f(code, stack);
-    Object* value_9 = new Object(new Integer(9));
     PushInst push_inst_7(value_7);
     PushInst push_inst_9(value_9);
     DeclareInst declare_inst("a");
@@ -73,10 +76,9 @@ TEST(vm_test, inst_call) {
     Frame f(code, stack);
     std::vector<Inst*> code_vector = {new Inst()};
     BuiltinSum builtinSum;
-    Object* builtin_sum = new Object(new Code(&builtinSum));
-    Object* value_9 = new Object(new Integer(9));
-    Object* value_16 = new Object(new Integer(16));
-    PushInst push_sum_value(builtin_sum);
+    Object builtin_sum(new Code(&builtinSum));
+    Object value_16(new Integer(16));
+    PushInst push_sum_value(&builtin_sum);
     PushInst push_inst_9(value_9);
     PushInst push_inst_7(value_7);
     DeclareInst declare_sum("__sum__");
@@ -90,7 +92,7 @@ TEST(vm_test, inst_call) {
     f.run_inst(push_inst_9);
     f.run_inst(load_sum);
     f.run_inst(call_inst);
-    EXPECT_TRUE(equal(stack.pop(), value_16));
+    EXPECT_TRUE(equal(stack.pop(), &value_16));
     EXPECT_TRUE(stack.empty());
 }
 
