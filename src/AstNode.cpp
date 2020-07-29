@@ -223,7 +223,7 @@ bool compare(ReturnNode* a, ReturnNode* b) {
 bool compare(AssignmentNode* a, AssignmentNode* b) {
     if (both_null(a, b)) return true;
     if (one_null(a, b)) return false;
-    return equal(a->lvalue, b->lvalue) and equal(a->rvalue, b->rvalue);
+    return equal(&a->lvalue, &b->lvalue) and equal(&a->rvalue, &b->rvalue);
 }
 
 

@@ -204,10 +204,10 @@ public:
 
 class AssignmentNode {
 public:
-    AstNode* lvalue;
-    AstNode* rvalue;
+    AstNode lvalue;
+    AstNode rvalue;
 
-    AssignmentNode(AstNode* lvalue, AstNode* rvalue) {
+    AssignmentNode(AstNode lvalue, AstNode rvalue) {
         this->lvalue = lvalue;
         this->rvalue = rvalue;
     }

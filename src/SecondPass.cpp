@@ -145,8 +145,8 @@ SemanticInfo SecondPass::analyze(DeclarationNode& n) {
 }
 
 SemanticInfo SecondPass::analyze(AssignmentNode& n) {
-    SemanticInfo linfo = this->analyze(*n.lvalue);
-    SemanticInfo expression_type = this->analyze(*n.rvalue);
+    SemanticInfo linfo = this->analyze(n.lvalue);
+    SemanticInfo expression_type = this->analyze(n.rvalue);
     if (!equal(linfo.symbol_info, expression_type.symbol_info)) {
         throw ReturnError(expression_type.symbol_info->object_info->parent, linfo.symbol_info->object_info->parent);
     }

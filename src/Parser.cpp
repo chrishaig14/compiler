@@ -264,7 +264,7 @@ AstNode* Parser::parse_assignment_or_expression() {
         AstNode* rvalue = this->parse_expression();
         AstNode* ast_node = new AstNode;
         ast_node->type = AstType::ASSIGNMENT;
-        AssignmentNode* node = new AssignmentNode(lvalue, rvalue);
+        AssignmentNode* node = new AssignmentNode(*lvalue, *rvalue);
         ast_node->ast_assignment = node;
         return ast_node;
     }

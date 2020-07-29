@@ -19,7 +19,7 @@ typedef std::vector<AstNode*> VectorOfNodes;
 AstNode* w_asn(AstNode* lvalue, AstNode* rvalue) {
     AstNode* ast_node = new AstNode;
     ast_node->type = AstType::ASSIGNMENT;
-    ast_node->ast_assignment = new AssignmentNode(lvalue, rvalue);
+    ast_node->ast_assignment = new AssignmentNode(*lvalue, *rvalue);
     return ast_node;
 }
 
