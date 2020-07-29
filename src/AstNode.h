@@ -192,10 +192,10 @@ public:
 class BinopNode {
 public:
     BinopType op;
-    AstNode* left;
-    AstNode* right;
+    AstNode left;
+    AstNode right;
 
-    BinopNode(BinopType op, AstNode* left, AstNode* right) {
+    BinopNode(BinopType op, AstNode left, AstNode right) {
         this->op = op;
         this->left = left;
         this->right = right;

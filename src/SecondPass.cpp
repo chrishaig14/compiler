@@ -192,8 +192,8 @@ SemanticInfo SecondPass::analyze(IfNode& n) {
 }
 
 SemanticInfo SecondPass::analyze(BinopNode& n) {
-    SemanticInfo left_info = this->analyze(*n.left);
-    SemanticInfo right_info = this->analyze(*n.right);
+    SemanticInfo left_info = this->analyze(n.left);
+    SemanticInfo right_info = this->analyze(n.right);
     SemanticInfo semantic_info;
     semantic_info.symbol_info = wrap_simple_info(new ObjectInfo(new TypeNode("Integer", {})));
     semantic_info.free_variables = left_info.free_variables;

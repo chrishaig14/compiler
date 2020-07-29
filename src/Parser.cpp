@@ -220,7 +220,7 @@ AstNode* Parser::parse_bool_expression() {
         AstNode* right = this->parse_add_or_sub_expression();
         AstNode* ast_node = new AstNode;
         ast_node->type = AstType::BINOP;
-        BinopNode* node = new BinopNode(BinopType::EQ, left, right);
+        BinopNode* node = new BinopNode(BinopType::EQ, *left, *right);
         ast_node->ast_binop = node;
         return ast_node;
     }
@@ -233,7 +233,7 @@ AstNode* Parser::parse_and_expression() {
         AstNode* right = this->parse_bool_expression();
         AstNode* ast_node = new AstNode;
         ast_node->type = AstType::BINOP;
-        BinopNode* node = new BinopNode(BinopType::AND, left, right);
+        BinopNode* node = new BinopNode(BinopType::AND, *left, *right);
         ast_node->ast_binop = node;
         return ast_node;
     }
@@ -246,7 +246,7 @@ AstNode* Parser::parse_or_expression() {
         AstNode* right = this->parse_and_expression();
         AstNode* ast_node = new AstNode;
         ast_node->type = AstType::BINOP;
-        BinopNode* node = new BinopNode(BinopType::OR, left, right);
+        BinopNode* node = new BinopNode(BinopType::OR, *left, *right);
         ast_node->ast_binop = node;
         return ast_node;
     }
@@ -593,6 +593,6 @@ AstNode* w_member(AstNode* parent, std::string child) {
 AstNode* w_bop(BinopType op, AstNode* left, AstNode* right) {
     AstNode* ast_node = new AstNode;
     ast_node->type = AstType::BINOP;
-    ast_node->ast_binop = new BinopNode(op, left, right);
+    ast_node->ast_binop = new BinopNode(op, *left, *right);
     return ast_node;
 }

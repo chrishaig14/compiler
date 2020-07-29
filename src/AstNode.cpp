@@ -162,10 +162,10 @@ bool compare(BinopNode* a, BinopNode* b) {
     if (a->op != b->op) {
         return false;
     }
-    if (not equal(a->left, b->left)) {
+    if (not equal(&a->left, &b->left)) {
         return false;
     }
-    if (not equal(a->right, b->right)) {
+    if (not equal(&a->right, &b->right)) {
         return false;
     }
     return true;
