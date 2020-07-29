@@ -66,7 +66,7 @@ CallNode* Parser::parse_call() {
         this->expect_token(TokenType::RPAREN);
     }
     CallNode* node;
-    node->function = function;
+    node->function = *function;
     node->arguments = arguments;
     return node;
 }
@@ -91,7 +91,7 @@ AstNode* Parser::parse_id_call_or_subscript() {
         this->next();
         VectorOfNodes arguments = this->parse_list_of_expressions();
         this->expect_token(TokenType::RPAREN);
-        CallNode* call_node = new CallNode(w_id(token.str), arguments);
+        CallNode* call_node = new CallNode(*w_id(token.str), arguments);
         node->type = AstType::CALL;
         node->ast_call = call_node;
     } else if (this->match(TokenType::LSQUARE)) {
@@ -572,7 +572,7 @@ AstNode* w_string(std::string value) {
 AstNode* w_call(AstNode* parent, VectorOfNodes arguments) {
     AstNode* ast_node = new AstNode;
     ast_node->type = AstType::CALL;
-    ast_node->ast_call = new CallNode(parent, arguments);
+    ast_node->ast_call = new CallNode(*parent, arguments);
     return ast_node;
 }
 

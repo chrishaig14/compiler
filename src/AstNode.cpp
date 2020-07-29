@@ -148,7 +148,7 @@ bool compare(IdentifierNode* a, IdentifierNode* b) {
 }
 
 bool equal(CallNode* a, CallNode* b) {
-    return equal(a->function, b->function) && equal(a->arguments, b->arguments);
+    return equal(&a->function, &b->function) && equal(a->arguments, b->arguments);
 }
 
 bool equal(SubscriptNode* a, SubscriptNode* b) {

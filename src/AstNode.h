@@ -164,10 +164,10 @@ public:
 
 class CallNode {
 public:
-    AstNode* function;
+    AstNode function;
     VectorOfNodes arguments;
 
-    CallNode(AstNode* function, VectorOfNodes arguments) {
+    CallNode(AstNode function, VectorOfNodes arguments) {
         this->function = function;
         this->arguments = arguments;
     }

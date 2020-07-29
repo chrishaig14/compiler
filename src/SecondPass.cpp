@@ -215,7 +215,7 @@ SemanticInfo SecondPass::analyze(ReturnNode& n) {
 }
 
 SemanticInfo SecondPass::analyze(CallNode& n) {
-    SemanticInfo function_semantic_info = this->analyze(*n.function);
+    SemanticInfo function_semantic_info = this->analyze(n.function);
     if (!function_semantic_info.symbol_info->is_function()) {
         throw std::runtime_error("Expected a function! Got something else!");
     }
