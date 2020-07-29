@@ -86,10 +86,10 @@ TEST(semantic_test, class_foo_with_field) {
     ClassInfo* ginfo = fp.class_table.get("Foo");
     MapStringToSimple fields;
     fields["x"] = s_info(typenode_string);
-    ClassInfo* class_info = new ClassInfo;
-    class_info->fields = fields;
-    class_info->methods;
-    EXPECT_TRUE(equal(ginfo, class_info));
+    ClassInfo class_info;
+    class_info.fields = fields;
+    class_info.methods;
+    EXPECT_TRUE(equal(ginfo, &class_info));
 }
 
 TEST(semantic_test, class_foo_with_method) {
@@ -100,9 +100,9 @@ TEST(semantic_test, class_foo_with_method) {
     ClassInfo* ginfo = fp.class_table.get("Foo");
     MapStringToFunction methods;
     methods["foo"] = f_info({typenode_integer}, typenode_string);
-    ClassInfo* expected = new ClassInfo;
-    expected->methods = methods;
-    EXPECT_TRUE(equal(ginfo, expected));
+    ClassInfo expected;
+    expected.methods = methods;
+    EXPECT_TRUE(equal(ginfo, &expected));
 }
 
 TEST(semantic_test, class_foo_complete) {
@@ -118,8 +118,8 @@ TEST(semantic_test, class_foo_complete) {
     MapStringToSimple fields;
     fields["y"] = s_info(typenode_string);
     fields["z"] = s_info(typenode_integer);
-    ClassInfo* expected = new ClassInfo;
-    expected->fields = fields;
-    expected->methods = methods;
-    EXPECT_TRUE(equal(ginfo, expected));
+    ClassInfo expected;
+    expected.fields = fields;
+    expected.methods = methods;
+    EXPECT_TRUE(equal(ginfo, &expected));
 }
