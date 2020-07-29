@@ -81,7 +81,7 @@ bool compare(MemberNode* a, MemberNode* b) {
     if (a == nullptr and b == nullptr) {
         return true;
     }
-    return equal(a->parent, b->parent) and (a->child == b->child);
+    return equal(&a->parent, &b->parent) and (a->child == b->child);
 }
 
 std::string ast_string(AstType type) {

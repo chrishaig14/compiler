@@ -586,7 +586,7 @@ AstNode* w_sub(AstNode* parent, AstNode* sub) {
 AstNode* w_member(AstNode* parent, std::string child) {
     AstNode* ast_node = new AstNode;
     ast_node->type = AstType::MEMBER;
-    ast_node->ast_member = new MemberNode(parent, child);
+    ast_node->ast_member = new MemberNode(*parent, child);
     return ast_node;
 }
 

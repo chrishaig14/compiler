@@ -295,10 +295,10 @@ public:
 
 class MemberNode {
 public:
-    AstNode* parent;
+    AstNode parent;
     std::string child;
 
-    MemberNode(AstNode* parent, std::string child) {
+    MemberNode(AstNode parent, std::string child) {
         this->parent = parent;
         this->child = child;
     }

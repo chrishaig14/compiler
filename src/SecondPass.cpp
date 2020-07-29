@@ -159,7 +159,7 @@ SemanticInfo SecondPass::analyze(AssignmentNode& n) {
 }
 
 SemanticInfo SecondPass::analyze(MemberNode& n) {
-    SemanticInfo semantic_info = this->analyze(*n.parent);
+    SemanticInfo semantic_info = this->analyze(n.parent);
     if (!semantic_info.symbol_info->is_object()) {
         throw std::runtime_error("Accessing member " + n.child + " of non object");
     }
