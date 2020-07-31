@@ -12,25 +12,25 @@ VectorOfNodes Parser::parse_program() {
     return program;
 }
 
-ReturnNode* Parser::parse_return() {
+ReturnNode Parser::parse_return() {
     this->expect_token(TokenType::RETURN);
-    AstNode* expression = this->parse_expression();
-    ReturnNode* node = new ReturnNode(expression);
+    AstNode expression = this->parse_expression();
+    ReturnNode node(expression);
     return node;
 }
 
-IfNode* Parser::parse_if() {
+IfNode Parser::parse_if() {
     this->expect_token(TokenType::IF);
     this->expect_token(TokenType::LPAREN);
-    AstNode* condition = this->parse_expression();
+    AstNode condition = this->parse_expression();
     this->expect_token(TokenType::RPAREN);
     VectorOfNodes body = this->parse_possibly_empty_block();
-    IfNode* node = new IfNode(*condition, body);
+    IfNode node(condition, body);
     return node;
 }
 
 
-ListNode* Parser::parse_list_literal() {
+ListNode Parser::parse_list_literal() {
     this->expect_token(TokenType::LSQUARE);
     VectorOfNodes elements;
     if (this->match(TokenType::RSQUARE)) {
@@ -38,26 +38,25 @@ ListNode* Parser::parse_list_literal() {
         this->next();
     } else {
         while (true) {
-            AstNode* element = this->parse_expression();
+            AstNode element = this->parse_expression();
             if (!this->match(TokenType::COMMA)) { break; }
             elements.push_back(element);
         }
         this->expect_token(TokenType::RSQUARE);
     }
-    ListNode* node;
-    node->elements = elements;
+    ListNode node(elements);
     return node;
 }
 
-CallNode* Parser::parse_call() {
-    AstNode* function = this->parse_expression();
+CallNode Parser::parse_call() {
+    AstNode function = this->parse_expression();
     this->expect_token(TokenType::LPAREN);
     VectorOfNodes arguments;
     if (this->match(TokenType::RPAREN)) {
         this->next();
     } else {
         while (true) {
-            AstNode* argument = this->parse_expression();
+            AstNode argument = this->parse_expression();
             arguments.push_back(argument);
             if (!this->match(TokenType::COMMA)) {
                 break;
@@ -65,9 +64,7 @@ CallNode* Parser::parse_call() {
         }
         this->expect_token(TokenType::RPAREN);
     }
-    CallNode* node;
-    node->function = *function;
-    node->arguments = arguments;
+    CallNode node(function, arguments);
     return node;
 }
 
@@ -84,32 +81,32 @@ VectorOfNodes Parser::parse_list_of_expressions() {
     return result;
 }
 
-AstNode* Parser::parse_id_call_or_subscript() {
+AstNode Parser::parse_id_call_or_subscript() {
     Token token = this->expect_token(TokenType::ID);
-    AstNode* node = new AstNode;
+    AstNode node;
     if (this->match(TokenType::LPAREN)) {
         this->next();
         VectorOfNodes arguments = this->parse_list_of_expressions();
         this->expect_token(TokenType::RPAREN);
-        CallNode* call_node = new CallNode(*w_id(token.str), arguments);
-        node->type = AstType::CALL;
-        node->ast_call = call_node;
+        CallNode* call_node = new CallNode(w_id(token.str), arguments);
+        node.type = AstType::CALL;
+        node.ast_call = call_node;
     } else if (this->match(TokenType::LSQUARE)) {
         this->next();
-        AstNode* value = this->parse_expression();
+        AstNode value = this->parse_expression();
         this->expect_token(TokenType::RSQUARE);
-        node->type = AstType::SUB;
-        node->ast_sub = new SubscriptNode(*w_id(token.str), *value);
+        node.type = AstType::SUB;
+        node.ast_sub = new SubscriptNode(w_id(token.str), value);
     }
     return node;
 }
 
-AstNode* Parser::parse_function_expression() {
-    return nullptr;
+AstNode Parser::parse_function_expression() {
+    return AstNode();
 }
 
-AstNode* Parser::parse_id_or_literal() {
-    AstNode* node;
+AstNode Parser::parse_id_or_literal() {
+    AstNode node;
     switch (this->token.type) {
         case TokenType::LPAREN: {
             this->next();
@@ -141,8 +138,8 @@ AstNode* Parser::parse_id_or_literal() {
     return node;
 }
 
-AstNode* Parser::parse_call_or_subscript_chain(AstNode* parent) {
-    AstNode* node = parent;
+AstNode Parser::parse_call_or_subscript_chain(AstNode parent) {
+    AstNode node = parent;
     while (this->match(TokenType::LPAREN) or this->match(TokenType::LSQUARE)) {
         if (this->match(TokenType::LPAREN)) {
 //                 function call
@@ -159,7 +156,7 @@ AstNode* Parser::parse_call_or_subscript_chain(AstNode* parent) {
             if (this->match(TokenType::RSQUARE)) {
                 throw std::runtime_error("Empty subscript error!");
             }
-            AstNode* value = this->parse_expression();
+            AstNode value = this->parse_expression();
             node = w_sub(node, value);
             this->expect_token(TokenType::RSQUARE);
         }
@@ -167,8 +164,8 @@ AstNode* Parser::parse_call_or_subscript_chain(AstNode* parent) {
     return node;
 }
 
-AstNode* Parser::parse_factor() {
-    AstNode* parent = this->parse_id_or_literal();
+AstNode Parser::parse_factor() {
+    AstNode parent = this->parse_id_or_literal();
     parent = this->parse_call_or_subscript_chain(parent);
     while (this->match(TokenType::DOT)) {
         this->next();
@@ -179,8 +176,8 @@ AstNode* Parser::parse_factor() {
     return parent;
 }
 
-AstNode* Parser::parse_mul_or_div_expression() {
-    AstNode* left = this->parse_factor();
+AstNode Parser::parse_mul_or_div_expression() {
+    AstNode left = this->parse_factor();
     BinopType op;
     while (this->match(TokenType::TIMES) || this->match(TokenType::DIV)) {
         if (this->match(TokenType::TIMES)) {
@@ -190,14 +187,14 @@ AstNode* Parser::parse_mul_or_div_expression() {
             this->next();
             op = BinopType::DIV;
         }
-        AstNode* right = this->parse_factor();
+        AstNode right = this->parse_factor();
         left = w_bop(op, left, right);
     }
     return left;
 }
 
-AstNode* Parser::parse_add_or_sub_expression() {
-    AstNode* left = this->parse_mul_or_div_expression();
+AstNode Parser::parse_add_or_sub_expression() {
+    AstNode left = this->parse_mul_or_div_expression();
     BinopType op;
     while (this->match(TokenType::PLUS) || this->match(TokenType::MINUS)) {
         if (this->match(TokenType::PLUS)) {
@@ -207,115 +204,122 @@ AstNode* Parser::parse_add_or_sub_expression() {
             this->next();
             op = BinopType::MINUS;
         }
-        AstNode* right = this->parse_mul_or_div_expression();
+        AstNode right = this->parse_mul_or_div_expression();
         left = w_bop(op, left, right);
     }
     return left;
 }
 
-AstNode* Parser::parse_bool_expression() {
-    AstNode* left = this->parse_add_or_sub_expression();
+AstNode Parser::parse_bool_expression() {
+    AstNode left = this->parse_add_or_sub_expression();
     if (this->match(TokenType::EQ)) {
         this->next();
-        AstNode* right = this->parse_add_or_sub_expression();
-        AstNode* ast_node = new AstNode;
-        ast_node->type = AstType::BINOP;
-        BinopNode* node = new BinopNode(BinopType::EQ, *left, *right);
-        ast_node->ast_binop = node;
+        AstNode right = this->parse_add_or_sub_expression();
+        AstNode ast_node;
+        ast_node.type = AstType::BINOP;
+        BinopNode* node = new BinopNode(BinopType::EQ, left, right);
+        ast_node.ast_binop = node;
         return ast_node;
     }
     return left;
 }
 
-AstNode* Parser::parse_and_expression() {
-    AstNode* left = this->parse_bool_expression();
+AstNode Parser::parse_and_expression() {
+    AstNode left = this->parse_bool_expression();
     if (this->match(TokenType::AND)) {
-        AstNode* right = this->parse_bool_expression();
-        AstNode* ast_node = new AstNode;
-        ast_node->type = AstType::BINOP;
-        BinopNode* node = new BinopNode(BinopType::AND, *left, *right);
-        ast_node->ast_binop = node;
+        AstNode right = this->parse_bool_expression();
+        AstNode ast_node;
+        ast_node.type = AstType::BINOP;
+        BinopNode* node = new BinopNode(BinopType::AND, left, right);
+        ast_node.ast_binop = node;
         return ast_node;
     }
     return left;
 }
 
-AstNode* Parser::parse_or_expression() {
-    AstNode* left = this->parse_and_expression();
+AstNode Parser::parse_or_expression() {
+    AstNode left = this->parse_and_expression();
     if (this->match(TokenType::OR)) {
-        AstNode* right = this->parse_and_expression();
-        AstNode* ast_node = new AstNode;
-        ast_node->type = AstType::BINOP;
-        BinopNode* node = new BinopNode(BinopType::OR, *left, *right);
-        ast_node->ast_binop = node;
+        AstNode right = this->parse_and_expression();
+        AstNode ast_node;
+        ast_node.type = AstType::BINOP;
+        BinopNode* node = new BinopNode(BinopType::OR, left, right);
+        ast_node.ast_binop = node;
         return ast_node;
     }
     return left;
 }
 
-AstNode* Parser::parse_expression() {
+AstNode Parser::parse_expression() {
     return this->parse_or_expression();
 }
 
-AstNode* Parser::parse_assignment_or_expression() {
-    AstNode* lvalue = this->parse_expression();
+AstNode Parser::parse_assignment_or_expression() {
+    AstNode lvalue = this->parse_expression();
     if (this->match(TokenType::EQQ)) {
         this->next();
-        AstNode* rvalue = this->parse_expression();
-        AstNode* ast_node = new AstNode;
-        ast_node->type = AstType::ASSIGNMENT;
-        AssignmentNode* node = new AssignmentNode(*lvalue, *rvalue);
-        ast_node->ast_assignment = node;
+        AstNode rvalue = this->parse_expression();
+        AstNode ast_node;
+        ast_node.type = AstType::ASSIGNMENT;
+        AssignmentNode* node = new AssignmentNode(lvalue, rvalue);
+        ast_node.ast_assignment = node;
         return ast_node;
     }
     return lvalue;
 }
 
-DeclarationNode* Parser::parse_variable_declaration() {
-    if (this->match(TokenType::VAR)) {
+DeclarationNode Parser::parse_variable_declaration() {
+    this->expect_token(TokenType::VAR);
+    Token identifier = this->expect_token(TokenType::ID);
+    if (!this->match(TokenType::COLON) && !this->match(TokenType::EQQ)) throw UnexpectedToken(this->token,
+                                                                                              {TokenType::EQQ,
+                                                                                               TokenType::COLON});
+    TypeNode* type = nullptr;
+    if (this->match(TokenType::COLON)) {
         this->next();
-        Token identifier = this->expect_token(TokenType::ID);
-        TypeNode* type = nullptr;
-        if (this->match(TokenType::COLON)) {
-            this->next();
-            type = this->parse_type_node();
-        }
-        AstNode* expression = nullptr;
-        if (this->match(TokenType::EQQ)) {
-            this->next();
-            expression = this->parse_expression();
-        }
-        DeclarationNode* node = new DeclarationNode(identifier.str, type, expression);
-        return node;
+        TypeNode ty = this->parse_type_node();
+        type = new TypeNode("", {});
+        *type = ty;
     }
-    return nullptr;
+    AstNode* expression = nullptr;
+    if (this->match(TokenType::EQQ)) {
+        this->next();
+        AstNode exp = this->parse_expression();
+        expression = new AstNode(exp);
+        *expression = exp;
+    }
+    DeclarationNode node(identifier.str, type, expression);
+    return node;
 }
 
-AstNode* Parser::parse_common_statement() {
-    AstNode* ast_node = new AstNode;
+AstNode Parser::parse_common_statement() {
+    AstNode ast_node;
     if (this->match(TokenType::IF)) {
-        ast_node->type = AstType::IF;
-        ast_node->ast_if = this->parse_if();
+        ast_node.type = AstType::IF;
+        IfNode n = this->parse_if();
+        ast_node.ast_if = new IfNode(n.condition, n.then);
         return ast_node;
     }
     if (this->match(TokenType::VAR)) {
-        ast_node->type = AstType::DECLARATION;
-        ast_node->ast_declaration = this->parse_variable_declaration();
+        ast_node.type = AstType::DECLARATION;
+        DeclarationNode n = this->parse_variable_declaration();
+        ast_node.ast_declaration = new DeclarationNode(n.identifier, n.type, n.expression);
         this->expect_token(TokenType::SEMICOLON);
         return ast_node;
     }
     if (this->match(TokenType::RETURN)) {
-        ast_node->type = AstType::RETURN;
-        ast_node->ast_return = this->parse_return();
+        ast_node.type = AstType::RETURN;
+        ReturnNode ret = this->parse_return();
+        ast_node.ast_return = new ReturnNode(ret.expression);
         this->expect_token(TokenType::SEMICOLON);
         return ast_node;
     }
-    AstNode* node = this->parse_assignment_or_expression();
+    AstNode node = this->parse_assignment_or_expression();
     this->expect_token(TokenType::SEMICOLON);
     return node;
 }
 
-AstNode* Parser::parse_interface_definition() {
+AstNode Parser::parse_interface_definition() {
     this->expect_token(TokenType::INTERFACE);
     Token identifier_token = this->expect_token(TokenType::ID);
     this->expect_token(TokenType::COLON);
@@ -338,17 +342,17 @@ AstNode* Parser::parse_interface_definition() {
     }
     this->expect_token(TokenType::LCURLY);
     this->expect_token(TokenType::RCURLY);
-    return nullptr;
+    return AstNode();
 }
 
-TypeNode* Parser::parse_type_node() {
+TypeNode Parser::parse_type_node() {
     Token identifier = this->expect_token(TokenType::ID);
     VectorOfTypes type_parameters;
     if (this->match(TokenType::LSQUARE)) {
         this->next();
         bool expects_parameter = true;
         while (expects_parameter) {
-            TypeNode* type_parameter = this->parse_type_node();
+            TypeNode type_parameter = this->parse_type_node();;
             type_parameters.push_back(type_parameter);
             if (this->match(TokenType::COMMA)) {
                 this->next();
@@ -358,11 +362,11 @@ TypeNode* Parser::parse_type_node() {
         }
         this->expect_token(TokenType::RSQUARE);
     }
-    TypeNode* node = new TypeNode(identifier.str, type_parameters);
+    TypeNode node(identifier.str, type_parameters);
     return node;
 }
 
-ClassNode* Parser::parse_class_definition() {
+ClassNode Parser::parse_class_definition() {
     this->expect_token(TokenType::CLASS);
     Token identifier_token = this->expect_token(TokenType::ID);
     VectorOfStrings template_parameters;
@@ -381,24 +385,24 @@ ClassNode* Parser::parse_class_definition() {
         }
         this->expect_token(TokenType::RSQUARE);
     }
-    std::vector<DeclarationNode*> fields;
-    std::vector<FunctionNode*> methods;
+    std::vector<DeclarationNode> fields;
+    std::vector<FunctionNode> methods;
 
     this->expect_token(TokenType::LCURLY);
     while (true) {
         if (this->match(TokenType::VAR)) {
-            DeclarationNode* field = this->parse_variable_declaration();
+            DeclarationNode field = this->parse_variable_declaration();
             this->expect_token(TokenType::SEMICOLON);
             fields.push_back(field);
         } else if (this->match(TokenType::FUN)) {
-            FunctionNode* method = this->parse_function_definition();
+            FunctionNode method = this->parse_function_definition();
             methods.push_back(method);
         } else {
             break;
         }
     }
     this->expect_token(TokenType::RCURLY);
-    ClassNode* node = new ClassNode(identifier_token.str, template_parameters, fields, methods);
+    ClassNode node(identifier_token.str, template_parameters, fields, methods);
     return node;
 }
 
@@ -410,13 +414,13 @@ VectorOfNodes Parser::parse_possibly_empty_block() {
             this->next();
             break;
         }
-        AstNode* statement = this->parse_common_statement();
+        AstNode statement = this->parse_common_statement();
         block.push_back(statement);
     }
     return block;
 }
 
-FunctionNode* Parser::parse_function_definition() {
+FunctionNode Parser::parse_function_definition() {
     this->expect_token(TokenType::FUN);
     Token matched_token = this->expect_token(TokenType::ID);
     std::string identifier = matched_token.str;
@@ -433,7 +437,7 @@ FunctionNode* Parser::parse_function_definition() {
         while (true) {
             Token parameter_identifier = this->expect_token(TokenType::ID);
             this->expect_token(TokenType::COLON);
-            TypeNode* parameter_type = this->parse_type_node();
+            TypeNode parameter_type = this->parse_type_node();
             parameter_types.push_back(parameter_type);
             parameter_names.push_back(parameter_identifier.str);
             if (this->match(TokenType::COMMA)) {
@@ -445,14 +449,14 @@ FunctionNode* Parser::parse_function_definition() {
         this->expect_token(TokenType::RPAREN);
     }
     // Parse return
-    TypeNode* return_type = nullptr;
+    TypeNode return_type("None", {});
     this->expect_token(TokenType::RARROW);
     return_type = this->parse_type_node();
 //        this->expect_token(TokenType::LCURLY);
     // Parse function body
     VectorOfNodes body = this->parse_possibly_empty_block();
 
-    FunctionNode* node = new FunctionNode(identifier, parameter_names, parameter_types, return_type, body);
+    FunctionNode node(identifier, parameter_names, parameter_types, return_type, body);
     return node;
 }
 
@@ -465,20 +469,18 @@ Token Parser::expect_token(TokenType token) {
     return matched_token;
 }
 
-AstNode* Parser::parse_top_level_statement() {
+AstNode Parser::parse_top_level_statement() {
     std::vector<TokenType> expected_tokens;
-    AstNode* ast_node = new AstNode;
+    AstNode ast_node;
     switch (this->token.type) {
         case TokenType::FUN: {
-            FunctionNode* node = this->parse_function_definition();
-            ast_node->type = AstType::FUNCTION;
-            ast_node->ast_function = node;
+            ast_node.type = AstType::FUNCTION;
+            ast_node.ast_function = new FunctionNode(this->parse_function_definition());;
             break;
         }
         case TokenType::CLASS: {
-            ClassNode* node = this->parse_class_definition();
-            ast_node->type = AstType::CLASS;
-            ast_node->ast_class = node;
+            ast_node.type = AstType::CLASS;
+            ast_node.ast_class = new ClassNode(this->parse_class_definition());
             break;
         }
         case TokenType::INTERFACE:
@@ -548,51 +550,51 @@ std::ostream& operator<<(std::ostream& os, const UnexpectedToken& unexpected_tok
     return os;
 }
 
-AstNode* w_id(std::string name) {
-    AstNode* ast_node = new AstNode;
-    ast_node->type = AstType::IDENTIFIER;
-    ast_node->ast_identifier = new IdentifierNode(name);
+AstNode w_id(std::string name) {
+    AstNode ast_node;
+    ast_node.type = AstType::IDENTIFIER;
+    ast_node.ast_identifier = new IdentifierNode(name);
     return ast_node;
 }
 
-AstNode* w_num(int value) {
-    AstNode* ast_node = new AstNode;
-    ast_node->type = AstType::NUMBER;
-    ast_node->ast_number = new NumberNode(value);
+AstNode w_num(int value) {
+    AstNode ast_node;
+    ast_node.type = AstType::NUMBER;
+    ast_node.ast_number = new NumberNode(value);
     return ast_node;
 }
 
-AstNode* w_string(std::string value) {
-    AstNode* ast_node = new AstNode;
-    ast_node->type = AstType::STRING;
-    ast_node->ast_string = new StringNode(value);
+AstNode w_string(std::string value) {
+    AstNode ast_node;
+    ast_node.type = AstType::STRING;
+    ast_node.ast_string = new StringNode(value);
     return ast_node;
 }
 
-AstNode* w_call(AstNode* parent, VectorOfNodes arguments) {
-    AstNode* ast_node = new AstNode;
-    ast_node->type = AstType::CALL;
-    ast_node->ast_call = new CallNode(*parent, arguments);
+AstNode w_call(AstNode parent, VectorOfNodes arguments) {
+    AstNode ast_node;
+    ast_node.type = AstType::CALL;
+    ast_node.ast_call = new CallNode(parent, arguments);
     return ast_node;
 }
 
-AstNode* w_sub(AstNode* parent, AstNode* sub) {
-    AstNode* ast_node = new AstNode;
-    ast_node->type = AstType::SUB;
-    ast_node->ast_sub = new SubscriptNode(*parent, *sub);
+AstNode w_sub(AstNode parent, AstNode sub) {
+    AstNode ast_node;
+    ast_node.type = AstType::SUB;
+    ast_node.ast_sub = new SubscriptNode(parent, sub);
     return ast_node;
 }
 
-AstNode* w_member(AstNode* parent, std::string child) {
-    AstNode* ast_node = new AstNode;
-    ast_node->type = AstType::MEMBER;
-    ast_node->ast_member = new MemberNode(*parent, child);
+AstNode w_member(AstNode parent, std::string child) {
+    AstNode ast_node;
+    ast_node.type = AstType::MEMBER;
+    ast_node.ast_member = new MemberNode(parent, child);
     return ast_node;
 }
 
-AstNode* w_bop(BinopType op, AstNode* left, AstNode* right) {
-    AstNode* ast_node = new AstNode;
-    ast_node->type = AstType::BINOP;
-    ast_node->ast_binop = new BinopNode(op, *left, *right);
+AstNode w_bop(BinopType op, AstNode left, AstNode right) {
+    AstNode ast_node;
+    ast_node.type = AstType::BINOP;
+    ast_node.ast_binop = new BinopNode(op, left, right);
     return ast_node;
 }

@@ -17,14 +17,14 @@ bool both_null(void* a, void* b);
 
 bool one_null(void* a, void* b);
 
-bool equal(ObjectInfo* a, ObjectInfo* b);
+bool equal(ObjectInfo a, ObjectInfo b);
 
-bool equal(FunctionInfo* a, FunctionInfo* b);
+bool equal(FunctionInfo a, FunctionInfo b);
 
-bool equal(ClassInfo* a, ClassInfo* b);
+bool equal(ClassInfo a, ClassInfo b);
 
 
-bool equal(SymbolInfo* a, SymbolInfo* b);
+bool equal(SymbolInfo a, SymbolInfo b);
 
 class FirstPass {
 public:

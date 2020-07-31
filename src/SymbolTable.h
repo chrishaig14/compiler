@@ -17,26 +17,30 @@ class FunctionInfo;
 class ObjectInfo {
 public:
     std::string parent;
-    std::vector<ObjectInfo*> type_parameters;
+    std::vector<ObjectInfo> type_parameters;
 
-    ObjectInfo(TypeNode* n);
+    ObjectInfo(TypeNode n);
+
+    ObjectInfo();
 };
 
 class FunctionInfo {
 public:
-    std::vector<ObjectInfo*> parameter_types;
-    ObjectInfo* return_type;
+    std::vector<ObjectInfo> parameter_types;
+    ObjectInfo return_type;
 
-    FunctionInfo(std::vector<TypeNode*> parameter_types, TypeNode* return_type);
+    FunctionInfo(std::vector<TypeNode> parameter_types, TypeNode return_type);
+
+    FunctionInfo();
 };
 
 class ClassInfo {
 public:
-    std::map<std::string, ObjectInfo*> fields;
-    std::map<std::string, FunctionInfo*> methods;
+    std::map<std::string, ObjectInfo> fields;
+    std::map<std::string, FunctionInfo> methods;
 
-    ClassInfo(std::map<std::string, ObjectInfo*> fields,
-              std::map<std::string, FunctionInfo*> methods) {
+    ClassInfo(std::map<std::string, ObjectInfo> fields,
+              std::map<std::string, FunctionInfo> methods) {
         this->fields = fields;
         this->methods = methods;
     }
@@ -57,29 +61,38 @@ public:
     };
     SINFO type;
 
-    SymbolInfo(FunctionInfo* function_info) : function_info(function_info) {
+    SymbolInfo(FunctionInfo function_info) : function_info(new FunctionInfo(function_info)) {
         this->type = SINFO::FUNCTION;
     }
 
-    SymbolInfo(ObjectInfo* object_info) : object_info(object_info) {
+    SymbolInfo(ObjectInfo object_info) : object_info(new ObjectInfo(object_info)) {
         this->type = SINFO::SIMPLE;
     }
+
+    SymbolInfo() {}
 
     bool is_function() { return this->type == SINFO::FUNCTION; }
 
     bool is_object() { return this->type == SINFO::SIMPLE; }
 
+    virtual ~SymbolInfo() {
+        if (this->is_function()) delete this->function_info;
+        if (this->is_object()) delete this->object_info;
+
+    }
+
+
 };
 
 class SymbolTable {
-    std::map<std::string, SymbolInfo*> table;
+    std::map<std::string, SymbolInfo> table;
 public:
     SymbolTable(std::string name, SymbolTable* parent) {
         this->name = name;
         this->parent = parent;
     }
 
-    SymbolTable(){};
+    SymbolTable() {};
 
 
     bool has(std::string name) {
@@ -93,7 +106,7 @@ public:
         }
     }
 
-    SymbolInfo* get(std::string name) {
+    SymbolInfo get(std::string name) {
         if (this->table.count(name) == 1) {
             return this->table[name];
         } else {
@@ -108,7 +121,7 @@ public:
         return this->table.count(name) == 1;
     }
 
-    void set(std::string name, SymbolInfo* info) {
+    void set(std::string name, SymbolInfo info) {
         this->table[name] = info;
     }
 
