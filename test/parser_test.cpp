@@ -8,58 +8,35 @@
 #include <gtest/gtest.h>
 #include <Scanner.h>
 #include <Parser.h>
-#include <AstNode.h>
 
-typedef std::vector<TypeNode> VectorOfTypes;
-typedef std::vector<std::string> VectorOfStrings;
-typedef std::vector<AstNode> VectorOfNodes;
-
-
-AstNode w_asn(AstNode lvalue, AstNode rvalue) {
-    AstNode ast_node;
-    ast_node.type = AstType::ASSIGNMENT;
-    ast_node.ast_assignment = new AssignmentNode(lvalue, rvalue);
-    return ast_node;
-}
-
-AstNode w_decl(std::string name, AstNode* expression) {
-    AstNode ast_node;
-    ast_node.type = AstType::DECLARATION;
-    ast_node.ast_declaration = new DeclarationNode(name, nullptr, expression);
-    return ast_node;
-}
-
-AstNode* w_class(ClassNode* node) {
-    AstNode* ast_node = new AstNode;
-    ast_node->type = AstType::CLASS;
-    ast_node->ast_class = node;
-    return ast_node;
-}
-
-AstNode* w_fun(FunctionNode* node) {
-    AstNode* ast_node = new AstNode;
-    ast_node->type = AstType::FUNCTION;
-    ast_node->ast_function = node;
-    return ast_node;
-}
-
-
-AstNode n_a_plus_b = w_bop(BinopType::PLUS, w_id("a"), w_id("b"));
-
-DeclarationNode n_decl_x("x", nullptr, nullptr);
-
-AstNode n_asn_x(AstNode rvalue) {
-    return w_asn(w_id("x"), rvalue);
-}
+#define ID(id) new IdNode(id)
+#define NUM(num) new NumberNode(num)
+#define BIN(op, left, right) new BinopNode(op, left, right)
+#define MEM(parent, child) new MemberNode(parent, child)
+#define IF(condition, then) new IfNode(condition, then)
+#define CALL(function, arguments) new CallNode(function, arguments)
+#define CLS(name, template_parameters, fields, methods) new ClassNode(name, template_parameters, fields, methods)
+#define ASN(lvalue, rvalue) new AssignmentNode(lvalue, rvalue)
+#define SUB(parent, child) new SubscriptNode(parent, child)
+#define DECL(id, type, exp) new DeclarationNode(id, type, exp)
+#define TYPE(parent, type_parameters) new TypeNode(parent, type_parameters)
+#define T_INT new TypeNode("Integer", {})
+#define T_STRING new TypeNode("String", {})
+#define FUN(a, b, c, d, e) new FunctionNode(a,b,c,d,e)
+#define BODY_NODE std::vector<Node*>({ASN(ID("x"), BIN(OpType::ADD, ID("a"), ID("b"))),ASN(ID("x"), ID("y"))})
+#define FUN_FOO_NODE FUN("foo", { "x" }, std::vector<TypeNode*>({ COMPLEX_TYPE }), TYPE("List", {T_INT}), BODY_NODE)
+#define FUN_FOO_STRING "fun foo(x:List[List[Integer]])->List[Integer]{x=a+b; x = y;}"
+#define T_LIST(e) TYPE("List", std::vector<TypeNode*>({e}))
+#define COMPLEX_TYPE T_LIST(T_LIST(T_INT))
 
 TEST(parser_test, binop_a_plus_b) {
     std::string text = "a + b";
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
-    AstNode node = parser.parse_add_or_sub_expression();
-    AstNode expected_node = n_a_plus_b;
-    EXPECT_EQ(equal(node, expected_node), true);
+    Node* node = parser.parse_add_or_sub_expression();
+    Node* expected_node = new BinopNode(OpType::ADD, ID("a"), ID("b"));
+    EXPECT_TRUE(node->equal(expected_node));
 }
 
 TEST(parser_test, binop_a_eq_b) {
@@ -67,9 +44,9 @@ TEST(parser_test, binop_a_eq_b) {
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
-    AstNode node = parser.parse_expression();
-    AstNode expected_node = w_bop(BinopType::EQ, w_id("a"), w_id("b"));
-    EXPECT_EQ(equal(node, expected_node), true);
+    Node* node = parser.parse_expression();
+    Node* expected_node = BIN(OpType::EQ, ID("a"), ID("b"));
+    EXPECT_TRUE(node->equal(expected_node));
 }
 
 TEST(parser_test, exp_identifier) {
@@ -77,8 +54,8 @@ TEST(parser_test, exp_identifier) {
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
-    AstNode node = parser.parse_add_or_sub_expression();
-    EXPECT_EQ(equal(node, w_id("foo")), true);
+    Node* node = parser.parse_add_or_sub_expression();
+    EXPECT_EQ(node->equal(ID("foo")), true);
 }
 
 TEST(parser_test, assign_x_equal_y) {
@@ -86,8 +63,9 @@ TEST(parser_test, assign_x_equal_y) {
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
-    AstNode node = parser.parse_assignment_or_expression();
-    EXPECT_EQ(equal(node, n_asn_x(w_id("y"))), true);
+    Node* node = parser.parse_assignment_or_expression();
+    Node* expected_node = ASN(ID("x"), ID("y"));
+    EXPECT_TRUE(node->equal(expected_node));
 }
 
 TEST(parser_test, assign_x_equal_binop_a_plus_b) {
@@ -95,8 +73,9 @@ TEST(parser_test, assign_x_equal_binop_a_plus_b) {
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
-    AstNode node = parser.parse_assignment_or_expression();
-    EXPECT_EQ(equal(node, n_asn_x(n_a_plus_b)), true);
+    Node* node = parser.parse_assignment_or_expression();
+    Node* expected_node = ASN(ID("x"), BIN(OpType::ADD, ID("a"), ID("b")));
+    EXPECT_TRUE(node->equal(expected_node));
 }
 
 TEST(parser_test, decl_x_without_value_or_type_throws_error) {
@@ -105,7 +84,7 @@ TEST(parser_test, decl_x_without_value_or_type_throws_error) {
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
     try {
-        DeclarationNode node = parser.parse_variable_declaration();
+        DeclarationNode* node = parser.parse_variable_declaration();
         FAIL() << "Didn't throw  unexpected token error";
     } catch (UnexpectedToken& e) {
 
@@ -117,8 +96,9 @@ TEST(parser_test, decl_x_with_value) {
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
-    DeclarationNode node = parser.parse_variable_declaration();
-    EXPECT_EQ(equal(node, i_decl("x", &n_a_plus_b)), true);
+    DeclarationNode* node = parser.parse_variable_declaration();
+    DeclarationNode* expected_node = DECL("x", nullptr, BIN(OpType::ADD, ID("a"), ID("b")));
+    EXPECT_TRUE(node->equal(expected_node));
 }
 
 TEST(parser_test, empty_block) {
@@ -137,8 +117,10 @@ TEST(parser_test, non_empty_block) {
     Parser parser(tokens);
     VectorOfNodes node = parser.parse_possibly_empty_block();
     EXPECT_EQ(node.size(), 2);
-    EXPECT_EQ(equal(node[0], w_asn(w_id("x"), n_a_plus_b)), true);
-    EXPECT_EQ(equal(node[1], w_asn(w_id("x"), w_id("y"))), true);
+    auto expected_node_0 = ASN(ID("x"), BIN(OpType::ADD, ID("a"), ID("b")));
+    EXPECT_TRUE(node[0]->equal(expected_node_0));
+    auto expected_node_1 = ASN(ID("x"), ID("y"));
+    EXPECT_TRUE(node[1]->equal(expected_node_1));
 }
 
 TEST(parser_test, if_empty_then) {
@@ -146,19 +128,20 @@ TEST(parser_test, if_empty_then) {
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
-    IfNode node = parser.parse_if();
-    EXPECT_EQ(equal(node, i_if(w_id("x"), VectorOfNodes())), true);
+    IfNode* node = parser.parse_if();
+    EXPECT_EQ(node->equal(IF(ID("x"), VectorOfNodes())), true);
 }
 
-std::string body_1_string = "x = a + b; x = y;";
-VectorOfNodes body_1_node = {w_asn(w_id("x"), n_a_plus_b), w_asn(w_id("x"), w_id("y"))};
 TEST(parser_test, if_non_empty_then) {
-    std::string text = "if(x){" + body_1_string + "}";
+    std::string text = "if(x){x=a+b; x = y;}";
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
-    IfNode node = parser.parse_if();
-    EXPECT_EQ(equal(node, i_if(w_id("x"), body_1_node)), true);
+    IfNode* node = parser.parse_if();
+    auto st_1 = ASN(ID("x"), BIN(OpType::ADD, ID("a"), ID("b")));
+    auto st_2 = ASN(ID("x"), ID("y"));
+    auto expected_node = IF(ID("x"), std::vector<Node*>({st_1, st_2}));
+    EXPECT_TRUE(node->equal(expected_node));
 }
 
 TEST(parser_test, simple_type) {
@@ -166,33 +149,31 @@ TEST(parser_test, simple_type) {
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
-    TypeNode node = parser.parse_type_node();
-    EXPECT_EQ(equal(node, i_type("String", VectorOfTypes())), true);
-}
-TypeNode t_integer = i_type("Integer", {});
+    TypeNode* node = parser.parse_type_node();
+    auto expected_node = TYPE("String", VectorOfTypes());
+    EXPECT_TRUE(node->equal(expected_node));
 
-TypeNode t_string = i_type("String", {});
+}
 
 TEST(parser_test, template_type) {
     std::string text = "String[Integer]";
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
-    TypeNode node = parser.parse_type_node();
-    EXPECT_EQ(equal(node, i_type("String", {t_integer})), true);
+    TypeNode* node = parser.parse_type_node();
+    auto expected_node = TYPE("String", std::vector<TypeNode*>{TYPE("Integer", {})});
+    EXPECT_TRUE(node->equal(expected_node));
 }
 
-
-
-TypeNode n_complex_type = i_type("String", {t_integer, i_type("List", {t_string})});
 
 TEST(parser_test, complex_template_type) {
     std::string text = "String[Integer, List[String]]";
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
-    TypeNode node = parser.parse_type_node();
-    EXPECT_EQ(equal(node, n_complex_type), true);
+    TypeNode* node = parser.parse_type_node();
+    auto expected_node = TYPE("String", std::vector<TypeNode*>({T_INT, T_LIST({T_STRING})}));
+    EXPECT_TRUE(node->equal(expected_node));
 }
 
 TEST(parser_test, decl_with_type) {
@@ -200,8 +181,9 @@ TEST(parser_test, decl_with_type) {
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
-    DeclarationNode node = parser.parse_variable_declaration();
-    EXPECT_EQ(equal(node, i_decl_type("x", &n_complex_type, nullptr)), true);
+    DeclarationNode* node = parser.parse_variable_declaration();
+    auto expected_node = DECL("x", TYPE("String", std::vector<TypeNode*>({T_INT, T_LIST({T_STRING})})), nullptr);
+    EXPECT_TRUE(node->equal(expected_node));
 }
 
 TEST(parser_test, decl_with_type_and_value) {
@@ -209,8 +191,11 @@ TEST(parser_test, decl_with_type_and_value) {
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
-    DeclarationNode node = parser.parse_variable_declaration();
-    EXPECT_EQ(equal(node, i_decl_type("x", &n_complex_type, &n_a_plus_b)), true);
+    DeclarationNode* node = parser.parse_variable_declaration();
+    auto expected_node = DECL("x", TYPE("String", std::vector<TypeNode*>({T_INT, T_LIST({T_STRING})})),
+                              BIN(OpType::ADD, ID("a"), ID("b")));
+    EXPECT_TRUE(node->equal(expected_node));
+
 }
 
 TEST(parser_test, function_no_params_empty_body) {
@@ -218,46 +203,42 @@ TEST(parser_test, function_no_params_empty_body) {
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
-    FunctionNode node = parser.parse_function_definition();
-    EXPECT_EQ(equal(node, i_fun("foo", {}, {}, i_type("String", {}), {})), true);
+    FunctionNode* node = parser.parse_function_definition();
+    auto return_type = TYPE("String", {});
+    std::vector<Node*> body;
+    auto expected_node = FUN("foo", std::vector<std::string>(), std::vector<TypeNode*>(), return_type, body);
+    EXPECT_TRUE(node->equal(expected_node));
 }
 
-TypeNode n_complex_type_1 = i_type("String", {i_type("List", {t_integer})});
 
 TEST(parser_test, function_with_params_empty_body) {
-    std::string text = "fun foo(x:String[List[Integer]])->Integer{}";
+    std::string text = "fun foo(x:List[List[Integer]])->Integer{}";
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
-    FunctionNode node = parser.parse_function_definition();
-    EXPECT_EQ(
-            equal(node, i_fun("foo", {"x"}, {n_complex_type_1}, i_type("Integer", {}), {})),
-            true);
+    FunctionNode* node = parser.parse_function_definition();
+    auto expected_node = FUN("foo", { "x" }, { COMPLEX_TYPE }, TYPE("Integer", {}), {});
+    EXPECT_TRUE(node->equal(expected_node));
 }
 
 TEST(parser_test, function_with_params_and_body) {
-    std::string text = "fun foo(x:String[List[Integer]])->String{" + body_1_string + "}";
+    std::string text = "fun foo(x:List[List[Integer]])->String{x=a+b; x = y;}";
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
-    FunctionNode node = parser.parse_function_definition();
-    EXPECT_EQ(
-            equal(node, i_fun("foo", {"x"}, {n_complex_type_1}, i_type("String", {}), body_1_node)),
-            true);
+    FunctionNode* node = parser.parse_function_definition();
+    auto expected_node = FUN("foo", { "x" }, { COMPLEX_TYPE }, TYPE("String", {}), BODY_NODE);
+    EXPECT_TRUE(node->equal(expected_node));
 }
 
-std::string fun_foo_string = "fun foo(x:String[List[Integer]])->List[Integer]{" + body_1_string + "}";
-FunctionNode fun_foo_node = i_fun("foo", {"x"}, {n_complex_type_1}, i_type("List", {t_integer}),
-                                  body_1_node);
 TEST(parser_test, function_with_params_return_type_and_body) {
-    std::string text = fun_foo_string;
+    std::string text = FUN_FOO_STRING;
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
-    FunctionNode node = parser.parse_function_definition();
-    EXPECT_EQ(
-            equal(node, fun_foo_node),
-            true);
+    FunctionNode* node = parser.parse_function_definition();
+    auto expected_node = FUN_FOO_NODE;
+    EXPECT_TRUE(node->equal(expected_node));
 }
 
 TEST(parser_test, class_foo_empty) {
@@ -265,9 +246,10 @@ TEST(parser_test, class_foo_empty) {
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
-    ClassNode node = parser.parse_class_definition();
-    EXPECT_EQ(
-            equal(node, i_class("Foo", {}, {}, {})), true);
+    ClassNode* node = parser.parse_class_definition();
+    auto expected_node = CLS("Foo", std::vector<std::string>(), std::vector<DeclarationNode*>(),
+                             std::vector<FunctionNode*>());
+    EXPECT_TRUE(node->equal(expected_node));
 }
 
 TEST(parser_test, class_foo_with_fields) {
@@ -275,49 +257,56 @@ TEST(parser_test, class_foo_with_fields) {
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
-    ClassNode node = parser.parse_class_definition();
-    EXPECT_EQ(
-            equal(node, i_class("Foo", {}, {i_decl_type("x", &t_string, nullptr),
-                                            i_decl_type("y", &t_integer, nullptr)}, {})),
-            true);
+    ClassNode* node = parser.parse_class_definition();
+    auto fields = {DECL("x", T_STRING, nullptr), DECL("y", T_INT, nullptr)};
+    auto expected_node = CLS("Foo", {}, fields, {});
+    EXPECT_TRUE(node->equal(expected_node));
 }
 
 TEST(parser_test, class_foo_with_method) {
-    std::string text = "class Foo{" + fun_foo_string + "}";
+    std::string text = "class Foo{"  FUN_FOO_STRING  "}";
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
-    ClassNode node = parser.parse_class_definition();
-    EXPECT_EQ(
-            equal(node, i_class("Foo", {}, {}, {fun_foo_node})),
-            true);
-}
+    ClassNode* node = parser.parse_class_definition();
+    auto expected_node = CLS("Foo", {}, {}, { FUN_FOO_NODE });
+    EXPECT_TRUE(node->equal(expected_node));
 
-std::string complete_foo_class_string = "class Foo{var x: String; var y: Integer;" + fun_foo_string + "}";
-ClassNode complete_foo_class_node = i_class("Foo", {}, {i_decl_type("x", &t_string, nullptr),
-                                                        i_decl_type("y", &t_integer, nullptr)},
-                                            {fun_foo_node});
+}
 
 TEST(parser_test, template_class_foo_empty) {
     std::string text = "class Foo[T, X]{}";
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
-    ClassNode node = parser.parse_class_definition();
-    EXPECT_EQ(
-            equal(node, i_class("Foo", {"T", "X"}, {}, {})),
-            true);
+    ClassNode* node = parser.parse_class_definition();
+    std::vector<std::string> params = {"T", "X"};
+    std::vector<DeclarationNode*> fields;
+    std::vector<FunctionNode*> methods;
+
+    ClassNode* expected_node = CLS("Foo", params, fields, methods);
+    EXPECT_TRUE(node->equal(expected_node));
+
 }
 
 TEST(parser_test, class_foo_with_fields_and_method) {
+    std::string complete_foo_class_string = "class Foo{var x: String; var y: Integer;"  FUN_FOO_STRING "}";
+    ClassNode* complete_foo_class_node = CLS("Foo", {}, std::vector<DeclarationNode*>({
+                                                                                              DECL("x",
+                                                                                                   T_STRING,
+                                                                                                   nullptr),
+                                                                                              DECL("y", T_INT,
+                                                                                                   nullptr)
+                                                                                      }),
+                                             { FUN_FOO_NODE });
     std::string text = complete_foo_class_string;
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
-    ClassNode node = parser.parse_class_definition();
-    EXPECT_EQ(
-            equal(node, complete_foo_class_node),
-            true);
+    ClassNode* node = parser.parse_class_definition();
+    auto expected_node = complete_foo_class_node;
+    EXPECT_TRUE(node->equal(expected_node));
+
 }
 
 TEST(parser_test, simple_member) {
@@ -325,11 +314,10 @@ TEST(parser_test, simple_member) {
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
-    AstNode node = parser.parse_expression();
-    AstNode member_node = w_member(w_id("a"), "b");
-    EXPECT_EQ(
-            equal(node, member_node),
-            true);
+    Node* node = parser.parse_expression();
+    Node* expected_node = MEM(ID("a"), "b");
+    EXPECT_TRUE(node->equal(expected_node));
+
 }
 
 TEST(parser_test, simple_id) {
@@ -337,11 +325,10 @@ TEST(parser_test, simple_id) {
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
-    AstNode node = parser.parse_expression();
-    AstNode expected_node = w_id("a");
-    EXPECT_EQ(
-            equal(node, expected_node),
-            true);
+    Node* node = parser.parse_expression();
+    Node* expected_node = ID("a");
+    EXPECT_TRUE(node->equal(expected_node));
+
 }
 
 TEST(parser_test, simple_call) {
@@ -349,11 +336,10 @@ TEST(parser_test, simple_call) {
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
-    AstNode node = parser.parse_expression();
-    AstNode expected_node = w_call(w_id("a"), {});
-    EXPECT_EQ(
-            equal(node, expected_node),
-            true);
+    Node* node = parser.parse_expression();
+    Node* expected_node = CALL(ID("a"), {});
+    EXPECT_TRUE(node->equal(expected_node));
+
 }
 
 TEST(parser_test, simple_subscript) {
@@ -361,23 +347,21 @@ TEST(parser_test, simple_subscript) {
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
-    AstNode node = parser.parse_expression();
-    AstNode expected_node = w_sub(w_id("a"), w_num(1));
-    EXPECT_EQ(
-            equal(node, expected_node),
-            true);
+    Node* node = parser.parse_expression();
+    Node* expected_node = SUB(ID("a"), NUM(1));
+    EXPECT_TRUE(node->equal(expected_node));
+
 }
 
 TEST(parser_test, literal_number_expression) {
-    std::string text = "1";
+    std::string text = "7";
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
-    AstNode node = parser.parse_expression();
-    AstNode expected_node = w_num(7);
-    EXPECT_EQ(
-            equal(node, expected_node),
-            true);
+    Node* node = parser.parse_expression();
+    Node* expected_node = NUM(7);
+    EXPECT_TRUE(node->equal(expected_node));
+
 }
 
 TEST(parser_test, simple_parenthesized_expression) {
@@ -385,11 +369,10 @@ TEST(parser_test, simple_parenthesized_expression) {
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
-    AstNode node = parser.parse_expression();
-    AstNode expected_node = w_num(1);
-    EXPECT_EQ(
-            equal(node, expected_node),
-            true);
+    Node* node = parser.parse_expression();
+    Node* expected_node = NUM(1);
+    EXPECT_TRUE(node->equal(expected_node));
+
 }
 
 TEST(parser_test, plus_parenthesized_expression) {
@@ -397,11 +380,10 @@ TEST(parser_test, plus_parenthesized_expression) {
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
-    AstNode node = parser.parse_expression();
-    AstNode expected_node = w_bop(BinopType::PLUS, w_num(1), w_id("a"));
-    EXPECT_EQ(
-            equal(node, expected_node),
-            true);
+    Node* node = parser.parse_expression();
+    Node* expected_node = BIN(OpType::ADD, NUM(1), ID("a"));
+    EXPECT_TRUE(node->equal(expected_node));
+
 }
 
 TEST(parser_test, more_complex_expression) {
@@ -409,11 +391,10 @@ TEST(parser_test, more_complex_expression) {
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
-    AstNode node = parser.parse_expression();
-    AstNode expected_node = w_bop(BinopType::PLUS, w_bop(BinopType::PLUS, w_num(1), w_id("a")), w_id("b"));
-    EXPECT_EQ(
-            equal(node, expected_node),
-            true);
+    Node* node = parser.parse_expression();
+    Node* expected_node = BIN(OpType::ADD, BIN(OpType::ADD, NUM(1), ID("a")), ID("b"));
+    EXPECT_TRUE(node->equal(expected_node));
+
 }
 
 TEST(parser_test, more_complex_expression_2) {
@@ -421,11 +402,10 @@ TEST(parser_test, more_complex_expression_2) {
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
-    AstNode node = parser.parse_expression();
-    AstNode expected_node = w_bop(BinopType::TIMES, w_id("b"), w_bop(BinopType::PLUS, w_num(1), w_id("a")));
-    EXPECT_EQ(
-            equal(node, expected_node),
-            true);
+    Node* node = parser.parse_expression();
+    Node* expected_node = BIN(OpType::MUL, ID("b"), BIN(OpType::ADD, NUM(1), ID("a")));
+    EXPECT_TRUE(node->equal(expected_node));
+
 }
 
 TEST(parser_test, plus_expression) {
@@ -433,11 +413,9 @@ TEST(parser_test, plus_expression) {
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
-    AstNode node = parser.parse_add_or_sub_expression();
-    AstNode expected_node = w_bop(BinopType::PLUS, w_num(1), w_id("a"));
-    EXPECT_EQ(
-            equal(node, expected_node),
-            true);
+    Node* node = parser.parse_add_or_sub_expression();
+    Node* expected_node = BIN(OpType::ADD, NUM(1), ID("a"));
+    EXPECT_EQ(node->equal(expected_node), true);
 }
 
 TEST(parser_test, minus_expression) {
@@ -445,11 +423,9 @@ TEST(parser_test, minus_expression) {
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
-    AstNode node = parser.parse_add_or_sub_expression();
-    AstNode expected_node = w_bop(BinopType::MINUS, w_id("a"), w_num(1));
-    EXPECT_EQ(
-            equal(node, expected_node),
-            true);
+    Node* node = parser.parse_add_or_sub_expression();
+    Node* expected_node = BIN(OpType::SUB, ID("a"), NUM(1));
+    EXPECT_TRUE(node->equal(expected_node));
 }
 
 TEST(parser_test, plus_or_minus_with_multiple_terms_expression) {
@@ -457,10 +433,10 @@ TEST(parser_test, plus_or_minus_with_multiple_terms_expression) {
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
-    AstNode node = parser.parse_add_or_sub_expression();
-    AstNode expected_node = w_bop(BinopType::MINUS, w_bop(BinopType::PLUS, w_id("a"), w_id("b")), w_id("c"));
+    Node* node = parser.parse_add_or_sub_expression();
+    Node* expected_node = BIN(OpType::SUB, BIN(OpType::ADD, ID("a"), ID("b")), ID("c"));
     EXPECT_EQ(
-            equal(node, expected_node),
+            node->equal(expected_node),
             true);
 }
 
@@ -469,10 +445,10 @@ TEST(parser_test, mul_or_div_with_multiple_factors_expression) {
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
-    AstNode node = parser.parse_add_or_sub_expression();
-    AstNode expected_node = w_bop(BinopType::TIMES, w_bop(BinopType::DIV, w_id("a"), w_id("b")), w_id("c"));
+    Node* node = parser.parse_add_or_sub_expression();
+    Node* expected_node = BIN(OpType::MUL, BIN(OpType::DIV, ID("a"), ID("b")), ID("c"));
     EXPECT_EQ(
-            equal(node, expected_node),
+            node->equal(expected_node),
             true);
 }
 
@@ -481,10 +457,10 @@ TEST(parser_test, times_expression) {
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
-    AstNode node = parser.parse_mul_or_div_expression();
-    AstNode expected_node = w_bop(BinopType::TIMES, w_id("foo"), w_id("bar"));
+    Node* node = parser.parse_mul_or_div_expression();
+    Node* expected_node = BIN(OpType::MUL, ID("foo"), ID("bar"));
     EXPECT_EQ(
-            equal(node, expected_node),
+            node->equal(expected_node),
             true);
 }
 
@@ -493,10 +469,10 @@ TEST(parser_test, div_expression) {
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
-    AstNode node = parser.parse_mul_or_div_expression();
-    AstNode expected_node = w_bop(BinopType::DIV, w_id("foo"), w_num(1));
+    Node* node = parser.parse_mul_or_div_expression();
+    Node* expected_node = BIN(OpType::DIV, ID("foo"), NUM(1));
     EXPECT_EQ(
-            equal(node, expected_node),
+            node->equal(expected_node),
             true);
 }
 
@@ -505,10 +481,10 @@ TEST(parser_test, parse_top_level) {
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
-    AstNode node = parser.parse_top_level_statement();
-    AstNode expected_node = w_decl("x", new AstNode(w_bop(BinopType::TIMES, w_num(9), w_num(7))));
+    Node* node = parser.parse_top_level_statement();
+    Node* expected_node = DECL("x", nullptr, BIN(OpType::MUL, NUM(9), NUM(7)));
     EXPECT_EQ(
-            equal(node, expected_node),
+            node->equal(expected_node),
             true);
 }
 
@@ -517,10 +493,10 @@ TEST(parser_test, complex_div_expression) {
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
-    AstNode node = parser.parse_add_or_sub_expression();
-    AstNode expected_node = w_bop(BinopType::PLUS, w_bop(BinopType::DIV, w_id("foo"), w_num(1)), w_id("a"));
+    Node* node = parser.parse_add_or_sub_expression();
+    Node* expected_node = BIN(OpType::ADD, BIN(OpType::DIV, ID("foo"), NUM(1)), ID("a"));
     EXPECT_EQ(
-            equal(node, expected_node),
+            node->equal(expected_node),
             true);
 }
 
@@ -529,21 +505,21 @@ TEST(parser_test, complex_expression) {
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
-    AstNode node = parser.parse_expression();
-    AstNode expected_node = w_bop(BinopType::PLUS, w_bop(BinopType::MINUS, w_bop(BinopType::MINUS, w_num(1),
-                                                                                 w_bop(BinopType::TIMES, w_num(7),
-                                                                                       w_num(8))),
-                                                         w_bop(BinopType::PLUS, w_bop(BinopType::MINUS,
-                                                                                      w_bop(BinopType::DIV,
-                                                                                            w_bop(BinopType::TIMES,
-                                                                                                  w_num(9),
-                                                                                                  w_bop(BinopType::MINUS,
-                                                                                                        w_num(1),
-                                                                                                        w_num(3))),
-                                                                                            w_num(7)), w_num(8)),
-                                                               w_num(4))), w_num(8));
+    Node* node = parser.parse_expression();
+    Node* expected_node = BIN(OpType::ADD, BIN(OpType::SUB, BIN(OpType::SUB, NUM(1),
+                                                                BIN(OpType::MUL, NUM(7),
+                                                                    NUM(8))),
+                                               BIN(OpType::ADD, BIN(OpType::SUB,
+                                                                    BIN(OpType::DIV,
+                                                                        BIN(OpType::MUL,
+                                                                            NUM(9),
+                                                                            BIN(OpType::SUB,
+                                                                                NUM(1),
+                                                                                NUM(3))),
+                                                                        NUM(7)), NUM(8)),
+                                                   NUM(4))), NUM(8));
     EXPECT_EQ(
-            equal(node, expected_node),
+            node->equal(expected_node),
             true);
 }
 
@@ -553,35 +529,35 @@ TEST(parser_test, complex_chain) {
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
-    AstNode node = parser.parse_expression();
-    AstNode expected_node =
-            w_member(
-                    w_sub(
-                            w_sub(
-                                    w_call(
-                                            w_sub(
-                                                    w_sub(
-                                                            w_member(
-                                                                    w_member(
-                                                                            w_call(
-                                                                                    w_member(
-                                                                                            w_sub(
-                                                                                                    w_sub(
-                                                                                                            w_id("a"),
-                                                                                                            w_num(1)),
-                                                                                                    w_id("b")),
+    Node* node = parser.parse_expression();
+    Node* expected_node =
+            MEM(
+                    SUB(
+                            SUB(
+                                    CALL(
+                                            SUB(
+                                                    SUB(
+                                                            MEM(
+                                                                    MEM(
+                                                                            CALL(
+                                                                                    MEM(
+                                                                                            SUB(
+                                                                                                    SUB(
+                                                                                                            ID("a"),
+                                                                                                            NUM(1)),
+                                                                                                    ID("b")),
                                                                                             "c"),
-                                                                                    {w_num(1), w_member(
-                                                                                            w_sub(w_sub(
-                                                                                                    w_id("d"),
-                                                                                                    w_num(5)),
-                                                                                                  w_num(0)),
-                                                                                            "e")}), "f"), "g"),
-                                                            w_id("h")),
-                                                    w_num(2)), {}), w_num(3)), w_num(5)),
+                                                                                    std::vector<Node*>({NUM(1), MEM(
+                                                                                            SUB(SUB(
+                                                                                                    ID("d"),
+                                                                                                    NUM(5)),
+                                                                                                NUM(0)),
+                                                                                            "e")})), "f"), "g"),
+                                                            ID("h")),
+                                                    NUM(2)), {}), NUM(3)), NUM(5)),
                     "i");
     EXPECT_EQ(
-            equal(node, expected_node),
+            node->equal(expected_node),
             true);
 }
 
@@ -591,34 +567,34 @@ TEST(parser_test, super_expression) {
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
-    AstNode node = parser.parse_expression();
-    AstNode expected_node = w_bop(BinopType::PLUS,
-                                  w_bop(BinopType::MINUS, w_num(1), w_bop(BinopType::DIV, w_bop(BinopType::TIMES,
-                                                                                                w_bop(BinopType::TIMES,
-                                                                                                      w_bop(BinopType::PLUS,
-                                                                                                            w_bop(BinopType::TIMES,
-                                                                                                                  w_id("a"),
-                                                                                                                  w_sub(w_call(
-                                                                                                                          w_id("c"),
-                                                                                                                          {}),
-                                                                                                                        w_num(
-                                                                                                                                0))),
-                                                                                                            w_bop(BinopType::DIV,
-                                                                                                                  w_num(7),
-                                                                                                                  w_call(w_member(
-                                                                                                                          w_member(
-                                                                                                                                  w_id("d"),
-                                                                                                                                  "a"),
-                                                                                                                          "x"),
-                                                                                                                         {w_num(7)}))),
-                                                                                                      w_id("v")),
-                                                                                                w_id("c")),
-                                                                          w_id("a"))), w_call(
-                    w_sub(w_sub(w_sub(w_member(w_member(w_id("v"), "x"), "y"), w_num(0)), w_num(1)),
-                          w_bop(BinopType::PLUS, w_id("a"), w_bop(BinopType::TIMES, w_id("c"), w_num(7)))),
-                    {w_num(4), w_num(1), w_bop(BinopType::PLUS, w_id("b"), w_id("c"))}));
+    Node* node = parser.parse_expression();
+    Node* expected_node = BIN(OpType::ADD,
+                              BIN(OpType::SUB, NUM(1), BIN(OpType::DIV, BIN(OpType::MUL,
+                                                                            BIN(OpType::MUL,
+                                                                                BIN(OpType::ADD,
+                                                                                    BIN(OpType::MUL,
+                                                                                        ID("a"),
+                                                                                        SUB(CALL(
+                                                                                                ID("c"),
+                                                                                                {}),
+                                                                                            NUM(
+                                                                                                    0))),
+                                                                                    BIN(OpType::DIV,
+                                                                                        NUM(7),
+                                                                                        CALL(MEM(
+                                                                                                MEM(
+                                                                                                        ID("d"),
+                                                                                                        "a"),
+                                                                                                "x"),
+                                                                                             {NUM(7)}))),
+                                                                                ID("v")),
+                                                                            ID("c")),
+                                                           ID("a"))), CALL(
+            SUB(SUB(SUB(MEM(MEM(ID("v"), "x"), "y"), NUM(0)), NUM(1)),
+                BIN(OpType::ADD, ID("a"), BIN(OpType::MUL, ID("c"), NUM(7)))),
+            std::vector<Node*>({NUM(4), NUM(1), BIN(OpType::ADD, ID("b"), ID("c"))})));
     EXPECT_EQ(
-            equal(node, expected_node),
+            node->equal(expected_node),
             true);
 
 }

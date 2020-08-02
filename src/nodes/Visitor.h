@@ -1,0 +1,72 @@
+//
+// Created by chris on 1/8/20.
+//
+
+#ifndef UNTITLED1_VISITOR_H
+#define UNTITLED1_VISITOR_H
+
+class AssignmentNode;
+
+class BinopNode;
+
+class CallNode;
+
+class ClassNode;
+
+class DeclarationNode;
+
+class FunctionNode;
+
+class IdNode;
+
+class IfNode;
+
+class ListNode;
+
+class MemberNode;
+
+class NumberNode;
+
+class ReturnNode;
+
+class StringNode;
+
+class SubscriptNode;
+
+class TypeNode;
+
+class Visitor {
+public:
+    virtual void visit(AssignmentNode& node) = 0;
+
+    virtual void visit(BinopNode& node) = 0;
+
+    virtual void visit(CallNode& node) = 0;
+
+    virtual void visit(ClassNode& node) = 0;
+
+    virtual void visit(DeclarationNode& node) = 0;
+
+    virtual void visit(FunctionNode& node) = 0;
+
+    virtual void visit(IdNode& node) = 0;
+
+    virtual void visit(IfNode& node) = 0;
+
+    virtual void visit(ListNode& node) = 0;
+
+    virtual void visit(MemberNode& node) = 0;
+
+    virtual void visit(NumberNode& node) = 0;
+
+    virtual void visit(ReturnNode& node) = 0;
+
+    virtual void visit(StringNode& node) = 0;
+
+    virtual void visit(SubscriptNode& node) = 0;
+
+    virtual void visit(TypeNode& node) = 0;
+};
+
+
+#endif //UNTITLED1_VISITOR_H

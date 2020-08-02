@@ -8,12 +8,13 @@
 
 #include <vector>
 #include "Token.h"
-#include "AstNode.h"
+#include "nodes/IfNode.h"
+#include "nodes/nodes.h"
 #include <iostream>
 
-typedef std::vector<TypeNode> VectorOfTypes;
+typedef std::vector<TypeNode*> VectorOfTypes;
 typedef std::vector<std::string> VectorOfStrings;
-typedef std::vector<AstNode> VectorOfNodes;
+typedef std::vector<Node*> VectorOfNodes;
 
 class UnexpectedToken : public std::runtime_error {
     Token token;
@@ -26,20 +27,6 @@ public:
     friend std::ostream& operator<<(std::ostream& os, const UnexpectedToken& unexpected_token);
 };
 
-AstNode w_id(std::string name);
-
-AstNode w_call(AstNode parent, VectorOfNodes arguments);
-
-AstNode w_num(int value);
-
-AstNode w_sub(AstNode parent, AstNode sub);
-
-AstNode w_string(std::string value);
-
-AstNode w_member(AstNode parent, std::string child);
-
-AstNode w_bop(BinopType op, AstNode left, AstNode right);
-
 class Parser {
     std::vector<Token> tokens;
     Token token;
@@ -47,63 +34,64 @@ class Parser {
 public:
     Parser(std::vector<Token>& tokens);
 
-    AstNode parse_id_or_literal();
-
-    VectorOfNodes parse_list_of_expressions();
-
-    AstNode parse_call_or_subscript_chain(AstNode parent);
-
     void expect_one_of(std::vector<TokenType> expected_tokens);
 
     bool match(TokenType type);
 
     void next();
 
-    AstNode parse_top_level_statement();
 
-    AstNode parse_bool_expression();
+    CallNode* parse_call();
+
+    ClassNode* parse_class_definition();
+
+    DeclarationNode* parse_variable_declaration();
+
+    FunctionNode* parse_function_definition();
+
+    IfNode* parse_if();
+
+    ListNode* parse_list_literal();
+
+    Node* parse_add_or_sub_expression();
+
+    Node* parse_and_expression();
+
+    Node* parse_assignment_or_expression();
+
+    Node* parse_bool_expression();
+
+    Node* parse_call_or_subscript_chain(Node* parent);
+
+    Node* parse_common_statement();
+
+    Node* parse_expression();
+
+    Node* parse_factor();
+
+    Node* parse_function_expression();
+
+    Node* parse_id_call_or_subscript();
+
+    Node* parse_id_or_literal();
+
+    Node* parse_interface_definition();
+
+    Node* parse_mul_or_div_expression();
+
+    Node* parse_or_expression();
+
+    Node* parse_top_level_statement();
+
+    ReturnNode* parse_return();
 
     Token expect_token(TokenType token);
 
-    FunctionNode parse_function_definition();
+    TypeNode* parse_type_node();
+
+    VectorOfNodes parse_list_of_expressions();
 
     VectorOfNodes parse_possibly_empty_block();
-
-    ClassNode parse_class_definition();
-
-    TypeNode parse_type_node();
-
-    AstNode parse_interface_definition();
-
-    AstNode parse_common_statement();
-
-    DeclarationNode parse_variable_declaration();
-
-    AstNode parse_assignment_or_expression();
-
-    AstNode parse_expression();
-
-    AstNode parse_or_expression();
-
-    AstNode parse_and_expression();
-
-    AstNode parse_id_call_or_subscript();
-
-    AstNode parse_add_or_sub_expression();
-
-    AstNode parse_mul_or_div_expression();
-
-    AstNode parse_factor();
-
-    AstNode parse_function_expression();
-
-    ListNode parse_list_literal();
-
-    CallNode parse_call();
-
-    IfNode parse_if();
-
-    ReturnNode parse_return();;
 
     VectorOfNodes parse_program();
 
