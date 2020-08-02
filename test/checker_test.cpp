@@ -3,7 +3,7 @@
 #include <scanner/Scanner.h>
 #include <semantic/SymbolInfo.h>
 #include <semantic/GlobalProcessor.h>
-#include <semantic/SecondPass.h>
+#include <semantic/Checker.h>
 
 BlockNode* get_treeA(std::string text) {
     Scanner scanner(text);
@@ -14,56 +14,56 @@ BlockNode* get_treeA(std::string text) {
 }
 
 #define ASSERT_THROWS_NOT_FOUND_ERROR(NAME) BlockNode* tree = get_treeA(text);       \
-                                            GlobalProcessor fp;fp.visit(*tree);              \
-                                            SecondPass sp(fp.globals, fp.class_table);                  \
+                                            GlobalProcessor gp;gp.visit(*tree);              \
+                                            Checker checker(gp.globals, gp.class_table);                  \
                                             try {                                       \
-                                                sp.visit(*tree);                       \
+                                                checker.visit(*tree);                       \
                                                 FAIL() << "Expected ScopeError thrown"; \
                                             } catch(const ScopeError& se){              \
                                                 EXPECT_EQ(se,ScopeError(NAME));         \
                                             }
 
 #define ASSERT_THROWS_REDECLARED_ERROR(NAME) BlockNode* tree = get_treeA(text);       \
-                                            GlobalProcessor fp;fp.visit(*tree);              \
-                                            SecondPass sp(fp.globals, fp.class_table);                  \
+                                            GlobalProcessor gp;gp.visit(*tree);              \
+                                            Checker checker(gp.globals, gp.class_table);                  \
                                             try {                                       \
-                                                sp.visit(*tree);                       \
+                                                checker.visit(*tree);                       \
                                                 FAIL() << "Expected RedeclareError thrown"; \
                                             } catch(const RedeclareError& se){              \
                                                 EXPECT_EQ(se,RedeclareError(NAME))  << se.what();       \
                                             }
 
 #define ASSERT_THROWS_RETURN_TYPE_ERROR(NAME, ACTUAL_TYPE, EXPECTED_TYPE) BlockNode* tree = get_treeA(text);       \
-                                            GlobalProcessor fp;fp.visit(*tree);              \
-                                            SecondPass sp(fp.globals, fp.class_table);                  \
+                                            GlobalProcessor gp;gp.visit(*tree);              \
+                                            Checker checker(gp.globals, gp.class_table);                  \
                                             try {                                       \
-                                                sp.visit(*tree);                       \
+                                                checker.visit(*tree);                       \
                                                 FAIL() << "Expected ReturnError thrown"; \
                                             } catch(const ReturnError& se){              \
                                                 EXPECT_EQ(se,ReturnError(ACTUAL_TYPE, EXPECTED_TYPE))  << se.what();       }\
 
 #define ASSERT_THROWS_BAD_ARGUMENTS() BlockNode* tree = get_treeA(text);       \
-                                            GlobalProcessor fp;fp.visit(*tree);              \
-                                            SecondPass sp(fp.globals, fp.class_table);                  \
+                                            GlobalProcessor gp;gp.visit(*tree);              \
+                                            Checker checker(gp.globals, gp.class_table);                  \
                                             try {                                       \
-                                                sp.visit(*tree);                       \
+                                                checker.visit(*tree);                       \
                                                 FAIL() << "Expected BadArguments thrown"; \
                                             } catch(const BadArguments& se){              \
                                                 EXPECT_EQ(se,BadArguments())  << se.what();       }\
 
 #define ASSERT_OK() BlockNode* tree = get_treeA(text);   \
-                    GlobalProcessor fp;fp.visit(*tree);          \
-                    SecondPass sp(fp.globals, fp.class_table);              \
-                    sp.visit(*tree);
+                    GlobalProcessor gp;gp.visit(*tree);          \
+                    Checker checker(gp.globals, gp.class_table);              \
+                    checker.visit(*tree);
 
 TEST(second_pass_test, fun_foo_cAomplete) {
     std::string text = "fun foo(y: Foo)->Integer{}";
     BlockNode* tree = get_treeA(text);
-    GlobalProcessor fp;
-    fp.visit(*tree);
-    SecondPass sp(fp.globals, fp.class_table);
-    sp.visit(*tree);
-    SymbolTable* foo_scope = sp.scopes["global.foo"];
+    GlobalProcessor gp;
+    gp.visit(*tree);
+    Checker checker(gp.globals, gp.class_table);
+    checker.visit(*tree);
+    SymbolTable* foo_scope = checker.scopes["global.foo"];
     SymbolInfo* sinfo = foo_scope->get("y");
     EXPECT_TRUE(((FunctionNode*) tree->nodes[0])->free_variables.size() == 0);
     EXPECT_EQ(sinfo->type, SINFO::SIMPLE);
@@ -73,12 +73,12 @@ TEST(second_pass_test, fun_foo_cAomplete) {
 TEST(second_pass_test, free_variable_test_1) {
     std::string text = "var x: Integer; fun foo(y: Foo)->Integer{return x;}";
     BlockNode* tree = get_treeA(text);
-    GlobalProcessor fp;
-    fp.visit(*tree);
-    SecondPass sp(fp.globals, fp.class_table);
-    sp.visit(*tree);
-    EXPECT_TRUE(sp.scopes["global"]->has("x"));
-    SymbolTable* foo_scope = sp.scopes["global.foo"];
+    GlobalProcessor gp;
+    gp.visit(*tree);
+    Checker checker(gp.globals, gp.class_table);
+    checker.visit(*tree);
+    EXPECT_TRUE(checker.scopes["global"]->has("x"));
+    SymbolTable* foo_scope = checker.scopes["global.foo"];
     SymbolInfo* sinfo = foo_scope->get("y");
     EXPECT_TRUE(((FunctionNode*) tree->nodes[1])->free_variables.size() == 1);
     EXPECT_TRUE(((FunctionNode*) tree->nodes[1])->free_variables.count("x") == 1);
@@ -90,12 +90,12 @@ TEST(second_pass_test, free_variable_test_1) {
 TEST(second_pass_test, free_variable_test_2) {
     std::string text = "var x: Integer; fun foo(y: Foo)->Integer{var z: Integer = 1 + x;}";
     BlockNode* tree = get_treeA(text);
-    GlobalProcessor fp;
-    fp.visit(*tree);
-    SecondPass sp(fp.globals, fp.class_table);
-    sp.visit(*tree);
-    EXPECT_TRUE(sp.scopes["global"]->has("x"));
-    SymbolTable* foo_scope = sp.scopes["global.foo"];
+    GlobalProcessor gp;
+    gp.visit(*tree);
+    Checker checker(gp.globals, gp.class_table);
+    checker.visit(*tree);
+    EXPECT_TRUE(checker.scopes["global"]->has("x"));
+    SymbolTable* foo_scope = checker.scopes["global.foo"];
     SymbolInfo* sinfo = foo_scope->get("y");
     EXPECT_TRUE(((FunctionNode*) tree->nodes[1])->free_variables.size() == 1);
     EXPECT_TRUE(((FunctionNode*) tree->nodes[1])->free_variables.count("x") == 1);
@@ -106,12 +106,12 @@ TEST(second_pass_test, free_variable_test_2) {
 TEST(second_pass_test, free_variable_test_3) {
     std::string text = "var x: Integer; fun foo(y: Foo)->Integer{if(y == 3){var z: Integer = 1 + x;}}";
     BlockNode* tree = get_treeA(text);
-    GlobalProcessor fp;
-    fp.visit(*tree);
-    SecondPass sp(fp.globals, fp.class_table);
-    sp.visit(*tree);
-    EXPECT_TRUE(sp.scopes["global"]->has("x"));
-    SymbolTable* foo_scope = sp.scopes["global.foo"];
+    GlobalProcessor gp;
+    gp.visit(*tree);
+    Checker checker(gp.globals, gp.class_table);
+    checker.visit(*tree);
+    EXPECT_TRUE(checker.scopes["global"]->has("x"));
+    SymbolTable* foo_scope = checker.scopes["global.foo"];
     SymbolInfo* sinfo = foo_scope->get("y");
     EXPECT_TRUE(((FunctionNode*) tree->nodes[1])->free_variables.size() == 1);
     EXPECT_TRUE(((FunctionNode*) tree->nodes[1])->free_variables.count("x") == 1);
@@ -122,12 +122,12 @@ TEST(second_pass_test, free_variable_test_3) {
 TEST(second_pass_test, free_variable_test_4) {
     std::string text = "var x: Integer; fun foo(y: Foo)->Integer{if(y == 3){var z: Integer = 1 + y;}}";
     BlockNode* tree = get_treeA(text);
-    GlobalProcessor fp;
-    fp.visit(*tree);
-    SecondPass sp(fp.globals, fp.class_table);
-    sp.visit(*tree);
-    EXPECT_TRUE(sp.scopes["global"]->has("x"));
-    SymbolTable* foo_scope = sp.scopes["global.foo"];
+    GlobalProcessor gp;
+    gp.visit(*tree);
+    Checker checker(gp.globals, gp.class_table);
+    checker.visit(*tree);
+    EXPECT_TRUE(checker.scopes["global"]->has("x"));
+    SymbolTable* foo_scope = checker.scopes["global.foo"];
     SymbolInfo* sinfo = foo_scope->get("y");
     EXPECT_TRUE(((FunctionNode*) tree->nodes[1])->free_variables.size() == 0);
     EXPECT_EQ(sinfo->type, SINFO::SIMPLE);
@@ -163,11 +163,11 @@ TEST(second_pass_test, FOFOOa) {
 TEST(second_pass_test, FOFOaOa) {
     std::string text = "fun foo(y: Foo)->String{var x:Integer;}";
     BlockNode* tree = get_treeA(text);
-    GlobalProcessor fp;
-    fp.visit(*tree);
-    SecondPass sp(fp.globals, fp.class_table);
-    sp.visit(*tree);
-    EXPECT_TRUE(sp.scopes["global.foo"]->declared("x"));
+    GlobalProcessor gp;
+    gp.visit(*tree);
+    Checker checker(gp.globals, gp.class_table);
+    checker.visit(*tree);
+    EXPECT_TRUE(checker.scopes["global.foo"]->declared("x"));
 }
 
 

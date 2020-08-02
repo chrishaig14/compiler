@@ -2,8 +2,8 @@
 // Created by chris on 28/6/20.
 //
 
-#ifndef UNTITLED1_SECONDPASS_H
-#define UNTITLED1_SECONDPASS_H
+#ifndef UNTITLED1_CHECKER_H
+#define UNTITLED1_CHECKER_H
 
 #include <map>
 #include "GlobalProcessor.h"
@@ -22,14 +22,14 @@ struct SemanticInfo {
     std::map<std::string, int> free_variables;
 };
 
-class SecondPass : public Visitor {
+class Checker : public Visitor {
     SymbolTable* scope;
     ClassTable* class_table;
     SemanticInfo rv;
 public:
     std::map<std::string, SymbolTable*> scopes;
 
-    SecondPass(SymbolTable* globals, ClassTable* class_table);
+    Checker(SymbolTable* globals, ClassTable* class_table);
 
     void enter_scope(std::string name);
 
@@ -80,4 +80,4 @@ public:
 
 };
 
-#endif //UNTITLED1_SECONDPASS_H
+#endif //UNTITLED1_CHECKER_H

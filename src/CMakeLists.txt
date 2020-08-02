@@ -61,6 +61,6 @@ add_library(srcLib
         semantic/ClassInfo.h
         semantic/FunctionInfo.cpp
         semantic/FunctionInfo.h
-        semantic/SecondPass.cpp
-        semantic/SecondPass.h
+        semantic/Checker.cpp
+        semantic/Checker.h
         semantic/RedeclareError.cpp semantic/RedeclareError.h semantic/BadArguments.cpp semantic/BadArguments.h semantic/ReturnError.cpp semantic/ReturnError.h semantic/ScopeError.cpp semantic/ScopeError.h nodes/BlockNode.cpp nodes/BlockNode.h)

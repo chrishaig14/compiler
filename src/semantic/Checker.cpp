@@ -2,10 +2,10 @@
 // Created by chris on 28/6/20.
 //
 
-#include "SecondPass.h"
+#include "Checker.h"
 
 
-SecondPass::SecondPass(SymbolTable* globals, ClassTable* class_table) {
+Checker::Checker(SymbolTable* globals, ClassTable* class_table) {
     this->class_table = class_table;
     this->scope = globals;
     this->scopes["global"] = this->scope;
@@ -13,7 +13,7 @@ SecondPass::SecondPass(SymbolTable* globals, ClassTable* class_table) {
                            new ClassInfo(std::map<std::string, SymbolInfo*>(), std::map<std::string, FunctionInfo*>()));
 }
 
-void SecondPass::enter_scope(std::string name) {
+void Checker::enter_scope(std::string name) {
     std::string new_scope_name = this->scope->name + "." + name;
     if (this->scopes.count(new_scope_name) == 1) {
         this->scope = this->scopes[new_scope_name];
@@ -23,12 +23,12 @@ void SecondPass::enter_scope(std::string name) {
     this->scopes[new_scope_name] = this->scope;
 }
 
-void SecondPass::leave_scope() {
+void Checker::leave_scope() {
     this->scope = this->scope->parent;
 }
 
 
-void SecondPass::visit(FunctionNode& n) {
+void Checker::visit(FunctionNode& n) {
     this->enter_scope(n.identifier);
     for (int i = 0; i < n.parameter_names.size(); i++) {
         ObjectInfo* object_info = new ObjectInfo(n.parameter_types[i]);
@@ -57,7 +57,7 @@ void SecondPass::visit(FunctionNode& n) {
     this->rv = semantic_info;
 }
 
-void SecondPass::visit(IdNode& n) {
+void Checker::visit(IdNode& n) {
     if (!this->scope->has(n.identifier)) {
         throw ScopeError(n.identifier);
     }
@@ -67,7 +67,7 @@ void SecondPass::visit(IdNode& n) {
     this->rv = semantic_info;
 }
 
-void SecondPass::visit(DeclarationNode& n) {
+void Checker::visit(DeclarationNode& n) {
     if (this->scope->declared(n.identifier)) {
         throw RedeclareError(n.identifier);
     }
@@ -87,7 +87,7 @@ void SecondPass::visit(DeclarationNode& n) {
     this->rv = semantic_info;
 }
 
-void SecondPass::visit(AssignmentNode& n) {
+void Checker::visit(AssignmentNode& n) {
     n.lvalue->accept(*this);
     SemanticInfo linfo = this->rv;
     n.rvalue->accept(*this);
@@ -103,7 +103,7 @@ void SecondPass::visit(AssignmentNode& n) {
     this->rv = semantic_info;
 }
 
-void SecondPass::visit(MemberNode& n) {
+void Checker::visit(MemberNode& n) {
     n.parent->accept(*this);
     SemanticInfo semantic_info = this->rv;
     if (!semantic_info.symbol_info->is_object()) {
@@ -124,7 +124,7 @@ void SecondPass::visit(MemberNode& n) {
     }
 }
 
-void SecondPass::visit(IfNode& n) {
+void Checker::visit(IfNode& n) {
     SemanticInfo semantic_info;
     n.condition->accept(*this);
     SemanticInfo condition_info = this->rv;
@@ -139,7 +139,7 @@ void SecondPass::visit(IfNode& n) {
     this->rv = semantic_info;
 }
 
-void SecondPass::visit(BinopNode& n) {
+void Checker::visit(BinopNode& n) {
     n.left->accept(*this);
     SemanticInfo left_info = this->rv;
     n.right->accept(*this);
@@ -153,7 +153,7 @@ void SecondPass::visit(BinopNode& n) {
     this->rv = semantic_info;
 }
 
-void SecondPass::visit(ReturnNode& n) {
+void Checker::visit(ReturnNode& n) {
     n.expression->accept(*this);
     SemanticInfo expression_info = this->rv;
     SymbolInfo* return_type = this->scope->get("__return__");
@@ -165,7 +165,7 @@ void SecondPass::visit(ReturnNode& n) {
     this->rv = semantic_info;
 }
 
-void SecondPass::visit(CallNode& n) {
+void Checker::visit(CallNode& n) {
     n.function->accept(*this);
     SemanticInfo function_semantic_info = this->rv;
     if (!function_semantic_info.symbol_info->is_function()) {
@@ -186,7 +186,7 @@ void SecondPass::visit(CallNode& n) {
     this->rv = semantic_info;
 }
 
-void SecondPass::visit(ClassNode& n) {
+void Checker::visit(ClassNode& n) {
     for (int i = 0; i < n.methods.size(); i++) {
         this->enter_scope(n.methods[i]->identifier);
         TypeNode* type_node = new TypeNode(n.identifier, {});
@@ -198,7 +198,7 @@ void SecondPass::visit(ClassNode& n) {
     }
 }
 
-void SecondPass::visit(BlockNode& program) {
+void Checker::visit(BlockNode& program) {
     SemanticInfo semantic_info;
     for (auto n: program.nodes) {
         n->accept(*this);
