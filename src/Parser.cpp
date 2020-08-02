@@ -400,7 +400,7 @@ FunctionNode* Parser::parse_function_definition() {
         this->expect_token(TokenType::RPAREN);
     }
     // Parse return
-    TypeNode* return_type = new TypeNode("None", {});
+    TypeNode* return_type = nullptr;
     this->expect_token(TokenType::RARROW);
     return_type = this->parse_type_node();
 //        this->expect_token(TokenType::LCURLY);
