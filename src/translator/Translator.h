@@ -9,8 +9,19 @@
 #include "../nodes/Visitor.h"
 #include "../nodes/nodes.h"
 #include "../instructions/Instruction.h"
-
-typedef std::vector<Instruction> Code;
+#include "../instructions/BinopInst.h"
+#include "../instructions/CallInst.h"
+#include "../instructions/DeclareInst.h"
+#include "../instructions/PushStringInst.h"
+#include "../instructions/ReturnInst.h"
+#include "../instructions/SetMemberInst.h"
+#include "../instructions/GetMemberInst.h"
+#include "../instructions/SetInst.h"
+#include "../instructions/GetInst.h"
+#include "../instructions/PushIntegerInst.h"
+#include "../instructions/SetSubscriptInst.h"
+#include "../instructions/GetSubscriptInst.h"
+#include "../instructions/PushFunctionInst.h"
 
 class Translator : public Visitor {
 public:
@@ -48,6 +59,8 @@ public:
 
     Code code;
     bool is_lvalue;
+
+    Translator();
 };
 
 

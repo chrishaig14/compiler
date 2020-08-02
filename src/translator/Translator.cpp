@@ -3,29 +3,20 @@
 //
 
 #include "Translator.h"
-#include "../instructions/BinopInst.h"
-#include "../instructions/CallInst.h"
-#include "../instructions/DeclareInst.h"
-#include "../instructions/PushStringInst.h"
-#include "../instructions/ReturnInst.h"
-#include "../instructions/SetMemberInst.h"
-#include "../instructions/GetMemberInst.h"
-#include "../instructions/SetInst.h"
-#include "../instructions/GetInst.h"
-#include "../instructions/PushIntegerInst.h"
-#include "../instructions/SetSubscriptInst.h"
-#include "../instructions/GetSubscriptInst.h"
-#include "../instructions/PushFunctionInst.h"
+
 
 void Translator::visit(AssignmentNode& node) {
     Code out;
+
     node.rvalue->accept(*this);
     Code r_code = this->code;
+    out.insert(out.end(), r_code.begin(), r_code.end());
+
     this->is_lvalue = true;
     node.lvalue->accept(*this);
     Code l_code = this->code;
-    out = l_code;
-    out.insert(out.end(), r_code.begin(), r_code.end());
+    out.insert(out.end(), l_code.begin(), l_code.end());
+
     this->code = out;
 }
 
@@ -36,7 +27,7 @@ void Translator::visit(BinopNode& node) {
     Code right_code = this->code;
     Code out = left_code;
     out.insert(out.end(), right_code.begin(), right_code.end());
-    out.push_back(BinopInst(node.op));
+    out.push_back(I_BIN(node.op));
     this->code = out;
 }
 
@@ -52,14 +43,15 @@ void Translator::visit(BlockNode& node) {
 
 void Translator::visit(CallNode& node) {
     Code out;
-    node.function->accept(*this);
-    out = this->code;
     for (auto a: node.arguments) {
         a->accept(*this);
         Code arg_code = this->code;
         out.insert(out.end(), arg_code.begin(), arg_code.end());
     }
-    out.push_back(CallInst());
+    node.function->accept(*this);
+    Code function_code = this->code;
+    out.insert(out.end(), function_code.begin(), function_code.end());
+    out.push_back(I_CALL);
     this->code = out;
 }
 
@@ -73,18 +65,19 @@ void Translator::visit(DeclarationNode& node) {
         node.expression->accept(*this);
         out = this->code;
     }
-    out.push_back(DeclareInst(node.identifier));
+    out.push_back(I_DECL(node.identifier));
+    out.push_back(I_SET(node.identifier));
     this->code = out;
 }
 
 void Translator::visit(FunctionNode& node) {
     Code out;
-    out.push_back(DeclareInst(node.identifier));
+    out.push_back(I_DECL(node.identifier));
     Code body_code;
     node.body->accept(*this);
     body_code = this->code;
-    out.push_back(PushFunctionInst(node.parameter_names, body_code, node.free_variables));
-    out.push_back(SetInst(node.identifier));
+    out.push_back(I_PUSHF(node.parameter_names, body_code, node.free_variables));
+    out.push_back(I_SET(node.identifier));
     this->code = out;
 }
 
@@ -92,9 +85,9 @@ void Translator::visit(IdNode& node) {
     Code out;
     if (this->is_lvalue) {
         this->is_lvalue = false;
-        out.push_back(SetInst(node.identifier));
+        out.push_back(I_SET(node.identifier));
     } else {
-        out.push_back(GetInst(node.identifier));
+        out.push_back(I_GET(node.identifier));
     }
     this->code = out;
 }
@@ -116,33 +109,33 @@ void Translator::visit(MemberNode& node) {
         Code parent_code = this->code;
         out.insert(out.end(), parent_code.begin(), parent_code.end());
 
-        out.push_back(SetMemberInst(node.child));
+        out.push_back(I_SETM(node.child));
     } else {
         node.parent->accept(*this);
         Code parent_code = this->code;
         out.insert(out.end(), parent_code.begin(), parent_code.end());
 
-        out.push_back(GetMemberInst(node.child));
+        out.push_back(I_GETM(node.child));
     }
     this->code = out;
 }
 
 void Translator::visit(NumberNode& node) {
     Code out;
-    out.push_back(PushIntegerInst(node.number));
+    out.push_back(I_PUSHI(node.number));
     this->code = out;
 }
 
 void Translator::visit(ReturnNode& node) {
     node.expression->accept(*this);
     Code out = this->code;
-    out.push_back(ReturnInst());
+    out.push_back(I_RET);
     this->code = out;
 }
 
 void Translator::visit(StringNode& node) {
     Code out;
-    out.push_back(PushStringInst(node.str));
+    out.push_back(I_PUSHS(node.str));
     this->code = out;
 }
 
@@ -159,7 +152,7 @@ void Translator::visit(SubscriptNode& node) {
         Code parent_code = this->code;
         out.insert(out.end(), parent_code.begin(), parent_code.end());
 
-        out.push_back(SetSubscriptInst());
+        out.push_back(I_SETS);
     } else {
         node.child->accept(*this);
         Code child_code = this->code;
@@ -169,7 +162,7 @@ void Translator::visit(SubscriptNode& node) {
         Code parent_code = this->code;
         out.insert(out.end(), parent_code.begin(), parent_code.end());
 
-        out.push_back(GetSubscriptInst());
+        out.push_back(I_GETS);
     }
     this->code = out;
 }
@@ -177,3 +170,5 @@ void Translator::visit(SubscriptNode& node) {
 void Translator::visit(TypeNode& node) {
 
 }
+
+Translator::Translator() : is_lvalue(false) {}

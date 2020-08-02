@@ -13,6 +13,10 @@ class BinopInst : public Instruction {
     OpType op;
 public:
     BinopInst(OpType op);
+
+    bool equal(const Instruction* inst) const override;
+
+    std::string to_string() const override;
 };
 
 

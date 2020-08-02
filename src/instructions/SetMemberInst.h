@@ -9,9 +9,19 @@
 #include <string>
 #include "Instruction.h"
 
-class SetMemberInst : public Instruction{
+class SetMemberInst : public Instruction {
 public:
     SetMemberInst(const std::string& member);
+
+    bool equal(const Instruction* inst) const {
+        const SetMemberInst* other = dynamic_cast<const SetMemberInst*>(inst);
+        if (other == nullptr) return false;
+        return this->member == other->member;
+    }
+
+    std::string to_string() const {
+        return "SET_MEMBER " + this->member;
+    }
 
 private:
     std::string member;

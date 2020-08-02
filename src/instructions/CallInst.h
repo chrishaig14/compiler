@@ -6,10 +6,14 @@
 #define UNTITLED1_CALLINST_H
 
 
+#include <string>
 #include "Instruction.h"
 
 class CallInst : public Instruction {
+public:
+    bool equal(const Instruction* inst) const override;
 
+    std::string to_string() const override;
 };
 
 

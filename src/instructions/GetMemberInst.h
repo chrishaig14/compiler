@@ -16,6 +16,17 @@ public:
 private:
     std::string member;
 
+    bool equal(const Instruction* inst) const {
+        const GetMemberInst* other = dynamic_cast<const GetMemberInst*>(inst);
+        if (other == nullptr) return false;
+        return this->member == other->member;
+    }
+
+    std::string to_string() const {
+        return "GET_MEMBER " + this->member;
+    }
+
+
 };
 
 

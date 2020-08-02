@@ -6,10 +6,19 @@
 #define UNTITLED1_RETURNINST_H
 
 
+#include <string>
 #include "Instruction.h"
 
 class ReturnInst : public Instruction {
+    bool equal(const Instruction* inst) const {
+        const ReturnInst* other = dynamic_cast<const ReturnInst*>(inst);
+        if (other == nullptr) return false;
+        return true;
+    }
 
+    std::string to_string() const {
+        return "RETURN";
+    }
 };
 
 

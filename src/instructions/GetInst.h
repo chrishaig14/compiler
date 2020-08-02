@@ -15,6 +15,16 @@ public:
 
 public:
     std::string identifier;
+
+    bool equal(const Instruction* inst) const {
+        const GetInst* other = dynamic_cast<const GetInst*>(inst);
+        if (other == nullptr) return false;
+        return this->identifier == other->identifier;
+    }
+
+    std::string to_string() const override;
+
+
 };
 
 

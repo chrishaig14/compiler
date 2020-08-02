@@ -14,6 +14,10 @@ public:
     std::string identifier;
 
     DeclareInst(std::string identifier);
+
+    bool equal(const Instruction* inst) const override;
+
+    std::string to_string() const override;
 };
 
 
