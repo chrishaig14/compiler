@@ -7,14 +7,12 @@
 
 
 #include <vector>
-#include "Token.h"
-#include "nodes/IfNode.h"
-#include "nodes/nodes.h"
+#include "../scanner/Token.h"
+#include "../nodes/IfNode.h"
+#include "../nodes/nodes.h"
+#include "../utils.h"
 #include <iostream>
 
-typedef std::vector<TypeNode*> VectorOfTypes;
-typedef std::vector<std::string> VectorOfStrings;
-typedef std::vector<Node*> VectorOfNodes;
 
 class UnexpectedToken : public std::runtime_error {
     Token token;

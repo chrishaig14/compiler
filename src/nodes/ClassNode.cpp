@@ -11,8 +11,8 @@ void ClassNode::accept(Visitor& visitor) {
 ClassNode::ClassNode(std::string identifier, std::vector<std::string> templateParameters,
                      std::vector<DeclarationNode*> fields, std::vector<FunctionNode*> methods) : identifier(
         identifier),
-                                                                                                   template_parameters(
-                                                                                                           templateParameters),
-                                                                                                   fields(fields),
-                                                                                                   methods(methods) {}
+                                                                                                 template_parameters(
+                                                                                                         templateParameters),
+                                                                                                 fields(fields),
+                                                                                                 methods(methods) {}
 

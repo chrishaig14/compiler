@@ -8,6 +8,6 @@ void DeclarationNode::accept(Visitor& visitor) {
     visitor.visit(*this);
 }
 
-DeclarationNode::DeclarationNode(const std::string& identifier, Node* type, Node* expression) : identifier(identifier),
+DeclarationNode::DeclarationNode(const std::string& identifier, TypeNode* type, Node* expression) : identifier(identifier),
                                                                                                 type(type), expression(
                 expression) {}

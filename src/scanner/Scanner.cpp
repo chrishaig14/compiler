@@ -4,7 +4,7 @@
 
 #include <iostream>
 #include "Scanner.h"
-#include "color_codes.h"
+#include "../color_codes.h"
 
 std::map<std::string, TokenType> TOKEN_KEYWORDS;
 std::map<std::string, TokenType> TOKEN_SPECIAL;

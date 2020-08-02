@@ -3,27 +3,13 @@
 //
 
 #include <gtest/gtest.h>
-#include <Scanner.h>
-#include <Parser.h>
+#include <scanner/Scanner.h>
+#include <parser/Parser.h>
 
-#define ID(id) new IdNode(id)
-#define NUM(num) new NumberNode(num)
-#define BIN(op, left, right) new BinopNode(op, left, right)
-#define MEM(parent, child) new MemberNode(parent, child)
-#define IF(condition, then) new IfNode(condition, then)
-#define CALL(function, arguments) new CallNode(function, arguments)
-#define CLS(name, template_parameters, fields, methods) new ClassNode(name, template_parameters, fields, methods)
-#define ASN(lvalue, rvalue) new AssignmentNode(lvalue, rvalue)
-#define SUB(parent, child) new SubscriptNode(parent, child)
-#define DECL(id, type, exp) new DeclarationNode(id, type, exp)
-#define TYPE(parent, type_parameters) new TypeNode(parent, type_parameters)
-#define T_INT new TypeNode("Integer", {})
-#define T_STRING new TypeNode("String", {})
-#define FUN(a, b, c, d, e) new FunctionNode(a,b,c,d,e)
+
 #define BODY_NODE std::vector<Node*>({ASN(ID("x"), BIN(OpType::ADD, ID("a"), ID("b"))),ASN(ID("x"), ID("y"))})
 #define FUN_FOO_NODE FUN("foo", { "x" }, std::vector<TypeNode*>({ COMPLEX_TYPE }), TYPE("List", {T_INT}), BODY_NODE)
 #define FUN_FOO_STRING "fun foo(x:List[List[Integer]])->List[Integer]{x=a+b; x = y;}"
-#define T_LIST(e) TYPE("List", std::vector<TypeNode*>({e}))
 #define COMPLEX_TYPE T_LIST(T_LIST(T_INT))
 
 #define COMPLETE_TEST EXPECT_TRUE(node->equal(expected_node)); delete node; delete expected_node;

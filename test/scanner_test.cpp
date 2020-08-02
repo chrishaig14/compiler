@@ -3,7 +3,7 @@
 //
 
 #include <gtest/gtest.h>
-#include <Scanner.h>
+#include <scanner/Scanner.h>
 #include <vector>
 
 

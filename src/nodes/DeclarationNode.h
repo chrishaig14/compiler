@@ -8,15 +8,16 @@
 
 #include <string>
 #include "Node.h"
+#include "TypeNode.h"
 #include "Visitor.h"
 
 class DeclarationNode : public Node {
 public:
     std::string identifier;
-    Node* type;
+    TypeNode* type;
     Node* expression;
 
-    DeclarationNode(const std::string& identifier, Node* type, Node* expression);
+    DeclarationNode(const std::string& identifier, TypeNode* type, Node* expression);
 
     void accept(Visitor& visitor) override;
 

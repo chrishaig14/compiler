@@ -23,6 +23,7 @@ public:
     ~ReturnNode() {
         delete this->expression;
     }
+
     json to_json() const override {
         json j;
         j["node"] = "return";
