@@ -13,6 +13,8 @@ public:
     virtual void accept(Visitor& visitor) = 0;
 
     virtual bool equal(Node* other) const = 0;
+
+    virtual ~Node() = default;
 };
 
 #endif //UNTITLED1_NODE_H

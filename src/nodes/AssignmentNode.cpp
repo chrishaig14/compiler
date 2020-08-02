@@ -19,3 +19,8 @@ bool AssignmentNode::equal(Node* other) const {
 bool AssignmentNode::operator==(AssignmentNode& other) const {
     return this->lvalue->equal(other.lvalue) && this->rvalue->equal(other.rvalue);
 }
+
+AssignmentNode::~AssignmentNode() {
+    delete this->lvalue;
+    delete this->rvalue;
+}

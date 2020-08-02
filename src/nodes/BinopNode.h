@@ -33,6 +33,11 @@ public:
         return this->op == other.op && this->left->equal(other.left) and this->right->equal(other.right);
     }
 
+    ~BinopNode() {
+        delete this->left;
+        delete this->right;
+    }
+
 };
 
 

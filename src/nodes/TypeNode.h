@@ -34,6 +34,12 @@ public:
         }
         return true;
     }
+
+    ~TypeNode() {
+        for (auto p: this->type_parameters) {
+            delete p;
+        }
+    }
 };
 
 

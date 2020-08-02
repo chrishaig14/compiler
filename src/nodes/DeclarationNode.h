@@ -36,6 +36,11 @@ public:
         bool same_identifier = this->identifier == other.identifier;
         return same_identifier && same_type && same_expression;
     }
+
+    ~DeclarationNode() {
+        if (this->type != nullptr) delete this->type;
+        if (this->expression != nullptr) delete this->expression;
+    }
 };
 
 

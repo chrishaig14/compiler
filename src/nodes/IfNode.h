@@ -22,6 +22,13 @@ public:
     bool equal(Node* other) const override;
 
     bool operator==(IfNode& other) const;
+
+    ~IfNode() {
+        delete this->condition;
+        for (auto st: this->then) {
+            delete st;
+        }
+    }
 };
 
 

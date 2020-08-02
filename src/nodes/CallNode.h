@@ -23,6 +23,13 @@ public:
 
     bool operator==(CallNode& other) const;
 
+    ~CallNode() {
+        delete this->function;
+        for (auto a: this->arguments) {
+            delete a;
+        }
+    }
+
 };
 
 

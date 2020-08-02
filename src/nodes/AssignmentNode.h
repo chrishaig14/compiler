@@ -22,6 +22,8 @@ public:
 
     bool operator==(AssignmentNode& other) const;
 
+    virtual ~AssignmentNode();
+
 };
 
 

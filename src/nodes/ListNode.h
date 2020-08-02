@@ -21,6 +21,12 @@ public:
     bool equal(Node* other) const override;
 
     bool operator==(ListNode& other) const;
+
+    ~ListNode() {
+        for (auto e: this->elements) {
+            delete e;
+        }
+    }
 };
 
 

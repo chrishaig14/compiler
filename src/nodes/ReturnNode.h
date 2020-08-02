@@ -19,6 +19,10 @@ public:
     bool equal(Node* other) const override;
 
     bool operator==(ReturnNode& other) const;
+
+    ~ReturnNode() {
+        delete this->expression;
+    }
 };
 
 #endif //UNTITLED1_RETURNNODE_H

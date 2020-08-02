@@ -42,10 +42,19 @@ public:
         for (int i = 0; i < this->fields.size(); i++) {
             if (!this->fields[i]->equal(other.fields[i])) return false;
         }
-        for(int i = 0; i < this->methods.size(); i++){
-            if(!this->methods[i]->equal(other.methods[i])) return false;
+        for (int i = 0; i < this->methods.size(); i++) {
+            if (!this->methods[i]->equal(other.methods[i])) return false;
         }
         return true;
+    }
+
+    ~ClassNode() {
+        for (auto f: this->fields) {
+            delete f;
+        }
+        for (auto m: this->methods) {
+            delete m;
+        }
     }
 
 };

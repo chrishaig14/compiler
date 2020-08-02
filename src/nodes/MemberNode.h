@@ -28,6 +28,10 @@ public:
     bool operator==(MemberNode& other) const {
         return this->parent->equal(other.parent) && this->child == other.child;
     }
+
+    ~MemberNode() {
+        delete this->parent;
+    }
 };
 
 

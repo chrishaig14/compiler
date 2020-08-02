@@ -22,6 +22,11 @@ private:
     bool equal(Node* other) const override;
 
     bool operator==(SubscriptNode& other) const;
+
+    ~SubscriptNode() {
+        delete this->parent;
+        delete this->child;
+    }
 };
 
 

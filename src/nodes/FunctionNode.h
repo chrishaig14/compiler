@@ -18,6 +18,8 @@ public:
     std::vector<std::string> parameter_names;
     std::vector<TypeNode*> parameter_types;
     std::vector<Node*> body;
+    TypeNode* return_type;
+
 
     void accept(Visitor& visitor) override;
 
@@ -30,7 +32,6 @@ public:
         this->return_type = return_type;
     }
 
-    TypeNode* return_type;
 
     bool equal(Node* other) const {
         auto other_ptr = dynamic_cast<FunctionNode*>(other);
@@ -53,6 +54,16 @@ public:
             if (!this->body[i]->equal(other.body[i])) return false;
         }
         return true;
+    }
+
+    ~FunctionNode() {
+        for (auto pt: this->parameter_types) {
+            delete pt;
+        }
+        for (auto st: this->body) {
+            delete st;
+        }
+        delete this->return_type;
     }
 
 };
