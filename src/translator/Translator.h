@@ -1,26 +1,24 @@
 //
-// Created by chris on 28/6/20.
+// Created by chris on 2/8/20.
 //
 
-#ifndef UNTITLED1_GLOBALPROCESSOR_H
-#define UNTITLED1_GLOBALPROCESSOR_H
+#ifndef UNTITLED1_TRANSLATOR_H
+#define UNTITLED1_TRANSLATOR_H
 
 
-#include <map>
+#include "../nodes/Visitor.h"
 #include "../nodes/nodes.h"
-#include "SymbolTable.h"
-#include "ClassTable.h"
+#include "../instructions/Instruction.h"
 
-class GlobalProcessor : public Visitor {
+typedef std::vector<Instruction> Code;
+
+class Translator : public Visitor {
 public:
-    SymbolTable* globals;
-    ClassTable* class_table;
-
-    GlobalProcessor();
-
     void visit(AssignmentNode& node) override;
 
     void visit(BinopNode& node) override;
+
+    void visit(BlockNode& node) override;
 
     void visit(CallNode& node) override;
 
@@ -48,9 +46,8 @@ public:
 
     void visit(TypeNode& node) override;
 
-    void visit(VectorOfNodes program);
-
-    void visit(BlockNode& node) override;
+    Code code;
 };
 
-#endif //UNTITLED1_GLOBALPROCESSOR_H
+
+#endif //UNTITLED1_TRANSLATOR_H

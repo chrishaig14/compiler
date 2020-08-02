@@ -63,4 +63,33 @@ add_library(srcLib
         semantic/FunctionInfo.h
         semantic/Checker.cpp
         semantic/Checker.h
-        semantic/RedeclareError.cpp semantic/RedeclareError.h semantic/BadArguments.cpp semantic/BadArguments.h semantic/ReturnError.cpp semantic/ReturnError.h semantic/ScopeError.cpp semantic/ScopeError.h nodes/BlockNode.cpp nodes/BlockNode.h)
+        semantic/RedeclareError.cpp
+        semantic/RedeclareError.h
+        semantic/BadArguments.cpp
+        semantic/BadArguments.h
+        semantic/ReturnError.cpp
+        semantic/ReturnError.h
+        semantic/ScopeError.cpp
+        semantic/ScopeError.h
+        nodes/BlockNode.cpp
+        nodes/BlockNode.h
+        translator/Translator.cpp
+        translator/Translator.h
+        instructions/LoadInst.cpp
+        instructions/LoadInst.h
+        instructions/StoreInst.cpp
+        instructions/StoreInst.h
+        instructions/DeclareInst.cpp
+        instructions/DeclareInst.h
+        instructions/BinopInst.cpp
+        instructions/BinopInst.h
+        instructions/PushIntegerInst.cpp
+        instructions/PushIntegerInst.h
+        instructions/PushStringInst.cpp
+        instructions/PushStringInst.h
+        instructions/Instruction.cpp
+        instructions/Instruction.h
+        instructions/CallInst.cpp
+        instructions/CallInst.h
+        instructions/ReturnInst.cpp
+        instructions/ReturnInst.h)
