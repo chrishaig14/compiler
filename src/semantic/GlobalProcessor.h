@@ -49,6 +49,8 @@ public:
     void visit(TypeNode& node) override;
 
     void visit(VectorOfNodes program);
+
+    void visit(BlockNode& node) override;
 };
 
 #endif //UNTITLED1_GLOBALPROCESSOR_H

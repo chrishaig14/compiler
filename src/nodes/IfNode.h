@@ -9,13 +9,14 @@
 #include <vector>
 #include "Node.h"
 #include "Visitor.h"
+#include "BlockNode.h"
 
 class IfNode : public Node {
 public:
     Node* condition;
-    std::vector<Node*> then;
+    BlockNode* then;
 
-    IfNode(Node* condition, std::vector<Node*> then);
+    IfNode(Node* condition, BlockNode* then);
 
     void accept(Visitor& visitor) override;
 
@@ -25,19 +26,14 @@ public:
 
     ~IfNode() {
         delete this->condition;
-        for (auto st: this->then) {
-            delete st;
-        }
+        delete this->then;
     }
 
     json to_json() const override {
         json j;
         j["node"] = "if";
         j["condition"] = this->condition->to_json();
-        j["then"] = {};
-        for (auto st: this->then) {
-            j["then"].push_back(st->to_json());
-        }
+        j["then"] = this->then->to_json();
         return j;
     }
 };

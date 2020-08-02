@@ -89,9 +89,9 @@ public:
 
     VectorOfNodes parse_list_of_expressions();
 
-    VectorOfNodes parse_possibly_empty_block();
+    BlockNode* parse_possibly_empty_block();
 
-    VectorOfNodes parse_program();
+    BlockNode* parse_program();
 
 };
 

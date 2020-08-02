@@ -85,5 +85,11 @@ void GlobalProcessor::visit(VectorOfNodes program) {
     }
 }
 
+void GlobalProcessor::visit(BlockNode& node) {
+    for (auto n: node.nodes) {
+        n->accept(*this);
+    }
+}
+
 
 

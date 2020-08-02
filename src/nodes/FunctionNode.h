@@ -11,20 +11,23 @@
 #include "Node.h"
 #include "Visitor.h"
 #include "TypeNode.h"
+#include "BlockNode.h"
 
 class FunctionNode : public Node {
 public:
     std::string identifier;
     std::vector<std::string> parameter_names;
     std::vector<TypeNode*> parameter_types;
-    std::vector<Node*> body;
+    BlockNode* body;
     TypeNode* return_type;
+    std::map<std::string, int> free_variables;
 
 
     void accept(Visitor& visitor) override;
 
     FunctionNode(std::string identifier, std::vector<std::string> parameter_names,
-                 std::vector<TypeNode*> parameter_types, TypeNode* return_type, std::vector<Node*> body) {
+                 std::vector<TypeNode*> parameter_types, TypeNode* return_type, BlockNode* body) {
+        assert(body != nullptr);
         this->identifier = identifier;
         this->parameter_names = parameter_names;
         this->parameter_types = parameter_types;
@@ -43,16 +46,13 @@ public:
         if (this->identifier != other.identifier) return false;
         if (this->parameter_types.size() != other.parameter_types.size()) return false;
         if (this->parameter_names.size() != other.parameter_names.size()) return false;
-        if (this->body.size() != other.body.size()) return false;
         for (int i = 0; i < this->parameter_types.size(); i++) {
             if (!this->parameter_types[i]->equal(other.parameter_types[i])) return false;
         }
         for (int i = 0; i < this->parameter_names.size(); i++) {
             if (this->parameter_names[i] != other.parameter_names[i]) return false;
         }
-        for (int i = 0; i < this->body.size(); i++) {
-            if (!this->body[i]->equal(other.body[i])) return false;
-        }
+        if (*this->body != *other.body) return false;
         return true;
     }
 
@@ -60,9 +60,7 @@ public:
         for (auto pt: this->parameter_types) {
             delete pt;
         }
-        for (auto st: this->body) {
-            delete st;
-        }
+        delete this->body;
         delete this->return_type;
     }
 
@@ -72,17 +70,18 @@ public:
         j["identifier"] = this->identifier;
         j["parameter_names"] = {};
         j["parameter_types"] = {};
-        j["body"] = {};
         for (auto pn: this->parameter_names) {
             j["parameter_names"].push_back(pn);
         }
         for (auto pt: this->parameter_types) {
             j["parameter_types"].push_back(pt->to_json());
         }
-        for (auto st: this->body) {
-            j["body"].push_back(st->to_json());
-        }
+        j["body"] = this->body->to_json();
         j["return_type"] = this->return_type->to_json();
+        j["free_variables"] = {};
+        for (auto it: this->free_variables) {
+            j["free_variables"].push_back(it.first);
+        }
         return j;
     }
 

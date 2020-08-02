@@ -4,12 +4,12 @@
 
 #include "Parser.h"
 
-VectorOfNodes Parser::parse_program() {
+BlockNode* Parser::parse_program() {
     VectorOfNodes program;
     while (this->token.type != TokenType::END) {
         program.push_back(this->parse_top_level_statement());
     }
-    return program;
+    return new BlockNode(program);
 }
 
 ReturnNode* Parser::parse_return() {
@@ -24,7 +24,7 @@ IfNode* Parser::parse_if() {
     this->expect_token(TokenType::LPAREN);
     Node* condition = this->parse_expression();
     this->expect_token(TokenType::RPAREN);
-    VectorOfNodes body = this->parse_possibly_empty_block();
+    BlockNode* body = this->parse_possibly_empty_block();
     IfNode* node = new IfNode(condition, body);
     return node;
 }
@@ -357,7 +357,7 @@ ClassNode* Parser::parse_class_definition() {
     return node;
 }
 
-VectorOfNodes Parser::parse_possibly_empty_block() {
+BlockNode* Parser::parse_possibly_empty_block() {
     this->expect_token(TokenType::LCURLY);
     VectorOfNodes block;
     while (true) {
@@ -368,7 +368,8 @@ VectorOfNodes Parser::parse_possibly_empty_block() {
         Node* statement = this->parse_common_statement();
         block.push_back(statement);
     }
-    return block;
+    BlockNode* rv = new BlockNode(block);
+    return rv;
 }
 
 FunctionNode* Parser::parse_function_definition() {
@@ -405,7 +406,7 @@ FunctionNode* Parser::parse_function_definition() {
     return_type = this->parse_type_node();
 //        this->expect_token(TokenType::LCURLY);
     // Parse function body
-    VectorOfNodes body = this->parse_possibly_empty_block();
+    BlockNode* body = this->parse_possibly_empty_block();
 
     FunctionNode* node = new FunctionNode(identifier, parameter_names, parameter_types, return_type, body);
     return node;

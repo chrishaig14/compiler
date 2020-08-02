@@ -10,7 +10,6 @@
 #include "Visitor.h"
 
 class ReturnNode : public Node {
-    Node* expression;
 public:
     explicit ReturnNode(Node* expression);
 
@@ -30,6 +29,8 @@ public:
         j["expression"] = this->expression->to_json();
         return j;
     }
+
+    Node* expression;
 };
 
 #endif //UNTITLED1_RETURNNODE_H

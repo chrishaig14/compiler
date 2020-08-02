@@ -15,8 +15,6 @@
 
 class SymbolTable {
     std::map<std::string, SymbolInfo*> table;
-    std::string name;
-    SymbolTable* parent;
 public:
     SymbolTable(std::string name, SymbolTable* parent) {
         this->name = name;
@@ -55,6 +53,8 @@ public:
     }
 
 
+    std::string name;
+    SymbolTable* parent;
 };
 
 #endif //UNTITLED1_SYMBOLTABLE_H

@@ -7,7 +7,7 @@
 #include <parser/Parser.h>
 
 
-#define BODY_NODE std::vector<Node*>({ASN(ID("x"), BIN(OpType::ADD, ID("a"), ID("b"))),ASN(ID("x"), ID("y"))})
+#define BODY_NODE new BlockNode({ASN(ID("x"), BIN(OpType::ADD, ID("a"), ID("b"))),ASN(ID("x"), ID("y"))})
 #define FUN_FOO_NODE FUN("foo", { "x" }, std::vector<TypeNode*>({ COMPLEX_TYPE }), TYPE("List", {T_INT}), BODY_NODE)
 #define FUN_FOO_STRING "fun foo(x:List[List[Integer]])->List[Integer]{x=a+b; x = y;}"
 #define COMPLEX_TYPE T_LIST(T_LIST(T_INT))
@@ -97,8 +97,8 @@ TEST(parser_test, empty_block) {
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
-    VectorOfNodes node = parser.parse_possibly_empty_block();
-    EXPECT_EQ(node.size(), 0);
+    BlockNode* node = parser.parse_possibly_empty_block();
+    EXPECT_EQ(node->nodes.size(), 0);
 }
 
 TEST(parser_test, non_empty_block) {
@@ -106,17 +106,15 @@ TEST(parser_test, non_empty_block) {
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
-    VectorOfNodes node = parser.parse_possibly_empty_block();
-    EXPECT_EQ(node.size(), 2);
+    BlockNode* node = parser.parse_possibly_empty_block();
+    EXPECT_EQ(node->nodes.size(), 2);
     auto expected_node_0 = ASN(ID("x"), BIN(OpType::ADD, ID("a"), ID("b")));
-    EXPECT_TRUE(node[0]->equal(expected_node_0));
+    EXPECT_TRUE(node->nodes[0]->equal(expected_node_0));
     auto expected_node_1 = ASN(ID("x"), ID("y"));
-    EXPECT_TRUE(node[1]->equal(expected_node_1));
+    EXPECT_TRUE(node->nodes[1]->equal(expected_node_1));
     delete expected_node_0;
     delete expected_node_1;
-    for (auto n: node) {
-        delete n;
-    }
+    delete node;
 }
 
 TEST(parser_test, if_empty_then) {
@@ -125,7 +123,7 @@ TEST(parser_test, if_empty_then) {
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
     IfNode* node = parser.parse_if();
-    auto expected_node = IF(ID("x"), VectorOfNodes());
+    auto expected_node = IF(ID("x"), new BlockNode({}));
     COMPLETE_TEST;
 }
 
@@ -137,7 +135,7 @@ TEST(parser_test, if_non_empty_then) {
     IfNode* node = parser.parse_if();
     auto st_1 = ASN(ID("x"), BIN(OpType::ADD, ID("a"), ID("b")));
     auto st_2 = ASN(ID("x"), ID("y"));
-    auto expected_node = IF(ID("x"), std::vector<Node*>({st_1, st_2}));
+    auto expected_node = IF(ID("x"), new BlockNode({st_1, st_2}));
     COMPLETE_TEST;
 
 }
@@ -208,8 +206,8 @@ TEST(parser_test, function_no_params_empty_body) {
     Parser parser(tokens);
     FunctionNode* node = parser.parse_function_definition();
     auto return_type = TYPE("String", {});
-    std::vector<Node*> body;
-    auto expected_node = FUN("foo", std::vector<std::string>(), std::vector<TypeNode*>(), return_type, body);
+    auto expected_node = FUN("foo", std::vector<std::string>(), std::vector<TypeNode*>(), return_type,
+                             new BlockNode({}));
     COMPLETE_TEST;
 
 }
@@ -221,7 +219,7 @@ TEST(parser_test, function_with_params_empty_body) {
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
     FunctionNode* node = parser.parse_function_definition();
-    auto expected_node = FUN("foo", { "x" }, { COMPLEX_TYPE }, TYPE("Integer", {}), {});
+    auto expected_node = FUN("foo", { "x" }, { COMPLEX_TYPE }, TYPE("Integer", {}), new BlockNode({}));
     COMPLETE_TEST;
 
 }

@@ -52,4 +52,15 @@ add_library(srcLib
         nodes/AssignmentNode.cpp
         nodes/AssignmentNode.h
         semantic/GlobalProcessor.cpp
-        utils.h semantic/SymbolInfo.cpp semantic/SymbolInfo.h semantic/ObjectInfo.cpp semantic/ObjectInfo.h semantic/ClassInfo.cpp semantic/ClassInfo.h semantic/FunctionInfo.cpp semantic/FunctionInfo.h)
+        utils.h
+        semantic/SymbolInfo.cpp
+        semantic/SymbolInfo.h
+        semantic/ObjectInfo.cpp
+        semantic/ObjectInfo.h
+        semantic/ClassInfo.cpp
+        semantic/ClassInfo.h
+        semantic/FunctionInfo.cpp
+        semantic/FunctionInfo.h
+        semantic/SecondPass.cpp
+        semantic/SecondPass.h
+        semantic/RedeclareError.cpp semantic/RedeclareError.h semantic/BadArguments.cpp semantic/BadArguments.h semantic/ReturnError.cpp semantic/ReturnError.h semantic/ScopeError.cpp semantic/ScopeError.h nodes/BlockNode.cpp nodes/BlockNode.h)

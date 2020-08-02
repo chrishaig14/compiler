@@ -9,6 +9,8 @@ class AssignmentNode;
 
 class BinopNode;
 
+class BlockNode;
+
 class CallNode;
 
 class ClassNode;
@@ -40,6 +42,8 @@ public:
     virtual void visit(AssignmentNode& node) = 0;
 
     virtual void visit(BinopNode& node) = 0;
+
+    virtual void visit(BlockNode& node) = 0;
 
     virtual void visit(CallNode& node) = 0;
 
