@@ -10,12 +10,12 @@
 #include "Visitor.h"
 
 class SubscriptNode : public Node {
-    Node* parent;
-    Node* child;
 
 public:
     SubscriptNode(Node* parent, Node* child);
 
+    Node* parent;
+    Node* child;
 private:
     void accept(Visitor& visitor) override;
 

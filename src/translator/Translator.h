@@ -47,6 +47,7 @@ public:
     void visit(TypeNode& node) override;
 
     Code code;
+    bool is_lvalue;
 };
 
 

@@ -8,6 +8,10 @@
 #include "Instruction.h"
 
 class PushIntegerInst : public Instruction {
+public:
+    PushIntegerInst(int num);
+
+private:
     int num;
 };
 

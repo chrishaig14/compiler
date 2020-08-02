@@ -3,3 +3,5 @@
 //
 
 #include "PushIntegerInst.h"
+
+PushIntegerInst::PushIntegerInst(int num) : num(num) {}

@@ -75,10 +75,10 @@ add_library(srcLib
         nodes/BlockNode.h
         translator/Translator.cpp
         translator/Translator.h
-        instructions/LoadInst.cpp
-        instructions/LoadInst.h
-        instructions/StoreInst.cpp
-        instructions/StoreInst.h
+        instructions/GetInst.cpp
+        instructions/GetInst.h
+        instructions/SetInst.cpp
+        instructions/SetInst.h
         instructions/DeclareInst.cpp
         instructions/DeclareInst.h
         instructions/BinopInst.cpp
@@ -92,4 +92,4 @@ add_library(srcLib
         instructions/CallInst.cpp
         instructions/CallInst.h
         instructions/ReturnInst.cpp
-        instructions/ReturnInst.h)
+        instructions/ReturnInst.h instructions/GetMemberInst.cpp instructions/GetMemberInst.h instructions/SetMemberInst.cpp instructions/SetMemberInst.h instructions/SetSubscriptInst.cpp instructions/SetSubscriptInst.h instructions/GetSubscriptInst.cpp instructions/GetSubscriptInst.h)
