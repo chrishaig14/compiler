@@ -20,6 +20,13 @@ public:
     bool equal(Node* other) const override;
 
     bool operator==(NumberNode& other) const;
+
+    json to_json() const override {
+        json j;
+        j["node"] = "number";
+        j["number"] = this->number;
+        return j;
+    }
 };
 
 

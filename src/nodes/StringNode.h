@@ -21,6 +21,13 @@ public:
     bool equal(Node* other) const override;
 
     bool operator==(StringNode& other) const;
+
+    json to_json() const override {
+        json j;
+        j["node"] = "string";
+        j["str"] = this->str;
+        return j;
+    }
 };
 
 

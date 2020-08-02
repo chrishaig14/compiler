@@ -27,6 +27,13 @@ private:
         delete this->parent;
         delete this->child;
     }
+    json to_json() const override {
+        json j;
+        j["node"] = "subscript";
+        j["parent"] = this->parent->to_json();
+        j["child"] = this->child->to_json();
+        return j;
+    }
 };
 
 

@@ -32,6 +32,14 @@ public:
     ~MemberNode() {
         delete this->parent;
     }
+
+    json to_json() const override {
+        json j;
+        j["node"] = "member";
+        j["parent"] = this->parent->to_json();
+        j["child"] = this->child;
+        return j;
+    }
 };
 
 

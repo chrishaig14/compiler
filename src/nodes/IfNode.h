@@ -29,6 +29,17 @@ public:
             delete st;
         }
     }
+
+    json to_json() const override {
+        json j;
+        j["node"] = "if";
+        j["condition"] = this->condition->to_json();
+        j["then"] = {};
+        for (auto st: this->then) {
+            j["then"].push_back(st->to_json());
+        }
+        return j;
+    }
 };
 
 

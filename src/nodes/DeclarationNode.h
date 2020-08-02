@@ -41,6 +41,21 @@ public:
         if (this->type != nullptr) delete this->type;
         if (this->expression != nullptr) delete this->expression;
     }
+
+    json to_json() const override {
+        json j;
+        j["node"] = "declaration";
+        j["identifier"] = this->identifier;
+        j["expression"] = {};
+        if (this->expression != nullptr) {
+            j["expression"] = this->expression->to_json();
+        }
+        if (this->type != nullptr) {
+            j["type"] = this->type->to_json();
+        }
+        return j;
+    }
+
 };
 
 

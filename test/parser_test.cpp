@@ -307,7 +307,6 @@ TEST(parser_test, template_class_foo_empty) {
     std::vector<std::string> params = {"T", "X"};
     std::vector<DeclarationNode*> fields;
     std::vector<FunctionNode*> methods;
-
     ClassNode* expected_node = CLS("Foo", params, fields, methods);
     COMPLETE_TEST;
 
@@ -328,6 +327,7 @@ TEST(parser_test, class_foo_with_fields_and_method) {
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
     ClassNode* node = parser.parse_class_definition();
+
     auto expected_node = complete_foo_class_node;
     COMPLETE_TEST;
 
@@ -611,5 +611,7 @@ TEST(parser_test, super_expression) {
             SUB(SUB(SUB(MEM(MEM(ID("v"), "x"), "y"), NUM(0)), NUM(1)),
                 BIN(OpType::ADD, ID("a"), BIN(OpType::MUL, ID("c"), NUM(7)))),
             std::vector<Node*>({NUM(4), NUM(1), BIN(OpType::ADD, ID("b"), ID("c"))})));
+    std::cout << *node << std::endl;
+
     COMPLETE_TEST;
 }

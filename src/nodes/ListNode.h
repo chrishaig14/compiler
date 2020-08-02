@@ -27,6 +27,16 @@ public:
             delete e;
         }
     }
+
+    json to_json() const override {
+        json j;
+        j["node"] = "list";
+        j["elements"] = {};
+        for (auto e: this->elements) {
+            j["elements"].push_back(e->to_json());
+        }
+        return j;
+    }
 };
 
 

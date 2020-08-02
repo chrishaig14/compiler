@@ -30,6 +30,17 @@ public:
         }
     }
 
+    json to_json() const override {
+        json j;
+        j["node"] = "call";
+        j["function"] = this->function->to_json();
+        j["arguments"] = {};
+        for (auto a: this->arguments) {
+            j["arguments"].push_back(a->to_json());
+        }
+        return j;
+    }
+
 };
 
 

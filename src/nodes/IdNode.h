@@ -21,6 +21,13 @@ public:
     bool equal(Node* other) const;
 
     bool operator==(IdNode& other) const;
+
+    json to_json() const override {
+        json j;
+        j["node"] = "id";
+        j["id"] = this->identifier;
+        return j;
+    }
 };
 
 

@@ -57,6 +57,16 @@ public:
         }
     }
 
+    json to_json() const override {
+        json j;
+        j["type"] = "class";
+        j["fields"] = {};
+        for(auto f: this->fields){
+            j["fields"][f->identifier] = f->type->to_json();
+        }
+        return j;
+    }
+
 };
 
 

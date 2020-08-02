@@ -66,6 +66,26 @@ public:
         delete this->return_type;
     }
 
+    json to_json() const override {
+        json j;
+        j["node"] = "function";
+        j["identifier"] = this->identifier;
+        j["parameter_names"] = {};
+        j["parameter_types"] = {};
+        j["body"] = {};
+        for (auto pn: this->parameter_names) {
+            j["parameter_names"].push_back(pn);
+        }
+        for (auto pt: this->parameter_types) {
+            j["parameter_types"].push_back(pt->to_json());
+        }
+        for (auto st: this->body) {
+            j["body"].push_back(st->to_json());
+        }
+        j["return_type"] = this->return_type->to_json();
+        return j;
+    }
+
 };
 
 

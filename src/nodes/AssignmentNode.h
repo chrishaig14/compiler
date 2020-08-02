@@ -24,6 +24,14 @@ public:
 
     virtual ~AssignmentNode();
 
+    json to_json() const override {
+        json j;
+        j["node"] = "assignment";
+        j["lvalue"] = this->lvalue->to_json();
+        j["rvalue"] = this->rvalue->to_json();
+        return j;
+    }
+
 };
 
 

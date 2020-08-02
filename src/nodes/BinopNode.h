@@ -13,6 +13,8 @@ enum class OpType {
     ADD, SUB, MUL, DIV, EQ, AND, OR
 };
 
+std::string op_to_string(OpType op);
+
 class BinopNode : public Node {
 public:
     Node* left;
@@ -38,6 +40,14 @@ public:
         delete this->right;
     }
 
+    json to_json() const override {
+        json j;
+        j["node"] = "binop";
+        j["left"] = this->left->to_json();
+        j["right"] = this->right->to_json();
+        j["op"] = op_to_string(this->op);
+        return j;
+    }
 };
 
 
