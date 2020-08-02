@@ -15,6 +15,7 @@
 #include "../instructions/PushIntegerInst.h"
 #include "../instructions/SetSubscriptInst.h"
 #include "../instructions/GetSubscriptInst.h"
+#include "../instructions/PushFunctionInst.h"
 
 void Translator::visit(AssignmentNode& node) {
     Code out;
@@ -77,7 +78,14 @@ void Translator::visit(DeclarationNode& node) {
 }
 
 void Translator::visit(FunctionNode& node) {
-
+    Code out;
+    out.push_back(DeclareInst(node.identifier));
+    Code body_code;
+    node.body->accept(*this);
+    body_code = this->code;
+    out.push_back(PushFunctionInst(node.parameter_names, body_code, node.free_variables));
+    out.push_back(SetInst(node.identifier));
+    this->code = out;
 }
 
 void Translator::visit(IdNode& node) {

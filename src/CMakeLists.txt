@@ -92,4 +92,4 @@ add_library(srcLib
         instructions/CallInst.cpp
         instructions/CallInst.h
         instructions/ReturnInst.cpp
-        instructions/ReturnInst.h instructions/GetMemberInst.cpp instructions/GetMemberInst.h instructions/SetMemberInst.cpp instructions/SetMemberInst.h instructions/SetSubscriptInst.cpp instructions/SetSubscriptInst.h instructions/GetSubscriptInst.cpp instructions/GetSubscriptInst.h)
+        instructions/ReturnInst.h instructions/GetMemberInst.cpp instructions/GetMemberInst.h instructions/SetMemberInst.cpp instructions/SetMemberInst.h instructions/SetSubscriptInst.cpp instructions/SetSubscriptInst.h instructions/GetSubscriptInst.cpp instructions/GetSubscriptInst.h instructions/PushFunctionInst.cpp instructions/PushFunctionInst.h)
