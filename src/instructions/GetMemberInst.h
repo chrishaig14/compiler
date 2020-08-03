@@ -8,6 +8,7 @@
 
 #include <string>
 #include "Instruction.h"
+#include "InstructionVisitor.h"
 
 class GetMemberInst : public Instruction {
 public:
@@ -25,6 +26,8 @@ private:
     std::string to_string() const {
         return "GET_MEMBER " + this->member;
     }
+
+    void visit(InstructionVisitor& visitor);
 
 
 };

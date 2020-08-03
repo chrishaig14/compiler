@@ -5,3 +5,7 @@
 #include "SetMemberInst.h"
 
 SetMemberInst::SetMemberInst(const std::string& member) : member(member) {}
+
+void SetMemberInst::visit(InstructionVisitor& visitor) {
+    visitor.visit(*this);
+}

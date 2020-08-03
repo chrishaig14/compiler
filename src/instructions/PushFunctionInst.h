@@ -10,6 +10,7 @@
 #include <string>
 #include "Instruction.h"
 #include "../translator/Translator.h"
+#include "InstructionVisitor.h"
 
 class PushFunctionInst : public Instruction {
 public:
@@ -34,6 +35,8 @@ public:
     std::string to_string() const {
         return "PUSH_FUNCTION";
     }
+
+    void visit(InstructionVisitor& visitor);
 
 private:
     std::vector<std::string> parameter_names;

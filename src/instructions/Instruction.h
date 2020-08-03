@@ -4,6 +4,7 @@
 
 #ifndef UNTITLED1_INSTRUCTION_H
 #define UNTITLED1_INSTRUCTION_H
+
 #include <string>
 
 class Instruction {
@@ -16,6 +17,11 @@ public:
         return os << inst.to_string();
     };
 
+    virtual void accept(InstructionVisitor& visitor) = 0;
+
+    void visit(InstructionVisitor& visitor) {
+        visitor.visit(*this);
+    }
 };
 
 

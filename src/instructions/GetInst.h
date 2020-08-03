@@ -8,6 +8,7 @@
 
 #include <string>
 #include "Instruction.h"
+#include "InstructionVisitor.h"
 
 class GetInst : public Instruction {
 public:
@@ -23,6 +24,8 @@ public:
     }
 
     std::string to_string() const override;
+
+    void visit(InstructionVisitor& visitor);
 
 
 };

@@ -13,3 +13,7 @@ bool CallInst::equal(const Instruction* inst) const {
 std::string CallInst::to_string() const {
     return "CALL";
 }
+
+void CallInst::visit(InstructionVisitor& visitor) {
+    visitor.visit(*this);
+}

@@ -8,6 +8,7 @@
 
 #include <string>
 #include "Instruction.h"
+#include "InstructionVisitor.h"
 
 class DeclareInst : public Instruction {
 public:
@@ -18,6 +19,8 @@ public:
     bool equal(const Instruction* inst) const override;
 
     std::string to_string() const override;
+
+    void visit(InstructionVisitor& visitor);
 };
 
 

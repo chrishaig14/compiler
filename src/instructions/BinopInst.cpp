@@ -17,3 +17,7 @@ bool BinopInst::equal(const Instruction* inst) const {
 std::string BinopInst::to_string() const {
     return op_to_string(this->op);
 }
+
+void BinopInst::visit(InstructionVisitor& visitor) {
+    visitor.visit(*this);
+}

@@ -3,3 +3,7 @@
 //
 
 #include "ReturnInst.h"
+
+void ReturnInst::visit(InstructionVisitor& visitor) {
+    visitor.visit(*this);
+}

@@ -8,6 +8,7 @@
 
 #include <string>
 #include "Instruction.h"
+#include "InstructionVisitor.h"
 
 class PushStringInst : public Instruction {
 public:
@@ -22,6 +23,9 @@ public:
     std::string to_string() const {
         return "PUSH_STRING " + this->str;
     }
+
+
+    void visit(InstructionVisitor& visitor);
 
 private:
     std::string str;

@@ -5,3 +5,7 @@
 #include "GetMemberInst.h"
 
 GetMemberInst::GetMemberInst(const std::string& member) : member(member) {}
+
+void GetMemberInst::visit(InstructionVisitor& visitor) {
+    visitor.visit(*this);
+}

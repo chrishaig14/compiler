@@ -8,6 +8,8 @@
 
 #include "../utils.h"
 #include "Instruction.h"
+#include "InstructionVisitor.h"
+#include "InstructionVisitor.h"
 
 class BinopInst : public Instruction {
     OpType op;
@@ -17,6 +19,8 @@ public:
     bool equal(const Instruction* inst) const override;
 
     std::string to_string() const override;
+
+    void visit(InstructionVisitor& visitor);
 };
 
 

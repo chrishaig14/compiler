@@ -7,6 +7,7 @@
 
 #include <string>
 #include "Instruction.h"
+#include "InstructionVisitor.h"
 
 class PushIntegerInst : public Instruction {
 public:
@@ -21,6 +22,8 @@ public:
     std::string to_string() const {
         return "PUSH_INTEGER " + std::to_string(this->num);
     }
+
+    void visit(InstructionVisitor& visitor);
 
 private:
     int num;

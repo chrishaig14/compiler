@@ -3,3 +3,7 @@
 //
 
 #include "SetSubscriptInst.h"
+
+void SetSubscriptInst::visit(InstructionVisitor& visitor) {
+    visitor.visit(*this);
+}

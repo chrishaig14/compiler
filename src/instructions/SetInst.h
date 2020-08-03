@@ -8,6 +8,7 @@
 
 #include <string>
 #include "Instruction.h"
+#include "InstructionVisitor.h"
 
 class SetInst : public Instruction {
 public:
@@ -18,6 +19,8 @@ public:
         if (other == nullptr) return false;
         return this->identifier == other->identifier;
     }
+
+    void visit(InstructionVisitor& visitor);
 
     std::string to_string() const {
         return "SET " + this->identifier;

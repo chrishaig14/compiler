@@ -8,6 +8,7 @@
 
 #include <string>
 #include "Instruction.h"
+#include "InstructionVisitor.h"
 
 class GetSubscriptInst : public Instruction {
     bool equal(const Instruction* inst) const {
@@ -19,6 +20,8 @@ class GetSubscriptInst : public Instruction {
     std::string to_string() const {
         return "GET_SUBSCRIPT";
     }
+
+    void visit(InstructionVisitor& visitor);
 };
 
 

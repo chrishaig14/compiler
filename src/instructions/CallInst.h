@@ -8,12 +8,15 @@
 
 #include <string>
 #include "Instruction.h"
+#include "InstructionVisitor.h"
 
 class CallInst : public Instruction {
 public:
     bool equal(const Instruction* inst) const override;
 
     std::string to_string() const override;
+
+    void visit(InstructionVisitor& visitor);
 };
 
 

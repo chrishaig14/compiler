@@ -5,3 +5,7 @@
 #include "PushIntegerInst.h"
 
 PushIntegerInst::PushIntegerInst(int num) : num(num) {}
+
+void PushIntegerInst::visit(InstructionVisitor& visitor) {
+    visitor.visit(*this);
+}

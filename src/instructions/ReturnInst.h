@@ -8,6 +8,7 @@
 
 #include <string>
 #include "Instruction.h"
+#include "InstructionVisitor.h"
 
 class ReturnInst : public Instruction {
     bool equal(const Instruction* inst) const {
@@ -15,6 +16,8 @@ class ReturnInst : public Instruction {
         if (other == nullptr) return false;
         return true;
     }
+
+    void visit(InstructionVisitor& visitor);
 
     std::string to_string() const {
         return "RETURN";

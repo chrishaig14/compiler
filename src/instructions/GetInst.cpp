@@ -9,3 +9,7 @@ GetInst::GetInst(const std::string& identifier) : identifier(identifier) {}
 std::string GetInst::to_string() const {
     return "GET " + this->identifier;
 }
+
+void GetInst::visit(InstructionVisitor& visitor) {
+    visitor.visit(*this);
+}

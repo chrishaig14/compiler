@@ -8,3 +8,7 @@ PushFunctionInst::PushFunctionInst(const std::vector<std::string>& parameterName
                                    const std::map<std::string, int>& freeVariables) : parameter_names(parameterNames),
                                                                                       body(body),
                                                                                       free_variables(freeVariables) {}
+
+void PushFunctionInst::visit(InstructionVisitor& visitor) {
+    visitor.visit(*this);
+}
