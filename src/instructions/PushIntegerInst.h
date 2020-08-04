@@ -25,7 +25,6 @@ public:
 
     void accept(InstructionVisitor& visitor);
 
-private:
     int num;
 };
 

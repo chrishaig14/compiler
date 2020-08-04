@@ -4,7 +4,6 @@ project(untitled1)
 set(CMAKE_CXX_STANDARD 11)
 
 add_library(srcLib
-        lib.cpp
         scanner/Scanner.cpp
         scanner/Scanner.h
         scanner/Token.cpp
@@ -92,4 +91,34 @@ add_library(srcLib
         instructions/CallInst.cpp
         instructions/CallInst.h
         instructions/ReturnInst.cpp
-        instructions/ReturnInst.h instructions/GetMemberInst.cpp instructions/GetMemberInst.h instructions/SetMemberInst.cpp instructions/SetMemberInst.h instructions/SetSubscriptInst.cpp instructions/SetSubscriptInst.h instructions/GetSubscriptInst.cpp instructions/GetSubscriptInst.h instructions/PushFunctionInst.cpp instructions/PushFunctionInst.h instructions/instructions.h instructions/InstructionVisitor.cpp instructions/InstructionVisitor.h)
+        instructions/ReturnInst.h
+        instructions/GetMemberInst.cpp
+        instructions/GetMemberInst.h
+        instructions/SetMemberInst.cpp
+        instructions/SetMemberInst.h
+        instructions/SetSubscriptInst.cpp
+        instructions/SetSubscriptInst.h
+        instructions/GetSubscriptInst.cpp
+        instructions/GetSubscriptInst.h
+        instructions/PushFunctionInst.cpp
+        instructions/PushFunctionInst.h
+        instructions/instructions.h
+        instructions/InstructionVisitor.cpp
+        instructions/InstructionVisitor.h
+        vm/ObjectStack.h
+        vm/ObjectStack.cpp
+        vm/Object.h
+        vm/Object.cpp
+        vm/BuiltinSum.cpp
+        vm/BuiltinSum.h
+        vm/CodeObject.cpp
+        vm/CodeObject.h
+        vm/CodeUser.cpp
+        vm/CodeUser.h
+        vm/IntegerObject.cpp
+        vm/IntegerObject.h
+        vm/StringObject.cpp
+        vm/StringObject.h
+        vm/Environment.h
+        vm/Environment.cpp
+        )

@@ -27,7 +27,6 @@ public:
 
     void accept(InstructionVisitor& visitor);
 
-private:
     std::string str;
 
 };
