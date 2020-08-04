@@ -16,6 +16,6 @@ std::string DeclareInst::to_string() const {
     return "DECLARE " + this->identifier;
 }
 
-void DeclareInst::visit(InstructionVisitor& visitor) {
+void DeclareInst::accept(InstructionVisitor& visitor) {
     visitor.visit(*this);
 }

@@ -21,7 +21,7 @@ class GetSubscriptInst : public Instruction {
         return "GET_SUBSCRIPT";
     }
 
-    void visit(InstructionVisitor& visitor);
+    void accept(InstructionVisitor& visitor);
 };
 
 

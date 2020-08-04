@@ -27,7 +27,7 @@ private:
         return "GET_MEMBER " + this->member;
     }
 
-    void visit(InstructionVisitor& visitor);
+    void accept(InstructionVisitor& visitor);
 
 
 };

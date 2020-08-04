@@ -6,6 +6,6 @@
 
 GetMemberInst::GetMemberInst(const std::string& member) : member(member) {}
 
-void GetMemberInst::visit(InstructionVisitor& visitor) {
+void GetMemberInst::accept(InstructionVisitor& visitor) {
     visitor.visit(*this);
 }

@@ -20,7 +20,7 @@ public:
         return this->member == other->member;
     }
 
-    void visit(InstructionVisitor& visitor);
+    void accept(InstructionVisitor& visitor);
 
     std::string to_string() const {
         return "SET_MEMBER " + this->member;

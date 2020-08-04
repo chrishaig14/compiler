@@ -4,6 +4,6 @@
 
 #include "ReturnInst.h"
 
-void ReturnInst::visit(InstructionVisitor& visitor) {
+void ReturnInst::accept(InstructionVisitor& visitor) {
     visitor.visit(*this);
 }

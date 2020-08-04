@@ -6,6 +6,7 @@
 #define UNTITLED1_INSTRUCTION_H
 
 #include <string>
+#include "InstructionVisitor.h"
 
 class Instruction {
 public:
@@ -19,9 +20,6 @@ public:
 
     virtual void accept(InstructionVisitor& visitor) = 0;
 
-    void visit(InstructionVisitor& visitor) {
-        visitor.visit(*this);
-    }
 };
 
 

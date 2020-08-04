@@ -25,7 +25,7 @@ public:
     }
 
 
-    void visit(InstructionVisitor& visitor);
+    void accept(InstructionVisitor& visitor);
 
 private:
     std::string str;

@@ -4,6 +4,6 @@
 
 #include "GetSubscriptInst.h"
 
-void GetSubscriptInst::visit(InstructionVisitor& visitor) {
+void GetSubscriptInst::accept(InstructionVisitor& visitor) {
     visitor.visit(*this);
 }

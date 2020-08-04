@@ -6,6 +6,6 @@
 
 PushIntegerInst::PushIntegerInst(int num) : num(num) {}
 
-void PushIntegerInst::visit(InstructionVisitor& visitor) {
+void PushIntegerInst::accept(InstructionVisitor& visitor) {
     visitor.visit(*this);
 }

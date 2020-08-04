@@ -14,6 +14,6 @@ std::string CallInst::to_string() const {
     return "CALL";
 }
 
-void CallInst::visit(InstructionVisitor& visitor) {
+void CallInst::accept(InstructionVisitor& visitor) {
     visitor.visit(*this);
 }

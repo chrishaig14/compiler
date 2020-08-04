@@ -9,6 +9,6 @@ PushFunctionInst::PushFunctionInst(const std::vector<std::string>& parameterName
                                                                                       body(body),
                                                                                       free_variables(freeVariables) {}
 
-void PushFunctionInst::visit(InstructionVisitor& visitor) {
+void PushFunctionInst::accept(InstructionVisitor& visitor) {
     visitor.visit(*this);
 }

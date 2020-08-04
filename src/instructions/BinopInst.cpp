@@ -18,6 +18,6 @@ std::string BinopInst::to_string() const {
     return op_to_string(this->op);
 }
 
-void BinopInst::visit(InstructionVisitor& visitor) {
+void BinopInst::accept(InstructionVisitor& visitor) {
     visitor.visit(*this);
 }

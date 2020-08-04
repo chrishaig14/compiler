@@ -23,7 +23,7 @@ public:
         return "PUSH_INTEGER " + std::to_string(this->num);
     }
 
-    void visit(InstructionVisitor& visitor);
+    void accept(InstructionVisitor& visitor);
 
 private:
     int num;

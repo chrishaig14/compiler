@@ -6,6 +6,6 @@
 
 SetInst::SetInst(const std::string& identifier) : identifier(identifier) {}
 
-void SetInst::visit(InstructionVisitor& visitor) {
+void SetInst::accept(InstructionVisitor& visitor) {
     visitor.visit(*this);
 }

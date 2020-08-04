@@ -10,6 +10,6 @@ std::string GetInst::to_string() const {
     return "GET " + this->identifier;
 }
 
-void GetInst::visit(InstructionVisitor& visitor) {
+void GetInst::accept(InstructionVisitor& visitor) {
     visitor.visit(*this);
 }

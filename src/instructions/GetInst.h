@@ -25,7 +25,7 @@ public:
 
     std::string to_string() const override;
 
-    void visit(InstructionVisitor& visitor);
+    void accept(InstructionVisitor& visitor);
 
 
 };

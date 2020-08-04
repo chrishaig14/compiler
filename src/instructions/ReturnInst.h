@@ -17,7 +17,7 @@ class ReturnInst : public Instruction {
         return true;
     }
 
-    void visit(InstructionVisitor& visitor);
+    void accept(InstructionVisitor& visitor);
 
     std::string to_string() const {
         return "RETURN";

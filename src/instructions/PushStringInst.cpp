@@ -6,6 +6,6 @@
 
 PushStringInst::PushStringInst(const std::string& str) : str(str) {}
 
-void PushStringInst::visit(InstructionVisitor& visitor) {
+void PushStringInst::accept(InstructionVisitor& visitor) {
     visitor.visit(*this);
 }

@@ -36,7 +36,7 @@ public:
         return "PUSH_FUNCTION";
     }
 
-    void visit(InstructionVisitor& visitor);
+    void accept(InstructionVisitor& visitor);
 
 private:
     std::vector<std::string> parameter_names;
