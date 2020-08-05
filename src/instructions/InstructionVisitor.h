@@ -17,6 +17,8 @@ class GetMemberInst;
 
 class GetSubscriptInst;
 
+class MakeObjectInst;
+
 class PushFunctionInst;
 
 class PushIntegerInst;
@@ -43,6 +45,8 @@ public:
     virtual void visit(GetMemberInst& inst) = 0;
 
     virtual void visit(GetSubscriptInst& inst) = 0;
+
+    virtual void visit(MakeObjectInst& inst) = 0;
 
     virtual void visit(PushFunctionInst& inst) = 0;
 

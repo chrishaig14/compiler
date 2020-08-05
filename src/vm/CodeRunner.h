@@ -16,6 +16,7 @@
 #include "IntegerObject.h"
 #include "StringObject.h"
 #include "CodeObject.h"
+#include "UserObject.h"
 
 class CodeRunner : public InstructionVisitor {
 public:
@@ -74,6 +75,9 @@ public:
     }
 
     void visit(GetMemberInst& inst) override {
+        Object* object = this->stack.pop();
+        UserObject* user_object = dynamic_cast<UserObject*>(object);
+        this->stack.push(user_object->fields[inst.member]);
         this->inst_ptr++;
     }
 
@@ -113,11 +117,19 @@ public:
     }
 
     void visit(SetMemberInst& inst) override {
-
+        Object* object = this->stack.pop();
+        UserObject* user_object = dynamic_cast<UserObject*>(object);
+        user_object->fields[inst.member] = this->stack.pop();
+        this->inst_ptr++;
     }
 
     void visit(SetSubscriptInst& inst) override {
 
+    }
+
+    void visit(MakeObjectInst& inst) override {
+        this->stack.push(new UserObject(inst.type, inst.fields));
+        this->inst_ptr++;
     }
 
 };

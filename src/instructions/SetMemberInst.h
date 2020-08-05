@@ -26,7 +26,6 @@ public:
         return "SET_MEMBER " + this->member;
     }
 
-private:
     std::string member;
 };
 

@@ -121,4 +121,4 @@ add_library(srcLib
         vm/StringObject.h
         vm/Environment.h
         vm/Environment.cpp
-        )
+        vm/UserObject.cpp vm/UserObject.h instructions/MakeObjectInst.cpp instructions/MakeObjectInst.h)

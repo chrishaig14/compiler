@@ -14,8 +14,8 @@ class GetMemberInst : public Instruction {
 public:
     GetMemberInst(const std::string& member);
 
-private:
     std::string member;
+private:
 
     bool equal(const Instruction* inst) const {
         const GetMemberInst* other = dynamic_cast<const GetMemberInst*>(inst);
