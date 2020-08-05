@@ -11,6 +11,7 @@
 #include "GetInst.h"
 #include "GetMemberInst.h"
 #include "GetSubscriptInst.h"
+#include "MakeListInst.h"
 #include "MakeObjectInst.h"
 #include "PushFunctionInst.h"
 #include "PushIntegerInst.h"

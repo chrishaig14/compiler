@@ -15,6 +15,7 @@
 #include "Environment.h"
 #include "IntegerObject.h"
 #include "StringObject.h"
+#include "ListObject.h"
 #include "CodeObject.h"
 #include "UserObject.h"
 
@@ -129,6 +130,15 @@ public:
 
     void visit(MakeObjectInst& inst) override {
         this->stack.push(new UserObject(inst.type, inst.fields));
+        this->inst_ptr++;
+    }
+
+    void visit(MakeListInst& inst) override {
+        std::vector<Object*> list(inst.length, nullptr);
+        for (int i = inst.length - 1; i >= 0; i--) {
+            list[i] = this->stack.pop();
+        }
+        this->stack.push(new ListObject(list));
         this->inst_ptr++;
     }
 

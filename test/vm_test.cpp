@@ -172,3 +172,29 @@ TEST(vm_test, inst_get_member) {
     EXPECT_TRUE(tos->equal(new IntegerObject(7)));
 }
 
+TEST(vm_test, inst_make_list) {
+    std::vector<std::string> f = {"foo", "bar"};
+    Code main_code = {
+            I_PUSHI(0),
+            I_PUSHI(1),
+            I_PUSHI(1),
+            I_PUSHI(2),
+            I_PUSHI(3),
+            I_PUSHI(5),
+            I_MAKE_LIST(6),
+    };
+    ObjectStack stack;
+    CodeRunner code_runner(main_code, stack, {});
+    code_runner.run();
+    Object* tos = stack.pop();
+    EXPECT_TRUE(stack.empty());
+    ListObject* list = dynamic_cast<ListObject*>(tos);
+    EXPECT_NE(list, nullptr);
+    EXPECT_EQ(list->list.size(), 6);
+    EXPECT_TRUE(list->list[0]->equal(new IntegerObject(0)));
+    EXPECT_TRUE(list->list[1]->equal(new IntegerObject(1)));
+    EXPECT_TRUE(list->list[2]->equal(new IntegerObject(1)));
+    EXPECT_TRUE(list->list[3]->equal(new IntegerObject(2)));
+    EXPECT_TRUE(list->list[4]->equal(new IntegerObject(3)));
+    EXPECT_TRUE(list->list[5]->equal(new IntegerObject(5)));
+}

@@ -42,6 +42,7 @@ typedef std::vector<Instruction*> Code;
 #define I_SET(x) new SetInst(x)
 #define I_GET(x) new GetInst(x)
 #define I_DECL(x) new DeclareInst(x)
+#define I_MAKE_LIST(length) new MakeListInst(length)
 #define I_MAKE_OBJECT(a,b) new MakeObjectInst(a,b)
 #define I_BIN(op) new BinopInst(op)
 #define I_RET new ReturnInst()
