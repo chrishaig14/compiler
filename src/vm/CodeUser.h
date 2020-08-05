@@ -6,12 +6,14 @@
 #define UNTITLED1_CODEUSER_H
 
 #include "../utils.h"
+#include "Object.h"
 
 class CodeUser {
 public:
     Code code;
+    std::map<std::string, Object*> closure;
 
-    CodeUser(Code code);
+    CodeUser(Code code, std::map<std::string, Object*> closure);
 
     Instruction* get(int i);
 

@@ -14,3 +14,8 @@ bool CodeObject::equal(const Object* other) const {
     return true;
 }
 
+CodeObject::CodeObject(CodeUser* user_code) {
+    this->type = CodeType::USER;
+    this->user = user_code;
+}
+

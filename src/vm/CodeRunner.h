@@ -25,12 +25,17 @@ public:
     ObjectStack& stack;
     Environment* env;
 
-    CodeRunner(Code& code, ObjectStack& stack) : code(code), stack(stack) {
+    CodeRunner(Code& code, ObjectStack& stack, std::map<std::string, Object*> closure) : code(code), stack(stack) {
         this->env = new Environment(nullptr);
+        for (auto it: closure) {
+            this->env->declare(it.first);
+            this->env->set(it.first, it.second);
+        }
+        this->inst_ptr = 0;
     }
 
     void run() {
-        while (inst_ptr < code.size()) {
+        while (this->inst_ptr < this->code.size()) {
             Instruction* inst = this->code[this->inst_ptr];
             inst->accept(*this);
         }
@@ -49,49 +54,62 @@ public:
         if (code->type == CodeType::BUILTIN) {
             code->builtin->run(this->stack);
         } else {
-            throw std::runtime_error("Trying to run user code!");
+            CodeRunner code_runner(code->user->code, this->stack, code->user->closure);
+            code_runner.run();
+//            throw std::runtime_error("Trying to run user code!");
         }
+        this->inst_ptr++;
 //        throw std::runtime_error("Unimplemented call instruction!");
     }
 
     void visit(DeclareInst& declare) override {
         this->env->declare(declare.identifier);
+        this->inst_ptr++;
     }
 
     void visit(GetInst& inst) override {
         Object* value = this->env->get(inst.identifier);
         this->stack.push(value);
+        this->inst_ptr++;
     }
 
     void visit(GetMemberInst& inst) override {
-
+        this->inst_ptr++;
     }
 
     void visit(GetSubscriptInst& inst) override {
-
+        this->inst_ptr++;
     }
 
     void visit(PushFunctionInst& inst) override {
-
+        std::map<std::string, Object*> closure;
+        for (auto it: inst.free_variables) {
+            closure[it.first] = this->env->get(it.first);
+        }
+        this->stack.push(new CodeObject(new CodeUser(inst.body, closure)));
+        this->inst_ptr++;
     }
 
     void visit(PushIntegerInst& inst) override {
         IntegerObject* reference_to_new_integer_object = new IntegerObject(inst.num);
         this->stack.push(reference_to_new_integer_object);
+        this->inst_ptr++;
     }
 
     void visit(PushStringInst& inst) override {
         StringObject* reference_to_new_integer_object = new StringObject(inst.str);
         this->stack.push(reference_to_new_integer_object);
+        this->inst_ptr++;
     }
 
     void visit(ReturnInst& inst) override {
-
+        this->inst_ptr++;
     }
 
     void visit(SetInst& inst) override {
         Object* value = this->stack.pop();
         this->env->set(inst.identifier, value);
+        this->inst_ptr++;
     }
 
     void visit(SetMemberInst& inst) override {

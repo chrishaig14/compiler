@@ -17,6 +17,7 @@ public:
     };
 
     CodeObject(CodeBuiltin* builtin);
+    CodeObject(CodeUser* user_code);
 
     bool equal(const Object* other) const override;
 };

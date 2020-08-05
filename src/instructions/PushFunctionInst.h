@@ -17,6 +17,8 @@ public:
     PushFunctionInst(const std::vector<std::string>& parameterNames, const Code& body,
                      const std::map<std::string, int>& freeVariables);
 
+    Code body;
+    std::map<std::string, int> free_variables;
 public:
 
     bool equal(const Instruction* inst) const {
@@ -40,8 +42,6 @@ public:
 
 private:
     std::vector<std::string> parameter_names;
-    Code body;
-    std::map<std::string, int> free_variables;
 };
 
 
