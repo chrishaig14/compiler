@@ -15,6 +15,7 @@ std::ostream& operator<<(std::ostream& out, const std::vector<Instruction*> v) {
 
 bool operator==(const std::vector<Instruction*> a, const std::vector<Instruction*> b) {
     for (int i = 0; i < a.size(); i++) {
+        std::cout << "comparing " << a[i]->to_string() << " == " << b[i]->to_string() << ": " << (a[i]->equal(b[i])? "True" : "False") << std::endl;
         if (!a[i]->equal(b[i])) return false;
     }
     return true;
@@ -79,6 +80,18 @@ TEST(translator_test, test_id_get) {
     Node* node = ASN(ID("y"), BIN(OpType::ADD, ID("x"), NUM(7)));
     node->accept(translator);
     Code expected_code = {I_GET("x"), I_PUSHI(7), I_BIN(OpType::ADD), I_SET("y")};
+    EXPECT_EQ(translator.code, expected_code)
+                        << "GOT:\n----\n" << translator.code << "----\nEXPECTED:\n----\n" << expected_code << "----\n";
+}
+
+TEST(translator_test, test_if) {
+    Translator translator;
+    VectorOfNodes then = {ASN(ID("y"), BIN(OpType::ADD, ID("x"), NUM(9)))};
+    BlockNode then_node(then);
+    Node* node = IF(BIN(OpType::EQ, ID("x"), NUM(3)), &then_node);
+    node->accept(translator);
+    Code expected_code = {I_GET("x"), I_PUSHI(3), I_BIN(OpType::EQ), I_JUMPF(5), I_GET("x"), I_PUSHI(9),
+                          I_BIN(OpType::ADD), I_SET("y")};
     EXPECT_EQ(translator.code, expected_code)
                         << "GOT:\n----\n" << translator.code << "----\nEXPECTED:\n----\n" << expected_code << "----\n";
 }

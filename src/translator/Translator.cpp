@@ -93,7 +93,15 @@ void Translator::visit(IdNode& node) {
 }
 
 void Translator::visit(IfNode& node) {
-
+    Code out;
+    node.condition->accept(*this);
+    Code condition_code = this->code;
+    out.insert(out.end(), condition_code.begin(), condition_code.end());
+    node.then->accept(*this);
+    Code then_code = this->code;
+    out.push_back(I_JUMPF(then_code.size() + 1));
+    out.insert(out.end(), then_code.begin(), then_code.end());
+    this->code = out;
 }
 
 void Translator::visit(ListNode& node) {

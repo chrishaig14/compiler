@@ -5,10 +5,10 @@
 #include "JumpIfFalseInst.h"
 
 bool JumpIfFalseInst::equal(const Instruction* inst) const {
-    return false;
+    const JumpIfFalseInst* other_ptr = dynamic_cast<const JumpIfFalseInst*>(inst);
+    if (other_ptr == nullptr) return false;
+    return this->offset == other_ptr->offset;
 }
-
-
 
 
 std::string JumpIfFalseInst::to_string() const {
