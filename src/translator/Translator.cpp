@@ -76,7 +76,11 @@ void Translator::visit(FunctionNode& node) {
     Code body_code;
     node.body->accept(*this);
     body_code = this->code;
-    out.push_back(I_PUSHF(node.parameter_names, body_code, node.free_variables));
+    std::vector<std::string> closure;
+    for (auto fv: node.free_variables) {
+        closure.push_back(fv.first);
+    }
+    out.push_back(I_PUSHF(node.parameter_names, body_code, closure));
     out.push_back(I_SET(node.identifier));
     this->code = out;
 }
