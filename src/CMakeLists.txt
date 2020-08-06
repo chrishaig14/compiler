@@ -121,4 +121,4 @@ add_library(srcLib
         vm/StringObject.h
         vm/Environment.h
         vm/Environment.cpp
-        vm/UserObject.cpp vm/UserObject.h instructions/MakeObjectInst.cpp instructions/MakeObjectInst.h instructions/MakeListInst.cpp instructions/MakeListInst.h vm/ListObject.cpp vm/ListObject.h)
+        vm/UserObject.cpp vm/UserObject.h instructions/MakeObjectInst.cpp instructions/MakeObjectInst.h instructions/MakeListInst.cpp instructions/MakeListInst.h vm/ListObject.cpp vm/ListObject.h instructions/JumpIfFalseInst.cpp instructions/JumpIfFalseInst.h instructions/PushBooleanInst.cpp instructions/PushBooleanInst.h vm/BooleanObject.cpp vm/BooleanObject.h)

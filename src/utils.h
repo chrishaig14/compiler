@@ -32,6 +32,7 @@ typedef std::vector<Instruction*> Code;
 #define FUN(a, b, c, d, e) new FunctionNode(a,b,c,d,e)
 
 #define I_CALL new CallInst()
+#define I_PUSHB(x) new PushBooleanInst(x)
 #define I_PUSHI(x) new PushIntegerInst(x)
 #define I_PUSHS(x) new PushStringInst(x)
 #define I_PUSHF(parameter_names, body, free_vars) new PushFunctionInst(parameter_names, body, free_vars)
@@ -46,5 +47,6 @@ typedef std::vector<Instruction*> Code;
 #define I_MAKE_OBJECT(a,b) new MakeObjectInst(a,b)
 #define I_BIN(op) new BinopInst(op)
 #define I_RET new ReturnInst()
+#define I_JUMPF(offset) new JumpIfFalseInst(offset)
 
 #endif //UNTITLED1_UTILS_H

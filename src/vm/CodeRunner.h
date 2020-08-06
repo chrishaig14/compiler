@@ -18,6 +18,7 @@
 #include "ListObject.h"
 #include "CodeObject.h"
 #include "UserObject.h"
+#include "BooleanObject.h"
 
 class CodeRunner : public InstructionVisitor {
 public:
@@ -139,6 +140,21 @@ public:
             list[i] = this->stack.pop();
         }
         this->stack.push(new ListObject(list));
+        this->inst_ptr++;
+    }
+
+    void visit(JumpIfFalseInst& inst) override {
+        Object* tos = this->stack.pop();
+        BooleanObject* boolean_ptr = dynamic_cast<BooleanObject*>(tos);
+        if (!boolean_ptr->boolean) {
+            this->inst_ptr += inst.offset;
+        } else {
+            this->inst_ptr++;
+        }
+    }
+
+    void visit(PushBooleanInst& inst) override {
+        this->stack.push(new BooleanObject(inst.boolean));
         this->inst_ptr++;
     }
 

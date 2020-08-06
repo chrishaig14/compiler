@@ -17,9 +17,13 @@ class GetMemberInst;
 
 class GetSubscriptInst;
 
+class JumpIfFalseInst;
+
 class MakeListInst;
 
 class MakeObjectInst;
+
+class PushBooleanInst;
 
 class PushFunctionInst;
 
@@ -48,9 +52,13 @@ public:
 
     virtual void visit(GetSubscriptInst& inst) = 0;
 
+    virtual void visit(JumpIfFalseInst& inst) = 0;
+
     virtual void visit(MakeListInst& inst) = 0;
 
     virtual void visit(MakeObjectInst& inst) = 0;
+
+    virtual void visit(PushBooleanInst& inst) = 0;
 
     virtual void visit(PushFunctionInst& inst) = 0;
 
