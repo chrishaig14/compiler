@@ -11,5 +11,5 @@ add_executable(runTests
         parser_test.cpp
         global_processor_test.cpp
         checker_test.cpp
-        translator_test.cpp)
+        translator_test.cpp total_test.cpp)
 target_link_libraries(runTests gtest gtest_main pthread srcLib)

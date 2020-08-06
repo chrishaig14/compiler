@@ -12,6 +12,7 @@
 #include "GetMemberInst.h"
 #include "GetSubscriptInst.h"
 #include "JumpIfFalseInst.h"
+#include "MakeClassInst.h"
 #include "MakeListInst.h"
 #include "MakeObjectInst.h"
 #include "PushBooleanInst.h"

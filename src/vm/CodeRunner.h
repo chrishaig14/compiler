@@ -27,6 +27,7 @@ public:
     size_t inst_ptr;
     ObjectStack& stack;
     Environment* env;
+    std::map<std::string, std::vector<std::string>> classes;
 
     CodeRunner(Code& code, ObjectStack& stack, std::map<std::string, Object*> closure) : code(code), stack(stack) {
         std::cout << "New code runner" << std::endl;
@@ -144,8 +145,14 @@ public:
 
     void visit(PushFunctionInst& inst) override {
         std::cout << "Run [" << inst.to_string() << "]" << std::endl;
-
-        this->stack.push(new CodeObject(new CodeUser(inst.body, inst.free_variables)));
+        Code function_body = inst.body;
+        Code get_parameters;
+        for (int i = inst.parameter_names.size() - 1; i >= 0; i--) {
+            Code param_code = {I_DECL(inst.parameter_names[i]), I_SET(inst.parameter_names[i])};
+            get_parameters.insert(get_parameters.end(), param_code.begin(), param_code.end());
+        }
+        function_body.insert(function_body.begin(), get_parameters.begin(), get_parameters.end());
+        this->stack.push(new CodeObject(new CodeUser(function_body, inst.free_variables)));
         this->inst_ptr++;
     }
 
@@ -196,7 +203,7 @@ public:
     void visit(MakeObjectInst& inst) override {
         std::cout << "Run [" << inst.to_string() << "]" << std::endl;
 
-        this->stack.push(new UserObject(inst.type, inst.fields));
+        this->stack.push(new UserObject(inst.type, this->classes[inst.type]));
         this->inst_ptr++;
     }
 
@@ -230,6 +237,11 @@ public:
         std::cout << "Run [" << inst.to_string() << "]" << std::endl;
 
         this->stack.push(new BooleanObject(inst.boolean));
+        this->inst_ptr++;
+    }
+
+    void visit(MakeClassInst& inst) override {
+        this->classes[inst.identifier] = inst.fields;
         this->inst_ptr++;
     }
 

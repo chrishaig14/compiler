@@ -19,6 +19,7 @@ public:
 
     Code body;
     std::vector<std::string> free_variables;
+    std::vector<std::string> parameter_names;
 public:
 
     bool equal(const Instruction* inst) const {
@@ -40,8 +41,6 @@ public:
 
     void accept(InstructionVisitor& visitor);
 
-private:
-    std::vector<std::string> parameter_names;
 };
 
 

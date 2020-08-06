@@ -19,6 +19,8 @@ class GetSubscriptInst;
 
 class JumpIfFalseInst;
 
+class MakeClassInst;
+
 class MakeListInst;
 
 class MakeObjectInst;
@@ -53,6 +55,8 @@ public:
     virtual void visit(GetSubscriptInst& inst) = 0;
 
     virtual void visit(JumpIfFalseInst& inst) = 0;
+
+    virtual void visit(MakeClassInst& inst) = 0;
 
     virtual void visit(MakeListInst& inst) = 0;
 

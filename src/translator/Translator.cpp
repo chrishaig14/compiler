@@ -56,7 +56,13 @@ void Translator::visit(CallNode& node) {
 }
 
 void Translator::visit(ClassNode& node) {
-
+    Code out;
+    std::vector<std::string> f;
+    for (auto field: node.fields) {
+        f.push_back(field->identifier);
+    }
+    out.push_back(I_MAKE_CLASS(node.identifier, f));
+    this->code = out;
 }
 
 void Translator::visit(DeclarationNode& node) {

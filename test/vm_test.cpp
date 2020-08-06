@@ -117,7 +117,7 @@ TEST(vm_test, inst_call_user) {
 TEST(vm_test, inst_make_object) {
     std::vector<std::string> f = {"foo", "bar"};
     Code main_code = {
-            I_MAKE_OBJECT("Foo", f),
+            I_MAKE_OBJECT("Foo"),
     };
     ObjectStack stack;
     CodeRunner code_runner(main_code, stack, {});
@@ -136,7 +136,7 @@ TEST(vm_test, inst_set_member) {
     std::vector<std::string> f = {"foo", "bar"};
     Code main_code = {
             I_DECL("x"),
-            I_MAKE_OBJECT("Foo", f),
+            I_MAKE_OBJECT("Foo"),
             I_SET("x"),
             I_PUSHI(7),
             I_GET("x"),
@@ -155,7 +155,7 @@ TEST(vm_test, inst_get_member) {
     std::vector<std::string> f = {"foo", "bar"};
     Code main_code = {
             I_DECL("x"),
-            I_MAKE_OBJECT("Foo", f),
+            I_MAKE_OBJECT("Foo"),
             I_SET("x"),
             I_PUSHI(7),
             I_GET("x"),

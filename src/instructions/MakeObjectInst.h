@@ -12,9 +12,8 @@
 
 class MakeObjectInst : public Instruction {
 public:
-    MakeObjectInst(std::string type, std::vector<std::string> fields) {
+    MakeObjectInst(std::string type) {
         this->type = type;
-        this->fields = fields;
     }
 
 public:
@@ -23,10 +22,7 @@ public:
     }
 
     std::string to_string() const override {
-        std::string st = "MAKE_OBJECT " + this->type + " : ";
-        for (auto f: this->fields) {
-            st += f;
-        }
+        std::string st = "MAKE_OBJECT " + this->type;
         return st;
     }
 
