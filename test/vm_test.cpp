@@ -96,8 +96,7 @@ TEST(vm_test, inst_call_user) {
             I_RET};
     BuiltinSum builtin_sum_function;
 
-    std::map<std::string, int> free_variables;
-    free_variables["__sum__"] = 1;
+    std::vector<std::string> free_variables = {"__sum__"};
 
     Code main_code = {
             I_PUSHF(std::vector<std::string>(), user_function_code, free_variables),
@@ -238,5 +237,41 @@ TEST(vm_test, inst_jump_if_false_no) {
     EXPECT_TRUE(tos->equal(new IntegerObject(9)));
     EXPECT_TRUE(stack.empty());
     EXPECT_TRUE(code_runner.env->get("x")->equal(new IntegerObject(7)));
+    EXPECT_TRUE(stack.empty());
+}
+
+TEST(vm_test, inst_factorial_test) {
+    Code factorial_code = {
+            I_DECL("n"),
+            I_SET("n"),
+            I_GET("n"),
+            I_PUSHI(1),
+            I_BIN(OpType::EQ),
+            I_JUMPF(3),
+            I_PUSHI(1),
+            I_RET,
+            I_GET("n"),
+            I_GET("n"),
+            I_PUSHI(1),
+            I_BIN(OpType::SUB),
+            I_GET("factorial"),
+            I_CALL,
+            I_BIN(OpType::MUL),
+            I_RET,
+    };
+    std::vector<std::string> free_vars = {"factorial"};
+    Code main_code = {
+            I_DECL("factorial"),
+            I_PUSHF(std::vector<std::string>(), factorial_code, free_vars),
+            I_SET("factorial"),
+            I_PUSHI(12),
+            I_GET("factorial"),
+            I_CALL
+    };
+    ObjectStack stack;
+    CodeRunner code_runner(main_code, stack, {});
+    code_runner.run();
+    Object* tos = stack.pop();
+    EXPECT_TRUE(tos->equal(new IntegerObject(479001600)));
     EXPECT_TRUE(stack.empty());
 }

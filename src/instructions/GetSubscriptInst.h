@@ -17,11 +17,12 @@ class GetSubscriptInst : public Instruction {
         return true;
     }
 
+    void accept(InstructionVisitor& visitor);
+
+public:
     std::string to_string() const {
         return "GET_SUBSCRIPT";
     }
-
-    void accept(InstructionVisitor& visitor);
 };
 
 

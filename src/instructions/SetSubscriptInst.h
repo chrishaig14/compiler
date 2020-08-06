@@ -19,6 +19,7 @@ class SetSubscriptInst : public Instruction {
 
     void accept(InstructionVisitor& visitor);
 
+public:
     std::string to_string() const {
         return "SET_SUBSCRIPT";
     }

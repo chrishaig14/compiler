@@ -15,10 +15,10 @@
 class PushFunctionInst : public Instruction {
 public:
     PushFunctionInst(const std::vector<std::string>& parameterNames, const Code& body,
-                     const std::map<std::string, int>& freeVariables);
+                     const std::vector<std::string>& freeVariables);
 
     Code body;
-    std::map<std::string, int> free_variables;
+    std::vector<std::string> free_variables;
 public:
 
     bool equal(const Instruction* inst) const {

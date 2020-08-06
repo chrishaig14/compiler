@@ -5,7 +5,7 @@
 #include "PushFunctionInst.h"
 
 PushFunctionInst::PushFunctionInst(const std::vector<std::string>& parameterNames, const Code& body,
-                                   const std::map<std::string, int>& freeVariables) : parameter_names(parameterNames),
+                                   const std::vector<std::string>& freeVariables) : parameter_names(parameterNames),
                                                                                       body(body),
                                                                                       free_variables(freeVariables) {}
 

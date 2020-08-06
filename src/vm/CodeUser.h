@@ -11,9 +11,9 @@
 class CodeUser {
 public:
     Code code;
-    std::map<std::string, Object*> closure;
+    std::vector<std::string> closure;
 
-    CodeUser(Code code, std::map<std::string, Object*> closure);
+    CodeUser(Code code, std::vector<std::string> closure);
 
     Instruction* get(int i);
 

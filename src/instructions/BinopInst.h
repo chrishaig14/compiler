@@ -12,7 +12,6 @@
 #include "InstructionVisitor.h"
 
 class BinopInst : public Instruction {
-    OpType op;
 public:
     BinopInst(OpType op);
 
@@ -21,6 +20,8 @@ public:
     std::string to_string() const override;
 
     void accept(InstructionVisitor& visitor);
+
+    OpType op;
 };
 
 
