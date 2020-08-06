@@ -198,3 +198,45 @@ TEST(vm_test, inst_make_list) {
     EXPECT_TRUE(list->list[4]->equal(new IntegerObject(3)));
     EXPECT_TRUE(list->list[5]->equal(new IntegerObject(5)));
 }
+
+TEST(vm_test, inst_jump_if_false_yes) {
+    Code main_code = {
+            I_DECL("x"),
+            I_PUSHI(3),
+            I_SET("x"),
+            I_PUSHB(false),
+            I_JUMPF(3),
+            I_PUSHI(7),
+            I_SET("x"),
+            I_PUSHI(9),
+    };
+    ObjectStack stack;
+    CodeRunner code_runner(main_code, stack, {});
+    code_runner.run();
+    Object* tos = stack.pop();
+    EXPECT_TRUE(tos->equal(new IntegerObject(9)));
+    EXPECT_TRUE(stack.empty());
+    EXPECT_TRUE(code_runner.env->get("x")->equal(new IntegerObject(3)));
+    EXPECT_TRUE(stack.empty());
+}
+
+TEST(vm_test, inst_jump_if_false_no) {
+    Code main_code = {
+            I_DECL("x"),
+            I_PUSHI(3),
+            I_SET("x"),
+            I_PUSHB(true),
+            I_JUMPF(3),
+            I_PUSHI(7),
+            I_SET("x"),
+            I_PUSHI(9),
+    };
+    ObjectStack stack;
+    CodeRunner code_runner(main_code, stack, {});
+    code_runner.run();
+    Object* tos = stack.pop();
+    EXPECT_TRUE(tos->equal(new IntegerObject(9)));
+    EXPECT_TRUE(stack.empty());
+    EXPECT_TRUE(code_runner.env->get("x")->equal(new IntegerObject(7)));
+    EXPECT_TRUE(stack.empty());
+}
