@@ -102,6 +102,72 @@ Node* Parser::parse_function_expression() {
     return nullptr;
 }
 
+Node* Parser::parse_id_or_class_literal() {
+    Node* node = nullptr;
+    std::string identifier = this->token.str;
+    this->next();
+    if (this->match(TokenType::LCURLY)) {
+        this->next();
+        std::map<std::string, Node*> initializers;
+        if (!this->match(TokenType::RCURLY)) {
+//            this->next();
+            Node* expression = this->parse_expression();
+            IdNode* id_ptr = dynamic_cast<IdNode*>(expression);
+            bool is_expression_initializer = false;
+            if (id_ptr != nullptr) {
+//                        it may be an expression or if a colon follows the name of a field
+                if (this->match(TokenType::COLON)) {
+                    is_expression_initializer = false;
+                } else {
+                    is_expression_initializer = true;
+                }
+            }
+            if (is_expression_initializer) {
+// its an expression
+                std::vector<Node*> initializers;
+                initializers.push_back(expression);
+                if (!this->match(TokenType::RCURLY)) {
+                    this->expect_token(TokenType::COMMA);
+                    while (true) {
+                        expression = this->parse_expression();
+                        initializers.push_back(expression);
+                        if (this->match(TokenType::COMMA)) {
+                            this->next();
+                        } else {
+                            break;
+                        }
+                    }
+                    this->expect_token(TokenType::RCURLY);
+                    node = new ClassLiteralExpressionNode(identifier, initializers);
+                }
+            } else {
+                std::string field_id = id_ptr->identifier;
+                std::map<std::string, Node*> initializers;
+                while (true) {
+                    this->expect_token(TokenType::COLON);
+                    expression = this->parse_expression();
+                    initializers[field_id] = expression;
+                    if (this->match(TokenType::COMMA)) {
+                        this->next();
+                        Token field = this->expect_token(TokenType::ID);
+                        field_id = field.str;
+                    } else {
+                        break;
+                    }
+                }
+                this->expect_token(TokenType::RCURLY);
+                node = new ClassLiteralFieldNode(identifier, initializers);
+            }
+        } else {
+            node = new ClassLiteralExpressionNode(identifier, {});
+        }
+
+    } else {
+        node = new IdNode(identifier);
+    }
+    return node;
+}
+
 Node* Parser::parse_id_or_literal() {
     Node* node;
     switch (this->token.type) {
@@ -112,8 +178,7 @@ Node* Parser::parse_id_or_literal() {
             break;
         }
         case TokenType::ID: {
-            node = new IdNode(this->token.str);
-            this->next();
+            node = this->parse_id_or_class_literal();
             break;
         }
         case TokenType::NUM: {

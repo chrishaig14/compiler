@@ -9,6 +9,8 @@
 #include "AssignmentNode.h"
 #include "BinopNode.h"
 #include "CallNode.h"
+#include "ClassLiteralExpressionNode.h"
+#include "ClassLiteralFieldNode.h"
 #include "ClassNode.h"
 #include "DeclarationNode.h"
 #include "FunctionNode.h"

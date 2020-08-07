@@ -63,6 +63,10 @@ public:
     bool is_lvalue;
 
     Translator();
+
+    void visit(ClassLiteralExpressionNode& node) override;
+
+    void visit(ClassLiteralFieldNode& node) override;
 };
 
 

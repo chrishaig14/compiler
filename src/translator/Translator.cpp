@@ -190,3 +190,11 @@ void Translator::visit(TypeNode& node) {
 }
 
 Translator::Translator() : is_lvalue(false) {}
+
+void Translator::visit(ClassLiteralExpressionNode& node) {
+
+}
+
+void Translator::visit(ClassLiteralFieldNode& node) {
+
+}

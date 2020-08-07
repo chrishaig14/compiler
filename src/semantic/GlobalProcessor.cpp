@@ -91,5 +91,13 @@ void GlobalProcessor::visit(BlockNode& node) {
     }
 }
 
+void GlobalProcessor::visit(ClassLiteralExpressionNode& node) {
+
+}
+
+void GlobalProcessor::visit(ClassLiteralFieldNode& node) {
+
+}
+
 
 

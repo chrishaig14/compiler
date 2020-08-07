@@ -51,6 +51,10 @@ public:
     void visit(VectorOfNodes program);
 
     void visit(BlockNode& node) override;
+
+    void visit(ClassLiteralExpressionNode& node) override;
+
+    void visit(ClassLiteralFieldNode& node) override;
 };
 
 #endif //UNTITLED1_GLOBALPROCESSOR_H

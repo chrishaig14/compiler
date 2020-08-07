@@ -23,6 +23,9 @@ typedef std::vector<Instruction*> Code;
 #define ASN(lvalue, rvalue) new AssignmentNode(lvalue, rvalue)
 #define SUB(parent, child) new SubscriptNode(parent, child)
 #define DECL(id, type, exp) new DeclarationNode(id, type, exp)
+#define LIT_EXP(id, type) new ClassLiteralExpressionNode(id, type)
+#define LIT_FIL(id, type) new ClassLiteralFieldNode(id, type)
+
 #define TYPE(parent, type_parameters) new TypeNode(parent, type_parameters)
 #define T_BOOL new TypeNode("Boolean", {})
 #define T_INT new TypeNode("Integer", {})

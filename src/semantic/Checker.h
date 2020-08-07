@@ -77,6 +77,10 @@ public:
 
     void visit(BlockNode& node) override;
 
+    void visit(ClassLiteralExpressionNode& node) override;
+
+    void visit(ClassLiteralFieldNode& node) override;
+
 
 };
 

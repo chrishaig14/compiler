@@ -13,6 +13,10 @@ class BlockNode;
 
 class CallNode;
 
+class ClassLiteralExpressionNode;
+
+class ClassLiteralFieldNode;
+
 class ClassNode;
 
 class DeclarationNode;
@@ -46,6 +50,11 @@ public:
     virtual void visit(BlockNode& node) = 0;
 
     virtual void visit(CallNode& node) = 0;
+
+    virtual void visit(ClassLiteralExpressionNode& node) = 0;
+
+    virtual void visit(ClassLiteralFieldNode& node) = 0;
+
 
     virtual void visit(ClassNode& node) = 0;
 

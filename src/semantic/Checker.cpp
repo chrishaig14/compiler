@@ -214,3 +214,11 @@ void Checker::visit(BlockNode& program) {
     }
     this->rv = semantic_info;
 }
+
+void Checker::visit(ClassLiteralExpressionNode& node) {
+
+}
+
+void Checker::visit(ClassLiteralFieldNode& node) {
+
+}

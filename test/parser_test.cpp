@@ -235,6 +235,66 @@ TEST(parser_test, function_with_params_and_body) {
 
 }
 
+TEST(parser_test, class_literal_exp) {
+    std::string text = "Person{name, 27*32}";
+    Scanner scanner(text);
+    std::vector<Token> tokens = scanner.scan_all();
+    Parser parser(tokens);
+    Node* node = parser.parse_id_or_class_literal();
+    std::vector<Node*> init = {ID("name"), BIN(OpType::MUL, NUM(27), NUM(32))};
+    auto expected_node = LIT_EXP("Person", init);
+    COMPLETE_TEST;
+}
+
+TEST(parser_test, class_literal_fil) {
+    std::string text = "Person{name: name, age: 27*32}";
+    Scanner scanner(text);
+    std::vector<Token> tokens = scanner.scan_all();
+    Parser parser(tokens);
+    Node* node = parser.parse_id_or_class_literal();
+    std::map<std::string, Node*> init = {{"name", ID("name")},
+                                         {"age",  BIN(OpType::MUL, NUM(27), NUM(32))}};
+    auto expected_node = LIT_FIL("Person", init);
+    COMPLETE_TEST;
+}
+
+TEST(parser_test, class_literal_empty_ok) {
+    std::string text = "Person{}";
+    Scanner scanner(text);
+    std::vector<Token> tokens = scanner.scan_all();
+    Parser parser(tokens);
+    Node* node = parser.parse_id_or_class_literal();
+    std::vector<Node*> init = {};
+    auto expected_node = LIT_EXP("Person", init);
+    COMPLETE_TEST;
+}
+
+TEST(parser_test, class_literal_error_1) {
+    std::string text = "Person{name: \"John\", age}";
+    Scanner scanner(text);
+    std::vector<Token> tokens = scanner.scan_all();
+    Parser parser(tokens);
+    try {
+        Node* node = parser.parse_id_or_class_literal();
+        FAIL() << "Didn't throw UnexpectedToken";
+    } catch (const UnexpectedToken& e) {
+
+    }
+}
+
+TEST(parser_test, class_literal_error_2) {
+    std::string text = "Person{name, age: 32}";
+    Scanner scanner(text);
+    std::vector<Token> tokens = scanner.scan_all();
+    Parser parser(tokens);
+    try {
+        Node* node = parser.parse_id_or_class_literal();
+        FAIL() << "Didn't throw UnexpectedToken";
+    } catch (const UnexpectedToken& e) {
+
+    }
+}
+
 TEST(parser_test, function_with_params_return_type_and_body) {
     std::string text = FUN_FOO_STRING;
     Scanner scanner(text);
