@@ -159,6 +159,7 @@ Node* Parser::parse_id_or_class_literal() {
                 node = new ClassLiteralFieldNode(identifier, initializers);
             }
         } else {
+            this->next();
             node = new ClassLiteralExpressionNode(identifier, {});
         }
 
