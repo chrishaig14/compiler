@@ -12,18 +12,8 @@
 #include "../nodes/nodes.h"
 #include "../utils.h"
 #include <iostream>
+#include "UnexpectedToken.h"
 
-
-class UnexpectedToken : public std::runtime_error {
-    Token token;
-    std::vector<TokenType> expected_tokens;
-public:
-    UnexpectedToken(Token token, const std::vector<TokenType>& expected_tokens);
-
-    std::string make_message(Token token, const std::vector<TokenType>& expected_tokens);
-
-    friend std::ostream& operator<<(std::ostream& os, const UnexpectedToken& unexpected_token);
-};
 
 class Parser {
     std::vector<Token> tokens;
@@ -32,14 +22,9 @@ class Parser {
 public:
     Parser(std::vector<Token>& tokens);
 
-    void expect_one_of(std::vector<TokenType> expected_tokens);
-
     bool match(TokenType type);
 
     void next();
-
-
-    CallNode* parse_call();
 
     ClassNode* parse_class_definition();
 
@@ -71,11 +56,7 @@ public:
 
     Node* parse_function_expression();
 
-    Node* parse_id_call_or_subscript();
-
     Node* parse_id_or_literal();
-
-    Node* parse_interface_definition();
 
     Node* parse_mul_or_div_expression();
 
@@ -85,7 +66,7 @@ public:
 
     ReturnNode* parse_return();
 
-    Token expect_token(TokenType token);
+    Token expect_token(TokenType token_type);
 
     TypeNode* parse_type_node();
 

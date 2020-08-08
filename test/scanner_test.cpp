@@ -42,8 +42,7 @@ Token st_VAR = Token(TokenType::VAR, -1, -1);
 Token st_IF = Token(TokenType::IF, -1, -1);
 Token st_ELSE = Token(TokenType::ELSE, -1, -1);
 Token st_END = Token(TokenType::END, -1, -1);
-Token st_CLASS = Token(TokenType::CLASS, -1, -1);
-Token st_INTERFACE = Token(TokenType::INTERFACE, -1, -1);
+Token st_CLASS = Token(TokenType::STRUCT, -1, -1);
 Token st_DOT = Token(TokenType::DOT, -1, -1);
 Token st_COMMA = Token(TokenType::COMMA, -1, -1);
 Token st_RSQUARE = Token(TokenType::RSQUARE, -1, -1);
@@ -66,9 +65,7 @@ Token t_ELSE(int line, int column) { return Token(TokenType::ELSE, line, column)
 
 Token t_END(int line, int column) { return Token(TokenType::END, line, column); }
 
-Token t_CLASS(int line, int column) { return Token(TokenType::CLASS, line, column); }
-
-Token t_INTERFACE(int line, int column) { return Token(TokenType::INTERFACE, line, column); }
+Token t_CLASS(int line, int column) { return Token(TokenType::STRUCT, line, column); }
 
 Token t_DOT(int line, int column) { return Token(TokenType::DOT, line, column); }
 
@@ -295,14 +292,14 @@ TEST(scanner_test, test_token_keyword_position_1) {
     std::string text = "class";
     Scanner scanner(text);
     Token token = scanner.get_next();
-    EXPECT_EQ(token, Token(TokenType::CLASS, 0, 0));
+    EXPECT_EQ(token, Token(TokenType::STRUCT, 0, 0));
 }
 
 TEST(scanner_test, test_token_keyword_position_2) {
     std::string text = "class fun";
     Scanner scanner(text);
     Token token = scanner.get_next();
-    EXPECT_EQ(token, Token(TokenType::CLASS, 0, 0));
+    EXPECT_EQ(token, Token(TokenType::STRUCT, 0, 0));
     token = scanner.get_next();
     EXPECT_EQ(token, Token(TokenType::FUN, 0, 6));
 }
@@ -311,7 +308,7 @@ TEST(scanner_test, test_token_keyword_position_3) {
     std::string text = "class\n\n\nfun";
     Scanner scanner(text);
     Token token = scanner.get_next();
-    EXPECT_EQ(token, Token(TokenType::CLASS, 0, 0));
+    EXPECT_EQ(token, Token(TokenType::STRUCT, 0, 0));
     token = scanner.get_next();
     EXPECT_EQ(token, Token(TokenType::FUN, 3, 0));
 }

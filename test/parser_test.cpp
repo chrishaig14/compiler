@@ -5,6 +5,7 @@
 #include <gtest/gtest.h>
 #include <scanner/Scanner.h>
 #include <parser/Parser.h>
+#include <parser/UnexpectedToken.h>
 
 
 #define BODY_NODE new BlockNode({ASN(ID("x"), BIN(OpType::ADD, ID("a"), ID("b"))),ASN(ID("x"), ID("y"))})

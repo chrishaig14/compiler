@@ -81,9 +81,8 @@ void initialize_token_strings() {
     TOKEN_STRINGS[TokenType::STRING] = "string";
     TOKEN_STRINGS[TokenType::FUN] = "fun";
     TOKEN_STRINGS[TokenType::RETURN] = "return";
-    TOKEN_STRINGS[TokenType::CLASS] = "class";
+    TOKEN_STRINGS[TokenType::STRUCT] = "struct";
     TOKEN_STRINGS[TokenType::IF] = "if";
-    TOKEN_STRINGS[TokenType::INTERFACE] = "interface";
     TOKEN_STRINGS[TokenType::ELSE] = "else";
     TOKEN_STRINGS[TokenType::FOR] = "for";
     TOKEN_STRINGS[TokenType::VAR] = "var";
