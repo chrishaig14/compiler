@@ -8,6 +8,8 @@
 #include "BinopInst.h"
 #include "CallInst.h"
 #include "DeclareInst.h"
+#include "DefineStructInst.h"
+#include "MakeDefaultInst.h"
 #include "GetInst.h"
 #include "GetMemberInst.h"
 #include "GetSubscriptInst.h"

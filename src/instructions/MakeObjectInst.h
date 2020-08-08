@@ -12,8 +12,9 @@
 
 class MakeObjectInst : public Instruction {
 public:
-    MakeObjectInst(std::string type) {
+    MakeObjectInst(std::string type, std::vector<std::string> fields) {
         this->type = type;
+        this->fields = fields;
     }
 
 public:

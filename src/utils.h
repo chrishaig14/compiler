@@ -25,7 +25,7 @@ typedef std::vector<Instruction*> Code;
 #define DECL(id, type, exp) new DeclarationNode(id, type, exp)
 #define LIT_EXP(id, type) new ClassLiteralExpressionNode(id, type)
 #define LIT_FIL(id, type) new ClassLiteralFieldNode(id, type)
-
+typedef std::map<std::string, std::map<std::string, Code>> StructProtos;
 #define TYPE(parent, type_parameters) new TypeNode(parent, type_parameters)
 #define T_BOOL new TypeNode("Boolean", {})
 #define T_INT new TypeNode("Integer", {})
@@ -48,7 +48,7 @@ typedef std::vector<Instruction*> Code;
 #define I_GET(x) new GetInst(x)
 #define I_DECL(x) new DeclareInst(x)
 #define I_MAKE_LIST(length) new MakeListInst(length)
-#define I_MAKE_OBJECT(a) new MakeObjectInst(a)
+#define I_MAKE_OBJECT(identifier, fields) new MakeObjectInst(identifier, fields)
 #define I_BIN(op) new BinopInst(op)
 #define I_RET new ReturnInst()
 #define I_JUMPF(offset) new JumpIfFalseInst(offset)

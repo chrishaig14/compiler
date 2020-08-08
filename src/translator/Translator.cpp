@@ -34,6 +34,7 @@ void Translator::visit(BinopNode& node) {
 void Translator::visit(BlockNode& node) {
     Code out;
     for (auto n: node.nodes) {
+        this->code = {};
         n->accept(*this);
         Code node_code = this->code;
         out.insert(out.end(), node_code.begin(), node_code.end());
@@ -192,9 +193,25 @@ void Translator::visit(TypeNode& node) {
 Translator::Translator() : is_lvalue(false) {}
 
 void Translator::visit(ClassLiteralExpressionNode& node) {
-
+    Code all;
+    for(auto exp: node.init){
+        this->code = {};
+        exp->accept(*this);
+        Code out = this->code;
+        all.insert(all.end(), out.begin(), all.end());
+    }
+//    all.push_back(MakeObjectExpInst(node.identifier, node.init.size()));
+    this->code = all;
 }
 
 void Translator::visit(ClassLiteralFieldNode& node) {
-
+    Code all;
+    for(auto exp: node.init){
+        this->code = {};
+//        exp->accept(*this);
+        Code out = this->code;
+        all.insert(all.end(), out.begin(), all.end());
+    }
+//    all.push_back(MakeObjectExpInst(node.identifier, node.init.size()));
+    this->code = all;
 }

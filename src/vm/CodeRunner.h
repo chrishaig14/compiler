@@ -23,13 +23,14 @@
 class CodeRunner : public InstructionVisitor {
 public:
 
-    Code& code;
+    const Code& code;
     size_t inst_ptr;
     ObjectStack& stack;
     Environment* env;
     std::map<std::string, std::vector<std::string>> classes;
 
-    CodeRunner(Code& code, ObjectStack& stack, std::map<std::string, Object*> closure) : code(code), stack(stack) {
+    CodeRunner(const Code& code, std::map<std::string, std::map<std::string, Code>>& structs, ObjectStack& stack,
+               std::map<std::string, Object*> closure) : code(code), stack(stack), structs(structs) {
         std::cout << "New code runner" << std::endl;
         this->env = new Environment(nullptr);
         for (auto it: closure) {
@@ -104,7 +105,7 @@ public:
         if (code->type == CodeType::BUILTIN) {
             code->builtin->run(this->stack);
         } else {
-            CodeRunner code_runner(code->user->code, this->stack, {});
+            CodeRunner code_runner(code->user->code, this->structs, this->stack, {});
             for (auto v: code->user->closure) {
                 code_runner.env->declare(v);
                 code_runner.env->set(v, this->env->get(v));
@@ -202,8 +203,11 @@ public:
 
     void visit(MakeObjectInst& inst) override {
         std::cout << "Run [" << inst.to_string() << "]" << std::endl;
-
-        this->stack.push(new UserObject(inst.type, this->classes[inst.type]));
+        UserObject* obj = new UserObject(inst.type, inst.fields);
+        for(int i = inst.fields.size() - 1; i >= 0; i--){
+            obj->fields[inst.fields[i]] = this->stack.pop();
+        }
+        this->stack.push(obj);
         this->inst_ptr++;
     }
 
@@ -245,6 +249,30 @@ public:
         this->inst_ptr++;
     }
 
+    void visit(DefineStructInst& inst) override {
+        this->structs[inst.identifier] = inst.fields;
+        this->inst_ptr++;
+    }
+
+    void visit(MakeDefaultInst& inst) override {
+//        if (inst.identifier == "String") {
+//            this->stack.push(new StringObject(""));
+//        } else if (inst.identifier == "Integer") {
+//            this->stack.push(new IntegerObject());
+//        } else {
+//            auto proto = this->structs[inst.identifier];
+//            std::vector<std::string> names;
+//            for(auto f: proto){
+//                names.push_back(f.first);
+//                CodeRunner field_initializer(f.second,this->structs, this->stack, {});
+//            }
+//            UserObject* obj = new UserObject(inst.identifier, names);
+//            obj->fields;
+//        }
+//        this->inst_ptr++;
+    }
+
+    std::map<std::string, std::map<std::string, Code>>& structs;
 };
 
 

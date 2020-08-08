@@ -10,12 +10,12 @@
 #include "Visitor.h"
 
 class ClassLiteralExpressionNode : public Node {
-    std::string identifier;
-    std::vector<Node*> init;
 
 public:
     ClassLiteralExpressionNode(const std::string& identifier, const std::vector<Node*>& init);
 
+    std::vector<Node*> init;
+    std::string identifier;
 private:
     void accept(Visitor& visitor) override;
 

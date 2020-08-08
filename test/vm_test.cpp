@@ -12,7 +12,8 @@ static Object* value_7 = new IntegerObject(7);
 TEST(vm_test, inst_push_integer) {
     ObjectStack stack;
     Code code;
-    CodeRunner code_runner(code, stack, {});
+    StructProtos structs;
+    CodeRunner code_runner(code, structs, stack, {});
     PushIntegerInst inst(7);
     inst.accept(code_runner);
     EXPECT_TRUE(stack.top()->equal(value_7));
@@ -22,7 +23,8 @@ TEST(vm_test, inst_push_integer) {
 TEST(vm_test, inst_declare) {
     ObjectStack stack;
     Code code;
-    CodeRunner code_runner(code, stack, {});
+    StructProtos structs;
+    CodeRunner code_runner(code, structs, stack, {});
     DeclareInst inst("a");
     inst.accept(code_runner);
     EXPECT_TRUE(code_runner.env->is_declared("a"));
@@ -31,7 +33,8 @@ TEST(vm_test, inst_declare) {
 TEST(vm_test, inst_store) {
     ObjectStack stack;
     Code code;
-    CodeRunner code_runner(code, stack, {});
+    StructProtos structs;
+    CodeRunner code_runner(code, structs, stack, {});
     PushIntegerInst push_inst(7);
     DeclareInst declare_inst("a");
     SetInst set_inst("a");
@@ -45,7 +48,8 @@ TEST(vm_test, inst_store) {
 TEST(vm_test, inst_load) {
     ObjectStack stack;
     Code code;
-    CodeRunner code_runner(code, stack, {});
+    StructProtos structs;
+    CodeRunner code_runner(code, structs, stack, {});
 
     PushIntegerInst push_inst_7(7);
     PushIntegerInst push_inst_9(9);
@@ -65,8 +69,8 @@ TEST(vm_test, inst_call) {
     Code code;
     BuiltinSum builtinSum;
     Object* builtin_sum = new CodeObject(&builtinSum);
-
-    CodeRunner code_runner(code, stack, {{"__sum__", builtin_sum}});
+    StructProtos structs;
+    CodeRunner code_runner(code, structs, stack, {{"__sum__", builtin_sum}});
     Object* value_16 = new IntegerObject(16);
     PushIntegerInst push_inst_9(9);
     PushIntegerInst push_inst_7(7);
@@ -109,66 +113,10 @@ TEST(vm_test, inst_call_user) {
     };
     ObjectStack stack;
     Object* builtin_sum_object = new CodeObject(&builtin_sum_function);
-    CodeRunner code_runner(main_code, stack, {{"__sum__", builtin_sum_object}});
+    StructProtos structs;
+    CodeRunner code_runner(main_code, structs, stack, {{"__sum__", builtin_sum_object}});
     code_runner.run();
     EXPECT_TRUE(stack.top()->equal(new IntegerObject(21)));
-}
-
-TEST(vm_test, inst_make_object) {
-    std::vector<std::string> f = {"foo", "bar"};
-    Code main_code = {
-            I_MAKE_OBJECT("Foo"),
-    };
-    ObjectStack stack;
-    CodeRunner code_runner(main_code, stack, {});
-    code_runner.run();
-    Object* top = stack.pop();
-    UserObject* user_object = dynamic_cast<UserObject*>(top);
-    EXPECT_NE(user_object, nullptr);
-    EXPECT_EQ(user_object->type, "Foo");
-    EXPECT_TRUE(stack.empty());
-    std::map<std::string, Object*> expected_fields = {{"foo", nullptr},
-                                                      {"bar", nullptr}};
-    EXPECT_EQ(user_object->fields, expected_fields);
-}
-
-TEST(vm_test, inst_set_member) {
-    std::vector<std::string> f = {"foo", "bar"};
-    Code main_code = {
-            I_DECL("x"),
-            I_MAKE_OBJECT("Foo"),
-            I_SET("x"),
-            I_PUSHI(7),
-            I_GET("x"),
-            I_SETM("foo"),
-    };
-    ObjectStack stack;
-    CodeRunner code_runner(main_code, stack, {});
-    code_runner.run();
-    EXPECT_TRUE(stack.empty());
-    Object* top = code_runner.env->get("x");
-    UserObject* user_object = dynamic_cast<UserObject*>(top);
-    EXPECT_TRUE(user_object->fields["foo"]->equal(new IntegerObject(7)));
-}
-
-TEST(vm_test, inst_get_member) {
-    std::vector<std::string> f = {"foo", "bar"};
-    Code main_code = {
-            I_DECL("x"),
-            I_MAKE_OBJECT("Foo"),
-            I_SET("x"),
-            I_PUSHI(7),
-            I_GET("x"),
-            I_SETM("foo"),
-            I_GET("x"),
-            I_GETM("foo")
-    };
-    ObjectStack stack;
-    CodeRunner code_runner(main_code, stack, {});
-    code_runner.run();
-    Object* tos = stack.pop();
-    EXPECT_TRUE(stack.empty());
-    EXPECT_TRUE(tos->equal(new IntegerObject(7)));
 }
 
 TEST(vm_test, inst_make_list) {
@@ -183,7 +131,8 @@ TEST(vm_test, inst_make_list) {
             I_MAKE_LIST(6),
     };
     ObjectStack stack;
-    CodeRunner code_runner(main_code, stack, {});
+    StructProtos structs;
+    CodeRunner code_runner(main_code, structs, stack, {});
     code_runner.run();
     Object* tos = stack.pop();
     EXPECT_TRUE(stack.empty());
@@ -210,7 +159,8 @@ TEST(vm_test, inst_jump_if_false_yes) {
             I_PUSHI(9),
     };
     ObjectStack stack;
-    CodeRunner code_runner(main_code, stack, {});
+    StructProtos structs;
+    CodeRunner code_runner(main_code, structs, stack, {});
     code_runner.run();
     Object* tos = stack.pop();
     EXPECT_TRUE(tos->equal(new IntegerObject(9)));
@@ -231,7 +181,8 @@ TEST(vm_test, inst_jump_if_false_no) {
             I_PUSHI(9),
     };
     ObjectStack stack;
-    CodeRunner code_runner(main_code, stack, {});
+    StructProtos structs;
+    CodeRunner code_runner(main_code, structs, stack, {});
     code_runner.run();
     Object* tos = stack.pop();
     EXPECT_TRUE(tos->equal(new IntegerObject(9)));
@@ -269,9 +220,31 @@ TEST(vm_test, inst_factorial_test) {
             I_CALL
     };
     ObjectStack stack;
-    CodeRunner code_runner(main_code, stack, {});
+    StructProtos structs;
+    CodeRunner code_runner(main_code, structs, stack, {});
     code_runner.run();
     Object* tos = stack.pop();
     EXPECT_TRUE(tos->equal(new IntegerObject(479001600)));
     EXPECT_TRUE(stack.empty());
+}
+
+TEST(vm_test, struct_test_1) {
+    std::vector<std::string> fields = {"val", "str"};
+    Code main_code = {
+            I_PUSHI(10),
+            I_PUSHS("Hello"),
+            I_MAKE_OBJECT("foo", fields)
+    };
+    ObjectStack stack;
+    StructProtos structs;
+    CodeRunner code_runner(main_code, structs, stack, {});
+    code_runner.run();
+    Object* object = stack.pop();
+    EXPECT_TRUE(stack.empty());
+    UserObject* user_object = dynamic_cast<UserObject*>(object);
+    EXPECT_NE(user_object, nullptr);
+    EXPECT_EQ(user_object->fields.count("val"), 1);
+    EXPECT_EQ(user_object->fields.count("str"), 1);
+    EXPECT_TRUE(user_object->fields["val"]->equal(new IntegerObject(10)));
+    EXPECT_TRUE(user_object->fields["str"]->equal(new StringObject("Hello")));
 }
