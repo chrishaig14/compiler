@@ -242,6 +242,16 @@ void Checker::visit(ClassLiteralFieldNode& node) {
         throw std::runtime_error(
                 "Expected " + std::to_string(class_fields.size()) + " initializers, got " +
                 std::to_string(node.init.size()));
+    for (auto f: node.init) {
+        Node* exp = f.second;
+        exp->accept(*this);
+        SemanticInfo semanticInfo = this->rv;
+        if (*semanticInfo.symbol_info != *this->class_table->get(node.identifier)->fields[f.first]) {
+            throw std::runtime_error(
+                    "Field type doesn't match: " + f.first + " expected " + class_fields[f.first]->object_info->parent +
+                    " but got " + semanticInfo.symbol_info->object_info->parent);
+        }
+    }
     this->rv = SemanticInfo();
     rv.symbol_info = new SymbolInfo(new ObjectInfo(new TypeNode(node.identifier, {})));
 }
