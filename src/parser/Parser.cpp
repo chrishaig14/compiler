@@ -237,9 +237,10 @@ Node* Parser::parse_id_or_class_literal() {
                             break;
                         }
                     }
-                    this->expect_token(TokenType::RCURLY);
-                    node = new ClassLiteralExpressionNode(identifier, initializers);
+
                 }
+                this->expect_token(TokenType::RCURLY);
+                node = new ClassLiteralExpressionNode(identifier, initializers);
             } else {
                 std::string field_id = id_ptr->identifier;
                 std::map<std::string, Node*> initializers;
@@ -298,20 +299,18 @@ Node* Parser::parse_call_or_subscript_chain(Node* parent) {
 DeclarationNode* Parser::parse_variable_declaration() {
     this->expect_token(TokenType::VAR);
     Token identifier = this->expect_token(TokenType::ID);
-    if (!this->match(TokenType::COLON) && !this->match(TokenType::EQQ))
-        throw UnexpectedToken(this->token,
-                              {TokenType::EQQ,
-                               TokenType::COLON});
     TypeNode* type = nullptr;
     if (this->match(TokenType::COLON)) {
         this->next();
         type = this->parse_type_node();
     }
     Node* expression = nullptr;
-    if (this->match(TokenType::EQQ)) {
-        this->next();
-        expression = this->parse_expression();
+    try {
+        this->expect_token(TokenType::EQQ);
+    } catch(...){
+        throw std::runtime_error("Error: you must initialize all variables!");
     }
+    expression = this->parse_expression();
     DeclarationNode* node = new DeclarationNode(identifier.str, type, expression);
     return node;
 }

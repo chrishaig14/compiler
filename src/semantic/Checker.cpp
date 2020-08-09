@@ -9,8 +9,7 @@ Checker::Checker(SymbolTable* globals, ClassTable* class_table) {
     this->class_table = class_table;
     this->scope = globals;
     this->scopes["global"] = this->scope;
-    this->class_table->set("Integer",
-                           new ClassInfo(std::map<std::string, SymbolInfo*>(), std::map<std::string, FunctionInfo*>()));
+    this->class_table->set("Integer", new ClassInfo(std::vector<std::string>(), std::vector<SymbolInfo*>()));
 }
 
 void Checker::enter_scope(std::string name) {
@@ -82,9 +81,15 @@ void Checker::visit(DeclarationNode& n) {
             throw ReturnError(expression_info.symbol_info->object_info->parent, n.type->identifier);
         }
         semantic_info.free_variables = expression_info.free_variables;
+        semantic_info.symbol_info = expression_info.symbol_info;
+    } else if (n.expression != nullptr) {
+        n.expression->accept(*this);
+        SemanticInfo expression_info = this->rv;
+        semantic_info.free_variables = expression_info.free_variables;
+        semantic_info.symbol_info = expression_info.symbol_info;
     }
-    this->scope->set(n.identifier, new SymbolInfo(new ObjectInfo(n.type)));
     this->rv = semantic_info;
+    this->scope->set(n.identifier, semantic_info.symbol_info);
 }
 
 void Checker::visit(AssignmentNode& n) {
@@ -114,10 +119,6 @@ void Checker::visit(MemberNode& n) {
     if (class_info->fields.count(n.child) == 1) {
         // It's a field
         semantic_info.symbol_info = class_info->fields[n.child];
-        this->rv = semantic_info;
-    } else if (class_info->methods.count(n.child) == 1) {
-        // It's a method
-        semantic_info.symbol_info = new SymbolInfo(class_info->methods[n.child]);
         this->rv = semantic_info;
     } else {
         throw ScopeError(n.child);
@@ -207,9 +208,35 @@ void Checker::visit(BlockNode& program) {
 }
 
 void Checker::visit(ClassLiteralExpressionNode& node) {
-
+    if (!this->class_table->declared(node.identifier)) throw std::runtime_error("No struct named " + node.identifier);
+    auto class_fields = this->class_table->get(node.identifier)->fields;
+    if (class_fields.size() != node.init.size())
+        throw std::runtime_error(
+                "Expected " + std::to_string(class_fields.size()) + " initializers, got " +
+                std::to_string(node.init.size()));
+    for (int i = 0; i < node.init.size(); i++) {
+        Node* exp = node.init[i];
+        exp->accept(*this);
+        SemanticInfo semanticInfo = this->rv;
+        if (*semanticInfo.symbol_info != *this->class_table->get(node.identifier)->field_types[i]) {
+            throw std::runtime_error(
+                    "Field type doesn't match: " + this->class_table->get(node.identifier)->field_names[i]);
+        }
+    }
+    this->rv = SemanticInfo();
+    rv.symbol_info = new SymbolInfo(new ObjectInfo(new TypeNode(node.identifier, {})));
 }
 
 void Checker::visit(ClassLiteralFieldNode& node) {
-
+    if (!this->class_table->declared(node.identifier)) throw std::runtime_error("No struct named " + node.identifier);
+    auto class_fields = this->class_table->get(node.identifier)->fields;
+    for (auto f: node.init) {
+        if (class_fields.count(f.first) == 0) throw std::runtime_error("No field named " + f.first);
+    }
+    if (class_fields.size() != node.init.size())
+        throw std::runtime_error(
+                "Expected " + std::to_string(class_fields.size()) + " initializers, got " +
+                std::to_string(node.init.size()));
+    this->rv = SemanticInfo();
+    rv.symbol_info = new SymbolInfo(new ObjectInfo(new TypeNode(node.identifier, {})));
 }

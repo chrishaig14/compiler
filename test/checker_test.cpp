@@ -71,7 +71,7 @@ TEST(second_pass_test, fun_foo_cAomplete) {
 }
 
 TEST(second_pass_test, free_variable_test_1) {
-    std::string text = "var x: Integer; fun foo(y: Foo)->Integer{return x;}";
+    std::string text = "var x: Integer=0; fun foo(y: Foo)->Integer{return x;}";
     BlockNode* tree = get_treeA(text);
     GlobalProcessor gp;
     gp.visit(*tree);
@@ -88,7 +88,7 @@ TEST(second_pass_test, free_variable_test_1) {
 
 
 TEST(second_pass_test, free_variable_test_2) {
-    std::string text = "var x: Integer; fun foo(y: Foo)->Integer{var z: Integer = 1 + x;}";
+    std::string text = "var x: Integer=0; fun foo(y: Foo)->Integer{var z: Integer = 1 + x;}";
     BlockNode* tree = get_treeA(text);
     GlobalProcessor gp;
     gp.visit(*tree);
@@ -104,7 +104,7 @@ TEST(second_pass_test, free_variable_test_2) {
 }
 
 TEST(second_pass_test, free_variable_test_3) {
-    std::string text = "var x: Integer; fun foo(y: Foo)->Integer{if(y == 3){var z: Integer = 1 + x;}}";
+    std::string text = "var x: Integer=0; fun foo(y: Foo)->Integer{if(y == 3){var z: Integer = 1 + x;}}";
     BlockNode* tree = get_treeA(text);
     GlobalProcessor gp;
     gp.visit(*tree);
@@ -120,7 +120,7 @@ TEST(second_pass_test, free_variable_test_3) {
 }
 
 TEST(second_pass_test, free_variable_test_4) {
-    std::string text = "var x: Integer; fun foo(y: Foo)->Integer{if(y == 3){var z: Integer = 1 + y;}}";
+    std::string text = "var x: Integer=0; fun foo(y: Foo)->Integer{if(y == 3){var z: Integer = 1 + y;}}";
     BlockNode* tree = get_treeA(text);
     GlobalProcessor gp;
     gp.visit(*tree);
@@ -161,7 +161,7 @@ TEST(second_pass_test, FOFOOa) {
 }
 
 TEST(second_pass_test, FOFOaOa) {
-    std::string text = "fun foo(y: Foo)->String{var x:Integer;}";
+    std::string text = "fun foo(y: Foo)->String{var x:Integer=0;}";
     BlockNode* tree = get_treeA(text);
     GlobalProcessor gp;
     gp.visit(*tree);
@@ -172,22 +172,22 @@ TEST(second_pass_test, FOFOaOa) {
 
 
 TEST(second_pass_test, z_not_found_error) {
-    std::string text = "fun foo(y: Foo)->String{var x:Integer;if(y==1){if(z==2){return x;}}}";
+    std::string text = "fun foo(y: Foo)->String{var x:Integer=0;if(y==1){if(z==2){return x;}}}";
     ASSERT_THROWS_NOT_FOUND_ERROR("z");
 }
 
 TEST(second_pass_test, x_redeclare_in_inner_scope_ok) {
-    std::string text = "fun foo(y: Integer)->Integer{var x:Integer;if(y==1){if(y==2){var x:Integer; return x;}}}";
+    std::string text = "fun foo(y: Integer)->Integer{var x:Integer=0;if(y==1){if(y==2){var x:Integer=7; return x;}}}";
     ASSERT_OK();
 }
 
 TEST(second_pass_test, x_redeclare_in_same_scope_error) {
-    std::string text = "fun foo(y: Foo)->String{var x:Integer;var x:String; return x;}";
+    std::string text = "fun foo(y: Foo)->String{var x:Integer=0;var x:String=""; return x;}";
     ASSERT_THROWS_REDECLARED_ERROR("x");
 }
 
 TEST(second_pass_test, x_declare_in_inner_scope_and_use_outside_error) {
-    std::string text = "fun foo(y: Foo)->Integer{if(y==1){if(y==2){var x:Integer;return x;}}return x;}";
+    std::string text = "fun foo(y: Foo)->Integer{if(y==1){if(y==2){var x:Integer=0;return x;}}return x;}";
     ASSERT_THROWS_NOT_FOUND_ERROR("x");
 }
 
@@ -202,12 +202,12 @@ TEST(second_pass_test, function_return_type_ok) {
 }
 
 TEST(second_pass_test, function_argument_type_ok) {
-    std::string text = "fun foo(x: Integer) -> Integer {return x;} fun bar()->Integer{var y: Integer; return foo(y);}";
+    std::string text = "fun foo(x: Integer) -> Integer {return x;} fun bar()->Integer{var y: Integer=0; return foo(y);}";
     ASSERT_OK();
 }
 
 TEST(second_pass_test, function_argument_type_error) {
-    std::string text = "fun foo(x: Integer) -> Integer {return x;} fun bar()->Integer{var y: String; return foo(y);}";
+    std::string text = "fun foo(x: Integer) -> Integer {return x;} fun bar()->Integer{var y: String=\"\"; return foo(y);}";
     ASSERT_THROWS_BAD_ARGUMENTS();
 }
 
@@ -222,11 +222,21 @@ TEST(second_pass_test, declaration_type_error_2) {
 }
 
 TEST(second_pass_test, assignment_type_error_1) {
-    std::string text = "var x: String; x = 5;";
+    std::string text = "var x: String=\"\"; x = 5;";
     ASSERT_THROWS_RETURN_TYPE_ERROR("", "Integer", "String");
 }
 
 TEST(second_pass_test, assignment_type_error_2) {
-    std::string text = "var x: Integer;x = \"Hello\";";
+    std::string text = "var x: Integer=0;x = \"Hello\";";
     ASSERT_THROWS_RETURN_TYPE_ERROR("", "String", "Integer");
+}
+
+TEST(second_pass_test, class_literal_expression_ok) {
+    std::string text = "struct Foo{name: String;} var f = Foo{\"Hello\"};";
+    ASSERT_OK();
+}
+
+TEST(second_pass_test, class_literal_expression_error) {
+    std::string text = "struct Foo{name: String;} var f = Foo{25};";
+    ASSERT_OK();
 }

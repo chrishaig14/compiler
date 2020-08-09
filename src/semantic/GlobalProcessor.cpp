@@ -65,7 +65,10 @@ void GlobalProcessor::visit(TypeNode& node) {
 void GlobalProcessor::visit(StructNode& node) {
     ClassInfo* class_info = new ClassInfo();
     for (auto f: node.fields) {
-        class_info->fields[f.first] = new SymbolInfo(new ObjectInfo(f.second));
+        class_info->field_names.push_back(f.first);
+        auto w = new SymbolInfo(new ObjectInfo(f.second));
+        class_info->field_types.push_back(w);
+        class_info->fields[f.first] = w;
     }
     this->class_table->set(node.identifier, class_info);
 }

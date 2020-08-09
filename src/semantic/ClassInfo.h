@@ -13,31 +13,29 @@
 
 class ClassInfo {
 public:
+    std::vector<std::string> field_names;
+    std::vector<SymbolInfo*> field_types;
     std::map<std::string, SymbolInfo*> fields;
-    std::map<std::string, FunctionInfo*> methods;
 
-    ClassInfo(std::map<std::string, SymbolInfo*> fields,
-              std::map<std::string, FunctionInfo*> methods) {
-        this->fields = fields;
-        this->methods = methods;
-    }
 
     ClassInfo() {}
+
+    ClassInfo(const std::vector<std::string>& fieldNames, const std::vector<SymbolInfo*>& fieldTypes) : field_names(
+            fieldNames), field_types(fieldTypes) {
+        for (int i = 0; i < fieldNames.size(); i++) {
+            this->fields[fieldNames[i]] = fieldTypes[i];
+        }
+    }
 
     bool operator!=(const ClassInfo& b) const {
         return !(*this == b);
     }
 
     bool operator==(const ClassInfo& b) const {
-        if (this->methods.size() != b.methods.size()) return false;
-        for (auto it : this->methods) {
-            if (b.methods.count(it.first) == 0)return false;
-            if (*(it.second) != *(b.methods.at(it.first))) return false;
-        }
-        if (this->fields.size() != b.fields.size()) return false;
-        for (auto it : this->fields) {
-            if (b.fields.count(it.first) == 0)return false;
-            if (*(it.second) != *(b.fields.at(it.first))) return false;
+        if (this->field_names != b.field_names) return false;
+        if (this->field_types.size() != b.field_types.size()) return false;
+        for (int i = 0; i < this->field_types.size(); i++) {
+            if (*this->field_types[i] != *b.field_types[i]) return false;
         }
         return true;
     }

@@ -301,7 +301,7 @@ TEST(scanner_test, test_token_keyword_position_2) {
     Token token = scanner.get_next();
     EXPECT_EQ(token, Token(TokenType::STRUCT, 0, 0));
     token = scanner.get_next();
-    EXPECT_EQ(token, Token(TokenType::FUN, 0, 6));
+    EXPECT_EQ(token, Token(TokenType::FUN, 0, 7));
 }
 
 TEST(scanner_test, test_token_keyword_position_3) {
@@ -350,11 +350,11 @@ TEST(scanner_test, test_token_special_position_4) {
 }
 
 TEST(scanner_test, test_token_position_complex) {
-    std::string text = "class Foo {\nvar x: String;\nfun foo(y: Integer) {\n}\n}";
+    std::string text = "struct Foo {\nvar x: String;\nfun foo(y: Integer) {\n}\n}";
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
     std::vector<Token> expected_tokens = {
-            t_CLASS(0, 0), t_ID("Foo", 0, 6), t_LCURLY(0, 10), t_VAR(1, 0),
+            t_CLASS(0, 0), t_ID("Foo", 0, 7), t_LCURLY(0, 11), t_VAR(1, 0),
             t_ID("x", 1, 4), t_COLON(1, 5),
             t_ID("String", 1, 7), t_SEMICOLON(1, 13), t_FUN(2, 0), t_ID("foo", 2, 4),
             t_LPAREN(2, 7),

@@ -70,5 +70,7 @@ TEST(first_pass_test, class_foo_with_field) {
     fields["x"] = S_INFO(O_INFO(T_STRING));
     ClassInfo class_info;
     class_info.fields = fields;
+    class_info.field_names.push_back("x");
+    class_info.field_types.push_back(class_info.fields["x"]);
     EXPECT_TRUE(*ginfo == class_info);
 }

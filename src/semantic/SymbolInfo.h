@@ -9,7 +9,7 @@
 #include "ObjectInfo.h"
 
 enum class SINFO {
-    CLASS, FUNCTION, SIMPLE
+    FUNCTION, SIMPLE
 };
 
 class SymbolInfo {
