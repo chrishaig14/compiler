@@ -188,7 +188,7 @@ TEST(scanner_test, test_empty_eof_twice) {
 }
 
 TEST(scanner_test, test_scan_all) {
-    std::string text = "class Foo{var x: String; fun foo(y: Integer) {}}";
+    std::string text = "struct Foo{var x: String; fun foo(y: Integer) {}}";
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
     std::vector<Token> expected_tokens = {st_CLASS, st_ID("Foo"), st_LCURLY, st_VAR, st_ID("x"), st_COLON,
@@ -289,14 +289,14 @@ TEST(scanner_test, test_token_num_position_4) {
 }
 
 TEST(scanner_test, test_token_keyword_position_1) {
-    std::string text = "class";
+    std::string text = "struct";
     Scanner scanner(text);
     Token token = scanner.get_next();
     EXPECT_EQ(token, Token(TokenType::STRUCT, 0, 0));
 }
 
 TEST(scanner_test, test_token_keyword_position_2) {
-    std::string text = "class fun";
+    std::string text = "struct fun";
     Scanner scanner(text);
     Token token = scanner.get_next();
     EXPECT_EQ(token, Token(TokenType::STRUCT, 0, 0));
@@ -305,7 +305,7 @@ TEST(scanner_test, test_token_keyword_position_2) {
 }
 
 TEST(scanner_test, test_token_keyword_position_3) {
-    std::string text = "class\n\n\nfun";
+    std::string text = "struct\n\n\nfun";
     Scanner scanner(text);
     Token token = scanner.get_next();
     EXPECT_EQ(token, Token(TokenType::STRUCT, 0, 0));

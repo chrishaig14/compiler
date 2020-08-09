@@ -19,7 +19,7 @@ typedef std::vector<Instruction*> Code;
 #define MEM(parent, child) new MemberNode(parent, child)
 #define IF(condition, then) new IfNode(condition, then)
 #define CALL(function, arguments) new CallNode(function, arguments)
-#define CLS(name, template_parameters, fields, methods) new ClassNode(name, template_parameters, fields, methods)
+#define CLS(name, template_parameters, fields) new StructNode(name, template_parameters, fields)
 #define ASN(lvalue, rvalue) new AssignmentNode(lvalue, rvalue)
 #define SUB(parent, child) new SubscriptNode(parent, child)
 #define DECL(id, type, exp) new DeclarationNode(id, type, exp)
@@ -52,5 +52,5 @@ typedef std::map<std::string, std::map<std::string, Code>> StructProtos;
 #define I_BIN(op) new BinopInst(op)
 #define I_RET new ReturnInst()
 #define I_JUMPF(offset) new JumpIfFalseInst(offset)
-
+typedef std::map<std::string, TypeNode*> StructFields;
 #endif //UNTITLED1_UTILS_H

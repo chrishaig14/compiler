@@ -191,21 +191,6 @@ TEST(second_pass_test, x_declare_in_inner_scope_and_use_outside_error) {
     ASSERT_THROWS_NOT_FOUND_ERROR("x");
 }
 
-TEST(second_pass_test, member_without_this_error) {
-    std::string text = "class Foo{var x: String; fun foo()->String{return x;}}";
-    ASSERT_THROWS_NOT_FOUND_ERROR("x");
-}
-
-TEST(second_pass_test, member_with_this_no_error) {
-    std::string text = "class Foo{var x: String; fun foo()->String{return this.x;}}";
-    ASSERT_OK();
-}
-
-TEST(second_pass_test, member_not_found_error) {
-    std::string text = "class Foo{var x: String; fun foo()->String{return this.y;}}";
-    ASSERT_THROWS_NOT_FOUND_ERROR("y");
-}
-
 TEST(second_pass_test, function_return_type_error) {
     std::string text = "fun foo()->String{} fun main()->Integer{return foo();}";
     ASSERT_THROWS_RETURN_TYPE_ERROR("main", "String", "Integer");

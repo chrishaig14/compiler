@@ -11,7 +11,7 @@
 #include "CallNode.h"
 #include "ClassLiteralExpressionNode.h"
 #include "ClassLiteralFieldNode.h"
-#include "ClassNode.h"
+#include "StructNode.h"
 #include "DeclarationNode.h"
 #include "FunctionNode.h"
 #include "IdNode.h"

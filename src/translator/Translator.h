@@ -14,6 +14,7 @@
 #include "../instructions/DeclareInst.h"
 #include "../instructions/PushStringInst.h"
 #include "../instructions/ReturnInst.h"
+#include "../instructions/MakeObjectInst.h"
 #include "../instructions/SetMemberInst.h"
 #include "../instructions/MakeClassInst.h"
 #include "../instructions/GetMemberInst.h"
@@ -35,7 +36,7 @@ public:
 
     void visit(CallNode& node) override;
 
-    void visit(ClassNode& node) override;
+    void visit(StructNode& node) override;
 
     void visit(DeclarationNode& node) override;
 

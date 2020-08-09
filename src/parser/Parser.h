@@ -26,7 +26,7 @@ public:
 
     void next();
 
-    ClassNode* parse_class_definition();
+    StructNode* parse_struct_definition();
 
     DeclarationNode* parse_variable_declaration();
 

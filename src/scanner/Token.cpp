@@ -23,7 +23,13 @@ Token::Token(TokenType type, int num, int line, int column) {
 }
 
 std::string Token::to_string() {
-    return TOKEN_STRINGS[this->type];
+    std::string st = TOKEN_STRINGS[this->type];
+    if (this->type == TokenType::ID || this->type == TokenType::STRING) {
+        st += " \"" + this->str + "\"";
+    } else if (this->type == TokenType::NUM) {
+        st += " \"" + std::to_string(this->num) + "\"";
+    }
+    return st;
 }
 
 Token::Token(TokenType type, int line, int column) {

@@ -17,7 +17,7 @@ class ClassLiteralExpressionNode;
 
 class ClassLiteralFieldNode;
 
-class ClassNode;
+class StructNode;
 
 class DeclarationNode;
 
@@ -56,7 +56,7 @@ public:
     virtual void visit(ClassLiteralFieldNode& node) = 0;
 
 
-    virtual void visit(ClassNode& node) = 0;
+    virtual void visit(StructNode& node) = 0;
 
     virtual void visit(DeclarationNode& node) = 0;
 

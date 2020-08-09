@@ -21,7 +21,7 @@ std::map<std::string, TokenType> TOKEN_SPECIAL;
 void initialize_tokens() {
     TOKEN_KEYWORDS["fun"] = TokenType::FUN;
     TOKEN_KEYWORDS["if"] = TokenType::IF;
-    TOKEN_KEYWORDS["class"] = TokenType::STRUCT;
+    TOKEN_KEYWORDS["struct"] = TokenType::STRUCT;
     TOKEN_KEYWORDS["else"] = TokenType::ELSE;
     TOKEN_KEYWORDS["for"] = TokenType::FOR;
     TOKEN_KEYWORDS["var"] = TokenType::VAR;

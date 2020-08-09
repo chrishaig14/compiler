@@ -217,7 +217,7 @@ Node* Parser::parse_id_or_class_literal() {
 //            this->next();
             Node* expression = this->parse_expression();
             IdNode* id_ptr = dynamic_cast<IdNode*>(expression);
-            bool is_expression_initializer = false;
+            bool is_expression_initializer = true;
             if (id_ptr != nullptr) {
 //                        it may be an expression or if a colon follows the name of a field
                 is_expression_initializer = !this->match(TokenType::COLON);
@@ -358,13 +358,13 @@ TypeNode* Parser::parse_type_node() {
     return node;
 }
 
-ClassNode* Parser::parse_class_definition() {
+StructNode* Parser::parse_struct_definition() {
     this->expect_token(TokenType::STRUCT);
     Token identifier_token = this->expect_token(TokenType::ID);
     VectorOfStrings template_parameters;
     if (this->match(TokenType::LSQUARE)) {
         this->next();
-        // template class
+        // template struct
         bool expects_parameter = true;
         while (expects_parameter) {
             Token template_parameter = this->expect_token(TokenType::ID);
@@ -377,24 +377,23 @@ ClassNode* Parser::parse_class_definition() {
         }
         this->expect_token(TokenType::RSQUARE);
     }
-    std::vector<DeclarationNode*> fields;
-    std::vector<FunctionNode*> methods;
+    std::map<std::string, TypeNode*> fields;
 
     this->expect_token(TokenType::LCURLY);
     while (true) {
-        if (this->match(TokenType::VAR)) {
-            DeclarationNode* field = this->parse_variable_declaration();
+        if (this->match(TokenType::ID)) {
+            std::string identifier = this->token.str;
+            this->next();
+            this->expect_token(TokenType::COLON);
+            TypeNode* field_type = this->parse_type_node();
+            fields[identifier] = field_type;
             this->expect_token(TokenType::SEMICOLON);
-            fields.push_back(field);
-        } else if (this->match(TokenType::FUN)) {
-            FunctionNode* method = this->parse_function_definition();
-            methods.push_back(method);
         } else {
             break;
         }
     }
     this->expect_token(TokenType::RCURLY);
-    ClassNode* node = new ClassNode(identifier_token.str, template_parameters, fields, methods);
+    StructNode* node = new StructNode(identifier_token.str, template_parameters, fields);
     return node;
 }
 
@@ -470,7 +469,7 @@ Node* Parser::parse_top_level_statement() {
             break;
         }
         case TokenType::STRUCT: {
-            node = this->parse_class_definition();
+            node = this->parse_struct_definition();
             break;
         }
         default:

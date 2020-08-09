@@ -308,70 +308,82 @@ TEST(parser_test, function_with_params_return_type_and_body) {
 }
 
 TEST(parser_test, class_foo_empty) {
-    std::string text = "class Foo{}";
+    std::string text = "struct Foo{}";
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
-    ClassNode* node = parser.parse_class_definition();
-    auto expected_node = CLS("Foo", std::vector<std::string>(), std::vector<DeclarationNode*>(),
-                             std::vector<FunctionNode*>());
+    StructNode* node = parser.parse_struct_definition();
+    StructFields fields;
+    auto expected_node = CLS("Foo", std::vector<std::string>(), fields);
     COMPLETE_TEST;
 
 }
 
 TEST(parser_test, class_foo_with_fields) {
-    std::string text = "class Foo{var x: String; var y: Integer;}";
+    std::string text = "struct Foo{ x: String; y: Integer;}";
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
-    ClassNode* node = parser.parse_class_definition();
-    auto fields = {DECL("x", T_STRING, nullptr), DECL("y", T_INT, nullptr)};
-    auto expected_node = CLS("Foo", {}, fields, {});
+    StructNode* node = parser.parse_struct_definition();
+    StructFields fields;
+    fields["x"] = T_STRING;
+    fields["y"] = T_INT;
+    auto expected_node = CLS("Foo", {}, fields);
     COMPLETE_TEST;
 
 }
 
-TEST(parser_test, class_foo_with_method) {
-    std::string text = "class Foo{"  FUN_FOO_STRING  "}";
+TEST(parser_test, struct_literal_with_names) {
+    std::string text = "Foo{ x: 27, y: 9}";
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
-    ClassNode* node = parser.parse_class_definition();
-    auto expected_node = CLS("Foo", {}, {}, { FUN_FOO_NODE });
+    Node* node = parser.parse_expression();
+    std::map<std::string, Node*> fields;
+    fields["x"] = NUM(27);
+    fields["y"] = NUM(9);
+    auto expected_node = new ClassLiteralFieldNode("Foo", fields);
     COMPLETE_TEST;
-
-
 }
+
+TEST(parser_test, struct_literal_without_names) {
+    std::string text = "Foo{9,27}";
+    Scanner scanner(text);
+    std::vector<Token> tokens = scanner.scan_all();
+    Parser parser(tokens);
+    Node* node = parser.parse_expression();
+    std::vector<Node*> fields;
+    fields.push_back(NUM(9));
+    fields.push_back(NUM(27));
+    auto expected_node = new ClassLiteralExpressionNode("Foo", fields);
+    COMPLETE_TEST;
+}
+
 
 TEST(parser_test, template_class_foo_empty) {
-    std::string text = "class Foo[T, X]{}";
+    std::string text = "struct Foo[T, X]{}";
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
-    ClassNode* node = parser.parse_class_definition();
+    StructNode* node = parser.parse_struct_definition();
     std::vector<std::string> params = {"T", "X"};
-    std::vector<DeclarationNode*> fields;
-    std::vector<FunctionNode*> methods;
-    ClassNode* expected_node = CLS("Foo", params, fields, methods);
+    StructFields fields;
+    StructNode* expected_node = CLS("Foo", params, fields);
     COMPLETE_TEST;
 
 }
 
 TEST(parser_test, class_foo_with_fields_and_method) {
-    std::string complete_foo_class_string = "class Foo{var x: String; var y: Integer;"  FUN_FOO_STRING "}";
-    ClassNode* complete_foo_class_node = CLS("Foo", {}, std::vector<DeclarationNode*>({
-                                                                                              DECL("x",
-                                                                                                   T_STRING,
-                                                                                                   nullptr),
-                                                                                              DECL("y", T_INT,
-                                                                                                   nullptr)
-                                                                                      }),
-                                             { FUN_FOO_NODE });
+    std::string complete_foo_class_string = "struct Foo{ x: String;  y: Integer;}";
+    StructFields fields;
+    fields["x"] = T_STRING;
+    fields["y"] = T_INT;
+    StructNode* complete_foo_class_node = CLS("Foo", {}, fields);
     std::string text = complete_foo_class_string;
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
-    ClassNode* node = parser.parse_class_definition();
+    StructNode* node = parser.parse_struct_definition();
 
     auto expected_node = complete_foo_class_node;
     COMPLETE_TEST;

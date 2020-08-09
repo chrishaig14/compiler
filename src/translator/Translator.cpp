@@ -56,11 +56,11 @@ void Translator::visit(CallNode& node) {
     this->code = out;
 }
 
-void Translator::visit(ClassNode& node) {
+void Translator::visit(StructNode& node) {
     Code out;
     std::vector<std::string> f;
     for (auto field: node.fields) {
-        f.push_back(field->identifier);
+        f.push_back(field.first);
     }
     out.push_back(I_MAKE_CLASS(node.identifier, f));
     this->code = out;
@@ -194,24 +194,25 @@ Translator::Translator() : is_lvalue(false) {}
 
 void Translator::visit(ClassLiteralExpressionNode& node) {
     Code all;
-    for(auto exp: node.init){
+    for (auto exp: node.init) {
         this->code = {};
         exp->accept(*this);
         Code out = this->code;
-        all.insert(all.end(), out.begin(), all.end());
+        all.insert(all.end(), out.begin(), out.end());
     }
-//    all.push_back(MakeObjectExpInst(node.identifier, node.init.size()));
     this->code = all;
 }
 
 void Translator::visit(ClassLiteralFieldNode& node) {
     Code all;
-    for(auto exp: node.init){
+    std::vector<std::string> fields;
+    for (auto f: node.init) {
         this->code = {};
-//        exp->accept(*this);
+        f.second->accept(*this);
+        fields.push_back(f.first);
         Code out = this->code;
-        all.insert(all.end(), out.begin(), all.end());
+        all.insert(all.end(), out.begin(), out.end());
     }
-//    all.push_back(MakeObjectExpInst(node.identifier, node.init.size()));
+    all.push_back(new MakeObjectInst(node.identifier, fields));
     this->code = all;
 }

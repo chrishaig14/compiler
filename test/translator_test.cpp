@@ -15,7 +15,8 @@ std::ostream& operator<<(std::ostream& out, const std::vector<Instruction*> v) {
 
 bool operator==(const std::vector<Instruction*> a, const std::vector<Instruction*> b) {
     for (int i = 0; i < a.size(); i++) {
-        std::cout << "comparing " << a[i]->to_string() << " == " << b[i]->to_string() << ": " << (a[i]->equal(b[i])? "True" : "False") << std::endl;
+        std::cout << "comparing " << a[i]->to_string() << " == " << b[i]->to_string() << ": "
+                  << (a[i]->equal(b[i]) ? "True" : "False") << std::endl;
         if (!a[i]->equal(b[i])) return false;
     }
     return true;
@@ -92,6 +93,17 @@ TEST(translator_test, test_if) {
     node->accept(translator);
     Code expected_code = {I_GET("x"), I_PUSHI(3), I_BIN(OpType::EQ), I_JUMPF(5), I_GET("x"), I_PUSHI(9),
                           I_BIN(OpType::ADD), I_SET("y")};
+    EXPECT_EQ(translator.code, expected_code)
+                        << "GOT:\n----\n" << translator.code << "----\nEXPECTED:\n----\n" << expected_code << "----\n";
+}
+
+TEST(translator_test, test_class_literal_fields) {
+    Translator translator;
+    Node* node = new ClassLiteralFieldNode("Foo", {{"foo", BIN(OpType::MUL, NUM(7), ID("a"))},
+                                                   {"bar", NUM(65)}});
+    node->accept(translator);
+    std::vector<std::string> fields = {"foo", "bar"};
+    Code expected_code = {I_PUSHI(7), I_GET("a"), I_BIN(OpType::MUL), I_PUSHI(65), I_MAKE_OBJECT("Foo", fields)};
     EXPECT_EQ(translator.code, expected_code)
                         << "GOT:\n----\n" << translator.code << "----\nEXPECTED:\n----\n" << expected_code << "----\n";
 }

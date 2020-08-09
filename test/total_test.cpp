@@ -25,7 +25,7 @@ TEST(total_test, test_1) {
 }
 
 TEST(total_test, test_2) {
-    std::string text = "struct Person { name: String; age: Integer;} fun get_name(p: Person)->String {return p.name;}var chris = Person{}; chris.name = \"Alex\";get_name(chris);";
+    std::string text = "struct Person { name: Integer; age: Integer;} fun get_name(p: Person)->String {return p.name;}var chris = Person{name:65,age:24}; var foo = chris.name;";
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
@@ -37,5 +37,9 @@ TEST(total_test, test_2) {
     StructProtos structs;
     CodeRunner code_runner(translated_code, structs, stack, {});
     code_runner.run();
-    EXPECT_TRUE(stack.top()->equal(new IntegerObject(13)));
+    auto expected_object = new UserObject("Person",{"name", "age"});
+    expected_object->fields["name"] = new IntegerObject(65);
+    expected_object->fields["age"] = new IntegerObject(24);
+    EXPECT_TRUE(code_runner.env->get("chris")->equal(expected_object));
+    EXPECT_TRUE(code_runner.env->get("foo")->equal(new IntegerObject(65)));
 }

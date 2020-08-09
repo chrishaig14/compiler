@@ -19,8 +19,8 @@ add_library(srcLib
         nodes/Visitor.h
         nodes/ReturnNode.cpp
         nodes/ReturnNode.h
-        nodes/ClassNode.cpp
-        nodes/ClassNode.h
+        nodes/StructNode.cpp
+        nodes/StructNode.h
         nodes/StringNode.cpp
         nodes/StringNode.h
         nodes/BinopNode.cpp

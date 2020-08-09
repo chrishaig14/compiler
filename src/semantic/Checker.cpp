@@ -186,16 +186,7 @@ void Checker::visit(CallNode& n) {
     this->rv = semantic_info;
 }
 
-void Checker::visit(ClassNode& n) {
-    for (int i = 0; i < n.methods.size(); i++) {
-        this->enter_scope(n.methods[i]->identifier);
-        TypeNode* type_node = new TypeNode(n.identifier, {});
-        ObjectInfo* simple_info = new ObjectInfo(type_node);
-        SymbolInfo* this_info = new SymbolInfo(simple_info);
-        this->scope->set("this", this_info);
-        this->leave_scope();
-        n.methods[i]->accept(*this);
-    }
+void Checker::visit(StructNode& n) {
 }
 
 void Checker::visit(BlockNode& program) {
