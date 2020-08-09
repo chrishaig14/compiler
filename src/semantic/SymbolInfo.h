@@ -56,6 +56,16 @@ public:
         return false;
     }
 
+    std::string to_string() const {
+        switch (this->type) {
+            case SINFO::FUNCTION:
+                return this->function_info->to_string();
+            case SINFO::SIMPLE:
+                return this->object_info->to_string();
+        }
+        return "";
+    }
+
 
 };
 

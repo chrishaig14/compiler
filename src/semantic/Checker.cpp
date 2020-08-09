@@ -217,7 +217,8 @@ void Checker::visit(ClassLiteralExpressionNode& node) {
     auto class_fields = this->class_table->get(node.identifier)->fields;
     if (class_fields.size() != node.init.size())
         throw std::runtime_error(
-                "Expected " + std::to_string(class_fields.size()) + " initializers, got " +
+                "In struct \"" + node.identifier + "\" initialization: " + "Expected " +
+                std::to_string(class_fields.size()) + " initializers but got " +
                 std::to_string(node.init.size()));
     for (int i = 0; i < node.init.size(); i++) {
         Node* exp = node.init[i];
@@ -240,7 +241,8 @@ void Checker::visit(ClassLiteralFieldNode& node) {
     }
     if (class_fields.size() != node.init.size())
         throw std::runtime_error(
-                "Expected " + std::to_string(class_fields.size()) + " initializers, got " +
+                "In struct \"" + node.identifier + "\" initialization: " + "Expected " +
+                std::to_string(class_fields.size()) + " initializers but got " +
                 std::to_string(node.init.size()));
     for (auto f: node.init) {
         Node* exp = f.second;
@@ -248,8 +250,9 @@ void Checker::visit(ClassLiteralFieldNode& node) {
         SemanticInfo semanticInfo = this->rv;
         if (*semanticInfo.symbol_info != *this->class_table->get(node.identifier)->fields[f.first]) {
             throw std::runtime_error(
-                    "Field type doesn't match: " + f.first + " expected " + class_fields[f.first]->object_info->parent +
-                    " but got " + semanticInfo.symbol_info->object_info->parent);
+                    "In struct \"" + node.identifier + "\" initialization: " + "field \"" + f.first + "\" is of type " +
+                    class_fields[f.first]->to_string() +
+                    " but got " + semanticInfo.symbol_info->to_string());
         }
     }
     this->rv = SemanticInfo();

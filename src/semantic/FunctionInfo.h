@@ -33,6 +33,17 @@ public:
         return true;
     }
 
+    std::string to_string() const {
+        std::string args;
+        if (this->parameter_types.size() != 0) {
+            for (int i = 0; i < this->parameter_types.size() - 1; i++) {
+                args += this->parameter_types[i]->to_string() + ",";
+            }
+            args += this->parameter_types[this->parameter_types.size() - 1]->to_string();
+        }
+        return "fun (" + args + ")->" + this->return_type->to_string();
+    }
+
 };
 
 #endif //UNTITLED1_FUNCTIONINFO_H

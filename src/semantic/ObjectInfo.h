@@ -33,6 +33,17 @@ public:
         }
         return true;
     }
+
+    std::string to_string() const {
+        std::string templ;
+        if (this->type_parameters.size() != 0) {
+            for (int i = 0; i < this->type_parameters.size() - 1; i++) {
+                templ += this->type_parameters[i]->to_string() + ",";
+            }
+            templ += this->type_parameters[this->type_parameters.size() - 1]->to_string();
+        }
+        return this->parent + templ;
+    }
 };
 
 #endif //UNTITLED1_OBJECTINFO_H
