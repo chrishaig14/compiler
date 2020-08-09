@@ -182,7 +182,7 @@ TEST(second_pass_test, x_redeclare_in_inner_scope_ok) {
 }
 
 TEST(second_pass_test, x_redeclare_in_same_scope_error) {
-    std::string text = "fun foo(y: Foo)->String{var x:Integer=0;var x:String=""; return x;}";
+    std::string text = "fun foo(y: Foo)->String{var x:Integer=0;var x:String=\"\"; return x;}";
     ASSERT_THROWS_REDECLARED_ERROR("x");
 }
 

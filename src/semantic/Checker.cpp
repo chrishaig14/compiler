@@ -174,6 +174,9 @@ void Checker::visit(CallNode& n) {
     }
     if (n.arguments.size() != function_semantic_info.symbol_info->function_info->parameter_types.size())
         throw BadArguments();
+    SemanticInfo semantic_info;
+
+    semantic_info.free_variables = function_semantic_info.free_variables;
 
     for (int i = 0; i < n.arguments.size(); i++) {
         n.arguments[i]->accept(*this);
@@ -181,8 +184,10 @@ void Checker::visit(CallNode& n) {
         if (*arg.symbol_info->object_info != *function_semantic_info.symbol_info->function_info->parameter_types[i]) {
             throw BadArguments();
         }
+        for (auto fv: arg.free_variables) {
+            semantic_info.free_variables[fv.first] = 1;
+        }
     }
-    SemanticInfo semantic_info;
     semantic_info.symbol_info = new SymbolInfo(function_semantic_info.symbol_info->function_info->return_type);
     this->rv = semantic_info;
 }

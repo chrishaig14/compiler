@@ -78,7 +78,7 @@ TEST(parser_test, decl_x_without_value_or_type_throws_error) {
     try {
         DeclarationNode* node = parser.parse_variable_declaration();
         FAIL() << "Didn't throw  unexpected token error";
-    } catch (UnexpectedToken& e) {
+    } catch (...) {
 
     }
 }
@@ -172,17 +172,6 @@ TEST(parser_test, complex_template_type) {
     Parser parser(tokens);
     TypeNode* node = parser.parse_type_node();
     auto expected_node = TYPE("String", std::vector<TypeNode*>({T_INT, T_LIST({T_STRING})}));
-    COMPLETE_TEST;
-
-}
-
-TEST(parser_test, decl_with_type) {
-    std::string text = "var x:String[Integer, List[String]]";
-    Scanner scanner(text);
-    std::vector<Token> tokens = scanner.scan_all();
-    Parser parser(tokens);
-    DeclarationNode* node = parser.parse_variable_declaration();
-    auto expected_node = DECL("x", TYPE("String", std::vector<TypeNode*>({T_INT, T_LIST({T_STRING})})), nullptr);
     COMPLETE_TEST;
 
 }
