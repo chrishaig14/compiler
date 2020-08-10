@@ -144,3 +144,26 @@ TEST(total_test, test_5) {
     EXPECT_TRUE(code_runner.env->get("chris")->equal(expected_object));
     EXPECT_TRUE(code_runner.env->get("foo")->equal(new StringObject("Alex")));
 }
+
+TEST(total_test, test_6) {
+    std::string text = "struct Foo { foo_str: String; bar: Bar; } struct Bar {bar_str: String;} var f = Foo{foo_str: \"FOO_STR\", bar: Bar{bar_str: \"BAR_STR\"}}; var bar = f.bar;";
+    Scanner scanner(text);
+    std::vector<Token> tokens = scanner.scan_all();
+    Parser parser(tokens);
+    BlockNode* program = parser.parse_program();
+    GlobalProcessor gp;
+    gp.visit(*program);
+    Checker checker(gp.globals, gp.class_table);
+    checker.visit(*program);
+    Translator translator;
+    program->accept(translator);
+    Code translated_code = translator.code;
+    ObjectStack stack;
+    StructProtos structs;
+    CodeRunner code_runner(translated_code, structs, stack, {});
+    code_runner.run();
+    auto expected_object = new UserObject("Bar", {"bar_str"});
+    expected_object->fields["bar_str"] = new StringObject("BAR_STR");
+    EXPECT_TRUE(code_runner.env->get("bar")->equal(expected_object));
+}
+
