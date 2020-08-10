@@ -121,3 +121,26 @@ TEST(total_test, test_4) {
     EXPECT_TRUE(code_runner.env->get("foo")->equal(new StringObject("Alex")));
 }
 
+TEST(total_test, test_5) {
+    std::string text = "var foo = \"Hello\"; foo = 8;";
+    Scanner scanner(text);
+    std::vector<Token> tokens = scanner.scan_all();
+    Parser parser(tokens);
+    BlockNode* program = parser.parse_program();
+    GlobalProcessor gp;
+    gp.visit(*program);
+    Checker checker(gp.globals, gp.class_table);
+    checker.visit(*program);
+    Translator translator;
+    program->accept(translator);
+    Code translated_code = translator.code;
+    ObjectStack stack;
+    StructProtos structs;
+    CodeRunner code_runner(translated_code, structs, stack, {});
+    code_runner.run();
+    auto expected_object = new UserObject("Person", {"name", "age"});
+    expected_object->fields["name"] = new StringObject("Alex");
+    expected_object->fields["age"] = new IntegerObject(24);
+    EXPECT_TRUE(code_runner.env->get("chris")->equal(expected_object));
+    EXPECT_TRUE(code_runner.env->get("foo")->equal(new StringObject("Alex")));
+}

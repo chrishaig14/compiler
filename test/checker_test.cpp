@@ -42,6 +42,16 @@ BlockNode* get_treeA(std::string text) {
                                             } catch(const ReturnError& se){              \
                                                 EXPECT_EQ(se,ReturnError(ACTUAL_TYPE, EXPECTED_TYPE))  << se.what();       }\
 
+#define ASSERT_THROWS_ASSIGNMENT_ERROR(NAME, EXPECTED_TYPE, ACTUAL_TYPE) BlockNode* tree = get_treeA(text);       \
+                                            GlobalProcessor gp;gp.visit(*tree);              \
+                                            Checker checker(gp.globals, gp.class_table);                  \
+                                            try {                                       \
+                                                checker.visit(*tree);                       \
+                                                FAIL() << "Expected ReturnError thrown"; \
+                                            } catch(const std::runtime_error& se){              \
+                                                EXPECT_EQ(se.what(),std::string("Assigning value of type ") + ACTUAL_TYPE + ", expected " +EXPECTED_TYPE)  << se.what();       }\
+
+
 #define ASSERT_THROWS_BAD_ARGUMENTS() BlockNode* tree = get_treeA(text);       \
                                             GlobalProcessor gp;gp.visit(*tree);              \
                                             Checker checker(gp.globals, gp.class_table);                  \
@@ -223,12 +233,12 @@ TEST(second_pass_test, declaration_type_error_2) {
 
 TEST(second_pass_test, assignment_type_error_1) {
     std::string text = "var x: String=\"\"; x = 5;";
-    ASSERT_THROWS_RETURN_TYPE_ERROR("", "Integer", "String");
+    ASSERT_THROWS_ASSIGNMENT_ERROR("", "String", "Integer");
 }
 
 TEST(second_pass_test, assignment_type_error_2) {
     std::string text = "var x: Integer=0;x = \"Hello\";";
-    ASSERT_THROWS_RETURN_TYPE_ERROR("", "String", "Integer");
+    ASSERT_THROWS_ASSIGNMENT_ERROR("", "Integer", "String");
 }
 
 TEST(second_pass_test, class_literal_expression_ok) {

@@ -98,7 +98,8 @@ void Checker::visit(AssignmentNode& n) {
     n.rvalue->accept(*this);
     SemanticInfo expression_type = this->rv;
     if (*linfo.symbol_info != *expression_type.symbol_info) {
-        throw ReturnError(expression_type.symbol_info->object_info->parent, linfo.symbol_info->object_info->parent);
+        throw std::runtime_error("Assigning value of type " + expression_type.symbol_info->to_string() + ", expected " +
+                                 linfo.symbol_info->to_string());
     }
     SemanticInfo semantic_info;
     semantic_info.free_variables = expression_type.free_variables;
