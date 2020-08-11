@@ -3,6 +3,7 @@
 //
 
 #include "CodeRunner.h"
+#include <iostream>
 
 CodeRunner::CodeRunner(const Code& code, std::map<std::string, std::map<std::string, Code>>& structs,
                        ObjectStack& stack, std::map<std::string, Object*> closure) : code(code), stack(stack), structs(structs) {

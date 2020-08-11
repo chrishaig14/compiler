@@ -9,7 +9,7 @@
 #include <vector>
 #include <stack>
 #include <stdexcept>
-#include "instructions/instructions.h"
+#include "../instructions/instructions.h"
 #include "Object.h"
 #include "ObjectStack.h"
 #include "Environment.h"
