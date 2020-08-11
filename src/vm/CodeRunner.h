@@ -30,247 +30,49 @@ public:
     std::map<std::string, std::vector<std::string>> classes;
 
     CodeRunner(const Code& code, std::map<std::string, std::map<std::string, Code>>& structs, ObjectStack& stack,
-               std::map<std::string, Object*> closure) : code(code), stack(stack), structs(structs) {
-        std::cout << "New code runner" << std::endl;
-        this->env = new Environment(nullptr);
-        for (auto it: closure) {
-            this->env->declare(it.first);
-            this->env->set(it.first, it.second);
-        }
-        this->inst_ptr = 0;
-    }
+               std::map<std::string, Object*> closure);
 
-    void run() {
-        while (this->inst_ptr < this->code.size()) {
-            Instruction* inst = this->code[this->inst_ptr];
-            inst->accept(*this);
-        }
-    }
+    void run();
 
-    void visit(BinopInst& inst) override {
-        std::cout << "Run [" << inst.to_string() << "]" << std::endl;
+    void visit(BinopInst& inst) override;
 
-        Object* right = this->stack.pop();
-        Object* left = this->stack.pop();
-        IntegerObject* right_int = dynamic_cast<IntegerObject*>(right);
-        IntegerObject* left_int = dynamic_cast<IntegerObject*>(left);
-        int result = 0;
-        if (right_int != nullptr && left_int != nullptr) {
-            switch (inst.op) {
-                case OpType::ADD:
-                    result = left_int->value + right_int->value;
-                    this->stack.push(new IntegerObject(result));
+    void visit(CallInst& call) override;
 
-                    break;
-                case OpType::SUB:
-                    result = left_int->value - right_int->value;
-                    this->stack.push(new IntegerObject(result));
+    void visit(DeclareInst& declare) override;
 
-                    break;
-                case OpType::MUL:
-                    result = left_int->value * right_int->value;
-                    this->stack.push(new IntegerObject(result));
+    void visit(GetInst& inst) override;
 
-                    break;
-                case OpType::DIV:
-                    result = left_int->value / right_int->value;
-                    this->stack.push(new IntegerObject(result));
+    void visit(GetMemberInst& inst) override;
 
-                    break;
-                case OpType::EQ:
-                    result = left_int->value == right_int->value;
-                    this->stack.push(new BooleanObject(result));
-                    break;
-                case OpType::AND:
-//                    result = left_int->value + right_int->value;
-                    break;
-                case OpType::OR:
-//                    result = left_int->value + right_int->value;
-                    break;
-            }
-        } else {
-            throw std::runtime_error("Try to do a binop with two non-Integers");
-        }
-        this->inst_ptr++;
-    }
+    void visit(GetSubscriptInst& inst) override;
 
-    void visit(CallInst& call) override {
-        std::cout << "Run [" << call.to_string() << "]" << std::endl;
+    void visit(PushFunctionInst& inst) override;
 
-        Object* value = this->stack.pop();
-        CodeObject* code = dynamic_cast<CodeObject*>(value);
-        if (code == nullptr) {
-            throw std::runtime_error("Trying to call something that's not code!");
-        }
-        if (code->type == CodeType::BUILTIN) {
-            code->builtin->run(this->stack);
-        } else {
-            CodeRunner code_runner(code->user->code, this->structs, this->stack, {});
-            for (auto v: code->user->closure) {
-                code_runner.env->declare(v);
-                code_runner.env->set(v, this->env->get(v));
-            }
-            code_runner.run();
-//            throw std::runtime_error("Trying to run user code!");
-        }
-        this->inst_ptr++;
-//        throw std::runtime_error("Unimplemented call instruction!");
-    }
+    void visit(PushIntegerInst& inst) override;
 
-    void visit(DeclareInst& declare) override {
-        std::cout << "Run [" << declare.to_string() << "]" << std::endl;
-        this->env->declare(declare.identifier);
-        this->inst_ptr++;
-    }
+    void visit(PushStringInst& inst) override;
 
-    void visit(GetInst& inst) override {
-        std::cout << "Run [" << inst.to_string() << "]" << std::endl;
-        Object* value = this->env->get(inst.identifier);
-        this->stack.push(value);
-        this->inst_ptr++;
-    }
+    void visit(ReturnInst& inst) override;
 
-    void visit(GetMemberInst& inst) override {
-        std::cout << "Run [" << inst.to_string() << "]" << std::endl;
-        Object* object = this->stack.pop();
-        UserObject* user_object = dynamic_cast<UserObject*>(object);
-        this->stack.push(user_object->fields[inst.member]);
-        this->inst_ptr++;
-    }
+    void visit(SetInst& inst) override;
 
-    void visit(GetSubscriptInst& inst) override {
-        std::cout << "Run [" << inst.to_string() << "]" << std::endl;
+    void visit(SetMemberInst& inst) override;
 
-        this->inst_ptr++;
-    }
+    void visit(SetSubscriptInst& inst) override;
 
-    void visit(PushFunctionInst& inst) override {
-        std::cout << "Run [" << inst.to_string() << "]" << std::endl;
-        Code function_body = inst.body;
-        Code get_parameters;
-        for (int i = inst.parameter_names.size() - 1; i >= 0; i--) {
-            Code param_code = {I_DECL(inst.parameter_names[i]), I_SET(inst.parameter_names[i])};
-            get_parameters.insert(get_parameters.end(), param_code.begin(), param_code.end());
-        }
-        function_body.insert(function_body.begin(), get_parameters.begin(), get_parameters.end());
-        this->stack.push(new CodeObject(new CodeUser(function_body, inst.free_variables)));
-        this->inst_ptr++;
-    }
+    void visit(MakeObjectInst& inst) override;
 
-    void visit(PushIntegerInst& inst) override {
-        std::cout << "Run [" << inst.to_string() << "]" << std::endl;
+    void visit(MakeListInst& inst) override;
 
-        IntegerObject* reference_to_new_integer_object = new IntegerObject(inst.num);
-        this->stack.push(reference_to_new_integer_object);
-        this->inst_ptr++;
-    }
+    void visit(JumpIfFalseInst& inst) override;
 
-    void visit(PushStringInst& inst) override {
-        std::cout << "Run [" << inst.to_string() << "]" << std::endl;
+    void visit(PushBooleanInst& inst) override;
 
-        StringObject* reference_to_new_integer_object = new StringObject(inst.str);
-        this->stack.push(reference_to_new_integer_object);
-        this->inst_ptr++;
-    }
+    void visit(MakeClassInst& inst) override;
 
-    void visit(ReturnInst& inst) override {
-        std::cout << "Run [" << inst.to_string() << "]" << std::endl;
+    void visit(DefineStructInst& inst) override;
 
-        this->inst_ptr = this->code.size() + 1;
-    }
-
-    void visit(SetInst& inst) override {
-        std::cout << "Run [" << inst.to_string() << "]" << std::endl;
-
-        Object* value = this->stack.pop();
-        this->env->set(inst.identifier, value);
-        this->inst_ptr++;
-    }
-
-    void visit(SetMemberInst& inst) override {
-        std::cout << "Run [" << inst.to_string() << "]" << std::endl;
-
-        Object* object = this->stack.pop();
-        UserObject* user_object = dynamic_cast<UserObject*>(object);
-        user_object->fields[inst.member] = this->stack.pop();
-        this->inst_ptr++;
-    }
-
-    void visit(SetSubscriptInst& inst) override {
-        std::cout << "Run [" << inst.to_string() << "]" << std::endl;
-
-    }
-
-    void visit(MakeObjectInst& inst) override {
-        std::cout << "Run [" << inst.to_string() << "]" << std::endl;
-        UserObject* obj = new UserObject(inst.type, inst.fields);
-        for(int i = inst.fields.size() - 1; i >= 0; i--){
-            obj->fields[inst.fields[i]] = this->stack.pop();
-        }
-        this->stack.push(obj);
-        this->inst_ptr++;
-    }
-
-    void visit(MakeListInst& inst) override {
-        std::cout << "Run [" << inst.to_string() << "]" << std::endl;
-
-        std::vector<Object*> list(inst.length, nullptr);
-        for (int i = inst.length - 1; i >= 0; i--) {
-            list[i] = this->stack.pop();
-        }
-        this->stack.push(new ListObject(list));
-        this->inst_ptr++;
-    }
-
-    void visit(JumpIfFalseInst& inst) override {
-        std::cout << "Run [" << inst.to_string() << "]" << std::endl;
-
-        Object* tos = this->stack.pop();
-        BooleanObject* boolean_ptr = dynamic_cast<BooleanObject*>(tos);
-        if (boolean_ptr == nullptr) {
-            throw std::runtime_error("Expected boolean!");
-        }
-        if (!boolean_ptr->boolean) {
-            this->inst_ptr += inst.offset;
-        } else {
-            this->inst_ptr++;
-        }
-    }
-
-    void visit(PushBooleanInst& inst) override {
-        std::cout << "Run [" << inst.to_string() << "]" << std::endl;
-
-        this->stack.push(new BooleanObject(inst.boolean));
-        this->inst_ptr++;
-    }
-
-    void visit(MakeClassInst& inst) override {
-        this->classes[inst.identifier] = inst.fields;
-        this->inst_ptr++;
-    }
-
-    void visit(DefineStructInst& inst) override {
-        this->structs[inst.identifier] = inst.fields;
-        this->inst_ptr++;
-    }
-
-    void visit(MakeDefaultInst& inst) override {
-//        if (inst.identifier == "String") {
-//            this->stack.push(new StringObject(""));
-//        } else if (inst.identifier == "Integer") {
-//            this->stack.push(new IntegerObject());
-//        } else {
-//            auto proto = this->structs[inst.identifier];
-//            std::vector<std::string> names;
-//            for(auto f: proto){
-//                names.push_back(f.first);
-//                CodeRunner field_initializer(f.second,this->structs, this->stack, {});
-//            }
-//            UserObject* obj = new UserObject(inst.identifier, names);
-//            obj->fields;
-//        }
-//        this->inst_ptr++;
-    }
+    void visit(MakeDefaultInst& inst) override;
 
     std::map<std::string, std::map<std::string, Code>>& structs;
 };
