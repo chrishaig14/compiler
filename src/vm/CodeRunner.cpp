@@ -6,7 +6,8 @@
 #include <iostream>
 
 CodeRunner::CodeRunner(const Code& code, std::map<std::string, std::map<std::string, Code>>& structs,
-                       ObjectStack& stack, std::map<std::string, Object*> closure) : code(code), stack(stack), structs(structs) {
+                       ObjectStack& stack, std::map<std::string, Object*> closure) : code(code), stack(stack),
+                                                                                     structs(structs) {
     std::cout << "New code runner" << std::endl;
     this->env = new Environment(nullptr);
     for (auto it: closure) {
@@ -116,7 +117,17 @@ void CodeRunner::visit(GetMemberInst& inst) {
 
 void CodeRunner::visit(GetSubscriptInst& inst) {
     std::cout << "Run [" << inst.to_string() << "]" << std::endl;
-
+    Object* obj = this->stack.pop();
+    ListObject* list = dynamic_cast<ListObject*>(obj);
+    if (list == nullptr) {
+        throw std::runtime_error("Subscript of non-list");
+    }
+    obj = this->stack.pop();
+    IntegerObject* index = dynamic_cast<IntegerObject*>(obj);
+    if (index == nullptr) {
+        throw std::runtime_error("Non-integer subscript of list");
+    }
+    this->stack.push(list->list[index->value]);
     this->inst_ptr++;
 }
 
@@ -180,7 +191,7 @@ void CodeRunner::visit(SetSubscriptInst& inst) {
 void CodeRunner::visit(MakeObjectInst& inst) {
     std::cout << "Run [" << inst.to_string() << "]" << std::endl;
     UserObject* obj = new UserObject(inst.type, inst.fields);
-    for(int i = inst.fields.size() - 1; i >= 0; i--){
+    for (int i = inst.fields.size() - 1; i >= 0; i--) {
         obj->fields[inst.fields[i]] = this->stack.pop();
     }
     this->stack.push(obj);
