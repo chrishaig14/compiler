@@ -56,8 +56,9 @@ ListNode* Parser::parse_list_literal() {
     } else {
         while (true) {
             Node* element = this->parse_expression();
-            if (!this->match(TokenType::COMMA)) { break; }
             elements.push_back(element);
+            if (!this->match(TokenType::COMMA)) { break; }
+            this->next();
         }
         this->expect_token(TokenType::RSQUARE);
     }
@@ -200,6 +201,8 @@ Node* Parser::parse_id_or_literal() {
         case TokenType::FUN: {
             return this->parse_function_expression();
         }
+        case TokenType::LSQUARE:
+            return this->parse_list_literal();
         default:
             throw std::runtime_error("parsing id or literal, unknown token type: " + TOKEN_STRINGS[token.type]);
     }
@@ -307,7 +310,7 @@ DeclarationNode* Parser::parse_variable_declaration() {
     Node* expression = nullptr;
     try {
         this->expect_token(TokenType::EQQ);
-    } catch(...){
+    } catch (...) {
         throw std::runtime_error("Error: you must initialize all variables!");
     }
     expression = this->parse_expression();

@@ -5,7 +5,9 @@
 #include "MakeListInst.h"
 
 bool MakeListInst::equal(const Instruction* inst) const {
-    return false;
+    const MakeListInst* other_ptr = dynamic_cast<const MakeListInst*>(inst);
+    if (other_ptr == nullptr) return false;
+    return this->length == other_ptr->length;
 }
 
 std::string MakeListInst::to_string() const {

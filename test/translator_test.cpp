@@ -107,3 +107,34 @@ TEST(translator_test, test_class_literal_fields) {
     EXPECT_EQ(translator.code, expected_code)
                         << "GOT:\n----\n" << translator.code << "----\nEXPECTED:\n----\n" << expected_code << "----\n";
 }
+
+TEST(translator_test, translate_empty_list) {
+    Translator translator;
+    Node* node = LST(VectorOfNodes());
+    node->accept(translator);
+    Code expected_code = {I_MAKE_LIST(0)};
+    EXPECT_EQ(translator.code.size(), expected_code.size());
+    EXPECT_EQ(translator.code, expected_code)
+                        << "GOT:\n----\n" << translator.code << "----\nEXPECTED:\n----\n" << expected_code << "----\n";
+}
+
+TEST(translator_test, translate_list_one_element) {
+    Translator translator;
+    Node* node = LST(VectorOfNodes({NUM(1)}));
+    node->accept(translator);
+    Code expected_code = {I_PUSHI(1), I_MAKE_LIST(1)};
+    EXPECT_EQ(translator.code.size(), expected_code.size());
+    EXPECT_EQ(translator.code, expected_code)
+                        << "GOT:\n----\n" << translator.code << "----\nEXPECTED:\n----\n" << expected_code << "----\n";
+}
+
+TEST(translator_test, translate_list_multiple_elements) {
+    Translator translator;
+    VectorOfNodes list = {NUM(3), NUM(1), NUM(4)};
+    Node* node = LST(list);
+    node->accept(translator);
+    Code expected_code = {I_PUSHI(3),I_PUSHI(1),I_PUSHI(4), I_MAKE_LIST(3)};
+    EXPECT_EQ(translator.code.size(), expected_code.size());
+    EXPECT_EQ(translator.code, expected_code)
+                        << "GOT:\n----\n" << translator.code << "----\nEXPECTED:\n----\n" << expected_code << "----\n";
+}

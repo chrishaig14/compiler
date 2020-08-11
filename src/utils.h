@@ -18,6 +18,7 @@ typedef std::vector<Instruction*> Code;
 #define BIN(op, left, right) new BinopNode(op, left, right)
 #define MEM(parent, child) new MemberNode(parent, child)
 #define IF(condition, then) new IfNode(condition, then)
+#define LST(list) new ListNode(list)
 #define CALL(function, arguments) new CallNode(function, arguments)
 #define CLS(name, template_parameters, fields) new StructNode(name, template_parameters, fields)
 #define ASN(lvalue, rvalue) new AssignmentNode(lvalue, rvalue)

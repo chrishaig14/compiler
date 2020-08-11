@@ -541,7 +541,39 @@ TEST(parser_test, div_expression) {
     Node* node = parser.parse_mul_or_div_expression();
     Node* expected_node = BIN(OpType::DIV, ID("foo"), NUM(1));
     COMPLETE_TEST;
+}
 
+TEST(parser_test, parse_list_empty) {
+    std::string text = "[]";
+    Scanner scanner(text);
+    std::vector<Token> tokens = scanner.scan_all();
+    Parser parser(tokens);
+    Node* node = parser.parse_expression();
+    VectorOfNodes list;
+    Node* expected_node = LST(list);
+    COMPLETE_TEST;
+}
+
+TEST(parser_test, parse_list_one_element) {
+    std::string text = "[13]";
+    Scanner scanner(text);
+    std::vector<Token> tokens = scanner.scan_all();
+    Parser parser(tokens);
+    Node* node = parser.parse_expression();
+    VectorOfNodes list = {NUM(13)};
+    Node* expected_node = LST(list);
+    COMPLETE_TEST;
+}
+
+TEST(parser_test, parse_list_multiple_elements) {
+    std::string text = "[23,17,64]";
+    Scanner scanner(text);
+    std::vector<Token> tokens = scanner.scan_all();
+    Parser parser(tokens);
+    Node* node = parser.parse_expression();
+    VectorOfNodes list = {NUM(23),NUM(17),NUM(64)};
+    Node* expected_node = LST(list);
+    COMPLETE_TEST;
 }
 
 TEST(parser_test, parse_top_level) {

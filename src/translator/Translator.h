@@ -15,6 +15,7 @@
 #include "../instructions/PushStringInst.h"
 #include "../instructions/ReturnInst.h"
 #include "../instructions/MakeObjectInst.h"
+#include "../instructions/MakeListInst.h"
 #include "../instructions/SetMemberInst.h"
 #include "../instructions/MakeClassInst.h"
 #include "../instructions/GetMemberInst.h"

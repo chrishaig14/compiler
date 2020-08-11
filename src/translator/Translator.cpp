@@ -116,7 +116,14 @@ void Translator::visit(IfNode& node) {
 }
 
 void Translator::visit(ListNode& node) {
-
+    Code out;
+    for (auto e: node.elements) {
+        e->accept(*this);
+        Code e_code = this->code;
+        out.insert(out.end(), e_code.begin(), e_code.end());
+    }
+    out.push_back(I_MAKE_LIST(node.elements.size()));
+    this->code = out;
 }
 
 void Translator::visit(MemberNode& node) {
