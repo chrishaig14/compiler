@@ -148,4 +148,4 @@ add_library(srcLib
         instructions/MakeDefaultInst.cpp
         instructions/MakeDefaultInst.h
         parser/UnexpectedToken.cpp
-        parser/UnexpectedToken.h)
+        parser/UnexpectedToken.h nodes/ForNode.cpp nodes/ForNode.h)

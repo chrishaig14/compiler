@@ -533,6 +533,28 @@ TEST(parser_test, times_expression) {
 
 }
 
+TEST(parser_test, for_loop_1) {
+    std::string text = "for(e:l){}";
+    Scanner scanner(text);
+    std::vector<Token> tokens = scanner.scan_all();
+    Parser parser(tokens);
+    Node* node = parser.parse_for_loop();
+    Node* expected_node = FOR("e", ID("l"), new BlockNode({}));
+    COMPLETE_TEST;
+}
+
+TEST(parser_test, for_loop_2) {
+    std::string text = "for(e:[4,5,6]){print(e);}";
+    Scanner scanner(text);
+    std::vector<Token> tokens = scanner.scan_all();
+    Parser parser(tokens);
+    Node* node = parser.parse_for_loop();
+    VectorOfNodes list = {NUM(4),NUM(5),NUM(6)};
+    BlockNode* body = new BlockNode({CALL(ID("print"),{ID("e")})});
+    Node* expected_node = FOR("e", LST(list), body);
+    COMPLETE_TEST;
+}
+
 TEST(parser_test, div_expression) {
     std::string text = "foo/1";
     Scanner scanner(text);
@@ -571,7 +593,7 @@ TEST(parser_test, parse_list_multiple_elements) {
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
     Node* node = parser.parse_expression();
-    VectorOfNodes list = {NUM(23),NUM(17),NUM(64)};
+    VectorOfNodes list = {NUM(23), NUM(17), NUM(64)};
     Node* expected_node = LST(list);
     COMPLETE_TEST;
 }

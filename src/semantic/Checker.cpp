@@ -259,3 +259,7 @@ void Checker::visit(ClassLiteralFieldNode& node) {
     this->rv = SemanticInfo();
     rv.symbol_info = new SymbolInfo(new ObjectInfo(new TypeNode(node.identifier, {})));
 }
+
+void Checker::visit(ForNode& node) {
+
+}

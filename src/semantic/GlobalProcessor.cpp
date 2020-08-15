@@ -99,5 +99,9 @@ void GlobalProcessor::visit(ClassLiteralFieldNode& node) {
 
 }
 
+void GlobalProcessor::visit(ForNode& node) {
+
+}
+
 
 

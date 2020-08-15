@@ -22,6 +22,7 @@ typedef std::vector<Instruction*> Code;
 #define CALL(function, arguments) new CallNode(function, arguments)
 #define CLS(name, template_parameters, fields) new StructNode(name, template_parameters, fields)
 #define ASN(lvalue, rvalue) new AssignmentNode(lvalue, rvalue)
+#define FOR(var, exp, block) new ForNode(var, exp, block)
 #define SUB(parent, child) new SubscriptNode(parent, child)
 #define DECL(id, type, exp) new DeclarationNode(id, type, exp)
 #define LIT_EXP(id, type) new ClassLiteralExpressionNode(id, type)

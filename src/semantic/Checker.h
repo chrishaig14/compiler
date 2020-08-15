@@ -81,6 +81,8 @@ public:
 
     void visit(ClassLiteralFieldNode& node) override;
 
+    void visit(ForNode& node) override;
+
 
 };
 

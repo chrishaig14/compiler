@@ -55,6 +55,8 @@ public:
     void visit(ClassLiteralExpressionNode& node) override;
 
     void visit(ClassLiteralFieldNode& node) override;
+
+    void visit(ForNode& node) override;
 };
 
 #endif //UNTITLED1_GLOBALPROCESSOR_H

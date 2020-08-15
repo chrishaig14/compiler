@@ -223,3 +223,7 @@ void Translator::visit(ClassLiteralFieldNode& node) {
     all.push_back(new MakeObjectInst(node.identifier, fields));
     this->code = all;
 }
+
+void Translator::visit(ForNode& node) {
+
+}

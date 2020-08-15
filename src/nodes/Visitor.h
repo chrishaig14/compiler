@@ -21,6 +21,8 @@ class StructNode;
 
 class DeclarationNode;
 
+class ForNode;
+
 class FunctionNode;
 
 class IdNode;
@@ -55,10 +57,9 @@ public:
 
     virtual void visit(ClassLiteralFieldNode& node) = 0;
 
-
-    virtual void visit(StructNode& node) = 0;
-
     virtual void visit(DeclarationNode& node) = 0;
+
+    virtual void visit(ForNode& node) = 0;
 
     virtual void visit(FunctionNode& node) = 0;
 
@@ -75,6 +76,8 @@ public:
     virtual void visit(ReturnNode& node) = 0;
 
     virtual void visit(StringNode& node) = 0;
+
+    virtual void visit(StructNode& node) = 0;
 
     virtual void visit(SubscriptNode& node) = 0;
 

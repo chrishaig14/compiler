@@ -480,4 +480,16 @@ Node* Parser::parse_top_level_statement() {
     return node;
 }
 
+ForNode* Parser::parse_for_loop() {
+    this->expect_token(TokenType::FOR);
+    this->expect_token(TokenType::LPAREN);
+    Token var = this->expect_token(TokenType::ID);
+    this->expect_token(TokenType::COLON);
+    Node* exp = this->parse_expression();
+    this->expect_token(TokenType::RPAREN);
+    BlockNode* body = this->parse_possibly_empty_block();
+    ForNode* for_node = FOR(var.str, exp, body);
+    return for_node;
+}
+
 
