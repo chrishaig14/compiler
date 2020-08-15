@@ -188,5 +188,5 @@ Token Scanner::scan_number() {
 }
 
 UnexpectedCharacter::UnexpectedCharacter(char c, size_t position) : std::runtime_error(
-        std::string("unexpected character ") + c + " at position " + std::to_string(position)) {
+        std::string("Unexpected character '") + std::string(1,c) + "' at position " + std::to_string(position)) {
 }

@@ -14,7 +14,7 @@
 extern std::map<std::string, TokenType> TOKEN_KEYWORDS;
 extern std::map<std::string, TokenType> TOKEN_SPECIAL;
 
-class UnexpectedCharacter : std::runtime_error {
+class UnexpectedCharacter : public std::runtime_error {
 public:
     UnexpectedCharacter(char c, size_t position);
 
