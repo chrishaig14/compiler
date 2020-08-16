@@ -334,6 +334,10 @@ Node* Parser::parse_common_statement() {
         this->expect_token(TokenType::SEMICOLON);
         return ast_node;
     }
+    if(this->match(TokenType::FOR)){
+        ast_node = this->parse_for_loop();
+        return ast_node;
+    }
     Node* node = this->parse_assignment_or_expression();
     this->expect_token(TokenType::SEMICOLON);
     return node;

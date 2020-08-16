@@ -555,6 +555,18 @@ TEST(parser_test, for_loop_2) {
     COMPLETE_TEST;
 }
 
+TEST(parser_test, for_loop_3) {
+    std::string text = "for(e:[4,5,6]){print(e);}";
+    Scanner scanner(text);
+    std::vector<Token> tokens = scanner.scan_all();
+    Parser parser(tokens);
+    Node* node = parser.parse_top_level_statement();
+    VectorOfNodes list = {NUM(4),NUM(5),NUM(6)};
+    BlockNode* body = new BlockNode({CALL(ID("print"),{ID("e")})});
+    Node* expected_node = FOR("e", LST(list), body);
+    COMPLETE_TEST;
+}
+
 TEST(parser_test, div_expression) {
     std::string text = "foo/1";
     Scanner scanner(text);
