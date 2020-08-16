@@ -1,7 +1,6 @@
 #include <gtest/gtest.h>
 #include <parser/Parser.h>
 #include <scanner/Scanner.h>
-#include <semantic/SymbolInfo.h>
 #include <semantic/GlobalProcessor.h>
 #include <semantic/Checker.h>
 
@@ -33,23 +32,23 @@ BlockNode* get_treeA(std::string text) {
                                                 EXPECT_EQ(se,RedeclareError(NAME))  << se.what();       \
                                             }
 
-#define ASSERT_THROWS_RETURN_TYPE_ERROR(NAME, ACTUAL_TYPE, EXPECTED_TYPE) BlockNode* tree = get_treeA(text);       \
+#define ASSERT_THROWS_RETURN_TYPE_ERROR(NAME, EXPECTED_TYPE, ACTUAL_TYPE) BlockNode* tree = get_treeA(text);       \
                                             GlobalProcessor gp;gp.visit(*tree);              \
                                             Checker checker(gp.globals, gp.class_table);                  \
                                             try {                                       \
                                                 checker.visit(*tree);                       \
                                                 FAIL() << "Expected ReturnError thrown"; \
                                             } catch(const ReturnError& se){              \
-                                                EXPECT_EQ(se,ReturnError(ACTUAL_TYPE, EXPECTED_TYPE))  << se.what();       }\
+                                                EXPECT_EQ(se,ReturnError(EXPECTED_TYPE, ACTUAL_TYPE))  << se.what();       }\
 
-#define ASSERT_THROWS_ASSIGNMENT_ERROR(NAME, EXPECTED_TYPE, ACTUAL_TYPE) BlockNode* tree = get_treeA(text);       \
+#define ASSERT_THROWS_ASSIGNMENT_ERROR(EXPECTED_TYPE, ACTUAL_TYPE ) BlockNode* tree = get_treeA(text);       \
                                             GlobalProcessor gp;gp.visit(*tree);              \
                                             Checker checker(gp.globals, gp.class_table);                  \
                                             try {                                       \
                                                 checker.visit(*tree);                       \
-                                                FAIL() << "Expected ReturnError thrown"; \
-                                            } catch(const std::runtime_error& se){              \
-                                                EXPECT_EQ(se.what(),std::string("Assigning value of type ") + ACTUAL_TYPE + ", expected " +EXPECTED_TYPE)  << se.what();       }\
+                                                FAIL() << "Expected AssignmentTypeError thrown"; \
+                                            } catch(const AssignmentTypeError& se){              \
+                                                EXPECT_EQ(se,AssignmentTypeError(EXPECTED_TYPE, ACTUAL_TYPE))  << se.what();       }\
 
 
 #define ASSERT_THROWS_BAD_ARGUMENTS() BlockNode* tree = get_treeA(text);       \
@@ -74,10 +73,10 @@ TEST(second_pass_test, fun_foo_cAomplete) {
     Checker checker(gp.globals, gp.class_table);
     checker.visit(*tree);
     SymbolTable* foo_scope = checker.scopes["global.foo"];
-    SymbolInfo* sinfo = foo_scope->get("y");
+    ObjectTypeNode* sinfo = dynamic_cast<ObjectTypeNode*>(foo_scope->get("y"));
+    EXPECT_NE(sinfo, nullptr);
     EXPECT_TRUE(((FunctionNode*) tree->nodes[0])->free_variables.size() == 0);
-    EXPECT_EQ(sinfo->type, SINFO::SIMPLE);
-    EXPECT_EQ(sinfo->object_info->parent, "Foo");
+    EXPECT_EQ(sinfo->identifier, "Foo");
 }
 
 TEST(second_pass_test, free_variable_test_1) {
@@ -89,11 +88,11 @@ TEST(second_pass_test, free_variable_test_1) {
     checker.visit(*tree);
     EXPECT_TRUE(checker.scopes["global"]->has("x"));
     SymbolTable* foo_scope = checker.scopes["global.foo"];
-    SymbolInfo* sinfo = foo_scope->get("y");
+    auto sinfo = dynamic_cast<ObjectTypeNode*>(foo_scope->get("y"));
     EXPECT_TRUE(((FunctionNode*) tree->nodes[1])->free_variables.size() == 1);
     EXPECT_TRUE(((FunctionNode*) tree->nodes[1])->free_variables.count("x") == 1);
-    EXPECT_EQ(sinfo->type, SINFO::SIMPLE);
-    EXPECT_EQ(sinfo->object_info->parent, "Foo");
+    EXPECT_NE(sinfo, nullptr);
+    EXPECT_EQ(sinfo->identifier, "Foo");
 }
 
 
@@ -106,11 +105,11 @@ TEST(second_pass_test, free_variable_test_2) {
     checker.visit(*tree);
     EXPECT_TRUE(checker.scopes["global"]->has("x"));
     SymbolTable* foo_scope = checker.scopes["global.foo"];
-    SymbolInfo* sinfo = foo_scope->get("y");
+    auto sinfo = dynamic_cast<ObjectTypeNode*>(foo_scope->get("y"));
     EXPECT_TRUE(((FunctionNode*) tree->nodes[1])->free_variables.size() == 1);
     EXPECT_TRUE(((FunctionNode*) tree->nodes[1])->free_variables.count("x") == 1);
-    EXPECT_EQ(sinfo->type, SINFO::SIMPLE);
-    EXPECT_EQ(sinfo->object_info->parent, "Foo");
+    EXPECT_NE(sinfo, nullptr);
+    EXPECT_EQ(sinfo->identifier, "Foo");
 }
 
 TEST(second_pass_test, free_variable_test_3) {
@@ -122,11 +121,11 @@ TEST(second_pass_test, free_variable_test_3) {
     checker.visit(*tree);
     EXPECT_TRUE(checker.scopes["global"]->has("x"));
     SymbolTable* foo_scope = checker.scopes["global.foo"];
-    SymbolInfo* sinfo = foo_scope->get("y");
+    auto sinfo = dynamic_cast<ObjectTypeNode*>(foo_scope->get("y"));
     EXPECT_TRUE(((FunctionNode*) tree->nodes[1])->free_variables.size() == 1);
     EXPECT_TRUE(((FunctionNode*) tree->nodes[1])->free_variables.count("x") == 1);
-    EXPECT_EQ(sinfo->type, SINFO::SIMPLE);
-    EXPECT_EQ(sinfo->object_info->parent, "Foo");
+    EXPECT_NE(sinfo, nullptr);
+    EXPECT_EQ(sinfo->identifier, "Foo");
 }
 
 TEST(second_pass_test, free_variable_test_4) {
@@ -138,10 +137,10 @@ TEST(second_pass_test, free_variable_test_4) {
     checker.visit(*tree);
     EXPECT_TRUE(checker.scopes["global"]->has("x"));
     SymbolTable* foo_scope = checker.scopes["global.foo"];
-    SymbolInfo* sinfo = foo_scope->get("y");
+    auto sinfo = dynamic_cast<ObjectTypeNode*>(foo_scope->get("y"));
+    EXPECT_NE(sinfo, nullptr);
     EXPECT_TRUE(((FunctionNode*) tree->nodes[1])->free_variables.size() == 0);
-    EXPECT_EQ(sinfo->type, SINFO::SIMPLE);
-    EXPECT_EQ(sinfo->object_info->parent, "Foo");
+    EXPECT_EQ(sinfo->identifier, "Foo");
 }
 
 TEST(second_pass_test, tee) {
@@ -203,7 +202,7 @@ TEST(second_pass_test, x_declare_in_inner_scope_and_use_outside_error) {
 
 TEST(second_pass_test, function_return_type_error) {
     std::string text = "fun foo()->String{} fun main()->Integer{return foo();}";
-    ASSERT_THROWS_RETURN_TYPE_ERROR("main", "String", "Integer");
+    ASSERT_THROWS_RETURN_TYPE_ERROR("main", T_STRING, T_INT);
 }
 
 TEST(second_pass_test, function_return_type_ok) {
@@ -223,22 +222,23 @@ TEST(second_pass_test, function_argument_type_error) {
 
 TEST(second_pass_test, declaration_type_error_1) {
     std::string text = "var x: String = 5;";
-    ASSERT_THROWS_RETURN_TYPE_ERROR("", "Integer", "String");
+    ASSERT_THROWS_ASSIGNMENT_ERROR(T_STRING, T_INT);
 }
 
 TEST(second_pass_test, declaration_type_error_2) {
     std::string text = "var x: Integer = \"Hello\";";
-    ASSERT_THROWS_RETURN_TYPE_ERROR("", "String", "Integer");
+    ASSERT_THROWS_ASSIGNMENT_ERROR(T_INT, T_STRING);
+
 }
 
 TEST(second_pass_test, assignment_type_error_1) {
     std::string text = "var x: String=\"\"; x = 5;";
-    ASSERT_THROWS_ASSIGNMENT_ERROR("", "String", "Integer");
+    ASSERT_THROWS_ASSIGNMENT_ERROR(T_STRING, T_INT);
 }
 
 TEST(second_pass_test, assignment_type_error_2) {
     std::string text = "var x: Integer=0;x = \"Hello\";";
-    ASSERT_THROWS_ASSIGNMENT_ERROR("", "Integer", "String");
+    ASSERT_THROWS_ASSIGNMENT_ERROR(T_INT, T_STRING);
 }
 
 TEST(second_pass_test, class_literal_expression_ok) {

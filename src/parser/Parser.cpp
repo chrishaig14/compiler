@@ -334,7 +334,7 @@ Node* Parser::parse_common_statement() {
         this->expect_token(TokenType::SEMICOLON);
         return ast_node;
     }
-    if(this->match(TokenType::FOR)){
+    if (this->match(TokenType::FOR)) {
         ast_node = this->parse_for_loop();
         return ast_node;
     }
@@ -344,6 +344,27 @@ Node* Parser::parse_common_statement() {
 }
 
 TypeNode* Parser::parse_type_node() {
+    if (this->match(TokenType::FUN)) {
+        this->next();
+        this->expect_token(TokenType::LPAREN);
+        VectorOfTypes parameter_types;
+        if (!this->match(TokenType::RPAREN)) {
+            while (true) {
+                TypeNode* parameter_type = this->parse_type_node();
+                parameter_types.push_back(parameter_type);
+                if (this->match(TokenType::COMMA)) {
+                    this->next();
+                } else {
+                    break;
+                }
+            }
+        }
+        this->expect_token(TokenType::RPAREN);
+        this->expect_token(TokenType::RARROW);
+        TypeNode* return_type = this->parse_type_node();
+        TypeNode* fun_type = new FunctionTypeNode(parameter_types, return_type);
+        return fun_type;
+    }
     Token identifier = this->expect_token(TokenType::ID);
     VectorOfTypes type_parameters;
     if (this->match(TokenType::LSQUARE)) {
@@ -360,7 +381,7 @@ TypeNode* Parser::parse_type_node() {
         }
         this->expect_token(TokenType::RSQUARE);
     }
-    TypeNode* node = new TypeNode(identifier.str, type_parameters);
+    TypeNode* node = new ObjectTypeNode(identifier.str, type_parameters);
     return node;
 }
 

@@ -147,10 +147,8 @@ TEST(parser_test, simple_type) {
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
     TypeNode* node = parser.parse_type_node();
-    auto expected_node = TYPE("String", VectorOfTypes());
+    auto expected_node = T_STRING;
     COMPLETE_TEST;
-
-
 }
 
 TEST(parser_test, template_type) {
@@ -159,9 +157,28 @@ TEST(parser_test, template_type) {
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
     TypeNode* node = parser.parse_type_node();
-    auto expected_node = TYPE("String", std::vector<TypeNode*>{TYPE("Integer", {})});
+    auto expected_node = TYPE("String", std::vector<TypeNode*>{OBJECT_TYPE("Integer", {})});
     COMPLETE_TEST;
+}
 
+TEST(parser_test, fun_empty) {
+    std::string text = "fun() ->String";
+    Scanner scanner(text);
+    std::vector<Token> tokens = scanner.scan_all();
+    Parser parser(tokens);
+    TypeNode* node = parser.parse_type_node();
+    auto expected_node = FUNCTION_TYPE({},T_STRING);
+    COMPLETE_TEST;
+}
+
+TEST(parser_test, fun_full) {
+    std::string text = "fun(List[String],fun(String)->Integer) -> List[Integer]";
+    Scanner scanner(text);
+    std::vector<Token> tokens = scanner.scan_all();
+    Parser parser(tokens);
+    TypeNode* node = parser.parse_type_node();
+    auto expected_node = new FunctionTypeNode({T_LIST(T_STRING), FUNCTION_TYPE({T_STRING},T_INT)},T_LIST(T_INT));
+    COMPLETE_TEST;
 }
 
 

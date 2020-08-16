@@ -21,8 +21,8 @@ TEST(first_pass_test, fun_foo) {
     BlockNode* tree = get_tree(text);
     GlobalProcessor gp;
     gp.visit(*tree);
-    SymbolInfo* ginfo = gp.globals->get("foo");
-    EXPECT_EQ(ginfo->type, SINFO::FUNCTION);
+    auto ginfo = dynamic_cast<FunctionTypeNode*>(gp.globals->get("foo"));
+    EXPECT_NE(ginfo, nullptr);
 }
 
 TEST(first_pass_test, fun_foo_eq) {
@@ -30,8 +30,9 @@ TEST(first_pass_test, fun_foo_eq) {
     BlockNode* tree = get_tree(text);
     GlobalProcessor gp;
     gp.visit(*tree);
-    SymbolInfo* ginfo = gp.globals->get("foo");
-    EXPECT_TRUE(*ginfo == *S_INFO(F_INFO({}, T_STRING)));
+    auto ginfo = dynamic_cast<FunctionTypeNode*>(gp.globals->get("foo"));
+    EXPECT_NE(ginfo, nullptr);
+    EXPECT_TRUE(*ginfo == FunctionTypeNode({}, T_STRING));
 }
 
 TEST(first_pass_test, fun_foo_complete) {
@@ -39,8 +40,9 @@ TEST(first_pass_test, fun_foo_complete) {
     BlockNode* tree = get_tree(text);
     GlobalProcessor gp;
     gp.visit(*tree);
-    SymbolInfo* ginfo = gp.globals->get("foo");
-    EXPECT_TRUE(*ginfo == *S_INFO(F_INFO(std::vector<TypeNode*>({T_INT, T_STRING}), T_BOOL)));
+    auto ginfo = dynamic_cast<FunctionTypeNode*>(gp.globals->get("foo"));
+    EXPECT_NE(ginfo, nullptr);
+    EXPECT_TRUE(*ginfo == FunctionTypeNode({T_INT, T_STRING}, T_BOOL));
 }
 
 TEST(first_pass_test, class_foo) {
@@ -58,8 +60,8 @@ TEST(first_pass_test, class_foo_eq) {
     gp.visit(*tree);
 }
 
-typedef std::map<std::string, SymbolInfo*> MapStringToSimple;
-typedef std::map<std::string, FunctionInfo*> MapStringToFunction;
+typedef std::map<std::string, TypeNode*> MapStringToSimple;
+typedef std::map<std::string, FunctionTypeNode*> MapStringToFunction;
 TEST(first_pass_test, class_foo_with_field) {
     std::string text = "struct Foo{x: String;}";
     BlockNode* tree = get_tree(text);
@@ -67,7 +69,7 @@ TEST(first_pass_test, class_foo_with_field) {
     gp.visit(*tree);
     ClassInfo* ginfo = gp.class_table->get("Foo");
     MapStringToSimple fields;
-    fields["x"] = S_INFO(O_INFO(T_STRING));
+    fields["x"] = T_STRING;
     ClassInfo class_info;
     class_info.fields = fields;
     class_info.field_names.push_back("x");

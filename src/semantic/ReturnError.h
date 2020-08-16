@@ -6,6 +6,7 @@
 #define UNTITLED1_RETURNERROR_H
 
 #include <stdexcept>
+#include "../nodes/TypeNode.h"
 
 class ReturnError : public std::runtime_error {
 public:
@@ -17,8 +18,8 @@ public:
         return t;
     }
 
-    ReturnError(std::string actual_type, std::string expected_type) : runtime_error(
-            "Expected to return " + expected_type + ", actual: " + actual_type) {
+    ReturnError(TypeNode* expected_type, TypeNode* actual_type) : runtime_error(
+            "Expected to return " + expected_type->to_string() + ", actual: " + actual_type->to_string()) {
 
     }
 

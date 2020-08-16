@@ -66,17 +66,15 @@ void GlobalProcessor::visit(StructNode& node) {
     ClassInfo* class_info = new ClassInfo();
     for (auto f: node.fields) {
         class_info->field_names.push_back(f.first);
-        auto w = new SymbolInfo(new ObjectInfo(f.second));
-        class_info->field_types.push_back(w);
-        class_info->fields[f.first] = w;
+        class_info->field_types.push_back(f.second);
+        class_info->fields[f.first] = f.second;
     }
     this->class_table->set(node.identifier, class_info);
 }
 
 void GlobalProcessor::visit(FunctionNode& node) {
-    FunctionInfo* function_info = new FunctionInfo(node.parameter_types, node.return_type);
-    SymbolInfo* ginfo = new SymbolInfo(function_info);
-    this->globals->set(node.identifier, ginfo);
+    FunctionTypeNode* function_info = new FunctionTypeNode(node.parameter_types, node.return_type);
+    this->globals->set(node.identifier, function_info);
 }
 
 void GlobalProcessor::visit(VectorOfNodes program) {

@@ -14,13 +14,13 @@
 class ClassInfo {
 public:
     std::vector<std::string> field_names;
-    std::vector<SymbolInfo*> field_types;
-    std::map<std::string, SymbolInfo*> fields;
+    std::vector<TypeNode*> field_types;
+    std::map<std::string, TypeNode*> fields;
 
 
     ClassInfo() {}
 
-    ClassInfo(const std::vector<std::string>& fieldNames, const std::vector<SymbolInfo*>& fieldTypes) : field_names(
+    ClassInfo(const std::vector<std::string>& fieldNames, const std::vector<TypeNode*>& fieldTypes) : field_names(
             fieldNames), field_types(fieldTypes) {
         for (int i = 0; i < fieldNames.size(); i++) {
             this->fields[fieldNames[i]] = fieldTypes[i];
@@ -35,7 +35,7 @@ public:
         if (this->field_names != b.field_names) return false;
         if (this->field_types.size() != b.field_types.size()) return false;
         for (int i = 0; i < this->field_types.size(); i++) {
-            if (*this->field_types[i] != *b.field_types[i]) return false;
+            if (!this->field_types[i]->equal(b.field_types[i])) return false;
         }
         return true;
     }

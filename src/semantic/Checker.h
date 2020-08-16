@@ -11,13 +11,14 @@
 #include "RedeclareError.h"
 #include "ReturnError.h"
 #include "BadArguments.h"
+#include "AssignmentTypeError.h"
 
-typedef std::map<std::string, ObjectInfo> MapStringToSimple;
-typedef std::map<std::string, FunctionInfo> MapStringToFunction;
+//typedef std::map<std::string, ObjectInfo> MapStringToSimple;
+//typedef std::map<std::string, FunctionInfo> MapStringToFunction;
 
 
 struct SemanticInfo {
-    SymbolInfo* symbol_info;
+    TypeNode* symbol_info;
     std::map<std::string, int> declared_variables;
     std::map<std::string, int> free_variables;
 };
@@ -57,7 +58,7 @@ public:
 
     void visit(NumberNode& node) override {
         SemanticInfo semanticInfo;
-        semanticInfo.symbol_info = new SymbolInfo(new ObjectInfo(new TypeNode("Integer", {})));
+        semanticInfo.symbol_info = new ObjectTypeNode("Integer",{});
         this->rv = semanticInfo;
     }
 
@@ -65,7 +66,7 @@ public:
 
     void visit(StringNode& node) override {
         SemanticInfo semanticInfo;
-        semanticInfo.symbol_info = new SymbolInfo(new ObjectInfo(new TypeNode("String", {})));
+        semanticInfo.symbol_info = new ObjectTypeNode("String",{});
         this->rv = semanticInfo;
     }
 

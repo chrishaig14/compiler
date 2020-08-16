@@ -14,7 +14,7 @@
 
 
 class SymbolTable {
-    std::map<std::string, SymbolInfo*> table;
+    std::map<std::string, TypeNode*> table;
 public:
     SymbolTable(std::string name, SymbolTable* parent) {
         this->name = name;
@@ -33,7 +33,7 @@ public:
         }
     }
 
-    SymbolInfo* get(std::string name) {
+    TypeNode* get(std::string name) {
         if (this->table.count(name) == 1) {
             return this->table[name];
         } else {
@@ -48,7 +48,7 @@ public:
         return this->table.count(name) == 1;
     }
 
-    void set(std::string name, SymbolInfo* info) {
+    void set(std::string name, TypeNode* info) {
         this->table[name] = info;
     }
 

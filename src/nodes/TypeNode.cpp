@@ -4,20 +4,71 @@
 
 #include "TypeNode.h"
 
-void TypeNode::accept(Visitor& visitor) {
-    visitor.visit(*this);
+void FunctionTypeNode::accept(Visitor& visitor) {
+
 }
 
-TypeNode::TypeNode(const std::string& identifier, const std::vector<TypeNode*>& typeParameters) : identifier(
-        identifier), type_parameters(typeParameters) {}
+bool FunctionTypeNode::equal(Node* other) const {
+    FunctionTypeNode* other_ptr = dynamic_cast<FunctionTypeNode*>(other);
+    if (other_ptr == nullptr) return false;
+    return *this == *other_ptr;
+}
 
-json TypeNode::to_json() const {
-    json j;
-    j["node"] = "type";
-    j["identifier"] = identifier;
-    j["type_parameters"] = {};
-    for (auto tp: this->type_parameters) {
-        j["type_parameters"].push_back(tp->to_json());
+FunctionTypeNode::FunctionTypeNode(const std::vector<TypeNode*>& parameterTypes, TypeNode* returnType)
+        : parameter_types(parameterTypes), return_type(returnType) {}
+
+std::string FunctionTypeNode::to_string() {
+    std::string parameters;
+    std::string ret;
+    for (auto p: this->parameter_types) {
+        parameters += p->to_string() + ", ";
     }
-    return j;
+    ret = this->return_type->to_string();
+    return "fun (" + parameters + ") -> " + ret;
 }
+
+void GeneratorTypeNode::accept(Visitor& visitor) {
+
+}
+
+bool GeneratorTypeNode::equal(Node* other) const {
+    return false;
+}
+
+GeneratorTypeNode::GeneratorTypeNode(const std::vector<TypeNode*>& parameterTypes, TypeNode* returnType)
+        : parameter_types(parameterTypes), return_type(returnType) {}
+
+std::string GeneratorTypeNode::to_string() {
+    std::string parameters;
+    std::string ret;
+    for (auto p: this->parameter_types) {
+        parameters += p->to_string() + ", ";
+    }
+    ret = this->return_type->to_string();
+    return "gen (" + parameters + ") -> " + ret;
+}
+
+void ObjectTypeNode::accept(Visitor& visitor) {
+
+}
+
+bool ObjectTypeNode::equal(Node* other) const {
+    const ObjectTypeNode* other_ptr = dynamic_cast<const ObjectTypeNode*>(other);
+    if (other_ptr == nullptr) return false;
+    return *this == *other_ptr;
+}
+
+ObjectTypeNode::ObjectTypeNode(const std::string& identifier, const std::vector<TypeNode*>& typeParameters)
+        : identifier(identifier), type_parameters(typeParameters) {}
+
+std::string ObjectTypeNode::to_string() {
+    std::string parameters;
+    for (auto p: this->type_parameters) {
+        parameters += p->to_string() + ", ";
+    }
+    if (parameters.size() != 0) {
+        return this->identifier + "[" + parameters + "]";
+    }
+    return this->identifier;
+}
+

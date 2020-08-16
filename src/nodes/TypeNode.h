@@ -13,35 +13,72 @@
 
 class TypeNode : public Node {
 public:
-    std::string identifier;
-    std::vector<TypeNode*> type_parameters;
+//    void accept(Visitor& visitor) override;
 
-    TypeNode(const std::string& identifier, const std::vector<TypeNode*>& typeParameters);
+//    bool equal(Node* other) const override;
+
+    virtual std::string to_string() = 0;
+};
+
+class FunctionTypeNode : public TypeNode {
+public:
+    FunctionTypeNode(const std::vector<TypeNode*>& parameterTypes, TypeNode* returnType);
 
     void accept(Visitor& visitor) override;
 
-    bool equal(Node* other) const override {
-        auto other_ptr = dynamic_cast<TypeNode*>(other);
-        if (other_ptr == nullptr) return false;
-        return *this == *other_ptr;
+    bool equal(Node* other) const override;
+
+    bool operator==(const FunctionTypeNode& other) const {
+        if (this->parameter_types.size() != other.parameter_types.size()) return false;
+        for (int i = 0; i < this->parameter_types.size(); i++) {
+            if (!this->parameter_types[i]->equal(other.parameter_types[i])) return false;
+        }
+        return this->return_type->equal(other.return_type);
     }
 
-    bool operator==(TypeNode& other) const {
+    std::string to_string() override;
+
+    std::vector<TypeNode*> parameter_types;
+    TypeNode* return_type;
+};
+
+class GeneratorTypeNode : public TypeNode {
+public:
+    GeneratorTypeNode(const std::vector<TypeNode*>& parameterTypes, TypeNode* returnType);
+
+    void accept(Visitor& visitor) override;
+
+    bool equal(Node* other) const override;
+
+    std::string to_string() override;
+
+private:
+    std::vector<TypeNode*> parameter_types;
+    TypeNode* return_type;
+};
+
+class ObjectTypeNode : public TypeNode {
+public:
+    ObjectTypeNode(const std::string& identifier, const std::vector<TypeNode*>& typeParameters);
+
+    void accept(Visitor& visitor) override;
+
+    bool equal(Node* other) const;
+
+    std::string to_string() override;
+
+    bool operator==(const ObjectTypeNode& other) const {
         if (this->identifier != other.identifier) return false;
         if (this->type_parameters.size() != other.type_parameters.size()) return false;
-        for (int i = 0; i < this->type_parameters.size(); ++i) {
-            if (!this->type_parameters[i]->equal(other.type_parameters[i]))return false;
+        for (int i = 0; i < this->type_parameters.size(); i++) {
+            if (!this->type_parameters[i]->equal(other.type_parameters[i])) return false;
         }
         return true;
     }
 
-    ~TypeNode() {
-        for (auto p: this->type_parameters) {
-            delete p;
-        }
-    }
-
-    json to_json() const override;
+    std::string identifier;
+private:
+    std::vector<TypeNode*> type_parameters;
 };
 
 
