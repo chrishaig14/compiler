@@ -77,7 +77,6 @@ public:
     }
 
     std::string identifier;
-private:
     std::vector<TypeNode*> type_parameters;
 };
 

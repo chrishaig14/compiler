@@ -95,7 +95,7 @@ void Checker::visit(AssignmentNode& n) {
     n.rvalue->accept(*this);
     SemanticInfo expression_type = this->rv;
     if (!linfo.symbol_info->equal(expression_type.symbol_info)) {
-        throw AssignmentTypeError(linfo.symbol_info,expression_type.symbol_info);
+        throw AssignmentTypeError(linfo.symbol_info, expression_type.symbol_info);
     }
     SemanticInfo semantic_info;
     semantic_info.free_variables = expression_type.free_variables;
@@ -259,5 +259,26 @@ void Checker::visit(ClassLiteralFieldNode& node) {
 }
 
 void Checker::visit(ForNode& node) {
+    node.exp->accept(*this);
+    SemanticInfo semantic_info = this->rv;
+    ObjectTypeNode* obj = dynamic_cast<ObjectTypeNode*>(semantic_info.symbol_info);
+    if (obj == nullptr) {
+        throw std::runtime_error("Iterating over something bad!");
+    }
+    TypeNode* var_type = nullptr;
+    if (obj->identifier == "List") {
+        var_type = obj->type_parameters[0];
+    }
+    this->enter_scope("for");
+    this->scope->set(node.var, var_type);
+    node.body->accept(*this);
+    this->leave_scope();
+}
 
+void Checker::visit(ListNode& node) {
+    node.elements[0]->accept(*this);
+    SemanticInfo semantic_info = this->rv;
+    SemanticInfo return_info;
+    return_info.symbol_info = new ObjectTypeNode("List",{semantic_info.symbol_info});
+    this->rv = return_info;
 }

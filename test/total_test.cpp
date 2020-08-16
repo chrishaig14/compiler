@@ -192,3 +192,29 @@ TEST(total_test, test_7) {
     code_runner.run();
     EXPECT_TRUE(code_runner.env->get("x")->equal(new IntegerObject(4)));
 }
+
+TEST(total_test, test_factorial_with_for) {
+    std::string text = "var result = 1; for(x:[1,2,3,4,5,6,7,8,9,10]){result = result * x;}";
+    Scanner scanner(text);
+    std::vector<Token> tokens = scanner.scan_all();
+    Parser parser(tokens);
+    BlockNode* program = parser.parse_program();
+    VectorOfNodes list = {NUM(3), NUM(1), NUM(4)};
+    auto expected_node = BlockNode({DECL("l", nullptr, LST(list)), DECL("x", nullptr, SUB(ID("l"), NUM(2)))});
+    EXPECT_EQ(*program, expected_node);
+    GlobalProcessor gp;
+    gp.visit(*program);
+    Checker checker(gp.globals, gp.class_table);
+    checker.visit(*program);
+    Translator translator;
+    program->accept(translator);
+    Code translated_code = translator.code;
+    Code expected_code = {I_PUSHI(3), I_PUSHI(1), I_PUSHI(4), I_MAKE_LIST(3), I_DECL("l"), I_SET("l"),
+                          I_PUSHI(2), I_GET("l"), I_GETS, I_DECL("x"), I_SET("x")};
+    EXPECT_EQ(translated_code, expected_code);
+    ObjectStack stack;
+    StructProtos structs;
+    CodeRunner code_runner(translated_code, structs, stack, {});
+    code_runner.run();
+    EXPECT_TRUE(code_runner.env->get("x")->equal(new IntegerObject(4)));
+}

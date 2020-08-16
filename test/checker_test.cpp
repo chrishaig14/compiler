@@ -241,6 +241,26 @@ TEST(second_pass_test, assignment_type_error_2) {
     ASSERT_THROWS_ASSIGNMENT_ERROR(T_INT, T_STRING);
 }
 
+TEST(second_pass_test, for_1) {
+    std::string text = "var y = 0; for(x:[1,2,3,4]){y = x;}";
+    ASSERT_OK();
+}
+
+TEST(second_pass_test, for_2) {
+    std::string text = "var y = 0; for(x:[1,2,3,4]){y = z;}";
+    ASSERT_THROWS_NOT_FOUND_ERROR("z");
+}
+
+TEST(second_pass_test, for_3) {
+    std::string text = "var y = 0; for(x:[1,2,3,4]){y = x;} y = x;";
+    ASSERT_THROWS_NOT_FOUND_ERROR("x");
+}
+
+TEST(second_pass_test, for_4) {
+    std::string text = "var y = 0; for(x:[1,2,3,4]){y = x;var w = 0;} y = w;";
+    ASSERT_THROWS_NOT_FOUND_ERROR("w");
+}
+
 TEST(second_pass_test, class_literal_expression_ok) {
     std::string text = "struct Foo{name: String;} var f = Foo{\"Hello\"};";
     ASSERT_OK();

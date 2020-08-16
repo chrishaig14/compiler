@@ -52,7 +52,7 @@ public:
 
     void visit(IfNode& node) override;
 
-    void visit(ListNode& node) override {}
+    void visit(ListNode& node) override;
 
     void visit(MemberNode& node) override;
 
