@@ -26,6 +26,7 @@
 #include "../instructions/GetSubscriptInst.h"
 #include "../instructions/JumpIfFalseInst.h"
 #include "../instructions/PushFunctionInst.h"
+#include "../instructions/PushBooleanInst.h"
 
 class Translator : public Visitor {
 public:

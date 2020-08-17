@@ -279,10 +279,12 @@ void Checker::visit(ListNode& node) {
     node.elements[0]->accept(*this);
     SemanticInfo semantic_info = this->rv;
     SemanticInfo return_info;
-    return_info.symbol_info = new ObjectTypeNode("List",{semantic_info.symbol_info});
+    return_info.symbol_info = new ObjectTypeNode("List", {semantic_info.symbol_info});
     this->rv = return_info;
 }
 
 void Checker::visit(BooleanNode& node) {
-
+    SemanticInfo semantic_info;
+    semantic_info.symbol_info = new ObjectTypeNode("Boolean", {});
+    this->rv = semantic_info;
 }

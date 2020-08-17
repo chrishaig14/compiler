@@ -138,3 +138,12 @@ TEST(translator_test, translate_list_multiple_elements) {
     EXPECT_EQ(translator.code, expected_code)
                         << "GOT:\n----\n" << translator.code << "----\nEXPECTED:\n----\n" << expected_code << "----\n";
 }
+
+TEST(translator_test, test_boolean) {
+    Translator translator;
+    Node* node = ASN(ID("x"), BOOL(true));
+    node->accept(translator);
+    Code expected_code = {I_PUSHB(true), I_SET("x")};
+    EXPECT_EQ(translator.code, expected_code)
+                        << "GOT:\n----\n" << translator.code << "----\nEXPECTED:\n----\n" << expected_code << "----\n";
+}

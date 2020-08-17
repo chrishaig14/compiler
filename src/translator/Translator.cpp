@@ -229,5 +229,7 @@ void Translator::visit(ForNode& node) {
 }
 
 void Translator::visit(BooleanNode& node) {
-
+    Code out;
+    out.push_back(new PushBooleanInst(node.value));
+    this->code = out;
 }

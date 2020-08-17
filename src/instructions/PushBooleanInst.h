@@ -21,6 +21,8 @@ public:
 
     void accept(InstructionVisitor& visitor) override;
 
+    bool operator==(const PushBooleanInst& other) const;
+
     bool boolean;
 };
 

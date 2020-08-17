@@ -5,13 +5,19 @@
 #include "PushBooleanInst.h"
 
 bool PushBooleanInst::equal(const Instruction* inst) const {
-    return false;
+    const PushBooleanInst* other = dynamic_cast<const PushBooleanInst*>(inst);
+    if (other == nullptr) return false;
+    return *this == *other;
 }
 
 std::string PushBooleanInst::to_string() const {
-    return "PUSHB " + this->boolean ? "True" : "False";
+    return "PUSHB " + std::string(this->boolean ? "True" : "False");
 }
 
 void PushBooleanInst::accept(InstructionVisitor& visitor) {
     visitor.visit(*this);
+}
+
+bool PushBooleanInst::operator==(const PushBooleanInst& other) const {
+    return this->boolean == other.boolean;
 }
