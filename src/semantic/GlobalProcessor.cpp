@@ -101,5 +101,9 @@ void GlobalProcessor::visit(ForNode& node) {
 
 }
 
+void GlobalProcessor::visit(BooleanNode& node) {
+
+}
+
 
 

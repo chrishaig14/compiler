@@ -144,6 +144,13 @@ TEST(scanner_test, test_all_keywords) {
     }
 }
 
+TEST(scanner_test, test_true_kw) {
+    std::string text = "true";
+    Scanner scanner(text);
+    Token token = scanner.get_next();
+    EXPECT_EQ(cmp_token_value(token, Token(TokenType::TRUE, -1, -1)), true);
+}
+
 
 TEST(scanner_test, test_identifier_and_eof) {
     std::string text = "hello";

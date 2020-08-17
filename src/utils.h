@@ -29,6 +29,7 @@ typedef std::vector<Instruction*> Code;
 #define LIT_FIL(id, type) new ClassLiteralFieldNode(id, type)
 typedef std::map<std::string, std::map<std::string, Code>> StructProtos;
 #define TYPE(parent, type_parameters) new ObjectTypeNode(parent, type_parameters)
+#define BOOL(x) new BooleanNode(x)
 #define T_BOOL new ObjectTypeNode("Boolean", {})
 #define T_INT new ObjectTypeNode("Integer", {})
 #define T_STRING new ObjectTypeNode("String", {})

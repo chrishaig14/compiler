@@ -100,5 +100,6 @@ void initialize_token_strings() {
     TOKEN_STRINGS[TokenType::LPAREN] = "lparen ( ( )";
     TOKEN_STRINGS[TokenType::RPAREN] = "rparen ( ) )";
     TOKEN_STRINGS[TokenType::END] = "EOF";
-
+    TOKEN_STRINGS[TokenType::TRUE] = "true";
+    TOKEN_STRINGS[TokenType::FALSE] = "false";
 }

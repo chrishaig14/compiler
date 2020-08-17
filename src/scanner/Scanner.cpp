@@ -26,6 +26,8 @@ void initialize_tokens() {
     TOKEN_KEYWORDS["for"] = TokenType::FOR;
     TOKEN_KEYWORDS["var"] = TokenType::VAR;
     TOKEN_KEYWORDS["return"] = TokenType::RETURN;
+    TOKEN_KEYWORDS["true"] = TokenType::TRUE;
+    TOKEN_KEYWORDS["false"] = TokenType::FALSE;
 
 
     TOKEN_SPECIAL[";"] = TokenType::SEMICOLON;

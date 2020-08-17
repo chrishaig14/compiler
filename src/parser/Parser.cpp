@@ -198,6 +198,16 @@ Node* Parser::parse_id_or_literal() {
             this->next();
             break;
         }
+        case TokenType::TRUE: {
+            node = new BooleanNode(true);
+            this->next();
+            break;
+        }
+        case TokenType::FALSE: {
+            node = new BooleanNode(false);
+            this->next();
+            break;
+        }
         case TokenType::FUN: {
             return this->parse_function_expression();
         }

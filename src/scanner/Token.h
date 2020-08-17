@@ -50,7 +50,7 @@ enum class TokenType {
     RCURLY,
     LPAREN,
     RPAREN,
-    END, RARROW
+    END, RARROW, TRUE, FALSE
 };
 
 extern std::map<TokenType, std::string> TOKEN_STRINGS;

@@ -9,6 +9,7 @@
 #include "AssignmentNode.h"
 #include "BinopNode.h"
 #include "CallNode.h"
+#include "BooleanNode.h"
 #include "ClassLiteralExpressionNode.h"
 #include "ClassLiteralFieldNode.h"
 #include "ForNode.h"

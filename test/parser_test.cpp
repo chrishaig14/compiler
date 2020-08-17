@@ -550,6 +550,26 @@ TEST(parser_test, times_expression) {
 
 }
 
+TEST(parser_test, boolean_true) {
+    std::string text = "true";
+    Scanner scanner(text);
+    std::vector<Token> tokens = scanner.scan_all();
+    Parser parser(tokens);
+    Node* node = parser.parse_expression();
+    Node* expected_node = BOOL(true);
+    COMPLETE_TEST;
+}
+
+TEST(parser_test, boolean_false) {
+    std::string text = "false";
+    Scanner scanner(text);
+    std::vector<Token> tokens = scanner.scan_all();
+    Parser parser(tokens);
+    Node* node = parser.parse_expression();
+    Node* expected_node = BOOL(false);
+    COMPLETE_TEST;
+}
+
 TEST(parser_test, for_loop_1) {
     std::string text = "for(e:l){}";
     Scanner scanner(text);

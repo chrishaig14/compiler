@@ -282,3 +282,7 @@ void Checker::visit(ListNode& node) {
     return_info.symbol_info = new ObjectTypeNode("List",{semantic_info.symbol_info});
     this->rv = return_info;
 }
+
+void Checker::visit(BooleanNode& node) {
+
+}

@@ -37,6 +37,8 @@ class NumberNode;
 
 class ReturnNode;
 
+class BooleanNode;
+
 class StringNode;
 
 class SubscriptNode;
@@ -62,6 +64,8 @@ public:
     virtual void visit(ForNode& node) = 0;
 
     virtual void visit(FunctionNode& node) = 0;
+
+    virtual void visit(BooleanNode& node) = 0;
 
     virtual void visit(IdNode& node) = 0;
 

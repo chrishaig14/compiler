@@ -84,6 +84,8 @@ public:
 
     void visit(ForNode& node) override;
 
+    void visit(BooleanNode& node) override;
+
 
 };
 

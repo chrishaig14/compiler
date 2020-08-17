@@ -227,3 +227,7 @@ void Translator::visit(ClassLiteralFieldNode& node) {
 void Translator::visit(ForNode& node) {
 
 }
+
+void Translator::visit(BooleanNode& node) {
+
+}
