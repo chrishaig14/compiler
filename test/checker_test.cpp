@@ -65,6 +65,12 @@ BlockNode* get_treeA(std::string text) {
                     Checker checker(gp.globals, gp.class_table);              \
                     checker.visit(*tree);
 
+#define ASSERT_VARIABLE_TYPE(id, type) BlockNode* tree = get_treeA(text);   \
+                    GlobalProcessor gp;gp.visit(*tree);          \
+                    Checker checker(gp.globals, gp.class_table);              \
+                    checker.visit(*tree);\
+                    EXPECT_TRUE(checker.scopes["global"]->get(id)->equal(type));
+
 TEST(second_pass_test, fun_foo_cAomplete) {
     std::string text = "fun foo(y: Foo)->Integer{}";
     BlockNode* tree = get_treeA(text);
@@ -269,4 +275,14 @@ TEST(second_pass_test, class_literal_expression_ok) {
 TEST(second_pass_test, class_literal_expression_error) {
     std::string text = "struct Foo{name: String;} var f = Foo{25};";
     ASSERT_OK();
+}
+
+TEST(second_pass_test, infer_boolean_false) {
+    std::string text = "var x = false;";
+    ASSERT_VARIABLE_TYPE("x",T_BOOL);
+}
+
+TEST(second_pass_test, infer_boolean_true) {
+    std::string text = "var x = true;";
+    ASSERT_VARIABLE_TYPE("x",T_BOOL);
 }
