@@ -74,6 +74,8 @@ public:
 
     void visit(MakeDefaultInst& inst) override;
 
+    void visit(JumpInst& inst) override;
+
     std::map<std::string, std::map<std::string, Code>>& structs;
 };
 

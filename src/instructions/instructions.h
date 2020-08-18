@@ -13,6 +13,7 @@
 #include "GetInst.h"
 #include "GetMemberInst.h"
 #include "GetSubscriptInst.h"
+#include "JumpInst.h"
 #include "JumpIfFalseInst.h"
 #include "MakeClassInst.h"
 #include "MakeListInst.h"

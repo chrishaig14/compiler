@@ -152,7 +152,7 @@ TEST(translator_test, test_while) {
     Translator translator;
     Node* node = WHILE(ID("x"), new BlockNode({CALL(ID("print"), {ID("y")})}));
     node->accept(translator);
-    Code expected_code = {I_GET("x"), I_JUMPF(5), I_GET("y"), I_GET("print"), I_CALL, I_JUMPF(-5)};
+    Code expected_code = {I_GET("x"), I_JUMPF(5), I_GET("y"), I_GET("print"), I_CALL, I_JUMP(-5)};
     EXPECT_EQ(translator.code, expected_code)
                         << "GOT:\n----\n" << translator.code << "----\nEXPECTED:\n----\n" << expected_code << "----\n";
 }

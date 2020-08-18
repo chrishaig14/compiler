@@ -14,6 +14,7 @@ class DeclareInst;
 
 class DefineStructInst;
 
+class JumpInst;
 
 class GetInst;
 
@@ -44,6 +45,7 @@ class SetInst;
 class SetMemberInst;
 
 class SetSubscriptInst;
+
 class MakeDefaultInst;
 
 class InstructionVisitor {
@@ -63,7 +65,10 @@ public:
 
     virtual void visit(JumpIfFalseInst& inst) = 0;
 
+    virtual void visit(JumpInst& inst) = 0;
+
     virtual void visit(MakeClassInst& inst) = 0;
+
     virtual void visit(MakeDefaultInst& inst) = 0;
 
     virtual void visit(MakeListInst& inst) = 0;

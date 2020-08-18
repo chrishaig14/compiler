@@ -239,7 +239,7 @@ void Translator::visit(WhileNode& node) {
     int loop_offset = -((condition_code.size() + 1) + body_code.size());
     out.push_back(I_JUMPF(offset));
     out.insert(out.end(), body_code.begin(), body_code.end());
-    out.push_back(I_JUMPF(loop_offset));
+    out.push_back(I_JUMP(loop_offset));
     this->code = out;
 }
 

@@ -248,3 +248,19 @@ TEST(vm_test, struct_test_1) {
     EXPECT_TRUE(user_object->fields["val"]->equal(new IntegerObject(10)));
     EXPECT_TRUE(user_object->fields["str"]->equal(new StringObject("Hello")));
 }
+
+TEST(vm_test, inst_jump_always) {
+    Code main_code = {
+            I_DECL("x"),
+            I_PUSHI(7),
+            I_JUMP(3),
+            I_PUSHI(5),
+            I_BIN(OpType::ADD),
+            I_SET("x"),
+    };
+    ObjectStack stack;
+    StructProtos structs;
+    CodeRunner code_runner(main_code, structs, stack, {});
+    code_runner.run();
+    EXPECT_TRUE(code_runner.env->get("x")->equal(new IntegerObject(7)));
+}

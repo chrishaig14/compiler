@@ -258,3 +258,8 @@ void CodeRunner::visit(MakeDefaultInst& inst) {
 //        }
 //        this->inst_ptr++;
 }
+
+void CodeRunner::visit(JumpInst& inst) {
+    std::cout << "Run [" << inst.to_string() << "]" << std::endl;
+    this->inst_ptr += inst.offset;
+}
