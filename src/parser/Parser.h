@@ -77,6 +77,15 @@ public:
     BlockNode* parse_program();
 
     ForNode* parse_for_loop();
+
+    WhileNode* parse_while_loop(){
+        this->expect_token(TokenType::WHILE);
+        this->expect_token(TokenType::LPAREN);
+        Node* condition = this->parse_expression();
+        this->expect_token(TokenType::RPAREN);
+        BlockNode* body = this->parse_possibly_empty_block();
+        return new WhileNode(condition, body);
+    }
 };
 
 

@@ -56,23 +56,13 @@ public:
 
     void visit(MemberNode& node) override;
 
-    void visit(NumberNode& node) override {
-        SemanticInfo semanticInfo;
-        semanticInfo.symbol_info = new ObjectTypeNode("Integer",{});
-        this->rv = semanticInfo;
-    }
+    void visit(NumberNode& node) override;
 
     void visit(ReturnNode& node) override;
 
-    void visit(StringNode& node) override {
-        SemanticInfo semanticInfo;
-        semanticInfo.symbol_info = new ObjectTypeNode("String",{});
-        this->rv = semanticInfo;
-    }
+    void visit(StringNode& node) override;
 
-    void visit(SubscriptNode& node) override {
-
-    }
+    void visit(SubscriptNode& node) override;
 
     void visit(TypeNode& node) override {}
 
@@ -85,6 +75,8 @@ public:
     void visit(ForNode& node) override;
 
     void visit(BooleanNode& node) override;
+
+    void visit(WhileNode& node) override;
 
 
 };

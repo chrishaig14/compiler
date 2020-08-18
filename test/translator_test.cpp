@@ -133,7 +133,7 @@ TEST(translator_test, translate_list_multiple_elements) {
     VectorOfNodes list = {NUM(3), NUM(1), NUM(4)};
     Node* node = LST(list);
     node->accept(translator);
-    Code expected_code = {I_PUSHI(3),I_PUSHI(1),I_PUSHI(4), I_MAKE_LIST(3)};
+    Code expected_code = {I_PUSHI(3), I_PUSHI(1), I_PUSHI(4), I_MAKE_LIST(3)};
     EXPECT_EQ(translator.code.size(), expected_code.size());
     EXPECT_EQ(translator.code, expected_code)
                         << "GOT:\n----\n" << translator.code << "----\nEXPECTED:\n----\n" << expected_code << "----\n";
@@ -144,6 +144,15 @@ TEST(translator_test, test_boolean) {
     Node* node = ASN(ID("x"), BOOL(true));
     node->accept(translator);
     Code expected_code = {I_PUSHB(true), I_SET("x")};
+    EXPECT_EQ(translator.code, expected_code)
+                        << "GOT:\n----\n" << translator.code << "----\nEXPECTED:\n----\n" << expected_code << "----\n";
+}
+
+TEST(translator_test, test_while) {
+    Translator translator;
+    Node* node = WHILE(ID("x"), new BlockNode({CALL(ID("print"), {ID("y")})}));
+    node->accept(translator);
+    Code expected_code = {I_GET("x"), I_JUMPF(5), I_GET("y"), I_GET("print"), I_CALL, I_JUMPF(-5)};
     EXPECT_EQ(translator.code, expected_code)
                         << "GOT:\n----\n" << translator.code << "----\nEXPECTED:\n----\n" << expected_code << "----\n";
 }

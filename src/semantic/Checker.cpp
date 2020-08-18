@@ -143,11 +143,13 @@ void Checker::visit(BinopNode& n) {
     n.right->accept(*this);
     SemanticInfo right_info = this->rv;
     SemanticInfo semantic_info;
-    semantic_info.symbol_info = new ObjectTypeNode("Integer", {});
     semantic_info.free_variables = left_info.free_variables;
     for (auto fv: right_info.free_variables) {
         semantic_info.free_variables[fv.first] = 1;
     }
+    if (n.op == OpType::EQ || n.op == OpType::AND || n.op == OpType::OR) {
+        semantic_info.symbol_info = new ObjectTypeNode("Boolean", {});
+    } else { semantic_info.symbol_info = new ObjectTypeNode("Integer", {}); }
     this->rv = semantic_info;
 }
 
@@ -287,4 +289,31 @@ void Checker::visit(BooleanNode& node) {
     SemanticInfo semantic_info;
     semantic_info.symbol_info = new ObjectTypeNode("Boolean", {});
     this->rv = semantic_info;
+}
+
+void Checker::visit(WhileNode& node) {
+    node.condition->accept(*this);
+    SemanticInfo condition = this->rv;
+    if (!condition.symbol_info->equal(new ObjectTypeNode("Boolean", {}))) {
+        throw std::runtime_error("Expected boolean expression as while loop condition!");
+    }
+    this->enter_scope("while");
+    node.body->accept(*this);
+    this->leave_scope();
+}
+
+void Checker::visit(NumberNode& node) {
+    SemanticInfo semanticInfo;
+    semanticInfo.symbol_info = new ObjectTypeNode("Integer", {});
+    this->rv = semanticInfo;
+}
+
+void Checker::visit(StringNode& node) {
+    SemanticInfo semanticInfo;
+    semanticInfo.symbol_info = new ObjectTypeNode("String", {});
+    this->rv = semanticInfo;
+}
+
+void Checker::visit(SubscriptNode& node) {
+
 }

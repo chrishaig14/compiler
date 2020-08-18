@@ -105,5 +105,9 @@ void GlobalProcessor::visit(BooleanNode& node) {
 
 }
 
+void GlobalProcessor::visit(WhileNode& node) {
+
+}
+
 
 

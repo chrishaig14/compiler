@@ -267,6 +267,16 @@ TEST(second_pass_test, for_4) {
     ASSERT_THROWS_NOT_FOUND_ERROR("w");
 }
 
+TEST(second_pass_test, while_1){
+    std::string text = "while(5){var x = 7;}";
+    ASSERT_OK();
+}
+
+TEST(second_pass_test, while_2){
+    std::string text = "var y = 0; while(5==y){var x = 7;}";
+    ASSERT_OK();
+}
+
 TEST(second_pass_test, class_literal_expression_ok) {
     std::string text = "struct Foo{name: String;} var f = Foo{\"Hello\"};";
     ASSERT_OK();

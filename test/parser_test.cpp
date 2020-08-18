@@ -580,6 +580,26 @@ TEST(parser_test, for_loop_1) {
     COMPLETE_TEST;
 }
 
+TEST(parser_test, while_loop_1){
+    std::string text = "while(true){}";
+    Scanner scanner(text);
+    std::vector<Token> tokens = scanner.scan_all();
+    Parser parser(tokens);
+    Node* node = parser.parse_while_loop();
+    Node* expected_node = WHILE(BOOL(true), new BlockNode({}));
+    COMPLETE_TEST;
+}
+
+TEST(parser_test, while_loop_common){
+    std::string text = "while(true){}";
+    Scanner scanner(text);
+    std::vector<Token> tokens = scanner.scan_all();
+    Parser parser(tokens);
+    Node* node = parser.parse_common_statement();
+    Node* expected_node = WHILE(BOOL(true), new BlockNode({}));
+    COMPLETE_TEST;
+}
+
 TEST(parser_test, for_loop_2) {
     std::string text = "for(e:[4,5,6]){print(e);}";
     Scanner scanner(text);

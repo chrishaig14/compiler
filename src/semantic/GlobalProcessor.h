@@ -59,6 +59,8 @@ public:
     void visit(ForNode& node) override;
 
     void visit(BooleanNode& node) override;
+
+    void visit(WhileNode& node) override;
 };
 
 #endif //UNTITLED1_GLOBALPROCESSOR_H

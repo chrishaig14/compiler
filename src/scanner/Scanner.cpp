@@ -28,6 +28,8 @@ void initialize_tokens() {
     TOKEN_KEYWORDS["return"] = TokenType::RETURN;
     TOKEN_KEYWORDS["true"] = TokenType::TRUE;
     TOKEN_KEYWORDS["false"] = TokenType::FALSE;
+    TOKEN_KEYWORDS["while"] = TokenType::WHILE;
+
 
 
     TOKEN_SPECIAL[";"] = TokenType::SEMICOLON;

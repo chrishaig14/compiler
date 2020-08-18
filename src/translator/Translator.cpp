@@ -228,6 +228,21 @@ void Translator::visit(ForNode& node) {
 
 }
 
+void Translator::visit(WhileNode& node) {
+    Code out;
+    node.condition->accept(*this);
+    Code condition_code = this->code;
+    out.insert(out.end(), condition_code.begin(), condition_code.end());
+    node.body->accept(*this);
+    Code body_code = this->code;
+    int offset = body_code.size() + 2;
+    int loop_offset = -((condition_code.size() + 1) + body_code.size());
+    out.push_back(I_JUMPF(offset));
+    out.insert(out.end(), body_code.begin(), body_code.end());
+    out.push_back(I_JUMPF(loop_offset));
+    this->code = out;
+}
+
 void Translator::visit(BooleanNode& node) {
     Code out;
     out.push_back(new PushBooleanInst(node.value));

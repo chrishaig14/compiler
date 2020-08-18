@@ -13,6 +13,7 @@
 #include "ClassLiteralExpressionNode.h"
 #include "ClassLiteralFieldNode.h"
 #include "ForNode.h"
+#include "WhileNode.h"
 #include "StructNode.h"
 #include "DeclarationNode.h"
 #include "FunctionNode.h"

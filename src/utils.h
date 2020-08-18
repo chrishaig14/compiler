@@ -36,6 +36,7 @@ typedef std::map<std::string, std::map<std::string, Code>> StructProtos;
 #define T_LIST(e) TYPE("List", std::vector<TypeNode*>({e}))
 #define T_DICT(k, v) TYPE("Dict", std::vector<TypeNode*>({k,v}))
 #define FUN(a, b, c, d, e) new FunctionNode(a,b,c,d,e)
+#define WHILE(condition, body) new WhileNode(condition, body)
 #define OBJECT_TYPE(identifier, parameters) new ObjectTypeNode(identifier, parameters)
 #define FUNCTION_TYPE(parameters, return_type) new FunctionTypeNode(parameters, return_type)
 

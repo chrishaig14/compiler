@@ -45,6 +45,8 @@ class SubscriptNode;
 
 class TypeNode;
 
+class WhileNode;
+
 class Visitor {
 public:
     virtual void visit(AssignmentNode& node) = 0;
@@ -86,6 +88,8 @@ public:
     virtual void visit(SubscriptNode& node) = 0;
 
     virtual void visit(TypeNode& node) = 0;
+
+    virtual void visit(WhileNode& node) = 0;
 };
 
 
