@@ -78,6 +78,8 @@ public:
 
     void visit(WhileNode& node) override;
 
+    void visit(BreakNode& node) override;
+
 
 };
 

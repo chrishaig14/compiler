@@ -10,9 +10,9 @@
 
 class JumpIfFalseInst : public Instruction {
 public:
-    JumpIfFalseInst(int offset){
-        this->offset = offset;
-    }
+    JumpIfFalseInst(std::string label);
+
+    JumpIfFalseInst(int offset);
 
     bool equal(const Instruction* inst) const override;
 
@@ -20,6 +20,7 @@ public:
 
     void accept(InstructionVisitor& visitor) override;
 
+    std::string label;
     int offset;
 };
 

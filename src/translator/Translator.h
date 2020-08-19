@@ -28,9 +28,12 @@
 #include "../instructions/PushFunctionInst.h"
 #include "../instructions/PushBooleanInst.h"
 #include "../instructions/JumpInst.h"
-
+#include "../instructions/EnterScope.h"
+#include "../instructions/LeaveScope.h"
+typedef std::vector<std::pair<std::string, Instruction*>> CodeLabel;
 class Translator : public Visitor {
 public:
+    int loop_counter;
     void visit(AssignmentNode& node) override;
 
     void visit(BinopNode& node) override;
@@ -63,7 +66,7 @@ public:
 
     void visit(TypeNode& node) override;
 
-    Code code;
+    CodeLabel code;
     bool is_lvalue;
 
     Translator();
@@ -77,6 +80,8 @@ public:
     void visit(WhileNode& node) override;
 
     void visit(BooleanNode& node) override;
+
+    void visit(BreakNode& node) override;
 };
 
 

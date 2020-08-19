@@ -317,3 +317,7 @@ void Checker::visit(StringNode& node) {
 void Checker::visit(SubscriptNode& node) {
 
 }
+
+void Checker::visit(BreakNode& node) {
+
+}

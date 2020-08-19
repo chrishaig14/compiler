@@ -8,7 +8,7 @@
 Object* value_7 = new IntegerObject(7);
 
 TEST(env_test, env_test_1) {
-    Environment env(nullptr);
+    Environment env("global",nullptr);
     try {
         env.set("a", value_7);
         FAIL() << "Error not thrown!";
@@ -17,7 +17,8 @@ TEST(env_test, env_test_1) {
 }
 
 TEST(env_test, env_test_2) {
-    Environment env(nullptr);
+
+    Environment env("global",nullptr);
 //    Object* value = new Object(new Integer(7));
     try {
         env.get("a");
@@ -27,13 +28,13 @@ TEST(env_test, env_test_2) {
 }
 
 TEST(env_test, env_test_3) {
-    Environment env(nullptr);
+    Environment env("global",nullptr);
 //    Object* value = new Object(new Integer(7));
     env.declare("a");
 }
 
 TEST(env_test, env_test_4) {
-    Environment env(nullptr);
+    Environment env("global",nullptr);
 //    Object* value = new Object(new Integer(7));
     env.declare("a");
     try {
@@ -45,7 +46,7 @@ TEST(env_test, env_test_4) {
 }
 
 TEST(env_test, env_test_5) {
-    Environment env(nullptr);
+    Environment env("global",nullptr);
     env.declare("a");
     env.set("a", value_7);
     Object* val = env.get("a");
@@ -53,7 +54,7 @@ TEST(env_test, env_test_5) {
 }
 
 TEST(env_test, env_test_6) {
-    Environment env(nullptr);
+    Environment env("global",nullptr);
 //    Object* value = new Object(Integer(7));
     env.declare("a");
     try {
@@ -65,29 +66,29 @@ TEST(env_test, env_test_6) {
 }
 
 TEST(env_test, env_test_7) {
-    Environment env(nullptr);
+    Environment env("global",nullptr);
     env.declare("a");
     env.set("a", value_7);
-    Environment* new_env = env.enter();
+    Environment* new_env = env.enter("child");
     Object* val = new_env->get("a");
     EXPECT_TRUE(val == value_7);
 }
 
 TEST(env_test, env_test_8) {
-    Environment env(nullptr);
+    Environment env("global",nullptr);
     env.declare("a");
     env.set("a", value_7);
-    Environment* new_env = env.enter();
+    Environment* new_env = env.enter("child");
     new_env->declare("a");
 }
 
 TEST(env_test, env_test_9) {
-    Environment* env = new Environment(nullptr); // env1
-    env = env->enter(); // env2
+    Environment* env = new Environment("global", nullptr); // env1
+    env = env->enter("child"); // env2
     env->declare("a");
     env->set("a", value_7);
     EXPECT_TRUE(env->get("a") == value_7);
-    env = env->leave(); // env1
+    env = env->leave("child"); // env1
     try {
         env->set("a", value_7);
         FAIL() << "Error not thrown";
@@ -97,32 +98,32 @@ TEST(env_test, env_test_9) {
 }
 
 TEST(env_test, env_test_10) {
-    Environment* env = new Environment(nullptr); // env1
+    Environment* env = new Environment("global", nullptr); // env1
     Object* value_9 = new IntegerObject(9);
     env->declare("a");
     env->set("a", value_7);
-    env = env->enter(); // env2
+    env = env->enter("child"); // env2
     env->declare("a");
     env->set("a", value_9);
-    env = env->enter(); // env3
+    env = env->enter("child"); // env3
     EXPECT_TRUE(env->get("a")== value_9);
-    env = env->leave(); // env2
+    env = env->leave("child"); // env2
     EXPECT_TRUE(env->get("a")== value_9);
-    env = env->leave(); // env1
+    env = env->leave("child"); // env1
     EXPECT_TRUE(env->get("a")== value_7);
 }
 
 TEST(env_test, env_test_11) {
-    Environment* env = new Environment(nullptr); // env1
+    Environment* env = new Environment("global", nullptr); // env1
     Object* value_9 = new IntegerObject(9);
     env->declare("a");
     env->set("a", value_7);
-    env = env->enter(); // env2
+    env = env->enter("child"); // env2
     env->declare("b");
     env->set("b", value_9);
     EXPECT_TRUE(env->get("a") == value_7);
     EXPECT_TRUE(env->get("b") == value_9);
-    env = env->leave(); // env1
+    env = env->leave("child"); // env1
     EXPECT_TRUE(env->get("a") == value_7);
     try {
         env->get("b");

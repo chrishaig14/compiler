@@ -11,11 +11,18 @@ bool JumpInst::equal(const Instruction* inst) const {
 }
 
 std::string JumpInst::to_string() const {
-    return "JUMP " + std::to_string(this->offset);
+    return "JUMP " + (this->offset != 0 ? std::to_string(this->offset) : this->label);
 }
 
 void JumpInst::accept(InstructionVisitor& visitor) {
     visitor.visit(*this);
 }
 
-JumpInst::JumpInst(int offset) : offset(offset) {}
+JumpInst::JumpInst(int offset) {
+    this->offset = offset;
+}
+
+JumpInst::JumpInst(std::string label) {
+    this->label = label;
+    this->offset = 0;
+}

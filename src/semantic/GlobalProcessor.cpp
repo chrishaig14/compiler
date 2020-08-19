@@ -109,5 +109,9 @@ void GlobalProcessor::visit(WhileNode& node) {
 
 }
 
+void GlobalProcessor::visit(BreakNode& node) {
+
+}
+
 
 

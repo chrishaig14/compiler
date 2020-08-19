@@ -8,13 +8,14 @@
 
 #include "Instruction.h"
 
-class JumpInst : public Instruction{
+class JumpInst : public Instruction {
 public:
 
-    int offset;
+    std::string label;
+
+    JumpInst(std::string label);
 
     JumpInst(int offset);
-
 
     std::string to_string() const override;
 
@@ -22,6 +23,7 @@ public:
 
     bool equal(const Instruction* inst) const override;
 
+    int offset;
 };
 
 

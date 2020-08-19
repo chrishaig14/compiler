@@ -4,8 +4,9 @@
 
 #include "Environment.h"
 
-Environment::Environment(Environment* parent) {
+Environment::Environment(std::string name, Environment* parent) {
     this->parent = parent;
+    this->name = name;
 }
 
 void Environment::set(std::string name, Object* value) {
@@ -40,10 +41,11 @@ void Environment::declare(std::string name) {
     this->table[name] = nullptr;
 }
 
-Environment* Environment::enter() {
-    return new Environment(this);
+Environment* Environment::enter(std::string name) {
+    return new Environment(name, this);
 }
 
-Environment* Environment::leave() {
-    return this->parent;
+Environment* Environment::leave(std::string name) {
+    if (this->name == name) return this->parent;
+    return this->parent->leave(name);
 }

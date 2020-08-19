@@ -46,7 +46,13 @@ class SetMemberInst;
 
 class SetSubscriptInst;
 
+class EnterScope;
+
+class LeaveScope;
+
 class MakeDefaultInst;
+
+class NopInst;
 
 class InstructionVisitor {
 public:
@@ -59,7 +65,13 @@ public:
 
     virtual void visit(GetInst& inst) = 0;
 
+    virtual void visit(NopInst& inst) = 0;
+
     virtual void visit(GetMemberInst& inst) = 0;
+
+    virtual void visit(LeaveScope& inst) = 0;
+
+    virtual void visit(EnterScope& inst) = 0;
 
     virtual void visit(GetSubscriptInst& inst) = 0;
 

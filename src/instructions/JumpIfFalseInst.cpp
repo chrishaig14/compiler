@@ -12,9 +12,18 @@ bool JumpIfFalseInst::equal(const Instruction* inst) const {
 
 
 std::string JumpIfFalseInst::to_string() const {
-    return "JUMP_IF_FALSE " + std::to_string(this->offset);
+    return "JUMP_IF_FALSE " + (this->offset != 0 ? std::to_string(this->offset) : this->label);
 }
 
 void JumpIfFalseInst::accept(InstructionVisitor& visitor) {
     visitor.visit(*this);
+}
+
+JumpIfFalseInst::JumpIfFalseInst(int offset) {
+    this->offset = offset;
+}
+
+JumpIfFalseInst::JumpIfFalseInst(std::string label) {
+    this->label = label;
+    this->offset = 0;
 }

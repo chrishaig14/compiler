@@ -9,7 +9,7 @@ CodeRunner::CodeRunner(const Code& code, std::map<std::string, std::map<std::str
                        ObjectStack& stack, std::map<std::string, Object*> closure) : code(code), stack(stack),
                                                                                      structs(structs) {
     std::cout << "New code runner" << std::endl;
-    this->env = new Environment(nullptr);
+    this->env = new Environment("global", nullptr);
     for (auto it: closure) {
         this->env->declare(it.first);
         this->env->set(it.first, it.second);
@@ -262,4 +262,18 @@ void CodeRunner::visit(MakeDefaultInst& inst) {
 void CodeRunner::visit(JumpInst& inst) {
     std::cout << "Run [" << inst.to_string() << "]" << std::endl;
     this->inst_ptr += inst.offset;
+}
+
+void CodeRunner::visit(LeaveScope& inst) {
+    this->env = this->env->leave(inst.name);
+    this->inst_ptr++;
+}
+
+void CodeRunner::visit(EnterScope& inst) {
+    this->env = this->env->enter(inst.name);
+    this->inst_ptr++;
+}
+
+void CodeRunner::visit(NopInst& inst) {
+    this->inst_ptr++;
 }

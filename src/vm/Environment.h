@@ -12,8 +12,9 @@ class Environment {
     std::map<std::string, Object*> table;
 
     Environment* parent;
+    std::string name;
 public:
-    Environment(Environment* parent);
+    Environment(std::string name, Environment* parent);
 
     void set(std::string name, Object* value);
 
@@ -25,9 +26,9 @@ public:
 
     void declare(std::string name);
 
-    Environment* enter();
+    Environment* enter(std::string name);
 
-    Environment* leave();
+    Environment* leave(std::string name);
 };
 
 #endif //UNTITLED1_ENVIRONMENT_H

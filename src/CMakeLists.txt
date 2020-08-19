@@ -148,4 +148,4 @@ add_library(srcLib
         instructions/MakeDefaultInst.cpp
         instructions/MakeDefaultInst.h
         parser/UnexpectedToken.cpp
-        parser/UnexpectedToken.h nodes/ForNode.cpp nodes/ForNode.h semantic/AssignmentTypeError.cpp semantic/AssignmentTypeError.h nodes/BooleanNode.cpp nodes/BooleanNode.h nodes/WhileNode.cpp nodes/WhileNode.h instructions/JumpInst.cpp instructions/JumpInst.h)
+        parser/UnexpectedToken.h nodes/ForNode.cpp nodes/ForNode.h semantic/AssignmentTypeError.cpp semantic/AssignmentTypeError.h nodes/BooleanNode.cpp nodes/BooleanNode.h nodes/WhileNode.cpp nodes/WhileNode.h instructions/JumpInst.cpp instructions/JumpInst.h instructions/EnterScope.cpp instructions/EnterScope.h instructions/LeaveScope.cpp instructions/LeaveScope.h vm/LabelledCode.cpp vm/LabelledCode.h instructions/NopInst.cpp instructions/NopInst.h  nodes/BreakNode.cpp nodes/BreakNode.h)

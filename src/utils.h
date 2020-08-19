@@ -40,6 +40,8 @@ typedef std::map<std::string, std::map<std::string, Code>> StructProtos;
 #define OBJECT_TYPE(identifier, parameters) new ObjectTypeNode(identifier, parameters)
 #define FUNCTION_TYPE(parameters, return_type) new FunctionTypeNode(parameters, return_type)
 
+#define I_ENTER(x) new EnterScope(x)
+#define I_LEAVE(x) new LeaveScope(x)
 #define I_CALL new CallInst()
 #define I_PUSHB(x) new PushBooleanInst(x)
 #define I_PUSHI(x) new PushIntegerInst(x)
@@ -59,5 +61,9 @@ typedef std::map<std::string, std::map<std::string, Code>> StructProtos;
 #define I_RET new ReturnInst()
 #define I_JUMPF(offset) new JumpIfFalseInst(offset)
 #define I_JUMP(offset) new JumpInst(offset)
+#define LC(label, instruction) std::pair<std::string, Instruction*>(label, instruction)
+#define BREAK new BreakNode()
+#define NL(instruction) std::pair<std::string, Instruction*>("", instruction)
+#define NOP new NopInst()
 typedef std::map<std::string, TypeNode*> StructFields;
 #endif //UNTITLED1_UTILS_H

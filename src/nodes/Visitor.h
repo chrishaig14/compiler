@@ -31,6 +31,8 @@ class IfNode;
 
 class ListNode;
 
+class BreakNode;
+
 class MemberNode;
 
 class NumberNode;
@@ -52,6 +54,8 @@ public:
     virtual void visit(AssignmentNode& node) = 0;
 
     virtual void visit(BinopNode& node) = 0;
+
+    virtual void visit(BreakNode& node) = 0;
 
     virtual void visit(BlockNode& node) = 0;
 

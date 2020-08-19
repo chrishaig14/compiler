@@ -76,6 +76,12 @@ public:
 
     void visit(JumpInst& inst) override;
 
+    void visit(LeaveScope& inst) override;
+
+    void visit(EnterScope& inst) override;
+
+    void visit(NopInst& inst) override;
+
     std::map<std::string, std::map<std::string, Code>>& structs;
 };
 
