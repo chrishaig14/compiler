@@ -7,7 +7,7 @@
 
 CodeRunner::CodeRunner(const Code& code, std::map<std::string, std::map<std::string, Code>>& structs,
                        ObjectStack& stack, Environment* global_env) : code(code), stack(stack),
-                                                                                     structs(structs) {
+                                                                      structs(structs) {
     std::cout << "New code runner" << std::endl;
     this->env = new Environment("", global_env);
     this->global_env = global_env;
@@ -60,6 +60,26 @@ void CodeRunner::visit(BinopInst& inst) {
                 break;
             case OpType::OR:
 //                    result = left_int->value + right_int->value;
+                break;
+            case OpType::LEQ:
+                result = left_int->value <= right_int->value;
+                this->stack.push(new BooleanObject(result));
+                break;
+            case OpType::GEQ:
+                result = left_int->value >= right_int->value;
+                this->stack.push(new BooleanObject(result));
+                break;
+            case OpType::LT:
+                result = left_int->value < right_int->value;
+                this->stack.push(new BooleanObject(result));
+                break;
+            case OpType::GT:
+                result = left_int->value > right_int->value;
+                this->stack.push(new BooleanObject(result));
+                break;
+            case OpType::NEQ:
+                result = left_int->value != right_int->value;
+                this->stack.push(new BooleanObject(result));
                 break;
         }
     } else {
