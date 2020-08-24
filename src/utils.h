@@ -39,7 +39,7 @@ typedef std::map<std::string, std::map<std::string, Code>> StructProtos;
 #define WHILE(condition, body) new WhileNode(condition, body)
 #define OBJECT_TYPE(identifier, parameters) new ObjectTypeNode(identifier, parameters)
 #define FUNCTION_TYPE(parameters, return_type) new FunctionTypeNode(parameters, return_type)
-
+#define RET(x) new ReturnNode(x)
 #define I_ENTER(x) new EnterScope(x)
 #define I_LEAVE(x) new LeaveScope(x)
 #define I_CALL new CallInst()
@@ -55,6 +55,8 @@ typedef std::map<std::string, std::map<std::string, Code>> StructProtos;
 #define I_SET(x) new SetInst(x)
 #define I_GET(x) new GetInst(x)
 #define I_DECL(x) new DeclareInst(x)
+#define I_END_FUNCTION(name) new EndFunction(name)
+#define I_START_FUNCTION(name) new StartFunction(name)
 #define I_MAKE_LIST(length) new MakeListInst(length)
 #define I_MAKE_OBJECT(identifier, fields) new MakeObjectInst(identifier, fields)
 #define I_BIN(op) new BinopInst(op)
@@ -64,6 +66,7 @@ typedef std::map<std::string, std::map<std::string, Code>> StructProtos;
 #define LC(label, instruction) std::pair<std::string, Instruction*>(label, instruction)
 #define BREAK new BreakNode()
 #define NL(instruction) std::pair<std::string, Instruction*>("", instruction)
-#define NOP new NopInst()
 typedef std::map<std::string, TypeNode*> StructFields;
+typedef std::vector<std::pair<std::string, Instruction*>> CodeLabel;
+
 #endif //UNTITLED1_UTILS_H

@@ -54,10 +54,18 @@ class MakeDefaultInst;
 
 class NopInst;
 
+class StartFunction;
+
+class EndFunction;
+
 class InstructionVisitor {
 public:
 
     virtual void visit(CallInst& inst) = 0;
+
+    virtual void visit(EndFunction& inst) = 0;
+
+    virtual void visit(StartFunction& inst) = 0;
 
     virtual void visit(DeclareInst& inst) = 0;
 

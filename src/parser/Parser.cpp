@@ -120,13 +120,33 @@ Node* Parser::parse_and_expression() {
 
 Node* Parser::parse_bool_expression() {
     Node* left = this->parse_add_or_sub_expression();
-    if (this->match(TokenType::EQ)) {
-        this->next();
-        Node* right = this->parse_add_or_sub_expression();
-        BinopNode* node = new BinopNode(OpType::EQ, left, right);
-        return node;
+    OpType op;
+    switch (this->token.type) {
+        case TokenType::EQ:
+            op = OpType::EQ;
+            break;
+        case TokenType::LT:
+            op = OpType::LT;
+            break;
+        case TokenType::GT:
+            op = OpType::GEQ;
+            break;
+        case TokenType::LEQ:
+            op = OpType::LEQ;
+            break;
+        case TokenType::GEQ:
+            op = OpType::GEQ;
+            break;
+        case TokenType::NEQ:
+            op = OpType::NEQ;
+            break;
+        default:
+            return left;
     }
-    return left;
+    this->next();
+    Node* right = this->parse_add_or_sub_expression();
+    BinopNode* node = new BinopNode(op, left, right);
+    return node;
 }
 
 Node* Parser::parse_add_or_sub_expression() {

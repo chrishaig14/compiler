@@ -7,7 +7,7 @@
 bool JumpIfFalseInst::equal(const Instruction* inst) const {
     const JumpIfFalseInst* other_ptr = dynamic_cast<const JumpIfFalseInst*>(inst);
     if (other_ptr == nullptr) return false;
-    return this->offset == other_ptr->offset;
+    return this->offset == other_ptr->offset && this->label == other_ptr->label;
 }
 
 

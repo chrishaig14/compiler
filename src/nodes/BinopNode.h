@@ -10,7 +10,7 @@
 #include "Visitor.h"
 
 enum class OpType {
-    ADD, SUB, MUL, DIV, EQ, AND, OR
+    ADD, SUB, MUL, DIV, EQ, AND, OR, LEQ, GEQ, LT, GT, NEQ
 };
 
 std::string op_to_string(OpType op);

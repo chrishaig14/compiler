@@ -8,9 +8,10 @@
 #include <translator/Translator.h>
 #include <vm/CodeRunner.h>
 #include <semantic/Checker.h>
+#include <vm/Loader.h>
 
 TEST(total_test, test_1) {
-    std::string text = "fun sum(x: Integer, y: Integer) -> Integer {return x+y;} sum(5, 8);";
+    std::string text = "fun sum(x: Integer, y: Integer) -> Integer {return x-y;} fun main()->None{sum(5, 8);}";
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
@@ -22,11 +23,15 @@ TEST(total_test, test_1) {
     Translator translator;
     program->accept(translator);
     CodeLabel translated_code = translator.code;
+    Loader loader(translated_code);
+    loader.load();
+    Environment* global_env = loader.global_env;
     ObjectStack stack;
     StructProtos structs;
-//    CodeRunner code_runner(translated_code, structs, stack, {});
-//    code_runner.run();
-//    EXPECT_TRUE(stack.top()->equal(new IntegerObject(13)));
+    CodeObject* main_function = dynamic_cast<CodeObject*>(global_env->get("main"));
+    CodeRunner code_runner(main_function->user->code, structs, stack, global_env);
+    code_runner.run();
+    EXPECT_TRUE(stack.top()->equal(new IntegerObject(-3)));
 }
 
 TEST(total_test, test_2) {
@@ -193,14 +198,17 @@ TEST(total_test, test_7) {
 //    EXPECT_TRUE(code_runner.env->get("x")->equal(new IntegerObject(4)));
 }
 
-TEST(total_test, test_factorial_with_for) {
-    std::string text = "var result = 1; for(x:[1,2,3,4,5,6,7,8,9,10]){result = result * x;}";
+TEST(total_test, test_factorial_with_while) {
+    std::string text = "var n = 10; var result = 1; var i = 2; while(i<=n){result = i * result; i = i + 1;}";
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
     BlockNode* program = parser.parse_program();
-    VectorOfNodes list = {NUM(3), NUM(1), NUM(4)};
-    auto expected_node = BlockNode({DECL("l", nullptr, LST(list)), DECL("x", nullptr, SUB(ID("l"), NUM(2)))});
+    auto expected_node = BlockNode(
+            {DECL("n", nullptr, NUM(10)), DECL("result", nullptr, NUM(1)), DECL("i", nullptr, NUM(2)),
+             WHILE(BIN(OpType::LEQ, ID("i"), ID("n")), new BlockNode(
+                     {ASN(ID("result"), BIN(OpType::MUL, ID("i"), ID("result"))),
+                      ASN(ID("i"), BIN(OpType::ADD, ID("i"), NUM(1)))}))});
     EXPECT_EQ(*program, expected_node);
     GlobalProcessor gp;
     gp.visit(*program);

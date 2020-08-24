@@ -6,14 +6,11 @@
 #include <iostream>
 
 CodeRunner::CodeRunner(const Code& code, std::map<std::string, std::map<std::string, Code>>& structs,
-                       ObjectStack& stack, std::map<std::string, Object*> closure) : code(code), stack(stack),
+                       ObjectStack& stack, Environment* global_env) : code(code), stack(stack),
                                                                                      structs(structs) {
     std::cout << "New code runner" << std::endl;
-    this->env = new Environment("global", nullptr);
-    for (auto it: closure) {
-        this->env->declare(it.first);
-        this->env->set(it.first, it.second);
-    }
+    this->env = new Environment("", global_env);
+    this->global_env = global_env;
     this->inst_ptr = 0;
 }
 
@@ -82,11 +79,7 @@ void CodeRunner::visit(CallInst& call) {
     if (code->type == CodeType::BUILTIN) {
         code->builtin->run(this->stack);
     } else {
-        CodeRunner code_runner(code->user->code, this->structs, this->stack, {});
-        for (auto v: code->user->closure) {
-            code_runner.env->declare(v);
-            code_runner.env->set(v, this->env->get(v));
-        }
+        CodeRunner code_runner(code->user->code, this->structs, this->stack, this->global_env);
         code_runner.run();
 //            throw std::runtime_error("Trying to run user code!");
     }
@@ -132,16 +125,6 @@ void CodeRunner::visit(GetSubscriptInst& inst) {
 }
 
 void CodeRunner::visit(PushFunctionInst& inst) {
-    std::cout << "Run [" << inst.to_string() << "]" << std::endl;
-    Code function_body = inst.body;
-    Code get_parameters;
-    for (int i = inst.parameter_names.size() - 1; i >= 0; i--) {
-        Code param_code = {I_DECL(inst.parameter_names[i]), I_SET(inst.parameter_names[i])};
-        get_parameters.insert(get_parameters.end(), param_code.begin(), param_code.end());
-    }
-    function_body.insert(function_body.begin(), get_parameters.begin(), get_parameters.end());
-    this->stack.push(new CodeObject(new CodeUser(function_body, inst.free_variables)));
-    this->inst_ptr++;
 }
 
 void CodeRunner::visit(PushIntegerInst& inst) {
@@ -276,4 +259,12 @@ void CodeRunner::visit(EnterScope& inst) {
 
 void CodeRunner::visit(NopInst& inst) {
     this->inst_ptr++;
+}
+
+void CodeRunner::visit(EndFunction& inst) {
+    // nothing
+}
+
+void CodeRunner::visit(StartFunction& inst) {
+    // nothing
 }

@@ -80,17 +80,18 @@ void Translator::visit(DeclarationNode& node) {
 
 void Translator::visit(FunctionNode& node) {
     CodeLabel out;
-    out.push_back(LC("", I_DECL(node.identifier)));
+    out.push_back(LC("", I_START_FUNCTION(node.identifier)));
     CodeLabel body_code;
     node.body->accept(*this);
     body_code = this->code;
-    std::vector<std::string> closure;
-    for (auto fv: node.free_variables) {
-        closure.push_back(fv.first);
+    CodeLabel parameters_code;
+    for (int i = node.parameter_names.size() - 1; i >= 0; i--) {
+        parameters_code.push_back(NL(I_DECL(node.parameter_names[i])));
+        parameters_code.push_back(NL(I_SET(node.parameter_names[i])));
     }
-//    auto w = I_PUSHF(node.parameter_names, body_code, closure);
-//    out.push_back(LC("", w));
-//    out.push_back(LC("", I_SET(node.identifier)));
+    out.insert(out.end(), parameters_code.begin(), parameters_code.end());
+    out.insert(out.end(), body_code.begin(), body_code.end());
+    out.push_back(LC("", I_END_FUNCTION(node.identifier)));
     this->code = out;
 }
 
@@ -238,12 +239,16 @@ void Translator::visit(WhileNode& node) {
     CodeLabel out;
     node.condition->accept(*this);
     std::vector<std::pair<std::string, Instruction*>> condition_code = this->code;
-    std::string start_loop_label = "start_loop." + std::to_string(this->loop_counter);
+    int loop_number = this->loop_counter;
+    this->current_loop = loop_number;
+    this->loop_counter++;
+    std::string start_loop_label = "start_loop." + std::to_string(loop_number);
     out.push_back(LC(start_loop_label, condition_code[0].second));
     for (int i = 1; i < condition_code.size(); i++) {
         out.push_back(condition_code[i]);
     }
     node.body->accept(*this);
+    this->current_loop--;
     CodeLabel body_code = this->code;
     CodeLabel p = {LC("", I_ENTER("while"))};
     body_code.insert(body_code.begin(), p.begin(), p.end());
@@ -252,9 +257,8 @@ void Translator::visit(WhileNode& node) {
     out.push_back(NL(I_JUMPF(body_code.size() + 3)));
     out.insert(out.end(), body_code.begin(), body_code.end());
     out.push_back(LC("", I_JUMP(start_loop_label)));
-    out.push_back(LC("break_loop." + std::to_string(this->loop_counter), I_LEAVE("while")));
+    out.push_back(LC("break_loop." + std::to_string(loop_number), I_LEAVE("while")));
     this->code = out;
-    this->loop_counter++;
 }
 
 void Translator::visit(BooleanNode& node) {
@@ -264,6 +268,6 @@ void Translator::visit(BooleanNode& node) {
 }
 
 void Translator::visit(BreakNode& node) {
-    CodeLabel out = {NL(I_JUMP("break_loop." + std::to_string(this->loop_counter)))};
+    CodeLabel out = {NL(I_JUMP("break_loop." + std::to_string(this->current_loop)))};
     this->code = out;
 }

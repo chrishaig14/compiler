@@ -11,9 +11,8 @@
 class CodeUser {
 public:
     Code code;
-    std::vector<std::string> closure;
 
-    CodeUser(Code code, std::vector<std::string> closure);
+    CodeUser(Code code);
 
     Instruction* get(int i);
 

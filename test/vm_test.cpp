@@ -70,7 +70,10 @@ TEST(vm_test, inst_call) {
     BuiltinSum builtinSum;
     Object* builtin_sum = new CodeObject(&builtinSum);
     StructProtos structs;
-    CodeRunner code_runner(code, structs, stack, {{"__sum__", builtin_sum}});
+    Environment* global_env = new Environment("", nullptr);
+    global_env->declare("__sum__");
+    global_env->set("__sum__", builtin_sum);
+    CodeRunner code_runner(code, structs, stack, global_env);
     Object* value_16 = new IntegerObject(16);
     PushIntegerInst push_inst_9(9);
     PushIntegerInst push_inst_7(7);
@@ -114,7 +117,10 @@ TEST(vm_test, inst_call_user) {
     ObjectStack stack;
     Object* builtin_sum_object = new CodeObject(&builtin_sum_function);
     StructProtos structs;
-    CodeRunner code_runner(main_code, structs, stack, {{"__sum__", builtin_sum_object}});
+    Environment* global_env = new Environment("", nullptr);
+    global_env->declare("__sum__");
+    global_env->set("__sum__", builtin_sum_object);
+    CodeRunner code_runner(main_code, structs, stack, global_env);
     code_runner.run();
     EXPECT_TRUE(stack.top()->equal(new IntegerObject(21)));
 }

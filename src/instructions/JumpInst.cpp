@@ -7,7 +7,7 @@
 bool JumpInst::equal(const Instruction* inst) const {
     auto p = dynamic_cast<const JumpInst*>(inst);
     if (p == nullptr) return false;
-    return this->offset == p->offset;
+    return this->offset == p->offset && this->label == p->label;
 }
 
 std::string JumpInst::to_string() const {

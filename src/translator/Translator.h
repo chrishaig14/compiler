@@ -24,13 +24,14 @@
 #include "../instructions/PushIntegerInst.h"
 #include "../instructions/SetSubscriptInst.h"
 #include "../instructions/GetSubscriptInst.h"
+#include "../instructions/EndFunction.h"
+#include "../instructions/StartFunction.h"
 #include "../instructions/JumpIfFalseInst.h"
 #include "../instructions/PushFunctionInst.h"
 #include "../instructions/PushBooleanInst.h"
 #include "../instructions/JumpInst.h"
 #include "../instructions/EnterScope.h"
 #include "../instructions/LeaveScope.h"
-typedef std::vector<std::pair<std::string, Instruction*>> CodeLabel;
 class Translator : public Visitor {
 public:
     int loop_counter;
@@ -68,6 +69,7 @@ public:
 
     CodeLabel code;
     bool is_lvalue;
+    int current_loop;
 
     Translator();
 

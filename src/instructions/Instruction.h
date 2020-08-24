@@ -8,8 +8,14 @@
 #include <string>
 #include "InstructionVisitor.h"
 
+enum class InstType {
+    OTHER, START_FUNCTION, END_FUNCTION
+};
+
 class Instruction {
 public:
+    InstType type = InstType::OTHER;
+
     virtual bool equal(const Instruction* inst) const = 0;
 
     virtual std::string to_string() const = 0;

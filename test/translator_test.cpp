@@ -19,7 +19,16 @@ std::ostream& operator<<(std::ostream& out, const CodeLabel v) {
 }
 
 bool operator==(const CodeLabel a, const CodeLabel b) {
-    if (a.size() != b.size()) return false;
+    if (a.size() != b.size()) {
+        int min = a.size() < b.size() ? a.size() : b.size();
+        for (int i = 0; i < min; i++) {
+            auto a_inst = a[i].second;
+            auto b_inst = b[i].second;
+            std::cout << "comparing " << a_inst->to_string() << " == " << b_inst->to_string() << ": "
+                      << (a_inst->equal(b_inst) ? "True" : "False") << std::endl;
+        }
+        return false;
+    }
     for (int i = 0; i < a.size(); i++) {
         auto a_inst = a[i].second;
         auto b_inst = b[i].second;
@@ -205,6 +214,144 @@ TEST(translator_test, test_while_with_break) {
             NL(I_LEAVE("while")),
             NL(I_JUMP("start_loop.0")),
             LC("break_loop.0", I_LEAVE("while"))
+    };
+    EXPECT_EQ(translator.code, expected_code)
+                        << "GOT:\n----\n" << translator.code << "----\nEXPECTED:\n----\n" << expected_code << "----\n";
+}
+
+TEST(translator_test, test_nested_while) {
+    Translator translator;
+    Node* node = WHILE(ID("x"), new BlockNode(
+            {WHILE(BIN(OpType::EQ, ID("y"), NUM(7)), new BlockNode({BREAK, CALL(ID("foo"), {NUM(13)})})), BREAK,
+             ASN(ID("x"), NUM(9))}));
+    node->accept(translator);
+    CodeLabel expected_code = {
+            LC("start_loop.0", I_GET("x")),
+            NL(I_JUMPF(20)), // outer loop condition false -> jump
+            NL(I_ENTER("while")), // enter outer loop scope
+            LC("start_loop.1", I_GET("y")),
+            NL(I_PUSHI(7)),
+            NL(I_BIN(OpType::EQ)),
+            NL(I_JUMPF(9)), // inner loop condition false -> jump
+            NL(I_ENTER("while")), // enter inner loop scope
+            NL(I_JUMP("break_loop.1")), // break inner loop
+            NL(I_PUSHI(13)),
+            NL(I_GET("foo")),
+            NL(I_CALL),
+            NL(I_LEAVE("while")), // leave inner loop scope
+            NL(I_JUMP("start_loop.1")), // go back to start of inner loop
+            LC("break_loop.1", I_LEAVE("while")), // break inner loop
+            NL(I_JUMP("break_loop.0")),
+            NL(I_PUSHI(9)),
+            NL(I_SET("x")),
+            NL(I_LEAVE("while")), // leave outer loop scope
+            NL(I_JUMP("start_loop.0")), // go back to start of outer loop,
+            LC("break_loop.0", I_LEAVE("while")) // break outer loop
+    };
+    EXPECT_EQ(translator.code, expected_code)
+                        << "GOT:\n----\n" << translator.code << "----\nEXPECTED:\n----\n" << expected_code << "----\n";
+}
+
+TEST(translator_test, test_very_complex_nested_while) {
+    Translator translator;
+    Node* node = new BlockNode({
+                                       WHILE(ID("x"), new BlockNode(
+                                               {
+                                                       WHILE(BIN(OpType::EQ, ID("y"), NUM(7)), new BlockNode({
+                                                                                                                     BREAK,
+                                                                                                                     CALL(ID("foo"),
+                                                                                                                          {NUM(13)})
+                                                                                                             })),
+                                                       BREAK,
+                                                       ASN(ID("x"), NUM(9)),
+                                                       IF(ID("z"), new BlockNode({
+                                                                                         BREAK
+                                                                                 }))
+                                               })),
+                                       WHILE(ID("w"), new BlockNode({
+                                                                            IF(ID("t"), new BlockNode({
+                                                                                                              BREAK
+                                                                                                      })),
+                                                                            ASN(ID("g"), NUM(8)),
+                                                                            BREAK
+                                                                    }))
+                               });
+    node->accept(translator);
+    CodeLabel expected_code = {
+            LC("start_loop.0", I_GET("x")),
+
+            NL(I_JUMPF(25)), // outer loop condition false -> jump
+
+            NL(I_ENTER("while")), // enter outer loop scope
+
+            LC("start_loop.1", I_GET("y")),
+            NL(I_PUSHI(7)),
+            NL(I_BIN(OpType::EQ)),
+
+            NL(I_JUMPF(9)), // inner loop condition false -> jump
+
+            NL(I_ENTER("while")), // enter inner loop scope
+            NL(I_JUMP("break_loop.1")), // break inner loop
+            NL(I_PUSHI(13)),
+            NL(I_GET("foo")),
+            NL(I_CALL),
+            NL(I_LEAVE("while")),
+            NL(I_JUMP("start_loop.1")),
+            LC("break_loop.1", I_LEAVE("while")),
+
+            NL(I_JUMP("break_loop.0")),
+
+            NL(I_PUSHI(9)),
+            NL(I_SET("x")),
+
+            NL(I_GET("z")),
+            NL(I_JUMPF(4)),
+            NL(I_ENTER("if")),
+            NL(I_JUMP("break_loop.0")),
+            NL(I_LEAVE("if")),
+
+            NL(I_LEAVE("while")), // leave inner loop scope
+            NL(I_JUMP("start_loop.0")), // go back to start of inner loop
+            LC("break_loop.0", I_LEAVE("while")), // break inner loop
+
+            LC("start_loop.2", I_GET("w")),
+            NL(I_JUMPF(13)), // jump to after loop
+            NL(I_ENTER("while")),
+            NL(I_GET("t")),
+            NL(I_JUMPF(4)), // if false
+            NL(I_ENTER("if")),
+            NL(I_JUMP("break_loop.2")),
+            NL(I_LEAVE("if")),
+            NL(I_PUSHI(8)),
+            NL(I_SET("g")),
+            NL(I_JUMP("break_loop.2")),
+            NL(I_LEAVE("while")),
+            NL(I_JUMP("start_loop.2")),
+            LC("break_loop.2", I_LEAVE("while"))
+    };
+    EXPECT_EQ(translator.code, expected_code)
+                        << "GOT:\n----\n" << translator.code << "----\nEXPECTED:\n----\n" << expected_code << "----\n";
+}
+
+TEST(translator_test, function) {
+    Translator translator;
+    std::vector<std::string> parameter_names = {"x", "y"};
+    VectorOfTypes parameter_types = {T_INT, T_INT};
+    BlockNode* function_code = new BlockNode({RET(BIN(OpType::ADD, ID("x"), ID("y")))});
+    Node* node = FUN("foo", parameter_names, parameter_types, T_INT, function_code);
+    node->accept(translator);
+    CodeLabel expected_code = {
+            NL(I_START_FUNCTION("foo")),
+            NL(I_ENTER("foo")),
+            NL(I_DECL("x")),
+            NL(I_DECL("y")),
+            NL(I_SET("y")),
+            NL(I_SET("x")),
+            NL(I_GET("x")),
+            NL(I_GET("y")),
+            NL(I_BIN(OpType::ADD)),
+            NL(I_LEAVE("foo")),
+            NL(I_END_FUNCTION("foo"))
     };
     EXPECT_EQ(translator.code, expected_code)
                         << "GOT:\n----\n" << translator.code << "----\nEXPECTED:\n----\n" << expected_code << "----\n";

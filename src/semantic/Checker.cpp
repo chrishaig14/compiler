@@ -147,7 +147,28 @@ void Checker::visit(BinopNode& n) {
     for (auto fv: right_info.free_variables) {
         semantic_info.free_variables[fv.first] = 1;
     }
-    if (n.op == OpType::EQ || n.op == OpType::AND || n.op == OpType::OR) {
+    bool is_boolean = true;
+    switch (n.op) {
+        case OpType::EQ:
+            break;
+        case OpType::AND:
+            break;
+        case OpType::OR:
+            break;
+        case OpType::LEQ:
+            break;
+        case OpType::GEQ:
+            break;
+        case OpType::LT:
+            break;
+        case OpType::GT:
+            break;
+        case OpType::NEQ:
+            break;
+        default:
+            is_boolean = false;
+    }
+    if (is_boolean) {
         semantic_info.symbol_info = new ObjectTypeNode("Boolean", {});
     } else { semantic_info.symbol_info = new ObjectTypeNode("Integer", {}); }
     this->rv = semantic_info;

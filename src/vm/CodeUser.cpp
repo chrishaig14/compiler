@@ -12,7 +12,6 @@ Instruction* CodeUser::get(int i) {
     return this->code[i];
 }
 
-CodeUser::CodeUser(std::vector<Instruction*> code, std::vector<std::string> closure) {
+CodeUser::CodeUser(Code code) {
     this->code = code;
-    this->closure = closure;
 }
