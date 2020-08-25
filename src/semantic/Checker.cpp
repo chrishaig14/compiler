@@ -179,7 +179,7 @@ void Checker::visit(ReturnNode& n) {
     SemanticInfo expression_info = this->rv;
     TypeNode* return_type = this->scope->get("__return__");
     if (!expression_info.symbol_info->equal(return_type)) {
-        throw ReturnError(expression_info.symbol_info, return_type);
+        throw ReturnError(return_type, expression_info.symbol_info);
     }
     SemanticInfo semantic_info;
     semantic_info.free_variables = expression_info.free_variables;
