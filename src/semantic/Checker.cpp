@@ -248,7 +248,8 @@ void Checker::visit(ClassLiteralExpressionNode& node) {
         SemanticInfo semanticInfo = this->rv;
         if (!semanticInfo.symbol_info->equal(class_info->field_types[i])) {
             throw std::runtime_error(
-                    "Field type doesn't match: " + class_info->field_names[i] + " ( field # " + std::to_string(i) + " )" +
+                    "Field type doesn't match: " + class_info->field_names[i] + " ( field # " + std::to_string(i) +
+                    " )" +
                     " expected " +
                     class_info->field_types[i]->to_string() + ", got " + semanticInfo.symbol_info->to_string());
         }
