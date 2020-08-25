@@ -9,9 +9,8 @@ void StructNode::accept(Visitor& visitor) {
 }
 
 StructNode::StructNode(std::string identifier, std::vector<std::string> templateParameters,
-                       std::map<std::string, TypeNode*> fields) : identifier(
+                       std::vector<std::pair<std::string, TypeNode*>> fields) : identifier(
         identifier),
-                                                                                                      template_parameters(
-                                                                                                              templateParameters),
-                                                                                                      fields(fields) {}
-
+                                                                                template_parameters(
+                                                                                        templateParameters),
+                                                                                fields(fields) {}

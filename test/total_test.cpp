@@ -105,3 +105,30 @@ TEST(total_test, test_factorial_while_function) {
     code_runner.run();
     EXPECT_TRUE(stack.top()->equal(new IntegerObject(3628800)));
 }
+
+TEST(total_test, test_struct) {
+    std::string text = "struct Person{name: String; age:Integer;} fun main()->Person{var x = Person{age: 26, name: \"chris\"}; return x;}";
+    Scanner scanner(text);
+    std::vector<Token> tokens = scanner.scan_all();
+    Parser parser(tokens);
+    BlockNode* program = parser.parse_program();
+    GlobalProcessor gp;
+    gp.visit(*program);
+    Checker checker(gp.globals, gp.class_table);
+    checker.visit(*program);
+    Translator translator;
+    program->accept(translator);
+    ObjectStack stack;
+    StructProtos structs;
+    CodeLabel translated_code = translator.code;
+    Loader loader(translated_code);
+    loader.load();
+    Environment* global_env = loader.global_env;
+    CodeObject* main_function = dynamic_cast<CodeObject*>(global_env->get("main"));
+    CodeRunner code_runner(main_function->user->code, structs, stack, global_env);
+    code_runner.run();
+    auto object = new UserObject("Person", {"name", "string"});
+    object->fields["name"] = new StringObject("chris");
+    object->fields["age"] = new IntegerObject(26);
+    EXPECT_TRUE(stack.top()->equal(object));
+}

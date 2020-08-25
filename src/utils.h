@@ -66,7 +66,8 @@ typedef std::map<std::string, std::map<std::string, Code>> StructProtos;
 #define LC(label, instruction) std::pair<std::string, Instruction*>(label, instruction)
 #define BREAK new BreakNode()
 #define NL(instruction) std::pair<std::string, Instruction*>("", instruction)
-typedef std::map<std::string, TypeNode*> StructFields;
+typedef std::pair<std::string, TypeNode*> FieldInfo;
+typedef std::vector<FieldInfo> StructFields;
 typedef std::vector<std::pair<std::string, Instruction*>> CodeLabel;
 
 #endif //UNTITLED1_UTILS_H

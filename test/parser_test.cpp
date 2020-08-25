@@ -167,7 +167,7 @@ TEST(parser_test, fun_empty) {
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
     TypeNode* node = parser.parse_type_node();
-    auto expected_node = FUNCTION_TYPE({},T_STRING);
+    auto expected_node = FUNCTION_TYPE({}, T_STRING);
     COMPLETE_TEST;
 }
 
@@ -177,7 +177,7 @@ TEST(parser_test, fun_full) {
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
     TypeNode* node = parser.parse_type_node();
-    auto expected_node = new FunctionTypeNode({T_LIST(T_STRING), FUNCTION_TYPE({T_STRING},T_INT)},T_LIST(T_INT));
+    auto expected_node = new FunctionTypeNode({T_LIST(T_STRING), FUNCTION_TYPE({ T_STRING }, T_INT)}, T_LIST(T_INT));
     COMPLETE_TEST;
 }
 
@@ -319,7 +319,7 @@ TEST(parser_test, class_foo_empty) {
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
     StructNode* node = parser.parse_struct_definition();
-    StructFields fields;
+    std::vector<std::pair<std::string, TypeNode*>> fields;
     auto expected_node = CLS("Foo", std::vector<std::string>(), fields);
     COMPLETE_TEST;
 
@@ -332,8 +332,8 @@ TEST(parser_test, class_foo_with_fields) {
     Parser parser(tokens);
     StructNode* node = parser.parse_struct_definition();
     StructFields fields;
-    fields["x"] = T_STRING;
-    fields["y"] = T_INT;
+    fields.push_back(FieldInfo("x", T_STRING));
+    fields.push_back(FieldInfo("y", T_INT));
     auto expected_node = CLS("Foo", {}, fields);
     COMPLETE_TEST;
 
@@ -382,15 +382,14 @@ TEST(parser_test, template_class_foo_empty) {
 TEST(parser_test, class_foo_with_fields_and_method) {
     std::string complete_foo_class_string = "struct Foo{ x: String;  y: Integer;}";
     StructFields fields;
-    fields["x"] = T_STRING;
-    fields["y"] = T_INT;
+    fields.push_back(FieldInfo("x", T_STRING));
+    fields.push_back(FieldInfo("y", T_INT));
     StructNode* complete_foo_class_node = CLS("Foo", {}, fields);
     std::string text = complete_foo_class_string;
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
     StructNode* node = parser.parse_struct_definition();
-
     auto expected_node = complete_foo_class_node;
     COMPLETE_TEST;
 
@@ -580,7 +579,7 @@ TEST(parser_test, for_loop_1) {
     COMPLETE_TEST;
 }
 
-TEST(parser_test, while_loop_1){
+TEST(parser_test, while_loop_1) {
     std::string text = "while(true){}";
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
@@ -590,7 +589,7 @@ TEST(parser_test, while_loop_1){
     COMPLETE_TEST;
 }
 
-TEST(parser_test, while_loop_common){
+TEST(parser_test, while_loop_common) {
     std::string text = "while(true){}";
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
@@ -606,8 +605,8 @@ TEST(parser_test, for_loop_2) {
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
     Node* node = parser.parse_for_loop();
-    VectorOfNodes list = {NUM(4),NUM(5),NUM(6)};
-    BlockNode* body = new BlockNode({CALL(ID("print"),{ID("e")})});
+    VectorOfNodes list = {NUM(4), NUM(5), NUM(6)};
+    BlockNode* body = new BlockNode({CALL(ID("print"), { ID("e") })});
     Node* expected_node = FOR("e", LST(list), body);
     COMPLETE_TEST;
 }
@@ -618,8 +617,8 @@ TEST(parser_test, for_loop_3) {
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
     Node* node = parser.parse_top_level_statement();
-    VectorOfNodes list = {NUM(4),NUM(5),NUM(6)};
-    BlockNode* body = new BlockNode({CALL(ID("print"),{ID("e")})});
+    VectorOfNodes list = {NUM(4), NUM(5), NUM(6)};
+    BlockNode* body = new BlockNode({CALL(ID("print"), { ID("e") })});
     Node* expected_node = FOR("e", LST(list), body);
     COMPLETE_TEST;
 }

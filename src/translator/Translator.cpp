@@ -214,6 +214,7 @@ void Translator::visit(ClassLiteralExpressionNode& node) {
         CodeLabel out = this->code;
         all.insert(all.end(), out.begin(), out.end());
     }
+//    all.push_back(LC("", new MakeObjectInst(node.identifier, fields)));
     this->code = all;
 }
 

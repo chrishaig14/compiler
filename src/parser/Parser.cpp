@@ -438,16 +438,18 @@ StructNode* Parser::parse_struct_definition() {
         }
         this->expect_token(TokenType::RSQUARE);
     }
-    std::map<std::string, TypeNode*> fields;
+    std::vector<std::pair<std::string, TypeNode*>> fields;
 
     this->expect_token(TokenType::LCURLY);
+    std::vector<std::string> field_names;
+    VectorOfTypes field_types;
     while (true) {
         if (this->match(TokenType::ID)) {
             std::string identifier = this->token.str;
             this->next();
             this->expect_token(TokenType::COLON);
             TypeNode* field_type = this->parse_type_node();
-            fields[identifier] = field_type;
+            fields.push_back(std::pair<std::string, TypeNode*>(identifier, field_type));
             this->expect_token(TokenType::SEMICOLON);
         } else {
             break;

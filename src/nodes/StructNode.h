@@ -12,15 +12,16 @@
 #include "Visitor.h"
 #include "DeclarationNode.h"
 #include "FunctionNode.h"
+#include "../utils.h"
 
 class StructNode : public Node {
 public:
     std::string identifier;
     std::vector<std::string> template_parameters;
-    std::map<std::string, TypeNode*> fields;
+    std::vector<std::pair<std::string, TypeNode*>> fields;
 
     StructNode(std::string identifier, std::vector<std::string> templateParameters,
-               std::map<std::string, TypeNode*> fields);
+               std::vector<std::pair<std::string, TypeNode*>> fields);
 
     void accept(Visitor& visitor) override;
 
@@ -37,8 +38,9 @@ public:
         for (int i = 0; i < this->template_parameters.size(); i++) {
             if (this->template_parameters[i] != other.template_parameters[i]) return false;
         }
-        for (auto f: this->fields) {
-            if (!f.second->equal(other.fields[f.first])) return false;
+        for (int i = 0; i < this->fields.size(); i++) {
+            if (this->fields[i].first != other.fields[i].first) return false;
+            if (!this->fields[i].second->equal(other.fields[i].second)) return false;
         }
         return true;
     }
