@@ -1,17 +1,18 @@
+#include <gtest/gtest.h>
 #include <iostream>
 #include <fstream>
 #include <sstream>
-#include "src/scanner/Scanner.h"
-#include "src/parser/Parser.h"
-#include "src/formatter/Formatter.h"
+#include <scanner/Scanner.h>
+#include <parser/Parser.h>
+#include <formatter/Formatter.h>
+#include <nodes/BlockNode.h>
 
-int main(int argc, char* argv[]) {
-    if (argc < 2) {
-        std::cerr << "Error: expected a file name to format!" << std::endl;
-        exit(1);
-    }
-    std::string filename = argv[1];
+TEST(formatter_test, test_1) {
+    std::string filename = "../../test_file.pl";
     std::ifstream file(filename);
+    if (!file.is_open()) {
+        FAIL() << "Couldn't open file";
+    }
     std::stringstream sstream;
     sstream << file.rdbuf();
     std::string text = sstream.str();
@@ -23,5 +24,4 @@ int main(int argc, char* argv[]) {
     Formatter formatter;
     ast->accept(formatter);
     std::cout << formatter.output;
-    return 0;
 }
