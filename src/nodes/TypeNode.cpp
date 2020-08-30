@@ -67,6 +67,7 @@ std::string ObjectTypeNode::to_string() {
         parameters += p->to_string() + ", ";
     }
     if (parameters.size() != 0) {
+        parameters = parameters.substr(0, parameters.size() - 2);
         return this->identifier + "[" + parameters + "]";
     }
     return this->identifier;
