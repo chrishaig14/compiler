@@ -62,6 +62,9 @@ class Formatter : public Visitor {
     void visit(WhileNode& node) override;
 
 public:
+    void visit(TernaryNode& node) override;
+
+public:
     std::string output;
 };
 

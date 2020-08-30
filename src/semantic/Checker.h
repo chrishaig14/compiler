@@ -80,6 +80,8 @@ public:
 
     void visit(BreakNode& node) override;
 
+    void visit(TernaryNode& node) override;
+
 
 };
 

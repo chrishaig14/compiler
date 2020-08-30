@@ -25,6 +25,67 @@ TEST(parser_test, binop_a_plus_b) {
     COMPLETE_TEST;
 }
 
+TEST(parser_test, ternary) {
+    std::string text = "a?7:6";
+    Scanner scanner(text);
+    std::vector<Token> tokens = scanner.scan_all();
+    Parser parser(tokens);
+    Node* node = parser.parse_ternary();
+    Node* expected_node = TERNARY(ID("a"), NUM(7), NUM(6));
+    COMPLETE_TEST;
+}
+
+TEST(parser_test, or_test) {
+    std::string text = "a||b";
+    Scanner scanner(text);
+    std::vector<Token> tokens = scanner.scan_all();
+    Parser parser(tokens);
+    Node* node = parser.parse_or_expression();
+    Node* expected_node = BIN(OpType::OR, ID("a"), ID("b"));
+    COMPLETE_TEST;
+}
+
+TEST(parser_test, expression_with_ternary) {
+    std::string text = "a||s-c==7?8-9?7:4:10";
+    Scanner scanner(text);
+    std::vector<Token> tokens = scanner.scan_all();
+    Parser parser(tokens);
+    Node* node = parser.parse_expression();
+    Node* expected_node = TERNARY(BIN(OpType::OR, ID("a"), BIN(OpType::EQ, BIN(OpType::SUB, ID("s"), ID("c")), NUM(7))),
+                                  TERNARY(BIN(OpType::SUB, NUM(8), NUM(9)), NUM(7), NUM(4)), NUM(10));
+    COMPLETE_TEST;
+}
+
+TEST(parser_test, ternary_fail_1) {
+    std::string text = "a?8:6";
+    Scanner scanner(text);
+    std::vector<Token> tokens = scanner.scan_all();
+    Parser parser(tokens);
+    Node* node = parser.parse_ternary();
+    Node* expected_node = TERNARY(ID("a"), NUM(7), NUM(6));
+    COMPLETE_TEST;
+}
+
+TEST(parser_test, ternary_fail_2) {
+    std::string text = "b?7:6";
+    Scanner scanner(text);
+    std::vector<Token> tokens = scanner.scan_all();
+    Parser parser(tokens);
+    Node* node = parser.parse_ternary();
+    Node* expected_node = TERNARY(ID("a"), NUM(7), NUM(6));
+    COMPLETE_TEST;
+}
+
+TEST(parser_test, ternary_fail_3) {
+    std::string text = "a?8:7";
+    Scanner scanner(text);
+    std::vector<Token> tokens = scanner.scan_all();
+    Parser parser(tokens);
+    Node* node = parser.parse_ternary();
+    Node* expected_node = TERNARY(ID("a"), NUM(7), NUM(6));
+    COMPLETE_TEST;
+}
+
 TEST(parser_test, binop_a_eq_b) {
     std::string text = "a==b";
     Scanner scanner(text);

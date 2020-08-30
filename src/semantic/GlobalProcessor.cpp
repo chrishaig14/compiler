@@ -113,5 +113,9 @@ void GlobalProcessor::visit(BreakNode& node) {
 
 }
 
+void GlobalProcessor::visit(TernaryNode& node) {
+
+}
+
 
 

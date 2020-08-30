@@ -272,3 +272,7 @@ void Translator::visit(BreakNode& node) {
     CodeLabel out = {NL(I_JUMP("break_loop." + std::to_string(this->current_loop)))};
     this->code = out;
 }
+
+void Translator::visit(TernaryNode& node) {
+
+}

@@ -355,3 +355,7 @@ void Checker::visit(SubscriptNode& node) {
 void Checker::visit(BreakNode& node) {
 
 }
+
+void Checker::visit(TernaryNode& node) {
+
+}

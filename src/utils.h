@@ -19,6 +19,7 @@ typedef std::vector<Instruction*> Code;
 #define MEM(parent, child) new MemberNode(parent, child)
 #define IF(condition, then) new IfNode(condition, then)
 #define LST(list) new ListNode(list)
+#define TERNARY(a,b,c) new TernaryNode(a,b,c)
 #define CALL(function, arguments) new CallNode(function, arguments)
 #define CLS(name, template_parameters, fields) new StructNode(name, template_parameters, fields)
 #define ASN(lvalue, rvalue) new AssignmentNode(lvalue, rvalue)

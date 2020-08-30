@@ -86,6 +86,8 @@ public:
         BlockNode* body = this->parse_possibly_empty_block();
         return new WhileNode(condition, body);
     }
+
+    Node* parse_ternary();
 };
 
 

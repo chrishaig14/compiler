@@ -235,3 +235,7 @@ void Formatter::visit(WhileNode& node) {
     std::string body = this->output;
     this->output = this->indentation() + "while (" + condition + ") {\n" + body + this->indentation() + "}";
 }
+
+void Formatter::visit(TernaryNode& node) {
+
+}

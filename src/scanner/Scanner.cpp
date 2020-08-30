@@ -31,11 +31,11 @@ void initialize_tokens() {
     TOKEN_KEYWORDS["while"] = TokenType::WHILE;
 
 
-
     TOKEN_SPECIAL[";"] = TokenType::SEMICOLON;
     TOKEN_SPECIAL[","] = TokenType::COMMA;
     TOKEN_SPECIAL[":"] = TokenType::COLON;
     TOKEN_SPECIAL["."] = TokenType::DOT;
+    TOKEN_SPECIAL["?"] = TokenType::QUESTION;
 
     TOKEN_SPECIAL["["] = TokenType::LSQUARE;
     TOKEN_SPECIAL["]"] = TokenType::RSQUARE;
@@ -195,5 +195,5 @@ Token Scanner::scan_number() {
 }
 
 UnexpectedCharacter::UnexpectedCharacter(char c, size_t position) : std::runtime_error(
-        std::string("Unexpected character '") + std::string(1,c) + "' at position " + std::to_string(position)) {
+        std::string("Unexpected character '") + std::string(1, c) + "' at position " + std::to_string(position)) {
 }

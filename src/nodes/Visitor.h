@@ -19,6 +19,8 @@ class ClassLiteralFieldNode;
 
 class StructNode;
 
+class TernaryNode;
+
 class DeclarationNode;
 
 class ForNode;
@@ -80,6 +82,8 @@ public:
     virtual void visit(ListNode& node) = 0;
 
     virtual void visit(MemberNode& node) = 0;
+
+    virtual void visit(TernaryNode& node) = 0;
 
     virtual void visit(NumberNode& node) = 0;
 

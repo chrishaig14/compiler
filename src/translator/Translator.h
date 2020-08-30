@@ -84,6 +84,8 @@ public:
     void visit(BooleanNode& node) override;
 
     void visit(BreakNode& node) override;
+
+    void visit(TernaryNode& node) override;
 };
 
 

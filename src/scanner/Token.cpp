@@ -75,6 +75,7 @@ void initialize_token_strings() {
     TOKEN_STRINGS[TokenType::NEQ] = "not equal ( != )";
     TOKEN_STRINGS[TokenType::INC] = "increment ( ++ )";
     TOKEN_STRINGS[TokenType::DEC] = "decrement ( -- )";
+    TOKEN_STRINGS[TokenType::QUESTION] = "question ( ? )";
     TOKEN_STRINGS[TokenType::PLUS] = "plus ( + )";
     TOKEN_STRINGS[TokenType::MINUS] = "minus ( - )";
     TOKEN_STRINGS[TokenType::TIMES] = "times ( * )";

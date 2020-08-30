@@ -95,12 +95,13 @@ Node* Parser::parse_assignment_or_expression() {
 }
 
 Node* Parser::parse_expression() {
-    return this->parse_or_expression();
+    return this->parse_ternary();
 }
 
 Node* Parser::parse_or_expression() {
     Node* left = this->parse_and_expression();
     if (this->match(TokenType::OR)) {
+        this->next();
         Node* right = this->parse_and_expression();
         BinopNode* node = new BinopNode(OpType::OR, left, right);
         return node;
@@ -551,6 +552,18 @@ ForNode* Parser::parse_for_loop() {
     BlockNode* body = this->parse_possibly_empty_block();
     ForNode* for_node = FOR(var.str, exp, body);
     return for_node;
+}
+
+Node* Parser::parse_ternary() {
+    Node* condition = this->parse_or_expression();
+    if (this->match(TokenType::QUESTION)){
+        this->next();
+        Node* true_case = this->parse_expression();
+        this->expect_token(TokenType::COLON);
+        Node* false_case = this->parse_expression();
+        return TERNARY(condition, true_case, false_case);
+    }
+    return condition;
 }
 
 
