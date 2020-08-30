@@ -126,12 +126,25 @@ TEST(scanner_test, test_string_full) {
     EXPECT_EQ(token, Token(TokenType::STRING, "hello", 1, 3));
 }
 
+TEST(scanner_test, test_string_full_start_end) {
+    std::string text = "123\n443\"hello\"";
+    Scanner scanner(text);
+    Token token = scanner.get_next();
+    token = scanner.get_next();
+    token = scanner.get_next();
+    EXPECT_EQ(token, Token(TokenType::STRING, "hello", 1, 3));
+    EXPECT_EQ(token.start, 7);
+    EXPECT_EQ(token.end, 13);
+}
+
 TEST(scanner_test, test_all_special) {
     for (auto i: TOKEN_SPECIAL) {
         std::string text = i.first;
         Scanner scanner(text);
         Token token = scanner.get_next();
         EXPECT_EQ(cmp_token_value(token, Token(i.second, -1, -1)), true);
+        EXPECT_EQ(token.start, 0);
+        EXPECT_EQ(token.end, i.first.size() - 1);
     }
 }
 
@@ -141,6 +154,8 @@ TEST(scanner_test, test_all_keywords) {
         Scanner scanner(text);
         Token token = scanner.get_next();
         EXPECT_EQ(cmp_token_value(token, Token(i.second, -1, -1)), true);
+        EXPECT_EQ(token.start, 0);
+        EXPECT_EQ(token.end, i.first.size() - 1);
     }
 }
 
@@ -149,6 +164,8 @@ TEST(scanner_test, test_true_kw) {
     Scanner scanner(text);
     Token token = scanner.get_next();
     EXPECT_EQ(cmp_token_value(token, Token(TokenType::TRUE, -1, -1)), true);
+    EXPECT_EQ(token.start, 0);
+    EXPECT_EQ(token.end, 3);
 }
 
 
@@ -159,6 +176,8 @@ TEST(scanner_test, test_identifier_and_eof) {
     EXPECT_EQ(cmp_token_value(token, st_ID("hello")), true);
     token = scanner.get_next();
     EXPECT_EQ(cmp_token_value(token, st_END), true);
+    EXPECT_EQ(token.start, 0);
+    EXPECT_EQ(token.end, 4);
 }
 
 TEST(scanner_test, test_keyword_and_eof) {
@@ -233,8 +252,12 @@ TEST(scanner_test, test_token_id_position_3) {
     Scanner scanner(text);
     Token token = scanner.get_next();
     EXPECT_EQ(token, Token(TokenType::ID, "foo", 0, 0));
+    EXPECT_EQ(token.start, 0);
+    EXPECT_EQ(token.end, 2);
     token = scanner.get_next();
     EXPECT_EQ(token, Token(TokenType::ID, "bar", 1, 0));
+    EXPECT_EQ(token.start, 4);
+    EXPECT_EQ(token.end, 6);
 }
 
 TEST(scanner_test, test_token_id_position_4) {

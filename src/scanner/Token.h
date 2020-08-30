@@ -64,6 +64,8 @@ public:
     std::string str;
     int num;
     int line, column;
+    int start;
+    int end;
 
     Token();
 

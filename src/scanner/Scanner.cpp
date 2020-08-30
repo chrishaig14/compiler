@@ -106,6 +106,7 @@ Token Scanner::get_next() {
         std::string str;
         int start_l = this->line;
         int start_c = this->column;
+        int start = this->current;
         this->current++;
         char c = this->text[this->current];
         while (c != '\"') {
@@ -118,40 +119,55 @@ Token Scanner::get_next() {
                 break;
             }
         }
+        int end = this->current;
         this->current++;
         if (this->current < this->text.size()) {
             this->column++;
         }
-        return Token(TokenType::STRING, str, start_l, start_c);
+        Token token(TokenType::STRING, str, start_l, start_c);
+        token.start = start;
+        token.end = end;
+        return token;
     }
     return this->scan_other();
 }
 
 Token Scanner::scan_other() {
+    int start = this->current;
     int start_l = this->line;
     int start_c = this->column;
     char c = this->text[this->current];
     std::string str;
     str.push_back(c);
     size_t p = this->current + 1;
+
     if (p < this->text.size()) {
         std::string tstr = str;
         tstr.push_back(this->text[p]);
         if (TOKEN_SPECIAL.count(tstr) == 1) {
             this->current += 2;
             this->column += 2;
-            return Token(TOKEN_SPECIAL[tstr], start_l, start_c);
+            Token token(TOKEN_SPECIAL[tstr], start_l, start_c);
+            token.start = start;
+            int end = this->current - 1;
+            token.end = end;
+            return token;
         }
     }
+    int end = this->current;
     if (TOKEN_SPECIAL.count(str) == 1) {
         this->current++;
         this->column++;
-        return Token(TOKEN_SPECIAL[str], start_l, start_c);
+        Token token(TOKEN_SPECIAL[str], start_l, start_c);
+        token.start = start;
+        token.end = end;
+        return token;
     }
     throw UnexpectedCharacter(c, this->current);
 }
 
 Token Scanner::scan_keyword_or_identifier() {
+    int start = this->current;
     int start_l = this->line;
     int start_c = this->column;
     char c = this->text[this->current];
@@ -166,17 +182,23 @@ Token Scanner::scan_keyword_or_identifier() {
             break;
         }
     }
-
+    int end = this->current - 1;
     if (TOKEN_KEYWORDS.count(str) == 1) {
 //      it's a keyword
-        Token token = Token(TOKEN_KEYWORDS[str], start_l, start_c);
+        Token token(TOKEN_KEYWORDS[str], start_l, start_c);
+        token.start = start;
+        token.end = end;
         return token;
     }
 //  it's an identifier
-    return Token(TokenType::ID, str, start_l, start_c);
+    Token token(TokenType::ID, str, start_l, start_c);
+    token.start = start;
+    token.end = end;
+    return token;
 }
 
 Token Scanner::scan_number() {
+    int start = this->current;
     int start_l = this->line;
     int start_c = this->column;
     char c = this->text[this->current];
@@ -191,7 +213,11 @@ Token Scanner::scan_number() {
             break;
         }
     }
-    return Token(TokenType::NUM, std::stoi(str), start_l, start_c);
+    int end = this->current - 1;
+    Token token = Token(TokenType::NUM, std::stoi(str), start_l, start_c);
+    token.start = start;
+    token.end = end;
+    return token;
 }
 
 UnexpectedCharacter::UnexpectedCharacter(char c, size_t position) : std::runtime_error(
