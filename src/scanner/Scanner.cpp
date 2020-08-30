@@ -91,6 +91,9 @@ Token Scanner::get_next() {
         } else {
             this->column++;
         }
+        if (this->current >= this->text.size()) {
+            return Token(TokenType::END, this->line, this->column);
+        }
         c = this->text[this->current];
     }
     if (isalpha(c) || c == '_') {

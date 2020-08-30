@@ -189,9 +189,13 @@ void Formatter::visit(NumberNode& node) {
 }
 
 void Formatter::visit(ReturnNode& node) {
+    int ind = this->indent_level;
+    this->indent_level = 0;
+    this->semicolon = false;
     node.expression->accept(*this);
+    this->indent_level = ind;
     std::string expression = this->output;
-    this->output = "return " + expression;
+    this->output = this->indentation() + "return " + expression + ";";
 }
 
 void Formatter::visit(StringNode& node) {

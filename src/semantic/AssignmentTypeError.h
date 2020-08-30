@@ -20,7 +20,7 @@ public:
     }
 
     AssignmentTypeError(TypeNode* expected_type, TypeNode* actual_type) : std::runtime_error(
-            "Assigning value of type " + expected_type->to_string() + ", expected: " + actual_type->to_string()) {
+            "Assigning value of type " + actual_type->to_string() + ", expected: " + expected_type->to_string()) {
     }
 
 };
