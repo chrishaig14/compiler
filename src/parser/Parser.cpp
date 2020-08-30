@@ -48,10 +48,13 @@ IfNode* Parser::parse_if() {
 }
 
 ListNode* Parser::parse_list_literal() {
-    this->expect_token(TokenType::LSQUARE);
+    Token list_start = this->expect_token(TokenType::LSQUARE);
+    int start = list_start.start;
     VectorOfNodes elements;
+    int end = 123;
     if (this->match(TokenType::RSQUARE)) {
         // empty list
+        end = this->token.end;
         this->next();
     } else {
         while (true) {
@@ -60,9 +63,12 @@ ListNode* Parser::parse_list_literal() {
             if (!this->match(TokenType::COMMA)) { break; }
             this->next();
         }
-        this->expect_token(TokenType::RSQUARE);
+        Token list_end = this->expect_token(TokenType::RSQUARE);
+        end = list_end.end;
     }
     ListNode* node = new ListNode(elements);
+    node->start = start;
+    node->end = end;
     return node;
 }
 
@@ -89,6 +95,8 @@ Node* Parser::parse_assignment_or_expression() {
         this->next();
         Node* rvalue = this->parse_expression();
         AssignmentNode* node = new AssignmentNode(lvalue, rvalue);
+        node->start = lvalue->start;
+        node->end = rvalue->end;
         return node;
     }
     return lvalue;
@@ -104,6 +112,8 @@ Node* Parser::parse_or_expression() {
         this->next();
         Node* right = this->parse_and_expression();
         BinopNode* node = new BinopNode(OpType::OR, left, right);
+        node->start = left->start;
+        node->end = right->end;
         return node;
     }
     return left;
@@ -114,6 +124,8 @@ Node* Parser::parse_and_expression() {
     if (this->match(TokenType::AND)) {
         Node* right = this->parse_bool_expression();
         BinopNode* node = new BinopNode(OpType::AND, left, right);
+        node->start = left->start;
+        node->end = right->end;
         return node;
     }
     return left;
@@ -147,6 +159,8 @@ Node* Parser::parse_bool_expression() {
     this->next();
     Node* right = this->parse_add_or_sub_expression();
     BinopNode* node = new BinopNode(op, left, right);
+    node->start = left->start;
+    node->end = right->end;
     return node;
 }
 
@@ -162,7 +176,11 @@ Node* Parser::parse_add_or_sub_expression() {
             op = OpType::SUB;
         }
         Node* right = this->parse_mul_or_div_expression();
-        left = new BinopNode(op, left, right);
+        Node* node = new BinopNode(op, left, right);
+        node->start = left->start;
+        node->end = right->end;
+        return node;
+
     }
     return left;
 }
@@ -179,7 +197,10 @@ Node* Parser::parse_mul_or_div_expression() {
             op = OpType::DIV;
         }
         Node* right = this->parse_factor();
-        left = new BinopNode(op, left, right);
+        Node* node = new BinopNode(op, left, right);
+        node->start = left->start;
+        node->end = right->end;
+        return node;
     }
     return left;
 }
@@ -211,6 +232,8 @@ Node* Parser::parse_id_or_literal() {
         }
         case TokenType::NUM: {
             node = new NumberNode(this->token.num);
+            node->start = this->token.start;
+            node->end = this->token.end;
             this->next();
             break;
         }
@@ -221,11 +244,15 @@ Node* Parser::parse_id_or_literal() {
         }
         case TokenType::TRUE: {
             node = new BooleanNode(true);
+            node->start = this->token.start;
+            node->end = this->token.end;
             this->next();
             break;
         }
         case TokenType::FALSE: {
             node = new BooleanNode(false);
+            node->start = this->token.start;
+            node->end = this->token.end;
             this->next();
             break;
         }
@@ -243,6 +270,8 @@ Node* Parser::parse_id_or_literal() {
 Node* Parser::parse_id_or_class_literal() {
     Node* node = nullptr;
     std::string identifier = this->token.str;
+    int start = this->token.start;
+    int end = this->token.end;
     this->next();
     if (this->match(TokenType::LCURLY)) {
         this->next();
@@ -301,6 +330,8 @@ Node* Parser::parse_id_or_class_literal() {
     } else {
         node = new IdNode(identifier);
     }
+    node->start = start;
+    node->end = end;
     return node;
 }
 
@@ -331,7 +362,8 @@ Node* Parser::parse_call_or_subscript_chain(Node* parent) {
 }
 
 DeclarationNode* Parser::parse_variable_declaration() {
-    this->expect_token(TokenType::VAR);
+    Token var_token = this->expect_token(TokenType::VAR);
+    int start = var_token.start;
     Token identifier = this->expect_token(TokenType::ID);
     TypeNode* type = nullptr;
     if (this->match(TokenType::COLON)) {
@@ -345,7 +377,10 @@ DeclarationNode* Parser::parse_variable_declaration() {
         throw std::runtime_error("Error: you must initialize all variables!");
     }
     expression = this->parse_expression();
+    int end = expression->end;
     DeclarationNode* node = new DeclarationNode(identifier.str, type, expression);
+    node->start = start;
+    node->end = end;
     return node;
 }
 
@@ -556,12 +591,15 @@ ForNode* Parser::parse_for_loop() {
 
 Node* Parser::parse_ternary() {
     Node* condition = this->parse_or_expression();
-    if (this->match(TokenType::QUESTION)){
+    if (this->match(TokenType::QUESTION)) {
         this->next();
         Node* true_case = this->parse_expression();
         this->expect_token(TokenType::COLON);
         Node* false_case = this->parse_expression();
-        return TERNARY(condition, true_case, false_case);
+        Node* node = TERNARY(condition, true_case, false_case);
+        node->start = condition->start;
+        node->end = false_case->end;
+        return node;
     }
     return condition;
 }

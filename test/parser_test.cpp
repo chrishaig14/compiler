@@ -22,6 +22,8 @@ TEST(parser_test, binop_a_plus_b) {
     Parser parser(tokens);
     Node* node = parser.parse_add_or_sub_expression();
     Node* expected_node = new BinopNode(OpType::ADD, ID("a"), ID("b"));
+    EXPECT_EQ(node->start, 0);
+    EXPECT_EQ(node->end, 4);
     COMPLETE_TEST;
 }
 
@@ -32,6 +34,8 @@ TEST(parser_test, ternary) {
     Parser parser(tokens);
     Node* node = parser.parse_ternary();
     Node* expected_node = TERNARY(ID("a"), NUM(7), NUM(6));
+    EXPECT_EQ(node->start, 0);
+    EXPECT_EQ(node->end, 4);
     COMPLETE_TEST;
 }
 
@@ -83,6 +87,8 @@ TEST(parser_test, ternary_fail_3) {
     Parser parser(tokens);
     Node* node = parser.parse_ternary();
     Node* expected_node = TERNARY(ID("a"), NUM(7), NUM(6));
+    EXPECT_EQ(node->start, 0);
+    EXPECT_EQ(node->end, 4);
     COMPLETE_TEST;
 }
 
@@ -93,6 +99,8 @@ TEST(parser_test, binop_a_eq_b) {
     Parser parser(tokens);
     Node* node = parser.parse_expression();
     Node* expected_node = BIN(OpType::EQ, ID("a"), ID("b"));
+    EXPECT_EQ(node->start, 0);
+    EXPECT_EQ(node->end, 3);
     COMPLETE_TEST;
 
 }
@@ -104,8 +112,9 @@ TEST(parser_test, exp_identifier) {
     Parser parser(tokens);
     Node* node = parser.parse_add_or_sub_expression();
     auto expected_node = ID("foo");
+    EXPECT_EQ(node->start, 0);
+    EXPECT_EQ(node->end, 2);
     COMPLETE_TEST;
-
 }
 
 TEST(parser_test, assign_x_equal_y) {
@@ -115,6 +124,8 @@ TEST(parser_test, assign_x_equal_y) {
     Parser parser(tokens);
     Node* node = parser.parse_assignment_or_expression();
     Node* expected_node = ASN(ID("x"), ID("y"));
+    EXPECT_EQ(node->start, 0);
+    EXPECT_EQ(node->end, 4);
     COMPLETE_TEST;
 
 
@@ -127,6 +138,8 @@ TEST(parser_test, assign_x_equal_binop_a_plus_b) {
     Parser parser(tokens);
     Node* node = parser.parse_assignment_or_expression();
     Node* expected_node = ASN(ID("x"), BIN(OpType::ADD, ID("a"), ID("b")));
+    EXPECT_EQ(node->start, 0);
+    EXPECT_EQ(node->end, 6);
     COMPLETE_TEST;
 
 }
@@ -151,6 +164,8 @@ TEST(parser_test, decl_x_with_value) {
     Parser parser(tokens);
     DeclarationNode* node = parser.parse_variable_declaration();
     DeclarationNode* expected_node = DECL("x", nullptr, BIN(OpType::ADD, ID("a"), ID("b")));
+    EXPECT_EQ(node->start, 0);
+    EXPECT_EQ(node->end, 12);
     COMPLETE_TEST;
 }
 
@@ -160,6 +175,8 @@ TEST(parser_test, empty_block) {
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
     BlockNode* node = parser.parse_possibly_empty_block();
+    EXPECT_EQ(node->start, 0);
+    EXPECT_EQ(node->end, 1);
     EXPECT_EQ(node->nodes.size(), 0);
 }
 
@@ -617,6 +634,8 @@ TEST(parser_test, boolean_true) {
     Parser parser(tokens);
     Node* node = parser.parse_expression();
     Node* expected_node = BOOL(true);
+    EXPECT_EQ(node->start, 0);
+    EXPECT_EQ(node->end, 3);
     COMPLETE_TEST;
 }
 
@@ -702,6 +721,8 @@ TEST(parser_test, parse_list_empty) {
     Node* node = parser.parse_expression();
     VectorOfNodes list;
     Node* expected_node = LST(list);
+    EXPECT_EQ(node->start, 0);
+    EXPECT_EQ(node->end, 1);
     COMPLETE_TEST;
 }
 
@@ -713,6 +734,8 @@ TEST(parser_test, parse_list_one_element) {
     Node* node = parser.parse_expression();
     VectorOfNodes list = {NUM(13)};
     Node* expected_node = LST(list);
+    EXPECT_EQ(node->start, 0);
+    EXPECT_EQ(node->end, 3);
     COMPLETE_TEST;
 }
 
@@ -724,6 +747,8 @@ TEST(parser_test, parse_list_multiple_elements) {
     Node* node = parser.parse_expression();
     VectorOfNodes list = {NUM(23), NUM(17), NUM(64)};
     Node* expected_node = LST(list);
+    EXPECT_EQ(node->start, 0);
+    EXPECT_EQ(node->end, 9);
     COMPLETE_TEST;
 }
 

@@ -14,6 +14,9 @@ class Visitor;
 
 class Node {
 public:
+    int start;
+    int end;
+
     virtual void accept(Visitor& visitor) = 0;
 
     virtual bool equal(Node* other) const = 0;
