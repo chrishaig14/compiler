@@ -739,6 +739,18 @@ TEST(parser_test, parse_list_one_element) {
     COMPLETE_TEST;
 }
 
+TEST(parser_test, parse_none) {
+    std::string text = "none";
+    Scanner scanner(text);
+    std::vector<Token> tokens = scanner.scan_all();
+    Parser parser(tokens);
+    Node* node = parser.parse_expression();
+    Node* expected_node = new NoneNode();
+    EXPECT_EQ(node->start, 0);
+    EXPECT_EQ(node->end, 3);
+    COMPLETE_TEST;
+}
+
 TEST(parser_test, parse_list_multiple_elements) {
     std::string text = "[23,17,64]";
     Scanner scanner(text);

@@ -13,6 +13,7 @@
 #include "BreakNode.h"
 #include "ClassLiteralExpressionNode.h"
 #include "TernaryNode.h"
+#include "NoneNode.h"
 #include "ClassLiteralFieldNode.h"
 #include "ForNode.h"
 #include "WhileNode.h"

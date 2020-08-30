@@ -261,6 +261,13 @@ Node* Parser::parse_id_or_literal() {
         }
         case TokenType::LSQUARE:
             return this->parse_list_literal();
+        case TokenType::NONE: {
+            Node* node = new NoneNode();
+            node->start = this->token.start;
+            node->end = this->token.end;
+            this->next();
+            return node;
+        }
         default:
             throw std::runtime_error("parsing id or literal, unknown token type: " + TOKEN_STRINGS[token.type]);
     }

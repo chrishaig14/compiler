@@ -196,6 +196,44 @@ TEST(second_pass_test, option_type_value) {
     EXPECT_TRUE(checker.scopes["global"]->get("x")->equal(new ObjectTypeNode("Option", {T_INT})));
 }
 
+TEST(second_pass_test, option_assign_none) {
+    std::string text = "var x : Option[Integer] = none;";
+    BlockNode* tree = get_treeA(text);
+    GlobalProcessor gp;
+    gp.visit(*tree);
+    Checker checker(gp.globals, gp.class_table);
+    checker.visit(*tree);
+    EXPECT_TRUE(checker.scopes["global"]->declared("x"));
+    EXPECT_TRUE(checker.scopes["global"]->get("x")->equal(new ObjectTypeNode("Option", {T_INT})));
+}
+
+TEST(second_pass_test, assign_none_to_none_option) {
+    std::string text = "var x : Integer = none;";
+    BlockNode* tree = get_treeA(text);
+    GlobalProcessor gp;
+    gp.visit(*tree);
+    Checker checker(gp.globals, gp.class_table);
+    checker.visit(*tree);
+}
+
+TEST(second_pass_test, assign_none_to_union) {
+    std::string text = "var x : Union[Integer, String] = none;";
+    BlockNode* tree = get_treeA(text);
+    GlobalProcessor gp;
+    gp.visit(*tree);
+    Checker checker(gp.globals, gp.class_table);
+    checker.visit(*tree);
+}
+
+TEST(second_pass_test, assign_none_to_union_ok) {
+    std::string text = "var x : Union[Integer, NoneType] = none;";
+    BlockNode* tree = get_treeA(text);
+    GlobalProcessor gp;
+    gp.visit(*tree);
+    Checker checker(gp.globals, gp.class_table);
+    checker.visit(*tree);
+}
+
 
 TEST(second_pass_test, union_type_ok_1) {
     std::string text = "var x : Union[Integer, String] = 2;";

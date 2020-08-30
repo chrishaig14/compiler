@@ -104,4 +104,5 @@ void initialize_token_strings() {
     TOKEN_STRINGS[TokenType::WHILE] = "while";
     TOKEN_STRINGS[TokenType::TRUE] = "true";
     TOKEN_STRINGS[TokenType::FALSE] = "false";
+    TOKEN_STRINGS[TokenType::NONE] = "none";
 }

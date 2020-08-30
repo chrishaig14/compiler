@@ -65,6 +65,8 @@ public:
     void visit(BreakNode& node) override;
 
     void visit(TernaryNode& node) override;
+
+    void visit(NoneNode& node) override;
 };
 
 #endif //UNTITLED1_GLOBALPROCESSOR_H

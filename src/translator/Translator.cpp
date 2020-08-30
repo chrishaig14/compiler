@@ -276,3 +276,7 @@ void Translator::visit(BreakNode& node) {
 void Translator::visit(TernaryNode& node) {
 
 }
+
+void Translator::visit(NoneNode& node) {
+
+}

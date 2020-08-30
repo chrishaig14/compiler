@@ -117,5 +117,9 @@ void GlobalProcessor::visit(TernaryNode& node) {
 
 }
 
+void GlobalProcessor::visit(NoneNode& node) {
+
+}
+
 
 

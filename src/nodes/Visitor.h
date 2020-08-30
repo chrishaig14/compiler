@@ -43,6 +43,8 @@ class ReturnNode;
 
 class BooleanNode;
 
+class NoneNode;
+
 class StringNode;
 
 class SubscriptNode;
@@ -62,6 +64,8 @@ public:
     virtual void visit(BlockNode& node) = 0;
 
     virtual void visit(CallNode& node) = 0;
+
+    virtual void visit(NoneNode& node) = 0;
 
     virtual void visit(ClassLiteralExpressionNode& node) = 0;
 

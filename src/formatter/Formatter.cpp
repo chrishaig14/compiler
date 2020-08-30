@@ -239,3 +239,7 @@ void Formatter::visit(WhileNode& node) {
 void Formatter::visit(TernaryNode& node) {
 
 }
+
+void Formatter::visit(NoneNode& node) {
+    this->output = "none";
+}

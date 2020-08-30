@@ -78,7 +78,10 @@ void Checker::visit(DeclarationNode& n) {
         auto actual_type = dynamic_cast<ObjectTypeNode*>(n.type);
         if (actual_type->identifier == "Option") {
             if (!actual_type->type_parameters[0]->equal(expression_info.symbol_info)) {
-                throw AssignmentTypeError(n.type, expression_info.symbol_info);
+                auto foo = dynamic_cast<ObjectTypeNode*>(expression_info.symbol_info);
+                if (foo->identifier != "NoneType"){
+                    throw AssignmentTypeError(n.type, expression_info.symbol_info);
+                }
             }
         } else if (actual_type->identifier == "Union") {
             bool ok = false;
@@ -406,10 +409,18 @@ void Checker::visit(TernaryNode& node) {
     node.false_case->accept(*this);
     SemanticInfo false_case = this->rv;
     if (!false_case.symbol_info->equal(true_case.symbol_info)) {
-        throw std::runtime_error("True case and false case type don't match: " + true_case.symbol_info->to_string() + " != " + false_case.symbol_info->to_string());
+        throw std::runtime_error(
+                "True case and false case type don't match: " + true_case.symbol_info->to_string() + " != " +
+                false_case.symbol_info->to_string());
 //        semanticInfo.symbol_info = new ObjectTypeNode("Union", {true_case.symbol_info, false_case.symbol_info});
     } else {
         semanticInfo.symbol_info = true_case.symbol_info;
     }
+    this->rv = semanticInfo;
+}
+
+void Checker::visit(NoneNode& node) {
+    SemanticInfo semanticInfo;
+    semanticInfo.symbol_info = new ObjectTypeNode("NoneType", {});
     this->rv = semanticInfo;
 }
