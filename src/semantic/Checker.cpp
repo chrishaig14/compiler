@@ -2,6 +2,7 @@
 // Created by chris on 28/6/20.
 //
 
+#include <set>
 #include "Checker.h"
 
 
@@ -74,11 +75,29 @@ void Checker::visit(DeclarationNode& n) {
     if (n.expression != nullptr and n.type != nullptr) {
         n.expression->accept(*this);
         SemanticInfo expression_info = this->rv;
-        if (!n.type->equal(expression_info.symbol_info)) {
-            throw AssignmentTypeError(n.type, expression_info.symbol_info);
+        auto actual_type = dynamic_cast<ObjectTypeNode*>(n.type);
+        if (actual_type->identifier == "Option") {
+            if (!actual_type->type_parameters[0]->equal(expression_info.symbol_info)) {
+                throw AssignmentTypeError(n.type, expression_info.symbol_info);
+            }
+        } else if (actual_type->identifier == "Union") {
+            bool ok = false;
+            for (int i = 0; i < actual_type->type_parameters.size(); i++) {
+                if (actual_type->type_parameters[i]->equal(expression_info.symbol_info)) {
+                    ok = true;
+                    break;
+                }
+            }
+            if (!ok) {
+                throw AssignmentTypeError(n.type, expression_info.symbol_info);
+            }
+        } else {
+            if (!n.type->equal(expression_info.symbol_info)) {
+                throw AssignmentTypeError(n.type, expression_info.symbol_info);
+            }
         }
         semantic_info.free_variables = expression_info.free_variables;
-        semantic_info.symbol_info = expression_info.symbol_info;
+        semantic_info.symbol_info = n.type;
     } else if (n.expression != nullptr) {
         n.expression->accept(*this);
         SemanticInfo expression_info = this->rv;
@@ -303,9 +322,19 @@ void Checker::visit(ForNode& node) {
 
 void Checker::visit(ListNode& node) {
     node.elements[0]->accept(*this);
+    auto element_type = this->rv.symbol_info;
+    for (int i = 1; i < node.elements.size(); i++) {
+        node.elements[i]->accept(*this);
+        auto current_type = this->rv.symbol_info;
+        if (!current_type->equal(element_type)) {
+            throw std::runtime_error("List literal with more than one element type, first element has type: " +
+                                     element_type->to_string() + " but at index " + std::to_string(i) + " got type " +
+                                     current_type->to_string());
+        }
+    }
     SemanticInfo semantic_info = this->rv;
     SemanticInfo return_info;
-    return_info.symbol_info = new ObjectTypeNode("List", {semantic_info.symbol_info});
+    return_info.symbol_info = T_LIST(element_type);
     this->rv = return_info;
 }
 
@@ -357,5 +386,30 @@ void Checker::visit(BreakNode& node) {
 }
 
 void Checker::visit(TernaryNode& node) {
-
+    node.expression->accept(*this);
+    SemanticInfo expression_info = this->rv;
+    auto expression_type = dynamic_cast<ObjectTypeNode*>(expression_info.symbol_info);
+    if (expression_type == nullptr) {
+        throw std::runtime_error("Unexpected non-object");
+    }
+    if (expression_type->identifier != "Option") {
+        throw std::runtime_error("Expected an Option[T], got: " + expression_type->to_string());
+    }
+    SemanticInfo semanticInfo;
+    TypeNode* type = expression_type->type_parameters[0];
+    semanticInfo.symbol_info = type;
+    this->enter_scope("true_case");
+    this->scope->set("it", type);
+    node.true_case->accept(*this);
+    this->leave_scope();
+    SemanticInfo true_case = this->rv;
+    node.false_case->accept(*this);
+    SemanticInfo false_case = this->rv;
+    if (!false_case.symbol_info->equal(true_case.symbol_info)) {
+        throw std::runtime_error("True case and false case type don't match: " + true_case.symbol_info->to_string() + " != " + false_case.symbol_info->to_string());
+//        semanticInfo.symbol_info = new ObjectTypeNode("Union", {true_case.symbol_info, false_case.symbol_info});
+    } else {
+        semanticInfo.symbol_info = true_case.symbol_info;
+    }
+    this->rv = semanticInfo;
 }

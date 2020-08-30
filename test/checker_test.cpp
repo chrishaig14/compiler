@@ -41,7 +41,7 @@ BlockNode* get_treeA(std::string text) {
                                             } catch(const ReturnError& se){              \
                                                 EXPECT_EQ(se,ReturnError(EXPECTED_TYPE, ACTUAL_TYPE))  << se.what();       }\
 
-#define ASSERT_THROWS_ASSIGNMENT_ERROR(EXPECTED_TYPE, ACTUAL_TYPE ) BlockNode* tree = get_treeA(text);       \
+#define ASSERT_THROWS_ASSIGNMENT_ERROR(EXPECTED_TYPE, ACTUAL_TYPE) BlockNode* tree = get_treeA(text);       \
                                             GlobalProcessor gp;gp.visit(*tree);              \
                                             Checker checker(gp.globals, gp.class_table);                  \
                                             try {                                       \
@@ -185,6 +185,105 @@ TEST(second_pass_test, FOFOaOa) {
     EXPECT_TRUE(checker.scopes["global.foo"]->declared("x"));
 }
 
+TEST(second_pass_test, option_type_value) {
+    std::string text = "var x : Option[Integer] = 2;";
+    BlockNode* tree = get_treeA(text);
+    GlobalProcessor gp;
+    gp.visit(*tree);
+    Checker checker(gp.globals, gp.class_table);
+    checker.visit(*tree);
+    EXPECT_TRUE(checker.scopes["global"]->declared("x"));
+    EXPECT_TRUE(checker.scopes["global"]->get("x")->equal(new ObjectTypeNode("Option", {T_INT})));
+}
+
+
+TEST(second_pass_test, union_type_ok_1) {
+    std::string text = "var x : Union[Integer, String] = 2;";
+    BlockNode* tree = get_treeA(text);
+    GlobalProcessor gp;
+    gp.visit(*tree);
+    Checker checker(gp.globals, gp.class_table);
+    checker.visit(*tree);
+    EXPECT_TRUE(checker.scopes["global"]->declared("x"));
+    EXPECT_TRUE(checker.scopes["global"]->get("x")->equal(new ObjectTypeNode("Union", {T_INT, T_STRING})));
+}
+
+TEST(second_pass_test, union_type_ok_2) {
+    std::string text = "var x : Union[Integer, String] = \"Hello\";";
+    BlockNode* tree = get_treeA(text);
+    GlobalProcessor gp;
+    gp.visit(*tree);
+    Checker checker(gp.globals, gp.class_table);
+    checker.visit(*tree);
+    EXPECT_TRUE(checker.scopes["global"]->declared("x"));
+    EXPECT_TRUE(checker.scopes["global"]->get("x")->equal(new ObjectTypeNode("Union", {T_INT, T_STRING})));
+}
+
+TEST(second_pass_test, union_type_error) {
+    std::string text = "var x : Union[Integer, String] = false;";
+    BlockNode* tree = get_treeA(text);
+    GlobalProcessor gp;
+    gp.visit(*tree);
+    Checker checker(gp.globals, gp.class_table);
+    checker.visit(*tree);
+    EXPECT_TRUE(checker.scopes["global"]->declared("x"));
+    EXPECT_TRUE(checker.scopes["global"]->get("x")->equal(new ObjectTypeNode("Union", {T_INT, T_STRING})));
+}
+
+TEST(second_pass_test, option_type_error) {
+    std::string text = "var x : Option[Integer] = \"Hello\";";
+    BlockNode* tree = get_treeA(text);
+    GlobalProcessor gp;
+    gp.visit(*tree);
+    Checker checker(gp.globals, gp.class_table);
+    checker.visit(*tree);
+    EXPECT_TRUE(checker.scopes["global"]->declared("x"));
+}
+
+TEST(second_pass_test, ternary_test_1) {
+    std::string text = "var x : Option[Integer] = 2;var z=x?\"ok\":\"bad\";";
+    BlockNode* tree = get_treeA(text);
+    GlobalProcessor gp;
+    gp.visit(*tree);
+    Checker checker(gp.globals, gp.class_table);
+    checker.visit(*tree);
+    EXPECT_TRUE(checker.scopes["global"]->declared("x"));
+    EXPECT_TRUE(checker.scopes["global"]->get("z")->equal(T_STRING));
+}
+
+TEST(second_pass_test, ternary_test_union_1) {
+    std::string text = "var x : Option[Integer] = 2;var z=x?\"ok\":3;";
+    BlockNode* tree = get_treeA(text);
+    GlobalProcessor gp;
+    gp.visit(*tree);
+    Checker checker(gp.globals, gp.class_table);
+    checker.visit(*tree);
+    EXPECT_TRUE(checker.scopes["global"]->declared("x"));
+    EXPECT_TRUE(checker.scopes["global"]->get("z")->equal(new ObjectTypeNode("Union", {T_STRING, T_INT})));
+}
+
+TEST(second_pass_test, ternary_test_union_2) {
+    std::string text = "var x : Option[Integer] = 2;var z=x?\"ok\":3;";
+    BlockNode* tree = get_treeA(text);
+    GlobalProcessor gp;
+    gp.visit(*tree);
+    Checker checker(gp.globals, gp.class_table);
+    checker.visit(*tree);
+    EXPECT_TRUE(checker.scopes["global"]->declared("x"));
+    EXPECT_TRUE(checker.scopes["global"]->get("z")->equal(new ObjectTypeNode("Union", {T_STRING, T_INT})));
+}
+
+TEST(second_pass_test, test_list) {
+    std::string text = "var x = [1,\"Hello\"];";
+    BlockNode* tree = get_treeA(text);
+    GlobalProcessor gp;
+    gp.visit(*tree);
+    Checker checker(gp.globals, gp.class_table);
+    checker.visit(*tree);
+    EXPECT_TRUE(checker.scopes["global"]->declared("x"));
+    EXPECT_TRUE(checker.scopes["global"]->get("x")->equal(T_LIST(new ObjectTypeNode("Union", {T_STRING, T_INT})))) << checker.scopes["global"]->get("x")->to_string();
+}
+
 
 TEST(second_pass_test, z_not_found_error) {
     std::string text = "fun foo(y: Foo)->String{var x:Integer=0;if(y==1){if(z==2){return x;}}}";
@@ -267,12 +366,12 @@ TEST(second_pass_test, for_4) {
     ASSERT_THROWS_NOT_FOUND_ERROR("w");
 }
 
-TEST(second_pass_test, while_1){
+TEST(second_pass_test, while_1) {
     std::string text = "while(5){var x = 7;}";
     ASSERT_OK();
 }
 
-TEST(second_pass_test, while_2){
+TEST(second_pass_test, while_2) {
     std::string text = "var y = 0; while(5==y){var x = 7;}";
     ASSERT_OK();
 }
@@ -289,10 +388,10 @@ TEST(second_pass_test, class_literal_expression_error) {
 
 TEST(second_pass_test, infer_boolean_false) {
     std::string text = "var x = false;";
-    ASSERT_VARIABLE_TYPE("x",T_BOOL);
+    ASSERT_VARIABLE_TYPE("x", T_BOOL);
 }
 
 TEST(second_pass_test, infer_boolean_true) {
     std::string text = "var x = true;";
-    ASSERT_VARIABLE_TYPE("x",T_BOOL);
+    ASSERT_VARIABLE_TYPE("x", T_BOOL);
 }
