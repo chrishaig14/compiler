@@ -356,3 +356,16 @@ TEST(translator_test, function) {
     EXPECT_EQ(translator.code, expected_code)
                         << "GOT:\n----\n" << translator.code << "----\nEXPECTED:\n----\n" << expected_code << "----\n";
 }
+
+TEST(translator_test, ternary) {
+//    var s = x ? "one" : "two";
+    Translator translator;
+    Node* node = DECL("s", nullptr, TERNARY(ID("x"), STR("one"), STR("two")));
+    node->accept(translator);
+    CodeLabel expected_code = {
+            NL(I_DECL("s")),
+            NL(I_GET("x")),
+    };
+    EXPECT_EQ(translator.code, expected_code)
+                        << "GOT:\n----\n" << translator.code << "----\nEXPECTED:\n----\n" << expected_code << "----\n";
+}

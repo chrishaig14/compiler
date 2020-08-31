@@ -3,6 +3,7 @@
 //
 
 #include "CodeRunner.h"
+#include "NoneObject.h"
 #include <iostream>
 
 CodeRunner::CodeRunner(const Code& code, std::map<std::string, std::map<std::string, Code>>& structs,
@@ -287,4 +288,19 @@ void CodeRunner::visit(EndFunction& inst) {
 
 void CodeRunner::visit(StartFunction& inst) {
     // nothing
+}
+
+void CodeRunner::visit(JumpIfNone& inst) {
+    Object* tos = this->stack.top();
+    if (tos->equal(new NoneObject())) {
+        this->stack.pop();
+        this->inst_ptr += inst.offset;
+    } else {
+        this->inst_ptr++;
+    }
+}
+
+void CodeRunner::visit(PushNone& inst) {
+    this->stack.push(new NoneObject());
+    this->inst_ptr++;
 }

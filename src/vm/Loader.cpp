@@ -8,6 +8,7 @@
 #include "../instructions/StartFunction.h"
 #include "../instructions/JumpInst.h"
 #include "../instructions/JumpIfFalseInst.h"
+#include "../instructions/JumpIfNone.h"
 
 
 void Loader::load() {
@@ -44,8 +45,26 @@ void Loader::load_function(std::string name, CodeLabel code) {
     for (int i = 0; i < code.size(); i++) {
         JumpInst* jinst = dynamic_cast<JumpInst*>(code[i].second);
         if (jinst != nullptr) {
-            jinst->offset = labels[jinst->label] - i;
-            jinst->label = "";
+            if (jinst->offset == 0) {
+                jinst->offset = labels[jinst->label] - i;
+                jinst->label = "";
+            }
+        } else {
+            JumpIfFalseInst* jfalse = dynamic_cast<JumpIfFalseInst*>(code[i].second);
+            if (jfalse != nullptr) {
+                if (jfalse->offset == 0) {
+                    jfalse->offset = labels[jfalse->label] - i;
+                    jfalse->label = "";
+                }
+            } else {
+                JumpIfNone* jnone = dynamic_cast<JumpIfNone*>(code[i].second);
+                if (jnone != nullptr) {
+                    if (jnone->offset == 0) {
+                        jnone->offset = labels[jnone->label] - i;
+                        jnone->label = "";
+                    }
+                }
+            }
         }
     }
     Code code_nl;

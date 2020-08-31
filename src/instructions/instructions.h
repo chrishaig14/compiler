@@ -16,6 +16,7 @@
 #include "LeaveScope.h"
 #include "GetSubscriptInst.h"
 #include "JumpInst.h"
+#include "JumpIfNone.h"
 #include "JumpIfFalseInst.h"
 #include "MakeClassInst.h"
 #include "MakeListInst.h"

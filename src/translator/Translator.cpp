@@ -274,9 +274,25 @@ void Translator::visit(BreakNode& node) {
 }
 
 void Translator::visit(TernaryNode& node) {
-
+    CodeLabel out = {};
+    node.expression->accept(*this);
+    CodeLabel expression_code = this->code;
+    out.insert(out.end(), expression_code.begin(), expression_code.end());
+    node.true_case->accept(*this);
+    CodeLabel true_case = this->code;
+    out.push_back(NL(I_JUMPN(true_case.size() + 6)));
+    CodeLabel it_code = {NL(I_ENTER("it_scope")), NL(I_DECL("it")),NL(I_SET("it"))};
+    out.insert(out.end(), it_code.begin(), it_code.end());
+    out.insert(out.end(), true_case.begin(), true_case.end());
+    out.push_back(NL(I_LEAVE("it_scope")));
+    node.false_case->accept(*this);
+    CodeLabel false_case = this->code;
+    out.push_back(NL(I_JUMP(false_case.size() + 1)));
+    out.insert(out.end(), false_case.begin(), false_case.end());
+    this->code = out;
 }
 
 void Translator::visit(NoneNode& node) {
-
+    CodeLabel out = {NL(I_PUSHN)};
+    this->code = out;
 }

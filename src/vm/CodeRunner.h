@@ -85,6 +85,10 @@ public:
 
     void visit(StartFunction& inst) override;
 
+    void visit(JumpIfNone& inst) override;
+
+    void visit(PushNone& inst) override;
+
     std::map<std::string, std::map<std::string, Code>>& structs;
     Environment* global_env;
 };
