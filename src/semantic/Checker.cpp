@@ -11,6 +11,7 @@ Checker::Checker(SymbolTable* globals, ClassTable* class_table) {
     this->scope = globals;
     this->scopes["global"] = this->scope;
     this->class_table->set("Integer", new ClassInfo(std::vector<std::string>(), std::vector<TypeNode*>()));
+    this->class_table->set("Option", new ClassInfo(std::vector<std::string>(), std::vector<TypeNode*>()));
 }
 
 void Checker::enter_scope(std::string name) {
@@ -79,7 +80,7 @@ void Checker::visit(DeclarationNode& n) {
         if (actual_type->identifier == "Option") {
             if (!actual_type->type_parameters[0]->equal(expression_info.symbol_info)) {
                 auto foo = dynamic_cast<ObjectTypeNode*>(expression_info.symbol_info);
-                if (foo->identifier != "NoneType"){
+                if (foo->identifier != "NoneType") {
                     throw AssignmentTypeError(n.type, expression_info.symbol_info);
                 }
             }
@@ -134,13 +135,16 @@ void Checker::visit(MemberNode& n) {
     if (object == nullptr) {
         throw std::runtime_error("Accessing member " + n.child + " of non object");
     }
+    if (!this->class_table->declared(object->identifier)) {
+        throw std::runtime_error("Class " + object->identifier + " not declared!");
+    }
     ClassInfo* class_info = this->class_table->get(object->identifier);
     if (class_info->fields.count(n.child) == 1) {
         // It's a field
         semantic_info.symbol_info = class_info->fields[n.child];
         this->rv = semantic_info;
     } else {
-        throw ScopeError(n.child);
+        throw std::runtime_error("Type " + object->to_string() + " has no member " + n.child);
     }
 }
 
@@ -192,7 +196,16 @@ void Checker::visit(BinopNode& n) {
     }
     if (is_boolean) {
         semantic_info.symbol_info = new ObjectTypeNode("Boolean", {});
-    } else { semantic_info.symbol_info = new ObjectTypeNode("Integer", {}); }
+    } else {
+        auto left = dynamic_cast<ObjectTypeNode*>(left_info.symbol_info);
+        auto right = dynamic_cast<ObjectTypeNode*>(right_info.symbol_info);
+        if (left->identifier != "Integer" || right->identifier != "Integer") {
+            throw std::runtime_error(
+                    "Cannot perform binary op betweeen types " + left->to_string() + " and " + right->to_string());
+        }
+
+        semantic_info.symbol_info = new ObjectTypeNode("Integer", {});
+    }
     this->rv = semantic_info;
 }
 
@@ -200,7 +213,7 @@ void Checker::visit(ReturnNode& n) {
     n.expression->accept(*this);
     SemanticInfo expression_info = this->rv;
     TypeNode* return_type = this->scope->get("__return__");
-    if (!expression_info.symbol_info->equal(return_type)) {
+    if (!this->can_assign(expression_info.symbol_info, return_type)) {
         throw ReturnError(return_type, expression_info.symbol_info);
     }
     SemanticInfo semantic_info;
@@ -280,6 +293,27 @@ void Checker::visit(ClassLiteralExpressionNode& node) {
     rv.symbol_info = new ObjectTypeNode(node.identifier, {});
 }
 
+bool Checker::can_assign(TypeNode* from, TypeNode* to) {
+    auto to_object = dynamic_cast<ObjectTypeNode*>(to);
+    if (to_object->identifier == "Option") {
+        if (!to_object->type_parameters[0]->equal(from)) {
+            auto foo = dynamic_cast<ObjectTypeNode*>(from);
+            if (foo->identifier != "NoneType") {
+                return false;
+            }
+        }
+        return true;
+    } else if (to_object->identifier == "Union") {
+        for (int i = 0; i < to_object->type_parameters.size(); i++) {
+            if (to_object->type_parameters[i]->equal(from)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    return to->equal(from);
+}
+
 void Checker::visit(ClassLiteralFieldNode& node) {
     if (!this->class_table->declared(node.identifier)) throw std::runtime_error("No struct named " + node.identifier);
     auto class_fields = this->class_table->get(node.identifier)->fields;
@@ -295,7 +329,7 @@ void Checker::visit(ClassLiteralFieldNode& node) {
         Node* exp = f.second;
         exp->accept(*this);
         SemanticInfo semanticInfo = this->rv;
-        if (!semanticInfo.symbol_info->equal(this->class_table->get(node.identifier)->fields[f.first])) {
+        if (!this->can_assign(semanticInfo.symbol_info, this->class_table->get(node.identifier)->fields[f.first])) {
             throw std::runtime_error(
                     "In struct \"" + node.identifier + "\" initialization: " + "field \"" + f.first + "\" is of type " +
                     class_fields[f.first]->to_string() +

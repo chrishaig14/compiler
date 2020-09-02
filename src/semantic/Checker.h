@@ -85,6 +85,7 @@ public:
     void visit(NoneNode& node) override;
 
 
+    bool can_assign(TypeNode* from, TypeNode* to);
 };
 
 #endif //UNTITLED1_CHECKER_H
