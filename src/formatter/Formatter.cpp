@@ -106,7 +106,16 @@ void Formatter::visit(ClassLiteralExpressionNode& node) {
 }
 
 void Formatter::visit(ClassLiteralFieldNode& node) {
-
+    std::string fields;
+    int ind = this->indent_level;
+    this->indent_level = 0;
+    for (auto f : node.init) {
+        f.second->accept(*this);
+        fields += f.first + ":" + this->output + ", ";
+    }
+    fields = fields.substr(0, fields.size()-2);
+    this->indent_level = ind;
+    this->output = this->indentation() + node.identifier + "{" + fields + "}";
 }
 
 void Formatter::visit(DeclarationNode& node) {
@@ -136,6 +145,7 @@ void Formatter::visit(FunctionNode& node) {
         std::string parameter_type = node.parameter_types[i]->to_string();
         parameters += parameter_name + " : " + parameter_type + ", ";
     }
+    parameters = parameters.substr(0, parameters.size()-2);
     std::string return_type = node.return_type->to_string();
     this->indent_level++;
     std::cout << "formatting body of function at indent level " << this->indent_level << std::endl;
@@ -175,6 +185,7 @@ void Formatter::visit(ListNode& node) {
         std::string element_str = this->output;
         elements += element_str + ", ";
     }
+    elements = elements.substr(0,elements.size()-2);
     this->output = "[" + elements + "]";
 }
 
@@ -206,11 +217,10 @@ void Formatter::visit(StructNode& node) {
     std::string fields;
     for (int i = 0; i < node.fields.size(); i++) {
         FieldInfo field = node.fields[i];
-        field.second->accept(*this);
-        std::string field_type = this->output;
-        fields += "\t" + field.first + ": " + field_type + ";\n";
+        std::string field_type = field.second->to_string();
+        fields += "    " + field.first + ": " + field_type + ";\n";
     }
-    this->output = "struct " + node.identifier + "{\n" + fields + "}\n";
+    this->output = "struct " + node.identifier + "{ \n" + fields + "}\n";
 }
 
 void Formatter::visit(SubscriptNode& node) {
@@ -237,7 +247,16 @@ void Formatter::visit(WhileNode& node) {
 }
 
 void Formatter::visit(TernaryNode& node) {
-
+    int ind = this->indent_level;
+    this->indent_level = 0;
+    node.expression->accept(*this);
+    std::string expression = this->output;
+    node.true_case->accept(*this);
+    std::string true_case = this->output;
+    node.false_case->accept(*this);
+    std::string false_case = this->output;
+    this->indent_level = ind;
+    this->output = this->indentation() + expression + "?" + true_case + ":" + false_case;
 }
 
 void Formatter::visit(NoneNode& node) {
