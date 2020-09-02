@@ -255,3 +255,32 @@ TEST(total_test, test_optional_2) {
     code_runner.run();
     EXPECT_TRUE(stack.top()->equal(new StringObject("one")));
 }
+
+TEST(total_test, test_inorder) {
+    std::string text = "struct LinkedList {head: Integer; tail: Option[LinkedList];}fun length(l: LinkedList)->Integer {return 1 + (l.tail?length(it):0);} fun main()->Option[Integer]{var x = LinkedList{head: 7, tail:LinkedList{head:9, tail:LinkedList{head:3, tail:none}}}; return length(x);}";
+    Scanner scanner(text);
+    std::vector<Token> tokens = scanner.scan_all();
+    Parser parser(tokens);
+    BlockNode* program = parser.parse_program();
+    GlobalProcessor gp;
+    gp.visit(*program);
+    Checker checker(gp.globals, gp.class_table);
+    checker.visit(*program);
+    Translator translator;
+    program->accept(translator);
+    ObjectStack stack;
+    StructProtos structs;
+    CodeLabel translated_code = translator.code;
+    std::cout << translated_code << std::endl;
+    Loader loader(translated_code);
+    loader.load();
+    Environment* global_env = loader.global_env;
+    CodeObject* main_function = dynamic_cast<CodeObject*>(global_env->get("main"));
+    for(int i = 0; i < main_function->user->code.size(); i++){
+        std::cout << main_function->user->code[i]->to_string() << std::endl;
+    }
+    CodeRunner code_runner(main_function->user->code, structs, stack, global_env);
+    code_runner.run();
+    EXPECT_TRUE(stack.top()->equal(new IntegerObject(3)));
+    EXPECT_FALSE(stack.top()->equal(new IntegerObject(7)));
+}
