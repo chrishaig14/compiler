@@ -316,3 +316,32 @@ TEST(total_test, test_print_int) {
     EXPECT_TRUE(stack.top()->equal(new IntegerObject(3)));
     EXPECT_FALSE(stack.top()->equal(new IntegerObject(7)));
 }
+
+TEST(total_test, test_set_list_index) {
+    std::string text = "fun main()->Integer{var x = [7 ,9 ,12]; x[1] = 3; return x[1] + x[2] + 4;}";
+    Scanner scanner(text);
+    std::vector<Token> tokens = scanner.scan_all();
+    Parser parser(tokens);
+    BlockNode* program = parser.parse_program();
+    GlobalProcessor gp;
+    gp.visit(*program);
+    Checker checker(gp.globals, gp.class_table);
+    checker.visit(*program);
+    Translator translator;
+    program->accept(translator);
+    ObjectStack stack;
+    StructProtos structs;
+    CodeLabel translated_code = translator.code;
+    std::cout << translated_code << std::endl;
+    Loader loader(translated_code);
+    loader.load();
+    Environment* global_env = loader.global_env;
+    CodeObject* main_function = dynamic_cast<CodeObject*>(global_env->get("main"));
+    for (int i = 0; i < main_function->user->code.size(); i++) {
+        std::cout << main_function->user->code[i]->to_string() << std::endl;
+    }
+    CodeRunner code_runner(main_function->user->code, structs, stack, global_env);
+    code_runner.run();
+    EXPECT_TRUE(stack.top()->equal(new IntegerObject(19)));
+    EXPECT_FALSE(stack.top()->equal(new IntegerObject(7)));
+}

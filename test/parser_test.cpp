@@ -726,6 +726,19 @@ TEST(parser_test, parse_list_empty) {
     COMPLETE_TEST;
 }
 
+TEST(parser_test, parse_xxx) {
+    std::string text = "y[2]+x[7] + 43";
+    Scanner scanner(text);
+    std::vector<Token> tokens = scanner.scan_all();
+    Parser parser(tokens);
+    Node* node = parser.parse_expression();
+    VectorOfNodes list;
+    Node* expected_node = BIN(OpType::ADD, BIN(OpType::ADD, SUB(ID("y"),NUM(2)),SUB(ID("x"),NUM(7))), NUM(43));
+//    EXPECT_EQ(node->start, 0);
+//    EXPECT_EQ(node->end, 1);
+    COMPLETE_TEST;
+}
+
 TEST(parser_test, parse_list_one_element) {
     std::string text = "[13]";
     Scanner scanner(text);

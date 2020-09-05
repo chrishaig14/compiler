@@ -189,7 +189,13 @@ void CodeRunner::visit(SetMemberInst& inst) {
 
 void CodeRunner::visit(SetSubscriptInst& inst) {
     std::cout << "Run [" << inst.to_string() << "]" << std::endl;
-
+    Object* element = this->stack.pop();
+    Object* index = this->stack.pop();
+    Object* value = this->stack.pop();
+    ListObject* list = dynamic_cast<ListObject*>(element);
+    IntegerObject* pos = dynamic_cast<IntegerObject*>(index);
+    list->list[pos->value] = value;
+    this->inst_ptr++;
 }
 
 void CodeRunner::visit(MakeObjectInst& inst) {
