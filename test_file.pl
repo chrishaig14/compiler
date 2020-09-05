@@ -1,4 +1,4 @@
-fun main() -> Integer {
-    return "a";
+struct Pepe {
+x: String;
+b: Option[List];
 }
-

@@ -180,6 +180,7 @@ TEST(total_test, object_reference) {
     code_runner.run();
     EXPECT_TRUE(stack.top()->equal(new StringObject("John")));
 }
+
 TEST(total_test, object_reference_2) {
     std::string text = "struct Person{name:String; age:Integer;} fun main()->String{var p = Person{name:\"chris\",age:26}; var c = p; c.name = \"John\"; c = Person{name:\"Alex\",age:24}; return p.name;}";
     Scanner scanner(text);
@@ -227,7 +228,9 @@ TEST(total_test, test_optional) {
     code_runner.run();
     EXPECT_TRUE(stack.top()->equal(new StringObject("two")));
 }
+
 std::ostream& operator<<(std::ostream& out, const CodeLabel v);
+
 TEST(total_test, test_optional_2) {
     std::string text = "fun main()->String{var x: Option[Integer] = 4; var s = x?\"one\":\"two\"; return s;}";
     Scanner scanner(text);
@@ -248,7 +251,7 @@ TEST(total_test, test_optional_2) {
     loader.load();
     Environment* global_env = loader.global_env;
     CodeObject* main_function = dynamic_cast<CodeObject*>(global_env->get("main"));
-    for(int i = 0; i < main_function->user->code.size(); i++){
+    for (int i = 0; i < main_function->user->code.size(); i++) {
         std::cout << main_function->user->code[i]->to_string() << std::endl;
     }
     CodeRunner code_runner(main_function->user->code, structs, stack, global_env);
@@ -276,7 +279,36 @@ TEST(total_test, test_inorder) {
     loader.load();
     Environment* global_env = loader.global_env;
     CodeObject* main_function = dynamic_cast<CodeObject*>(global_env->get("main"));
-    for(int i = 0; i < main_function->user->code.size(); i++){
+    for (int i = 0; i < main_function->user->code.size(); i++) {
+        std::cout << main_function->user->code[i]->to_string() << std::endl;
+    }
+    CodeRunner code_runner(main_function->user->code, structs, stack, global_env);
+    code_runner.run();
+    EXPECT_TRUE(stack.top()->equal(new IntegerObject(3)));
+    EXPECT_FALSE(stack.top()->equal(new IntegerObject(7)));
+}
+
+TEST(total_test, test_print_int) {
+    std::string text = "fun main()->Integer{print(str(7)); return 9;}";
+    Scanner scanner(text);
+    std::vector<Token> tokens = scanner.scan_all();
+    Parser parser(tokens);
+    BlockNode* program = parser.parse_program();
+    GlobalProcessor gp;
+    gp.visit(*program);
+    Checker checker(gp.globals, gp.class_table);
+    checker.visit(*program);
+    Translator translator;
+    program->accept(translator);
+    ObjectStack stack;
+    StructProtos structs;
+    CodeLabel translated_code = translator.code;
+    std::cout << translated_code << std::endl;
+    Loader loader(translated_code);
+    loader.load();
+    Environment* global_env = loader.global_env;
+    CodeObject* main_function = dynamic_cast<CodeObject*>(global_env->get("main"));
+    for (int i = 0; i < main_function->user->code.size(); i++) {
         std::cout << main_function->user->code[i]->to_string() << std::endl;
     }
     CodeRunner code_runner(main_function->user->code, structs, stack, global_env);

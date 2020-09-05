@@ -4,10 +4,22 @@
 
 #include "GlobalProcessor.h"
 #include "ClassInfo.h"
+#include "../vm/Object.h"
 
-GlobalProcessor::GlobalProcessor() {
+void GlobalProcessor::add_builtin(std::string name, FunctionTypeNode* ftype) {
+    this->globals->set(name, ftype);
+}
+
+GlobalProcessor::GlobalProcessor(std::map<std::string, CodeBuiltin*> builtins) {
     this->globals = new SymbolTable("global", nullptr);
     this->class_table = new ClassTable();
+    for (auto b: builtins) {
+        this->add_builtin(b.first, b.second->ftype);
+    }
+}
+
+GlobalProcessor::GlobalProcessor() : GlobalProcessor(std::map<std::string, CodeBuiltin*>({})) {
+
 }
 
 void GlobalProcessor::visit(AssignmentNode& node) {

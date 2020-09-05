@@ -31,6 +31,7 @@ public:
 
 class CodeBuiltin {
 public:
+    FunctionTypeNode* ftype;
     virtual void run(ObjectStack& stack) = 0;
 };
 

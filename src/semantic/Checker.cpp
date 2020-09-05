@@ -228,20 +228,29 @@ void Checker::visit(CallNode& n) {
     if (function == nullptr) {
         throw std::runtime_error("Expected a function! Got something else!");
     }
-    if (n.arguments.size() != function->parameter_types.size())
-        throw BadArguments();
+    if (n.arguments.size() != function->parameter_types.size()) {
+        throw std::runtime_error("Function called with wrong number of arguments");
+    }
+
+//        throw BadArguments(function->parameter_types, n.arguments);
     SemanticInfo semantic_info;
 
     semantic_info.free_variables = function_semantic_info.free_variables;
-
+    VectorOfTypes args;
     for (int i = 0; i < n.arguments.size(); i++) {
         n.arguments[i]->accept(*this);
         SemanticInfo arg = this->rv;
-        if (!arg.symbol_info->equal(function->parameter_types[i])) {
-            throw BadArguments();
-        }
+        args.push_back(arg.symbol_info);
+//        if (!arg.symbol_info->equal(function->parameter_types[i])) {
+//            throw BadArguments();
+//        }
         for (auto fv: arg.free_variables) {
             semantic_info.free_variables[fv.first] = 1;
+        }
+    }
+    for (int i = 0; i < args.size(); i++) {
+        if (!args[i]->equal(function->parameter_types[i])) {
+            throw BadArguments(function->parameter_types, args);
         }
     }
     semantic_info.symbol_info = function->return_type;

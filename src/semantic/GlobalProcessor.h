@@ -10,6 +10,7 @@
 #include "../nodes/nodes.h"
 #include "SymbolTable.h"
 #include "ClassTable.h"
+#include "../vm/Object.h"
 
 class GlobalProcessor : public Visitor {
 public:
@@ -17,6 +18,8 @@ public:
     ClassTable* class_table;
 
     GlobalProcessor();
+
+    GlobalProcessor(std::map<std::string, CodeBuiltin*> builtins);
 
     void visit(AssignmentNode& node) override;
 
@@ -67,6 +70,8 @@ public:
     void visit(TernaryNode& node) override;
 
     void visit(NoneNode& node) override;
+
+    void add_builtin(std::string name, FunctionTypeNode* ftype);
 };
 
 #endif //UNTITLED1_GLOBALPROCESSOR_H
