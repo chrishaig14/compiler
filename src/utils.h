@@ -74,4 +74,8 @@ typedef std::pair<std::string, TypeNode*> FieldInfo;
 typedef std::vector<FieldInfo> StructFields;
 typedef std::vector<std::pair<std::string, Instruction*>> CodeLabel;
 
+std::ostream& operator<<(std::ostream& out, const CodeLabel v);
+
+bool operator==(const CodeLabel a, const CodeLabel b);
+
 #endif //UNTITLED1_UTILS_H

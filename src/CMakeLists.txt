@@ -52,6 +52,7 @@ add_library(srcLib
         nodes/AssignmentNode.h
         semantic/GlobalProcessor.cpp
         utils.h
+        utils.cpp
         semantic/SymbolInfo.cpp
         semantic/SymbolInfo.h
         semantic/ObjectInfo.cpp
