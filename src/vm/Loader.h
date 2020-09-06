@@ -12,7 +12,7 @@
 
 class Loader {
 public:
-    Loader(CodeLabel allCode);
+    Loader(CodeLabel allCode, std::map<std::string, CodeBuiltin*> builtins);
 
     void load();
 

@@ -14,7 +14,12 @@ GlobalProcessor::GlobalProcessor(std::map<std::string, CodeBuiltin*> builtins) {
     this->globals = new SymbolTable("global", nullptr);
     this->class_table = new ClassTable();
     for (auto b: builtins) {
-        this->add_builtin(b.first, b.second->ftype);
+        std::string params;
+        for (auto p:b.second->ftype->parameter_types) {
+            params += p->to_string() + ".";
+        }
+        params = params.substr(0, params.size() - 1);
+        this->add_builtin(b.first + ":" + params, b.second->ftype);
     }
 }
 
@@ -86,7 +91,13 @@ void GlobalProcessor::visit(StructNode& node) {
 
 void GlobalProcessor::visit(FunctionNode& node) {
     FunctionTypeNode* function_info = new FunctionTypeNode(node.parameter_types, node.return_type);
-    this->globals->set(node.identifier, function_info);
+    std::string params;
+    for (auto p:node.parameter_types) {
+        params += p->to_string() + ".";
+    }
+    params = params.substr(0, params.size() - 1);
+    std::string new_name = node.identifier + ":" + params;
+    this->globals->set(new_name, function_info);
 }
 
 void GlobalProcessor::visit(VectorOfNodes program) {

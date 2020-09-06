@@ -890,7 +890,7 @@ TEST(parser_test, super_expression) {
             SUB(SUB(SUB(MEM(MEM(ID("v"), "x"), "y"), NUM(0)), NUM(1)),
                 BIN(OpType::ADD, ID("a"), BIN(OpType::MUL, ID("c"), NUM(7)))),
             std::vector<Node*>({NUM(4), NUM(1), BIN(OpType::ADD, ID("b"), ID("c"))})));
-    std::cout << *node << std::endl;
+    std::cerr <<  *node << std::endl;
 
     COMPLETE_TEST;
 }

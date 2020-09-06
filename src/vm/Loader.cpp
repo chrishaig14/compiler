@@ -76,6 +76,15 @@ void Loader::load_function(std::string name, CodeLabel code) {
     this->global_env->set(name, new CodeObject(function_object));
 }
 
-Loader::Loader(CodeLabel allCode) : all_code(allCode) {
+Loader::Loader(CodeLabel allCode, std::map<std::string, CodeBuiltin*> builtins) : all_code(allCode) {
     this->global_env = new Environment("global", nullptr);
+    for (auto b: builtins) {
+        std::string params;
+        for (auto p: b.second->ftype->parameter_types) {
+            params += p->to_string() + ".";
+        }
+        params = params.substr(0, params.size() - 1);
+        this->global_env->declare(b.first + ":" + params);
+        this->global_env->set(b.first + ":" + params, new CodeObject(b.second));
+    }
 }

@@ -16,12 +16,12 @@ TEST(formatter_test, test_1) {
     std::stringstream sstream;
     sstream << file.rdbuf();
     std::string text = sstream.str();
-    std::cout << "The input file is: " << std::endl << text << std::endl;
+    std::cerr <<  "The input file is: \n" + text +"\n";
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
     BlockNode* ast = parser.parse_program();
     Formatter formatter;
     ast->accept(formatter);
-    std::cout << formatter.output;
+    std::cerr <<  formatter.output;
 }

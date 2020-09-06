@@ -148,7 +148,7 @@ void Formatter::visit(FunctionNode& node) {
     parameters = parameters.substr(0, parameters.size()-2);
     std::string return_type = node.return_type->to_string();
     this->indent_level++;
-    std::cout << "formatting body of function at indent level " << this->indent_level << std::endl;
+    std::cerr <<  "formatting body of function at indent level " << this->indent_level << std::endl;
     node.body->accept(*this);
     this->indent_level--;
     std::string body = this->output;
@@ -239,7 +239,7 @@ void Formatter::visit(WhileNode& node) {
     node.condition->accept(*this);
     std::string condition = this->output;
     this->indent_level++;
-    std::cout << "formatting body of while at indent level" << this->indent_level << std::endl;
+    std::cerr <<  "formatting body of while at indent level" << this->indent_level << std::endl;
     node.body->accept(*this);
     this->indent_level--;
     std::string body = this->output;

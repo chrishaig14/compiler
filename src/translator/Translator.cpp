@@ -80,7 +80,14 @@ void Translator::visit(DeclarationNode& node) {
 
 void Translator::visit(FunctionNode& node) {
     CodeLabel out;
-    out.push_back(LC("", I_START_FUNCTION(node.identifier)));
+    FunctionTypeNode* function_info = new FunctionTypeNode(node.parameter_types, node.return_type);
+    std::string params;
+    for (auto p: node.parameter_types) {
+        params += p->to_string() + ".";
+    }
+    params = params.substr(0, params.size() - 1);
+    std::string new_name = node.identifier + ":" + params;
+    out.push_back(LC("", I_START_FUNCTION(new_name)));
     CodeLabel body_code;
     node.body->accept(*this);
     body_code = this->code;
@@ -281,7 +288,7 @@ void Translator::visit(TernaryNode& node) {
     node.true_case->accept(*this);
     CodeLabel true_case = this->code;
     out.push_back(NL(I_JUMPN(true_case.size() + 6)));
-    CodeLabel it_code = {NL(I_ENTER("it_scope")), NL(I_DECL("it")),NL(I_SET("it"))};
+    CodeLabel it_code = {NL(I_ENTER("it_scope")), NL(I_DECL("it")), NL(I_SET("it"))};
     out.insert(out.end(), it_code.begin(), it_code.end());
     out.insert(out.end(), true_case.begin(), true_case.end());
     out.push_back(NL(I_LEAVE("it_scope")));

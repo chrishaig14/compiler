@@ -24,7 +24,7 @@ bool operator==(const CodeLabel a, const CodeLabel b) {
         for (int i = 0; i < min; i++) {
             auto a_inst = a[i].second;
             auto b_inst = b[i].second;
-            std::cout << "comparing " << a_inst->to_string() << " == " << b_inst->to_string() << ": "
+            std::cerr <<  "comparing " << a_inst->to_string() << " == " << b_inst->to_string() << ": "
                       << (a_inst->equal(b_inst) ? "True" : "False") << std::endl;
         }
         return false;
@@ -32,7 +32,7 @@ bool operator==(const CodeLabel a, const CodeLabel b) {
     for (int i = 0; i < a.size(); i++) {
         auto a_inst = a[i].second;
         auto b_inst = b[i].second;
-        std::cout << "comparing " << a_inst->to_string() << " == " << b_inst->to_string() << ": "
+        std::cerr <<  "comparing " << a_inst->to_string() << " == " << b_inst->to_string() << ": "
                   << (a_inst->equal(b_inst) ? "True" : "False") << std::endl;
         if (!a_inst->equal(b_inst)) return false;
     }

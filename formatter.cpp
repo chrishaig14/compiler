@@ -15,14 +15,14 @@ int main(int argc, char* argv[]) {
     std::stringstream sstream;
     sstream << file.rdbuf();
     std::string text = sstream.str();
-//    std::cout << "The input file is: " << std::endl << text << std::endl;
+//    std::cerr <<  "The input file is: " << std::endl << text << std::endl;
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
     BlockNode* ast = parser.parse_program();
     Formatter formatter;
     ast->accept(formatter);
-    std::cout << formatter.output;
+    std::cerr <<  formatter.output;
     std::ofstream output(argv[2]);
     output << formatter.output;
     return 0;

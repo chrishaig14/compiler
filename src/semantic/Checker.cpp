@@ -222,20 +222,26 @@ void Checker::visit(ReturnNode& n) {
 }
 
 void Checker::visit(CallNode& n) {
-    n.function->accept(*this);
-    SemanticInfo function_semantic_info = this->rv;
-    FunctionTypeNode* function = dynamic_cast<FunctionTypeNode*>(function_semantic_info.symbol_info);
-    if (function == nullptr) {
-        throw std::runtime_error("Expected a function! Got something else!");
-    }
-    if (n.arguments.size() != function->parameter_types.size()) {
-        throw std::runtime_error("Function called with wrong number of arguments");
-    }
+    // we call function only by name
+
+
+
+
+
+
+//    SemanticInfo function_semantic_info = this->rv;
+//    FunctionTypeNode* function = dynamic_cast<FunctionTypeNode*>(function_semantic_info.symbol_info);
+//    if (function == nullptr) {
+//        throw std::runtime_error("Expected a function! Got something else!");
+//    }
+//    if (n.arguments.size() != function->parameter_types.size()) {
+//        throw std::runtime_error("Function called with wrong number of arguments");
+//    }
 
 //        throw BadArguments(function->parameter_types, n.arguments);
-    SemanticInfo semantic_info;
+//    SemanticInfo semantic_info;
 
-    semantic_info.free_variables = function_semantic_info.free_variables;
+//    semantic_info.free_variables = function_semantic_info.free_variables;
     VectorOfTypes args;
     for (int i = 0; i < n.arguments.size(); i++) {
         n.arguments[i]->accept(*this);
@@ -245,14 +251,28 @@ void Checker::visit(CallNode& n) {
 //            throw BadArguments();
 //        }
         for (auto fv: arg.free_variables) {
-            semantic_info.free_variables[fv.first] = 1;
+//            semantic_info.free_variables[fv.first] = 1;
         }
     }
+
+    std::string params;
+    for (auto p:args) {
+        params += p->to_string() + ".";
+    }
+    params = params.substr(0, params.size() - 1);
+    std::string func_name = dynamic_cast<IdNode*>(n.function)->identifier;
+    std::string new_name = func_name + ":" + params;
+    dynamic_cast<IdNode*>(n.function)->identifier = new_name;
+
+    FunctionTypeNode* function = dynamic_cast<FunctionTypeNode*>(this->scopes["global"]->get(new_name));
+
     for (int i = 0; i < args.size(); i++) {
         if (!args[i]->equal(function->parameter_types[i])) {
             throw BadArguments(function->parameter_types, args);
         }
     }
+    SemanticInfo semantic_info;
+
     semantic_info.symbol_info = function->return_type;
     this->rv = semantic_info;
 }
