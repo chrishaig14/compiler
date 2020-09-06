@@ -144,5 +144,9 @@ void GlobalProcessor::visit(NoneNode& node) {
 
 }
 
+void GlobalProcessor::visit(EmptyListNode& node) {
+
+}
+
 
 

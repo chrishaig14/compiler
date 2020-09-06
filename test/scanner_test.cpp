@@ -107,6 +107,17 @@ TEST(scanner_test, test_number) {
     EXPECT_EQ(cmp_token_value(token, st_NUM(123)), true);
 }
 
+TEST(scanner_test, test_double_colon) {
+    std::string text = "a::b";
+    Scanner scanner(text);
+    Token token = scanner.get_next();
+    EXPECT_EQ(cmp_token_value(token, st_ID("a")), true);
+    token = scanner.get_next();
+    EXPECT_EQ(cmp_token_value(token, Token(TokenType::DOUBLE_COLON, -1, -1)), true);
+    token = scanner.get_next();
+    EXPECT_EQ(cmp_token_value(token, st_ID("b")), true);
+}
+
 TEST(scanner_test, test_string_literal) {
     std::string text = "\"hello\"";
     Scanner scanner(text);

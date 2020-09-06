@@ -72,6 +72,8 @@ public:
     void visit(NoneNode& node) override;
 
     void add_builtin(std::string name, FunctionTypeNode* ftype);
+
+    void visit(EmptyListNode& node) override;
 };
 
 #endif //UNTITLED1_GLOBALPROCESSOR_H

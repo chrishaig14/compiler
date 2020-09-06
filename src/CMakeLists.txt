@@ -142,6 +142,8 @@ add_library(srcLib
         instructions/MakeClassInst.h
         nodes/ClassLiteralExpressionNode.cpp
         nodes/ClassLiteralExpressionNode.h
+        nodes/EmptyListNode.cpp
+        nodes/EmptyListNode.h
         nodes/ClassLiteralFieldNode.cpp
         nodes/ClassLiteralFieldNode.h
         instructions/DefineStructInst.cpp

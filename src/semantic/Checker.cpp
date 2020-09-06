@@ -487,3 +487,9 @@ void Checker::visit(NoneNode& node) {
     semanticInfo.symbol_info = new ObjectTypeNode("NoneType", {});
     this->rv = semanticInfo;
 }
+
+void Checker::visit(EmptyListNode& node) {
+    SemanticInfo semanticInfo;
+    semanticInfo.symbol_info = node.type;
+    this->rv = semanticInfo;
+}

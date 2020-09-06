@@ -8,7 +8,6 @@
 
 #include <vector>
 #include "../scanner/Token.h"
-#include "../nodes/IfNode.h"
 #include "../nodes/nodes.h"
 #include "../utils.h"
 #include <iostream>
@@ -36,7 +35,7 @@ public:
 
     IfNode* parse_if();
 
-    ListNode* parse_list_literal();
+    Node* parse_list_literal();
 
     Node* parse_add_or_sub_expression();
 

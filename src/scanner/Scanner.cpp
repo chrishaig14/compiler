@@ -61,6 +61,7 @@ void initialize_tokens() {
     TOKEN_SPECIAL["<="] = TokenType::LEQ;
     TOKEN_SPECIAL[">="] = TokenType::GEQ;
     TOKEN_SPECIAL["=="] = TokenType::EQ;
+    TOKEN_SPECIAL["::"] = TokenType::DOUBLE_COLON;
     TOKEN_SPECIAL["!="] = TokenType::NEQ;
     TOKEN_SPECIAL["!"] = TokenType::NOT;
     TOKEN_SPECIAL["&&"] = TokenType::AND;

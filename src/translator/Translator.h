@@ -90,6 +90,8 @@ public:
     void visit(TernaryNode& node) override;
 
     void visit(NoneNode& node) override;
+
+    void visit(EmptyListNode& node) override;
 };
 
 

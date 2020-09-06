@@ -382,3 +382,34 @@ TEST(total_test, test_overloading) {
 }
 
 
+TEST(total_test, test_empty_list) {
+    std::string text = "fun main()->Integer{var l = []::List[Integer]; return 0;}";
+    Scanner scanner(text);
+    std::vector<Token> tokens = scanner.scan_all();
+    Parser parser(tokens);
+    BlockNode* program = parser.parse_program();
+    std::map<std::string, CodeBuiltin*> builtins;
+    builtins["str"] = new BuiltinIntegerToString();
+    builtins["print"] = new BuiltinPrintString();
+    GlobalProcessor gp(builtins);
+    gp.visit(*program);
+    Checker checker(gp.globals, gp.class_table);
+    checker.visit(*program);
+    Translator translator;
+    program->accept(translator);
+    ObjectStack stack;
+    StructProtos structs;
+    CodeLabel translated_code = translator.code;
+    std::cerr <<  translated_code << std::endl;
+    Loader loader(translated_code, builtins);
+    loader.load();
+    Environment* global_env = loader.global_env;
+    CodeObject* main_function = dynamic_cast<CodeObject*>(global_env->get("main:"));
+    for (int i = 0; i < main_function->user->code.size(); i++) {
+        std::cerr <<  main_function->user->code[i]->to_string() << std::endl;
+    }
+    CodeRunner code_runner(main_function->user->code, structs, stack, global_env);
+    code_runner.run();
+    EXPECT_TRUE(stack.top()->equal(new IntegerObject(0)));
+}
+

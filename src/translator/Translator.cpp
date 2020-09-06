@@ -303,3 +303,8 @@ void Translator::visit(NoneNode& node) {
     CodeLabel out = {NL(I_PUSHN)};
     this->code = out;
 }
+
+void Translator::visit(EmptyListNode& node) {
+    CodeLabel out  = {NL(I_MAKE_LIST(0))};
+    this->code = out;
+}

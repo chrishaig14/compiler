@@ -53,9 +53,13 @@ class TypeNode;
 
 class WhileNode;
 
+class EmptyListNode;
+
 class Visitor {
 public:
     virtual void visit(AssignmentNode& node) = 0;
+
+    virtual void visit(EmptyListNode& node) = 0;
 
     virtual void visit(BinopNode& node) = 0;
 

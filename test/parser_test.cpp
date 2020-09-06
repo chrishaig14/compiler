@@ -739,6 +739,19 @@ TEST(parser_test, parse_xxx) {
     COMPLETE_TEST;
 }
 
+TEST(parser_test, parse_empty_list) {
+    std::string text = "[]::Integer";
+    Scanner scanner(text);
+    std::vector<Token> tokens = scanner.scan_all();
+    Parser parser(tokens);
+    Node* node = parser.parse_expression();
+    VectorOfNodes list;
+    Node* expected_node = new EmptyListNode(T_INT);
+//    EXPECT_EQ(node->start, 0);
+//    EXPECT_EQ(node->end, 1);
+    COMPLETE_TEST;
+}
+
 TEST(parser_test, parse_list_one_element) {
     std::string text = "[13]";
     Scanner scanner(text);

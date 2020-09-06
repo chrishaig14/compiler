@@ -7,13 +7,18 @@
 #include "src/translator/Translator.h"
 #include "src/vm/Loader.h"
 #include "src/vm/CodeRunner.h"
+#include "src/vm/BuiltinIntegerToString.h"
+#include "src/vm/BuiltinPrintString.h"
 
 void compile_and_run(std::string text) {
     Scanner scanner(text);
-    std::vector <Token> tokens = scanner.scan_all();
+    std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
     BlockNode* program = parser.parse_program();
-    GlobalProcessor gp;
+    std::map<std::string, CodeBuiltin*> builtins;
+    builtins["str"] = new BuiltinIntegerToString();
+    builtins["print"] = new BuiltinPrintString();
+    GlobalProcessor gp(builtins);
     gp.visit(*program);
     Checker checker(gp.globals, gp.class_table);
     checker.visit(*program);
@@ -23,10 +28,10 @@ void compile_and_run(std::string text) {
     StructProtos structs;
     CodeLabel translated_code = translator.code;
     std::cerr << translated_code << std::endl;
-    Loader loader(translated_code, {});
+    Loader loader(translated_code, builtins);
     loader.load();
     Environment* global_env = loader.global_env;
-    CodeObject* main_function = dynamic_cast<CodeObject*>(global_env->get("main"));
+    CodeObject* main_function = dynamic_cast<CodeObject*>(global_env->get("main:"));
     CodeRunner code_runner(main_function->user->code, structs, stack, global_env);
     code_runner.run();
 }

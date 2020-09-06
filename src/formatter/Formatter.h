@@ -66,6 +66,8 @@ public:
 
     void visit(NoneNode& node) override;
 
+    void visit(EmptyListNode& node) override;
+
 public:
     std::string output;
 };

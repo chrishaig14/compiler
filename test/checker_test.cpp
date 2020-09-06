@@ -165,6 +165,11 @@ TEST(second_pass_test, tee) {
     ASSERT_THROWS_NOT_FOUND_ERROR(text, "x");
 }
 
+TEST(second_pass_test, list) {
+    std::string text = "fun main()->Integer{var l=[]::List[Integer];return 0;}";
+    ASSERT_OK(text);
+}
+
 TEST(second_pass_test, teea) {
     std::string text = "fun foo(y: Foo)->String{if(y==1){return x;}}";
     ASSERT_THROWS_NOT_FOUND_ERROR(text, "x");

@@ -1,4 +1,4 @@
-struct Pepe {
-x: String;
-b: Option[List];
+fun main()->Integer{
+    var l = [];
+    return 0;
 }

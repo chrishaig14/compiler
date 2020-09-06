@@ -47,7 +47,7 @@ IfNode* Parser::parse_if() {
     return node;
 }
 
-ListNode* Parser::parse_list_literal() {
+Node* Parser::parse_list_literal() {
     Token list_start = this->expect_token(TokenType::LSQUARE);
     int start = list_start.start;
     VectorOfNodes elements;
@@ -56,6 +56,13 @@ ListNode* Parser::parse_list_literal() {
         // empty list
         end = this->token.end;
         this->next();
+        // parse required type annotation (cannot infer type of empty list
+        this->expect_token(TokenType::DOUBLE_COLON);
+        TypeNode* type = this->parse_type_node();
+        EmptyListNode* node = new EmptyListNode(type);
+        node->start = start;
+        node->end = end;
+        return node;
     } else {
         while (true) {
             Node* element = this->parse_expression();

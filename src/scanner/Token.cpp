@@ -99,6 +99,7 @@ void initialize_token_strings() {
     TOKEN_STRINGS[TokenType::LCURLY] = "lcurly ( { )";
     TOKEN_STRINGS[TokenType::RCURLY] = "rcurly ( } )";
     TOKEN_STRINGS[TokenType::LPAREN] = "lparen ( ( )";
+    TOKEN_STRINGS[TokenType::DOUBLE_COLON] = "double colon ( :: )";
     TOKEN_STRINGS[TokenType::RPAREN] = "rparen ( ) )";
     TOKEN_STRINGS[TokenType::END] = "EOF";
     TOKEN_STRINGS[TokenType::WHILE] = "while";

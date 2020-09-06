@@ -262,3 +262,7 @@ void Formatter::visit(TernaryNode& node) {
 void Formatter::visit(NoneNode& node) {
     this->output = "none";
 }
+
+void Formatter::visit(EmptyListNode& node) {
+
+}
