@@ -100,7 +100,7 @@ TEST(translator_test, test_if) {
 
 TEST(translator_test, test_class_literal_fields) {
     Translator translator;
-    Node* node = new ClassLiteralFieldNode("Foo", {{"foo", BIN(OpType::MUL, NUM(7), ID("a"))},
+    Node* node = new ClassLiteralFieldNode(OBJECT_TYPE("Foo", {}), {{"foo", BIN(OpType::MUL, NUM(7), ID("a"))},
                                                    {"bar", NUM(65)}});
     node->accept(translator);
     std::vector<std::string> fields = {"foo", "bar"};

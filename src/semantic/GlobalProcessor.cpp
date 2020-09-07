@@ -86,6 +86,7 @@ void GlobalProcessor::visit(StructNode& node) {
         class_info->field_types.push_back(f.second);
         class_info->fields[f.first] = f.second;
     }
+    class_info->type_parameters = node.template_parameters;
     this->class_table->set(node.identifier, class_info);
 }
 

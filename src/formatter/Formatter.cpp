@@ -115,7 +115,7 @@ void Formatter::visit(ClassLiteralFieldNode& node) {
     }
     fields = fields.substr(0, fields.size()-2);
     this->indent_level = ind;
-    this->output = this->indentation() + node.identifier + "{" + fields + "}";
+    this->output = this->indentation() + node.type->to_string() + "{" + fields + "}";
 }
 
 void Formatter::visit(DeclarationNode& node) {

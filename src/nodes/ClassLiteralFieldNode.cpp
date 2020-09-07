@@ -11,7 +11,7 @@ void ClassLiteralFieldNode::accept(Visitor& visitor) {
 bool ClassLiteralFieldNode::equal(Node* other) const {
     const ClassLiteralFieldNode* other_ptr = dynamic_cast<const ClassLiteralFieldNode*>(other);
     if (other_ptr == nullptr) return false;
-    if (this->identifier != other_ptr->identifier) return false;
+    if (!this->type->equal(other_ptr->type)) return false;
     if (this->init.size() != other_ptr->init.size()) return false;
     for (auto f: this->init) {
         if (other_ptr->init.count(f.first) == 0) return false;
@@ -20,5 +20,5 @@ bool ClassLiteralFieldNode::equal(Node* other) const {
     return true;
 }
 
-ClassLiteralFieldNode::ClassLiteralFieldNode(const std::string& identifier, const std::map<std::string, Node*>& init)
-        : identifier(identifier), init(init) {}
+ClassLiteralFieldNode::ClassLiteralFieldNode(ObjectTypeNode* type, const std::map<std::string, Node*>& init)
+        : type(type), init(init) {}

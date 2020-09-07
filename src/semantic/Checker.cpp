@@ -10,8 +10,16 @@ Checker::Checker(SymbolTable* globals, ClassTable* class_table) {
     this->class_table = class_table;
     this->scope = globals;
     this->scopes["global"] = this->scope;
-    this->class_table->set("Integer", new ClassInfo(std::vector<std::string>(), std::vector<TypeNode*>()));
-    this->class_table->set("Option", new ClassInfo(std::vector<std::string>(), std::vector<TypeNode*>()));
+    this->class_table->set("Integer", new ClassInfo(std::vector<std::string>(), std::vector<TypeNode*>(), {}));
+    this->class_table->set("Option", new ClassInfo(std::vector<std::string>(), std::vector<TypeNode*>(), {"T"}));
+
+    this->check_structs();
+}
+
+void Checker::check_structs() {
+//    for(auto c: this->class_table.){
+
+//    }
 }
 
 void Checker::enter_scope(std::string name) {
@@ -277,7 +285,52 @@ void Checker::visit(CallNode& n) {
     this->rv = semantic_info;
 }
 
+bool Checker::type_exists(TypeNode* type) {
+    auto function_type = dynamic_cast<FunctionTypeNode*>(type);
+    if (function_type != nullptr) {
+        for (auto pt: function_type->parameter_types) {
+            if (!this->type_exists(pt)) return false;
+        }
+        if (!this->type_exists(function_type->return_type)) return false;
+    } else {
+        auto object_type = dynamic_cast<ObjectTypeNode*>(type);
+        if (object_type != nullptr) {
+            if (this->class_table->declared(object_type->identifier)) {
+                if (object_type->type_parameters.size() !=
+                    this->class_table->get(object_type->identifier)->type_parameters.size()) {
+                    throw std::runtime_error("Template struct " + object_type->identifier + " expects " +
+                                             std::to_string(this->class_table->get(
+                                                     object_type->identifier)->type_parameters.size()) +
+                                             " parameters, but " + std::to_string(object_type->type_parameters.size()) +
+                                             " given");
+                }
+                for (auto tp: object_type->type_parameters) {
+                    if (!this->type_exists(tp)) return false;
+                }
+            } else {
+                if (object_type->type_parameters.size() == 0) {
+                    for (auto t: this->type_params) {
+                        if (t == object_type->identifier) return true;
+                    }
+                    return false;
+                } else {
+                    return false;
+                }
+            }
+        }
+    }
+    return true;
+}
+
 void Checker::visit(StructNode& n) {
+    std::vector<std::string> type_params = n.template_parameters;
+    this->type_params = type_params;
+    for (auto f: n.fields) {
+        if (!this->type_exists(f.second)) {
+            throw std::runtime_error("Type " + f.second->to_string() + " for field '" + f.first + "' doesn't exist");
+        }
+    }
+    this->type_params = {};
 }
 
 void Checker::visit(BlockNode& program) {
@@ -298,12 +351,13 @@ void Checker::visit(BlockNode& program) {
 }
 
 void Checker::visit(ClassLiteralExpressionNode& node) {
-    if (!this->class_table->declared(node.identifier)) throw std::runtime_error("No struct named " + node.identifier);
-    ClassInfo* class_info = this->class_table->get(node.identifier);
+    if (!this->class_table->declared(node.type->identifier))
+        throw std::runtime_error("No struct named " + node.type->identifier);
+    ClassInfo* class_info = this->class_table->get(node.type->identifier);
     auto class_fields = class_info->fields;
     if (class_fields.size() != node.init.size())
         throw std::runtime_error(
-                "In struct \"" + node.identifier + "\" initialization: " + "Expected " +
+                "In struct \"" + node.type->identifier + "\" initialization: " + "Expected " +
                 std::to_string(class_fields.size()) + " initializers but got " +
                 std::to_string(node.init.size()));
     for (int i = 0; i < node.init.size(); i++) {
@@ -319,7 +373,7 @@ void Checker::visit(ClassLiteralExpressionNode& node) {
         }
     }
     this->rv = SemanticInfo();
-    rv.symbol_info = new ObjectTypeNode(node.identifier, {});
+    rv.symbol_info = new ObjectTypeNode(node.type->identifier, {});
 }
 
 bool Checker::can_assign(TypeNode* from, TypeNode* to) {
@@ -343,30 +397,104 @@ bool Checker::can_assign(TypeNode* from, TypeNode* to) {
     return to->equal(from);
 }
 
+bool Checker::can_assign_generic(TypeNode* from, TypeNode* to, std::vector<std::string> type_params) {
+    auto to_object = dynamic_cast<ObjectTypeNode*>(to);
+    if (to_object->type_parameters.size() == 0) {
+        for (auto tp:type_params) {
+            if (to_object->identifier == tp) {
+                return true;
+            }
+        }
+    }
+    if (to_object->identifier == "Option") {
+        if (!to_object->type_parameters[0]->equal(from)) {
+            auto foo = dynamic_cast<ObjectTypeNode*>(from);
+            if (foo->identifier != "NoneType") {
+                return false;
+            }
+        }
+        return true;
+    } else if (to_object->identifier == "Union") {
+        for (int i = 0; i < to_object->type_parameters.size(); i++) {
+            if (to_object->type_parameters[i]->equal(from)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    return to->equal(from);
+}
+
+TypeNode* Checker::make_type(TypeNode* original, std::map<std::string, TypeNode*>& replacements) {
+    auto object_type = dynamic_cast<ObjectTypeNode*>(original);
+    TypeNode* new_type = nullptr;
+    VectorOfTypes new_type_params;
+    if (object_type != nullptr) {
+        std::string type_identifier = object_type->identifier;
+
+        for (auto r: replacements) {
+            if (type_identifier == r.first) {
+                if (object_type->type_parameters.size() != 0) {
+                    throw std::runtime_error(
+                            "Trying to make a type for a template for exmaple struct Foo[T]{foo:T[Integer];}!");
+                }
+                new_type = r.second;
+                return new_type;
+            }
+        }
+        // It's not the top level type
+        for (auto tp: object_type->type_parameters) {
+            TypeNode* new_tp = this->make_type(tp, replacements);
+            new_type_params.push_back(new_tp);
+        }
+        new_type = new ObjectTypeNode(type_identifier, new_type_params);
+    } else {
+        throw std::runtime_error("Making non object concrete type template!");
+    }
+    return new_type;
+}
+
 void Checker::visit(ClassLiteralFieldNode& node) {
-    if (!this->class_table->declared(node.identifier)) throw std::runtime_error("No struct named " + node.identifier);
-    auto class_fields = this->class_table->get(node.identifier)->fields;
+    if (!this->class_table->declared(node.type->identifier))
+        throw std::runtime_error("No struct named " + node.type->identifier);
+    auto class_fields = this->class_table->get(node.type->identifier)->fields;
     for (auto f: node.init) {
         if (class_fields.count(f.first) == 0) throw std::runtime_error("No field named " + f.first);
     }
     if (class_fields.size() != node.init.size())
         throw std::runtime_error(
-                "In struct \"" + node.identifier + "\" initialization: " + "Expected " +
+                "In struct \"" + node.type->identifier + "\" initialization: " + "Expected " +
                 std::to_string(class_fields.size()) + " initializers but got " +
                 std::to_string(node.init.size()));
+    ClassInfo* cinfo = this->class_table->get(node.type->identifier);
+    std::map<std::string, TypeNode*> replacements;
+    for (int i = 0; i < cinfo->type_parameters.size(); i++) {
+        std::string tp = cinfo->type_parameters[i];
+        TypeNode* ta = node.type->type_parameters[i];
+        replacements[tp] = ta;
+    }
+    auto field_names = cinfo->field_names;
+    std::vector<TypeNode*> concrete_field_types;
+    for (auto f: cinfo->field_types) {
+        TypeNode* concrete_type = this->make_type(f, replacements);
+        concrete_field_types.push_back(concrete_type);
+    }
+    ClassInfo* concrete = new ClassInfo(field_names, concrete_field_types, {});
     for (auto f: node.init) {
         Node* exp = f.second;
         exp->accept(*this);
         SemanticInfo semanticInfo = this->rv;
-        if (!this->can_assign(semanticInfo.symbol_info, this->class_table->get(node.identifier)->fields[f.first])) {
+        TypeNode* field_type = concrete->fields[f.first];
+        if (!this->can_assign(semanticInfo.symbol_info, field_type)) {
             throw std::runtime_error(
-                    "In struct \"" + node.identifier + "\" initialization: " + "field \"" + f.first + "\" is of type " +
-                    class_fields[f.first]->to_string() +
+                    "In struct \"" + node.type->identifier + "\" initialization: " + "field \"" + f.first +
+                    "\" is of type " +
+                    field_type->to_string() +
                     " but got " + semanticInfo.symbol_info->to_string());
         }
     }
     this->rv = SemanticInfo();
-    rv.symbol_info = new ObjectTypeNode(node.identifier, {});
+    rv.symbol_info = node.type;
 }
 
 void Checker::visit(ForNode& node) {
@@ -493,3 +621,5 @@ void Checker::visit(EmptyListNode& node) {
     semanticInfo.symbol_info = node.type;
     this->rv = semanticInfo;
 }
+
+

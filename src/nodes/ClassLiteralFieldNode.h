@@ -8,12 +8,14 @@
 
 #include "Node.h"
 #include "Visitor.h"
+#include "TypeNode.h"
+
 class ClassLiteralFieldNode : public Node {
 public:
-    std::string identifier;
+    ObjectTypeNode* type;
     std::map<std::string, Node*> init;
 
-    ClassLiteralFieldNode(const std::string& identifier, const std::map<std::string, Node*>& init);
+    ClassLiteralFieldNode(ObjectTypeNode* type, const std::map<std::string, Node*>& init);
 
     void accept(Visitor& visitor) override;
 

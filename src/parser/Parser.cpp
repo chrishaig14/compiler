@@ -287,8 +287,34 @@ Node* Parser::parse_id_or_class_literal() {
     int start = this->token.start;
     int end = this->token.end;
     this->next();
-    if (this->match(TokenType::LCURLY)) {
+    bool is_struct_literal = false;
+    ObjectTypeNode* literal_type = nullptr;
+    if (this->match(TokenType::LSQUARE)) {
         this->next();
+        VectorOfTypes type_params;
+        while (true) {
+            TypeNode* type = this->parse_type_node();
+            type_params.push_back(type);
+            if (this->match(TokenType::COMMA)) {
+                this->next();
+            } else {
+                break;
+            }
+        }
+        this->expect_token(TokenType::RSQUARE);
+        is_struct_literal = true;
+        literal_type = new ObjectTypeNode(identifier, type_params);
+    }
+    if (is_struct_literal) {
+        this->expect_token(TokenType::LCURLY);
+    } else {
+        if (this->match(TokenType::LCURLY)) {
+            this->next();
+            is_struct_literal = true;
+            literal_type = new ObjectTypeNode(identifier, {});
+        }
+    }
+    if (is_struct_literal) {
         std::map<std::string, Node*> initializers;
         if (!this->match(TokenType::RCURLY)) {
 //            this->next();
@@ -317,7 +343,7 @@ Node* Parser::parse_id_or_class_literal() {
 
                 }
                 this->expect_token(TokenType::RCURLY);
-                node = new ClassLiteralExpressionNode(identifier, initializers);
+                node = new ClassLiteralExpressionNode(literal_type, initializers);
             } else {
                 std::string field_id = id_ptr->identifier;
                 std::map<std::string, Node*> initializers;
@@ -334,11 +360,11 @@ Node* Parser::parse_id_or_class_literal() {
                     }
                 }
                 this->expect_token(TokenType::RCURLY);
-                node = new ClassLiteralFieldNode(identifier, initializers);
+                node = new ClassLiteralFieldNode(literal_type, initializers);
             }
         } else {
             this->next();
-            node = new ClassLiteralExpressionNode(identifier, {});
+            node = new ClassLiteralExpressionNode(literal_type, {});
         }
 
     } else {

@@ -88,6 +88,16 @@ public:
     bool can_assign(TypeNode* from, TypeNode* to);
 
     void visit(EmptyListNode& node) override;
+
+    void check_structs();
+
+    std::vector<std::string> type_params;
+
+    bool type_exists(TypeNode* type);
+
+    bool can_assign_generic(TypeNode* from, TypeNode* to, std::vector<std::string> type_params);
+
+    TypeNode* make_type(TypeNode* original, std::map<std::string, TypeNode*>& replacements);
 };
 
 #endif //UNTITLED1_CHECKER_H

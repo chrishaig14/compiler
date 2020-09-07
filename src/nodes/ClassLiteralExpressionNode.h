@@ -8,14 +8,15 @@
 
 #include "Node.h"
 #include "Visitor.h"
+#include "TypeNode.h"
 
 class ClassLiteralExpressionNode : public Node {
 
 public:
-    ClassLiteralExpressionNode(const std::string& identifier, const std::vector<Node*>& init);
+    ClassLiteralExpressionNode(ObjectTypeNode* type, const std::vector<Node*>& init);
 
     std::vector<Node*> init;
-    std::string identifier;
+    ObjectTypeNode* type;
 private:
     void accept(Visitor& visitor) override;
 

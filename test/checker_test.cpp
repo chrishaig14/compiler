@@ -451,6 +451,56 @@ TEST(second_pass_test, class_literal_expression_error) {
     ASSERT_OK(text);
 }
 
+TEST(second_pass_test, template_struct) {
+    std::string text = "struct Tree[T]{value:T;left:Option[Tree[T]];right:Option[Tree[T]];}";
+    ASSERT_OK(text);
+}
+
+TEST(second_pass_test, template_struct_type_not_found) {
+    std::string text = "struct Tree[T]{value:W;left:Option[Tree[T]];right:Option[Tree[T]];}";
+    ASSERT_OK(text);
+}
+
+TEST(second_pass_test, template_struct_1) {
+    std::string text = "struct Tree[T]{value:T;left:Option[Tree[Integer]];right:Option[Tree[T]];}";
+    ASSERT_OK(text);
+}
+
+TEST(second_pass_test, template_struct_wrong_number_of_args) {
+    std::string text = "struct Tree[T]{value:T;left:Option[Tree[Integer, T]];right:Option[Tree[T]];}";
+    ASSERT_OK(text);
+}
+
+TEST(second_pass_test, template_struct_instantiate) {
+    std::string text = "struct Tree[T]{value:T;left:Option[Tree[T]];right:Option[Tree[T]];} fun main()->Integer{var x = Tree{value:5,left:none,right:none}; return 5;}";
+    ASSERT_OK(text);
+}
+
+TEST(second_pass_test, template_struct_instantiate_more_than_one) {
+    std::string text = "struct Tree[T,U]{t:T;u:U;} fun main()->Integer{var x = Tree{t:5,u:\"Hello\"}; return 5;}";
+    ASSERT_OK(text);
+}
+
+TEST(second_pass_test, template_struct_instantiate_more_than_one_2) {
+    std::string text = "struct Tree[T,U]{t:T;u:U;} fun main()->Integer{var x = Tree[Integer,String]{t:5,u:\"Hello\"}; return 5;}";
+    ASSERT_OK(text);
+}
+
+TEST(second_pass_test, template_struct_instantiate_more_than_4) {
+    std::string text = "struct Tree[T,U]{t:T;u:U;v:T;} fun main()->Integer{var x = Tree[Integer,String]{t:5,u:\"Hello\",v:7}; return 5;}";
+    ASSERT_OK(text);
+}
+
+TEST(second_pass_test, template_struct_instantiate_more_than_5) {
+    std::string text = "struct Tree[T,U]{t:T;u:U;v:T;} fun main()->Integer{var x = Tree[Integer,String]{t:5,u:\"Hello\",v:\"World\"}; return 5;}";
+    ASSERT_OK(text);
+}
+
+TEST(second_pass_test, template_struct_tree) {
+    std::string text = "struct Tree[T]{v:T;l:Option[Tree[T]];r:Option[Tree[T]];} fun main()->Integer{var x = Tree[Integer]{v:5,l:Tree[Integer]{v:9,l:none,r:none},r:Tree[String]{v:\"\",l:none,r:none}}; return 5;}";
+    ASSERT_OK(text);
+}
+
 TEST(second_pass_test, infer_boolean_false) {
     std::string text = "var x = false;";
     ASSERT_VARIABLE_TYPE(text, "x", T_BOOL);

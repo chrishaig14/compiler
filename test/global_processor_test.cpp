@@ -25,6 +25,15 @@ TEST(first_pass_test, fun_foo) {
     EXPECT_NE(ginfo, nullptr);
 }
 
+TEST(first_pass_test, template_struct) {
+    std::string text = "struct Tree[T]{value:T; left:Option[Tree[T]]; right: Option[Tree[T]];}";
+    BlockNode* tree = get_tree(text);
+    GlobalProcessor gp;
+    gp.visit(*tree);
+    auto p = gp.class_table->get("Tree");
+//    EXPECT_NE(ginfo, nullptr);
+}
+
 TEST(first_pass_test, fun_foo_eq) {
     std::string text = "fun foo()->String{}";
     BlockNode* tree = get_tree(text);

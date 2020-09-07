@@ -206,6 +206,20 @@ TEST(parser_test, if_empty_then) {
     COMPLETE_TEST;
 }
 
+TEST(parser_test, parse_template) {
+    std::string text = "struct Tree[T]{value:T; left:Option[Tree[T]]; right: Option[Tree[T]];}";
+    Scanner scanner(text);
+    std::vector<Token> tokens = scanner.scan_all();
+    Parser parser(tokens);
+    StructNode* node = parser.parse_struct_definition();
+    StructFields fields;
+    fields.push_back({"value", TYPE("T", {})});
+    fields.push_back({"left", TYPE("Option", { TYPE("Tree", {TYPE("T", {})}) })});
+    fields.push_back({"right", TYPE("Option", { TYPE("Tree", {TYPE("T", {})}) })});
+    auto expected_node = CLS("Tree", { "T" }, fields);
+    COMPLETE_TEST;
+}
+
 TEST(parser_test, if_non_empty_then) {
     std::string text = "if(x){x=a+b; x = y;}";
     Scanner scanner(text);
@@ -327,7 +341,7 @@ TEST(parser_test, class_literal_exp) {
     Parser parser(tokens);
     Node* node = parser.parse_id_or_class_literal();
     std::vector<Node*> init = {ID("name"), BIN(OpType::MUL, NUM(27), NUM(32))};
-    auto expected_node = LIT_EXP("Person", init);
+    auto expected_node = LIT_EXP(OBJECT_TYPE("Person", {}), init);
     COMPLETE_TEST;
 }
 
@@ -339,7 +353,7 @@ TEST(parser_test, class_literal_fil) {
     Node* node = parser.parse_id_or_class_literal();
     std::map<std::string, Node*> init = {{"name", ID("name")},
                                          {"age",  BIN(OpType::MUL, NUM(27), NUM(32))}};
-    auto expected_node = LIT_FIL("Person", init);
+    auto expected_node = LIT_FIL(OBJECT_TYPE("Person", {}), init);
     COMPLETE_TEST;
 }
 
@@ -350,7 +364,7 @@ TEST(parser_test, class_literal_empty_ok) {
     Parser parser(tokens);
     Node* node = parser.parse_id_or_class_literal();
     std::vector<Node*> init = {};
-    auto expected_node = LIT_EXP("Person", init);
+    auto expected_node = LIT_EXP(OBJECT_TYPE("Person", {}), init);
     COMPLETE_TEST;
 }
 
@@ -426,7 +440,7 @@ TEST(parser_test, struct_literal_with_names) {
     std::map<std::string, Node*> fields;
     fields["x"] = NUM(27);
     fields["y"] = NUM(9);
-    auto expected_node = new ClassLiteralFieldNode("Foo", fields);
+    auto expected_node = new ClassLiteralFieldNode(OBJECT_TYPE("Foo", {}), fields);
     COMPLETE_TEST;
 }
 
@@ -439,7 +453,7 @@ TEST(parser_test, struct_literal_without_names) {
     std::vector<Node*> fields;
     fields.push_back(NUM(9));
     fields.push_back(NUM(27));
-    auto expected_node = new ClassLiteralExpressionNode("Foo", fields);
+    auto expected_node = new ClassLiteralExpressionNode(OBJECT_TYPE("Foo", {}), fields);
     COMPLETE_TEST;
 }
 
@@ -733,7 +747,7 @@ TEST(parser_test, parse_xxx) {
     Parser parser(tokens);
     Node* node = parser.parse_expression();
     VectorOfNodes list;
-    Node* expected_node = BIN(OpType::ADD, BIN(OpType::ADD, SUB(ID("y"),NUM(2)),SUB(ID("x"),NUM(7))), NUM(43));
+    Node* expected_node = BIN(OpType::ADD, BIN(OpType::ADD, SUB(ID("y"), NUM(2)), SUB(ID("x"), NUM(7))), NUM(43));
 //    EXPECT_EQ(node->start, 0);
 //    EXPECT_EQ(node->end, 1);
     COMPLETE_TEST;
@@ -903,7 +917,7 @@ TEST(parser_test, super_expression) {
             SUB(SUB(SUB(MEM(MEM(ID("v"), "x"), "y"), NUM(0)), NUM(1)),
                 BIN(OpType::ADD, ID("a"), BIN(OpType::MUL, ID("c"), NUM(7)))),
             std::vector<Node*>({NUM(4), NUM(1), BIN(OpType::ADD, ID("b"), ID("c"))})));
-    std::cerr <<  *node << std::endl;
+    std::cerr << *node << std::endl;
 
     COMPLETE_TEST;
 }

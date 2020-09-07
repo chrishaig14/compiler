@@ -20,5 +20,5 @@ bool ClassLiteralExpressionNode::equal(Node* other) const {
     return result;
 }
 
-ClassLiteralExpressionNode::ClassLiteralExpressionNode(const std::string& identifier, const std::vector<Node*>& init)
-        : identifier(identifier), init(init) {}
+ClassLiteralExpressionNode::ClassLiteralExpressionNode(ObjectTypeNode* type, const std::vector<Node*>& init)
+        : type(type), init(init) {}

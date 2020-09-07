@@ -16,12 +16,13 @@ public:
     std::vector<std::string> field_names;
     std::vector<TypeNode*> field_types;
     std::map<std::string, TypeNode*> fields;
-
+    std::vector<std::string> type_parameters;
 
     ClassInfo() {}
 
-    ClassInfo(const std::vector<std::string>& fieldNames, const std::vector<TypeNode*>& fieldTypes) : field_names(
-            fieldNames), field_types(fieldTypes) {
+    ClassInfo(const std::vector<std::string>& fieldNames, const std::vector<TypeNode*>& fieldTypes,
+              std::vector<std::string> type_parameters) : field_names(
+            fieldNames), field_types(fieldTypes), type_parameters(type_parameters) {
         for (int i = 0; i < fieldNames.size(); i++) {
             this->fields[fieldNames[i]] = fieldTypes[i];
         }
