@@ -11,10 +11,12 @@ bool MakeClassInst::equal(const Instruction* inst) const {
 }
 
 std::string MakeClassInst::to_string() const {
-    std::string out = "MAKE_CLASS " + this->identifier;
+    std::string out = "MAKE_CLASS " + this->identifier + "(";
     for (auto f: this->fields) {
-        out += f + " ";
+        out += f + ",";
     }
+    out = out.substr(0,out.size()-1);
+    out += ")";
     return out;
 }
 

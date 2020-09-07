@@ -220,7 +220,12 @@ void Formatter::visit(StructNode& node) {
         std::string field_type = field.second->to_string();
         fields += "    " + field.first + ": " + field_type + ";\n";
     }
-    this->output = "struct " + node.identifier + "{ \n" + fields + "}\n";
+    std::string p;
+    for(auto t: node.template_parameters){
+        p+=t+",";
+    }
+    p = p.substr(0,p.size()-1);
+    this->output = "struct " + node.identifier+"["+p+"]" + "{ \n" + fields + "}\n";
 }
 
 void Formatter::visit(SubscriptNode& node) {
