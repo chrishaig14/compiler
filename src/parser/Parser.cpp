@@ -207,7 +207,7 @@ Node* Parser::parse_mul_or_div_expression() {
         Node* node = new BinopNode(op, left, right);
         node->start = left->start;
         node->end = right->end;
-        return node;
+        left = node;
     }
     return left;
 }
