@@ -14,6 +14,7 @@
 #define COMPLEX_TYPE T_LIST(T_LIST(T_INT))
 
 #define COMPLETE_TEST EXPECT_TRUE(node->equal(expected_node)); delete node; delete expected_node;
+#define EXPECT_NOT_EQUAL EXPECT_FALSE(node->equal(expected_node)); delete node; delete expected_node;
 
 TEST(parser_test, binop_a_plus_b) {
     std::string text = "a + b";
@@ -67,7 +68,7 @@ TEST(parser_test, ternary_fail_1) {
     Parser parser(tokens);
     Node* node = parser.parse_ternary();
     Node* expected_node = TERNARY(ID("a"), NUM(7), NUM(6));
-    COMPLETE_TEST;
+    EXPECT_NOT_EQUAL;
 }
 
 TEST(parser_test, ternary_fail_2) {
@@ -77,7 +78,7 @@ TEST(parser_test, ternary_fail_2) {
     Parser parser(tokens);
     Node* node = parser.parse_ternary();
     Node* expected_node = TERNARY(ID("a"), NUM(7), NUM(6));
-    COMPLETE_TEST;
+    EXPECT_NOT_EQUAL;
 }
 
 TEST(parser_test, ternary_fail_3) {
@@ -89,7 +90,7 @@ TEST(parser_test, ternary_fail_3) {
     Node* expected_node = TERNARY(ID("a"), NUM(7), NUM(6));
     EXPECT_EQ(node->start, 0);
     EXPECT_EQ(node->end, 4);
-    COMPLETE_TEST;
+    EXPECT_NOT_EQUAL;
 }
 
 TEST(parser_test, binop_a_eq_b) {
@@ -528,7 +529,6 @@ TEST(parser_test, simple_subscript) {
     Node* node = parser.parse_expression();
     Node* expected_node = SUB(ID("a"), NUM(1));
     COMPLETE_TEST;
-
 }
 
 TEST(parser_test, literal_number_expression) {

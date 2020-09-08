@@ -12,10 +12,32 @@
 #include "ClassTable.h"
 #include "../vm/Object.h"
 
+typedef std::vector<FunctionTypeNode*> FunctionOverloads;
+
+class FunctionTable {
+    std::string foo;
+
+    std::map<std::string, FunctionOverloads*> functions;
+
+    bool function_exists(std::string function_name);
+
+public:
+    FunctionTable();
+
+    void add(std::string function_name, FunctionTypeNode* function_type);
+
+    FunctionTypeNode* get_simple_function(std::string function_name);
+
+    bool is_overloaded(std::string function_name);
+
+    FunctionOverloads* get_overloads(std::string function_name);
+};
+
 class GlobalProcessor : public Visitor {
 public:
     SymbolTable* globals;
     ClassTable* class_table;
+    FunctionTable* function_table;
 
     GlobalProcessor();
 

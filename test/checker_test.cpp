@@ -22,6 +22,7 @@ void compile(std::string text) {
     GlobalProcessor gp(builtins);
     gp.visit(*tree);
     Checker checker(gp.globals, gp.class_table);
+    checker.function_table = gp.function_table;
     checker.visit(*tree);
 }
 
@@ -471,13 +472,54 @@ TEST(second_pass_test, template_struct_wrong_number_of_args) {
     ASSERT_OK(text);
 }
 
+TEST(second_pass_test, template_function_very_simple){
+    std::string text = "fun id(x:t)->t{return x;} fun main()->Integer{var x = id(7);return 0;}";
+    ASSERT_OK(text);
+}
+
+TEST(second_pass_test, template_function_return_second_same_type){
+    std::string text = "fun second(x:t,y:t)->t{return y;} fun main()->Integer{var x = second(7,9);return 0;}";
+    ASSERT_OK(text);
+}
+
+TEST(second_pass_test, template_function_return_second_same_type_error){
+    std::string text = "fun second(x:t,y:t)->t{return y;} fun main()->Integer{var x = second(7,\"Hello\");return 0;}";
+    ASSERT_OK(text);
+}
+
+TEST(second_pass_test, template_function_return_second_diff_generic){
+    std::string text = "fun second(x:t,y:u)->u{return y;} fun main()->Integer{var x = second(7,\"Hello\");return x;}";
+    ASSERT_OK(text);
+}
+
+TEST(second_pass_test, function_overload){
+    std::string text = "fun foo(x:String)->String{return x;} fun foo(x:Integer)->Integer{return x;} fun main()->Integer{var x: Integer = foo(7); var y:String=foo(\"Hello\");return 0;}";
+    ASSERT_OK(text);
+}
+
+TEST(second_pass_test, template_function_return_type_ok){
+    std::string text = "fun second(x:t)->t{return x;} fun main()->Integer{return 0;}";
+    ASSERT_OK(text);
+}
+
+TEST(second_pass_test, template_function_bad_return_type_2){
+    std::string text = "fun second(x:t)->Integer{return x;} fun main()->Integer{return 0;}";
+    ASSERT_OK(text);
+}
+
+TEST(second_pass_test, template_function_bad_return_type_3){
+    std::string text = "fun second(x:t)->t{return 2;} fun main()->Integer{return 0;}";
+    ASSERT_OK(text);
+}
+
+
 TEST(second_pass_test, template_struct_instantiate) {
-    std::string text = "struct Tree[T]{value:T;left:Option[Tree[T]];right:Option[Tree[T]];} fun main()->Integer{var x = Tree{value:5,left:none,right:none}; return 5;}";
+    std::string text = "struct Tree[T]{value:T;} fun main()->Integer{var x = Tree[Integer]{value:7}; return 7;}";
     ASSERT_OK(text);
 }
 
 TEST(second_pass_test, template_struct_instantiate_more_than_one) {
-    std::string text = "struct Tree[T,U]{t:T;u:U;} fun main()->Integer{var x = Tree{t:5,u:\"Hello\"}; return 5;}";
+    std::string text = "struct Tree[T,U]{t:T;u:U;} fun main()->Integer{var x = Tree[Integer,String]{t:5,u:\"Hello\"}; return 5;}";
     ASSERT_OK(text);
 }
 

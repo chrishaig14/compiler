@@ -21,6 +21,7 @@ void compile_and_run(std::string text) {
     GlobalProcessor gp(builtins);
     gp.visit(*program);
     Checker checker(gp.globals, gp.class_table);
+    checker.function_table = gp.function_table;
     checker.visit(*program);
     Translator translator;
     program->accept(translator);

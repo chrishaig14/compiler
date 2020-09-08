@@ -2,6 +2,7 @@
 // Created by chris on 28/6/20.
 //
 
+#include <iostream>
 #include "GlobalProcessor.h"
 #include "ClassInfo.h"
 #include "../vm/Object.h"
@@ -11,6 +12,8 @@ void GlobalProcessor::add_builtin(std::string name, FunctionTypeNode* ftype) {
 }
 
 GlobalProcessor::GlobalProcessor(std::map<std::string, CodeBuiltin*> builtins) {
+    this->function_table = new FunctionTable();
+
     this->globals = new SymbolTable("global", nullptr);
     this->class_table = new ClassTable();
     for (auto b: builtins) {
@@ -24,7 +27,6 @@ GlobalProcessor::GlobalProcessor(std::map<std::string, CodeBuiltin*> builtins) {
 }
 
 GlobalProcessor::GlobalProcessor() : GlobalProcessor(std::map<std::string, CodeBuiltin*>({})) {
-
 }
 
 void GlobalProcessor::visit(AssignmentNode& node) {
@@ -92,13 +94,13 @@ void GlobalProcessor::visit(StructNode& node) {
 
 void GlobalProcessor::visit(FunctionNode& node) {
     FunctionTypeNode* function_info = new FunctionTypeNode(node.parameter_types, node.return_type);
-    std::string params;
-    for (auto p:node.parameter_types) {
-        params += p->to_string() + ".";
-    }
-    params = params.substr(0, params.size() - 1);
-    std::string new_name = node.identifier + ":" + params;
-    this->globals->set(new_name, function_info);
+//    std::string params;
+//    for (auto p:node.parameter_types) {
+//        params += p->to_string() + ".";
+//    }
+//    params = params.substr(0, params.size() - 1);
+//    std::string new_name = node.identifier + ":" + params;
+    this->function_table->add(node.identifier, function_info);
 }
 
 void GlobalProcessor::visit(VectorOfNodes program) {
@@ -150,4 +152,33 @@ void GlobalProcessor::visit(EmptyListNode& node) {
 }
 
 
+FunctionTypeNode* FunctionTable::get_simple_function(std::string function_name) {
+    if (this->is_overloaded(function_name)) {
+        throw std::runtime_error("Function " + function_name + " is not simple!");
+    }
+    return (*functions[function_name])[0];
+}
 
+std::vector<FunctionTypeNode*>* FunctionTable::get_overloads(std::string function_name) {
+    return this->functions[function_name];
+}
+
+bool FunctionTable::function_exists(std::string function_name) {
+    return this->functions.count(function_name) == 1;
+}
+
+bool FunctionTable::is_overloaded(std::string function_name) {
+    if (!function_exists(function_name)) throw std::runtime_error("Function '" + function_name + "' doesnt exist!");
+    return functions[function_name]->size() > 1;
+}
+
+void FunctionTable::add(std::string function_name, FunctionTypeNode* function_type) {
+    if (functions.count(function_name) == 0) {
+        functions[function_name] = new std::vector<FunctionTypeNode*>();
+    }
+    functions[function_name]->push_back(function_type);
+}
+
+FunctionTable::FunctionTable() {
+    this->foo = "Pepito";
+}

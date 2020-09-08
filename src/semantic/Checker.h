@@ -98,6 +98,10 @@ public:
     bool can_assign_generic(TypeNode* from, TypeNode* to, std::vector<std::string> type_params);
 
     TypeNode* make_type(TypeNode* original, std::map<std::string, TypeNode*>& replacements);
+
+    ClassInfo* instantiate_generic(ClassInfo* generic, ObjectTypeNode* instance);
+
+    FunctionTable* function_table;
 };
 
 #endif //UNTITLED1_CHECKER_H
