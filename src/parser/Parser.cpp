@@ -537,10 +537,13 @@ StructNode* Parser::parse_struct_definition() {
 }
 
 BlockNode* Parser::parse_possibly_empty_block() {
-    this->expect_token(TokenType::LCURLY);
+    Token st = this->expect_token(TokenType::LCURLY);
+    int start = st.start;
+    int end = -1;
     VectorOfNodes block;
     while (true) {
         if (this->match(TokenType::RCURLY)) {
+            end = this->token.end;
             this->next();
             break;
         }
@@ -548,6 +551,8 @@ BlockNode* Parser::parse_possibly_empty_block() {
         block.push_back(statement);
     }
     BlockNode* rv = new BlockNode(block);
+    rv->start = start;
+    rv->end = end;
     return rv;
 }
 
