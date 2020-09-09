@@ -213,7 +213,11 @@ Node* Parser::parse_mul_or_div_expression() {
 }
 
 Node* Parser::parse_factor() {
-    Node* parent = this->parse_id_or_literal();
+    Node* parent = nullptr;
+    if (this->match(TokenType::HASH)) {
+        this->next();
+        parent = this->parse_class_literal();
+    } else { parent = this->parse_id_or_literal(); }
     parent = this->parse_call_or_subscript_chain(parent);
     while (this->match(TokenType::DOT)) {
         this->next();
@@ -281,97 +285,74 @@ Node* Parser::parse_id_or_literal() {
     return node;
 }
 
+bool may_be_a_type(Node* node) {
+    SubscriptNode* subs = dynamic_cast<SubscriptNode*>(node);
+    if (subs == nullptr) {
+        IdNode* idn = dynamic_cast<IdNode*>(node);
+        return idn != nullptr;
+    } else {
+        if (may_be_a_type(subs->parent)) {
+            for (int i = 0; i < subs->child.size(); i++) {
+                if (!may_be_a_type(subs->child[i]))return false;
+            }
+            return true;
+        }
+        return false;
+    }
+}
+
+std::map<std::string, Node*> Parser::parse_initializers() {
+    std::map<std::string, Node*> init;
+    while (true) {
+        Token field_id = this->expect_token(TokenType::ID);
+        this->expect_token(TokenType::COLON);
+        Node* exp = this->parse_expression();
+        init[field_id.str] = exp;
+        if (!this->match(TokenType::COMMA)) {
+            break;
+        }
+    }
+    return init;
+}
+
+ObjectTypeNode* convert_to_type(Node* node) {
+    SubscriptNode* sub = dynamic_cast<SubscriptNode*>(node);
+    if (sub == nullptr) {
+        IdNode* idn = dynamic_cast<IdNode*>(node);
+        VectorOfTypes t;
+        return new ObjectTypeNode(idn->identifier, t);
+    }
+    IdNode* idn = dynamic_cast<IdNode*>(sub->parent);
+    std::string type_id = idn->identifier;
+    VectorOfTypes type_params;
+    for (int i = 0; i < sub->child.size(); i++) {
+        type_params.push_back(convert_to_type(sub->child[i]));
+    }
+    ObjectTypeNode* type = new ObjectTypeNode(type_id, type_params);
+    return type;
+}
+
+Node* Parser::parse_class_literal() {
+    TypeNode* type = this->parse_type_node();
+    ObjectTypeNode* literal_type = dynamic_cast<ObjectTypeNode*>(type);
+    if (literal_type == nullptr) {
+        throw std::runtime_error("Expecterd a type to initialize!");
+    }
+    Node* node = nullptr;
+    this->expect_token(TokenType::LCURLY);
+    std::map<std::string, Node*> initializers;
+    if (!this->match(TokenType::RCURLY)) {
+        initializers = this->parse_initializers();
+    }
+    this->expect_token(TokenType::RCURLY);
+    return new ClassLiteralFieldNode(literal_type, initializers);
+}
+
 Node* Parser::parse_id_or_class_literal() {
     Node* node = nullptr;
     std::string identifier = this->token.str;
-    int start = this->token.start;
-    int end = this->token.end;
     this->next();
-    bool is_struct_literal = false;
-    ObjectTypeNode* literal_type = nullptr;
-    if (this->match(TokenType::LSQUARE)) {
-        this->next();
-        VectorOfTypes type_params;
-        while (true) {
-            TypeNode* type = this->parse_type_node();
-            type_params.push_back(type);
-            if (this->match(TokenType::COMMA)) {
-                this->next();
-            } else {
-                break;
-            }
-        }
-        this->expect_token(TokenType::RSQUARE);
-        is_struct_literal = true;
-        literal_type = new ObjectTypeNode(identifier, type_params);
-    }
-    if (is_struct_literal) {
-        this->expect_token(TokenType::LCURLY);
-    } else {
-        if (this->match(TokenType::LCURLY)) {
-            this->next();
-            is_struct_literal = true;
-            literal_type = new ObjectTypeNode(identifier, {});
-        }
-    }
-    if (is_struct_literal) {
-        std::map<std::string, Node*> initializers;
-        if (!this->match(TokenType::RCURLY)) {
-//            this->next();
-            Node* expression = this->parse_expression();
-            IdNode* id_ptr = dynamic_cast<IdNode*>(expression);
-            bool is_expression_initializer = true;
-            if (id_ptr != nullptr) {
-//                        it may be an expression or if a colon follows the name of a field
-                is_expression_initializer = !this->match(TokenType::COLON);
-            }
-            if (is_expression_initializer) {
-// its an expression
-                std::vector<Node*> initializers;
-                initializers.push_back(expression);
-                if (!this->match(TokenType::RCURLY)) {
-                    this->expect_token(TokenType::COMMA);
-                    while (true) {
-                        expression = this->parse_expression();
-                        initializers.push_back(expression);
-                        if (this->match(TokenType::COMMA)) {
-                            this->next();
-                        } else {
-                            break;
-                        }
-                    }
-
-                }
-                this->expect_token(TokenType::RCURLY);
-                node = new ClassLiteralExpressionNode(literal_type, initializers);
-            } else {
-                std::string field_id = id_ptr->identifier;
-                std::map<std::string, Node*> initializers;
-                while (true) {
-                    this->expect_token(TokenType::COLON);
-                    expression = this->parse_expression();
-                    initializers[field_id] = expression;
-                    if (this->match(TokenType::COMMA)) {
-                        this->next();
-                        Token field = this->expect_token(TokenType::ID);
-                        field_id = field.str;
-                    } else {
-                        break;
-                    }
-                }
-                this->expect_token(TokenType::RCURLY);
-                node = new ClassLiteralFieldNode(literal_type, initializers);
-            }
-        } else {
-            this->next();
-            node = new ClassLiteralExpressionNode(literal_type, {});
-        }
-
-    } else {
-        node = new IdNode(identifier);
-    }
-    node->start = start;
-    node->end = end;
+    node = new IdNode(identifier);
     return node;
 }
 

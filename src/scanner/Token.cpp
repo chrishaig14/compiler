@@ -62,6 +62,7 @@ void initialize_token_strings() {
     TOKEN_STRINGS[TokenType::DOT] = "dot ( . )";
     TOKEN_STRINGS[TokenType::SEMICOLON] = "semicolon ( ; )";
     TOKEN_STRINGS[TokenType::COLON] = "colon ( : )";
+    TOKEN_STRINGS[TokenType::HASH] = "hash ( # )";
     TOKEN_STRINGS[TokenType::EQQ] = "equal ( = )";
     TOKEN_STRINGS[TokenType::PLUS_EQQ] = "plus equal ( += )";
     TOKEN_STRINGS[TokenType::MINUS_EQQ] = "minus equal ( -= )";

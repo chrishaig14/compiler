@@ -23,6 +23,8 @@ public:
 
     bool match(TokenType type);
 
+    Node* parse_class_literal();
+
     void next();
 
     StructNode* parse_struct_definition();
@@ -77,7 +79,7 @@ public:
 
     ForNode* parse_for_loop();
 
-    WhileNode* parse_while_loop(){
+    WhileNode* parse_while_loop() {
         this->expect_token(TokenType::WHILE);
         this->expect_token(TokenType::LPAREN);
         Node* condition = this->parse_expression();
@@ -87,6 +89,8 @@ public:
     }
 
     Node* parse_ternary();
+
+    std::map<std::string, Node*> parse_initializers();
 };
 
 
