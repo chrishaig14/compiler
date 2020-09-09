@@ -308,7 +308,9 @@ std::map<std::string, Node*> Parser::parse_initializers() {
         this->expect_token(TokenType::COLON);
         Node* exp = this->parse_expression();
         init[field_id.str] = exp;
-        if (!this->match(TokenType::COMMA)) {
+        if (this->match(TokenType::COMMA)) {
+            this->next();
+        } else {
             break;
         }
     }

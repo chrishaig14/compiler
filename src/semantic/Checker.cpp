@@ -265,12 +265,13 @@ void Checker::visit(CallNode& n) {
         FunctionTypeNode* function = this->function_table->get_simple_function(func_name);
 
         std::map<std::string, TypeNode*> replace;
-
+        bool is_generic = false;
         for (int i = 0; i < args.size(); i++) {
             auto pt = function->parameter_types[i];
             ObjectTypeNode* ptt = dynamic_cast<ObjectTypeNode*>(pt);
             if (ptt == nullptr) throw std::runtime_error("ASDFASDF");
             if (ptt->identifier.size() == 1 && islower(ptt->identifier[0])) {
+                is_generic = true;
                 // is generic type
                 if (replace.count(ptt->identifier) == 0) {
                     // new replacement
@@ -291,8 +292,11 @@ void Checker::visit(CallNode& n) {
 
         ObjectTypeNode* otn = dynamic_cast<ObjectTypeNode*>(function->return_type);
         if (otn == nullptr) { throw std::runtime_error("not an objectypenode"); };
-
-        semantic_info.symbol_info = replace[otn->identifier];
+        if (is_generic) {
+            semantic_info.symbol_info = replace[otn->identifier];
+        } else {
+            semantic_info.symbol_info = otn;
+        }
     }
 
 //    SemanticInfo semantic_info;
