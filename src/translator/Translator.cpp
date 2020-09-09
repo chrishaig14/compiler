@@ -182,7 +182,7 @@ void Translator::visit(SubscriptNode& node) {
     if (this->is_lvalue) {
         this->is_lvalue = false;
 
-        node.child->accept(*this);
+//        node.child->accept(*this);
         CodeLabel child_code = this->code;
         out.insert(out.end(), child_code.begin(), child_code.end());
 
@@ -192,7 +192,7 @@ void Translator::visit(SubscriptNode& node) {
 
         out.push_back(LC("", I_SETS));
     } else {
-        node.child->accept(*this);
+//        node.child->accept(*this);
         CodeLabel child_code = this->code;
         out.insert(out.end(), child_code.begin(), child_code.end());
 

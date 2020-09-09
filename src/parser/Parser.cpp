@@ -394,7 +394,7 @@ Node* Parser::parse_call_or_subscript_chain(Node* parent) {
                 throw std::runtime_error("Empty subscript error!");
             }
             Node* value = this->parse_expression();
-            node = new SubscriptNode(node, value);
+            node = new SubscriptNode(node, {value});
             this->expect_token(TokenType::RSQUARE);
         }
     }

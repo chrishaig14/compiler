@@ -604,7 +604,7 @@ void Checker::visit(StringNode& node) {
 void Checker::visit(SubscriptNode& node) {
     node.parent->accept(*this);
     SemanticInfo parent = this->rv;
-    node.child->accept(*this);
+//    node.child->accept(*this);
     SemanticInfo child = this->rv;
     ObjectTypeNode* object_type = dynamic_cast<ObjectTypeNode*>(parent.symbol_info);
     if (object_type == nullptr) { throw std::runtime_error("Accessing subscript of non object!"); }

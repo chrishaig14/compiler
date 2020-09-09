@@ -231,7 +231,7 @@ void Formatter::visit(StructNode& node) {
 void Formatter::visit(SubscriptNode& node) {
     node.parent->accept(*this);
     std::string parent = this->output;
-    node.child->accept(*this);
+//    node.child->accept(*this);
     std::string child = this->output;
     this->output = parent + "[" + child + "]";
 }
