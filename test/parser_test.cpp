@@ -336,22 +336,22 @@ TEST(parser_test, function_with_params_and_body) {
 }
 
 TEST(parser_test, class_literal_exp) {
-    std::string text = "Person{name, 27*32}";
+    std::string text = "#Person{name, 27*32}";
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
-    Node* node = parser.parse_id_or_class_literal();
+    Node* node = parser.parse_factor();
     std::vector<Node*> init = {ID("name"), BIN(OpType::MUL, NUM(27), NUM(32))};
     auto expected_node = LIT_EXP(OBJECT_TYPE("Person", {}), init);
     COMPLETE_TEST;
 }
 
 TEST(parser_test, class_literal_fil) {
-    std::string text = "Person{name: name, age: 27*32}";
+    std::string text = "#Person{name: name, age: 27*32}";
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
-    Node* node = parser.parse_id_or_class_literal();
+    Node* node = parser.parse_factor();
     std::map<std::string, Node*> init = {{"name", ID("name")},
                                          {"age",  BIN(OpType::MUL, NUM(27), NUM(32))}};
     auto expected_node = LIT_FIL(OBJECT_TYPE("Person", {}), init);
@@ -359,11 +359,11 @@ TEST(parser_test, class_literal_fil) {
 }
 
 TEST(parser_test, class_literal_empty_ok) {
-    std::string text = "Person{}";
+    std::string text = "#Person{}";
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
-    Node* node = parser.parse_id_or_class_literal();
+    Node* node = parser.parse_factor();
     std::vector<Node*> init = {};
     auto expected_node = LIT_EXP(OBJECT_TYPE("Person", {}), init);
     COMPLETE_TEST;
@@ -375,7 +375,7 @@ TEST(parser_test, class_literal_error_1) {
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
     try {
-        Node* node = parser.parse_id_or_class_literal();
+        Node* node = parser.parse_factor();
         FAIL() << "Didn't throw UnexpectedToken";
     } catch (const UnexpectedToken& e) {
 
@@ -433,7 +433,7 @@ TEST(parser_test, class_foo_with_fields) {
 }
 
 TEST(parser_test, struct_literal_with_names) {
-    std::string text = "Foo{ x: 27, y: 9}";
+    std::string text = "#Foo{ x: 27, y: 9}";
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
@@ -446,7 +446,7 @@ TEST(parser_test, struct_literal_with_names) {
 }
 
 TEST(parser_test, struct_literal_without_names) {
-    std::string text = "Foo{9,27}";
+    std::string text = "#Foo{9,27}";
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
@@ -527,7 +527,7 @@ TEST(parser_test, simple_subscript) {
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
     Node* node = parser.parse_expression();
-    Node* expected_node = SUB(ID("a"), {NUM(1)});
+    Node* expected_node = SUB(ID("a"), { NUM(1) });
     COMPLETE_TEST;
 }
 
@@ -569,7 +569,7 @@ TEST(parser_test, test_now_2) {
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
     Node* node = parser.parse_expression();
-    Node* expected_node = SUB(ID("x"), {NUM(7)});
+    Node* expected_node = SUB(ID("x"), { NUM(7) });
     COMPLETE_TEST;
 }
 
@@ -579,7 +579,7 @@ TEST(parser_test, test_now_3_should_fail) {
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
     Node* node = parser.parse_expression();
-    Node* expected_node = SUB(ID("x"), {NUM(7)});
+    Node* expected_node = SUB(ID("x"), { NUM(7) });
     COMPLETE_TEST;
 }
 
@@ -600,11 +600,12 @@ TEST(parser_test, test_now_4) {
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
-    Node* node = parser.parse_expression();
-    std::map<std::string, Node*> fields;
-    fields["v"] = NUM(7);
-    Node* expected_node = LIT_FIL(TYPE("x", {TYPE("y", {})}), fields);
-    COMPLETE_TEST;
+    try {
+        parser.parse_expression();
+        FAIL() << "Expected exception!";
+    } catch (const UnexpectedToken& e) {
+
+    }
 }
 
 TEST(parser_test, test_now_8) {
@@ -623,11 +624,12 @@ TEST(parser_test, test_now_5) {
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
-    Node* node = parser.parse_expression();
-    std::map<std::string, Node*> fields;
-    fields["v"] = NUM(7);
-    Node* expected_node = LIT_FIL(TYPE("x", {TYPE("y", {})}), fields);
-    COMPLETE_TEST;
+    try {
+        parser.parse_expression();
+        FAIL() << "Expected exception!";
+    } catch (const UnexpectedToken& e) {
+
+    }
 }
 
 TEST(parser_test, plus_parenthesized_expression) {
@@ -946,13 +948,13 @@ TEST(parser_test, complex_chain) {
                                                                                             SUB(
                                                                                                     SUB(
                                                                                                             ID("a"),
-            {NUM(1)}),
-            {ID("b")}),
+                                                                                                            {NUM(1)}),
+                                                                                                    {ID("b")}),
                                                                                             "c"),
                                                                                     std::vector<Node*>({NUM(1), MEM(
                                                                                             SUB(SUB(
                                                                                                     ID("d"),
-            {NUM(5)}),
+                                                                                                    {NUM(5)}),
                                                                                                 {NUM(0)}),
                                                                                             "e")})), "f"), "g"),
                                                             {ID("h")}),

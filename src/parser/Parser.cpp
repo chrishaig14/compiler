@@ -335,6 +335,7 @@ ObjectTypeNode* convert_to_type(Node* node) {
 }
 
 Node* Parser::parse_class_literal() {
+
     TypeNode* type = this->parse_type_node();
     ObjectTypeNode* literal_type = dynamic_cast<ObjectTypeNode*>(type);
     if (literal_type == nullptr) {
@@ -353,8 +354,12 @@ Node* Parser::parse_class_literal() {
 Node* Parser::parse_id_or_class_literal() {
     Node* node = nullptr;
     std::string identifier = this->token.str;
+    int start = this->token.start;
+    int end = this->token.end;
     this->next();
     node = new IdNode(identifier);
+    node->start = start;
+    node->end = end;
     return node;
 }
 

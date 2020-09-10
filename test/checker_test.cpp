@@ -74,6 +74,14 @@ void ASSERT_THROWS_BAD_ARGUMENTS(std::string text) {
 
 void ASSERT_OK(std::string text) { compile(text); }
 
+void ASSERT_FAILS(std::string text) {
+    try {
+        compile(text);
+        FAIL() << "Expected exception!";
+    } catch (...) {}
+}
+
+
 void ASSERT_VARIABLE_TYPE(std::string text, std::string id, TypeNode* type) {
     BlockNode* tree = get_ast(text);
     GlobalProcessor gp;
@@ -148,17 +156,7 @@ TEST(second_pass_test, free_variable_test_3) {
 
 TEST(second_pass_test, free_variable_test_4) {
     std::string text = "var x: Integer=0; fun foo(y: Foo)->Integer{if(y == 3){var z: Integer = 1 + y;}}";
-    BlockNode* tree = get_ast(text);
-    GlobalProcessor gp;
-    gp.visit(*tree);
-    Checker checker(gp.globals, gp.class_table);
-    checker.visit(*tree);
-    EXPECT_TRUE(checker.scopes["global"]->has("x"));
-    SymbolTable* foo_scope = checker.scopes["global.foo"];
-    auto sinfo = dynamic_cast<ObjectTypeNode*>(foo_scope->get("y"));
-    EXPECT_NE(sinfo, nullptr);
-    EXPECT_TRUE(((FunctionNode*) tree->nodes[1])->free_variables.size() == 0);
-    EXPECT_EQ(sinfo->identifier, "Foo");
+    ASSERT_FAILS(text);
 }
 
 TEST(second_pass_test, tee) {
@@ -226,20 +224,14 @@ TEST(second_pass_test, option_assign_none) {
 
 TEST(second_pass_test, assign_none_to_none_option) {
     std::string text = "var x : Integer = none;";
-    BlockNode* tree = get_ast(text);
-    GlobalProcessor gp;
-    gp.visit(*tree);
-    Checker checker(gp.globals, gp.class_table);
-    checker.visit(*tree);
+    ASSERT_THROWS_ASSIGNMENT_ERROR(text, T_INT, TYPE("NoneType", {}));
 }
 
 TEST(second_pass_test, assign_none_to_union) {
     std::string text = "var x : Union[Integer, String] = none;";
-    BlockNode* tree = get_ast(text);
-    GlobalProcessor gp;
-    gp.visit(*tree);
-    Checker checker(gp.globals, gp.class_table);
-    checker.visit(*tree);
+    VectorOfTypes o = {T_INT, T_STRING};
+    auto ut = TYPE("Union", o);
+    ASSERT_THROWS_ASSIGNMENT_ERROR(text, ut, TYPE("NoneType", {}));
 }
 
 TEST(second_pass_test, assign_none_to_union_ok) {
@@ -276,23 +268,12 @@ TEST(second_pass_test, union_type_ok_2) {
 
 TEST(second_pass_test, union_type_error) {
     std::string text = "var x : Union[Integer, String] = false;";
-    BlockNode* tree = get_ast(text);
-    GlobalProcessor gp;
-    gp.visit(*tree);
-    Checker checker(gp.globals, gp.class_table);
-    checker.visit(*tree);
-    EXPECT_TRUE(checker.scopes["global"]->declared("x"));
-    EXPECT_TRUE(checker.scopes["global"]->get("x")->equal(new ObjectTypeNode("Union", {T_INT, T_STRING})));
+    ASSERT_FAILS(text);
 }
 
 TEST(second_pass_test, option_type_error) {
     std::string text = "var x : Option[Integer] = \"Hello\";";
-    BlockNode* tree = get_ast(text);
-    GlobalProcessor gp;
-    gp.visit(*tree);
-    Checker checker(gp.globals, gp.class_table);
-    checker.visit(*tree);
-    EXPECT_TRUE(checker.scopes["global"]->declared("x"));
+    ASSERT_FAILS(text);
 }
 
 TEST(second_pass_test, ternary_test_1) {
@@ -308,24 +289,12 @@ TEST(second_pass_test, ternary_test_1) {
 
 TEST(second_pass_test, ternary_test_union_1) {
     std::string text = "var x : Option[Integer] = 2;var z=x?\"ok\":3;";
-    BlockNode* tree = get_ast(text);
-    GlobalProcessor gp;
-    gp.visit(*tree);
-    Checker checker(gp.globals, gp.class_table);
-    checker.visit(*tree);
-    EXPECT_TRUE(checker.scopes["global"]->declared("x"));
-    EXPECT_TRUE(checker.scopes["global"]->get("z")->equal(new ObjectTypeNode("Union", {T_STRING, T_INT})));
+    ASSERT_FAILS(text);
 }
 
 TEST(second_pass_test, ternary_test_union_2) {
     std::string text = "var x : Option[Integer] = 2;var z=x?\"ok\":3;";
-    BlockNode* tree = get_ast(text);
-    GlobalProcessor gp;
-    gp.visit(*tree);
-    Checker checker(gp.globals, gp.class_table);
-    checker.visit(*tree);
-    EXPECT_TRUE(checker.scopes["global"]->declared("x"));
-    EXPECT_TRUE(checker.scopes["global"]->get("z")->equal(new ObjectTypeNode("Union", {T_STRING, T_INT})));
+    ASSERT_FAILS(text);
 }
 
 TEST(second_pass_test, test_list) {
@@ -434,7 +403,7 @@ TEST(second_pass_test, for_4) {
 
 TEST(second_pass_test, while_1) {
     std::string text = "while(5){var x = 7;}";
-    ASSERT_OK(text);
+    ASSERT_FAILS(text);
 }
 
 TEST(second_pass_test, while_2) {
@@ -459,7 +428,7 @@ TEST(second_pass_test, template_struct) {
 
 TEST(second_pass_test, template_struct_type_not_found) {
     std::string text = "struct Tree[T]{value:W;left:Option[Tree[T]];right:Option[Tree[T]];}";
-    ASSERT_OK(text);
+    ASSERT_FAILS(text);
 }
 
 TEST(second_pass_test, template_struct_1) {
@@ -469,7 +438,7 @@ TEST(second_pass_test, template_struct_1) {
 
 TEST(second_pass_test, template_struct_wrong_number_of_args) {
     std::string text = "struct Tree[T]{value:T;left:Option[Tree[Integer, T]];right:Option[Tree[T]];}";
-    ASSERT_OK(text);
+    ASSERT_FAILS(text);
 }
 
 TEST(second_pass_test, template_function_very_simple) {
@@ -484,12 +453,12 @@ TEST(second_pass_test, template_function_return_second_same_type) {
 
 TEST(second_pass_test, template_function_return_second_same_type_error) {
     std::string text = "fun second(x:t,y:t)->t{return y;} fun main()->Integer{var x = second(7,\"Hello\");return 0;}";
-    ASSERT_OK(text);
+    ASSERT_FAILS(text);
 }
 
 TEST(second_pass_test, template_function_return_second_diff_generic) {
     std::string text = "fun second(x:t,y:u)->u{return y;} fun main()->Integer{var x = second(7,\"Hello\");return x;}";
-    ASSERT_OK(text);
+    ASSERT_FAILS(text);
 }
 
 TEST(second_pass_test, function_overload) {
@@ -504,12 +473,12 @@ TEST(second_pass_test, template_function_return_type_ok) {
 
 TEST(second_pass_test, template_function_bad_return_type_2) {
     std::string text = "fun second(x:t)->Integer{return x;} fun main()->Integer{return 0;}";
-    ASSERT_OK(text);
+    ASSERT_FAILS(text);
 }
 
 TEST(second_pass_test, template_function_bad_return_type_3) {
     std::string text = "fun second(x:t)->t{return 2;} fun main()->Integer{return 0;}";
-    ASSERT_OK(text);
+    ASSERT_FAILS(text);
 }
 
 
@@ -535,7 +504,7 @@ TEST(second_pass_test, template_struct_instantiate_more_than_4) {
 
 TEST(second_pass_test, template_struct_instantiate_more_than_5) {
     std::string text = "struct Tree[T,U]{t:T;u:U;v:T;} fun main()->Integer{var x = #Tree[Integer,String]{t:5,u:\"Hello\",v:\"World\"}; return 5;}";
-    ASSERT_OK(text);
+    ASSERT_FAILS(text);
 }
 
 TEST(second_pass_test, template_struct_tree) {
