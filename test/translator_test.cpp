@@ -8,7 +8,6 @@
 #include <vm/LabelledCode.h>
 
 
-
 TEST(translator_test, test_declaration_with_expression) {
     Translator translator;
     Node* node = DECL("x", nullptr, BIN(OpType::ADD, NUM(5), NUM(7)));
@@ -101,7 +100,7 @@ TEST(translator_test, test_if) {
 TEST(translator_test, test_class_literal_fields) {
     Translator translator;
     Node* node = new ClassLiteralFieldNode(OBJECT_TYPE("Foo", {}), {{"foo", BIN(OpType::MUL, NUM(7), ID("a"))},
-                                                   {"bar", NUM(65)}});
+                                                                    {"bar", NUM(65)}});
     node->accept(translator);
     std::vector<std::string> fields = {"foo", "bar"};
     CodeLabel expected_code = {NL(I_PUSHI(7)), NL(I_GET("a")), NL(I_BIN(OpType::MUL)), NL(I_PUSHI(65)),

@@ -29,7 +29,8 @@ public:
     Environment* env;
     std::map<std::string, std::vector<std::string>> classes;
 
-    CodeRunner(const Code& code, std::map<std::string, std::map<std::string, Code>>& structs, ObjectStack& stack, Environment* global_env);
+    CodeRunner(const Code& code, std::map<std::string, std::map<std::string, Code>>& structs, ObjectStack& stack,
+               Environment* global_env);
 
     void run();
 

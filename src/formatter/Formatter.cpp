@@ -113,7 +113,7 @@ void Formatter::visit(ClassLiteralFieldNode& node) {
         f.second->accept(*this);
         fields += f.first + ":" + this->output + ", ";
     }
-    fields = fields.substr(0, fields.size()-2);
+    fields = fields.substr(0, fields.size() - 2);
     this->indent_level = ind;
     this->output = this->indentation() + node.type->to_string() + "{" + fields + "}";
 }
@@ -145,10 +145,10 @@ void Formatter::visit(FunctionNode& node) {
         std::string parameter_type = node.parameter_types[i]->to_string();
         parameters += parameter_name + " : " + parameter_type + ", ";
     }
-    parameters = parameters.substr(0, parameters.size()-2);
+    parameters = parameters.substr(0, parameters.size() - 2);
     std::string return_type = node.return_type->to_string();
     this->indent_level++;
-    std::cerr <<  "formatting body of function at indent level " << this->indent_level << std::endl;
+    std::cerr << "formatting body of function at indent level " << this->indent_level << std::endl;
     node.body->accept(*this);
     this->indent_level--;
     std::string body = this->output;
@@ -185,7 +185,7 @@ void Formatter::visit(ListNode& node) {
         std::string element_str = this->output;
         elements += element_str + ", ";
     }
-    elements = elements.substr(0,elements.size()-2);
+    elements = elements.substr(0, elements.size() - 2);
     this->output = "[" + elements + "]";
 }
 
@@ -221,11 +221,11 @@ void Formatter::visit(StructNode& node) {
         fields += "    " + field.first + ": " + field_type + ";\n";
     }
     std::string p;
-    for(auto t: node.template_parameters){
-        p+=t+",";
+    for (auto t: node.template_parameters) {
+        p += t + ",";
     }
-    p = p.substr(0,p.size()-1);
-    this->output = "struct " + node.identifier+"["+p+"]" + "{ \n" + fields + "}\n";
+    p = p.substr(0, p.size() - 1);
+    this->output = "struct " + node.identifier + "[" + p + "]" + "{ \n" + fields + "}\n";
 }
 
 void Formatter::visit(SubscriptNode& node) {
@@ -244,7 +244,7 @@ void Formatter::visit(WhileNode& node) {
     node.condition->accept(*this);
     std::string condition = this->output;
     this->indent_level++;
-    std::cerr <<  "formatting body of while at indent level" << this->indent_level << std::endl;
+    std::cerr << "formatting body of while at indent level" << this->indent_level << std::endl;
     node.body->accept(*this);
     this->indent_level--;
     std::string body = this->output;

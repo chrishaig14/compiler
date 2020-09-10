@@ -8,7 +8,7 @@
 
 #include "Instruction.h"
 
-class EnterScope : public Instruction{
+class EnterScope : public Instruction {
 public:
     std::string name;
 

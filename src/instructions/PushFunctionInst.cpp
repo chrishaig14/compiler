@@ -6,8 +6,8 @@
 
 PushFunctionInst::PushFunctionInst(const std::vector<std::string>& parameterNames, const Code& body,
                                    const std::vector<std::string>& freeVariables) : parameter_names(parameterNames),
-                                                                                      body(body),
-                                                                                      free_variables(freeVariables) {}
+                                                                                    body(body),
+                                                                                    free_variables(freeVariables) {}
 
 void PushFunctionInst::accept(InstructionVisitor& visitor) {
     visitor.visit(*this);

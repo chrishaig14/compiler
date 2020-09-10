@@ -25,7 +25,7 @@ TEST(total_test, test_1) {
     Translator translator;
     program->accept(translator);
     CodeLabel translated_code = translator.code;
-    Loader loader(translated_code,{});
+    Loader loader(translated_code, {});
     loader.load();
     Environment* global_env = loader.global_env;
     ObjectStack stack;
@@ -51,7 +51,7 @@ TEST(total_test, test_factorial) {
     ObjectStack stack;
     StructProtos structs;
     CodeLabel translated_code = translator.code;
-    Loader loader(translated_code,{});
+    Loader loader(translated_code, {});
     loader.load();
     Environment* global_env = loader.global_env;
     CodeObject* main_function = dynamic_cast<CodeObject*>(global_env->get("main"));
@@ -75,7 +75,7 @@ TEST(total_test, test_factorial_while_main) {
     ObjectStack stack;
     StructProtos structs;
     CodeLabel translated_code = translator.code;
-    Loader loader(translated_code,{});
+    Loader loader(translated_code, {});
     loader.load();
     Environment* global_env = loader.global_env;
     CodeObject* main_function = dynamic_cast<CodeObject*>(global_env->get("main"));
@@ -99,7 +99,7 @@ TEST(total_test, test_factorial_while_function) {
     ObjectStack stack;
     StructProtos structs;
     CodeLabel translated_code = translator.code;
-    Loader loader(translated_code,{});
+    Loader loader(translated_code, {});
     loader.load();
     Environment* global_env = loader.global_env;
     CodeObject* main_function = dynamic_cast<CodeObject*>(global_env->get("main"));
@@ -123,7 +123,7 @@ TEST(total_test, test_struct) {
     ObjectStack stack;
     StructProtos structs;
     CodeLabel translated_code = translator.code;
-    Loader loader(translated_code,{});
+    Loader loader(translated_code, {});
     loader.load();
     Environment* global_env = loader.global_env;
     CodeObject* main_function = dynamic_cast<CodeObject*>(global_env->get("main"));
@@ -150,7 +150,7 @@ TEST(total_test, test_list) {
     ObjectStack stack;
     StructProtos structs;
     CodeLabel translated_code = translator.code;
-    Loader loader(translated_code,{});
+    Loader loader(translated_code, {});
     loader.load();
     Environment* global_env = loader.global_env;
     CodeObject* main_function = dynamic_cast<CodeObject*>(global_env->get("main"));
@@ -174,7 +174,7 @@ TEST(total_test, object_reference) {
     ObjectStack stack;
     StructProtos structs;
     CodeLabel translated_code = translator.code;
-    Loader loader(translated_code,{});
+    Loader loader(translated_code, {});
     loader.load();
     Environment* global_env = loader.global_env;
     CodeObject* main_function = dynamic_cast<CodeObject*>(global_env->get("main"));
@@ -198,7 +198,7 @@ TEST(total_test, object_reference_2) {
     ObjectStack stack;
     StructProtos structs;
     CodeLabel translated_code = translator.code;
-    Loader loader(translated_code,{});
+    Loader loader(translated_code, {});
     loader.load();
     Environment* global_env = loader.global_env;
     CodeObject* main_function = dynamic_cast<CodeObject*>(global_env->get("main"));
@@ -248,13 +248,13 @@ TEST(total_test, test_optional_2) {
     ObjectStack stack;
     StructProtos structs;
     CodeLabel translated_code = translator.code;
-    std::cerr <<  translated_code << std::endl;
+    std::cerr << translated_code << std::endl;
     Loader loader(translated_code, {});
     loader.load();
     Environment* global_env = loader.global_env;
     CodeObject* main_function = dynamic_cast<CodeObject*>(global_env->get("main"));
     for (int i = 0; i < main_function->user->code.size(); i++) {
-        std::cerr <<  main_function->user->code[i]->to_string() << std::endl;
+        std::cerr << main_function->user->code[i]->to_string() << std::endl;
     }
     CodeRunner code_runner(main_function->user->code, structs, stack, global_env);
     code_runner.run();
@@ -276,13 +276,13 @@ TEST(total_test, test_inorder) {
     ObjectStack stack;
     StructProtos structs;
     CodeLabel translated_code = translator.code;
-    std::cerr <<  translated_code << std::endl;
+    std::cerr << translated_code << std::endl;
     Loader loader(translated_code, {});
     loader.load();
     Environment* global_env = loader.global_env;
     CodeObject* main_function = dynamic_cast<CodeObject*>(global_env->get("main"));
     for (int i = 0; i < main_function->user->code.size(); i++) {
-        std::cerr <<  main_function->user->code[i]->to_string() << std::endl;
+        std::cerr << main_function->user->code[i]->to_string() << std::endl;
     }
     CodeRunner code_runner(main_function->user->code, structs, stack, global_env);
     code_runner.run();
@@ -305,13 +305,13 @@ TEST(total_test, test_print_int) {
     ObjectStack stack;
     StructProtos structs;
     CodeLabel translated_code = translator.code;
-    std::cerr <<  translated_code << std::endl;
+    std::cerr << translated_code << std::endl;
     Loader loader(translated_code, {});
     loader.load();
     Environment* global_env = loader.global_env;
     CodeObject* main_function = dynamic_cast<CodeObject*>(global_env->get("main"));
     for (int i = 0; i < main_function->user->code.size(); i++) {
-        std::cerr <<  main_function->user->code[i]->to_string() << std::endl;
+        std::cerr << main_function->user->code[i]->to_string() << std::endl;
     }
     CodeRunner code_runner(main_function->user->code, structs, stack, global_env);
     code_runner.run();
@@ -334,20 +334,19 @@ TEST(total_test, test_set_list_index) {
     ObjectStack stack;
     StructProtos structs;
     CodeLabel translated_code = translator.code;
-    std::cerr <<  translated_code << std::endl;
+    std::cerr << translated_code << std::endl;
     Loader loader(translated_code, {});
     loader.load();
     Environment* global_env = loader.global_env;
     CodeObject* main_function = dynamic_cast<CodeObject*>(global_env->get("main"));
     for (int i = 0; i < main_function->user->code.size(); i++) {
-        std::cerr <<  main_function->user->code[i]->to_string() << std::endl;
+        std::cerr << main_function->user->code[i]->to_string() << std::endl;
     }
     CodeRunner code_runner(main_function->user->code, structs, stack, global_env);
     code_runner.run();
     EXPECT_TRUE(stack.top()->equal(new IntegerObject(19)));
     EXPECT_FALSE(stack.top()->equal(new IntegerObject(7)));
 }
-
 
 
 TEST(total_test, test_overloading) {
@@ -368,13 +367,13 @@ TEST(total_test, test_overloading) {
     ObjectStack stack;
     StructProtos structs;
     CodeLabel translated_code = translator.code;
-    std::cerr <<  translated_code << std::endl;
+    std::cerr << translated_code << std::endl;
     Loader loader(translated_code, builtins);
     loader.load();
     Environment* global_env = loader.global_env;
     CodeObject* main_function = dynamic_cast<CodeObject*>(global_env->get("main:"));
     for (int i = 0; i < main_function->user->code.size(); i++) {
-        std::cerr <<  main_function->user->code[i]->to_string() << std::endl;
+        std::cerr << main_function->user->code[i]->to_string() << std::endl;
     }
     CodeRunner code_runner(main_function->user->code, structs, stack, global_env);
     code_runner.run();
@@ -400,13 +399,13 @@ TEST(total_test, test_empty_list) {
     ObjectStack stack;
     StructProtos structs;
     CodeLabel translated_code = translator.code;
-    std::cerr <<  translated_code << std::endl;
+    std::cerr << translated_code << std::endl;
     Loader loader(translated_code, builtins);
     loader.load();
     Environment* global_env = loader.global_env;
     CodeObject* main_function = dynamic_cast<CodeObject*>(global_env->get("main:"));
     for (int i = 0; i < main_function->user->code.size(); i++) {
-        std::cerr <<  main_function->user->code[i]->to_string() << std::endl;
+        std::cerr << main_function->user->code[i]->to_string() << std::endl;
     }
     CodeRunner code_runner(main_function->user->code, structs, stack, global_env);
     code_runner.run();

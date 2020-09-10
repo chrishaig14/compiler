@@ -9,5 +9,4 @@
 #include "ObjectInfo.h"
 
 
-
 #endif //UNTITLED1_SYMBOLINFO_H

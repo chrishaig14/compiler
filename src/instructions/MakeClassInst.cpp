@@ -15,7 +15,7 @@ std::string MakeClassInst::to_string() const {
     for (auto f: this->fields) {
         out += f + ",";
     }
-    out = out.substr(0,out.size()-1);
+    out = out.substr(0, out.size() - 1);
     out += ")";
     return out;
 }

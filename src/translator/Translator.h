@@ -34,9 +34,11 @@
 #include "../instructions/JumpInst.h"
 #include "../instructions/EnterScope.h"
 #include "../instructions/LeaveScope.h"
+
 class Translator : public Visitor {
 public:
     int loop_counter;
+
     void visit(AssignmentNode& node) override;
 
     void visit(BinopNode& node) override;

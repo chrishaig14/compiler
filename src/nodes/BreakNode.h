@@ -9,7 +9,7 @@
 #include "Node.h"
 #include "Visitor.h"
 
-class BreakNode : public Node{
+class BreakNode : public Node {
 public:
     void accept(Visitor& visitor) override;
 

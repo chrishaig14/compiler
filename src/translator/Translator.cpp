@@ -305,6 +305,6 @@ void Translator::visit(NoneNode& node) {
 }
 
 void Translator::visit(EmptyListNode& node) {
-    CodeLabel out  = {NL(I_MAKE_LIST(0))};
+    CodeLabel out = {NL(I_MAKE_LIST(0))};
     this->code = out;
 }

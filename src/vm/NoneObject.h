@@ -8,7 +8,7 @@
 
 #include "Object.h"
 
-class NoneObject : public Object{
+class NoneObject : public Object {
 public:
     bool equal(const Object* other) const override;
 

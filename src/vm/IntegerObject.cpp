@@ -12,6 +12,6 @@ IntegerObject::IntegerObject(int value) {
 
 bool IntegerObject::equal(const Object* other) const {
     const IntegerObject* other_ptr = dynamic_cast<const IntegerObject*>(other);
-    if (other_ptr== nullptr) return false;
+    if (other_ptr == nullptr) return false;
     return this->value == other_ptr->value;
 }

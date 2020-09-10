@@ -11,7 +11,7 @@
 class PushBooleanInst : public Instruction {
 public:
 
-    PushBooleanInst(bool boolean){
+    PushBooleanInst(bool boolean) {
         this->boolean = boolean;
     }
 

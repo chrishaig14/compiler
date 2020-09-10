@@ -8,7 +8,7 @@
 
 #include "Instruction.h"
 
-class MakeDefaultInst : public Instruction{
+class MakeDefaultInst : public Instruction {
 public:
     bool equal(const Instruction* inst) const override;
 
@@ -16,7 +16,7 @@ public:
 
     void accept(InstructionVisitor& visitor) override;
 
-    MakeDefaultInst(std::string identifier){
+    MakeDefaultInst(std::string identifier) {
         this->identifier = identifier;
     }
 

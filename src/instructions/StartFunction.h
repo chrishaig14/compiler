@@ -8,7 +8,7 @@
 
 #include "Instruction.h"
 
-class StartFunction: public Instruction {
+class StartFunction : public Instruction {
 public:
     std::string name;
 

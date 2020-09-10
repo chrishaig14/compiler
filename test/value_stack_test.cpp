@@ -13,7 +13,7 @@ TEST(vm_test, stack_push) {
     ObjectStack stack;
     stack.push(value_7);
     Object* a = stack.top();
-    EXPECT_TRUE(a== value_7);
+    EXPECT_TRUE(a == value_7);
     EXPECT_FALSE(stack.empty());
 }
 
@@ -47,10 +47,10 @@ TEST(vm_test, stack_integration) {
     stack.pop(); // 1
     stack.push(value_5); // 1 5
     EXPECT_FALSE(stack.empty());
-    EXPECT_TRUE(stack.top()== value_5);
-    EXPECT_TRUE(stack.pop()== value_5);
+    EXPECT_TRUE(stack.top() == value_5);
+    EXPECT_TRUE(stack.pop() == value_5);
     EXPECT_FALSE(stack.empty());
-    EXPECT_TRUE(stack.top()== value_1);
-    EXPECT_TRUE(stack.pop()== value_1);
+    EXPECT_TRUE(stack.top() == value_1);
+    EXPECT_TRUE(stack.pop() == value_1);
     EXPECT_TRUE(stack.empty());
 }

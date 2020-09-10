@@ -8,7 +8,7 @@
 
 #include "Instruction.h"
 
-class LeaveScope : public Instruction{
+class LeaveScope : public Instruction {
 public:
     std::string name;
 

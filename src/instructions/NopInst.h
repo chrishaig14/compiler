@@ -8,7 +8,7 @@
 
 #include "Instruction.h"
 
-class NopInst : public Instruction{
+class NopInst : public Instruction {
 public:
     bool equal(const Instruction* inst) const override;
 

@@ -20,4 +20,5 @@ public:
 
     friend std::ostream& operator<<(std::ostream& os, const UnexpectedToken& unexpected_token);
 };
+
 #endif //UNTITLED1_UNEXPECTEDTOKEN_H

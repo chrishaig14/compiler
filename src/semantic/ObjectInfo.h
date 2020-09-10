@@ -10,5 +10,4 @@
 #include "../nodes/TypeNode.h"
 
 
-
 #endif //UNTITLED1_OBJECTINFO_H

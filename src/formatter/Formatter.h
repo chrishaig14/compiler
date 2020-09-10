@@ -14,7 +14,7 @@ class Formatter : public Visitor {
     int indent_level = 0;
 
     inline std::string indentation() {
-        return std::string(this->indent_level*4, ' ');
+        return std::string(this->indent_level * 4, ' ');
     }
 
     void visit(AssignmentNode& node) override;
