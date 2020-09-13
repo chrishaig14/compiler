@@ -44,6 +44,18 @@ TEST(first_pass_test, fun_foo_eq) {
     EXPECT_TRUE(*ginfo == FunctionTypeNode({}, T_STRING));
 }
 
+TEST(first_pass_test, fun_overloaded) {
+    std::string text = "fun foo(s: String)->String{return \"Hello\";}fun foo(i: Integer)->Integer{return 17;}";
+    BlockNode* tree = get_tree(text);
+    GlobalProcessor gp;
+    gp.visit(*tree);
+    EXPECT_TRUE(gp.function_table->is_overloaded("foo"));
+    auto overloads = *gp.function_table->get_overloads("foo");
+    EXPECT_EQ(*overloads[0], FunctionTypeNode({T_STRING}, T_STRING));
+    EXPECT_EQ(*overloads[1], FunctionTypeNode({T_INT}, T_INT));
+}
+
+
 TEST(first_pass_test, fun_foo_complete) {
     std::string text = "fun foo(y: Integer, x: String)-> Boolean{}";
     BlockNode* tree = get_tree(text);

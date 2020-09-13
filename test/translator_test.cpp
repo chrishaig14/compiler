@@ -338,3 +338,19 @@ TEST(translator_test, ternary) {
     EXPECT_EQ(translator.code, expected_code)
                         << "GOT:\n----\n" << translator.code << "----\nEXPECTED:\n----\n" << expected_code << "----\n";
 }
+
+TEST(translator_test, overload) {
+//    var s = x ? "one" : "two";
+    Translator translator;
+    auto to_string_string = FUN("to_string.0",{"s"},{T_STRING},T_STRING,new BlockNode({RET(ID("s"))}));
+    auto to_string_integer = FUN("to_string.1",{"i"},{T_INT},T_STRING,new BlockNode({RET(STR("Integer string"))}));
+
+    BlockNode* node = new BlockNode({to_string_string, to_string_integer});
+    node->accept(translator);
+    CodeLabel expected_code = {
+            NL(I_DECL("s")),
+            NL(I_GET("x")),
+    };
+    EXPECT_EQ(translator.code, expected_code)
+                        << "GOT:\n----\n" << translator.code << "----\nEXPECTED:\n----\n" << expected_code << "----\n";
+}

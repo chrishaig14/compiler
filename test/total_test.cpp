@@ -412,3 +412,72 @@ TEST(total_test, test_empty_list) {
     EXPECT_TRUE(stack.top()->equal(new IntegerObject(0)));
 }
 
+TEST(total_test, overload_1) {
+
+    std::string text = "fun to_string(s: String)->String{return s;}fun to_string(i:Integer)->String{return \"Integer string\";}fun main()->String{return to_string(\"foo\");}";
+    Scanner scanner(text);
+    std::vector<Token> tokens = scanner.scan_all();
+    Parser parser(tokens);
+    BlockNode* program = parser.parse_program();
+    std::map<std::string, CodeBuiltin*> builtins;
+    builtins["str"] = new BuiltinIntegerToString();
+    builtins["print"] = new BuiltinPrintString();
+    GlobalProcessor gp(builtins);
+    gp.visit(*program);
+    Checker checker(gp.globals, gp.class_table);
+    checker.function_table=gp.function_table;
+    checker.visit(*program);
+    Translator translator;
+    program->accept(translator);
+    ObjectStack stack;
+    StructProtos structs;
+    CodeLabel translated_code = translator.code;
+    std::cerr << translated_code << std::endl;
+    Loader loader(translated_code, builtins);
+    loader.load();
+    Environment* global_env = loader.global_env;
+    CodeObject* main_function = dynamic_cast<CodeObject*>(global_env->get("main.0"));
+    for (int i = 0; i < main_function->user->code.size(); i++) {
+        std::cerr << main_function->user->code[i]->to_string() << std::endl;
+    }
+    CodeRunner code_runner(main_function->user->code, structs, stack, global_env);
+    code_runner.run();
+    auto t = stack.top();
+    EXPECT_TRUE(t->equal(new StringObject("foo")));
+    EXPECT_FALSE(t->equal(new StringObject("Integer string")));
+}
+
+TEST(total_test, overload_2) {
+
+    std::string text = "fun to_string(s: String)->String{return s;}fun to_string(i:Integer)->String{return \"Integer string\";}fun main()->String{return to_string(17);}";
+    Scanner scanner(text);
+    std::vector<Token> tokens = scanner.scan_all();
+    Parser parser(tokens);
+    BlockNode* program = parser.parse_program();
+    std::map<std::string, CodeBuiltin*> builtins;
+    builtins["str"] = new BuiltinIntegerToString();
+    builtins["print"] = new BuiltinPrintString();
+    GlobalProcessor gp(builtins);
+    gp.visit(*program);
+    Checker checker(gp.globals, gp.class_table);
+    checker.function_table=gp.function_table;
+    checker.visit(*program);
+    Translator translator;
+    program->accept(translator);
+    ObjectStack stack;
+    StructProtos structs;
+    CodeLabel translated_code = translator.code;
+    std::cerr << translated_code << std::endl;
+    Loader loader(translated_code, builtins);
+    loader.load();
+    Environment* global_env = loader.global_env;
+    CodeObject* main_function = dynamic_cast<CodeObject*>(global_env->get("main.0"));
+    for (int i = 0; i < main_function->user->code.size(); i++) {
+        std::cerr << main_function->user->code[i]->to_string() << std::endl;
+    }
+    CodeRunner code_runner(main_function->user->code, structs, stack, global_env);
+    code_runner.run();
+    auto t = stack.top();
+    EXPECT_TRUE(t->equal(new StringObject("Integer string")));
+    EXPECT_FALSE(t->equal(new StringObject("foo")));
+}

@@ -21,7 +21,7 @@ public:
     }
 
     std::string to_string() const {
-        return "PUSH_STRING " + this->str;
+        return "PUSH_STRING \"" + this->str + "\"";
     }
 
 

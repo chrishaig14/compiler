@@ -462,7 +462,7 @@ TEST(second_pass_test, template_function_return_second_diff_generic) {
 }
 
 TEST(second_pass_test, function_overload) {
-    std::string text = "fun foo(x:String)->String{return x;} fun foo(x:Integer)->Integer{return x;} fun main()->Integer{var x: Integer = foo(7); var y:String=foo(\"Hello\");return 0;}";
+    std::string text = "fun foo(x:String)->String{return x;} fun foo(x:Integer)->Integer{return x;} fun main()->Integer{var x: Integer = foo(\"Hello\"); var y:String=foo(\"Hello\");return 0;}";
     ASSERT_OK(text);
 }
 

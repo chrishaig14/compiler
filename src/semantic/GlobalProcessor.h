@@ -24,7 +24,7 @@ class FunctionTable {
 public:
     FunctionTable();
 
-    void add(std::string function_name, FunctionTypeNode* function_type);
+    int add(std::string function_name, FunctionTypeNode* function_type);
 
     FunctionTypeNode* get_simple_function(std::string function_name);
 

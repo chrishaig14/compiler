@@ -248,17 +248,32 @@ void Checker::visit(CallNode& n) {
     params = params.substr(0, params.size() - 1);
     std::string func_name = dynamic_cast<IdNode*>(n.function)->identifier;
     std::string new_name = func_name + ":" + params;
-    dynamic_cast<IdNode*>(n.function)->identifier = new_name;
+//    dynamic_cast<IdNode*>(n.function)->identifier = new_name;
     SemanticInfo semantic_info;
 
     if (this->function_table->is_overloaded(func_name)) {
-        for (auto overload: *this->function_table->get_overloads(func_name)) {
-            for (int i = 0; i < n.arguments.size(); i++) {
-                if (!args[i]->equal(overload->parameter_types[i])) {
-                    throw BadArguments(overload->parameter_types, args);
+        bool matching_overload_found = false;
+        int overload_index = -1;
+        std::vector<FunctionTypeNode*> all_overloads = *this->function_table->get_overloads(func_name);
+        for (int i = 0; i < all_overloads.size(); i++) {
+            FunctionTypeNode* overload = all_overloads[i];
+            bool overload_matches = true;
+            for (int j = 0; j < n.arguments.size(); j++) {
+                if (!args[j]->equal(overload->parameter_types[j])) {
+                    overload_matches = false;
+                    break;
                 }
             }
-
+            if (overload_matches) {
+                matching_overload_found = true;
+                overload_index = i;
+                break;
+            }
+        }
+        if (matching_overload_found) {
+            dynamic_cast<IdNode*>(n.function)->identifier =
+                    dynamic_cast<IdNode*>(n.function)->identifier + "." + std::to_string(overload_index);
+            semantic_info.symbol_info = all_overloads[overload_index]->return_type;
         }
     } else {
         // function not overloaded, but may be generic

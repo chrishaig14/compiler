@@ -50,9 +50,8 @@ void Translator::visit(CallNode& node) {
         CodeLabel arg_code = this->code;
         out.insert(out.end(), arg_code.begin(), arg_code.end());
     }
-    node.function->accept(*this);
-    CodeLabel function_code = this->code;
-    out.insert(out.end(), function_code.begin(), function_code.end());
+    IdNode* function_id = dynamic_cast<IdNode*>(node.function);
+    out.push_back(LC("",I_GET(function_id->identifier)));
     out.push_back(LC("", I_CALL));
     this->code = out;
 }
@@ -86,7 +85,7 @@ void Translator::visit(FunctionNode& node) {
         params += p->to_string() + ".";
     }
     params = params.substr(0, params.size() - 1);
-    std::string new_name = node.identifier + ":" + params;
+    std::string new_name = node.identifier;
     out.push_back(LC("", I_START_FUNCTION(new_name)));
     CodeLabel body_code;
     node.body->accept(*this);

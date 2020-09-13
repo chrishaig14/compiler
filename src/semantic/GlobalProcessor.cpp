@@ -100,7 +100,8 @@ void GlobalProcessor::visit(FunctionNode& node) {
 //    }
 //    params = params.substr(0, params.size() - 1);
 //    std::string new_name = node.identifier + ":" + params;
-    this->function_table->add(node.identifier, function_info);
+    int index = this->function_table->add(node.identifier, function_info);
+    node.identifier = node.identifier + "." + std::to_string(index);
 }
 
 void GlobalProcessor::visit(VectorOfNodes program) {
@@ -172,11 +173,12 @@ bool FunctionTable::is_overloaded(std::string function_name) {
     return functions[function_name]->size() > 1;
 }
 
-void FunctionTable::add(std::string function_name, FunctionTypeNode* function_type) {
+int FunctionTable::add(std::string function_name, FunctionTypeNode* function_type) {
     if (functions.count(function_name) == 0) {
         functions[function_name] = new std::vector<FunctionTypeNode*>();
     }
     functions[function_name]->push_back(function_type);
+    return functions[function_name]->size() - 1;
 }
 
 FunctionTable::FunctionTable() {
