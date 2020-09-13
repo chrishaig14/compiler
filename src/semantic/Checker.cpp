@@ -211,13 +211,27 @@ void Checker::visit(BinopNode& n) {
     } else {
         auto left = dynamic_cast<ObjectTypeNode*>(left_info.symbol_info);
         auto right = dynamic_cast<ObjectTypeNode*>(right_info.symbol_info);
-        if (left->identifier != "Integer" || right->identifier != "Integer") {
+        auto ltype = left->identifier;
+        auto rtype = right->identifier;
+        bool ok = false;
+        if (ltype == "Integer" && rtype == "Integer") {
+            semantic_info.symbol_info = new ObjectTypeNode("Integer", {});
+            ok = true;
+        }
+        if (ltype == "String" && rtype == "String") {
+            if (n.op == OpType::ADD) {
+                semantic_info.symbol_info = new ObjectTypeNode("String", {});
+                ok = true;
+            }
+        }
+
+        if (!ok) {
             throw std::runtime_error(
                     "Cannot perform binary op betweeen types " + left->to_string() + " and " + right->to_string());
         }
-
-        semantic_info.symbol_info = new ObjectTypeNode("Integer", {});
+//        semantic_info.symbol_info = new ObjectTypeNode("Integer", {});
     }
+
     this->rv = semantic_info;
 }
 
@@ -278,7 +292,8 @@ void Checker::visit(CallNode& n) {
     } else {
         // function not overloaded, but may be generic
         FunctionTypeNode* function = this->function_table->get_simple_function(func_name);
-
+        dynamic_cast<IdNode*>(n.function)->identifier =
+                dynamic_cast<IdNode*>(n.function)->identifier + "." + std::to_string(0);
         std::map<std::string, TypeNode*> replace;
         bool is_generic = false;
         for (int i = 0; i < args.size(); i++) {

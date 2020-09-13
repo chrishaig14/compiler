@@ -13,5 +13,5 @@ void BuiltinPrintString::run(ObjectStack& stack) {
     if (integer == nullptr) {
         throw std::runtime_error("trying to print a non integer!");
     }
-    std::cout << "printing " << integer->str << std::endl;
+    std::cout << ">> " << integer->str << std::endl;
 }

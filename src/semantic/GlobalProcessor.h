@@ -32,6 +32,7 @@ public:
 
     FunctionOverloads* get_overloads(std::string function_name);
 };
+typedef std::pair<std::string, CodeBuiltin*> Builtin;
 
 class GlobalProcessor : public Visitor {
 public:
@@ -40,8 +41,8 @@ public:
     FunctionTable* function_table;
 
     GlobalProcessor();
-
-    GlobalProcessor(std::map<std::string, CodeBuiltin*> builtins);
+    GlobalProcessor(std::vector<Builtin>& builtins);
+        void add_builtins(std::vector<Builtin>& builtins);
 
     void visit(AssignmentNode& node) override;
 
@@ -92,9 +93,7 @@ public:
     void visit(TernaryNode& node) override;
 
     void visit(NoneNode& node) override;
-
-    void add_builtin(std::string name, FunctionTypeNode* ftype);
-
+    void add_builtin(std::string name, CodeBuiltin* builtin);
     void visit(EmptyListNode& node) override;
 };
 

@@ -84,7 +84,17 @@ void CodeRunner::visit(BinopInst& inst) {
                 break;
         }
     } else {
-        throw std::runtime_error("Try to do a binop with two non-Integers");
+        StringObject* right_str = dynamic_cast<StringObject*>(right);
+        StringObject* left_str = dynamic_cast<StringObject*>(left);
+        std::string result;
+        if (right_str != nullptr && left_str != nullptr) {
+            if (inst.op == OpType::ADD) {
+                result = left_str->str + right_str->str;
+                this->stack.push(new StringObject(result));
+            }
+        } else {
+            throw std::runtime_error("Try to do a binop with two non-Integers or non-Strings");
+        }
     }
     this->inst_ptr++;
 }

@@ -15,9 +15,9 @@ void compile_and_run(std::string text) {
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
     BlockNode* program = parser.parse_program();
-    std::map<std::string, CodeBuiltin*> builtins;
-    builtins["str"] = new BuiltinIntegerToString();
-    builtins["print"] = new BuiltinPrintString();
+    std::vector<Builtin> builtins;
+    builtins.push_back({"str", new BuiltinIntegerToString()});
+    builtins.push_back({"print", new BuiltinPrintString()});
     GlobalProcessor gp(builtins);
     gp.visit(*program);
     Checker checker(gp.globals, gp.class_table);
@@ -32,7 +32,7 @@ void compile_and_run(std::string text) {
     Loader loader(translated_code, builtins);
     loader.load();
     Environment* global_env = loader.global_env;
-    CodeObject* main_function = dynamic_cast<CodeObject*>(global_env->get("main:"));
+    CodeObject* main_function = dynamic_cast<CodeObject*>(global_env->get("main.0"));
     CodeRunner code_runner(main_function->user->code, structs, stack, global_env);
     code_runner.run();
 }

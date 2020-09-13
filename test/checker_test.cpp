@@ -16,9 +16,9 @@ BlockNode* get_ast(std::string text) {
 
 void compile(std::string text) {
     BlockNode* tree = get_ast(text);
-    std::map<std::string, CodeBuiltin*> builtins;
-    builtins["str"] = new BuiltinIntegerToString();
-    builtins["print"] = new BuiltinPrintString();
+    std::vector<std::pair<std::string, CodeBuiltin*>> builtins;
+    builtins.push_back({"str", new BuiltinIntegerToString()});
+    builtins.push_back({"print", new BuiltinPrintString()});
     GlobalProcessor gp(builtins);
     gp.visit(*tree);
     Checker checker(gp.globals, gp.class_table);
