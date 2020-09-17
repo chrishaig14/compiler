@@ -10,6 +10,7 @@ add_executable(runTests
         scanner_test.cpp
         parser_test.cpp
         global_processor_test.cpp
+        generic_test.cpp
         checker_test.cpp
         translator_test.cpp total_test.cpp formatter_test.cpp)
 target_link_libraries(runTests gtest gtest_main pthread srcLib)

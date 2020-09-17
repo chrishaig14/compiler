@@ -148,15 +148,20 @@ void Checker::visit(MemberNode& n) {
     }
     if (object->type_parameters.size() != 0) {
         // it's a generic
-
-    }
-    ClassInfo* class_info = this->class_table->get(object->identifier);
-    if (class_info->fields.count(n.child) == 1) {
-        // It's a field
-        semantic_info.symbol_info = class_info->fields[n.child];
+        ClassInfo* generic_class_info = this->class_table->get(object->identifier);
+        ClassInfo* concrete_class_info = instantiate_generic(generic_class_info, object);
+        TypeNode* field = concrete_class_info->fields[n.child];
+        semantic_info.symbol_info = field;
         this->rv = semantic_info;
     } else {
-        throw std::runtime_error("Type " + object->to_string() + " has no member " + n.child);
+        ClassInfo* class_info = this->class_table->get(object->identifier);
+        if (class_info->fields.count(n.child) == 1) {
+            // It's a field
+            semantic_info.symbol_info = class_info->fields[n.child];
+            this->rv = semantic_info;
+        } else {
+            throw std::runtime_error("Type " + object->to_string() + " has no member " + n.child);
+        }
     }
 }
 
@@ -247,6 +252,64 @@ void Checker::visit(ReturnNode& n) {
     this->rv = semantic_info;
 }
 
+bool is_generic(TypeNode* t) {
+    ObjectTypeNode* o = dynamic_cast<ObjectTypeNode*>(t);
+    if (o != nullptr) {
+        if (o->identifier.size() == 1 && islower(o->identifier[0])) {
+            // a is generic
+            assert(o->type_parameters.size() == 0);
+            return true;
+        }
+        for (int i = 0; i < o->type_parameters.size(); i++) {
+            if (is_generic(o->type_parameters[i])) return true;
+        }
+    }
+    return false;
+}
+
+std::map<std::string, TypeNode*> make_replacements(TypeNode* a, TypeNode* b) {
+    std::map<std::string, TypeNode*> replacements;
+    ObjectTypeNode* oa = dynamic_cast<ObjectTypeNode*>(a);
+    ObjectTypeNode* ob = dynamic_cast<ObjectTypeNode*>(b);
+    if (oa != nullptr) {
+        if (oa->identifier.size() == 1 && islower(oa->identifier[0])) {
+            replacements[oa->identifier] = b;
+        }
+        for (int i = 0; i < oa->type_parameters.size(); i++) {
+            if (is_generic(oa->type_parameters[i])) {
+                std::map<std::string, TypeNode*> rep = make_replacements(oa->type_parameters[i],
+                                                                         ob->type_parameters[i]);
+                replacements.insert(rep.begin(), rep.end());
+            }
+        }
+    }
+    return replacements;
+}
+
+bool type_matches(TypeNode* a, TypeNode* b) {
+    ObjectTypeNode* oa = dynamic_cast<ObjectTypeNode*>(a);
+    ObjectTypeNode* ob = dynamic_cast<ObjectTypeNode*>(b);
+    if ((oa == nullptr && ob != nullptr) || (oa != nullptr && ob == nullptr)) {
+        return false;
+    } else if (oa == nullptr && ob == nullptr) {
+        // both are not an object
+    } else {
+        // both are objects
+        if (!is_generic(a)) {
+            return a->equal(b);
+        }
+        // a is generic
+        if (oa->type_parameters.size() == 0) return true;
+        if (oa->identifier != ob->identifier) return false;
+        if (oa->type_parameters.size() != ob->type_parameters.size()) return false;
+        for (int i = 0; i < oa->type_parameters.size(); i++) {
+            if (!type_matches(oa->type_parameters[i], ob->type_parameters[i])) return false;
+        }
+        return true;
+    }
+    return false;
+}
+
 void Checker::visit(CallNode& n) {
     VectorOfTypes args;
     for (int i = 0; i < n.arguments.size(); i++) {
@@ -295,38 +358,53 @@ void Checker::visit(CallNode& n) {
         dynamic_cast<IdNode*>(n.function)->identifier =
                 dynamic_cast<IdNode*>(n.function)->identifier + "." + std::to_string(0);
         std::map<std::string, TypeNode*> replace;
-        bool is_generic = false;
+//        bool is_generic = false;
         for (int i = 0; i < args.size(); i++) {
             auto pt = function->parameter_types[i];
             ObjectTypeNode* ptt = dynamic_cast<ObjectTypeNode*>(pt);
-            if (ptt == nullptr) throw std::runtime_error("ASDFASDF");
-            if (ptt->identifier.size() == 1 && islower(ptt->identifier[0])) {
-                is_generic = true;
-                // is generic type
-                if (replace.count(ptt->identifier) == 0) {
-                    // new replacement
-                    replace[ptt->identifier] = args[i];
-                } else {
-                    if (!args[i]->equal(replace[ptt->identifier])) {
-                        throw BadArguments(function->parameter_types, args);
+            if (ptt == nullptr) throw std::runtime_error("ERROR IS NOT AN OBJECT");
+            ObjectTypeNode* arg = dynamic_cast<ObjectTypeNode*>(args[i]);
+            if (type_matches(ptt, arg)) {
+                if (is_generic(ptt)) {
+                    std::map<std::string, TypeNode*> rep = make_replacements(ptt, arg);
+                    for (auto r: rep) {
+                        if (replace.count(r.first)) {
+                            if (!r.second->equal(replace[r.first])) {
+                                throw std::runtime_error(
+                                        "Bad generic subtitution! " + r.first + " is already substituted for " +
+                                        replace[r.first]->to_string() + " but now trying to replace for " +
+                                        r.second->to_string());
+                            }
+                        } else {
+                            replace[r.first] = r.second;
+                        }
                     }
                 }
             } else {
-                // this parameter is fixed, not generic
-                if (!args[i]->equal(function->parameter_types[i])) {
-                    throw BadArguments(function->parameter_types, args);
-                }
+                throw std::runtime_error(
+                        "Argument types don't match calling function '" + func_name + "': param: " + ptt->to_string() +
+                        " and arg: " + arg->to_string());
             }
         }
 
 
         ObjectTypeNode* otn = dynamic_cast<ObjectTypeNode*>(function->return_type);
+        TypeNode* rettype = nullptr;
         if (otn == nullptr) { throw std::runtime_error("not an objectypenode"); };
-        if (is_generic) {
-            semantic_info.symbol_info = replace[otn->identifier];
-        } else {
-            semantic_info.symbol_info = otn;
+        if (is_generic(otn)) {
+            if (otn->type_parameters.size() == 0) {
+                if (replace.count(otn->identifier) == 1) {
+                    rettype = replace[otn->identifier];
+                } else {
+                    throw "Unknown generic type " + otn->to_string() + " for return!";
+                }
+            } else {
+                rettype = make_type(otn, replace);
+            }
+        }else{
+            rettype = otn;
         }
+        semantic_info.symbol_info = rettype;
     }
 
 //    SemanticInfo semantic_info;

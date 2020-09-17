@@ -23,6 +23,12 @@ struct SemanticInfo {
     std::map<std::string, int> free_variables;
 };
 
+bool type_matches(TypeNode* a, TypeNode* b);
+
+bool is_generic(TypeNode* t);
+
+std::map<std::string, TypeNode*> make_replacements(TypeNode* a, TypeNode* b);
+
 class Checker : public Visitor {
     SymbolTable* scope;
     ClassTable* class_table;

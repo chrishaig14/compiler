@@ -360,6 +360,19 @@ TEST(second_pass_test, function_argument_type_error) {
     ASSERT_THROWS_BAD_ARGUMENTS(text);
 }
 
+TEST(second_pass_test, function_generic_argument_type_error) {
+    std::string text = "fun first(f:a,s:a)->a{return f;} fun foo()->Integer{var r = first(\"Hello\",7); return 0;}";
+    ASSERT_THROWS_BAD_ARGUMENTS(text);
+}
+
+TEST(second_pass_test, function_generic_argument_ok) {
+    std::string text = "struct Pair[a,b]{first:a;second:b;}fun first(p: Pair[a,b])->a{return p.first;} fun foo()->String{var r = first(#Pair[String,Integer]{first:\"Hello\",second:7}); return r;}";
+}
+
+TEST(second_pass_test, function_generic_argument_ok_2) {
+    std::string text = "struct Pair[a,b]{first:a;second:b;}fun firsts(p1: Pair[a,b],p2:Pair[a,c])->Pair[a,a]{return #Pair[a,a]{first:p1.first,second:p2.first};} fun foo()->Pair[String,String]{var r = firsts(#Pair[String,Integer]{first:\"Hello\",second:7},#Pair[String, Boolean]{first:\"Hello\",second:true}); return r;}";
+}
+
 TEST(second_pass_test, declaration_type_error_1) {
     std::string text = "var x: String = 5;";
     ASSERT_THROWS_ASSIGNMENT_ERROR(text, T_STRING, T_INT);

@@ -335,17 +335,6 @@ TEST(parser_test, function_with_params_and_body) {
 
 }
 
-TEST(parser_test, class_literal_exp) {
-    std::string text = "#Person{name, 27*32}";
-    Scanner scanner(text);
-    std::vector<Token> tokens = scanner.scan_all();
-    Parser parser(tokens);
-    Node* node = parser.parse_factor();
-    std::vector<Node*> init = {ID("name"), BIN(OpType::MUL, NUM(27), NUM(32))};
-    auto expected_node = LIT_EXP(OBJECT_TYPE("Person", {}), init);
-    COMPLETE_TEST;
-}
-
 TEST(parser_test, class_literal_fil) {
     std::string text = "#Person{name: name, age: 27*32}";
     Scanner scanner(text);
