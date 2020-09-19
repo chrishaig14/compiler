@@ -1,13 +1,5 @@
-fun apply(i: Integer, f: fun(Integer)->Integer)->Integer {
-    return f(i);
-}
-
-fun double(i: Integer)->Integer{
-    return 2*i;
-}
-
 fun main()->Integer{
-    var r = apply(7, double);
+    var r = [1,2,3];
     print(str(r));
     return 0;
 }

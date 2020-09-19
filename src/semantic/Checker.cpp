@@ -17,9 +17,6 @@ Checker::Checker(SymbolTable* globals, ClassTable* class_table) {
 }
 
 void Checker::check_structs() {
-//    for(auto c: this->class_table.){
-
-//    }
 }
 
 void Checker::enter_scope(std::string name) {
@@ -52,12 +49,25 @@ void Checker::visit(FunctionNode& n) {
 }
 
 void Checker::visit(IdNode& n) {
+    SymbolInfo semantic_info;
     if (!this->scope->has(n.identifier)) {
         // it might be a function name
-        throw ScopeError(n.identifier);
+        if (this->function_table->has_function(n.identifier)) {
+            semantic_info.is_a_function = true;
+            if (this->function_table->is_overloaded(n.identifier)) {
+                semantic_info.is_overloaded = true;
+                semantic_info.overloads = *this->function_table->get_overloads(n.identifier);
+            } else {
+                semantic_info.is_overloaded = false;
+                semantic_info.symbol_info = this->function_table->get_simple_function(n.identifier);
+            }
+        } else {
+            throw ScopeError(n.identifier);
+        }
+    } else {
+        semantic_info.is_a_function = false;
+        semantic_info.symbol_info = this->scope->get(n.identifier);
     }
-    SymbolInfo semantic_info;
-    semantic_info.symbol_info = this->scope->get(n.identifier);
     this->rv = semantic_info;
 }
 
@@ -206,7 +216,6 @@ void Checker::visit(BinopNode& n) {
             throw std::runtime_error(
                     "Cannot perform binary op betweeen types " + left->to_string() + " and " + right->to_string());
         }
-//        semantic_info.symbol_info = new ObjectTypeNode("Integer", {});
     }
 
     this->rv = semantic_info;
@@ -234,6 +243,13 @@ bool is_generic(TypeNode* t) {
         for (int i = 0; i < o->type_parameters.size(); i++) {
             if (is_generic(o->type_parameters[i])) return true;
         }
+    } else {
+        FunctionTypeNode* fo = dynamic_cast<FunctionTypeNode*>(t);
+        if (fo != nullptr) {
+            for (int i = 0; i < fo->parameter_types.size(); i++) {
+                if (is_generic(fo->parameter_types[i])) return true;
+            }
+        }
     }
     return false;
 }
@@ -253,6 +269,23 @@ std::map<std::string, TypeNode*> make_replacements(TypeNode* a, TypeNode* b) {
                 replacements.insert(rep.begin(), rep.end());
             }
         }
+    } else {
+        FunctionTypeNode* fa = dynamic_cast<FunctionTypeNode*>(a);
+        FunctionTypeNode* fb = dynamic_cast<FunctionTypeNode*>(b);
+
+        if (fa != nullptr && fb != nullptr) {
+            for (int i = 0; i < fa->parameter_types.size(); i++) {
+                if (is_generic(fa->parameter_types[i])) {
+                    std::map<std::string, TypeNode*> rep = make_replacements(fa->parameter_types[i],
+                                                                             fb->parameter_types[i]);
+                    replacements.insert(rep.begin(), rep.end());
+                }
+            }
+            if (is_generic(fa->return_type)) {
+                std::map<std::string, TypeNode*> rep = make_replacements(fa->return_type, fb->return_type);
+                replacements.insert(rep.begin(), rep.end());
+            }
+        }
     }
     return replacements;
 }
@@ -264,6 +297,16 @@ bool type_matches(TypeNode* a, TypeNode* b) {
         return false;
     } else if (oa == nullptr && ob == nullptr) {
         // both are not an object
+        FunctionTypeNode* fa = dynamic_cast<FunctionTypeNode*>(a);
+        FunctionTypeNode* fb = dynamic_cast<FunctionTypeNode*>(b);
+        if (fa != nullptr && fb != nullptr) {
+            // both are functions
+            if (fa->parameter_types.size() != fb->parameter_types.size()) return false;
+            for (int i = 0; i < fa->parameter_types.size(); i++) {
+                if (!type_matches(fa->parameter_types[i], fb->parameter_types[i])) return false;
+            }
+            return type_matches(fa->return_type, fb->return_type);
+        }
     } else {
         // both are objects
         if (!is_generic(a)) {
@@ -295,13 +338,9 @@ void Checker::visit(CallNode& n) {
     }
     params = params.substr(0, params.size() - 1);
     std::string func_name = dynamic_cast<IdNode*>(n.function)->identifier;
-    std::string new_name = func_name + ":" + params;
-//    dynamic_cast<IdNode*>(n.function)->identifier = new_name;
     SymbolInfo semantic_info;
 
     if (this->function_table->has_function(func_name)) {
-
-
         if (this->function_table->is_overloaded(func_name)) {
             bool matching_overload_found = false;
             int overload_index = -1;
@@ -332,15 +371,11 @@ void Checker::visit(CallNode& n) {
             dynamic_cast<IdNode*>(n.function)->identifier =
                     dynamic_cast<IdNode*>(n.function)->identifier + "." + std::to_string(0);
             std::map<std::string, TypeNode*> replace;
-//        bool is_generic = false;
             for (int i = 0; i < args.size(); i++) {
                 auto pt = function->parameter_types[i];
-                ObjectTypeNode* ptt = dynamic_cast<ObjectTypeNode*>(pt);
-                if (ptt == nullptr) throw std::runtime_error("ERROR IS NOT AN OBJECT");
-                ObjectTypeNode* arg = dynamic_cast<ObjectTypeNode*>(args[i]);
-                if (type_matches(ptt, arg)) {
-                    if (is_generic(ptt)) {
-                        std::map<std::string, TypeNode*> rep = make_replacements(ptt, arg);
+                if (type_matches(pt, args[i])) {
+                    if (is_generic(pt)) {
+                        std::map<std::string, TypeNode*> rep = make_replacements(pt, args[i]);
                         for (auto r: rep) {
                             if (replace.count(r.first)) {
                                 if (!r.second->equal(replace[r.first])) {
@@ -357,8 +392,8 @@ void Checker::visit(CallNode& n) {
                 } else {
                     throw std::runtime_error(
                             "Argument types don't match calling function '" + func_name + "': param: " +
-                            ptt->to_string() +
-                            " and arg: " + arg->to_string());
+                            pt->to_string() +
+                            " and arg: " + args[i]->to_string());
                 }
             }
 
@@ -371,7 +406,7 @@ void Checker::visit(CallNode& n) {
                     if (replace.count(otn->identifier) == 1) {
                         rettype = replace[otn->identifier];
                     } else {
-                        throw "Unknown generic type " + otn->to_string() + " for return!";
+                        throw std::runtime_error("Unknown generic type '" + otn->to_string() + "' for return!");
                     }
                 } else {
                     rettype = make_type(otn, replace);
@@ -391,6 +426,12 @@ void Checker::visit(CallNode& n) {
                 throw std::runtime_error(
                         "Calling something that's not a function: '" + func_name + "' is " + vt->to_string());
             } else {
+                if (function->parameter_types.size() != args.size()) {
+                    throw std::runtime_error(
+                            "Function '" + func_name + "' called with bad number of arguments, expected: " +
+                            std::to_string(function->parameter_types.size()) + " but " + std::to_string(args.size()) +
+                            " given");
+                }
                 for (int i = 0; i < args.size(); i++) {
                     auto pt = function->parameter_types[i];
                     ObjectTypeNode* ptt = dynamic_cast<ObjectTypeNode*>(pt);

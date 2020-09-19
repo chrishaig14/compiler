@@ -46,6 +46,7 @@ TEST(generic_test, test_1) {
     EXPECT_TRUE(type_matches(a, b));
 }
 
+
 TEST(generic_test, test_2) {
     auto a = TYPE("String", {});
     auto b = TYPE("Integer", {});
@@ -94,6 +95,39 @@ TEST(generic_test, test_9) {
     auto b = T_DICT(T_LIST(TYPE("Integer", {})), T_STRING);
     EXPECT_TRUE(type_matches(a, b));
 }
+
+
+TEST(generic_test, test_20) {
+    VectorOfTypes pt = {};
+    TypeNode* rt = TYPE("NoneType", {});
+    auto a = FUNCTION_TYPE(pt, rt);
+    EXPECT_TRUE(type_matches(a, a));
+}
+
+TEST(generic_test, test_21) {
+    VectorOfTypes pt = {};
+    TypeNode* rt = TYPE("NoneType", {});
+    auto a = FUNCTION_TYPE(pt, rt);
+    auto b = FUNCTION_TYPE({T_INT}, rt);
+    EXPECT_FALSE(type_matches(a, b));
+}
+
+
+TEST(generic_test, test_22) {
+    VectorOfTypes pt = {TYPE("a",{})};
+    TypeNode* rt = TYPE("NoneType", {});
+    auto a = FUNCTION_TYPE(pt, rt);
+    EXPECT_TRUE(is_generic(a));
+}
+
+TEST(generic_test, test_23) {
+    VectorOfTypes pt = {TYPE("Integer",{})};
+    TypeNode* rt = TYPE("NoneType", {});
+    auto a = FUNCTION_TYPE(pt, rt);
+    EXPECT_FALSE(is_generic(a));
+}
+
+
 
 TEST(generic_test, make_replacement_1) {
     auto a = TYPE("a", {});
