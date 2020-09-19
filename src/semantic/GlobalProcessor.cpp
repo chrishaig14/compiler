@@ -27,6 +27,10 @@ GlobalProcessor::GlobalProcessor(std::vector<Builtin>& builtins) {
 }
 
 GlobalProcessor::GlobalProcessor() {
+    this->function_table = new FunctionTable();
+
+    this->globals = new SymbolTable("global", nullptr);
+    this->class_table = new ClassTable();
 }
 
 void GlobalProcessor::visit(AssignmentNode& node) {
@@ -174,6 +178,7 @@ bool FunctionTable::is_overloaded(std::string function_name) {
 }
 
 int FunctionTable::add(std::string function_name, FunctionTypeNode* function_type) {
+    int n = functions.size();
     if (functions.count(function_name) == 0) {
         functions[function_name] = new std::vector<FunctionTypeNode*>();
     }
