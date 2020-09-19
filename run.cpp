@@ -9,6 +9,7 @@
 #include "src/vm/CodeRunner.h"
 #include "src/vm/BuiltinIntegerToString.h"
 #include "src/vm/BuiltinPrintString.h"
+#include "src/vm/BuiltinListIntegerToString.h"
 
 void compile_and_run(std::string text) {
     Scanner scanner(text);
@@ -17,6 +18,7 @@ void compile_and_run(std::string text) {
     BlockNode* program = parser.parse_program();
     std::vector<Builtin> builtins;
     builtins.push_back({"str", new BuiltinIntegerToString()});
+    builtins.push_back({"str", new BuiltinListIntegerToString()});
     builtins.push_back({"print", new BuiltinPrintString()});
     GlobalProcessor gp(builtins);
     gp.visit(*program);

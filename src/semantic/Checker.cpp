@@ -66,6 +66,7 @@ void Checker::visit(FunctionNode& n) {
 
 void Checker::visit(IdNode& n) {
     if (!this->scope->has(n.identifier)) {
+        // it might be a function name
         throw ScopeError(n.identifier);
     }
     SemanticInfo semantic_info;
@@ -328,83 +329,120 @@ void Checker::visit(CallNode& n) {
 //    dynamic_cast<IdNode*>(n.function)->identifier = new_name;
     SemanticInfo semantic_info;
 
-    if (this->function_table->is_overloaded(func_name)) {
-        bool matching_overload_found = false;
-        int overload_index = -1;
-        std::vector<FunctionTypeNode*> all_overloads = *this->function_table->get_overloads(func_name);
-        for (int i = 0; i < all_overloads.size(); i++) {
-            FunctionTypeNode* overload = all_overloads[i];
-            bool overload_matches = true;
-            for (int j = 0; j < n.arguments.size(); j++) {
-                if (!args[j]->equal(overload->parameter_types[j])) {
-                    overload_matches = false;
+    if (this->function_table->has_function(func_name)) {
+
+
+        if (this->function_table->is_overloaded(func_name)) {
+            bool matching_overload_found = false;
+            int overload_index = -1;
+            std::vector<FunctionTypeNode*> all_overloads = *this->function_table->get_overloads(func_name);
+            for (int i = 0; i < all_overloads.size(); i++) {
+                FunctionTypeNode* overload = all_overloads[i];
+                bool overload_matches = true;
+                for (int j = 0; j < n.arguments.size(); j++) {
+                    if (!args[j]->equal(overload->parameter_types[j])) {
+                        overload_matches = false;
+                        break;
+                    }
+                }
+                if (overload_matches) {
+                    matching_overload_found = true;
+                    overload_index = i;
                     break;
                 }
             }
-            if (overload_matches) {
-                matching_overload_found = true;
-                overload_index = i;
-                break;
+            if (matching_overload_found) {
+                dynamic_cast<IdNode*>(n.function)->identifier =
+                        dynamic_cast<IdNode*>(n.function)->identifier + "." + std::to_string(overload_index);
+                semantic_info.symbol_info = all_overloads[overload_index]->return_type;
             }
-        }
-        if (matching_overload_found) {
+        } else {
+            // function not overloaded, but may be generic
+            FunctionTypeNode* function = this->function_table->get_simple_function(func_name);
             dynamic_cast<IdNode*>(n.function)->identifier =
-                    dynamic_cast<IdNode*>(n.function)->identifier + "." + std::to_string(overload_index);
-            semantic_info.symbol_info = all_overloads[overload_index]->return_type;
-        }
-    } else {
-        // function not overloaded, but may be generic
-        FunctionTypeNode* function = this->function_table->get_simple_function(func_name);
-        dynamic_cast<IdNode*>(n.function)->identifier =
-                dynamic_cast<IdNode*>(n.function)->identifier + "." + std::to_string(0);
-        std::map<std::string, TypeNode*> replace;
+                    dynamic_cast<IdNode*>(n.function)->identifier + "." + std::to_string(0);
+            std::map<std::string, TypeNode*> replace;
 //        bool is_generic = false;
-        for (int i = 0; i < args.size(); i++) {
-            auto pt = function->parameter_types[i];
-            ObjectTypeNode* ptt = dynamic_cast<ObjectTypeNode*>(pt);
-            if (ptt == nullptr) throw std::runtime_error("ERROR IS NOT AN OBJECT");
-            ObjectTypeNode* arg = dynamic_cast<ObjectTypeNode*>(args[i]);
-            if (type_matches(ptt, arg)) {
-                if (is_generic(ptt)) {
-                    std::map<std::string, TypeNode*> rep = make_replacements(ptt, arg);
-                    for (auto r: rep) {
-                        if (replace.count(r.first)) {
-                            if (!r.second->equal(replace[r.first])) {
-                                throw std::runtime_error(
-                                        "Bad generic subtitution! " + r.first + " is already substituted for " +
-                                        replace[r.first]->to_string() + " but now trying to replace for " +
-                                        r.second->to_string());
+            for (int i = 0; i < args.size(); i++) {
+                auto pt = function->parameter_types[i];
+                ObjectTypeNode* ptt = dynamic_cast<ObjectTypeNode*>(pt);
+                if (ptt == nullptr) throw std::runtime_error("ERROR IS NOT AN OBJECT");
+                ObjectTypeNode* arg = dynamic_cast<ObjectTypeNode*>(args[i]);
+                if (type_matches(ptt, arg)) {
+                    if (is_generic(ptt)) {
+                        std::map<std::string, TypeNode*> rep = make_replacements(ptt, arg);
+                        for (auto r: rep) {
+                            if (replace.count(r.first)) {
+                                if (!r.second->equal(replace[r.first])) {
+                                    throw std::runtime_error(
+                                            "Bad generic subtitution! " + r.first + " is already substituted for " +
+                                            replace[r.first]->to_string() + " but now trying to replace for " +
+                                            r.second->to_string());
+                                }
+                            } else {
+                                replace[r.first] = r.second;
                             }
-                        } else {
-                            replace[r.first] = r.second;
                         }
                     }
-                }
-            } else {
-                throw std::runtime_error(
-                        "Argument types don't match calling function '" + func_name + "': param: " + ptt->to_string() +
-                        " and arg: " + arg->to_string());
-            }
-        }
-
-
-        ObjectTypeNode* otn = dynamic_cast<ObjectTypeNode*>(function->return_type);
-        TypeNode* rettype = nullptr;
-        if (otn == nullptr) { throw std::runtime_error("not an objectypenode"); };
-        if (is_generic(otn)) {
-            if (otn->type_parameters.size() == 0) {
-                if (replace.count(otn->identifier) == 1) {
-                    rettype = replace[otn->identifier];
                 } else {
-                    throw "Unknown generic type " + otn->to_string() + " for return!";
+                    throw std::runtime_error(
+                            "Argument types don't match calling function '" + func_name + "': param: " +
+                            ptt->to_string() +
+                            " and arg: " + arg->to_string());
+                }
+            }
+
+
+            ObjectTypeNode* otn = dynamic_cast<ObjectTypeNode*>(function->return_type);
+            TypeNode* rettype = nullptr;
+            if (otn == nullptr) { throw std::runtime_error("not an objectypenode"); };
+            if (is_generic(otn)) {
+                if (otn->type_parameters.size() == 0) {
+                    if (replace.count(otn->identifier) == 1) {
+                        rettype = replace[otn->identifier];
+                    } else {
+                        throw "Unknown generic type " + otn->to_string() + " for return!";
+                    }
+                } else {
+                    rettype = make_type(otn, replace);
                 }
             } else {
-                rettype = make_type(otn, replace);
+                rettype = otn;
             }
-        }else{
-            rettype = otn;
+            semantic_info.symbol_info = rettype;
         }
-        semantic_info.symbol_info = rettype;
+    } else {
+        // it's a local function!
+        if (this->scope->has(func_name)) {
+            // see if it's a function
+            TypeNode* vt = this->scope->get(func_name);
+            FunctionTypeNode* function = dynamic_cast<FunctionTypeNode*>(vt);
+            if (function == nullptr) {
+                throw std::runtime_error(
+                        "Calling something that's not a function: '" + func_name + "' is " + vt->to_string());
+            } else {
+                for (int i = 0; i < args.size(); i++) {
+                    auto pt = function->parameter_types[i];
+                    ObjectTypeNode* ptt = dynamic_cast<ObjectTypeNode*>(pt);
+                    if (ptt == nullptr) throw std::runtime_error("ERROR IS NOT AN OBJECT");
+                    ObjectTypeNode* arg = dynamic_cast<ObjectTypeNode*>(args[i]);
+                    if (arg->equal(ptt)) {
+                        // ok!
+                    } else {
+                        throw std::runtime_error(
+                                "Argument types don't match calling function '" + func_name + "': param: " +
+                                ptt->to_string() +
+                                " and arg: " + arg->to_string());
+                    }
+                }
+//                throw std::runtime_error("HERE!");
+                ObjectTypeNode* otn = dynamic_cast<ObjectTypeNode*>(function->return_type);
+                TypeNode* rettype = nullptr;
+                if (otn == nullptr) { throw std::runtime_error("not an objectypenode"); };
+                rettype = otn;
+                semantic_info.symbol_info = rettype;
+            }
+        }
     }
 
 //    SemanticInfo semantic_info;

@@ -1,14 +1,13 @@
-fun foo(i: Integer)->String{
-    return "This is an Integer";
+fun apply(i: Integer, f: fun(Integer)->Integer)->Integer {
+    return f(i);
 }
 
-fun foo(s: String) -> String {
-    return s;
+fun double(i: Integer)->Integer{
+    return 2*i;
 }
 
 fun main()->Integer{
-    print(foo(7));
-    print(foo("Hello world!"));
-    print(foo(false));
+    var r = apply(7, double);
+    print(str(r));
     return 0;
 }

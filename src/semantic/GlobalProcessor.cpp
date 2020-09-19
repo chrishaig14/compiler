@@ -10,6 +10,7 @@
 void GlobalProcessor::add_builtins(std::vector<Builtin>& builtins) {
     for (int i = 0; i < builtins.size(); i++) {
         Builtin b = builtins[i];
+        assert(b.second->ftype != nullptr);
         int index = this->function_table->add(b.first, b.second->ftype);
         b.first = b.first + "." + std::to_string(index);
         builtins[i] = b;
@@ -182,4 +183,8 @@ int FunctionTable::add(std::string function_name, FunctionTypeNode* function_typ
 
 FunctionTable::FunctionTable() {
     this->foo = "Pepito";
+}
+
+bool FunctionTable::has_function(std::string name) {
+    return this->functions.count(name) == 1;
 }
