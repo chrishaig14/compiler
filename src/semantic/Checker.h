@@ -17,7 +17,7 @@
 //typedef std::map<std::string, FunctionInfo> MapStringToFunction;
 
 
-struct SemanticInfo {
+struct SymbolInfo {
     TypeNode* symbol_info;
 };
 
@@ -30,7 +30,7 @@ std::map<std::string, TypeNode*> make_replacements(TypeNode* a, TypeNode* b);
 class Checker : public Visitor {
     SymbolTable* scope;
     ClassTable* class_table;
-    SemanticInfo rv;
+    SymbolInfo rv;
 public:
     std::map<std::string, SymbolTable*> scopes;
 

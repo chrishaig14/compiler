@@ -44,9 +44,9 @@ void Checker::visit(FunctionNode& n) {
     }
     this->scope->set("__return__", n.return_type);
     n.body->accept(*this);
-    SemanticInfo body_info = this->rv;
+    SymbolInfo body_info = this->rv;
     this->leave_scope();
-    SemanticInfo semantic_info;
+    SymbolInfo semantic_info;
 //    semantic_info.symbol_info = ;
     this->rv = semantic_info;
 }
@@ -56,7 +56,7 @@ void Checker::visit(IdNode& n) {
         // it might be a function name
         throw ScopeError(n.identifier);
     }
-    SemanticInfo semantic_info;
+    SymbolInfo semantic_info;
     semantic_info.symbol_info = this->scope->get(n.identifier);
     this->rv = semantic_info;
 }
@@ -65,11 +65,11 @@ void Checker::visit(DeclarationNode& n) {
     if (this->scope->declared(n.identifier)) {
         throw RedeclareError(n.identifier);
     }
-    SemanticInfo semantic_info;
+    SymbolInfo semantic_info;
 
     if (n.expression != nullptr and n.type != nullptr) {
         n.expression->accept(*this);
-        SemanticInfo expression_info = this->rv;
+        SymbolInfo expression_info = this->rv;
         auto actual_type = dynamic_cast<ObjectTypeNode*>(n.type);
         if (actual_type->identifier == "Option") {
             if (!actual_type->type_parameters[0]->equal(expression_info.symbol_info)) {
@@ -97,7 +97,7 @@ void Checker::visit(DeclarationNode& n) {
         semantic_info.symbol_info = n.type;
     } else if (n.expression != nullptr) {
         n.expression->accept(*this);
-        SemanticInfo expression_info = this->rv;
+        SymbolInfo expression_info = this->rv;
         semantic_info.symbol_info = expression_info.symbol_info;
     }
     this->rv = semantic_info;
@@ -106,19 +106,19 @@ void Checker::visit(DeclarationNode& n) {
 
 void Checker::visit(AssignmentNode& n) {
     n.lvalue->accept(*this);
-    SemanticInfo linfo = this->rv;
+    SymbolInfo linfo = this->rv;
     n.rvalue->accept(*this);
-    SemanticInfo expression_type = this->rv;
+    SymbolInfo expression_type = this->rv;
     if (!linfo.symbol_info->equal(expression_type.symbol_info)) {
         throw AssignmentTypeError(linfo.symbol_info, expression_type.symbol_info);
     }
-    SemanticInfo semantic_info;
+    SymbolInfo semantic_info;
     this->rv = semantic_info;
 }
 
 void Checker::visit(MemberNode& n) {
     n.parent->accept(*this);
-    SemanticInfo semantic_info = this->rv;
+    SymbolInfo semantic_info = this->rv;
     ObjectTypeNode* object = dynamic_cast<ObjectTypeNode*>(semantic_info.symbol_info);
     if (object == nullptr) {
         throw std::runtime_error("Accessing member " + n.child + " of non object");
@@ -146,22 +146,22 @@ void Checker::visit(MemberNode& n) {
 }
 
 void Checker::visit(IfNode& n) {
-    SemanticInfo semantic_info;
+    SymbolInfo semantic_info;
     n.condition->accept(*this);
-    SemanticInfo condition_info = this->rv;
+    SymbolInfo condition_info = this->rv;
     this->enter_scope("if");
     n.then->accept(*this);
-    SemanticInfo then_info = this->rv;
+    SymbolInfo then_info = this->rv;
     this->leave_scope();
     this->rv = semantic_info;
 }
 
 void Checker::visit(BinopNode& n) {
     n.left->accept(*this);
-    SemanticInfo left_info = this->rv;
+    SymbolInfo left_info = this->rv;
     n.right->accept(*this);
-    SemanticInfo right_info = this->rv;
-    SemanticInfo semantic_info;
+    SymbolInfo right_info = this->rv;
+    SymbolInfo semantic_info;
     bool is_boolean = true;
     switch (n.op) {
         case OpType::EQ:
@@ -214,12 +214,12 @@ void Checker::visit(BinopNode& n) {
 
 void Checker::visit(ReturnNode& n) {
     n.expression->accept(*this);
-    SemanticInfo expression_info = this->rv;
+    SymbolInfo expression_info = this->rv;
     TypeNode* return_type = this->scope->get("__return__");
     if (!this->can_assign(expression_info.symbol_info, return_type)) {
         throw ReturnError(return_type, expression_info.symbol_info);
     }
-    SemanticInfo semantic_info;
+    SymbolInfo semantic_info;
     this->rv = semantic_info;
 }
 
@@ -285,7 +285,7 @@ void Checker::visit(CallNode& n) {
     VectorOfTypes args;
     for (int i = 0; i < n.arguments.size(); i++) {
         n.arguments[i]->accept(*this);
-        SemanticInfo arg = this->rv;
+        SymbolInfo arg = this->rv;
         args.push_back(arg.symbol_info);
     }
 
@@ -297,7 +297,7 @@ void Checker::visit(CallNode& n) {
     std::string func_name = dynamic_cast<IdNode*>(n.function)->identifier;
     std::string new_name = func_name + ":" + params;
 //    dynamic_cast<IdNode*>(n.function)->identifier = new_name;
-    SemanticInfo semantic_info;
+    SymbolInfo semantic_info;
 
     if (this->function_table->has_function(func_name)) {
 
@@ -415,7 +415,7 @@ void Checker::visit(CallNode& n) {
         }
     }
 
-//    SemanticInfo semantic_info;
+//    SymbolInfo semantic_info;
 //
 //    semantic_info.symbol_info = function->return_type;
     this->rv = semantic_info;
@@ -470,10 +470,10 @@ void Checker::visit(StructNode& n) {
 }
 
 void Checker::visit(BlockNode& program) {
-    SemanticInfo semantic_info;
+    SymbolInfo semantic_info;
     for (auto n: program.nodes) {
         n->accept(*this);
-        SemanticInfo node_info = this->rv;
+        SymbolInfo node_info = this->rv;
     }
     this->rv = semantic_info;
 }
@@ -491,7 +491,7 @@ void Checker::visit(ClassLiteralExpressionNode& node) {
     for (int i = 0; i < node.init.size(); i++) {
         Node* exp = node.init[i];
         exp->accept(*this);
-        SemanticInfo semanticInfo = this->rv;
+        SymbolInfo semanticInfo = this->rv;
         if (!semanticInfo.symbol_info->equal(class_info->field_types[i])) {
             throw std::runtime_error(
                     "Field type doesn't match: " + class_info->field_names[i] + " ( field # " + std::to_string(i) +
@@ -500,7 +500,7 @@ void Checker::visit(ClassLiteralExpressionNode& node) {
                     class_info->field_types[i]->to_string() + ", got " + semanticInfo.symbol_info->to_string());
         }
     }
-    this->rv = SemanticInfo();
+    this->rv = SymbolInfo();
     rv.symbol_info = new ObjectTypeNode(node.type->identifier, {});
 }
 
@@ -635,7 +635,7 @@ void Checker::visit(ClassLiteralFieldNode& node) {
     for (auto f: node.init) {
         Node* exp = f.second;
         exp->accept(*this);
-        SemanticInfo semanticInfo = this->rv;
+        SymbolInfo semanticInfo = this->rv;
         TypeNode* field_type = concrete->fields[f.first];
         if (!this->can_assign(semanticInfo.symbol_info, field_type)) {
             throw std::runtime_error(
@@ -645,13 +645,13 @@ void Checker::visit(ClassLiteralFieldNode& node) {
                     " but got " + semanticInfo.symbol_info->to_string());
         }
     }
-    this->rv = SemanticInfo();
+    this->rv = SymbolInfo();
     rv.symbol_info = node.type;
 }
 
 void Checker::visit(ForNode& node) {
     node.exp->accept(*this);
-    SemanticInfo semantic_info = this->rv;
+    SymbolInfo semantic_info = this->rv;
     ObjectTypeNode* obj = dynamic_cast<ObjectTypeNode*>(semantic_info.symbol_info);
     if (obj == nullptr) {
         throw std::runtime_error("Iterating over something bad!");
@@ -678,21 +678,21 @@ void Checker::visit(ListNode& node) {
                                      current_type->to_string());
         }
     }
-    SemanticInfo semantic_info = this->rv;
-    SemanticInfo return_info;
+    SymbolInfo semantic_info = this->rv;
+    SymbolInfo return_info;
     return_info.symbol_info = T_LIST(element_type);
     this->rv = return_info;
 }
 
 void Checker::visit(BooleanNode& node) {
-    SemanticInfo semantic_info;
+    SymbolInfo semantic_info;
     semantic_info.symbol_info = new ObjectTypeNode("Boolean", {});
     this->rv = semantic_info;
 }
 
 void Checker::visit(WhileNode& node) {
     node.condition->accept(*this);
-    SemanticInfo condition = this->rv;
+    SymbolInfo condition = this->rv;
     if (!condition.symbol_info->equal(new ObjectTypeNode("Boolean", {}))) {
         throw std::runtime_error("Expected boolean expression as while loop condition!");
     }
@@ -702,25 +702,25 @@ void Checker::visit(WhileNode& node) {
 }
 
 void Checker::visit(NumberNode& node) {
-    SemanticInfo semanticInfo;
+    SymbolInfo semanticInfo;
     semanticInfo.symbol_info = new ObjectTypeNode("Integer", {});
     this->rv = semanticInfo;
 }
 
 void Checker::visit(StringNode& node) {
-    SemanticInfo semanticInfo;
+    SymbolInfo semanticInfo;
     semanticInfo.symbol_info = new ObjectTypeNode("String", {});
     this->rv = semanticInfo;
 }
 
 void Checker::visit(SubscriptNode& node) {
     node.parent->accept(*this);
-    SemanticInfo parent = this->rv;
+    SymbolInfo parent = this->rv;
 //    node.child->accept(*this);
-    SemanticInfo child = this->rv;
+    SymbolInfo child = this->rv;
     ObjectTypeNode* object_type = dynamic_cast<ObjectTypeNode*>(parent.symbol_info);
     if (object_type == nullptr) { throw std::runtime_error("Accessing subscript of non object!"); }
-    SemanticInfo semantic_info;
+    SymbolInfo semantic_info;
     if (object_type->identifier == "List") {
         semantic_info.symbol_info = object_type->type_parameters[0];
     }
@@ -733,7 +733,7 @@ void Checker::visit(BreakNode& node) {
 
 void Checker::visit(TernaryNode& node) {
     node.expression->accept(*this);
-    SemanticInfo expression_info = this->rv;
+    SymbolInfo expression_info = this->rv;
     auto expression_type = dynamic_cast<ObjectTypeNode*>(expression_info.symbol_info);
     if (expression_type == nullptr) {
         throw std::runtime_error("Unexpected non-object");
@@ -741,16 +741,16 @@ void Checker::visit(TernaryNode& node) {
     if (expression_type->identifier != "Option") {
         throw std::runtime_error("Expected an Option[T], got: " + expression_type->to_string());
     }
-    SemanticInfo semanticInfo;
+    SymbolInfo semanticInfo;
     TypeNode* type = expression_type->type_parameters[0];
     semanticInfo.symbol_info = type;
     this->enter_scope("true_case");
     this->scope->set("it", type);
     node.true_case->accept(*this);
     this->leave_scope();
-    SemanticInfo true_case = this->rv;
+    SymbolInfo true_case = this->rv;
     node.false_case->accept(*this);
-    SemanticInfo false_case = this->rv;
+    SymbolInfo false_case = this->rv;
     if (!false_case.symbol_info->equal(true_case.symbol_info)) {
         throw std::runtime_error(
                 "True case and false case type don't match: " + true_case.symbol_info->to_string() + " != " +
@@ -763,13 +763,13 @@ void Checker::visit(TernaryNode& node) {
 }
 
 void Checker::visit(NoneNode& node) {
-    SemanticInfo semanticInfo;
+    SymbolInfo semanticInfo;
     semanticInfo.symbol_info = new ObjectTypeNode("NoneType", {});
     this->rv = semanticInfo;
 }
 
 void Checker::visit(EmptyListNode& node) {
-    SemanticInfo semanticInfo;
+    SymbolInfo semanticInfo;
     semanticInfo.symbol_info = node.type;
     this->rv = semanticInfo;
 }
