@@ -14,8 +14,7 @@
 
 class PushFunctionInst : public Instruction {
 public:
-    PushFunctionInst(const std::vector<std::string>& parameterNames, const Code& body,
-                     const std::vector<std::string>& freeVariables);
+    PushFunctionInst(const std::vector<std::string>& parameterNames, const Code& body);
 
     Code body;
     std::vector<std::string> free_variables;

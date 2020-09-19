@@ -78,10 +78,6 @@ public:
         }
         j["body"] = this->body->to_json();
         j["return_type"] = this->return_type->to_json();
-        j["free_variables"] = {};
-        for (auto it: this->free_variables) {
-            j["free_variables"].push_back(it.first);
-        }
         return j;
     }
 

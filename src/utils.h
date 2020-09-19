@@ -48,7 +48,7 @@ typedef std::map<std::string, std::map<std::string, Code>> StructProtos;
 #define I_PUSHB(x) new PushBooleanInst(x)
 #define I_PUSHI(x) new PushIntegerInst(x)
 #define I_PUSHS(x) new PushStringInst(x)
-#define I_PUSHF(parameter_names, body, free_vars) new PushFunctionInst(parameter_names, body, free_vars)
+#define I_PUSHF(parameter_names, body) new PushFunctionInst(parameter_names, body)
 #define I_SETS new SetSubscriptInst()
 #define I_GETS new GetSubscriptInst()
 #define I_SETM(x) new SetMemberInst(x)

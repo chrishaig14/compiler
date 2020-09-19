@@ -48,19 +48,6 @@ void Checker::visit(FunctionNode& n) {
     this->leave_scope();
     SemanticInfo semantic_info;
 //    semantic_info.symbol_info = ;
-    for (auto fv: body_info.free_variables) {
-        bool is_a_param = false;
-        for (auto p: n.parameter_names) {
-            if (fv.first == p) {
-                is_a_param = true;
-                break;
-            }
-        }
-        if (!is_a_param) {
-            semantic_info.free_variables[fv.first] = 1;
-        }
-    }
-    n.free_variables = semantic_info.free_variables;
     this->rv = semantic_info;
 }
 
@@ -71,7 +58,6 @@ void Checker::visit(IdNode& n) {
     }
     SemanticInfo semantic_info;
     semantic_info.symbol_info = this->scope->get(n.identifier);
-    semantic_info.free_variables[n.identifier] = 1;
     this->rv = semantic_info;
 }
 
@@ -80,7 +66,6 @@ void Checker::visit(DeclarationNode& n) {
         throw RedeclareError(n.identifier);
     }
     SemanticInfo semantic_info;
-    semantic_info.declared_variables[n.identifier] = 1;
 
     if (n.expression != nullptr and n.type != nullptr) {
         n.expression->accept(*this);
@@ -109,12 +94,10 @@ void Checker::visit(DeclarationNode& n) {
                 throw AssignmentTypeError(n.type, expression_info.symbol_info);
             }
         }
-        semantic_info.free_variables = expression_info.free_variables;
         semantic_info.symbol_info = n.type;
     } else if (n.expression != nullptr) {
         n.expression->accept(*this);
         SemanticInfo expression_info = this->rv;
-        semantic_info.free_variables = expression_info.free_variables;
         semantic_info.symbol_info = expression_info.symbol_info;
     }
     this->rv = semantic_info;
@@ -130,10 +113,6 @@ void Checker::visit(AssignmentNode& n) {
         throw AssignmentTypeError(linfo.symbol_info, expression_type.symbol_info);
     }
     SemanticInfo semantic_info;
-    semantic_info.free_variables = expression_type.free_variables;
-    for (auto fv: linfo.free_variables) {
-        semantic_info.free_variables[fv.first] = 1;
-    }
     this->rv = semantic_info;
 }
 
@@ -174,10 +153,6 @@ void Checker::visit(IfNode& n) {
     n.then->accept(*this);
     SemanticInfo then_info = this->rv;
     this->leave_scope();
-    semantic_info.free_variables = condition_info.free_variables;
-    for (auto fv: then_info.free_variables) {
-        semantic_info.free_variables[fv.first] = 1;
-    }
     this->rv = semantic_info;
 }
 
@@ -187,10 +162,6 @@ void Checker::visit(BinopNode& n) {
     n.right->accept(*this);
     SemanticInfo right_info = this->rv;
     SemanticInfo semantic_info;
-    semantic_info.free_variables = left_info.free_variables;
-    for (auto fv: right_info.free_variables) {
-        semantic_info.free_variables[fv.first] = 1;
-    }
     bool is_boolean = true;
     switch (n.op) {
         case OpType::EQ:
@@ -249,7 +220,6 @@ void Checker::visit(ReturnNode& n) {
         throw ReturnError(return_type, expression_info.symbol_info);
     }
     SemanticInfo semantic_info;
-    semantic_info.free_variables = expression_info.free_variables;
     this->rv = semantic_info;
 }
 
@@ -504,14 +474,6 @@ void Checker::visit(BlockNode& program) {
     for (auto n: program.nodes) {
         n->accept(*this);
         SemanticInfo node_info = this->rv;
-        for (auto fv: node_info.free_variables) {
-            if (semantic_info.declared_variables.count(fv.first) == 0) {
-                semantic_info.free_variables[fv.first] = 1;
-            }
-        }
-        for (auto fv: node_info.declared_variables) {
-            semantic_info.declared_variables[fv.first] = 1;
-        }
     }
     this->rv = semantic_info;
 }

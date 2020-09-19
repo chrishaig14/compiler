@@ -19,8 +19,6 @@
 
 struct SemanticInfo {
     TypeNode* symbol_info;
-    std::map<std::string, int> declared_variables;
-    std::map<std::string, int> free_variables;
 };
 
 bool type_matches(TypeNode* a, TypeNode* b);

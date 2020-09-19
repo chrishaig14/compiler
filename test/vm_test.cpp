@@ -107,7 +107,7 @@ TEST(vm_test, inst_call_user) {
     std::vector<std::string> free_variables = {"__sum__"};
 
     Code main_code = {
-            I_PUSHF(std::vector<std::string>(), user_function_code, free_variables),
+            I_PUSHF(std::vector<std::string>(), user_function_code),
             I_DECL("user_function"),
             I_SET("user_function"),
             I_PUSHI(5),
@@ -221,7 +221,7 @@ TEST(vm_test, inst_factorial_test) {
     std::vector<std::string> free_vars = {"factorial"};
     Code main_code = {
             I_DECL("factorial"),
-            I_PUSHF(std::vector<std::string>(), factorial_code, free_vars),
+            I_PUSHF(std::vector<std::string>(), factorial_code),
             I_SET("factorial"),
             I_PUSHI(12),
             I_GET("factorial"),

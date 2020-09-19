@@ -4,10 +4,8 @@
 
 #include "PushFunctionInst.h"
 
-PushFunctionInst::PushFunctionInst(const std::vector<std::string>& parameterNames, const Code& body,
-                                   const std::vector<std::string>& freeVariables) : parameter_names(parameterNames),
-                                                                                    body(body),
-                                                                                    free_variables(freeVariables) {}
+PushFunctionInst::PushFunctionInst(const std::vector<std::string>& parameterNames, const Code& body) : parameter_names(parameterNames),
+                                                                                    body(body){}
 
 void PushFunctionInst::accept(InstructionVisitor& visitor) {
     visitor.visit(*this);

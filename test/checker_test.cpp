@@ -101,7 +101,6 @@ TEST(second_pass_test, fun_foo_cAomplete) {
     SymbolTable* foo_scope = checker.scopes["global.foo.0"];
     ObjectTypeNode* sinfo = dynamic_cast<ObjectTypeNode*>(foo_scope->get("y"));
     EXPECT_NE(sinfo, nullptr);
-    EXPECT_TRUE(((FunctionNode*) tree->nodes[0])->free_variables.size() == 0);
     EXPECT_EQ(sinfo->identifier, "Foo");
 }
 
@@ -115,8 +114,6 @@ TEST(second_pass_test, free_variable_test_1) {
     EXPECT_TRUE(checker.scopes["global"]->has("x"));
     SymbolTable* foo_scope = checker.scopes["global.foo.0"];
     auto sinfo = dynamic_cast<ObjectTypeNode*>(foo_scope->get("y"));
-    EXPECT_TRUE(((FunctionNode*) tree->nodes[1])->free_variables.size() == 1);
-    EXPECT_TRUE(((FunctionNode*) tree->nodes[1])->free_variables.count("x") == 1);
     EXPECT_NE(sinfo, nullptr);
     EXPECT_EQ(sinfo->identifier, "Foo");
 }
@@ -132,8 +129,6 @@ TEST(second_pass_test, free_variable_test_2) {
     EXPECT_TRUE(checker.scopes["global"]->has("x"));
     SymbolTable* foo_scope = checker.scopes["global.foo.0"];
     auto sinfo = dynamic_cast<ObjectTypeNode*>(foo_scope->get("y"));
-    EXPECT_TRUE(((FunctionNode*) tree->nodes[1])->free_variables.size() == 1);
-    EXPECT_TRUE(((FunctionNode*) tree->nodes[1])->free_variables.count("x") == 1);
     EXPECT_NE(sinfo, nullptr);
     EXPECT_EQ(sinfo->identifier, "Foo");
 }
@@ -148,8 +143,6 @@ TEST(second_pass_test, free_variable_test_3) {
     EXPECT_TRUE(checker.scopes["global"]->has("x"));
     SymbolTable* foo_scope = checker.scopes["global.foo.0"];
     auto sinfo = dynamic_cast<ObjectTypeNode*>(foo_scope->get("y"));
-    EXPECT_TRUE(((FunctionNode*) tree->nodes[1])->free_variables.size() == 1);
-    EXPECT_TRUE(((FunctionNode*) tree->nodes[1])->free_variables.count("x") == 1);
     EXPECT_NE(sinfo, nullptr);
     EXPECT_EQ(sinfo->identifier, "Foo");
 }
