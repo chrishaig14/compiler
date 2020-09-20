@@ -211,6 +211,12 @@ void Checker::visit(BinopNode& n) {
                 ok = true;
             }
         }
+        if (ltype == "List" && rtype == "List" && left->equal(right)) {
+            if (n.op == OpType::ADD) {
+                semantic_info.symbol_info = left;
+                ok = true;
+            }
+        }
 
         if (!ok) {
             throw std::runtime_error(
@@ -325,20 +331,28 @@ bool type_matches(TypeNode* a, TypeNode* b) {
 }
 
 void Checker::visit(CallNode& n) {
-    VectorOfTypes args;
+    std::vector<SymbolInfo> args;
     for (int i = 0; i < n.arguments.size(); i++) {
         n.arguments[i]->accept(*this);
         SymbolInfo arg = this->rv;
-        args.push_back(arg.symbol_info);
+        args.push_back(arg);
+        if (arg.is_a_function) {
+            IdNode* id = dynamic_cast<IdNode*>(n.arguments[i]);
+            if (id != nullptr) {
+                // modify the name for the overload
+                id->identifier = id->identifier + ".0";
+            }
+        }
     }
 
     std::string params;
     for (auto p:args) {
-        params += p->to_string() + ".";
+        params += p.symbol_info->to_string() + ".";
     }
     params = params.substr(0, params.size() - 1);
     std::string func_name = dynamic_cast<IdNode*>(n.function)->identifier;
     SymbolInfo semantic_info;
+
 
     if (this->function_table->has_function(func_name)) {
         if (this->function_table->is_overloaded(func_name)) {
@@ -349,7 +363,7 @@ void Checker::visit(CallNode& n) {
                 FunctionTypeNode* overload = all_overloads[i];
                 bool overload_matches = true;
                 for (int j = 0; j < n.arguments.size(); j++) {
-                    if (!args[j]->equal(overload->parameter_types[j])) {
+                    if (!args[j].symbol_info->equal(overload->parameter_types[j])) {
                         overload_matches = false;
                         break;
                     }
@@ -368,14 +382,13 @@ void Checker::visit(CallNode& n) {
         } else {
             // function not overloaded, but may be generic
             FunctionTypeNode* function = this->function_table->get_simple_function(func_name);
-            dynamic_cast<IdNode*>(n.function)->identifier =
-                    dynamic_cast<IdNode*>(n.function)->identifier + "." + std::to_string(0);
+            dynamic_cast<IdNode*>(n.function)->identifier += "." + std::to_string(0);
             std::map<std::string, TypeNode*> replace;
             for (int i = 0; i < args.size(); i++) {
                 auto pt = function->parameter_types[i];
-                if (type_matches(pt, args[i])) {
+                if (type_matches(pt, args[i].symbol_info)) {
                     if (is_generic(pt)) {
-                        std::map<std::string, TypeNode*> rep = make_replacements(pt, args[i]);
+                        std::map<std::string, TypeNode*> rep = make_replacements(pt, args[i].symbol_info);
                         for (auto r: rep) {
                             if (replace.count(r.first)) {
                                 if (!r.second->equal(replace[r.first])) {
@@ -393,7 +406,7 @@ void Checker::visit(CallNode& n) {
                     throw std::runtime_error(
                             "Argument types don't match calling function '" + func_name + "': param: " +
                             pt->to_string() +
-                            " and arg: " + args[i]->to_string());
+                            " and arg: " + args[i].symbol_info->to_string());
                 }
             }
 
@@ -433,10 +446,11 @@ void Checker::visit(CallNode& n) {
                             " given");
                 }
                 for (int i = 0; i < args.size(); i++) {
+
                     auto pt = function->parameter_types[i];
                     ObjectTypeNode* ptt = dynamic_cast<ObjectTypeNode*>(pt);
                     if (ptt == nullptr) throw std::runtime_error("ERROR IS NOT AN OBJECT");
-                    ObjectTypeNode* arg = dynamic_cast<ObjectTypeNode*>(args[i]);
+                    ObjectTypeNode* arg = dynamic_cast<ObjectTypeNode*>(args[i].symbol_info);
                     if (arg->equal(ptt)) {
                         // ok!
                     } else {

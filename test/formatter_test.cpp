@@ -8,7 +8,7 @@
 #include <nodes/BlockNode.h>
 
 TEST(formatter_test, test_1) {
-    std::string filename = "../../test_file.pl";
+    std::string filename = "../../join_list_of_strings.pl";
     std::ifstream file(filename);
     if (!file.is_open()) {
         FAIL() << "Couldn't open file";

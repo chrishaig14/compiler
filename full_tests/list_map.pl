@@ -12,10 +12,6 @@ fun double(i: Integer) -> Integer {
     return 2*i;
 }
 
-fun double(i: String) -> Integer {
-    return 7;
-}
-
 fun main()->Integer{
     var r = map([1,2,3,4], 4, double);
     print(str(r));
