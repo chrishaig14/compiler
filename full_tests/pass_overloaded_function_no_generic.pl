@@ -1,4 +1,4 @@
-fun call(x: a, f: fun(a)->String)->String{
+fun call(x: Integer, f: fun(Integer)->String)->String{
     return f(x);
 }
 
@@ -12,6 +12,5 @@ fun foo(i: String)->String{
 
 fun main()->Integer{
     print(call(5, foo));
-    print(call("5", foo));
     return 0;
 }

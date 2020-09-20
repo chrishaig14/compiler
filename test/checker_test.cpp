@@ -527,3 +527,88 @@ TEST(second_pass_test, infer_boolean_true) {
     std::string text = "var x = true;";
     ASSERT_VARIABLE_TYPE(text, "x", T_BOOL);
 }
+
+TEST(second_pass_test, call_overloaded_function) {
+    std::string text = "fun foo(x:String)->String{"
+                       "return x;"
+                       "}"
+                       "fun foo(x:Integer)->Integer{"
+                       "return x;"
+                       "}"
+                       "fun main()->Integer{"
+                       "var x = foo(7);"
+                       "var y = foo(\"Hello\");"
+                       "return 0;"
+                       "}";
+    BlockNode* tree = get_ast(text);
+    std::vector<std::pair<std::string, CodeBuiltin*>> builtins;
+    builtins.push_back({"str", new BuiltinIntegerToString()});
+    builtins.push_back({"print", new BuiltinPrintString()});
+    GlobalProcessor gp(builtins);
+    gp.visit(*tree);
+    Checker checker(gp.globals, gp.class_table);
+    checker.function_table = gp.function_table;
+    checker.visit(*tree);
+    FunctionNode* main_fun = dynamic_cast<FunctionNode*>(tree->nodes[2]);
+    EXPECT_TRUE(main_fun->body->nodes[0]->equal(DECL("x", nullptr, CALL(ID("foo.1"), {NUM(7)}))));
+    EXPECT_TRUE(main_fun->body->nodes[1]->equal(DECL("y", nullptr, CALL(ID("foo.0"), {STR("Hello")}))));
+}
+
+TEST(second_pass_test, pass_overloaded_function_no_generic) {
+    std::string text = "fun foo(x:String)->String{"
+                       "return \"A string\";"
+                       "} "
+                       "fun foo(x:Integer)->String{"
+                       "return \"A number\";"
+                       "} "
+                       "fun call(x: Integer, f: fun(Integer)->String)->String{"
+                       "return f(x);"
+                       "} "
+                       "fun main()->Integer{"
+                       "var x = call(7, foo); "
+                       "return 0;"
+                       "}";
+    BlockNode* tree = get_ast(text);
+    std::vector<std::pair<std::string, CodeBuiltin*>> builtins;
+    builtins.push_back({"str", new BuiltinIntegerToString()});
+    builtins.push_back({"print", new BuiltinPrintString()});
+    GlobalProcessor gp(builtins);
+    gp.visit(*tree);
+    Checker checker(gp.globals, gp.class_table);
+    checker.function_table = gp.function_table;
+    checker.visit(*tree);
+    FunctionNode* main_fun = dynamic_cast<FunctionNode*>(tree->nodes[3]);
+    auto c0 = CALL(ID("call.0"), VectorOfNodes({NUM(7), ID("foo.1")}));
+    EXPECT_TRUE(main_fun->body->nodes[0]->equal(DECL("x", nullptr, c0))) << *main_fun->body->nodes[0];
+}
+
+TEST(second_pass_test, pass_overloaded_function_generic) {
+    std::string text = "fun foo(x:String)->String{"
+                       "return \"A string\";"
+                       "} "
+                       "fun foo(x:Integer)->String{"
+                       "return \"A number\";"
+                       "} "
+                       "fun call(x: a, f: fun(a)->String)->String{"
+                       "return f(x);"
+                       "} "
+                       "fun main()->Integer{"
+                       "var x = call(7, foo);"
+                       "var y = call(\"Hello\", foo);"
+                       "return 0;"
+                       "}";
+    BlockNode* tree = get_ast(text);
+    std::vector<std::pair<std::string, CodeBuiltin*>> builtins;
+    builtins.push_back({"str", new BuiltinIntegerToString()});
+    builtins.push_back({"print", new BuiltinPrintString()});
+    GlobalProcessor gp(builtins);
+    gp.visit(*tree);
+    Checker checker(gp.globals, gp.class_table);
+    checker.function_table = gp.function_table;
+    checker.visit(*tree);
+    FunctionNode* main_fun = dynamic_cast<FunctionNode*>(tree->nodes[3]);
+    auto c0 = CALL(ID("call.0"), VectorOfNodes({NUM(7), ID("foo.1")}));
+    EXPECT_TRUE(main_fun->body->nodes[0]->equal(DECL("x", nullptr, c0))) << *main_fun->body->nodes[0];
+    auto c1 = CALL(ID("call.0"), VectorOfNodes({NUM(7), ID("foo.0")}));
+    EXPECT_TRUE(main_fun->body->nodes[1]->equal(DECL("y", nullptr, c0))) << *main_fun->body->nodes[0];
+}

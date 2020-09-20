@@ -45,11 +45,13 @@ void Checker::visit(FunctionNode& n) {
     this->leave_scope();
     SymbolInfo semantic_info;
 //    semantic_info.symbol_info = ;
+    semantic_info.is_a_function = false;
     this->rv = semantic_info;
 }
 
 void Checker::visit(IdNode& n) {
     SymbolInfo semantic_info;
+    semantic_info.is_a_function = false;
     if (!this->scope->has(n.identifier)) {
         // it might be a function name
         if (this->function_table->has_function(n.identifier)) {
@@ -76,7 +78,7 @@ void Checker::visit(DeclarationNode& n) {
         throw RedeclareError(n.identifier);
     }
     SymbolInfo semantic_info;
-
+    semantic_info.is_a_function = false;
     if (n.expression != nullptr and n.type != nullptr) {
         n.expression->accept(*this);
         SymbolInfo expression_info = this->rv;
@@ -331,28 +333,16 @@ bool type_matches(TypeNode* a, TypeNode* b) {
 }
 
 void Checker::visit(CallNode& n) {
+    std::string func_name = dynamic_cast<IdNode*>(n.function)->identifier;
+
     std::vector<SymbolInfo> args;
     for (int i = 0; i < n.arguments.size(); i++) {
         n.arguments[i]->accept(*this);
         SymbolInfo arg = this->rv;
         args.push_back(arg);
-        if (arg.is_a_function) {
-            IdNode* id = dynamic_cast<IdNode*>(n.arguments[i]);
-            if (id != nullptr) {
-                // modify the name for the overload
-                id->identifier = id->identifier + ".0";
-            }
-        }
     }
 
-    std::string params;
-    for (auto p:args) {
-        params += p.symbol_info->to_string() + ".";
-    }
-    params = params.substr(0, params.size() - 1);
-    std::string func_name = dynamic_cast<IdNode*>(n.function)->identifier;
     SymbolInfo semantic_info;
-
 
     if (this->function_table->has_function(func_name)) {
         if (this->function_table->is_overloaded(func_name)) {
@@ -386,27 +376,57 @@ void Checker::visit(CallNode& n) {
             std::map<std::string, TypeNode*> replace;
             for (int i = 0; i < args.size(); i++) {
                 auto pt = function->parameter_types[i];
-                if (type_matches(pt, args[i].symbol_info)) {
-                    if (is_generic(pt)) {
-                        std::map<std::string, TypeNode*> rep = make_replacements(pt, args[i].symbol_info);
-                        for (auto r: rep) {
-                            if (replace.count(r.first)) {
-                                if (!r.second->equal(replace[r.first])) {
-                                    throw std::runtime_error(
-                                            "Bad generic subtitution! " + r.first + " is already substituted for " +
-                                            replace[r.first]->to_string() + " but now trying to replace for " +
-                                            r.second->to_string());
+                if (args[i].is_a_function) {
+                    if (!args[i].is_overloaded) {
+                        if (!is_generic(pt)) {
+                            if (!pt->equal(args[i].symbol_info)) {
+                                throw std::runtime_error(
+                                        "Passing function -" + args[i].symbol_info->to_string() + "- but expected -" +
+                                        pt->to_string() + "-");
+                            }
+                        }
+                    } else {
+                        IdNode* id = dynamic_cast<IdNode*>(n.arguments[i]);
+                        std::string name = id->identifier;
+                        if (!is_generic(pt)) {
+                            bool found = false;
+                            for (int k = 0; k < args[i].overloads.size(); k++) {
+                                if (pt->equal(args[i].overloads[k])) {
+                                    id->identifier += "." + std::to_string(k);
+                                    found = true;
+                                    break;
                                 }
-                            } else {
-                                replace[r.first] = r.second;
+                            }
+                            if (!found) {
+                                throw std::runtime_error(
+                                        "No matching overload of '" + name + "' to pass as parameter " +
+                                        pt->to_string());
                             }
                         }
                     }
                 } else {
-                    throw std::runtime_error(
-                            "Argument types don't match calling function '" + func_name + "': param: " +
-                            pt->to_string() +
-                            " and arg: " + args[i].symbol_info->to_string());
+                    if (type_matches(pt, args[i].symbol_info)) {
+                        if (is_generic(pt)) {
+                            std::map<std::string, TypeNode*> rep = make_replacements(pt, args[i].symbol_info);
+                            for (auto r: rep) {
+                                if (replace.count(r.first)) {
+                                    if (!r.second->equal(replace[r.first])) {
+                                        throw std::runtime_error(
+                                                "Bad generic subtitution! " + r.first + " is already substituted for " +
+                                                replace[r.first]->to_string() + " but now trying to replace for " +
+                                                r.second->to_string());
+                                    }
+                                } else {
+                                    replace[r.first] = r.second;
+                                }
+                            }
+                        }
+                    } else {
+                        throw std::runtime_error(
+                                "Argument types don't match calling function '" + func_name + "': param: " +
+                                pt->to_string() +
+                                " and arg: " + args[i].symbol_info->to_string());
+                    }
                 }
             }
 
@@ -759,12 +779,14 @@ void Checker::visit(WhileNode& node) {
 void Checker::visit(NumberNode& node) {
     SymbolInfo semanticInfo;
     semanticInfo.symbol_info = new ObjectTypeNode("Integer", {});
+    semanticInfo.is_a_function = false;
     this->rv = semanticInfo;
 }
 
 void Checker::visit(StringNode& node) {
     SymbolInfo semanticInfo;
     semanticInfo.symbol_info = new ObjectTypeNode("String", {});
+    semanticInfo.is_a_function = false;
     this->rv = semanticInfo;
 }
 
