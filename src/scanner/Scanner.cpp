@@ -166,7 +166,7 @@ Token Scanner::scan_other() {
         token.end = end;
         return token;
     }
-    throw UnexpectedCharacter(c, this->current);
+    throw UnexpectedCharacter(c, start_l, start_c);
 }
 
 Token Scanner::scan_keyword_or_identifier() {
@@ -225,4 +225,11 @@ Token Scanner::scan_number() {
 
 UnexpectedCharacter::UnexpectedCharacter(char c, size_t position) : std::runtime_error(
         std::string("Unexpected character '") + std::string(1, c) + "' at position " + std::to_string(position)) {
+}
+
+UnexpectedCharacter::UnexpectedCharacter(char c, int line, int column) : std::runtime_error(
+        std::string("Unexpected character '") + std::string(1, c) + "' at line " + std::to_string(line+1) + " column " +
+        std::to_string(column+1)) {
+    this->column = column;
+    this->line = line;
 }

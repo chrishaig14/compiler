@@ -409,3 +409,15 @@ TEST(scanner_test, test_token_position_complex) {
         EXPECT_EQ(token, expected_token);
     }
 }
+
+TEST(scanner_test, test_unexpected_character_position) {
+    std::string text = "fo%o";
+    Scanner scanner(text);
+    try {
+        scanner.scan_all();
+        FAIL() << "Expected UnexpectedCharacter error";
+    } catch (const UnexpectedCharacter& uc) {
+        EXPECT_EQ(uc.line, 0);
+        EXPECT_EQ(uc.column, 2);
+    }
+}

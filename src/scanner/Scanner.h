@@ -16,7 +16,11 @@ extern std::map<std::string, TokenType> TOKEN_SPECIAL;
 
 class UnexpectedCharacter : public std::runtime_error {
 public:
+    int line, column;
+
     UnexpectedCharacter(char c, size_t position);
+
+    UnexpectedCharacter(char c, int line, int column);
 
     bool operator==(const UnexpectedCharacter& other) const;
 };
