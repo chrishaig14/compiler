@@ -29,7 +29,7 @@ bool type_matches(TypeNode* a, TypeNode* b);
 bool is_generic(TypeNode* t);
 
 std::map<std::string, TypeNode*> make_replacements(TypeNode* a, TypeNode* b);
-
+TypeNode* make_type(TypeNode* original, std::map<std::string, TypeNode*>& replacements);
 class Checker : public Visitor {
     SymbolTable* scope;
     ClassTable* class_table;
@@ -104,11 +104,23 @@ public:
 
     bool can_assign_generic(TypeNode* from, TypeNode* to, std::vector<std::string> type_params);
 
-    TypeNode* make_type(TypeNode* original, std::map<std::string, TypeNode*>& replacements);
 
     ClassInfo* instantiate_generic(ClassInfo* generic, ObjectTypeNode* instance);
 
     FunctionTable* function_table;
+
+    SymbolInfo visit_overloaded_function_call(CallNode& n, std::string func_name, VectorOfTypes & args);
+
+    std::vector<SymbolInfo> analyze_arguments(VectorOfNodes& arguments);
+
+    SymbolInfo* visit_local_function_call(FunctionTypeNode& function, VectorOfTypes & args);
+
+    SymbolInfo* visit_call_global_function(FunctionTypeNode& ft, VectorOfTypes & args);
+
+    SymbolInfo* visit_non_generic_function_call(FunctionTypeNode& function, VectorOfTypes & args);
+    SymbolInfo* visit_generic_function_call(FunctionTypeNode& function, VectorOfTypes & args);
+
+    std::vector<std::pair<VectorOfTypes,VectorOfNodes>> make_combinations(VectorOfNodes args);
 };
 
 #endif //UNTITLED1_CHECKER_H

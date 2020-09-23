@@ -324,7 +324,7 @@ TEST(second_pass_test, x_declare_in_inner_scope_and_use_outside_error) {
 }
 
 TEST(second_pass_test, function_return_type_error) {
-    std::string text = "fun foo()->String{} fun main()->Integer{return foo();}";
+    std::string text = "fun foo()->String{return \"Hello\";} fun main()->Integer{return foo();}";
     ASSERT_THROWS_RETURN_TYPE_ERROR(text, "main", T_INT, T_STRING);
 }
 
@@ -582,6 +582,56 @@ TEST(second_pass_test, pass_overloaded_function_no_generic) {
     EXPECT_TRUE(main_fun->body->nodes[0]->equal(DECL("x", nullptr, c0))) << *main_fun->body->nodes[0];
 }
 
+TEST(second_pass_test, pass_simple_function_generic) {
+    std::string text = "fun foo(x:String)->String{"
+                       "return \"A string\";"
+                       "} "
+                       "fun call(x: a, f: fun(a)->String)->String{"
+                       "return f(x);"
+                       "} "
+                       "fun main()->Integer{"
+                       "var y = call(\"Hello\", foo);"
+                       "return 0;"
+                       "}";
+    BlockNode* tree = get_ast(text);
+    std::vector<std::pair<std::string, CodeBuiltin*>> builtins;
+    builtins.push_back({"str", new BuiltinIntegerToString()});
+    builtins.push_back({"print", new BuiltinPrintString()});
+    GlobalProcessor gp(builtins);
+    gp.visit(*tree);
+    Checker checker(gp.globals, gp.class_table);
+    checker.function_table = gp.function_table;
+    checker.visit(*tree);
+    FunctionNode* main_fun = dynamic_cast<FunctionNode*>(tree->nodes[2]);
+    auto c1 = CALL(ID("call.0"), VectorOfNodes({STR("Hello"), ID("foo.0")}));
+    EXPECT_TRUE(main_fun->body->nodes[0]->equal(DECL("y", nullptr, c1))) << *main_fun->body->nodes[0];
+}
+
+TEST(second_pass_test, pass_simple_function_return_generic) {
+    std::string text = "fun foo(x:String)->String{"
+                       "return \"A string\";"
+                       "} "
+                       "fun call(x: a, f: fun(a)->b)->b{"
+                       "return f(x);"
+                       "} "
+                       "fun main()->Integer{"
+                       "var y = call(\"Hello\", foo);"
+                       "return 0;"
+                       "}";
+    BlockNode* tree = get_ast(text);
+    std::vector<std::pair<std::string, CodeBuiltin*>> builtins;
+    builtins.push_back({"str", new BuiltinIntegerToString()});
+    builtins.push_back({"print", new BuiltinPrintString()});
+    GlobalProcessor gp(builtins);
+    gp.visit(*tree);
+    Checker checker(gp.globals, gp.class_table);
+    checker.function_table = gp.function_table;
+    checker.visit(*tree);
+    FunctionNode* main_fun = dynamic_cast<FunctionNode*>(tree->nodes[2]);
+    auto c1 = CALL(ID("call.0"), VectorOfNodes({STR("Hello"), ID("foo.0")}));
+    EXPECT_TRUE(main_fun->body->nodes[0]->equal(DECL("y", nullptr, c1))) << *main_fun->body->nodes[0];
+}
+
 TEST(second_pass_test, pass_overloaded_function_generic) {
     std::string text = "fun foo(x:String)->String{"
                        "return \"A string\";"
@@ -609,6 +659,97 @@ TEST(second_pass_test, pass_overloaded_function_generic) {
     FunctionNode* main_fun = dynamic_cast<FunctionNode*>(tree->nodes[3]);
     auto c0 = CALL(ID("call.0"), VectorOfNodes({NUM(7), ID("foo.1")}));
     EXPECT_TRUE(main_fun->body->nodes[0]->equal(DECL("x", nullptr, c0))) << *main_fun->body->nodes[0];
-    auto c1 = CALL(ID("call.0"), VectorOfNodes({NUM(7), ID("foo.0")}));
-    EXPECT_TRUE(main_fun->body->nodes[1]->equal(DECL("y", nullptr, c0))) << *main_fun->body->nodes[0];
+    auto c1 = CALL(ID("call.0"), VectorOfNodes({STR("Hello"), ID("foo.0")}));
+    EXPECT_TRUE(main_fun->body->nodes[1]->equal(DECL("y", nullptr, c1))) << *main_fun->body->nodes[1];
+}
+
+TEST(second_pass_test, pass_overloaded_function_generic_error) {
+    std::string text = "fun foo(x:String)->String{"
+                       "return \"A string\";"
+                       "} "
+                       "fun foo(x:Integer)->String{"
+                       "return \"A number\";"
+                       "} "
+                       "fun call(x: a, f: fun(a)->String)->String{"
+                       "return f(x);"
+                       "} "
+                       "fun main()->Integer{"
+                       "var x = call(7, foo);"
+                       "var y = call(\"Hello\", foo);"
+                       "var z = call(false, foo);"
+                       "return 0;"
+                       "}";
+    BlockNode* tree = get_ast(text);
+    std::vector<std::pair<std::string, CodeBuiltin*>> builtins;
+    builtins.push_back({"str", new BuiltinIntegerToString()});
+    builtins.push_back({"print", new BuiltinPrintString()});
+    GlobalProcessor gp(builtins);
+    gp.visit(*tree);
+    Checker checker(gp.globals, gp.class_table);
+    checker.function_table = gp.function_table;
+    checker.visit(*tree);
+    FunctionNode* main_fun = dynamic_cast<FunctionNode*>(tree->nodes[3]);
+    auto c0 = CALL(ID("call.0"), VectorOfNodes({NUM(7), ID("foo.1")}));
+    EXPECT_TRUE(main_fun->body->nodes[0]->equal(DECL("x", nullptr, c0))) << *main_fun->body->nodes[0];
+    auto c1 = CALL(ID("call.0"), VectorOfNodes({STR("Hello"), ID("foo.0")}));
+    EXPECT_TRUE(main_fun->body->nodes[1]->equal(DECL("y", nullptr, c1))) << *main_fun->body->nodes[1];
+}
+
+TEST(second_pass_test, generic_map) {
+    std::string text = "fun map(l: List[a], n:Integer, f: fun(a)->b)->List[b]{"
+                       "    var i = 0;"
+                       "    var r = []::List[b];"
+                       "    while(i<n){"
+                       "        r = r + [f(l[i])];"
+                       "        i = i+1;"
+                       "    }"
+                       "    return r;"
+                       "}"
+                       "fun double(i: Integer)->Integer{"
+                       "    return 2*i;"
+                       "}"
+                       "fun main()->Integer{"
+                       "    var l = map([1,2,3,4,5], 5, double);"
+                       "    return 0;"
+                       "}";
+    BlockNode* tree = get_ast(text);
+    std::vector<std::pair<std::string, CodeBuiltin*>> builtins;
+    builtins.push_back({"str", new BuiltinIntegerToString()});
+    builtins.push_back({"print", new BuiltinPrintString()});
+    GlobalProcessor gp(builtins);
+    gp.visit(*tree);
+    Checker checker(gp.globals, gp.class_table);
+    checker.function_table = gp.function_table;
+    checker.visit(*tree);
+    FunctionNode* main_fun = dynamic_cast<FunctionNode*>(tree->nodes[2]);
+    auto ls = new ListNode({NUM(1), NUM(2), NUM(3), NUM(4), NUM(5)});
+    auto c0 = CALL(ID("map.0"), VectorOfNodes({ls, NUM(5), ID("double.0")}));
+    EXPECT_TRUE(main_fun->body->nodes[0]->equal(DECL("l", nullptr, c0))) << *main_fun->body->nodes[0];
+}
+
+TEST(second_pass_test, generic_pass_function_error) {
+    std::string text = "fun foo(x:a,f:fun(a)->a)->a{"
+                       "return f(x);"
+                       "}"
+                       "fun bar(i: Integer)->String{"
+                       "return \"Hello\";"
+                       "}"
+                       "fun main()->Integer{"
+                       "var w = foo(5,bar);"
+                       "return 0;"
+                       "}";
+    BlockNode* tree = get_ast(text);
+    std::vector<std::pair<std::string, CodeBuiltin*>> builtins;
+    builtins.push_back({"str", new BuiltinIntegerToString()});
+    builtins.push_back({"print", new BuiltinPrintString()});
+    GlobalProcessor gp(builtins);
+    gp.visit(*tree);
+    Checker checker(gp.globals, gp.class_table);
+    checker.function_table = gp.function_table;
+    try {
+        checker.visit(*tree);
+        FAIL() << "Expected an error!";
+    } catch (...) {
+
+    }
 }

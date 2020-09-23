@@ -26,6 +26,8 @@ public:
         json j;
         j["node"] = "id";
         j["id"] = this->identifier;
+        j["start"] = this->start;
+        j["end"] = this->end;
         return j;
     }
 };

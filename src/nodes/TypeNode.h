@@ -18,6 +18,10 @@ public:
 //    bool equal(Node* other) const override;
 
     virtual std::string to_string() = 0;
+
+    virtual bool is_a_function() {
+        return false;
+    }
 };
 
 class FunctionTypeNode : public TypeNode {
@@ -27,6 +31,8 @@ public:
     void accept(Visitor& visitor) override;
 
     bool equal(Node* other) const override;
+
+    bool is_a_function() override { return true; }
 
     bool operator==(const FunctionTypeNode& other) const {
         if (this->parameter_types.size() != other.parameter_types.size()) return false;

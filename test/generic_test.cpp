@@ -108,25 +108,56 @@ TEST(generic_test, test_21) {
     VectorOfTypes pt = {};
     TypeNode* rt = TYPE("NoneType", {});
     auto a = FUNCTION_TYPE(pt, rt);
-    auto b = FUNCTION_TYPE({T_INT}, rt);
+    auto b = FUNCTION_TYPE({ T_INT }, rt);
     EXPECT_FALSE(type_matches(a, b));
 }
 
 
 TEST(generic_test, test_22) {
-    VectorOfTypes pt = {TYPE("a",{})};
+    VectorOfTypes pt = {TYPE("a", {})};
     TypeNode* rt = TYPE("NoneType", {});
     auto a = FUNCTION_TYPE(pt, rt);
     EXPECT_TRUE(is_generic(a));
 }
 
 TEST(generic_test, test_23) {
-    VectorOfTypes pt = {TYPE("Integer",{})};
+    VectorOfTypes pt = {TYPE("Integer", {})};
     TypeNode* rt = TYPE("NoneType", {});
     auto a = FUNCTION_TYPE(pt, rt);
     EXPECT_FALSE(is_generic(a));
 }
 
+TEST(generic_test, test_24) {
+    VectorOfTypes pt = {TYPE("a", {}), TYPE("a", {}), TYPE("b", {})};
+    auto a = FUNCTION_TYPE(pt, T_INT);
+    VectorOfTypes ptb = {T_INT, T_INT, T_STRING};
+    auto b = FUNCTION_TYPE(ptb, T_INT);
+    EXPECT_TRUE(type_matches(a, b));
+}
+
+TEST(generic_test, test_25) {
+    VectorOfTypes pt = {TYPE("a", {}), TYPE("a", {}), TYPE("b", {})};
+    auto a = FUNCTION_TYPE(pt, T_INT);
+    VectorOfTypes ptb = {T_INT, T_STRING, T_STRING};
+    auto b = FUNCTION_TYPE(ptb, T_INT);
+    EXPECT_FALSE(type_matches(a, b));
+}
+
+
+TEST(generic_test, test_26) {
+    auto a = TYPE("a", {});
+    VectorOfTypes ptb = {T_INT, T_INT, T_STRING};
+    auto b = FUNCTION_TYPE(ptb, T_INT);
+    EXPECT_TRUE(type_matches(a, b));
+}
+
+TEST(generic_test, test_27) {
+    VectorOfTypes pta = {TYPE("a", {})};
+    auto a = FUNCTION_TYPE(pta, TYPE("a", {}));
+    VectorOfTypes ptb = {T_INT};
+    auto b = FUNCTION_TYPE(ptb, T_STRING);
+    EXPECT_FALSE(type_matches(a, b));
+}
 
 
 TEST(generic_test, make_replacement_1) {

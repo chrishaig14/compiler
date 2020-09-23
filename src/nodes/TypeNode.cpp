@@ -23,6 +23,9 @@ std::string FunctionTypeNode::to_string() {
     for (auto p: this->parameter_types) {
         parameters += p->to_string() + ", ";
     }
+    if (this->parameter_types.size() != 0) {
+        parameters = parameters.substr(0, parameters.size() - 2);
+    }
     ret = this->return_type->to_string();
     return "fun (" + parameters + ") -> " + ret;
 }

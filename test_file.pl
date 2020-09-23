@@ -1,17 +1,11 @@
-fun call(x: a, f: fun(a)->String)->String{
-    return f(x);
-}
-
-fun foo(i: Integer)->String{
-    return "A number";
-}
-
-fun foo(i: String)->String{
-    return "A string";
+fun top(x: Integer)->Integer{
+    if(x == 2){
+        return 7;
+    }
+    return 8;
 }
 
 fun main()->Integer{
-    print(call(5, foo));
-    print(call("5", foo));
+    print(str(top(2)));
     return 0;
 }

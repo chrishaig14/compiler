@@ -312,9 +312,9 @@ TEST(translator_test, function) {
     CodeLabel expected_code = {
             NL(I_START_FUNCTION("foo")),
             NL(I_ENTER("foo")),
-            NL(I_DECL("x")),
             NL(I_DECL("y")),
             NL(I_SET("y")),
+            NL(I_DECL("x")),
             NL(I_SET("x")),
             NL(I_GET("x")),
             NL(I_GET("y")),
