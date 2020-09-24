@@ -4,6 +4,7 @@
 
 #include "Parser.h"
 #include "UnexpectedToken.h"
+#include <exception>
 
 Parser::Parser(std::vector<Token>& tokens) {
     this->tokens = tokens;
@@ -98,13 +99,22 @@ Node* Parser::parse_function_expression() {
 
 Node* Parser::parse_assignment_or_expression() {
     Node* lvalue = this->parse_expression();
+    auto call = dynamic_cast<CallNode*>(lvalue);
     if (this->match(TokenType::EQQ)) {
+        if (call != nullptr) {
+            throw std::runtime_error("Can't assign to a function call!");
+        }
         this->next();
         Node* rvalue = this->parse_expression();
         AssignmentNode* node = new AssignmentNode(lvalue, rvalue);
         node->start = lvalue->start;
         node->end = rvalue->end;
         return node;
+    } else {
+        if (call == nullptr) {
+            throw std::runtime_error(
+                    "Only function calls are allowed here! No ID, NUM, SUBSCRIPT, BINOP or other expression!");
+        }
     }
     return lvalue;
 }
@@ -243,6 +253,8 @@ Node* Parser::parse_id_or_literal() {
         }
         case TokenType::NUM: {
             node = new NumberNode(this->token.num);
+            node->line = this->token.line;
+            node->column = this->token.column;
             node->start = this->token.start;
             node->end = this->token.end;
             this->next();
@@ -280,7 +292,10 @@ Node* Parser::parse_id_or_literal() {
             return node;
         }
         default:
-            throw std::runtime_error("parsing id or literal, unknown token type: " + TOKEN_STRINGS[token.type]);
+            throw UnexpectedToken(token,
+                                  {TokenType::STRING, TokenType::NUM, TokenType::ID, TokenType::FUN,
+                                   TokenType::LPAREN});
+//            throw std::runtime_error("parsing id or literal, unknown token type: " + TOKEN_STRINGS[token.type]);
     }
     return node;
 }
@@ -356,10 +371,14 @@ Node* Parser::parse_id_or_class_literal() {
     std::string identifier = this->token.str;
     int start = this->token.start;
     int end = this->token.end;
+    int line = this->token.line;
+    int column = this->token.column;
     this->next();
     node = new IdNode(identifier);
     node->start = start;
     node->end = end;
+    node->line = line;
+    node->column = column;
     return node;
 }
 
@@ -463,7 +482,12 @@ TypeNode* Parser::parse_type_node() {
         TypeNode* fun_type = new FunctionTypeNode(parameter_types, return_type);
         return fun_type;
     }
-    Token identifier = this->expect_token(TokenType::ID);
+    Token identifier;
+    try {
+        identifier = this->expect_token(TokenType::ID);
+    } catch (...) {
+        throw std::runtime_error("Expected a valid TYPE, but got token " + TOKEN_STRINGS[this->token.type]);
+    }
     VectorOfTypes type_parameters;
     if (this->match(TokenType::LSQUARE)) {
         this->next();

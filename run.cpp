@@ -15,7 +15,13 @@ void compile_and_run(std::string text) {
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
-    BlockNode* program = parser.parse_program();
+    BlockNode* program;
+    try {
+        program = parser.parse_program();
+    } catch (const UnexpectedToken& ut) {
+        std::cerr << ut.what() << std::endl;
+        exit(1);
+    }
     std::vector<Builtin> builtins;
     builtins.push_back({"str", new BuiltinIntegerToString()});
     builtins.push_back({"str", new BuiltinListIntegerToString()});

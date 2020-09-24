@@ -175,6 +175,10 @@ void Checker::visit(IfNode& n) {
     SymbolInfo semantic_info;
     n.condition->accept(*this);
     SymbolInfo condition_info = this->rv;
+    if (!condition_info.symbol_info->equal(T_BOOL)) {
+        throw std::runtime_error("Expected a Boolean expression as a condition for if statement!, got " +
+                                 condition_info.symbol_info->to_string());
+    }
     this->enter_scope("if");
     n.then->accept(*this);
     SymbolInfo then_info = this->rv;
@@ -337,7 +341,7 @@ bool type_matches(TypeNode* a, TypeNode* b) {
                     }
                 } else { return false; }
             }
-            return type_matches(make_type(fa->return_type,replacements), fb->return_type);
+            return type_matches(make_type(fa->return_type, replacements), fb->return_type);
         }
     } else {
         // both are objects
@@ -1039,8 +1043,9 @@ void Checker::visit(BooleanNode& node) {
 void Checker::visit(WhileNode& node) {
     node.condition->accept(*this);
     SymbolInfo condition = this->rv;
-    if (!condition.symbol_info->equal(new ObjectTypeNode("Boolean", {}))) {
-        throw std::runtime_error("Expected boolean expression as while loop condition!");
+    if (!condition.symbol_info->equal(T_BOOL)) {
+        throw std::runtime_error("At line "+
+                std::to_string(node.condition->line+1) + " column " + std::to_string(node.condition->column+1) + ": Expected Boolean expression as while loop condition, got " + condition.symbol_info->to_string());
     }
     this->enter_scope("while");
     node.body->accept(*this);

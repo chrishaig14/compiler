@@ -15,14 +15,16 @@ std::string UnexpectedToken::make_message(Token token, const std::vector<TokenTy
     std::string expected_strings;
     if (expected_tokens.size() > 1) {
         for (int i = 0; i < expected_tokens.size() - 1; i++) {
-            expected_strings += TOKEN_STRINGS[expected_tokens[i]];
+            expected_strings += TOKEN_STRINGS[expected_tokens[i]] + ", ";
         }
+        expected_strings = expected_strings.substr(0,expected_strings.size()-2);
         expected_strings +=
                 " or " + TOKEN_STRINGS[expected_tokens[expected_tokens.size() - 1]];
     } else {
         expected_strings += TOKEN_STRINGS[expected_tokens[0]];
     }
-    message = "UnexpectedToken: got " + token.to_string() + ", expected " + expected_strings;
+    message = "UnexpectedToken at line " + std::to_string(token.line+1) + " column Parser.cpp:5:9 " + std::to_string(token.column+1) +
+              ": got " + token.to_string() + ", expected " + expected_strings;
     return message;
 }
 

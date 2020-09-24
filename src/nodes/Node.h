@@ -16,6 +16,8 @@ class Node {
 public:
     int start;
     int end;
+    int line;
+    int column;
 
     virtual void accept(Visitor& visitor) = 0;
 
