@@ -223,17 +223,20 @@ void Checker::visit(BinopNode& n) {
         bool ok = false;
         if (ltype == "Integer" && rtype == "Integer") {
             semantic_info.symbol_info = new ObjectTypeNode("Integer", {});
+            semantic_info.is_a_function = false;
             ok = true;
         }
         if (ltype == "String" && rtype == "String") {
             if (n.op == OpType::ADD) {
                 semantic_info.symbol_info = new ObjectTypeNode("String", {});
+                semantic_info.is_a_function = false;
                 ok = true;
             }
         }
         if (ltype == "List" && rtype == "List" && left->equal(right)) {
             if (n.op == OpType::ADD) {
                 semantic_info.symbol_info = left;
+                semantic_info.is_a_function = false;
                 ok = true;
             }
         }
