@@ -51,7 +51,7 @@ void Translator::visit(CallNode& node) {
         out.insert(out.end(), arg_code.begin(), arg_code.end());
     }
     IdNode* function_id = dynamic_cast<IdNode*>(node.function);
-    out.push_back(LC("",I_GET(function_id->identifier)));
+    out.push_back(LC("", I_GET(function_id->identifier)));
     out.push_back(LC("", I_CALL));
     this->code = out;
 }
@@ -240,7 +240,15 @@ void Translator::visit(ClassLiteralFieldNode& node) {
 }
 
 void Translator::visit(ForNode& node) {
-
+    node.body->nodes.push_back(ASN(ID("index"), BIN(OpType::ADD, ID("index"), NUM(1))));
+    auto s = SUB(ID("list"), {ID("index")});
+    node.body->nodes.insert(node.body->nodes.begin(), DECL(node.var, nullptr, s));
+    BlockNode* desugared = new BlockNode({DECL("list", nullptr, node.exp),
+                                          DECL("len", nullptr, CALL(ID("length.0"), {ID("list")})),
+                                          DECL("index", nullptr, NUM(0)),
+                                          WHILE(BIN(OpType::LT, ID("index"), ID("len")), node.body)
+                                         });
+    desugared->accept(*this);
 }
 
 void Translator::visit(WhileNode& node) {

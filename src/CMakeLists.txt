@@ -112,6 +112,8 @@ add_library(srcLib
         vm/Object.cpp
         vm/BuiltinSum.cpp
         vm/BuiltinSum.h
+        vm/BuiltinListLength.cpp
+        vm/BuiltinListLength.h
         vm/CodeObject.cpp
         vm/CodeObject.h
         vm/CodeUser.cpp

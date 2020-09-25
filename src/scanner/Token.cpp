@@ -102,6 +102,7 @@ void initialize_token_strings() {
     TOKEN_STRINGS[TokenType::LPAREN] = "lparen ( ( )";
     TOKEN_STRINGS[TokenType::DOUBLE_COLON] = "double colon ( :: )";
     TOKEN_STRINGS[TokenType::RPAREN] = "rparen ( ) )";
+    TOKEN_STRINGS[TokenType::ARROBA] = "arroba ( @ )";
     TOKEN_STRINGS[TokenType::END] = "EOF";
     TOKEN_STRINGS[TokenType::WHILE] = "while";
     TOKEN_STRINGS[TokenType::TRUE] = "true";

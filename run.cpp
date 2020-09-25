@@ -10,6 +10,7 @@
 #include "src/vm/BuiltinIntegerToString.h"
 #include "src/vm/BuiltinPrintString.h"
 #include "src/vm/BuiltinListIntegerToString.h"
+#include "src/vm/BuiltinListLength.h"
 
 void compile_and_run(std::string text) {
     Scanner scanner(text);
@@ -26,6 +27,7 @@ void compile_and_run(std::string text) {
     builtins.push_back({"str", new BuiltinIntegerToString()});
     builtins.push_back({"str", new BuiltinListIntegerToString()});
     builtins.push_back({"print", new BuiltinPrintString()});
+    builtins.push_back({"length", new BuiltinListLength()});
     GlobalProcessor gp(builtins);
     gp.visit(*program);
     Checker checker(gp.globals, gp.class_table);
@@ -36,7 +38,7 @@ void compile_and_run(std::string text) {
     ObjectStack stack;
     StructProtos structs;
     CodeLabel translated_code = translator.code;
-    std::cerr << translated_code << std::endl;
+//    std::cerr << translated_code << std::endl;
     Loader loader(translated_code, builtins);
     loader.load();
     Environment* global_env = loader.global_env;

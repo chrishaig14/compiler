@@ -1,8 +1,16 @@
-fun top(x: Integer) -> Integer {
-    if (x == 2){return 11;
- }
+fun range(a: Integer, s: Integer, b: Integer) -> List[Integer] {
+    var r = []::List[Integer];
+    while(a < b){
+        r = r + [a];
+        a = a + s;
+    }
+    return r;
 }
-fun main()-> Integer {
-    while(1){return 7;}
+
+fun main() -> Integer {
+    for (i @ range (0,5,100)) {
+        print(str(i));
+    }
+    print(str(length(range(0, 5, 100))));
     return 0;
 }

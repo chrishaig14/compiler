@@ -57,6 +57,7 @@ void initialize_tokens() {
     TOKEN_SPECIAL["/="] = TokenType::DIV_EQQ;
 
     TOKEN_SPECIAL["<"] = TokenType::LT;
+    TOKEN_SPECIAL["@"] = TokenType::ARROBA;
     TOKEN_SPECIAL[">"] = TokenType::GT;
     TOKEN_SPECIAL["<="] = TokenType::LEQ;
     TOKEN_SPECIAL[">="] = TokenType::GEQ;
