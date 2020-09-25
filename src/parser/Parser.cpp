@@ -40,9 +40,7 @@ ReturnNode* Parser::parse_return() {
 
 IfNode* Parser::parse_if() {
     this->expect_token(TokenType::IF);
-    this->expect_token(TokenType::LPAREN);
     Node* condition = this->parse_expression();
-    this->expect_token(TokenType::RPAREN);
     BlockNode* body = this->parse_possibly_empty_block();
     IfNode* node = new IfNode(condition, body);
     return node;
@@ -636,11 +634,17 @@ Node* Parser::parse_top_level_statement() {
 
 ForNode* Parser::parse_for_loop() {
     this->expect_token(TokenType::FOR);
-    this->expect_token(TokenType::LPAREN);
+    bool expect_paren = false;
+    if(this->match(TokenType::LPAREN)){
+        this->next();
+        expect_paren = true;
+    }
     Token var = this->expect_token(TokenType::ID);
     this->expect_token(TokenType::ARROBA);
     Node* exp = this->parse_expression();
-    this->expect_token(TokenType::RPAREN);
+    if (expect_paren) {
+        this->expect_token(TokenType::RPAREN);
+    }
     BlockNode* body = this->parse_possibly_empty_block();
     ForNode* for_node = FOR(var.str, exp, body);
     return for_node;
@@ -659,6 +663,13 @@ Node* Parser::parse_ternary() {
         return node;
     }
     return condition;
+}
+
+WhileNode* Parser::parse_while_loop() {
+    this->expect_token(TokenType::WHILE);
+    Node* condition = this->parse_expression();
+    BlockNode* body = this->parse_possibly_empty_block();
+    return new WhileNode(condition, body);
 }
 
 
