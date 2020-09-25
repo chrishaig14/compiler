@@ -27,7 +27,7 @@ void compile_and_run(std::string text) {
     builtins.push_back({"str", new BuiltinIntegerToString()});
     builtins.push_back({"str", new BuiltinListIntegerToString()});
     builtins.push_back({"print", new BuiltinPrintString()});
-    builtins.push_back({"length", new BuiltinListLength()});
+    builtins.push_back({"len", new BuiltinListLength()});
     GlobalProcessor gp(builtins);
     gp.visit(*program);
     Checker checker(gp.globals, gp.class_table);

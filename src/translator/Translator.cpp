@@ -240,13 +240,13 @@ void Translator::visit(ClassLiteralFieldNode& node) {
 }
 
 void Translator::visit(ForNode& node) {
-    node.body->nodes.push_back(ASN(ID("index"), BIN(OpType::ADD, ID("index"), NUM(1))));
-    auto s = SUB(ID("list"), {ID("index")});
+    node.body->nodes.push_back(ASN(ID(".index"), BIN(OpType::ADD, ID(".index"), NUM(1))));
+    auto s = SUB(ID(".list"), {ID(".index")});
     node.body->nodes.insert(node.body->nodes.begin(), DECL(node.var, nullptr, s));
-    BlockNode* desugared = new BlockNode({DECL("list", nullptr, node.exp),
-                                          DECL("len", nullptr, CALL(ID("length.0"), {ID("list")})),
-                                          DECL("index", nullptr, NUM(0)),
-                                          WHILE(BIN(OpType::LT, ID("index"), ID("len")), node.body)
+    BlockNode* desugared = new BlockNode({DECL(".list", nullptr, node.exp),
+                                          DECL(".length", nullptr, CALL(ID("len.0"), {ID(".list")})),
+                                          DECL(".index", nullptr, NUM(0)),
+                                          WHILE(BIN(OpType::LT, ID(".index"), ID(".length")), node.body)
                                          });
     desugared->accept(*this);
 }
