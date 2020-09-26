@@ -4,7 +4,6 @@
 
 #include <gtest/gtest.h>
 #include <vm/CodeRunner.h>
-#include <vm/builtins/BuiltinSum.h>
 #include "vm/ObjectStack.h"
 
 static Object* value_7 = new IntegerObject(7);
@@ -67,12 +66,8 @@ TEST(vm_test, inst_load) {
 TEST(vm_test, inst_call) {
     ObjectStack stack;
     Code code;
-    BuiltinSum builtinSum;
-    Object* builtin_sum = new CodeObject(&builtinSum);
     StructProtos structs;
     Environment* global_env = new Environment("", nullptr);
-    global_env->declare("__sum__");
-    global_env->set("__sum__", builtin_sum);
     CodeRunner code_runner(code, structs, stack, global_env);
     Object* value_16 = new IntegerObject(16);
     PushIntegerInst push_inst_9(9);
@@ -102,7 +97,6 @@ TEST(vm_test, inst_call_user) {
             I_GET("__sum__"),
             I_CALL,
             I_RET};
-    BuiltinSum builtin_sum_function;
 
     std::vector<std::string> free_variables = {"__sum__"};
 
@@ -116,11 +110,9 @@ TEST(vm_test, inst_call_user) {
             I_CALL
     };
     ObjectStack stack;
-    Object* builtin_sum_object = new CodeObject(&builtin_sum_function);
     StructProtos structs;
     Environment* global_env = new Environment("", nullptr);
     global_env->declare("__sum__");
-    global_env->set("__sum__", builtin_sum_object);
     CodeRunner code_runner(main_code, structs, stack, global_env);
     code_runner.run();
     EXPECT_TRUE(stack.top()->equal(new IntegerObject(21)));

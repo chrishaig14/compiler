@@ -3,8 +3,6 @@
 #include <scanner/Scanner.h>
 #include <semantic/GlobalProcessor.h>
 #include <semantic/Checker.h>
-#include <vm/builtins/BuiltinIntegerToString.h>
-#include <vm/builtins/BuiltinPrintString.h>
 #include <gtest/gtest.h>
 #include <scanner/Scanner.h>
 #include <parser/Parser.h>

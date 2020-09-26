@@ -9,8 +9,6 @@
 #include <vm/CodeRunner.h>
 #include <semantic/Checker.h>
 #include <vm/Loader.h>
-#include <vm/builtins/BuiltinIntegerToString.h>
-#include <vm/builtins/BuiltinPrintString.h>
 
 TEST(total_test, test_1) {
     std::string text = "fun sum(x: Integer, y: Integer) -> Integer {return x-y;} fun main()->None{sum(5, 8);}";
@@ -369,8 +367,6 @@ TEST(total_test, test_overloading) {
     Parser parser(tokens);
     BlockNode* program = parser.parse_program();
     std::vector<Builtin> builtins;
-    builtins.push_back({"str", new BuiltinIntegerToString()});
-    builtins.push_back({"print", new BuiltinPrintString()});
     GlobalProcessor gp(builtins);
     gp.visit(*program);
     Checker checker(gp.globals, gp.class_table);
@@ -401,8 +397,6 @@ TEST(total_test, test_empty_list) {
     Parser parser(tokens);
     BlockNode* program = parser.parse_program();
     std::vector<Builtin> builtins;
-    builtins.push_back({"str", new BuiltinIntegerToString()});
-    builtins.push_back({"print", new BuiltinPrintString()});
     GlobalProcessor gp(builtins);
     gp.visit(*program);
     Checker checker(gp.globals, gp.class_table);
@@ -433,8 +427,6 @@ TEST(total_test, overload_1) {
     Parser parser(tokens);
     BlockNode* program = parser.parse_program();
     std::vector<Builtin> builtins;
-    builtins.push_back({"str", new BuiltinIntegerToString()});
-    builtins.push_back({"print", new BuiltinPrintString()});
     GlobalProcessor gp(builtins);
     gp.visit(*program);
     Checker checker(gp.globals, gp.class_table);
@@ -468,8 +460,6 @@ TEST(total_test, overload_2) {
     Parser parser(tokens);
     BlockNode* program = parser.parse_program();
     std::vector<std::pair<std::string, CodeBuiltin*>> builtins;
-    builtins.push_back({"str", new BuiltinIntegerToString()});
-    builtins.push_back({"print", new BuiltinPrintString()});
     GlobalProcessor gp(builtins);
     gp.visit(*program);
     Checker checker(gp.globals, gp.class_table);
