@@ -533,29 +533,8 @@ SymbolInfo* Checker::visit_generic_function_call(FunctionTypeNode& function, Vec
                     }
                 }
             } else {
-                if (type_matches(pt, args[i])) {
-                    if (is_generic(pt)) {
-                        std::map<std::string, TypeNode*> rep = make_replacements(pt, args[i]);
-//                    for (auto r: rep) {
-//                        if (replace.count(r.first)) {
-//                            if (!r.second->equal(replace[r.first])) {
-//                                throw std::runtime_error(
-//                                        "Bad generic subtitution! " + r.first +
-//                                        " is already substituted for " +
-//                                        replace[r.first]->to_string() + " but now trying to replace for " +
-//                                        r.second->to_string());
-//                            }
-//                        } else {
-//                            replace[r.first] = r.second;
-//                        }
-//                    }
-                    }
-                } else {
-//                throw std::runtime_error(
-//                        "Argument types don't match calling function '" + func_name + "': param: " +
-//                        pt->to_string() +
-//                        " and arg: " + args[i].symbol_info->to_string());
-                }
+                return nullptr;
+
             }
         }
     }
