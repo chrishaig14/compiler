@@ -459,7 +459,7 @@ TEST(total_test, overload_2) {
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
     BlockNode* program = parser.parse_program();
-    std::vector<std::pair<std::string, CodeBuiltin*>> builtins;
+    std::vector<std::pair<std::string, CodeBuiltin>> builtins;
     GlobalProcessor gp(builtins);
     gp.visit(*program);
     Checker checker(gp.globals, gp.class_table);

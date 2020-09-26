@@ -21,6 +21,8 @@ class StringObject;
 
 class CodeObject;
 
+class Environment;
+
 class Object {
 public:
     virtual bool equal(const Object* other) const = 0;
@@ -28,19 +30,14 @@ public:
     virtual Object* sum(const Object* other) const { return nullptr; }
 };
 
+typedef void(* BuiltinFunction)(std::map<std::string, std::map<std::string, Code>>& structs,
+                                ObjectStack& stack, Environment* global_env);
 
-class CodeBuiltin {
-public:
 
+struct CodeBuiltin {
     FunctionTypeNode* ftype;
 
-    CodeBuiltin(FunctionTypeNode* ftype, void (* function)(ObjectStack&)) : ftype(ftype), function(function) {}
-
-    void (* function)(ObjectStack& stack);
-
-    void run(ObjectStack& stack) {
-        this->function(stack);
-    }
+    BuiltinFunction function;
 };
 
 

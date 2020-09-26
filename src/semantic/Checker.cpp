@@ -353,6 +353,7 @@ bool type_matches(TypeNode* a, TypeNode* b) {
         }
         // a is generic
         if (oa->type_parameters.size() == 0) return true;
+        if (dynamic_cast<FunctionTypeNode*>(b) != nullptr) return false;
         if (oa->identifier != ob->identifier) return false;
         if (oa->type_parameters.size() != ob->type_parameters.size()) return false;
         for (int i = 0; i < oa->type_parameters.size(); i++) {

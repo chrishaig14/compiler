@@ -121,7 +121,7 @@ void CodeRunner::visit(CallInst& call) {
         throw std::runtime_error("Trying to call something that's not code!");
     }
     if (code->type == CodeType::BUILTIN) {
-        code->builtin->run(this->stack);
+        code->builtin.function(this->structs, this->stack, this->global_env);
     } else {
         CodeRunner code_runner(code->user->code, this->structs, this->stack, this->global_env);
         code_runner.run();

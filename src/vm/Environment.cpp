@@ -49,3 +49,7 @@ Environment* Environment::leave(std::string name) {
     if (this->name == name) return this->parent;
     return this->parent->leave(name);
 }
+
+bool Environment::is_declared(std::string name) {
+    return this->table.count(name) == 1;
+}

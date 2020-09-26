@@ -13,10 +13,10 @@ public:
     CodeType type;
     union {
         CodeUser* user;
-        CodeBuiltin* builtin;
+        CodeBuiltin builtin;
     };
 
-    CodeObject(CodeBuiltin* builtin);
+    CodeObject(CodeBuiltin builtin);
 
     CodeObject(CodeUser* user_code);
 

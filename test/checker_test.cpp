@@ -14,7 +14,7 @@ BlockNode* get_ast(std::string text) {
 
 void compile(std::string text) {
     BlockNode* tree = get_ast(text);
-    std::vector<std::pair<std::string, CodeBuiltin*>> builtins;
+    std::vector<std::pair<std::string, CodeBuiltin>> builtins;
     GlobalProcessor gp(builtins);
     gp.visit(*tree);
     Checker checker(gp.globals, gp.class_table);
@@ -537,7 +537,7 @@ TEST(second_pass_test, call_overloaded_function) {
                        "return 0;"
                        "}";
     BlockNode* tree = get_ast(text);
-    std::vector<std::pair<std::string, CodeBuiltin*>> builtins;
+    std::vector<std::pair<std::string, CodeBuiltin>> builtins;
     GlobalProcessor gp(builtins);
     gp.visit(*tree);
     Checker checker(gp.globals, gp.class_table);
@@ -563,7 +563,7 @@ TEST(second_pass_test, pass_overloaded_function_no_generic) {
                        "return 0;"
                        "}";
     BlockNode* tree = get_ast(text);
-    std::vector<std::pair<std::string, CodeBuiltin*>> builtins;
+    std::vector<std::pair<std::string, CodeBuiltin>> builtins;
     GlobalProcessor gp(builtins);
     gp.visit(*tree);
     Checker checker(gp.globals, gp.class_table);
@@ -586,7 +586,7 @@ TEST(second_pass_test, pass_simple_function_generic) {
                        "return 0;"
                        "}";
     BlockNode* tree = get_ast(text);
-    std::vector<std::pair<std::string, CodeBuiltin*>> builtins;
+    std::vector<std::pair<std::string, CodeBuiltin>> builtins;
     GlobalProcessor gp(builtins);
     gp.visit(*tree);
     Checker checker(gp.globals, gp.class_table);
@@ -609,7 +609,7 @@ TEST(second_pass_test, pass_simple_function_return_generic) {
                        "return 0;"
                        "}";
     BlockNode* tree = get_ast(text);
-    std::vector<std::pair<std::string, CodeBuiltin*>> builtins;
+    std::vector<std::pair<std::string, CodeBuiltin>> builtins;
     GlobalProcessor gp(builtins);
     gp.visit(*tree);
     Checker checker(gp.globals, gp.class_table);
@@ -636,7 +636,7 @@ TEST(second_pass_test, pass_overloaded_function_generic) {
                        "return 0;"
                        "}";
     BlockNode* tree = get_ast(text);
-    std::vector<std::pair<std::string, CodeBuiltin*>> builtins;
+    std::vector<std::pair<std::string, CodeBuiltin>> builtins;
     GlobalProcessor gp(builtins);
     gp.visit(*tree);
     Checker checker(gp.globals, gp.class_table);
@@ -666,7 +666,7 @@ TEST(second_pass_test, pass_overloaded_function_generic_error) {
                        "return 0;"
                        "}";
     BlockNode* tree = get_ast(text);
-    std::vector<std::pair<std::string, CodeBuiltin*>> builtins;
+    std::vector<std::pair<std::string, CodeBuiltin>> builtins;
     GlobalProcessor gp(builtins);
     gp.visit(*tree);
     Checker checker(gp.globals, gp.class_table);
@@ -697,7 +697,7 @@ TEST(second_pass_test, generic_map) {
                        "    return 0;"
                        "}";
     BlockNode* tree = get_ast(text);
-    std::vector<std::pair<std::string, CodeBuiltin*>> builtins;
+    std::vector<std::pair<std::string, CodeBuiltin>> builtins;
     GlobalProcessor gp(builtins);
     gp.visit(*tree);
     Checker checker(gp.globals, gp.class_table);
@@ -721,7 +721,7 @@ TEST(second_pass_test, generic_pass_function_error) {
                        "return 0;"
                        "}";
     BlockNode* tree = get_ast(text);
-    std::vector<std::pair<std::string, CodeBuiltin*>> builtins;
+    std::vector<std::pair<std::string, CodeBuiltin>> builtins;
     GlobalProcessor gp(builtins);
     gp.visit(*tree);
     Checker checker(gp.globals, gp.class_table);

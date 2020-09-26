@@ -35,7 +35,7 @@ public:
     FunctionOverloads* get_overloads(std::string function_name);
 };
 
-typedef std::pair<std::string, CodeBuiltin*> Builtin;
+typedef std::pair<std::string, CodeBuiltin> Builtin;
 
 class GlobalProcessor : public Visitor {
 public:

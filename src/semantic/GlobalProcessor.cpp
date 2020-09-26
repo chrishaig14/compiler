@@ -7,34 +7,50 @@
 #include "ClassInfo.h"
 #include "../vm/Object.h"
 #include "../vm/ObjectStack.h"
+#include "../vm/CodeObject.h"
+#include "../vm/CodeRunner.h"
 
 void GlobalProcessor::add_builtins(std::vector<Builtin>& builtins) {
     for (int i = 0; i < builtins.size(); i++) {
         Builtin b = builtins[i];
-        assert(b.second->ftype != nullptr);
-        int index = this->function_table->add(b.first, b.second->ftype);
+        assert(b.second.ftype != nullptr);
+        int index = this->function_table->add(b.first, b.second.ftype);
         b.first = b.first + "." + std::to_string(index);
         builtins[i] = b;
     }
 
 }
 
-void int_to_str(ObjectStack& stack) {
+void int_to_str(std::map<std::string, std::map<std::string, Code>>& structs, ObjectStack& stack,
+                Environment* global_env) {
     IntegerObject* x = stack.pop_integer();
     stack.push(new StringObject(std::to_string(x->value)));
 }
 
-void print(ObjectStack& stack) {
+void str_to_str(std::map<std::string, std::map<std::string, Code>>& structs, ObjectStack& stack,
+                Environment* global_env) {
+}
+
+void print(std::map<std::string, std::map<std::string, Code>>& structs, ObjectStack& stack,
+           Environment* global_env) {
     StringObject* st = stack.pop_string();
     std::cout << "<< " << st->str << std::endl;
 }
 
-void list_len(ObjectStack& stack) {
+void list_len(std::map<std::string, std::map<std::string, Code>>& structs, ObjectStack& stack,
+              Environment* global_env) {
     ListObject* ls = stack.pop_list();
     stack.push(new IntegerObject(ls->list.size()));
 }
 
-void range(ObjectStack& stack) {
+void string_len(std::map<std::string, std::map<std::string, Code>>& structs, ObjectStack& stack,
+                Environment* global_env) {
+    StringObject* ls = stack.pop_string();
+    stack.push(new IntegerObject(ls->str.size()));
+}
+
+void range(std::map<std::string, std::map<std::string, Code>>& structs, ObjectStack& stack,
+           Environment* global_env) {
     IntegerObject* end = stack.pop_integer();
     IntegerObject* step = stack.pop_integer();
     IntegerObject* start = stack.pop_integer();
@@ -45,9 +61,40 @@ void range(ObjectStack& stack) {
     stack.push(new ListObject(ls));
 }
 
+void join(std::map<std::string, std::map<std::string, Code>>& structs, ObjectStack& stack,
+          Environment* global_env) {
+    ListObject* ls = stack.pop_list();
+    StringObject* sep = stack.pop_string();
+    std::string res;
+    for (int i = 0; i < ls->list.size(); i++) {
+        StringObject* str = dynamic_cast<StringObject*>(ls->list[i]);
+        if (str == nullptr) throw "Joining list with no strings!";
+        res += str->str + sep->str;
+    }
+    if (ls->list.size() != 0) {
+        res = res.substr(0, res.size() - sep->str.size());
+    }
+    stack.push(new StringObject(res));
+}
 
-void GlobalProcessor::call(std::string function_name, FunctionTypeNode* ftype, void (* function)(ObjectStack&)) {
-    new CodeBuiltin(ftype, function);
+void list_map(std::map<std::string, std::map<std::string, Code>>& structs, ObjectStack& stack,
+              Environment* global_env) {
+    CodeObject* fun = dynamic_cast<CodeObject*>(stack.pop());
+    if (fun == nullptr)throw std::runtime_error("Popping a code object but it's not!");
+    ListObject* ls = stack.pop_list();
+    std::vector<Object*> rv;
+    for (int i = 0; i < ls->list.size(); i++) {
+        stack.push(ls->list[i]);
+        if (fun->type == CodeType::BUILTIN) {
+            fun->builtin.function(structs, stack, global_env);
+        } else {
+            CodeRunner code_runner(fun->user->code, structs, stack, global_env);
+            code_runner.run();
+        }
+        Object* obj = stack.top();
+        rv.push_back(stack.pop());
+    }
+    stack.push(new ListObject(rv));
 }
 
 GlobalProcessor::GlobalProcessor(std::vector<Builtin>& builtins) {
@@ -55,12 +102,21 @@ GlobalProcessor::GlobalProcessor(std::vector<Builtin>& builtins) {
 
     this->globals = new SymbolTable("global", nullptr);
     this->class_table = new ClassTable();
+    auto ft = FUNCTION_TYPE({ TYPE("a", {}) }, TYPE("b", {}));
+    auto at = T_LIST(TYPE("a", {}));
+    builtins.push_back({"map", CodeBuiltin{FUNCTION_TYPE(VectorOfTypes({at, ft}), T_LIST(TYPE("b", {}))), list_map}});
+    builtins.push_back({"str", CodeBuiltin{FUNCTION_TYPE({ T_INT }, T_STRING), int_to_str}});
+    builtins.push_back({"str", CodeBuiltin{FUNCTION_TYPE({ T_STRING }, T_STRING), str_to_str}});
 
-    builtins.push_back({"str", new CodeBuiltin(FUNCTION_TYPE({ T_INT }, T_STRING), int_to_str)});
-    builtins.push_back({"print", new CodeBuiltin(FUNCTION_TYPE({ T_STRING }, T_INT), print)});
-    builtins.push_back({"len", new CodeBuiltin(FUNCTION_TYPE({ T_LIST(TYPE("a", {})) }, T_INT), list_len)});
+    builtins.push_back({"print", CodeBuiltin{FUNCTION_TYPE({ T_STRING }, T_INT), print}});
     builtins.push_back(
-            {"range", new CodeBuiltin(FUNCTION_TYPE(VectorOfTypes({T_INT, T_INT, T_INT}), T_LIST(T_INT)), range)});
+            {"join", CodeBuiltin{FUNCTION_TYPE(VectorOfTypes({T_STRING, T_LIST(T_STRING)}), T_STRING), join}});
+
+    builtins.push_back({"len", CodeBuiltin{FUNCTION_TYPE({ T_LIST(TYPE("a", {})) }, T_INT), list_len}});
+    builtins.push_back({"len", CodeBuiltin{FUNCTION_TYPE({ T_STRING }, T_INT), string_len}});
+
+    builtins.push_back(
+            {"range", CodeBuiltin{FUNCTION_TYPE(VectorOfTypes({T_INT, T_INT, T_INT}), T_LIST(T_INT)), range}});
 
     this->add_builtins(builtins);
 }
@@ -212,7 +268,8 @@ bool FunctionTable::function_exists(std::string function_name) {
 }
 
 bool FunctionTable::is_overloaded(std::string function_name) {
-    if (!function_exists(function_name)) throw std::runtime_error("Function '" + function_name + "' doesnt exist!");
+    if (!function_exists(function_name))
+        throw std::runtime_error("Function '" + function_name + "' doesnt exist!");
     return functions[function_name]->size() > 1;
 }
 

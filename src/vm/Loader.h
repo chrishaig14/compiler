@@ -12,7 +12,7 @@
 
 class Loader {
 public:
-    Loader(CodeLabel allCode, std::vector<std::pair<std::string, CodeBuiltin*>>& builtins);
+    Loader(CodeLabel allCode, std::vector<std::pair<std::string, CodeBuiltin>>& builtins);
 
     void load();
 

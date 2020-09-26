@@ -4,7 +4,7 @@
 #include "CodeObject.h"
 #include "Object.h"
 
-CodeObject::CodeObject(CodeBuiltin* builtin) {
+CodeObject::CodeObject(CodeBuiltin builtin) {
     this->type = CodeType::BUILTIN;
     this->builtin = builtin;
 }
