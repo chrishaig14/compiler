@@ -1109,12 +1109,14 @@ void Checker::visit(TernaryNode& node) {
 void Checker::visit(NoneNode& node) {
     SymbolInfo semanticInfo;
     semanticInfo.symbol_info = new ObjectTypeNode("NoneType", {});
+    semanticInfo.is_a_function = false;
     this->rv = semanticInfo;
 }
 
 void Checker::visit(EmptyListNode& node) {
     SymbolInfo semanticInfo;
     semanticInfo.symbol_info = node.type;
+    semanticInfo.is_a_function = false;
     this->rv = semanticInfo;
 }
 
