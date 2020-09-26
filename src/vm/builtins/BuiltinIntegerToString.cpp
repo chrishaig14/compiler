@@ -4,9 +4,9 @@
 
 #include <iostream>
 #include "BuiltinIntegerToString.h"
-#include "ObjectStack.h"
-#include "IntegerObject.h"
-#include "StringObject.h"
+#include "../ObjectStack.h"
+#include "../IntegerObject.h"
+#include "../StringObject.h"
 
 void BuiltinIntegerToString::run(ObjectStack& stack) {
     Object* value = stack.pop();

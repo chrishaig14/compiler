@@ -3,7 +3,7 @@
 //
 
 #include "BuiltinListIntegerToString.h"
-#include "ListObject.h"
+#include "../ListObject.h"
 
 void BuiltinListIntegerToString::run(ObjectStack& stack) {
     ListObject* list = dynamic_cast<ListObject*>(stack.pop());

@@ -6,10 +6,10 @@
 #define UNTITLED1_BUILTINLISTLENGTH_H
 
 
-#include "Object.h"
-#include "ObjectStack.h"
-#include "IntegerObject.h"
-#include "StringObject.h"
+#include "../Object.h"
+#include "../ObjectStack.h"
+#include "../IntegerObject.h"
+#include "../StringObject.h"
 
 
 class BuiltinListLength : public CodeBuiltin {

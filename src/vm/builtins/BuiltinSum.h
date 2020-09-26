@@ -5,8 +5,8 @@
 #ifndef UNTITLED1_BUILTINSUM_H
 #define UNTITLED1_BUILTINSUM_H
 
-#include "ObjectStack.h"
-#include "IntegerObject.h"
+#include "../ObjectStack.h"
+#include "../IntegerObject.h"
 
 class BuiltinSum : public CodeBuiltin {
 public:

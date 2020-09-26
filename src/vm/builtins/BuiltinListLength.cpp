@@ -4,7 +4,7 @@
 
 #include "BuiltinListLength.h"
 
-#include "ListObject.h"
+#include "../ListObject.h"
 
 void BuiltinListLength::run(ObjectStack& stack) {
     ListObject* list = dynamic_cast<ListObject*>(stack.pop());

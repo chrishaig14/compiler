@@ -9,6 +9,9 @@
 #include <stack>
 #include <stdexcept>
 #include "Object.h"
+#include "IntegerObject.h"
+#include "StringObject.h"
+#include "ListObject.h"
 
 class ObjectStackElement {
 public:
@@ -28,6 +31,8 @@ public:
     Object* top();
 
     void push(Object* value);
+
+    IntegerObject* pop_integer();
 
     Object* pop();
 

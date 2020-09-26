@@ -4,7 +4,7 @@
 
 #include <gtest/gtest.h>
 #include <vm/CodeRunner.h>
-#include <vm/BuiltinSum.h>
+#include <vm/builtins/BuiltinSum.h>
 #include "vm/ObjectStack.h"
 
 static Object* value_7 = new IntegerObject(7);

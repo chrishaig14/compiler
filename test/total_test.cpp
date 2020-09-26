@@ -9,8 +9,8 @@
 #include <vm/CodeRunner.h>
 #include <semantic/Checker.h>
 #include <vm/Loader.h>
-#include <vm/BuiltinIntegerToString.h>
-#include <vm/BuiltinPrintString.h>
+#include <vm/builtins/BuiltinIntegerToString.h>
+#include <vm/builtins/BuiltinPrintString.h>
 
 TEST(total_test, test_1) {
     std::string text = "fun sum(x: Integer, y: Integer) -> Integer {return x-y;} fun main()->None{sum(5, 8);}";

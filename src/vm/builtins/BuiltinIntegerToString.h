@@ -6,7 +6,7 @@
 #define UNTITLED1_BUILTININTEGERTOSTRING_H
 
 
-#include "Object.h"
+#include "../Object.h"
 
 class BuiltinIntegerToString : public CodeBuiltin {
 public:

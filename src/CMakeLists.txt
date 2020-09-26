@@ -110,10 +110,10 @@ add_library(srcLib
         vm/ObjectStack.cpp
         vm/Object.h
         vm/Object.cpp
-        vm/BuiltinSum.cpp
-        vm/BuiltinSum.h
-        vm/BuiltinListLength.cpp
-        vm/BuiltinListLength.h
+        vm/builtins/BuiltinSum.cpp
+        vm/builtins/BuiltinSum.h
+        vm/builtins/BuiltinListLength.cpp
+        vm/builtins/BuiltinListLength.h
         vm/CodeObject.cpp
         vm/CodeObject.h
         vm/CodeUser.cpp
@@ -153,4 +153,6 @@ add_library(srcLib
         instructions/MakeDefaultInst.cpp
         instructions/MakeDefaultInst.h
         parser/UnexpectedToken.cpp
-        parser/UnexpectedToken.h nodes/ForNode.cpp nodes/ForNode.h semantic/AssignmentTypeError.cpp semantic/AssignmentTypeError.h nodes/BooleanNode.cpp nodes/BooleanNode.h nodes/WhileNode.cpp nodes/WhileNode.h instructions/JumpInst.cpp instructions/JumpInst.h instructions/EnterScope.cpp instructions/EnterScope.h instructions/LeaveScope.cpp instructions/LeaveScope.h vm/LabelledCode.cpp vm/LabelledCode.h instructions/NopInst.cpp instructions/NopInst.h nodes/BreakNode.cpp nodes/BreakNode.h vm/Loader.cpp vm/Loader.h instructions/StartFunction.cpp instructions/StartFunction.h instructions/EndFunction.cpp instructions/EndFunction.h formatter/Formatter.cpp formatter/Formatter.h nodes/TernaryNode.cpp nodes/TernaryNode.h nodes/NoneNode.cpp nodes/NoneNode.h instructions/JumpIfNone.cpp instructions/JumpIfNone.h vm/NoneObject.cpp vm/NoneObject.h instructions/PushNone.cpp instructions/PushNone.h vm/BuiltinIntegerToString.cpp vm/BuiltinIntegerToString.h vm/BuiltinPrintString.cpp vm/BuiltinPrintString.h vm/BuiltinPrintString.cpp vm/BuiltinListIntegerToString.cpp vm/BuiltinListIntegerToString.h)
+        vm/builtins/BuiltinRange.cpp
+        vm/builtins/BuiltinRange.h
+        parser/UnexpectedToken.h nodes/ForNode.cpp nodes/ForNode.h semantic/AssignmentTypeError.cpp semantic/AssignmentTypeError.h nodes/BooleanNode.cpp nodes/BooleanNode.h nodes/WhileNode.cpp nodes/WhileNode.h instructions/JumpInst.cpp instructions/JumpInst.h instructions/EnterScope.cpp instructions/EnterScope.h instructions/LeaveScope.cpp instructions/LeaveScope.h vm/LabelledCode.cpp vm/LabelledCode.h instructions/NopInst.cpp instructions/NopInst.h nodes/BreakNode.cpp nodes/BreakNode.h vm/Loader.cpp vm/Loader.h instructions/StartFunction.cpp instructions/StartFunction.h instructions/EndFunction.cpp instructions/EndFunction.h formatter/Formatter.cpp formatter/Formatter.h nodes/TernaryNode.cpp nodes/TernaryNode.h nodes/NoneNode.cpp nodes/NoneNode.h instructions/JumpIfNone.cpp instructions/JumpIfNone.h vm/NoneObject.cpp vm/NoneObject.h instructions/PushNone.cpp instructions/PushNone.h vm/builtins/BuiltinIntegerToString.cpp vm/builtins/BuiltinIntegerToString.h vm/builtins/BuiltinPrintString.cpp vm/builtins/BuiltinPrintString.h vm/builtins/BuiltinPrintString.cpp vm/builtins/BuiltinListIntegerToString.cpp vm/builtins/BuiltinListIntegerToString.h)

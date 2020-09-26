@@ -7,10 +7,10 @@
 #include "src/translator/Translator.h"
 #include "src/vm/Loader.h"
 #include "src/vm/CodeRunner.h"
-#include "src/vm/BuiltinIntegerToString.h"
-#include "src/vm/BuiltinPrintString.h"
-#include "src/vm/BuiltinListIntegerToString.h"
-#include "src/vm/BuiltinListLength.h"
+#include "src/vm/builtins/BuiltinIntegerToString.h"
+#include "src/vm/builtins/BuiltinPrintString.h"
+#include "src/vm/builtins/BuiltinListIntegerToString.h"
+#include "src/vm/builtins/BuiltinListLength.h"
 
 void compile_and_run(std::string text) {
     Scanner scanner(text);
@@ -24,10 +24,7 @@ void compile_and_run(std::string text) {
         exit(1);
     }
     std::vector<Builtin> builtins;
-    builtins.push_back({"str", new BuiltinIntegerToString()});
-    builtins.push_back({"str", new BuiltinListIntegerToString()});
-    builtins.push_back({"print", new BuiltinPrintString()});
-    builtins.push_back({"len", new BuiltinListLength()});
+
     GlobalProcessor gp(builtins);
     gp.visit(*program);
     Checker checker(gp.globals, gp.class_table);

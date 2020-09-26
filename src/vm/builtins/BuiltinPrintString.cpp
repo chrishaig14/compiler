@@ -4,8 +4,8 @@
 
 #include <iostream>
 #include "BuiltinPrintString.h"
-#include "ObjectStack.h"
-#include "StringObject.h"
+#include "../ObjectStack.h"
+#include "../StringObject.h"
 
 void BuiltinPrintString::run(ObjectStack& stack) {
     Object* value = stack.pop();

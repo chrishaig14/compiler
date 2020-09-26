@@ -6,10 +6,10 @@
 #define UNTITLED1_BUILTINLISTINTEGERTOSTRING_H
 
 
-#include "Object.h"
-#include "ObjectStack.h"
-#include "IntegerObject.h"
-#include "StringObject.h"
+#include "../Object.h"
+#include "../ObjectStack.h"
+#include "../IntegerObject.h"
+#include "../StringObject.h"
 
 class BuiltinListIntegerToString : public CodeBuiltin {
 public:

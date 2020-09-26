@@ -6,7 +6,7 @@
 #define UNTITLED1_BUILTINPRINTSTRING_H
 
 
-#include "Object.h"
+#include "../Object.h"
 
 class BuiltinPrintString : public CodeBuiltin {
 public:

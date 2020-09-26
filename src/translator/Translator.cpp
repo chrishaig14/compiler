@@ -241,10 +241,11 @@ void Translator::visit(ClassLiteralFieldNode& node) {
 
 void Translator::visit(ForNode& node) {
     node.body->nodes.push_back(ASN(ID(".index"), BIN(OpType::ADD, ID(".index"), NUM(1))));
-    auto s = SUB(ID(".list"), {ID(".index")});
+    std::string list_name = ".list"+std::to_string(current_loop);
+    auto s = SUB(ID(list_name), {ID(".index")});
     node.body->nodes.insert(node.body->nodes.begin(), DECL(node.var, nullptr, s));
-    BlockNode* desugared = new BlockNode({DECL(".list", nullptr, node.exp),
-                                          DECL(".length", nullptr, CALL(ID("len.0"), {ID(".list")})),
+    BlockNode* desugared = new BlockNode({DECL(list_name, nullptr, node.exp),
+                                          DECL(".length", nullptr, CALL(ID("len.0"), {ID(list_name)})),
                                           DECL(".index", nullptr, NUM(0)),
                                           WHILE(BIN(OpType::LT, ID(".index"), ID(".length")), node.body)
                                          });

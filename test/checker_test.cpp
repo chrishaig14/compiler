@@ -3,8 +3,8 @@
 #include <scanner/Scanner.h>
 #include <semantic/GlobalProcessor.h>
 #include <semantic/Checker.h>
-#include <vm/BuiltinIntegerToString.h>
-#include <vm/BuiltinPrintString.h>
+#include <vm/builtins/BuiltinIntegerToString.h>
+#include <vm/builtins/BuiltinPrintString.h>
 
 BlockNode* get_ast(std::string text) {
     Scanner scanner(text);

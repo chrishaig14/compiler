@@ -28,6 +28,12 @@ bool ObjectStack::empty() {
     return this->_top == nullptr;
 }
 
+IntegerObject* ObjectStack::pop_integer() {
+    auto ptr = dynamic_cast<IntegerObject*>(this->pop());
+    if (ptr == nullptr) throw std::runtime_error("Trying to pop an integer, but it's not!");
+    return ptr;
+}
+
 ObjectStackElement::ObjectStackElement(Object* value, ObjectStackElement* previous) {
     this->value = value;
     this->previous = previous;

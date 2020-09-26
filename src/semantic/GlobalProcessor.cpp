@@ -6,6 +6,11 @@
 #include "GlobalProcessor.h"
 #include "ClassInfo.h"
 #include "../vm/Object.h"
+#include "../vm/builtins/BuiltinIntegerToString.h"
+#include "../vm/builtins/BuiltinListIntegerToString.h"
+#include "../vm/builtins/BuiltinPrintString.h"
+#include "../vm/builtins/BuiltinListLength.h"
+#include "../vm/builtins/BuiltinRange.h"
 
 void GlobalProcessor::add_builtins(std::vector<Builtin>& builtins) {
     for (int i = 0; i < builtins.size(); i++) {
@@ -23,6 +28,12 @@ GlobalProcessor::GlobalProcessor(std::vector<Builtin>& builtins) {
 
     this->globals = new SymbolTable("global", nullptr);
     this->class_table = new ClassTable();
+    builtins.push_back({"str", new BuiltinIntegerToString()});
+    builtins.push_back({"str", new BuiltinListIntegerToString()});
+    builtins.push_back({"print", new BuiltinPrintString()});
+    builtins.push_back({"len", new BuiltinListLength()});
+    builtins.push_back({"range", new BuiltinRange()});
+
     this->add_builtins(builtins);
 }
 
