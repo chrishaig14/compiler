@@ -657,6 +657,9 @@ void Checker::visit(CallNode& n) {
                 FunctionTypeNode* overload = (*overloads)[i];
                 for (int j = 0; j < combinations.size(); j++) {
                     VectorOfTypes comb_info = combinations[j].first;
+                    if (comb_info.size() != overload->parameter_types.size()) {
+                        continue;
+                    }
                     SymbolInfo* candidate = this->visit_call_global_function(*overload, comb_info);
                     // there might be more than 1 candidate combination for 1 overload that should not be ok
                     if (candidate != nullptr) {
@@ -679,13 +682,15 @@ void Checker::visit(CallNode& n) {
                 semantic_info.symbol_info = ft->return_type;
                 semantic_info.is_a_function = false;
             } else {
+                auto funt = this->function_table->get_simple_function(func_name);
                 std::map<int, SymbolInfo*> candidates;
-
-                for (int j = 0; j < combinations.size(); j++) {
-                    SymbolInfo* candidate = this->visit_call_global_function(
-                            *this->function_table->get_simple_function(func_name), combinations[j].first);
-                    if (candidate != nullptr) {
-                        candidates[j] = candidate;
+                if (n.arguments.size() == funt->parameter_types.size()) {
+                    for (int j = 0; j < combinations.size(); j++) {
+                        SymbolInfo* candidate = this->visit_call_global_function(
+                                *funt, combinations[j].first);
+                        if (candidate != nullptr) {
+                            candidates[j] = candidate;
+                        }
                     }
                 }
                 if (candidates.size() == 0) {
@@ -1026,8 +1031,11 @@ void Checker::visit(WhileNode& node) {
     node.condition->accept(*this);
     SymbolInfo condition = this->rv;
     if (!condition.symbol_info->equal(T_BOOL)) {
-        throw std::runtime_error("At line "+
-                std::to_string(node.condition->line+1) + " column " + std::to_string(node.condition->column+1) + ": Expected Boolean expression as while loop condition, got " + condition.symbol_info->to_string());
+        throw std::runtime_error("At line " +
+                                 std::to_string(node.condition->line + 1) + " column " +
+                                 std::to_string(node.condition->column + 1) +
+                                 ": Expected Boolean expression as while loop condition, got " +
+                                 condition.symbol_info->to_string());
     }
     this->enter_scope("while");
     node.body->accept(*this);
