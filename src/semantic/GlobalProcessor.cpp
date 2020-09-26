@@ -6,11 +6,7 @@
 #include "GlobalProcessor.h"
 #include "ClassInfo.h"
 #include "../vm/Object.h"
-#include "../vm/builtins/BuiltinIntegerToString.h"
-#include "../vm/builtins/BuiltinListIntegerToString.h"
-#include "../vm/builtins/BuiltinPrintString.h"
-#include "../vm/builtins/BuiltinListLength.h"
-#include "../vm/builtins/BuiltinRange.h"
+#include "../vm/ObjectStack.h"
 
 void GlobalProcessor::add_builtins(std::vector<Builtin>& builtins) {
     for (int i = 0; i < builtins.size(); i++) {
@@ -23,16 +19,48 @@ void GlobalProcessor::add_builtins(std::vector<Builtin>& builtins) {
 
 }
 
+void int_to_str(ObjectStack& stack) {
+    IntegerObject* x = stack.pop_integer();
+    stack.push(new StringObject(std::to_string(x->value)));
+}
+
+void print(ObjectStack& stack) {
+    StringObject* st = stack.pop_string();
+    std::cout << "<< " << st->str << std::endl;
+}
+
+void list_len(ObjectStack& stack) {
+    ListObject* ls = stack.pop_list();
+    stack.push(new IntegerObject(ls->list.size()));
+}
+
+void range(ObjectStack& stack) {
+    IntegerObject* end = stack.pop_integer();
+    IntegerObject* step = stack.pop_integer();
+    IntegerObject* start = stack.pop_integer();
+    std::vector<Object*> ls;
+    for (int i = start->value; i < end->value; i += step->value) {
+        ls.push_back(new IntegerObject(i));
+    }
+    stack.push(new ListObject(ls));
+}
+
+
+void GlobalProcessor::call(std::string function_name, FunctionTypeNode* ftype, void (* function)(ObjectStack&)) {
+    new CodeBuiltin(ftype, function);
+}
+
 GlobalProcessor::GlobalProcessor(std::vector<Builtin>& builtins) {
     this->function_table = new FunctionTable();
 
     this->globals = new SymbolTable("global", nullptr);
     this->class_table = new ClassTable();
-    builtins.push_back({"str", new BuiltinIntegerToString()});
-    builtins.push_back({"str", new BuiltinListIntegerToString()});
-    builtins.push_back({"print", new BuiltinPrintString()});
-    builtins.push_back({"len", new BuiltinListLength()});
-    builtins.push_back({"range", new BuiltinRange()});
+
+    builtins.push_back({"str", new CodeBuiltin(FUNCTION_TYPE({ T_INT }, T_STRING), int_to_str)});
+    builtins.push_back({"print", new CodeBuiltin(FUNCTION_TYPE({ T_STRING }, T_INT), print)});
+    builtins.push_back({"len", new CodeBuiltin(FUNCTION_TYPE({ T_LIST(TYPE("a", {})) }, T_INT), list_len)});
+    builtins.push_back(
+            {"range", new CodeBuiltin(FUNCTION_TYPE(VectorOfTypes({T_INT, T_INT, T_INT}), T_LIST(T_INT)), range)});
 
     this->add_builtins(builtins);
 }

@@ -7,10 +7,6 @@
 #include "src/translator/Translator.h"
 #include "src/vm/Loader.h"
 #include "src/vm/CodeRunner.h"
-#include "src/vm/builtins/BuiltinIntegerToString.h"
-#include "src/vm/builtins/BuiltinPrintString.h"
-#include "src/vm/builtins/BuiltinListIntegerToString.h"
-#include "src/vm/builtins/BuiltinListLength.h"
 
 void compile_and_run(std::string text) {
     Scanner scanner(text);
@@ -35,7 +31,7 @@ void compile_and_run(std::string text) {
     ObjectStack stack;
     StructProtos structs;
     CodeLabel translated_code = translator.code;
-//    std::cerr << translated_code << std::endl;
+    std::cerr << translated_code << std::endl;
     Loader loader(translated_code, builtins);
     loader.load();
     Environment* global_env = loader.global_env;

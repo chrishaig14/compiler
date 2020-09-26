@@ -240,14 +240,20 @@ void Translator::visit(ClassLiteralFieldNode& node) {
 }
 
 void Translator::visit(ForNode& node) {
-    node.body->nodes.push_back(ASN(ID(".index"), BIN(OpType::ADD, ID(".index"), NUM(1))));
-    std::string list_name = ".list"+std::to_string(current_loop);
-    auto s = SUB(ID(list_name), {ID(".index")});
+    int loop_number = this->loop_counter;
+    this->current_loop = loop_number;
+    this->loop_counter++;
+    std::string list_name = ".list" + std::to_string(this->current_loop);
+    std::string len_name = ".len" + std::to_string(this->current_loop);
+    std::string index_name = ".index" + std::to_string(this->current_loop);
+    node.body->nodes.push_back(ASN(ID(index_name), BIN(OpType::ADD, ID(index_name), NUM(1))));
+
+    auto s = SUB(ID(list_name), { ID(index_name) });
     node.body->nodes.insert(node.body->nodes.begin(), DECL(node.var, nullptr, s));
     BlockNode* desugared = new BlockNode({DECL(list_name, nullptr, node.exp),
-                                          DECL(".length", nullptr, CALL(ID("len.0"), {ID(list_name)})),
-                                          DECL(".index", nullptr, NUM(0)),
-                                          WHILE(BIN(OpType::LT, ID(".index"), ID(".length")), node.body)
+                                          DECL(len_name, nullptr, CALL(ID("len.0"), {ID(list_name)})),
+                                          DECL(index_name, nullptr, NUM(0)),
+                                          WHILE(BIN(OpType::LT, ID(index_name), ID(len_name)), node.body)
                                          });
     desugared->accept(*this);
 }

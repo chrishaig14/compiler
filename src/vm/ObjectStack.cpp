@@ -34,6 +34,18 @@ IntegerObject* ObjectStack::pop_integer() {
     return ptr;
 }
 
+StringObject* ObjectStack::pop_string() {
+    auto ptr = dynamic_cast<StringObject*>(this->pop());
+    if (ptr == nullptr) throw std::runtime_error("Trying to pop a string, but it's not!");
+    return ptr;
+}
+
+ListObject* ObjectStack::pop_list() {
+    auto ptr = dynamic_cast<ListObject*>(this->pop());
+    if (ptr == nullptr) throw std::runtime_error("Trying to pop a list, but it's not!");
+    return ptr;
+}
+
 ObjectStackElement::ObjectStackElement(Object* value, ObjectStackElement* previous) {
     this->value = value;
     this->previous = previous;

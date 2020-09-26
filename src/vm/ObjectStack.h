@@ -33,6 +33,8 @@ public:
     void push(Object* value);
 
     IntegerObject* pop_integer();
+    StringObject* pop_string();
+    ListObject* pop_list();
 
     Object* pop();
 

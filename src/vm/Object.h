@@ -31,9 +31,16 @@ public:
 
 class CodeBuiltin {
 public:
+
     FunctionTypeNode* ftype;
 
-    virtual void run(ObjectStack& stack) = 0;
+    CodeBuiltin(FunctionTypeNode* ftype, void (* function)(ObjectStack&)) : ftype(ftype), function(function) {}
+
+    void (* function)(ObjectStack& stack);
+
+    void run(ObjectStack& stack) {
+        this->function(stack);
+    }
 };
 
 
