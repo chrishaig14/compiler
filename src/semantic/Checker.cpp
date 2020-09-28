@@ -642,7 +642,18 @@ std::vector<std::pair<VectorOfTypes, VectorOfNodes>> Checker::make_combinations(
 }
 
 void Checker::visit(CallNode& n) {
-    std::string func_name = dynamic_cast<IdNode*>(n.function)->identifier;
+    IdNode* func = dynamic_cast<IdNode*>(n.function);
+    std::string func_name;
+    if (func == nullptr) {
+        MemberNode* mem = dynamic_cast<MemberNode*>(n.function);
+        n.arguments.insert(n.arguments.begin(), mem->parent);
+        func_name = mem->child;
+        n.function = ID(func_name);
+//        throw std::runtime_error("Function call on something that's not an Identifier");
+    } else {
+        func_name = func->identifier;
+    }
+
 
     std::vector<std::pair<VectorOfTypes, VectorOfNodes>> combinations;
     combinations = make_combinations(n.arguments);

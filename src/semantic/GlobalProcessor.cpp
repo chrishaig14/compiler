@@ -63,8 +63,8 @@ void range(std::map<std::string, std::map<std::string, Code>>& structs, ObjectSt
 
 void join(std::map<std::string, std::map<std::string, Code>>& structs, ObjectStack& stack,
           Environment* global_env) {
-    ListObject* ls = stack.pop_list();
     StringObject* sep = stack.pop_string();
+    ListObject* ls = stack.pop_list();
     std::string res;
     for (int i = 0; i < ls->list.size(); i++) {
         StringObject* str = dynamic_cast<StringObject*>(ls->list[i]);
@@ -110,7 +110,7 @@ GlobalProcessor::GlobalProcessor(std::vector<Builtin>& builtins) {
 
     builtins.push_back({"print", CodeBuiltin{FUNCTION_TYPE({ T_STRING }, T_INT), print}});
     builtins.push_back(
-            {"join", CodeBuiltin{FUNCTION_TYPE(VectorOfTypes({T_STRING, T_LIST(T_STRING)}), T_STRING), join}});
+            {"join", CodeBuiltin{FUNCTION_TYPE(VectorOfTypes({T_LIST(T_STRING), T_STRING}), T_STRING), join}});
 
     builtins.push_back({"len", CodeBuiltin{FUNCTION_TYPE({ T_LIST(TYPE("a", {})) }, T_INT), list_len}});
     builtins.push_back({"len", CodeBuiltin{FUNCTION_TYPE({ T_STRING }, T_INT), string_len}});
