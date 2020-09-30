@@ -46,7 +46,19 @@ void Checker::leave_scope() {
 void Checker::visit(FunctionNode& n) {
     this->enter_scope(n.identifier);
     for (int i = 0; i < n.parameter_names.size(); i++) {
+        ObjectTypeNode* otn = dynamic_cast<ObjectTypeNode*>(n.parameter_types[i]);
+        if (otn != nullptr) {
+            if (!this->class_table->declared(otn->identifier)) {
+                throw std::runtime_error("type " + n.parameter_types[i]->to_string() + " doesn't exist!");
+            }
+        }
         this->scope->set(n.parameter_names[i], n.parameter_types[i]);
+    }
+    ObjectTypeNode* rotn = dynamic_cast<ObjectTypeNode*>(n.return_type);
+    if (rotn != nullptr) {
+        if (!this->class_table->declared(rotn->identifier)) {
+            throw std::runtime_error("type " + n.return_type->to_string() + " doesn't exist!");
+        }
     }
     this->scope->set("__return__", n.return_type);
     n.body->accept(*this);
