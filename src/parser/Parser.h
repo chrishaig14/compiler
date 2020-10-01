@@ -59,7 +59,7 @@ public:
 
     Node* parse_id_or_literal();
 
-    Node* parse_mul_or_div_expression();
+    Node* parse_mul_div_or_mod_expression();
 
     Node* parse_or_expression();
 

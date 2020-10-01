@@ -703,7 +703,7 @@ TEST(parser_test, times_expression) {
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
-    Node* node = parser.parse_mul_or_div_expression();
+    Node* node = parser.parse_mul_div_or_mod_expression();
     Node* expected_node = BIN(OpType::MUL, ID("foo"), ID("bar"));
     COMPLETE_TEST;
 
@@ -790,7 +790,7 @@ TEST(parser_test, div_expression) {
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
-    Node* node = parser.parse_mul_or_div_expression();
+    Node* node = parser.parse_mul_div_or_mod_expression();
     Node* expected_node = BIN(OpType::DIV, ID("foo"), NUM(1));
     COMPLETE_TEST;
 }

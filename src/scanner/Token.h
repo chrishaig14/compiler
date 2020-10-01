@@ -43,6 +43,7 @@ enum class TokenType {
     IF,
     ELSE,
     FOR,
+    MOD,
     WHILE,
     VAR,
     LSQUARE,

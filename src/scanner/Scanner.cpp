@@ -47,6 +47,7 @@ void initialize_tokens() {
 
     TOKEN_SPECIAL["+"] = TokenType::PLUS;
     TOKEN_SPECIAL["-"] = TokenType::MINUS;
+    TOKEN_SPECIAL["%"] = TokenType::MOD;
     TOKEN_SPECIAL["*"] = TokenType::TIMES;
     TOKEN_SPECIAL["/"] = TokenType::DIV;
 

@@ -180,7 +180,7 @@ Node* Parser::parse_bool_expression() {
 }
 
 Node* Parser::parse_add_or_sub_expression() {
-    Node* left = this->parse_mul_or_div_expression();
+    Node* left = this->parse_mul_div_or_mod_expression();
     OpType op;
     while (this->match(TokenType::PLUS) || this->match(TokenType::MINUS)) {
         if (this->match(TokenType::PLUS)) {
@@ -190,7 +190,7 @@ Node* Parser::parse_add_or_sub_expression() {
             this->next();
             op = OpType::SUB;
         }
-        Node* right = this->parse_mul_or_div_expression();
+        Node* right = this->parse_mul_div_or_mod_expression();
         Node* node = new BinopNode(op, left, right);
         node->start = left->start;
         node->end = right->end;
@@ -200,17 +200,29 @@ Node* Parser::parse_add_or_sub_expression() {
     return left;
 }
 
-Node* Parser::parse_mul_or_div_expression() {
+Node* Parser::parse_mul_div_or_mod_expression() {
     Node* left = this->parse_factor();
     OpType op;
-    while (this->match(TokenType::TIMES) || this->match(TokenType::DIV)) {
-        if (this->match(TokenType::TIMES)) {
-            this->next();
-            op = OpType::MUL;
-        } else if (this->match(TokenType::DIV)) {
-            this->next();
-            op = OpType::DIV;
+    while (this->match(TokenType::TIMES) || this->match(TokenType::DIV) || this->match(TokenType::MOD)) {
+        switch (this->token.type) {
+            case TokenType::TIMES: {
+                op = OpType::MUL;
+                break;
+            }
+            case TokenType::DIV: {
+                op = OpType::DIV;
+                break;
+            }
+            case TokenType::MOD: {
+                op = OpType::MOD;
+                break;
+            }
+            default: {
+                throw std::runtime_error(
+                        "Unexpected token :" + TOKEN_STRINGS[this->token.type] + " expected mul, div or mod!");
+            }
         }
+        this->next();
         Node* right = this->parse_factor();
         Node* node = new BinopNode(op, left, right);
         node->start = left->start;
@@ -635,7 +647,7 @@ Node* Parser::parse_top_level_statement() {
 ForNode* Parser::parse_for_loop() {
     this->expect_token(TokenType::FOR);
     bool expect_paren = false;
-    if(this->match(TokenType::LPAREN)){
+    if (this->match(TokenType::LPAREN)) {
         this->next();
         expect_paren = true;
     }

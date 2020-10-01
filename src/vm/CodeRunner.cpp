@@ -9,7 +9,7 @@
 CodeRunner::CodeRunner(const Code& code, std::map<std::string, std::map<std::string, Code>>& structs,
                        ObjectStack& stack, Environment* global_env) : code(code), stack(stack),
                                                                       structs(structs) {
-    std::cerr << "New code runner" << std::endl;
+    //std::cerr << "New code runner" << std::endl;
     this->env = new Environment("", global_env);
     this->global_env = global_env;
     this->inst_ptr = 0;
@@ -23,7 +23,7 @@ void CodeRunner::run() {
 }
 
 void CodeRunner::visit(BinopInst& inst) {
-    std::cerr << "Run [" << inst.to_string() << "]" << std::endl;
+//    //std::cerr << "Run [" << inst.to_string() << "]" << std::endl;
 
     Object* right = this->stack.pop();
     Object* left = this->stack.pop();
@@ -44,6 +44,11 @@ void CodeRunner::visit(BinopInst& inst) {
                 break;
             case OpType::MUL:
                 result = left_int->value * right_int->value;
+                this->stack.push(new IntegerObject(result));
+
+                break;
+            case OpType::MOD:
+                result = left_int->value % right_int->value;
                 this->stack.push(new IntegerObject(result));
 
                 break;
@@ -91,6 +96,12 @@ void CodeRunner::visit(BinopInst& inst) {
             if (inst.op == OpType::ADD) {
                 result = left_str->str + right_str->str;
                 this->stack.push(new StringObject(result));
+            } else if (inst.op == OpType::EQ) {
+                bool res = left_str->str == right_str->str;
+                this->stack.push(new BooleanObject(res));
+            } else if (inst.op == OpType::NEQ) {
+                bool res = left_str->str != right_str->str;
+                this->stack.push(new BooleanObject(res));
             }
         } else {
             ListObject* right_list = dynamic_cast<ListObject*>(right);
@@ -113,7 +124,7 @@ void CodeRunner::visit(BinopInst& inst) {
 }
 
 void CodeRunner::visit(CallInst& call) {
-    std::cerr << "Run [" << call.to_string() << "]" << std::endl;
+//    //std::cerr << "Run [" << call.to_string() << "]" << std::endl;
 
     Object* value = this->stack.pop();
     CodeObject* code = dynamic_cast<CodeObject*>(value);
@@ -132,20 +143,20 @@ void CodeRunner::visit(CallInst& call) {
 }
 
 void CodeRunner::visit(DeclareInst& declare) {
-    std::cerr << "Run [" << declare.to_string() << "]" << std::endl;
+    //std::cerr << "Run [" << declare.to_string() << "]" << std::endl;
     this->env->declare(declare.identifier);
     this->inst_ptr++;
 }
 
 void CodeRunner::visit(GetInst& inst) {
-    std::cerr << "Run [" << inst.to_string() << "]" << std::endl;
+    //std::cerr << "Run [" << inst.to_string() << "]" << std::endl;
     Object* value = this->env->get(inst.identifier);
     this->stack.push(value);
     this->inst_ptr++;
 }
 
 void CodeRunner::visit(GetMemberInst& inst) {
-    std::cerr << "Run [" << inst.to_string() << "]" << std::endl;
+    //std::cerr << "Run [" << inst.to_string() << "]" << std::endl;
     Object* object = this->stack.pop();
     UserObject* user_object = dynamic_cast<UserObject*>(object);
     this->stack.push(user_object->fields[inst.member]);
@@ -153,7 +164,7 @@ void CodeRunner::visit(GetMemberInst& inst) {
 }
 
 void CodeRunner::visit(GetSubscriptInst& inst) {
-    std::cerr << "Run [" << inst.to_string() << "]" << std::endl;
+    //std::cerr << "Run [" << inst.to_string() << "]" << std::endl;
     Object* obj = this->stack.pop();
     ListObject* list = dynamic_cast<ListObject*>(obj);
     if (list == nullptr) {
@@ -172,7 +183,7 @@ void CodeRunner::visit(PushFunctionInst& inst) {
 }
 
 void CodeRunner::visit(PushIntegerInst& inst) {
-    std::cerr << "Run [" << inst.to_string() << "]" << std::endl;
+    //std::cerr << "Run [" << inst.to_string() << "]" << std::endl;
 
     IntegerObject* reference_to_new_integer_object = new IntegerObject(inst.num);
     this->stack.push(reference_to_new_integer_object);
@@ -180,7 +191,7 @@ void CodeRunner::visit(PushIntegerInst& inst) {
 }
 
 void CodeRunner::visit(PushStringInst& inst) {
-    std::cerr << "Run [" << inst.to_string() << "]" << std::endl;
+    //std::cerr << "Run [" << inst.to_string() << "]" << std::endl;
 
     StringObject* reference_to_new_integer_object = new StringObject(inst.str);
     this->stack.push(reference_to_new_integer_object);
@@ -188,13 +199,13 @@ void CodeRunner::visit(PushStringInst& inst) {
 }
 
 void CodeRunner::visit(ReturnInst& inst) {
-    std::cerr << "Run [" << inst.to_string() << "]" << std::endl;
+    //std::cerr << "Run [" << inst.to_string() << "]" << std::endl;
 
     this->inst_ptr = this->code.size() + 1;
 }
 
 void CodeRunner::visit(SetInst& inst) {
-    std::cerr << "Run [" << inst.to_string() << "]" << std::endl;
+    //std::cerr << "Run [" << inst.to_string() << "]" << std::endl;
 
     Object* value = this->stack.pop();
     this->env->set(inst.identifier, value);
@@ -202,7 +213,7 @@ void CodeRunner::visit(SetInst& inst) {
 }
 
 void CodeRunner::visit(SetMemberInst& inst) {
-    std::cerr << "Run [" << inst.to_string() << "]" << std::endl;
+    //std::cerr << "Run [" << inst.to_string() << "]" << std::endl;
 
     Object* object = this->stack.pop();
     UserObject* user_object = dynamic_cast<UserObject*>(object);
@@ -211,7 +222,7 @@ void CodeRunner::visit(SetMemberInst& inst) {
 }
 
 void CodeRunner::visit(SetSubscriptInst& inst) {
-    std::cerr << "Run [" << inst.to_string() << "]" << std::endl;
+    //std::cerr << "Run [" << inst.to_string() << "]" << std::endl;
     Object* element = this->stack.pop();
     Object* index = this->stack.pop();
     Object* value = this->stack.pop();
@@ -222,7 +233,7 @@ void CodeRunner::visit(SetSubscriptInst& inst) {
 }
 
 void CodeRunner::visit(MakeObjectInst& inst) {
-    std::cerr << "Run [" << inst.to_string() << "]" << std::endl;
+    //std::cerr << "Run [" << inst.to_string() << "]" << std::endl;
     UserObject* obj = new UserObject(inst.type, inst.fields);
     for (int i = inst.fields.size() - 1; i >= 0; i--) {
         obj->fields[inst.fields[i]] = this->stack.pop();
@@ -232,7 +243,7 @@ void CodeRunner::visit(MakeObjectInst& inst) {
 }
 
 void CodeRunner::visit(MakeListInst& inst) {
-    std::cerr << "Run [" << inst.to_string() << "]" << std::endl;
+    //std::cerr << "Run [" << inst.to_string() << "]" << std::endl;
 
     std::vector<Object*> list(inst.length, nullptr);
     for (int i = inst.length - 1; i >= 0; i--) {
@@ -243,7 +254,7 @@ void CodeRunner::visit(MakeListInst& inst) {
 }
 
 void CodeRunner::visit(JumpIfFalseInst& inst) {
-    std::cerr << "Run [" << inst.to_string() << "]" << std::endl;
+    //std::cerr << "Run [" << inst.to_string() << "]" << std::endl;
 
     Object* tos = this->stack.pop();
     BooleanObject* boolean_ptr = dynamic_cast<BooleanObject*>(tos);
@@ -258,7 +269,7 @@ void CodeRunner::visit(JumpIfFalseInst& inst) {
 }
 
 void CodeRunner::visit(PushBooleanInst& inst) {
-    std::cerr << "Run [" << inst.to_string() << "]" << std::endl;
+    //std::cerr << "Run [" << inst.to_string() << "]" << std::endl;
 
     this->stack.push(new BooleanObject(inst.boolean));
     this->inst_ptr++;
@@ -293,7 +304,7 @@ void CodeRunner::visit(MakeDefaultInst& inst) {
 }
 
 void CodeRunner::visit(JumpInst& inst) {
-    std::cerr << "Run [" << inst.to_string() << "]" << std::endl;
+    //std::cerr << "Run [" << inst.to_string() << "]" << std::endl;
     this->inst_ptr += inst.offset;
 }
 

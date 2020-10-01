@@ -31,7 +31,7 @@ void compile_and_run(std::string text) {
     ObjectStack stack;
     StructProtos structs;
     CodeLabel translated_code = translator.code;
-    std::cerr << translated_code << std::endl;
+//    std::cerr << translated_code << std::endl;
     Loader loader(translated_code, builtins);
     loader.load();
     Environment* global_env = loader.global_env;
