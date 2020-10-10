@@ -16,13 +16,13 @@
 #define COMPLETE_TEST EXPECT_TRUE(node->equal(expected_node)); delete node; delete expected_node;
 #define EXPECT_NOT_EQUAL EXPECT_FALSE(node->equal(expected_node)); delete node; delete expected_node;
 
-TEST(parser_test, binop_a_plus_b) {
+TEST(parser_test, a_plus_b) {
     std::string text = "a + b";
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
     Node* node = parser.parse_add_or_sub_expression();
-    Node* expected_node = new BinopNode(OpType::ADD, ID("a"), ID("b"));
+    Node* expected_node = BIN(OpType::ADD, ID("a"), ID("b"));
     EXPECT_EQ(node->start, 0);
     EXPECT_EQ(node->end, 4);
     COMPLETE_TEST;
@@ -40,7 +40,7 @@ TEST(parser_test, ternary) {
     COMPLETE_TEST;
 }
 
-TEST(parser_test, or_test) {
+TEST(parser_test, a_or_b) {
     std::string text = "a||b";
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
@@ -50,7 +50,7 @@ TEST(parser_test, or_test) {
     COMPLETE_TEST;
 }
 
-TEST(parser_test, expression_with_ternary) {
+TEST(parser_test, complex_expression_1) {
     std::string text = "a||s-c==7?8-9?7:4:10";
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
@@ -61,39 +61,7 @@ TEST(parser_test, expression_with_ternary) {
     COMPLETE_TEST;
 }
 
-TEST(parser_test, ternary_fail_1) {
-    std::string text = "a?8:6";
-    Scanner scanner(text);
-    std::vector<Token> tokens = scanner.scan_all();
-    Parser parser(tokens);
-    Node* node = parser.parse_ternary();
-    Node* expected_node = TERNARY(ID("a"), NUM(7), NUM(6));
-    EXPECT_NOT_EQUAL;
-}
-
-TEST(parser_test, ternary_fail_2) {
-    std::string text = "b?7:6";
-    Scanner scanner(text);
-    std::vector<Token> tokens = scanner.scan_all();
-    Parser parser(tokens);
-    Node* node = parser.parse_ternary();
-    Node* expected_node = TERNARY(ID("a"), NUM(7), NUM(6));
-    EXPECT_NOT_EQUAL;
-}
-
-TEST(parser_test, ternary_fail_3) {
-    std::string text = "a?8:7";
-    Scanner scanner(text);
-    std::vector<Token> tokens = scanner.scan_all();
-    Parser parser(tokens);
-    Node* node = parser.parse_ternary();
-    Node* expected_node = TERNARY(ID("a"), NUM(7), NUM(6));
-    EXPECT_EQ(node->start, 0);
-    EXPECT_EQ(node->end, 4);
-    EXPECT_NOT_EQUAL;
-}
-
-TEST(parser_test, binop_a_eq_b) {
+TEST(parser_test, a_eq_b) {
     std::string text = "a==b";
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
@@ -106,7 +74,7 @@ TEST(parser_test, binop_a_eq_b) {
 
 }
 
-TEST(parser_test, exp_identifier) {
+TEST(parser_test, id) {
     std::string text = "foo";
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
@@ -118,7 +86,7 @@ TEST(parser_test, exp_identifier) {
     COMPLETE_TEST;
 }
 
-TEST(parser_test, assign_x_equal_y) {
+TEST(parser_test, assign_x_y) {
     std::string text = "x = y";
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
@@ -132,7 +100,7 @@ TEST(parser_test, assign_x_equal_y) {
 
 }
 
-TEST(parser_test, assign_x_equal_binop_a_plus_b) {
+TEST(parser_test, assign_x_a_plus_b) {
     std::string text = "x = a+b";
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
@@ -145,7 +113,7 @@ TEST(parser_test, assign_x_equal_binop_a_plus_b) {
 
 }
 
-TEST(parser_test, decl_x_without_value_or_type_throws_error) {
+TEST(parser_test, declare_x_no_type_no_exp_error) {
     std::string text = "var x";
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
@@ -158,7 +126,7 @@ TEST(parser_test, decl_x_without_value_or_type_throws_error) {
     }
 }
 
-TEST(parser_test, decl_x_with_value) {
+TEST(parser_test, declare_x_a_plus_b) {
     std::string text = "var x = a + b";
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
@@ -197,7 +165,7 @@ TEST(parser_test, non_empty_block) {
     delete node;
 }
 
-TEST(parser_test, if_empty_then) {
+TEST(parser_test, if_x_empty_then) {
     std::string text = "if(x){}";
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
@@ -207,21 +175,7 @@ TEST(parser_test, if_empty_then) {
     COMPLETE_TEST;
 }
 
-TEST(parser_test, parse_template) {
-    std::string text = "struct Tree[T]{value:T; left:Option[Tree[T]]; right: Option[Tree[T]];}";
-    Scanner scanner(text);
-    std::vector<Token> tokens = scanner.scan_all();
-    Parser parser(tokens);
-    StructNode* node = parser.parse_struct_definition();
-    StructFields fields;
-    fields.push_back({"value", TYPE("T", {})});
-    fields.push_back({"left", TYPE("Option", { TYPE("Tree", {TYPE("T", {})}) })});
-    fields.push_back({"right", TYPE("Option", { TYPE("Tree", {TYPE("T", {})}) })});
-    auto expected_node = CLS("Tree", { "T" }, fields);
-    COMPLETE_TEST;
-}
-
-TEST(parser_test, if_non_empty_then) {
+TEST(parser_test, if_x_non_empty_then) {
     std::string text = "if(x){x=a+b; x = y;}";
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
@@ -608,19 +562,6 @@ TEST(parser_test, test_now_8) {
     COMPLETE_TEST;
 }
 
-TEST(parser_test, test_now_5) {
-    std::string text = "#x[7]{}";
-    Scanner scanner(text);
-    std::vector<Token> tokens = scanner.scan_all();
-    Parser parser(tokens);
-    try {
-        parser.parse_expression();
-        FAIL() << "Expected exception!";
-    } catch (const UnexpectedToken& e) {
-
-    }
-}
-
 TEST(parser_test, plus_parenthesized_expression) {
     std::string text = "(1+a)";
     Scanner scanner(text);
@@ -732,7 +673,7 @@ TEST(parser_test, boolean_false) {
 }
 
 TEST(parser_test, for_loop_1) {
-    std::string text = "for(e:l){}";
+    std::string text = "for(e@l){}";
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
@@ -762,7 +703,7 @@ TEST(parser_test, while_loop_common) {
 }
 
 TEST(parser_test, for_loop_2) {
-    std::string text = "for(e:[4,5,6]){print(e);}";
+    std::string text = "for(e@[4,5,6]){print(e);}";
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
@@ -774,7 +715,7 @@ TEST(parser_test, for_loop_2) {
 }
 
 TEST(parser_test, for_loop_3) {
-    std::string text = "for(e:[4,5,6]){print(e);}";
+    std::string text = "for(e @[4,5,6]){print(e);}";
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
@@ -795,17 +736,17 @@ TEST(parser_test, div_expression) {
     COMPLETE_TEST;
 }
 
-TEST(parser_test, parse_list_empty) {
+TEST(parser_test, parse_list_empty_no_type_throws_error) {
     std::string text = "[]";
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
-    Node* node = parser.parse_expression();
-    VectorOfNodes list;
-    Node* expected_node = LST(list);
-    EXPECT_EQ(node->start, 0);
-    EXPECT_EQ(node->end, 1);
-    COMPLETE_TEST;
+    try {
+        Node* node = parser.parse_expression();
+        FAIL() << "Did not throw an error";
+    }catch(...){
+
+    }
 }
 
 TEST(parser_test, parse_xxx) {

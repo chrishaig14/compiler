@@ -94,6 +94,10 @@ public:
     void visit(NoneNode& node) override;
 
     void visit(EmptyListNode& node) override;
+
+    void visit(ClassNode& node) override;
+
+    void visit(InstanceNode& node) override;
 };
 
 

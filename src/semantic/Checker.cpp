@@ -4,6 +4,7 @@
 #include <iostream>
 #include <set>
 #include "Checker.h"
+#include "TypeClassInfo.h"
 
 bool function_is_generic(FunctionTypeNode& ft) {
     for (int i = 0; i < ft.parameter_types.size(); i++) {
@@ -20,6 +21,7 @@ Checker::Checker(SymbolTable* globals, ClassTable* class_table) {
     this->scope = globals;
     this->scopes["global"] = this->scope;
     this->class_table->set("Integer", new ClassInfo(std::vector<std::string>(), std::vector<TypeNode*>(), {}));
+    this->class_table->set("String", new ClassInfo(std::vector<std::string>(), std::vector<TypeNode*>(), {}));
     this->class_table->set("Option", new ClassInfo(std::vector<std::string>(), std::vector<TypeNode*>(), {"T"}));
 
     this->check_structs();
@@ -48,7 +50,7 @@ void Checker::visit(FunctionNode& n) {
     for (int i = 0; i < n.parameter_names.size(); i++) {
         ObjectTypeNode* otn = dynamic_cast<ObjectTypeNode*>(n.parameter_types[i]);
         if (otn != nullptr) {
-            if (!this->class_table->declared(otn->identifier)) {
+            if (!is_generic(otn) && !this->class_table->declared(otn->identifier)) {
                 throw std::runtime_error("type " + n.parameter_types[i]->to_string() + " doesn't exist!");
             }
         }
@@ -56,7 +58,7 @@ void Checker::visit(FunctionNode& n) {
     }
     ObjectTypeNode* rotn = dynamic_cast<ObjectTypeNode*>(n.return_type);
     if (rotn != nullptr) {
-        if (!this->class_table->declared(rotn->identifier)) {
+        if (!is_generic(rotn) && !this->class_table->declared(rotn->identifier)) {
             throw std::runtime_error("type " + n.return_type->to_string() + " doesn't exist!");
         }
     }
@@ -266,6 +268,8 @@ void Checker::visit(ReturnNode& n) {
     n.expression->accept(*this);
     SymbolInfo expression_info = this->rv;
     TypeNode* return_type = this->scope->get("__return__");
+    assert(expression_info.symbol_info != nullptr);
+    assert(return_type != nullptr);
     if (!this->can_assign(expression_info.symbol_info, return_type)) {
         throw ReturnError(return_type, expression_info.symbol_info);
     }
@@ -487,6 +491,12 @@ SymbolInfo* Checker::visit_generic_function_call(FunctionTypeNode& function, Vec
                 }
             } else {
                 // non-function argument
+                if (!pt->equal(args[i])) {
+                    throw std::runtime_error(
+                            "Passing function -" + args[i]->to_string() +
+                            "- but expected -" +
+                            pt->to_string() + "-");
+                }
             }
         } else {
             // generic argument
@@ -495,7 +505,6 @@ SymbolInfo* Checker::visit_generic_function_call(FunctionTypeNode& function, Vec
                 for (auto r: rep) {
                     if (replace.count(r.first)) {
                         if (!r.second->equal(replace[r.first])) {
-                            return nullptr;
                             throw std::runtime_error(
                                     "Bad generic subtitution! " + r.first +
                                     " is already substituted for " +
@@ -653,129 +662,256 @@ std::vector<std::pair<VectorOfTypes, VectorOfNodes>> Checker::make_combinations(
     return combinations;
 }
 
+bool matches_signature(FunctionTypeNode* function, VectorOfTypes args) {
+    SymbolInfo* semantic_info;
+    std::map<std::string, TypeNode*> replace;
+    for (int i = 0; i < args.size(); i++) {
+        auto pt = function->parameter_types[i];
+        if (!is_generic(pt)) {
+            // non-generic argument
+            if (!pt->equal(args[i])) {
+                return false;
+            }
+        } else {
+            // generic argument
+            if (type_matches(pt, args[i])) {
+                std::map<std::string, TypeNode*> rep = make_replacements(pt, args[i]);
+                for (auto r: rep) {
+                    if (replace.count(r.first)) {
+                        if (!r.second->equal(replace[r.first])) {
+                            throw std::runtime_error(
+                                    "Bad generic subtitution! " + r.first +
+                                    " is already substituted for " +
+                                    replace[r.first]->to_string() + " but now trying to replace for " +
+                                    r.second->to_string());
+                        }
+                    } else {
+                        replace[r.first] = r.second;
+                    }
+                }
+
+            } else if (args[i]->is_a_function()) {
+                if (!is_generic(pt)) {
+                    // non overloaded function to non-generic argument
+                    if (!pt->equal(args[i])) {
+                        throw std::runtime_error(
+                                "Passing function -" + args[i]->to_string() +
+                                "- but expected -" +
+                                pt->to_string() + "-");
+                    }
+                } else {
+                    // non overloaded function to generic argument
+                    if (type_matches(pt, args[i])) {
+//                        IdNode* id = dynamic_cast<IdNode*>(n.arguments[i]);
+//                        id->identifier += "." + std::to_string(0);
+                        std::map<std::string, TypeNode*> rep = make_replacements(pt, args[i]);
+//                        for (auto r: rep) {
+//                            if (replace.count(r.first)) {
+//                                if (!r.second->equal(replace[r.first])) {
+//                                    throw std::runtime_error(
+//                                            "Bad generic subtitution! " + r.first +
+//                                            " is already substituted for " +
+//                                            replace[r.first]->to_string() +
+//                                            " but now trying to replace for " +
+//                                            r.second->to_string());
+//                                }
+//                            } else {
+//                                replace[r.first] = r.second;
+//                            }
+//                        }
+                    } else {
+                        throw std::runtime_error(
+                                "Passing function -" + args[i]->to_string() +
+                                "- but doesn't match generic -" +
+                                pt->to_string() + "-");
+                    }
+                }
+            }
+        }
+    }
+    ObjectTypeNode* otn = dynamic_cast<ObjectTypeNode*>(function->return_type);
+    TypeNode* rettype = nullptr;
+    if (otn == nullptr) {
+        throw std::runtime_error("not an objectypenode");
+    };
+    if (is_generic(otn)) {
+        if (otn->type_parameters.size() == 0) {
+            if (replace.count(otn->identifier) == 1) {
+                rettype = replace[otn->identifier];
+            } else {
+                return false;
+                throw std::runtime_error("Unknown generic type '" + otn->to_string() + "' for return!");
+            }
+        } else {
+            rettype = make_type(otn, replace);
+        }
+    } else {
+        rettype = otn;
+    }
+    semantic_info = new SymbolInfo;
+    semantic_info->symbol_info = rettype;
+    semantic_info->is_a_function = false;
+    return semantic_info;
+}
+
+
 void Checker::visit(CallNode& n) {
     IdNode* func = dynamic_cast<IdNode*>(n.function);
-    std::string func_name;
-    if (func == nullptr) {
-        MemberNode* mem = dynamic_cast<MemberNode*>(n.function);
-        n.arguments.insert(n.arguments.begin(), mem->parent);
-        func_name = mem->child;
-        n.function = ID(func_name);
-//        throw std::runtime_error("Function call on something that's not an Identifier");
+    std::string func_name = func->identifier;
+    // *** theres only one type signature for a given function name ***
+    int n_args = n.arguments.size();
+    VectorOfNodes& args = n.arguments;
+    TypeClassInfo* typeclass_info = this->get_typeclass_for_function(func_name);
+    if (typeclass_info == nullptr) {
+        // *** This is a regular function, not from a typeclass! ***
+        FunctionTypeNode* function_signature = this->function_table->get_simple_function(func_name);
+        if (function_signature->parameter_types.size() != n_args) {
+            throw std::runtime_error("Function expects a diofferent number of arguments!");
+        }
+        VectorOfTypes arg_types;
+        for (int i = 0; i < n_args; i++) {
+            args[i]->accept(*this);
+            arg_types.push_back(this->rv.symbol_info);
+        }
+        FunctionTypeNode* actual_function_signature = nullptr;
+        SymbolInfo symbolInfo = *this->visit_generic_function_call(*function_signature, arg_types);
+        this->rv = symbolInfo;
     } else {
-        func_name = func->identifier;
+        // *** This is part of a typeclass instance ***
+        FunctionTypeNode* function_signature = typeclass_info->functions[func_name];
+        std::string type_name = typeclass_info->type_name;
+        if (function_signature->parameter_types.size() != n_args) {
+            throw std::runtime_error("Function expects a diofferent number of arguments!");
+        }
+        VectorOfTypes arg_types;
+        for (int i = 0; i < n_args; i++) {
+            args[i]->accept(*this);
+            arg_types.push_back(this->rv.symbol_info);
+        }
+        if (!matches_signature(function_signature, arg_types)) {
+            std::string arg_types_str;
+            for (int i = 0; i < n_args; i++) {
+                arg_types_str += arg_types[i]->to_string() + ", ";
+            }
+            arg_types_str = arg_types_str.substr(0, arg_types_str.size() - 2);
+            throw std::runtime_error(
+                    "Function call doesn't match function signature " + function_signature->to_string() +
+                    " but called with " + arg_types_str);
+        }
     }
 
 
-    std::vector<std::pair<VectorOfTypes, VectorOfNodes>> combinations;
-    combinations = make_combinations(n.arguments);
-
-    SymbolInfo semantic_info;
-
-    if (this->function_table->has_function(func_name)) {
-        // it's a global function
-        if (this->function_table->is_overloaded(func_name)) {
-            auto overloads = this->function_table->get_overloads(func_name);
-            std::map<int, SymbolInfo*> candidates;
-            for (int i = 0; i < overloads->size(); i++) {
-                FunctionTypeNode* overload = (*overloads)[i];
-                for (int j = 0; j < combinations.size(); j++) {
-                    VectorOfTypes comb_info = combinations[j].first;
-                    if (comb_info.size() != overload->parameter_types.size()) {
-                        continue;
-                    }
-                    SymbolInfo* candidate = this->visit_call_global_function(*overload, comb_info);
-                    // there might be more than 1 candidate combination for 1 overload that should not be ok
-                    if (candidate != nullptr) {
-                        candidates[i] = candidate;
-                    }
-                }
-            }
-            if (candidates.size() > 1) {
-                throw std::runtime_error("Don't know which overload to call for function '" + func_name + "'!");
-            } else {
-                dynamic_cast<IdNode*>(n.function)->identifier += "." + std::to_string(candidates.begin()->first);
-                semantic_info = *candidates.begin()->second;
-            }
-
-        } else {
-            // function is not overloaded
-            FunctionTypeNode* ft = this->function_table->get_simple_function(func_name);
-            if (n.arguments.size() == 0 && ft->parameter_types.size() == 0) {
-                dynamic_cast<IdNode*>(n.function)->identifier += ".0";
-                semantic_info.symbol_info = ft->return_type;
-                semantic_info.is_a_function = false;
-            } else {
-                auto funt = this->function_table->get_simple_function(func_name);
-                std::map<int, SymbolInfo*> candidates;
-                if (n.arguments.size() == funt->parameter_types.size()) {
-                    for (int j = 0; j < combinations.size(); j++) {
-                        SymbolInfo* candidate = this->visit_call_global_function(
-                                *funt, combinations[j].first);
-                        if (candidate != nullptr) {
-                            candidates[j] = candidate;
-                        }
-                    }
-                }
-                if (candidates.size() == 0) {
-                    if (n.arguments.size() != 0) {
-                        std::string argstr;
-                        for (int q = 0; q < combinations.size(); q++) {
-                            VectorOfTypes vt = combinations[q].first;
-                            for (int y = 0; y < vt.size(); y++) {
-                                argstr += vt[y]->to_string() + ", ";
-                            }
-                            argstr = argstr.substr(0, argstr.size() - 2);
-                        }
-                        std::string signature = ft->to_string();
-                        throw std::runtime_error(
-                                "No candidate function '" + func_name + "' to call, with arguments (" + argstr + ")" +
-                                " the function has signature " + signature);
-                    } else {
-                        dynamic_cast<IdNode*>(n.function)->identifier += ".0";
-                        semantic_info = *candidates[0];
-                    }
-                }
-                if (candidates.size() > 1) {
-                    throw std::runtime_error("Don't know how to call function '" + func_name + "'!");
-                } else {
-                    dynamic_cast<IdNode*>(n.function)->identifier += ".0";
-                    semantic_info = *candidates.begin()->second;
-                    n.arguments = combinations[candidates.begin()->first].second;
-                }
-            }
-        }
-    } else if (this->scope->has(func_name)) {
-        // it's a local function
-        FunctionTypeNode* ft = dynamic_cast<FunctionTypeNode*>(this->scope->get(func_name));
-        if (ft == nullptr) { throw std::runtime_error("Calling something that's not a function!"); }
-        std::vector<SymbolInfo*> candidates;
-        for (int j = 0; j < combinations.size(); j++) {
-            SymbolInfo* candidate = this->visit_local_function_call(*ft, combinations[j].first);
-            if (candidate != nullptr) {
-                candidates.push_back(candidate);
-            }
-        }
-
-        if (candidates.size() == 0) {
-            if (n.arguments.size() != 0) {
-                throw std::runtime_error("Local function '" + func_name + "' expects 0 arguments");
-            } else {
-                // function with no arguments
+//
+//
+//    std::vector<std::pair<VectorOfTypes, VectorOfNodes>> combinations;
+//    combinations = make_combinations(n.arguments);
+//
+//    SymbolInfo semantic_info;
+//
+//    if (this->function_table->has_function(func_name)) {
+//        // it's a global function
+//        if (this->function_table->is_overloaded(func_name)) {
+//            auto overloads = this->function_table->get_overloads(func_name);
+//            std::map<int, SymbolInfo*> candidates;
+//            for (int i = 0; i < overloads->size(); i++) {
+//                FunctionTypeNode* overload = (*overloads)[i];
+//                for (int j = 0; j < combinations.size(); j++) {
+//                    VectorOfTypes comb_info = combinations[j].first;
+//                    if (comb_info.size() != overload->parameter_types.size()) {
+//                        continue;
+//                    }
+//                    SymbolInfo* candidate = this->visit_call_global_function(*overload, comb_info);
+//                    // there might be more than 1 candidate combination for 1 overload that should not be ok
+//                    if (candidate != nullptr) {
+//                        candidates[i] = candidate;
+//                    }
+//                }
+//            }
+//            if (candidates.size() > 1) {
+//                throw std::runtime_error("Don't know which overload to call for function '" + func_name + "'!");
+//            } else {
+//                dynamic_cast<IdNode*>(n.function)->identifier += "." + std::to_string(candidates.begin()->first);
+//                semantic_info = *candidates.begin()->second;
+//            }
+//
+//        } else {
+//            // function is not overloaded
+//            FunctionTypeNode* ft = this->function_table->get_simple_function(func_name);
+//            if (n.arguments.size() == 0 && ft->parameter_types.size() == 0) {
 //                dynamic_cast<IdNode*>(n.function)->identifier += ".0";
-                semantic_info.symbol_info = ft->return_type;
-            }
-        } else if (candidates.size() > 1) {
-            throw std::runtime_error("Don't know how to call function '" + func_name + "'!");
-        } else {
-//            dynamic_cast<IdNode*>(n.function)->identifier += ".0";
-            semantic_info = *candidates[0];
-        }
-    } else {
-        throw std::runtime_error("Function '" + func_name + "' not found!");
-    }
-    semantic_info.is_a_function = false;
-    this->rv = semantic_info;
+//                semantic_info.symbol_info = ft->return_type;
+//                semantic_info.is_a_function = false;
+//            } else {
+//                auto funt = this->function_table->get_simple_function(func_name);
+//                std::map<int, SymbolInfo*> candidates;
+//                if (n.arguments.size() == funt->parameter_types.size()) {
+//                    for (int j = 0; j < combinations.size(); j++) {
+//                        SymbolInfo* candidate = this->visit_call_global_function(
+//                                *funt, combinations[j].first);
+//                        if (candidate != nullptr) {
+//                            candidates[j] = candidate;
+//                        }
+//                    }
+//                }
+//                if (candidates.size() == 0) {
+//                    if (n.arguments.size() != 0) {
+//                        std::string argstr;
+//                        for (int q = 0; q < combinations.size(); q++) {
+//                            VectorOfTypes vt = combinations[q].first;
+//                            for (int y = 0; y < vt.size(); y++) {
+//                                argstr += vt[y]->to_string() + ", ";
+//                            }
+//                            argstr = argstr.substr(0, argstr.size() - 2);
+//                        }
+//                        std::string signature = ft->to_string();
+//                        throw std::runtime_error(
+//                                "No candidate function '" + func_name + "' to call, with arguments (" + argstr + ")" +
+//                                " the function has signature " + signature);
+//                    } else {
+//                        dynamic_cast<IdNode*>(n.function)->identifier += ".0";
+//                        semantic_info = *candidates[0];
+//                    }
+//                }
+//                if (candidates.size() > 1) {
+//                    throw std::runtime_error("Don't know how to call function '" + func_name + "'!");
+//                } else {
+//                    dynamic_cast<IdNode*>(n.function)->identifier += ".0";
+//                    semantic_info = *candidates.begin()->second;
+//                    n.arguments = combinations[candidates.begin()->first].second;
+//                }
+//            }
+//        }
+//    } else if (this->scope->has(func_name)) {
+//        // it's a local function
+//        FunctionTypeNode* ft = dynamic_cast<FunctionTypeNode*>(this->scope->get(func_name));
+//        if (ft == nullptr) { throw std::runtime_error("Calling something that's not a function!"); }
+//        std::vector<SymbolInfo*> candidates;
+//        for (int j = 0; j < combinations.size(); j++) {
+//            SymbolInfo* candidate = this->visit_local_function_call(*ft, combinations[j].first);
+//            if (candidate != nullptr) {
+//                candidates.push_back(candidate);
+//            }
+//        }
+//
+//        if (candidates.size() == 0) {
+//            if (n.arguments.size() != 0) {
+//                throw std::runtime_error("Local function '" + func_name + "' expects 0 arguments");
+//            } else {
+//                // function with no arguments
+////                dynamic_cast<IdNode*>(n.function)->identifier += ".0";
+//                semantic_info.symbol_info = ft->return_type;
+//            }
+//        } else if (candidates.size() > 1) {
+//            throw std::runtime_error("Don't know how to call function '" + func_name + "'!");
+//        } else {
+////            dynamic_cast<IdNode*>(n.function)->identifier += ".0";
+//            semantic_info = *candidates[0];
+//        }
+//    } else {
+//        throw std::runtime_error("Function '" + func_name + "' not found!");
+//    }
+//    semantic_info.is_a_function = false;
+//    this->rv = semantic_info;
 }
 
 bool Checker::type_exists(TypeNode* type) {
@@ -881,6 +1017,8 @@ bool Checker::can_assign(TypeNode* from, TypeNode* to) {
         }
         return false;
     }
+    assert(from != nullptr);
+    assert(to != nullptr);
     return to->equal(from);
 }
 
@@ -1142,6 +1280,14 @@ void Checker::visit(EmptyListNode& node) {
     semanticInfo.symbol_info = node.type;
     semanticInfo.is_a_function = false;
     this->rv = semanticInfo;
+}
+
+void Checker::visit(ClassNode& node) {
+
+}
+
+void Checker::visit(InstanceNode& node) {
+
 }
 
 

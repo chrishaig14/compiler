@@ -84,6 +84,14 @@ public:
     Node* parse_ternary();
 
     std::map<std::string, Node*> parse_initializers();
+
+    ClassNode* parse_class_definition();
+
+    Node* parse_instance_definition();
+
+    FunctionTypeNode* parse_function_signature(std::string& function_name);
+
+    Node* parse_function_definition_with_where();
 };
 
 

@@ -43,6 +43,7 @@ enum class TokenType {
     IF,
     ELSE,
     FOR,
+    WHERE,
     MOD,
     WHILE,
     VAR,
@@ -52,7 +53,7 @@ enum class TokenType {
     RCURLY,
     LPAREN,
     RPAREN,
-    END, RARROW, TRUE, FALSE, QUESTION, NONE, DOUBLE_COLON, HASH, ARROBA
+    END, RARROW, TRUE, FALSE, QUESTION, NONE, DOUBLE_COLON, HASH, ARROBA, CLASS, INSTANCE
 };
 
 extern std::map<TokenType, std::string> TOKEN_STRINGS;

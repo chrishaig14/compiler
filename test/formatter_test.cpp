@@ -21,7 +21,7 @@ TEST(formatter_test, test_1) {
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
     BlockNode* ast = parser.parse_program();
-    Formatter formatter;
-    ast->accept(formatter);
-    std::cerr << formatter.output;
+//    Formatter formatter;
+//    ast->accept(formatter);
+//    std::cerr << formatter.output;
 }

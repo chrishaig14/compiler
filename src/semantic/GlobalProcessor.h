@@ -106,6 +106,10 @@ public:
     void call(std::string function_name, std::string function_type, void (* function)(ObjectStack&));
 
     void call(std::string function_name, FunctionTypeNode* ftype, void (* function)(ObjectStack&));
+
+    void visit(ClassNode& node) override;
+
+    void visit(InstanceNode& node) override;
 };
 
 #endif //UNTITLED1_GLOBALPROCESSOR_H

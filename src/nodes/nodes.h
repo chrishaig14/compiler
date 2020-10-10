@@ -13,6 +13,8 @@
 #include "BreakNode.h"
 #include "EmptyListNode.h"
 #include "ClassLiteralExpressionNode.h"
+#include "ClassNode.h"
+#include "InstanceNode.h"
 #include "TernaryNode.h"
 #include "NoneNode.h"
 #include "ClassLiteralFieldNode.h"

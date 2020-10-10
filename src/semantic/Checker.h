@@ -12,6 +12,7 @@
 #include "ReturnError.h"
 #include "BadArguments.h"
 #include "AssignmentTypeError.h"
+#include "TypeClassInfo.h"
 
 //typedef std::map<std::string, ObjectInfo> MapStringToSimple;
 //typedef std::map<std::string, FunctionInfo> MapStringToFunction;
@@ -29,9 +30,12 @@ bool type_matches(TypeNode* a, TypeNode* b);
 bool is_generic(TypeNode* t);
 
 std::map<std::string, TypeNode*> make_replacements(TypeNode* a, TypeNode* b);
+
 TypeNode* make_type(TypeNode* original, std::map<std::string, TypeNode*>& replacements);
+
 class Checker : public Visitor {
     SymbolTable* scope;
+    std::map<std::string, TypeClassInfo*> typeclasses;
     ClassTable* class_table;
     SymbolInfo rv;
 public:
@@ -109,18 +113,32 @@ public:
 
     FunctionTable* function_table;
 
-    SymbolInfo visit_overloaded_function_call(CallNode& n, std::string func_name, VectorOfTypes & args);
+    SymbolInfo visit_overloaded_function_call(CallNode& n, std::string func_name, VectorOfTypes& args);
 
     std::vector<SymbolInfo> analyze_arguments(VectorOfNodes& arguments);
 
-    SymbolInfo* visit_local_function_call(FunctionTypeNode& function, VectorOfTypes & args);
+    SymbolInfo* visit_local_function_call(FunctionTypeNode& function, VectorOfTypes& args);
 
-    SymbolInfo* visit_call_global_function(FunctionTypeNode& ft, VectorOfTypes & args);
+    SymbolInfo* visit_call_global_function(FunctionTypeNode& ft, VectorOfTypes& args);
 
-    SymbolInfo* visit_non_generic_function_call(FunctionTypeNode& function, VectorOfTypes & args);
-    SymbolInfo* visit_generic_function_call(FunctionTypeNode& function, VectorOfTypes & args);
+    SymbolInfo* visit_non_generic_function_call(FunctionTypeNode& function, VectorOfTypes& args);
 
-    std::vector<std::pair<VectorOfTypes,VectorOfNodes>> make_combinations(VectorOfNodes args);
+    SymbolInfo* visit_generic_function_call(FunctionTypeNode& function, VectorOfTypes& args);
+
+    std::vector<std::pair<VectorOfTypes, VectorOfNodes>> make_combinations(VectorOfNodes args);
+
+    void visit(ClassNode& node) override;
+
+    void visit(InstanceNode& node) override;
+
+    TypeClassInfo* get_typeclass_for_function(std::string function_name) {
+        for (auto typeclass: this->typeclasses) {
+            if (typeclass.second->has_function(function_name)) {
+                return typeclass.second;
+            }
+        }
+        return nullptr;
+    }
 };
 
 #endif //UNTITLED1_CHECKER_H

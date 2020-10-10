@@ -1,11 +1,11 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
-#include "src/scanner/Scanner.h"
-#include "src/parser/Parser.h"
-#include "src/formatter/Formatter.h"
-#include "src/semantic/GlobalProcessor.h"
-#include "src/semantic/Checker.h"
+#include "scanner/Scanner.h"
+#include "parser/Parser.h"
+#include "formatter/Formatter.h"
+#include "semantic/GlobalProcessor.h"
+#include "semantic/Checker.h"
 
 int main(int argc, char* argv[]) {
     if (argc < 2) {

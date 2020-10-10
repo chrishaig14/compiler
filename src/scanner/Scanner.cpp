@@ -28,7 +28,10 @@ void initialize_tokens() {
     TOKEN_KEYWORDS["return"] = TokenType::RETURN;
     TOKEN_KEYWORDS["true"] = TokenType::TRUE;
     TOKEN_KEYWORDS["false"] = TokenType::FALSE;
+    TOKEN_KEYWORDS["class"] = TokenType::CLASS;
+    TOKEN_KEYWORDS["instance"] = TokenType::INSTANCE;
     TOKEN_KEYWORDS["while"] = TokenType::WHILE;
+    TOKEN_KEYWORDS["where"] = TokenType::WHERE;
     TOKEN_KEYWORDS["none"] = TokenType::NONE;
 
 
@@ -230,8 +233,9 @@ UnexpectedCharacter::UnexpectedCharacter(char c, size_t position) : std::runtime
 }
 
 UnexpectedCharacter::UnexpectedCharacter(char c, int line, int column) : std::runtime_error(
-        std::string("Unexpected character '") + std::string(1, c) + "' at line " + std::to_string(line+1) + " column " +
-        std::to_string(column+1)) {
+        std::string("Unexpected character '") + std::string(1, c) + "' at line " + std::to_string(line + 1) +
+        " column " +
+        std::to_string(column + 1)) {
     this->column = column;
     this->line = line;
 }

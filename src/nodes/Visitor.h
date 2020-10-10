@@ -7,6 +7,8 @@
 
 class AssignmentNode;
 
+class ClassNode;
+
 class BinopNode;
 
 class BlockNode;
@@ -53,15 +55,20 @@ class TypeNode;
 
 class WhileNode;
 
+class InstanceNode;
+
 class EmptyListNode;
 
 class Visitor {
 public:
+
     virtual void visit(AssignmentNode& node) = 0;
 
     virtual void visit(EmptyListNode& node) = 0;
 
     virtual void visit(BinopNode& node) = 0;
+
+    virtual void visit(InstanceNode& node) = 0;
 
     virtual void visit(BreakNode& node) = 0;
 
@@ -78,6 +85,8 @@ public:
     virtual void visit(DeclarationNode& node) = 0;
 
     virtual void visit(ForNode& node) = 0;
+
+    virtual void visit(ClassNode& node) = 0;
 
     virtual void visit(FunctionNode& node) = 0;
 

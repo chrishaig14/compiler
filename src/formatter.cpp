@@ -1,9 +1,9 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
-#include "src/scanner/Scanner.h"
-#include "src/parser/Parser.h"
-#include "src/formatter/Formatter.h"
+#include "scanner/Scanner.h"
+#include "parser/Parser.h"
+#include "formatter/Formatter.h"
 
 int main(int argc, char* argv[]) {
     if (argc < 3) {

@@ -81,6 +81,7 @@ public:
         return j;
     }
 
+    std::map<std::string, std::string> constraints;
 };
 
 

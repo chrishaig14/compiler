@@ -323,3 +323,11 @@ void Translator::visit(EmptyListNode& node) {
     CodeLabel out = {NL(I_MAKE_LIST(0))};
     this->code = out;
 }
+
+void Translator::visit(ClassNode& node) {
+
+}
+
+void Translator::visit(InstanceNode& node) {
+
+}

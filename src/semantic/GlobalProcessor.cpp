@@ -251,6 +251,14 @@ void GlobalProcessor::visit(EmptyListNode& node) {
 
 }
 
+void GlobalProcessor::visit(ClassNode& node) {
+
+}
+
+void GlobalProcessor::visit(InstanceNode& node) {
+
+}
+
 
 FunctionTypeNode* FunctionTable::get_simple_function(std::string function_name) {
     if (this->is_overloaded(function_name)) {
