@@ -181,14 +181,14 @@ void GlobalProcessor::visit(TypeNode& node) {
 }
 
 void GlobalProcessor::visit(StructNode& node) {
-    ClassInfo* class_info = new ClassInfo();
-    for (auto f: node.fields) {
-        class_info->field_names.push_back(f.first);
-        class_info->field_types.push_back(f.second);
-        class_info->fields[f.first] = f.second;
-    }
-    class_info->type_parameters = node.template_parameters;
-    this->class_table->set(node.identifier, class_info);
+//    ClassInfo* class_info = new ClassInfo();
+//    for (auto f: node.fields) {
+//        class_info->member_names.push_back(f.first);
+//        class_info->member_types.push_back(f.second);
+//        class_info->fields[f.first] = f.second;
+//    }
+//    class_info->type_parameters = node.template_parameters;
+//    this->class_table->set(node.identifier, class_info);
 }
 
 void GlobalProcessor::visit(FunctionNode& node) {
@@ -252,7 +252,19 @@ void GlobalProcessor::visit(EmptyListNode& node) {
 }
 
 void GlobalProcessor::visit(ClassNode& node) {
-
+    ClassInfo* class_info = new ClassInfo();
+    for (auto f: node.members) {
+        class_info->member_names.push_back(f.first);
+        class_info->member_types.push_back(f.second);
+        class_info->members[f.first] = f.second;
+    }
+    for (auto f: node.methods) {
+        class_info->method_names.push_back(f.first);
+        FunctionTypeNode* ft = new FunctionTypeNode(f.second->parameter_types, f.second->return_type);
+        class_info->method_types.push_back(ft);
+        class_info->methods[f.first] = ft;
+    }
+    this->class_table->set(node.class_name, class_info);
 }
 
 void GlobalProcessor::visit(InstanceNode& node) {

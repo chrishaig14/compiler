@@ -23,7 +23,7 @@ std::string UnexpectedToken::make_message(Token token, const std::vector<TokenTy
     } else {
         expected_strings += TOKEN_STRINGS[expected_tokens[0]];
     }
-    message = "UnexpectedToken at line " + std::to_string(token.line+1) + " column Parser.cpp:5:9 " + std::to_string(token.column+1) +
+    message = "UnexpectedToken at line " + std::to_string(token.line+1) + " column " + std::to_string(token.column+1) +
               ": got " + token.to_string() + ", expected " + expected_strings;
     return message;
 }

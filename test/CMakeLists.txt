@@ -12,5 +12,5 @@ add_executable(runTests
         global_processor_test.cpp
         generic_test.cpp
         checker_test.cpp
-        translator_test.cpp total_test.cpp formatter_test.cpp full_test/something_test.cpp)
+        translator_test.cpp total_test.cpp formatter_test.cpp full_test/something_test.cpp full_test/should_pass/custom_class_simple.pl)
 target_link_libraries(runTests gtest gtest_main pthread srcLib)

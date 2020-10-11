@@ -11,17 +11,17 @@
 #include "TypeNode.h"
 
 class ClassNode : public Node {
-    std::map<std::string, FunctionTypeNode*> functions;
-    std::string class_name;
-    std::string type_name;
 public:
-    ClassNode(const std::string& className, const std::string& typeName,
-              const std::map<std::string, FunctionTypeNode*>& functions);
+    ClassNode(const std::string& className, std::map<std::string, TypeNode*> members,
+              std::map<std::string, FunctionNode*> functions);
 
     void accept(Visitor& visitor) override;
 
     bool equal(Node* other) const override;
 
+    std::map<std::string, TypeNode*> members;
+    std::map<std::string, FunctionNode*> methods;
+    std::string class_name;
 };
 
 

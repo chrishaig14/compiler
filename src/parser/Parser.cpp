@@ -723,19 +723,27 @@ FunctionTypeNode* Parser::parse_function_signature(std::string& function_name) {
 ClassNode* Parser::parse_class_definition() {
     this->expect_token(TokenType::CLASS);
     Token class_name_tk = this->expect_token(TokenType::ID);
-    Token type_name_tk = this->expect_token(TokenType::ID);
     this->expect_token(TokenType::LCURLY);
-    std::map<std::string, FunctionTypeNode*> functions;
+    std::map<std::string, FunctionNode*> methods;
+    std::map<std::string, TypeNode*> members;
     while (true) {
-        FunctionTypeNode* ftn;
-        std::string function_name;
-        this->parse_function_signature(function_name);
-        if (this->match(TokenType::RCURLY)) {
-            break;
+        if (this->match(TokenType::ID)) {
+            Token member_name_tk = this->expect_token(TokenType::ID);
+            this->expect_token(TokenType::COLON);
+            TypeNode* member_type = this->parse_type_node();
+            members[member_name_tk.str] = member_type;
+            this->expect_token(TokenType::SEMICOLON);
+        } else {
+            if (this->match(TokenType::FUN)) {
+                FunctionNode* method_node = this->parse_function_definition();
+                methods[method_node->identifier] = method_node;
+            } else {
+                break;
+            }
         }
     }
     this->expect_token(TokenType::RCURLY);
-    return new ClassNode(class_name_tk.str, type_name_tk.str, functions);
+    return new ClassNode(class_name_tk.str, members, methods);
 }
 
 Node* Parser::parse_instance_definition() {

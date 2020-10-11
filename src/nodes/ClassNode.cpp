@@ -12,6 +12,6 @@ bool ClassNode::equal(Node* other) const {
     return false;
 }
 
-ClassNode::ClassNode(const std::string& className, const std::string& typeName,
-                     const std::map<std::string, FunctionTypeNode*>& functions)
-        : functions(functions), class_name(className), type_name(typeName) {}
+ClassNode::ClassNode(const std::string& className, std::map<std::string, TypeNode*> members,
+                     std::map<std::string, FunctionNode*> functions)
+        : methods(functions), class_name(className), members(members) {}

@@ -166,23 +166,21 @@ void Checker::visit(MemberNode& n) {
     if (!this->class_table->declared(object->identifier)) {
         throw std::runtime_error("Class " + object->identifier + " not declared!");
     }
-    if (object->type_parameters.size() != 0) {
-        // it's a generic
-        ClassInfo* generic_class_info = this->class_table->get(object->identifier);
-        ClassInfo* concrete_class_info = instantiate_generic(generic_class_info, object);
-        TypeNode* field = concrete_class_info->fields[n.child];
-        semantic_info.symbol_info = field;
+    ClassInfo* class_info = this->class_table->get(object->identifier);
+    if (class_info->members.count(n.child) == 1) {
+        // It's a member
+        semantic_info.symbol_info = class_info->members[n.child];
         this->rv = semantic_info;
+        this->rv.is_a_function = false;
+    } else if (class_info->methods.count(n.child) == 1) {
+        // It's a method
+        semantic_info.symbol_info = class_info->methods[n.child];
+        this->rv = semantic_info;
+        this->rv.is_a_function = true;
     } else {
-        ClassInfo* class_info = this->class_table->get(object->identifier);
-        if (class_info->fields.count(n.child) == 1) {
-            // It's a field
-            semantic_info.symbol_info = class_info->fields[n.child];
-            this->rv = semantic_info;
-        } else {
-            throw std::runtime_error("Type " + object->to_string() + " has no member " + n.child);
-        }
+        throw std::runtime_error("Type " + object->to_string() + " has no member " + n.child);
     }
+
 }
 
 void Checker::visit(IfNode& n) {
@@ -756,200 +754,53 @@ bool matches_signature(FunctionTypeNode* function, VectorOfTypes args) {
 
 
 void Checker::visit(CallNode& n) {
-    IdNode* func = dynamic_cast<IdNode*>(n.function);
-    std::string func_name = func->identifier;
-    // *** theres only one type signature for a given function name ***
-    int n_args = n.arguments.size();
-    VectorOfNodes& args = n.arguments;
-    TypeClassInfo* typeclass_info = this->get_typeclass_for_function(func_name);
-    if (typeclass_info == nullptr) {
-        // *** This is a regular function, not from a typeclass! ***
-        FunctionTypeNode* function_signature = this->function_table->get_simple_function(func_name);
-        if (function_signature->parameter_types.size() != n_args) {
-            throw std::runtime_error("Function expects a diofferent number of arguments!");
-        }
-        VectorOfTypes arg_types;
-        for (int i = 0; i < n_args; i++) {
-            args[i]->accept(*this);
-            arg_types.push_back(this->rv.symbol_info);
-        }
-        FunctionTypeNode* actual_function_signature = nullptr;
-        SymbolInfo symbolInfo = *this->visit_generic_function_call(*function_signature, arg_types);
-        this->rv = symbolInfo;
+    n.function->accept(*this);
+    if (this->rv.is_a_function) {
+        // ok
+        FunctionTypeNode* function_type = dynamic_cast<FunctionTypeNode*>(this->rv.symbol_info);
+        this->rv.symbol_info = function_type->return_type;
     } else {
-        // *** This is part of a typeclass instance ***
-        FunctionTypeNode* function_signature = typeclass_info->functions[func_name];
-        std::string type_name = typeclass_info->type_name;
-        if (function_signature->parameter_types.size() != n_args) {
-            throw std::runtime_error("Function expects a diofferent number of arguments!");
-        }
-        VectorOfTypes arg_types;
-        for (int i = 0; i < n_args; i++) {
-            args[i]->accept(*this);
-            arg_types.push_back(this->rv.symbol_info);
-        }
-        if (!matches_signature(function_signature, arg_types)) {
-            std::string arg_types_str;
-            for (int i = 0; i < n_args; i++) {
-                arg_types_str += arg_types[i]->to_string() + ", ";
-            }
-            arg_types_str = arg_types_str.substr(0, arg_types_str.size() - 2);
-            throw std::runtime_error(
-                    "Function call doesn't match function signature " + function_signature->to_string() +
-                    " but called with " + arg_types_str);
-        }
+        throw std::runtime_error("calling something that's not a function!");
     }
-
-
-//
-//
-//    std::vector<std::pair<VectorOfTypes, VectorOfNodes>> combinations;
-//    combinations = make_combinations(n.arguments);
-//
-//    SymbolInfo semantic_info;
-//
-//    if (this->function_table->has_function(func_name)) {
-//        // it's a global function
-//        if (this->function_table->is_overloaded(func_name)) {
-//            auto overloads = this->function_table->get_overloads(func_name);
-//            std::map<int, SymbolInfo*> candidates;
-//            for (int i = 0; i < overloads->size(); i++) {
-//                FunctionTypeNode* overload = (*overloads)[i];
-//                for (int j = 0; j < combinations.size(); j++) {
-//                    VectorOfTypes comb_info = combinations[j].first;
-//                    if (comb_info.size() != overload->parameter_types.size()) {
-//                        continue;
-//                    }
-//                    SymbolInfo* candidate = this->visit_call_global_function(*overload, comb_info);
-//                    // there might be more than 1 candidate combination for 1 overload that should not be ok
-//                    if (candidate != nullptr) {
-//                        candidates[i] = candidate;
-//                    }
-//                }
-//            }
-//            if (candidates.size() > 1) {
-//                throw std::runtime_error("Don't know which overload to call for function '" + func_name + "'!");
-//            } else {
-//                dynamic_cast<IdNode*>(n.function)->identifier += "." + std::to_string(candidates.begin()->first);
-//                semantic_info = *candidates.begin()->second;
-//            }
-//
-//        } else {
-//            // function is not overloaded
-//            FunctionTypeNode* ft = this->function_table->get_simple_function(func_name);
-//            if (n.arguments.size() == 0 && ft->parameter_types.size() == 0) {
-//                dynamic_cast<IdNode*>(n.function)->identifier += ".0";
-//                semantic_info.symbol_info = ft->return_type;
-//                semantic_info.is_a_function = false;
-//            } else {
-//                auto funt = this->function_table->get_simple_function(func_name);
-//                std::map<int, SymbolInfo*> candidates;
-//                if (n.arguments.size() == funt->parameter_types.size()) {
-//                    for (int j = 0; j < combinations.size(); j++) {
-//                        SymbolInfo* candidate = this->visit_call_global_function(
-//                                *funt, combinations[j].first);
-//                        if (candidate != nullptr) {
-//                            candidates[j] = candidate;
-//                        }
-//                    }
-//                }
-//                if (candidates.size() == 0) {
-//                    if (n.arguments.size() != 0) {
-//                        std::string argstr;
-//                        for (int q = 0; q < combinations.size(); q++) {
-//                            VectorOfTypes vt = combinations[q].first;
-//                            for (int y = 0; y < vt.size(); y++) {
-//                                argstr += vt[y]->to_string() + ", ";
-//                            }
-//                            argstr = argstr.substr(0, argstr.size() - 2);
-//                        }
-//                        std::string signature = ft->to_string();
-//                        throw std::runtime_error(
-//                                "No candidate function '" + func_name + "' to call, with arguments (" + argstr + ")" +
-//                                " the function has signature " + signature);
-//                    } else {
-//                        dynamic_cast<IdNode*>(n.function)->identifier += ".0";
-//                        semantic_info = *candidates[0];
-//                    }
-//                }
-//                if (candidates.size() > 1) {
-//                    throw std::runtime_error("Don't know how to call function '" + func_name + "'!");
-//                } else {
-//                    dynamic_cast<IdNode*>(n.function)->identifier += ".0";
-//                    semantic_info = *candidates.begin()->second;
-//                    n.arguments = combinations[candidates.begin()->first].second;
-//                }
-//            }
-//        }
-//    } else if (this->scope->has(func_name)) {
-//        // it's a local function
-//        FunctionTypeNode* ft = dynamic_cast<FunctionTypeNode*>(this->scope->get(func_name));
-//        if (ft == nullptr) { throw std::runtime_error("Calling something that's not a function!"); }
-//        std::vector<SymbolInfo*> candidates;
-//        for (int j = 0; j < combinations.size(); j++) {
-//            SymbolInfo* candidate = this->visit_local_function_call(*ft, combinations[j].first);
-//            if (candidate != nullptr) {
-//                candidates.push_back(candidate);
-//            }
-//        }
-//
-//        if (candidates.size() == 0) {
-//            if (n.arguments.size() != 0) {
-//                throw std::runtime_error("Local function '" + func_name + "' expects 0 arguments");
-//            } else {
-//                // function with no arguments
-////                dynamic_cast<IdNode*>(n.function)->identifier += ".0";
-//                semantic_info.symbol_info = ft->return_type;
-//            }
-//        } else if (candidates.size() > 1) {
-//            throw std::runtime_error("Don't know how to call function '" + func_name + "'!");
-//        } else {
-////            dynamic_cast<IdNode*>(n.function)->identifier += ".0";
-//            semantic_info = *candidates[0];
-//        }
-//    } else {
-//        throw std::runtime_error("Function '" + func_name + "' not found!");
-//    }
-//    semantic_info.is_a_function = false;
-//    this->rv = semantic_info;
 }
 
 bool Checker::type_exists(TypeNode* type) {
-    auto function_type = dynamic_cast<FunctionTypeNode*>(type);
-    if (function_type != nullptr) {
-        for (auto pt: function_type->parameter_types) {
-            if (!this->type_exists(pt)) return false;
-        }
-        if (!this->type_exists(function_type->return_type)) return false;
-    } else {
-        auto object_type = dynamic_cast<ObjectTypeNode*>(type);
-        if (object_type != nullptr) {
-            if (this->class_table->declared(object_type->identifier)) {
-                if (object_type->type_parameters.size() !=
-                    this->class_table->get(object_type->identifier)->type_parameters.size()) {
-                    throw std::runtime_error("Template struct " + object_type->identifier + " expects " +
-                                             std::to_string(this->class_table->get(
-                                                     object_type->identifier)->type_parameters.size()) +
-                                             " parameters, but " +
-                                             std::to_string(object_type->type_parameters.size()) +
-                                             " given");
-                }
-                for (auto tp: object_type->type_parameters) {
-                    if (!this->type_exists(tp)) return false;
-                }
-            } else {
-                if (object_type->type_parameters.size() == 0) {
-                    for (auto t: this->type_params) {
-                        if (t == object_type->identifier) return true;
-                    }
-                    return false;
-                } else {
-                    return false;
-                }
-            }
-        }
-    }
-    return true;
+    return false;
+//    auto function_type = dynamic_cast<FunctionTypeNode*>(type);
+//    if (function_type != nullptr) {
+//        for (auto pt: function_type->parameter_types) {
+//            if (!this->type_exists(pt)) return false;
+//        }
+//        if (!this->type_exists(function_type->return_type)) return false;
+//    } else {
+//        auto object_type = dynamic_cast<ObjectTypeNode*>(type);
+//        if (object_type != nullptr) {
+//            if (this->class_table->declared(object_type->identifier)) {
+//                if (object_type->type_parameters.size() !=
+//                    this->class_table->get(object_type->identifier)->type_parameters.size()) {
+//                    throw std::runtime_error("Template struct " + object_type->identifier + " expects " +
+//                                             std::to_string(this->class_table->get(
+//                                                     object_type->identifier)->type_parameters.size()) +
+//                                             " parameters, but " +
+//                                             std::to_string(object_type->type_parameters.size()) +
+//                                             " given");
+//                }
+//                for (auto tp: object_type->type_parameters) {
+//                    if (!this->type_exists(tp)) return false;
+//                }
+//            } else {
+//                if (object_type->type_parameters.size() == 0) {
+//                    for (auto t: this->type_params) {
+//                        if (t == object_type->identifier) return true;
+//                    }
+//                    return false;
+//                } else {
+//                    return false;
+//                }
+//            }
+//        }
+//    }
+//    return true;
 }
 
 void Checker::visit(StructNode& n) {
@@ -977,26 +828,26 @@ void Checker::visit(ClassLiteralExpressionNode& node) {
     if (!this->class_table->declared(node.type->identifier))
         throw std::runtime_error("No struct named " + node.type->identifier);
     ClassInfo* class_info = this->class_table->get(node.type->identifier);
-    auto class_fields = class_info->fields;
+    auto class_fields = class_info->members;
     if (class_fields.size() != node.init.size())
         throw std::runtime_error(
                 "In struct \"" + node.type->identifier + "\" initialization: " + "Expected " +
                 std::to_string(class_fields.size()) + " initializers but got " +
                 std::to_string(node.init.size()));
-    for (int i = 0; i < node.init.size(); i++) {
-        Node* exp = node.init[i];
-        exp->accept(*this);
-        SymbolInfo semanticInfo = this->rv;
-        if (!semanticInfo.symbol_info->equal(class_info->field_types[i])) {
-            throw std::runtime_error(
-                    "Field type doesn't match: " + class_info->field_names[i] + " ( field # " + std::to_string(i) +
-                    " )" +
-                    " expected " +
-                    class_info->field_types[i]->to_string() + ", got " + semanticInfo.symbol_info->to_string());
-        }
-    }
-    this->rv = SymbolInfo();
-    rv.symbol_info = new ObjectTypeNode(node.type->identifier, {});
+//    for (int i = 0; i < node.init.size(); i++) {
+//        Node* exp = node.init[i];
+//        exp->accept(*this);
+//        SymbolInfo semanticInfo = this->rv;
+//        if (!semanticInfo.symbol_info->equal(class_info->member_types[i])) {
+//            throw std::runtime_error(
+//                    "Field type doesn't match: " + class_info->member_names[i] + " ( field # " + std::to_string(i) +
+//                    " )" +
+//                    " expected " +
+//                    class_info->member_types[i]->to_string() + ", got " + semanticInfo.symbol_info->to_string());
+//        }
+//    }
+//    this->rv = SymbolInfo();
+//    rv.symbol_info = new ObjectTypeNode(node.type->identifier, {});
 }
 
 bool Checker::can_assign(TypeNode* from, TypeNode* to) {
@@ -1081,14 +932,14 @@ TypeNode* make_type(TypeNode* original, std::map<std::string, TypeNode*>& replac
 
 ClassInfo* Checker::instantiate_generic(ClassInfo* generic, ObjectTypeNode* instance) {
     std::map<std::string, TypeNode*> replacements;
-    for (int i = 0; i < generic->type_parameters.size(); i++) {
-        std::string tp = generic->type_parameters[i];
-        TypeNode* type_replacement = instance->type_parameters[i];
-        replacements[tp] = type_replacement;
-    }
-    auto field_names = generic->field_names;
+//    for (int i = 0; i < generic->type_parameters.size(); i++) {
+//        std::string tp = generic->type_parameters[i];
+//        TypeNode* type_replacement = instance->type_parameters[i];
+//        replacements[tp] = type_replacement;
+//    }
+    auto field_names = generic->member_names;
     std::vector<TypeNode*> concrete_field_types;
-    for (auto f: generic->field_types) {
+    for (auto f: generic->member_types) {
         TypeNode* concrete_type = make_type(f, replacements);
         concrete_field_types.push_back(concrete_type);
     }
@@ -1099,7 +950,7 @@ ClassInfo* Checker::instantiate_generic(ClassInfo* generic, ObjectTypeNode* inst
 void Checker::visit(ClassLiteralFieldNode& node) {
     if (!this->class_table->declared(node.type->identifier))
         throw std::runtime_error("No struct named " + node.type->identifier);
-    auto class_fields = this->class_table->get(node.type->identifier)->fields;
+    auto class_fields = this->class_table->get(node.type->identifier)->members;
     for (auto f: node.init) {
         if (class_fields.count(f.first) == 0) throw std::runtime_error("No field named " + f.first);
     }
@@ -1108,32 +959,11 @@ void Checker::visit(ClassLiteralFieldNode& node) {
                 "In struct \"" + node.type->identifier + "\" initialization: " + "Expected " +
                 std::to_string(class_fields.size()) + " initializers but got " +
                 std::to_string(node.init.size()));
-    ClassInfo* cinfo = this->class_table->get(node.type->identifier);
-    int actual_type_parameters = node.type->type_parameters.size();
-    int expected_type_parameters = cinfo->type_parameters.size();
-    if (actual_type_parameters != expected_type_parameters) {
-        throw std::runtime_error("Expected " + std::to_string(expected_type_parameters) + " type parameters, got " +
-                                 std::to_string(actual_type_parameters));
-    }
-//    std::map<std::string, TypeNode*> replacements;
-//    for (int i = 0; i < cinfo->type_parameters.size(); i++) {
-//        std::string tp = cinfo->type_parameters[i];
-//        TypeNode* ta = node.type->type_parameters[i];
-//        replacements[tp] = ta;
-//    }
-//    auto field_names = cinfo->field_names;
-//    std::vector<TypeNode*> concrete_field_types;
-//    for (auto f: cinfo->field_types) {
-//        TypeNode* concrete_type = this->make_type(f, replacements);
-//        concrete_field_types.push_back(concrete_type);
-//    }
-//    ClassInfo* concrete = new ClassInfo(field_names, concrete_field_types, {});
-    ClassInfo* concrete = instantiate_generic(cinfo, node.type);
     for (auto f: node.init) {
         Node* exp = f.second;
         exp->accept(*this);
         SymbolInfo semanticInfo = this->rv;
-        TypeNode* field_type = concrete->fields[f.first];
+        TypeNode* field_type = class_fields[f.first];
         if (!this->can_assign(semanticInfo.symbol_info, field_type)) {
             throw std::runtime_error(
                     "In struct \"" + node.type->identifier + "\" initialization: " + "field \"" + f.first +

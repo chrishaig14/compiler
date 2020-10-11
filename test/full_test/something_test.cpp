@@ -75,10 +75,20 @@ TEST(run_test, test_should_pass_4) {
 }
 
 TEST(run_test, test_should_pass_5) {
-test_file("should_pass/"  "call_complex_generic_function.pl");
+    test_file("should_pass/"  "call_complex_generic_function.pl");
 }
 
+TEST(run_test, test_should_pass_6) {
+    test_file("should_pass/"  "custom_class_simple.pl");
+}
 
+TEST(run_test, test_should_pass_7) {
+    test_file("should_pass/"  "class_instantiate.pl");
+}
+
+TEST(run_test, test_should_pass_8) {
+    test_file("should_pass/"  "custom_class_with_method.pl");
+}
 
 TEST(run_test, test_should_fail_1) {
     should_fail_test("call_non_existent_function.pl");
@@ -97,5 +107,22 @@ TEST(run_test, test_should_fail_4) {
 }
 
 TEST(run_test, test_should_fail_5) {
-should_fail_test("call_complex_generic_function_error.pl");
+    should_fail_test("call_complex_generic_function_error.pl");
+}
+
+TEST(run_test, test_should_fail_6) {
+    should_fail_test("class_no_member_found_error.pl");
+}
+
+
+TEST(run_test, test_should_fail_7) {
+    should_fail_test("instantiate_non_existant_class_error.pl");
+}
+
+TEST(run_test, test_should_fail_8) {
+    should_fail_test("instantiate_class_bad_member_error.pl");
+}
+
+TEST(run_test, test_should_fail_9) {
+    should_fail_test("instantiate_class_bad_member_type_error.pl");
 }
