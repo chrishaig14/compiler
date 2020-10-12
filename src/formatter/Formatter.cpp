@@ -271,3 +271,11 @@ void Formatter::visit(NoneNode& node) {
 void Formatter::visit(EmptyListNode& node) {
 
 }
+
+void Formatter::visit(InstanceNode& node) {
+
+}
+
+void Formatter::visit(ClassNode& node) {
+
+}

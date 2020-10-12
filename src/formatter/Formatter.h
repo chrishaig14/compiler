@@ -68,6 +68,10 @@ public:
 
     void visit(EmptyListNode& node) override;
 
+    void visit(InstanceNode& node) override;
+
+    void visit(ClassNode& node) override;
+
 public:
     std::string output;
 };
