@@ -769,7 +769,6 @@ void Checker::visit(CallNode& n) {
     if (this->rv.is_a_function || this->rv.is_a_method) {
         // ok
         FunctionTypeNode* function_type = dynamic_cast<FunctionTypeNode*>(this->rv.symbol_info);
-        this->rv.symbol_info = function_type->return_type;
         if (n.arguments.size() != function_type->parameter_types.size()) {
 
             throw std::runtime_error("Calling function with wrong number of arguments");
@@ -784,6 +783,8 @@ void Checker::visit(CallNode& n) {
                                          function_type->parameter_types[i]->to_string());
             }
         }
+        this->rv.symbol_info = function_type->return_type;
+
     } else {
         throw std::runtime_error("calling something that's not a function!");
     }

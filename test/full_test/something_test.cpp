@@ -108,6 +108,10 @@ TEST(run_test, call_method) {
 }
 
 
+TEST(run_test, call_method_with_args) {
+    test_file("should_pass/"  "call_method_with_args.pl");
+}
+
 TEST(run_test, call_non_existent_function) {
     should_fail_test("call_non_existent_function.pl");
 }
@@ -147,4 +151,8 @@ TEST(run_test, call_function_wrong_arg_type_error) {
 
 TEST(run_test, cant_overload_function_error) {
     should_fail_test("cant_overload_function_error.pl");
+}
+
+TEST(run_test, call_method_with_args_error) {
+    should_fail_test("call_method_with_args_error.pl");
 }
