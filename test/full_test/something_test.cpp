@@ -94,8 +94,13 @@ TEST(run_test, test_should_pass_9) {
     test_file("should_pass/"  "call_function_ok.pl");
 }
 
+
 TEST(run_test, test_should_pass_10) {
-    test_file("should_pass/"  "generic_class.pl");
+    test_file("should_pass/"  "simple_list.pl");
+}
+
+TEST(run_test, test_should_pass_11) {
+    test_file("should_pass/"  "get_list_subscript.pl");
 }
 
 TEST(run_test, test_should_fail_1) {
