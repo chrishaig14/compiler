@@ -32,11 +32,11 @@ void compile_and_run(std::string text) {
     ObjectStack stack;
     StructProtos structs;
     CodeLabel translated_code = translator.code;
-//    std::cerr << translated_code << std::endl;
+    std::cerr << translated_code << std::endl;
     Loader loader(translated_code, builtins);
     loader.load();
     Environment* global_env = loader.global_env;
-    CodeObject* main_function = dynamic_cast<CodeObject*>(global_env->get("main.0"));
+    CodeObject* main_function = dynamic_cast<CodeObject*>(global_env->get("main"));
     CodeRunner code_runner(main_function->user->code, structs, stack, global_env);
     code_runner.run();
 }

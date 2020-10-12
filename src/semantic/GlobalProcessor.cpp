@@ -15,7 +15,7 @@ void GlobalProcessor::add_builtins(std::vector<Builtin>& builtins) {
         Builtin b = builtins[i];
         assert(b.second.ftype != nullptr);
         int index = this->function_table->add(b.first, b.second.ftype);
-        b.first = b.first + "." + std::to_string(index);
+        b.first = b.first;
         builtins[i] = b;
     }
 
@@ -106,6 +106,7 @@ GlobalProcessor::GlobalProcessor(std::vector<Builtin>& builtins) {
     auto at = T_LIST(TYPE("a", {}));
     builtins.push_back({"map", CodeBuiltin{FUNCTION_TYPE(VectorOfTypes({at, ft}), T_LIST(TYPE("b", {}))), list_map}});
     builtins.push_back({"str", CodeBuiltin{FUNCTION_TYPE({ T_INT }, T_STRING), int_to_str}});
+    builtins.push_back({"List.len", CodeBuiltin{FUNCTION_TYPE({ T_LIST(TYPE("a", {})) }, T_INT), list_len}});
     builtins.push_back({"print", CodeBuiltin{FUNCTION_TYPE({ T_STRING }, T_INT), print}});
     builtins.push_back(
             {"join", CodeBuiltin{FUNCTION_TYPE(VectorOfTypes({T_LIST(T_STRING), T_STRING}), T_STRING), join}});
@@ -188,7 +189,7 @@ void GlobalProcessor::visit(StructNode& node) {
 void GlobalProcessor::visit(FunctionNode& node) {
     FunctionTypeNode* function_info = new FunctionTypeNode(node.parameter_types, node.return_type);
     int index = this->function_table->add(node.identifier, function_info);
-    node.identifier = node.identifier + "." + std::to_string(index);
+    node.identifier = node.identifier;
 }
 
 void GlobalProcessor::visit(VectorOfNodes program) {

@@ -115,18 +115,6 @@ public:
 
     FunctionTable* function_table;
 
-    SymbolInfo visit_overloaded_function_call(CallNode& n, std::string func_name, VectorOfTypes& args);
-
-    std::vector<SymbolInfo> analyze_arguments(VectorOfNodes& arguments);
-
-    SymbolInfo* visit_local_function_call(FunctionTypeNode& function, VectorOfTypes& args);
-
-    SymbolInfo* visit_call_global_function(FunctionTypeNode& ft, VectorOfTypes& args);
-
-    SymbolInfo* visit_non_generic_function_call(FunctionTypeNode& function, VectorOfTypes& args);
-
-    SymbolInfo* visit_generic_function_call(FunctionTypeNode& function, VectorOfTypes& args);
-
     std::vector<std::pair<VectorOfTypes, VectorOfNodes>> make_combinations(VectorOfNodes args);
 
     void visit(ClassNode& node) override;

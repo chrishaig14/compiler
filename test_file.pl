@@ -1,13 +1,6 @@
-class Person {
-    name: String;
-    age: Integer;
-    fun get_name()->String{
-        return this.name + "foo";
-    }
-}
-
 fun main()->Integer{
-    var p = #Person{name: "Christian", age: 26};
-    print(p.get_name());
+    for e @ [3,1,4,1,5,9,2,6,5] {
+        print(str(e));
+    }
     return 0;
 }

@@ -245,7 +245,7 @@ void Translator::visit(ForNode& node) {
     auto s = SUB(ID(list_name), { ID(index_name) });
     node.body->nodes.insert(node.body->nodes.begin(), DECL(node.var, nullptr, s));
     BlockNode* desugared = new BlockNode({DECL(list_name, nullptr, node.exp),
-                                          DECL(len_name, nullptr, CALL(ID("len.0"), {ID(list_name)})),
+                                          DECL(len_name, nullptr, CALL(ID("List.len"), {ID(list_name)})),
                                           DECL(index_name, nullptr, NUM(0)),
                                           WHILE(BIN(OpType::LT, ID(index_name), ID(len_name)), node.body)
                                          });
