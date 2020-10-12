@@ -20,9 +20,11 @@ Checker::Checker(SymbolTable* globals, ClassTable* class_table) {
     this->class_table = class_table;
     this->scope = globals;
     this->scopes["global"] = this->scope;
-    this->class_table->set("Integer", new ClassInfo(std::vector<std::string>(), std::vector<TypeNode*>(), {}));
-    this->class_table->set("String", new ClassInfo(std::vector<std::string>(), std::vector<TypeNode*>(), {}));
-    this->class_table->set("Option", new ClassInfo(std::vector<std::string>(), std::vector<TypeNode*>(), {"T"}));
+    this->class_table->set("Integer",
+                           new ClassInfo("Integer", std::vector<std::string>(), std::vector<TypeNode*>(), {}));
+    this->class_table->set("String", new ClassInfo("String", std::vector<std::string>(), std::vector<TypeNode*>(), {}));
+    this->class_table->set("Option",
+                           new ClassInfo("Option", std::vector<std::string>(), std::vector<TypeNode*>(), {"T"}));
 
     this->check_structs();
 }
@@ -75,21 +77,17 @@ void Checker::visit(FunctionNode& n) {
 void Checker::visit(IdNode& n) {
     SymbolInfo semantic_info;
     semantic_info.is_a_function = false;
+    semantic_info.is_a_method = false;
     if (!this->scope->has(n.identifier)) {
         // it might be a function name
         if (this->function_table->has_function(n.identifier)) {
             semantic_info.is_a_function = true;
-            if (this->function_table->is_overloaded(n.identifier)) {
-                semantic_info.is_overloaded = true;
-                semantic_info.overloads = *this->function_table->get_overloads(n.identifier);
-            } else {
-                semantic_info.is_overloaded = false;
-                semantic_info.symbol_info = this->function_table->get_simple_function(n.identifier);
-                FunctionTypeNode* ft = dynamic_cast<FunctionTypeNode*>(semantic_info.symbol_info);
-                if (!function_is_generic(*ft)) {
-                    n.identifier += ".0";
-                }
+            semantic_info.symbol_info = this->function_table->get_simple_function(n.identifier);
+            FunctionTypeNode* ft = dynamic_cast<FunctionTypeNode*>(semantic_info.symbol_info);
+            if (!function_is_generic(*ft)) {
+                n.identifier += ".0";
             }
+
         } else {
             std::cout << n << std::endl;
             throw ScopeError(n.identifier);
@@ -172,11 +170,13 @@ void Checker::visit(MemberNode& n) {
         semantic_info.symbol_info = class_info->members[n.child];
         this->rv = semantic_info;
         this->rv.is_a_function = false;
+        this->rv.is_a_method = false;
     } else if (class_info->methods.count(n.child) == 1) {
         // It's a method
         semantic_info.symbol_info = class_info->methods[n.child];
         this->rv = semantic_info;
-        this->rv.is_a_function = true;
+        this->rv.is_a_method = true;
+        this->rv.class_info = class_info;
     } else {
         throw std::runtime_error("Type " + object->to_string() + " has no member " + n.child);
     }
@@ -755,11 +755,22 @@ bool matches_signature(FunctionTypeNode* function, VectorOfTypes args) {
 
 void Checker::visit(CallNode& n) {
     n.function->accept(*this);
-    if (this->rv.is_a_function) {
+    bool is_a_method = false;
+    Node* object_node;
+    if (this->rv.is_a_method) {
+        // Since it's a method, we have to transform it and prepare it for the translation step,
+        // where instead of calling object.method(args), we call <class>.method(object, args)
+        MemberNode* member_node = dynamic_cast<MemberNode*>(n.function);
+        assert(member_node != nullptr);
+        n.function = new IdNode(this->rv.class_info->class_name + "." + member_node->child);
+        object_node = member_node->parent;
+        is_a_method = true;
+    }
+    if (this->rv.is_a_function || this->rv.is_a_method) {
         // ok
         FunctionTypeNode* function_type = dynamic_cast<FunctionTypeNode*>(this->rv.symbol_info);
         this->rv.symbol_info = function_type->return_type;
-        if (n.arguments.size() != function_type->parameter_types.size()){
+        if (n.arguments.size() != function_type->parameter_types.size()) {
 
             throw std::runtime_error("Calling function with wrong number of arguments");
         }
@@ -775,6 +786,10 @@ void Checker::visit(CallNode& n) {
         }
     } else {
         throw std::runtime_error("calling something that's not a function!");
+    }
+    if (is_a_method) {
+        // prepend the "this" argument (the object on which the method is being called)
+        n.arguments.insert(n.arguments.begin(), object_node);
     }
 }
 
@@ -957,8 +972,9 @@ ClassInfo* Checker::instantiate_generic(ClassInfo* generic, ObjectTypeNode* inst
         TypeNode* concrete_type = make_type(f, replacements);
         concrete_field_types.push_back(concrete_type);
     }
-    ClassInfo* concrete = new ClassInfo(field_names, concrete_field_types, {});
-    return concrete;
+//    ClassInfo* concrete = new ClassInfo(field_names, concrete_field_types, {});
+//    return concrete;
+    return nullptr;
 }
 
 void Checker::visit(ClassLiteralFieldNode& node) {

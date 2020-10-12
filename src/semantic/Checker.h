@@ -21,8 +21,10 @@
 struct SymbolInfo {
     TypeNode* symbol_info;
     bool is_a_function;
+    bool is_a_method;
     FunctionOverloads overloads;
     bool is_overloaded;
+    ClassInfo* class_info;
 };
 
 bool type_matches(TypeNode* a, TypeNode* b);

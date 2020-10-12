@@ -107,8 +107,10 @@ GlobalProcessor::GlobalProcessor(std::vector<Builtin>& builtins) {
     builtins.push_back({"map", CodeBuiltin{FUNCTION_TYPE(VectorOfTypes({at, ft}), T_LIST(TYPE("b", {}))), list_map}});
     builtins.push_back({"str", CodeBuiltin{FUNCTION_TYPE({ T_INT }, T_STRING), int_to_str}});
     builtins.push_back({"print", CodeBuiltin{FUNCTION_TYPE({ T_STRING }, T_INT), print}});
-    builtins.push_back({"join", CodeBuiltin{FUNCTION_TYPE(VectorOfTypes({T_LIST(T_STRING), T_STRING}), T_STRING), join}});
-    builtins.push_back({"range", CodeBuiltin{FUNCTION_TYPE(VectorOfTypes({T_INT, T_INT, T_INT}), T_LIST(T_INT)), range}});
+    builtins.push_back(
+            {"join", CodeBuiltin{FUNCTION_TYPE(VectorOfTypes({T_LIST(T_STRING), T_STRING}), T_STRING), join}});
+    builtins.push_back(
+            {"range", CodeBuiltin{FUNCTION_TYPE(VectorOfTypes({T_INT, T_INT, T_INT}), T_LIST(T_INT)), range}});
 
     this->add_builtins(builtins);
 }
@@ -250,6 +252,7 @@ void GlobalProcessor::visit(ClassNode& node) {
         class_info->method_types.push_back(ft);
         class_info->methods[f.first] = ft;
     }
+    class_info->class_name = node.class_name;
     this->class_table->set(node.class_name, class_info);
 }
 

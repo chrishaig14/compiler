@@ -58,92 +58,93 @@ void should_fail_test(std::string f) {
     }
 }
 
-TEST(run_test, test_should_pass_1) {
+TEST(run_test, call_simple_generic_function) {
     test_file("should_pass/"  "call_simple_generic_function.pl");
 }
 
-TEST(run_test, test_should_pass_2) {
+TEST(run_test, normal_function) {
     test_file("should_pass/"  "normal_function.pl");
 }
 
-TEST(run_test, test_should_pass_3) {
+TEST(run_test, simple_generic_function) {
     test_file("should_pass/"  "simple_generic_function.pl");
 }
 
-TEST(run_test, test_should_pass_4) {
+TEST(run_test, test_file) {
     test_file("should_pass/"  "test_file.pl");
 }
 
-TEST(run_test, test_should_pass_5) {
+TEST(run_test, call_complex_generic_function) {
     test_file("should_pass/"  "call_complex_generic_function.pl");
 }
 
-TEST(run_test, test_should_pass_6) {
+TEST(run_test, custom_class_simple) {
     test_file("should_pass/"  "custom_class_simple.pl");
 }
 
-TEST(run_test, test_should_pass_7) {
+TEST(run_test, class_instantiate) {
     test_file("should_pass/"  "class_instantiate.pl");
 }
 
-TEST(run_test, test_should_pass_8) {
+TEST(run_test, custom_class_with_method) {
     test_file("should_pass/"  "custom_class_with_method.pl");
 }
 
-TEST(run_test, test_should_pass_9) {
+TEST(run_test, call_function_ok) {
     test_file("should_pass/"  "call_function_ok.pl");
 }
 
 
-TEST(run_test, test_should_pass_10) {
+TEST(run_test, simple_list) {
     test_file("should_pass/"  "simple_list.pl");
 }
 
-TEST(run_test, test_should_pass_11) {
+TEST(run_test, get_list_subscript) {
     test_file("should_pass/"  "get_list_subscript.pl");
 }
 
-TEST(run_test, test_should_fail_1) {
+TEST(run_test, call_method) {
+    test_file("should_pass/"  "call_method.pl");
+}
+
+
+TEST(run_test, call_non_existent_function) {
     should_fail_test("call_non_existent_function.pl");
 }
 
-TEST(run_test, test_should_fail_2) {
+TEST(run_test, call_simple_function_wrong_argument_types) {
     should_fail_test("call_simple_function_wrong_argument_types.pl");
 }
 
-TEST(run_test, test_should_fail_3) {
+TEST(run_test, call_simple_function_wrong_number_of_arguments) {
     should_fail_test("call_simple_function_wrong_number_of_arguments.pl");
 }
 
-TEST(run_test, test_should_fail_4) {
-    should_fail_test("call_simple_generic_function.pl");
-}
-
-TEST(run_test, test_should_fail_5) {
+TEST(run_test, call_complex_generic_function_error) {
     should_fail_test("call_complex_generic_function_error.pl");
 }
 
-TEST(run_test, test_should_fail_6) {
+TEST(run_test, class_no_member_found_error) {
     should_fail_test("class_no_member_found_error.pl");
 }
 
 
-TEST(run_test, test_should_fail_7) {
+TEST(run_test, instantiate_non_existant_class_error) {
     should_fail_test("instantiate_non_existant_class_error.pl");
 }
 
-TEST(run_test, test_should_fail_8) {
+TEST(run_test, instantiate_class_bad_member_error) {
     should_fail_test("instantiate_class_bad_member_error.pl");
 }
 
-TEST(run_test, test_should_fail_9) {
+TEST(run_test, instantiate_class_bad_member_type_error) {
     should_fail_test("instantiate_class_bad_member_type_error.pl");
 }
 
-TEST(run_test, test_should_fail_10) {
+TEST(run_test, call_function_wrong_arg_type_error) {
     should_fail_test("call_function_wrong_arg_type_error.pl");
 }
 
-TEST(run_test, test_should_fail_11) {
+TEST(run_test, cant_overload_function_error) {
     should_fail_test("cant_overload_function_error.pl");
 }
