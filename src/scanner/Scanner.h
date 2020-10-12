@@ -54,6 +54,8 @@ public:
     Token scan_number();
 
     Token scan_other();
+
+    bool comment;
 };
 
 

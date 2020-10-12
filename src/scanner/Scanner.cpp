@@ -65,6 +65,7 @@ void initialize_tokens() {
     TOKEN_SPECIAL[">"] = TokenType::GT;
     TOKEN_SPECIAL["<="] = TokenType::LEQ;
     TOKEN_SPECIAL[">="] = TokenType::GEQ;
+    TOKEN_SPECIAL["//"] = TokenType::DOUBLE_SLASH;
     TOKEN_SPECIAL["=="] = TokenType::EQ;
     TOKEN_SPECIAL["::"] = TokenType::DOUBLE_COLON;
     TOKEN_SPECIAL["!="] = TokenType::NEQ;
@@ -159,6 +160,15 @@ Token Scanner::scan_other() {
             token.start = start;
             int end = this->current - 1;
             token.end = end;
+            if (token.type == TokenType::DOUBLE_SLASH) {
+                // ignore everything until end of line
+                while (c != '\n') {
+                    c = this->text[this->current];
+                    this->current++;
+                }
+                token = this->get_next();
+
+            }
             return token;
         }
     }

@@ -85,6 +85,7 @@ void initialize_token_strings() {
     TOKEN_STRINGS[TokenType::DIV] = "div ( / )";
     TOKEN_STRINGS[TokenType::AND] = "and ( && )";
     TOKEN_STRINGS[TokenType::OR] = "or ( || )";
+    TOKEN_STRINGS[TokenType::DOUBLE_SLASH] = "double slash ( // )";
     TOKEN_STRINGS[TokenType::NOT] = "not ( ! )";
     TOKEN_STRINGS[TokenType::ID] = "identifier";
     TOKEN_STRINGS[TokenType::NUM] = "number";

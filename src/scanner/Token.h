@@ -38,6 +38,7 @@ enum class TokenType {
     NUM,
     STRING,
     FUN,
+    DOUBLE_SLASH,
     RETURN,
     STRUCT,
     IF,
