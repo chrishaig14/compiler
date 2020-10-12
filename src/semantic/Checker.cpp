@@ -165,6 +165,24 @@ void Checker::visit(AssignmentNode& n) {
 }
 
 void Checker::visit(MemberNode& n) {
+    IdNode* id_node = dynamic_cast<IdNode*>(n.parent);
+    if (id_node != nullptr) {
+        // It might be something like <class>.<method>, so we need to handle this case differently
+        if (this->class_table->declared(id_node->identifier)) {
+            ClassInfo* class_info = this->class_table->get(id_node->identifier);
+            if (class_info->methods.count(n.child) == 1) {
+                this->rv.symbol_info = class_info->methods[n.child];
+                this->rv.is_a_method = false;
+                this->rv.is_a_class_method = true;
+                this->rv.class_info = class_info;
+                this->replace_me = true;
+                this->replacement = new IdNode(class_info->class_name + "." + n.child);
+                return;
+            } else {
+                throw std::runtime_error("Class " + class_info->class_name + " has no method " + n.child);
+            }
+        }
+    }
     n.parent->accept(*this);
     SymbolInfo semantic_info = this->rv;
     ObjectTypeNode* object = dynamic_cast<ObjectTypeNode*>(semantic_info.symbol_info);
@@ -388,99 +406,6 @@ bool type_matches(TypeNode* a, TypeNode* b) {
     return false;
 }
 
-bool matches_signature(FunctionTypeNode* function, VectorOfTypes args) {
-    SymbolInfo* semantic_info;
-    std::map<std::string, TypeNode*> replace;
-    for (int i = 0; i < args.size(); i++) {
-        auto pt = function->parameter_types[i];
-        if (!is_generic(pt)) {
-            // non-generic argument
-            if (!pt->equal(args[i])) {
-                return false;
-            }
-        } else {
-            // generic argument
-            if (type_matches(pt, args[i])) {
-                std::map<std::string, TypeNode*> rep = make_replacements(pt, args[i]);
-                for (auto r: rep) {
-                    if (replace.count(r.first)) {
-                        if (!r.second->equal(replace[r.first])) {
-                            throw std::runtime_error(
-                                    "Bad generic subtitution! " + r.first +
-                                    " is already substituted for " +
-                                    replace[r.first]->to_string() + " but now trying to replace for " +
-                                    r.second->to_string());
-                        }
-                    } else {
-                        replace[r.first] = r.second;
-                    }
-                }
-
-            } else if (args[i]->is_a_function()) {
-                if (!is_generic(pt)) {
-                    // non overloaded function to non-generic argument
-                    if (!pt->equal(args[i])) {
-                        throw std::runtime_error(
-                                "Passing function -" + args[i]->to_string() +
-                                "- but expected -" +
-                                pt->to_string() + "-");
-                    }
-                } else {
-                    // non overloaded function to generic argument
-                    if (type_matches(pt, args[i])) {
-//                        IdNode* id = dynamic_cast<IdNode*>(n.arguments[i]);
-//                        id->identifier += "." + std::to_string(0);
-                        std::map<std::string, TypeNode*> rep = make_replacements(pt, args[i]);
-//                        for (auto r: rep) {
-//                            if (replace.count(r.first)) {
-//                                if (!r.second->equal(replace[r.first])) {
-//                                    throw std::runtime_error(
-//                                            "Bad generic subtitution! " + r.first +
-//                                            " is already substituted for " +
-//                                            replace[r.first]->to_string() +
-//                                            " but now trying to replace for " +
-//                                            r.second->to_string());
-//                                }
-//                            } else {
-//                                replace[r.first] = r.second;
-//                            }
-//                        }
-                    } else {
-                        throw std::runtime_error(
-                                "Passing function -" + args[i]->to_string() +
-                                "- but doesn't match generic -" +
-                                pt->to_string() + "-");
-                    }
-                }
-            }
-        }
-    }
-    ObjectTypeNode* otn = dynamic_cast<ObjectTypeNode*>(function->return_type);
-    TypeNode* rettype = nullptr;
-    if (otn == nullptr) {
-        throw std::runtime_error("not an objectypenode");
-    };
-    if (is_generic(otn)) {
-        if (otn->type_parameters.size() == 0) {
-            if (replace.count(otn->identifier) == 1) {
-                rettype = replace[otn->identifier];
-            } else {
-                return false;
-                throw std::runtime_error("Unknown generic type '" + otn->to_string() + "' for return!");
-            }
-        } else {
-            rettype = make_type(otn, replace);
-        }
-    } else {
-        rettype = otn;
-    }
-    semantic_info = new SymbolInfo;
-    semantic_info->symbol_info = rettype;
-    semantic_info->is_a_function = false;
-    return semantic_info;
-}
-
-
 void Checker::visit(CallNode& n) {
     n.function->accept(*this);
     bool is_a_method = false;
@@ -493,8 +418,16 @@ void Checker::visit(CallNode& n) {
         n.function = new IdNode(this->rv.class_info->class_name + "." + member_node->child);
         object_node = member_node->parent;
         is_a_method = true;
+    } else if (this->rv.is_a_class_method) {
+        MemberNode* member_node = dynamic_cast<MemberNode*>(n.function);
+        assert(member_node != nullptr);
+        n.function = new IdNode(this->rv.class_info->class_name + "." + member_node->child);
+        FunctionTypeNode* ftn = dynamic_cast<FunctionTypeNode*>(this->rv.symbol_info);
+        ftn->parameter_types.insert(ftn->parameter_types.begin(), TYPE(this->rv.class_info->class_name, {}));
+        this->rv.symbol_info = ftn;
+        object_node = member_node->parent;
     }
-    if (this->rv.is_a_function || this->rv.is_a_method) {
+    if (this->rv.is_a_function || this->rv.is_a_method || this->rv.is_a_class_method) {
         // ok
         FunctionTypeNode* function_type = dynamic_cast<FunctionTypeNode*>(this->rv.symbol_info);
         if (n.arguments.size() != function_type->parameter_types.size()) {

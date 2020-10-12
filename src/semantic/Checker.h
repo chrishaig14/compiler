@@ -18,13 +18,22 @@
 //typedef std::map<std::string, FunctionInfo> MapStringToFunction;
 
 
-struct SymbolInfo {
+class SymbolInfo {
+public:
     TypeNode* symbol_info;
     bool is_a_function;
     bool is_a_method;
     FunctionOverloads overloads;
-    bool is_overloaded;
     ClassInfo* class_info;
+    bool is_a_class_method;
+
+    SymbolInfo() {
+        this->symbol_info = nullptr;
+        this->is_a_function = false;
+        this->is_a_method = false;
+        this->class_info = nullptr;
+        this->is_a_class_method = false;
+    }
 };
 
 bool type_matches(TypeNode* a, TypeNode* b);
@@ -40,6 +49,7 @@ class Checker : public Visitor {
     std::map<std::string, TypeClassInfo*> typeclasses;
     ClassTable* class_table;
     SymbolInfo rv;
+    Node* replacement;
 public:
     std::map<std::string, SymbolTable*> scopes;
 
@@ -129,6 +139,8 @@ public:
         }
         return nullptr;
     }
+
+    bool replace_me;
 };
 
 #endif //UNTITLED1_CHECKER_H
