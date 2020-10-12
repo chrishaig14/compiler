@@ -20,9 +20,23 @@ Checker::Checker(SymbolTable* globals, ClassTable* class_table) {
     this->class_table = class_table;
     this->scope = globals;
     this->scopes["global"] = this->scope;
-    this->class_table->set("Integer",
-                           new ClassInfo("Integer", std::vector<std::string>(), std::vector<TypeNode*>(), {}));
-    this->class_table->set("String", new ClassInfo("String", std::vector<std::string>(), std::vector<TypeNode*>(), {}));
+    auto int_class_info = new ClassInfo();
+    int_class_info->class_name = "Integer";
+    int_class_info->methods["str"] = new FunctionTypeNode({}, T_STRING);
+
+    auto list_class_info = new ClassInfo();
+    list_class_info->class_name = "List";
+    list_class_info->methods["len"] = new FunctionTypeNode({}, T_INT);
+
+
+    this->class_table->set("Integer", int_class_info);
+    this->class_table->set("List", list_class_info);
+
+    auto string_class_info = new ClassInfo();
+    string_class_info->class_name = "String";
+    string_class_info->methods["len"] = new FunctionTypeNode({}, T_INT);
+    this->class_table->set("String", string_class_info);
+
     this->class_table->set("Option",
                            new ClassInfo("Option", std::vector<std::string>(), std::vector<TypeNode*>(), {"T"}));
 

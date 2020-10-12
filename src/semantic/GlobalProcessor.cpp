@@ -105,8 +105,9 @@ GlobalProcessor::GlobalProcessor(std::vector<Builtin>& builtins) {
     auto ft = FUNCTION_TYPE({ TYPE("a", {}) }, TYPE("b", {}));
     auto at = T_LIST(TYPE("a", {}));
     builtins.push_back({"map", CodeBuiltin{FUNCTION_TYPE(VectorOfTypes({at, ft}), T_LIST(TYPE("b", {}))), list_map}});
-    builtins.push_back({"str", CodeBuiltin{FUNCTION_TYPE({ T_INT }, T_STRING), int_to_str}});
+    builtins.push_back({"Integer.str", CodeBuiltin{FUNCTION_TYPE({ T_INT }, T_STRING), int_to_str}});
     builtins.push_back({"List.len", CodeBuiltin{FUNCTION_TYPE({ T_LIST(TYPE("a", {})) }, T_INT), list_len}});
+    builtins.push_back({"String.len", CodeBuiltin{FUNCTION_TYPE({ T_STRING }, T_INT), string_len}});
     builtins.push_back({"print", CodeBuiltin{FUNCTION_TYPE({ T_STRING }, T_INT), print}});
     builtins.push_back(
             {"join", CodeBuiltin{FUNCTION_TYPE(VectorOfTypes({T_LIST(T_STRING), T_STRING}), T_STRING), join}});
