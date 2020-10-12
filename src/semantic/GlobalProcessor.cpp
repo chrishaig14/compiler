@@ -106,14 +106,14 @@ GlobalProcessor::GlobalProcessor(std::vector<Builtin>& builtins) {
     auto at = T_LIST(TYPE("a", {}));
     builtins.push_back({"map", CodeBuiltin{FUNCTION_TYPE(VectorOfTypes({at, ft}), T_LIST(TYPE("b", {}))), list_map}});
     builtins.push_back({"str", CodeBuiltin{FUNCTION_TYPE({ T_INT }, T_STRING), int_to_str}});
-    builtins.push_back({"str", CodeBuiltin{FUNCTION_TYPE({ T_STRING }, T_STRING), str_to_str}});
+//    builtins.push_back({"str", CodeBuiltin{FUNCTION_TYPE({ T_STRING }, T_STRING), str_to_str}});
 
     builtins.push_back({"print", CodeBuiltin{FUNCTION_TYPE({ T_STRING }, T_INT), print}});
     builtins.push_back(
             {"join", CodeBuiltin{FUNCTION_TYPE(VectorOfTypes({T_LIST(T_STRING), T_STRING}), T_STRING), join}});
 
-    builtins.push_back({"len", CodeBuiltin{FUNCTION_TYPE({ T_LIST(TYPE("a", {})) }, T_INT), list_len}});
-    builtins.push_back({"len", CodeBuiltin{FUNCTION_TYPE({ T_STRING }, T_INT), string_len}});
+//    builtins.push_back({"len", CodeBuiltin{FUNCTION_TYPE({ T_LIST(TYPE("a", {})) }, T_INT), list_len}});
+//    builtins.push_back({"len", CodeBuiltin{FUNCTION_TYPE({ T_STRING }, T_INT), string_len}});
 
     builtins.push_back(
             {"range", CodeBuiltin{FUNCTION_TYPE(VectorOfTypes({T_INT, T_INT, T_INT}), T_LIST(T_INT)), range}});
@@ -193,12 +193,6 @@ void GlobalProcessor::visit(StructNode& node) {
 
 void GlobalProcessor::visit(FunctionNode& node) {
     FunctionTypeNode* function_info = new FunctionTypeNode(node.parameter_types, node.return_type);
-//    std::string params;
-//    for (auto p:node.parameter_types) {
-//        params += p->to_string() + ".";
-//    }
-//    params = params.substr(0, params.size() - 1);
-//    std::string new_name = node.identifier + ":" + params;
     int index = this->function_table->add(node.identifier, function_info);
     node.identifier = node.identifier + "." + std::to_string(index);
 }
@@ -297,6 +291,8 @@ int FunctionTable::add(std::string function_name, FunctionTypeNode* function_typ
     int n = functions.size();
     if (functions.count(function_name) == 0) {
         functions[function_name] = new std::vector<FunctionTypeNode*>();
+    } else {
+        throw std::runtime_error("Cant overload function " + function_name);
     }
     functions[function_name]->push_back(function_type);
     return functions[function_name]->size() - 1;

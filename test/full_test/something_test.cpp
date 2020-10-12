@@ -90,6 +90,14 @@ TEST(run_test, test_should_pass_8) {
     test_file("should_pass/"  "custom_class_with_method.pl");
 }
 
+TEST(run_test, test_should_pass_9) {
+    test_file("should_pass/"  "call_function_ok.pl");
+}
+
+TEST(run_test, test_should_pass_10) {
+    test_file("should_pass/"  "generic_class.pl");
+}
+
 TEST(run_test, test_should_fail_1) {
     should_fail_test("call_non_existent_function.pl");
 }
@@ -125,4 +133,12 @@ TEST(run_test, test_should_fail_8) {
 
 TEST(run_test, test_should_fail_9) {
     should_fail_test("instantiate_class_bad_member_type_error.pl");
+}
+
+TEST(run_test, test_should_fail_10) {
+    should_fail_test("call_function_wrong_arg_type_error.pl");
+}
+
+TEST(run_test, test_should_fail_11) {
+    should_fail_test("cant_overload_function_error.pl");
 }

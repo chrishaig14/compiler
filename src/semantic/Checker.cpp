@@ -759,6 +759,20 @@ void Checker::visit(CallNode& n) {
         // ok
         FunctionTypeNode* function_type = dynamic_cast<FunctionTypeNode*>(this->rv.symbol_info);
         this->rv.symbol_info = function_type->return_type;
+        if (n.arguments.size() != function_type->parameter_types.size()){
+
+            throw std::runtime_error("Calling function with wrong number of arguments");
+        }
+        for (int i = 0; i < n.arguments.size(); i++) {
+            Node* arg = n.arguments[i];
+            arg->accept(*this);
+            TypeNode* arg_type = this->rv.symbol_info;
+            if (!arg_type->equal(function_type->parameter_types[i])) {
+                throw std::runtime_error("Argument # " + std::to_string(i + 1) + " of type " + arg_type->to_string() +
+                                         " doesn't match expected type " +
+                                         function_type->parameter_types[i]->to_string());
+            }
+        }
     } else {
         throw std::runtime_error("calling something that's not a function!");
     }
