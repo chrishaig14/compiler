@@ -79,12 +79,6 @@ void Translator::visit(DeclarationNode& node) {
 
 void Translator::visit(FunctionNode& node) {
     CodeLabel out;
-    FunctionTypeNode* function_info = new FunctionTypeNode(node.parameter_types, node.return_type);
-    std::string params;
-    for (auto p: node.parameter_types) {
-        params += p->to_string() + ".";
-    }
-    params = params.substr(0, params.size() - 1);
     std::string new_name = node.identifier;
     out.push_back(LC("", I_START_FUNCTION(new_name)));
     CodeLabel body_code;
@@ -325,7 +319,22 @@ void Translator::visit(EmptyListNode& node) {
 }
 
 void Translator::visit(ClassNode& node) {
+    CodeLabel out;
+    std::vector<std::string> f;
+    for (auto field: node.members) {
+        f.push_back(field.first);
+    }
+    out.push_back(LC("", I_MAKE_CLASS(node.class_name, f)));
 
+    for (auto method: node.methods) {
+        method.second->identifier = node.class_name + "." + method.second->identifier;
+        method.second->parameter_names.insert(method.second->parameter_names.begin(), "this");
+        method.second->parameter_types.insert(method.second->parameter_types.begin(), nullptr);
+        method.second->accept(*this);
+        auto method_code = this->code;
+        out.insert(out.end(), method_code.begin(), method_code.end());
+    }
+    this->code = out;
 }
 
 void Translator::visit(InstanceNode& node) {

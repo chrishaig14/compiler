@@ -2,7 +2,7 @@ class Person {
     name: String;
     age: Integer;
     fun get_name()->String{
-        return this.name;
+        return this.name + "foo";
     }
 }
 
