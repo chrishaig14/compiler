@@ -106,17 +106,9 @@ GlobalProcessor::GlobalProcessor(std::vector<Builtin>& builtins) {
     auto at = T_LIST(TYPE("a", {}));
     builtins.push_back({"map", CodeBuiltin{FUNCTION_TYPE(VectorOfTypes({at, ft}), T_LIST(TYPE("b", {}))), list_map}});
     builtins.push_back({"str", CodeBuiltin{FUNCTION_TYPE({ T_INT }, T_STRING), int_to_str}});
-//    builtins.push_back({"str", CodeBuiltin{FUNCTION_TYPE({ T_STRING }, T_STRING), str_to_str}});
-
     builtins.push_back({"print", CodeBuiltin{FUNCTION_TYPE({ T_STRING }, T_INT), print}});
-    builtins.push_back(
-            {"join", CodeBuiltin{FUNCTION_TYPE(VectorOfTypes({T_LIST(T_STRING), T_STRING}), T_STRING), join}});
-
-//    builtins.push_back({"len", CodeBuiltin{FUNCTION_TYPE({ T_LIST(TYPE("a", {})) }, T_INT), list_len}});
-//    builtins.push_back({"len", CodeBuiltin{FUNCTION_TYPE({ T_STRING }, T_INT), string_len}});
-
-    builtins.push_back(
-            {"range", CodeBuiltin{FUNCTION_TYPE(VectorOfTypes({T_INT, T_INT, T_INT}), T_LIST(T_INT)), range}});
+    builtins.push_back({"join", CodeBuiltin{FUNCTION_TYPE(VectorOfTypes({T_LIST(T_STRING), T_STRING}), T_STRING), join}});
+    builtins.push_back({"range", CodeBuiltin{FUNCTION_TYPE(VectorOfTypes({T_INT, T_INT, T_INT}), T_LIST(T_INT)), range}});
 
     this->add_builtins(builtins);
 }
