@@ -103,8 +103,12 @@ void Checker::visit(IdNode& n) {
             throw ScopeError(n.identifier);
         }
     } else {
-        semantic_info.is_a_function = false;
         semantic_info.symbol_info = this->scope->get(n.identifier);
+        if (semantic_info.symbol_info->is_a_function()) {
+            semantic_info.is_a_function = true;
+            semantic_info.is_a_method = false;
+            semantic_info.is_a_class_method = false;
+        }
     }
     this->rv = semantic_info;
 }
@@ -406,6 +410,64 @@ bool type_matches(TypeNode* a, TypeNode* b) {
     return false;
 }
 
+std::map<std::string, TypeNode*>
+make_generic_replacements(TypeNode* t_generic_type, TypeNode* t_matching_type) {
+    ObjectTypeNode* generic_type = dynamic_cast<ObjectTypeNode*>(t_generic_type);
+    ObjectTypeNode* matching_type = dynamic_cast<ObjectTypeNode*>(t_matching_type);
+    assert(generic_type != nullptr);
+    assert(matching_type != nullptr);
+    std::map<std::string, TypeNode*> replacements;
+    if (generic_type->type_parameters.size() == 0) {
+        replacements[generic_type->identifier] = matching_type;
+    } else {
+        for (int i = 0; i < generic_type->type_parameters.size(); i++) {
+            std::map<std::string, TypeNode*> param_replacements = make_generic_replacements(
+                    generic_type->type_parameters[i],
+                    matching_type->type_parameters[i]);
+            replacements.insert(param_replacements.begin(), param_replacements.end());
+        }
+    }
+    return replacements;
+}
+
+void Checker::match_arguments_to_generic_function(FunctionTypeNode* function_type, VectorOfTypes arg_types) {
+    std::map<std::string, TypeNode*> generic_replacements;
+    for (int i = 0; i < function_type->parameter_types.size(); i++) {
+        TypeNode* param_type = function_type->parameter_types[i];
+        ObjectTypeNode* otn = dynamic_cast<ObjectTypeNode*>(param_type);
+        if (is_generic(param_type)) {
+            if (type_matches(param_type, arg_types[i])) {
+                std::map<std::string, TypeNode*> param_generic_replacements = make_replacements(param_type,
+                                                                                                arg_types[i]);
+                for (auto gtr: param_generic_replacements) {
+                    if (generic_replacements.count(gtr.first) == 1) {
+                        // this type has already been replaced, see if it matches
+                        if (!gtr.second->equal(generic_replacements[gtr.first])) {
+                            throw std::runtime_error(
+                                    "Type has already been replacen by something that doesn't match!");
+                        }
+                    }
+                }
+                generic_replacements.insert(param_generic_replacements.begin(), param_generic_replacements.end());
+            } else {
+                throw std::runtime_error("Argument type error!");
+            }
+        } else {
+            if (!arg_types[i]->equal(function_type->parameter_types[i])) {
+                throw std::runtime_error("Function call type mismatch! Expected " +
+                                         function_type->parameter_types[i]->to_string() + " but got " +
+                                         arg_types[i]->to_string() + "  instead");
+            }
+        }
+    }
+    if (is_generic(function_type->return_type)) {
+        ObjectTypeNode* rtn = dynamic_cast<ObjectTypeNode*>(function_type->return_type);
+        this->rv.symbol_info = make_type(rtn, generic_replacements);
+    } else { this->rv.symbol_info = function_type->return_type; }
+
+}
+
+
 void Checker::visit(CallNode& n) {
     n.function->accept(*this);
     bool is_a_method = false;
@@ -423,29 +485,36 @@ void Checker::visit(CallNode& n) {
         assert(member_node != nullptr);
         n.function = new IdNode(this->rv.class_info->class_name + "." + member_node->child);
         FunctionTypeNode* ftn = dynamic_cast<FunctionTypeNode*>(this->rv.symbol_info);
-        ftn->parameter_types.insert(ftn->parameter_types.begin(), TYPE(this->rv.class_info->class_name, {}));
-        this->rv.symbol_info = ftn;
+        FunctionTypeNode* copy_ftn = new FunctionTypeNode(ftn->parameter_types, ftn->return_type);
+        copy_ftn->parameter_types.insert(ftn->parameter_types.begin(), TYPE(this->rv.class_info->class_name, {}));
+        this->rv.symbol_info = copy_ftn;
         object_node = member_node->parent;
     }
     if (this->rv.is_a_function || this->rv.is_a_method || this->rv.is_a_class_method) {
         // ok
         FunctionTypeNode* function_type = dynamic_cast<FunctionTypeNode*>(this->rv.symbol_info);
         if (n.arguments.size() != function_type->parameter_types.size()) {
-
             throw std::runtime_error("Calling function with wrong number of arguments");
         }
+        VectorOfTypes arg_types;
         for (int i = 0; i < n.arguments.size(); i++) {
             Node* arg = n.arguments[i];
             arg->accept(*this);
             TypeNode* arg_type = this->rv.symbol_info;
-            if (!arg_type->equal(function_type->parameter_types[i])) {
-                throw std::runtime_error("Argument # " + std::to_string(i + 1) + " of type " + arg_type->to_string() +
-                                         " doesn't match expected type " +
-                                         function_type->parameter_types[i]->to_string());
-            }
+            arg_types.push_back(arg_type);
         }
-        this->rv.symbol_info = function_type->return_type;
-
+        if (function_is_generic(*function_type)) {
+            match_arguments_to_generic_function(function_type, arg_types);
+        } else {
+            for (int i = 0; i < n.arguments.size(); i++) {
+                if (!arg_types[i]->equal(function_type->parameter_types[i])) {
+                    throw std::runtime_error("Function call type mismatch! Expected " +
+                                             function_type->parameter_types[i]->to_string() + " but got " +
+                                             arg_types[i]->to_string() + "  instead");
+                }
+            }
+            this->rv.symbol_info = function_type->return_type;
+        }
     } else {
         throw std::runtime_error("calling something that's not a function!");
     }

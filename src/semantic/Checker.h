@@ -141,6 +141,10 @@ public:
     }
 
     bool replace_me;
+
+    void match_arguments_to_generic_function();
+
+    void match_arguments_to_generic_function(FunctionTypeNode* function_type, VectorOfTypes arg_types);
 };
 
 #endif //UNTITLED1_CHECKER_H
