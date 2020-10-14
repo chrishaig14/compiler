@@ -1,7 +1,13 @@
-fun foo(x: a, y: a)->a{
-    return x;
+fun imap(l: List[t], f: fun(t)->b) -> List[b] {
+    return [f(l[0])];
+}
+
+fun foo(x: String) -> String {
+    return "Hello";
 }
 
 fun main()->Integer{
-    return foo(7,"Hello");
+    var f : List[String] = imap([5,4,6],foo);
+    print(f[0]);
+    return 0;
 }
