@@ -21,7 +21,7 @@ fun main()->Integer{
 
     var t9 = #Tree[Integer]{value:9,left:t8,right:t10}
 
-    var t7 = #Tree[Integer]{value:7,left:none,right:t9}
+    var t7 = #Tree[Integer]{7,none,"Hello"}
 
     var t2 = #Tree[Integer]{value:2,left:t1,right:t3}
     var t6 = #Tree[Integer]{value:6,left:t5,right:t7}

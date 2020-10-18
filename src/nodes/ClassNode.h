@@ -20,6 +20,7 @@ public:
     bool equal(Node* other) const override;
 
     std::map<std::string, TypeNode*> members;
+    std::vector<std::string> members_ordered;
     std::map<std::string, FunctionNode*> methods;
     std::string class_name;
     std::vector<std::string> type_parameters;

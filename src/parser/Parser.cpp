@@ -369,12 +369,76 @@ Node* Parser::parse_class_literal() {
     }
     Node* node = nullptr;
     this->expect_token(TokenType::LCURLY);
-    std::map<std::string, Node*> initializers;
+
+    std::map<std::string, Node*> init;
+    std::vector<Node*> exps;
     if (!this->match(TokenType::RCURLY)) {
-        initializers = this->parse_initializers();
+        Node* first = this->parse_expression();
+        // if it's an id
+        IdNode* idn = dynamic_cast<IdNode*>(first);
+        if (idn != nullptr) {
+            if (this->match(TokenType::RCURLY)) {
+                exps.push_back(idn);
+                return new ClassLiteralExpressionNode(literal_type, exps);
+
+            } else if (this->match(TokenType::COMMA)) {
+                // it's a list of expressions
+                exps.push_back(idn);
+                this->next();
+                while (true) {
+                    Node* exp = this->parse_expression();
+                    exps.push_back(exp);
+                    if (this->match(TokenType::COMMA)) {
+                        this->next();
+                    } else {
+                        break;
+                    }
+                }
+                this->expect_token(TokenType::RCURLY);
+                return new ClassLiteralExpressionNode(literal_type, exps);
+            } else {
+                // it's field:exp, field:exp
+                this->expect_token(TokenType::COLON);
+                Node* exp = this->parse_expression();
+                init[idn->identifier] = exp;
+                if (this->match(TokenType::COMMA)) {
+                    this->next();
+                    while (true) {
+                        Token field_id = this->expect_token(TokenType::ID);
+                        this->expect_token(TokenType::COLON);
+                        Node* exp = this->parse_expression();
+                        init[field_id.str] = exp;
+                        if (this->match(TokenType::COMMA)) {
+                            this->next();
+                        } else {
+                            break;
+                        }
+                    }
+                }
+                this->expect_token(TokenType::RCURLY);
+                return new ClassLiteralFieldNode(literal_type, init);
+            }
+        } else {
+            // it's a list of expressions
+            exps.push_back(first);
+            if (this->match(TokenType::COMMA)) {
+                this->next();
+                while (true) {
+                    Node* exp = this->parse_expression();
+                    exps.push_back(exp);
+                    if (this->match(TokenType::COMMA)) {
+                        this->next();
+                    } else {
+                        break;
+                    }
+                }
+            }
+            this->expect_token(TokenType::RCURLY);
+            return new ClassLiteralExpressionNode(literal_type, exps);
+        }
     }
     this->expect_token(TokenType::RCURLY);
-    return new ClassLiteralFieldNode(literal_type, initializers);
+    return new ClassLiteralFieldNode(literal_type, init);
 }
 
 Node* Parser::parse_id_or_class_literal() {
@@ -739,12 +803,14 @@ ClassNode* Parser::parse_class_definition() {
     this->expect_token(TokenType::LCURLY);
     std::map<std::string, FunctionNode*> methods;
     std::map<std::string, TypeNode*> members;
+    std::vector<std::string> members_ordered;
     while (true) {
         if (this->match(TokenType::ID)) {
             Token member_name_tk = this->expect_token(TokenType::ID);
             this->expect_token(TokenType::COLON);
             TypeNode* member_type = this->parse_type_node();
             members[member_name_tk.str] = member_type;
+            members_ordered.push_back(member_name_tk.str);
 //            this->expect_token(TokenType::SEMICOLON);
         } else {
             if (this->match(TokenType::FUN)) {
@@ -756,7 +822,9 @@ ClassNode* Parser::parse_class_definition() {
         }
     }
     this->expect_token(TokenType::RCURLY);
-    return new ClassNode(class_name_tk.str, type_parameters, members, methods);
+    auto c = new ClassNode(class_name_tk.str, type_parameters, members, methods);
+    c->members_ordered = members_ordered;
+    return c;
 }
 
 Node* Parser::parse_instance_definition() {

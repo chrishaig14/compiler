@@ -645,29 +645,44 @@ void Checker::visit(ClassLiteralExpressionNode& node) {
                     "Error: generic class requires " + std::to_string(class_info->type_parameters.size()) +
                     " type parameters, but " + std::to_string(node.type->type_parameters.size()) + " given");
         }
-        class_info = instantiate_generic(class_info, node.type);
+        if (this->class_table->declared(node.type->to_string())) {
+            class_info = this->class_table->get(node.type->to_string());
+        } else {
+            class_info = instantiate_generic(class_info, node.type);
+            this->class_table->set(node.type->to_string(), class_info);
+        }
     }
-    auto class_fields = class_info->members;
-    if (class_fields.size() != node.init.size())
+    auto class_field_types_ordered = class_info->member_types;
+    auto class_field_names_ordered = class_info->member_names;
+
+    if (class_field_names_ordered.size() != node.init.size())
         throw std::runtime_error(
                 "In struct \"" + node.type->identifier + "\" initialization: " + "Expected " +
-                std::to_string(class_fields.size()) + " initializers but got " +
+                std::to_string(class_field_names_ordered.size()) + " initializers but got " +
                 std::to_string(node.init.size()));
-//    for (int i = 0; i < node.init.size(); i++) {
-//        Node* exp = node.init[i];
-//        exp->accept(*this);
-//        SymbolInfo semanticInfo = this->rv;
-//        if (!semanticInfo.symbol_info->equal(class_info->member_types[i])) {
-//            throw std::runtime_error(
-//                    "Field type doesn't match: " + class_info->member_names[i] + " ( field # " + std::to_string(i) +
-//                    " )" +
-//                    " expected " +
-//                    class_info->member_types[i]->to_string() + ", got " + semanticInfo.symbol_info->to_string());
-//        }
-//    }
-//    this->rv = SymbolInfo();
-//    rv.symbol_info = new ObjectTypeNode(node.type->identifier, {});
+
+    for (int i = 0; i < node.init.size(); i++) {
+        Node* exp = node.init[i];
+        exp->accept(*this);
+        if (this->replace_me) {
+            node.init[i] = this->replacement;
+            this->replace_me = false;
+        }
+        SymbolInfo semanticInfo = this->rv;
+        TypeNode* field_type = class_field_types_ordered[i];
+        if (!this->can_assign(semanticInfo.symbol_info, field_type)) {
+            throw std::runtime_error(
+                    "In struct \"" + node.type->identifier + "\" initialization: " + "field \"" +
+                    class_field_names_ordered[i] +
+                    "\" is of type " +
+                    field_type->to_string() +
+                    " but got " + semanticInfo.symbol_info->to_string());
+        }
+    }
+    this->rv = SymbolInfo();
+    rv.symbol_info = node.type;
 }
+
 
 bool Checker::can_assign(TypeNode* from, TypeNode* to) {
     auto to_object = dynamic_cast<ObjectTypeNode*>(to);

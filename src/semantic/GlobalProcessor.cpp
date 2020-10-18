@@ -246,10 +246,11 @@ void GlobalProcessor::visit(EmptyListNode& node) {
 
 void GlobalProcessor::visit(ClassNode& node) {
     ClassInfo* class_info = new ClassInfo();
-    for (auto f: node.members) {
-        class_info->member_names.push_back(f.first);
-        class_info->member_types.push_back(f.second);
-        class_info->members[f.first] = f.second;
+    for (auto mn: node.members_ordered) {
+        auto mt = node.members[mn];
+        class_info->member_names.push_back(mn);
+        class_info->member_types.push_back(mt);
+        class_info->members[mn] = mt;
     }
     for (auto f: node.methods) {
         FunctionTypeNode* ft = new FunctionTypeNode(f.second->parameter_types, f.second->return_type);
