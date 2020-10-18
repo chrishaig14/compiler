@@ -16,6 +16,7 @@ public:
     ClassLiteralExpressionNode(ObjectTypeNode* type, const std::vector<Node*>& init);
 
     std::vector<Node*> init;
+    std::vector<std::string> names;
     ObjectTypeNode* type;
 private:
     void accept(Visitor& visitor) override;

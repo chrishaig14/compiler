@@ -209,13 +209,17 @@ Translator::Translator() : is_lvalue(false) {
 
 void Translator::visit(ClassLiteralExpressionNode& node) {
     CodeLabel all;
-    for (auto exp: node.init) {
+    std::vector<std::string> fields;
+    for (int i = 0; i < node.init.size(); i++) {
+        Node* exp = node.init[i];
+        std::string name = node.names[i];
         this->code = {};
         exp->accept(*this);
+        fields.push_back(name);
         CodeLabel out = this->code;
         all.insert(all.end(), out.begin(), out.end());
     }
-//    all.push_back(LC("", new MakeObjectInst(node.identifier, fields)));
+    all.push_back(LC("", new MakeObjectInst(node.type->identifier, fields)));
     this->code = all;
 }
 

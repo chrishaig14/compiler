@@ -679,6 +679,7 @@ void Checker::visit(ClassLiteralExpressionNode& node) {
                     " but got " + semanticInfo.symbol_info->to_string());
         }
     }
+    node.names = class_field_names_ordered;
     this->rv = SymbolInfo();
     rv.symbol_info = node.type;
 }
