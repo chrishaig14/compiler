@@ -105,11 +105,11 @@ GlobalProcessor::GlobalProcessor(std::vector<Builtin>& builtins) {
     auto ft = FUNCTION_TYPE({ TYPE("a", {}) }, TYPE("b", {}));
     auto at = T_LIST(TYPE("a", {}));
     builtins.push_back({"map", CodeBuiltin{FUNCTION_TYPE(VectorOfTypes({at, ft}), T_LIST(TYPE("b", {}))), list_map}});
-    builtins.push_back({"Integer.str", CodeBuiltin{FUNCTION_TYPE({ T_INT }, T_STRING), int_to_str}});
+    builtins.push_back({"Integer.str", CodeBuiltin{FUNCTION_TYPE({T_INT}, T_STRING), int_to_str}});
     builtins.push_back({"List.len", CodeBuiltin{FUNCTION_TYPE({ T_LIST(TYPE("a", {})) }, T_INT), list_len}});
-    auto function_from_t_to_u = FUNCTION_TYPE({ TYPE("t", {}) }, TYPE("u", {}));
+    auto function_from_t_to_u = FUNCTION_TYPE({ TYPE("t", {}) }, TYPE("b", {}));
     builtins.push_back(
-            {"List.map", CodeBuiltin{FUNCTION_TYPE({ function_from_t_to_u }, T_LIST(TYPE("u", {}))), list_map}});
+            {"List.map", CodeBuiltin{FUNCTION_TYPE({ function_from_t_to_u }, T_LIST(TYPE("b", {}))), list_map}});
     builtins.push_back({"String.len", CodeBuiltin{FUNCTION_TYPE({ T_STRING }, T_INT), string_len}});
     builtins.push_back({"print", CodeBuiltin{FUNCTION_TYPE({ T_STRING }, T_INT), print}});
     builtins.push_back(
@@ -252,12 +252,11 @@ void GlobalProcessor::visit(ClassNode& node) {
         class_info->members[f.first] = f.second;
     }
     for (auto f: node.methods) {
-        class_info->method_names.push_back(f.first);
         FunctionTypeNode* ft = new FunctionTypeNode(f.second->parameter_types, f.second->return_type);
-        class_info->method_types.push_back(ft);
         class_info->methods[f.first] = ft;
     }
     class_info->class_name = node.class_name;
+    class_info->type_parameters = node.type_parameters;
     this->class_table->set(node.class_name, class_info);
 }
 

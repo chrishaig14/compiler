@@ -450,12 +450,12 @@ Node* Parser::parse_common_statement() {
     }
     if (this->match(TokenType::VAR)) {
         ast_node = this->parse_variable_declaration();
-        this->expect_token(TokenType::SEMICOLON);
+//        this->expect_token(TokenType::SEMICOLON);
         return ast_node;
     }
     if (this->match(TokenType::RETURN)) {
         ast_node = this->parse_return();
-        this->expect_token(TokenType::SEMICOLON);
+//        this->expect_token(TokenType::SEMICOLON);
         return ast_node;
     }
     if (this->match(TokenType::FOR)) {
@@ -467,7 +467,7 @@ Node* Parser::parse_common_statement() {
         return ast_node;
     }
     Node* node = this->parse_assignment_or_expression();
-    this->expect_token(TokenType::SEMICOLON);
+//    this->expect_token(TokenType::SEMICOLON);
     return node;
 }
 
@@ -549,7 +549,7 @@ StructNode* Parser::parse_struct_definition() {
             this->expect_token(TokenType::COLON);
             TypeNode* field_type = this->parse_type_node();
             fields.push_back(std::pair<std::string, TypeNode*>(identifier, field_type));
-            this->expect_token(TokenType::SEMICOLON);
+//            this->expect_token(TokenType::SEMICOLON);
         } else {
             break;
         }
@@ -723,6 +723,19 @@ FunctionTypeNode* Parser::parse_function_signature(std::string& function_name) {
 ClassNode* Parser::parse_class_definition() {
     this->expect_token(TokenType::CLASS);
     Token class_name_tk = this->expect_token(TokenType::ID);
+    std::vector<std::string> type_parameters;
+    if (this->match(TokenType::LSQUARE)) {
+        this->next();
+
+        while (true) {
+            Token type_param_tk = this->expect_token(TokenType::ID);
+            type_parameters.push_back(type_param_tk.str);
+            if (!this->match(TokenType::COMMA)) {
+                break;
+            }
+        }
+        this->expect_token(TokenType::RSQUARE);
+    }
     this->expect_token(TokenType::LCURLY);
     std::map<std::string, FunctionNode*> methods;
     std::map<std::string, TypeNode*> members;
@@ -732,7 +745,7 @@ ClassNode* Parser::parse_class_definition() {
             this->expect_token(TokenType::COLON);
             TypeNode* member_type = this->parse_type_node();
             members[member_name_tk.str] = member_type;
-            this->expect_token(TokenType::SEMICOLON);
+//            this->expect_token(TokenType::SEMICOLON);
         } else {
             if (this->match(TokenType::FUN)) {
                 FunctionNode* method_node = this->parse_function_definition();
@@ -743,7 +756,7 @@ ClassNode* Parser::parse_class_definition() {
         }
     }
     this->expect_token(TokenType::RCURLY);
-    return new ClassNode(class_name_tk.str, members, methods);
+    return new ClassNode(class_name_tk.str, type_parameters, members, methods);
 }
 
 Node* Parser::parse_instance_definition() {

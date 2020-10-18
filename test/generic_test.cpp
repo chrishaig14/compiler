@@ -158,6 +158,13 @@ TEST(generic_test, test_27) {
 }
 
 
+TEST(generic_test, test_28) {
+    VectorOfTypes pt = {TYPE("Integer", {})};
+    TypeNode* rt = TYPE("a", {});
+    auto a = FUNCTION_TYPE(pt, rt);
+    EXPECT_TRUE(is_generic(a));
+}
+
 TEST(generic_test, make_replacement_1) {
     auto a = TYPE("a", {});
     auto b = TYPE("Integer", {});

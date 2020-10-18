@@ -19,16 +19,12 @@ public:
     std::map<std::string, TypeNode*> members;
     std::map<std::string, FunctionTypeNode*> methods;
 
-    std::vector<std::string> method_names;
-    std::vector<FunctionTypeNode*> method_types;
-
     std::string class_name;
 
     ClassInfo() {}
 
     ClassInfo(std::string class_name, const std::vector<std::string>& fieldNames,
-              const std::vector<TypeNode*>& fieldTypes,
-              std::vector<std::string> type_parameters) : member_names(
+              const std::vector<TypeNode*>& fieldTypes, std::vector<std::string> type_parameters) : member_names(
             fieldNames), member_types(fieldTypes) {
         this->class_name = class_name;
         for (int i = 0; i < fieldNames.size(); i++) {
@@ -37,6 +33,7 @@ public:
         for (int i = 0; i < fieldNames.size(); i++) {
             this->members[fieldNames[i]] = fieldTypes[i];
         }
+        this->type_parameters = type_parameters;
     }
 
     bool operator!=(const ClassInfo& b) const {
@@ -52,6 +49,7 @@ public:
         return true;
     }
 
+    std::vector<std::string> type_parameters;
 };
 
 #endif //UNTITLED1_CLASSINFO_H

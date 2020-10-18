@@ -27,6 +27,9 @@ Checker::Checker(SymbolTable* globals, ClassTable* class_table) {
     auto list_class_info = new ClassInfo();
     list_class_info->class_name = "List";
     list_class_info->methods["len"] = new FunctionTypeNode({}, T_INT);
+    list_class_info->methods["map"] = new FunctionTypeNode({FUNCTION_TYPE({ TYPE("t", {}) }, TYPE("b", {}))},
+                                                           T_LIST(TYPE("b", {})));
+    list_class_info->type_parameters = {"t"};
 
 
     this->class_table->set("Integer", int_class_info);
@@ -36,9 +39,9 @@ Checker::Checker(SymbolTable* globals, ClassTable* class_table) {
     string_class_info->class_name = "String";
     string_class_info->methods["len"] = new FunctionTypeNode({}, T_INT);
     this->class_table->set("String", string_class_info);
-
+    this->replace_me = false;
     this->class_table->set("Option",
-                           new ClassInfo("Option", std::vector<std::string>(), std::vector<TypeNode*>(), {"T"}));
+                           new ClassInfo("Option", std::vector<std::string>(), std::vector<TypeNode*>(), {"t"}));
 
     this->check_structs();
 }
@@ -121,6 +124,10 @@ void Checker::visit(DeclarationNode& n) {
     semantic_info.is_a_function = false;
     if (n.expression != nullptr and n.type != nullptr) {
         n.expression->accept(*this);
+        if (this->replace_me) {
+            n.expression = replacement;
+            this->replace_me = false;
+        }
         SymbolInfo expression_info = this->rv;
         auto actual_type = dynamic_cast<ObjectTypeNode*>(n.type);
         if (actual_type->identifier == "Option") {
@@ -149,6 +156,10 @@ void Checker::visit(DeclarationNode& n) {
         semantic_info.symbol_info = n.type;
     } else if (n.expression != nullptr) {
         n.expression->accept(*this);
+        if (this->replace_me) {
+            n.expression = replacement;
+            this->replace_me = false;
+        }
         SymbolInfo expression_info = this->rv;
         semantic_info.symbol_info = expression_info.symbol_info;
     }
@@ -160,6 +171,10 @@ void Checker::visit(AssignmentNode& n) {
     n.lvalue->accept(*this);
     SymbolInfo linfo = this->rv;
     n.rvalue->accept(*this);
+    if (this->replace_me) {
+        n.rvalue = replacement;
+        this->replace_me = false;
+    }
     SymbolInfo expression_type = this->rv;
     if (!linfo.symbol_info->equal(expression_type.symbol_info)) {
         throw AssignmentTypeError(linfo.symbol_info, expression_type.symbol_info);
@@ -176,9 +191,20 @@ void Checker::visit(MemberNode& n) {
             ClassInfo* class_info = this->class_table->get(id_node->identifier);
             if (class_info->methods.count(n.child) == 1) {
                 this->rv.symbol_info = class_info->methods[n.child];
+                this->rv.class_info = class_info;
+
+                FunctionTypeNode* ftn = dynamic_cast<FunctionTypeNode*>(this->rv.symbol_info);
+                FunctionTypeNode* copy_ftn = new FunctionTypeNode(ftn->parameter_types, ftn->return_type);
+                std::vector<TypeNode*> tp;
+                for (auto tttp: this->rv.class_info->type_parameters) {
+                    tp.push_back(TYPE(tttp, {}));
+                }
+                auto instance_type = TYPE(this->rv.class_info->class_name, tp);
+                copy_ftn->parameter_types.insert(copy_ftn->parameter_types.begin(), instance_type);
+
+                this->rv.symbol_info = copy_ftn;
                 this->rv.is_a_method = false;
                 this->rv.is_a_class_method = true;
-                this->rv.class_info = class_info;
                 this->replace_me = true;
                 this->replacement = new IdNode(class_info->class_name + "." + n.child);
                 return;
@@ -193,10 +219,18 @@ void Checker::visit(MemberNode& n) {
     if (object == nullptr) {
         throw std::runtime_error("Accessing member " + n.child + " of non object");
     }
-    if (!this->class_table->declared(object->identifier)) {
-        throw std::runtime_error("Class " + object->identifier + " not declared!");
+    ClassInfo* class_info;
+    if (this->class_table->declared(object->to_string())) {
+        class_info = this->class_table->get(object->to_string());
+    } else {
+        class_info = this->class_table->get(object->identifier);
+        class_info = instantiate_generic(class_info, object);
+        this->class_table->set(object->to_string(), class_info);
     }
-    ClassInfo* class_info = this->class_table->get(object->identifier);
+//    if (!this->class_table->declared(semantic_info.symbol_info->to_string())) {
+//        throw std::runtime_error("Class " + semantic_info.symbol_info->to_string() + " not declared!");
+//    }
+//    = this->class_table->get(semantic_info.symbol_info->to_string());
     if (class_info->members.count(n.child) == 1) {
         // It's a member
         semantic_info.symbol_info = class_info->members[n.child];
@@ -296,6 +330,10 @@ void Checker::visit(BinopNode& n) {
 
 void Checker::visit(ReturnNode& n) {
     n.expression->accept(*this);
+    if (this->replace_me) {
+        n.expression = replacement;
+        this->replace_me = false;
+    }
     SymbolInfo expression_info = this->rv;
     TypeNode* return_type = this->scope->get("__return__");
     assert(expression_info.symbol_info != nullptr);
@@ -308,6 +346,7 @@ void Checker::visit(ReturnNode& n) {
 }
 
 bool is_generic(TypeNode* t) {
+
     ObjectTypeNode* o = dynamic_cast<ObjectTypeNode*>(t);
     if (o != nullptr) {
         if (o->identifier.size() == 1 && islower(o->identifier[0])) {
@@ -324,6 +363,8 @@ bool is_generic(TypeNode* t) {
             for (int i = 0; i < fo->parameter_types.size(); i++) {
                 if (is_generic(fo->parameter_types[i])) return true;
             }
+            if (is_generic(fo->return_type)) return true;
+
         }
     }
     return false;
@@ -472,22 +513,25 @@ void Checker::visit(CallNode& n) {
     n.function->accept(*this);
     bool is_a_method = false;
     Node* object_node;
+    SymbolInfo retv;
     if (this->rv.is_a_method) {
         // Since it's a method, we have to transform it and prepare it for the translation step,
         // where instead of calling object.method(args), we call <class>.method(object, args)
         MemberNode* member_node = dynamic_cast<MemberNode*>(n.function);
         assert(member_node != nullptr);
         n.function = new IdNode(this->rv.class_info->class_name + "." + member_node->child);
+        this->replace_me = false;
         object_node = member_node->parent;
         is_a_method = true;
     } else if (this->rv.is_a_class_method) {
         MemberNode* member_node = dynamic_cast<MemberNode*>(n.function);
         assert(member_node != nullptr);
         n.function = new IdNode(this->rv.class_info->class_name + "." + member_node->child);
+        this->replace_me = false;
         FunctionTypeNode* ftn = dynamic_cast<FunctionTypeNode*>(this->rv.symbol_info);
         FunctionTypeNode* copy_ftn = new FunctionTypeNode(ftn->parameter_types, ftn->return_type);
-        copy_ftn->parameter_types.insert(ftn->parameter_types.begin(), TYPE(this->rv.class_info->class_name, {}));
-        this->rv.symbol_info = copy_ftn;
+        copy_ftn->parameter_types.insert(copy_ftn->parameter_types.begin(), TYPE(this->rv.class_info->class_name, {}));
+        retv.symbol_info = copy_ftn;
         object_node = member_node->parent;
     }
     if (this->rv.is_a_function || this->rv.is_a_method || this->rv.is_a_class_method) {
@@ -500,11 +544,16 @@ void Checker::visit(CallNode& n) {
         for (int i = 0; i < n.arguments.size(); i++) {
             Node* arg = n.arguments[i];
             arg->accept(*this);
+            if (this->replace_me) {
+                n.arguments[i] = replacement;
+                this->replace_me = false;
+            }
             TypeNode* arg_type = this->rv.symbol_info;
             arg_types.push_back(arg_type);
         }
         if (function_is_generic(*function_type)) {
             match_arguments_to_generic_function(function_type, arg_types);
+            retv = this->rv;
         } else {
             for (int i = 0; i < n.arguments.size(); i++) {
                 if (!arg_types[i]->equal(function_type->parameter_types[i])) {
@@ -513,7 +562,7 @@ void Checker::visit(CallNode& n) {
                                              arg_types[i]->to_string() + "  instead");
                 }
             }
-            this->rv.symbol_info = function_type->return_type;
+            retv.symbol_info = function_type->return_type;
         }
     } else {
         throw std::runtime_error("calling something that's not a function!");
@@ -522,6 +571,7 @@ void Checker::visit(CallNode& n) {
         // prepend the "this" argument (the object on which the method is being called)
         n.arguments.insert(n.arguments.begin(), object_node);
     }
+    this->rv = retv;
 }
 
 bool Checker::type_exists(TypeNode* type) {
@@ -588,6 +638,15 @@ void Checker::visit(ClassLiteralExpressionNode& node) {
     if (!this->class_table->declared(node.type->identifier))
         throw std::runtime_error("No struct named " + node.type->identifier);
     ClassInfo* class_info = this->class_table->get(node.type->identifier);
+    if (class_info->type_parameters.size() != 0) {
+        // it's a generic class
+        if (class_info->type_parameters.size() != node.type->type_parameters.size()) {
+            throw std::runtime_error(
+                    "Error: generic class requires " + std::to_string(class_info->type_parameters.size()) +
+                    " type parameters, but " + std::to_string(node.type->type_parameters.size()) + " given");
+        }
+        class_info = instantiate_generic(class_info, node.type);
+    }
     auto class_fields = class_info->members;
     if (class_fields.size() != node.init.size())
         throw std::runtime_error(
@@ -685,33 +744,74 @@ TypeNode* make_type(TypeNode* original, std::map<std::string, TypeNode*>& replac
         }
         new_type = new ObjectTypeNode(type_identifier, new_type_params);
     } else {
-        throw std::runtime_error("Making non object concrete type template!");
+        FunctionTypeNode* ftn = dynamic_cast<FunctionTypeNode*>(original);
+        VectorOfTypes new_param_types;
+        for (auto pt: ftn->parameter_types) {
+            TypeNode* new_pt = make_type(pt, replacements);
+            new_param_types.push_back(new_pt);
+        }
+        TypeNode* new_return_type = make_type(ftn->return_type, replacements);
+        new_type = new FunctionTypeNode(new_param_types, new_return_type);
+//        throw std::runtime_error("Making non object concrete type template!");
     }
     return new_type;
 }
 
 ClassInfo* Checker::instantiate_generic(ClassInfo* generic, ObjectTypeNode* instance) {
     std::map<std::string, TypeNode*> replacements;
-//    for (int i = 0; i < generic->type_parameters.size(); i++) {
-//        std::string tp = generic->type_parameters[i];
-//        TypeNode* type_replacement = instance->type_parameters[i];
-//        replacements[tp] = type_replacement;
-//    }
+    for (int i = 0; i < generic->type_parameters.size(); i++) {
+        std::string tp = generic->type_parameters[i];
+        TypeNode* type_replacement = instance->type_parameters[i];
+        replacements[tp] = type_replacement;
+    }
     auto field_names = generic->member_names;
     std::vector<TypeNode*> concrete_field_types;
     for (auto f: generic->member_types) {
         TypeNode* concrete_type = make_type(f, replacements);
         concrete_field_types.push_back(concrete_type);
     }
-//    ClassInfo* concrete = new ClassInfo(field_names, concrete_field_types, {});
-//    return concrete;
-    return nullptr;
+
+    std::map<std::string, FunctionTypeNode*> concrete_methods;
+    for (auto m: generic->methods) {
+        TypeNode* concrete_type = make_type(m.second, replacements);
+        concrete_methods[m.first] = dynamic_cast<FunctionTypeNode*>(concrete_type);
+        assert(concrete_methods[m.first] != nullptr);
+    }
+
+    ClassInfo* concrete = new ClassInfo();
+    concrete->class_name = generic->class_name;
+    concrete->methods = concrete_methods;
+    concrete->member_names = generic->member_names;
+    concrete->member_types = concrete_field_types;
+    for (int i = 0; i < generic->member_names.size(); i++) {
+        concrete->members[generic->member_names[i]] = concrete_field_types[i];
+    }
+    return concrete;
 }
 
 void Checker::visit(ClassLiteralFieldNode& node) {
     if (!this->class_table->declared(node.type->identifier))
         throw std::runtime_error("No struct named " + node.type->identifier);
-    auto class_fields = this->class_table->get(node.type->identifier)->members;
+
+    if (!this->class_table->declared(node.type->identifier))
+        throw std::runtime_error("No struct named " + node.type->identifier);
+    ClassInfo* class_info = this->class_table->get(node.type->identifier);
+    if (class_info->type_parameters.size() != 0) {
+        // it's a generic class
+        if (class_info->type_parameters.size() != node.type->type_parameters.size()) {
+            throw std::runtime_error(
+                    "Error: generic class requires " + std::to_string(class_info->type_parameters.size()) +
+                    " type parameters, but " + std::to_string(node.type->type_parameters.size()) + " given");
+        }
+        if (this->class_table->declared(node.type->to_string())) {
+            class_info = this->class_table->get(node.type->to_string());
+        } else {
+            class_info = instantiate_generic(class_info, node.type);
+            this->class_table->set(node.type->to_string(), class_info);
+        }
+    }
+    auto class_fields = class_info->members;
+
     for (auto f: node.init) {
         if (class_fields.count(f.first) == 0) throw std::runtime_error("No field named " + f.first);
     }
@@ -723,6 +823,10 @@ void Checker::visit(ClassLiteralFieldNode& node) {
     for (auto f: node.init) {
         Node* exp = f.second;
         exp->accept(*this);
+        if (this->replace_me) {
+            node.init[f.first] = this->replacement;
+            this->replace_me = false;
+        }
         SymbolInfo semanticInfo = this->rv;
         TypeNode* field_type = class_fields[f.first];
         if (!this->can_assign(semanticInfo.symbol_info, field_type)) {
@@ -756,9 +860,17 @@ void Checker::visit(ForNode& node) {
 
 void Checker::visit(ListNode& node) {
     node.elements[0]->accept(*this);
+    if (this->replace_me) {
+        node.elements[0] = this->replacement;
+        this->replace_me = false;
+    }
     auto element_type = this->rv.symbol_info;
     for (int i = 1; i < node.elements.size(); i++) {
         node.elements[i]->accept(*this);
+        if (this->replace_me) {
+            node.elements[i] = this->replacement;
+            this->replace_me = false;
+        }
         auto current_type = this->rv.symbol_info;
         if (!current_type->equal(element_type)) {
             throw std::runtime_error("List literal with more than one element type, first element has type: " +
@@ -844,9 +956,17 @@ void Checker::visit(TernaryNode& node) {
     this->enter_scope("true_case");
     this->scope->set("it", type);
     node.true_case->accept(*this);
+    if (this->replace_me) {
+        node.true_case = this->replacement;
+        this->replace_me = false;
+    }
     this->leave_scope();
     SymbolInfo true_case = this->rv;
     node.false_case->accept(*this);
+    if (this->replace_me) {
+        node.false_case = this->replacement;
+        this->replace_me = false;
+    }
     SymbolInfo false_case = this->rv;
     if (!false_case.symbol_info->equal(true_case.symbol_info)) {
         throw std::runtime_error(
@@ -874,7 +994,17 @@ void Checker::visit(EmptyListNode& node) {
 }
 
 void Checker::visit(ClassNode& node) {
+    for (auto method: node.methods) {
+        this->enter_scope(method.first);
 
+        std::vector<TypeNode*> tp;
+        for (int i = 0; i < node.type_parameters.size(); i++) {
+            tp.push_back(TYPE(node.type_parameters[i], {}));
+        }
+        this->scope->set("this", TYPE(node.class_name, tp));
+        this->leave_scope();
+        method.second->accept(*this);
+    }
 }
 
 void Checker::visit(InstanceNode& node) {
