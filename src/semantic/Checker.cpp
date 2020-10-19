@@ -232,6 +232,9 @@ void Checker::visit(MemberNode& n) {
     if (this->class_table->declared(object->to_string())) {
         class_info = this->class_table->get(object->to_string());
     } else {
+        if (is_generic(object) && object->type_parameters.size()==0){
+            throw std::runtime_error("Cannot access member of totally generic value of generic type "+ object->identifier +"!");
+        }
         class_info = this->class_table->get(object->identifier);
         class_info = instantiate_generic(class_info, object);
         this->class_table->set(object->to_string(), class_info);
