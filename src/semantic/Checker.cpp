@@ -128,32 +128,41 @@ void Checker::visit(DeclarationNode& n) {
             n.expression = replacement;
             this->replace_me = false;
         }
-        SymbolInfo expression_info = this->rv;
-        auto actual_type = dynamic_cast<ObjectTypeNode*>(n.type);
-        if (actual_type->identifier == "Option") {
-            if (!actual_type->type_parameters[0]->equal(expression_info.symbol_info)) {
-                auto foo = dynamic_cast<ObjectTypeNode*>(expression_info.symbol_info);
-                if (foo->identifier != "NoneType") {
+        auto ft = dynamic_cast<FunctionTypeNode*>(n.type);
+        if (ft != nullptr) {
+            // it's a function
+            if (!ft->equal(this->rv.symbol_info)) {
+                throw AssignmentTypeError(n.type, this->rv.symbol_info);
+            }
+        } else {
+            SymbolInfo expression_info = this->rv;
+            auto actual_type = dynamic_cast<ObjectTypeNode*>(n.type);
+            if (actual_type->identifier == "Option") {
+                if (!actual_type->type_parameters[0]->equal(expression_info.symbol_info)) {
+                    auto foo = dynamic_cast<ObjectTypeNode*>(expression_info.symbol_info);
+                    if (foo->identifier != "NoneType") {
+                        throw AssignmentTypeError(n.type, expression_info.symbol_info);
+                    }
+                }
+            } else if (actual_type->identifier == "Union") {
+                bool ok = false;
+                for (int i = 0; i < actual_type->type_parameters.size(); i++) {
+                    if (actual_type->type_parameters[i]->equal(expression_info.symbol_info)) {
+                        ok = true;
+                        break;
+                    }
+                }
+                if (!ok) {
+                    throw AssignmentTypeError(n.type, expression_info.symbol_info);
+                }
+            } else {
+                if (!n.type->equal(expression_info.symbol_info)) {
                     throw AssignmentTypeError(n.type, expression_info.symbol_info);
                 }
             }
-        } else if (actual_type->identifier == "Union") {
-            bool ok = false;
-            for (int i = 0; i < actual_type->type_parameters.size(); i++) {
-                if (actual_type->type_parameters[i]->equal(expression_info.symbol_info)) {
-                    ok = true;
-                    break;
-                }
-            }
-            if (!ok) {
-                throw AssignmentTypeError(n.type, expression_info.symbol_info);
-            }
-        } else {
-            if (!n.type->equal(expression_info.symbol_info)) {
-                throw AssignmentTypeError(n.type, expression_info.symbol_info);
-            }
         }
         semantic_info.symbol_info = n.type;
+
     } else if (n.expression != nullptr) {
         n.expression->accept(*this);
         if (this->replace_me) {
