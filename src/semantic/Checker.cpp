@@ -185,8 +185,19 @@ void Checker::visit(AssignmentNode& n) {
         this->replace_me = false;
     }
     SymbolInfo expression_type = this->rv;
+
     if (!linfo.symbol_info->equal(expression_type.symbol_info)) {
-        throw AssignmentTypeError(linfo.symbol_info, expression_type.symbol_info);
+        auto actual_type = dynamic_cast<ObjectTypeNode*>(linfo.symbol_info);
+        if (actual_type->identifier == "Option") {
+            if (!actual_type->type_parameters[0]->equal(expression_type.symbol_info)) {
+                auto foo = dynamic_cast<ObjectTypeNode*>(expression_type.symbol_info);
+                if (foo->identifier != "NoneType") {
+                    throw AssignmentTypeError(linfo.symbol_info, expression_type.symbol_info);
+                }
+            }
+        } else {
+            throw AssignmentTypeError(linfo.symbol_info, expression_type.symbol_info);
+        }
     }
     SymbolInfo semantic_info;
     this->rv = semantic_info;
