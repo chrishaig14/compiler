@@ -316,11 +316,22 @@ void Checker::visit(BinopNode& n) {
             is_boolean = false;
     }
     if (is_boolean) {
-        if (!left_info.symbol_info->equal(right_info.symbol_info)) {
-            throw std::runtime_error(
-                    "Cannot perform binary op betweeen types " + left_info.symbol_info->to_string() + " and " + right_info.symbol_info->to_string());
+        auto left = dynamic_cast<ObjectTypeNode*>(left_info.symbol_info);
+        if (left != nullptr) {
+            auto right = dynamic_cast<ObjectTypeNode*>(right_info.symbol_info);
+            if (right != nullptr) {
+                if (left->identifier == "Option" && right->identifier == "NoneType") {
+                    semantic_info.symbol_info = new ObjectTypeNode("Boolean", {});
+                }
+            }
+        } else {
+            if (!left_info.symbol_info->equal(right_info.symbol_info)) {
+                throw std::runtime_error(
+                        "Cannot perform binary op betweeen types " + left_info.symbol_info->to_string() + " and " +
+                        right_info.symbol_info->to_string());
+            }
+            semantic_info.symbol_info = new ObjectTypeNode("Boolean", {});
         }
-        semantic_info.symbol_info = new ObjectTypeNode("Boolean", {});
     } else {
         auto left = dynamic_cast<ObjectTypeNode*>(left_info.symbol_info);
         auto right = dynamic_cast<ObjectTypeNode*>(right_info.symbol_info);
