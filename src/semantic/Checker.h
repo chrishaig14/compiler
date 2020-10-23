@@ -145,6 +145,8 @@ public:
     void match_arguments_to_generic_function();
 
     void match_arguments_to_generic_function(FunctionTypeNode* function_type, VectorOfTypes arg_types);
+
+    int null_check_type;
 };
 
 #endif //UNTITLED1_CHECKER_H

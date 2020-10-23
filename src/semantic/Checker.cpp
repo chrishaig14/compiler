@@ -6,6 +6,10 @@
 #include "Checker.h"
 #include "TypeClassInfo.h"
 
+#define NONE 0
+#define NOT_NULL_CHECK 1
+#define NULL_CHECK 2
+
 bool function_is_generic(FunctionTypeNode& ft) {
     for (int i = 0; i < ft.parameter_types.size(); i++) {
         if (is_generic(ft.parameter_types[i])) {
@@ -186,17 +190,31 @@ void Checker::visit(AssignmentNode& n) {
     }
     SymbolInfo expression_type = this->rv;
 
-    if (!linfo.symbol_info->equal(expression_type.symbol_info)) {
-        auto actual_type = dynamic_cast<ObjectTypeNode*>(linfo.symbol_info);
+    auto actual_type = dynamic_cast<ObjectTypeNode*>(linfo.symbol_info);
+    IdNode* lid = dynamic_cast<IdNode*>(n.lvalue);
+    if (lid != nullptr) {
         if (actual_type->identifier == "Option") {
-            if (!actual_type->type_parameters[0]->equal(expression_type.symbol_info)) {
-                auto foo = dynamic_cast<ObjectTypeNode*>(expression_type.symbol_info);
-                if (foo->identifier != "NoneType") {
-                    throw AssignmentTypeError(linfo.symbol_info, expression_type.symbol_info);
-                }
+            if (expression_type.symbol_info->equal(actual_type->type_parameters[0])) {
+                std::cout << "p cant be none" << std::endl;
+                this->scope->set_not_none(lid->identifier, true);
+            } else {
+                std::cout << "p may be none" << std::endl;
+                this->scope->set_not_none(lid->identifier, false);
             }
-        } else {
-            throw AssignmentTypeError(linfo.symbol_info, expression_type.symbol_info);
+        }
+    } else {
+        if (!linfo.symbol_info->equal(expression_type.symbol_info)) {
+            auto actual_type = dynamic_cast<ObjectTypeNode*>(linfo.symbol_info);
+            if (actual_type->identifier == "Option") {
+                if (!actual_type->type_parameters[0]->equal(expression_type.symbol_info)) {
+                    auto foo = dynamic_cast<ObjectTypeNode*>(expression_type.symbol_info);
+                    if (foo->identifier != "NoneType") {
+                        throw AssignmentTypeError(linfo.symbol_info, expression_type.symbol_info);
+                    }
+                }
+            } else {
+                throw AssignmentTypeError(linfo.symbol_info, expression_type.symbol_info);
+            }
         }
     }
     SymbolInfo semantic_info;
@@ -239,6 +257,18 @@ void Checker::visit(MemberNode& n) {
     if (object == nullptr) {
         throw std::runtime_error("Accessing member " + n.child + " of non object");
     }
+    IdNode* idn = dynamic_cast<IdNode*>(n.parent);
+    if (idn != nullptr) {
+        if (object->identifier == "Option") {
+            if (this->scope->get_not_none(idn->identifier)) {
+                // we can guarantee that it's not null, so we can access the members
+                object = dynamic_cast<ObjectTypeNode*>(object->type_parameters[0]);
+            } else {
+                throw std::runtime_error("Error: line " + std::to_string(idn->line + 1) + " -> " +  idn->identifier +
+                                         " might be none here, make sure to wrap this in a if XXX != none {...}!");
+            }
+        }
+    }
     ClassInfo* class_info;
     if (this->class_table->declared(object->to_string())) {
         class_info = this->class_table->get(object->to_string());
@@ -276,6 +306,31 @@ void Checker::visit(MemberNode& n) {
 void Checker::visit(IfNode& n) {
     SymbolInfo semantic_info;
     n.condition->accept(*this);
+    BinopNode* bop = dynamic_cast<BinopNode*>(n.condition);
+    if (bop != nullptr) {
+        if (bop->right->equal(new NoneNode())) {
+            if (bop->op == OpType::NEQ) {
+                IdNode* left = dynamic_cast<IdNode*>(bop->left);
+                NoneNode* right = dynamic_cast<NoneNode*>(bop->right);
+                if (left != nullptr && right != nullptr) {
+                    this->enter_scope("if");
+                    std::cout << "Cant be none: " << left->identifier << std::endl;
+                    this->scope->set_not_none(left->identifier, true);
+                    this->leave_scope();
+                }
+            }
+            if (bop->op == OpType::EQ) {
+                IdNode* left = dynamic_cast<IdNode*>(bop->left);
+                NoneNode* right = dynamic_cast<NoneNode*>(bop->right);
+                if (left != nullptr && right != nullptr) {
+                    this->enter_scope("if");
+                    std::cout << "MAY be none: " << left->identifier << std::endl;
+                    this->scope->set_not_none(left->identifier, false);
+                    this->leave_scope();
+                }
+            }
+        }
+    }
     SymbolInfo condition_info = this->rv;
     if (!condition_info.symbol_info->equal(T_BOOL)) {
         throw std::runtime_error("Expected a Boolean expression as a condition for if statement!, got " +

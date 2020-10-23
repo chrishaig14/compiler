@@ -116,7 +116,16 @@ void CodeRunner::visit(BinopInst& inst) {
                     this->stack.push(result);
                 }
             } else {
-                throw std::runtime_error("Try to do a binop with two non-Integers or non-Strings");
+                NoneObject* right_none = dynamic_cast<NoneObject*>(right);
+                if (right_none != nullptr) {
+                    NoneObject* left_none = dynamic_cast<NoneObject*>(left);
+                    if (inst.op == OpType::EQ) {
+                        this->stack.push(new BooleanObject(left_none != nullptr));
+                    } else if (inst.op == OpType::NEQ) {
+                        this->stack.push(new BooleanObject(left_none == nullptr));
+                    }
+
+                } else { throw std::runtime_error("Try to do a binop with two non-Integers or non-Strings"); }
             }
         }
     }

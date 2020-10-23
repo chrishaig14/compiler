@@ -49,12 +49,32 @@ public:
     }
 
     void set(std::string name, TypeNode* info) {
+        ObjectTypeNode* otn = dynamic_cast<ObjectTypeNode*>(info);
+        if (otn->identifier == "Option"){
+            this->not_null[name] = false;
+        }
         this->table[name] = info;
+    }
+
+    void set_not_none(std::string name, bool may_be_none) {
+        this->not_null[name] = may_be_none;
+    }
+
+    bool get_not_none(std::string name) {
+        if (this->not_null.count(name) == 1) {
+            return this->not_null[name];
+        } else {
+            if (this->parent != nullptr) {
+                return this->parent->get_not_none(name);
+            }
+        }
+        throw std::runtime_error("Symbol " + name + " not found in scope");
     }
 
 
     std::string name;
     SymbolTable* parent;
+    std::map<std::string, bool> not_null;
 };
 
 #endif //UNTITLED1_SYMBOLTABLE_H

@@ -1,32 +1,11 @@
-class Tree[t] {
-    value: t
-    left: Option[Tree[t]]
-    right: Option[Tree[t]]
-    fun inorder()->List[t]{
-        var l = this.left ? it.inorder() : []::List[t]
-        var r = this.right ? it.inorder() : []::List[t]
-        return l + [this.value] + r
-    }
-    fun foo()->Tree[t]{
-        return this
-    }
-}
-
 fun main()->Integer{
-    var t1 = #Tree[Integer]{1,none,none}
-    var t3 = #Tree[Integer]{3,none,none}
-    var t5 = #Tree[Integer]{5,none,none}
-    var t8 = #Tree[Integer]{8,none,none}
-    var t10 = #Tree[Integer]{value:10,left:none,right:none}
-
-    var t9 = #Tree[Integer]{value:9,left:t8,right:t10}
-
-    var t7 = #Tree[Integer]{7,none,t9}
-
-    var t2 = #Tree[Integer]{value:2,left:t1,right:t3}
-    var t6 = #Tree[Integer]{value:6,left:t5,right:t7}
-
-    var t4 = #Tree[Integer]{value:4,left:t2,right:t6}
-    print(join(t4.inorder().map(Integer.str), " , "))
+    var p : Option[Integer] = 5
+     if p != none {
+        var x = p.str()
+         p = 9
+         var z = p.str()
+    }
+    var z = 8
+    var y = p.str()
     return 0
 }
