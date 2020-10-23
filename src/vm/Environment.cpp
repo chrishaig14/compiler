@@ -16,8 +16,9 @@ void Environment::set(std::string name, Object* value) {
         } else {
             throw std::runtime_error("Error name " + name + " not found in current environment");
         }
+    } else {
+        this->table[name] = value;
     }
-    this->table[name] = value;
 }
 
 Object* Environment::get(std::string name) {
