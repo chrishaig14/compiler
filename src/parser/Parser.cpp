@@ -7,6 +7,19 @@
 #include "../nodes/InstanceNode.h"
 #include <exception>
 
+std::map<TokenType, OpType> TOKEN_TO_OP = {
+        {TokenType::PLUS,  OpType::ADD},
+        {TokenType::MINUS, OpType::SUB},
+        {TokenType::TIMES, OpType::MUL},
+        {TokenType::DIV,   OpType::DIV},
+        {TokenType::MOD,   OpType::MOD},
+        {TokenType::LT,    OpType::LT},
+        {TokenType::GT,    OpType::GT},
+        {TokenType::LEQ,   OpType::LEQ},
+        {TokenType::GEQ,   OpType::GEQ},
+        {TokenType::NEQ,   OpType::NEQ},
+};
+
 Parser::Parser(std::vector<Token>& tokens) {
     this->tokens = tokens;
     this->token = this->tokens[0];
@@ -147,31 +160,20 @@ Node* Parser::parse_and_expression() {
     return left;
 }
 
+template<typename T>
+bool item_in_vec(T item, std::vector<T> vec) {
+    return std::find(vec.begin(), vec.end(), item) != vec.end();
+}
+
 Node* Parser::parse_bool_expression() {
     Node* left = this->parse_add_or_sub_expression();
     OpType op;
-    switch (this->token.type) {
-        case TokenType::EQ:
-            op = OpType::EQ;
-            break;
-        case TokenType::LT:
-            op = OpType::LT;
-            break;
-        case TokenType::GT:
-            op = OpType::GEQ;
-            break;
-        case TokenType::LEQ:
-            op = OpType::LEQ;
-            break;
-        case TokenType::GEQ:
-            op = OpType::GEQ;
-            break;
-        case TokenType::NEQ:
-            op = OpType::NEQ;
-            break;
-        default:
-            return left;
+    std::vector<TokenType> boolean_tokens = {TokenType::EQ, TokenType::LT, TokenType::GT, TokenType::LEQ,
+                                             TokenType::GEQ, TokenType::NEQ};
+    if (!item_in_vec(this->token.type, boolean_tokens)) {
+        return left;
     }
+    op = TOKEN_TO_OP[this->token.type];
     this->next();
     Node* right = this->parse_add_or_sub_expression();
     BinopNode* node = new BinopNode(op, left, right);
@@ -183,14 +185,9 @@ Node* Parser::parse_bool_expression() {
 Node* Parser::parse_add_or_sub_expression() {
     Node* left = this->parse_mul_div_or_mod_expression();
     OpType op;
-    while (this->match(TokenType::PLUS) || this->match(TokenType::MINUS)) {
-        if (this->match(TokenType::PLUS)) {
-            this->next();
-            op = OpType::ADD;
-        } else if (this->match(TokenType::MINUS)) {
-            this->next();
-            op = OpType::SUB;
-        }
+    while (item_in_vec(this->token.type, {TokenType::PLUS, TokenType::MINUS})) {
+        op = TOKEN_TO_OP[this->token.type];
+        this->next();
         Node* right = this->parse_mul_div_or_mod_expression();
         Node* node = new BinopNode(op, left, right);
         node->start = left->start;
@@ -204,25 +201,8 @@ Node* Parser::parse_add_or_sub_expression() {
 Node* Parser::parse_mul_div_or_mod_expression() {
     Node* left = this->parse_factor();
     OpType op;
-    while (this->match(TokenType::TIMES) || this->match(TokenType::DIV) || this->match(TokenType::MOD)) {
-        switch (this->token.type) {
-            case TokenType::TIMES: {
-                op = OpType::MUL;
-                break;
-            }
-            case TokenType::DIV: {
-                op = OpType::DIV;
-                break;
-            }
-            case TokenType::MOD: {
-                op = OpType::MOD;
-                break;
-            }
-            default: {
-                throw std::runtime_error(
-                        "Unexpected token :" + TOKEN_STRINGS[this->token.type] + " expected mul, div or mod!");
-            }
-        }
+    while (item_in_vec(this->token.type, {TokenType::TIMES, TokenType::DIV, TokenType::MOD})) {
+        op = TOKEN_TO_OP[this->token.type];
         this->next();
         Node* right = this->parse_factor();
         Node* node = new BinopNode(op, left, right);
@@ -325,22 +305,6 @@ bool may_be_a_type(Node* node) {
         }
         return false;
     }
-}
-
-std::map<std::string, Node*> Parser::parse_initializers() {
-    std::map<std::string, Node*> init;
-    while (true) {
-        Token field_id = this->expect_token(TokenType::ID);
-        this->expect_token(TokenType::COLON);
-        Node* exp = this->parse_expression();
-        init[field_id.str] = exp;
-        if (this->match(TokenType::COMMA)) {
-            this->next();
-        } else {
-            break;
-        }
-    }
-    return init;
 }
 
 ObjectTypeNode* convert_to_type(Node* node) {
@@ -485,24 +449,21 @@ Node* Parser::parse_call_or_subscript_chain(Node* parent) {
 
 DeclarationNode* Parser::parse_variable_declaration() {
     Token var_token = this->expect_token(TokenType::VAR);
-    int start = var_token.start;
     Token identifier = this->expect_token(TokenType::ID);
     TypeNode* type = nullptr;
     if (this->match(TokenType::COLON)) {
         this->next();
         type = this->parse_type_node();
     }
-    Node* expression = nullptr;
     try {
         this->expect_token(TokenType::EQQ);
     } catch (...) {
         throw std::runtime_error("Error: you must initialize all variables!");
     }
-    expression = this->parse_expression();
-    int end = expression->end;
+    Node* expression = this->parse_expression();
     DeclarationNode* node = new DeclarationNode(identifier.str, type, expression);
-    node->start = start;
-    node->end = end;
+    node->start = var_token.start;
+    node->end = expression->end;
     return node;
 }
 
@@ -514,7 +475,7 @@ Node* Parser::parse_common_statement() {
     }
     if (this->match(TokenType::VAR)) {
         ast_node = this->parse_variable_declaration();
-        if (this->match(TokenType::SEMICOLON)){
+        if (this->match(TokenType::SEMICOLON)) {
             this->next();
         }
 //        this->expect_token(TokenType::SEMICOLON);
@@ -522,7 +483,7 @@ Node* Parser::parse_common_statement() {
     }
     if (this->match(TokenType::RETURN)) {
         ast_node = this->parse_return();
-        if (this->match(TokenType::SEMICOLON)){
+        if (this->match(TokenType::SEMICOLON)) {
             this->next();
         }
 //        this->expect_token(TokenType::SEMICOLON);
@@ -538,7 +499,7 @@ Node* Parser::parse_common_statement() {
     }
     Node* node = this->parse_assignment_or_expression();
 //    this->expect_token(TokenType::SEMICOLON);
-    if (this->match(TokenType::SEMICOLON)){
+    if (this->match(TokenType::SEMICOLON)) {
         this->next();
     }
     return node;
@@ -623,7 +584,7 @@ StructNode* Parser::parse_struct_definition() {
             TypeNode* field_type = this->parse_type_node();
             fields.push_back(std::pair<std::string, TypeNode*>(identifier, field_type));
 //            this->expect_token(TokenType::SEMICOLON);
-            if (this->match(TokenType::SEMICOLON)){
+            if (this->match(TokenType::SEMICOLON)) {
                 this->next();
             }
         } else {
@@ -704,33 +665,20 @@ Token Parser::expect_token(TokenType token_type) {
 }
 
 Node* Parser::parse_top_level_statement() {
-    std::vector<TokenType> expected_tokens;
-    Node* node;
     switch (this->token.type) {
-        case TokenType::FUN: {
-            node = this->parse_function_definition();
-            break;
-        }
-        case TokenType::WHERE: {
-            node = this->parse_function_definition_with_where();
-            break;
-        }
-        case TokenType::STRUCT: {
-            node = this->parse_struct_definition();
-            break;
-        }
-        case TokenType::CLASS: {
-            node = this->parse_class_definition();
-            break;
-        }
-        case TokenType::INSTANCE: {
-            node = this->parse_instance_definition();
-            break;
-        }
+        case TokenType::FUN:
+            return this->parse_function_definition();
+        case TokenType::WHERE:
+            return this->parse_function_definition_with_where();
+        case TokenType::STRUCT:
+            return this->parse_struct_definition();
+        case TokenType::CLASS:
+            return this->parse_class_definition();
+        case TokenType::INSTANCE:
+            return this->parse_instance_definition();
         default:
             return this->parse_common_statement();
     }
-    return node;
 }
 
 ForNode* Parser::parse_for_loop() {
@@ -824,7 +772,7 @@ ClassNode* Parser::parse_class_definition() {
             members[member_name_tk.str] = member_type;
             members_ordered.push_back(member_name_tk.str);
 //            this->expect_token(TokenType::SEMICOLON);
-            if (this->match(TokenType::SEMICOLON)){
+            if (this->match(TokenType::SEMICOLON)) {
                 this->next();
             }
         } else {

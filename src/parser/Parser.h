@@ -13,6 +13,7 @@
 #include <iostream>
 #include "UnexpectedToken.h"
 
+extern std::map<TokenType, OpType> TOKEN_TO_OP;
 
 class Parser {
     std::vector<Token> tokens;
