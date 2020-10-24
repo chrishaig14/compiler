@@ -514,11 +514,17 @@ Node* Parser::parse_common_statement() {
     }
     if (this->match(TokenType::VAR)) {
         ast_node = this->parse_variable_declaration();
+        if (this->match(TokenType::SEMICOLON)){
+            this->next();
+        }
 //        this->expect_token(TokenType::SEMICOLON);
         return ast_node;
     }
     if (this->match(TokenType::RETURN)) {
         ast_node = this->parse_return();
+        if (this->match(TokenType::SEMICOLON)){
+            this->next();
+        }
 //        this->expect_token(TokenType::SEMICOLON);
         return ast_node;
     }
@@ -532,6 +538,9 @@ Node* Parser::parse_common_statement() {
     }
     Node* node = this->parse_assignment_or_expression();
 //    this->expect_token(TokenType::SEMICOLON);
+    if (this->match(TokenType::SEMICOLON)){
+        this->next();
+    }
     return node;
 }
 
@@ -614,6 +623,9 @@ StructNode* Parser::parse_struct_definition() {
             TypeNode* field_type = this->parse_type_node();
             fields.push_back(std::pair<std::string, TypeNode*>(identifier, field_type));
 //            this->expect_token(TokenType::SEMICOLON);
+            if (this->match(TokenType::SEMICOLON)){
+                this->next();
+            }
         } else {
             break;
         }
@@ -812,6 +824,9 @@ ClassNode* Parser::parse_class_definition() {
             members[member_name_tk.str] = member_type;
             members_ordered.push_back(member_name_tk.str);
 //            this->expect_token(TokenType::SEMICOLON);
+            if (this->match(TokenType::SEMICOLON)){
+                this->next();
+            }
         } else {
             if (this->match(TokenType::FUN)) {
                 FunctionNode* method_node = this->parse_function_definition();
