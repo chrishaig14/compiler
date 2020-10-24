@@ -26,7 +26,7 @@ TEST(first_pass_test, fun_foo) {
 }
 
 TEST(first_pass_test, template_struct) {
-    std::string text = "struct Tree[T]{value:T; left:Option[Tree[T]]; right: Option[Tree[T]];}";
+    std::string text = "class Tree[T]{value:T; left:Option[Tree[T]]; right: Option[Tree[T]];}";
     BlockNode* tree = get_tree(text);
     GlobalProcessor gp;
     gp.visit(*tree);
@@ -39,20 +39,21 @@ TEST(first_pass_test, fun_foo_eq) {
     BlockNode* tree = get_tree(text);
     GlobalProcessor gp;
     gp.visit(*tree);
-    auto ginfo = dynamic_cast<FunctionTypeNode*>(gp.globals->get("foo"));
+    auto ginfo = dynamic_cast<FunctionTypeNode*>(gp.function_table->get_simple_function("foo"));
     EXPECT_NE(ginfo, nullptr);
     EXPECT_TRUE(*ginfo == FunctionTypeNode({}, T_STRING));
 }
 
-TEST(first_pass_test, fun_overloaded) {
+TEST(first_pass_test, fun_dont_allow_overload) {
     std::string text = "fun foo(s: String)->String{return \"Hello\";}fun foo(i: Integer)->Integer{return 17;}";
     BlockNode* tree = get_tree(text);
     GlobalProcessor gp;
-    gp.visit(*tree);
-    EXPECT_TRUE(gp.function_table->is_overloaded("foo"));
-    auto overloads = *gp.function_table->get_overloads("foo");
-    EXPECT_EQ(*overloads[0], FunctionTypeNode({T_STRING}, T_STRING));
-    EXPECT_EQ(*overloads[1], FunctionTypeNode({T_INT}, T_INT));
+    try {
+        gp.visit(*tree);
+        FAIL() << "Expected failure";
+    }catch(...){
+
+    }
 }
 
 
@@ -61,13 +62,13 @@ TEST(first_pass_test, fun_foo_complete) {
     BlockNode* tree = get_tree(text);
     GlobalProcessor gp;
     gp.visit(*tree);
-    auto ginfo = dynamic_cast<FunctionTypeNode*>(gp.globals->get("foo"));
+    auto ginfo = dynamic_cast<FunctionTypeNode*>(gp.function_table->get_simple_function("foo"));
     EXPECT_NE(ginfo, nullptr);
     EXPECT_TRUE(*ginfo == FunctionTypeNode({T_INT, T_STRING}, T_BOOL));
 }
 
 TEST(first_pass_test, class_foo) {
-    std::string text = "struct Foo{}";
+    std::string text = "class Foo{}";
     BlockNode* tree = get_tree(text);
     GlobalProcessor gp;
     gp.visit(*tree);
