@@ -50,8 +50,10 @@ public:
 
     void set(std::string name, TypeNode* info) {
         ObjectTypeNode* otn = dynamic_cast<ObjectTypeNode*>(info);
-        if (otn->identifier == "Option"){
-            this->not_null[name] = false;
+        if (otn != nullptr) {
+            if (otn->identifier == "Option") {
+                this->not_null[name] = false;
+            }
         }
         this->table[name] = info;
     }
