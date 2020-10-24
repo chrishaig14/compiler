@@ -312,26 +312,13 @@ TEST(parser_test, class_literal_empty_ok) {
     COMPLETE_TEST;
 }
 
-TEST(parser_test, class_literal_error_1) {
-    std::string text = "Person{name: \"John\", age}";
+TEST(parser_test, class_literal_error_2) {
+    std::string text = "#Person{name, age: 32}";
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
     try {
         Node* node = parser.parse_factor();
-        FAIL() << "Didn't throw UnexpectedToken";
-    } catch (const UnexpectedToken& e) {
-
-    }
-}
-
-TEST(parser_test, class_literal_error_2) {
-    std::string text = "Person{name, age: 32}";
-    Scanner scanner(text);
-    std::vector<Token> tokens = scanner.scan_all();
-    Parser parser(tokens);
-    try {
-        Node* node = parser.parse_id_or_class_literal();
         FAIL() << "Didn't throw UnexpectedToken";
     } catch (const UnexpectedToken& e) {
 
