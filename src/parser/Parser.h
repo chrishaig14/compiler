@@ -82,6 +82,9 @@ public:
 
     ClassNode* parse_class_definition();
 
+    FunctionTypeNode* parse_function_type();
+
+    ObjectTypeNode* parse_object_type();
 };
 
 

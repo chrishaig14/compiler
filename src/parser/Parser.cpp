@@ -425,79 +425,79 @@ DeclarationNode* Parser::parse_variable_declaration() {
 #define OPTIONAL_SEMICOLON()     if (this->match(TokType::SEMICOLON)) {this->next();}
 
 Node* Parser::parse_common_statement() {
-    Node* ast_node;
-    if (this->match(TokType::IF)) {
-        ast_node = this->parse_if();
-        return ast_node;
+    switch (this->token.type) {
+        case TokType::IF: {
+            return this->parse_if();
+        }
+        case TokType::VAR: {
+            Node* node = this->parse_variable_declaration();
+            OPTIONAL_SEMICOLON();
+            return node;
+        }
+        case TokType::RETURN: {
+            Node* node = this->parse_return();
+            OPTIONAL_SEMICOLON();
+            return node;
+        }
+        case TokType::FOR: {
+            return this->parse_for_loop();
+        }
+        case TokType::WHILE: {
+            return this->parse_while_loop();
+        }
+        default: {
+            Node* node = this->parse_assignment_or_expression();
+            OPTIONAL_SEMICOLON();
+            return node;
+        }
     }
-    if (this->match(TokType::VAR)) {
-        ast_node = this->parse_variable_declaration();
-        OPTIONAL_SEMICOLON();
-        return ast_node;
-    }
-    if (this->match(TokType::RETURN)) {
-        ast_node = this->parse_return();
-        OPTIONAL_SEMICOLON();
-        return ast_node;
-    }
-    if (this->match(TokType::FOR)) {
-        ast_node = this->parse_for_loop();
-        return ast_node;
-    }
-    if (this->match(TokType::WHILE)) {
-        ast_node = this->parse_while_loop();
-        return ast_node;
-    }
-    Node* node = this->parse_assignment_or_expression();
-    OPTIONAL_SEMICOLON();
-    return node;
 }
 
-TypeNode* Parser::parse_type_node() {
-    if (this->match(TokType::FUN)) {
-        this->next();
-        this->expect_token(TokType::LPAREN);
-        VectorOfTypes parameter_types;
-        if (!this->match(TokType::RPAREN)) {
-            while (true) {
-                TypeNode* parameter_type = this->parse_type_node();
-                parameter_types.push_back(parameter_type);
-                if (this->match(TokType::COMMA)) {
-                    this->next();
-                } else {
-                    break;
-                }
+FunctionTypeNode* Parser::parse_function_type() {
+    this->expect_token(TokType::FUN);
+    this->expect_token(TokType::LPAREN);
+    VectorOfTypes parameter_types;
+    if (!this->match(TokType::RPAREN)) {
+        while (true) {
+            TypeNode* parameter_type = this->parse_type_node();
+            parameter_types.push_back(parameter_type);
+            if (this->match(TokType::COMMA)) {
+                this->next();
+            } else {
+                break;
             }
         }
-        this->expect_token(TokType::RPAREN);
-        this->expect_token(TokType::RARROW);
-        TypeNode* return_type = this->parse_type_node();
-        TypeNode* fun_type = FUNCTION_TYPE(parameter_types, return_type);
-        return fun_type;
     }
-    Token identifier;
-    try {
-        identifier = this->expect_token(TokType::ID);
-    } catch (...) {
-        throw std::runtime_error("Expected a valid TYPE, but got token " + TOKEN_STRINGS[this->token.type]);
-    }
+    this->expect_token(TokType::RPAREN);
+    this->expect_token(TokType::RARROW);
+    TypeNode* return_type = this->parse_type_node();
+    return FUNCTION_TYPE(parameter_types, return_type);
+}
+
+ObjectTypeNode* Parser::parse_object_type() {
+    Token identifier = this->expect_token(TokType::ID);
     VectorOfTypes type_parameters;
     if (this->match(TokType::LSQUARE)) {
         this->next();
-        bool expects_parameter = true;
-        while (expects_parameter) {
+        while (true) {
             TypeNode* type_parameter = this->parse_type_node();;
             type_parameters.push_back(type_parameter);
             if (this->match(TokType::COMMA)) {
                 this->next();
             } else {
-                expects_parameter = false;
+                break;
             }
         }
         this->expect_token(TokType::RSQUARE);
     }
-    TypeNode* node = TYPE(identifier.str, type_parameters);
-    return node;
+    return TYPE(identifier.str, type_parameters);
+}
+
+TypeNode* Parser::parse_type_node() {
+    if (this->match(TokType::FUN)) {
+        return this->parse_function_type();
+    }
+    return parse_object_type();
 }
 
 BlockNode* Parser::parse_possibly_empty_block() {
