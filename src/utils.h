@@ -78,4 +78,10 @@ std::ostream& operator<<(std::ostream& out, const CodeLabel v);
 
 bool operator==(const CodeLabel a, const CodeLabel b);
 
+template<typename T>
+bool item_in_vec(T item, std::vector<T> vec) {
+    return std::find(vec.begin(), vec.end(), item) != vec.end();
+}
+
+
 #endif //UNTITLED1_UTILS_H

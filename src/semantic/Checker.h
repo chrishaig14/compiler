@@ -13,6 +13,7 @@
 #include "BadArguments.h"
 #include "AssignmentTypeError.h"
 #include "TypeClassInfo.h"
+#include "../utils.h"
 
 //typedef std::map<std::string, ObjectInfo> MapStringToSimple;
 //typedef std::map<std::string, FunctionInfo> MapStringToFunction;

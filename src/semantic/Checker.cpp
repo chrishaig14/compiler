@@ -38,8 +38,8 @@ Checker::Checker(SymbolTable* globals, ClassTable* class_table) {
     auto list_class_info = new ClassInfo();
     list_class_info->class_name = "List";
     list_class_info->methods["len"] = FUNCTION_TYPE({}, T_INT);
-    list_class_info->methods["map"] = FUNCTION_TYPE({FUNCTION_TYPE({ TYPE("t", {}) }, TYPE("b", {}))},
-                                                           T_LIST(TYPE("b", {})));
+    list_class_info->methods["map"] = FUNCTION_TYPE({ FUNCTION_TYPE({TYPE("t", {})}, TYPE("b", {})) },
+                                                    T_LIST(TYPE("b", {})));
     list_class_info->type_parameters = {"t"};
 
 
@@ -356,27 +356,8 @@ void Checker::visit(BinopNode& n) {
     n.right->accept(*this);
     SymbolInfo right_info = this->rv;
     SymbolInfo semantic_info;
-    bool is_boolean = true;
-    switch (n.op) {
-        case OpType::EQ:
-            break;
-        case OpType::AND:
-            break;
-        case OpType::OR:
-            break;
-        case OpType::LEQ:
-            break;
-        case OpType::GEQ:
-            break;
-        case OpType::LT:
-            break;
-        case OpType::GT:
-            break;
-        case OpType::NEQ:
-            break;
-        default:
-            is_boolean = false;
-    }
+    bool is_boolean = item_in_vec(n.op, {OpType::EQ, OpType::AND, OpType::OR, OpType::LEQ, OpType::GEQ, OpType::LT,
+                                         OpType::GT, OpType::NEQ});
     if (is_boolean) {
         auto left = TO_OBJECT_TYPE(left_info.symbol_info);
         if (left != nullptr) {

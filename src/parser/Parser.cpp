@@ -156,10 +156,7 @@ Node* Parser::parse_and_expression() {
     return left;
 }
 
-template<typename T>
-bool item_in_vec(T item, std::vector<T> vec) {
-    return std::find(vec.begin(), vec.end(), item) != vec.end();
-}
+
 
 Node* Parser::parse_bool_expression() {
     Node* left = this->parse_add_or_sub_expression();
