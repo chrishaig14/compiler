@@ -4,11 +4,7 @@
 
 #include "TypeNode.h"
 
-void FunctionTypeNode::accept(Visitor& visitor) {
-
-}
-
-bool FunctionTypeNode::equal(Node* other) const {
+bool FunctionTypeNode::equal(TypeNode* other) const {
     FunctionTypeNode* other_ptr = dynamic_cast<FunctionTypeNode*>(other);
     if (other_ptr == nullptr) return false;
     return *this == *other_ptr;
@@ -30,32 +26,8 @@ std::string FunctionTypeNode::to_string() {
     return "fun (" + parameters + ") -> " + ret;
 }
 
-void GeneratorTypeNode::accept(Visitor& visitor) {
 
-}
-
-bool GeneratorTypeNode::equal(Node* other) const {
-    return false;
-}
-
-GeneratorTypeNode::GeneratorTypeNode(const std::vector<TypeNode*>& parameterTypes, TypeNode* returnType)
-        : parameter_types(parameterTypes), return_type(returnType) {}
-
-std::string GeneratorTypeNode::to_string() {
-    std::string parameters;
-    std::string ret;
-    for (auto p: this->parameter_types) {
-        parameters += p->to_string() + ", ";
-    }
-    ret = this->return_type->to_string();
-    return "gen (" + parameters + ") -> " + ret;
-}
-
-void ObjectTypeNode::accept(Visitor& visitor) {
-
-}
-
-bool ObjectTypeNode::equal(Node* other) const {
+bool ObjectTypeNode::equal(TypeNode* other) const {
     const ObjectTypeNode* other_ptr = dynamic_cast<const ObjectTypeNode*>(other);
     if (other_ptr == nullptr) return false;
     return *this == *other_ptr;

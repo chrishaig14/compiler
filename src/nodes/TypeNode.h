@@ -11,16 +11,19 @@
 #include "Node.h"
 #include "Visitor.h"
 
-class TypeNode : public Node {
+class TypeNode {
 public:
-//    void accept(Visitor& visitor) override;
 
-//    bool equal(Node* other) const override;
+    virtual bool equal(TypeNode* other) const = 0;
 
     virtual std::string to_string() = 0;
 
     virtual bool is_function() {
         return false;
+    }
+
+    json to_json() {
+        return json();
     }
 };
 
@@ -28,9 +31,7 @@ class FunctionTypeNode : public TypeNode {
 public:
     FunctionTypeNode(const std::vector<TypeNode*>& parameterTypes, TypeNode* returnType);
 
-    void accept(Visitor& visitor) override;
-
-    bool equal(Node* other) const override;
+    bool equal(TypeNode* other) const override;
 
     bool is_function() override { return true; }
 
@@ -48,28 +49,11 @@ public:
     TypeNode* return_type;
 };
 
-class GeneratorTypeNode : public TypeNode {
-public:
-    GeneratorTypeNode(const std::vector<TypeNode*>& parameterTypes, TypeNode* returnType);
-
-    void accept(Visitor& visitor) override;
-
-    bool equal(Node* other) const override;
-
-    std::string to_string() override;
-
-private:
-    std::vector<TypeNode*> parameter_types;
-    TypeNode* return_type;
-};
-
 class ObjectTypeNode : public TypeNode {
 public:
     ObjectTypeNode(const std::string& identifier, const std::vector<TypeNode*>& typeParameters);
 
-    void accept(Visitor& visitor) override;
-
-    bool equal(Node* other) const;
+    bool equal(TypeNode* other) const override;
 
     std::string to_string() override;
 
