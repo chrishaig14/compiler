@@ -10,6 +10,13 @@
 #define NOT_NULL_CHECK 1
 #define NULL_CHECK 2
 
+#define TO_FUNCTION_TYPE(x) dynamic_cast<FunctionTypeNode*> (x)
+#define TO_OBJECT_TYPE(x) dynamic_cast<ObjectTypeNode*> (x)
+#define TO_ID(x) dynamic_cast<IdNode*> (x)
+#define TO_MEMBER(x) dynamic_cast<MemberNode*>(x)
+#define TO_BINOP(x) dynamic_cast<BinopNode*>(x)
+#define TO_NONE(x) dynamic_cast<NoneNode*>(x)
+
 bool function_is_generic(FunctionTypeNode& ft) {
     for (int i = 0; i < ft.parameter_types.size(); i++) {
         if (is_generic(ft.parameter_types[i])) {
@@ -71,7 +78,7 @@ void Checker::leave_scope() {
 void Checker::visit(FunctionNode& n) {
     this->enter_scope(n.identifier);
     for (int i = 0; i < n.parameter_names.size(); i++) {
-        ObjectTypeNode* otn = dynamic_cast<ObjectTypeNode*>(n.parameter_types[i]);
+        ObjectTypeNode* otn = TO_OBJECT_TYPE(n.parameter_types[i]);
         if (otn != nullptr) {
             if (!is_generic(otn) && !this->class_table->declared(otn->identifier)) {
                 throw std::runtime_error("type " + n.parameter_types[i]->to_string() + " doesn't exist!");
@@ -79,7 +86,7 @@ void Checker::visit(FunctionNode& n) {
         }
         this->scope->set(n.parameter_names[i], n.parameter_types[i]);
     }
-    ObjectTypeNode* rotn = dynamic_cast<ObjectTypeNode*>(n.return_type);
+    ObjectTypeNode* rotn = TO_OBJECT_TYPE(n.return_type);
     if (rotn != nullptr) {
         if (!is_generic(rotn) && !this->class_table->declared(rotn->identifier)) {
             throw std::runtime_error("type " + n.return_type->to_string() + " doesn't exist!");
@@ -104,7 +111,7 @@ void Checker::visit(IdNode& n) {
         if (this->function_table->has_function(n.identifier)) {
             semantic_info.is_a_function = true;
             semantic_info.symbol_info = this->function_table->get_simple_function(n.identifier);
-            FunctionTypeNode* ft = dynamic_cast<FunctionTypeNode*>(semantic_info.symbol_info);
+            FunctionTypeNode* ft = TO_FUNCTION_TYPE(semantic_info.symbol_info);
         } else {
             std::cout << n << std::endl;
             throw ScopeError(n.identifier);
@@ -132,7 +139,7 @@ void Checker::visit(DeclarationNode& n) {
             n.expression = replacement;
             this->replace_me = false;
         }
-        auto ft = dynamic_cast<FunctionTypeNode*>(n.type);
+        auto ft = TO_FUNCTION_TYPE(n.type);
         if (ft != nullptr) {
             // it's a function
             if (!ft->equal(this->rv.symbol_info)) {
@@ -140,10 +147,10 @@ void Checker::visit(DeclarationNode& n) {
             }
         } else {
             SymbolInfo expression_info = this->rv;
-            auto actual_type = dynamic_cast<ObjectTypeNode*>(n.type);
+            auto actual_type = TO_OBJECT_TYPE(n.type);
             if (actual_type->identifier == "Option") {
                 if (!actual_type->type_parameters[0]->equal(expression_info.symbol_info)) {
-                    auto foo = dynamic_cast<ObjectTypeNode*>(expression_info.symbol_info);
+                    auto foo = TO_OBJECT_TYPE(expression_info.symbol_info);
                     if (foo->identifier != "NoneType") {
                         throw AssignmentTypeError(n.type, expression_info.symbol_info);
                     }
@@ -190,8 +197,8 @@ void Checker::visit(AssignmentNode& n) {
     }
     SymbolInfo expression_type = this->rv;
 
-    auto actual_type = dynamic_cast<ObjectTypeNode*>(linfo.symbol_info);
-    IdNode* lid = dynamic_cast<IdNode*>(n.lvalue);
+    auto actual_type = TO_OBJECT_TYPE(linfo.symbol_info);
+    IdNode* lid = TO_ID(n.lvalue);
     if (lid != nullptr) {
         if (actual_type->identifier == "Option") {
             if (expression_type.symbol_info->equal(actual_type->type_parameters[0])) {
@@ -204,10 +211,10 @@ void Checker::visit(AssignmentNode& n) {
         }
     } else {
         if (!linfo.symbol_info->equal(expression_type.symbol_info)) {
-            auto actual_type = dynamic_cast<ObjectTypeNode*>(linfo.symbol_info);
+            auto actual_type = TO_OBJECT_TYPE(linfo.symbol_info);
             if (actual_type->identifier == "Option") {
                 if (!actual_type->type_parameters[0]->equal(expression_type.symbol_info)) {
-                    auto foo = dynamic_cast<ObjectTypeNode*>(expression_type.symbol_info);
+                    auto foo = TO_OBJECT_TYPE(expression_type.symbol_info);
                     if (foo->identifier != "NoneType") {
                         throw AssignmentTypeError(linfo.symbol_info, expression_type.symbol_info);
                     }
@@ -222,7 +229,7 @@ void Checker::visit(AssignmentNode& n) {
 }
 
 void Checker::visit(MemberNode& n) {
-    IdNode* id_node = dynamic_cast<IdNode*>(n.parent);
+    IdNode* id_node = TO_ID(n.parent);
     if (id_node != nullptr) {
         // It might be something like <class>.<method>, so we need to handle this case differently
         if (this->class_table->declared(id_node->identifier)) {
@@ -231,7 +238,7 @@ void Checker::visit(MemberNode& n) {
                 this->rv.symbol_info = class_info->methods[n.child];
                 this->rv.class_info = class_info;
 
-                FunctionTypeNode* ftn = dynamic_cast<FunctionTypeNode*>(this->rv.symbol_info);
+                FunctionTypeNode* ftn = TO_FUNCTION_TYPE(this->rv.symbol_info);
                 FunctionTypeNode* copy_ftn = new FunctionTypeNode(ftn->parameter_types, ftn->return_type);
                 std::vector<TypeNode*> tp;
                 for (auto tttp: this->rv.class_info->type_parameters) {
@@ -253,18 +260,18 @@ void Checker::visit(MemberNode& n) {
     }
     n.parent->accept(*this);
     SymbolInfo semantic_info = this->rv;
-    ObjectTypeNode* object = dynamic_cast<ObjectTypeNode*>(semantic_info.symbol_info);
+    ObjectTypeNode* object = TO_OBJECT_TYPE(semantic_info.symbol_info);
     if (object == nullptr) {
         throw std::runtime_error("Accessing member " + n.child + " of non object");
     }
-    IdNode* idn = dynamic_cast<IdNode*>(n.parent);
+    IdNode* idn = TO_ID(n.parent);
     if (idn != nullptr) {
         if (object->identifier == "Option") {
             if (this->scope->get_not_none(idn->identifier)) {
                 // we can guarantee that it's not null, so we can access the members
-                object = dynamic_cast<ObjectTypeNode*>(object->type_parameters[0]);
+                object = TO_OBJECT_TYPE(object->type_parameters[0]);
             } else {
-                throw std::runtime_error("Error: line " + std::to_string(idn->line + 1) + " -> " +  idn->identifier +
+                throw std::runtime_error("Error: line " + std::to_string(idn->line + 1) + " -> " + idn->identifier +
                                          " might be none here, make sure to wrap this in a if XXX != none {...}!");
             }
         }
@@ -306,12 +313,12 @@ void Checker::visit(MemberNode& n) {
 void Checker::visit(IfNode& n) {
     SymbolInfo semantic_info;
     n.condition->accept(*this);
-    BinopNode* bop = dynamic_cast<BinopNode*>(n.condition);
+    BinopNode* bop = TO_BINOP(n.condition);
     if (bop != nullptr) {
         if (bop->right->equal(new NoneNode())) {
             if (bop->op == OpType::NEQ) {
-                IdNode* left = dynamic_cast<IdNode*>(bop->left);
-                NoneNode* right = dynamic_cast<NoneNode*>(bop->right);
+                IdNode* left = TO_ID(bop->left);
+                NoneNode* right = TO_NONE(bop->right);
                 if (left != nullptr && right != nullptr) {
                     this->enter_scope("if");
                     std::cout << "Cant be none: " << left->identifier << std::endl;
@@ -320,8 +327,8 @@ void Checker::visit(IfNode& n) {
                 }
             }
             if (bop->op == OpType::EQ) {
-                IdNode* left = dynamic_cast<IdNode*>(bop->left);
-                NoneNode* right = dynamic_cast<NoneNode*>(bop->right);
+                IdNode* left = TO_ID(bop->left);
+                NoneNode* right = TO_NONE(bop->right);
                 if (left != nullptr && right != nullptr) {
                     this->enter_scope("if");
                     std::cout << "MAY be none: " << left->identifier << std::endl;
@@ -371,9 +378,9 @@ void Checker::visit(BinopNode& n) {
             is_boolean = false;
     }
     if (is_boolean) {
-        auto left = dynamic_cast<ObjectTypeNode*>(left_info.symbol_info);
+        auto left = TO_OBJECT_TYPE(left_info.symbol_info);
         if (left != nullptr) {
-            auto right = dynamic_cast<ObjectTypeNode*>(right_info.symbol_info);
+            auto right = TO_OBJECT_TYPE(right_info.symbol_info);
             if (right != nullptr) {
                 if (left->identifier == "Option" && right->identifier == "NoneType") {
                     semantic_info.symbol_info = new ObjectTypeNode("Boolean", {});
@@ -388,8 +395,8 @@ void Checker::visit(BinopNode& n) {
             semantic_info.symbol_info = new ObjectTypeNode("Boolean", {});
         }
     } else {
-        auto left = dynamic_cast<ObjectTypeNode*>(left_info.symbol_info);
-        auto right = dynamic_cast<ObjectTypeNode*>(right_info.symbol_info);
+        auto left = TO_OBJECT_TYPE(left_info.symbol_info);
+        auto right = TO_OBJECT_TYPE(right_info.symbol_info);
         auto ltype = left->identifier;
         auto rtype = right->identifier;
         bool ok = false;
@@ -441,7 +448,7 @@ void Checker::visit(ReturnNode& n) {
 
 bool is_generic(TypeNode* t) {
 
-    ObjectTypeNode* o = dynamic_cast<ObjectTypeNode*>(t);
+    ObjectTypeNode* o = TO_OBJECT_TYPE(t);
     if (o != nullptr) {
         if (o->identifier.size() == 1 && islower(o->identifier[0])) {
             // a is generic
@@ -452,7 +459,7 @@ bool is_generic(TypeNode* t) {
             if (is_generic(o->type_parameters[i])) return true;
         }
     } else {
-        FunctionTypeNode* fo = dynamic_cast<FunctionTypeNode*>(t);
+        FunctionTypeNode* fo = TO_FUNCTION_TYPE(t);
         if (fo != nullptr) {
             for (int i = 0; i < fo->parameter_types.size(); i++) {
                 if (is_generic(fo->parameter_types[i])) return true;
@@ -466,8 +473,8 @@ bool is_generic(TypeNode* t) {
 
 std::map<std::string, TypeNode*> make_replacements(TypeNode* a, TypeNode* b) {
     std::map<std::string, TypeNode*> replacements;
-    ObjectTypeNode* oa = dynamic_cast<ObjectTypeNode*>(a);
-    ObjectTypeNode* ob = dynamic_cast<ObjectTypeNode*>(b);
+    ObjectTypeNode* oa = TO_OBJECT_TYPE(a);
+    ObjectTypeNode* ob = TO_OBJECT_TYPE(b);
     if (oa != nullptr) {
         if (oa->identifier.size() == 1 && islower(oa->identifier[0])) {
             replacements[oa->identifier] = b;
@@ -480,8 +487,8 @@ std::map<std::string, TypeNode*> make_replacements(TypeNode* a, TypeNode* b) {
             }
         }
     } else {
-        FunctionTypeNode* fa = dynamic_cast<FunctionTypeNode*>(a);
-        FunctionTypeNode* fb = dynamic_cast<FunctionTypeNode*>(b);
+        FunctionTypeNode* fa = TO_FUNCTION_TYPE(a);
+        FunctionTypeNode* fb = TO_FUNCTION_TYPE(b);
 
         if (fa != nullptr && fb != nullptr) {
             for (int i = 0; i < fa->parameter_types.size(); i++) {
@@ -501,14 +508,14 @@ std::map<std::string, TypeNode*> make_replacements(TypeNode* a, TypeNode* b) {
 }
 
 bool type_matches(TypeNode* a, TypeNode* b) {
-    ObjectTypeNode* oa = dynamic_cast<ObjectTypeNode*>(a);
-    ObjectTypeNode* ob = dynamic_cast<ObjectTypeNode*>(b);
+    ObjectTypeNode* oa = TO_OBJECT_TYPE(a);
+    ObjectTypeNode* ob = TO_OBJECT_TYPE(b);
     if ((oa == nullptr && ob != nullptr)) {
         return false;
     } else if (oa == nullptr && ob == nullptr) {
         // both are not an object
-        FunctionTypeNode* fa = dynamic_cast<FunctionTypeNode*>(a);
-        FunctionTypeNode* fb = dynamic_cast<FunctionTypeNode*>(b);
+        FunctionTypeNode* fa = TO_FUNCTION_TYPE(a);
+        FunctionTypeNode* fb = TO_FUNCTION_TYPE(b);
         if (fa != nullptr && fb != nullptr) {
             // both are functions
             FunctionTypeNode* new_f = fa;
@@ -534,7 +541,7 @@ bool type_matches(TypeNode* a, TypeNode* b) {
         }
         // a is generic
         if (oa->type_parameters.size() == 0) return true;
-        if (dynamic_cast<FunctionTypeNode*>(b) != nullptr) return false;
+        if (TO_FUNCTION_TYPE(b) != nullptr) return false;
         if (oa->identifier != ob->identifier) return false;
         if (oa->type_parameters.size() != ob->type_parameters.size()) return false;
         for (int i = 0; i < oa->type_parameters.size(); i++) {
@@ -547,8 +554,8 @@ bool type_matches(TypeNode* a, TypeNode* b) {
 
 std::map<std::string, TypeNode*>
 make_generic_replacements(TypeNode* t_generic_type, TypeNode* t_matching_type) {
-    ObjectTypeNode* generic_type = dynamic_cast<ObjectTypeNode*>(t_generic_type);
-    ObjectTypeNode* matching_type = dynamic_cast<ObjectTypeNode*>(t_matching_type);
+    ObjectTypeNode* generic_type = TO_OBJECT_TYPE(t_generic_type);
+    ObjectTypeNode* matching_type = TO_OBJECT_TYPE(t_matching_type);
     assert(generic_type != nullptr);
     assert(matching_type != nullptr);
     std::map<std::string, TypeNode*> replacements;
@@ -569,7 +576,7 @@ void Checker::match_arguments_to_generic_function(FunctionTypeNode* function_typ
     std::map<std::string, TypeNode*> generic_replacements;
     for (int i = 0; i < function_type->parameter_types.size(); i++) {
         TypeNode* param_type = function_type->parameter_types[i];
-        ObjectTypeNode* otn = dynamic_cast<ObjectTypeNode*>(param_type);
+        ObjectTypeNode* otn = TO_OBJECT_TYPE(param_type);
         if (is_generic(param_type)) {
             if (type_matches(param_type, arg_types[i])) {
                 std::map<std::string, TypeNode*> param_generic_replacements = make_replacements(param_type,
@@ -596,7 +603,7 @@ void Checker::match_arguments_to_generic_function(FunctionTypeNode* function_typ
         }
     }
     if (is_generic(function_type->return_type)) {
-        ObjectTypeNode* rtn = dynamic_cast<ObjectTypeNode*>(function_type->return_type);
+        ObjectTypeNode* rtn = TO_OBJECT_TYPE(function_type->return_type);
         this->rv.symbol_info = make_type(rtn, generic_replacements);
     } else { this->rv.symbol_info = function_type->return_type; }
 
@@ -611,18 +618,18 @@ void Checker::visit(CallNode& n) {
     if (this->rv.is_a_method) {
         // Since it's a method, we have to transform it and prepare it for the translation step,
         // where instead of calling object.method(args), we call <class>.method(object, args)
-        MemberNode* member_node = dynamic_cast<MemberNode*>(n.function);
+        MemberNode* member_node = TO_MEMBER(n.function);
         assert(member_node != nullptr);
         n.function = new IdNode(this->rv.class_info->class_name + "." + member_node->child);
         this->replace_me = false;
         object_node = member_node->parent;
         is_a_method = true;
     } else if (this->rv.is_a_class_method) {
-        MemberNode* member_node = dynamic_cast<MemberNode*>(n.function);
+        MemberNode* member_node = TO_MEMBER(n.function);
         assert(member_node != nullptr);
         n.function = new IdNode(this->rv.class_info->class_name + "." + member_node->child);
         this->replace_me = false;
-        FunctionTypeNode* ftn = dynamic_cast<FunctionTypeNode*>(this->rv.symbol_info);
+        FunctionTypeNode* ftn = TO_FUNCTION_TYPE(this->rv.symbol_info);
         FunctionTypeNode* copy_ftn = new FunctionTypeNode(ftn->parameter_types, ftn->return_type);
         copy_ftn->parameter_types.insert(copy_ftn->parameter_types.begin(), TYPE(this->rv.class_info->class_name, {}));
         retv.symbol_info = copy_ftn;
@@ -630,7 +637,7 @@ void Checker::visit(CallNode& n) {
     }
     if (this->rv.is_a_function || this->rv.is_a_method || this->rv.is_a_class_method) {
         // ok
-        FunctionTypeNode* function_type = dynamic_cast<FunctionTypeNode*>(this->rv.symbol_info);
+        FunctionTypeNode* function_type = TO_FUNCTION_TYPE(this->rv.symbol_info);
         if (n.arguments.size() != function_type->parameter_types.size()) {
             throw std::runtime_error("Calling function with wrong number of arguments");
         }
@@ -670,14 +677,14 @@ void Checker::visit(CallNode& n) {
 
 bool Checker::type_exists(TypeNode* type) {
     return false;
-//    auto function_type = dynamic_cast<FunctionTypeNode*>(type);
+//    auto function_type = TO_FUNCTION_TYPE(type);
 //    if (function_type != nullptr) {
 //        for (auto pt: function_type->parameter_types) {
 //            if (!this->type_exists(pt)) return false;
 //        }
 //        if (!this->type_exists(function_type->return_type)) return false;
 //    } else {
-//        auto object_type = dynamic_cast<ObjectTypeNode*>(type);
+//        auto object_type = TO_OBJECT_TYPE(type);
 //        if (object_type != nullptr) {
 //            if (this->class_table->declared(object_type->identifier)) {
 //                if (object_type->type_parameters.size() !=
@@ -780,10 +787,10 @@ void Checker::visit(ClassLiteralExpressionNode& node) {
 
 
 bool Checker::can_assign(TypeNode* from, TypeNode* to) {
-    auto to_object = dynamic_cast<ObjectTypeNode*>(to);
+    auto to_object = TO_OBJECT_TYPE(to);
     if (to_object->identifier == "Option") {
         if (!to_object->type_parameters[0]->equal(from)) {
-            auto foo = dynamic_cast<ObjectTypeNode*>(from);
+            auto foo = TO_OBJECT_TYPE(from);
             if (foo->identifier != "NoneType") {
                 return false;
             }
@@ -803,7 +810,7 @@ bool Checker::can_assign(TypeNode* from, TypeNode* to) {
 }
 
 bool Checker::can_assign_generic(TypeNode* from, TypeNode* to, std::vector<std::string> type_params) {
-    auto to_object = dynamic_cast<ObjectTypeNode*>(to);
+    auto to_object = TO_OBJECT_TYPE(to);
     if (to_object->type_parameters.size() == 0) {
         for (auto tp:type_params) {
             if (to_object->identifier == tp) {
@@ -813,7 +820,7 @@ bool Checker::can_assign_generic(TypeNode* from, TypeNode* to, std::vector<std::
     }
     if (to_object->identifier == "Option") {
         if (!to_object->type_parameters[0]->equal(from)) {
-            auto foo = dynamic_cast<ObjectTypeNode*>(from);
+            auto foo = TO_OBJECT_TYPE(from);
             if (foo->identifier != "NoneType") {
                 return false;
             }
@@ -831,7 +838,7 @@ bool Checker::can_assign_generic(TypeNode* from, TypeNode* to, std::vector<std::
 }
 
 TypeNode* make_type(TypeNode* original, std::map<std::string, TypeNode*>& replacements) {
-    auto object_type = dynamic_cast<ObjectTypeNode*>(original);
+    auto object_type = TO_OBJECT_TYPE(original);
     TypeNode* new_type = nullptr;
     VectorOfTypes new_type_params;
     if (object_type != nullptr) {
@@ -854,7 +861,7 @@ TypeNode* make_type(TypeNode* original, std::map<std::string, TypeNode*>& replac
         }
         new_type = new ObjectTypeNode(type_identifier, new_type_params);
     } else {
-        FunctionTypeNode* ftn = dynamic_cast<FunctionTypeNode*>(original);
+        FunctionTypeNode* ftn = TO_FUNCTION_TYPE(original);
         VectorOfTypes new_param_types;
         for (auto pt: ftn->parameter_types) {
             TypeNode* new_pt = make_type(pt, replacements);
@@ -884,7 +891,7 @@ ClassInfo* Checker::instantiate_generic(ClassInfo* generic, ObjectTypeNode* inst
     std::map<std::string, FunctionTypeNode*> concrete_methods;
     for (auto m: generic->methods) {
         TypeNode* concrete_type = make_type(m.second, replacements);
-        concrete_methods[m.first] = dynamic_cast<FunctionTypeNode*>(concrete_type);
+        concrete_methods[m.first] = TO_FUNCTION_TYPE(concrete_type);
         assert(concrete_methods[m.first] != nullptr);
     }
 
@@ -954,7 +961,7 @@ void Checker::visit(ClassLiteralFieldNode& node) {
 void Checker::visit(ForNode& node) {
     node.exp->accept(*this);
     SymbolInfo semantic_info = this->rv;
-    ObjectTypeNode* obj = dynamic_cast<ObjectTypeNode*>(semantic_info.symbol_info);
+    ObjectTypeNode* obj = TO_OBJECT_TYPE(semantic_info.symbol_info);
     if (obj == nullptr) {
         throw std::runtime_error("Iterating over something bad!");
     }
@@ -1036,7 +1043,7 @@ void Checker::visit(SubscriptNode& node) {
     SymbolInfo parent = this->rv;
 //    node.child->accept(*this);
     SymbolInfo child = this->rv;
-    ObjectTypeNode* object_type = dynamic_cast<ObjectTypeNode*>(parent.symbol_info);
+    ObjectTypeNode* object_type = TO_OBJECT_TYPE(parent.symbol_info);
     if (object_type == nullptr) { throw std::runtime_error("Accessing subscript of non object!"); }
     SymbolInfo semantic_info;
     if (object_type->identifier == "List") {
@@ -1053,7 +1060,7 @@ void Checker::visit(BreakNode& node) {
 void Checker::visit(TernaryNode& node) {
     node.expression->accept(*this);
     SymbolInfo expression_info = this->rv;
-    auto expression_type = dynamic_cast<ObjectTypeNode*>(expression_info.symbol_info);
+    auto expression_type = TO_OBJECT_TYPE(expression_info.symbol_info);
     if (expression_type == nullptr) {
         throw std::runtime_error("Unexpected non-object");
     }
