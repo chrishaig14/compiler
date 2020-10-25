@@ -29,9 +29,7 @@ void initialize_tokens() {
     TOKEN_KEYWORDS["true"] = TokenType::TRUE;
     TOKEN_KEYWORDS["false"] = TokenType::FALSE;
     TOKEN_KEYWORDS["class"] = TokenType::CLASS;
-    TOKEN_KEYWORDS["instance"] = TokenType::INSTANCE;
     TOKEN_KEYWORDS["while"] = TokenType::WHILE;
-    TOKEN_KEYWORDS["where"] = TokenType::WHERE;
     TOKEN_KEYWORDS["none"] = TokenType::NONE;
 
 

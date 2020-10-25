@@ -552,50 +552,6 @@ TypeNode* Parser::parse_type_node() {
     return node;
 }
 
-StructNode* Parser::parse_struct_definition() {
-    this->expect_token(TokenType::STRUCT);
-    Token identifier_token = this->expect_token(TokenType::ID);
-    VectorOfStrings template_parameters;
-    if (this->match(TokenType::LSQUARE)) {
-        this->next();
-        // template struct
-        bool expects_parameter = true;
-        while (expects_parameter) {
-            Token template_parameter = this->expect_token(TokenType::ID);
-            template_parameters.push_back(template_parameter.str);
-            if (this->match(TokenType::COMMA)) {
-                this->next();
-            } else {
-                expects_parameter = false;
-            }
-        }
-        this->expect_token(TokenType::RSQUARE);
-    }
-    std::vector<std::pair<std::string, TypeNode*>> fields;
-
-    this->expect_token(TokenType::LCURLY);
-    std::vector<std::string> field_names;
-    VectorOfTypes field_types;
-    while (true) {
-        if (this->match(TokenType::ID)) {
-            std::string identifier = this->token.str;
-            this->next();
-            this->expect_token(TokenType::COLON);
-            TypeNode* field_type = this->parse_type_node();
-            fields.push_back(std::pair<std::string, TypeNode*>(identifier, field_type));
-//            this->expect_token(TokenType::SEMICOLON);
-            if (this->match(TokenType::SEMICOLON)) {
-                this->next();
-            }
-        } else {
-            break;
-        }
-    }
-    this->expect_token(TokenType::RCURLY);
-    StructNode* node = new StructNode(identifier_token.str, template_parameters, fields);
-    return node;
-}
-
 BlockNode* Parser::parse_possibly_empty_block() {
     Token st = this->expect_token(TokenType::LCURLY);
     int start = st.start;
@@ -668,14 +624,8 @@ Node* Parser::parse_top_level_statement() {
     switch (this->token.type) {
         case TokenType::FUN:
             return this->parse_function_definition();
-        case TokenType::WHERE:
-            return this->parse_function_definition_with_where();
-        case TokenType::STRUCT:
-            return this->parse_struct_definition();
         case TokenType::CLASS:
             return this->parse_class_definition();
-        case TokenType::INSTANCE:
-            return this->parse_instance_definition();
         default:
             return this->parse_common_statement();
     }
@@ -719,29 +669,6 @@ WhileNode* Parser::parse_while_loop() {
     Node* condition = this->parse_expression();
     BlockNode* body = this->parse_possibly_empty_block();
     return new WhileNode(condition, body);
-}
-
-FunctionTypeNode* Parser::parse_function_signature(std::string& function_name) {
-    this->expect_token(TokenType::FUN);
-    Token function_name_tk = this->expect_token(TokenType::ID);
-    function_name = function_name_tk.str;
-    this->expect_token(TokenType::LPAREN);
-    VectorOfTypes parameter_types;
-    if (!this->match(TokenType::RPAREN)) {
-        while (true) {
-            TypeNode* parameter_type = this->parse_type_node();
-            parameter_types.push_back(parameter_type);
-            if (this->match(TokenType::COMMA)) {
-                this->next();
-            } else {
-                break;
-            }
-        }
-    }
-    this->expect_token(TokenType::RPAREN);
-    this->expect_token(TokenType::RARROW);
-    TypeNode* return_type = this->parse_type_node();
-    return new FunctionTypeNode(parameter_types, return_type);
 }
 
 ClassNode* Parser::parse_class_definition() {
@@ -789,40 +716,3 @@ ClassNode* Parser::parse_class_definition() {
     c->members_ordered = members_ordered;
     return c;
 }
-
-Node* Parser::parse_instance_definition() {
-    this->expect_token(TokenType::INSTANCE);
-    Token class_name_tk = this->expect_token(TokenType::ID);
-    Token type_name_tk = this->expect_token(TokenType::ID);
-    this->expect_token(TokenType::LCURLY);
-    std::vector<FunctionNode*> functions;
-    while (true) {
-        FunctionNode* function = this->parse_function_definition();
-        functions.push_back(function);
-        if (this->match(TokenType::RCURLY)) {
-            break;
-        }
-    }
-    this->expect_token(TokenType::RCURLY);
-    return new InstanceNode(class_name_tk.str, type_name_tk.str, functions);
-}
-
-Node* Parser::parse_function_definition_with_where() {
-    this->next();
-    this->expect_token(TokenType::LCURLY);
-    std::map<std::string, std::string> constraints;
-    while (true) {
-        Token type_name_tk = this->expect_token(TokenType::ID);
-        this->expect_token(TokenType::COLON);
-        this->expect_token(TokenType::ID);
-        if (this->match(TokenType::RCURLY)) {
-            break;
-        }
-    }
-    this->expect_token(TokenType::RCURLY);
-    FunctionNode* function_node = this->parse_function_definition();
-    function_node->constraints = constraints;
-    return function_node;
-}
-
-

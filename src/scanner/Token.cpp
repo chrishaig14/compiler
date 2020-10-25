@@ -65,7 +65,6 @@ void initialize_token_strings() {
     TOKEN_STRINGS[TokenType::HASH] = "hash ( # )";
     TOKEN_STRINGS[TokenType::EQQ] = "equal ( = )";
     TOKEN_STRINGS[TokenType::PLUS_EQQ] = "plus equal ( += )";
-    TOKEN_STRINGS[TokenType::WHERE] = "where";
     TOKEN_STRINGS[TokenType::MINUS_EQQ] = "minus equal ( -= )";
     TOKEN_STRINGS[TokenType::TIMES_EQQ] = "times equal ( *= )";
     TOKEN_STRINGS[TokenType::DIV_EQQ] = "div equal ( /= )";
@@ -93,7 +92,6 @@ void initialize_token_strings() {
     TOKEN_STRINGS[TokenType::FUN] = "fun";
     TOKEN_STRINGS[TokenType::RETURN] = "return";
     TOKEN_STRINGS[TokenType::CLASS] = "class";
-    TOKEN_STRINGS[TokenType::INSTANCE] = "instance";
     TOKEN_STRINGS[TokenType::STRUCT] = "struct";
     TOKEN_STRINGS[TokenType::IF] = "if";
     TOKEN_STRINGS[TokenType::ELSE] = "else";
