@@ -21,19 +21,19 @@
 
 class SymbolInfo {
 public:
-    TypeNode* symbol_info;
-    bool is_a_function;
-    bool is_a_method;
+    TypeNode* type;
+    bool is_function;
+    bool is_method;
     FunctionOverloads overloads;
     ClassInfo* class_info;
-    bool is_a_class_method;
+    bool is_class_method;
 
     SymbolInfo() {
-        this->symbol_info = nullptr;
-        this->is_a_function = false;
-        this->is_a_method = false;
+        this->type = nullptr;
+        this->is_function = false;
+        this->is_method = false;
         this->class_info = nullptr;
-        this->is_a_class_method = false;
+        this->is_class_method = false;
     }
 };
 

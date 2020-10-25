@@ -267,24 +267,11 @@ void GlobalProcessor::visit(InstanceNode& node) {
 
 
 FunctionTypeNode* FunctionTable::get_simple_function(std::string function_name) {
-    if (this->is_overloaded(function_name)) {
-        throw std::runtime_error("Function " + function_name + " is not simple!");
-    }
     return (*functions[function_name])[0];
-}
-
-std::vector<FunctionTypeNode*>* FunctionTable::get_overloads(std::string function_name) {
-    return this->functions[function_name];
 }
 
 bool FunctionTable::function_exists(std::string function_name) {
     return this->functions.count(function_name) == 1;
-}
-
-bool FunctionTable::is_overloaded(std::string function_name) {
-    if (!function_exists(function_name))
-        throw std::runtime_error("Function '" + function_name + "' doesnt exist!");
-    return functions[function_name]->size() > 1;
 }
 
 int FunctionTable::add(std::string function_name, FunctionTypeNode* function_type) {

@@ -19,7 +19,7 @@ public:
 
     virtual std::string to_string() = 0;
 
-    virtual bool is_a_function() {
+    virtual bool is_function() {
         return false;
     }
 };
@@ -32,7 +32,7 @@ public:
 
     bool equal(Node* other) const override;
 
-    bool is_a_function() override { return true; }
+    bool is_function() override { return true; }
 
     bool operator==(const FunctionTypeNode& other) const {
         if (this->parameter_types.size() != other.parameter_types.size()) return false;

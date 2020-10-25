@@ -30,9 +30,6 @@ public:
 
     FunctionTypeNode* get_simple_function(std::string function_name);
 
-    bool is_overloaded(std::string function_name);
-
-    FunctionOverloads* get_overloads(std::string function_name);
 };
 
 typedef std::pair<std::string, CodeBuiltin> Builtin;

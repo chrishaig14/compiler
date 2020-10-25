@@ -85,43 +85,43 @@ void Checker::visit(FunctionNode& n) {
     n.body->accept(*this);
     SymbolInfo body_info = this->rv;
     this->leave_scope();
-    SymbolInfo semantic_info;
-//    semantic_info.symbol_info = ;
-    semantic_info.is_a_function = false;
-    this->rv = semantic_info;
+    SymbolInfo symbol_info;
+//    type.type = ;
+    symbol_info.is_function = false;
+    this->rv = symbol_info;
 }
 
 void Checker::visit(IdNode& n) {
-    SymbolInfo semantic_info;
-    semantic_info.is_a_function = false;
-    semantic_info.is_a_method = false;
+    SymbolInfo symbol_info;
+    symbol_info.is_function = false;
+    symbol_info.is_method = false;
     if (!this->scope->has(n.identifier)) {
         // it might be a function name
         if (this->function_table->has_function(n.identifier)) {
-            semantic_info.is_a_function = true;
-            semantic_info.symbol_info = this->function_table->get_simple_function(n.identifier);
-            FunctionTypeNode* ft = TO_FUNCTION_TYPE(semantic_info.symbol_info);
+            symbol_info.is_function = true;
+            symbol_info.type = this->function_table->get_simple_function(n.identifier);
+            FunctionTypeNode* ft = TO_FUNCTION_TYPE(symbol_info.type);
         } else {
             std::cout << n << std::endl;
             throw ScopeError(n.identifier);
         }
     } else {
-        semantic_info.symbol_info = this->scope->get(n.identifier);
-        if (semantic_info.symbol_info->is_a_function()) {
-            semantic_info.is_a_function = true;
-            semantic_info.is_a_method = false;
-            semantic_info.is_a_class_method = false;
+        symbol_info.type = this->scope->get(n.identifier);
+        if (symbol_info.type->is_function()) {
+            symbol_info.is_function = true;
+            symbol_info.is_method = false;
+            symbol_info.is_class_method = false;
         }
     }
-    this->rv = semantic_info;
+    this->rv = symbol_info;
 }
 
 void Checker::visit(DeclarationNode& n) {
     if (this->scope->declared(n.identifier)) {
         throw RedeclareError(n.identifier);
     }
-    SymbolInfo semantic_info;
-    semantic_info.is_a_function = false;
+    SymbolInfo symbol_info;
+    symbol_info.is_function = false;
     if (n.expression != nullptr and n.type != nullptr) {
         n.expression->accept(*this);
         if (this->replace_me) {
@@ -131,37 +131,37 @@ void Checker::visit(DeclarationNode& n) {
         auto ft = TO_FUNCTION_TYPE(n.type);
         if (ft != nullptr) {
             // it's a function
-            if (!ft->equal(this->rv.symbol_info)) {
-                throw AssignmentTypeError(n.type, this->rv.symbol_info);
+            if (!ft->equal(this->rv.type)) {
+                throw AssignmentTypeError(n.type, this->rv.type);
             }
         } else {
             SymbolInfo expression_info = this->rv;
             auto actual_type = TO_OBJECT_TYPE(n.type);
             if (actual_type->identifier == "Option") {
-                if (!actual_type->type_parameters[0]->equal(expression_info.symbol_info)) {
-                    auto foo = TO_OBJECT_TYPE(expression_info.symbol_info);
+                if (!actual_type->type_parameters[0]->equal(expression_info.type)) {
+                    auto foo = TO_OBJECT_TYPE(expression_info.type);
                     if (foo->identifier != "NoneType") {
-                        throw AssignmentTypeError(n.type, expression_info.symbol_info);
+                        throw AssignmentTypeError(n.type, expression_info.type);
                     }
                 }
             } else if (actual_type->identifier == "Union") {
                 bool ok = false;
                 for (int i = 0; i < actual_type->type_parameters.size(); i++) {
-                    if (actual_type->type_parameters[i]->equal(expression_info.symbol_info)) {
+                    if (actual_type->type_parameters[i]->equal(expression_info.type)) {
                         ok = true;
                         break;
                     }
                 }
                 if (!ok) {
-                    throw AssignmentTypeError(n.type, expression_info.symbol_info);
+                    throw AssignmentTypeError(n.type, expression_info.type);
                 }
             } else {
-                if (!n.type->equal(expression_info.symbol_info)) {
-                    throw AssignmentTypeError(n.type, expression_info.symbol_info);
+                if (!n.type->equal(expression_info.type)) {
+                    throw AssignmentTypeError(n.type, expression_info.type);
                 }
             }
         }
-        semantic_info.symbol_info = n.type;
+        symbol_info.type = n.type;
 
     } else if (n.expression != nullptr) {
         n.expression->accept(*this);
@@ -170,10 +170,10 @@ void Checker::visit(DeclarationNode& n) {
             this->replace_me = false;
         }
         SymbolInfo expression_info = this->rv;
-        semantic_info.symbol_info = expression_info.symbol_info;
+        symbol_info.type = expression_info.type;
     }
-    this->rv = semantic_info;
-    this->scope->set(n.identifier, semantic_info.symbol_info);
+    this->rv = symbol_info;
+    this->scope->set(n.identifier, symbol_info.type);
 }
 
 void Checker::visit(AssignmentNode& n) {
@@ -186,11 +186,11 @@ void Checker::visit(AssignmentNode& n) {
     }
     SymbolInfo expression_type = this->rv;
 
-    auto actual_type = TO_OBJECT_TYPE(linfo.symbol_info);
+    auto actual_type = TO_OBJECT_TYPE(linfo.type);
     IdNode* lid = TO_ID(n.lvalue);
     if (lid != nullptr) {
         if (actual_type->identifier == "Option") {
-            if (expression_type.symbol_info->equal(actual_type->type_parameters[0])) {
+            if (expression_type.type->equal(actual_type->type_parameters[0])) {
                 std::cout << "p cant be none" << std::endl;
                 this->scope->set_not_none(lid->identifier, true);
             } else {
@@ -199,22 +199,22 @@ void Checker::visit(AssignmentNode& n) {
             }
         }
     } else {
-        if (!linfo.symbol_info->equal(expression_type.symbol_info)) {
-            auto actual_type = TO_OBJECT_TYPE(linfo.symbol_info);
+        if (!linfo.type->equal(expression_type.type)) {
+            auto actual_type = TO_OBJECT_TYPE(linfo.type);
             if (actual_type->identifier == "Option") {
-                if (!actual_type->type_parameters[0]->equal(expression_type.symbol_info)) {
-                    auto foo = TO_OBJECT_TYPE(expression_type.symbol_info);
+                if (!actual_type->type_parameters[0]->equal(expression_type.type)) {
+                    auto foo = TO_OBJECT_TYPE(expression_type.type);
                     if (foo->identifier != "NoneType") {
-                        throw AssignmentTypeError(linfo.symbol_info, expression_type.symbol_info);
+                        throw AssignmentTypeError(linfo.type, expression_type.type);
                     }
                 }
             } else {
-                throw AssignmentTypeError(linfo.symbol_info, expression_type.symbol_info);
+                throw AssignmentTypeError(linfo.type, expression_type.type);
             }
         }
     }
-    SymbolInfo semantic_info;
-    this->rv = semantic_info;
+    SymbolInfo symbol_info;
+    this->rv = symbol_info;
 }
 
 void Checker::visit(MemberNode& n) {
@@ -224,10 +224,10 @@ void Checker::visit(MemberNode& n) {
         if (this->class_table->declared(id_node->identifier)) {
             ClassInfo* class_info = this->class_table->get(id_node->identifier);
             if (class_info->methods.count(n.child) == 1) {
-                this->rv.symbol_info = class_info->methods[n.child];
+                this->rv.type = class_info->methods[n.child];
                 this->rv.class_info = class_info;
 
-                FunctionTypeNode* ftn = TO_FUNCTION_TYPE(this->rv.symbol_info);
+                FunctionTypeNode* ftn = TO_FUNCTION_TYPE(this->rv.type);
                 FunctionTypeNode* copy_ftn = FUNCTION_TYPE(ftn->parameter_types, ftn->return_type);
                 std::vector<TypeNode*> tp;
                 for (auto tttp: this->rv.class_info->type_parameters) {
@@ -236,9 +236,9 @@ void Checker::visit(MemberNode& n) {
                 auto instance_type = TYPE(this->rv.class_info->class_name, tp);
                 copy_ftn->parameter_types.insert(copy_ftn->parameter_types.begin(), instance_type);
 
-                this->rv.symbol_info = copy_ftn;
-                this->rv.is_a_method = false;
-                this->rv.is_a_class_method = true;
+                this->rv.type = copy_ftn;
+                this->rv.is_method = false;
+                this->rv.is_class_method = true;
                 this->replace_me = true;
                 this->replacement = ID(class_info->class_name + "." + n.child);
                 return;
@@ -248,8 +248,8 @@ void Checker::visit(MemberNode& n) {
         }
     }
     n.parent->accept(*this);
-    SymbolInfo semantic_info = this->rv;
-    ObjectTypeNode* object = TO_OBJECT_TYPE(semantic_info.symbol_info);
+    SymbolInfo symbol_info = this->rv;
+    ObjectTypeNode* object = TO_OBJECT_TYPE(symbol_info.type);
     if (object == nullptr) {
         throw std::runtime_error("Accessing member " + n.child + " of non object");
     }
@@ -277,21 +277,21 @@ void Checker::visit(MemberNode& n) {
         class_info = instantiate_generic(class_info, object);
         this->class_table->set(object->to_string(), class_info);
     }
-//    if (!this->class_table->declared(semantic_info.symbol_info->to_string())) {
-//        throw std::runtime_error("Class " + semantic_info.symbol_info->to_string() + " not declared!");
+//    if (!this->class_table->declared(type.type->to_string())) {
+//        throw std::runtime_error("Class " + type.type->to_string() + " not declared!");
 //    }
-//    = this->class_table->get(semantic_info.symbol_info->to_string());
+//    = this->class_table->get(type.type->to_string());
     if (class_info->members.count(n.child) == 1) {
         // It's a member
-        semantic_info.symbol_info = class_info->members[n.child];
-        this->rv = semantic_info;
-        this->rv.is_a_function = false;
-        this->rv.is_a_method = false;
+        symbol_info.type = class_info->members[n.child];
+        this->rv = symbol_info;
+        this->rv.is_function = false;
+        this->rv.is_method = false;
     } else if (class_info->methods.count(n.child) == 1) {
         // It's a method
-        semantic_info.symbol_info = class_info->methods[n.child];
-        this->rv = semantic_info;
-        this->rv.is_a_method = true;
+        symbol_info.type = class_info->methods[n.child];
+        this->rv = symbol_info;
+        this->rv.is_method = true;
         this->rv.class_info = class_info;
     } else {
         throw std::runtime_error("Type " + object->to_string() + " has no member " + n.child);
@@ -300,7 +300,7 @@ void Checker::visit(MemberNode& n) {
 }
 
 void Checker::visit(IfNode& n) {
-    SymbolInfo semantic_info;
+    SymbolInfo symbol_info;
     n.condition->accept(*this);
     BinopNode* bop = TO_BINOP(n.condition);
     if (bop != nullptr) {
@@ -328,15 +328,15 @@ void Checker::visit(IfNode& n) {
         }
     }
     SymbolInfo condition_info = this->rv;
-    if (!condition_info.symbol_info->equal(T_BOOL)) {
+    if (!condition_info.type->equal(T_BOOL)) {
         throw std::runtime_error("Expected a Boolean expression as a condition for if statement!, got " +
-                                 condition_info.symbol_info->to_string());
+                                 condition_info.type->to_string());
     }
     this->enter_scope("if");
     n.then->accept(*this);
     SymbolInfo then_info = this->rv;
     this->leave_scope();
-    this->rv = semantic_info;
+    this->rv = symbol_info;
 }
 
 void Checker::visit(BinopNode& n) {
@@ -344,48 +344,48 @@ void Checker::visit(BinopNode& n) {
     SymbolInfo left_info = this->rv;
     n.right->accept(*this);
     SymbolInfo right_info = this->rv;
-    SymbolInfo semantic_info;
+    SymbolInfo symbol_info;
     bool is_boolean = item_in_vec(n.op, {OpType::EQ, OpType::AND, OpType::OR, OpType::LEQ, OpType::GEQ, OpType::LT,
                                          OpType::GT, OpType::NEQ});
     if (is_boolean) {
-        auto left = TO_OBJECT_TYPE(left_info.symbol_info);
+        auto left = TO_OBJECT_TYPE(left_info.type);
         if (left != nullptr) {
-            auto right = TO_OBJECT_TYPE(right_info.symbol_info);
+            auto right = TO_OBJECT_TYPE(right_info.type);
             if (right != nullptr) {
                 if (left->identifier == "Option" && right->identifier == "NoneType") {
-                    semantic_info.symbol_info = TYPE("Boolean", {});
+                    symbol_info.type = TYPE("Boolean", {});
                 }
             }
         } else {
-            if (!left_info.symbol_info->equal(right_info.symbol_info)) {
+            if (!left_info.type->equal(right_info.type)) {
                 throw std::runtime_error(
-                        "Cannot perform binary op betweeen types " + left_info.symbol_info->to_string() + " and " +
-                        right_info.symbol_info->to_string());
+                        "Cannot perform binary op betweeen types " + left_info.type->to_string() + " and " +
+                        right_info.type->to_string());
             }
-            semantic_info.symbol_info = TYPE("Boolean", {});
+            symbol_info.type = TYPE("Boolean", {});
         }
     } else {
-        auto left = TO_OBJECT_TYPE(left_info.symbol_info);
-        auto right = TO_OBJECT_TYPE(right_info.symbol_info);
+        auto left = TO_OBJECT_TYPE(left_info.type);
+        auto right = TO_OBJECT_TYPE(right_info.type);
         auto ltype = left->identifier;
         auto rtype = right->identifier;
         bool ok = false;
         if (ltype == "Integer" && rtype == "Integer") {
-            semantic_info.symbol_info = TYPE("Integer", {});
-            semantic_info.is_a_function = false;
+            symbol_info.type = TYPE("Integer", {});
+            symbol_info.is_function = false;
             ok = true;
         }
         if (ltype == "String" && rtype == "String") {
             if (n.op == OpType::ADD) {
-                semantic_info.symbol_info = TYPE("String", {});
-                semantic_info.is_a_function = false;
+                symbol_info.type = TYPE("String", {});
+                symbol_info.is_function = false;
                 ok = true;
             }
         }
         if (ltype == "List" && rtype == "List" && left->equal(right)) {
             if (n.op == OpType::ADD) {
-                semantic_info.symbol_info = left;
-                semantic_info.is_a_function = false;
+                symbol_info.type = left;
+                symbol_info.is_function = false;
                 ok = true;
             }
         }
@@ -396,7 +396,7 @@ void Checker::visit(BinopNode& n) {
         }
     }
 
-    this->rv = semantic_info;
+    this->rv = symbol_info;
 }
 
 void Checker::visit(ReturnNode& n) {
@@ -407,13 +407,13 @@ void Checker::visit(ReturnNode& n) {
     }
     SymbolInfo expression_info = this->rv;
     TypeNode* return_type = this->scope->get("__return__");
-    assert(expression_info.symbol_info != nullptr);
+    assert(expression_info.type != nullptr);
     assert(return_type != nullptr);
-    if (!this->can_assign(expression_info.symbol_info, return_type)) {
-        throw ReturnError(return_type, expression_info.symbol_info);
+    if (!this->can_assign(expression_info.type, return_type)) {
+        throw ReturnError(return_type, expression_info.type);
     }
-    SymbolInfo semantic_info;
-    this->rv = semantic_info;
+    SymbolInfo symbol_info;
+    this->rv = symbol_info;
 }
 
 bool is_generic(TypeNode* t) {
@@ -574,8 +574,8 @@ void Checker::match_arguments_to_generic_function(FunctionTypeNode* function_typ
     }
     if (is_generic(function_type->return_type)) {
         ObjectTypeNode* rtn = TO_OBJECT_TYPE(function_type->return_type);
-        this->rv.symbol_info = make_type(rtn, generic_replacements);
-    } else { this->rv.symbol_info = function_type->return_type; }
+        this->rv.type = make_type(rtn, generic_replacements);
+    } else { this->rv.type = function_type->return_type; }
 
 }
 
@@ -585,7 +585,7 @@ void Checker::visit(CallNode& n) {
     bool is_a_method = false;
     Node* object_node;
     SymbolInfo retv;
-    if (this->rv.is_a_method) {
+    if (this->rv.is_method) {
         // Since it's a method, we have to transform it and prepare it for the translation step,
         // where instead of calling object.method(args), we call <class>.method(object, args)
         MemberNode* member_node = TO_MEMBER(n.function);
@@ -594,20 +594,20 @@ void Checker::visit(CallNode& n) {
         this->replace_me = false;
         object_node = member_node->parent;
         is_a_method = true;
-    } else if (this->rv.is_a_class_method) {
+    } else if (this->rv.is_class_method) {
         MemberNode* member_node = TO_MEMBER(n.function);
         assert(member_node != nullptr);
         n.function = ID(this->rv.class_info->class_name + "." + member_node->child);
         this->replace_me = false;
-        FunctionTypeNode* ftn = TO_FUNCTION_TYPE(this->rv.symbol_info);
+        FunctionTypeNode* ftn = TO_FUNCTION_TYPE(this->rv.type);
         FunctionTypeNode* copy_ftn = FUNCTION_TYPE(ftn->parameter_types, ftn->return_type);
         copy_ftn->parameter_types.insert(copy_ftn->parameter_types.begin(), TYPE(this->rv.class_info->class_name, {}));
-        retv.symbol_info = copy_ftn;
+        retv.type = copy_ftn;
         object_node = member_node->parent;
     }
-    if (this->rv.is_a_function || this->rv.is_a_method || this->rv.is_a_class_method) {
+    if (this->rv.is_function || this->rv.is_method || this->rv.is_class_method) {
         // ok
-        FunctionTypeNode* function_type = TO_FUNCTION_TYPE(this->rv.symbol_info);
+        FunctionTypeNode* function_type = TO_FUNCTION_TYPE(this->rv.type);
         if (n.arguments.size() != function_type->parameter_types.size()) {
             throw std::runtime_error("Calling function with wrong number of arguments");
         }
@@ -619,7 +619,7 @@ void Checker::visit(CallNode& n) {
                 n.arguments[i] = replacement;
                 this->replace_me = false;
             }
-            TypeNode* arg_type = this->rv.symbol_info;
+            TypeNode* arg_type = this->rv.type;
             arg_types.push_back(arg_type);
         }
         if (function_is_generic(*function_type)) {
@@ -633,7 +633,7 @@ void Checker::visit(CallNode& n) {
                                              arg_types[i]->to_string() + "  instead");
                 }
             }
-            retv.symbol_info = function_type->return_type;
+            retv.type = function_type->return_type;
         }
     } else {
         throw std::runtime_error("calling something that's not a function!");
@@ -697,12 +697,12 @@ void Checker::visit(StructNode& n) {
 }
 
 void Checker::visit(BlockNode& program) {
-    SymbolInfo semantic_info;
+    SymbolInfo symbol_info;
     for (auto n: program.nodes) {
         n->accept(*this);
         SymbolInfo node_info = this->rv;
     }
-    this->rv = semantic_info;
+    this->rv = symbol_info;
 }
 
 void Checker::visit(ClassLiteralExpressionNode& node) {
@@ -741,18 +741,18 @@ void Checker::visit(ClassLiteralExpressionNode& node) {
         }
         SymbolInfo semanticInfo = this->rv;
         TypeNode* field_type = class_field_types_ordered[i];
-        if (!this->can_assign(semanticInfo.symbol_info, field_type)) {
+        if (!this->can_assign(semanticInfo.type, field_type)) {
             throw std::runtime_error(
                     "In struct \"" + node.type->identifier + "\" initialization: " + "field \"" +
                     class_field_names_ordered[i] +
                     "\" is of type " +
                     field_type->to_string() +
-                    " but got " + semanticInfo.symbol_info->to_string());
+                    " but got " + semanticInfo.type->to_string());
         }
     }
     node.names = class_field_names_ordered;
     this->rv = SymbolInfo();
-    rv.symbol_info = node.type;
+    rv.type = node.type;
 }
 
 
@@ -916,22 +916,22 @@ void Checker::visit(ClassLiteralFieldNode& node) {
         }
         SymbolInfo semanticInfo = this->rv;
         TypeNode* field_type = class_fields[f.first];
-        if (!this->can_assign(semanticInfo.symbol_info, field_type)) {
+        if (!this->can_assign(semanticInfo.type, field_type)) {
             throw std::runtime_error(
                     "In struct \"" + node.type->identifier + "\" initialization: " + "field \"" + f.first +
                     "\" is of type " +
                     field_type->to_string() +
-                    " but got " + semanticInfo.symbol_info->to_string());
+                    " but got " + semanticInfo.type->to_string());
         }
     }
     this->rv = SymbolInfo();
-    rv.symbol_info = node.type;
+    rv.type = node.type;
 }
 
 void Checker::visit(ForNode& node) {
     node.exp->accept(*this);
-    SymbolInfo semantic_info = this->rv;
-    ObjectTypeNode* obj = TO_OBJECT_TYPE(semantic_info.symbol_info);
+    SymbolInfo symbol_info = this->rv;
+    ObjectTypeNode* obj = TO_OBJECT_TYPE(symbol_info.type);
     if (obj == nullptr) {
         throw std::runtime_error("Iterating over something bad!");
     }
@@ -951,14 +951,14 @@ void Checker::visit(ListNode& node) {
         node.elements[0] = this->replacement;
         this->replace_me = false;
     }
-    auto element_type = this->rv.symbol_info;
+    auto element_type = this->rv.type;
     for (int i = 1; i < node.elements.size(); i++) {
         node.elements[i]->accept(*this);
         if (this->replace_me) {
             node.elements[i] = this->replacement;
             this->replace_me = false;
         }
-        auto current_type = this->rv.symbol_info;
+        auto current_type = this->rv.type;
         if (!current_type->equal(element_type)) {
             throw std::runtime_error("List literal with more than one element type, first element has type: " +
                                      element_type->to_string() + " but at index " + std::to_string(i) +
@@ -967,27 +967,27 @@ void Checker::visit(ListNode& node) {
         }
     }
     SymbolInfo return_info;
-    return_info.is_a_function = false;
-    return_info.symbol_info = T_LIST(element_type);
+    return_info.is_function = false;
+    return_info.type = T_LIST(element_type);
     this->rv = return_info;
 }
 
 void Checker::visit(BooleanNode& node) {
-    SymbolInfo semantic_info;
-    semantic_info.symbol_info = TYPE("Boolean", {});
-    semantic_info.is_a_function = false;
-    this->rv = semantic_info;
+    SymbolInfo symbol_info;
+    symbol_info.type = TYPE("Boolean", {});
+    symbol_info.is_function = false;
+    this->rv = symbol_info;
 }
 
 void Checker::visit(WhileNode& node) {
     node.condition->accept(*this);
     SymbolInfo condition = this->rv;
-    if (!condition.symbol_info->equal(T_BOOL)) {
+    if (!condition.type->equal(T_BOOL)) {
         throw std::runtime_error("At line " +
                                  std::to_string(node.condition->line + 1) + " column " +
                                  std::to_string(node.condition->column + 1) +
                                  ": Expected Boolean expression as while loop condition, got " +
-                                 condition.symbol_info->to_string());
+                                 condition.type->to_string());
     }
     this->enter_scope("while");
     node.body->accept(*this);
@@ -996,15 +996,15 @@ void Checker::visit(WhileNode& node) {
 
 void Checker::visit(NumberNode& node) {
     SymbolInfo semanticInfo;
-    semanticInfo.symbol_info = TYPE("Integer", {});
-    semanticInfo.is_a_function = false;
+    semanticInfo.type = TYPE("Integer", {});
+    semanticInfo.is_function = false;
     this->rv = semanticInfo;
 }
 
 void Checker::visit(StringNode& node) {
     SymbolInfo semanticInfo;
-    semanticInfo.symbol_info = TYPE("String", {});
-    semanticInfo.is_a_function = false;
+    semanticInfo.type = TYPE("String", {});
+    semanticInfo.is_function = false;
     this->rv = semanticInfo;
 }
 
@@ -1013,14 +1013,14 @@ void Checker::visit(SubscriptNode& node) {
     SymbolInfo parent = this->rv;
 //    node.child->accept(*this);
     SymbolInfo child = this->rv;
-    ObjectTypeNode* object_type = TO_OBJECT_TYPE(parent.symbol_info);
+    ObjectTypeNode* object_type = TO_OBJECT_TYPE(parent.type);
     if (object_type == nullptr) { throw std::runtime_error("Accessing subscript of non object!"); }
-    SymbolInfo semantic_info;
+    SymbolInfo symbol_info;
     if (object_type->identifier == "List") {
-        semantic_info.symbol_info = object_type->type_parameters[0];
+        symbol_info.type = object_type->type_parameters[0];
     }
-    semantic_info.is_a_function = false;
-    this->rv = semantic_info;
+    symbol_info.is_function = false;
+    this->rv = symbol_info;
 }
 
 void Checker::visit(BreakNode& node) {
@@ -1030,7 +1030,7 @@ void Checker::visit(BreakNode& node) {
 void Checker::visit(TernaryNode& node) {
     node.expression->accept(*this);
     SymbolInfo expression_info = this->rv;
-    auto expression_type = TO_OBJECT_TYPE(expression_info.symbol_info);
+    auto expression_type = TO_OBJECT_TYPE(expression_info.type);
     if (expression_type == nullptr) {
         throw std::runtime_error("Unexpected non-object");
     }
@@ -1039,7 +1039,7 @@ void Checker::visit(TernaryNode& node) {
     }
     SymbolInfo semanticInfo;
     TypeNode* type = expression_type->type_parameters[0];
-    semanticInfo.symbol_info = type;
+    semanticInfo.type = type;
     this->enter_scope("true_case");
     this->scope->set("it", type);
     node.true_case->accept(*this);
@@ -1055,28 +1055,28 @@ void Checker::visit(TernaryNode& node) {
         this->replace_me = false;
     }
     SymbolInfo false_case = this->rv;
-    if (!false_case.symbol_info->equal(true_case.symbol_info)) {
+    if (!false_case.type->equal(true_case.type)) {
         throw std::runtime_error(
-                "True case and false case type don't match: " + true_case.symbol_info->to_string() + " != " +
-                false_case.symbol_info->to_string());
-//        semanticInfo.symbol_info = TYPE("Union", {true_case.symbol_info, false_case.symbol_info});
+                "True case and false case type don't match: " + true_case.type->to_string() + " != " +
+                false_case.type->to_string());
+//        semanticInfo.type = TYPE("Union", {true_case.type, false_case.type});
     } else {
-        semanticInfo.symbol_info = true_case.symbol_info;
+        semanticInfo.type = true_case.type;
     }
     this->rv = semanticInfo;
 }
 
 void Checker::visit(NoneNode& node) {
     SymbolInfo semanticInfo;
-    semanticInfo.symbol_info = TYPE("NoneType", {});
-    semanticInfo.is_a_function = false;
+    semanticInfo.type = TYPE("NoneType", {});
+    semanticInfo.is_function = false;
     this->rv = semanticInfo;
 }
 
 void Checker::visit(EmptyListNode& node) {
     SymbolInfo semanticInfo;
-    semanticInfo.symbol_info = node.type;
-    semanticInfo.is_a_function = false;
+    semanticInfo.type = node.type;
+    semanticInfo.is_function = false;
     this->rv = semanticInfo;
 }
 
