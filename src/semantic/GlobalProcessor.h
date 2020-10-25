@@ -13,12 +13,9 @@
 #include "../vm/Object.h"
 
 class FunctionTable {
-    std::string foo;
-
     std::map<std::string, FunctionTypeNode*> functions;
 
 public:
-    FunctionTable();
 
     int add(std::string function_name, FunctionTypeNode* function_type);
 

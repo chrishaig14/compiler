@@ -279,10 +279,6 @@ int FunctionTable::add(std::string function_name, FunctionTypeNode* function_typ
     return 0;
 }
 
-FunctionTable::FunctionTable() {
-    this->foo = "Pepito";
-}
-
 bool FunctionTable::has_function(std::string name) {
     return this->functions.count(name) == 1;
 }
