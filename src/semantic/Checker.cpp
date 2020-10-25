@@ -99,7 +99,7 @@ void Checker::visit(IdNode& n) {
         // it might be a function name
         if (this->function_table->has_function(n.identifier)) {
             symbol_info.is_function = true;
-            symbol_info.type = this->function_table->get_simple_function(n.identifier);
+            symbol_info.type = this->function_table->get(n.identifier);
             FunctionTypeNode* ft = TO_FUNCTION_TYPE(symbol_info.type);
         } else {
             std::cout << n << std::endl;

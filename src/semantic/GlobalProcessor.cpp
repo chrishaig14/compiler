@@ -266,12 +266,8 @@ void GlobalProcessor::visit(InstanceNode& node) {
 }
 
 
-FunctionTypeNode* FunctionTable::get_simple_function(std::string function_name) {
+FunctionTypeNode* FunctionTable::get(std::string function_name) {
     return functions[function_name];
-}
-
-bool FunctionTable::function_exists(std::string function_name) {
-    return this->functions.count(function_name) == 1;
 }
 
 int FunctionTable::add(std::string function_name, FunctionTypeNode* function_type) {

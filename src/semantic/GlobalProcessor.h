@@ -17,8 +17,6 @@ class FunctionTable {
 
     std::map<std::string, FunctionTypeNode*> functions;
 
-    bool function_exists(std::string function_name);
-
 public:
     FunctionTable();
 
@@ -26,7 +24,7 @@ public:
 
     bool has_function(std::string name);
 
-    FunctionTypeNode* get_simple_function(std::string function_name);
+    FunctionTypeNode* get(std::string function_name);
 
 };
 

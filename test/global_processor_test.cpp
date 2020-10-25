@@ -21,7 +21,7 @@ TEST(first_pass_test, fun_foo) {
     BlockNode* tree = get_tree(text);
     GlobalProcessor gp;
     gp.visit(*tree);
-    auto ginfo = dynamic_cast<FunctionTypeNode*>(gp.function_table->get_simple_function("foo"));
+    auto ginfo = dynamic_cast<FunctionTypeNode*>(gp.function_table->get("foo"));
     EXPECT_NE(ginfo, nullptr);
 }
 
@@ -39,7 +39,7 @@ TEST(first_pass_test, fun_foo_eq) {
     BlockNode* tree = get_tree(text);
     GlobalProcessor gp;
     gp.visit(*tree);
-    auto ginfo = dynamic_cast<FunctionTypeNode*>(gp.function_table->get_simple_function("foo"));
+    auto ginfo = dynamic_cast<FunctionTypeNode*>(gp.function_table->get("foo"));
     EXPECT_NE(ginfo, nullptr);
     EXPECT_TRUE(*ginfo == FunctionTypeNode({}, T_STRING));
 }
@@ -62,7 +62,7 @@ TEST(first_pass_test, fun_foo_complete) {
     BlockNode* tree = get_tree(text);
     GlobalProcessor gp;
     gp.visit(*tree);
-    auto ginfo = dynamic_cast<FunctionTypeNode*>(gp.function_table->get_simple_function("foo"));
+    auto ginfo = dynamic_cast<FunctionTypeNode*>(gp.function_table->get("foo"));
     EXPECT_NE(ginfo, nullptr);
     EXPECT_TRUE(*ginfo == FunctionTypeNode({T_INT, T_STRING}, T_BOOL));
 }
