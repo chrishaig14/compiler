@@ -24,7 +24,6 @@ public:
     TypeNode* type;
     bool is_function;
     bool is_method;
-    FunctionOverloads overloads;
     ClassInfo* class_info;
     bool is_class_method;
 

@@ -12,12 +12,10 @@
 #include "ClassTable.h"
 #include "../vm/Object.h"
 
-typedef std::vector<FunctionTypeNode*> FunctionOverloads;
-
 class FunctionTable {
     std::string foo;
 
-    std::map<std::string, FunctionOverloads*> functions;
+    std::map<std::string, FunctionTypeNode*> functions;
 
     bool function_exists(std::string function_name);
 

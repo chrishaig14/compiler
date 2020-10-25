@@ -105,7 +105,7 @@ GlobalProcessor::GlobalProcessor(std::vector<Builtin>& builtins) {
     auto ft = FUNCTION_TYPE({ TYPE("a", {}) }, TYPE("b", {}));
     auto at = T_LIST(TYPE("a", {}));
     builtins.push_back({"map", CodeBuiltin{FUNCTION_TYPE(VectorOfTypes({at, ft}), T_LIST(TYPE("b", {}))), list_map}});
-    builtins.push_back({"Integer.str", CodeBuiltin{FUNCTION_TYPE({T_INT}, T_STRING), int_to_str}});
+    builtins.push_back({"Integer.str", CodeBuiltin{FUNCTION_TYPE({ T_INT }, T_STRING), int_to_str}});
     builtins.push_back({"List.len", CodeBuiltin{FUNCTION_TYPE({ T_LIST(TYPE("a", {})) }, T_INT), list_len}});
     auto function_from_t_to_u = FUNCTION_TYPE({ TYPE("t", {}) }, TYPE("b", {}));
     builtins.push_back(
@@ -267,7 +267,7 @@ void GlobalProcessor::visit(InstanceNode& node) {
 
 
 FunctionTypeNode* FunctionTable::get_simple_function(std::string function_name) {
-    return (*functions[function_name])[0];
+    return functions[function_name];
 }
 
 bool FunctionTable::function_exists(std::string function_name) {
@@ -275,14 +275,12 @@ bool FunctionTable::function_exists(std::string function_name) {
 }
 
 int FunctionTable::add(std::string function_name, FunctionTypeNode* function_type) {
-    int n = functions.size();
     if (functions.count(function_name) == 0) {
-        functions[function_name] = new std::vector<FunctionTypeNode*>();
+        functions[function_name] = function_type;
     } else {
         throw std::runtime_error("Cant overload function " + function_name);
     }
-    functions[function_name]->push_back(function_type);
-    return functions[function_name]->size() - 1;
+    return 0;
 }
 
 FunctionTable::FunctionTable() {
