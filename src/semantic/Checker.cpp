@@ -6,17 +6,6 @@
 #include "Checker.h"
 #include "TypeClassInfo.h"
 
-#define NONE 0
-#define NOT_NULL_CHECK 1
-#define NULL_CHECK 2
-
-#define TO_FUNCTION_TYPE(x) dynamic_cast<FunctionTypeNode*> (x)
-#define TO_OBJECT_TYPE(x) dynamic_cast<ObjectTypeNode*> (x)
-#define TO_ID(x) dynamic_cast<IdNode*> (x)
-#define TO_MEMBER(x) dynamic_cast<MemberNode*>(x)
-#define TO_BINOP(x) dynamic_cast<BinopNode*>(x)
-#define TO_NONE(x) dynamic_cast<NoneNode*>(x)
-
 bool function_is_generic(FunctionTypeNode& ft) {
     for (int i = 0; i < ft.parameter_types.size(); i++) {
         if (is_generic(ft.parameter_types[i])) {
@@ -315,7 +304,7 @@ void Checker::visit(IfNode& n) {
     n.condition->accept(*this);
     BinopNode* bop = TO_BINOP(n.condition);
     if (bop != nullptr) {
-        if (bop->right->equal(NONE)) {
+        if (bop->right->equal(new NoneNode())) {
             if (bop->op == OpType::NEQ) {
                 IdNode* left = TO_ID(bop->left);
                 NoneNode* right = TO_NONE(bop->right);

@@ -73,7 +73,14 @@ typedef std::map<std::string, std::map<std::string, Code>> StructProtos;
 typedef std::pair<std::string, TypeNode*> FieldInfo;
 typedef std::vector<FieldInfo> StructFields;
 typedef std::vector<std::pair<std::string, Instruction*>> CodeLabel;
-
+#define TO_FUNCTION_TYPE(x) dynamic_cast<FunctionTypeNode*> (x)
+#define TO_OBJECT_TYPE(x) dynamic_cast<ObjectTypeNode*> (x)
+#define TO_ID(x) dynamic_cast<IdNode*> (x)
+#define TO_SUB(x) dynamic_cast<SubscriptNode*> (x)
+#define TO_MEMBER(x) dynamic_cast<MemberNode*>(x)
+#define TO_CALL(x) dynamic_cast<CallNode*>(x)
+#define TO_BINOP(x) dynamic_cast<BinopNode*>(x)
+#define TO_NONE(x) dynamic_cast<NoneNode*>(x)
 std::ostream& operator<<(std::ostream& out, const CodeLabel v);
 
 bool operator==(const CodeLabel a, const CodeLabel b);

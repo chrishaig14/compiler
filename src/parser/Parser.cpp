@@ -107,7 +107,7 @@ VectorOfNodes Parser::parse_list_of_expressions() {
 
 Node* Parser::parse_assignment_or_expression() {
     Node* lvalue = this->parse_expression();
-    auto call = dynamic_cast<CallNode*>(lvalue);
+    auto call = TO_CALL(lvalue);
     if (this->match(TokenType::EQQ)) {
         if (call != nullptr) {
             throw std::runtime_error("Can't assign to a function call!");
@@ -282,9 +282,9 @@ Node* Parser::parse_id_or_literal() {
 }
 
 bool may_be_a_type(Node* node) {
-    SubscriptNode* subs = dynamic_cast<SubscriptNode*>(node);
+    SubscriptNode* subs = TO_SUB(node);
     if (subs == nullptr) {
-        IdNode* idn = dynamic_cast<IdNode*>(node);
+        IdNode* idn = TO_ID(node);
         return idn != nullptr;
     } else {
         if (may_be_a_type(subs->parent)) {
@@ -298,13 +298,13 @@ bool may_be_a_type(Node* node) {
 }
 
 ObjectTypeNode* convert_to_type(Node* node) {
-    SubscriptNode* sub = dynamic_cast<SubscriptNode*>(node);
+    SubscriptNode* sub = TO_SUB(node);
     if (sub == nullptr) {
-        IdNode* idn = dynamic_cast<IdNode*>(node);
+        IdNode* idn = TO_ID(node);
         VectorOfTypes t;
         return TYPE(idn->identifier, t);
     }
-    IdNode* idn = dynamic_cast<IdNode*>(sub->parent);
+    IdNode* idn = TO_ID(sub->parent);
     std::string type_id = idn->identifier;
     VectorOfTypes type_params;
     for (int i = 0; i < sub->child.size(); i++) {
@@ -317,7 +317,7 @@ ObjectTypeNode* convert_to_type(Node* node) {
 Node* Parser::parse_class_literal() {
 
     TypeNode* type = this->parse_type_node();
-    ObjectTypeNode* literal_type = dynamic_cast<ObjectTypeNode*>(type);
+    ObjectTypeNode* literal_type = TO_OBJECT_TYPE(type);
     if (literal_type == nullptr) {
         throw std::runtime_error("Expecterd a type to initialize!");
     }
@@ -328,7 +328,7 @@ Node* Parser::parse_class_literal() {
     if (!this->match(TokenType::RCURLY)) {
         Node* first = this->parse_expression();
         // if it's an id
-        IdNode* idn = dynamic_cast<IdNode*>(first);
+        IdNode* idn = TO_ID(first);
         if (idn != nullptr) {
             if (this->match(TokenType::RCURLY)) {
                 exps.push_back(idn);
