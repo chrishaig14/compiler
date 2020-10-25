@@ -157,7 +157,6 @@ Node* Parser::parse_and_expression() {
 }
 
 
-
 Node* Parser::parse_bool_expression() {
     Node* left = this->parse_add_or_sub_expression();
     OpType op;
@@ -279,39 +278,6 @@ Node* Parser::parse_id_or_literal() {
 //            throw std::runtime_error("parsing id or literal, unknown token type: " + TOKEN_STRINGS[token.type]);
     }
     return node;
-}
-
-bool may_be_a_type(Node* node) {
-    SubscriptNode* subs = TO_SUB(node);
-    if (subs == nullptr) {
-        IdNode* idn = TO_ID(node);
-        return idn != nullptr;
-    } else {
-        if (may_be_a_type(subs->parent)) {
-            for (int i = 0; i < subs->child.size(); i++) {
-                if (!may_be_a_type(subs->child[i]))return false;
-            }
-            return true;
-        }
-        return false;
-    }
-}
-
-ObjectTypeNode* convert_to_type(Node* node) {
-    SubscriptNode* sub = TO_SUB(node);
-    if (sub == nullptr) {
-        IdNode* idn = TO_ID(node);
-        VectorOfTypes t;
-        return TYPE(idn->identifier, t);
-    }
-    IdNode* idn = TO_ID(sub->parent);
-    std::string type_id = idn->identifier;
-    VectorOfTypes type_params;
-    for (int i = 0; i < sub->child.size(); i++) {
-        type_params.push_back(convert_to_type(sub->child[i]));
-    }
-    ObjectTypeNode* type = TYPE(type_id, type_params);
-    return type;
 }
 
 Node* Parser::parse_class_literal() {
@@ -456,6 +422,8 @@ DeclarationNode* Parser::parse_variable_declaration() {
     return node;
 }
 
+#define OPTIONAL_SEMICOLON()     if (this->match(TokenType::SEMICOLON)) {this->next();}
+
 Node* Parser::parse_common_statement() {
     Node* ast_node;
     if (this->match(TokenType::IF)) {
@@ -464,18 +432,12 @@ Node* Parser::parse_common_statement() {
     }
     if (this->match(TokenType::VAR)) {
         ast_node = this->parse_variable_declaration();
-        if (this->match(TokenType::SEMICOLON)) {
-            this->next();
-        }
-//        this->expect_token(TokenType::SEMICOLON);
+        OPTIONAL_SEMICOLON();
         return ast_node;
     }
     if (this->match(TokenType::RETURN)) {
         ast_node = this->parse_return();
-        if (this->match(TokenType::SEMICOLON)) {
-            this->next();
-        }
-//        this->expect_token(TokenType::SEMICOLON);
+        OPTIONAL_SEMICOLON();
         return ast_node;
     }
     if (this->match(TokenType::FOR)) {
@@ -487,10 +449,7 @@ Node* Parser::parse_common_statement() {
         return ast_node;
     }
     Node* node = this->parse_assignment_or_expression();
-//    this->expect_token(TokenType::SEMICOLON);
-    if (this->match(TokenType::SEMICOLON)) {
-        this->next();
-    }
+    OPTIONAL_SEMICOLON();
     return node;
 }
 
@@ -687,10 +646,7 @@ ClassNode* Parser::parse_class_definition() {
             TypeNode* member_type = this->parse_type_node();
             members[member_name_tk.str] = member_type;
             members_ordered.push_back(member_name_tk.str);
-//            this->expect_token(TokenType::SEMICOLON);
-            if (this->match(TokenType::SEMICOLON)) {
-                this->next();
-            }
+            OPTIONAL_SEMICOLON();
         } else if (this->match(TokenType::FUN)) {
             FunctionNode* method_node = this->parse_function_definition();
             methods[method_node->identifier] = method_node;
