@@ -105,10 +105,6 @@ VectorOfNodes Parser::parse_list_of_expressions() {
     return result;
 }
 
-Node* Parser::parse_function_expression() {
-    return nullptr;
-}
-
 Node* Parser::parse_assignment_or_expression() {
     Node* lvalue = this->parse_expression();
     auto call = dynamic_cast<CallNode*>(lvalue);
@@ -270,13 +266,10 @@ Node* Parser::parse_id_or_literal() {
             this->next();
             break;
         }
-        case TokenType::FUN: {
-            return this->parse_function_expression();
-        }
         case TokenType::LSQUARE:
             return this->parse_list_literal();
         case TokenType::NONE: {
-            Node* node = new NoneNode();
+            node = new NoneNode();
             node->start = this->token.start;
             node->end = this->token.end;
             this->next();
@@ -331,7 +324,6 @@ Node* Parser::parse_class_literal() {
     if (literal_type == nullptr) {
         throw std::runtime_error("Expecterd a type to initialize!");
     }
-    Node* node = nullptr;
     this->expect_token(TokenType::LCURLY);
 
     std::map<std::string, Node*> init;
@@ -370,7 +362,7 @@ Node* Parser::parse_class_literal() {
                     while (true) {
                         Token field_id = this->expect_token(TokenType::ID);
                         this->expect_token(TokenType::COLON);
-                        Node* exp = this->parse_expression();
+                        exp = this->parse_expression();
                         init[field_id.str] = exp;
                         if (this->match(TokenType::COMMA)) {
                             this->next();
@@ -423,7 +415,7 @@ Node* Parser::parse_id_or_class_literal() {
 
 Node* Parser::parse_call_or_subscript_chain(Node* parent) {
     Node* node = parent;
-    while (this->match(TokenType::LPAREN) or this->match(TokenType::LSQUARE)) {
+    while (item_in_vec(this->token.type, {TokenType::LPAREN, TokenType::LSQUARE})) {
         if (this->match(TokenType::LPAREN)) {
 //                 function call
             this->next();
@@ -702,13 +694,11 @@ ClassNode* Parser::parse_class_definition() {
             if (this->match(TokenType::SEMICOLON)) {
                 this->next();
             }
+        } else if (this->match(TokenType::FUN)) {
+            FunctionNode* method_node = this->parse_function_definition();
+            methods[method_node->identifier] = method_node;
         } else {
-            if (this->match(TokenType::FUN)) {
-                FunctionNode* method_node = this->parse_function_definition();
-                methods[method_node->identifier] = method_node;
-            } else {
-                break;
-            }
+            break;
         }
     }
     this->expect_token(TokenType::RCURLY);

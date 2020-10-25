@@ -54,8 +54,6 @@ public:
 
     Node* parse_factor();
 
-    Node* parse_function_expression();
-
     Node* parse_id_or_literal();
 
     Node* parse_mul_div_or_mod_expression();
