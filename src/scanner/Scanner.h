@@ -11,8 +11,8 @@
 
 #include <vector>
 
-extern std::map<std::string, TokenType> TOKEN_KEYWORDS;
-extern std::map<std::string, TokenType> TOKEN_SPECIAL;
+extern std::map<std::string, TokType> TOKEN_KEYWORDS;
+extern std::map<std::string, TokType> TOKEN_SPECIAL;
 
 class UnexpectedCharacter : public std::runtime_error {
 public:
@@ -40,7 +40,7 @@ public:
         while (true) {
             Token token = this->get_next();
             tokens.push_back(token);
-            if (token.type == TokenType::END) {
+            if (token.type == TokType::END) {
                 break;
             }
         }

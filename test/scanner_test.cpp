@@ -16,74 +16,74 @@ bool cmp_token_full(Token a, Token b) {
 }
 
 Token st_ID(std::string s) {
-    return Token(TokenType::ID, s, -1, -1);
+    return Token(TokType::ID, s, -1, -1);
 }
 
 Token st_NUM(int s) {
-    return Token(TokenType::NUM, s, -1, -1);
+    return Token(TokType::NUM, s, -1, -1);
 }
 
 Token st_STRING(std::string s) {
-    return Token(TokenType::STRING, s, -1, -1);
+    return Token(TokType::STRING, s, -1, -1);
 }
 
 Token t_ID(std::string s, int line, int column) {
-    return Token(TokenType::ID, s, line, column);
+    return Token(TokType::ID, s, line, column);
 }
 
 Token t_NUM(int s, int line, int column) {
-    return Token(TokenType::NUM, s, line, column);
+    return Token(TokType::NUM, s, line, column);
 }
 
 
-Token st_FUN = Token(TokenType::FUN, -1, -1);
-Token st_SEMICOLON = Token(TokenType::SEMICOLON, -1, -1);
-Token st_VAR = Token(TokenType::VAR, -1, -1);
-Token st_IF = Token(TokenType::IF, -1, -1);
-Token st_ELSE = Token(TokenType::ELSE, -1, -1);
-Token st_END = Token(TokenType::END, -1, -1);
-Token st_CLASS = Token(TokenType::STRUCT, -1, -1);
-Token st_DOT = Token(TokenType::DOT, -1, -1);
-Token st_COMMA = Token(TokenType::COMMA, -1, -1);
-Token st_RSQUARE = Token(TokenType::RSQUARE, -1, -1);
-Token st_LSQUARE = Token(TokenType::LSQUARE, -1, -1);
-Token st_COLON = Token(TokenType::COLON, -1, -1);
-Token st_LPAREN = Token(TokenType::LPAREN, -1, -1);
-Token st_RPAREN = Token(TokenType::RPAREN, -1, -1);
-Token st_LCURLY = Token(TokenType::LCURLY, -1, -1);
-Token st_RCURLY = Token(TokenType::RCURLY, -1, -1);
+Token st_FUN = Token(TokType::FUN, -1, -1);
+Token st_SEMICOLON = Token(TokType::SEMICOLON, -1, -1);
+Token st_VAR = Token(TokType::VAR, -1, -1);
+Token st_IF = Token(TokType::IF, -1, -1);
+Token st_ELSE = Token(TokType::ELSE, -1, -1);
+Token st_END = Token(TokType::END, -1, -1);
+Token st_CLASS = Token(TokType::STRUCT, -1, -1);
+Token st_DOT = Token(TokType::DOT, -1, -1);
+Token st_COMMA = Token(TokType::COMMA, -1, -1);
+Token st_RSQUARE = Token(TokType::RSQUARE, -1, -1);
+Token st_LSQUARE = Token(TokType::LSQUARE, -1, -1);
+Token st_COLON = Token(TokType::COLON, -1, -1);
+Token st_LPAREN = Token(TokType::LPAREN, -1, -1);
+Token st_RPAREN = Token(TokType::RPAREN, -1, -1);
+Token st_LCURLY = Token(TokType::LCURLY, -1, -1);
+Token st_RCURLY = Token(TokType::RCURLY, -1, -1);
 
-Token t_FUN(int line, int column) { return Token(TokenType::FUN, line, column); }
+Token t_FUN(int line, int column) { return Token(TokType::FUN, line, column); }
 
-Token t_SEMICOLON(int line, int column) { return Token(TokenType::SEMICOLON, line, column); }
+Token t_SEMICOLON(int line, int column) { return Token(TokType::SEMICOLON, line, column); }
 
-Token t_VAR(int line, int column) { return Token(TokenType::VAR, line, column); }
+Token t_VAR(int line, int column) { return Token(TokType::VAR, line, column); }
 
-Token t_IF(int line, int column) { return Token(TokenType::IF, line, column); }
+Token t_IF(int line, int column) { return Token(TokType::IF, line, column); }
 
-Token t_ELSE(int line, int column) { return Token(TokenType::ELSE, line, column); }
+Token t_ELSE(int line, int column) { return Token(TokType::ELSE, line, column); }
 
-Token t_END(int line, int column) { return Token(TokenType::END, line, column); }
+Token t_END(int line, int column) { return Token(TokType::END, line, column); }
 
-Token t_CLASS(int line, int column) { return Token(TokenType::STRUCT, line, column); }
+Token t_CLASS(int line, int column) { return Token(TokType::STRUCT, line, column); }
 
-Token t_DOT(int line, int column) { return Token(TokenType::DOT, line, column); }
+Token t_DOT(int line, int column) { return Token(TokType::DOT, line, column); }
 
-Token t_COMMA(int line, int column) { return Token(TokenType::COMMA, line, column); }
+Token t_COMMA(int line, int column) { return Token(TokType::COMMA, line, column); }
 
-Token t_RSQUARE(int line, int column) { return Token(TokenType::RSQUARE, line, column); }
+Token t_RSQUARE(int line, int column) { return Token(TokType::RSQUARE, line, column); }
 
-Token t_LSQUARE(int line, int column) { return Token(TokenType::LSQUARE, line, column); }
+Token t_LSQUARE(int line, int column) { return Token(TokType::LSQUARE, line, column); }
 
-Token t_COLON(int line, int column) { return Token(TokenType::COLON, line, column); }
+Token t_COLON(int line, int column) { return Token(TokType::COLON, line, column); }
 
-Token t_LPAREN(int line, int column) { return Token(TokenType::LPAREN, line, column); }
+Token t_LPAREN(int line, int column) { return Token(TokType::LPAREN, line, column); }
 
-Token t_RPAREN(int line, int column) { return Token(TokenType::RPAREN, line, column); }
+Token t_RPAREN(int line, int column) { return Token(TokType::RPAREN, line, column); }
 
-Token t_LCURLY(int line, int column) { return Token(TokenType::LCURLY, line, column); }
+Token t_LCURLY(int line, int column) { return Token(TokType::LCURLY, line, column); }
 
-Token t_RCURLY(int line, int column) { return Token(TokenType::RCURLY, line, column); }
+Token t_RCURLY(int line, int column) { return Token(TokType::RCURLY, line, column); }
 
 
 TEST(scanner_test, test_only_alpha_identifier) {
@@ -113,7 +113,7 @@ TEST(scanner_test, test_double_colon) {
     Token token = scanner.get_next();
     EXPECT_EQ(cmp_token_value(token, st_ID("a")), true);
     token = scanner.get_next();
-    EXPECT_EQ(cmp_token_value(token, Token(TokenType::DOUBLE_COLON, -1, -1)), true);
+    EXPECT_EQ(cmp_token_value(token, Token(TokType::DOUBLE_COLON, -1, -1)), true);
     token = scanner.get_next();
     EXPECT_EQ(cmp_token_value(token, st_ID("b")), true);
 }
@@ -125,7 +125,7 @@ TEST(scanner_test, test_string_literal) {
     EXPECT_EQ(cmp_token_value(token, st_STRING("hello")), true);
     token = scanner.get_next();
 
-    EXPECT_EQ(token.type, TokenType::END) << TOKEN_STRINGS[token.type];
+    EXPECT_EQ(token.type, TokType::END) << TOKEN_STRINGS[token.type];
 }
 
 TEST(scanner_test, test_string_full) {
@@ -134,7 +134,7 @@ TEST(scanner_test, test_string_full) {
     Token token = scanner.get_next();
     token = scanner.get_next();
     token = scanner.get_next();
-    EXPECT_EQ(token, Token(TokenType::STRING, "hello", 1, 3));
+    EXPECT_EQ(token, Token(TokType::STRING, "hello", 1, 3));
 }
 
 TEST(scanner_test, test_string_full_start_end) {
@@ -143,7 +143,7 @@ TEST(scanner_test, test_string_full_start_end) {
     Token token = scanner.get_next();
     token = scanner.get_next();
     token = scanner.get_next();
-    EXPECT_EQ(token, Token(TokenType::STRING, "hello", 1, 3));
+    EXPECT_EQ(token, Token(TokType::STRING, "hello", 1, 3));
     EXPECT_EQ(token.start, 7);
     EXPECT_EQ(token.end, 13);
 }
@@ -174,7 +174,7 @@ TEST(scanner_test, test_true_kw) {
     std::string text = "true";
     Scanner scanner(text);
     Token token = scanner.get_next();
-    EXPECT_EQ(cmp_token_value(token, Token(TokenType::TRUE, -1, -1)), true);
+    EXPECT_EQ(cmp_token_value(token, Token(TokType::TRUE, -1, -1)), true);
     EXPECT_EQ(token.start, 0);
     EXPECT_EQ(token.end, 3);
 }
@@ -246,27 +246,27 @@ TEST(scanner_test, test_token_id_position_1) {
     std::string text = "foo";
     Scanner scanner(text);
     Token token = scanner.get_next();
-    EXPECT_EQ(token, Token(TokenType::ID, "foo", 0, 0));
+    EXPECT_EQ(token, Token(TokType::ID, "foo", 0, 0));
 }
 
 TEST(scanner_test, test_token_id_position_2) {
     std::string text = "foo bar";
     Scanner scanner(text);
     Token token = scanner.get_next();
-    EXPECT_EQ(token, Token(TokenType::ID, "foo", 0, 0));
+    EXPECT_EQ(token, Token(TokType::ID, "foo", 0, 0));
     token = scanner.get_next();
-    EXPECT_EQ(token, Token(TokenType::ID, "bar", 0, 4));
+    EXPECT_EQ(token, Token(TokType::ID, "bar", 0, 4));
 }
 
 TEST(scanner_test, test_token_id_position_3) {
     std::string text = "foo\nbar";
     Scanner scanner(text);
     Token token = scanner.get_next();
-    EXPECT_EQ(token, Token(TokenType::ID, "foo", 0, 0));
+    EXPECT_EQ(token, Token(TokType::ID, "foo", 0, 0));
     EXPECT_EQ(token.start, 0);
     EXPECT_EQ(token.end, 2);
     token = scanner.get_next();
-    EXPECT_EQ(token, Token(TokenType::ID, "bar", 1, 0));
+    EXPECT_EQ(token, Token(TokType::ID, "bar", 1, 0));
     EXPECT_EQ(token.start, 4);
     EXPECT_EQ(token.end, 6);
 }
@@ -275,119 +275,119 @@ TEST(scanner_test, test_token_id_position_4) {
     std::string text = "foo\n\n\nbar";
     Scanner scanner(text);
     Token token = scanner.get_next();
-    EXPECT_EQ(token, Token(TokenType::ID, "foo", 0, 0));
+    EXPECT_EQ(token, Token(TokType::ID, "foo", 0, 0));
     token = scanner.get_next();
-    EXPECT_EQ(token, Token(TokenType::ID, "bar", 3, 0));
+    EXPECT_EQ(token, Token(TokType::ID, "bar", 3, 0));
 }
 
 TEST(scanner_test, test_token_id_position_5) {
     std::string text = "foo\n\n\nbar fizz";
     Scanner scanner(text);
     Token token = scanner.get_next();
-    EXPECT_EQ(token, Token(TokenType::ID, "foo", 0, 0));
+    EXPECT_EQ(token, Token(TokType::ID, "foo", 0, 0));
     token = scanner.get_next();
-    EXPECT_EQ(token, Token(TokenType::ID, "bar", 3, 0));
+    EXPECT_EQ(token, Token(TokType::ID, "bar", 3, 0));
     token = scanner.get_next();
-    EXPECT_EQ(token, Token(TokenType::ID, "fizz", 3, 4));
+    EXPECT_EQ(token, Token(TokType::ID, "fizz", 3, 4));
 }
 
 TEST(scanner_test, test_token_num_position_1) {
     std::string text = "123";
     Scanner scanner(text);
     Token token = scanner.get_next();
-    EXPECT_EQ(token, Token(TokenType::NUM, 123, 0, 0));
+    EXPECT_EQ(token, Token(TokType::NUM, 123, 0, 0));
 }
 
 TEST(scanner_test, test_token_num_position_2) {
     std::string text = "123\n\n\n456";
     Scanner scanner(text);
     Token token = scanner.get_next();
-    EXPECT_EQ(token, Token(TokenType::NUM, 123, 0, 0));
+    EXPECT_EQ(token, Token(TokType::NUM, 123, 0, 0));
     token = scanner.get_next();
-    EXPECT_EQ(token, Token(TokenType::NUM, 456, 3, 0));
+    EXPECT_EQ(token, Token(TokType::NUM, 456, 3, 0));
 }
 
 TEST(scanner_test, test_token_num_position_3) {
     std::string text = "123\n\n\n456 789";
     Scanner scanner(text);
     Token token = scanner.get_next();
-    EXPECT_EQ(token, Token(TokenType::NUM, 123, 0, 0));
+    EXPECT_EQ(token, Token(TokType::NUM, 123, 0, 0));
     token = scanner.get_next();
-    EXPECT_EQ(token, Token(TokenType::NUM, 456, 3, 0));
+    EXPECT_EQ(token, Token(TokType::NUM, 456, 3, 0));
     token = scanner.get_next();
-    EXPECT_EQ(token, Token(TokenType::NUM, 789, 3, 4));
+    EXPECT_EQ(token, Token(TokType::NUM, 789, 3, 4));
 }
 
 TEST(scanner_test, test_token_num_position_4) {
     std::string text = "123 456       789";
     Scanner scanner(text);
     Token token = scanner.get_next();
-    EXPECT_EQ(token, Token(TokenType::NUM, 123, 0, 0));
+    EXPECT_EQ(token, Token(TokType::NUM, 123, 0, 0));
     token = scanner.get_next();
-    EXPECT_EQ(token, Token(TokenType::NUM, 456, 0, 4));
+    EXPECT_EQ(token, Token(TokType::NUM, 456, 0, 4));
     token = scanner.get_next();
-    EXPECT_EQ(token, Token(TokenType::NUM, 789, 0, 14));
+    EXPECT_EQ(token, Token(TokType::NUM, 789, 0, 14));
 }
 
 TEST(scanner_test, test_token_keyword_position_1) {
     std::string text = "struct";
     Scanner scanner(text);
     Token token = scanner.get_next();
-    EXPECT_EQ(token, Token(TokenType::STRUCT, 0, 0));
+    EXPECT_EQ(token, Token(TokType::STRUCT, 0, 0));
 }
 
 TEST(scanner_test, test_token_keyword_position_2) {
     std::string text = "struct fun";
     Scanner scanner(text);
     Token token = scanner.get_next();
-    EXPECT_EQ(token, Token(TokenType::STRUCT, 0, 0));
+    EXPECT_EQ(token, Token(TokType::STRUCT, 0, 0));
     token = scanner.get_next();
-    EXPECT_EQ(token, Token(TokenType::FUN, 0, 7));
+    EXPECT_EQ(token, Token(TokType::FUN, 0, 7));
 }
 
 TEST(scanner_test, test_token_keyword_position_3) {
     std::string text = "struct\n\n\nfun";
     Scanner scanner(text);
     Token token = scanner.get_next();
-    EXPECT_EQ(token, Token(TokenType::STRUCT, 0, 0));
+    EXPECT_EQ(token, Token(TokType::STRUCT, 0, 0));
     token = scanner.get_next();
-    EXPECT_EQ(token, Token(TokenType::FUN, 3, 0));
+    EXPECT_EQ(token, Token(TokType::FUN, 3, 0));
 }
 
 TEST(scanner_test, test_token_special_position_1) {
     std::string text = "+";
     Scanner scanner(text);
     Token token = scanner.get_next();
-    EXPECT_EQ(token, Token(TokenType::PLUS, 0, 0));
+    EXPECT_EQ(token, Token(TokType::PLUS, 0, 0));
 }
 
 TEST(scanner_test, test_token_special_position_2) {
     std::string text = "+    -";
     Scanner scanner(text);
     Token token = scanner.get_next();
-    EXPECT_EQ(token, Token(TokenType::PLUS, 0, 0));
+    EXPECT_EQ(token, Token(TokType::PLUS, 0, 0));
     token = scanner.get_next();
-    EXPECT_EQ(token, Token(TokenType::MINUS, 0, 5));
+    EXPECT_EQ(token, Token(TokType::MINUS, 0, 5));
 }
 
 TEST(scanner_test, test_token_special_position_3) {
     std::string text = "+\n\n\n-";
     Scanner scanner(text);
     Token token = scanner.get_next();
-    EXPECT_EQ(token, Token(TokenType::PLUS, 0, 0));
+    EXPECT_EQ(token, Token(TokType::PLUS, 0, 0));
     token = scanner.get_next();
-    EXPECT_EQ(token, Token(TokenType::MINUS, 3, 0));
+    EXPECT_EQ(token, Token(TokType::MINUS, 3, 0));
 }
 
 TEST(scanner_test, test_token_special_position_4) {
     std::string text = "+\n\n\n--++";
     Scanner scanner(text);
     Token token = scanner.get_next();
-    EXPECT_EQ(token, Token(TokenType::PLUS, 0, 0));
+    EXPECT_EQ(token, Token(TokType::PLUS, 0, 0));
     token = scanner.get_next();
-    EXPECT_EQ(token, Token(TokenType::DEC, 3, 0));
+    EXPECT_EQ(token, Token(TokType::DEC, 3, 0));
     token = scanner.get_next();
-    EXPECT_EQ(token, Token(TokenType::INC, 3, 2));
+    EXPECT_EQ(token, Token(TokType::INC, 3, 2));
 }
 
 TEST(scanner_test, test_token_position_complex) {

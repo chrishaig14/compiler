@@ -4,13 +4,13 @@
 
 #include "UnexpectedToken.h"
 
-UnexpectedToken::UnexpectedToken(Token token, const std::vector<TokenType>& expected_tokens) : std::runtime_error(
+UnexpectedToken::UnexpectedToken(Token token, const std::vector<TokType>& expected_tokens) : std::runtime_error(
         this->make_message(token, expected_tokens)) {
     this->token = token;
     this->expected_tokens = expected_tokens;
 }
 
-std::string UnexpectedToken::make_message(Token token, const std::vector<TokenType>& expected_tokens) {
+std::string UnexpectedToken::make_message(Token token, const std::vector<TokType>& expected_tokens) {
     std::string message;
     std::string expected_strings;
     if (expected_tokens.size() > 1) {

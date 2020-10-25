@@ -9,7 +9,7 @@
 #include <map>
 #include <iostream>
 
-enum class TokenType {
+enum class TokType {
     COMMA,
     DOT,
     SEMICOLON,
@@ -56,13 +56,13 @@ enum class TokenType {
     END, RARROW, TRUE, FALSE, QUESTION, NONE, DOUBLE_COLON, HASH, ARROBA, CLASS
 };
 
-extern std::map<TokenType, std::string> TOKEN_STRINGS;
+extern std::map<TokType, std::string> TOKEN_STRINGS;
 
 void initialize_token_strings();
 
 class Token {
 public:
-    TokenType type;
+    TokType type;
     std::string str;
     int num;
     int line, column;
@@ -71,11 +71,11 @@ public:
 
     Token();
 
-    Token(TokenType type, int line, int column);
+    Token(TokType type, int line, int column);
 
-    Token(TokenType type, std::string str, int line, int column);
+    Token(TokType type, std::string str, int line, int column);
 
-    Token(TokenType type, int num, int line, int column);
+    Token(TokType type, int num, int line, int column);
 
     bool operator==(const Token& other) const;
 

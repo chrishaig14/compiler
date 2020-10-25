@@ -13,7 +13,7 @@
 #include <iostream>
 #include "UnexpectedToken.h"
 
-extern std::map<TokenType, OpType> TOKEN_TO_OP;
+extern std::map<TokType, OpType> TOKEN_TO_OP;
 
 class Parser {
     std::vector<Token> tokens;
@@ -22,7 +22,7 @@ class Parser {
 public:
     Parser(std::vector<Token>& tokens);
 
-    bool match(TokenType type);
+    bool match(TokType type);
 
     Node* parse_class_literal();
 
@@ -64,7 +64,7 @@ public:
 
     ReturnNode* parse_return();
 
-    Token expect_token(TokenType token_type);
+    Token expect_token(TokType token_type);
 
     TypeNode* parse_type_node();
 

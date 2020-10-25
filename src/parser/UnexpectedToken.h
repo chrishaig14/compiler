@@ -12,11 +12,11 @@
 
 class UnexpectedToken : public std::runtime_error {
     Token token;
-    std::vector<TokenType> expected_tokens;
+    std::vector<TokType> expected_tokens;
 public:
-    UnexpectedToken(Token token, const std::vector<TokenType>& expected_tokens);
+    UnexpectedToken(Token token, const std::vector<TokType>& expected_tokens);
 
-    std::string make_message(Token token, const std::vector<TokenType>& expected_tokens);
+    std::string make_message(Token token, const std::vector<TokType>& expected_tokens);
 
     friend std::ostream& operator<<(std::ostream& os, const UnexpectedToken& unexpected_token);
 };
