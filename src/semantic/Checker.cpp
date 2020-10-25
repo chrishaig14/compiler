@@ -107,6 +107,15 @@ void Checker::visit(IdNode& n) {
         }
     } else {
         symbol_info.type = this->scope->get(n.identifier);
+        ObjectTypeNode* otn = TO_OBJECT_TYPE(symbol_info.type);
+        if (otn != nullptr) {
+            if (otn->identifier == "Option") {
+                if (this->scope->get_not_none(n.identifier)) {
+                    symbol_info.type = otn->type_parameters[0];
+                }
+            }
+
+        }
         if (symbol_info.type->is_function()) {
             symbol_info.is_function = true;
             symbol_info.is_method = false;
@@ -188,20 +197,27 @@ void Checker::visit(AssignmentNode& n) {
 
     auto actual_type = TO_OBJECT_TYPE(linfo.type);
     IdNode* lid = TO_ID(n.lvalue);
-    if (lid != nullptr) {
-        if (actual_type->identifier == "Option") {
-            if (expression_type.type->equal(actual_type->type_parameters[0])) {
-                std::cout << "p cant be none" << std::endl;
-                this->scope->set_not_none(lid->identifier, true);
-            } else {
-                std::cout << "p may be none" << std::endl;
-                this->scope->set_not_none(lid->identifier, false);
+    if (lid != nullptr && actual_type->identifier == "Option") {
+        // special treatment if we are assigning to an id of a variable of type Option[t]
+        if (expression_type.type->equal(actual_type->type_parameters[0])) {
+            std::cout << "p cant be none" << std::endl;
+            this->scope->set_not_none(lid->identifier, true);
+        } else {
+            if (!linfo.type->equal(expression_type.type)) {
+                auto foo = TO_OBJECT_TYPE(expression_type.type);
+                if (foo->identifier != "NoneType") {
+                    throw AssignmentTypeError(linfo.type, expression_type.type);
+                }
+                // assigning none, ok
             }
+            // type matches exactly, no proble
+            std::cout << "p may be none" << std::endl;
+            this->scope->set_not_none(lid->identifier, false);
         }
     } else {
         if (!linfo.type->equal(expression_type.type)) {
-            auto actual_type = TO_OBJECT_TYPE(linfo.type);
             if (actual_type->identifier == "Option") {
+                // if type doesn't match exactly, we may be assigning to an Option[t]
                 if (!actual_type->type_parameters[0]->equal(expression_type.type)) {
                     auto foo = TO_OBJECT_TYPE(expression_type.type);
                     if (foo->identifier != "NoneType") {
@@ -209,10 +225,13 @@ void Checker::visit(AssignmentNode& n) {
                     }
                 }
             } else {
+                // if it's not Option[t], then it's an error
                 throw AssignmentTypeError(linfo.type, expression_type.type);
             }
         }
+        // else, type matches don't do anything
     }
+
     SymbolInfo symbol_info;
     this->rv = symbol_info;
 }
@@ -766,7 +785,7 @@ bool Checker::can_assign(TypeNode* from, TypeNode* to) {
         }
         return true;
     } else if (to_object->identifier == "Union") {
-        for(auto type_param: to_object->type_parameters){
+        for (auto type_param: to_object->type_parameters) {
             if (type_param->equal(from)) {
                 return true;
             }
@@ -796,7 +815,7 @@ bool Checker::can_assign_generic(TypeNode* from, TypeNode* to, std::vector<std::
         }
         return true;
     } else if (to_object->identifier == "Union") {
-        for(auto type_param: to_object->type_parameters){
+        for (auto type_param: to_object->type_parameters) {
             if (type_param->equal(from)) {
                 return true;
             }
