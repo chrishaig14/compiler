@@ -33,12 +33,12 @@ Checker::Checker(SymbolTable* globals, ClassTable* class_table) {
     this->scopes["global"] = this->scope;
     auto int_class_info = new ClassInfo();
     int_class_info->class_name = "Integer";
-    int_class_info->methods["str"] = new FunctionTypeNode({}, T_STRING);
+    int_class_info->methods["str"] = FUNCTION_TYPE({}, T_STRING);
 
     auto list_class_info = new ClassInfo();
     list_class_info->class_name = "List";
-    list_class_info->methods["len"] = new FunctionTypeNode({}, T_INT);
-    list_class_info->methods["map"] = new FunctionTypeNode({FUNCTION_TYPE({ TYPE("t", {}) }, TYPE("b", {}))},
+    list_class_info->methods["len"] = FUNCTION_TYPE({}, T_INT);
+    list_class_info->methods["map"] = FUNCTION_TYPE({FUNCTION_TYPE({ TYPE("t", {}) }, TYPE("b", {}))},
                                                            T_LIST(TYPE("b", {})));
     list_class_info->type_parameters = {"t"};
 
@@ -48,7 +48,7 @@ Checker::Checker(SymbolTable* globals, ClassTable* class_table) {
 
     auto string_class_info = new ClassInfo();
     string_class_info->class_name = "String";
-    string_class_info->methods["len"] = new FunctionTypeNode({}, T_INT);
+    string_class_info->methods["len"] = FUNCTION_TYPE({}, T_INT);
     this->class_table->set("String", string_class_info);
     this->replace_me = false;
     this->class_table->set("Option",
@@ -239,7 +239,7 @@ void Checker::visit(MemberNode& n) {
                 this->rv.class_info = class_info;
 
                 FunctionTypeNode* ftn = TO_FUNCTION_TYPE(this->rv.symbol_info);
-                FunctionTypeNode* copy_ftn = new FunctionTypeNode(ftn->parameter_types, ftn->return_type);
+                FunctionTypeNode* copy_ftn = FUNCTION_TYPE(ftn->parameter_types, ftn->return_type);
                 std::vector<TypeNode*> tp;
                 for (auto tttp: this->rv.class_info->type_parameters) {
                     tp.push_back(TYPE(tttp, {}));
@@ -251,7 +251,7 @@ void Checker::visit(MemberNode& n) {
                 this->rv.is_a_method = false;
                 this->rv.is_a_class_method = true;
                 this->replace_me = true;
-                this->replacement = new IdNode(class_info->class_name + "." + n.child);
+                this->replacement = ID(class_info->class_name + "." + n.child);
                 return;
             } else {
                 throw std::runtime_error("Class " + class_info->class_name + " has no method " + n.child);
@@ -315,7 +315,7 @@ void Checker::visit(IfNode& n) {
     n.condition->accept(*this);
     BinopNode* bop = TO_BINOP(n.condition);
     if (bop != nullptr) {
-        if (bop->right->equal(new NoneNode())) {
+        if (bop->right->equal(NONE)) {
             if (bop->op == OpType::NEQ) {
                 IdNode* left = TO_ID(bop->left);
                 NoneNode* right = TO_NONE(bop->right);
@@ -383,7 +383,7 @@ void Checker::visit(BinopNode& n) {
             auto right = TO_OBJECT_TYPE(right_info.symbol_info);
             if (right != nullptr) {
                 if (left->identifier == "Option" && right->identifier == "NoneType") {
-                    semantic_info.symbol_info = new ObjectTypeNode("Boolean", {});
+                    semantic_info.symbol_info = TYPE("Boolean", {});
                 }
             }
         } else {
@@ -392,7 +392,7 @@ void Checker::visit(BinopNode& n) {
                         "Cannot perform binary op betweeen types " + left_info.symbol_info->to_string() + " and " +
                         right_info.symbol_info->to_string());
             }
-            semantic_info.symbol_info = new ObjectTypeNode("Boolean", {});
+            semantic_info.symbol_info = TYPE("Boolean", {});
         }
     } else {
         auto left = TO_OBJECT_TYPE(left_info.symbol_info);
@@ -401,13 +401,13 @@ void Checker::visit(BinopNode& n) {
         auto rtype = right->identifier;
         bool ok = false;
         if (ltype == "Integer" && rtype == "Integer") {
-            semantic_info.symbol_info = new ObjectTypeNode("Integer", {});
+            semantic_info.symbol_info = TYPE("Integer", {});
             semantic_info.is_a_function = false;
             ok = true;
         }
         if (ltype == "String" && rtype == "String") {
             if (n.op == OpType::ADD) {
-                semantic_info.symbol_info = new ObjectTypeNode("String", {});
+                semantic_info.symbol_info = TYPE("String", {});
                 semantic_info.is_a_function = false;
                 ok = true;
             }
@@ -620,17 +620,17 @@ void Checker::visit(CallNode& n) {
         // where instead of calling object.method(args), we call <class>.method(object, args)
         MemberNode* member_node = TO_MEMBER(n.function);
         assert(member_node != nullptr);
-        n.function = new IdNode(this->rv.class_info->class_name + "." + member_node->child);
+        n.function = ID(this->rv.class_info->class_name + "." + member_node->child);
         this->replace_me = false;
         object_node = member_node->parent;
         is_a_method = true;
     } else if (this->rv.is_a_class_method) {
         MemberNode* member_node = TO_MEMBER(n.function);
         assert(member_node != nullptr);
-        n.function = new IdNode(this->rv.class_info->class_name + "." + member_node->child);
+        n.function = ID(this->rv.class_info->class_name + "." + member_node->child);
         this->replace_me = false;
         FunctionTypeNode* ftn = TO_FUNCTION_TYPE(this->rv.symbol_info);
-        FunctionTypeNode* copy_ftn = new FunctionTypeNode(ftn->parameter_types, ftn->return_type);
+        FunctionTypeNode* copy_ftn = FUNCTION_TYPE(ftn->parameter_types, ftn->return_type);
         copy_ftn->parameter_types.insert(copy_ftn->parameter_types.begin(), TYPE(this->rv.class_info->class_name, {}));
         retv.symbol_info = copy_ftn;
         object_node = member_node->parent;
@@ -859,7 +859,7 @@ TypeNode* make_type(TypeNode* original, std::map<std::string, TypeNode*>& replac
             TypeNode* new_tp = make_type(tp, replacements);
             new_type_params.push_back(new_tp);
         }
-        new_type = new ObjectTypeNode(type_identifier, new_type_params);
+        new_type = TYPE(type_identifier, new_type_params);
     } else {
         FunctionTypeNode* ftn = TO_FUNCTION_TYPE(original);
         VectorOfTypes new_param_types;
@@ -868,7 +868,7 @@ TypeNode* make_type(TypeNode* original, std::map<std::string, TypeNode*>& replac
             new_param_types.push_back(new_pt);
         }
         TypeNode* new_return_type = make_type(ftn->return_type, replacements);
-        new_type = new FunctionTypeNode(new_param_types, new_return_type);
+        new_type = FUNCTION_TYPE(new_param_types, new_return_type);
 //        throw std::runtime_error("Making non object concrete type template!");
     }
     return new_type;
@@ -1004,7 +1004,7 @@ void Checker::visit(ListNode& node) {
 
 void Checker::visit(BooleanNode& node) {
     SymbolInfo semantic_info;
-    semantic_info.symbol_info = new ObjectTypeNode("Boolean", {});
+    semantic_info.symbol_info = TYPE("Boolean", {});
     semantic_info.is_a_function = false;
     this->rv = semantic_info;
 }
@@ -1026,14 +1026,14 @@ void Checker::visit(WhileNode& node) {
 
 void Checker::visit(NumberNode& node) {
     SymbolInfo semanticInfo;
-    semanticInfo.symbol_info = new ObjectTypeNode("Integer", {});
+    semanticInfo.symbol_info = TYPE("Integer", {});
     semanticInfo.is_a_function = false;
     this->rv = semanticInfo;
 }
 
 void Checker::visit(StringNode& node) {
     SymbolInfo semanticInfo;
-    semanticInfo.symbol_info = new ObjectTypeNode("String", {});
+    semanticInfo.symbol_info = TYPE("String", {});
     semanticInfo.is_a_function = false;
     this->rv = semanticInfo;
 }
@@ -1089,7 +1089,7 @@ void Checker::visit(TernaryNode& node) {
         throw std::runtime_error(
                 "True case and false case type don't match: " + true_case.symbol_info->to_string() + " != " +
                 false_case.symbol_info->to_string());
-//        semanticInfo.symbol_info = new ObjectTypeNode("Union", {true_case.symbol_info, false_case.symbol_info});
+//        semanticInfo.symbol_info = TYPE("Union", {true_case.symbol_info, false_case.symbol_info});
     } else {
         semanticInfo.symbol_info = true_case.symbol_info;
     }
@@ -1098,7 +1098,7 @@ void Checker::visit(TernaryNode& node) {
 
 void Checker::visit(NoneNode& node) {
     SymbolInfo semanticInfo;
-    semanticInfo.symbol_info = new ObjectTypeNode("NoneType", {});
+    semanticInfo.symbol_info = TYPE("NoneType", {});
     semanticInfo.is_a_function = false;
     this->rv = semanticInfo;
 }
