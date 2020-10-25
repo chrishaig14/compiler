@@ -7,8 +7,8 @@
 #include "TypeClassInfo.h"
 
 bool function_is_generic(FunctionTypeNode& ft) {
-    for (int i = 0; i < ft.parameter_types.size(); i++) {
-        if (is_generic(ft.parameter_types[i])) {
+    for (auto param_type: ft.parameter_types) {
+        if (is_generic(param_type)) {
             return true;
             break;
         }
@@ -146,8 +146,8 @@ void Checker::visit(DeclarationNode& n) {
                 }
             } else if (actual_type->identifier == "Union") {
                 bool ok = false;
-                for (int i = 0; i < actual_type->type_parameters.size(); i++) {
-                    if (actual_type->type_parameters[i]->equal(expression_info.type)) {
+                for (auto type_param: actual_type->type_parameters) {
+                    if (type_param->equal(expression_info.type)) {
                         ok = true;
                         break;
                     }
@@ -425,14 +425,14 @@ bool is_generic(TypeNode* t) {
             assert(o->type_parameters.size() == 0);
             return true;
         }
-        for (int i = 0; i < o->type_parameters.size(); i++) {
-            if (is_generic(o->type_parameters[i])) return true;
+        for (auto type_param: o->type_parameters) {
+            if (is_generic(type_param)) return true;
         }
     } else {
         FunctionTypeNode* fo = TO_FUNCTION_TYPE(t);
         if (fo != nullptr) {
-            for (int i = 0; i < fo->parameter_types.size(); i++) {
-                if (is_generic(fo->parameter_types[i])) return true;
+            for (auto param_type: fo->parameter_types) {
+                if (is_generic(param_type)) return true;
             }
             if (is_generic(fo->return_type)) return true;
 
@@ -612,11 +612,10 @@ void Checker::visit(CallNode& n) {
             throw std::runtime_error("Calling function with wrong number of arguments");
         }
         VectorOfTypes arg_types;
-        for (int i = 0; i < n.arguments.size(); i++) {
-            Node* arg = n.arguments[i];
+        for (auto& arg: n.arguments) {
             arg->accept(*this);
             if (this->replace_me) {
-                n.arguments[i] = replacement;
+                arg = replacement;
                 this->replace_me = false;
             }
             TypeNode* arg_type = this->rv.type;
@@ -767,8 +766,8 @@ bool Checker::can_assign(TypeNode* from, TypeNode* to) {
         }
         return true;
     } else if (to_object->identifier == "Union") {
-        for (int i = 0; i < to_object->type_parameters.size(); i++) {
-            if (to_object->type_parameters[i]->equal(from)) {
+        for(auto type_param: to_object->type_parameters){
+            if (type_param->equal(from)) {
                 return true;
             }
         }
@@ -797,8 +796,8 @@ bool Checker::can_assign_generic(TypeNode* from, TypeNode* to, std::vector<std::
         }
         return true;
     } else if (to_object->identifier == "Union") {
-        for (int i = 0; i < to_object->type_parameters.size(); i++) {
-            if (to_object->type_parameters[i]->equal(from)) {
+        for(auto type_param: to_object->type_parameters){
+            if (type_param->equal(from)) {
                 return true;
             }
         }
@@ -1085,8 +1084,8 @@ void Checker::visit(ClassNode& node) {
         this->enter_scope(method.first);
 
         std::vector<TypeNode*> tp;
-        for (int i = 0; i < node.type_parameters.size(); i++) {
-            tp.push_back(TYPE(node.type_parameters[i], {}));
+        for (auto type_param: node.type_parameters) {
+            tp.push_back(TYPE(type_param, {}));
         }
         this->scope->set("this", TYPE(node.class_name, tp));
         this->leave_scope();
