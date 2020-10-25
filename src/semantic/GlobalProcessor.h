@@ -89,13 +89,7 @@ public:
 
     void visit(NoneNode& node) override;
 
-    void add_builtin(std::string name, CodeBuiltin* builtin);
-
     void visit(EmptyListNode& node) override;
-
-    void call(std::string function_name, std::string function_type, void (* function)(ObjectStack&));
-
-    void call(std::string function_name, FunctionTypeNode* ftype, void (* function)(ObjectStack&));
 
     void visit(ClassNode& node) override;
 
