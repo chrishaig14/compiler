@@ -147,6 +147,7 @@ Node* Parser::parse_or_expression() {
 Node* Parser::parse_and_expression() {
     Node* left = this->parse_bool_expression();
     if (this->match(TokType::AND)) {
+        this->next();
         Node* right = this->parse_bool_expression();
         BinopNode* node = BIN(OpType::AND, left, right);
         node->start = left->start;
