@@ -21,14 +21,19 @@ void compile_and_run(std::string text) {
         exit(1);
     }
     std::vector<Builtin> builtins;
-
-    GlobalProcessor gp(builtins);
-    gp.visit(*program);
-    Checker checker(gp.globals, gp.class_table);
-    checker.function_table = gp.function_table;
-    checker.visit(*program);
     Translator translator;
-    program->accept(translator);
+
+    try {
+        GlobalProcessor gp(builtins);
+        gp.visit(*program);
+        Checker checker(gp.globals, gp.class_table);
+        checker.function_table = gp.function_table;
+        checker.visit(*program);
+        program->accept(translator);
+    }catch(const std::runtime_error& e){
+        std::cerr << "THERE WAS A SEMANTIC ERROR: "<< e.what() << std::endl;
+        exit(1);
+    }
     ObjectStack stack;
     StructProtos structs;
     CodeLabel translated_code = translator.code;
@@ -38,7 +43,12 @@ void compile_and_run(std::string text) {
     Environment* global_env = loader.global_env;
     CodeObject* main_function = dynamic_cast<CodeObject*>(global_env->get("main"));
     CodeRunner code_runner(main_function->user->code, structs, stack, global_env);
-    code_runner.run();
+    try {
+        code_runner.run();
+    }catch(const std::runtime_error& e){
+        std::cerr << "THERE WAS A RUNTIME ERROR: "<< e.what() << std::endl;
+        exit(1);
+    }
 }
 
 int main(int argc, char* argv[]) {
