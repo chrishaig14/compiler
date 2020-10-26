@@ -381,8 +381,8 @@ void Checker::visit(BinopNode& n) {
                         "Cannot perform binary op betweeen types " + left_info.type->to_string() + " and " +
                         right_info.type->to_string());
             }
-            symbol_info.type = TYPE("Boolean", {});
         }
+        symbol_info.type = TYPE("Boolean", {});
     } else {
         auto left = TO_OBJECT_TYPE(left_info.type);
         auto right = TO_OBJECT_TYPE(right_info.type);

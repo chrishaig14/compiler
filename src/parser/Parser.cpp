@@ -17,6 +17,7 @@ std::map<TokType, OpType> TOKEN_TO_OP = {
         {TokType::GT,    OpType::GT},
         {TokType::LEQ,   OpType::LEQ},
         {TokType::GEQ,   OpType::GEQ},
+        {TokType::EQ,   OpType::EQ},
         {TokType::NEQ,   OpType::NEQ},
 };
 
