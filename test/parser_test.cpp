@@ -175,6 +175,16 @@ TEST(parser_test, if_x_empty_then) {
     COMPLETE_TEST;
 }
 
+TEST(parser_test, if_with_else) {
+    std::string text = "if(x){}else{}";
+    Scanner scanner(text);
+    std::vector<Token> tokens = scanner.scan_all();
+    Parser parser(tokens);
+    IfNode* node = parser.parse_if();
+    auto expected_node = IFELSE(ID("x"), new BlockNode({}), new BlockNode({}));
+    COMPLETE_TEST;
+}
+
 TEST(parser_test, if_x_non_empty_then) {
     std::string text = "if(x){x=a+b; x = y;}";
     Scanner scanner(text);
@@ -731,7 +741,7 @@ TEST(parser_test, parse_list_empty_no_type_throws_error) {
     try {
         Node* node = parser.parse_expression();
         FAIL() << "Did not throw an error";
-    }catch(...){
+    } catch (...) {
 
     }
 }

@@ -8,7 +8,9 @@ void IfNode::accept(Visitor& visitor) {
     visitor.visit(*this);
 }
 
-IfNode::IfNode(Node* condition, BlockNode* then) : condition(condition), then(then) {}
+IfNode::IfNode(Node* condition, BlockNode* then) : condition(condition), then(then) { this->_else = nullptr; }
+
+IfNode::IfNode(Node* condition, BlockNode* then, BlockNode* _else) : condition(condition), then(then), _else(_else) {}
 
 bool IfNode::equal(Node* other) const {
     auto other_ptr = dynamic_cast<IfNode*>(other);

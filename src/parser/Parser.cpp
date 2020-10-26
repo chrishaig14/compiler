@@ -57,6 +57,11 @@ IfNode* Parser::parse_if() {
     this->expect_token(TokType::IF);
     Node* condition = this->parse_expression();
     BlockNode* body = this->parse_possibly_empty_block();
+    if (this->match(TokType::ELSE)){
+        this->next();
+        BlockNode* _else = this->parse_possibly_empty_block();
+        return IFELSE(condition, body, _else);
+    }
     IfNode* node = IF(condition, body);
     return node;
 }

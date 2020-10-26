@@ -113,10 +113,19 @@ void Translator::visit(IfNode& node) {
     out.insert(out.end(), condition_code.begin(), condition_code.end());
     node.then->accept(*this);
     CodeLabel then_code = this->code;
-    out.push_back(LC("", I_JUMPF(then_code.size() + 3)));
+    bool has_else = node._else != nullptr;
+    out.push_back(LC("", I_JUMPF(then_code.size() + 3 + (has_else?1:0))));
     out.push_back(LC("", new EnterScope("if")));
     out.insert(out.end(), then_code.begin(), then_code.end());
     out.push_back(LC("", new LeaveScope("if")));
+    if (has_else) {
+        node._else->accept(*this);
+        CodeLabel else_code = this->code;
+        out.push_back(LC("", I_JUMP(else_code.size() + 3)));
+        out.push_back(LC("", new EnterScope("else")));
+        out.insert(out.end(), else_code.begin(), else_code.end());
+        out.push_back(LC("", new LeaveScope("else")));
+    }
     this->code = out;
 }
 

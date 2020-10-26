@@ -15,8 +15,11 @@ class IfNode : public Node {
 public:
     Node* condition;
     BlockNode* then;
+    BlockNode* _else;
 
     IfNode(Node* condition, BlockNode* then);
+
+    IfNode(Node* condition, BlockNode* then, BlockNode* _else);
 
     void accept(Visitor& visitor) override;
 
@@ -27,6 +30,7 @@ public:
     ~IfNode() {
         delete this->condition;
         delete this->then;
+        delete this->_else;
     }
 
     json to_json() const override {

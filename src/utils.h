@@ -18,6 +18,7 @@ typedef std::vector<Instruction*> Code;
 #define BIN(op, left, right) new BinopNode(op, left, right)
 #define MEM(parent, child) new MemberNode(parent, child)
 #define IF(condition, then) new IfNode(condition, then)
+#define IFELSE(condition, then, _else) new IfNode(condition, then, _else)
 #define LST(list) new ListNode(list)
 #define STR(str) new StringNode(str)
 #define TERNARY(a, b, c) new TernaryNode(a,b,c)
@@ -81,6 +82,7 @@ typedef std::vector<std::pair<std::string, Instruction*>> CodeLabel;
 #define TO_CALL(x) dynamic_cast<CallNode*>(x)
 #define TO_BINOP(x) dynamic_cast<BinopNode*>(x)
 #define TO_NONE(x) dynamic_cast<NoneNode*>(x)
+
 std::ostream& operator<<(std::ostream& out, const CodeLabel v);
 
 bool operator==(const CodeLabel a, const CodeLabel b);

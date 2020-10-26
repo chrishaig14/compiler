@@ -321,6 +321,11 @@ void Checker::visit(MemberNode& n) {
 void Checker::visit(IfNode& n) {
     SymbolInfo symbol_info;
     n.condition->accept(*this);
+    SymbolInfo condition_info = this->rv;
+    if (!condition_info.type->equal(T_BOOL)) {
+        throw std::runtime_error("Expected a Boolean expression as a condition for if statement!, got " +
+                                 condition_info.type->to_string());
+    }
     BinopNode* bop = TO_BINOP(n.condition);
     if (bop != nullptr) {
         if (bop->right->equal(new NoneNode())) {
@@ -346,15 +351,15 @@ void Checker::visit(IfNode& n) {
             }
         }
     }
-    SymbolInfo condition_info = this->rv;
-    if (!condition_info.type->equal(T_BOOL)) {
-        throw std::runtime_error("Expected a Boolean expression as a condition for if statement!, got " +
-                                 condition_info.type->to_string());
-    }
     this->enter_scope("if");
     n.then->accept(*this);
-    SymbolInfo then_info = this->rv;
     this->leave_scope();
+
+    if (n._else != nullptr) {
+        this->enter_scope("else");
+        n._else->accept(*this);
+        this->leave_scope();
+    }
     this->rv = symbol_info;
 }
 
