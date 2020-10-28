@@ -15,11 +15,10 @@ class IfNode : public Node {
 public:
     Node* condition;
     BlockNode* then;
-    BlockNode* _else;
+    BlockNode* selse;
+    std::vector<std::pair<Node*, BlockNode*>> elifs;
 
-    IfNode(Node* condition, BlockNode* then);
-
-    IfNode(Node* condition, BlockNode* then, BlockNode* _else);
+    IfNode(Node* condition, BlockNode* then, const std::vector<std::pair<Node*, BlockNode*>>& elifs, BlockNode* selse);
 
     void accept(Visitor& visitor) override;
 
@@ -30,7 +29,7 @@ public:
     ~IfNode() {
         delete this->condition;
         delete this->then;
-        delete this->_else;
+        delete this->selse;
     }
 
     json to_json() const override {

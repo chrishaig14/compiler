@@ -8,10 +8,6 @@ void IfNode::accept(Visitor& visitor) {
     visitor.visit(*this);
 }
 
-IfNode::IfNode(Node* condition, BlockNode* then) : condition(condition), then(then) { this->_else = nullptr; }
-
-IfNode::IfNode(Node* condition, BlockNode* then, BlockNode* _else) : condition(condition), then(then), _else(_else) {}
-
 bool IfNode::equal(Node* other) const {
     auto other_ptr = dynamic_cast<IfNode*>(other);
     if (other_ptr == nullptr) return false;
@@ -21,3 +17,9 @@ bool IfNode::equal(Node* other) const {
 bool IfNode::operator==(IfNode& other) const {
     return this->condition->equal(other.condition);
 }
+
+IfNode::IfNode(Node* condition, BlockNode* then,
+               const std::vector<std::pair<Node*, BlockNode*>>& elifs, BlockNode* selse) : condition(condition),
+                                                                                            then(then), selse(selse),
+                                                                                            elifs(elifs) {}
+

@@ -23,6 +23,7 @@ void initialize_tokens() {
     TOKEN_KEYWORDS["if"] = TokType::IF;
     TOKEN_KEYWORDS["struct"] = TokType::STRUCT;
     TOKEN_KEYWORDS["else"] = TokType::ELSE;
+    TOKEN_KEYWORDS["elif"] = TokType::ELIF;
     TOKEN_KEYWORDS["for"] = TokType::FOR;
     TOKEN_KEYWORDS["var"] = TokType::VAR;
     TOKEN_KEYWORDS["return"] = TokType::RETURN;

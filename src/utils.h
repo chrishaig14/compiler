@@ -17,7 +17,7 @@ typedef std::vector<Instruction*> Code;
 #define NUM(num) new NumberNode(num)
 #define BIN(op, left, right) new BinopNode(op, left, right)
 #define MEM(parent, child) new MemberNode(parent, child)
-#define IF(condition, then) new IfNode(condition, then)
+#define IF(condition, then, elifs, selse) new IfNode(condition, then, elifs, selse)
 #define IFELSE(condition, then, _else) new IfNode(condition, then, _else)
 #define LST(list) new ListNode(list)
 #define STR(str) new StringNode(str)

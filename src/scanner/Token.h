@@ -43,6 +43,7 @@ enum class TokType {
     STRUCT,
     IF,
     ELSE,
+    ELIF,
     FOR,
     MOD,
     WHILE,

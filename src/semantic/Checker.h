@@ -147,6 +147,8 @@ public:
     void match_arguments_to_generic_function(FunctionTypeNode* function_type, VectorOfTypes arg_types);
 
     int null_check_type;
+
+    std::map<std::string, bool> process_condition(BinopNode* bop, std::string scope_name);
 };
 
 #endif //UNTITLED1_CHECKER_H

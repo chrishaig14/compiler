@@ -71,6 +71,7 @@ void initialize_token_strings() {
     TOKEN_STRINGS[TokType::EQ] = "equal ( == )";
     TOKEN_STRINGS[TokType::LT] = "less than ( < )";
     TOKEN_STRINGS[TokType::GT] = "greater than ( > )";
+    TOKEN_STRINGS[TokType::ELIF] = "elif";
     TOKEN_STRINGS[TokType::LEQ] = "less than or equal ( <= )";
     TOKEN_STRINGS[TokType::GEQ] = "greater than or equal ( >= )";
     TOKEN_STRINGS[TokType::NEQ] = "not equal ( != )";

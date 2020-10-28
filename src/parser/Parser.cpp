@@ -17,7 +17,7 @@ std::map<TokType, OpType> TOKEN_TO_OP = {
         {TokType::GT,    OpType::GT},
         {TokType::LEQ,   OpType::LEQ},
         {TokType::GEQ,   OpType::GEQ},
-        {TokType::EQ,   OpType::EQ},
+        {TokType::EQ,    OpType::EQ},
         {TokType::NEQ,   OpType::NEQ},
 };
 
@@ -57,12 +57,19 @@ IfNode* Parser::parse_if() {
     this->expect_token(TokType::IF);
     Node* condition = this->parse_expression();
     BlockNode* body = this->parse_possibly_empty_block();
-    if (this->match(TokType::ELSE)){
+    std::vector<std::pair<Node*, BlockNode*>> elifs;
+    while (this->match(TokType::ELIF)) {
         this->next();
-        BlockNode* _else = this->parse_possibly_empty_block();
-        return IFELSE(condition, body, _else);
+        Node* elif_condition = this->parse_expression();
+        BlockNode* elif_body = this->parse_possibly_empty_block();
+        elifs.push_back(std::pair<Node*, BlockNode*>(elif_condition, elif_body));
     }
-    IfNode* node = IF(condition, body);
+    BlockNode* _else = nullptr;
+    if (this->match(TokType::ELSE)) {
+        this->next();
+        _else = this->parse_possibly_empty_block();
+    }
+    IfNode* node = IF(condition, body, elifs, _else);
     return node;
 }
 

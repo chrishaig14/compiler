@@ -1,11 +1,14 @@
 fun main()->Integer{
-    var p : Option[Integer] = 5
-     if p != none {
-        var x = p.str()
-         p = 9
-         var z = p.str()
+    var y : Option[Integer] = 7
+    var y_val = y? it: 0;
+    if y == none {
+
+                print("y is equal to " + y_val.str())
     }
-    var z = 8
-    var y = p.str()
+    else {
+         var x = "Hello"
+         x = y_val.str()
+         print("y is none")
+    }
     return 0
 }
