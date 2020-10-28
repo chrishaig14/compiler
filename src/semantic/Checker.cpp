@@ -318,31 +318,6 @@ void Checker::visit(MemberNode& n) {
 
 }
 
-std::map<std::string, bool> Checker::process_condition(BinopNode* bop, std::string scope_name) {
-    std::map<std::string, bool> not_none;
-    if (bop != nullptr) {
-        if (bop->right->equal(new NoneNode())) {
-            if (bop->op == OpType::NEQ) {
-                IdNode* left = TO_ID(bop->left);
-                NoneNode* right = TO_NONE(bop->right);
-                if (left != nullptr && right != nullptr) {
-                    std::cout << "Cant be none: " << left->identifier << std::endl;
-                    not_none[left->identifier] = true;
-                }
-            }
-            if (bop->op == OpType::EQ) {
-                IdNode* left = TO_ID(bop->left);
-                NoneNode* right = TO_NONE(bop->right);
-                if (left != nullptr && right != nullptr) {
-                    std::cout << "MAY be none: " << left->identifier << std::endl;
-                    not_none[left->identifier] = false;
-                }
-            }
-        }
-    }
-    return not_none;
-}
-
 void Checker::visit(IfNode& n) {
     SymbolInfo symbol_info;
     n.condition->accept(*this);
@@ -356,12 +331,7 @@ void Checker::visit(IfNode& n) {
     }
     BinopNode* bop = TO_BINOP(n.condition);
 
-//    std::map<std::string, bool> not_nones = this->process_condition(bop, "if");
-
     this->enter_scope("if");
-//    for (auto v: not_nones) {
-//        this->scope->set_not_none(v.first, v.second);
-//    }
     n.then->accept(*this);
     this->leave_scope();
 
@@ -373,20 +343,12 @@ void Checker::visit(IfNode& n) {
             throw std::runtime_error("Expected a Boolean expression as a condition for elif statement!, got " +
                                      condition_info.type->to_string());
         }
-//        bop = TO_BINOP(n.elifs[i].first);
-//        auto new_not_nones = this->process_condition(bop, "elif");
-//        for(auto v: new_not_nones){
-//            not_nones[v.first] = v.second;
-//        }
         this->enter_scope("elif");
         n.elifs[i].second->accept(*this);
         this->leave_scope();
     }
     if (n.selse != nullptr) {
         this->enter_scope("else");
-//        for (auto v: not_nones) {
-//            this->scope->set_not_none(v.first, !v.second);
-//        }
         n.selse->accept(*this);
         this->leave_scope();
     }

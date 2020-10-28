@@ -148,7 +148,6 @@ public:
 
     int null_check_type;
 
-    std::map<std::string, bool> process_condition(BinopNode* bop, std::string scope_name);
 };
 
 #endif //UNTITLED1_CHECKER_H
