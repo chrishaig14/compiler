@@ -10,6 +10,7 @@
 #include "../nodes/nodes.h"
 #include "../instructions/Instruction.h"
 #include "../instructions/BinopInst.h"
+#include "../instructions/PopInst.h"
 #include "../instructions/CallInst.h"
 #include "../instructions/JumpIfNone.h"
 #include "../instructions/DeclareInst.h"

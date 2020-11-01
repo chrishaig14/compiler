@@ -45,6 +45,7 @@ void compile_and_run(std::string text) {
     CodeRunner code_runner(main_function->user->code, structs, stack, global_env);
     try {
         code_runner.run();
+        auto x = stack;
     }catch(const std::runtime_error& e){
         std::cerr << "THERE WAS A RUNTIME ERROR: "<< e.what() << std::endl;
         exit(1);

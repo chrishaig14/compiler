@@ -66,6 +66,7 @@ typedef std::map<std::string, std::map<std::string, Code>> StructProtos;
 #define I_MAKE_OBJECT(identifier, fields) new MakeObjectInst(identifier, fields)
 #define I_BIN(op) new BinopInst(op)
 #define I_RET new ReturnInst()
+#define I_POP new PopInst()
 #define I_JUMPF(offset) new JumpIfFalseInst(offset)
 #define I_JUMP(offset) new JumpInst(offset)
 #define LC(label, instruction) std::pair<std::string, Instruction*>(label, instruction)

@@ -2,6 +2,7 @@
 // Created by chris on 21/7/20.
 //
 
+#include <iostream>
 #include "ObjectStack.h"
 
 ObjectStack::ObjectStack() {

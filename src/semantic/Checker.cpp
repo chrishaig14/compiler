@@ -186,6 +186,13 @@ void Checker::visit(DeclarationNode& n) {
 }
 
 void Checker::visit(AssignmentNode& n) {
+    IdNode* lv = TO_ID(n.lvalue);
+    if (lv != nullptr) {
+        if (lv->identifier == "_"){
+            n.rvalue->accept(*this);
+            return;
+        }
+    }
     n.lvalue->accept(*this);
     SymbolInfo linfo = this->rv;
     n.rvalue->accept(*this);
@@ -715,6 +722,14 @@ void Checker::visit(BlockNode& program) {
     SymbolInfo symbol_info;
     for (auto n: program.nodes) {
         n->accept(*this);
+        CallNode* call = TO_CALL(n);
+        if (call != nullptr) {
+            // it's a function call
+            // if return value != NoneType, then force the return value
+            if (!this->rv.type->equal(TYPE("NoneType", {}))) {
+                throw std::runtime_error("You should use the return value of this function call!");
+            }
+        }
         SymbolInfo node_info = this->rv;
     }
     this->rv = symbol_info;

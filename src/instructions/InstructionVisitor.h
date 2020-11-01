@@ -62,10 +62,14 @@ class JumpIfNone;
 
 class PushNone;
 
+class PopInst;
+
 class InstructionVisitor {
 public:
 
     virtual void visit(CallInst& inst) = 0;
+
+    virtual void visit(PopInst& inst) = 0;
 
     virtual void visit(PushNone& inst) = 0;
 

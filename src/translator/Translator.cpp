@@ -14,10 +14,14 @@ void Translator::visit(AssignmentNode& node) {
     out.insert(out.end(), r_code.begin(), r_code.end());
 
     this->is_lvalue = true;
-    node.lvalue->accept(*this);
-    CodeLabel l_code = this->code;
-    out.insert(out.end(), l_code.begin(), l_code.end());
-
+    IdNode* ln = TO_ID(node.lvalue);
+    if (ln != nullptr && ln->identifier == "_") {
+        out.push_back(LC("", I_POP));
+    } else {
+        node.lvalue->accept(*this);
+        CodeLabel l_code = this->code;
+        out.insert(out.end(), l_code.begin(), l_code.end());
+    }
     this->code = out;
 }
 
@@ -114,19 +118,19 @@ void Translator::visit(IfNode& node) {
     node.then->accept(*this);
     CodeLabel then_code = this->code;
     bool has_else = node.selse != nullptr;
-    out.push_back(LC("a", I_JUMPF(then_code.size() + 3 + (has_else && node.elifs.size() == 0?1:0))));
+    out.push_back(LC("a", I_JUMPF(then_code.size() + 3 + (has_else && node.elifs.size() == 0 ? 1 : 0))));
     out.push_back(LC("", new EnterScope("if")));
     out.insert(out.end(), then_code.begin(), then_code.end());
     out.push_back(LC("", new LeaveScope("if")));
 
-    for(int i = 0; i < node.elifs.size(); i++){
+    for (int i = 0; i < node.elifs.size(); i++) {
         CodeLabel eout;
         node.elifs[i].first->accept(*this);
         CodeLabel econdition_code = this->code;
         out.insert(out.end(), econdition_code.begin(), econdition_code.end());
         node.elifs[i].second->accept(*this);
         CodeLabel ethen_code = this->code;
-        out.push_back(LC("", I_JUMPF(ethen_code.size() + 3 + ((has_else && i == node.elifs.size() - 1)?1:0))));
+        out.push_back(LC("", I_JUMPF(ethen_code.size() + 3 + ((has_else && i == node.elifs.size() - 1) ? 1 : 0))));
         out.push_back(LC("", new EnterScope("elif")));
         out.insert(out.end(), ethen_code.begin(), ethen_code.end());
         out.push_back(LC("", new LeaveScope("elif")));

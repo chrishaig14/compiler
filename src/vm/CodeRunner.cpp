@@ -353,3 +353,8 @@ void CodeRunner::visit(PushNone& inst) {
     this->stack.push(new NoneObject());
     this->inst_ptr++;
 }
+
+void CodeRunner::visit(PopInst& inst) {
+    this->stack.pop();
+    this->inst_ptr++;
+}

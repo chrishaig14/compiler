@@ -90,6 +90,8 @@ public:
 
     void visit(PushNone& inst) override;
 
+    void visit(PopInst& inst) override;
+
     std::map<std::string, std::map<std::string, Code>>& structs;
     Environment* global_env;
 };
