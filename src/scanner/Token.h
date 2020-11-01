@@ -16,6 +16,7 @@ enum class TokType {
     COLON,
     EQQ,
     PLUS_EQQ,
+    NEWLINE,
     MINUS_EQQ,
     TIMES_EQQ,
     DIV_EQQ,

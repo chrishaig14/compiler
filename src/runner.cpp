@@ -12,6 +12,10 @@
 void compile_and_run(std::string text) {
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
+    Token token;
+    for(auto token: tokens){
+        std::cout << token.to_string() << std::endl;
+    }
     Parser parser(tokens);
     BlockNode* program;
     try {

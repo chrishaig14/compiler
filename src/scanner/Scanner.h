@@ -56,6 +56,9 @@ public:
     Token scan_other();
 
     bool comment;
+    Token token;
+
+    Token next_token();
 };
 
 

@@ -131,9 +131,12 @@ TEST(scanner_test, test_string_literal) {
 TEST(scanner_test, test_string_full) {
     std::string text = "123\n443\"hello\"";
     Scanner scanner(text);
-    Token token = scanner.get_next();
-    token = scanner.get_next();
-    token = scanner.get_next();
+    Token token;
+    do {
+        token = scanner.get_next();
+        std::cout << token.to_string() << std::endl;
+        std::cout << TOKEN_STRINGS[token.type] << std::endl;
+    } while (token.type != TokType::END);
     EXPECT_EQ(token, Token(TokType::STRING, "hello", 1, 3));
 }
 
