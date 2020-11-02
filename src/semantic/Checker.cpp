@@ -77,12 +77,26 @@ void Checker::visit(FunctionNode& n) {
     }
     ObjectTypeNode* rotn = TO_OBJECT_TYPE(n.return_type);
     if (rotn != nullptr) {
-        if (!is_generic(rotn) && !this->class_table->declared(rotn->identifier)) {
+        if (!is_generic(rotn) && !this->class_table->declared(rotn->identifier) && rotn->identifier != ".None") {
+
             throw std::runtime_error("type " + n.return_type->to_string() + " doesn't exist!");
         }
     }
     this->scope->set("__return__", n.return_type);
     n.body->accept(*this);
+    if (!n.return_type->equal(TYPE(".None", {}))) {
+        if (n.body->nodes.size() != 0) {
+            ReturnNode* last_node = dynamic_cast<ReturnNode*>(n.body->nodes[n.body->nodes.size() - 1]);
+            if (last_node == nullptr) {
+                // it's not a return statement, error
+                throw std::runtime_error(
+                        "Error: the last statement in a function returning a value should be \"return\" EXPRESSION ");
+            }
+        } else {
+            throw std::runtime_error(
+                    "Error: the last statement in a function returning a value should be \"return\" EXPRESSION ");
+        }
+    }
     SymbolInfo body_info = this->rv;
     this->leave_scope();
     SymbolInfo symbol_info;
@@ -188,7 +202,7 @@ void Checker::visit(DeclarationNode& n) {
 void Checker::visit(AssignmentNode& n) {
     IdNode* lv = TO_ID(n.lvalue);
     if (lv != nullptr) {
-        if (lv->identifier == "_"){
+        if (lv->identifier == "_") {
             n.rvalue->accept(*this);
             return;
         }
@@ -423,13 +437,23 @@ void Checker::visit(BinopNode& n) {
 }
 
 void Checker::visit(ReturnNode& n) {
+    TypeNode* return_type = this->scope->get("__return__");
+    if (return_type->equal(TYPE(".None", {}))) {
+        if (n.expression != nullptr) {
+            throw std::runtime_error("returning a value from a function returning no value!");
+        }
+        SymbolInfo symbol_info;
+        this->rv = symbol_info;
+        return;
+    } else if (n.expression == nullptr) {
+        throw std::runtime_error("not returning any value, but function expects type: " + return_type->to_string());
+    }
     n.expression->accept(*this);
     if (this->replace_me) {
         n.expression = replacement;
         this->replace_me = false;
     }
     SymbolInfo expression_info = this->rv;
-    TypeNode* return_type = this->scope->get("__return__");
     assert(expression_info.type != nullptr);
     assert(return_type != nullptr);
     if (!this->can_assign(expression_info.type, return_type)) {
@@ -726,7 +750,7 @@ void Checker::visit(BlockNode& program) {
         if (call != nullptr) {
             // it's a function call
             // if return value != NoneType, then force the return value
-            if (!this->rv.type->equal(TYPE("NoneType", {}))) {
+            if (!this->rv.type->equal(TYPE(".None", {}))) {
                 throw std::runtime_error("You should use the return value of this function call!");
             }
         }

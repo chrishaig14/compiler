@@ -101,7 +101,7 @@ Token Scanner::next_token() {
         this->current++;
         if (c == '\n') {
             Token tok(TokType::ID, "DUMMY", this->line, this->column);
-            std::vector<TokType> semic = {TokType::RETURN, TokType::ID, TokType::NUM, TokType::RPAREN, TokType::STRING};
+            std::vector<TokType> semic = {TokType::RETURN, TokType::ID, TokType::NUM, TokType::RPAREN, TokType::STRING, TokType::NONE, TokType::TRUE, TokType::FALSE};
             for (auto ts : semic) {
                 if (this->token.type == ts) {
                     tok = Token(TokType::SEMICOLON, this->line, this->column);

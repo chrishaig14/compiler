@@ -111,7 +111,7 @@ GlobalProcessor::GlobalProcessor(std::vector<Builtin>& builtins) {
     builtins.push_back(
             {"List.map", CodeBuiltin{FUNCTION_TYPE({ function_from_t_to_u }, T_LIST(TYPE("b", {}))), list_map}});
     builtins.push_back({"String.len", CodeBuiltin{FUNCTION_TYPE({ T_STRING }, T_INT), string_len}});
-    builtins.push_back({"print", CodeBuiltin{FUNCTION_TYPE({ T_STRING }, T_INT), print}});
+    builtins.push_back({"print", CodeBuiltin{FUNCTION_TYPE({ T_STRING }, TYPE(".None",{})), print}});
     builtins.push_back(
             {"join", CodeBuiltin{FUNCTION_TYPE(VectorOfTypes({T_LIST(T_STRING), T_STRING}), T_STRING), join}});
     builtins.push_back(

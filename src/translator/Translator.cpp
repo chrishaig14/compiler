@@ -184,8 +184,11 @@ void Translator::visit(NumberNode& node) {
 }
 
 void Translator::visit(ReturnNode& node) {
-    node.expression->accept(*this);
-    CodeLabel out = this->code;
+    CodeLabel out;
+    if (node.expression != nullptr) {
+        node.expression->accept(*this);
+        out = this->code;
+    }
     out.push_back(LC("", I_RET));
     this->code = out;
 }

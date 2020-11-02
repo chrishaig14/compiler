@@ -48,7 +48,10 @@ BlockNode* Parser::parse_program() {
 
 ReturnNode* Parser::parse_return() {
     this->expect_token(TokType::RETURN);
-    Node* expression = this->parse_expression();
+    Node* expression = nullptr;
+    if (!this->match(TokType::SEMICOLON)) {
+        expression = this->parse_expression();
+    }
     ReturnNode* node = RET(expression);
     return node;
 }
@@ -436,7 +439,7 @@ DeclarationNode* Parser::parse_variable_declaration() {
     return node;
 }
 
-#define OPTIONAL_SEMICOLON()     if (this->match(TokType::SEMICOLON)) {this->next();}
+//#define OPTIONAL_SEMICOLON()     if (this->match(TokType::SEMICOLON)) {this->next();}
 
 Node* Parser::parse_common_statement() {
     switch (this->token.type) {
@@ -445,12 +448,12 @@ Node* Parser::parse_common_statement() {
         }
         case TokType::VAR: {
             Node* node = this->parse_variable_declaration();
-            OPTIONAL_SEMICOLON();
+            this->expect_token(TokType::SEMICOLON);
             return node;
         }
         case TokType::RETURN: {
             Node* node = this->parse_return();
-            OPTIONAL_SEMICOLON();
+            this->expect_token(TokType::SEMICOLON);
             return node;
         }
         case TokType::FOR: {
@@ -461,7 +464,7 @@ Node* Parser::parse_common_statement() {
         }
         default: {
             Node* node = this->parse_assignment_or_expression();
-            OPTIONAL_SEMICOLON();
+            this->expect_token(TokType::SEMICOLON);
             return node;
         }
     }
@@ -564,8 +567,13 @@ FunctionNode* Parser::parse_function_definition() {
     }
     // Parse return
     TypeNode* return_type = nullptr;
-    this->expect_token(TokType::RARROW);
-    return_type = this->parse_type_node();
+    if (this->match(TokType::RARROW)) {
+        // function with return value
+        this->expect_token(TokType::RARROW);
+        return_type = this->parse_type_node();
+    } else {
+        return_type = TYPE(".None", {});
+    }
     // Parse function body
     BlockNode* body = this->parse_possibly_empty_block();
 
@@ -660,7 +668,8 @@ ClassNode* Parser::parse_class_definition() {
             TypeNode* member_type = this->parse_type_node();
             members[member_name_tk.str] = member_type;
             members_ordered.push_back(member_name_tk.str);
-            OPTIONAL_SEMICOLON();
+//            OPTIONAL_SEMICOLON();
+            this->expect_token(TokType::SEMICOLON);
         } else if (this->match(TokType::FUN)) {
             FunctionNode* method_node = this->parse_function_definition();
             methods[method_node->identifier] = method_node;
