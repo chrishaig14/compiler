@@ -27,6 +27,8 @@ Checker::Checker(SymbolTable* globals, ClassTable* class_table) {
     auto list_class_info = new ClassInfo();
     list_class_info->class_name = "List";
     list_class_info->methods["len"] = FUNCTION_TYPE({}, T_INT);
+    list_class_info->methods["push"] = FUNCTION_TYPE({ TYPE("t", {}) }, TYPE(".None", {}));
+    list_class_info->methods["pop"] = FUNCTION_TYPE({}, TYPE("t", {}));
     list_class_info->methods["map"] = FUNCTION_TYPE({ FUNCTION_TYPE({TYPE("t", {})}, TYPE("b", {})) },
                                                     T_LIST(TYPE("b", {})));
     list_class_info->type_parameters = {"t"};

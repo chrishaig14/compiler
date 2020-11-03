@@ -42,6 +42,21 @@ void list_len(std::map<std::string, std::map<std::string, Code>>& structs, Objec
     ListObject* ls = stack.pop_list();
     stack.push(new IntegerObject(ls->list.size()));
 }
+void list_pop(std::map<std::string, std::map<std::string, Code>>& structs, ObjectStack& stack,
+              Environment* global_env) {
+    ListObject* ls = stack.pop_list();
+    if (ls->list.size() == 0) throw std::runtime_error("RUNTIME ERROR: pop from empty list!");
+    Object* last = ls->list[ls->list.size() - 1];
+    ls->list.pop_back();
+    stack.push(last);
+}
+
+void list_push(std::map<std::string, std::map<std::string, Code>>& structs, ObjectStack& stack,
+              Environment* global_env) {
+    Object* new_el = stack.pop();
+    ListObject* ls = stack.pop_list();
+    ls->list.push_back(new_el);
+}
 
 void string_len(std::map<std::string, std::map<std::string, Code>>& structs, ObjectStack& stack,
                 Environment* global_env) {
@@ -104,14 +119,18 @@ GlobalProcessor::GlobalProcessor(std::vector<Builtin>& builtins) {
     this->class_table = new ClassTable();
     auto ft = FUNCTION_TYPE({ TYPE("a", {}) }, TYPE("b", {}));
     auto at = T_LIST(TYPE("a", {}));
+    auto none = TYPE(".None", {});
     builtins.push_back({"map", CodeBuiltin{FUNCTION_TYPE(VectorOfTypes({at, ft}), T_LIST(TYPE("b", {}))), list_map}});
     builtins.push_back({"Integer.str", CodeBuiltin{FUNCTION_TYPE({ T_INT }, T_STRING), int_to_str}});
     builtins.push_back({"List.len", CodeBuiltin{FUNCTION_TYPE({ T_LIST(TYPE("a", {})) }, T_INT), list_len}});
+    VectorOfTypes x = {T_LIST(TYPE("a", {})), TYPE("a", {})};
+    builtins.push_back({"List.pop", CodeBuiltin{FUNCTION_TYPE(x, none), list_pop}});
+    builtins.push_back({"List.push", CodeBuiltin{FUNCTION_TYPE({ T_LIST(TYPE("a", {})) }, TYPE("a", {})), list_push}});
     auto function_from_t_to_u = FUNCTION_TYPE({ TYPE("t", {}) }, TYPE("b", {}));
     builtins.push_back(
             {"List.map", CodeBuiltin{FUNCTION_TYPE({ function_from_t_to_u }, T_LIST(TYPE("b", {}))), list_map}});
     builtins.push_back({"String.len", CodeBuiltin{FUNCTION_TYPE({ T_STRING }, T_INT), string_len}});
-    builtins.push_back({"print", CodeBuiltin{FUNCTION_TYPE({ T_STRING }, TYPE(".None",{})), print}});
+    builtins.push_back({"print", CodeBuiltin{FUNCTION_TYPE({ T_STRING }, none), print}});
     builtins.push_back(
             {"join", CodeBuiltin{FUNCTION_TYPE(VectorOfTypes({T_LIST(T_STRING), T_STRING}), T_STRING), join}});
     builtins.push_back(
