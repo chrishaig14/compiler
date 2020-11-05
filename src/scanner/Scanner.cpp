@@ -29,6 +29,7 @@ void initialize_tokens() {
     TOKEN_KEYWORDS["return"] = TokType::RETURN;
     TOKEN_KEYWORDS["true"] = TokType::TRUE;
     TOKEN_KEYWORDS["false"] = TokType::FALSE;
+    TOKEN_KEYWORDS["break"] = TokType::BREAK;
     TOKEN_KEYWORDS["class"] = TokType::CLASS;
     TOKEN_KEYWORDS["while"] = TokType::WHILE;
     TOKEN_KEYWORDS["none"] = TokType::NONE;

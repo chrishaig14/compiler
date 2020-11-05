@@ -85,6 +85,8 @@ public:
     FunctionTypeNode* parse_function_type();
 
     ObjectTypeNode* parse_object_type();
+
+    bool allow_break;
 };
 
 

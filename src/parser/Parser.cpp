@@ -25,6 +25,7 @@ Parser::Parser(std::vector<Token>& tokens) {
     this->tokens = tokens;
     this->token = this->tokens[0];
     this->current = 0;
+    this->allow_break = false;
 }
 
 void Parser::next() {
@@ -462,6 +463,13 @@ Node* Parser::parse_common_statement() {
         case TokType::WHILE: {
             return this->parse_while_loop();
         }
+        case TokType::BREAK:
+            {   this->next();
+                if (!this->allow_break){
+                    throw std::runtime_error("Break used outside a loop!");
+                }
+                return NBREAK;
+            }
         default: {
             Node* node = this->parse_assignment_or_expression();
             this->expect_token(TokType::SEMICOLON);
@@ -614,7 +622,10 @@ ForNode* Parser::parse_for_loop() {
     if (expect_paren) {
         this->expect_token(TokType::RPAREN);
     }
+    bool prev = this->allow_break;
+    this->allow_break = true;
     BlockNode* body = this->parse_possibly_empty_block();
+    this->allow_break = prev;
     ForNode* for_node = FOR(var.str, exp, body);
     return for_node;
 }
@@ -637,7 +648,10 @@ Node* Parser::parse_ternary() {
 WhileNode* Parser::parse_while_loop() {
     this->expect_token(TokType::WHILE);
     Node* condition = this->parse_expression();
+    bool prev = this->allow_break;
+    this->allow_break = true;
     BlockNode* body = this->parse_possibly_empty_block();
+    this->allow_break = prev;
     return WHILE(condition, body);
 }
 
