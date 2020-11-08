@@ -25,7 +25,7 @@ Parser::Parser(std::vector<Token>& tokens) {
     this->tokens = tokens;
     this->token = this->tokens[0];
     this->current = 0;
-    this->allow_break = false;
+    this->inside_loop = false;
 }
 
 void Parser::next() {
@@ -463,13 +463,21 @@ Node* Parser::parse_common_statement() {
         case TokType::WHILE: {
             return this->parse_while_loop();
         }
-        case TokType::BREAK:
-            {   this->next();
-                if (!this->allow_break){
-                    throw std::runtime_error("Break used outside a loop!");
-                }
-                return NBREAK;
+        case TokType::BREAK: {
+            this->next();
+            if (!this->inside_loop) {
+                throw std::runtime_error("Break used outside a loop!");
             }
+            return NBREAK;
+        }
+        case TokType::CONTINUE: {
+            this->next();
+            std::cout << "RETURNIONG A CONTINUE NODE" << std::endl;
+            if (!this->inside_loop) {
+                throw std::runtime_error("Continue used outside a loop!");
+            }
+            return NCONTINUE;
+        }
         default: {
             Node* node = this->parse_assignment_or_expression();
             this->expect_token(TokType::SEMICOLON);
@@ -622,10 +630,10 @@ ForNode* Parser::parse_for_loop() {
     if (expect_paren) {
         this->expect_token(TokType::RPAREN);
     }
-    bool prev = this->allow_break;
-    this->allow_break = true;
+    bool prev = this->inside_loop;
+    this->inside_loop = true;
     BlockNode* body = this->parse_possibly_empty_block();
-    this->allow_break = prev;
+    this->inside_loop = prev;
     ForNode* for_node = FOR(var.str, exp, body);
     return for_node;
 }
@@ -648,10 +656,10 @@ Node* Parser::parse_ternary() {
 WhileNode* Parser::parse_while_loop() {
     this->expect_token(TokType::WHILE);
     Node* condition = this->parse_expression();
-    bool prev = this->allow_break;
-    this->allow_break = true;
+    bool prev = this->inside_loop;
+    this->inside_loop = true;
     BlockNode* body = this->parse_possibly_empty_block();
-    this->allow_break = prev;
+    this->inside_loop = prev;
     return WHILE(condition, body);
 }
 

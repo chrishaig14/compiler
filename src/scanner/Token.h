@@ -18,6 +18,7 @@ enum class TokType {
     PLUS_EQQ,
     NEWLINE,
     BREAK,
+    CONTINUE,
     MINUS_EQQ,
     TIMES_EQQ,
     DIV_EQQ,

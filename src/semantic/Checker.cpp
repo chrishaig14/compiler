@@ -1154,4 +1154,8 @@ void Checker::visit(InstanceNode& node) {
 
 }
 
+void Checker::visit(ContinueNode& node) {
+
+}
+
 

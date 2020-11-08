@@ -99,6 +99,10 @@ public:
     void visit(ClassNode& node) override;
 
     void visit(InstanceNode& node) override;
+
+    void visit(ContinueNode& node) override;
+
+    bool in_for_loop;
 };
 
 

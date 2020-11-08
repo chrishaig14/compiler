@@ -25,6 +25,7 @@
 #include "FunctionNode.h"
 #include "IdNode.h"
 #include "IfNode.h"
+#include "ContinueNode.h"
 #include "ListNode.h"
 #include "MemberNode.h"
 #include "NumberNode.h"

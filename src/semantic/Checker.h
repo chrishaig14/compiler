@@ -146,6 +146,8 @@ public:
 
     void match_arguments_to_generic_function(FunctionTypeNode* function_type, VectorOfTypes arg_types);
 
+    void visit(ContinueNode& node) override;
+
     int null_check_type;
 
 };

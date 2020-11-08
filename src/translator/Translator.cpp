@@ -2,6 +2,7 @@
 // Created by chris on 2/8/20.
 //
 
+#include <iostream>
 #include "Translator.h"
 #include "../vm/LabelledCode.h"
 
@@ -118,7 +119,7 @@ void Translator::visit(IfNode& node) {
     node.then->accept(*this);
     CodeLabel then_code = this->code;
     bool has_else = node.selse != nullptr;
-    out.push_back(LC("a", I_JUMPF(then_code.size() + 3 + (has_else && node.elifs.size() == 0 ? 1 : 0))));
+    out.push_back(LC("labelinif", I_JUMPF(then_code.size() + 3 + (has_else && node.elifs.size() == 0 ? 1 : 0))));
     out.push_back(LC("", new EnterScope("if")));
     out.insert(out.end(), then_code.begin(), then_code.end());
     out.push_back(LC("", new LeaveScope("if")));
@@ -234,6 +235,7 @@ void Translator::visit(TypeNode& node) {
 
 Translator::Translator() : is_lvalue(false) {
     this->loop_counter = 0;
+    this->in_for_loop = false;
 }
 
 void Translator::visit(ClassLiteralExpressionNode& node) {
@@ -267,22 +269,74 @@ void Translator::visit(ClassLiteralFieldNode& node) {
 }
 
 void Translator::visit(ForNode& node) {
+    CodeLabel out;
     int loop_number = this->loop_counter;
     this->current_loop = loop_number;
     this->loop_counter++;
+
     std::string list_name = ".list" + std::to_string(this->current_loop);
     std::string len_name = ".len" + std::to_string(this->current_loop);
     std::string index_name = ".index" + std::to_string(this->current_loop);
-    node.body->nodes.push_back(ASN(ID(index_name), BIN(OpType::ADD, ID(index_name), NUM(1))));
 
-    auto s = SUB(ID(list_name), { ID(index_name) });
-    node.body->nodes.insert(node.body->nodes.begin(), DECL(node.var, nullptr, s));
-    BlockNode* desugared = new BlockNode({DECL(list_name, nullptr, node.exp),
-                                          DECL(len_name, nullptr, CALL(ID("List.len"), {ID(list_name)})),
-                                          DECL(index_name, nullptr, NUM(0)),
-                                          WHILE(BIN(OpType::LT, ID(index_name), ID(len_name)), node.body)
-                                         });
-    desugared->accept(*this);
+    // list = expression
+    auto list_init = DECL(list_name, nullptr, node.exp);
+    list_init->accept(*this);
+    out.insert(out.end(), this->code.begin(), this->code.end());
+
+    // len = list.len()
+    auto list_len = DECL(len_name, nullptr, CALL(ID("List.len"), {ID(list_name)}));
+    list_len->accept(*this);
+    out.insert(out.end(), this->code.begin(), this->code.end());
+
+    // index = 0
+    auto index = DECL(index_name, nullptr, NUM(0));
+    index->accept(*this);
+    out.insert(out.end(), this->code.begin(), this->code.end());
+
+    // index < list_len ?
+    auto condition = BIN(OpType::LT, ID(index_name), ID(len_name));
+    condition->accept(*this);
+    auto condition_code = this->code;
+
+    // start new iteration
+    std::string start_loop_label = "start_loop." + std::to_string(loop_number);
+    out.push_back(LC(start_loop_label, condition_code[0].second));
+    for (int i = 1; i < condition_code.size(); i++) {
+        out.push_back(condition_code[i]);
+    }
+    out.push_back(LC("", I_ENTER("for")));
+    out.push_back(LC("", I_JUMPF("break_loop." + std::to_string(this->current_loop))));
+
+    // var = list[index]
+    auto it = SUB(ID(list_name), { ID(index_name) });
+    node.body->nodes.insert(node.body->nodes.begin(), DECL(node.var, nullptr, it));
+
+    // index = index + 1
+    auto update_index = ASN(ID(index_name), BIN(OpType::ADD, ID(index_name), NUM(1)));
+    update_index->accept(*this);
+    CodeLabel update_index_code = this->code;
+
+//    out.insert(out.end(), condition_code.begin(), condition_code.end());
+    bool old_in_for_loop = this->in_for_loop;
+    this->in_for_loop = true;
+    node.body->accept(*this);
+    this->in_for_loop = old_in_for_loop;
+    out.insert(out.end(), this->code.begin(), this->code.end());
+    out.push_back(LC("", I_LEAVE("for")));
+    this->current_loop--;
+//
+//    CodeLabel body_code = this->code;
+//    CodeLabel p = {LC("", I_ENTER("while"))};
+//    body_code.insert(body_code.begin(), p.begin(), p.end());
+//    p = {LC("", I_LEAVE("while"))};
+//    body_code.insert(body_code.end(), p.begin(), p.end());
+//    out.push_back(NL(I_JUMPF(body_code.size() + 3)));
+//    out.insert(out.end(), body_code.begin(), body_code.end());
+    out.insert(out.end(), update_index_code.begin(), update_index_code.end());
+    out.push_back(LC("", I_JUMP(start_loop_label)));
+    out.push_back(LC("break_loop." + std::to_string(loop_number), I_LEAVE("for")));
+    this->code = out;
+
 }
 
 void Translator::visit(WhileNode& node) {
@@ -372,4 +426,24 @@ void Translator::visit(ClassNode& node) {
 
 void Translator::visit(InstanceNode& node) {
 
+}
+
+void Translator::visit(ContinueNode& node) {
+    if (this->in_for_loop) {
+        std::cout << "TRANSLATING A CONTINUE NOED" << std::endl;
+        CodeLabel out;
+        auto update_index = ASN(ID(".index" + std::to_string(this->current_loop)),
+                                BIN(OpType::ADD, ID(".index" + std::to_string(this->current_loop)), NUM(1)));
+        update_index->accept(*this);
+        out.insert(out.end(), this->code.begin(), this->code.end());
+        out.push_back(LC("", I_LEAVE("for")));
+        out.push_back(LC("", I_JUMP("start_loop." + std::to_string(this->current_loop))));
+        this->code = out;
+    }else {
+        // while loop
+        CodeLabel out;
+        out.push_back(LC("", I_JUMP("start_loop." + std::to_string(this->current_loop))));
+        this->code = out;
+
+    }
 }

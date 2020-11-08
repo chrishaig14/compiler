@@ -11,6 +11,8 @@ class ClassNode;
 
 class BinopNode;
 
+class ContinueNode;
+
 class BlockNode;
 
 class CallNode;
@@ -67,6 +69,8 @@ public:
     virtual void visit(EmptyListNode& node) = 0;
 
     virtual void visit(BinopNode& node) = 0;
+
+    virtual void visit(ContinueNode& node) = 0;
 
     virtual void visit(InstanceNode& node) = 0;
 

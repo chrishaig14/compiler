@@ -284,6 +284,10 @@ void GlobalProcessor::visit(InstanceNode& node) {
 
 }
 
+void GlobalProcessor::visit(ContinueNode& node) {
+
+}
+
 
 FunctionTypeNode* FunctionTable::get(std::string function_name) {
     return functions[function_name];

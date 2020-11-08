@@ -94,6 +94,8 @@ public:
     void visit(ClassNode& node) override;
 
     void visit(InstanceNode& node) override;
+
+    void visit(ContinueNode& node) override;
 };
 
 #endif //UNTITLED1_GLOBALPROCESSOR_H

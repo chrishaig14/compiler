@@ -60,6 +60,7 @@ Token::Token() {
 void initialize_token_strings() {
     TOKEN_STRINGS[TokType::COMMA] = "comma ( , )";
     TOKEN_STRINGS[TokType::BREAK] = "break";
+    TOKEN_STRINGS[TokType::CONTINUE] = "continue";
     TOKEN_STRINGS[TokType::DOT] = "dot ( . )";
     TOKEN_STRINGS[TokType::SEMICOLON] = "semicolon ( ; )";
     TOKEN_STRINGS[TokType::COLON] = "colon ( : )";

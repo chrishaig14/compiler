@@ -26,6 +26,18 @@ std::string op_to_string(OpType op) {
             return "AND";
         case OpType::OR:
             return "OR";
+        case OpType::LEQ:
+            return "CMP <=";
+        case OpType::GEQ:
+            return "CMP >=";
+        case OpType::LT:
+            return "CMP <";
+        case OpType::GT:
+            return "CMP >";
+        case OpType::NEQ:
+            return "CMP !=";
+        case OpType::MOD:
+            return "MOD";
         default:
             return "OP";
     }

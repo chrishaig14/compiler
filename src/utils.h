@@ -71,6 +71,7 @@ typedef std::map<std::string, std::map<std::string, Code>> StructProtos;
 #define I_JUMP(offset) new JumpInst(offset)
 #define LC(label, instruction) std::pair<std::string, Instruction*>(label, instruction)
 #define NBREAK new BreakNode()
+#define NCONTINUE new ContinueNode()
 #define NL(instruction) std::pair<std::string, Instruction*>("", instruction)
 typedef std::pair<std::string, TypeNode*> FieldInfo;
 typedef std::vector<FieldInfo> StructFields;

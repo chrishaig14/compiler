@@ -86,7 +86,7 @@ public:
 
     ObjectTypeNode* parse_object_type();
 
-    bool allow_break;
+    bool inside_loop;
 };
 
 
