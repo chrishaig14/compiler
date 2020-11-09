@@ -8,6 +8,7 @@
 
 #include "Node.h"
 #include "Visitor.h"
+#include "NodeContainer.h"
 
 class NumberNode : public Node {
 public:
@@ -17,7 +18,7 @@ public:
 
     void accept(Visitor& visitor) override;
 
-    bool equal(Node* other) const override;
+    bool equal(NodeContainer other) const override;
 
     bool operator==(NumberNode& other) const;
 

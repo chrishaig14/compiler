@@ -8,7 +8,7 @@ void InstanceNode::accept(Visitor& visitor) {
     visitor.visit(*this);
 }
 
-bool InstanceNode::equal(Node* other) const {
+bool InstanceNode::equal(NodeContainer other) const {
     return false;
 }
 

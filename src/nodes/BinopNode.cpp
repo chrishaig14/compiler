@@ -8,7 +8,7 @@ void BinopNode::accept(Visitor& visitor) {
     visitor.visit(*this);
 }
 
-BinopNode::BinopNode(OpType op, Node* left, Node* right) : left(left), right(right), op(op) {}
+BinopNode::BinopNode(OpType op, NodeContainer left, NodeContainer right) : left(left), right(right), op(op) {}
 
 std::string op_to_string(OpType op) {
     switch (op) {

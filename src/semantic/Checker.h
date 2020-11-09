@@ -49,7 +49,7 @@ class Checker : public Visitor {
     std::map<std::string, TypeClassInfo*> typeclasses;
     ClassTable* class_table;
     SymbolInfo rv;
-    Node* replacement;
+    NodeContainer replacement;
 public:
     std::map<std::string, SymbolTable*> scopes;
 
@@ -150,6 +150,7 @@ public:
 
     int null_check_type;
 
+    void dispatch(NodeContainer node);
 };
 
 #endif //UNTITLED1_CHECKER_H

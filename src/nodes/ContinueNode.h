@@ -14,7 +14,7 @@ class ContinueNode : public Node{
 public:
     void accept(Visitor& visitor) override;
 
-    bool equal(Node* other) const override;
+    bool equal(NodeContainer other) const override;
 
 };
 

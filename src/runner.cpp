@@ -13,11 +13,11 @@ void compile_and_run(std::string text) {
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
     Token token;
-    for(auto token: tokens){
+    for (auto token: tokens) {
         std::cout << token.to_string() << std::endl;
     }
     Parser parser(tokens);
-    BlockNode* program;
+    NodeContainer program;
     try {
         program = parser.parse_program();
     } catch (const UnexpectedToken& ut) {
@@ -29,13 +29,14 @@ void compile_and_run(std::string text) {
 
     try {
         GlobalProcessor gp(builtins);
-        gp.visit(*program);
+        gp.visit(*program.node.block);
         Checker checker(gp.globals, gp.class_table);
         checker.function_table = gp.function_table;
-        checker.visit(*program);
-        program->accept(translator);
-    }catch(const std::runtime_error& e){
-        std::cerr << "THERE WAS A SEMANTIC ERROR: "<< e.what() << std::endl;
+        checker.dispatch(program);
+//        program->accept(translator);
+        translator.dispatch(program);
+    } catch (const std::runtime_error& e) {
+        std::cerr << "THERE WAS A SEMANTIC ERROR: " << e.what() << std::endl;
         exit(1);
     }
     ObjectStack stack;
@@ -50,8 +51,8 @@ void compile_and_run(std::string text) {
     try {
         code_runner.run();
         auto x = stack;
-    }catch(const std::runtime_error& e){
-        std::cerr << "THERE WAS A RUNTIME ERROR: "<< e.what() << std::endl;
+    } catch (const std::runtime_error& e) {
+        std::cerr << "THERE WAS A RUNTIME ERROR: " << e.what() << std::endl;
         exit(1);
     }
 }

@@ -8,7 +8,8 @@ void BreakNode::accept(Visitor& visitor) {
     visitor.visit(*this);
 }
 
-bool BreakNode::equal(Node* other) const {
-    BreakNode* o = dynamic_cast<BreakNode*>(other);
-    return o != nullptr;
+bool BreakNode::equal(NodeContainer other) const {
+//    BreakNode* o = dynamic_cast<BreakNode*>(other);
+//    return o != nullptr;
+return false;
 }

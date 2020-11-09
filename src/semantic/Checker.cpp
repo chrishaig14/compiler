@@ -85,11 +85,12 @@ void Checker::visit(FunctionNode& n) {
         }
     }
     this->scope->set("__return__", n.return_type);
-    n.body->accept(*this);
+//    n.body->accept(*this)
+    this->dispatch(n.body);
     if (!n.return_type->equal(TYPE(".None", {}))) {
         if (n.body->nodes.size() != 0) {
-            ReturnNode* last_node = dynamic_cast<ReturnNode*>(n.body->nodes[n.body->nodes.size() - 1]);
-            if (last_node == nullptr) {
+            NodeContainer last_node = n.body->nodes[n.body->nodes.size() - 1];
+            if (last_node.type != NodeContainer::RETRN) {
                 // it's not a return statement, error
                 throw std::runtime_error(
                         "Error: the last statement in a function returning a value should be \"return\" EXPRESSION ");
@@ -147,8 +148,10 @@ void Checker::visit(DeclarationNode& n) {
     }
     SymbolInfo symbol_info;
     symbol_info.is_function = false;
-    if (n.expression != nullptr and n.type != nullptr) {
-        n.expression->accept(*this);
+    if (n.expression.type != NodeContainer::UNINITIALIZED and n.type != nullptr) {
+        this->dispatch(n.expression);
+////        n.expression->accept(*this)
+        this->dispatch(n.expression);
         if (this->replace_me) {
             n.expression = replacement;
             this->replace_me = false;
@@ -188,8 +191,9 @@ void Checker::visit(DeclarationNode& n) {
         }
         symbol_info.type = n.type;
 
-    } else if (n.expression != nullptr) {
-        n.expression->accept(*this);
+    } else if (n.expression.type != NodeContainer::UNINITIALIZED) {
+//        n.expression->accept(*this)
+        this->dispatch(n.expression);
         if (this->replace_me) {
             n.expression = replacement;
             this->replace_me = false;
@@ -202,16 +206,19 @@ void Checker::visit(DeclarationNode& n) {
 }
 
 void Checker::visit(AssignmentNode& n) {
-    IdNode* lv = TO_ID(n.lvalue);
-    if (lv != nullptr) {
-        if (lv->identifier == "_") {
-            n.rvalue->accept(*this);
+//    IdNode* lv = TO_ID(n.lvalue);
+    if (n.lvalue.type == NodeContainer::ID) {
+        if (n.lvalue.node.id->identifier == "_") {
+//            n.rvalue->accept(*this)
+            this->dispatch(n.rvalue);
             return;
         }
     }
-    n.lvalue->accept(*this);
+//    n.lvalue->accept(*this)
+    this->dispatch(n.lvalue);
     SymbolInfo linfo = this->rv;
-    n.rvalue->accept(*this);
+//    n.rvalue->accept(*this)
+    this->dispatch(n.rvalue);
     if (this->replace_me) {
         n.rvalue = replacement;
         this->replace_me = false;
@@ -219,12 +226,12 @@ void Checker::visit(AssignmentNode& n) {
     SymbolInfo expression_type = this->rv;
 
     auto actual_type = TO_OBJECT_TYPE(linfo.type);
-    IdNode* lid = TO_ID(n.lvalue);
-    if (lid != nullptr && actual_type->identifier == "Option") {
+//    IdNode* lid = TO_ID(n.lvalue);
+    if (n.lvalue.type == NodeContainer::ID && actual_type->identifier == "Option") {
         // special treatment if we are assigning to an id of a variable of type Option[t]
         if (expression_type.type->equal(actual_type->type_parameters[0])) {
             std::cout << "p cant be none" << std::endl;
-            this->scope->set_not_none(lid->identifier, true);
+            this->scope->set_not_none(n.lvalue.node.id->identifier, true);
         } else {
             if (!linfo.type->equal(expression_type.type)) {
                 auto foo = TO_OBJECT_TYPE(expression_type.type);
@@ -235,7 +242,7 @@ void Checker::visit(AssignmentNode& n) {
             }
             // type matches exactly, no proble
             std::cout << "p may be none" << std::endl;
-            this->scope->set_not_none(lid->identifier, false);
+            this->scope->set_not_none(n.lvalue.node.id->identifier, false);
         }
     } else {
         if (!linfo.type->equal(expression_type.type)) {
@@ -260,8 +267,8 @@ void Checker::visit(AssignmentNode& n) {
 }
 
 void Checker::visit(MemberNode& n) {
-    IdNode* id_node = TO_ID(n.parent);
-    if (id_node != nullptr) {
+    if (n.parent.type == NodeContainer::ID) {
+        IdNode* id_node = n.parent.node.id;
         // It might be something like <class>.<method>, so we need to handle this case differently
         if (this->class_table->declared(id_node->identifier)) {
             ClassInfo* class_info = this->class_table->get(id_node->identifier);
@@ -289,14 +296,15 @@ void Checker::visit(MemberNode& n) {
             }
         }
     }
-    n.parent->accept(*this);
+//    n.parent->accept(*this)
+    this->dispatch(n.parent);
     SymbolInfo symbol_info = this->rv;
     ObjectTypeNode* object = TO_OBJECT_TYPE(symbol_info.type);
     if (object == nullptr) {
         throw std::runtime_error("Accessing member " + n.child + " of non object");
     }
-    IdNode* idn = TO_ID(n.parent);
-    if (idn != nullptr) {
+    if (n.parent.type == NodeContainer::ID) {
+        IdNode* idn = n.parent.node.id;
         if (object->identifier == "Option") {
             if (this->scope->get_not_none(idn->identifier)) {
                 // we can guarantee that it's not null, so we can access the members
@@ -343,7 +351,8 @@ void Checker::visit(MemberNode& n) {
 
 void Checker::visit(IfNode& n) {
     SymbolInfo symbol_info;
-    n.condition->accept(*this);
+//    n.condition->accept(*this)
+    this->dispatch(n.condition);
     SymbolInfo condition_info = this->rv;
 
     std::map<std::string, bool> not_null_vars;
@@ -352,36 +361,41 @@ void Checker::visit(IfNode& n) {
         throw std::runtime_error("Expected a Boolean expression as a condition for if statement!, got " +
                                  condition_info.type->to_string());
     }
-    BinopNode* bop = TO_BINOP(n.condition);
 
     this->enter_scope("if");
-    n.then->accept(*this);
+//    n.then->accept(*this)
+    this->dispatch(n.then);
     this->leave_scope();
 
     for (int i = 0; i < n.elifs.size(); i++) {
 
-        n.elifs[i].first->accept(*this);
+//        n.elifs[i].first->accept(*this)
+        this->dispatch(n.elifs[i].first);
         condition_info = this->rv;
         if (!condition_info.type->equal(T_BOOL)) {
             throw std::runtime_error("Expected a Boolean expression as a condition for elif statement!, got " +
                                      condition_info.type->to_string());
         }
         this->enter_scope("elif");
-        n.elifs[i].second->accept(*this);
+//        n.elifs[i].second->accept(*this)
+        this->dispatch(n.elifs[i].second);
         this->leave_scope();
     }
-    if (n.selse != nullptr) {
+    if (n.selse.type != NodeContainer::UNINITIALIZED) {
         this->enter_scope("else");
-        n.selse->accept(*this);
+//        n.selse->accept(*this)
+        this->dispatch(n.selse);
         this->leave_scope();
     }
     this->rv = symbol_info;
 }
 
 void Checker::visit(BinopNode& n) {
-    n.left->accept(*this);
+//    n.left->accept(*this)
+    this->dispatch(n.left);
     SymbolInfo left_info = this->rv;
-    n.right->accept(*this);
+//    n.right->accept(*this)
+    this->dispatch(n.right);
     SymbolInfo right_info = this->rv;
     SymbolInfo symbol_info;
     bool is_boolean = item_in_vec(n.op, {OpType::EQ, OpType::AND, OpType::OR, OpType::LEQ, OpType::GEQ, OpType::LT,
@@ -441,16 +455,17 @@ void Checker::visit(BinopNode& n) {
 void Checker::visit(ReturnNode& n) {
     TypeNode* return_type = this->scope->get("__return__");
     if (return_type->equal(TYPE(".None", {}))) {
-        if (n.expression != nullptr) {
+        if (n.expression.type != NodeContainer::UNINITIALIZED) {
             throw std::runtime_error("returning a value from a function returning no value!");
         }
         SymbolInfo symbol_info;
         this->rv = symbol_info;
         return;
-    } else if (n.expression == nullptr) {
+    } else if (n.expression.type == NodeContainer::UNINITIALIZED) {
         throw std::runtime_error("not returning any value, but function expects type: " + return_type->to_string());
     }
-    n.expression->accept(*this);
+//    n.expression->accept(*this)
+    this->dispatch(n.expression);
     if (this->replace_me) {
         n.expression = replacement;
         this->replace_me = false;
@@ -630,22 +645,28 @@ void Checker::match_arguments_to_generic_function(FunctionTypeNode* function_typ
 
 
 void Checker::visit(CallNode& n) {
-    n.function->accept(*this);
+//    n.function->accept(*this)
+    this->dispatch(n.function);
     bool is_a_method = false;
-    Node* object_node;
+    NodeContainer object_node;
     SymbolInfo retv;
     if (this->rv.is_method) {
         // Since it's a method, we have to transform it and prepare it for the translation step,
         // where instead of calling object.method(args), we call <class>.method(object, args)
-        MemberNode* member_node = TO_MEMBER(n.function);
-        assert(member_node != nullptr);
+
+        if (n.function.type != NodeContainer::MEMBER) {
+            throw std::runtime_error("Expected it to be a member node!");
+        }
+        MemberNode* member_node = n.function.node.member;
         n.function = ID(this->rv.class_info->class_name + "." + member_node->child);
         this->replace_me = false;
         object_node = member_node->parent;
         is_a_method = true;
     } else if (this->rv.is_class_method) {
-        MemberNode* member_node = TO_MEMBER(n.function);
-        assert(member_node != nullptr);
+        if (n.function.type != NodeContainer::MEMBER) {
+            throw std::runtime_error("Expected it to be a member node!");
+        }
+        MemberNode* member_node = n.function.node.member;
         n.function = ID(this->rv.class_info->class_name + "." + member_node->child);
         this->replace_me = false;
         FunctionTypeNode* ftn = TO_FUNCTION_TYPE(this->rv.type);
@@ -662,7 +683,8 @@ void Checker::visit(CallNode& n) {
         }
         VectorOfTypes arg_types;
         for (auto& arg: n.arguments) {
-            arg->accept(*this);
+//            arg->accept(*this)
+            this->dispatch(arg);
             if (this->replace_me) {
                 arg = replacement;
                 this->replace_me = false;
@@ -747,9 +769,9 @@ void Checker::visit(StructNode& n) {
 void Checker::visit(BlockNode& program) {
     SymbolInfo symbol_info;
     for (auto n: program.nodes) {
-        n->accept(*this);
-        CallNode* call = TO_CALL(n);
-        if (call != nullptr) {
+//        n->accept(*this)
+        this->dispatch(n);
+        if (n.type == NodeContainer::CALL) {
             // it's a function call
             // if return value != NoneType, then force the return value
             if (!this->rv.type->equal(TYPE(".None", {}))) {
@@ -789,8 +811,9 @@ void Checker::visit(ClassLiteralExpressionNode& node) {
                 std::to_string(node.init.size()));
 
     for (int i = 0; i < node.init.size(); i++) {
-        Node* exp = node.init[i];
-        exp->accept(*this);
+        NodeContainer exp = node.init[i];
+//        exp->accept(*this)
+        this->dispatch(exp);
         if (this->replace_me) {
             node.init[i] = this->replacement;
             this->replace_me = false;
@@ -964,8 +987,9 @@ void Checker::visit(ClassLiteralFieldNode& node) {
                 std::to_string(class_fields.size()) + " initializers but got " +
                 std::to_string(node.init.size()));
     for (auto f: node.init) {
-        Node* exp = f.second;
-        exp->accept(*this);
+        NodeContainer exp = f.second;
+//        exp->accept(*this)
+        this->dispatch(exp);
         if (this->replace_me) {
             node.init[f.first] = this->replacement;
             this->replace_me = false;
@@ -985,7 +1009,8 @@ void Checker::visit(ClassLiteralFieldNode& node) {
 }
 
 void Checker::visit(ForNode& node) {
-    node.exp->accept(*this);
+//    node.exp->accept(*this)
+    this->dispatch(node.exp);
     SymbolInfo symbol_info = this->rv;
     ObjectTypeNode* obj = TO_OBJECT_TYPE(symbol_info.type);
     if (obj == nullptr) {
@@ -997,19 +1022,22 @@ void Checker::visit(ForNode& node) {
     }
     this->enter_scope("for");
     this->scope->set(node.var, var_type);
-    node.body->accept(*this);
+//    node.body->accept(*this)
+    this->dispatch(node.body);
     this->leave_scope();
 }
 
 void Checker::visit(ListNode& node) {
-    node.elements[0]->accept(*this);
+//    node.elements[0]->accept(*this)
+    this->dispatch(node.elements[0]);
     if (this->replace_me) {
         node.elements[0] = this->replacement;
         this->replace_me = false;
     }
     auto element_type = this->rv.type;
     for (int i = 1; i < node.elements.size(); i++) {
-        node.elements[i]->accept(*this);
+//        node.elements[i]->accept(*this)
+        this->dispatch(node.elements[i]);
         if (this->replace_me) {
             node.elements[i] = this->replacement;
             this->replace_me = false;
@@ -1036,17 +1064,21 @@ void Checker::visit(BooleanNode& node) {
 }
 
 void Checker::visit(WhileNode& node) {
-    node.condition->accept(*this);
+//    node.condition->accept(*this)
+    this->dispatch(node.condition);
     SymbolInfo condition = this->rv;
     if (!condition.type->equal(T_BOOL)) {
-        throw std::runtime_error("At line " +
-                                 std::to_string(node.condition->line + 1) + " column " +
-                                 std::to_string(node.condition->column + 1) +
-                                 ": Expected Boolean expression as while loop condition, got " +
+//        throw std::runtime_error("At line " +
+//                                 std::to_string(node.condition->line + 1) + " column " +
+//                                 std::to_string(node.condition->column + 1) +
+//                                 ": Expected Boolean expression as while loop condition, got " +
+//                                 condition.type->to_string());
+        throw std::runtime_error("At line column : Expected Boolean expression as while loop condition, got " +
                                  condition.type->to_string());
     }
     this->enter_scope("while");
-    node.body->accept(*this);
+//    node.body->accept(*this)
+    this->dispatch(node.body);
     this->leave_scope();
 }
 
@@ -1065,9 +1097,10 @@ void Checker::visit(StringNode& node) {
 }
 
 void Checker::visit(SubscriptNode& node) {
-    node.parent->accept(*this);
+//    node.parent->accept(*this)
+    this->dispatch(node.parent);
     SymbolInfo parent = this->rv;
-//    node.child->accept(*this);
+////    node.child->accept(*this)
     SymbolInfo child = this->rv;
     ObjectTypeNode* object_type = TO_OBJECT_TYPE(parent.type);
     if (object_type == nullptr) { throw std::runtime_error("Accessing subscript of non object!"); }
@@ -1084,7 +1117,8 @@ void Checker::visit(BreakNode& node) {
 }
 
 void Checker::visit(TernaryNode& node) {
-    node.expression->accept(*this);
+//    node.expression->accept(*this)
+    this->dispatch(node.expression);
     SymbolInfo expression_info = this->rv;
     auto expression_type = TO_OBJECT_TYPE(expression_info.type);
     if (expression_type == nullptr) {
@@ -1098,14 +1132,16 @@ void Checker::visit(TernaryNode& node) {
     semanticInfo.type = type;
     this->enter_scope("true_case");
     this->scope->set("it", type);
-    node.true_case->accept(*this);
+//    node.true_case->accept(*this)
+    this->dispatch(node.true_case);
     if (this->replace_me) {
         node.true_case = this->replacement;
         this->replace_me = false;
     }
     this->leave_scope();
     SymbolInfo true_case = this->rv;
-    node.false_case->accept(*this);
+//    node.false_case->accept(*this)
+    this->dispatch(node.false_case);
     if (this->replace_me) {
         node.false_case = this->replacement;
         this->replace_me = false;
@@ -1146,7 +1182,8 @@ void Checker::visit(ClassNode& node) {
         }
         this->scope->set("this", TYPE(node.class_name, tp));
         this->leave_scope();
-        method.second->accept(*this);
+//        method.second->accept(*this)
+        this->dispatch(method.second);
     }
 }
 
@@ -1156,6 +1193,97 @@ void Checker::visit(InstanceNode& node) {
 
 void Checker::visit(ContinueNode& node) {
 
+}
+
+void Checker::dispatch(NodeContainer n) {
+    switch (n.type) {
+        case NodeContainer::ASSIGN:
+            n.node.assign->accept(*this);
+            break;
+        case NodeContainer::BINOP:
+            n.node.binop->accept(*this);
+            break;
+        case NodeContainer::BLOCK:
+            n.node.block->accept(*this);
+            break;
+        case NodeContainer::BOOLEAN:
+            n.node.boolean->accept(*this);
+            break;
+        case NodeContainer::BRK:
+            n.node.brk->accept(*this);
+            break;
+        case NodeContainer::CALL:
+            n.node.call->accept(*this);
+            break;
+        case NodeContainer::CLSEXP:
+            n.node.clsexp->accept(*this);
+            break;
+        case NodeContainer::CLSFLD:
+            n.node.clsfld->accept(*this);
+            break;
+        case NodeContainer::CLS:
+            n.node.cls->accept(*this);
+            break;
+        case NodeContainer::CNTINUE:
+            n.node.cntinue->accept(*this);
+            break;
+        case NodeContainer::DECL:
+            n.node.decl->accept(*this);
+            break;
+        case NodeContainer::EMPTYLST:
+            n.node.emptylst->accept(*this);
+            break;
+        case NodeContainer::FORLOOP:
+            n.node.forloop->accept(*this);
+            break;
+        case NodeContainer::FUNC:
+            n.node.func->accept(*this);
+            break;
+        case NodeContainer::ID:
+            n.node.id->accept(*this);
+            break;
+        case NodeContainer::IFN:
+            n.node.ifn->accept(*this);
+            break;
+        case NodeContainer::INSTANCE:
+//                n.node.instance->accept(*this);
+            break;
+        case NodeContainer::LST:
+            n.node.lst->accept(*this);
+            break;
+        case NodeContainer::MEMBER:
+            n.node.member->accept(*this);
+            break;
+        case NodeContainer::NONE:
+            n.node.none->accept(*this);
+            break;
+        case NodeContainer::NUMBER:
+            n.node.number->accept(*this);
+            break;
+        case NodeContainer::RETRN:
+            n.node.retrn->accept(*this);
+            break;
+        case NodeContainer::STRNG:
+            n.node.strng->accept(*this);
+            break;
+        case NodeContainer::STRCT:
+            n.node.strct->accept(*this);
+            break;
+        case NodeContainer::SUB:
+            n.node.sub->accept(*this);
+            break;
+        case NodeContainer::TERNARY:
+            n.node.ternary->accept(*this);
+            break;
+        case NodeContainer::TYPE:
+//                n.node.type->accept(*this);
+            break;
+        case NodeContainer::WHIL:
+            n.node.whil->accept(*this);
+            break;
+        case NodeContainer::UNINITIALIZED:
+            break;
+    }
 }
 
 

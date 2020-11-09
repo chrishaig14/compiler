@@ -8,6 +8,6 @@ void ContinueNode::accept(Visitor& visitor) {
     visitor.visit(*this);
 }
 
-bool ContinueNode::equal(Node* other) const {
+bool ContinueNode::equal(NodeContainer other) const {
     return false;
 }

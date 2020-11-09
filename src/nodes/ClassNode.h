@@ -13,15 +13,15 @@
 class ClassNode : public Node {
 public:
     ClassNode(const std::string& className, std::vector<std::string> type_parameters,
-              std::map<std::string, TypeNode*> members, std::map<std::string, FunctionNode*> functions);
+              std::map<std::string, NodeContainer> members, std::map<std::string, NodeContainer> functions);
 
     void accept(Visitor& visitor) override;
 
-    bool equal(Node* other) const override;
+    bool equal(NodeContainer other) const override;
 
-    std::map<std::string, TypeNode*> members;
+    std::map<std::string, NodeContainer> members;
     std::vector<std::string> members_ordered;
-    std::map<std::string, FunctionNode*> methods;
+    std::map<std::string, NodeContainer> methods;
     std::string class_name;
     std::vector<std::string> type_parameters;
 };

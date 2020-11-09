@@ -12,6 +12,7 @@
 #include "../utils.h"
 #include <iostream>
 #include "UnexpectedToken.h"
+#include "../nodes/NodeFactory.h"
 
 extern std::map<TokType, OpType> TOKEN_TO_OP;
 
@@ -24,45 +25,45 @@ public:
 
     bool match(TokType type);
 
-    Node* parse_class_literal();
+    NodeContainer parse_class_literal();
 
     void next();
 
-    DeclarationNode* parse_variable_declaration();
+    NodeContainer parse_variable_declaration();
 
-    Node* parse_id_or_class_literal();
+    NodeContainer parse_id_or_class_literal();
 
-    FunctionNode* parse_function_definition();
+    NodeContainer parse_function_definition();
 
-    IfNode* parse_if();
+    NodeContainer parse_if();
 
-    Node* parse_list_literal();
+    NodeContainer parse_list_literal();
 
-    Node* parse_add_or_sub_expression();
+    NodeContainer parse_add_or_sub_expression();
 
-    Node* parse_and_expression();
+    NodeContainer parse_and_expression();
 
-    Node* parse_assignment_or_expression();
+    NodeContainer parse_assignment_or_expression();
 
-    Node* parse_bool_expression();
+    NodeContainer parse_bool_expression();
 
-    Node* parse_call_or_subscript_chain(Node* parent);
+    NodeContainer parse_call_or_subscript_chain(NodeContainer parent);
 
-    Node* parse_common_statement();
+    NodeContainer parse_common_statement();
 
-    Node* parse_expression();
+    NodeContainer parse_expression();
 
-    Node* parse_factor();
+    NodeContainer parse_factor();
 
-    Node* parse_id_or_literal();
+    NodeContainer parse_id_or_literal();
 
-    Node* parse_mul_div_or_mod_expression();
+    NodeContainer parse_mul_div_or_mod_expression();
 
-    Node* parse_or_expression();
+    NodeContainer parse_or_expression();
 
-    Node* parse_top_level_statement();
+    NodeContainer parse_top_level_statement();
 
-    ReturnNode* parse_return();
+    NodeContainer parse_return();
 
     Token expect_token(TokType token_type);
 
@@ -72,15 +73,15 @@ public:
 
     BlockNode* parse_possibly_empty_block();
 
-    BlockNode* parse_program();
+    NodeContainer parse_program();
 
-    ForNode* parse_for_loop();
+    NodeContainer parse_for_loop();
 
-    WhileNode* parse_while_loop();
+    NodeContainer parse_while_loop();
 
-    Node* parse_ternary();
+    NodeContainer parse_ternary();
 
-    ClassNode* parse_class_definition();
+    NodeContainer parse_class_definition();
 
     FunctionTypeNode* parse_function_type();
 

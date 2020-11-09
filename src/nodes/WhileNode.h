@@ -11,15 +11,15 @@
 
 class WhileNode : public Node {
 public:
-    BlockNode* body;
-    Node* condition;
+    NodeContainer body;
+    NodeContainer condition;
 
 
-    WhileNode(Node* condition, BlockNode* body);
+    WhileNode(NodeContainer condition, NodeContainer body);
 
     void accept(Visitor& visitor) override;
 
-    bool equal(Node* other) const override;
+    bool equal(NodeContainer other) const override;
 
     bool operator==(const WhileNode& other) const;
 };

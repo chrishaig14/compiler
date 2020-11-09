@@ -10,10 +10,11 @@ void NumberNode::accept(Visitor& visitor) {
 
 NumberNode::NumberNode(int number) : number(number) {}
 
-bool NumberNode::equal(Node* other) const {
-    auto other_ptr = dynamic_cast<NumberNode*>(other);
-    if (other_ptr == nullptr) return false;
-    return *this == *other_ptr;
+bool NumberNode::equal(NodeContainer other) const {
+//    auto other_ptr = dynamic_cast<NumberNode*>(other);
+//    if (other_ptr == nullptr) return false;
+//    return *this == *other_ptr;
+return false;
 }
 
 bool NumberNode::operator==(NumberNode& other) const {

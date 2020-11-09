@@ -13,13 +13,13 @@
 class ClassLiteralFieldNode : public Node {
 public:
     ObjectTypeNode* type;
-    std::map<std::string, Node*> init;
+    std::map<std::string, NodeContainer> init;
 
-    ClassLiteralFieldNode(ObjectTypeNode* type, const std::map<std::string, Node*>& init);
+    ClassLiteralFieldNode(ObjectTypeNode* type, const std::map<std::string, NodeContainer>& init);
 
     void accept(Visitor& visitor) override;
 
-    bool equal(Node* other) const override;
+    bool equal(NodeContainer other) const override;
 
 };
 

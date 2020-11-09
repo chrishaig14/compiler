@@ -9,34 +9,34 @@
 #include <vector>
 #include "Node.h"
 #include "Visitor.h"
-
+#include "NodeContainer.h"
 class CallNode : public Node {
 public:
-    Node* function;
-    std::vector<Node*> arguments;
+    NodeContainer function;
+    std::vector<NodeContainer> arguments;
 
-    CallNode(Node* function, const std::vector<Node*>& arguments);
+    CallNode(NodeContainer function, const std::vector<NodeContainer>& arguments);
 
     void accept(Visitor& visitor) override;
 
-    bool equal(Node* other) const override;
+    bool equal(NodeContainer other) const override;
 
     bool operator==(CallNode& other) const;
 
     ~CallNode() {
-        delete this->function;
+//        delete this->function;
         for (auto a: this->arguments) {
-            delete a;
+//            delete a;
         }
     }
 
     json to_json() const override {
         json j;
         j["node"] = "call";
-        j["function"] = this->function->to_json();
+//        j["function"] = this->function->to_json();
         j["arguments"] = {};
         for (auto a: this->arguments) {
-            j["arguments"].push_back(a->to_json());
+//            j["arguments"].push_back(a->to_json());
         }
         return j;
     }

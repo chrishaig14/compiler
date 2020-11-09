@@ -5,6 +5,8 @@
 #ifndef UNTITLED1_VISITOR_H
 #define UNTITLED1_VISITOR_H
 
+#include "NodeContainer.h"
+
 class AssignmentNode;
 
 class ClassNode;
@@ -63,6 +65,7 @@ class EmptyListNode;
 
 class Visitor {
 public:
+
 
     virtual void visit(AssignmentNode& node) = 0;
 

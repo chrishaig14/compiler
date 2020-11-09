@@ -9,7 +9,7 @@
 #include <string>
 #include "Node.h"
 #include "Visitor.h"
-
+#include "NodeContainer.h"
 class StringNode : public Node {
 public:
     std::string str;
@@ -18,7 +18,7 @@ public:
 
     StringNode(std::string str);
 
-    bool equal(Node* other) const override;
+    bool equal(NodeContainer other) const override;
 
     bool operator==(StringNode& other) const;
 

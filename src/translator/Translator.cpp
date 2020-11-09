@@ -9,17 +9,18 @@
 
 void Translator::visit(AssignmentNode& node) {
     CodeLabel out;
-
-    node.rvalue->accept(*this);
+    this->dispatch(node.rvalue);
+//    node.rvalue->accept(*this)
+    this->dispatch(node.rvalue);
     CodeLabel r_code = this->code;
     out.insert(out.end(), r_code.begin(), r_code.end());
 
     this->is_lvalue = true;
-    IdNode* ln = TO_ID(node.lvalue);
-    if (ln != nullptr && ln->identifier == "_") {
+    if (node.lvalue.type == NodeContainer::ID && node.lvalue.node.id->identifier == "_") {
         out.push_back(LC("", I_POP));
     } else {
-        node.lvalue->accept(*this);
+//        node.lvalue->accept(*this)
+        this->dispatch(node.lvalue);
         CodeLabel l_code = this->code;
         out.insert(out.end(), l_code.begin(), l_code.end());
     }
@@ -27,9 +28,11 @@ void Translator::visit(AssignmentNode& node) {
 }
 
 void Translator::visit(BinopNode& node) {
-    node.left->accept(*this);
+//    node.left->accept(*this)
+    this->dispatch(node.left);
     CodeLabel left_code = this->code;
-    node.right->accept(*this);
+//    node.right->accept(*this)
+    this->dispatch(node.right);
     CodeLabel right_code = this->code;
     CodeLabel out = left_code;
     out.insert(out.end(), right_code.begin(), right_code.end());
@@ -41,7 +44,8 @@ void Translator::visit(BlockNode& node) {
     CodeLabel out;
     for (auto n: node.nodes) {
         this->code = {};
-        n->accept(*this);
+//        n->accept(*this)
+        this->dispatch(n);
         CodeLabel node_code = this->code;
         out.insert(out.end(), node_code.begin(), node_code.end());
     }
@@ -51,12 +55,12 @@ void Translator::visit(BlockNode& node) {
 void Translator::visit(CallNode& node) {
     CodeLabel out;
     for (auto a: node.arguments) {
-        a->accept(*this);
+//        a->accept(*this)
+        this->dispatch(a);
         CodeLabel arg_code = this->code;
         out.insert(out.end(), arg_code.begin(), arg_code.end());
     }
-    IdNode* function_id = dynamic_cast<IdNode*>(node.function);
-    out.push_back(LC("", I_GET(function_id->identifier)));
+    out.push_back(LC("", I_GET(node.function.node.id->identifier)));
     out.push_back(LC("", I_CALL));
     this->code = out;
 }
@@ -73,8 +77,11 @@ void Translator::visit(StructNode& node) {
 
 void Translator::visit(DeclarationNode& node) {
     CodeLabel out;
-    if (node.expression != nullptr) {
-        node.expression->accept(*this);
+    if (node.expression.type != NodeContainer::UNINITIALIZED) {
+
+//    if (node.expression != nullptr) {
+//        node.expression->accept(*this)
+        this->dispatch(node.expression);
         out = this->code;
     }
     out.push_back(LC("", I_DECL(node.identifier)));
@@ -87,7 +94,8 @@ void Translator::visit(FunctionNode& node) {
     std::string new_name = node.identifier;
     out.push_back(LC("", I_START_FUNCTION(new_name)));
     CodeLabel body_code;
-    node.body->accept(*this);
+//    node.body->accept(*this)
+    this->dispatch(node.body);
     body_code = this->code;
     CodeLabel parameters_code;
     for (int i = node.parameter_names.size() - 1; i >= 0; i--) {
@@ -113,12 +121,16 @@ void Translator::visit(IdNode& node) {
 
 void Translator::visit(IfNode& node) {
     CodeLabel out;
-    node.condition->accept(*this);
+//    node.condition->accept(*this)
+    this->dispatch(node.condition);
     CodeLabel condition_code = this->code;
     out.insert(out.end(), condition_code.begin(), condition_code.end());
-    node.then->accept(*this);
+//    node.then->accept(*this)
+    this->dispatch(node.then);
     CodeLabel then_code = this->code;
-    bool has_else = node.selse != nullptr;
+    bool has_else = node.selse.type != NodeContainer::UNINITIALIZED;
+//    bool has_else = node.selse != nullptr;
+
     out.push_back(LC("labelinif", I_JUMPF(then_code.size() + 3 + (has_else && node.elifs.size() == 0 ? 1 : 0))));
     out.push_back(LC("", new EnterScope("if")));
     out.insert(out.end(), then_code.begin(), then_code.end());
@@ -126,10 +138,12 @@ void Translator::visit(IfNode& node) {
 
     for (int i = 0; i < node.elifs.size(); i++) {
         CodeLabel eout;
-        node.elifs[i].first->accept(*this);
+//        node.elifs[i].first->accept(*this)
+        this->dispatch(node.elifs[i].first);
         CodeLabel econdition_code = this->code;
         out.insert(out.end(), econdition_code.begin(), econdition_code.end());
-        node.elifs[i].second->accept(*this);
+//        node.elifs[i].second->accept(*this)
+        this->dispatch(node.elifs[i].second);
         CodeLabel ethen_code = this->code;
         out.push_back(LC("", I_JUMPF(ethen_code.size() + 3 + ((has_else && i == node.elifs.size() - 1) ? 1 : 0))));
         out.push_back(LC("", new EnterScope("elif")));
@@ -137,7 +151,8 @@ void Translator::visit(IfNode& node) {
         out.push_back(LC("", new LeaveScope("elif")));
     }
     if (has_else) {
-        node.selse->accept(*this);
+//        node.selse->accept(*this)
+        this->dispatch(node.selse);
         CodeLabel else_code = this->code;
         out.push_back(LC("", I_JUMP(else_code.size() + 3)));
         out.push_back(LC("", new EnterScope("else")));
@@ -150,7 +165,8 @@ void Translator::visit(IfNode& node) {
 void Translator::visit(ListNode& node) {
     CodeLabel out;
     for (auto e: node.elements) {
-        e->accept(*this);
+//        e->accept(*this)
+        this->dispatch(e);
         CodeLabel e_code = this->code;
         out.insert(out.end(), e_code.begin(), e_code.end());
     }
@@ -163,13 +179,15 @@ void Translator::visit(MemberNode& node) {
     if (this->is_lvalue) {
         this->is_lvalue = false;
 
-        node.parent->accept(*this);
+//        node.parent->accept(*this)
+        this->dispatch(node.parent);
         CodeLabel parent_code = this->code;
         out.insert(out.end(), parent_code.begin(), parent_code.end());
 
         out.push_back(LC("", I_SETM(node.child)));
     } else {
-        node.parent->accept(*this);
+//        node.parent->accept(*this)
+        this->dispatch(node.parent);
         CodeLabel parent_code = this->code;
         out.insert(out.end(), parent_code.begin(), parent_code.end());
 
@@ -186,8 +204,10 @@ void Translator::visit(NumberNode& node) {
 
 void Translator::visit(ReturnNode& node) {
     CodeLabel out;
-    if (node.expression != nullptr) {
-        node.expression->accept(*this);
+    if (node.expression.type != NodeContainer::UNINITIALIZED) {
+//    if (node.expression != nullptr) {
+//        node.expression->accept(*this)
+        this->dispatch(node.expression);
         out = this->code;
     }
     out.push_back(LC("", I_RET));
@@ -209,18 +229,20 @@ void Translator::visit(SubscriptNode& node) {
         CodeLabel child_code = this->code;
         out.insert(out.end(), child_code.begin(), child_code.end());
 
-        node.parent->accept(*this);
+//        node.parent->accept(*this)
+        this->dispatch(node.parent);
         CodeLabel parent_code = this->code;
         out.insert(out.end(), parent_code.begin(), parent_code.end());
 
         out.push_back(LC("", I_SETS));
     } else {
-//        node.child->accept(*this);
-        node.child[0]->accept(*this);
+//        node.child[0]->accept(*this)
+        this->dispatch(node.child[0]);
         CodeLabel child_code = this->code;
         out.insert(out.end(), child_code.begin(), child_code.end());
 
-        node.parent->accept(*this);
+//        node.parent->accept(*this)
+        this->dispatch(node.parent);
         CodeLabel parent_code = this->code;
         out.insert(out.end(), parent_code.begin(), parent_code.end());
 
@@ -242,10 +264,11 @@ void Translator::visit(ClassLiteralExpressionNode& node) {
     CodeLabel all;
     std::vector<std::string> fields;
     for (int i = 0; i < node.init.size(); i++) {
-        Node* exp = node.init[i];
+        NodeContainer exp = node.init[i];
         std::string name = node.names[i];
         this->code = {};
-        exp->accept(*this);
+//        exp->accept(*this)
+        this->dispatch(exp);
         fields.push_back(name);
         CodeLabel out = this->code;
         all.insert(all.end(), out.begin(), out.end());
@@ -259,7 +282,8 @@ void Translator::visit(ClassLiteralFieldNode& node) {
     std::vector<std::string> fields;
     for (auto f: node.init) {
         this->code = {};
-        f.second->accept(*this);
+//        f.second->accept(*this)
+        this->dispatch(f.second);
         fields.push_back(f.first);
         CodeLabel out = this->code;
         all.insert(all.end(), out.begin(), out.end());
@@ -280,22 +304,26 @@ void Translator::visit(ForNode& node) {
 
     // list = expression
     auto list_init = DECL(list_name, nullptr, node.exp);
-    list_init->accept(*this);
+//    list_init->accept(*this)
+    this->dispatch(list_init);
     out.insert(out.end(), this->code.begin(), this->code.end());
 
     // len = list.len()
     auto list_len = DECL(len_name, nullptr, CALL(ID("List.len"), {ID(list_name)}));
-    list_len->accept(*this);
+//    list_len->accept(*this)
+    this->dispatch(list_len);
     out.insert(out.end(), this->code.begin(), this->code.end());
 
     // index = 0
     auto index = DECL(index_name, nullptr, NUM(0));
-    index->accept(*this);
+//    index->accept(*this)
+    this->dispatch(index);
     out.insert(out.end(), this->code.begin(), this->code.end());
 
     // index < list_len ?
     auto condition = BIN(OpType::LT, ID(index_name), ID(len_name));
-    condition->accept(*this);
+//    condition->accept(*this)
+    this->dispatch(condition);
     auto condition_code = this->code;
 
     // start new iteration
@@ -313,13 +341,15 @@ void Translator::visit(ForNode& node) {
 
     // index = index + 1
     auto update_index = ASN(ID(index_name), BIN(OpType::ADD, ID(index_name), NUM(1)));
-    update_index->accept(*this);
+//    update_index->accept(*this)
+    this->dispatch(update_index);
     CodeLabel update_index_code = this->code;
 
 //    out.insert(out.end(), condition_code.begin(), condition_code.end());
     bool old_in_for_loop = this->in_for_loop;
     this->in_for_loop = true;
-    node.body->accept(*this);
+//    node.body->accept(*this)
+    this->dispatch(node.body);
     this->in_for_loop = old_in_for_loop;
     out.insert(out.end(), this->code.begin(), this->code.end());
     out.push_back(LC("", I_LEAVE("for")));
@@ -341,7 +371,8 @@ void Translator::visit(ForNode& node) {
 
 void Translator::visit(WhileNode& node) {
     CodeLabel out;
-    node.condition->accept(*this);
+//    node.condition->accept(*this)
+    this->dispatch(node.condition);
     std::vector<std::pair<std::string, Instruction*>> condition_code = this->code;
     int loop_number = this->loop_counter;
     this->current_loop = loop_number;
@@ -351,7 +382,8 @@ void Translator::visit(WhileNode& node) {
     for (int i = 1; i < condition_code.size(); i++) {
         out.push_back(condition_code[i]);
     }
-    node.body->accept(*this);
+//    node.body->accept(*this)
+    this->dispatch(node.body);
     this->current_loop--;
     CodeLabel body_code = this->code;
     CodeLabel p = {LC("", I_ENTER("while"))};
@@ -378,17 +410,20 @@ void Translator::visit(BreakNode& node) {
 
 void Translator::visit(TernaryNode& node) {
     CodeLabel out = {};
-    node.expression->accept(*this);
+//    node.expression->accept(*this)
+    this->dispatch(node.expression);
     CodeLabel expression_code = this->code;
     out.insert(out.end(), expression_code.begin(), expression_code.end());
-    node.true_case->accept(*this);
+//    node.true_case->accept(*this)
+    this->dispatch(node.true_case);
     CodeLabel true_case = this->code;
     out.push_back(NL(I_JUMPN(true_case.size() + 6)));
     CodeLabel it_code = {NL(I_ENTER("it_scope")), NL(I_DECL("it")), NL(I_SET("it"))};
     out.insert(out.end(), it_code.begin(), it_code.end());
     out.insert(out.end(), true_case.begin(), true_case.end());
     out.push_back(NL(I_LEAVE("it_scope")));
-    node.false_case->accept(*this);
+//    node.false_case->accept(*this)
+    this->dispatch(node.false_case);
     CodeLabel false_case = this->code;
     out.push_back(NL(I_JUMP(false_case.size() + 1)));
     out.insert(out.end(), false_case.begin(), false_case.end());
@@ -414,10 +449,12 @@ void Translator::visit(ClassNode& node) {
     out.push_back(LC("", I_MAKE_CLASS(node.class_name, f)));
 
     for (auto method: node.methods) {
-        method.second->identifier = node.class_name + "." + method.second->identifier;
-        method.second->parameter_names.insert(method.second->parameter_names.begin(), "this");
-        method.second->parameter_types.insert(method.second->parameter_types.begin(), nullptr);
-        method.second->accept(*this);
+        FunctionNode* method_node = method.second.node.func;
+        method_node->identifier = node.class_name + "." + method_node->identifier;
+        method_node->parameter_names.insert(method_node->parameter_names.begin(), "this");
+        method_node->parameter_types.insert(method_node->parameter_types.begin(), nullptr);
+//        method.second->accept(*this)
+        this->dispatch(method.second);
         auto method_code = this->code;
         out.insert(out.end(), method_code.begin(), method_code.end());
     }
@@ -434,12 +471,13 @@ void Translator::visit(ContinueNode& node) {
         CodeLabel out;
         auto update_index = ASN(ID(".index" + std::to_string(this->current_loop)),
                                 BIN(OpType::ADD, ID(".index" + std::to_string(this->current_loop)), NUM(1)));
-        update_index->accept(*this);
+//        update_index->accept(*this)
+        this->dispatch(update_index);
         out.insert(out.end(), this->code.begin(), this->code.end());
         out.push_back(LC("", I_LEAVE("for")));
         out.push_back(LC("", I_JUMP("start_loop." + std::to_string(this->current_loop))));
         this->code = out;
-    }else {
+    } else {
         // while loop
         CodeLabel out;
         out.push_back(LC("", I_JUMP("start_loop." + std::to_string(this->current_loop))));

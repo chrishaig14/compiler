@@ -38,6 +38,97 @@
 
 class Translator : public Visitor {
 public:
+    void dispatch(NodeContainer n) {
+        switch (n.type) {
+            case NodeContainer::ASSIGN:
+                n.node.assign->accept(*this);
+                break;
+            case NodeContainer::BINOP:
+                n.node.binop->accept(*this);
+                break;
+            case NodeContainer::BLOCK:
+                n.node.block->accept(*this);
+                break;
+            case NodeContainer::BOOLEAN:
+                n.node.boolean->accept(*this);
+                break;
+            case NodeContainer::BRK:
+                n.node.brk->accept(*this);
+                break;
+            case NodeContainer::CALL:
+                n.node.call->accept(*this);
+                break;
+            case NodeContainer::CLSEXP:
+                n.node.clsexp->accept(*this);
+                break;
+            case NodeContainer::CLSFLD:
+                n.node.clsfld->accept(*this);
+                break;
+            case NodeContainer::CLS:
+                n.node.cls->accept(*this);
+                break;
+            case NodeContainer::CNTINUE:
+                n.node.cntinue->accept(*this);
+                break;
+            case NodeContainer::DECL:
+                n.node.decl->accept(*this);
+                break;
+            case NodeContainer::EMPTYLST:
+                n.node.emptylst->accept(*this);
+                break;
+            case NodeContainer::FORLOOP:
+                n.node.forloop->accept(*this);
+                break;
+            case NodeContainer::FUNC:
+                n.node.func->accept(*this);
+                break;
+            case NodeContainer::ID:
+                n.node.id->accept(*this);
+                break;
+            case NodeContainer::IFN:
+                n.node.ifn->accept(*this);
+                break;
+            case NodeContainer::INSTANCE:
+//                n.node.instance->accept(*this);
+                break;
+            case NodeContainer::LST:
+                n.node.lst->accept(*this);
+                break;
+            case NodeContainer::MEMBER:
+                n.node.member->accept(*this);
+                break;
+            case NodeContainer::NONE:
+                n.node.none->accept(*this);
+                break;
+            case NodeContainer::NUMBER:
+                n.node.number->accept(*this);
+                break;
+            case NodeContainer::RETRN:
+                n.node.retrn->accept(*this);
+                break;
+            case NodeContainer::STRNG:
+                n.node.strng->accept(*this);
+                break;
+            case NodeContainer::STRCT:
+                n.node.strct->accept(*this);
+                break;
+            case NodeContainer::SUB:
+                n.node.sub->accept(*this);
+                break;
+            case NodeContainer::TERNARY:
+                n.node.ternary->accept(*this);
+                break;
+            case NodeContainer::TYPE:
+//                n.node.type->accept(*this);
+                break;
+            case NodeContainer::WHIL:
+                n.node.whil->accept(*this);
+                break;
+            case NodeContainer::UNINITIALIZED:
+                break;
+        }
+    }
+
     int loop_counter;
 
     void visit(AssignmentNode& node) override;

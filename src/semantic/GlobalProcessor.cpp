@@ -42,6 +42,7 @@ void list_len(std::map<std::string, std::map<std::string, Code>>& structs, Objec
     ListObject* ls = stack.pop_list();
     stack.push(new IntegerObject(ls->list.size()));
 }
+
 void list_pop(std::map<std::string, std::map<std::string, Code>>& structs, ObjectStack& stack,
               Environment* global_env) {
     ListObject* ls = stack.pop_list();
@@ -52,7 +53,7 @@ void list_pop(std::map<std::string, std::map<std::string, Code>>& structs, Objec
 }
 
 void list_push(std::map<std::string, std::map<std::string, Code>>& structs, ObjectStack& stack,
-              Environment* global_env) {
+               Environment* global_env) {
     Object* new_el = stack.pop();
     ListObject* ls = stack.pop_list();
     ls->list.push_back(new_el);
@@ -217,13 +218,13 @@ void GlobalProcessor::visit(FunctionNode& node) {
 
 void GlobalProcessor::visit(VectorOfNodes program) {
     for (auto n: program) {
-        n->accept(*this);
+//        n->accept(*this);
     }
 }
 
 void GlobalProcessor::visit(BlockNode& node) {
     for (auto n: node.nodes) {
-        n->accept(*this);
+        this->dispatch(n);
     }
 }
 
@@ -268,11 +269,12 @@ void GlobalProcessor::visit(ClassNode& node) {
     for (auto mn: node.members_ordered) {
         auto mt = node.members[mn];
         class_info->member_names.push_back(mn);
-        class_info->member_types.push_back(mt);
-        class_info->members[mn] = mt;
+//        class_info->member_types.push_back(mt);
+//        class_info->members[mn] = mt;
     }
     for (auto f: node.methods) {
-        FunctionTypeNode* ft = new FunctionTypeNode(f.second->parameter_types, f.second->return_type);
+        FunctionNode* method = f.second.node.func;
+        FunctionTypeNode* ft = new FunctionTypeNode(method->parameter_types, method->return_type);
         class_info->methods[f.first] = ft;
     }
     class_info->class_name = node.class_name;
@@ -286,6 +288,97 @@ void GlobalProcessor::visit(InstanceNode& node) {
 
 void GlobalProcessor::visit(ContinueNode& node) {
 
+}
+
+void GlobalProcessor::dispatch(NodeContainer n) {
+    switch (n.type) {
+        case NodeContainer::ASSIGN:
+            n.node.assign->accept(*this);
+            break;
+        case NodeContainer::BINOP:
+            n.node.binop->accept(*this);
+            break;
+        case NodeContainer::BLOCK:
+            n.node.block->accept(*this);
+            break;
+        case NodeContainer::BOOLEAN:
+            n.node.boolean->accept(*this);
+            break;
+        case NodeContainer::BRK:
+            n.node.brk->accept(*this);
+            break;
+        case NodeContainer::CALL:
+            n.node.call->accept(*this);
+            break;
+        case NodeContainer::CLSEXP:
+            n.node.clsexp->accept(*this);
+            break;
+        case NodeContainer::CLSFLD:
+            n.node.clsfld->accept(*this);
+            break;
+        case NodeContainer::CLS:
+            n.node.cls->accept(*this);
+            break;
+        case NodeContainer::CNTINUE:
+            n.node.cntinue->accept(*this);
+            break;
+        case NodeContainer::DECL:
+            n.node.decl->accept(*this);
+            break;
+        case NodeContainer::EMPTYLST:
+            n.node.emptylst->accept(*this);
+            break;
+        case NodeContainer::FORLOOP:
+            n.node.forloop->accept(*this);
+            break;
+        case NodeContainer::FUNC:
+            n.node.func->accept(*this);
+            break;
+        case NodeContainer::ID:
+            n.node.id->accept(*this);
+            break;
+        case NodeContainer::IFN:
+            n.node.ifn->accept(*this);
+            break;
+        case NodeContainer::INSTANCE:
+//                n.node.instance->accept(*this);
+            break;
+        case NodeContainer::LST:
+            n.node.lst->accept(*this);
+            break;
+        case NodeContainer::MEMBER:
+            n.node.member->accept(*this);
+            break;
+        case NodeContainer::NONE:
+            n.node.none->accept(*this);
+            break;
+        case NodeContainer::NUMBER:
+            n.node.number->accept(*this);
+            break;
+        case NodeContainer::RETRN:
+            n.node.retrn->accept(*this);
+            break;
+        case NodeContainer::STRNG:
+            n.node.strng->accept(*this);
+            break;
+        case NodeContainer::STRCT:
+            n.node.strct->accept(*this);
+            break;
+        case NodeContainer::SUB:
+            n.node.sub->accept(*this);
+            break;
+        case NodeContainer::TERNARY:
+            n.node.ternary->accept(*this);
+            break;
+        case NodeContainer::TYPE:
+//                n.node.type->accept(*this);
+            break;
+        case NodeContainer::WHIL:
+            n.node.whil->accept(*this);
+            break;
+        case NodeContainer::UNINITIALIZED:
+            break;
+    }
 }
 
 

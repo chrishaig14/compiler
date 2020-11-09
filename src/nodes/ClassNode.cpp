@@ -8,12 +8,12 @@ void ClassNode::accept(Visitor& visitor) {
     visitor.visit(*this);
 }
 
-bool ClassNode::equal(Node* other) const {
+bool ClassNode::equal(NodeContainer other) const {
     return false;
 }
 
 ClassNode::ClassNode(const std::string& className, std::vector<std::string> type_parameters,
-                     std::map<std::string, TypeNode*> members, std::map<std::string, FunctionNode*> functions)
+                     std::map<std::string, NodeContainer> members, std::map<std::string, NodeContainer> functions)
         : methods(functions), class_name(className), members(members) {
     this->type_parameters = type_parameters;
 }

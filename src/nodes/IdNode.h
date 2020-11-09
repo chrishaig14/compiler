@@ -9,6 +9,7 @@
 #include <string>
 #include "Node.h"
 #include "Visitor.h"
+#include "NodeContainer.h"
 
 class IdNode : public Node {
 public:
@@ -18,7 +19,7 @@ public:
 
     IdNode(std::string identifier);
 
-    bool equal(Node* other) const;
+    bool equal(NodeContainer other) const;
 
     bool operator==(IdNode& other) const;
 

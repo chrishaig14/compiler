@@ -8,7 +8,7 @@
 #include "instructions/Instruction.h"
 #include "nodes/nodes.h"
 
-typedef std::vector<Node*> VectorOfNodes;
+typedef std::vector<NodeContainer> VectorOfNodes;
 typedef std::vector<TypeNode*> VectorOfTypes;
 typedef std::vector<std::string> VectorOfStrings;
 typedef std::vector<Instruction*> Code;

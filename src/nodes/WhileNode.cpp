@@ -8,15 +8,17 @@ void WhileNode::accept(Visitor& visitor) {
     visitor.visit(*this);
 }
 
-bool WhileNode::equal(Node* other) const {
-    WhileNode* other_ptr = dynamic_cast<WhileNode*>(other);
-    if (other_ptr == nullptr) return false;
-    return *this == *other_ptr;
+bool WhileNode::equal(NodeContainer other) const {
+//    WhileNode* other_ptr = dynamic_cast<WhileNode*>(other);
+//    if (other_ptr == nullptr) return false;
+//    return *this == *other_ptr;
+    return false;
 }
 
-WhileNode::WhileNode(Node* condition, BlockNode* body) : body(body), condition(condition) {}
+WhileNode::WhileNode(NodeContainer condition, NodeContainer body) : body(body), condition(condition) {}
 
 bool WhileNode::operator==(const WhileNode& other) const {
-    return this->condition->equal(other.condition) && this->body->equal(other.body);
+//    return this->condition->equal(other.condition) && this->body->equal(other.body);
+    return false;
 }
 

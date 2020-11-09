@@ -11,15 +11,15 @@
 
 class TernaryNode : public Node {
 public:
-    Node* expression;
-    Node* true_case;
-    Node* false_case;;
+    NodeContainer expression;
+    NodeContainer true_case;
+    NodeContainer false_case;;
 
-    TernaryNode(Node* expression, Node* trueCase, Node* falseCase);
+    TernaryNode(NodeContainer expression, NodeContainer trueCase, NodeContainer falseCase);
 
     void accept(Visitor& visitor) override;
 
-    bool equal(Node* other) const override;
+    bool equal(NodeContainer other) const override;
 
     bool operator==(TernaryNode& other) const;
 

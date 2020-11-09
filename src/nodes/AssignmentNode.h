@@ -8,17 +8,18 @@
 
 #include "Node.h"
 #include "Visitor.h"
+#include "NodeContainer.h"
 
 class AssignmentNode : public Node {
 public:
-    Node* lvalue;
-    Node* rvalue;
+    NodeContainer lvalue;
+    NodeContainer rvalue;
 
-    AssignmentNode(Node* lvalue, Node* rvalue);
+    AssignmentNode(NodeContainer lvalue, NodeContainer rvalue);
 
     void accept(Visitor& visitor) override;
 
-    bool equal(Node* other) const override;
+    bool equal(NodeContainer other) const override;
 
     bool operator==(AssignmentNode& other) const;
 
@@ -27,8 +28,8 @@ public:
     json to_json() const override {
         json j;
         j["node"] = "assignment";
-        j["lvalue"] = this->lvalue->to_json();
-        j["rvalue"] = this->rvalue->to_json();
+//        j["lvalue"] = this->lvalue->to_json();
+//        j["rvalue"] = this->rvalue->to_json();
         return j;
     }
 

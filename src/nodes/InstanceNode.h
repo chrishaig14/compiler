@@ -17,7 +17,7 @@ public:
 private:
     void accept(Visitor& visitor) override;
 
-    bool equal(Node* other) const override;
+    bool equal(NodeContainer other) const override;
 
     std::string class_name;
     std::string type_name;
