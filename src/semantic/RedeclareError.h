@@ -2,8 +2,8 @@
 // Created by chris on 2/8/20.
 //
 
-#ifndef UNTITLED1_REDECLAREERROR_H
-#define UNTITLED1_REDECLAREERROR_H
+#ifndef REDECLAREERROR_H
+#define REDECLAREERROR_H
 
 #include <string>
 #include <stdexcept>
@@ -15,4 +15,4 @@ public:
     bool operator==(const RedeclareError& other) const;
 };
 
-#endif //UNTITLED1_REDECLAREERROR_H
+#endif //REDECLAREERROR_H

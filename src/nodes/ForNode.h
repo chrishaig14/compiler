@@ -2,8 +2,8 @@
 // Created by chris on 14/8/20.
 //
 
-#ifndef UNTITLED1_FORNODE_H
-#define UNTITLED1_FORNODE_H
+#ifndef FORNODE_H
+#define FORNODE_H
 
 
 #include "Node.h"
@@ -24,4 +24,4 @@ public:
 };
 
 
-#endif //UNTITLED1_FORNODE_H
+#endif //FORNODE_H

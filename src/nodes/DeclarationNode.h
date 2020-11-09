@@ -2,8 +2,8 @@
 // Created by chris on 1/8/20.
 //
 
-#ifndef UNTITLED1_DECLARATIONNODE_H
-#define UNTITLED1_DECLARATIONNODE_H
+#ifndef DECLARATIONNODE_H
+#define DECLARATIONNODE_H
 
 
 #include <string>
@@ -62,4 +62,4 @@ return false;
 };
 
 
-#endif //UNTITLED1_DECLARATIONNODE_H
+#endif //DECLARATIONNODE_H

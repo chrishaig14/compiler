@@ -2,8 +2,8 @@
 // Created by chris on 20/7/20.
 //
 
-#ifndef UNTITLED1_CODERUNNER_H
-#define UNTITLED1_CODERUNNER_H
+#ifndef CODERUNNER_H
+#define CODERUNNER_H
 
 
 #include <vector>
@@ -97,4 +97,4 @@ public:
 };
 
 
-#endif //UNTITLED1_CODERUNNER_H
+#endif //CODERUNNER_H

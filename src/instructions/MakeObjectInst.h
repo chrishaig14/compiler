@@ -2,8 +2,8 @@
 // Created by chris on 5/8/20.
 //
 
-#ifndef UNTITLED1_MAKEOBJECTINST_H
-#define UNTITLED1_MAKEOBJECTINST_H
+#ifndef MAKEOBJECTINST_H
+#define MAKEOBJECTINST_H
 
 
 #include <string>
@@ -36,4 +36,4 @@ public:
 };
 
 
-#endif //UNTITLED1_MAKEOBJECTINST_H
+#endif //MAKEOBJECTINST_H

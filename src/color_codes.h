@@ -2,8 +2,8 @@
 // Created by chris on 6/6/20.
 //
 
-#ifndef UNTITLED1_COLOR_CODES_H
-#define UNTITLED1_COLOR_CODES_H
+#ifndef COLOR_CODES_H
+#define COLOR_CODES_H
 
 //Regular text
 #define BLK "\e[0;30m"
@@ -78,4 +78,4 @@
 //Reset
 #define reset "\e[0m"
 
-#endif //UNTITLED1_COLOR_CODES_H
+#endif //COLOR_CODES_H

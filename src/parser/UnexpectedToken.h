@@ -2,8 +2,8 @@
 // Created by chris on 8/8/20.
 //
 
-#ifndef UNTITLED1_UNEXPECTEDTOKEN_H
-#define UNTITLED1_UNEXPECTEDTOKEN_H
+#ifndef UNEXPECTEDTOKEN_H
+#define UNEXPECTEDTOKEN_H
 
 
 #include <stdexcept>
@@ -21,4 +21,4 @@ public:
     friend std::ostream& operator<<(std::ostream& os, const UnexpectedToken& unexpected_token);
 };
 
-#endif //UNTITLED1_UNEXPECTEDTOKEN_H
+#endif //UNEXPECTEDTOKEN_H

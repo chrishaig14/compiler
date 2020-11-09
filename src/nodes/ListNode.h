@@ -2,8 +2,8 @@
 // Created by chris on 1/8/20.
 //
 
-#ifndef UNTITLED1_LISTNODE_H
-#define UNTITLED1_LISTNODE_H
+#ifndef LISTNODE_H
+#define LISTNODE_H
 
 
 #include <vector>
@@ -40,4 +40,4 @@ public:
 };
 
 
-#endif //UNTITLED1_LISTNODE_H
+#endif //LISTNODE_H

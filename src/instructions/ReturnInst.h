@@ -2,8 +2,8 @@
 // Created by chris on 2/8/20.
 //
 
-#ifndef UNTITLED1_RETURNINST_H
-#define UNTITLED1_RETURNINST_H
+#ifndef RETURNINST_H
+#define RETURNINST_H
 
 
 #include <string>
@@ -26,4 +26,4 @@ public:
 };
 
 
-#endif //UNTITLED1_RETURNINST_H
+#endif //RETURNINST_H

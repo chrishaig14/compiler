@@ -2,8 +2,8 @@
 // Created by chris on 31/10/20.
 //
 
-#ifndef UNTITLED1_POPINST_H
-#define UNTITLED1_POPINST_H
+#ifndef POPINST_H
+#define POPINST_H
 
 
 #include "Instruction.h"
@@ -28,4 +28,4 @@ public:
     }
 };
 
-#endif //UNTITLED1_POPINST_H
+#endif //POPINST_H

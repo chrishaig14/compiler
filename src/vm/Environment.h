@@ -2,8 +2,8 @@
 // Created by chris on 21/7/20.
 //
 
-#ifndef UNTITLED1_ENVIRONMENT_H
-#define UNTITLED1_ENVIRONMENT_H
+#ifndef ENVIRONMENT_H
+#define ENVIRONMENT_H
 
 #include <map>
 #include "Object.h"
@@ -29,4 +29,4 @@ public:
     Environment* leave(std::string name);
 };
 
-#endif //UNTITLED1_ENVIRONMENT_H
+#endif //ENVIRONMENT_H

@@ -2,8 +2,8 @@
 // Created by chris on 19/8/20.
 //
 
-#ifndef UNTITLED1_NOPINST_H
-#define UNTITLED1_NOPINST_H
+#ifndef NOPINST_H
+#define NOPINST_H
 
 
 #include "Instruction.h"
@@ -19,4 +19,4 @@ public:
 };
 
 
-#endif //UNTITLED1_NOPINST_H
+#endif //NOPINST_H

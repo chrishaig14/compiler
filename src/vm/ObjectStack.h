@@ -2,8 +2,8 @@
 // Created by chris on 21/7/20.
 //
 
-#ifndef UNTITLED1_OBJECTSTACK_H
-#define UNTITLED1_OBJECTSTACK_H
+#ifndef OBJECTSTACK_H
+#define OBJECTSTACK_H
 
 #include <vector>
 #include <stack>
@@ -42,4 +42,4 @@ public:
 };
 
 
-#endif //UNTITLED1_OBJECTSTACK_H
+#endif //OBJECTSTACK_H

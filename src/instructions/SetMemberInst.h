@@ -2,8 +2,8 @@
 // Created by chris on 2/8/20.
 //
 
-#ifndef UNTITLED1_SETMEMBERINST_H
-#define UNTITLED1_SETMEMBERINST_H
+#ifndef SETMEMBERINST_H
+#define SETMEMBERINST_H
 
 
 #include <string>
@@ -30,4 +30,4 @@ public:
 };
 
 
-#endif //UNTITLED1_SETMEMBERINST_H
+#endif //SETMEMBERINST_H

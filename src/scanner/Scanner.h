@@ -2,8 +2,8 @@
 // Created by chris on 6/6/20.
 //
 
-#ifndef UNTITLED1_SCANNER_H
-#define UNTITLED1_SCANNER_H
+#ifndef SCANNER_H
+#define SCANNER_H
 
 
 #include <string>
@@ -62,4 +62,4 @@ public:
 };
 
 
-#endif //UNTITLED1_SCANNER_H
+#endif //SCANNER_H

@@ -2,8 +2,8 @@
 // Created by chris on 2/8/20.
 //
 
-#ifndef UNTITLED1_BLOCKNODE_H
-#define UNTITLED1_BLOCKNODE_H
+#ifndef BLOCKNODE_H
+#define BLOCKNODE_H
 
 
 #include <vector>
@@ -50,4 +50,4 @@ return false;
 };
 
 
-#endif //UNTITLED1_BLOCKNODE_H
+#endif //BLOCKNODE_H

@@ -2,8 +2,8 @@
 // Created by chris on 1/8/20.
 //
 
-#ifndef UNTITLED1_FUNCTIONNODE_H
-#define UNTITLED1_FUNCTIONNODE_H
+#ifndef FUNCTIONNODE_H
+#define FUNCTIONNODE_H
 
 
 #include <string>
@@ -88,4 +88,4 @@ return false;
 };
 
 
-#endif //UNTITLED1_FUNCTIONNODE_H
+#endif //FUNCTIONNODE_H

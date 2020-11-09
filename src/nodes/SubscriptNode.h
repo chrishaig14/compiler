@@ -2,8 +2,8 @@
 // Created by chris on 1/8/20.
 //
 
-#ifndef UNTITLED1_SUBSCRIPTNODE_H
-#define UNTITLED1_SUBSCRIPTNODE_H
+#ifndef SUBSCRIPTNODE_H
+#define SUBSCRIPTNODE_H
 
 
 #include "Node.h"
@@ -41,4 +41,4 @@ private:
 };
 
 
-#endif //UNTITLED1_SUBSCRIPTNODE_H
+#endif //SUBSCRIPTNODE_H

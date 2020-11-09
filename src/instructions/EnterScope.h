@@ -2,8 +2,8 @@
 // Created by chris on 18/8/20.
 //
 
-#ifndef UNTITLED1_ENTERSCOPE_H
-#define UNTITLED1_ENTERSCOPE_H
+#ifndef ENTERSCOPE_H
+#define ENTERSCOPE_H
 
 
 #include "Instruction.h"
@@ -23,4 +23,4 @@ public:
 };
 
 
-#endif //UNTITLED1_ENTERSCOPE_H
+#endif //ENTERSCOPE_H

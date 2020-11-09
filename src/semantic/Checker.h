@@ -2,8 +2,8 @@
 // Created by chris on 28/6/20.
 //
 
-#ifndef UNTITLED1_CHECKER_H
-#define UNTITLED1_CHECKER_H
+#ifndef CHECKER_H
+#define CHECKER_H
 
 #include <map>
 #include "GlobalProcessor.h"
@@ -153,4 +153,4 @@ public:
     void dispatch(NodeContainer node);
 };
 
-#endif //UNTITLED1_CHECKER_H
+#endif //CHECKER_H

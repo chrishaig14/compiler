@@ -2,8 +2,8 @@
 // Created by chris on 2/8/20.
 //
 
-#ifndef UNTITLED1_GETMEMBERINST_H
-#define UNTITLED1_GETMEMBERINST_H
+#ifndef GETMEMBERINST_H
+#define GETMEMBERINST_H
 
 
 #include <string>
@@ -34,4 +34,4 @@ private:
 };
 
 
-#endif //UNTITLED1_GETMEMBERINST_H
+#endif //GETMEMBERINST_H

@@ -2,8 +2,8 @@
 // Created by chris on 3/8/20.
 //
 
-#ifndef UNTITLED1_CODEUSER_H
-#define UNTITLED1_CODEUSER_H
+#ifndef CODEUSER_H
+#define CODEUSER_H
 
 #include "../utils.h"
 #include "Object.h"
@@ -19,4 +19,4 @@ public:
     size_t size();
 };
 
-#endif //UNTITLED1_CODEUSER_H
+#endif //CODEUSER_H

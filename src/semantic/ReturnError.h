@@ -2,8 +2,8 @@
 // Created by chris on 2/8/20.
 //
 
-#ifndef UNTITLED1_RETURNERROR_H
-#define UNTITLED1_RETURNERROR_H
+#ifndef RETURNERROR_H
+#define RETURNERROR_H
 
 #include <stdexcept>
 #include "../nodes/TypeNode.h"
@@ -26,4 +26,4 @@ public:
 
 };
 
-#endif //UNTITLED1_RETURNERROR_H
+#endif //RETURNERROR_H

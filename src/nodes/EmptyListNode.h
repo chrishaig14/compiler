@@ -2,8 +2,8 @@
 // Created by chris on 6/9/20.
 //
 
-#ifndef UNTITLED1_EMPTYLISTNODE_H
-#define UNTITLED1_EMPTYLISTNODE_H
+#ifndef EMPTYLISTNODE_H
+#define EMPTYLISTNODE_H
 
 
 #include "Node.h"
@@ -21,4 +21,4 @@ public:
 };
 
 
-#endif //UNTITLED1_EMPTYLISTNODE_H
+#endif //EMPTYLISTNODE_H

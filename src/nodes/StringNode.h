@@ -2,8 +2,8 @@
 // Created by chris on 1/8/20.
 //
 
-#ifndef UNTITLED1_STRINGNODE_H
-#define UNTITLED1_STRINGNODE_H
+#ifndef STRINGNODE_H
+#define STRINGNODE_H
 
 
 #include <string>
@@ -31,4 +31,4 @@ public:
 };
 
 
-#endif //UNTITLED1_STRINGNODE_H
+#endif //STRINGNODE_H

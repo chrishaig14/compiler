@@ -2,8 +2,8 @@
 // Created by chris on 2/8/20.
 //
 
-#ifndef UNTITLED1_INSTRUCTION_H
-#define UNTITLED1_INSTRUCTION_H
+#ifndef INSTRUCTION_H
+#define INSTRUCTION_H
 
 #include <string>
 #include "InstructionVisitor.h"
@@ -29,4 +29,4 @@ public:
 };
 
 
-#endif //UNTITLED1_INSTRUCTION_H
+#endif //INSTRUCTION_H

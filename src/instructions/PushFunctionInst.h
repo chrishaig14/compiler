@@ -2,8 +2,8 @@
 // Created by chris on 2/8/20.
 //
 
-#ifndef UNTITLED1_PUSHFUNCTIONINST_H
-#define UNTITLED1_PUSHFUNCTIONINST_H
+#ifndef PUSHFUNCTIONINST_H
+#define PUSHFUNCTIONINST_H
 
 
 #include <vector>
@@ -43,4 +43,4 @@ public:
 };
 
 
-#endif //UNTITLED1_PUSHFUNCTIONINST_H
+#endif //PUSHFUNCTIONINST_H

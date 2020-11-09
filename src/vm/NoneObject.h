@@ -2,8 +2,8 @@
 // Created by chris on 30/8/20.
 //
 
-#ifndef UNTITLED1_NONEOBJECT_H
-#define UNTITLED1_NONEOBJECT_H
+#ifndef NONEOBJECT_H
+#define NONEOBJECT_H
 
 
 #include "Object.h"
@@ -15,4 +15,4 @@ public:
 };
 
 
-#endif //UNTITLED1_NONEOBJECT_H
+#endif //NONEOBJECT_H

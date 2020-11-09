@@ -2,8 +2,8 @@
 // Created by chris on 23/8/20.
 //
 
-#ifndef UNTITLED1_LOADER_H
-#define UNTITLED1_LOADER_H
+#ifndef LOADER_H
+#define LOADER_H
 
 
 #include <vector>
@@ -24,4 +24,4 @@ public:
 };
 
 
-#endif //UNTITLED1_LOADER_H
+#endif //LOADER_H

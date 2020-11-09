@@ -2,8 +2,8 @@
 // Created by chris on 5/8/20.
 //
 
-#ifndef UNTITLED1_BOOLEANOBJECT_H
-#define UNTITLED1_BOOLEANOBJECT_H
+#ifndef BOOLEANOBJECT_H
+#define BOOLEANOBJECT_H
 
 
 #include "Object.h"
@@ -24,4 +24,4 @@ public:
 };
 
 
-#endif //UNTITLED1_BOOLEANOBJECT_H
+#endif //BOOLEANOBJECT_H

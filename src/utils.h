@@ -2,8 +2,8 @@
 // Created by chris on 2/8/20.
 //
 
-#ifndef UNTITLED1_UTILS_H
-#define UNTITLED1_UTILS_H
+#ifndef UTILS_H
+#define UTILS_H
 
 #include "instructions/Instruction.h"
 #include "nodes/nodes.h"
@@ -95,4 +95,4 @@ bool item_in_vec(T item, std::vector<T> vec) {
 }
 
 
-#endif //UNTITLED1_UTILS_H
+#endif //UTILS_H

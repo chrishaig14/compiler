@@ -2,8 +2,8 @@
 // Created by chris on 2/8/20.
 //
 
-#ifndef UNTITLED1_GETINST_H
-#define UNTITLED1_GETINST_H
+#ifndef GETINST_H
+#define GETINST_H
 
 
 #include <string>
@@ -31,4 +31,4 @@ public:
 };
 
 
-#endif //UNTITLED1_GETINST_H
+#endif //GETINST_H

@@ -2,8 +2,8 @@
 // Created by chris on 1/8/20.
 //
 
-#ifndef UNTITLED1_VISITOR_H
-#define UNTITLED1_VISITOR_H
+#ifndef VISITOR_H
+#define VISITOR_H
 
 #include "NodeContainer.h"
 
@@ -125,4 +125,4 @@ public:
 };
 
 
-#endif //UNTITLED1_VISITOR_H
+#endif //VISITOR_H

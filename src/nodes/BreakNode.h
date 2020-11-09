@@ -2,8 +2,8 @@
 // Created by chris on 18/8/20.
 //
 
-#ifndef UNTITLED1_BREAKNODE_H
-#define UNTITLED1_BREAKNODE_H
+#ifndef BREAKNODE_H
+#define BREAKNODE_H
 
 
 #include "Node.h"
@@ -18,4 +18,4 @@ public:
 };
 
 
-#endif //UNTITLED1_BREAKNODE_H
+#endif //BREAKNODE_H

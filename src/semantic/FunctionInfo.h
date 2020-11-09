@@ -2,11 +2,11 @@
 // Created by chris on 2/8/20.
 //
 
-#ifndef UNTITLED1_FUNCTIONINFO_H
-#define UNTITLED1_FUNCTIONINFO_H
+#ifndef FUNCTIONINFO_H
+#define FUNCTIONINFO_H
 
 #include "../nodes/TypeNode.h"
 #include "ObjectInfo.h"
 
 
-#endif //UNTITLED1_FUNCTIONINFO_H
+#endif //FUNCTIONINFO_H

@@ -2,8 +2,8 @@
 // Created by chris on 6/8/20.
 //
 
-#ifndef UNTITLED1_MAKECLASSINST_H
-#define UNTITLED1_MAKECLASSINST_H
+#ifndef MAKECLASSINST_H
+#define MAKECLASSINST_H
 
 
 #include <vector>
@@ -26,4 +26,4 @@ public:
 };
 
 
-#endif //UNTITLED1_MAKECLASSINST_H
+#endif //MAKECLASSINST_H

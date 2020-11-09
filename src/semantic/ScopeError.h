@@ -2,8 +2,8 @@
 // Created by chris on 2/8/20.
 //
 
-#ifndef UNTITLED1_SCOPEERROR_H
-#define UNTITLED1_SCOPEERROR_H
+#ifndef SCOPEERROR_H
+#define SCOPEERROR_H
 
 #include <stdexcept>
 
@@ -20,4 +20,4 @@ public:
     }
 };
 
-#endif //UNTITLED1_SCOPEERROR_H
+#endif //SCOPEERROR_H

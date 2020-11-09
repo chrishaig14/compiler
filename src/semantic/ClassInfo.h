@@ -2,8 +2,8 @@
 // Created by chris on 2/8/20.
 //
 
-#ifndef UNTITLED1_CLASSINFO_H
-#define UNTITLED1_CLASSINFO_H
+#ifndef CLASSINFO_H
+#define CLASSINFO_H
 
 #include <string>
 #include <map>
@@ -52,4 +52,4 @@ public:
     std::vector<std::string> type_parameters;
 };
 
-#endif //UNTITLED1_CLASSINFO_H
+#endif //CLASSINFO_H

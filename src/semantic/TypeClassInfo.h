@@ -2,8 +2,8 @@
 // Created by chris on 6/10/20.
 //
 
-#ifndef UNTITLED1_TYPECLASSINFO_H
-#define UNTITLED1_TYPECLASSINFO_H
+#ifndef TYPECLASSINFO_H
+#define TYPECLASSINFO_H
 
 
 #include <string>
@@ -21,4 +21,4 @@ public:
 };
 
 
-#endif //UNTITLED1_TYPECLASSINFO_H
+#endif //TYPECLASSINFO_H

@@ -2,8 +2,8 @@
 // Created by chris on 17/8/20.
 //
 
-#ifndef UNTITLED1_JUMPINST_H
-#define UNTITLED1_JUMPINST_H
+#ifndef JUMPINST_H
+#define JUMPINST_H
 
 
 #include "Instruction.h"
@@ -27,4 +27,4 @@ public:
 };
 
 
-#endif //UNTITLED1_JUMPINST_H
+#endif //JUMPINST_H

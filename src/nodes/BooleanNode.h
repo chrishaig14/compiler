@@ -2,8 +2,8 @@
 // Created by chris on 17/8/20.
 //
 
-#ifndef UNTITLED1_BOOLEANNODE_H
-#define UNTITLED1_BOOLEANNODE_H
+#ifndef BOOLEANNODE_H
+#define BOOLEANNODE_H
 
 
 #include "Node.h"
@@ -25,4 +25,4 @@ public:
 };
 
 
-#endif //UNTITLED1_BOOLEANNODE_H
+#endif //BOOLEANNODE_H

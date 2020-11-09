@@ -2,8 +2,8 @@
 // Created by chris on 2/8/20.
 //
 
-#ifndef UNTITLED1_CALLINST_H
-#define UNTITLED1_CALLINST_H
+#ifndef CALLINST_H
+#define CALLINST_H
 
 
 #include <string>
@@ -20,4 +20,4 @@ public:
 };
 
 
-#endif //UNTITLED1_CALLINST_H
+#endif //CALLINST_H

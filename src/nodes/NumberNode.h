@@ -2,8 +2,8 @@
 // Created by chris on 1/8/20.
 //
 
-#ifndef UNTITLED1_NUMBERNODE_H
-#define UNTITLED1_NUMBERNODE_H
+#ifndef NUMBERNODE_H
+#define NUMBERNODE_H
 
 
 #include "Node.h"
@@ -31,4 +31,4 @@ public:
 };
 
 
-#endif //UNTITLED1_NUMBERNODE_H
+#endif //NUMBERNODE_H

@@ -2,8 +2,8 @@
 // Created by chris on 8/8/20.
 //
 
-#ifndef UNTITLED1_DEFINESTRUCTINST_H
-#define UNTITLED1_DEFINESTRUCTINST_H
+#ifndef DEFINESTRUCTINST_H
+#define DEFINESTRUCTINST_H
 
 
 #include "Instruction.h"
@@ -25,4 +25,4 @@ public:
 };
 
 
-#endif //UNTITLED1_DEFINESTRUCTINST_H
+#endif //DEFINESTRUCTINST_H

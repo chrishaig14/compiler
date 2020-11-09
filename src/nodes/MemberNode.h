@@ -2,8 +2,8 @@
 // Created by chris on 1/8/20.
 //
 
-#ifndef UNTITLED1_MEMBERNODE_H
-#define UNTITLED1_MEMBERNODE_H
+#ifndef MEMBERNODE_H
+#define MEMBERNODE_H
 
 
 #include <string>
@@ -45,4 +45,4 @@ return false;
 };
 
 
-#endif //UNTITLED1_MEMBERNODE_H
+#endif //MEMBERNODE_H

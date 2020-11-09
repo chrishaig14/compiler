@@ -2,8 +2,8 @@
 // Created by chris on 1/8/20.
 //
 
-#ifndef UNTITLED1_RETURNNODE_H
-#define UNTITLED1_RETURNNODE_H
+#ifndef RETURNNODE_H
+#define RETURNNODE_H
 
 
 #include "Node.h"
@@ -33,4 +33,4 @@ public:
     NodeContainer expression;
 };
 
-#endif //UNTITLED1_RETURNNODE_H
+#endif //RETURNNODE_H

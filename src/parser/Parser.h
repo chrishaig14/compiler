@@ -1,9 +1,5 @@
-//
-// Created by chris on 7/6/20.
-//
-
-#ifndef UNTITLED1_PARSER_H
-#define UNTITLED1_PARSER_H
+#ifndef PARSER_H
+#define PARSER_H
 
 
 #include <vector>
@@ -91,4 +87,4 @@ public:
 };
 
 
-#endif //UNTITLED1_PARSER_H
+#endif //PARSER_H

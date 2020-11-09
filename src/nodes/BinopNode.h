@@ -2,8 +2,8 @@
 // Created by chris on 1/8/20.
 //
 
-#ifndef UNTITLED1_BINOPNODE_H
-#define UNTITLED1_BINOPNODE_H
+#ifndef BINOPNODE_H
+#define BINOPNODE_H
 
 
 #include "Node.h"
@@ -53,4 +53,4 @@ return false;
 };
 
 
-#endif //UNTITLED1_BINOPNODE_H
+#endif //BINOPNODE_H

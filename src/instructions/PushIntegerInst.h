@@ -2,8 +2,8 @@
 // Created by chris on 2/8/20.
 //
 
-#ifndef UNTITLED1_PUSHINTEGERINST_H
-#define UNTITLED1_PUSHINTEGERINST_H
+#ifndef PUSHINTEGERINST_H
+#define PUSHINTEGERINST_H
 
 #include <string>
 #include "Instruction.h"
@@ -29,4 +29,4 @@ public:
 };
 
 
-#endif //UNTITLED1_PUSHINTEGERINST_H
+#endif //PUSHINTEGERINST_H

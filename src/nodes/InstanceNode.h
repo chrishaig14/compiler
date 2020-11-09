@@ -2,8 +2,8 @@
 // Created by chris on 4/10/20.
 //
 
-#ifndef UNTITLED1_INSTANCENODE_H
-#define UNTITLED1_INSTANCENODE_H
+#ifndef INSTANCENODE_H
+#define INSTANCENODE_H
 
 
 #include "Node.h"
@@ -26,4 +26,4 @@ private:
 };
 
 
-#endif //UNTITLED1_INSTANCENODE_H
+#endif //INSTANCENODE_H

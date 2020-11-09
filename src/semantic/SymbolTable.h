@@ -2,8 +2,8 @@
 // Created by chris on 1/7/20.
 //
 
-#ifndef UNTITLED1_SYMBOLTABLE_H
-#define UNTITLED1_SYMBOLTABLE_H
+#ifndef SYMBOLTABLE_H
+#define SYMBOLTABLE_H
 
 #include <string>
 #include <vector>
@@ -79,4 +79,4 @@ public:
     std::map<std::string, bool> not_null;
 };
 
-#endif //UNTITLED1_SYMBOLTABLE_H
+#endif //SYMBOLTABLE_H

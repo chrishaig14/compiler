@@ -2,8 +2,8 @@
 // Created by chris on 1/8/20.
 //
 
-#ifndef UNTITLED1_CALLNODE_H
-#define UNTITLED1_CALLNODE_H
+#ifndef CALLNODE_H
+#define CALLNODE_H
 
 
 #include <vector>
@@ -44,4 +44,4 @@ public:
 };
 
 
-#endif //UNTITLED1_CALLNODE_H
+#endif //CALLNODE_H

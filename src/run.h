@@ -2,11 +2,11 @@
 // Created by chris on 6/10/20.
 //
 
-#ifndef UNTITLED1_RUN_H
-#define UNTITLED1_RUN_H
+#ifndef RUN_H
+#define RUN_H
 
 #include <string>
 
 void compile_and_run(std::string text);
 
-#endif //UNTITLED1_RUN_H
+#endif //RUN_H

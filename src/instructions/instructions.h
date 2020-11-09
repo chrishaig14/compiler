@@ -2,8 +2,8 @@
 // Created by chris on 3/8/20.
 //
 
-#ifndef UNTITLED1_INSTRUCTIONS_H
-#define UNTITLED1_INSTRUCTIONS_H
+#ifndef INSTRUCTIONS_H
+#define INSTRUCTIONS_H
 
 #include "BinopInst.h"
 #include "CallInst.h"
@@ -31,4 +31,4 @@
 #include "SetSubscriptInst.h"
 
 
-#endif //UNTITLED1_INSTRUCTIONS_H
+#endif //INSTRUCTIONS_H

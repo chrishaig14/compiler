@@ -2,8 +2,8 @@
 // Created by chris on 1/8/20.
 //
 
-#ifndef UNTITLED1_IDNODE_H
-#define UNTITLED1_IDNODE_H
+#ifndef IDNODE_H
+#define IDNODE_H
 
 
 #include <string>
@@ -34,4 +34,4 @@ public:
 };
 
 
-#endif //UNTITLED1_IDNODE_H
+#endif //IDNODE_H

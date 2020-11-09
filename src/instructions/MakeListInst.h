@@ -2,8 +2,8 @@
 // Created by chris on 5/8/20.
 //
 
-#ifndef UNTITLED1_MAKELISTINST_H
-#define UNTITLED1_MAKELISTINST_H
+#ifndef MAKELISTINST_H
+#define MAKELISTINST_H
 
 
 #include "Instruction.h"
@@ -22,4 +22,4 @@ public:
 };
 
 
-#endif //UNTITLED1_MAKELISTINST_H
+#endif //MAKELISTINST_H

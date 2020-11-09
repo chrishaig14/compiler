@@ -2,8 +2,8 @@
 //// Created by chris on 26/8/20.
 ////
 //
-//#ifndef UNTITLED1_FORMATTER_H
-//#define UNTITLED1_FORMATTER_H
+//#ifndef FORMATTER_H
+//#define FORMATTER_H
 //
 //#include <map>
 //#include "../nodes/Visitor.h"
@@ -77,4 +77,4 @@
 //};
 //
 //
-//#endif //UNTITLED1_FORMATTER_H
+//#endif //FORMATTER_H

@@ -2,8 +2,8 @@
 // Created by chris on 2/8/20.
 //
 
-#ifndef UNTITLED1_GETSUBSCRIPTINST_H
-#define UNTITLED1_GETSUBSCRIPTINST_H
+#ifndef GETSUBSCRIPTINST_H
+#define GETSUBSCRIPTINST_H
 
 
 #include <string>
@@ -26,4 +26,4 @@ public:
 };
 
 
-#endif //UNTITLED1_GETSUBSCRIPTINST_H
+#endif //GETSUBSCRIPTINST_H

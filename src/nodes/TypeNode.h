@@ -2,8 +2,8 @@
 // Created by chris on 1/8/20.
 //
 
-#ifndef UNTITLED1_TYPENODE_H
-#define UNTITLED1_TYPENODE_H
+#ifndef TYPENODE_H
+#define TYPENODE_H
 
 
 #include <string>
@@ -71,4 +71,4 @@ public:
 };
 
 
-#endif //UNTITLED1_TYPENODE_H
+#endif //TYPENODE_H

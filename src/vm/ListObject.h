@@ -2,8 +2,8 @@
 // Created by chris on 5/8/20.
 //
 
-#ifndef UNTITLED1_LISTOBJECT_H
-#define UNTITLED1_LISTOBJECT_H
+#ifndef LISTOBJECT_H
+#define LISTOBJECT_H
 
 
 #include "Object.h"
@@ -18,4 +18,4 @@ public:
 };
 
 
-#endif //UNTITLED1_LISTOBJECT_H
+#endif //LISTOBJECT_H

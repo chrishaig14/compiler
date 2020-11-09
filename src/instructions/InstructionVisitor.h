@@ -2,8 +2,8 @@
 // Created by chris on 3/8/20.
 //
 
-#ifndef UNTITLED1_INSTRUCTIONVISITOR_H
-#define UNTITLED1_INSTRUCTIONVISITOR_H
+#ifndef INSTRUCTIONVISITOR_H
+#define INSTRUCTIONVISITOR_H
 
 class BinopInst;
 
@@ -127,4 +127,4 @@ public:
 };
 
 
-#endif //UNTITLED1_INSTRUCTIONVISITOR_H
+#endif //INSTRUCTIONVISITOR_H

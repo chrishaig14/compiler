@@ -2,8 +2,8 @@
 // Created by chris on 1/8/20.
 //
 
-#ifndef UNTITLED1_ASSIGNMENTNODE_H
-#define UNTITLED1_ASSIGNMENTNODE_H
+#ifndef ASSIGNMENTNODE_H
+#define ASSIGNMENTNODE_H
 
 
 #include "Node.h"
@@ -36,4 +36,4 @@ public:
 };
 
 
-#endif //UNTITLED1_ASSIGNMENTNODE_H
+#endif //ASSIGNMENTNODE_H

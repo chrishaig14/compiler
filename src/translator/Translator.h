@@ -2,8 +2,8 @@
 // Created by chris on 2/8/20.
 //
 
-#ifndef UNTITLED1_TRANSLATOR_H
-#define UNTITLED1_TRANSLATOR_H
+#ifndef TRANSLATOR_H
+#define TRANSLATOR_H
 
 
 #include "../nodes/Visitor.h"
@@ -197,4 +197,4 @@ public:
 };
 
 
-#endif //UNTITLED1_TRANSLATOR_H
+#endif //TRANSLATOR_H

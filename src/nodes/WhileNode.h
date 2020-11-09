@@ -2,8 +2,8 @@
 // Created by chris on 16/8/20.
 //
 
-#ifndef UNTITLED1_WHILENODE_H
-#define UNTITLED1_WHILENODE_H
+#ifndef WHILENODE_H
+#define WHILENODE_H
 
 
 #include "Node.h"
@@ -25,4 +25,4 @@ public:
 };
 
 
-#endif //UNTITLED1_WHILENODE_H
+#endif //WHILENODE_H

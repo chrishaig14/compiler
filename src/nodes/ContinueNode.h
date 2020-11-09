@@ -2,8 +2,8 @@
 // Created by chris on 7/11/20.
 //
 
-#ifndef UNTITLED1_CONTINUENODE_H
-#define UNTITLED1_CONTINUENODE_H
+#ifndef CONTINUENODE_H
+#define CONTINUENODE_H
 
 
 #include "Node.h"
@@ -19,4 +19,4 @@ public:
 };
 
 
-#endif //UNTITLED1_CONTINUENODE_H
+#endif //CONTINUENODE_H

@@ -2,8 +2,8 @@
 // Created by chris on 8/8/20.
 //
 
-#ifndef UNTITLED1_MAKEDEFAULTINST_H
-#define UNTITLED1_MAKEDEFAULTINST_H
+#ifndef MAKEDEFAULTINST_H
+#define MAKEDEFAULTINST_H
 
 
 #include "Instruction.h"
@@ -24,4 +24,4 @@ public:
 };
 
 
-#endif //UNTITLED1_MAKEDEFAULTINST_H
+#endif //MAKEDEFAULTINST_H

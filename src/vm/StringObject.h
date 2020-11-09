@@ -2,8 +2,8 @@
 // Created by chris on 3/8/20.
 //
 
-#ifndef UNTITLED1_STRINGOBJECT_H
-#define UNTITLED1_STRINGOBJECT_H
+#ifndef STRINGOBJECT_H
+#define STRINGOBJECT_H
 
 #include <string>
 #include "Object.h"
@@ -25,4 +25,4 @@ public:
     std::string str;
 };
 
-#endif //UNTITLED1_STRINGOBJECT_H
+#endif //STRINGOBJECT_H

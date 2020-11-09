@@ -2,8 +2,8 @@
 // Created by chris on 28/6/20.
 //
 
-#ifndef UNTITLED1_GLOBALPROCESSOR_H
-#define UNTITLED1_GLOBALPROCESSOR_H
+#ifndef GLOBALPROCESSOR_H
+#define GLOBALPROCESSOR_H
 
 
 #include <map>
@@ -100,4 +100,4 @@ public:
     void dispatch(NodeContainer container);
 };
 
-#endif //UNTITLED1_GLOBALPROCESSOR_H
+#endif //GLOBALPROCESSOR_H

@@ -2,8 +2,8 @@
 // Created by chris on 2/8/20.
 //
 
-#ifndef UNTITLED1_BADARGUMENTS_H
-#define UNTITLED1_BADARGUMENTS_H
+#ifndef BADARGUMENTS_H
+#define BADARGUMENTS_H
 
 #include <stdexcept>
 #include "../utils.h"
@@ -26,4 +26,4 @@ public:
 };
 
 
-#endif //UNTITLED1_BADARGUMENTS_H
+#endif //BADARGUMENTS_H

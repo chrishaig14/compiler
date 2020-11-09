@@ -2,8 +2,8 @@
 // Created by chris on 1/8/20.
 //
 
-#ifndef UNTITLED1_STRUCTNODE_H
-#define UNTITLED1_STRUCTNODE_H
+#ifndef STRUCTNODE_H
+#define STRUCTNODE_H
 
 
 #include <string>
@@ -66,4 +66,4 @@ return false;
 };
 
 
-#endif //UNTITLED1_STRUCTNODE_H
+#endif //STRUCTNODE_H

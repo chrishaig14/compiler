@@ -2,8 +2,8 @@
 // Created by chris on 1/8/20.
 //
 
-#ifndef UNTITLED1_NODE_H
-#define UNTITLED1_NODE_H
+#ifndef NODE_H
+#define NODE_H
 
 #include "json.hpp"
 //#include "NodeContainer.h"
@@ -38,4 +38,4 @@ public:
     }
 };
 
-#endif //UNTITLED1_NODE_H
+#endif //NODE_H

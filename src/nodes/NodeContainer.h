@@ -2,8 +2,8 @@
 // Created by chris on 8/11/20.
 //
 
-#ifndef UNTITLED1_NODECONTAINER_H
-#define UNTITLED1_NODECONTAINER_H
+#ifndef NODECONTAINER_H
+#define NODECONTAINER_H
 
 
 class AssignmentNode;
@@ -277,4 +277,4 @@ public:
 
 };
 
-#endif //UNTITLED1_NODECONTAINER_H
+#endif //NODECONTAINER_H

@@ -2,8 +2,8 @@
 // Created by chris on 6/6/20.
 //
 
-#ifndef UNTITLED1_TOKEN_H
-#define UNTITLED1_TOKEN_H
+#ifndef TOKEN_H
+#define TOKEN_H
 
 #include <string>
 #include <map>
@@ -89,4 +89,4 @@ public:
 };
 
 
-#endif //UNTITLED1_TOKEN_H
+#endif //TOKEN_H

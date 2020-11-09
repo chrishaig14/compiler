@@ -2,8 +2,8 @@
 // Created by chris on 23/8/20.
 //
 
-#ifndef UNTITLED1_STARTFUNCTION_H
-#define UNTITLED1_STARTFUNCTION_H
+#ifndef STARTFUNCTION_H
+#define STARTFUNCTION_H
 
 
 #include "Instruction.h"
@@ -23,4 +23,4 @@ public:
 };
 
 
-#endif //UNTITLED1_STARTFUNCTION_H
+#endif //STARTFUNCTION_H

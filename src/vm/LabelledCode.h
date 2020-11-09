@@ -2,8 +2,8 @@
 // Created by chris on 18/8/20.
 //
 
-#ifndef UNTITLED1_LABELLEDCODE_H
-#define UNTITLED1_LABELLEDCODE_H
+#ifndef LABELLEDCODE_H
+#define LABELLEDCODE_H
 
 
 #include <map>
@@ -59,4 +59,4 @@ public:
 };
 
 
-#endif //UNTITLED1_LABELLEDCODE_H
+#endif //LABELLEDCODE_H

@@ -2,8 +2,8 @@
 // Created by chris on 30/8/20.
 //
 
-#ifndef UNTITLED1_NONENODE_H
-#define UNTITLED1_NONENODE_H
+#ifndef NONENODE_H
+#define NONENODE_H
 
 
 #include "Node.h"
@@ -18,4 +18,4 @@ public:
 };
 
 
-#endif //UNTITLED1_NONENODE_H
+#endif //NONENODE_H

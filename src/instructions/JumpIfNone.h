@@ -2,8 +2,8 @@
 // Created by chris on 30/8/20.
 //
 
-#ifndef UNTITLED1_JUMPIFNONE_H
-#define UNTITLED1_JUMPIFNONE_H
+#ifndef JUMPIFNONE_H
+#define JUMPIFNONE_H
 
 
 #include "Instruction.h"
@@ -25,4 +25,4 @@ public:
 };
 
 
-#endif //UNTITLED1_JUMPIFNONE_H
+#endif //JUMPIFNONE_H

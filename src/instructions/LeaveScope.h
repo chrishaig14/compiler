@@ -2,8 +2,8 @@
 // Created by chris on 18/8/20.
 //
 
-#ifndef UNTITLED1_LEAVESCOPE_H
-#define UNTITLED1_LEAVESCOPE_H
+#ifndef LEAVESCOPE_H
+#define LEAVESCOPE_H
 
 
 #include "Instruction.h"
@@ -23,4 +23,4 @@ public:
 };
 
 
-#endif //UNTITLED1_LEAVESCOPE_H
+#endif //LEAVESCOPE_H

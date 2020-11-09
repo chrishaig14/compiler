@@ -2,8 +2,8 @@
 // Created by chris on 18/7/20.
 //
 
-#ifndef UNTITLED1_CLASSTABLE_H
-#define UNTITLED1_CLASSTABLE_H
+#ifndef CLASSTABLE_H
+#define CLASSTABLE_H
 
 
 #include <map>
@@ -29,4 +29,4 @@ public:
     }
 };
 
-#endif //UNTITLED1_CLASSTABLE_H
+#endif //CLASSTABLE_H

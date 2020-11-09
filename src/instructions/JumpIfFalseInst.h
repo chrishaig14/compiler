@@ -2,8 +2,8 @@
 // Created by chris on 5/8/20.
 //
 
-#ifndef UNTITLED1_JUMPIFFALSEINST_H
-#define UNTITLED1_JUMPIFFALSEINST_H
+#ifndef JUMPIFFALSEINST_H
+#define JUMPIFFALSEINST_H
 
 
 #include "Instruction.h"
@@ -25,4 +25,4 @@ public:
 };
 
 
-#endif //UNTITLED1_JUMPIFFALSEINST_H
+#endif //JUMPIFFALSEINST_H

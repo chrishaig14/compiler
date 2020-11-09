@@ -2,8 +2,8 @@
 // Created by chris on 2/8/20.
 //
 
-#ifndef UNTITLED1_DECLAREINST_H
-#define UNTITLED1_DECLAREINST_H
+#ifndef DECLAREINST_H
+#define DECLAREINST_H
 
 
 #include <string>
@@ -24,4 +24,4 @@ public:
 };
 
 
-#endif //UNTITLED1_DECLAREINST_H
+#endif //DECLAREINST_H

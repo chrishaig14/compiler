@@ -2,8 +2,8 @@
 // Created by chris on 2/8/20.
 //
 
-#ifndef UNTITLED1_PUSHSTRINGINST_H
-#define UNTITLED1_PUSHSTRINGINST_H
+#ifndef PUSHSTRINGINST_H
+#define PUSHSTRINGINST_H
 
 
 #include <string>
@@ -32,4 +32,4 @@ public:
 };
 
 
-#endif //UNTITLED1_PUSHSTRINGINST_H
+#endif //PUSHSTRINGINST_H

@@ -2,8 +2,8 @@
 // Created by chris on 16/8/20.
 //
 
-#ifndef UNTITLED1_ASSIGNMENTTYPEERROR_H
-#define UNTITLED1_ASSIGNMENTTYPEERROR_H
+#ifndef ASSIGNMENTTYPEERROR_H
+#define ASSIGNMENTTYPEERROR_H
 
 
 #include <stdexcept>
@@ -26,4 +26,4 @@ public:
 };
 
 
-#endif //UNTITLED1_ASSIGNMENTTYPEERROR_H
+#endif //ASSIGNMENTTYPEERROR_H

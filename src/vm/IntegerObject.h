@@ -2,8 +2,8 @@
 // Created by chris on 3/8/20.
 //
 
-#ifndef UNTITLED1_INTEGEROBJECT_H
-#define UNTITLED1_INTEGEROBJECT_H
+#ifndef INTEGEROBJECT_H
+#define INTEGEROBJECT_H
 
 #include "Object.h"
 
@@ -28,4 +28,4 @@ public:
 };
 
 
-#endif //UNTITLED1_INTEGEROBJECT_H
+#endif //INTEGEROBJECT_H

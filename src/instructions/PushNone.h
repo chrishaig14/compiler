@@ -2,8 +2,8 @@
 // Created by chris on 30/8/20.
 //
 
-#ifndef UNTITLED1_PUSHNONE_H
-#define UNTITLED1_PUSHNONE_H
+#ifndef PUSHNONE_H
+#define PUSHNONE_H
 
 
 #include "Instruction.h"
@@ -20,4 +20,4 @@ public:
 };
 
 
-#endif //UNTITLED1_PUSHNONE_H
+#endif //PUSHNONE_H

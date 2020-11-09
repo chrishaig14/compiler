@@ -2,8 +2,8 @@
 // Created by chris on 5/8/20.
 //
 
-#ifndef UNTITLED1_USEROBJECT_H
-#define UNTITLED1_USEROBJECT_H
+#ifndef USEROBJECT_H
+#define USEROBJECT_H
 
 
 #include <string>
@@ -26,4 +26,4 @@ public:
 };
 
 
-#endif //UNTITLED1_USEROBJECT_H
+#endif //USEROBJECT_H

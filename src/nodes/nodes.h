@@ -2,8 +2,8 @@
 // Created by chris on 1/8/20.
 //
 
-#ifndef UNTITLED1_NODES_H
-#define UNTITLED1_NODES_H
+#ifndef NODES_H
+#define NODES_H
 
 
 #include "AssignmentNode.h"
@@ -34,4 +34,4 @@
 #include "SubscriptNode.h"
 #include "TypeNode.h"
 
-#endif //UNTITLED1_NODES_H
+#endif //NODES_H

@@ -2,8 +2,8 @@
 // Created by chris on 29/8/20.
 //
 
-#ifndef UNTITLED1_TERNARYNODE_H
-#define UNTITLED1_TERNARYNODE_H
+#ifndef TERNARYNODE_H
+#define TERNARYNODE_H
 
 
 #include "Node.h"
@@ -26,4 +26,4 @@ public:
 };
 
 
-#endif //UNTITLED1_TERNARYNODE_H
+#endif //TERNARYNODE_H

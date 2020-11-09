@@ -2,8 +2,8 @@
 // Created by chris on 4/10/20.
 //
 
-#ifndef UNTITLED1_CLASSNODE_H
-#define UNTITLED1_CLASSNODE_H
+#ifndef CLASSNODE_H
+#define CLASSNODE_H
 
 
 #include "Node.h"
@@ -27,4 +27,4 @@ public:
 };
 
 
-#endif //UNTITLED1_CLASSNODE_H
+#endif //CLASSNODE_H

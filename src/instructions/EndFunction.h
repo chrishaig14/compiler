@@ -2,8 +2,8 @@
 // Created by chris on 23/8/20.
 //
 
-#ifndef UNTITLED1_ENDFUNCTION_H
-#define UNTITLED1_ENDFUNCTION_H
+#ifndef ENDFUNCTION_H
+#define ENDFUNCTION_H
 
 
 #include "Instruction.h"
@@ -23,4 +23,4 @@ public:
 };
 
 
-#endif //UNTITLED1_ENDFUNCTION_H
+#endif //ENDFUNCTION_H

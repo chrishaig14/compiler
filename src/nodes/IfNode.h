@@ -2,8 +2,8 @@
 // Created by chris on 1/8/20.
 //
 
-#ifndef UNTITLED1_IFNODE_H
-#define UNTITLED1_IFNODE_H
+#ifndef IFNODE_H
+#define IFNODE_H
 
 
 #include <vector>
@@ -39,4 +39,4 @@ public:
 };
 
 
-#endif //UNTITLED1_IFNODE_H
+#endif //IFNODE_H

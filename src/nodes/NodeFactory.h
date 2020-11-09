@@ -2,8 +2,8 @@
 // Created by chris on 8/11/20.
 //
 
-#ifndef UNTITLED1_NODEFACTORY_H
-#define UNTITLED1_NODEFACTORY_H
+#ifndef NODEFACTORY_H
+#define NODEFACTORY_H
 
 #include "NodeContainer.h"
 #include "AssignmentNode.h"
@@ -48,4 +48,4 @@ public:
     }
 };
 
-#endif //UNTITLED1_NODEFACTORY_H
+#endif //NODEFACTORY_H

@@ -2,8 +2,8 @@
 // Created by chris on 5/8/20.
 //
 
-#ifndef UNTITLED1_PUSHBOOLEANINST_H
-#define UNTITLED1_PUSHBOOLEANINST_H
+#ifndef PUSHBOOLEANINST_H
+#define PUSHBOOLEANINST_H
 
 
 #include "Instruction.h"
@@ -27,4 +27,4 @@ public:
 };
 
 
-#endif //UNTITLED1_PUSHBOOLEANINST_H
+#endif //PUSHBOOLEANINST_H

@@ -2,8 +2,8 @@
 // Created by chris on 3/8/20.
 //
 
-#ifndef UNTITLED1_CODEOBJECT_H
-#define UNTITLED1_CODEOBJECT_H
+#ifndef CODEOBJECT_H
+#define CODEOBJECT_H
 
 #include "Object.h"
 #include "CodeUser.h"
@@ -24,4 +24,4 @@ public:
 };
 
 
-#endif //UNTITLED1_CODEOBJECT_H
+#endif //CODEOBJECT_H
