@@ -487,7 +487,7 @@ NodeContainer Parser::parse_common_statement() {
     }
 }
 
-FunctionTypeNode& Parser::parse_function_type() {
+FunctionTypeNode Parser::parse_function_type() {
     this->expect_token(TokType::FUN);
     this->expect_token(TokType::LPAREN);
     std::vector<TypeNode> parameter_types;
@@ -505,7 +505,7 @@ FunctionTypeNode& Parser::parse_function_type() {
     this->expect_token(TokType::RPAREN);
     this->expect_token(TokType::RARROW);
     TypeNode& return_type = this->parse_type_node();
-    return NodeFactory::ftype(parameter_types, return_type);
+    return FunctionTypeNode(parameter_types, return_type);
 }
 
 ObjectTypeNode& Parser::parse_object_type() {
@@ -529,7 +529,7 @@ ObjectTypeNode& Parser::parse_object_type() {
 
 TypeNode& Parser::parse_type_node() {
     if (this->match(TokType::FUN)) {
-        return NodeFactory::type(this->parse_function_type());
+        return NodeFactory::type(*(new FunctionTypeNode(this->parse_function_type())));
     }
     return NodeFactory::type(this->parse_object_type());
 }
