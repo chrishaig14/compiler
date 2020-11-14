@@ -3,14 +3,22 @@ project(untitled_test)
 include_directories(../src)
 set(CMAKE_CXX_STANDARD 11)
 
-add_executable(runTests
-        env_test.cpp
-        value_stack_test.cpp
-        vm_test.cpp
-        scanner_test.cpp
-        parser_test.cpp
-        global_processor_test.cpp
-        generic_test.cpp
-        checker_test.cpp
-        translator_test.cpp total_test.cpp formatter_test.cpp full_test/something_test.cpp full_test/should_pass/custom_class_simple.pl)
-target_link_libraries(runTests gtest gtest_main pthread srcLib)
+add_executable(scanner_test
+        scanner_test.cpp)
+target_link_libraries(scanner_test gtest gtest_main pthread srcLib)
+
+add_executable(checker_test
+        checker_test.cpp)
+target_link_libraries(checker_test gtest gtest_main pthread srcLib)
+
+add_executable(parser_test
+        parser_test.cpp)
+target_link_libraries(parser_test gtest gtest_main pthread srcLib)
+
+add_executable(env_test
+        env_test.cpp)
+target_link_libraries(env_test gtest gtest_main pthread srcLib)
+
+add_executable(translator_test
+        translator_test.cpp)
+target_link_libraries(translator_test gtest gtest_main pthread srcLib)
