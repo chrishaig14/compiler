@@ -129,7 +129,7 @@ void Translator::visit(IfNode& node) {
 //    this->dispatch(node.then);
     this->visit(node.then);
     CodeLabel then_code = this->code;
-    bool has_else = node.selse.type != NodeContainer::UNINITIALIZED;
+    bool has_else = !node.selse.nodes.empty();
 //    bool has_else = node.selse != nullptr;
 
     out.push_back(LC("labelinif", I_JUMPF(then_code.size() + 3 + (has_else && node.elifs.size() == 0 ? 1 : 0))));
@@ -153,7 +153,7 @@ void Translator::visit(IfNode& node) {
     }
     if (has_else) {
 //        node.selse->accept(*this)
-        this->dispatch(node.selse);
+        this->visit(node.selse);
         CodeLabel else_code = this->code;
         out.push_back(LC("", I_JUMP(else_code.size() + 3)));
         out.push_back(LC("", new EnterScope("else")));

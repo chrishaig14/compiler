@@ -60,18 +60,18 @@ ReturnNode Parser::parse_return() {
 IfNode& Parser::parse_if() {
     this->expect_token(TokType::IF);
     NodeContainer condition = this->parse_expression();
-    BlockNode& body = this->parse_possibly_empty_block();
+    BlockNode body = this->parse_possibly_empty_block();
     std::vector<std::pair<NodeContainer, std::reference_wrapper<BlockNode>>> elifs;
     while (this->match(TokType::ELIF)) {
         this->next();
         NodeContainer elif_condition = this->parse_expression();
-        BlockNode& elif_body = this->parse_possibly_empty_block();
+        BlockNode elif_body = this->parse_possibly_empty_block();
         elifs.push_back(std::pair<NodeContainer, std::reference_wrapper<BlockNode>>(elif_condition, elif_body));
     }
-    NodeContainer _else;
+    BlockNode _else;
     if (this->match(TokType::ELSE)) {
         this->next();
-        _else = NodeContainer(&this->parse_possibly_empty_block());
+        _else = this->parse_possibly_empty_block();
     }
 //    IfNode* node = IF(condition, body, elifs, _else);
     return *NodeFactory::iff(condition, body, elifs, _else).node.iff;
@@ -535,7 +535,7 @@ TypeNode& Parser::parse_type_node() {
     return NodeFactory::type(this->parse_object_type());
 }
 
-BlockNode& Parser::parse_possibly_empty_block() {
+BlockNode Parser::parse_possibly_empty_block() {
     Token st = this->expect_token(TokType::LCURLY);
     int start = st.start;
     int end = -1;
@@ -549,7 +549,7 @@ BlockNode& Parser::parse_possibly_empty_block() {
         NodeContainer statement = this->parse_common_statement();
         block.push_back(statement);
     }
-    return *(NodeFactory::block(block).node.block);
+    return BlockNode(block);
 }
 
 FunctionNode& Parser::parse_function_definition() {
@@ -588,7 +588,7 @@ FunctionNode& Parser::parse_function_definition() {
         return_type = this->parse_type_node();
     }
     // Parse function body
-    BlockNode& body = this->parse_possibly_empty_block();
+    BlockNode body = this->parse_possibly_empty_block();
 
     return *(NodeFactory::function(identifier, parameter_names, parameter_types, return_type, body).node.func);
 }
@@ -628,7 +628,7 @@ ForNode Parser::parse_for_loop() {
     }
     bool prev = this->inside_loop;
     this->inside_loop = true;
-    BlockNode& body = this->parse_possibly_empty_block();
+    BlockNode body = this->parse_possibly_empty_block();
     this->inside_loop = prev;
     return ForNode(var.str, exp, body);
 }
@@ -651,7 +651,7 @@ WhileNode Parser::parse_while_loop() {
     NodeContainer condition = this->parse_expression();
     bool prev = this->inside_loop;
     this->inside_loop = true;
-    BlockNode& body = this->parse_possibly_empty_block();
+    BlockNode body = this->parse_possibly_empty_block();
     this->inside_loop = prev;
     return WhileNode(condition, body);
 }

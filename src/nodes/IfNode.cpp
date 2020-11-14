@@ -21,7 +21,7 @@ return false;
 }
 
 IfNode::IfNode(NodeContainer condition, BlockNode& then,
-               const std::vector<std::pair<NodeContainer, std::reference_wrapper<BlockNode>>>& elifs, NodeContainer selse) : condition(condition),
+               const std::vector<std::pair<NodeContainer, std::reference_wrapper<BlockNode>>>& elifs, BlockNode selse) : condition(condition),
                                                                                             then(then), selse(selse),
                                                                                             elifs(elifs) {}
 

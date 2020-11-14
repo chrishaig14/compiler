@@ -67,7 +67,7 @@ public:
 
     VectorOfNodes parse_list_of_expressions();
 
-    BlockNode& parse_possibly_empty_block();
+    BlockNode parse_possibly_empty_block();
 
     BlockNode parse_program();
 

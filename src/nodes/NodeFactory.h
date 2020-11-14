@@ -76,7 +76,7 @@ public:
     static NodeContainer
     iff(NodeContainer condition, BlockNode& body,
         std::vector<std::pair<NodeContainer, std::reference_wrapper<BlockNode>>> elifs,
-        NodeContainer _else) {
+        BlockNode _else) {
         auto node = new IfNode(condition, body, elifs, _else);
         return NodeContainer(node);
     }

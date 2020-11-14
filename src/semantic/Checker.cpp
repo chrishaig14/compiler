@@ -380,10 +380,10 @@ void Checker::visit(IfNode& n) {
         this->visit(n.elifs[i].second);
         this->leave_scope();
     }
-    if (n.selse.type != NodeContainer::UNINITIALIZED) {
+    if (!n.selse.nodes.empty()) {
         this->enter_scope("else");
 //        n.selse->accept(*this)
-        this->dispatch(n.selse);
+        this->visit(n.selse);
         this->leave_scope();
     }
     this->rv = symbol_info;
