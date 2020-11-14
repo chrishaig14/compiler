@@ -463,7 +463,7 @@ NodeContainer Parser::parse_common_statement() {
             return NodeContainer(new ForNode(this->parse_for_loop()));
         }
         case TokType::WHILE: {
-            return NodeContainer(&this->parse_while_loop());
+            return NodeContainer(new WhileNode(this->parse_while_loop()));
         }
         case TokType::BREAK: {
             this->next();
@@ -646,14 +646,14 @@ NodeContainer Parser::parse_ternary() {
     return condition;
 }
 
-WhileNode& Parser::parse_while_loop() {
+WhileNode Parser::parse_while_loop() {
     this->expect_token(TokType::WHILE);
     NodeContainer condition = this->parse_expression();
     bool prev = this->inside_loop;
     this->inside_loop = true;
     BlockNode& body = this->parse_possibly_empty_block();
     this->inside_loop = prev;
-    return *(NodeFactory::whileloop(condition, body).node.whil);
+    return WhileNode(condition, body);
 }
 
 ClassNode& Parser::parse_class_definition() {

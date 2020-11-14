@@ -73,7 +73,7 @@ public:
 
     ForNode parse_for_loop();
 
-    WhileNode& parse_while_loop();
+    WhileNode parse_while_loop();
 
     NodeContainer parse_ternary();
 
