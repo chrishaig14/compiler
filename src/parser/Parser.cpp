@@ -48,13 +48,13 @@ BlockNode Parser::parse_program() {
     return BlockNode(program);
 }
 
-ReturnNode& Parser::parse_return() {
+ReturnNode Parser::parse_return() {
     this->expect_token(TokType::RETURN);
     NodeContainer expression;
     if (!this->match(TokType::SEMICOLON)) {
         expression = this->parse_expression();
     }
-    return *(NodeFactory::retrn(expression).node.retrn);
+    return ReturnNode(expression);
 }
 
 IfNode& Parser::parse_if() {
@@ -455,9 +455,9 @@ NodeContainer Parser::parse_common_statement() {
             return node;
         }
         case TokType::RETURN: {
-            ReturnNode& node = this->parse_return();
+            ReturnNode node = this->parse_return();
             this->expect_token(TokType::SEMICOLON);
-            return NodeContainer(&node);
+            return NodeContainer(new ReturnNode(node));
         }
         case TokType::FOR: {
             return NodeContainer(new ForNode(this->parse_for_loop()));

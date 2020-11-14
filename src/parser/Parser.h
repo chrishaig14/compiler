@@ -59,7 +59,7 @@ public:
 
     NodeContainer parse_top_level_statement();
 
-    ReturnNode& parse_return();
+    ReturnNode parse_return();
 
     Token expect_token(TokType token_type);
 
