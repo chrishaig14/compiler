@@ -25,7 +25,7 @@ public:
 
     void next();
 
-    NodeContainer parse_variable_declaration();
+    DeclarationNode parse_variable_declaration();
 
     NodeContainer parse_id_or_class_literal();
 

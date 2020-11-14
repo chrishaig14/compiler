@@ -421,7 +421,7 @@ NodeContainer Parser::parse_call_or_subscript_chain(NodeContainer parent) {
     return node;
 }
 
-NodeContainer Parser::parse_variable_declaration() {
+DeclarationNode Parser::parse_variable_declaration() {
     Token var_token = this->expect_token(TokType::VAR);
     Token identifier = this->expect_token(TokType::ID);
     TypeNode* type = nullptr;
@@ -435,10 +435,7 @@ NodeContainer Parser::parse_variable_declaration() {
         throw std::runtime_error("Error: you must initialize all variables!");
     }
     NodeContainer expression = this->parse_expression();
-    NodeContainer node = NodeFactory::decl(identifier.str, type, expression);
-//    node->start = var_token.start;
-//    node->end = expression->end;
-    return node;
+    return DeclarationNode(identifier.str, type, expression);
 }
 
 //#define OPTIONAL_SEMICOLON()     if (this->match(TokType::SEMICOLON)) {this->next();}
@@ -449,9 +446,9 @@ NodeContainer Parser::parse_common_statement() {
             return NodeContainer(new IfNode(this->parse_if()));
         }
         case TokType::VAR: {
-            NodeContainer node = this->parse_variable_declaration();
+            DeclarationNode node = this->parse_variable_declaration();
             this->expect_token(TokType::SEMICOLON);
-            return node;
+            return NodeContainer(new DeclarationNode(node));
         }
         case TokType::RETURN: {
             ReturnNode node = this->parse_return();
