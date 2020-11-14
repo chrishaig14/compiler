@@ -63,7 +63,7 @@ public:
 
     Token expect_token(TokType token_type);
 
-    TypeNode& parse_type_node();
+    TypeNode parse_type_node();
 
     VectorOfNodes parse_list_of_expressions();
 

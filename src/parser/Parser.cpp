@@ -87,7 +87,7 @@ NodeContainer Parser::parse_list_literal() {
         this->next();
         // parse required type annotation (cannot infer type of empty list
         this->expect_token(TokType::DOUBLE_COLON);
-        TypeNode& type = this->parse_type_node();
+        TypeNode type = this->parse_type_node();
         NodeContainer node = NodeFactory::emptylst(type);
         return node;
     } else {
@@ -300,7 +300,7 @@ NodeContainer Parser::parse_id_or_literal() {
 
 NodeContainer Parser::parse_class_literal() {
 
-    TypeNode& type = this->parse_type_node();
+    TypeNode type = this->parse_type_node();
     if (type.kind != Kind::OBJECT) {
         throw std::runtime_error("Expecterd a type to initialize, but got " + type.to_string());
     }
@@ -427,7 +427,7 @@ NodeContainer Parser::parse_variable_declaration() {
     TypeNode* type = nullptr;
     if (this->match(TokType::COLON)) {
         this->next();
-        type = &this->parse_type_node();
+        type = new TypeNode(this->parse_type_node());
     }
     try {
         this->expect_token(TokType::EQQ);
@@ -493,7 +493,7 @@ FunctionTypeNode Parser::parse_function_type() {
     std::vector<TypeNode> parameter_types;
     if (!this->match(TokType::RPAREN)) {
         while (true) {
-            TypeNode& parameter_type = this->parse_type_node();
+            TypeNode parameter_type = this->parse_type_node();
             parameter_types.push_back(parameter_type);
             if (this->match(TokType::COMMA)) {
                 this->next();
@@ -504,7 +504,7 @@ FunctionTypeNode Parser::parse_function_type() {
     }
     this->expect_token(TokType::RPAREN);
     this->expect_token(TokType::RARROW);
-    TypeNode& return_type = this->parse_type_node();
+    TypeNode return_type = this->parse_type_node();
     return FunctionTypeNode(parameter_types, return_type);
 }
 
@@ -514,7 +514,7 @@ ObjectTypeNode Parser::parse_object_type() {
     if (this->match(TokType::LSQUARE)) {
         this->next();
         while (true) {
-            TypeNode& type_parameter = this->parse_type_node();;
+            TypeNode type_parameter = this->parse_type_node();;
             type_parameters.push_back(type_parameter);
             if (this->match(TokType::COMMA)) {
                 this->next();
@@ -527,11 +527,11 @@ ObjectTypeNode Parser::parse_object_type() {
     return ObjectTypeNode(identifier.str, type_parameters);
 }
 
-TypeNode& Parser::parse_type_node() {
+TypeNode Parser::parse_type_node() {
     if (this->match(TokType::FUN)) {
-        return NodeFactory::type(*(new FunctionTypeNode(this->parse_function_type())));
+        return TypeNode(*new FunctionTypeNode(this->parse_function_type()));
     }
-    return NodeFactory::type(*(new ObjectTypeNode(this->parse_object_type())));
+    return TypeNode(*new ObjectTypeNode(this->parse_object_type()));
 }
 
 BlockNode Parser::parse_possibly_empty_block() {
@@ -568,7 +568,7 @@ FunctionNode& Parser::parse_function_definition() {
         while (true) {
             Token parameter_identifier = this->expect_token(TokType::ID);
             this->expect_token(TokType::COLON);
-            TypeNode& parameter_type = this->parse_type_node();
+            TypeNode parameter_type = this->parse_type_node();
             parameter_types.push_back(parameter_type);
             parameter_names.push_back(parameter_identifier.str);
             if (this->match(TokType::COMMA)) {
@@ -679,7 +679,7 @@ ClassNode& Parser::parse_class_definition() {
         if (this->match(TokType::ID)) {
             Token member_name_tk = this->expect_token(TokType::ID);
             this->expect_token(TokType::COLON);
-            TypeNode& member_type = this->parse_type_node();
+            TypeNode member_type = this->parse_type_node();
             members[member_name_tk.str] = member_type;
             members_ordered.push_back(member_name_tk.str);
 //            OPTIONAL_SEMICOLON();
