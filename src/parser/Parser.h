@@ -31,7 +31,7 @@ public:
 
     FunctionNode& parse_function_definition();
 
-    IfNode& parse_if();
+    IfNode parse_if();
 
     NodeContainer parse_list_literal();
 

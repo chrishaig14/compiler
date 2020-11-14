@@ -57,7 +57,7 @@ ReturnNode Parser::parse_return() {
     return ReturnNode(expression);
 }
 
-IfNode& Parser::parse_if() {
+IfNode Parser::parse_if() {
     this->expect_token(TokType::IF);
     NodeContainer condition = this->parse_expression();
     BlockNode body = this->parse_possibly_empty_block();
@@ -73,8 +73,7 @@ IfNode& Parser::parse_if() {
         this->next();
         _else = this->parse_possibly_empty_block();
     }
-//    IfNode* node = IF(condition, body, elifs, _else);
-    return *NodeFactory::iff(condition, body, elifs, _else).node.iff;
+    return IfNode(condition, body, elifs, _else);
 }
 
 NodeContainer Parser::parse_list_literal() {
@@ -447,7 +446,7 @@ NodeContainer Parser::parse_variable_declaration() {
 NodeContainer Parser::parse_common_statement() {
     switch (this->token.type) {
         case TokType::IF: {
-            return NodeContainer(&this->parse_if());
+            return NodeContainer(new IfNode(this->parse_if()));
         }
         case TokType::VAR: {
             NodeContainer node = this->parse_variable_declaration();
