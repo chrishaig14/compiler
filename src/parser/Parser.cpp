@@ -508,7 +508,7 @@ FunctionTypeNode Parser::parse_function_type() {
     return FunctionTypeNode(parameter_types, return_type);
 }
 
-ObjectTypeNode& Parser::parse_object_type() {
+ObjectTypeNode Parser::parse_object_type() {
     Token identifier = this->expect_token(TokType::ID);
     std::vector<TypeNode> type_parameters;
     if (this->match(TokType::LSQUARE)) {
@@ -524,14 +524,14 @@ ObjectTypeNode& Parser::parse_object_type() {
         }
         this->expect_token(TokType::RSQUARE);
     }
-    return NodeFactory::otype(identifier.str, type_parameters);
+    return ObjectTypeNode(identifier.str, type_parameters);
 }
 
 TypeNode& Parser::parse_type_node() {
     if (this->match(TokType::FUN)) {
         return NodeFactory::type(*(new FunctionTypeNode(this->parse_function_type())));
     }
-    return NodeFactory::type(this->parse_object_type());
+    return NodeFactory::type(*(new ObjectTypeNode(this->parse_object_type())));
 }
 
 BlockNode Parser::parse_possibly_empty_block() {

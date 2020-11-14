@@ -81,7 +81,7 @@ public:
 
     FunctionTypeNode parse_function_type();
 
-    ObjectTypeNode& parse_object_type();
+    ObjectTypeNode parse_object_type();
 
     bool inside_loop;
 };
