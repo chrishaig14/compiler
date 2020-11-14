@@ -15,4 +15,4 @@ bool EmptyListNode::equal(NodeContainer other) const {
 return false;
 }
 
-EmptyListNode::EmptyListNode(TypeNode* type) : type(type) {}
+EmptyListNode::EmptyListNode(TypeNode& type) : type(type) {}

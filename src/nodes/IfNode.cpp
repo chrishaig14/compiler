@@ -20,8 +20,8 @@ bool IfNode::operator==(IfNode& other) const {
 return false;
 }
 
-IfNode::IfNode(NodeContainer condition, NodeContainer then,
-               const std::vector<std::pair<NodeContainer, NodeContainer>>& elifs, NodeContainer selse) : condition(condition),
+IfNode::IfNode(NodeContainer condition, BlockNode& then,
+               const std::vector<std::pair<NodeContainer, std::reference_wrapper<BlockNode>>>& elifs, NodeContainer selse) : condition(condition),
                                                                                             then(then), selse(selse),
                                                                                             elifs(elifs) {}
 

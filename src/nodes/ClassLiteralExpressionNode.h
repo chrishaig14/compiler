@@ -14,11 +14,11 @@
 class ClassLiteralExpressionNode : public Node {
 
 public:
-    ClassLiteralExpressionNode(ObjectTypeNode* type, const std::vector<NodeContainer>& init);
+    ClassLiteralExpressionNode(ObjectTypeNode& type, const std::vector<NodeContainer>& init);
 
     std::vector<NodeContainer> init;
     std::vector<std::string> names;
-    ObjectTypeNode* type;
+    ObjectTypeNode& type;
 
     void accept(Visitor& visitor) override;
 

@@ -9,7 +9,7 @@
 #include "nodes/nodes.h"
 
 typedef std::vector<NodeContainer> VectorOfNodes;
-typedef std::vector<TypeNode*> VectorOfTypes;
+typedef std::vector<TypeNode> VectorOfTypes;
 typedef std::vector<std::string> VectorOfStrings;
 typedef std::vector<Instruction*> Code;
 
@@ -31,17 +31,17 @@ typedef std::vector<Instruction*> Code;
 #define LIT_EXP(id, type) new ClassLiteralExpressionNode(id, type)
 #define LIT_FIL(id, type) new ClassLiteralFieldNode(id, type)
 typedef std::map<std::string, std::map<std::string, Code>> StructProtos;
-#define TYPE(parent, type_parameters) new ObjectTypeNode(parent, type_parameters)
+#define TYPE(parent, type_parameters) NodeFactory::otype(parent, type_parameters)
 #define BOOL(x) new BooleanNode(x)
-#define T_BOOL new ObjectTypeNode("Boolean", {})
-#define T_INT new ObjectTypeNode("Integer", {})
-#define T_STRING new ObjectTypeNode("String", {})
-#define T_LIST(e) TYPE("List", std::vector<TypeNode*>({e}))
+#define T_BOOL  NodeFactory::otype("Boolean", {})
+#define T_INT  NodeFactory::otype("Integer", {})
+#define T_STRING  NodeFactory::otype("String", {})
+#define T_LIST(e) NodeFactory::otype("List", {e})
 #define T_DICT(k, v) TYPE("Dict", std::vector<TypeNode*>({k,v}))
 #define FUN(a, b, c, d, e) new FunctionNode(a,b,c,d,e)
 #define WHILE(condition, body) new WhileNode(condition, body)
-#define OBJECT_TYPE(identifier, parameters) new ObjectTypeNode(identifier, parameters)
-#define FUNCTION_TYPE(parameters, return_type) new FunctionTypeNode(parameters, return_type)
+#define OBJECT_TYPE(identifier, parameters) NodeFactory::otype(identifier, parameters)
+#define FUNCTION_TYPE(parameters, return_type) NodeFactory::ftype(parameters, return_type)
 #define RET(x) new ReturnNode(x)
 #define I_ENTER(x) new EnterScope(x)
 #define I_LEAVE(x) new LeaveScope(x)

@@ -305,7 +305,7 @@ TEST(translator_test, test_nested_while) {
 TEST(translator_test, function) {
     Translator translator;
     std::vector<std::string> parameter_names = {"x", "y"};
-    VectorOfTypes parameter_types = {T_INT, T_INT};
+    std::vector<NodeContainer> parameter_types = {T_INT, T_INT};
     BlockNode* function_code = new BlockNode({RET(BIN(OpType::ADD, ID("x"), ID("y")))});
     NodeContainer node = FUN("foo", parameter_names, parameter_types, T_INT, function_code);
     node->accept(translator);

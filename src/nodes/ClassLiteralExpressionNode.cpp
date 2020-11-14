@@ -21,5 +21,5 @@ bool ClassLiteralExpressionNode::equal(NodeContainer other) const {
 return false;
 }
 
-ClassLiteralExpressionNode::ClassLiteralExpressionNode(ObjectTypeNode* type, const std::vector<NodeContainer>& init)
+ClassLiteralExpressionNode::ClassLiteralExpressionNode(ObjectTypeNode& type, const std::vector<NodeContainer>& init)
         : type(type), init(init) {}

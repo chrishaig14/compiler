@@ -15,20 +15,15 @@
 #include "TypeClassInfo.h"
 #include "../utils.h"
 
-//typedef std::map<std::string, ObjectInfo> MapStringToSimple;
-//typedef std::map<std::string, FunctionInfo> MapStringToFunction;
-
-
 class SymbolInfo {
 public:
-    TypeNode* type;
+    TypeNode type;
     bool is_function;
     bool is_method;
     ClassInfo* class_info;
     bool is_class_method;
 
     SymbolInfo() {
-        this->type = nullptr;
         this->is_function = false;
         this->is_method = false;
         this->class_info = nullptr;
@@ -38,11 +33,11 @@ public:
 
 bool type_matches(TypeNode* a, TypeNode* b);
 
-bool is_generic(TypeNode* t);
+bool is_generic(const TypeNode& t);
 
 std::map<std::string, TypeNode*> make_replacements(TypeNode* a, TypeNode* b);
 
-TypeNode* make_type(TypeNode* original, std::map<std::string, TypeNode*>& replacements);
+TypeNode make_type(TypeNode original, std::map<std::string, TypeNode> replacements);
 
 class Checker : public Visitor {
     SymbolTable* scope;
@@ -108,20 +103,18 @@ public:
     void visit(NoneNode& node) override;
 
 
-    bool can_assign(TypeNode* from, TypeNode* to);
+    bool can_assign(TypeNode from, TypeNode to);
 
     void visit(EmptyListNode& node) override;
 
     void check_structs();
 
-    std::vector<std::string> type_params;
+    bool type_exists(TypeNode type);
 
-    bool type_exists(TypeNode* type);
-
-    bool can_assign_generic(TypeNode* from, TypeNode* to, std::vector<std::string> type_params);
+    bool can_assign_generic(TypeNode from, TypeNode to, std::vector<std::string> type_params);
 
 
-    ClassInfo* instantiate_generic(ClassInfo* generic, ObjectTypeNode* instance);
+    ClassInfo* instantiate_generic(ClassInfo* generic, ObjectTypeNode instance);
 
     FunctionTable* function_table;
 
@@ -142,13 +135,10 @@ public:
 
     bool replace_me;
 
-    void match_arguments_to_generic_function();
+    void match_arguments_to_generic_function(FunctionTypeNode function_type, VectorOfTypes arg_types);
 
-    void match_arguments_to_generic_function(FunctionTypeNode* function_type, VectorOfTypes arg_types);
 
     void visit(ContinueNode& node) override;
-
-    int null_check_type;
 
     void dispatch(NodeContainer node);
 };

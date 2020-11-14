@@ -14,7 +14,7 @@
 
 
 class SymbolTable {
-    std::map<std::string, TypeNode*> table;
+    std::map<std::string, TypeNode> table;
 public:
     SymbolTable(std::string name, SymbolTable* parent) {
         this->name = name;
@@ -33,7 +33,7 @@ public:
         }
     }
 
-    TypeNode* get(std::string name) {
+    TypeNode& get(std::string name) {
         if (this->table.count(name) == 1) {
             return this->table[name];
         } else {
@@ -48,10 +48,9 @@ public:
         return this->table.count(name) == 1;
     }
 
-    void set(std::string name, TypeNode* info) {
-        ObjectTypeNode* otn = dynamic_cast<ObjectTypeNode*>(info);
-        if (otn != nullptr) {
-            if (otn->identifier == "Option") {
+    void set(std::string name, const TypeNode& info) {
+        if (info.kind == Kind::OBJECT) {
+            if (info.otype->identifier == "Option") {
                 this->not_null[name] = false;
             }
         }

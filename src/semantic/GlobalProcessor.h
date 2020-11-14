@@ -13,15 +13,15 @@
 #include "../vm/Object.h"
 
 class FunctionTable {
-    std::map<std::string, FunctionTypeNode*> functions;
+    std::map<std::string, FunctionTypeNode> functions;
 
 public:
 
-    int add(std::string function_name, FunctionTypeNode* function_type);
+    void add(std::string function_name, FunctionTypeNode& function_type);
 
     bool has_function(std::string name);
 
-    FunctionTypeNode* get(std::string function_name);
+    FunctionTypeNode& get(std::string function_name);
 
 };
 

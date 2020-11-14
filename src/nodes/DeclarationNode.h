@@ -54,7 +54,7 @@ return false;
 //            j["expression"] = this->expression->to_json();
 //        }
         if (this->type != nullptr) {
-            j["type"] = this->type->to_json();
+//            j["type"] = this->type->to_json();
         }
         return j;
     }

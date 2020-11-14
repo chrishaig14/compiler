@@ -18,9 +18,11 @@ public:
         return t;
     }
 
-    ReturnError(TypeNode* expected_type, TypeNode* actual_type) : runtime_error(
-            "Expected to return " + expected_type->to_string() + ", actual: " +
-            (actual_type == nullptr ? "NULL" : actual_type->to_string())) {
+    ReturnError(TypeNode expected_type, TypeNode actual_type) : runtime_error(
+            "Expected to return " + expected_type.to_string() + ", actual: " +
+                    ((actual_type.kind == Kind::OBJECT && actual_type.otype->identifier == ".None") ? "NULL"
+                                                                                           : actual_type.to_string())
+    ) {
 
     }
 

@@ -4,47 +4,53 @@
 
 #include "TypeNode.h"
 
-bool FunctionTypeNode::equal(TypeNode* other) const {
-    FunctionTypeNode* other_ptr = dynamic_cast<FunctionTypeNode*>(other);
-    if (other_ptr == nullptr) return false;
-    return *this == *other_ptr;
-}
-
-FunctionTypeNode::FunctionTypeNode(const std::vector<TypeNode*>& parameterTypes, TypeNode* returnType)
+FunctionTypeNode::FunctionTypeNode(const std::vector<TypeNode>& parameterTypes,
+                                   TypeNode returnType)
         : parameter_types(parameterTypes), return_type(returnType) {}
 
-std::string FunctionTypeNode::to_string() {
+ObjectTypeNode::ObjectTypeNode(const std::string& identifier,
+                               const std::vector<TypeNode>& typeParameters) : identifier(
+        identifier), type_parameters(typeParameters) {
+
+}
+std::string ftype_to_string(FunctionTypeNode& ftype) {
     std::string parameters;
     std::string ret;
-    for (auto p: this->parameter_types) {
-        parameters += p->to_string() + ", ";
+    for (auto p: ftype.parameter_types) {
+        parameters += p.to_string() + ", ";
     }
-    if (this->parameter_types.size() != 0) {
+    if (ftype.parameter_types.size() != 0) {
         parameters = parameters.substr(0, parameters.size() - 2);
     }
-    ret = this->return_type->to_string();
-    return "fun (" + parameters + ") -> " + ret;
+    ret = ftype.return_type.to_string() + ", ";
+    return "fun (" + parameters + ") . " + ret;
 }
 
-
-bool ObjectTypeNode::equal(TypeNode* other) const {
-    const ObjectTypeNode* other_ptr = dynamic_cast<const ObjectTypeNode*>(other);
-    if (other_ptr == nullptr) return false;
-    return *this == *other_ptr;
-}
-
-ObjectTypeNode::ObjectTypeNode(const std::string& identifier, const std::vector<TypeNode*>& typeParameters)
-        : identifier(identifier), type_parameters(typeParameters) {}
-
-std::string ObjectTypeNode::to_string() {
+std::string otype_to_string(ObjectTypeNode& otype) {
     std::string parameters;
-    for (auto p: this->type_parameters) {
-        parameters += p->to_string() + ", ";
+    for (auto p: otype.type_parameters) {
+        parameters += p.to_string() + ", ";
     }
     if (parameters.size() != 0) {
         parameters = parameters.substr(0, parameters.size() - 2);
-        return this->identifier + "[" + parameters + "]";
+        return otype.identifier + "[" + parameters + "]";
     }
-    return this->identifier;
+    return otype.identifier;
 }
 
+bool ftype_equal(FunctionTypeNode& a, FunctionTypeNode& b) {
+    if (a.parameter_types.size() != b.parameter_types.size()) return false;
+    for (int i = 0; i < a.parameter_types.size(); i++) {
+        if (a.parameter_types[i] != b.parameter_types[i]) return false;
+    }
+    return a.return_type == b.return_type;
+}
+
+bool otype_equal(ObjectTypeNode& a, ObjectTypeNode& b) {
+    if (a.identifier != b.identifier) return false;
+    if (a.type_parameters.size() != b.type_parameters.size()) return false;
+    for (int i = 0; i < a.type_parameters.size(); i++) {
+        if (a.type_parameters[i] == b.type_parameters[i]) return false;
+    }
+    return true;
+}

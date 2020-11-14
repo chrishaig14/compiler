@@ -18,22 +18,20 @@ class FunctionNode : public Node {
 public:
     std::string identifier;
     std::vector<std::string> parameter_names;
-    std::vector<TypeNode*> parameter_types;
-    BlockNode* body;
-    TypeNode* return_type;
+    std::vector<TypeNode> parameter_types;
+    BlockNode body;
+    TypeNode return_type;
     std::map<std::string, int> free_variables;
 
 
     void accept(Visitor& visitor) override;
 
     FunctionNode(std::string identifier, std::vector<std::string> parameter_names,
-                 std::vector<TypeNode*> parameter_types, TypeNode* return_type, BlockNode* body) {
-        assert(body != nullptr);
+                 std::vector<TypeNode> parameter_types, TypeNode return_type, BlockNode& body)
+            : body(body), return_type(return_type) {
         this->identifier = identifier;
         this->parameter_names = parameter_names;
         this->parameter_types = parameter_types;
-        this->body = body;
-        this->return_type = return_type;
     }
 
 
@@ -41,7 +39,7 @@ public:
 //        auto other_ptr = dynamic_cast<FunctionNode*>(other);
 //        if (other_ptr == nullptr) return false;
 //        return *this == *other_ptr;
-return false;
+        return false;
     }
 
     bool operator==(FunctionNode& other) const {

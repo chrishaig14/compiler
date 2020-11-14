@@ -9,12 +9,12 @@
 #include "../vm/ObjectStack.h"
 #include "../vm/CodeObject.h"
 #include "../vm/CodeRunner.h"
+#include "../nodes/NodeFactory.h"
 
 void GlobalProcessor::add_builtins(std::vector<Builtin>& builtins) {
     for (int i = 0; i < builtins.size(); i++) {
         Builtin b = builtins[i];
         assert(b.second.ftype != nullptr);
-        int index = this->function_table->add(b.first, b.second.ftype);
         b.first = b.first;
         builtins[i] = b;
     }
@@ -46,7 +46,9 @@ void list_len(std::map<std::string, std::map<std::string, Code>>& structs, Objec
 void list_pop(std::map<std::string, std::map<std::string, Code>>& structs, ObjectStack& stack,
               Environment* global_env) {
     ListObject* ls = stack.pop_list();
-    if (ls->list.size() == 0) throw std::runtime_error("RUNTIME ERROR: pop from empty list!");
+    if (ls->list.size() == 0) {
+        throw std::runtime_error("RUNTIME ERROR: pop from empty list!");
+    }
     Object* last = ls->list[ls->list.size() - 1];
     ls->list.pop_back();
     stack.push(last);
@@ -84,7 +86,9 @@ void join(std::map<std::string, std::map<std::string, Code>>& structs, ObjectSta
     std::string res;
     for (int i = 0; i < ls->list.size(); i++) {
         StringObject* str = dynamic_cast<StringObject*>(ls->list[i]);
-        if (str == nullptr) throw "Joining list with no strings!";
+        if (str == nullptr) {
+            throw "Joining list with no strings!";
+        }
         res += str->str + sep->str;
     }
     if (ls->list.size() != 0) {
@@ -96,7 +100,9 @@ void join(std::map<std::string, std::map<std::string, Code>>& structs, ObjectSta
 void list_map(std::map<std::string, std::map<std::string, Code>>& structs, ObjectStack& stack,
               Environment* global_env) {
     CodeObject* fun = dynamic_cast<CodeObject*>(stack.pop());
-    if (fun == nullptr)throw std::runtime_error("Popping a code object but it's not!");
+    if (fun == nullptr) {
+        throw std::runtime_error("Popping a code object but it's not!");
+    }
     ListObject* ls = stack.pop_list();
     std::vector<Object*> rv;
     for (int i = 0; i < ls->list.size(); i++) {
@@ -115,27 +121,33 @@ void list_map(std::map<std::string, std::map<std::string, Code>>& structs, Objec
 
 GlobalProcessor::GlobalProcessor(std::vector<Builtin>& builtins) {
     this->function_table = new FunctionTable();
-
     this->globals = new SymbolTable("global", nullptr);
     this->class_table = new ClassTable();
-    auto ft = FUNCTION_TYPE({ TYPE("a", {}) }, TYPE("b", {}));
-    auto at = T_LIST(TYPE("a", {}));
-    auto none = TYPE(".None", {});
-    builtins.push_back({"map", CodeBuiltin{FUNCTION_TYPE(VectorOfTypes({at, ft}), T_LIST(TYPE("b", {}))), list_map}});
-    builtins.push_back({"Integer.str", CodeBuiltin{FUNCTION_TYPE({ T_INT }, T_STRING), int_to_str}});
-    builtins.push_back({"List.len", CodeBuiltin{FUNCTION_TYPE({ T_LIST(TYPE("a", {})) }, T_INT), list_len}});
-    VectorOfTypes x = {T_LIST(TYPE("a", {})), TYPE("a", {})};
-    builtins.push_back({"List.pop", CodeBuiltin{FUNCTION_TYPE(x, none), list_pop}});
-    builtins.push_back({"List.push", CodeBuiltin{FUNCTION_TYPE({ T_LIST(TYPE("a", {})) }, TYPE("a", {})), list_push}});
-    auto function_from_t_to_u = FUNCTION_TYPE({ TYPE("t", {}) }, TYPE("b", {}));
+    auto ft = FUNCTION_TYPE({ TypeNode(NodeFactory::otype("a", {})) }, TypeNode(NodeFactory::otype("b", {})));
+    auto at = T_LIST(TypeNode(NodeFactory::otype("a", {})));
+    auto none = NodeFactory::otype(".None", {});
+    std::vector<TypeNode> w = {at, ft};
     builtins.push_back(
-            {"List.map", CodeBuiltin{FUNCTION_TYPE({ function_from_t_to_u }, T_LIST(TYPE("b", {}))), list_map}});
-    builtins.push_back({"String.len", CodeBuiltin{FUNCTION_TYPE({ T_STRING }, T_INT), string_len}});
-    builtins.push_back({"print", CodeBuiltin{FUNCTION_TYPE({ T_STRING }, none), print}});
+            {"map", CodeBuiltin{&FUNCTION_TYPE(w, T_LIST(TypeNode(NodeFactory::otype("b", {})))), list_map}});
+    builtins.push_back({"Integer.str", CodeBuiltin{&FUNCTION_TYPE({ T_INT }, T_STRING), int_to_str}});
     builtins.push_back(
-            {"join", CodeBuiltin{FUNCTION_TYPE(VectorOfTypes({T_LIST(T_STRING), T_STRING}), T_STRING), join}});
+            {"List.len", CodeBuiltin{&FUNCTION_TYPE({ T_LIST(NodeFactory::otype("a", {})) }, T_INT), list_len}});
+    std::vector<TypeNode> x = {T_LIST(TYPE("a", {})), NodeFactory::otype("a", {})};
+    builtins.push_back({"List.pop", CodeBuiltin{&FUNCTION_TYPE(x, none), list_pop}});
+    builtins.push_back({"List.push", CodeBuiltin{
+            &FUNCTION_TYPE({ T_LIST(NodeFactory::otype("a", {})) }, NodeFactory::otype("a", {})), list_push}});
+    auto function_from_t_to_u = FUNCTION_TYPE({ TYPE("t", {}) }, NodeFactory::otype("b", {}));
     builtins.push_back(
-            {"range", CodeBuiltin{FUNCTION_TYPE(VectorOfTypes({T_INT, T_INT, T_INT}), T_LIST(T_INT)), range}});
+            {"List.map",
+             CodeBuiltin{&FUNCTION_TYPE({ function_from_t_to_u }, T_LIST(NodeFactory::otype("b", {}))), list_map}});
+    builtins.push_back({"String.len", CodeBuiltin{&FUNCTION_TYPE({ T_STRING }, T_INT), string_len}});
+    builtins.push_back({"print", CodeBuiltin{&FUNCTION_TYPE({ T_STRING }, none), print}});
+    std::vector<TypeNode> a1 = {T_LIST(T_STRING), T_STRING};
+    builtins.push_back(
+            {"join", CodeBuiltin{&FUNCTION_TYPE(a1, T_STRING), join}});
+    std::vector<TypeNode> a2 = {T_LIST(T_STRING), T_STRING};
+    builtins.push_back(
+            {"range", CodeBuiltin{&FUNCTION_TYPE(a2, T_LIST(T_INT)), range}});
 
     this->add_builtins(builtins);
 }
@@ -211,8 +223,8 @@ void GlobalProcessor::visit(StructNode& node) {
 }
 
 void GlobalProcessor::visit(FunctionNode& node) {
-    FunctionTypeNode* function_info = new FunctionTypeNode(node.parameter_types, node.return_type);
-    int index = this->function_table->add(node.identifier, function_info);
+    FunctionTypeNode function_info(node.parameter_types, node.return_type);
+    this->function_table->add(node.identifier, function_info);
     node.identifier = node.identifier;
 }
 
@@ -273,9 +285,9 @@ void GlobalProcessor::visit(ClassNode& node) {
 //        class_info->members[mn] = mt;
     }
     for (auto f: node.methods) {
-        FunctionNode* method = f.second.node.func;
-        FunctionTypeNode* ft = new FunctionTypeNode(method->parameter_types, method->return_type);
-        class_info->methods[f.first] = ft;
+        FunctionNode& method = f.second;
+        class_info->methods.insert(make_pair(f.first, FunctionTypeNode(method.parameter_types, method.return_type)));
+//        class_info->methods[f.first] = ;
     }
     class_info->class_name = node.class_name;
     class_info->type_parameters = node.type_parameters;
@@ -338,7 +350,7 @@ void GlobalProcessor::dispatch(NodeContainer n) {
             n.node.id->accept(*this);
             break;
         case NodeContainer::IFN:
-            n.node.ifn->accept(*this);
+            n.node.iff->accept(*this);
             break;
         case NodeContainer::INSTANCE:
 //                n.node.instance->accept(*this);
@@ -370,29 +382,30 @@ void GlobalProcessor::dispatch(NodeContainer n) {
         case NodeContainer::TERNARY:
             n.node.ternary->accept(*this);
             break;
-        case NodeContainer::TYPE:
+//        case NodeContainer::TYPE:
 //                n.node.type->accept(*this);
-            break;
+//            break;
         case NodeContainer::WHIL:
             n.node.whil->accept(*this);
             break;
         case NodeContainer::UNINITIALIZED:
             break;
+        default:
+            throw std::runtime_error("Dont know what to do here!");
     }
 }
 
 
-FunctionTypeNode* FunctionTable::get(std::string function_name) {
-    return functions[function_name];
+FunctionTypeNode& FunctionTable::get(std::string function_name) {
+    return functions.find(function_name)->second;
 }
 
-int FunctionTable::add(std::string function_name, FunctionTypeNode* function_type) {
+void FunctionTable::add(std::string function_name, FunctionTypeNode& function_type) {
     if (functions.count(function_name) == 0) {
-        functions[function_name] = function_type;
+        functions.insert(std::make_pair(function_name, function_type));
     } else {
         throw std::runtime_error("Cant overload function " + function_name);
     }
-    return 0;
 }
 
 bool FunctionTable::has_function(std::string name) {

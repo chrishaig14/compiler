@@ -34,6 +34,8 @@ class ForNode;
 
 class FunctionNode;
 
+class FunctionTypeNode;
+
 class IdNode;
 
 class IfNode;
@@ -47,6 +49,8 @@ class MemberNode;
 class NoneNode;
 
 class NumberNode;
+
+class ObjectTypeNode;
 
 class ReturnNode;
 
@@ -91,7 +95,8 @@ public:
         STRCT,
         SUB,
         TERNARY,
-        TYPE,
+        OTYPE,
+        FTYPE,
         WHIL,
         UNINITIALIZED
     } type;
@@ -111,12 +116,14 @@ public:
         ForNode* forloop;
         FunctionNode* func;
         IdNode* id;
-        IfNode* ifn;
+        IfNode* iff;
         InstanceNode* instance;
         ListNode* lst;
         MemberNode* member;
         NoneNode* none;
         NumberNode* number;
+        ObjectTypeNode* otype;
+        FunctionTypeNode* ftype;
         ReturnNode* retrn;
         StringNode* strng;
         StructNode* strct;
@@ -135,142 +142,147 @@ public:
         this->node = other.node;
     }
 
-    NodeContainer(AssignmentNode* assign) {
+    explicit NodeContainer(AssignmentNode* assign) {
         this->node.assign = assign;
         this->type = ASSIGN;
     }
 
-    NodeContainer(BinopNode* binop) {
+    explicit NodeContainer(BinopNode* binop) {
         this->node.binop = binop;
         this->type = BINOP;
     }
 
-    NodeContainer(BlockNode* block) {
+    explicit NodeContainer(BlockNode* block) {
         this->node.block = block;
         this->type = BLOCK;
     }
 
-    NodeContainer(BooleanNode* boolean) {
+    explicit NodeContainer(BooleanNode* boolean) {
         this->node.boolean = boolean;
         this->type = BOOLEAN;
     }
 
-    NodeContainer(BreakNode* brk) {
+    explicit NodeContainer(BreakNode* brk) {
         this->node.brk = brk;
         this->type = BRK;
     }
 
-    NodeContainer(CallNode* call) {
+    explicit NodeContainer(CallNode* call) {
         this->node.call = call;
         this->type = CALL;
     }
 
-    NodeContainer(ClassLiteralExpressionNode* clsexp) {
+    explicit NodeContainer(ClassLiteralExpressionNode* clsexp) {
         this->node.clsexp = clsexp;
         this->type = CLSEXP;
     }
 
-    NodeContainer(ClassLiteralFieldNode* clsfld) {
+    explicit NodeContainer(ClassLiteralFieldNode* clsfld) {
         this->node.clsfld = clsfld;
         this->type = CLSFLD;
     }
 
-    NodeContainer(ClassNode* cls) {
+    explicit NodeContainer(ClassNode* cls) {
         this->node.cls = cls;
         this->type = CLS;
     }
 
-    NodeContainer(ContinueNode* cntinue) {
+    explicit NodeContainer(ContinueNode* cntinue) {
         this->node.cntinue = cntinue;
         this->type = CNTINUE;
     }
 
-    NodeContainer(DeclarationNode* decl) {
+    explicit NodeContainer(DeclarationNode* decl) {
         this->node.decl = decl;
         this->type = DECL;
     }
 
-    NodeContainer(EmptyListNode* emptylst) {
+    explicit NodeContainer(EmptyListNode* emptylst) {
         this->node.emptylst = emptylst;
         this->type = EMPTYLST;
     }
 
-    NodeContainer(ForNode* forloop) {
+    explicit NodeContainer(ForNode* forloop) {
         this->node.forloop = forloop;
         this->type = FORLOOP;
     }
 
-    NodeContainer(FunctionNode* func) {
+    explicit NodeContainer(FunctionNode* func) {
         this->node.func = func;
         this->type = FUNC;
     }
 
-    NodeContainer(IdNode* id) {
+    explicit NodeContainer(IdNode* id) {
         this->node.id = id;
         this->type = ID;
     }
 
-    NodeContainer(IfNode* ifn) {
-        this->node.ifn = ifn;
+    explicit NodeContainer(IfNode* ifn) {
+        this->node.iff = ifn;
         this->type = IFN;
     }
 
-    NodeContainer(InstanceNode* instance) {
+    explicit NodeContainer(InstanceNode* instance) {
         this->node.instance = instance;
         this->type = INSTANCE;
     }
 
-    NodeContainer(ListNode* lst) {
+    explicit NodeContainer(ListNode* lst) {
         this->node.lst = lst;
         this->type = LST;
     }
 
-    NodeContainer(MemberNode* member) {
+    explicit NodeContainer(MemberNode* member) {
         this->node.member = member;
         this->type = MEMBER;
     }
 
-    NodeContainer(NoneNode* none) {
+    explicit NodeContainer(NoneNode* none) {
         this->node.none = none;
         this->type = NONE;
     }
 
-    NodeContainer(NumberNode* number) {
+    explicit NodeContainer(NumberNode* number) {
         this->node.number = number;
         this->type = NUMBER;
     }
 
-    NodeContainer(ReturnNode* retrn) {
+    explicit NodeContainer(ReturnNode* retrn) {
         this->node.retrn = retrn;
         this->type = RETRN;
     }
 
-    NodeContainer(StringNode* strng) {
+    explicit NodeContainer(StringNode* strng) {
         this->node.strng = strng;
         this->type = STRNG;
     }
 
-    NodeContainer(StructNode* strct) {
+    explicit NodeContainer(StructNode* strct) {
         this->node.strct = strct;
         this->type = STRCT;
     }
 
-    NodeContainer(SubscriptNode* sub) {
+    explicit NodeContainer(SubscriptNode* sub) {
         this->node.sub = sub;
         this->type = SUB;
     }
 
-    NodeContainer(TernaryNode* ternary) {
+    explicit NodeContainer(TernaryNode* ternary) {
         this->node.ternary = ternary;
         this->type = TERNARY;
     }
 
-    NodeContainer(TypeNode* type) {
-        this->node.type = type;
-        this->type = TYPE;
+    explicit NodeContainer(ObjectTypeNode* type) {
+        this->node.otype = type;
+        this->type = OTYPE;
     }
 
-    NodeContainer(WhileNode* whil) {
+    explicit NodeContainer(FunctionTypeNode* type) {
+        this->node.ftype = type;
+        this->type = FTYPE;
+    }
+
+    explicit NodeContainer(WhileNode* whil) {
         this->node.whil = whil;
         this->type = WHIL;
     }

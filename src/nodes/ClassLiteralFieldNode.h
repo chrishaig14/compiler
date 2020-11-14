@@ -12,10 +12,10 @@
 
 class ClassLiteralFieldNode : public Node {
 public:
-    ObjectTypeNode* type;
+    ObjectTypeNode& type;
     std::map<std::string, NodeContainer> init;
 
-    ClassLiteralFieldNode(ObjectTypeNode* type, const std::map<std::string, NodeContainer>& init);
+    ClassLiteralFieldNode(ObjectTypeNode& type, const std::map<std::string, NodeContainer>& init);
 
     void accept(Visitor& visitor) override;
 

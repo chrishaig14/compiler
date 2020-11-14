@@ -218,7 +218,7 @@ TEST(second_pass_test, assign_none_to_none_option) {
 
 TEST(second_pass_test, assign_none_to_union) {
     std::string text = "var x : Union[Integer, String] = none;";
-    VectorOfTypes o = {T_INT, T_STRING};
+    std::vector<NodeContainer> o = {T_INT, T_STRING};
     auto ut = TYPE("Union", o);
     ASSERT_THROWS_ASSIGNMENT_ERROR(text, ut, TYPE("NoneType", {}));
 }

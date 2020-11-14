@@ -15,4 +15,4 @@ bool ForNode::equal(NodeContainer other) const {
     return false;
 }
 
-ForNode::ForNode(const std::string& var, NodeContainer exp, BlockNode* body) : var(var), exp(exp), body(body) {}
+ForNode::ForNode(const std::string& var, NodeContainer exp, BlockNode& body) : var(var), exp(exp), body(body) {}

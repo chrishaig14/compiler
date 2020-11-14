@@ -58,7 +58,7 @@ return false;
         j["type"] = "class";
         j["fields"] = {};
         for (auto f: this->fields) {
-            j["fields"][f.first] = f.second->to_json();
+//            j["fields"][f.first] = f.second->to_json();
         }
         return j;
     }

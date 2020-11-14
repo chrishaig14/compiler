@@ -86,7 +86,7 @@ public:
                 n.node.id->accept(*this);
                 break;
             case NodeContainer::IFN:
-                n.node.ifn->accept(*this);
+                n.node.iff->accept(*this);
                 break;
             case NodeContainer::INSTANCE:
 //                n.node.instance->accept(*this);
@@ -118,7 +118,10 @@ public:
             case NodeContainer::TERNARY:
                 n.node.ternary->accept(*this);
                 break;
-            case NodeContainer::TYPE:
+            case NodeContainer::OTYPE:
+//                n.node.type->accept(*this);
+                break;
+            case NodeContainer::FTYPE:
 //                n.node.type->accept(*this);
                 break;
             case NodeContainer::WHIL:

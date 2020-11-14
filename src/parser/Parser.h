@@ -29,9 +29,9 @@ public:
 
     NodeContainer parse_id_or_class_literal();
 
-    NodeContainer parse_function_definition();
+    FunctionNode& parse_function_definition();
 
-    NodeContainer parse_if();
+    IfNode& parse_if();
 
     NodeContainer parse_list_literal();
 
@@ -59,29 +59,29 @@ public:
 
     NodeContainer parse_top_level_statement();
 
-    NodeContainer parse_return();
+    ReturnNode& parse_return();
 
     Token expect_token(TokType token_type);
 
-    TypeNode* parse_type_node();
+    TypeNode& parse_type_node();
 
     VectorOfNodes parse_list_of_expressions();
 
-    BlockNode* parse_possibly_empty_block();
+    BlockNode& parse_possibly_empty_block();
 
     NodeContainer parse_program();
 
-    NodeContainer parse_for_loop();
+    ForNode& parse_for_loop();
 
-    NodeContainer parse_while_loop();
+    WhileNode& parse_while_loop();
 
     NodeContainer parse_ternary();
 
-    NodeContainer parse_class_definition();
+    ClassNode& parse_class_definition();
 
-    FunctionTypeNode* parse_function_type();
+    FunctionTypeNode& parse_function_type();
 
-    ObjectTypeNode* parse_object_type();
+    ObjectTypeNode& parse_object_type();
 
     bool inside_loop;
 };

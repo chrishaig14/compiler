@@ -13,9 +13,9 @@ class ForNode : public Node {
 public:
     std::string var;
     NodeContainer exp;
-    BlockNode* body;
+    BlockNode& body;
 
-    ForNode(const std::string& var, NodeContainer exp, BlockNode* body);
+    ForNode(const std::string& var, NodeContainer exp, BlockNode& body);
 
     void accept(Visitor& visitor) override;
 

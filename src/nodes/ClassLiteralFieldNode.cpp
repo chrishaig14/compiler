@@ -21,5 +21,5 @@ bool ClassLiteralFieldNode::equal(NodeContainer other) const {
 return false;
 }
 
-ClassLiteralFieldNode::ClassLiteralFieldNode(ObjectTypeNode* type, const std::map<std::string, NodeContainer>& init)
+ClassLiteralFieldNode::ClassLiteralFieldNode(ObjectTypeNode& type, const std::map<std::string, NodeContainer>& init)
         : type(type), init(init) {}

@@ -5,7 +5,7 @@
 #include <iostream>
 #include "Translator.h"
 #include "../vm/LabelledCode.h"
-
+#include "../nodes/NodeFactory.h"
 
 void Translator::visit(AssignmentNode& node) {
     CodeLabel out;
@@ -95,7 +95,7 @@ void Translator::visit(FunctionNode& node) {
     out.push_back(LC("", I_START_FUNCTION(new_name)));
     CodeLabel body_code;
 //    node.body->accept(*this)
-    this->dispatch(node.body);
+    this->visit(node.body);
     body_code = this->code;
     CodeLabel parameters_code;
     for (int i = node.parameter_names.size() - 1; i >= 0; i--) {
@@ -126,7 +126,8 @@ void Translator::visit(IfNode& node) {
     CodeLabel condition_code = this->code;
     out.insert(out.end(), condition_code.begin(), condition_code.end());
 //    node.then->accept(*this)
-    this->dispatch(node.then);
+//    this->dispatch(node.then);
+    this->visit(node.then);
     CodeLabel then_code = this->code;
     bool has_else = node.selse.type != NodeContainer::UNINITIALIZED;
 //    bool has_else = node.selse != nullptr;
@@ -143,7 +144,7 @@ void Translator::visit(IfNode& node) {
         CodeLabel econdition_code = this->code;
         out.insert(out.end(), econdition_code.begin(), econdition_code.end());
 //        node.elifs[i].second->accept(*this)
-        this->dispatch(node.elifs[i].second);
+        this->visit(node.elifs[i].second);
         CodeLabel ethen_code = this->code;
         out.push_back(LC("", I_JUMPF(ethen_code.size() + 3 + ((has_else && i == node.elifs.size() - 1) ? 1 : 0))));
         out.push_back(LC("", new EnterScope("elif")));
@@ -273,7 +274,7 @@ void Translator::visit(ClassLiteralExpressionNode& node) {
         CodeLabel out = this->code;
         all.insert(all.end(), out.begin(), out.end());
     }
-    all.push_back(LC("", new MakeObjectInst(node.type->identifier, fields)));
+    all.push_back(LC("", new MakeObjectInst(node.type.identifier, fields)));
     this->code = all;
 }
 
@@ -288,7 +289,7 @@ void Translator::visit(ClassLiteralFieldNode& node) {
         CodeLabel out = this->code;
         all.insert(all.end(), out.begin(), out.end());
     }
-    all.push_back(LC("", new MakeObjectInst(node.type->identifier, fields)));
+    all.push_back(LC("", new MakeObjectInst(node.type.identifier, fields)));
     this->code = all;
 }
 
@@ -303,25 +304,26 @@ void Translator::visit(ForNode& node) {
     std::string index_name = ".index" + std::to_string(this->current_loop);
 
     // list = expression
-    auto list_init = DECL(list_name, nullptr, node.exp);
+    auto list_init = NodeFactory::decl(list_name, nullptr, node.exp);
 //    list_init->accept(*this)
     this->dispatch(list_init);
     out.insert(out.end(), this->code.begin(), this->code.end());
 
     // len = list.len()
-    auto list_len = DECL(len_name, nullptr, CALL(ID("List.len"), {ID(list_name)}));
+    auto list_len = NodeFactory::decl(len_name, nullptr,
+                                      NodeFactory::call(NodeFactory::id("List.len"), {NodeFactory::id(list_name)}));
 //    list_len->accept(*this)
     this->dispatch(list_len);
     out.insert(out.end(), this->code.begin(), this->code.end());
 
     // index = 0
-    auto index = DECL(index_name, nullptr, NUM(0));
+    auto index = NodeFactory::decl(index_name, nullptr, NodeFactory::number(0));
 //    index->accept(*this)
     this->dispatch(index);
     out.insert(out.end(), this->code.begin(), this->code.end());
 
     // index < list_len ?
-    auto condition = BIN(OpType::LT, ID(index_name), ID(len_name));
+    auto condition = NodeFactory::binop(OpType::LT, NodeFactory::id(index_name), NodeFactory::id(len_name));
 //    condition->accept(*this)
     this->dispatch(condition);
     auto condition_code = this->code;
@@ -336,11 +338,13 @@ void Translator::visit(ForNode& node) {
     out.push_back(LC("", I_JUMPF("break_loop." + std::to_string(this->current_loop))));
 
     // var = list[index]
-    auto it = SUB(ID(list_name), { ID(index_name) });
-    node.body->nodes.insert(node.body->nodes.begin(), DECL(node.var, nullptr, it));
+    auto it = NodeFactory::sub(NodeFactory::id(list_name), {NodeFactory::id(index_name)});
+    node.body.nodes.insert(node.body.nodes.begin(), NodeFactory::decl(node.var, nullptr, it));
 
     // index = index + 1
-    auto update_index = ASN(ID(index_name), BIN(OpType::ADD, ID(index_name), NUM(1)));
+    auto update_index = NodeFactory::assign(NodeFactory::id(index_name),
+                                            NodeFactory::binop(OpType::ADD, NodeFactory::id(index_name),
+                                                               NodeFactory::number(1)));
 //    update_index->accept(*this)
     this->dispatch(update_index);
     CodeLabel update_index_code = this->code;
@@ -349,7 +353,7 @@ void Translator::visit(ForNode& node) {
     bool old_in_for_loop = this->in_for_loop;
     this->in_for_loop = true;
 //    node.body->accept(*this)
-    this->dispatch(node.body);
+    this->visit(node.body);
     this->in_for_loop = old_in_for_loop;
     out.insert(out.end(), this->code.begin(), this->code.end());
     out.push_back(LC("", I_LEAVE("for")));
@@ -383,7 +387,7 @@ void Translator::visit(WhileNode& node) {
         out.push_back(condition_code[i]);
     }
 //    node.body->accept(*this)
-    this->dispatch(node.body);
+    this->visit(node.body);
     this->current_loop--;
     CodeLabel body_code = this->code;
     CodeLabel p = {LC("", I_ENTER("while"))};
@@ -449,12 +453,13 @@ void Translator::visit(ClassNode& node) {
     out.push_back(LC("", I_MAKE_CLASS(node.class_name, f)));
 
     for (auto method: node.methods) {
-        FunctionNode* method_node = method.second.node.func;
-        method_node->identifier = node.class_name + "." + method_node->identifier;
-        method_node->parameter_names.insert(method_node->parameter_names.begin(), "this");
-        method_node->parameter_types.insert(method_node->parameter_types.begin(), nullptr);
+        FunctionNode& method_node = method.second;
+        method_node.identifier = node.class_name + "." + method_node.identifier;
+        method_node.parameter_names.insert(method_node.parameter_names.begin(), "this");
+        method_node.parameter_types.insert(method_node.parameter_types.begin(),
+                                           NodeFactory::otype("dummy", {}));
 //        method.second->accept(*this)
-        this->dispatch(method.second);
+        this->visit(method.second);
         auto method_code = this->code;
         out.insert(out.end(), method_code.begin(), method_code.end());
     }
@@ -469,8 +474,10 @@ void Translator::visit(ContinueNode& node) {
     if (this->in_for_loop) {
         std::cout << "TRANSLATING A CONTINUE NOED" << std::endl;
         CodeLabel out;
-        auto update_index = ASN(ID(".index" + std::to_string(this->current_loop)),
-                                BIN(OpType::ADD, ID(".index" + std::to_string(this->current_loop)), NUM(1)));
+        auto update_index = NodeFactory::assign(NodeFactory::id(".index" + std::to_string(this->current_loop)),
+                                                NodeFactory::binop(OpType::ADD, NodeFactory::id(
+                                                        ".index" + std::to_string(this->current_loop)),
+                                                                   NodeFactory::number(1)));
 //        update_index->accept(*this)
         this->dispatch(update_index);
         out.insert(out.end(), this->code.begin(), this->code.end());

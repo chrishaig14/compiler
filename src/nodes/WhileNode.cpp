@@ -15,7 +15,7 @@ bool WhileNode::equal(NodeContainer other) const {
     return false;
 }
 
-WhileNode::WhileNode(NodeContainer condition, NodeContainer body) : body(body), condition(condition) {}
+WhileNode::WhileNode(NodeContainer condition, BlockNode& body) : body(body), condition(condition) {}
 
 bool WhileNode::operator==(const WhileNode& other) const {
 //    return this->condition->equal(other.condition) && this->body->equal(other.body);
