@@ -179,7 +179,7 @@ Token Scanner::scan_other() {
             token.end = end;
             if (token.type == TokType::DOUBLE_SLASH) {
                 // ignore everything until end of line
-                while (c != '\n') {
+                while (c != '\n' && this->current < this->text.size()) {
                     c = this->text[this->current];
                     this->current++;
                 }
