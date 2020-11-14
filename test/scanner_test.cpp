@@ -266,12 +266,14 @@ TEST(scanner_test, test_token_id_position_3) {
     Scanner scanner(text);
     Token token = scanner.get_next();
     EXPECT_EQ(token, Token(TokType::ID, "foo", 0, 0));
-    EXPECT_EQ(token.start, 0);
-    EXPECT_EQ(token.end, 2);
+//    EXPECT_EQ(token.start, 0);
+//    EXPECT_EQ(token.end, 2);
+    token = scanner.get_next();
+    EXPECT_EQ(token, Token(TokType::SEMICOLON, 0, 3));
     token = scanner.get_next();
     EXPECT_EQ(token, Token(TokType::ID, "bar", 1, 0));
-    EXPECT_EQ(token.start, 4);
-    EXPECT_EQ(token.end, 6);
+//    EXPECT_EQ(token.start, 4);
+//    EXPECT_EQ(token.end, 6);
 }
 
 TEST(scanner_test, test_token_id_position_4) {
@@ -279,6 +281,8 @@ TEST(scanner_test, test_token_id_position_4) {
     Scanner scanner(text);
     Token token = scanner.get_next();
     EXPECT_EQ(token, Token(TokType::ID, "foo", 0, 0));
+    token = scanner.get_next();
+    EXPECT_EQ(token, Token(TokType::SEMICOLON, 0, 3));
     token = scanner.get_next();
     EXPECT_EQ(token, Token(TokType::ID, "bar", 3, 0));
 }
@@ -288,6 +292,8 @@ TEST(scanner_test, test_token_id_position_5) {
     Scanner scanner(text);
     Token token = scanner.get_next();
     EXPECT_EQ(token, Token(TokType::ID, "foo", 0, 0));
+    token = scanner.get_next();
+    EXPECT_EQ(token, Token(TokType::SEMICOLON, 0, 3));
     token = scanner.get_next();
     EXPECT_EQ(token, Token(TokType::ID, "bar", 3, 0));
     token = scanner.get_next();
