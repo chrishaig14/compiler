@@ -5,7 +5,6 @@
 #ifndef NODECONTAINER_H
 #define NODECONTAINER_H
 
-
 class AssignmentNode;
 
 class BinopNode;

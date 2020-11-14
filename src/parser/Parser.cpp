@@ -460,7 +460,7 @@ NodeContainer Parser::parse_common_statement() {
             return NodeContainer(&node);
         }
         case TokType::FOR: {
-            return NodeContainer(&this->parse_for_loop());
+            return NodeContainer(new ForNode(this->parse_for_loop()));
         }
         case TokType::WHILE: {
             return NodeContainer(&this->parse_while_loop());
@@ -613,7 +613,7 @@ NodeContainer Parser::parse_top_level_statement() {
     }
 }
 
-ForNode& Parser::parse_for_loop() {
+ForNode Parser::parse_for_loop() {
     this->expect_token(TokType::FOR);
     bool expect_paren = false;
     if (this->match(TokType::LPAREN)) {
@@ -630,7 +630,7 @@ ForNode& Parser::parse_for_loop() {
     this->inside_loop = true;
     BlockNode& body = this->parse_possibly_empty_block();
     this->inside_loop = prev;
-    return *(NodeFactory::forloop(var.str, exp, body).node.forloop);
+    return ForNode(var.str, exp, body);
 }
 
 NodeContainer Parser::parse_ternary() {
