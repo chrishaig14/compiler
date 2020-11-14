@@ -69,7 +69,7 @@ public:
 
     BlockNode& parse_possibly_empty_block();
 
-    NodeContainer parse_program();
+    BlockNode parse_program();
 
     ForNode& parse_for_loop();
 

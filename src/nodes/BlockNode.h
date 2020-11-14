@@ -13,7 +13,10 @@
 
 class BlockNode : public Node {
 public:
+
     BlockNode(std::vector<NodeContainer> nodes) : nodes(nodes) {}
+
+    BlockNode();
 
     std::vector<NodeContainer> nodes;
 

@@ -17,7 +17,7 @@ void compile_and_run(std::string text) {
         std::cout << token.to_string() << std::endl;
     }
     Parser parser(tokens);
-    NodeContainer program;
+    BlockNode program;
     try {
         program = parser.parse_program();
     } catch (const UnexpectedToken& ut) {
@@ -29,12 +29,12 @@ void compile_and_run(std::string text) {
 
     try {
         GlobalProcessor gp(builtins);
-        gp.visit(*program.node.block);
+        gp.visit(program);
         Checker checker(gp.globals, gp.class_table);
         checker.function_table = gp.function_table;
-        checker.dispatch(program);
+        checker.visit(program);
 //        program->accept(translator);
-        translator.dispatch(program);
+        translator.visit(program);
     } catch (const std::runtime_error& e) {
         std::cerr << "THERE WAS A SEMANTIC ERROR: " << e.what() << std::endl;
         exit(1);

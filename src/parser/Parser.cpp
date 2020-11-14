@@ -40,12 +40,12 @@ bool Parser::match(TokType type) {
     return this->token.type == type;
 }
 
-NodeContainer Parser::parse_program() {
+BlockNode Parser::parse_program() {
     VectorOfNodes program;
     while (this->token.type != TokType::END) {
         program.push_back(this->parse_top_level_statement());
     }
-    return NodeFactory::block(program);
+    return BlockNode(program);
 }
 
 ReturnNode& Parser::parse_return() {
