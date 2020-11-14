@@ -77,7 +77,7 @@ public:
 
     NodeContainer parse_ternary();
 
-    ClassNode& parse_class_definition();
+    ClassNode parse_class_definition();
 
     FunctionTypeNode parse_function_type();
 

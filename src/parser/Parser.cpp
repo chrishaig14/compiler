@@ -606,7 +606,7 @@ NodeContainer Parser::parse_top_level_statement() {
         case TokType::FUN:
             return NodeContainer(new FunctionNode(this->parse_function_definition()));
         case TokType::CLASS:
-            return NodeContainer(&this->parse_class_definition());
+            return NodeContainer(new ClassNode(this->parse_class_definition()));
         default:
             return this->parse_common_statement();
     }
@@ -655,7 +655,7 @@ WhileNode Parser::parse_while_loop() {
     return WhileNode(condition, body);
 }
 
-ClassNode& Parser::parse_class_definition() {
+ClassNode Parser::parse_class_definition() {
     this->expect_token(TokType::CLASS);
     Token class_name_tk = this->expect_token(TokType::ID);
     std::vector<std::string> type_parameters;
@@ -692,7 +692,7 @@ ClassNode& Parser::parse_class_definition() {
         }
     }
     this->expect_token(TokType::RCURLY);
-    auto& c = *NodeFactory::cls(class_name_tk.str, type_parameters, members, methods).node.cls;
+    ClassNode c(class_name_tk.str, type_parameters, members, methods);
     c.members_ordered = members_ordered;
     return c;
 }
