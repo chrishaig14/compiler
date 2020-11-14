@@ -551,7 +551,7 @@ BlockNode Parser::parse_possibly_empty_block() {
     return BlockNode(block);
 }
 
-FunctionNode& Parser::parse_function_definition() {
+FunctionNode Parser::parse_function_definition() {
     this->expect_token(TokType::FUN);
     Token matched_token = this->expect_token(TokType::ID);
     std::string identifier = matched_token.str;
@@ -589,7 +589,7 @@ FunctionNode& Parser::parse_function_definition() {
     // Parse function body
     BlockNode body = this->parse_possibly_empty_block();
 
-    return *(NodeFactory::function(identifier, parameter_names, parameter_types, return_type, body).node.func);
+    return FunctionNode(identifier, parameter_names, parameter_types, return_type, body);
 }
 
 Token Parser::expect_token(TokType token_type) {
@@ -604,7 +604,7 @@ Token Parser::expect_token(TokType token_type) {
 NodeContainer Parser::parse_top_level_statement() {
     switch (this->token.type) {
         case TokType::FUN:
-            return NodeContainer(&this->parse_function_definition());
+            return NodeContainer(new FunctionNode(this->parse_function_definition()));
         case TokType::CLASS:
             return NodeContainer(&this->parse_class_definition());
         default:

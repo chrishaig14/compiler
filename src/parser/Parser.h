@@ -29,7 +29,7 @@ public:
 
     NodeContainer parse_id_or_class_literal();
 
-    FunctionNode& parse_function_definition();
+    FunctionNode parse_function_definition();
 
     IfNode parse_if();
 
