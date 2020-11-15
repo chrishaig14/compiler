@@ -123,7 +123,7 @@ NodeContainer Parser::parse_assignment_or_expression() {
     NodeContainer lvalue = this->parse_expression();
 //    auto call = TO_CALL(lvalue);
     if (this->match(TokType::EQQ)) {
-        if (lvalue.type == NodeContainer::CALL) {
+        if (lvalue.ntype == NodeContainer::CALL) {
             throw std::runtime_error("Can't assign to a function call!");
         }
         this->next();
@@ -133,7 +133,7 @@ NodeContainer Parser::parse_assignment_or_expression() {
 //        node->end = rvalue->end;
         return node;
     } else {
-        if (lvalue.type != NodeContainer::CALL) {
+        if (lvalue.ntype != NodeContainer::CALL) {
             throw std::runtime_error(
                     "Only function calls are allowed here! No ID, NUM, SUBSCRIPT, BINOP or other expression!");
         }
@@ -313,7 +313,7 @@ NodeContainer Parser::parse_class_literal() {
         NodeContainer first = this->parse_expression();
         // if it's an id
 //        IdNode* idn = TO_ID(first);
-        if (first.type == NodeContainer::ID) {
+        if (first.ntype == NodeContainer::ID) {
             IdNode* idn = first.node.id;
             if (this->match(TokType::RCURLY)) {
                 exps.push_back(first);

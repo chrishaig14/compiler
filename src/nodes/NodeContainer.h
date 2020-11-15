@@ -98,7 +98,7 @@ public:
         FTYPE,
         WHIL,
         UNINITIALIZED
-    } type;
+    } ntype;
     union {
         AssignmentNode* assign;
         BinopNode* binop;
@@ -133,157 +133,157 @@ public:
     } node;
 
     NodeContainer() : node({nullptr}) {
-        this->type = UNINITIALIZED;
+        this->ntype = UNINITIALIZED;
     }
 
     NodeContainer(const NodeContainer& other) {
-        this->type = other.type;
+        this->ntype = other.ntype;
         this->node = other.node;
     }
 
     explicit NodeContainer(AssignmentNode* assign) {
         this->node.assign = assign;
-        this->type = ASSIGN;
+        this->ntype = ASSIGN;
     }
 
     explicit NodeContainer(BinopNode* binop) {
         this->node.binop = binop;
-        this->type = BINOP;
+        this->ntype = BINOP;
     }
 
     explicit NodeContainer(BlockNode* block) {
         this->node.block = block;
-        this->type = BLOCK;
+        this->ntype = BLOCK;
     }
 
     explicit NodeContainer(BooleanNode* boolean) {
         this->node.boolean = boolean;
-        this->type = BOOLEAN;
+        this->ntype = BOOLEAN;
     }
 
     explicit NodeContainer(BreakNode* brk) {
         this->node.brk = brk;
-        this->type = BRK;
+        this->ntype = BRK;
     }
 
     explicit NodeContainer(CallNode* call) {
         this->node.call = call;
-        this->type = CALL;
+        this->ntype = CALL;
     }
 
     explicit NodeContainer(ClassLiteralExpressionNode* clsexp) {
         this->node.clsexp = clsexp;
-        this->type = CLSEXP;
+        this->ntype = CLSEXP;
     }
 
     explicit NodeContainer(ClassLiteralFieldNode* clsfld) {
         this->node.clsfld = clsfld;
-        this->type = CLSFLD;
+        this->ntype = CLSFLD;
     }
 
     explicit NodeContainer(ClassNode* cls) {
         this->node.cls = cls;
-        this->type = CLS;
+        this->ntype = CLS;
     }
 
     explicit NodeContainer(ContinueNode* cntinue) {
         this->node.cntinue = cntinue;
-        this->type = CNTINUE;
+        this->ntype = CNTINUE;
     }
 
     explicit NodeContainer(DeclarationNode* decl) {
         this->node.decl = decl;
-        this->type = DECL;
+        this->ntype = DECL;
     }
 
     explicit NodeContainer(EmptyListNode* emptylst) {
         this->node.emptylst = emptylst;
-        this->type = EMPTYLST;
+        this->ntype = EMPTYLST;
     }
 
     explicit NodeContainer(ForNode* forloop) {
         this->node.forloop = forloop;
-        this->type = FORLOOP;
+        this->ntype = FORLOOP;
     }
 
     explicit NodeContainer(FunctionNode* func) {
         this->node.func = func;
-        this->type = FUNC;
+        this->ntype = FUNC;
     }
 
     explicit NodeContainer(IdNode* id) {
         this->node.id = id;
-        this->type = ID;
+        this->ntype = ID;
     }
 
     explicit NodeContainer(IfNode* ifn) {
         this->node.iff = ifn;
-        this->type = IFN;
+        this->ntype = IFN;
     }
 
     explicit NodeContainer(InstanceNode* instance) {
         this->node.instance = instance;
-        this->type = INSTANCE;
+        this->ntype = INSTANCE;
     }
 
     explicit NodeContainer(ListNode* lst) {
         this->node.lst = lst;
-        this->type = LST;
+        this->ntype = LST;
     }
 
     explicit NodeContainer(MemberNode* member) {
         this->node.member = member;
-        this->type = MEMBER;
+        this->ntype = MEMBER;
     }
 
     explicit NodeContainer(NoneNode* none) {
         this->node.none = none;
-        this->type = NONE;
+        this->ntype = NONE;
     }
 
     explicit NodeContainer(NumberNode* number) {
         this->node.number = number;
-        this->type = NUMBER;
+        this->ntype = NUMBER;
     }
 
     explicit NodeContainer(ReturnNode* retrn) {
         this->node.retrn = retrn;
-        this->type = RETRN;
+        this->ntype = RETRN;
     }
 
     explicit NodeContainer(StringNode* strng) {
         this->node.strng = strng;
-        this->type = STRNG;
+        this->ntype = STRNG;
     }
 
     explicit NodeContainer(StructNode* strct) {
         this->node.strct = strct;
-        this->type = STRCT;
+        this->ntype = STRCT;
     }
 
     explicit NodeContainer(SubscriptNode* sub) {
         this->node.sub = sub;
-        this->type = SUB;
+        this->ntype = SUB;
     }
 
     explicit NodeContainer(TernaryNode* ternary) {
         this->node.ternary = ternary;
-        this->type = TERNARY;
+        this->ntype = TERNARY;
     }
 
     explicit NodeContainer(ObjectTypeNode* type) {
         this->node.otype = type;
-        this->type = OTYPE;
+        this->ntype = OTYPE;
     }
 
     explicit NodeContainer(FunctionTypeNode* type) {
         this->node.ftype = type;
-        this->type = FTYPE;
+        this->ntype = FTYPE;
     }
 
     explicit NodeContainer(WhileNode* whil) {
         this->node.whil = whil;
-        this->type = WHIL;
+        this->ntype = WHIL;
     }
 
 };

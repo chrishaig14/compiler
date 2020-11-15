@@ -303,7 +303,7 @@ void GlobalProcessor::visit(ContinueNode& node) {
 }
 
 void GlobalProcessor::dispatch(NodeContainer n) {
-    switch (n.type) {
+    switch (n.ntype) {
         case NodeContainer::ASSIGN:
             n.node.assign->accept(*this);
             break;

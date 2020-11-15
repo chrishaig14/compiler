@@ -28,7 +28,7 @@ public:
 return false;
     }
 
-    bool operator==(DeclarationNode& other) const {
+    bool operator==(const DeclarationNode& other) const {
         return false;
 //        if (this->type == nullptr && other.type != nullptr) return false;
 //        if (this->type != nullptr && other.type == nullptr) return false;

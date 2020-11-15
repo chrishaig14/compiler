@@ -15,7 +15,7 @@ public:
     NodeContainer condition;
 
 
-    WhileNode(NodeContainer condition, BlockNode& body);
+    WhileNode(NodeContainer condition, BlockNode body);
 
     void accept(Visitor& visitor) override;
 

@@ -16,7 +16,7 @@ void Translator::visit(AssignmentNode& node) {
     out.insert(out.end(), r_code.begin(), r_code.end());
 
     this->is_lvalue = true;
-    if (node.lvalue.type == NodeContainer::ID && node.lvalue.node.id->identifier == "_") {
+    if (node.lvalue.ntype == NodeContainer::ID && node.lvalue.node.id->identifier == "_") {
         out.push_back(LC("", I_POP));
     } else {
 //        node.lvalue->accept(*this)
@@ -77,7 +77,7 @@ void Translator::visit(StructNode& node) {
 
 void Translator::visit(DeclarationNode& node) {
     CodeLabel out;
-    if (node.expression.type != NodeContainer::UNINITIALIZED) {
+    if (node.expression.ntype != NodeContainer::UNINITIALIZED) {
 
 //    if (node.expression != nullptr) {
 //        node.expression->accept(*this)
@@ -205,7 +205,7 @@ void Translator::visit(NumberNode& node) {
 
 void Translator::visit(ReturnNode& node) {
     CodeLabel out;
-    if (node.expression.type != NodeContainer::UNINITIALIZED) {
+    if (node.expression.ntype != NodeContainer::UNINITIALIZED) {
 //    if (node.expression != nullptr) {
 //        node.expression->accept(*this)
         this->dispatch(node.expression);

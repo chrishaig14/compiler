@@ -4,22 +4,22 @@
 #include <semantic/GlobalProcessor.h>
 #include <semantic/Checker.h>
 
-BlockNode* get_ast(std::string text) {
+BlockNode& get_ast(std::string text) {
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
-    BlockNode* tree = parser.parse_program();
+    BlockNode tree = parser.parse_program();
     return tree;
 }
 
 void compile(std::string text) {
-    BlockNode* tree = get_ast(text);
+    BlockNode tree = get_ast(text);
     std::vector<std::pair<std::string, CodeBuiltin>> builtins;
     GlobalProcessor gp(builtins);
-    gp.visit(*tree);
+    gp.visit(tree);
     Checker checker(gp.globals, gp.class_table);
     checker.function_table = gp.function_table;
-    checker.visit(*tree);
+    checker.visit(tree);
 }
 
 void ASSERT_THROWS_NOT_FOUND_ERROR(std::string text, std::string NAME) {
@@ -42,7 +42,7 @@ void ASSERT_THROWS_REDECLARED_ERROR(std::string text, std::string NAME) {
 }
 
 void
-ASSERT_THROWS_RETURN_TYPE_ERROR(std::string text, std::string NAME, TypeNode* EXPECTED_TYPE, TypeNode* ACTUAL_TYPE) {
+ASSERT_THROWS_RETURN_TYPE_ERROR(std::string text, std::string NAME, TypeNode EXPECTED_TYPE, TypeNode ACTUAL_TYPE) {
     try {
         compile(text);
         FAIL() << "Expected ReturnError thrown";
@@ -74,26 +74,27 @@ void ASSERT_FAILS(std::string text) {
     try {
         compile(text);
         FAIL() << "Expected exception!";
-    } catch (...) {}
+    } catch (...) {
+    }
 }
 
 
 void ASSERT_VARIABLE_TYPE(std::string text, std::string id, TypeNode* type) {
-    BlockNode* tree = get_ast(text);
+    BlockNode tree = get_ast(text);
     GlobalProcessor gp;
-    gp.visit(*tree);
+    gp.visit(tree);
     Checker checker(gp.globals, gp.class_table);
-    checker.visit(*tree);
-    EXPECT_TRUE(checker.scopes["global"]->get(id)->equal(type));
+    checker.visit(tree);
+    EXPECT_TRUE(checker.scopes["global"]->get(id).equal(type));
 }
 
 TEST(second_pass_test, fun_foo_cAomplete) {
     std::string text = "fun foo(y: Foo)->Integer{}";
-    BlockNode* tree = get_ast(text);
+    BlockNode tree = get_ast(text);
     GlobalProcessor gp;
-    gp.visit(*tree);
+    gp.visit(tree);
     Checker checker(gp.globals, gp.class_table);
-    checker.visit(*tree);
+    checker.visit(tree);
     SymbolTable* foo_scope = checker.scopes["global.foo.0"];
     ObjectTypeNode* sinfo = dynamic_cast<ObjectTypeNode*>(foo_scope->get("y"));
     EXPECT_NE(sinfo, nullptr);
@@ -102,11 +103,11 @@ TEST(second_pass_test, fun_foo_cAomplete) {
 
 TEST(second_pass_test, free_variable_test_1) {
     std::string text = "var x: Integer=0; fun foo(y: Foo)->Integer{return x;}";
-    BlockNode* tree = get_ast(text);
+    BlockNode tree = get_ast(text);
     GlobalProcessor gp;
-    gp.visit(*tree);
+    gp.visit(tree);
     Checker checker(gp.globals, gp.class_table);
-    checker.visit(*tree);
+    checker.visit(tree);
     EXPECT_TRUE(checker.scopes["global"]->has("x"));
     SymbolTable* foo_scope = checker.scopes["global.foo.0"];
     auto sinfo = dynamic_cast<ObjectTypeNode*>(foo_scope->get("y"));
@@ -117,11 +118,11 @@ TEST(second_pass_test, free_variable_test_1) {
 
 TEST(second_pass_test, free_variable_test_2) {
     std::string text = "var x: Integer=0; fun foo(y: Foo)->Integer{var z: Integer = 1 + x;}";
-    BlockNode* tree = get_ast(text);
+    BlockNode tree = get_ast(text);
     GlobalProcessor gp;
-    gp.visit(*tree);
+    gp.visit(tree);
     Checker checker(gp.globals, gp.class_table);
-    checker.visit(*tree);
+    checker.visit(tree);
     EXPECT_TRUE(checker.scopes["global"]->has("x"));
     SymbolTable* foo_scope = checker.scopes["global.foo.0"];
     auto sinfo = dynamic_cast<ObjectTypeNode*>(foo_scope->get("y"));
@@ -131,11 +132,11 @@ TEST(second_pass_test, free_variable_test_2) {
 
 TEST(second_pass_test, free_variable_test_3) {
     std::string text = "var x: Integer=0; fun foo(y: Foo)->Integer{if(y == 3){var z: Integer = 1 + x;}}";
-    BlockNode* tree = get_ast(text);
+    BlockNode tree = get_ast(text);
     GlobalProcessor gp;
-    gp.visit(*tree);
+    gp.visit(tree);
     Checker checker(gp.globals, gp.class_table);
-    checker.visit(*tree);
+    checker.visit(tree);
     EXPECT_TRUE(checker.scopes["global"]->has("x"));
     SymbolTable* foo_scope = checker.scopes["global.foo.0"];
     auto sinfo = dynamic_cast<ObjectTypeNode*>(foo_scope->get("y"));
@@ -181,34 +182,34 @@ TEST(second_pass_test, FOFOOa) {
 
 TEST(second_pass_test, FOFOaOa) {
     std::string text = "fun foo(y: Foo)->String{var x:Integer=0;}";
-    BlockNode* tree = get_ast(text);
+    BlockNode tree = get_ast(text);
     GlobalProcessor gp;
-    gp.visit(*tree);
+    gp.visit(tree);
     Checker checker(gp.globals, gp.class_table);
-    checker.visit(*tree);
+    checker.visit(tree);
     EXPECT_TRUE(checker.scopes["global.foo.0"]->declared("x"));
 }
 
 TEST(second_pass_test, option_type_value) {
     std::string text = "var x : Option[Integer] = 2;";
-    BlockNode* tree = get_ast(text);
+    BlockNode tree = get_ast(text);
     GlobalProcessor gp;
-    gp.visit(*tree);
+    gp.visit(tree);
     Checker checker(gp.globals, gp.class_table);
-    checker.visit(*tree);
+    checker.visit(tree);
     EXPECT_TRUE(checker.scopes["global"]->declared("x"));
-    EXPECT_TRUE(checker.scopes["global"]->get("x")->equal(new ObjectTypeNode("Option", {T_INT})));
+    EXPECT_TRUE(checker.scopes["global"]->get("x").equal(new ObjectTypeNode("Option", {T_INT})));
 }
 
 TEST(second_pass_test, option_assign_none) {
     std::string text = "var x : Option[Integer] = none;";
-    BlockNode* tree = get_ast(text);
+    BlockNode tree = get_ast(text);
     GlobalProcessor gp;
-    gp.visit(*tree);
+    gp.visit(tree);
     Checker checker(gp.globals, gp.class_table);
-    checker.visit(*tree);
+    checker.visit(tree);
     EXPECT_TRUE(checker.scopes["global"]->declared("x"));
-    EXPECT_TRUE(checker.scopes["global"]->get("x")->equal(new ObjectTypeNode("Option", {T_INT})));
+    EXPECT_TRUE(checker.scopes["global"]->get("x").equal(new ObjectTypeNode("Option", {T_INT})));
 }
 
 TEST(second_pass_test, assign_none_to_none_option) {
@@ -225,34 +226,34 @@ TEST(second_pass_test, assign_none_to_union) {
 
 TEST(second_pass_test, assign_none_to_union_ok) {
     std::string text = "var x : Union[Integer, NoneType] = none;";
-    BlockNode* tree = get_ast(text);
+    BlockNode tree = get_ast(text);
     GlobalProcessor gp;
-    gp.visit(*tree);
+    gp.visit(tree);
     Checker checker(gp.globals, gp.class_table);
-    checker.visit(*tree);
+    checker.visit(tree);
 }
 
 
 TEST(second_pass_test, union_type_ok_1) {
     std::string text = "var x : Union[Integer, String] = 2;";
-    BlockNode* tree = get_ast(text);
+    BlockNode tree = get_ast(text);
     GlobalProcessor gp;
-    gp.visit(*tree);
+    gp.visit(tree);
     Checker checker(gp.globals, gp.class_table);
-    checker.visit(*tree);
+    checker.visit(tree);
     EXPECT_TRUE(checker.scopes["global"]->declared("x"));
-    EXPECT_TRUE(checker.scopes["global"]->get("x")->equal(new ObjectTypeNode("Union", {T_INT, T_STRING})));
+    EXPECT_TRUE(checker.scopes["global"]->get("x").equal(new ObjectTypeNode("Union", {T_INT, T_STRING})));
 }
 
 TEST(second_pass_test, union_type_ok_2) {
     std::string text = "var x : Union[Integer, String] = \"Hello\";";
-    BlockNode* tree = get_ast(text);
+    BlockNode tree = get_ast(text);
     GlobalProcessor gp;
-    gp.visit(*tree);
+    gp.visit(tree);
     Checker checker(gp.globals, gp.class_table);
-    checker.visit(*tree);
+    checker.visit(tree);
     EXPECT_TRUE(checker.scopes["global"]->declared("x"));
-    EXPECT_TRUE(checker.scopes["global"]->get("x")->equal(new ObjectTypeNode("Union", {T_INT, T_STRING})));
+    EXPECT_TRUE(checker.scopes["global"]->get("x").equal(new ObjectTypeNode("Union", {T_INT, T_STRING})));
 }
 
 TEST(second_pass_test, union_type_error) {
@@ -267,13 +268,13 @@ TEST(second_pass_test, option_type_error) {
 
 TEST(second_pass_test, ternary_test_1) {
     std::string text = "var x : Option[Integer] = 2;var z=x?\"ok\":\"bad\";";
-    BlockNode* tree = get_ast(text);
+    BlockNode tree = get_ast(text);
     GlobalProcessor gp;
-    gp.visit(*tree);
+    gp.visit(tree);
     Checker checker(gp.globals, gp.class_table);
-    checker.visit(*tree);
+    checker.visit(tree);
     EXPECT_TRUE(checker.scopes["global"]->declared("x"));
-    EXPECT_TRUE(checker.scopes["global"]->get("z")->equal(T_STRING));
+    EXPECT_TRUE(checker.scopes["global"]->get("z").equal(T_STRING));
 }
 
 TEST(second_pass_test, ternary_test_union_1) {
@@ -288,14 +289,14 @@ TEST(second_pass_test, ternary_test_union_2) {
 
 TEST(second_pass_test, test_list) {
     std::string text = "var x = [1,\"Hello\"];";
-    BlockNode* tree = get_ast(text);
+    BlockNode tree = get_ast(text);
     GlobalProcessor gp;
-    gp.visit(*tree);
+    gp.visit(tree);
     Checker checker(gp.globals, gp.class_table);
-    checker.visit(*tree);
+    checker.visit(tree);
     EXPECT_TRUE(checker.scopes["global"]->declared("x"));
-    EXPECT_TRUE(checker.scopes["global"]->get("x")->equal(T_LIST(new ObjectTypeNode("Union", {T_STRING, T_INT}))))
-                        << checker.scopes["global"]->get("x")->to_string();
+    EXPECT_TRUE(checker.scopes["global"]->get("x") == T_LIST(new ObjectTypeNode("Union", {T_STRING, T_INT})))
+                        << checker.scopes["global"]->get("x").to_string();
 }
 
 
@@ -536,16 +537,16 @@ TEST(second_pass_test, call_overloaded_function) {
                        "var y = foo(\"Hello\");"
                        "return 0;"
                        "}";
-    BlockNode* tree = get_ast(text);
+    BlockNode tree = get_ast(text);
     std::vector<std::pair<std::string, CodeBuiltin>> builtins;
     GlobalProcessor gp(builtins);
-    gp.visit(*tree);
+    gp.visit(tree);
     Checker checker(gp.globals, gp.class_table);
     checker.function_table = gp.function_table;
-    checker.visit(*tree);
-    FunctionNode* main_fun = dynamic_cast<FunctionNode*>(tree->nodes[2]);
-    EXPECT_TRUE(main_fun->body->nodes[0]->equal(DECL("x", nullptr, CALL(ID("foo.1"), {NUM(7)}))));
-    EXPECT_TRUE(main_fun->body->nodes[1]->equal(DECL("y", nullptr, CALL(ID("foo.0"), {STR("Hello")}))));
+    checker.visit(tree);
+    FunctionNode* main_fun = dynamic_cast<FunctionNode*>(tree.nodes[2]);
+    EXPECT_TRUE(main_fun->body.nodes[0].equal(DECL("x", nullptr, CALL(ID("foo.1"), {NUM(7)}))));
+    EXPECT_TRUE(main_fun->body.nodes[1].equal(DECL("y", nullptr, CALL(ID("foo.0"), {STR("Hello")}))));
 }
 
 TEST(second_pass_test, pass_overloaded_function_no_generic) {
@@ -562,16 +563,16 @@ TEST(second_pass_test, pass_overloaded_function_no_generic) {
                        "var x = call(7, foo); "
                        "return 0;"
                        "}";
-    BlockNode* tree = get_ast(text);
+    BlockNode tree = get_ast(text);
     std::vector<std::pair<std::string, CodeBuiltin>> builtins;
     GlobalProcessor gp(builtins);
-    gp.visit(*tree);
+    gp.visit(tree);
     Checker checker(gp.globals, gp.class_table);
     checker.function_table = gp.function_table;
-    checker.visit(*tree);
-    FunctionNode* main_fun = dynamic_cast<FunctionNode*>(tree->nodes[3]);
+    checker.visit(tree);
+    FunctionNode* main_fun = dynamic_cast<FunctionNode*>(tree.nodes[3]);
     auto c0 = CALL(ID("call.0"), VectorOfNodes({NUM(7), ID("foo.1")}));
-    EXPECT_TRUE(main_fun->body->nodes[0]->equal(DECL("x", nullptr, c0))) << *main_fun->body->nodes[0];
+    EXPECT_TRUE(main_fun->body.nodes[0].equal(DECL("x", nullptr, c0))) << *main_fun->body.nodes[0];
 }
 
 TEST(second_pass_test, pass_simple_function_generic) {
@@ -585,16 +586,16 @@ TEST(second_pass_test, pass_simple_function_generic) {
                        "var y = call(\"Hello\", foo);"
                        "return 0;"
                        "}";
-    BlockNode* tree = get_ast(text);
+    BlockNode tree = get_ast(text);
     std::vector<std::pair<std::string, CodeBuiltin>> builtins;
     GlobalProcessor gp(builtins);
-    gp.visit(*tree);
+    gp.visit(tree);
     Checker checker(gp.globals, gp.class_table);
     checker.function_table = gp.function_table;
-    checker.visit(*tree);
-    FunctionNode* main_fun = dynamic_cast<FunctionNode*>(tree->nodes[2]);
+    checker.visit(tree);
+    FunctionNode* main_fun = dynamic_cast<FunctionNode*>(tree.nodes[2]);
     auto c1 = CALL(ID("call.0"), VectorOfNodes({STR("Hello"), ID("foo.0")}));
-    EXPECT_TRUE(main_fun->body->nodes[0]->equal(DECL("y", nullptr, c1))) << *main_fun->body->nodes[0];
+    EXPECT_TRUE(main_fun->body.nodes[0].equal(DECL("y", nullptr, c1))) << *main_fun->body.nodes[0];
 }
 
 TEST(second_pass_test, pass_simple_function_return_generic) {
@@ -608,16 +609,16 @@ TEST(second_pass_test, pass_simple_function_return_generic) {
                        "var y = call(\"Hello\", foo);"
                        "return 0;"
                        "}";
-    BlockNode* tree = get_ast(text);
+    BlockNode tree = get_ast(text);
     std::vector<std::pair<std::string, CodeBuiltin>> builtins;
     GlobalProcessor gp(builtins);
-    gp.visit(*tree);
+    gp.visit(tree);
     Checker checker(gp.globals, gp.class_table);
     checker.function_table = gp.function_table;
-    checker.visit(*tree);
-    FunctionNode* main_fun = dynamic_cast<FunctionNode*>(tree->nodes[2]);
+    checker.visit(tree);
+    FunctionNode* main_fun = dynamic_cast<FunctionNode*>(tree.nodes[2]);
     auto c1 = CALL(ID("call.0"), VectorOfNodes({STR("Hello"), ID("foo.0")}));
-    EXPECT_TRUE(main_fun->body->nodes[0]->equal(DECL("y", nullptr, c1))) << *main_fun->body->nodes[0];
+    EXPECT_TRUE(main_fun->body.nodes[0].equal(DECL("y", nullptr, c1))) << *main_fun->body.nodes[0];
 }
 
 TEST(second_pass_test, pass_overloaded_function_generic) {
@@ -635,18 +636,18 @@ TEST(second_pass_test, pass_overloaded_function_generic) {
                        "var y = call(\"Hello\", foo);"
                        "return 0;"
                        "}";
-    BlockNode* tree = get_ast(text);
+    BlockNode tree = get_ast(text);
     std::vector<std::pair<std::string, CodeBuiltin>> builtins;
     GlobalProcessor gp(builtins);
-    gp.visit(*tree);
+    gp.visit(tree);
     Checker checker(gp.globals, gp.class_table);
     checker.function_table = gp.function_table;
-    checker.visit(*tree);
-    FunctionNode* main_fun = dynamic_cast<FunctionNode*>(tree->nodes[3]);
+    checker.visit(tree);
+    FunctionNode* main_fun = dynamic_cast<FunctionNode*>(tree.nodes[3]);
     auto c0 = CALL(ID("call.0"), VectorOfNodes({NUM(7), ID("foo.1")}));
-    EXPECT_TRUE(main_fun->body->nodes[0]->equal(DECL("x", nullptr, c0))) << *main_fun->body->nodes[0];
+    EXPECT_TRUE(main_fun->body.nodes[0].equal(DECL("x", nullptr, c0))) << *main_fun->body.nodes[0];
     auto c1 = CALL(ID("call.0"), VectorOfNodes({STR("Hello"), ID("foo.0")}));
-    EXPECT_TRUE(main_fun->body->nodes[1]->equal(DECL("y", nullptr, c1))) << *main_fun->body->nodes[1];
+    EXPECT_TRUE(main_fun->body.nodes[1].equal(DECL("y", nullptr, c1))) << *main_fun->body.nodes[1];
 }
 
 TEST(second_pass_test, pass_overloaded_function_generic_error) {
@@ -665,18 +666,18 @@ TEST(second_pass_test, pass_overloaded_function_generic_error) {
                        "var z = call(false, foo);"
                        "return 0;"
                        "}";
-    BlockNode* tree = get_ast(text);
+    BlockNode tree = get_ast(text);
     std::vector<std::pair<std::string, CodeBuiltin>> builtins;
     GlobalProcessor gp(builtins);
-    gp.visit(*tree);
+    gp.visit(tree);
     Checker checker(gp.globals, gp.class_table);
     checker.function_table = gp.function_table;
-    checker.visit(*tree);
-    FunctionNode* main_fun = dynamic_cast<FunctionNode*>(tree->nodes[3]);
+    checker.visit(tree);
+    FunctionNode* main_fun = dynamic_cast<FunctionNode*>(tree.nodes[3]);
     auto c0 = CALL(ID("call.0"), VectorOfNodes({NUM(7), ID("foo.1")}));
-    EXPECT_TRUE(main_fun->body->nodes[0]->equal(DECL("x", nullptr, c0))) << *main_fun->body->nodes[0];
+    EXPECT_TRUE(main_fun->body.nodes[0].equal(DECL("x", nullptr, c0))) << *main_fun->body.nodes[0];
     auto c1 = CALL(ID("call.0"), VectorOfNodes({STR("Hello"), ID("foo.0")}));
-    EXPECT_TRUE(main_fun->body->nodes[1]->equal(DECL("y", nullptr, c1))) << *main_fun->body->nodes[1];
+    EXPECT_TRUE(main_fun->body.nodes[1].equal(DECL("y", nullptr, c1))) << *main_fun->body.nodes[1];
 }
 
 TEST(second_pass_test, generic_map) {
@@ -696,17 +697,17 @@ TEST(second_pass_test, generic_map) {
                        "    var l = map([1,2,3,4,5], 5, double);"
                        "    return 0;"
                        "}";
-    BlockNode* tree = get_ast(text);
+    BlockNode tree = get_ast(text);
     std::vector<std::pair<std::string, CodeBuiltin>> builtins;
     GlobalProcessor gp(builtins);
-    gp.visit(*tree);
+    gp.visit(tree);
     Checker checker(gp.globals, gp.class_table);
     checker.function_table = gp.function_table;
-    checker.visit(*tree);
-    FunctionNode* main_fun = dynamic_cast<FunctionNode*>(tree->nodes[2]);
+    checker.visit(tree);
+    FunctionNode* main_fun = dynamic_cast<FunctionNode*>(tree.nodes[2]);
     auto ls = new ListNode({NUM(1), NUM(2), NUM(3), NUM(4), NUM(5)});
     auto c0 = CALL(ID("map.0"), VectorOfNodes({ls, NUM(5), ID("double.0")}));
-    EXPECT_TRUE(main_fun->body->nodes[0]->equal(DECL("l", nullptr, c0))) << *main_fun->body->nodes[0];
+    EXPECT_TRUE(main_fun->body.nodes[0].equal(DECL("l", nullptr, c0))) << *main_fun->body.nodes[0];
 }
 
 TEST(second_pass_test, generic_pass_function_error) {
@@ -720,14 +721,14 @@ TEST(second_pass_test, generic_pass_function_error) {
                        "var w = foo(5,bar);"
                        "return 0;"
                        "}";
-    BlockNode* tree = get_ast(text);
+    BlockNode tree = get_ast(text);
     std::vector<std::pair<std::string, CodeBuiltin>> builtins;
     GlobalProcessor gp(builtins);
-    gp.visit(*tree);
+    gp.visit(tree);
     Checker checker(gp.globals, gp.class_table);
     checker.function_table = gp.function_table;
     try {
-        checker.visit(*tree);
+        checker.visit(tree);
         FAIL() << "Expected an error!";
     } catch (...) {
 

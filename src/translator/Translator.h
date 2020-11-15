@@ -39,7 +39,7 @@
 class Translator : public Visitor {
 public:
     void dispatch(NodeContainer n) {
-        switch (n.type) {
+        switch (n.ntype) {
             case NodeContainer::ASSIGN:
                 n.node.assign->accept(*this);
                 break;

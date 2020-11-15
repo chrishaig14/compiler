@@ -27,7 +27,7 @@ public:
     void accept(Visitor& visitor) override;
 
     FunctionNode(std::string identifier, std::vector<std::string> parameter_names,
-                 std::vector<TypeNode> parameter_types, TypeNode return_type, BlockNode& body)
+                 std::vector<TypeNode> parameter_types, TypeNode return_type, BlockNode body)
             : body(body), return_type(return_type) {
         this->identifier = identifier;
         this->parameter_names = parameter_names;
@@ -42,7 +42,7 @@ public:
         return false;
     }
 
-    bool operator==(FunctionNode& other) const {
+    bool operator==(const FunctionNode& other) const {
         return false;
 //        if (this->identifier != other.identifier) return false;
 //        if (this->parameter_types.size() != other.parameter_types.size()) return false;

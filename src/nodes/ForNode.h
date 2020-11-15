@@ -15,7 +15,7 @@ public:
     NodeContainer exp;
     BlockNode& body;
 
-    ForNode(const std::string& var, NodeContainer exp, BlockNode& body);
+    ForNode(const std::string& var, NodeContainer exp, BlockNode body);
 
     void accept(Visitor& visitor) override;
 

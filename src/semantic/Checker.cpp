@@ -91,7 +91,7 @@ void Checker::visit(FunctionNode& n) {
     if (returnType != TYPE(".None", {})) {
         if (n.body.nodes.size() != 0) {
             NodeContainer last_node = n.body.nodes[n.body.nodes.size() - 1];
-            if (last_node.type != NodeContainer::RETRN) {
+            if (last_node.ntype != NodeContainer::RETRN) {
                 // it's not a return statement, error
                 throw std::runtime_error(
                         "Error: the last statement in a function returning a value should be \"return\" EXPRESSION ");
@@ -148,7 +148,7 @@ void Checker::visit(DeclarationNode& n) {
     }
     SymbolInfo symbol_info;
     symbol_info.is_function = false;
-    if (n.expression.type != NodeContainer::UNINITIALIZED and n.type != nullptr) {
+    if (n.expression.ntype != NodeContainer::UNINITIALIZED and n.type != nullptr) {
         this->dispatch(n.expression);
         ObjectTypeNode otn = *n.type->otype;
         if (this->replace_me) {
@@ -189,7 +189,7 @@ void Checker::visit(DeclarationNode& n) {
         }
         symbol_info.type = *n.type;
 
-    } else if (n.expression.type != NodeContainer::UNINITIALIZED) {
+    } else if (n.expression.ntype != NodeContainer::UNINITIALIZED) {
 //        n.expression->accept(*this)
         this->dispatch(n.expression);
         if (this->replace_me) {
@@ -205,7 +205,7 @@ void Checker::visit(DeclarationNode& n) {
 
 void Checker::visit(AssignmentNode& n) {
 //    IdNode* lv = TO_ID(n.lvalue);
-    if (n.lvalue.type == NodeContainer::ID) {
+    if (n.lvalue.ntype == NodeContainer::ID) {
         if (n.lvalue.node.id->identifier == "_") {
 //            n.rvalue->accept(*this)
             this->dispatch(n.rvalue);
@@ -225,7 +225,7 @@ void Checker::visit(AssignmentNode& n) {
 
     auto actual_type = (linfo.type).otype;
 //    IdNode* lid = TO_ID(n.lvalue);
-    if (n.lvalue.type == NodeContainer::ID && actual_type->identifier == "Option") {
+    if (n.lvalue.ntype == NodeContainer::ID && actual_type->identifier == "Option") {
         // special treatment if we are assigning to an id of a variable of type Option[t]
         if (expression_type.type == (actual_type->type_parameters[0])) {
             std::cout << "p cant be none" << std::endl;
@@ -265,7 +265,7 @@ void Checker::visit(AssignmentNode& n) {
 }
 
 void Checker::visit(MemberNode& n) {
-    if (n.parent.type == NodeContainer::ID) {
+    if (n.parent.ntype == NodeContainer::ID) {
         IdNode* id_node = n.parent.node.id;
         // It might be something like <class>.<method>, so we need to handle this case differently
         if (this->class_table->declared(id_node->identifier)) {
@@ -302,7 +302,7 @@ void Checker::visit(MemberNode& n) {
     }
     ObjectTypeNode& object = *(symbol_info.type).otype;
 
-    if (n.parent.type == NodeContainer::ID) {
+    if (n.parent.ntype == NodeContainer::ID) {
         IdNode* idn = n.parent.node.id;
         if (object.identifier == "Option") {
             if (this->scope->get_not_none(idn->identifier)) {
@@ -454,13 +454,13 @@ void Checker::visit(BinopNode& n) {
 void Checker::visit(ReturnNode& n) {
     TypeNode return_type = this->scope->get("__return__");
     if (return_type == TYPE(".None", {})) {
-        if (n.expression.type != NodeContainer::UNINITIALIZED) {
+        if (n.expression.ntype != NodeContainer::UNINITIALIZED) {
             throw std::runtime_error("returning a value from a function returning no value!");
         }
         SymbolInfo symbol_info;
         this->rv = symbol_info;
         return;
-    } else if (n.expression.type == NodeContainer::UNINITIALIZED) {
+    } else if (n.expression.ntype == NodeContainer::UNINITIALIZED) {
         throw std::runtime_error("not returning any value, but function expects type: " + return_type.to_string());
     }
 //    n.expression->accept(*this)
@@ -664,7 +664,7 @@ void Checker::visit(CallNode& n) {
         // Since it's a method, we have to transform it and prepare it for the translation step,
         // where instead of calling object.method(args), we call <class>.method(object, args)
 
-        if (n.function.type != NodeContainer::MEMBER) {
+        if (n.function.ntype != NodeContainer::MEMBER) {
             throw std::runtime_error("Expected it to be a member node!");
         }
         MemberNode* member_node = n.function.node.member;
@@ -673,7 +673,7 @@ void Checker::visit(CallNode& n) {
         object_node = member_node->parent;
         is_a_method = true;
     } else if (this->rv.is_class_method) {
-        if (n.function.type != NodeContainer::MEMBER) {
+        if (n.function.ntype != NodeContainer::MEMBER) {
             throw std::runtime_error("Expected it to be a member node!");
         }
         MemberNode* member_node = n.function.node.member;
@@ -781,7 +781,7 @@ void Checker::visit(BlockNode& program) {
     for (auto n: program.nodes) {
 //        n->accept(*this)
         this->dispatch(n);
-        if (n.type == NodeContainer::CALL) {
+        if (n.ntype == NodeContainer::CALL) {
             // it's a function call
             // if return value != NoneType, then force the return value
             if (this->rv.type != TYPE(".None", {})) {
@@ -1214,7 +1214,7 @@ void Checker::visit(ContinueNode& node) {
 }
 
 void Checker::dispatch(NodeContainer n) {
-    switch (n.type) {
+    switch (n.ntype) {
         case NodeContainer::ASSIGN:
             n.node.assign->accept(*this);
             break;
