@@ -21,7 +21,8 @@ public:
 
     bool equal(NodeContainer other) const override;
 
-    bool operator==(CallNode& other) const;
+    bool operator==(const CallNode& other) const;
+    bool operator!=(const CallNode& other) const;
 
     ~CallNode() {
 //        delete this->function;

@@ -13,6 +13,11 @@
 class ClassLiteralFieldNode : public Node {
 public:
     ObjectTypeNode& type;
+
+    bool operator==(const ClassLiteralFieldNode& other) const;
+
+    bool operator!=(const ClassLiteralFieldNode& other) const;
+
     std::map<std::string, NodeContainer> init;
 
     ClassLiteralFieldNode(ObjectTypeNode& type, const std::map<std::string, NodeContainer>& init);

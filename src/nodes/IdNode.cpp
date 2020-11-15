@@ -17,7 +17,8 @@ bool IdNode::equal(NodeContainer other) const {
     return false;
 }
 
-bool IdNode::operator==(IdNode& other) const {
-//    return this->identifier == other.identifier;
-    return false;
+bool IdNode::operator==(const IdNode& other) const {
+    return this->identifier == other.identifier;
 }
+
+bool IdNode::operator!=(const IdNode& other) const {return !(*this == other);}

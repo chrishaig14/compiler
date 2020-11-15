@@ -17,6 +17,14 @@ public:
 
     bool equal(NodeContainer other) const override;
 
+    bool operator==(const EmptyListNode& other) const {
+        return this->type == other.type;
+    }
+
+    bool operator!=(const EmptyListNode& other) const {
+        return !(*this == other);
+    }
+
     TypeNode& type;
 };
 

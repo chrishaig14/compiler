@@ -18,7 +18,9 @@ bool StringNode::equal(NodeContainer other) const {
     return false;
 }
 
-bool StringNode::operator==(StringNode& other) const {
-    return false;
-//    return this->str == other.str;
+bool StringNode::operator==(const StringNode& other) const {
+    return this->str == other.str;
+}
+bool StringNode::operator!=(const StringNode& other) const {
+    return !(*this == other);
 }

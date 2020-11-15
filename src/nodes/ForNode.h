@@ -14,7 +14,12 @@ public:
     std::string var;
     NodeContainer exp;
     BlockNode& body;
-
+    bool operator==(const ForNode& other) const {
+        return false;
+    }
+    bool operator!=(const ForNode& other) const {
+        return !(*this==other);
+    }
     ForNode(const std::string& var, NodeContainer exp, BlockNode body);
 
     void accept(Visitor& visitor) override;

@@ -86,8 +86,9 @@ typedef std::vector<std::pair<std::string, Instruction*>> CodeLabel;
 #define TO_NONE(x) dynamic_cast<NoneNode*>(x)
 
 std::ostream& operator<<(std::ostream& out, const CodeLabel v);
-
+bool operator==(const NodeContainer& a, const NodeContainer& b);
 bool operator==(const CodeLabel a, const CodeLabel b);
+bool operator!=(const NodeContainer& a, const NodeContainer& b);
 
 template<typename T>
 bool item_in_vec(T item, std::vector<T> vec) {

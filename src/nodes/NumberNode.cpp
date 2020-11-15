@@ -17,6 +17,10 @@ bool NumberNode::equal(NodeContainer other) const {
 return false;
 }
 
-bool NumberNode::operator==(NumberNode& other) const {
+bool NumberNode::operator==(const NumberNode& other) const {
     return this->number == other.number;
+}
+
+bool NumberNode::operator!=(const NumberNode& other) const {
+    return !(*this == other);
 }

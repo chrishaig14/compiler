@@ -9,6 +9,8 @@
 #include "Node.h"
 #include "Visitor.h"
 #include "NodeContainer.h"
+#include "../utils.h"
+
 enum class OpType {
     ADD, SUB, MUL, DIV, EQ, AND, OR, LEQ, GEQ, LT, GT, NEQ, MOD
 };
@@ -25,17 +27,11 @@ public:
 
     void accept(Visitor& visitor) override;
 
-    bool equal(NodeContainer other) const {
-//        auto other_ptr = dynamic_cast<BinopNodeContainer>(other);
-//        if (other_ptr == nullptr) return false;
-//        return *this == *other_ptr;
-return false;
-    }
+    bool equal(NodeContainer other) const;
 
-    bool operator==(BinopNode& other) const {
-//        return this->op == other.op && this->left->equal(other.left) and this->right->equal(other.right);
-return false;
-    }
+    bool operator==(const BinopNode& other) const;
+    bool operator!=(const BinopNode& other) const;
+
 
     ~BinopNode() {
 //        delete this->left;

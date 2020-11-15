@@ -206,7 +206,7 @@ void Checker::visit(DeclarationNode& n) {
 void Checker::visit(AssignmentNode& n) {
 //    IdNode* lv = TO_ID(n.lvalue);
     if (n.lvalue.ntype == NodeContainer::ID) {
-        if (n.lvalue.node.id->identifier == "_") {
+        if (n.lvalue.id().identifier == "_") {
 //            n.rvalue->accept(*this)
             this->dispatch(n.rvalue);
             return;
@@ -229,7 +229,7 @@ void Checker::visit(AssignmentNode& n) {
         // special treatment if we are assigning to an id of a variable of type Option[t]
         if (expression_type.type == (actual_type->type_parameters[0])) {
             std::cout << "p cant be none" << std::endl;
-            this->scope->set_not_none(n.lvalue.node.id->identifier, true);
+            this->scope->set_not_none(n.lvalue.id().identifier, true);
         } else {
             if (linfo.type != (expression_type.type)) {
                 auto foo = expression_type.type.otype;
@@ -240,7 +240,7 @@ void Checker::visit(AssignmentNode& n) {
             }
             // type matches exactly, no proble
             std::cout << "p may be none" << std::endl;
-            this->scope->set_not_none(n.lvalue.node.id->identifier, false);
+            this->scope->set_not_none(n.lvalue.id().identifier, false);
         }
     } else {
         if (linfo.type != expression_type.type) {
@@ -266,10 +266,10 @@ void Checker::visit(AssignmentNode& n) {
 
 void Checker::visit(MemberNode& n) {
     if (n.parent.ntype == NodeContainer::ID) {
-        IdNode* id_node = n.parent.node.id;
+        IdNode& id_node = n.parent.id();
         // It might be something like <class>.<method>, so we need to handle this case differently
-        if (this->class_table->declared(id_node->identifier)) {
-            ClassInfo* class_info = this->class_table->get(id_node->identifier);
+        if (this->class_table->declared(id_node.identifier)) {
+            ClassInfo* class_info = this->class_table->get(id_node.identifier);
             if (class_info->methods.count(n.child) == 1) {
                 this->rv.type = class_info->methods.find(n.child)->second;
                 this->rv.class_info = class_info;
@@ -303,13 +303,13 @@ void Checker::visit(MemberNode& n) {
     ObjectTypeNode& object = *(symbol_info.type).otype;
 
     if (n.parent.ntype == NodeContainer::ID) {
-        IdNode* idn = n.parent.node.id;
+        IdNode& idn = n.parent.id();
         if (object.identifier == "Option") {
-            if (this->scope->get_not_none(idn->identifier)) {
+            if (this->scope->get_not_none(idn.identifier)) {
                 // we can guarantee that it's not null, so we can access the members
                 object = *(object.type_parameters[0]).otype;
             } else {
-                throw std::runtime_error("Error: line " + std::to_string(idn->line + 1) + " -> " + idn->identifier +
+                throw std::runtime_error("Error: line " + std::to_string(idn.line + 1) + " -> " + idn.identifier +
                                          " might be none here, make sure to wrap this in a if XXX != none {...}!");
             }
         }
@@ -667,23 +667,23 @@ void Checker::visit(CallNode& n) {
         if (n.function.ntype != NodeContainer::MEMBER) {
             throw std::runtime_error("Expected it to be a member node!");
         }
-        MemberNode* member_node = n.function.node.member;
-        n.function = NodeFactory::id(this->rv.class_info->class_name + "." + member_node->child);
+        MemberNode& member_node = n.function.member();
+        n.function = NodeFactory::id(this->rv.class_info->class_name + "." + member_node.child);
         this->replace_me = false;
-        object_node = member_node->parent;
+        object_node = member_node.parent;
         is_a_method = true;
     } else if (this->rv.is_class_method) {
         if (n.function.ntype != NodeContainer::MEMBER) {
             throw std::runtime_error("Expected it to be a member node!");
         }
-        MemberNode* member_node = n.function.node.member;
-        n.function = NodeFactory::id(this->rv.class_info->class_name + "." + member_node->child);
+        MemberNode& member_node = n.function.member();
+        n.function = NodeFactory::id(this->rv.class_info->class_name + "." + member_node.child);
         this->replace_me = false;
         FunctionTypeNode ftn = *this->rv.type.ftype;
         FunctionTypeNode copy_ftn = FUNCTION_TYPE(ftn.parameter_types, ftn.return_type);
         copy_ftn.parameter_types.insert(copy_ftn.parameter_types.begin(), TYPE(this->rv.class_info->class_name, {}));
         retv.type = copy_ftn;
-        object_node = member_node->parent;
+        object_node = member_node.parent;
     }
     if (this->rv.is_function || this->rv.is_method || this->rv.is_class_method) {
         // ok
@@ -1216,85 +1216,85 @@ void Checker::visit(ContinueNode& node) {
 void Checker::dispatch(NodeContainer n) {
     switch (n.ntype) {
         case NodeContainer::ASSIGN:
-            n.node.assign->accept(*this);
+            n.assign().accept(*this);
             break;
         case NodeContainer::BINOP:
-            n.node.binop->accept(*this);
+            n.binop().accept(*this);
             break;
         case NodeContainer::BLOCK:
-            n.node.block->accept(*this);
+            n.block().accept(*this);
             break;
         case NodeContainer::BOOLEAN:
-            n.node.boolean->accept(*this);
+            n.boolean().accept(*this);
             break;
         case NodeContainer::BRK:
-            n.node.brk->accept(*this);
+            n.brk().accept(*this);
             break;
         case NodeContainer::CALL:
-            n.node.call->accept(*this);
+            n.call().accept(*this);
             break;
         case NodeContainer::CLSEXP:
-            n.node.clsexp->accept(*this);
+            n.clsexp().accept(*this);
             break;
         case NodeContainer::CLSFLD:
-            n.node.clsfld->accept(*this);
+            n.clsfld().accept(*this);
             break;
         case NodeContainer::CLS:
-            n.node.cls->accept(*this);
+            n.cls().accept(*this);
             break;
         case NodeContainer::CNTINUE:
-            n.node.cntinue->accept(*this);
+            n.cntinue().accept(*this);
             break;
         case NodeContainer::DECL:
-            n.node.decl->accept(*this);
+            n.decl().accept(*this);
             break;
         case NodeContainer::EMPTYLST:
-            n.node.emptylst->accept(*this);
+            n.emptylst().accept(*this);
             break;
         case NodeContainer::FORLOOP:
-            n.node.forloop->accept(*this);
+            n.forloop().accept(*this);
             break;
         case NodeContainer::FUNC:
-            n.node.func->accept(*this);
+            n.func().accept(*this);
             break;
         case NodeContainer::ID:
-            n.node.id->accept(*this);
+            n.id().accept(*this);
             break;
-        case NodeContainer::IFN:
-            n.node.iff->accept(*this);
+        case NodeContainer::IFF:
+            n.iff().accept(*this);
             break;
         case NodeContainer::INSTANCE:
-//                n.node.instance->accept(*this);
+//                n.instance().accept(*this);
             break;
         case NodeContainer::LST:
-            n.node.lst->accept(*this);
+            n.lst().accept(*this);
             break;
         case NodeContainer::MEMBER:
-            n.node.member->accept(*this);
+            n.member().accept(*this);
             break;
         case NodeContainer::NONE:
-            n.node.none->accept(*this);
+            n.none().accept(*this);
             break;
         case NodeContainer::NUMBER:
-            n.node.number->accept(*this);
+            n.number().accept(*this);
             break;
         case NodeContainer::RETRN:
-            n.node.retrn->accept(*this);
+            n.retrn().accept(*this);
             break;
         case NodeContainer::STRNG:
-            n.node.strng->accept(*this);
+            n.strng().accept(*this);
             break;
         case NodeContainer::STRCT:
-            n.node.strct->accept(*this);
+            n.strct().accept(*this);
             break;
         case NodeContainer::SUB:
-            n.node.sub->accept(*this);
+            n.sub().accept(*this);
             break;
         case NodeContainer::TERNARY:
-            n.node.ternary->accept(*this);
+            n.ternary().accept(*this);
             break;
         case NodeContainer::WHIL:
-            n.node.whil->accept(*this);
+            n.whil().accept(*this);
             break;
         case NodeContainer::UNINITIALIZED:
             break;

@@ -18,8 +18,16 @@ bool ClassLiteralExpressionNode::equal(NodeContainer other) const {
 //
 //    }
 //    return result;
-return false;
+    return false;
 }
 
 ClassLiteralExpressionNode::ClassLiteralExpressionNode(ObjectTypeNode& type, const std::vector<NodeContainer>& init)
         : type(type), init(init) {}
+
+bool ClassLiteralExpressionNode::operator!=(const ClassLiteralExpressionNode& other) const {
+    return !(*this == other);
+}
+
+bool ClassLiteralExpressionNode::operator==(const ClassLiteralExpressionNode& other) const {
+    return false;
+}

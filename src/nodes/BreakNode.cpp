@@ -13,3 +13,11 @@ bool BreakNode::equal(NodeContainer other) const {
 //    return o != nullptr;
 return false;
 }
+
+bool BreakNode::operator==(const BreakNode& other) const {
+    return true;
+}
+
+bool BreakNode::operator!=(const BreakNode& other) const {
+    return false;
+}

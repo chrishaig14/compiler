@@ -16,6 +16,8 @@ public:
 
     bool equal(NodeContainer other) const override;
 
+    bool operator==(const ContinueNode& other) const {return true;}
+    bool operator!=(const ContinueNode& other) const {return false;}
 };
 
 

@@ -314,7 +314,7 @@ NodeContainer Parser::parse_class_literal() {
         // if it's an id
 //        IdNode* idn = TO_ID(first);
         if (first.ntype == NodeContainer::ID) {
-            IdNode* idn = first.node.id;
+            IdNode& idn = first.id();
             if (this->match(TokType::RCURLY)) {
                 exps.push_back(first);
                 return NodeFactory::clslitexp(otn, exps);
@@ -338,7 +338,7 @@ NodeContainer Parser::parse_class_literal() {
                 // it's field:exp, field:exp
                 this->expect_token(TokType::COLON);
                 NodeContainer exp = this->parse_expression();
-                init[idn->identifier] = exp;
+                init[idn.identifier] = exp;
                 if (this->match(TokType::COMMA)) {
                     this->next();
                     while (true) {

@@ -19,19 +19,21 @@ public:
     std::vector<NodeContainer> child;
 
     void accept(Visitor& visitor) override;
+    bool operator==(const SubscriptNode& other) const;
 
+    bool operator!=(const SubscriptNode& other) const;
 private:
 
     bool equal(NodeContainer other) const override;
 
-    bool operator==(SubscriptNode& other) const;
 
     ~SubscriptNode() {
 //        delete this->parent;
 //        delete this->child;
     }
 
-    json to_json() const override {
+    json to_json() const
+    override {
         json j;
         j["node"] = "subscript";
 //        j["parent"] = this->parent->to_json();

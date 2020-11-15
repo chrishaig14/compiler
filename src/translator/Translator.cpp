@@ -16,7 +16,7 @@ void Translator::visit(AssignmentNode& node) {
     out.insert(out.end(), r_code.begin(), r_code.end());
 
     this->is_lvalue = true;
-    if (node.lvalue.ntype == NodeContainer::ID && node.lvalue.node.id->identifier == "_") {
+    if (node.lvalue.ntype == NodeContainer::ID && node.lvalue.id().identifier == "_") {
         out.push_back(LC("", I_POP));
     } else {
 //        node.lvalue->accept(*this)
@@ -60,7 +60,7 @@ void Translator::visit(CallNode& node) {
         CodeLabel arg_code = this->code;
         out.insert(out.end(), arg_code.begin(), arg_code.end());
     }
-    out.push_back(LC("", I_GET(node.function.node.id->identifier)));
+    out.push_back(LC("", I_GET(node.function.id().identifier)));
     out.push_back(LC("", I_CALL));
     this->code = out;
 }

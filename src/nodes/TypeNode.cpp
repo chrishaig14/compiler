@@ -50,7 +50,7 @@ bool otype_equal(ObjectTypeNode& a, ObjectTypeNode& b) {
     if (a.identifier != b.identifier) return false;
     if (a.type_parameters.size() != b.type_parameters.size()) return false;
     for (int i = 0; i < a.type_parameters.size(); i++) {
-        if (a.type_parameters[i] == b.type_parameters[i]) return false;
+        if (a.type_parameters[i] != b.type_parameters[i]) return false;
     }
     return true;
 }

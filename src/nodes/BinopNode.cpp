@@ -10,6 +10,19 @@ void BinopNode::accept(Visitor& visitor) {
 
 BinopNode::BinopNode(OpType op, NodeContainer left, NodeContainer right) : left(left), right(right), op(op) {}
 
+bool BinopNode::operator==(const BinopNode& other) const {
+    return this->op == other.op && this->left == other.left and this->right == other.right;
+}
+
+bool BinopNode::equal(NodeContainer other) const {
+//        auto other_ptr = dynamic_cast<BinopNodeContainer>(other);
+//        if (other_ptr == nullptr) return false;
+//        return *this == *other_ptr;
+    return false;
+}
+
+bool BinopNode::operator!=(const BinopNode& other) const { return !(*this == other); }
+
 std::string op_to_string(OpType op) {
     switch (op) {
         case OpType::ADD:

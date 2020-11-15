@@ -20,8 +20,9 @@ public:
     IdNode(std::string identifier);
 
     bool equal(NodeContainer other) const;
-
-    bool operator==(IdNode& other) const;
+//
+    bool operator==(const IdNode& other) const;
+    bool operator!=(const IdNode& other) const;;
 
     json to_json() const override {
         json j;

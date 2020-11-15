@@ -18,11 +18,15 @@ bool SubscriptNode::equal(NodeContainer other) const {
 return false;
 }
 
-bool SubscriptNode::operator==(SubscriptNode& other) const {
+bool SubscriptNode::operator==(const SubscriptNode& other) const {
     if (this->child.size() != other.child.size())return false;
     for (int i = 0; i < this->child.size(); i++) {
 //        if (!this->child[i]->equal(other.child[i])) return false;
     }
 //    return this->parent->equal(other.parent);
 return false;
+}
+
+bool SubscriptNode::operator!=(const SubscriptNode& other) const {
+    return !(*this==other);
 }

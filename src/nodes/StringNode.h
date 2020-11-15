@@ -20,7 +20,8 @@ public:
 
     bool equal(NodeContainer other) const override;
 
-    bool operator==(StringNode& other) const;
+    bool operator==(const StringNode& other) const;
+    bool operator!=(const StringNode& other) const;
 
     json to_json() const override {
         json j;

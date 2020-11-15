@@ -18,8 +18,14 @@ bool ClassLiteralFieldNode::equal(NodeContainer other) const {
 //        if (!f.second->equal(other_ptr->init.at(f.first))) return false;
 //    }
 //    return true;
-return false;
+    return false;
 }
 
 ClassLiteralFieldNode::ClassLiteralFieldNode(ObjectTypeNode& type, const std::map<std::string, NodeContainer>& init)
         : type(type), init(init) {}
+
+bool ClassLiteralFieldNode::operator!=(const ClassLiteralFieldNode& other) const { return !(*this == other); }
+
+bool ClassLiteralFieldNode::operator==(const ClassLiteralFieldNode& other) const {
+    return false;
+}

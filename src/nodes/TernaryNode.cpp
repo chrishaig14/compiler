@@ -3,7 +3,7 @@
 //
 
 #include "TernaryNode.h"
-
+#include "../utils.h"
 void TernaryNode::accept(Visitor& visitor) {
     visitor.visit(*this);
 }
@@ -15,12 +15,8 @@ bool TernaryNode::equal(NodeContainer other) const {
     return false;
 }
 
-bool TernaryNode::operator==(TernaryNode& other) const {
-//    if (!this->expression->equal(other.expression)) return false;
-//    if (!this->true_case->equal(other.true_case)) return false;
-//    if (!this->false_case->equal(other.false_case)) return false;
-//    return true;
-    return false;
+bool TernaryNode::operator==(const TernaryNode& other) const {
+    return this->expression == other.expression && this->true_case == other.true_case && this->false_case == other.false_case;
 }
 
 TernaryNode::TernaryNode(NodeContainer expression, NodeContainer trueCase, NodeContainer falseCase) : expression(

@@ -12,7 +12,10 @@
 #include "FunctionNode.h"
 class ClassNode : public Node {
 public:
-    ClassNode(const std::string& className, std::vector<std::string> type_parameters,
+
+    bool operator==(const ClassNode& other) const;
+    bool operator!=(const ClassNode& other) const;
+        ClassNode(const std::string& className, std::vector<std::string> type_parameters,
               std::map<std::string, TypeNode> members, std::map<std::string, FunctionNode> functions);
 
     void accept(Visitor& visitor) override;

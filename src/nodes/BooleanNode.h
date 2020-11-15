@@ -18,6 +18,7 @@ public:
     void accept(Visitor& visitor) override;
 
     bool equal(NodeContainer other) const override;
+    bool operator!=(const BooleanNode& other) const;
 
     bool operator==(const BooleanNode& other) const {
         return this->value == other.value;

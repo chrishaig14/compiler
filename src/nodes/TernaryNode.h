@@ -21,7 +21,7 @@ public:
 
     bool equal(NodeContainer other) const override;
 
-    bool operator==(TernaryNode& other) const;
+    bool operator==(const TernaryNode& other) const;
 
 };
 

@@ -13,7 +13,7 @@
 #define FUN_FOO_STRING "fun foo(x:List[List[Integer]])->List[Integer]{x=a+b; x = y;}"
 #define COMPLEX_TYPE T_LIST(T_LIST(T_INT))
 
-#define COMPLETE_TEST  EXPECT_EQ(node.ntype, expected_node.ntype);
+#define COMPLETE_TEST  EXPECT_EQ(node, expected_node);
 #define EXPECT_NOT_EQUAL EXPECT_FALSE(node->equal(expected_node)); delete node; delete expected_node;
 #define N_NUM(x) NodeContainer(NUM(x))
 #define N_SUB(a, b) NodeContainer(SUB(a,b))
@@ -22,12 +22,12 @@
 #define N_CALL(a, b) NodeContainer(CALL(a,b))
 #define N_ASN(a, b) NodeContainer(ASN(a,b))
 #define N_LST(a) NodeContainer(LST(a))
-#define N_FOR(a,b,c) NodeContainer(FOR(a,b,c))
-#define N_WHILE(a,b) NodeContainer(WHILE(a,b))
+#define N_FOR(a, b, c) NodeContainer(FOR(a,b,c))
+#define N_WHILE(a, b) NodeContainer(WHILE(a,b))
 #define N_BOOL(a) NodeContainer(BOOL(a))
 #define N_TERNARY(a, b, c) NodeContainer(TERNARY(a,b,c))
 #define N_DECL(a, b, c) NodeContainer(DECL(a,b,c))
-#define N_MEM(a,b) NodeContainer(MEM(a,b))
+#define N_MEM(a, b) NodeContainer(MEM(a,b))
 TEST(parser_test, a_plus_b) {
     std::string text = "a + b";
     Scanner scanner(text);
@@ -37,8 +37,7 @@ TEST(parser_test, a_plus_b) {
     NodeContainer expected_node = NodeContainer(
             N_BIN(OpType::ADD, NodeContainer(N_ID("a")), NodeContainer(N_ID("b"))));
     EXPECT_EQ(node.ntype, expected_node.ntype);
-    bool eq = *node.node.binop == *expected_node.node.binop;
-//    EXPECT_EQ();
+    EXPECT_EQ(node.binop(), expected_node.binop());
 }
 
 bool operator==(const NodeContainer& a, const NodeContainer& b) {
@@ -53,8 +52,7 @@ TEST(parser_test, ternary) {
     NodeContainer node = parser.parse_ternary();
     NodeContainer expected_node = N_TERNARY(N_ID("a"), N_NUM(7), N_NUM(6));
     EXPECT_EQ(node.ntype, expected_node.ntype);
-    EXPECT_EQ(node.node.binop, expected_node.node.binop);
-    EXPECT_EQ(node.node.binop, expected_node.node.binop);
+    EXPECT_EQ(node.ternary(), expected_node.ternary());
 }
 
 TEST(parser_test, a_or_b) {
@@ -65,7 +63,9 @@ TEST(parser_test, a_or_b) {
     NodeContainer node = parser.parse_or_expression();
     NodeContainer expected_node = N_BIN(OpType::OR, N_ID("a"), N_ID("b"));
     EXPECT_EQ(node.ntype, expected_node.ntype);
-    EXPECT_EQ(node.node.binop, expected_node.node.binop);
+    EXPECT_EQ(node.binop(), expected_node.binop());
+
+
 }
 
 TEST(parser_test, complex_expression_1) {
@@ -79,7 +79,8 @@ TEST(parser_test, complex_expression_1) {
             N_TERNARY(N_BIN(OpType::SUB, N_NUM(8), N_NUM(9)), N_NUM(7), N_NUM(4)),
             N_NUM(10));
     EXPECT_EQ(node.ntype, expected_node.ntype);
-    EXPECT_EQ(node.node.binop, expected_node.node.binop);
+    EXPECT_EQ(node.ternary(), expected_node.ternary());
+
 }
 
 TEST(parser_test, a_eq_b) {
@@ -310,7 +311,7 @@ TEST(parser_test, function_with_params_empty_body) {
     Parser parser(tokens);
     FunctionNode node = parser.parse_function_definition();
     BlockNode b;
-    auto expected_node = FunctionNode("foo", { "x" }, { COMPLEX_TYPE }, TYPE("Integer", {}), b);
+    auto expected_node = FunctionNode("foo", {"x"}, {COMPLEX_TYPE}, TYPE("Integer", {}), b);
     EXPECT_EQ(node, expected_node);
 }
 
@@ -320,8 +321,8 @@ TEST(parser_test, function_with_params_and_body) {
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
     FunctionNode node = parser.parse_function_definition();
-    BlockNode b;
-    auto expected_node = FunctionNode("foo", { "x" }, { COMPLEX_TYPE }, TYPE("String", {}), b);
+    BlockNode b({N_ASN(N_ID("x"), N_BIN(OpType::ADD, N_ID("a"), N_ID("b"))), N_ASN(N_ID("x"), N_ID("y"))});
+    auto expected_node = FunctionNode("foo", {"x"}, {COMPLEX_TYPE}, TYPE("String", {}), b);
     EXPECT_EQ(node, expected_node);
 }
 
@@ -898,7 +899,8 @@ TEST(parser_test, complex_chain) {
     Parser parser(tokens);
     NodeContainer node = parser.parse_expression();
     // a[1][b].c(d[5][0].e
-    auto call = N_CALL(N_MEM(N_SUB(N_SUB(N_ID("a"),{N_NUM(1)}),{N_ID("b")}),"c"),{N_MEM(N_SUB(N_SUB(N_ID("d"),{N_NUM(5)}), {N_NUM(0)}),"e")});
+    auto call = N_CALL(N_MEM(N_SUB(N_SUB(N_ID("a"), {N_NUM(1)}), {N_ID("b")}), "c"),
+                       { N_MEM(N_SUB(N_SUB(N_ID("d"), {N_NUM(5)}), {N_NUM(0)}), "e") });
 //    NodeContainer expected_node = N_MEM(N_SUB(N_SUB(N_CALL(N_SUB(N_SUB(N_MEM(N_MEM(call, "f"),"g"),{N_ID("h")}),{N_NUM(2)}),{}),{N_NUM(3)}),{N_NUM(5)}),"i");
 //    COMPLETE_TEST;
 

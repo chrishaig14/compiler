@@ -15,6 +15,10 @@ public:
 
     bool equal(NodeContainer other) const override;
 
+    bool operator==(const BreakNode& other) const;
+
+    bool operator!=(const BreakNode& other) const;
+
 };
 
 

@@ -13,3 +13,7 @@ bool NoneNode::equal(NodeContainer other) const {
 //    return ptr != nullptr;
     return false;
 }
+
+bool NoneNode::operator==(const NoneNode& other) const {return true;}
+
+bool NoneNode::operator!=(const NoneNode& other) const {return false;}

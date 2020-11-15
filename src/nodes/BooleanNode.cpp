@@ -16,3 +16,5 @@ return false;
 }
 
 BooleanNode::BooleanNode(bool value) : value(value) {}
+
+bool BooleanNode::operator!=(const BooleanNode& other) const {return !(*this==other);}
