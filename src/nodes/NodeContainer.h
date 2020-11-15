@@ -66,7 +66,38 @@ class TernaryNode;
 class TypeNode;
 
 class WhileNode;
-
+enum NodeType {
+    ASSIGN,
+    BINOP,
+    BLOCK,
+    BOOLEAN,
+    BRK,
+    CALL,
+    CLSEXP,
+    CLSFLD,
+    CLS,
+    CNTINUE,
+    DECL,
+    EMPTYLST,
+    FORLOOP,
+    FUNC,
+    ID,
+    IFF,
+    INSTANCE,
+    LST,
+    MEMBER,
+    NONE,
+    NUMBER,
+    RETRN,
+    STRNG,
+    STRCT,
+    SUB,
+    TERNARY,
+    OTYPE,
+    FTYPE,
+    WHIL,
+    UNINITIALIZED
+};
 class NodeContainer {
 private:
 
@@ -313,38 +344,7 @@ public:
         }
         throw std::runtime_error("Getting wrong node out of NodeContainer: whil");
     };
-    enum NodeType {
-        ASSIGN,
-        BINOP,
-        BLOCK,
-        BOOLEAN,
-        BRK,
-        CALL,
-        CLSEXP,
-        CLSFLD,
-        CLS,
-        CNTINUE,
-        DECL,
-        EMPTYLST,
-        FORLOOP,
-        FUNC,
-        ID,
-        IFF,
-        INSTANCE,
-        LST,
-        MEMBER,
-        NONE,
-        NUMBER,
-        RETRN,
-        STRNG,
-        STRCT,
-        SUB,
-        TERNARY,
-        OTYPE,
-        FTYPE,
-        WHIL,
-        UNINITIALIZED
-    } ntype;
+    NodeType ntype;
 
 
     NodeContainer() : node({nullptr}) {

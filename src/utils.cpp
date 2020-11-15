@@ -43,91 +43,91 @@ bool operator==(const NodeContainer& a, const NodeContainer& b) {
         return false;
     }
     switch (a.ntype) {
-        case NodeContainer::ASSIGN:
+        case NodeType::ASSIGN:
             return a.assign() == b.assign();
             break;
-        case NodeContainer::BINOP:
+        case NodeType::BINOP:
             return a.binop() == b.binop();
             break;
-        case NodeContainer::BLOCK:
+        case NodeType::BLOCK:
             return a.block() == b.block();
             break;
-        case NodeContainer::BOOLEAN:
+        case NodeType::BOOLEAN:
             return a.boolean() == b.boolean();
             break;
-        case NodeContainer::BRK:
+        case NodeType::BRK:
             return a.brk() == b.brk();
             break;
-        case NodeContainer::CALL:
+        case NodeType::CALL:
             return a.call() == b.call();
             break;
-        case NodeContainer::CLSEXP:
+        case NodeType::CLSEXP:
             return a.clsexp() == b.clsexp();
             break;
-        case NodeContainer::CLSFLD:
+        case NodeType::CLSFLD:
             return a.clsfld() == b.clsfld();
             break;
-        case NodeContainer::CLS:
+        case NodeType::CLS:
             return a.cls() == b.cls();
             break;
-        case NodeContainer::CNTINUE:
+        case NodeType::CNTINUE:
             return a.cntinue() == b.cntinue();
             break;
-        case NodeContainer::DECL:
+        case NodeType::DECL:
             return a.decl() == b.decl();
             break;
-        case NodeContainer::EMPTYLST:
+        case NodeType::EMPTYLST:
             return a.emptylst() == b.emptylst();
             break;
-        case NodeContainer::FORLOOP:
+        case NodeType::FORLOOP:
             return a.forloop() == b.forloop();
             break;
-        case NodeContainer::FUNC:
+        case NodeType::FUNC:
             return a.func() == b.func();
             break;
-        case NodeContainer::ID:
+        case NodeType::ID:
             return a.id() == b.id();
             break;
-        case NodeContainer::IFF:
+        case NodeType::IFF:
             return a.iff() == b.iff();
             break;
-        case NodeContainer::INSTANCE:
+        case NodeType::INSTANCE:
 //                return a.instance() == b.instance();
             break;
-        case NodeContainer::LST:
+        case NodeType::LST:
             return a.lst() == b.lst();
             break;
-        case NodeContainer::MEMBER:
+        case NodeType::MEMBER:
             return a.member() == b.member();
             break;
-        case NodeContainer::NONE:
+        case NodeType::NONE:
             return a.none() == b.none();
             break;
-        case NodeContainer::NUMBER:
+        case NodeType::NUMBER:
             return a.number() == b.number();
             break;
-        case NodeContainer::RETRN:
+        case NodeType::RETRN:
             return a.retrn() == b.retrn();
             break;
-        case NodeContainer::STRNG:
+        case NodeType::STRNG:
             return a.strng() == b.strng();
             break;
-        case NodeContainer::STRCT:
+        case NodeType::STRCT:
             return a.strct() == b.strct();
             break;
-        case NodeContainer::SUB:
+        case NodeType::SUB:
             return a.sub() == b.sub();
             break;
-        case NodeContainer::TERNARY:
+        case NodeType::TERNARY:
             return a.ternary() == b.ternary();
             break;
-//        case NodeContainer::TYPE:
+//        case NodeType::TYPE:
 //                return a.type() == b.type();
 //            break;
-        case NodeContainer::WHIL:
+        case NodeType::WHIL:
             return a.whil() == b.whil();
             break;
-        case NodeContainer::UNINITIALIZED:
+        case NodeType::UNINITIALIZED:
             break;
         default:
             throw std::runtime_error("Dont know what to do here!");

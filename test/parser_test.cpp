@@ -15,19 +15,7 @@
 
 #define COMPLETE_TEST  EXPECT_EQ(node, expected_node);
 #define EXPECT_NOT_EQUAL EXPECT_FALSE(node->equal(expected_node)); delete node; delete expected_node;
-#define N_NUM(x) NodeContainer(NUM(x))
-#define N_SUB(a, b) NodeContainer(SUB(a,b))
-#define N_ID(x) NodeContainer(ID(x))
-#define N_BIN(a, b, c) NodeContainer(BIN(a,b,c))
-#define N_CALL(a, b) NodeContainer(CALL(a,b))
-#define N_ASN(a, b) NodeContainer(ASN(a,b))
-#define N_LST(a) NodeContainer(LST(a))
-#define N_FOR(a, b, c) NodeContainer(FOR(a,b,c))
-#define N_WHILE(a, b) NodeContainer(WHILE(a,b))
-#define N_BOOL(a) NodeContainer(BOOL(a))
-#define N_TERNARY(a, b, c) NodeContainer(TERNARY(a,b,c))
-#define N_DECL(a, b, c) NodeContainer(DECL(a,b,c))
-#define N_MEM(a, b) NodeContainer(MEM(a,b))
+
 TEST(parser_test, a_plus_b) {
     std::string text = "a + b";
     Scanner scanner(text);

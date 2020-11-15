@@ -304,91 +304,91 @@ void GlobalProcessor::visit(ContinueNode& node) {
 
 void GlobalProcessor::dispatch(NodeContainer n) {
     switch (n.ntype) {
-        case NodeContainer::ASSIGN:
+        case NodeType::ASSIGN:
             n.assign().accept(*this);
             break;
-        case NodeContainer::BINOP:
+        case NodeType::BINOP:
             n.binop().accept(*this);
             break;
-        case NodeContainer::BLOCK:
+        case NodeType::BLOCK:
             n.block().accept(*this);
             break;
-        case NodeContainer::BOOLEAN:
+        case NodeType::BOOLEAN:
             n.boolean().accept(*this);
             break;
-        case NodeContainer::BRK:
+        case NodeType::BRK:
             n.brk().accept(*this);
             break;
-        case NodeContainer::CALL:
+        case NodeType::CALL:
             n.call().accept(*this);
             break;
-        case NodeContainer::CLSEXP:
+        case NodeType::CLSEXP:
             n.clsexp().accept(*this);
             break;
-        case NodeContainer::CLSFLD:
+        case NodeType::CLSFLD:
             n.clsfld().accept(*this);
             break;
-        case NodeContainer::CLS:
+        case NodeType::CLS:
             n.cls().accept(*this);
             break;
-        case NodeContainer::CNTINUE:
+        case NodeType::CNTINUE:
             n.cntinue().accept(*this);
             break;
-        case NodeContainer::DECL:
+        case NodeType::DECL:
             n.decl().accept(*this);
             break;
-        case NodeContainer::EMPTYLST:
+        case NodeType::EMPTYLST:
             n.emptylst().accept(*this);
             break;
-        case NodeContainer::FORLOOP:
+        case NodeType::FORLOOP:
             n.forloop().accept(*this);
             break;
-        case NodeContainer::FUNC:
+        case NodeType::FUNC:
             n.func().accept(*this);
             break;
-        case NodeContainer::ID:
+        case NodeType::ID:
             n.id().accept(*this);
             break;
-        case NodeContainer::IFF:
+        case NodeType::IFF:
             n.iff().accept(*this);
             break;
-        case NodeContainer::INSTANCE:
+        case NodeType::INSTANCE:
 //                n.instance().accept(*this);
             break;
-        case NodeContainer::LST:
+        case NodeType::LST:
             n.lst().accept(*this);
             break;
-        case NodeContainer::MEMBER:
+        case NodeType::MEMBER:
             n.member().accept(*this);
             break;
-        case NodeContainer::NONE:
+        case NodeType::NONE:
             n.none().accept(*this);
             break;
-        case NodeContainer::NUMBER:
+        case NodeType::NUMBER:
             n.number().accept(*this);
             break;
-        case NodeContainer::RETRN:
+        case NodeType::RETRN:
             n.retrn().accept(*this);
             break;
-        case NodeContainer::STRNG:
+        case NodeType::STRNG:
             n.strng().accept(*this);
             break;
-        case NodeContainer::STRCT:
+        case NodeType::STRCT:
             n.strct().accept(*this);
             break;
-        case NodeContainer::SUB:
+        case NodeType::SUB:
             n.sub().accept(*this);
             break;
-        case NodeContainer::TERNARY:
+        case NodeType::TERNARY:
             n.ternary().accept(*this);
             break;
-//        case NodeContainer::TYPE:
+//        case NodeType::TYPE:
 //                n.type().accept(*this);
 //            break;
-        case NodeContainer::WHIL:
+        case NodeType::WHIL:
             n.whil().accept(*this);
             break;
-        case NodeContainer::UNINITIALIZED:
+        case NodeType::UNINITIALIZED:
             break;
         default:
             throw std::runtime_error("Dont know what to do here!");
