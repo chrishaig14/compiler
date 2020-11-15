@@ -408,8 +408,8 @@ TEST(parser_test, struct_literal_with_names) {
     std::map<std::string, NodeContainer> fields;
     fields["x"] = N_NUM(27);
     fields["y"] = N_NUM(9);
-    auto expected_node = new ClassLiteralFieldNode(OBJECT_TYPE("Foo", {}), fields);
-//    COMPLETE_TEST;
+    auto expected_node = NodeContainer(new ClassLiteralFieldNode(OBJECT_TYPE("Foo", {}), fields));
+    COMPLETE_TEST;
 }
 
 TEST(parser_test, struct_literal_without_names) {
@@ -421,8 +421,8 @@ TEST(parser_test, struct_literal_without_names) {
     std::vector<NodeContainer> fields;
     fields.push_back(N_NUM(9));
     fields.push_back(N_NUM(27));
-    auto expected_node = new ClassLiteralExpressionNode(OBJECT_TYPE("Foo", {}), fields);
-//    COMPLETE_TEST;
+    auto expected_node = NodeContainer(new ClassLiteralExpressionNode(OBJECT_TYPE("Foo", {}), fields));
+    COMPLETE_TEST;
 }
 
 
@@ -584,6 +584,8 @@ TEST(parser_test, test_now_8) {
     std::map<std::string, NodeContainer> fields;
 //    NodeContainer expected_node = LIT_FIL(TYPE("x", {TYPE("y", {})}), fields);
 //    COMPLETE_TEST;
+//    EXPECT_EQ(node, expected_node);
+
 }
 
 TEST(parser_test, plus_parenthesized_expression) {
@@ -709,6 +711,7 @@ TEST(parser_test, for_loop_1) {
     Parser parser(tokens);
     ForNode node = parser.parse_for_loop();
     ForNode expected_node = ForNode("e", N_ID("l"), BlockNode());
+    EXPECT_EQ(node, expected_node);
 }
 
 TEST(parser_test, while_loop_1) {
@@ -718,6 +721,7 @@ TEST(parser_test, while_loop_1) {
     Parser parser(tokens);
     WhileNode node = parser.parse_while_loop();
     WhileNode expected_node = WhileNode(N_BOOL(true), BlockNode());
+    EXPECT_EQ(node, expected_node);
 }
 
 TEST(parser_test, while_loop_common) {
@@ -725,8 +729,9 @@ TEST(parser_test, while_loop_common) {
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
-    NodeContainer node = parser.parse_common_statement();
+    WhileNode node = parser.parse_while_loop();
     WhileNode expected_node = WhileNode(N_BOOL(true), BlockNode());
+    EXPECT_EQ(node, expected_node);
 }
 
 TEST(parser_test, for_loop_2) {
@@ -738,7 +743,7 @@ TEST(parser_test, for_loop_2) {
     VectorOfNodes list = {N_NUM(4), N_NUM(5), N_NUM(6)};
     BlockNode body = BlockNode({N_CALL(N_ID("print"), { N_ID("e") })});
     ForNode expected_node = ForNode("e", N_LST(list), body);
-//    COMPLETE_TEST;
+    COMPLETE_TEST;
 }
 
 TEST(parser_test, for_loop_3) {
@@ -901,8 +906,10 @@ TEST(parser_test, complex_chain) {
     // a[1][b].c(d[5][0].e
     auto call = N_CALL(N_MEM(N_SUB(N_SUB(N_ID("a"), {N_NUM(1)}), {N_ID("b")}), "c"),
                        { N_MEM(N_SUB(N_SUB(N_ID("d"), {N_NUM(5)}), {N_NUM(0)}), "e") });
-//    NodeContainer expected_node = N_MEM(N_SUB(N_SUB(N_CALL(N_SUB(N_SUB(N_MEM(N_MEM(call, "f"),"g"),{N_ID("h")}),{N_NUM(2)}),{}),{N_NUM(3)}),{N_NUM(5)}),"i");
-//    COMPLETE_TEST;
+    NodeContainer expected_node = N_MEM(
+            N_SUB(N_SUB(N_CALL(N_SUB(N_SUB(N_MEM(N_MEM(call, "f"), "g"), {N_ID("h")}), {N_NUM(2)}), {}), {N_NUM(3)}),
+                  {N_NUM(5)}), "i");
+    EXPECT_EQ(node, expected_node);
 
 }
 

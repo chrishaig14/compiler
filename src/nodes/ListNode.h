@@ -20,7 +20,8 @@ public:
 
     bool equal(NodeContainer other) const override;
 
-    bool operator==(ListNode& other) const;
+    bool operator==(const ListNode& other) const;
+    bool operator!=(const ListNode& other) const;
 
     ~ListNode() {
 //        for (auto e: this->elements) {

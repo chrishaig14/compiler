@@ -3,7 +3,7 @@
 //
 
 #include "ListNode.h"
-
+#include "../utils.h"
 void ListNode::accept(Visitor& visitor) {
     visitor.visit(*this);
 
@@ -17,13 +17,12 @@ bool ListNode::equal(NodeContainer other) const {
 //    auto other_ptr = dynamic_cast<ListNode*>(other);
 //    if (other_ptr == nullptr) return false;
 //    return *this == *other_ptr;
-return false;
+    return false;
 }
 
-bool ListNode::operator==(ListNode& other) const {
-    if (this->elements.size() != other.elements.size()) return false;
-//    for (int i = 0; i < this->elements.size(); i++) {
-//        if (!this->elements[i]->equal(other.elements[i])) return false;
-//    }
-    return true;
+bool ListNode::operator!=(const ListNode& other) const { return !(*this == other); }
+
+bool ListNode::operator==(const ListNode& other) const {
+    return this->elements == other.elements;
 }
+

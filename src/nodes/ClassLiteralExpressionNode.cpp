@@ -3,7 +3,7 @@
 //
 
 #include "ClassLiteralExpressionNode.h"
-
+#include "../utils.h"
 void ClassLiteralExpressionNode::accept(Visitor& visitor) {
     visitor.visit(*this);
 }
@@ -29,5 +29,6 @@ bool ClassLiteralExpressionNode::operator!=(const ClassLiteralExpressionNode& ot
 }
 
 bool ClassLiteralExpressionNode::operator==(const ClassLiteralExpressionNode& other) const {
+    return this->type == other.type && this->init == other.init;
     return false;
 }

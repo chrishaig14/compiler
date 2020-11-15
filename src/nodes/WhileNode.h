@@ -22,6 +22,8 @@ public:
     bool equal(NodeContainer other) const override;
 
     bool operator==(const WhileNode& other) const;
+    bool operator!=(const WhileNode& other) const;
+
 };
 
 

@@ -3,7 +3,7 @@
 //
 
 #include "ClassLiteralFieldNode.h"
-
+#include "../utils.h"
 void ClassLiteralFieldNode::accept(Visitor& visitor) {
     visitor.visit(*this);
 }
@@ -27,5 +27,5 @@ ClassLiteralFieldNode::ClassLiteralFieldNode(ObjectTypeNode& type, const std::ma
 bool ClassLiteralFieldNode::operator!=(const ClassLiteralFieldNode& other) const { return !(*this == other); }
 
 bool ClassLiteralFieldNode::operator==(const ClassLiteralFieldNode& other) const {
-    return false;
+    return this->type == other.type && this->init == other.init;
 }
