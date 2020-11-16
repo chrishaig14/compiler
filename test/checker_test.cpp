@@ -294,9 +294,3 @@ void f(CodeBuiltin c){
     CodeBuiltin d = {ft, nullptr};
     d = c;
 }
-
-TEST(checker_test, assign_function_type_node){
-    FunctionTypeNode ft({NodeFactory::otype("foo",{})},NodeFactory::otype("Integer",{}));
-    CodeBuiltin builtin = {ft, nullptr};
-    CodeObject c(builtin);
-}
