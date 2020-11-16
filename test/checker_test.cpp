@@ -3,7 +3,7 @@
 #include <scanner/Scanner.h>
 #include <semantic/GlobalProcessor.h>
 #include <semantic/Checker.h>
-
+#include "vm/CodeObject.h"
 BlockNode get_ast(std::string text) {
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
@@ -287,4 +287,16 @@ TEST(checker_test, test_add_list_ok) {
     gp.visit(tree);
     Checker checker(gp.globals, gp.class_table, gp.function_table);
     checker.visit(tree);
+}
+
+void f(CodeBuiltin c){
+    FunctionTypeNode ft({NodeFactory::otype("foo",{})},NodeFactory::otype("Integer",{}));
+    CodeBuiltin d = {ft, nullptr};
+    d = c;
+}
+
+TEST(checker_test, assign_function_type_node){
+    FunctionTypeNode ft({NodeFactory::otype("foo",{})},NodeFactory::otype("Integer",{}));
+    CodeBuiltin builtin = {ft, nullptr};
+    CodeObject c(builtin);
 }

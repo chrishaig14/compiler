@@ -6,7 +6,7 @@
 
 CodeObject::CodeObject(CodeBuiltin builtin) {
     this->type = CodeType::BUILTIN;
-    this->builtin = builtin;
+    this->stuff.builtin = new CodeBuiltin(builtin);
 }
 
 bool CodeObject::equal(const Object* other) const {
@@ -16,6 +16,6 @@ bool CodeObject::equal(const Object* other) const {
 
 CodeObject::CodeObject(CodeUser* user_code) {
     this->type = CodeType::USER;
-    this->user = user_code;
+    this->stuff.user = user_code;
 }
 

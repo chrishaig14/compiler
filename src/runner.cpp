@@ -30,8 +30,7 @@ void compile_and_run(std::string text) {
     try {
         GlobalProcessor gp(builtins);
         gp.visit(program);
-        Checker checker(gp.globals, gp.class_table);
-        checker.function_table = gp.function_table;
+        Checker checker(gp.globals, gp.class_table, gp.function_table);
         checker.visit(program);
 //        program->accept(translator);
         translator.visit(program);
@@ -47,7 +46,7 @@ void compile_and_run(std::string text) {
     loader.load();
     Environment* global_env = loader.global_env;
     CodeObject* main_function = dynamic_cast<CodeObject*>(global_env->get("main"));
-    CodeRunner code_runner(main_function->user->code, structs, stack, global_env);
+    CodeRunner code_runner(main_function->stuff.user->code, structs, stack, global_env);
     try {
         code_runner.run();
         auto x = stack;

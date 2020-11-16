@@ -105,9 +105,9 @@ void list_map(std::map<std::string, std::map<std::string, Code>>& structs, Objec
     for (int i = 0; i < ls->list.size(); i++) {
         stack.push(ls->list[i]);
         if (fun->type == CodeType::BUILTIN) {
-            fun->builtin.function(structs, stack, global_env);
+            fun->stuff.builtin->function(structs, stack, global_env);
         } else {
-            CodeRunner code_runner(fun->user->code, structs, stack, global_env);
+            CodeRunner code_runner(fun->stuff.user->code, structs, stack, global_env);
             code_runner.run();
         }
         Object* obj = stack.top();

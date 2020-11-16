@@ -16,10 +16,10 @@ enum class Kind {
 };
 
 
-std::string otype_to_string(ObjectTypeNode& otype);
-bool otype_equal(ObjectTypeNode& a, ObjectTypeNode& b);
-bool ftype_equal(FunctionTypeNode& a, FunctionTypeNode& b);
-std::string ftype_to_string(FunctionTypeNode& ftype);
+std::string otype_to_string(const ObjectTypeNode& otype);
+bool otype_equal(const ObjectTypeNode& a, const ObjectTypeNode& b);
+bool ftype_equal(const FunctionTypeNode& a, const FunctionTypeNode& b);
+std::string ftype_to_string(const FunctionTypeNode& ftype);
 
 class TypeNode {
 public:
@@ -45,7 +45,7 @@ public:
         this->kind = Kind::FUNCTION;
     }
 
-    std::string to_string() {
+    std::string to_string() const {
         switch (this->kind) {
             case Kind::OBJECT:
                 return otype_to_string(*this->otype);
@@ -56,7 +56,9 @@ public:
     }
 
     bool operator==(const TypeNode& other) const {
-        if (this->kind != other.kind) return false;
+        if (this->kind != other.kind) {
+            return false;
+        }
         switch (this->kind) {
             case Kind::OBJECT:
                 return otype_equal(*this->otype, *other.otype);
@@ -76,15 +78,15 @@ public:
     ObjectTypeNode(const std::string& identifier,
                    const std::vector<TypeNode>& typeParameters);
 
-    bool operator==(ObjectTypeNode& other) {
+    bool operator==(const ObjectTypeNode& other) const {
         return otype_equal(*this, other);
     }
 
-    bool operator!=(ObjectTypeNode& other) {
+    bool operator!=(const ObjectTypeNode& other) const {
         return !(*this == other);
     }
 
-    std::string to_string() {
+    std::string to_string() const {
         return otype_to_string(*this);
     }
 
@@ -97,19 +99,21 @@ class FunctionTypeNode {
 public:
     FunctionTypeNode(const std::vector<TypeNode>& parameterTypes, TypeNode returnType);
 
-    bool is_object() const { return false; }
+//    FunctionTypeNode& operator=(const FunctionTypeNode& other) = default;
 
-    bool is_function() { return true; }
+//    FunctionTypeNode operator=(const FunctionTypeNode& other) {
+//        return FunctionTypeNode(other.parameter_types, other.return_type);
+//    }
 
-    bool operator==(FunctionTypeNode& other) {
+    bool operator==(const FunctionTypeNode& other) const {
         return ftype_equal(*this, other);
     }
 
-    bool operator!=(FunctionTypeNode& other) {
+    bool operator!=(const FunctionTypeNode& other) const {
         return !(*this == other);
     }
 
-    std::string to_string() {
+    std::string to_string() const {
         return ftype_to_string(*this);
     }
 
