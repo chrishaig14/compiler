@@ -526,9 +526,9 @@ ObjectTypeNode Parser::parse_object_type() {
 
 TypeNode Parser::parse_type_node() {
     if (this->match(TokType::FUN)) {
-        return TypeNode(*new FunctionTypeNode(this->parse_function_type()));
+        return TypeNode(new FunctionTypeNode(this->parse_function_type()));
     }
-    return TypeNode(*new ObjectTypeNode(this->parse_object_type()));
+    return TypeNode(new ObjectTypeNode(this->parse_object_type()));
 }
 
 BlockNode Parser::parse_possibly_empty_block() {

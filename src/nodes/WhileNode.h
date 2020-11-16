@@ -11,7 +11,7 @@
 
 class WhileNode : public Node {
 public:
-    BlockNode& body;
+    BlockNode body;
     NodeContainer condition;
 
 

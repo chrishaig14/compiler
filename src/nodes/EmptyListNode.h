@@ -25,7 +25,7 @@ public:
         return !(*this == other);
     }
 
-    TypeNode& type;
+    TypeNode type;
 };
 
 

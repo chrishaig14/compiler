@@ -3,8 +3,8 @@ fun sort(l: List[Integer]) -> List[Integer]{
         return l
     }
     var pivot = l[0]
-    var smaller = []::List[Integer]
-    var greater = []::List[Integer]
+    var smaller = []::Integer
+    var greater = []::Integer
     var equal = [pivot]
     for i @ range(1,1,l.len()) {
         if l[i] < pivot {

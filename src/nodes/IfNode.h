@@ -14,11 +14,11 @@
 class IfNode : public Node {
 public:
     NodeContainer condition;
-    BlockNode& then;
+    BlockNode then;
     BlockNode selse;
     std::vector<std::pair<NodeContainer, std::reference_wrapper<BlockNode>>> elifs;
 
-    IfNode(NodeContainer condition, BlockNode& then, const std::vector<std::pair<NodeContainer, std::reference_wrapper<BlockNode>>>& elifs, BlockNode selse);
+    IfNode(NodeContainer condition, BlockNode then, const std::vector<std::pair<NodeContainer, std::reference_wrapper<BlockNode>>>& elifs, BlockNode selse);
 
     void accept(Visitor& visitor) override;
 

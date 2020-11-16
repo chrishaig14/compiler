@@ -17,21 +17,22 @@ bool function_is_generic(FunctionTypeNode& ft) {
     return false;
 }
 
-Checker::Checker(SymbolTable* globals, ClassTable* class_table) {
+Checker::Checker(SymbolTable* globals, ClassTable* class_table, FunctionTable* function_table) {
+    this->function_table = function_table;
     this->class_table = class_table;
     this->scope = globals;
     this->scopes["global"] = this->scope;
     auto int_class_info = new ClassInfo();
     int_class_info->class_name = "Integer";
-    int_class_info->methods.insert(std::make_pair("str", FUNCTION_TYPE({}, T_STRING)));
+    int_class_info->methods.insert(std::make_pair("str", FunctionTypeNode({}, T_STRING)));
 
     auto list_class_info = new ClassInfo();
     list_class_info->class_name = "List";
-    list_class_info->methods.insert(std::make_pair("len", FUNCTION_TYPE({}, T_INT)));
-    list_class_info->methods.insert(std::make_pair("push", FUNCTION_TYPE({ (TYPE("t", {})) }, TYPE(".None", {}))));
-    list_class_info->methods.insert(std::make_pair("pop", FUNCTION_TYPE({}, TYPE("t", {}))));
+    list_class_info->methods.insert(std::make_pair("len", FunctionTypeNode({}, T_INT)));
+    list_class_info->methods.insert(std::make_pair("push", FunctionTypeNode({ (TYPE("t", {})) }, TYPE(".None", {}))));
+    list_class_info->methods.insert(std::make_pair("pop", FunctionTypeNode({}, TYPE("t", {}))));
     list_class_info->methods.insert(
-            std::make_pair("map", FUNCTION_TYPE({ FUNCTION_TYPE({TYPE("t", {})}, TYPE("b", {})) },
+            std::make_pair("map", FunctionTypeNode({ FUNCTION_TYPE({TYPE("t", {})}, TYPE("b", {})) },
                                                 T_LIST(TYPE("b", {})))));
     list_class_info->type_parameters = {"t"};
 
@@ -41,7 +42,7 @@ Checker::Checker(SymbolTable* globals, ClassTable* class_table) {
 
     auto string_class_info = new ClassInfo();
     string_class_info->class_name = "String";
-    string_class_info->methods.insert(std::make_pair("len", FUNCTION_TYPE({}, T_INT)));
+    string_class_info->methods.insert(std::make_pair("len", FunctionTypeNode({}, T_INT)));
     this->class_table->set("String", string_class_info);
     this->replace_me = false;
     this->class_table->set("Option",
@@ -117,7 +118,7 @@ void Checker::visit(IdNode& n) {
         // it might be a function name
         if (this->function_table->has_function(n.identifier)) {
             symbol_info.is_function = true;
-            symbol_info.type = this->function_table->get(n.identifier);
+            symbol_info.type = NodeFactory::wrap(this->function_table->get(n.identifier));
         } else {
             std::cout << n << std::endl;
             throw ScopeError(n.identifier);
@@ -158,7 +159,7 @@ void Checker::visit(DeclarationNode& n) {
         if (n.type->kind == Kind::FUNCTION) {
             // it's a function
             if (*n.type != this->rv.type) {
-                throw AssignmentTypeError(otn, this->rv.type);
+                throw AssignmentTypeError(*n.type, this->rv.type);
             }
         } else {
             SymbolInfo expression_info = this->rv;
@@ -167,7 +168,7 @@ void Checker::visit(DeclarationNode& n) {
                 if (actual_type.type_parameters[0] != expression_info.type) {
                     auto foo = expression_info.type.otype;
                     if (foo->identifier != "NoneType") {
-                        throw AssignmentTypeError(otn, expression_info.type);
+                        throw AssignmentTypeError(*n.type, expression_info.type);
                     }
                 }
             } else if (actual_type.identifier == "Union") {
@@ -179,11 +180,11 @@ void Checker::visit(DeclarationNode& n) {
                     }
                 }
                 if (!ok) {
-                    throw AssignmentTypeError(otn, expression_info.type);
+                    throw AssignmentTypeError(*n.type, expression_info.type);
                 }
             } else {
                 if (*n.type != expression_info.type) {
-                    throw AssignmentTypeError(otn, expression_info.type);
+                    throw AssignmentTypeError(*n.type, expression_info.type);
                 }
             }
         }
@@ -271,11 +272,11 @@ void Checker::visit(MemberNode& n) {
         if (this->class_table->declared(id_node.identifier)) {
             ClassInfo* class_info = this->class_table->get(id_node.identifier);
             if (class_info->methods.count(n.child) == 1) {
-                this->rv.type = class_info->methods.find(n.child)->second;
+                this->rv.type = NodeFactory::wrap(class_info->methods.find(n.child)->second);
                 this->rv.class_info = class_info;
 
                 FunctionTypeNode ftn = *this->rv.type.ftype;
-                FunctionTypeNode copy_ftn = FUNCTION_TYPE(ftn.parameter_types, ftn.return_type);
+                FunctionTypeNode copy_ftn(ftn.parameter_types, ftn.return_type);
                 std::vector<TypeNode> tp;
                 for (auto tttp: this->rv.class_info->type_parameters) {
                     tp.push_back(TypeNode(NodeFactory::otype(tttp, {})));
@@ -283,7 +284,7 @@ void Checker::visit(MemberNode& n) {
                 auto instance_type = NodeFactory::otype(this->rv.class_info->class_name, tp);
                 copy_ftn.parameter_types.insert(copy_ftn.parameter_types.begin(), instance_type);
 
-                this->rv.type = copy_ftn;
+                this->rv.type = NodeFactory::wrap(copy_ftn);
                 this->rv.is_method = false;
                 this->rv.is_class_method = true;
                 this->replace_me = true;
@@ -310,7 +311,7 @@ void Checker::visit(MemberNode& n) {
                 object = *(object.type_parameters[0]).otype;
             } else {
                 throw std::runtime_error("Error: line " + std::to_string(idn.line + 1) + " -> " + idn.identifier +
-                                         " might be none here, make sure to wrap this in a if XXX != none {...}!");
+                                         " might be none here, make sure to NodeFactory::wrap this in a if XXX != none {...}!");
             }
         }
     }
@@ -318,7 +319,7 @@ void Checker::visit(MemberNode& n) {
     if (this->class_table->declared(object.to_string())) {
         class_info = this->class_table->get(object.to_string());
     } else {
-        if (is_generic(TypeNode(object)) && object.type_parameters.size() == 0) {
+        if (is_generic(NodeFactory::wrap(object)) && object.type_parameters.size() == 0) {
             throw std::runtime_error(
                     "Cannot access member of totally generic value of generic type " + object.identifier + "!");
         }
@@ -338,7 +339,7 @@ void Checker::visit(MemberNode& n) {
         this->rv.is_method = false;
     } else if (class_info->methods.count(n.child) == 1) {
         // It's a method
-        symbol_info.type = class_info->methods.find(n.child)->second;
+        symbol_info.type = NodeFactory::wrap(class_info->methods.find(n.child)->second);
         this->rv = symbol_info;
         this->rv.is_method = true;
         this->rv.class_info = class_info;
@@ -427,16 +428,16 @@ void Checker::visit(BinopNode& n) {
             symbol_info.is_function = false;
             ok = true;
         }
-        if (ltype == "String" && rtype == "String") {
+        else if (ltype == "String" && rtype == "String") {
             if (n.op == OpType::ADD) {
                 symbol_info.type = TYPE("String", {});
                 symbol_info.is_function = false;
                 ok = true;
             }
         }
-        if (ltype == "List" && rtype == "List" && left == (right)) {
+        else if (ltype == "List" && rtype == "List" && left == (right)) {
             if (n.op == OpType::ADD) {
-                symbol_info.type = TypeNode(left);
+                symbol_info.type = NodeFactory::wrap(left);
                 symbol_info.is_function = false;
                 ok = true;
             }
@@ -602,7 +603,7 @@ make_generic_replacements(TypeNode t_generic_type, TypeNode t_matching_type) {
     ObjectTypeNode matching_type = *(t_matching_type).otype;
     std::map<std::string, TypeNode> replacements;
     if (generic_type.type_parameters.size() == 0) {
-        replacements[generic_type.identifier] = matching_type;
+        replacements[generic_type.identifier] = NodeFactory::wrap(matching_type);
     } else {
         for (int i = 0; i < generic_type.type_parameters.size(); i++) {
             std::map<std::string, TypeNode> param_replacements = make_generic_replacements(
@@ -646,7 +647,7 @@ void Checker::match_arguments_to_generic_function(FunctionTypeNode function_type
     }
     if (is_generic(function_type.return_type)) {
         ObjectTypeNode rtn = *function_type.return_type.otype;
-        this->rv.type = make_type(rtn, generic_replacements);
+        this->rv.type = make_type(NodeFactory::wrap(rtn), generic_replacements);
     } else {
         this->rv.type = function_type.return_type;
     }
@@ -680,9 +681,9 @@ void Checker::visit(CallNode& n) {
         n.function = NodeFactory::id(this->rv.class_info->class_name + "." + member_node.child);
         this->replace_me = false;
         FunctionTypeNode ftn = *this->rv.type.ftype;
-        FunctionTypeNode copy_ftn = FUNCTION_TYPE(ftn.parameter_types, ftn.return_type);
+        FunctionTypeNode copy_ftn = FunctionTypeNode(ftn.parameter_types, ftn.return_type);
         copy_ftn.parameter_types.insert(copy_ftn.parameter_types.begin(), TYPE(this->rv.class_info->class_name, {}));
-        retv.type = copy_ftn;
+        retv.type = NodeFactory::wrap(copy_ftn);
         object_node = member_node.parent;
     }
     if (this->rv.is_function || this->rv.is_method || this->rv.is_class_method) {
@@ -843,7 +844,7 @@ void Checker::visit(ClassLiteralExpressionNode& node) {
     }
     node.names = class_field_names_ordered;
     this->rv = SymbolInfo();
-    rv.type = node.type;
+    rv.type = NodeFactory::wrap(node.type);
 }
 
 
@@ -946,7 +947,7 @@ ClassInfo* Checker::instantiate_generic(ClassInfo* generic, ObjectTypeNode insta
 
     std::map<std::string, FunctionTypeNode> concrete_methods;
     for (auto m: generic->methods) {
-        TypeNode concrete_type = make_type(m.second, replacements);
+        TypeNode concrete_type = make_type(NodeFactory::wrap(m.second), replacements);
         concrete_methods.insert(std::make_pair(m.first, *concrete_type.ftype));
     }
 
@@ -1016,7 +1017,7 @@ void Checker::visit(ClassLiteralFieldNode& node) {
         }
     }
     this->rv = SymbolInfo();
-    rv.type = node.type;
+    rv.type = NodeFactory::wrap(node.type);
 }
 
 void Checker::visit(ForNode& node) {
@@ -1184,7 +1185,7 @@ void Checker::visit(NoneNode& node) {
 
 void Checker::visit(EmptyListNode& node) {
     SymbolInfo semanticInfo;
-    semanticInfo.type = node.type;
+    semanticInfo.type = T_LIST(node.type);
     semanticInfo.is_function = false;
     this->rv = semanticInfo;
 }

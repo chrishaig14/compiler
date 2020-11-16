@@ -33,14 +33,14 @@ public:
         this->kind = Kind::UNINITIALIZED;
     }
 
-    TypeNode(ObjectTypeNode& otype) {
-        this->otype = &otype;
+    TypeNode(ObjectTypeNode* otype) {
+        this->otype = otype;
         this->ftype = nullptr;
         this->kind = Kind::OBJECT;
     }
 
-    TypeNode(FunctionTypeNode& ftype) {
-        this->ftype = &ftype;
+    TypeNode(FunctionTypeNode* ftype) {
+        this->ftype = ftype;
         this->otype = nullptr;
         this->kind = Kind::FUNCTION;
     }

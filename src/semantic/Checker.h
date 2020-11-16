@@ -48,7 +48,7 @@ class Checker : public Visitor {
 public:
     std::map<std::string, SymbolTable*> scopes;
 
-    Checker(SymbolTable* globals, ClassTable* class_table);
+    Checker(SymbolTable* globals, ClassTable* class_table, FunctionTable* function_table);
 
     void enter_scope(std::string name);
 

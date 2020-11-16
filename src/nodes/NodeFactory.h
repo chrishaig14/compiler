@@ -10,27 +10,30 @@
 
 class NodeFactory {
 public:
-    static TypeNode& type(ObjectTypeNode& otype) {
-        auto node = new TypeNode(otype);
-        return *node;
+    static TypeNode otype(const std::string& identifier,
+                          const std::vector<TypeNode>& typeParameters) {
+        auto node = new ObjectTypeNode(identifier, typeParameters);
+        return TypeNode(node);
     }
-    static TypeNode& type(FunctionTypeNode& ftype) {
-        auto node = new TypeNode(ftype);
-        return *node;
+
+    static TypeNode wrap(ObjectTypeNode otn){
+        auto node = new ObjectTypeNode(otn);
+        return TypeNode(node);
     }
+
+    static TypeNode wrap(FunctionTypeNode otn){
+        auto node = new FunctionTypeNode(otn);
+        return TypeNode(node);
+    }
+
+    static TypeNode ftype(const std::vector<TypeNode>& parameterTypes, TypeNode returnType) {
+        auto node = new FunctionTypeNode(parameterTypes, returnType);
+        return TypeNode(node);
+    }
+
     static NodeContainer assign(NodeContainer lvalue, NodeContainer rvalue) {
         auto node = new AssignmentNode(lvalue, rvalue);
         return NodeContainer(node);
-    }
-
-    static FunctionTypeNode& ftype(std::vector<TypeNode> parameter_types, TypeNode return_type) {
-        auto node = new FunctionTypeNode(parameter_types, return_type);
-        return *node;
-    }
-
-    static ObjectTypeNode& otype(std::string identifier, std::vector<TypeNode> type_parameters) {
-        auto node = new ObjectTypeNode(identifier, type_parameters);
-        return *node;
     }
 
     static NodeContainer binop(OpType op, NodeContainer left, NodeContainer right) {

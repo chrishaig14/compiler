@@ -25,7 +25,7 @@ void compile_and_run(std::string text) {
 
     GlobalProcessor gp(builtins);
     gp.visit(program);
-    Checker checker(gp.globals, gp.class_table);
+    Checker checker(gp.globals, gp.class_table, gp.function_table);
     checker.function_table = gp.function_table;
     checker.visit(program);
     std::cout << "Semantic check passed!" << std::endl;

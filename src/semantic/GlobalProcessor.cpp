@@ -13,10 +13,7 @@
 
 void GlobalProcessor::add_builtins(std::vector<Builtin>& builtins) {
     for (int i = 0; i < builtins.size(); i++) {
-        Builtin b = builtins[i];
-        assert(b.second.ftype != nullptr);
-        b.first = b.first;
-        builtins[i] = b;
+        this->function_table->add(builtins[i].first, builtins[i].second.ftype);
     }
 
 }
@@ -128,26 +125,26 @@ GlobalProcessor::GlobalProcessor(std::vector<Builtin>& builtins) {
     auto none = NodeFactory::otype(".None", {});
     std::vector<TypeNode> w = {at, ft};
     builtins.push_back(
-            {"map", CodeBuiltin{&FUNCTION_TYPE(w, T_LIST(TypeNode(NodeFactory::otype("b", {})))), list_map}});
-    builtins.push_back({"Integer.str", CodeBuiltin{&FUNCTION_TYPE({ T_INT }, T_STRING), int_to_str}});
+            {"map", CodeBuiltin{FunctionTypeNode(w, T_LIST(NodeFactory::otype("b", {}))), list_map}});
+    builtins.push_back({"Integer.str", CodeBuiltin{FunctionTypeNode({T_INT}, T_STRING), int_to_str}});
     builtins.push_back(
-            {"List.len", CodeBuiltin{&FUNCTION_TYPE({ T_LIST(NodeFactory::otype("a", {})) }, T_INT), list_len}});
+            {"List.len", CodeBuiltin{FunctionTypeNode({T_LIST(NodeFactory::otype("a", {}))}, T_INT), list_len}});
     std::vector<TypeNode> x = {T_LIST(TYPE("a", {})), NodeFactory::otype("a", {})};
-    builtins.push_back({"List.pop", CodeBuiltin{&FUNCTION_TYPE(x, none), list_pop}});
+    builtins.push_back({"List.pop", CodeBuiltin{FunctionTypeNode(x, none), list_pop}});
     builtins.push_back({"List.push", CodeBuiltin{
-            &FUNCTION_TYPE({ T_LIST(NodeFactory::otype("a", {})) }, NodeFactory::otype("a", {})), list_push}});
+            FunctionTypeNode({T_LIST(NodeFactory::otype("a", {}))}, NodeFactory::otype("a", {})), list_push}});
     auto function_from_t_to_u = FUNCTION_TYPE({ TYPE("t", {}) }, NodeFactory::otype("b", {}));
     builtins.push_back(
             {"List.map",
-             CodeBuiltin{&FUNCTION_TYPE({ function_from_t_to_u }, T_LIST(NodeFactory::otype("b", {}))), list_map}});
-    builtins.push_back({"String.len", CodeBuiltin{&FUNCTION_TYPE({ T_STRING }, T_INT), string_len}});
-    builtins.push_back({"print", CodeBuiltin{&FUNCTION_TYPE({ T_STRING }, none), print}});
+             CodeBuiltin{FunctionTypeNode({function_from_t_to_u}, T_LIST(NodeFactory::otype("b", {}))), list_map}});
+    builtins.push_back({"String.len", CodeBuiltin{FunctionTypeNode({T_STRING}, T_INT), string_len}});
+    builtins.push_back({"print", CodeBuiltin{FunctionTypeNode({T_STRING}, none), print}});
     std::vector<TypeNode> a1 = {T_LIST(T_STRING), T_STRING};
     builtins.push_back(
-            {"join", CodeBuiltin{&FUNCTION_TYPE(a1, T_STRING), join}});
-    std::vector<TypeNode> a2 = {T_LIST(T_STRING), T_STRING};
+            {"join", CodeBuiltin{FunctionTypeNode(a1, T_STRING), join}});
+    std::vector<TypeNode> a2 = {T_INT, T_INT, T_INT};
     builtins.push_back(
-            {"range", CodeBuiltin{&FUNCTION_TYPE(a2, T_LIST(T_INT)), range}});
+            {"range", CodeBuiltin{FunctionTypeNode(a2, T_LIST(T_INT)), range}});
 
     this->add_builtins(builtins);
 }
