@@ -16,9 +16,9 @@ public:
         CodeBuiltin* builtin;
     } stuff;
 
-    CodeObject(CodeBuiltin builtin);
+    explicit CodeObject(CodeBuiltin builtin);
 
-    CodeObject(CodeUser* user_code);
+    explicit CodeObject(CodeUser* user_code);
 
     bool equal(const Object* other) const override;
 };
