@@ -26,8 +26,6 @@ public:
     bool operator!=(const ClassLiteralExpressionNode& other) const;
 private:
 
-    bool equal(NodeContainer other) const override;
-
 };
 
 

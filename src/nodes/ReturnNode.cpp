@@ -11,13 +11,6 @@ void ReturnNode::accept(Visitor& visitor) {
 
 ReturnNode::ReturnNode(NodeContainer expression) : expression(expression) {}
 
-bool ReturnNode::equal(NodeContainer other) const {
-//    auto other_ptr = dynamic_cast<ReturnNode*>(other);
-//    if (other_ptr == nullptr) return false;
-//    return *this == *other_ptr;
-return false;
-}
-
 bool ReturnNode::operator==(ReturnNode& other) const {
 //    return this->expression->equal(other.expression);
 return false;

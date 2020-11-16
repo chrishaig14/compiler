@@ -23,8 +23,6 @@ public:
 
     virtual void accept(Visitor& visitor) = 0;
 
-    virtual bool equal(NodeContainer other) const = 0;
-
     virtual ~Node() = default;
 
     friend std::ostream& operator<<(std::ostream& os, const Node& node) {

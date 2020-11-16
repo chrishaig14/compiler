@@ -19,13 +19,6 @@ public:
 
     void accept(Visitor& visitor) override;
 
-    bool equal(NodeContainer other) const {
-//        auto other_ptr = dynamic_cast<MemberNode*>(other);
-//        if (other_ptr == nullptr) return false;
-//        return *this == *other_ptr;
-return false;
-    }
-
     bool operator==(MemberNode& other) const {
 //        return this->parent->equal(other.parent) && this->child == other.child;
 return false;

@@ -19,9 +19,6 @@ public:
               std::map<std::string, TypeNode> members, std::map<std::string, FunctionNode> functions);
 
     void accept(Visitor& visitor) override;
-
-    bool equal(NodeContainer other) const override;
-
     std::map<std::string, TypeNode> members;
     std::vector<std::string> members_ordered;
     std::map<std::string, FunctionNode> methods;

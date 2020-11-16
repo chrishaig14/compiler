@@ -8,9 +8,6 @@ void InstanceNode::accept(Visitor& visitor) {
     visitor.visit(*this);
 }
 
-bool InstanceNode::equal(NodeContainer other) const {
-    return false;
-}
 
 InstanceNode::InstanceNode(const std::string& className, const std::string& typeName,
                            const std::vector<FunctionNode*>& functions) : class_name(className), type_name(typeName),

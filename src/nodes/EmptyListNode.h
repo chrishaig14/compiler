@@ -15,8 +15,6 @@ public:
 
     void accept(Visitor& visitor) override;
 
-    bool equal(NodeContainer other) const override;
-
     bool operator==(const EmptyListNode& other) const {
         return this->type == other.type;
     }

@@ -35,13 +35,6 @@ public:
     }
 
 
-    bool equal(NodeContainer other) const {
-//        auto other_ptr = dynamic_cast<FunctionNode*>(other);
-//        if (other_ptr == nullptr) return false;
-//        return *this == *other_ptr;
-        return false;
-    }
-
     bool operator!=(const FunctionNode& other) const;
 
     bool operator==(const FunctionNode& other) const;

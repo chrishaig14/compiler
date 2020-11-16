@@ -19,8 +19,6 @@ public:
 
     IdNode(std::string identifier);
 
-    bool equal(NodeContainer other) const;
-//
     bool operator==(const IdNode& other) const;
     bool operator!=(const IdNode& other) const;;
 

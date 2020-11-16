@@ -32,9 +32,3 @@ bool DeclarationNode::operator==(const DeclarationNode& other) const {
 
 bool DeclarationNode::operator!=(const DeclarationNode& other) const { return !(*this == other); }
 
-bool DeclarationNode::equal(NodeContainer other) const {
-//        auto other_ptr = dynamic_cast<DeclarationNode*>(other);
-//        if (other_ptr == nullptr) return false;
-//        return *this == *other_ptr;
-    return false;
-}

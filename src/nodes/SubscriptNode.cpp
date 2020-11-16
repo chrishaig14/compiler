@@ -11,12 +11,6 @@ void SubscriptNode::accept(Visitor& visitor) {
 
 SubscriptNode::SubscriptNode(NodeContainer parent, std::vector<NodeContainer> child) : parent(parent), child(child) {}
 
-bool SubscriptNode::equal(NodeContainer other) const {
-//    auto other_ptr = dynamic_cast<SubscriptNode*>(other);
-//    if (other_ptr == nullptr) return false;
-//    return *this == *other_ptr;
-return false;
-}
 
 bool SubscriptNode::operator==(const SubscriptNode& other) const {
     if (this->child.size() != other.child.size())return false;

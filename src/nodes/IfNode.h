@@ -22,8 +22,6 @@ public:
 
     void accept(Visitor& visitor) override;
 
-    bool equal(NodeContainer other) const override;
-
     bool operator==(IfNode& other) const;
 
     ~IfNode() {

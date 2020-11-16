@@ -18,8 +18,6 @@ public:
 
     ListNode(std::vector<NodeContainer> elements);
 
-    bool equal(NodeContainer other) const override;
-
     bool operator==(const ListNode& other) const;
     bool operator!=(const ListNode& other) const;
 

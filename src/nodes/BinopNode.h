@@ -27,8 +27,6 @@ public:
 
     void accept(Visitor& visitor) override;
 
-    bool equal(NodeContainer other) const;
-
     bool operator==(const BinopNode& other) const;
     bool operator!=(const BinopNode& other) const;
 

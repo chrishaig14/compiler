@@ -22,10 +22,6 @@ public:
     bool operator==(const SubscriptNode& other) const;
 
     bool operator!=(const SubscriptNode& other) const;
-private:
-
-    bool equal(NodeContainer other) const override;
-
 
     ~SubscriptNode() {
 //        delete this->parent;

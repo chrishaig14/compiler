@@ -19,8 +19,6 @@ public:
 
     void accept(Visitor& visitor) override;
 
-    bool equal(NodeContainer other) const override;
-
     bool operator==(const WhileNode& other) const;
     bool operator!=(const WhileNode& other) const;
 

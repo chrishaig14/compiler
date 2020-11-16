@@ -8,13 +8,6 @@ void IfNode::accept(Visitor& visitor) {
     visitor.visit(*this);
 }
 
-bool IfNode::equal(NodeContainer other) const {
-//    auto other_ptr = dynamic_cast<IfNode*>(other);
-//    if (other_ptr == nullptr) return false;
-//    return *this == *other_ptr;
-return false;
-}
-
 bool IfNode::operator==(IfNode& other) const {
     return this->condition==other.condition && this->then == other.then;
 }

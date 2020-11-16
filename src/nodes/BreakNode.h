@@ -13,8 +13,6 @@ class BreakNode : public Node {
 public:
     void accept(Visitor& visitor) override;
 
-    bool equal(NodeContainer other) const override;
-
     bool operator==(const BreakNode& other) const;
 
     bool operator!=(const BreakNode& other) const;

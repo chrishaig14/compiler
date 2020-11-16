@@ -18,8 +18,6 @@ public:
 
     StringNode(std::string str);
 
-    bool equal(NodeContainer other) const override;
-
     bool operator==(const StringNode& other) const;
     bool operator!=(const StringNode& other) const;
 

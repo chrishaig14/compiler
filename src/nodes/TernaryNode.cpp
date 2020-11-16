@@ -8,13 +8,6 @@ void TernaryNode::accept(Visitor& visitor) {
     visitor.visit(*this);
 }
 
-bool TernaryNode::equal(NodeContainer other) const {
-//    auto other_ptr = dynamic_cast<TernaryNode*>(other);
-//    if (other_ptr == nullptr) return false;
-//    return *this == *other_ptr;
-    return false;
-}
-
 bool TernaryNode::operator==(const TernaryNode& other) const {
     return this->expression == other.expression && this->true_case == other.true_case && this->false_case == other.false_case;
 }

@@ -21,9 +21,6 @@ public:
     DeclarationNode(const std::string& identifier, TypeNode* type, NodeContainer expression);
 
     void accept(Visitor& visitor) override;
-
-    bool equal(NodeContainer other) const;
-
     bool operator!=(const DeclarationNode& other) const;
 
     bool operator==(const DeclarationNode& other) const;

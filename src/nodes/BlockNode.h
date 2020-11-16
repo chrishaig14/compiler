@@ -20,13 +20,6 @@ public:
 
     std::vector<NodeContainer> nodes;
 
-    bool equal(NodeContainer other) const {
-//        auto other_ptr = dynamic_cast<BlockNode*>(other);
-//        if (other_ptr == nullptr) return false;
-//        return *this == *other_ptr;
-return false;
-    }
-
     bool operator!=(const BlockNode& other) const {
         return !(*this == other);
     }

@@ -13,9 +13,6 @@
 class ContinueNode : public Node{
 public:
     void accept(Visitor& visitor) override;
-
-    bool equal(NodeContainer other) const override;
-
     bool operator==(const ContinueNode& other) const {return true;}
     bool operator!=(const ContinueNode& other) const {return false;}
 };
