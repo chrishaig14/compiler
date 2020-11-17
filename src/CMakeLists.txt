@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.16)
 project(untitled1)
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 14)
 
 add_library(srcLib
         scanner/Scanner.cpp
