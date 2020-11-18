@@ -17,11 +17,9 @@ public:
 
     BlockNode(VectorOfNodes nodes) : nodes(nodes) { this->ntype = BLOCK; }
 
-    BlockNode();
-
     VectorOfNodes nodes;
 
-    bool equal(const Node& p) const {
+    bool equal(const Node& p) const override{
         auto& other = p.block();
         if (this->nodes.size() != other.nodes.size()) {
             return false;

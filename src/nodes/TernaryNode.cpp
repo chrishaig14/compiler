@@ -11,8 +11,8 @@ void TernaryNode::accept(Visitor& visitor) {
 
 bool TernaryNode::equal(const Node& x) const {
     auto& other = x.ternary();
-    return this->expression == other.expression && this->true_case == other.true_case &&
-           this->false_case == other.false_case;
+    return *this->expression == *other.expression && *this->true_case == *other.true_case &&
+           *this->false_case == *other.false_case;
 }
 
 TernaryNode::TernaryNode(Node* expression, Node* trueCase, Node* falseCase) : expression(
@@ -20,4 +20,12 @@ TernaryNode::TernaryNode(Node* expression, Node* trueCase, Node* falseCase) : ex
                                                                               true_case(
                                                                                       trueCase),
                                                                               false_case(
-                                                                                      falseCase) {}
+                                                                                      falseCase) {this->ntype = TERNARY;}
+
+TernaryNode &TernaryNode::ternary() {
+    return *this;
+}
+
+const TernaryNode &TernaryNode::ternary() const {
+    return *this;
+}

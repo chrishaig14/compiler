@@ -22,7 +22,7 @@ bool FunctionNode::equal(const Node& x) const {
         return false;
     }
     for (int i = 0; i < this->parameter_types.size(); i++) {
-        if (this->parameter_types[i] != other.parameter_types[i]) {
+        if (*this->parameter_types[i] != *other.parameter_types[i]) {
             return false;
         }
     }
@@ -31,8 +31,13 @@ bool FunctionNode::equal(const Node& x) const {
             return false;
         }
     }
-    if (this->body != other.body) {
-        return false;
-    }
-    return true;
+    return *this->body == *other.body;
+}
+
+FunctionNode &FunctionNode::func() {
+    return *this;
+}
+
+const FunctionNode &FunctionNode::func() const {
+    return *this;
 }

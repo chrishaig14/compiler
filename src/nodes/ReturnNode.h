@@ -28,6 +28,10 @@ public:
         return j;
     }
 
+    ReturnNode &retrn() override;
+
+    const ReturnNode &retrn() const override;
+
     Node* expression;
 };
 

@@ -24,7 +24,7 @@ bool ListNode::equal(const Node& other) const {
             return false;
         }
     }
-    return this->elements == other.lst().elements;
+    return true;
 }
 
 ListNode& ListNode::lst() {

@@ -21,6 +21,10 @@ public:
 
     bool equal(const Node& other) const override ;
 
+    WhileNode &whil() override;
+
+    const WhileNode &whil() const override;
+
 };
 
 

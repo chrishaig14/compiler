@@ -37,7 +37,6 @@ TEST(node_test, strng) {
 }
 
 
-
 TEST(node_test, boolean) {
     EXPECT_EQ(BooleanNode(true), BooleanNode(true));
     EXPECT_NE(BooleanNode(true), BooleanNode(false));
@@ -45,27 +44,54 @@ TEST(node_test, boolean) {
 
 
 TEST(node_test, binop) {
-    EXPECT_EQ(BinopNode(OpType::ADD, new IdNode("a"), new IdNode("b")), BinopNode(OpType::ADD, new IdNode("a"), new IdNode("b")));
-    EXPECT_NE(BinopNode(OpType::ADD, new IdNode("a"), new IdNode("b")), BinopNode(OpType::ADD, new IdNode("a"), new IdNode("c")));
-    EXPECT_NE(BinopNode(OpType::ADD, new IdNode("a"), new IdNode("b")), BinopNode(OpType::ADD, new IdNode("c"), new IdNode("b")));
-    EXPECT_NE(BinopNode(OpType::SUB, new IdNode("a"), new IdNode("b")), BinopNode(OpType::ADD, new IdNode("a"), new IdNode("b")));
-    EXPECT_NE(BinopNode(OpType::ADD, new IdNode("a"), new IdNode("b")), BinopNode(OpType::ADD, new NumberNode(2), new IdNode("b")));
-    EXPECT_NE(BinopNode(OpType::ADD, new IdNode("a"), new IdNode("b")), BinopNode(OpType::ADD, new IdNode("a"), new NumberNode(2)));
+    EXPECT_EQ(BinopNode(OpType::ADD, new IdNode("a"), new IdNode("b")),
+              BinopNode(OpType::ADD, new IdNode("a"), new IdNode("b")));
+    EXPECT_NE(BinopNode(OpType::ADD, new IdNode("a"), new IdNode("b")),
+              BinopNode(OpType::ADD, new IdNode("a"), new IdNode("c")));
+    EXPECT_NE(BinopNode(OpType::ADD, new IdNode("a"), new IdNode("b")),
+              BinopNode(OpType::ADD, new IdNode("c"), new IdNode("b")));
+    EXPECT_NE(BinopNode(OpType::SUB, new IdNode("a"), new IdNode("b")),
+              BinopNode(OpType::ADD, new IdNode("a"), new IdNode("b")));
+    EXPECT_NE(BinopNode(OpType::ADD, new IdNode("a"), new IdNode("b")),
+              BinopNode(OpType::ADD, new NumberNode(2), new IdNode("b")));
+    EXPECT_NE(BinopNode(OpType::ADD, new IdNode("a"), new IdNode("b")),
+              BinopNode(OpType::ADD, new IdNode("a"), new NumberNode(2)));
 }
-
-
 
 
 TEST(node_test, call) {
     EXPECT_EQ(CallNode(new IdNode("foo"), {}), CallNode(new IdNode("foo"), {}));
     EXPECT_EQ(CallNode(new IdNode("foo"), {new IdNode("a")}), CallNode(new IdNode("foo"), {new IdNode("a")}));
-    EXPECT_EQ(CallNode(new IdNode("foo"), {new IdNode("a"), new NumberNode(7)}), CallNode(new IdNode("foo"), {new IdNode("a"), new NumberNode(7)}));
+    EXPECT_EQ(CallNode(new IdNode("foo"), {new IdNode("a"), new NumberNode(7)}),
+              CallNode(new IdNode("foo"), {new IdNode("a"), new NumberNode(7)}));
     EXPECT_NE(CallNode(new IdNode("foo"), {}), CallNode(new IdNode("bar"), {}));
-    EXPECT_NE(CallNode(new IdNode("foo"), {}), CallNode(new MemberNode(new IdNode("foo"),"bar"), {}));
+    EXPECT_NE(CallNode(new IdNode("foo"), {}), CallNode(new MemberNode(new IdNode("foo"), "bar"), {}));
     EXPECT_NE(CallNode(new IdNode("foo"), {}), CallNode(new IdNode("foo"), {new IdNode("a")}));
     EXPECT_NE(CallNode(new IdNode("foo"), {new IdNode("a")}), CallNode(new IdNode("foo"), {new IdNode("b")}));
     EXPECT_NE(CallNode(new IdNode("foo"), {new IdNode("a")}), CallNode(new IdNode("foo"), {new NumberNode(7)}));
-    EXPECT_NE(CallNode(new IdNode("foo"), {new IdNode("a")}), CallNode(new IdNode("foo"), {new IdNode("a"), new IdNode("b")}));
-    EXPECT_NE(CallNode(new IdNode("foo"), {new IdNode("a"), new NumberNode(7)}), CallNode(new IdNode("foo"), {new IdNode("a"), new NumberNode(8)}));
+    EXPECT_NE(CallNode(new IdNode("foo"), {new IdNode("a")}),
+              CallNode(new IdNode("foo"), {new IdNode("a"), new IdNode("b")}));
+    EXPECT_NE(CallNode(new IdNode("foo"), {new IdNode("a"), new NumberNode(7)}),
+              CallNode(new IdNode("foo"), {new IdNode("a"), new NumberNode(8)}));
     EXPECT_NE(CallNode(new IdNode("foo"), {new IdNode("a")}), CallNode(new IdNode("foo"), {}));
+}
+
+
+TEST(node_test, retrn) {
+    EXPECT_EQ(ReturnNode(new IdNode("a")), ReturnNode(new IdNode("a")));
+    EXPECT_NE(ReturnNode(new IdNode("a")), ReturnNode(new IdNode("b")));
+}
+
+TEST(node_test, block) {
+    EXPECT_EQ(BlockNode({}), BlockNode({}));
+    EXPECT_NE(BlockNode({new ReturnNode(new IdNode("b"))}), BlockNode({new ReturnNode(new IdNode("a"))}));
+    EXPECT_EQ(BlockNode({new ReturnNode(new IdNode("b"))}), BlockNode({new ReturnNode(new IdNode("b"))}));
+    EXPECT_NE(BlockNode({new ReturnNode(new IdNode("a"))}), BlockNode({}));
+    EXPECT_NE(BlockNode({new ReturnNode(new IdNode("b"))}), BlockNode({new CallNode(new IdNode("b"), {})}));
+}
+
+TEST(node_test, decl) {
+    EXPECT_EQ(DeclarationNode("x", nullptr, new IdNode("a")), DeclarationNode("x", nullptr, new IdNode("a")));
+    EXPECT_NE(DeclarationNode("x", nullptr, new IdNode("a")), DeclarationNode("x", nullptr, new IdNode("b")));
+    EXPECT_NE(DeclarationNode("x", nullptr, new IdNode("a")), DeclarationNode("y", nullptr, new IdNode("a")));
 }

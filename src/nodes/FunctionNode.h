@@ -12,7 +12,6 @@
 #include "Visitor.h"
 #include "TypeNode.h"
 #include "BlockNode.h"
-#include "Node.h"
 
 class FunctionNode : public Node {
 public:
@@ -29,6 +28,7 @@ public:
     FunctionNode(std::string identifier, std::vector<std::string> parameter_names,
                  VectorOfTypes parameter_types, TypeNode* return_type, BlockNode* body)
             : body(body), return_type(return_type) {
+        this->ntype = FUNC;
         this->identifier = identifier;
         this->parameter_names = parameter_names;
         this->parameter_types = parameter_types;
@@ -61,6 +61,10 @@ public:
 //        j["return_type"] = this->return_type->to_json();
         return j;
     }
+
+    FunctionNode &func() override;
+
+    const FunctionNode &func() const override;
 
     std::map<std::string, std::string> constraints;
 };

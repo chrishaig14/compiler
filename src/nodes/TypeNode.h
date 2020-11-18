@@ -28,15 +28,15 @@ public:
 
     virtual bool equal(const TypeNode& other) const = 0;
 
-    ObjectTypeNode& object() { throw std::runtime_error("Getting wrong type!"); }
-
     virtual TypeNode* clone() const = 0;
 
-    FunctionTypeNode& function() { throw std::runtime_error("Getting wrong type!"); }
+    virtual ObjectTypeNode& object() { throw std::runtime_error("Getting wrong type!"); }
 
-    const FunctionTypeNode& function() const { throw std::runtime_error("Getting wrong type!"); }
+    virtual FunctionTypeNode& function() { throw std::runtime_error("Getting wrong type!"); }
 
-    const ObjectTypeNode& object() const { throw std::runtime_error("Getting wrong type!"); }
+    virtual const FunctionTypeNode& function() const { throw std::runtime_error("Getting wrong type!"); }
+
+    virtual const ObjectTypeNode& object() const { throw std::runtime_error("Getting wrong type!"); }
 
     bool operator==(const TypeNode& other) const {
         if (this->kind != other.kind) {
@@ -58,7 +58,7 @@ public:
                    const VectorOfTypes& typeParameters
     );
 
-    bool equal(const TypeNode& other) const {
+    bool equal(const TypeNode& other) const override {
         auto& a = *this;
         auto& b = other.object();
         if (a.identifier != b.identifier) {
@@ -68,7 +68,7 @@ public:
             return false;
         }
         for (int i = 0; i < a.type_parameters.size(); i++) {
-            if (a.type_parameters[i] != b.type_parameters[i]) {
+            if (*a.type_parameters[i] != *b.type_parameters[i]) {
                 return false;
             }
         }
@@ -90,6 +90,10 @@ public:
     }
 
     TypeNode* clone() const override;
+
+    ObjectTypeNode& object() override{ return *this; }
+
+    const ObjectTypeNode& object() const override{ return *this; }
 
     std::string identifier;
     VectorOfTypes type_parameters;
@@ -113,11 +117,11 @@ public:
             return false;
         }
         for (int i = 0; i < a.parameter_types.size(); i++) {
-            if (a.parameter_types[i] != b.parameter_types[i]) {
+            if (*a.parameter_types[i] != *b.parameter_types[i]) {
                 return false;
             }
         }
-        return a.return_type == b.return_type;
+        return *a.return_type == *b.return_type;
     }
 
     std::string to_string() const {
@@ -136,7 +140,9 @@ public:
     }
 
     TypeNode* clone() const override;
+    FunctionTypeNode& function() override{ return *this; }
 
+    const FunctionTypeNode& function() const override{ return *this; }
     VectorOfTypes parameter_types;
     TypeNode* return_type;
 };

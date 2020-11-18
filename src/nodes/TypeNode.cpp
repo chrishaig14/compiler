@@ -6,7 +6,9 @@
 
 FunctionTypeNode::FunctionTypeNode(const VectorOfTypes& parameterTypes,
                                    TypeNode* returnType)
-        : parameter_types(parameterTypes), return_type(returnType) {}
+        : parameter_types(parameterTypes), return_type(returnType) {
+    this->kind = Kind::FUNCTION;
+}
 
 TypeNode* FunctionTypeNode::clone() const {
     VectorOfTypes aux;
@@ -19,7 +21,7 @@ TypeNode* FunctionTypeNode::clone() const {
 ObjectTypeNode::ObjectTypeNode(const std::string& identifier,
                                const VectorOfTypes& typeParameters) : identifier(
         identifier), type_parameters(typeParameters) {
-
+this->kind = Kind::OBJECT;
 }
 
 TypeNode* ObjectTypeNode::clone() const {

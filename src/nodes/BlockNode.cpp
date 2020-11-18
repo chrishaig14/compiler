@@ -8,8 +8,6 @@ void BlockNode::accept(Visitor& visitor) {
     visitor.visit(*this);
 }
 
-BlockNode::BlockNode() {}
-
 BlockNode& BlockNode::block() {
     return *this;
 }

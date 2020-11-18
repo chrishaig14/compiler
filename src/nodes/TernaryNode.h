@@ -21,6 +21,10 @@ public:
 
     bool equal(const Node& other) const override ;
 
+    TernaryNode &ternary() override;
+
+    const TernaryNode &ternary() const override;
+
 };
 
 
