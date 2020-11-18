@@ -14,7 +14,7 @@
 
 
 class SymbolTable {
-    std::map<std::string, TypeNode> table;
+    std::map<std::string, TypeNode*> table;
 public:
     SymbolTable(std::string name, SymbolTable* parent) {
         this->name = name;
@@ -33,9 +33,9 @@ public:
         }
     }
 
-    TypeNode& get(std::string name) {
+    TypeNode* get(std::string name) {
         if (this->table.count(name) == 1) {
-            return this->table[name];
+            return this->table[name]->clone();
         } else {
             if (this->parent != nullptr) {
                 return this->parent->get(name);
@@ -50,11 +50,11 @@ public:
 
     void set(std::string name, const TypeNode& info) {
         if (info.kind == Kind::OBJECT) {
-            if (info.otype->identifier == "Option") {
+            if (info.object().identifier == "Option") {
                 this->not_null[name] = false;
             }
         }
-        this->table[name] = info;
+        this->table[name] = info.clone();
     }
 
     void set_not_none(std::string name, bool may_be_none) {

@@ -8,4 +8,4 @@ void MemberNode::accept(Visitor& visitor) {
     visitor.visit(*this);
 }
 
-MemberNode::MemberNode(NodeContainer parent, const std::string& child) : parent(parent), child(child) {}
+MemberNode::MemberNode(Node* parent, const std::string& child) : parent(parent), child(child) {}

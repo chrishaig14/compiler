@@ -2,124 +2,144 @@
 // Created by chris on 1/8/20.
 //
 
-#ifndef TYPENODE_H
-#define TYPENODE_H
+#ifndef TypeNode_H
+#define TypeNode_H
 
 
 #include <string>
 #include <vector>
 #include "Node.h"
 #include "Visitor.h"
+#include "../types.h"
 
 enum class Kind {
-    OBJECT, FUNCTION, UNINITIALIZED
+    OBJECT, FUNCTION
 };
 
+class ObjectTypeNode;
 
-std::string otype_to_string(const ObjectTypeNode& otype);
-bool otype_equal(const ObjectTypeNode& a, const ObjectTypeNode& b);
-bool ftype_equal(const FunctionTypeNode& a, const FunctionTypeNode& b);
-std::string ftype_to_string(const FunctionTypeNode& ftype);
+class FunctionTypeNode;
 
 class TypeNode {
 public:
-    ObjectTypeNode* otype;
-    FunctionTypeNode* ftype;
     Kind kind;
 
-    TypeNode() {
-        this->otype = nullptr;
-        this->ftype = nullptr;
-        this->kind = Kind::UNINITIALIZED;
-    }
+    virtual std::string to_string() const = 0;
 
-    TypeNode(ObjectTypeNode* otype) {
-        this->otype = otype;
-        this->ftype = nullptr;
-        this->kind = Kind::OBJECT;
-    }
+    virtual bool equal(const TypeNode& other) const = 0;
 
-    TypeNode(FunctionTypeNode* ftype) {
-        this->ftype = ftype;
-        this->otype = nullptr;
-        this->kind = Kind::FUNCTION;
-    }
+    ObjectTypeNode& object() { throw std::runtime_error("Getting wrong type!"); }
 
-    std::string to_string() const {
-        switch (this->kind) {
-            case Kind::OBJECT:
-                return otype_to_string(*this->otype);
-            case Kind::FUNCTION:
-                return ftype_to_string(*this->ftype);
-        }
-        return "";
-    }
+    virtual TypeNode* clone() const = 0;
+
+    FunctionTypeNode& function() { throw std::runtime_error("Getting wrong type!"); }
+
+    const FunctionTypeNode& function() const { throw std::runtime_error("Getting wrong type!"); }
+
+    const ObjectTypeNode& object() const { throw std::runtime_error("Getting wrong type!"); }
 
     bool operator==(const TypeNode& other) const {
         if (this->kind != other.kind) {
             return false;
         }
-        switch (this->kind) {
-            case Kind::OBJECT:
-                return otype_equal(*this->otype, *other.otype);
-            case Kind::FUNCTION:
-                return ftype_equal(*this->ftype, *other.ftype);
-        }
-        return true;
+        return this->equal(other);
     }
 
     bool operator!=(const TypeNode& other) const {
         return !(*this == other);
     }
+
 };
 
-class ObjectTypeNode {
+class ObjectTypeNode : public TypeNode {
 public:
-    ObjectTypeNode(const std::string& identifier,
-                   const std::vector<TypeNode>& typeParameters);
+    ObjectTypeNode(const std::string
+                   & identifier,
+                   const VectorOfTypes& typeParameters
+    );
 
-    bool operator==(const ObjectTypeNode& other) const {
-        return otype_equal(*this, other);
-    }
-
-    bool operator!=(const ObjectTypeNode& other) const {
-        return !(*this == other);
+    bool equal(const TypeNode& other) const {
+        auto& a = *this;
+        auto& b = other.object();
+        if (a.identifier != b.identifier) {
+            return false;
+        }
+        if (a.type_parameters.size() != b.type_parameters.size()) {
+            return false;
+        }
+        for (int i = 0; i < a.type_parameters.size(); i++) {
+            if (a.type_parameters[i] != b.type_parameters[i]) {
+                return false;
+            }
+        }
+        return true;
     }
 
     std::string to_string() const {
-        return otype_to_string(*this);
+        auto& otype = *this;
+        std::string parameters;
+        for (auto ptr: otype.type_parameters) {
+            auto& p = *ptr;
+            parameters += p.to_string() + ", ";
+        }
+        if (parameters.size() != 0) {
+            parameters = parameters.substr(0, parameters.size() - 2);
+            return otype.identifier + "[" + parameters + "]";
+        }
+        return otype.identifier;
     }
+
+    TypeNode* clone() const override;
 
     std::string identifier;
-    std::vector<TypeNode> type_parameters;
+    VectorOfTypes type_parameters;
 };
 
 
-class FunctionTypeNode {
+class FunctionTypeNode : public TypeNode {
 public:
-    FunctionTypeNode(const std::vector<TypeNode>& parameterTypes, TypeNode returnType);
+    FunctionTypeNode(const VectorOfTypes& parameterTypes, TypeNode* returnType);
 
-//    FunctionTypeNode& operator=(const FunctionTypeNode& other) = default;
+//    FunctionTypeNode* operator=(const FunctionTypeNode* other) = default;
 
-//    FunctionTypeNode operator=(const FunctionTypeNode& other) {
-//        return FunctionTypeNode(other.parameter_types, other.return_type);
+//    FunctionTypeNode*operator=(const FunctionTypeNode* other) {
+//        return FunctionTypeNode*other.parameter_types, other.return_type);
 //    }
 
-    bool operator==(const FunctionTypeNode& other) const {
-        return ftype_equal(*this, other);
-    }
-
-    bool operator!=(const FunctionTypeNode& other) const {
-        return !(*this == other);
+    bool equal(const TypeNode& other) const override {
+        auto& a = *this;
+        auto& b = other.function();
+        if (a.parameter_types.size() != b.parameter_types.size()) {
+            return false;
+        }
+        for (int i = 0; i < a.parameter_types.size(); i++) {
+            if (a.parameter_types[i] != b.parameter_types[i]) {
+                return false;
+            }
+        }
+        return a.return_type == b.return_type;
     }
 
     std::string to_string() const {
-        return ftype_to_string(*this);
+        auto& ftype = *this;
+        std::string parameters;
+        std::string ret;
+        for (auto ptr: ftype.parameter_types) {
+            auto& p = *ptr;
+            parameters += p.to_string() + ", ";
+        }
+        if (ftype.parameter_types.size() != 0) {
+            parameters = parameters.substr(0, parameters.size() - 2);
+        }
+        ret = ftype.return_type->to_string() + ", ";
+        return "fun (" + parameters + ") . " + ret;
     }
 
-    std::vector<TypeNode> parameter_types;
-    TypeNode return_type;
+    TypeNode* clone() const override;
+
+    VectorOfTypes parameter_types;
+    TypeNode* return_type;
 };
 
 
-#endif //TYPENODE_H
+#endif //TypeNode_H

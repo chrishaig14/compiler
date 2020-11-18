@@ -8,7 +8,7 @@ void ForNode::accept(Visitor& visitor) {
     visitor.visit(*this);
 }
 
-ForNode::ForNode(const std::string& var, NodeContainer exp, BlockNode body) : var(var), exp(exp), body(body) {}
+ForNode::ForNode(const std::string& var, Node* exp, BlockNode* body) : var(var), exp(exp), body(body) {}
 
 bool ForNode::operator==(const ForNode& other) const {
     return this->var == other.var && this->exp == other.exp && this->body == other.body;

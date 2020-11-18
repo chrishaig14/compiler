@@ -8,14 +8,14 @@
 
 #include "Node.h"
 #include "Visitor.h"
-#include "NodeContainer.h"
+#include "Node.h"
 
 class AssignmentNode : public Node {
 public:
-    NodeContainer lvalue;
-    NodeContainer rvalue;
+    Node* lvalue;
+    Node* rvalue;
 
-    AssignmentNode(NodeContainer lvalue, NodeContainer rvalue);
+    AssignmentNode(Node* lvalue, Node* rvalue);
 
     void accept(Visitor& visitor) override;
 

@@ -9,4 +9,4 @@ void EmptyListNode::accept(Visitor& visitor) {
 }
 
 
-EmptyListNode::EmptyListNode(TypeNode type) : type(type) {}
+EmptyListNode::EmptyListNode(TypeNode* type) : type(type) {}

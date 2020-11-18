@@ -9,16 +9,16 @@
 #include "Node.h"
 #include "Visitor.h"
 #include "TypeNode.h"
-#include "NodeContainer.h"
+#include "Node.h"
 
 class ClassLiteralExpressionNode : public Node {
 
 public:
-    ClassLiteralExpressionNode(ObjectTypeNode& type, const std::vector<NodeContainer>& init);
+    ClassLiteralExpressionNode(ObjectTypeNode* type, const VectorOfNodes& init);
 
-    std::vector<NodeContainer> init;
+    VectorOfNodes init;
     std::vector<std::string> names;
-    ObjectTypeNode& type;
+    ObjectTypeNode* type;
 
     void accept(Visitor& visitor) override;
 

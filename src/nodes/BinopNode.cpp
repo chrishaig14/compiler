@@ -8,7 +8,7 @@ void BinopNode::accept(Visitor& visitor) {
     visitor.visit(*this);
 }
 
-BinopNode::BinopNode(OpType op, NodeContainer left, NodeContainer right) : left(left), right(right), op(op) {}
+BinopNode::BinopNode(OpType op, Node* left, Node* right) : left(left), right(right), op(op) {}
 
 bool BinopNode::operator==(const BinopNode& other) const {
     return this->op == other.op && this->left == other.left and this->right == other.right;

@@ -5,7 +5,7 @@
 #ifndef VISITOR_H
 #define VISITOR_H
 
-#include "NodeContainer.h"
+#include "Node.h"
 
 class AssignmentNode;
 
@@ -118,8 +118,6 @@ public:
     virtual void visit(StructNode& node) = 0;
 
     virtual void visit(SubscriptNode& node) = 0;
-
-    virtual void visit(TypeNode& node) = 0;
 
     virtual void visit(WhileNode& node) = 0;
 };

@@ -9,13 +9,13 @@
 #include <string>
 #include "Node.h"
 #include "Visitor.h"
-#include "NodeContainer.h"
+#include "Node.h"
 class MemberNode : public Node {
 public:
-    NodeContainer parent;
+    Node* parent;
     std::string child;
 
-    MemberNode(NodeContainer parent, const std::string& child);
+    MemberNode(Node* parent, const std::string& child);
 
     void accept(Visitor& visitor) override;
 

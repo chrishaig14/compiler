@@ -12,22 +12,22 @@
 #include "Visitor.h"
 #include "TypeNode.h"
 #include "BlockNode.h"
-#include "NodeContainer.h"
+#include "Node.h"
 
 class FunctionNode : public Node {
 public:
     std::string identifier;
     std::vector<std::string> parameter_names;
-    std::vector<TypeNode> parameter_types;
-    BlockNode body;
-    TypeNode return_type;
+    VectorOfTypes parameter_types;
+    BlockNode* body;
+    TypeNode* return_type;
     std::map<std::string, int> free_variables;
 
 
     void accept(Visitor& visitor) override;
 
     FunctionNode(std::string identifier, std::vector<std::string> parameter_names,
-                 std::vector<TypeNode> parameter_types, TypeNode return_type, BlockNode body)
+                 VectorOfTypes parameter_types, TypeNode* return_type, BlockNode* body)
             : body(body), return_type(return_type) {
         this->identifier = identifier;
         this->parameter_names = parameter_names;

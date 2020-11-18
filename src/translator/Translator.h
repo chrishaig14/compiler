@@ -38,7 +38,9 @@
 
 class Translator : public Visitor {
 public:
-    void dispatch(NodeContainer n) {
+
+    void dispatch(Node* nptr) {
+        Node& n = *nptr;
         switch (n.ntype) {
             case NodeType::ASSIGN:
                 n.assign().accept(*this);
@@ -109,9 +111,6 @@ public:
             case NodeType::STRNG:
                 n.strng().accept(*this);
                 break;
-            case NodeType::STRCT:
-                n.strct().accept(*this);
-                break;
             case NodeType::SUB:
                 n.sub().accept(*this);
                 break;
@@ -163,8 +162,6 @@ public:
     void visit(StringNode& node) override;
 
     void visit(SubscriptNode& node) override;
-
-    void visit(TypeNode& node) override;
 
     CodeLabel code;
     bool is_lvalue;

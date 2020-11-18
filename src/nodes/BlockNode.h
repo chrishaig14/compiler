@@ -9,16 +9,17 @@
 #include <vector>
 #include "Node.h"
 #include "Visitor.h"
-#include "NodeContainer.h"
+#include "Node.h"
+#include "../types.h"
 
 class BlockNode : public Node {
 public:
 
-    BlockNode(std::vector<NodeContainer> nodes) : nodes(nodes) {}
+    BlockNode(VectorOfNodes nodes) : nodes(nodes) {}
 
     BlockNode();
 
-    std::vector<NodeContainer> nodes;
+    VectorOfNodes nodes;
 
     bool operator!=(const BlockNode& other) const {
         return !(*this == other);

@@ -9,7 +9,7 @@ void ReturnNode::accept(Visitor& visitor) {
 
 }
 
-ReturnNode::ReturnNode(NodeContainer expression) : expression(expression) {}
+ReturnNode::ReturnNode(Node* expression) : expression(expression) {}
 
 bool ReturnNode::operator==(ReturnNode& other) const {
 //    return this->expression->equal(other.expression);

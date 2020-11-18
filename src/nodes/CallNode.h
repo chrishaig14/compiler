@@ -9,13 +9,14 @@
 #include <vector>
 #include "Node.h"
 #include "Visitor.h"
-#include "NodeContainer.h"
+#include "Node.h"
+#include "../types.h"
 class CallNode : public Node {
 public:
-    NodeContainer function;
-    std::vector<NodeContainer> arguments;
+    Node* function;
+    VectorOfNodes arguments;
 
-    CallNode(NodeContainer function, const std::vector<NodeContainer>& arguments);
+    CallNode(Node* function, const VectorOfNodes& arguments);
 
     void accept(Visitor& visitor) override;
 

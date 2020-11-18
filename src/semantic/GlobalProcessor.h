@@ -21,7 +21,7 @@ public:
 
     bool has_function(std::string name);
 
-    FunctionTypeNode& get(std::string function_name);
+    FunctionTypeNode* get(std::string function_name);
 
 };
 
@@ -63,11 +63,10 @@ public:
 
     void visit(ReturnNode& node) override;
 
+    void dispatch(Node* nod);
     void visit(StringNode& node) override;
 
     void visit(SubscriptNode& node) override;
-
-    void visit(TypeNode& node) override;
 
     void visit(VectorOfNodes program);
 
@@ -96,8 +95,6 @@ public:
     void visit(InstanceNode& node) override;
 
     void visit(ContinueNode& node) override;
-
-    void dispatch(NodeContainer container);
 };
 
 #endif //GLOBALPROCESSOR_H

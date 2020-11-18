@@ -8,7 +8,7 @@ void AssignmentNode::accept(Visitor& visitor) {
     visitor.visit(*this);
 }
 
-AssignmentNode::AssignmentNode(NodeContainer lvalue, NodeContainer rvalue) : lvalue(lvalue), rvalue(rvalue) {}
+AssignmentNode::AssignmentNode(Node* lvalue, Node* rvalue) : lvalue(lvalue), rvalue(rvalue) {}
 
 bool AssignmentNode::operator==(AssignmentNode& other) const {
 //    return this->lvalue->equal(other.lvalue) && this->rvalue->equal(other.rvalue);

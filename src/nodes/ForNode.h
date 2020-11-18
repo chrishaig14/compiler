@@ -12,14 +12,14 @@
 class ForNode : public Node {
 public:
     std::string var;
-    NodeContainer exp;
-    BlockNode body;
+    Node* exp;
+    BlockNode* body;
 
     bool operator==(const ForNode& other) const;
 
     bool operator!=(const ForNode& other) const;
 
-    ForNode(const std::string& var, NodeContainer exp, BlockNode body);
+    ForNode(const std::string& var, Node* exp, BlockNode* body);
 
     void accept(Visitor& visitor) override;
 

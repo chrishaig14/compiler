@@ -11,11 +11,11 @@
 
 class TernaryNode : public Node {
 public:
-    NodeContainer expression;
-    NodeContainer true_case;
-    NodeContainer false_case;;
+    Node* expression;
+    Node* true_case;
+    Node* false_case;;
 
-    TernaryNode(NodeContainer expression, NodeContainer trueCase, NodeContainer falseCase);
+    TernaryNode(Node* expression, Node* trueCase, Node* falseCase);
 
     void accept(Visitor& visitor) override;
 

@@ -8,10 +8,10 @@
 
 #include "Node.h"
 #include "Visitor.h"
-#include "NodeContainer.h"
+#include "Node.h"
 class ReturnNode : public Node {
 public:
-    explicit ReturnNode(NodeContainer expression);
+    explicit ReturnNode(Node* expression);
 
     void accept(Visitor& visitor) override;
 
@@ -28,7 +28,7 @@ public:
         return j;
     }
 
-    NodeContainer expression;
+    Node* expression;
 };
 
 #endif //RETURNNODE_H

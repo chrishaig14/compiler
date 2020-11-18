@@ -35,7 +35,7 @@ typedef void(* BuiltinFunction)(std::map<std::string, std::map<std::string, Code
 
 
 struct CodeBuiltin {
-    FunctionTypeNode ftype;
+    FunctionTypeNode*ftype;
 
     BuiltinFunction function;
 };

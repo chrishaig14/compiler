@@ -57,7 +57,7 @@
 //
 //    void visit(SubscriptNode& node) override;
 //
-//    void visit(TypeNode& node) override;
+//    void visit(TypeNode* node) override;
 //
 //    void visit(WhileNode& node) override;
 //

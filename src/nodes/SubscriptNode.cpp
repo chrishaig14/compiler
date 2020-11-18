@@ -9,7 +9,7 @@ void SubscriptNode::accept(Visitor& visitor) {
 
 }
 
-SubscriptNode::SubscriptNode(NodeContainer parent, std::vector<NodeContainer> child) : parent(parent), child(child) {}
+SubscriptNode::SubscriptNode(Node* parent, VectorOfNodes child) : parent(parent), child(child) {}
 
 
 bool SubscriptNode::operator==(const SubscriptNode& other) const {

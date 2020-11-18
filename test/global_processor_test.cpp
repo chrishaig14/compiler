@@ -41,7 +41,7 @@ TEST(first_pass_test, fun_foo_eq) {
     gp.visit(*tree);
     auto ginfo = dynamic_cast<FunctionTypeNode*>(gp.function_table->get("foo"));
     EXPECT_NE(ginfo, nullptr);
-    EXPECT_TRUE(*ginfo == FunctionTypeNode({}, T_STRING));
+    EXPECT_TRUE(*ginfo == FunctionTypeNode*{}, T_STRING));
 }
 
 TEST(first_pass_test, fun_dont_allow_overload) {
@@ -64,7 +64,7 @@ TEST(first_pass_test, fun_foo_complete) {
     gp.visit(*tree);
     auto ginfo = dynamic_cast<FunctionTypeNode*>(gp.function_table->get("foo"));
     EXPECT_NE(ginfo, nullptr);
-    EXPECT_TRUE(*ginfo == FunctionTypeNode({T_INT, T_STRING}, T_BOOL));
+    EXPECT_TRUE(*ginfo == FunctionTypeNode*{T_INT, T_STRING}, T_BOOL));
 }
 
 TEST(first_pass_test, class_foo) {

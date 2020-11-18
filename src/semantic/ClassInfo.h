@@ -14,17 +14,17 @@
 class ClassInfo {
 public:
     std::vector<std::string> member_names;
-    std::vector<TypeNode> member_types;
+    VectorOfTypes member_types;
 
-    std::map<std::string, TypeNode> members;
-    std::map<std::string, FunctionTypeNode> methods;
+    std::map<std::string, TypeNode*> members;
+    std::map<std::string, FunctionTypeNode*> methods;
 
     std::string class_name;
 
     ClassInfo() {}
 
     ClassInfo(std::string class_name, const std::vector<std::string>& fieldNames,
-              const std::vector<TypeNode>& fieldTypes, std::vector<std::string> type_parameters) : member_names(
+              const VectorOfTypes& fieldTypes, std::vector<std::string> type_parameters) : member_names(
             fieldNames), member_types(fieldTypes) {
         this->class_name = class_name;
         for (int i = 0; i < fieldNames.size(); i++) {

@@ -10,15 +10,15 @@
 #include "Node.h"
 #include "TypeNode.h"
 #include "Visitor.h"
-//#include "NodeContainer.h"
+//#include "Node.h"
 #include "../utils.h"
 class DeclarationNode : public Node {
 public:
     std::string identifier;
     TypeNode* type;
-    NodeContainer expression;
+    Node* expression;
 
-    DeclarationNode(const std::string& identifier, TypeNode* type, NodeContainer expression);
+    DeclarationNode(const std::string& identifier, TypeNode* type, Node* expression);
 
     void accept(Visitor& visitor) override;
     bool operator!=(const DeclarationNode& other) const;

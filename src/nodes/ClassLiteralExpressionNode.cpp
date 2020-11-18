@@ -9,7 +9,7 @@ void ClassLiteralExpressionNode::accept(Visitor& visitor) {
 }
 
 
-ClassLiteralExpressionNode::ClassLiteralExpressionNode(ObjectTypeNode& type, const std::vector<NodeContainer>& init)
+ClassLiteralExpressionNode::ClassLiteralExpressionNode(ObjectTypeNode* type, const VectorOfNodes& init)
         : type(type), init(init) {}
 
 bool ClassLiteralExpressionNode::operator!=(const ClassLiteralExpressionNode& other) const {

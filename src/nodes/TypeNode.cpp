@@ -4,53 +4,28 @@
 
 #include "TypeNode.h"
 
-FunctionTypeNode::FunctionTypeNode(const std::vector<TypeNode>& parameterTypes,
-                                   TypeNode returnType)
+FunctionTypeNode::FunctionTypeNode(const VectorOfTypes& parameterTypes,
+                                   TypeNode* returnType)
         : parameter_types(parameterTypes), return_type(returnType) {}
 
+TypeNode* FunctionTypeNode::clone() const {
+    VectorOfTypes aux;
+    for (auto p: this->parameter_types) {
+        aux.emplace_back(p->clone());
+    }
+    return new FunctionTypeNode(aux, this->return_type->clone());
+}
+
 ObjectTypeNode::ObjectTypeNode(const std::string& identifier,
-                               const std::vector<TypeNode>& typeParameters) : identifier(
+                               const VectorOfTypes& typeParameters) : identifier(
         identifier), type_parameters(typeParameters) {
 
 }
-std::string ftype_to_string(const FunctionTypeNode& ftype) {
-    std::string parameters;
-    std::string ret;
-    for (auto p: ftype.parameter_types) {
-        parameters += p.to_string() + ", ";
-    }
-    if (ftype.parameter_types.size() != 0) {
-        parameters = parameters.substr(0, parameters.size() - 2);
-    }
-    ret = ftype.return_type.to_string() + ", ";
-    return "fun (" + parameters + ") . " + ret;
-}
 
-std::string otype_to_string(const ObjectTypeNode& otype) {
-    std::string parameters;
-    for (auto p: otype.type_parameters) {
-        parameters += p.to_string() + ", ";
+TypeNode* ObjectTypeNode::clone() const {
+    VectorOfTypes aux;
+    for (auto p: this->type_parameters) {
+        aux.emplace_back(p->clone());
     }
-    if (parameters.size() != 0) {
-        parameters = parameters.substr(0, parameters.size() - 2);
-        return otype.identifier + "[" + parameters + "]";
-    }
-    return otype.identifier;
-}
-
-bool ftype_equal(const FunctionTypeNode& a,const  FunctionTypeNode& b) {
-    if (a.parameter_types.size() != b.parameter_types.size()) return false;
-    for (int i = 0; i < a.parameter_types.size(); i++) {
-        if (a.parameter_types[i] != b.parameter_types[i]) return false;
-    }
-    return a.return_type == b.return_type;
-}
-
-bool otype_equal(const ObjectTypeNode& a,const  ObjectTypeNode& b) {
-    if (a.identifier != b.identifier) return false;
-    if (a.type_parameters.size() != b.type_parameters.size()) return false;
-    for (int i = 0; i < a.type_parameters.size(); i++) {
-        if (a.type_parameters[i] != b.type_parameters[i]) return false;
-    }
-    return true;
+    return new ObjectTypeNode(this->identifier, aux);
 }

@@ -9,7 +9,7 @@
 #include <string>
 #include "Node.h"
 #include "Visitor.h"
-#include "NodeContainer.h"
+#include "Node.h"
 class StringNode : public Node {
 public:
     std::string str;

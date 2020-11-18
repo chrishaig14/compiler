@@ -11,11 +11,11 @@
 
 class WhileNode : public Node {
 public:
-    BlockNode body;
-    NodeContainer condition;
+    BlockNode* body;
+    Node* condition;
 
 
-    WhileNode(NodeContainer condition, BlockNode body);
+    WhileNode(Node* condition, BlockNode* body);
 
     void accept(Visitor& visitor) override;
 

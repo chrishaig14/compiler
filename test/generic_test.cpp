@@ -77,7 +77,7 @@ TEST(generic_test, test_6) {
 
 TEST(generic_test, test_7) {
     auto a = TYPE("List", { TYPE("a", {}) });
-    std::vector<NodeContainer> t = {T_STRING, T_INT};
+    VectorOfNodes t = {T_STRING, T_INT};
     auto b = TYPE("Dict", t);
     EXPECT_FALSE(type_matches(a, b));
 }
@@ -96,14 +96,14 @@ TEST(generic_test, test_9) {
 
 
 TEST(generic_test, test_20) {
-    std::vector<NodeContainer> pt = {};
+    VectorOfNodes pt = {};
     TypeNode* rt = TYPE("NoneType", {});
     auto a = FUNCTION_TYPE(pt, rt);
     EXPECT_TRUE(type_matches(a, a));
 }
 
 TEST(generic_test, test_21) {
-    std::vector<NodeContainer> pt = {};
+    VectorOfNodes pt = {};
     TypeNode* rt = TYPE("NoneType", {});
     auto a = FUNCTION_TYPE(pt, rt);
     auto b = FUNCTION_TYPE({ T_INT }, rt);
@@ -112,31 +112,31 @@ TEST(generic_test, test_21) {
 
 
 TEST(generic_test, test_22) {
-    std::vector<NodeContainer> pt = {TYPE("a", {})};
+    VectorOfNodes pt = {TYPE("a", {})};
     TypeNode* rt = TYPE("NoneType", {});
     auto a = FUNCTION_TYPE(pt, rt);
     EXPECT_TRUE(is_generic(a));
 }
 
 TEST(generic_test, test_23) {
-    std::vector<NodeContainer> pt = {TYPE("Integer", {})};
+    VectorOfNodes pt = {TYPE("Integer", {})};
     TypeNode* rt = TYPE("NoneType", {});
     auto a = FUNCTION_TYPE(pt, rt);
     EXPECT_FALSE(is_generic(a));
 }
 
 TEST(generic_test, test_24) {
-    std::vector<NodeContainer> pt = {TYPE("a", {}), TYPE("a", {}), TYPE("b", {})};
+    VectorOfNodes pt = {TYPE("a", {}), TYPE("a", {}), TYPE("b", {})};
     auto a = FUNCTION_TYPE(pt, T_INT);
-    std::vector<NodeContainer> ptb = {T_INT, T_INT, T_STRING};
+    VectorOfNodes ptb = {T_INT, T_INT, T_STRING};
     auto b = FUNCTION_TYPE(ptb, T_INT);
     EXPECT_TRUE(type_matches(a, b));
 }
 
 TEST(generic_test, test_25) {
-    std::vector<NodeContainer> pt = {TYPE("a", {}), TYPE("a", {}), TYPE("b", {})};
+    VectorOfNodes pt = {TYPE("a", {}), TYPE("a", {}), TYPE("b", {})};
     auto a = FUNCTION_TYPE(pt, T_INT);
-    std::vector<NodeContainer> ptb = {T_INT, T_STRING, T_STRING};
+    VectorOfNodes ptb = {T_INT, T_STRING, T_STRING};
     auto b = FUNCTION_TYPE(ptb, T_INT);
     EXPECT_FALSE(type_matches(a, b));
 }
@@ -144,22 +144,22 @@ TEST(generic_test, test_25) {
 
 TEST(generic_test, test_26) {
     auto a = TYPE("a", {});
-    std::vector<NodeContainer> ptb = {T_INT, T_INT, T_STRING};
+    VectorOfNodes ptb = {T_INT, T_INT, T_STRING};
     auto b = FUNCTION_TYPE(ptb, T_INT);
     EXPECT_TRUE(type_matches(a, b));
 }
 
 TEST(generic_test, test_27) {
-    std::vector<NodeContainer> pta = {TYPE("a", {})};
+    VectorOfNodes pta = {TYPE("a", {})};
     auto a = FUNCTION_TYPE(pta, TYPE("a", {}));
-    std::vector<NodeContainer> ptb = {T_INT};
+    VectorOfNodes ptb = {T_INT};
     auto b = FUNCTION_TYPE(ptb, T_STRING);
     EXPECT_FALSE(type_matches(a, b));
 }
 
 
 TEST(generic_test, test_28) {
-    std::vector<NodeContainer> pt = {TYPE("Integer", {})};
+    VectorOfNodes pt = {TYPE("Integer", {})};
     TypeNode* rt = TYPE("a", {});
     auto a = FUNCTION_TYPE(pt, rt);
     EXPECT_TRUE(is_generic(a));

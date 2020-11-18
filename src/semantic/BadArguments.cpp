@@ -13,11 +13,14 @@ BadArguments::BadArguments(VectorOfTypes ftype, VectorOfTypes args) : std::runti
     this->args = args;
     std::string sargs;
     std::string sparams;
-    for (auto a:this->args) {
+    for (auto ptr:this->args) {
+        auto& a = *ptr;
         sargs += a.to_string() + ", ";
     }
     sargs = sargs.substr(0, sargs.size() - 2);
-    for (auto p:this->ftype) {
+    for (auto ptr:this->ftype) {
+        auto& p = *ptr;
+
         sparams += p.to_string() + ", ";
     }
     sparams = sparams.substr(0, sparams.size() - 2);

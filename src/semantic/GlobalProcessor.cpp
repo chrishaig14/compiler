@@ -9,11 +9,11 @@
 #include "../vm/ObjectStack.h"
 #include "../vm/CodeObject.h"
 #include "../vm/CodeRunner.h"
-#include "../nodes/NodeFactory.h"
+#include "../macros.h"
 
 void GlobalProcessor::add_builtins(std::vector<Builtin>& builtins) {
     for (int i = 0; i < builtins.size(); i++) {
-        this->function_table->add(builtins[i].first, builtins[i].second.ftype);
+        this->function_table->add(builtins[i].first, *builtins[i].second.ftype);
     }
 
 }
@@ -120,31 +120,31 @@ GlobalProcessor::GlobalProcessor(std::vector<Builtin>& builtins) {
     this->function_table = new FunctionTable();
     this->globals = new SymbolTable("global", nullptr);
     this->class_table = new ClassTable();
-    auto ft = FUNCTION_TYPE({ TypeNode(NodeFactory::otype("a", {})) }, TypeNode(NodeFactory::otype("b", {})));
-    auto at = T_LIST(TypeNode(NodeFactory::otype("a", {})));
-    auto none = NodeFactory::otype(".None", {});
-    std::vector<TypeNode> w = {at, ft};
+    auto ft = FUNCTION_TYPE({ new ObjectTypeNode("a", {}) }, new ObjectTypeNode("b", {}));
+    auto at = T_LIST(new ObjectTypeNode("a", {}));
+    auto none = new ObjectTypeNode(".None", {});
+    VectorOfTypes w = {at, ft};
     builtins.push_back(
-            {"map", CodeBuiltin{FunctionTypeNode(w, T_LIST(NodeFactory::otype("b", {}))), list_map}});
-    builtins.push_back({"Integer.str", CodeBuiltin{FunctionTypeNode({T_INT}, T_STRING), int_to_str}});
+            {"map", CodeBuiltin{new FunctionTypeNode(w, T_LIST(new ObjectTypeNode("b", {}))), list_map}});
+    builtins.push_back({"Integer.str", CodeBuiltin{new FunctionTypeNode({T_INT}, T_STRING), int_to_str}});
     builtins.push_back(
-            {"List.len", CodeBuiltin{FunctionTypeNode({T_LIST(NodeFactory::otype("a", {}))}, T_INT), list_len}});
-    std::vector<TypeNode> x = {T_LIST(TYPE("a", {})), NodeFactory::otype("a", {})};
-    builtins.push_back({"List.pop", CodeBuiltin{FunctionTypeNode(x, none), list_pop}});
+            {"List.len", CodeBuiltin{new FunctionTypeNode({T_LIST(new ObjectTypeNode("a", {}))}, T_INT), list_len}});
+    VectorOfTypes x = {T_LIST(TYPE("a", {})), new ObjectTypeNode("a", {})};
+    builtins.push_back({"List.pop", CodeBuiltin{new FunctionTypeNode(x, none), list_pop}});
     builtins.push_back({"List.push", CodeBuiltin{
-            FunctionTypeNode({T_LIST(NodeFactory::otype("a", {}))}, NodeFactory::otype("a", {})), list_push}});
-    auto function_from_t_to_u = FUNCTION_TYPE({ TYPE("t", {}) }, NodeFactory::otype("b", {}));
+            new FunctionTypeNode({T_LIST(new ObjectTypeNode("a", {}))}, new ObjectTypeNode("a", {})), list_push}});
+    auto function_from_t_to_u = FUNCTION_TYPE({ TYPE("t", {}) }, new ObjectTypeNode("b", {}));
     builtins.push_back(
             {"List.map",
-             CodeBuiltin{FunctionTypeNode({function_from_t_to_u}, T_LIST(NodeFactory::otype("b", {}))), list_map}});
-    builtins.push_back({"String.len", CodeBuiltin{FunctionTypeNode({T_STRING}, T_INT), string_len}});
-    builtins.push_back({"print", CodeBuiltin{FunctionTypeNode({T_STRING}, none), print}});
-    std::vector<TypeNode> a1 = {T_LIST(T_STRING), T_STRING};
+             CodeBuiltin{new FunctionTypeNode({function_from_t_to_u}, T_LIST(new ObjectTypeNode("b", {}))), list_map}});
+    builtins.push_back({"String.len", CodeBuiltin{new FunctionTypeNode({T_STRING}, T_INT), string_len}});
+    builtins.push_back({"print", CodeBuiltin{new FunctionTypeNode({T_STRING}, none), print}});
+    VectorOfTypes a1 = {T_LIST(T_STRING), T_STRING};
     builtins.push_back(
-            {"join", CodeBuiltin{FunctionTypeNode(a1, T_STRING), join}});
-    std::vector<TypeNode> a2 = {T_INT, T_INT, T_INT};
+            {"join", CodeBuiltin{new FunctionTypeNode(a1, T_STRING), join}});
+    VectorOfTypes a2 = {T_INT, T_INT, T_INT};
     builtins.push_back(
-            {"range", CodeBuiltin{FunctionTypeNode(a2, T_LIST(T_INT)), range}});
+            {"range", CodeBuiltin{new FunctionTypeNode(a2, T_LIST(T_INT)), range}});
 
     this->add_builtins(builtins);
 }
@@ -201,10 +201,6 @@ void GlobalProcessor::visit(StringNode& node) {
 }
 
 void GlobalProcessor::visit(SubscriptNode& node) {
-
-}
-
-void GlobalProcessor::visit(TypeNode& node) {
 
 }
 
@@ -282,8 +278,8 @@ void GlobalProcessor::visit(ClassNode& node) {
 //        class_info->members[mn] = mt;
     }
     for (auto f: node.methods) {
-        FunctionNode& method = f.second;
-        class_info->methods.insert(make_pair(f.first, FunctionTypeNode(method.parameter_types, method.return_type)));
+        FunctionNode& method = *f.second;
+        class_info->methods.insert(make_pair(f.first, new FunctionTypeNode(method.parameter_types, method.return_type)));
 //        class_info->methods[f.first] = ;
     }
     class_info->class_name = node.class_name;
@@ -299,7 +295,8 @@ void GlobalProcessor::visit(ContinueNode& node) {
 
 }
 
-void GlobalProcessor::dispatch(NodeContainer n) {
+void GlobalProcessor::dispatch(Node* nod) {
+    auto& n = *nod;
     switch (n.ntype) {
         case NodeType::ASSIGN:
             n.assign().accept(*this);
@@ -370,9 +367,6 @@ void GlobalProcessor::dispatch(NodeContainer n) {
         case NodeType::STRNG:
             n.strng().accept(*this);
             break;
-        case NodeType::STRCT:
-            n.strct().accept(*this);
-            break;
         case NodeType::SUB:
             n.sub().accept(*this);
             break;
@@ -393,8 +387,8 @@ void GlobalProcessor::dispatch(NodeContainer n) {
 }
 
 
-FunctionTypeNode& FunctionTable::get(std::string function_name) {
-    return functions.find(function_name)->second;
+FunctionTypeNode* FunctionTable::get(std::string function_name) {
+    return &functions.find(function_name)->second.clone()->function();
 }
 
 void FunctionTable::add(std::string function_name, FunctionTypeNode& function_type) {

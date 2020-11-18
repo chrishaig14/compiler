@@ -11,7 +11,7 @@
 
 class EmptyListNode : public Node {
 public:
-    EmptyListNode(TypeNode type);
+    EmptyListNode(TypeNode* type);
 
     void accept(Visitor& visitor) override;
 
@@ -23,7 +23,7 @@ public:
         return !(*this == other);
     }
 
-    TypeNode type;
+    TypeNode* type;
 };
 
 

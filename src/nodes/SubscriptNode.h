@@ -8,15 +8,17 @@
 
 #include "Node.h"
 #include "Visitor.h"
-#include "NodeContainer.h"
+#include "Node.h"
+
+#include "../types.h"
 
 class SubscriptNode : public Node {
 
 public:
-    SubscriptNode(NodeContainer parent, std::vector<NodeContainer> child);
+    SubscriptNode(Node* parent, VectorOfNodes child);
 
-    NodeContainer parent;
-    std::vector<NodeContainer> child;
+    Node* parent;
+    VectorOfNodes child;
 
     void accept(Visitor& visitor) override;
     bool operator==(const SubscriptNode& other) const;

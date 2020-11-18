@@ -8,7 +8,7 @@
 
 #include "Node.h"
 #include "Visitor.h"
-#include "NodeContainer.h"
+#include "Node.h"
 #include "../utils.h"
 
 enum class OpType {
@@ -19,11 +19,11 @@ std::string op_to_string(OpType op);
 
 class BinopNode : public Node {
 public:
-    NodeContainer left;
-    NodeContainer right;
+    Node* left;
+    Node* right;
     OpType op;
 
-    BinopNode(OpType op, NodeContainer left, NodeContainer right);
+    BinopNode(OpType op, Node* left, Node* right);
 
     void accept(Visitor& visitor) override;
 

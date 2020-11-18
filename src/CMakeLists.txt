@@ -19,8 +19,6 @@ add_library(srcLib
         nodes/Visitor.h
         nodes/ReturnNode.cpp
         nodes/ReturnNode.h
-        nodes/StructNode.cpp
-        nodes/StructNode.h
         nodes/StringNode.cpp
         nodes/StringNode.h
         nodes/BinopNode.cpp
@@ -149,5 +147,5 @@ add_library(srcLib
         instructions/MakeDefaultInst.cpp
         instructions/MakeDefaultInst.h
         parser/UnexpectedToken.cpp
-        parser/UnexpectedToken.h nodes/ForNode.cpp nodes/ForNode.h semantic/AssignmentTypeError.cpp semantic/AssignmentTypeError.h nodes/BooleanNode.cpp nodes/BooleanNode.h nodes/WhileNode.cpp nodes/WhileNode.h instructions/JumpInst.cpp instructions/JumpInst.h instructions/EnterScope.cpp instructions/EnterScope.h instructions/LeaveScope.cpp instructions/LeaveScope.h vm/LabelledCode.cpp vm/LabelledCode.h instructions/NopInst.cpp instructions/NopInst.h nodes/BreakNode.cpp nodes/BreakNode.h vm/Loader.cpp vm/Loader.h instructions/StartFunction.cpp instructions/StartFunction.h instructions/EndFunction.cpp instructions/EndFunction.h formatter/Formatter.cpp formatter/Formatter.h nodes/TernaryNode.cpp nodes/TernaryNode.h nodes/NoneNode.cpp nodes/NoneNode.h instructions/JumpIfNone.cpp instructions/JumpIfNone.h vm/NoneObject.cpp vm/NoneObject.h instructions/PushNone.cpp instructions/PushNone.h nodes/ClassNode.cpp nodes/ClassNode.h nodes/InstanceNode.cpp nodes/InstanceNode.h semantic/TypeClassInfo.cpp semantic/TypeClassInfo.h run.h run.cpp instructions/PopInst.cpp instructions/PopInst.h nodes/ContinueNode.cpp nodes/ContinueNode.h nodes/NodeContainer.cpp nodes/NodeContainer.h nodes/NodeFactory.cpp nodes/NodeFactory.h)
+        parser/UnexpectedToken.h nodes/ForNode.cpp nodes/ForNode.h semantic/AssignmentTypeError.cpp semantic/AssignmentTypeError.h nodes/BooleanNode.cpp nodes/BooleanNode.h nodes/WhileNode.cpp nodes/WhileNode.h instructions/JumpInst.cpp instructions/JumpInst.h instructions/EnterScope.cpp instructions/EnterScope.h instructions/LeaveScope.cpp instructions/LeaveScope.h vm/LabelledCode.cpp vm/LabelledCode.h instructions/NopInst.cpp instructions/NopInst.h nodes/BreakNode.cpp nodes/BreakNode.h vm/Loader.cpp vm/Loader.h instructions/StartFunction.cpp instructions/StartFunction.h instructions/EndFunction.cpp instructions/EndFunction.h formatter/Formatter.cpp formatter/Formatter.h nodes/TernaryNode.cpp nodes/TernaryNode.h nodes/NoneNode.cpp nodes/NoneNode.h instructions/JumpIfNone.cpp instructions/JumpIfNone.h vm/NoneObject.cpp vm/NoneObject.h instructions/PushNone.cpp instructions/PushNone.h nodes/ClassNode.cpp nodes/ClassNode.h semantic/TypeClassInfo.cpp semantic/TypeClassInfo.h run.h run.cpp instructions/PopInst.cpp instructions/PopInst.h nodes/ContinueNode.cpp nodes/ContinueNode.h nodes/Node.cpp nodes/Node.h nodes/node_types.h types.h macros.h)
 

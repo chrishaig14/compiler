@@ -12,7 +12,7 @@ bool TernaryNode::operator==(const TernaryNode& other) const {
     return this->expression == other.expression && this->true_case == other.true_case && this->false_case == other.false_case;
 }
 
-TernaryNode::TernaryNode(NodeContainer expression, NodeContainer trueCase, NodeContainer falseCase) : expression(
+TernaryNode::TernaryNode(Node* expression, Node* trueCase, Node* falseCase) : expression(
         expression),
                                                                                                       true_case(
                                                                                                               trueCase),

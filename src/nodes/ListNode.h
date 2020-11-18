@@ -9,14 +9,16 @@
 #include <vector>
 #include "Node.h"
 #include "Visitor.h"
-#include "NodeContainer.h"
+#include "Node.h"
+#include "../types.h"
+
 class ListNode : public Node {
 public:
-    std::vector<NodeContainer> elements;
+    VectorOfNodes elements;
 
     void accept(Visitor& visitor) override;
 
-    ListNode(std::vector<NodeContainer> elements);
+    ListNode(VectorOfNodes elements);
 
     bool operator==(const ListNode& other) const;
     bool operator!=(const ListNode& other) const;

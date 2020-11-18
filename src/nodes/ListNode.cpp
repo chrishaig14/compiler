@@ -9,7 +9,7 @@ void ListNode::accept(Visitor& visitor) {
 
 }
 
-ListNode::ListNode(std::vector<NodeContainer> elements) : elements(elements) {
+ListNode::ListNode(VectorOfNodes elements) : elements(elements) {
 
 }
 

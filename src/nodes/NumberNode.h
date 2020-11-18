@@ -8,7 +8,7 @@
 
 #include "Node.h"
 #include "Visitor.h"
-#include "NodeContainer.h"
+#include "Node.h"
 
 class NumberNode : public Node {
 public:

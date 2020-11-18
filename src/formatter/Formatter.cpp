@@ -180,7 +180,7 @@
 //void Formatter::visit(ListNode& node) {
 //    std::string elements;
 //    for (int i = 0; i < node.elements.size(); i++) {
-//        NodeContainer element = node.elements[i];
+//        Node* element = node.elements[i];
 //        element->accept(*this);
 //        std::string element_str = this->output;
 //        elements += element_str + ", ";
@@ -236,7 +236,7 @@
 //    this->output = parent + "[" + child + "]";
 //}
 //
-//void Formatter::visit(TypeNode& node) {
+//void Formatter::visit(TypeNode* node) {
 //    this->output = node.to_string();
 //}
 //

@@ -8,7 +8,7 @@ void CallNode::accept(Visitor& visitor) {
     visitor.visit(*this);
 }
 
-CallNode::CallNode(NodeContainer function, const std::vector<NodeContainer>& arguments) : function(function),
+CallNode::CallNode(Node* function, const VectorOfNodes& arguments) : function(function),
                                                                                           arguments(arguments) {}
 
 bool CallNode::operator==(const CallNode& other) const {

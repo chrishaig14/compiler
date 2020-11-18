@@ -8,7 +8,7 @@ void ClassLiteralFieldNode::accept(Visitor& visitor) {
     visitor.visit(*this);
 }
 
-ClassLiteralFieldNode::ClassLiteralFieldNode(ObjectTypeNode& type, const std::map<std::string, NodeContainer>& init)
+ClassLiteralFieldNode::ClassLiteralFieldNode(ObjectTypeNode* type, const std::map<std::string, Node*>& init)
         : type(type), init(init) {}
 
 bool ClassLiteralFieldNode::operator!=(const ClassLiteralFieldNode& other) const { return !(*this == other); }
