@@ -11,7 +11,6 @@ void ReturnNode::accept(Visitor& visitor) {
 
 ReturnNode::ReturnNode(Node* expression) : expression(expression) {}
 
-bool ReturnNode::operator==(ReturnNode& other) const {
-//    return this->expression->equal(other.expression);
-return false;
+bool ReturnNode::equal(const Node& x) const {
+    return *x.retrn().expression == *this->expression;
 }

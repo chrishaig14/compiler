@@ -189,7 +189,7 @@ void Translator::visit(MemberNode& node) {
 
 void Translator::visit(NumberNode& node) {
     CodeLabel out;
-    out.push_back(LC("", I_PUSHI(node.number)));
+    out.push_back(LC("", I_PUSHI(node.num)));
     this->code = out;
 }
 

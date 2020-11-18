@@ -14,7 +14,7 @@
 #define FUN_FOO_STRING "fun foo(x:List[List[Integer]])->List[Integer]{x=a+b; x = y;}"
 #define COMPLEX_TYPE T_LIST(T_LIST(T_INT))
 
-#define COMPLETE_TEST  EXPECT_EQ(node, expected_node);
+#define COMPLETE_TEST  EXPECT_EQ(*node, *expected_node);
 #define EXPECT_NOT_EQUAL EXPECT_FALSE(node->equal(expected_node)); delete node; delete expected_node;
 
 TEST(parser_test, a_plus_b) {
@@ -145,7 +145,7 @@ TEST(parser_test, declare_x_a_plus_b) {
     DeclarationNode* node = parser.parse_variable_declaration();
     DeclarationNode* expected_node = new DeclarationNode("x", nullptr,
                                                     new BinopNode(OpType::ADD, new IdNode("a"), new IdNode("b")));
-    EXPECT_EQ(node, expected_node);
+    EXPECT_EQ(*node, *expected_node);
 }
 
 TEST(parser_test, empty_block) {
@@ -213,8 +213,7 @@ TEST(parser_test, simple_type) {
     Parser parser(tokens);
     TypeNode* node = parser.parse_type_node();
     auto expected_node = T_STRING;
-//    COMPLETE_TEST;
-    EXPECT_EQ(node, expected_node);
+    COMPLETE_TEST;
 }
 
 TEST(parser_test, template_type) {
@@ -225,7 +224,7 @@ TEST(parser_test, template_type) {
     TypeNode* node = parser.parse_type_node();
     auto expected_node = TYPE("String", VectorOfTypes{TYPE("Integer", {})});
 //    COMPLETE_TEST;
-    EXPECT_EQ(node, expected_node);
+    EXPECT_EQ(*node, *expected_node);
 }
 
 TEST(parser_test, fun_empty) {
@@ -235,7 +234,7 @@ TEST(parser_test, fun_empty) {
     Parser parser(tokens);
     TypeNode* node = parser.parse_type_node();
     auto expected_node = FUNCTION_TYPE({}, T_STRING);
-    EXPECT_EQ(node, expected_node);
+    EXPECT_EQ(*node, *expected_node);
 
 //    COMPLETE_TEST;
 }
@@ -248,7 +247,7 @@ TEST(parser_test, fun_full) {
     TypeNode* node = parser.parse_type_node();
     VectorOfTypes t = {T_LIST(T_STRING), FUNCTION_TYPE({ T_STRING }, T_INT)};
     auto expected_node = FUNCTION_TYPE(t, T_LIST(T_INT));
-    EXPECT_EQ(node, expected_node);
+    EXPECT_EQ(*node, *expected_node);
 
 //    COMPLETE_TEST;
 }
@@ -261,7 +260,7 @@ TEST(parser_test, complex_template_type) {
     Parser parser(tokens);
     TypeNode* node = parser.parse_type_node();
     auto expected_node = TYPE("String", VectorOfTypes({T_INT, T_LIST({T_STRING})}));
-    EXPECT_EQ(node, expected_node);
+    EXPECT_EQ(*node, *expected_node);
 
 }
 
@@ -272,7 +271,7 @@ TEST(parser_test, decl_with_type_and_value) {
     Parser parser(tokens);
     DeclarationNode* node = parser.parse_variable_declaration();
     auto expected_node = new DeclarationNode("x", TYPE("String", VectorOfTypes({T_INT, T_LIST({T_STRING})})), new BinopNode(OpType::ADD, new IdNode("a"), new IdNode("b")));
-    EXPECT_EQ(node, expected_node);
+    EXPECT_EQ(*node, *expected_node);
 
 //    COMPLETE_TEST;
 }
@@ -287,7 +286,7 @@ TEST(parser_test, function_no_params_empty_body) {
     BlockNode* b = new BlockNode();
     auto expected_node = new FunctionNode("foo", std::vector<std::string>(), VectorOfTypes(), return_type, b);
 //    COMPLETE_TEST;
-    EXPECT_EQ(node, expected_node);
+    EXPECT_EQ(*node, *expected_node);
 
 
 }
@@ -301,7 +300,7 @@ TEST(parser_test, function_with_params_empty_body) {
     FunctionNode* node = parser.parse_function_definition();
     BlockNode* b = new BlockNode();
     auto expected_node = new FunctionNode("foo", {"x"}, {COMPLEX_TYPE}, TYPE("Integer", {}), b);
-    EXPECT_EQ(node, expected_node);
+    EXPECT_EQ(*node, *expected_node);
 }
 
 TEST(parser_test, function_with_params_and_body) {
@@ -313,7 +312,7 @@ TEST(parser_test, function_with_params_and_body) {
     BlockNode* b = new BlockNode({new AssignmentNode(new IdNode("x"), new BinopNode(OpType::ADD, new IdNode("a"), new IdNode("b"))),
                  new AssignmentNode(new IdNode("x"), new IdNode("y"))});
     auto expected_node = new FunctionNode("foo", {"x"}, {COMPLEX_TYPE}, TYPE("String", {}), b);
-    EXPECT_EQ(node, expected_node);
+    EXPECT_EQ(*node, *expected_node);
 }
 
 TEST(parser_test, class_literal_fil) {
@@ -574,7 +573,7 @@ TEST(parser_test, test_now_8) {
     std::map<std::string, Node*> fields;
 //    Node* expected_node = LIT_FIL(TYPE("x", {TYPE("y", {})}), fields);
 //    COMPLETE_TEST;
-//    EXPECT_EQ(node, expected_node);
+//    EXPECT_EQ(*node, *expected_node);
 
 }
 
@@ -701,7 +700,7 @@ TEST(parser_test, for_loop_1) {
     Parser parser(tokens);
     ForNode* node = parser.parse_for_loop();
     ForNode* expected_node = new ForNode("e", new IdNode("l"), new BlockNode());
-    EXPECT_EQ(node, expected_node);
+    EXPECT_EQ(*node, *expected_node);
 }
 
 TEST(parser_test, while_loop_1) {
@@ -711,7 +710,7 @@ TEST(parser_test, while_loop_1) {
     Parser parser(tokens);
     WhileNode* node = parser.parse_while_loop();
     WhileNode* expected_node = new WhileNode(new BooleanNode(true), new BlockNode());
-    EXPECT_EQ(node, expected_node);
+    EXPECT_EQ(*node, *expected_node);
 }
 
 TEST(parser_test, while_loop_common) {
@@ -721,7 +720,7 @@ TEST(parser_test, while_loop_common) {
     Parser parser(tokens);
     WhileNode* node = parser.parse_while_loop();
     WhileNode* expected_node = new WhileNode(new BooleanNode(true), new BlockNode());
-    EXPECT_EQ(node, expected_node);
+    EXPECT_EQ(*node, *expected_node);
 }
 
 TEST(parser_test, for_loop_2) {
@@ -910,7 +909,7 @@ TEST(parser_test, complex_chain) {
                     new SubscriptNode(new MemberNode(new MemberNode(call, "f"), "g"), {new IdNode("h")}),
                     {new NumberNode(2)}), {}), {new NumberNode(3)}),
                               {new NumberNode(5)}), "i");
-    EXPECT_EQ(node, expected_node);
+    EXPECT_EQ(*node, *expected_node);
 
 }
 

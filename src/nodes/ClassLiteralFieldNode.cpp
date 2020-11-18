@@ -4,6 +4,7 @@
 
 #include "ClassLiteralFieldNode.h"
 #include "../utils.h"
+
 void ClassLiteralFieldNode::accept(Visitor& visitor) {
     visitor.visit(*this);
 }
@@ -11,8 +12,7 @@ void ClassLiteralFieldNode::accept(Visitor& visitor) {
 ClassLiteralFieldNode::ClassLiteralFieldNode(ObjectTypeNode* type, const std::map<std::string, Node*>& init)
         : type(type), init(init) {}
 
-bool ClassLiteralFieldNode::operator!=(const ClassLiteralFieldNode& other) const { return !(*this == other); }
-
-bool ClassLiteralFieldNode::operator==(const ClassLiteralFieldNode& other) const {
+bool ClassLiteralFieldNode::equal(const Node& x) const {
+    auto& other = x.clsfld();
     return this->type == other.type && this->init == other.init;
 }

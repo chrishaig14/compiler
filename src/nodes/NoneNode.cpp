@@ -8,6 +8,7 @@ void NoneNode::accept(Visitor& visitor) {
     visitor.visit(*this);
 }
 
-bool NoneNode::operator==(const NoneNode& other) const {return true;}
+bool NoneNode::equal(const Node& other) const {
+    return true;
+}
 
-bool NoneNode::operator!=(const NoneNode& other) const {return false;}

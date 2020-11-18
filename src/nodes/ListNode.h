@@ -20,8 +20,7 @@ public:
 
     ListNode(VectorOfNodes elements);
 
-    bool operator==(const ListNode& other) const;
-    bool operator!=(const ListNode& other) const;
+    bool equal(const Node& other) const;
 
     ~ListNode() {
 //        for (auto e: this->elements) {
@@ -38,6 +37,9 @@ public:
 //        }
         return j;
     }
+
+    ListNode& lst() override;
+    const ListNode& lst() const override;
 };
 
 

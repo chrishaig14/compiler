@@ -19,9 +19,9 @@ public:
 
     bool operator!=(const BooleanNode& other) const;
 
-    bool operator==(const BooleanNode& other) const {
-        return this->value == other.value;
-    }
+    bool equal(const Node& x) const override;
+    const BooleanNode& boolean() const override ;
+    BooleanNode& boolean() override ;
 };
 
 

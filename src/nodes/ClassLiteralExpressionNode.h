@@ -22,10 +22,7 @@ public:
 
     void accept(Visitor& visitor) override;
 
-    bool operator==(const ClassLiteralExpressionNode& other) const;
-    bool operator!=(const ClassLiteralExpressionNode& other) const;
-private:
-
+    bool equal(const Node& x) const override;
 };
 
 

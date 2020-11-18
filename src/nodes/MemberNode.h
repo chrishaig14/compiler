@@ -10,6 +10,7 @@
 #include "Node.h"
 #include "Visitor.h"
 #include "Node.h"
+
 class MemberNode : public Node {
 public:
     Node* parent;
@@ -19,9 +20,9 @@ public:
 
     void accept(Visitor& visitor) override;
 
-    bool operator==(MemberNode& other) const {
-//        return this->parent->equal(other.parent) && this->child == other.child;
-return false;
+    bool equal(const Node& x) const override {
+        auto& other = x.member();
+        return *this->parent == *other.parent && this->child == other.child;
     }
 
     ~MemberNode() {
@@ -35,6 +36,9 @@ return false;
         j["child"] = this->child;
         return j;
     }
+
+    MemberNode& member() override;
+    const MemberNode& member() const override;
 };
 
 

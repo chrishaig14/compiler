@@ -13,8 +13,7 @@
 class ContinueNode : public Node{
 public:
     void accept(Visitor& visitor) override;
-    bool operator==(const ContinueNode& other) const {return true;}
-    bool operator!=(const ContinueNode& other) const {return false;}
+    bool equal(const Node& other) const override;
 };
 
 

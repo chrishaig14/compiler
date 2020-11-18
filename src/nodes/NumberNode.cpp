@@ -8,12 +8,17 @@ void NumberNode::accept(Visitor& visitor) {
     visitor.visit(*this);
 }
 
-NumberNode::NumberNode(int number) : number(number) {}
+NumberNode::NumberNode(int number) : num(number) {this->ntype =NUMBER;}
 
-bool NumberNode::operator==(const NumberNode& other) const {
-    return this->number == other.number;
+bool NumberNode::equal(const Node& x) const {
+    auto& other = x.number();
+    return this->num == other.num;
 }
 
-bool NumberNode::operator!=(const NumberNode& other) const {
-    return !(*this == other);
+NumberNode& NumberNode::number() {
+    return *this;
+}
+
+const NumberNode& NumberNode::number() const {
+    return *this;
 }

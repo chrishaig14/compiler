@@ -12,9 +12,7 @@
 class NoneNode : public Node {
 public:
     void accept(Visitor& visitor) override;
-
-    bool operator==(const NoneNode& other )const;
-    bool operator!=(const NoneNode& other )const;
+    bool equal(const Node& other) const override;
 
 };
 

@@ -9,12 +9,13 @@ void IfNode::accept(Visitor& visitor) {
     visitor.visit(*this);
 }
 
-bool IfNode::operator==(IfNode& other) const {
+bool IfNode::equal(const Node& x) const {
+    auto& other = x.iff();
     return this->condition == other.condition && this->then == other.then;
 }
 
 IfNode::IfNode(Node* condition, BlockNode* then,
                std::vector<std::pair<Node*, BlockNode*>> elifs, BlockNode* selse) : condition(condition),
-                                                                                   then(then), selse(selse),
-                                                                                   elifs(elifs) {}
+                                                                                    then(then), selse(selse),
+                                                                                    elifs(elifs) {}
 

@@ -10,3 +10,11 @@ void EmptyListNode::accept(Visitor& visitor) {
 
 
 EmptyListNode::EmptyListNode(TypeNode* type) : type(type) {}
+
+EmptyListNode& EmptyListNode::emptylst() {
+    return *this;
+}
+
+const EmptyListNode& EmptyListNode::emptylst() const {
+    return *this;
+}

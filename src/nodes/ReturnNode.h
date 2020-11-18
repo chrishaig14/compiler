@@ -15,7 +15,7 @@ public:
 
     void accept(Visitor& visitor) override;
 
-    bool operator==(ReturnNode& other) const;
+    bool equal(const Node& other) const;
 
     ~ReturnNode() {
 //        delete this->expression;

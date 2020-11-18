@@ -15,13 +15,12 @@ public:
 
     void accept(Visitor& visitor) override;
 
-    bool operator==(const EmptyListNode& other) const {
-        return this->type == other.type;
+    bool equal(const Node& other) const override {
+        return *other.emptylst().type == *this->type;
     }
 
-    bool operator!=(const EmptyListNode& other) const {
-        return !(*this == other);
-    }
+    EmptyListNode& emptylst() override;
+    const EmptyListNode& emptylst() const override;
 
     TypeNode* type;
 };

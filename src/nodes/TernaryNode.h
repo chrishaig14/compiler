@@ -19,7 +19,7 @@ public:
 
     void accept(Visitor& visitor) override;
 
-    bool operator==(const TernaryNode& other) const;
+    bool equal(const Node& other) const override ;
 
 };
 

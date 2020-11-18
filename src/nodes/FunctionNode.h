@@ -35,9 +35,7 @@ public:
     }
 
 
-    bool operator!=(const FunctionNode& other) const;
-
-    bool operator==(const FunctionNode& other) const;
+    bool equal(const Node& x) const override ;
 
     ~FunctionNode() {
 //        for (auto pt: this->parameter_types) {

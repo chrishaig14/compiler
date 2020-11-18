@@ -12,21 +12,24 @@
 
 class NumberNode : public Node {
 public:
-    int number;
+    int num;
 
     NumberNode(int number);
 
     void accept(Visitor& visitor) override;
+    bool equal(const Node& x) const override;
 
-    bool operator==(const NumberNode& other) const;
-    bool operator!=(const NumberNode& other) const;
 
     json to_json() const override {
         json j;
         j["node"] = "number";
-        j["number"] = this->number;
+        j["number"] = this->num;
         return j;
     }
+
+    NumberNode& number() override;
+    const NumberNode& number() const override;
+
 };
 
 

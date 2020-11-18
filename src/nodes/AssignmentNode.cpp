@@ -8,11 +8,11 @@ void AssignmentNode::accept(Visitor& visitor) {
     visitor.visit(*this);
 }
 
-AssignmentNode::AssignmentNode(Node* lvalue, Node* rvalue) : lvalue(lvalue), rvalue(rvalue) {}
+AssignmentNode::AssignmentNode(Node* lvalue, Node* rvalue) : lvalue(lvalue), rvalue(rvalue) {this->ntype =ASSIGN;}
 
-bool AssignmentNode::operator==(AssignmentNode& other) const {
-//    return this->lvalue->equal(other.lvalue) && this->rvalue->equal(other.rvalue);
-    return false;
+bool AssignmentNode::equal(const Node& x) const {
+    auto& other = x.assign();
+    return *this->lvalue == *other.lvalue && *this->rvalue == *other.rvalue;
 }
 
 AssignmentNode::~AssignmentNode() {

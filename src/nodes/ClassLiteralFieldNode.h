@@ -14,9 +14,7 @@ class ClassLiteralFieldNode : public Node {
 public:
     ObjectTypeNode* type;
 
-    bool operator==(const ClassLiteralFieldNode& other) const;
-
-    bool operator!=(const ClassLiteralFieldNode& other) const;
+    bool equal(const Node& other) const override ;
 
     std::map<std::string, Node*> init;
 

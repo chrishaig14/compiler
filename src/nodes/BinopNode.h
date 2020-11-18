@@ -23,12 +23,12 @@ public:
     Node* right;
     OpType op;
 
+    BinopNode& binop() override { return *this; }
+    const BinopNode& binop() const override { return *this; }
+
     BinopNode(OpType op, Node* left, Node* right);
-
+    bool equal(const Node& x) const override ;
     void accept(Visitor& visitor) override;
-
-    bool operator==(const BinopNode& other) const;
-    bool operator!=(const BinopNode& other) const;
 
 
     ~BinopNode() {
@@ -44,6 +44,7 @@ public:
         j["op"] = op_to_string(this->op);
         return j;
     }
+
 };
 
 

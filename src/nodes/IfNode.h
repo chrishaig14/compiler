@@ -23,7 +23,7 @@ public:
 
     void accept(Visitor& visitor) override;
 
-    bool operator==(IfNode& other) const;
+    bool equal(const Node& other) const override ;
 
     ~IfNode() {
     }

@@ -19,8 +19,7 @@ public:
 
     IdNode(std::string identifier);
 
-    bool operator==(const IdNode& other) const;
-    bool operator!=(const IdNode& other) const;;
+    bool equal(const Node& other) const override;
 
     json to_json() const override {
         json j;
@@ -30,6 +29,9 @@ public:
         j["end"] = this->end;
         return j;
     }
+
+    IdNode& id() override;
+    const IdNode& id() const override;
 };
 
 

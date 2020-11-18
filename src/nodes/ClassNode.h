@@ -13,8 +13,7 @@
 class ClassNode : public Node {
 public:
 
-    bool operator==(const ClassNode& other) const;
-    bool operator!=(const ClassNode& other) const;
+    bool equal(const Node& other) const;
         ClassNode(const std::string& className, std::vector<std::string> type_parameters,
               std::map<std::string, TypeNode*> members, std::map<std::string, FunctionNode*> functions);
 

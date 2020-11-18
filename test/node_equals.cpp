@@ -21,30 +21,30 @@
 #define EXPECT_NOT_EQUAL EXPECT_FALSE(node->equal(expected_node)); delete node; delete expected_node;
 
 
-TEST(parser_test, id) {
+TEST(node_test, id) {
     EXPECT_EQ(IdNode("a"), IdNode("a"));
     EXPECT_NE(IdNode("a"), IdNode("b"));
 }
 
-TEST(parser_test, number) {
+TEST(node_test, number) {
     EXPECT_EQ(NumberNode(7), NumberNode(7));
     EXPECT_NE(NumberNode(7), NumberNode(8));
 }
 
-TEST(parser_test, strng) {
+TEST(node_test, strng) {
     EXPECT_EQ(StringNode("foo"), StringNode("foo"));
     EXPECT_NE(StringNode("foo"), StringNode("bar"));
 }
 
 
 
-TEST(parser_test, boolean) {
+TEST(node_test, boolean) {
     EXPECT_EQ(BooleanNode(true), BooleanNode(true));
     EXPECT_NE(BooleanNode(true), BooleanNode(false));
 }
 
 
-TEST(parser_test, binop) {
+TEST(node_test, binop) {
     EXPECT_EQ(BinopNode(OpType::ADD, new IdNode("a"), new IdNode("b")), BinopNode(OpType::ADD, new IdNode("a"), new IdNode("b")));
     EXPECT_NE(BinopNode(OpType::ADD, new IdNode("a"), new IdNode("b")), BinopNode(OpType::ADD, new IdNode("a"), new IdNode("c")));
     EXPECT_NE(BinopNode(OpType::ADD, new IdNode("a"), new IdNode("b")), BinopNode(OpType::ADD, new IdNode("c"), new IdNode("b")));
@@ -56,7 +56,7 @@ TEST(parser_test, binop) {
 
 
 
-TEST(parser_test, call) {
+TEST(node_test, call) {
     EXPECT_EQ(CallNode(new IdNode("foo"), {}), CallNode(new IdNode("foo"), {}));
     EXPECT_EQ(CallNode(new IdNode("foo"), {new IdNode("a")}), CallNode(new IdNode("foo"), {new IdNode("a")}));
     EXPECT_EQ(CallNode(new IdNode("foo"), {new IdNode("a"), new NumberNode(7)}), CallNode(new IdNode("foo"), {new IdNode("a"), new NumberNode(7)}));

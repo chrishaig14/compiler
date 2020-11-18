@@ -21,9 +21,7 @@ public:
     VectorOfNodes child;
 
     void accept(Visitor& visitor) override;
-    bool operator==(const SubscriptNode& other) const;
-
-    bool operator!=(const SubscriptNode& other) const;
+    bool equal(const Node& other) const override ;
 
     ~SubscriptNode() {
 //        delete this->parent;
@@ -38,6 +36,9 @@ public:
 //        j["child"] = this->child->to_json();
         return j;
     }
+
+    SubscriptNode& sub() override;
+    const SubscriptNode& sub() const override;
 };
 
 

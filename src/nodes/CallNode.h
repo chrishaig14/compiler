@@ -20,8 +20,7 @@ public:
 
     void accept(Visitor& visitor) override;
 
-    bool operator==(const CallNode& other) const;
-    bool operator!=(const CallNode& other) const;
+    bool equal(const Node& other) const override ;
 
     ~CallNode() {
 //        delete this->function;
@@ -40,6 +39,9 @@ public:
         }
         return j;
     }
+
+    CallNode& call() override;
+    const CallNode& call() const override;
 
 };
 

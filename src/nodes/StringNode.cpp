@@ -9,11 +9,17 @@ void StringNode::accept(Visitor& visitor) {
 
 }
 
-StringNode::StringNode(std::string str) : str(str) {}
+StringNode::StringNode(std::string str) : str(str) { this->ntype = STRNG; }
 
-bool StringNode::operator==(const StringNode& other) const {
+bool StringNode::equal(const Node& x) const {
+    auto& other = x.strng();
     return this->str == other.str;
 }
-bool StringNode::operator!=(const StringNode& other) const {
-    return !(*this == other);
+
+StringNode& StringNode::strng() {
+    return *this;
+}
+
+const StringNode& StringNode::strng() const {
+    return *this;
 }

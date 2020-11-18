@@ -10,3 +10,11 @@ void BlockNode::accept(Visitor& visitor) {
 
 BlockNode::BlockNode() {}
 
+BlockNode& BlockNode::block() {
+    return *this;
+}
+
+const BlockNode& BlockNode::block() const {
+    return *this;
+}
+

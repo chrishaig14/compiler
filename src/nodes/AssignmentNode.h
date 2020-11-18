@@ -15,11 +15,15 @@ public:
     Node* lvalue;
     Node* rvalue;
 
+    AssignmentNode& assign() override { return *this; }
+
+    const AssignmentNode& assign() const override { return *this; }
+
     AssignmentNode(Node* lvalue, Node* rvalue);
 
     void accept(Visitor& visitor) override;
+    bool equal(const Node& x) const override;
 
-    bool operator==(AssignmentNode& other) const;
 
     virtual ~AssignmentNode();
 

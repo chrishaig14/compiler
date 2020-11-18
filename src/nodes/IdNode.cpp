@@ -8,11 +8,19 @@ void IdNode::accept(Visitor& visitor) {
     visitor.visit(*this);
 }
 
-IdNode::IdNode(std::string identifier) : identifier(identifier) {}
+IdNode::IdNode(std::string identifier) : identifier(identifier) { this->ntype = ID; }
 
 
-bool IdNode::operator==(const IdNode& other) const {
+bool IdNode::equal(const Node& x) const {
+    auto& other = x.id();
     return this->identifier == other.identifier;
 }
 
-bool IdNode::operator!=(const IdNode& other) const {return !(*this == other);}
+
+IdNode& IdNode::id() {
+    return *this;
+}
+
+const IdNode& IdNode::id() const {
+    return *this;
+}

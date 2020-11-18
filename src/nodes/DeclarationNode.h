@@ -21,9 +21,7 @@ public:
     DeclarationNode(const std::string& identifier, TypeNode* type, Node* expression);
 
     void accept(Visitor& visitor) override;
-    bool operator!=(const DeclarationNode& other) const;
-
-    bool operator==(const DeclarationNode& other) const;
+    bool equal(const Node& other) const override ;
 
     ~DeclarationNode() {
 //        if (this->type != nullptr) delete this->type;
@@ -43,6 +41,9 @@ public:
         }
         return j;
     }
+
+    DeclarationNode& decl() override;
+    const DeclarationNode& decl() const override;
 
 };
 

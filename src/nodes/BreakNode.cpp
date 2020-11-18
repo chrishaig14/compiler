@@ -8,10 +8,7 @@ void BreakNode::accept(Visitor& visitor) {
     visitor.visit(*this);
 }
 
-bool BreakNode::operator==(const BreakNode& other) const {
+bool BreakNode::equal(const Node& other) const {
     return true;
 }
 
-bool BreakNode::operator!=(const BreakNode& other) const {
-    return false;
-}

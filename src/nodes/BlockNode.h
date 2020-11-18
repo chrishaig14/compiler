@@ -15,20 +15,21 @@
 class BlockNode : public Node {
 public:
 
-    BlockNode(VectorOfNodes nodes) : nodes(nodes) {}
+    BlockNode(VectorOfNodes nodes) : nodes(nodes) { this->ntype = BLOCK; }
 
     BlockNode();
 
     VectorOfNodes nodes;
 
-    bool operator!=(const BlockNode& other) const {
-        return !(*this == other);
-    }
-
-    bool operator==(const BlockNode& other) const {
-        if (this->nodes.size() != other.nodes.size()) return false;
+    bool equal(const Node& p) const {
+        auto& other = p.block();
+        if (this->nodes.size() != other.nodes.size()) {
+            return false;
+        }
         for (int i = 0; i < this->nodes.size(); i++) {
-//            if (!this->nodes[i]->equal(other.nodes[i])) return false;
+            if (*this->nodes[i] != *other.nodes[i]) {
+                return false;
+            }
         };
         return true;
     }
@@ -44,6 +45,9 @@ public:
         }
         return j;
     }
+
+    BlockNode& block() override;
+    const BlockNode& block() const override;
 };
 
 
