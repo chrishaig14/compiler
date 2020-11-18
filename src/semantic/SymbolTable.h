@@ -8,7 +8,7 @@
 #include <string>
 #include <vector>
 #include <map>
-#include "../nodes/nodes.h"
+#include "../nodes/TypeNode.h"
 #include "../utils.h"
 #include "SymbolInfo.h"
 

@@ -14,6 +14,7 @@
 #include "AssignmentTypeError.h"
 #include "TypeClassInfo.h"
 #include "../utils.h"
+#include "../nodes/nodes.h"
 
 class SymbolInfo {
 public:

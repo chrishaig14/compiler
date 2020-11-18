@@ -14,7 +14,6 @@ public:
     std::string var;
     Node* exp;
     BlockNode* body;
-
     bool equal(const Node& other) const override ;
 
     ForNode(const std::string& var, Node* exp, BlockNode* body);

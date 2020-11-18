@@ -10,6 +10,7 @@
 #include "Instruction.h"
 #include "InstructionVisitor.h"
 #include "InstructionVisitor.h"
+#include "../nodes/optypes.h"
 
 class BinopInst : public Instruction {
 public:

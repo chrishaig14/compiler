@@ -9,8 +9,8 @@
 #include <vector>
 #include <string>
 #include "Instruction.h"
-#include "../translator/Translator.h"
 #include "InstructionVisitor.h"
+#include "../types.h"
 
 class PushFunctionInst : public Instruction {
 public:
@@ -23,14 +23,22 @@ public:
 
     bool equal(const Instruction* inst) const {
         const PushFunctionInst* other = dynamic_cast<const PushFunctionInst*>(inst);
-        if (other == nullptr) return false;
+        if (other == nullptr) {
+            return false;
+        }
         return *this == *other;
     }
 
     bool operator==(const PushFunctionInst& other) const {
-        if (this->parameter_names != other.parameter_names) return false;
-        if (this->free_variables != other.free_variables) return false;
-        if (this->body != other.body) return false;
+        if (this->parameter_names != other.parameter_names) {
+            return false;
+        }
+        if (this->free_variables != other.free_variables) {
+            return false;
+        }
+        if (this->body != other.body) {
+            return false;
+        }
         return true;
     }
 

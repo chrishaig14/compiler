@@ -7,7 +7,8 @@
 
 #include <stdexcept>
 #include "../utils.h"
-
+#include "../types.h"
+#include "../nodes/TypeNode.h"
 class BadArguments : public std::runtime_error {
 public:
     BadArguments(VectorOfTypes ftype, VectorOfTypes args);

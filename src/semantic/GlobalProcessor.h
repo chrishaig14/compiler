@@ -7,10 +7,10 @@
 
 
 #include <map>
-#include "../nodes/nodes.h"
 #include "SymbolTable.h"
 #include "ClassTable.h"
 #include "../vm/Object.h"
+#include "../nodes/ClassNode.h"
 
 class FunctionTable {
     std::map<std::string, FunctionTypeNode> functions;

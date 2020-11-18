@@ -5,16 +5,13 @@
 #ifndef UTILS_H
 #define UTILS_H
 
+//#include "instructions/Instruction.h"
+//#include "nodes/nodes.h"
+#include <vector>
+#include <map>
+#include <algorithm>
+#include "types.h"
 #include "instructions/Instruction.h"
-#include "nodes/nodes.h"
-
-typedef std::vector<std::string> VectorOfStrings;
-typedef std::vector<Instruction*> Code;
-typedef std::pair<std::string, TypeNode*> FieldInfo;
-typedef std::vector<FieldInfo> StructFields;
-typedef std::vector<std::pair<std::string, Instruction*>> CodeLabel;
-typedef std::map<std::string, std::map<std::string, Code>> StructProtos;
-
 
 std::ostream& operator<<(std::ostream& out, const CodeLabel v);
 

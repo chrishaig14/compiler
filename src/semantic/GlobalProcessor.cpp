@@ -10,6 +10,7 @@
 #include "../vm/CodeObject.h"
 #include "../vm/CodeRunner.h"
 #include "../macros.h"
+#include "../nodes/FunctionNode.h"
 
 void GlobalProcessor::add_builtins(std::vector<Builtin>& builtins) {
     for (int i = 0; i < builtins.size(); i++) {
@@ -279,7 +280,8 @@ void GlobalProcessor::visit(ClassNode& node) {
     }
     for (auto f: node.methods) {
         FunctionNode& method = *f.second;
-        class_info->methods.insert(make_pair(f.first, new FunctionTypeNode(method.parameter_types, method.return_type)));
+        class_info->methods.insert(
+                make_pair(f.first, new FunctionTypeNode(method.parameter_types, method.return_type)));
 //        class_info->methods[f.first] = ;
     }
     class_info->class_name = node.class_name;
@@ -298,91 +300,12 @@ void GlobalProcessor::visit(ContinueNode& node) {
 void GlobalProcessor::dispatch(Node* nod) {
     auto& n = *nod;
     switch (n.ntype) {
-        case NodeType::ASSIGN:
-            n.assign().accept(*this);
-            break;
-        case NodeType::BINOP:
-            n.binop().accept(*this);
-            break;
-        case NodeType::BLOCK:
-            n.block().accept(*this);
-            break;
-        case NodeType::BOOLEAN:
-            n.boolean().accept(*this);
-            break;
-        case NodeType::BRK:
-            n.brk().accept(*this);
-            break;
-        case NodeType::CALL:
-            n.call().accept(*this);
-            break;
-        case NodeType::CLSEXP:
-            n.clsexp().accept(*this);
-            break;
-        case NodeType::CLSFLD:
-            n.clsfld().accept(*this);
-            break;
         case NodeType::CLS:
             n.cls().accept(*this);
-            break;
-        case NodeType::CNTINUE:
-            n.cntinue().accept(*this);
-            break;
-        case NodeType::DECL:
-            n.decl().accept(*this);
-            break;
-        case NodeType::EMPTYLST:
-            n.emptylst().accept(*this);
-            break;
-        case NodeType::FORLOOP:
-            n.forloop().accept(*this);
             break;
         case NodeType::FUNC:
             n.func().accept(*this);
             break;
-        case NodeType::ID:
-            n.id().accept(*this);
-            break;
-        case NodeType::IFF:
-            n.iff().accept(*this);
-            break;
-        case NodeType::INSTANCE:
-//                n.instance().accept(*this);
-            break;
-        case NodeType::LST:
-            n.lst().accept(*this);
-            break;
-        case NodeType::MEMBER:
-            n.member().accept(*this);
-            break;
-        case NodeType::NONE:
-            n.none().accept(*this);
-            break;
-        case NodeType::NUMBER:
-            n.number().accept(*this);
-            break;
-        case NodeType::RETRN:
-            n.retrn().accept(*this);
-            break;
-        case NodeType::STRNG:
-            n.strng().accept(*this);
-            break;
-        case NodeType::SUB:
-            n.sub().accept(*this);
-            break;
-        case NodeType::TERNARY:
-            n.ternary().accept(*this);
-            break;
-//        case NodeType::TYPE:
-//                n.type().accept(*this);
-//            break;
-        case NodeType::WHIL:
-            n.whil().accept(*this);
-            break;
-        case NodeType::UNINITIALIZED:
-            break;
-        default:
-            throw std::runtime_error("Dont know what to do here!");
     }
 }
 

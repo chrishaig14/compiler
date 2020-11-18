@@ -5,6 +5,9 @@
 #ifndef OBJECT_H
 #define OBJECT_H
 
+//#include "../utils.h"
+
+#include "../nodes/TypeNode.h"
 #include "../utils.h"
 
 enum class ValueType {
