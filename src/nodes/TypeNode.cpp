@@ -10,7 +10,7 @@ FunctionTypeNode::FunctionTypeNode(const VectorOfTypes& parameterTypes,
     this->kind = Kind::FUNCTION;
 }
 
-TypeNode* FunctionTypeNode::clone() const {
+FunctionTypeNode* FunctionTypeNode::clone() const {
     VectorOfTypes aux;
     for (auto p: this->parameter_types) {
         aux.emplace_back(p->clone());

@@ -120,7 +120,6 @@ void Checker::visit(IdNode& n) {
             symbol_info.is_function = true;
             symbol_info.type = this->function_table->get(n.identifier);
         } else {
-            std::cout << n << std::endl;
             throw ScopeError(n.identifier);
         }
     } else {
@@ -232,7 +231,7 @@ void Checker::visit(AssignmentNode& n) {
             std::cout << "p cant be none" << std::endl;
             this->scope->set_not_none(n.lvalue->id().identifier, true);
         } else {
-            if (linfo.type != (expression_type.type)) {
+            if (*linfo.type != *(expression_type.type)) {
                 auto foo = expression_type.type->object();
                 if (foo.identifier != "NoneType") {
                     throw AssignmentTypeError(*linfo.type, *expression_type.type);
@@ -244,7 +243,7 @@ void Checker::visit(AssignmentNode& n) {
             this->scope->set_not_none(n.lvalue->id().identifier, false);
         }
     } else {
-        if (linfo.type != expression_type.type) {
+        if (*linfo.type != *expression_type.type) {
             if (actual_type.identifier == "Option") {
                 // if type doesn't match exactly, we may be assigning to an Option[t]
                 if (actual_type.type_parameters[0] != expression_type.type) {
@@ -357,7 +356,7 @@ void Checker::visit(IfNode& n) {
 
     std::map<std::string, bool> not_null_vars;
 
-    if (condition_info.type != T_BOOL) {
+    if (*condition_info.type != *T_BOOL) {
         throw std::runtime_error("Expected a Boolean expression as a condition for if statement!, got " +
                                  condition_info.type->to_string());
     }
@@ -381,9 +380,9 @@ void Checker::visit(IfNode& n) {
         this->visit(*n.elifs[i].second);
         this->leave_scope();
     }
-    if (!n.selse->nodes.empty()) {
+    if (n.selse != nullptr && !n.selse->nodes.empty()) {
         this->enter_scope("else");
-//        n.selse->accept(*this)
+        n.selse->accept(*this);
         this->visit(*n.selse);
         this->leave_scope();
     }
@@ -418,8 +417,8 @@ void Checker::visit(BinopNode& n) {
         }
         symbol_info.type = TYPE("Boolean", {});
     } else {
-        auto left = (left_info.type)->object();
-        auto right = (right_info.type)->object();
+        auto& left = (left_info.type)->object();
+        auto& right = (right_info.type)->object();
         auto ltype = left.identifier;
         auto rtype = right.identifier;
         bool ok = false;
@@ -435,7 +434,7 @@ void Checker::visit(BinopNode& n) {
             }
         } else if (ltype == "List" && rtype == "List" && left == (right)) {
             if (n.op == OpType::ADD) {
-                symbol_info.type = &(left);
+                symbol_info.type = &left;
                 symbol_info.is_function = false;
                 ok = true;
             }
@@ -538,7 +537,9 @@ std::map<std::string, TypeNode*> make_replacements(TypeNode* a, TypeNode* b) {
     return replacements;
 }
 
-bool type_matches(TypeNode& a, TypeNode& b) {
+bool type_matches(TypeNode* aa, TypeNode* bb) {
+    auto& a = *aa;
+    auto& b = *bb;
     if (a.kind != Kind::OBJECT && b.kind == Kind::OBJECT) {
         return false;
     } else if (a.kind == Kind::FUNCTION && b.kind == Kind::FUNCTION) {
@@ -618,7 +619,7 @@ void Checker::match_arguments_to_generic_function(FunctionTypeNode& function_typ
         TypeNode& param_type = *function_type.parameter_types[i];
         ObjectTypeNode& otn = param_type.object();
         if (is_generic(param_type)) {
-            if (type_matches(param_type, *arg_types[i])) {
+            if (type_matches(&param_type, arg_types[i])) {
                 std::map<std::string, TypeNode*> param_generic_replacements = make_replacements(&param_type,
                                                                                                 arg_types[i]);
                 for (auto gtr: param_generic_replacements) {
@@ -894,8 +895,9 @@ bool Checker::can_assign_generic(TypeNode& from, TypeNode& to, std::vector<std::
     return to == (from);
 }
 
-TypeNode& make_type(TypeNode& original, std::map<std::string, TypeNode*> replacements) {
+TypeNode* make_type(TypeNode* o, std::map<std::string, TypeNode*> replacements) {
     VectorOfTypes new_type_params;
+    auto& original = *o;
     if (original.kind == Kind::OBJECT) {
         auto object_type = original.object();
         std::string type_identifier = object_type.identifier;
@@ -906,7 +908,7 @@ TypeNode& make_type(TypeNode& original, std::map<std::string, TypeNode*> replace
                     throw std::runtime_error(
                             "Trying to make a type for a template for exmaple struct Foo[T]{foo:T[Integer];}!");
                 }
-                return *r.second;
+                return r.second;
             }
         }
         // It's not the top level type
@@ -914,7 +916,7 @@ TypeNode& make_type(TypeNode& original, std::map<std::string, TypeNode*> replace
             TypeNode& new_tp = *make_type(tp, replacements);
             new_type_params.push_back(&new_tp);
         }
-        return *TYPE(type_identifier, new_type_params);
+        return TYPE(type_identifier, new_type_params);
     } else {
         FunctionTypeNode& ftn = original.function();
         VectorOfTypes new_param_types;
@@ -923,7 +925,7 @@ TypeNode& make_type(TypeNode& original, std::map<std::string, TypeNode*> replace
             new_param_types.push_back(&new_pt);
         }
         TypeNode& new_return_type = *make_type(ftn.return_type, replacements);
-        return *FUNCTION_TYPE(new_param_types, &new_return_type);
+        return FUNCTION_TYPE(new_param_types, &new_return_type);
 //        throw std::runtime_error("Making non object concrete type template!");
     }
 }
@@ -1078,7 +1080,7 @@ void Checker::visit(WhileNode& node) {
 //    node.condition->accept(*this)
     this->dispatch(node.condition);
     SymbolInfo condition = this->rv;
-    if (condition.type != T_BOOL) {
+    if (*condition.type != *T_BOOL) {
 //        throw std::runtime_error("At line " +
 //                                 std::to_string(node.condition->line + 1) + " column " +
 //                                 std::to_string(node.condition->column + 1) +

@@ -13,7 +13,7 @@
 #include "../nodes/ClassNode.h"
 
 class FunctionTable {
-    std::map<std::string, FunctionTypeNode> functions;
+    std::map<std::string, FunctionTypeNode*> functions;
 
 public:
 

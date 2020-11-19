@@ -11,6 +11,7 @@
 #include "Node.h"
 #include "Visitor.h"
 #include "../types.h"
+#include <iostream>
 
 enum class Kind {
     OBJECT, FUNCTION
@@ -91,9 +92,9 @@ public:
 
     TypeNode* clone() const override;
 
-    ObjectTypeNode& object() override{ return *this; }
+    ObjectTypeNode& object() override { return *this; }
 
-    const ObjectTypeNode& object() const override{ return *this; }
+    const ObjectTypeNode& object() const override { return *this; }
 
     std::string identifier;
     VectorOfTypes type_parameters;
@@ -139,10 +140,12 @@ public:
         return "fun (" + parameters + ") . " + ret;
     }
 
-    TypeNode* clone() const override;
-    FunctionTypeNode& function() override{ return *this; }
+    FunctionTypeNode* clone() const override;
 
-    const FunctionTypeNode& function() const override{ return *this; }
+    FunctionTypeNode& function() override { return *this; }
+
+    const FunctionTypeNode& function() const override { return *this; }
+
     VectorOfTypes parameter_types;
     TypeNode* return_type;
 };

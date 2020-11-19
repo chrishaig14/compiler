@@ -311,12 +311,12 @@ void GlobalProcessor::dispatch(Node* nod) {
 
 
 FunctionTypeNode* FunctionTable::get(std::string function_name) {
-    return &functions.find(function_name)->second.clone()->function();
+    return &functions.find(function_name)->second->clone()->function();
 }
 
 void FunctionTable::add(std::string function_name, FunctionTypeNode& function_type) {
     if (functions.count(function_name) == 0) {
-        functions.insert(std::make_pair(function_name, function_type));
+        functions.insert(std::make_pair(function_name, function_type.clone()));
     } else {
         throw std::runtime_error("Cant overload function " + function_name);
     }

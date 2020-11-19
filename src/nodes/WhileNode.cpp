@@ -13,7 +13,9 @@ WhileNode::WhileNode(Node *condition, BlockNode *body) : body(body), condition(c
 
 bool WhileNode::equal(const Node &x) const {
     auto &other = x.whil();
-    return *this->condition == *other.condition && *this->body == *other.body;
+    if (this->body == nullptr && other.body != nullptr || this->body != nullptr && other.body == nullptr) return false;
+
+    return *this->condition == *other.condition && (this->body == nullptr && other.body == nullptr || *this->body == *other.body);
 }
 
 WhileNode &WhileNode::whil() {

@@ -132,33 +132,24 @@ TEST(scanner_test, test_string_full) {
     std::string text = "123\n443\"hello\"";
     Scanner scanner(text);
     Token token;
-    do {
-        token = scanner.get_next();
-        std::cout << token.to_string() << std::endl;
-        std::cout << TOKEN_STRINGS[token.type] << std::endl;
-    } while (token.type != TokType::END);
+    token = scanner.get_next(); // 123
+    token = scanner.get_next(); // semicolon
+    token = scanner.get_next(); // 443
+    token = scanner.get_next(); // "hello"
     EXPECT_EQ(token, Token(TokType::STRING, "hello", 1, 3));
-}
-
-TEST(scanner_test, test_string_full_start_end) {
-    std::string text = "123\n443\"hello\"";
-    Scanner scanner(text);
-    Token token = scanner.get_next();
-    token = scanner.get_next();
-    token = scanner.get_next();
-    EXPECT_EQ(token, Token(TokType::STRING, "hello", 1, 3));
-    EXPECT_EQ(token.start, 7);
-    EXPECT_EQ(token.end, 13);
 }
 
 TEST(scanner_test, test_all_special) {
     for (auto i: TOKEN_SPECIAL) {
+        if (i.second == TokType::DOUBLE_SLASH) {
+            // skip comment
+            continue;
+        }
         std::string text = i.first;
         Scanner scanner(text);
         Token token = scanner.get_next();
-        EXPECT_EQ(cmp_token_value(token, Token(i.second, -1, -1)), true);
-        EXPECT_EQ(token.start, 0);
-        EXPECT_EQ(token.end, i.first.size() - 1);
+        EXPECT_EQ(token.type, i.second)
+                            << "is " << TOKEN_STRINGS[token.type] << " but expected " << TOKEN_STRINGS[i.second];
     }
 }
 
@@ -311,9 +302,13 @@ TEST(scanner_test, test_token_num_position_2) {
     std::string text = "123\n\n\n456";
     Scanner scanner(text);
     Token token = scanner.get_next();
-    EXPECT_EQ(token, Token(TokType::NUM, 123, 0, 0));
+    EXPECT_EQ(token.type, TokType::NUM);
+    EXPECT_EQ(token.num, 123);
     token = scanner.get_next();
-    EXPECT_EQ(token, Token(TokType::NUM, 456, 3, 0));
+    EXPECT_EQ(token.type, TokType::SEMICOLON);
+    token = scanner.get_next();
+    EXPECT_EQ(token.type, TokType::NUM);
+    EXPECT_EQ(token.num, 456);
 }
 
 TEST(scanner_test, test_token_num_position_3) {
@@ -321,6 +316,7 @@ TEST(scanner_test, test_token_num_position_3) {
     Scanner scanner(text);
     Token token = scanner.get_next();
     EXPECT_EQ(token, Token(TokType::NUM, 123, 0, 0));
+    token = scanner.get_next();
     token = scanner.get_next();
     EXPECT_EQ(token, Token(TokType::NUM, 456, 3, 0));
     token = scanner.get_next();
@@ -399,28 +395,9 @@ TEST(scanner_test, test_token_special_position_4) {
     EXPECT_EQ(token, Token(TokType::INC, 3, 2));
 }
 
-TEST(scanner_test, test_token_position_complex) {
-    std::string text = "struct Foo {\nvar x: String;\nfun foo(y: Integer) {\n}\n}";
-    Scanner scanner(text);
-    std::vector<Token> tokens = scanner.scan_all();
-    std::vector<Token> expected_tokens = {
-            t_CLASS(0, 0), t_ID("Foo", 0, 7), t_LCURLY(0, 11), t_VAR(1, 0),
-            t_ID("x", 1, 4), t_COLON(1, 5),
-            t_ID("String", 1, 7), t_SEMICOLON(1, 13), t_FUN(2, 0), t_ID("foo", 2, 4),
-            t_LPAREN(2, 7),
-            t_ID("y", 2, 8), t_COLON(2, 9), t_ID("Integer", 2, 11),
-            t_RPAREN(2, 18), t_LCURLY(2, 20),
-            t_RCURLY(3, 0), t_RCURLY(4, 0), t_END(4, 1)};
-    EXPECT_EQ(tokens.size(), expected_tokens.size());
-    for (int i = 0; i < tokens.size(); i++) {
-        Token token = tokens[i];
-        Token expected_token = expected_tokens[i];
-        EXPECT_EQ(token, expected_token);
-    }
-}
 
 TEST(scanner_test, test_unexpected_character_position) {
-    std::string text = "fo%o";
+    std::string text = "fo~o";
     Scanner scanner(text);
     try {
         scanner.scan_all();

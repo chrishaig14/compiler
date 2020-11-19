@@ -80,70 +80,56 @@ public:
                 return "BINOP";
             case BLOCK:
                 return "BLOCK";
-
-                break;
             case BOOLEAN:
                 return "BOOLEAN";
-                break;
             case BRK:
                 return "BRK";
-                break;
             case CALL:
                 return "CALL";
-                break;
             case CLSEXP:
                 return "CLSEXP";
-                break;
             case CLSFLD:
                 return "CLSFLD";
-                break;
             case CLS:
                 return "CLS";
-                break;
             case CNTINUE:
-                break;
+                return "CNTINUE";
             case DECL:
-                break;
+                return "DECL";
             case EMPTYLST:
-                break;
+                return "EMPTYLST";
             case FORLOOP:
-                break;
+                return "FORLOOP";
             case FUNC:
-                break;
+                return "FUNC";
             case ID:
                 return "ID";
-                break;
             case IFF:
-                break;
-            case INSTANCE:
-                break;
+                return "IFF";
             case LST:
-                break;
+                return "LST";
             case MEMBER:
-                break;
+                return "MEMBER";
             case NONE:
-                break;
+                return "NONE";
             case NUMBER:
                 return "NUMBER";
-                break;
             case RETRN:
-                break;
+                return "RETRN";
             case STRNG:
-                break;
-            case STRCT:
-                break;
+                return "STRNG";
             case SUB:
-                break;
+                return "SUB";
             case TERNARY:
-                break;
+                return "TERNARY";
             case OTYPE:
-                break;
+                return "OTYPE";
             case FTYPE:
-                break;
+                return "FTYPE";
             case WHIL:
-                break;
+                return "WHIL";
             case UNINITIALIZED:
-                break;
+                return "UNINITIALIZED";
         }
         return "UNKNOWN";
     }

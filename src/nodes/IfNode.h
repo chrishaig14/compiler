@@ -35,6 +35,9 @@ public:
 //        j["then"] = this->then->to_json();
         return j;
     }
+
+    IfNode& iff() override;
+    const IfNode& iff() const override;
 };
 
 

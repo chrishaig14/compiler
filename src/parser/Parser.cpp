@@ -49,7 +49,7 @@ BlockNode* Parser::parse_program() {
 
 ReturnNode* Parser::parse_return() {
     this->expect_token(TokType::RETURN);
-    Node* expression;
+    Node* expression = nullptr;
     if (!this->match(TokType::SEMICOLON)) {
         expression = this->parse_expression();
     }
@@ -67,7 +67,7 @@ IfNode* Parser::parse_if() {
         BlockNode* elif_body = this->parse_possibly_empty_block();
         elifs.push_back(std::make_pair(elif_condition, elif_body));
     }
-    BlockNode* _else;
+    BlockNode* _else = nullptr;
     if (this->match(TokType::ELSE)) {
         this->next();
         _else = this->parse_possibly_empty_block();
