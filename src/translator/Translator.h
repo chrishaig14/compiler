@@ -36,95 +36,95 @@
 #include "../instructions/EnterScope.h"
 #include "../instructions/LeaveScope.h"
 
-class Translator : public Visitor {
+class Translator {
 public:
 
     void dispatch(Node* nptr) {
         Node& n = *nptr;
         switch (n.ntype) {
             case NodeType::ASSIGN:
-                n.assign().accept(*this);
+                this->visit(n.assign());
                 break;
             case NodeType::BINOP:
-                n.binop().accept(*this);
+                this->visit(n.binop());
                 break;
             case NodeType::BLOCK:
-                n.block().accept(*this);
+                this->visit(n.block());
                 break;
             case NodeType::BOOLEAN:
-                n.boolean().accept(*this);
+                this->visit(n.boolean());
                 break;
             case NodeType::BRK:
-                n.brk().accept(*this);
+                this->visit(n.brk());
                 break;
             case NodeType::CALL:
-                n.call().accept(*this);
+                this->visit(n.call());
                 break;
             case NodeType::CLSEXP:
-                n.clsexp().accept(*this);
+                this->visit(n.clsexp());
                 break;
             case NodeType::CLSFLD:
-                n.clsfld().accept(*this);
+                this->visit(n.clsfld());
                 break;
             case NodeType::CLS:
-                n.cls().accept(*this);
+                this->visit(n.cls());
                 break;
             case NodeType::CNTINUE:
-                n.cntinue().accept(*this);
+                this->visit(n.cntinue());
                 break;
             case NodeType::DECL:
-                n.decl().accept(*this);
+                this->visit(n.decl());
                 break;
             case NodeType::EMPTYLST:
-                n.emptylst().accept(*this);
+                this->visit(n.emptylst());
                 break;
             case NodeType::FORLOOP:
-                n.forloop().accept(*this);
+                this->visit(n.forloop());
                 break;
             case NodeType::FUNC:
-                n.func().accept(*this);
+                this->visit(n.func());
                 break;
             case NodeType::ID:
-                n.id().accept(*this);
+                this->visit(n.id());
                 break;
             case NodeType::IFF:
-                n.iff().accept(*this);
+                this->visit(n.iff());
                 break;
             case NodeType::INSTANCE:
-//                n.instance().accept(*this);
+//                this->visit(n.instance());
                 break;
             case NodeType::LST:
-                n.lst().accept(*this);
+                this->visit(n.lst());
                 break;
             case NodeType::MEMBER:
-                n.member().accept(*this);
+                this->visit(n.member());
                 break;
             case NodeType::NONE:
-                n.none().accept(*this);
+                this->visit(n.none());
                 break;
             case NodeType::NUMBER:
-                n.number().accept(*this);
+                this->visit(n.number());
                 break;
             case NodeType::RETRN:
-                n.retrn().accept(*this);
+                this->visit(n.retrn());
                 break;
             case NodeType::STRNG:
-                n.strng().accept(*this);
+                this->visit(n.strng());
                 break;
             case NodeType::SUB:
-                n.sub().accept(*this);
+                this->visit(n.sub());
                 break;
             case NodeType::TERNARY:
-                n.ternary().accept(*this);
+                this->visit(n.ternary());
                 break;
             case NodeType::OTYPE:
-//                n.type().accept(*this);
+//                this->visit(n.type());
                 break;
             case NodeType::FTYPE:
-//                n.type().accept(*this);
+//                this->visit(n.type());
                 break;
             case NodeType::WHIL:
-                n.whil().accept(*this);
+                this->visit(n.whil());
                 break;
             case NodeType::UNINITIALIZED:
                 break;
@@ -133,33 +133,33 @@ public:
 
     int loop_counter;
 
-    void visit(AssignmentNode& node) override;
+    void visit(AssignmentNode& node);
 
-    void visit(BinopNode& node) override;
+    void visit(BinopNode& node);
 
-    void visit(BlockNode& node) override;
+    void visit(BlockNode& node);
 
-    void visit(CallNode& node) override;
+    void visit(CallNode& node);
 
-    void visit(DeclarationNode& node) override;
+    void visit(DeclarationNode& node);
 
-    void visit(FunctionNode& node) override;
+    void visit(FunctionNode& node);
 
-    void visit(IdNode& node) override;
+    void visit(IdNode& node);
 
-    void visit(IfNode& node) override;
+    void visit(IfNode& node);
 
-    void visit(ListNode& node) override;
+    void visit(ListNode& node);
 
-    void visit(MemberNode& node) override;
+    void visit(MemberNode& node);
 
-    void visit(NumberNode& node) override;
+    void visit(NumberNode& node);
 
-    void visit(ReturnNode& node) override;
+    void visit(ReturnNode& node);
 
-    void visit(StringNode& node) override;
+    void visit(StringNode& node);
 
-    void visit(SubscriptNode& node) override;
+    void visit(SubscriptNode& node);
 
     CodeLabel code;
     bool is_lvalue;
@@ -167,29 +167,29 @@ public:
 
     Translator();
 
-    void visit(ClassLiteralExpressionNode& node) override;
+    void visit(ClassLiteralExpressionNode& node);
 
-    void visit(ClassLiteralFieldNode& node) override;
+    void visit(ClassLiteralFieldNode& node);
 
-    void visit(ForNode& node) override;
+    void visit(ForNode& node);
 
-    void visit(WhileNode& node) override;
+    void visit(WhileNode& node);
 
-    void visit(BooleanNode& node) override;
+    void visit(BooleanNode& node);
 
-    void visit(BreakNode& node) override;
+    void visit(BreakNode& node);
 
-    void visit(TernaryNode& node) override;
+    void visit(TernaryNode& node);
 
-    void visit(NoneNode& node) override;
+    void visit(NoneNode& node);
 
-    void visit(EmptyListNode& node) override;
+    void visit(EmptyListNode& node);
 
-    void visit(ClassNode& node) override;
+    void visit(ClassNode& node);
 
-    void visit(InstanceNode& node) override;
+    void visit(InstanceNode& node);
 
-    void visit(ContinueNode& node) override;
+    void visit(ContinueNode& node);
 
     bool in_for_loop;
 };
