@@ -382,7 +382,6 @@ void Checker::visit(IfNode& n) {
     }
     if (n.selse != nullptr && !n.selse->nodes.empty()) {
         this->enter_scope("else");
-        n.selse->accept(*this);
         this->visit(*n.selse);
         this->leave_scope();
     }
