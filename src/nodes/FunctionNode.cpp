@@ -3,7 +3,6 @@
 //
 
 #include "FunctionNode.h"
-#include "../utils.h"
 
 bool FunctionNode::equal(const Node& x) const {
     auto& other = x.func();

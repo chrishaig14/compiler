@@ -3,7 +3,6 @@
 //
 
 #include "ClassLiteralExpressionNode.h"
-#include "../utils.h"
 
 
 ClassLiteralExpressionNode::ClassLiteralExpressionNode(ObjectTypeNode* type, const VectorOfNodes& init)

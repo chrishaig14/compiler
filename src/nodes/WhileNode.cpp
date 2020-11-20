@@ -3,7 +3,6 @@
 //
 
 #include "WhileNode.h"
-#include "../utils.h"
 
 WhileNode::WhileNode(Node* condition, BlockNode* body) : body(body), condition(condition) { this->ntype = WHIL; }
 

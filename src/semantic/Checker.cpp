@@ -1193,10 +1193,6 @@ void Checker::visit(ClassNode& node) {
     }
 }
 
-void Checker::visit(InstanceNode& node) {
-
-}
-
 void Checker::visit(ContinueNode& node) {
 
 }

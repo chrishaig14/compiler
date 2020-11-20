@@ -9,7 +9,7 @@
 #include <string>
 #include <vector>
 #include "Node.h"
-#include "Visitor.h"
+
 #include "TypeNode.h"
 #include "BlockNode.h"
 
@@ -20,8 +20,6 @@ public:
     VectorOfTypes parameter_types;
     BlockNode* body;
     TypeNode* return_type;
-    std::map<std::string, int> free_variables;
-
 
     FunctionNode(std::string identifier, std::vector<std::string> parameter_names,
                  VectorOfTypes parameter_types, TypeNode* return_type, BlockNode* body)

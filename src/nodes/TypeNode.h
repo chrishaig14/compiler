@@ -9,7 +9,7 @@
 #include <string>
 #include <vector>
 #include "Node.h"
-#include "Visitor.h"
+
 #include "../types.h"
 #include <iostream>
 
@@ -56,7 +56,7 @@ public:
 
     bool equal(const TypeNode& other) const override;
 
-    std::string to_string() const;
+    std::string to_string() const override;
 
     TypeNode* clone() const override;
 
@@ -75,15 +75,9 @@ class FunctionTypeNode : public TypeNode {
 public:
     FunctionTypeNode(const VectorOfTypes& parameterTypes, TypeNode& returnType);
 
-//    FunctionTypeNode* operator=(const FunctionTypeNode* other) = default;
-
-//    FunctionTypeNode*operator=(const FunctionTypeNode* other) {
-//        return FunctionTypeNode*other.parameter_types, other.return_type);
-//    }
-
     bool equal(const TypeNode& other) const override;
 
-    std::string to_string() const;
+    std::string to_string() const override;
 
     FunctionTypeNode* clone() const override;
 

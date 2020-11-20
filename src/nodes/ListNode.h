@@ -8,7 +8,7 @@
 
 #include <vector>
 #include "Node.h"
-#include "Visitor.h"
+
 #include "Node.h"
 #include "../types.h"
 

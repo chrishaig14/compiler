@@ -5,8 +5,6 @@
 #ifndef UTILS_H
 #define UTILS_H
 
-//#include "instructions/Instruction.h"
-//#include "nodes/nodes.h"
 #include <vector>
 #include <map>
 #include <algorithm>

@@ -128,8 +128,6 @@ public:
 
     void visit(ClassNode& node);
 
-    void visit(InstanceNode& node);
-
     TypeClassInfo* get_typeclass_for_function(std::string function_name) {
         for (auto typeclass: this->typeclasses) {
             if (typeclass.second->has_function(function_name)) {

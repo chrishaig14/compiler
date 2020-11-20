@@ -6,7 +6,6 @@
 #define BINOPINST_H
 
 
-#include "../utils.h"
 #include "Instruction.h"
 #include "InstructionVisitor.h"
 #include "InstructionVisitor.h"

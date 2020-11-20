@@ -7,7 +7,7 @@
 
 
 #include "Node.h"
-#include "Visitor.h"
+
 #include "Node.h"
 
 class AssignmentNode : public Node {

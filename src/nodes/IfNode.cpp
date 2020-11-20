@@ -3,7 +3,6 @@
 //
 
 #include "IfNode.h"
-#include "../utils.h"
 
 bool IfNode::equal(const Node& x) const {
     auto& other = x.iff();

@@ -7,7 +7,7 @@
 
 
 #include "Node.h"
-#include "Visitor.h"
+
 
 class BooleanNode : public Node {
 public:

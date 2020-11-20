@@ -6,7 +6,6 @@
 #define TRANSLATOR_H
 
 
-#include "../nodes/Visitor.h"
 #include "../nodes/nodes.h"
 #include "../instructions/Instruction.h"
 #include "../instructions/BinopInst.h"
@@ -183,8 +182,6 @@ public:
     void visit(EmptyListNode& node);
 
     void visit(ClassNode& node);
-
-    void visit(InstanceNode& node);
 
     void visit(ContinueNode& node);
 

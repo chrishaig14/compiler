@@ -453,10 +453,6 @@ void Translator::visit(ClassNode& node) {
     this->code = out;
 }
 
-void Translator::visit(InstanceNode& node) {
-
-}
-
 void Translator::visit(ContinueNode& node) {
     if (this->in_for_loop) {
         std::cout << "TRANSLATING A CONTINUE NOED" << std::endl;

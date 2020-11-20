@@ -7,7 +7,7 @@
 
 
 #include "Node.h"
-#include "Visitor.h"
+
 #include "TypeNode.h"
 #include "FunctionNode.h"
 class ClassNode : public Node {

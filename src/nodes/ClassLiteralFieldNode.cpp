@@ -3,7 +3,6 @@
 //
 
 #include "ClassLiteralFieldNode.h"
-#include "../utils.h"
 
 ClassLiteralFieldNode::ClassLiteralFieldNode(ObjectTypeNode* type, const std::map<std::string, Node*>& init)
         : type(type), init(init) {}

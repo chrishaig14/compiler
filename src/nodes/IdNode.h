@@ -8,7 +8,7 @@
 
 #include <string>
 #include "Node.h"
-#include "Visitor.h"
+
 #include "Node.h"
 
 class IdNode : public Node {

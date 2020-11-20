@@ -9,7 +9,6 @@ class BinopInst;
 
 class CallInst;
 
-
 class DeclareInst;
 
 class DefineStructInst;

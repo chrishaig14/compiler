@@ -9,7 +9,7 @@
 #include <string>
 #include "Node.h"
 #include "TypeNode.h"
-#include "Visitor.h"
+
 //#include "Node.h"
 #include "../utils.h"
 class DeclarationNode : public Node {

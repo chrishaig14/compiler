@@ -3,7 +3,6 @@
 //
 
 #include "ListNode.h"
-#include "../utils.h"
 
 ListNode::ListNode(VectorOfNodes elements) : elements(elements) {
     this->ntype = LST;

@@ -32,7 +32,5 @@ std::string op_to_string(OpType op) {
             return "CMP !=";
         case OpType::MOD:
             return "MOD";
-        default:
-            return "OP";
     }
 }

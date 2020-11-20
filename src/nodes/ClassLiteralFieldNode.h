@@ -7,7 +7,7 @@
 
 
 #include "Node.h"
-#include "Visitor.h"
+
 #include "TypeNode.h"
 
 class ClassLiteralFieldNode : public Node {

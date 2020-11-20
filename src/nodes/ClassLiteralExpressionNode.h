@@ -7,7 +7,7 @@
 
 
 #include "Node.h"
-#include "Visitor.h"
+
 #include "TypeNode.h"
 #include "Node.h"
 

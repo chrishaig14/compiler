@@ -8,8 +8,7 @@ add_library(scanner scanner/Scanner.cpp
         scanner/Token.cpp
         scanner/Token.h)
 
-add_library(nodes nodes/Visitor.cpp
-        nodes/Visitor.h
+add_library(nodes
         nodes/ReturnNode.cpp
         nodes/ReturnNode.h
         nodes/StringNode.cpp
