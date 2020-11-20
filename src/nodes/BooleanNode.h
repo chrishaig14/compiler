@@ -15,8 +15,6 @@ public:
 
     BooleanNode(bool value);
 
-    void accept(Visitor& visitor) override;
-
     bool operator!=(const BooleanNode& other) const;
 
     bool equal(const Node& x) const override;

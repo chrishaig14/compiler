@@ -18,7 +18,6 @@ public:
 
     ForNode(const std::string& var, Node* exp, BlockNode* body);
     ~ForNode();
-    void accept(Visitor& visitor) override;
     ForNode& forloop() override;
     const ForNode& forloop() const override;
 

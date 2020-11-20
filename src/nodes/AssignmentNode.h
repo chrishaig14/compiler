@@ -21,7 +21,6 @@ public:
 
     AssignmentNode(Node* lvalue, Node* rvalue);
 
-    void accept(Visitor& visitor) override;
     bool equal(const Node& x) const override;
 
 

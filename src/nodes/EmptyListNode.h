@@ -13,8 +13,6 @@ class EmptyListNode : public Node {
 public:
     EmptyListNode(TypeNode* type);
 
-    void accept(Visitor& visitor) override;
-
     bool equal(const Node& other) const override;
 
     ~EmptyListNode();

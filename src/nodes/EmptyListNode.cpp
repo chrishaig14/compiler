@@ -4,10 +4,6 @@
 
 #include "EmptyListNode.h"
 
-void EmptyListNode::accept(Visitor& visitor) {
-    visitor.visit(*this);
-}
-
 
 EmptyListNode::EmptyListNode(TypeNode* type) : type(type) { this->ntype = EMPTYLST; }
 

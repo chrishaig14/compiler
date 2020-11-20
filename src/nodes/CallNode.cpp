@@ -5,10 +5,6 @@
 #include "CallNode.h"
 #include "../utils.h"
 
-void CallNode::accept(Visitor& visitor) {
-    visitor.visit(*this);
-}
-
 CallNode::CallNode(Node* function, const VectorOfNodes& arguments) : function(function),
                                                                      arguments(arguments) {this->ntype = CALL;}
 

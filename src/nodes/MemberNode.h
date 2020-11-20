@@ -18,8 +18,6 @@ public:
 
     MemberNode(Node* parent, const std::string& child);
 
-    void accept(Visitor& visitor) override;
-
     bool equal(const Node& x) const override;
 
     ~MemberNode();

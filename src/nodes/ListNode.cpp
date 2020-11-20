@@ -5,11 +5,6 @@
 #include "ListNode.h"
 #include "../utils.h"
 
-void ListNode::accept(Visitor& visitor) {
-    visitor.visit(*this);
-
-}
-
 ListNode::ListNode(VectorOfNodes elements) : elements(elements) {
     this->ntype = LST;
 

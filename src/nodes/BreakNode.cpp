@@ -4,10 +4,6 @@
 
 #include "BreakNode.h"
 
-void BreakNode::accept(Visitor& visitor) {
-    visitor.visit(*this);
-}
-
 bool BreakNode::equal(const Node& other) const {
     return true;
 }

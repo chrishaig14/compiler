@@ -134,8 +134,6 @@ public:
         return "UNKNOWN";
     }
 
-    virtual void accept(Visitor& visitor) = 0;
-
     virtual ~Node() = default;
 
     virtual bool equal(const Node& other) const = 0;

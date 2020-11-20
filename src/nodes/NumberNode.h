@@ -16,7 +16,6 @@ public:
 
     NumberNode(int number);
 
-    void accept(Visitor& visitor) override;
     bool equal(const Node& x) const override;
 
 

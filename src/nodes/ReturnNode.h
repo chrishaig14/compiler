@@ -13,8 +13,6 @@ class ReturnNode : public Node {
 public:
     explicit ReturnNode(Node* expression);
 
-    void accept(Visitor& visitor) override;
-
     bool equal(const Node& other) const;
 
     ~ReturnNode() {

@@ -4,10 +4,6 @@
 
 #include "ClassNode.h"
 
-void ClassNode::accept(Visitor& visitor) {
-    visitor.visit(*this);
-}
-
 ClassNode::ClassNode(const std::string& className, std::vector<std::string> type_parameters,
                      std::map<std::string, TypeNode*> members,
                      std::map<std::string, FunctionNode*> functions)

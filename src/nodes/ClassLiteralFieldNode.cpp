@@ -5,10 +5,6 @@
 #include "ClassLiteralFieldNode.h"
 #include "../utils.h"
 
-void ClassLiteralFieldNode::accept(Visitor& visitor) {
-    visitor.visit(*this);
-}
-
 ClassLiteralFieldNode::ClassLiteralFieldNode(ObjectTypeNode* type, const std::map<std::string, Node*>& init)
         : type(type), init(init) {}
 

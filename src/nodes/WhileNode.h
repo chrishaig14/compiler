@@ -16,8 +16,6 @@ public:
 
     WhileNode(Node* condition, BlockNode* body);
 
-    void accept(Visitor& visitor) override;
-
     bool equal(const Node& other) const override ;
 
     WhileNode &whil() override;

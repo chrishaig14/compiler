@@ -22,8 +22,6 @@ public:
     std::vector<std::string> names;
     ObjectTypeNode* type;
 
-    void accept(Visitor& visitor) override;
-
     bool equal(const Node& x) const override;
 };
 

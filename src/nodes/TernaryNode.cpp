@@ -5,10 +5,6 @@
 #include "TernaryNode.h"
 #include "../utils.h"
 
-void TernaryNode::accept(Visitor& visitor) {
-    visitor.visit(*this);
-}
-
 bool TernaryNode::equal(const Node& x) const {
     auto& other = x.ternary();
     return *this->expression == *other.expression && *this->true_case == *other.true_case &&

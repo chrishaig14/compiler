@@ -32,8 +32,6 @@ public:
         return true;
     }
 
-    void accept(Visitor& visitor) override;
-
     json to_json() {
         json j;
         j["node"] = "block";

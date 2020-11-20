@@ -13,7 +13,6 @@
 
 class IdNode : public Node {
 public:
-    void accept(Visitor& visitor) override;
 
     std::string identifier;
 

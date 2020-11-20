@@ -4,11 +4,6 @@
 
 #include "ReturnNode.h"
 
-void ReturnNode::accept(Visitor& visitor) {
-    visitor.visit(*this);
-
-}
-
 ReturnNode::ReturnNode(Node* expression) : expression(expression) {this->ntype = RETRN;}
 
 bool ReturnNode::equal(const Node& x) const {

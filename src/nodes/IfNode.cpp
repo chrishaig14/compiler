@@ -5,10 +5,6 @@
 #include "IfNode.h"
 #include "../utils.h"
 
-void IfNode::accept(Visitor& visitor) {
-    visitor.visit(*this);
-}
-
 bool IfNode::equal(const Node& x) const {
     auto& other = x.iff();
     if (*this->condition != *other.condition) {

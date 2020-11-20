@@ -11,7 +11,6 @@
 
 class BreakNode : public Node {
 public:
-    void accept(Visitor& visitor) override;
 
     bool equal(const Node& other) const override ;
 

@@ -23,8 +23,6 @@ public:
     std::map<std::string, int> free_variables;
 
 
-    void accept(Visitor& visitor) override;
-
     FunctionNode(std::string identifier, std::vector<std::string> parameter_names,
                  VectorOfTypes parameter_types, TypeNode* return_type, BlockNode* body)
             : body(body), return_type(return_type) {

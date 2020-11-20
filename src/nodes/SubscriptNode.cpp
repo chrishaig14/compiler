@@ -4,11 +4,6 @@
 
 #include "SubscriptNode.h"
 
-void SubscriptNode::accept(Visitor& visitor) {
-    visitor.visit(*this);
-
-}
-
 SubscriptNode::SubscriptNode(Node* parent, VectorOfNodes child) : parent(parent), child(child) {this->ntype = SUB;}
 
 

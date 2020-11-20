@@ -4,10 +4,6 @@
 
 #include "AssignmentNode.h"
 
-void AssignmentNode::accept(Visitor& visitor) {
-    visitor.visit(*this);
-}
-
 AssignmentNode::AssignmentNode(Node* lvalue, Node* rvalue) : lvalue(lvalue), rvalue(rvalue) {this->ntype =ASSIGN;}
 
 bool AssignmentNode::equal(const Node& x) const {

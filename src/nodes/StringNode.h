@@ -15,8 +15,6 @@ class StringNode : public Node {
 public:
     std::string str;
 
-    void accept(Visitor& visitor) override;
-
     StringNode(std::string str);
     bool equal(const Node& x) const override;
 

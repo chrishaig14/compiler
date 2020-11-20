@@ -18,8 +18,6 @@ public:
 
     CallNode(Node* function, const VectorOfNodes& arguments);
 
-    void accept(Visitor& visitor) override;
-
     bool equal(const Node& other) const override ;
 
     ~CallNode() {

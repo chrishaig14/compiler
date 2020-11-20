@@ -4,10 +4,6 @@
 
 #include "NumberNode.h"
 
-void NumberNode::accept(Visitor& visitor) {
-    visitor.visit(*this);
-}
-
 NumberNode::NumberNode(int number) : num(number) {this->ntype =NUMBER;}
 
 bool NumberNode::equal(const Node& x) const {

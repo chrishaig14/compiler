@@ -4,10 +4,6 @@
 
 #include "IdNode.h"
 
-void IdNode::accept(Visitor& visitor) {
-    visitor.visit(*this);
-}
-
 IdNode::IdNode(std::string identifier) : identifier(identifier) { this->ntype = ID; }
 
 

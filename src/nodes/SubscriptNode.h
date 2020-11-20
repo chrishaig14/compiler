@@ -20,7 +20,6 @@ public:
     Node* parent;
     VectorOfNodes child;
 
-    void accept(Visitor& visitor) override;
     bool equal(const Node& other) const override;
 
     ~SubscriptNode() {

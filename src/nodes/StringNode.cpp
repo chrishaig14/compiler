@@ -4,11 +4,6 @@
 
 #include "StringNode.h"
 
-void StringNode::accept(Visitor& visitor) {
-    visitor.visit(*this);
-
-}
-
 StringNode::StringNode(std::string str) : str(str) { this->ntype = STRNG; }
 
 bool StringNode::equal(const Node& x) const {

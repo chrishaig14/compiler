@@ -4,10 +4,6 @@
 
 #include "ForNode.h"
 
-void ForNode::accept(Visitor& visitor) {
-    visitor.visit(*this);
-}
-
 ForNode::ForNode(const std::string& var, Node* exp, BlockNode* body) : var(var), exp(exp), body(body) {this->ntype = FORLOOP;}
 
 bool ForNode::equal(const Node& x) const {

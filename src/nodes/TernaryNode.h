@@ -17,8 +17,6 @@ public:
 
     TernaryNode(Node* expression, Node* trueCase, Node* falseCase);
 
-    void accept(Visitor& visitor) override;
-
     bool equal(const Node& other) const override;
 
     TernaryNode& ternary() override;

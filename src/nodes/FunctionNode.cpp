@@ -5,10 +5,6 @@
 #include "FunctionNode.h"
 #include "../utils.h"
 
-void FunctionNode::accept(Visitor& visitor) {
-    visitor.visit(*this);
-}
-
 bool FunctionNode::equal(const Node& x) const {
     auto& other = x.func();
 //    return false;

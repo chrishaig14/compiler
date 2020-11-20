@@ -21,8 +21,6 @@ public:
 
     IfNode(Node* condition, BlockNode* then, std::vector<std::pair<Node*, BlockNode*>> elifs, BlockNode* selse);
 
-    void accept(Visitor& visitor) override;
-
     bool equal(const Node& other) const override;
 
     ~IfNode();

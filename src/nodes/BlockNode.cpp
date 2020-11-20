@@ -4,10 +4,6 @@
 
 #include "BlockNode.h"
 
-void BlockNode::accept(Visitor& visitor) {
-    visitor.visit(*this);
-}
-
 BlockNode& BlockNode::block() {
     return *this;
 }

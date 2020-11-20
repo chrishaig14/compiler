@@ -5,10 +5,6 @@
 #include "WhileNode.h"
 #include "../utils.h"
 
-void WhileNode::accept(Visitor& visitor) {
-    visitor.visit(*this);
-}
-
 WhileNode::WhileNode(Node* condition, BlockNode* body) : body(body), condition(condition) { this->ntype = WHIL; }
 
 bool WhileNode::equal(const Node& x) const {

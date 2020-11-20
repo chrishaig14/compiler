@@ -5,10 +5,6 @@
 #include "ClassLiteralExpressionNode.h"
 #include "../utils.h"
 
-void ClassLiteralExpressionNode::accept(Visitor& visitor) {
-    visitor.visit(*this);
-}
-
 
 ClassLiteralExpressionNode::ClassLiteralExpressionNode(ObjectTypeNode* type, const VectorOfNodes& init)
         : type(type), init(init) {}

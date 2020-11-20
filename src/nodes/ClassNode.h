@@ -17,7 +17,6 @@ public:
         ClassNode(const std::string& className, std::vector<std::string> type_parameters,
               std::map<std::string, TypeNode*> members, std::map<std::string, FunctionNode*> functions);
 
-    void accept(Visitor& visitor) override;
     std::map<std::string, TypeNode*> members;
     std::vector<std::string> members_ordered;
     std::map<std::string, FunctionNode*> methods;

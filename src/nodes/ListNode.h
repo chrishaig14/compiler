@@ -16,8 +16,6 @@ class ListNode : public Node {
 public:
     VectorOfNodes elements;
 
-    void accept(Visitor& visitor) override;
-
     ListNode(VectorOfNodes elements);
 
     bool equal(const Node& other) const;

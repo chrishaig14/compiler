@@ -25,7 +25,6 @@ public:
 
     BinopNode(OpType op, Node* left, Node* right);
     bool equal(const Node& x) const override ;
-    void accept(Visitor& visitor) override;
 
 
     ~BinopNode() {

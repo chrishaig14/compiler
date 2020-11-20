@@ -22,8 +22,6 @@ public:
 
     ClassLiteralFieldNode(ObjectTypeNode* type, const std::map<std::string, Node*>& init);
 
-    void accept(Visitor& visitor) override;
-
 };
 
 
