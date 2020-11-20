@@ -90,9 +90,6 @@ public:
             case NodeType::IFF:
                 this->visit(n.iff());
                 break;
-            case NodeType::INSTANCE:
-//                this->visit(n.instance());
-                break;
             case NodeType::LST:
                 this->visit(n.lst());
                 break;

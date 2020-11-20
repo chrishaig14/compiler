@@ -11,8 +11,6 @@
 
 using json = nlohmann::json;
 
-class Visitor;
-
 class AssignmentNode;
 
 class BinopNode;
@@ -25,9 +23,9 @@ class BreakNode;
 
 class CallNode;
 
-class ClassLiteralFieldNode;
-
 class ClassLiteralExpressionNode;
+
+class ClassLiteralFieldNode;
 
 class ClassNode;
 
@@ -71,68 +69,7 @@ public:
     int line;
     int column;
 
-    std::string node_type_string(NodeType type) const {
-        switch (type) {
-
-            case ASSIGN:
-                return "ASSIGN";
-            case BINOP:
-                return "BINOP";
-            case BLOCK:
-                return "BLOCK";
-            case BOOLEAN:
-                return "BOOLEAN";
-            case BRK:
-                return "BRK";
-            case CALL:
-                return "CALL";
-            case CLSEXP:
-                return "CLSEXP";
-            case CLSFLD:
-                return "CLSFLD";
-            case CLS:
-                return "CLS";
-            case CNTINUE:
-                return "CNTINUE";
-            case DECL:
-                return "DECL";
-            case EMPTYLST:
-                return "EMPTYLST";
-            case FORLOOP:
-                return "FORLOOP";
-            case FUNC:
-                return "FUNC";
-            case ID:
-                return "ID";
-            case IFF:
-                return "IFF";
-            case LST:
-                return "LST";
-            case MEMBER:
-                return "MEMBER";
-            case NONE:
-                return "NONE";
-            case NUMBER:
-                return "NUMBER";
-            case RETRN:
-                return "RETRN";
-            case STRNG:
-                return "STRNG";
-            case SUB:
-                return "SUB";
-            case TERNARY:
-                return "TERNARY";
-            case OTYPE:
-                return "OTYPE";
-            case FTYPE:
-                return "FTYPE";
-            case WHIL:
-                return "WHIL";
-            case UNINITIALIZED:
-                return "UNINITIALIZED";
-        }
-        return "UNKNOWN";
-    }
+    std::string node_type_string(NodeType type) const;
 
     virtual ~Node() = default;
 
@@ -141,218 +78,62 @@ public:
     bool operator==(const Node& other) const;
     bool operator!=(const Node& other) const;
 
-    friend std::ostream& operator<<(std::ostream& os, const Node& node) {
-        return os << node.to_json();
-    }
+    friend std::ostream& operator<<(std::ostream& os, const Node& node);
 
-    virtual AssignmentNode& assign() {
-        throw std::runtime_error("Getting AssignmentNode but it's a " + this->node_type_string(this->ntype));
-    }
+    void throw_dereference_error(NodeType expected) const;
 
-    virtual BinopNode& binop() {
-        throw std::runtime_error("Getting BinopNode but it's a " + this->node_type_string(this->ntype));
-    }
+    virtual AssignmentNode& assign();
+    virtual BinopNode& binop();
+    virtual BlockNode& block();
+    virtual BooleanNode& boolean();
+    virtual BreakNode& brk();
+    virtual CallNode& call();
+    virtual ClassLiteralExpressionNode& clsexp();
+    virtual ClassLiteralFieldNode& clsfld();
+    virtual ClassNode& cls();
+    virtual ContinueNode& cntinue();
+    virtual DeclarationNode& decl();
+    virtual EmptyListNode& emptylst();
+    virtual ForNode& forloop();
+    virtual FunctionNode& func();
+    virtual IdNode& id();
+    virtual IfNode& iff();
+    virtual ListNode& lst();
+    virtual MemberNode& member();
+    virtual NoneNode& none();
+    virtual NumberNode& number();
+    virtual ReturnNode& retrn();
+    virtual StringNode& strng();
+    virtual SubscriptNode& sub();
+    virtual TernaryNode& ternary();
+    virtual WhileNode& whil();
+    virtual const AssignmentNode& assign() const;
+    virtual const BinopNode& binop() const;
+    virtual const BlockNode& block() const;
+    virtual const BooleanNode& boolean() const;
+    virtual const BreakNode& brk() const;
+    virtual const CallNode& call() const;
+    virtual const ClassLiteralExpressionNode& clsexp() const;
+    virtual const ClassLiteralFieldNode& clsfld() const;
+    virtual const ClassNode& cls() const;
+    virtual const ContinueNode& cntinue() const;
+    virtual const DeclarationNode& decl() const;
+    virtual const EmptyListNode& emptylst() const;
+    virtual const ForNode& forloop() const;
+    virtual const FunctionNode& func() const;
+    virtual const IdNode& id() const;
+    virtual const IfNode& iff() const;
+    virtual const ListNode& lst() const;
+    virtual const MemberNode& member() const;
+    virtual const NoneNode& none() const;
+    virtual const NumberNode& number() const;
+    virtual const ReturnNode& retrn() const;
+    virtual const StringNode& strng() const;
+    virtual const SubscriptNode& sub() const;
+    virtual const TernaryNode& ternary() const;
+    virtual const WhileNode& whil() const;
 
-    virtual BlockNode& block() {
-        throw std::runtime_error("Getting BlockNode but it's a " + this->node_type_string(this->ntype));
-    }
-
-    virtual BooleanNode& boolean() {
-        throw std::runtime_error("Getting BooleanNode but it's a " + this->node_type_string(this->ntype));
-    }
-
-    virtual BreakNode& brk() {
-        throw std::runtime_error("Getting BreakNode but it's a " + this->node_type_string(this->ntype));
-    }
-
-    virtual CallNode& call() {
-        throw std::runtime_error("Getting CallNode but it's a " + this->node_type_string(this->ntype));
-    }
-
-    virtual ClassLiteralFieldNode& clsfld() {
-        throw std::runtime_error("Getting ClassLiteralFieldNode but it's a " + this->node_type_string(this->ntype));
-    }
-
-    virtual ClassLiteralExpressionNode& clsexp() {
-        throw std::runtime_error(
-                "Getting ClassLiteralExpressionNode but it's a " + this->node_type_string(this->ntype));
-    }
-
-    virtual ClassNode& cls() {
-        throw std::runtime_error("Getting ClassNode but it's a " + this->node_type_string(this->ntype));
-    }
-
-    virtual ContinueNode& cntinue() {
-        throw std::runtime_error("Getting ContinueNode but it's a " + this->node_type_string(this->ntype));
-    }
-
-    virtual DeclarationNode& decl() {
-        throw std::runtime_error("Getting DeclarationNode but it's a " + this->node_type_string(this->ntype));
-    }
-
-    virtual EmptyListNode& emptylst() {
-        throw std::runtime_error("Getting EmptyListNode but it's a " + this->node_type_string(this->ntype));
-    }
-
-    virtual ForNode& forloop() {
-        throw std::runtime_error("Getting ForNode but it's a " + this->node_type_string(this->ntype));
-    }
-
-    virtual FunctionNode& func() {
-        throw std::runtime_error("Getting FunctionNode but it's a " + this->node_type_string(this->ntype));
-    }
-
-    virtual IdNode& id() {
-        throw std::runtime_error("Getting IdNode but it's a " + this->node_type_string(this->ntype));
-    }
-
-    virtual IfNode& iff() {
-        throw std::runtime_error("Getting IfNode but it's a " + this->node_type_string(this->ntype));
-    }
-
-    virtual ListNode& lst() {
-        throw std::runtime_error("Getting ListNode but it's a " + this->node_type_string(this->ntype));
-    }
-
-    virtual MemberNode& member() {
-        throw std::runtime_error("Getting MemberNode but it's a " + this->node_type_string(this->ntype));
-    }
-
-    virtual NoneNode& none() {
-        throw std::runtime_error("Getting NoneNode but it's a " + this->node_type_string(this->ntype));
-    }
-
-    virtual NumberNode& number() {
-        throw std::runtime_error("Getting NumberNode but it's a " + this->node_type_string(this->ntype));
-    }
-
-    virtual ReturnNode& retrn() {
-        throw std::runtime_error("Getting ReturnNode but it's a " + this->node_type_string(this->ntype));
-    }
-
-    virtual StringNode& strng() {
-        throw std::runtime_error("Getting StringNode but it's a " + this->node_type_string(this->ntype));
-    }
-
-    virtual SubscriptNode& sub() {
-        throw std::runtime_error("Getting SubscriptNode but it's a " + this->node_type_string(this->ntype));
-    }
-
-    virtual TernaryNode& ternary() {
-        throw std::runtime_error("Getting TernaryNode but it's a " + this->node_type_string(this->ntype));
-    }
-
-    virtual WhileNode& whil() {
-        throw std::runtime_error("Getting WhileNode but it's a " + this->node_type_string(this->ntype));
-    }
-
-    virtual const AssignmentNode& assign() const {
-        throw std::runtime_error("Getting AssignmentNode but it's a " + this->node_type_string(this->ntype));
-    }
-
-    virtual const BinopNode& binop() const {
-        throw std::runtime_error("Getting BinopNode but it's a " + this->node_type_string(this->ntype));
-    }
-
-    virtual const BlockNode& block() const {
-        throw std::runtime_error("Getting BlockNode but it's a " + this->node_type_string(this->ntype));
-    }
-
-    virtual const BooleanNode& boolean() const {
-        throw std::runtime_error("Getting BooleanNode but it's a " + this->node_type_string(this->ntype));
-    }
-
-    virtual const BreakNode& brk() const {
-        throw std::runtime_error("Getting BreakNode but it's a " + this->node_type_string(this->ntype));
-    }
-
-    virtual const CallNode& call() const {
-        throw std::runtime_error("Getting CallNode but it's a " + this->node_type_string(this->ntype));
-    }
-
-    virtual const ClassLiteralFieldNode& clsfld() const {
-        throw std::runtime_error("Getting ClassLiteralFieldNode but it's a " + this->node_type_string(this->ntype));
-    }
-
-    virtual const ClassLiteralExpressionNode& clsexp() const {
-        throw std::runtime_error(
-                "Getting ClassLiteralExpressionNode but it's a " + this->node_type_string(this->ntype));
-    }
-
-    virtual const ClassNode& cls() const {
-        throw std::runtime_error("Getting ClassNode but it's a " + this->node_type_string(this->ntype));
-    }
-
-    virtual const ContinueNode& cntinue() const {
-        throw std::runtime_error("Getting ContinueNode but it's a " + this->node_type_string(this->ntype));
-    }
-
-    virtual const DeclarationNode& decl() const {
-        throw std::runtime_error("Getting DeclarationNode but it's a " + this->node_type_string(this->ntype));
-    }
-
-    virtual const EmptyListNode& emptylst() const {
-        throw std::runtime_error("Getting EmptyListNode but it's a " + this->node_type_string(this->ntype));
-    }
-
-    virtual const ForNode& forloop() const {
-        throw std::runtime_error("Getting ForNode but it's a " + this->node_type_string(this->ntype));
-    }
-
-    virtual const FunctionNode& func() const {
-        throw std::runtime_error("Getting FunctionNode but it's a " + this->node_type_string(this->ntype));
-    }
-
-    virtual const IdNode& id() const {
-        throw std::runtime_error("Getting IdNode but it's a " + this->node_type_string(this->ntype));
-    }
-
-    virtual const IfNode& iff() const {
-        throw std::runtime_error("Getting IfNode but it's a " + this->node_type_string(this->ntype));
-    }
-
-    virtual const ListNode& lst() const {
-        throw std::runtime_error("Getting ListNode but it's a " + this->node_type_string(this->ntype));
-    }
-
-    virtual const MemberNode& member() const {
-        throw std::runtime_error("Getting MemberNode but it's a " + this->node_type_string(this->ntype));
-    }
-
-    virtual const NoneNode& none() const {
-        throw std::runtime_error("Getting NoneNode but it's a " + this->node_type_string(this->ntype));
-    }
-
-    virtual const NumberNode& number() const {
-        throw std::runtime_error("Getting NumberNode but it's a " + this->node_type_string(this->ntype));
-    }
-
-    virtual const ReturnNode& retrn() const {
-        throw std::runtime_error("Getting ReturnNode but it's a " + this->node_type_string(this->ntype));
-    }
-
-    virtual const StringNode& strng() const {
-        throw std::runtime_error("Getting StringNode but it's a " + this->node_type_string(this->ntype));
-    }
-
-    virtual const SubscriptNode& sub() const {
-        throw std::runtime_error("Getting SubscriptNode but it's a " + this->node_type_string(this->ntype));
-    }
-
-    virtual const TernaryNode& ternary() const {
-        throw std::runtime_error("Getting TernaryNode but it's a " + this->node_type_string(this->ntype));
-    }
-
-    virtual const WhileNode& whil() const {
-        throw std::runtime_error("Getting WhileNode but it's a " + this->node_type_string(this->ntype));
-    }
-
-
-    virtual json to_json() const {
-        json j;
-        j["name"] = "johnny";
-        return j;
-    }
+    virtual json to_json() const;
 };
 
 #endif //NODE_H

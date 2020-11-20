@@ -1252,9 +1252,6 @@ void Checker::dispatch(Node* nod) {
         case NodeType::IFF:
             this->visit(n.iff());
             break;
-        case NodeType::INSTANCE:
-//                n.instance().accept(*this);
-            break;
         case NodeType::LST:
             this->visit(n.lst());
             break;
