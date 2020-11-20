@@ -137,9 +137,10 @@ GlobalProcessor::GlobalProcessor(std::vector<Builtin>& builtins) {
     auto function_from_t_to_u = FUNCTION_TYPE({ TYPE("t", {}) }, *new ObjectTypeNode("b", {}));
     builtins.push_back(
             {"List.map",
-             CodeBuiltin{new FunctionTypeNode({function_from_t_to_u}, *T_LIST(new ObjectTypeNode("b", {}))), list_map}});
+             CodeBuiltin{new FunctionTypeNode({function_from_t_to_u}, *T_LIST(new ObjectTypeNode("b", {}))),
+                         list_map}});
     builtins.push_back({"String.len", CodeBuiltin{new FunctionTypeNode({T_STRING}, *T_INT), string_len}});
-    builtins.push_back({"print", CodeBuiltin{new FunctionTypeNode({T_STRING},*none), print}});
+    builtins.push_back({"print", CodeBuiltin{new FunctionTypeNode({T_STRING}, *none), print}});
     VectorOfTypes a1 = {T_LIST(T_STRING), T_STRING};
     builtins.push_back(
             {"join", CodeBuiltin{new FunctionTypeNode(a1, *T_STRING), join}});
@@ -155,54 +156,6 @@ GlobalProcessor::GlobalProcessor() {
 
     this->globals = new SymbolTable("global", nullptr);
     this->class_table = new ClassTable();
-}
-
-void GlobalProcessor::visit(AssignmentNode& node) {
-
-}
-
-void GlobalProcessor::visit(BinopNode& node) {
-
-}
-
-void GlobalProcessor::visit(CallNode& node) {
-
-}
-
-void GlobalProcessor::visit(DeclarationNode& node) {
-
-}
-
-void GlobalProcessor::visit(IdNode& node) {
-
-}
-
-void GlobalProcessor::visit(IfNode& node) {
-
-}
-
-void GlobalProcessor::visit(ListNode& node) {
-
-}
-
-void GlobalProcessor::visit(MemberNode& node) {
-
-}
-
-void GlobalProcessor::visit(NumberNode& node) {
-
-}
-
-void GlobalProcessor::visit(ReturnNode& node) {
-
-}
-
-void GlobalProcessor::visit(StringNode& node) {
-
-}
-
-void GlobalProcessor::visit(SubscriptNode& node) {
-
 }
 
 void GlobalProcessor::visit(FunctionNode& node) {
@@ -221,42 +174,6 @@ void GlobalProcessor::visit(BlockNode& node) {
     for (auto n: node.nodes) {
         this->dispatch(n);
     }
-}
-
-void GlobalProcessor::visit(ClassLiteralExpressionNode& node) {
-
-}
-
-void GlobalProcessor::visit(ClassLiteralFieldNode& node) {
-
-}
-
-void GlobalProcessor::visit(ForNode& node) {
-
-}
-
-void GlobalProcessor::visit(BooleanNode& node) {
-
-}
-
-void GlobalProcessor::visit(WhileNode& node) {
-
-}
-
-void GlobalProcessor::visit(BreakNode& node) {
-
-}
-
-void GlobalProcessor::visit(TernaryNode& node) {
-
-}
-
-void GlobalProcessor::visit(NoneNode& node) {
-
-}
-
-void GlobalProcessor::visit(EmptyListNode& node) {
-
 }
 
 void GlobalProcessor::visit(ClassNode& node) {
@@ -278,22 +195,14 @@ void GlobalProcessor::visit(ClassNode& node) {
     this->class_table->set(node.class_name, class_info);
 }
 
-void GlobalProcessor::visit(InstanceNode& node) {
-
-}
-
-void GlobalProcessor::visit(ContinueNode& node) {
-
-}
-
 void GlobalProcessor::dispatch(Node* nod) {
     auto& n = *nod;
     switch (n.ntype) {
         case NodeType::CLS:
-            n.cls().accept(*this);
+            this->visit(n.cls());
             break;
         case NodeType::FUNC:
-            n.func().accept(*this);
+            this->visit(n.func());
             break;
     }
 }

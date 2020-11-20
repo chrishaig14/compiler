@@ -27,7 +27,7 @@ public:
 
 typedef std::pair<std::string, CodeBuiltin> Builtin;
 
-class GlobalProcessor : public Visitor {
+class GlobalProcessor {
 public:
     SymbolTable* globals;
     ClassTable* class_table;
@@ -39,60 +39,60 @@ public:
 
     void add_builtins(std::vector<Builtin>& builtins);
 
-    void visit(AssignmentNode& node) override;
+    void visit(AssignmentNode& node);
 
-    void visit(BinopNode& node) override;
+    void visit(BinopNode& node);
 
-    void visit(CallNode& node) override;
+    void visit(CallNode& node);
 
-    void visit(DeclarationNode& node) override;
+    void visit(DeclarationNode& node);
 
-    void visit(FunctionNode& node) override;
+    void visit(FunctionNode& node);
 
-    void visit(IdNode& node) override;
+    void visit(IdNode& node);
 
-    void visit(IfNode& node) override;
+    void visit(IfNode& node);
 
-    void visit(ListNode& node) override;
+    void visit(ListNode& node);
 
-    void visit(MemberNode& node) override;
+    void visit(MemberNode& node);
 
-    void visit(NumberNode& node) override;
+    void visit(NumberNode& node);
 
-    void visit(ReturnNode& node) override;
+    void visit(ReturnNode& node);
 
     void dispatch(Node* nod);
-    void visit(StringNode& node) override;
+    void visit(StringNode& node);
 
-    void visit(SubscriptNode& node) override;
+    void visit(SubscriptNode& node);
 
     void visit(VectorOfNodes program);
 
-    void visit(BlockNode& node) override;
+    void visit(BlockNode& node);
 
-    void visit(ClassLiteralExpressionNode& node) override;
+    void visit(ClassLiteralExpressionNode& node);
 
-    void visit(ClassLiteralFieldNode& node) override;
+    void visit(ClassLiteralFieldNode& node);
 
-    void visit(ForNode& node) override;
+    void visit(ForNode& node);
 
-    void visit(BooleanNode& node) override;
+    void visit(BooleanNode& node);
 
-    void visit(WhileNode& node) override;
+    void visit(WhileNode& node);
 
-    void visit(BreakNode& node) override;
+    void visit(BreakNode& node);
 
-    void visit(TernaryNode& node) override;
+    void visit(TernaryNode& node);
 
-    void visit(NoneNode& node) override;
+    void visit(NoneNode& node);
 
-    void visit(EmptyListNode& node) override;
+    void visit(EmptyListNode& node);
 
-    void visit(ClassNode& node) override;
+    void visit(ClassNode& node);
 
-    void visit(InstanceNode& node) override;
+    void visit(InstanceNode& node);
 
-    void visit(ContinueNode& node) override;
+    void visit(ContinueNode& node);
 };
 
 #endif //GLOBALPROCESSOR_H
