@@ -24,8 +24,8 @@ public:
     bool equal(const Node& other) const override ;
 
     ~DeclarationNode() {
-//        if (this->type != nullptr) delete this->type;
-//        if (this->expression != nullptr) delete this->expression;
+        if (this->type != nullptr) delete this->type;
+        if (this->expression != nullptr) delete this->expression;
     }
 
     json to_json() const override {

@@ -23,18 +23,11 @@ public:
 
     void accept(Visitor& visitor) override;
 
-    bool equal(const Node& other) const override ;
+    bool equal(const Node& other) const override;
 
-    ~IfNode() {
-    }
+    ~IfNode();
 
-    json to_json() const override {
-        json j;
-        j["node"] = "if";
-//        j["condition"] = this->condition->to_json();
-//        j["then"] = this->then->to_json();
-        return j;
-    }
+    json to_json() const override;
 
     IfNode& iff() override;
     const IfNode& iff() const override;

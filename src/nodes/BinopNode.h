@@ -29,8 +29,8 @@ public:
 
 
     ~BinopNode() {
-//        delete this->left;
-//        delete this->right;
+        delete this->left;
+        delete this->right;
     }
 
     json to_json() const override {

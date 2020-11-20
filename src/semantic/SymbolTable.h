@@ -33,9 +33,9 @@ public:
         }
     }
 
-    TypeNode* get(std::string name) {
+    const TypeNode& get(std::string name) {
         if (this->table.count(name) == 1) {
-            return this->table[name]->clone();
+            return *this->table[name];
         } else {
             if (this->parent != nullptr) {
                 return this->parent->get(name);

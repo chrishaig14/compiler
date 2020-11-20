@@ -23,9 +23,9 @@ public:
     bool equal(const Node& other) const override ;
 
     ~CallNode() {
-//        delete this->function;
+        delete this->function;
         for (auto a: this->arguments) {
-//            delete a;
+            delete a;
         }
     }
 

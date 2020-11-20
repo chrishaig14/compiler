@@ -21,11 +21,13 @@ public:
     VectorOfNodes child;
 
     void accept(Visitor& visitor) override;
-    bool equal(const Node& other) const override ;
+    bool equal(const Node& other) const override;
 
     ~SubscriptNode() {
-//        delete this->parent;
-//        delete this->child;
+        delete this->parent;
+        for (auto c: this->child) {
+            delete c;
+        }
     }
 
     json to_json() const

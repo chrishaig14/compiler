@@ -17,8 +17,8 @@
 #include "../nodes/nodes.h"
 
 class SymbolInfo {
+    const TypeNode* _type;
 public:
-    TypeNode* type;
     bool is_function;
     bool is_method;
     ClassInfo* class_info;
@@ -30,6 +30,17 @@ public:
         this->class_info = nullptr;
         this->is_class_method = false;
     }
+
+    void set_type(const TypeNode& typ) {
+        this->_type = typ.clone();
+    }
+
+    const TypeNode& type() {
+        if (_type == nullptr) {
+            throw std::runtime_error("SymbolInfo has no TypeNode");
+        }
+        return *this->_type;
+    }
 };
 
 bool type_matches(TypeNode* a, TypeNode* b);
@@ -38,7 +49,7 @@ bool is_generic(const TypeNode& t);
 
 std::map<std::string, TypeNode*> make_replacements(TypeNode* a, TypeNode* b);
 
-TypeNode* make_type(TypeNode* original, std::map<std::string, TypeNode*> replacements);
+TypeNode* make_type(const TypeNode* o, std::map<std::string, TypeNode*> replacements);
 
 class Checker : public Visitor {
     SymbolTable* scope;
@@ -102,7 +113,7 @@ public:
     void visit(NoneNode& node) override;
 
 
-    bool can_assign(TypeNode& from, TypeNode& to);
+    bool can_assign(const TypeNode& from, const TypeNode& to);
 
     void visit(EmptyListNode& node) override;
 
@@ -113,7 +124,7 @@ public:
     bool can_assign_generic(TypeNode& from, TypeNode& to, std::vector<std::string> type_params);
 
 
-    ClassInfo* instantiate_generic(ClassInfo* generic, ObjectTypeNode& instance);
+    ClassInfo* instantiate_generic(ClassInfo* generic, const ObjectTypeNode& instance);
 
     FunctionTable* function_table;
 
@@ -131,7 +142,7 @@ public:
     }
 
     bool replace_me;
-    void match_arguments_to_generic_function(FunctionTypeNode& function_type, VectorOfTypes arg_types);
+    void match_arguments_to_generic_function(const FunctionTypeNode& function_type, VectorOfTypes arg_types);
 
 
     void visit(ContinueNode& node) override;

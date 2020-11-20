@@ -23,3 +23,8 @@ const ForNode& ForNode::forloop() const {
     return *this;
 }
 
+ForNode::~ForNode() {
+    delete this->exp;
+    delete this->body;
+}
+

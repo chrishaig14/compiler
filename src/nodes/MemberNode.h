@@ -20,22 +20,11 @@ public:
 
     void accept(Visitor& visitor) override;
 
-    bool equal(const Node& x) const override {
-        auto& other = x.member();
-        return *this->parent == *other.parent && this->child == other.child;
-    }
+    bool equal(const Node& x) const override;
 
-    ~MemberNode() {
-//        delete this->parent;
-    }
+    ~MemberNode();
 
-    json to_json() const override {
-        json j;
-        j["node"] = "member";
-//        j["parent"] = this->parent->to_json();
-        j["child"] = this->child;
-        return j;
-    }
+    json to_json() const override;
 
     MemberNode& member() override;
     const MemberNode& member() const override;

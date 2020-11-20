@@ -22,21 +22,9 @@ public:
 
     bool equal(const Node& other) const;
 
-    ~ListNode() {
-//        for (auto e: this->elements) {
-//            delete e;
-//        }
-    }
+    ~ListNode();
 
-    json to_json() const override {
-        json j;
-        j["node"] = "list";
-        j["elements"] = {};
-//        for (auto e: this->elements) {
-//            j["elements"].push_back(e->to_json());
-//        }
-        return j;
-    }
+    json to_json() const override;
 
     ListNode& lst() override;
     const ListNode& lst() const override;

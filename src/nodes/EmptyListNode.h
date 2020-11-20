@@ -15,10 +15,9 @@ public:
 
     void accept(Visitor& visitor) override;
 
-    bool equal(const Node& other) const override {
-        return *other.emptylst().type == *this->type;
-    }
+    bool equal(const Node& other) const override;
 
+    ~EmptyListNode();
     EmptyListNode& emptylst() override;
     const EmptyListNode& emptylst() const override;
 

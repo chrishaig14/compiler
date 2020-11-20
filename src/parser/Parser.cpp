@@ -576,11 +576,13 @@ FunctionNode* Parser::parse_function_definition() {
         this->expect_token(TokType::RPAREN);
     }
     // Parse return
-    TypeNode* return_type(new ObjectTypeNode(".None", {}));
+    TypeNode* return_type = nullptr;
     if (this->match(TokType::RARROW)) {
         // function with return value
         this->expect_token(TokType::RARROW);
         return_type = this->parse_type_node();
+    } else {
+        return_type = new ObjectTypeNode(".None", {});
     }
     // Parse function body
     BlockNode* body = this->parse_possibly_empty_block();

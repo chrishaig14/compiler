@@ -50,3 +50,23 @@ const IfNode& IfNode::iff() const {
     return *this;
 }
 
+IfNode::~IfNode() {
+    delete this->condition;
+    delete this->then;
+    if (this->selse != nullptr) {
+        delete this->selse;
+    }
+    for (auto p: this->elifs) {
+        delete p.first;
+        delete p.second;
+    }
+}
+
+json IfNode::to_json() const {
+    json j;
+    j["node"] = "if";
+//        j["condition"] = this->condition->to_json();
+//        j["then"] = this->then->to_json();
+    return j;
+}
+

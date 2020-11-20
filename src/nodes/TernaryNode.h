@@ -19,11 +19,13 @@ public:
 
     void accept(Visitor& visitor) override;
 
-    bool equal(const Node& other) const override ;
+    bool equal(const Node& other) const override;
 
-    TernaryNode &ternary() override;
+    TernaryNode& ternary() override;
 
-    const TernaryNode &ternary() const override;
+    ~TernaryNode();
+
+    const TernaryNode& ternary() const override;
 
 };
 

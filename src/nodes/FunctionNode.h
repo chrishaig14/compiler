@@ -38,11 +38,11 @@ public:
     bool equal(const Node& x) const override ;
 
     ~FunctionNode() {
-//        for (auto pt: this->parameter_types) {
-//            delete pt;
-//        }
-//        delete this->body;
-//        delete this->return_type;
+        for (auto pt: this->parameter_types) {
+            delete pt;
+        }
+        delete this->body;
+        delete this->return_type;
     }
 
     json to_json() const override {

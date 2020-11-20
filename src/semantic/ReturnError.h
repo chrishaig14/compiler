@@ -18,7 +18,7 @@ public:
         return t;
     }
 
-    ReturnError(TypeNode& expected_type, TypeNode& actual_type) : runtime_error(
+    ReturnError(const TypeNode& expected_type, const TypeNode& actual_type) : runtime_error(
             "Expected to return " + expected_type.to_string() + ", actual: " +
                     ((actual_type.kind == Kind::OBJECT && actual_type.object().identifier == ".None") ? "NULL"
                                                                                            : actual_type.to_string())

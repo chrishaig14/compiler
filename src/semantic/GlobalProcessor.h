@@ -21,7 +21,7 @@ public:
 
     bool has_function(std::string name);
 
-    FunctionTypeNode* get(std::string function_name);
+    const FunctionTypeNode& get(std::string function_name);
 
 };
 

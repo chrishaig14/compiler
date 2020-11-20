@@ -310,8 +310,8 @@ void GlobalProcessor::dispatch(Node* nod) {
 }
 
 
-FunctionTypeNode* FunctionTable::get(std::string function_name) {
-    return &functions.find(function_name)->second->clone()->function();
+const FunctionTypeNode& FunctionTable::get(std::string function_name) {
+    return *functions.find(function_name)->second;
 }
 
 void FunctionTable::add(std::string function_name, FunctionTypeNode& function_type) {

@@ -46,6 +46,11 @@ public:
 
     BlockNode& block() override;
     const BlockNode& block() const override;
+    ~BlockNode(){
+        for(auto p: this->nodes){
+            delete p;
+        }
+    }
 };
 
 

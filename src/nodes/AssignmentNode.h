@@ -25,7 +25,7 @@ public:
     bool equal(const Node& x) const override;
 
 
-    virtual ~AssignmentNode();
+    ~AssignmentNode();
 
     json to_json() const override {
         json j;

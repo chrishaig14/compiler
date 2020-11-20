@@ -29,3 +29,9 @@ TernaryNode &TernaryNode::ternary() {
 const TernaryNode &TernaryNode::ternary() const {
     return *this;
 }
+
+TernaryNode::~TernaryNode() {
+    delete expression;
+    delete true_case;
+    delete false_case;
+}

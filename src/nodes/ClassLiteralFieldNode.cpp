@@ -16,3 +16,10 @@ bool ClassLiteralFieldNode::equal(const Node& x) const {
     auto& other = x.clsfld();
     return this->type == other.type && this->init == other.init;
 }
+
+ClassLiteralFieldNode::~ClassLiteralFieldNode() {
+    delete this->type;
+    for (auto p: this->init) {
+        delete p.second;
+    }
+}

@@ -85,7 +85,7 @@ void ASSERT_VARIABLE_TYPE(std::string text, std::string id, TypeNode* type) {
     gp.visit(*tree);
     Checker checker(gp.globals, gp.class_table, gp.function_table);
     checker.visit(*tree);
-    EXPECT_TRUE(checker.scopes["global"]->get(id) == type);
+    EXPECT_EQ(checker.scopes["global"]->get(id), *type);
 }
 
 TEST(checker_test, fun_foo_cAomplete) {

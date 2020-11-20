@@ -16,6 +16,8 @@ class ClassLiteralExpressionNode : public Node {
 public:
     ClassLiteralExpressionNode(ObjectTypeNode* type, const VectorOfNodes& init);
 
+    ~ClassLiteralExpressionNode();
+
     VectorOfNodes init;
     std::vector<std::string> names;
     ObjectTypeNode* type;

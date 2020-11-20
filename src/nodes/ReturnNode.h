@@ -18,7 +18,7 @@ public:
     bool equal(const Node& other) const;
 
     ~ReturnNode() {
-//        delete this->expression;
+        delete this->expression;
     }
 
     json to_json() const override {
