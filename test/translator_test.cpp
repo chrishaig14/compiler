@@ -11,7 +11,7 @@
 TEST(translator_test, test_declaration_with_expression) {
     Translator translator;
     Node* node = DECL("x", nullptr, BIN(OpType::ADD, NUM(5), NUM(7)));
-    node->accept(translator);
+    translator.dispatch(node);
     CodeLabel expected_code = {NL(I_PUSHI(5)), NL(I_PUSHI(7)), NL(I_BIN(OpType::ADD)), NL(I_DECL("x")), NL(I_SET("x"))};
     EXPECT_EQ(translator.code, expected_code)
                         << "GOT:\n----\n" << translator.code << "----\nEXPECTED:\n----\n" << expected_code << "----\n";
@@ -20,7 +20,7 @@ TEST(translator_test, test_declaration_with_expression) {
 TEST(translator_test, test_call) {
     Translator translator;
     Node* node = CALL(ID("x"), VectorOfNodes({NUM(7), BIN(OpType::SUB, NUM(3), ID("y"))}));
-    node->accept(translator);
+    translator.dispatch(node);
     CodeLabel expected_code = {NL(I_PUSHI(7)), NL(I_PUSHI(3)), NL(I_GET("y")), NL(I_BIN(OpType::SUB)), NL(I_GET("x")),
                                NL(I_CALL)};
     EXPECT_EQ(translator.code, expected_code)
@@ -30,7 +30,7 @@ TEST(translator_test, test_call) {
 TEST(translator_test, test_member_get) {
     Translator translator;
     Node* node = MEM(CALL(ID("x"), VectorOfNodes({NUM(7), ID("y")})), "w");
-    node->accept(translator);
+    translator.dispatch(node);
     CodeLabel expected_code = {NL(I_PUSHI(7)), NL(I_GET("y")), NL(I_GET("x")), NL(I_CALL), NL(I_GETM("w"))};
     EXPECT_EQ(translator.code, expected_code)
                         << "GOT:\n----\n" << translator.code << "----\nEXPECTED:\n----\n" << expected_code << "----\n";
@@ -39,7 +39,7 @@ TEST(translator_test, test_member_get) {
 TEST(translator_test, test_member_get_rvalue) {
     Translator translator;
     Node* node = DECL("z", nullptr, MEM(CALL(ID("x"), VectorOfNodes({NUM(7), ID("y")})), "w"));
-    node->accept(translator);
+    translator.dispatch(node);
     CodeLabel expected_code = {NL(I_PUSHI(7)), NL(I_GET("y")), NL(I_GET("x")), NL(I_CALL), NL(I_GETM("w")),
                                NL(I_DECL("z")), NL(I_SET("z"))};
     EXPECT_EQ(translator.code, expected_code)
@@ -49,7 +49,7 @@ TEST(translator_test, test_member_get_rvalue) {
 TEST(translator_test, test_member_set_lvalue) {
     Translator translator;
     Node* node = ASN(MEM(CALL(ID("x"), VectorOfNodes({NUM(7), ID("y")})), "w"), NUM(14));
-    node->accept(translator);
+    translator.dispatch(node);
     CodeLabel expected_code = {NL(I_PUSHI(14)), NL(I_PUSHI(7)), NL(I_GET("y")), NL(I_GET("x")), NL(I_CALL),
                                NL(I_SETM("w"))};
     EXPECT_EQ(translator.code, expected_code)
@@ -59,7 +59,7 @@ TEST(translator_test, test_member_set_lvalue) {
 TEST(translator_test, test_id_set) {
     Translator translator;
     Node* node = ASN(ID("x"), NUM(14));
-    node->accept(translator);
+    translator.dispatch(node);
     CodeLabel expected_code = {NL(I_PUSHI(14)), NL(I_SET("x"))};
     EXPECT_EQ(translator.code, expected_code)
                         << "GOT:\n----\n" << translator.code << "----\nEXPECTED:\n----\n" << expected_code << "----\n";
@@ -68,7 +68,7 @@ TEST(translator_test, test_id_set) {
 TEST(translator_test, test_id_get) {
     Translator translator;
     Node* node = ASN(ID("y"), BIN(OpType::ADD, ID("x"), NUM(7)));
-    node->accept(translator);
+    translator.dispatch(node);
     CodeLabel expected_code = {NL(I_GET("x")), NL(I_PUSHI(7)), NL(I_BIN(OpType::ADD)), NL(I_SET("y"))};
     EXPECT_EQ(translator.code, expected_code)
                         << "GOT:\n----\n" << translator.code << "----\nEXPECTED:\n----\n" << expected_code << "----\n";
@@ -101,7 +101,7 @@ TEST(translator_test, test_class_literal_fields) {
     Translator translator;
     Node* node = new ClassLiteralFieldNode(OBJECT_TYPE("Foo", {}), {{"foo", BIN(OpType::MUL, NUM(7), ID("a"))},
                                                                     {"bar", NUM(65)}});
-    node->accept(translator);
+    translator.dispatch(node);
     std::vector<std::string> fields = {"foo", "bar"};
     CodeLabel expected_code = {NL(I_PUSHI(7)), NL(I_GET("a")), NL(I_BIN(OpType::MUL)), NL(I_PUSHI(65)),
                                NL(I_MAKE_OBJECT("Foo", fields))};
@@ -112,7 +112,7 @@ TEST(translator_test, test_class_literal_fields) {
 TEST(translator_test, translate_empty_list) {
     Translator translator;
     Node* node = LST(VectorOfNodes());
-    node->accept(translator);
+    translator.dispatch(node);
     CodeLabel expected_code = {NL(I_MAKE_LIST(0))};
     EXPECT_EQ(translator.code.size(), expected_code.size());
     EXPECT_EQ(translator.code, expected_code)
@@ -122,7 +122,7 @@ TEST(translator_test, translate_empty_list) {
 TEST(translator_test, translate_list_one_element) {
     Translator translator;
     Node* node = LST(VectorOfNodes({NUM(1)}));
-    node->accept(translator);
+    translator.dispatch(node);
     CodeLabel expected_code = {NL(I_PUSHI(1)), NL(I_MAKE_LIST(1))};
     EXPECT_EQ(translator.code.size(), expected_code.size());
     EXPECT_EQ(translator.code, expected_code)
@@ -133,7 +133,7 @@ TEST(translator_test, translate_list_multiple_elements) {
     Translator translator;
     VectorOfNodes list = {NUM(3), NUM(1), NUM(4)};
     Node* node = LST(list);
-    node->accept(translator);
+    translator.dispatch(node);
     CodeLabel expected_code = {NL(I_PUSHI(3)), NL(I_PUSHI(1)), NL(I_PUSHI(4)), NL(I_MAKE_LIST(3))};
     EXPECT_EQ(translator.code.size(), expected_code.size());
     EXPECT_EQ(translator.code, expected_code)
@@ -143,7 +143,7 @@ TEST(translator_test, translate_list_multiple_elements) {
 TEST(translator_test, test_boolean) {
     Translator translator;
     Node* node = ASN(ID("x"), BOOL(true));
-    node->accept(translator);
+    translator.dispatch(node);
     CodeLabel expected_code = {NL(I_PUSHB(true)), NL(I_SET("x"))};
     EXPECT_EQ(translator.code, expected_code)
                         << "GOT:\n----\n" << translator.code << "----\nEXPECTED:\n----\n" << expected_code << "----\n";
@@ -152,7 +152,7 @@ TEST(translator_test, test_boolean) {
 TEST(translator_test, test_while) {
     Translator translator;
     Node* node = WHILE(ID("x"), new BlockNode({CALL(ID("print"), {ID("y")})}));
-    node->accept(translator);
+    translator.dispatch(node);
     CodeLabel expected_code = {
             LC("start_loop.0", I_GET("x")),
             NL(I_JUMPF(8)),
@@ -171,7 +171,7 @@ TEST(translator_test, test_while) {
 TEST(translator_test, test_while_with_break) {
     Translator translator;
     Node* node = WHILE(ID("x"), new BlockNode({BREAK, CALL(ID("foo"), {NUM(13)})}));
-    node->accept(translator);
+    translator.dispatch(node);
     CodeLabel expected_code = {
             LC("start_loop.0", I_GET("x")),
             NL(I_JUMPF(9)),
@@ -193,7 +193,7 @@ TEST(translator_test, test_nested_while) {
     Node* node = WHILE(ID("x"), new BlockNode(
             {WHILE(BIN(OpType::EQ, ID("y"), NUM(7)), new BlockNode({BREAK, CALL(ID("foo"), {NUM(13)})})), BREAK,
              ASN(ID("x"), NUM(9))}));
-    node->accept(translator);
+    translator.dispatch(node);
     CodeLabel expected_code = {
             LC("start_loop.0", I_GET("x")),
             NL(I_JUMPF(20)), // outer loop condition false -> jump
@@ -308,7 +308,7 @@ TEST(translator_test, function) {
     VectorOfNodes parameter_types = {T_INT, T_INT};
     BlockNode* function_code = new BlockNode({RET(BIN(OpType::ADD, ID("x"), ID("y")))});
     Node* node = FUN("foo", parameter_names, parameter_types, T_INT, function_code);
-    node->accept(translator);
+    translator.dispatch(node);
     CodeLabel expected_code = {
             NL(I_START_FUNCTION("foo")),
             NL(I_ENTER("foo")),
@@ -330,7 +330,7 @@ TEST(translator_test, ternary) {
 //    var s = x ? "one" : "two";
     Translator translator;
     Node* node = DECL("s", nullptr, TERNARY(ID("x"), STR("one"), STR("two")));
-    node->accept(translator);
+    translator.dispatch(node);
     CodeLabel expected_code = {
             NL(I_DECL("s")),
             NL(I_GET("x")),
@@ -346,7 +346,7 @@ TEST(translator_test, overload) {
     auto to_string_integer = FUN("to_string.1",{"i"},{T_INT},T_STRING,new BlockNode({RET(STR("Integer string"))}));
 
     BlockNode* node = new BlockNode({to_string_string, to_string_integer});
-    node->accept(translator);
+    translator.dispatch(node);
     CodeLabel expected_code = {
             NL(I_DECL("s")),
             NL(I_GET("x")),
