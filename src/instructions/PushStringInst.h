@@ -16,7 +16,9 @@ public:
 
     bool equal(const Instruction* inst) const {
         const PushStringInst* other = dynamic_cast<const PushStringInst*>(inst);
-        if (other == nullptr) return false;
+        if (other == nullptr) {
+            return false;
+        }
         return this->str == other->str;
     }
 

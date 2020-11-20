@@ -13,20 +13,11 @@
 class ClassTable {
     std::map<std::string, ClassInfo*> table;
 public:
-    ClassInfo* get(std::string name) {
-        if (this->table.count(name) == 1) {
-            return this->table[name];
-        }
-        throw std::runtime_error("Symbol " + name + " not found in scope");
-    }
+    ClassInfo* get(std::string name);
 
-    bool declared(std::string name) {
-        return this->table.count(name) == 1;
-    }
+    bool declared(std::string name);
 
-    void set(std::string name, ClassInfo* info) {
-        this->table[name] = info;
-    }
+    void set(std::string name, ClassInfo* info);
 };
 
 #endif //CLASSTABLE_H

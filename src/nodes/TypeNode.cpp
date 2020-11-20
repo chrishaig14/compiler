@@ -57,6 +57,10 @@ bool FunctionTypeNode::equal(const TypeNode& other) const {
     return *a.return_type == *b.return_type;
 }
 
+FunctionTypeNode& FunctionTypeNode::function() { return *this; }
+
+const FunctionTypeNode& FunctionTypeNode::function() const { return *this; }
+
 ObjectTypeNode::ObjectTypeNode(const std::string& identifier,
                                const VectorOfTypes& typeParameters) : identifier(
         identifier), type_parameters(typeParameters) {
@@ -108,6 +112,10 @@ bool ObjectTypeNode::equal(const TypeNode& other) const {
     return true;
 }
 
+const ObjectTypeNode& ObjectTypeNode::object() const { return *this; }
+
+ObjectTypeNode& ObjectTypeNode::object() { return *this; }
+
 bool TypeNode::operator!=(const TypeNode& other) const {
     return !(*this == other);
 }
@@ -118,3 +126,11 @@ bool TypeNode::operator==(const TypeNode& other) const {
     }
     return this->equal(other);
 }
+
+ObjectTypeNode& TypeNode::object() { throw std::runtime_error("Getting wrong type!"); }
+
+FunctionTypeNode& TypeNode::function() { throw std::runtime_error("Getting wrong type!"); }
+
+const FunctionTypeNode& TypeNode::function() const { throw std::runtime_error("Getting wrong type!"); }
+
+const ObjectTypeNode& TypeNode::object() const { throw std::runtime_error("Getting wrong type!"); }

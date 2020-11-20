@@ -6,7 +6,9 @@
 
 bool MakeListInst::equal(const Instruction* inst) const {
     const MakeListInst* other_ptr = dynamic_cast<const MakeListInst*>(inst);
-    if (other_ptr == nullptr) return false;
+    if (other_ptr == nullptr) {
+        return false;
+    }
     return this->length == other_ptr->length;
 }
 

@@ -6,7 +6,9 @@
 
 bool PushBooleanInst::equal(const Instruction* inst) const {
     const PushBooleanInst* other = dynamic_cast<const PushBooleanInst*>(inst);
-    if (other == nullptr) return false;
+    if (other == nullptr) {
+        return false;
+    }
     return *this == *other;
 }
 

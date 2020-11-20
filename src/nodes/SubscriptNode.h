@@ -22,21 +22,10 @@ public:
 
     bool equal(const Node& other) const override;
 
-    ~SubscriptNode() {
-        delete this->parent;
-        for (auto c: this->child) {
-            delete c;
-        }
-    }
+    ~SubscriptNode();
 
     json to_json() const
-    override {
-        json j;
-        j["node"] = "subscript";
-//        j["parent"] = this->parent->to_json();
-//        j["child"] = this->child->to_json();
-        return j;
-    }
+    override;
 
     SubscriptNode& sub() override;
     const SubscriptNode& sub() const override;

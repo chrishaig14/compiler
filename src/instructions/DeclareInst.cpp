@@ -8,7 +8,9 @@ DeclareInst::DeclareInst(std::string identifier) : identifier(identifier) {}
 
 bool DeclareInst::equal(const Instruction* inst) const {
     const DeclareInst* other = dynamic_cast<const DeclareInst*>(inst);
-    if (other == nullptr) return false;
+    if (other == nullptr) {
+        return false;
+    }
     return this->identifier == other->identifier;
 }
 

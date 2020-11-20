@@ -15,12 +15,7 @@ public:
 
     std::map<std::string, Object*> fields;
 
-    UserObject(std::string type, std::vector<std::string> fields) {
-        this->type = type;
-        for (auto f: fields) {
-            this->fields[f] = nullptr;
-        }
-    }
+    UserObject(std::string type, std::vector<std::string> fields);
 
     std::string type;
 };

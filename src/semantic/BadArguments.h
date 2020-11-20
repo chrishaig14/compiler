@@ -9,6 +9,7 @@
 #include "../utils.h"
 #include "../types.h"
 #include "../nodes/TypeNode.h"
+
 class BadArguments : public std::runtime_error {
 public:
     BadArguments(VectorOfTypes ftype, VectorOfTypes args);
@@ -19,11 +20,7 @@ public:
     VectorOfTypes args;
     std::string text;
 
-    const char* what() const noexcept override {
-
-        return text.c_str();
-//        return /* something using base_msg */;
-    }
+    const char* what() const noexcept override;
 };
 
 

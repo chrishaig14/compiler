@@ -18,12 +18,7 @@ public:
     StringNode(std::string str);
     bool equal(const Node& x) const override;
 
-    json to_json() const override {
-        json j;
-        j["node"] = "string";
-        j["str"] = this->str;
-        return j;
-    }
+    json to_json() const override;
 
     StringNode& strng() override;
     const StringNode& strng() const override;

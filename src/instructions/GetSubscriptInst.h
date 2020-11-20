@@ -13,7 +13,9 @@
 class GetSubscriptInst : public Instruction {
     bool equal(const Instruction* inst) const {
         const GetSubscriptInst* other = dynamic_cast<const GetSubscriptInst*>(inst);
-        if (other == nullptr) return false;
+        if (other == nullptr) {
+            return false;
+        }
         return true;
     }
 

@@ -12,16 +12,9 @@
 class AssignmentTypeError : public std::runtime_error {
 public:
 
-    bool operator==(const AssignmentTypeError& other) const {
-        std::string a = this->what();
-        std::string b = other.what();
-        bool t = a == b;
-        return t;
-    }
+    bool operator==(const AssignmentTypeError& other) const;
 
-    AssignmentTypeError(const TypeNode& expected_type,const TypeNode& actual_type) : std::runtime_error(
-            "Assigning value of type " + actual_type.to_string() + ", expected: " + expected_type.to_string()) {
-    }
+    AssignmentTypeError(const TypeNode& expected_type, const TypeNode& actual_type);
 
 };
 

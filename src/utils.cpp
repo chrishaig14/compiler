@@ -32,7 +32,9 @@ bool operator==(CodeLabel a, CodeLabel b) {
         auto b_inst = b[i].second;
         std::cerr << "comparing " << a_inst->to_string() << " == " << b_inst->to_string() << ": "
                   << (a_inst->equal(b_inst) ? "True" : "False") << std::endl;
-        if (!a_inst->equal(b_inst)) return false;
+        if (!a_inst->equal(b_inst)) {
+            return false;
+        }
     }
     return true;
 }

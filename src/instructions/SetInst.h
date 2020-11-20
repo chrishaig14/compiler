@@ -16,7 +16,9 @@ public:
 
     bool equal(const Instruction* inst) const {
         const SetInst* other = dynamic_cast<const SetInst*>(inst);
-        if (other == nullptr) return false;
+        if (other == nullptr) {
+            return false;
+        }
         return this->identifier == other->identifier;
     }
 

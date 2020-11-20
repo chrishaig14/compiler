@@ -15,40 +15,17 @@
 class BlockNode : public Node {
 public:
 
-    BlockNode(VectorOfNodes nodes) : nodes(nodes) { this->ntype = BLOCK; }
+    BlockNode(VectorOfNodes nodes);
 
     VectorOfNodes nodes;
 
-    bool equal(const Node& p) const override{
-        auto& other = p.block();
-        if (this->nodes.size() != other.nodes.size()) {
-            return false;
-        }
-        for (int i = 0; i < this->nodes.size(); i++) {
-            if (*this->nodes[i] != *other.nodes[i]) {
-                return false;
-            }
-        };
-        return true;
-    }
+    bool equal(const Node& p) const override;
 
-    json to_json() {
-        json j;
-        j["node"] = "block";
-        j["block"] = {};
-        for (auto n: this->nodes) {
-//            j["block"].push_back(n->to_json());
-        }
-        return j;
-    }
+    json to_json();
 
     BlockNode& block() override;
     const BlockNode& block() const override;
-    ~BlockNode(){
-        for(auto p: this->nodes){
-            delete p;
-        }
-    }
+    ~BlockNode();
 };
 
 

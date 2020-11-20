@@ -19,7 +19,9 @@ void ObjectStack::push(Object* value) {
 }
 
 Object* ObjectStack::pop() {
-    if (this->_top == nullptr) throw std::runtime_error("Popping from empty stack!");
+    if (this->_top == nullptr) {
+        throw std::runtime_error("Popping from empty stack!");
+    }
     Object* return_value = this->_top->value;
     this->_top = this->_top->previous;
     return return_value;
@@ -31,19 +33,25 @@ bool ObjectStack::empty() {
 
 IntegerObject* ObjectStack::pop_integer() {
     auto ptr = dynamic_cast<IntegerObject*>(this->pop());
-    if (ptr == nullptr) throw std::runtime_error("Trying to pop an integer, but it's not!");
+    if (ptr == nullptr) {
+        throw std::runtime_error("Trying to pop an integer, but it's not!");
+    }
     return ptr;
 }
 
 StringObject* ObjectStack::pop_string() {
     auto ptr = dynamic_cast<StringObject*>(this->pop());
-    if (ptr == nullptr) throw std::runtime_error("Trying to pop a string, but it's not!");
+    if (ptr == nullptr) {
+        throw std::runtime_error("Trying to pop a string, but it's not!");
+    }
     return ptr;
 }
 
 ListObject* ObjectStack::pop_list() {
     auto ptr = dynamic_cast<ListObject*>(this->pop());
-    if (ptr == nullptr) throw std::runtime_error("Trying to pop a list, but it's not!");
+    if (ptr == nullptr) {
+        throw std::runtime_error("Trying to pop a list, but it's not!");
+    }
     return ptr;
 }
 

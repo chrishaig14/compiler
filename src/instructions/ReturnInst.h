@@ -13,7 +13,9 @@
 class ReturnInst : public Instruction {
     bool equal(const Instruction* inst) const {
         const ReturnInst* other = dynamic_cast<const ReturnInst*>(inst);
-        if (other == nullptr) return false;
+        if (other == nullptr) {
+            return false;
+        }
         return true;
     }
 

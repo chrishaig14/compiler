@@ -9,12 +9,13 @@
 #include "Node.h"
 #include "BlockNode.h"
 #include "../utils.h"
+
 class ForNode : public Node {
 public:
     std::string var;
     Node* exp;
     BlockNode* body;
-    bool equal(const Node& other) const override ;
+    bool equal(const Node& other) const override;
 
     ForNode(const std::string& var, Node* exp, BlockNode* body);
     ~ForNode();

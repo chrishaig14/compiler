@@ -47,7 +47,9 @@ Environment* Environment::enter(std::string name) {
 }
 
 Environment* Environment::leave(std::string name) {
-    if (this->name == name) return this->parent;
+    if (this->name == name) {
+        return this->parent;
+    }
     return this->parent->leave(name);
 }
 

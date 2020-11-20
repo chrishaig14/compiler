@@ -26,3 +26,9 @@ BadArguments::BadArguments(VectorOfTypes ftype, VectorOfTypes args) : std::runti
     sparams = sparams.substr(0, sparams.size() - 2);
     text = "Function called with arguments (" + sargs + ")" + " but expects (" + sparams + ")";
 }
+
+const char* BadArguments::what() const noexcept {
+
+    return text.c_str();
+//        return /* something using base_msg */;
+}

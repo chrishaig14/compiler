@@ -12,6 +12,7 @@
 
 //#include "Node.h"
 #include "../utils.h"
+
 class DeclarationNode : public Node {
 public:
     std::string identifier;
@@ -20,26 +21,11 @@ public:
 
     DeclarationNode(const std::string& identifier, TypeNode* type, Node* expression);
 
-    bool equal(const Node& other) const override ;
+    bool equal(const Node& other) const override;
 
-    ~DeclarationNode() {
-        if (this->type != nullptr) delete this->type;
-        if (this->expression != nullptr) delete this->expression;
-    }
+    ~DeclarationNode();
 
-    json to_json() const override {
-        json j;
-        j["node"] = "declaration";
-        j["identifier"] = this->identifier;
-        j["expression"] = {};
-//        if (this->expression != nullptr) {
-//            j["expression"] = this->expression->to_json();
-//        }
-        if (this->type != nullptr) {
-//            j["type"] = this->type->to_json();
-        }
-        return j;
-    }
+    json to_json() const override;
 
     DeclarationNode& decl() override;
     const DeclarationNode& decl() const override;

@@ -11,16 +11,11 @@
 class BooleanObject : public Object {
 
 public:
-    bool equal(const Object* other) const override {
-        const BooleanObject* other_ptr = dynamic_cast<const BooleanObject*>(other);
-        return this->boolean == other_ptr->boolean;
-    }
+    bool equal(const Object* other) const override;
 
     bool boolean;
 
-    BooleanObject(bool boolean) {
-        this->boolean = boolean;
-    }
+    BooleanObject(bool boolean);
 };
 
 

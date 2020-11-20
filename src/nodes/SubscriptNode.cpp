@@ -4,7 +4,7 @@
 
 #include "SubscriptNode.h"
 
-SubscriptNode::SubscriptNode(Node* parent, VectorOfNodes child) : parent(parent), child(child) {this->ntype = SUB;}
+SubscriptNode::SubscriptNode(Node* parent, VectorOfNodes child) : parent(parent), child(child) { this->ntype = SUB; }
 
 
 bool SubscriptNode::equal(const Node& x) const {
@@ -26,4 +26,19 @@ SubscriptNode& SubscriptNode::sub() {
 
 const SubscriptNode& SubscriptNode::sub() const {
     return *this;
+}
+
+SubscriptNode::~SubscriptNode() {
+    delete this->parent;
+    for (auto c: this->child) {
+        delete c;
+    }
+}
+
+json SubscriptNode::to_json() const {
+    json j;
+    j["node"] = "subscript";
+//        j["parent"] = this->parent->to_json();
+//        j["child"] = this->child->to_json();
+    return j;
 }

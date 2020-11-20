@@ -103,7 +103,8 @@ Token Scanner::next_token() {
         this->current++;
         if (c == '\n') {
             Token tok(TokType::ID, "DUMMY", this->line, this->column);
-            std::vector<TokType> semic = {TokType::RETURN, TokType::ID, TokType::NUM, TokType::RPAREN, TokType::RSQUARE,TokType::STRING, TokType::NONE, TokType::TRUE, TokType::FALSE};
+            std::vector<TokType> semic = {TokType::RETURN, TokType::ID, TokType::NUM, TokType::RPAREN, TokType::RSQUARE,
+                                          TokType::STRING, TokType::NONE, TokType::TRUE, TokType::FALSE};
             for (auto ts : semic) {
                 if (this->token.type == ts) {
                     tok = Token(TokType::SEMICOLON, this->line, this->column);
@@ -253,6 +254,18 @@ Token Scanner::scan_number() {
     token.start = start;
     token.end = end;
     return token;
+}
+
+std::vector<Token> Scanner::scan_all() {
+    std::vector<Token> tokens;
+    while (true) {
+        Token token = this->get_next();
+        tokens.push_back(token);
+        if (token.type == TokType::END) {
+            break;
+        }
+    }
+    return tokens;
 }
 
 UnexpectedCharacter::UnexpectedCharacter(char c, size_t position) : std::runtime_error(

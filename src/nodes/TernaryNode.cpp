@@ -16,13 +16,13 @@ TernaryNode::TernaryNode(Node* expression, Node* trueCase, Node* falseCase) : ex
                                                                               true_case(
                                                                                       trueCase),
                                                                               false_case(
-                                                                                      falseCase) {this->ntype = TERNARY;}
+                                                                                      falseCase) { this->ntype = TERNARY; }
 
-TernaryNode &TernaryNode::ternary() {
+TernaryNode& TernaryNode::ternary() {
     return *this;
 }
 
-const TernaryNode &TernaryNode::ternary() const {
+const TernaryNode& TernaryNode::ternary() const {
     return *this;
 }
 

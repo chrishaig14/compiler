@@ -21,7 +21,9 @@ void Loader::load() {
             case InstType::START_FUNCTION: {
                 current_function_code = {};
                 StartFunction* start_function_inst = dynamic_cast<StartFunction*>(inst);
-                if (start_function_inst == nullptr) { throw std::runtime_error("instruction type doesn't match!"); }
+                if (start_function_inst == nullptr) {
+                    throw std::runtime_error("instruction type doesn't match!");
+                }
                 current_function_name = start_function_inst->name;
                 break;
             }

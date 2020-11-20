@@ -9,8 +9,7 @@
 #include "Node.h"
 
 
-
-class ContinueNode : public Node{
+class ContinueNode : public Node {
 public:
     bool equal(const Node& other) const override;
 };

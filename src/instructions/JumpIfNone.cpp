@@ -6,7 +6,9 @@
 
 bool JumpIfNone::equal(const Instruction* inst) const {
     const JumpIfNone* other_ptr = dynamic_cast<const JumpIfNone*>(inst);
-    if (other_ptr == nullptr) return false;
+    if (other_ptr == nullptr) {
+        return false;
+    }
     return this->offset == other_ptr->offset && this->label == other_ptr->label;
 }
 

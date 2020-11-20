@@ -24,23 +24,11 @@ public:
     ClassInfo* class_info;
     bool is_class_method;
 
-    SymbolInfo() {
-        this->is_function = false;
-        this->is_method = false;
-        this->class_info = nullptr;
-        this->is_class_method = false;
-    }
+    SymbolInfo();
 
-    void set_type(const TypeNode& typ) {
-        this->_type = typ.clone();
-    }
+    void set_type(const TypeNode& typ);
 
-    const TypeNode& type() {
-        if (_type == nullptr) {
-            throw std::runtime_error("SymbolInfo has no TypeNode");
-        }
-        return *this->_type;
-    }
+    const TypeNode& type();
 };
 
 bool type_matches(TypeNode* a, TypeNode* b);
@@ -128,14 +116,7 @@ public:
 
     void visit(ClassNode& node);
 
-    TypeClassInfo* get_typeclass_for_function(std::string function_name) {
-        for (auto typeclass: this->typeclasses) {
-            if (typeclass.second->has_function(function_name)) {
-                return typeclass.second;
-            }
-        }
-        return nullptr;
-    }
+    TypeClassInfo* get_typeclass_for_function(std::string function_name);
 
     bool replace_me;
     void match_arguments_to_generic_function(const FunctionTypeNode& function_type, VectorOfTypes arg_types);

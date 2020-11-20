@@ -17,14 +17,7 @@ public:
     std::map<std::string, int> labels;
     std::vector<std::pair<std::string, Instruction*>> code;
 
-    LabelledCode(std::vector<std::pair<std::string, Instruction*>> code) {
-        for (int i = 0; i < code.size(); i++) {
-            if (code[i].first.size() != 0) {
-                this->labels[code[i].first] = i;
-            }
-        }
-//        now we have for each label its absolute offset
-    }
+    LabelledCode(std::vector<std::pair<std::string, Instruction*>> code);
 
 //    std::vector<Instruction*> relativize() {
 //        for (int current_address = 0; current_address < this->code.size(); current_address++) {
@@ -49,13 +42,9 @@ public:
 //        }
 //    }
 
-    int get_label(std::string label) {
-        return this->labels[label];
-    }
+    int get_label(std::string label);
 
-    Instruction* get_instruction(int address) {
-        return this->code[address].second;
-    }
+    Instruction* get_instruction(int address);
 };
 
 

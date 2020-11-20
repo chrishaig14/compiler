@@ -35,17 +35,7 @@ public:
 
     Token get_next();
 
-    std::vector<Token> scan_all() {
-        std::vector<Token> tokens;
-        while (true) {
-            Token token = this->get_next();
-            tokens.push_back(token);
-            if (token.type == TokType::END) {
-                break;
-            }
-        }
-        return tokens;
-    }
+    std::vector<Token> scan_all();
 
     size_t current;
 

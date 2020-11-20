@@ -6,7 +6,9 @@
 
 bool LeaveScope::equal(const Instruction* inst) const {
     auto ptr = dynamic_cast<const LeaveScope*>(inst);
-    if (ptr == nullptr) return false;
+    if (ptr == nullptr) {
+        return false;
+    }
     return this->name == ptr->name;
 }
 

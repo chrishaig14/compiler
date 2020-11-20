@@ -31,13 +31,13 @@ public:
 
     virtual TypeNode* clone() const = 0;
 
-    virtual ObjectTypeNode& object() { throw std::runtime_error("Getting wrong type!"); }
+    virtual ObjectTypeNode& object();
 
-    virtual FunctionTypeNode& function() { throw std::runtime_error("Getting wrong type!"); }
+    virtual FunctionTypeNode& function();
 
-    virtual const FunctionTypeNode& function() const { throw std::runtime_error("Getting wrong type!"); }
+    virtual const FunctionTypeNode& function() const;
 
-    virtual const ObjectTypeNode& object() const { throw std::runtime_error("Getting wrong type!"); }
+    virtual const ObjectTypeNode& object() const;
 
     bool operator==(const TypeNode& other) const;
 
@@ -60,9 +60,9 @@ public:
 
     TypeNode* clone() const override;
 
-    ObjectTypeNode& object() override { return *this; }
+    ObjectTypeNode& object() override;
 
-    const ObjectTypeNode& object() const override { return *this; }
+    const ObjectTypeNode& object() const override;
 
     ~ObjectTypeNode();
 
@@ -81,11 +81,11 @@ public:
 
     FunctionTypeNode* clone() const override;
 
-    FunctionTypeNode& function() override { return *this; }
+    FunctionTypeNode& function() override;
 
     ~FunctionTypeNode();
 
-    const FunctionTypeNode& function() const override { return *this; }
+    const FunctionTypeNode& function() const override;
 
     VectorOfTypes parameter_types;
     TypeNode* return_type;

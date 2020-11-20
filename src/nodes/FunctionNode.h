@@ -22,45 +22,18 @@ public:
     TypeNode* return_type;
 
     FunctionNode(std::string identifier, std::vector<std::string> parameter_names,
-                 VectorOfTypes parameter_types, TypeNode* return_type, BlockNode* body)
-            : body(body), return_type(return_type) {
-        this->ntype = FUNC;
-        this->identifier = identifier;
-        this->parameter_names = parameter_names;
-        this->parameter_types = parameter_types;
-    }
+                 VectorOfTypes parameter_types, TypeNode* return_type, BlockNode* body);
 
 
-    bool equal(const Node& x) const override ;
+    bool equal(const Node& x) const override;
 
-    ~FunctionNode() {
-        for (auto pt: this->parameter_types) {
-            delete pt;
-        }
-        delete this->body;
-        delete this->return_type;
-    }
+    ~FunctionNode();
 
-    json to_json() const override {
-        json j;
-        j["node"] = "function";
-//        j["identifier"] = this->identifier;
-//        j["parameter_names"] = {};
-//        j["parameter_types"] = {};
-//        for (auto pn: this->parameter_names) {
-//            j["parameter_names"].push_back(pn);
-//        }
-//        for (auto pt: this->parameter_types) {
-//            j["parameter_types"].push_back(pt->to_json());
-//        }
-//        j["body"] = this->body->to_json();
-//        j["return_type"] = this->return_type->to_json();
-        return j;
-    }
+    json to_json() const override;
 
-    FunctionNode &func() override;
+    FunctionNode& func() override;
 
-    const FunctionNode &func() const override;
+    const FunctionNode& func() const override;
 
     std::map<std::string, std::string> constraints;
 };

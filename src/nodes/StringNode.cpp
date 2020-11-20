@@ -18,3 +18,10 @@ StringNode& StringNode::strng() {
 const StringNode& StringNode::strng() const {
     return *this;
 }
+
+json StringNode::to_json() const {
+    json j;
+    j["node"] = "string";
+    j["str"] = this->str;
+    return j;
+}

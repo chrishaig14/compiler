@@ -10,17 +10,11 @@
 
 class StringObject : public Object {
 public:
-    StringObject(std::string str) {
-        this->str = str;
-    }
+    StringObject(std::string str);
 
     StringObject();
 
-    bool equal(const Object* other) const override {
-        const StringObject* other_ptr = dynamic_cast<const StringObject*>(other);
-        if (other_ptr == nullptr) return false;
-        return this->str == other_ptr->str;
-    }
+    bool equal(const Object* other) const override;
 
     std::string str;
 };

@@ -18,8 +18,8 @@ public:
     bool operator!=(const BooleanNode& other) const;
 
     bool equal(const Node& x) const override;
-    const BooleanNode& boolean() const override ;
-    BooleanNode& boolean() override ;
+    const BooleanNode& boolean() const override;
+    BooleanNode& boolean() override;
 };
 
 

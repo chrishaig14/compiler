@@ -29,10 +29,44 @@ bool FunctionNode::equal(const Node& x) const {
     return *this->body == *other.body;
 }
 
-FunctionNode &FunctionNode::func() {
+FunctionNode& FunctionNode::func() {
     return *this;
 }
 
-const FunctionNode &FunctionNode::func() const {
+const FunctionNode& FunctionNode::func() const {
     return *this;
+}
+
+FunctionNode::FunctionNode(std::string identifier, std::vector<std::string> parameter_names,
+                           VectorOfTypes parameter_types, TypeNode* return_type, BlockNode* body)
+        : body(body), return_type(return_type) {
+    this->ntype = FUNC;
+    this->identifier = identifier;
+    this->parameter_names = parameter_names;
+    this->parameter_types = parameter_types;
+}
+
+FunctionNode::~FunctionNode() {
+    for (auto pt: this->parameter_types) {
+        delete pt;
+    }
+    delete this->body;
+    delete this->return_type;
+}
+
+json FunctionNode::to_json() const {
+    json j;
+    j["node"] = "function";
+//        j["identifier"] = this->identifier;
+//        j["parameter_names"] = {};
+//        j["parameter_types"] = {};
+//        for (auto pn: this->parameter_names) {
+//            j["parameter_names"].push_back(pn);
+//        }
+//        for (auto pt: this->parameter_types) {
+//            j["parameter_types"].push_back(pt->to_json());
+//        }
+//        j["body"] = this->body->to_json();
+//        j["return_type"] = this->return_type->to_json();
+    return j;
 }

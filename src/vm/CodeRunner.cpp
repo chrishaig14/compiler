@@ -125,7 +125,9 @@ void CodeRunner::visit(BinopInst& inst) {
                         this->stack.push(new BooleanObject(left_none == nullptr));
                     }
 
-                } else { throw std::runtime_error("Try to do a binop with two non-Integers or non-Strings"); }
+                } else {
+                    throw std::runtime_error("Try to do a binop with two non-Integers or non-Strings");
+                }
             }
         }
     }

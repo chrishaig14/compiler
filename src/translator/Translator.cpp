@@ -475,3 +475,92 @@ void Translator::visit(ContinueNode& node) {
 
     }
 }
+
+void Translator::dispatch(Node* nptr) {
+    Node& n = *nptr;
+    switch (n.ntype) {
+        case NodeType::ASSIGN:
+            this->visit(n.assign());
+            break;
+        case NodeType::BINOP:
+            this->visit(n.binop());
+            break;
+        case NodeType::BLOCK:
+            this->visit(n.block());
+            break;
+        case NodeType::BOOLEAN:
+            this->visit(n.boolean());
+            break;
+        case NodeType::BRK:
+            this->visit(n.brk());
+            break;
+        case NodeType::CALL:
+            this->visit(n.call());
+            break;
+        case NodeType::CLSEXP:
+            this->visit(n.clsexp());
+            break;
+        case NodeType::CLSFLD:
+            this->visit(n.clsfld());
+            break;
+        case NodeType::CLS:
+            this->visit(n.cls());
+            break;
+        case NodeType::CNTINUE:
+            this->visit(n.cntinue());
+            break;
+        case NodeType::DECL:
+            this->visit(n.decl());
+            break;
+        case NodeType::EMPTYLST:
+            this->visit(n.emptylst());
+            break;
+        case NodeType::FORLOOP:
+            this->visit(n.forloop());
+            break;
+        case NodeType::FUNC:
+            this->visit(n.func());
+            break;
+        case NodeType::ID:
+            this->visit(n.id());
+            break;
+        case NodeType::IFF:
+            this->visit(n.iff());
+            break;
+        case NodeType::LST:
+            this->visit(n.lst());
+            break;
+        case NodeType::MEMBER:
+            this->visit(n.member());
+            break;
+        case NodeType::NONE:
+            this->visit(n.none());
+            break;
+        case NodeType::NUMBER:
+            this->visit(n.number());
+            break;
+        case NodeType::RETRN:
+            this->visit(n.retrn());
+            break;
+        case NodeType::STRNG:
+            this->visit(n.strng());
+            break;
+        case NodeType::SUB:
+            this->visit(n.sub());
+            break;
+        case NodeType::TERNARY:
+            this->visit(n.ternary());
+            break;
+        case NodeType::OTYPE:
+//                this->visit(n.type());
+            break;
+        case NodeType::FTYPE:
+//                this->visit(n.type());
+            break;
+        case NodeType::WHIL:
+            this->visit(n.whil());
+            break;
+        case NodeType::UNINITIALIZED:
+            break;
+    }
+}

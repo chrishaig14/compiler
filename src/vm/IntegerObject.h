@@ -13,17 +13,11 @@ public:
 
     IntegerObject();
 
-    bool operator==(const IntegerObject& other) const {
-        return this->value == other.value;
-    }
+    bool operator==(const IntegerObject& other) const;
 
     bool equal(const Object* other) const;
 
-    Object* sum(const Object* other) const override {
-        const IntegerObject* other_ptr = dynamic_cast<const IntegerObject*>(other);
-        return new IntegerObject(this->value + other_ptr->value);
-    }
-
+    Object* sum(const Object* other) const override;
     int value;
 };
 

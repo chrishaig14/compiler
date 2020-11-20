@@ -5,7 +5,7 @@
 #include "CallNode.h"
 
 CallNode::CallNode(Node* function, const VectorOfNodes& arguments) : function(function),
-                                                                     arguments(arguments) {this->ntype = CALL;}
+                                                                     arguments(arguments) { this->ntype = CALL; }
 
 bool CallNode::equal(const Node& x) const {
     auto& other = x.call();
@@ -26,4 +26,22 @@ CallNode& CallNode::call() {
 
 const CallNode& CallNode::call() const {
     return *this;
+}
+
+json CallNode::to_json() const {
+    json j;
+    j["node"] = "call";
+//        j["function"] = this->function->to_json();
+    j["arguments"] = {};
+    for (auto a: this->arguments) {
+//            j["arguments"].push_back(a->to_json());
+    }
+    return j;
+}
+
+CallNode::~CallNode() {
+    delete this->function;
+    for (auto a: this->arguments) {
+        delete a;
+    }
 }

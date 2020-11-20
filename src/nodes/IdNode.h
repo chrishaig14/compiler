@@ -20,14 +20,7 @@ public:
 
     bool equal(const Node& other) const override;
 
-    json to_json() const override {
-        json j;
-        j["node"] = "id";
-        j["id"] = this->identifier;
-        j["start"] = this->start;
-        j["end"] = this->end;
-        return j;
-    }
+    json to_json() const override;
 
     IdNode& id() override;
     const IdNode& id() const override;

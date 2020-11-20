@@ -6,7 +6,9 @@
 
 bool JumpInst::equal(const Instruction* inst) const {
     auto p = dynamic_cast<const JumpInst*>(inst);
-    if (p == nullptr) return false;
+    if (p == nullptr) {
+        return false;
+    }
     return this->offset == p->offset && this->label == p->label;
 }
 

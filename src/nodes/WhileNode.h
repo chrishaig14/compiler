@@ -16,13 +16,13 @@ public:
 
     WhileNode(Node* condition, BlockNode* body);
 
-    bool equal(const Node& other) const override ;
+    bool equal(const Node& other) const override;
 
-    WhileNode &whil() override;
+    WhileNode& whil() override;
 
     ~WhileNode();
 
-    const WhileNode &whil() const override;
+    const WhileNode& whil() const override;
 
 };
 
