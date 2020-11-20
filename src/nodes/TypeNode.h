@@ -73,7 +73,7 @@ public:
 
 class FunctionTypeNode : public TypeNode {
 public:
-    FunctionTypeNode(const VectorOfTypes& parameterTypes, TypeNode* returnType);
+    FunctionTypeNode(const VectorOfTypes& parameterTypes, TypeNode& returnType);
 
 //    FunctionTypeNode* operator=(const FunctionTypeNode* other) = default;
 

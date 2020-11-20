@@ -291,7 +291,7 @@ TEST(checker_test, test_add_list_ok) {
 }
 
 void f(CodeBuiltin c) {
-    FunctionTypeNode* ft = new FunctionTypeNode({new ObjectTypeNode("foo", {})}, new ObjectTypeNode("Integer", {}));
+    FunctionTypeNode* ft = new FunctionTypeNode({new ObjectTypeNode("foo", {})}, *new ObjectTypeNode("Integer", {}));
     CodeBuiltin d = {ft, nullptr};
     d = c;
 }
