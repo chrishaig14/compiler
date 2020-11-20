@@ -289,9 +289,3 @@ TEST(checker_test, test_add_list_ok) {
     Checker checker(gp.globals, gp.class_table, gp.function_table);
     checker.visit(*tree);
 }
-
-void f(CodeBuiltin c) {
-    FunctionTypeNode* ft = new FunctionTypeNode({new ObjectTypeNode("foo", {})}, *new ObjectTypeNode("Integer", {}));
-    CodeBuiltin d = {ft, nullptr};
-    d = c;
-}
