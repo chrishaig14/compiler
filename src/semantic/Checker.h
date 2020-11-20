@@ -72,8 +72,6 @@ public:
 
     void visit(CallNode& node) override;
 
-    void visit(StructNode& node) override;
-
     void visit(DeclarationNode& node) override;
 
     void visit(FunctionNode& node) override;

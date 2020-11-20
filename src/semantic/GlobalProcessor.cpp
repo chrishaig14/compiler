@@ -205,17 +205,6 @@ void GlobalProcessor::visit(SubscriptNode& node) {
 
 }
 
-void GlobalProcessor::visit(StructNode& node) {
-//    ClassInfo* class_info = new ClassInfo();
-//    for (auto f: node.fields) {
-//        class_info->member_names.push_back(f.first);
-//        class_info->member_types.push_back(f.second);
-//        class_info->fields[f.first] = f.second;
-//    }
-//    class_info->type_parameters = node.template_parameters;
-//    this->class_table->set(node.identifier, class_info);
-}
-
 void GlobalProcessor::visit(FunctionNode& node) {
     FunctionTypeNode function_info(node.parameter_types, *node.return_type);
     this->function_table->add(node.identifier, function_info);

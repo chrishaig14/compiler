@@ -63,6 +63,8 @@ add_library(parser parser/Parser.cpp
         parser/UnexpectedToken.h
         )
 
+add_library(translator translator/Translator.cpp
+        translator/Translator.h)
 add_library(srcLib
         color_codes.h
 
@@ -91,8 +93,7 @@ add_library(srcLib
         semantic/ReturnError.h
         semantic/ScopeError.cpp
         semantic/ScopeError.h
-        translator/Translator.cpp
-        translator/Translator.h
+
         instructions/GetInst.cpp
         instructions/GetInst.h
         instructions/SetInst.cpp
@@ -162,5 +163,5 @@ add_library(srcLib
         instructions/DefineStructInst.h
         instructions/MakeDefaultInst.cpp
         instructions/MakeDefaultInst.h
-        semantic/AssignmentTypeError.cpp semantic/AssignmentTypeError.h instructions/JumpInst.cpp instructions/JumpInst.h instructions/EnterScope.cpp instructions/EnterScope.h instructions/LeaveScope.cpp instructions/LeaveScope.h vm/LabelledCode.cpp vm/LabelledCode.h instructions/NopInst.cpp instructions/NopInst.h  vm/Loader.cpp vm/Loader.h instructions/StartFunction.cpp instructions/StartFunction.h instructions/EndFunction.cpp instructions/EndFunction.h formatter/Formatter.cpp formatter/Formatter.h  instructions/JumpIfNone.cpp instructions/JumpIfNone.h vm/NoneObject.cpp vm/NoneObject.h instructions/PushNone.cpp instructions/PushNone.h  semantic/TypeClassInfo.cpp semantic/TypeClassInfo.h run.h run.cpp instructions/PopInst.cpp instructions/PopInst.h nodes/node_types.h types.h macros.h)
+        semantic/AssignmentTypeError.cpp semantic/AssignmentTypeError.h instructions/JumpInst.cpp instructions/JumpInst.h instructions/EnterScope.cpp instructions/EnterScope.h instructions/LeaveScope.cpp instructions/LeaveScope.h vm/LabelledCode.cpp vm/LabelledCode.h instructions/NopInst.cpp instructions/NopInst.h vm/Loader.cpp vm/Loader.h instructions/StartFunction.cpp instructions/StartFunction.h instructions/EndFunction.cpp instructions/EndFunction.h formatter/Formatter.cpp formatter/Formatter.h instructions/JumpIfNone.cpp instructions/JumpIfNone.h vm/NoneObject.cpp vm/NoneObject.h instructions/PushNone.cpp instructions/PushNone.h semantic/TypeClassInfo.cpp semantic/TypeClassInfo.h run.h run.cpp instructions/PopInst.cpp instructions/PopInst.h nodes/node_types.h types.h macros.h)
 

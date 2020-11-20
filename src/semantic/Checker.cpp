@@ -763,18 +763,6 @@ bool Checker::type_exists(TypeNode& type) {
 //    return true;
 }
 
-void Checker::visit(StructNode& n) {
-//    std::vector<std::string> type_params = n.template_parameters;
-//    this->type_params = type_params;
-//    for (auto f: n.fields) {
-//        if (!this->type_exists(f.second)) {
-//            throw std::runtime_error(
-//                    "Type " + f.second.to_string() + " for field '" + f.first + "' doesn't exist");
-//        }
-//    }
-//    this->type_params = {};
-}
-
 void Checker::visit(BlockNode& program) {
     SymbolInfo symbol_info;
     for (auto n: program.nodes) {

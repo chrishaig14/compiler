@@ -23,8 +23,6 @@ class ClassLiteralExpressionNode;
 
 class ClassLiteralFieldNode;
 
-class StructNode;
-
 class TernaryNode;
 
 class DeclarationNode;
@@ -114,8 +112,6 @@ public:
     virtual void visit(ReturnNode& node) = 0;
 
     virtual void visit(StringNode& node) = 0;
-
-    virtual void visit(StructNode& node) = 0;
 
     virtual void visit(SubscriptNode& node) = 0;
 
