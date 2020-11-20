@@ -29,11 +29,12 @@ Checker::Checker(SymbolTable* globals, ClassTable* class_table, FunctionTable* f
     auto list_class_info = new ClassInfo();
     list_class_info->class_name = "List";
     list_class_info->methods.insert(std::make_pair("len", new FunctionTypeNode({}, *T_INT)));
-    list_class_info->methods.insert(std::make_pair("push", new FunctionTypeNode({(TYPE("t", {}))}, *TYPE(".None", {}))));
+    list_class_info->methods.insert(
+            std::make_pair("push", new FunctionTypeNode({(TYPE("t", {}))}, *TYPE(".None", {}))));
     list_class_info->methods.insert(std::make_pair("pop", new FunctionTypeNode({}, *TYPE("t", {}))));
     list_class_info->methods.insert(
             std::make_pair("map", new FunctionTypeNode({FUNCTION_TYPE({ TYPE("t", {}) }, *TYPE("b", {}))},
-                                                      *T_LIST(TYPE("b", {})))));
+                                                       *T_LIST(TYPE("b", {})))));
     list_class_info->type_parameters = {"t"};
 
 
@@ -1204,82 +1205,82 @@ void Checker::dispatch(Node* nod) {
     auto& n = *nod;
     switch (n.ntype) {
         case NodeType::ASSIGN:
-            n.assign().accept(*this);
+            this->visit(n.assign());
             break;
         case NodeType::BINOP:
-            n.binop().accept(*this);
+            this->visit(n.binop());
             break;
         case NodeType::BLOCK:
-            n.block().accept(*this);
+            this->visit(n.block());
             break;
         case NodeType::BOOLEAN:
-            n.boolean().accept(*this);
+            this->visit(n.boolean());
             break;
         case NodeType::BRK:
-            n.brk().accept(*this);
+            this->visit(n.brk());
             break;
         case NodeType::CALL:
-            n.call().accept(*this);
+            this->visit(n.call());
             break;
         case NodeType::CLSEXP:
-            n.clsexp().accept(*this);
+            this->visit(n.clsexp());
             break;
         case NodeType::CLSFLD:
-            n.clsfld().accept(*this);
+            this->visit(n.clsfld());
             break;
         case NodeType::CLS:
-            n.cls().accept(*this);
+            this->visit(n.cls());
             break;
         case NodeType::CNTINUE:
-            n.cntinue().accept(*this);
+            this->visit(n.cntinue());
             break;
         case NodeType::DECL:
-            n.decl().accept(*this);
+            this->visit(n.decl());
             break;
         case NodeType::EMPTYLST:
-            n.emptylst().accept(*this);
+            this->visit(n.emptylst());
             break;
         case NodeType::FORLOOP:
-            n.forloop().accept(*this);
+            this->visit(n.forloop());
             break;
         case NodeType::FUNC:
-            n.func().accept(*this);
+            this->visit(n.func());
             break;
         case NodeType::ID:
-            n.id().accept(*this);
+            this->visit(n.id());
             break;
         case NodeType::IFF:
-            n.iff().accept(*this);
+            this->visit(n.iff());
             break;
         case NodeType::INSTANCE:
 //                n.instance().accept(*this);
             break;
         case NodeType::LST:
-            n.lst().accept(*this);
+            this->visit(n.lst());
             break;
         case NodeType::MEMBER:
-            n.member().accept(*this);
+            this->visit(n.member());
             break;
         case NodeType::NONE:
-            n.none().accept(*this);
+            this->visit(n.none());
             break;
         case NodeType::NUMBER:
-            n.number().accept(*this);
+            this->visit(n.number());
             break;
         case NodeType::RETRN:
-            n.retrn().accept(*this);
+            this->visit(n.retrn());
             break;
         case NodeType::STRNG:
-            n.strng().accept(*this);
+            this->visit(n.strng());
             break;
         case NodeType::SUB:
-            n.sub().accept(*this);
+            this->visit(n.sub());
             break;
         case NodeType::TERNARY:
-            n.ternary().accept(*this);
+            this->visit(n.ternary());
             break;
         case NodeType::WHIL:
-            n.whil().accept(*this);
+            this->visit(n.whil());
             break;
         case NodeType::UNINITIALIZED:
             break;

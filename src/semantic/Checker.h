@@ -51,7 +51,7 @@ std::map<std::string, TypeNode*> make_replacements(TypeNode* a, TypeNode* b);
 
 TypeNode* make_type(const TypeNode* o, std::map<std::string, TypeNode*> replacements);
 
-class Checker : public Visitor {
+class Checker {
     SymbolTable* scope;
     std::map<std::string, TypeClassInfo*> typeclasses;
     ClassTable* class_table;
@@ -66,54 +66,54 @@ public:
 
     void leave_scope();
 
-    void visit(AssignmentNode& node) override;
+    void visit(AssignmentNode& node);
 
-    void visit(BinopNode& node) override;
+    void visit(BinopNode& node);
 
-    void visit(CallNode& node) override;
+    void visit(CallNode& node);
 
-    void visit(DeclarationNode& node) override;
+    void visit(DeclarationNode& node);
 
-    void visit(FunctionNode& node) override;
+    void visit(FunctionNode& node);
 
-    void visit(IdNode& node) override;
+    void visit(IdNode& node);
 
-    void visit(IfNode& node) override;
+    void visit(IfNode& node);
 
-    void visit(ListNode& node) override;
+    void visit(ListNode& node);
 
-    void visit(MemberNode& node) override;
+    void visit(MemberNode& node);
 
-    void visit(NumberNode& node) override;
+    void visit(NumberNode& node);
 
-    void visit(ReturnNode& node) override;
+    void visit(ReturnNode& node);
 
-    void visit(StringNode& node) override;
+    void visit(StringNode& node);
 
-    void visit(SubscriptNode& node) override;
+    void visit(SubscriptNode& node);
 
-    void visit(BlockNode& node) override;
+    void visit(BlockNode& node);
 
-    void visit(ClassLiteralExpressionNode& node) override;
+    void visit(ClassLiteralExpressionNode& node);
 
-    void visit(ClassLiteralFieldNode& node) override;
+    void visit(ClassLiteralFieldNode& node);
 
-    void visit(ForNode& node) override;
+    void visit(ForNode& node);
 
-    void visit(BooleanNode& node) override;
+    void visit(BooleanNode& node);
 
-    void visit(WhileNode& node) override;
+    void visit(WhileNode& node);
 
-    void visit(BreakNode& node) override;
+    void visit(BreakNode& node);
 
-    void visit(TernaryNode& node) override;
+    void visit(TernaryNode& node);
 
-    void visit(NoneNode& node) override;
+    void visit(NoneNode& node);
 
 
     bool can_assign(const TypeNode& from, const TypeNode& to);
 
-    void visit(EmptyListNode& node) override;
+    void visit(EmptyListNode& node);
 
     void check_structs();
 
@@ -126,9 +126,9 @@ public:
 
     FunctionTable* function_table;
 
-    void visit(ClassNode& node) override;
+    void visit(ClassNode& node);
 
-    void visit(InstanceNode& node) override;
+    void visit(InstanceNode& node);
 
     TypeClassInfo* get_typeclass_for_function(std::string function_name) {
         for (auto typeclass: this->typeclasses) {
@@ -143,7 +143,7 @@ public:
     void match_arguments_to_generic_function(const FunctionTypeNode& function_type, VectorOfTypes arg_types);
 
 
-    void visit(ContinueNode& node) override;
+    void visit(ContinueNode& node);
 
 
     void dispatch(Node* nod);
