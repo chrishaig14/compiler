@@ -119,7 +119,7 @@ void Translator::visit(IfNode& node) {
 //    this->dispatch(node.then);
     this->visit(*node.then);
     CodeLabel then_code = this->code;
-    bool has_else = !node.selse->nodes.empty();
+    bool has_else = node.selse != nullptr && !node.selse->nodes.empty();
 //    bool has_else = node.selse != nullptr;
 
     out.push_back(LC("labelinif", I_JUMPF(then_code.size() + 3 + (has_else && node.elifs.size() == 0 ? 1 : 0))));
