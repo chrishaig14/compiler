@@ -121,12 +121,23 @@ VectorOfNodes Parser::parse_list_of_expressions() {
 Node* Parser::parse_assignment_or_expression() {
     Node* lvalue = this->parse_expression();
 //    auto call = TO_CALL(lvalue);
-    if (this->match(TokType::EQQ)) {
+    if (item_in_vec(this->token.type, {TokType::EQQ, TokType::PLUS_EQQ, TokType::MINUS_EQQ})) {
         if (lvalue->ntype == NodeType::CALL) {
             throw std::runtime_error("Can't assign to a function call!");
         }
+        TokType op = this->token.type;
         this->next();
         Node* rvalue = this->parse_expression();
+        if (lvalue->ntype != ID && item_in_vec(op, {TokType::PLUS_EQQ, TokType::MINUS_EQQ})) {
+            throw std::runtime_error("Error += or -= can only be used on ids!");
+        }
+        if (lvalue->ntype == ID) {
+            if (op == TokType::PLUS_EQQ) {
+                rvalue = new BinopNode(OpType::ADD, new IdNode(lvalue->id().identifier), rvalue);
+            } else if (op == TokType::MINUS_EQQ) {
+                rvalue = new BinopNode(OpType::SUB, new IdNode(lvalue->id().identifier), rvalue);
+            }
+        }
         Node* node = new AssignmentNode(lvalue, rvalue);
 //        node->start = lvalue->start;
 //        node->end = rvalue->end;
@@ -134,7 +145,8 @@ Node* Parser::parse_assignment_or_expression() {
     } else {
         if (lvalue->ntype != NodeType::CALL) {
             throw std::runtime_error(
-                    "Only function calls are allowed here! No ID, NUM, SUBSCRIPT, BINOP or other expression!");
+                    "Only function calls are allowed here! No ID, NUM, SUBSCRIPT, BINOP or other expression!"
+            );
         }
     }
     return lvalue;
@@ -289,9 +301,11 @@ Node* Parser::parse_id_or_literal() {
             return node;
         }
         default:
-            throw UnexpectedToken(token,
-                                  {TokType::STRING, TokType::NUM, TokType::ID, TokType::FUN,
-                                   TokType::LPAREN});
+            throw UnexpectedToken(
+                    token,
+                    {TokType::STRING, TokType::NUM, TokType::ID, TokType::FUN,
+                     TokType::LPAREN}
+            );
 //            throw std::runtime_error("parsing id or literal, unknown token type: " + TOKEN_STRINGS[token.type]);
     }
     return node;
