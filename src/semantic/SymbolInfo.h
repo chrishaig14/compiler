@@ -24,6 +24,8 @@ public:
         this->is_class_method = other.is_class_method;
         if (other._type != nullptr) {
             this->_type = other._type->clone();
+        }else {
+            this->_type = nullptr;
         }
     }
 
