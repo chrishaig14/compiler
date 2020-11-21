@@ -354,18 +354,18 @@ TEST_F(parser_test, class_literal_empty_ok) {
 ////    EXPECT_EQ(*node,*expected_node);
 }
 
-TEST_F(parser_test, class_literal_error_2) {
-    std::string text = "#Person{name, age: 32}";
-    SetUp(text);
-    std::vector<Token> tokens = scanner->scan_all();
-    Parser parser(tokens);
-    try {
-        node = parser.parse_factor();
-        FAIL() << "Didn't throw UnexpectedToken";
-    } catch (const UnexpectedToken& e) {
-
-    }
-}
+//TEST_F(parser_test, class_literal_error_2) {
+//    std::string text = "#Person{name, age: 32}";
+//    SetUp(text);
+//    std::vector<Token> tokens = scanner->scan_all();
+//    Parser parser(tokens);
+//    try {
+//        node = parser.parse_factor();
+//        FAIL() << "Didn't throw UnexpectedToken";
+//    } catch (const UnexpectedToken& e) {
+//
+//    }
+//}
 
 TEST_F(parser_test, function_with_params_return_type_and_body) {
 //    std::string text = FUN_FOO_STRING;

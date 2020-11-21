@@ -48,54 +48,54 @@ public:
 
     void leave_scope();
 
-    SymbolInfo visit(AssignmentNode& n);
+    SymbolInfo* visit(AssignmentNode& n);
 
-    SymbolInfo visit(BinopNode& node);
+    SymbolInfo* visit(BinopNode& node);
 
-    SymbolInfo visit(CallNode& node);
+    SymbolInfo* visit(CallNode& node);
 
-    SymbolInfo visit(DeclarationNode& node);
+    SymbolInfo* visit(DeclarationNode& node);
 
-    SymbolInfo visit(FunctionNode& node);
+    SymbolInfo* visit(FunctionNode& node);
 
-    SymbolInfo visit(IdNode& node);
+    SymbolInfo* visit(IdNode& node);
 
-    SymbolInfo visit(IfNode& node);
+    SymbolInfo* visit(IfNode& node);
 
-    SymbolInfo visit(ListNode& node);
+    SymbolInfo* visit(ListNode& node);
 
-    SymbolInfo visit(MemberNode& node);
+    SymbolInfo* visit(MemberNode& node);
 
-    SymbolInfo visit(NumberNode& node);
+    SymbolInfo* visit(NumberNode& node);
 
-    SymbolInfo visit(ReturnNode& n);
+    SymbolInfo* visit(ReturnNode& n);
 
-    SymbolInfo visit(StringNode& node);
+    SymbolInfo* visit(StringNode& node);
 
-    SymbolInfo visit(SubscriptNode& node);
+    SymbolInfo* visit(SubscriptNode& node);
 
-    SymbolInfo visit(BlockNode& node);
+    SymbolInfo* visit(BlockNode& node);
 
-    SymbolInfo visit(ClassLiteralExpressionNode& node);
+    SymbolInfo* visit(ClassLiteralExpressionNode& node);
 
-    SymbolInfo visit(ClassLiteralFieldNode& node);
+    SymbolInfo* visit(ClassLiteralFieldNode& node);
 
-    SymbolInfo visit(ForNode& node);
+    SymbolInfo* visit(ForNode& node);
 
-    SymbolInfo visit(BooleanNode& node);
+    SymbolInfo* visit(BooleanNode& node);
 
-    SymbolInfo visit(WhileNode& node);
+    SymbolInfo* visit(WhileNode& node);
 
-    SymbolInfo visit(BreakNode& node);
+    SymbolInfo* visit(BreakNode& node);
 
-    SymbolInfo visit(TernaryNode& node);
+    SymbolInfo* visit(TernaryNode& node);
 
-    SymbolInfo visit(NoneNode& node);
+    SymbolInfo* visit(NoneNode& node);
 
 
     bool can_assign(const TypeNode& from, const TypeNode& to);
 
-    SymbolInfo visit(EmptyListNode& node);
+    SymbolInfo* visit(EmptyListNode& node);
 
     bool type_exists(TypeNode& type);
 
@@ -106,7 +106,7 @@ public:
 
     FunctionTable* function_table;
 
-    SymbolInfo visit(ClassNode& node);
+    SymbolInfo* visit(ClassNode& node);
 
     TypeClassInfo* get_typeclass_for_function(std::string function_name);
 
@@ -114,10 +114,10 @@ public:
     SymbolInfo match_arguments_to_generic_function(const FunctionTypeNode& function_type, VectorOfTypes arg_types);
 
 
-    SymbolInfo visit(ContinueNode& node);
+    SymbolInfo* visit(ContinueNode& node);
 
 
-    SymbolInfo dispatch(Node* nod);
+    SymbolInfo* dispatch(Node* nod);
 };
 
 #endif //CHECKER_H

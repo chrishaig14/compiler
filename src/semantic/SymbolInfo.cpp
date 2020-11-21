@@ -9,6 +9,7 @@ SymbolInfo::SymbolInfo() {
     this->is_method = false;
     this->class_info = nullptr;
     this->is_class_method = false;
+    this->_type = nullptr;
 }
 
 void SymbolInfo::set_type(const TypeNode& typ) {

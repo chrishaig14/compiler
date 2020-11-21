@@ -17,6 +17,22 @@ public:
     ClassInfo* class_info;
     bool is_class_method;
 
+    SymbolInfo(const SymbolInfo& other) {
+        this->is_function = other.is_function;
+        this->is_method = other.is_method;
+        this->class_info = other.class_info;
+        this->is_class_method = other.is_class_method;
+        if (other._type != nullptr) {
+            this->_type = other._type->clone();
+        }
+    }
+
+    ~SymbolInfo() {
+        if (this->_type != nullptr) {
+            delete this->_type;
+        }
+    }
+
     SymbolInfo();
 
     void set_type(const TypeNode& typ);
