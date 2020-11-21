@@ -17,6 +17,11 @@ public:
     ClassInfo* class_info;
     bool is_class_method;
 
+    SymbolInfo& operator=(const SymbolInfo& other) {
+        this->_type = other._type->clone();
+        return *this;
+    }
+
     SymbolInfo(const SymbolInfo& other) {
         this->is_function = other.is_function;
         this->is_method = other.is_method;
@@ -24,7 +29,7 @@ public:
         this->is_class_method = other.is_class_method;
         if (other._type != nullptr) {
             this->_type = other._type->clone();
-        }else {
+        } else {
             this->_type = nullptr;
         }
     }

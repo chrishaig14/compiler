@@ -709,7 +709,8 @@ USymbolInfo Checker::visit(CallNode& n) {
         }
         VectorOfTypes arg_types;
         for (auto& arg: n.arguments) {
-            const TypeNode& arg_type = this->dispatch(arg)->type();
+            USymbolInfo arg_type_p = this->dispatch(arg);
+            const TypeNode& arg_type = arg_type_p->type();
             if (this->replace_me) {
                 arg = replacement;
                 this->replace_me = false;
