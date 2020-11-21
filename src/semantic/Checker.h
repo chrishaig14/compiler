@@ -16,20 +16,6 @@
 #include "../utils.h"
 #include "../nodes/nodes.h"
 
-class SymbolInfo {
-    const TypeNode* _type;
-public:
-    bool is_function;
-    bool is_method;
-    ClassInfo* class_info;
-    bool is_class_method;
-
-    SymbolInfo();
-
-    void set_type(const TypeNode& typ);
-
-    const TypeNode& type();
-};
 
 bool type_matches(TypeNode* a, TypeNode* b);
 
@@ -101,8 +87,6 @@ public:
     bool can_assign(const TypeNode& from, const TypeNode& to);
 
     SymbolInfo visit(EmptyListNode& node);
-
-    void check_structs();
 
     bool type_exists(TypeNode& type);
 

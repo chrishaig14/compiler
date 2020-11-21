@@ -9,7 +9,6 @@
 #include <map>
 #include "ObjectInfo.h"
 #include "FunctionInfo.h"
-#include "SymbolInfo.h"
 
 class ClassInfo {
 public:
