@@ -35,6 +35,15 @@ public:
 
     Checker(SymbolTable* globals, ClassTable* class_table, FunctionTable* function_table);
 
+    ~Checker() {
+        for (auto s: this->scopes) {
+            if (s.first == "global") {
+                continue;
+            }
+            delete s.second;
+        }
+    }
+
     void enter_scope(std::string name);
 
     void leave_scope();

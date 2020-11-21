@@ -18,6 +18,12 @@ public:
     bool declared(std::string name);
 
     void set(std::string name, ClassInfo* info);
+
+    ~ClassTable() {
+        for (auto c: this->table) {
+            delete c.second;
+        }
+    }
 };
 
 #endif //CLASSTABLE_H

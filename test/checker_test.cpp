@@ -5,6 +5,7 @@
 #include <semantic/Checker.h>
 #include "vm/CodeObject.h"
 
+
 BlockNode* get_ast(std::string text) {
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
@@ -88,204 +89,172 @@ void ASSERT_VARIABLE_TYPE(std::string text, std::string id, TypeNode* type) {
     EXPECT_EQ(checker.scopes["global"]->get(id), *type);
 }
 
-TEST(checker_test, fun_foo_cAomplete) {
+class checker_test : public ::testing::Test {
+protected:
+    BlockNode* tree;
+    GlobalProcessor gp;
+    Checker* checker;
+
+    void SetUp(std::string text) {
+        tree = get_ast(text);
+        gp.visit(*tree);
+        checker = new Checker(gp.globals, gp.class_table, gp.function_table);
+    }
+
+    void TearDown() override {
+        delete tree;
+        delete gp.globals;
+        delete gp.class_table;
+        delete gp.function_table;
+        delete checker;
+    }
+};
+
+
+TEST_F(checker_test, fun_foo_complete) {
     std::string text = "fun foo(y: String)->Integer{return 0;}";
-    BlockNode* tree = get_ast(text);
-    GlobalProcessor gp;
-    gp.visit(*tree);
-    Checker checker(gp.globals, gp.class_table, gp.function_table);
-    checker.visit(*tree);
+    SetUp(text);
+    checker->visit(*tree);
 }
 
-TEST(checker_test, test_assign_string_to_int_error) {
+TEST_F(checker_test, test_assign_string_to_int_error) {
     std::string text = "fun foo()->Integer{var x : Integer = \"Hello\";return 0;}";
-    BlockNode* tree = get_ast(text);
-    GlobalProcessor gp;
-    gp.visit(*tree);
-    Checker checker(gp.globals, gp.class_table, gp.function_table);
+    SetUp(text);
     try {
-        checker.visit(*tree);
+        checker->visit(*tree);
         FAIL();
     } catch (...) {
 
     }
 }
 
-TEST(checker_test, test_assign_int_to_string_error) {
+TEST_F(checker_test, test_assign_int_to_string_error) {
     std::string text = "fun foo()->Integer{var x : Integer = \"Hello\";return 0;}";
-    BlockNode* tree = get_ast(text);
-    GlobalProcessor gp;
-    gp.visit(*tree);
-    Checker checker(gp.globals, gp.class_table, gp.function_table);
+    SetUp(text);
     try {
-        checker.visit(*tree);
+        checker->visit(*tree);
         FAIL();
     } catch (...) {
 
     }
 }
 
-TEST(checker_test, test_assign_int_to_int_ok) {
+TEST_F(checker_test, test_assign_int_to_int_ok) {
     std::string text = "fun foo()->Integer{var x : Integer = 123;return 0;}";
-    BlockNode* tree = get_ast(text);
-    GlobalProcessor gp;
-    gp.visit(*tree);
-    Checker checker(gp.globals, gp.class_table, gp.function_table);
-    checker.visit(*tree);
+    SetUp(text);
+    checker->visit(*tree);
 }
 
-TEST(checker_test, test_assign_string_to_string_ok) {
+TEST_F(checker_test, test_assign_string_to_string_ok) {
     std::string text = "fun foo()->Integer{var x : String = \"Hello\";return 0;}";
-    BlockNode* tree = get_ast(text);
-    GlobalProcessor gp;
-    gp.visit(*tree);
-    Checker checker(gp.globals, gp.class_table, gp.function_table);
-    checker.visit(*tree);
+    SetUp(text);
+    checker->visit(*tree);
 }
 
-TEST(checker_test, test_if_condition_not_boolean_error) {
+TEST_F(checker_test, test_if_condition_not_boolean_error) {
     std::string text = "fun foo()->Integer{if 2 {return 1;}return 0;}";
-    BlockNode* tree = get_ast(text);
-    GlobalProcessor gp;
-    gp.visit(*tree);
-    Checker checker(gp.globals, gp.class_table, gp.function_table);
+    SetUp(text);
     try {
-        checker.visit(*tree);
+        checker->visit(*tree);
         FAIL();
     } catch (...) {
 
     }
 }
 
-TEST(checker_test, test_if_condition_boolean_ok) {
+TEST_F(checker_test, test_if_condition_boolean_ok) {
     std::string text = "fun foo()->Integer{if true {return 1;}return 0;}";
-    BlockNode* tree = get_ast(text);
-    GlobalProcessor gp;
-    gp.visit(*tree);
-    Checker checker(gp.globals, gp.class_table, gp.function_table);
-    checker.visit(*tree);
+    SetUp(text);
+    checker->visit(*tree);
 }
 
-TEST(checker_test, test_while_condition_not_boolean_error) {
+TEST_F(checker_test, test_while_condition_not_boolean_error) {
     std::string text = "fun foo()->Integer{while 2 {return 1;}return 0;}";
-    BlockNode* tree = get_ast(text);
-    GlobalProcessor gp;
-    gp.visit(*tree);
-    Checker checker(gp.globals, gp.class_table, gp.function_table);
+    SetUp(text);
     try {
-        checker.visit(*tree);
+        checker->visit(*tree);
         FAIL();
     } catch (...) {
 
     }
 }
 
-TEST(checker_test, test_while_condition_boolean_ok) {
+TEST_F(checker_test, test_while_condition_boolean_ok) {
     std::string text = "fun foo()->Integer{while true {return 1;}return 0;}";
-    BlockNode* tree = get_ast(text);
-    GlobalProcessor gp;
-    gp.visit(*tree);
-    Checker checker(gp.globals, gp.class_table, gp.function_table);
-    checker.visit(*tree);
+    SetUp(text);
+    checker->visit(*tree);
 }
 
-TEST(checker_test, test_for_not_a_list_error) {
+TEST_F(checker_test, test_for_not_a_list_error) {
     std::string text = "fun foo()->Integer{for x @ 2 {return 1;}return 0;}";
-    BlockNode* tree = get_ast(text);
-    GlobalProcessor gp;
-    gp.visit(*tree);
-    Checker checker(gp.globals, gp.class_table, gp.function_table);
+    SetUp(text);
     try {
-        checker.visit(*tree);
+        checker->visit(*tree);
         FAIL();
     } catch (...) {
 
     }
 }
 
-TEST(checker_test, test_for_list_ok) {
+TEST_F(checker_test, test_for_list_ok) {
     std::string text = "fun foo()->Integer{for x @ [1,2,3] {return 1;}return 0;}";
-    BlockNode* tree = get_ast(text);
-    GlobalProcessor gp;
-    gp.visit(*tree);
-    Checker checker(gp.globals, gp.class_table, gp.function_table);
-    checker.visit(*tree);
+    SetUp(text);
+    checker->visit(*tree);
 }
 
-TEST(checker_test, test_function_return_wrong_type_error) {
+TEST_F(checker_test, test_function_return_wrong_type_error) {
     std::string text = "fun foo()->Integer{return \"Hello\";}";
-    BlockNode* tree = get_ast(text);
-    GlobalProcessor gp;
-    gp.visit(*tree);
-    Checker checker(gp.globals, gp.class_table, gp.function_table);
+    SetUp(text);
     try {
-        checker.visit(*tree);
+        checker->visit(*tree);
         FAIL();
     } catch (...) {
 
     }
 }
 
-TEST(checker_test, test_function_return_ok) {
+TEST_F(checker_test, test_function_return_ok) {
     std::string text = "fun foo()->Integer{return 1;}";
-    BlockNode* tree = get_ast(text);
-    GlobalProcessor gp;
-    gp.visit(*tree);
-    Checker checker(gp.globals, gp.class_table, gp.function_table);
-    checker.visit(*tree);
+    SetUp(text);
+    checker->visit(*tree);
 }
 
-TEST(checker_test, test_call_undefined_function_error) {
+TEST_F(checker_test, test_call_undefined_function_error) {
     std::string text = "fun foo()->Integer{return bar();}";
-    BlockNode* tree = get_ast(text);
-    GlobalProcessor gp;
-    gp.visit(*tree);
-    Checker checker(gp.globals, gp.class_table, gp.function_table);
+    SetUp(text);
     try {
-        checker.visit(*tree);
+        checker->visit(*tree);
         FAIL();
     } catch (...) {
 
     }
 }
 
-TEST(checker_test, test_call_function_ok) {
+TEST_F(checker_test, test_call_function_ok) {
     std::string text = "fun foo()->Integer{return bar();}fun bar()->Integer{return 5;}";
-    BlockNode* tree = get_ast(text);
-    GlobalProcessor gp;
-    gp.visit(*tree);
-    Checker checker(gp.globals, gp.class_table, gp.function_table);
-    checker.visit(*tree);
+    SetUp(text);
+    checker->visit(*tree);
 }
 
-TEST(checker_test, test_empty_list_type_ok) {
+TEST_F(checker_test, test_empty_list_type_ok) {
     std::string text = "fun foo()->Integer{var x : List[Integer] = []::Integer; return 0;}";
-    BlockNode* tree = get_ast(text);
-    GlobalProcessor gp;
-    gp.visit(*tree);
-    Checker checker(gp.globals, gp.class_table, gp.function_table);
-    checker.visit(*tree);
+    SetUp(text);
+    checker->visit(*tree);
 }
 
-TEST(checker_test, test_empty_list_type_error) {
+TEST_F(checker_test, test_empty_list_type_error) {
     std::string text = "fun foo()->Integer{var x : List[String] = []::Integer; return 0;}";
-    BlockNode* tree = get_ast(text);
-    GlobalProcessor gp;
-    gp.visit(*tree);
-    Checker checker(gp.globals, gp.class_table, gp.function_table);
+    SetUp(text);
     try {
-        checker.visit(*tree);
+        checker->visit(*tree);
         FAIL();
     } catch (...) {
 
     }
 }
 
-TEST(checker_test, test_add_list_ok) {
+TEST_F(checker_test, test_add_list_ok) {
     std::string text = "fun foo()->Integer{var x = [0]; x = x + [1]; return 1;}";
-    BlockNode* tree = get_ast(text);
-    GlobalProcessor gp;
-    gp.visit(*tree);
-    Checker checker(gp.globals, gp.class_table, gp.function_table);
-    checker.visit(*tree);
+    SetUp(text);
+    checker->visit(*tree);
 }

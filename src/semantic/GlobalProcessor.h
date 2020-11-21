@@ -21,6 +21,12 @@ public:
 
     bool has_function(std::string name);
 
+    ~FunctionTable() {
+        for (auto f: this->functions) {
+            delete f.second;
+        }
+    }
+
     const FunctionTypeNode& get(std::string function_name);
 
 };

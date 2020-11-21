@@ -31,6 +31,11 @@ public:
 
     bool get_not_none(std::string name);
 
+    ~SymbolTable() {
+        for (auto e: this->table) {
+            delete e.second;
+        }
+    }
 
     std::string name;
     SymbolTable* parent;
