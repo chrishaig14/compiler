@@ -57,7 +57,7 @@ ReturnNode* Parser::parse_return() {
 }
 
 IfNode* Parser::parse_if() {
-    this->expect_token(TokType::IF);
+    Token if_tok = this->expect_token(TokType::IF);
     Node* condition = this->parse_expression();
     BlockNode* body = this->parse_possibly_empty_block();
     std::vector<std::pair<Node*, BlockNode*>> elifs;
@@ -72,7 +72,10 @@ IfNode* Parser::parse_if() {
         this->next();
         _else = this->parse_possibly_empty_block();
     }
-    return new IfNode(condition, body, elifs, _else);
+    IfNode* iff = new IfNode(condition, body, elifs, _else);
+    iff->line = if_tok.line;
+    iff->column = if_tok.column;
+    return iff;
 }
 
 Node* Parser::parse_list_literal() {
@@ -625,7 +628,7 @@ Node* Parser::parse_top_level_statement() {
 }
 
 ForNode* Parser::parse_for_loop() {
-    this->expect_token(TokType::FOR);
+    Token for_tok = this->expect_token(TokType::FOR);
     bool expect_paren = false;
     if (this->match(TokType::LPAREN)) {
         this->next();
@@ -641,7 +644,10 @@ ForNode* Parser::parse_for_loop() {
     this->inside_loop = true;
     BlockNode* body = this->parse_possibly_empty_block();
     this->inside_loop = prev;
-    return new ForNode(var.str, exp, body);
+    ForNode* forloop = new ForNode(var.str, exp, body);
+    forloop->line = for_tok.line;
+    forloop->column = for_tok.column;
+    return forloop;
 }
 
 Node* Parser::parse_ternary() {
@@ -658,13 +664,16 @@ Node* Parser::parse_ternary() {
 }
 
 WhileNode* Parser::parse_while_loop() {
-    this->expect_token(TokType::WHILE);
+    Token while_tok = this->expect_token(TokType::WHILE);
     Node* condition = this->parse_expression();
     bool prev = this->inside_loop;
     this->inside_loop = true;
     BlockNode* body = this->parse_possibly_empty_block();
     this->inside_loop = prev;
-    return new WhileNode(condition, body);
+    WhileNode* whil = new WhileNode(condition, body);
+    whil->line = while_tok.line;
+    whil->column = while_tok.column;
+    return whil;
 }
 
 ClassNode* Parser::parse_class_definition() {

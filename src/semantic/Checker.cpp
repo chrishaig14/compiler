@@ -105,12 +105,14 @@ USymbolInfo Checker::visit(FunctionNode& n) {
             if (last_node->ntype != NodeType::RETRN) {
                 // it's not a return statement, error
                 throw std::runtime_error(
-                        "Error: the last statement in a function returning a value should be \"return\" EXPRESSION "
+                        "Error in function \"" + n.identifier +
+                        "\": the last statement in a function returning a value should be \"return\" EXPRESSION "
                 );
             }
         } else {
             throw std::runtime_error(
-                    "Error: the last statement in a function returning a value should be \"return\" EXPRESSION "
+                    "Error in function \"" + n.identifier +
+                    "\"the last statement in a function returning a value should be \"return\" EXPRESSION "
             );
         }
     }
@@ -361,7 +363,8 @@ USymbolInfo Checker::visit(IfNode& n) {
 
     if (condition_info.type() != T_BOOL) {
         throw std::runtime_error(
-                "Expected a Boolean expression as a condition for if statement!, got " +
+                "Expected a Boolean expression as a condition for if statement at line " + std::to_string(n.line) +
+                " column " + std::to_string(n.column) + ", got " +
                 condition_info.type().to_string());
     }
 
@@ -1055,7 +1058,9 @@ USymbolInfo Checker::visit(ForNode& node) {
 
     const ObjectTypeNode& obj = symbol_info.type().object();
     if (obj.identifier != "List") {
-        throw std::runtime_error("For loop for a non-list!");
+        throw std::runtime_error(
+                "At line " + std::to_string(node.line) + " column " + std::to_string(node.column) +
+                ": For loop should have a List[t] after @ but got " + obj.to_string());
     }
 
     TypeNode& var_type = *obj.type_parameters[0];
@@ -1112,7 +1117,8 @@ USymbolInfo Checker::visit(WhileNode& node) {
 //                                 ": Expected Boolean expression as while loop condition, got " +
 //                                 condition.type->to_string());
         throw std::runtime_error(
-                "At line column : Expected Boolean expression as while loop condition, got " + str
+                "At line " + std::to_string(node.line) + " column " + std::to_string(node.column) +
+                ": Expected Boolean expression as while loop condition, got " + str
         );
     }
     this->enter_scope("while");
