@@ -23,6 +23,8 @@ public:
     ObjectTypeNode* type;
 
     bool equal(const Node& x) const override;
+    ClassLiteralExpressionNode& clsexp() override;
+    const ClassLiteralExpressionNode& clsexp() const override;
 };
 
 

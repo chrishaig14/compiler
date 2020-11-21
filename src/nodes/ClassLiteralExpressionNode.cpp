@@ -6,7 +6,9 @@
 
 
 ClassLiteralExpressionNode::ClassLiteralExpressionNode(ObjectTypeNode* type, const VectorOfNodes& init)
-        : type(type), init(init) {}
+        : type(type), init(init) {
+    this->ntype = CLSEXP;
+}
 
 bool ClassLiteralExpressionNode::equal(const Node& x) const {
     auto& other = x.clsexp();
@@ -18,4 +20,12 @@ ClassLiteralExpressionNode::~ClassLiteralExpressionNode() {
         delete i;
     }
     delete this->type;
+}
+
+ClassLiteralExpressionNode& ClassLiteralExpressionNode::clsexp() {
+    return *this;
+}
+
+const ClassLiteralExpressionNode& ClassLiteralExpressionNode::clsexp() const {
+    return *this;
 }

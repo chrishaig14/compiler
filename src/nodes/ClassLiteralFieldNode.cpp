@@ -5,7 +5,9 @@
 #include "ClassLiteralFieldNode.h"
 
 ClassLiteralFieldNode::ClassLiteralFieldNode(ObjectTypeNode* type, const std::map<std::string, Node*>& init)
-        : type(type), init(init) {}
+        : type(type), init(init) {
+    this->ntype = CLSFLD;
+}
 
 bool ClassLiteralFieldNode::equal(const Node& x) const {
     auto& other = x.clsfld();
@@ -17,4 +19,12 @@ ClassLiteralFieldNode::~ClassLiteralFieldNode() {
     for (auto p: this->init) {
         delete p.second;
     }
+}
+
+ClassLiteralFieldNode& ClassLiteralFieldNode::clsfld() {
+    return *this;
+}
+
+const ClassLiteralFieldNode& ClassLiteralFieldNode::clsfld() const {
+    return *this;
 }

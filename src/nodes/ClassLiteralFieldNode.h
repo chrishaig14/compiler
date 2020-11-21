@@ -21,6 +21,8 @@ public:
     std::map<std::string, Node*> init;
 
     ClassLiteralFieldNode(ObjectTypeNode* type, const std::map<std::string, Node*>& init);
+    ClassLiteralFieldNode& clsfld() override;
+    const ClassLiteralFieldNode& clsfld() const override;
 
 };
 
