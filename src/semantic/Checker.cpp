@@ -1,6 +1,3 @@
-//
-// Created by chris on 28/6/20.
-//
 #include <iostream>
 #include <set>
 #include "Checker.h"
@@ -88,7 +85,6 @@ SymbolInfo Checker::visit(FunctionNode& n) {
         throw std::runtime_error("type " + returnType.to_string() + " doesn't exist!");
     }
     this->scope->set("__return__", returnType);
-//    n.body->accept(*this)
     this->visit(*n.body);
     if (returnType != ObjectTypeNode(".None", {})) {
         if (n.body->nodes.size() != 0) {
@@ -187,7 +183,6 @@ SymbolInfo Checker::visit(DeclarationNode& n) {
         symbol_info.set_type(*n.type);
 
     } else if (n.expression->ntype != NodeType::UNINITIALIZED) {
-//        n.expression->accept(*this)
         SymbolInfo exp_info = this->dispatch(n.expression);
         if (this->replace_me) {
             n.expression = replacement;
@@ -200,17 +195,13 @@ SymbolInfo Checker::visit(DeclarationNode& n) {
 }
 
 SymbolInfo Checker::visit(AssignmentNode& n) {
-//    IdNode* lv = TO_ID(n.lvalue);
     if (n.lvalue->ntype == NodeType::ID) {
         if (n.lvalue->id().identifier == "_") {
-//            n.rvalue->accept(*this)
             this->dispatch(n.rvalue);
             return SymbolInfo();
         }
     }
-//    n.lvalue->accept(*this)
     SymbolInfo linfo = this->dispatch(n.lvalue);
-//    n.rvalue->accept(*this)
     SymbolInfo expression_type = this->dispatch(n.rvalue);
     if (this->replace_me) {
         n.rvalue = replacement;
@@ -218,7 +209,6 @@ SymbolInfo Checker::visit(AssignmentNode& n) {
     }
 
     auto actual_type = linfo.type().object();
-//    IdNode* lid = TO_ID(n.lvalue);
     if (n.lvalue->ntype == NodeType::ID && actual_type.identifier == "Option") {
         // special treatment if we are assigning to an id of a variable of type Option[t]
         if (expression_type.type() == (*actual_type.type_parameters[0])) {
@@ -287,7 +277,6 @@ SymbolInfo Checker::visit(MemberNode& n) {
             }
         }
     }
-//    n.parent->accept(*this)
 
     SymbolInfo symbol_info = this->dispatch(n.parent);
     if (symbol_info.type().kind != Kind::OBJECT) {
@@ -320,10 +309,6 @@ SymbolInfo Checker::visit(MemberNode& n) {
         class_info = instantiate_generic(class_info, final_type);
         this->class_table->set(object.to_string(), class_info);
     }
-//    if (!this->class_table->declared(type.type->to_string())) {
-//        throw std::runtime_error("Class " + type.type->to_string() + " not declared!");
-//    }
-//    = this->class_table->get(type.type->to_string());
     if (class_info->members.count(n.child) == 1) {
         // It's a member
         symbol_info.set_type(*class_info->members[n.child]);
@@ -346,9 +331,7 @@ SymbolInfo Checker::visit(MemberNode& n) {
 
 SymbolInfo Checker::visit(IfNode& n) {
     SymbolInfo symbol_info;
-//    n.condition->accept(*this)
     SymbolInfo condition_info = this->dispatch(n.condition);
-
 
     std::map<std::string, bool> not_null_vars;
 
@@ -358,21 +341,16 @@ SymbolInfo Checker::visit(IfNode& n) {
     }
 
     this->enter_scope("if");
-//    n.then->accept(*this)
     this->visit(*n.then);
     this->leave_scope();
 
     for (int i = 0; i < n.elifs.size(); i++) {
-
-//        n.elifs[i].first->accept(*this)
-
         condition_info = this->dispatch(n.elifs[i].first);
         if (condition_info.type() != T_BOOL) {
             throw std::runtime_error("Expected a Boolean expression as a condition for elif statement!, got " +
                                      condition_info.type().to_string());
         }
         this->enter_scope("elif");
-//        n.elifs[i].second->accept(*this)
         this->visit(*n.elifs[i].second);
         this->leave_scope();
     }
@@ -385,10 +363,7 @@ SymbolInfo Checker::visit(IfNode& n) {
 }
 
 SymbolInfo Checker::visit(BinopNode& n) {
-//    n.left->accept(*this)
-
     SymbolInfo left_info = this->dispatch(n.left);
-//    n.right->accept(*this)
     SymbolInfo right_info = this->dispatch(n.right);
 
     SymbolInfo symbol_info;
@@ -454,7 +429,6 @@ SymbolInfo Checker::visit(ReturnNode& n) {
     } else if (n.expression->ntype == NodeType::UNINITIALIZED) {
         throw std::runtime_error("not returning any value, but function expects type: " + return_type.to_string());
     }
-//    n.expression->accept(*this)
     SymbolInfo expression_info = this->dispatch(n.expression);
     if (this->replace_me) {
         n.expression = replacement;
@@ -652,7 +626,6 @@ Checker::match_arguments_to_generic_function(const FunctionTypeNode& function_ty
 
 
 SymbolInfo Checker::visit(CallNode& n) {
-//    n.function->accept(*this)
     SymbolInfo fun_info = this->dispatch(n.function);
     bool is_a_method = false;
     Node* object_node;
@@ -690,7 +663,6 @@ SymbolInfo Checker::visit(CallNode& n) {
         }
         VectorOfTypes arg_types;
         for (auto& arg: n.arguments) {
-//            arg->accept(*this)
             const TypeNode& arg_type = this->dispatch(arg).type();
             if (this->replace_me) {
                 arg = replacement;
@@ -763,7 +735,6 @@ bool Checker::type_exists(TypeNode& type) {
 
 SymbolInfo Checker::visit(BlockNode& program) {
     for (auto n: program.nodes) {
-//        n->accept(*this)
         SymbolInfo sinfo = this->dispatch(n);
         if (n->ntype == NodeType::CALL) {
             // it's a function call
@@ -815,7 +786,6 @@ SymbolInfo Checker::visit(ClassLiteralExpressionNode& node) {
 
     for (int i = 0; i < num_actual_init; i++) {
         Node* exp = node.init[i];
-//        exp->accept(*this)
         SymbolInfo semanticInfo = this->dispatch(exp);
         if (this->replace_me) {
             node.init[i] = this->replacement;
@@ -889,7 +859,6 @@ bool Checker::can_assign_generic(TypeNode& from, TypeNode& to, std::vector<std::
 
 TypeNode*
 make_type_from_object_pattern(const ObjectTypeNode& object_type, std::map<std::string, TypeNode*> replacements) {
-//    auto object_type = original.object();
     std::string type_identifier = object_type.identifier;
     for (auto r: replacements) {
         if (type_identifier == r.first) {
@@ -1003,7 +972,6 @@ SymbolInfo Checker::visit(ClassLiteralFieldNode& node) {
     }
     for (auto f: node.init) {
         Node* exp = f.second;
-//        exp->accept(*this)
         SymbolInfo semanticInfo = this->dispatch(exp);
         if (this->replace_me) {
             node.init[f.first] = this->replacement;
@@ -1024,36 +992,31 @@ SymbolInfo Checker::visit(ClassLiteralFieldNode& node) {
 }
 
 SymbolInfo Checker::visit(ForNode& node) {
-//    node.exp->accept(*this)
-
     SymbolInfo symbol_info = this->dispatch(node.exp);
     if (symbol_info.type().kind != Kind::OBJECT) {
         throw std::runtime_error("Iterating over something bad!");
     }
+
     const ObjectTypeNode& obj = symbol_info.type().object();
     if (obj.identifier != "List") {
         throw std::runtime_error("For loop for a non-list!");
     }
-    TypeNode& var_type = *obj.type_parameters[0];
 
+    TypeNode& var_type = *obj.type_parameters[0];
     this->enter_scope("for");
     this->scope->set(node.var, var_type);
-//    node.body->accept(*this)
-//    this->dispatch(node.body);
     this->visit(*node.body);
     this->leave_scope();
     return SymbolInfo();
 }
 
 SymbolInfo Checker::visit(ListNode& node) {
-//    node.elements[0]->accept(*this)
     const auto& element_type = this->dispatch(node.elements[0]).type();
     if (this->replace_me) {
         node.elements[0] = this->replacement;
         this->replace_me = false;
     }
     for (int i = 1; i < node.elements.size(); i++) {
-//        node.elements[i]->accept(*this)
         auto& current_type = this->dispatch(node.elements[i]).type();
         if (this->replace_me) {
             node.elements[i] = this->replacement;
@@ -1080,7 +1043,6 @@ SymbolInfo Checker::visit(BooleanNode& node) {
 }
 
 SymbolInfo Checker::visit(WhileNode& node) {
-//    node.condition->accept(*this)
     SymbolInfo condition = this->dispatch(node.condition);
     if (condition.type() != ObjectTypeNode("Boolean", {})) {
 //        throw std::runtime_error("At line " +
@@ -1092,8 +1054,6 @@ SymbolInfo Checker::visit(WhileNode& node) {
                                  condition.type().to_string());
     }
     this->enter_scope("while");
-//    node.body->accept(*this)
-//    this->dispatch(node.body);
     this->visit(*node.body);
     this->leave_scope();
     return SymbolInfo();
@@ -1114,12 +1074,10 @@ SymbolInfo Checker::visit(StringNode& node) {
 }
 
 SymbolInfo Checker::visit(SubscriptNode& node) {
-//    node.parent->accept(*this)
     SymbolInfo parent = this->dispatch(node.parent);
     for (auto& c: node.child) {
         this->dispatch(c);
     }
-////    node.child->accept(*this)
     if (parent.type().kind != Kind::OBJECT) {
         throw std::runtime_error("Accessing subscript of non object!");
     }
@@ -1137,8 +1095,6 @@ SymbolInfo Checker::visit(BreakNode& node) {
 }
 
 SymbolInfo Checker::visit(TernaryNode& node) {
-//    node.expression->accept(*this)
-
     SymbolInfo expression_info = this->dispatch(node.expression);
     if (expression_info.type().kind != Kind::OBJECT) {
         throw std::runtime_error("Unexpected non-object");
@@ -1153,14 +1109,12 @@ SymbolInfo Checker::visit(TernaryNode& node) {
     semanticInfo.set_type(type);
     this->enter_scope("true_case");
     this->scope->set("it", type);
-//    node.true_case->accept(*this)
     SymbolInfo true_case = this->dispatch(node.true_case);
     if (this->replace_me) {
         node.true_case = this->replacement;
         this->replace_me = false;
     }
     this->leave_scope();
-//    node.false_case->accept(*this)
     SymbolInfo false_case = this->dispatch(node.false_case);
     if (this->replace_me) {
         node.false_case = this->replacement;
@@ -1170,7 +1124,6 @@ SymbolInfo Checker::visit(TernaryNode& node) {
         throw std::runtime_error(
                 "True case and false case type don't match: " + true_case.type().to_string() + " != " +
                 false_case.type().to_string());
-//        semanticInfo.type() = TYPE("Union", {true_case.type(), false_case.type()});
     } else {
         semanticInfo.set_type(true_case.type());
     }
@@ -1201,8 +1154,6 @@ SymbolInfo Checker::visit(ClassNode& node) {
         }
         this->scope->set("this", ObjectTypeNode(node.class_name, tp));
         this->leave_scope();
-//        method.second->accept(*this)
-//        this->dispatch(method.second);
         this->visit(*method.second);
     }
     return SymbolInfo();
