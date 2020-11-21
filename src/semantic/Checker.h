@@ -43,7 +43,6 @@ class Checker {
     SymbolTable* scope;
     std::map<std::string, TypeClassInfo*> typeclasses;
     ClassTable* class_table;
-    SymbolInfo rv;
     Node* replacement;
 public:
     std::map<std::string, SymbolTable*> scopes;
@@ -54,54 +53,54 @@ public:
 
     void leave_scope();
 
-    void visit(AssignmentNode& node);
+    SymbolInfo visit(AssignmentNode& n);
 
-    void visit(BinopNode& node);
+    SymbolInfo visit(BinopNode& node);
 
-    void visit(CallNode& node);
+    SymbolInfo visit(CallNode& node);
 
-    void visit(DeclarationNode& node);
+    SymbolInfo visit(DeclarationNode& node);
 
-    void visit(FunctionNode& node);
+    SymbolInfo visit(FunctionNode& node);
 
-    void visit(IdNode& node);
+    SymbolInfo visit(IdNode& node);
 
-    void visit(IfNode& node);
+    SymbolInfo visit(IfNode& node);
 
-    void visit(ListNode& node);
+    SymbolInfo visit(ListNode& node);
 
-    void visit(MemberNode& node);
+    SymbolInfo visit(MemberNode& node);
 
-    void visit(NumberNode& node);
+    SymbolInfo visit(NumberNode& node);
 
-    void visit(ReturnNode& node);
+    SymbolInfo visit(ReturnNode& n);
 
-    void visit(StringNode& node);
+    SymbolInfo visit(StringNode& node);
 
-    void visit(SubscriptNode& node);
+    SymbolInfo visit(SubscriptNode& node);
 
-    void visit(BlockNode& node);
+    SymbolInfo visit(BlockNode& node);
 
-    void visit(ClassLiteralExpressionNode& node);
+    SymbolInfo visit(ClassLiteralExpressionNode& node);
 
-    void visit(ClassLiteralFieldNode& node);
+    SymbolInfo visit(ClassLiteralFieldNode& node);
 
-    void visit(ForNode& node);
+    SymbolInfo visit(ForNode& node);
 
-    void visit(BooleanNode& node);
+    SymbolInfo visit(BooleanNode& node);
 
-    void visit(WhileNode& node);
+    SymbolInfo visit(WhileNode& node);
 
-    void visit(BreakNode& node);
+    SymbolInfo visit(BreakNode& node);
 
-    void visit(TernaryNode& node);
+    SymbolInfo visit(TernaryNode& node);
 
-    void visit(NoneNode& node);
+    SymbolInfo visit(NoneNode& node);
 
 
     bool can_assign(const TypeNode& from, const TypeNode& to);
 
-    void visit(EmptyListNode& node);
+    SymbolInfo visit(EmptyListNode& node);
 
     void check_structs();
 
@@ -114,18 +113,18 @@ public:
 
     FunctionTable* function_table;
 
-    void visit(ClassNode& node);
+    SymbolInfo visit(ClassNode& node);
 
     TypeClassInfo* get_typeclass_for_function(std::string function_name);
 
     bool replace_me;
-    void match_arguments_to_generic_function(const FunctionTypeNode& function_type, VectorOfTypes arg_types);
+    SymbolInfo match_arguments_to_generic_function(const FunctionTypeNode& function_type, VectorOfTypes arg_types);
 
 
-    void visit(ContinueNode& node);
+    SymbolInfo visit(ContinueNode& node);
 
 
-    void dispatch(Node* nod);
+    SymbolInfo dispatch(Node* nod);
 };
 
 #endif //CHECKER_H
