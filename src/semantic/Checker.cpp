@@ -14,37 +14,55 @@ bool function_is_generic(const FunctionTypeNode& ft) {
     return false;
 }
 
+ClassInfo* make_list_class_info() {
+    auto list_class_info = new ClassInfo();
+    list_class_info->class_name = "List";
+    list_class_info->methods.insert(std::make_pair("len", new FunctionTypeNode({}, new T_INT)));
+
+    ObjectTypeNode generic_type_t("t", {});
+    ObjectTypeNode generic_type_b("b", {});
+
+    list_class_info->methods.insert(
+            std::make_pair("push", new FunctionTypeNode({(generic_type_t.clone())}, TYPE(".None", {}))));
+    list_class_info->methods.insert(std::make_pair("pop", new FunctionTypeNode({}, generic_type_t.clone())));
+    list_class_info->methods.insert(
+            std::make_pair(
+                    "map",
+                    new FunctionTypeNode(
+                            {FUNCTION_TYPE({ generic_type_t.clone() },
+                                           generic_type_b.clone())},
+                            new T_LIST(generic_type_b.clone()))));
+    list_class_info->type_parameters = {"t"};
+    return list_class_info;
+}
+
+ClassInfo* make_int_class_info() {
+    auto int_class_info = new ClassInfo();
+    int_class_info->class_name = "Integer";
+    int_class_info->methods.insert(std::make_pair("str", new FunctionTypeNode({}, new T_STRING)));
+    return int_class_info;
+}
+
+ClassInfo* make_string_class_info() {
+    auto string_class_info = new ClassInfo();
+    string_class_info->class_name = "String";
+    string_class_info->methods.insert(std::make_pair("len", new FunctionTypeNode({}, new T_INT)));
+    return string_class_info;
+}
+
 Checker::Checker(SymbolTable* globals, ClassTable* class_table, FunctionTable* function_table) {
     this->function_table = function_table;
     this->class_table = class_table;
     this->scope = globals;
     this->scopes["global"] = this->scope;
-    auto int_class_info = new ClassInfo();
-    int_class_info->class_name = "Integer";
-    int_class_info->methods.insert(std::make_pair("str", new FunctionTypeNode({}, new T_STRING)));
-
-    auto list_class_info = new ClassInfo();
-    list_class_info->class_name = "List";
-    list_class_info->methods.insert(std::make_pair("len", new FunctionTypeNode({}, new T_INT)));
-    list_class_info->methods.insert(
-            std::make_pair("push", new FunctionTypeNode({(TYPE("t", {}))}, TYPE(".None", {}))));
-    list_class_info->methods.insert(std::make_pair("pop", new FunctionTypeNode({}, TYPE("t", {}))));
-    list_class_info->methods.insert(
-            std::make_pair("map", new FunctionTypeNode({FUNCTION_TYPE({ TYPE("t", {}) }, TYPE("b", {}))},
-                                                       new T_LIST(TYPE("b", {})))));
-    list_class_info->type_parameters = {"t"};
 
 
-    this->class_table->set("Integer", int_class_info);
-    this->class_table->set("List", list_class_info);
+    this->class_table->set("Integer", make_int_class_info());
+    this->class_table->set("List", make_list_class_info());
+    this->class_table->set("String", make_string_class_info());
 
-    auto string_class_info = new ClassInfo();
-    string_class_info->class_name = "String";
-    string_class_info->methods.insert(std::make_pair("len", new FunctionTypeNode({}, new T_INT)));
-    this->class_table->set("String", string_class_info);
+    this->class_table->set("Option", new ClassInfo("Option", std::vector<std::string>(), {}, {"t"}));
     this->replace_me = false;
-    this->class_table->set("Option",
-                           new ClassInfo("Option", std::vector<std::string>(), {}, {"t"}));
 }
 
 void Checker::enter_scope(std::string name) {
@@ -87,11 +105,13 @@ SymbolInfo Checker::visit(FunctionNode& n) {
             if (last_node->ntype != NodeType::RETRN) {
                 // it's not a return statement, error
                 throw std::runtime_error(
-                        "Error: the last statement in a function returning a value should be \"return\" EXPRESSION ");
+                        "Error: the last statement in a function returning a value should be \"return\" EXPRESSION "
+                );
             }
         } else {
             throw std::runtime_error(
-                    "Error: the last statement in a function returning a value should be \"return\" EXPRESSION ");
+                    "Error: the last statement in a function returning a value should be \"return\" EXPRESSION "
+            );
         }
     }
     this->leave_scope();
@@ -286,8 +306,10 @@ SymbolInfo Checker::visit(MemberNode& n) {
                 // we can guarantee that it's not null, so we can access the members
                 option_type = &(object.type_parameters[0])->object();
             } else {
-                throw std::runtime_error("Error: line " + std::to_string(idn.line + 1) + " -> " + idn.identifier +
-                                         " might be none here, make sure to  this in a if XXX != none {...}!");
+                throw std::runtime_error(
+                        "Error: line " + std::to_string(idn.line + 1) + " -> " + idn.identifier +
+                        " might be none here, make sure to  this in a if XXX != none {...}!"
+                );
             }
         }
     }
@@ -298,7 +320,8 @@ SymbolInfo Checker::visit(MemberNode& n) {
     } else {
         if (is_generic((final_type)) && final_type.type_parameters.size() == 0) {
             throw std::runtime_error(
-                    "Cannot access member of totally generic value of generic type " + object.identifier + "!");
+                    "Cannot access member of totally generic value of generic type " + object.identifier + "!"
+            );
         }
         class_info = this->class_table->get(object.identifier);
         class_info = instantiate_generic(class_info, final_type);
@@ -331,8 +354,9 @@ SymbolInfo Checker::visit(IfNode& n) {
     std::map<std::string, bool> not_null_vars;
 
     if (condition_info.type() != T_BOOL) {
-        throw std::runtime_error("Expected a Boolean expression as a condition for if statement!, got " +
-                                 condition_info.type().to_string());
+        throw std::runtime_error(
+                "Expected a Boolean expression as a condition for if statement!, got " +
+                condition_info.type().to_string());
     }
 
     this->enter_scope("if");
@@ -342,8 +366,9 @@ SymbolInfo Checker::visit(IfNode& n) {
     for (int i = 0; i < n.elifs.size(); i++) {
         condition_info = this->dispatch(n.elifs[i].first);
         if (condition_info.type() != T_BOOL) {
-            throw std::runtime_error("Expected a Boolean expression as a condition for elif statement!, got " +
-                                     condition_info.type().to_string());
+            throw std::runtime_error(
+                    "Expected a Boolean expression as a condition for elif statement!, got " +
+                    condition_info.type().to_string());
         }
         this->enter_scope("elif");
         this->visit(*n.elifs[i].second);
@@ -362,8 +387,10 @@ SymbolInfo Checker::visit(BinopNode& n) {
     SymbolInfo right_info = this->dispatch(n.right);
 
     SymbolInfo symbol_info;
-    bool is_boolean = item_in_vec(n.op, {OpType::EQ, OpType::AND, OpType::OR, OpType::LEQ, OpType::GEQ, OpType::LT,
-                                         OpType::GT, OpType::NEQ});
+    bool is_boolean = item_in_vec(
+            n.op, {OpType::EQ, OpType::AND, OpType::OR, OpType::LEQ, OpType::GEQ, OpType::LT,
+                   OpType::GT, OpType::NEQ}
+    );
     if (is_boolean) {
         if (left_info.type().kind == Kind::OBJECT) {
             auto left = left_info.type().object();
@@ -472,8 +499,10 @@ std::map<std::string, TypeNode*> make_replacements(TypeNode* a, TypeNode* b) {
         }
         for (int i = 0; i < oa.type_parameters.size(); i++) {
             if (is_generic(*oa.type_parameters[i])) {
-                std::map<std::string, TypeNode*> rep = make_replacements(oa.type_parameters[i],
-                                                                         ob.type_parameters[i]);
+                std::map<std::string, TypeNode*> rep = make_replacements(
+                        oa.type_parameters[i],
+                        ob.type_parameters[i]
+                );
                 replacements.insert(rep.begin(), rep.end());
             }
         }
@@ -483,8 +512,10 @@ std::map<std::string, TypeNode*> make_replacements(TypeNode* a, TypeNode* b) {
             FunctionTypeNode& fb = b->function();
             for (int i = 0; i < fa.parameter_types.size(); i++) {
                 if (is_generic(*fa.parameter_types[i])) {
-                    std::map<std::string, TypeNode*> rep = make_replacements(fa.parameter_types[i],
-                                                                             fb.parameter_types[i]);
+                    std::map<std::string, TypeNode*> rep = make_replacements(
+                            fa.parameter_types[i],
+                            fb.parameter_types[i]
+                    );
                     replacements.insert(rep.begin(), rep.end());
                 }
             }
@@ -514,8 +545,10 @@ bool type_matches(TypeNode* aa, TypeNode* bb) {
         VectorOfTypes param_types = fa.parameter_types;
         for (int i = 0; i < param_types.size(); i++) {
             if (type_matches(param_types[i], fb.parameter_types[i])) {
-                std::map<std::string, TypeNode*> rep = make_replacements(fa.parameter_types[i],
-                                                                         fb.parameter_types[i]);
+                std::map<std::string, TypeNode*> rep = make_replacements(
+                        fa.parameter_types[i],
+                        fb.parameter_types[i]
+                );
                 replacements.insert(rep.begin(), rep.end());
                 for (int j = 0; j < param_types.size(); j++) {
                     param_types[j] = make_type(*param_types[j], replacements);
@@ -566,7 +599,8 @@ make_generic_replacements(TypeNode& t_generic_type, TypeNode& t_matching_type) {
         for (int i = 0; i < generic_type.type_parameters.size(); i++) {
             std::map<std::string, TypeNode*> param_replacements = make_generic_replacements(
                     *generic_type.type_parameters[i],
-                    *matching_type.type_parameters[i]);
+                    *matching_type.type_parameters[i]
+            );
             replacements.insert(param_replacements.begin(), param_replacements.end());
         }
     }
@@ -581,14 +615,17 @@ Checker::match_arguments_to_generic_function(const FunctionTypeNode& function_ty
         ObjectTypeNode& otn = param_type.object();
         if (is_generic(param_type)) {
             if (type_matches(&param_type, arg_types[i])) {
-                std::map<std::string, TypeNode*> param_generic_replacements = make_replacements(&param_type,
-                                                                                                arg_types[i]);
+                std::map<std::string, TypeNode*> param_generic_replacements = make_replacements(
+                        &param_type,
+                        arg_types[i]
+                );
                 for (auto gtr: param_generic_replacements) {
                     if (generic_replacements.count(gtr.first) == 1) {
                         // this type has already been replaced, see if it matches
                         if (gtr.second != (generic_replacements[gtr.first])) {
                             throw std::runtime_error(
-                                    "Type has already been replacen by something that doesn't match!");
+                                    "Type has already been replacen by something that doesn't match!"
+                            );
                         }
                     }
                 }
@@ -600,9 +637,11 @@ Checker::match_arguments_to_generic_function(const FunctionTypeNode& function_ty
             const TypeNode& arg_type = *arg_types[i];
             const TypeNode& param_type = *function_type.parameter_types[i];
             if (arg_type != param_type) {
-                throw std::runtime_error("Function call type mismatch! Expected " +
-                                         param_type.to_string() + " but got " +
-                                         arg_type.to_string() + "  instead");
+                throw std::runtime_error(
+                        "Function call type mismatch! Expected " +
+                        param_type.to_string() + " but got " +
+                        arg_type.to_string() + "  instead"
+                );
             }
         }
     }
@@ -672,9 +711,11 @@ SymbolInfo Checker::visit(CallNode& n) {
                 const TypeNode& arg_type = *arg_types[i];
                 const TypeNode& param_type = *function_type.parameter_types[i];
                 if (arg_type != param_type) {
-                    throw std::runtime_error("Function call type mismatch! Expected " +
-                                             param_type.to_string() + " but got " +
-                                             arg_type.to_string() + "  instead");
+                    throw std::runtime_error(
+                            "Function call type mismatch! Expected " +
+                            param_type.to_string() + " but got " +
+                            arg_type.to_string() + "  instead"
+                    );
                 }
             }
             retv.set_type(*function_type.return_type);
@@ -758,7 +799,8 @@ SymbolInfo Checker::visit(ClassLiteralExpressionNode& node) {
         if (num_required_type_params != num_actual_type_params) {
             throw std::runtime_error(
                     "Error: generic class requires " + std::to_string(num_required_type_params) +
-                    " type parameters, but " + std::to_string(num_actual_type_params) + " given");
+                    " type parameters, but " + std::to_string(num_actual_type_params) + " given"
+            );
         }
         if (this->class_table->declared(object_type_str)) {
             class_info = this->class_table->get(object_type_str);
@@ -859,7 +901,8 @@ make_type_from_object_pattern(const ObjectTypeNode& object_type, std::map<std::s
         if (type_identifier == r.first) {
             if (object_type.type_parameters.size() != 0) {
                 throw std::runtime_error(
-                        "Trying to make a type for a template for exmaple struct Foo[T]{foo:T[Integer];}!");
+                        "Trying to make a type for a template for exmaple struct Foo[T]{foo:T[Integer];}!"
+                );
             }
             return r.second;
         }
@@ -943,7 +986,8 @@ SymbolInfo Checker::visit(ClassLiteralFieldNode& node) {
         if (num_required_type_params != num_actual_type_params) {
             throw std::runtime_error(
                     "Error: generic class requires " + std::to_string(num_required_type_params) +
-                    " type parameters, but " + std::to_string(num_actual_type_params) + " given");
+                    " type parameters, but " + std::to_string(num_actual_type_params) + " given"
+            );
         }
         if (this->class_table->declared(object_type_str)) {
             class_info = this->class_table->get(object_type_str);
@@ -1018,10 +1062,11 @@ SymbolInfo Checker::visit(ListNode& node) {
             this->replace_me = false;
         }
         if (current_type != element_type) {
-            throw std::runtime_error("List literal with more than one element type, first element has type: " +
-                                     element_type.to_string() + " but at index " + std::to_string(i) +
-                                     " got type " +
-                                     current_type.to_string());
+            throw std::runtime_error(
+                    "List literal with more than one element type, first element has type: " +
+                    element_type.to_string() + " but at index " + std::to_string(i) +
+                    " got type " +
+                    current_type.to_string());
         }
     }
     SymbolInfo return_info;
@@ -1045,8 +1090,9 @@ SymbolInfo Checker::visit(WhileNode& node) {
 //                                 std::to_string(node.condition->column + 1) +
 //                                 ": Expected Boolean expression as while loop condition, got " +
 //                                 condition.type->to_string());
-        throw std::runtime_error("At line column : Expected Boolean expression as while loop condition, got " +
-                                 condition.type().to_string());
+        throw std::runtime_error(
+                "At line column : Expected Boolean expression as while loop condition, got " +
+                condition.type().to_string());
     }
     this->enter_scope("while");
     this->visit(*node.body);
