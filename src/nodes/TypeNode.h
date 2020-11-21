@@ -73,7 +73,7 @@ public:
 
 class FunctionTypeNode : public TypeNode {
 public:
-    FunctionTypeNode(const VectorOfTypes& parameterTypes, TypeNode& returnType);
+    FunctionTypeNode(const VectorOfTypes& parameterTypes, TypeNode* returnType);
 
     bool equal(const TypeNode& other) const override;
 

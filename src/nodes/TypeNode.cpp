@@ -5,11 +5,14 @@
 #include "TypeNode.h"
 
 FunctionTypeNode::FunctionTypeNode(const VectorOfTypes& parameterTypes,
-                                   TypeNode& returnType) {
+                                   TypeNode* returnType) {
+
     for (auto p: parameterTypes) {
-        this->parameter_types.emplace_back(p->clone());
+        assert(p != nullptr);
     }
-    this->return_type = returnType.clone();
+    assert(returnType != nullptr);
+    this->parameter_types = parameterTypes;
+    this->return_type = returnType;
     this->kind = Kind::FUNCTION;
 }
 
@@ -18,7 +21,7 @@ FunctionTypeNode* FunctionTypeNode::clone() const {
     for (auto p: this->parameter_types) {
         aux.emplace_back(p->clone());
     }
-    return new FunctionTypeNode(aux, *this->return_type);
+    return new FunctionTypeNode(aux, this->return_type->clone());
 }
 
 FunctionTypeNode::~FunctionTypeNode() {
@@ -64,6 +67,9 @@ const FunctionTypeNode& FunctionTypeNode::function() const { return *this; }
 ObjectTypeNode::ObjectTypeNode(const std::string& identifier,
                                const VectorOfTypes& typeParameters) : identifier(
         identifier), type_parameters(typeParameters) {
+    for (auto p: typeParameters) {
+        assert(p != nullptr);
+    }
     this->kind = Kind::OBJECT;
 }
 

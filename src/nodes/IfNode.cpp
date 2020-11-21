@@ -34,6 +34,8 @@ IfNode::IfNode(Node* condition, BlockNode* then,
                std::vector<std::pair<Node*, BlockNode*>> elifs, BlockNode* selse) : condition(condition),
                                                                                     then(then), selse(selse),
                                                                                     elifs(elifs) {
+    assert(condition != nullptr);
+    assert(then != nullptr);
     this->ntype = IFF;
 }
 

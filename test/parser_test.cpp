@@ -254,7 +254,7 @@ TEST_F(parser_test, fun_empty) {
     std::vector<Token> tokens = scanner->scan_all();
     Parser parser(tokens);
     t_node = parser.parse_type_node();
-    t_expected_node = FUNCTION_TYPE({}, *T_STRING);
+    t_expected_node = FUNCTION_TYPE({}, T_STRING);
     EXPECT_EQ(*t_node, *t_expected_node);
 
 //    EXPECT_EQ(*node,*expected_node);
@@ -266,8 +266,8 @@ TEST_F(parser_test, fun_full) {
     std::vector<Token> tokens = scanner->scan_all();
     Parser parser(tokens);
     t_node = parser.parse_type_node();
-    VectorOfTypes t = {T_LIST(T_STRING), FUNCTION_TYPE({ T_STRING }, *T_INT)};
-    t_expected_node = FUNCTION_TYPE(t, *T_LIST(T_INT));
+    VectorOfTypes t = {T_LIST(T_STRING), FUNCTION_TYPE({ T_STRING }, T_INT)};
+    t_expected_node = FUNCTION_TYPE(t, T_LIST(T_INT));
     EXPECT_EQ(*t_node, *t_expected_node);
 }
 

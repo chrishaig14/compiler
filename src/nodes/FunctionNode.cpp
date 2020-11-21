@@ -40,6 +40,11 @@ const FunctionNode& FunctionNode::func() const {
 FunctionNode::FunctionNode(std::string identifier, std::vector<std::string> parameter_names,
                            VectorOfTypes parameter_types, TypeNode* return_type, BlockNode* body)
         : body(body), return_type(return_type) {
+    for (auto p: parameter_types) {
+        assert(p != nullptr);
+    }
+    assert(return_type != nullptr);
+    assert(body != nullptr);
     this->ntype = FUNC;
     this->identifier = identifier;
     this->parameter_names = parameter_names;

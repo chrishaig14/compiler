@@ -4,7 +4,11 @@
 
 #include "WhileNode.h"
 
-WhileNode::WhileNode(Node* condition, BlockNode* body) : body(body), condition(condition) { this->ntype = WHIL; }
+WhileNode::WhileNode(Node* condition, BlockNode* body) : body(body), condition(condition) {
+    assert(condition != nullptr);
+    assert(body != nullptr);
+    this->ntype = WHIL;
+}
 
 bool WhileNode::equal(const Node& x) const {
     auto& other = x.whil();

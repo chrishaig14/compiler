@@ -24,17 +24,17 @@ Checker::Checker(SymbolTable* globals, ClassTable* class_table, FunctionTable* f
     this->scopes["global"] = this->scope;
     auto int_class_info = new ClassInfo();
     int_class_info->class_name = "Integer";
-    int_class_info->methods.insert(std::make_pair("str", new FunctionTypeNode({}, *T_STRING)));
+    int_class_info->methods.insert(std::make_pair("str", new FunctionTypeNode({}, T_STRING)));
 
     auto list_class_info = new ClassInfo();
     list_class_info->class_name = "List";
-    list_class_info->methods.insert(std::make_pair("len", new FunctionTypeNode({}, *T_INT)));
+    list_class_info->methods.insert(std::make_pair("len", new FunctionTypeNode({}, T_INT)));
     list_class_info->methods.insert(
-            std::make_pair("push", new FunctionTypeNode({(TYPE("t", {}))}, *TYPE(".None", {}))));
-    list_class_info->methods.insert(std::make_pair("pop", new FunctionTypeNode({}, *TYPE("t", {}))));
+            std::make_pair("push", new FunctionTypeNode({(TYPE("t", {}))}, TYPE(".None", {}))));
+    list_class_info->methods.insert(std::make_pair("pop", new FunctionTypeNode({}, TYPE("t", {}))));
     list_class_info->methods.insert(
-            std::make_pair("map", new FunctionTypeNode({FUNCTION_TYPE({ TYPE("t", {}) }, *TYPE("b", {}))},
-                                                       *T_LIST(TYPE("b", {})))));
+            std::make_pair("map", new FunctionTypeNode({FUNCTION_TYPE({ TYPE("t", {}) }, TYPE("b", {}))},
+                                                       T_LIST(TYPE("b", {})))));
     list_class_info->type_parameters = {"t"};
 
 
@@ -43,7 +43,7 @@ Checker::Checker(SymbolTable* globals, ClassTable* class_table, FunctionTable* f
 
     auto string_class_info = new ClassInfo();
     string_class_info->class_name = "String";
-    string_class_info->methods.insert(std::make_pair("len", new FunctionTypeNode({}, *T_INT)));
+    string_class_info->methods.insert(std::make_pair("len", new FunctionTypeNode({}, T_INT)));
     this->class_table->set("String", string_class_info);
     this->replace_me = false;
     this->class_table->set("Option",
@@ -909,10 +909,10 @@ TypeNode* make_type(const TypeNode* o, std::map<std::string, TypeNode*> replacem
         const FunctionTypeNode& ftn = original.function();
         VectorOfTypes new_param_types;
         for (auto pt: ftn.parameter_types) {
-            TypeNode& new_pt = *make_type(pt, replacements);
-            new_param_types.push_back(&new_pt);
+            TypeNode* new_pt = make_type(pt, replacements);
+            new_param_types.push_back(new_pt);
         }
-        TypeNode& new_return_type = *make_type(ftn.return_type, replacements);
+        TypeNode* new_return_type = make_type(ftn.return_type, replacements);
         return FUNCTION_TYPE(new_param_types, new_return_type);
 //        throw std::runtime_error("Making non object concrete type template!");
     }
