@@ -37,7 +37,7 @@ bool is_generic(const TypeNode& t);
 
 std::map<std::string, TypeNode*> make_replacements(TypeNode* a, TypeNode* b);
 
-TypeNode* make_type(const TypeNode* o, std::map<std::string, TypeNode*> replacements);
+TypeNode* make_type(const TypeNode& original, std::map<std::string, TypeNode*> replacements);
 
 class Checker {
     SymbolTable* scope;

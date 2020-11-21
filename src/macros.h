@@ -71,10 +71,10 @@
 
 // Builtin primitive types
 
-#define T_BOOL  new ObjectTypeNode("Boolean", {})
-#define T_INT  new ObjectTypeNode("Integer", {})
-#define T_STRING  new ObjectTypeNode("String", {})
-#define T_LIST(e) new ObjectTypeNode("List", {e})
+#define T_BOOL  ObjectTypeNode("Boolean", {})
+#define T_INT  ObjectTypeNode("Integer", {})
+#define T_STRING  ObjectTypeNode("String", {})
+#define T_LIST(e) ObjectTypeNode("List", {e})
 
 
 #endif //UNTITLED1_MACROS_H

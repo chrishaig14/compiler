@@ -24,17 +24,17 @@ Checker::Checker(SymbolTable* globals, ClassTable* class_table, FunctionTable* f
     this->scopes["global"] = this->scope;
     auto int_class_info = new ClassInfo();
     int_class_info->class_name = "Integer";
-    int_class_info->methods.insert(std::make_pair("str", new FunctionTypeNode({}, T_STRING)));
+    int_class_info->methods.insert(std::make_pair("str", new FunctionTypeNode({}, new T_STRING)));
 
     auto list_class_info = new ClassInfo();
     list_class_info->class_name = "List";
-    list_class_info->methods.insert(std::make_pair("len", new FunctionTypeNode({}, T_INT)));
+    list_class_info->methods.insert(std::make_pair("len", new FunctionTypeNode({}, new T_INT)));
     list_class_info->methods.insert(
             std::make_pair("push", new FunctionTypeNode({(TYPE("t", {}))}, TYPE(".None", {}))));
     list_class_info->methods.insert(std::make_pair("pop", new FunctionTypeNode({}, TYPE("t", {}))));
     list_class_info->methods.insert(
             std::make_pair("map", new FunctionTypeNode({FUNCTION_TYPE({ TYPE("t", {}) }, TYPE("b", {}))},
-                                                       T_LIST(TYPE("b", {})))));
+                                                       new T_LIST(TYPE("b", {})))));
     list_class_info->type_parameters = {"t"};
 
 
@@ -43,7 +43,7 @@ Checker::Checker(SymbolTable* globals, ClassTable* class_table, FunctionTable* f
 
     auto string_class_info = new ClassInfo();
     string_class_info->class_name = "String";
-    string_class_info->methods.insert(std::make_pair("len", new FunctionTypeNode({}, T_INT)));
+    string_class_info->methods.insert(std::make_pair("len", new FunctionTypeNode({}, new T_INT)));
     this->class_table->set("String", string_class_info);
     this->replace_me = false;
     this->class_table->set("Option",
@@ -357,7 +357,7 @@ void Checker::visit(IfNode& n) {
 
     std::map<std::string, bool> not_null_vars;
 
-    if (condition_info.type() != *T_BOOL) {
+    if (condition_info.type() != T_BOOL) {
         throw std::runtime_error("Expected a Boolean expression as a condition for if statement!, got " +
                                  condition_info.type().to_string());
     }
@@ -372,7 +372,7 @@ void Checker::visit(IfNode& n) {
 //        n.elifs[i].first->accept(*this)
         this->dispatch(n.elifs[i].first);
         condition_info = this->rv;
-        if (condition_info.type() != *T_BOOL) {
+        if (condition_info.type() != T_BOOL) {
             throw std::runtime_error("Expected a Boolean expression as a condition for elif statement!, got " +
                                      condition_info.type().to_string());
         }
@@ -558,13 +558,13 @@ bool type_matches(TypeNode* aa, TypeNode* bb) {
                                                                          fb.parameter_types[i]);
                 replacements.insert(rep.begin(), rep.end());
                 for (int j = 0; j < param_types.size(); j++) {
-                    param_types[j] = make_type(param_types[j], replacements);
+                    param_types[j] = make_type(*param_types[j], replacements);
                 }
             } else {
                 return false;
             }
         }
-        return type_matches(make_type(fa.return_type, replacements), fb.return_type);
+        return type_matches(make_type(*fa.return_type, replacements), fb.return_type);
     } else {
         // both are objects
         ObjectTypeNode& oa = a.object();
@@ -636,18 +636,22 @@ void Checker::match_arguments_to_generic_function(const FunctionTypeNode& functi
                 throw std::runtime_error("Argument type error!");
             }
         } else {
-            if (arg_types[i] != function_type.parameter_types[i]) {
+            const TypeNode& arg_type = *arg_types[i];
+            const TypeNode& param_type = *function_type.parameter_types[i];
+            if (arg_type != param_type) {
                 throw std::runtime_error("Function call type mismatch! Expected " +
-                                         function_type.parameter_types[i]->to_string() + " but got " +
-                                         arg_types[i]->to_string() + "  instead");
+                                         param_type.to_string() + " but got " +
+                                         arg_type.to_string() + "  instead");
             }
         }
     }
-    if (is_generic(*function_type.return_type)) {
-        ObjectTypeNode& rtn = function_type.return_type->object();
-        this->rv.set_type(*make_type(&rtn, generic_replacements));
+
+    const TypeNode& ret_type = *function_type.return_type;
+    if (is_generic(ret_type)) {
+        const ObjectTypeNode& rtn = ret_type.object();
+        this->rv.set_type(*make_type(rtn, generic_replacements));
     } else {
-        this->rv.set_type(*function_type.return_type);
+        this->rv.set_type(ret_type);
     }
 
 }
@@ -706,10 +710,12 @@ void Checker::visit(CallNode& n) {
             retv = this->rv;
         } else {
             for (int i = 0; i < n.arguments.size(); i++) {
-                if (arg_types[i] != (function_type.parameter_types[i])) {
+                const TypeNode& arg_type = *arg_types[i];
+                const TypeNode& param_type = *function_type.parameter_types[i];
+                if (arg_type != param_type) {
                     throw std::runtime_error("Function call type mismatch! Expected " +
-                                             function_type.parameter_types[i]->to_string() + " but got " +
-                                             arg_types[i]->to_string() + "  instead");
+                                             param_type.to_string() + " but got " +
+                                             arg_type.to_string() + "  instead");
                 }
             }
             retv.set_type(*function_type.return_type);
@@ -781,35 +787,43 @@ void Checker::visit(BlockNode& program) {
 }
 
 void Checker::visit(ClassLiteralExpressionNode& node) {
-    if (!this->class_table->declared(node.type->identifier)) {
-        throw std::runtime_error("No struct named " + node.type->identifier);
+    ObjectTypeNode& object_type = *node.type;
+    std::string& object_type_id = object_type.identifier;
+    const std::string& object_type_str = object_type.to_string();
+
+    if (!this->class_table->declared(object_type_id)) {
+        throw std::runtime_error("No struct named " + object_type_id);
     }
-    ClassInfo* class_info = this->class_table->get(node.type->identifier);
-    if (class_info->type_parameters.size() != 0) {
+    ClassInfo* class_info = this->class_table->get(object_type_id);
+    unsigned long num_required_type_params = class_info->type_parameters.size();
+    unsigned long num_actual_type_params = object_type.type_parameters.size();
+    if (num_required_type_params != 0) {
         // it's a generic class
-        if (class_info->type_parameters.size() != node.type->type_parameters.size()) {
+        if (num_required_type_params != num_actual_type_params) {
             throw std::runtime_error(
-                    "Error: generic class requires " + std::to_string(class_info->type_parameters.size()) +
-                    " type parameters, but " + std::to_string(node.type->type_parameters.size()) + " given");
+                    "Error: generic class requires " + std::to_string(num_required_type_params) +
+                    " type parameters, but " + std::to_string(num_actual_type_params) + " given");
         }
-        if (this->class_table->declared(node.type->to_string())) {
-            class_info = this->class_table->get(node.type->to_string());
+        if (this->class_table->declared(object_type_str)) {
+            class_info = this->class_table->get(object_type_str);
         } else {
-            class_info = instantiate_generic(class_info, node.type->object());
-            this->class_table->set(node.type->to_string(), class_info);
+            class_info = instantiate_generic(class_info, object_type);
+            this->class_table->set(object_type_str, class_info);
         }
     }
     auto class_field_types_ordered = class_info->member_types;
     auto class_field_names_ordered = class_info->member_names;
 
-    if (class_field_names_ordered.size() != node.init.size()) {
+    unsigned long num_required_init = class_field_names_ordered.size();
+    unsigned long num_actual_init = node.init.size();
+    if (num_required_init != num_actual_init) {
         throw std::runtime_error(
-                "In struct \"" + node.type->identifier + "\" initialization: " + "Expected " +
-                std::to_string(class_field_names_ordered.size()) + " initializers but got " +
-                std::to_string(node.init.size()));
+                "In struct \"" + object_type_id + "\" initialization: " + "Expected " +
+                std::to_string(num_required_init) + " initializers but got " +
+                std::to_string(num_actual_init));
     }
 
-    for (int i = 0; i < node.init.size(); i++) {
+    for (int i = 0; i < num_actual_init; i++) {
         Node* exp = node.init[i];
 //        exp->accept(*this)
         this->dispatch(exp);
@@ -821,7 +835,7 @@ void Checker::visit(ClassLiteralExpressionNode& node) {
         TypeNode& field_type = *class_field_types_ordered[i];
         if (!this->can_assign(semanticInfo.type(), field_type)) {
             throw std::runtime_error(
-                    "In struct \"" + node.type->identifier + "\" initialization: " + "field \"" +
+                    "In struct \"" + object_type_id + "\" initialization: " + "field \"" +
                     class_field_names_ordered[i] +
                     "\" is of type " +
                     field_type.to_string() +
@@ -830,7 +844,7 @@ void Checker::visit(ClassLiteralExpressionNode& node) {
     }
     node.names = class_field_names_ordered;
     this->rv = SymbolInfo();
-    rv.set_type(*node.type);
+    rv.set_type(object_type);
 }
 
 
@@ -883,38 +897,44 @@ bool Checker::can_assign_generic(TypeNode& from, TypeNode& to, std::vector<std::
     return to == (from);
 }
 
-TypeNode* make_type(const TypeNode* o, std::map<std::string, TypeNode*> replacements) {
-    VectorOfTypes new_type_params;
-    auto& original = *o;
-    if (original.kind == Kind::OBJECT) {
-        auto object_type = original.object();
-        std::string type_identifier = object_type.identifier;
-
-        for (auto r: replacements) {
-            if (type_identifier == r.first) {
-                if (object_type.type_parameters.size() != 0) {
-                    throw std::runtime_error(
-                            "Trying to make a type for a template for exmaple struct Foo[T]{foo:T[Integer];}!");
-                }
-                return r.second;
+TypeNode*
+make_type_from_object_pattern(const ObjectTypeNode& object_type, std::map<std::string, TypeNode*> replacements) {
+//    auto object_type = original.object();
+    std::string type_identifier = object_type.identifier;
+    for (auto r: replacements) {
+        if (type_identifier == r.first) {
+            if (object_type.type_parameters.size() != 0) {
+                throw std::runtime_error(
+                        "Trying to make a type for a template for exmaple struct Foo[T]{foo:T[Integer];}!");
             }
+            return r.second;
         }
-        // It's not the top level type
-        for (auto tp: object_type.type_parameters) {
-            TypeNode& new_tp = *make_type(tp, replacements);
-            new_type_params.push_back(&new_tp);
-        }
-        return TYPE(type_identifier, new_type_params);
-    } else {
-        const FunctionTypeNode& ftn = original.function();
-        VectorOfTypes new_param_types;
-        for (auto pt: ftn.parameter_types) {
-            TypeNode* new_pt = make_type(pt, replacements);
-            new_param_types.push_back(new_pt);
-        }
-        TypeNode* new_return_type = make_type(ftn.return_type, replacements);
-        return FUNCTION_TYPE(new_param_types, new_return_type);
+    }
+    // It's not the top level type
+    VectorOfTypes new_type_params;
+    for (auto tp: object_type.type_parameters) {
+        TypeNode* new_tp = make_type(*tp, replacements);
+        new_type_params.push_back(new_tp);
+    }
+    return TYPE(type_identifier, new_type_params);
+}
+
+TypeNode* make_type_from_function_pattern(const FunctionTypeNode& ftn, std::map<std::string, TypeNode*> replacements) {
+    VectorOfTypes new_param_types;
+    for (auto pt: ftn.parameter_types) {
+        TypeNode* new_pt = make_type(*pt, replacements);
+        new_param_types.push_back(new_pt);
+    }
+    TypeNode* new_return_type = make_type(*ftn.return_type, replacements);
+    return FUNCTION_TYPE(new_param_types, new_return_type);
 //        throw std::runtime_error("Making non object concrete type template!");
+}
+
+TypeNode* make_type(const TypeNode& original, std::map<std::string, TypeNode*> replacements) {
+    if (original.kind == Kind::OBJECT) {
+        return make_type_from_object_pattern(original.object(), replacements);
+    } else {
+        return make_type_from_function_pattern(original.function(), replacements);
     }
 }
 
@@ -928,13 +948,13 @@ ClassInfo* Checker::instantiate_generic(ClassInfo* generic, const ObjectTypeNode
     auto field_names = generic->member_names;
     VectorOfTypes concrete_field_types;
     for (auto f: generic->member_types) {
-        TypeNode& concrete_type = *make_type(f, replacements);
+        TypeNode& concrete_type = *make_type(*f, replacements);
         concrete_field_types.push_back(&concrete_type);
     }
 
     std::map<std::string, FunctionTypeNode*> concrete_methods;
     for (auto m: generic->methods) {
-        TypeNode& concrete_type = *make_type((m.second), replacements);
+        TypeNode& concrete_type = *make_type(*(m.second), replacements);
         concrete_methods.insert(std::make_pair(m.first, &concrete_type.function()));
     }
 
@@ -950,26 +970,32 @@ ClassInfo* Checker::instantiate_generic(ClassInfo* generic, const ObjectTypeNode
 }
 
 void Checker::visit(ClassLiteralFieldNode& node) {
-    if (!this->class_table->declared(node.type->identifier)) {
-        throw std::runtime_error("No struct named " + node.type->identifier);
+    ObjectTypeNode* object_type = node.type;
+    std::string& object_type_id = object_type->identifier;
+    const std::string& object_type_str = object_type->to_string();
+
+    if (!this->class_table->declared(object_type_id)) {
+        throw std::runtime_error("No struct named " + object_type_id);
     }
 
-    if (!this->class_table->declared(node.type->identifier)) {
-        throw std::runtime_error("No struct named " + node.type->identifier);
+    if (!this->class_table->declared(object_type_id)) {
+        throw std::runtime_error("No struct named " + object_type_id);
     }
-    ClassInfo* class_info = this->class_table->get(node.type->identifier);
-    if (class_info->type_parameters.size() != 0) {
+    ClassInfo* class_info = this->class_table->get(object_type_id);
+    unsigned long num_required_type_params = class_info->type_parameters.size();
+    unsigned long num_actual_type_params = object_type->type_parameters.size();
+    if (num_required_type_params != 0) {
         // it's a generic class
-        if (class_info->type_parameters.size() != node.type->type_parameters.size()) {
+        if (num_required_type_params != num_actual_type_params) {
             throw std::runtime_error(
-                    "Error: generic class requires " + std::to_string(class_info->type_parameters.size()) +
-                    " type parameters, but " + std::to_string(node.type->type_parameters.size()) + " given");
+                    "Error: generic class requires " + std::to_string(num_required_type_params) +
+                    " type parameters, but " + std::to_string(num_actual_type_params) + " given");
         }
-        if (this->class_table->declared(node.type->to_string())) {
-            class_info = this->class_table->get(node.type->to_string());
+        if (this->class_table->declared(object_type_str)) {
+            class_info = this->class_table->get(object_type_str);
         } else {
-            class_info = instantiate_generic(class_info, *node.type);
-            this->class_table->set(node.type->to_string(), class_info);
+            class_info = instantiate_generic(class_info, *object_type);
+            this->class_table->set(object_type_str, class_info);
         }
     }
     auto class_fields = class_info->members;
@@ -981,7 +1007,7 @@ void Checker::visit(ClassLiteralFieldNode& node) {
     }
     if (class_fields.size() != node.init.size()) {
         throw std::runtime_error(
-                "In struct \"" + node.type->identifier + "\" initialization: " + "Expected " +
+                "In struct \"" + object_type_id + "\" initialization: " + "Expected " +
                 std::to_string(class_fields.size()) + " initializers but got " +
                 std::to_string(node.init.size()));
     }
@@ -997,14 +1023,14 @@ void Checker::visit(ClassLiteralFieldNode& node) {
         TypeNode& field_type = *class_fields[f.first];
         if (!this->can_assign(semanticInfo.type(), field_type)) {
             throw std::runtime_error(
-                    "In struct \"" + node.type->identifier + "\" initialization: " + "field \"" + f.first +
+                    "In struct \"" + object_type_id + "\" initialization: " + "field \"" + f.first +
                     "\" is of type " +
                     field_type.to_string() +
                     " but got " + semanticInfo.type().to_string());
         }
     }
     this->rv = SymbolInfo();
-    this->rv.set_type(*node.type);
+    this->rv.set_type(*object_type);
 }
 
 void Checker::visit(ForNode& node) {
@@ -1053,7 +1079,7 @@ void Checker::visit(ListNode& node) {
     }
     SymbolInfo return_info;
     return_info.is_function = false;
-    return_info.set_type(*T_LIST(element_type.clone()));
+    return_info.set_type(ObjectTypeNode("List", {element_type.clone()}));
     this->rv = return_info;
 }
 
@@ -1068,7 +1094,7 @@ void Checker::visit(WhileNode& node) {
 //    node.condition->accept(*this)
     this->dispatch(node.condition);
     SymbolInfo condition = this->rv;
-    if (condition.type() != *T_BOOL) {
+    if (condition.type() != ObjectTypeNode("Boolean", {})) {
 //        throw std::runtime_error("At line " +
 //                                 std::to_string(node.condition->line + 1) + " column " +
 //                                 std::to_string(node.condition->column + 1) +
@@ -1172,7 +1198,7 @@ void Checker::visit(NoneNode& node) {
 
 void Checker::visit(EmptyListNode& node) {
     SymbolInfo semanticInfo;
-    semanticInfo.set_type(*T_LIST(node.type->clone()));
+    semanticInfo.set_type(T_LIST(node.type->clone()));
     semanticInfo.is_function = false;
     this->rv = semanticInfo;
 }

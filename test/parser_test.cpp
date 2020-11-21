@@ -10,9 +10,9 @@
 
 
 #define BODY_NODE new BlockNode({new AssignmentNode(new IdNode("x"), new BinopNode(OpType::ADD, new IdNode("a"), new IdNode("b"))),new AssignmentNode(new IdNode("x"), new IdNode("y"))})
-#define FUN_FOO_NODE FUN("foo", { "x" }, VectorOfTypes({ COMPLEX_TYPE }), TYPE("List", {T_INT}), BODY_NODE)
+#define FUN_FOO_NODE FUN("foo", { "x" }, VectorOfTypes({ COMPLEX_TYPE }), TYPE("List", {new T_INT}), BODY_NODE)
 #define FUN_FOO_STRING "fun foo(x:List[List[Integer]])->List[Integer]{x=a+b; x = y;}"
-#define COMPLEX_TYPE T_LIST(T_LIST(T_INT))
+#define COMPLEX_TYPE new T_LIST(new T_LIST(new T_INT))
 
 #define EXPECT_NOT_EQUAL EXPECT_FALSE(node->equal(expected_node)); delete node; delete expected_node;
 
@@ -233,7 +233,7 @@ TEST_F(parser_test, simple_type) {
     std::vector<Token> tokens = scanner->scan_all();
     Parser parser(tokens);
     t_node = parser.parse_type_node();
-    t_expected_node = T_STRING;
+    t_expected_node = new T_STRING;
     EXPECT_EQ(*t_node, *t_expected_node);
 }
 
@@ -254,7 +254,7 @@ TEST_F(parser_test, fun_empty) {
     std::vector<Token> tokens = scanner->scan_all();
     Parser parser(tokens);
     t_node = parser.parse_type_node();
-    t_expected_node = FUNCTION_TYPE({}, T_STRING);
+    t_expected_node = FUNCTION_TYPE({}, new T_STRING);
     EXPECT_EQ(*t_node, *t_expected_node);
 
 //    EXPECT_EQ(*node,*expected_node);
@@ -266,8 +266,8 @@ TEST_F(parser_test, fun_full) {
     std::vector<Token> tokens = scanner->scan_all();
     Parser parser(tokens);
     t_node = parser.parse_type_node();
-    VectorOfTypes t = {T_LIST(T_STRING), FUNCTION_TYPE({ T_STRING }, T_INT)};
-    t_expected_node = FUNCTION_TYPE(t, T_LIST(T_INT));
+    VectorOfTypes t = {new T_LIST(new T_STRING), FUNCTION_TYPE({ new T_STRING }, new T_INT)};
+    t_expected_node = FUNCTION_TYPE(t, new T_LIST(new T_INT));
     EXPECT_EQ(*t_node, *t_expected_node);
 }
 
@@ -278,7 +278,7 @@ TEST_F(parser_test, complex_template_type) {
     std::vector<Token> tokens = scanner->scan_all();
     Parser parser(tokens);
     t_node = parser.parse_type_node();
-    t_expected_node = TYPE("String", VectorOfTypes({T_INT, T_LIST({T_STRING})}));
+    t_expected_node = TYPE("String", VectorOfTypes({new T_INT, new T_LIST({new T_STRING})}));
     EXPECT_EQ(*t_node, *t_expected_node);
 }
 
@@ -288,7 +288,7 @@ TEST_F(parser_test, decl_with_type_and_value) {
     std::vector<Token> tokens = scanner->scan_all();
     Parser parser(tokens);
     node = parser.parse_variable_declaration();
-    expected_node = new DeclarationNode("x", TYPE("String", VectorOfTypes({T_INT, T_LIST({T_STRING})})),
+    expected_node = new DeclarationNode("x", TYPE("String", VectorOfTypes({new T_INT, new T_LIST({new T_STRING})})),
                                         new BinopNode(OpType::ADD, new IdNode("a"), new IdNode("b")));
     EXPECT_EQ(*node, *expected_node);
 }
@@ -397,8 +397,8 @@ TEST_F(parser_test, class_foo_with_fields) {
 //    Parser parser(tokens);
 //    Structnode = parser.parse_struct_definition();
 //    StructFields fields;
-//    fields.push_back(FieldInfo("x", T_STRING));
-//    fields.push_back(FieldInfo("y", T_INT));
+//    fields.push_back(FieldInfo("x", new T_STRING));
+//    fields.push_back(FieldInfo("y", new T_INT));
 //    expected_node = CLS("Foo", {}, fields);
 //    EXPECT_EQ(*node,*expected_node);
 
@@ -447,8 +447,8 @@ TEST_F(parser_test, template_class_foo_empty) {
 TEST_F(parser_test, class_foo_with_fields_and_method) {
     std::string complete_foo_class_string = "struct Foo{ x: String;  y: Integer;}";
     StructFields fields;
-//    fields.push_back(FieldInfo("x", T_STRING));
-//    fields.push_back(FieldInfo("y", T_INT));
+//    fields.push_back(FieldInfo("x", new T_STRING));
+//    fields.push_back(FieldInfo("y", new T_INT));
 //    StructNode complete_foo_class_node = CLS("Foo", {}, fields);
 //    std::string text = complete_foo_class_string;
 //    SetUp(text);
@@ -793,7 +793,7 @@ TEST_F(parser_test, parse_empty_list) {
     Parser parser(tokens);
     node = parser.parse_expression();
     VectorOfNodes list;
-    expected_node = (new EmptyListNode(T_INT));
+    expected_node = (new EmptyListNode(new T_INT));
     EXPECT_EQ(*node, *expected_node);
 }
 

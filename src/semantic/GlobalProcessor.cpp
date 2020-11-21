@@ -122,31 +122,32 @@ GlobalProcessor::GlobalProcessor(std::vector<Builtin>& builtins) {
     this->globals = new SymbolTable("global", nullptr);
     this->class_table = new ClassTable();
     auto ft = FUNCTION_TYPE({ new ObjectTypeNode("a", {}) }, new ObjectTypeNode("b", {}));
-    auto at = T_LIST(new ObjectTypeNode("a", {}));
+    auto at = new T_LIST(new ObjectTypeNode("a", {}));
     auto none = new ObjectTypeNode(".None", {});
     VectorOfTypes w = {at, ft};
     builtins.push_back(
-            {"map", CodeBuiltin{new FunctionTypeNode(w, T_LIST(new ObjectTypeNode("b", {}))), list_map}});
-    builtins.push_back({"Integer.str", CodeBuiltin{new FunctionTypeNode({T_INT}, T_STRING), int_to_str}});
+            {"map", CodeBuiltin{new FunctionTypeNode(w, new T_LIST(new ObjectTypeNode("b", {}))), list_map}});
+    builtins.push_back({"Integer.str", CodeBuiltin{new FunctionTypeNode({new T_INT}, new T_STRING), int_to_str}});
     builtins.push_back(
-            {"List.len", CodeBuiltin{new FunctionTypeNode({T_LIST(new ObjectTypeNode("a", {}))}, T_INT), list_len}});
-    VectorOfTypes x = {T_LIST(TYPE("a", {})), new ObjectTypeNode("a", {})};
+            {"List.len",
+             CodeBuiltin{new FunctionTypeNode({new T_LIST(new ObjectTypeNode("a", {}))}, new T_INT), list_len}});
+    VectorOfTypes x = {new T_LIST(TYPE("a", {})), new ObjectTypeNode("a", {})};
     builtins.push_back({"List.pop", CodeBuiltin{new FunctionTypeNode(x, none), list_pop}});
     builtins.push_back({"List.push", CodeBuiltin{
-            new FunctionTypeNode({T_LIST(new ObjectTypeNode("a", {}))}, new ObjectTypeNode("a", {})), list_push}});
+            new FunctionTypeNode({new T_LIST(new ObjectTypeNode("a", {}))}, new ObjectTypeNode("a", {})), list_push}});
     auto function_from_t_to_u = FUNCTION_TYPE({ TYPE("t", {}) }, new ObjectTypeNode("b", {}));
     builtins.push_back(
             {"List.map",
-             CodeBuiltin{new FunctionTypeNode({function_from_t_to_u}, T_LIST(new ObjectTypeNode("b", {}))),
+             CodeBuiltin{new FunctionTypeNode({function_from_t_to_u}, new T_LIST(new ObjectTypeNode("b", {}))),
                          list_map}});
-    builtins.push_back({"String.len", CodeBuiltin{new FunctionTypeNode({T_STRING}, T_INT), string_len}});
-    builtins.push_back({"print", CodeBuiltin{new FunctionTypeNode({T_STRING}, none), print}});
-    VectorOfTypes a1 = {T_LIST(T_STRING), T_STRING};
+    builtins.push_back({"String.len", CodeBuiltin{new FunctionTypeNode({new T_STRING}, new T_INT), string_len}});
+    builtins.push_back({"print", CodeBuiltin{new FunctionTypeNode({new T_STRING}, none), print}});
+    VectorOfTypes a1 = {new T_LIST(new T_STRING), new T_STRING};
     builtins.push_back(
-            {"join", CodeBuiltin{new FunctionTypeNode(a1, T_STRING), join}});
-    VectorOfTypes a2 = {T_INT, T_INT, T_INT};
+            {"join", CodeBuiltin{new FunctionTypeNode(a1, new T_STRING), join}});
+    VectorOfTypes a2 = {new T_INT, new T_INT, new T_INT};
     builtins.push_back(
-            {"range", CodeBuiltin{new FunctionTypeNode(a2, T_LIST(T_INT)), range}});
+            {"range", CodeBuiltin{new FunctionTypeNode(a2, new T_LIST(new T_INT)), range}});
 
     this->add_builtins(builtins);
 }
