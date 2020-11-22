@@ -238,7 +238,6 @@ Node* Parser::parse_mul_div_or_mod_expression() {
 Node* Parser::parse_factor() {
     Node* parent;
     if (this->match(TokType::HASH)) {
-        this->next();
         parent = this->parse_class_literal();
     } else {
         parent = this->parse_id_or_literal();
@@ -315,6 +314,7 @@ Node* Parser::parse_id_or_literal() {
 }
 
 Node* Parser::parse_class_literal() {
+    Token hash_tok = this->expect_token(TokType::HASH);
 
     TypeNode* type = this->parse_type_node();
     if (type->kind != Kind::OBJECT) {
@@ -333,7 +333,10 @@ Node* Parser::parse_class_literal() {
             IdNode& idn = first.id();
             if (this->match(TokType::RCURLY)) {
                 exps.push_back(&first);
-                return new ClassLiteralExpressionNode(otn, exps);
+                ClassLiteralExpressionNode* clen = new ClassLiteralExpressionNode(otn, exps);
+                clen->line = hash_tok.line;
+                clen->column = hash_tok.column;
+                return clen;
 
             } else if (this->match(TokType::COMMA)) {
                 // it's a list of expressions
@@ -349,7 +352,10 @@ Node* Parser::parse_class_literal() {
                     }
                 }
                 this->expect_token(TokType::RCURLY);
-                return new ClassLiteralExpressionNode(otn, exps);
+                ClassLiteralExpressionNode* clen = new ClassLiteralExpressionNode(otn, exps);
+                clen->line = hash_tok.line;
+                clen->column = hash_tok.column;
+                return clen;
             } else {
                 // it's field:exp, field:exp
                 this->expect_token(TokType::COLON);
@@ -370,7 +376,10 @@ Node* Parser::parse_class_literal() {
                     }
                 }
                 this->expect_token(TokType::RCURLY);
-                return new ClassLiteralFieldNode(otn, init);
+                ClassLiteralFieldNode* clfn = new ClassLiteralFieldNode(otn, init);
+                clfn->line = hash_tok.line;
+                clfn->column = hash_tok.column;
+                return clfn;
             }
         } else {
             // it's a list of expressions
@@ -388,11 +397,17 @@ Node* Parser::parse_class_literal() {
                 }
             }
             this->expect_token(TokType::RCURLY);
-            return new ClassLiteralExpressionNode(otn, exps);
+            ClassLiteralExpressionNode* clen = new ClassLiteralExpressionNode(otn, exps);
+            clen->line = hash_tok.line;
+            clen->column = hash_tok.column;
+            return clen;
         }
     }
     this->expect_token(TokType::RCURLY);
-    return new ClassLiteralFieldNode(otn, init);
+    ClassLiteralFieldNode* clfn = new ClassLiteralFieldNode(otn, init);
+    clfn->line = hash_tok.line;
+    clfn->column = hash_tok.column;
+    return clfn;
 }
 
 Node* Parser::parse_id_or_class_literal() {
@@ -715,7 +730,8 @@ ClassNode* Parser::parse_class_definition() {
             FunctionNode* method_node = this->parse_function_definition();
             if (members.count(method_node->identifier) || methods.count(method_node->identifier)) {
                 throw std::runtime_error(
-                        "Error in class " + class_name_tk.str + " definition: member/method \"" + method_node->identifier +
+                        "Error in class " + class_name_tk.str + " definition: member/method \"" +
+                        method_node->identifier +
                         "\" already defined!"
                 );
             }
