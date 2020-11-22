@@ -733,9 +733,9 @@ USymbolInfo Checker::visit(CallNode& n) {
                 const TypeNode& param_type = *function_type.parameter_types[i];
                 if (arg_type != param_type) {
                     throw std::runtime_error(
-                            "Function call type mismatch! Expected " +
-                            param_type.to_string() + " but got " +
-                            arg_type.to_string() + "  instead"
+                            "At line " + std::to_string(n.line) + " column " + std::to_string(n.column) + ": ERROR, Function call type mismatch!\n\tExpected: \n\t\t" +
+                            param_type.to_string() + "\n\tbut got:\n\t\t" +
+                            arg_type.to_string() + ""
                     );
                 }
             }
