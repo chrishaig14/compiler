@@ -68,8 +68,8 @@ Checker::Checker(SymbolTable* globals, ClassTable* class_table, FunctionTable* f
 void Checker::enter_scope(std::string name) {
     std::string new_scope_name = this->scope->name + "." + name;
     if (this->scopes.count(new_scope_name) == 1) {
-        this->scope = this->scopes[new_scope_name];
-        return;
+        delete this->scopes[new_scope_name];
+        this->scopes.erase(new_scope_name);
     }
     this->scope = new SymbolTable(new_scope_name, this->scope);
     this->scopes[new_scope_name] = this->scope;
