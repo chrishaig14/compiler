@@ -23,3 +23,12 @@ ClassNode& ClassNode::cls() {
 const ClassNode& ClassNode::cls() const {
     return *this;
 }
+
+ClassNode::~ClassNode() {
+    for (auto mem: this->members) {
+        delete mem.second;
+    }
+    for (auto method: this->methods) {
+        delete method.second;
+    }
+}

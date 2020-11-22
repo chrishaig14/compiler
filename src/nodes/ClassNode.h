@@ -20,6 +20,8 @@ public:
     ClassNode& cls() override;
     const ClassNode& cls() const override;
 
+    ~ClassNode();
+
     std::map<std::string, TypeNode*> members;
     std::vector<std::string> members_ordered;
     std::map<std::string, FunctionNode*> methods;

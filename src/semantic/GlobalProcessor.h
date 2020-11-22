@@ -49,8 +49,6 @@ public:
 
     void dispatch(Node* nod);
 
-    void visit(VectorOfNodes program);
-
     void visit(BlockNode& node);
 
     void visit(ClassNode& node);

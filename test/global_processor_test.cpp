@@ -1,100 +1,95 @@
 #include <gtest/gtest.h>
+#include <nodes/BlockNode.h>
 #include <scanner/Scanner.h>
 #include <parser/Parser.h>
 #include <semantic/GlobalProcessor.h>
-#include <utils.h>
+#include <semantic/Checker.h>
+#include <macros.h>
 
-#define S_INFO(o) new SymbolInfo(o)
-#define F_INFO(a, b) new FunctionInfo(a,b)
-#define O_INFO(a) new ObjectInfo(a)
-#define C_INFO(a, b) new ClassInfo(a,b)
 
-BlockNode* get_tree(std::string text) {
+BlockNode* get_ast(std::string text) {
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
-    return parser.parse_program();
+    BlockNode* tree = parser.parse_program();
+    return tree;
 }
 
-TEST(first_pass_test, fun_foo) {
-    std::string text = "fun foo()->None{}";
-    BlockNode* tree = get_tree(text);
-    GlobalProcessor gp;
+void compile(std::string text) {
+    BlockNode* tree = get_ast(text);
+    std::vector<std::pair<std::string, CodeBuiltin>> builtins;
+    GlobalProcessor gp(builtins);
     gp.visit(*tree);
-    auto ginfo = dynamic_cast<FunctionTypeNode*>(gp.function_table->get("foo"));
-    EXPECT_NE(ginfo, nullptr);
+    Checker checker(gp.globals, gp.class_table, gp.function_table);
+    checker.visit(*tree);
 }
 
-TEST(first_pass_test, template_struct) {
-    std::string text = "class Tree[T]{value:T; left:Option[Tree[T]]; right: Option[Tree[T]];}";
-    BlockNode* tree = get_tree(text);
+class global_test : public ::testing::Test {
+protected:
+    BlockNode* tree;
     GlobalProcessor gp;
+
+    void SetUp(std::string text) {
+        tree = get_ast(text);
+    }
+
+    void TearDown() override {
+        delete tree;
+        delete gp.globals;
+        delete gp.class_table;
+        delete gp.function_table;
+    }
+};
+
+
+TEST_F(global_test, test_class_declared_ok) {
+    std::string text = "class Foo {x: Integer\ny:String\n}";
+    SetUp(text);
     gp.visit(*tree);
-    auto p = gp.class_table->get("Tree");
-//    EXPECT_NE(ginfo, nullptr);
+    EXPECT_TRUE(gp.class_table->declared("Foo"));
+    EXPECT_FALSE(gp.class_table->declared("Bar"));
 }
 
-TEST(first_pass_test, fun_foo_eq) {
-    std::string text = "fun foo()->String{}";
-    BlockNode* tree = get_tree(text);
-    GlobalProcessor gp;
+TEST_F(global_test, test_class_info_members_ok) {
+    std::string text = "class Foo {x: Integer\ny:String\n}";
+    SetUp(text);
     gp.visit(*tree);
-    auto ginfo = dynamic_cast<FunctionTypeNode*>(gp.function_table->get("foo"));
-    EXPECT_NE(ginfo, nullptr);
-    EXPECT_TRUE(*ginfo == FunctionTypeNode*{}, T_STRING));
+    EXPECT_EQ(gp.class_table->get("Foo")->members.count("x"), 1);
+    EXPECT_EQ(gp.class_table->get("Foo")->members.count("y"), 1);
+    EXPECT_EQ(gp.class_table->get("Foo")->members.count("z"), 0);
+    EXPECT_EQ(*gp.class_table->get("Foo")->members["x"], T_INT);
+    EXPECT_EQ(*gp.class_table->get("Foo")->members["y"], T_STRING);
 }
 
-TEST(first_pass_test, fun_dont_allow_overload) {
-    std::string text = "fun foo(s: String)->String{return \"Hello\";}fun foo(i: Integer)->Integer{return 17;}";
-    BlockNode* tree = get_tree(text);
-    GlobalProcessor gp;
+TEST_F(global_test, test_class_already_declared_error) {
+    std::string text = "class Foo {x: Integer\ny:String\n}\nclass Foo {x: String\n}";
+    SetUp(text);
     try {
         gp.visit(*tree);
-        FAIL() << "Expected failure";
-    }catch(...){
+        FAIL();
+    } catch (...) {
 
     }
 }
 
+TEST_F(global_test, test_function_already_declared_error) {
+    std::string text = "fun foo()->Integer{}\nfun foo(x: Integer)->String{}";
+    SetUp(text);
+    try {
+        gp.visit(*tree);
+        FAIL();
+    } catch (...) {
 
-TEST(first_pass_test, fun_foo_complete) {
-    std::string text = "fun foo(y: Integer, x: String)-> Boolean{}";
-    BlockNode* tree = get_tree(text);
-    GlobalProcessor gp;
-    gp.visit(*tree);
-    auto ginfo = dynamic_cast<FunctionTypeNode*>(gp.function_table->get("foo"));
-    EXPECT_NE(ginfo, nullptr);
-    EXPECT_TRUE(*ginfo == FunctionTypeNode*{T_INT, T_STRING}, T_BOOL));
+    }
 }
 
-TEST(first_pass_test, class_foo) {
-    std::string text = "class Foo{}";
-    BlockNode* tree = get_tree(text);
-    GlobalProcessor gp;
-    gp.visit(*tree);
-    ClassInfo* ginfo = gp.class_table->get("Foo");
-}
+TEST_F(global_test, test_already_declared_error) {
+    std::string text = "class Foo {x: Integer\ny:String\n}\nfun Foo(x: Integer)->String{}";
+    SetUp(text);
+    try {
+        gp.visit(*tree);
+        FAIL();
+    } catch (...) {
 
-TEST(first_pass_test, class_foo_eq) {
-    std::string text = "struct Foo{}";
-    BlockNode* tree = get_tree(text);
-    GlobalProcessor gp;
-    gp.visit(*tree);
-}
-
-typedef std::map<std::string, TypeNode*> MapStringToSimple;
-typedef std::map<std::string, FunctionTypeNode*> MapStringToFunction;
-TEST(first_pass_test, class_foo_with_field) {
-//    std::string text = "struct Foo{x: String;}";
-//    BlockNode* tree = get_tree(text);
-//    GlobalProcessor gp;
-//    gp.visit(*tree);
-//    ClassInfo* ginfo = gp.class_table->get("Foo");
-//    MapStringToSimple fields;
-//    fields["x"] = T_STRING;
-//    ClassInfo class_info;
-//    class_info.fields = fields;
-//    class_info.member_names.push_back("x");
-//    class_info.member_types.push_back(class_info.fields["x"]);
-//    EXPECT_TRUE(*ginfo == class_info);
+    }
 }

@@ -258,3 +258,9 @@ TEST_F(checker_test, test_add_list_ok) {
     SetUp(text);
     checker->visit(*tree);
 }
+
+TEST_F(checker_test, test_declare_class_ok) {
+    std::string text = "class Foo{x: Integer\ny: String\n}";
+    SetUp(text);
+    checker->visit(*tree);
+}

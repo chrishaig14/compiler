@@ -11,6 +11,10 @@ add_executable(checker_test
         checker_test.cpp node_equals.cpp)
 target_link_libraries(checker_test gtest gtest_main pthread scanner parser srcLib nodes)
 
+add_executable(global_processor_test
+        global_processor_test.cpp)
+target_link_libraries(global_processor_test gtest gtest_main pthread scanner parser srcLib nodes)
+
 add_executable(parser_test
         parser_test.cpp)
 target_link_libraries(parser_test gtest gtest_main pthread scanner parser nodes srcLib)
