@@ -95,6 +95,13 @@ void join(std::map<std::string, std::map<std::string, Code>>& structs, ObjectSta
     stack.push(new StringObject(res));
 }
 
+void input(std::map<std::string, std::map<std::string, Code>>& structs, ObjectStack& stack,
+           Environment* global_env) {
+    std::string line;
+    std::cin >> line;
+    stack.push(new StringObject(line));
+}
+
 void list_map(std::map<std::string, std::map<std::string, Code>>& structs, ObjectStack& stack,
               Environment* global_env) {
     CodeObject* fun = dynamic_cast<CodeObject*>(stack.pop());
@@ -155,6 +162,10 @@ GlobalProcessor::GlobalProcessor(std::vector<Builtin>& builtins) {
     VectorOfTypes a2 = {new T_INT, new T_INT, new T_INT};
     builtins.push_back(
             {"range", CodeBuiltin{new FunctionTypeNode(a2, new T_LIST(new T_INT)), range}}
+    );
+
+    builtins.push_back(
+            {"input", CodeBuiltin{new FunctionTypeNode({}, new T_STRING), input}}
     );
 
     this->add_builtins(builtins);
