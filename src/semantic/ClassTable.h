@@ -6,12 +6,12 @@
 #define CLASSTABLE_H
 
 
-#include <map>
+#include <unordered_map>
 #include "SymbolTable.h"
 #include "ClassInfo.h"
 
 class ClassTable {
-    std::map<std::string, ClassInfo*> table;
+    std::unordered_map<std::string, ClassInfo*> table;
 public:
     ClassInfo* get(std::string name);
 

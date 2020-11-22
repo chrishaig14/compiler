@@ -16,15 +16,15 @@ public:
 
     bool equal(const Node& other) const;
     ClassNode(const std::string& className, std::vector<std::string> type_parameters,
-              std::map<std::string, TypeNode*> members, std::map<std::string, FunctionNode*> functions);
+              std::unordered_map<std::string, TypeNode*> members, std::unordered_map<std::string, FunctionNode*> functions);
     ClassNode& cls() override;
     const ClassNode& cls() const override;
 
     ~ClassNode();
 
-    std::map<std::string, TypeNode*> members;
+    std::unordered_map<std::string, TypeNode*> members;
     std::vector<std::string> members_ordered;
-    std::map<std::string, FunctionNode*> methods;
+    std::unordered_map<std::string, FunctionNode*> methods;
     std::string class_name;
     std::vector<std::string> type_parameters;
 };

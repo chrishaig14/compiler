@@ -5,7 +5,7 @@
 #ifndef CHECKER_H
 #define CHECKER_H
 
-#include <map>
+#include <unordered_map>
 #include "GlobalProcessor.h"
 #include "ScopeError.h"
 #include "RedeclareError.h"
@@ -22,17 +22,17 @@ bool type_matches(TypeNode* a, TypeNode* b);
 
 bool is_generic(const TypeNode& t);
 
-std::map<std::string, TypeNode*> make_replacements(TypeNode* a, TypeNode* b);
+std::unordered_map<std::string, TypeNode*> make_replacements(TypeNode* a, TypeNode* b);
 
-TypeNode* make_type(const TypeNode& original, std::map<std::string, TypeNode*> replacements);
+TypeNode* make_type(const TypeNode& original, std::unordered_map<std::string, TypeNode*> replacements);
 
 class Checker {
     SymbolTable* scope;
-    std::map<std::string, TypeClassInfo*> typeclasses;
+    std::unordered_map<std::string, TypeClassInfo*> typeclasses;
     ClassTable* class_table;
     Node* replacement;
 public:
-    std::map<std::string, SymbolTable*> scopes;
+    std::unordered_map<std::string, SymbolTable*> scopes;
 
     Checker(SymbolTable* globals, ClassTable* class_table, FunctionTable* function_table);
 

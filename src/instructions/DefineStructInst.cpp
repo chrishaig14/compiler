@@ -16,5 +16,5 @@ void DefineStructInst::accept(InstructionVisitor& visitor) {
     visitor.visit(*this);
 }
 
-DefineStructInst::DefineStructInst(const std::string& identifier, const std::map<std::string, Code>& fields)
+DefineStructInst::DefineStructInst(const std::string& identifier, const std::unordered_map<std::string, Code>& fields)
         : identifier(identifier), fields(fields) {}

@@ -33,7 +33,7 @@ public:
     virtual Object* sum(const Object* other) const { return nullptr; }
 };
 
-typedef void(* BuiltinFunction)(std::map<std::string, std::map<std::string, Code>>& structs,
+typedef void(* BuiltinFunction)(std::unordered_map<std::string, std::unordered_map<std::string, Code>>& structs,
                                 ObjectStack& stack, Environment* global_env);
 
 

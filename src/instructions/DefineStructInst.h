@@ -12,9 +12,9 @@
 class DefineStructInst : public Instruction {
 public:
     std::string identifier;
-    std::map<std::string, Code> fields;
+    std::unordered_map<std::string, Code> fields;
 
-    DefineStructInst(const std::string& identifier, const std::map<std::string, Code>& fields);
+    DefineStructInst(const std::string& identifier, const std::unordered_map<std::string, Code>& fields);
 
     bool equal(const Instruction* inst) const override;
 

@@ -13,7 +13,7 @@ class UserObject : public Object {
 public:
     bool equal(const Object* other) const override;
 
-    std::map<std::string, Object*> fields;
+    std::unordered_map<std::string, Object*> fields;
 
     UserObject(std::string type, std::vector<std::string> fields);
 

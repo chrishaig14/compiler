@@ -9,7 +9,7 @@
 #include <iostream>
 #include "UnexpectedToken.h"
 
-extern std::map<TokType, OpType> TOKEN_TO_OP;
+extern std::unordered_map<TokType, OpType> TOKEN_TO_OP;
 
 class Parser {
     std::vector<Token> tokens;

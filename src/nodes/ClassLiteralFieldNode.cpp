@@ -4,7 +4,7 @@
 
 #include "ClassLiteralFieldNode.h"
 
-ClassLiteralFieldNode::ClassLiteralFieldNode(ObjectTypeNode* type, const std::map<std::string, Node*>& init)
+ClassLiteralFieldNode::ClassLiteralFieldNode(ObjectTypeNode* type, const std::unordered_map<std::string, Node*>& init)
         : type(type), init(init) {
     this->ntype = CLSFLD;
 }

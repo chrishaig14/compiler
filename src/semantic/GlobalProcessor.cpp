@@ -19,29 +19,29 @@ void GlobalProcessor::add_builtins(std::vector<Builtin>& builtins) {
 
 }
 
-void int_to_str(std::map<std::string, std::map<std::string, Code>>& structs, ObjectStack& stack,
+void int_to_str(std::unordered_map<std::string, std::unordered_map<std::string, Code>>& structs, ObjectStack& stack,
                 Environment* global_env) {
     IntegerObject* x = stack.pop_integer();
     stack.push(new StringObject(std::to_string(x->value)));
 }
 
-void str_to_str(std::map<std::string, std::map<std::string, Code>>& structs, ObjectStack& stack,
+void str_to_str(std::unordered_map<std::string, std::unordered_map<std::string, Code>>& structs, ObjectStack& stack,
                 Environment* global_env) {
 }
 
-void print(std::map<std::string, std::map<std::string, Code>>& structs, ObjectStack& stack,
+void print(std::unordered_map<std::string, std::unordered_map<std::string, Code>>& structs, ObjectStack& stack,
            Environment* global_env) {
     StringObject* st = stack.pop_string();
     std::cout << "<< " << st->str << std::endl;
 }
 
-void list_len(std::map<std::string, std::map<std::string, Code>>& structs, ObjectStack& stack,
+void list_len(std::unordered_map<std::string, std::unordered_map<std::string, Code>>& structs, ObjectStack& stack,
               Environment* global_env) {
     ListObject* ls = stack.pop_list();
     stack.push(new IntegerObject(ls->list.size()));
 }
 
-void list_pop(std::map<std::string, std::map<std::string, Code>>& structs, ObjectStack& stack,
+void list_pop(std::unordered_map<std::string, std::unordered_map<std::string, Code>>& structs, ObjectStack& stack,
               Environment* global_env) {
     ListObject* ls = stack.pop_list();
     if (ls->list.size() == 0) {
@@ -52,20 +52,20 @@ void list_pop(std::map<std::string, std::map<std::string, Code>>& structs, Objec
     stack.push(last);
 }
 
-void list_push(std::map<std::string, std::map<std::string, Code>>& structs, ObjectStack& stack,
+void list_push(std::unordered_map<std::string, std::unordered_map<std::string, Code>>& structs, ObjectStack& stack,
                Environment* global_env) {
     Object* new_el = stack.pop();
     ListObject* ls = stack.pop_list();
     ls->list.push_back(new_el);
 }
 
-void string_len(std::map<std::string, std::map<std::string, Code>>& structs, ObjectStack& stack,
+void string_len(std::unordered_map<std::string, std::unordered_map<std::string, Code>>& structs, ObjectStack& stack,
                 Environment* global_env) {
     StringObject* ls = stack.pop_string();
     stack.push(new IntegerObject(ls->str.size()));
 }
 
-void range(std::map<std::string, std::map<std::string, Code>>& structs, ObjectStack& stack,
+void range(std::unordered_map<std::string, std::unordered_map<std::string, Code>>& structs, ObjectStack& stack,
            Environment* global_env) {
     IntegerObject* end = stack.pop_integer();
     IntegerObject* step = stack.pop_integer();
@@ -77,7 +77,7 @@ void range(std::map<std::string, std::map<std::string, Code>>& structs, ObjectSt
     stack.push(new ListObject(ls));
 }
 
-void join(std::map<std::string, std::map<std::string, Code>>& structs, ObjectStack& stack,
+void join(std::unordered_map<std::string, std::unordered_map<std::string, Code>>& structs, ObjectStack& stack,
           Environment* global_env) {
     StringObject* sep = stack.pop_string();
     ListObject* ls = stack.pop_list();
@@ -95,14 +95,14 @@ void join(std::map<std::string, std::map<std::string, Code>>& structs, ObjectSta
     stack.push(new StringObject(res));
 }
 
-void input(std::map<std::string, std::map<std::string, Code>>& structs, ObjectStack& stack,
+void input(std::unordered_map<std::string, std::unordered_map<std::string, Code>>& structs, ObjectStack& stack,
            Environment* global_env) {
     std::string line;
     std::cin >> line;
     stack.push(new StringObject(line));
 }
 
-void list_map(std::map<std::string, std::map<std::string, Code>>& structs, ObjectStack& stack,
+void list_map(std::unordered_map<std::string, std::unordered_map<std::string, Code>>& structs, ObjectStack& stack,
               Environment* global_env) {
     CodeObject* fun = dynamic_cast<CodeObject*>(stack.pop());
     if (fun == nullptr) {
@@ -133,7 +133,7 @@ GlobalProcessor::GlobalProcessor(std::vector<Builtin>& builtins) {
     auto none = new ObjectTypeNode(".None", {});
     VectorOfTypes w = {at, ft};
     builtins.push_back(
-            {"map", CodeBuiltin{new FunctionTypeNode(w, new T_LIST(new ObjectTypeNode("b", {}))), list_map}}
+            {"unordered_map", CodeBuiltin{new FunctionTypeNode(w, new T_LIST(new ObjectTypeNode("b", {}))), list_map}}
     );
     builtins.push_back({"Integer.str", CodeBuiltin{new FunctionTypeNode({new T_INT}, new T_STRING), int_to_str}});
     builtins.push_back(
@@ -149,7 +149,7 @@ GlobalProcessor::GlobalProcessor(std::vector<Builtin>& builtins) {
     );
     auto function_from_t_to_u = FUNCTION_TYPE({ TYPE("t", {}) }, new ObjectTypeNode("b", {}));
     builtins.push_back(
-            {"List.map",
+            {"List.unordered_map",
              CodeBuiltin{new FunctionTypeNode({function_from_t_to_u}, new T_LIST(new ObjectTypeNode("b", {}))),
                          list_map}}
     );

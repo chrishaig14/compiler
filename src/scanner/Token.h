@@ -6,7 +6,7 @@
 #define TOKEN_H
 
 #include <string>
-#include <map>
+#include <unordered_map>
 #include <iostream>
 
 enum class TokType {
@@ -60,7 +60,7 @@ enum class TokType {
     END, RARROW, TRUE, FALSE, QUESTION, NONE, DOUBLE_COLON, HASH, ARROBA, CLASS
 };
 
-extern std::map<TokType, std::string> TOKEN_STRINGS;
+extern std::unordered_map<TokType, std::string> TOKEN_STRINGS;
 
 void initialize_token_strings();
 

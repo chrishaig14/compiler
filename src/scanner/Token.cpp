@@ -4,7 +4,7 @@
 
 #include "Token.h"
 
-std::map<TokType, std::string> TOKEN_STRINGS;
+std::unordered_map<TokType, std::string> TOKEN_STRINGS;
 
 Token::Token(TokType type, std::string str, int line, int column) {
     this->type = type;

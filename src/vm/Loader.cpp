@@ -38,7 +38,7 @@ void Loader::load() {
 }
 
 void Loader::load_function(std::string name, CodeLabel code) {
-    std::map<std::string, int> labels;
+    std::unordered_map<std::string, int> labels;
     for (int i = 0; i < code.size(); i++) {
         if (code[i].first != "") {
             labels[code[i].first] = i;

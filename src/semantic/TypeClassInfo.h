@@ -13,7 +13,7 @@ class TypeClassInfo {
 
 public:
     std::string type_name;
-    std::map<std::string, FunctionTypeNode*> functions;
+    std::unordered_map<std::string, FunctionTypeNode*> functions;
 
     bool has_function(std::string function_name);
 };

@@ -35,7 +35,7 @@ public:
 
     const FunctionNode& func() const override;
 
-    std::map<std::string, std::string> constraints;
+    std::unordered_map<std::string, std::string> constraints;
 };
 
 

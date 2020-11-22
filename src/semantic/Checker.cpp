@@ -27,7 +27,7 @@ ClassInfo* make_list_class_info() {
     list_class_info->methods.insert(std::make_pair("pop", new FunctionTypeNode({}, generic_type_t.clone())));
     list_class_info->methods.insert(
             std::make_pair(
-                    "map",
+                    "unordered_map",
                     new FunctionTypeNode(
                             {FUNCTION_TYPE({ generic_type_t.clone() },
                                            generic_type_b.clone())},
@@ -364,7 +364,7 @@ USymbolInfo Checker::visit(IfNode& n) {
     USymbolInfo condition_info_p = this->dispatch(n.condition);
     SymbolInfo& condition_info = *condition_info_p;
 
-    std::map<std::string, bool> not_null_vars;
+    std::unordered_map<std::string, bool> not_null_vars;
 
     if (condition_info.type() != T_BOOL) {
         throw std::runtime_error(
@@ -508,8 +508,8 @@ bool is_generic(const TypeNode& t) {
     return false;
 }
 
-std::map<std::string, TypeNode*> make_replacements(TypeNode* a, TypeNode* b) {
-    std::map<std::string, TypeNode*> replacements;
+std::unordered_map<std::string, TypeNode*> make_replacements(TypeNode* a, TypeNode* b) {
+    std::unordered_map<std::string, TypeNode*> replacements;
     ObjectTypeNode& ob = b->object();
     if (a->kind == Kind::OBJECT) {
         ObjectTypeNode& oa = a->object();
@@ -518,7 +518,7 @@ std::map<std::string, TypeNode*> make_replacements(TypeNode* a, TypeNode* b) {
         }
         for (int i = 0; i < oa.type_parameters.size(); i++) {
             if (is_generic(*oa.type_parameters[i])) {
-                std::map<std::string, TypeNode*> rep = make_replacements(
+                std::unordered_map<std::string, TypeNode*> rep = make_replacements(
                         oa.type_parameters[i],
                         ob.type_parameters[i]
                 );
@@ -531,7 +531,7 @@ std::map<std::string, TypeNode*> make_replacements(TypeNode* a, TypeNode* b) {
             FunctionTypeNode& fb = b->function();
             for (int i = 0; i < fa.parameter_types.size(); i++) {
                 if (is_generic(*fa.parameter_types[i])) {
-                    std::map<std::string, TypeNode*> rep = make_replacements(
+                    std::unordered_map<std::string, TypeNode*> rep = make_replacements(
                             fa.parameter_types[i],
                             fb.parameter_types[i]
                     );
@@ -539,7 +539,7 @@ std::map<std::string, TypeNode*> make_replacements(TypeNode* a, TypeNode* b) {
                 }
             }
             if (is_generic(*fa.return_type)) {
-                std::map<std::string, TypeNode*> rep = make_replacements(fa.return_type, fb.return_type);
+                std::unordered_map<std::string, TypeNode*> rep = make_replacements(fa.return_type, fb.return_type);
                 replacements.insert(rep.begin(), rep.end());
             }
         }
@@ -557,14 +557,14 @@ bool type_matches(TypeNode* aa, TypeNode* bb) {
         FunctionTypeNode& fa = a.function();
         FunctionTypeNode& fb = b.function();
         FunctionTypeNode& new_f = fa;
-        std::map<std::string, TypeNode*> replacements;
+        std::unordered_map<std::string, TypeNode*> replacements;
         if (fa.parameter_types.size() != fb.parameter_types.size()) {
             return false;
         }
         VectorOfTypes param_types = fa.parameter_types;
         for (int i = 0; i < param_types.size(); i++) {
             if (type_matches(param_types[i], fb.parameter_types[i])) {
-                std::map<std::string, TypeNode*> rep = make_replacements(
+                std::unordered_map<std::string, TypeNode*> rep = make_replacements(
                         fa.parameter_types[i],
                         fb.parameter_types[i]
                 );
@@ -607,16 +607,16 @@ bool type_matches(TypeNode* aa, TypeNode* bb) {
     return false;
 }
 
-std::map<std::string, TypeNode*>
+std::unordered_map<std::string, TypeNode*>
 make_generic_replacements(TypeNode& t_generic_type, TypeNode& t_matching_type) {
     ObjectTypeNode& generic_type = (t_generic_type).object();
     ObjectTypeNode& matching_type = (t_matching_type).object();
-    std::map<std::string, TypeNode*> replacements;
+    std::unordered_map<std::string, TypeNode*> replacements;
     if (generic_type.type_parameters.size() == 0) {
         replacements[generic_type.identifier] = &matching_type;
     } else {
         for (int i = 0; i < generic_type.type_parameters.size(); i++) {
-            std::map<std::string, TypeNode*> param_replacements = make_generic_replacements(
+            std::unordered_map<std::string, TypeNode*> param_replacements = make_generic_replacements(
                     *generic_type.type_parameters[i],
                     *matching_type.type_parameters[i]
             );
@@ -628,13 +628,13 @@ make_generic_replacements(TypeNode& t_generic_type, TypeNode& t_matching_type) {
 
 SymbolInfo
 Checker::match_arguments_to_generic_function(const FunctionTypeNode& function_type, VectorOfTypes arg_types) {
-    std::map<std::string, TypeNode*> generic_replacements;
+    std::unordered_map<std::string, TypeNode*> generic_replacements;
     for (int i = 0; i < function_type.parameter_types.size(); i++) {
         TypeNode& param_type = *function_type.parameter_types[i];
         ObjectTypeNode& otn = param_type.object();
         if (is_generic(param_type)) {
             if (type_matches(&param_type, arg_types[i])) {
-                std::map<std::string, TypeNode*> param_generic_replacements = make_replacements(
+                std::unordered_map<std::string, TypeNode*> param_generic_replacements = make_replacements(
                         &param_type,
                         arg_types[i]
                 );
@@ -923,7 +923,7 @@ bool Checker::can_assign_generic(TypeNode& from, TypeNode& to, std::vector<std::
 }
 
 TypeNode*
-make_type_from_object_pattern(const ObjectTypeNode& object_type, std::map<std::string, TypeNode*> replacements) {
+make_type_from_object_pattern(const ObjectTypeNode& object_type, std::unordered_map<std::string, TypeNode*> replacements) {
     std::string type_identifier = object_type.identifier;
     for (auto r: replacements) {
         if (type_identifier == r.first) {
@@ -944,7 +944,7 @@ make_type_from_object_pattern(const ObjectTypeNode& object_type, std::map<std::s
     return TYPE(type_identifier, new_type_params);
 }
 
-TypeNode* make_type_from_function_pattern(const FunctionTypeNode& ftn, std::map<std::string, TypeNode*> replacements) {
+TypeNode* make_type_from_function_pattern(const FunctionTypeNode& ftn, std::unordered_map<std::string, TypeNode*> replacements) {
     VectorOfTypes new_param_types;
     for (auto pt: ftn.parameter_types) {
         TypeNode* new_pt = make_type(*pt, replacements);
@@ -955,7 +955,7 @@ TypeNode* make_type_from_function_pattern(const FunctionTypeNode& ftn, std::map<
 //        throw std::runtime_error("Making non object concrete type template!");
 }
 
-TypeNode* make_type(const TypeNode& original, std::map<std::string, TypeNode*> replacements) {
+TypeNode* make_type(const TypeNode& original, std::unordered_map<std::string, TypeNode*> replacements) {
     if (original.kind == Kind::OBJECT) {
         return make_type_from_object_pattern(original.object(), replacements);
     } else {
@@ -964,7 +964,7 @@ TypeNode* make_type(const TypeNode& original, std::map<std::string, TypeNode*> r
 }
 
 ClassInfo* Checker::instantiate_generic(ClassInfo* generic, const ObjectTypeNode& instance) {
-    std::map<std::string, TypeNode*> replacements;
+    std::unordered_map<std::string, TypeNode*> replacements;
     for (int i = 0; i < generic->type_parameters.size(); i++) {
         std::string tp = generic->type_parameters[i];
         TypeNode& type_replacement = *instance.type_parameters[i];
@@ -977,7 +977,7 @@ ClassInfo* Checker::instantiate_generic(ClassInfo* generic, const ObjectTypeNode
         concrete_field_types.push_back(&concrete_type);
     }
 
-    std::map<std::string, FunctionTypeNode*> concrete_methods;
+    std::unordered_map<std::string, FunctionTypeNode*> concrete_methods;
     for (auto m: generic->methods) {
         TypeNode& concrete_type = *make_type(*(m.second), replacements);
         concrete_methods.insert(std::make_pair(m.first, &concrete_type.function()));

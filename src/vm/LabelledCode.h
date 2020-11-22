@@ -6,7 +6,7 @@
 #define LABELLEDCODE_H
 
 
-#include <map>
+#include <unordered_map>
 #include <vector>
 #include "../instructions/Instruction.h"
 #include "../instructions/JumpInst.h"
@@ -14,7 +14,7 @@
 
 class LabelledCode {
 public:
-    std::map<std::string, int> labels;
+    std::unordered_map<std::string, int> labels;
     std::vector<std::pair<std::string, Instruction*>> code;
 
     LabelledCode(std::vector<std::pair<std::string, Instruction*>> code);

@@ -6,8 +6,8 @@
 #include "Scanner.h"
 #include "../color_codes.h"
 
-std::map<std::string, TokType> TOKEN_KEYWORDS;
-std::map<std::string, TokType> TOKEN_SPECIAL;
+std::unordered_map<std::string, TokType> TOKEN_KEYWORDS;
+std::unordered_map<std::string, TokType> TOKEN_SPECIAL;
 
 /*
  * fun initialize_tokens(){

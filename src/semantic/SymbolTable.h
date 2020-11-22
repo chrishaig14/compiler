@@ -7,14 +7,14 @@
 
 #include <string>
 #include <vector>
-#include <map>
+#include <unordered_map>
 #include "../nodes/TypeNode.h"
 #include "../utils.h"
 #include "SymbolInfo.h"
 
 
 class SymbolTable {
-    std::map<std::string, TypeNode*> table;
+    std::unordered_map<std::string, TypeNode*> table;
 public:
     SymbolTable(std::string name, SymbolTable* parent);
 
@@ -39,7 +39,7 @@ public:
 
     std::string name;
     SymbolTable* parent;
-    std::map<std::string, bool> not_null;
+    std::unordered_map<std::string, bool> not_null;
 };
 
 #endif //SYMBOLTABLE_H

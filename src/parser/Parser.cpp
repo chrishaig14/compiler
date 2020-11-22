@@ -7,7 +7,7 @@
 #include "../semantic/GlobalProcessor.h"
 #include <exception>
 
-std::map<TokType, OpType> TOKEN_TO_OP = {
+std::unordered_map<TokType, OpType> TOKEN_TO_OP = {
         {TokType::PLUS,  OpType::ADD},
         {TokType::MINUS, OpType::SUB},
         {TokType::TIMES, OpType::MUL},
@@ -323,7 +323,7 @@ Node* Parser::parse_class_literal() {
     ObjectTypeNode* otn = &type->object();
     this->expect_token(TokType::LCURLY);
 
-    std::map<std::string, Node*> init;
+    std::unordered_map<std::string, Node*> init;
     VectorOfNodes exps;
     if (!this->match(TokType::RCURLY)) {
         Node& first = *this->parse_expression();
@@ -716,8 +716,8 @@ ClassNode* Parser::parse_class_definition() {
         this->expect_token(TokType::RSQUARE);
     }
     this->expect_token(TokType::LCURLY);
-    std::map<std::string, FunctionNode*> methods;
-    std::map<std::string, TypeNode*> members;
+    std::unordered_map<std::string, FunctionNode*> methods;
+    std::unordered_map<std::string, TypeNode*> members;
     std::vector<std::string> members_ordered;
     while (true) {
         if (this->match(TokType::ID)) {

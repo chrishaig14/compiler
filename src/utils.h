@@ -6,7 +6,7 @@
 #define UTILS_H
 
 #include <vector>
-#include <map>
+#include <unordered_map>
 #include <algorithm>
 #include "types.h"
 #include "instructions/Instruction.h"

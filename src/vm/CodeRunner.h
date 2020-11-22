@@ -27,9 +27,9 @@ public:
     size_t inst_ptr;
     ObjectStack& stack;
     Environment* env;
-    std::map<std::string, std::vector<std::string>> classes;
+    std::unordered_map<std::string, std::vector<std::string>> classes;
 
-    CodeRunner(const Code& code, std::map<std::string, std::map<std::string, Code>>& structs, ObjectStack& stack,
+    CodeRunner(const Code& code, std::unordered_map<std::string, std::unordered_map<std::string, Code>>& structs, ObjectStack& stack,
                Environment* global_env);
 
     void run();
@@ -92,7 +92,7 @@ public:
 
     void visit(PopInst& inst) override;
 
-    std::map<std::string, std::map<std::string, Code>>& structs;
+    std::unordered_map<std::string, std::unordered_map<std::string, Code>>& structs;
     Environment* global_env;
 };
 

@@ -5,11 +5,11 @@
 #ifndef ENVIRONMENT_H
 #define ENVIRONMENT_H
 
-#include <map>
+#include <unordered_map>
 #include "Object.h"
 
 class Environment {
-    std::map<std::string, Object*> table;
+    std::unordered_map<std::string, Object*> table;
 
     Environment* parent;
     std::string name;

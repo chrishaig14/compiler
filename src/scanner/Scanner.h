@@ -11,8 +11,8 @@
 
 #include <vector>
 
-extern std::map<std::string, TokType> TOKEN_KEYWORDS;
-extern std::map<std::string, TokType> TOKEN_SPECIAL;
+extern std::unordered_map<std::string, TokType> TOKEN_KEYWORDS;
+extern std::unordered_map<std::string, TokType> TOKEN_SPECIAL;
 
 class UnexpectedCharacter : public std::runtime_error {
 public:

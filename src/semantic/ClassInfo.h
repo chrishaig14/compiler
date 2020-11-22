@@ -6,7 +6,7 @@
 #define CLASSINFO_H
 
 #include <string>
-#include <map>
+#include <unordered_map>
 #include "ObjectInfo.h"
 #include "FunctionInfo.h"
 
@@ -15,8 +15,8 @@ public:
     std::vector<std::string> member_names;
     VectorOfTypes member_types;
 
-    std::map<std::string, TypeNode*> members;
-    std::map<std::string, FunctionTypeNode*> methods;
+    std::unordered_map<std::string, TypeNode*> members;
+    std::unordered_map<std::string, FunctionTypeNode*> methods;
 
     std::string class_name;
 

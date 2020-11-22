@@ -6,7 +6,7 @@
 #include "NoneObject.h"
 #include <iostream>
 
-CodeRunner::CodeRunner(const Code& code, std::map<std::string, std::map<std::string, Code>>& structs,
+CodeRunner::CodeRunner(const Code& code, std::unordered_map<std::string, std::unordered_map<std::string, Code>>& structs,
                        ObjectStack& stack, Environment* global_env) : code(code), stack(stack),
                                                                       structs(structs) {
     //std::cerr << "New code runner" << std::endl;
@@ -320,7 +320,9 @@ void CodeRunner::visit(JumpInst& inst) {
 }
 
 void CodeRunner::visit(LeaveScope& inst) {
+    Environment* old_env = this->env;
     this->env = this->env->leave(inst.name);
+    delete old_env;
     this->inst_ptr++;
 }
 

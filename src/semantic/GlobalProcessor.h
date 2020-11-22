@@ -6,14 +6,14 @@
 #define GLOBALPROCESSOR_H
 
 
-#include <map>
+#include <unordered_map>
 #include "SymbolTable.h"
 #include "ClassTable.h"
 #include "../vm/Object.h"
 #include "../nodes/ClassNode.h"
 
 class FunctionTable {
-    std::map<std::string, FunctionTypeNode*> functions;
+    std::unordered_map<std::string, FunctionTypeNode*> functions;
 
 public:
 
