@@ -61,6 +61,25 @@ TEST_F(global_test, test_class_info_members_ok) {
     EXPECT_EQ(*gp.class_table->get("Foo")->members["y"], T_STRING);
 }
 
+TEST_F(global_test, test_class_info_methods_ok) {
+    std::string text = "class Foo {x: Integer\ny:String\nfun foo()->Integer{return this.x\n}\n}";
+    SetUp(text);
+    gp.visit(*tree);
+    EXPECT_EQ(gp.class_table->get("Foo")->methods.count("foo"), 1);
+    EXPECT_EQ(*gp.class_table->get("Foo")->methods["foo"], FunctionTypeNode({}, new T_INT));
+}
+
+TEST_F(global_test, test_class_info_method_redeclared_error) {
+    std::string text = "class Foo {x: Integer\ny:String\nfun foo()->Integer{return this.x\n}\nfun foo(x: Integer)->String{return this.x\n}\n}";
+    SetUp(text);
+    try {
+        gp.visit(*tree);
+        FAIL();
+    } catch (...) {
+
+    }
+}
+
 TEST_F(global_test, test_class_already_declared_error) {
     std::string text = "class Foo {x: Integer\ny:String\n}\nclass Foo {x: String\n}";
     SetUp(text);

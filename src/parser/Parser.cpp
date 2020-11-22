@@ -701,12 +701,24 @@ ClassNode* Parser::parse_class_definition() {
             Token member_name_tk = this->expect_token(TokType::ID);
             this->expect_token(TokType::COLON);
             TypeNode* member_type = this->parse_type_node();
+            if (members.count(member_name_tk.str) || methods.count(member_name_tk.str)) {
+                throw std::runtime_error(
+                        "Error in class " + class_name_tk.str + " definition: member/method \"" + member_name_tk.str +
+                        "\" already defined!"
+                );
+            }
             members[member_name_tk.str] = member_type;
             members_ordered.push_back(member_name_tk.str);
 //            OPTIONAL_SEMICOLON();
             this->expect_token(TokType::SEMICOLON);
         } else if (this->match(TokType::FUN)) {
             FunctionNode* method_node = this->parse_function_definition();
+            if (members.count(method_node->identifier) || methods.count(method_node->identifier)) {
+                throw std::runtime_error(
+                        "Error in class " + class_name_tk.str + " definition: member/method \"" + method_node->identifier +
+                        "\" already defined!"
+                );
+            }
             methods.insert(make_pair(method_node->identifier, method_node));
         } else {
             break;

@@ -4,7 +4,7 @@
 
 #include "RedeclareError.h"
 
-RedeclareError::RedeclareError(std::string name) : runtime_error("Name " + name + "already declared in current scope") {
+RedeclareError::RedeclareError(std::string name) : runtime_error("Name \"" + name + "\" already declared in current scope") {
 }
 
 bool RedeclareError::operator==(const RedeclareError& other) const {
