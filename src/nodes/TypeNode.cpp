@@ -42,8 +42,8 @@ std::string FunctionTypeNode::to_string() const {
     if (ftype.parameter_types.size() != 0) {
         parameters = parameters.substr(0, parameters.size() - 2);
     }
-    ret = ftype.return_type->to_string() + ", ";
-    return "fun (" + parameters + ") . " + ret;
+    ret = ftype.return_type->to_string();
+    return "fun (" + parameters + ")" + (*ftype.return_type == ObjectTypeNode(".None", {}) ? "" : (" -> " + ret));
 }
 
 bool FunctionTypeNode::equal(const TypeNode& other) const {
@@ -66,7 +66,8 @@ const FunctionTypeNode& FunctionTypeNode::function() const { return *this; }
 
 ObjectTypeNode::ObjectTypeNode(const std::string& identifier,
                                const VectorOfTypes& typeParameters) : identifier(
-        identifier), type_parameters(typeParameters) {
+        identifier
+), type_parameters(typeParameters) {
     for (auto p: typeParameters) {
         assert(p != nullptr);
     }
