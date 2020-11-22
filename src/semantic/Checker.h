@@ -119,6 +119,8 @@ public:
 
 
     USymbolInfo dispatch(Node* nod);
+    bool add_this;
+    TypeNode* this_type;
 };
 
 #endif //CHECKER_H

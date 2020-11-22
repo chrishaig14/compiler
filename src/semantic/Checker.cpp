@@ -56,6 +56,8 @@ Checker::Checker(SymbolTable* globals, ClassTable* class_table, FunctionTable* f
     this->scope = globals;
     this->scopes["global"] = this->scope;
 
+    this->add_this = false;
+    this->this_type = nullptr;
 
     this->class_table->set("Integer", make_int_class_info());
     this->class_table->set("List", make_list_class_info());
@@ -82,6 +84,9 @@ void Checker::leave_scope() {
 
 USymbolInfo Checker::visit(FunctionNode& n) {
     this->enter_scope(n.identifier);
+    if (this->add_this) {
+        this->scope->set("this", *this->this_type);
+    }
     for (int i = 0; i < n.parameter_names.size(); i++) {
         TypeNode& type = *n.parameter_types[i];
         if (type.kind == Kind::OBJECT) {
@@ -1217,17 +1222,18 @@ USymbolInfo Checker::visit(EmptyListNode& node) {
 }
 
 USymbolInfo Checker::visit(ClassNode& node) {
+    this->add_this = true;
+    VectorOfTypes tp;
+    for (auto type_param: node.type_parameters) {
+        tp.push_back(TYPE(type_param, {}));
+    }
+    this->this_type = new ObjectTypeNode(node.class_name, tp);
     for (auto method: node.methods) {
-        this->enter_scope(method.first);
-
-        VectorOfTypes tp;
-        for (auto type_param: node.type_parameters) {
-            tp.push_back(TYPE(type_param, {}));
-        }
-        this->scope->set("this", ObjectTypeNode(node.class_name, tp));
-        this->leave_scope();
         this->visit(*method.second);
     }
+    this->add_this = false;
+    delete this_type;
+    this->this_type = nullptr;
     return nullptr;
 }
 
