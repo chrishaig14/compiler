@@ -419,6 +419,8 @@ Node* Parser::parse_id_or_class_literal() {
     int column = this->token.column;
     this->next();
     node = new IdNode(identifier);
+    node->line = this->token.line;
+    node->column = this->token.column;
 //    node->start = start;
 //    node->end = end;
 //    node->line = line;
@@ -436,7 +438,10 @@ Node* Parser::parse_call_or_subscript_chain(Node* parent) {
             if (!this->match(TokType::RPAREN)) {
                 arguments = this->parse_list_of_expressions();
             }
+            Node* old_node = node;
             node = new CallNode(node, arguments);
+            node->line = old_node->line;
+            node->column = old_node->column;
             this->expect_token(TokType::RPAREN);
         } else if (this->match(TokType::LSQUARE)) {
 //                subscript
@@ -445,7 +450,10 @@ Node* Parser::parse_call_or_subscript_chain(Node* parent) {
                 throw std::runtime_error("Empty subscript error!");
             }
             Node* value = this->parse_expression();
+            Node* old_node = node;
             node = new SubscriptNode(node, {value});
+            node->line = old_node->line;
+            node->column = old_node->column;
             this->expect_token(TokType::RSQUARE);
         }
     }
