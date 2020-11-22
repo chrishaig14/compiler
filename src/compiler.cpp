@@ -3,7 +3,6 @@
 #include <sstream>
 #include "scanner/Scanner.h"
 #include "parser/Parser.h"
-#include "formatter/Formatter.h"
 #include "semantic/GlobalProcessor.h"
 #include "semantic/Checker.h"
 
