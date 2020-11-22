@@ -264,3 +264,20 @@ TEST_F(checker_test, test_declare_class_ok) {
     SetUp(text);
     checker->visit(*tree);
 }
+
+TEST_F(checker_test, test_variable_redeclared_error) {
+    std::string text = "fun foo(){var x = 0; var x : String = \"Hello\";}";
+    SetUp(text);
+    try {
+        checker->visit(*tree);
+        FAIL();
+    } catch (...) {
+
+    }
+}
+
+TEST_F(checker_test, test_variable_redeclared_inside_scope_ok) {
+    std::string text = "fun foo(){var x = 0; if x == 0 {var x : String = \"Hello\"; var y: String = x;} if x == 1 {var x : Boolean = false; var y : Boolean = x;}}";
+    SetUp(text);
+    checker->visit(*tree);
+}
