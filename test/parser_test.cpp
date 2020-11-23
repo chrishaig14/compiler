@@ -65,8 +65,7 @@ TEST_F(parser_test, a_plus_b) {
     node = parser.parse_add_or_sub_expression();
     expected_node = (
             new BinopNode(OpType::ADD, (new IdNode("a")), (new IdNode("b"))));
-    EXPECT_EQ(node->ntype, expected_node->ntype);
-    EXPECT_EQ(node->binop(), expected_node->binop());
+    EXPECT_EQ(*node, *expected_node);
 }
 
 TEST_F(parser_test, ternary) {
@@ -86,8 +85,7 @@ TEST_F(parser_test, a_or_b) {
     Parser parser(tokens);
     node = parser.parse_or_expression();
     expected_node = new BinopNode(OpType::OR, new IdNode("a"), new IdNode("b"));
-    EXPECT_EQ(node->ntype, expected_node->ntype);
-    EXPECT_EQ(node->binop(), expected_node->binop());
+    EXPECT_EQ(*node, *expected_node);
 }
 
 TEST_F(parser_test, complex_expression_1) {
@@ -106,8 +104,7 @@ TEST_F(parser_test, complex_expression_1) {
                     new BinopNode(OpType::SUB, new NumberNode(8), new NumberNode(9)), new NumberNode(7),
                     new NumberNode(4)),
             new NumberNode(10));
-    EXPECT_EQ(node->ntype, expected_node->ntype);
-    EXPECT_EQ(node->ternary(), expected_node->ternary());
+    EXPECT_EQ(*node, *expected_node);
 }
 
 TEST_F(parser_test, a_eq_b) {
