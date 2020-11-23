@@ -21,8 +21,9 @@ bool SymbolTable::has(std::string name) {
 }
 
 const TypeNode& SymbolTable::get(std::string name) {
-    if (this->table.find(name) != this->table.end()) {
-        return *this->table[name];
+    auto it = this->table.find(name);
+    if (it != this->table.end()) {
+        return *it->second;
     } else {
         if (this->parent != nullptr) {
             return this->parent->get(name);
