@@ -97,11 +97,14 @@ TEST_F(parser_test, complex_expression_1) {
     Parser parser(tokens);
     node = parser.parse_expression();
     expected_node = new TernaryNode(
-            new BinopNode(OpType::OR, new IdNode("a"),
-                          new BinopNode(OpType::EQ, new BinopNode(OpType::SUB, new IdNode("s"), new IdNode("c")),
-                                        new NumberNode(7))),
-            new TernaryNode(new BinopNode(OpType::SUB, new NumberNode(8), new NumberNode(9)), new NumberNode(7),
-                            new NumberNode(4)),
+            new BinopNode(
+                    OpType::OR, new IdNode("a"),
+                    new BinopNode(
+                            OpType::EQ, new BinopNode(OpType::SUB, new IdNode("s"), new IdNode("c")),
+                            new NumberNode(7))),
+            new TernaryNode(
+                    new BinopNode(OpType::SUB, new NumberNode(8), new NumberNode(9)), new NumberNode(7),
+                    new NumberNode(4)),
             new NumberNode(10));
     EXPECT_EQ(node->ntype, expected_node->ntype);
     EXPECT_EQ(node->ternary(), expected_node->ternary());
@@ -143,8 +146,9 @@ TEST_F(parser_test, assign_x_a_plus_b) {
     std::vector<Token> tokens = scanner->scan_all();
     Parser parser(tokens);
     node = parser.parse_assignment_or_expression();
-    expected_node = new AssignmentNode(new IdNode("x"),
-                                       new BinopNode(OpType::ADD, new IdNode("a"), new IdNode("b")));
+    expected_node = new AssignmentNode(
+            new IdNode("x"),
+            new BinopNode(OpType::ADD, new IdNode("a"), new IdNode("b")));
     EXPECT_EQ(*node, *expected_node);
 }
 
@@ -167,8 +171,9 @@ TEST_F(parser_test, declare_x_a_plus_b) {
     std::vector<Token> tokens = scanner->scan_all();
     Parser parser(tokens);
     node = parser.parse_variable_declaration();
-    expected_node = new DeclarationNode("x", nullptr,
-                                        new BinopNode(OpType::ADD, new IdNode("a"), new IdNode("b")));
+    expected_node = new DeclarationNode(
+            "x", nullptr,
+            new BinopNode(OpType::ADD, new IdNode("a"), new IdNode("b")));
     EXPECT_EQ(*node, *expected_node);
 }
 
@@ -188,9 +193,12 @@ TEST_F(parser_test, non_empty_block) {
     std::vector<Token> tokens = scanner->scan_all();
     Parser parser(tokens);
     node = parser.parse_possibly_empty_block();
-    expected_node = new BlockNode({new AssignmentNode(new IdNode("x"),
-                                                      new BinopNode(OpType::ADD, new IdNode("a"), new IdNode("b"))),
-                                   new AssignmentNode(new IdNode("x"), new IdNode("y"))});
+    expected_node = new BlockNode(
+            {new AssignmentNode(
+                    new IdNode("x"),
+                    new BinopNode(OpType::ADD, new IdNode("a"), new IdNode("b"))),
+             new AssignmentNode(new IdNode("x"), new IdNode("y"))}
+    );
     EXPECT_EQ(*node, *expected_node);
 }
 
@@ -288,8 +296,9 @@ TEST_F(parser_test, decl_with_type_and_value) {
     std::vector<Token> tokens = scanner->scan_all();
     Parser parser(tokens);
     node = parser.parse_variable_declaration();
-    expected_node = new DeclarationNode("x", TYPE("String", VectorOfTypes({new T_INT, new T_LIST({new T_STRING})})),
-                                        new BinopNode(OpType::ADD, new IdNode("a"), new IdNode("b")));
+    expected_node = new DeclarationNode(
+            "x", TYPE("String", VectorOfTypes({new T_INT, new T_LIST({new T_STRING})})),
+            new BinopNode(OpType::ADD, new IdNode("a"), new IdNode("b")));
     EXPECT_EQ(*node, *expected_node);
 }
 
@@ -326,7 +335,8 @@ TEST_F(parser_test, function_with_params_and_body) {
     node = parser.parse_function_definition();
     BlockNode* b = new BlockNode(
             {new AssignmentNode(new IdNode("x"), new BinopNode(OpType::ADD, new IdNode("a"), new IdNode("b"))),
-             new AssignmentNode(new IdNode("x"), new IdNode("y"))});
+             new AssignmentNode(new IdNode("x"), new IdNode("y"))}
+    );
     expected_node = new FunctionNode("foo", {"x"}, {COMPLEX_TYPE}, TYPE("String", {}), b);
     EXPECT_EQ(*node, *expected_node);
 }
@@ -350,8 +360,8 @@ TEST_F(parser_test, class_literal_empty_ok) {
 //    Parser parser(tokens);
 //    node = parser.parse_factor();
 //    VectorOfNodes init = {};
-////    expected_node = LIT_EXP(TYPE("Person", {}), init);
-////    EXPECT_EQ(*node,*expected_node);
+//    expected_node = LIT_EXP(TYPE("Person", {}), init);
+//    EXPECT_EQ(*node,*expected_node);
 }
 
 //TEST_F(parser_test, class_literal_error_2) {
@@ -378,85 +388,30 @@ TEST_F(parser_test, function_with_params_return_type_and_body) {
 
 }
 
-TEST_F(parser_test, class_foo_empty) {
-//    std::string text = "struct Foo{}";
-//    SetUp(text);
-//    std::vector<Token> tokens = scanner->scan_all();
-//    Parser parser(tokens);
-//    Structnode = parser.parse_struct_definition();
-//    std::vector<std::pair<std::string, TypeNode*> fields;
-//    expected_node = CLS("Foo", std::vector<std::string>(), fields);
-//    EXPECT_EQ(*node,*expected_node);
-
+TEST_F(parser_test, class_literal_fields) {
+    std::string text = "#Foo{ y: 27, x: 9}";
+    SetUp(text);
+    std::vector<Token> tokens = scanner->scan_all();
+    Parser parser(tokens);
+    node = parser.parse_expression();
+    std::unordered_map<std::string, Node*> fields;
+    fields["y"] = new NumberNode(27);
+    fields["x"] = new NumberNode(9);
+    expected_node = new ClassLiteralFieldNode(TYPE("Foo", {}), fields);
+    EXPECT_EQ(*node, *expected_node);
 }
 
-TEST_F(parser_test, class_foo_with_fields) {
-//    std::string text = "struct Foo{ x: String; y: Integer;}";
-//    SetUp(text);
-//    std::vector<Token> tokens = scanner->scan_all();
-//    Parser parser(tokens);
-//    Structnode = parser.parse_struct_definition();
-//    StructFields fields;
-//    fields.push_back(FieldInfo("x", new T_STRING));
-//    fields.push_back(FieldInfo("y", new T_INT));
-//    expected_node = CLS("Foo", {}, fields);
-//    EXPECT_EQ(*node,*expected_node);
-
-}
-
-TEST_F(parser_test, struct_literal_with_names) {
-//    std::string text = "#Foo{ x: 27, y: 9}";
-//    SetUp(text);
-//    std::vector<Token> tokens = scanner->scan_all();
-//    Parser parser(tokens);
-//    node = parser.parse_expression();
-//    std::map<std::string, Node*> fields;
-//    fields["x"] = new NumberNode(27);
-//    fields["y"] = new NumberNode(9);
-////    expected_node = (new ClassLiteralFieldNode(TYPE("Foo", {}), fields));
-////    EXPECT_EQ(*node,*expected_node);
-}
-
-TEST_F(parser_test, struct_literal_without_names) {
-//    std::string text = "#Foo{9,27}";
-//    SetUp(text);
-//    std::vector<Token> tokens = scanner->scan_all();
-//    Parser parser(tokens);
-//    node = parser.parse_expression();
-//    VectorOfNodes fields;
-//    fields.push_back(new NumberNode(9));
-//    fields.push_back(new NumberNode(27));
-////    expected_node = (new ClassLiteralExpressionNode(TYPE("Foo", {}), fields));
-////    EXPECT_EQ(*node,*expected_node);
-}
-
-
-TEST_F(parser_test, template_class_foo_empty) {
-//    std::string text = "struct Foo[T, X]{}";
-//    SetUp(text);
-//    std::vector<Token> tokens = scanner->scan_all();
-//    Parser parser(tokens);
-////    Structnode = parser.parse_struct_definition();
-////    std::vector<std::string> params = {"T", "X"};
-////    StructFields fields;
-////    StructNode expected_node = CLS("Foo", params, fields);
-////    EXPECT_EQ(*node,*expected_node);
-
-}
-
-TEST_F(parser_test, class_foo_with_fields_and_method) {
-    std::string complete_foo_class_string = "struct Foo{ x: String;  y: Integer;}";
-    StructFields fields;
-//    fields.push_back(FieldInfo("x", new T_STRING));
-//    fields.push_back(FieldInfo("y", new T_INT));
-//    StructNode complete_foo_class_node = CLS("Foo", {}, fields);
-//    std::string text = complete_foo_class_string;
-//    SetUp(text);
-//    std::vector<Token> tokens = scanner->scan_all();
-//    Parser parser(tokens);
-////    Structnode = parser.parse_struct_definition();
-////    expected_node = complete_foo_class_node;
-////    EXPECT_EQ(*node,*expected_node);
+TEST_F(parser_test, class_literal_expression_ok) {
+    std::string text = "#Foo{9,27}";
+    SetUp(text);
+    std::vector<Token> tokens = scanner->scan_all();
+    Parser parser(tokens);
+    node = parser.parse_expression();
+    VectorOfNodes fields;
+    fields.push_back(new NumberNode(9));
+    fields.push_back(new NumberNode(27));
+    expected_node = new ClassLiteralExpressionNode(TYPE("Foo", {}), fields);
+    EXPECT_EQ(*node, *expected_node);
 }
 
 TEST_F(parser_test, simple_member) {
@@ -603,8 +558,9 @@ TEST_F(parser_test, more_complex_expression) {
     std::vector<Token> tokens = scanner->scan_all();
     Parser parser(tokens);
     node = parser.parse_expression();
-    expected_node = new BinopNode(OpType::ADD, new BinopNode(OpType::ADD, new NumberNode(1), new IdNode("a")),
-                                  new IdNode("b"));
+    expected_node = new BinopNode(
+            OpType::ADD, new BinopNode(OpType::ADD, new NumberNode(1), new IdNode("a")),
+            new IdNode("b"));
     EXPECT_EQ(*node, *expected_node);
 }
 
@@ -614,8 +570,9 @@ TEST_F(parser_test, more_complex_expression_2) {
     std::vector<Token> tokens = scanner->scan_all();
     Parser parser(tokens);
     node = parser.parse_expression();
-    expected_node = new BinopNode(OpType::MUL, new IdNode("b"),
-                                  new BinopNode(OpType::ADD, new NumberNode(1), new IdNode("a")));
+    expected_node = new BinopNode(
+            OpType::MUL, new IdNode("b"),
+            new BinopNode(OpType::ADD, new NumberNode(1), new IdNode("a")));
     EXPECT_EQ(*node, *expected_node);
 }
 
@@ -646,9 +603,10 @@ TEST_F(parser_test, plus_or_minus_with_multiple_terms_expression) {
     std::vector<Token> tokens = scanner->scan_all();
     Parser parser(tokens);
     node = parser.parse_add_or_sub_expression();
-    expected_node = new BinopNode(OpType::SUB,
-                                  new BinopNode(OpType::ADD, new IdNode("a"), new IdNode("b")),
-                                  new IdNode("c"));
+    expected_node = new BinopNode(
+            OpType::SUB,
+            new BinopNode(OpType::ADD, new IdNode("a"), new IdNode("b")),
+            new IdNode("c"));
     EXPECT_EQ(*node, *expected_node);
 }
 
@@ -658,9 +616,10 @@ TEST_F(parser_test, mul_or_div_with_multiple_factors_expression) {
     std::vector<Token> tokens = scanner->scan_all();
     Parser parser(tokens);
     node = parser.parse_add_or_sub_expression();
-    expected_node = new BinopNode(OpType::MUL,
-                                  new BinopNode(OpType::DIV, new IdNode("a"), new IdNode("b")),
-                                  new IdNode("c"));
+    expected_node = new BinopNode(
+            OpType::MUL,
+            new BinopNode(OpType::DIV, new IdNode("a"), new IdNode("b")),
+            new IdNode("c"));
     EXPECT_EQ(*node, *expected_node);
 }
 
@@ -778,11 +737,13 @@ TEST_F(parser_test, parse_xxx) {
     Parser parser(tokens);
     node = parser.parse_expression();
     VectorOfNodes list;
-    expected_node = new BinopNode(OpType::ADD,
-                                  new BinopNode(OpType::ADD,
-                                                new SubscriptNode(new IdNode("y"), {new NumberNode(2)}),
-                                                new SubscriptNode(new IdNode("x"), {new NumberNode(7)})),
-                                  new NumberNode(43));
+    expected_node = new BinopNode(
+            OpType::ADD,
+            new BinopNode(
+                    OpType::ADD,
+                    new SubscriptNode(new IdNode("y"), {new NumberNode(2)}),
+                    new SubscriptNode(new IdNode("x"), {new NumberNode(7)})),
+            new NumberNode(43));
     EXPECT_EQ(*node, *expected_node);
 }
 
@@ -835,8 +796,9 @@ TEST_F(parser_test, parse_top_level) {
     std::vector<Token> tokens = scanner->scan_all();
     Parser parser(tokens);
     node = parser.parse_top_level_statement();
-    expected_node = new DeclarationNode("x", nullptr,
-                                        new BinopNode(OpType::MUL, new NumberNode(9), new NumberNode(7)));
+    expected_node = new DeclarationNode(
+            "x", nullptr,
+            new BinopNode(OpType::MUL, new NumberNode(9), new NumberNode(7)));
     EXPECT_EQ(*node, *expected_node);
 }
 
@@ -846,8 +808,9 @@ TEST_F(parser_test, complex_div_expression) {
     std::vector<Token> tokens = scanner->scan_all();
     Parser parser(tokens);
     node = parser.parse_add_or_sub_expression();
-    expected_node = new BinopNode(OpType::ADD, new BinopNode(OpType::DIV, new IdNode("foo"), new NumberNode(1)),
-                                  new IdNode("a"));
+    expected_node = new BinopNode(
+            OpType::ADD, new BinopNode(OpType::DIV, new IdNode("foo"), new NumberNode(1)),
+            new IdNode("a"));
     EXPECT_EQ(*node, *expected_node);
 }
 
@@ -857,28 +820,38 @@ TEST_F(parser_test, complex_expression) {
     std::vector<Token> tokens = scanner->scan_all();
     Parser parser(tokens);
     node = parser.parse_expression();
-    expected_node = new BinopNode(OpType::ADD,
-                                  new BinopNode(OpType::SUB, new BinopNode(OpType::SUB, new NumberNode(1),
-                                                                           new BinopNode(OpType::MUL,
-                                                                                         new NumberNode(7),
-                                                                                         new NumberNode(8))),
-                                                new BinopNode(OpType::ADD, new BinopNode(OpType::SUB,
-                                                                                         new BinopNode(
-                                                                                                 OpType::DIV,
-                                                                                                 new BinopNode(
-                                                                                                         OpType::MUL,
-                                                                                                         new NumberNode(
-                                                                                                                 9),
-                                                                                                         new BinopNode(
-                                                                                                                 OpType::SUB,
-                                                                                                                 new NumberNode(
-                                                                                                                         1),
-                                                                                                                 new NumberNode(
-                                                                                                                         3))),
-                                                                                                 new NumberNode(
-                                                                                                         7)),
-                                                                                         new NumberNode(8)),
-                                                              new NumberNode(4))), new NumberNode(8));
+    expected_node = new BinopNode(
+            OpType::ADD,
+            new BinopNode(
+                    OpType::SUB, new BinopNode(
+                            OpType::SUB, new NumberNode(1),
+                            new BinopNode(
+                                    OpType::MUL,
+                                    new NumberNode(7),
+                                    new NumberNode(8))),
+                    new BinopNode(
+                            OpType::ADD, new BinopNode(
+                                    OpType::SUB,
+                                    new BinopNode(
+                                            OpType::DIV,
+                                            new BinopNode(
+                                                    OpType::MUL,
+                                                    new NumberNode(
+                                                            9
+                                                    ),
+                                                    new BinopNode(
+                                                            OpType::SUB,
+                                                            new NumberNode(
+                                                                    1
+                                                            ),
+                                                            new NumberNode(
+                                                                    3
+                                                            ))),
+                                            new NumberNode(
+                                                    7
+                                            )),
+                                    new NumberNode(8)),
+                            new NumberNode(4))), new NumberNode(8));
     EXPECT_EQ(*node, *expected_node);
 
 }
@@ -891,16 +864,34 @@ TEST_F(parser_test, complex_chain) {
     Parser parser(tokens);
     node = parser.parse_expression();
     // a[1][b].c(d[5][0].e
-    auto call = new CallNode(new MemberNode(
-            new SubscriptNode(new SubscriptNode(new IdNode("a"), {new NumberNode(1)}), {new IdNode("b")}), "c"),
-                             {new MemberNode(new SubscriptNode(new SubscriptNode(new IdNode("d"), {new NumberNode(5)}),
-                                                               {new NumberNode(0)}), "e")
-                             });
+    auto call = new CallNode(
+            new MemberNode(
+                    new SubscriptNode(new SubscriptNode(new IdNode("a"), {new NumberNode(1)}), {new IdNode("b")}), "c"
+            ),
+            {new MemberNode(
+                    new SubscriptNode(
+                            new SubscriptNode(new IdNode("d"), {new NumberNode(5)}),
+                            {new NumberNode(0)}
+                    ), "e"
+            )
+            }
+    );
     expected_node = new MemberNode(
-            new SubscriptNode(new SubscriptNode(new CallNode(new SubscriptNode(
-                    new SubscriptNode(new MemberNode(new MemberNode(call, "f"), "g"), {new IdNode("h")}),
-                    {new NumberNode(2)}), {}), {new NumberNode(3)}),
-                              {new NumberNode(5)}), "i");
+            new SubscriptNode(
+                    new SubscriptNode(
+                            new CallNode(
+                                    new SubscriptNode(
+                                            new SubscriptNode(
+                                                    new MemberNode(new MemberNode(call, "f"), "g"),
+                                                    {new IdNode("h")}
+                                            ),
+                                            {new NumberNode(2)}
+                                    ), {}
+                            ), {new NumberNode(3)}
+                    ),
+                    {new NumberNode(5)}
+            ), "i"
+    );
     EXPECT_EQ(*node, *expected_node);
 }
 

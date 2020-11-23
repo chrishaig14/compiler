@@ -12,7 +12,15 @@ ClassLiteralExpressionNode::ClassLiteralExpressionNode(ObjectTypeNode* type, con
 
 bool ClassLiteralExpressionNode::equal(const Node& x) const {
     auto& other = x.clsexp();
-    return this->type == other.type && this->init == other.init;
+    if (other.init.size() != this->init.size()) {
+        return false;
+    }
+    for (int i = 0; i < this->init.size(); i++) {
+        if (*this->init[i] != *other.init[i]) {
+            return false;
+        }
+    }
+    return *this->type == *other.type;
 }
 
 ClassLiteralExpressionNode::~ClassLiteralExpressionNode() {

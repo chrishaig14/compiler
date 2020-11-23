@@ -11,7 +11,19 @@ ClassLiteralFieldNode::ClassLiteralFieldNode(ObjectTypeNode* type, const std::un
 
 bool ClassLiteralFieldNode::equal(const Node& x) const {
     auto& other = x.clsfld();
-    return this->type == other.type && this->init == other.init;
+    if (this->init.size() != other.init.size()) {
+        return false;
+    }
+    for (auto i: this->init) {
+        auto other_it = other.init.find(i.first);
+        if (other_it == other.init.end()) {
+            return false;
+        }
+        if (*i.second != *other_it->second) {
+            return false;
+        }
+    }
+    return *this->type == *other.type;
 }
 
 ClassLiteralFieldNode::~ClassLiteralFieldNode() {
