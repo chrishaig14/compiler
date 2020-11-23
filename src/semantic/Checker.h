@@ -23,8 +23,12 @@ bool type_matches(TypeNode* a, TypeNode* b);
 bool is_generic(const TypeNode& t);
 
 std::unordered_map<std::string, TypeNode*> make_replacements(TypeNode* a, TypeNode* b);
-
-TypeNode* make_type(const TypeNode& original, std::unordered_map<std::string, TypeNode*> replacements);
+TypeNode*
+make_type_from_object_pattern(const ObjectTypeNode& object_type,
+                              const std::unordered_map<std::string, TypeNode*>& replacements);
+TypeNode* make_type_from_function_pattern(const FunctionTypeNode& ftn,
+                                          const std::unordered_map<std::string, TypeNode*>& replacements);
+TypeNode* make_type(const TypeNode& original, const std::unordered_map<std::string, TypeNode*>& replacements);
 
 class Checker {
     SymbolTable* scope;

@@ -923,7 +923,7 @@ bool Checker::can_assign_generic(TypeNode& from, TypeNode& to, std::vector<std::
 }
 
 TypeNode*
-make_type_from_object_pattern(const ObjectTypeNode& object_type, std::unordered_map<std::string, TypeNode*> replacements) {
+make_type_from_object_pattern(const ObjectTypeNode& object_type, const std::unordered_map<std::string, TypeNode*>& replacements) {
     std::string type_identifier = object_type.identifier;
     for (auto r: replacements) {
         if (type_identifier == r.first) {
@@ -944,7 +944,7 @@ make_type_from_object_pattern(const ObjectTypeNode& object_type, std::unordered_
     return TYPE(type_identifier, new_type_params);
 }
 
-TypeNode* make_type_from_function_pattern(const FunctionTypeNode& ftn, std::unordered_map<std::string, TypeNode*> replacements) {
+TypeNode* make_type_from_function_pattern(const FunctionTypeNode& ftn, const std::unordered_map<std::string, TypeNode*>& replacements) {
     VectorOfTypes new_param_types;
     for (auto pt: ftn.parameter_types) {
         TypeNode* new_pt = make_type(*pt, replacements);
@@ -955,7 +955,7 @@ TypeNode* make_type_from_function_pattern(const FunctionTypeNode& ftn, std::unor
 //        throw std::runtime_error("Making non object concrete type template!");
 }
 
-TypeNode* make_type(const TypeNode& original, std::unordered_map<std::string, TypeNode*> replacements) {
+TypeNode* make_type(const TypeNode& original, const std::unordered_map<std::string, TypeNode*>& replacements) {
     if (original.kind == Kind::OBJECT) {
         return make_type_from_object_pattern(original.object(), replacements);
     } else {
