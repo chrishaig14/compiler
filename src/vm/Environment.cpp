@@ -10,7 +10,8 @@ Environment::Environment(std::string name, Environment* parent) {
 }
 
 void Environment::set(std::string name, Object* value) {
-    if (this->table.find(name) == this->table.end()) {
+    auto it = this->table.find(name);
+    if (it == this->table.end()) {
         // not already in table
         if (this->parent != nullptr) {
             this->parent->set(name, value);
@@ -18,22 +19,23 @@ void Environment::set(std::string name, Object* value) {
             throw std::runtime_error("Error name " + name + " not found in current environment");
         }
     } else {
-        this->table[name] = value;
+        it->second = value;
     }
 }
 
 Object* Environment::get(std::string name) {
-    if (this->table.find(name) == this->table.end()) {
+    auto it = this->table.find(name);
+    if (it == this->table.end()) {
         if (this->parent != nullptr) {
             return this->parent->get(name);
         } else {
             throw std::runtime_error("Error name " + name + " not found in current scope");
         }
     }
-    if (this->table[name] == nullptr) {
+    if (it->second == nullptr) {
         throw std::runtime_error("Error name " + name + " has nullptr");
     }
-    return this->table[name];
+    return it->second;
 }
 
 void Environment::declare(std::string name) {
