@@ -59,6 +59,8 @@ class SubscriptNode;
 
 class TernaryNode;
 
+class TupleNode;
+
 class WhileNode;
 
 class Node {
@@ -105,6 +107,7 @@ public:
     virtual ReturnNode& retrn();
     virtual StringNode& strng();
     virtual SubscriptNode& sub();
+    virtual TupleNode& tuple();
     virtual TernaryNode& ternary();
     virtual WhileNode& whil();
     virtual const AssignmentNode& assign() const;
@@ -131,6 +134,7 @@ public:
     virtual const StringNode& strng() const;
     virtual const SubscriptNode& sub() const;
     virtual const TernaryNode& ternary() const;
+    virtual const TupleNode& tuple() const;
     virtual const WhileNode& whil() const;
 
     virtual json to_json() const;

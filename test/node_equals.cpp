@@ -95,3 +95,14 @@ TEST(node_test, decl) {
     EXPECT_NE(DeclarationNode("x", nullptr, new IdNode("a")), DeclarationNode("x", nullptr, new IdNode("b")));
     EXPECT_NE(DeclarationNode("x", nullptr, new IdNode("a")), DeclarationNode("y", nullptr, new IdNode("a")));
 }
+
+TEST(node_test, tuple) {
+    EXPECT_EQ(TupleNode(VectorOfNodes({new NumberNode(7), new StringNode("foo")})),
+              TupleNode(VectorOfNodes({new NumberNode(7), new StringNode("foo")})));
+    EXPECT_NE(TupleNode(VectorOfNodes({new NumberNode(9), new StringNode("foo")})),
+              TupleNode(VectorOfNodes({new NumberNode(7), new StringNode("foo")})));
+    EXPECT_NE(TupleNode(VectorOfNodes({new NumberNode(7), new StringNode("foo")})),
+              TupleNode(VectorOfNodes({new NumberNode(7), new StringNode("bar")})));
+    EXPECT_NE(TupleNode(VectorOfNodes({new NumberNode(7), new StringNode("foo")})),
+              TupleNode(VectorOfNodes({new NumberNode(7), new StringNode("foo"), new NumberNode(17)})));
+}

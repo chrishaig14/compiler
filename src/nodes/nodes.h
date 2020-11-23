@@ -28,6 +28,7 @@
 #include "MemberNode.h"
 #include "NumberNode.h"
 #include "ReturnNode.h"
+#include "TupleNode.h"
 #include "StringNode.h"
 #include "SubscriptNode.h"
 #include "TypeNode.h"

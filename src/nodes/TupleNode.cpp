@@ -1,0 +1,31 @@
+//
+// Created by chris on 23/11/20.
+//
+
+#include "TupleNode.h"
+
+bool TupleNode::equal(const Node& n) const {
+    auto& other = n.tuple();
+    if (this->values.size() != other.values.size()) {
+        return false;
+    }
+    for (int i = 0; i < this->values.size(); i++) {
+        if (*this->values[i] != *other.values[i]) {
+            return false;
+        }
+    }
+    return true;
+}
+
+TupleNode::TupleNode(const VectorOfNodes& values) {
+    this->ntype = TUPLE;
+    this->values = values;
+}
+
+TupleNode& TupleNode::tuple() {
+    return *this;
+}
+
+const TupleNode& TupleNode::tuple() const {
+    return *this;
+}

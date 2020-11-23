@@ -30,6 +30,7 @@ enum NodeType {
     STRNG,
     SUB,
     TERNARY,
+    TUPLE,
     OTYPE,
     FTYPE,
     WHIL,

@@ -21,6 +21,10 @@ const WhileNode& Node::whil() const {
     this->throw_dereference_error(WHIL);
 }
 
+const TupleNode& Node::tuple() const {
+    this->throw_dereference_error(TUPLE);
+}
+
 const TernaryNode& Node::ternary() const {
     this->throw_dereference_error(TERNARY);
 }
@@ -115,6 +119,10 @@ CallNode& Node::call() {
 
 ClassLiteralFieldNode& Node::clsfld() {
     this->throw_dereference_error(CLSFLD);
+}
+
+TupleNode& Node::tuple() {
+    this->throw_dereference_error(TUPLE);
 }
 
 ClassLiteralExpressionNode& Node::clsexp() {
@@ -286,6 +294,9 @@ std::string Node::node_type_string(NodeType type) const {
             return "WHIL";
         case UNINITIALIZED:
             return "UNINITIALIZED";
+        case TUPLE:
+            return "TUPLE";
+            break;
     }
     return "UNKNOWN";
 }
