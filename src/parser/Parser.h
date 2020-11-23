@@ -20,7 +20,7 @@ public:
 
     bool match(TokType type);
 
-    Node* parse_class_literal();
+    Node* parse_class_or_tuple_literal();
 
     void next();
 

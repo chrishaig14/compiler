@@ -238,7 +238,7 @@ Node* Parser::parse_mul_div_or_mod_expression() {
 Node* Parser::parse_factor() {
     Node* parent;
     if (this->match(TokType::HASH)) {
-        parent = this->parse_class_literal();
+        parent = this->parse_class_or_tuple_literal();
     } else {
         parent = this->parse_id_or_literal();
     }
@@ -313,8 +313,34 @@ Node* Parser::parse_id_or_literal() {
     return node;
 }
 
-Node* Parser::parse_class_literal() {
+Node* Parser::parse_class_or_tuple_literal() {
     Token hash_tok = this->expect_token(TokType::HASH);
+
+    if (this->match(TokType::LPAREN)) {
+        // it's a tuple
+        this->next();
+        VectorOfNodes values;
+        if (this->match(TokType::RPAREN)){
+            throw std::runtime_error("Error: can't have an empty tuple");
+        }
+        bool first = true;
+        while (true) {
+            Node* exp = this->parse_expression();
+            values.emplace_back(exp);
+            if (this->match(TokType::COMMA)) {
+                this->next();
+                first = false;
+                continue;
+            } else {
+                if (first && this->match(TokType::RPAREN)){
+                    throw std::runtime_error("Error: can't have a tuple with only one element!");
+                }
+                break;
+            }
+        }
+        this->expect_token(TokType::RPAREN);
+        return new TupleNode(values);
+    }
 
     TypeNode* type = this->parse_type_node();
     if (type->kind != Kind::OBJECT) {
@@ -737,7 +763,8 @@ ClassNode* Parser::parse_class_definition() {
             this->expect_token(TokType::SEMICOLON);
         } else if (this->match(TokType::FUN)) {
             FunctionNode* method_node = this->parse_function_definition();
-            if (members.find(method_node->identifier) != members.end() || methods.find(method_node->identifier) != methods.end()) {
+            if (members.find(method_node->identifier) != members.end() ||
+                methods.find(method_node->identifier) != methods.end()) {
                 throw std::runtime_error(
                         "Error in class " + class_name_tk.str + " definition: member/method \"" +
                         method_node->identifier +

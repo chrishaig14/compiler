@@ -384,6 +384,42 @@ TEST_F(parser_test, function_with_params_return_type_and_body) {
 ////    EXPECT_EQ(*node,*expected_node);
 
 }
+//
+TEST_F(parser_test, tuple_literal_one_element_error) {
+    std::string text = "#(23)";
+    SetUp(text);
+    std::vector<Token> tokens = scanner->scan_all();
+    Parser parser(tokens);
+    try {
+        node = parser.parse_expression();
+    } catch (...) {
+
+    }
+}
+
+TEST_F(parser_test, tuple_literal_multi_elements_ok) {
+    std::string text = "#(23, \"Hello\", 43 + 9)";
+    SetUp(text);
+    std::vector<Token> tokens = scanner->scan_all();
+    Parser parser(tokens);
+    node = parser.parse_expression();
+    VectorOfNodes values = {NUM(23), STR("Hello"), BIN(OpType::ADD, NUM(43), NUM(9))};
+    expected_node = new TupleNode(values);
+    EXPECT_EQ(*node, *expected_node);
+}
+
+TEST_F(parser_test, tuple_literal_empty_error) {
+    std::string text = "#()";
+    SetUp(text);
+    std::vector<Token> tokens = scanner->scan_all();
+    Parser parser(tokens);
+    try {
+        node = parser.parse_expression();
+        FAIL();
+    } catch (...) {
+
+    }
+}
 
 TEST_F(parser_test, class_literal_fields) {
     std::string text = "#Foo{ y: 27, x: 9}";
