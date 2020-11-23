@@ -16,20 +16,20 @@
 class SymbolTable {
     std::unordered_map<std::string, TypeNode*> table;
 public:
-    SymbolTable(std::string name, SymbolTable* parent);
+    SymbolTable(const std::string& name, SymbolTable* parent);
 
 
-    bool has(std::string name);
+    bool has(const std::string& name);
 
-    const TypeNode& get(std::string name);
+    const TypeNode& get(const std::string& name);
 
-    bool declared(std::string name);
+    bool declared(const std::string& name);
 
-    void set(std::string name, const TypeNode& info);
+    void set(const std::string& name, const TypeNode& info);
 
-    void set_not_none(std::string name, bool may_be_none);
+    void set_not_none(const std::string& name, bool may_be_none);
 
-    bool get_not_none(std::string name);
+    bool get_not_none(const std::string& name);
 
     ~SymbolTable() {
         for (auto e: this->table) {

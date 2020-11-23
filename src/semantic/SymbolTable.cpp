@@ -4,12 +4,12 @@
 
 #include "SymbolTable.h"
 
-SymbolTable::SymbolTable(std::string name, SymbolTable* parent) {
+SymbolTable::SymbolTable(const std::string& name, SymbolTable* parent) {
     this->name = name;
     this->parent = parent;
 }
 
-bool SymbolTable::has(std::string name) {
+bool SymbolTable::has(const std::string& name) {
     if (this->table.find(name) != this->table.end()) {
         return true;
     } else {
@@ -20,7 +20,7 @@ bool SymbolTable::has(std::string name) {
     }
 }
 
-const TypeNode& SymbolTable::get(std::string name) {
+const TypeNode& SymbolTable::get(const std::string& name) {
     auto it = this->table.find(name);
     if (it != this->table.end()) {
         return *it->second;
@@ -32,11 +32,11 @@ const TypeNode& SymbolTable::get(std::string name) {
     throw std::runtime_error("Symbol " + name + " not found in scope");
 }
 
-bool SymbolTable::declared(std::string name) {
+bool SymbolTable::declared(const std::string& name) {
     return this->table.find(name) != this->table.end();
 }
 
-void SymbolTable::set(std::string name, const TypeNode& info) {
+void SymbolTable::set(const std::string& name, const TypeNode& info) {
     if (info.kind == Kind::OBJECT) {
         if (info.object().identifier == "Option") {
             this->not_null[name] = false;
@@ -45,11 +45,11 @@ void SymbolTable::set(std::string name, const TypeNode& info) {
     this->table[name] = info.clone();
 }
 
-void SymbolTable::set_not_none(std::string name, bool may_be_none) {
+void SymbolTable::set_not_none(const std::string& name, bool may_be_none) {
     this->not_null[name] = may_be_none;
 }
 
-bool SymbolTable::get_not_none(std::string name) {
+bool SymbolTable::get_not_none(const std::string& name) {
     if (this->not_null.find(name) != this->not_null.end()) {
         return this->not_null[name];
     } else {
