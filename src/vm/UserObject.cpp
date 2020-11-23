@@ -13,7 +13,7 @@ bool UserObject::equal(const Object* other) const {
         return false;
     }
     for (auto f: this->fields) {
-        if (other_ptr->fields.count(f.first) == 0) {
+        if (other_ptr->fields.find(f.first) == other_ptr->fields.end()) {
             return false;
         }
         if (!f.second->equal(other_ptr->fields.at(f.first))) {

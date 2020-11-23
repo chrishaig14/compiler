@@ -10,7 +10,8 @@ Environment::Environment(std::string name, Environment* parent) {
 }
 
 void Environment::set(std::string name, Object* value) {
-    if (this->table.count(name) == 0) {
+    if (this->table.find(name) == this->table.end()) {
+        // not already in table
         if (this->parent != nullptr) {
             this->parent->set(name, value);
         } else {
@@ -22,7 +23,7 @@ void Environment::set(std::string name, Object* value) {
 }
 
 Object* Environment::get(std::string name) {
-    if (this->table.count(name) == 0) {
+    if (this->table.find(name) == this->table.end()) {
         if (this->parent != nullptr) {
             return this->parent->get(name);
         } else {
@@ -36,7 +37,7 @@ Object* Environment::get(std::string name) {
 }
 
 void Environment::declare(std::string name) {
-    if (this->table.count(name) == 1) {
+    if (this->table.find(name) != this->table.end()) {
         throw std::runtime_error("Error name " + name + " already declared in current environment");
     }
     this->table[name] = nullptr;
@@ -54,5 +55,5 @@ Environment* Environment::leave(std::string name) {
 }
 
 bool Environment::is_declared(std::string name) {
-    return this->table.count(name) == 1;
+    return this->table.find(name) != this->table.end();
 }

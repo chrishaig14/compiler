@@ -69,7 +69,7 @@ Checker::Checker(SymbolTable* globals, ClassTable* class_table, FunctionTable* f
 
 void Checker::enter_scope(std::string name) {
     std::string new_scope_name = this->scope->name + "." + name;
-    if (this->scopes.count(new_scope_name) == 1) {
+    if (this->scopes.find(new_scope_name) != this->scopes.end()) {
         delete this->scopes[new_scope_name];
         this->scopes.erase(new_scope_name);
     }
@@ -279,7 +279,7 @@ USymbolInfo Checker::visit(MemberNode& n) {
         // It might be something like <class>.<method>, so we need to handle this case differently
         if (this->class_table->declared(id_node.identifier)) {
             ClassInfo* class_info = this->class_table->get(id_node.identifier);
-            if (class_info->methods.count(n.child) == 1) {
+            if (class_info->methods.find(n.child) != class_info->methods.end()) {
                 rv.set_type(*class_info->methods.find(n.child)->second);
                 rv.class_info = class_info;
 
@@ -339,13 +339,13 @@ USymbolInfo Checker::visit(MemberNode& n) {
         class_info = instantiate_generic(class_info, final_type);
         this->class_table->set(object.to_string(), class_info);
     }
-    if (class_info->members.count(n.child) == 1) {
+    if (class_info->members.find(n.child) != class_info->members.end()) {
         // It's a member
         symbol_info.set_type(*class_info->members[n.child]);
         rv = symbol_info;
         rv.is_function = false;
         rv.is_method = false;
-    } else if (class_info->methods.count(n.child) == 1) {
+    } else if (class_info->methods.find(n.child) != class_info->methods.end()) {
         // It's a method
         symbol_info.set_type(*class_info->methods.find(n.child)->second);
         rv = symbol_info;
@@ -639,7 +639,7 @@ Checker::match_arguments_to_generic_function(const FunctionTypeNode& function_ty
                         arg_types[i]
                 );
                 for (auto gtr: param_generic_replacements) {
-                    if (generic_replacements.count(gtr.first) == 1) {
+                    if (generic_replacements.find(gtr.first) != generic_replacements.end()) {
                         // this type has already been replaced, see if it matches
                         if (gtr.second != (generic_replacements[gtr.first])) {
                             throw std::runtime_error(
@@ -1027,7 +1027,7 @@ USymbolInfo Checker::visit(ClassLiteralFieldNode& node) {
     auto class_fields = class_info->members;
 
     for (auto f: node.init) {
-        if (class_fields.count(f.first) == 0) {
+        if (class_fields.find(f.first) == class_fields.end()) {
             throw std::runtime_error("No field named " + f.first);
         }
     }

@@ -10,7 +10,7 @@ SymbolTable::SymbolTable(std::string name, SymbolTable* parent) {
 }
 
 bool SymbolTable::has(std::string name) {
-    if (this->table.count(name) == 1) {
+    if (this->table.find(name) != this->table.end()) {
         return true;
     } else {
         if (this->parent != nullptr) {
@@ -21,7 +21,7 @@ bool SymbolTable::has(std::string name) {
 }
 
 const TypeNode& SymbolTable::get(std::string name) {
-    if (this->table.count(name) == 1) {
+    if (this->table.find(name) != this->table.end()) {
         return *this->table[name];
     } else {
         if (this->parent != nullptr) {
@@ -32,7 +32,7 @@ const TypeNode& SymbolTable::get(std::string name) {
 }
 
 bool SymbolTable::declared(std::string name) {
-    return this->table.count(name) == 1;
+    return this->table.find(name) != this->table.end();
 }
 
 void SymbolTable::set(std::string name, const TypeNode& info) {
@@ -49,7 +49,7 @@ void SymbolTable::set_not_none(std::string name, bool may_be_none) {
 }
 
 bool SymbolTable::get_not_none(std::string name) {
-    if (this->not_null.count(name) == 1) {
+    if (this->not_null.find(name) != this->not_null.end()) {
         return this->not_null[name];
     } else {
         if (this->parent != nullptr) {

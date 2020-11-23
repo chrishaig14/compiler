@@ -5,5 +5,5 @@
 #include "TypeClassInfo.h"
 
 bool TypeClassInfo::has_function(std::string function_name) {
-    return this->functions.count(function_name) == 1;
+    return this->functions.find(function_name) != this->functions.end();
 }

@@ -171,7 +171,7 @@ Token Scanner::scan_other() {
     if (p < this->text.size()) {
         std::string tstr = str;
         tstr.push_back(this->text[p]);
-        if (TOKEN_SPECIAL.count(tstr) == 1) {
+        if (TOKEN_SPECIAL.find(tstr) != TOKEN_SPECIAL.end()) {
             this->current += 2;
             this->column += 2;
             Token token(TOKEN_SPECIAL[tstr], start_l, start_c);
@@ -191,7 +191,7 @@ Token Scanner::scan_other() {
         }
     }
     int end = this->current;
-    if (TOKEN_SPECIAL.count(str) == 1) {
+    if (TOKEN_SPECIAL.find(str) != TOKEN_SPECIAL.end()) {
         this->current++;
         this->column++;
         Token token(TOKEN_SPECIAL[str], start_l, start_c);
@@ -219,7 +219,7 @@ Token Scanner::scan_keyword_or_identifier() {
         }
     }
     int end = this->current - 1;
-    if (TOKEN_KEYWORDS.count(str) == 1) {
+    if (TOKEN_KEYWORDS.find(str) != TOKEN_KEYWORDS.end()) {
 //      it's a keyword
         Token token(TOKEN_KEYWORDS[str], start_l, start_c);
         token.start = start;

@@ -240,7 +240,7 @@ const FunctionTypeNode& FunctionTable::get(std::string function_name) {
 }
 
 void FunctionTable::add(std::string function_name, FunctionTypeNode& function_type) {
-    if (functions.count(function_name) == 0) {
+    if (functions.find(function_name) == functions.end()) {
         functions.insert(std::make_pair(function_name, function_type.clone()));
     } else {
         throw std::runtime_error("Cant overload function " + function_name);
@@ -248,5 +248,5 @@ void FunctionTable::add(std::string function_name, FunctionTypeNode& function_ty
 }
 
 bool FunctionTable::has_function(std::string name) {
-    return this->functions.count(name) == 1;
+    return this->functions.find(name) != this->functions.end();
 }
