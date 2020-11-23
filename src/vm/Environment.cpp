@@ -4,13 +4,13 @@
 
 #include "Environment.h"
 
-Environment::Environment(std::string name, Environment* parent) {
+Environment::Environment(const std::string& id, Environment* parent) {
     this->parent = parent;
-    this->name = name;
+    this->id = id;
 }
 
-void Environment::set(std::string name, Object* value) {
-    auto it = this->table.find(name);
+void Environment::set(const std::string& name, Object* value) {
+    std::unordered_map<std::string, Object*>::iterator it = this->table.find(name);
     if (it == this->table.end()) {
         // not already in table
         if (this->parent != nullptr) {
@@ -23,7 +23,7 @@ void Environment::set(std::string name, Object* value) {
     }
 }
 
-Object* Environment::get(std::string name) {
+Object* Environment::get(const std::string& name) {
     auto it = this->table.find(name);
     if (it == this->table.end()) {
         if (this->parent != nullptr) {
@@ -38,24 +38,24 @@ Object* Environment::get(std::string name) {
     return it->second;
 }
 
-void Environment::declare(std::string name) {
+void Environment::declare(const std::string& name) {
     if (this->table.find(name) != this->table.end()) {
         throw std::runtime_error("Error name " + name + " already declared in current environment");
     }
     this->table[name] = nullptr;
 }
 
-Environment* Environment::enter(std::string name) {
+Environment* Environment::enter(const std::string& name) {
     return new Environment(name, this);
 }
 
-Environment* Environment::leave(std::string name) {
-    if (this->name == name) {
+Environment* Environment::leave(const std::string& name) {
+    if (this->id == name) {
         return this->parent;
     }
     return this->parent->leave(name);
 }
 
-bool Environment::is_declared(std::string name) {
+bool Environment::is_declared(const std::string& name) {
     return this->table.find(name) != this->table.end();
 }
