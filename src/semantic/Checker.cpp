@@ -228,6 +228,9 @@ USymbolInfo Checker::visit(AssignmentNode& n) {
         }
     }
     USymbolInfo linfo_p = this->dispatch(n.lvalue);
+    if (n.lvalue->ntype == MEMBER && n.lvalue->member().type == MemberType::NUM) {
+        throw std::runtime_error("Error: can't reassign a member of a tuple!");
+    }
     USymbolInfo expression_type_p = this->dispatch(n.rvalue);
     SymbolInfo& linfo = *linfo_p;
     SymbolInfo& expression_type = *expression_type_p;

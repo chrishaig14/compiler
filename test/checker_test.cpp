@@ -143,6 +143,17 @@ TEST_F(checker_test, test_access_tuple_element) {
     checker->visit(*tree);
 }
 
+TEST_F(checker_test, test_cant_assign_to_tuple_element) {
+    std::string text = "fun foo()->Integer{var x = #(1, \"Hello\", false); x.3 = true; return 5;}";
+    SetUp(text);
+    try {
+        checker->visit(*tree);
+        FAIL();
+    } catch (...) {
+
+    }
+}
+
 TEST_F(checker_test, test_access_tuple_element_out_of_range_error) {
     std::string text = "fun foo()->Integer{var x = #(1, \"Hello\", false); var y = false; y = x.432; return 5;}";
     SetUp(text);
