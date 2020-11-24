@@ -186,15 +186,22 @@ void CodeRunner::visit(GetSubscriptInst& inst) {
     //std::cerr << "Run [" << inst.to_string() << "]" << std::endl;
     Object* obj = this->stack.pop();
     ListObject* list = dynamic_cast<ListObject*>(obj);
-    if (list == nullptr) {
-        throw std::runtime_error("Subscript of non-list");
+    StringObject* str = dynamic_cast<StringObject*>(obj);
+
+    if (list == nullptr && str == nullptr) {
+        throw std::runtime_error("Subscript of not a List or String");
     }
-    obj = this->stack.pop();
-    IntegerObject* index = dynamic_cast<IntegerObject*>(obj);
-    if (index == nullptr) {
-        throw std::runtime_error("Non-integer subscript of list");
+
+    IntegerObject* index = this->stack.pop_integer();
+    if (list != nullptr) {
+        this->stack.push(list->list[index->value]);
+    } else if (str != nullptr) {
+        if (index->value > str->str.size()) {
+            throw std::runtime_error("String index out of bounds!");
+        }
+        char c = str->str[index->value];
+        this->stack.push(new StringObject(std::string(&c)));
     }
-    this->stack.push(list->list[index->value]);
     this->inst_ptr++;
 }
 

@@ -154,6 +154,23 @@ TEST_F(checker_test, test_cant_assign_to_tuple_element) {
     }
 }
 
+TEST_F(checker_test, test_cant_assign_to_string_position) {
+    std::string text = "fun foo()->Integer{var x = \"Hello\"; x[2] = \"w\";}";
+    SetUp(text);
+    try {
+        checker->visit(*tree);
+        FAIL();
+    } catch (...) {
+
+    }
+}
+
+TEST_F(checker_test, test_string_subscript_ok) {
+    std::string text = "fun foo()->Integer{var x = \"Hello\"; var y : String = x[2]; return 0;}";
+    SetUp(text);
+    checker->visit(*tree);
+}
+
 TEST_F(checker_test, test_access_tuple_element_out_of_range_error) {
     std::string text = "fun foo()->Integer{var x = #(1, \"Hello\", false); var y = false; y = x.432; return 5;}";
     SetUp(text);
