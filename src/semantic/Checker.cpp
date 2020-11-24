@@ -1185,18 +1185,39 @@ USymbolInfo Checker::visit(StringNode& node) {
 USymbolInfo Checker::visit(SubscriptNode& node) {
     USymbolInfo parent_p = this->dispatch(node.parent);
     SymbolInfo& parent = *parent_p;
-    for (auto& c: node.child) {
-        this->dispatch(c);
-    }
     if (parent.type().kind != Kind::OBJECT) {
         throw std::runtime_error("Accessing subscript of non object!");
     }
     SymbolInfo symbol_info;
     const ObjectTypeNode& object_type = parent.type().object();
-    if (object_type.identifier == "List") {
-        symbol_info.set_type(*object_type.type_parameters[0]);
+
+    VectorOfTypes children;
+    bool not_integer = false;
+    if (node.child.size() > 1) {
+        throw std::runtime_error("Error subscript with more than one child!");
     }
+    for (auto& c: node.child) {
+        USymbolInfo ct = this->dispatch(c);
+        if (ct->type() != T_INT) {
+            not_integer = true;
+        }
+        children.emplace_back(ct->type().clone());
+    }
+
+    if (object_type.identifier == "List") {
+        if (not_integer) {
+            throw std::runtime_error("Access not number subscript of List!");
+        }
+        symbol_info.set_type(*object_type.type_parameters[0]);
+    } else if (object_type.identifier == "String") {
+        if (not_integer) {
+            throw std::runtime_error("Access not number subscript of String!");
+        }
+        symbol_info.set_type(object_type);
+    }
+
     symbol_info.is_function = false;
+
     return std::make_unique<SymbolInfo>(symbol_info);
 }
 
