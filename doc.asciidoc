@@ -1,0 +1,151 @@
+= XL programming language
+
+== Function definition
+
+[source]
+----
+fun add(a: Integer, b: Integer) -> Integer {
+    return a + b
+}
+----
+
+[source]
+----
+fun greet(name: String){
+    print("Hello, " + name + "!")
+}
+----
+
+== Class definition
+
+[source]
+----
+class Person {
+    name: String
+    age: Integer
+    fun get_name() -> String {
+        return this.name
+    }
+}
+----
+
+== Statements
+
+=== Declaration
+
+[source]
+----
+var x = 5
+var y : Integer = 5
+----
+
+=== Assignment
+
+[source]
+----
+x = 5
+y = 17
+----
+
+=== For loop
+
+[source]
+----
+var total = 0
+for i @ [1,2,3,4,5] {
+    total += i
+}
+----
+
+=== While loop
+
+[source]
+----
+var i = 0
+while i < 10 {
+    print(i.str())
+    i += 1
+}
+
+----
+
+=== If
+
+[source]
+----
+if x > 7 {
+    print("x is greater than 7")
+}
+----
+
+=== Return
+
+[source]
+----
+return result
+----
+
+=== Function call
+
+[source]
+----
+fun add(a: Integer, b: Integer)->Integer{
+    return a + b
+}
+
+fun main(){
+    var r = add(7, 5)
+}
+----
+
+== Basic types
+
+* `String`: Double quoted only, immutable
+* `Integer`
+* `Boolean`: `true` or `false`
+
+== Compound types
+
+=== `List[t]`
+
+[source]
+----
+var l = [1,2,3,4,5]
+----
+
+For an empty list with elements of type `Boolean` for example, you need to do the following:
+
+[source]
+----
+var l = []::Boolean
+----
+
+=== `Tuple[t1, t2, ..., tn]`
+
+[source]
+----
+var t = #(5, "Hello", false)
+----
+
+Members of a tuple are accessed through the indices `1` through the number of elements in the tuple:
+
+[source]
+----
+var t = #(5, "Hello", false)
+var five = t.1
+var hello = t.2
+var boolean = t.3
+----
+
+Tuples are also immutable, so their elements must also be immutable (i.e. you can't have a `Tuple[Integer, List[String]]` as `List[String]` is not immutable).
+Also, you can't reassign a tuple member. This is invalid:
+
+[source]
+----
+var t = #(5, "Hello", false)
+t.1 = 19
+----
+
+=== `Dict[k,v]`
+
+Dictionary keys must be immutable, therefore you can only use `Integer`, `String`, `Tuple[...]`, etc. for keys.
