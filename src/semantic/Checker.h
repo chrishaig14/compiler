@@ -77,6 +77,8 @@ public:
 
     USymbolInfo visit(StringNode& node);
 
+    USymbolInfo visit(TupleNode& node);
+
     USymbolInfo visit(SubscriptNode& node);
 
     USymbolInfo visit(BlockNode& node);

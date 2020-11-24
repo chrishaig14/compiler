@@ -175,14 +175,18 @@ void Translator::visit(MemberNode& node) {
         CodeLabel parent_code = this->code;
         out.insert(out.end(), parent_code.begin(), parent_code.end());
 
-        out.push_back(LC("", I_SETM(node.child)));
+        out.push_back(LC("", I_SETM(node.s_child)));
     } else {
 //        node.parent->accept(*this)
         this->dispatch(node.parent);
         CodeLabel parent_code = this->code;
         out.insert(out.end(), parent_code.begin(), parent_code.end());
-
-        out.push_back(LC("", I_GETM(node.child)));
+        if (node.type == MemberType::STR) {
+            out.push_back(LC("", I_GETM(node.s_child)));
+        } else {
+            // NUM
+            out.push_back(LC("", new GetTupleMemberInst(node.n_child)));
+        }
     }
     this->code = out;
 }
@@ -297,8 +301,9 @@ void Translator::visit(ForNode& node) {
     out.insert(out.end(), this->code.begin(), this->code.end());
 
     // len = list.len()
-    auto list_len = new DeclarationNode(len_name, nullptr,
-                                        new CallNode(new IdNode("List.len"), {new IdNode(list_name)}));
+    auto list_len = new DeclarationNode(
+            len_name, nullptr,
+            new CallNode(new IdNode("List.len"), {new IdNode(list_name)}));
 //    list_len->accept(*this)
     this->dispatch(list_len);
     out.insert(out.end(), this->code.begin(), this->code.end());
@@ -329,9 +334,11 @@ void Translator::visit(ForNode& node) {
     node.body->nodes.insert(node.body->nodes.begin(), new DeclarationNode(node.var, nullptr, it));
 
     // index = index + 1
-    auto update_index = new AssignmentNode(new IdNode(index_name),
-                                           new BinopNode(OpType::ADD, new IdNode(index_name),
-                                                         new NumberNode(1)));
+    auto update_index = new AssignmentNode(
+            new IdNode(index_name),
+            new BinopNode(
+                    OpType::ADD, new IdNode(index_name),
+                    new NumberNode(1)));
 //    update_index->accept(*this)
     this->dispatch(update_index);
     CodeLabel update_index_code = this->code;
@@ -443,8 +450,9 @@ void Translator::visit(ClassNode& node) {
         FunctionNode& method_node = *method.second;
         method_node.identifier = node.class_name + "." + method_node.identifier;
         method_node.parameter_names.insert(method_node.parameter_names.begin(), "this");
-        method_node.parameter_types.insert(method_node.parameter_types.begin(),
-                                           new ObjectTypeNode("dummy", {}));
+        method_node.parameter_types.insert(
+                method_node.parameter_types.begin(),
+                new ObjectTypeNode("dummy", {}));
 //        method.second->accept(*this)
         this->visit(*method.second);
         auto method_code = this->code;
@@ -453,14 +461,28 @@ void Translator::visit(ClassNode& node) {
     this->code = out;
 }
 
+void Translator::visit(TupleNode& node) {
+    CodeLabel out;
+    for (auto e: node.values) {
+//        e->accept(*this)
+        this->dispatch(e);
+        CodeLabel e_code = this->code;
+        out.insert(out.end(), e_code.begin(), e_code.end());
+    }
+    out.push_back(LC("", new MakeTupleInst(node.values.size())));
+    this->code = out;
+}
+
 void Translator::visit(ContinueNode& node) {
     if (this->in_for_loop) {
         std::cout << "TRANSLATING A CONTINUE NOED" << std::endl;
         CodeLabel out;
-        auto update_index = new AssignmentNode(new IdNode(".index" + std::to_string(this->current_loop)),
-                                               new BinopNode(OpType::ADD, new IdNode(
-                                                       ".index" + std::to_string(this->current_loop)),
-                                                             new NumberNode(1)));
+        auto update_index = new AssignmentNode(
+                new IdNode(".index" + std::to_string(this->current_loop)),
+                new BinopNode(
+                        OpType::ADD, new IdNode(
+                                ".index" + std::to_string(this->current_loop)),
+                        new NumberNode(1)));
 //        update_index->accept(*this)
         this->dispatch(update_index);
         out.insert(out.end(), this->code.begin(), this->code.end());
@@ -561,6 +583,9 @@ void Translator::dispatch(Node* nptr) {
             this->visit(n.whil());
             break;
         case NodeType::UNINITIALIZED:
+            break;
+        case TUPLE:
+            this->visit(n.tuple());
             break;
     }
 }

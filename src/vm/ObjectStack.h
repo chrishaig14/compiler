@@ -12,6 +12,7 @@
 #include "IntegerObject.h"
 #include "StringObject.h"
 #include "ListObject.h"
+#include "TupleObject.h"
 
 class ObjectStackElement {
 public:
@@ -33,6 +34,9 @@ public:
     void push(Object* value);
 
     IntegerObject* pop_integer();
+
+    TupleObject* pop_tuple();
+
     StringObject* pop_string();
     ListObject* pop_list();
 

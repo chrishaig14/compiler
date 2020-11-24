@@ -13,11 +13,10 @@
 class GetMemberInst : public Instruction {
 public:
     GetMemberInst(const std::string& member);
-
-    std::string member;
+    std::string s_member;
 
     std::string to_string() const {
-        return "GET_MEMBER " + this->member;
+        return "GET_MEMBER " + this->s_member;
     }
 
 private:
@@ -27,11 +26,10 @@ private:
         if (other == nullptr) {
             return false;
         }
-        return this->member == other->member;
+        return this->s_member == other->s_member;
     }
 
     void accept(InstructionVisitor& visitor);
-
 
 };
 

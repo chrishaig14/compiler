@@ -55,6 +55,14 @@ ListObject* ObjectStack::pop_list() {
     return ptr;
 }
 
+TupleObject* ObjectStack::pop_tuple() {
+    auto ptr = dynamic_cast<TupleObject*>(this->pop());
+    if (ptr == nullptr) {
+        throw std::runtime_error("Trying to pop a tuple, but it's not!");
+    }
+    return ptr;
+}
+
 ObjectStackElement::ObjectStackElement(Object* value, ObjectStackElement* previous) {
     this->value = value;
     this->previous = previous;

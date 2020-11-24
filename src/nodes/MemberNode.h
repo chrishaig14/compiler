@@ -11,12 +11,19 @@
 
 #include "Node.h"
 
+enum class MemberType {
+    NUM, STR
+};
+
 class MemberNode : public Node {
 public:
+    MemberType type;
     Node* parent;
-    std::string child;
+    std::string s_child;
+    int n_child;
 
     MemberNode(Node* parent, const std::string& child);
+    MemberNode(Node* parent, int child);
 
     bool equal(const Node& x) const override;
 

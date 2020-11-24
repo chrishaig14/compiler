@@ -447,13 +447,23 @@ TEST_F(parser_test, class_literal_expression_ok) {
     EXPECT_EQ(*node, *expected_node);
 }
 
-TEST_F(parser_test, simple_member) {
+TEST_F(parser_test, simple_member_str) {
     std::string text = "a.b";
     SetUp(text);
     std::vector<Token> tokens = scanner->scan_all();
     Parser parser(tokens);
     node = parser.parse_expression();
     expected_node = new MemberNode(new IdNode("a"), "b");
+    EXPECT_EQ(*node, *expected_node);
+}
+
+TEST_F(parser_test, simple_member_num) {
+    std::string text = "a.7";
+    SetUp(text);
+    std::vector<Token> tokens = scanner->scan_all();
+    Parser parser(tokens);
+    node = parser.parse_expression();
+    expected_node = new MemberNode(new IdNode("a"), 7);
     EXPECT_EQ(*node, *expected_node);
 }
 

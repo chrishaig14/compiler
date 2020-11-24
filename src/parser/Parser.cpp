@@ -245,8 +245,14 @@ Node* Parser::parse_factor() {
     parent = this->parse_call_or_subscript_chain(parent);
     while (this->match(TokType::DOT)) {
         this->next();
-        Token id = this->expect_token(TokType::ID);
-        parent = new MemberNode(parent, id.str);
+        Token tok;
+        if (this->match(TokType::NUM)) {
+            tok = this->expect_token(TokType::NUM);
+            parent = new MemberNode(parent, tok.num);
+        } else {
+            tok = this->expect_token(TokType::ID);
+            parent = new MemberNode(parent, tok.str);
+        }
         parent = this->parse_call_or_subscript_chain(parent);
     }
     return parent;
@@ -320,7 +326,7 @@ Node* Parser::parse_class_or_tuple_literal() {
         // it's a tuple
         this->next();
         VectorOfNodes values;
-        if (this->match(TokType::RPAREN)){
+        if (this->match(TokType::RPAREN)) {
             throw std::runtime_error("Error: can't have an empty tuple");
         }
         bool first = true;
@@ -332,7 +338,7 @@ Node* Parser::parse_class_or_tuple_literal() {
                 first = false;
                 continue;
             } else {
-                if (first && this->match(TokType::RPAREN)){
+                if (first && this->match(TokType::RPAREN)) {
                     throw std::runtime_error("Error: can't have a tuple with only one element!");
                 }
                 break;

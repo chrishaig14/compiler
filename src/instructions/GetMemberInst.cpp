@@ -4,7 +4,7 @@
 
 #include "GetMemberInst.h"
 
-GetMemberInst::GetMemberInst(const std::string& member) : member(member) {}
+GetMemberInst::GetMemberInst(const std::string& member) : s_member(member) {}
 
 void GetMemberInst::accept(InstructionVisitor& visitor) {
     visitor.visit(*this);

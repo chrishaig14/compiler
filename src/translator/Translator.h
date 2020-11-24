@@ -23,9 +23,11 @@
 #include "../instructions/GetMemberInst.h"
 #include "../instructions/SetInst.h"
 #include "../instructions/GetInst.h"
+#include "../instructions/MakeTupleInst.h"
 #include "../instructions/PushIntegerInst.h"
 #include "../instructions/SetSubscriptInst.h"
 #include "../instructions/GetSubscriptInst.h"
+#include "../instructions/GetTupleMemberInst.h"
 #include "../instructions/EndFunction.h"
 #include "../instructions/StartFunction.h"
 #include "../instructions/JumpIfFalseInst.h"
@@ -99,6 +101,7 @@ public:
     void visit(ContinueNode& node);
 
     bool in_for_loop;
+    void visit(TupleNode& node);
 };
 
 

@@ -103,6 +103,68 @@ TEST_F(checker_test, test_if_condition_boolean_ok) {
     checker->visit(*tree);
 }
 
+TEST_F(checker_test, test_tuple_type_assign_ok) {
+    std::string text = "fun foo()->Integer{var x = #(4, \"Hello\", false); var y : Tuple[Integer, String, Boolean] = x; return 5;}";
+    SetUp(text);
+    checker->visit(*tree);
+}
+
+TEST_F(checker_test, test_tuple_type_assign_error) {
+    std::string text = "fun foo()->Integer{var x = #(\"Hello\", false, 4); var y : Tuple[Integer, String, Boolean] = x; return 5;}";
+    SetUp(text);
+    try {
+        checker->visit(*tree);
+        FAIL();
+    } catch (...) {
+
+    }
+}
+
+TEST_F(checker_test, test_call_function_pass_tuple) {
+    std::string text = "fun foo(t: Tuple[Integer, String])->Integer{var x = t; return 5;} fun main(){var y = foo(#(5, \"Hola\"));}";
+    SetUp(text);
+    checker->visit(*tree);
+}
+
+TEST_F(checker_test, test_call_function_pass_tuple_error) {
+    std::string text = "fun foo(t: Tuple[Integer, String])->Integer{var x = t; return 5;} fun main(){var y = foo(#(5, false));}";
+    SetUp(text);
+    try {
+        checker->visit(*tree);
+        FAIL();
+    } catch (...) {
+
+    }
+}
+
+TEST_F(checker_test, test_access_tuple_element) {
+    std::string text = "fun foo()->Integer{var x = #(1, \"Hello\", false); var y = false; y = x.3; return 5;}";
+    SetUp(text);
+    checker->visit(*tree);
+}
+
+TEST_F(checker_test, test_access_tuple_element_out_of_range_error) {
+    std::string text = "fun foo()->Integer{var x = #(1, \"Hello\", false); var y = false; y = x.432; return 5;}";
+    SetUp(text);
+    try {
+        checker->visit(*tree);
+        FAIL();
+    } catch (...) {
+
+    }
+}
+
+TEST_F(checker_test, test_access_tuple_element_string_error) {
+    std::string text = "fun foo()->Integer{var x = #(1, \"Hello\", false); var y = false; y = x.foo; return 5;}";
+    SetUp(text);
+    try {
+        checker->visit(*tree);
+        FAIL();
+    } catch (...) {
+
+    }
+}
+
 TEST_F(checker_test, test_while_condition_not_boolean_error) {
     std::string text = "fun foo()->Integer{while 2 {return 1;}return 0;}";
     SetUp(text);

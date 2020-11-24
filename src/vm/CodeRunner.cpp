@@ -6,7 +6,8 @@
 #include "NoneObject.h"
 #include <iostream>
 
-CodeRunner::CodeRunner(const Code& code, std::unordered_map<std::string, std::unordered_map<std::string, Code>>& structs,
+CodeRunner::CodeRunner(const Code& code,
+                       std::unordered_map<std::string, std::unordered_map<std::string, Code>>& structs,
                        ObjectStack& stack, Environment* global_env) : code(code), stack(stack),
                                                                       structs(structs) {
     //std::cerr << "New code runner" << std::endl;
@@ -170,7 +171,14 @@ void CodeRunner::visit(GetMemberInst& inst) {
     //std::cerr << "Run [" << inst.to_string() << "]" << std::endl;
     Object* object = this->stack.pop();
     UserObject* user_object = dynamic_cast<UserObject*>(object);
-    this->stack.push(user_object->fields[inst.member]);
+    this->stack.push(user_object->fields[inst.s_member]);
+    this->inst_ptr++;
+}
+
+void CodeRunner::visit(GetTupleMemberInst& inst) {
+    std::cerr << "Run [" << inst.to_string() << "]" << std::endl;
+    TupleObject* object = this->stack.pop_tuple();
+    this->stack.push(object->values[inst.member - 1]);
     this->inst_ptr++;
 }
 
@@ -360,5 +368,14 @@ void CodeRunner::visit(PushNone& inst) {
 
 void CodeRunner::visit(PopInst& inst) {
     this->stack.pop();
+    this->inst_ptr++;
+}
+
+void CodeRunner::visit(MakeTupleInst& inst) {
+    std::vector<Object*> tuple(inst.length, nullptr);
+    for (int i = inst.length - 1; i >= 0; i--) {
+        tuple[i] = this->stack.pop();
+    }
+    this->stack.push(new TupleObject(tuple));
     this->inst_ptr++;
 }

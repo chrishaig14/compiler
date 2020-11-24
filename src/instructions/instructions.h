@@ -17,6 +17,7 @@
 #include "GetSubscriptInst.h"
 #include "JumpInst.h"
 #include "JumpIfNone.h"
+#include "MakeTupleInst.h"
 #include "JumpIfFalseInst.h"
 #include "MakeClassInst.h"
 #include "MakeListInst.h"

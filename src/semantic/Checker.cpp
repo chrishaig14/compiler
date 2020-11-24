@@ -63,6 +63,8 @@ Checker::Checker(SymbolTable* globals, ClassTable* class_table, FunctionTable* f
     this->class_table->set("List", make_list_class_info());
     this->class_table->set("String", make_string_class_info());
 
+    this->class_table->set("Tuple", nullptr);
+
     this->class_table->set("Option", new ClassInfo("Option", std::vector<std::string>(), {}, {"t"}));
     this->replace_me = false;
 }
@@ -279,8 +281,8 @@ USymbolInfo Checker::visit(MemberNode& n) {
         // It might be something like <class>.<method>, so we need to handle this case differently
         if (this->class_table->declared(id_node.identifier)) {
             ClassInfo* class_info = this->class_table->get(id_node.identifier);
-            if (class_info->methods.find(n.child) != class_info->methods.end()) {
-                rv.set_type(*class_info->methods.find(n.child)->second);
+            if (class_info->methods.find(n.s_child) != class_info->methods.end()) {
+                rv.set_type(*class_info->methods.find(n.s_child)->second);
                 rv.class_info = class_info;
 
                 const FunctionTypeNode& ftn = rv.type().function();
@@ -296,10 +298,10 @@ USymbolInfo Checker::visit(MemberNode& n) {
                 rv.is_method = false;
                 rv.is_class_method = true;
                 this->replace_me = true;
-                this->replacement = new IdNode(class_info->class_name + "." + n.child);
+                this->replacement = new IdNode(class_info->class_name + "." + n.s_child);
                 return std::make_unique<SymbolInfo>(rv);
             } else {
-                throw std::runtime_error("Class " + class_info->class_name + " has no method " + n.child);
+                throw std::runtime_error("Class " + class_info->class_name + " has no method " + n.s_child);
             }
         }
     }
@@ -307,7 +309,7 @@ USymbolInfo Checker::visit(MemberNode& n) {
     USymbolInfo symbol_info_p = this->dispatch(n.parent);
     SymbolInfo& symbol_info = *symbol_info_p;
     if (symbol_info.type().kind != Kind::OBJECT) {
-        throw std::runtime_error("Accessing member " + n.child + " of non object");
+        throw std::runtime_error("Accessing member " + n.s_child + " of non object");
     }
     const ObjectTypeNode& object = symbol_info.type().object();
     const ObjectTypeNode* option_type = nullptr;
@@ -326,33 +328,55 @@ USymbolInfo Checker::visit(MemberNode& n) {
         }
     }
     const ObjectTypeNode& final_type = option_type != nullptr ? *option_type : object;
-    ClassInfo* class_info;
-    if (this->class_table->declared(final_type.to_string())) {
-        class_info = this->class_table->get(final_type.to_string());
-    } else {
-        if (is_generic((final_type)) && final_type.type_parameters.size() == 0) {
+    if (final_type.identifier == "Tuple") {
+        // special treatment for tuples
+        if (n.type != MemberType::NUM) {
             throw std::runtime_error(
-                    "Cannot access member of totally generic value of generic type " + object.identifier + "!"
-            );
+                    "Error can only access members " + std::to_string(1) + " to " +
+                    std::to_string(final_type.type_parameters.size()) + " of " + final_type.to_string());
         }
-        class_info = this->class_table->get(object.identifier);
-        class_info = instantiate_generic(class_info, final_type);
-        this->class_table->set(object.to_string(), class_info);
-    }
-    if (class_info->members.find(n.child) != class_info->members.end()) {
-        // It's a member
-        symbol_info.set_type(*class_info->members[n.child]);
-        rv = symbol_info;
-        rv.is_function = false;
-        rv.is_method = false;
-    } else if (class_info->methods.find(n.child) != class_info->methods.end()) {
-        // It's a method
-        symbol_info.set_type(*class_info->methods.find(n.child)->second);
-        rv = symbol_info;
-        rv.is_method = true;
-        rv.class_info = class_info;
+        if (n.n_child < 1 || n.n_child > final_type.type_parameters.size()) {
+            throw std::runtime_error(
+                    "Error can only access members " + std::to_string(1) + " to " +
+                    std::to_string(final_type.type_parameters.size()) + " of " + final_type.to_string());
+        }
+        SymbolInfo s;
+        s.set_type(*final_type.type_parameters[n.n_child - 1]);
+        return std::make_unique<SymbolInfo>(s);
     } else {
-        throw std::runtime_error("Type " + object.to_string() + " has no member " + n.child);
+        if (n.type != MemberType::STR) {
+            throw std::runtime_error(
+                    "Error: can access number member for tuple types only, but got " + final_type.to_string());
+        }
+
+        ClassInfo* class_info;
+        if (this->class_table->declared(final_type.to_string())) {
+            class_info = this->class_table->get(final_type.to_string());
+        } else {
+            if (is_generic((final_type)) && final_type.type_parameters.size() == 0) {
+                throw std::runtime_error(
+                        "Cannot access member of totally generic value of generic type " + object.identifier + "!"
+                );
+            }
+            class_info = this->class_table->get(object.identifier);
+            class_info = instantiate_generic(class_info, final_type);
+            this->class_table->set(object.to_string(), class_info);
+        }
+        if (class_info->members.find(n.s_child) != class_info->members.end()) {
+            // It's a member
+            symbol_info.set_type(*class_info->members[n.s_child]);
+            rv = symbol_info;
+            rv.is_function = false;
+            rv.is_method = false;
+        } else if (class_info->methods.find(n.s_child) != class_info->methods.end()) {
+            // It's a method
+            symbol_info.set_type(*class_info->methods.find(n.s_child)->second);
+            rv = symbol_info;
+            rv.is_method = true;
+            rv.class_info = class_info;
+        } else {
+            throw std::runtime_error("Type " + object.to_string() + " has no member " + n.s_child);
+        }
     }
 
     return std::make_unique<SymbolInfo>(rv);
@@ -692,7 +716,7 @@ USymbolInfo Checker::visit(CallNode& n) {
             throw std::runtime_error("Expected it to be a member node!");
         }
         MemberNode& member_node = n.function->member();
-        n.function = new IdNode(fun_info.class_info->class_name + "." + member_node.child);
+        n.function = new IdNode(fun_info.class_info->class_name + "." + member_node.s_child);
         this->replace_me = false;
         object_node = member_node.parent;
         is_a_method = true;
@@ -701,7 +725,7 @@ USymbolInfo Checker::visit(CallNode& n) {
             throw std::runtime_error("Expected it to be a member node!");
         }
         MemberNode& member_node = n.function->member();
-        n.function = new IdNode(fun_info.class_info->class_name + "." + member_node.child);
+        n.function = new IdNode(fun_info.class_info->class_name + "." + member_node.s_child);
         this->replace_me = false;
         const FunctionTypeNode& ftn = fun_info.type().function();
         FunctionTypeNode& copy_ftn = ftn.clone()->function();
@@ -733,7 +757,8 @@ USymbolInfo Checker::visit(CallNode& n) {
                 const TypeNode& param_type = *function_type.parameter_types[i];
                 if (arg_type != param_type) {
                     throw std::runtime_error(
-                            "At line " + std::to_string(n.line) + " column " + std::to_string(n.column) + ": ERROR, Function call type mismatch!\n\tExpected: \n\t\t" +
+                            "At line " + std::to_string(n.line) + " column " + std::to_string(n.column) +
+                            ": ERROR, Function call type mismatch!\n\tExpected: \n\t\t" +
                             param_type.to_string() + "\n\tbut got:\n\t\t" +
                             arg_type.to_string() + ""
                     );
@@ -832,7 +857,8 @@ USymbolInfo Checker::visit(ClassLiteralExpressionNode& node) {
         }
     } else if (num_actual_type_params != 0) {
         throw std::runtime_error(
-                "At line " + std::to_string(node.line) + " column " + std::to_string(node.column) + ": Error, class " + object_type_id + " is not generic, but given " +
+                "At line " + std::to_string(node.line) + " column " + std::to_string(node.column) + ": Error, class " +
+                object_type_id + " is not generic, but given " +
                 std::to_string(num_actual_type_params) + " type parameter(s)!"
         );
     }
@@ -923,7 +949,8 @@ bool Checker::can_assign_generic(TypeNode& from, TypeNode& to, std::vector<std::
 }
 
 TypeNode*
-make_type_from_object_pattern(const ObjectTypeNode& object_type, const std::unordered_map<std::string, TypeNode*>& replacements) {
+make_type_from_object_pattern(const ObjectTypeNode& object_type,
+                              const std::unordered_map<std::string, TypeNode*>& replacements) {
     std::string type_identifier = object_type.identifier;
     for (auto r: replacements) {
         if (type_identifier == r.first) {
@@ -944,7 +971,8 @@ make_type_from_object_pattern(const ObjectTypeNode& object_type, const std::unor
     return TYPE(type_identifier, new_type_params);
 }
 
-TypeNode* make_type_from_function_pattern(const FunctionTypeNode& ftn, const std::unordered_map<std::string, TypeNode*>& replacements) {
+TypeNode* make_type_from_function_pattern(const FunctionTypeNode& ftn,
+                                          const std::unordered_map<std::string, TypeNode*>& replacements) {
     VectorOfTypes new_param_types;
     for (auto pt: ftn.parameter_types) {
         TypeNode* new_pt = make_type(*pt, replacements);
@@ -1320,11 +1348,16 @@ USymbolInfo Checker::dispatch(Node* nod) {
         case NodeType::TERNARY:
             return this->visit(n.ternary());
             break;
+        case NodeType::TUPLE:
+            return this->visit(n.tuple());
+            break;
         case NodeType::WHIL:
             return this->visit(n.whil());
             break;
         case NodeType::UNINITIALIZED:
             break;
+        default:
+            throw std::runtime_error("Don't know what to do!");
     }
     return nullptr;
 }
@@ -1336,4 +1369,16 @@ TypeClassInfo* Checker::get_typeclass_for_function(std::string function_name) {
         }
     }
     return nullptr;
+}
+
+USymbolInfo Checker::visit(TupleNode& node) {
+    VectorOfTypes types;
+    for (auto n: node.values) {
+        USymbolInfo vtype = this->dispatch(n);
+        types.emplace_back(vtype->type().clone());
+    }
+    ObjectTypeNode tuple_type("Tuple", types);
+    SymbolInfo sinfo;
+    sinfo.set_type(tuple_type);
+    return std::make_unique<SymbolInfo>(sinfo);
 }

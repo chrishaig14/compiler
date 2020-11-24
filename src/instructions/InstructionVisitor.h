@@ -61,6 +61,10 @@ class JumpIfNone;
 
 class PushNone;
 
+class GetTupleMemberInst;
+
+class MakeTupleInst;
+
 class PopInst;
 
 class InstructionVisitor {
@@ -90,9 +94,13 @@ public:
 
     virtual void visit(EnterScope& inst) = 0;
 
+    virtual void visit(MakeTupleInst& inst) = 0;
+
     virtual void visit(GetSubscriptInst& inst) = 0;
 
     virtual void visit(JumpIfFalseInst& inst) = 0;
+
+    virtual void visit(GetTupleMemberInst& inst) = 0;
 
     virtual void visit(JumpIfNone& inst) = 0;
 

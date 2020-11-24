@@ -19,6 +19,7 @@
 #include "CodeObject.h"
 #include "UserObject.h"
 #include "BooleanObject.h"
+#include "../instructions/GetTupleMemberInst.h"
 
 class CodeRunner : public InstructionVisitor {
 public:
@@ -29,7 +30,8 @@ public:
     Environment* env;
     std::unordered_map<std::string, std::vector<std::string>> classes;
 
-    CodeRunner(const Code& code, std::unordered_map<std::string, std::unordered_map<std::string, Code>>& structs, ObjectStack& stack,
+    CodeRunner(const Code& code, std::unordered_map<std::string, std::unordered_map<std::string, Code>>& structs,
+               ObjectStack& stack,
                Environment* global_env);
 
     void run();
@@ -44,11 +46,15 @@ public:
 
     void visit(GetMemberInst& inst) override;
 
+    void visit(GetTupleMemberInst& inst) override;
+
     void visit(GetSubscriptInst& inst) override;
 
     void visit(PushFunctionInst& inst) override;
 
     void visit(PushIntegerInst& inst) override;
+
+    void visit(MakeTupleInst& inst) override;
 
     void visit(PushStringInst& inst) override;
 
