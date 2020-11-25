@@ -127,6 +127,40 @@ TEST_F(parser_test, id) {
     EXPECT_EQ(*node, *expected_node);
 }
 
+TEST_F(parser_test, flot) {
+    std::string text = "43.567";
+    SetUp(text);
+    std::vector<Token> tokens = scanner->scan_all();
+    Parser parser(tokens);
+    node = parser.parse_expression();
+    expected_node = new FloatNode(43.567f);
+    EXPECT_EQ(*node, *expected_node);
+}
+
+TEST_F(parser_test, float_with_member) {
+    std::string text = "0.567.foo";
+    SetUp(text);
+    std::vector<Token> tokens = scanner->scan_all();
+    Parser parser(tokens);
+    node = parser.parse_expression();
+    expected_node = new MemberNode(new FloatNode(0.567f), "foo");
+    EXPECT_EQ(*node, *expected_node);
+}
+
+TEST_F(parser_test, float_without_zero_error) {
+    std::string text = ".567";
+    SetUp(text);
+    std::vector<Token> tokens = scanner->scan_all();
+    Parser parser(tokens);
+    try {
+        node = parser.parse_expression();
+        FAIL();
+    } catch (...) {
+
+    }
+}
+
+
 TEST_F(parser_test, assign_x_y) {
     std::string text = "x = y";
     SetUp(text);

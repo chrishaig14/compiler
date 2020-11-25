@@ -280,6 +280,15 @@ Node* Parser::parse_id_or_literal() {
             this->next();
             break;
         }
+        case TokType::FLOAT: {
+            node = new FloatNode(this->token.flot);
+//            node->line = this->token.line;
+//            node->column = this->token.column;
+//            node->start = this->token.start;
+//            node->end = this->token.end;
+            this->next();
+            break;
+        }
         case TokType::STRING: {
             node = new StringNode(this->token.str);
             this->next();

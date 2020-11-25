@@ -15,6 +15,7 @@
 #include "ClassLiteralExpressionNode.h"
 #include "ClassNode.h"
 #include "TernaryNode.h"
+#include "FloatNode.h"
 #include "NoneNode.h"
 #include "ClassLiteralFieldNode.h"
 #include "ForNode.h"

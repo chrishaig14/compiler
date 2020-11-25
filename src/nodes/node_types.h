@@ -18,6 +18,7 @@ enum NodeType {
     CNTINUE,
     DECL,
     EMPTYLST,
+    FLOT,
     FORLOOP,
     FUNC,
     ID,

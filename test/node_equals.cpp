@@ -106,3 +106,8 @@ TEST(node_test, tuple) {
     EXPECT_NE(TupleNode(VectorOfNodes({new NumberNode(7), new StringNode("foo")})),
               TupleNode(VectorOfNodes({new NumberNode(7), new StringNode("foo"), new NumberNode(17)})));
 }
+
+TEST(node_test, flot) {
+    EXPECT_EQ(FloatNode(7.43f), FloatNode(7.43f));
+    EXPECT_NE(FloatNode(7.43f), FloatNode(3.32f));
+}

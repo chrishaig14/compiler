@@ -47,6 +47,8 @@ class ListNode;
 
 class MemberNode;
 
+class FloatNode;
+
 class NoneNode;
 
 class NumberNode;
@@ -96,6 +98,7 @@ public:
     virtual ContinueNode& cntinue();
     virtual DeclarationNode& decl();
     virtual EmptyListNode& emptylst();
+    virtual FloatNode& flot();
     virtual ForNode& forloop();
     virtual FunctionNode& func();
     virtual IdNode& id();
@@ -122,6 +125,7 @@ public:
     virtual const ContinueNode& cntinue() const;
     virtual const DeclarationNode& decl() const;
     virtual const EmptyListNode& emptylst() const;
+    virtual const FloatNode& flot() const;
     virtual const ForNode& forloop() const;
     virtual const FunctionNode& func() const;
     virtual const IdNode& id() const;

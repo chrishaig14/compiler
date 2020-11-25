@@ -54,7 +54,7 @@ add_library(nodes
         nodes/BooleanNode.cpp nodes/BooleanNode.h nodes/WhileNode.cpp nodes/WhileNode.h
         nodes/ContinueNode.cpp nodes/ContinueNode.h nodes/Node.cpp nodes/Node.h
         nodes/ForNode.cpp nodes/ForNode.h
-        nodes/optypes.h nodes/optypes.cpp nodes/TupleNode.cpp nodes/TupleNode.h)
+        nodes/optypes.h nodes/optypes.cpp nodes/TupleNode.cpp nodes/TupleNode.h nodes/FloatNode.cpp nodes/FloatNode.h)
 
 add_library(parser parser/Parser.cpp
         parser/Parser.h

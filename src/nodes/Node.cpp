@@ -197,6 +197,10 @@ WhileNode& Node::whil() {
     this->throw_dereference_error(WHIL);
 }
 
+FloatNode& Node::flot() {
+    this->throw_dereference_error(FLOT);
+}
+
 const AssignmentNode& Node::assign() const {
     this->throw_dereference_error(ASSIGN);
 }
@@ -211,6 +215,10 @@ const BlockNode& Node::block() const {
 
 const BooleanNode& Node::boolean() const {
     this->throw_dereference_error(BOOLEAN);
+}
+
+const FloatNode& Node::flot() const {
+    this->throw_dereference_error(FLOT);
 }
 
 const BreakNode& Node::brk() const {
@@ -262,6 +270,8 @@ std::string Node::node_type_string(NodeType type) const {
             return "DECL";
         case EMPTYLST:
             return "EMPTYLST";
+        case FLOT:
+            return "FLOT";
         case FORLOOP:
             return "FORLOOP";
         case FUNC:
