@@ -251,6 +251,7 @@ Token Scanner::scan_number() {
     }
     if (this->current < this->text.size()) {
         if (c == '.') {
+            str += c;
             if (this->current + 1 < this->text.size()) {
                 if (isdigit(this->text[this->current + 1])) {
                     // it's a decimal number

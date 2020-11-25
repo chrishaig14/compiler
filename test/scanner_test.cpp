@@ -8,7 +8,7 @@
 
 
 bool cmp_token_value(Token a, Token b) {
-    return a.type == b.type and a.str == b.str and a.num == b.num;
+    return a.type == b.type and a.str == b.str and a.num == b.num and a.flot == b.flot;
 }
 
 bool cmp_token_full(Token a, Token b) {
@@ -109,11 +109,20 @@ TEST(scanner_test, test_number) {
     EXPECT_EQ(token.type, TokType::END);
 }
 
-TEST(scanner_test, test_float) {
+TEST(scanner_test, test_float_1) {
     std::string text = "123.032";
     Scanner scanner(text);
     Token token = scanner.get_next();
     EXPECT_EQ(cmp_token_value(token, Token(TokType::FLOAT, 123.032f, -1, -1)), true);
+    token = scanner.get_next();
+    EXPECT_EQ(token.type, TokType::END);
+}
+
+TEST(scanner_test, test_float_2) {
+    std::string text = "43.567";
+    Scanner scanner(text);
+    Token token = scanner.get_next();
+    EXPECT_EQ(cmp_token_value(token, Token(TokType::FLOAT, 43.567f, -1, -1)), true);
     token = scanner.get_next();
     EXPECT_EQ(token.type, TokType::END);
 }
