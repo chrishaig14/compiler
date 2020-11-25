@@ -89,6 +89,8 @@ public:
 
     USymbolInfo visit(ForNode& node);
 
+    USymbolInfo visit(FloatNode& node);
+
     USymbolInfo visit(BooleanNode& node);
 
     USymbolInfo visit(WhileNode& node);

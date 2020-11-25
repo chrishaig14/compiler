@@ -1336,6 +1336,9 @@ USymbolInfo Checker::dispatch(Node* nod) {
         case NodeType::EMPTYLST:
             return this->visit(n.emptylst());
             break;
+        case NodeType::FLOT:
+            return this->visit(n.flot());
+            break;
         case NodeType::FORLOOP:
             return this->visit(n.forloop());
             break;
@@ -1405,4 +1408,10 @@ USymbolInfo Checker::visit(TupleNode& node) {
     SymbolInfo sinfo;
     sinfo.set_type(tuple_type);
     return std::make_unique<SymbolInfo>(sinfo);
+}
+
+USymbolInfo Checker::visit(FloatNode& node) {
+    SymbolInfo s;
+    s.set_type(T_FLOAT);
+    return std::make_unique<SymbolInfo>(s);
 }

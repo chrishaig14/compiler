@@ -171,6 +171,32 @@ TEST_F(checker_test, test_string_subscript_ok) {
     checker->visit(*tree);
 }
 
+TEST_F(checker_test, list_index_float_error) {
+    std::string text = "fun foo()->Integer{var x = [3,1,4,1,5]; var y = x[2.5]; return 0;}";
+    SetUp(text);
+    try {
+        checker->visit(*tree);
+        FAIL();
+    } catch (...) {
+    }
+}
+
+TEST_F(checker_test, float_type_ok) {
+    std::string text = "fun foo()->Integer{var x : Float = 0.5; return 0;}";
+    SetUp(text);
+    checker->visit(*tree);
+}
+
+TEST_F(checker_test, float_type_error) {
+    std::string text = "fun foo()->Integer{var x : Integer = 0.5; return 0;}";
+    SetUp(text);
+    try {
+        checker->visit(*tree);
+        FAIL();
+    } catch (...) {
+    }
+}
+
 TEST_F(checker_test, test_access_tuple_element_out_of_range_error) {
     std::string text = "fun foo()->Integer{var x = #(1, \"Hello\", false); var y = false; y = x.432; return 5;}";
     SetUp(text);

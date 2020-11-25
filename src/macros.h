@@ -75,6 +75,7 @@
 #define T_INT  ObjectTypeNode("Integer", {})
 #define T_STRING  ObjectTypeNode("String", {})
 #define T_LIST(e) ObjectTypeNode("List", {e})
+#define T_FLOAT ObjectTypeNode("Float", {})
 
 
 #endif //UNTITLED1_MACROS_H
