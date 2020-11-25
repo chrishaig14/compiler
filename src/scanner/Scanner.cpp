@@ -249,6 +249,39 @@ Token Scanner::scan_number() {
             break;
         }
     }
+    if (this->current < this->text.size()) {
+        if (c == '.') {
+            if (this->current + 1 < this->text.size()) {
+                if (isdigit(this->text[this->current + 1])) {
+                    // it's a decimal number
+                    this->current++;
+                    c = this->text[this->current];
+                    while (isdigit(c)) {
+                        str += c;
+                        this->current++;
+                        if (this->current < this->text.size()) {
+                            this->column++;
+                            c = this->text[this->current];
+                        } else {
+                            break;
+                        }
+                    }
+                    int end = this->current - 1;
+                    Token token = Token(TokType::FLOAT, std::stof(str), start_l, start_c);
+                    token.start = start;
+                    token.end = end;
+                    return token;
+                }
+            } else {
+                // it's just a dot, so return the number
+                int end = this->current - 1;
+                Token token = Token(TokType::NUM, std::stoi(str), start_l, start_c);
+                token.start = start;
+                token.end = end;
+                return token;
+            }
+        }
+    }
     int end = this->current - 1;
     Token token = Token(TokType::NUM, std::stoi(str), start_l, start_c);
     token.start = start;
@@ -268,11 +301,16 @@ std::vector<Token> Scanner::scan_all() {
     return tokens;
 }
 
-UnexpectedCharacter::UnexpectedCharacter(char c, size_t position) : std::runtime_error(
+UnexpectedCharacter::UnexpectedCharacter(char
+                                         c, size_t
+                                         position) : std::runtime_error(
         std::string("Unexpected character '") + std::string(1, c) + "' at position " + std::to_string(position)) {
 }
 
-UnexpectedCharacter::UnexpectedCharacter(char c, int line, int column) : std::runtime_error(
+UnexpectedCharacter::UnexpectedCharacter(char
+                                         c, int
+                                         line, int
+                                         column) : std::runtime_error(
         std::string("Unexpected character '") + std::string(1, c) + "' at line " + std::to_string(line + 1) +
         " column " +
         std::to_string(column + 1)) {

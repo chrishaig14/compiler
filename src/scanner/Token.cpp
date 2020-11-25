@@ -12,11 +12,22 @@ Token::Token(TokType type, std::string str, int line, int column) {
     this->num = 0;
     this->line = line;
     this->column = column;
+    this->flot = 0.0f;
 }
 
 Token::Token(TokType type, int num, int line, int column) {
     this->type = type;
     this->num = num;
+    this->str = "";
+    this->line = line;
+    this->column = column;
+    this->flot = 0.0f;
+}
+
+Token::Token(TokType type, float flot, int line, int column) {
+    this->type = type;
+    this->num = 0;
+    this->flot = flot;
     this->str = "";
     this->line = line;
     this->column = column;
@@ -84,6 +95,7 @@ void initialize_token_strings() {
     TOKEN_STRINGS[TokType::MOD] = "modulo ( % )";
     TOKEN_STRINGS[TokType::PLUS] = "plus ( + )";
     TOKEN_STRINGS[TokType::MINUS] = "minus ( - )";
+    TOKEN_STRINGS[TokType::FLOAT] = "float";
     TOKEN_STRINGS[TokType::TIMES] = "times ( * )";
     TOKEN_STRINGS[TokType::DIV] = "div ( / )";
     TOKEN_STRINGS[TokType::AND] = "and ( && )";

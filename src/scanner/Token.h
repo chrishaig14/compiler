@@ -54,6 +54,7 @@ enum class TokType {
     LSQUARE,
     RSQUARE,
     LCURLY,
+    FLOAT,
     RCURLY,
     LPAREN,
     RPAREN,
@@ -69,6 +70,7 @@ public:
     TokType type;
     std::string str;
     int num;
+    float flot;
     int line, column;
     int start;
     int end;
@@ -77,9 +79,13 @@ public:
 
     Token(TokType type, int line, int column);
 
+
+
     Token(TokType type, std::string str, int line, int column);
 
     Token(TokType type, int num, int line, int column);
+    Token(TokType type, float flot, int line, int column);
+
 
     bool operator==(const Token& other) const;
 

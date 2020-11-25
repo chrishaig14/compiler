@@ -105,7 +105,45 @@ TEST(scanner_test, test_number) {
     Scanner scanner(text);
     Token token = scanner.get_next();
     EXPECT_EQ(cmp_token_value(token, st_NUM(123)), true);
+    token = scanner.get_next();
+    EXPECT_EQ(token.type, TokType::END);
 }
+
+TEST(scanner_test, test_float) {
+    std::string text = "123.032";
+    Scanner scanner(text);
+    Token token = scanner.get_next();
+    EXPECT_EQ(cmp_token_value(token, Token(TokType::FLOAT, 123.032f, -1, -1)), true);
+    token = scanner.get_next();
+    EXPECT_EQ(token.type, TokType::END);
+}
+
+TEST(scanner_test, test_int_member) {
+    std::string text = "123.hello";
+    Scanner scanner(text);
+    Token token = scanner.get_next();
+    EXPECT_EQ(cmp_token_value(token, st_NUM(123)), true);
+    token = scanner.get_next();
+    EXPECT_EQ(token.type, TokType::DOT);
+    token = scanner.get_next();
+    EXPECT_EQ(cmp_token_value(token, st_ID("hello")), true);
+    token = scanner.get_next();
+    EXPECT_EQ(token.type, TokType::END);
+}
+
+TEST(scanner_test, test_float_member) {
+    std::string text = "0.5.hello";
+    Scanner scanner(text);
+    Token token = scanner.get_next();
+    EXPECT_EQ(cmp_token_value(token, Token(TokType::FLOAT, 0.5f, -1, -1)), true);
+    token = scanner.get_next();
+    EXPECT_EQ(token.type, TokType::DOT);
+    token = scanner.get_next();
+    EXPECT_EQ(cmp_token_value(token, st_ID("hello")), true);
+    token = scanner.get_next();
+    EXPECT_EQ(token.type, TokType::END);
+}
+
 
 TEST(scanner_test, test_double_colon) {
     std::string text = "a::b";
