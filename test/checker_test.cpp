@@ -187,6 +187,42 @@ TEST_F(checker_test, float_type_ok) {
     checker->visit(*tree);
 }
 
+TEST_F(checker_test, float_binop) {
+    std::string text = "fun foo()->Integer{var x : Float = 0.5*7; return 0;}";
+    SetUp(text);
+    checker->visit(*tree);
+}
+
+TEST_F(checker_test, cant_use_integer_as_float) {
+    std::string text = "fun foo()->Integer{var x : Float = 7*8; return 0;}";
+    SetUp(text);
+    try {
+        checker->visit(*tree);
+        FAIL();
+    } catch (...) {
+    }
+}
+
+TEST_F(checker_test, cant_use_float_as_int) {
+    std::string text = "fun foo()->Integer{var x : Integer = 7*0.5; return 0;}";
+    SetUp(text);
+    try {
+        checker->visit(*tree);
+        FAIL();
+    } catch (...) {
+    }
+}
+
+TEST_F(checker_test, cant_pass_int_as_float) {
+    std::string text = "fun bar(f: Float){} fun foo()->Integer{bar(2); return 0;}";
+    SetUp(text);
+    try {
+        checker->visit(*tree);
+        FAIL();
+    } catch (...) {
+    }
+}
+
 TEST_F(checker_test, float_type_error) {
     std::string text = "fun foo()->Integer{var x : Integer = 0.5; return 0;}";
     SetUp(text);

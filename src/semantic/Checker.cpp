@@ -43,6 +43,13 @@ ClassInfo* make_int_class_info() {
     return int_class_info;
 }
 
+ClassInfo* make_float_class_info() {
+    auto float_class_info = new ClassInfo();
+    float_class_info->class_name = "Float";
+    float_class_info->methods.insert(std::make_pair("str", new FunctionTypeNode({}, new T_STRING)));
+    return float_class_info;
+}
+
 ClassInfo* make_string_class_info() {
     auto string_class_info = new ClassInfo();
     string_class_info->class_name = "String";
@@ -59,6 +66,7 @@ Checker::Checker(SymbolTable* globals, ClassTable* class_table, FunctionTable* f
     this->add_this = false;
     this->this_type = nullptr;
 
+    this->class_table->set("Float", make_float_class_info());
     this->class_table->set("Integer", make_int_class_info());
     this->class_table->set("List", make_list_class_info());
     this->class_table->set("String", make_string_class_info());
@@ -461,6 +469,14 @@ USymbolInfo Checker::visit(BinopNode& n) {
         bool ok = false;
         if (ltype == "Integer" && rtype == "Integer") {
             symbol_info.set_type(ObjectTypeNode("Integer", {}));
+            symbol_info.is_function = false;
+            ok = true;
+        } else if (ltype == "Float" && rtype == "Float") {
+            symbol_info.set_type(ObjectTypeNode("Float", {}));
+            symbol_info.is_function = false;
+            ok = true;
+        } else if (ltype == "Float" && rtype == "Integer" || ltype == "Integer" && rtype == "Float") {
+            symbol_info.set_type(ObjectTypeNode("Float", {}));
             symbol_info.is_function = false;
             ok = true;
         } else if (ltype == "String" && rtype == "String") {
