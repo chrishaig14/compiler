@@ -89,21 +89,21 @@ void CodeRunner::visit(BoolOpInst& inst) {
     IntegerObject* right_int = dynamic_cast<IntegerObject*>(right);
     IntegerObject* left_int = dynamic_cast<IntegerObject*>(left);
     if (right_int != nullptr && left_int != nullptr) {
-        this->stack.push(new BooleanObject(bool_int_int(inst.op, right_int->value, left_int->value)));
+        this->stack.push(new BooleanObject(bool_int_int(inst.op, left_int->value, right_int->value)));
         this->inst_ptr++;
         return;
     }
     FloatObject* right_float = dynamic_cast<FloatObject*>(right);
     FloatObject* left_float = dynamic_cast<FloatObject*>(left);
     if (right_float != nullptr && left_float != nullptr) {
-        this->stack.push(new BooleanObject(bool_float_float(inst.op, right_float->value, left_float->value)));
+        this->stack.push(new BooleanObject(bool_float_float(inst.op, left_float->value, right_float->value)));
         this->inst_ptr++;
         return;
     }
     StringObject* right_str = dynamic_cast<StringObject*>(right);
     StringObject* left_str = dynamic_cast<StringObject*>(left);
     if (right_str != nullptr && left_str != nullptr) {
-        this->stack.push(new BooleanObject(bool_str_str(inst.op, right_str->str, left_str->str)));
+        this->stack.push(new BooleanObject(bool_str_str(inst.op, left_str->str, right_str->str)));
         this->inst_ptr++;
         return;
     }
@@ -211,7 +211,7 @@ void CodeRunner::visit(BinopInst& inst) {
     StringObject* right_str = dynamic_cast<StringObject*>(right);
     StringObject* left_str = dynamic_cast<StringObject*>(left);
     if (right_str != nullptr && left_str != nullptr) {
-        this->stack.push(new StringObject(op_str_str(inst.op, right_str->str, left_str->str)));
+        this->stack.push(new StringObject(op_str_str(inst.op, left_str->str, right_str->str)));
         this->inst_ptr++;
         return;
     }
