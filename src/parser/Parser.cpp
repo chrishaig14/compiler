@@ -16,13 +16,14 @@ std::unordered_map<TokType, OpType> TOKEN_TO_OP = {
 };
 
 std::unordered_map<TokType, BoolOp> TOKEN_TO_BOOL_OP = {
-        {TokType::PLUS,  BoolOp::AND},
-        {TokType::MINUS, BoolOp::OR},
-        {TokType::TIMES, BoolOp::LT},
-        {TokType::DIV,   BoolOp::GT},
-        {TokType::MOD,   BoolOp::LEQ},
-        {TokType::MOD,   BoolOp::GEQ},
-        {TokType::MOD,   BoolOp::NEQ}
+        {TokType::AND, BoolOp::AND},
+        {TokType::OR,  BoolOp::OR},
+        {TokType::LT,  BoolOp::LT},
+        {TokType::GT,  BoolOp::GT},
+        {TokType::LEQ, BoolOp::LEQ},
+        {TokType::GEQ, BoolOp::GEQ},
+        {TokType::NEQ, BoolOp::NEQ},
+        {TokType::EQ,  BoolOp::EQ}
 };
 
 Parser::Parser(std::vector<Token>& tokens) {
