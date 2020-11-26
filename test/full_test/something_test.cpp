@@ -71,7 +71,7 @@ TEST(run_test, simple_generic_function) {
 }
 
 TEST(run_test, test_file) {
-    test_file("should_pass/"  "test_file.pl");
+    test_file("should_pass/"  "test_file.xl");
 }
 
 TEST(run_test, call_complex_generic_function) {

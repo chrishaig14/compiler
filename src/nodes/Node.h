@@ -55,6 +55,8 @@ class NumberNode;
 
 class ReturnNode;
 
+class BoolOpNode;
+
 class StringNode;
 
 class SubscriptNode;
@@ -88,6 +90,8 @@ public:
 
     virtual AssignmentNode& assign();
     virtual BinopNode& binop();
+    virtual BoolOpNode& boolop();
+    virtual const BoolOpNode& boolop() const;
     virtual BlockNode& block();
     virtual BooleanNode& boolean();
     virtual BreakNode& brk();

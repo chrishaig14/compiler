@@ -12,13 +12,17 @@ std::unordered_map<TokType, OpType> TOKEN_TO_OP = {
         {TokType::MINUS, OpType::SUB},
         {TokType::TIMES, OpType::MUL},
         {TokType::DIV,   OpType::DIV},
-        {TokType::MOD,   OpType::MOD},
-        {TokType::LT,    OpType::LT},
-        {TokType::GT,    OpType::GT},
-        {TokType::LEQ,   OpType::LEQ},
-        {TokType::GEQ,   OpType::GEQ},
-        {TokType::EQ,    OpType::EQ},
-        {TokType::NEQ,   OpType::NEQ},
+        {TokType::MOD,   OpType::MOD}
+};
+
+std::unordered_map<TokType, BoolOp> TOKEN_TO_BOOL_OP = {
+        {TokType::PLUS,  BoolOp::AND},
+        {TokType::MINUS, BoolOp::OR},
+        {TokType::TIMES, BoolOp::LT},
+        {TokType::DIV,   BoolOp::GT},
+        {TokType::MOD,   BoolOp::LEQ},
+        {TokType::MOD,   BoolOp::GEQ},
+        {TokType::MOD,   BoolOp::NEQ}
 };
 
 Parser::Parser(std::vector<Token>& tokens) {
@@ -164,7 +168,7 @@ Node* Parser::parse_or_expression() {
     if (this->match(TokType::OR)) {
         this->next();
         Node* right = this->parse_and_expression();
-        Node* node = new BinopNode(OpType::OR, left, right);
+        Node* node = new BoolOpNode(BoolOp::OR, left, right);
 //        BinopNode* node = BIN(OpType::OR, left, right);
 //        node->start = left->start;
 //        node->end = right->end;
@@ -178,7 +182,7 @@ Node* Parser::parse_and_expression() {
     if (this->match(TokType::AND)) {
         this->next();
         Node* right = this->parse_bool_expression();
-        Node* node = new BinopNode(OpType::AND, left, right);
+        Node* node = new BoolOpNode(BoolOp::AND, left, right);
 //        node->start = left->start;
 //        node->end = right->end;
         return node;
@@ -189,16 +193,16 @@ Node* Parser::parse_and_expression() {
 
 Node* Parser::parse_bool_expression() {
     Node* left = this->parse_add_or_sub_expression();
-    OpType op;
+    BoolOp op;
     std::vector<TokType> boolean_tokens = {TokType::EQ, TokType::LT, TokType::GT, TokType::LEQ,
                                            TokType::GEQ, TokType::NEQ};
     if (!item_in_vec(this->token.type, boolean_tokens)) {
         return left;
     }
-    op = TOKEN_TO_OP[this->token.type];
+    op = TOKEN_TO_BOOL_OP[this->token.type];
     this->next();
     Node* right = this->parse_add_or_sub_expression();
-    Node* node = new BinopNode(op, left, right);
+    Node* node = new BoolOpNode(op, left, right);
 //    node->start = left->start;
 //    node->end = right->end;
     return node;

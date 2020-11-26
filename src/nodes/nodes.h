@@ -17,6 +17,7 @@
 #include "TernaryNode.h"
 #include "FloatNode.h"
 #include "NoneNode.h"
+#include "BoolOpNode.h"
 #include "ClassLiteralFieldNode.h"
 #include "ForNode.h"
 #include "WhileNode.h"

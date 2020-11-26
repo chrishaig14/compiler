@@ -250,6 +250,8 @@ std::string Node::node_type_string(NodeType type) const {
             return "ASSIGN";
         case BINOP:
             return "BINOP";
+        case BOOLOP:
+            return "BOOLOP";
         case BLOCK:
             return "BLOCK";
         case BOOLEAN:
@@ -315,4 +317,12 @@ json Node::to_json() const {
     json j;
     j["name"] = "johnny";
     return j;
+}
+
+BoolOpNode& Node::boolop() {
+    this->throw_dereference_error(BOOLOP);
+}
+
+const BoolOpNode& Node::boolop() const {
+    this->throw_dereference_error(BOOLOP);
 }

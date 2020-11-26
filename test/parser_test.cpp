@@ -84,7 +84,7 @@ TEST_F(parser_test, a_or_b) {
     std::vector<Token> tokens = scanner->scan_all();
     Parser parser(tokens);
     node = parser.parse_or_expression();
-    expected_node = new BinopNode(OpType::OR, new IdNode("a"), new IdNode("b"));
+    expected_node = new BoolOpNode(BoolOp::OR, new IdNode("a"), new IdNode("b"));
     EXPECT_EQ(*node, *expected_node);
 }
 
@@ -95,10 +95,10 @@ TEST_F(parser_test, complex_expression_1) {
     Parser parser(tokens);
     node = parser.parse_expression();
     expected_node = new TernaryNode(
-            new BinopNode(
-                    OpType::OR, new IdNode("a"),
-                    new BinopNode(
-                            OpType::EQ, new BinopNode(OpType::SUB, new IdNode("s"), new IdNode("c")),
+            new BoolOpNode(
+                    BoolOp::OR, new IdNode("a"),
+                    new BoolOpNode(
+                            BoolOp::EQ, new BinopNode(OpType::SUB, new IdNode("s"), new IdNode("c")),
                             new NumberNode(7))),
             new TernaryNode(
                     new BinopNode(OpType::SUB, new NumberNode(8), new NumberNode(9)), new NumberNode(7),
@@ -113,7 +113,7 @@ TEST_F(parser_test, a_eq_b) {
     std::vector<Token> tokens = scanner->scan_all();
     Parser parser(tokens);
     node = parser.parse_expression();
-    expected_node = new BinopNode(OpType::EQ, new IdNode("a"), new IdNode("b"));
+    expected_node = new BoolOpNode(BoolOp::EQ, new IdNode("a"), new IdNode("b"));
     EXPECT_EQ(*node, *expected_node);
 }
 

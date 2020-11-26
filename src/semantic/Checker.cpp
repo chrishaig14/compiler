@@ -432,6 +432,34 @@ USymbolInfo Checker::visit(IfNode& n) {
     return std::make_unique<SymbolInfo>(symbol_info);
 }
 
+USymbolInfo Checker::visit(BoolOpNode& n) {
+    USymbolInfo left_info_p = this->dispatch(n.left);
+    USymbolInfo right_info_p = this->dispatch(n.right);
+
+    SymbolInfo& left_info = *left_info_p;
+    SymbolInfo& right_info = *right_info_p;
+
+    SymbolInfo symbol_info;
+    if (left_info.type().kind == Kind::OBJECT) {
+        auto left = left_info.type().object();
+        if (right_info.type().kind == Kind::OBJECT) {
+            auto right = right_info.type().object();
+            if (left.identifier == "Option" && right.identifier == "NoneType") {
+                symbol_info.set_type(ObjectTypeNode("Boolean", {}));
+            }
+        }
+    } else {
+        if (left_info.type() != right_info.type()) {
+            throw std::runtime_error(
+                    "Cannot perform bool op betweeen types " + left_info.type().to_string() + " and " +
+                    right_info.type().to_string());
+        }
+    }
+    symbol_info.set_type(ObjectTypeNode("Boolean", {}));
+
+    return std::make_unique<SymbolInfo>(symbol_info);
+}
+
 USymbolInfo Checker::visit(BinopNode& n) {
     USymbolInfo left_info_p = this->dispatch(n.left);
     USymbolInfo right_info_p = this->dispatch(n.right);
@@ -440,63 +468,40 @@ USymbolInfo Checker::visit(BinopNode& n) {
     SymbolInfo& right_info = *right_info_p;
 
     SymbolInfo symbol_info;
-    bool is_boolean = item_in_vec(
-            n.op, {OpType::EQ, OpType::AND, OpType::OR, OpType::LEQ, OpType::GEQ, OpType::LT,
-                   OpType::GT, OpType::NEQ}
-    );
-    if (is_boolean) {
-        if (left_info.type().kind == Kind::OBJECT) {
-            auto left = left_info.type().object();
-            if (right_info.type().kind == Kind::OBJECT) {
-                auto right = right_info.type().object();
-                if (left.identifier == "Option" && right.identifier == "NoneType") {
-                    symbol_info.set_type(ObjectTypeNode("Boolean", {}));
-                }
-            }
-        } else {
-            if (left_info.type() != right_info.type()) {
-                throw std::runtime_error(
-                        "Cannot perform binary op betweeen types " + left_info.type().to_string() + " and " +
-                        right_info.type().to_string());
-            }
+    auto& left = left_info.type().object();
+    auto& right = right_info.type().object();
+    auto ltype = left.identifier;
+    auto rtype = right.identifier;
+    bool ok = false;
+    if (ltype == "Integer" && rtype == "Integer") {
+        symbol_info.set_type(ObjectTypeNode("Integer", {}));
+        symbol_info.is_function = false;
+        ok = true;
+    } else if (ltype == "Float" && rtype == "Float") {
+        symbol_info.set_type(ObjectTypeNode("Float", {}));
+        symbol_info.is_function = false;
+        ok = true;
+    } else if (ltype == "Float" && rtype == "Integer" || ltype == "Integer" && rtype == "Float") {
+        symbol_info.set_type(ObjectTypeNode("Float", {}));
+        symbol_info.is_function = false;
+        ok = true;
+    } else if (ltype == "String" && rtype == "String") {
+        if (n.op == OpType::ADD) {
+            symbol_info.set_type(ObjectTypeNode("String", {}));
+            symbol_info.is_function = false;
+            ok = true;
         }
-        symbol_info.set_type(ObjectTypeNode("Boolean", {}));
-    } else {
-        auto& left = left_info.type().object();
-        auto& right = right_info.type().object();
-        auto ltype = left.identifier;
-        auto rtype = right.identifier;
-        bool ok = false;
-        if (ltype == "Integer" && rtype == "Integer") {
-            symbol_info.set_type(ObjectTypeNode("Integer", {}));
+    } else if (ltype == "List" && rtype == "List" && left == (right)) {
+        if (n.op == OpType::ADD) {
+            symbol_info.set_type(left);
             symbol_info.is_function = false;
             ok = true;
-        } else if (ltype == "Float" && rtype == "Float") {
-            symbol_info.set_type(ObjectTypeNode("Float", {}));
-            symbol_info.is_function = false;
-            ok = true;
-        } else if (ltype == "Float" && rtype == "Integer" || ltype == "Integer" && rtype == "Float") {
-            symbol_info.set_type(ObjectTypeNode("Float", {}));
-            symbol_info.is_function = false;
-            ok = true;
-        } else if (ltype == "String" && rtype == "String") {
-            if (n.op == OpType::ADD) {
-                symbol_info.set_type(ObjectTypeNode("String", {}));
-                symbol_info.is_function = false;
-                ok = true;
-            }
-        } else if (ltype == "List" && rtype == "List" && left == (right)) {
-            if (n.op == OpType::ADD) {
-                symbol_info.set_type(left);
-                symbol_info.is_function = false;
-                ok = true;
-            }
         }
+    }
 
-        if (!ok) {
-            throw std::runtime_error(
-                    "Cannot perform binary op betweeen types " + left.to_string() + " and " + right.to_string());
-        }
+    if (!ok) {
+        throw std::runtime_error(
+                "Cannot perform binary op betweeen types " + left.to_string() + " and " + right.to_string());
     }
 
     return std::make_unique<SymbolInfo>(symbol_info);
@@ -1321,6 +1326,9 @@ USymbolInfo Checker::dispatch(Node* nod) {
             return this->visit(n.assign());
         case NodeType::BINOP:
             return this->visit(n.binop());
+            break;
+        case NodeType::BOOLOP:
+            return this->visit(n.boolop());
             break;
         case NodeType::BLOCK:
             return this->visit(n.block());

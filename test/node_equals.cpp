@@ -58,6 +58,21 @@ TEST(node_test, binop) {
               BinopNode(OpType::ADD, new IdNode("a"), new NumberNode(2)));
 }
 
+TEST(node_test, boolop) {
+    EXPECT_EQ(BoolOpNode(BoolOp::AND, new IdNode("a"), new IdNode("b")),
+              BoolOpNode(BoolOp::AND, new IdNode("a"), new IdNode("b")));
+    EXPECT_NE(BoolOpNode(BoolOp::AND, new IdNode("a"), new IdNode("b")),
+              BoolOpNode(BoolOp::AND, new IdNode("a"), new IdNode("c")));
+    EXPECT_NE(BoolOpNode(BoolOp::AND, new IdNode("a"), new IdNode("b")),
+              BoolOpNode(BoolOp::AND, new IdNode("c"), new IdNode("b")));
+    EXPECT_NE(BoolOpNode(BoolOp::AND, new IdNode("a"), new IdNode("b")),
+              BoolOpNode(BoolOp::OR, new IdNode("a"), new IdNode("b")));
+    EXPECT_NE(BoolOpNode(BoolOp::AND, new IdNode("a"), new IdNode("b")),
+              BoolOpNode(BoolOp::AND, new NumberNode(2), new IdNode("b")));
+    EXPECT_NE(BoolOpNode(BoolOp::AND, new IdNode("a"), new IdNode("b")),
+              BoolOpNode(BoolOp::AND, new IdNode("a"), new NumberNode(2)));
+}
+
 
 TEST(node_test, call) {
     EXPECT_EQ(CallNode(new IdNode("foo"), {}), CallNode(new IdNode("foo"), {}));

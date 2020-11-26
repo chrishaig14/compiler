@@ -35,7 +35,7 @@ enum NodeType {
     OTYPE,
     FTYPE,
     WHIL,
-    UNINITIALIZED
+    UNINITIALIZED, BOOLOP
 };
 
 #endif //UNTITLED1_NODE_TYPES_H

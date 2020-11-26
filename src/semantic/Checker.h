@@ -56,12 +56,13 @@ public:
     USymbolInfo visit(AssignmentNode& n);
 
     USymbolInfo visit(BinopNode& node);
-
+    USymbolInfo visit(BoolOpNode& n);
     USymbolInfo visit(CallNode& node);
 
     USymbolInfo visit(DeclarationNode& node);
 
     USymbolInfo visit(FunctionNode& node);
+    USymbolInfo visit(StringNode& node);
 
     USymbolInfo visit(IdNode& node);
 
@@ -74,8 +75,6 @@ public:
     USymbolInfo visit(NumberNode& node);
 
     USymbolInfo visit(ReturnNode& n);
-
-    USymbolInfo visit(StringNode& node);
 
     USymbolInfo visit(TupleNode& node);
 

@@ -58,36 +58,6 @@ void CodeRunner::visit(BinopInst& inst) {
                 this->stack.push(new IntegerObject(result));
 
                 break;
-            case OpType::EQ:
-                result = left_int->value == right_int->value;
-                this->stack.push(new BooleanObject(result));
-                break;
-            case OpType::AND:
-//                    result = left_int->value + right_int->value;
-                break;
-            case OpType::OR:
-//                    result = left_int->value + right_int->value;
-                break;
-            case OpType::LEQ:
-                result = left_int->value <= right_int->value;
-                this->stack.push(new BooleanObject(result));
-                break;
-            case OpType::GEQ:
-                result = left_int->value >= right_int->value;
-                this->stack.push(new BooleanObject(result));
-                break;
-            case OpType::LT:
-                result = left_int->value < right_int->value;
-                this->stack.push(new BooleanObject(result));
-                break;
-            case OpType::GT:
-                result = left_int->value > right_int->value;
-                this->stack.push(new BooleanObject(result));
-                break;
-            case OpType::NEQ:
-                result = left_int->value != right_int->value;
-                this->stack.push(new BooleanObject(result));
-                break;
         }
     } else {
         StringObject* right_str = dynamic_cast<StringObject*>(right);
@@ -97,12 +67,6 @@ void CodeRunner::visit(BinopInst& inst) {
             if (inst.op == OpType::ADD) {
                 result = left_str->str + right_str->str;
                 this->stack.push(new StringObject(result));
-            } else if (inst.op == OpType::EQ) {
-                bool res = left_str->str == right_str->str;
-                this->stack.push(new BooleanObject(res));
-            } else if (inst.op == OpType::NEQ) {
-                bool res = left_str->str != right_str->str;
-                this->stack.push(new BooleanObject(res));
             }
         } else {
             ListObject* right_list = dynamic_cast<ListObject*>(right);
@@ -120,11 +84,6 @@ void CodeRunner::visit(BinopInst& inst) {
                 NoneObject* right_none = dynamic_cast<NoneObject*>(right);
                 if (right_none != nullptr) {
                     NoneObject* left_none = dynamic_cast<NoneObject*>(left);
-                    if (inst.op == OpType::EQ) {
-                        this->stack.push(new BooleanObject(left_none != nullptr));
-                    } else if (inst.op == OpType::NEQ) {
-                        this->stack.push(new BooleanObject(left_none == nullptr));
-                    }
 
                 } else {
                     throw std::runtime_error("Try to do a binop with two non-Integers or non-Strings");
