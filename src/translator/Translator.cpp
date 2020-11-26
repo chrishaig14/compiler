@@ -27,6 +27,20 @@ void Translator::visit(AssignmentNode& node) {
     this->code = out;
 }
 
+void Translator::visit(BoolOpNode& node) {
+//    node.left->accept(*this)
+    this->dispatch(node.left);
+    CodeLabel left_code = this->code;
+//    node.right->accept(*this)
+    this->dispatch(node.right);
+    CodeLabel right_code = this->code;
+    CodeLabel out = left_code;
+    out.insert(out.end(), right_code.begin(), right_code.end());
+    out.push_back(LC("", new BoolOpInst(node.op)));
+    this->code = out;
+}
+
+
 void Translator::visit(BinopNode& node) {
 //    node.left->accept(*this)
     this->dispatch(node.left);
@@ -36,7 +50,7 @@ void Translator::visit(BinopNode& node) {
     CodeLabel right_code = this->code;
     CodeLabel out = left_code;
     out.insert(out.end(), right_code.begin(), right_code.end());
-    out.push_back(LC("", I_BIN(node.op)));
+    out.push_back(LC("", new BinopInst(node.op)));
     this->code = out;
 }
 
@@ -197,6 +211,12 @@ void Translator::visit(NumberNode& node) {
     this->code = out;
 }
 
+void Translator::visit(FloatNode& node) {
+    CodeLabel out;
+    out.push_back(LC("", new PushFloatInst(node.value)));
+    this->code = out;
+}
+
 void Translator::visit(ReturnNode& node) {
     CodeLabel out;
     if (node.expression->ntype != NodeType::UNINITIALIZED) {
@@ -315,7 +335,7 @@ void Translator::visit(ForNode& node) {
     out.insert(out.end(), this->code.begin(), this->code.end());
 
     // index < list_len ?
-    auto condition = new BinopNode(OpType::LT, new IdNode(index_name), new IdNode(len_name));
+    auto condition = new BoolOpNode(BoolOp::LT, new IdNode(index_name), new IdNode(len_name));
 //    condition->accept(*this)
     this->dispatch(condition);
     auto condition_code = this->code;
@@ -461,6 +481,8 @@ void Translator::visit(ClassNode& node) {
     this->code = out;
 }
 
+
+
 void Translator::visit(TupleNode& node) {
     CodeLabel out;
     for (auto e: node.values) {
@@ -501,6 +523,9 @@ void Translator::visit(ContinueNode& node) {
 void Translator::dispatch(Node* nptr) {
     Node& n = *nptr;
     switch (n.ntype) {
+        case NodeType::BOOLOP:
+            this->visit(n.boolop());
+            break;
         case NodeType::ASSIGN:
             this->visit(n.assign());
             break;
@@ -561,6 +586,9 @@ void Translator::dispatch(Node* nptr) {
         case NodeType::NUMBER:
             this->visit(n.number());
             break;
+        case NodeType::FLOT:
+            this->visit(n.flot());
+            break;
         case NodeType::RETRN:
             this->visit(n.retrn());
             break;
@@ -587,5 +615,8 @@ void Translator::dispatch(Node* nptr) {
         case TUPLE:
             this->visit(n.tuple());
             break;
+        default:
+            throw std::runtime_error("Don't know what to do!");
     }
 }
+

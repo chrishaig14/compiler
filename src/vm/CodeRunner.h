@@ -17,6 +17,7 @@
 #include "StringObject.h"
 #include "ListObject.h"
 #include "CodeObject.h"
+#include "FloatObject.h"
 #include "UserObject.h"
 #include "BooleanObject.h"
 #include "../instructions/GetTupleMemberInst.h"
@@ -97,6 +98,8 @@ public:
     void visit(PushNone& inst) override;
 
     void visit(PopInst& inst) override;
+    void visit(BoolOpInst& inst) override;
+    void visit(PushFloatInst& inst) override;
 
     std::unordered_map<std::string, std::unordered_map<std::string, Code>>& structs;
     Environment* global_env;

@@ -63,6 +63,14 @@ TupleObject* ObjectStack::pop_tuple() {
     return ptr;
 }
 
+FloatObject* ObjectStack::pop_float() {
+    auto ptr = dynamic_cast<FloatObject*>(this->pop());
+    if (ptr == nullptr) {
+        throw std::runtime_error("Trying to pop a Float, but it's not!");
+    }
+    return ptr;
+}
+
 ObjectStackElement::ObjectStackElement(Object* value, ObjectStackElement* previous) {
     this->value = value;
     this->previous = previous;

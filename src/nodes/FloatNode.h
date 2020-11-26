@@ -9,7 +9,6 @@
 #include "Node.h"
 
 class FloatNode : public Node {
-    float value;
 public:
     FloatNode(float value) {
         this->value = value;
@@ -20,6 +19,7 @@ public:
     FloatNode& flot() override;
     const FloatNode& flot() const override;
 
+    float value;
 };
 
 

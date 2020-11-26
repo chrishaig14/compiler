@@ -23,6 +23,161 @@ void CodeRunner::run() {
     }
 }
 
+
+bool bool_int_int(BoolOp op, int a, int b) {
+    switch (op) {
+        case BoolOp::EQ:
+            return a == b;
+        case BoolOp::LEQ:
+            return a <= b;
+        case BoolOp::GEQ:
+            return a >= b;
+        case BoolOp::LT:
+            return a < b;
+        case BoolOp::GT:
+            return a > b;
+        case BoolOp::NEQ:
+            return a != b;
+        default:
+            throw std::runtime_error("Unsupported op between int and int");
+    }
+}
+
+bool bool_float_float(BoolOp op, float a, float b) {
+    switch (op) {
+        case BoolOp::EQ:
+            return a == b;
+        case BoolOp::LEQ:
+            return a <= b;
+        case BoolOp::GEQ:
+            return a >= b;
+        case BoolOp::LT:
+            return a < b;
+        case BoolOp::GT:
+            return a > b;
+        case BoolOp::NEQ:
+            return a != b;
+        default:
+            throw std::runtime_error("Unsupported op between int and int");
+    }
+}
+
+bool bool_str_str(BoolOp op, std::string a, std::string b) {
+    switch (op) {
+        case BoolOp::EQ:
+            return a == b;
+        case BoolOp::LEQ:
+            return a <= b;
+        case BoolOp::GEQ:
+            return a >= b;
+        case BoolOp::LT:
+            return a < b;
+        case BoolOp::GT:
+            return a > b;
+        case BoolOp::NEQ:
+            return a != b;
+        default:
+            throw std::runtime_error("Unsupported op between int and int");
+    }
+}
+
+void CodeRunner::visit(BoolOpInst& inst) {
+//    //std::cerr << "Run [" << inst.to_string() << "]" << std::endl;
+
+    Object* right = this->stack.pop();
+    Object* left = this->stack.pop();
+    IntegerObject* right_int = dynamic_cast<IntegerObject*>(right);
+    IntegerObject* left_int = dynamic_cast<IntegerObject*>(left);
+    if (right_int != nullptr && left_int != nullptr) {
+        this->stack.push(new BooleanObject(bool_int_int(inst.op, right_int->value, left_int->value)));
+        this->inst_ptr++;
+        return;
+    }
+    FloatObject* right_float = dynamic_cast<FloatObject*>(right);
+    FloatObject* left_float = dynamic_cast<FloatObject*>(left);
+    if (right_float != nullptr && left_float != nullptr) {
+        this->stack.push(new BooleanObject(bool_float_float(inst.op, right_float->value, left_float->value)));
+        this->inst_ptr++;
+        return;
+    }
+    StringObject* right_str = dynamic_cast<StringObject*>(right);
+    StringObject* left_str = dynamic_cast<StringObject*>(left);
+    if (right_str != nullptr && left_str != nullptr) {
+        this->stack.push(new BooleanObject(bool_str_str(inst.op, right_str->str, left_str->str)));
+        this->inst_ptr++;
+        return;
+    }
+}
+
+int op_int_int(OpType op, int a, int b) {
+    switch (op) {
+        case OpType::ADD:
+            return a + b;
+        case OpType::SUB:
+            return a - b;
+        case OpType::MUL:
+            return a * b;
+        case OpType::DIV:
+            return a / b;
+        case OpType::MOD:
+            return a % b;
+    }
+}
+
+std::string op_str_str(OpType op, std::string a, std::string b) {
+    switch (op) {
+        case OpType::ADD:
+            return a + b;
+        default:
+            throw std::runtime_error("Unsupported op between two strings!");
+    }
+}
+
+float op_float_float(OpType op, float a, float b) {
+    switch (op) {
+        case OpType::ADD:
+            return a + b;
+        case OpType::SUB:
+            return a - b;
+        case OpType::MUL:
+            return a * b;
+        case OpType::DIV:
+            return a / b;
+        default:
+            throw std::runtime_error("Unsupported op between two floats!");
+    }
+}
+
+float op_float_int(OpType op, float a, int b) {
+    switch (op) {
+        case OpType::ADD:
+            return a + b;
+        case OpType::SUB:
+            return a - b;
+        case OpType::MUL:
+            return a * b;
+        case OpType::DIV:
+            return a / b;
+        default:
+            throw std::runtime_error("Unsupported op between float and int!");
+    }
+}
+
+float op_int_float(OpType op, int a, float b) {
+    switch (op) {
+        case OpType::ADD:
+            return a + b;
+        case OpType::SUB:
+            return a - b;
+        case OpType::MUL:
+            return a * b;
+        case OpType::DIV:
+            return a / b;
+        default:
+            throw std::runtime_error("Unsupported op between int and float!");
+    }
+}
+
 void CodeRunner::visit(BinopInst& inst) {
 //    //std::cerr << "Run [" << inst.to_string() << "]" << std::endl;
 
@@ -30,65 +185,54 @@ void CodeRunner::visit(BinopInst& inst) {
     Object* left = this->stack.pop();
     IntegerObject* right_int = dynamic_cast<IntegerObject*>(right);
     IntegerObject* left_int = dynamic_cast<IntegerObject*>(left);
-    int result = 0;
     if (right_int != nullptr && left_int != nullptr) {
-        switch (inst.op) {
-            case OpType::ADD:
-                result = left_int->value + right_int->value;
-                this->stack.push(new IntegerObject(result));
+        this->stack.push(new IntegerObject(op_int_int(inst.op, right_int->value, left_int->value)));
+        this->inst_ptr++;
+        return;
+    }
+    FloatObject* right_float = dynamic_cast<FloatObject*>(right);
+    FloatObject* left_float = dynamic_cast<FloatObject*>(left);
+    if (right_float != nullptr && left_float != nullptr) {
+        this->stack.push(new FloatObject(op_float_float(inst.op, left_float->value, right_float->value)));
+        this->inst_ptr++;
+        return;
+    }
+    if (left_float != nullptr && right_int != nullptr) {
+        this->stack.push(new FloatObject(op_float_int(inst.op, left_float->value, right_int->value)));
+        this->inst_ptr++;
+        return;
+    }
+    if (left_int != nullptr && right_float != nullptr) {
+        this->stack.push(new FloatObject(op_int_float(inst.op, left_int->value, right_float->value)));
+        this->inst_ptr++;
+        return;
+    }
 
-                break;
-            case OpType::SUB:
-                result = left_int->value - right_int->value;
-                this->stack.push(new IntegerObject(result));
-
-                break;
-            case OpType::MUL:
-                result = left_int->value * right_int->value;
-                this->stack.push(new IntegerObject(result));
-
-                break;
-            case OpType::MOD:
-                result = left_int->value % right_int->value;
-                this->stack.push(new IntegerObject(result));
-
-                break;
-            case OpType::DIV:
-                result = left_int->value / right_int->value;
-                this->stack.push(new IntegerObject(result));
-
-                break;
+    StringObject* right_str = dynamic_cast<StringObject*>(right);
+    StringObject* left_str = dynamic_cast<StringObject*>(left);
+    if (right_str != nullptr && left_str != nullptr) {
+        this->stack.push(new StringObject(op_str_str(inst.op, right_str->str, left_str->str)));
+        this->inst_ptr++;
+        return;
+    }
+    ListObject* right_list = dynamic_cast<ListObject*>(right);
+    ListObject* left_list = dynamic_cast<ListObject*>(left);
+    ListObject* result;
+    if (right_list != nullptr && left_list != nullptr) {
+        if (inst.op == OpType::ADD) {
+            std::vector<Object*> elements;
+            elements.insert(elements.end(), left_list->list.begin(), left_list->list.end());
+            elements.insert(elements.end(), right_list->list.begin(), right_list->list.end());
+            result = new ListObject(elements);
+            this->stack.push(result);
         }
     } else {
-        StringObject* right_str = dynamic_cast<StringObject*>(right);
-        StringObject* left_str = dynamic_cast<StringObject*>(left);
-        std::string result;
-        if (right_str != nullptr && left_str != nullptr) {
-            if (inst.op == OpType::ADD) {
-                result = left_str->str + right_str->str;
-                this->stack.push(new StringObject(result));
-            }
-        } else {
-            ListObject* right_list = dynamic_cast<ListObject*>(right);
-            ListObject* left_list = dynamic_cast<ListObject*>(left);
-            ListObject* result;
-            if (right_list != nullptr && left_list != nullptr) {
-                if (inst.op == OpType::ADD) {
-                    std::vector<Object*> elements;
-                    elements.insert(elements.end(), left_list->list.begin(), left_list->list.end());
-                    elements.insert(elements.end(), right_list->list.begin(), right_list->list.end());
-                    result = new ListObject(elements);
-                    this->stack.push(result);
-                }
-            } else {
-                NoneObject* right_none = dynamic_cast<NoneObject*>(right);
-                if (right_none != nullptr) {
-                    NoneObject* left_none = dynamic_cast<NoneObject*>(left);
+        NoneObject* right_none = dynamic_cast<NoneObject*>(right);
+        if (right_none != nullptr) {
+            NoneObject* left_none = dynamic_cast<NoneObject*>(left);
 
-                } else {
-                    throw std::runtime_error("Try to do a binop with two non-Integers or non-Strings");
-                }
-            }
+        } else {
+            throw std::runtime_error("Try to do a binop with two non-Integers or non-Strings");
         }
     }
     this->inst_ptr++;
@@ -343,5 +487,10 @@ void CodeRunner::visit(MakeTupleInst& inst) {
         tuple[i] = this->stack.pop();
     }
     this->stack.push(new TupleObject(tuple));
+    this->inst_ptr++;
+}
+
+void CodeRunner::visit(PushFloatInst& inst) {
+    this->stack.push(new FloatObject(inst.value));
     this->inst_ptr++;
 }

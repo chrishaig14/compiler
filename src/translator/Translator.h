@@ -12,6 +12,7 @@
 #include "../instructions/PopInst.h"
 #include "../instructions/CallInst.h"
 #include "../instructions/JumpIfNone.h"
+#include "../instructions/BoolOpInst.h"
 #include "../instructions/DeclareInst.h"
 #include "../instructions/PushStringInst.h"
 #include "../instructions/ReturnInst.h"
@@ -35,6 +36,7 @@
 #include "../instructions/PushBooleanInst.h"
 #include "../instructions/JumpInst.h"
 #include "../instructions/EnterScope.h"
+#include "../instructions/PushFloatInst.h"
 #include "../instructions/LeaveScope.h"
 
 class Translator {
@@ -43,10 +45,11 @@ public:
     void dispatch(Node* nptr);
 
     int loop_counter;
-
+    void visit(FloatNode& node);
     void visit(AssignmentNode& node);
 
     void visit(BinopNode& node);
+    void visit(BoolOpNode& node);
 
     void visit(BlockNode& node);
 

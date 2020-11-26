@@ -448,13 +448,13 @@ USymbolInfo Checker::visit(BoolOpNode& n) {
                 symbol_info.set_type(ObjectTypeNode("Boolean", {}));
             }
         }
-    } else {
-        if (left_info.type() != right_info.type()) {
-            throw std::runtime_error(
-                    "Cannot perform bool op betweeen types " + left_info.type().to_string() + " and " +
-                    right_info.type().to_string());
-        }
     }
+    if (left_info.type() != right_info.type()) {
+        throw std::runtime_error(
+                "Cannot perform bool op betweeen types " + left_info.type().to_string() + " and " +
+                right_info.type().to_string());
+    }
+
     symbol_info.set_type(ObjectTypeNode("Boolean", {}));
 
     return std::make_unique<SymbolInfo>(symbol_info);

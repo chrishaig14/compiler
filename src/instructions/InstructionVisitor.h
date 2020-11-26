@@ -67,14 +67,20 @@ class MakeTupleInst;
 
 class PopInst;
 
+class PushFloatInst;
+
+class BoolOpInst;
+
 class InstructionVisitor {
 public:
 
     virtual void visit(CallInst& inst) = 0;
 
     virtual void visit(PopInst& inst) = 0;
+    virtual void visit(PushFloatInst& inst) = 0;
 
     virtual void visit(PushNone& inst) = 0;
+    virtual void visit(BoolOpInst& inst) = 0;
 
     virtual void visit(EndFunction& inst) = 0;
 
