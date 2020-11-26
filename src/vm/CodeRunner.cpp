@@ -186,7 +186,7 @@ void CodeRunner::visit(BinopInst& inst) {
     IntegerObject* right_int = dynamic_cast<IntegerObject*>(right);
     IntegerObject* left_int = dynamic_cast<IntegerObject*>(left);
     if (right_int != nullptr && left_int != nullptr) {
-        this->stack.push(new IntegerObject(op_int_int(inst.op, right_int->value, left_int->value)));
+        this->stack.push(new IntegerObject(op_int_int(inst.op, left_int->value, right_int->value)));
         this->inst_ptr++;
         return;
     }
