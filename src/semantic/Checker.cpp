@@ -562,7 +562,7 @@ std::unordered_map<std::string, TypeNode*> make_replacements(TypeNode* a, TypeNo
     if (a->kind == Kind::OBJECT) {
         ObjectTypeNode& oa = a->object();
         if (oa.identifier.size() == 1 && islower(oa.identifier[0])) {
-            replacements[oa.identifier] = b;
+            replacements[oa.identifier] = b->clone();
         }
         for (int i = 0; i < oa.type_parameters.size(); i++) {
             if (is_generic(*oa.type_parameters[i])) {
@@ -689,7 +689,7 @@ Checker::match_arguments_to_generic_function(const FunctionTypeNode& function_ty
                 for (auto gtr: param_generic_replacements) {
                     if (generic_replacements.find(gtr.first) != generic_replacements.end()) {
                         // this type has already been replaced, see if it matches
-                        if (gtr.second != (generic_replacements[gtr.first])) {
+                        if (*gtr.second != *generic_replacements[gtr.first]) {
                             throw std::runtime_error(
                                     "Type has already been replacen by something that doesn't match!"
                             );
@@ -924,7 +924,7 @@ USymbolInfo Checker::visit(ClassLiteralExpressionNode& node) {
 
 
 bool Checker::can_assign(const TypeNode& from, const TypeNode& to) {
-    auto to_object = (to).object();
+    auto& to_object = (to).object();
     if (to_object.identifier == "Option") {
         if (*to_object.type_parameters[0] != from) {
             auto foo = from.object();
