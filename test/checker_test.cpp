@@ -368,3 +368,32 @@ TEST_F(checker_test, test_variable_redeclared_inside_scope_ok) {
     SetUp(text);
     checker->visit(*tree);
 }
+
+TEST_F(checker_test, test_generic_simple_ok) {
+    std::string text = "fun foo(x: t)->t{return x;}fun bar(){var y: Integer = foo(7);}";
+    SetUp(text);
+    checker->visit(*tree);
+}
+
+TEST_F(checker_test, test_generic_multiple_ok) {
+    std::string text = "fun foo(x: t, y: u)->u{return y;}fun bar(){var y: Integer = foo(true, 9);}";
+    SetUp(text);
+    checker->visit(*tree);
+}
+
+
+TEST_F(checker_test, test_generic_multiple_repeated_ok) {
+    std::string text = "fun foo(x: t, y: u, z: t)->t{return z;}fun bar(){var y: Integer = foo(5, 9.23, 4);}";
+    SetUp(text);
+    checker->visit(*tree);
+}
+
+TEST_F(checker_test, test_generic_multiple_repeated_error) {
+    std::string text = "fun foo(x: t, y: u, z: t)->t{return z;}fun bar(){var y = foo(5, 9.23, true);}";
+    SetUp(text);
+    try {
+        checker->visit(*tree);
+        FAIL();
+    } catch (...) {
+    }
+}
