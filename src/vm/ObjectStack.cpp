@@ -23,7 +23,9 @@ Object* ObjectStack::pop() {
         throw std::runtime_error("Popping from empty stack!");
     }
     Object* return_value = this->_top->value;
+    ObjectStackElement* old_top = this->_top;
     this->_top = this->_top->previous;
+    delete old_top;
     return return_value;
 }
 
