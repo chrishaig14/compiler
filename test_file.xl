@@ -1,0 +1,6 @@
+fun main(){
+    var x = range(0,1,10000)
+    for i @ x {
+        print(i.str())
+    }
+}
