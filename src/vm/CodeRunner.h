@@ -21,7 +21,7 @@
 #include "UserObject.h"
 #include "BooleanObject.h"
 #include "../instructions/GetTupleMemberInst.h"
-
+#include "ObjectStore.h"
 class CodeRunner : public InstructionVisitor {
 public:
 

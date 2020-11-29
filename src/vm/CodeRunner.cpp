@@ -81,32 +81,34 @@ bool bool_str_str(BoolOp op, std::string a, std::string b) {
     }
 }
 
+bool bool_op(BoolOp op, Object* left, Object* right) {
+    IntegerObject* right_int = dynamic_cast<IntegerObject*>(right);
+    IntegerObject* left_int = dynamic_cast<IntegerObject*>(left);
+    if (right_int != nullptr && left_int != nullptr) {
+        return bool_int_int(op, left_int->value, right_int->value);
+    }
+    FloatObject* right_float = dynamic_cast<FloatObject*>(right);
+    FloatObject* left_float = dynamic_cast<FloatObject*>(left);
+    if (right_float != nullptr && left_float != nullptr) {
+        return bool_float_float(op, left_float->value, right_float->value);
+    }
+    StringObject* right_str = dynamic_cast<StringObject*>(right);
+    StringObject* left_str = dynamic_cast<StringObject*>(left);
+    if (right_str != nullptr && left_str != nullptr) {
+        return bool_str_str(op, left_str->str, right_str->str);
+    }
+}
+
 void CodeRunner::visit(BoolOpInst& inst) {
 //    //std::cerr << "Run [" << inst.to_string() << "]" << std::endl;
 
     Object* right = this->stack.pop();
     Object* left = this->stack.pop();
-    IntegerObject* right_int = dynamic_cast<IntegerObject*>(right);
-    IntegerObject* left_int = dynamic_cast<IntegerObject*>(left);
-    if (right_int != nullptr && left_int != nullptr) {
-        this->stack.push(new BooleanObject(bool_int_int(inst.op, left_int->value, right_int->value)));
-        this->inst_ptr++;
-        return;
-    }
-    FloatObject* right_float = dynamic_cast<FloatObject*>(right);
-    FloatObject* left_float = dynamic_cast<FloatObject*>(left);
-    if (right_float != nullptr && left_float != nullptr) {
-        this->stack.push(new BooleanObject(bool_float_float(inst.op, left_float->value, right_float->value)));
-        this->inst_ptr++;
-        return;
-    }
-    StringObject* right_str = dynamic_cast<StringObject*>(right);
-    StringObject* left_str = dynamic_cast<StringObject*>(left);
-    if (right_str != nullptr && left_str != nullptr) {
-        this->stack.push(new BooleanObject(bool_str_str(inst.op, left_str->str, right_str->str)));
-        this->inst_ptr++;
-        return;
-    }
+    BooleanObject* obj = new BooleanObject(bool_op(inst.op, left, right));
+    ObjectStore::register_object(obj);
+    this->stack.push(obj);
+    this->inst_ptr++;
+    return;
 }
 
 int op_int_int(OpType op, int a, int b) {
@@ -178,53 +180,38 @@ float op_int_float(OpType op, int a, float b) {
     }
 }
 
-void CodeRunner::visit(BinopInst& inst) {
-//    //std::cerr << "Run [" << inst.to_string() << "]" << std::endl;
-
-    Object* right = this->stack.pop();
-    Object* left = this->stack.pop();
+Object* binop(OpType op, Object* left, Object* right) {
     IntegerObject* right_int = dynamic_cast<IntegerObject*>(right);
     IntegerObject* left_int = dynamic_cast<IntegerObject*>(left);
     if (right_int != nullptr && left_int != nullptr) {
-        this->stack.push(new IntegerObject(op_int_int(inst.op, left_int->value, right_int->value)));
-        this->inst_ptr++;
-        return;
+        return new IntegerObject(op_int_int(op, left_int->value, right_int->value));
     }
     FloatObject* right_float = dynamic_cast<FloatObject*>(right);
     FloatObject* left_float = dynamic_cast<FloatObject*>(left);
     if (right_float != nullptr && left_float != nullptr) {
-        this->stack.push(new FloatObject(op_float_float(inst.op, left_float->value, right_float->value)));
-        this->inst_ptr++;
-        return;
+        return new FloatObject(op_float_float(op, left_float->value, right_float->value));
     }
     if (left_float != nullptr && right_int != nullptr) {
-        this->stack.push(new FloatObject(op_float_int(inst.op, left_float->value, right_int->value)));
-        this->inst_ptr++;
-        return;
+        return new FloatObject(op_float_int(op, left_float->value, right_int->value));
     }
     if (left_int != nullptr && right_float != nullptr) {
-        this->stack.push(new FloatObject(op_int_float(inst.op, left_int->value, right_float->value)));
-        this->inst_ptr++;
-        return;
+        return new FloatObject(op_int_float(op, left_int->value, right_float->value));
     }
 
     StringObject* right_str = dynamic_cast<StringObject*>(right);
     StringObject* left_str = dynamic_cast<StringObject*>(left);
     if (right_str != nullptr && left_str != nullptr) {
-        this->stack.push(new StringObject(op_str_str(inst.op, left_str->str, right_str->str)));
-        this->inst_ptr++;
-        return;
+        return new StringObject(op_str_str(op, left_str->str, right_str->str));
     }
     ListObject* right_list = dynamic_cast<ListObject*>(right);
     ListObject* left_list = dynamic_cast<ListObject*>(left);
     ListObject* result;
     if (right_list != nullptr && left_list != nullptr) {
-        if (inst.op == OpType::ADD) {
+        if (op == OpType::ADD) {
             std::vector<Object*> elements;
             elements.insert(elements.end(), left_list->list.begin(), left_list->list.end());
             elements.insert(elements.end(), right_list->list.begin(), right_list->list.end());
-            result = new ListObject(elements);
-            this->stack.push(result);
+            return new ListObject(elements);
         }
     } else {
         NoneObject* right_none = dynamic_cast<NoneObject*>(right);
@@ -235,6 +222,16 @@ void CodeRunner::visit(BinopInst& inst) {
             throw std::runtime_error("Try to do a binop with two non-Integers or non-Strings");
         }
     }
+}
+
+void CodeRunner::visit(BinopInst& inst) {
+//    //std::cerr << "Run [" << inst.to_string() << "]" << std::endl;
+
+    Object* right = this->stack.pop();
+    Object* left = this->stack.pop();
+    Object* result = binop(inst.op, left, right);
+    ObjectStore::register_object(result);
+    this->stack.push(result);
     this->inst_ptr++;
 }
 
@@ -303,7 +300,9 @@ void CodeRunner::visit(GetSubscriptInst& inst) {
             throw std::runtime_error("String index out of bounds!");
         }
         char c = str->str[index->value];
-        this->stack.push(new StringObject(std::string(&c)));
+        StringObject* result = new StringObject(std::string(&c));
+        ObjectStore::register_object(result);
+        this->stack.push(result);
     }
     this->inst_ptr++;
 }
@@ -314,16 +313,18 @@ void CodeRunner::visit(PushFunctionInst& inst) {
 void CodeRunner::visit(PushIntegerInst& inst) {
     //std::cerr << "Run [" << inst.to_string() << "]" << std::endl;
 
-    IntegerObject* reference_to_new_integer_object = new IntegerObject(inst.num);
-    this->stack.push(reference_to_new_integer_object);
+    IntegerObject* obj = new IntegerObject(inst.num);
+    ObjectStore::register_object(obj);
+    this->stack.push(obj);
     this->inst_ptr++;
 }
 
 void CodeRunner::visit(PushStringInst& inst) {
     //std::cerr << "Run [" << inst.to_string() << "]" << std::endl;
 
-    StringObject* reference_to_new_integer_object = new StringObject(inst.str);
-    this->stack.push(reference_to_new_integer_object);
+    StringObject* obj = new StringObject(inst.str);
+    ObjectStore::register_object(obj);
+    this->stack.push(obj);
     this->inst_ptr++;
 }
 
@@ -367,6 +368,7 @@ void CodeRunner::visit(MakeObjectInst& inst) {
     for (int i = inst.fields.size() - 1; i >= 0; i--) {
         obj->fields[inst.fields[i]] = this->stack.pop();
     }
+    ObjectStore::register_object(obj);
     this->stack.push(obj);
     this->inst_ptr++;
 }
@@ -378,7 +380,9 @@ void CodeRunner::visit(MakeListInst& inst) {
     for (int i = inst.length - 1; i >= 0; i--) {
         list[i] = this->stack.pop();
     }
-    this->stack.push(new ListObject(list));
+    Object* obj = new ListObject(list);
+    ObjectStore::register_object(obj);
+    this->stack.push(obj);
     this->inst_ptr++;
 }
 
@@ -399,8 +403,9 @@ void CodeRunner::visit(JumpIfFalseInst& inst) {
 
 void CodeRunner::visit(PushBooleanInst& inst) {
     //std::cerr << "Run [" << inst.to_string() << "]" << std::endl;
-
-    this->stack.push(new BooleanObject(inst.boolean));
+    Object* obj = new BooleanObject(inst.boolean);
+    ObjectStore::register_object(obj);
+    this->stack.push(obj);
     this->inst_ptr++;
 }
 
@@ -463,16 +468,20 @@ void CodeRunner::visit(StartFunction& inst) {
 
 void CodeRunner::visit(JumpIfNone& inst) {
     Object* tos = this->stack.top();
-    if (tos->equal(new NoneObject())) {
+    Object* obj = new NoneObject();
+    if (tos->equal(obj)) {
         this->stack.pop();
         this->inst_ptr += inst.offset;
     } else {
         this->inst_ptr++;
     }
+    delete obj;
 }
 
 void CodeRunner::visit(PushNone& inst) {
-    this->stack.push(new NoneObject());
+    Object* obj = new NoneObject();
+    ObjectStore::register_object(obj);
+    this->stack.push(obj);
     this->inst_ptr++;
 }
 
@@ -486,11 +495,15 @@ void CodeRunner::visit(MakeTupleInst& inst) {
     for (int i = inst.length - 1; i >= 0; i--) {
         tuple[i] = this->stack.pop();
     }
-    this->stack.push(new TupleObject(tuple));
+    TupleObject* obj = new TupleObject(tuple);
+    ObjectStore::register_object(obj);
+    this->stack.push(obj);
     this->inst_ptr++;
 }
 
 void CodeRunner::visit(PushFloatInst& inst) {
-    this->stack.push(new FloatObject(inst.value));
+    FloatObject* obj = new FloatObject(inst.value);
+    ObjectStore::register_object(obj);
+    this->stack.push(obj);
     this->inst_ptr++;
 }
