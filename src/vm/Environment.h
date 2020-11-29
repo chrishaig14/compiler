@@ -13,6 +13,7 @@ class Environment {
 
     Environment* parent;
     std::string id;
+    std::unordered_map<std::string, Object*> reachable;
 public:
     Environment(const std::string& id, Environment* parent);
 
@@ -25,6 +26,21 @@ public:
     void declare(const std::string& name);
 
     Environment* enter(const std::string& name);
+
+    const std::unordered_map<std::string, Object*>& get_directly_reachable() {
+        reachable = {};
+        for (auto e: this->table) {
+            reachable.insert(std::make_pair(this->id + "::" + e.first, e.second));
+        }
+        if (this->parent != nullptr) {
+            const std::unordered_map<std::string, Object*>& parent_reachable = parent->get_directly_reachable();
+            reachable.insert(
+                    parent_reachable.begin(),
+                    parent_reachable.end());
+        }
+        return reachable;
+    }
+
 
     Environment* leave(const std::string& name);
 };

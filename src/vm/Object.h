@@ -28,6 +28,7 @@ class Environment;
 
 class Object {
 public:
+    bool visited;
     virtual bool equal(const Object* other) const = 0;
 
     virtual Object* sum(const Object* other) const { return nullptr; }

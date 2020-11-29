@@ -58,7 +58,9 @@ void compile_and_run(std::string text) {
     CodeObject* main_function = dynamic_cast<CodeObject*>(global_env->get("main"));
     CodeRunner code_runner(main_function->stuff.user->code, structs, stack, global_env);
     try {
+        auto runtime_stopwatch = spdlog::stopwatch();
         code_runner.run();
+        spdlog::get("main")->info("{:<32}\tTotal time: {:03.9f} seconds", "Finished running", runtime_stopwatch);
         auto x = stack;
     } catch (const std::runtime_error& e) {
         std::cerr << "THERE WAS A RUNTIME ERROR: " << e.what() << std::endl;

@@ -446,6 +446,12 @@ void CodeRunner::visit(LeaveScope& inst) {
     Environment* old_env = this->env;
     this->env = this->env->leave(inst.name);
     delete old_env;
+    const std::unordered_map<std::string, Object*> reachable = this->env->get_directly_reachable();
+    std::unordered_set<Object*> root;
+    for (auto r: reachable) {
+        root.insert(r.second);
+    }
+    ObjectStore::gc(root);
     this->inst_ptr++;
 }
 
