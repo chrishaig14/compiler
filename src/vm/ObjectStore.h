@@ -15,10 +15,10 @@
 
 class ObjectStore {
 private:
-    static std::unordered_set<Object*> all_objects;
+    static std::vector<Object*> all_objects;
 public:
     static void register_object(Object* obj) {
-        ObjectStore::all_objects.insert(obj);
+        ObjectStore::all_objects.push_back(obj);
     }
 
     static void gc(const std::vector<Object*>& root) {
@@ -32,11 +32,11 @@ public:
 //            assert(FLAG_IS_SET(o->flags, VISITED));
         }
         ObjectStore::mark(root);
-        std::unordered_set<Object*> reachable;
+        std::vector<Object*> reachable;
         for (auto o: all_objects) {
 //            if (o->visited) {
             if (FLAG_IS_SET(o->flags, VISITED)) {
-                reachable.insert(o);
+                reachable.push_back(o);
             } else {
                 delete o;
             }

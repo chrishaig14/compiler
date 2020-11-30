@@ -4,4 +4,4 @@
 
 #include "ObjectStore.h"
 
-std::unordered_set<Object*> ObjectStore::all_objects;
+std::vector<Object*> ObjectStore::all_objects;
