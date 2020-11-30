@@ -446,7 +446,7 @@ void CodeRunner::visit(LeaveScope& inst) {
     Environment* old_env = this->env;
     this->env = this->env->leave(inst.name);
     delete old_env;
-    std::unordered_set<Object*> root = this->env->get_directly_reachable();
+    const std::vector<Object*>& root = this->env->get_directly_reachable();
     ObjectStore::gc(root);
     this->inst_ptr++;
 }

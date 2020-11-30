@@ -14,7 +14,7 @@ class Environment {
 
     Environment* parent;
     std::string id;
-    std::unordered_set<Object*> reachable;
+    std::vector<Object*> reachable;
 public:
     Environment(const std::string& id, Environment* parent);
 
@@ -28,16 +28,17 @@ public:
 
     Environment* enter(const std::string& name);
 
-    const std::unordered_set<Object*>& get_directly_reachable() {
+    const std::vector<Object*>& get_directly_reachable() {
         reachable = {};
         for (auto e: this->table) {
-            reachable.insert(e.second);
+            if (!FLAG_IS_SET(e.second->flags, REACHABLE)) {
+                SET_FLAG(e.second->flags, REACHABLE);
+                reachable.push_back(e.second);
+            }
         }
         if (this->parent != nullptr) {
-            const std::unordered_set<Object*>& parent_reachable = parent->get_directly_reachable();
-            reachable.insert(
-                    parent_reachable.begin(),
-                    parent_reachable.end());
+            const std::vector<Object*>& parent_reachable = parent->get_directly_reachable();
+            reachable.insert(reachable.end(), parent_reachable.begin(), parent_reachable.end());
         }
         return reachable;
     }

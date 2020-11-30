@@ -25,13 +25,15 @@ class StringObject;
 class CodeObject;
 
 class Environment;
-
+#define SET_FLAG(bitfield, flag) bitfield |= flag
+#define UNSET_FLAG(bitfield, flag) bitfield &= ~(flag)
+#define FLAG_IS_SET(bitfield, flag) (bitfield & (flag))
 #define VISITED (1<<7)
 #define INSERTED (1<<6)
 #define IS_USER (1<<5)
 #define IS_INT (1<<4)
 #define IS_LIST (1<<3)
-
+#define REACHABLE (1<<2)
 class Object {
 public:
     uint8_t flags;

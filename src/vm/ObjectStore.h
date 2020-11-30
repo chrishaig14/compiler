@@ -11,9 +11,7 @@
 #include "UserObject.h"
 #include "ListObject.h"
 
-#define SET_FLAG(bitfield, flag) bitfield |= flag
-#define UNSET_FLAG(bitfield, flag) bitfield &= ~(flag)
-#define FLAG_IS_SET(bitfield, flag) (bitfield & (flag))
+
 
 class ObjectStore {
 private:
@@ -23,19 +21,17 @@ public:
         ObjectStore::all_objects.insert(obj);
     }
 
-    static void gc(std::unordered_set<Object*>& root) {
-        std::vector<Object*> new_root;
+    static void gc(const std::vector<Object*>& root) {
         for (auto o: root) {
 //            o->visited = true;
 //            std::cout << "flags: " << (int)o->flags << std::endl;
             SET_FLAG(o->flags, VISITED);
-            new_root.push_back(o);
 //            o->flags |= VISITED;
 //            std::cout << "VISITED: " << (int)VISITED << std::endl;
 //            std::cout << "flags: " << (int)o->flags << std::endl;
 //            assert(FLAG_IS_SET(o->flags, VISITED));
         }
-        ObjectStore::mark(new_root);
+        ObjectStore::mark(root);
         std::unordered_set<Object*> reachable;
         for (auto o: all_objects) {
 //            if (o->visited) {
@@ -52,7 +48,7 @@ public:
         }
     }
 
-    static void mark(std::vector<Object*>& root) {
+    static void mark(const std::vector<Object*>& root) {
         std::vector<Object*> next_root;
         bool any = false;
         for (auto obj: root) {
