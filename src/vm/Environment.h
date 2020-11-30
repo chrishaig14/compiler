@@ -6,6 +6,7 @@
 #define ENVIRONMENT_H
 
 #include <unordered_map>
+#include <unordered_set>
 #include "Object.h"
 
 class Environment {
@@ -13,7 +14,7 @@ class Environment {
 
     Environment* parent;
     std::string id;
-    std::unordered_map<std::string, Object*> reachable;
+    std::unordered_set<Object*> reachable;
 public:
     Environment(const std::string& id, Environment* parent);
 
@@ -27,13 +28,13 @@ public:
 
     Environment* enter(const std::string& name);
 
-    const std::unordered_map<std::string, Object*>& get_directly_reachable() {
+    const std::unordered_set<Object*>& get_directly_reachable() {
         reachable = {};
         for (auto e: this->table) {
-            reachable.insert(std::make_pair(this->id + "::" + e.first, e.second));
+            reachable.insert(e.second);
         }
         if (this->parent != nullptr) {
-            const std::unordered_map<std::string, Object*>& parent_reachable = parent->get_directly_reachable();
+            const std::unordered_set<Object*>& parent_reachable = parent->get_directly_reachable();
             reachable.insert(
                     parent_reachable.begin(),
                     parent_reachable.end());
