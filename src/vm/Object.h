@@ -26,9 +26,21 @@ class CodeObject;
 
 class Environment;
 
+#define VISITED (1<<7)
+#define INSERTED (1<<6)
+#define IS_USER (1<<5)
+#define IS_INT (1<<4)
+#define IS_LIST (1<<3)
+
 class Object {
 public:
-    bool visited;
+    uint8_t flags;
+
+//    bool visited;
+    Object() {
+        this->flags = 0;
+    }
+
     virtual bool equal(const Object* other) const = 0;
 
     virtual Object* sum(const Object* other) const { return nullptr; }

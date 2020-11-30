@@ -11,6 +11,10 @@
 #include "UserObject.h"
 #include "ListObject.h"
 
+#define SET_FLAG(bitfield, flag) bitfield |= flag
+#define UNSET_FLAG(bitfield, flag) bitfield &= ~(flag)
+#define FLAG_IS_SET(bitfield, flag) (bitfield & (flag))
+
 class ObjectStore {
 private:
     static std::unordered_set<Object*> all_objects;
@@ -20,80 +24,67 @@ public:
     }
 
     static void gc(std::unordered_set<Object*>& root) {
+        std::vector<Object*> new_root;
         for (auto o: root) {
-            o->visited = true;
+//            o->visited = true;
+//            std::cout << "flags: " << (int)o->flags << std::endl;
+            SET_FLAG(o->flags, VISITED);
+            new_root.push_back(o);
+//            o->flags |= VISITED;
+//            std::cout << "VISITED: " << (int)VISITED << std::endl;
+//            std::cout << "flags: " << (int)o->flags << std::endl;
+//            assert(FLAG_IS_SET(o->flags, VISITED));
         }
-//    std::cout << "CALLING GARBAGE COLLECTION with root: " << std::endl;
-//    for (auto p: root) {
-//        std::cout << p->to_string() << " POINTER: " << p << std::endl;
-//    }
-//        std::unordered_set<Object*> visited;
-//        ObjectStore::mark(root, visited);
-        ObjectStore::mark(root);
+        ObjectStore::mark(new_root);
         std::unordered_set<Object*> reachable;
         for (auto o: all_objects) {
-            if (o->visited) {
+//            if (o->visited) {
+            if (FLAG_IS_SET(o->flags, VISITED)) {
                 reachable.insert(o);
             } else {
                 delete o;
             }
         }
-//        for (auto e: visited) {
-//            unreachable.erase(e);
-//        }
-//    std::set_difference(
-//            all_objects.begin(),
-//            all_objects.end(),
-//            visited.begin(),
-//            visited.end(),
-//            std::inserter(unreachable, unreachable.end()));
-//        for (auto o: unreachable) {
-//            delete o;
-//        }
-//        all_objects = visited;
-
         all_objects = reachable;
         for (auto o: all_objects) {
-            o->visited = false;
+//            o->visited = false;
+            UNSET_FLAG(o->flags, VISITED);
         }
     }
 
-    static void mark(std::unordered_set<Object*>& root) {
-
-//    static void mark(std::unordered_set<Object*>& root, std::unordered_set<Object*>& visited) {
-        std::unordered_set<Object*> next_root;
+    static void mark(std::vector<Object*>& root) {
+        std::vector<Object*> next_root;
         bool any = false;
         for (auto obj: root) {
-//            visited.insert(obj);
-            obj->visited = true;
-            UserObject* user_obj = dynamic_cast<UserObject*>(obj);
-            ListObject* list_obj = dynamic_cast<ListObject*>(obj);
-            if (user_obj != nullptr) {
+//            obj->visited = true;
+            SET_FLAG(obj->flags, VISITED);
+//            ListObject* list_obj = dynamic_cast<ListObject*>(obj);
+//            UserObject* user_obj = dynamic_cast<UserObject*>(obj);
+//            if (user_obj != nullptr) {
+            if (FLAG_IS_SET(obj->flags, IS_USER)) {
+                UserObject* user_obj = dynamic_cast<UserObject*>(obj);
                 for (auto m: user_obj->fields) {
-                    if (!m.second->visited) {
-                        next_root.insert(m.second);
+//                    if (!m.second->visited) {
+                    if (!FLAG_IS_SET(m.second->flags, VISITED) && !FLAG_IS_SET(m.second->flags, INSERTED)) {
+                        next_root.push_back(m.second);
                         any = true;
                     }
-//                    if (visited.find(m.second) == visited.end()) {
-//                        next_root.insert(m.second);
-//                    }
                 }
-            } else if (list_obj != nullptr) {
+//            } else if (list_obj != nullptr) {
+            } else if (FLAG_IS_SET(obj->flags, IS_LIST)) {
+                ListObject* list_obj = dynamic_cast<ListObject*>(obj);
                 for (auto e: list_obj->list) {
-                    if (!e->visited) {
-                        next_root.insert(e);
+//                    if (!e->visited) {
+                    if (!FLAG_IS_SET(e->flags, VISITED) && !FLAG_IS_SET(e->flags, INSERTED)) {
+                        next_root.push_back(e);
                         any = true;
                     }
-//                    if (visited.find(e) == visited.end()) {
-//                        next_root.insert(e);
-//                    }
                 }
             } else {
 
             }
         }
         if (any) {
-//            ObjectStore::mark(next_root, visited);
             ObjectStore::mark(next_root);
         }
     }
