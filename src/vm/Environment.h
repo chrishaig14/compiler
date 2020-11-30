@@ -30,7 +30,7 @@ public:
 
     const std::vector<Object*>& get_directly_reachable() {
         reachable = {};
-        for (auto e: this->table) {
+        for (auto& e: this->table) {
             if (!FLAG_IS_SET(e.second->flags, REACHABLE)) {
                 SET_FLAG(e.second->flags, REACHABLE);
                 reachable.push_back(e.second);
