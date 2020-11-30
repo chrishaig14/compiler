@@ -22,13 +22,17 @@ void GlobalProcessor::add_builtins(std::vector<Builtin>& builtins) {
 void int_to_str(std::unordered_map<std::string, std::unordered_map<std::string, Code>>& structs, ObjectStack& stack,
                 Environment* global_env) {
     IntegerObject* x = stack.pop_integer();
-    stack.push(new StringObject(std::to_string(x->value)));
+    Object* obj = new StringObject(std::to_string(x->value));
+    ObjectStore::register_object(obj);
+    stack.push(obj);
 }
 
 void float_to_str(std::unordered_map<std::string, std::unordered_map<std::string, Code>>& structs, ObjectStack& stack,
                 Environment* global_env) {
     FloatObject* x = stack.pop_float();
-    stack.push(new StringObject(std::to_string(x->value)));
+    Object* obj = new StringObject(std::to_string(x->value));
+    ObjectStore::register_object(obj);
+    stack.push(obj);
 }
 
 void str_to_str(std::unordered_map<std::string, std::unordered_map<std::string, Code>>& structs, ObjectStack& stack,
