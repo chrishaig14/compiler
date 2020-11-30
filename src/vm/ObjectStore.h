@@ -48,7 +48,7 @@ public:
         all_objects = reachable;
         for (auto o: all_objects) {
 //            o->visited = false;
-            UNSET_FLAG(o->flags, VISITED);
+            UNSET_FLAG(o->flags, VISITED | INSERTED);
         }
     }
 
