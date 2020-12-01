@@ -11,6 +11,9 @@
 
 class Environment {
     std::unordered_map<std::string, Object*> table;
+    std::vector<Object*> variables;
+    std::unordered_map<std::string, int> name_to_index;
+    std::unordered_map<int, std::string> index_to_name;
 
     Environment* parent;
     std::string id;
@@ -19,10 +22,13 @@ public:
     Environment(const std::string& id, Environment* parent);
 
     void set(const std::string& name, Object* value);
+    void set_with_location(const std::string& name, Object* value, VariableLocation location);
+
 
     bool is_declared(const std::string& name);
 
     Object* get(const std::string& name);
+    Object* get_with_location(const std::string& name, VariableLocation location);
 
     void declare(const std::string& name);
 

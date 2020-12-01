@@ -7,6 +7,7 @@
 SymbolTable::SymbolTable(const std::string& name, SymbolTable* parent) {
     this->name = name;
     this->parent = parent;
+    this->ret = nullptr;
 }
 
 bool SymbolTable::has(const std::string& name) {
@@ -20,7 +21,32 @@ bool SymbolTable::has(const std::string& name) {
     }
 }
 
+VariableLocation SymbolTable::find(const std::string& name) {
+    auto it = this->indices.find(name);
+    if (it != this->indices.end()) {
+        int index = it->second;
+        return VariableLocation(0, index);
+    } else {
+        if (this->parent != nullptr) {
+            VariableLocation location = this->parent->find(name);
+            location.depth++;
+            return location;
+        }
+        return VariableLocation(-1, -1);
+    }
+}
+
 const TypeNode& SymbolTable::get(const std::string& name) {
+    if (name == "__return__") {
+        if (this->ret == nullptr) {
+            if (this->parent != nullptr) {
+                return this->parent->get(name);
+            } else {
+                throw std::runtime_error("ERROR: no parent but want __return__");
+            }
+        }
+        return *this->ret;
+    }
     auto it = this->table.find(name);
     if (it != this->table.end()) {
         return *it->second;
@@ -37,10 +63,19 @@ bool SymbolTable::declared(const std::string& name) {
 }
 
 void SymbolTable::set(const std::string& name, const TypeNode& info) {
+    if (name == "__return__") {
+        this->ret = info.clone();
+        return;
+    }
     if (info.kind == Kind::OBJECT) {
         if (info.object().identifier == "Option") {
             this->not_null[name] = false;
         }
+    }
+    auto it = this->table.find(name);
+    if (it == this->table.end()) {
+        // it's new
+        this->indices.insert({name, this->table.size()});
     }
     this->table[name] = info.clone();
 }

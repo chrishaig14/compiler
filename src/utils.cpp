@@ -38,3 +38,18 @@ bool operator==(CodeLabel a, CodeLabel b) {
     }
     return true;
 }
+
+VariableLocation::VariableLocation(int depth, int index) {
+    this->depth = depth;
+    this->index = index;
+}
+
+VariableLocation::VariableLocation(const VariableLocation& other) {
+    this->depth = other.depth;
+    this->index = other.index;
+}
+
+VariableLocation::VariableLocation() {
+    this->depth = -1;
+    this->index = -1;
+}

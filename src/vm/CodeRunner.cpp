@@ -262,7 +262,8 @@ void CodeRunner::visit(DeclareInst& declare) {
 
 void CodeRunner::visit(GetInst& inst) {
     //std::cerr << "Run [" << inst.to_string() << "]" << std::endl;
-    Object* value = this->env->get(inst.identifier);
+//    Object* value = this->env->get(inst.identifier);
+    Object* value = this->env->get_with_location(inst.identifier, inst.location);
     this->stack.push(value);
     this->inst_ptr++;
 }
@@ -338,7 +339,8 @@ void CodeRunner::visit(SetInst& inst) {
     //std::cerr << "Run [" << inst.to_string() << "]" << std::endl;
 
     Object* value = this->stack.pop();
-    this->env->set(inst.identifier, value);
+//    this->env->set(inst.identifier, value);
+    this->env->set_with_location(inst.identifier, value, inst.location);
     this->inst_ptr++;
 }
 

@@ -13,6 +13,17 @@
 
 std::ostream& operator<<(std::ostream& out, const CodeLabel v);
 
+class VariableLocation {
+public:
+    int depth;
+    int index;
+
+    VariableLocation();
+
+    VariableLocation(int depth, int index);
+    VariableLocation(const VariableLocation& other);
+};
+
 template<typename T>
 bool item_in_vec(T item, std::vector<T> vec) {
     return std::find(vec.begin(), vec.end(), item) != vec.end();

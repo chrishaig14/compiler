@@ -9,10 +9,13 @@
 #include <string>
 #include "Instruction.h"
 #include "InstructionVisitor.h"
+#include "../utils.h"
 
 class SetInst : public Instruction {
 public:
     SetInst(const std::string& identifier);
+    SetInst(const std::string& identifier, VariableLocation location);
+    VariableLocation location;
 
     bool equal(const Instruction* inst) const {
         const SetInst* other = dynamic_cast<const SetInst*>(inst);
@@ -25,7 +28,8 @@ public:
     void accept(InstructionVisitor& visitor);
 
     std::string to_string() const {
-        return "SET " + this->identifier;
+        return "SET " + this->identifier + " (D: " + std::to_string(this->location.depth) + " I: " +
+               std::to_string(this->location.index) + ")";
     }
 
     std::string identifier;

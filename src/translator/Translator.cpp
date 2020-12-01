@@ -116,9 +116,9 @@ void Translator::visit(IdNode& node) {
     CodeLabel out;
     if (this->is_lvalue) {
         this->is_lvalue = false;
-        out.push_back(LC("", I_SET(node.identifier)));
+        out.push_back(LC("", new SetInst(node.identifier, node.location)));
     } else {
-        out.push_back(LC("", I_GET(node.identifier)));
+        out.push_back(LC("", new GetInst(node.identifier, node.location)));
     }
     this->code = out;
 }
@@ -480,7 +480,6 @@ void Translator::visit(ClassNode& node) {
     }
     this->code = out;
 }
-
 
 
 void Translator::visit(TupleNode& node) {

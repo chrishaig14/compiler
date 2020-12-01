@@ -9,12 +9,15 @@
 #include <string>
 #include "Instruction.h"
 #include "InstructionVisitor.h"
+#include "../utils.h"
 
 class GetInst : public Instruction {
 public:
     GetInst(const std::string& identifier);
+    GetInst(const std::string& identifier, VariableLocation location);
 
 public:
+    VariableLocation location;
     std::string identifier;
 
     bool equal(const Instruction* inst) const {

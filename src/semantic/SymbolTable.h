@@ -15,9 +15,12 @@
 
 class SymbolTable {
     std::unordered_map<std::string, TypeNode*> table;
+    std::unordered_map<std::string, int> indices;
+    TypeNode* ret;
 public:
     SymbolTable(const std::string& name, SymbolTable* parent);
 
+    VariableLocation find(const std::string& name);
 
     bool has(const std::string& name);
 

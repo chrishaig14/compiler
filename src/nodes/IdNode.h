@@ -10,10 +10,11 @@
 #include "Node.h"
 
 #include "Node.h"
+#include "../semantic/SymbolTable.h"
 
 class IdNode : public Node {
 public:
-
+    VariableLocation location;
     std::string identifier;
 
     IdNode(std::string identifier);

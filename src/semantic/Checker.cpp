@@ -149,6 +149,7 @@ USymbolInfo Checker::visit(IdNode& n) {
         }
     } else {
         symbol_info.set_type(this->scope->get(n.identifier));
+        n.location = this->scope->find(n.identifier);
         if (symbol_info.type().kind == Kind::OBJECT) {
             const ObjectTypeNode& otn = symbol_info.type().object();
             if (otn.identifier == "Option") {
