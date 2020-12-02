@@ -74,14 +74,18 @@ void Loader::load_function(std::string name, CodeLabel code) {
         code_nl.push_back(code[i].second);
     }
     CodeUser* function_object = new CodeUser(code_nl);
-    this->global_env->declare(name);
-    this->global_env->set(name, new CodeObject(function_object));
+    if (name == "main") {
+        this->main = new CodeObject(function_object);
+    } else {
+//        this->global_env->declare(name);
+        this->global_env->set_with_location(name, new CodeObject(function_object), VariableLocation(-2, 0));
+    }
 }
 
 Loader::Loader(CodeLabel allCode, std::vector<std::pair<std::string, CodeBuiltin>>& builtins) : all_code(allCode) {
     this->global_env = new Environment("global", nullptr);
     for (auto b: builtins) {
-        this->global_env->declare(b.first);
-        this->global_env->set(b.first, new CodeObject(b.second));
+//        this->global_env->declare(b.first);
+        this->global_env->set_with_location(b.first, new CodeObject(b.second), VariableLocation(-2, -1));
     }
 }

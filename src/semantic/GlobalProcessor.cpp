@@ -42,6 +42,7 @@ void str_to_str(std::unordered_map<std::string, std::unordered_map<std::string, 
 void print(std::unordered_map<std::string, std::unordered_map<std::string, Code>>& structs, ObjectStack& stack,
            Environment* global_env) {
     StringObject* st = stack.pop_string();
+//    printf("%s\n", st->str.c_str());
     std::cout << "<< " << st->str << std::endl;
 }
 
@@ -143,7 +144,7 @@ GlobalProcessor::GlobalProcessor(std::vector<Builtin>& builtins) {
     auto none = new ObjectTypeNode(".None", {});
     VectorOfTypes w = {at, ft};
     builtins.push_back(
-            {"unordered_map", CodeBuiltin{new FunctionTypeNode(w, new T_LIST(new ObjectTypeNode("b", {}))), list_map}}
+            {"map", CodeBuiltin{new FunctionTypeNode(w, new T_LIST(new ObjectTypeNode("b", {}))), list_map}}
     );
     builtins.push_back({"Integer.str", CodeBuiltin{new FunctionTypeNode({new T_INT}, new T_STRING), int_to_str}});
     builtins.push_back({"Float.str", CodeBuiltin{new FunctionTypeNode({new T_FLOAT}, new T_STRING), float_to_str}});

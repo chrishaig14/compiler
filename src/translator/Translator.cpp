@@ -74,22 +74,22 @@ void Translator::visit(CallNode& node) {
         CodeLabel arg_code = this->code;
         out.insert(out.end(), arg_code.begin(), arg_code.end());
     }
-    out.push_back(LC("", I_GET(node.function->id().identifier)));
+    out.push_back(LC("", new GetInst(node.function->id().identifier, node.function->id().location)));
     out.push_back(LC("", I_CALL));
     this->code = out;
 }
 
 void Translator::visit(DeclarationNode& node) {
     CodeLabel out;
-    if (node.expression->ntype != NodeType::UNINITIALIZED) {
+//    if (node.expression->ntype != NodeType::UNINITIALIZED) {
 
 //    if (node.expression != nullptr) {
 //        node.expression->accept(*this)
-        this->dispatch(node.expression);
-        out = this->code;
-    }
-    out.push_back(LC("", I_DECL(node.identifier)));
-    out.push_back(LC("", I_SET(node.identifier)));
+    this->dispatch(node.expression);
+    out = this->code;
+//    }
+//    out.push_back(LC("", I_DECL(node.identifier)));
+    out.push_back(LC("", new SetInst(node.identifier, VariableLocation(0, -1))));
     this->code = out;
 }
 
@@ -305,6 +305,7 @@ void Translator::visit(ClassLiteralFieldNode& node) {
 }
 
 void Translator::visit(ForNode& node) {
+    return;
     CodeLabel out;
     int loop_number = this->loop_counter;
     this->current_loop = loop_number;

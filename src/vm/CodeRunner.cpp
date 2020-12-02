@@ -12,6 +12,7 @@ CodeRunner::CodeRunner(const Code& code,
                                                                       structs(structs) {
     //std::cerr << "New code runner" << std::endl;
     this->env = new Environment("", global_env);
+    this->env->global = global_env;
     this->global_env = global_env;
     this->inst_ptr = 0;
 }

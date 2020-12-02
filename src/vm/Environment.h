@@ -14,7 +14,6 @@ class Environment {
     std::vector<Object*> variables;
     std::unordered_map<std::string, int> name_to_index;
     std::unordered_map<int, std::string> index_to_name;
-
     Environment* parent;
     std::string id;
     std::vector<Object*> reachable;
@@ -27,7 +26,7 @@ public:
 
     bool is_declared(const std::string& name);
 
-    Object* get(const std::string& name);
+//    Object* get(const std::string& name);
     Object* get_with_location(const std::string& name, VariableLocation location);
 
     void declare(const std::string& name);
@@ -36,10 +35,10 @@ public:
 
     const std::vector<Object*>& get_directly_reachable() {
         reachable = {};
-        for (auto& e: this->table) {
-            if (!FLAG_IS_SET(e.second->flags, REACHABLE)) {
-                SET_FLAG(e.second->flags, REACHABLE);
-                reachable.push_back(e.second);
+        for (auto& e: this->variables) {
+            if (!FLAG_IS_SET(e->flags, REACHABLE)) {
+                SET_FLAG(e->flags, REACHABLE);
+                reachable.push_back(e);
             }
         }
         if (this->parent != nullptr) {
@@ -51,6 +50,7 @@ public:
 
 
     Environment* leave(const std::string& name);
+    Environment* global;
 };
 
 #endif //ENVIRONMENT_H

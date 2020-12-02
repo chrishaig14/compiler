@@ -143,6 +143,7 @@ USymbolInfo Checker::visit(IdNode& n) {
         // it might be a function name
         if (this->function_table->has_function(n.identifier)) {
             symbol_info.is_function = true;
+            n.location = VariableLocation(-2, -1);
             symbol_info.set_type(this->function_table->get(n.identifier));
         } else {
             throw ScopeError(n.identifier);
@@ -741,7 +742,9 @@ USymbolInfo Checker::visit(CallNode& n) {
             throw std::runtime_error("Expected it to be a member node!");
         }
         MemberNode& member_node = n.function->member();
-        n.function = new IdNode(fun_info.class_info->class_name + "." + member_node.s_child);
+        IdNode* pNode = new IdNode(fun_info.class_info->class_name + "." + member_node.s_child);
+        pNode->location = VariableLocation(-2, -1);
+        n.function = pNode;
         this->replace_me = false;
         object_node = member_node.parent;
         is_a_method = true;
@@ -841,8 +844,13 @@ bool Checker::type_exists(TypeNode& type) {
 }
 
 USymbolInfo Checker::visit(BlockNode& program) {
-    for (auto n: program.nodes) {
+    for (auto& n: program.nodes) {
         USymbolInfo sinfo_p = this->dispatch(n);
+        if (this->replace_me) {
+            n = this->replacement;
+            this->replace_me = false;
+            this->replacement = nullptr;
+        }
         SymbolInfo& sinfo = *sinfo_p;
         if (n->ntype == NodeType::CALL) {
             // it's a function call
@@ -1125,12 +1133,38 @@ USymbolInfo Checker::visit(ForNode& node) {
                 "At line " + std::to_string(node.line) + " column " + std::to_string(node.column) +
                 ": For loop should have a List[t] after @ but got " + obj.to_string());
     }
+    this->scope->set(".index0", T_INT);
+    this->scope->set(".list0", T_LIST(new T_INT));
+
+    Node* new_condition = new BoolOpNode(
+            BoolOp::LT,
+            new IdNode(".index0"),
+            new CallNode(new IdNode("List.len"), {new IdNode(".list0")}));
+
+    BlockNode* new_body = new BlockNode({});
+    new_body->nodes.push_back(
+            new DeclarationNode(
+                    node.var,
+                    nullptr,
+                    new SubscriptNode(new IdNode(".list0"), {new IdNode(".index0")}))
+    );
+    new_body->nodes.insert(new_body->nodes.end(), node.body->nodes.begin(), node.body->nodes.end());
+    new_body->nodes.push_back(
+            new AssignmentNode(
+                    new IdNode(".index0"),
+                    new BinopNode(OpType::ADD, new IdNode(".index0"), new NumberNode(1))));
 
     TypeNode& var_type = *obj.type_parameters[0];
     this->enter_scope("for");
     this->scope->set(node.var, var_type);
     this->visit(*node.body);
     this->leave_scope();
+    this->replace_me = true;
+    this->replacement = new BlockNode(
+            {new DeclarationNode(".index0", nullptr, new NumberNode(0)),
+             new DeclarationNode(".list0", nullptr, node.exp),
+             new WhileNode(new_condition, new_body)}
+    );
     return nullptr;
 }
 

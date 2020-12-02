@@ -51,11 +51,11 @@ void compile_and_run(std::string text) {
     ObjectStack stack;
     StructProtos structs;
     CodeLabel translated_code = translator.code;
-    std::cerr << translated_code << std::endl;
+
     Loader loader(translated_code, builtins);
     loader.load();
     Environment* global_env = loader.global_env;
-    CodeObject* main_function = dynamic_cast<CodeObject*>(global_env->get("main"));
+    CodeObject* main_function = dynamic_cast<CodeObject*>(loader.main);
     CodeRunner code_runner(main_function->stuff.user->code, structs, stack, global_env);
     try {
         auto runtime_stopwatch = spdlog::stopwatch();
@@ -63,9 +63,11 @@ void compile_and_run(std::string text) {
         spdlog::get("main")->info("{:<32}\tTotal time: {:03.9f} seconds", "Finished running", runtime_stopwatch);
         auto x = stack;
     } catch (const std::runtime_error& e) {
+        std::cerr << translated_code << std::endl;
         std::cerr << "THERE WAS A RUNTIME ERROR: " << e.what() << std::endl;
         exit(1);
     }
+    std::cerr << translated_code << std::endl;
 }
 
 int main(int argc, char* argv[]) {
