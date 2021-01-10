@@ -24,14 +24,13 @@
 #define L_ERR(x) style(RED,x)
 #define L_HLT(x) style(MAGENTA BOLD, x)
 std::string style(std::string s, std::string str);
-#define E_FMT(x) fmt::format(fmt::fg(fmt::terminal_color::red), "{}", x)
+
+inline std::string E_FMT(const std::string& x) {
+    return fmt::format(fmt::fg(fmt::terminal_color::red), "{}", x);
+}
 
 inline std::string E_HLT(const std::string& x) {
-    return fmt::format(
-            fmt::fg(fmt::terminal_color::bright_magenta),
-            "{}",
-            x
-    );
+    return fmt::format(fmt::fg(fmt::terminal_color::bright_magenta), "{}", x);
 }
 
 #define E_LINE(x) fmt::format(fmt::fg(fmt::terminal_color::white),"{}", x)
