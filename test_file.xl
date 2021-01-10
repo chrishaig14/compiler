@@ -1,0 +1,8 @@
+fun first(x: t, y: u)->t{
+    return x
+}
+
+fun main()->Integer{
+    print(first("Chris", 89))
+    return 0
+}

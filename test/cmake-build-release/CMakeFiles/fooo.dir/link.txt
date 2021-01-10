@@ -1,0 +1,1 @@
+/usr/bin/c++  -O3 -DNDEBUG   CMakeFiles/fooo.dir/fooo.cpp.o  -o fooo  -ltranspiler 

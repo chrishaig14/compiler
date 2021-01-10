@@ -1,0 +1,1 @@
+/usr/bin/c++  -O3 -DNDEBUG   CMakeFiles/env_test.dir/env_test.cpp.o  -o env_test  -lgtest -lgtest_main -lpthread -lsrcLib -lscanner -lnodes -lparser 

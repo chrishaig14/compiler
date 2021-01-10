@@ -1,0 +1,47 @@
+//
+// Created by chris on 2/8/20.
+//
+
+#ifndef CLASSINFO_H
+#define CLASSINFO_H
+
+#include <string>
+#include <unordered_map>
+#include "ObjectInfo.h"
+#include "FunctionInfo.h"
+
+class ClassInfo {
+public:
+    std::vector<std::string> member_names;
+    VectorOfTypes member_types;
+
+    std::unordered_map<std::string, TypeNode*> members;
+    std::unordered_map<std::string, FunctionTypeNode*> methods;
+
+    std::string class_name;
+
+    ClassInfo() {}
+
+    ClassInfo(std::string class_name, const std::vector<std::string>& fieldNames,
+              const VectorOfTypes& fieldTypes, std::vector<std::string> type_parameters);
+
+    ~ClassInfo() {
+        for (auto m: this->members) {
+            delete m.second;
+        }
+        for (auto m: this->methods) {
+            delete m.second;
+        }
+        for (auto m: this->member_types) {
+            delete m;
+        }
+    }
+
+    bool operator!=(const ClassInfo& b) const;
+
+    bool operator==(const ClassInfo& b) const;
+
+    std::vector<std::string> type_parameters;
+};
+
+#endif //CLASSINFO_H

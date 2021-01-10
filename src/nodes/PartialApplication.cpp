@@ -1,0 +1,43 @@
+//
+// Created by chris on 7/12/20.
+//
+
+#include "PartialApplication.h"
+
+
+
+bool PartialApplication::equal(const Node& other) const {
+    const PartialApplication& other_p = other.partial();
+    if ((*(this->function)) != (*(other_p.function))) {
+        return false;
+    }
+    if (this->args.size() != other_p.args.size()) {
+        return false;
+    }
+    for (int i = 0; i < this->args.size(); i++) {
+        if (this->args[i] == nullptr && other_p.args[i] != nullptr) {
+            return false;
+        } else if (this->args[i] != nullptr && other_p.args[i] == nullptr) {
+            return false;
+        } else if (this->args[i] != nullptr && other_p.args[i] != nullptr) {
+            if (*this->args[i] != *other_p.args[i]) {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+PartialApplication::PartialApplication(Node* function, VectorOfNodes args) {
+    this->function = function;
+    this->args = args;
+    this->ntype = PARTIAL;
+}
+
+PartialApplication& PartialApplication::partial() {
+    return *this;
+}
+
+const PartialApplication& PartialApplication::partial() const {
+    return *this;
+}

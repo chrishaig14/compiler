@@ -1,0 +1,27 @@
+//
+// Created by chris on 7/12/20.
+//
+
+#ifndef UNTITLED1_PARTIALAPPLICATION_H
+#define UNTITLED1_PARTIALAPPLICATION_H
+
+#include "../types.h"
+#include "Node.h"
+#include "TypeNode.h"
+
+class PartialApplication : public Node {
+public:
+    Node* function;
+    VectorOfNodes args;
+    FunctionTypeNode* complete_type;
+
+    PartialApplication(Node* function, VectorOfNodes args);
+
+    bool equal(const Node& other) const override;
+    PartialApplication& partial() override;
+    const PartialApplication& partial() const override;
+
+};
+
+
+#endif //UNTITLED1_PARTIALAPPLICATION_H
