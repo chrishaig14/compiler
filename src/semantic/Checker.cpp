@@ -304,6 +304,7 @@ std::string Checker::code_context_string(TextPosition position) {
 }
 
 void Checker::error_binop(const TypeNode& left, const TypeNode& right, TextPosition position) {
+    this->failed = true;
     std::string msg;
     msg = context_string(position) +
           E_FMT(" Cannot perform binary op between types ") + E_HLT(left.to_string()) +
@@ -313,6 +314,7 @@ void Checker::error_binop(const TypeNode& left, const TypeNode& right, TextPosit
 }
 
 void Checker::error_no_member(const TypeNode& t, const std::string& member, TextPosition position) {
+    this->failed = true;
     std::string msg;
     msg =
             context_string(position) +
@@ -323,6 +325,7 @@ void Checker::error_no_member(const TypeNode& t, const std::string& member, Text
 }
 
 void Checker::error_bool_op(const TypeNode& left, const TypeNode& right, TextPosition position) {
+    this->failed = true;
     std::string msg;
     msg = context_string(position) +
           E_FMT(" Cannot perform bool op between types ") + E_HLT(left.to_string()) +
@@ -332,6 +335,7 @@ void Checker::error_bool_op(const TypeNode& left, const TypeNode& right, TextPos
 }
 
 void Checker::error_assignment(const TypeNode& expected, const TypeNode& actual, TextPosition position) {
+    this->failed = true;
     std::string msg;
     msg = context_string(position) +
           E_HLT(actual.to_string()) +
@@ -341,6 +345,7 @@ void Checker::error_assignment(const TypeNode& expected, const TypeNode& actual,
 }
 
 void Checker::error_condition(const TypeNode& t, TextPosition position, const std::string& st) {
+    this->failed = true;
     std::string msg;
     msg = context_string(position) +
           E_FMT(" Expected ") + E_HLT("Boolean ") +
@@ -350,6 +355,7 @@ void Checker::error_condition(const TypeNode& t, TextPosition position, const st
 }
 
 void Checker::error_no_return(const TypeNode& t, TextPosition position) {
+    this->failed = true;
     std::string msg;
     msg = context_string(position) + E_FMT(" Expected to return ") +
           E_HLT(t.to_string()) +
@@ -358,6 +364,7 @@ void Checker::error_no_return(const TypeNode& t, TextPosition position) {
 }
 
 void Checker::error_bad_return(TextPosition position) {
+    this->failed = true;
     std::string msg;
     msg = E_HLT(text_pos_to_string(this->__file__, position)) +
           E_FMT(" Returning a value from a function returning no value ");
@@ -365,6 +372,7 @@ void Checker::error_bad_return(TextPosition position) {
 }
 
 void Checker::error_return_mismatch(const TypeNode& expected, const TypeNode& actual, TextPosition position) {
+    this->failed = true;
     std::string msg;
     msg = E_HLT(text_pos_to_string(this->__file__, position)) +
           E_FMT(" In function ") +
@@ -707,6 +715,9 @@ USymbolInfo Checker::visit(ReturnNode& n) {
     }
     USymbolInfo expression_info_p = this->dispatch(n.expression);
     SymbolInfo& expression_info = *expression_info_p;
+    if (expression_info.is_error) {
+        return nullptr;
+    }
     if (this->replace_me) {
         n.expression = replacement;
         this->replace_me = false;
@@ -1024,6 +1035,7 @@ Checker::get_replacements_in_order(const FunctionTypeNode& function_type, Vector
 
 void
 Checker::error_function_call_type_mismatch(const TypeNode& expected, const TypeNode& actual, TextPosition position) {
+    this->failed = true;
     std::string msg;
     msg = context_string(position) +
           E_FMT(" Function call type mismatch") +
@@ -1033,6 +1045,7 @@ Checker::error_function_call_type_mismatch(const TypeNode& expected, const TypeN
 }
 
 void Checker::error_function_call_num_args(TextPosition position) {
+    this->failed = true;
     std::string msg;
     msg = context_string(position) +
           E_FMT("Calling function with wrong number of arguments ");
@@ -1040,6 +1053,7 @@ void Checker::error_function_call_num_args(TextPosition position) {
 }
 
 void Checker::error_call_not_a_function(TextPosition position) {
+    this->failed = true;
     std::string msg;
     msg = E_HLT(text_pos_to_string(this->__file__, position)) + E_FMT("Calling something that's not a function");
     std::cout << msg << std::endl;
@@ -1437,6 +1451,7 @@ USymbolInfo Checker::visit(ClassLiteralFieldNode& node) {
 }
 
 void Checker::error_for(const TypeNode& t, TextPosition position) {
+    this->failed = true;
     std::string msg;
     msg = E_HLT(text_pos_to_string(this->__file__, position)) +
           E_FMT("Expected") + E_HLT(" List[t] ") +
