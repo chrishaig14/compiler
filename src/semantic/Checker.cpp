@@ -303,6 +303,14 @@ std::string Checker::code_context_string(TextPosition position) {
     return str;
 }
 
+std::string Checker::code_error_string(TextPosition start, TextPosition end) {
+    int length = end.column - start.column + 1;
+    std::string str = "\n" + this->code_lines.get_line(start.line) + "\n";
+    str += fmt::format(fmt::fg(fmt::color::orange_red), std::string(start.column, ' ') + std::string(length, '^'));
+    return str;
+}
+
+
 void Checker::error_binop(const TypeNode& left, const TypeNode& right, TextPosition position) {
     this->failed = true;
     std::string msg;
@@ -1034,13 +1042,14 @@ Checker::get_replacements_in_order(const FunctionTypeNode& function_type, Vector
 }
 
 void
-Checker::error_function_call_type_mismatch(const TypeNode& expected, const TypeNode& actual, TextPosition position) {
+Checker::error_function_call_type_mismatch(const TypeNode& expected, const TypeNode& actual, TextPosition start,
+                                           TextPosition end) {
     this->failed = true;
     std::string msg;
-    msg = context_string(position) +
+    msg = context_string(start) +
           E_FMT(" Function call type mismatch") +
           E_FMT(" expected ") + E_HLT(expected.to_string()) + E_FMT(" but got ") + E_HLT(actual.to_string()) +
-          this->code_context_string(position);
+          this->code_error_string(start, end);
     std::cout << msg << std::endl;
 }
 
@@ -1119,7 +1128,12 @@ USymbolInfo Checker::visit(CallNode& n) {
                 const TypeNode& arg_type = *arg_types[i];
                 const TypeNode& param_type = *function_type.parameter_types[i];
                 if (arg_type != param_type) {
-                    this->error_function_call_type_mismatch(param_type, arg_type, n.start);
+                    this->error_function_call_type_mismatch(
+                            param_type,
+                            arg_type,
+                            n.arguments[i]->start,
+                            n.arguments[i]->end
+                    );
                     return std::make_unique<SymbolInfo>(retv);
                 }
             }

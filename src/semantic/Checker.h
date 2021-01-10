@@ -62,7 +62,7 @@ public:
     void error_for(const TypeNode& t, TextPosition position);
     void error_function_call_num_args(TextPosition position);
     void
-    error_function_call_type_mismatch(const TypeNode& expected, const TypeNode& actual, TextPosition position);
+    error_function_call_type_mismatch(const TypeNode& expected, const TypeNode& actual, TextPosition start, TextPosition end);
     void error_no_member(const TypeNode& t, const std::string& member, TextPosition position);
     void error_no_return(const TypeNode& t, TextPosition position);
     void error_return_mismatch(const TypeNode& expected, const TypeNode& actual, TextPosition position);
@@ -106,6 +106,7 @@ public:
     std::string context_string(TextPosition position);
     CodeLines code_lines;
     std::string code_context_string(TextPosition position);
+    std::string code_error_string(TextPosition start, TextPosition end);
 };
 
 #endif //CHECKER_H

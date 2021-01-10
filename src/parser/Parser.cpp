@@ -359,6 +359,7 @@ Node* Parser::parse_id_or_literal() {
         }
         case TokType::NUM: {
             node = new NumberNode(this->token.num, this->token.start);
+            node->end = this->token.end_pos;
             this->next();
             break;
         }
@@ -369,6 +370,7 @@ Node* Parser::parse_id_or_literal() {
         }
         case TokType::STRING: {
             node = new StringNode(this->token.str, this->token.start);
+            node->end = this->token.end_pos;
             this->next();
             break;
         }
