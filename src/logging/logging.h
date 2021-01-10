@@ -1,0 +1,38 @@
+//
+// Created by chris on 27/12/20.
+//
+
+#ifndef UNTITLED1_LOGGING_H
+#define UNTITLED1_LOGGING_H
+
+#include <string>
+#include <fmt/core.h>
+#include <fmt/format.h>
+#include <fmt/color.h>
+
+#define BLACK "\033[30m"
+#define RED "\033[31m"
+#define GREEN "\033[32m"
+#define YELLOW "\033[33m"
+#define BLUE "\033[34m"
+#define MAGENTA "\033[35m"
+#define CYAN "\033[36m"
+#define WHITE "\033[37m"
+#define RESET "\033[0m"
+
+#define BOLD "\033[1m"
+#define L_ERR(x) style(RED,x)
+#define L_HLT(x) style(MAGENTA BOLD, x)
+std::string style(std::string s, std::string str);
+#define E_FMT(x) fmt::format(fmt::fg(fmt::terminal_color::red), "{}", x)
+
+inline std::string E_HLT(const std::string& x) {
+    return fmt::format(
+            fmt::fg(fmt::terminal_color::bright_magenta),
+            "{}",
+            x
+    );
+}
+
+#define E_LINE(x) fmt::format(fmt::fg(fmt::terminal_color::white),"{}", x)
+#endif //UNTITLED1_LOGGING_H

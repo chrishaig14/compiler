@@ -17,6 +17,15 @@ BlockNode* get_ast(std::string text) {
 
 void compile(std::string text) {
     BlockNode* tree = get_ast(text);
+    std::vector <std::pair<std::string, CodeBuiltin>> builtins;
+    GlobalProcessor gp(builtins);
+    gp.visit(*tree);
+    Checker checker(gp.globals, gp.class_table, gp.function_table);
+    checker.visit(*tree);
+}
+
+void compile(std::string text) {
+    BlockNode* tree = get_ast(text);
     std::vector<std::pair<std::string, CodeBuiltin>> builtins;
     GlobalProcessor gp(builtins);
     gp.visit(*tree);
@@ -111,4 +120,12 @@ TEST_F(global_test, test_already_declared_error) {
     } catch (...) {
 
     }
+}
+
+BlockNode* get_ast(std::string text) {
+    Scanner scanner(text);
+    std::vector <Token> tokens = scanner.scan_all();
+    Parser parser(tokens);
+    BlockNode* tree = parser.parse_program();
+    return tree;
 }

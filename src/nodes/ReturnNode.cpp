@@ -4,7 +4,7 @@
 
 #include "ReturnNode.h"
 
-ReturnNode::ReturnNode(Node* expression) : expression(expression) { this->ntype = RETRN; }
+ReturnNode::ReturnNode(Node* expression, TextPosition start) : expression(expression) { this->ntype = RETRN; this->start = start;}
 
 bool ReturnNode::equal(const Node& x) const {
     return *x.retrn().expression == *this->expression;

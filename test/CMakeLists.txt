@@ -3,13 +3,20 @@ project(untitled_test)
 include_directories(../src)
 set(CMAKE_CXX_STANDARD 14)
 
+add_library(utils_test utils_test.cpp utils_test.h)
+
+
 add_executable(scanner_test
         scanner_test.cpp)
 target_link_libraries(scanner_test gtest gtest_main pthread scanner)
 
 add_executable(checker_test
         checker_test.cpp node_equals.cpp)
-target_link_libraries(checker_test gtest gtest_main pthread scanner parser srcLib nodes)
+target_link_libraries(checker_test gtest gtest_main utils_test pthread scanner parser srcLib nodes )
+
+add_executable(generic_test
+        generic_test.cpp)
+target_link_libraries(generic_test gtest gtest_main utils_test pthread scanner parser srcLib nodes )
 
 add_executable(global_processor_test
         global_processor_test.cpp)
@@ -31,6 +38,11 @@ add_executable(translator_test
         translator_test.cpp)
 target_link_libraries(translator_test gtest gtest_main pthread srcLib scanner nodes parser)
 
-add_executable(test_all
-        scanner_test.cpp parser_test.cpp checker_test.cpp)
-target_link_libraries(test_all gtest gtest_main pthread srcLib scanner parser srcLib nodes)
+
+add_executable(fooo fooo.cpp)
+target_link_libraries(fooo transpiler)
+
+add_executable(transpiler_test
+        transpiler_test.cpp)
+target_link_libraries(transpiler_test gtest gtest_main pthread srcLib utils_test parser nodes scanner fuck)
+

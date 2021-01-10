@@ -17,7 +17,7 @@ class FunctionTable {
 
 public:
 
-    void add(std::string function_name, FunctionTypeNode& function_type);
+    void add(std::string function_name, const FunctionTypeNode& function_type);
 
     bool has_function(std::string name);
 
@@ -40,8 +40,8 @@ public:
     FunctionTable* function_table;
 
     GlobalProcessor();
-
-    GlobalProcessor(std::vector<Builtin>& builtins);
+    GlobalProcessor(std::vector<Builtin>& builtins, ClassTable* imported_classes,
+                                     FunctionTable* imported_functions);
 
     void add_builtins(std::vector<Builtin>& builtins);
 
@@ -53,6 +53,7 @@ public:
 
     void visit(ClassNode& node);
 
+    std::string __file__;
 };
 
 #endif //GLOBALPROCESSOR_H

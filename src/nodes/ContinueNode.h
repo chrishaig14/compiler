@@ -11,7 +11,10 @@
 
 class ContinueNode : public Node {
 public:
+    ContinueNode();
     bool equal(const Node& other) const override;
+    ContinueNode& cntinue() override;
+    const ContinueNode& cntinue() const override;
 };
 
 

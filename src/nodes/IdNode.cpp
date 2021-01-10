@@ -4,7 +4,10 @@
 
 #include "IdNode.h"
 
-IdNode::IdNode(std::string identifier) : identifier(identifier) { this->ntype = ID; }
+IdNode::IdNode(std::string identifier) : identifier(identifier) {
+    this->ntype = ID;
+    this->is_global_function = false;
+}
 
 
 bool IdNode::equal(const Node& x) const {
@@ -25,7 +28,7 @@ json IdNode::to_json() const {
     json j;
     j["node"] = "id";
     j["id"] = this->identifier;
-    j["start"] = this->start;
-    j["end"] = this->end;
+    // j["start"] = this->start;
+    // j["end"] = this->end;
     return j;
 }

@@ -15,7 +15,9 @@ class StringNode : public Node {
 public:
     std::string str;
 
-    StringNode(std::string str);
+    StringNode(std::string str) : StringNode(str, {-1, -1}) {}
+
+    StringNode(std::string str, TextPosition start);
     bool equal(const Node& x) const override;
 
     json to_json() const override;

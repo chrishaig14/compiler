@@ -8,3 +8,15 @@ bool ContinueNode::equal(const Node& other) const {
     return true;
 }
 
+ContinueNode& ContinueNode::cntinue() {
+    return *this;
+}
+
+const ContinueNode& ContinueNode::cntinue() const {
+    return *this;
+}
+
+ContinueNode::ContinueNode() {
+    this->ntype = CNTINUE;
+}
+

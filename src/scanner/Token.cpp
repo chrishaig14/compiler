@@ -6,31 +6,28 @@
 
 std::unordered_map<TokType, std::string> TOKEN_STRINGS;
 
-Token::Token(TokType type, std::string str, int line, int column) {
+Token::Token(TokType type, std::string str, TextPosition start) {
     this->type = type;
     this->str = str;
     this->num = 0;
-    this->line = line;
-    this->column = column;
+    this->start = start;
     this->flot = 0.0f;
 }
 
-Token::Token(TokType type, int num, int line, int column) {
+Token::Token(TokType type, int num, TextPosition start) {
     this->type = type;
     this->num = num;
     this->str = "";
-    this->line = line;
-    this->column = column;
+    this->start = start;
     this->flot = 0.0f;
 }
 
-Token::Token(TokType type, float flot, int line, int column) {
+Token::Token(TokType type, float flot, TextPosition start) {
     this->type = type;
     this->num = 0;
     this->flot = flot;
     this->str = "";
-    this->line = line;
-    this->column = column;
+    this->start = start;
 }
 
 std::string Token::to_string() {
@@ -43,22 +40,20 @@ std::string Token::to_string() {
     return st;
 }
 
-Token::Token(TokType type, int line, int column) {
+Token::Token(TokType type, TextPosition start) {
     this->type = type;
     this->num = 0;
     this->str = "";
-    this->line = line;
-    this->column = column;
+    this->start = start;
 }
 
 bool Token::operator==(const Token& other) const {
-    return this->type == other.type && this->str == other.str && this->num == other.num && this->line == other.line &&
-           this->column == other.column;
+    return this->type == other.type && this->str == other.str && this->num == other.num && this->start == other.start;
 }
 
 std::ostream& operator<<(std::ostream& os, const Token& token) {
-    os << TOKEN_STRINGS[token.type] << ", num: " << token.num << ", str: " << token.str << " pos: l" << token.line
-       << ":c" << token.column;
+    os << TOKEN_STRINGS[token.type] << ", num: " << token.num << ", str: " << token.str << " pos: l" << token.start.line
+       << ":c" << token.start.column;
     return os;
 }
 
@@ -67,11 +62,16 @@ Token::Token() {
     this->str = "";
 }
 
+std::string Token::pos_string() {
+    return std::to_string(this->start.line + 1) + ":" + std::to_string(this->start.column + 1);
+}
+
 
 void initialize_token_strings() {
     TOKEN_STRINGS[TokType::COMMA] = "comma ( , )";
     TOKEN_STRINGS[TokType::BREAK] = "break";
     TOKEN_STRINGS[TokType::CONTINUE] = "continue";
+    TOKEN_STRINGS[TokType::DOLLAR_SIGN] = "dollar sign ( $ )";
     TOKEN_STRINGS[TokType::DOT] = "dot ( . )";
     TOKEN_STRINGS[TokType::SEMICOLON] = "semicolon ( ; )";
     TOKEN_STRINGS[TokType::COLON] = "colon ( : )";
@@ -127,4 +127,6 @@ void initialize_token_strings() {
     TOKEN_STRINGS[TokType::TRUE] = "true";
     TOKEN_STRINGS[TokType::FALSE] = "false";
     TOKEN_STRINGS[TokType::NONE] = "none";
+    TOKEN_STRINGS[TokType::FROM] = "from";
+    TOKEN_STRINGS[TokType::IMPORT] = "import";
 }

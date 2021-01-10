@@ -9,11 +9,13 @@
 #include "Node.h"
 
 #include "Node.h"
+#include "TypeNode.h"
 
 class AssignmentNode : public Node {
 public:
     Node* lvalue;
     Node* rvalue;
+    TypeNode* type;
 
     AssignmentNode& assign() override { return *this; }
 

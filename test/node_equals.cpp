@@ -38,8 +38,8 @@ TEST(node_test, strng) {
 
 
 TEST(node_test, boolean) {
-    EXPECT_EQ(BooleanNode(true), BooleanNode(true));
-    EXPECT_NE(BooleanNode(true), BooleanNode(false));
+    EXPECT_EQ(BooleanNode(true, TextPosition()), BooleanNode(true, TextPosition()));
+    EXPECT_NE(BooleanNode(true, TextPosition()), BooleanNode(false, TextPosition()));
 }
 
 

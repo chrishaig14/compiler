@@ -3,6 +3,7 @@
 //
 
 #include "UnexpectedToken.h"
+#include "../logging/logging.h"
 
 UnexpectedToken::UnexpectedToken(Token token, const std::vector<TokType>& expected_tokens) : std::runtime_error(
         this->make_message(token, expected_tokens)) {
@@ -23,9 +24,9 @@ std::string UnexpectedToken::make_message(Token token, const std::vector<TokType
     } else {
         expected_strings += TOKEN_STRINGS[expected_tokens[0]];
     }
-    message = "UnexpectedToken at line " + std::to_string(token.line + 1) + " column " +
-              std::to_string(token.column + 1) +
-              ": got " + token.to_string() + ", expected " + expected_strings;
+    message = L_ERR("Unexpected token at line ") + L_HLT(std::to_string(token.start.line + 1)) + L_ERR(" column ") +
+              L_HLT(std::to_string(token.start.column + 1)) +
+              L_ERR(": got ") + L_HLT(token.to_string()) + L_ERR(", expected ") + L_HLT(expected_strings);
     return message;
 }
 

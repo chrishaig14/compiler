@@ -3,17 +3,19 @@ project(untitled1)
 
 set(CMAKE_CXX_STANDARD 14)
 
-add_library(scanner scanner/Scanner.cpp
-        scanner/Scanner.h
-        scanner/Token.cpp
-        scanner/Token.h)
+add_library(tinyxml tinyxml/tinyxml2.cpp tinyxml/tinyxml2.h)
 
-add_library(nodes
+add_library(scanner scanner/Scanner.cpp scanner/Scanner.h scanner/Token.cpp
+        scanner/Token.h scanner/CodeLines.cpp scanner/CodeLines.h scanner/TextPosition.cpp scanner/TextPosition.h)
+
+add_library(
+        nodes
         nodes/ReturnNode.cpp
         nodes/ReturnNode.h
         nodes/StringNode.cpp
         nodes/StringNode.h
-        nodes/BreakNode.cpp nodes/BreakNode.h
+        nodes/BreakNode.cpp
+        nodes/BreakNode.h
         nodes/BinopNode.cpp
         nodes/BinopNode.h
         nodes/Node.cpp
@@ -34,10 +36,16 @@ add_library(nodes
         nodes/TypeNode.cpp
         nodes/TypeNode.h
         nodes/IfNode.cpp
-        nodes/TernaryNode.cpp nodes/TernaryNode.h nodes/NoneNode.cpp nodes/NoneNode.h
+        nodes/TernaryNode.cpp
+        nodes/TernaryNode.h
+        nodes/NoneNode.cpp
+        nodes/NoneNode.h
         nodes/IfNode.h
+        nodes/ImportNode.h
+        nodes/ImportNode.cpp
         nodes/IdNode.cpp
-        nodes/ClassNode.cpp nodes/ClassNode.h
+        nodes/ClassNode.cpp
+        nodes/ClassNode.h
         nodes/IdNode.h
         nodes/NumberNode.cpp
         nodes/NumberNode.h
@@ -51,22 +59,34 @@ add_library(nodes
         nodes/EmptyListNode.h
         nodes/ClassLiteralFieldNode.cpp
         nodes/ClassLiteralFieldNode.h
-        nodes/BooleanNode.cpp nodes/BooleanNode.h nodes/WhileNode.cpp nodes/WhileNode.h
-        nodes/ContinueNode.cpp nodes/ContinueNode.h nodes/Node.cpp nodes/Node.h
-        nodes/ForNode.cpp nodes/ForNode.h
-        nodes/optypes.h nodes/optypes.cpp nodes/TupleNode.cpp nodes/TupleNode.h nodes/FloatNode.cpp nodes/FloatNode.h nodes/BoolOpNode.cpp nodes/BoolOpNode.h)
+        nodes/BooleanNode.cpp
+        nodes/BooleanNode.h
+        nodes/WhileNode.cpp
+        nodes/WhileNode.h
+        nodes/ContinueNode.cpp
+        nodes/ContinueNode.h
+        nodes/Node.cpp
+        nodes/Node.h
+        nodes/ForNode.cpp
+        nodes/ForNode.h
+        nodes/optypes.h
+        nodes/optypes.cpp
+        nodes/TupleNode.cpp
+        nodes/TupleNode.h
+        nodes/FloatNode.cpp
+        nodes/FloatNode.h
+        nodes/BoolOpNode.cpp
+        nodes/BoolOpNode.h
+        nodes/PartialApplication.cpp
+        nodes/PartialApplication.h)
 
-add_library(parser parser/Parser.cpp
-        parser/Parser.h
-        parser/UnexpectedToken.cpp
-        parser/UnexpectedToken.h
-        )
+add_library(parser parser/Parser.cpp parser/Parser.h parser/UnexpectedToken.cpp
+        parser/UnexpectedToken.h)
 
-add_library(translator translator/Translator.cpp
-        translator/Translator.h)
-add_library(srcLib
-        color_codes.h
-
+add_library(translator translator/Translator.cpp translator/Translator.h)
+add_library(
+        srcLib
+        logging/logging.cpp
         semantic/ClassTable.cpp
         semantic/ClassTable.h
         semantic/SymbolTable.cpp
@@ -92,7 +112,6 @@ add_library(srcLib
         semantic/ReturnError.h
         semantic/ScopeError.cpp
         semantic/ScopeError.h
-
         instructions/GetInst.cpp
         instructions/GetInst.h
         instructions/SetInst.cpp
@@ -156,11 +175,56 @@ add_library(srcLib
         vm/BooleanObject.h
         instructions/MakeClassInst.cpp
         instructions/MakeClassInst.h
-
-
         instructions/DefineStructInst.cpp
         instructions/DefineStructInst.h
         instructions/MakeDefaultInst.cpp
         instructions/MakeDefaultInst.h
-        semantic/AssignmentTypeError.cpp semantic/AssignmentTypeError.h instructions/JumpInst.cpp instructions/JumpInst.h instructions/EnterScope.cpp instructions/EnterScope.h instructions/LeaveScope.cpp instructions/LeaveScope.h vm/LabelledCode.cpp vm/LabelledCode.h instructions/NopInst.cpp instructions/NopInst.h vm/Loader.cpp vm/Loader.h instructions/StartFunction.cpp instructions/StartFunction.h instructions/EndFunction.cpp instructions/EndFunction.h instructions/JumpIfNone.cpp instructions/JumpIfNone.h vm/NoneObject.cpp vm/NoneObject.h instructions/PushNone.cpp instructions/PushNone.h semantic/TypeClassInfo.cpp semantic/TypeClassInfo.h run.h run.cpp instructions/PopInst.cpp instructions/PopInst.h nodes/node_types.h types.h macros.h instructions/GetTupleMemberInst.cpp instructions/GetTupleMemberInst.h vm/TupleObject.cpp vm/TupleObject.h instructions/MakeTupleInst.cpp instructions/MakeTupleInst.h instructions/BoolOpInst.cpp instructions/BoolOpInst.h vm/FloatObject.cpp vm/FloatObject.h instructions/PushFloatInst.cpp instructions/PushFloatInst.h vm/ObjectStore.cpp vm/ObjectStore.h)
+        instructions/JumpInst.cpp
+        instructions/JumpInst.h
+        instructions/EnterScope.cpp
+        instructions/EnterScope.h
+        instructions/LeaveScope.cpp
+        instructions/LeaveScope.h
+        vm/LabelledCode.cpp
+        vm/LabelledCode.h
+        instructions/NopInst.cpp
+        instructions/NopInst.h
+        vm/Loader.cpp
+        vm/Loader.h
+        instructions/StartFunction.cpp
+        instructions/StartFunction.h
+        instructions/EndFunction.cpp
+        instructions/EndFunction.h
+        instructions/JumpIfNone.cpp
+        instructions/JumpIfNone.h
+        vm/NoneObject.cpp
+        vm/NoneObject.h
+        instructions/PushNone.cpp
+        instructions/PushNone.h
+        semantic/TypeClassInfo.cpp
+        semantic/TypeClassInfo.h
+        run.h
+        run.cpp
+        instructions/PopInst.cpp
+        instructions/PopInst.h
+        nodes/node_types.h
+        types.h
+        macros.h
+        instructions/GetTupleMemberInst.cpp
+        instructions/GetTupleMemberInst.h
+        vm/TupleObject.cpp
+        vm/TupleObject.h
+        instructions/MakeTupleInst.cpp
+        instructions/MakeTupleInst.h
+        instructions/BoolOpInst.cpp
+        instructions/BoolOpInst.h
+        vm/FloatObject.cpp
+        vm/FloatObject.h
+        instructions/PushFloatInst.cpp
+        instructions/PushFloatInst.h
+        vm/ObjectStore.cpp
+        vm/ObjectStore.h
+        semantic/unify.cpp
+        semantic/unify.h)
 
+add_library(transpiler transpiler/Transpiler.cpp transpiler/Transpiler.h)

@@ -28,6 +28,7 @@ public:
     CallNode& call() override;
     const CallNode& call() const override;
 
+    VectorOfTypes ftype;
 };
 
 

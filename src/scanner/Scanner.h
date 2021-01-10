@@ -8,6 +8,7 @@
 
 #include <string>
 #include "Token.h"
+#include "CodeLines.h"
 
 #include <vector>
 
@@ -49,6 +50,8 @@ public:
     Token token;
 
     Token next_token();
+    CodeLines code_lines;
+    std::string __file__;
 };
 
 

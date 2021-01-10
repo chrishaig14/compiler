@@ -4,7 +4,11 @@
 
 #include "BinopNode.h"
 
-BinopNode::BinopNode(OpType op, Node* left, Node* right) : left(left), right(right), op(op) { this->ntype = BINOP; }
+BinopNode::BinopNode(OpType op, Node* left, Node* right, TextPosition start)
+        : left(left), right(right), op(op) {
+    this->ntype = BINOP;
+    this->start = start;
+}
 
 bool BinopNode::equal(const Node& x) const {
     auto& other = x.binop();

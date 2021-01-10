@@ -1,0 +1,9 @@
+from lib import first
+
+class Person {
+    name: String
+}
+
+fun foo(x:Person, f: fun(I)->A){
+    var name = x.age
+}

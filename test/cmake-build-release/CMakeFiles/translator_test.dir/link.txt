@@ -1,0 +1,1 @@
+/usr/bin/c++  -O3 -DNDEBUG   CMakeFiles/translator_test.dir/translator_test.cpp.o  -o translator_test  -lgtest -lgtest_main -lpthread -lsrcLib -lscanner -lnodes -lparser 

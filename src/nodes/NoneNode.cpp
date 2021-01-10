@@ -8,3 +8,15 @@ bool NoneNode::equal(const Node& other) const {
     return true;
 }
 
+NoneNode& NoneNode::none() {
+    return *this;
+}
+
+const NoneNode& NoneNode::none() const {
+    return *this;
+}
+
+NoneNode::NoneNode() {
+    this->ntype = NONE;
+}
+

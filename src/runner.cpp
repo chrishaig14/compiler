@@ -7,10 +7,7 @@
 #include "translator/Translator.h"
 #include "vm/Loader.h"
 #include "vm/CodeRunner.h"
-#include <spdlog/spdlog.h>
-#include <spdlog/sinks/stdout_color_sinks.h>
 #include <chrono>
-#include <spdlog/stopwatch.h>
 
 void compile_and_run(std::string text) {
     Scanner scanner(text);
@@ -22,9 +19,7 @@ void compile_and_run(std::string text) {
     Parser parser(tokens);
     BlockNode* program;
     try {
-        auto parse_stopwatch = spdlog::stopwatch();
         program = parser.parse_program();
-        spdlog::get("main")->info("{:<32}\tTotal time: {:03.9f} seconds", "Finished parsing", parse_stopwatch);
     } catch (const UnexpectedToken& ut) {
         std::cerr << ut.what() << std::endl;
         exit(1);
@@ -33,17 +28,13 @@ void compile_and_run(std::string text) {
     Translator translator;
 
     try {
-        auto check_stopwatch = spdlog::stopwatch();
         GlobalProcessor gp(builtins);
         gp.visit(*program);
         Checker checker(gp.globals, gp.class_table, gp.function_table);
         checker.visit(*program);
         auto end = std::chrono::steady_clock::now();
-        spdlog::get("main")->info("{:<32}\tTotal time: {:03.9f} seconds", "Finished checking", check_stopwatch);
 //        program->accept(translator);
-        auto translate_stopwatch = spdlog::stopwatch();
         translator.visit(*program);
-        spdlog::get("main")->info("{:<32}\tTotal time: {:03.9f} seconds", "Finished translating", translate_stopwatch);
     } catch (const std::runtime_error& e) {
         std::cerr << "THERE WAS A SEMANTIC ERROR: " << e.what() << std::endl;
         exit(1);
@@ -51,16 +42,14 @@ void compile_and_run(std::string text) {
     ObjectStack stack;
     StructProtos structs;
     CodeLabel translated_code = translator.code;
-
+    std::cerr << translated_code << std::endl;
     Loader loader(translated_code, builtins);
     loader.load();
     Environment* global_env = loader.global_env;
     CodeObject* main_function = dynamic_cast<CodeObject*>(loader.main);
     CodeRunner code_runner(main_function->stuff.user->code, structs, stack, global_env);
     try {
-        auto runtime_stopwatch = spdlog::stopwatch();
         code_runner.run();
-        spdlog::get("main")->info("{:<32}\tTotal time: {:03.9f} seconds", "Finished running", runtime_stopwatch);
         auto x = stack;
     } catch (const std::runtime_error& e) {
         std::cerr << translated_code << std::endl;
@@ -81,7 +70,5 @@ int main(int argc, char* argv[]) {
     std::stringstream sstream;
     sstream << file.rdbuf();
     std::string text = sstream.str();
-    spdlog::set_level(spdlog::level::debug);
-    spdlog::stdout_color_mt("main");
     compile_and_run(text);
 }

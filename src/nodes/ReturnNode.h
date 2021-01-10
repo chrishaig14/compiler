@@ -12,7 +12,9 @@
 
 class ReturnNode : public Node {
 public:
-    explicit ReturnNode(Node* expression);
+    explicit ReturnNode(Node* expression, TextPosition start);
+
+    explicit ReturnNode(Node* expression) : ReturnNode(expression, {-1, -1}) {}
 
     bool equal(const Node& other) const;
 

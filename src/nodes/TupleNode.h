@@ -11,6 +11,7 @@
 
 class TupleNode : public Node {
 public:
+    int tuple_index;
     VectorOfNodes values;
     bool equal(const Node& other) const override;
 

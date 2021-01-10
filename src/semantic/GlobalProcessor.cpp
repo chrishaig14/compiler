@@ -11,6 +11,7 @@
 #include "../vm/CodeRunner.h"
 #include "../macros.h"
 #include "../nodes/FunctionNode.h"
+#include "../logging/logging.h"
 
 void GlobalProcessor::add_builtins(std::vector<Builtin>& builtins) {
     for (int i = 0; i < builtins.size(); i++) {
@@ -28,7 +29,7 @@ void int_to_str(std::unordered_map<std::string, std::unordered_map<std::string, 
 }
 
 void float_to_str(std::unordered_map<std::string, std::unordered_map<std::string, Code>>& structs, ObjectStack& stack,
-                Environment* global_env) {
+                  Environment* global_env) {
     FloatObject* x = stack.pop_float();
     Object* obj = new StringObject(std::to_string(x->value));
     ObjectStore::register_object(obj);
@@ -135,10 +136,11 @@ void list_map(std::unordered_map<std::string, std::unordered_map<std::string, Co
     stack.push(new ListObject(rv));
 }
 
-GlobalProcessor::GlobalProcessor(std::vector<Builtin>& builtins) {
-    this->function_table = new FunctionTable();
+GlobalProcessor::GlobalProcessor(std::vector<Builtin>& builtins, ClassTable* imported_classes,
+                                 FunctionTable* imported_functions) {
+    this->function_table = imported_functions;
     this->globals = new SymbolTable("global", nullptr);
-    this->class_table = new ClassTable();
+    this->class_table = imported_classes;
     auto ft = FUNCTION_TYPE({ new ObjectTypeNode("a", {}) }, new ObjectTypeNode("b", {}));
     auto at = new T_LIST(new ObjectTypeNode("a", {}));
     auto none = new ObjectTypeNode(".None", {});
@@ -198,7 +200,12 @@ void GlobalProcessor::visit(FunctionNode& node) {
     }
     FunctionTypeNode function_info(x, node.return_type->clone());
     if (this->class_table->declared(node.identifier) || this->function_table->has_function(node.identifier)) {
-        throw std::runtime_error("Error " + node.identifier + " already declared!");
+        std::string msg;
+        msg = E_FMT("Name ") + E_HLT(node.identifier) + E_FMT(" already declared at ") +
+              E_HLT(text_pos_to_string(this->__file__, node.start));
+        std::cout << msg << std::endl;
+        exit(1);
+        // throw std::runtime_error("Error " + node.identifier + " already declared!");
     }
     this->function_table->add(node.identifier, function_info);
     node.identifier = node.identifier;
@@ -230,7 +237,11 @@ void GlobalProcessor::visit(ClassNode& node) {
     class_info->class_name = node.class_name;
     class_info->type_parameters = node.type_parameters;
     if (this->class_table->declared(node.class_name) || this->function_table->has_function(node.class_name)) {
-        throw std::runtime_error("Error " + node.class_name + " already declared!");
+        std::string msg;
+        msg = E_FMT("Name ") + E_HLT(node.class_name) + E_FMT(" already declared at ") +
+              E_HLT(text_pos_to_string(this->__file__, node.start));
+        std::cout << msg << std::endl;
+        exit(1);
     }
     this->class_table->set(node.class_name, class_info);
 }
@@ -252,7 +263,7 @@ const FunctionTypeNode& FunctionTable::get(std::string function_name) {
     return *functions.find(function_name)->second;
 }
 
-void FunctionTable::add(std::string function_name, FunctionTypeNode& function_type) {
+void FunctionTable::add(std::string function_name, const FunctionTypeNode& function_type) {
     if (functions.find(function_name) == functions.end()) {
         functions.insert(std::make_pair(function_name, function_type.clone()));
     } else {

@@ -14,12 +14,14 @@
 #include <iostream>
 
 enum class Kind {
-    OBJECT, FUNCTION
+    OBJECT, FUNCTION, UNKNOWN
 };
 
 class ObjectTypeNode;
 
 class FunctionTypeNode;
+
+class UnknownTypeNode;
 
 class TypeNode {
 public:
@@ -70,6 +72,24 @@ public:
     VectorOfTypes type_parameters;
 };
 
+class UnknownTypeNode : public TypeNode {
+public:
+    UnknownTypeNode() {
+        this->kind = Kind::UNKNOWN;
+    }
+
+    std::string to_string() const override {
+        return std::string();
+    }
+
+    bool equal(const TypeNode& other) const override {
+        return false;
+    }
+
+    TypeNode* clone() const override {
+        return new UnknownTypeNode();
+    }
+};
 
 class FunctionTypeNode : public TypeNode {
 public:

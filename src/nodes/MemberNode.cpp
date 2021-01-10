@@ -4,14 +4,16 @@
 
 #include "MemberNode.h"
 
-MemberNode::MemberNode(Node* parent, const std::string& child) : parent(parent), s_child(child) {
+MemberNode::MemberNode(Node* parent, const std::string& child, TextPosition start) : parent(parent), s_child(child) {
     this->ntype = MEMBER;
     this->type = MemberType::STR;
+    this->start = start;
 }
 
-MemberNode::MemberNode(Node* parent, int child) : parent(parent), n_child(child) {
+MemberNode::MemberNode(Node* parent, int child, TextPosition start) : parent(parent), n_child(child) {
     this->ntype = MEMBER;
     this->type = MemberType::NUM;
+    this->start = start;
 }
 
 

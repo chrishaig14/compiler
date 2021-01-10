@@ -292,11 +292,11 @@ void Translator::visit(ClassLiteralExpressionNode& node) {
 void Translator::visit(ClassLiteralFieldNode& node) {
     CodeLabel all;
     std::vector<std::string> fields;
-    for (auto f: node.init) {
+    for (int i = 0; node.init_names.size(); i++) {
         this->code = {};
 //        f.second->accept(*this)
-        this->dispatch(f.second);
-        fields.push_back(f.first);
+        this->dispatch(node.init_values[i]);
+        fields.push_back(node.init_names[i]);
         CodeLabel out = this->code;
         all.insert(all.end(), out.begin(), out.end());
     }

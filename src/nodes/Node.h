@@ -8,6 +8,7 @@
 #include "json.hpp"
 #include "node_types.h"
 #include <string>
+#include "../scanner/TextPosition.h"
 
 using json = nlohmann::json;
 
@@ -55,6 +56,8 @@ class NumberNode;
 
 class ReturnNode;
 
+class PartialApplication;
+
 class BoolOpNode;
 
 class StringNode;
@@ -67,13 +70,20 @@ class TupleNode;
 
 class WhileNode;
 
+class ImportNode;
+
+
 class Node {
 public:
     NodeType ntype;
-    int start;
-    int end;
-    int line;
-    int column;
+
+    TextPosition start;
+    TextPosition end;
+
+    // int start;
+    // int end;
+    // int line;
+    // int column;
 
     std::string node_type_string(NodeType type) const;
 
@@ -92,6 +102,8 @@ public:
     virtual BinopNode& binop();
     virtual BoolOpNode& boolop();
     virtual const BoolOpNode& boolop() const;
+    virtual const ImportNode& import() const;
+    virtual ImportNode& import();
     virtual BlockNode& block();
     virtual BooleanNode& boolean();
     virtual BreakNode& brk();
@@ -146,6 +158,8 @@ public:
     virtual const WhileNode& whil() const;
 
     virtual json to_json() const;
+    virtual PartialApplication& partial();
+    virtual const PartialApplication& partial() const;
 };
 
 #endif //NODE_H

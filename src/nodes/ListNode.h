@@ -26,6 +26,7 @@ public:
 
     ListNode& lst() override;
     const ListNode& lst() const override;
+    TypeNode* type;
 };
 
 

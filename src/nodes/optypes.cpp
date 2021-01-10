@@ -2,6 +2,7 @@
 // Created by chris on 18/11/20.
 //
 #include <string>
+#include <stdexcept>
 #include "optypes.h"
 
 std::string op_to_string(OpType op) {
@@ -17,6 +18,7 @@ std::string op_to_string(OpType op) {
         case OpType::MOD:
             return "MOD";
     }
+    throw std::runtime_error("Unknow op type");
 }
 
 std::string bool_op_to_string(BoolOp op) {
@@ -38,4 +40,5 @@ std::string bool_op_to_string(BoolOp op) {
         case BoolOp::EQ:
             return "==";
     }
+    throw std::runtime_error("Dont know whta to do with bool op");
 }

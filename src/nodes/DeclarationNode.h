@@ -19,7 +19,14 @@ public:
     TypeNode* type;
     Node* expression;
 
-    DeclarationNode(const std::string& identifier, TypeNode* type, Node* expression);
+    DeclarationNode(const std::string& identifier, TypeNode* type, Node* expression) : DeclarationNode(
+            identifier,
+            type,
+            expression,
+            {-1, -1}
+    ) {}
+
+    DeclarationNode(const std::string& identifier, TypeNode* type, Node* expression, TextPosition start);
 
     bool equal(const Node& other) const override;
 

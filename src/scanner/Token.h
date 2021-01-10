@@ -8,6 +8,7 @@
 #include <string>
 #include <unordered_map>
 #include <iostream>
+#include "TextPosition.h"
 
 enum class TokType {
     COMMA,
@@ -22,6 +23,7 @@ enum class TokType {
     MINUS_EQQ,
     TIMES_EQQ,
     DIV_EQQ,
+    DOLLAR_SIGN,
     EQ,
     LT,
     GT,
@@ -58,7 +60,7 @@ enum class TokType {
     RCURLY,
     LPAREN,
     RPAREN,
-    END, RARROW, TRUE, FALSE, QUESTION, NONE, DOUBLE_COLON, HASH, ARROBA, CLASS
+    END, RARROW, TRUE, FALSE, QUESTION, NONE, DOUBLE_COLON, HASH, ARROBA, CLASS, IMPORT, FROM
 };
 
 extern std::unordered_map<TokType, std::string> TOKEN_STRINGS;
@@ -71,27 +73,26 @@ public:
     std::string str;
     int num;
     float flot;
-    int line, column;
-    int start;
+    TextPosition start;
     int end;
 
     Token();
 
-    Token(TokType type, int line, int column);
+    Token(TokType type, TextPosition start);
 
+    Token(TokType type, std::string str, TextPosition start);
 
+    Token(TokType type, int num, TextPosition start);
 
-    Token(TokType type, std::string str, int line, int column);
-
-    Token(TokType type, int num, int line, int column);
-    Token(TokType type, float flot, int line, int column);
-
+    Token(TokType type, float flot, TextPosition start);
 
     bool operator==(const Token& other) const;
 
     friend std::ostream& operator<<(std::ostream& os, const Token& token);
 
     std::string to_string();
+
+    std::string pos_string();
 };
 
 

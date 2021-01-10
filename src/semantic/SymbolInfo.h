@@ -16,6 +16,7 @@ public:
     bool is_method;
     ClassInfo* class_info;
     bool is_class_method;
+    bool is_error;
 
     SymbolInfo& operator=(const SymbolInfo& other) {
         this->_type = other._type->clone();
@@ -23,6 +24,7 @@ public:
     }
 
     SymbolInfo(const SymbolInfo& other) {
+        this->is_error = other.is_error;
         this->is_function = other.is_function;
         this->is_method = other.is_method;
         this->class_info = other.class_info;
@@ -32,6 +34,7 @@ public:
         } else {
             this->_type = nullptr;
         }
+        this->is_error = is_error;
     }
 
     ~SymbolInfo() {
@@ -45,6 +48,11 @@ public:
     void set_type(const TypeNode& typ);
 
     const TypeNode& type();
+};
+
+class ErrorStub : public SymbolInfo {
+public:
+    ErrorStub();
 };
 
 

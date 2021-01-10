@@ -30,6 +30,7 @@
 #include "MemberNode.h"
 #include "NumberNode.h"
 #include "ReturnNode.h"
+#include "PartialApplication.h"
 #include "TupleNode.h"
 #include "StringNode.h"
 #include "SubscriptNode.h"

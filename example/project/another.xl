@@ -1,0 +1,4 @@
+from lib import second
+fun third(x:a,y:b,z:c)->c{
+    return second(y,z)
+}

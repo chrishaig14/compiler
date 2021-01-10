@@ -4,24 +4,7 @@
 #include <semantic/GlobalProcessor.h>
 #include <semantic/Checker.h>
 #include "vm/CodeObject.h"
-
-
-BlockNode* get_ast(std::string text) {
-    Scanner scanner(text);
-    std::vector<Token> tokens = scanner.scan_all();
-    Parser parser(tokens);
-    BlockNode* tree = parser.parse_program();
-    return tree;
-}
-
-void compile(std::string text) {
-    BlockNode* tree = get_ast(text);
-    std::vector<std::pair<std::string, CodeBuiltin>> builtins;
-    GlobalProcessor gp(builtins);
-    gp.visit(*tree);
-    Checker checker(gp.globals, gp.class_table, gp.function_table);
-    checker.visit(*tree);
-}
+#include "utils_test.h"
 
 
 class checker_test : public ::testing::Test {
@@ -344,6 +327,75 @@ TEST_F(checker_test, test_add_list_ok) {
     std::string text = "fun foo()->Integer{var x = [0]; x = x + [1]; return 1;}";
     SetUp(text);
     checker->visit(*tree);
+}
+
+TEST_F(checker_test, test_partial_ok) {
+    std::string text = "fun foo(x: Integer, y: String)->Integer{return 5;} fun main()->Integer{var part = $foo(5, *); var x : Integer = part(\"Hello\"); return 1;}";
+    SetUp(text);
+    checker->visit(*tree);
+}
+
+TEST_F(checker_test, test_partial_bad_return) {
+    std::string text = "fun foo(x: Integer, y: String)->Integer{return 5;} fun main()->Integer{var part = $foo(5, *); var x : String = part(\"Hello\"); return 1;}";
+    SetUp(text);
+    try {
+        checker->visit(*tree);
+    } catch (...) {
+
+    }
+}
+
+TEST_F(checker_test, test_partial_bad_args) {
+    std::string text = "fun foo(x: Integer, y: String)->Integer{return 5;} fun main()->Integer{var part = $foo(\"Hello\", *); var x : Integer = part(\"Hello\"); return 1;}";
+    SetUp(text);
+    try {
+        checker->visit(*tree);
+    } catch (...) {
+
+    }
+}
+
+TEST_F(checker_test, test_partial_bad_num_args) {
+    std::string text = "fun foo(x: Integer, y: String)->Integer{return 5;} fun main()->Integer{var part = $foo(5, *, *); var x : Integer = part(\"Hello\"); return 1;}";
+    SetUp(text);
+    try {
+        checker->visit(*tree);
+    } catch (...) {
+
+    }
+}
+
+TEST_F(checker_test, test_partial_all_wildcards) {
+    std::string text = "fun foo(x: Integer, y: String)->Integer{return 5;} fun main()->Integer{var part = $foo(*, *); var x : Integer = part(7, \"Hello\"); return 1;}";
+    SetUp(text);
+    checker->visit(*tree);
+}
+
+TEST_F(checker_test, test_partial_no_wildcards) {
+    std::string text = "fun foo(x: Integer, y: String)->Integer{return 5;} fun main()->Integer{var part = $foo(9, \"Hello\"); var x : Integer = part(); return 1;}";
+    SetUp(text);
+    checker->visit(*tree);
+}
+
+TEST_F(checker_test, test_partial_type_ok) {
+    std::string text = "fun foo(x: Integer, y: String)->Integer{return 5;} fun main()->Integer{var part : fun(String)->Integer = $foo(9, *); var x : Integer = part(\"Hello\"); return 1;}";
+    SetUp(text);
+    checker->visit(*tree);
+}
+
+TEST_F(checker_test, test_function_type_ok) {
+    std::string text = "fun foo(x: Integer, y: String)->Integer{return 5;} fun main()->Integer{var bar : fun(Integer, String) -> Integer = foo; return 1;}";
+    SetUp(text);
+    checker->visit(*tree);
+}
+
+TEST_F(checker_test, test_function_type_error) {
+    std::string text = "fun foo(x: Integer, y: String)->Integer{return 5;} fun main()->Integer{var bar : fun(Integer, String) -> String = foo; return 1;}";
+    SetUp(text);
+    try {
+        checker->visit(*tree);
+    } catch (...) {
+    }
 }
 
 TEST_F(checker_test, test_declare_class_ok) {

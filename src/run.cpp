@@ -12,23 +12,23 @@
 void compile_and_run(std::string text) {
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
-    Parser parser(tokens);
-    BlockNode* program;
-    try {
-        program = parser.parse_program();
-    } catch (const UnexpectedToken& ut) {
-        std::cerr << ut.what() << std::endl;
-        exit(1);
-    }
-    std::vector<Builtin> builtins;
-    std::cout << "Parser check passed!" << std::endl;
+    // Parser parser(tokens);
+    // BlockNode* program;
+    // try {
+    //     program = parser.parse_program();
+    // } catch (const UnexpectedToken& ut) {
+    //     std::cerr << ut.what() << std::endl;
+    //     exit(1);
+    // }
+    // std::vector<Builtin> builtins;
+    // std::cout << "Parser check passed!" << std::endl;
 
-    GlobalProcessor gp(builtins);
-    gp.visit(*program);
-    Checker checker(gp.globals, gp.class_table, gp.function_table);
-    checker.function_table = gp.function_table;
-    checker.visit(*program);
-    std::cout << "Semantic check passed!" << std::endl;
+    // GlobalProcessor gp(builtins);
+    // gp.visit(*program);
+    // Checker checker(gp.globals, gp.class_table, gp.function_table);
+    // checker.function_table = gp.function_table;
+    // checker.visit(*program);
+    // std::cout << "Semantic check passed!" << std::endl;
 //    Translator translator;
 //    program->accept(translator);
 //    ObjectStack stack;

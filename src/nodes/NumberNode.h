@@ -14,10 +14,11 @@ class NumberNode : public Node {
 public:
     int num;
 
-    NumberNode(int number);
+    NumberNode(int number) : NumberNode(number, {-1, -1}) {}
+
+    NumberNode(int number, TextPosition start);
 
     bool equal(const Node& x) const override;
-
 
     json to_json() const override;
 

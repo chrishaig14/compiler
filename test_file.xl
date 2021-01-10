@@ -1,6 +1,8 @@
-fun main(){
-    var x = range(0,1,10000)
-    for i @ x {
-        print(i.str())
-    }
+fun first(x: t, y: u)->t{
+    return x
+}
+
+fun main()->Integer{
+    print(first("Chris", 89))
+    return 0
 }

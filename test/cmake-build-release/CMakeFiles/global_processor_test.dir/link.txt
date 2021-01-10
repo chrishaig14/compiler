@@ -1,0 +1,1 @@
+/usr/bin/c++  -O3 -DNDEBUG   CMakeFiles/global_processor_test.dir/global_processor_test.cpp.o  -o global_processor_test  -lgtest -lgtest_main -lpthread -lscanner -lparser -lsrcLib -lnodes 

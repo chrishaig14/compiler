@@ -11,7 +11,10 @@
 
 class NoneNode : public Node {
 public:
+    NoneNode();
     bool equal(const Node& other) const override;
+    NoneNode& none() override;
+    const NoneNode& none() const override;
 
 };
 

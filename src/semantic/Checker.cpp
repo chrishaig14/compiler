@@ -3,6 +3,8 @@
 #include "Checker.h"
 #include "TypeClassInfo.h"
 #include "../macros.h"
+#include "unify.h"
+#include "../logging/logging.h"
 
 bool function_is_generic(const FunctionTypeNode& ft) {
     for (auto param_type: ft.parameter_types) {
@@ -43,6 +45,13 @@ ClassInfo* make_int_class_info() {
     return int_class_info;
 }
 
+ClassInfo* make_boolean_class_info() {
+    auto int_class_info = new ClassInfo();
+    int_class_info->class_name = "Boolean";
+    int_class_info->methods.insert(std::make_pair("str", new FunctionTypeNode({}, new T_STRING)));
+    return int_class_info;
+}
+
 ClassInfo* make_float_class_info() {
     auto float_class_info = new ClassInfo();
     float_class_info->class_name = "Float";
@@ -58,7 +67,9 @@ ClassInfo* make_string_class_info() {
 }
 
 Checker::Checker(SymbolTable* globals, ClassTable* class_table, FunctionTable* function_table) {
+    this->is_lvalue = false;
     this->function_table = function_table;
+    this->failed = false;
     this->class_table = class_table;
     this->scope = globals;
     this->scopes["global"] = this->scope;
@@ -69,6 +80,7 @@ Checker::Checker(SymbolTable* globals, ClassTable* class_table, FunctionTable* f
     this->class_table->set("Float", make_float_class_info());
     this->class_table->set("Integer", make_int_class_info());
     this->class_table->set("List", make_list_class_info());
+    this->class_table->set("Boolean", make_boolean_class_info());
     this->class_table->set("String", make_string_class_info());
 
     this->class_table->set("Tuple", nullptr);
@@ -91,8 +103,41 @@ void Checker::leave_scope() {
     this->scope = this->scope->parent;
 }
 
+void Checker::assert_type_exists(TypeNode& type, TextPosition pos) {
+    if (type.kind == Kind::OBJECT) {
+        if (type.object().type_parameters.size() == 0) {
+            if (!is_generic(type)) {
+                if (!this->class_table->declared(type.object().identifier)) {
+                    std::string msg;
+                    msg = E_FMT(text_pos_to_string(this->__file__, pos));
+                    msg += E_FMT(" type ") + E_HLT(type.object().identifier) + E_FMT(" doesn't exist");
+                    std::cout << msg << std::endl;
+                    exit(1);
+                }
+            }
+            return;
+        }
+        if (!this->class_table->declared(type.object().identifier)) {
+            std::string msg;
+            msg = E_FMT(text_pos_to_string(this->__file__, pos));
+            msg += E_FMT(" type ") + E_HLT(type.object().identifier) + E_FMT(" doesn't exist");
+            std::cout << msg << std::endl;
+            exit(1);
+        } else {
+            for (auto t: type.object().type_parameters) {
+                this->assert_type_exists(*t, pos);
+            }
+        }
+    } else {
+        for (auto t: type.function().parameter_types) {
+            this->assert_type_exists(*t, pos);
+        }
+        this->assert_type_exists(*type.function().return_type, pos);
+    }
+}
 
 USymbolInfo Checker::visit(FunctionNode& n) {
+    this->current_function = n.identifier;
     this->enter_scope(n.identifier);
     if (this->add_this) {
         this->scope->set("this", *this->this_type);
@@ -100,18 +145,12 @@ USymbolInfo Checker::visit(FunctionNode& n) {
     for (int i = 0; i < n.parameter_names.size(); i++) {
         TypeNode& type = *n.parameter_types[i];
         if (type.kind == Kind::OBJECT) {
-            if (!is_generic(type) && !this->class_table->declared(type.object().identifier)) {
-                throw std::runtime_error("type " + type.to_string() + " doesn't exist!");
-            }
+            this->assert_type_exists(type, n.start);
         }
         this->scope->set(n.parameter_names[i], type);
     }
     TypeNode& returnType = *n.return_type;
-    if (!is_generic(returnType) && returnType.kind == Kind::OBJECT &&
-        !this->class_table->declared(returnType.object().identifier) && returnType.object().identifier != ".None") {
-
-        throw std::runtime_error("type " + returnType.to_string() + " doesn't exist!");
-    }
+    this->assert_type_exists(returnType, n.start);
     this->scope->set("__return__", returnType);
     this->visit(*n.body);
     if (returnType != ObjectTypeNode(".None", {})) {
@@ -142,6 +181,7 @@ USymbolInfo Checker::visit(IdNode& n) {
     if (!this->scope->has(n.identifier)) {
         // it might be a function name
         if (this->function_table->has_function(n.identifier)) {
+            n.is_global_function = true;
             symbol_info.is_function = true;
             n.location = VariableLocation(-2, -1);
             symbol_info.set_type(this->function_table->get(n.identifier));
@@ -150,20 +190,24 @@ USymbolInfo Checker::visit(IdNode& n) {
         }
     } else {
         symbol_info.set_type(this->scope->get(n.identifier));
-        n.location = this->scope->find(n.identifier);
-        if (symbol_info.type().kind == Kind::OBJECT) {
-            const ObjectTypeNode& otn = symbol_info.type().object();
-            if (otn.identifier == "Option") {
-                if (this->scope->get_not_none(n.identifier)) {
-                    symbol_info.set_type(*otn.type_parameters[0]);
+        if (symbol_info.type().kind == Kind::UNKNOWN) {
+            symbol_info.is_error = true;
+        } else {
+            n.location = this->scope->find(n.identifier);
+            if (symbol_info.type().kind == Kind::OBJECT) {
+                const ObjectTypeNode& otn = symbol_info.type().object();
+                if (otn.identifier == "Option") {
+                    if (this->scope->get_not_none(n.identifier)) {
+                        symbol_info.set_type(*otn.type_parameters[0]);
+                    }
                 }
-            }
 
-        }
-        if (symbol_info.type().kind == Kind::FUNCTION) {
-            symbol_info.is_function = true;
-            symbol_info.is_method = false;
-            symbol_info.is_class_method = false;
+            }
+            if (symbol_info.type().kind == Kind::FUNCTION) {
+                symbol_info.is_function = true;
+                symbol_info.is_method = false;
+                symbol_info.is_class_method = false;
+            }
         }
     }
     return std::make_unique<SymbolInfo>(symbol_info);
@@ -171,14 +215,23 @@ USymbolInfo Checker::visit(IdNode& n) {
 
 USymbolInfo Checker::visit(DeclarationNode& n) {
     if (this->scope->declared(n.identifier)) {
+        std::string msg;
+        msg = E_FMT("Variable ") + E_HLT(n.identifier) + E_FMT(" already declared in current scope at ") +
+              E_HLT(text_pos_to_string(this->__file__, n.start));
+        std::cout << msg << std::endl;
+        exit(1);
         throw RedeclareError(n.identifier);
     }
     SymbolInfo symbol_info;
     symbol_info.is_function = false;
     if (n.expression->ntype != NodeType::UNINITIALIZED and n.type != nullptr) {
+        this->assert_type_exists(*n.type, n.start);
         USymbolInfo exp_info_p = this->dispatch(n.expression);
         SymbolInfo& exp_info = *exp_info_p;
-        ObjectTypeNode& otn = n.type->object();
+        if (exp_info.is_error) {
+            this->scope->set(n.identifier, exp_info.type());
+            return std::make_unique<SymbolInfo>(symbol_info);
+        }
         if (this->replace_me) {
             n.expression = replacement;
             this->replace_me = false;
@@ -186,7 +239,8 @@ USymbolInfo Checker::visit(DeclarationNode& n) {
         if (n.type->kind == Kind::FUNCTION) {
             // it's a function
             if (*n.type != exp_info.type()) {
-                throw AssignmentTypeError(*n.type, exp_info.type());
+                this->error_assignment(*n.type, exp_info.type(), n.start);
+                exit(1);
             }
         } else {
             SymbolInfo expression_info = exp_info;
@@ -195,7 +249,8 @@ USymbolInfo Checker::visit(DeclarationNode& n) {
                 if (*actual_type.type_parameters[0] != expression_info.type()) {
                     auto foo = expression_info.type().object();
                     if (foo.identifier != "NoneType") {
-                        throw AssignmentTypeError(*n.type, expression_info.type());
+                        this->error_assignment(*n.type, expression_info.type(), n.start);
+                        exit(1);
                     }
                 }
             } else if (actual_type.identifier == "Union") {
@@ -207,11 +262,13 @@ USymbolInfo Checker::visit(DeclarationNode& n) {
                     }
                 }
                 if (!ok) {
-                    throw AssignmentTypeError(*n.type, expression_info.type());
+                    this->error_assignment(*n.type, expression_info.type(), n.start);
+                    exit(1);
                 }
             } else {
                 if (*n.type != expression_info.type()) {
-                    throw AssignmentTypeError(*n.type, expression_info.type());
+                    this->error_assignment(*n.type, expression_info.type(), n.start);
+                    exit(1);
                 }
             }
         }
@@ -219,6 +276,7 @@ USymbolInfo Checker::visit(DeclarationNode& n) {
 
     } else if (n.expression->ntype != NodeType::UNINITIALIZED) {
         USymbolInfo exp_info_p = this->dispatch(n.expression);
+        n.type = exp_info_p->type().clone();
         SymbolInfo& exp_info = *exp_info_p;
         if (this->replace_me) {
             n.expression = replacement;
@@ -230,6 +288,91 @@ USymbolInfo Checker::visit(DeclarationNode& n) {
     return std::make_unique<SymbolInfo>(symbol_info);
 }
 
+std::string Checker::context_string(TextPosition position) {
+    std::string msg = E_HLT(text_pos_to_string(this->__file__, position)) +
+                      E_FMT(" In function ") +
+                      E_HLT((this->current_class == "" ? "" : this->current_class + ".") + this->current_function) +
+                      E_FMT(": ");
+    return msg;
+}
+
+
+std::string Checker::code_context_string(TextPosition position) {
+    std::string str = "\n" + this->code_lines.get_line(position.line) + "\n";
+    str += fmt::format(fmt::fg(fmt::color::orange_red), std::string(position.column, ' ') + std::string(1, '^'));
+    return str;
+}
+
+void Checker::error_binop(const TypeNode& left, const TypeNode& right, TextPosition position) {
+    std::string msg;
+    msg = context_string(position) +
+          E_FMT(" Cannot perform binary op between types ") + E_HLT(left.to_string()) +
+          E_FMT(" and ") +
+          E_HLT(right.to_string()) + this->code_context_string(position);
+    std::cout << msg << std::endl;
+}
+
+void Checker::error_no_member(const TypeNode& t, const std::string& member, TextPosition position) {
+    std::string msg;
+    msg =
+            context_string(position) +
+            E_FMT(" Type ") + E_HLT(t.to_string()) +
+            E_FMT(" has no member ") +
+            E_HLT("'" + member + "'");
+    std::cout << msg << std::endl;
+}
+
+void Checker::error_bool_op(const TypeNode& left, const TypeNode& right, TextPosition position) {
+    std::string msg;
+    msg = context_string(position) +
+          E_FMT(" Cannot perform bool op between types ") + E_HLT(left.to_string()) +
+          E_FMT(" and ") +
+          E_HLT(right.to_string());
+    std::cout << msg << std::endl;
+}
+
+void Checker::error_assignment(const TypeNode& expected, const TypeNode& actual, TextPosition position) {
+    std::string msg;
+    msg = context_string(position) +
+          E_HLT(actual.to_string()) +
+          E_FMT(", expected: ") +
+          E_HLT(expected.to_string());
+    std::cout << msg << std::endl;
+}
+
+void Checker::error_condition(const TypeNode& t, TextPosition position, const std::string& st) {
+    std::string msg;
+    msg = context_string(position) +
+          E_FMT(" Expected ") + E_HLT("Boolean ") +
+          E_FMT("as condition for " + st + " statement, got ") +
+          E_HLT(t.to_string());
+    std::cout << msg << std::endl;
+}
+
+void Checker::error_no_return(const TypeNode& t, TextPosition position) {
+    std::string msg;
+    msg = context_string(position) + E_FMT(" Expected to return ") +
+          E_HLT(t.to_string()) +
+          E_FMT(" but not returning anything");
+    std::cout << msg << std::endl;
+}
+
+void Checker::error_bad_return(TextPosition position) {
+    std::string msg;
+    msg = E_HLT(text_pos_to_string(this->__file__, position)) +
+          E_FMT(" Returning a value from a function returning no value ");
+    std::cout << msg << std::endl;
+}
+
+void Checker::error_return_mismatch(const TypeNode& expected, const TypeNode& actual, TextPosition position) {
+    std::string msg;
+    msg = E_HLT(text_pos_to_string(this->__file__, position)) +
+          E_FMT(" In function ") +
+          E_HLT((this->current_class == "" ? "" : this->current_class + ".") + this->current_function) + E_FMT(": ") +
+          E_FMT(" Expected to return ") + E_HLT(expected.to_string()) + E_FMT(" but got ") + E_HLT(actual.to_string());
+    std::cout << msg << std::endl;
+}
+
 USymbolInfo Checker::visit(AssignmentNode& n) {
     if (n.lvalue->ntype == NodeType::ID) {
         if (n.lvalue->id().identifier == "_") {
@@ -237,11 +380,16 @@ USymbolInfo Checker::visit(AssignmentNode& n) {
             return nullptr;
         }
     }
+    this->is_lvalue = true;
     USymbolInfo linfo_p = this->dispatch(n.lvalue);
+    this->is_lvalue = false;
     if (n.lvalue->ntype == MEMBER && n.lvalue->member().type == MemberType::NUM) {
         throw std::runtime_error("Error: can't reassign a member of a tuple!");
     }
     USymbolInfo expression_type_p = this->dispatch(n.rvalue);
+    if (expression_type_p->is_error) {
+        return nullptr;
+    }
     SymbolInfo& linfo = *linfo_p;
     SymbolInfo& expression_type = *expression_type_p;
     if (this->replace_me) {
@@ -257,14 +405,16 @@ USymbolInfo Checker::visit(AssignmentNode& n) {
             this->scope->set_not_none(n.lvalue->id().identifier, true);
         } else {
             if (linfo.type() != (expression_type.type())) {
-                auto foo = expression_type.type().object();
+                auto& foo = expression_type.type().object();
                 if (foo.identifier != "NoneType") {
-                    throw AssignmentTypeError(linfo.type(), expression_type.type());
+                    this->error_assignment(linfo.type(), expression_type.type(), n.start);
+                    exit(1);
                 }
                 // assigning none, ok
             }
             // type matches exactly, no proble
             std::cout << "p may be none" << std::endl;
+            n.type = linfo.type().clone();
             this->scope->set_not_none(n.lvalue->id().identifier, false);
         }
     } else {
@@ -272,17 +422,24 @@ USymbolInfo Checker::visit(AssignmentNode& n) {
             if (actual_type.identifier == "Option") {
                 // if type doesn't match exactly, we may be assigning to an Option[t]
                 if (*actual_type.type_parameters[0] != expression_type.type()) {
-                    auto foo = expression_type.type().object();
+                    auto& foo = expression_type.type().object();
                     if (foo.identifier != "NoneType") {
-                        throw AssignmentTypeError(linfo.type(), expression_type.type());
+                        this->error_assignment(
+                                linfo.type(),
+                                expression_type.type(),
+                                n.start
+                        );
+                        exit(1);
                     }
                 }
             } else {
                 // if it's not Option[t], then it's an error
-                throw AssignmentTypeError(linfo.type(), expression_type.type());
+                this->error_assignment(linfo.type(), expression_type.type(), n.start);
+                exit(1);
             }
         }
         // else, type matches don't do anything
+        n.type = linfo.type().clone();
     }
     return nullptr;
 }
@@ -311,15 +468,19 @@ USymbolInfo Checker::visit(MemberNode& n) {
                 rv.is_method = false;
                 rv.is_class_method = true;
                 this->replace_me = true;
-                this->replacement = new IdNode(class_info->class_name + "." + n.s_child);
+                IdNode* idn = new IdNode(class_info->class_name + "." + n.s_child);
+                idn->is_global_function = true;
+                this->replacement = idn;
                 return std::make_unique<SymbolInfo>(rv);
             } else {
                 throw std::runtime_error("Class " + class_info->class_name + " has no method " + n.s_child);
             }
         }
     }
-
+    bool old_lvalue = this->is_lvalue;
+    this->is_lvalue = false;
     USymbolInfo symbol_info_p = this->dispatch(n.parent);
+    this->is_lvalue = old_lvalue;
     SymbolInfo& symbol_info = *symbol_info_p;
     if (symbol_info.type().kind != Kind::OBJECT) {
         throw std::runtime_error("Accessing member " + n.s_child + " of non object");
@@ -334,7 +495,7 @@ USymbolInfo Checker::visit(MemberNode& n) {
                 option_type = &(object.type_parameters[0])->object();
             } else {
                 throw std::runtime_error(
-                        "Error: line " + std::to_string(idn.line + 1) + " -> " + idn.identifier +
+                        "Error: line " + text_pos_to_string(this->__file__, idn.start) + " -> " + idn.identifier +
                         " might be none here, make sure to  this in a if XXX != none {...}!"
                 );
             }
@@ -388,7 +549,8 @@ USymbolInfo Checker::visit(MemberNode& n) {
             rv.is_method = true;
             rv.class_info = class_info;
         } else {
-            throw std::runtime_error("Type " + object.to_string() + " has no member " + n.s_child);
+            this->error_no_member(object, n.s_child, n.start);
+            exit(1);
         }
     }
 
@@ -404,10 +566,8 @@ USymbolInfo Checker::visit(IfNode& n) {
     std::unordered_map<std::string, bool> not_null_vars;
 
     if (condition_info.type() != T_BOOL) {
-        throw std::runtime_error(
-                "Expected a Boolean expression as a condition for if statement at line " + std::to_string(n.line) +
-                " column " + std::to_string(n.column) + ", got " +
-                condition_info.type().to_string());
+        this->error_condition(condition_info.type(), n.start, "if");
+        exit(1);
     }
 
     this->enter_scope("if");
@@ -416,11 +576,9 @@ USymbolInfo Checker::visit(IfNode& n) {
 
     for (int i = 0; i < n.elifs.size(); i++) {
         condition_info_p = this->dispatch(n.elifs[i].first);
-        condition_info = *condition_info_p;
+        SymbolInfo& condition_info = *condition_info_p;
         if (condition_info.type() != T_BOOL) {
-            throw std::runtime_error(
-                    "Expected a Boolean expression as a condition for elif statement!, got " +
-                    condition_info.type().to_string());
+            this->error_condition(condition_info.type(), n.start, "elif");
         }
         this->enter_scope("elif");
         this->visit(*n.elifs[i].second);
@@ -442,19 +600,20 @@ USymbolInfo Checker::visit(BoolOpNode& n) {
     SymbolInfo& right_info = *right_info_p;
 
     SymbolInfo symbol_info;
+    bool ok = false;
     if (left_info.type().kind == Kind::OBJECT) {
-        auto left = left_info.type().object();
+        auto& left = left_info.type().object();
         if (right_info.type().kind == Kind::OBJECT) {
-            auto right = right_info.type().object();
+            auto& right = right_info.type().object();
             if (left.identifier == "Option" && right.identifier == "NoneType") {
                 symbol_info.set_type(ObjectTypeNode("Boolean", {}));
+                ok = true;
             }
         }
     }
-    if (left_info.type() != right_info.type()) {
-        throw std::runtime_error(
-                "Cannot perform bool op betweeen types " + left_info.type().to_string() + " and " +
-                right_info.type().to_string());
+    if (!ok && left_info.type() != right_info.type()) {
+        this->error_bool_op(left_info.type(), right_info.type(), n.start);
+        exit(1);
     }
 
     symbol_info.set_type(ObjectTypeNode("Boolean", {}));
@@ -464,10 +623,25 @@ USymbolInfo Checker::visit(BoolOpNode& n) {
 
 USymbolInfo Checker::visit(BinopNode& n) {
     USymbolInfo left_info_p = this->dispatch(n.left);
+    if (this->replace_me) {
+        n.left = this->replacement;
+        this->replace_me = false;
+    }
+
     USymbolInfo right_info_p = this->dispatch(n.right);
+    if (this->replace_me) {
+        n.right = this->replacement;
+        this->replace_me = false;
+    }
 
     SymbolInfo& left_info = *left_info_p;
     SymbolInfo& right_info = *right_info_p;
+
+    if (left_info.is_error || right_info.is_error) {
+        auto e = ErrorStub();
+        auto s = std::make_unique<SymbolInfo>(e);
+        return s;
+    }
 
     SymbolInfo symbol_info;
     auto& left = left_info.type().object();
@@ -491,33 +665,45 @@ USymbolInfo Checker::visit(BinopNode& n) {
         if (n.op == OpType::ADD) {
             symbol_info.set_type(ObjectTypeNode("String", {}));
             symbol_info.is_function = false;
+            IdNode* idn = new IdNode("String_add");
+            idn->is_global_function = true;
+            this->replace_me = true;
+            this->replacement = new CallNode(idn, VectorOfNodes({n.left, n.right}));
             ok = true;
         }
     } else if (ltype == "List" && rtype == "List" && left == (right)) {
         if (n.op == OpType::ADD) {
             symbol_info.set_type(left);
             symbol_info.is_function = false;
+            IdNode* idn = new IdNode("List_add");
+            idn->is_global_function = true;
+            this->replace_me = true;
+            this->replacement = new CallNode(idn, VectorOfNodes({n.left, n.right}));
             ok = true;
         }
     }
 
     if (!ok) {
-        throw std::runtime_error(
-                "Cannot perform binary op betweeen types " + left.to_string() + " and " + right.to_string());
+        this->error_binop(left, right, n.start);
+        return std::make_unique<ErrorStub>(ErrorStub());
+        // exit(1);
     }
 
     return std::make_unique<SymbolInfo>(symbol_info);
 }
 
+
 USymbolInfo Checker::visit(ReturnNode& n) {
     const TypeNode& return_type = this->scope->get("__return__");
     if (return_type == ObjectTypeNode(".None", {})) {
-        if (n.expression->ntype != NodeType::UNINITIALIZED) {
-            throw std::runtime_error("returning a value from a function returning no value!");
+        if (n.expression != nullptr) {
+            this->error_bad_return(n.start);
+            exit(1);
         }
         return nullptr;
-    } else if (n.expression->ntype == NodeType::UNINITIALIZED) {
-        throw std::runtime_error("not returning any value, but function expects type: " + return_type.to_string());
+    } else if (n.expression == nullptr) {
+        this->error_no_return(return_type, n.start);
+        exit(1);
     }
     USymbolInfo expression_info_p = this->dispatch(n.expression);
     SymbolInfo& expression_info = *expression_info_p;
@@ -526,7 +712,9 @@ USymbolInfo Checker::visit(ReturnNode& n) {
         this->replace_me = false;
     }
     if (!this->can_assign(expression_info.type(), return_type)) {
-        throw ReturnError(return_type, expression_info.type());
+        this->error_return_mismatch(return_type, expression_info.type(), n.start);
+        this->failed = true;
+        return std::make_unique<SymbolInfo>(ErrorStub());
     }
     return nullptr;
 }
@@ -560,9 +748,9 @@ bool is_generic(const TypeNode& t) {
 
 std::unordered_map<std::string, TypeNode*> make_replacements(TypeNode* a, TypeNode* b) {
     std::unordered_map<std::string, TypeNode*> replacements;
-    ObjectTypeNode& ob = b->object();
     if (a->kind == Kind::OBJECT) {
         ObjectTypeNode& oa = a->object();
+        ObjectTypeNode& ob = b->object();
         if (oa.identifier.size() == 1 && islower(oa.identifier[0])) {
             replacements[oa.identifier] = b->clone();
         }
@@ -591,6 +779,46 @@ std::unordered_map<std::string, TypeNode*> make_replacements(TypeNode* a, TypeNo
             if (is_generic(*fa.return_type)) {
                 std::unordered_map<std::string, TypeNode*> rep = make_replacements(fa.return_type, fb.return_type);
                 replacements.insert(rep.begin(), rep.end());
+            }
+        }
+    }
+    return replacements;
+}
+
+std::vector<TypeNode*> make_replacements_in_order(TypeNode* a, TypeNode* b) {
+    std::vector<TypeNode*> replacements;
+    if (a->kind == Kind::OBJECT) {
+        ObjectTypeNode& oa = a->object();
+        ObjectTypeNode& ob = b->object();
+        if (oa.identifier.size() == 1 && islower(oa.identifier[0])) {
+            replacements.push_back(b->clone());
+        } else {
+            for (int i = 0; i < oa.type_parameters.size(); i++) {
+                if (is_generic(*oa.type_parameters[i])) {
+                    std::vector<TypeNode*> rep = make_replacements_in_order(
+                            oa.type_parameters[i],
+                            ob.type_parameters[i]
+                    );
+                    replacements.insert(replacements.end(), rep.begin(), rep.end());
+                }
+            }
+        }
+    } else {
+        if (a->kind == Kind::FUNCTION && b->kind == Kind::FUNCTION) {
+            FunctionTypeNode& fa = a->function();
+            FunctionTypeNode& fb = b->function();
+            for (int i = 0; i < fa.parameter_types.size(); i++) {
+                if (is_generic(*fa.parameter_types[i])) {
+                    std::vector<TypeNode*> rep = make_replacements_in_order(
+                            fa.parameter_types[i],
+                            fb.parameter_types[i]
+                    );
+                    replacements.insert(replacements.end(), rep.begin(), rep.end());
+                }
+            }
+            if (is_generic(*fa.return_type)) {
+                std::vector<TypeNode*> rep = make_replacements_in_order(fa.return_type, fb.return_type);
+                replacements.insert(replacements.end(), rep.begin(), rep.end());
             }
         }
     }
@@ -638,9 +866,6 @@ bool type_matches(TypeNode* aa, TypeNode* bb) {
         if (oa.type_parameters.size() == 0) {
             return true;
         }
-        if (b.kind != Kind::FUNCTION) {
-            return false;
-        }
         if (oa.identifier != ob.identifier) {
             return false;
         }
@@ -658,73 +883,166 @@ bool type_matches(TypeNode* aa, TypeNode* bb) {
 }
 
 std::unordered_map<std::string, TypeNode*>
-make_generic_replacements(TypeNode& t_generic_type, TypeNode& t_matching_type) {
-    ObjectTypeNode& generic_type = (t_generic_type).object();
-    ObjectTypeNode& matching_type = (t_matching_type).object();
-    std::unordered_map<std::string, TypeNode*> replacements;
-    if (generic_type.type_parameters.size() == 0) {
-        replacements[generic_type.identifier] = &matching_type;
-    } else {
-        for (int i = 0; i < generic_type.type_parameters.size(); i++) {
-            std::unordered_map<std::string, TypeNode*> param_replacements = make_generic_replacements(
-                    *generic_type.type_parameters[i],
-                    *matching_type.type_parameters[i]
+make_generic_replacements(TypeNode& t_generic_type, TypeNode& t_matching_type);
+
+std::unordered_map<std::string, TypeNode*>
+make_function_generic_replacements(FunctionTypeNode& t_generic_type, FunctionTypeNode& t_matching_type) {
+    std::unordered_map<std::string, TypeNode*> repl;
+
+    if (t_generic_type.parameter_types.size() != t_matching_type.parameter_types.size()) {
+        throw std::runtime_error("Error parameter_types size mismatch!");
+    }
+    for (int i = 0; i < t_generic_type.parameter_types.size(); i++) {
+        if (is_generic(*t_generic_type.parameter_types[i])) {
+            auto r = make_generic_replacements(
+                    *t_generic_type.parameter_types[i],
+                    *t_matching_type.parameter_types[i]
             );
-            replacements.insert(param_replacements.begin(), param_replacements.end());
+            for (auto x: r) {
+                if (repl.count(x.first) != 0 && *repl[x.first] != *x.second) {
+                    throw std::runtime_error("Error type already replaced by something else");
+                }
+            }
+            repl.insert(r.begin(), r.end());
+        } else {
+            if (*t_generic_type.parameter_types[i] != *t_matching_type.parameter_types[i]) {
+                throw std::runtime_error("Error: parameter type mismatch!");
+            }
         }
     }
-    return replacements;
+
+    if (is_generic(*t_generic_type.return_type)) {
+        auto r = make_generic_replacements(
+                *t_generic_type.return_type,
+                *t_matching_type.return_type
+        );
+        for (auto x: r) {
+            if (repl.count(x.first) != 0 && *repl[x.first] != *x.second) {
+                throw std::runtime_error("Error type already replaced by something else");
+            }
+        }
+        repl.insert(r.begin(), r.end());
+    }
+
+    return repl;
 }
 
-SymbolInfo
-Checker::match_arguments_to_generic_function(const FunctionTypeNode& function_type, VectorOfTypes arg_types) {
-    std::unordered_map<std::string, TypeNode*> generic_replacements;
+std::unordered_map<std::string, TypeNode*>
+make_object_generic_replacements(ObjectTypeNode& t_generic_type, ObjectTypeNode& t_matching_type) {
+    std::unordered_map<std::string, TypeNode*> repl;
+    if (t_generic_type.type_parameters.size() == 0) {
+        repl[t_generic_type.identifier] = t_matching_type.clone();
+    } else {
+        if (t_generic_type.type_parameters.size() != t_matching_type.type_parameters.size()) {
+            throw std::runtime_error("Error type parameter size mismatch!");
+        }
+        for (int i = 0; i < t_generic_type.type_parameters.size(); i++) {
+            if (is_generic(*t_generic_type.type_parameters[i])) {
+                auto r = make_generic_replacements(
+                        *t_generic_type.type_parameters[i],
+                        *t_matching_type.type_parameters[i]
+                );
+                for (auto x: r) {
+                    if (repl.count(x.first) != 0 && *repl[x.first] != *x.second) {
+                        throw std::runtime_error("Error type already replaced by something else");
+                    }
+                }
+                repl.insert(r.begin(), r.end());
+            }
+        }
+    }
+    return repl;
+}
+
+std::unordered_map<std::string, TypeNode*>
+make_generic_replacements(TypeNode& t_generic_type, TypeNode& t_matching_type) {
+    if (t_generic_type.kind == Kind::FUNCTION && t_matching_type.kind == Kind::FUNCTION) {
+        return make_function_generic_replacements(t_generic_type.function(), t_matching_type.function());
+    } else if (t_generic_type.kind == Kind::OBJECT && t_matching_type.kind == Kind::OBJECT) {
+        return make_object_generic_replacements(t_generic_type.object(), t_matching_type.object());
+    } else {
+        if (t_generic_type.kind == Kind::OBJECT && t_matching_type.kind == Kind::FUNCTION) {
+            if (t_generic_type.object().type_parameters.size() == 0) {
+                return std::unordered_map<std::string, TypeNode*>({{t_generic_type.object().identifier, t_matching_type.clone()}});
+            }
+        }
+        throw std::runtime_error("Error: making generic replacements for mismatching types!");
+    }
+}
+
+std::unordered_map<std::string, TypeNode*>
+make_generic_to_generic_replacements(TypeNode& t_generic_type, TypeNode& t_matching_type) {
+    std::unordered_map<std::string, TypeNode*> replacements;
+    if (t_generic_type.kind == Kind::FUNCTION && t_matching_type.kind == Kind::FUNCTION) {
+
+    } else if (t_generic_type.kind == Kind::OBJECT && t_matching_type.kind == Kind::OBJECT) {
+        return make_object_generic_replacements(t_generic_type.object(), t_matching_type.object());
+    } else {
+        if (t_generic_type.kind == Kind::OBJECT && t_matching_type.kind == Kind::FUNCTION) {
+            if (t_generic_type.object().type_parameters.size() == 0) {
+                return std::unordered_map<std::string, TypeNode*>({{t_generic_type.object().identifier, t_matching_type.clone()}});
+            }
+        }
+    }
+    throw std::runtime_error("Error: making generic replacements for mismatching types!");
+}
+
+SymbolInfo match_arguments_to_generic_function(const FunctionTypeNode& ft, VectorOfTypes arg_types) {
+    FunctionTypeNode& function_type = ft.clone()->function();
+    FunctionTypeNode* f = ft.clone();
+    unify_function_call(*f, arg_types);
+    SymbolInfo rv;
+    const TypeNode& ret_type = *f->return_type;
+    rv.set_type(ret_type);
+    return rv;
+
+}
+
+VectorOfTypes
+Checker::get_replacements_in_order(const FunctionTypeNode& function_type, VectorOfTypes arg_types) {
+    VectorOfTypes generic_replacements;
     for (int i = 0; i < function_type.parameter_types.size(); i++) {
         TypeNode& param_type = *function_type.parameter_types[i];
-        ObjectTypeNode& otn = param_type.object();
         if (is_generic(param_type)) {
             if (type_matches(&param_type, arg_types[i])) {
-                std::unordered_map<std::string, TypeNode*> param_generic_replacements = make_replacements(
+                VectorOfTypes param_generic_replacements = make_replacements_in_order(
                         &param_type,
                         arg_types[i]
                 );
-                for (auto gtr: param_generic_replacements) {
-                    if (generic_replacements.find(gtr.first) != generic_replacements.end()) {
-                        // this type has already been replaced, see if it matches
-                        if (*gtr.second != *generic_replacements[gtr.first]) {
-                            throw std::runtime_error(
-                                    "Type has already been replacen by something that doesn't match!"
-                            );
-                        }
-                    }
-                }
-                generic_replacements.insert(param_generic_replacements.begin(), param_generic_replacements.end());
+                generic_replacements.insert(
+                        generic_replacements.end(),
+                        param_generic_replacements.begin(),
+                        param_generic_replacements.end());
             } else {
                 throw std::runtime_error("Argument type error!");
-            }
-        } else {
-            const TypeNode& arg_type = *arg_types[i];
-            const TypeNode& param_type = *function_type.parameter_types[i];
-            if (arg_type != param_type) {
-                throw std::runtime_error(
-                        "Function call type mismatch! Expected " +
-                        param_type.to_string() + " but got " +
-                        arg_type.to_string() + "  instead"
-                );
             }
         }
     }
 
-    SymbolInfo rv;
-    const TypeNode& ret_type = *function_type.return_type;
-    if (is_generic(ret_type)) {
-        const ObjectTypeNode& rtn = ret_type.object();
-        rv.set_type(*make_type(rtn, generic_replacements));
-    } else {
-        rv.set_type(ret_type);
-    }
-    return rv;
+    return generic_replacements;
+}
 
+void
+Checker::error_function_call_type_mismatch(const TypeNode& expected, const TypeNode& actual, TextPosition position) {
+    std::string msg;
+    msg = context_string(position) +
+          E_FMT(" Function call type mismatch") +
+          E_FMT(" expected ") + E_HLT(expected.to_string()) + E_FMT(" but got ") + E_HLT(actual.to_string()) +
+          this->code_context_string(position);
+    std::cout << msg << std::endl;
+}
+
+void Checker::error_function_call_num_args(TextPosition position) {
+    std::string msg;
+    msg = context_string(position) +
+          E_FMT("Calling function with wrong number of arguments ");
+    std::cout << msg << std::endl;
+}
+
+void Checker::error_call_not_a_function(TextPosition position) {
+    std::string msg;
+    msg = E_HLT(text_pos_to_string(this->__file__, position)) + E_FMT("Calling something that's not a function");
+    std::cout << msg << std::endl;
 }
 
 
@@ -745,6 +1063,7 @@ USymbolInfo Checker::visit(CallNode& n) {
         IdNode* pNode = new IdNode(fun_info.class_info->class_name + "." + member_node.s_child);
         pNode->location = VariableLocation(-2, -1);
         n.function = pNode;
+        pNode->is_global_function = true;
         this->replace_me = false;
         object_node = member_node.parent;
         is_a_method = true;
@@ -765,7 +1084,8 @@ USymbolInfo Checker::visit(CallNode& n) {
         // ok
         const FunctionTypeNode& function_type = fun_info.type().function();
         if (n.arguments.size() != function_type.parameter_types.size()) {
-            throw std::runtime_error("Calling function with wrong number of arguments");
+            this->error_function_call_num_args(n.start);
+            exit(1);
         }
         VectorOfTypes arg_types;
         for (auto& arg: n.arguments) {
@@ -780,22 +1100,19 @@ USymbolInfo Checker::visit(CallNode& n) {
         if (function_is_generic(function_type)) {
             retv = match_arguments_to_generic_function(function_type, arg_types);
         } else {
+            retv.set_type(*function_type.return_type);
             for (int i = 0; i < n.arguments.size(); i++) {
                 const TypeNode& arg_type = *arg_types[i];
                 const TypeNode& param_type = *function_type.parameter_types[i];
                 if (arg_type != param_type) {
-                    throw std::runtime_error(
-                            "At line " + std::to_string(n.line) + " column " + std::to_string(n.column) +
-                            ": ERROR, Function call type mismatch!\n\tExpected: \n\t\t" +
-                            param_type.to_string() + "\n\tbut got:\n\t\t" +
-                            arg_type.to_string() + ""
-                    );
+                    this->error_function_call_type_mismatch(param_type, arg_type, n.start);
+                    return std::make_unique<SymbolInfo>(retv);
                 }
             }
-            retv.set_type(*function_type.return_type);
         }
     } else {
-        throw std::runtime_error("calling something that's not a function!");
+        this->error_call_not_a_function(n.start);
+        exit(1);
     }
     if (is_a_method) {
         // prepend the "this" argument (the object on which the method is being called)
@@ -890,7 +1207,7 @@ USymbolInfo Checker::visit(ClassLiteralExpressionNode& node) {
         }
     } else if (num_actual_type_params != 0) {
         throw std::runtime_error(
-                "At line " + std::to_string(node.line) + " column " + std::to_string(node.column) + ": Error, class " +
+                "At " + text_pos_to_string(this->__file__, node.start) + ": Error, class " +
                 object_type_id + " is not generic, but given " +
                 std::to_string(num_actual_type_params) + " type parameter(s)!"
         );
@@ -1013,7 +1330,6 @@ TypeNode* make_type_from_function_pattern(const FunctionTypeNode& ftn,
     }
     TypeNode* new_return_type = make_type(*ftn.return_type, replacements);
     return FUNCTION_TYPE(new_param_types, new_return_type);
-//        throw std::runtime_error("Making non object concrete type template!");
 }
 
 TypeNode* make_type(const TypeNode& original, const std::unordered_map<std::string, TypeNode*>& replacements) {
@@ -1087,29 +1403,29 @@ USymbolInfo Checker::visit(ClassLiteralFieldNode& node) {
     }
     auto class_fields = class_info->members;
 
-    for (auto f: node.init) {
-        if (class_fields.find(f.first) == class_fields.end()) {
-            throw std::runtime_error("No field named " + f.first);
+    for (int i = 0; i < node.init_names.size(); i++) {
+        if (class_fields.find(node.init_names[i]) == class_fields.end()) {
+            throw std::runtime_error("No field named " + node.init_names[i]);
         }
     }
-    if (class_fields.size() != node.init.size()) {
+    if (class_fields.size() != node.init_names.size()) {
         throw std::runtime_error(
                 "In struct \"" + object_type_id + "\" initialization: " + "Expected " +
                 std::to_string(class_fields.size()) + " initializers but got " +
-                std::to_string(node.init.size()));
+                std::to_string(node.init_names.size()));
     }
-    for (auto f: node.init) {
-        Node* exp = f.second;
+    for (int i = 0; i < node.init_names.size(); i++) {
+        Node* exp = node.init_values[i];
         USymbolInfo semanticInfo_p = this->dispatch(exp);
         SymbolInfo& semanticInfo = *semanticInfo_p;
         if (this->replace_me) {
-            node.init[f.first] = this->replacement;
+            node.init_values[i] = this->replacement;
             this->replace_me = false;
         }
-        TypeNode& field_type = *class_fields[f.first];
+        TypeNode& field_type = *class_fields[node.init_names[i]];
         if (!this->can_assign(semanticInfo.type(), field_type)) {
             throw std::runtime_error(
-                    "In struct \"" + object_type_id + "\" initialization: " + "field \"" + f.first +
+                    "In struct \"" + object_type_id + "\" initialization: " + "field \"" + node.init_names[i] +
                     "\" is of type " +
                     field_type.to_string() +
                     " but got " + semanticInfo.type().to_string());
@@ -1118,6 +1434,15 @@ USymbolInfo Checker::visit(ClassLiteralFieldNode& node) {
     SymbolInfo rv;
     rv.set_type(*object_type);
     return std::make_unique<SymbolInfo>(rv);
+}
+
+void Checker::error_for(const TypeNode& t, TextPosition position) {
+    std::string msg;
+    msg = E_HLT(text_pos_to_string(this->__file__, position)) +
+          E_FMT("Expected") + E_HLT(" List[t] ") +
+          E_FMT("in loop, but got ") +
+          E_HLT(t.to_string());
+    std::cout << msg << std::endl;
 }
 
 USymbolInfo Checker::visit(ForNode& node) {
@@ -1129,30 +1454,33 @@ USymbolInfo Checker::visit(ForNode& node) {
 
     const ObjectTypeNode& obj = symbol_info.type().object();
     if (obj.identifier != "List") {
-        throw std::runtime_error(
-                "At line " + std::to_string(node.line) + " column " + std::to_string(node.column) +
-                ": For loop should have a List[t] after @ but got " + obj.to_string());
+        this->error_for(obj, node.start);
+        exit(1);
     }
     this->scope->set(".index0", T_INT);
     this->scope->set(".list0", T_LIST(new T_INT));
-
+    IdNode* lid = new IdNode("List.len");
+    lid->is_global_function = true;
     Node* new_condition = new BoolOpNode(
             BoolOp::LT,
             new IdNode(".index0"),
-            new CallNode(new IdNode("List.len"), {new IdNode(".list0")}));
+            new CallNode(lid, {new IdNode(".list0")}));
 
     BlockNode* new_body = new BlockNode({});
     new_body->nodes.push_back(
             new DeclarationNode(
                     node.var,
-                    nullptr,
+                    obj.type_parameters[0]->clone(),
                     new SubscriptNode(new IdNode(".list0"), {new IdNode(".index0")}))
     );
     new_body->nodes.insert(new_body->nodes.end(), node.body->nodes.begin(), node.body->nodes.end());
+    AssignmentNode* asn = new AssignmentNode(
+            new IdNode(".index0"),
+            new BinopNode(OpType::ADD, new IdNode(".index0"), new NumberNode(1)));
+    asn->type = new T_INT;
     new_body->nodes.push_back(
-            new AssignmentNode(
-                    new IdNode(".index0"),
-                    new BinopNode(OpType::ADD, new IdNode(".index0"), new NumberNode(1))));
+            asn
+    );
 
     TypeNode& var_type = *obj.type_parameters[0];
     this->enter_scope("for");
@@ -1161,8 +1489,8 @@ USymbolInfo Checker::visit(ForNode& node) {
     this->leave_scope();
     this->replace_me = true;
     this->replacement = new BlockNode(
-            {new DeclarationNode(".index0", nullptr, new NumberNode(0)),
-             new DeclarationNode(".list0", nullptr, node.exp),
+            {new DeclarationNode(".index0", new T_INT, new NumberNode(0)),
+             new DeclarationNode(".list0", obj.clone(), node.exp),
              new WhileNode(new_condition, new_body)}
     );
     return nullptr;
@@ -1190,6 +1518,7 @@ USymbolInfo Checker::visit(ListNode& node) {
                     current_type.to_string());
         }
     }
+    node.type = element_type.clone();
     SymbolInfo return_info;
     return_info.is_function = false;
     return_info.set_type(ObjectTypeNode("List", {element_type.clone()}));
@@ -1207,16 +1536,8 @@ USymbolInfo Checker::visit(WhileNode& node) {
     USymbolInfo condition_p = this->dispatch(node.condition);
     SymbolInfo& condition = *condition_p;
     if (condition.type() != ObjectTypeNode("Boolean", {})) {
-        std::string str = condition.type().to_string();
-//        throw std::runtime_error("At line " +
-//                                 std::to_string(node.condition->line + 1) + " column " +
-//                                 std::to_string(node.condition->column + 1) +
-//                                 ": Expected Boolean expression as while loop condition, got " +
-//                                 condition.type->to_string());
-        throw std::runtime_error(
-                "At line " + std::to_string(node.line) + " column " + std::to_string(node.column) +
-                ": Expected Boolean expression as while loop condition, got " + str
-        );
+        this->error_condition(condition.type(), node.start, "elif");
+        exit(1);
     }
     this->enter_scope("while");
     this->visit(*node.body);
@@ -1247,11 +1568,19 @@ USymbolInfo Checker::visit(SubscriptNode& node) {
     SymbolInfo symbol_info;
     const ObjectTypeNode& object_type = parent.type().object();
 
+    if (object_type.identifier == "String") {
+        if (this->is_lvalue) {
+            throw std::runtime_error("Error: Strings are immutable!");
+        }
+    }
+
     VectorOfTypes children;
     bool not_integer = false;
     if (node.child.size() > 1) {
         throw std::runtime_error("Error subscript with more than one child!");
     }
+    bool old_lvalue = this->is_lvalue;
+    this->is_lvalue = false;
     for (auto& c: node.child) {
         USymbolInfo ct = this->dispatch(c);
         if (ct->type() != T_INT) {
@@ -1259,6 +1588,7 @@ USymbolInfo Checker::visit(SubscriptNode& node) {
         }
         children.emplace_back(ct->type().clone());
     }
+    this->is_lvalue = old_lvalue;
 
     if (object_type.identifier == "List") {
         if (not_integer) {
@@ -1287,7 +1617,7 @@ USymbolInfo Checker::visit(TernaryNode& node) {
     if (expression_info.type().kind != Kind::OBJECT) {
         throw std::runtime_error("Unexpected non-object");
     }
-    auto expression_type = expression_info.type().object();
+    auto& expression_type = expression_info.type().object();
 
     if (expression_type.identifier != "Option") {
         throw std::runtime_error("Expected an Option[T], got: " + expression_type.to_string());
@@ -1335,11 +1665,17 @@ USymbolInfo Checker::visit(EmptyListNode& node) {
 }
 
 USymbolInfo Checker::visit(ClassNode& node) {
+    this->current_class = node.class_name;
     this->add_this = true;
     VectorOfTypes tp;
     for (auto type_param: node.type_parameters) {
         tp.push_back(TYPE(type_param, {}));
     }
+    for (auto mt: node.members_ordered) {
+        TypeNode& t = *node.members[mt];
+        this->assert_type_exists(t, node.start);
+    }
+
     this->this_type = new ObjectTypeNode(node.class_name, tp);
     for (auto method: node.methods) {
         this->visit(*method.second);
@@ -1347,6 +1683,7 @@ USymbolInfo Checker::visit(ClassNode& node) {
     this->add_this = false;
     delete this_type;
     this->this_type = nullptr;
+    this->current_class = "";
     return nullptr;
 }
 
@@ -1359,8 +1696,10 @@ USymbolInfo Checker::dispatch(Node* nod) {
     switch (n.ntype) {
         case NodeType::ASSIGN:
             return this->visit(n.assign());
-        case NodeType::BINOP:
-            return this->visit(n.binop());
+        case NodeType::BINOP: {
+            auto r = this->visit(n.binop());
+            return r;
+        }
             break;
         case NodeType::BOOLOP:
             return this->visit(n.boolop());
@@ -1442,6 +1781,15 @@ USymbolInfo Checker::dispatch(Node* nod) {
             break;
         case NodeType::UNINITIALIZED:
             break;
+        case PARTIAL:
+            return this->visit(n.partial());
+            break;
+        case OTYPE:
+            break;
+        case FTYPE:
+            break;
+        case IMPORT:
+            break;
         default:
             throw std::runtime_error("Don't know what to do!");
     }
@@ -1457,11 +1805,35 @@ TypeClassInfo* Checker::get_typeclass_for_function(std::string function_name) {
     return nullptr;
 }
 
+bool Checker::is_immutable(const TypeNode& node) {
+    if (node == T_STRING) {
+        return true;
+    }
+    if (node == T_INT) {
+        return true;
+    }
+    if (node == T_BOOL) {
+        return true;
+    }
+    if (node.kind == Kind::OBJECT && node.object().identifier == "Tuple") {
+        return true;
+    }
+    return false;
+}
+
 USymbolInfo Checker::visit(TupleNode& node) {
     VectorOfTypes types;
+    int i = 0;
     for (auto n: node.values) {
+        i++;
         USymbolInfo vtype = this->dispatch(n);
         types.emplace_back(vtype->type().clone());
+        if (!this->is_immutable(vtype->type())) {
+            throw std::runtime_error(
+                    "All tuple member types must be immutable, at position " + std::to_string(i) + " got " +
+                    vtype->type().to_string() + " which is not"
+            );
+        }
     }
     ObjectTypeNode tuple_type("Tuple", types);
     SymbolInfo sinfo;
@@ -1473,4 +1845,38 @@ USymbolInfo Checker::visit(FloatNode& node) {
     SymbolInfo s;
     s.set_type(T_FLOAT);
     return std::make_unique<SymbolInfo>(s);
+}
+
+USymbolInfo Checker::visit(PartialApplication& node) {
+    USymbolInfo func = this->dispatch(node.function);
+    VectorOfTypes partial_args;
+    if (node.args.size() != func->type().function().parameter_types.size()) {
+        throw std::runtime_error("Error: wrong number of arguments for partial function");
+    }
+    for (int i = 0; i < node.args.size(); i++) {
+        if (node.args[i] != nullptr) {
+            USymbolInfo arg = this->dispatch(node.args[i]);
+            if (arg->type() != *func->type().function().parameter_types[i]) {
+                throw std::runtime_error(
+                        "Error in partial function: type of arg " + std::to_string(i + 1) + " (" +
+                        arg->type().to_string() + ") doesn't match expected type " +
+                        func->type().function().parameter_types[i]->to_string());
+            }
+        } else {
+            partial_args.push_back(func->type().function().parameter_types[i]->clone());
+        }
+    }
+    node.complete_type = &func->type().clone()->function();
+    SymbolInfo s;
+    s.set_type(FunctionTypeNode(partial_args, func->type().function().return_type->clone()));
+    return std::make_unique<SymbolInfo>(s);
+}
+
+Checker::~Checker() {
+    for (auto s: this->scopes) {
+        if (s.first == "global") {
+            continue;
+        }
+        delete s.second;
+    }
 }

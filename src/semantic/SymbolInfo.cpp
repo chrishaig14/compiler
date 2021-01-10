@@ -9,6 +9,7 @@ SymbolInfo::SymbolInfo() {
     this->is_method = false;
     this->class_info = nullptr;
     this->is_class_method = false;
+    this->is_error = false;
     this->_type = nullptr;
 }
 
@@ -21,4 +22,10 @@ const TypeNode& SymbolInfo::type() {
         throw std::runtime_error("SymbolInfo has no TypeNode");
     }
     return *this->_type;
+}
+
+ErrorStub::ErrorStub() {
+    this->is_error = true;
+    auto x = UnknownTypeNode();
+    this->set_type(x);
 }

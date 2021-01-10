@@ -468,6 +468,16 @@ TEST_F(parser_test, class_literal_fields) {
     EXPECT_EQ(*node, *expected_node);
 }
 
+TEST_F(parser_test, partial_function) {
+    std::string text = "$sum(4, *, \"Hello\")";
+    SetUp(text);
+    std::vector<Token> tokens = scanner->scan_all();
+    Parser parser(tokens);
+    node = parser.parse_expression();
+    expected_node = new PartialApplication(new IdNode("sum"), VectorOfNodes({new NumberNode(4), nullptr, new StringNode("Hello")}));
+    EXPECT_EQ(*node, *expected_node);
+}
+
 TEST_F(parser_test, class_literal_expression_ok) {
     std::string text = "#Foo{9,27}";
     SetUp(text);
@@ -716,7 +726,7 @@ TEST_F(parser_test, boolean_true) {
     std::vector<Token> tokens = scanner->scan_all();
     Parser parser(tokens);
     node = parser.parse_expression();
-    expected_node = new BooleanNode(true);
+    expected_node = new BooleanNode(true, TextPosition());
     EXPECT_EQ(*node, *expected_node);
 }
 
@@ -726,7 +736,7 @@ TEST_F(parser_test, boolean_false) {
     std::vector<Token> tokens = scanner->scan_all();
     Parser parser(tokens);
     node = parser.parse_expression();
-    expected_node = new BooleanNode(false);
+    expected_node = new BooleanNode(false, TextPosition());
     EXPECT_EQ(*node, *expected_node);
 }
 
@@ -746,7 +756,7 @@ TEST_F(parser_test, while_loop_1) {
     std::vector<Token> tokens = scanner->scan_all();
     Parser parser(tokens);
     node = parser.parse_while_loop();
-    expected_node = new WhileNode(new BooleanNode(true), new BlockNode({}));
+    expected_node = new WhileNode(new BooleanNode(true, TextPosition()), new BlockNode({}));
     EXPECT_EQ(*node, *expected_node);
 }
 
@@ -756,7 +766,7 @@ TEST_F(parser_test, while_loop_common) {
     std::vector<Token> tokens = scanner->scan_all();
     Parser parser(tokens);
     node = parser.parse_while_loop();
-    expected_node = new WhileNode(new BooleanNode(true), new BlockNode({}));
+    expected_node = new WhileNode(new BooleanNode(true, TextPosition()), new BlockNode({}));
     EXPECT_EQ(*node, *expected_node);
 }
 

@@ -4,7 +4,10 @@
 
 #include "NumberNode.h"
 
-NumberNode::NumberNode(int number) : num(number) { this->ntype = NUMBER; }
+NumberNode::NumberNode(int number, TextPosition start) : num(number) {
+    this->ntype = NUMBER;
+    this->start = start;
+}
 
 bool NumberNode::equal(const Node& x) const {
     auto& other = x.number();

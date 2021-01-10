@@ -8,15 +8,22 @@
 #include "../utils.h"
 #include <iostream>
 #include "UnexpectedToken.h"
+#include "../nodes/ImportNode.h"
+#include "../scanner/CodeLines.h"
 
 extern std::unordered_map<TokType, OpType> TOKEN_TO_OP;
+
 
 class Parser {
     std::vector<Token> tokens;
     Token token;
     size_t current;
+    CodeLines code_lines;
+    std::string __file__;
+
 public:
-    Parser(std::vector<Token>& tokens);
+
+    Parser(const std::string& __file__, CodeLines code_lines, std::vector<Token>& tokens);
 
     bool match(TokType type);
 
@@ -72,6 +79,8 @@ public:
 
     ForNode* parse_for_loop();
 
+    ImportNode* parse_import();
+
     WhileNode* parse_while_loop();
 
     Node* parse_ternary();
@@ -83,6 +92,13 @@ public:
     ObjectTypeNode* parse_object_type();
 
     bool inside_loop;
+    Node* parse_partial_application();
+    VectorOfNodes parse_list_of_arguments();
+    std::string parse_error(const std::vector<std::string>& options);
+    std::string empty_tuple_error(TextPosition pos);
+    std::string tuple_one_element_error(TextPosition pos);
+    std::string after_expression_error(const std::vector<TokType>& expected_extra, TextPosition position);
+    std::string after_expression_error(const std::vector<TokType>& expected_extra, Token tok, TextPosition position);
 };
 
 

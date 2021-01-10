@@ -21,6 +21,14 @@ const WhileNode& Node::whil() const {
     this->throw_dereference_error(WHIL);
 }
 
+PartialApplication& Node::partial() {
+    this->throw_dereference_error(PARTIAL);
+}
+
+const PartialApplication& Node::partial() const {
+    this->throw_dereference_error(PARTIAL);
+}
+
 const TupleNode& Node::tuple() const {
     this->throw_dereference_error(TUPLE);
 }
@@ -309,6 +317,9 @@ std::string Node::node_type_string(NodeType type) const {
         case TUPLE:
             return "TUPLE";
             break;
+        case PARTIAL:
+            return "PARTIAL";
+            break;
     }
     return "UNKNOWN";
 }
@@ -325,4 +336,12 @@ BoolOpNode& Node::boolop() {
 
 const BoolOpNode& Node::boolop() const {
     this->throw_dereference_error(BOOLOP);
+}
+
+const ImportNode& Node::import() const {
+    this->throw_dereference_error(IMPORT);
+}
+
+ImportNode& Node::import() {
+    this->throw_dereference_error(IMPORT);
 }

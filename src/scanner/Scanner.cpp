@@ -4,7 +4,8 @@
 
 #include <iostream>
 #include "Scanner.h"
-#include "../color_codes.h"
+#include "../logging/logging.h"
+#include "../utils.h"
 
 std::unordered_map<std::string, TokType> TOKEN_KEYWORDS;
 std::unordered_map<std::string, TokType> TOKEN_SPECIAL;
@@ -30,6 +31,8 @@ void initialize_tokens() {
     TOKEN_KEYWORDS["return"] = TokType::RETURN;
     TOKEN_KEYWORDS["true"] = TokType::TRUE;
     TOKEN_KEYWORDS["false"] = TokType::FALSE;
+    TOKEN_KEYWORDS["from"] = TokType::FROM;
+    TOKEN_KEYWORDS["import"] = TokType::IMPORT;
     TOKEN_KEYWORDS["break"] = TokType::BREAK;
     TOKEN_KEYWORDS["class"] = TokType::CLASS;
     TOKEN_KEYWORDS["while"] = TokType::WHILE;
@@ -41,6 +44,7 @@ void initialize_tokens() {
     TOKEN_SPECIAL[":"] = TokType::COLON;
     TOKEN_SPECIAL["."] = TokType::DOT;
     TOKEN_SPECIAL["?"] = TokType::QUESTION;
+    TOKEN_SPECIAL["$"] = TokType::DOLLAR_SIGN;
 
     TOKEN_SPECIAL["["] = TokType::LSQUARE;
     TOKEN_SPECIAL["]"] = TokType::RSQUARE;
@@ -79,7 +83,10 @@ void initialize_tokens() {
     TOKEN_SPECIAL["--"] = TokType::DEC;
 }
 
-Scanner::Scanner(const std::string& text) {
+Scanner::Scanner(const std::string& __file__) {
+    std::string text = file_to_string(__file__);
+    this->code_lines.text = text;
+    this->code_lines.line_offsets.push_back(Range{.offset=0, .length=0});
     initialize_tokens();
     initialize_token_strings();
     this->text = text;
@@ -96,30 +103,35 @@ Token Scanner::get_next() {
 
 Token Scanner::next_token() {
     if (this->current >= this->text.size()) {
-        return Token(TokType::END, this->line, this->column);
+        return Token(TokType::END, {this->line, this->column});
     }
     char c = this->text[this->current];
     while (isspace(c)) {
         this->current++;
         if (c == '\n') {
-            Token tok(TokType::ID, "DUMMY", this->line, this->column);
+            Token tok(TokType::ID, "DUMMY", {this->line, this->column});
             std::vector<TokType> semic = {TokType::RETURN, TokType::ID, TokType::NUM, TokType::RPAREN, TokType::RSQUARE,
                                           TokType::STRING, TokType::NONE, TokType::TRUE, TokType::FALSE};
             for (auto ts : semic) {
                 if (this->token.type == ts) {
-                    tok = Token(TokType::SEMICOLON, this->line, this->column);
+                    tok = Token(TokType::SEMICOLON, {this->line, this->column});
                     this->line++;
+                    this->code_lines.line_offsets.back().length =
+                            this->current - this->code_lines.line_offsets.back().offset;
+                    this->code_lines.line_offsets.push_back(Range{.offset=this->current, .length=0});
                     this->column = 0;
                     return tok;
                 }
             }
             this->line++;
+            this->code_lines.line_offsets.back().length = this->current - this->code_lines.line_offsets.back().offset;
+            this->code_lines.line_offsets.push_back(Range{.offset=this->current, .length=0});
             this->column = 0;
         } else {
             this->column++;
         }
         if (this->current >= this->text.size()) {
-            return Token(TokType::END, this->line, this->column);
+            return Token(TokType::END, {this->line, this->column});
         }
         c = this->text[this->current];
     }
@@ -151,8 +163,8 @@ Token Scanner::next_token() {
         if (this->current < this->text.size()) {
             this->column++;
         }
-        Token token(TokType::STRING, str, start_l, start_c);
-        token.start = start;
+        Token token(TokType::STRING, str, {start_l, start_c});
+        // token.start = start;
         token.end = end;
         return token;
     }
@@ -174,8 +186,7 @@ Token Scanner::scan_other() {
         if (TOKEN_SPECIAL.find(tstr) != TOKEN_SPECIAL.end()) {
             this->current += 2;
             this->column += 2;
-            Token token(TOKEN_SPECIAL[tstr], start_l, start_c);
-            token.start = start;
+            Token token(TOKEN_SPECIAL[tstr], {start_l, start_c});
             int end = this->current - 1;
             token.end = end;
             if (token.type == TokType::DOUBLE_SLASH) {
@@ -194,12 +205,16 @@ Token Scanner::scan_other() {
     if (TOKEN_SPECIAL.find(str) != TOKEN_SPECIAL.end()) {
         this->current++;
         this->column++;
-        Token token(TOKEN_SPECIAL[str], start_l, start_c);
-        token.start = start;
+        Token token(TOKEN_SPECIAL[str], {start_l, start_c});
         token.end = end;
         return token;
     }
-    throw UnexpectedCharacter(c, start_l, start_c);
+    std::string msg = E_FMT("Unexpected character ");
+    msg += E_HLT("'" + std::string(1, c) + "'");
+    msg += E_FMT(" at ");
+    msg += E_HLT(this->__file__ + ":" + std::to_string(start_l + 1) + ":" + std::to_string(start_c + 1));
+    std::cout << msg << std::endl;
+    exit(1);
 }
 
 Token Scanner::scan_keyword_or_identifier() {
@@ -221,14 +236,12 @@ Token Scanner::scan_keyword_or_identifier() {
     int end = this->current - 1;
     if (TOKEN_KEYWORDS.find(str) != TOKEN_KEYWORDS.end()) {
 //      it's a keyword
-        Token token(TOKEN_KEYWORDS[str], start_l, start_c);
-        token.start = start;
+        Token token(TOKEN_KEYWORDS[str], {start_l, start_c});
         token.end = end;
         return token;
     }
 //  it's an identifier
-    Token token(TokType::ID, str, start_l, start_c);
-    token.start = start;
+    Token token(TokType::ID, str, {start_l, start_c});
     token.end = end;
     return token;
 }
@@ -268,24 +281,21 @@ Token Scanner::scan_number() {
                         }
                     }
                     int end = this->current - 1;
-                    Token token = Token(TokType::FLOAT, std::stof(str), start_l, start_c);
-                    token.start = start;
+                    Token token = Token(TokType::FLOAT, std::stof(str), {start_l, start_c});
                     token.end = end;
                     return token;
                 }
             } else {
                 // it's just a dot, so return the number
                 int end = this->current - 1;
-                Token token = Token(TokType::NUM, std::stoi(str), start_l, start_c);
-                token.start = start;
+                Token token = Token(TokType::NUM, std::stoi(str), {start_l, start_c});
                 token.end = end;
                 return token;
             }
         }
     }
     int end = this->current - 1;
-    Token token = Token(TokType::NUM, std::stoi(str), start_l, start_c);
-    token.start = start;
+    Token token = Token(TokType::NUM, std::stoi(str), {start_l, start_c});
     token.end = end;
     return token;
 }
