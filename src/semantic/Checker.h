@@ -16,6 +16,7 @@
 #include "../nodes/nodes.h"
 #include <set>
 #include "../scanner/CodeLines.h"
+
 typedef std::unique_ptr<SymbolInfo> USymbolInfo;
 
 bool type_matches(TypeNode* a, TypeNode* b);
@@ -62,7 +63,8 @@ public:
     void error_for(const TypeNode& t, TextPosition position);
     void error_function_call_num_args(TextPosition position);
     void
-    error_function_call_type_mismatch(const TypeNode& expected, const TypeNode& actual, TextPosition start, TextPosition end);
+    error_function_call_type_mismatch(const TypeNode& expected, const TypeNode& actual, TextPosition start,
+                                      TextPosition end);
     void error_no_member(const TypeNode& t, const std::string& member, TextPosition position);
     void error_no_return(const TypeNode& t, TextPosition position);
     void error_return_mismatch(const TypeNode& expected, const TypeNode& actual, TextPosition position);
@@ -107,6 +109,19 @@ public:
     CodeLines code_lines;
     std::string code_context_string(TextPosition position);
     std::string code_error_string(TextPosition start, TextPosition end);
+
+    bool is_variable(const ObjectTypeNode& a);
+    std::pair<std::string, TypeNode*>*
+    get_first_substitution_function(FunctionTypeNode& a, FunctionTypeNode& b, bool is_top_level_arg);
+    std::pair<std::string, TypeNode*>*
+    get_first_substitution_object(ObjectTypeNode& a, ObjectTypeNode& b, bool is_top_level_arg);
+    std::pair<std::string, TypeNode*>* get_first_substitution(TypeNode& a, TypeNode& b, bool is_top_level_arg);
+    TypeNode* substitute(TypeNode* t, std::string var, TypeNode* replacement);
+    void unify_function_call(FunctionTypeNode& fun, VectorOfTypes& args);
+    SymbolInfo match_arguments_to_generic_function(const FunctionTypeNode& ft, VectorOfTypes arg_types);
+    void error_generic_call_mismatch(const TypeNode& expected, const TypeNode& actual, int i);
+
+    void error_call_bad_num_args();
 };
 
 #endif //CHECKER_H
