@@ -160,6 +160,7 @@ Token Scanner::next_token() {
         }
         int end = this->current;
         this->current++;
+        this->column++;
         if (this->current < this->text.size()) {
             this->column++;
         }
