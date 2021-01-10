@@ -1108,7 +1108,7 @@ USymbolInfo Checker::visit(CallNode& n) {
         const FunctionTypeNode& function_type = fun_info.type().function();
         if (n.arguments.size() != function_type.parameter_types.size()) {
             this->error_function_call_num_args(n.start);
-            exit(1);
+            return std::make_unique<SymbolInfo>(ErrorStub());
         }
         VectorOfTypes arg_types;
         for (auto& arg: n.arguments) {
