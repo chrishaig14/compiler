@@ -213,14 +213,17 @@ USymbolInfo Checker::visit(IdNode& n) {
     return std::make_unique<SymbolInfo>(symbol_info);
 }
 
+void Checker::error_redeclared(const std::string& name, TextPosition pos) {
+    std::string msg;
+    msg = this->context_string(pos) + E_FMT("Variable ") + E_HLT(name) + E_FMT(" already declared ") +
+          this->code_context_string(pos);
+    std::cout << msg << std::endl;
+}
+
 USymbolInfo Checker::visit(DeclarationNode& n) {
     if (this->scope->declared(n.identifier)) {
-        std::string msg;
-        msg = E_FMT("Variable ") + E_HLT(n.identifier) + E_FMT(" already declared in current scope at ") +
-              E_HLT(text_pos_to_string(this->__file__, n.start));
-        std::cout << msg << std::endl;
-        // exit(1);
-        throw RedeclareError(n.identifier);
+        this->error_redeclared(n.identifier, n.start);
+        this->failed = true;
     }
     SymbolInfo symbol_info;
     symbol_info.is_function = false;

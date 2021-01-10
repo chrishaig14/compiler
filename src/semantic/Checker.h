@@ -122,6 +122,7 @@ public:
     void error_generic_call_mismatch(const TypeNode& expected, const TypeNode& actual, int i);
 
     void error_call_bad_num_args();
+    void error_redeclared(const std::string& name, TextPosition pos);
 };
 
 #endif //CHECKER_H
