@@ -700,7 +700,7 @@ USymbolInfo Checker::visit(BinopNode& n) {
     }
 
     if (!ok) {
-        this->error_binop(left, right, n.start);
+        this->error_binop(left, right, n.op_pos);
         return std::make_unique<ErrorStub>(ErrorStub());
         // exit(1);
     }

@@ -267,9 +267,11 @@ Node* Parser::parse_add_or_sub_expression() {
     OpType op;
     while (item_in_vec(this->token.type, {TokType::PLUS, TokType::MINUS})) {
         op = TOKEN_TO_OP[this->token.type];
+        Token op_token = this->token;
         this->next();
         Node* right = this->parse_mul_div_or_mod_expression();
-        Node* node = new BinopNode(op, left, right, left->start);
+        BinopNode* node = new BinopNode(op, left, right, left->start);
+        node->op_pos = op_token.start;
         left = node;
     }
     return left;
@@ -280,9 +282,11 @@ Node* Parser::parse_mul_div_or_mod_expression() {
     OpType op;
     while (item_in_vec(this->token.type, {TokType::TIMES, TokType::DIV, TokType::MOD})) {
         op = TOKEN_TO_OP[this->token.type];
+        Token op_token = this->token;
         this->next();
         Node* right = this->parse_factor();
-        Node* node = new BinopNode(op, left, right, left->start);
+        BinopNode* node = new BinopNode(op, left, right, left->start);
+        node->op_pos = op_token.start;
         left = node;
     }
     return left;
