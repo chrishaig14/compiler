@@ -174,6 +174,17 @@ USymbolInfo Checker::visit(FunctionNode& n) {
     return nullptr;
 }
 
+void Checker::error_variable_not_declared(const std::string& name, TextPosition pos) {
+    std::string msg;
+    msg = this->context_string(pos) +
+          E_FMT("Variable ") +
+          E_HLT("'" + name + "'") +
+          E_FMT(" not declared") +
+          this->code_context_string(pos);
+    std::cout << msg << std::endl;
+    this->failed = true;
+}
+
 USymbolInfo Checker::visit(IdNode& n) {
     SymbolInfo symbol_info;
     symbol_info.is_function = false;
@@ -186,7 +197,8 @@ USymbolInfo Checker::visit(IdNode& n) {
             n.location = VariableLocation(-2, -1);
             symbol_info.set_type(this->function_table->get(n.identifier));
         } else {
-            throw ScopeError(n.identifier);
+            this->error_variable_not_declared(n.identifier, n.start);
+            return std::make_unique<SymbolInfo>(ErrorStub());
         }
     } else {
         symbol_info.set_type(this->scope->get(n.identifier));
