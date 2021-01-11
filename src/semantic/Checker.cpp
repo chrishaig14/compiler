@@ -340,10 +340,11 @@ void Checker::error_no_member(const TypeNode& t, const std::string& member, Text
     this->failed = true;
     std::string msg;
     msg =
-            context_string(position) +
-            E_FMT(" Type ") + E_HLT(t.to_string()) +
+            this->context_string(position) +
+            E_FMT("Type ") + E_HLT(t.to_string()) +
             E_FMT(" has no member ") +
-            E_HLT("'" + member + "'");
+            E_HLT("'" + member + "'") +
+            this->code_context_string(position);
     std::cout << msg << std::endl;
 }
 
@@ -593,6 +594,7 @@ USymbolInfo Checker::visit(MemberNode& n) {
             rv.class_info = class_info;
         } else {
             this->error_no_member(object, n.s_child, n.start);
+            return std::make_unique<SymbolInfo>(ErrorStub());
             // exit(1);
         }
     }
@@ -1098,6 +1100,9 @@ void Checker::error_call_not_a_function(TextPosition position) {
 
 USymbolInfo Checker::visit(CallNode& n) {
     USymbolInfo fun_info_p = this->dispatch(n.function);
+    if (fun_info_p->is_error) {
+        return std::make_unique<SymbolInfo>(ErrorStub());
+    }
     SymbolInfo& fun_info = *fun_info_p;
     bool is_a_method = false;
     Node* object_node;
@@ -1235,7 +1240,7 @@ USymbolInfo Checker::visit(BlockNode& program) {
         if (n->ntype == NodeType::CALL) {
             // it's a function call
             // if return value != NoneType, then force the return value
-            if (sinfo.type() != ObjectTypeNode(".None", {})) {
+            if (!sinfo.is_error && sinfo.type() != ObjectTypeNode(".None", {})) {
                 this->error_unused_return_value(n->start);
                 // throw std::runtime_error("You should use the return value of this function call!");
             }
