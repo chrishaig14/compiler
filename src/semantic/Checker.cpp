@@ -394,6 +394,15 @@ void Checker::error_return_mismatch(const TypeNode& expected, const TypeNode& ac
     std::cout << msg << std::endl;
 }
 
+void Checker::error_tuple_assign(TextPosition pos) {
+    std::string msg =
+            this->context_string(pos) +
+            E_FMT("Error: can't reassign a member of a tuple!") +
+            this->code_context_string(pos);
+    std::cout << msg << std::endl;
+}
+
+
 USymbolInfo Checker::visit(AssignmentNode& n) {
     if (n.lvalue->ntype == NodeType::ID) {
         if (n.lvalue->id().identifier == "_") {
@@ -405,7 +414,8 @@ USymbolInfo Checker::visit(AssignmentNode& n) {
     USymbolInfo linfo_p = this->dispatch(n.lvalue);
     this->is_lvalue = false;
     if (n.lvalue->ntype == MEMBER && n.lvalue->member().type == MemberType::NUM) {
-        throw std::runtime_error("Error: can't reassign a member of a tuple!");
+        this->error_tuple_assign(n.start);
+        this->failed = true;
     }
     USymbolInfo expression_type_p = this->dispatch(n.rvalue);
     if (expression_type_p->is_error) {

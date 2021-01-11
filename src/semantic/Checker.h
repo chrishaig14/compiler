@@ -123,6 +123,7 @@ public:
 
     void error_call_bad_num_args();
     void error_redeclared(const std::string& name, TextPosition pos);
+    void error_tuple_assign(TextPosition pos);
 };
 
 #endif //CHECKER_H
