@@ -1094,9 +1094,9 @@ USymbolInfo Checker::visit(CallNode& n) {
         // Since it's a method, we have to transform it and prepare it for the translation step,
         // where instead of calling object.method(args), we call <class>.method(object, args)
 
-        if (n.function->ntype != NodeType::MEMBER) {
-            throw std::runtime_error("Expected it to be a member node!");
-        }
+        // if (n.function->ntype != NodeType::MEMBER) {
+        //     throw std::runtime_error("Expected it to be a member node!");
+        // }
         MemberNode& member_node = n.function->member();
         IdNode* pNode = new IdNode(fun_info.class_info->class_name + "." + member_node.s_child);
         pNode->location = VariableLocation(-2, -1);
@@ -1106,9 +1106,9 @@ USymbolInfo Checker::visit(CallNode& n) {
         object_node = member_node.parent;
         is_a_method = true;
     } else if (fun_info.is_class_method) {
-        if (n.function->ntype != NodeType::MEMBER) {
-            throw std::runtime_error("Expected it to be a member node!");
-        }
+        // if (n.function->ntype != NodeType::MEMBER) {
+        //     throw std::runtime_error("Expected it to be a member node!");
+        // }
         MemberNode& member_node = n.function->member();
         n.function = new IdNode(fun_info.class_info->class_name + "." + member_node.s_child);
         this->replace_me = false;
@@ -1203,6 +1203,14 @@ bool Checker::type_exists(TypeNode& type) {
 //    return true;
 }
 
+void Checker::error_unused_return_value(TextPosition pos) {
+    std::string msg;
+    msg = this->context_string(pos) +
+          E_FMT("Unused return value of function call") + this->code_context_string(pos);
+    std::cout << msg << std::endl;
+    this->failed = true;
+}
+
 USymbolInfo Checker::visit(BlockNode& program) {
     for (auto& n: program.nodes) {
         USymbolInfo sinfo_p = this->dispatch(n);
@@ -1216,7 +1224,8 @@ USymbolInfo Checker::visit(BlockNode& program) {
             // it's a function call
             // if return value != NoneType, then force the return value
             if (sinfo.type() != ObjectTypeNode(".None", {})) {
-                throw std::runtime_error("You should use the return value of this function call!");
+                this->error_unused_return_value(n->start);
+                // throw std::runtime_error("You should use the return value of this function call!");
             }
         }
     }
