@@ -1383,10 +1383,10 @@ USemanticInfo Checker::visit(ListNode& node) {
 }
 
 USemanticInfo Checker::visit(BooleanNode& node) {
-    SemanticInfo symbol_info;
-    symbol_info.set_type(T_BOOL);
-    symbol_info.is_function = false;
-    return std::make_unique<SemanticInfo>(symbol_info);
+    SemanticInfo info;
+    info.set_type(T_BOOL);
+    info.is_function = false;
+    return std::make_unique<SemanticInfo>(info);
 }
 
 USemanticInfo Checker::visit(WhileNode& node) {
@@ -1402,17 +1402,17 @@ USemanticInfo Checker::visit(WhileNode& node) {
 }
 
 USemanticInfo Checker::visit(NumberNode& node) {
-    SemanticInfo semanticInfo;
-    semanticInfo.set_type(T_INT);
-    semanticInfo.is_function = false;
-    return std::make_unique<SemanticInfo>(semanticInfo);
+    SemanticInfo info;
+    info.set_type(T_INT);
+    info.is_function = false;
+    return std::make_unique<SemanticInfo>(info);
 }
 
 USemanticInfo Checker::visit(StringNode& node) {
-    SemanticInfo semanticInfo;
-    semanticInfo.set_type(T_STRING);
-    semanticInfo.is_function = false;
-    return std::make_unique<SemanticInfo>(semanticInfo);
+    SemanticInfo info;
+    info.set_type(T_STRING);
+    info.is_function = false;
+    return std::make_unique<SemanticInfo>(info);
 }
 
 USemanticInfo Checker::visit(SubscriptNode& node) {
@@ -1509,17 +1509,17 @@ USemanticInfo Checker::visit(TernaryNode& node) {
 }
 
 USemanticInfo Checker::visit(NoneNode& node) {
-    SemanticInfo semanticInfo;
-    semanticInfo.set_type(ObjectType("NoneType", {}));
-    semanticInfo.is_function = false;
-    return std::make_unique<SemanticInfo>(semanticInfo);
+    SemanticInfo info;
+    info.set_type(ObjectType("NoneType", {}));
+    info.is_function = false;
+    return std::make_unique<SemanticInfo>(info);
 }
 
 USemanticInfo Checker::visit(EmptyListNode& node) {
-    SemanticInfo semanticInfo;
-    semanticInfo.set_type(T_LIST(node.type->clone()));
-    semanticInfo.is_function = false;
-    return std::make_unique<SemanticInfo>(semanticInfo);
+    SemanticInfo info;
+    info.set_type(T_LIST(node.type->clone()));
+    info.is_function = false;
+    return std::make_unique<SemanticInfo>(info);
 }
 
 USemanticInfo Checker::visit(ClassNode& node) {
