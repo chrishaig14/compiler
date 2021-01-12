@@ -107,7 +107,7 @@ public:
 
     const FunctionType& function() const override;
 
-    VectorOfTypes parameter_types;
+    VectorOfTypes param_types;
     TypeNode* return_type;
 };
 

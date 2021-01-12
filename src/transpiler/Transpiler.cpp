@@ -288,9 +288,9 @@ std::string Transpiler::add_type(const TypeNode& t, std::string n) {
 
 std::string Transpiler::wrap_in_function_type(const FunctionType& t, std::string n) {
     std::string out;
-    out = "Function" + std::to_string(t.parameter_types.size()) + "<";
-    for (int i = 0; i < t.parameter_types.size(); i++) {
-        out += this->type_mapper(*t.parameter_types[i]) + ", ";
+    out = "Function" + std::to_string(t.param_types.size()) + "<";
+    for (int i = 0; i < t.param_types.size(); i++) {
+        out += this->type_mapper(*t.param_types[i]) + ", ";
     }
 //    if (t.parameter_types.size() != 0) {
 //        out = out.substr(0, out.size() - 2);
@@ -303,7 +303,7 @@ std::string Transpiler::wrap_in_function_type(const FunctionType& t, std::string
 
 std::string Transpiler::function_type_mapper(const FunctionType& t) {
     std::string out;
-    out += "Function" + std::to_string(t.parameter_types.size()) + "*";
+    out += "Function" + std::to_string(t.param_types.size()) + "*";
     return out;
 }
 
@@ -376,7 +376,7 @@ std::set<std::string> get_generic_types(const TypeNode& t) {
             }
         }
     } else {
-        for (auto tp: t.function().parameter_types) {
+        for (auto tp: t.function().param_types) {
             if (is_generic(*tp)) {
                 for (auto pp: get_generic_types(*tp)) {
                     types.insert(pp);

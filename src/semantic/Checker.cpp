@@ -7,7 +7,7 @@
 #include "../logging/logging.h"
 
 bool function_is_generic(const FunctionType& ft) {
-    for (auto param_type: ft.parameter_types) {
+    for (auto param_type: ft.param_types) {
         if (is_generic(*param_type)) {
             return true;
             break;
@@ -127,7 +127,7 @@ void Checker::assert_type_exists(TypeNode& type, TextPosition pos) {
             }
         }
     } else {
-        for (auto t: type.function().parameter_types) {
+        for (auto t: type.function().param_types) {
             this->assert_type_exists(*t, pos);
         }
         this->assert_type_exists(*type.function().return_type, pos);
@@ -390,7 +390,7 @@ USymbolInfo Checker::visit(MemberNode& n) {
                     tp.push_back(new ObjectType(tttp, {}));
                 }
                 auto instance_type = new ObjectType(rv.class_info->class_name, tp);
-                copy_ftn.parameter_types.insert(copy_ftn.parameter_types.begin(), instance_type);
+                copy_ftn.param_types.insert(copy_ftn.param_types.begin(), instance_type);
 
                 rv.set_type(copy_ftn);
                 rv.is_method = false;
@@ -661,7 +661,7 @@ bool is_generic(const TypeNode& t) {
         }
     } else {
         const FunctionType& fo = t.function();
-        for (auto param_type: fo.parameter_types) {
+        for (auto param_type: fo.param_types) {
             if (is_generic(*param_type)) {
                 return true;
             }
@@ -694,11 +694,11 @@ std::unordered_map<std::string, TypeNode*> make_replacements(TypeNode* a, TypeNo
         if (a->kind == Kind::FUNCTION && b->kind == Kind::FUNCTION) {
             FunctionType& fa = a->function();
             FunctionType& fb = b->function();
-            for (int i = 0; i < fa.parameter_types.size(); i++) {
-                if (is_generic(*fa.parameter_types[i])) {
+            for (int i = 0; i < fa.param_types.size(); i++) {
+                if (is_generic(*fa.param_types[i])) {
                     std::unordered_map<std::string, TypeNode*> rep = make_replacements(
-                            fa.parameter_types[i],
-                            fb.parameter_types[i]
+                            fa.param_types[i],
+                            fb.param_types[i]
                     );
                     replacements.insert(rep.begin(), rep.end());
                 }
@@ -734,11 +734,11 @@ std::vector<TypeNode*> make_replacements_in_order(TypeNode* a, TypeNode* b) {
         if (a->kind == Kind::FUNCTION && b->kind == Kind::FUNCTION) {
             FunctionType& fa = a->function();
             FunctionType& fb = b->function();
-            for (int i = 0; i < fa.parameter_types.size(); i++) {
-                if (is_generic(*fa.parameter_types[i])) {
+            for (int i = 0; i < fa.param_types.size(); i++) {
+                if (is_generic(*fa.param_types[i])) {
                     std::vector<TypeNode*> rep = make_replacements_in_order(
-                            fa.parameter_types[i],
-                            fb.parameter_types[i]
+                            fa.param_types[i],
+                            fb.param_types[i]
                     );
                     replacements.insert(replacements.end(), rep.begin(), rep.end());
                 }
@@ -763,15 +763,15 @@ bool type_matches(TypeNode* aa, TypeNode* bb) {
         FunctionType& fb = b.function();
         FunctionType& new_f = fa;
         std::unordered_map<std::string, TypeNode*> replacements;
-        if (fa.parameter_types.size() != fb.parameter_types.size()) {
+        if (fa.param_types.size() != fb.param_types.size()) {
             return false;
         }
-        VectorOfTypes param_types = fa.parameter_types;
+        VectorOfTypes param_types = fa.param_types;
         for (int i = 0; i < param_types.size(); i++) {
-            if (type_matches(param_types[i], fb.parameter_types[i])) {
+            if (type_matches(param_types[i], fb.param_types[i])) {
                 std::unordered_map<std::string, TypeNode*> rep = make_replacements(
-                        fa.parameter_types[i],
-                        fb.parameter_types[i]
+                        fa.param_types[i],
+                        fb.param_types[i]
                 );
                 replacements.insert(rep.begin(), rep.end());
                 for (int j = 0; j < param_types.size(); j++) {
@@ -816,14 +816,14 @@ std::unordered_map<std::string, TypeNode*>
 make_function_generic_replacements(FunctionType& t_generic_type, FunctionType& t_matching_type) {
     std::unordered_map<std::string, TypeNode*> repl;
 
-    if (t_generic_type.parameter_types.size() != t_matching_type.parameter_types.size()) {
+    if (t_generic_type.param_types.size() != t_matching_type.param_types.size()) {
         throw std::runtime_error("Error parameter_types size mismatch!");
     }
-    for (int i = 0; i < t_generic_type.parameter_types.size(); i++) {
-        if (is_generic(*t_generic_type.parameter_types[i])) {
+    for (int i = 0; i < t_generic_type.param_types.size(); i++) {
+        if (is_generic(*t_generic_type.param_types[i])) {
             auto r = make_generic_replacements(
-                    *t_generic_type.parameter_types[i],
-                    *t_matching_type.parameter_types[i]
+                    *t_generic_type.param_types[i],
+                    *t_matching_type.param_types[i]
             );
             for (auto x: r) {
                 if (repl.count(x.first) != 0 && *repl[x.first] != *x.second) {
@@ -832,7 +832,7 @@ make_function_generic_replacements(FunctionType& t_generic_type, FunctionType& t
             }
             repl.insert(r.begin(), r.end());
         } else {
-            if (*t_generic_type.parameter_types[i] != *t_matching_type.parameter_types[i]) {
+            if (*t_generic_type.param_types[i] != *t_matching_type.param_types[i]) {
                 throw std::runtime_error("Error: parameter type mismatch!");
             }
         }
@@ -928,8 +928,8 @@ SymbolInfo Checker::match_arguments_to_generic_function(const FunctionType& ft, 
 VectorOfTypes
 Checker::get_replacements_in_order(const FunctionType& function_type, VectorOfTypes arg_types) {
     VectorOfTypes generic_replacements;
-    for (int i = 0; i < function_type.parameter_types.size(); i++) {
-        TypeNode& param_type = *function_type.parameter_types[i];
+    for (int i = 0; i < function_type.param_types.size(); i++) {
+        TypeNode& param_type = *function_type.param_types[i];
         if (is_generic(param_type)) {
             if (type_matches(&param_type, arg_types[i])) {
                 VectorOfTypes param_generic_replacements = make_replacements_in_order(
@@ -982,14 +982,14 @@ USymbolInfo Checker::visit(CallNode& n) {
         this->replace_me = false;
         const FunctionType& ftn = fun_info.type().function();
         FunctionType& copy_ftn = ftn.clone()->function();
-        copy_ftn.parameter_types.insert(copy_ftn.parameter_types.begin(), TYPE(fun_info.class_info->class_name, {}));
+        copy_ftn.param_types.insert(copy_ftn.param_types.begin(), TYPE(fun_info.class_info->class_name, {}));
         retv.set_type(*copy_ftn.clone());
         object_node = member_node.parent;
     }
     if (fun_info.is_function || fun_info.is_method || fun_info.is_class_method) {
         // ok
         const FunctionType& function_type = fun_info.type().function();
-        if (n.arguments.size() != function_type.parameter_types.size()) {
+        if (n.arguments.size() != function_type.param_types.size()) {
             this->error_function_call_num_args(n.start);
             return std::make_unique<SymbolInfo>(ErrorStub());
         }
@@ -1009,7 +1009,7 @@ USymbolInfo Checker::visit(CallNode& n) {
             retv.set_type(*function_type.return_type);
             for (int i = 0; i < n.arguments.size(); i++) {
                 const TypeNode& arg_type = *arg_types[i];
-                const TypeNode& param_type = *function_type.parameter_types[i];
+                const TypeNode& param_type = *function_type.param_types[i];
                 if (arg_type != param_type) {
                     this->error_function_call_type_mismatch(
                             param_type,
@@ -1195,7 +1195,7 @@ make_type_from_object_pattern(const ObjectType& object_type,
 TypeNode* make_type_from_function_pattern(const FunctionType& ftn,
                                           const std::unordered_map<std::string, TypeNode*>& replacements) {
     VectorOfTypes new_param_types;
-    for (auto pt: ftn.parameter_types) {
+    for (auto pt: ftn.param_types) {
         TypeNode* new_pt = make_type(*pt, replacements);
         new_param_types.push_back(new_pt);
     }
@@ -1701,20 +1701,20 @@ USymbolInfo Checker::visit(FloatNode& node) {
 USymbolInfo Checker::visit(PartialApplication& node) {
     USymbolInfo func = this->dispatch(node.function);
     VectorOfTypes partial_args;
-    if (node.args.size() != func->type().function().parameter_types.size()) {
+    if (node.args.size() != func->type().function().param_types.size()) {
         throw std::runtime_error("Error: wrong number of arguments for partial function");
     }
     for (int i = 0; i < node.args.size(); i++) {
         if (node.args[i] != nullptr) {
             USymbolInfo arg = this->dispatch(node.args[i]);
-            if (arg->type() != *func->type().function().parameter_types[i]) {
+            if (arg->type() != *func->type().function().param_types[i]) {
                 throw std::runtime_error(
                         "Error in partial function: type of arg " + std::to_string(i + 1) + " (" +
                         arg->type().to_string() + ") doesn't match expected type " +
-                        func->type().function().parameter_types[i]->to_string());
+                        func->type().function().param_types[i]->to_string());
             }
         } else {
-            partial_args.push_back(func->type().function().parameter_types[i]->clone());
+            partial_args.push_back(func->type().function().param_types[i]->clone());
         }
     }
     node.complete_type = &func->type().clone()->function();
@@ -1778,8 +1778,8 @@ TypeNode* Checker::substitute(TypeNode* t, std::string var, TypeNode* replacemen
         }
     } else {
         TypeNode* c = t->clone();
-        for (int i = 0; i < t->function().parameter_types.size(); i++) {
-            c->function().parameter_types[i] = substitute(t->function().parameter_types[i], var, replacement);
+        for (int i = 0; i < t->function().param_types.size(); i++) {
+            c->function().param_types[i] = substitute(t->function().param_types[i], var, replacement);
         }
         c->function().return_type = substitute(c->function().return_type, var, replacement);
         return c;
@@ -1788,15 +1788,15 @@ TypeNode* Checker::substitute(TypeNode* t, std::string var, TypeNode* replacemen
 
 std::pair<std::string, TypeNode*>*
 Checker::get_first_substitution_function(FunctionType& a, FunctionType& b, bool is_top_level_arg) {
-    if (a.parameter_types.size() != b.parameter_types.size()) {
+    if (a.param_types.size() != b.param_types.size()) {
         throw std::runtime_error(
                 "Error: trying to unify two functions with different parameter count: " + a.to_string() + " and " +
                 b.to_string());
     }
-    for (int i = 0; i < a.parameter_types.size(); i++) {
+    for (int i = 0; i < a.param_types.size(); i++) {
         std::pair<std::string, TypeNode*>* u = get_first_substitution(
-                *a.parameter_types[i],
-                *b.parameter_types[i],
+                *a.param_types[i],
+                *b.param_types[i],
                 false
         );
         if (u != nullptr) {
@@ -1811,14 +1811,14 @@ Checker::get_first_substitution_function(FunctionType& a, FunctionType& b, bool 
 }
 
 void Checker::unify_function_call(FunctionType& fun, VectorOfTypes& args) {
-    if (args.size() != fun.parameter_types.size()) {
+    if (args.size() != fun.param_types.size()) {
         this->error_call_bad_num_args();
         this->failed = true;
         return;
     }
 
     for (int i = 0; i < args.size(); i++) {
-        auto param = fun.parameter_types[i];
+        auto param = fun.param_types[i];
         auto arg = args[i];
         try {
             std::pair<std::string, TypeNode*>* substitution = get_first_substitution(*param, *arg, true);
@@ -1827,8 +1827,8 @@ void Checker::unify_function_call(FunctionType& fun, VectorOfTypes& args) {
                     // if (j == i) {
                     //     continue;
                     // }
-                    fun.parameter_types[j] = substitute(
-                            fun.parameter_types[j],
+                    fun.param_types[j] = substitute(
+                            fun.param_types[j],
                             substitution->first,
                             substitution->second
                     );
@@ -1836,7 +1836,7 @@ void Checker::unify_function_call(FunctionType& fun, VectorOfTypes& args) {
                 }
                 fun.return_type = substitute(fun.return_type, substitution->first, substitution->second);
                 std::cout << "Simple substitution: " << fun.to_string() << std::endl;
-                param = fun.parameter_types[i];
+                param = fun.param_types[i];
                 arg = args[i];
                 substitution = get_first_substitution(*param, *arg, true);
             }

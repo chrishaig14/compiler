@@ -11,14 +11,14 @@ FunctionType::FunctionType(const VectorOfTypes& parameterTypes,
         assert(p != nullptr);
     }
     assert(returnType != nullptr);
-    this->parameter_types = parameterTypes;
+    this->param_types = parameterTypes;
     this->return_type = returnType;
     this->kind = Kind::FUNCTION;
 }
 
 FunctionType* FunctionType::clone() const {
     VectorOfTypes aux;
-    for (auto p: this->parameter_types) {
+    for (auto p: this->param_types) {
         aux.emplace_back(p->clone());
     }
     return new FunctionType(aux, this->return_type->clone());
@@ -26,7 +26,7 @@ FunctionType* FunctionType::clone() const {
 
 FunctionType::~FunctionType() {
     delete this->return_type;
-    for (auto p: this->parameter_types) {
+    for (auto p: this->param_types) {
         delete p;
     }
 }
@@ -35,11 +35,11 @@ std::string FunctionType::to_string() const {
     auto& ftype = *this;
     std::string parameters;
     std::string ret;
-    for (auto ptr: ftype.parameter_types) {
+    for (auto ptr: ftype.param_types) {
         auto& p = *ptr;
         parameters += p.to_string() + ", ";
     }
-    if (ftype.parameter_types.size() != 0) {
+    if (ftype.param_types.size() != 0) {
         parameters = parameters.substr(0, parameters.size() - 2);
     }
     ret = ftype.return_type->to_string();
@@ -49,11 +49,11 @@ std::string FunctionType::to_string() const {
 bool FunctionType::equal(const TypeNode& other) const {
     auto& a = *this;
     auto& b = other.function();
-    if (a.parameter_types.size() != b.parameter_types.size()) {
+    if (a.param_types.size() != b.param_types.size()) {
         return false;
     }
-    for (int i = 0; i < a.parameter_types.size(); i++) {
-        if (*a.parameter_types[i] != *b.parameter_types[i]) {
+    for (int i = 0; i < a.param_types.size(); i++) {
+        if (*a.param_types[i] != *b.param_types[i]) {
             return false;
         }
     }
