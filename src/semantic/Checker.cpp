@@ -1202,45 +1202,6 @@ USymbolInfo Checker::visit(CallNode& n) {
     return std::make_unique<SymbolInfo>(retv);
 }
 
-bool Checker::type_exists(TypeNode& type) {
-    return false;
-//    auto function_type = TO_FUNCTION_TYPE(type);
-//    if (function_type != nullptr) {
-//        for (auto pt: function_type->parameter_types) {
-//            if (!this->type_exists(pt)) return false;
-//        }
-//        if (!this->type_exists(function_type->return_type)) return false;
-//    } else {
-//        auto object_type = (type)->object();
-//        if (object_type != nullptr) {
-//            if (this->class_table->declared(object_type->identifier)) {
-//                if (object_type->type_parameters.size() !=
-//                    this->class_table->get(object_type->identifier)->type_parameters.size()) {
-//                    throw std::runtime_error("Template struct " + object_type->identifier + " expects " +
-//                                             std::to_string(this->class_table->get(
-//                                                     object_type->identifier)->type_parameters.size()) +
-//                                             " parameters, but " +
-//                                             std::to_string(object_type->type_parameters.size()) +
-//                                             " given");
-//                }
-//                for (auto tp: object_type->type_parameters) {
-//                    if (!this->type_exists(tp)) return false;
-//                }
-//            } else {
-//                if (object_type->type_parameters.size() == 0) {
-//                    for (auto t: this->type_params) {
-//                        if (t == object_type->identifier) return true;
-//                    }
-//                    return false;
-//                } else {
-//                    return false;
-//                }
-//            }
-//        }
-//    }
-//    return true;
-}
-
 void Checker::error_unused_return_value(TextPosition pos) {
     std::string msg;
     msg = this->context_string(pos) +

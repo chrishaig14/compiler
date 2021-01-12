@@ -51,7 +51,6 @@ public:
     bool can_assign(const TypeNode& from, const TypeNode& to);
     bool can_assign_generic(TypeNode& from, TypeNode& to, std::vector<std::string> type_params);
     bool is_immutable(const TypeNode& node);
-    bool type_exists(TypeNode& type);
     Checker(SymbolTable* globals, ClassTable* class_table, FunctionTable* function_table);
     ClassInfo* instantiate_generic(ClassInfo* generic, const ObjectTypeNode& instance);
     void error_assignment(const TypeNode& expected, const TypeNode& actual, TextPosition position);
