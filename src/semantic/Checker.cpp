@@ -112,7 +112,6 @@ void Checker::assert_type_exists(TypeNode& type, TextPosition pos) {
                     msg = E_FMT(text_pos_to_string(this->__file__, pos));
                     msg += E_FMT(" type ") + E_HLT(type.object().identifier) + E_FMT(" doesn't exist");
                     std::cout << msg << std::endl;
-                    // exit(1);
                 }
             }
             return;
@@ -122,7 +121,6 @@ void Checker::assert_type_exists(TypeNode& type, TextPosition pos) {
             msg = E_FMT(text_pos_to_string(this->__file__, pos));
             msg += E_FMT(" type ") + E_HLT(type.object().identifier) + E_FMT(" doesn't exist");
             std::cout << msg << std::endl;
-            // exit(1);
         } else {
             for (auto t: type.object().type_parameters) {
                 this->assert_type_exists(*t, pos);
@@ -255,7 +253,6 @@ USymbolInfo Checker::visit(DeclarationNode& n) {
             // it's a function
             if (*n.type != exp_info.type()) {
                 this->error_assignment(*n.type, exp_info.type(), n.start);
-                // exit(1);
             }
         } else {
             SymbolInfo expression_info = exp_info;
@@ -265,7 +262,6 @@ USymbolInfo Checker::visit(DeclarationNode& n) {
                     auto foo = expression_info.type().object();
                     if (foo.identifier != "NoneType") {
                         this->error_assignment(*n.type, expression_info.type(), n.start);
-                        // exit(1);
                     }
                 }
             } else if (actual_type.identifier == "Union") {
@@ -278,12 +274,10 @@ USymbolInfo Checker::visit(DeclarationNode& n) {
                 }
                 if (!ok) {
                     this->error_assignment(*n.type, expression_info.type(), n.start);
-                    // exit(1);
                 }
             } else {
                 if (*n.type != expression_info.type()) {
                     this->error_assignment(*n.type, expression_info.type(), n.start);
-                    // exit(1);
                 }
             }
         }
@@ -455,7 +449,6 @@ USymbolInfo Checker::visit(AssignmentNode& n) {
                 auto& foo = expression_type.type().object();
                 if (foo.identifier != "NoneType") {
                     this->error_assignment(linfo.type(), expression_type.type(), n.start);
-                    // exit(1);
                 }
                 // assigning none, ok
             }
@@ -476,13 +469,11 @@ USymbolInfo Checker::visit(AssignmentNode& n) {
                                 expression_type.type(),
                                 n.start
                         );
-                        // exit(1);
                     }
                 }
             } else {
                 // if it's not Option[t], then it's an error
                 this->error_assignment(linfo.type(), expression_type.type(), n.start);
-                // exit(1);
             }
         }
         // else, type matches don't do anything
@@ -616,7 +607,6 @@ USymbolInfo Checker::visit(MemberNode& n) {
         } else {
             this->error_no_member(object, n.s_child, n.start);
             return std::make_unique<SymbolInfo>(ErrorStub());
-            // exit(1);
         }
     }
 
@@ -633,7 +623,6 @@ USymbolInfo Checker::visit(IfNode& n) {
 
     if (condition_info.type() != T_BOOL) {
         this->error_condition(condition_info.type(), n.start, "if");
-        // exit(1);
     }
 
     this->enter_scope("if");
@@ -679,7 +668,6 @@ USymbolInfo Checker::visit(BoolOpNode& n) {
     }
     if (!ok && left_info.type() != right_info.type()) {
         this->error_bool_op(left_info.type(), right_info.type(), n.start);
-        // exit(1);
     }
 
     symbol_info.set_type(ObjectTypeNode("Boolean", {}));
@@ -752,7 +740,6 @@ USymbolInfo Checker::visit(BinopNode& n) {
     if (!ok) {
         this->error_binop(left, right, n.op_pos);
         return std::make_unique<ErrorStub>(ErrorStub());
-        // exit(1);
     }
 
     return std::make_unique<SymbolInfo>(symbol_info);
@@ -764,12 +751,10 @@ USymbolInfo Checker::visit(ReturnNode& n) {
     if (return_type == ObjectTypeNode(".None", {})) {
         if (n.expression != nullptr) {
             this->error_bad_return(n.start);
-            // exit(1);
         }
         return nullptr;
     } else if (n.expression == nullptr) {
         this->error_no_return(return_type, n.start);
-        // exit(1);
     }
     USymbolInfo expression_info_p = this->dispatch(n.expression);
     SymbolInfo& expression_info = *expression_info_p;
@@ -1193,7 +1178,6 @@ USymbolInfo Checker::visit(CallNode& n) {
         }
     } else {
         this->error_call_not_a_function(n.start);
-        // exit(1);
     }
     if (is_a_method) {
         // prepend the "this" argument (the object on which the method is being called)
@@ -1507,7 +1491,6 @@ USymbolInfo Checker::visit(ForNode& node) {
     const ObjectTypeNode& obj = symbol_info.type().object();
     if (obj.identifier != "List") {
         this->error_for(obj, node.start);
-        // exit(1);
     }
     this->scope->set(".index0", T_INT);
     this->scope->set(".list0", T_LIST(new T_INT));
@@ -1589,7 +1572,6 @@ USymbolInfo Checker::visit(WhileNode& node) {
     SymbolInfo& condition = *condition_p;
     if (condition.type() != ObjectTypeNode("Boolean", {})) {
         this->error_condition(condition.type(), node.start, "elif");
-        // exit(1);
     }
     this->enter_scope("while");
     this->visit(*node.body);
@@ -2071,7 +2053,6 @@ void Checker::unify_function_call(FunctionTypeNode& fun, VectorOfTypes& args) {
         } catch (...) {
             error_generic_call_mismatch(*param, *arg, i);
             this->failed = true;
-            // exit(1);
         }
     }
 }
