@@ -23,7 +23,7 @@
 #include "unify.h"
 #include "../logging/logging.h"
 
-typedef std::unique_ptr<SemanticInfo> USymbolInfo;
+typedef std::unique_ptr<SemanticInfo> USemanticInfo;
 
 bool type_matches(TypeNode* a, TypeNode* b);
 
@@ -74,36 +74,36 @@ public:
     void error_no_return(const TypeNode& t, TextPosition position);
     void error_class_no_method(const std::string& class_name, const std::string method_name, TextPosition pos);
     void error_return_mismatch(const TypeNode& expected, const TypeNode& actual, TextPosition position);
-    USymbolInfo dispatch(Node* nod);
-    USymbolInfo visit(AssignmentNode& n);
-    USymbolInfo visit(BinopNode& node);
-    USymbolInfo visit(BlockNode& node);
-    USymbolInfo visit(BooleanNode& node);
-    USymbolInfo visit(BoolOpNode& n);
-    USymbolInfo visit(BreakNode& node);
-    USymbolInfo visit(CallNode& node);
-    USymbolInfo visit(ClassLiteralExpressionNode& node);
-    USymbolInfo visit(ClassLiteralFieldNode& node);
-    USymbolInfo visit(ClassNode& node);
-    USymbolInfo visit(ContinueNode& node);
-    USymbolInfo visit(DeclarationNode& node);
-    USymbolInfo visit(EmptyListNode& node);
-    USymbolInfo visit(FloatNode& node);
-    USymbolInfo visit(ForNode& node);
-    USymbolInfo visit(FunctionNode& node);
-    USymbolInfo visit(IdNode& node);
-    USymbolInfo visit(IfNode& node);
-    USymbolInfo visit(ListNode& node);
-    USymbolInfo visit(MemberNode& node);
-    USymbolInfo visit(NoneNode& node);
-    USymbolInfo visit(NumberNode& node);
-    USymbolInfo visit(PartialApplication& node);
-    USymbolInfo visit(ReturnNode& n);
-    USymbolInfo visit(StringNode& node);
-    USymbolInfo visit(SubscriptNode& node);
-    USymbolInfo visit(TernaryNode& node);
-    USymbolInfo visit(TupleNode& node);
-    USymbolInfo visit(WhileNode& node);
+    USemanticInfo dispatch(Node* nod);
+    USemanticInfo visit(AssignmentNode& n);
+    USemanticInfo visit(BinopNode& node);
+    USemanticInfo visit(BlockNode& node);
+    USemanticInfo visit(BooleanNode& node);
+    USemanticInfo visit(BoolOpNode& n);
+    USemanticInfo visit(BreakNode& node);
+    USemanticInfo visit(CallNode& node);
+    USemanticInfo visit(ClassLiteralExpressionNode& node);
+    USemanticInfo visit(ClassLiteralFieldNode& node);
+    USemanticInfo visit(ClassNode& node);
+    USemanticInfo visit(ContinueNode& node);
+    USemanticInfo visit(DeclarationNode& node);
+    USemanticInfo visit(EmptyListNode& node);
+    USemanticInfo visit(FloatNode& node);
+    USemanticInfo visit(ForNode& node);
+    USemanticInfo visit(FunctionNode& node);
+    USemanticInfo visit(IdNode& node);
+    USemanticInfo visit(IfNode& node);
+    USemanticInfo visit(ListNode& node);
+    USemanticInfo visit(MemberNode& node);
+    USemanticInfo visit(NoneNode& node);
+    USemanticInfo visit(NumberNode& node);
+    USemanticInfo visit(PartialApplication& node);
+    USemanticInfo visit(ReturnNode& n);
+    USemanticInfo visit(StringNode& node);
+    USemanticInfo visit(SubscriptNode& node);
+    USemanticInfo visit(TernaryNode& node);
+    USemanticInfo visit(TupleNode& node);
+    USemanticInfo visit(WhileNode& node);
     VectorOfTypes get_replacements_in_order(const FunctionType& function_type, VectorOfTypes arg_types);
     void enter_scope(std::string name);
     void leave_scope();

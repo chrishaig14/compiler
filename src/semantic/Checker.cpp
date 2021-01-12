@@ -134,7 +134,7 @@ void Checker::assert_type_exists(TypeNode& type, TextPosition pos) {
     }
 }
 
-USymbolInfo Checker::visit(FunctionNode& n) {
+USemanticInfo Checker::visit(FunctionNode& n) {
     this->current_function = n.identifier;
     this->enter_scope(n.identifier);
     if (this->add_this) {
@@ -172,7 +172,7 @@ USymbolInfo Checker::visit(FunctionNode& n) {
     return nullptr;
 }
 
-USymbolInfo Checker::visit(IdNode& n) {
+USemanticInfo Checker::visit(IdNode& n) {
     SemanticInfo symbol_info;
     symbol_info.is_function = false;
     symbol_info.is_method = false;
@@ -212,7 +212,7 @@ USymbolInfo Checker::visit(IdNode& n) {
     return std::make_unique<SemanticInfo>(symbol_info);
 }
 
-USymbolInfo Checker::visit(DeclarationNode& n) {
+USemanticInfo Checker::visit(DeclarationNode& n) {
     if (this->scope->declared(n.identifier)) {
         this->error_redeclared(n.identifier, n.start);
         this->failed = true;
@@ -221,7 +221,7 @@ USymbolInfo Checker::visit(DeclarationNode& n) {
     symbol_info.is_function = false;
     if (n.expression->ntype != NodeType::UNINITIALIZED and n.type != nullptr) {
         this->assert_type_exists(*n.type, n.start);
-        USymbolInfo exp_info_p = this->dispatch(n.expression);
+        USemanticInfo exp_info_p = this->dispatch(n.expression);
         SemanticInfo& exp_info = *exp_info_p;
         if (exp_info.is_error) {
             this->scope->set(n.identifier, *n.type);
@@ -266,7 +266,7 @@ USymbolInfo Checker::visit(DeclarationNode& n) {
         symbol_info.set_type(*n.type);
 
     } else if (n.expression->ntype != NodeType::UNINITIALIZED) {
-        USymbolInfo exp_info_p = this->dispatch(n.expression);
+        USemanticInfo exp_info_p = this->dispatch(n.expression);
         n.type = exp_info_p->type().clone();
         SemanticInfo& exp_info = *exp_info_p;
         if (this->replace_me) {
@@ -300,7 +300,7 @@ std::string Checker::code_error_string(TextPosition start, TextPosition end) {
     return str;
 }
 
-USymbolInfo Checker::visit(AssignmentNode& n) {
+USemanticInfo Checker::visit(AssignmentNode& n) {
     if (n.lvalue->ntype == NodeType::ID) {
         if (n.lvalue->id()._id == "_") {
             this->dispatch(n.rvalue);
@@ -308,7 +308,7 @@ USymbolInfo Checker::visit(AssignmentNode& n) {
         }
     }
     this->is_lvalue = true;
-    USymbolInfo linfo_p = this->dispatch(n.lvalue);
+    USemanticInfo linfo_p = this->dispatch(n.lvalue);
     if (linfo_p->is_error) {
         return nullptr;
     }
@@ -317,7 +317,7 @@ USymbolInfo Checker::visit(AssignmentNode& n) {
         this->error_tuple_assign(n.start);
         this->failed = true;
     }
-    USymbolInfo expression_type_p = this->dispatch(n.rvalue);
+    USemanticInfo expression_type_p = this->dispatch(n.rvalue);
     if (expression_type_p->is_error) {
         return nullptr;
     }
@@ -372,7 +372,7 @@ USymbolInfo Checker::visit(AssignmentNode& n) {
     return nullptr;
 }
 
-USymbolInfo Checker::visit(MemberNode& n) {
+USemanticInfo Checker::visit(MemberNode& n) {
     SemanticInfo rv;
     if (n.parent->ntype == NodeType::ID) {
         IdNode& id_node = n.parent->id();
@@ -408,7 +408,7 @@ USymbolInfo Checker::visit(MemberNode& n) {
     }
     bool old_lvalue = this->is_lvalue;
     this->is_lvalue = false;
-    USymbolInfo symbol_info_p = this->dispatch(n.parent);
+    USemanticInfo symbol_info_p = this->dispatch(n.parent);
     this->is_lvalue = old_lvalue;
     SemanticInfo& symbol_info = *symbol_info_p;
     if (symbol_info.type().kind != Kind::OBJECT) {
@@ -488,9 +488,9 @@ USymbolInfo Checker::visit(MemberNode& n) {
 
 }
 
-USymbolInfo Checker::visit(IfNode& n) {
+USemanticInfo Checker::visit(IfNode& n) {
     SemanticInfo symbol_info;
-    USymbolInfo condition_info_p = this->dispatch(n.condition);
+    USemanticInfo condition_info_p = this->dispatch(n.condition);
     SemanticInfo& condition_info = *condition_info_p;
 
     std::unordered_map<std::string, bool> not_null_vars;
@@ -521,9 +521,9 @@ USymbolInfo Checker::visit(IfNode& n) {
     return std::make_unique<SemanticInfo>(symbol_info);
 }
 
-USymbolInfo Checker::visit(BoolOpNode& n) {
-    USymbolInfo left_info_p = this->dispatch(n.left);
-    USymbolInfo right_info_p = this->dispatch(n.right);
+USemanticInfo Checker::visit(BoolOpNode& n) {
+    USemanticInfo left_info_p = this->dispatch(n.left);
+    USemanticInfo right_info_p = this->dispatch(n.right);
 
     SemanticInfo& left_info = *left_info_p;
     SemanticInfo& right_info = *right_info_p;
@@ -549,14 +549,14 @@ USymbolInfo Checker::visit(BoolOpNode& n) {
     return std::make_unique<SemanticInfo>(symbol_info);
 }
 
-USymbolInfo Checker::visit(BinopNode& n) {
-    USymbolInfo left_info_p = this->dispatch(n.left);
+USemanticInfo Checker::visit(BinopNode& n) {
+    USemanticInfo left_info_p = this->dispatch(n.left);
     if (this->replace_me) {
         n.left = this->replacement;
         this->replace_me = false;
     }
 
-    USymbolInfo right_info_p = this->dispatch(n.right);
+    USemanticInfo right_info_p = this->dispatch(n.right);
     if (this->replace_me) {
         n.right = this->replacement;
         this->replace_me = false;
@@ -619,7 +619,7 @@ USymbolInfo Checker::visit(BinopNode& n) {
     return std::make_unique<SemanticInfo>(symbol_info);
 }
 
-USymbolInfo Checker::visit(ReturnNode& n) {
+USemanticInfo Checker::visit(ReturnNode& n) {
     const TypeNode& return_type = this->scope->get("__return__");
     if (return_type == ObjectType(".None", {})) {
         if (n.expression != nullptr) {
@@ -629,7 +629,7 @@ USymbolInfo Checker::visit(ReturnNode& n) {
     } else if (n.expression == nullptr) {
         this->error_no_return(return_type, n.start);
     }
-    USymbolInfo expression_info_p = this->dispatch(n.expression);
+    USemanticInfo expression_info_p = this->dispatch(n.expression);
     SemanticInfo& expression_info = *expression_info_p;
     if (expression_info.is_error) {
         return nullptr;
@@ -949,8 +949,8 @@ Checker::get_replacements_in_order(const FunctionType& function_type, VectorOfTy
     return generic_replacements;
 }
 
-USymbolInfo Checker::visit(CallNode& n) {
-    USymbolInfo fun_info_p = this->dispatch(n.function);
+USemanticInfo Checker::visit(CallNode& n) {
+    USemanticInfo fun_info_p = this->dispatch(n.function);
     if (fun_info_p->is_error) {
         return std::make_unique<SemanticInfo>(ErrorStub());
     }
@@ -995,7 +995,7 @@ USymbolInfo Checker::visit(CallNode& n) {
         }
         VectorOfTypes arg_types;
         for (auto& arg: n.arguments) {
-            USymbolInfo arg_type_p = this->dispatch(arg);
+            USemanticInfo arg_type_p = this->dispatch(arg);
             const TypeNode& arg_type = arg_type_p->type();
             if (this->replace_me) {
                 arg = replacement;
@@ -1031,9 +1031,9 @@ USymbolInfo Checker::visit(CallNode& n) {
     return std::make_unique<SemanticInfo>(retv);
 }
 
-USymbolInfo Checker::visit(BlockNode& program) {
+USemanticInfo Checker::visit(BlockNode& program) {
     for (auto& n: program.nodes) {
-        USymbolInfo sinfo_p = this->dispatch(n);
+        USemanticInfo sinfo_p = this->dispatch(n);
         if (this->replace_me) {
             n = this->replacement;
             this->replace_me = false;
@@ -1052,7 +1052,7 @@ USymbolInfo Checker::visit(BlockNode& program) {
     return nullptr;
 }
 
-USymbolInfo Checker::visit(ClassLiteralExpressionNode& node) {
+USemanticInfo Checker::visit(ClassLiteralExpressionNode& node) {
     ObjectType& object_type = *node.type;
     std::string& object_type_id = object_type.id;
     const std::string& object_type_str = object_type.to_string();
@@ -1098,7 +1098,7 @@ USymbolInfo Checker::visit(ClassLiteralExpressionNode& node) {
 
     for (int i = 0; i < num_actual_init; i++) {
         Node* exp = node.init[i];
-        USymbolInfo semanticInfo_p = this->dispatch(exp);
+        USemanticInfo semanticInfo_p = this->dispatch(exp);
         SemanticInfo& semanticInfo = *semanticInfo_p;
         if (this->replace_me) {
             node.init[i] = this->replacement;
@@ -1242,7 +1242,7 @@ ClassInfo* Checker::instantiate_generic(ClassInfo* generic, const ObjectType& in
     return concrete;
 }
 
-USymbolInfo Checker::visit(ClassLiteralFieldNode& node) {
+USemanticInfo Checker::visit(ClassLiteralFieldNode& node) {
     ObjectType* object_type = node.type;
     std::string& object_type_id = object_type->id;
     const std::string& object_type_str = object_type->to_string();
@@ -1287,7 +1287,7 @@ USymbolInfo Checker::visit(ClassLiteralFieldNode& node) {
     }
     for (int i = 0; i < node.init_names.size(); i++) {
         Node* exp = node.init_values[i];
-        USymbolInfo semanticInfo_p = this->dispatch(exp);
+        USemanticInfo semanticInfo_p = this->dispatch(exp);
         SemanticInfo& semanticInfo = *semanticInfo_p;
         if (this->replace_me) {
             node.init_values[i] = this->replacement;
@@ -1303,8 +1303,8 @@ USymbolInfo Checker::visit(ClassLiteralFieldNode& node) {
     return std::make_unique<SemanticInfo>(rv);
 }
 
-USymbolInfo Checker::visit(ForNode& node) {
-    USymbolInfo symbol_info_p = this->dispatch(node.exp);
+USemanticInfo Checker::visit(ForNode& node) {
+    USemanticInfo symbol_info_p = this->dispatch(node.exp);
     SemanticInfo& symbol_info = *symbol_info_p;
     if (symbol_info.type().kind != Kind::OBJECT) {
         throw std::runtime_error("Iterating over something bad!");
@@ -1353,15 +1353,15 @@ USymbolInfo Checker::visit(ForNode& node) {
     return nullptr;
 }
 
-USymbolInfo Checker::visit(ListNode& node) {
-    USymbolInfo element_type_p = this->dispatch(node.elements[0]);
+USemanticInfo Checker::visit(ListNode& node) {
+    USemanticInfo element_type_p = this->dispatch(node.elements[0]);
     const TypeNode& element_type = element_type_p->type();
     if (this->replace_me) {
         node.elements[0] = this->replacement;
         this->replace_me = false;
     }
     for (int i = 1; i < node.elements.size(); i++) {
-        USymbolInfo current_type_p = this->dispatch(node.elements[i]);
+        USemanticInfo current_type_p = this->dispatch(node.elements[i]);
         const TypeNode& current_type = current_type_p->type();
         if (this->replace_me) {
             node.elements[i] = this->replacement;
@@ -1382,15 +1382,15 @@ USymbolInfo Checker::visit(ListNode& node) {
     return std::make_unique<SemanticInfo>(return_info);
 }
 
-USymbolInfo Checker::visit(BooleanNode& node) {
+USemanticInfo Checker::visit(BooleanNode& node) {
     SemanticInfo symbol_info;
     symbol_info.set_type(T_BOOL);
     symbol_info.is_function = false;
     return std::make_unique<SemanticInfo>(symbol_info);
 }
 
-USymbolInfo Checker::visit(WhileNode& node) {
-    USymbolInfo condition_p = this->dispatch(node.condition);
+USemanticInfo Checker::visit(WhileNode& node) {
+    USemanticInfo condition_p = this->dispatch(node.condition);
     SemanticInfo& condition = *condition_p;
     if (condition.type() != T_BOOL) {
         this->error_condition(condition.type(), node.start, "elif");
@@ -1401,22 +1401,22 @@ USymbolInfo Checker::visit(WhileNode& node) {
     return nullptr;
 }
 
-USymbolInfo Checker::visit(NumberNode& node) {
+USemanticInfo Checker::visit(NumberNode& node) {
     SemanticInfo semanticInfo;
     semanticInfo.set_type(T_INT);
     semanticInfo.is_function = false;
     return std::make_unique<SemanticInfo>(semanticInfo);
 }
 
-USymbolInfo Checker::visit(StringNode& node) {
+USemanticInfo Checker::visit(StringNode& node) {
     SemanticInfo semanticInfo;
     semanticInfo.set_type(T_STRING);
     semanticInfo.is_function = false;
     return std::make_unique<SemanticInfo>(semanticInfo);
 }
 
-USymbolInfo Checker::visit(SubscriptNode& node) {
-    USymbolInfo parent_p = this->dispatch(node.parent);
+USemanticInfo Checker::visit(SubscriptNode& node) {
+    USemanticInfo parent_p = this->dispatch(node.parent);
     SemanticInfo& parent = *parent_p;
     if (parent.type().kind != Kind::OBJECT) {
         this->error_subscript_non_object(node.start);
@@ -1440,7 +1440,7 @@ USymbolInfo Checker::visit(SubscriptNode& node) {
     bool old_lvalue = this->is_lvalue;
     this->is_lvalue = false;
     for (auto& c: node.child) {
-        USymbolInfo ct = this->dispatch(c);
+        USemanticInfo ct = this->dispatch(c);
         if (ct->type() != T_INT) {
             not_integer = true;
         }
@@ -1465,12 +1465,12 @@ USymbolInfo Checker::visit(SubscriptNode& node) {
     return std::make_unique<SemanticInfo>(symbol_info);
 }
 
-USymbolInfo Checker::visit(BreakNode& node) {
+USemanticInfo Checker::visit(BreakNode& node) {
     return nullptr;
 }
 
-USymbolInfo Checker::visit(TernaryNode& node) {
-    USymbolInfo expression_info_p = this->dispatch(node.expression);
+USemanticInfo Checker::visit(TernaryNode& node) {
+    USemanticInfo expression_info_p = this->dispatch(node.expression);
     SemanticInfo& expression_info = *expression_info_p;
     if (expression_info.type().kind != Kind::OBJECT) {
         throw std::runtime_error("Unexpected non-object");
@@ -1485,14 +1485,14 @@ USymbolInfo Checker::visit(TernaryNode& node) {
     semanticInfo.set_type(type);
     this->enter_scope("true_case");
     this->scope->set("it", type);
-    USymbolInfo true_case_p = this->dispatch(node.true_case);
+    USemanticInfo true_case_p = this->dispatch(node.true_case);
     SemanticInfo& true_case = *true_case_p;
     if (this->replace_me) {
         node.true_case = this->replacement;
         this->replace_me = false;
     }
     this->leave_scope();
-    USymbolInfo false_case_p = this->dispatch(node.false_case);
+    USemanticInfo false_case_p = this->dispatch(node.false_case);
     SemanticInfo& false_case = *false_case_p;
     if (this->replace_me) {
         node.false_case = this->replacement;
@@ -1508,21 +1508,21 @@ USymbolInfo Checker::visit(TernaryNode& node) {
     return std::make_unique<SemanticInfo>(semanticInfo);
 }
 
-USymbolInfo Checker::visit(NoneNode& node) {
+USemanticInfo Checker::visit(NoneNode& node) {
     SemanticInfo semanticInfo;
     semanticInfo.set_type(ObjectType("NoneType", {}));
     semanticInfo.is_function = false;
     return std::make_unique<SemanticInfo>(semanticInfo);
 }
 
-USymbolInfo Checker::visit(EmptyListNode& node) {
+USemanticInfo Checker::visit(EmptyListNode& node) {
     SemanticInfo semanticInfo;
     semanticInfo.set_type(T_LIST(node.type->clone()));
     semanticInfo.is_function = false;
     return std::make_unique<SemanticInfo>(semanticInfo);
 }
 
-USymbolInfo Checker::visit(ClassNode& node) {
+USemanticInfo Checker::visit(ClassNode& node) {
     this->current_class = node.class_name;
     this->add_this = true;
     VectorOfTypes tp;
@@ -1545,11 +1545,11 @@ USymbolInfo Checker::visit(ClassNode& node) {
     return nullptr;
 }
 
-USymbolInfo Checker::visit(ContinueNode& node) {
+USemanticInfo Checker::visit(ContinueNode& node) {
     return nullptr;
 }
 
-USymbolInfo Checker::dispatch(Node* nod) {
+USemanticInfo Checker::dispatch(Node* nod) {
     auto& n = *nod;
     switch (n.ntype) {
         case NodeType::ASSIGN:
@@ -1670,12 +1670,12 @@ bool Checker::is_immutable(const TypeNode& node) {
     return false;
 }
 
-USymbolInfo Checker::visit(TupleNode& node) {
+USemanticInfo Checker::visit(TupleNode& node) {
     VectorOfTypes types;
     int i = 0;
     for (auto n: node.values) {
         i++;
-        USymbolInfo vtype = this->dispatch(n);
+        USemanticInfo vtype = this->dispatch(n);
         types.emplace_back(vtype->type().clone());
         if (!this->is_immutable(vtype->type())) {
             this->error_tuple_member_not_immutable(vtype->type(), node.start);
@@ -1688,21 +1688,21 @@ USymbolInfo Checker::visit(TupleNode& node) {
     return std::make_unique<SemanticInfo>(sinfo);
 }
 
-USymbolInfo Checker::visit(FloatNode& node) {
+USemanticInfo Checker::visit(FloatNode& node) {
     SemanticInfo s;
     s.set_type(T_FLOAT);
     return std::make_unique<SemanticInfo>(s);
 }
 
-USymbolInfo Checker::visit(PartialApplication& node) {
-    USymbolInfo func = this->dispatch(node.function);
+USemanticInfo Checker::visit(PartialApplication& node) {
+    USemanticInfo func = this->dispatch(node.function);
     VectorOfTypes partial_args;
     if (node.args.size() != func->type().function().param_types.size()) {
         throw std::runtime_error("Error: wrong number of arguments for partial function");
     }
     for (int i = 0; i < node.args.size(); i++) {
         if (node.args[i] != nullptr) {
-            USymbolInfo arg = this->dispatch(node.args[i]);
+            USemanticInfo arg = this->dispatch(node.args[i]);
             if (arg->type() != *func->type().function().param_types[i]) {
                 throw std::runtime_error(
                         "Error in partial function: type of arg " + std::to_string(i + 1) + " (" +
