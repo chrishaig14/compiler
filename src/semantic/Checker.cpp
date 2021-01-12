@@ -176,27 +176,27 @@ USymbolInfo Checker::visit(IdNode& n) {
     SymbolInfo symbol_info;
     symbol_info.is_function = false;
     symbol_info.is_method = false;
-    if (!this->scope->has(n.identifier)) {
+    if (!this->scope->has(n._id)) {
         // it might be a function name
-        if (this->function_table->has_function(n.identifier)) {
+        if (this->function_table->has_function(n._id)) {
             n.is_global_function = true;
             symbol_info.is_function = true;
             n.location = VariableLocation(-2, -1);
-            symbol_info.set_type(this->function_table->get(n.identifier));
+            symbol_info.set_type(this->function_table->get(n._id));
         } else {
-            this->error_variable_not_declared(n.identifier, n.start);
+            this->error_variable_not_declared(n._id, n.start);
             return std::make_unique<SymbolInfo>(ErrorStub());
         }
     } else {
-        symbol_info.set_type(this->scope->get(n.identifier));
+        symbol_info.set_type(this->scope->get(n._id));
         if (symbol_info.type().kind == Kind::UNKNOWN) {
             symbol_info.is_error = true;
         } else {
-            n.location = this->scope->find(n.identifier);
+            n.location = this->scope->find(n._id);
             if (symbol_info.type().kind == Kind::OBJECT) {
                 const ObjectTypeNode& otn = symbol_info.type().object();
                 if (otn.id == "Option") {
-                    if (this->scope->get_not_none(n.identifier)) {
+                    if (this->scope->get_not_none(n._id)) {
                         symbol_info.set_type(*otn.type_parameters[0]);
                     }
                 }
@@ -302,7 +302,7 @@ std::string Checker::code_error_string(TextPosition start, TextPosition end) {
 
 USymbolInfo Checker::visit(AssignmentNode& n) {
     if (n.lvalue->ntype == NodeType::ID) {
-        if (n.lvalue->id().identifier == "_") {
+        if (n.lvalue->id()._id == "_") {
             this->dispatch(n.rvalue);
             return nullptr;
         }
@@ -333,7 +333,7 @@ USymbolInfo Checker::visit(AssignmentNode& n) {
         // special treatment if we are assigning to an id of a variable of type Option[t]
         if (expression_type.type() == (*actual_type.type_parameters[0])) {
             std::cout << "p cant be none" << std::endl;
-            this->scope->set_not_none(n.lvalue->id().identifier, true);
+            this->scope->set_not_none(n.lvalue->id()._id, true);
         } else {
             if (linfo.type() != (expression_type.type())) {
                 auto& foo = expression_type.type().object();
@@ -345,7 +345,7 @@ USymbolInfo Checker::visit(AssignmentNode& n) {
             // type matches exactly, no proble
             std::cout << "p may be none" << std::endl;
             n.type = linfo.type().clone();
-            this->scope->set_not_none(n.lvalue->id().identifier, false);
+            this->scope->set_not_none(n.lvalue->id()._id, false);
         }
     } else {
         if (linfo.type() != expression_type.type()) {
@@ -377,8 +377,8 @@ USymbolInfo Checker::visit(MemberNode& n) {
     if (n.parent->ntype == NodeType::ID) {
         IdNode& id_node = n.parent->id();
         // It might be something like <class>.<method>, so we need to handle this case differently
-        if (this->class_table->declared(id_node.identifier)) {
-            ClassInfo* class_info = this->class_table->get(id_node.identifier);
+        if (this->class_table->declared(id_node._id)) {
+            ClassInfo* class_info = this->class_table->get(id_node._id);
             if (class_info->methods.find(n.s_child) != class_info->methods.end()) {
                 rv.set_type(*class_info->methods.find(n.s_child)->second);
                 rv.class_info = class_info;
@@ -420,12 +420,12 @@ USymbolInfo Checker::visit(MemberNode& n) {
     if (n.parent->ntype == NodeType::ID) {
         IdNode& idn = n.parent->id();
         if (object.id == "Option") {
-            if (this->scope->get_not_none(idn.identifier)) {
+            if (this->scope->get_not_none(idn._id)) {
                 // we can guarantee that it's not null, so we can access the members
                 option_type = &(object.type_parameters[0])->object();
             } else {
                 throw std::runtime_error(
-                        "Error: line " + text_pos_to_string(this->__file__, idn.start) + " -> " + idn.identifier +
+                        "Error: line " + text_pos_to_string(this->__file__, idn.start) + " -> " + idn._id +
                         " might be none here, make sure to  this in a if XXX != none {...}!"
                 );
             }

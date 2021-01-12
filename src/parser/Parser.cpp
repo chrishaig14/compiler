@@ -196,9 +196,9 @@ Node* Parser::parse_assignment_or_expression() {
         }
         if (lvalue->ntype == ID) {
             if (op == TokType::PLUS_EQQ) {
-                rvalue = new BinopNode(OpType::ADD, new IdNode(lvalue->id().identifier), rvalue);
+                rvalue = new BinopNode(OpType::ADD, new IdNode(lvalue->id()._id), rvalue);
             } else if (op == TokType::MINUS_EQQ) {
-                rvalue = new BinopNode(OpType::SUB, new IdNode(lvalue->id().identifier), rvalue);
+                rvalue = new BinopNode(OpType::SUB, new IdNode(lvalue->id()._id), rvalue);
             }
         }
         Node* node = new AssignmentNode(lvalue, rvalue);
@@ -499,7 +499,7 @@ Node* Parser::parse_class_or_tuple_literal() {
                 // it's field:exp, field:exp
                 this->expect_token(TokType::COLON);
                 Node* exp = this->parse_expression();
-                init[idn.identifier] = exp;
+                init[idn._id] = exp;
                 if (this->match(TokType::COMMA)) {
                     this->next();
                     while (true) {

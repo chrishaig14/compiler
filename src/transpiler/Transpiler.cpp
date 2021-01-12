@@ -439,9 +439,9 @@ std::string Transpiler::visit_function(FunctionNode& node) {
 }
 
 std::string Transpiler::visit_id(IdNode& node) {
-    std::string idn = node.identifier;
+    std::string idn = node._id;
     if (node.is_global_function) {
-        std::string out = node.identifier;
+        std::string out = node._id;
         for (int i = 0; i < out.size(); i++) {
             if (out[i] == '.') {
                 out[i] = '_';

@@ -16,7 +16,7 @@ void Translator::visit(AssignmentNode& node) {
     out.insert(out.end(), r_code.begin(), r_code.end());
 
     this->is_lvalue = true;
-    if (node.lvalue->ntype == NodeType::ID && node.lvalue->id().identifier == "_") {
+    if (node.lvalue->ntype == NodeType::ID && node.lvalue->id()._id == "_") {
         out.push_back(LC("", I_POP));
     } else {
 //        node.lvalue->accept(*this)
@@ -74,7 +74,7 @@ void Translator::visit(CallNode& node) {
         CodeLabel arg_code = this->code;
         out.insert(out.end(), arg_code.begin(), arg_code.end());
     }
-    out.push_back(LC("", new GetInst(node.function->id().identifier, node.function->id().location)));
+    out.push_back(LC("", new GetInst(node.function->id()._id, node.function->id().location)));
     out.push_back(LC("", I_CALL));
     this->code = out;
 }
@@ -116,9 +116,9 @@ void Translator::visit(IdNode& node) {
     CodeLabel out;
     if (this->is_lvalue) {
         this->is_lvalue = false;
-        out.push_back(LC("", new SetInst(node.identifier, node.location)));
+        out.push_back(LC("", new SetInst(node._id, node.location)));
     } else {
-        out.push_back(LC("", new GetInst(node.identifier, node.location)));
+        out.push_back(LC("", new GetInst(node._id, node.location)));
     }
     this->code = out;
 }
