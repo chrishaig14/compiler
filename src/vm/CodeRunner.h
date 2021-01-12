@@ -29,7 +29,7 @@ public:
     size_t inst_ptr;
     ObjectStack& stack;
     Environment* env;
-    std::unordered_map<std::string, std::vector<std::string>> classes;
+    std::unordered_map<std::string, VectorOfStrings> classes;
 
     CodeRunner(const Code& code, std::unordered_map<std::string, std::unordered_map<std::string, Code>>& structs,
                ObjectStack& stack,

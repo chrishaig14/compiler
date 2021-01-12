@@ -19,7 +19,7 @@ public:
     ~ClassLiteralExpressionNode();
 
     VectorOfNodes init;
-    std::vector<std::string> names;
+    VectorOfStrings names;
     ObjectType* type;
 
     bool equal(const Node& x) const override;

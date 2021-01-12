@@ -16,12 +16,12 @@
 class FunctionNode : public Node {
 public:
     std::string identifier;
-    std::vector<std::string> parameter_names;
+    VectorOfStrings parameter_names;
     VectorOfTypes parameter_types;
     BlockNode* body;
     TypeNode* return_type;
 
-    FunctionNode(std::string identifier, std::vector<std::string> parameter_names,
+    FunctionNode(std::string identifier, VectorOfStrings parameter_names,
                  VectorOfTypes parameter_types, TypeNode* return_type, BlockNode* body);
 
 

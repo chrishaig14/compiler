@@ -274,7 +274,7 @@ Translator::Translator() : is_lvalue(false) {
 
 void Translator::visit(ClassLiteralExpressionNode& node) {
     CodeLabel all;
-    std::vector<std::string> fields;
+    VectorOfStrings fields;
     for (int i = 0; i < node.init.size(); i++) {
         Node* exp = node.init[i];
         std::string name = node.names[i];
@@ -291,7 +291,7 @@ void Translator::visit(ClassLiteralExpressionNode& node) {
 
 void Translator::visit(ClassLiteralFieldNode& node) {
     CodeLabel all;
-    std::vector<std::string> fields;
+    VectorOfStrings fields;
     for (int i = 0; node.init_names.size(); i++) {
         this->code = {};
 //        f.second->accept(*this)
@@ -461,7 +461,7 @@ void Translator::visit(EmptyListNode& node) {
 
 void Translator::visit(ClassNode& node) {
     CodeLabel out;
-    std::vector<std::string> f;
+    VectorOfStrings f;
     for (auto field: node.members) {
         f.push_back(field.first);
     }

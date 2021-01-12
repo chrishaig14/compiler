@@ -94,7 +94,7 @@ public:
     bool inside_loop;
     Node* parse_partial_application();
     VectorOfNodes parse_list_of_arguments();
-    std::string parse_error(const std::vector<std::string>& options);
+    std::string parse_error(const VectorOfStrings& options);
     std::string empty_tuple_error(TextPosition pos);
     std::string tuple_one_element_error(TextPosition pos);
     std::string after_expression_error(const std::vector<TokType>& expected_extra, TextPosition position);

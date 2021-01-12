@@ -429,7 +429,7 @@ void CodeRunner::visit(MakeDefaultInst& inst) {
 //            this->stack.push(new IntegerObject());
 //        } else {
 //            auto proto = this->structs[inst.identifier];
-//            std::vector<std::string> names;
+//            VectorOfStrings names;
 //            for(auto f: proto){
 //                names.push_back(f.first);
 //                CodeRunner field_initializer(f.second,this->structs, this->stack, {});

@@ -85,7 +85,7 @@ Checker::Checker(SymbolTable* globals, ClassTable* class_table, FunctionTable* f
 
     this->class_table->set("Tuple", nullptr);
 
-    this->class_table->set("Option", new ClassInfo("Option", std::vector<std::string>(), {}, {"t"}));
+    this->class_table->set("Option", new ClassInfo("Option", VectorOfStrings(), {}, {"t"}));
     this->replace_me = false;
 }
 
@@ -1141,7 +1141,7 @@ bool Checker::can_assign(const TypeNode& from, const TypeNode& to) {
     return to == from;
 }
 
-bool Checker::can_assign_generic(TypeNode& from, TypeNode& to, std::vector<std::string> type_params) {
+bool Checker::can_assign_generic(TypeNode& from, TypeNode& to, VectorOfStrings type_params) {
     auto to_object = (to).object();
     if (to_object.type_params.size() == 0) {
         for (auto tp:type_params) {

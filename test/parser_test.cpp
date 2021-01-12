@@ -341,7 +341,7 @@ TEST_F(parser_test, function_no_params_empty_body) {
     node = parser.parse_function_definition();
     auto return_type = TYPE("String", {});
     BlockNode* b = new BlockNode({});
-    expected_node = new FunctionNode("foo", std::vector<std::string>(), VectorOfTypes(), return_type, b);
+    expected_node = new FunctionNode("foo", VectorOfStrings(), VectorOfTypes(), return_type, b);
 //    EXPECT_EQ(*node,*expected_node);
     EXPECT_EQ(*node, *expected_node);
 }

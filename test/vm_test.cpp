@@ -98,10 +98,10 @@ TEST(vm_test, inst_call_user) {
             I_CALL,
             I_RET};
 
-    std::vector<std::string> free_variables = {"__sum__"};
+    VectorOfStrings free_variables = {"__sum__"};
 
     Code main_code = {
-            I_PUSHF(std::vector<std::string>(), user_function_code),
+            I_PUSHF(VectorOfStrings(), user_function_code),
             I_DECL("user_function"),
             I_SET("user_function"),
             I_PUSHI(5),
@@ -119,7 +119,7 @@ TEST(vm_test, inst_call_user) {
 }
 
 TEST(vm_test, inst_make_list) {
-    std::vector<std::string> f = {"foo", "bar"};
+    VectorOfStrings f = {"foo", "bar"};
     Code main_code = {
             I_PUSHI(0),
             I_PUSHI(1),
@@ -210,10 +210,10 @@ TEST(vm_test, inst_factorial_test) {
             I_BIN(OpType::MUL),
             I_RET,
     };
-    std::vector<std::string> free_vars = {"factorial"};
+    VectorOfStrings free_vars = {"factorial"};
     Code main_code = {
             I_DECL("factorial"),
-            I_PUSHF(std::vector<std::string>(), factorial_code),
+            I_PUSHF(VectorOfStrings(), factorial_code),
             I_SET("factorial"),
             I_PUSHI(12),
             I_GET("factorial"),
@@ -229,7 +229,7 @@ TEST(vm_test, inst_factorial_test) {
 }
 
 TEST(vm_test, struct_test_1) {
-    std::vector<std::string> fields = {"val", "str"};
+    VectorOfStrings fields = {"val", "str"};
     Code main_code = {
             I_PUSHI(10),
             I_PUSHS("Hello"),

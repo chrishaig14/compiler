@@ -13,7 +13,7 @@
 
 class ClassInfo {
 public:
-    std::vector<std::string> member_names;
+    VectorOfStrings member_names;
     VectorOfTypes member_types;
 
     MapStringType members;
@@ -23,8 +23,8 @@ public:
 
     ClassInfo() {}
 
-    ClassInfo(std::string class_name, const std::vector<std::string>& fieldNames,
-              const VectorOfTypes& fieldTypes, std::vector<std::string> type_parameters);
+    ClassInfo(std::string class_name, const VectorOfStrings& fieldNames,
+              const VectorOfTypes& fieldTypes, VectorOfStrings type_parameters);
 
     ~ClassInfo() {
         for (auto m: this->members) {
@@ -42,7 +42,7 @@ public:
 
     bool operator==(const ClassInfo& b) const;
 
-    std::vector<std::string> type_params;
+    VectorOfStrings type_params;
 };
 
 #endif //CLASSINFO_H

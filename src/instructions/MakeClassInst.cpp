@@ -3,6 +3,7 @@
 //
 
 #include "MakeClassInst.h"
+#include "../types.h"
 
 bool MakeClassInst::equal(const Instruction* inst) const {
     const MakeClassInst* other_ptr = dynamic_cast<const MakeClassInst*>(inst);
@@ -24,5 +25,5 @@ void MakeClassInst::accept(InstructionVisitor& visitor) {
     visitor.visit(*this);
 }
 
-MakeClassInst::MakeClassInst(const std::string& identifier, const std::vector<std::string>& fields) : identifier(
+MakeClassInst::MakeClassInst(const std::string& identifier, const VectorOfStrings& fields) : identifier(
         identifier), fields(fields) {}

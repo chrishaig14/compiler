@@ -941,7 +941,7 @@ WhileNode* Parser::parse_while_loop() {
 ClassNode* Parser::parse_class_definition() {
     Token class_tok = this->expect_token(TokType::CLASS);
     Token class_name_tk = this->expect_token(TokType::ID);
-    std::vector<std::string> type_parameters;
+    VectorOfStrings type_parameters;
     if (this->match(TokType::LSQUARE)) {
         this->next();
 
@@ -957,7 +957,7 @@ ClassNode* Parser::parse_class_definition() {
     this->expect_token(TokType::LCURLY);
     std::unordered_map<std::string, FunctionNode*> methods;
     MapStringType members;
-    std::vector<std::string> members_ordered;
+    VectorOfStrings members_ordered;
     while (true) {
         if (this->match(TokType::ID)) {
             Token member_name_tk = this->expect_token(TokType::ID);
@@ -999,7 +999,7 @@ ImportNode* Parser::parse_import() {
     this->expect_token(TokType::FROM);
     Token module_tok = this->expect_token(TokType::ID);
     this->expect_token(TokType::IMPORT);
-    std::vector<std::string> imports;
+    VectorOfStrings imports;
     while (true) {
         Token import_tok = this->expect_token(TokType::ID);
         imports.push_back(import_tok.str);

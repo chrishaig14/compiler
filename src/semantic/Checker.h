@@ -55,7 +55,7 @@ public:
     std::string __file__;
 
     bool can_assign(const TypeNode& from, const TypeNode& to);
-    bool can_assign_generic(TypeNode& from, TypeNode& to, std::vector<std::string> type_params);
+    bool can_assign_generic(TypeNode& from, TypeNode& to, VectorOfStrings type_params);
     bool is_immutable(const TypeNode& node);
     Checker(SymbolTable* globals, ClassTable* class_table, FunctionTable* function_table);
     ClassInfo* instantiate_generic(ClassInfo* generic, const ObjectType& instance);

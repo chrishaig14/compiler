@@ -15,7 +15,7 @@ class ClassNode : public Node {
 public:
 
     bool equal(const Node& other) const;
-    ClassNode(const std::string& className, std::vector<std::string> type_parameters,
+    ClassNode(const std::string& className, VectorOfStrings type_parameters,
               MapStringType members, std::unordered_map<std::string, FunctionNode*> functions);
     ClassNode& cls() override;
     const ClassNode& cls() const override;
@@ -23,10 +23,10 @@ public:
     ~ClassNode();
 
     MapStringType members;
-    std::vector<std::string> members_ordered;
+    VectorOfStrings members_ordered;
     std::unordered_map<std::string, FunctionNode*> methods;
     std::string class_name;
-    std::vector<std::string> type_parameters;
+    VectorOfStrings type_parameters;
 };
 
 

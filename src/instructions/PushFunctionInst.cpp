@@ -4,7 +4,7 @@
 
 #include "PushFunctionInst.h"
 
-PushFunctionInst::PushFunctionInst(const std::vector<std::string>& parameterNames, const Code& body) : parameter_names(
+PushFunctionInst::PushFunctionInst(const VectorOfStrings& parameterNames, const Code& body) : parameter_names(
         parameterNames),
                                                                                                        body(body) {}
 

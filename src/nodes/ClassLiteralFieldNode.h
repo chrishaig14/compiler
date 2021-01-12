@@ -18,7 +18,7 @@ public:
 
     ~ClassLiteralFieldNode();
 
-    std::vector<std::string> init_names;
+    VectorOfStrings init_names;
     VectorOfNodes init_values;
 
     ClassLiteralFieldNode(ObjectType* type, const std::unordered_map<std::string, Node*>& init);

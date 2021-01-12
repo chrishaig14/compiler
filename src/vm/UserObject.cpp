@@ -23,7 +23,7 @@ bool UserObject::equal(const Object* other) const {
     return true;
 }
 
-UserObject::UserObject(std::string type, std::vector<std::string> fields) {
+UserObject::UserObject(std::string type, VectorOfStrings fields) {
     this->type = type;
     for (auto f: fields) {
         this->fields[f] = nullptr;
