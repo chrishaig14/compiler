@@ -712,8 +712,8 @@ MapStringType make_replacements(TypeNode* a, TypeNode* b) {
     return replacements;
 }
 
-std::vector<TypeNode*> make_replacements_in_order(TypeNode* a, TypeNode* b) {
-    std::vector<TypeNode*> replacements;
+VectorOfTypes make_replacements_in_order(TypeNode* a, TypeNode* b) {
+    VectorOfTypes replacements;
     if (a->kind == Kind::OBJECT) {
         ObjectType& oa = a->object();
         ObjectType& ob = b->object();
@@ -722,7 +722,7 @@ std::vector<TypeNode*> make_replacements_in_order(TypeNode* a, TypeNode* b) {
         } else {
             for (int i = 0; i < oa.type_params.size(); i++) {
                 if (is_generic(*oa.type_params[i])) {
-                    std::vector<TypeNode*> rep = make_replacements_in_order(
+                    VectorOfTypes rep = make_replacements_in_order(
                             oa.type_params[i],
                             ob.type_params[i]
                     );
@@ -736,7 +736,7 @@ std::vector<TypeNode*> make_replacements_in_order(TypeNode* a, TypeNode* b) {
             FunctionType& fb = b->function();
             for (int i = 0; i < fa.param_types.size(); i++) {
                 if (is_generic(*fa.param_types[i])) {
-                    std::vector<TypeNode*> rep = make_replacements_in_order(
+                    VectorOfTypes rep = make_replacements_in_order(
                             fa.param_types[i],
                             fb.param_types[i]
                     );
@@ -744,7 +744,7 @@ std::vector<TypeNode*> make_replacements_in_order(TypeNode* a, TypeNode* b) {
                 }
             }
             if (is_generic(*fa.return_type)) {
-                std::vector<TypeNode*> rep = make_replacements_in_order(fa.return_type, fb.return_type);
+                VectorOfTypes rep = make_replacements_in_order(fa.return_type, fb.return_type);
                 replacements.insert(replacements.end(), rep.begin(), rep.end());
             }
         }
