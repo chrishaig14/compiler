@@ -1274,7 +1274,10 @@ USemanticInfo Checker::visit(ClassLiteralFieldNode& node) {
 
     for (int i = 0; i < node.init_names.size(); i++) {
         if (class_fields.find(node.init_names[i]) == class_fields.end()) {
-            throw std::runtime_error("No field named " + node.init_names[i]);
+            this->error_no_member(*node.type, node.init_names[i], node.start);
+            SemanticInfo rv;
+            rv.set_type(*object_type);
+            return std::make_unique<SemanticInfo>(rv);
         }
     }
     if (class_fields.size() != node.init_names.size()) {
