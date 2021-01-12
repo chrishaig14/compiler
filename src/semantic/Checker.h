@@ -23,7 +23,7 @@
 #include "unify.h"
 #include "../logging/logging.h"
 
-typedef std::unique_ptr<SymbolInfo> USymbolInfo;
+typedef std::unique_ptr<SemanticInfo> USymbolInfo;
 
 bool type_matches(TypeNode* a, TypeNode* b);
 
@@ -35,7 +35,7 @@ TypeNode* make_type_from_object_pattern(const ObjectType& object_type,
 TypeNode* make_type_from_function_pattern(const FunctionType& ftn,
                                           const MapStringType& replacements);
 TypeNode* make_type(const TypeNode& original, const MapStringType& replacements);
-SymbolInfo match_arguments_to_generic_function(const FunctionType& function_type, VectorOfTypes arg_types);
+SemanticInfo match_arguments_to_generic_function(const FunctionType& function_type, VectorOfTypes arg_types);
 
 class Checker {
     bool add_this;
@@ -123,7 +123,7 @@ public:
     std::pair<std::string, TypeNode*>* get_first_substitution(TypeNode& a, TypeNode& b, bool is_top_level_arg);
     TypeNode* substitute(TypeNode* t, std::string var, TypeNode* replacement);
     void unify_function_call(FunctionType& fun, VectorOfTypes& args);
-    SymbolInfo match_arguments_to_generic_function(const FunctionType& ft, VectorOfTypes arg_types);
+    SemanticInfo match_arguments_to_generic_function(const FunctionType& ft, VectorOfTypes arg_types);
     void error_generic_call_mismatch(const TypeNode& expected, const TypeNode& actual, int i);
 
     void error_call_bad_num_args();

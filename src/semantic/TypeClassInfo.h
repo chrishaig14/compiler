@@ -7,7 +7,7 @@
 
 
 #include <string>
-#include "SymbolInfo.h"
+#include "SemanticInfo.h"
 
 class TypeClassInfo {
 

@@ -206,7 +206,7 @@ TEST(generic_test, make_replacement_4) {
 TEST(generic_test, function_call_1) {
     FunctionType* ftn = FUNCTION_TYPE({ TYPE("a", {}) }, TYPE("a", {}));
     VectorOfTypes ats = {new T_INT};
-    SymbolInfo retv = match_arguments_to_generic_function(*ftn, ats);
+    SemanticInfo retv = match_arguments_to_generic_function(*ftn, ats);
     EXPECT_EQ(retv.type(), T_INT);
 }
 
@@ -214,7 +214,7 @@ TEST(generic_test, function_call_2) {
     VectorOfTypes pt = {TYPE("a", {}), TYPE("b", {})};
     FunctionType* ftn = FUNCTION_TYPE(pt, TYPE("a", {}));
     VectorOfTypes ats = {new T_INT, new T_STRING};
-    SymbolInfo retv = match_arguments_to_generic_function(*ftn, ats);
+    SemanticInfo retv = match_arguments_to_generic_function(*ftn, ats);
     EXPECT_EQ(retv.type(), T_INT);
 }
 
@@ -223,7 +223,7 @@ TEST(generic_test, function_call_3) {
     VectorOfTypes pt = {TYPE("a", {}), TYPE("b", {})};
     FunctionType* ftn = FUNCTION_TYPE(pt, TYPE("b", {}));
     VectorOfTypes ats = {new T_INT, new T_STRING};
-    SymbolInfo retv = match_arguments_to_generic_function(*ftn, ats);
+    SemanticInfo retv = match_arguments_to_generic_function(*ftn, ats);
     EXPECT_EQ(retv.type(), T_STRING);
 }
 
@@ -236,7 +236,7 @@ TEST(generic_test, function_call_4) {
     // Integer, fun(Integer)->String
     VectorOfTypes ats = {new T_INT, FUNCTION_TYPE({ new T_INT }, new T_STRING)};
 
-    SymbolInfo retv = match_arguments_to_generic_function(*ftn, ats);
+    SemanticInfo retv = match_arguments_to_generic_function(*ftn, ats);
 
     EXPECT_EQ(retv.type(), T_STRING);
 }
@@ -248,7 +248,7 @@ TEST(generic_test, function_call_5) {
 
     VectorOfTypes ats = {FUNCTION_TYPE({ new T_INT }, new T_STRING), new T_INT};
 
-    SymbolInfo retv = match_arguments_to_generic_function(*ftn, ats);
+    SemanticInfo retv = match_arguments_to_generic_function(*ftn, ats);
 
     EXPECT_EQ(retv.type(), T_STRING);
 }
@@ -260,7 +260,7 @@ TEST(generic_test, function_call_6) {
 
     VectorOfTypes ats = {FUNCTION_TYPE({ TYPE("t", {}) }, new T_STRING), new T_INT};
 
-    SymbolInfo retv = match_arguments_to_generic_function(*ftn, ats);
+    SemanticInfo retv = match_arguments_to_generic_function(*ftn, ats);
 
     EXPECT_EQ(retv.type(), T_STRING);
 }
@@ -272,7 +272,7 @@ TEST(generic_test, function_call_7) {
 
     VectorOfTypes ats = {FUNCTION_TYPE({ TYPE("t", {}) }, new T_STRING), new T_INT};
 
-    SymbolInfo retv = match_arguments_to_generic_function(*ftn, ats);
+    SemanticInfo retv = match_arguments_to_generic_function(*ftn, ats);
 
     EXPECT_EQ(retv.type(), T_STRING);
 }
@@ -288,7 +288,7 @@ TEST(generic_test, function_call_8) {
     // fun(a)->String // fun(a)->String           --> a = String --> fun(String)->String
     // fun(t)->t      // fun(t)->t --> t = String --> fun(String)->String
     try {
-        SymbolInfo retv = match_arguments_to_generic_function(*ftn, ats);
+        SemanticInfo retv = match_arguments_to_generic_function(*ftn, ats);
         FAIL();
     } catch (...) {
 
@@ -302,7 +302,7 @@ TEST(generic_test, function_call_9) {
 
     VectorOfTypes ats = {new T_STRING, FUNCTION_TYPE({ TYPE("t", {}) }, TYPE("t", {}))};
 
-    SymbolInfo retv = match_arguments_to_generic_function(*ftn, ats);
+    SemanticInfo retv = match_arguments_to_generic_function(*ftn, ats);
     EXPECT_EQ(retv.type(), T_STRING);
 }
 
@@ -313,7 +313,7 @@ TEST(generic_test, function_call_10) {
 
     VectorOfTypes ats = {FUNCTION_TYPE({ TYPE("t", {}) }, TYPE("t", {})), new T_STRING};
 
-    SymbolInfo retv = match_arguments_to_generic_function(*ftn, ats);
+    SemanticInfo retv = match_arguments_to_generic_function(*ftn, ats);
     EXPECT_EQ(retv.type(), T_STRING);
 }
 
@@ -326,7 +326,7 @@ TEST(generic_test, function_call_11) {
 
     VectorOfTypes ats = {TYPE("t", {})};
     try {
-        SymbolInfo retv = match_arguments_to_generic_function(*ftn, ats);
+        SemanticInfo retv = match_arguments_to_generic_function(*ftn, ats);
         FAIL();
     } catch (...) {
     }
@@ -340,7 +340,7 @@ TEST(generic_test, function_call_12) {
 
     VectorOfTypes ats = {FUNCTION_TYPE({ TYPE("t", {}) }, TYPE("t", {})), new T_STRING};
 
-    SymbolInfo retv = match_arguments_to_generic_function(*ftn, ats);
+    SemanticInfo retv = match_arguments_to_generic_function(*ftn, ats);
     EXPECT_EQ(retv.type(), T_STRING);
 }
 

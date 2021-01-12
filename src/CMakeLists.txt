@@ -94,8 +94,8 @@ add_library(
         semantic/GlobalProcessor.cpp
         utils.h
         utils.cpp
-        semantic/SymbolInfo.cpp
-        semantic/SymbolInfo.h
+        semantic/SemanticInfo.cpp
+        semantic/SemanticInfo.h
         semantic/ObjectInfo.cpp
         semantic/ObjectInfo.h
         semantic/ClassInfo.cpp

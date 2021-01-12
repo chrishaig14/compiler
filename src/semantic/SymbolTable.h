@@ -10,7 +10,7 @@
 #include <unordered_map>
 #include "../nodes/TypeNode.h"
 #include "../utils.h"
-#include "SymbolInfo.h"
+#include "SemanticInfo.h"
 
 
 class SymbolTable {
