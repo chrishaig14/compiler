@@ -16,6 +16,12 @@
 #include "../nodes/nodes.h"
 #include <set>
 #include "../scanner/CodeLines.h"
+#include <iostream>
+#include <set>
+#include "TypeClassInfo.h"
+#include "../macros.h"
+#include "unify.h"
+#include "../logging/logging.h"
 
 typedef std::unique_ptr<SymbolInfo> USymbolInfo;
 

@@ -225,6 +225,6 @@ add_library(
         vm/ObjectStore.cpp
         vm/ObjectStore.h
         semantic/unify.cpp
-        semantic/unify.h)
+        semantic/unify.h semantic/CheckerErrors.cpp)
 
 add_library(transpiler transpiler/Transpiler.cpp transpiler/Transpiler.h)
