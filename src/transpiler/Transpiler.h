@@ -58,9 +58,9 @@ public:
     std::string generate_tuple(int n);
     std::string object_type_mapper(const ObjectType& t);
     std::string type_mapper(const TypeNode& t);
-    std::string function_type_mapper(const FunctionTypeNode& t);
+    std::string function_type_mapper(const FunctionType& t);
     bool is_lvalue;
-    std::string wrap_in_function_type(const FunctionTypeNode& t, std::string n);
+    std::string wrap_in_function_type(const FunctionType& t, std::string n);
     std::string add_type(const TypeNode& t, std::string n);
     std::string ptr_to_type(const TypeNode& t);
     std::string ptr_to_type_object(const ObjectType& t);

@@ -4,8 +4,8 @@
 
 #include "TypeNode.h"
 
-FunctionTypeNode::FunctionTypeNode(const VectorOfTypes& parameterTypes,
-                                   TypeNode* returnType) {
+FunctionType::FunctionType(const VectorOfTypes& parameterTypes,
+                           TypeNode* returnType) {
 
     for (auto p: parameterTypes) {
         assert(p != nullptr);
@@ -16,22 +16,22 @@ FunctionTypeNode::FunctionTypeNode(const VectorOfTypes& parameterTypes,
     this->kind = Kind::FUNCTION;
 }
 
-FunctionTypeNode* FunctionTypeNode::clone() const {
+FunctionType* FunctionType::clone() const {
     VectorOfTypes aux;
     for (auto p: this->parameter_types) {
         aux.emplace_back(p->clone());
     }
-    return new FunctionTypeNode(aux, this->return_type->clone());
+    return new FunctionType(aux, this->return_type->clone());
 }
 
-FunctionTypeNode::~FunctionTypeNode() {
+FunctionType::~FunctionType() {
     delete this->return_type;
     for (auto p: this->parameter_types) {
         delete p;
     }
 }
 
-std::string FunctionTypeNode::to_string() const {
+std::string FunctionType::to_string() const {
     auto& ftype = *this;
     std::string parameters;
     std::string ret;
@@ -46,7 +46,7 @@ std::string FunctionTypeNode::to_string() const {
     return "fun (" + parameters + ")" + (*ftype.return_type == ObjectType(".None", {}) ? "" : (" -> " + ret));
 }
 
-bool FunctionTypeNode::equal(const TypeNode& other) const {
+bool FunctionType::equal(const TypeNode& other) const {
     auto& a = *this;
     auto& b = other.function();
     if (a.parameter_types.size() != b.parameter_types.size()) {
@@ -60,9 +60,9 @@ bool FunctionTypeNode::equal(const TypeNode& other) const {
     return *a.return_type == *b.return_type;
 }
 
-FunctionTypeNode& FunctionTypeNode::function() { return *this; }
+FunctionType& FunctionType::function() { return *this; }
 
-const FunctionTypeNode& FunctionTypeNode::function() const { return *this; }
+const FunctionType& FunctionType::function() const { return *this; }
 
 ObjectType::ObjectType(const std::string& identifier,
                        const VectorOfTypes& typeParameters) : id(
@@ -136,8 +136,8 @@ bool TypeNode::operator==(const TypeNode& other) const {
 
 ObjectType& TypeNode::object() { throw std::runtime_error("Getting wrong type!"); }
 
-FunctionTypeNode& TypeNode::function() { throw std::runtime_error("Getting wrong type!"); }
+FunctionType& TypeNode::function() { throw std::runtime_error("Getting wrong type!"); }
 
-const FunctionTypeNode& TypeNode::function() const { throw std::runtime_error("Getting wrong type!"); }
+const FunctionType& TypeNode::function() const { throw std::runtime_error("Getting wrong type!"); }
 
 const ObjectType& TypeNode::object() const { throw std::runtime_error("Getting wrong type!"); }

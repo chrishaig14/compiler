@@ -286,7 +286,7 @@ std::string Transpiler::add_type(const TypeNode& t, std::string n) {
     return this->wrap_in_function_type(t.function(), n);
 }
 
-std::string Transpiler::wrap_in_function_type(const FunctionTypeNode& t, std::string n) {
+std::string Transpiler::wrap_in_function_type(const FunctionType& t, std::string n) {
     std::string out;
     out = "Function" + std::to_string(t.parameter_types.size()) + "<";
     for (int i = 0; i < t.parameter_types.size(); i++) {
@@ -301,7 +301,7 @@ std::string Transpiler::wrap_in_function_type(const FunctionTypeNode& t, std::st
     return out;
 }
 
-std::string Transpiler::function_type_mapper(const FunctionTypeNode& t) {
+std::string Transpiler::function_type_mapper(const FunctionType& t) {
     std::string out;
     out += "Function" + std::to_string(t.parameter_types.size()) + "*";
     return out;

@@ -32,10 +32,10 @@ bool is_generic(const TypeNode& t);
 std::unordered_map<std::string, TypeNode*> make_replacements(TypeNode* a, TypeNode* b);
 TypeNode* make_type_from_object_pattern(const ObjectType& object_type,
                                         const std::unordered_map<std::string, TypeNode*>& replacements);
-TypeNode* make_type_from_function_pattern(const FunctionTypeNode& ftn,
+TypeNode* make_type_from_function_pattern(const FunctionType& ftn,
                                           const std::unordered_map<std::string, TypeNode*>& replacements);
 TypeNode* make_type(const TypeNode& original, const std::unordered_map<std::string, TypeNode*>& replacements);
-SymbolInfo match_arguments_to_generic_function(const FunctionTypeNode& function_type, VectorOfTypes arg_types);
+SymbolInfo match_arguments_to_generic_function(const FunctionType& function_type, VectorOfTypes arg_types);
 
 class Checker {
     bool add_this;
@@ -104,7 +104,7 @@ public:
     USymbolInfo visit(TernaryNode& node);
     USymbolInfo visit(TupleNode& node);
     USymbolInfo visit(WhileNode& node);
-    VectorOfTypes get_replacements_in_order(const FunctionTypeNode& function_type, VectorOfTypes arg_types);
+    VectorOfTypes get_replacements_in_order(const FunctionType& function_type, VectorOfTypes arg_types);
     void enter_scope(std::string name);
     void leave_scope();
     ~Checker();
@@ -117,13 +117,13 @@ public:
 
     bool is_variable(const ObjectType& a);
     std::pair<std::string, TypeNode*>*
-    get_first_substitution_function(FunctionTypeNode& a, FunctionTypeNode& b, bool is_top_level_arg);
+    get_first_substitution_function(FunctionType& a, FunctionType& b, bool is_top_level_arg);
     std::pair<std::string, TypeNode*>*
     get_first_substitution_object(ObjectType& a, ObjectType& b, bool is_top_level_arg);
     std::pair<std::string, TypeNode*>* get_first_substitution(TypeNode& a, TypeNode& b, bool is_top_level_arg);
     TypeNode* substitute(TypeNode* t, std::string var, TypeNode* replacement);
-    void unify_function_call(FunctionTypeNode& fun, VectorOfTypes& args);
-    SymbolInfo match_arguments_to_generic_function(const FunctionTypeNode& ft, VectorOfTypes arg_types);
+    void unify_function_call(FunctionType& fun, VectorOfTypes& args);
+    SymbolInfo match_arguments_to_generic_function(const FunctionType& ft, VectorOfTypes arg_types);
     void error_generic_call_mismatch(const TypeNode& expected, const TypeNode& actual, int i);
 
     void error_call_bad_num_args();

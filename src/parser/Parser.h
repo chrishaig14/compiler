@@ -87,7 +87,7 @@ public:
 
     ClassNode* parse_class_definition();
 
-    FunctionTypeNode* parse_function_type();
+    FunctionType* parse_function_type();
 
     ObjectType* parse_object_type();
 

@@ -16,7 +16,7 @@ public:
     VectorOfTypes member_types;
 
     std::unordered_map<std::string, TypeNode*> members;
-    std::unordered_map<std::string, FunctionTypeNode*> methods;
+    std::unordered_map<std::string, FunctionType*> methods;
 
     std::string class_name;
 

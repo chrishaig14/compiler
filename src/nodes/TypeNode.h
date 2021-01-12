@@ -19,7 +19,7 @@ enum class Kind {
 
 class ObjectType;
 
-class FunctionTypeNode;
+class FunctionType;
 
 class UnknownTypeNode;
 
@@ -35,9 +35,9 @@ public:
 
     virtual ObjectType& object();
 
-    virtual FunctionTypeNode& function();
+    virtual FunctionType& function();
 
-    virtual const FunctionTypeNode& function() const;
+    virtual const FunctionType& function() const;
 
     virtual const ObjectType& object() const;
 
@@ -91,21 +91,21 @@ public:
     }
 };
 
-class FunctionTypeNode : public TypeNode {
+class FunctionType : public TypeNode {
 public:
-    FunctionTypeNode(const VectorOfTypes& parameterTypes, TypeNode* returnType);
+    FunctionType(const VectorOfTypes& parameterTypes, TypeNode* returnType);
 
     bool equal(const TypeNode& other) const override;
 
     std::string to_string() const override;
 
-    FunctionTypeNode* clone() const override;
+    FunctionType* clone() const override;
 
-    FunctionTypeNode& function() override;
+    FunctionType& function() override;
 
-    ~FunctionTypeNode();
+    ~FunctionType();
 
-    const FunctionTypeNode& function() const override;
+    const FunctionType& function() const override;
 
     VectorOfTypes parameter_types;
     TypeNode* return_type;

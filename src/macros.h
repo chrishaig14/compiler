@@ -28,7 +28,7 @@
 #define T_DICT(k, v) TYPE("Dict", VectorOfTypes({k,v}))
 #define FUN(a, b, c, d, e) new FunctionNode(a,b,c,d,e)
 #define WHILE(condition, body) new WhileNode(condition, body)
-#define FUNCTION_TYPE(parameters, return_type) new FunctionTypeNode(parameters, return_type)
+#define FUNCTION_TYPE(parameters, return_type) new FunctionType(parameters, return_type)
 #define RET(x) new ReturnNode(x)
 #define I_ENTER(x) new EnterScope(x)
 #define I_LEAVE(x) new LeaveScope(x)

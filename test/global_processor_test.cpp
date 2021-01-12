@@ -75,7 +75,7 @@ TEST_F(global_test, test_class_info_methods_ok) {
     SetUp(text);
     gp.visit(*tree);
     EXPECT_EQ(gp.class_table->get("Foo")->methods.count("foo"), 1);
-    EXPECT_EQ(*gp.class_table->get("Foo")->methods["foo"], FunctionTypeNode({}, new T_INT));
+    EXPECT_EQ(*gp.class_table->get("Foo")->methods["foo"], FunctionType({}, new T_INT));
 }
 
 TEST_F(global_test, test_class_info_method_redeclared_error) {

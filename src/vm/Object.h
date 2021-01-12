@@ -55,7 +55,7 @@ typedef void(* BuiltinFunction)(std::unordered_map<std::string, std::unordered_m
 
 
 struct CodeBuiltin {
-    FunctionTypeNode* ftype;
+    FunctionType* ftype;
 
     BuiltinFunction function;
 };

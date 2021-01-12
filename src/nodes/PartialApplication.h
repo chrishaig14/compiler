@@ -13,7 +13,7 @@ class PartialApplication : public Node {
 public:
     Node* function;
     VectorOfNodes args;
-    FunctionTypeNode* complete_type;
+    FunctionType* complete_type;
 
     PartialApplication(Node* function, VectorOfNodes args);
 

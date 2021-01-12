@@ -691,7 +691,7 @@ Node* Parser::parse_common_statement() {
     }
 }
 
-FunctionTypeNode* Parser::parse_function_type() {
+FunctionType* Parser::parse_function_type() {
     this->expect_token(TokType::FUN);
     this->expect_token(TokType::LPAREN);
     VectorOfTypes parameter_types;
@@ -709,7 +709,7 @@ FunctionTypeNode* Parser::parse_function_type() {
     this->expect_token(TokType::RPAREN);
     this->expect_token(TokType::RARROW);
     TypeNode* return_type = this->parse_type_node();
-    return new FunctionTypeNode(parameter_types, return_type);
+    return new FunctionType(parameter_types, return_type);
 }
 
 ObjectType* Parser::parse_object_type() {

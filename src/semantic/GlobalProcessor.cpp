@@ -146,41 +146,41 @@ GlobalProcessor::GlobalProcessor(std::vector<Builtin>& builtins, ClassTable* imp
     auto none = new ObjectType(".None", {});
     VectorOfTypes w = {at, ft};
     builtins.push_back(
-            {"map", CodeBuiltin{new FunctionTypeNode(w, new T_LIST(new ObjectType("b", {}))), list_map}}
+            {"map", CodeBuiltin{new FunctionType(w, new T_LIST(new ObjectType("b", {}))), list_map}}
     );
-    builtins.push_back({"Integer.str", CodeBuiltin{new FunctionTypeNode({new T_INT}, new T_STRING), int_to_str}});
-    builtins.push_back({"Float.str", CodeBuiltin{new FunctionTypeNode({new T_FLOAT}, new T_STRING), float_to_str}});
+    builtins.push_back({"Integer.str", CodeBuiltin{new FunctionType({new T_INT}, new T_STRING), int_to_str}});
+    builtins.push_back({"Float.str", CodeBuiltin{new FunctionType({new T_FLOAT}, new T_STRING), float_to_str}});
 
     builtins.push_back(
             {"List.len",
-             CodeBuiltin{new FunctionTypeNode({new T_LIST(new ObjectType("a", {}))}, new T_INT), list_len}}
+             CodeBuiltin{new FunctionType({new T_LIST(new ObjectType("a", {}))}, new T_INT), list_len}}
     );
     VectorOfTypes x = {new T_LIST(TYPE("a", {})), new ObjectType("a", {})};
-    builtins.push_back({"List.pop", CodeBuiltin{new FunctionTypeNode(x, none), list_pop}});
+    builtins.push_back({"List.pop", CodeBuiltin{new FunctionType(x, none), list_pop}});
     builtins.push_back(
             {"List.push", CodeBuiltin{
-                    new FunctionTypeNode({new T_LIST(new ObjectType("a", {}))}, new ObjectType("a", {})),
+                    new FunctionType({new T_LIST(new ObjectType("a", {}))}, new ObjectType("a", {})),
                     list_push}}
     );
     auto function_from_t_to_u = FUNCTION_TYPE({ TYPE("t", {}) }, new ObjectType("b", {}));
     builtins.push_back(
             {"List.unordered_map",
-             CodeBuiltin{new FunctionTypeNode({function_from_t_to_u}, new T_LIST(new ObjectType("b", {}))),
+             CodeBuiltin{new FunctionType({function_from_t_to_u}, new T_LIST(new ObjectType("b", {}))),
                          list_map}}
     );
-    builtins.push_back({"String.len", CodeBuiltin{new FunctionTypeNode({new T_STRING}, new T_INT), string_len}});
-    builtins.push_back({"print", CodeBuiltin{new FunctionTypeNode({new T_STRING}, none), print}});
+    builtins.push_back({"String.len", CodeBuiltin{new FunctionType({new T_STRING}, new T_INT), string_len}});
+    builtins.push_back({"print", CodeBuiltin{new FunctionType({new T_STRING}, none), print}});
     VectorOfTypes a1 = {new T_LIST(new T_STRING), new T_STRING};
     builtins.push_back(
-            {"join", CodeBuiltin{new FunctionTypeNode(a1, new T_STRING), join}}
+            {"join", CodeBuiltin{new FunctionType(a1, new T_STRING), join}}
     );
     VectorOfTypes a2 = {new T_INT, new T_INT, new T_INT};
     builtins.push_back(
-            {"range", CodeBuiltin{new FunctionTypeNode(a2, new T_LIST(new T_INT)), range}}
+            {"range", CodeBuiltin{new FunctionType(a2, new T_LIST(new T_INT)), range}}
     );
 
     builtins.push_back(
-            {"input", CodeBuiltin{new FunctionTypeNode({}, new T_STRING), input}}
+            {"input", CodeBuiltin{new FunctionType({}, new T_STRING), input}}
     );
 
     this->add_builtins(builtins);
@@ -198,7 +198,7 @@ void GlobalProcessor::visit(FunctionNode& node) {
     for (auto p: node.parameter_types) {
         x.emplace_back(p->clone());
     }
-    FunctionTypeNode function_info(x, node.return_type->clone());
+    FunctionType function_info(x, node.return_type->clone());
     if (this->class_table->declared(node.identifier) || this->function_table->has_function(node.identifier)) {
         std::string msg;
         msg = E_FMT("Name ") + E_HLT(node.identifier) + E_FMT(" already declared at ") +
@@ -232,7 +232,7 @@ void GlobalProcessor::visit(ClassNode& node) {
             x.emplace_back(p->clone());
         }
         class_info->methods.insert(
-                make_pair(f.first, new FunctionTypeNode(x, method.return_type->clone())));
+                make_pair(f.first, new FunctionType(x, method.return_type->clone())));
     }
     class_info->class_name = node.class_name;
     class_info->type_parameters = node.type_parameters;
@@ -259,11 +259,11 @@ void GlobalProcessor::dispatch(Node* nod) {
 }
 
 
-const FunctionTypeNode& FunctionTable::get(std::string function_name) {
+const FunctionType& FunctionTable::get(std::string function_name) {
     return *functions.find(function_name)->second;
 }
 
-void FunctionTable::add(std::string function_name, const FunctionTypeNode& function_type) {
+void FunctionTable::add(std::string function_name, const FunctionType& function_type) {
     if (functions.find(function_name) == functions.end()) {
         functions.insert(std::make_pair(function_name, function_type.clone()));
     } else {

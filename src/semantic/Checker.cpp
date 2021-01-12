@@ -6,7 +6,7 @@
 #include "unify.h"
 #include "../logging/logging.h"
 
-bool function_is_generic(const FunctionTypeNode& ft) {
+bool function_is_generic(const FunctionType& ft) {
     for (auto param_type: ft.parameter_types) {
         if (is_generic(*param_type)) {
             return true;
@@ -19,18 +19,18 @@ bool function_is_generic(const FunctionTypeNode& ft) {
 ClassInfo* make_list_class_info() {
     auto list_class_info = new ClassInfo();
     list_class_info->class_name = "List";
-    list_class_info->methods.insert(std::make_pair("len", new FunctionTypeNode({}, new T_INT)));
+    list_class_info->methods.insert(std::make_pair("len", new FunctionType({}, new T_INT)));
 
     ObjectType generic_type_t("t", {});
     ObjectType generic_type_b("b", {});
 
     list_class_info->methods.insert(
-            std::make_pair("push", new FunctionTypeNode({(generic_type_t.clone())}, TYPE(".None", {}))));
-    list_class_info->methods.insert(std::make_pair("pop", new FunctionTypeNode({}, generic_type_t.clone())));
+            std::make_pair("push", new FunctionType({(generic_type_t.clone())}, TYPE(".None", {}))));
+    list_class_info->methods.insert(std::make_pair("pop", new FunctionType({}, generic_type_t.clone())));
     list_class_info->methods.insert(
             std::make_pair(
                     "unordered_map",
-                    new FunctionTypeNode(
+                    new FunctionType(
                             {FUNCTION_TYPE({ generic_type_t.clone() },
                                            generic_type_b.clone())},
                             new T_LIST(generic_type_b.clone()))));
@@ -41,28 +41,28 @@ ClassInfo* make_list_class_info() {
 ClassInfo* make_int_class_info() {
     auto int_class_info = new ClassInfo();
     int_class_info->class_name = "Integer";
-    int_class_info->methods.insert(std::make_pair("str", new FunctionTypeNode({}, new T_STRING)));
+    int_class_info->methods.insert(std::make_pair("str", new FunctionType({}, new T_STRING)));
     return int_class_info;
 }
 
 ClassInfo* make_boolean_class_info() {
     auto int_class_info = new ClassInfo();
     int_class_info->class_name = "Boolean";
-    int_class_info->methods.insert(std::make_pair("str", new FunctionTypeNode({}, new T_STRING)));
+    int_class_info->methods.insert(std::make_pair("str", new FunctionType({}, new T_STRING)));
     return int_class_info;
 }
 
 ClassInfo* make_float_class_info() {
     auto float_class_info = new ClassInfo();
     float_class_info->class_name = "Float";
-    float_class_info->methods.insert(std::make_pair("str", new FunctionTypeNode({}, new T_STRING)));
+    float_class_info->methods.insert(std::make_pair("str", new FunctionType({}, new T_STRING)));
     return float_class_info;
 }
 
 ClassInfo* make_string_class_info() {
     auto string_class_info = new ClassInfo();
     string_class_info->class_name = "String";
-    string_class_info->methods.insert(std::make_pair("len", new FunctionTypeNode({}, new T_INT)));
+    string_class_info->methods.insert(std::make_pair("len", new FunctionType({}, new T_INT)));
     return string_class_info;
 }
 
@@ -383,8 +383,8 @@ USymbolInfo Checker::visit(MemberNode& n) {
                 rv.set_type(*class_info->methods.find(n.s_child)->second);
                 rv.class_info = class_info;
 
-                const FunctionTypeNode& ftn = rv.type().function();
-                FunctionTypeNode& copy_ftn = *ftn.clone();
+                const FunctionType& ftn = rv.type().function();
+                FunctionType& copy_ftn = *ftn.clone();
                 VectorOfTypes tp;
                 for (auto tttp: rv.class_info->type_parameters) {
                     tp.push_back(new ObjectType(tttp, {}));
@@ -660,7 +660,7 @@ bool is_generic(const TypeNode& t) {
             }
         }
     } else {
-        const FunctionTypeNode& fo = t.function();
+        const FunctionType& fo = t.function();
         for (auto param_type: fo.parameter_types) {
             if (is_generic(*param_type)) {
                 return true;
@@ -692,8 +692,8 @@ std::unordered_map<std::string, TypeNode*> make_replacements(TypeNode* a, TypeNo
         }
     } else {
         if (a->kind == Kind::FUNCTION && b->kind == Kind::FUNCTION) {
-            FunctionTypeNode& fa = a->function();
-            FunctionTypeNode& fb = b->function();
+            FunctionType& fa = a->function();
+            FunctionType& fb = b->function();
             for (int i = 0; i < fa.parameter_types.size(); i++) {
                 if (is_generic(*fa.parameter_types[i])) {
                     std::unordered_map<std::string, TypeNode*> rep = make_replacements(
@@ -732,8 +732,8 @@ std::vector<TypeNode*> make_replacements_in_order(TypeNode* a, TypeNode* b) {
         }
     } else {
         if (a->kind == Kind::FUNCTION && b->kind == Kind::FUNCTION) {
-            FunctionTypeNode& fa = a->function();
-            FunctionTypeNode& fb = b->function();
+            FunctionType& fa = a->function();
+            FunctionType& fb = b->function();
             for (int i = 0; i < fa.parameter_types.size(); i++) {
                 if (is_generic(*fa.parameter_types[i])) {
                     std::vector<TypeNode*> rep = make_replacements_in_order(
@@ -759,9 +759,9 @@ bool type_matches(TypeNode* aa, TypeNode* bb) {
         return false;
     } else if (a.kind == Kind::FUNCTION && b.kind == Kind::FUNCTION) {
         // both are functions
-        FunctionTypeNode& fa = a.function();
-        FunctionTypeNode& fb = b.function();
-        FunctionTypeNode& new_f = fa;
+        FunctionType& fa = a.function();
+        FunctionType& fb = b.function();
+        FunctionType& new_f = fa;
         std::unordered_map<std::string, TypeNode*> replacements;
         if (fa.parameter_types.size() != fb.parameter_types.size()) {
             return false;
@@ -813,7 +813,7 @@ std::unordered_map<std::string, TypeNode*>
 make_generic_replacements(TypeNode& t_generic_type, TypeNode& t_matching_type);
 
 std::unordered_map<std::string, TypeNode*>
-make_function_generic_replacements(FunctionTypeNode& t_generic_type, FunctionTypeNode& t_matching_type) {
+make_function_generic_replacements(FunctionType& t_generic_type, FunctionType& t_matching_type) {
     std::unordered_map<std::string, TypeNode*> repl;
 
     if (t_generic_type.parameter_types.size() != t_matching_type.parameter_types.size()) {
@@ -914,9 +914,9 @@ make_generic_to_generic_replacements(TypeNode& t_generic_type, TypeNode& t_match
     throw std::runtime_error("Error: making generic replacements for mismatching types!");
 }
 
-SymbolInfo Checker::match_arguments_to_generic_function(const FunctionTypeNode& ft, VectorOfTypes arg_types) {
-    FunctionTypeNode& function_type = ft.clone()->function();
-    FunctionTypeNode* f = ft.clone();
+SymbolInfo Checker::match_arguments_to_generic_function(const FunctionType& ft, VectorOfTypes arg_types) {
+    FunctionType& function_type = ft.clone()->function();
+    FunctionType* f = ft.clone();
     unify_function_call(*f, arg_types);
     SymbolInfo rv;
     const TypeNode& ret_type = *f->return_type;
@@ -926,7 +926,7 @@ SymbolInfo Checker::match_arguments_to_generic_function(const FunctionTypeNode& 
 }
 
 VectorOfTypes
-Checker::get_replacements_in_order(const FunctionTypeNode& function_type, VectorOfTypes arg_types) {
+Checker::get_replacements_in_order(const FunctionType& function_type, VectorOfTypes arg_types) {
     VectorOfTypes generic_replacements;
     for (int i = 0; i < function_type.parameter_types.size(); i++) {
         TypeNode& param_type = *function_type.parameter_types[i];
@@ -980,15 +980,15 @@ USymbolInfo Checker::visit(CallNode& n) {
         MemberNode& member_node = n.function->member();
         n.function = new IdNode(fun_info.class_info->class_name + "." + member_node.s_child);
         this->replace_me = false;
-        const FunctionTypeNode& ftn = fun_info.type().function();
-        FunctionTypeNode& copy_ftn = ftn.clone()->function();
+        const FunctionType& ftn = fun_info.type().function();
+        FunctionType& copy_ftn = ftn.clone()->function();
         copy_ftn.parameter_types.insert(copy_ftn.parameter_types.begin(), TYPE(fun_info.class_info->class_name, {}));
         retv.set_type(*copy_ftn.clone());
         object_node = member_node.parent;
     }
     if (fun_info.is_function || fun_info.is_method || fun_info.is_class_method) {
         // ok
-        const FunctionTypeNode& function_type = fun_info.type().function();
+        const FunctionType& function_type = fun_info.type().function();
         if (n.arguments.size() != function_type.parameter_types.size()) {
             this->error_function_call_num_args(n.start);
             return std::make_unique<SymbolInfo>(ErrorStub());
@@ -1192,7 +1192,7 @@ make_type_from_object_pattern(const ObjectType& object_type,
     return TYPE(type_identifier, new_type_params);
 }
 
-TypeNode* make_type_from_function_pattern(const FunctionTypeNode& ftn,
+TypeNode* make_type_from_function_pattern(const FunctionType& ftn,
                                           const std::unordered_map<std::string, TypeNode*>& replacements) {
     VectorOfTypes new_param_types;
     for (auto pt: ftn.parameter_types) {
@@ -1225,7 +1225,7 @@ ClassInfo* Checker::instantiate_generic(ClassInfo* generic, const ObjectType& in
         concrete_field_types.push_back(&concrete_type);
     }
 
-    std::unordered_map<std::string, FunctionTypeNode*> concrete_methods;
+    std::unordered_map<std::string, FunctionType*> concrete_methods;
     for (auto m: generic->methods) {
         TypeNode& concrete_type = *make_type(*(m.second), replacements);
         concrete_methods.insert(std::make_pair(m.first, &concrete_type.function()));
@@ -1719,7 +1719,7 @@ USymbolInfo Checker::visit(PartialApplication& node) {
     }
     node.complete_type = &func->type().clone()->function();
     SymbolInfo s;
-    s.set_type(FunctionTypeNode(partial_args, func->type().function().return_type->clone()));
+    s.set_type(FunctionType(partial_args, func->type().function().return_type->clone()));
     return std::make_unique<SymbolInfo>(s);
 }
 
@@ -1787,7 +1787,7 @@ TypeNode* Checker::substitute(TypeNode* t, std::string var, TypeNode* replacemen
 }
 
 std::pair<std::string, TypeNode*>*
-Checker::get_first_substitution_function(FunctionTypeNode& a, FunctionTypeNode& b, bool is_top_level_arg) {
+Checker::get_first_substitution_function(FunctionType& a, FunctionType& b, bool is_top_level_arg) {
     if (a.parameter_types.size() != b.parameter_types.size()) {
         throw std::runtime_error(
                 "Error: trying to unify two functions with different parameter count: " + a.to_string() + " and " +
@@ -1810,7 +1810,7 @@ Checker::get_first_substitution_function(FunctionTypeNode& a, FunctionTypeNode& 
     return nullptr;
 }
 
-void Checker::unify_function_call(FunctionTypeNode& fun, VectorOfTypes& args) {
+void Checker::unify_function_call(FunctionType& fun, VectorOfTypes& args) {
     if (args.size() != fun.parameter_types.size()) {
         this->error_call_bad_num_args();
         this->failed = true;
