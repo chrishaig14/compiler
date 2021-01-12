@@ -68,7 +68,6 @@ public:
     void error_no_return(const TypeNode& t, TextPosition position);
     void error_class_no_method(const std::string& class_name, const std::string method_name, TextPosition pos);
     void error_return_mismatch(const TypeNode& expected, const TypeNode& actual, TextPosition position);
-    TypeClassInfo* get_typeclass_for_function(std::string function_name);
     USymbolInfo dispatch(Node* nod);
     USymbolInfo visit(AssignmentNode& n);
     USymbolInfo visit(BinopNode& node);

@@ -1864,15 +1864,6 @@ USymbolInfo Checker::dispatch(Node* nod) {
     return nullptr;
 }
 
-TypeClassInfo* Checker::get_typeclass_for_function(std::string function_name) {
-    for (auto typeclass: this->typeclasses) {
-        if (typeclass.second->has_function(function_name)) {
-            return typeclass.second;
-        }
-    }
-    return nullptr;
-}
-
 bool Checker::is_immutable(const TypeNode& node) {
     if (node == T_STRING) {
         return true;
