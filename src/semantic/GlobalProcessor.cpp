@@ -235,7 +235,7 @@ void GlobalProcessor::visit(ClassNode& node) {
                 make_pair(f.first, new FunctionType(x, method.return_type->clone())));
     }
     class_info->class_name = node.class_name;
-    class_info->type_parameters = node.type_parameters;
+    class_info->type_params = node.type_parameters;
     if (this->class_table->declared(node.class_name) || this->function_table->has_function(node.class_name)) {
         std::string msg;
         msg = E_FMT("Name ") + E_HLT(node.class_name) + E_FMT(" already declared at ") +

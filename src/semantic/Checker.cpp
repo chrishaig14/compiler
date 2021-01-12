@@ -34,7 +34,7 @@ ClassInfo* make_list_class_info() {
                             {FUNCTION_TYPE({ generic_type_t.clone() },
                                            generic_type_b.clone())},
                             new T_LIST(generic_type_b.clone()))));
-    list_class_info->type_parameters = {"t"};
+    list_class_info->type_params = {"t"};
     return list_class_info;
 }
 
@@ -386,7 +386,7 @@ USymbolInfo Checker::visit(MemberNode& n) {
                 const FunctionType& ftn = rv.type().function();
                 FunctionType& copy_ftn = *ftn.clone();
                 VectorOfTypes tp;
-                for (auto tttp: rv.class_info->type_parameters) {
+                for (auto tttp: rv.class_info->type_params) {
                     tp.push_back(new ObjectType(tttp, {}));
                 }
                 auto instance_type = new ObjectType(rv.class_info->class_name, tp);
@@ -1061,7 +1061,7 @@ USymbolInfo Checker::visit(ClassLiteralExpressionNode& node) {
         throw std::runtime_error("No struct named " + object_type_id);
     }
     ClassInfo* class_info = this->class_table->get(object_type_id);
-    unsigned long num_required_type_params = class_info->type_parameters.size();
+    unsigned long num_required_type_params = class_info->type_params.size();
     unsigned long num_actual_type_params = object_type.type_params.size();
     if (num_required_type_params != 0) {
         // it's a generic class
@@ -1213,8 +1213,8 @@ TypeNode* make_type(const TypeNode& original, const MapStringType& replacements)
 
 ClassInfo* Checker::instantiate_generic(ClassInfo* generic, const ObjectType& instance) {
     MapStringType replacements;
-    for (int i = 0; i < generic->type_parameters.size(); i++) {
-        std::string tp = generic->type_parameters[i];
+    for (int i = 0; i < generic->type_params.size(); i++) {
+        std::string tp = generic->type_params[i];
         TypeNode& type_replacement = *instance.type_params[i];
         replacements[tp] = &type_replacement;
     }
@@ -1255,7 +1255,7 @@ USymbolInfo Checker::visit(ClassLiteralFieldNode& node) {
         throw std::runtime_error("No struct named " + object_type_id);
     }
     ClassInfo* class_info = this->class_table->get(object_type_id);
-    unsigned long num_required_type_params = class_info->type_parameters.size();
+    unsigned long num_required_type_params = class_info->type_params.size();
     unsigned long num_actual_type_params = object_type->type_params.size();
     if (num_required_type_params != 0) {
         // it's a generic class

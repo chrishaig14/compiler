@@ -42,7 +42,7 @@ public:
 
     bool operator==(const ClassInfo& b) const;
 
-    std::vector<std::string> type_parameters;
+    std::vector<std::string> type_params;
 };
 
 #endif //CLASSINFO_H
