@@ -138,6 +138,7 @@ public:
     void error_tuple_member_not_immutable(const TypeNode& t, TextPosition pos);
     void error_class_init_bad_member_type(const TypeNode& cls, const TypeNode& expected, const TypeNode& actual,
                                           TextPosition pos);
+    void error_class_not_found(const TypeNode& cls, TextPosition pos);
 };
 
 #endif //CHECKER_H

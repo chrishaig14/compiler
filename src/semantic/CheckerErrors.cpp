@@ -215,3 +215,11 @@ void Checker::error_class_init_bad_member_type(const TypeNode& cls, const TypeNo
           E_HLT(actual.to_string()) + this->code_context_string(pos);
     std::cout << msg << std::endl;
 }
+
+void Checker::error_class_not_found(const TypeNode& cls, TextPosition pos) {
+    this->failed = true;
+    std::string msg;
+    msg = this->context_string(pos) + E_FMT("Class ") +
+          E_HLT(cls.to_string()) + E_FMT(" not found") + this->code_context_string(pos);
+    std::cout << msg << std::endl;
+}

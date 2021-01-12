@@ -1248,12 +1248,10 @@ USymbolInfo Checker::visit(ClassLiteralFieldNode& node) {
     const std::string& object_type_str = object_type->to_string();
 
     if (!this->class_table->declared(object_type_id)) {
-        throw std::runtime_error("No struct named " + object_type_id);
+        this->error_class_not_found(*object_type, node.start);
+        return std::make_unique<SymbolInfo>(ErrorStub());
     }
 
-    if (!this->class_table->declared(object_type_id)) {
-        throw std::runtime_error("No struct named " + object_type_id);
-    }
     ClassInfo* class_info = this->class_table->get(object_type_id);
     unsigned long num_required_type_params = class_info->type_params.size();
     unsigned long num_actual_type_params = object_type->type_params.size();
