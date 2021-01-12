@@ -535,7 +535,7 @@ USymbolInfo Checker::visit(BoolOpNode& n) {
         if (right_info.type().kind == Kind::OBJECT) {
             auto& right = right_info.type().object();
             if (left.id == "Option" && right.id == "NoneType") {
-                symbol_info.set_type(ObjectType("Boolean", {}));
+                symbol_info.set_type(T_BOOL);
                 ok = true;
             }
         }
@@ -544,7 +544,7 @@ USymbolInfo Checker::visit(BoolOpNode& n) {
         this->error_bool_op(left_info.type(), right_info.type(), n.start);
     }
 
-    symbol_info.set_type(ObjectType("Boolean", {}));
+    symbol_info.set_type(T_BOOL);
 
     return std::make_unique<SymbolInfo>(symbol_info);
 }
@@ -1384,7 +1384,7 @@ USymbolInfo Checker::visit(ListNode& node) {
 
 USymbolInfo Checker::visit(BooleanNode& node) {
     SymbolInfo symbol_info;
-    symbol_info.set_type(ObjectType("Boolean", {}));
+    symbol_info.set_type(T_BOOL);
     symbol_info.is_function = false;
     return std::make_unique<SymbolInfo>(symbol_info);
 }
@@ -1392,7 +1392,7 @@ USymbolInfo Checker::visit(BooleanNode& node) {
 USymbolInfo Checker::visit(WhileNode& node) {
     USymbolInfo condition_p = this->dispatch(node.condition);
     SymbolInfo& condition = *condition_p;
-    if (condition.type() != ObjectType("Boolean", {})) {
+    if (condition.type() != T_BOOL) {
         this->error_condition(condition.type(), node.start, "elif");
     }
     this->enter_scope("while");
