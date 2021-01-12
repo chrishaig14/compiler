@@ -1643,6 +1643,13 @@ void Checker::error_subscript_non_object(TextPosition pos) {
     this->failed = true;
 }
 
+void Checker::error_string_immutable(TextPosition pos) {
+    std::string msg;
+    msg = this->context_string(pos) + E_FMT("Strings are immutable") + this->code_context_string(pos);
+    std::cout << msg << std::endl;
+    this->failed = true;
+}
+
 USymbolInfo Checker::visit(SubscriptNode& node) {
     USymbolInfo parent_p = this->dispatch(node.parent);
     SymbolInfo& parent = *parent_p;
@@ -1655,7 +1662,8 @@ USymbolInfo Checker::visit(SubscriptNode& node) {
 
     if (object_type.identifier == "String") {
         if (this->is_lvalue) {
-            throw std::runtime_error("Error: Strings are immutable!");
+            this->error_string_immutable(node.start);
+            return std::make_unique<SymbolInfo>(ErrorStub());
         }
     }
 
