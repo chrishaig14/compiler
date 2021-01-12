@@ -461,7 +461,7 @@ Node* Parser::parse_class_or_tuple_literal() {
     if (type->kind != Kind::OBJECT) {
         throw std::runtime_error("Expecterd a type to initialize, but got " + type->to_string());
     }
-    ObjectTypeNode* otn = &type->object();
+    ObjectType* otn = &type->object();
     this->expect_token(TokType::LCURLY);
 
     std::unordered_map<std::string, Node*> init;
@@ -712,7 +712,7 @@ FunctionTypeNode* Parser::parse_function_type() {
     return new FunctionTypeNode(parameter_types, return_type);
 }
 
-ObjectTypeNode* Parser::parse_object_type() {
+ObjectType* Parser::parse_object_type() {
     if (!this->match(TokType::ID)) {
         std::string msg = E_FMT("Got ");
         msg += E_HLT(this->token.to_string());
@@ -742,7 +742,7 @@ ObjectTypeNode* Parser::parse_object_type() {
         }
         this->next();
     }
-    return new ObjectTypeNode(identifier.str, type_parameters);
+    return new ObjectType(identifier.str, type_parameters);
 }
 
 TypeNode* Parser::parse_type_node() {
@@ -843,7 +843,7 @@ FunctionNode* Parser::parse_function_definition() {
         this->expect_token(TokType::RARROW);
         return_type = this->parse_type_node();
     } else {
-        return_type = new ObjectTypeNode(".None", {});
+        return_type = new ObjectType(".None", {});
     }
     // Parse function body
     BlockNode* body = this->parse_possibly_empty_block();

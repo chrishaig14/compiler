@@ -473,7 +473,7 @@ void Translator::visit(ClassNode& node) {
         method_node.parameter_names.insert(method_node.parameter_names.begin(), "this");
         method_node.parameter_types.insert(
                 method_node.parameter_types.begin(),
-                new ObjectTypeNode("dummy", {}));
+                new ObjectType("dummy", {}));
 //        method.second->accept(*this)
         this->visit(*method.second);
         auto method_code = this->code;

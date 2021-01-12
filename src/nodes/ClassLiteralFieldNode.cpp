@@ -4,7 +4,7 @@
 
 #include "ClassLiteralFieldNode.h"
 
-ClassLiteralFieldNode::ClassLiteralFieldNode(ObjectTypeNode* type, const std::unordered_map<std::string, Node*>& init)
+ClassLiteralFieldNode::ClassLiteralFieldNode(ObjectType* type, const std::unordered_map<std::string, Node*>& init)
         : type(type) {
     for (auto x: init) {
         this->init_names.push_back(x.first);

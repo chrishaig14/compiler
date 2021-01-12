@@ -141,31 +141,31 @@ GlobalProcessor::GlobalProcessor(std::vector<Builtin>& builtins, ClassTable* imp
     this->function_table = imported_functions;
     this->globals = new SymbolTable("global", nullptr);
     this->class_table = imported_classes;
-    auto ft = FUNCTION_TYPE({ new ObjectTypeNode("a", {}) }, new ObjectTypeNode("b", {}));
-    auto at = new T_LIST(new ObjectTypeNode("a", {}));
-    auto none = new ObjectTypeNode(".None", {});
+    auto ft = FUNCTION_TYPE({ new ObjectType("a", {}) }, new ObjectType("b", {}));
+    auto at = new T_LIST(new ObjectType("a", {}));
+    auto none = new ObjectType(".None", {});
     VectorOfTypes w = {at, ft};
     builtins.push_back(
-            {"map", CodeBuiltin{new FunctionTypeNode(w, new T_LIST(new ObjectTypeNode("b", {}))), list_map}}
+            {"map", CodeBuiltin{new FunctionTypeNode(w, new T_LIST(new ObjectType("b", {}))), list_map}}
     );
     builtins.push_back({"Integer.str", CodeBuiltin{new FunctionTypeNode({new T_INT}, new T_STRING), int_to_str}});
     builtins.push_back({"Float.str", CodeBuiltin{new FunctionTypeNode({new T_FLOAT}, new T_STRING), float_to_str}});
 
     builtins.push_back(
             {"List.len",
-             CodeBuiltin{new FunctionTypeNode({new T_LIST(new ObjectTypeNode("a", {}))}, new T_INT), list_len}}
+             CodeBuiltin{new FunctionTypeNode({new T_LIST(new ObjectType("a", {}))}, new T_INT), list_len}}
     );
-    VectorOfTypes x = {new T_LIST(TYPE("a", {})), new ObjectTypeNode("a", {})};
+    VectorOfTypes x = {new T_LIST(TYPE("a", {})), new ObjectType("a", {})};
     builtins.push_back({"List.pop", CodeBuiltin{new FunctionTypeNode(x, none), list_pop}});
     builtins.push_back(
             {"List.push", CodeBuiltin{
-                    new FunctionTypeNode({new T_LIST(new ObjectTypeNode("a", {}))}, new ObjectTypeNode("a", {})),
+                    new FunctionTypeNode({new T_LIST(new ObjectType("a", {}))}, new ObjectType("a", {})),
                     list_push}}
     );
-    auto function_from_t_to_u = FUNCTION_TYPE({ TYPE("t", {}) }, new ObjectTypeNode("b", {}));
+    auto function_from_t_to_u = FUNCTION_TYPE({ TYPE("t", {}) }, new ObjectType("b", {}));
     builtins.push_back(
             {"List.unordered_map",
-             CodeBuiltin{new FunctionTypeNode({function_from_t_to_u}, new T_LIST(new ObjectTypeNode("b", {}))),
+             CodeBuiltin{new FunctionTypeNode({function_from_t_to_u}, new T_LIST(new ObjectType("b", {}))),
                          list_map}}
     );
     builtins.push_back({"String.len", CodeBuiltin{new FunctionTypeNode({new T_STRING}, new T_INT), string_len}});

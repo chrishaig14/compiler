@@ -212,13 +212,13 @@ std::string Transpiler::visit_class(ClassNode& node) {
         n.second->parameter_names.insert(n.second->parameter_names.begin(), "this_obj");
         n.second->parameter_types.insert(
                 n.second->parameter_types.begin(),
-                new ObjectTypeNode(node.class_name, {}));
+                new ObjectType(node.class_name, {}));
         out += this->dispatch(n.second);
     }
     return out;
 }
 
-std::string Transpiler::ptr_to_type_object(const ObjectTypeNode& t) {
+std::string Transpiler::ptr_to_type_object(const ObjectType& t) {
     if (t.id.size() == 1 && islower(t.id[0])) {
         // it's a generic, return same without pointer;
         return "void*";
@@ -249,7 +249,7 @@ std::string Transpiler::ptr_to_type_object(const ObjectTypeNode& t) {
 }
 
 
-std::string Transpiler::object_type_mapper(const ObjectTypeNode& t) {
+std::string Transpiler::object_type_mapper(const ObjectType& t) {
     if (t.id.size() == 1 && islower(t.id[0])) {
         // it's a generic, return same without pointer;
         return "XObject*";

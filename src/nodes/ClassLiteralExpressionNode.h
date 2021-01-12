@@ -14,13 +14,13 @@
 class ClassLiteralExpressionNode : public Node {
 
 public:
-    ClassLiteralExpressionNode(ObjectTypeNode* type, const VectorOfNodes& init);
+    ClassLiteralExpressionNode(ObjectType* type, const VectorOfNodes& init);
 
     ~ClassLiteralExpressionNode();
 
     VectorOfNodes init;
     std::vector<std::string> names;
-    ObjectTypeNode* type;
+    ObjectType* type;
 
     bool equal(const Node& x) const override;
     ClassLiteralExpressionNode& clsexp() override;

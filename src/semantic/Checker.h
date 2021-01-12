@@ -30,7 +30,7 @@ bool type_matches(TypeNode* a, TypeNode* b);
 bool is_generic(const TypeNode& t);
 
 std::unordered_map<std::string, TypeNode*> make_replacements(TypeNode* a, TypeNode* b);
-TypeNode* make_type_from_object_pattern(const ObjectTypeNode& object_type,
+TypeNode* make_type_from_object_pattern(const ObjectType& object_type,
                                         const std::unordered_map<std::string, TypeNode*>& replacements);
 TypeNode* make_type_from_function_pattern(const FunctionTypeNode& ftn,
                                           const std::unordered_map<std::string, TypeNode*>& replacements);
@@ -48,7 +48,7 @@ class Checker {
     Node* replacement;
     std::unordered_map<std::string, SymbolTable*> scopes;
     std::unordered_map<std::string, TypeClassInfo*> typeclasses;
-    std::vector<ObjectTypeNode*> tuple_types;
+    std::vector<ObjectType*> tuple_types;
     SymbolTable* scope;
     TypeNode* this_type;
 public:
@@ -58,7 +58,7 @@ public:
     bool can_assign_generic(TypeNode& from, TypeNode& to, std::vector<std::string> type_params);
     bool is_immutable(const TypeNode& node);
     Checker(SymbolTable* globals, ClassTable* class_table, FunctionTable* function_table);
-    ClassInfo* instantiate_generic(ClassInfo* generic, const ObjectTypeNode& instance);
+    ClassInfo* instantiate_generic(ClassInfo* generic, const ObjectType& instance);
     void error_assignment(const TypeNode& expected, const TypeNode& actual, TextPosition position);
     void error_bad_return(TextPosition position);
     void error_binop(const TypeNode& left, const TypeNode& right, TextPosition position);
@@ -115,11 +115,11 @@ public:
     std::string code_context_string(TextPosition position);
     std::string code_error_string(TextPosition start, TextPosition end);
 
-    bool is_variable(const ObjectTypeNode& a);
+    bool is_variable(const ObjectType& a);
     std::pair<std::string, TypeNode*>*
     get_first_substitution_function(FunctionTypeNode& a, FunctionTypeNode& b, bool is_top_level_arg);
     std::pair<std::string, TypeNode*>*
-    get_first_substitution_object(ObjectTypeNode& a, ObjectTypeNode& b, bool is_top_level_arg);
+    get_first_substitution_object(ObjectType& a, ObjectType& b, bool is_top_level_arg);
     std::pair<std::string, TypeNode*>* get_first_substitution(TypeNode& a, TypeNode& b, bool is_top_level_arg);
     TypeNode* substitute(TypeNode* t, std::string var, TypeNode* replacement);
     void unify_function_call(FunctionTypeNode& fun, VectorOfTypes& args);

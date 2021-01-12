@@ -89,7 +89,7 @@ public:
 
     FunctionTypeNode* parse_function_type();
 
-    ObjectTypeNode* parse_object_type();
+    ObjectType* parse_object_type();
 
     bool inside_loop;
     Node* parse_partial_application();

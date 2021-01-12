@@ -12,7 +12,7 @@
 
 class ClassLiteralFieldNode : public Node {
 public:
-    ObjectTypeNode* type;
+    ObjectType* type;
 
     bool equal(const Node& other) const override;
 
@@ -21,7 +21,7 @@ public:
     std::vector<std::string> init_names;
     VectorOfNodes init_values;
 
-    ClassLiteralFieldNode(ObjectTypeNode* type, const std::unordered_map<std::string, Node*>& init);
+    ClassLiteralFieldNode(ObjectType* type, const std::unordered_map<std::string, Node*>& init);
     ClassLiteralFieldNode& clsfld() override;
     const ClassLiteralFieldNode& clsfld() const override;
 
