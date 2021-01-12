@@ -578,7 +578,7 @@ USymbolInfo Checker::visit(BinopNode& n) {
     auto rtype = right.id;
     bool ok = false;
     if (ltype == "Integer" && rtype == "Integer") {
-        symbol_info.set_type(ObjectType("Integer", {}));
+        symbol_info.set_type(T_INT);
         symbol_info.is_function = false;
         ok = true;
     } else if (ltype == "Float" && rtype == "Float") {
@@ -1403,7 +1403,7 @@ USymbolInfo Checker::visit(WhileNode& node) {
 
 USymbolInfo Checker::visit(NumberNode& node) {
     SymbolInfo semanticInfo;
-    semanticInfo.set_type(ObjectType("Integer", {}));
+    semanticInfo.set_type(T_INT);
     semanticInfo.is_function = false;
     return std::make_unique<SymbolInfo>(semanticInfo);
 }
