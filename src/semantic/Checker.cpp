@@ -1284,6 +1284,8 @@ USymbolInfo Checker::visit(ClassLiteralFieldNode& node) {
                 "In struct \"" + object_type_id + "\" initialization: " + "Expected " +
                 std::to_string(class_fields.size()) + " initializers but got " +
                 std::to_string(node.init_names.size()));
+
+
     }
     for (int i = 0; i < node.init_names.size(); i++) {
         Node* exp = node.init_values[i];
@@ -1295,11 +1297,7 @@ USymbolInfo Checker::visit(ClassLiteralFieldNode& node) {
         }
         TypeNode& field_type = *class_fields[node.init_names[i]];
         if (!this->can_assign(semanticInfo.type(), field_type)) {
-            throw std::runtime_error(
-                    "In struct \"" + object_type_id + "\" initialization: " + "field \"" + node.init_names[i] +
-                    "\" is of type " +
-                    field_type.to_string() +
-                    " but got " + semanticInfo.type().to_string());
+            this->error_class_init_bad_member_type(*object_type, field_type, semanticInfo.type(), exp->start);
         }
     }
     SymbolInfo rv;

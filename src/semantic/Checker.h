@@ -136,6 +136,8 @@ public:
     void error_string_immutable(TextPosition pos);
     void error_member_no_object(const std::string& class_name, const std::string method_name, TextPosition pos);
     void error_tuple_member_not_immutable(const TypeNode& t, TextPosition pos);
+    void error_class_init_bad_member_type(const TypeNode& cls, const TypeNode& expected, const TypeNode& actual,
+                                          TextPosition pos);
 };
 
 #endif //CHECKER_H

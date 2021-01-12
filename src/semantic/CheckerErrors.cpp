@@ -205,3 +205,13 @@ void Checker::error_call_not_a_function(TextPosition position) {
     msg = E_HLT(text_pos_to_string(this->__file__, position)) + E_FMT("Calling something that's not a function");
     std::cout << msg << std::endl;
 }
+
+void Checker::error_class_init_bad_member_type(const TypeNode& cls, const TypeNode& expected, const TypeNode& actual,
+                                               TextPosition pos) {
+    this->failed = true;
+    std::string msg;
+    msg = this->context_string(pos) + E_FMT("In initialization of class ") +
+          E_HLT(cls.to_string()) + E_FMT(" expected ") + E_HLT(expected.to_string()) + E_FMT(" but got ") +
+          E_HLT(actual.to_string()) + this->code_context_string(pos);
+    std::cout << msg << std::endl;
+}
