@@ -425,6 +425,9 @@ USymbolInfo Checker::visit(AssignmentNode& n) {
     }
     this->is_lvalue = true;
     USymbolInfo linfo_p = this->dispatch(n.lvalue);
+    if (linfo_p->is_error) {
+        return nullptr;
+    }
     this->is_lvalue = false;
     if (n.lvalue->ntype == MEMBER && n.lvalue->member().type == MemberType::NUM) {
         this->error_tuple_assign(n.start);
