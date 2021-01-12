@@ -591,7 +591,7 @@ USymbolInfo Checker::visit(BinopNode& n) {
         ok = true;
     } else if (ltype == "String" && rtype == "String") {
         if (n.op == OpType::ADD) {
-            symbol_info.set_type(ObjectType("String", {}));
+            symbol_info.set_type(T_STRING);
             symbol_info.is_function = false;
             IdNode* idn = new IdNode("String_add");
             idn->is_global_function = true;
@@ -1410,7 +1410,7 @@ USymbolInfo Checker::visit(NumberNode& node) {
 
 USymbolInfo Checker::visit(StringNode& node) {
     SymbolInfo semanticInfo;
-    semanticInfo.set_type(ObjectType("String", {}));
+    semanticInfo.set_type(T_STRING);
     semanticInfo.is_function = false;
     return std::make_unique<SymbolInfo>(semanticInfo);
 }
