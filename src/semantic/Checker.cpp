@@ -1880,6 +1880,14 @@ bool Checker::is_immutable(const TypeNode& node) {
     return false;
 }
 
+void Checker::error_tuple_member_not_immutable(const TypeNode& t, TextPosition pos) {
+    std::string msg;
+    msg = this->context_string(pos) + E_FMT("Tuple member not immutable, it's of type ") + E_HLT(t.to_string()) +
+          this->code_context_string(pos);
+    std::cout << msg << std::endl;
+    this->failed = true;
+}
+
 USymbolInfo Checker::visit(TupleNode& node) {
     VectorOfTypes types;
     int i = 0;
@@ -1888,10 +1896,8 @@ USymbolInfo Checker::visit(TupleNode& node) {
         USymbolInfo vtype = this->dispatch(n);
         types.emplace_back(vtype->type().clone());
         if (!this->is_immutable(vtype->type())) {
-            throw std::runtime_error(
-                    "All tuple member types must be immutable, at position " + std::to_string(i) + " got " +
-                    vtype->type().to_string() + " which is not"
-            );
+            this->error_tuple_member_not_immutable(vtype->type(), node.start);
+            return std::make_unique<SymbolInfo>(ErrorStub());
         }
     }
     ObjectTypeNode tuple_type("Tuple", types);

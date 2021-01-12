@@ -129,6 +129,7 @@ public:
     void error_subscript_non_object(TextPosition pos);
     void error_string_immutable(TextPosition pos);
     void error_member_no_object(const std::string& class_name, const std::string method_name, TextPosition pos);
+    void error_tuple_member_not_immutable(const TypeNode& t, TextPosition pos);
 };
 
 #endif //CHECKER_H
