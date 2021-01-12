@@ -65,7 +65,7 @@ FunctionTypeNode& FunctionTypeNode::function() { return *this; }
 const FunctionTypeNode& FunctionTypeNode::function() const { return *this; }
 
 ObjectTypeNode::ObjectTypeNode(const std::string& identifier,
-                               const VectorOfTypes& typeParameters) : identifier(
+                               const VectorOfTypes& typeParameters) : id(
         identifier
 ), type_parameters(typeParameters) {
     for (auto p: typeParameters) {
@@ -79,7 +79,7 @@ TypeNode* ObjectTypeNode::clone() const {
     for (auto p: this->type_parameters) {
         aux.emplace_back(p->clone());
     }
-    return new ObjectTypeNode(this->identifier, aux);
+    return new ObjectTypeNode(this->id, aux);
 }
 
 ObjectTypeNode::~ObjectTypeNode() {
@@ -97,15 +97,15 @@ std::string ObjectTypeNode::to_string() const {
     }
     if (parameters.size() != 0) {
         parameters = parameters.substr(0, parameters.size() - 2);
-        return otype.identifier + "[" + parameters + "]";
+        return otype.id + "[" + parameters + "]";
     }
-    return otype.identifier;
+    return otype.id;
 }
 
 bool ObjectTypeNode::equal(const TypeNode& other) const {
     auto& a = *this;
     auto& b = other.object();
-    if (a.identifier != b.identifier) {
+    if (a.id != b.id) {
         return false;
     }
     if (a.type_parameters.size() != b.type_parameters.size()) {

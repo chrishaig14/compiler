@@ -285,7 +285,7 @@ void Translator::visit(ClassLiteralExpressionNode& node) {
         CodeLabel out = this->code;
         all.insert(all.end(), out.begin(), out.end());
     }
-    all.push_back(LC("", new MakeObjectInst(node.type->identifier, fields)));
+    all.push_back(LC("", new MakeObjectInst(node.type->id, fields)));
     this->code = all;
 }
 
@@ -300,7 +300,7 @@ void Translator::visit(ClassLiteralFieldNode& node) {
         CodeLabel out = this->code;
         all.insert(all.end(), out.begin(), out.end());
     }
-    all.push_back(LC("", new MakeObjectInst(node.type->identifier, fields)));
+    all.push_back(LC("", new MakeObjectInst(node.type->id, fields)));
     this->code = all;
 }
 

@@ -107,19 +107,19 @@ void Checker::assert_type_exists(TypeNode& type, TextPosition pos) {
     if (type.kind == Kind::OBJECT) {
         if (type.object().type_parameters.size() == 0) {
             if (!is_generic(type)) {
-                if (!this->class_table->declared(type.object().identifier)) {
+                if (!this->class_table->declared(type.object().id)) {
                     std::string msg;
                     msg = E_FMT(text_pos_to_string(this->__file__, pos));
-                    msg += E_FMT(" type ") + E_HLT(type.object().identifier) + E_FMT(" doesn't exist");
+                    msg += E_FMT(" type ") + E_HLT(type.object().id) + E_FMT(" doesn't exist");
                     std::cout << msg << std::endl;
                 }
             }
             return;
         }
-        if (!this->class_table->declared(type.object().identifier)) {
+        if (!this->class_table->declared(type.object().id)) {
             std::string msg;
             msg = E_FMT(text_pos_to_string(this->__file__, pos));
-            msg += E_FMT(" type ") + E_HLT(type.object().identifier) + E_FMT(" doesn't exist");
+            msg += E_FMT(" type ") + E_HLT(type.object().id) + E_FMT(" doesn't exist");
             std::cout << msg << std::endl;
         } else {
             for (auto t: type.object().type_parameters) {
@@ -195,7 +195,7 @@ USymbolInfo Checker::visit(IdNode& n) {
             n.location = this->scope->find(n.identifier);
             if (symbol_info.type().kind == Kind::OBJECT) {
                 const ObjectTypeNode& otn = symbol_info.type().object();
-                if (otn.identifier == "Option") {
+                if (otn.id == "Option") {
                     if (this->scope->get_not_none(n.identifier)) {
                         symbol_info.set_type(*otn.type_parameters[0]);
                     }
@@ -239,14 +239,14 @@ USymbolInfo Checker::visit(DeclarationNode& n) {
         } else {
             SymbolInfo expression_info = exp_info;
             const ObjectTypeNode& actual_type = n.type->object();
-            if (actual_type.identifier == "Option") {
+            if (actual_type.id == "Option") {
                 if (*actual_type.type_parameters[0] != expression_info.type()) {
                     auto foo = expression_info.type().object();
-                    if (foo.identifier != "NoneType") {
+                    if (foo.id != "NoneType") {
                         this->error_assignment(*n.type, expression_info.type(), n.start);
                     }
                 }
-            } else if (actual_type.identifier == "Union") {
+            } else if (actual_type.id == "Union") {
                 bool ok = false;
                 for (auto type_param: actual_type.type_parameters) {
                     if (*type_param != expression_info.type()) {
@@ -329,7 +329,7 @@ USymbolInfo Checker::visit(AssignmentNode& n) {
     }
 
     const ObjectTypeNode& actual_type = linfo.type().object();
-    if (n.lvalue->ntype == NodeType::ID && actual_type.identifier == "Option") {
+    if (n.lvalue->ntype == NodeType::ID && actual_type.id == "Option") {
         // special treatment if we are assigning to an id of a variable of type Option[t]
         if (expression_type.type() == (*actual_type.type_parameters[0])) {
             std::cout << "p cant be none" << std::endl;
@@ -337,7 +337,7 @@ USymbolInfo Checker::visit(AssignmentNode& n) {
         } else {
             if (linfo.type() != (expression_type.type())) {
                 auto& foo = expression_type.type().object();
-                if (foo.identifier != "NoneType") {
+                if (foo.id != "NoneType") {
                     this->error_assignment(linfo.type(), expression_type.type(), n.start);
                 }
                 // assigning none, ok
@@ -349,11 +349,11 @@ USymbolInfo Checker::visit(AssignmentNode& n) {
         }
     } else {
         if (linfo.type() != expression_type.type()) {
-            if (actual_type.identifier == "Option") {
+            if (actual_type.id == "Option") {
                 // if type doesn't match exactly, we may be assigning to an Option[t]
                 if (*actual_type.type_parameters[0] != expression_type.type()) {
                     auto& foo = expression_type.type().object();
-                    if (foo.identifier != "NoneType") {
+                    if (foo.id != "NoneType") {
                         this->error_assignment(
                                 linfo.type(),
                                 expression_type.type(),
@@ -419,7 +419,7 @@ USymbolInfo Checker::visit(MemberNode& n) {
     const ObjectTypeNode* option_type = nullptr;
     if (n.parent->ntype == NodeType::ID) {
         IdNode& idn = n.parent->id();
-        if (object.identifier == "Option") {
+        if (object.id == "Option") {
             if (this->scope->get_not_none(idn.identifier)) {
                 // we can guarantee that it's not null, so we can access the members
                 option_type = &(object.type_parameters[0])->object();
@@ -432,7 +432,7 @@ USymbolInfo Checker::visit(MemberNode& n) {
         }
     }
     const ObjectTypeNode& final_type = option_type != nullptr ? *option_type : object;
-    if (final_type.identifier == "Tuple") {
+    if (final_type.id == "Tuple") {
         // special treatment for tuples
         if (n.type != MemberType::NUM) {
             throw std::runtime_error(
@@ -459,10 +459,10 @@ USymbolInfo Checker::visit(MemberNode& n) {
         } else {
             if (is_generic((final_type)) && final_type.type_parameters.size() == 0) {
                 throw std::runtime_error(
-                        "Cannot access member of totally generic value of generic type " + object.identifier + "!"
+                        "Cannot access member of totally generic value of generic type " + object.id + "!"
                 );
             }
-            class_info = this->class_table->get(object.identifier);
+            class_info = this->class_table->get(object.id);
             class_info = instantiate_generic(class_info, final_type);
             this->class_table->set(object.to_string(), class_info);
         }
@@ -534,7 +534,7 @@ USymbolInfo Checker::visit(BoolOpNode& n) {
         auto& left = left_info.type().object();
         if (right_info.type().kind == Kind::OBJECT) {
             auto& right = right_info.type().object();
-            if (left.identifier == "Option" && right.identifier == "NoneType") {
+            if (left.id == "Option" && right.id == "NoneType") {
                 symbol_info.set_type(ObjectTypeNode("Boolean", {}));
                 ok = true;
             }
@@ -574,8 +574,8 @@ USymbolInfo Checker::visit(BinopNode& n) {
     SymbolInfo symbol_info;
     auto& left = left_info.type().object();
     auto& right = right_info.type().object();
-    auto ltype = left.identifier;
-    auto rtype = right.identifier;
+    auto ltype = left.id;
+    auto rtype = right.id;
     bool ok = false;
     if (ltype == "Integer" && rtype == "Integer") {
         symbol_info.set_type(ObjectTypeNode("Integer", {}));
@@ -649,7 +649,7 @@ USymbolInfo Checker::visit(ReturnNode& n) {
 bool is_generic(const TypeNode& t) {
     if (t.kind == Kind::OBJECT) {
         const ObjectTypeNode& o = t.object();
-        if (o.identifier.size() == 1 && islower(o.identifier[0])) {
+        if (o.id.size() == 1 && islower(o.id[0])) {
             // a is generic
             assert(o.type_parameters.size() == 0);
             return true;
@@ -678,8 +678,8 @@ std::unordered_map<std::string, TypeNode*> make_replacements(TypeNode* a, TypeNo
     if (a->kind == Kind::OBJECT) {
         ObjectTypeNode& oa = a->object();
         ObjectTypeNode& ob = b->object();
-        if (oa.identifier.size() == 1 && islower(oa.identifier[0])) {
-            replacements[oa.identifier] = b->clone();
+        if (oa.id.size() == 1 && islower(oa.id[0])) {
+            replacements[oa.id] = b->clone();
         }
         for (int i = 0; i < oa.type_parameters.size(); i++) {
             if (is_generic(*oa.type_parameters[i])) {
@@ -717,7 +717,7 @@ std::vector<TypeNode*> make_replacements_in_order(TypeNode* a, TypeNode* b) {
     if (a->kind == Kind::OBJECT) {
         ObjectTypeNode& oa = a->object();
         ObjectTypeNode& ob = b->object();
-        if (oa.identifier.size() == 1 && islower(oa.identifier[0])) {
+        if (oa.id.size() == 1 && islower(oa.id[0])) {
             replacements.push_back(b->clone());
         } else {
             for (int i = 0; i < oa.type_parameters.size(); i++) {
@@ -793,7 +793,7 @@ bool type_matches(TypeNode* aa, TypeNode* bb) {
         if (oa.type_parameters.size() == 0) {
             return true;
         }
-        if (oa.identifier != ob.identifier) {
+        if (oa.id != ob.id) {
             return false;
         }
         if (oa.type_parameters.size() != ob.type_parameters.size()) {
@@ -858,7 +858,7 @@ std::unordered_map<std::string, TypeNode*>
 make_object_generic_replacements(ObjectTypeNode& t_generic_type, ObjectTypeNode& t_matching_type) {
     std::unordered_map<std::string, TypeNode*> repl;
     if (t_generic_type.type_parameters.size() == 0) {
-        repl[t_generic_type.identifier] = t_matching_type.clone();
+        repl[t_generic_type.id] = t_matching_type.clone();
     } else {
         if (t_generic_type.type_parameters.size() != t_matching_type.type_parameters.size()) {
             throw std::runtime_error("Error type parameter size mismatch!");
@@ -890,7 +890,7 @@ make_generic_replacements(TypeNode& t_generic_type, TypeNode& t_matching_type) {
     } else {
         if (t_generic_type.kind == Kind::OBJECT && t_matching_type.kind == Kind::FUNCTION) {
             if (t_generic_type.object().type_parameters.size() == 0) {
-                return std::unordered_map<std::string, TypeNode*>({{t_generic_type.object().identifier, t_matching_type.clone()}});
+                return std::unordered_map<std::string, TypeNode*>({{t_generic_type.object().id, t_matching_type.clone()}});
             }
         }
         throw std::runtime_error("Error: making generic replacements for mismatching types!");
@@ -907,7 +907,7 @@ make_generic_to_generic_replacements(TypeNode& t_generic_type, TypeNode& t_match
     } else {
         if (t_generic_type.kind == Kind::OBJECT && t_matching_type.kind == Kind::FUNCTION) {
             if (t_generic_type.object().type_parameters.size() == 0) {
-                return std::unordered_map<std::string, TypeNode*>({{t_generic_type.object().identifier, t_matching_type.clone()}});
+                return std::unordered_map<std::string, TypeNode*>({{t_generic_type.object().id, t_matching_type.clone()}});
             }
         }
     }
@@ -1054,7 +1054,7 @@ USymbolInfo Checker::visit(BlockNode& program) {
 
 USymbolInfo Checker::visit(ClassLiteralExpressionNode& node) {
     ObjectTypeNode& object_type = *node.type;
-    std::string& object_type_id = object_type.identifier;
+    std::string& object_type_id = object_type.id;
     const std::string& object_type_str = object_type.to_string();
 
     if (!this->class_table->declared(object_type_id)) {
@@ -1122,15 +1122,15 @@ USymbolInfo Checker::visit(ClassLiteralExpressionNode& node) {
 
 bool Checker::can_assign(const TypeNode& from, const TypeNode& to) {
     auto& to_object = (to).object();
-    if (to_object.identifier == "Option") {
+    if (to_object.id == "Option") {
         if (*to_object.type_parameters[0] != from) {
             auto foo = from.object();
-            if (foo.identifier != "NoneType") {
+            if (foo.id != "NoneType") {
                 return false;
             }
         }
         return true;
-    } else if (to_object.identifier == "Union") {
+    } else if (to_object.id == "Union") {
         for (auto type_param: to_object.type_parameters) {
             if (*type_param == from) {
                 return true;
@@ -1145,20 +1145,20 @@ bool Checker::can_assign_generic(TypeNode& from, TypeNode& to, std::vector<std::
     auto to_object = (to).object();
     if (to_object.type_parameters.size() == 0) {
         for (auto tp:type_params) {
-            if (to_object.identifier == tp) {
+            if (to_object.id == tp) {
                 return true;
             }
         }
     }
-    if (to_object.identifier == "Option") {
+    if (to_object.id == "Option") {
         if (*to_object.type_parameters[0] != from) {
             auto foo = from.object();
-            if (foo.identifier != "NoneType") {
+            if (foo.id != "NoneType") {
                 return false;
             }
         }
         return true;
-    } else if (to_object.identifier == "Union") {
+    } else if (to_object.id == "Union") {
         for (auto type_param: to_object.type_parameters) {
             if (*type_param == from) {
                 return true;
@@ -1172,7 +1172,7 @@ bool Checker::can_assign_generic(TypeNode& from, TypeNode& to, std::vector<std::
 TypeNode*
 make_type_from_object_pattern(const ObjectTypeNode& object_type,
                               const std::unordered_map<std::string, TypeNode*>& replacements) {
-    std::string type_identifier = object_type.identifier;
+    std::string type_identifier = object_type.id;
     for (auto r: replacements) {
         if (type_identifier == r.first) {
             if (object_type.type_parameters.size() != 0) {
@@ -1244,7 +1244,7 @@ ClassInfo* Checker::instantiate_generic(ClassInfo* generic, const ObjectTypeNode
 
 USymbolInfo Checker::visit(ClassLiteralFieldNode& node) {
     ObjectTypeNode* object_type = node.type;
-    std::string& object_type_id = object_type->identifier;
+    std::string& object_type_id = object_type->id;
     const std::string& object_type_str = object_type->to_string();
 
     if (!this->class_table->declared(object_type_id)) {
@@ -1315,7 +1315,7 @@ USymbolInfo Checker::visit(ForNode& node) {
     }
 
     const ObjectTypeNode& obj = symbol_info.type().object();
-    if (obj.identifier != "List") {
+    if (obj.id != "List") {
         this->error_for(obj, node.start);
     }
     this->scope->set(".index0", T_INT);
@@ -1429,7 +1429,7 @@ USymbolInfo Checker::visit(SubscriptNode& node) {
     SymbolInfo symbol_info;
     const ObjectTypeNode& object_type = parent.type().object();
 
-    if (object_type.identifier == "String") {
+    if (object_type.id == "String") {
         if (this->is_lvalue) {
             this->error_string_immutable(node.start);
             return std::make_unique<SymbolInfo>(ErrorStub());
@@ -1452,12 +1452,12 @@ USymbolInfo Checker::visit(SubscriptNode& node) {
     }
     this->is_lvalue = old_lvalue;
 
-    if (object_type.identifier == "List") {
+    if (object_type.id == "List") {
         if (not_integer) {
             throw std::runtime_error("Access not number subscript of List!");
         }
         symbol_info.set_type(*object_type.type_parameters[0]);
-    } else if (object_type.identifier == "String") {
+    } else if (object_type.id == "String") {
         if (not_integer) {
             throw std::runtime_error("Access not number subscript of String!");
         }
@@ -1481,7 +1481,7 @@ USymbolInfo Checker::visit(TernaryNode& node) {
     }
     auto& expression_type = expression_info.type().object();
 
-    if (expression_type.identifier != "Option") {
+    if (expression_type.id != "Option") {
         throw std::runtime_error("Expected an Option[T], got: " + expression_type.to_string());
     }
     SymbolInfo semanticInfo;
@@ -1668,7 +1668,7 @@ bool Checker::is_immutable(const TypeNode& node) {
     if (node == T_BOOL) {
         return true;
     }
-    if (node.kind == Kind::OBJECT && node.object().identifier == "Tuple") {
+    if (node.kind == Kind::OBJECT && node.object().id == "Tuple") {
         return true;
     }
     return false;
@@ -1734,19 +1734,19 @@ Checker::~Checker() {
 
 std::pair<std::string, TypeNode*>*
 Checker::get_first_substitution_object(ObjectTypeNode& a, ObjectTypeNode& b, bool is_top_level_arg) {
-    if (is_variable(a) && is_variable(b) && a.object().identifier == b.object().identifier) {
+    if (is_variable(a) && is_variable(b) && a.object().id == b.object().id) {
         return nullptr;
     }
     if (is_variable(a)) {
-        return new std::pair<std::string, TypeNode*>(a.object().identifier, b.clone());
+        return new std::pair<std::string, TypeNode*>(a.object().id, b.clone());
     }
     if (is_variable(b)) {
         if (is_top_level_arg) {
             throw std::runtime_error("trying to replace var with concrete type at top level!");
         }
-        return new std::pair<std::string, TypeNode*>(b.object().identifier, a.clone());
+        return new std::pair<std::string, TypeNode*>(b.object().id, a.clone());
     }
-    if (a.identifier != b.identifier) {
+    if (a.id != b.id) {
         throw std::runtime_error("Error trying to unify object types " + a.to_string() + " and " + b.to_string());
     }
     if (a.type_parameters.size() != b.type_parameters.size()) {
@@ -1767,7 +1767,7 @@ Checker::get_first_substitution_object(ObjectTypeNode& a, ObjectTypeNode& b, boo
 
 TypeNode* Checker::substitute(TypeNode* t, std::string var, TypeNode* replacement) {
     if (t->kind == Kind::OBJECT) {
-        if (is_variable(t->object()) && t->object().identifier == var) {
+        if (is_variable(t->object()) && t->object().id == var) {
             return replacement;
         } else {
             TypeNode* c = t->clone();
@@ -1860,6 +1860,6 @@ std::pair<std::string, TypeNode*>* Checker::get_first_substitution(TypeNode& a, 
 }
 
 bool Checker::is_variable(const ObjectTypeNode& a) {
-    return a.type_parameters.size() == 0 && islower(a.identifier[0]);
+    return a.type_parameters.size() == 0 && islower(a.id[0]);
 }
 

@@ -148,7 +148,7 @@ std::string Transpiler::visit_class_literal_expression(ClassLiteralExpressionNod
 std::string Transpiler::visit_class_literal_field(ClassLiteralFieldNode& node) {
     std::string out;
     out = "GC::register_object(TAG(";
-    out += "new class_" + node.type->identifier + "(";
+    out += "new class_" + node.type->id + "(";
     for (int i = 0; i < node.init_names.size(); i++) {
         out += this->dispatch(node.init_values[i]) + ", ";
     }
@@ -219,7 +219,7 @@ std::string Transpiler::visit_class(ClassNode& node) {
 }
 
 std::string Transpiler::ptr_to_type_object(const ObjectTypeNode& t) {
-    if (t.identifier.size() == 1 && islower(t.identifier[0])) {
+    if (t.id.size() == 1 && islower(t.id[0])) {
         // it's a generic, return same without pointer;
         return "void*";
     }
@@ -232,25 +232,25 @@ std::string Transpiler::ptr_to_type_object(const ObjectTypeNode& t) {
     if (t == T_BOOL) {
         return "bool";
     }
-    if (t.identifier == "Tuple") {
+    if (t.id == "Tuple") {
         for (int i = 0; i < this->tuple_types.size(); i++) {
             if (t == *this->tuple_types[i]) {
                 return "Tuple" + std::to_string(i) + "*";
             }
         }
     }
-    if (t.identifier == "Option") {
+    if (t.id == "Option") {
         return this->type_mapper(*t.type_parameters[0]);
     }
-    if (t.identifier == "List") {
+    if (t.id == "List") {
         return "PTR_TO_LIST";
     }
-    return "class_" + t.identifier + "*";
+    return "class_" + t.id + "*";
 }
 
 
 std::string Transpiler::object_type_mapper(const ObjectTypeNode& t) {
-    if (t.identifier.size() == 1 && islower(t.identifier[0])) {
+    if (t.id.size() == 1 && islower(t.id[0])) {
         // it's a generic, return same without pointer;
         return "XObject*";
     }
@@ -263,20 +263,20 @@ std::string Transpiler::object_type_mapper(const ObjectTypeNode& t) {
     if (t == T_BOOL) {
         return "XObject*";
     }
-    if (t.identifier == "Tuple") {
+    if (t.id == "Tuple") {
         for (int i = 0; i < this->tuple_types.size(); i++) {
             if (t == *this->tuple_types[i]) {
                 return "Tuple" + std::to_string(i) + "*";
             }
         }
     }
-    if (t.identifier == "Option") {
+    if (t.id == "Option") {
         return this->type_mapper(*t.type_parameters[0]);
     }
-    if (t.identifier == "List") {
+    if (t.id == "List") {
         return "std::vector<" + this->type_mapper(*t.type_parameters[0]) + ">*";
     }
-    return "class_" + t.identifier + "*";
+    return "class_" + t.id + "*";
 }
 
 std::string Transpiler::add_type(const TypeNode& t, std::string n) {
@@ -365,7 +365,7 @@ std::set<std::string> get_generic_types(const TypeNode& t) {
     std::set<std::string> types;
     if (t.kind == Kind::OBJECT) {
         if (t.object().type_parameters.size() == 0) {
-            types.insert("class_" + t.object().identifier);
+            types.insert("class_" + t.object().id);
             return types;
         }
         for (auto tp: t.object().type_parameters) {
@@ -420,7 +420,7 @@ std::string Transpiler::visit_function(FunctionNode& node) {
     out += "void* it = nullptr;\n";
     out += "GC::enter_function();";
     out += this->dispatch(node.body);
-    if (node.return_type->kind == Kind::OBJECT && node.return_type->object().identifier == ".None") {
+    if (node.return_type->kind == Kind::OBJECT && node.return_type->object().id == ".None") {
         out += "return GC::function_return(nullptr);";
     }
     out += "}";

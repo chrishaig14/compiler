@@ -68,7 +68,7 @@ public:
 
     ~ObjectTypeNode();
 
-    std::string identifier;
+    std::string id;
     VectorOfTypes type_parameters;
 };
 

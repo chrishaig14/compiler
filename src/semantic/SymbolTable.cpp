@@ -68,7 +68,7 @@ void SymbolTable::set(const std::string& name, const TypeNode& info) {
         return;
     }
     if (info.kind == Kind::OBJECT) {
-        if (info.object().identifier == "Option") {
+        if (info.object().id == "Option") {
             this->not_null[name] = false;
         }
     }
