@@ -1636,11 +1636,19 @@ USymbolInfo Checker::visit(StringNode& node) {
     return std::make_unique<SymbolInfo>(semanticInfo);
 }
 
+void Checker::error_subscript_non_object(TextPosition pos) {
+    std::string msg;
+    msg = this->context_string(pos) + E_FMT("Accessing subscript of non object") + this->code_context_string(pos);
+    std::cout << msg << std::endl;
+    this->failed = true;
+}
+
 USymbolInfo Checker::visit(SubscriptNode& node) {
     USymbolInfo parent_p = this->dispatch(node.parent);
     SymbolInfo& parent = *parent_p;
     if (parent.type().kind != Kind::OBJECT) {
-        throw std::runtime_error("Accessing subscript of non object!");
+        this->error_subscript_non_object(node.start);
+        return std::make_unique<SymbolInfo>(ErrorStub());
     }
     SymbolInfo symbol_info;
     const ObjectTypeNode& object_type = parent.type().object();
