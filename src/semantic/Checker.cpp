@@ -105,7 +105,7 @@ void Checker::leave_scope() {
 
 void Checker::assert_type_exists(TypeNode& type, TextPosition pos) {
     if (type.kind == Kind::OBJECT) {
-        if (type.object().type_parameters.size() == 0) {
+        if (type.object().type_params.size() == 0) {
             if (!is_generic(type)) {
                 if (!this->class_table->declared(type.object().id)) {
                     std::string msg;
@@ -122,7 +122,7 @@ void Checker::assert_type_exists(TypeNode& type, TextPosition pos) {
             msg += E_FMT(" type ") + E_HLT(type.object().id) + E_FMT(" doesn't exist");
             std::cout << msg << std::endl;
         } else {
-            for (auto t: type.object().type_parameters) {
+            for (auto t: type.object().type_params) {
                 this->assert_type_exists(*t, pos);
             }
         }
@@ -197,7 +197,7 @@ USymbolInfo Checker::visit(IdNode& n) {
                 const ObjectType& otn = symbol_info.type().object();
                 if (otn.id == "Option") {
                     if (this->scope->get_not_none(n._id)) {
-                        symbol_info.set_type(*otn.type_parameters[0]);
+                        symbol_info.set_type(*otn.type_params[0]);
                     }
                 }
 
@@ -240,7 +240,7 @@ USymbolInfo Checker::visit(DeclarationNode& n) {
             SymbolInfo expression_info = exp_info;
             const ObjectType& actual_type = n.type->object();
             if (actual_type.id == "Option") {
-                if (*actual_type.type_parameters[0] != expression_info.type()) {
+                if (*actual_type.type_params[0] != expression_info.type()) {
                     auto foo = expression_info.type().object();
                     if (foo.id != "NoneType") {
                         this->error_assignment(*n.type, expression_info.type(), n.start);
@@ -248,7 +248,7 @@ USymbolInfo Checker::visit(DeclarationNode& n) {
                 }
             } else if (actual_type.id == "Union") {
                 bool ok = false;
-                for (auto type_param: actual_type.type_parameters) {
+                for (auto type_param: actual_type.type_params) {
                     if (*type_param != expression_info.type()) {
                         ok = true;
                         break;
@@ -331,7 +331,7 @@ USymbolInfo Checker::visit(AssignmentNode& n) {
     const ObjectType& actual_type = linfo.type().object();
     if (n.lvalue->ntype == NodeType::ID && actual_type.id == "Option") {
         // special treatment if we are assigning to an id of a variable of type Option[t]
-        if (expression_type.type() == (*actual_type.type_parameters[0])) {
+        if (expression_type.type() == (*actual_type.type_params[0])) {
             std::cout << "p cant be none" << std::endl;
             this->scope->set_not_none(n.lvalue->id()._id, true);
         } else {
@@ -351,7 +351,7 @@ USymbolInfo Checker::visit(AssignmentNode& n) {
         if (linfo.type() != expression_type.type()) {
             if (actual_type.id == "Option") {
                 // if type doesn't match exactly, we may be assigning to an Option[t]
-                if (*actual_type.type_parameters[0] != expression_type.type()) {
+                if (*actual_type.type_params[0] != expression_type.type()) {
                     auto& foo = expression_type.type().object();
                     if (foo.id != "NoneType") {
                         this->error_assignment(
@@ -422,7 +422,7 @@ USymbolInfo Checker::visit(MemberNode& n) {
         if (object.id == "Option") {
             if (this->scope->get_not_none(idn._id)) {
                 // we can guarantee that it's not null, so we can access the members
-                option_type = &(object.type_parameters[0])->object();
+                option_type = &(object.type_params[0])->object();
             } else {
                 throw std::runtime_error(
                         "Error: line " + text_pos_to_string(this->__file__, idn.start) + " -> " + idn._id +
@@ -437,15 +437,15 @@ USymbolInfo Checker::visit(MemberNode& n) {
         if (n.type != MemberType::NUM) {
             throw std::runtime_error(
                     "Error can only access members " + std::to_string(1) + " to " +
-                    std::to_string(final_type.type_parameters.size()) + " of " + final_type.to_string());
+                    std::to_string(final_type.type_params.size()) + " of " + final_type.to_string());
         }
-        if (n.n_child < 1 || n.n_child > final_type.type_parameters.size()) {
+        if (n.n_child < 1 || n.n_child > final_type.type_params.size()) {
             throw std::runtime_error(
                     "Error can only access members " + std::to_string(1) + " to " +
-                    std::to_string(final_type.type_parameters.size()) + " of " + final_type.to_string());
+                    std::to_string(final_type.type_params.size()) + " of " + final_type.to_string());
         }
         SymbolInfo s;
-        s.set_type(*final_type.type_parameters[n.n_child - 1]);
+        s.set_type(*final_type.type_params[n.n_child - 1]);
         return std::make_unique<SymbolInfo>(s);
     } else {
         if (n.type != MemberType::STR) {
@@ -457,7 +457,7 @@ USymbolInfo Checker::visit(MemberNode& n) {
         if (this->class_table->declared(final_type.to_string())) {
             class_info = this->class_table->get(final_type.to_string());
         } else {
-            if (is_generic((final_type)) && final_type.type_parameters.size() == 0) {
+            if (is_generic((final_type)) && final_type.type_params.size() == 0) {
                 throw std::runtime_error(
                         "Cannot access member of totally generic value of generic type " + object.id + "!"
                 );
@@ -651,10 +651,10 @@ bool is_generic(const TypeNode& t) {
         const ObjectType& o = t.object();
         if (o.id.size() == 1 && islower(o.id[0])) {
             // a is generic
-            assert(o.type_parameters.size() == 0);
+            assert(o.type_params.size() == 0);
             return true;
         }
-        for (auto type_param: o.type_parameters) {
+        for (auto type_param: o.type_params) {
             if (is_generic(*type_param)) {
                 return true;
             }
@@ -681,11 +681,11 @@ std::unordered_map<std::string, TypeNode*> make_replacements(TypeNode* a, TypeNo
         if (oa.id.size() == 1 && islower(oa.id[0])) {
             replacements[oa.id] = b->clone();
         }
-        for (int i = 0; i < oa.type_parameters.size(); i++) {
-            if (is_generic(*oa.type_parameters[i])) {
+        for (int i = 0; i < oa.type_params.size(); i++) {
+            if (is_generic(*oa.type_params[i])) {
                 std::unordered_map<std::string, TypeNode*> rep = make_replacements(
-                        oa.type_parameters[i],
-                        ob.type_parameters[i]
+                        oa.type_params[i],
+                        ob.type_params[i]
                 );
                 replacements.insert(rep.begin(), rep.end());
             }
@@ -720,11 +720,11 @@ std::vector<TypeNode*> make_replacements_in_order(TypeNode* a, TypeNode* b) {
         if (oa.id.size() == 1 && islower(oa.id[0])) {
             replacements.push_back(b->clone());
         } else {
-            for (int i = 0; i < oa.type_parameters.size(); i++) {
-                if (is_generic(*oa.type_parameters[i])) {
+            for (int i = 0; i < oa.type_params.size(); i++) {
+                if (is_generic(*oa.type_params[i])) {
                     std::vector<TypeNode*> rep = make_replacements_in_order(
-                            oa.type_parameters[i],
-                            ob.type_parameters[i]
+                            oa.type_params[i],
+                            ob.type_params[i]
                     );
                     replacements.insert(replacements.end(), rep.begin(), rep.end());
                 }
@@ -790,17 +790,17 @@ bool type_matches(TypeNode* aa, TypeNode* bb) {
             return a == (b);
         }
         // a is generic
-        if (oa.type_parameters.size() == 0) {
+        if (oa.type_params.size() == 0) {
             return true;
         }
         if (oa.id != ob.id) {
             return false;
         }
-        if (oa.type_parameters.size() != ob.type_parameters.size()) {
+        if (oa.type_params.size() != ob.type_params.size()) {
             return false;
         }
-        for (int i = 0; i < oa.type_parameters.size(); i++) {
-            if (!type_matches(oa.type_parameters[i], ob.type_parameters[i])) {
+        for (int i = 0; i < oa.type_params.size(); i++) {
+            if (!type_matches(oa.type_params[i], ob.type_params[i])) {
                 return false;
             }
         }
@@ -857,17 +857,17 @@ make_function_generic_replacements(FunctionType& t_generic_type, FunctionType& t
 std::unordered_map<std::string, TypeNode*>
 make_object_generic_replacements(ObjectType& t_generic_type, ObjectType& t_matching_type) {
     std::unordered_map<std::string, TypeNode*> repl;
-    if (t_generic_type.type_parameters.size() == 0) {
+    if (t_generic_type.type_params.size() == 0) {
         repl[t_generic_type.id] = t_matching_type.clone();
     } else {
-        if (t_generic_type.type_parameters.size() != t_matching_type.type_parameters.size()) {
+        if (t_generic_type.type_params.size() != t_matching_type.type_params.size()) {
             throw std::runtime_error("Error type parameter size mismatch!");
         }
-        for (int i = 0; i < t_generic_type.type_parameters.size(); i++) {
-            if (is_generic(*t_generic_type.type_parameters[i])) {
+        for (int i = 0; i < t_generic_type.type_params.size(); i++) {
+            if (is_generic(*t_generic_type.type_params[i])) {
                 auto r = make_generic_replacements(
-                        *t_generic_type.type_parameters[i],
-                        *t_matching_type.type_parameters[i]
+                        *t_generic_type.type_params[i],
+                        *t_matching_type.type_params[i]
                 );
                 for (auto x: r) {
                     if (repl.count(x.first) != 0 && *repl[x.first] != *x.second) {
@@ -889,7 +889,7 @@ make_generic_replacements(TypeNode& t_generic_type, TypeNode& t_matching_type) {
         return make_object_generic_replacements(t_generic_type.object(), t_matching_type.object());
     } else {
         if (t_generic_type.kind == Kind::OBJECT && t_matching_type.kind == Kind::FUNCTION) {
-            if (t_generic_type.object().type_parameters.size() == 0) {
+            if (t_generic_type.object().type_params.size() == 0) {
                 return std::unordered_map<std::string, TypeNode*>({{t_generic_type.object().id, t_matching_type.clone()}});
             }
         }
@@ -906,7 +906,7 @@ make_generic_to_generic_replacements(TypeNode& t_generic_type, TypeNode& t_match
         return make_object_generic_replacements(t_generic_type.object(), t_matching_type.object());
     } else {
         if (t_generic_type.kind == Kind::OBJECT && t_matching_type.kind == Kind::FUNCTION) {
-            if (t_generic_type.object().type_parameters.size() == 0) {
+            if (t_generic_type.object().type_params.size() == 0) {
                 return std::unordered_map<std::string, TypeNode*>({{t_generic_type.object().id, t_matching_type.clone()}});
             }
         }
@@ -1062,7 +1062,7 @@ USymbolInfo Checker::visit(ClassLiteralExpressionNode& node) {
     }
     ClassInfo* class_info = this->class_table->get(object_type_id);
     unsigned long num_required_type_params = class_info->type_parameters.size();
-    unsigned long num_actual_type_params = object_type.type_parameters.size();
+    unsigned long num_actual_type_params = object_type.type_params.size();
     if (num_required_type_params != 0) {
         // it's a generic class
         if (num_required_type_params != num_actual_type_params) {
@@ -1123,7 +1123,7 @@ USymbolInfo Checker::visit(ClassLiteralExpressionNode& node) {
 bool Checker::can_assign(const TypeNode& from, const TypeNode& to) {
     auto& to_object = (to).object();
     if (to_object.id == "Option") {
-        if (*to_object.type_parameters[0] != from) {
+        if (*to_object.type_params[0] != from) {
             auto foo = from.object();
             if (foo.id != "NoneType") {
                 return false;
@@ -1131,7 +1131,7 @@ bool Checker::can_assign(const TypeNode& from, const TypeNode& to) {
         }
         return true;
     } else if (to_object.id == "Union") {
-        for (auto type_param: to_object.type_parameters) {
+        for (auto type_param: to_object.type_params) {
             if (*type_param == from) {
                 return true;
             }
@@ -1143,7 +1143,7 @@ bool Checker::can_assign(const TypeNode& from, const TypeNode& to) {
 
 bool Checker::can_assign_generic(TypeNode& from, TypeNode& to, std::vector<std::string> type_params) {
     auto to_object = (to).object();
-    if (to_object.type_parameters.size() == 0) {
+    if (to_object.type_params.size() == 0) {
         for (auto tp:type_params) {
             if (to_object.id == tp) {
                 return true;
@@ -1151,7 +1151,7 @@ bool Checker::can_assign_generic(TypeNode& from, TypeNode& to, std::vector<std::
         }
     }
     if (to_object.id == "Option") {
-        if (*to_object.type_parameters[0] != from) {
+        if (*to_object.type_params[0] != from) {
             auto foo = from.object();
             if (foo.id != "NoneType") {
                 return false;
@@ -1159,7 +1159,7 @@ bool Checker::can_assign_generic(TypeNode& from, TypeNode& to, std::vector<std::
         }
         return true;
     } else if (to_object.id == "Union") {
-        for (auto type_param: to_object.type_parameters) {
+        for (auto type_param: to_object.type_params) {
             if (*type_param == from) {
                 return true;
             }
@@ -1175,7 +1175,7 @@ make_type_from_object_pattern(const ObjectType& object_type,
     std::string type_identifier = object_type.id;
     for (auto r: replacements) {
         if (type_identifier == r.first) {
-            if (object_type.type_parameters.size() != 0) {
+            if (object_type.type_params.size() != 0) {
                 throw std::runtime_error(
                         "Trying to make a type for a template for exmaple struct Foo[T]{foo:T[Integer];}!"
                 );
@@ -1185,7 +1185,7 @@ make_type_from_object_pattern(const ObjectType& object_type,
     }
     // It's not the top level type
     VectorOfTypes new_type_params;
-    for (auto tp: object_type.type_parameters) {
+    for (auto tp: object_type.type_params) {
         TypeNode* new_tp = make_type(*tp, replacements);
         new_type_params.push_back(new_tp);
     }
@@ -1215,7 +1215,7 @@ ClassInfo* Checker::instantiate_generic(ClassInfo* generic, const ObjectType& in
     std::unordered_map<std::string, TypeNode*> replacements;
     for (int i = 0; i < generic->type_parameters.size(); i++) {
         std::string tp = generic->type_parameters[i];
-        TypeNode& type_replacement = *instance.type_parameters[i];
+        TypeNode& type_replacement = *instance.type_params[i];
         replacements[tp] = &type_replacement;
     }
     auto field_names = generic->member_names;
@@ -1256,7 +1256,7 @@ USymbolInfo Checker::visit(ClassLiteralFieldNode& node) {
     }
     ClassInfo* class_info = this->class_table->get(object_type_id);
     unsigned long num_required_type_params = class_info->type_parameters.size();
-    unsigned long num_actual_type_params = object_type->type_parameters.size();
+    unsigned long num_actual_type_params = object_type->type_params.size();
     if (num_required_type_params != 0) {
         // it's a generic class
         if (num_required_type_params != num_actual_type_params) {
@@ -1331,7 +1331,7 @@ USymbolInfo Checker::visit(ForNode& node) {
     new_body->nodes.push_back(
             new DeclarationNode(
                     node.var,
-                    obj.type_parameters[0]->clone(),
+                    obj.type_params[0]->clone(),
                     new SubscriptNode(new IdNode(".list0"), {new IdNode(".index0")}))
     );
     new_body->nodes.insert(new_body->nodes.end(), node.body->nodes.begin(), node.body->nodes.end());
@@ -1343,7 +1343,7 @@ USymbolInfo Checker::visit(ForNode& node) {
             asn
     );
 
-    TypeNode& var_type = *obj.type_parameters[0];
+    TypeNode& var_type = *obj.type_params[0];
     this->enter_scope("for");
     this->scope->set(node.var, var_type);
     this->visit(*node.body);
@@ -1456,7 +1456,7 @@ USymbolInfo Checker::visit(SubscriptNode& node) {
         if (not_integer) {
             throw std::runtime_error("Access not number subscript of List!");
         }
-        symbol_info.set_type(*object_type.type_parameters[0]);
+        symbol_info.set_type(*object_type.type_params[0]);
     } else if (object_type.id == "String") {
         if (not_integer) {
             throw std::runtime_error("Access not number subscript of String!");
@@ -1485,7 +1485,7 @@ USymbolInfo Checker::visit(TernaryNode& node) {
         throw std::runtime_error("Expected an Option[T], got: " + expression_type.to_string());
     }
     SymbolInfo semanticInfo;
-    TypeNode& type = *expression_type.type_parameters[0];
+    TypeNode& type = *expression_type.type_params[0];
     semanticInfo.set_type(type);
     this->enter_scope("true_case");
     this->scope->set("it", type);
@@ -1749,13 +1749,13 @@ Checker::get_first_substitution_object(ObjectType& a, ObjectType& b, bool is_top
     if (a.id != b.id) {
         throw std::runtime_error("Error trying to unify object types " + a.to_string() + " and " + b.to_string());
     }
-    if (a.type_parameters.size() != b.type_parameters.size()) {
+    if (a.type_params.size() != b.type_params.size()) {
         throw std::runtime_error("Error trying to unify object types " + a.to_string() + " and " + b.to_string());
     }
-    for (int i = 0; i < a.type_parameters.size(); i++) {
+    for (int i = 0; i < a.type_params.size(); i++) {
         std::pair<std::string, TypeNode*>* u = get_first_substitution(
-                *a.type_parameters[i],
-                *b.type_parameters[i],
+                *a.type_params[i],
+                *b.type_params[i],
                 is_top_level_arg
         );
         if (u != nullptr) {
@@ -1771,8 +1771,8 @@ TypeNode* Checker::substitute(TypeNode* t, std::string var, TypeNode* replacemen
             return replacement;
         } else {
             TypeNode* c = t->clone();
-            for (int i = 0; i < t->object().type_parameters.size(); i++) {
-                c->object().type_parameters[i] = substitute(t->object().type_parameters[i], var, replacement);
+            for (int i = 0; i < t->object().type_params.size(); i++) {
+                c->object().type_params[i] = substitute(t->object().type_params[i], var, replacement);
             }
             return c;
         }
@@ -1860,6 +1860,6 @@ std::pair<std::string, TypeNode*>* Checker::get_first_substitution(TypeNode& a, 
 }
 
 bool Checker::is_variable(const ObjectType& a) {
-    return a.type_parameters.size() == 0 && islower(a.id[0]);
+    return a.type_params.size() == 0 && islower(a.id[0]);
 }
 

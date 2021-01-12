@@ -69,7 +69,7 @@ public:
     ~ObjectType();
 
     std::string id;
-    VectorOfTypes type_parameters;
+    VectorOfTypes type_params;
 };
 
 class UnknownTypeNode : public TypeNode {

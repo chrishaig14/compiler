@@ -240,7 +240,7 @@ std::string Transpiler::ptr_to_type_object(const ObjectType& t) {
         }
     }
     if (t.id == "Option") {
-        return this->type_mapper(*t.type_parameters[0]);
+        return this->type_mapper(*t.type_params[0]);
     }
     if (t.id == "List") {
         return "PTR_TO_LIST";
@@ -271,10 +271,10 @@ std::string Transpiler::object_type_mapper(const ObjectType& t) {
         }
     }
     if (t.id == "Option") {
-        return this->type_mapper(*t.type_parameters[0]);
+        return this->type_mapper(*t.type_params[0]);
     }
     if (t.id == "List") {
-        return "std::vector<" + this->type_mapper(*t.type_parameters[0]) + ">*";
+        return "std::vector<" + this->type_mapper(*t.type_params[0]) + ">*";
     }
     return "class_" + t.id + "*";
 }
@@ -364,11 +364,11 @@ std::string Transpiler::visit_for(ForNode& node) {
 std::set<std::string> get_generic_types(const TypeNode& t) {
     std::set<std::string> types;
     if (t.kind == Kind::OBJECT) {
-        if (t.object().type_parameters.size() == 0) {
+        if (t.object().type_params.size() == 0) {
             types.insert("class_" + t.object().id);
             return types;
         }
-        for (auto tp: t.object().type_parameters) {
+        for (auto tp: t.object().type_params) {
             if (is_generic(*tp)) {
                 for (auto pp: get_generic_types(*tp)) {
                     types.insert(pp);

@@ -67,7 +67,7 @@ const FunctionType& FunctionType::function() const { return *this; }
 ObjectType::ObjectType(const std::string& identifier,
                        const VectorOfTypes& typeParameters) : id(
         identifier
-), type_parameters(typeParameters) {
+), type_params(typeParameters) {
     for (auto p: typeParameters) {
         assert(p != nullptr);
     }
@@ -76,14 +76,14 @@ ObjectType::ObjectType(const std::string& identifier,
 
 TypeNode* ObjectType::clone() const {
     VectorOfTypes aux;
-    for (auto p: this->type_parameters) {
+    for (auto p: this->type_params) {
         aux.emplace_back(p->clone());
     }
     return new ObjectType(this->id, aux);
 }
 
 ObjectType::~ObjectType() {
-    for (auto p: this->type_parameters) {
+    for (auto p: this->type_params) {
         delete p;
     }
 }
@@ -91,7 +91,7 @@ ObjectType::~ObjectType() {
 std::string ObjectType::to_string() const {
     auto& otype = *this;
     std::string parameters;
-    for (auto ptr: otype.type_parameters) {
+    for (auto ptr: otype.type_params) {
         auto& p = *ptr;
         parameters += p.to_string() + ", ";
     }
@@ -108,11 +108,11 @@ bool ObjectType::equal(const TypeNode& other) const {
     if (a.id != b.id) {
         return false;
     }
-    if (a.type_parameters.size() != b.type_parameters.size()) {
+    if (a.type_params.size() != b.type_params.size()) {
         return false;
     }
-    for (int i = 0; i < a.type_parameters.size(); i++) {
-        if (*a.type_parameters[i] != *b.type_parameters[i]) {
+    for (int i = 0; i < a.type_params.size(); i++) {
+        if (*a.type_params[i] != *b.type_params[i]) {
             return false;
         }
     }
