@@ -67,6 +67,7 @@ public:
                                       TextPosition end);
     void error_no_member(const TypeNode& t, const std::string& member, TextPosition position);
     void error_no_return(const TypeNode& t, TextPosition position);
+    void error_class_no_method(const std::string& class_name, const std::string method_name, TextPosition pos);
     void error_return_mismatch(const TypeNode& expected, const TypeNode& actual, TextPosition position);
     TypeClassInfo* get_typeclass_for_function(std::string function_name);
     USymbolInfo dispatch(Node* nod);
@@ -129,6 +130,7 @@ public:
     void error_member_no_object(TextPosition pos);
     void error_subscript_non_object(TextPosition pos);
     void error_string_immutable(TextPosition pos);
+    void error_member_no_object(const std::string& class_name, const std::string method_name, TextPosition pos);
 };
 
 #endif //CHECKER_H

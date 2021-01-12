@@ -497,6 +497,15 @@ void Checker::error_member_no_object(TextPosition pos) {
     std::cout << msg << std::endl;
 }
 
+void Checker::error_class_no_method(const std::string& class_name, const std::string method_name, TextPosition pos) {
+    std::string msg;
+    msg = this->context_string(pos) + E_FMT("Class ") + E_HLT(class_name) + E_FMT(" has no method ") +
+          E_HLT(method_name) + this->code_context_string(pos);
+    std::cout << msg << std::endl;
+    this->failed = true;
+}
+
+
 USymbolInfo Checker::visit(MemberNode& n) {
     SymbolInfo rv;
     if (n.parent->ntype == NodeType::ID) {
@@ -526,7 +535,8 @@ USymbolInfo Checker::visit(MemberNode& n) {
                 this->replacement = idn;
                 return std::make_unique<SymbolInfo>(rv);
             } else {
-                throw std::runtime_error("Class " + class_info->class_name + " has no method " + n.s_child);
+                this->error_class_no_method(class_info->class_name, n.s_child, n.start);
+                return std::make_unique<SymbolInfo>(ErrorStub());
             }
         }
     }
