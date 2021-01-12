@@ -495,6 +495,7 @@ void Checker::error_member_no_object(TextPosition pos) {
     std::string msg;
     msg = this->context_string(pos) + E_FMT("Accessing member of non object ") + this->code_context_string(pos);
     std::cout << msg << std::endl;
+    this->failed = true;
 }
 
 void Checker::error_class_no_method(const std::string& class_name, const std::string method_name, TextPosition pos) {
