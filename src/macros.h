@@ -77,5 +77,6 @@
 #define T_LIST(e) ObjectType("List", {e})
 #define T_FLOAT ObjectType("Float", {})
 
+typedef std::unordered_map<std::string, TypeNode*> MapStringType;
 
 #endif //UNTITLED1_MACROS_H

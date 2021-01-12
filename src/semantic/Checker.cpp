@@ -673,8 +673,8 @@ bool is_generic(const TypeNode& t) {
     return false;
 }
 
-std::unordered_map<std::string, TypeNode*> make_replacements(TypeNode* a, TypeNode* b) {
-    std::unordered_map<std::string, TypeNode*> replacements;
+MapStringType make_replacements(TypeNode* a, TypeNode* b) {
+    MapStringType replacements;
     if (a->kind == Kind::OBJECT) {
         ObjectType& oa = a->object();
         ObjectType& ob = b->object();
@@ -683,7 +683,7 @@ std::unordered_map<std::string, TypeNode*> make_replacements(TypeNode* a, TypeNo
         }
         for (int i = 0; i < oa.type_params.size(); i++) {
             if (is_generic(*oa.type_params[i])) {
-                std::unordered_map<std::string, TypeNode*> rep = make_replacements(
+                MapStringType rep = make_replacements(
                         oa.type_params[i],
                         ob.type_params[i]
                 );
@@ -696,7 +696,7 @@ std::unordered_map<std::string, TypeNode*> make_replacements(TypeNode* a, TypeNo
             FunctionType& fb = b->function();
             for (int i = 0; i < fa.param_types.size(); i++) {
                 if (is_generic(*fa.param_types[i])) {
-                    std::unordered_map<std::string, TypeNode*> rep = make_replacements(
+                    MapStringType rep = make_replacements(
                             fa.param_types[i],
                             fb.param_types[i]
                     );
@@ -704,7 +704,7 @@ std::unordered_map<std::string, TypeNode*> make_replacements(TypeNode* a, TypeNo
                 }
             }
             if (is_generic(*fa.return_type)) {
-                std::unordered_map<std::string, TypeNode*> rep = make_replacements(fa.return_type, fb.return_type);
+                MapStringType rep = make_replacements(fa.return_type, fb.return_type);
                 replacements.insert(rep.begin(), rep.end());
             }
         }
@@ -762,14 +762,14 @@ bool type_matches(TypeNode* aa, TypeNode* bb) {
         FunctionType& fa = a.function();
         FunctionType& fb = b.function();
         FunctionType& new_f = fa;
-        std::unordered_map<std::string, TypeNode*> replacements;
+        MapStringType replacements;
         if (fa.param_types.size() != fb.param_types.size()) {
             return false;
         }
         VectorOfTypes param_types = fa.param_types;
         for (int i = 0; i < param_types.size(); i++) {
             if (type_matches(param_types[i], fb.param_types[i])) {
-                std::unordered_map<std::string, TypeNode*> rep = make_replacements(
+                MapStringType rep = make_replacements(
                         fa.param_types[i],
                         fb.param_types[i]
                 );
@@ -809,12 +809,12 @@ bool type_matches(TypeNode* aa, TypeNode* bb) {
     return false;
 }
 
-std::unordered_map<std::string, TypeNode*>
+MapStringType
 make_generic_replacements(TypeNode& t_generic_type, TypeNode& t_matching_type);
 
-std::unordered_map<std::string, TypeNode*>
+MapStringType
 make_function_generic_replacements(FunctionType& t_generic_type, FunctionType& t_matching_type) {
-    std::unordered_map<std::string, TypeNode*> repl;
+    MapStringType repl;
 
     if (t_generic_type.param_types.size() != t_matching_type.param_types.size()) {
         throw std::runtime_error("Error parameter_types size mismatch!");
@@ -854,9 +854,9 @@ make_function_generic_replacements(FunctionType& t_generic_type, FunctionType& t
     return repl;
 }
 
-std::unordered_map<std::string, TypeNode*>
+MapStringType
 make_object_generic_replacements(ObjectType& t_generic_type, ObjectType& t_matching_type) {
-    std::unordered_map<std::string, TypeNode*> repl;
+    MapStringType repl;
     if (t_generic_type.type_params.size() == 0) {
         repl[t_generic_type.id] = t_matching_type.clone();
     } else {
@@ -881,7 +881,7 @@ make_object_generic_replacements(ObjectType& t_generic_type, ObjectType& t_match
     return repl;
 }
 
-std::unordered_map<std::string, TypeNode*>
+MapStringType
 make_generic_replacements(TypeNode& t_generic_type, TypeNode& t_matching_type) {
     if (t_generic_type.kind == Kind::FUNCTION && t_matching_type.kind == Kind::FUNCTION) {
         return make_function_generic_replacements(t_generic_type.function(), t_matching_type.function());
@@ -890,16 +890,16 @@ make_generic_replacements(TypeNode& t_generic_type, TypeNode& t_matching_type) {
     } else {
         if (t_generic_type.kind == Kind::OBJECT && t_matching_type.kind == Kind::FUNCTION) {
             if (t_generic_type.object().type_params.size() == 0) {
-                return std::unordered_map<std::string, TypeNode*>({{t_generic_type.object().id, t_matching_type.clone()}});
+                return MapStringType({{t_generic_type.object().id, t_matching_type.clone()}});
             }
         }
         throw std::runtime_error("Error: making generic replacements for mismatching types!");
     }
 }
 
-std::unordered_map<std::string, TypeNode*>
+MapStringType
 make_generic_to_generic_replacements(TypeNode& t_generic_type, TypeNode& t_matching_type) {
-    std::unordered_map<std::string, TypeNode*> replacements;
+    MapStringType replacements;
     if (t_generic_type.kind == Kind::FUNCTION && t_matching_type.kind == Kind::FUNCTION) {
 
     } else if (t_generic_type.kind == Kind::OBJECT && t_matching_type.kind == Kind::OBJECT) {
@@ -907,7 +907,7 @@ make_generic_to_generic_replacements(TypeNode& t_generic_type, TypeNode& t_match
     } else {
         if (t_generic_type.kind == Kind::OBJECT && t_matching_type.kind == Kind::FUNCTION) {
             if (t_generic_type.object().type_params.size() == 0) {
-                return std::unordered_map<std::string, TypeNode*>({{t_generic_type.object().id, t_matching_type.clone()}});
+                return MapStringType({{t_generic_type.object().id, t_matching_type.clone()}});
             }
         }
     }
@@ -1171,7 +1171,7 @@ bool Checker::can_assign_generic(TypeNode& from, TypeNode& to, std::vector<std::
 
 TypeNode*
 make_type_from_object_pattern(const ObjectType& object_type,
-                              const std::unordered_map<std::string, TypeNode*>& replacements) {
+                              const MapStringType& replacements) {
     std::string type_identifier = object_type.id;
     for (auto r: replacements) {
         if (type_identifier == r.first) {
@@ -1193,7 +1193,7 @@ make_type_from_object_pattern(const ObjectType& object_type,
 }
 
 TypeNode* make_type_from_function_pattern(const FunctionType& ftn,
-                                          const std::unordered_map<std::string, TypeNode*>& replacements) {
+                                          const MapStringType& replacements) {
     VectorOfTypes new_param_types;
     for (auto pt: ftn.param_types) {
         TypeNode* new_pt = make_type(*pt, replacements);
@@ -1203,7 +1203,7 @@ TypeNode* make_type_from_function_pattern(const FunctionType& ftn,
     return FUNCTION_TYPE(new_param_types, new_return_type);
 }
 
-TypeNode* make_type(const TypeNode& original, const std::unordered_map<std::string, TypeNode*>& replacements) {
+TypeNode* make_type(const TypeNode& original, const MapStringType& replacements) {
     if (original.kind == Kind::OBJECT) {
         return make_type_from_object_pattern(original.object(), replacements);
     } else {
@@ -1212,7 +1212,7 @@ TypeNode* make_type(const TypeNode& original, const std::unordered_map<std::stri
 }
 
 ClassInfo* Checker::instantiate_generic(ClassInfo* generic, const ObjectType& instance) {
-    std::unordered_map<std::string, TypeNode*> replacements;
+    MapStringType replacements;
     for (int i = 0; i < generic->type_parameters.size(); i++) {
         std::string tp = generic->type_parameters[i];
         TypeNode& type_replacement = *instance.type_params[i];
