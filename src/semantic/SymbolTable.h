@@ -14,7 +14,7 @@
 
 
 class SymbolTable {
-    std::unordered_map<std::string, TypeNode*> table;
+    MapStringType table;
     std::unordered_map<std::string, int> indices;
     TypeNode* ret;
 public:

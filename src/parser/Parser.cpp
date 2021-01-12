@@ -956,7 +956,7 @@ ClassNode* Parser::parse_class_definition() {
     }
     this->expect_token(TokType::LCURLY);
     std::unordered_map<std::string, FunctionNode*> methods;
-    std::unordered_map<std::string, TypeNode*> members;
+    MapStringType members;
     std::vector<std::string> members_ordered;
     while (true) {
         if (this->match(TokType::ID)) {

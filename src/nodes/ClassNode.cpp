@@ -5,7 +5,7 @@
 #include "ClassNode.h"
 
 ClassNode::ClassNode(const std::string& className, std::vector<std::string> type_parameters,
-                     std::unordered_map<std::string, TypeNode*> members,
+                     MapStringType members,
                      std::unordered_map<std::string, FunctionNode*> functions)
         : methods(functions), class_name(className), members(members) {
     this->type_parameters = type_parameters;

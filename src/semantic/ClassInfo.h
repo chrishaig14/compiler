@@ -9,13 +9,14 @@
 #include <unordered_map>
 #include "ObjectInfo.h"
 #include "FunctionInfo.h"
+#include "../macros.h"
 
 class ClassInfo {
 public:
     std::vector<std::string> member_names;
     VectorOfTypes member_types;
 
-    std::unordered_map<std::string, TypeNode*> members;
+    MapStringType members;
     std::unordered_map<std::string, FunctionType*> methods;
 
     std::string class_name;

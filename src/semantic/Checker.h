@@ -29,12 +29,12 @@ bool type_matches(TypeNode* a, TypeNode* b);
 
 bool is_generic(const TypeNode& t);
 
-std::unordered_map<std::string, TypeNode*> make_replacements(TypeNode* a, TypeNode* b);
+MapStringType make_replacements(TypeNode* a, TypeNode* b);
 TypeNode* make_type_from_object_pattern(const ObjectType& object_type,
-                                        const std::unordered_map<std::string, TypeNode*>& replacements);
+                                        const MapStringType& replacements);
 TypeNode* make_type_from_function_pattern(const FunctionType& ftn,
-                                          const std::unordered_map<std::string, TypeNode*>& replacements);
-TypeNode* make_type(const TypeNode& original, const std::unordered_map<std::string, TypeNode*>& replacements);
+                                          const MapStringType& replacements);
+TypeNode* make_type(const TypeNode& original, const MapStringType& replacements);
 SymbolInfo match_arguments_to_generic_function(const FunctionType& function_type, VectorOfTypes arg_types);
 
 class Checker {
