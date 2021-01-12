@@ -488,6 +488,12 @@ USymbolInfo Checker::visit(AssignmentNode& n) {
     return nullptr;
 }
 
+void Checker::error_member_no_object(TextPosition pos) {
+    std::string msg;
+    msg = this->context_string(pos) + E_FMT("Accessing member of non object ") + this->code_context_string(pos);
+    std::cout << msg << std::endl;
+}
+
 USymbolInfo Checker::visit(MemberNode& n) {
     SymbolInfo rv;
     if (n.parent->ntype == NodeType::ID) {
@@ -527,7 +533,8 @@ USymbolInfo Checker::visit(MemberNode& n) {
     this->is_lvalue = old_lvalue;
     SymbolInfo& symbol_info = *symbol_info_p;
     if (symbol_info.type().kind != Kind::OBJECT) {
-        throw std::runtime_error("Accessing member " + n.s_child + " of non object");
+        this->error_member_no_object(n.start);
+        return std::make_unique<SymbolInfo>(ErrorStub());
     }
     const ObjectTypeNode& object = symbol_info.type().object();
     const ObjectTypeNode* option_type = nullptr;

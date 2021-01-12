@@ -126,6 +126,7 @@ public:
     void error_tuple_assign(TextPosition pos);
     void error_unused_return_value(TextPosition pos);
     void error_variable_not_declared(const std::string& name, TextPosition pos);
+    void error_member_no_object(TextPosition pos);
 };
 
 #endif //CHECKER_H
