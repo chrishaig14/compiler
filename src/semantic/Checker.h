@@ -139,6 +139,7 @@ public:
     void error_class_init_bad_member_type(const TypeNode& cls, const TypeNode& expected, const TypeNode& actual,
                                           TextPosition pos);
     void error_class_not_found(const TypeNode& cls, TextPosition pos);
+    void error_list_literal(const TypeNode& lt, const TypeNode& et, TextPosition pos);
 };
 
 #endif //CHECKER_H

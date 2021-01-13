@@ -1371,11 +1371,7 @@ USemanticInfo Checker::visit(ListNode& node) {
             this->replace_me = false;
         }
         if (current_type != element_type) {
-            throw std::runtime_error(
-                    "List literal with more than one element type, first element has type: " +
-                    element_type.to_string() + " but at index " + std::to_string(i) +
-                    " got type " +
-                    current_type.to_string());
+            this->error_list_literal(element_type, current_type, node.elements[i]->start);
         }
     }
     node.type = element_type.clone();

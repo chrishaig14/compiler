@@ -223,3 +223,11 @@ void Checker::error_class_not_found(const TypeNode& cls, TextPosition pos) {
           E_HLT(cls.to_string()) + E_FMT(" not found") + this->code_context_string(pos);
     std::cout << msg << std::endl;
 }
+
+void Checker::error_list_literal(const TypeNode& lt, const TypeNode& et, TextPosition pos) {
+    this->failed = true;
+    std::string msg;
+    msg = this->context_string(pos) + E_FMT("List literal with element of wrong type, expected ") +
+          E_HLT(lt.to_string()) + E_FMT(" got ") + E_HLT(et.to_string()) + this->code_context_string(pos);
+    std::cout << msg << std::endl;
+}
