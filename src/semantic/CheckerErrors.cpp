@@ -240,3 +240,13 @@ void Checker::error_function_return_last_stmt(const std::string& function_name, 
           this->code_context_string(pos);
     std::cout << msg << std::endl;
 }
+
+void Checker::error_partial_wrong_num_args(TextPosition pos) {
+    this->failed = true;
+    std::string msg;
+    msg = this->context_string(pos) + E_FMT("wrong number of arguments for partial function") +
+          this->code_context_string(pos);
+    std::cout << msg << std::endl;
+    throw std::runtime_error("Error: wrong number of arguments for partial function");
+
+}

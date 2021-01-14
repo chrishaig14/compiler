@@ -1689,7 +1689,8 @@ USemanticInfo Checker::visit(PartialApplication& node) {
     USemanticInfo func = this->dispatch(node.function);
     VectorOfTypes partial_args;
     if (node.args.size() != func->type().function().param_types.size()) {
-        throw std::runtime_error("Error: wrong number of arguments for partial function");
+        this->error_partial_wrong_num_args(node.start);
+        return this->error();
     }
     for (int i = 0; i < node.args.size(); i++) {
         if (node.args[i] != nullptr) {

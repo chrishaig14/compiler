@@ -142,6 +142,8 @@ public:
     void error_list_literal(const TypeNode& lt, const TypeNode& et, TextPosition pos);
     void error_function_return_last_stmt(const std::string& function_name, const TypeNode& et, TextPosition pos);
     USemanticInfo error();
+    void error_partial_wrong_num_args(const std::string& function_name, const TypeNode& et, TextPosition pos);
+    void error_partial_wrong_num_args(TextPosition pos);
 };
 
 #endif //CHECKER_H

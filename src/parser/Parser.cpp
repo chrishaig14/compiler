@@ -340,7 +340,9 @@ Node* Parser::parse_partial_application() {
         }
     }
     this->expect_token(TokType::RPAREN);
-    return new PartialApplication(new IdNode(total_function_tok.str), args);
+    auto partial = new PartialApplication(new IdNode(total_function_tok.str), args);
+    partial->start = total_function_tok.start;
+    return partial;
 }
 
 Node* Parser::parse_id_or_literal() {
