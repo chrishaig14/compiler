@@ -1221,10 +1221,13 @@ USemanticInfo Checker::visit(ClassLiteralFieldNode& node) {
     if (num_required_type_params != 0) {
         // it's a generic class
         if (num_required_type_params != num_actual_type_params) {
-            throw std::runtime_error(
-                    "Error: generic class requires " + std::to_string(num_required_type_params) +
-                    " type parameters, but " + std::to_string(num_actual_type_params) + " given"
+            this->error_generic_class_wrong_type_param_number(
+                    object_type->id,
+                    num_required_type_params,
+                    num_actual_type_params,
+                    node.start
             );
+            return this->error();
         }
         if (this->class_table->declared(object_type_str)) {
             class_info = this->class_table->get(object_type_str);

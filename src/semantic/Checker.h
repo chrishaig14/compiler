@@ -147,6 +147,8 @@ public:
     void error_partial_function_call_type_mismatch(const TypeNode& expected, const TypeNode& actual, TextPosition start,
                                                    TextPosition end);
     Node* replace_if_necessary(Node* node);
+    void
+    error_generic_class_wrong_type_param_number(const std::string& cls, int num_req, int num_given, TextPosition pos);
 };
 
 #endif //CHECKER_H

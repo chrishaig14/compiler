@@ -252,12 +252,22 @@ void Checker::error_partial_wrong_num_args(TextPosition pos) {
 
 void
 Checker::error_partial_function_call_type_mismatch(const TypeNode& expected, const TypeNode& actual, TextPosition start,
-                                           TextPosition end) {
+                                                   TextPosition end) {
     this->failed = true;
     std::string msg;
     msg = context_string(start) +
           E_FMT(" Function call type mismatch") +
           E_FMT(" expected ") + E_HLT(expected.to_string()) + E_FMT(" but got ") + E_HLT(actual.to_string()) +
           this->code_error_string(start, end);
+    std::cout << msg << std::endl;
+}
+
+void Checker::error_generic_class_wrong_type_param_number(const std::string& cls, int num_req, int num_given,
+                                                          TextPosition pos) {
+    this->failed = true;
+    std::string msg;
+    msg = this->context_string(pos) + E_FMT("Generic class ") + E_HLT(cls) +
+          E_FMT(" given " + std::to_string(num_given)) + E_FMT(" types but " + std::to_string(num_req) + " required") +
+          this->code_context_string(pos);
     std::cout << msg << std::endl;
 }
