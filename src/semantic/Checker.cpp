@@ -221,10 +221,7 @@ USemanticInfo Checker::visit(DeclarationNode& n) {
             this->scope->set(n.identifier, *n.type);
             return std::make_unique<SemanticInfo>(symbol_info);
         }
-        if (this->replace_me) {
-            n.expression = replacement;
-            this->replace_me = false;
-        }
+        n.expression = this->replace_if_necessary(n.expression);
         if (n.type->kind == Kind::FUNCTION) {
             // it's a function
             if (*n.type != exp_info.type()) {
@@ -263,10 +260,7 @@ USemanticInfo Checker::visit(DeclarationNode& n) {
         USemanticInfo exp_info_p = this->dispatch(n.expression);
         n.type = exp_info_p->type().clone();
         SemanticInfo& exp_info = *exp_info_p;
-        if (this->replace_me) {
-            n.expression = replacement;
-            this->replace_me = false;
-        }
+        n.expression = this->replace_if_necessary(n.expression);
         symbol_info.set_type(exp_info.type());
     }
     this->scope->set(n.identifier, symbol_info.type());
@@ -317,10 +311,7 @@ USemanticInfo Checker::visit(AssignmentNode& n) {
     }
     SemanticInfo& linfo = *linfo_p;
     SemanticInfo& expression_type = *expression_type_p;
-    if (this->replace_me) {
-        n.rvalue = replacement;
-        this->replace_me = false;
-    }
+    n.rvalue = this->replace_if_necessary(n.rvalue);
 
     const ObjectType& actual_type = linfo.type().object();
     if (n.lvalue->ntype == NodeType::ID && actual_type.id == "Option") {
@@ -545,16 +536,9 @@ USemanticInfo Checker::visit(BoolOpNode& n) {
 
 USemanticInfo Checker::visit(BinopNode& n) {
     USemanticInfo left_info_p = this->dispatch(n.left);
-    if (this->replace_me) {
-        n.left = this->replacement;
-        this->replace_me = false;
-    }
-
+    n.left = this->replace_if_necessary(n.left);
     USemanticInfo right_info_p = this->dispatch(n.right);
-    if (this->replace_me) {
-        n.right = this->replacement;
-        this->replace_me = false;
-    }
+    n.right = this->replace_if_necessary(n.right);
 
     SemanticInfo& left_info = *left_info_p;
     SemanticInfo& right_info = *right_info_p;
@@ -628,10 +612,7 @@ USemanticInfo Checker::visit(ReturnNode& n) {
     if (expression_info.is_error) {
         return nullptr;
     }
-    if (this->replace_me) {
-        n.expression = replacement;
-        this->replace_me = false;
-    }
+    n.expression = this->replace_if_necessary(n.expression);
     if (!this->can_assign(expression_info.type(), return_type)) {
         this->error_return_mismatch(return_type, expression_info.type(), n.start);
         this->failed = true;
@@ -985,10 +966,7 @@ USemanticInfo Checker::visit(CallNode& n) {
         for (auto& arg: n.arguments) {
             USemanticInfo arg_type_p = this->dispatch(arg);
             const TypeNode& arg_type = arg_type_p->type();
-            if (this->replace_me) {
-                arg = replacement;
-                this->replace_me = false;
-            }
+            arg = this->replace_if_necessary(arg);
             arg_types.push_back(arg_type.clone());
         }
         if (function_is_generic(function_type)) {
@@ -1022,11 +1000,7 @@ USemanticInfo Checker::visit(CallNode& n) {
 USemanticInfo Checker::visit(BlockNode& program) {
     for (auto& n: program.nodes) {
         USemanticInfo sinfo_p = this->dispatch(n);
-        if (this->replace_me) {
-            n = this->replacement;
-            this->replace_me = false;
-            this->replacement = nullptr;
-        }
+        n = this->replace_if_necessary(n);
         SemanticInfo& sinfo = *sinfo_p;
         if (n->ntype == NodeType::CALL) {
             // it's a function call
@@ -1088,10 +1062,7 @@ USemanticInfo Checker::visit(ClassLiteralExpressionNode& node) {
         Node* exp = node.init[i];
         USemanticInfo semanticInfo_p = this->dispatch(exp);
         SemanticInfo& semanticInfo = *semanticInfo_p;
-        if (this->replace_me) {
-            node.init[i] = this->replacement;
-            this->replace_me = false;
-        }
+        node.init[i] = this->replace_if_necessary(node.init[i]);
         TypeNode& field_type = *class_field_types_ordered[i];
         if (!this->can_assign(semanticInfo.type(), field_type)) {
             throw std::runtime_error(
@@ -1284,10 +1255,7 @@ USemanticInfo Checker::visit(ClassLiteralFieldNode& node) {
         Node* exp = node.init_values[i];
         USemanticInfo semanticInfo_p = this->dispatch(exp);
         SemanticInfo& semanticInfo = *semanticInfo_p;
-        if (this->replace_me) {
-            node.init_values[i] = this->replacement;
-            this->replace_me = false;
-        }
+        node.init_values[i] = this->replace_if_necessary(node.init_values[i]);
         TypeNode& field_type = *class_fields[node.init_names[i]];
         if (!this->can_assign(semanticInfo.type(), field_type)) {
             this->error_class_init_bad_member_type(*object_type, field_type, semanticInfo.type(), exp->start);
@@ -1348,20 +1316,22 @@ USemanticInfo Checker::visit(ForNode& node) {
     return nullptr;
 }
 
+Node* Checker::replace_if_necessary(Node* node) {
+    if (this->replace_me) {
+        this->replace_me = false;
+        return this->replacement;
+    }
+    return node;
+}
+
 USemanticInfo Checker::visit(ListNode& node) {
     USemanticInfo element_type_p = this->dispatch(node.elements[0]);
     const TypeNode& element_type = element_type_p->type();
-    if (this->replace_me) {
-        node.elements[0] = this->replacement;
-        this->replace_me = false;
-    }
+    node.elements[0] = this->replace_if_necessary(node.elements[0]);
     for (int i = 1; i < node.elements.size(); i++) {
         USemanticInfo current_type_p = this->dispatch(node.elements[i]);
         const TypeNode& current_type = current_type_p->type();
-        if (this->replace_me) {
-            node.elements[i] = this->replacement;
-            this->replace_me = false;
-        }
+        node.elements[i] = this->replace_if_necessary(node.elements[i]);
         if (current_type != element_type) {
             this->error_list_literal(element_type, current_type, node.elements[i]->start);
         }
@@ -1478,17 +1448,11 @@ USemanticInfo Checker::visit(TernaryNode& node) {
     this->scope->set("it", type);
     USemanticInfo true_case_p = this->dispatch(node.true_case);
     SemanticInfo& true_case = *true_case_p;
-    if (this->replace_me) {
-        node.true_case = this->replacement;
-        this->replace_me = false;
-    }
+    node.true_case = this->replace_if_necessary(node.true_case);
     this->leave_scope();
     USemanticInfo false_case_p = this->dispatch(node.false_case);
     SemanticInfo& false_case = *false_case_p;
-    if (this->replace_me) {
-        node.false_case = this->replacement;
-        this->replace_me = false;
-    }
+    node.false_case = this->replace_if_necessary(node.false_case);
     if (false_case.type() != true_case.type()) {
         throw std::runtime_error(
                 "True case and false case type don't match: " + true_case.type().to_string() + " != " +

@@ -146,6 +146,7 @@ public:
     void error_partial_wrong_num_args(TextPosition pos);
     void error_partial_function_call_type_mismatch(const TypeNode& expected, const TypeNode& actual, TextPosition start,
                                                    TextPosition end);
+    Node* replace_if_necessary(Node* node);
 };
 
 #endif //CHECKER_H
