@@ -1045,7 +1045,8 @@ USemanticInfo Checker::visit(ClassLiteralExpressionNode& node) {
     const std::string& object_type_str = object_type.to_string();
 
     if (!this->class_table->declared(object_type_id)) {
-        throw std::runtime_error("No struct named " + object_type_id);
+        this->error_class_not_found(object_type, node.start);
+        return std::make_unique<SemanticInfo>(ErrorStub());
     }
     ClassInfo* class_info = this->class_table->get(object_type_id);
     unsigned long num_required_type_params = class_info->type_params.size();
