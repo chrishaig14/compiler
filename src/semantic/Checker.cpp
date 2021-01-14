@@ -956,9 +956,6 @@ USemanticInfo Checker::visit(CallNode& n) {
         // Since it's a method, we have to transform it and prepare it for the translation step,
         // where instead of calling object.method(args), we call <class>.method(object, args)
 
-        // if (n.function->ntype != NodeType::MEMBER) {
-        //     throw std::runtime_error("Expected it to be a member node!");
-        // }
         MemberNode& member_node = n.function->member();
         IdNode* pNode = new IdNode(fun_info.class_info->class_name + "." + member_node.s_child);
         pNode->location = VariableLocation(-2, -1);
@@ -968,9 +965,6 @@ USemanticInfo Checker::visit(CallNode& n) {
         object_node = member_node.parent;
         is_a_method = true;
     } else if (fun_info.is_class_method) {
-        // if (n.function->ntype != NodeType::MEMBER) {
-        //     throw std::runtime_error("Expected it to be a member node!");
-        // }
         MemberNode& member_node = n.function->member();
         n.function = new IdNode(fun_info.class_info->class_name + "." + member_node.s_child);
         this->replace_me = false;
@@ -1039,7 +1033,6 @@ USemanticInfo Checker::visit(BlockNode& program) {
             // if return value != NoneType, then force the return value
             if (!sinfo.is_error && sinfo.type() != ObjectType(".None", {})) {
                 this->error_unused_return_value(n->start);
-                // throw std::runtime_error("You should use the return value of this function call!");
             }
         }
     }
