@@ -144,6 +144,8 @@ public:
     USemanticInfo error();
     void error_partial_wrong_num_args(const std::string& function_name, const TypeNode& et, TextPosition pos);
     void error_partial_wrong_num_args(TextPosition pos);
+    void error_partial_function_call_type_mismatch(const TypeNode& expected, const TypeNode& actual, TextPosition start,
+                                                   TextPosition end);
 };
 
 #endif //CHECKER_H

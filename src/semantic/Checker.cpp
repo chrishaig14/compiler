@@ -1696,10 +1696,13 @@ USemanticInfo Checker::visit(PartialApplication& node) {
         if (node.args[i] != nullptr) {
             USemanticInfo arg = this->dispatch(node.args[i]);
             if (arg->type() != *func->type().function().param_types[i]) {
-                throw std::runtime_error(
-                        "Error in partial function: type of arg " + std::to_string(i + 1) + " (" +
-                        arg->type().to_string() + ") doesn't match expected type " +
-                        func->type().function().param_types[i]->to_string());
+                this->error_partial_function_call_type_mismatch(
+                        *func->type().function().param_types[i],
+                        arg->type(),
+                        node.args[i]->start,
+                        node.args[i]->end
+                );
+                return this->error();
             }
         } else {
             partial_args.push_back(func->type().function().param_types[i]->clone());

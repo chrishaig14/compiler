@@ -248,5 +248,16 @@ void Checker::error_partial_wrong_num_args(TextPosition pos) {
           this->code_context_string(pos);
     std::cout << msg << std::endl;
     throw std::runtime_error("Error: wrong number of arguments for partial function");
+}
 
+void
+Checker::error_partial_function_call_type_mismatch(const TypeNode& expected, const TypeNode& actual, TextPosition start,
+                                           TextPosition end) {
+    this->failed = true;
+    std::string msg;
+    msg = context_string(start) +
+          E_FMT(" Function call type mismatch") +
+          E_FMT(" expected ") + E_HLT(expected.to_string()) + E_FMT(" but got ") + E_HLT(actual.to_string()) +
+          this->code_error_string(start, end);
+    std::cout << msg << std::endl;
 }
