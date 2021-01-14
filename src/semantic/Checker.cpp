@@ -179,7 +179,7 @@ USemanticInfo Checker::visit(IdNode& n) {
             symbol_info.set_type(this->function_table->get(n._id));
         } else {
             this->error_variable_not_declared(n._id, n.start);
-            return std::make_unique<SemanticInfo>(ErrorStub());
+            return this->error();
         }
     } else {
         symbol_info.set_type(this->scope->get(n._id));
@@ -396,7 +396,7 @@ USemanticInfo Checker::visit(MemberNode& n) {
                 return std::make_unique<SemanticInfo>(rv);
             } else {
                 this->error_class_no_method(class_info->class_name, n.s_child, n.start);
-                return std::make_unique<SemanticInfo>(ErrorStub());
+                return this->error();
             }
         }
     }
@@ -407,7 +407,7 @@ USemanticInfo Checker::visit(MemberNode& n) {
     SemanticInfo& symbol_info = *symbol_info_p;
     if (symbol_info.type().kind != Kind::OBJECT) {
         this->error_member_no_object(n.start);
-        return std::make_unique<SemanticInfo>(ErrorStub());
+        return this->error();
     }
     const ObjectType& object = symbol_info.type().object();
     const ObjectType* option_type = nullptr;
@@ -474,7 +474,7 @@ USemanticInfo Checker::visit(MemberNode& n) {
             rv.class_info = class_info;
         } else {
             this->error_no_member(object, n.s_child, n.start);
-            return std::make_unique<SemanticInfo>(ErrorStub());
+            return this->error();
         }
     }
 
@@ -635,7 +635,7 @@ USemanticInfo Checker::visit(ReturnNode& n) {
     if (!this->can_assign(expression_info.type(), return_type)) {
         this->error_return_mismatch(return_type, expression_info.type(), n.start);
         this->failed = true;
-        return std::make_unique<SemanticInfo>(ErrorStub());
+        return this->error();
     }
     return nullptr;
 }
@@ -946,7 +946,7 @@ Checker::get_replacements_in_order(const FunctionType& function_type, VectorOfTy
 USemanticInfo Checker::visit(CallNode& n) {
     USemanticInfo fun_info_p = this->dispatch(n.function);
     if (fun_info_p->is_error) {
-        return std::make_unique<SemanticInfo>(ErrorStub());
+        return this->error();
     }
     SemanticInfo& fun_info = *fun_info_p;
     bool is_a_method = false;
@@ -979,7 +979,7 @@ USemanticInfo Checker::visit(CallNode& n) {
         const FunctionType& function_type = fun_info.type().function();
         if (n.arguments.size() != function_type.param_types.size()) {
             this->error_function_call_num_args(n.start);
-            return std::make_unique<SemanticInfo>(ErrorStub());
+            return this->error();
         }
         VectorOfTypes arg_types;
         for (auto& arg: n.arguments) {
@@ -1046,7 +1046,7 @@ USemanticInfo Checker::visit(ClassLiteralExpressionNode& node) {
 
     if (!this->class_table->declared(object_type_id)) {
         this->error_class_not_found(object_type, node.start);
-        return std::make_unique<SemanticInfo>(ErrorStub());
+        return this->error();
     }
     ClassInfo* class_info = this->class_table->get(object_type_id);
     unsigned long num_required_type_params = class_info->type_params.size();
@@ -1230,6 +1230,10 @@ ClassInfo* Checker::instantiate_generic(ClassInfo* generic, const ObjectType& in
     return concrete;
 }
 
+USemanticInfo Checker::error() {
+    return std::make_unique<SemanticInfo>(ErrorStub());
+}
+
 USemanticInfo Checker::visit(ClassLiteralFieldNode& node) {
     ObjectType* object_type = node.type;
     std::string& object_type_id = object_type->id;
@@ -1237,7 +1241,7 @@ USemanticInfo Checker::visit(ClassLiteralFieldNode& node) {
 
     if (!this->class_table->declared(object_type_id)) {
         this->error_class_not_found(*object_type, node.start);
-        return std::make_unique<SemanticInfo>(ErrorStub());
+        return this->error();
     }
 
     ClassInfo* class_info = this->class_table->get(object_type_id);
@@ -1407,7 +1411,7 @@ USemanticInfo Checker::visit(SubscriptNode& node) {
     SemanticInfo& parent = *parent_p;
     if (parent.type().kind != Kind::OBJECT) {
         this->error_subscript_non_object(node.start);
-        return std::make_unique<SemanticInfo>(ErrorStub());
+        return this->error();
     }
     SemanticInfo symbol_info;
     const ObjectType& object_type = parent.type().object();
@@ -1415,7 +1419,7 @@ USemanticInfo Checker::visit(SubscriptNode& node) {
     if (object_type.id == "String") {
         if (this->is_lvalue) {
             this->error_string_immutable(node.start);
-            return std::make_unique<SemanticInfo>(ErrorStub());
+            return this->error();
         }
     }
 
@@ -1666,7 +1670,7 @@ USemanticInfo Checker::visit(TupleNode& node) {
         types.emplace_back(vtype->type().clone());
         if (!this->is_immutable(vtype->type())) {
             this->error_tuple_member_not_immutable(vtype->type(), node.start);
-            return std::make_unique<SemanticInfo>(ErrorStub());
+            return this->error();
         }
     }
     ObjectType tuple_type("Tuple", types);
