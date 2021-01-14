@@ -156,16 +156,10 @@ USemanticInfo Checker::visit(FunctionNode& n) {
             Node* last_node = n.body->nodes[n.body->nodes.size() - 1];
             if (last_node->ntype != NodeType::RETRN) {
                 // it's not a return statement, error
-                throw std::runtime_error(
-                        "Error in function \"" + n.identifier +
-                        "\": the last statement in a function returning a value should be \"return\" EXPRESSION "
-                );
+                this->error_function_return_last_stmt(n.identifier, returnType, last_node->start);
             }
         } else {
-            throw std::runtime_error(
-                    "Error in function \"" + n.identifier +
-                    "\"the last statement in a function returning a value should be \"return\" EXPRESSION "
-            );
+            this->error_function_return_last_stmt(n.identifier, returnType, n.start);
         }
     }
     this->leave_scope();

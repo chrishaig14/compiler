@@ -231,3 +231,12 @@ void Checker::error_list_literal(const TypeNode& lt, const TypeNode& et, TextPos
           E_HLT(lt.to_string()) + E_FMT(" got ") + E_HLT(et.to_string()) + this->code_context_string(pos);
     std::cout << msg << std::endl;
 }
+
+void Checker::error_function_return_last_stmt(const std::string& function_name, const TypeNode& et, TextPosition pos) {
+    this->failed = true;
+    std::string msg;
+    msg = this->context_string(pos) + E_FMT("Error in function ") + E_HLT(function_name) +
+          E_FMT(": The last statement must be a return <EXPRESSION> of type ") + E_HLT(et.to_string()) +
+          this->code_context_string(pos);
+    std::cout << msg << std::endl;
+}

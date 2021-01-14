@@ -140,6 +140,7 @@ public:
                                           TextPosition pos);
     void error_class_not_found(const TypeNode& cls, TextPosition pos);
     void error_list_literal(const TypeNode& lt, const TypeNode& et, TextPosition pos);
+    void error_function_return_last_stmt(const std::string& function_name, const TypeNode& et, TextPosition pos);
 };
 
 #endif //CHECKER_H
