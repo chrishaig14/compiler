@@ -263,26 +263,7 @@ USemanticInfo Checker::visit(DeclarationNode& n) {
     return std::make_unique<SemanticInfo>(symbol_info);
 }
 
-std::string Checker::context_string(TextPosition position) {
-    std::string msg = E_HLT(text_pos_to_string(this->__file__, position)) +
-                      E_FMT(" In function ") +
-                      E_HLT((this->current_class == "" ? "" : this->current_class + ".") + this->current_function) +
-                      E_FMT(": ");
-    return msg;
-}
 
-std::string Checker::code_context_string(TextPosition position) {
-    std::string str = "\n" + this->code_lines.get_line(position.line) + "\n";
-    str += fmt::format(fmt::fg(fmt::color::orange_red), std::string(position.column, ' ') + std::string(1, '^'));
-    return str;
-}
-
-std::string Checker::code_error_string(TextPosition start, TextPosition end) {
-    int length = end.column - start.column + 1;
-    std::string str = "\n" + this->code_lines.get_line(start.line) + "\n";
-    str += fmt::format(fmt::fg(fmt::color::orange_red), std::string(start.column, ' ') + std::string(length, '^'));
-    return str;
-}
 
 USemanticInfo Checker::visit(AssignmentNode& n) {
     if (n.lvalue->ntype == NodeType::ID) {
