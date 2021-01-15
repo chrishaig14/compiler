@@ -271,3 +271,13 @@ void Checker::error_generic_class_wrong_type_param_number(const std::string& cls
           this->code_context_string(pos);
     std::cout << msg << std::endl;
 }
+
+void Checker::error_class_init_wrong_number_init(const std::string& cls, int num_req, int num_given,
+                                                 TextPosition pos) {
+    this->failed = true;
+    std::string msg;
+    msg = this->context_string(pos) + E_FMT("In initialization of class ") + E_HLT(cls) +
+          E_FMT(" expected " + std::to_string(num_req) + " initializers but got " + std::to_string(num_given)) +
+          this->code_context_string(pos);
+    std::cout << msg << std::endl;
+}

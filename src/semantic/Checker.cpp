@@ -1054,10 +1054,8 @@ USemanticInfo Checker::visit(ClassLiteralExpressionNode& node) {
     unsigned long num_required_init = class_field_names_ordered.size();
     unsigned long num_actual_init = node.init.size();
     if (num_required_init != num_actual_init) {
-        throw std::runtime_error(
-                "In struct \"" + object_type_id + "\" initialization: " + "Expected " +
-                std::to_string(num_required_init) + " initializers but got " +
-                std::to_string(num_actual_init));
+        this->error_class_init_wrong_number_init(object_type_id, num_required_init, num_actual_init, node.start);
+        return this->error();
     }
 
     for (int i = 0; i < num_actual_init; i++) {
@@ -1249,12 +1247,8 @@ USemanticInfo Checker::visit(ClassLiteralFieldNode& node) {
         }
     }
     if (class_fields.size() != node.init_names.size()) {
-        throw std::runtime_error(
-                "In struct \"" + object_type_id + "\" initialization: " + "Expected " +
-                std::to_string(class_fields.size()) + " initializers but got " +
-                std::to_string(node.init_names.size()));
-
-
+        this->error_class_init_wrong_number_init(object_type_id, class_fields.size(), node.init_names.size(), node.start);
+        return this->error();
     }
     for (int i = 0; i < node.init_names.size(); i++) {
         Node* exp = node.init_values[i];

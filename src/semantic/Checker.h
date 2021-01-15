@@ -149,6 +149,7 @@ public:
     Node* replace_if_necessary(Node* node);
     void
     error_generic_class_wrong_type_param_number(const std::string& cls, int num_req, int num_given, TextPosition pos);
+    void error_class_init_wrong_number_init(const std::string& cls, int num_req, int num_given, TextPosition pos);
 };
 
 #endif //CHECKER_H
