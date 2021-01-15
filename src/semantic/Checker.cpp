@@ -103,30 +103,38 @@ void Checker::leave_scope() {
     this->scope = this->scope->parent;
 }
 
-void Checker::assert_type_exists(TypeNode& type, TextPosition pos) {
+bool Checker::assert_type_exists(TypeNode& type, TextPosition pos) {
     if (type.kind == Kind::OBJECT) {
         if (type.object().type_params.size() == 0) {
             if (!is_generic(type)) {
                 if (!this->class_table->declared(type.object().id)) {
                     this->error_class_not_found(type, pos);
-                    return;
+                    return false;
                 }
             }
-            return;
+            return true;
         }
         if (!this->class_table->declared(type.object().id)) {
             this->error_class_not_found(type, pos);
-            return;
+            return false;
         } else {
+            bool error = false;
             for (auto t: type.object().type_params) {
-                this->assert_type_exists(*t, pos);
+                if (!this->assert_type_exists(*t, pos)) {
+                    error = true;
+                }
             }
+            return !error;
         }
     } else {
+        bool error = false;
         for (auto t: type.function().param_types) {
-            this->assert_type_exists(*t, pos);
+            if (!this->assert_type_exists(*t, pos)) {
+                error = true;
+            }
+            return !error;
         }
-        this->assert_type_exists(*type.function().return_type, pos);
+        return this->assert_type_exists(*type.function().return_type, pos);
     }
 }
 
@@ -210,7 +218,9 @@ USemanticInfo Checker::visit(DeclarationNode& n) {
     SemanticInfo symbol_info;
     symbol_info.is_function = false;
     if (n.expression->ntype != NodeType::UNINITIALIZED and n.type != nullptr) {
-        this->assert_type_exists(*n.type, n.start);
+        if (!this->assert_type_exists(*n.type, n.start)) {
+            return this->error();
+        }
         USemanticInfo exp_info_p = this->dispatch(n.expression);
         SemanticInfo& exp_info = *exp_info_p;
         if (exp_info.is_error) {
@@ -262,7 +272,6 @@ USemanticInfo Checker::visit(DeclarationNode& n) {
     this->scope->set(n.identifier, symbol_info.type());
     return std::make_unique<SemanticInfo>(symbol_info);
 }
-
 
 
 USemanticInfo Checker::visit(AssignmentNode& n) {

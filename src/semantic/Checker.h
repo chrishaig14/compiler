@@ -108,7 +108,7 @@ public:
     void enter_scope(std::string name);
     void leave_scope();
     ~Checker();
-    void assert_type_exists(TypeNode& type, TextPosition pos);
+    bool assert_type_exists(TypeNode& type, TextPosition pos);
     bool failed;
     std::string context_string(TextPosition position);
     CodeLines code_lines;
