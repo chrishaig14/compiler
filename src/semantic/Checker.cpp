@@ -108,19 +108,15 @@ void Checker::assert_type_exists(TypeNode& type, TextPosition pos) {
         if (type.object().type_params.size() == 0) {
             if (!is_generic(type)) {
                 if (!this->class_table->declared(type.object().id)) {
-                    std::string msg;
-                    msg = E_FMT(text_pos_to_string(this->__file__, pos));
-                    msg += E_FMT(" type ") + E_HLT(type.object().id) + E_FMT(" doesn't exist");
-                    std::cout << msg << std::endl;
+                    this->error_class_not_found(type, pos);
+                    return;
                 }
             }
             return;
         }
         if (!this->class_table->declared(type.object().id)) {
-            std::string msg;
-            msg = E_FMT(text_pos_to_string(this->__file__, pos));
-            msg += E_FMT(" type ") + E_HLT(type.object().id) + E_FMT(" doesn't exist");
-            std::cout << msg << std::endl;
+            this->error_class_not_found(type, pos);
+            return;
         } else {
             for (auto t: type.object().type_params) {
                 this->assert_type_exists(*t, pos);
