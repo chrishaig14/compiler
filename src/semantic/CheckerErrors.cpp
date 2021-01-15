@@ -281,3 +281,13 @@ void Checker::error_class_init_wrong_number_init(const std::string& cls, int num
           this->code_context_string(pos);
     std::cout << msg << std::endl;
 }
+
+void Checker::error_subscript_type(const TypeNode& t, const TypeNode& s, const TypeNode& es,
+                                   TextPosition pos) {
+    this->failed = true;
+    std::string msg;
+    msg = this->context_string(pos) + E_FMT("Expected ") + E_HLT(es.to_string()) + E_FMT(" in ") +
+          E_HLT(t.to_string()) + E_FMT(" subscript, but got ") + E_HLT(s.to_string()) +
+          this->code_context_string(pos);
+    std::cout << msg << std::endl;
+}

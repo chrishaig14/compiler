@@ -1247,7 +1247,12 @@ USemanticInfo Checker::visit(ClassLiteralFieldNode& node) {
         }
     }
     if (class_fields.size() != node.init_names.size()) {
-        this->error_class_init_wrong_number_init(object_type_id, class_fields.size(), node.init_names.size(), node.start);
+        this->error_class_init_wrong_number_init(
+                object_type_id,
+                class_fields.size(),
+                node.init_names.size(),
+                node.start
+        );
         return this->error();
     }
     for (int i = 0; i < node.init_names.size(); i++) {
@@ -1393,29 +1398,25 @@ USemanticInfo Checker::visit(SubscriptNode& node) {
     }
 
     VectorOfTypes children;
-    bool not_integer = false;
     if (node.child.size() > 1) {
         throw std::runtime_error("Error subscript with more than one child!");
     }
     bool old_lvalue = this->is_lvalue;
     this->is_lvalue = false;
-    for (auto& c: node.child) {
-        USemanticInfo ct = this->dispatch(c);
-        if (ct->type() != T_INT) {
-            not_integer = true;
-        }
-        children.emplace_back(ct->type().clone());
-    }
+    Node* c = node.child[0];
+    USemanticInfo ct = this->dispatch(c);
+    bool is_integer = ct->type() == T_INT;
+    children.emplace_back(ct->type().clone());
     this->is_lvalue = old_lvalue;
 
     if (object_type.id == "List") {
-        if (not_integer) {
-            throw std::runtime_error("Access not number subscript of List!");
+        if (!is_integer) {
+            this->error_subscript_type(object_type, ct->type(), T_INT, node.start);
         }
         symbol_info.set_type(*object_type.type_params[0]);
     } else if (object_type.id == "String") {
-        if (not_integer) {
-            throw std::runtime_error("Access not number subscript of String!");
+        if (!is_integer) {
+            this->error_subscript_type(object_type, ct->type(), T_INT, node.start);
         }
         symbol_info.set_type(object_type);
     }
