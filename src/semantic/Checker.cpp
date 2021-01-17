@@ -1048,12 +1048,7 @@ USemanticInfo Checker::visit(ClassLiteralExpressionNode& node) {
         node.init[i] = this->replace_if_necessary(node.init[i]);
         TypeNode& field_type = *class_field_types_ordered[i];
         if (!this->can_assign(semanticInfo.type(), field_type)) {
-            throw std::runtime_error(
-                    "In struct \"" + object_type_id + "\" initialization: " + "field \"" +
-                    class_field_names_ordered[i] +
-                    "\" is of type " +
-                    field_type.to_string() +
-                    " but got " + semanticInfo.type().to_string());
+            this->error_class_init_bad_member_type(object_type, field_type, semanticInfo.type(), node.init[i]->start);
         }
     }
     node.names = class_field_names_ordered;
