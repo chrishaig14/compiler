@@ -312,3 +312,12 @@ std::string Checker::code_error_string(TextPosition start, TextPosition end) {
     str += fmt::format(fmt::fg(fmt::color::orange_red), std::string(start.column, ' ') + std::string(length, '^'));
     return str;
 }
+
+void Checker::error_class_not_generic(const std::string& cls, TextPosition pos) {
+    this->failed = true;
+    std::string msg;
+    msg = this->context_string(pos) + E_FMT("Class ") + E_HLT(cls) +
+          E_FMT(" is not generic") +
+          this->code_context_string(pos);
+    std::cout << msg << std::endl;
+}

@@ -1028,11 +1028,8 @@ USemanticInfo Checker::visit(ClassLiteralExpressionNode& node) {
             this->class_table->set(object_type_str, class_info);
         }
     } else if (num_actual_type_params != 0) {
-        throw std::runtime_error(
-                "At " + text_pos_to_string(this->__file__, node.start) + ": Error, class " +
-                object_type_id + " is not generic, but given " +
-                std::to_string(num_actual_type_params) + " type parameter(s)!"
-        );
+        this->error_class_not_generic(object_type_id, node.start);
+        return this->error();
     }
     auto class_field_types_ordered = class_info->member_types;
     auto class_field_names_ordered = class_info->member_names;
@@ -1221,6 +1218,9 @@ USemanticInfo Checker::visit(ClassLiteralFieldNode& node) {
             class_info = instantiate_generic(class_info, *object_type);
             this->class_table->set(object_type_str, class_info);
         }
+    } else if (num_actual_type_params != 0) {
+        this->error_class_not_generic(object_type->id, node.start);
+        return this->error();
     }
     auto class_fields = class_info->members;
 
