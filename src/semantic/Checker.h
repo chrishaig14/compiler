@@ -154,4 +154,6 @@ public:
     void error_class_not_generic(const std::string& cls, TextPosition pos);
 };
 
+bool function_is_generic(const FunctionType& ft);
+
 #endif //CHECKER_H
