@@ -20,7 +20,6 @@
 #include <set>
 #include "TypeClassInfo.h"
 #include "../macros.h"
-#include "unify.h"
 #include "../logging/logging.h"
 
 typedef std::unique_ptr<SemanticInfo> USemanticInfo;

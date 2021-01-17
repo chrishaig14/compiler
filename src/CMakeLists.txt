@@ -224,7 +224,6 @@ add_library(
         instructions/PushFloatInst.h
         vm/ObjectStore.cpp
         vm/ObjectStore.h
-        semantic/unify.cpp
-        semantic/unify.h semantic/CheckerErrors.cpp semantic/CheckerVisit.cpp semantic/CheckerUnify.cpp)
+        semantic/CheckerErrors.cpp semantic/CheckerVisit.cpp semantic/CheckerUnify.cpp)
 
 add_library(transpiler transpiler/Transpiler.cpp transpiler/Transpiler.h)

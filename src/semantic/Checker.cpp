@@ -3,7 +3,6 @@
 #include "Checker.h"
 #include "TypeClassInfo.h"
 #include "../macros.h"
-#include "unify.h"
 #include "../logging/logging.h"
 
 bool function_is_generic(const FunctionType& ft) {
