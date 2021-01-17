@@ -111,10 +111,10 @@ void Checker::error_string_immutable(TextPosition pos) {
 void Checker::error_for(const TypeNode& t, TextPosition position) {
     this->failed = true;
     std::string msg;
-    msg = E_HLT(text_pos_to_string(this->__file__, position)) +
-          E_FMT("Expected") + E_HLT(" List[t] ") +
+    msg = this->context_string(position) +
+          E_FMT(" Expected") + E_HLT(" List[t] ") +
           E_FMT("in loop, but got ") +
-          E_HLT(t.to_string());
+          E_HLT(t.to_string()) + this->code_context_string(position);
     std::cout << msg << std::endl;
 }
 

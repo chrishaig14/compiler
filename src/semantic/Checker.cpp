@@ -1255,7 +1255,7 @@ USemanticInfo Checker::visit(ForNode& node) {
     USemanticInfo symbol_info_p = this->dispatch(node.exp);
     SemanticInfo& symbol_info = *symbol_info_p;
     if (symbol_info.type().kind != Kind::OBJECT) {
-        throw std::runtime_error("Iterating over something bad!");
+        this->error_for(symbol_info.type(), node.start);
     }
 
     const ObjectType& obj = symbol_info.type().object();
