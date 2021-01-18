@@ -6,7 +6,6 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 add_subdirectory(src)
 add_subdirectory(example/build)
 add_subdirectory(test)
-add_executable(runner src/runner.cpp)
 find_package(fmt)
 add_executable(compiler src/full.cpp)
 
