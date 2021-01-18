@@ -20,122 +20,6 @@ void GlobalProcessor::add_builtins(std::vector<Builtin>& builtins) {
 
 }
 
-void int_to_str(std::unordered_map<std::string, std::unordered_map<std::string, Code>>& structs, ObjectStack& stack,
-                Environment* global_env) {
-    IntegerObject* x = stack.pop_integer();
-    Object* obj = new StringObject(std::to_string(x->value));
-    ObjectStore::register_object(obj);
-    stack.push(obj);
-}
-
-void float_to_str(std::unordered_map<std::string, std::unordered_map<std::string, Code>>& structs, ObjectStack& stack,
-                  Environment* global_env) {
-    FloatObject* x = stack.pop_float();
-    Object* obj = new StringObject(std::to_string(x->value));
-    ObjectStore::register_object(obj);
-    stack.push(obj);
-}
-
-void str_to_str(std::unordered_map<std::string, std::unordered_map<std::string, Code>>& structs, ObjectStack& stack,
-                Environment* global_env) {
-}
-
-void print(std::unordered_map<std::string, std::unordered_map<std::string, Code>>& structs, ObjectStack& stack,
-           Environment* global_env) {
-    StringObject* st = stack.pop_string();
-//    printf("%s\n", st->str.c_str());
-    std::cout << "<< " << st->str << std::endl;
-}
-
-void list_len(std::unordered_map<std::string, std::unordered_map<std::string, Code>>& structs, ObjectStack& stack,
-              Environment* global_env) {
-    ListObject* ls = stack.pop_list();
-    stack.push(new IntegerObject(ls->list.size()));
-}
-
-void list_pop(std::unordered_map<std::string, std::unordered_map<std::string, Code>>& structs, ObjectStack& stack,
-              Environment* global_env) {
-    ListObject* ls = stack.pop_list();
-    if (ls->list.size() == 0) {
-        throw std::runtime_error("RUNTIME ERROR: pop from empty list!");
-    }
-    Object* last = ls->list[ls->list.size() - 1];
-    ls->list.pop_back();
-    stack.push(last);
-}
-
-void list_push(std::unordered_map<std::string, std::unordered_map<std::string, Code>>& structs, ObjectStack& stack,
-               Environment* global_env) {
-    Object* new_el = stack.pop();
-    ListObject* ls = stack.pop_list();
-    ls->list.push_back(new_el);
-}
-
-void string_len(std::unordered_map<std::string, std::unordered_map<std::string, Code>>& structs, ObjectStack& stack,
-                Environment* global_env) {
-    StringObject* ls = stack.pop_string();
-    stack.push(new IntegerObject(ls->str.size()));
-}
-
-void range(std::unordered_map<std::string, std::unordered_map<std::string, Code>>& structs, ObjectStack& stack,
-           Environment* global_env) {
-    IntegerObject* end = stack.pop_integer();
-    IntegerObject* step = stack.pop_integer();
-    IntegerObject* start = stack.pop_integer();
-    std::vector<Object*> ls;
-    for (int i = start->value; i < end->value; i += step->value) {
-        ls.push_back(new IntegerObject(i));
-    }
-    stack.push(new ListObject(ls));
-}
-
-void join(std::unordered_map<std::string, std::unordered_map<std::string, Code>>& structs, ObjectStack& stack,
-          Environment* global_env) {
-    StringObject* sep = stack.pop_string();
-    ListObject* ls = stack.pop_list();
-    std::string res;
-    for (int i = 0; i < ls->list.size(); i++) {
-        StringObject* str = dynamic_cast<StringObject*>(ls->list[i]);
-        if (str == nullptr) {
-            throw "Joining list with no strings!";
-        }
-        res += str->str + sep->str;
-    }
-    if (ls->list.size() != 0) {
-        res = res.substr(0, res.size() - sep->str.size());
-    }
-    stack.push(new StringObject(res));
-}
-
-void input(std::unordered_map<std::string, std::unordered_map<std::string, Code>>& structs, ObjectStack& stack,
-           Environment* global_env) {
-    std::string line;
-    std::cin >> line;
-    stack.push(new StringObject(line));
-}
-
-void list_map(std::unordered_map<std::string, std::unordered_map<std::string, Code>>& structs, ObjectStack& stack,
-              Environment* global_env) {
-    CodeObject* fun = dynamic_cast<CodeObject*>(stack.pop());
-    if (fun == nullptr) {
-        throw std::runtime_error("Popping a code object but it's not!");
-    }
-    ListObject* ls = stack.pop_list();
-    std::vector<Object*> rv;
-    for (int i = 0; i < ls->list.size(); i++) {
-        stack.push(ls->list[i]);
-        if (fun->type == CodeType::BUILTIN) {
-            fun->stuff.builtin->function(structs, stack, global_env);
-        } else {
-            CodeRunner code_runner(fun->stuff.user->code, structs, stack, global_env);
-            code_runner.run();
-        }
-        Object* obj = stack.top();
-        rv.push_back(stack.pop());
-    }
-    stack.push(new ListObject(rv));
-}
-
 GlobalProcessor::GlobalProcessor(std::vector<Builtin>& builtins, ClassTable* imported_classes,
                                  FunctionTable* imported_functions) {
     this->function_table = imported_functions;
@@ -146,41 +30,41 @@ GlobalProcessor::GlobalProcessor(std::vector<Builtin>& builtins, ClassTable* imp
     auto none = new ObjectType(".None", {});
     VectorOfTypes w = {at, ft};
     builtins.push_back(
-            {"map", CodeBuiltin{new FunctionType(w, new T_LIST(new ObjectType("b", {}))), list_map}}
+            {"map", CodeBuiltin{new FunctionType(w, new T_LIST(new ObjectType("b", {}))), nullptr}}
     );
-    builtins.push_back({"Integer.str", CodeBuiltin{new FunctionType({new T_INT}, new T_STRING), int_to_str}});
-    builtins.push_back({"Float.str", CodeBuiltin{new FunctionType({new T_FLOAT}, new T_STRING), float_to_str}});
+    builtins.push_back({"Integer.str", CodeBuiltin{new FunctionType({new T_INT}, new T_STRING), nullptr}});
+    builtins.push_back({"Float.str", CodeBuiltin{new FunctionType({new T_FLOAT}, new T_STRING), nullptr}});
 
     builtins.push_back(
             {"List.len",
-             CodeBuiltin{new FunctionType({new T_LIST(new ObjectType("a", {}))}, new T_INT), list_len}}
+             CodeBuiltin{new FunctionType({new T_LIST(new ObjectType("a", {}))}, new T_INT), nullptr}}
     );
     VectorOfTypes x = {new T_LIST(TYPE("a", {})), new ObjectType("a", {})};
-    builtins.push_back({"List.pop", CodeBuiltin{new FunctionType(x, none), list_pop}});
+    builtins.push_back({"List.pop", CodeBuiltin{new FunctionType(x, none), nullptr}});
     builtins.push_back(
             {"List.push", CodeBuiltin{
                     new FunctionType({new T_LIST(new ObjectType("a", {}))}, new ObjectType("a", {})),
-                    list_push}}
+                    nullptr}}
     );
     auto function_from_t_to_u = FUNCTION_TYPE({ TYPE("t", {}) }, new ObjectType("b", {}));
     builtins.push_back(
             {"List.unordered_map",
              CodeBuiltin{new FunctionType({function_from_t_to_u}, new T_LIST(new ObjectType("b", {}))),
-                         list_map}}
+                         nullptr}}
     );
-    builtins.push_back({"String.len", CodeBuiltin{new FunctionType({new T_STRING}, new T_INT), string_len}});
-    builtins.push_back({"print", CodeBuiltin{new FunctionType({new T_STRING}, none), print}});
+    builtins.push_back({"String.len", CodeBuiltin{new FunctionType({new T_STRING}, new T_INT), nullptr}});
+    builtins.push_back({"print", CodeBuiltin{new FunctionType({new T_STRING}, none), nullptr}});
     VectorOfTypes a1 = {new T_LIST(new T_STRING), new T_STRING};
     builtins.push_back(
-            {"join", CodeBuiltin{new FunctionType(a1, new T_STRING), join}}
+            {"join", CodeBuiltin{new FunctionType(a1, new T_STRING), nullptr}}
     );
     VectorOfTypes a2 = {new T_INT, new T_INT, new T_INT};
     builtins.push_back(
-            {"range", CodeBuiltin{new FunctionType(a2, new T_LIST(new T_INT)), range}}
+            {"range", CodeBuiltin{new FunctionType(a2, new T_LIST(new T_INT)), nullptr}}
     );
 
     builtins.push_back(
-            {"input", CodeBuiltin{new FunctionType({}, new T_STRING), input}}
+            {"input", CodeBuiltin{new FunctionType({}, new T_STRING), nullptr}}
     );
 
     this->add_builtins(builtins);
