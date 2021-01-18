@@ -111,37 +111,6 @@ add_library(
         semantic/ReturnError.h
         semantic/ScopeError.cpp
         semantic/ScopeError.h
-        instructions/GetInst.cpp
-        instructions/GetInst.h
-        instructions/SetInst.cpp
-        instructions/SetInst.h
-        instructions/DeclareInst.cpp
-        instructions/DeclareInst.h
-        instructions/BinopInst.cpp
-        instructions/BinopInst.h
-        instructions/PushIntegerInst.cpp
-        instructions/PushIntegerInst.h
-        instructions/PushStringInst.cpp
-        instructions/PushStringInst.h
-        instructions/Instruction.cpp
-        instructions/Instruction.h
-        instructions/CallInst.cpp
-        instructions/CallInst.h
-        instructions/ReturnInst.cpp
-        instructions/ReturnInst.h
-        instructions/GetMemberInst.cpp
-        instructions/GetMemberInst.h
-        instructions/SetMemberInst.cpp
-        instructions/SetMemberInst.h
-        instructions/SetSubscriptInst.cpp
-        instructions/SetSubscriptInst.h
-        instructions/GetSubscriptInst.cpp
-        instructions/GetSubscriptInst.h
-        instructions/PushFunctionInst.cpp
-        instructions/PushFunctionInst.h
-        instructions/instructions.h
-        instructions/InstructionVisitor.cpp
-        instructions/InstructionVisitor.h
         vm/ObjectStack.h
         vm/ObjectStack.cpp
         vm/Object.h
@@ -156,65 +125,21 @@ add_library(
         vm/Environment.cpp
         vm/UserObject.cpp
         vm/UserObject.h
-        instructions/MakeObjectInst.cpp
-        instructions/MakeObjectInst.h
-        instructions/MakeListInst.cpp
-        instructions/MakeListInst.h
         vm/ListObject.cpp
         vm/ListObject.h
-        instructions/JumpIfFalseInst.cpp
-        instructions/JumpIfFalseInst.h
-        instructions/PushBooleanInst.cpp
-        instructions/PushBooleanInst.h
         vm/BooleanObject.cpp
         vm/BooleanObject.h
-        instructions/MakeClassInst.cpp
-        instructions/MakeClassInst.h
-        instructions/DefineStructInst.cpp
-        instructions/DefineStructInst.h
-        instructions/MakeDefaultInst.cpp
-        instructions/MakeDefaultInst.h
-        instructions/JumpInst.cpp
-        instructions/JumpInst.h
-        instructions/EnterScope.cpp
-        instructions/EnterScope.h
-        instructions/LeaveScope.cpp
-        instructions/LeaveScope.h
-        vm/LabelledCode.cpp
-        vm/LabelledCode.h
-        instructions/NopInst.cpp
-        instructions/NopInst.h
-        vm/Loader.cpp
-        vm/Loader.h
-        instructions/StartFunction.cpp
-        instructions/StartFunction.h
-        instructions/EndFunction.cpp
-        instructions/EndFunction.h
-        instructions/JumpIfNone.cpp
-        instructions/JumpIfNone.h
         vm/NoneObject.cpp
         vm/NoneObject.h
-        instructions/PushNone.cpp
-        instructions/PushNone.h
         semantic/TypeClassInfo.cpp
         semantic/TypeClassInfo.h
-        instructions/PopInst.cpp
-        instructions/PopInst.h
         nodes/node_types.h
         types.h
         macros.h
-        instructions/GetTupleMemberInst.cpp
-        instructions/GetTupleMemberInst.h
         vm/TupleObject.cpp
         vm/TupleObject.h
-        instructions/MakeTupleInst.cpp
-        instructions/MakeTupleInst.h
-        instructions/BoolOpInst.cpp
-        instructions/BoolOpInst.h
         vm/FloatObject.cpp
         vm/FloatObject.h
-        instructions/PushFloatInst.cpp
-        instructions/PushFloatInst.h
         vm/ObjectStore.cpp
         vm/ObjectStore.h
         semantic/CheckerErrors.cpp semantic/CheckerVisit.cpp semantic/CheckerUnify.cpp)

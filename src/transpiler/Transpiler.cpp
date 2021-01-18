@@ -4,7 +4,6 @@
 
 #include <iostream>
 #include "Transpiler.h"
-#include "../vm/LabelledCode.h"
 #include "../macros.h"
 #include "../semantic/Checker.h"
 

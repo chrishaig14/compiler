@@ -9,7 +9,6 @@
 #include <unordered_map>
 #include <algorithm>
 #include "types.h"
-#include "instructions/Instruction.h"
 #include <unistd.h>
 #include <cstring>
 
@@ -19,8 +18,6 @@
 #include <libgen.h>
 #include <sstream>
 #include <fstream>
-
-std::ostream& operator<<(std::ostream& out, const CodeLabel v);
 
 class VariableLocation {
 public:
