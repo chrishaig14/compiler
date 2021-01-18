@@ -83,7 +83,6 @@ add_library(
 add_library(parser parser/Parser.cpp parser/Parser.h parser/UnexpectedToken.cpp
         parser/UnexpectedToken.h)
 
-add_library(translator translator/Translator.cpp translator/Translator.h)
 add_library(
         srcLib
         logging/logging.cpp
@@ -203,8 +202,6 @@ add_library(
         instructions/PushNone.h
         semantic/TypeClassInfo.cpp
         semantic/TypeClassInfo.h
-        run.h
-        run.cpp
         instructions/PopInst.cpp
         instructions/PopInst.h
         nodes/node_types.h

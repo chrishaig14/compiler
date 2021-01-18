@@ -12,7 +12,6 @@ add_executable(compiler src/full.cpp)
 
 target_link_libraries(
   compiler
-  translator
   parser
   srcLib
   nodes
