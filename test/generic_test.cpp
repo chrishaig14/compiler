@@ -204,26 +204,26 @@ TEST(generic_test, make_replacement_4) {
 }
 
 TEST(generic_test, function_call_1) {
-    FunctionTypeNode* ftn = FUNCTION_TYPE({ TYPE("a", {}) }, TYPE("a", {}));
+    FunctionType* ftn = FUNCTION_TYPE({ TYPE("a", {}) }, TYPE("a", {}));
     VectorOfTypes ats = {new T_INT};
-    SymbolInfo retv = match_arguments_to_generic_function(*ftn, ats);
+    SemanticInfo retv = match_arguments_to_generic_function(*ftn, ats);
     EXPECT_EQ(retv.type(), T_INT);
 }
 
 TEST(generic_test, function_call_2) {
     VectorOfTypes pt = {TYPE("a", {}), TYPE("b", {})};
-    FunctionTypeNode* ftn = FUNCTION_TYPE(pt, TYPE("a", {}));
+    FunctionType* ftn = FUNCTION_TYPE(pt, TYPE("a", {}));
     VectorOfTypes ats = {new T_INT, new T_STRING};
-    SymbolInfo retv = match_arguments_to_generic_function(*ftn, ats);
+    SemanticInfo retv = match_arguments_to_generic_function(*ftn, ats);
     EXPECT_EQ(retv.type(), T_INT);
 }
 
 
 TEST(generic_test, function_call_3) {
     VectorOfTypes pt = {TYPE("a", {}), TYPE("b", {})};
-    FunctionTypeNode* ftn = FUNCTION_TYPE(pt, TYPE("b", {}));
+    FunctionType* ftn = FUNCTION_TYPE(pt, TYPE("b", {}));
     VectorOfTypes ats = {new T_INT, new T_STRING};
-    SymbolInfo retv = match_arguments_to_generic_function(*ftn, ats);
+    SemanticInfo retv = match_arguments_to_generic_function(*ftn, ats);
     EXPECT_EQ(retv.type(), T_STRING);
 }
 
@@ -231,12 +231,12 @@ TEST(generic_test, function_call_4) {
 
     VectorOfTypes pt = {TYPE("a", {}), FUNCTION_TYPE(VectorOfTypes({TYPE("a", {})}), TYPE("b", {}))};
     // fun(a,fun(a)->b) -> b
-    FunctionTypeNode* ftn = FUNCTION_TYPE(pt, TYPE("b", {}));
+    FunctionType* ftn = FUNCTION_TYPE(pt, TYPE("b", {}));
 
     // Integer, fun(Integer)->String
     VectorOfTypes ats = {new T_INT, FUNCTION_TYPE({ new T_INT }, new T_STRING)};
 
-    SymbolInfo retv = match_arguments_to_generic_function(*ftn, ats);
+    SemanticInfo retv = match_arguments_to_generic_function(*ftn, ats);
 
     EXPECT_EQ(retv.type(), T_STRING);
 }
@@ -244,11 +244,11 @@ TEST(generic_test, function_call_4) {
 TEST(generic_test, function_call_5) {
 
     VectorOfTypes pt = {FUNCTION_TYPE(VectorOfTypes({TYPE("a", {})}), TYPE("b", {})), TYPE("a", {})};
-    FunctionTypeNode* ftn = FUNCTION_TYPE(pt, TYPE("b", {}));
+    FunctionType* ftn = FUNCTION_TYPE(pt, TYPE("b", {}));
 
     VectorOfTypes ats = {FUNCTION_TYPE({ new T_INT }, new T_STRING), new T_INT};
 
-    SymbolInfo retv = match_arguments_to_generic_function(*ftn, ats);
+    SemanticInfo retv = match_arguments_to_generic_function(*ftn, ats);
 
     EXPECT_EQ(retv.type(), T_STRING);
 }
@@ -256,11 +256,11 @@ TEST(generic_test, function_call_5) {
 TEST(generic_test, function_call_6) {
 
     VectorOfTypes pt = {FUNCTION_TYPE(VectorOfTypes({TYPE("a", {})}), TYPE("b", {})), TYPE("a", {})};
-    FunctionTypeNode* ftn = FUNCTION_TYPE(pt, TYPE("b", {}));
+    FunctionType* ftn = FUNCTION_TYPE(pt, TYPE("b", {}));
 
     VectorOfTypes ats = {FUNCTION_TYPE({ TYPE("t", {}) }, new T_STRING), new T_INT};
 
-    SymbolInfo retv = match_arguments_to_generic_function(*ftn, ats);
+    SemanticInfo retv = match_arguments_to_generic_function(*ftn, ats);
 
     EXPECT_EQ(retv.type(), T_STRING);
 }
@@ -268,11 +268,11 @@ TEST(generic_test, function_call_6) {
 TEST(generic_test, function_call_7) {
 
     VectorOfTypes pt = {FUNCTION_TYPE(VectorOfTypes({TYPE("a", {})}), new T_STRING), TYPE("a", {})};
-    FunctionTypeNode* ftn = FUNCTION_TYPE(pt, new T_STRING);
+    FunctionType* ftn = FUNCTION_TYPE(pt, new T_STRING);
 
     VectorOfTypes ats = {FUNCTION_TYPE({ TYPE("t", {}) }, new T_STRING), new T_INT};
 
-    SymbolInfo retv = match_arguments_to_generic_function(*ftn, ats);
+    SemanticInfo retv = match_arguments_to_generic_function(*ftn, ats);
 
     EXPECT_EQ(retv.type(), T_STRING);
 }
@@ -282,13 +282,13 @@ TEST(generic_test, function_call_8) {
     VectorOfTypes pt = {FUNCTION_TYPE(VectorOfTypes({TYPE("a", {})}), new T_STRING), TYPE("a", {})};
     // fun(fun(a)->String, a) -> String
     // fun(fun(t)->String, t) -> String
-    FunctionTypeNode* ftn = FUNCTION_TYPE(pt, new T_STRING);
+    FunctionType* ftn = FUNCTION_TYPE(pt, new T_STRING);
     // fun(t)->t, Integer
     VectorOfTypes ats = {FUNCTION_TYPE({ TYPE("t", {}) }, TYPE("t", {})), new T_INT};
     // fun(a)->String // fun(a)->String           --> a = String --> fun(String)->String
     // fun(t)->t      // fun(t)->t --> t = String --> fun(String)->String
     try {
-        SymbolInfo retv = match_arguments_to_generic_function(*ftn, ats);
+        SemanticInfo retv = match_arguments_to_generic_function(*ftn, ats);
         FAIL();
     } catch (...) {
 
@@ -298,22 +298,22 @@ TEST(generic_test, function_call_8) {
 TEST(generic_test, function_call_9) {
 
     VectorOfTypes pt = {TYPE("a", {}), FUNCTION_TYPE(VectorOfTypes({TYPE("a", {})}), new T_STRING)};
-    FunctionTypeNode* ftn = FUNCTION_TYPE(pt, new T_STRING);
+    FunctionType* ftn = FUNCTION_TYPE(pt, new T_STRING);
 
     VectorOfTypes ats = {new T_STRING, FUNCTION_TYPE({ TYPE("t", {}) }, TYPE("t", {}))};
 
-    SymbolInfo retv = match_arguments_to_generic_function(*ftn, ats);
+    SemanticInfo retv = match_arguments_to_generic_function(*ftn, ats);
     EXPECT_EQ(retv.type(), T_STRING);
 }
 
 TEST(generic_test, function_call_10) {
 
     VectorOfTypes pt = {FUNCTION_TYPE(VectorOfTypes({TYPE("a", {})}), new T_STRING), TYPE("a", {})};
-    FunctionTypeNode* ftn = FUNCTION_TYPE(pt, new T_STRING);
+    FunctionType* ftn = FUNCTION_TYPE(pt, new T_STRING);
 
     VectorOfTypes ats = {FUNCTION_TYPE({ TYPE("t", {}) }, TYPE("t", {})), new T_STRING};
 
-    SymbolInfo retv = match_arguments_to_generic_function(*ftn, ats);
+    SemanticInfo retv = match_arguments_to_generic_function(*ftn, ats);
     EXPECT_EQ(retv.type(), T_STRING);
 }
 
@@ -322,11 +322,11 @@ TEST(generic_test, function_call_11) {
     VectorOfTypes pt = {new T_STRING};
     // fun(String)->String
     // t
-    FunctionTypeNode* ftn = FUNCTION_TYPE(pt, new T_STRING);
+    FunctionType* ftn = FUNCTION_TYPE(pt, new T_STRING);
 
     VectorOfTypes ats = {TYPE("t", {})};
     try {
-        SymbolInfo retv = match_arguments_to_generic_function(*ftn, ats);
+        SemanticInfo retv = match_arguments_to_generic_function(*ftn, ats);
         FAIL();
     } catch (...) {
     }
@@ -336,11 +336,11 @@ TEST(generic_test, function_call_12) {
 
     VectorOfTypes pt = {FUNCTION_TYPE(VectorOfTypes({TYPE("a", {})}), TYPE("b", {})), TYPE("a", {})};
     // fun(fun(a)->b, a) -> b
-    FunctionTypeNode* ftn = FUNCTION_TYPE(pt, TYPE("b", {}));
+    FunctionType* ftn = FUNCTION_TYPE(pt, TYPE("b", {}));
 
     VectorOfTypes ats = {FUNCTION_TYPE({ TYPE("t", {}) }, TYPE("t", {})), new T_STRING};
 
-    SymbolInfo retv = match_arguments_to_generic_function(*ftn, ats);
+    SemanticInfo retv = match_arguments_to_generic_function(*ftn, ats);
     EXPECT_EQ(retv.type(), T_STRING);
 }
 
@@ -377,7 +377,7 @@ TEST(generic_test, unify_function_call_3) {
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
-    FunctionTypeNode* fun = parser.parse_function_type();
+    FunctionType* fun = parser.parse_function_type();
     parser.next();
     TypeNode* arg0 = parser.parse_type_node();
     parser.next();
@@ -403,7 +403,7 @@ TEST(generic_test, unify_function_call_4) {
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
-    FunctionTypeNode* fun = parser.parse_function_type();
+    FunctionType* fun = parser.parse_function_type();
     parser.next();
     TypeNode* arg0 = parser.parse_type_node();
     parser.next();
@@ -450,7 +450,7 @@ TEST(generic_test, unify_function_call_5) {
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
-    FunctionTypeNode* fun = parser.parse_function_type();
+    FunctionType* fun = parser.parse_function_type();
     parser.next();
     TypeNode* arg0 = parser.parse_type_node();
     parser.next();
@@ -472,7 +472,7 @@ TEST(generic_test, unify_function_call_6) {
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
-    FunctionTypeNode* fun = parser.parse_function_type();
+    FunctionType* fun = parser.parse_function_type();
     parser.next();
     TypeNode* arg0 = parser.parse_type_node();
     parser.next();
@@ -498,7 +498,7 @@ TEST(generic_test, foo_1) {
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
-    FunctionTypeNode* fun = parser.parse_function_type();
+    FunctionType* fun = parser.parse_function_type();
     parser.next();
     TypeNode* arg0 = parser.parse_type_node();
     parser.next();
@@ -525,7 +525,7 @@ TEST(generic_test, foo_2) {
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
-    FunctionTypeNode* fun = parser.parse_function_type();
+    FunctionType* fun = parser.parse_function_type();
     parser.next();
     TypeNode* arg0 = parser.parse_type_node();
     parser.next();
@@ -552,7 +552,7 @@ TEST(generic_test, foo_3) {
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
-    FunctionTypeNode* fun = parser.parse_function_type();
+    FunctionType* fun = parser.parse_function_type();
     parser.next();
     TypeNode* arg0 = parser.parse_type_node();
     parser.next();
@@ -579,7 +579,7 @@ TEST(generic_test, foo_4) {
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
-    FunctionTypeNode* fun = parser.parse_function_type();
+    FunctionType* fun = parser.parse_function_type();
     parser.next();
     TypeNode* arg0 = parser.parse_type_node();
     parser.next();
@@ -602,7 +602,7 @@ TEST(generic_test, foo_5) {
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
-    FunctionTypeNode* fun = parser.parse_function_type();
+    FunctionType* fun = parser.parse_function_type();
     parser.next();
     TypeNode* arg0 = parser.parse_type_node();
     parser.next();
@@ -625,7 +625,7 @@ TEST(generic_test, foo_6) {
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
-    FunctionTypeNode* fun = parser.parse_function_type();
+    FunctionType* fun = parser.parse_function_type();
     parser.next();
     TypeNode* arg0 = parser.parse_type_node();
     parser.next();
@@ -645,7 +645,7 @@ TEST(generic_test, foo_7) {
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
-    FunctionTypeNode* fun = parser.parse_function_type();
+    FunctionType* fun = parser.parse_function_type();
     parser.next();
     TypeNode* arg0 = parser.parse_type_node();
     std::cout << fun->to_string() << std::endl;
@@ -668,7 +668,7 @@ TEST(generic_test, foo_8) {
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
-    FunctionTypeNode* fun = parser.parse_function_type();
+    FunctionType* fun = parser.parse_function_type();
     parser.next();
     TypeNode* arg0 = parser.parse_type_node();
     std::cout << fun->to_string() << std::endl;
@@ -691,7 +691,7 @@ TEST(generic_test, foo_9) {
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
-    FunctionTypeNode* fun = parser.parse_function_type();
+    FunctionType* fun = parser.parse_function_type();
     parser.next();
     TypeNode* arg0 = parser.parse_type_node();
     std::cout << fun->to_string() << std::endl;
@@ -714,7 +714,7 @@ TEST(generic_test, foo_10) {
     Scanner scanner(text);
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
-    FunctionTypeNode* fun = parser.parse_function_type();
+    FunctionType* fun = parser.parse_function_type();
     parser.next();
     TypeNode* arg0 = parser.parse_type_node();
     parser.next();

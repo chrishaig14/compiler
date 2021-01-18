@@ -26,10 +26,10 @@ void open_and_compile(std::string filename) {
     compile_and_run(text);
 }
 
-std::vector<std::string> get_all_files_in_directory(std::string dirpath) {
+VectorOfStrings get_all_files_in_directory(std::string dirpath) {
     DIR* dir;
     struct dirent* ent;
-    std::vector<std::string> files;
+    VectorOfStrings files;
     if ((dir = opendir(dirpath.c_str())) != NULL) {
         /* print all the files and directories within directory */
         while ((ent = readdir(dir)) != NULL) {

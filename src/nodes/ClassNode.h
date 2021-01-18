@@ -10,23 +10,23 @@
 
 #include "TypeNode.h"
 #include "FunctionNode.h"
-
+#include "../macros.h"
 class ClassNode : public Node {
 public:
 
     bool equal(const Node& other) const;
-    ClassNode(const std::string& className, std::vector<std::string> type_parameters,
-              std::unordered_map<std::string, TypeNode*> members, std::unordered_map<std::string, FunctionNode*> functions);
+    ClassNode(const std::string& className, VectorOfStrings type_parameters,
+              MapStringType members, std::unordered_map<std::string, FunctionNode*> functions);
     ClassNode& cls() override;
     const ClassNode& cls() const override;
 
     ~ClassNode();
 
-    std::unordered_map<std::string, TypeNode*> members;
-    std::vector<std::string> members_ordered;
+    MapStringType members;
+    VectorOfStrings members_ordered;
     std::unordered_map<std::string, FunctionNode*> methods;
     std::string class_name;
-    std::vector<std::string> type_parameters;
+    VectorOfStrings type_parameters;
 };
 
 

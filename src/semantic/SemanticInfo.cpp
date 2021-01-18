@@ -2,9 +2,9 @@
 // Created by chris on 2/8/20.
 //
 
-#include "SymbolInfo.h"
+#include "SemanticInfo.h"
 
-SymbolInfo::SymbolInfo() {
+SemanticInfo::SemanticInfo() {
     this->is_function = false;
     this->is_method = false;
     this->class_info = nullptr;
@@ -13,11 +13,11 @@ SymbolInfo::SymbolInfo() {
     this->_type = nullptr;
 }
 
-void SymbolInfo::set_type(const TypeNode& typ) {
+void SemanticInfo::set_type(const TypeNode& typ) {
     this->_type = typ.clone();
 }
 
-const TypeNode& SymbolInfo::type() {
+const TypeNode& SemanticInfo::type() {
     if (_type == nullptr) {
         throw std::runtime_error("SymbolInfo has no TypeNode");
     }

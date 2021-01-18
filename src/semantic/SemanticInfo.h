@@ -9,7 +9,7 @@
 #include "ObjectInfo.h"
 #include "ClassInfo.h"
 
-class SymbolInfo {
+class SemanticInfo {
     const TypeNode* _type;
 public:
     bool is_function;
@@ -18,12 +18,12 @@ public:
     bool is_class_method;
     bool is_error;
 
-    SymbolInfo& operator=(const SymbolInfo& other) {
+    SemanticInfo& operator=(const SemanticInfo& other) {
         this->_type = other._type->clone();
         return *this;
     }
 
-    SymbolInfo(const SymbolInfo& other) {
+    SemanticInfo(const SemanticInfo& other) {
         this->is_error = other.is_error;
         this->is_function = other.is_function;
         this->is_method = other.is_method;
@@ -37,20 +37,20 @@ public:
         this->is_error = is_error;
     }
 
-    ~SymbolInfo() {
+    ~SemanticInfo() {
         if (this->_type != nullptr) {
             delete this->_type;
         }
     }
 
-    SymbolInfo();
+    SemanticInfo();
 
     void set_type(const TypeNode& typ);
 
     const TypeNode& type();
 };
 
-class ErrorStub : public SymbolInfo {
+class ErrorStub : public SemanticInfo {
 public:
     ErrorStub();
 };

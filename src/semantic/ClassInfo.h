@@ -9,21 +9,22 @@
 #include <unordered_map>
 #include "ObjectInfo.h"
 #include "FunctionInfo.h"
+#include "../macros.h"
 
 class ClassInfo {
 public:
-    std::vector<std::string> member_names;
+    VectorOfStrings member_names;
     VectorOfTypes member_types;
 
-    std::unordered_map<std::string, TypeNode*> members;
-    std::unordered_map<std::string, FunctionTypeNode*> methods;
+    MapStringType members;
+    std::unordered_map<std::string, FunctionType*> methods;
 
     std::string class_name;
 
     ClassInfo() {}
 
-    ClassInfo(std::string class_name, const std::vector<std::string>& fieldNames,
-              const VectorOfTypes& fieldTypes, std::vector<std::string> type_parameters);
+    ClassInfo(std::string class_name, const VectorOfStrings& fieldNames,
+              const VectorOfTypes& fieldTypes, VectorOfStrings type_parameters);
 
     ~ClassInfo() {
         for (auto m: this->members) {
@@ -41,7 +42,7 @@ public:
 
     bool operator==(const ClassInfo& b) const;
 
-    std::vector<std::string> type_parameters;
+    VectorOfStrings type_params;
 };
 
 #endif //CLASSINFO_H

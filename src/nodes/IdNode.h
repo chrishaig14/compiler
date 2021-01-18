@@ -15,7 +15,7 @@
 class IdNode : public Node {
 public:
     VariableLocation location;
-    std::string identifier;
+    std::string _id;
     bool is_global_function;
 
     IdNode(std::string identifier);

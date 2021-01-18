@@ -17,9 +17,9 @@ enum class Kind {
     OBJECT, FUNCTION, UNKNOWN
 };
 
-class ObjectTypeNode;
+class ObjectType;
 
-class FunctionTypeNode;
+class FunctionType;
 
 class UnknownTypeNode;
 
@@ -33,13 +33,13 @@ public:
 
     virtual TypeNode* clone() const = 0;
 
-    virtual ObjectTypeNode& object();
+    virtual ObjectType& object();
 
-    virtual FunctionTypeNode& function();
+    virtual FunctionType& function();
 
-    virtual const FunctionTypeNode& function() const;
+    virtual const FunctionType& function() const;
 
-    virtual const ObjectTypeNode& object() const;
+    virtual const ObjectType& object() const;
 
     bool operator==(const TypeNode& other) const;
 
@@ -49,11 +49,11 @@ public:
 
 };
 
-class ObjectTypeNode : public TypeNode {
+class ObjectType : public TypeNode {
 public:
-    ObjectTypeNode(const std::string
+    ObjectType(const std::string
                    & identifier,
-                   const VectorOfTypes& typeParameters
+               const VectorOfTypes& typeParameters
     );
 
     bool equal(const TypeNode& other) const override;
@@ -62,14 +62,14 @@ public:
 
     TypeNode* clone() const override;
 
-    ObjectTypeNode& object() override;
+    ObjectType& object() override;
 
-    const ObjectTypeNode& object() const override;
+    const ObjectType& object() const override;
 
-    ~ObjectTypeNode();
+    ~ObjectType();
 
-    std::string identifier;
-    VectorOfTypes type_parameters;
+    std::string id;
+    VectorOfTypes type_params;
 };
 
 class UnknownTypeNode : public TypeNode {
@@ -91,23 +91,23 @@ public:
     }
 };
 
-class FunctionTypeNode : public TypeNode {
+class FunctionType : public TypeNode {
 public:
-    FunctionTypeNode(const VectorOfTypes& parameterTypes, TypeNode* returnType);
+    FunctionType(const VectorOfTypes& parameterTypes, TypeNode* returnType);
 
     bool equal(const TypeNode& other) const override;
 
     std::string to_string() const override;
 
-    FunctionTypeNode* clone() const override;
+    FunctionType* clone() const override;
 
-    FunctionTypeNode& function() override;
+    FunctionType& function() override;
 
-    ~FunctionTypeNode();
+    ~FunctionType();
 
-    const FunctionTypeNode& function() const override;
+    const FunctionType& function() const override;
 
-    VectorOfTypes parameter_types;
+    VectorOfTypes param_types;
     TypeNode* return_type;
 };
 

@@ -5,7 +5,7 @@
 #include "ClassLiteralExpressionNode.h"
 
 
-ClassLiteralExpressionNode::ClassLiteralExpressionNode(ObjectTypeNode* type, const VectorOfNodes& init)
+ClassLiteralExpressionNode::ClassLiteralExpressionNode(ObjectType* type, const VectorOfNodes& init)
         : type(type), init(init) {
     this->ntype = CLSEXP;
 }

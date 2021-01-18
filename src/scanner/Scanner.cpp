@@ -160,12 +160,14 @@ Token Scanner::next_token() {
         }
         int end = this->current;
         this->current++;
+        this->column++;
         if (this->current < this->text.size()) {
             this->column++;
         }
         Token token(TokType::STRING, str, {start_l, start_c});
         // token.start = start;
         token.end = end;
+        token.end_pos = {this->line, this->column};
         return token;
     }
     return this->scan_other();
@@ -296,7 +298,7 @@ Token Scanner::scan_number() {
     }
     int end = this->current - 1;
     Token token = Token(TokType::NUM, std::stoi(str), {start_l, start_c});
-    token.end = end;
+    token.end_pos = {this->line, this->column-1};
     return token;
 }
 

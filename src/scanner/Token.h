@@ -74,6 +74,7 @@ public:
     int num;
     float flot;
     TextPosition start;
+    TextPosition end_pos;
     int end;
 
     Token();

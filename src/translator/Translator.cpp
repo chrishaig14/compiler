@@ -16,7 +16,7 @@ void Translator::visit(AssignmentNode& node) {
     out.insert(out.end(), r_code.begin(), r_code.end());
 
     this->is_lvalue = true;
-    if (node.lvalue->ntype == NodeType::ID && node.lvalue->id().identifier == "_") {
+    if (node.lvalue->ntype == NodeType::ID && node.lvalue->id()._id == "_") {
         out.push_back(LC("", I_POP));
     } else {
 //        node.lvalue->accept(*this)
@@ -74,7 +74,7 @@ void Translator::visit(CallNode& node) {
         CodeLabel arg_code = this->code;
         out.insert(out.end(), arg_code.begin(), arg_code.end());
     }
-    out.push_back(LC("", new GetInst(node.function->id().identifier, node.function->id().location)));
+    out.push_back(LC("", new GetInst(node.function->id()._id, node.function->id().location)));
     out.push_back(LC("", I_CALL));
     this->code = out;
 }
@@ -116,9 +116,9 @@ void Translator::visit(IdNode& node) {
     CodeLabel out;
     if (this->is_lvalue) {
         this->is_lvalue = false;
-        out.push_back(LC("", new SetInst(node.identifier, node.location)));
+        out.push_back(LC("", new SetInst(node._id, node.location)));
     } else {
-        out.push_back(LC("", new GetInst(node.identifier, node.location)));
+        out.push_back(LC("", new GetInst(node._id, node.location)));
     }
     this->code = out;
 }
@@ -274,7 +274,7 @@ Translator::Translator() : is_lvalue(false) {
 
 void Translator::visit(ClassLiteralExpressionNode& node) {
     CodeLabel all;
-    std::vector<std::string> fields;
+    VectorOfStrings fields;
     for (int i = 0; i < node.init.size(); i++) {
         Node* exp = node.init[i];
         std::string name = node.names[i];
@@ -285,13 +285,13 @@ void Translator::visit(ClassLiteralExpressionNode& node) {
         CodeLabel out = this->code;
         all.insert(all.end(), out.begin(), out.end());
     }
-    all.push_back(LC("", new MakeObjectInst(node.type->identifier, fields)));
+    all.push_back(LC("", new MakeObjectInst(node.type->id, fields)));
     this->code = all;
 }
 
 void Translator::visit(ClassLiteralFieldNode& node) {
     CodeLabel all;
-    std::vector<std::string> fields;
+    VectorOfStrings fields;
     for (int i = 0; node.init_names.size(); i++) {
         this->code = {};
 //        f.second->accept(*this)
@@ -300,7 +300,7 @@ void Translator::visit(ClassLiteralFieldNode& node) {
         CodeLabel out = this->code;
         all.insert(all.end(), out.begin(), out.end());
     }
-    all.push_back(LC("", new MakeObjectInst(node.type->identifier, fields)));
+    all.push_back(LC("", new MakeObjectInst(node.type->id, fields)));
     this->code = all;
 }
 
@@ -461,7 +461,7 @@ void Translator::visit(EmptyListNode& node) {
 
 void Translator::visit(ClassNode& node) {
     CodeLabel out;
-    std::vector<std::string> f;
+    VectorOfStrings f;
     for (auto field: node.members) {
         f.push_back(field.first);
     }
@@ -473,7 +473,7 @@ void Translator::visit(ClassNode& node) {
         method_node.parameter_names.insert(method_node.parameter_names.begin(), "this");
         method_node.parameter_types.insert(
                 method_node.parameter_types.begin(),
-                new ObjectTypeNode("dummy", {}));
+                new ObjectType("dummy", {}));
 //        method.second->accept(*this)
         this->visit(*method.second);
         auto method_code = this->code;

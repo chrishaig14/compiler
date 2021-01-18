@@ -4,124 +4,124 @@
 
 #include "TypeNode.h"
 
-FunctionTypeNode::FunctionTypeNode(const VectorOfTypes& parameterTypes,
-                                   TypeNode* returnType) {
+FunctionType::FunctionType(const VectorOfTypes& parameterTypes,
+                           TypeNode* returnType) {
 
     for (auto p: parameterTypes) {
         assert(p != nullptr);
     }
     assert(returnType != nullptr);
-    this->parameter_types = parameterTypes;
+    this->param_types = parameterTypes;
     this->return_type = returnType;
     this->kind = Kind::FUNCTION;
 }
 
-FunctionTypeNode* FunctionTypeNode::clone() const {
+FunctionType* FunctionType::clone() const {
     VectorOfTypes aux;
-    for (auto p: this->parameter_types) {
+    for (auto p: this->param_types) {
         aux.emplace_back(p->clone());
     }
-    return new FunctionTypeNode(aux, this->return_type->clone());
+    return new FunctionType(aux, this->return_type->clone());
 }
 
-FunctionTypeNode::~FunctionTypeNode() {
+FunctionType::~FunctionType() {
     delete this->return_type;
-    for (auto p: this->parameter_types) {
+    for (auto p: this->param_types) {
         delete p;
     }
 }
 
-std::string FunctionTypeNode::to_string() const {
+std::string FunctionType::to_string() const {
     auto& ftype = *this;
     std::string parameters;
     std::string ret;
-    for (auto ptr: ftype.parameter_types) {
+    for (auto ptr: ftype.param_types) {
         auto& p = *ptr;
         parameters += p.to_string() + ", ";
     }
-    if (ftype.parameter_types.size() != 0) {
+    if (ftype.param_types.size() != 0) {
         parameters = parameters.substr(0, parameters.size() - 2);
     }
     ret = ftype.return_type->to_string();
-    return "fun (" + parameters + ")" + (*ftype.return_type == ObjectTypeNode(".None", {}) ? "" : (" -> " + ret));
+    return "fun (" + parameters + ")" + (*ftype.return_type == ObjectType(".None", {}) ? "" : (" -> " + ret));
 }
 
-bool FunctionTypeNode::equal(const TypeNode& other) const {
+bool FunctionType::equal(const TypeNode& other) const {
     auto& a = *this;
     auto& b = other.function();
-    if (a.parameter_types.size() != b.parameter_types.size()) {
+    if (a.param_types.size() != b.param_types.size()) {
         return false;
     }
-    for (int i = 0; i < a.parameter_types.size(); i++) {
-        if (*a.parameter_types[i] != *b.parameter_types[i]) {
+    for (int i = 0; i < a.param_types.size(); i++) {
+        if (*a.param_types[i] != *b.param_types[i]) {
             return false;
         }
     }
     return *a.return_type == *b.return_type;
 }
 
-FunctionTypeNode& FunctionTypeNode::function() { return *this; }
+FunctionType& FunctionType::function() { return *this; }
 
-const FunctionTypeNode& FunctionTypeNode::function() const { return *this; }
+const FunctionType& FunctionType::function() const { return *this; }
 
-ObjectTypeNode::ObjectTypeNode(const std::string& identifier,
-                               const VectorOfTypes& typeParameters) : identifier(
+ObjectType::ObjectType(const std::string& identifier,
+                       const VectorOfTypes& typeParameters) : id(
         identifier
-), type_parameters(typeParameters) {
+), type_params(typeParameters) {
     for (auto p: typeParameters) {
         assert(p != nullptr);
     }
     this->kind = Kind::OBJECT;
 }
 
-TypeNode* ObjectTypeNode::clone() const {
+TypeNode* ObjectType::clone() const {
     VectorOfTypes aux;
-    for (auto p: this->type_parameters) {
+    for (auto p: this->type_params) {
         aux.emplace_back(p->clone());
     }
-    return new ObjectTypeNode(this->identifier, aux);
+    return new ObjectType(this->id, aux);
 }
 
-ObjectTypeNode::~ObjectTypeNode() {
-    for (auto p: this->type_parameters) {
+ObjectType::~ObjectType() {
+    for (auto p: this->type_params) {
         delete p;
     }
 }
 
-std::string ObjectTypeNode::to_string() const {
+std::string ObjectType::to_string() const {
     auto& otype = *this;
     std::string parameters;
-    for (auto ptr: otype.type_parameters) {
+    for (auto ptr: otype.type_params) {
         auto& p = *ptr;
         parameters += p.to_string() + ", ";
     }
     if (parameters.size() != 0) {
         parameters = parameters.substr(0, parameters.size() - 2);
-        return otype.identifier + "[" + parameters + "]";
+        return otype.id + "[" + parameters + "]";
     }
-    return otype.identifier;
+    return otype.id;
 }
 
-bool ObjectTypeNode::equal(const TypeNode& other) const {
+bool ObjectType::equal(const TypeNode& other) const {
     auto& a = *this;
     auto& b = other.object();
-    if (a.identifier != b.identifier) {
+    if (a.id != b.id) {
         return false;
     }
-    if (a.type_parameters.size() != b.type_parameters.size()) {
+    if (a.type_params.size() != b.type_params.size()) {
         return false;
     }
-    for (int i = 0; i < a.type_parameters.size(); i++) {
-        if (*a.type_parameters[i] != *b.type_parameters[i]) {
+    for (int i = 0; i < a.type_params.size(); i++) {
+        if (*a.type_params[i] != *b.type_params[i]) {
             return false;
         }
     }
     return true;
 }
 
-const ObjectTypeNode& ObjectTypeNode::object() const { return *this; }
+const ObjectType& ObjectType::object() const { return *this; }
 
-ObjectTypeNode& ObjectTypeNode::object() { return *this; }
+ObjectType& ObjectType::object() { return *this; }
 
 bool TypeNode::operator!=(const TypeNode& other) const {
     return !(*this == other);
@@ -134,10 +134,10 @@ bool TypeNode::operator==(const TypeNode& other) const {
     return this->equal(other);
 }
 
-ObjectTypeNode& TypeNode::object() { throw std::runtime_error("Getting wrong type!"); }
+ObjectType& TypeNode::object() { throw std::runtime_error("Getting wrong type!"); }
 
-FunctionTypeNode& TypeNode::function() { throw std::runtime_error("Getting wrong type!"); }
+FunctionType& TypeNode::function() { throw std::runtime_error("Getting wrong type!"); }
 
-const FunctionTypeNode& TypeNode::function() const { throw std::runtime_error("Getting wrong type!"); }
+const FunctionType& TypeNode::function() const { throw std::runtime_error("Getting wrong type!"); }
 
-const ObjectTypeNode& TypeNode::object() const { throw std::runtime_error("Getting wrong type!"); }
+const ObjectType& TypeNode::object() const { throw std::runtime_error("Getting wrong type!"); }

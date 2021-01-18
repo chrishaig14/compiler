@@ -102,7 +102,7 @@ TEST(translator_test, test_class_literal_fields) {
     Node* node = new ClassLiteralFieldNode(OBJECT_TYPE("Foo", {}), {{"foo", BIN(OpType::MUL, NUM(7), ID("a"))},
                                                                     {"bar", NUM(65)}});
     translator.dispatch(node);
-    std::vector<std::string> fields = {"foo", "bar"};
+    VectorOfStrings fields = {"foo", "bar"};
     CodeLabel expected_code = {NL(I_PUSHI(7)), NL(I_GET("a")), NL(I_BIN(OpType::MUL)), NL(I_PUSHI(65)),
                                NL(I_MAKE_OBJECT("Foo", fields))};
     EXPECT_EQ(translator.code, expected_code)
@@ -304,7 +304,7 @@ TEST(translator_test, test_nested_while) {
 
 TEST(translator_test, function) {
     Translator translator;
-    std::vector<std::string> parameter_names = {"x", "y"};
+    VectorOfStrings parameter_names = {"x", "y"};
     VectorOfNodes parameter_types = {T_INT, T_INT};
     BlockNode* function_code = new BlockNode({RET(BIN(OpType::ADD, ID("x"), ID("y")))});
     Node* node = FUN("foo", parameter_names, parameter_types, T_INT, function_code);

@@ -13,11 +13,11 @@
 #include "../nodes/ClassNode.h"
 
 class FunctionTable {
-    std::unordered_map<std::string, FunctionTypeNode*> functions;
+    std::unordered_map<std::string, FunctionType*> functions;
 
 public:
 
-    void add(std::string function_name, const FunctionTypeNode& function_type);
+    void add(std::string function_name, const FunctionType& function_type);
 
     bool has_function(std::string name);
 
@@ -27,7 +27,7 @@ public:
         }
     }
 
-    const FunctionTypeNode& get(std::string function_name);
+    const FunctionType& get(std::string function_name);
 
 };
 

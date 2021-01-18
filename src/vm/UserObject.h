@@ -15,7 +15,7 @@ public:
 
     std::unordered_map<std::string, Object*> fields;
 
-    UserObject(std::string type, std::vector<std::string> fields);
+    UserObject(std::string type, VectorOfStrings fields);
 
     std::string type;
 };

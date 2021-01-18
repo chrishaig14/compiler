@@ -18,6 +18,7 @@ public:
     Node* left;
     Node* right;
     OpType op;
+    TextPosition op_pos;
 
     BinopNode& binop() override;
     const BinopNode& binop() const override;

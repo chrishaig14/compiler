@@ -196,9 +196,9 @@ Node* Parser::parse_assignment_or_expression() {
         }
         if (lvalue->ntype == ID) {
             if (op == TokType::PLUS_EQQ) {
-                rvalue = new BinopNode(OpType::ADD, new IdNode(lvalue->id().identifier), rvalue);
+                rvalue = new BinopNode(OpType::ADD, new IdNode(lvalue->id()._id), rvalue);
             } else if (op == TokType::MINUS_EQQ) {
-                rvalue = new BinopNode(OpType::SUB, new IdNode(lvalue->id().identifier), rvalue);
+                rvalue = new BinopNode(OpType::SUB, new IdNode(lvalue->id()._id), rvalue);
             }
         }
         Node* node = new AssignmentNode(lvalue, rvalue);
@@ -267,9 +267,11 @@ Node* Parser::parse_add_or_sub_expression() {
     OpType op;
     while (item_in_vec(this->token.type, {TokType::PLUS, TokType::MINUS})) {
         op = TOKEN_TO_OP[this->token.type];
+        Token op_token = this->token;
         this->next();
         Node* right = this->parse_mul_div_or_mod_expression();
-        Node* node = new BinopNode(op, left, right, left->start);
+        BinopNode* node = new BinopNode(op, left, right, left->start);
+        node->op_pos = op_token.start;
         left = node;
     }
     return left;
@@ -280,9 +282,11 @@ Node* Parser::parse_mul_div_or_mod_expression() {
     OpType op;
     while (item_in_vec(this->token.type, {TokType::TIMES, TokType::DIV, TokType::MOD})) {
         op = TOKEN_TO_OP[this->token.type];
+        Token op_token = this->token;
         this->next();
         Node* right = this->parse_factor();
-        Node* node = new BinopNode(op, left, right, left->start);
+        BinopNode* node = new BinopNode(op, left, right, left->start);
+        node->op_pos = op_token.start;
         left = node;
     }
     return left;
@@ -336,7 +340,9 @@ Node* Parser::parse_partial_application() {
         }
     }
     this->expect_token(TokType::RPAREN);
-    return new PartialApplication(new IdNode(total_function_tok.str), args);
+    auto partial = new PartialApplication(new IdNode(total_function_tok.str), args);
+    partial->start = total_function_tok.start;
+    return partial;
 }
 
 Node* Parser::parse_id_or_literal() {
@@ -359,6 +365,7 @@ Node* Parser::parse_id_or_literal() {
         }
         case TokType::NUM: {
             node = new NumberNode(this->token.num, this->token.start);
+            node->end = this->token.end_pos;
             this->next();
             break;
         }
@@ -369,6 +376,7 @@ Node* Parser::parse_id_or_literal() {
         }
         case TokType::STRING: {
             node = new StringNode(this->token.str, this->token.start);
+            node->end = this->token.end_pos;
             this->next();
             break;
         }
@@ -455,7 +463,7 @@ Node* Parser::parse_class_or_tuple_literal() {
     if (type->kind != Kind::OBJECT) {
         throw std::runtime_error("Expecterd a type to initialize, but got " + type->to_string());
     }
-    ObjectTypeNode* otn = &type->object();
+    ObjectType* otn = &type->object();
     this->expect_token(TokType::LCURLY);
 
     std::unordered_map<std::string, Node*> init;
@@ -493,7 +501,7 @@ Node* Parser::parse_class_or_tuple_literal() {
                 // it's field:exp, field:exp
                 this->expect_token(TokType::COLON);
                 Node* exp = this->parse_expression();
-                init[idn.identifier] = exp;
+                init[idn._id] = exp;
                 if (this->match(TokType::COMMA)) {
                     this->next();
                     while (true) {
@@ -685,7 +693,7 @@ Node* Parser::parse_common_statement() {
     }
 }
 
-FunctionTypeNode* Parser::parse_function_type() {
+FunctionType* Parser::parse_function_type() {
     this->expect_token(TokType::FUN);
     this->expect_token(TokType::LPAREN);
     VectorOfTypes parameter_types;
@@ -703,10 +711,10 @@ FunctionTypeNode* Parser::parse_function_type() {
     this->expect_token(TokType::RPAREN);
     this->expect_token(TokType::RARROW);
     TypeNode* return_type = this->parse_type_node();
-    return new FunctionTypeNode(parameter_types, return_type);
+    return new FunctionType(parameter_types, return_type);
 }
 
-ObjectTypeNode* Parser::parse_object_type() {
+ObjectType* Parser::parse_object_type() {
     if (!this->match(TokType::ID)) {
         std::string msg = E_FMT("Got ");
         msg += E_HLT(this->token.to_string());
@@ -736,7 +744,7 @@ ObjectTypeNode* Parser::parse_object_type() {
         }
         this->next();
     }
-    return new ObjectTypeNode(identifier.str, type_parameters);
+    return new ObjectType(identifier.str, type_parameters);
 }
 
 TypeNode* Parser::parse_type_node() {
@@ -837,7 +845,7 @@ FunctionNode* Parser::parse_function_definition() {
         this->expect_token(TokType::RARROW);
         return_type = this->parse_type_node();
     } else {
-        return_type = new ObjectTypeNode(".None", {});
+        return_type = new ObjectType(".None", {});
     }
     // Parse function body
     BlockNode* body = this->parse_possibly_empty_block();
@@ -935,7 +943,7 @@ WhileNode* Parser::parse_while_loop() {
 ClassNode* Parser::parse_class_definition() {
     Token class_tok = this->expect_token(TokType::CLASS);
     Token class_name_tk = this->expect_token(TokType::ID);
-    std::vector<std::string> type_parameters;
+    VectorOfStrings type_parameters;
     if (this->match(TokType::LSQUARE)) {
         this->next();
 
@@ -950,8 +958,8 @@ ClassNode* Parser::parse_class_definition() {
     }
     this->expect_token(TokType::LCURLY);
     std::unordered_map<std::string, FunctionNode*> methods;
-    std::unordered_map<std::string, TypeNode*> members;
-    std::vector<std::string> members_ordered;
+    MapStringType members;
+    VectorOfStrings members_ordered;
     while (true) {
         if (this->match(TokType::ID)) {
             Token member_name_tk = this->expect_token(TokType::ID);
@@ -993,7 +1001,7 @@ ImportNode* Parser::parse_import() {
     this->expect_token(TokType::FROM);
     Token module_tok = this->expect_token(TokType::ID);
     this->expect_token(TokType::IMPORT);
-    std::vector<std::string> imports;
+    VectorOfStrings imports;
     while (true) {
         Token import_tok = this->expect_token(TokType::ID);
         imports.push_back(import_tok.str);

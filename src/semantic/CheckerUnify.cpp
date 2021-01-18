@@ -1,35 +1,33 @@
 //
-// Created by chris on 16/12/20.
+// Created by chris on 17/1/21.
 //
 
-#include "unify.h"
-#include "../logging/logging.h"
-
+#include "Checker.h"
 
 std::pair<std::string, TypeNode*>*
-get_first_substitution_object(ObjectTypeNode& a, ObjectTypeNode& b, bool is_top_level_arg) {
-    if (is_variable(a) && is_variable(b) && a.object().identifier == b.object().identifier) {
+Checker::get_first_substitution_object(ObjectType& a, ObjectType& b, bool is_top_level_arg) {
+    if (is_variable(a) && is_variable(b) && a.object().id == b.object().id) {
         return nullptr;
     }
     if (is_variable(a)) {
-        return new std::pair<std::string, TypeNode*>(a.object().identifier, b.clone());
+        return new std::pair<std::string, TypeNode*>(a.object().id, b.clone());
     }
     if (is_variable(b)) {
         if (is_top_level_arg) {
             throw std::runtime_error("trying to replace var with concrete type at top level!");
         }
-        return new std::pair<std::string, TypeNode*>(b.object().identifier, a.clone());
+        return new std::pair<std::string, TypeNode*>(b.object().id, a.clone());
     }
-    if (a.identifier != b.identifier) {
+    if (a.id != b.id) {
         throw std::runtime_error("Error trying to unify object types " + a.to_string() + " and " + b.to_string());
     }
-    if (a.type_parameters.size() != b.type_parameters.size()) {
+    if (a.type_params.size() != b.type_params.size()) {
         throw std::runtime_error("Error trying to unify object types " + a.to_string() + " and " + b.to_string());
     }
-    for (int i = 0; i < a.type_parameters.size(); i++) {
+    for (int i = 0; i < a.type_params.size(); i++) {
         std::pair<std::string, TypeNode*>* u = get_first_substitution(
-                *a.type_parameters[i],
-                *b.type_parameters[i],
+                *a.type_params[i],
+                *b.type_params[i],
                 is_top_level_arg
         );
         if (u != nullptr) {
@@ -39,39 +37,38 @@ get_first_substitution_object(ObjectTypeNode& a, ObjectTypeNode& b, bool is_top_
     return nullptr;
 }
 
-TypeNode* substitute(TypeNode* t, std::string var, TypeNode* replacement) {
+TypeNode* Checker::substitute(TypeNode* t, std::string var, TypeNode* replacement) {
     if (t->kind == Kind::OBJECT) {
-        if (is_variable(t->object()) && t->object().identifier == var) {
+        if (is_variable(t->object()) && t->object().id == var) {
             return replacement;
         } else {
             TypeNode* c = t->clone();
-            for (int i = 0; i < t->object().type_parameters.size(); i++) {
-                c->object().type_parameters[i] = substitute(t->object().type_parameters[i], var, replacement);
+            for (int i = 0; i < t->object().type_params.size(); i++) {
+                c->object().type_params[i] = substitute(t->object().type_params[i], var, replacement);
             }
             return c;
         }
     } else {
         TypeNode* c = t->clone();
-        for (int i = 0; i < t->function().parameter_types.size(); i++) {
-            c->function().parameter_types[i] = substitute(t->function().parameter_types[i], var, replacement);
+        for (int i = 0; i < t->function().param_types.size(); i++) {
+            c->function().param_types[i] = substitute(t->function().param_types[i], var, replacement);
         }
         c->function().return_type = substitute(c->function().return_type, var, replacement);
         return c;
     }
 }
 
-
 std::pair<std::string, TypeNode*>*
-get_first_substitution_function(FunctionTypeNode& a, FunctionTypeNode& b, bool is_top_level_arg) {
-    if (a.parameter_types.size() != b.parameter_types.size()) {
+Checker::get_first_substitution_function(FunctionType& a, FunctionType& b, bool is_top_level_arg) {
+    if (a.param_types.size() != b.param_types.size()) {
         throw std::runtime_error(
                 "Error: trying to unify two functions with different parameter count: " + a.to_string() + " and " +
                 b.to_string());
     }
-    for (int i = 0; i < a.parameter_types.size(); i++) {
+    for (int i = 0; i < a.param_types.size(); i++) {
         std::pair<std::string, TypeNode*>* u = get_first_substitution(
-                *a.parameter_types[i],
-                *b.parameter_types[i],
+                *a.param_types[i],
+                *b.param_types[i],
                 false
         );
         if (u != nullptr) {
@@ -85,20 +82,15 @@ get_first_substitution_function(FunctionTypeNode& a, FunctionTypeNode& b, bool i
     return nullptr;
 }
 
-std::string error_generic_call_mismatch(const TypeNode& expected, const TypeNode& actual, int i) {
-    std::string msg =
-            E_FMT("Error matching argument number " + std::to_string(i) + " expected ") + E_HLT(expected.to_string()) +
-            E_FMT(" got ") + E_HLT(actual.to_string());
-    return msg;
-}
-
-void unify_function_call(FunctionTypeNode& fun, VectorOfTypes& args) {
-    if (args.size() != fun.parameter_types.size()) {
-        throw std::runtime_error("Function call with wrong number of arguments!");
+void Checker::unify_function_call(FunctionType& fun, VectorOfTypes& args) {
+    if (args.size() != fun.param_types.size()) {
+        this->error_call_bad_num_args();
+        this->failed = true;
+        return;
     }
 
     for (int i = 0; i < args.size(); i++) {
-        auto param = fun.parameter_types[i];
+        auto param = fun.param_types[i];
         auto arg = args[i];
         try {
             std::pair<std::string, TypeNode*>* substitution = get_first_substitution(*param, *arg, true);
@@ -107,8 +99,8 @@ void unify_function_call(FunctionTypeNode& fun, VectorOfTypes& args) {
                     // if (j == i) {
                     //     continue;
                     // }
-                    fun.parameter_types[j] = substitute(
-                            fun.parameter_types[j],
+                    fun.param_types[j] = substitute(
+                            fun.param_types[j],
                             substitution->first,
                             substitution->second
                     );
@@ -116,18 +108,18 @@ void unify_function_call(FunctionTypeNode& fun, VectorOfTypes& args) {
                 }
                 fun.return_type = substitute(fun.return_type, substitution->first, substitution->second);
                 std::cout << "Simple substitution: " << fun.to_string() << std::endl;
-                param = fun.parameter_types[i];
+                param = fun.param_types[i];
                 arg = args[i];
                 substitution = get_first_substitution(*param, *arg, true);
             }
         } catch (...) {
-            std::cout << error_generic_call_mismatch(*param, *arg, i);
-            exit(1);
+            error_generic_call_mismatch(*param, *arg, i);
+            this->failed = true;
         }
     }
 }
 
-std::pair<std::string, TypeNode*>* get_first_substitution(TypeNode& a, TypeNode& b, bool is_top_level_arg) {
+std::pair<std::string, TypeNode*>* Checker::get_first_substitution(TypeNode& a, TypeNode& b, bool is_top_level_arg) {
     if (a.kind != b.kind) {
         throw std::runtime_error(
                 "Error trying to unify types of different kind" + a.to_string() + " and " + b.to_string());
@@ -138,8 +130,3 @@ std::pair<std::string, TypeNode*>* get_first_substitution(TypeNode& a, TypeNode&
         return get_first_substitution_object(a.object(), b.object(), is_top_level_arg);
     }
 }
-
-bool is_variable(const ObjectTypeNode& a) {
-    return a.type_parameters.size() == 0 && islower(a.identifier[0]);
-}
-

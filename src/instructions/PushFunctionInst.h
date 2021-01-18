@@ -14,11 +14,11 @@
 
 class PushFunctionInst : public Instruction {
 public:
-    PushFunctionInst(const std::vector<std::string>& parameterNames, const Code& body);
+    PushFunctionInst(const VectorOfStrings& parameterNames, const Code& body);
 
     Code body;
-    std::vector<std::string> free_variables;
-    std::vector<std::string> parameter_names;
+    VectorOfStrings free_variables;
+    VectorOfStrings parameter_names;
 public:
 
     bool equal(const Instruction* inst) const {

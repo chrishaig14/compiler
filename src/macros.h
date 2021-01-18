@@ -22,13 +22,13 @@
 #define DECL(id, type, exp) new DeclarationNode(id, type, exp)
 #define LIT_EXP(id, type) new ClassLiteralExpressionNode(id, type)
 #define LIT_FIL(id, type) new ClassLiteralFieldNode(id, type)
-#define TYPE(parent, type_parameters) new ObjectTypeNode(parent, type_parameters)
+#define TYPE(parent, type_parameters) new ObjectType(parent, type_parameters)
 #define BOOL(x) new BooleanNode(x)
 
 #define T_DICT(k, v) TYPE("Dict", VectorOfTypes({k,v}))
 #define FUN(a, b, c, d, e) new FunctionNode(a,b,c,d,e)
 #define WHILE(condition, body) new WhileNode(condition, body)
-#define FUNCTION_TYPE(parameters, return_type) new FunctionTypeNode(parameters, return_type)
+#define FUNCTION_TYPE(parameters, return_type) new FunctionType(parameters, return_type)
 #define RET(x) new ReturnNode(x)
 #define I_ENTER(x) new EnterScope(x)
 #define I_LEAVE(x) new LeaveScope(x)
@@ -71,11 +71,12 @@
 
 // Builtin primitive types
 
-#define T_BOOL  ObjectTypeNode("Boolean", {})
-#define T_INT  ObjectTypeNode("Integer", {})
-#define T_STRING  ObjectTypeNode("String", {})
-#define T_LIST(e) ObjectTypeNode("List", {e})
-#define T_FLOAT ObjectTypeNode("Float", {})
+#define T_BOOL  ObjectType("Boolean", {})
+#define T_INT  ObjectType("Integer", {})
+#define T_STRING  ObjectType("String", {})
+#define T_LIST(e) ObjectType("List", {e})
+#define T_FLOAT ObjectType("Float", {})
 
+typedef std::unordered_map<std::string, TypeNode*> MapStringType;
 
 #endif //UNTITLED1_MACROS_H

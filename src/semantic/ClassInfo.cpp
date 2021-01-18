@@ -4,8 +4,8 @@
 
 #include "ClassInfo.h"
 
-ClassInfo::ClassInfo(std::string class_name, const std::vector<std::string>& fieldNames,
-                     const VectorOfTypes& fieldTypes, std::vector<std::string> type_parameters) : member_names(
+ClassInfo::ClassInfo(std::string class_name, const VectorOfStrings& fieldNames,
+                     const VectorOfTypes& fieldTypes, VectorOfStrings type_parameters) : member_names(
         fieldNames), member_types(fieldTypes) {
     this->class_name = class_name;
     for (int i = 0; i < fieldNames.size(); i++) {
@@ -14,7 +14,7 @@ ClassInfo::ClassInfo(std::string class_name, const std::vector<std::string>& fie
     for (int i = 0; i < fieldNames.size(); i++) {
         this->members[fieldNames[i]] = fieldTypes[i];
     }
-    this->type_parameters = type_parameters;
+    this->type_params = type_parameters;
 }
 
 bool ClassInfo::operator!=(const ClassInfo& b) const {

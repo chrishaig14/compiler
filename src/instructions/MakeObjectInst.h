@@ -9,10 +9,11 @@
 #include <string>
 #include <vector>
 #include "Instruction.h"
+#include "../types.h"
 
 class MakeObjectInst : public Instruction {
 public:
-    MakeObjectInst(std::string type, std::vector<std::string> fields) {
+    MakeObjectInst(std::string type, VectorOfStrings fields) {
         this->type = type;
         this->fields = fields;
     }
@@ -32,7 +33,7 @@ public:
     }
 
     std::string type;
-    std::vector<std::string> fields;
+    VectorOfStrings fields;
 };
 
 
