@@ -111,8 +111,6 @@ add_library(
         semantic/ReturnError.h
         semantic/ScopeError.cpp
         semantic/ScopeError.h
-        vm/ObjectStack.h
-        vm/ObjectStack.cpp
         vm/Object.h
         vm/Object.cpp
         vm/CodeObject.cpp
