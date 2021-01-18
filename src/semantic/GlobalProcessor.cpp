@@ -5,12 +5,8 @@
 #include <iostream>
 #include "GlobalProcessor.h"
 #include "ClassInfo.h"
-#include "../vm/Object.h"
 #include "../vm/ObjectStack.h"
-#include "../vm/CodeObject.h"
 #include "../vm/CodeRunner.h"
-#include "../macros.h"
-#include "../nodes/FunctionNode.h"
 #include "../logging/logging.h"
 
 void GlobalProcessor::add_builtins(std::vector<Builtin>& builtins) {
