@@ -152,12 +152,8 @@ add_library(
         vm/CodeUser.h
         vm/IntegerObject.cpp
         vm/IntegerObject.h
-        vm/StringObject.cpp
-        vm/StringObject.h
         vm/Environment.h
         vm/Environment.cpp
-        vm/CodeRunner.h
-        vm/CodeRunner.cpp
         vm/UserObject.cpp
         vm/UserObject.h
         instructions/MakeObjectInst.cpp
