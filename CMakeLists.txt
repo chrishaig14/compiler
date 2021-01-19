@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(untitled1)
+project(xlang)
 
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
@@ -7,7 +7,7 @@ add_subdirectory(src)
 add_subdirectory(test)
 find_package(fmt)
 add_executable(compiler src/full.cpp)
-
+add_subdirectory(example/output)
 target_link_libraries(
   compiler
   parser
