@@ -103,3 +103,13 @@ Parser::error_after_expression(const std::vector<TokType>& expected_extra, Token
     msg += E_HLT(tok.to_string());
     return msg;
 }
+
+std::string Parser::error_empty_tuple(TextPosition pos) {
+    std::string msg = text_pos_to_string(this->__file__, pos) + E_FMT(" Error: can't have an empty tuple");
+    return msg;
+}
+
+std::string Parser::error_tuple_one_element(TextPosition pos) {
+    std::string msg = text_pos_to_string(this->__file__, pos) + E_FMT(" Error: can't have tuple with only one element");
+    return msg;
+}

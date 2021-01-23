@@ -94,8 +94,8 @@ public:
     bool inside_loop;
     Node* parse_partial_application();
     VectorOfNodes parse_list_of_arguments();
-    std::string empty_tuple_error(TextPosition pos);
-    std::string tuple_one_element_error(TextPosition pos);
+    std::string error_empty_tuple(TextPosition pos);
+    std::string error_tuple_one_element(TextPosition pos);
 
     std::string code_context_string(TextPosition position);
     std::string code_error_string(TextPosition start, TextPosition end);

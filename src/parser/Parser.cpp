@@ -391,16 +391,6 @@ Node* Parser::parse_id_or_literal() {
     return node;
 }
 
-std::string Parser::empty_tuple_error(TextPosition pos) {
-    std::string msg = text_pos_to_string(this->__file__, pos) + E_FMT(" Error: can't have an empty tuple");
-    return msg;
-}
-
-std::string Parser::tuple_one_element_error(TextPosition pos) {
-    std::string msg = text_pos_to_string(this->__file__, pos) + E_FMT(" Error: can't have tuple with only one element");
-    return msg;
-}
-
 Node* Parser::parse_class_or_tuple_literal() {
     Token hash_tok = this->expect_token(TokType::HASH);
 
@@ -409,7 +399,7 @@ Node* Parser::parse_class_or_tuple_literal() {
         this->next();
         VectorOfNodes values;
         if (this->match(TokType::RPAREN)) {
-            std::cout << empty_tuple_error(hash_tok.start);
+            std::cout << error_empty_tuple(hash_tok.start);
             exit(1);
         }
         bool first = true;
@@ -422,7 +412,7 @@ Node* Parser::parse_class_or_tuple_literal() {
                 continue;
             } else {
                 if (first && this->match(TokType::RPAREN)) {
-                    std::cout << tuple_one_element_error(hash_tok.start);
+                    std::cout << error_tuple_one_element(hash_tok.start);
                     exit(1);
                 }
                 break;
