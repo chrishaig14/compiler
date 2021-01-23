@@ -618,7 +618,7 @@ void Parser::error_after_var_type(Token tok) {
     std::cout << msg << std::endl;
 }
 
-void Parser::error_break_out_of_loop(Token tok) {
+void Parser::error_out_of_loop(Token tok) {
     std::string msg;
     msg += this->context_string(tok.start);
     msg += E_FMT("Got ");
@@ -676,23 +676,18 @@ Node* Parser::parse_common_statement() {
         }
         case TokType::BREAK: {
             if (!this->inside_loop) {
-                this->error_break_out_of_loop(this->token);
+                this->error_out_of_loop(this->token);
                 exit(1);
             }
             this->next();
             return new BreakNode();
         }
         case TokType::CONTINUE: {
-            Token token = this->token;
-            this->next();
-            std::cout << "RETURNIONG A CONTINUE NODE" << std::endl;
             if (!this->inside_loop) {
-                std::string msg;
-                msg = E_FMT("Error: ") + E_HLT("continue") + E_FMT(" used outside loop") + E_FMT(" at ") +
-                      E_HLT(text_pos_to_string(this->__file__, token.start));
-                std::cout << msg;
+                this->error_out_of_loop(this->token);
                 exit(1);
             }
+            this->next();
             return new ContinueNode();
         }
         default: {
