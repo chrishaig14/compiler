@@ -107,6 +107,7 @@ public:
     void after_var_error(Token tok);
     void error_after_var_name(Token tok);
     void error_after_var_type(Token tok);
+    void error_break_out_of_loop(Token tok);
 };
 
 

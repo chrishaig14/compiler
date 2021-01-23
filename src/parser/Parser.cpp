@@ -618,6 +618,16 @@ void Parser::error_after_var_type(Token tok) {
     std::cout << msg << std::endl;
 }
 
+void Parser::error_break_out_of_loop(Token tok) {
+    std::string msg;
+    msg += this->context_string(tok.start);
+    msg += E_FMT("Got ");
+    msg += E_HLT(tok.to_string());
+    msg += E_FMT(" out of loop ");
+    msg += this->code_context_string(tok.start);
+    std::cout << msg << std::endl;
+}
+
 DeclarationNode* Parser::parse_variable_declaration() {
     Token var_token = this->expect_token(TokType::VAR);
     if (!this->match(TokType::ID)) {
@@ -665,15 +675,11 @@ Node* Parser::parse_common_statement() {
             return this->parse_while_loop();
         }
         case TokType::BREAK: {
-            this->next();
             if (!this->inside_loop) {
-                Token token = this->token;
-                std::string msg;
-                msg = E_FMT("Error: ") + E_HLT("break") + E_FMT(" used outside loop") + E_FMT(" at ") +
-                      E_HLT(text_pos_to_string(this->__file__, token.start));
-                std::cout << msg;
+                this->error_break_out_of_loop(this->token);
                 exit(1);
             }
+            this->next();
             return new BreakNode();
         }
         case TokType::CONTINUE: {
