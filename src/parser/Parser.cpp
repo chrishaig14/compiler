@@ -403,16 +403,8 @@ Node* Parser::parse_id_or_literal() {
 
         }
         default:
-            std::string msg;
-            msg += E_FMT("Error: expected ");
-            msg += E_HLT("expression");
-            msg += E_FMT(" but got ");
-            msg += E_HLT(this->token.to_string());
-            msg += E_FMT(" at ");
-            msg += E_HLT(this->__file__ + ":" + this->token.pos_string());
-            msg += E_FMT("\n");
-            msg += E_LINE(this->code_lines.get_line(this->token.start.line) + "\n");
-            std::cout << msg << std::endl;
+            this->error_expected_expression(this->token);
+
             exit(1);
     }
     return node;
@@ -588,34 +580,54 @@ Node* Parser::parse_call_or_subscript_chain(Node* parent) {
     return node;
 }
 
+void Parser::after_var_error(Token tok) {
+    std::string msg;
+    msg += this->context_string(tok.start);
+    msg += E_FMT("Got ");
+    msg += E_HLT(tok.to_string());
+    msg += E_FMT(" expected ");
+    msg += E_HLT(TOKEN_STRINGS[TokType::ID]);
+    msg += E_FMT(" (new variable name)");
+    msg += this->code_context_string(tok.start);
+    std::cout << msg << std::endl;
+}
+
+void Parser::error_after_var_name(Token tok) {
+    std::string msg;
+    msg += this->context_string(tok.start);
+    msg += E_FMT("Got ");
+    msg += E_HLT(tok.to_string());
+    msg += E_FMT(" expected ");
+    msg += E_HLT(TOKEN_STRINGS[TokType::COLON]);
+    msg += E_FMT(" or ");
+    msg += E_HLT(TOKEN_STRINGS[TokType::EQQ]);
+    msg += E_FMT(" (new variable type/initial value)");
+    msg += this->code_context_string(tok.start);
+    std::cout << msg << std::endl;
+}
+
+void Parser::error_after_var_type(Token tok) {
+    std::string msg;
+    msg += this->context_string(tok.start);
+    msg += E_FMT("Got ");
+    msg += E_HLT(tok.to_string());
+    msg += E_FMT(" expected ");
+    msg += E_HLT(TOKEN_STRINGS[TokType::ID]);
+    msg += E_FMT(" (new variable initialization)");
+    msg += this->code_context_string(tok.start);
+    std::cout << msg << std::endl;
+}
+
 DeclarationNode* Parser::parse_variable_declaration() {
     Token var_token = this->expect_token(TokType::VAR);
     if (!this->match(TokType::ID)) {
-        std::string msg;
-        msg += E_FMT("Got ");
-        msg += E_HLT(this->token.to_string());
-        msg += E_FMT(" expected ");
-        msg += E_HLT(TOKEN_STRINGS[TokType::ID]);
-        msg += E_FMT(" (new variable name)");
-        msg += E_FMT(" at ");
-        msg += E_HLT(this->__file__ + ":" + this->token.pos_string());
-        std::cout << msg << std::endl;
+        this->after_var_error(this->token);
         exit(1);
     }
     Token identifier = this->expect_token(TokType::ID);
     TypeNode* type = nullptr;
     if (!this->match(TokType::COLON) && !this->match(TokType::EQQ)) {
-        std::string msg;
-        msg += E_FMT("Got ");
-        msg += E_HLT(this->token.to_string());
-        msg += E_FMT(" expected ");
-        msg += E_HLT(TOKEN_STRINGS[TokType::COLON]);
-        msg += E_FMT(" or ");
-        msg += E_HLT(TOKEN_STRINGS[TokType::EQQ]);
-        msg += E_FMT(" (new variable type/initial value)");
-        msg += E_FMT(" at ");
-        msg += E_HLT(this->__file__ + ":" + this->token.pos_string());
-        std::cout << msg << std::endl;
+        this->error_after_var_name(this->token);
         exit(1);
     }
     if (this->match(TokType::COLON)) {
@@ -623,15 +635,7 @@ DeclarationNode* Parser::parse_variable_declaration() {
         type = this->parse_type_node();
     }
     if (!this->match(TokType::EQQ)) {
-        std::string msg;
-        msg += E_FMT("Got ");
-        msg += E_HLT(this->token.to_string());
-        msg += E_FMT(" expected ");
-        msg += E_HLT(TOKEN_STRINGS[TokType::ID]);
-        msg += E_FMT(" (new variable initialization)");
-        msg += E_FMT(" at ");
-        msg += E_HLT(this->__file__ + ":" + this->token.pos_string());
-        std::cout << msg << std::endl;
+        this->error_after_var_type(this->token);
         exit(1);
     }
     this->next();
@@ -1015,5 +1019,43 @@ ImportNode* Parser::parse_import() {
     this->expect_token(TokType::SEMICOLON);
     auto x = new ImportNode(module_tok.str, imports);
     return x;
+}
+
+std::string Parser::code_context_string(TextPosition position) {
+    std::string str = "\n" + this->code_lines.get_line(position.line) + "\n";
+    str += fmt::format(fmt::fg(fmt::color::orange_red), std::string(position.column, ' ') + std::string(1, '^'));
+    return str;
+}
+
+std::string Parser::code_error_string(TextPosition start, TextPosition end) {
+    int length = end.column - start.column + 1;
+    std::string str = "\n" + this->code_lines.get_line(start.line) + "\n";
+    str += fmt::format(fmt::fg(fmt::color::orange_red), std::string(start.column, ' ') + std::string(length, '^'));
+    return str;
+}
+
+std::string Parser::context_string(TextPosition position) {
+    std::string msg = E_HLT(text_pos_to_string(this->__file__, position)) +
+                      E_FMT(": ");
+    return msg;
+}
+
+
+void Parser::error_expected_expression(Token tok) {
+    std::string msg;
+    msg += this->context_string(tok.start);
+    msg += E_FMT("Error: expected ");
+    msg += E_HLT("expression");
+    msg += E_FMT(" but got ");
+    msg += E_HLT(tok.to_string());
+    msg += E_FMT(" at ");
+    msg += E_HLT(this->__file__ + ":" + tok.pos_string());
+    msg += E_FMT("\n");
+    msg += this->code_context_string(tok.start);
+    std::cout << msg << std::endl;
+}
+
+void Parser::after_var_error() {
+
 }
 
