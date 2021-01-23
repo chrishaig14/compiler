@@ -122,3 +122,36 @@ void Parser::error_class_member_redefined(const std::string& cls, const std::str
            E_FMT("\" already defined!") + this->code_context_string(pos);
     std::cout << msg << std::endl;
 }
+
+
+void Parser::error_expected_argument_id(Token tok, int idx, const std::string& id) {
+    std::string msg;
+    msg = this->context_string(tok.start);
+    msg += E_FMT("Error: got ");
+    msg += E_HLT(tok.to_string());
+    msg += E_FMT(" expected ");
+    msg += E_HLT(TOKEN_STRINGS[TokType::ID]);
+    msg += E_FMT(" (argument #" + std::to_string(idx) + " of function ");
+    msg += E_HLT(id);
+    msg += E_FMT(")");
+    msg += this->code_context_string(tok.start);
+    std::cout << msg << std::endl;
+
+}
+
+void Parser::error_expected_argument_type(Token tok, int idx, const std::string& id, const std::string& param_id) {
+    std::string msg;
+    msg = this->context_string(tok.start);
+    msg += E_FMT("Error: got ");
+    msg += E_HLT(tok.to_string());
+    msg += E_FMT(" expected ");
+    msg += E_HLT(TOKEN_STRINGS[TokType::COLON]);
+    msg += E_FMT(" (type of argument ");
+    msg += E_HLT(param_id);
+    msg += E_FMT(" of function ");
+    msg += E_HLT(id);
+    msg += E_FMT(")");
+    msg += this->code_context_string(tok.start);
+    std::cout << msg << std::endl;
+}
+

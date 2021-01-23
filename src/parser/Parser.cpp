@@ -728,30 +728,12 @@ FunctionNode* Parser::parse_function_definition() {
 
         while (true) {
             if (!this->match(TokType::ID)) {
-                std::string msg = E_FMT("Error: got ");
-                msg += E_HLT(this->token.to_string());
-                msg += E_FMT(" expected ");
-                msg += E_HLT(TOKEN_STRINGS[TokType::ID]);
-                msg += E_FMT(" (argument #" + std::to_string(parameter_names.size() + 1) + " of function ");
-                msg += E_HLT(identifier);
-                msg += E_FMT(")");
-                msg += E_FMT(" at ");
-                msg += E_HLT(this->__file__ + ":" + this->token.pos_string());
-                std::cout << msg << std::endl;
+                this->error_expected_argument_id(this->token, parameter_types.size() + 1, identifier);
                 exit(1);
             }
             Token parameter_identifier = this->expect_token(TokType::ID);
             if (!this->match(TokType::COLON)) {
-                std::string msg = E_FMT("Error: got ");
-                msg += E_HLT(this->token.to_string());
-                msg += E_FMT(" expected ");
-                msg += E_HLT(" colon ( : )");
-                msg += E_FMT(" (argument ");
-                msg += E_HLT(parameter_identifier.str);
-                msg += E_FMT(" type)");
-                msg += E_FMT(" at ");
-                msg += E_HLT(this->__file__ + ":" + this->token.pos_string());
-                std::cout << msg << std::endl;
+                this->error_expected_argument_type(this->token, 0, identifier, parameter_identifier.str);
                 exit(1);
             }
             this->next();
