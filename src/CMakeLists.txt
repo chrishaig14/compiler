@@ -81,7 +81,7 @@ add_library(
         nodes/PartialApplication.h)
 
 add_library(parser parser/Parser.cpp parser/Parser.h parser/UnexpectedToken.cpp
-        parser/UnexpectedToken.h)
+            parser/UnexpectedToken.h parser/ParserErrors.cpp)
 
 add_library(
         srcLib

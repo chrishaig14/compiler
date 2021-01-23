@@ -94,20 +94,20 @@ public:
     bool inside_loop;
     Node* parse_partial_application();
     VectorOfNodes parse_list_of_arguments();
-    std::string parse_error(const VectorOfStrings& options);
     std::string empty_tuple_error(TextPosition pos);
     std::string tuple_one_element_error(TextPosition pos);
-    std::string after_expression_error(const std::vector<TokType>& expected_extra, TextPosition position);
-    std::string after_expression_error(const std::vector<TokType>& expected_extra, Token tok, TextPosition position);
-    void error_expected_expression(Token token);
+
     std::string code_context_string(TextPosition position);
     std::string code_error_string(TextPosition start, TextPosition end);
     std::string context_string(TextPosition position);
-    void after_var_error();
-    void after_var_error(Token tok);
+
+    void error_after_var(Token tok);
     void error_after_var_name(Token tok);
     void error_after_var_type(Token tok);
     void error_out_of_loop(Token tok);
+    void error_expected_expression(Token token);
+    std::string error_after_expression(const std::vector<TokType>& expected_extra, TextPosition position);
+    std::string error_after_expression(const std::vector<TokType>& expected_extra, Token tok, TextPosition position);
 };
 
 
