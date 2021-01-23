@@ -113,3 +113,12 @@ std::string Parser::error_tuple_one_element(TextPosition pos) {
     std::string msg = text_pos_to_string(this->__file__, pos) + E_FMT(" Error: can't have tuple with only one element");
     return msg;
 }
+
+void Parser::error_class_member_redefined(const std::string& cls, const std::string& name, TextPosition pos) {
+    std::string msg;
+    msg += this->context_string(pos);
+    msg += E_FMT("In class ") + E_HLT(cls) + E_FMT(" definition: member/method \"") +
+           E_HLT(name) +
+           E_FMT("\" already defined!") + this->code_context_string(pos);
+    std::cout << msg << std::endl;
+}

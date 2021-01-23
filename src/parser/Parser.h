@@ -108,6 +108,7 @@ public:
     void error_expected_expression(Token token);
     std::string error_after_expression(const std::vector<TokType>& expected_extra, TextPosition position);
     std::string error_after_expression(const std::vector<TokType>& expected_extra, Token tok, TextPosition position);
+    void error_class_member_redefined(const std::string& cls, const std::string& name, TextPosition pos);
 };
 
 

@@ -895,10 +895,8 @@ ClassNode* Parser::parse_class_definition() {
             TypeNode* member_type = this->parse_type_node();
             if (members.find(member_name_tk.str) != members.end() ||
                 methods.find(member_name_tk.str) != methods.end()) {
-                throw std::runtime_error(
-                        "Error in class " + class_name_tk.str + " definition: member/method \"" + member_name_tk.str +
-                        "\" already defined!"
-                );
+                this->error_class_member_redefined(class_name_tk.str, member_name_tk.str, member_name_tk.start);
+                exit(1);
             }
             members[member_name_tk.str] = member_type;
             members_ordered.push_back(member_name_tk.str);
@@ -907,11 +905,8 @@ ClassNode* Parser::parse_class_definition() {
             FunctionNode* method_node = this->parse_function_definition();
             if (members.find(method_node->identifier) != members.end() ||
                 methods.find(method_node->identifier) != methods.end()) {
-                throw std::runtime_error(
-                        "Error in class " + class_name_tk.str + " definition: member/method \"" +
-                        method_node->identifier +
-                        "\" already defined!"
-                );
+                this->error_class_member_redefined(class_name_tk.str, method_node->identifier, method_node->start);
+                exit(1);
             }
             methods.insert(make_pair(method_node->identifier, method_node));
         } else {
