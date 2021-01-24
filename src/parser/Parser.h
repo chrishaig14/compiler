@@ -113,6 +113,7 @@ public:
     void error_expected_argument_type(Token tok, int idx, const std::string& id, const std::string& param_id);
     void error_object_type(Token tok);
     void error(const std::string& msg, TextPosition pos);
+    void error_assign_call(Token tok);
 };
 
 

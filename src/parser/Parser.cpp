@@ -164,7 +164,8 @@ Node* Parser::parse_assignment_or_expression() {
     Node* lvalue = this->parse_expression();
     if (item_in_vec(this->token.type, {TokType::EQQ, TokType::PLUS_EQQ, TokType::MINUS_EQQ})) {
         if (lvalue->ntype == NodeType::CALL) {
-            throw std::runtime_error("Can't assign to a function call!");
+            this->error_assign_call(this->token);
+            exit(1);
         }
         TokType op = this->token.type;
         this->next();
@@ -787,7 +788,6 @@ Node* Parser::parse_top_level_statement() {
             return this->parse_common_statement();
     }
 }
-
 
 
 ForNode* Parser::parse_for_loop() {

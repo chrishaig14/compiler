@@ -143,7 +143,7 @@ void Parser::error_expected_argument_type(Token tok, int idx, const std::string&
 
 void Parser::error(const std::string& msg, TextPosition pos) {
     std::string m = this->context_string(pos) + msg + this->code_context_string(pos);
-    std::cout << msg << std::endl;
+    std::cout << m << std::endl;
 }
 
 void Parser::error_object_type(Token tok) {
@@ -153,5 +153,11 @@ void Parser::error_object_type(Token tok) {
     msg += E_FMT(" expected ");
     msg += E_HLT(TOKEN_STRINGS[TokType::ID]);
     msg += E_FMT(" (type)");
+    this->error(msg, tok.start);
+}
+
+void Parser::error_assign_call(Token tok) {
+    std::string msg;
+    msg += E_FMT("Can't assign to a function call");
     this->error(msg, tok.start);
 }
