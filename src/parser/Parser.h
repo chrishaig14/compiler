@@ -111,6 +111,8 @@ public:
     void error_class_member_redefined(const std::string& cls, const std::string& name, TextPosition pos);
     void error_expected_argument_id(Token tok, int idx, const std::string& id);
     void error_expected_argument_type(Token tok, int idx, const std::string& id, const std::string& param_id);
+    void error_object_type(Token tok);
+    void error(const std::string& msg, TextPosition pos);
 };
 
 

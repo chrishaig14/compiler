@@ -644,14 +644,15 @@ FunctionType* Parser::parse_function_type() {
 
 ObjectType* Parser::parse_object_type() {
     if (!this->match(TokType::ID)) {
-        std::string msg = E_FMT("Got ");
-        msg += E_HLT(this->token.to_string());
-        msg += E_FMT(" expected ");
-        msg += E_HLT(TOKEN_STRINGS[TokType::ID]);
-        msg += E_FMT(" (type)");
-        msg += E_FMT(" at ");
-        msg += E_HLT(this->__file__ + ":" + this->token.pos_string());
-        std::cout << msg << std::endl;
+        this->error_object_type(this->token);
+        // std::string msg = E_FMT("Got ");
+        // msg += E_HLT(this->token.to_string());
+        // msg += E_FMT(" expected ");
+        // msg += E_HLT(TOKEN_STRINGS[TokType::ID]);
+        // msg += E_FMT(" (type)");
+        // msg += E_FMT(" at ");
+        // msg += E_HLT(this->__file__ + ":" + this->token.pos_string());
+        // std::cout << msg << std::endl;
         exit(1);
     }
     Token identifier = this->expect_token(TokType::ID);
@@ -786,6 +787,8 @@ Node* Parser::parse_top_level_statement() {
             return this->parse_common_statement();
     }
 }
+
+
 
 ForNode* Parser::parse_for_loop() {
     Token for_tok = this->expect_token(TokType::FOR);

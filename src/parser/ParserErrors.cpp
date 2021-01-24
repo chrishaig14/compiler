@@ -26,19 +26,16 @@ std::string Parser::context_string(TextPosition position) {
 
 void Parser::error_after_var(Token tok) {
     std::string msg;
-    msg += this->context_string(tok.start);
     msg += E_FMT("Got ");
     msg += E_HLT(tok.to_string());
     msg += E_FMT(" expected ");
     msg += E_HLT(TOKEN_STRINGS[TokType::ID]);
     msg += E_FMT(" (new variable name)");
-    msg += this->code_context_string(tok.start);
-    std::cout << msg << std::endl;
+    this->error(msg, tok.start);
 }
 
 void Parser::error_after_var_name(Token tok) {
     std::string msg;
-    msg += this->context_string(tok.start);
     msg += E_FMT("Got ");
     msg += E_HLT(tok.to_string());
     msg += E_FMT(" expected ");
@@ -46,35 +43,29 @@ void Parser::error_after_var_name(Token tok) {
     msg += E_FMT(" or ");
     msg += E_HLT(TOKEN_STRINGS[TokType::EQQ]);
     msg += E_FMT(" (new variable type/initial value)");
-    msg += this->code_context_string(tok.start);
-    std::cout << msg << std::endl;
+    this->error(msg, tok.start);
 }
 
 void Parser::error_after_var_type(Token tok) {
     std::string msg;
-    msg += this->context_string(tok.start);
     msg += E_FMT("Got ");
     msg += E_HLT(tok.to_string());
     msg += E_FMT(" expected ");
     msg += E_HLT(TOKEN_STRINGS[TokType::ID]);
     msg += E_FMT(" (new variable initialization)");
-    msg += this->code_context_string(tok.start);
-    std::cout << msg << std::endl;
+    this->error(msg, tok.start);
 }
 
 void Parser::error_out_of_loop(Token tok) {
     std::string msg;
-    msg += this->context_string(tok.start);
     msg += E_FMT("Got ");
     msg += E_HLT(tok.to_string());
     msg += E_FMT(" out of loop ");
-    msg += this->code_context_string(tok.start);
-    std::cout << msg << std::endl;
+    this->error(msg, tok.start);
 }
 
 void Parser::error_expected_expression(Token tok) {
     std::string msg;
-    msg += this->context_string(tok.start);
     msg += E_FMT("Error: expected ");
     msg += E_HLT("expression");
     msg += E_FMT(" but got ");
@@ -82,8 +73,7 @@ void Parser::error_expected_expression(Token tok) {
     msg += E_FMT(" at ");
     msg += E_HLT(this->__file__ + ":" + tok.pos_string());
     msg += E_FMT("\n");
-    msg += this->code_context_string(tok.start);
-    std::cout << msg << std::endl;
+    this->error(msg, tok.start);
 }
 
 std::string
@@ -116,17 +106,15 @@ std::string Parser::error_tuple_one_element(TextPosition pos) {
 
 void Parser::error_class_member_redefined(const std::string& cls, const std::string& name, TextPosition pos) {
     std::string msg;
-    msg += this->context_string(pos);
     msg += E_FMT("In class ") + E_HLT(cls) + E_FMT(" definition: member/method \"") +
            E_HLT(name) +
-           E_FMT("\" already defined!") + this->code_context_string(pos);
-    std::cout << msg << std::endl;
+           E_FMT("\" already defined!");
+    this->error(msg, pos);
 }
 
 
 void Parser::error_expected_argument_id(Token tok, int idx, const std::string& id) {
     std::string msg;
-    msg = this->context_string(tok.start);
     msg += E_FMT("Error: got ");
     msg += E_HLT(tok.to_string());
     msg += E_FMT(" expected ");
@@ -134,9 +122,7 @@ void Parser::error_expected_argument_id(Token tok, int idx, const std::string& i
     msg += E_FMT(" (argument #" + std::to_string(idx) + " of function ");
     msg += E_HLT(id);
     msg += E_FMT(")");
-    msg += this->code_context_string(tok.start);
-    std::cout << msg << std::endl;
-
+    this->error(msg, tok.start);
 }
 
 void Parser::error_expected_argument_type(Token tok, int idx, const std::string& id, const std::string& param_id) {
@@ -155,3 +141,17 @@ void Parser::error_expected_argument_type(Token tok, int idx, const std::string&
     std::cout << msg << std::endl;
 }
 
+void Parser::error(const std::string& msg, TextPosition pos) {
+    std::string m = this->context_string(pos) + msg + this->code_context_string(pos);
+    std::cout << msg << std::endl;
+}
+
+void Parser::error_object_type(Token tok) {
+    std::string msg;
+    msg += E_FMT("Error: got ");
+    msg += E_HLT(tok.to_string());
+    msg += E_FMT(" expected ");
+    msg += E_HLT(TOKEN_STRINGS[TokType::ID]);
+    msg += E_FMT(" (type)");
+    this->error(msg, tok.start);
+}
