@@ -114,6 +114,7 @@ public:
     void error_object_type(Token tok);
     void error(const std::string& msg, TextPosition pos);
     void error_assign_call(Token tok);
+    void error_expected_statement(TextPosition pos);
 };
 
 

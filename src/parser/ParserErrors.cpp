@@ -161,3 +161,9 @@ void Parser::error_assign_call(Token tok) {
     msg += E_FMT("Can't assign to a function call");
     this->error(msg, tok.start);
 }
+
+void Parser::error_expected_statement(TextPosition pos) {
+    std::string msg;
+    msg += E_FMT("Expected a statement (assignment, function call, if, while, for, return)");
+    this->error(msg, pos);
+}

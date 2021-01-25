@@ -190,13 +190,7 @@ Node* Parser::parse_assignment_or_expression() {
         return node;
     } else {
         if (lvalue->ntype != NodeType::CALL) {
-            std::string st = "Only function calls are allowed here! No ID, NUM, SUBSCRIPT, BINOP or other expression!";
-            st = "Expected a statement (assignment, function call, if, while, for, return)";
-            std::cout << L_ERR("Expected a statement (declaration, assignment, function call, ") << L_HLT("if")
-                      << L_ERR(", ")
-                      << L_HLT("while") << L_ERR(", ") << L_HLT("for") << L_ERR(", ") << L_HLT("return") << L_ERR(")")
-                      << E_FMT(" at ") << E_HLT(this->__file__ + ":" + this->token.pos_string() + "\n")
-                      << E_LINE(this->code_lines.get_line(this->token.start.line));
+            this->error_expected_statement(this->token.start);
             exit(1);
         }
     }
