@@ -533,9 +533,6 @@ Node* Parser::parse_call_or_subscript_chain(Node* parent) {
         } else if (this->match(TokType::LSQUARE)) {
 //                subscript
             this->next();
-            if (this->match(TokType::RSQUARE)) {
-                throw std::runtime_error("Empty subscript error!");
-            }
             Node* value = this->parse_expression();
             Node* old_node = node;
             node = new SubscriptNode(node, {value});
