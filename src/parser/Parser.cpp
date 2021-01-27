@@ -123,7 +123,7 @@ Node* Parser::parse_list_literal() {
 
         // if (!this->match(TokType::RSQUARE)) {
         //     this->error_after_expression({TokType::RSQUARE, TokType::COMMA}, this->token, this->token.start);
-        //     exit(1);
+        //     
         // }
         Token list_end = this->expect_token(TokType::RSQUARE);
     }
@@ -166,7 +166,7 @@ Node* Parser::parse_assignment_or_expression() {
     if (item_in_vec(this->token.type, {TokType::EQQ, TokType::PLUS_EQQ, TokType::MINUS_EQQ})) {
         if (lvalue->ntype == NodeType::CALL) {
             this->error_assign_call(this->token);
-            exit(1);
+
         }
         TokType op = this->token.type;
         this->next();
@@ -178,7 +178,7 @@ Node* Parser::parse_assignment_or_expression() {
 
         // if (!this->match(TokType::SEMICOLON)) {
         //     this->error_after_expression({TokType::SEMICOLON}, this->token, this->token.start);
-        //     exit(1);
+        //     
         // }
         if (lvalue->ntype == ID) {
             if (op == TokType::PLUS_EQQ) {
@@ -194,7 +194,7 @@ Node* Parser::parse_assignment_or_expression() {
     } else {
         if (lvalue->ntype != NodeType::CALL) {
             this->error_expected_statement(this->token.start);
-            exit(1);
+
         }
     }
     return lvalue;
@@ -331,7 +331,7 @@ Node* Parser::parse_id_or_literal() {
             node = this->parse_expression();
             if (!this->match(TokType::RPAREN)) {
                 this->error_after_expression({TokType::RPAREN}, this->token, this->token.start);
-                exit(1);
+
             } else {
                 this->next();
             }
@@ -383,7 +383,7 @@ Node* Parser::parse_id_or_literal() {
         default:
             this->error_expected_expression(this->token);
 
-            exit(1);
+
     }
     return node;
 }
@@ -397,7 +397,7 @@ Node* Parser::parse_class_or_tuple_literal() {
         VectorOfNodes values;
         if (this->match(TokType::RPAREN)) {
             this->error_empty_tuple(hash_tok.start);
-            exit(1);
+
         }
         bool first = true;
         while (true) {
@@ -410,7 +410,7 @@ Node* Parser::parse_class_or_tuple_literal() {
             } else {
                 if (first && this->match(TokType::RPAREN)) {
                     this->error_tuple_one_element(hash_tok.start);
-                    exit(1);
+
                 }
                 break;
             }
@@ -549,13 +549,13 @@ DeclarationNode* Parser::parse_variable_declaration() {
     Token var_token = this->expect_token(TokType::VAR);
     if (!this->match(TokType::ID)) {
         this->error_after_var(this->token);
-        exit(1);
+
     }
     Token identifier = this->expect_token(TokType::ID);
     TypeNode* type = nullptr;
     if (!this->match(TokType::COLON) && !this->match(TokType::EQQ)) {
         this->error_after_var_name(this->token);
-        exit(1);
+
     }
     if (this->match(TokType::COLON)) {
         this->next();
@@ -563,7 +563,7 @@ DeclarationNode* Parser::parse_variable_declaration() {
     }
     if (!this->match(TokType::EQQ)) {
         this->error_after_var_type(this->token);
-        exit(1);
+
     }
     this->next();
     Node* expression = this->parse_expression();
@@ -594,7 +594,7 @@ Node* Parser::parse_common_statement() {
         case TokType::BREAK: {
             if (!this->inside_loop) {
                 this->error_out_of_loop(this->token);
-                exit(1);
+
             }
             this->next();
             return new BreakNode();
@@ -602,7 +602,7 @@ Node* Parser::parse_common_statement() {
         case TokType::CONTINUE: {
             if (!this->inside_loop) {
                 this->error_out_of_loop(this->token);
-                exit(1);
+
             }
             this->next();
             return new ContinueNode();
@@ -639,7 +639,7 @@ FunctionType* Parser::parse_function_type() {
 ObjectType* Parser::parse_object_type() {
     if (!this->match(TokType::ID)) {
         this->error_object_type(this->token);
-        exit(1);
+
     }
     Token identifier = this->expect_token(TokType::ID);
     VectorOfTypes type_parameters;
@@ -679,7 +679,7 @@ BlockNode* Parser::parse_possibly_empty_block() {
         msg += E_FMT(" at ");
         msg += E_HLT(this->__file__ + ":" + this->token.pos_string());
         std::cout << msg << std::endl;
-        exit(1);
+
     }
     Token st = this->expect_token(TokType::LCURLY);
     VectorOfNodes block;
@@ -716,12 +716,12 @@ FunctionNode* Parser::parse_function_definition() {
         while (true) {
             if (!this->match(TokType::ID)) {
                 this->error_expected_argument_id(this->token, parameter_types.size() + 1, identifier);
-                exit(1);
+
             }
             Token parameter_identifier = this->expect_token(TokType::ID);
             if (!this->match(TokType::COLON)) {
                 this->error_expected_argument_type(this->token, 0, identifier, parameter_identifier.str);
-                exit(1);
+
             }
             this->next();
             TypeNode* parameter_type = this->parse_type_node();
@@ -757,7 +757,7 @@ void Parser::unexpected_token_error() {
             this->context_string(this->token.start) + E_FMT("Unexpected token ") + E_HLT(this->token.to_string()) +
             this->code_context_string(this->token.start);
     std::cout << msg << std::endl;
-    exit(1);
+
 }
 
 Token Parser::expect_token(TokType token_type) {
@@ -766,7 +766,7 @@ Token Parser::expect_token(TokType token_type) {
                 this->context_string(this->token.start) + E_FMT("Unexpected token ") + E_HLT(this->token.to_string()) +
                 this->code_context_string(this->token.start);
         std::cout << msg << std::endl;
-        exit(1);
+
     }
     Token matched_token = this->token;
     this->next();
@@ -804,7 +804,7 @@ ForNode* Parser::parse_for_loop() {
         msg += E_FMT(" at ");
         msg += E_HLT(this->__file__ + ":" + this->token.pos_string());
         std::cout << msg << std::endl;
-        exit(1);
+
     }
     Token var = this->expect_token(TokType::ID);
     this->expect_token(TokType::ARROBA);
@@ -840,7 +840,7 @@ WhileNode* Parser::parse_while_loop() {
     this->expect_token(TokType::LCURLY);
     // if (!this->match(TokType::LCURLY)) {
     //     this->error_after_expression({TokType::LCURLY}, this->token, this->token.start);
-    //     exit(1);
+    //     
     // }
     bool prev = this->inside_loop;
     this->inside_loop = true;
@@ -879,7 +879,7 @@ ClassNode* Parser::parse_class_definition() {
             if (members.find(member_name_tk.str) != members.end() ||
                 methods.find(member_name_tk.str) != methods.end()) {
                 this->error_class_member_redefined(class_name_tk.str, member_name_tk.str, member_name_tk.start);
-                exit(1);
+
             }
             members[member_name_tk.str] = member_type;
             members_ordered.push_back(member_name_tk.str);
@@ -889,7 +889,7 @@ ClassNode* Parser::parse_class_definition() {
             if (members.find(method_node->identifier) != members.end() ||
                 methods.find(method_node->identifier) != methods.end()) {
                 this->error_class_member_redefined(class_name_tk.str, method_node->identifier, method_node->start);
-                exit(1);
+
             }
             methods.insert(make_pair(method_node->identifier, method_node));
         } else {

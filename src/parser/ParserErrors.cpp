@@ -139,6 +139,7 @@ void Parser::error_expected_argument_type(Token tok, int idx, const std::string&
 void Parser::error(const std::string& msg, TextPosition pos) {
     std::string m = this->context_string(pos) + msg + this->code_context_string(pos);
     std::cout << "Syntax Error: " << m << std::endl;
+    throw std::runtime_error("ParseError");
 }
 
 void Parser::error_object_type(Token tok) {
