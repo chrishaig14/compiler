@@ -120,10 +120,11 @@ Node* Parser::parse_list_literal() {
             }
             this->next();
         }
-        if (!this->match(TokType::RSQUARE)) {
-            std::cout << error_after_expression({TokType::RSQUARE, TokType::COMMA}, this->token, this->token.start);
-            exit(1);
-        }
+
+        // if (!this->match(TokType::RSQUARE)) {
+        //     this->error_after_expression({TokType::RSQUARE, TokType::COMMA}, this->token, this->token.start);
+        //     exit(1);
+        // }
         Token list_end = this->expect_token(TokType::RSQUARE);
     }
     Node* node = new ListNode(elements);
@@ -173,10 +174,12 @@ Node* Parser::parse_assignment_or_expression() {
             throw std::runtime_error("Error += or -= can only be used on ids!");
         }
         Node* rvalue = this->parse_expression();
-        if (!this->match(TokType::SEMICOLON)) {
-            std::cout << error_after_expression({TokType::SEMICOLON}, this->token, this->token.start);
-            exit(1);
-        }
+        this->expect_token(TokType::SEMICOLON);
+
+        // if (!this->match(TokType::SEMICOLON)) {
+        //     this->error_after_expression({TokType::SEMICOLON}, this->token, this->token.start);
+        //     exit(1);
+        // }
         if (lvalue->ntype == ID) {
             if (op == TokType::PLUS_EQQ) {
                 rvalue = new BinopNode(OpType::ADD, new IdNode(lvalue->id()._id), rvalue);
@@ -277,8 +280,7 @@ Node* Parser::parse_factor() {
     }
     if (item_in_vec(parent->ntype, {TUPLE, NUMBER, NONE, BOOLEAN})) {
         if (item_in_vec(this->token.type, {TokType::LPAREN, TokType::LSQUARE})) {
-            std::cout << error_after_expression({}, this->token, this->token.start);
-            exit(1);
+            this->unexpected_token_error();
         }
     }
     parent = this->parse_call_or_subscript_chain(parent);
@@ -328,7 +330,7 @@ Node* Parser::parse_id_or_literal() {
             this->next();
             node = this->parse_expression();
             if (!this->match(TokType::RPAREN)) {
-                std::cout << error_after_expression({TokType::RPAREN}, this->token, this->token.start);
+                this->error_after_expression({TokType::RPAREN}, this->token, this->token.start);
                 exit(1);
             } else {
                 this->next();
@@ -394,7 +396,7 @@ Node* Parser::parse_class_or_tuple_literal() {
         this->next();
         VectorOfNodes values;
         if (this->match(TokType::RPAREN)) {
-            std::cout << error_empty_tuple(hash_tok.start);
+            this->error_empty_tuple(hash_tok.start);
             exit(1);
         }
         bool first = true;
@@ -407,7 +409,7 @@ Node* Parser::parse_class_or_tuple_literal() {
                 continue;
             } else {
                 if (first && this->match(TokType::RPAREN)) {
-                    std::cout << error_tuple_one_element(hash_tok.start);
+                    this->error_tuple_one_element(hash_tok.start);
                     exit(1);
                 }
                 break;
@@ -637,14 +639,6 @@ FunctionType* Parser::parse_function_type() {
 ObjectType* Parser::parse_object_type() {
     if (!this->match(TokType::ID)) {
         this->error_object_type(this->token);
-        // std::string msg = E_FMT("Got ");
-        // msg += E_HLT(this->token.to_string());
-        // msg += E_FMT(" expected ");
-        // msg += E_HLT(TOKEN_STRINGS[TokType::ID]);
-        // msg += E_FMT(" (type)");
-        // msg += E_FMT(" at ");
-        // msg += E_HLT(this->__file__ + ":" + this->token.pos_string());
-        // std::cout << msg << std::endl;
         exit(1);
     }
     Token identifier = this->expect_token(TokType::ID);
@@ -758,9 +752,21 @@ FunctionNode* Parser::parse_function_definition() {
     return node;
 }
 
+void Parser::unexpected_token_error() {
+    std::string msg =
+            this->context_string(this->token.start) + E_FMT("Unexpected token ") + E_HLT(this->token.to_string()) +
+            this->code_context_string(this->token.start);
+    std::cout << msg << std::endl;
+    exit(1);
+}
+
 Token Parser::expect_token(TokType token_type) {
     if (not this->match(token_type)) {
-        throw UnexpectedToken(this->token, std::vector<TokType>(1, token_type));
+        std::string msg =
+                this->context_string(this->token.start) + E_FMT("Unexpected token ") + E_HLT(this->token.to_string()) +
+                this->code_context_string(this->token.start);
+        std::cout << msg << std::endl;
+        exit(1);
     }
     Token matched_token = this->token;
     this->next();
@@ -831,10 +837,11 @@ Node* Parser::parse_ternary() {
 WhileNode* Parser::parse_while_loop() {
     Token while_tok = this->expect_token(TokType::WHILE);
     Node* condition = this->parse_expression();
-    if (!this->match(TokType::LCURLY)) {
-        std::cout << error_after_expression({TokType::LCURLY}, this->token, this->token.start);
-        exit(1);
-    }
+    this->expect_token(TokType::LCURLY);
+    // if (!this->match(TokType::LCURLY)) {
+    //     this->error_after_expression({TokType::LCURLY}, this->token, this->token.start);
+    //     exit(1);
+    // }
     bool prev = this->inside_loop;
     this->inside_loop = true;
     BlockNode* body = this->parse_possibly_empty_block();

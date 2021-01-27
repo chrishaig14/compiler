@@ -66,21 +66,19 @@ void Parser::error_out_of_loop(Token tok) {
 
 void Parser::error_expected_expression(Token tok) {
     std::string msg;
-    msg += E_FMT("Error: expected ");
-    msg += E_HLT("expression");
-    msg += E_FMT(" but got ");
+    msg += E_FMT("Got ");
     msg += E_HLT(tok.to_string());
-    msg += E_FMT(" at ");
-    msg += E_HLT(this->__file__ + ":" + tok.pos_string());
-    msg += E_FMT("\n");
+    msg += E_FMT(" expected ");
+    msg += E_HLT("expression ");
     this->error(msg, tok.start);
 }
 
-std::string
+void
 Parser::error_after_expression(const std::vector<TokType>& expected_extra, Token tok, TextPosition position) {
     std::string msg;
-    msg += E_FMT(text_pos_to_string(this->__file__, position)) +
-           E_FMT(" Error: expected ");
+    msg = E_FMT("Got ");
+    msg += E_HLT(tok.to_string());
+    msg = E_FMT(" Expected ");
     for (auto x: expected_extra) {
         msg += E_HLT(TOKEN_STRINGS[x]) + E_FMT(" or ");
     }
@@ -89,19 +87,18 @@ Parser::error_after_expression(const std::vector<TokType>& expected_extra, Token
     msg += E_HLT(" member (.xxx)");
     msg += E_FMT(" or ");
     msg += E_HLT(" subscript ([xxx])");
-    msg += E_FMT(" after expression, but got ");
-    msg += E_HLT(tok.to_string());
-    return msg;
+    msg += E_FMT(" after expression");
+    this->error(msg, tok.start);
 }
 
-std::string Parser::error_empty_tuple(TextPosition pos) {
-    std::string msg = text_pos_to_string(this->__file__, pos) + E_FMT(" Error: can't have an empty tuple");
-    return msg;
+void Parser::error_empty_tuple(TextPosition pos) {
+    std::string msg = text_pos_to_string(this->__file__, pos) + E_FMT(" Can't have an empty tuple");
+    this->error(msg, pos);
 }
 
-std::string Parser::error_tuple_one_element(TextPosition pos) {
-    std::string msg = text_pos_to_string(this->__file__, pos) + E_FMT(" Error: can't have tuple with only one element");
-    return msg;
+void Parser::error_tuple_one_element(TextPosition pos) {
+    std::string msg = text_pos_to_string(this->__file__, pos) + E_FMT(" Can't have tuple with only one element");
+    this->error(msg, pos);
 }
 
 void Parser::error_class_member_redefined(const std::string& cls, const std::string& name, TextPosition pos) {
@@ -115,7 +112,7 @@ void Parser::error_class_member_redefined(const std::string& cls, const std::str
 
 void Parser::error_expected_argument_id(Token tok, int idx, const std::string& id) {
     std::string msg;
-    msg += E_FMT("Error: got ");
+    msg += E_FMT("Got ");
     msg += E_HLT(tok.to_string());
     msg += E_FMT(" expected ");
     msg += E_HLT(TOKEN_STRINGS[TokType::ID]);
@@ -127,8 +124,7 @@ void Parser::error_expected_argument_id(Token tok, int idx, const std::string& i
 
 void Parser::error_expected_argument_type(Token tok, int idx, const std::string& id, const std::string& param_id) {
     std::string msg;
-    msg = this->context_string(tok.start);
-    msg += E_FMT("Error: got ");
+    msg += E_FMT("Got ");
     msg += E_HLT(tok.to_string());
     msg += E_FMT(" expected ");
     msg += E_HLT(TOKEN_STRINGS[TokType::COLON]);
@@ -137,18 +133,17 @@ void Parser::error_expected_argument_type(Token tok, int idx, const std::string&
     msg += E_FMT(" of function ");
     msg += E_HLT(id);
     msg += E_FMT(")");
-    msg += this->code_context_string(tok.start);
-    std::cout << msg << std::endl;
+    this->error(msg, tok.start);
 }
 
 void Parser::error(const std::string& msg, TextPosition pos) {
     std::string m = this->context_string(pos) + msg + this->code_context_string(pos);
-    std::cout << m << std::endl;
+    std::cout << "Syntax Error: " << m << std::endl;
 }
 
 void Parser::error_object_type(Token tok) {
     std::string msg;
-    msg += E_FMT("Error: got ");
+    msg += E_FMT("Got ");
     msg += E_HLT(tok.to_string());
     msg += E_FMT(" expected ");
     msg += E_HLT(TOKEN_STRINGS[TokType::ID]);
