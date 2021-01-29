@@ -39,8 +39,8 @@ BlockNode* full_parse(const std::string& __file__, CodeLines* code_lines) {
     *code_lines = scanner.code_lines;
     try {
         tree = parser.parse_program();
-    } catch (const UnexpectedToken& ut) {
-        std::cerr << ut.what() << std::endl;
+    } catch(const std::runtime_error& e){
+        std::cout << e.what() << std::endl;
         exit(1);
     }
     return tree;

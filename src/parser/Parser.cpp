@@ -155,7 +155,8 @@ VectorOfNodes Parser::parse_list_of_arguments() {
         }
     }
     if (!this->match(TokType::COMMA) && !this->match(TokType::RPAREN)) {
-        throw std::runtime_error("Error: expected ',' or ')' after function call argument!");
+        this->expect_token(TokType::COMMA);
+        // throw std::runtime_error("Error: expected ',' or ')' after function call argument!");
     }
     this->expect_token(TokType::RPAREN);
     return result;
@@ -280,7 +281,7 @@ Node* Parser::parse_factor() {
     }
     if (item_in_vec(parent->ntype, {TUPLE, NUMBER, NONE, BOOLEAN})) {
         if (item_in_vec(this->token.type, {TokType::LPAREN, TokType::LSQUARE})) {
-            this->unexpected_token_error();
+            this->expect_token(TokType::RPAREN); // some random token
         }
     }
     parent = this->parse_call_or_subscript_chain(parent);
@@ -547,25 +548,22 @@ Node* Parser::parse_call_or_subscript_chain(Node* parent) {
 
 DeclarationNode* Parser::parse_variable_declaration() {
     Token var_token = this->expect_token(TokType::VAR);
-    if (!this->match(TokType::ID)) {
-        this->error_after_var(this->token);
-
-    }
+    // if (!this->match(TokType::ID)) {
+    //     this->error_after_var(this->token);
+    //
+    // }
     Token identifier = this->expect_token(TokType::ID);
     TypeNode* type = nullptr;
-    if (!this->match(TokType::COLON) && !this->match(TokType::EQQ)) {
-        this->error_after_var_name(this->token);
-
-    }
+    // if (!this->match(TokType::COLON) && !this->match(TokType::EQQ)) {
+    //     this->error_after_var_name(this->token);
+    //
+    // }
     if (this->match(TokType::COLON)) {
         this->next();
         type = this->parse_type_node();
     }
-    if (!this->match(TokType::EQQ)) {
-        this->error_after_var_type(this->token);
-
-    }
-    this->next();
+    this->expect_token(TokType::EQQ);
+    // this->next();
     Node* expression = this->parse_expression();
     return new DeclarationNode(identifier.str, type, expression, var_token.start);
 }
@@ -654,9 +652,10 @@ ObjectType* Parser::parse_object_type() {
                 break;
             }
         }
-        if (!this->match(TokType::RSQUARE)) {
-            throw UnexpectedToken(this->token, {TokType::RSQUARE, TokType::COMMA});
-        }
+        this->expect_token(TokType::RSQUARE);
+        // if (!this->match(TokType::RSQUARE)) {
+        //     throw UnexpectedToken(this->token, {TokType::RSQUARE, TokType::COMMA});
+        // }
         this->next();
     }
     return new ObjectType(identifier.str, type_parameters);
@@ -665,8 +664,11 @@ ObjectType* Parser::parse_object_type() {
 TypeNode* Parser::parse_type_node() {
     if (this->match(TokType::FUN)) {
         return this->parse_function_type();
+    } else if (this->match(TokType::ID)) {
+        return this->parse_object_type();
+    } else {
+        this->error_expected_type(this->token);
     }
-    return this->parse_object_type();
 }
 
 BlockNode* Parser::parse_possibly_empty_block() {
@@ -714,16 +716,18 @@ FunctionNode* Parser::parse_function_definition() {
         // Parse parameter list
 
         while (true) {
-            if (!this->match(TokType::ID)) {
-                this->error_expected_argument_id(this->token, parameter_types.size() + 1, identifier);
-
-            }
+            // this->expect_token(TokType::ID);
+            // if (!this->match(TokType::ID)) {
+            //     this->error_expected_argument_id(this->token, parameter_types.size() + 1, identifier);
+            //
+            // }
             Token parameter_identifier = this->expect_token(TokType::ID);
-            if (!this->match(TokType::COLON)) {
-                this->error_expected_argument_type(this->token, 0, identifier, parameter_identifier.str);
-
-            }
-            this->next();
+            this->expect_token(TokType::COLON);
+            // if (!this->match(TokType::COLON)) {
+            //     this->error_expected_argument_type(this->token, 0, identifier, parameter_identifier.str);
+            //
+            // }
+            // this->next();
             TypeNode* parameter_type = this->parse_type_node();
             parameter_types.push_back(parameter_type);
             parameter_names.push_back(parameter_identifier.str);
@@ -765,8 +769,8 @@ Token Parser::expect_token(TokType token_type) {
         std::string msg =
                 this->context_string(this->token.start) + E_FMT("Unexpected token ") + E_HLT(this->token.to_string()) +
                 this->code_context_string(this->token.start);
-        std::cout << msg << std::endl;
-
+        // std::cout << msg << std::endl;
+        throw std::runtime_error(msg);
     }
     Token matched_token = this->token;
     this->next();

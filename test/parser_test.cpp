@@ -85,6 +85,271 @@ protected:
     }
 };
 
+void ASSERT_PARSE_ERROR(Parser* parser, const std::string& msg) {
+    try {
+        parser->parse_program();
+        // EXPECT_THROW()
+        FAIL() << "DID NOT THROW";
+    } catch (const std::runtime_error& e) {
+        std::string s = e.what();
+        if (s.find(msg) == -1) {
+            FAIL() << "ERROR DID NOT MATCH, GOT " << s;
+        }
+    }
+}
+
+TEST_F(parser_test, error_1) {
+    std::string text = "fun main()->Integer{x=}";
+    SetUp(text);
+    ASSERT_PARSE_ERROR(parser, "expected expression");
+}
+
+TEST_F(parser_test, error_2) {
+    std::string text = "fun main()->Integer{x=43+}";
+    SetUp(text);
+    ASSERT_PARSE_ERROR(parser, "expected expression");
+}
+
+TEST_F(parser_test, error_3) {
+    std::string text = "fun main()->Integer{x=43+[}";
+    SetUp(text);
+    ASSERT_PARSE_ERROR(parser, "expected expression");
+}
+
+TEST_F(parser_test, error_4) {
+    std::string text = "fun main()->{}";
+    SetUp(text);
+    ASSERT_PARSE_ERROR(parser, "expected type");
+}
+
+TEST_F(parser_test, error_5) {
+    std::string text = "fun main()->List[{}";
+    SetUp(text);
+    ASSERT_PARSE_ERROR(parser, "expected type");
+}
+
+TEST_F(parser_test, error_6) {
+    std::string text = "fun main()->Dict[Integer,{}";
+    SetUp(text);
+    ASSERT_PARSE_ERROR(parser, "expected type");
+}
+
+TEST_F(parser_test, error_7) {
+    std::string text = "fun main()->List[Integer{}";
+    SetUp(text);
+    ASSERT_PARSE_ERROR(parser, "Unexpected token");
+}
+
+TEST_F(parser_test, error_8) {
+    std::string text = "fun (";
+    SetUp(text);
+    ASSERT_PARSE_ERROR(parser, "Unexpected token");
+}
+
+TEST_F(parser_test, error_9) {
+    std::string text = "fun main+";
+    SetUp(text);
+    ASSERT_PARSE_ERROR(parser, "Unexpected token");
+}
+
+TEST_F(parser_test, error_10) {
+    std::string text = "fun main(123";
+    SetUp(text);
+    ASSERT_PARSE_ERROR(parser, "Unexpected token");
+}
+
+TEST_F(parser_test, error_11) {
+    std::string text = "fun main(x 12";
+    SetUp(text);
+    ASSERT_PARSE_ERROR(parser, "Unexpected token");
+}
+
+TEST_F(parser_test, error_12) {
+    std::string text = "fun main(x: 123";
+    SetUp(text);
+    ASSERT_PARSE_ERROR(parser, "expected type");
+}
+
+TEST_F(parser_test, error_13) {
+    std::string text = "fun main(x: Integer,)";
+    SetUp(text);
+    ASSERT_PARSE_ERROR(parser, "Unexpected token");
+}
+
+TEST_F(parser_test, error_14) {
+    std::string text = "fun main(x: Integer)12";
+    SetUp(text);
+    ASSERT_PARSE_ERROR(parser, "Unexpected token");
+}
+
+TEST_F(parser_test, error_15) {
+    std::string text = "fun main(x: Integer)->{";
+    SetUp(text);
+    ASSERT_PARSE_ERROR(parser, "expected type");
+}
+
+TEST_F(parser_test, error_16) {
+    std::string text = "fun main(x: Integer)->String(";
+    SetUp(text);
+    ASSERT_PARSE_ERROR(parser, "Unexpected token");
+}
+
+TEST_F(parser_test, error_17) {
+    std::string text = "fun main(x: Integer)->String{break}";
+    SetUp(text);
+    ASSERT_PARSE_ERROR(parser, "break out of loop");
+}
+
+TEST_F(parser_test, error_18) {
+    std::string text = "fun main(x: Integer)->String{continue}";
+    SetUp(text);
+    ASSERT_PARSE_ERROR(parser, "continue out of loop");
+}
+
+TEST_F(parser_test, error_19) {
+    std::string text = "fun main(x: Integer)->String{2+5}";
+    SetUp(text);
+    ASSERT_PARSE_ERROR(parser, "Unexpected token");
+}
+
+TEST_F(parser_test, error_20) {
+    std::string text = "fun main(x: Integer)->String{var 23}";
+    SetUp(text);
+    ASSERT_PARSE_ERROR(parser, "Unexpected token");
+}
+
+TEST_F(parser_test, error_21) {
+    std::string text = "fun main(x: Integer)->String{var x + }";
+    SetUp(text);
+    ASSERT_PARSE_ERROR(parser, "Unexpected token");
+}
+
+TEST_F(parser_test, error_22) {
+    std::string text = "fun main(x: Integer)->String{var x : 23 }";
+    SetUp(text);
+    ASSERT_PARSE_ERROR(parser, "expected type");
+}
+
+TEST_F(parser_test, error_23) {
+    std::string text = "fun main(x: Integer)->String{var x : Integer .,., }";
+    SetUp(text);
+    ASSERT_PARSE_ERROR(parser, "Unexpected token");
+}
+
+TEST_F(parser_test, error_24) {
+    std::string text = "fun main(x: Integer)->String{var x : Integer = ,,}";
+    SetUp(text);
+    ASSERT_PARSE_ERROR(parser, "expected expression");
+}
+
+TEST_F(parser_test, error_25) {
+    std::string text = "fun main(x: Integer)->String{var x : Integer = 23,}";
+    SetUp(text);
+    ASSERT_PARSE_ERROR(parser, "Unexpected token");
+}
+
+TEST_F(parser_test, error_26) {
+    std::string text = "fun main(x: Integer)->String{var x : Integer = 23(}";
+    SetUp(text);
+    ASSERT_PARSE_ERROR(parser, "Unexpected token");
+}
+
+TEST_F(parser_test, error_27) {
+    std::string text = "fun main(x: Integer)->String{var x : Integer = foo)}";
+    SetUp(text);
+    ASSERT_PARSE_ERROR(parser, "Unexpected token");
+}
+
+TEST_F(parser_test, error_28) {
+    std::string text = "fun main(x: Integer)->String{var x : Integer = s[]}";
+    SetUp(text);
+    ASSERT_PARSE_ERROR(parser, "expected expression");
+}
+
+TEST_F(parser_test, error_29) {
+    std::string text = "fun main(x: Integer)->String{var x : Integer = s[24,]}";
+    SetUp(text);
+    ASSERT_PARSE_ERROR(parser, "Unexpected token");
+}
+
+TEST_F(parser_test, error_30) {
+    std::string text = "fun main(x: Integer)->String{var x : Integer = foo(.,}";
+    SetUp(text);
+    ASSERT_PARSE_ERROR(parser, "expected expression");
+}
+
+TEST_F(parser_test, error_31) {
+    std::string text = "fun main(x: Integer)->String{var x : Integer = foo(23,}";
+    SetUp(text);
+    ASSERT_PARSE_ERROR(parser, "expected expression");
+}
+
+TEST_F(parser_test, error_32) {
+    std::string text = "fun main(x: Integer)->String{var x : Integer = foo(23,123]}";
+    SetUp(text);
+    ASSERT_PARSE_ERROR(parser, "Unexpected token");
+}
+
+TEST_F(parser_test, error_33) {
+    std::string text = "fun main(x: Integer)->String{var x : Integer = foo(23,123);if ,.}";
+    SetUp(text);
+    ASSERT_PARSE_ERROR(parser, "expected expression");
+}
+
+TEST_F(parser_test, error_34) {
+    std::string text = "fun main(x: Integer)->String{var x : Integer = foo(23,123);if 23+{}";
+    SetUp(text);
+    ASSERT_PARSE_ERROR(parser, "expected expression");
+}
+
+TEST_F(parser_test, error_35) {
+    std::string text = "fun main(x: Integer)->String{var x : Integer = foo(23,123);if 23,{}";
+    SetUp(text);
+    ASSERT_PARSE_ERROR(parser, "Unexpected token");
+}
+
+TEST_F(parser_test, error_36) {
+    std::string text = "fun main(x: Integer)->String{var x : Integer = foo(23,123);for 23}";
+    SetUp(text);
+    ASSERT_PARSE_ERROR(parser, "Unexpected token");
+}
+
+TEST_F(parser_test, error_37) {
+    std::string text = "fun main(x: Integer)->String{var x : Integer = foo(23,123);for wqe 2}";
+    SetUp(text);
+    ASSERT_PARSE_ERROR(parser, "Unexpected token");
+}
+
+TEST_F(parser_test, error_38) {
+    std::string text = "fun main(x: Integer)->String{var x : Integer = foo(23,123);for wqe @ ,..}";
+    SetUp(text);
+    ASSERT_PARSE_ERROR(parser, "expected expression");
+}
+
+TEST_F(parser_test, error_39) {
+    std::string text = "fun main(x: Integer)->String{var x : Integer = foo(23,123);for wqe @ l]}";
+    SetUp(text);
+    ASSERT_PARSE_ERROR(parser, "Unexpected token");
+}
+
+TEST_F(parser_test, error_40) {
+    std::string text = "fun main(x: Integer)->String{var x = [.}";
+    SetUp(text);
+    ASSERT_PARSE_ERROR(parser, "expected expression");
+}
+
+TEST_F(parser_test, error_41) {
+    std::string text = "fun main(x: Integer)->String{var x = [23=}";
+    SetUp(text);
+    ASSERT_PARSE_ERROR(parser, "Unexpected token");
+}
+
+TEST_F(parser_test, error_42) {
+    std::string text = "fun main(x: Integer)->String{var x = [23,}";
+    SetUp(text);
+    ASSERT_PARSE_ERROR(parser, "expected expression");
+}
+
 TEST_F(parser_test, a_plus_b) {
     std::string text = "a + b";
     SetUp(text);

@@ -116,6 +116,7 @@ public:
     void error_assign_call(Token tok);
     void error_expected_statement(TextPosition pos);
     void unexpected_token_error();
+    void error_expected_type(Token tok);
 };
 
 
