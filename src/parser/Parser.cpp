@@ -100,24 +100,6 @@ IfNode* Parser::parse_if() {
     return iff;
 }
 
-std::string
-Parser::after_expression_error(const std::vector<TokType>& expected_extra, Token tok, TextPosition position) {
-    std::string msg;
-    msg += E_FMT(text_pos_to_string(this->__file__, position)) +
-           E_FMT(" Error: expected ");
-    for (auto x: expected_extra) {
-        msg += E_HLT(TOKEN_STRINGS[x]) + E_FMT(" or ");
-    }
-    msg += E_HLT(" operator (+,-,/,*) ");
-    msg += E_FMT(" or ");
-    msg += E_HLT(" member (.xxx)");
-    msg += E_FMT(" or ");
-    msg += E_HLT(" subscript ([xxx])");
-    msg += E_FMT(" after expression, but got ");
-    msg += E_HLT(tok.to_string());
-    return msg;
-}
-
 Node* Parser::parse_list_literal() {
     Token list_start = this->expect_token(TokType::LSQUARE);
     VectorOfNodes elements;
@@ -137,10 +119,6 @@ Node* Parser::parse_list_literal() {
                 break;
             }
             this->next();
-        }
-        if (!this->match(TokType::RSQUARE)) {
-            std::cout << after_expression_error({TokType::RSQUARE, TokType::COMMA}, this->token, this->token.start);
-            exit(1);
         }
         Token list_end = this->expect_token(TokType::RSQUARE);
     }
@@ -172,7 +150,7 @@ VectorOfNodes Parser::parse_list_of_arguments() {
         }
     }
     if (!this->match(TokType::COMMA) && !this->match(TokType::RPAREN)) {
-        throw std::runtime_error("Error: expected ',' or ')' after function call argument!");
+        this->expect_token(TokType::COMMA);
     }
     this->expect_token(TokType::RPAREN);
     return result;
@@ -182,7 +160,8 @@ Node* Parser::parse_assignment_or_expression() {
     Node* lvalue = this->parse_expression();
     if (item_in_vec(this->token.type, {TokType::EQQ, TokType::PLUS_EQQ, TokType::MINUS_EQQ})) {
         if (lvalue->ntype == NodeType::CALL) {
-            throw std::runtime_error("Can't assign to a function call!");
+            this->error_assign_call(this->token);
+
         }
         TokType op = this->token.type;
         this->next();
@@ -190,10 +169,6 @@ Node* Parser::parse_assignment_or_expression() {
             throw std::runtime_error("Error += or -= can only be used on ids!");
         }
         Node* rvalue = this->parse_expression();
-        if (!this->match(TokType::SEMICOLON)) {
-            std::cout << after_expression_error({TokType::SEMICOLON}, this->token, this->token.start);
-            exit(1);
-        }
         if (lvalue->ntype == ID) {
             if (op == TokType::PLUS_EQQ) {
                 rvalue = new BinopNode(OpType::ADD, new IdNode(lvalue->id()._id), rvalue);
@@ -207,14 +182,7 @@ Node* Parser::parse_assignment_or_expression() {
         return node;
     } else {
         if (lvalue->ntype != NodeType::CALL) {
-            std::string st = "Only function calls are allowed here! No ID, NUM, SUBSCRIPT, BINOP or other expression!";
-            st = "Expected a statement (assignment, function call, if, while, for, return)";
-            std::cout << L_ERR("Expected a statement (declaration, assignment, function call, ") << L_HLT("if")
-                      << L_ERR(", ")
-                      << L_HLT("while") << L_ERR(", ") << L_HLT("for") << L_ERR(", ") << L_HLT("return") << L_ERR(")")
-                      << E_FMT(" at ") << E_HLT(this->__file__ + ":" + this->token.pos_string() + "\n")
-                      << E_LINE(this->code_lines.get_line(this->token.start.line));
-            exit(1);
+            this->error_expected_statement(this->token.start);
         }
     }
     return lvalue;
@@ -245,7 +213,6 @@ Node* Parser::parse_and_expression() {
     }
     return left;
 }
-
 
 Node* Parser::parse_bool_expression() {
     Node* left = this->parse_add_or_sub_expression();
@@ -301,8 +268,7 @@ Node* Parser::parse_factor() {
     }
     if (item_in_vec(parent->ntype, {TUPLE, NUMBER, NONE, BOOLEAN})) {
         if (item_in_vec(this->token.type, {TokType::LPAREN, TokType::LSQUARE})) {
-            std::cout << after_expression_error({}, this->token, this->token.start);
-            exit(1);
+            this->expect_token(TokType::RPAREN); // some random token
         }
     }
     parent = this->parse_call_or_subscript_chain(parent);
@@ -351,12 +317,7 @@ Node* Parser::parse_id_or_literal() {
         case TokType::LPAREN: {
             this->next();
             node = this->parse_expression();
-            if (!this->match(TokType::RPAREN)) {
-                std::cout << after_expression_error({TokType::RPAREN}, this->token, this->token.start);
-                exit(1);
-            } else {
-                this->next();
-            }
+            this->expect_token(TokType::RPAREN);
             break;
         }
         case TokType::ID: {
@@ -400,32 +361,11 @@ Node* Parser::parse_id_or_literal() {
         case TokType::DOLLAR_SIGN: {
             node = this->parse_partial_application();
             return node;
-
         }
         default:
-            std::string msg;
-            msg += E_FMT("Error: expected ");
-            msg += E_HLT("expression");
-            msg += E_FMT(" but got ");
-            msg += E_HLT(this->token.to_string());
-            msg += E_FMT(" at ");
-            msg += E_HLT(this->__file__ + ":" + this->token.pos_string());
-            msg += E_FMT("\n");
-            msg += E_LINE(this->code_lines.get_line(this->token.start.line) + "\n");
-            std::cout << msg << std::endl;
-            exit(1);
+            this->error_expected_expression(this->token);
     }
     return node;
-}
-
-std::string Parser::empty_tuple_error(TextPosition pos) {
-    std::string msg = text_pos_to_string(this->__file__, pos) + E_FMT(" Error: can't have an empty tuple");
-    return msg;
-}
-
-std::string Parser::tuple_one_element_error(TextPosition pos) {
-    std::string msg = text_pos_to_string(this->__file__, pos) + E_FMT(" Error: can't have tuple with only one element");
-    return msg;
 }
 
 Node* Parser::parse_class_or_tuple_literal() {
@@ -436,8 +376,7 @@ Node* Parser::parse_class_or_tuple_literal() {
         this->next();
         VectorOfNodes values;
         if (this->match(TokType::RPAREN)) {
-            std::cout << empty_tuple_error(hash_tok.start);
-            exit(1);
+            this->error_empty_tuple(hash_tok.start);
         }
         bool first = true;
         while (true) {
@@ -449,8 +388,7 @@ Node* Parser::parse_class_or_tuple_literal() {
                 continue;
             } else {
                 if (first && this->match(TokType::RPAREN)) {
-                    std::cout << tuple_one_element_error(hash_tok.start);
-                    exit(1);
+                    this->error_tuple_one_element(hash_tok.start);
                 }
                 break;
             }
@@ -575,9 +513,6 @@ Node* Parser::parse_call_or_subscript_chain(Node* parent) {
         } else if (this->match(TokType::LSQUARE)) {
 //                subscript
             this->next();
-            if (this->match(TokType::RSQUARE)) {
-                throw std::runtime_error("Empty subscript error!");
-            }
             Node* value = this->parse_expression();
             Node* old_node = node;
             node = new SubscriptNode(node, {value});
@@ -590,51 +525,13 @@ Node* Parser::parse_call_or_subscript_chain(Node* parent) {
 
 DeclarationNode* Parser::parse_variable_declaration() {
     Token var_token = this->expect_token(TokType::VAR);
-    if (!this->match(TokType::ID)) {
-        std::string msg;
-        msg += E_FMT("Got ");
-        msg += E_HLT(this->token.to_string());
-        msg += E_FMT(" expected ");
-        msg += E_HLT(TOKEN_STRINGS[TokType::ID]);
-        msg += E_FMT(" (new variable name)");
-        msg += E_FMT(" at ");
-        msg += E_HLT(this->__file__ + ":" + this->token.pos_string());
-        std::cout << msg << std::endl;
-        exit(1);
-    }
     Token identifier = this->expect_token(TokType::ID);
     TypeNode* type = nullptr;
-    if (!this->match(TokType::COLON) && !this->match(TokType::EQQ)) {
-        std::string msg;
-        msg += E_FMT("Got ");
-        msg += E_HLT(this->token.to_string());
-        msg += E_FMT(" expected ");
-        msg += E_HLT(TOKEN_STRINGS[TokType::COLON]);
-        msg += E_FMT(" or ");
-        msg += E_HLT(TOKEN_STRINGS[TokType::EQQ]);
-        msg += E_FMT(" (new variable type/initial value)");
-        msg += E_FMT(" at ");
-        msg += E_HLT(this->__file__ + ":" + this->token.pos_string());
-        std::cout << msg << std::endl;
-        exit(1);
-    }
     if (this->match(TokType::COLON)) {
         this->next();
         type = this->parse_type_node();
     }
-    if (!this->match(TokType::EQQ)) {
-        std::string msg;
-        msg += E_FMT("Got ");
-        msg += E_HLT(this->token.to_string());
-        msg += E_FMT(" expected ");
-        msg += E_HLT(TOKEN_STRINGS[TokType::ID]);
-        msg += E_FMT(" (new variable initialization)");
-        msg += E_FMT(" at ");
-        msg += E_HLT(this->__file__ + ":" + this->token.pos_string());
-        std::cout << msg << std::endl;
-        exit(1);
-    }
-    this->next();
+    this->expect_token(TokType::EQQ);
     Node* expression = this->parse_expression();
     return new DeclarationNode(identifier.str, type, expression, var_token.start);
 }
@@ -661,28 +558,19 @@ Node* Parser::parse_common_statement() {
             return this->parse_while_loop();
         }
         case TokType::BREAK: {
-            this->next();
             if (!this->inside_loop) {
-                Token token = this->token;
-                std::string msg;
-                msg = E_FMT("Error: ") + E_HLT("break") + E_FMT(" used outside loop") + E_FMT(" at ") +
-                      E_HLT(text_pos_to_string(this->__file__, token.start));
-                std::cout << msg;
-                exit(1);
+                this->error_out_of_loop(this->token);
+
             }
+            this->next();
             return new BreakNode();
         }
         case TokType::CONTINUE: {
-            Token token = this->token;
-            this->next();
-            std::cout << "RETURNIONG A CONTINUE NODE" << std::endl;
             if (!this->inside_loop) {
-                std::string msg;
-                msg = E_FMT("Error: ") + E_HLT("continue") + E_FMT(" used outside loop") + E_FMT(" at ") +
-                      E_HLT(text_pos_to_string(this->__file__, token.start));
-                std::cout << msg;
-                exit(1);
+                this->error_out_of_loop(this->token);
+
             }
+            this->next();
             return new ContinueNode();
         }
         default: {
@@ -715,17 +603,6 @@ FunctionType* Parser::parse_function_type() {
 }
 
 ObjectType* Parser::parse_object_type() {
-    if (!this->match(TokType::ID)) {
-        std::string msg = E_FMT("Got ");
-        msg += E_HLT(this->token.to_string());
-        msg += E_FMT(" expected ");
-        msg += E_HLT(TOKEN_STRINGS[TokType::ID]);
-        msg += E_FMT(" (type)");
-        msg += E_FMT(" at ");
-        msg += E_HLT(this->__file__ + ":" + this->token.pos_string());
-        std::cout << msg << std::endl;
-        exit(1);
-    }
     Token identifier = this->expect_token(TokType::ID);
     VectorOfTypes type_parameters;
     if (this->match(TokType::LSQUARE)) {
@@ -739,10 +616,7 @@ ObjectType* Parser::parse_object_type() {
                 break;
             }
         }
-        if (!this->match(TokType::RSQUARE)) {
-            throw UnexpectedToken(this->token, {TokType::RSQUARE, TokType::COMMA});
-        }
-        this->next();
+        this->expect_token(TokType::RSQUARE);
     }
     return new ObjectType(identifier.str, type_parameters);
 }
@@ -750,22 +624,14 @@ ObjectType* Parser::parse_object_type() {
 TypeNode* Parser::parse_type_node() {
     if (this->match(TokType::FUN)) {
         return this->parse_function_type();
+    } else if (this->match(TokType::ID)) {
+        return this->parse_object_type();
+    } else {
+        this->error_expected_type(this->token);
     }
-    return this->parse_object_type();
 }
 
 BlockNode* Parser::parse_possibly_empty_block() {
-    if (!this->match(TokType::LCURLY)) {
-        std::string msg = E_FMT("Got ");
-        msg += E_HLT(this->token.to_string());
-        msg += E_FMT(" expected ");
-        msg += E_HLT(" left curly {{");
-        msg += E_FMT(" (block)");
-        msg += E_FMT(" at ");
-        msg += E_HLT(this->__file__ + ":" + this->token.pos_string());
-        std::cout << msg << std::endl;
-        exit(1);
-    }
     Token st = this->expect_token(TokType::LCURLY);
     VectorOfNodes block;
     while (true) {
@@ -788,7 +654,7 @@ FunctionNode* Parser::parse_function_definition() {
     VectorOfStrings parameter_names;
 
     if (!this->match(TokType::RPAREN) && !this->match(TokType::ID)) {
-        throw UnexpectedToken(this->token, {TokType::RPAREN, TokType::ID});
+        this->expect_token(TokType::RPAREN);
     }
 
     if (this->match(TokType::RPAREN)) {
@@ -799,34 +665,8 @@ FunctionNode* Parser::parse_function_definition() {
         // Parse parameter list
 
         while (true) {
-            if (!this->match(TokType::ID)) {
-                std::string msg = E_FMT("Error: got ");
-                msg += E_HLT(this->token.to_string());
-                msg += E_FMT(" expected ");
-                msg += E_HLT(TOKEN_STRINGS[TokType::ID]);
-                msg += E_FMT(" (argument #" + std::to_string(parameter_names.size() + 1) + " of function ");
-                msg += E_HLT(identifier);
-                msg += E_FMT(")");
-                msg += E_FMT(" at ");
-                msg += E_HLT(this->__file__ + ":" + this->token.pos_string());
-                std::cout << msg << std::endl;
-                exit(1);
-            }
             Token parameter_identifier = this->expect_token(TokType::ID);
-            if (!this->match(TokType::COLON)) {
-                std::string msg = E_FMT("Error: got ");
-                msg += E_HLT(this->token.to_string());
-                msg += E_FMT(" expected ");
-                msg += E_HLT(" colon ( : )");
-                msg += E_FMT(" (argument ");
-                msg += E_HLT(parameter_identifier.str);
-                msg += E_FMT(" type)");
-                msg += E_FMT(" at ");
-                msg += E_HLT(this->__file__ + ":" + this->token.pos_string());
-                std::cout << msg << std::endl;
-                exit(1);
-            }
-            this->next();
+            this->expect_token(TokType::COLON);
             TypeNode* parameter_type = this->parse_type_node();
             parameter_types.push_back(parameter_type);
             parameter_names.push_back(parameter_identifier.str);
@@ -857,7 +697,10 @@ FunctionNode* Parser::parse_function_definition() {
 
 Token Parser::expect_token(TokType token_type) {
     if (not this->match(token_type)) {
-        throw UnexpectedToken(this->token, std::vector<TokType>(1, token_type));
+        std::string msg =
+                this->context_string(this->token.start) + E_FMT("Unexpected token ") + E_HLT(this->token.to_string()) +
+                this->code_context_string(this->token.start);
+        throw std::runtime_error(msg);
     }
     Token matched_token = this->token;
     this->next();
@@ -877,24 +720,13 @@ Node* Parser::parse_top_level_statement() {
     }
 }
 
+
 ForNode* Parser::parse_for_loop() {
     Token for_tok = this->expect_token(TokType::FOR);
     bool expect_paren = false;
     if (this->match(TokType::LPAREN)) {
         this->next();
         expect_paren = true;
-    }
-    if (!this->match(TokType::ID)) {
-        std::string msg;
-        msg += E_FMT("Got ");
-        msg += E_HLT(this->token.to_string());
-        msg += E_FMT(" expected ");
-        msg += E_HLT(TOKEN_STRINGS[TokType::ID]);
-        msg += E_FMT(" (for loop variable)");
-        msg += E_FMT(" at ");
-        msg += E_HLT(this->__file__ + ":" + this->token.pos_string());
-        std::cout << msg << std::endl;
-        exit(1);
     }
     Token var = this->expect_token(TokType::ID);
     this->expect_token(TokType::ARROBA);
@@ -927,10 +759,6 @@ Node* Parser::parse_ternary() {
 WhileNode* Parser::parse_while_loop() {
     Token while_tok = this->expect_token(TokType::WHILE);
     Node* condition = this->parse_expression();
-    if (!this->match(TokType::LCURLY)) {
-        std::cout << after_expression_error({TokType::LCURLY}, this->token, this->token.start);
-        exit(1);
-    }
     bool prev = this->inside_loop;
     this->inside_loop = true;
     BlockNode* body = this->parse_possibly_empty_block();
@@ -967,10 +795,8 @@ ClassNode* Parser::parse_class_definition() {
             TypeNode* member_type = this->parse_type_node();
             if (members.find(member_name_tk.str) != members.end() ||
                 methods.find(member_name_tk.str) != methods.end()) {
-                throw std::runtime_error(
-                        "Error in class " + class_name_tk.str + " definition: member/method \"" + member_name_tk.str +
-                        "\" already defined!"
-                );
+                this->error_class_member_redefined(class_name_tk.str, member_name_tk.str, member_name_tk.start);
+
             }
             members[member_name_tk.str] = member_type;
             members_ordered.push_back(member_name_tk.str);
@@ -979,11 +805,8 @@ ClassNode* Parser::parse_class_definition() {
             FunctionNode* method_node = this->parse_function_definition();
             if (members.find(method_node->identifier) != members.end() ||
                 methods.find(method_node->identifier) != methods.end()) {
-                throw std::runtime_error(
-                        "Error in class " + class_name_tk.str + " definition: member/method \"" +
-                        method_node->identifier +
-                        "\" already defined!"
-                );
+                this->error_class_member_redefined(class_name_tk.str, method_node->identifier, method_node->start);
+
             }
             methods.insert(make_pair(method_node->identifier, method_node));
         } else {
@@ -1016,4 +839,5 @@ ImportNode* Parser::parse_import() {
     auto x = new ImportNode(module_tok.str, imports);
     return x;
 }
+
 
