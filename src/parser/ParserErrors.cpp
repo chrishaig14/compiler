@@ -92,7 +92,7 @@ Parser::error_after_expression(const std::vector<TokType>& expected_extra, Token
 }
 
 void Parser::error_empty_tuple(TextPosition pos) {
-    std::string msg = text_pos_to_string(this->__file__, pos) + E_FMT(" Can't have an empty tuple");
+    std::string msg = E_FMT(" Can't have an empty tuple");
     this->error(msg, pos);
 }
 
@@ -147,8 +147,7 @@ void Parser::error_expected_type(Token tok) {
 
 void Parser::error(const std::string& msg, TextPosition pos) {
     std::string m = this->context_string(pos) + msg + this->code_context_string(pos);
-    std::cout << "Syntax Error: " << m << std::endl;
-    throw std::runtime_error("ParseError: " + msg);
+    throw std::runtime_error("ParseError: " + m);
 }
 
 void Parser::error_object_type(Token tok) {

@@ -183,7 +183,6 @@ Node* Parser::parse_assignment_or_expression() {
     } else {
         if (lvalue->ntype != NodeType::CALL) {
             this->error_expected_statement(this->token.start);
-
         }
     }
     return lvalue;
@@ -318,12 +317,7 @@ Node* Parser::parse_id_or_literal() {
         case TokType::LPAREN: {
             this->next();
             node = this->parse_expression();
-            if (!this->match(TokType::RPAREN)) {
-                this->error_after_expression({TokType::RPAREN}, this->token, this->token.start);
-
-            } else {
-                this->next();
-            }
+            this->expect_token(TokType::RPAREN);
             break;
         }
         case TokType::ID: {
@@ -367,12 +361,9 @@ Node* Parser::parse_id_or_literal() {
         case TokType::DOLLAR_SIGN: {
             node = this->parse_partial_application();
             return node;
-
         }
         default:
             this->error_expected_expression(this->token);
-
-
     }
     return node;
 }
@@ -386,7 +377,6 @@ Node* Parser::parse_class_or_tuple_literal() {
         VectorOfNodes values;
         if (this->match(TokType::RPAREN)) {
             this->error_empty_tuple(hash_tok.start);
-
         }
         bool first = true;
         while (true) {
@@ -399,7 +389,6 @@ Node* Parser::parse_class_or_tuple_literal() {
             } else {
                 if (first && this->match(TokType::RPAREN)) {
                     this->error_tuple_one_element(hash_tok.start);
-
                 }
                 break;
             }
@@ -614,9 +603,6 @@ FunctionType* Parser::parse_function_type() {
 }
 
 ObjectType* Parser::parse_object_type() {
-    if (!this->match(TokType::ID)) {
-        this->error_object_type(this->token);
-    }
     Token identifier = this->expect_token(TokType::ID);
     VectorOfTypes type_parameters;
     if (this->match(TokType::LSQUARE)) {
@@ -646,17 +632,6 @@ TypeNode* Parser::parse_type_node() {
 }
 
 BlockNode* Parser::parse_possibly_empty_block() {
-    if (!this->match(TokType::LCURLY)) {
-        std::string msg = E_FMT("Got ");
-        msg += E_HLT(this->token.to_string());
-        msg += E_FMT(" expected ");
-        msg += E_HLT(" left curly {{");
-        msg += E_FMT(" (block)");
-        msg += E_FMT(" at ");
-        msg += E_HLT(this->__file__ + ":" + this->token.pos_string());
-        std::cout << msg << std::endl;
-
-    }
     Token st = this->expect_token(TokType::LCURLY);
     VectorOfNodes block;
     while (true) {
@@ -679,7 +654,7 @@ FunctionNode* Parser::parse_function_definition() {
     VectorOfStrings parameter_names;
 
     if (!this->match(TokType::RPAREN) && !this->match(TokType::ID)) {
-        throw UnexpectedToken(this->token, {TokType::RPAREN, TokType::ID});
+        this->expect_token(TokType::RPAREN);
     }
 
     if (this->match(TokType::RPAREN)) {
@@ -720,14 +695,6 @@ FunctionNode* Parser::parse_function_definition() {
     return node;
 }
 
-void Parser::unexpected_token_error() {
-    std::string msg =
-            this->context_string(this->token.start) + E_FMT("Unexpected token ") + E_HLT(this->token.to_string()) +
-            this->code_context_string(this->token.start);
-    std::cout << msg << std::endl;
-
-}
-
 Token Parser::expect_token(TokType token_type) {
     if (not this->match(token_type)) {
         std::string msg =
@@ -760,18 +727,6 @@ ForNode* Parser::parse_for_loop() {
     if (this->match(TokType::LPAREN)) {
         this->next();
         expect_paren = true;
-    }
-    if (!this->match(TokType::ID)) {
-        std::string msg;
-        msg += E_FMT("Got ");
-        msg += E_HLT(this->token.to_string());
-        msg += E_FMT(" expected ");
-        msg += E_HLT(TOKEN_STRINGS[TokType::ID]);
-        msg += E_FMT(" (for loop variable)");
-        msg += E_FMT(" at ");
-        msg += E_HLT(this->__file__ + ":" + this->token.pos_string());
-        std::cout << msg << std::endl;
-
     }
     Token var = this->expect_token(TokType::ID);
     this->expect_token(TokType::ARROBA);
