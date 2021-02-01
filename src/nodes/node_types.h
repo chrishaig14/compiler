@@ -14,6 +14,8 @@ enum NodeType {
     BRK,
     CALL,
     CLSEXP,
+    DICT,
+    EMPTYDICT,
     IMPORT,
     CLSFLD,
     CLS,

@@ -89,6 +89,10 @@ const DeclarationNode& Node::decl() const {
     this->throw_dereference_error(DECL);
 }
 
+const DictNode& Node::dict() const {
+    this->throw_dereference_error(DICT);
+}
+
 const ContinueNode& Node::cntinue() const {
     this->throw_dereference_error(CNTINUE);
 }
@@ -148,6 +152,15 @@ ContinueNode& Node::cntinue() {
 DeclarationNode& Node::decl() {
     this->throw_dereference_error(DECL);
 }
+
+DictNode& Node::dict() {
+    this->throw_dereference_error(DICT);
+}
+
+EmptyDictNode& Node::emptydict() {
+    this->throw_dereference_error(EMPTYDICT);
+}
+
 
 EmptyListNode& Node::emptylst() {
     this->throw_dereference_error(EMPTYLST);
@@ -320,6 +333,9 @@ std::string Node::node_type_string(NodeType type) const {
         case PARTIAL:
             return "PARTIAL";
             break;
+        case DICT:
+            return "DICT";
+            break;
     }
     return "UNKNOWN";
 }
@@ -336,6 +352,10 @@ BoolOpNode& Node::boolop() {
 
 const BoolOpNode& Node::boolop() const {
     this->throw_dereference_error(BOOLOP);
+}
+
+const EmptyDictNode& Node::emptydict() const {
+    this->throw_dereference_error(EMPTYDICT);
 }
 
 const ImportNode& Node::import() const {

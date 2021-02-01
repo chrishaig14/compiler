@@ -287,6 +287,36 @@ Node* Parser::parse_factor() {
     return parent;
 }
 
+Node* Parser::parse_dictionary() {
+    this->expect_token(TokType::LCURLY);
+    DictNode* dict = new DictNode();
+    if (this->match(TokType::RCURLY)) {
+        // empty dict
+        this->next();
+        this->expect_token(TokType::DOUBLE_COLON);
+        this->expect_token(TokType::LSQUARE);
+        TypeNode* key_type = this->parse_type_node();
+        this->expect_token(TokType::COMMA);
+        TypeNode* value_type = this->parse_type_node();
+        this->expect_token(TokType::RSQUARE);
+        return new EmptyDictNode(key_type, value_type);
+    }
+    while (true) {
+        Node* key = this->parse_expression();
+        this->expect_token(TokType::COLON);
+        Node* value = this->parse_expression();
+        dict->items.push_back(std::make_pair(key, value));
+        if (this->match(TokType::COMMA)) {
+            this->next();
+        } else {
+            this->expect_token(TokType::RCURLY);
+            break;
+        }
+    }
+    return dict;
+}
+
+
 Node* Parser::parse_partial_application() {
     this->expect_token(TokType::DOLLAR_SIGN);
     Token total_function_tok = this->expect_token(TokType::ID);
@@ -360,6 +390,10 @@ Node* Parser::parse_id_or_literal() {
         }
         case TokType::DOLLAR_SIGN: {
             node = this->parse_partial_application();
+            return node;
+        }
+        case TokType::LCURLY: {
+            node = this->parse_dictionary();
             return node;
         }
         default:

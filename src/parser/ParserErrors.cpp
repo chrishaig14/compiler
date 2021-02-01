@@ -166,3 +166,4 @@ void Parser::error_expected_statement(TextPosition pos) {
     msg += E_FMT("Expected a statement (assignment, function call, if, while, for, return)");
     this->error(msg, pos);
 }
+

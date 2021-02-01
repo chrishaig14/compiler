@@ -78,7 +78,7 @@ add_library(
         nodes/BoolOpNode.cpp
         nodes/BoolOpNode.h
         nodes/PartialApplication.cpp
-        nodes/PartialApplication.h)
+        nodes/PartialApplication.h nodes/DictNode.cpp nodes/DictNode.h nodes/EmptyDictNode.cpp nodes/EmptyDictNode.h)
 
 add_library(parser parser/Parser.cpp parser/Parser.h parser/UnexpectedToken.cpp
             parser/UnexpectedToken.h parser/ParserErrors.cpp)
