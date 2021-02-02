@@ -350,6 +350,60 @@ TEST_F(parser_test, error_42) {
     ASSERT_PARSE_ERROR(parser, "expected expression");
 }
 
+TEST_F(parser_test, error_43) {
+    std::string text = "fun main(x: Integer)->String{var x = {\"chris\"}";
+    SetUp(text);
+    ASSERT_PARSE_ERROR(parser, "Unexpected token");
+}
+
+TEST_F(parser_test, error_44) {
+    std::string text = "fun main(x: Integer)->String{var x = {\"chris\":23,}";
+    SetUp(text);
+    ASSERT_PARSE_ERROR(parser, "expected expression");
+}
+
+TEST_F(parser_test, error_45) {
+    std::string text = "fun main(x: Integer)->String{var x = {}2";
+    SetUp(text);
+    ASSERT_PARSE_ERROR(parser, "Unexpected token");
+}
+
+TEST_F(parser_test, error_46) {
+    std::string text = "fun main(x: Integer)->String{var x = {}::23";
+    SetUp(text);
+    ASSERT_PARSE_ERROR(parser, "Unexpected token");
+}
+
+TEST_F(parser_test, error_47) {
+    std::string text = "fun main(x: Integer)->String{var x = {}::[31";
+    SetUp(text);
+    ASSERT_PARSE_ERROR(parser, "expected type");
+}
+
+TEST_F(parser_test, error_48) {
+    std::string text = "fun main(x: Integer)->String{var x = {}::[Integer+";
+    SetUp(text);
+    ASSERT_PARSE_ERROR(parser, "Unexpected token");
+}
+
+TEST_F(parser_test, error_49) {
+    std::string text = "fun main(x: Integer)->String{var x = {}::[Integer,$";
+    SetUp(text);
+    ASSERT_PARSE_ERROR(parser, "expected type");
+}
+
+TEST_F(parser_test, error_50) {
+    std::string text = "fun main(x: Integer)->String{var x = {}::[Integer,List[Integer]+";
+    SetUp(text);
+    ASSERT_PARSE_ERROR(parser, "Unexpected token");
+}
+
+TEST_F(parser_test, error_51) {
+    std::string text = "fun main(x: Integer)->String{var x = {}::[Integer,List[Integer]],";
+    SetUp(text);
+    ASSERT_PARSE_ERROR(parser, "Unexpected token");
+}
+
 TEST_F(parser_test, a_plus_b) {
     std::string text = "a + b";
     SetUp(text);
@@ -938,6 +992,45 @@ TEST_F(parser_test, parse_list_one_element) {
     VectorOfNodes list = {new NumberNode(13)};
     expected_node = new ListNode(list);
     EXPECT_EQ(*node, *expected_node);
+}
+
+TEST_F(parser_test, parse_empty_dict) {
+    std::string text = "{}::[String,Integer]";
+    SetUp(text);
+    node = parser->parse_expression();
+    expected_node = new EmptyDictNode(new T_STRING, new T_INT);
+    EXPECT_EQ(*node, *expected_node);
+}
+
+
+TEST_F(parser_test, parse_dict_one_element) {
+    std::string text = "{\"chris\":26}";
+    SetUp(text);
+    node = parser->parse_expression();
+    DictNode dict;
+    expected_node = &dict;
+    dict.items = {{new StringNode("chris"), new NumberNode(26)}};
+    EXPECT_EQ(*node, *expected_node);
+}
+
+TEST_F(parser_test, parse_dict_one_element_diff_value) {
+    std::string text = "{\"chris\":26}";
+    SetUp(text);
+    node = parser->parse_expression();
+    DictNode dict;
+    expected_node = &dict;
+    dict.items = {{new StringNode("chris"), new NumberNode(27)}};
+    EXPECT_NE(*node, *expected_node);
+}
+
+TEST_F(parser_test, parse_dict_one_element_diff_key) {
+    std::string text = "{\"chris\":26}";
+    SetUp(text);
+    node = parser->parse_expression();
+    DictNode dict;
+    expected_node = &dict;
+    dict.items = {{new StringNode("johnny"), new NumberNode(26)}};
+    EXPECT_NE(*node, *expected_node);
 }
 
 TEST_F(parser_test, parse_none) {

@@ -34,6 +34,8 @@ class ContinueNode;
 
 class DeclarationNode;
 
+class DictNode;
+
 class EmptyListNode;
 
 class ForNode;
@@ -45,6 +47,8 @@ class IdNode;
 class IfNode;
 
 class ListNode;
+
+class EmptyDictNode;
 
 class MemberNode;
 
@@ -113,6 +117,8 @@ public:
     virtual ClassNode& cls();
     virtual ContinueNode& cntinue();
     virtual DeclarationNode& decl();
+    virtual DictNode& dict();
+    virtual EmptyDictNode& emptydict();
     virtual EmptyListNode& emptylst();
     virtual FloatNode& flot();
     virtual ForNode& forloop();
@@ -140,6 +146,8 @@ public:
     virtual const ClassNode& cls() const;
     virtual const ContinueNode& cntinue() const;
     virtual const DeclarationNode& decl() const;
+    virtual const DictNode& dict() const;
+    virtual const EmptyDictNode& emptydict() const;
     virtual const EmptyListNode& emptylst() const;
     virtual const FloatNode& flot() const;
     virtual const ForNode& forloop() const;

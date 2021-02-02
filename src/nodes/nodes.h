@@ -11,6 +11,8 @@
 #include "CallNode.h"
 #include "BooleanNode.h"
 #include "BreakNode.h"
+#include "DictNode.h"
+#include "EmptyDictNode.h"
 #include "EmptyListNode.h"
 #include "ClassLiteralExpressionNode.h"
 #include "ClassNode.h"
