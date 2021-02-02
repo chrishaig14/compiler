@@ -431,11 +431,11 @@ USemanticInfo Checker::dispatch(Node* nod) {
         case PARTIAL:
             return this->visit(n.partial());
             break;
-        case OTYPE:
+        case DICT:
+            return this->visit(n.dict());
             break;
-        case FTYPE:
-            break;
-        case IMPORT:
+        case EMPTYDICT:
+            return this->visit(n.emptydict());
             break;
         default:
             throw std::runtime_error("Don't know what to do!");
