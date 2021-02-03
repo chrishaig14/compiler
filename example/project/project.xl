@@ -1,3 +1,6 @@
-fun main()->Dict[Integer{
-
+fun main()->Integer{
+    var l = [1,2,3]
+    var d = {}::[List[Integer],Integer]
+    var x : Integer = {"hello": 34, "asdf": false};
+    return 0
 }

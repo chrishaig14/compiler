@@ -86,6 +86,8 @@ public:
     USemanticInfo visit(ClassNode& node);
     USemanticInfo visit(ContinueNode& node);
     USemanticInfo visit(DeclarationNode& node);
+    USemanticInfo visit(DictNode& node);
+    USemanticInfo visit(EmptyDictNode& node);
     USemanticInfo visit(EmptyListNode& node);
     USemanticInfo visit(FloatNode& node);
     USemanticInfo visit(ForNode& node);

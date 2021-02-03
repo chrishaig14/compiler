@@ -90,6 +90,13 @@ USemanticInfo Checker::visit(SubscriptNode& node) {
             this->error_subscript_type(object_type, ct->type(), T_INT, node.start);
         }
         symbol_info.set_type(*object_type.type_params[0]);
+    } else if (object_type.id == "Dict") {
+        TypeNode* key_type = object_type.type_params[0];
+        if (ct->type() != *key_type) {
+            throw std::runtime_error("Error key of dictionary must be of type " + ct->type().to_string());
+        }
+        TypeNode* value_type = object_type.type_params[1];
+        symbol_info.set_type(*value_type);
     } else if (object_type.id == "String") {
         if (!is_integer) {
             this->error_subscript_type(object_type, ct->type(), T_INT, node.start);
@@ -964,4 +971,29 @@ USemanticInfo Checker::visit(ReturnNode& n) {
         return this->error();
     }
     return nullptr;
+}
+
+USemanticInfo Checker::visit(DictNode& node) {
+    SemanticInfo info;
+    USemanticInfo first_key_type = this->dispatch(node.items[0].first);
+    USemanticInfo first_value_type = this->dispatch(node.items[0].second);
+
+    for (int i = 1; i < node.items.size(); i++) {
+        USemanticInfo key_type = this->dispatch(node.items[i].first);
+        USemanticInfo value_type = this->dispatch(node.items[i].second);
+        if (key_type->type() != first_key_type->type()) {
+            throw std::runtime_error("Second key type different to first");
+        }
+        if (value_type->type() != first_value_type->type()) {
+            throw std::runtime_error("Second value type different to first");
+        }
+    }
+    info.set_type(ObjectType("Dict", {first_key_type->type().clone(), first_value_type->type().clone()}));
+    return std::make_unique<SemanticInfo>(info);
+}
+
+USemanticInfo Checker::visit(EmptyDictNode& node) {
+    SemanticInfo info;
+    info.set_type(ObjectType("Dict", {node.key_type, node.value_type}));
+    return std::make_unique<SemanticInfo>(info);
 }
