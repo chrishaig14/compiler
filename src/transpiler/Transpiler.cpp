@@ -477,11 +477,24 @@ std::string Transpiler::visit_if(IfNode& node) {
 
 std::string Transpiler::visit_list(ListNode& node) {
     std::string out;
-    out = "GC::register_object(LIST_TO_PTR(new XList({";
+    out = "GC::register_object((new XList({";
     for (int i = 0; i < node.elements.size(); i++) {
         out += this->dispatch(node.elements[i]) + ", ";
     }
     if (node.elements.size() != 0) {
+        out = out.substr(0, out.size() - 2);
+    }
+    out += "})))";
+    return out;
+}
+
+std::string Transpiler::visit_dict(DictNode& node) {
+    std::string out;
+    out = "GC::register_object((new XDict({";
+    for (int i = 0; i < node.items.size(); i++) {
+        out += "{" + this->dispatch(node.items[i].first) + ", " + this->dispatch(node.items[i].second) + "}, ";
+    }
+    if (node.items.size() != 0) {
         out = out.substr(0, out.size() - 2);
     }
     out += "})))";
@@ -636,6 +649,11 @@ std::string Transpiler::dispatch(Node* nptr) {
             return this->visit_partial(n.partial());
         case IMPORT:
             return "";
+            break;
+        case DICT:
+            return this->visit_dict(n.dict());
+            break;
+        case EMPTYDICT:
             break;
         default:
             throw std::runtime_error("Don't know what to do!");

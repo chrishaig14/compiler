@@ -64,6 +64,7 @@ public:
     std::string add_type(const TypeNode& t, std::string n);
     std::string ptr_to_type(const TypeNode& t);
     std::string ptr_to_type_object(const ObjectType& t);
+    std::string visit_dict(DictNode& node);
 };
 
 
