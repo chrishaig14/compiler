@@ -165,12 +165,17 @@ inline XString* PTR_TO_STRING(XObject* l) {
     return (XString*) ((unsigned long) l & 0xfffffffffffffff0);
 }
 
+XObject* hash(XObject* n);
+
+
 class XDict : public XObject {
 public:
     std::unordered_map<XObject*, XObject*> l;
 
     XDict(const std::unordered_map<XObject*, XObject*>& v) : XObject("Dict") {
-        this->l = v;
+        for(auto& it: v){
+            this->l[hash(it.first)] = it.second;
+        }
         this->is_list = false;
     }
 
