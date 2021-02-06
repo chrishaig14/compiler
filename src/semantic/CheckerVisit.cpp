@@ -93,7 +93,7 @@ USemanticInfo Checker::visit(SubscriptNode& node) {
     } else if (object_type.id == "Dict") {
         TypeNode* key_type = object_type.type_params[0];
         if (ct->type() != *key_type) {
-            throw std::runtime_error("Error key of dictionary must be of type " + ct->type().to_string());
+            throw std::runtime_error("Error key of dictionary must be of type " +key_type->to_string() + " but it is "  + ct->type().to_string());
         }
         TypeNode* value_type = object_type.type_params[1];
         symbol_info.set_type(*value_type);

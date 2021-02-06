@@ -117,8 +117,6 @@ XObject* op_leq(XObject* a, XObject* b) {
 }
 
 
-
-
 XObject* subscript(XObject* _l, XObject* i) {
     XObject* p = UNTAG(_l);
     if (p->is_list) {
@@ -127,7 +125,11 @@ XObject* subscript(XObject* _l, XObject* i) {
         return list->l[index];
     }
     XDict* dict = (XDict*) UNTAG(_l);
-    return dict->l.at(hash(i));
+    int h = hash(i);
+    if (dict->l.find(h) == dict->l.end()) {
+        throw std::runtime_error("DictKeyError: key not found");
+    }
+    return dict->l.at(h);
 }
 
 

@@ -1,6 +1,5 @@
 fun main()->Integer{
-    var l = [1,2,3]
-    var d = {}::[List[Integer],Integer]
-    var x : Integer = {"hello": 34, "asdf": false};
+    var x = {5:"Hello", 8: "Chris", 3: "Alex"};
+    print(x[8]+x[3])
     return 0
 }

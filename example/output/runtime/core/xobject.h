@@ -165,36 +165,16 @@ inline XString* PTR_TO_STRING(XObject* l) {
     return (XString*) ((unsigned long) l & 0xfffffffffffffff0);
 }
 
-XObject* hash(XObject* n);
+int hash(XObject* n);
 
 
 class XDict : public XObject {
 public:
-    std::unordered_map<XObject*, XObject*> l;
+    std::unordered_map<int, XObject*> l;
 
-    XDict(const std::unordered_map<XObject*, XObject*>& v) : XObject("Dict") {
-        for(auto& it: v){
-            this->l[hash(it.first)] = it.second;
-        }
-        this->is_list = false;
-    }
+    XDict(std::unordered_map<XObject*, XObject*> v);
 
-    void mark(std::vector<XObject*>& new_root) override {
-        // int list_len = this->l.size();
-        // if (list_len != 0) {
-        //     if (has_tag(this->l[0], INT_TAG)) {
-        //         // don't gc ints as they are not heap-allocated
-        //     } else {
-        //         for (int j = 0; j < list_len; j++) {
-        //             XObject* element = PTR_TO_OBJ(this->l[j]);
-        //             if (!element->is_reachable() && !element->inserted) {
-        //                 new_root.push_back(element);
-        //                 element->inserted = true;
-        //             }
-        //         }
-        //     }
-        // }
-    }
+    void mark(std::vector<XObject*>& new_root) override;
 };
 
 #endif //UNTITLED1_XOBJECT_H
