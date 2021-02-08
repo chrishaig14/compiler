@@ -194,7 +194,7 @@ std::string Transpiler::visit_class(ClassNode& node) {
     for (int i = 0; i < node.members_ordered.size(); i++) {
         get_member += "if (s==\"" + node.members_ordered[i] + "\"){return this->" + node.members_ordered[i] + ";}\n";
     }
-    get_member += "}\n";
+    get_member += "return nullptr;}\n";
     out += get_member;
     std::string get_all_members;
     get_all_members += "std::vector<XObject*> get_members() override{\n";
