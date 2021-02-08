@@ -100,7 +100,38 @@ XObject* op_gt(XObject* a, XObject* b) {
 
 
 XObject* op_eq(XObject* a, XObject* b) {
-    return BOOL_TO_PTR(PTR_TO_INT(a) == PTR_TO_INT(b));
+    if (has_tag(a, INT_TAG)) {
+        return BOOL_TO_PTR(PTR_TO_INT(a) == PTR_TO_INT(b));
+    }
+    XObject* oa = UNTAG(a);
+    XObject* ob = UNTAG(b);
+    bool r = true;
+    if (oa->is_string) {
+        r = ((XString*) (oa))->s == ((XString*) (ob))->s;
+    } else if (oa->is_list) {
+        XList* la = (XList*) oa;
+        XList* lb = (XList*) ob;
+        if (la->l.size() != lb->l.size()) {
+            r = false;
+        } else {
+            for (int i = 0; i < la->l.size(); i++) {
+                if (!PTR_TO_BOOL(op_eq(la->l[i], lb->l[i]))) {
+                    r = false;
+                    break;
+                }
+            }
+        }
+    } else {
+        Tuple* ta = (Tuple*) oa;
+        Tuple* tb = (Tuple*) ob;
+        for (int i = 0; i < ta->members.size(); i++) {
+            if (!PTR_TO_BOOL(op_eq(ta->members[i], tb->members[i]))) {
+                r = false;
+                break;
+            }
+        }
+    }
+    return BOOL_TO_PTR(r);
 }
 
 XObject* op_neq(XObject* a, XObject* b) {
