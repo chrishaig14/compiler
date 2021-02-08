@@ -436,16 +436,16 @@ Node* Parser::parse_class_or_tuple_literal() {
         throw std::runtime_error("Expecterd a type to initialize, but got " + type->to_string());
     }
     ObjectType* otn = &type->object();
-    this->expect_token(TokType::LCURLY);
+    this->expect_token(TokType::LPAREN);
 
     std::unordered_map<std::string, Node*> init;
     VectorOfNodes exps;
-    if (!this->match(TokType::RCURLY)) {
+    if (!this->match(TokType::RPAREN)) {
         Node& first = *this->parse_expression();
         // if it's an id
         if (first.ntype == NodeType::ID) {
             IdNode& idn = first.id();
-            if (this->match(TokType::RCURLY)) {
+            if (this->match(TokType::RPAREN)) {
                 this->next();
                 exps.push_back(&first);
                 ClassLiteralExpressionNode* clen = new ClassLiteralExpressionNode(otn, exps);
@@ -465,7 +465,7 @@ Node* Parser::parse_class_or_tuple_literal() {
                         break;
                     }
                 }
-                this->expect_token(TokType::RCURLY);
+                this->expect_token(TokType::RPAREN);
                 ClassLiteralExpressionNode* clen = new ClassLiteralExpressionNode(otn, exps);
                 clen->start = hash_tok.start;
                 return clen;
@@ -488,7 +488,7 @@ Node* Parser::parse_class_or_tuple_literal() {
                         }
                     }
                 }
-                this->expect_token(TokType::RCURLY);
+                this->expect_token(TokType::RPAREN);
                 ClassLiteralFieldNode* clfn = new ClassLiteralFieldNode(otn, init);
                 clfn->start = hash_tok.start;
                 return clfn;
@@ -508,13 +508,13 @@ Node* Parser::parse_class_or_tuple_literal() {
                     }
                 }
             }
-            this->expect_token(TokType::RCURLY);
+            this->expect_token(TokType::RPAREN);
             ClassLiteralExpressionNode* clen = new ClassLiteralExpressionNode(otn, exps);
             clen->start = hash_tok.start;
             return clen;
         }
     }
-    this->expect_token(TokType::RCURLY);
+    this->expect_token(TokType::RPAREN);
     ClassLiteralFieldNode* clfn = new ClassLiteralFieldNode(otn, init);
     clfn->start = hash_tok.start;
     return clfn;
