@@ -169,15 +169,36 @@ USemanticInfo Checker::visit(ClassNode& node) {
     for (auto type_param: node.type_parameters) {
         tp.push_back(TYPE(type_param, {}));
     }
+
+    VectorOfTypes members_ordered_types;
+
     for (auto mt: node.members_ordered) {
         TypeNode& t = *node.members[mt];
+        members_ordered_types.push_back(&t);
         this->assert_type_exists(t, node.start);
     }
 
     this->this_type = new ObjectType(node.class_name, tp);
+    bool has_init = false;
     for (auto method: node.methods) {
         this->is_method = true;
         this->visit(*method.second);
+        has_init = method.first == "init";
+    }
+    if (!has_init) {
+        BlockNode* init_body = new BlockNode({});
+        for (auto mt: node.members_ordered) {
+            init_body->nodes.push_back(
+                    new AssignmentNode(
+                            new MemberNode(new IdNode("this"), mt),
+                            new IdNode(mt)));
+        }
+        node.methods["init"] = new FunctionNode(
+                "init",
+                node.members_ordered,
+                members_ordered_types,
+                new ObjectType(node.class_name, tp), init_body
+        );
     }
     this->is_method = false;
     this->add_this = false;

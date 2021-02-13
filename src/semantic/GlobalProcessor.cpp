@@ -105,14 +105,19 @@ void GlobalProcessor::visit(ClassNode& node) {
         class_info->member_types.push_back(mt->clone());
         class_info->members[mn] = mt->clone();
     }
+    bool has_init = false;
     for (auto f: node.methods) {
         FunctionNode& method = *f.second;
+        has_init = f.first == "init";
         VectorOfTypes x;
         for (auto p: method.parameter_types) {
             x.emplace_back(p->clone());
         }
         class_info->methods.insert(
                 make_pair(f.first, new FunctionType(x, method.return_type->clone())));
+    }
+    if (!has_init) {
+        class_info->methods["init"] = new FunctionType(class_info->member_types, new ObjectType(node.class_name, {}));
     }
     class_info->class_name = node.class_name;
     class_info->type_params = node.type_parameters;
