@@ -37,6 +37,13 @@ ClassInfo* make_list_class_info() {
     return list_class_info;
 }
 
+ClassInfo* make_file_class_info() {
+    auto int_class_info = new ClassInfo();
+    int_class_info->class_name = "File";
+    int_class_info->methods.insert(std::make_pair("read_line", new FunctionType({}, new T_STRING)));
+    return int_class_info;
+}
+
 ClassInfo* make_int_class_info() {
     auto int_class_info = new ClassInfo();
     int_class_info->class_name = "Integer";
@@ -67,6 +74,7 @@ ClassInfo* make_string_class_info() {
 
 Checker::Checker(SymbolTable* globals, ClassTable* class_table, FunctionTable* function_table) {
     this->is_lvalue = false;
+    this->is_method = false;
     this->function_table = function_table;
     this->failed = false;
     this->class_table = class_table;
@@ -77,6 +85,7 @@ Checker::Checker(SymbolTable* globals, ClassTable* class_table, FunctionTable* f
     this->this_type = nullptr;
 
     this->class_table->set("Float", make_float_class_info());
+    this->class_table->set("File", make_file_class_info());
     this->class_table->set("Integer", make_int_class_info());
     this->class_table->set("List", make_list_class_info());
     this->class_table->set("Boolean", make_boolean_class_info());

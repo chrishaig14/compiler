@@ -153,6 +153,7 @@ public:
     void error_class_init_wrong_number_init(const std::string& cls, int num_req, int num_given, TextPosition pos);
     void error_subscript_type(const TypeNode& t, const TypeNode& s, const TypeNode& es, TextPosition pos);
     void error_class_not_generic(const std::string& cls, TextPosition pos);
+    bool is_method;
 };
 
 bool function_is_generic(const FunctionType& ft);

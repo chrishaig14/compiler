@@ -18,6 +18,7 @@ public:
     std::string static_initializations;
     std::string externs_declaration;
     std::string globals_initialization;
+    std::string method_class;
     std::vector<ObjectType*> tuple_types;
     Transpiler();
     std::string dispatch(Node* nptr);
@@ -65,6 +66,7 @@ public:
     std::string ptr_to_type(const TypeNode& t);
     std::string ptr_to_type_object(const ObjectType& t);
     std::string visit_dict(DictNode& node);
+    unsigned long num_members_class;
 };
 
 

@@ -93,7 +93,9 @@ USemanticInfo Checker::visit(SubscriptNode& node) {
     } else if (object_type.id == "Dict") {
         TypeNode* key_type = object_type.type_params[0];
         if (ct->type() != *key_type) {
-            throw std::runtime_error("Error key of dictionary must be of type " +key_type->to_string() + " but it is "  + ct->type().to_string());
+            throw std::runtime_error(
+                    "Error key of dictionary must be of type " + key_type->to_string() + " but it is " +
+                    ct->type().to_string());
         }
         TypeNode* value_type = object_type.type_params[1];
         symbol_info.set_type(*value_type);
@@ -174,8 +176,10 @@ USemanticInfo Checker::visit(ClassNode& node) {
 
     this->this_type = new ObjectType(node.class_name, tp);
     for (auto method: node.methods) {
+        this->is_method = true;
         this->visit(*method.second);
     }
+    this->is_method = false;
     this->add_this = false;
     delete this_type;
     this->this_type = nullptr;
@@ -381,13 +385,22 @@ USemanticInfo Checker::visit(CallNode& n) {
         is_a_method = true;
     } else if (fun_info.is_class_method) {
         MemberNode& member_node = n.function->member();
-        n.function = new IdNode(fun_info.class_info->class_name + "." + member_node.s_child);
-        this->replace_me = false;
-        const FunctionType& ftn = fun_info.type().function();
-        FunctionType& copy_ftn = ftn.clone()->function();
-        copy_ftn.param_types.insert(copy_ftn.param_types.begin(), TYPE(fun_info.class_info->class_name, {}));
-        retv.set_type(*copy_ftn.clone());
-        object_node = member_node.parent;
+        if (member_node.s_child == "init") {
+            n.function = this->replacement;
+            this->replace_me = false;
+            const FunctionType& ftn = fun_info.type().function();
+            FunctionType& copy_ftn = ftn.clone()->function();
+            retv.set_type(*copy_ftn.clone());
+            object_node = member_node.parent;
+        } else {
+            n.function = new IdNode(fun_info.class_info->class_name + "." + member_node.s_child);
+            this->replace_me = false;
+            const FunctionType& ftn = fun_info.type().function();
+            FunctionType& copy_ftn = ftn.clone()->function();
+            copy_ftn.param_types.insert(copy_ftn.param_types.begin(), TYPE(fun_info.class_info->class_name, {}));
+            retv.set_type(*copy_ftn.clone());
+            object_node = member_node.parent;
+        }
     }
     if (fun_info.is_function || fun_info.is_method || fun_info.is_class_method) {
         // ok
@@ -508,6 +521,7 @@ USemanticInfo Checker::visit(ClassLiteralExpressionNode& node) {
 USemanticInfo Checker::visit(FunctionNode& n) {
     this->current_function = n.identifier;
     this->enter_scope(n.identifier);
+    bool is_init_method = this->is_method && n.identifier == "init";
     if (this->add_this) {
         this->scope->set("this", *this->this_type);
     }
@@ -518,10 +532,15 @@ USemanticInfo Checker::visit(FunctionNode& n) {
         }
         this->scope->set(n.parameter_names[i], type);
     }
+
     TypeNode& returnType = *n.return_type;
     this->assert_type_exists(returnType, n.start);
     this->scope->set("__return__", returnType);
     this->visit(*n.body);
+    if (is_init_method) {
+        this->leave_scope();
+        return nullptr;
+    }
     if (returnType != ObjectType(".None", {})) {
         if (n.body->nodes.size() != 0) {
             Node* last_node = n.body->nodes[n.body->nodes.size() - 1];
@@ -717,6 +736,23 @@ USemanticInfo Checker::visit(MemberNode& n) {
         if (this->class_table->declared(id_node._id)) {
             ClassInfo* class_info = this->class_table->get(id_node._id);
             if (class_info->methods.find(n.s_child) != class_info->methods.end()) {
+
+                if (n.s_child == "init") {
+                    const FunctionType& ft = *class_info->methods.find(n.s_child)->second;
+                    VectorOfTypes params = ft.param_types;
+                    for (int i = 0; i < params.size(); i++) {
+                        params[i] = params[i]->clone();
+                    }
+                    FunctionType f(params, new ObjectType(id_node._id, {}));
+                    rv.set_type(f);
+                    rv.is_class_method = true;
+                    this->replace_me = true;
+                    IdNode* idn = new IdNode(class_info->class_name + "." + n.s_child);
+                    idn->is_global_function = true;
+                    this->replacement = idn;
+                    return std::make_unique<SemanticInfo>(rv);
+                }
+
                 rv.set_type(*class_info->methods.find(n.s_child)->second);
                 rv.class_info = class_info;
 

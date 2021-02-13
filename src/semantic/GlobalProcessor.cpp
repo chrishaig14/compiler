@@ -26,6 +26,7 @@ GlobalProcessor::GlobalProcessor(std::vector<Builtin>& builtins, ClassTable* imp
     builtins.push_back(
             {"map", CodeBuiltin{new FunctionType(w, new T_LIST(new ObjectType("b", {}))), nullptr}}
     );
+    builtins.push_back({"File.read_line", CodeBuiltin{new FunctionType({}, new T_STRING), nullptr}});
     builtins.push_back({"Integer.str", CodeBuiltin{new FunctionType({new T_INT}, new T_STRING), nullptr}});
     builtins.push_back({"Float.str", CodeBuiltin{new FunctionType({new T_FLOAT}, new T_STRING), nullptr}});
 
@@ -48,6 +49,7 @@ GlobalProcessor::GlobalProcessor(std::vector<Builtin>& builtins, ClassTable* imp
     );
     builtins.push_back({"String.len", CodeBuiltin{new FunctionType({new T_STRING}, new T_INT), nullptr}});
     builtins.push_back({"print", CodeBuiltin{new FunctionType({new T_STRING}, none), nullptr}});
+    builtins.push_back({"open", CodeBuiltin{new FunctionType({new T_STRING}, new ObjectType("File", {})), nullptr}});
     VectorOfTypes a1 = {new T_LIST(new T_STRING), new T_STRING};
     builtins.push_back(
             {"join", CodeBuiltin{new FunctionType(a1, new T_STRING), nullptr}}

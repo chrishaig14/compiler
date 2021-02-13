@@ -162,6 +162,8 @@ std::string Transpiler::visit_class_literal_field(ClassLiteralFieldNode& node) {
 
 std::string Transpiler::visit_class(ClassNode& node) {
     std::string out;
+    this->method_class = node.class_name;
+    this->num_members_class = node.members.size();
     out = "class class_" + node.class_name + " : public XUserObject {\n";
     std::sort(node.members_ordered.begin(), node.members_ordered.end());
     for (int i = 0; i < node.members_ordered.size(); i++) {
@@ -207,11 +209,14 @@ std::string Transpiler::visit_class(ClassNode& node) {
     out += get_all_members;
     out += "};\n";
     for (auto n: node.methods) {
+        std::string method_name = n.second->identifier;
         n.second->identifier = node.class_name + "_" + n.second->identifier;
-        n.second->parameter_names.insert(n.second->parameter_names.begin(), "this_obj");
-        n.second->parameter_types.insert(
-                n.second->parameter_types.begin(),
-                new ObjectType(node.class_name, {}));
+        if (method_name != "init") {
+            n.second->parameter_names.insert(n.second->parameter_names.begin(), "this_obj");
+            n.second->parameter_types.insert(
+                    n.second->parameter_types.begin(),
+                    new ObjectType(node.class_name, {}));
+        }
         out += this->dispatch(n.second);
     }
     return out;
@@ -416,10 +421,29 @@ std::string Transpiler::visit_function(FunctionNode& node) {
         out += this->type_mapper(*node.parameter_types[i]) + " " + node.parameter_names[i] + " = (" +
                this->type_mapper(*node.parameter_types[i]) + ")" + " ptr_" + node.parameter_names[i] + ";";
     }
+
     out += "void* it = nullptr;\n";
     out += "GC::enter_function();";
+    bool is_init = false;
+    if (node.identifier == this->method_class + "_init") {
+        is_init = true;
+        out += "XObject* this_obj = GC::register_object(TAG(";
+        out += "new class_" + this->method_class + "(";
+        for (int i = 0; i < this->num_members_class; i++) {
+            out += "nullptr, ";
+        }
+        if (this->num_members_class != 0) {
+            out = out.substr(0, out.size() - 2);
+        }
+        out += ")";
+        out += ")";
+        out += ");\n";
+
+    }
     out += this->dispatch(node.body);
-    if (node.return_type->kind == Kind::OBJECT && node.return_type->object().id == ".None") {
+    if (is_init) {
+        out += "return GC::function_return(this_obj);";
+    } else if (node.return_type->kind == Kind::OBJECT && node.return_type->object().id == ".None") {
         out += "return GC::function_return(nullptr);";
     }
     out += "}";
