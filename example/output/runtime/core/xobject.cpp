@@ -25,6 +25,13 @@ int hash(XObject* n) {
     return h;
 }
 
+XObject* f_File_read_line(XObject* o) {
+    XFile* f = (XFile*) UNTAG(o);
+    std::string line;
+    std::getline(f->f, line);
+    return new XString(line);
+}
+
 XDict::XDict(std::unordered_map<XObject*, XObject*> v) : XObject("Dict") {
     for (auto& it: v) {
         this->l[hash(it.first)] = it.second;

@@ -4,6 +4,10 @@
 
 #include "core.h"
 
+XObject* f_open(XObject* _s) {
+    return new XFile(((XString*) UNTAG(_s))->s);
+}
+
 XObject* f_print(XObject* _s) {
     XString* s = PTR_TO_STRING(_s);
     std::cout << s->s << std::endl;
@@ -170,20 +174,24 @@ XObject* f_String_add(XObject* _a, XObject* _b) {
     return GC::register_object(TAG(new XString(a->s + b->s)));
 }
 
+Function1 function_open_p = Function1(f_open);
 Function1 function_print_p = Function1(f_print);
 Function3 function_range_p = Function3(f_range);
 Function2 function_map_p = Function2(f_map);
 Function2 function_join_p = Function2(f_join);
+Function1 function_File_read_line_p = Function1(f_File_read_line);
 Function1 function_Integer_str_p = Function1(f_Integer_str);
 Function1 function_Boolean_str_p = Function1(f_Boolean_str);
 Function2 function_List_add_p = Function2(f_List_add);
 Function1 function_List_len_p = Function1(f_List_len);
 Function2 function_String_add_p = Function2(f_String_add);
 
+Function1* function_open = &function_open_p;
 Function1* function_print = &function_print_p;
 Function3* function_range = &function_range_p;
 Function2* function_map = &function_map_p;
 Function2* function_join = &function_join_p;
+Function1* function_File_read_line = &function_File_read_line_p;
 Function1* function_Integer_str = &function_Integer_str_p;
 Function1* function_Boolean_str = &function_Boolean_str_p;
 Function2* function_List_add = &function_List_add_p;

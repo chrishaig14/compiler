@@ -85,19 +85,23 @@ public:
     XObject* get_member(int i) override;
 };
 
+extern Function1 function_open_p;
 extern Function1 function_print_p;
 extern Function3 function_range_p;
 extern Function2 function_map_p;
 extern Function2 function_join_p;
+extern Function1 function_File_read_line_p;
 extern Function1 function_Integer_str_p;
 extern Function1 function_Boolean_str_p;
 extern Function2 function_List_add_p;
 extern Function1 function_List_len_p;
 extern Function2 function_String_add_p;
+extern Function1* function_open;
 extern Function1* function_print;
 extern Function3* function_range;
 extern Function2* function_map;
 extern Function2* function_join;
+extern Function1* function_File_read_line;
 extern Function1* function_Integer_str;
 extern Function1* function_Boolean_str;
 extern Function2* function_List_add;

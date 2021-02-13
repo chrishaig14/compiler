@@ -20,7 +20,7 @@ XObject* GC::function_return(XObject* f) {
     if (f != nullptr) {
         // mark return value as reachable/root
         if (has_tag(f, OBJECT_TAG)) {
-            f->set_reachable();
+            UNTAG(f)->set_reachable();
         }
     }
     leave_scope();

@@ -9,6 +9,7 @@
 #include <vector>
 #include <unordered_map>
 #include <iostream>
+#include <fstream>
 
 #define TRUE_TAG 0b0010
 #define FALSE_TAG 0b0100
@@ -176,5 +177,20 @@ public:
 
     void mark(std::vector<XObject*>& new_root) override;
 };
+
+class XFile : public XObject {
+public:
+    std::ifstream f;
+
+    XFile(const std::string& filename) : XObject("File") {
+        f.open(filename);
+    }
+
+    void mark(std::vector<XObject*>& new_root) override {
+
+    }
+};
+
+XObject* f_File_read_line(XObject* o);
 
 #endif //UNTITLED1_XOBJECT_H
