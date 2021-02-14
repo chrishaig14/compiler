@@ -450,12 +450,14 @@ USemanticInfo Checker::visit(CallNode& n) {
                 const TypeNode& arg_type = *arg_types[i];
                 const TypeNode& param_type = *function_type.param_types[i];
                 if (arg_type != param_type) {
-                    this->error_function_call_type_mismatch(
-                            param_type,
-                            arg_type,
-                            n.arguments[i]->start,
-                            n.arguments[i]->end
-                    );
+                    if (arg_type.kind != Kind::UNKNOWN) {
+                        this->error_function_call_type_mismatch(
+                                param_type,
+                                arg_type,
+                                n.arguments[i]->start,
+                                n.arguments[i]->end
+                        );
+                    }
                     return std::make_unique<SemanticInfo>(retv);
                 }
             }
