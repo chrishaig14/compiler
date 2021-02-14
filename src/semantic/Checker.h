@@ -154,7 +154,7 @@ public:
     void error_subscript_type(const TypeNode& t, const TypeNode& s, const TypeNode& es, TextPosition pos);
     void error_class_not_generic(const std::string& cls, TextPosition pos);
     bool is_method;
-    void error_function_doesnt_return_a_value(TextPosition position);
+    void error_function_doesnt_return_a_value(TextPosition position, const TypeNode* expected_type);
 };
 
 bool function_is_generic(const FunctionType& ft);

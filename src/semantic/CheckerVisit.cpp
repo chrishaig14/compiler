@@ -679,7 +679,7 @@ USemanticInfo Checker::visit(DeclarationNode& n) {
     } else if (n.expression->ntype != NodeType::UNINITIALIZED) {
         USemanticInfo exp_info_p = this->dispatch(n.expression);
         if (exp_info_p->type() == ObjectType(".None", {})) {
-            this->error_function_doesnt_return_a_value(n.expression->start);
+            this->error_function_doesnt_return_a_value(n.expression->start, nullptr);
             USemanticInfo error_t = this->error();
             this->scope->set(n.identifier, error_t->type());
             return error_t;
@@ -711,6 +711,10 @@ USemanticInfo Checker::visit(AssignmentNode& n) {
         this->failed = true;
     }
     USemanticInfo expression_type_p = this->dispatch(n.rvalue);
+    if (expression_type_p->type() == ObjectType(".None", {})) {
+        this->error_function_doesnt_return_a_value(n.rvalue->start, &linfo_p->type());
+        return nullptr;
+    }
     if (expression_type_p->is_error) {
         return nullptr;
     }
@@ -904,8 +908,9 @@ USemanticInfo Checker::visit(IfNode& n) {
     SemanticInfo& condition_info = *condition_info_p;
 
     std::unordered_map<std::string, bool> not_null_vars;
-
-    if (condition_info.type() != T_BOOL) {
+    if (condition_info.type() == ObjectType(".None", {})) {
+        this->error_function_doesnt_return_a_value(n.condition->start, new T_BOOL);
+    } else if (condition_info.type() != T_BOOL) {
         this->error_condition(condition_info.type(), n.start, "if");
     }
 
@@ -964,12 +969,12 @@ USemanticInfo Checker::visit(BinopNode& n) {
     USemanticInfo right_info_p = this->dispatch(n.right);
     bool err = false;
     if (left_info_p->type() == ObjectType(".None", {})) {
-        this->error_function_doesnt_return_a_value(n.left->start);
+        this->error_function_doesnt_return_a_value(n.left->start, nullptr);
         err = true;
     }
 
     if (right_info_p->type() == ObjectType(".None", {})) {
-        this->error_function_doesnt_return_a_value(n.right->start);
+        this->error_function_doesnt_return_a_value(n.right->start, nullptr);
         err = true;
     }
     if (err) {
