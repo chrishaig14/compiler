@@ -239,6 +239,8 @@ Node* Parser::parse_add_or_sub_expression() {
         Node* right = this->parse_mul_div_or_mod_expression();
         BinopNode* node = new BinopNode(op, left, right, left->start);
         node->op_pos = op_token.start;
+        node->start = left->start;
+        node->end = right->end;
         left = node;
     }
     return left;
