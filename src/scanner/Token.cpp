@@ -31,7 +31,9 @@ Token::Token(TokType type, float flot, TextPosition start) {
 }
 
 std::string Token::to_string() {
-    std::string st = TOKEN_STRINGS[this->type];
+    std::string st;
+    st = "["+this->pos_string() + "]\t";
+    st += TOKEN_STRINGS[this->type];
     if (this->type == TokType::ID || this->type == TokType::STRING) {
         st += " \"" + this->str + "\"";
     } else if (this->type == TokType::NUM) {
