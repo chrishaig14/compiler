@@ -178,8 +178,8 @@ Checker::error_function_call_type_mismatch(const TypeNode& expected, const TypeN
     std::string msg;
     msg = context_string(start) +
           E_FMT(" Function call type mismatch") +
-          E_FMT(" expected ") + E_HLT(expected.to_string()) + E_FMT(" but got ") + E_HLT(actual.to_string());
-//          this->code_error_string(start, end);
+          E_FMT(" expected ") + E_HLT(expected.to_string()) + E_FMT(" but got ") + E_HLT(actual.to_string()) +
+          this->code_error_string(start, end);
     std::cout << msg << std::endl;
 }
 
