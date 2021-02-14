@@ -164,6 +164,7 @@ Node* Parser::parse_assignment_or_expression() {
 
         }
         TokType op = this->token.type;
+        TextPosition op_pos = this->token.start;
         this->next();
         if (lvalue->ntype != ID && item_in_vec(op, {TokType::PLUS_EQQ, TokType::MINUS_EQQ})) {
             throw std::runtime_error("Error += or -= can only be used on ids!");
@@ -177,8 +178,7 @@ Node* Parser::parse_assignment_or_expression() {
             }
         }
         Node* node = new AssignmentNode(lvalue, rvalue);
-        node->start = lvalue->start;
-        node->end = rvalue->end;
+        node->start = op_pos;
         return node;
     } else {
         if (lvalue->ntype != NodeType::CALL) {
