@@ -778,6 +778,7 @@ USemanticInfo Checker::visit(MemberNode& n) {
         // It might be something like <class>.<method>, so we need to handle this case differently
         if (this->class_table->declared(id_node._id)) {
             ClassInfo* class_info = this->class_table->get(id_node._id);
+            std::string& class_name = class_info->class_name;
             if (class_info->methods.find(child) != class_info->methods.end()) {
 
                 if (child == "init") {
@@ -790,7 +791,7 @@ USemanticInfo Checker::visit(MemberNode& n) {
                     rv.set_type(f);
                     rv.is_class_method = true;
                     this->replace_me = true;
-                    IdNode* idn = new IdNode(class_info->class_name + "." + child);
+                    IdNode* idn = new IdNode(class_name + "." + child);
                     idn->is_global_function = true;
                     this->replacement = idn;
                     return std::make_unique<SemanticInfo>(rv);
@@ -812,12 +813,12 @@ USemanticInfo Checker::visit(MemberNode& n) {
                 rv.is_method = false;
                 rv.is_class_method = true;
                 this->replace_me = true;
-                IdNode* idn = new IdNode(class_info->class_name + "." + child);
+                IdNode* idn = new IdNode(class_name + "." + child);
                 idn->is_global_function = true;
                 this->replacement = idn;
                 return std::make_unique<SemanticInfo>(rv);
             } else {
-                this->error_class_no_method(class_info->class_name, child, n.start);
+                this->error_class_no_method(class_name, child, n.start);
                 return this->error();
             }
         }
