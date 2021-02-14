@@ -65,7 +65,7 @@ USemanticInfo Checker::visit(SubscriptNode& node) {
         this->error_subscript_non_object(node.start);
         return this->error();
     }
-    SemanticInfo symbol_info;
+    SemanticInfo info;
     const ObjectType& object_type = parent.type().object();
 
     if (object_type.id == "String") {
@@ -91,7 +91,7 @@ USemanticInfo Checker::visit(SubscriptNode& node) {
         if (!is_integer) {
             this->error_subscript_type(object_type, ct->type(), T_INT, node.start);
         }
-        symbol_info.set_type(*object_type.type_params[0]);
+        info.set_type(*object_type.type_params[0]);
     } else if (object_type.id == "Dict") {
         TypeNode* key_type = object_type.type_params[0];
         if (ct->type() != *key_type) {
@@ -100,17 +100,17 @@ USemanticInfo Checker::visit(SubscriptNode& node) {
                     ct->type().to_string());
         }
         TypeNode* value_type = object_type.type_params[1];
-        symbol_info.set_type(*value_type);
+        info.set_type(*value_type);
     } else if (object_type.id == "String") {
         if (!is_integer) {
             this->error_subscript_type(object_type, ct->type(), T_INT, node.start);
         }
-        symbol_info.set_type(object_type);
+        info.set_type(object_type);
     }
 
-    symbol_info.is_function = false;
+    info.is_function = false;
 
-    return std::make_unique<SemanticInfo>(symbol_info);
+    return std::make_unique<SemanticInfo>(info);
 }
 
 USemanticInfo Checker::visit(BreakNode& node) {
@@ -336,13 +336,13 @@ USemanticInfo Checker::visit(ClassLiteralFieldNode& node) {
 }
 
 USemanticInfo Checker::visit(ForNode& node) {
-    USemanticInfo symbol_info_p = this->dispatch(node.exp);
-    SemanticInfo& symbol_info = *symbol_info_p;
-    if (symbol_info.type().kind != Kind::OBJECT) {
-        this->error_for(symbol_info.type(), node.start);
+    USemanticInfo info_p = this->dispatch(node.exp);
+    SemanticInfo& info = *info_p;
+    if (info.type().kind != Kind::OBJECT) {
+        this->error_for(info.type(), node.start);
     }
 
-    const ObjectType& obj = symbol_info.type().object();
+    const ObjectType& obj = info.type().object();
     if (obj.id != "List") {
         this->error_for(obj, node.start);
     }
@@ -588,43 +588,43 @@ USemanticInfo Checker::visit(FunctionNode& n) {
 }
 
 USemanticInfo Checker::visit(IdNode& n) {
-    SemanticInfo symbol_info;
-    symbol_info.is_function = false;
-    symbol_info.is_method = false;
+    SemanticInfo info;
+    info.is_function = false;
+    info.is_method = false;
     if (!this->scope->has(n._id)) {
         // it might be a function name
         if (this->function_table->has_function(n._id)) {
             n.is_global_function = true;
-            symbol_info.is_function = true;
+            info.is_function = true;
             n.location = VariableLocation(-2, -1);
-            symbol_info.set_type(this->function_table->get(n._id));
+            info.set_type(this->function_table->get(n._id));
         } else {
             this->error_variable_not_declared(n._id, n.start);
             return this->error();
         }
     } else {
-        symbol_info.set_type(this->scope->get(n._id));
-        if (symbol_info.type().kind == Kind::UNKNOWN) {
-            symbol_info.is_error = true;
+        info.set_type(this->scope->get(n._id));
+        if (info.type().kind == Kind::UNKNOWN) {
+            info.is_error = true;
         } else {
             n.location = this->scope->find(n._id);
-            if (symbol_info.type().kind == Kind::OBJECT) {
-                const ObjectType& otn = symbol_info.type().object();
+            if (info.type().kind == Kind::OBJECT) {
+                const ObjectType& otn = info.type().object();
                 if (otn.id == "Option") {
                     if (this->scope->get_not_none(n._id)) {
-                        symbol_info.set_type(*otn.type_params[0]);
+                        info.set_type(*otn.type_params[0]);
                     }
                 }
 
             }
-            if (symbol_info.type().kind == Kind::FUNCTION) {
-                symbol_info.is_function = true;
-                symbol_info.is_method = false;
-                symbol_info.is_class_method = false;
+            if (info.type().kind == Kind::FUNCTION) {
+                info.is_function = true;
+                info.is_method = false;
+                info.is_class_method = false;
             }
         }
     }
-    return std::make_unique<SemanticInfo>(symbol_info);
+    return std::make_unique<SemanticInfo>(info);
 }
 
 USemanticInfo Checker::visit(DeclarationNode& n) {
@@ -632,8 +632,8 @@ USemanticInfo Checker::visit(DeclarationNode& n) {
         this->error_redeclared(n.identifier, n.start);
         this->failed = true;
     }
-    SemanticInfo symbol_info;
-    symbol_info.is_function = false;
+    SemanticInfo info;
+    info.is_function = false;
     if (n.expression->ntype != NodeType::UNINITIALIZED and n.type != nullptr) {
         TypeNode& n_type = *n.type;
         if (!this->assert_type_exists(n_type, n.start)) {
@@ -643,7 +643,7 @@ USemanticInfo Checker::visit(DeclarationNode& n) {
         SemanticInfo& exp_info = *exp_info_p;
         if (exp_info.is_error) {
             this->scope->set(n.identifier, n_type);
-            return std::make_unique<SemanticInfo>(symbol_info);
+            return std::make_unique<SemanticInfo>(info);
         }
         n.expression = this->replace_if_necessary(n.expression);
         if (n.type->kind == Kind::FUNCTION) {
@@ -679,7 +679,7 @@ USemanticInfo Checker::visit(DeclarationNode& n) {
                 }
             }
         }
-        symbol_info.set_type(n_type);
+        info.set_type(n_type);
 
     } else if (n.expression->ntype != NodeType::UNINITIALIZED) {
         USemanticInfo exp_info_p = this->dispatch(n.expression);
@@ -692,10 +692,10 @@ USemanticInfo Checker::visit(DeclarationNode& n) {
         n.type = exp_info_p->type().clone();
         SemanticInfo& exp_info = *exp_info_p;
         n.expression = this->replace_if_necessary(n.expression);
-        symbol_info.set_type(exp_info.type());
+        info.set_type(exp_info.type());
     }
-    this->scope->set(n.identifier, symbol_info.type());
-    return std::make_unique<SemanticInfo>(symbol_info);
+    this->scope->set(n.identifier, info.type());
+    return std::make_unique<SemanticInfo>(info);
 }
 
 USemanticInfo Checker::visit(AssignmentNode& n) {
@@ -830,15 +830,15 @@ USemanticInfo Checker::visit(MemberNode& n) {
     this->is_lvalue = false;
     USemanticInfo symbol_info_p = this->dispatch(n.parent);
     this->is_lvalue = old_lvalue;
-    SemanticInfo& symbol_info = *symbol_info_p;
-    if (symbol_info.is_error) {
+    SemanticInfo& info = *symbol_info_p;
+    if (info.is_error) {
         return this->error();
     }
-    if (symbol_info.type().kind != Kind::OBJECT) {
+    if (info.type().kind != Kind::OBJECT) {
         this->error_member_no_object(n.start);
         return this->error();
     }
-    const ObjectType& object = symbol_info.type().object();
+    const ObjectType& object = info.type().object();
     const ObjectType* option_type = nullptr;
     if (n.parent->ntype == NodeType::ID) {
         IdNode& idn = n.parent->id();
@@ -891,14 +891,14 @@ USemanticInfo Checker::visit(MemberNode& n) {
         }
         if (class_info->members.find(child) != class_info->members.end()) {
             // It's a member
-            symbol_info.set_type(*class_info->members[child]);
-            rv = symbol_info;
+            info.set_type(*class_info->members[child]);
+            rv = info;
             rv.is_function = false;
             rv.is_method = false;
         } else if (class_info->methods.find(child) != class_info->methods.end()) {
             // It's a method
-            symbol_info.set_type(*class_info->methods.find(child)->second);
-            rv = symbol_info;
+            info.set_type(*class_info->methods.find(child)->second);
+            rv = info;
             rv.is_method = true;
             rv.class_info = class_info;
         } else {
@@ -912,7 +912,7 @@ USemanticInfo Checker::visit(MemberNode& n) {
 }
 
 USemanticInfo Checker::visit(IfNode& n) {
-    SemanticInfo symbol_info;
+    SemanticInfo info;
     USemanticInfo condition_info_p = this->dispatch(n.condition);
     SemanticInfo& condition_info = *condition_info_p;
 
@@ -942,7 +942,7 @@ USemanticInfo Checker::visit(IfNode& n) {
         this->visit(*n.selse);
         this->leave_scope();
     }
-    return std::make_unique<SemanticInfo>(symbol_info);
+    return std::make_unique<SemanticInfo>(info);
 }
 
 USemanticInfo Checker::visit(BoolOpNode& n) {
@@ -952,7 +952,7 @@ USemanticInfo Checker::visit(BoolOpNode& n) {
     SemanticInfo& left_info = *left_info_p;
     SemanticInfo& right_info = *right_info_p;
 
-    SemanticInfo symbol_info;
+    SemanticInfo info;
     bool ok = false;
     const TypeNode& l_type = left_info.type();
     const TypeNode& r_type = right_info.type();
@@ -961,7 +961,7 @@ USemanticInfo Checker::visit(BoolOpNode& n) {
         if (r_type.kind == Kind::OBJECT) {
             auto& right = r_type.object();
             if (left.id == "Option" && right.id == "NoneType") {
-                symbol_info.set_type(T_BOOL);
+                info.set_type(T_BOOL);
                 ok = true;
             }
         }
@@ -970,9 +970,9 @@ USemanticInfo Checker::visit(BoolOpNode& n) {
         this->error_bool_op(l_type, r_type, n.start);
     }
 
-    symbol_info.set_type(T_BOOL);
+    info.set_type(T_BOOL);
 
-    return std::make_unique<SemanticInfo>(symbol_info);
+    return std::make_unique<SemanticInfo>(info);
 }
 
 USemanticInfo Checker::visit(BinopNode& n) {
@@ -1003,28 +1003,28 @@ USemanticInfo Checker::visit(BinopNode& n) {
         return s;
     }
 
-    SemanticInfo symbol_info;
+    SemanticInfo info;
     auto& left = left_info.type().object();
     auto& right = right_info.type().object();
     auto ltype = left.id;
     auto rtype = right.id;
     bool ok = false;
     if (ltype == "Integer" && rtype == "Integer") {
-        symbol_info.set_type(T_INT);
-        symbol_info.is_function = false;
+        info.set_type(T_INT);
+        info.is_function = false;
         ok = true;
     } else if (ltype == "Float" && rtype == "Float") {
-        symbol_info.set_type(ObjectType("Float", {}));
-        symbol_info.is_function = false;
+        info.set_type(ObjectType("Float", {}));
+        info.is_function = false;
         ok = true;
     } else if (ltype == "Float" && rtype == "Integer" || ltype == "Integer" && rtype == "Float") {
-        symbol_info.set_type(ObjectType("Float", {}));
-        symbol_info.is_function = false;
+        info.set_type(ObjectType("Float", {}));
+        info.is_function = false;
         ok = true;
     } else if (ltype == "String" && rtype == "String") {
         if (n.op == OpType::ADD) {
-            symbol_info.set_type(T_STRING);
-            symbol_info.is_function = false;
+            info.set_type(T_STRING);
+            info.is_function = false;
             IdNode* idn = new IdNode("String_add");
             idn->is_global_function = true;
             this->replace_me = true;
@@ -1033,8 +1033,8 @@ USemanticInfo Checker::visit(BinopNode& n) {
         }
     } else if (ltype == "List" && rtype == "List" && left == right) {
         if (n.op == OpType::ADD) {
-            symbol_info.set_type(left);
-            symbol_info.is_function = false;
+            info.set_type(left);
+            info.is_function = false;
             IdNode* idn = new IdNode("List_add");
             idn->is_global_function = true;
             this->replace_me = true;
@@ -1048,7 +1048,7 @@ USemanticInfo Checker::visit(BinopNode& n) {
         return std::make_unique<ErrorStub>(ErrorStub());
     }
 
-    return std::make_unique<SemanticInfo>(symbol_info);
+    return std::make_unique<SemanticInfo>(info);
 }
 
 USemanticInfo Checker::visit(ReturnNode& n) {
