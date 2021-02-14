@@ -807,6 +807,7 @@ WhileNode* Parser::parse_while_loop() {
 ClassNode* Parser::parse_class_definition() {
     Token class_tok = this->expect_token(TokType::CLASS);
     Token class_name_tk = this->expect_token(TokType::ID);
+    std::string& class_name = class_name_tk.str;
     VectorOfStrings type_parameters;
     if (this->match(TokType::LSQUARE)) {
         this->next();
@@ -829,20 +830,21 @@ ClassNode* Parser::parse_class_definition() {
             Token member_name_tk = this->expect_token(TokType::ID);
             this->expect_token(TokType::COLON);
             TypeNode* member_type = this->parse_type_node();
-            if (members.find(member_name_tk.str) != members.end() ||
-                methods.find(member_name_tk.str) != methods.end()) {
-                this->error_class_member_redefined(class_name_tk.str, member_name_tk.str, member_name_tk.start);
+            std::string& member_name = member_name_tk.str;
+            if (members.find(member_name) != members.end() ||
+                methods.find(member_name) != methods.end()) {
+                this->error_class_member_redefined(class_name, member_name, member_name_tk.start);
 
             }
-            members[member_name_tk.str] = member_type;
-            members_ordered.push_back(member_name_tk.str);
+            members[member_name] = member_type;
+            members_ordered.push_back(member_name);
             this->expect_token(TokType::SEMICOLON);
         } else if (this->match(TokType::FUN)) {
             FunctionNode* method_node = this->parse_function_definition();
             std::string& method_name = method_node->identifier;
             if (members.find(method_name) != members.end() ||
                 methods.find(method_name) != methods.end()) {
-                this->error_class_member_redefined(class_name_tk.str, method_name, method_node->start);
+                this->error_class_member_redefined(class_name, method_name, method_node->start);
 
             }
             methods.insert(make_pair(method_name, method_node));
@@ -851,7 +853,7 @@ ClassNode* Parser::parse_class_definition() {
         }
     }
     this->expect_token(TokType::RCURLY);
-    ClassNode* c = new ClassNode(class_name_tk.str, type_parameters, members, methods);
+    ClassNode* c = new ClassNode(class_name, type_parameters, members, methods);
     c->members_ordered = members_ordered;
     c->start = class_tok.start;
     return c;
