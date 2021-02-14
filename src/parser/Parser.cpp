@@ -565,9 +565,9 @@ DeclarationNode* Parser::parse_variable_declaration() {
         this->next();
         type = this->parse_type_node();
     }
-    this->expect_token(TokType::EQQ);
+    Token eq_tok = this->expect_token(TokType::EQQ);
     Node* expression = this->parse_expression();
-    return new DeclarationNode(identifier.str, type, expression, var_token.start);
+    return new DeclarationNode(identifier.str, type, expression, eq_tok.start);
 }
 
 Node* Parser::parse_common_statement() {
