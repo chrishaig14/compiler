@@ -4,6 +4,8 @@
 
 #include "Checker.h"
 
+#define T_NONE ObjectType(".None", {})
+
 USemanticInfo Checker::visit(ListNode& node) {
     USemanticInfo element_type_p = this->dispatch(node.elements[0]);
     const TypeNode& element_type = element_type_p->type();
@@ -480,7 +482,7 @@ USemanticInfo Checker::visit(BlockNode& program) {
         if (n->ntype == NodeType::CALL) {
             // it's a function call
             // if return value != NoneType, then force the return value
-            if (!sinfo.is_error && sinfo.type() != ObjectType(".None", {})) {
+            if (!sinfo.is_error && sinfo.type() != T_NONE) {
                 this->error_unused_return_value(n->start);
             }
         }
@@ -570,7 +572,7 @@ USemanticInfo Checker::visit(FunctionNode& n) {
         this->leave_scope();
         return nullptr;
     }
-    if (returnType != ObjectType(".None", {})) {
+    if (returnType != T_NONE) {
         if (n.body->nodes.size() != 0) {
             Node* last_node = n.body->nodes.back();
             if (last_node->ntype != NodeType::RETRN) {
@@ -681,7 +683,7 @@ USemanticInfo Checker::visit(DeclarationNode& n) {
 
     } else if (n.expression->ntype != NodeType::UNINITIALIZED) {
         USemanticInfo exp_info_p = this->dispatch(n.expression);
-        if (exp_info_p->type() == ObjectType(".None", {})) {
+        if (exp_info_p->type() == T_NONE) {
             this->error_function_doesnt_return_a_value(n.expression->start, nullptr);
             USemanticInfo error_t = this->error();
             this->scope->set(n.identifier, error_t->type());
@@ -714,7 +716,7 @@ USemanticInfo Checker::visit(AssignmentNode& n) {
         this->failed = true;
     }
     USemanticInfo expression_type_p = this->dispatch(n.rvalue);
-    if (expression_type_p->type() == ObjectType(".None", {})) {
+    if (expression_type_p->type() == T_NONE) {
         this->error_function_doesnt_return_a_value(n.rvalue->start, &linfo_p->type());
         return nullptr;
     }
@@ -915,7 +917,7 @@ USemanticInfo Checker::visit(IfNode& n) {
     SemanticInfo& condition_info = *condition_info_p;
 
     std::unordered_map<std::string, bool> not_null_vars;
-    if (condition_info.type() == ObjectType(".None", {})) {
+    if (condition_info.type() == T_NONE) {
         this->error_function_doesnt_return_a_value(n.condition->start, new T_BOOL);
     } else if (condition_info.type() != T_BOOL) {
         this->error_condition(condition_info.type(), n.start, "if");
@@ -975,12 +977,12 @@ USemanticInfo Checker::visit(BinopNode& n) {
     USemanticInfo left_info_p = this->dispatch(n.left);
     USemanticInfo right_info_p = this->dispatch(n.right);
     bool err = false;
-    if (left_info_p->type() == ObjectType(".None", {})) {
+    if (left_info_p->type() == T_NONE) {
         this->error_function_doesnt_return_a_value(n.left->start, nullptr);
         err = true;
     }
 
-    if (right_info_p->type() == ObjectType(".None", {})) {
+    if (right_info_p->type() == T_NONE) {
         this->error_function_doesnt_return_a_value(n.right->start, nullptr);
         err = true;
     }
@@ -1049,7 +1051,7 @@ USemanticInfo Checker::visit(BinopNode& n) {
 
 USemanticInfo Checker::visit(ReturnNode& n) {
     const TypeNode& return_type = this->scope->get("__return__");
-    if (return_type == ObjectType(".None", {})) {
+    if (return_type == T_NONE) {
         if (n.expression != nullptr) {
             this->error_bad_return(n.start);
         }
