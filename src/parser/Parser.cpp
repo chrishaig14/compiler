@@ -523,9 +523,9 @@ Node* Parser::parse_class_or_tuple_literal() {
 Node* Parser::parse_id_or_class_literal() {
     Node* node;
     std::string identifier = this->token.str;
-    this->next();
     node = new IdNode(identifier);
     node->start = this->token.start;
+    this->next();
     return node;
 }
 
