@@ -632,49 +632,51 @@ USemanticInfo Checker::visit(DeclarationNode& n) {
     SemanticInfo symbol_info;
     symbol_info.is_function = false;
     if (n.expression->ntype != NodeType::UNINITIALIZED and n.type != nullptr) {
-        if (!this->assert_type_exists(*n.type, n.start)) {
+        TypeNode& n_type = *n.type;
+        if (!this->assert_type_exists(n_type, n.start)) {
             return this->error();
         }
         USemanticInfo exp_info_p = this->dispatch(n.expression);
         SemanticInfo& exp_info = *exp_info_p;
         if (exp_info.is_error) {
-            this->scope->set(n.identifier, *n.type);
+            this->scope->set(n.identifier, n_type);
             return std::make_unique<SemanticInfo>(symbol_info);
         }
         n.expression = this->replace_if_necessary(n.expression);
         if (n.type->kind == Kind::FUNCTION) {
             // it's a function
-            if (*n.type != exp_info.type()) {
-                this->error_assignment(*n.type, exp_info.type(), n.start);
+            if (n_type != exp_info.type()) {
+                this->error_assignment(n_type, exp_info.type(), n.start);
             }
         } else {
             SemanticInfo expression_info = exp_info;
             const ObjectType& actual_type = n.type->object();
+            const TypeNode& exp_type = expression_info.type();
             if (actual_type.id == "Option") {
-                if (*actual_type.type_params[0] != expression_info.type()) {
-                    auto foo = expression_info.type().object();
+                if (*actual_type.type_params[0] != exp_type) {
+                    auto foo = exp_type.object();
                     if (foo.id != "NoneType") {
-                        this->error_assignment(*n.type, expression_info.type(), n.start);
+                        this->error_assignment(n_type, exp_type, n.start);
                     }
                 }
             } else if (actual_type.id == "Union") {
                 bool ok = false;
                 for (auto type_param: actual_type.type_params) {
-                    if (*type_param != expression_info.type()) {
+                    if (*type_param != exp_type) {
                         ok = true;
                         break;
                     }
                 }
                 if (!ok) {
-                    this->error_assignment(*n.type, expression_info.type(), n.start);
+                    this->error_assignment(n_type, exp_type, n.start);
                 }
             } else {
-                if (*n.type != expression_info.type()) {
-                    this->error_assignment(*n.type, expression_info.type(), n.start);
+                if (n_type != exp_type) {
+                    this->error_assignment(n_type, exp_type, n.start);
                 }
             }
         }
-        symbol_info.set_type(*n.type);
+        symbol_info.set_type(n_type);
 
     } else if (n.expression->ntype != NodeType::UNINITIALIZED) {
         USemanticInfo exp_info_p = this->dispatch(n.expression);
