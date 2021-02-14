@@ -547,9 +547,10 @@ USemanticInfo Checker::visit(ClassLiteralExpressionNode& node) {
 }
 
 USemanticInfo Checker::visit(FunctionNode& n) {
-    this->current_function = n.identifier;
-    this->enter_scope(n.identifier);
-    bool is_init_method = this->is_method && n.identifier == "init";
+    std::string& function_name = n.identifier;
+    this->current_function = function_name;
+    this->enter_scope(function_name);
+    bool is_init_method = this->is_method && function_name == "init";
     if (this->add_this) {
         this->scope->set("this", *this->this_type);
     }
@@ -574,10 +575,10 @@ USemanticInfo Checker::visit(FunctionNode& n) {
             Node* last_node = n.body->nodes.back();
             if (last_node->ntype != NodeType::RETRN) {
                 // it's not a return statement, error
-                this->error_function_return_last_stmt(n.identifier, returnType, last_node->start);
+                this->error_function_return_last_stmt(function_name, returnType, last_node->start);
             }
         } else {
-            this->error_function_return_last_stmt(n.identifier, returnType, n.start);
+            this->error_function_return_last_stmt(function_name, returnType, n.start);
         }
     }
     this->leave_scope();
