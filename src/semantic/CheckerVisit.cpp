@@ -725,16 +725,17 @@ USemanticInfo Checker::visit(AssignmentNode& n) {
     n.rvalue = this->replace_if_necessary(n.rvalue);
 
     const ObjectType& actual_type = linfo.type().object();
+    const TypeNode& exp_type = expression_type.type();
     if (n.lvalue->ntype == NodeType::ID && actual_type.id == "Option") {
         // special treatment if we are assigning to an id of a variable of type Option[t]
-        if (expression_type.type() == (*actual_type.type_params[0])) {
+        if (exp_type == (*actual_type.type_params[0])) {
             std::cout << "p cant be none" << std::endl;
             this->scope->set_not_none(n.lvalue->id()._id, true);
         } else {
-            if (linfo.type() != (expression_type.type())) {
-                auto& foo = expression_type.type().object();
+            if (linfo.type() != exp_type) {
+                auto& foo = exp_type.object();
                 if (foo.id != "NoneType") {
-                    this->error_assignment(linfo.type(), expression_type.type(), n.start);
+                    this->error_assignment(linfo.type(), exp_type, n.start);
                 }
                 // assigning none, ok
             }
@@ -744,22 +745,22 @@ USemanticInfo Checker::visit(AssignmentNode& n) {
             this->scope->set_not_none(n.lvalue->id()._id, false);
         }
     } else {
-        if (linfo.type() != expression_type.type()) {
+        if (linfo.type() != exp_type) {
             if (actual_type.id == "Option") {
                 // if type doesn't match exactly, we may be assigning to an Option[t]
-                if (*actual_type.type_params[0] != expression_type.type()) {
-                    auto& foo = expression_type.type().object();
+                if (*actual_type.type_params[0] != exp_type) {
+                    auto& foo = exp_type.object();
                     if (foo.id != "NoneType") {
                         this->error_assignment(
                                 linfo.type(),
-                                expression_type.type(),
+                                exp_type,
                                 n.start
                         );
                     }
                 }
             } else {
                 // if it's not Option[t], then it's an error
-                this->error_assignment(linfo.type(), expression_type.type(), n.start);
+                this->error_assignment(linfo.type(), exp_type, n.start);
             }
         }
         // else, type matches don't do anything
