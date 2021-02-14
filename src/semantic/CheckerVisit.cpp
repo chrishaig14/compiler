@@ -772,15 +772,16 @@ USemanticInfo Checker::visit(AssignmentNode& n) {
 
 USemanticInfo Checker::visit(MemberNode& n) {
     SemanticInfo rv;
+    std::string& child = n.s_child;
     if (n.parent->ntype == NodeType::ID) {
         IdNode& id_node = n.parent->id();
         // It might be something like <class>.<method>, so we need to handle this case differently
         if (this->class_table->declared(id_node._id)) {
             ClassInfo* class_info = this->class_table->get(id_node._id);
-            if (class_info->methods.find(n.s_child) != class_info->methods.end()) {
+            if (class_info->methods.find(child) != class_info->methods.end()) {
 
-                if (n.s_child == "init") {
-                    const FunctionType& ft = *class_info->methods.find(n.s_child)->second;
+                if (child == "init") {
+                    const FunctionType& ft = *class_info->methods.find(child)->second;
                     VectorOfTypes params = ft.param_types;
                     for (int i = 0; i < params.size(); i++) {
                         params[i] = params[i]->clone();
@@ -789,13 +790,13 @@ USemanticInfo Checker::visit(MemberNode& n) {
                     rv.set_type(f);
                     rv.is_class_method = true;
                     this->replace_me = true;
-                    IdNode* idn = new IdNode(class_info->class_name + "." + n.s_child);
+                    IdNode* idn = new IdNode(class_info->class_name + "." + child);
                     idn->is_global_function = true;
                     this->replacement = idn;
                     return std::make_unique<SemanticInfo>(rv);
                 }
 
-                rv.set_type(*class_info->methods.find(n.s_child)->second);
+                rv.set_type(*class_info->methods.find(child)->second);
                 rv.class_info = class_info;
 
                 const FunctionType& ftn = rv.type().function();
@@ -811,12 +812,12 @@ USemanticInfo Checker::visit(MemberNode& n) {
                 rv.is_method = false;
                 rv.is_class_method = true;
                 this->replace_me = true;
-                IdNode* idn = new IdNode(class_info->class_name + "." + n.s_child);
+                IdNode* idn = new IdNode(class_info->class_name + "." + child);
                 idn->is_global_function = true;
                 this->replacement = idn;
                 return std::make_unique<SemanticInfo>(rv);
             } else {
-                this->error_class_no_method(class_info->class_name, n.s_child, n.start);
+                this->error_class_no_method(class_info->class_name, child, n.start);
                 return this->error();
             }
         }
@@ -884,20 +885,20 @@ USemanticInfo Checker::visit(MemberNode& n) {
             class_info = instantiate_generic(class_info, final_type);
             this->class_table->set(object.to_string(), class_info);
         }
-        if (class_info->members.find(n.s_child) != class_info->members.end()) {
+        if (class_info->members.find(child) != class_info->members.end()) {
             // It's a member
-            symbol_info.set_type(*class_info->members[n.s_child]);
+            symbol_info.set_type(*class_info->members[child]);
             rv = symbol_info;
             rv.is_function = false;
             rv.is_method = false;
-        } else if (class_info->methods.find(n.s_child) != class_info->methods.end()) {
+        } else if (class_info->methods.find(child) != class_info->methods.end()) {
             // It's a method
-            symbol_info.set_type(*class_info->methods.find(n.s_child)->second);
+            symbol_info.set_type(*class_info->methods.find(child)->second);
             rv = symbol_info;
             rv.is_method = true;
             rv.class_info = class_info;
         } else {
-            this->error_no_member(object, n.s_child, n.start);
+            this->error_no_member(object, child, n.start);
             return this->error();
         }
     }
