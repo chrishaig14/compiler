@@ -428,7 +428,12 @@ USemanticInfo Checker::visit(CallNode& n) {
         const FunctionType& function_type = fun_info.type().function();
         if (n.arguments.size() != function_type.param_types.size()) {
             this->error_function_call_num_args(n.start);
-            return this->error();
+            if (!function_is_generic(function_type)) {
+                retv.set_type(*function_type.return_type);
+                return std::make_unique<SemanticInfo>(retv);
+            } else {
+                return this->error();
+            }
         }
         VectorOfTypes arg_types;
         for (auto& arg: n.arguments) {
@@ -805,7 +810,7 @@ USemanticInfo Checker::visit(MemberNode& n) {
     USemanticInfo symbol_info_p = this->dispatch(n.parent);
     this->is_lvalue = old_lvalue;
     SemanticInfo& symbol_info = *symbol_info_p;
-    if (symbol_info.is_error){
+    if (symbol_info.is_error) {
         return this->error();
     }
     if (symbol_info.type().kind != Kind::OBJECT) {
