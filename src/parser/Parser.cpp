@@ -839,12 +839,13 @@ ClassNode* Parser::parse_class_definition() {
             this->expect_token(TokType::SEMICOLON);
         } else if (this->match(TokType::FUN)) {
             FunctionNode* method_node = this->parse_function_definition();
-            if (members.find(method_node->identifier) != members.end() ||
-                methods.find(method_node->identifier) != methods.end()) {
-                this->error_class_member_redefined(class_name_tk.str, method_node->identifier, method_node->start);
+            std::string& method_name = method_node->identifier;
+            if (members.find(method_name) != members.end() ||
+                methods.find(method_name) != methods.end()) {
+                this->error_class_member_redefined(class_name_tk.str, method_name, method_node->start);
 
             }
-            methods.insert(make_pair(method_node->identifier, method_node));
+            methods.insert(make_pair(method_name, method_node));
         } else {
             break;
         }
