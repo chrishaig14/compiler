@@ -954,18 +954,20 @@ USemanticInfo Checker::visit(BoolOpNode& n) {
 
     SemanticInfo symbol_info;
     bool ok = false;
-    if (left_info.type().kind == Kind::OBJECT) {
-        auto& left = left_info.type().object();
-        if (right_info.type().kind == Kind::OBJECT) {
-            auto& right = right_info.type().object();
+    const TypeNode& l_type = left_info.type();
+    const TypeNode& r_type = right_info.type();
+    if (l_type.kind == Kind::OBJECT) {
+        auto& left = l_type.object();
+        if (r_type.kind == Kind::OBJECT) {
+            auto& right = r_type.object();
             if (left.id == "Option" && right.id == "NoneType") {
                 symbol_info.set_type(T_BOOL);
                 ok = true;
             }
         }
     }
-    if (!ok && left_info.type() != right_info.type()) {
-        this->error_bool_op(left_info.type(), right_info.type(), n.start);
+    if (!ok && l_type != r_type) {
+        this->error_bool_op(l_type, r_type, n.start);
     }
 
     symbol_info.set_type(T_BOOL);
