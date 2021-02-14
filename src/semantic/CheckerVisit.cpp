@@ -678,6 +678,12 @@ USemanticInfo Checker::visit(DeclarationNode& n) {
 
     } else if (n.expression->ntype != NodeType::UNINITIALIZED) {
         USemanticInfo exp_info_p = this->dispatch(n.expression);
+        if (exp_info_p->type() == ObjectType(".None", {})) {
+            this->error_function_doesnt_return_a_value(n.expression->start);
+            USemanticInfo error_t = this->error();
+            this->scope->set(n.identifier, error_t->type());
+            return error_t;
+        }
         n.type = exp_info_p->type().clone();
         SemanticInfo& exp_info = *exp_info_p;
         n.expression = this->replace_if_necessary(n.expression);
@@ -955,8 +961,21 @@ USemanticInfo Checker::visit(BoolOpNode& n) {
 
 USemanticInfo Checker::visit(BinopNode& n) {
     USemanticInfo left_info_p = this->dispatch(n.left);
-    n.left = this->replace_if_necessary(n.left);
     USemanticInfo right_info_p = this->dispatch(n.right);
+    bool err = false;
+    if (left_info_p->type() == ObjectType(".None", {})) {
+        this->error_function_doesnt_return_a_value(n.left->start);
+        err = true;
+    }
+
+    if (right_info_p->type() == ObjectType(".None", {})) {
+        this->error_function_doesnt_return_a_value(n.right->start);
+        err = true;
+    }
+    if (err) {
+        return this->error();
+    }
+    n.left = this->replace_if_necessary(n.left);
     n.right = this->replace_if_necessary(n.right);
 
     SemanticInfo& left_info = *left_info_p;

@@ -68,6 +68,14 @@ void Checker::error_no_return(const TypeNode& t, TextPosition position) {
     std::cout << msg << std::endl;
 }
 
+void Checker::error_function_doesnt_return_a_value(TextPosition position) {
+    this->failed = true;
+    std::string msg;
+    msg = context_string(position) + E_FMT(" Function doesn't return a value but its being used as an expression ") +
+          this->code_context_string(position);
+    std::cout << msg << std::endl;
+}
+
 void Checker::error_bad_return(TextPosition position) {
     this->failed = true;
     std::string msg;
