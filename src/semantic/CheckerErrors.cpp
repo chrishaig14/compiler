@@ -195,7 +195,7 @@ void Checker::error_function_call_num_args(TextPosition position) {
     this->failed = true;
     std::string msg;
     msg = context_string(position) +
-          E_FMT("Calling function with wrong number of arguments ");
+          E_FMT("Calling function with wrong number of arguments ") + this->code_context_string(position);
     std::cout << msg << std::endl;
 }
 
