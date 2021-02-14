@@ -571,7 +571,7 @@ USemanticInfo Checker::visit(FunctionNode& n) {
     }
     if (returnType != ObjectType(".None", {})) {
         if (n.body->nodes.size() != 0) {
-            Node* last_node = n.body->nodes[n.body->nodes.size() - 1];
+            Node* last_node = n.body->nodes.back();
             if (last_node->ntype != NodeType::RETRN) {
                 // it's not a return statement, error
                 this->error_function_return_last_stmt(n.identifier, returnType, last_node->start);
