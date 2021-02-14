@@ -805,6 +805,9 @@ USemanticInfo Checker::visit(MemberNode& n) {
     USemanticInfo symbol_info_p = this->dispatch(n.parent);
     this->is_lvalue = old_lvalue;
     SemanticInfo& symbol_info = *symbol_info_p;
+    if (symbol_info.is_error){
+        return this->error();
+    }
     if (symbol_info.type().kind != Kind::OBJECT) {
         this->error_member_no_object(n.start);
         return this->error();
