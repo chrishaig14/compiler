@@ -1029,7 +1029,7 @@ USemanticInfo Checker::visit(BinopNode& n) {
             this->replacement = new CallNode(idn, VectorOfNodes({n.left, n.right}));
             ok = true;
         }
-    } else if (ltype == "List" && rtype == "List" && left == (right)) {
+    } else if (ltype == "List" && rtype == "List" && left == right) {
         if (n.op == OpType::ADD) {
             symbol_info.set_type(left);
             symbol_info.is_function = false;
