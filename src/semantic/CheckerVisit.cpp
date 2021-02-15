@@ -201,6 +201,8 @@ USemanticInfo Checker::visit(ClassNode& node) {
                 members_ordered_types,
                 new ObjectType(node.class_name, tp), init_body
         );
+        this->is_method = true;
+        this->visit(*node.methods["init"]);
     }
     this->is_method = false;
     this->add_this = false;
@@ -838,6 +840,7 @@ USemanticInfo Checker::visit(MemberNode& n) {
         this->error_member_no_object(n.start);
         return this->error();
     }
+    n.parent_t = symbol_info_p->type().clone();
     const ObjectType& object = info.type().object();
     const ObjectType* option_type = nullptr;
     if (n.parent->ntype == NodeType::ID) {

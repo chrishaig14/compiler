@@ -15,6 +15,10 @@ std::string Transpiler::transpile(BlockNode* node) {
     return out;
 }
 
+inline std::string get_class_name(const std::string& c) {
+    return "class_" + c;
+}
+
 std::string Transpiler::visit_assignment(AssignmentNode& node) {
     std::string out;
     this->is_lvalue = true;
@@ -24,9 +28,12 @@ std::string Transpiler::visit_assignment(AssignmentNode& node) {
                this->dispatch(node.rvalue) + ")";
     } else if (node.lvalue->ntype == MEMBER) {
         this->is_lvalue = false;
-        out += "((XUserObject*)(UNTAG(" + this->dispatch(node.lvalue->member().parent) + ")))->set_member(\"";
-        out += node.lvalue->member().s_child + "\", ";
-        out += this->dispatch(node.rvalue) + ")";
+        MemberNode& memberNode = node.lvalue->member();
+        TypeNode* cast_type = memberNode.parent_t;
+        out += "CAST(" + this->dispatch(node.lvalue->member().parent) + "," +
+               get_class_name(cast_type->to_string()) + ")->";
+        out += node.lvalue->member().s_child + "=";
+        out += this->dispatch(node.rvalue) + "";
     } else {
         out += this->dispatch(node.lvalue) + " = ";
         this->is_lvalue = false;
@@ -147,7 +154,7 @@ std::string Transpiler::visit_class_literal_expression(ClassLiteralExpressionNod
 std::string Transpiler::visit_class_literal_field(ClassLiteralFieldNode& node) {
     std::string out;
     out = "GC::register_object(TAG(";
-    out += "new class_" + node.type->id + "(";
+    out += "new " + get_class_name(node.type->id) + "(";
     for (int i = 0; i < node.init_names.size(); i++) {
         out += this->dispatch(node.init_values[i]) + ", ";
     }
@@ -164,20 +171,21 @@ std::string Transpiler::visit_class(ClassNode& node) {
     std::string out;
     this->method_class = node.class_name;
     this->num_members_class = node.members.size();
-    out = "class class_" + node.class_name + " : public XUserObject {\n";
+    std::string class_name = get_class_name(node.class_name);
+    out = "class " + class_name + " : public XUserObject {\n";
     std::sort(node.members_ordered.begin(), node.members_ordered.end());
     for (int i = 0; i < node.members_ordered.size(); i++) {
         out += "XObject* " + node.members_ordered[i] + ";\n";
     }
     out += "\n";
     out += "public:\n";
-    out += "class_" + node.class_name + "(";
+    out += class_name + "(";
     for (int i = 0; i < node.members_ordered.size(); i++) {
         out += "XObject* " + node.members_ordered[i] + ", ";
     }
     out = out.substr(0, out.size() - 2);
     out += "):";
-    out += "XUserObject(\"class_" + node.class_name + "\")";
+    out += "XUserObject(\"" + class_name + "\")";
     out += "{\n";
     for (int i = 0; i < node.members_ordered.size(); i++) {
         out += "this->" + node.members_ordered[i] + " = " + node.members_ordered[i] + ";\n";
@@ -249,7 +257,7 @@ std::string Transpiler::ptr_to_type_object(const ObjectType& t) {
     if (t.id == "List") {
         return "PTR_TO_LIST";
     }
-    return "class_" + t.id + "*";
+    return get_class_name(t.id) + "*";
 }
 
 
@@ -280,7 +288,7 @@ std::string Transpiler::object_type_mapper(const ObjectType& t) {
     if (t.id == "List") {
         return "std::vector<" + this->type_mapper(*t.type_params[0]) + ">*";
     }
-    return "class_" + t.id + "*";
+    return get_class_name(t.id) + "*";
 }
 
 std::string Transpiler::add_type(const TypeNode& t, std::string n) {
@@ -369,7 +377,7 @@ std::set<std::string> get_generic_types(const TypeNode& t) {
     std::set<std::string> types;
     if (t.kind == Kind::OBJECT) {
         if (t.object().type_params.size() == 0) {
-            types.insert("class_" + t.object().id);
+            types.insert(get_class_name(t.object().id));
             return types;
         }
         for (auto tp: t.object().type_params) {
@@ -428,7 +436,7 @@ std::string Transpiler::visit_function(FunctionNode& node) {
     if (node.identifier == this->method_class + "_init") {
         is_init = true;
         out += "XObject* this_obj = GC::register_object(TAG(";
-        out += "new class_" + this->method_class + "(";
+        out += "new " + get_class_name(this->method_class) + "(";
         for (int i = 0; i < this->num_members_class; i++) {
             out += "nullptr, ";
         }

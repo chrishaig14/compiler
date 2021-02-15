@@ -10,6 +10,7 @@
 #include "Node.h"
 
 #include "Node.h"
+#include "TypeNode.h"
 
 enum class MemberType {
     NUM, STR
@@ -21,6 +22,7 @@ public:
     Node* parent;
     std::string s_child;
     int n_child;
+    TypeNode* parent_t;
 
     MemberNode(Node* parent, const std::string& child) : MemberNode(parent, child, {-1, 1}) {}
 
