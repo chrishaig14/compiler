@@ -433,16 +433,14 @@ std::string Transpiler::visit_function(FunctionNode& node) {
     bool is_init = false;
     if (node.identifier == this->method_class + "_init") {
         is_init = true;
-        out += "XObject* this_obj = GC::register_object(TAG(";
-        out += "new " + get_class_name(this->method_class) + "(";
+        out += "XObject* this_obj = NEW(";
+        out += get_class_name(this->method_class) + ",";
         for (int i = 0; i < this->num_members_class; i++) {
             out += "nullptr, ";
         }
         if (this->num_members_class != 0) {
             out = out.substr(0, out.size() - 2);
         }
-        out += ")";
-        out += ")";
         out += ");\n";
 
     }
@@ -561,9 +559,7 @@ std::string Transpiler::visit_return(ReturnNode& node) {
 
 std::string Transpiler::visit_string(StringNode& node) {
     std::string out;
-    out += "GC::register_object(";
-    out += "(TAG(new XString(\"" + node.str + "\"))";
-    out += "))";
+    out += "NEW(XString,\""+node.str+"\")";
     return out;
 }
 
@@ -582,16 +578,14 @@ std::string Transpiler::visit_ternary(TernaryNode& node) {
 
 std::string Transpiler::visit_tuple(TupleNode& node) {
     std::string out;
-    out += "GC::register_object(TAG(";
-    out += "new Tuple" + std::to_string(node.values.size()) + "(";
+    out += "NEW(";
+    out += "Tuple" + std::to_string(node.values.size()) + ",";
     for (int i = 0; i < node.values.size(); i++) {
         out += this->dispatch(node.values[i]) + ", ";
     }
     if (node.values.size() != 0) {
         out = out.substr(0, out.size() - 2);
     }
-    out += ")";
-    out += ")";
     out += ")";
     return out;
 }
