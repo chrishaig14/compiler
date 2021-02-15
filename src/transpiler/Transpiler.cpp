@@ -174,11 +174,11 @@ std::string Transpiler::visit_class(ClassNode& node) {
     std::string class_name = get_class_name(node.class_name);
     out = "class " + class_name + " : public XUserObject {\n";
     std::sort(node.members_ordered.begin(), node.members_ordered.end());
+    out += "public:\n";
     for (int i = 0; i < node.members_ordered.size(); i++) {
         out += "XObject* " + node.members_ordered[i] + ";\n";
     }
     out += "\n";
-    out += "public:\n";
     out += class_name + "(";
     for (int i = 0; i < node.members_ordered.size(); i++) {
         out += "XObject* " + node.members_ordered[i] + ", ";
