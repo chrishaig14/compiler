@@ -123,7 +123,8 @@ std::string Transpiler::visit_break(BreakNode& node) { return ""; }
 
 std::string Transpiler::visit_call(CallNode& node) {
     std::string out;
-    out += "(*(" + this->visit_id(node.function->id()) + "))";
+    out += "CALL(";
+    out += this->visit_id(node.function->id()) + ", ";
     // if (node.ftype.size() != 0) {
     //     out += "<";
     //     for (int i = 0; i < node.ftype.size(); i++) {
@@ -135,7 +136,6 @@ std::string Transpiler::visit_call(CallNode& node) {
     // out += "::instance()";
 
     // out += "->call(";
-    out += "(";
 
     for (int i = 0; i < node.arguments.size(); i++) {
         out += this->dispatch(node.arguments[i]) + ", ";

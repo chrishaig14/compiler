@@ -63,6 +63,7 @@ inline XObject* UNTAG(XObject* l) {
     return (XObject*) ((unsigned long) l & 0xfffffffffffffff0);
 }
 
+#define CAST(ptr, cls) ((cls*)UNTAG(ptr))
 
 inline XObject* PTR_TO_OBJ(XObject* x) {
     return (XObject*) ((unsigned long) x & 0xfffffffffffffff0);

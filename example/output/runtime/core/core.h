@@ -18,7 +18,7 @@
 
 
 XObject* f_print(XObject* _s);
-
+#define CALL(fn, ...) (*fn)(__VA_ARGS__)
 
 XObject* f_range(XObject* _start, XObject* _step, XObject* _end);
 
