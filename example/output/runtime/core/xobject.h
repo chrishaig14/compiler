@@ -129,22 +129,6 @@ public:
     }
 
     virtual ~XUserObject() {}
-
-    virtual std::vector<XObject*> get_members() = 0;
-    virtual XObject* get_member(const std::string& s) = 0;
-    virtual void set_member(const std::string& s, XObject* v) = 0;
-
-    virtual void mark(std::vector<XObject*>& new_root) override {
-        for (auto& m: this->get_members()) {
-            if (has_tag(m, OBJECT_TAG)) {
-                XObject* element = UNTAG(m);
-                if (!element->is_reachable() && !element->inserted) {
-                    new_root.push_back(element);
-                    element->inserted = true;
-                }
-            }
-        }
-    }
 };
 
 class XString : public XObject {

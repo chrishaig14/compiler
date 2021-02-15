@@ -191,31 +191,29 @@ std::string Transpiler::visit_class(ClassNode& node) {
         out += "this->" + node.members_ordered[i] + " = " + node.members_ordered[i] + ";\n";
     }
     out += "}\n";
-    std::string set_member;
-    set_member += "void set_member(const std::string& s, XObject* v) override{\n";
-    for (int i = 0; i < node.members_ordered.size(); i++) {
-        set_member +=
-                "if (s==\"" + node.members_ordered[i] + "\"){this->" + node.members_ordered[i] + " = v;return;}\n";
+    std::string mark;
+    mark += "void mark(std::vector<XObject*>& new_root)override{";
+    // void mark(std::vector<XObject*>& new_root) override {
+    //         for (auto& m: this->get_members()) {
+    //             if (has_tag(m, OBJECT_TAG)) {
+    //                 XObject* element = UNTAG(m);
+    //                 if (!element->is_reachable() && !element->inserted) {
+    //                     new_root.push_back(element);
+    //                     element->inserted = true;
+    //                 }
+    //             }
+    //         }
+    // }
+    for (auto m: node.members_ordered) {
+        mark += "if (has_tag(this->" + m + ", OBJECT_TAG)){XObject* element = UNTAG(this->" + m +
+                ");               if (!element->is_reachable() && !element->inserted) {\n"
+                "                      new_root.push_back(element);\n"
+                "                      element->inserted = true;\n"
+                "                  }}";
     }
-    set_member += "}\n";
-    out += set_member;
-    std::string get_member;
-    get_member += "XObject* get_member(const std::string& s) override{\n";
-    for (int i = 0; i < node.members_ordered.size(); i++) {
-        get_member += "if (s==\"" + node.members_ordered[i] + "\"){return this->" + node.members_ordered[i] + ";}\n";
-    }
-    get_member += "return nullptr;}\n";
-    out += get_member;
-    std::string get_all_members;
-    get_all_members += "std::vector<XObject*> get_members() override{\n";
-    get_all_members += "return {";
-    for (int i = 0; i < node.members_ordered.size(); i++) {
-        get_all_members += "this->" + node.members_ordered[i] + ", ";
-    }
-    get_all_members = get_all_members.substr(0, get_all_members.size() - 2);
-    get_all_members += "};}\n";
-    out += get_all_members;
-    out += "};\n";
+    mark += "}";
+    out += mark;
+    out += "};";
     for (auto n: node.methods) {
         std::string method_name = n.second->identifier;
         n.second->identifier = node.class_name + "_" + n.second->identifier;
@@ -538,7 +536,8 @@ std::string Transpiler::visit_member(MemberNode& node) {
         return "((Tuple*)(UNTAG(" + this->dispatch(node.parent) + ")))->get_member(" + std::to_string(node.n_child) +
                ")";
     }
-    return "CAST(" + this->dispatch(node.parent) + ","+get_class_name(node.parent_t->to_string()) + ")->" + node.s_child;
+    return "CAST(" + this->dispatch(node.parent) + "," + get_class_name(node.parent_t->to_string()) + ")->" +
+           node.s_child;
 }
 
 std::string Transpiler::visit_none(NoneNode& node) { return "nullptr"; }
