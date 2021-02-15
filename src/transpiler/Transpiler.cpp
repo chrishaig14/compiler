@@ -71,11 +71,7 @@ std::string Transpiler::visit_block(BlockNode& node) {
     std::string out;
     for (auto n: node.nodes) {
         out += this->dispatch(n);
-        FunctionNode* o = dynamic_cast<FunctionNode*>(n);
-        WhileNode* w = dynamic_cast<WhileNode*>(n);
-        IfNode* i = dynamic_cast<IfNode*>(n);
-        ClassNode* c = dynamic_cast<ClassNode*>(n);
-        if (o == nullptr && w == nullptr && i == nullptr && c == nullptr) {
+        if (n->ntype != FUNC && n->ntype != WHIL && n->ntype != IFF && n->ntype != CLS) {
             out += ";";
         }
     }
