@@ -538,7 +538,7 @@ std::string Transpiler::visit_member(MemberNode& node) {
         return "((Tuple*)(UNTAG(" + this->dispatch(node.parent) + ")))->get_member(" + std::to_string(node.n_child) +
                ")";
     }
-    return "((XUserObject*)(UNTAG(" + this->dispatch(node.parent) + ")))->get_member(\"" + node.s_child + "\")";
+    return "CAST(" + this->dispatch(node.parent) + ","+get_class_name(node.parent_t->to_string()) + ")->" + node.s_child;
 }
 
 std::string Transpiler::visit_none(NoneNode& node) { return "nullptr"; }
