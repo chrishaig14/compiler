@@ -123,7 +123,7 @@ std::string Transpiler::visit_break(BreakNode& node) { return ""; }
 
 std::string Transpiler::visit_call(CallNode& node) {
     std::string out;
-    out += "CALL(";
+    out += "CALL(CAST(";
     out += this->visit_id(node.function->id()) + ", ";
     // if (node.ftype.size() != 0) {
     //     out += "<";
@@ -136,7 +136,8 @@ std::string Transpiler::visit_call(CallNode& node) {
     // out += "::instance()";
 
     // out += "->call(";
-
+    out += "Function" + std::to_string(node.arguments.size());
+    out += "),";
     for (int i = 0; i < node.arguments.size(); i++) {
         out += this->dispatch(node.arguments[i]) + ", ";
     }
@@ -559,7 +560,7 @@ std::string Transpiler::visit_return(ReturnNode& node) {
 
 std::string Transpiler::visit_string(StringNode& node) {
     std::string out;
-    out += "NEW(XString,\""+node.str+"\")";
+    out += "NEW(XString,\"" + node.str + "\")";
     return out;
 }
 
@@ -769,7 +770,7 @@ std::string Transpiler::visit_partial(PartialApplication& node) {
     if (node.args.size() != 0) {
         args = args.substr(0, args.size() - 2);
     }
-    out += "new Partial" + std::to_string(num_args) + "(" + this->dispatch(node.function) + "," + args + ")";
+    out += "NEW(Partial" + std::to_string(num_args) + "," + this->dispatch(node.function) + "," + args + ")";
     return out;
 }
 
