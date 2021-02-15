@@ -505,14 +505,14 @@ std::string Transpiler::visit_if(IfNode& node) {
 
 std::string Transpiler::visit_list(ListNode& node) {
     std::string out;
-    out = "GC::register_object((new XList({";
+    out = "NEW(XList,{";
     for (int i = 0; i < node.elements.size(); i++) {
         out += this->dispatch(node.elements[i]) + ", ";
     }
     if (node.elements.size() != 0) {
         out = out.substr(0, out.size() - 2);
     }
-    out += "})))";
+    out += "})";
     return out;
 }
 
