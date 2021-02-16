@@ -6,57 +6,69 @@
 #define UNTITLED1_FUNCTIONS_H
 
 #include <vector>
+#include "xobject.h"
 
-class XObject;
-
-class Function {
-};
-
-class Function0 : public Function {
+class Function0 : public XObject {
     XObject* (* f)();
 public:
-    Function0() { this->f = nullptr; }
+    Function0() : XObject("function0") { this->f = nullptr; }
 
-    Function0(XObject* (* f)()) { this->f = f; }
+    Function0(XObject* (* f)()) : XObject("function0") { this->f = f; }
 
     virtual XObject* operator()() {
         return this->f();
     }
+
+    void mark(std::vector<XObject*>& new_root) override {
+
+    }
 };
 
-class Function1 : public Function {
+class Function1 : public XObject {
     XObject* (* f)(XObject*);
 public:
-    Function1() { this->f = nullptr; }
+    Function1() : XObject("function1") { this->f = nullptr; }
 
-    Function1(XObject* (* f)(XObject*)) { this->f = f; }
+    Function1(XObject* (* f)(XObject*)) : XObject("function1") { this->f = f; }
 
     virtual XObject* operator()(XObject* a0) {
         return this->f(a0);
     }
+
+    void mark(std::vector<XObject*>& new_root) override {
+
+    }
 };
 
-class Function2 : public Function {
+class Function2 : public XObject {
     XObject* (* f)(XObject*, XObject*);
 public:
-    Function2() { this->f = nullptr; }
+    Function2() : XObject("function2") { this->f = nullptr; }
 
-    Function2(XObject* (* f)(XObject*, XObject*)) { this->f = f; }
+    Function2(XObject* (* f)(XObject*, XObject*)) : XObject("function2") { this->f = f; }
 
     virtual XObject* operator()(XObject* a0, XObject* a1) {
         return this->f(a0, a1);
     }
+
+    void mark(std::vector<XObject*>& new_root) override {
+
+    }
 };
 
-class Function3 : public Function {
+class Function3 : public XObject {
     XObject* (* f)(XObject*, XObject*, XObject*);
 public:
-    Function3() { this->f = nullptr; }
+    Function3() : XObject("function3") { this->f = nullptr; }
 
-    Function3(XObject* (* f)(XObject*, XObject*, XObject*)) { this->f = f; }
+    Function3(XObject* (* f)(XObject*, XObject*, XObject*)) : XObject("function3") { this->f = f; }
 
     virtual XObject* operator()(XObject* a0, XObject* a1, XObject* a2) {
         return this->f(a0, a1, a2);
+    }
+
+    void mark(std::vector<XObject*>& new_root) override {
+
     }
 };
 
@@ -70,10 +82,9 @@ class Partial0 : public Function0 {
 public:
     Partial0(Function1
              * f,
-             XObject* p0,
-             XObject* p1
-    ) {
-        this->p = {p0, p1};
+             XObject* p0
+    ) : Function0() {
+        this->p = {p0};
         this->f.f1 = f;
     }
 
@@ -81,7 +92,7 @@ public:
              * f,
              XObject* p0,
              XObject* p1
-    ) {
+    ) : Function0() {
         this->p = {p0, p1};
         this->f.f2 = f;
     }
@@ -91,7 +102,7 @@ public:
              XObject* p0,
              XObject* p1,
              XObject* p2
-    ) {
+    ) : Function0() {
         this->p = {p0, p1, p2};
         this->f.f3 = f;
     }
