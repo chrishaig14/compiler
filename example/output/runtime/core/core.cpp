@@ -152,19 +152,23 @@ XObject* op_leq(XObject* a, XObject* b) {
 }
 
 
-XObject* subscript(XObject* _l, XObject* i) {
-    XObject* p = UNTAG(_l);
-    if (p->is_list) {
-        XList* list = (XList*) UNTAG(_l);
-        unsigned long index = PTR_TO_INT(i);
-        return list->l[index];
-    }
+XObject* dict_subscript(XObject* _l, XObject* i) {
     XDict* dict = (XDict*) UNTAG(_l);
     int h = hash(i);
     if (dict->l.find(h) == dict->l.end()) {
         throw std::runtime_error("DictKeyError: key not found");
     }
     return dict->l.at(h);
+}
+
+XObject* list_subscript(XObject* _l, XObject* i) {
+    XObject* p = UNTAG(_l);
+    XList* list = (XList*) UNTAG(_l);
+    unsigned long index = PTR_TO_INT(i);
+    if (index >= list->l.size()) {
+        throw std::runtime_error("List index out of range");
+    }
+    return list->l[index];
 }
 
 
@@ -184,6 +188,7 @@ Function1 function_Integer_str_p = Function1(f_Integer_str);
 Function1 function_Boolean_str_p = Function1(f_Boolean_str);
 Function2 function_List_add_p = Function2(f_List_add);
 Function1 function_List_len_p = Function1(f_List_len);
+Function2 function_list_subscript_p = Function2(list_subscript);
 Function2 function_String_add_p = Function2(f_String_add);
 
 Function1* function_open = &function_open_p;
@@ -196,6 +201,7 @@ Function1* function_Integer_str = &function_Integer_str_p;
 Function1* function_Boolean_str = &function_Boolean_str_p;
 Function2* function_List_add = &function_List_add_p;
 Function1* function_List_len = &function_List_len_p;
+Function2* function_list_subscript = &function_list_subscript_p;
 Function2* function_String_add = &function_String_add_p;
 
 Tuple::Tuple(const std::string& n, int num) : XObject(n), members(num, nullptr) {}

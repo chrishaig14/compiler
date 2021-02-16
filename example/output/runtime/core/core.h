@@ -96,6 +96,7 @@ extern Function1 function_Integer_str_p;
 extern Function1 function_Boolean_str_p;
 extern Function2 function_List_add_p;
 extern Function1 function_List_len_p;
+extern Function2 function_list_subscript_p;
 extern Function2 function_String_add_p;
 extern Function1* function_open;
 extern Function1* function_print;
@@ -107,6 +108,7 @@ extern Function1* function_Integer_str;
 extern Function1* function_Boolean_str;
 extern Function2* function_List_add;
 extern Function1* function_List_len;
+extern Function2* function_list_subscript;
 extern Function2* function_String_add;
 
 

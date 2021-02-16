@@ -489,7 +489,7 @@ std::string Transpiler::visit_id(IdNode& node) {
 std::string Transpiler::visit_if(IfNode& node) {
     std::string out;
     out = "if";
-    out += "(" + this->dispatch(node.condition) + ")" + "{";
+    out += "(PTR_TO_BOOL(" + this->dispatch(node.condition) + "))" + "{";
     out += "GC::enter_scope();";
     out += this->visit_block(*node.then);
     out += "GC::leave_scope();";
