@@ -25,7 +25,7 @@ XObject* f_range(XObject* _start, XObject* _step, XObject* _end) {
         v[k] = INT_TO_PTR(i);
         k++;
     }
-    return GC::register_object(TAG(new XList(v)));
+    return NEW(XList,v);
 }
 
 XObject* f_Integer_str(XObject* _i) {
@@ -63,12 +63,12 @@ XObject* f_join(XObject* _l, XObject* _s) {
 
 
 XObject* f_List_add(XObject* _a, XObject* _b) {
-    XList* a = (XList*) _a;
-    XList* b = (XList*) _b;
-    XList* r = new XList({});
+    XList* a = CAST(_a, XList);
+    XList* b = CAST(_b, XList);
+    XList* r = CAST(NEW(XList, std::vector<XObject*>()), XList);
     r->l.insert(r->l.end(), a->l.begin(), a->l.end());
     r->l.insert(r->l.end(), b->l.begin(), b->l.end());
-    return r;
+    return TAG(r);
 }
 
 XObject* f_List_len(XObject* _l) {
