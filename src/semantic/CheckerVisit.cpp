@@ -86,7 +86,7 @@ USemanticInfo Checker::visit(SubscriptNode& node) {
     bool is_integer = ct->type() == T_INT;
     children.emplace_back(ct->type().clone());
     this->is_lvalue = old_lvalue;
-
+    node.parent_t = object_type.clone();
     if (object_type.id == "List") {
         if (!is_integer) {
             this->error_subscript_type(object_type, ct->type(), T_INT, node.start);
