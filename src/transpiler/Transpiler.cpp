@@ -281,7 +281,7 @@ std::string Transpiler::object_type_mapper(const ObjectType& t) {
         return this->type_mapper(*t.type_params[0]);
     }
     if (t.id == "List") {
-        return "std::vector<" + this->type_mapper(*t.type_params[0]) + ">*";
+        return "XList*";
     }
     return get_class_name(t.id) + "*";
 }
@@ -351,7 +351,7 @@ std::string Transpiler::visit_declaration(DeclarationNode& node) {
 }
 
 std::string Transpiler::visit_empty_list(EmptyListNode& node) {
-    return "GC::register_object(LIST_TO_PTR(new XList()))";
+    return "NEW(XList,std::vector<XObject*>())";
 }
 
 std::string Transpiler::visit_float(FloatNode& node) { return ""; }
@@ -562,7 +562,13 @@ std::string Transpiler::visit_string(StringNode& node) {
 
 std::string Transpiler::visit_subscript(SubscriptNode& node) {
     std::string out;
-    out = "subscript(" + this->dispatch(node.parent) + ", " + this->dispatch(node.child[0]) + ")";
+    std::string fun;
+    if (node.parent_t->object().id == "List") {
+        fun = "function_list_subscript";
+    } else {
+        fun = "function_dict_subscript";
+    }
+    out = "CALL("+fun + "," + this->dispatch(node.parent) + ", " + this->dispatch(node.child[0]) + ")";
     return out;
 }
 
