@@ -4,39 +4,40 @@
 
 #include "GC.h"
 
-void GC::enter_scope() {
+void GC::enter_local_scope() {
     // std::cout << "Now entering scope" << std::endl;
-    current_scope = new Scope(current_scope);
+    frame->scope = new Scope(frame->scope);
 }
 
-void GC::enter_function() {
-    current_function_scope = new Scope(current_scope);
-    current_scope = current_function_scope;
-    function_scopes.push_back(current_function_scope);
+void GC::enter_function(std::string function_name) {
+    frame = new Frame(function_name);
+    frames.push_back(frame);
+    GC::enter_local_scope();
 }
 
 XObject* GC::function_return(XObject* f) {
-    current_scope = current_function_scope;
     if (f != nullptr) {
         // mark return value as reachable/root
         if (has_tag(f, OBJECT_TAG)) {
             UNTAG(f)->set_reachable();
         }
     }
-    leave_scope();
-    function_scopes.pop_back();
-    if (function_scopes.empty()) {
+    frames.pop_back();
+    if (frames.empty()) {
         // this is main, probably
+        leave_scope(nullptr);
         return f;
     }
-    current_function_scope = function_scopes.back();
+    delete frame;
+    frame = frames.back();
+    leave_scope(frame->scope);
     return f;
 }
 
 void GC::declare(const std::string& n, XObject* obj) {
     if (has_tag(obj, OBJECT_TAG)) {
         // std::cout<< "DECLARE OBJECT WITH TAG!" << std::endl;
-        current_scope->declare(n, UNTAG(obj));
+        frame->scope->declare(n, UNTAG(obj));
     }
 }
 
@@ -44,17 +45,16 @@ void GC::set(const std::string& n, XObject* obj) {
     if (has_tag(obj, OBJECT_TAG)) {
         // std::cout<< "SET OBJECT WITH TAG!" << std::endl;
 
-        current_scope->set(n, UNTAG(obj));
+        frame->scope->set(n, UNTAG(obj));
     }
 }
 
-void GC::leave_scope() {
-    // std::cout << "Now leaving scope" << std::endl;
-    Scope* old_scope = current_scope;
-    current_scope = current_scope->parent;
-    delete old_scope;
-    if (current_scope != nullptr) {
-        current_scope->get_reachable();
+void GC::leave_scope(Scope* parent) {
+    if (parent != nullptr) {
+        frame->scope = parent;
+        if (frame->scope != nullptr) {
+            frame->scope->get_reachable();
+        }
     }
     std::vector<XObject*> root(all_objects.size(), nullptr);
     int k = 0;
@@ -72,10 +72,15 @@ void GC::leave_scope() {
     // std::cout << "Done leaving scope" << std::endl;
 }
 
+void GC::leave_local_scope() {
+    // std::cout << "Now leaving scope" << std::endl;
+    GC::leave_scope(frame->scope->parent);
+}
+
 XObject* GC::register_object(XObject* u) {
     XObject* o = UNTAG(u);
     // std::cout << "Registered object " << o << " (" << o->class_name << ")" << std::endl;
-    // current_scope->objects.push_back(o);
+    // frame->scope->objects.push_back(o);
     all_objects.push_back(o);
     return u;
 }
@@ -114,9 +119,8 @@ void GC::sweep() {
     // all_objects = std::vector<XObject*>(survivors.begin(), survivors.begin() + c);
 }
 
-Scope* GC::current_scope = nullptr;
-Scope* GC::current_function_scope = nullptr;
+Frame* GC::frame = nullptr;
 
 
-std::vector<Scope*> GC::function_scopes;
+std::vector<Frame*> GC::frames;
 std::vector<XObject*> GC::all_objects;

@@ -10,7 +10,9 @@
 
 class Scope {
 public:
+    bool is_function;
     Scope(Scope* parent) {
+        is_function = false;
         this->parent = parent;
     }
 
@@ -87,15 +89,36 @@ public:
 // std::vector<XObject*> objects;
 };
 
+class Frame {
+    std::string function_name;
+
+public:
+    Scope* scope;
+    Frame(const std::string& name){
+        this->function_name = name;
+        this->scope = nullptr;
+    }
+    ~Frame(){
+        Scope* cur_scope = this->scope;
+        while (cur_scope != nullptr){
+            Scope* old_scope = cur_scope;
+            cur_scope = cur_scope->parent;
+            delete old_scope;
+        }
+    }
+};
+
+
+
 class GC {
     static std::vector<XObject*> all_objects;
     static Scope* current_scope;
-    static Scope* current_function_scope;
-    static std::vector<Scope*> function_scopes;
+    static Frame* frame;
+    static std::vector<Frame*> frames;
 public:
-    static void enter_scope();
+    static void enter_local_scope();
 
-    static void enter_function();
+    static void enter_function(std::string function_name);
 
     static XObject* function_return(XObject* f);
 
@@ -103,7 +126,7 @@ public:
 
     static void set(const std::string& n, XObject* obj);
 
-    static void leave_scope();
+    static void leave_local_scope();
 
 
     static XObject* register_object(XObject* u);
@@ -112,6 +135,7 @@ public:
 
     static void sweep();
 
+    static void leave_scope(Scope* parent);
 };
 
 

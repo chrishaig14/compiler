@@ -359,11 +359,11 @@ std::string Transpiler::visit_float(FloatNode& node) { return ""; }
 std::string Transpiler::visit_for(ForNode& node) {
     std::string out;
     out += "for(int myindex=0;myindex < ((XList*)(UNTAG(" + this->dispatch(node.exp) + ")))->l.size(); myindex++){\n";
-    out += "GC::enter_scope();";
+    out += "GC::enter_local_scope();";
     out += "XObject* " + node.var + " = ((XList*)(UNTAG(" + this->dispatch(node.exp) + ")))->l[myindex];";
     out += "GC::declare(\"" + node.var + "\", " + node.var + ");";
     out += this->dispatch(node.body);
-    out += "GC::leave_scope();";
+    out += "GC::leave_local_scope();";
     out += "}";
     return out;
 }
@@ -426,7 +426,7 @@ std::string Transpiler::visit_function(FunctionNode& node) {
     }
 
     out += "void* it = nullptr;\n";
-    out += "GC::enter_function();";
+    out += "GC::enter_function(\"" + node.identifier + "\");";
     bool is_init = false;
     if (node.identifier == this->method_class + "_init") {
         is_init = true;
@@ -490,9 +490,9 @@ std::string Transpiler::visit_if(IfNode& node) {
     std::string out;
     out = "if";
     out += "(PTR_TO_BOOL(" + this->dispatch(node.condition) + "))" + "{";
-    out += "GC::enter_scope();";
+    out += "GC::enter_local_scope();";
     out += this->visit_block(*node.then);
-    out += "GC::leave_scope();";
+    out += "GC::leave_local_scope();";
     out += "}";
     if (node.selse != nullptr) {
         out += "else {" + this->dispatch(node.selse) + "}";
@@ -568,7 +568,7 @@ std::string Transpiler::visit_subscript(SubscriptNode& node) {
     } else {
         fun = "function_dict_subscript";
     }
-    out = "CALL("+fun + "," + this->dispatch(node.parent) + ", " + this->dispatch(node.child[0]) + ")";
+    out = "CALL(" + fun + "," + this->dispatch(node.parent) + ", " + this->dispatch(node.child[0]) + ")";
     return out;
 }
 
@@ -601,9 +601,9 @@ std::string Transpiler::visit_while(WhileNode& node) {
     out += "PTR_TO_BOOL(" + this->dispatch(node.condition) + ")";
     out += ")";
     out += "{";
-    out += "GC::enter_scope();";
+    out += "GC::enter_local_scope();";
     out += this->dispatch(node.body);
-    out += "GC::leave_scope();";
+    out += "GC::leave_local_scope();";
     out += "}";
     return out;
 }
