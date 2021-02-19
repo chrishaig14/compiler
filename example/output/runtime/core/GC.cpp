@@ -55,6 +55,9 @@ void GC::leave_scope(Scope* parent) {
         if (frame->scope != nullptr) {
             frame->scope->get_reachable();
         }
+        for (int i = 0; i < frames.size() - 1; i++) {
+            frames[i]->scope->get_reachable();
+        }
     }
     std::vector<XObject*> root(all_objects.size(), nullptr);
     int k = 0;
@@ -74,7 +77,9 @@ void GC::leave_scope(Scope* parent) {
 
 void GC::leave_local_scope() {
     // std::cout << "Now leaving scope" << std::endl;
-    GC::leave_scope(frame->scope->parent);
+    Scope* old = frame->scope;
+    GC::leave_scope(old->parent);
+    delete old;
 }
 
 XObject* GC::register_object(XObject* u) {
