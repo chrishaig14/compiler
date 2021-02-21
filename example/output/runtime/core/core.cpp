@@ -25,7 +25,7 @@ XObject* f_range(XObject* _start, XObject* _step, XObject* _end) {
         v[k] = INT_TO_PTR(i);
         k++;
     }
-    return NEW(XList,v);
+    return NEW(XList, v);
 }
 
 XObject* f_Integer_str(XObject* _i) {
@@ -80,23 +80,6 @@ XObject* f_List_add(XObject* _a, XObject* _b) {
 XObject* f_List_len(XObject* _l) {
     XList* l = (XList*) (UNTAG(_l));
     return INT_TO_PTR(l->l.size());
-}
-
-
-XObject* op_add(XObject* a, XObject* b) {
-    return INT_TO_PTR(PTR_TO_INT(a) + PTR_TO_INT(b));
-}
-
-XObject* op_sub(XObject* a, XObject* b) {
-    return INT_TO_PTR(PTR_TO_INT(a) - PTR_TO_INT(b));
-}
-
-XObject* op_div(XObject* a, XObject* b) {
-    return INT_TO_PTR(PTR_TO_INT(a) / PTR_TO_INT(b));
-}
-
-XObject* op_mul(XObject* a, XObject* b) {
-    return INT_TO_PTR(PTR_TO_INT(a) * PTR_TO_INT(b));
 }
 
 XObject* op_lt(XObject* a, XObject* b) {

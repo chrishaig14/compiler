@@ -39,7 +39,7 @@ std::string Transpiler::visit_assignment(AssignmentNode& node) {
         this->is_lvalue = false;
         std::string var_type = this->type_mapper(*node.type);
         out += this->dispatch(node.rvalue) + ";";
-        out += "GC::set(\"" + this->dispatch(node.lvalue) + "\"," + this->dispatch(node.lvalue) + ")";
+        out += "SET(" + this->dispatch(node.lvalue) + ")";
     }
     return out;
 }
@@ -48,19 +48,19 @@ std::string Transpiler::visit_binop(BinopNode& node) {
     std::string out = "op_";
     switch (node.op) {
         case OpType::ADD:
-            out += "add";
+            out = "INT_ADD";
             break;
         case OpType::SUB:
-            out += "sub";
+            out = "INT_SUB";
             break;
         case OpType::MUL:
-            out += "mul";
+            out = "INT_MUL";
             break;
         case OpType::DIV:
-            out += "div";
+            out = "INT_DIV";
             break;
         case OpType::MOD:
-            out += "mod";
+            out = "INT_MOD";
             break;
     }
     out += "(" + this->dispatch(node.left) + ", " + this->dispatch(node.right) + ")";
@@ -119,25 +119,12 @@ std::string Transpiler::visit_break(BreakNode& node) { return ""; }
 
 std::string Transpiler::visit_call(CallNode& node) {
     std::string out;
-    out += "CALL(CAST(";
-    out += this->visit_id(node.function->id()) + ", ";
-    // if (node.ftype.size() != 0) {
-    //     out += "<";
-    //     for (int i = 0; i < node.ftype.size(); i++) {
-    //         out += this->type_mapper(*node.ftype[i]) + ", ";
-    //     }
-    //     out = out.substr(0, out.size() - 2);
-    //     out += ">";
-    // }
-    // out += "::instance()";
-
-    // out += "->call(";
-    out += "Function" + std::to_string(node.arguments.size());
-    out += "),";
+    out += "CALL" + std::to_string(node.arguments.size()) + "(";
+    out += this->visit_id(node.function->id()) + ",";
     for (int i = 0; i < node.arguments.size(); i++) {
         std::string w = this->dispatch(node.arguments[i]);
         if (node.arguments[i]->ntype != ID) {
-            w = "GC::temp(" + w + ")";
+            w = "TEMP(" + w + ")";
         }
         out += w + ", ";
     }
@@ -350,7 +337,7 @@ std::string Transpiler::visit_declaration(DeclarationNode& node) {
     // out += var_type + " " + node.identifier + " = " + "(" + this->ptr_to_type_object(node.type->object()) + ")(" +
     //        this->dispatch(node.expression) + ")";
     out += "XObject* " + node.identifier + " = " + this->dispatch(node.expression) + ";";
-    out += "GC::declare(\"" + node.identifier + "\"," + node.identifier + ")";
+    out += "DECLARE(" + node.identifier + ")";
     return out;
 }
 
@@ -363,11 +350,11 @@ std::string Transpiler::visit_float(FloatNode& node) { return ""; }
 std::string Transpiler::visit_for(ForNode& node) {
     std::string out;
     out += "for(int myindex=0;myindex < ((XList*)(UNTAG(" + this->dispatch(node.exp) + ")))->l.size(); myindex++){\n";
-    out += "GC::enter_local_scope();";
+    out += "ENTER();";
     out += "XObject* " + node.var + " = ((XList*)(UNTAG(" + this->dispatch(node.exp) + ")))->l[myindex];";
-    out += "GC::declare(\"" + node.var + "\", " + node.var + ");";
+    out += "DECLARE(" + node.var + ");";
     out += this->dispatch(node.body);
-    out += "GC::leave_local_scope();";
+    out += "LEAVE();";
     out += "}";
     return out;
 }
@@ -430,7 +417,7 @@ std::string Transpiler::visit_function(FunctionNode& node) {
     }
 
     out += "void* it = nullptr;\n";
-    out += "GC::enter_function(\"" + node.identifier + "\");";
+    out += "ENTER_FUN(" + node.identifier + ");";
     bool is_init = false;
     if (node.identifier == this->method_class + "_init") {
         is_init = true;
@@ -447,9 +434,9 @@ std::string Transpiler::visit_function(FunctionNode& node) {
     }
     out += this->dispatch(node.body);
     if (is_init) {
-        out += "return GC::function_return(this_obj);";
+        out += "RETURN(this_obj);";
     } else if (node.return_type->kind == Kind::OBJECT && node.return_type->object().id == ".None") {
-        out += "return GC::function_return(nullptr);";
+        out += "RETURN(nullptr);";
     }
     out += "}";
     std::string num_args_str = std::to_string(node.parameter_names.size());
@@ -494,9 +481,9 @@ std::string Transpiler::visit_if(IfNode& node) {
     std::string out;
     out = "if";
     out += "(PTR_TO_BOOL(" + this->dispatch(node.condition) + "))" + "{";
-    out += "GC::enter_local_scope();";
+    out += "ENTER();";
     out += this->visit_block(*node.then);
-    out += "GC::leave_local_scope();";
+    out += "LEAVE();";
     out += "}";
     if (node.selse != nullptr) {
         out += "else {" + this->dispatch(node.selse) + "}";
@@ -506,18 +493,18 @@ std::string Transpiler::visit_if(IfNode& node) {
 
 std::string Transpiler::visit_list(ListNode& node) {
     std::string out;
-    out = "NEW(XList,{";
+    out = "LIST(";
     for (int i = 0; i < node.elements.size(); i++) {
         std::string w = this->dispatch(node.elements[i]);
         if (node.elements[i]->ntype != ID) {
-            w = "GC::temp(" + w + ")";
+            w = "TEMP(" + w + ")";
         }
         out += w + ", ";
     }
     if (node.elements.size() != 0) {
         out = out.substr(0, out.size() - 2);
     }
-    out += "})";
+    out += ")";
     return out;
 }
 
@@ -551,7 +538,7 @@ std::string Transpiler::visit_number(NumberNode& node) {
 
 std::string Transpiler::visit_return(ReturnNode& node) {
     std::string out;
-    out += "return GC::function_return(";
+    out += "RETURN(";
     if (node.expression != nullptr) {
         out += " " + this->dispatch(node.expression);
     } else {
@@ -572,11 +559,11 @@ std::string Transpiler::visit_subscript(SubscriptNode& node) {
     std::string out;
     std::string fun;
     if (node.parent_t->object().id == "List") {
-        fun = "function_list_subscript";
+        out = "LIST_SUBSCRIPT(" + this->dispatch(node.parent) + ", " + this->dispatch(node.child[0]) + ")";
     } else {
         fun = "function_dict_subscript";
+        out = "CALL2(" + fun + "," + this->dispatch(node.parent) + ", " + this->dispatch(node.child[0]) + ")";
     }
-    out = "CALL(" + fun + "," + this->dispatch(node.parent) + ", " + this->dispatch(node.child[0]) + ")";
     return out;
 }
 
@@ -609,9 +596,9 @@ std::string Transpiler::visit_while(WhileNode& node) {
     out += "PTR_TO_BOOL(" + this->dispatch(node.condition) + ")";
     out += ")";
     out += "{";
-    out += "GC::enter_local_scope();";
+    out += "ENTER();";
     out += this->dispatch(node.body);
-    out += "GC::leave_local_scope();";
+    out += "LEAVE();";
     out += "}";
     return out;
 }
