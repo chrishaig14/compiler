@@ -576,8 +576,7 @@ std::string Transpiler::visit_ternary(TernaryNode& node) {
 
 std::string Transpiler::visit_tuple(TupleNode& node) {
     std::string out;
-    out += "NEW(";
-    out += "Tuple" + std::to_string(node.values.size()) + ",";
+    out += "TUPLE" + std::to_string(node.values.size()) + "(";
     for (int i = 0; i < node.values.size(); i++) {
         out += this->dispatch(node.values[i]) + ", ";
     }
