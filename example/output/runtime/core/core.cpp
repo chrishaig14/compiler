@@ -66,8 +66,14 @@ XObject* f_List_add(XObject* _a, XObject* _b) {
     XList* a = CAST(_a, XList);
     XList* b = CAST(_b, XList);
     XList* r = CAST(NEW(XList, std::vector<XObject*>()), XList);
-    r->l.insert(r->l.end(), a->l.begin(), a->l.end());
-    r->l.insert(r->l.end(), b->l.begin(), b->l.end());
+    auto re = r->l.end();
+    auto ab = a->l.begin();
+    auto ae = a->l.end();
+    r->l.insert(re, ab, ae);
+    const std::vector<XObject*>::iterator& be = b->l.end();
+    const std::vector<XObject*>::iterator& bb = b->l.begin();
+    const std::vector<XObject*>::iterator& re2 = r->l.end();
+    r->l.insert(re2, bb, be);
     return TAG(r);
 }
 
@@ -202,6 +208,7 @@ Function1* function_Boolean_str = &function_Boolean_str_p;
 Function2* function_List_add = &function_List_add_p;
 Function1* function_List_len = &function_List_len_p;
 Function2* function_list_subscript = &function_list_subscript_p;
+Function2* function_dict_subscript = nullptr;
 Function2* function_String_add = &function_String_add_p;
 
 Tuple::Tuple(const std::string& n, int num) : XObject(n), members(num, nullptr) {}

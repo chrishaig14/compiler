@@ -980,6 +980,7 @@ USemanticInfo Checker::visit(BoolOpNode& n) {
 
 USemanticInfo Checker::visit(BinopNode& n) {
     USemanticInfo left_info_p = this->dispatch(n.left);
+    Node* left_replace = this->replace_if_necessary(n.left);
     USemanticInfo right_info_p = this->dispatch(n.right);
     bool err = false;
     if (left_info_p->type() == T_NONE) {
@@ -994,7 +995,8 @@ USemanticInfo Checker::visit(BinopNode& n) {
     if (err) {
         return this->error();
     }
-    n.left = this->replace_if_necessary(n.left);
+    n.left = left_replace;
+    // n.left = this->replace_if_necessary(n.left);
     n.right = this->replace_if_necessary(n.right);
 
     SemanticInfo& left_info = *left_info_p;

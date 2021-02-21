@@ -135,7 +135,11 @@ std::string Transpiler::visit_call(CallNode& node) {
     out += "Function" + std::to_string(node.arguments.size());
     out += "),";
     for (int i = 0; i < node.arguments.size(); i++) {
-        out += this->dispatch(node.arguments[i]) + ", ";
+        std::string w = this->dispatch(node.arguments[i]);
+        if (node.arguments[i]->ntype != ID) {
+            w = "GC::temp(" + w + ")";
+        }
+        out += w + ", ";
     }
     if (node.arguments.size() != 0) {
         out = out.substr(0, out.size() - 2);
@@ -504,7 +508,11 @@ std::string Transpiler::visit_list(ListNode& node) {
     std::string out;
     out = "NEW(XList,{";
     for (int i = 0; i < node.elements.size(); i++) {
-        out += this->dispatch(node.elements[i]) + ", ";
+        std::string w = this->dispatch(node.elements[i]);
+        if (node.elements[i]->ntype != ID) {
+            w = "GC::temp(" + w + ")";
+        }
+        out += w + ", ";
     }
     if (node.elements.size() != 0) {
         out = out.substr(0, out.size() - 2);

@@ -34,6 +34,15 @@ XObject* GC::function_return(XObject* f) {
     return f;
 }
 
+XObject* GC::temp(XObject* obj) {
+    if (has_tag(obj, OBJECT_TAG)) {
+        // std::cout<< "DECLARE OBJECT WITH TAG!" << std::endl;
+        frame->scope->declare("temp" + std::to_string(frame->scope->temp), UNTAG(obj));
+        frame->scope->temp++;
+    }
+    return obj;
+}
+
 void GC::declare(const std::string& n, XObject* obj) {
     if (has_tag(obj, OBJECT_TAG)) {
         // std::cout<< "DECLARE OBJECT WITH TAG!" << std::endl;

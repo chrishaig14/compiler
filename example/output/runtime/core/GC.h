@@ -11,8 +11,11 @@
 class Scope {
 public:
     bool is_function;
+    int temp;
+
     Scope(Scope* parent) {
         is_function = false;
+        this->temp = 0;
         this->parent = parent;
     }
 
@@ -94,20 +97,24 @@ class Frame {
 
 public:
     Scope* scope;
-    Frame(const std::string& name){
+
+    Frame(const std::string& name) {
         this->function_name = name;
         this->scope = nullptr;
+        this->num_args = 0;
     }
-    ~Frame(){
+
+    ~Frame() {
         Scope* cur_scope = this->scope;
-        while (cur_scope != nullptr){
+        while (cur_scope != nullptr) {
             Scope* old_scope = cur_scope;
             cur_scope = cur_scope->parent;
             delete old_scope;
         }
     }
-};
 
+    int num_args;
+};
 
 
 class GC {
@@ -136,6 +143,8 @@ public:
     static void sweep();
 
     static void leave_scope(Scope* parent);
+
+    static XObject* temp(XObject* obj);
 };
 
 
