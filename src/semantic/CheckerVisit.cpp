@@ -348,8 +348,6 @@ USemanticInfo Checker::visit(ForNode& node) {
     if (obj.id != "List") {
         this->error_for(obj, node.start);
     }
-    this->scope->set(".index0", T_INT);
-    this->scope->set(".list0", T_LIST(new T_INT));
     IdNode* lid = new IdNode("List.len");
     lid->is_global_function = true;
     Node* new_condition = new BoolOpNode(
@@ -376,14 +374,19 @@ USemanticInfo Checker::visit(ForNode& node) {
     TypeNode& var_type = *obj.type_params[0];
     this->enter_scope("for");
     this->scope->set(node.var, var_type);
-    this->visit(*node.body);
-    this->leave_scope();
-    this->replace_me = true;
-    this->replacement = new BlockNode(
+
+    BlockNode* bn = new BlockNode(
             {new DeclarationNode(".index0", new T_INT, new NumberNode(0)),
              new DeclarationNode(".list0", obj.clone(), node.exp),
-             new WhileNode(new_condition, new_body)}
+            }
     );
+    this->visit(*bn);
+    this->visit(*node.body);
+    this->dispatch(new_body->nodes[0]->decl().expression);
+    this->leave_scope();
+    this->replacement = bn;
+    this->replace_me = true;
+    bn->nodes.push_back(new WhileNode(new_condition, new_body));
     return nullptr;
 }
 
