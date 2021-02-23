@@ -83,16 +83,25 @@ void initialize_tokens() {
     TOKEN_SPECIAL["--"] = TokType::DEC;
 }
 
-Scanner::Scanner(const std::string& __file__) {
-    std::string text = file_to_string(__file__);
-    this->code_lines.text = text;
-    this->code_lines.line_offsets.push_back(Range{.offset=0, .length=0});
+Scanner::Scanner() {
     initialize_tokens();
     initialize_token_strings();
-    this->text = text;
     this->current = 0;
     this->line = 0;
     this->column = 0;
+}
+
+void Scanner::load_file(const std::string& __file__) {
+    std::string text = file_to_string(__file__);
+    this->text = text;
+    this->code_lines.text = text;
+    this->code_lines.line_offsets.push_back(Range{.offset=0, .length=0});
+}
+
+void Scanner::load_text(const std::string& text) {
+    this->text = text;
+    this->code_lines.text = text;
+    this->code_lines.line_offsets.push_back(Range{.offset=0, .length=0});
 }
 
 Token Scanner::get_next() {
@@ -298,7 +307,7 @@ Token Scanner::scan_number() {
     }
     int end = this->current - 1;
     Token token = Token(TokType::NUM, std::stoi(str), {start_l, start_c});
-    token.end_pos = {this->line, this->column-1};
+    token.end_pos = {this->line, this->column - 1};
     return token;
 }
 

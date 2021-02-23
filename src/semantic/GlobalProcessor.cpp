@@ -6,6 +6,24 @@
 #include "GlobalProcessor.h"
 #include "ClassInfo.h"
 #include "../logging/logging.h"
+#include "../scanner/Scanner.h"
+#include "../parser/Parser.h"
+
+TypeNode* parse_type(const std::string& s) {
+    Scanner scanner;
+    scanner.load_text(s);
+    std::vector<Token> tokens = scanner.scan_all();
+    Parser parser("", scanner.code_lines, tokens);
+    return parser.parse_type_node();
+}
+
+FunctionType* parse_function_type(const std::string& s) {
+    Scanner scanner;
+    scanner.load_text(s);
+    std::vector<Token> tokens = scanner.scan_all();
+    Parser parser("", scanner.code_lines, tokens);
+    return parser.parse_function_type();
+}
 
 void GlobalProcessor::add_builtins(std::vector<Builtin>& builtins) {
     for (int i = 0; i < builtins.size(); i++) {
@@ -19,48 +37,39 @@ GlobalProcessor::GlobalProcessor(std::vector<Builtin>& builtins, ClassTable* imp
     this->function_table = imported_functions;
     this->globals = new SymbolTable("global", nullptr);
     this->class_table = imported_classes;
-    auto ft = FUNCTION_TYPE({ new ObjectType("a", {}) }, new ObjectType("b", {}));
-    auto at = new T_LIST(new ObjectType("a", {}));
-    auto none = new ObjectType(".None", {});
-    VectorOfTypes w = {at, ft};
-    builtins.push_back(
-            {"map", CodeBuiltin{new FunctionType(w, new T_LIST(new ObjectType("b", {}))), nullptr}}
-    );
-    builtins.push_back({"File.read_line", CodeBuiltin{new FunctionType({}, new T_STRING), nullptr}});
-    builtins.push_back({"Integer.str", CodeBuiltin{new FunctionType({new T_INT}, new T_STRING), nullptr}});
-    builtins.push_back({"Float.str", CodeBuiltin{new FunctionType({new T_FLOAT}, new T_STRING), nullptr}});
 
+    builtins.push_back(
+            {"map", CodeBuiltin{parse_function_type("fun(List[a],fun(a)->b)->List[b]"), nullptr}}
+    );
+    builtins.push_back({"File.read_line", CodeBuiltin{parse_function_type("fun()->String"), nullptr}});
+    builtins.push_back({"Integer.str", CodeBuiltin{parse_function_type("fun(Integer)->String"), nullptr}});
+    builtins.push_back({"Float.str", CodeBuiltin{parse_function_type("fun(Float)->String"), nullptr}});
     builtins.push_back(
             {"List.len",
-             CodeBuiltin{new FunctionType({new T_LIST(new ObjectType("a", {}))}, new T_INT), nullptr}}
+             CodeBuiltin{parse_function_type("fun(List[a])->Integer"), nullptr}}
     );
-    VectorOfTypes x = {new T_LIST(TYPE("a", {})), new ObjectType("a", {})};
-    builtins.push_back({"List.pop", CodeBuiltin{new FunctionType(x, none), nullptr}});
+    builtins.push_back({"List.pop", CodeBuiltin{parse_function_type("fun(List[a],a)"), nullptr}});
     builtins.push_back(
             {"List.push", CodeBuiltin{
-                    new FunctionType({new T_LIST(new ObjectType("a", {}))}, new ObjectType("a", {})),
+                    parse_function_type("fun(List[a])->a"),
                     nullptr}}
     );
-    auto function_from_t_to_u = FUNCTION_TYPE({ TYPE("t", {}) }, new ObjectType("b", {}));
     builtins.push_back(
             {"List.unordered_map",
-             CodeBuiltin{new FunctionType({function_from_t_to_u}, new T_LIST(new ObjectType("b", {}))),
+             CodeBuiltin{parse_function_type("fun(fun(t)->b)->List[b]"),
                          nullptr}}
     );
-    builtins.push_back({"String.len", CodeBuiltin{new FunctionType({new T_STRING}, new T_INT), nullptr}});
-    builtins.push_back({"print", CodeBuiltin{new FunctionType({new T_STRING}, none), nullptr}});
-    builtins.push_back({"open", CodeBuiltin{new FunctionType({new T_STRING}, new ObjectType("File", {})), nullptr}});
-    VectorOfTypes a1 = {new T_LIST(new T_STRING), new T_STRING};
+    builtins.push_back({"String.len", CodeBuiltin{parse_function_type("fun(String)->Integer"), nullptr}});
+    builtins.push_back({"print", CodeBuiltin{parse_function_type("fun(String)"), nullptr}});
+    builtins.push_back({"open", CodeBuiltin{parse_function_type("fun(String)->File"), nullptr}});
     builtins.push_back(
-            {"join", CodeBuiltin{new FunctionType(a1, new T_STRING), nullptr}}
+            {"join", CodeBuiltin{parse_function_type("fun(List[String],String)->String"), nullptr}}
     );
-    VectorOfTypes a2 = {new T_INT, new T_INT, new T_INT};
     builtins.push_back(
-            {"range", CodeBuiltin{new FunctionType(a2, new T_LIST(new T_INT)), nullptr}}
+            {"range", CodeBuiltin{parse_function_type("fun(Integer,Integer,Integer)->List[Integer])->String"), nullptr}}
     );
-
     builtins.push_back(
-            {"input", CodeBuiltin{new FunctionType({}, new T_STRING), nullptr}}
+            {"input", CodeBuiltin{parse_function_type("fun()->String"), nullptr}}
     );
 
     this->add_builtins(builtins);

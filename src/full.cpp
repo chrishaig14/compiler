@@ -29,7 +29,8 @@ namespace Errors {
 
 BlockNode* full_parse(const std::string& __file__, CodeLines* code_lines) {
     BlockNode* tree;
-    Scanner scanner(__file__);
+    Scanner scanner;
+    scanner.load_file(__file__);
     std::vector<Token> tokens = scanner.scan_all();
     for (auto token: tokens) {
         std::cout << token.to_string() << std::endl;

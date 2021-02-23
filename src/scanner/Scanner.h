@@ -32,7 +32,10 @@ class Scanner {
     int line, column;
 public:
 
-    Scanner(const std::string& text);
+    Scanner();
+
+    void load_file(const std::string& file);
+    void load_text(const std::string& text);
 
     Token get_next();
 

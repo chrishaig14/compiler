@@ -633,8 +633,13 @@ FunctionType* Parser::parse_function_type() {
         }
     }
     this->expect_token(TokType::RPAREN);
-    this->expect_token(TokType::RARROW);
-    TypeNode* return_type = this->parse_type_node();
+    TypeNode* return_type = nullptr;
+    if (this->match(TokType::RARROW)) {
+        this->expect_token(TokType::RARROW);
+        return_type = this->parse_type_node();
+    } else {
+        return_type = new ObjectType(".None", {});
+    }
     return new FunctionType(parameter_types, return_type);
 }
 
