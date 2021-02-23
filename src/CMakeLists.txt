@@ -99,8 +99,6 @@ add_library(
         semantic/ClassInfo.h
         semantic/Checker.cpp
         semantic/Checker.h
-        semantic/ReturnError.cpp
-        semantic/ReturnError.h
         semantic/ScopeError.cpp
         semantic/ScopeError.h
         nodes/node_types.h
