@@ -1,7 +1,6 @@
 #include <iostream>
 #include <set>
 #include "Checker.h"
-#include "TypeClassInfo.h"
 #include "../macros.h"
 #include "../logging/logging.h"
 

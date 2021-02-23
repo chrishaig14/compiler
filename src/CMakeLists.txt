@@ -111,8 +111,6 @@ add_library(
         semantic/ReturnError.h
         semantic/ScopeError.cpp
         semantic/ScopeError.h
-        semantic/TypeClassInfo.cpp
-        semantic/TypeClassInfo.h
         nodes/node_types.h
         types.h
         macros.h

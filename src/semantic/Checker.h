@@ -11,14 +11,12 @@
 #include "RedeclareError.h"
 #include "ReturnError.h"
 #include "BadArguments.h"
-#include "TypeClassInfo.h"
 #include "../utils.h"
 #include "../nodes/nodes.h"
 #include <set>
 #include "../scanner/CodeLines.h"
 #include <iostream>
 #include <set>
-#include "TypeClassInfo.h"
 #include "../macros.h"
 #include "../logging/logging.h"
 
@@ -46,7 +44,6 @@ class Checker {
     FunctionTable* function_table;
     Node* replacement;
     std::unordered_map<std::string, SymbolTable*> scopes;
-    std::unordered_map<std::string, TypeClassInfo*> typeclasses;
     std::vector<ObjectType*> tuple_types;
     SymbolTable* scope;
     TypeNode* this_type;
