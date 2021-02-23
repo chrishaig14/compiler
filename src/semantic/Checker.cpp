@@ -22,16 +22,13 @@ ClassInfo* make_list_class_info() {
     ObjectType generic_type_t("t", {});
     ObjectType generic_type_b("b", {});
 
-    list_class_info->methods.insert(
-            std::make_pair("push", new FunctionType({(generic_type_t.clone())}, TYPE(".None", {}))));
+    list_class_info->methods.insert(std::make_pair("push",
+                                                   new FunctionType({(generic_type_t.clone())}, TYPE(".None", {}))));
     list_class_info->methods.insert(std::make_pair("pop", new FunctionType({}, generic_type_t.clone())));
-    list_class_info->methods.insert(
-            std::make_pair(
-                    "unordered_map",
-                    new FunctionType(
-                            {FUNCTION_TYPE({ generic_type_t.clone() },
-                                           generic_type_b.clone())},
-                            new T_LIST(generic_type_b.clone()))));
+    list_class_info->methods.insert(std::make_pair("unordered_map",
+                                                   new FunctionType({FUNCTION_TYPE({ generic_type_t.clone() },
+                                                                                   generic_type_b.clone())},
+                                                                    new T_LIST(generic_type_b.clone()))));
     list_class_info->type_params = {"t"};
     return list_class_info;
 }
@@ -232,16 +229,13 @@ bool Checker::can_assign_generic(TypeNode& from, TypeNode& to, VectorOfStrings t
     return to == (from);
 }
 
-TypeNode*
-make_type_from_object_pattern(const ObjectType& object_type,
-                              const MapStringType& replacements) {
+TypeNode* make_type_from_object_pattern(const ObjectType& object_type, const MapStringType& replacements) {
     std::string type_identifier = object_type.id;
     for (auto r: replacements) {
         if (type_identifier == r.first) {
             if (object_type.type_params.size() != 0) {
                 throw std::runtime_error(
-                        "Trying to make a type for a template for exmaple struct Foo[T]{foo:T[Integer];}!"
-                );
+                        "Trying to make a type for a template for exmaple struct Foo[T]{foo:T[Integer];}!");
             }
             return r.second;
         }
@@ -255,8 +249,7 @@ make_type_from_object_pattern(const ObjectType& object_type,
     return TYPE(type_identifier, new_type_params);
 }
 
-TypeNode* make_type_from_function_pattern(const FunctionType& ftn,
-                                          const MapStringType& replacements) {
+TypeNode* make_type_from_function_pattern(const FunctionType& ftn, const MapStringType& replacements) {
     VectorOfTypes new_param_types;
     for (auto pt: ftn.param_types) {
         TypeNode* new_pt = make_type(*pt, replacements);

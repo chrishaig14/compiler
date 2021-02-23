@@ -24,6 +24,31 @@ const TypeNode& SemanticInfo::type() {
     return *this->_type;
 }
 
+SemanticInfo& SemanticInfo::operator=(const SemanticInfo& other) {
+    this->_type = other._type->clone();
+    return *this;
+}
+
+SemanticInfo::SemanticInfo(const SemanticInfo& other) {
+    this->is_error = other.is_error;
+    this->is_function = other.is_function;
+    this->is_method = other.is_method;
+    this->class_info = other.class_info;
+    this->is_class_method = other.is_class_method;
+    if (other._type != nullptr) {
+        this->_type = other._type->clone();
+    } else {
+        this->_type = nullptr;
+    }
+    this->is_error = is_error;
+}
+
+SemanticInfo::~SemanticInfo() {
+    if (this->_type != nullptr) {
+        delete this->_type;
+    }
+}
+
 ErrorStub::ErrorStub() {
     this->is_error = true;
     auto x = UnknownTypeNode();

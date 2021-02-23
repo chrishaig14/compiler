@@ -148,3 +148,9 @@ void FunctionTable::add(std::string function_name, const FunctionType& function_
 bool FunctionTable::has_function(std::string name) {
     return this->functions.find(name) != this->functions.end();
 }
+
+FunctionTable::~FunctionTable() {
+    for (auto f: this->functions) {
+        delete f.second;
+    }
+}

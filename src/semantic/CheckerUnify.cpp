@@ -25,11 +25,9 @@ Checker::get_first_substitution_object(ObjectType& a, ObjectType& b, bool is_top
         throw std::runtime_error("Error trying to unify object types " + a.to_string() + " and " + b.to_string());
     }
     for (int i = 0; i < a.type_params.size(); i++) {
-        std::pair<std::string, TypeNode*>* u = get_first_substitution(
-                *a.type_params[i],
-                *b.type_params[i],
-                is_top_level_arg
-        );
+        std::pair<std::string, TypeNode*>* u = get_first_substitution(*a.type_params[i],
+                                                                      *b.type_params[i],
+                                                                      is_top_level_arg);
         if (u != nullptr) {
             return u;
         }
@@ -66,11 +64,7 @@ Checker::get_first_substitution_function(FunctionType& a, FunctionType& b, bool 
                 b.to_string());
     }
     for (int i = 0; i < a.param_types.size(); i++) {
-        std::pair<std::string, TypeNode*>* u = get_first_substitution(
-                *a.param_types[i],
-                *b.param_types[i],
-                false
-        );
+        std::pair<std::string, TypeNode*>* u = get_first_substitution(*a.param_types[i], *b.param_types[i], false);
         if (u != nullptr) {
             return u;
         }
@@ -99,11 +93,7 @@ void Checker::unify_function_call(FunctionType& fun, VectorOfTypes& args) {
                     // if (j == i) {
                     //     continue;
                     // }
-                    fun.param_types[j] = substitute(
-                            fun.param_types[j],
-                            substitution->first,
-                            substitution->second
-                    );
+                    fun.param_types[j] = substitute(fun.param_types[j], substitution->first, substitution->second);
                     args[j] = substitute(args[j], substitution->first, substitution->second);
                 }
                 fun.return_type = substitute(fun.return_type, substitution->first, substitution->second);

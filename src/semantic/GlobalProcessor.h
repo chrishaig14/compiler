@@ -20,11 +20,7 @@ public:
 
     bool has_function(std::string name);
 
-    ~FunctionTable() {
-        for (auto f: this->functions) {
-            delete f.second;
-        }
-    }
+    ~FunctionTable();
 
     const FunctionType& get(std::string function_name);
 
@@ -39,8 +35,7 @@ public:
     FunctionTable* function_table;
 
     GlobalProcessor();
-    GlobalProcessor(std::vector<Builtin>& builtins, ClassTable* imported_classes,
-                                     FunctionTable* imported_functions);
+    GlobalProcessor(std::vector<Builtin>& builtins, ClassTable* imported_classes, FunctionTable* imported_functions);
 
     void add_builtins(std::vector<Builtin>& builtins);
 

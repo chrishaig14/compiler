@@ -23,22 +23,20 @@ bool type_matches(TypeNode* a, TypeNode* b);
 bool is_generic(const TypeNode& t);
 
 MapStringType make_replacements(TypeNode* a, TypeNode* b);
-TypeNode* make_type_from_object_pattern(const ObjectType& object_type,
-                                        const MapStringType& replacements);
-TypeNode* make_type_from_function_pattern(const FunctionType& ftn,
-                                          const MapStringType& replacements);
+TypeNode* make_type_from_object_pattern(const ObjectType& object_type, const MapStringType& replacements);
+TypeNode* make_type_from_function_pattern(const FunctionType& ftn, const MapStringType& replacements);
 TypeNode* make_type(const TypeNode& original, const MapStringType& replacements);
 SemanticInfo match_arguments_to_generic_function(const FunctionType& function_type, VectorOfTypes arg_types);
 
 class Checker {
     bool add_this;
-    std::string current_function;
-    std::string current_class;
     bool is_lvalue;
     bool replace_me;
     ClassTable* class_table;
     FunctionTable* function_table;
     Node* replacement;
+    std::string current_class;
+    std::string current_function;
     std::unordered_map<std::string, SymbolTable*> scopes;
     std::vector<ObjectType*> tuple_types;
     SymbolTable* scope;
@@ -59,9 +57,8 @@ public:
     void error_condition(const TypeNode& t, TextPosition position, const std::string& st);
     void error_for(const TypeNode& t, TextPosition position);
     void error_function_call_num_args(TextPosition position);
-    void
-    error_function_call_type_mismatch(const TypeNode& expected, const TypeNode& actual, TextPosition start,
-                                      TextPosition end);
+    void error_function_call_type_mismatch(const TypeNode& expected, const TypeNode& actual, TextPosition start,
+                                           TextPosition end);
     void error_no_member(const TypeNode& t, const std::string& member, TextPosition position);
     void error_no_return(const TypeNode& t, TextPosition position);
     void error_class_no_method(const std::string& class_name, const std::string method_name, TextPosition pos);
@@ -141,8 +138,7 @@ public:
     void error_partial_function_call_type_mismatch(const TypeNode& expected, const TypeNode& actual, TextPosition start,
                                                    TextPosition end);
     Node* replace_if_necessary(Node* node);
-    void
-    error_generic_class_wrong_type_param_number(const std::string& cls, int num_req, int num_given, TextPosition pos);
+    void error_generic_class_wrong_type_param_number(const std::string& cls, int num_req, int num_given, TextPosition pos);
     void error_class_init_wrong_number_init(const std::string& cls, int num_req, int num_given, TextPosition pos);
     void error_subscript_type(const TypeNode& t, const TypeNode& s, const TypeNode& es, TextPosition pos);
     void error_class_not_generic(const std::string& cls, TextPosition pos);

@@ -36,3 +36,15 @@ bool ClassInfo::operator==(const ClassInfo& b) const {
     }
     return true;
 }
+
+ClassInfo::~ClassInfo() {
+    for (auto m: this->members) {
+        delete m.second;
+    }
+    for (auto m: this->methods) {
+        delete m.second;
+    }
+    for (auto m: this->member_types) {
+        delete m;
+    }
+}

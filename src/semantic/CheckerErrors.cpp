@@ -8,62 +8,47 @@
 void Checker::error_binop(const TypeNode& left, const TypeNode& right, TextPosition position) {
     this->failed = true;
     std::string msg;
-    msg = context_string(position) +
-          E_FMT("Cannot perform binary op between types ") + E_HLT(left.to_string()) +
-          E_FMT(" and ") +
-          E_HLT(right.to_string()) + this->code_context_string(position);
+    msg = context_string(position) + E_FMT("Cannot perform binary op between types ") + E_HLT(left.to_string()) +
+          E_FMT(" and ") + E_HLT(right.to_string()) + this->code_context_string(position);
     std::cout << msg << std::endl;
 }
 
 void Checker::error_no_member(const TypeNode& t, const std::string& member, TextPosition position) {
     this->failed = true;
     std::string msg;
-    msg =
-            this->context_string(position) +
-            E_FMT("Type ") + E_HLT(t.to_string()) +
-            E_FMT(" has no member ") +
-            E_HLT("'" + member + "'") +
-            this->code_context_string(position);
+    msg = this->context_string(position) + E_FMT("Type ") + E_HLT(t.to_string()) + E_FMT(" has no member ") +
+          E_HLT("'" + member + "'") + this->code_context_string(position);
     std::cout << msg << std::endl;
 }
 
 void Checker::error_bool_op(const TypeNode& left, const TypeNode& right, TextPosition position) {
     this->failed = true;
     std::string msg;
-    msg = context_string(position) +
-          E_FMT("Cannot perform bool op between types ") + E_HLT(left.to_string()) +
-          E_FMT(" and ") +
-          E_HLT(right.to_string());
+    msg = context_string(position) + E_FMT("Cannot perform bool op between types ") + E_HLT(left.to_string()) +
+          E_FMT(" and ") + E_HLT(right.to_string());
     std::cout << msg << std::endl;
 }
 
 void Checker::error_assignment(const TypeNode& expected, const TypeNode& actual, TextPosition position) {
     this->failed = true;
     std::string msg;
-    msg = context_string(position) +
-          E_FMT("Expected ") +
-          E_HLT(expected.to_string()) +
-          E_FMT(", got ") +
-          E_HLT(actual.to_string()) +
-          this->code_error_string(position, position);
+    msg = context_string(position) + E_FMT("Expected ") + E_HLT(expected.to_string()) + E_FMT(", got ") +
+          E_HLT(actual.to_string()) + this->code_error_string(position, position);
     std::cout << msg << std::endl;
 }
 
 void Checker::error_condition(const TypeNode& t, TextPosition position, const std::string& st) {
     this->failed = true;
     std::string msg;
-    msg = context_string(position) +
-          E_FMT(" Expected ") + E_HLT("Boolean ") +
-          E_FMT("as condition for " + st + " statement, got ") +
-          E_HLT(t.to_string());
+    msg = context_string(position) + E_FMT(" Expected ") + E_HLT("Boolean ") +
+          E_FMT("as condition for " + st + " statement, got ") + E_HLT(t.to_string());
     std::cout << msg << std::endl;
 }
 
 void Checker::error_no_return(const TypeNode& t, TextPosition position) {
     this->failed = true;
     std::string msg;
-    msg = context_string(position) + E_FMT(" Expected to return ") +
-          E_HLT(t.to_string()) +
+    msg = context_string(position) + E_FMT(" Expected to return ") + E_HLT(t.to_string()) +
           E_FMT(" but not returning anything");
     std::cout << msg << std::endl;
 }
@@ -88,18 +73,15 @@ void Checker::error_bad_return(TextPosition position) {
 void Checker::error_return_mismatch(const TypeNode& expected, const TypeNode& actual, TextPosition position) {
     this->failed = true;
     std::string msg;
-    msg = E_HLT(text_pos_to_string(this->__file__, position)) +
-          E_FMT(" In function ") +
+    msg = E_HLT(text_pos_to_string(this->__file__, position)) + E_FMT(" In function ") +
           E_HLT((this->current_class == "" ? "" : this->current_class + ".") + this->current_function) + E_FMT(": ") +
           E_FMT(" Expected to return ") + E_HLT(expected.to_string()) + E_FMT(" but got ") + E_HLT(actual.to_string());
     std::cout << msg << std::endl;
 }
 
 void Checker::error_tuple_assign(TextPosition pos) {
-    std::string msg =
-            this->context_string(pos) +
-            E_FMT("Error: can't reassign a member of a tuple!") +
-            this->code_context_string(pos);
+    std::string msg = this->context_string(pos) + E_FMT("Error: can't reassign a member of a tuple!") +
+                      this->code_context_string(pos);
     std::cout << msg << std::endl;
 }
 
@@ -120,9 +102,7 @@ void Checker::error_string_immutable(TextPosition pos) {
 void Checker::error_for(const TypeNode& t, TextPosition position) {
     this->failed = true;
     std::string msg;
-    msg = this->context_string(position) +
-          E_FMT(" Expected") + E_HLT(" List[t] ") +
-          E_FMT("in loop, but got ") +
+    msg = this->context_string(position) + E_FMT(" Expected") + E_HLT(" List[t] ") + E_FMT("in loop, but got ") +
           E_HLT(t.to_string()) + this->code_context_string(position);
     std::cout << msg << std::endl;
 }
@@ -171,31 +151,25 @@ void Checker::error_redeclared(const std::string& name, TextPosition pos) {
 
 void Checker::error_variable_not_declared(const std::string& name, TextPosition pos) {
     std::string msg;
-    msg = this->context_string(pos) +
-          E_FMT("Variable ") +
-          E_HLT("'" + name + "'") +
-          E_FMT(" not declared") +
+    msg = this->context_string(pos) + E_FMT("Variable ") + E_HLT("'" + name + "'") + E_FMT(" not declared") +
           this->code_context_string(pos);
     std::cout << msg << std::endl;
     this->failed = true;
 }
 
-void
-Checker::error_function_call_type_mismatch(const TypeNode& expected, const TypeNode& actual, TextPosition start,
-                                           TextPosition end) {
+void Checker::error_function_call_type_mismatch(const TypeNode& expected, const TypeNode& actual, TextPosition start,
+                                                TextPosition end) {
     this->failed = true;
     std::string msg;
-    msg = context_string(start) +
-          E_FMT(" Function call type mismatch") +
-          E_FMT(" expected ") + E_HLT(expected.to_string()) + E_FMT(" but got ") + E_HLT(actual.to_string()) +
+    msg = context_string(start) + E_FMT(" Function call type mismatch") + E_FMT(" expected ") +
+          E_HLT(expected.to_string()) + E_FMT(" but got ") + E_HLT(actual.to_string()) +
           this->code_error_string(start, end);
     std::cout << msg << std::endl;
 }
 
 void Checker::error_unused_return_value(TextPosition pos) {
     std::string msg;
-    msg = this->context_string(pos) +
-          E_FMT("Unused return value of function call") + this->code_context_string(pos);
+    msg = this->context_string(pos) + E_FMT("Unused return value of function call") + this->code_context_string(pos);
     std::cout << msg << std::endl;
     this->failed = true;
 }
@@ -203,8 +177,8 @@ void Checker::error_unused_return_value(TextPosition pos) {
 void Checker::error_function_call_num_args(TextPosition position) {
     this->failed = true;
     std::string msg;
-    msg = context_string(position) +
-          E_FMT("Calling function with wrong number of arguments ") + this->code_context_string(position);
+    msg = context_string(position) + E_FMT("Calling function with wrong number of arguments ") +
+          this->code_context_string(position);
     std::cout << msg << std::endl;
 }
 
@@ -219,17 +193,17 @@ void Checker::error_class_init_bad_member_type(const TypeNode& cls, const TypeNo
                                                TextPosition pos) {
     this->failed = true;
     std::string msg;
-    msg = this->context_string(pos) + E_FMT("In initialization of class ") +
-          E_HLT(cls.to_string()) + E_FMT(" expected ") + E_HLT(expected.to_string()) + E_FMT(" but got ") +
-          E_HLT(actual.to_string()) + this->code_context_string(pos);
+    msg = this->context_string(pos) + E_FMT("In initialization of class ") + E_HLT(cls.to_string()) +
+          E_FMT(" expected ") + E_HLT(expected.to_string()) + E_FMT(" but got ") + E_HLT(actual.to_string()) +
+          this->code_context_string(pos);
     std::cout << msg << std::endl;
 }
 
 void Checker::error_class_not_found(const TypeNode& cls, TextPosition pos) {
     this->failed = true;
     std::string msg;
-    msg = this->context_string(pos) + E_FMT("Class ") +
-          E_HLT(cls.to_string()) + E_FMT(" not found") + this->code_context_string(pos);
+    msg = this->context_string(pos) + E_FMT("Class ") + E_HLT(cls.to_string()) + E_FMT(" not found") +
+          this->code_context_string(pos);
     std::cout << msg << std::endl;
 }
 
@@ -264,9 +238,8 @@ Checker::error_partial_function_call_type_mismatch(const TypeNode& expected, con
                                                    TextPosition end) {
     this->failed = true;
     std::string msg;
-    msg = context_string(start) +
-          E_FMT(" Function call type mismatch") +
-          E_FMT(" expected ") + E_HLT(expected.to_string()) + E_FMT(" but got ") + E_HLT(actual.to_string()) +
+    msg = context_string(start) + E_FMT(" Function call type mismatch") + E_FMT(" expected ") +
+          E_HLT(expected.to_string()) + E_FMT(" but got ") + E_HLT(actual.to_string()) +
           this->code_error_string(start, end);
     std::cout << msg << std::endl;
 }
@@ -281,8 +254,7 @@ void Checker::error_generic_class_wrong_type_param_number(const std::string& cls
     std::cout << msg << std::endl;
 }
 
-void Checker::error_class_init_wrong_number_init(const std::string& cls, int num_req, int num_given,
-                                                 TextPosition pos) {
+void Checker::error_class_init_wrong_number_init(const std::string& cls, int num_req, int num_given, TextPosition pos) {
     this->failed = true;
     std::string msg;
     msg = this->context_string(pos) + E_FMT("In initialization of class ") + E_HLT(cls) +
@@ -291,19 +263,16 @@ void Checker::error_class_init_wrong_number_init(const std::string& cls, int num
     std::cout << msg << std::endl;
 }
 
-void Checker::error_subscript_type(const TypeNode& t, const TypeNode& s, const TypeNode& es,
-                                   TextPosition pos) {
+void Checker::error_subscript_type(const TypeNode& t, const TypeNode& s, const TypeNode& es, TextPosition pos) {
     this->failed = true;
     std::string msg;
     msg = this->context_string(pos) + E_FMT("Expected ") + E_HLT(es.to_string()) + E_FMT(" in ") +
-          E_HLT(t.to_string()) + E_FMT(" subscript, but got ") + E_HLT(s.to_string()) +
-          this->code_context_string(pos);
+          E_HLT(t.to_string()) + E_FMT(" subscript, but got ") + E_HLT(s.to_string()) + this->code_context_string(pos);
     std::cout << msg << std::endl;
 }
 
 std::string Checker::context_string(TextPosition position) {
-    std::string msg = E_HLT(text_pos_to_string(this->__file__, position)) +
-                      E_FMT(" In function ") +
+    std::string msg = E_HLT(text_pos_to_string(this->__file__, position)) + E_FMT(" In function ") +
                       E_HLT((this->current_class == "" ? "" : this->current_class + ".") + this->current_function) +
                       E_FMT(": ");
     return msg;
@@ -325,8 +294,7 @@ std::string Checker::code_error_string(TextPosition start, TextPosition end) {
 void Checker::error_class_not_generic(const std::string& cls, TextPosition pos) {
     this->failed = true;
     std::string msg;
-    msg = this->context_string(pos) + E_FMT("Class ") + E_HLT(cls) +
-          E_FMT(" is not generic") +
+    msg = this->context_string(pos) + E_FMT("Class ") + E_HLT(cls) + E_FMT(" is not generic") +
           this->code_context_string(pos);
     std::cout << msg << std::endl;
 }

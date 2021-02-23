@@ -141,9 +141,8 @@ USemanticInfo Checker::visit(TernaryNode& node) {
     SemanticInfo& false_case = *false_case_p;
     node.false_case = this->replace_if_necessary(node.false_case);
     if (false_case.type() != true_case.type()) {
-        throw std::runtime_error(
-                "True case and false case type don't match: " + true_case.type().to_string() + " != " +
-                false_case.type().to_string());
+        throw std::runtime_error("True case and false case type don't match: " + true_case.type().to_string() + " != " +
+                                 false_case.type().to_string());
     } else {
         semanticInfo.set_type(true_case.type());
     }
@@ -190,17 +189,13 @@ USemanticInfo Checker::visit(ClassNode& node) {
     if (!has_init) {
         BlockNode* init_body = new BlockNode({});
         for (auto mt: node.members_ordered) {
-            init_body->nodes.push_back(
-                    new AssignmentNode(
-                            new MemberNode(new IdNode("this"), mt),
-                            new IdNode(mt)));
+            init_body->nodes.push_back(new AssignmentNode(new MemberNode(new IdNode("this"), mt), new IdNode(mt)));
         }
-        node.methods["init"] = new FunctionNode(
-                "init",
-                node.members_ordered,
-                members_ordered_types,
-                new ObjectType(node.class_name, tp), init_body
-        );
+        node.methods["init"] = new FunctionNode("init",
+                                                node.members_ordered,
+                                                members_ordered_types,
+                                                new ObjectType(node.class_name, tp),
+                                                init_body);
         this->is_method = true;
         this->visit(*node.methods["init"]);
     }
@@ -251,12 +246,10 @@ USemanticInfo Checker::visit(PartialApplication& node) {
         if (node.args[i] != nullptr) {
             USemanticInfo arg = this->dispatch(node.args[i]);
             if (arg->type() != *func->type().function().param_types[i]) {
-                this->error_partial_function_call_type_mismatch(
-                        *func->type().function().param_types[i],
-                        arg->type(),
-                        node.args[i]->start,
-                        node.args[i]->end
-                );
+                this->error_partial_function_call_type_mismatch(*func->type().function().param_types[i],
+                                                                arg->type(),
+                                                                node.args[i]->start,
+                                                                node.args[i]->end);
                 return this->error();
             }
         } else {
@@ -285,12 +278,10 @@ USemanticInfo Checker::visit(ClassLiteralFieldNode& node) {
     if (num_required_type_params != 0) {
         // it's a generic class
         if (num_required_type_params != num_actual_type_params) {
-            this->error_generic_class_wrong_type_param_number(
-                    object_type->id,
-                    num_required_type_params,
-                    num_actual_type_params,
-                    node.start
-            );
+            this->error_generic_class_wrong_type_param_number(object_type->id,
+                                                              num_required_type_params,
+                                                              num_actual_type_params,
+                                                              node.start);
             return this->error();
         }
         if (this->class_table->declared(object_type_str)) {
@@ -314,12 +305,10 @@ USemanticInfo Checker::visit(ClassLiteralFieldNode& node) {
         }
     }
     if (class_fields.size() != node.init_names.size()) {
-        this->error_class_init_wrong_number_init(
-                object_type_id,
-                class_fields.size(),
-                node.init_names.size(),
-                node.start
-        );
+        this->error_class_init_wrong_number_init(object_type_id,
+                                                 class_fields.size(),
+                                                 node.init_names.size(),
+                                                 node.start);
         return this->error();
     }
     for (int i = 0; i < node.init_names.size(); i++) {
@@ -350,36 +339,24 @@ USemanticInfo Checker::visit(ForNode& node) {
     }
     IdNode* lid = new IdNode("List.len");
     lid->is_global_function = true;
-    Node* new_condition = new BoolOpNode(
-            BoolOp::LT,
-            new IdNode(".index0"),
-            new CallNode(lid, {new IdNode(".list0")}));
+    Node* new_condition = new BoolOpNode(BoolOp::LT, new IdNode(".index0"), new CallNode(lid, {new IdNode(".list0")}));
 
     BlockNode* new_body = new BlockNode({});
-    new_body->nodes.push_back(
-            new DeclarationNode(
-                    node.var,
-                    obj.type_params[0]->clone(),
-                    new SubscriptNode(new IdNode(".list0"), {new IdNode(".index0")}))
-    );
+    new_body->nodes.push_back(new DeclarationNode(node.var,
+                                                  obj.type_params[0]->clone(),
+                                                  new SubscriptNode(new IdNode(".list0"), {new IdNode(".index0")})));
     new_body->nodes.insert(new_body->nodes.end(), node.body->nodes.begin(), node.body->nodes.end());
-    AssignmentNode* asn = new AssignmentNode(
-            new IdNode(".index0"),
-            new BinopNode(OpType::ADD, new IdNode(".index0"), new NumberNode(1)));
+    AssignmentNode* asn = new AssignmentNode(new IdNode(".index0"),
+                                             new BinopNode(OpType::ADD, new IdNode(".index0"), new NumberNode(1)));
     asn->type = new T_INT;
-    new_body->nodes.push_back(
-            asn
-    );
+    new_body->nodes.push_back(asn);
 
     TypeNode& var_type = *obj.type_params[0];
     this->enter_scope("for");
     this->scope->set(node.var, var_type);
 
-    BlockNode* bn = new BlockNode(
-            {new DeclarationNode(".index0", new T_INT, new NumberNode(0)),
-             new DeclarationNode(".list0", obj.clone(), node.exp),
-            }
-    );
+    BlockNode* bn = new BlockNode({new DeclarationNode(".index0", new T_INT, new NumberNode(0)),
+                                   new DeclarationNode(".list0", obj.clone(), node.exp),});
     this->visit(*bn);
     this->visit(*node.body);
     this->dispatch(new_body->nodes[0]->decl().expression);
@@ -458,12 +435,10 @@ USemanticInfo Checker::visit(CallNode& n) {
                 const TypeNode& param_type = *function_type.param_types[i];
                 if (arg_type != param_type) {
                     if (arg_type.kind != Kind::UNKNOWN) {
-                        this->error_function_call_type_mismatch(
-                                param_type,
-                                arg_type,
-                                n.arguments[i]->start,
-                                n.arguments[i]->end
-                        );
+                        this->error_function_call_type_mismatch(param_type,
+                                                                arg_type,
+                                                                n.arguments[i]->start,
+                                                                n.arguments[i]->end);
                     }
                     return std::make_unique<SemanticInfo>(retv);
                 }
@@ -510,12 +485,10 @@ USemanticInfo Checker::visit(ClassLiteralExpressionNode& node) {
     if (num_required_type_params != 0) {
         // it's a generic class
         if (num_required_type_params != num_actual_type_params) {
-            this->error_generic_class_wrong_type_param_number(
-                    object_type.id,
-                    num_required_type_params,
-                    num_actual_type_params,
-                    node.start
-            );
+            this->error_generic_class_wrong_type_param_number(object_type.id,
+                                                              num_required_type_params,
+                                                              num_actual_type_params,
+                                                              node.start);
         }
         if (this->class_table->declared(object_type_str)) {
             class_info = this->class_table->get(object_type_str);
@@ -760,11 +733,7 @@ USemanticInfo Checker::visit(AssignmentNode& n) {
                 if (*actual_type.type_params[0] != exp_type) {
                     auto& foo = exp_type.object();
                     if (foo.id != "NoneType") {
-                        this->error_assignment(
-                                l_type,
-                                exp_type,
-                                n.start
-                        );
+                        this->error_assignment(l_type, exp_type, n.start);
                     }
                 }
             } else {
@@ -855,8 +824,7 @@ USemanticInfo Checker::visit(MemberNode& n) {
             } else {
                 throw std::runtime_error(
                         "Error: line " + text_pos_to_string(this->__file__, idn.start) + " -> " + idn._id +
-                        " might be none here, make sure to  this in a if XXX != none {...}!"
-                );
+                        " might be none here, make sure to  this in a if XXX != none {...}!");
             }
         }
     }
@@ -864,14 +832,12 @@ USemanticInfo Checker::visit(MemberNode& n) {
     if (final_type.id == "Tuple") {
         // special treatment for tuples
         if (n.type != MemberType::NUM) {
-            throw std::runtime_error(
-                    "Error can only access members " + std::to_string(1) + " to " +
-                    std::to_string(final_type.type_params.size()) + " of " + final_type.to_string());
+            throw std::runtime_error("Error can only access members " + std::to_string(1) + " to " +
+                                     std::to_string(final_type.type_params.size()) + " of " + final_type.to_string());
         }
         if (n.n_child < 1 || n.n_child > final_type.type_params.size()) {
-            throw std::runtime_error(
-                    "Error can only access members " + std::to_string(1) + " to " +
-                    std::to_string(final_type.type_params.size()) + " of " + final_type.to_string());
+            throw std::runtime_error("Error can only access members " + std::to_string(1) + " to " +
+                                     std::to_string(final_type.type_params.size()) + " of " + final_type.to_string());
         }
         SemanticInfo s;
         s.set_type(*final_type.type_params[n.n_child - 1]);
@@ -888,8 +854,7 @@ USemanticInfo Checker::visit(MemberNode& n) {
         } else {
             if (is_generic((final_type)) && final_type.type_params.size() == 0) {
                 throw std::runtime_error(
-                        "Cannot access member of totally generic value of generic type " + object.id + "!"
-                );
+                        "Cannot access member of totally generic value of generic type " + object.id + "!");
             }
             class_info = this->class_table->get(object.id);
             class_info = instantiate_generic(class_info, final_type);

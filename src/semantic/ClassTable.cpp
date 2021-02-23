@@ -18,3 +18,9 @@ bool ClassTable::declared(std::string name) {
 void ClassTable::set(std::string name, ClassInfo* info) {
     this->table[name] = info;
 }
+
+ClassTable::~ClassTable() {
+    for (auto c: this->table) {
+        delete c.second;
+    }
+}

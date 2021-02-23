@@ -19,11 +19,7 @@ public:
 
     void set(std::string name, ClassInfo* info);
 
-    ~ClassTable() {
-        for (auto c: this->table) {
-            delete c.second;
-        }
-    }
+    ~ClassTable();
 };
 
 #endif //CLASSTABLE_H

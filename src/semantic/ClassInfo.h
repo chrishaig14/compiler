@@ -24,20 +24,10 @@ public:
 
     ClassInfo() {}
 
-    ClassInfo(std::string class_name, const VectorOfStrings& fieldNames,
-              const VectorOfTypes& fieldTypes, VectorOfStrings type_parameters);
+    ClassInfo(std::string class_name, const VectorOfStrings& fieldNames, const VectorOfTypes& fieldTypes,
+              VectorOfStrings type_parameters);
 
-    ~ClassInfo() {
-        for (auto m: this->members) {
-            delete m.second;
-        }
-        for (auto m: this->methods) {
-            delete m.second;
-        }
-        for (auto m: this->member_types) {
-            delete m;
-        }
-    }
+    ~ClassInfo();
 
     bool operator!=(const ClassInfo& b) const;
 
