@@ -31,7 +31,7 @@ public:
 
 };
 
-typedef std::pair<std::string, CodeBuiltin> Builtin;
+typedef std::pair<std::string, std::string> Builtin;
 
 class GlobalProcessor {
 public:

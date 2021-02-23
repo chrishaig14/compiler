@@ -25,6 +25,7 @@ class StringObject;
 class CodeObject;
 
 class Environment;
+
 #define SET_FLAG(bitfield, flag) bitfield |= flag
 #define UNSET_FLAG(bitfield, flag) bitfield &= ~(flag)
 #define FLAG_IS_SET(bitfield, flag) (bitfield & (flag))
@@ -34,6 +35,7 @@ class Environment;
 #define IS_INT (1<<4)
 #define IS_LIST (1<<3)
 #define REACHABLE (1<<2)
+
 class Object {
 public:
     uint8_t flags;
@@ -50,14 +52,8 @@ public:
     virtual ~Object() {}
 };
 
-typedef void(* BuiltinFunction)(std::unordered_map<std::string, std::unordered_map<std::string, Code>>& structs,
-                                ObjectStack& stack, Environment* global_env);
-
-
 struct CodeBuiltin {
     FunctionType* ftype;
-
-    BuiltinFunction function;
 };
 
 

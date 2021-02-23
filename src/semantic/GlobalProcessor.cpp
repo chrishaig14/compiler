@@ -27,7 +27,7 @@ FunctionType* parse_function_type(const std::string& s) {
 
 void GlobalProcessor::add_builtins(std::vector<Builtin>& builtins) {
     for (int i = 0; i < builtins.size(); i++) {
-        this->function_table->add(builtins[i].first, *builtins[i].second.ftype);
+        this->function_table->add(builtins[i].first, *parse_function_type(builtins[i].second));
     }
 
 }
@@ -38,39 +38,20 @@ GlobalProcessor::GlobalProcessor(std::vector<Builtin>& builtins, ClassTable* imp
     this->globals = new SymbolTable("global", nullptr);
     this->class_table = imported_classes;
 
-    builtins.push_back(
-            {"map", CodeBuiltin{parse_function_type("fun(List[a],fun(a)->b)->List[b]"), nullptr}}
-    );
-    builtins.push_back({"File.read_line", CodeBuiltin{parse_function_type("fun()->String"), nullptr}});
-    builtins.push_back({"Integer.str", CodeBuiltin{parse_function_type("fun(Integer)->String"), nullptr}});
-    builtins.push_back({"Float.str", CodeBuiltin{parse_function_type("fun(Float)->String"), nullptr}});
-    builtins.push_back(
-            {"List.len",
-             CodeBuiltin{parse_function_type("fun(List[a])->Integer"), nullptr}}
-    );
-    builtins.push_back({"List.pop", CodeBuiltin{parse_function_type("fun(List[a],a)"), nullptr}});
-    builtins.push_back(
-            {"List.push", CodeBuiltin{
-                    parse_function_type("fun(List[a])->a"),
-                    nullptr}}
-    );
-    builtins.push_back(
-            {"List.unordered_map",
-             CodeBuiltin{parse_function_type("fun(fun(t)->b)->List[b]"),
-                         nullptr}}
-    );
-    builtins.push_back({"String.len", CodeBuiltin{parse_function_type("fun(String)->Integer"), nullptr}});
-    builtins.push_back({"print", CodeBuiltin{parse_function_type("fun(String)"), nullptr}});
-    builtins.push_back({"open", CodeBuiltin{parse_function_type("fun(String)->File"), nullptr}});
-    builtins.push_back(
-            {"join", CodeBuiltin{parse_function_type("fun(List[String],String)->String"), nullptr}}
-    );
-    builtins.push_back(
-            {"range", CodeBuiltin{parse_function_type("fun(Integer,Integer,Integer)->List[Integer])->String"), nullptr}}
-    );
-    builtins.push_back(
-            {"input", CodeBuiltin{parse_function_type("fun()->String"), nullptr}}
-    );
+    builtins.push_back({"map", "fun(List[a],fun(a)->b)->List[b]"});
+    builtins.push_back({"File.read_line", "fun()->String"});
+    builtins.push_back({"Integer.str", "fun(Integer)->String"});
+    builtins.push_back({"Float.str", "fun(Float)->String"});
+    builtins.push_back({"List.len", "fun(List[a])->Integer"});
+    builtins.push_back({"List.pop", "fun(List[a],a)"});
+    builtins.push_back({"List.push", "fun(List[a])->a"});
+    builtins.push_back({"List.unordered_map", "fun(fun(t)->b)->List[b]"});
+    builtins.push_back({"String.len", "fun(String)->Integer"});
+    builtins.push_back({"print", "fun(String)"});
+    builtins.push_back({"open", "fun(String)->File"});
+    builtins.push_back({"join", "fun(List[String],String)->String"});
+    builtins.push_back({"range", "fun(Integer,Integer,Integer)->List[Integer])->String"});
+    builtins.push_back({"input", "fun()->String"});
 
     this->add_builtins(builtins);
 }
@@ -122,8 +103,7 @@ void GlobalProcessor::visit(ClassNode& node) {
         for (auto p: method.parameter_types) {
             x.emplace_back(p->clone());
         }
-        class_info->methods.insert(
-                make_pair(f.first, new FunctionType(x, method.return_type->clone())));
+        class_info->methods.insert(make_pair(f.first, new FunctionType(x, method.return_type->clone())));
     }
     if (!has_init) {
         class_info->methods["init"] = new FunctionType(class_info->member_types, new ObjectType(node.class_name, {}));
