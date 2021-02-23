@@ -105,8 +105,6 @@ add_library(
         semantic/Checker.h
         semantic/RedeclareError.cpp
         semantic/RedeclareError.h
-        semantic/BadArguments.cpp
-        semantic/BadArguments.h
         semantic/ReturnError.cpp
         semantic/ReturnError.h
         semantic/ScopeError.cpp

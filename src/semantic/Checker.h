@@ -10,7 +10,6 @@
 #include "ScopeError.h"
 #include "RedeclareError.h"
 #include "ReturnError.h"
-#include "BadArguments.h"
 #include "../utils.h"
 #include "../nodes/nodes.h"
 #include <set>
