@@ -3,7 +3,6 @@
 //
 
 #include "Parser.h"
-#include "UnexpectedToken.h"
 #include "../semantic/GlobalProcessor.h"
 #include "../nodes/PartialApplication.h"
 #include "../logging/logging.h"

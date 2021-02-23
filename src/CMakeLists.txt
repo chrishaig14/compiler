@@ -6,7 +6,7 @@ set(CMAKE_CXX_STANDARD 14)
 add_library(tinyxml tinyxml/tinyxml2.cpp tinyxml/tinyxml2.h)
 
 add_library(scanner scanner/Scanner.cpp scanner/Scanner.h scanner/Token.cpp
-        scanner/Token.h scanner/CodeLines.cpp scanner/CodeLines.h scanner/TextPosition.cpp scanner/TextPosition.h)
+            scanner/Token.h scanner/CodeLines.cpp scanner/CodeLines.h scanner/TextPosition.cpp scanner/TextPosition.h)
 
 add_library(
         nodes
@@ -80,8 +80,7 @@ add_library(
         nodes/PartialApplication.cpp
         nodes/PartialApplication.h nodes/DictNode.cpp nodes/DictNode.h nodes/EmptyDictNode.cpp nodes/EmptyDictNode.h)
 
-add_library(parser parser/Parser.cpp parser/Parser.h parser/UnexpectedToken.cpp
-            parser/UnexpectedToken.h parser/ParserErrors.cpp)
+add_library(parser parser/Parser.cpp parser/Parser.h parser/ParserErrors.cpp)
 
 add_library(
         srcLib
