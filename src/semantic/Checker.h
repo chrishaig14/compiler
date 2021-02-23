@@ -8,7 +8,6 @@
 #include <unordered_map>
 #include "GlobalProcessor.h"
 #include "ScopeError.h"
-#include "RedeclareError.h"
 #include "ReturnError.h"
 #include "../utils.h"
 #include "../nodes/nodes.h"

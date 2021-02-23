@@ -103,8 +103,6 @@ add_library(
         semantic/FunctionInfo.h
         semantic/Checker.cpp
         semantic/Checker.h
-        semantic/RedeclareError.cpp
-        semantic/RedeclareError.h
         semantic/ReturnError.cpp
         semantic/ReturnError.h
         semantic/ScopeError.cpp
