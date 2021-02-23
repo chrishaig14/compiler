@@ -111,35 +111,11 @@ add_library(
         semantic/ReturnError.h
         semantic/ScopeError.cpp
         semantic/ScopeError.h
-        vm/Object.h
-        vm/Object.cpp
-        vm/CodeObject.cpp
-        vm/CodeObject.h
-        vm/CodeUser.cpp
-        vm/CodeUser.h
-        vm/IntegerObject.cpp
-        vm/IntegerObject.h
-        vm/Environment.h
-        vm/Environment.cpp
-        vm/UserObject.cpp
-        vm/UserObject.h
-        vm/ListObject.cpp
-        vm/ListObject.h
-        vm/BooleanObject.cpp
-        vm/BooleanObject.h
-        vm/NoneObject.cpp
-        vm/NoneObject.h
         semantic/TypeClassInfo.cpp
         semantic/TypeClassInfo.h
         nodes/node_types.h
         types.h
         macros.h
-        vm/TupleObject.cpp
-        vm/TupleObject.h
-        vm/FloatObject.cpp
-        vm/FloatObject.h
-        vm/ObjectStore.cpp
-        vm/ObjectStore.h
         semantic/CheckerErrors.cpp semantic/CheckerVisit.cpp semantic/CheckerUnify.cpp)
 
 add_library(transpiler transpiler/Transpiler.cpp transpiler/Transpiler.h)

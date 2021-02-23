@@ -9,7 +9,6 @@
 #include <unordered_map>
 #include "SymbolTable.h"
 #include "ClassTable.h"
-#include "../vm/Object.h"
 #include "../nodes/ClassNode.h"
 
 class FunctionTable {
