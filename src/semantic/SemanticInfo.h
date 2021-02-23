@@ -5,8 +5,9 @@
 #ifndef SYMBOLINFO_H
 #define SYMBOLINFO_H
 
-#include "FunctionInfo.h"
-#include "ObjectInfo.h"
+#include <string>
+#include <vector>
+#include "../nodes/TypeNode.h"
 #include "ClassInfo.h"
 
 class SemanticInfo {

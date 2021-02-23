@@ -7,8 +7,9 @@
 
 #include <string>
 #include <unordered_map>
-#include "ObjectInfo.h"
-#include "FunctionInfo.h"
+#include <string>
+#include <vector>
+#include "../nodes/TypeNode.h"
 #include "../macros.h"
 
 class ClassInfo {

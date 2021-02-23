@@ -95,12 +95,8 @@ add_library(
         utils.cpp
         semantic/SemanticInfo.cpp
         semantic/SemanticInfo.h
-        semantic/ObjectInfo.cpp
-        semantic/ObjectInfo.h
         semantic/ClassInfo.cpp
         semantic/ClassInfo.h
-        semantic/FunctionInfo.cpp
-        semantic/FunctionInfo.h
         semantic/Checker.cpp
         semantic/Checker.h
         semantic/ReturnError.cpp
