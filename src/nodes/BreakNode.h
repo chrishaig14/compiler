@@ -12,7 +12,10 @@
 class BreakNode : public Node {
 public:
 
+    BreakNode();
     bool equal(const Node& other) const override;
+    BreakNode& brk() override;
+    const BreakNode& brk() const override;
 
 };
 
