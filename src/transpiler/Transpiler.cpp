@@ -24,14 +24,13 @@ std::string Transpiler::visit_assignment(AssignmentNode& node) {
     this->is_lvalue = true;
     if (node.lvalue->ntype == SUB) {
         out += "set_subscript(" + this->dispatch(node.lvalue->sub().parent) + ", " +
-               this->dispatch(node.lvalue->sub().child[0]) + ", " +
-               this->dispatch(node.rvalue) + ")";
+               this->dispatch(node.lvalue->sub().child[0]) + ", " + this->dispatch(node.rvalue) + ")";
     } else if (node.lvalue->ntype == MEMBER) {
         this->is_lvalue = false;
         MemberNode& memberNode = node.lvalue->member();
         TypeNode* cast_type = memberNode.parent_t;
-        out += "CAST(" + this->dispatch(node.lvalue->member().parent) + "," +
-               get_class_name(cast_type->to_string()) + ")->";
+        out += "CAST(" + this->dispatch(node.lvalue->member().parent) + "," + get_class_name(cast_type->to_string()) +
+               ")->";
         out += node.lvalue->member().s_child + "=";
         out += this->dispatch(node.rvalue) + "";
     } else {
@@ -207,9 +206,7 @@ std::string Transpiler::visit_class(ClassNode& node) {
         n.second->identifier = node.class_name + "_" + n.second->identifier;
         if (method_name != "init") {
             n.second->parameter_names.insert(n.second->parameter_names.begin(), "this_obj");
-            n.second->parameter_types.insert(
-                    n.second->parameter_types.begin(),
-                    new ObjectType(node.class_name, {}));
+            n.second->parameter_types.insert(n.second->parameter_types.begin(), new ObjectType(node.class_name, {}));
         }
         out += this->dispatch(n.second);
     }
@@ -445,8 +442,9 @@ std::string Transpiler::visit_function(FunctionNode& node) {
     std::string function_class = "Function" + num_args_str;
     this->externs_declaration += "extern  " + function_class + "* " + function_obj_name + "\n;";
     // this->static_declarations += "static Function" + num_args_str + "* " + function_obj_name + ";\n";
-    this->globals_initialization += function_class + " " + raw_function_name + "_f" + " = " + function_class + " (" +
-                                    raw_function_name + ");\n";
+    this->globals_initialization +=
+            function_class + " " + raw_function_name + "_f" + " = " + function_class + " (" + raw_function_name +
+            ");\n";
     this->globals_initialization += function_class + "* " + function_obj_name + "=&" + raw_function_name + "_f;";
     // out += "static Function" + num_args_str + "* " + function_obj_name + " = new Function" + num_args_str + "(" +
     //        raw_function_name + ");\n";
@@ -560,10 +558,14 @@ std::string Transpiler::visit_subscript(SubscriptNode& node) {
     std::string fun;
     if (node.parent_t->object().id == "List") {
         out = "LIST_SUBSCRIPT(" + this->dispatch(node.parent) + ", " + this->dispatch(node.child[0]) + ")";
+    } else if (node.parent_t->object().id == "String") {
+        fun = "function_string_subscript";
+        out = "CALL2(" + fun + "," + this->dispatch(node.parent) + ", " + this->dispatch(node.child[0]) + ")";
     } else {
         fun = "function_dict_subscript";
         out = "CALL2(" + fun + "," + this->dispatch(node.parent) + ", " + this->dispatch(node.child[0]) + ")";
     }
+
     return out;
 }
 

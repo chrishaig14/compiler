@@ -20,6 +20,7 @@
 XObject* f_print(XObject* _s);
 #define CALL(fn, ...) (*fn)(__VA_ARGS__)
 #define NEW(cls, ...) GC::register_object((TAG(new cls(__VA_ARGS__))))
+#define CALL0(fn, ...) CALL(CAST(fn, Function0))
 #define CALL1(fn, ...) CALL(CAST(fn, Function1),__VA_ARGS__)
 #define CALL2(fn, ...) CALL(CAST(fn, Function2),__VA_ARGS__)
 #define CALL3(fn, ...) CALL(CAST(fn, Function3),__VA_ARGS__)
@@ -123,7 +124,9 @@ extern Function2* function_List_add;
 extern Function1* function_List_len;
 extern Function2* function_list_subscript;
 extern Function2* function_dict_subscript;
+extern Function2* function_string_subscript;
 extern Function2* function_String_add;
+extern Function1* function_String_len;
 
 
 #endif //UNTITLED1_CORE_H

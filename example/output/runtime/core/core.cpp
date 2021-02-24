@@ -160,11 +160,27 @@ XObject* list_subscript(XObject* _l, XObject* i) {
     return list->l[index];
 }
 
+XObject* string_subscript(XObject* _l, XObject* i) {
+    XObject* p = UNTAG(_l);
+    XString* str = (XString*) UNTAG(_l);
+    unsigned long index = PTR_TO_INT(i);
+    std::cout << "String is: " << str->s << std::endl;
+    if (index >= str->s.size()) {
+        throw std::runtime_error("String index out of range: " + std::to_string(index) + " but length is " +
+                                 std::to_string(str->s.size()));
+    }
+    return NEW(XString, std::string(1, str->s[index]));
+}
 
 XObject* f_String_add(XObject* _a, XObject* _b) {
     XString* a = (XString*) UNTAG(_a);
     XString* b = (XString*) UNTAG(_b);
     return GC::register_object(TAG(new XString(a->s + b->s)));
+}
+
+XObject* f_String_len(XObject* _a) {
+    XString* a = (XString*) UNTAG(_a);
+    return INT_TO_PTR(a->s.size());
 }
 
 Function1 function_open_p = Function1(f_open);
@@ -178,7 +194,9 @@ Function1 function_Boolean_str_p = Function1(f_Boolean_str);
 Function2 function_List_add_p = Function2(f_List_add);
 Function1 function_List_len_p = Function1(f_List_len);
 Function2 function_list_subscript_p = Function2(list_subscript);
+Function2 function_string_subscript_p = Function2(string_subscript);
 Function2 function_String_add_p = Function2(f_String_add);
+Function1 function_String_len_p = Function1(f_String_len);
 
 Function1* function_open = &function_open_p;
 Function1* function_print = &function_print_p;
@@ -191,8 +209,10 @@ Function1* function_Boolean_str = &function_Boolean_str_p;
 Function2* function_List_add = &function_List_add_p;
 Function1* function_List_len = &function_List_len_p;
 Function2* function_list_subscript = &function_list_subscript_p;
+Function2* function_string_subscript = &function_string_subscript_p;
 Function2* function_dict_subscript = nullptr;
 Function2* function_String_add = &function_String_add_p;
+Function1* function_String_len = &function_String_len_p;
 
 Tuple::Tuple(const std::string& n, int num) : XObject(n), members(num, nullptr) {}
 
