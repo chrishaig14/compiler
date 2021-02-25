@@ -204,11 +204,11 @@ Node* Parser::parse_or_expression() {
 
 Node* Parser::parse_and_expression() {
     Node* left = this->parse_bool_expression();
-    if (this->match(TokType::AND)) {
+    while (this->match(TokType::AND)) {
         this->next();
         Node* right = this->parse_bool_expression();
         Node* node = new BoolOpNode(BoolOp::AND, left, right, left->start);
-        return node;
+        left = node;
     }
     return left;
 }
