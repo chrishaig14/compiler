@@ -6,7 +6,7 @@
 #define UNTITLED1_OPTYPES_H
 
 enum class OpType {
-    ADD, SUB, MUL, DIV, MOD
+    ADD, SUB, MUL, DIV, MOD, DEC, INC
 };
 std::string op_to_string(OpType op);
 

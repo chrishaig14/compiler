@@ -949,6 +949,12 @@ USemanticInfo Checker::visit(BoolOpNode& n) {
 USemanticInfo Checker::visit(BinopNode& n) {
     USemanticInfo left_info_p = this->dispatch(n.left);
     Node* left_replace = this->replace_if_necessary(n.left);
+    if (n.op == OpType::INC || n.op == OpType::DEC) {
+        if (left_info_p->type() != T_INT) {
+            throw std::runtime_error("Inc/Dec operators can only be used for Integer values!");
+        }
+        return nullptr;
+    }
     USemanticInfo right_info_p = this->dispatch(n.right);
     bool err = false;
     if (left_info_p->type() == T_NONE) {

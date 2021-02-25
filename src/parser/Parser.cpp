@@ -22,24 +22,20 @@ std::string highlight2(const std::string& text, size_t column, size_t length) {
 }
 
 
-std::unordered_map<TokType, OpType> TOKEN_TO_OP = {
-        {TokType::PLUS,  OpType::ADD},
-        {TokType::MINUS, OpType::SUB},
-        {TokType::TIMES, OpType::MUL},
-        {TokType::DIV,   OpType::DIV},
-        {TokType::MOD,   OpType::MOD}
-};
+std::unordered_map<TokType, OpType> TOKEN_TO_OP = {{TokType::PLUS,  OpType::ADD},
+                                                   {TokType::MINUS, OpType::SUB},
+                                                   {TokType::TIMES, OpType::MUL},
+                                                   {TokType::DIV,   OpType::DIV},
+                                                   {TokType::MOD,   OpType::MOD}};
 
-std::unordered_map<TokType, BoolOp> TOKEN_TO_BOOL_OP = {
-        {TokType::AND, BoolOp::AND},
-        {TokType::OR,  BoolOp::OR},
-        {TokType::LT,  BoolOp::LT},
-        {TokType::GT,  BoolOp::GT},
-        {TokType::LEQ, BoolOp::LEQ},
-        {TokType::GEQ, BoolOp::GEQ},
-        {TokType::NEQ, BoolOp::NEQ},
-        {TokType::EQ,  BoolOp::EQ}
-};
+std::unordered_map<TokType, BoolOp> TOKEN_TO_BOOL_OP = {{TokType::AND, BoolOp::AND},
+                                                        {TokType::OR,  BoolOp::OR},
+                                                        {TokType::LT,  BoolOp::LT},
+                                                        {TokType::GT,  BoolOp::GT},
+                                                        {TokType::LEQ, BoolOp::LEQ},
+                                                        {TokType::GEQ, BoolOp::GEQ},
+                                                        {TokType::NEQ, BoolOp::NEQ},
+                                                        {TokType::EQ,  BoolOp::EQ}};
 
 Parser::Parser(const std::string& __file__, CodeLines code_lines, std::vector<Token>& tokens) {
     this->__file__ = __file__;
@@ -157,6 +153,20 @@ VectorOfNodes Parser::parse_list_of_arguments() {
 
 Node* Parser::parse_assignment_or_expression() {
     Node* lvalue = this->parse_expression();
+    if (this->match(TokType::INC)) {
+        if (lvalue->ntype != MEMBER && lvalue->ntype != SUB && lvalue->ntype != ID) {
+            throw std::runtime_error("error inc/dec can only be used on member, subscript and id");
+        }
+        this->next();
+        return new BinopNode(OpType::INC, lvalue, nullptr);
+    }
+    if (this->match(TokType::DEC)) {
+        if (lvalue->ntype != MEMBER && lvalue->ntype != SUB && lvalue->ntype != ID) {
+            throw std::runtime_error("error inc/dec can only be used on member, subscript and id");
+        }
+        this->next();
+        return new BinopNode(OpType::DEC, lvalue, nullptr);
+    }
     if (item_in_vec(this->token.type, {TokType::EQQ, TokType::PLUS_EQQ, TokType::MINUS_EQQ})) {
         if (lvalue->ntype == NodeType::CALL) {
             this->error_assign_call(this->token);
@@ -216,8 +226,8 @@ Node* Parser::parse_and_expression() {
 Node* Parser::parse_bool_expression() {
     Node* left = this->parse_add_or_sub_expression();
     BoolOp op;
-    std::vector<TokType> boolean_tokens = {TokType::EQ, TokType::LT, TokType::GT, TokType::LEQ,
-                                           TokType::GEQ, TokType::NEQ};
+    std::vector<TokType> boolean_tokens = {TokType::EQ, TokType::LT, TokType::GT, TokType::LEQ, TokType::GEQ,
+                                           TokType::NEQ};
     if (!item_in_vec(this->token.type, boolean_tokens)) {
         return left;
     }
@@ -835,8 +845,7 @@ ClassNode* Parser::parse_class_definition() {
             this->expect_token(TokType::COLON);
             TypeNode* member_type = this->parse_type_node();
             std::string& member_name = member_name_tk.str;
-            if (members.find(member_name) != members.end() ||
-                methods.find(member_name) != methods.end()) {
+            if (members.find(member_name) != members.end() || methods.find(member_name) != methods.end()) {
                 this->error_class_member_redefined(class_name, member_name, member_name_tk.start);
 
             }
@@ -846,8 +855,7 @@ ClassNode* Parser::parse_class_definition() {
         } else if (this->match(TokType::FUN)) {
             FunctionNode* method_node = this->parse_function_definition();
             std::string& method_name = method_node->identifier;
-            if (members.find(method_name) != members.end() ||
-                methods.find(method_name) != methods.end()) {
+            if (members.find(method_name) != members.end() || methods.find(method_name) != methods.end()) {
                 this->error_class_member_redefined(class_name, method_name, method_node->start);
 
             }
