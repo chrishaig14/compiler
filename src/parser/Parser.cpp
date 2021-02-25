@@ -193,11 +193,11 @@ Node* Parser::parse_expression() {
 
 Node* Parser::parse_or_expression() {
     Node* left = this->parse_and_expression();
-    if (this->match(TokType::OR)) {
+    while (this->match(TokType::OR)) {
         this->next();
         Node* right = this->parse_and_expression();
         Node* node = new BoolOpNode(BoolOp::OR, left, right, left->start);
-        return node;
+        left = node;
     }
     return left;
 }
