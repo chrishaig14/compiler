@@ -82,36 +82,40 @@ std::string Transpiler::visit_boolean(BooleanNode& node) {
 }
 
 std::string Transpiler::visit_bool_op(BoolOpNode& node) {
-    std::string out = "op";
+    std::string out = "";
+    std::string op;
     switch (node.op) {
         case BoolOp::EQ:
-            out += "_eq";
+            op += "==";
             break;
         case BoolOp::AND:
-            out += "_and";
+            op += "&&";
             break;
         case BoolOp::OR:
-            out += "_or";
+            op += "||";
             break;
         case BoolOp::LEQ:
-            out += "_leq";
+            op += "<=";
             break;
         case BoolOp::GEQ:
-            out += "_geq";
+            op += ">=";
             break;
         case BoolOp::LT:
-            out += "_lt";
+            op += "<";
             break;
         case BoolOp::GT:
-            out += "_gt";
+            op += ">";
             break;
         case BoolOp::NEQ:
-            out += "_neq";
+            op += "!=";
             break;
     }
-    out += "(";
-    out += this->dispatch(node.left) + ", " + this->dispatch(node.right) + ")";
-    return out;
+    if (node.op == BoolOp::AND || node.op == BoolOp::OR) {
+        return "BOOL_TO_PTR(PTR_TO_BOOL(" + this->dispatch(node.left) + ")" + op + "PTR_TO_BOOL(" +
+               this->dispatch(node.right) + "))";
+    }
+    return "BOOL_TO_PTR(PTR_TO_INT(" + this->dispatch(node.left) + ")" + op + "PTR_TO_INT(" +
+           this->dispatch(node.right) + "))";
 }
 
 std::string Transpiler::visit_break(BreakNode& node) { return ""; }
