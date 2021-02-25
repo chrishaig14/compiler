@@ -109,6 +109,9 @@ void Checker::leave_scope() {
 
 bool Checker::assert_type_exists(TypeNode& type, TextPosition pos) {
     if (type.kind == Kind::OBJECT) {
+        if (type.object().id == ".None") {
+            return true;
+        }
         if (type.object().type_params.size() == 0) {
             if (!is_generic(type)) {
                 if (!this->class_table->declared(type.object().id)) {
