@@ -118,7 +118,7 @@ std::string Transpiler::visit_bool_op(BoolOpNode& node) {
            this->dispatch(node.right) + "))";
 }
 
-std::string Transpiler::visit_break(BreakNode& node) { return ""; }
+std::string Transpiler::visit_break(BreakNode& node) { return "GC::function_return(nullptr);\nbreak"; }
 
 std::string Transpiler::visit_call(CallNode& node) {
     std::string out;
@@ -601,9 +601,9 @@ std::string Transpiler::visit_while(WhileNode& node) {
     out += "PTR_TO_BOOL(" + this->dispatch(node.condition) + ")";
     out += ")";
     out += "{";
-    out += "ENTER();";
+    out += "ENTER_FUN(loop);";
     out += this->dispatch(node.body);
-    out += "LEAVE();";
+    out += "GC::function_return(nullptr);";
     out += "}";
     return out;
 }
