@@ -706,28 +706,11 @@ USemanticInfo Checker::visit(AssignmentNode& n) {
     n.rvalue = this->replace_if_necessary(n.rvalue);
 
     const TypeNode& l_type = linfo.type();
-    const ObjectType& actual_type = l_type.object();
     const TypeNode& exp_type = expression_type.type();
-    if (n.lvalue->ntype == NodeType::ID && actual_type.id == "Option") {
-        // special treatment if we are assigning to an id of a variable of type Option[t]
-        if (exp_type == (*actual_type.type_params[0])) {
-            std::cout << "p cant be none" << std::endl;
-            this->scope->set_not_none(n.lvalue->id()._id, true);
-        } else {
-            if (l_type != exp_type) {
-                auto& foo = exp_type.object();
-                if (foo.id != "NoneType") {
-                    this->error_assignment(l_type, exp_type, n.start);
-                }
-                // assigning none, ok
-            }
-            // type matches exactly, no proble
-            std::cout << "p may be none" << std::endl;
-            n.type = l_type.clone();
-            this->scope->set_not_none(n.lvalue->id()._id, false);
-        }
-    } else {
-        if (l_type != exp_type) {
+
+    if (l_type != exp_type) {
+        if (l_type.kind == Kind::OBJECT) {
+            const ObjectType& actual_type = l_type.object();
             if (actual_type.id == "Option") {
                 // if type doesn't match exactly, we may be assigning to an Option[t]
                 if (*actual_type.type_params[0] != exp_type) {
@@ -740,10 +723,13 @@ USemanticInfo Checker::visit(AssignmentNode& n) {
                 // if it's not Option[t], then it's an error
                 this->error_assignment(l_type, exp_type, n.start);
             }
+        } else {
+            // if it's not Option[t], then it's an error
+            this->error_assignment(l_type, exp_type, n.start);
         }
-        // else, type matches don't do anything
-        n.type = l_type.clone();
     }
+    // else, type matches don't do anything
+    n.type = l_type.clone();
     return nullptr;
 }
 
