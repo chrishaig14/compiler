@@ -172,19 +172,22 @@ USemanticInfo Checker::visit(ClassNode& node) {
     }
 
     VectorOfTypes members_ordered_types;
+    inits = std::map<std::string, bool>();
 
     for (auto mt: node.members_ordered) {
         TypeNode& t = *node.members[mt];
+        inits[mt] = false;
         members_ordered_types.push_back(&t);
         this->assert_type_exists(t, node.start);
     }
 
     this->this_type = new ObjectType(node.class_name, tp);
     bool has_init = false;
+
     for (auto method: node.methods) {
         this->is_method = true;
         this->visit(*method.second);
-        has_init = method.first == "init";
+        has_init = has_init || method.first == "init";
     }
     if (!has_init) {
         BlockNode* init_body = new BlockNode({});
@@ -199,6 +202,7 @@ USemanticInfo Checker::visit(ClassNode& node) {
         this->is_method = true;
         this->visit(*node.methods["init"]);
     }
+
     this->is_method = false;
     this->add_this = false;
     delete this_type;
@@ -547,6 +551,30 @@ USemanticInfo Checker::visit(FunctionNode& n) {
     this->scope->set("__return__", returnType);
     this->visit(*n.body);
     if (is_init_method) {
+        for (int i = 0; i < n.body->nodes.size(); i++) {
+            if (n.body->nodes[i]->ntype == ASSIGN) {
+                AssignmentNode& nod = n.body->nodes[i]->assign();
+                if (nod.lvalue->ntype == MEMBER) {
+                    MemberNode& mem = nod.lvalue->member();
+                    if (mem.parent->ntype == ID) {
+                        if (mem.parent->id()._id == "this") {
+                            inits[mem.s_child] = true;
+                        }
+                    }
+                }
+            }
+        }
+        bool er = false;
+        for (auto x: this->inits) {
+            if (x.second == false) {
+                er = true;
+                this->error_class_init_member_not_init(this->current_class,x.first,n.start);
+                // std::cout << "MEMBER " + x.first + " not initialized in init method!" << std::endl;
+            }
+        }
+        if (er) {
+            throw std::runtime_error("FAILED");
+        }
         this->leave_scope();
         return nullptr;
     }
@@ -750,7 +778,11 @@ USemanticInfo Checker::visit(MemberNode& n) {
                     for (int i = 0; i < params.size(); i++) {
                         params[i] = params[i]->clone();
                     }
-                    FunctionType f(params, new ObjectType(id_node._id, {}));
+                    VectorOfTypes tp;
+                    for (auto t: class_info->type_params) {
+                        tp.push_back(new ObjectType(t, {}));
+                    }
+                    FunctionType f(params, new ObjectType(class_name, tp));
                     rv.set_type(f);
                     rv.is_class_method = true;
                     this->replace_me = true;

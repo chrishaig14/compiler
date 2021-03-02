@@ -263,6 +263,14 @@ void Checker::error_class_init_wrong_number_init(const std::string& cls, int num
     std::cout << msg << std::endl;
 }
 
+void Checker::error_class_init_member_not_init(const std::string& cls, std::string mem, TextPosition pos) {
+    this->failed = true;
+    std::string msg;
+    msg = this->context_string(pos) + E_FMT(" Member ") + E_HLT(mem) +
+          E_FMT(" not initialized") + this->code_context_string(pos);
+    std::cout << msg << std::endl;
+}
+
 void Checker::error_subscript_type(const TypeNode& t, const TypeNode& s, const TypeNode& es, TextPosition pos) {
     this->failed = true;
     std::string msg;

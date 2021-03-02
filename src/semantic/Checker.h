@@ -31,6 +31,7 @@ SemanticInfo match_arguments_to_generic_function(const FunctionType& function_ty
 class Checker {
     bool add_this;
     bool is_lvalue;
+    std::map<std::string, bool> inits;
     bool replace_me;
     ClassTable* class_table;
     FunctionTable* function_table;
@@ -144,6 +145,7 @@ public:
     void error_class_not_generic(const std::string& cls, TextPosition pos);
     bool is_method;
     void error_function_doesnt_return_a_value(TextPosition position, const TypeNode* expected_type);
+    void error_class_init_member_not_init(const std::string& cls, std::string mem, TextPosition pos);
 };
 
 bool function_is_generic(const FunctionType& ft);

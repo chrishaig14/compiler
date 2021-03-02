@@ -29,7 +29,7 @@ std::string Transpiler::visit_assignment(AssignmentNode& node) {
         this->is_lvalue = false;
         MemberNode& memberNode = node.lvalue->member();
         TypeNode* cast_type = memberNode.parent_t;
-        out += "CAST(" + this->dispatch(node.lvalue->member().parent) + "," + get_class_name(cast_type->to_string()) +
+        out += "CAST(" + this->dispatch(node.lvalue->member().parent) + "," + get_class_name(cast_type->object().id) +
                ")->";
         out += node.lvalue->member().s_child + "=";
         out += this->dispatch(node.rvalue) + "";
@@ -528,8 +528,9 @@ std::string Transpiler::visit_member(MemberNode& node) {
         return "((Tuple*)(UNTAG(" + this->dispatch(node.parent) + ")))->get_member(" + std::to_string(node.n_child) +
                ")";
     }
-    return "CAST(" + this->dispatch(node.parent) + "," + get_class_name(node.parent_t->to_string()) + ")->" +
+    auto s = "CAST(" + this->dispatch(node.parent) + "," + get_class_name(node.parent_t->object().id) + ")->" +
            node.s_child;
+    return s;
 }
 
 std::string Transpiler::visit_none(NoneNode& node) { return "nullptr"; }
