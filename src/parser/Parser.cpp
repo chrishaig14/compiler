@@ -821,6 +821,8 @@ ClassNode* Parser::parse_class_definition() {
             type_parameters.push_back(type_param_tk.str);
             if (!this->match(TokType::COMMA)) {
                 break;
+            }else{
+                this->next();
             }
         }
         this->expect_token(TokType::RSQUARE);
