@@ -111,6 +111,7 @@ public:
                 for (int j = 0; j < list_len; j++) {
                     XObject* element = PTR_TO_OBJ(this->l[j]);
                     if (!element->is_reachable() && !element->inserted) {
+                        element->set_reachable();
                         new_root.push_back(element);
                         element->inserted = true;
                     }
