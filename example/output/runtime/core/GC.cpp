@@ -80,6 +80,11 @@ void GC::leave_scope(Scope* parent) {
     }
     root.resize(k);
     mark(root);
+    for (int i = 0; i < all_objects.size(); i++) {
+        // all_objects[i]->reset_reachable();
+            all_objects[i]->inserted= false;
+            k++;
+    }
     sweep();
     // std::cout << "Done leaving scope" << std::endl;
 }
