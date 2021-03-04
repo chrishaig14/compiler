@@ -8,10 +8,6 @@
 #include <iostream>
 #include <map>
 #include <assert.h>
-#include "../Object.h"
-#include "../BooleanObject.h"
-#include "../ListObject.h"
-#include "../StringObject.h"
 #include "xobjects/XString.h"
 #include "xobjects/XList.h"
 #include "xobjects/XDict.h"

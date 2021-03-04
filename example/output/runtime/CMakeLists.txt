@@ -7,13 +7,6 @@ add_library(
   core
   core/core.cpp
   core/core.h
-  StringObject.cpp
-  ListObject.cpp
-  Object.cpp
-  NoneObject.cpp
-  TupleObject.cpp
-  UserObject.cpp
-  BooleanObject.cpp
   core/functions.h
   core/GC.cpp
   core/GC.h
