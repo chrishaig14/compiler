@@ -6,21 +6,24 @@
 #define XLANG_XSTRING_H
 
 #include "XObject.h"
+#include "../functions.h"
+#include "../GC.h"
 
 class XString : public XObject {
 public:
     std::string s;
 
-    XString(const std::string& x) : XObject("String") {
-        this->s = x;
-        this->is_string = true;
-    }
+    XString(const std::string& x);
 
-    ~XString() {
-        // std::cout << "Deleted String '" << this->s << "' (" << this << ")" << std::endl;
-    }
+    ~XString();
 
-    void mark(std::vector<XObject*>& x) override {}
+    void mark(std::vector<XObject*>& x) override;
 };
+
+extern Function2* function_String_add;
+extern Function1* function_String_len;
+extern Function2 function_String_add_p;
+XObject* f_String_add(XObject* _a, XObject* _b);
+
 
 #endif //XLANG_XSTRING_H

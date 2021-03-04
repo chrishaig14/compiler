@@ -18,32 +18,15 @@ public:
     bool is_string;
     std::string class_name;
 
-    XObject(std::string class_name) {
-        this->class_name = class_name;
-        this->is_list = false;
-        this->inserted = false;
-        this->reachable = false;
-        this->is_string = false;
-        this->is_user = false;
-    }
+    XObject(std::string class_name);
 
-    void set_reachable() {
-        // std::cout << "Set object " << this << " (" << this->class_name << ") reachable" << std::endl;
-        this->reachable = true;
-    }
+    void set_reachable();
 
-    void reset_reachable() {
-        // std::cout << "Reset object " << this << " (" << this->class_name << ") reachable" << std::endl;
-        this->reachable = false;
-    }
+    void reset_reachable();
 
-    bool is_reachable() {
-        return this->reachable;
-    }
+    bool is_reachable();
 
-    virtual ~XObject() {
-        // std::cout << "Deleted object " << this << " (" << this->class_name << ")" << std::endl;
-    }
+    virtual ~XObject();
 
     virtual void mark(std::vector<XObject*>& new_root) = 0;
 

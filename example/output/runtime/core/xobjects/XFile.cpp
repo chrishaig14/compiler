@@ -3,3 +3,13 @@
 //
 
 #include "XFile.h"
+
+Function1 function_File_read_line_p = Function1(f_File_read_line);
+
+XFile::XFile(const std::string& filename) : XObject("File") {
+    f.open(filename);
+}
+
+void XFile::mark(std::vector<XObject*>& new_root) {
+
+}

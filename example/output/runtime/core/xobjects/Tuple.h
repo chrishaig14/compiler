@@ -6,6 +6,8 @@
 #define XLANG_TUPLE_H
 
 #include "XObject.h"
+#include "../xobject.h"
+#include <assert.h>
 
 class Tuple : public XObject {
 public:
@@ -33,5 +35,6 @@ public:
 
     XObject* get_member(int i) override;
 };
+
 
 #endif //XLANG_TUPLE_H
