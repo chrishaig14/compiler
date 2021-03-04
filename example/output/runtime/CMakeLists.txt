@@ -7,7 +7,6 @@ add_library(
   core
   core/core.cpp
   core/core.h
-  IntegerObject.cpp
   StringObject.cpp
   ListObject.cpp
   Object.cpp

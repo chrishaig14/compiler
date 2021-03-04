@@ -10,7 +10,6 @@
 #include <assert.h>
 #include "../Object.h"
 #include "../BooleanObject.h"
-#include "../IntegerObject.h"
 #include "../ListObject.h"
 #include "../StringObject.h"
 #include "xobjects/XString.h"
