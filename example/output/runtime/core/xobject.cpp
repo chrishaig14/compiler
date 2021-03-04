@@ -7,13 +7,13 @@
 #include "xobjects/XString.h"
 #include "xobjects/XFile.h"
 #include "xobjects/XDict.h"
-#include "xobjects/Tuple.h"
+#include "xobjects/XTuple.h"
 
 int hash(XObject* n) {
     if (has_tag(n, INT_TAG)) {
         return PTR_TO_INT(n);
     }
-    Tuple2* t = dynamic_cast<Tuple2*>(UNTAG(n));
+    XTuple2* t = dynamic_cast<XTuple2*>(UNTAG(n));
     int h = 0;
 
     if (t != nullptr) {

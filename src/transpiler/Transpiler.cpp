@@ -234,7 +234,7 @@ std::string Transpiler::ptr_to_type_object(const ObjectType& t) {
     if (t.id == "Tuple") {
         for (int i = 0; i < this->tuple_types.size(); i++) {
             if (t == *this->tuple_types[i]) {
-                return "Tuple" + std::to_string(i) + "*";
+                return "XTuple" + std::to_string(i) + "*";
             }
         }
     }
@@ -265,7 +265,7 @@ std::string Transpiler::object_type_mapper(const ObjectType& t) {
     if (t.id == "Tuple") {
         for (int i = 0; i < this->tuple_types.size(); i++) {
             if (t == *this->tuple_types[i]) {
-                return "Tuple" + std::to_string(i) + "*";
+                return "XTuple" + std::to_string(i) + "*";
             }
         }
     }
@@ -525,7 +525,7 @@ std::string Transpiler::visit_dict(DictNode& node) {
 
 std::string Transpiler::visit_member(MemberNode& node) {
     if (node.type == MemberType::NUM) {
-        return "((Tuple*)(UNTAG(" + this->dispatch(node.parent) + ")))->get_member(" + std::to_string(node.n_child) +
+        return "((XTuple*)(UNTAG(" + this->dispatch(node.parent) + ")))->get_member(" + std::to_string(node.n_child) +
                ")";
     }
     auto s = "CAST(" + this->dispatch(node.parent) + "," + get_class_name(node.parent_t->object().id) + ")->" +

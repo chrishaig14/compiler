@@ -13,7 +13,7 @@
 #include "xobjects/XDict.h"
 #include "xobjects/XFile.h"
 #include "xobjects/XObject.h"
-#include "xobjects/Tuple.h"
+#include "xobjects/XTuple.h"
 #include "functions.h"
 #include "GC.h"
 

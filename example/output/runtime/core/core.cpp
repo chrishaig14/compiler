@@ -7,7 +7,7 @@
 #include "xobjects/XFile.h"
 #include "xobjects/XList.h"
 #include "xobjects/XDict.h"
-#include "xobjects/Tuple.h"
+#include "xobjects/XTuple.h"
 
 XObject* f_open(XObject* _s) {
     return new XFile(((XString*) UNTAG(_s))->s);
@@ -96,8 +96,8 @@ XObject* op_eq(XObject* a, XObject* b) {
             }
         }
     } else {
-        Tuple* ta = (Tuple*) oa;
-        Tuple* tb = (Tuple*) ob;
+        XTuple* ta = (XTuple*) oa;
+        XTuple* tb = (XTuple*) ob;
         for (int i = 0; i < ta->members.size(); i++) {
             if (!PTR_TO_BOOL(op_eq(ta->members[i], tb->members[i]))) {
                 r = false;

@@ -25,5 +25,5 @@ add_library(
         core/xobjects/XFile.cpp
         core/xobjects/XFile.cpp
         core/xobjects/XFile.h
-        core/xobjects/Tuple.cpp
-        core/xobjects/Tuple.h macros.h)
+        core/xobjects/XTuple.cpp
+        core/xobjects/XTuple.h macros.h)
