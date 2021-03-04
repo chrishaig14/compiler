@@ -3,13 +3,18 @@
 //
 
 #include "core.h"
+#include "xobjects/XString.h"
+#include "xobjects/XFile.h"
+#include "xobjects/XList.h"
+#include "xobjects/XDict.h"
+#include "xobjects/Tuple.h"
 
 XObject* f_open(XObject* _s) {
     return new XFile(((XString*) UNTAG(_s))->s);
 }
 
 XObject* f_print(XObject* _s) {
-    XString* s = PTR_TO_STRING(_s);
+    XString* s = CAST(_s, XString);
     std::cout << s->s << std::endl;
     return nullptr;
 }

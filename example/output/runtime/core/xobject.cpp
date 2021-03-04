@@ -4,6 +4,10 @@
 
 #include "xobject.h"
 #include "core.h"
+#include "xobjects/XString.h"
+#include "xobjects/XFile.h"
+#include "xobjects/XDict.h"
+#include "xobjects/Tuple.h"
 
 int hash(XObject* n) {
     if (has_tag(n, INT_TAG)) {
@@ -16,7 +20,7 @@ int hash(XObject* n) {
         h = hash(t->get_member(1));
         h += hash(t->get_member(2));
     } else {
-        XString* s = PTR_TO_STRING(n);
+        XString* s = CAST(n, XString);
         const std::string& str = s->s;
         for (int i = 0; i < str.size(); i++) {
             h += int(str[i]);
@@ -32,26 +36,3 @@ XObject* f_File_read_line(XObject* o) {
     return new XString(line);
 }
 
-XDict::XDict(std::unordered_map<XObject*, XObject*> v) : XObject("Dict") {
-    for (auto& it: v) {
-        this->l[hash(it.first)] = it.second;
-    }
-    this->is_list = false;
-}
-
-void XDict::mark(std::vector<XObject*>& new_root) {
-    // int list_len = this->l.size();
-    // if (list_len != 0) {
-    //     if (has_tag(this->l[0], INT_TAG)) {
-    //         // don't gc ints as they are not heap-allocated
-    //     } else {
-    //         for (int j = 0; j < list_len; j++) {
-    //             XObject* element = PTR_TO_OBJ(this->l[j]);
-    //             if (!element->is_reachable() && !element->inserted) {
-    //                 new_root.push_back(element);
-    //                 element->inserted = true;
-    //             }
-    //         }
-    //     }
-    // }
-}

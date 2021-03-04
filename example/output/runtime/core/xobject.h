@@ -10,60 +10,20 @@
 #include <unordered_map>
 #include <iostream>
 #include <fstream>
+#include "xobjects/XObject.h"
 
 #define TRUE_TAG 0b0010
 #define FALSE_TAG 0b0100
 #define INT_TAG 0b0110
 #define OBJECT_TAG 0b1100
 #define REACHABLE_FLAG 0b0001
+#define CAST(ptr, cls) ((cls*)UNTAG(ptr))
 
-
-class XObject {
-private:
-    bool reachable;
-public:
-    bool inserted;
-    bool is_list;
-    bool is_user;
-    bool is_string;
-    std::string class_name;
-
-    XObject(std::string class_name) {
-        this->class_name = class_name;
-        this->is_list = false;
-        this->inserted = false;
-        this->reachable = false;
-        this->is_string = false;
-        this->is_user = false;
-    }
-
-    void set_reachable() {
-        // std::cout << "Set object " << this << " (" << this->class_name << ") reachable" << std::endl;
-        this->reachable = true;
-    }
-
-    void reset_reachable() {
-        // std::cout << "Reset object " << this << " (" << this->class_name << ") reachable" << std::endl;
-        this->reachable = false;
-    }
-
-    bool is_reachable() {
-        return this->reachable;
-    }
-
-    virtual ~XObject() {
-        // std::cout << "Deleted object " << this << " (" << this->class_name << ")" << std::endl;
-    }
-
-    virtual void mark(std::vector<XObject*>& new_root) = 0;
-
-};
 
 inline XObject* UNTAG(XObject* l) {
     return (XObject*) ((unsigned long) l & 0xfffffffffffffff0);
 }
 
-#define CAST(ptr, cls) ((cls*)UNTAG(ptr))
 
 inline XObject* PTR_TO_OBJ(XObject* x) {
     return (XObject*) ((unsigned long) x & 0xfffffffffffffff0);
@@ -91,91 +51,10 @@ inline XObject* BOOL_TO_PTR(bool x) { return (XObject*) (unsigned long) (x ? TRU
 inline bool PTR_TO_BOOL(XObject* x) { return (unsigned long) x == TRUE_TAG; }
 
 
-inline long PTR_TO_INT(XObject* x) { return (long) x >> 4; }
-
-class XList : public XObject {
-public:
-    std::vector<XObject*> l;
-
-    XList(const std::vector<XObject*> v) : XObject("List") {
-        this->l = v;
-        this->is_list = true;
-    }
-
-    void mark(std::vector<XObject*>& new_root) override {
-        int list_len = this->l.size();
-        if (list_len != 0) {
-            if (has_tag(this->l[0], INT_TAG)) {
-                // don't gc ints as they are not heap-allocated
-            } else {
-                for (int j = 0; j < list_len; j++) {
-                    XObject* element = PTR_TO_OBJ(this->l[j]);
-                    if (!element->is_reachable() && !element->inserted) {
-                        element->set_reachable();
-                        new_root.push_back(element);
-                        element->inserted = true;
-                    }
-                }
-            }
-        }
-    }
-};
-
-class XUserObject : public XObject {
-public:
-    std::unordered_map<std::string, XObject*> members;
-
-    XUserObject(std::string class_name) : XObject(class_name) {
-        this->is_user = true;
-    }
-
-    virtual ~XUserObject() {}
-};
-
-class XString : public XObject {
-public:
-    std::string s;
-
-    XString(const std::string& x) : XObject("String") {
-        this->s = x;
-        this->is_string = true;
-    }
-
-    ~XString() {
-        // std::cout << "Deleted String '" << this->s << "' (" << this << ")" << std::endl;
-    }
-
-    void mark(std::vector<XObject*>& x) override {}
-};
-
-inline XString* PTR_TO_STRING(XObject* l) {
-    return (XString*) ((unsigned long) l & 0xfffffffffffffff0);
-}
-
-int hash(XObject* n);
+inline long PTR_TO_INT(XObject* x) { return (long) x >> 4; };
 
 
-class XDict : public XObject {
-public:
-    std::unordered_map<int, XObject*> l;
 
-    XDict(std::unordered_map<XObject*, XObject*> v);
-
-    void mark(std::vector<XObject*>& new_root) override;
-};
-
-class XFile : public XObject {
-public:
-    std::ifstream f;
-
-    XFile(const std::string& filename) : XObject("File") {
-        f.open(filename);
-    }
-
-    void mark(std::vector<XObject*>& new_root) override {
-
-    }
-};
 
 XObject* f_File_read_line(XObject* o);
 

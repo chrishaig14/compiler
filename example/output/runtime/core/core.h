@@ -13,9 +13,14 @@
 #include "../IntegerObject.h"
 #include "../ListObject.h"
 #include "../StringObject.h"
+#include "xobjects/XString.h"
+#include "xobjects/XList.h"
+#include "xobjects/XDict.h"
+#include "xobjects/XFile.h"
+#include "xobjects/XObject.h"
+#include "xobjects/Tuple.h"
 #include "functions.h"
 #include "GC.h"
-
 
 XObject* f_print(XObject* _s);
 #define CALL(fn, ...) (*fn)(__VA_ARGS__)
@@ -73,32 +78,7 @@ XObject* subscript(XObject* _l, XObject* i);
 XObject* f_String_add(XObject* _a, XObject* _b);
 
 
-class Tuple : public XObject {
-public:
 
-    std::vector<XObject*> members;
-
-    Tuple(const std::string& n, int num);
-
-    virtual XObject* get_member(int i) = 0;
-
-    virtual void mark(std::vector<XObject*>& new_root) override;
-};
-
-class Tuple2 : public Tuple {
-public:
-
-    Tuple2(XObject* mem_1, XObject* mem_2);
-    XObject* get_member(int i) override;
-};
-
-class Tuple3 : public Tuple {
-public:
-
-    Tuple3(XObject* mem_1, XObject* mem_2, XObject* mem_3);
-
-    XObject* get_member(int i) override;
-};
 
 extern Function1 function_open_p;
 extern Function1 function_print_p;
