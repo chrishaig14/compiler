@@ -19,23 +19,23 @@ void XTuple::mark(std::vector<XObject*>& new_root) {
 }
 
 
-XTuple2::XTuple2(XObject* mem_1, XObject* mem_2) : XTuple("Tuple2", 2) {
+XTuple2::XTuple2(TaggedObject* mem_1, TaggedObject* mem_2) : XTuple("Tuple2", 2) {
     this->members[0] = mem_1;
     this->members[1] = mem_2;
 }
 
-XObject* XTuple2::get_member(int i) {
+TaggedObject* XTuple2::get_member(int i) {
     assert(i >= 1 && i <= 2);
     return this->members[i - 1];
 }
 
-XTuple3::XTuple3(XObject* mem_1, XObject* mem_2, XObject* mem_3) : XTuple("Tuple3", 3) {
+XTuple3::XTuple3(TaggedObject* mem_1, TaggedObject* mem_2, TaggedObject* mem_3) : XTuple("Tuple3", 3) {
     this->members[0] = mem_1;
     this->members[1] = mem_2;
     this->members[2] = mem_3;
 }
 
-XObject* XTuple3::get_member(int i) {
+TaggedObject* XTuple3::get_member(int i) {
     assert(i >= 1 && i <= 3);
     return this->members[i - 1];
 }

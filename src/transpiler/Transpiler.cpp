@@ -337,7 +337,7 @@ std::string Transpiler::visit_declaration(DeclarationNode& node) {
     std::string var_type = this->type_mapper(*node.type);
     // out += var_type + " " + node.identifier + " = " + "(" + this->ptr_to_type_object(node.type->object()) + ")(" +
     //        this->dispatch(node.expression) + ")";
-    out += "XObject* " + node.identifier + " = " + this->dispatch(node.expression) + ";";
+    out += "TaggedObject* " + node.identifier + " = " + this->dispatch(node.expression) + ";";
     out += "DECLARE(" + node.identifier + ")";
     return out;
 }
@@ -398,12 +398,12 @@ std::string Transpiler::visit_function(FunctionNode& node) {
 
     std::string signature;
 
-    signature += "XObject*";
+    signature += "TaggedObject*";
     signature += " ";
     signature += raw_function_name;
     signature += "(";
     for (int i = 0; i < node.parameter_types.size(); i++) {
-        signature += std::string() + "XObject*" + " ptr_" + node.parameter_names[i] + ", ";
+        signature += std::string() + "TaggedObject*" + " ptr_" + node.parameter_names[i] + ", ";
     }
     if (node.parameter_types.size() > 0) {
         signature = signature.substr(0, signature.size() - 2);
@@ -422,7 +422,7 @@ std::string Transpiler::visit_function(FunctionNode& node) {
     bool is_init = false;
     if (node.identifier == this->method_class + "_init") {
         is_init = true;
-        out += "XObject* this_obj = NEW(";
+        out += "TaggedObject* this_obj = NEW(";
         out += get_class_name(this->method_class) + ",";
         for (int i = 0; i < this->num_members_class; i++) {
             out += "nullptr, ";

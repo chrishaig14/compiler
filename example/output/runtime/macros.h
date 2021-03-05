@@ -8,9 +8,14 @@
 #define CALL(fn, ...) (*fn)(__VA_ARGS__)
 #define NEW(cls, ...) GC::register_object((TAG(new cls(__VA_ARGS__))))
 #define CALL0(fn, ...) CALL(CAST(fn, Function0))
-#define CALL1(fn, ...) CALL(CAST(fn, Function1),__VA_ARGS__)
+// #define CALL1(fn, ...) CALL(CAST(fn, Function1),__VA_ARGS__)
 #define CALL2(fn, ...) CALL(CAST(fn, Function2),__VA_ARGS__)
 #define CALL3(fn, ...) CALL(CAST(fn, Function3),__VA_ARGS__)
+
+inline TaggedObject* CALL1(TaggedObject* f, TaggedObject* arg) {
+    return (*CAST(f, Function1))(arg);
+}
+
 #define INT_ADD(a, b) INT_TO_PTR(PTR_TO_INT(a) + PTR_TO_INT(b))
 #define INT_SUB(a, b) INT_TO_PTR(PTR_TO_INT(a) - PTR_TO_INT(b))
 #define INT_MUL(a, b) INT_TO_PTR(PTR_TO_INT(a) * PTR_TO_INT(b))

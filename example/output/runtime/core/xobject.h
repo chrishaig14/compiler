@@ -20,18 +20,18 @@
 #define CAST(ptr, cls) ((cls*)UNTAG(ptr))
 
 
-inline XObject* UNTAG(XObject* l) {
+inline XObject* UNTAG(TaggedObject* l) {
     return (XObject*) ((unsigned long) l & 0xfffffffffffffff0);
 }
 
 
-inline XObject* PTR_TO_OBJ(XObject* x) {
+inline XObject* PTR_TO_OBJ(TaggedObject* x) {
     return (XObject*) ((unsigned long) x & 0xfffffffffffffff0);
 }
 
-inline XObject* TAG(XObject* s) { return (XObject*) ((unsigned long) s | OBJECT_TAG); }
+inline TaggedObject* TAG(XObject* s) { return (TaggedObject*) ((unsigned long) s | OBJECT_TAG); }
 
-inline bool has_tag(XObject* p, unsigned long tag) {
+inline bool has_tag(TaggedObject* p, unsigned long tag) {
     return ((unsigned long) p & 0b1110) == tag;
 }
 
@@ -44,18 +44,15 @@ inline void set_reachable(XObject** p) {
 }
 
 
-inline XObject* INT_TO_PTR(long x) { return (XObject*) ((unsigned long) (x << 4) | INT_TAG); }
+inline TaggedObject* INT_TO_PTR(long x) { return (TaggedObject*) ((unsigned long) (x << 4) | INT_TAG); }
 
-inline XObject* BOOL_TO_PTR(bool x) { return (XObject*) (unsigned long) (x ? TRUE_TAG : FALSE_TAG); }
+inline TaggedObject* BOOL_TO_PTR(bool x) { return (TaggedObject*) (unsigned long) (x ? TRUE_TAG : FALSE_TAG); }
 
-inline bool PTR_TO_BOOL(XObject* x) { return (unsigned long) x == TRUE_TAG; }
-
-
-inline long PTR_TO_INT(XObject* x) { return (long) x >> 4; };
+inline bool PTR_TO_BOOL(TaggedObject* x) { return (unsigned long) x == TRUE_TAG; }
 
 
+inline long PTR_TO_INT(TaggedObject* x) { return (long) x >> 4; };
 
 
-XObject* f_File_read_line(XObject* o);
 
 #endif //UNTITLED1_XOBJECT_H

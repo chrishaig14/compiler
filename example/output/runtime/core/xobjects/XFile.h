@@ -18,8 +18,9 @@ public:
     void mark(std::vector<XObject*>& new_root) override;
 };
 
-extern Function1* function_File_read_line;
+extern TaggedObject* function_File_read_line;
 extern Function1 function_File_read_line_p;
+TaggedObject* f_File_read_line(TaggedObject* o);
 
 
 #endif //XLANG_XFILE_H

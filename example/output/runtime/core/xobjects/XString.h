@@ -20,8 +20,8 @@ public:
     void mark(std::vector<XObject*>& x) override;
 };
 
-extern Function2* function_String_add;
-extern Function1* function_String_len;
+extern TaggedObject* function_String_add;
+extern TaggedObject* function_String_len;
 extern Function2 function_String_add_p;
 XObject* f_String_add(XObject* _a, XObject* _b);
 

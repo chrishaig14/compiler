@@ -5,7 +5,7 @@
 #include "XDict.h"
 
 
-XDict::XDict(std::unordered_map<XObject*, XObject*> v) : XObject("Dict") {
+XDict::XDict(std::unordered_map<TaggedObject*, TaggedObject*> v) : XObject("Dict") {
     for (auto& it: v) {
         this->l[hash(it.first)] = it.second;
     }

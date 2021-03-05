@@ -9,21 +9,21 @@
 #include "xobjects/XDict.h"
 #include "xobjects/XTuple.h"
 
-XObject* f_open(XObject* _s) {
-    return new XFile(((XString*) UNTAG(_s))->s);
+TaggedObject* f_open(TaggedObject* _s) {
+    return NEW(XFile, (((XString*) UNTAG(_s))->s));
 }
 
-XObject* f_print(XObject* _s) {
+TaggedObject* f_print(TaggedObject* _s) {
     XString* s = CAST(_s, XString);
     std::cout << s->s << std::endl;
     return nullptr;
 }
 
-XObject* f_range(XObject* _start, XObject* _step, XObject* _end) {
+TaggedObject* f_range(TaggedObject* _start, TaggedObject* _step, TaggedObject* _end) {
     long start = PTR_TO_INT(_start);
     long step = PTR_TO_INT(_step);
     long end = PTR_TO_INT(_end);
-    std::vector<XObject*> v((end - start) / step, nullptr);
+    std::vector<TaggedObject*> v((end - start) / step, nullptr);
     int k = 0;
     for (int i = start; i < end; i += step) {
         v[k] = INT_TO_PTR(i);
@@ -32,48 +32,46 @@ XObject* f_range(XObject* _start, XObject* _step, XObject* _end) {
     return NEW(XList, v);
 }
 
-XObject* f_Integer_str(XObject* _i) {
-    XObject* x = new XString(std::to_string((PTR_TO_INT(_i))));
-    GC::register_object(TAG(x));
+TaggedObject* f_Integer_str(TaggedObject* _i) {
+    TaggedObject* x = NEW(XString, std::to_string((PTR_TO_INT(_i))));
     return x;
 }
 
-XObject* f_Boolean_str(XObject* _i) {
-    XObject* x = new XString((PTR_TO_BOOL(_i) ? "true" : "false"));
-    GC::register_object(TAG(x));
+TaggedObject* f_Boolean_str(TaggedObject* _i) {
+    TaggedObject* x = NEW(XString, ((PTR_TO_BOOL(_i) ? "true" : "false")));
     return x;
 }
 
-XObject* f_map(XObject* _l, XObject* _f) {
-    std::vector<XObject*>* l = (std::vector<XObject*>*) _l;
+TaggedObject* f_map(TaggedObject* _l, TaggedObject* _f) {
+    std::vector<TaggedObject*>* l = (std::vector<TaggedObject*>*) _l;
     Function1* f = (Function1*) (_f);
-    std::vector<XObject*> r;
+    std::vector<TaggedObject*> r;
     for (int i = 0; i < l->size(); i++) {
         r.push_back((*f)((*l)[i]));
     }
-    return new XList(r);
+    return NEW(XList, r);
 }
 
-XObject* f_join(XObject* _l, XObject* _s) {
-    std::vector<XObject*>* l = (std::vector<XObject*>*) _l;
+TaggedObject* f_join(TaggedObject* _l, TaggedObject* _s) {
+    std::vector<TaggedObject*>* l = (std::vector<TaggedObject*>*) _l;
     std::string s;
     std::string js = *(std::string*) (_s);
     for (int i = 0; i < l->size(); i++) {
         s += *(std::string*) ((*l)[i]) + js;
     }
     s = s.substr(0, s.size() - js.size());
-    return new XString(s);
+    return NEW(XString, s);
 }
 
-XObject* op_lt(XObject* a, XObject* b) {
+TaggedObject* op_lt(TaggedObject* a, TaggedObject* b) {
     return BOOL_TO_PTR(PTR_TO_INT(a) < PTR_TO_INT(b));
 }
 
-XObject* op_gt(XObject* a, XObject* b) {
+TaggedObject* op_gt(TaggedObject* a, TaggedObject* b) {
     return BOOL_TO_PTR(PTR_TO_INT(a) > PTR_TO_INT(b));
 }
 
-XObject* op_eq(XObject* a, XObject* b) {
+TaggedObject* op_eq(TaggedObject* a, TaggedObject* b) {
     if (has_tag(a, INT_TAG)) {
         return BOOL_TO_PTR(PTR_TO_INT(a) == PTR_TO_INT(b));
     }
@@ -108,20 +106,20 @@ XObject* op_eq(XObject* a, XObject* b) {
     return BOOL_TO_PTR(r);
 }
 
-XObject* op_neq(XObject* a, XObject* b) {
+TaggedObject* op_neq(TaggedObject* a, TaggedObject* b) {
     return BOOL_TO_PTR(PTR_TO_INT(a) != PTR_TO_INT(b));
 }
 
-XObject* op_geq(XObject* a, XObject* b) {
+TaggedObject* op_geq(TaggedObject* a, TaggedObject* b) {
     return BOOL_TO_PTR(PTR_TO_INT(a) >= PTR_TO_INT(b));
 }
 
 
-XObject* op_leq(XObject* a, XObject* b) {
+TaggedObject* op_leq(TaggedObject* a, TaggedObject* b) {
     return BOOL_TO_PTR(PTR_TO_INT(a) <= PTR_TO_INT(b));
 }
 
-XObject* dict_subscript(XObject* _l, XObject* i) {
+TaggedObject* dict_subscript(TaggedObject* _l, TaggedObject* i) {
     XDict* dict = (XDict*) UNTAG(_l);
     int h = hash(i);
     if (dict->l.find(h) == dict->l.end()) {
@@ -130,8 +128,7 @@ XObject* dict_subscript(XObject* _l, XObject* i) {
     return dict->l.at(h);
 }
 
-XObject* list_subscript(XObject* _l, XObject* i) {
-    XObject* p = UNTAG(_l);
+TaggedObject* list_subscript(TaggedObject* _l, TaggedObject* i) {
     XList* list = (XList*) UNTAG(_l);
     unsigned long index = PTR_TO_INT(i);
     if (index >= list->l.size()) {
@@ -140,8 +137,7 @@ XObject* list_subscript(XObject* _l, XObject* i) {
     return list->l[index];
 }
 
-XObject* string_subscript(XObject* _l, XObject* i) {
-    XObject* p = UNTAG(_l);
+TaggedObject* string_subscript(TaggedObject* _l, TaggedObject* i) {
     XString* str = (XString*) UNTAG(_l);
     unsigned long index = PTR_TO_INT(i);
     std::cout << "String is: " << str->s << std::endl;
@@ -161,16 +157,16 @@ Function1 function_Integer_str_p = Function1(f_Integer_str);
 Function1 function_Boolean_str_p = Function1(f_Boolean_str);
 Function2 function_list_subscript_p = Function2(list_subscript);
 Function2 function_string_subscript_p = Function2(string_subscript);
-Function1* function_open = &function_open_p;
-Function1* function_print = &function_print_p;
-Function3* function_range = &function_range_p;
-Function2* function_map = &function_map_p;
-Function2* function_join = &function_join_p;
-Function1* function_File_read_line = &function_File_read_line_p;
-Function1* function_Integer_str = &function_Integer_str_p;
-Function1* function_Boolean_str = &function_Boolean_str_p;
-Function2* function_list_subscript = &function_list_subscript_p;
-Function2* function_string_subscript = &function_string_subscript_p;
-Function2* function_dict_subscript = nullptr;
+TaggedObject* function_open = TAG(&function_open_p);
+TaggedObject* function_print = TAG(&function_print_p);
+TaggedObject* function_range = TAG(&function_range_p);
+TaggedObject* function_map = TAG(&function_map_p);
+TaggedObject* function_join = TAG(&function_join_p);
+TaggedObject* function_File_read_line = TAG(&function_File_read_line_p);
+TaggedObject* function_Integer_str = TAG(&function_Integer_str_p);
+TaggedObject* function_Boolean_str = TAG(&function_Boolean_str_p);
+TaggedObject* function_list_subscript = TAG(&function_list_subscript_p);
+TaggedObject* function_string_subscript = TAG(&function_string_subscript_p);
+TaggedObject* function_dict_subscript = TAG(nullptr);
 
 

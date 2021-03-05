@@ -9,7 +9,7 @@
 #include "xobjects/XDict.h"
 #include "xobjects/XTuple.h"
 
-int hash(XObject* n) {
+int hash(TaggedObject* n) {
     if (has_tag(n, INT_TAG)) {
         return PTR_TO_INT(n);
     }
@@ -29,10 +29,10 @@ int hash(XObject* n) {
     return h;
 }
 
-XObject* f_File_read_line(XObject* o) {
+TaggedObject* f_File_read_line(TaggedObject* o) {
     XFile* f = (XFile*) UNTAG(o);
     std::string line;
     std::getline(f->f, line);
-    return new XString(line);
+    return NEW(XString, line);
 }
 

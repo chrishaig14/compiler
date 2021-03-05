@@ -17,31 +17,31 @@
 #include "functions.h"
 #include "GC.h"
 
-XObject* f_print(XObject* _s);
+TaggedObject* f_print(TaggedObject* _s);
 
-XObject* f_range(XObject* _start, XObject* _step, XObject* _end);
+TaggedObject* f_range(TaggedObject* _start, TaggedObject* _step, TaggedObject* _end);
 
-XObject* f_Integer_str(XObject* _i);
+TaggedObject* f_Integer_str(TaggedObject* _i);
 
-XObject* f_Boolean_str(XObject* _i);
+TaggedObject* f_Boolean_str(TaggedObject* _i);
 
-XObject* f_map(XObject* _l, XObject* _f);
+TaggedObject* f_map(TaggedObject* _l, TaggedObject* _f);
 
-XObject* f_join(XObject* _l, XObject* _s);
+TaggedObject* f_join(TaggedObject* _l, TaggedObject* _s);
 
-XObject* op_lt(XObject* a, XObject* b);
+TaggedObject* op_lt(TaggedObject* a, TaggedObject* b);
 
-XObject* op_gt(XObject* a, XObject* b);
+TaggedObject* op_gt(TaggedObject* a, TaggedObject* b);
 
-XObject* op_eq(XObject* a, XObject* b);
+TaggedObject* op_eq(TaggedObject* a, TaggedObject* b);
 
-XObject* op_neq(XObject* a, XObject* b);
+TaggedObject* op_neq(TaggedObject* a, TaggedObject* b);
 
-XObject* op_geq(XObject* a, XObject* b);
+TaggedObject* op_geq(TaggedObject* a, TaggedObject* b);
 
-XObject* op_leq(XObject* a, XObject* b);
+TaggedObject* op_leq(TaggedObject* a, TaggedObject* b);
 
-XObject* subscript(XObject* _l, XObject* i);
+TaggedObject* subscript(TaggedObject* _l, TaggedObject* i);
 
 extern Function1 function_open_p;
 extern Function1 function_print_p;
@@ -51,15 +51,15 @@ extern Function2 function_join_p;
 extern Function1 function_Integer_str_p;
 extern Function1 function_Boolean_str_p;
 extern Function2 function_list_subscript_p;
-extern Function1* function_open;
-extern Function1* function_print;
-extern Function3* function_range;
-extern Function2* function_map;
-extern Function2* function_join;
-extern Function1* function_Integer_str;
-extern Function1* function_Boolean_str;
-extern Function2* function_list_subscript;
-extern Function2* function_dict_subscript;
-extern Function2* function_string_subscript;
+extern TaggedObject* function_open;
+extern TaggedObject* function_print;
+extern TaggedObject* function_range;
+extern TaggedObject* function_map;
+extern TaggedObject* function_join;
+extern TaggedObject* function_Integer_str;
+extern TaggedObject* function_Boolean_str;
+extern TaggedObject* function_list_subscript;
+extern TaggedObject* function_dict_subscript;
+extern TaggedObject* function_string_subscript;
 
 #endif //UNTITLED1_CORE_H

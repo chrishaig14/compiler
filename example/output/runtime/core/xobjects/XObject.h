@@ -8,6 +8,8 @@
 #include <string>
 #include <vector>
 
+class TaggedObject;
+
 class XObject {
 private:
     bool reachable;

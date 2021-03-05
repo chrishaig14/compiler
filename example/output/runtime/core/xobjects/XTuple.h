@@ -12,11 +12,11 @@
 class XTuple : public XObject {
 public:
 
-    std::vector<XObject*> members;
+    std::vector<TaggedObject*> members;
 
     XTuple(const std::string& n, int num);
 
-    virtual XObject* get_member(int i) = 0;
+    virtual TaggedObject* get_member(int i) = 0;
 
     virtual void mark(std::vector<XObject*>& new_root) override;
 };
@@ -24,16 +24,16 @@ public:
 class XTuple2 : public XTuple {
 public:
 
-    XTuple2(XObject* mem_1, XObject* mem_2);
-    XObject* get_member(int i) override;
+    XTuple2(TaggedObject* mem_1, TaggedObject* mem_2);
+    TaggedObject* get_member(int i) override;
 };
 
 class XTuple3 : public XTuple {
 public:
 
-    XTuple3(XObject* mem_1, XObject* mem_2, XObject* mem_3);
+    XTuple3(TaggedObject* mem_1, TaggedObject* mem_2, TaggedObject* mem_3);
 
-    XObject* get_member(int i) override;
+    TaggedObject* get_member(int i) override;
 };
 
 

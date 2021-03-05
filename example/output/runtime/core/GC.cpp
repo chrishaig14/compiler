@@ -15,7 +15,7 @@ void GC::enter_function(std::string function_name) {
     GC::enter_local_scope();
 }
 
-XObject* GC::function_return(XObject* f) {
+TaggedObject* GC::function_return(TaggedObject* f) {
     if (f != nullptr) {
         // mark return value as reachable/root
         if (has_tag(f, OBJECT_TAG)) {
@@ -34,7 +34,7 @@ XObject* GC::function_return(XObject* f) {
     return f;
 }
 
-XObject* GC::temp(XObject* obj) {
+TaggedObject* GC::temp(TaggedObject* obj) {
     if (has_tag(obj, OBJECT_TAG)) {
         // std::cout<< "DECLARE OBJECT WITH TAG!" << std::endl;
         frame->scope->declare("temp" + std::to_string(frame->scope->temp), UNTAG(obj));
@@ -43,14 +43,14 @@ XObject* GC::temp(XObject* obj) {
     return obj;
 }
 
-void GC::declare(const std::string& n, XObject* obj) {
+void GC::declare(const std::string& n, TaggedObject* obj) {
     if (has_tag(obj, OBJECT_TAG)) {
         // std::cout<< "DECLARE OBJECT WITH TAG!" << std::endl;
         frame->scope->declare(n, UNTAG(obj));
     }
 }
 
-void GC::set(const std::string& n, XObject* obj) {
+void GC::set(const std::string& n, TaggedObject* obj) {
     if (has_tag(obj, OBJECT_TAG)) {
         // std::cout<< "SET OBJECT WITH TAG!" << std::endl;
 
@@ -96,7 +96,7 @@ void GC::leave_local_scope() {
     delete old;
 }
 
-XObject* GC::register_object(XObject* u) {
+TaggedObject* GC::register_object(TaggedObject* u) {
     XObject* o = UNTAG(u);
     // std::cout << "Registered object " << o << " (" << o->class_name << ")" << std::endl;
     // frame->scope->objects.push_back(o);

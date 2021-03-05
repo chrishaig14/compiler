@@ -127,16 +127,16 @@ public:
 
     static void enter_function(std::string function_name);
 
-    static XObject* function_return(XObject* f);
+    static TaggedObject* function_return(TaggedObject* f);
 
-    static void declare(const std::string& n, XObject* obj);
+    static void declare(const std::string& n, TaggedObject* obj);
 
-    static void set(const std::string& n, XObject* obj);
+    static void set(const std::string& n, TaggedObject* obj);
 
     static void leave_local_scope();
 
 
-    static XObject* register_object(XObject* u);
+    static TaggedObject* register_object(TaggedObject* u);
 
     static void mark(const std::vector<XObject*>& root);
 
@@ -144,7 +144,7 @@ public:
 
     static void leave_scope(Scope* parent);
 
-    static XObject* temp(XObject* obj);
+    static TaggedObject* temp(TaggedObject* obj);
 };
 
 

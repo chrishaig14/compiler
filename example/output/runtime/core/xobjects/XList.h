@@ -6,24 +6,23 @@
 #define XLANG_XLIST_H
 
 #include "XObject.h"
-#include "../xobject.h"
 #include "../functions.h"
 #include "../../macros.h"
 #include "../GC.h"
 
 class XList : public XObject {
 public:
-    std::vector<XObject*> l;
+    std::vector<TaggedObject*> l;
 
-    XList(const std::vector<XObject*> v);
+    XList(const std::vector<TaggedObject*> v);
 
     void mark(std::vector<XObject*>& new_root) override;
 };
 
-XObject* f_List_add(XObject* _a, XObject* _b);
-XObject* f_List_len(XObject* _l);
-extern Function2* function_List_add;
-extern Function1* function_List_len;
+TaggedObject* f_List_add(TaggedObject* _a, TaggedObject* _b);
+TaggedObject* f_List_len(TaggedObject* _l);
+extern TaggedObject* function_List_add;
+extern TaggedObject* function_List_len;
 extern Function2 function_List_add_p;
 extern Function1 function_List_len_p;
 

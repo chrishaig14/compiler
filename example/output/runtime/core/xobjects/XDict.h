@@ -9,13 +9,13 @@
 #include <unordered_map>
 #include "XObject.h"
 
-int hash(XObject* n);
+int hash(TaggedObject* n);
 
 class XDict : public XObject {
 public:
-    std::unordered_map<int, XObject*> l;
+    std::unordered_map<int, TaggedObject*> l;
 
-    XDict(std::unordered_map<XObject*, XObject*> v);
+    XDict(std::unordered_map<TaggedObject*, TaggedObject*> v);
 
     void mark(std::vector<XObject*>& new_root) override;
 };
