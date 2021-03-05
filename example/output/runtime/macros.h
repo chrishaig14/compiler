@@ -5,21 +5,39 @@
 #ifndef XLANG_MACROS_H
 #define XLANG_MACROS_H
 
-#define CALL(fn, ...) (*fn)(__VA_ARGS__)
 #define NEW(cls, ...) GC::register_object((TAG(new cls(__VA_ARGS__))))
-#define CALL0(fn, ...) CALL(CAST(fn, Function0))
-// #define CALL1(fn, ...) CALL(CAST(fn, Function1),__VA_ARGS__)
-#define CALL2(fn, ...) CALL(CAST(fn, Function2),__VA_ARGS__)
-#define CALL3(fn, ...) CALL(CAST(fn, Function3),__VA_ARGS__)
+
+inline TaggedObject* CALL0(TaggedObject* f) {
+    return (*CAST(f, Function0))();
+}
 
 inline TaggedObject* CALL1(TaggedObject* f, TaggedObject* arg) {
     return (*CAST(f, Function1))(arg);
 }
 
-#define INT_ADD(a, b) INT_TO_PTR(PTR_TO_INT(a) + PTR_TO_INT(b))
-#define INT_SUB(a, b) INT_TO_PTR(PTR_TO_INT(a) - PTR_TO_INT(b))
-#define INT_MUL(a, b) INT_TO_PTR(PTR_TO_INT(a) * PTR_TO_INT(b))
-#define INT_DIV(a, b) INT_TO_PTR(PTR_TO_INT(a) / PTR_TO_INT(b))
+inline TaggedObject* CALL2(TaggedObject* f, TaggedObject* arg_0, TaggedObject* arg_1) {
+    return (*CAST(f, Function2))(arg_0, arg_1);
+}
+
+inline TaggedObject* CALL3(TaggedObject* f, TaggedObject* arg_0, TaggedObject* arg_1, TaggedObject* arg_2) {
+    return (*CAST(f, Function3))(arg_0, arg_1, arg_2);
+}
+
+inline TaggedObject* INT_ADD(TaggedObject* a, TaggedObject* b) {
+    return INT_TO_PTR(PTR_TO_INT(a) + PTR_TO_INT(b));
+}
+
+inline TaggedObject* INT_SUB(TaggedObject* a, TaggedObject* b) {
+    return INT_TO_PTR(PTR_TO_INT(a) - PTR_TO_INT(b));
+}
+
+inline TaggedObject* INT_MUL(TaggedObject* a, TaggedObject* b) {
+    return INT_TO_PTR(PTR_TO_INT(a) * PTR_TO_INT(b));
+}
+
+inline TaggedObject* INT_DIV(TaggedObject* a, TaggedObject* b) {
+    return INT_TO_PTR(PTR_TO_INT(a) / PTR_TO_INT(b));
+}
 
 #define LIST_SUBSCRIPT(list, index) CALL2(function_list_subscript, list, index)
 #define LIST(...) NEW(XList, {__VA_ARGS__})
