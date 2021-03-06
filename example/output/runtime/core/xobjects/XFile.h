@@ -8,6 +8,8 @@
 #include <fstream>
 #include "XObject.h"
 #include "../functions.h"
+#include "../xobjects/XString.h"
+#include "../../macros.h"
 
 class XFile : public XObject {
 public:
