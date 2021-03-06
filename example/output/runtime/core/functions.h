@@ -80,19 +80,19 @@ class Partial0 : public Function0 {
         Function3* f3;
     } f;
 public:
-    Partial0(Function1* f, TaggedObject* p0) : Function0() {
+    Partial0(TaggedObject* f, TaggedObject* p0) : Function0() {
         this->p = {p0};
-        this->f.f1 = f;
+        this->f.f1 = CAST(f, Function1);
     }
 
-    Partial0(Function2* f, TaggedObject* p0, TaggedObject* p1) : Function0() {
+    Partial0(TaggedObject* f, TaggedObject* p0, TaggedObject* p1) : Function0() {
         this->p = {p0, p1};
-        this->f.f2 = f;
+        this->f.f2 = CAST(f, Function2);;
     }
 
-    Partial0(Function3* f, TaggedObject* p0, TaggedObject* p1, TaggedObject* p2) : Function0() {
+    Partial0(TaggedObject* f, TaggedObject* p0, TaggedObject* p1, TaggedObject* p2) : Function0() {
         this->p = {p0, p1, p2};
-        this->f.f3 = f;
+        this->f.f3 = CAST(f, Function3);;
     }
 
     TaggedObject* operator()() override {
