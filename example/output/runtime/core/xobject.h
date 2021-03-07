@@ -19,6 +19,9 @@
 #define REACHABLE_FLAG 0b0001
 #define CAST(ptr, cls) ((cls*)UNTAG(ptr))
 
+extern TaggedObject* TRUE;
+extern TaggedObject* FALSE;
+
 
 inline XObject* UNTAG(TaggedObject* l) {
     return (XObject*) ((unsigned long) l & 0xfffffffffffffff0);
@@ -52,7 +55,6 @@ inline bool GET_BOOL(TaggedObject* x) { return (unsigned long) x == TRUE_TAG; }
 
 
 inline long GET_INT(TaggedObject* x) { return (long) x >> 4; };
-
 
 
 #endif //UNTITLED1_XOBJECT_H

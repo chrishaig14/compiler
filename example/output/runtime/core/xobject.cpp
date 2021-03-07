@@ -28,3 +28,6 @@ int hash(TaggedObject* n) {
     }
     return h;
 }
+
+TaggedObject* TRUE = (TaggedObject*) (unsigned long) TRUE_TAG;
+TaggedObject* FALSE = (TaggedObject*) (unsigned long) FALSE_TAG;

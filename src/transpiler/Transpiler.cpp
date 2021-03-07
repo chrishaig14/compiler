@@ -78,7 +78,7 @@ std::string Transpiler::visit_block(BlockNode& node) {
 }
 
 std::string Transpiler::visit_boolean(BooleanNode& node) {
-    return node.value ? "MAKE_BOOL(true)" : "MAKE_BOOL(false)";
+    return node.value ? "TRUE" : "FALSE";
 }
 
 std::string Transpiler::visit_bool_op(BoolOpNode& node) {
@@ -218,9 +218,9 @@ std::string Transpiler::visit_class(ClassNode& node) {
     eq += class_name + "* other = CAST(o," + class_name + ");";
     for (int i = 0; i < node.members_ordered.size(); i++) {
         eq += "if(EQ( this->" + node.members_ordered[i] + ", other->" + node.members_ordered[i] +
-              ")==MAKE_BOOL(false)) {return MAKE_BOOL(false);}\n";
+              ")==FALSE) {return FALSE;}\n";
     }
-    eq += "return MAKE_BOOL(true);";
+    eq += "return TRUE;";
     eq += "}\n";
     out += eq;
     out += "};";
