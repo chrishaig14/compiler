@@ -17,8 +17,8 @@ int hash(TaggedObject* n) {
     int h = 0;
 
     if (t != nullptr) {
-        h = hash(t->get_member(1));
-        h += hash(t->get_member(2));
+        h = hash(t->mem_1);
+        h += hash(t->mem_2);
     } else {
         XString* s = CAST(n, XString);
         const std::string& str = s->s;

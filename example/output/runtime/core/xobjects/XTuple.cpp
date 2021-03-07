@@ -3,6 +3,7 @@
 //
 
 #include "XTuple.h"
+#include "../basics.h"
 
 XTuple::XTuple(const std::string& n, int num) : XObject(n), members(num, nullptr) {}
 
@@ -20,22 +21,45 @@ void XTuple::mark(std::vector<XObject*>& new_root) {
 
 
 XTuple2::XTuple2(TaggedObject* mem_1, TaggedObject* mem_2) : XTuple("Tuple2", 2) {
-    this->members[0] = mem_1;
-    this->members[1] = mem_2;
+    this->mem_1 = mem_1;
+    this->mem_2 = mem_2;
 }
 
-TaggedObject* XTuple2::get_member(int i) {
-    assert(i >= 1 && i <= 2);
-    return this->members[i - 1];
+TaggedObject* XTuple2::__eq__(TaggedObject* pObject) {
+    XTuple3* other = CAST(pObject, XTuple3);
+    if (EQ(this->mem_1, other->mem_1) == MAKE_BOOL(false)) {
+        return MAKE_BOOL(false);
+    }
+    if (EQ(this->mem_2, other->mem_2) == MAKE_BOOL(false)) {
+        return MAKE_BOOL(false);
+    }
+    return MAKE_BOOL(true);
+}
+
+void XTuple2::mark(std::vector<XObject*>& new_root) {
+    XTuple::mark(new_root);
 }
 
 XTuple3::XTuple3(TaggedObject* mem_1, TaggedObject* mem_2, TaggedObject* mem_3) : XTuple("Tuple3", 3) {
-    this->members[0] = mem_1;
-    this->members[1] = mem_2;
-    this->members[2] = mem_3;
+    this->mem_1 = mem_1;
+    this->mem_2 = mem_2;
+    this->mem_3 = mem_3;
 }
 
-TaggedObject* XTuple3::get_member(int i) {
-    assert(i >= 1 && i <= 3);
-    return this->members[i - 1];
+TaggedObject* XTuple3::__eq__(TaggedObject* pObject) {
+    XTuple3* other = CAST(pObject, XTuple3);
+    if (EQ(this->mem_1, other->mem_1) == MAKE_BOOL(false)) {
+        return MAKE_BOOL(false);
+    }
+    if (EQ(this->mem_2, other->mem_2) == MAKE_BOOL(false)) {
+        return MAKE_BOOL(false);
+    }
+    if (EQ(this->mem_3, other->mem_3) == MAKE_BOOL(false)) {
+        return MAKE_BOOL(false);
+    }
+    return MAKE_BOOL(true);
+}
+
+void XTuple3::mark(std::vector<XObject*>& new_root) {
+    XTuple::mark(new_root);
 }

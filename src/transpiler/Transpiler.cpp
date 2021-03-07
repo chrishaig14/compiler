@@ -282,11 +282,7 @@ std::string Transpiler::object_type_mapper(const ObjectType& t) {
         return "TaggedObject*";
     }
     if (t.id == "Tuple") {
-        for (int i = 0; i < this->tuple_types.size(); i++) {
-            if (t == *this->tuple_types[i]) {
-                return "XTuple" + std::to_string(i) + "*";
-            }
-        }
+        return "XTuple" + std::to_string(t.type_params.size());
     }
     if (t.id == "Option") {
         return this->type_mapper(*t.type_params[0]);
@@ -544,8 +540,9 @@ std::string Transpiler::visit_dict(DictNode& node) {
 
 std::string Transpiler::visit_member(MemberNode& node) {
     if (node.type == MemberType::NUM) {
-        return "((XTuple*)(UNTAG(" + this->dispatch(node.parent) + ")))->get_member(" + std::to_string(node.n_child) +
-               ")";
+        std::string s = "CAST(" + this->dispatch(node.parent) + "," + this->type_mapper(*node.parent_t) + ")->mem_" +
+                        std::to_string(node.n_child) + "";
+        return s;
     }
     auto s = "CAST(" + this->dispatch(node.parent) + "," + get_class_name(node.parent_t->object().id) + ")->" +
              node.s_child;
