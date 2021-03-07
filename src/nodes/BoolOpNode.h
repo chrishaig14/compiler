@@ -7,6 +7,7 @@
 
 #include "Node.h"
 #include "optypes.h"
+#include "TypeNode.h"
 
 class BoolOpNode : public Node {
 public:
@@ -27,6 +28,8 @@ public:
 
     json to_json() const override;
 
+    TypeNode* ltype;
+    TypeNode* rtype;
 };
 
 #endif //UNTITLED1_BOOLOPNODE_H

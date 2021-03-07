@@ -20,25 +20,25 @@ TaggedObject* f_print(TaggedObject* _s) {
 }
 
 TaggedObject* f_range(TaggedObject* _start, TaggedObject* _step, TaggedObject* _end) {
-    long start = PTR_TO_INT(_start);
-    long step = PTR_TO_INT(_step);
-    long end = PTR_TO_INT(_end);
+    long start = GET_INT(_start);
+    long step = GET_INT(_step);
+    long end = GET_INT(_end);
     std::vector<TaggedObject*> v((end - start) / step, nullptr);
     int k = 0;
     for (int i = start; i < end; i += step) {
-        v[k] = INT_TO_PTR(i);
+        v[k] = MAKE_INT(i);
         k++;
     }
     return NEW(XList, v);
 }
 
 TaggedObject* f_Integer_str(TaggedObject* _i) {
-    TaggedObject* x = NEW(XString, std::to_string((PTR_TO_INT(_i))));
+    TaggedObject* x = NEW(XString, std::to_string((GET_INT(_i))));
     return x;
 }
 
 TaggedObject* f_Boolean_str(TaggedObject* _i) {
-    TaggedObject* x = NEW(XString, ((PTR_TO_BOOL(_i) ? "true" : "false")));
+    TaggedObject* x = NEW(XString, ((GET_BOOL(_i) ? "true" : "false")));
     return x;
 }
 
@@ -64,16 +64,16 @@ TaggedObject* f_join(TaggedObject* _l, TaggedObject* _s) {
 }
 
 TaggedObject* op_lt(TaggedObject* a, TaggedObject* b) {
-    return BOOL_TO_PTR(PTR_TO_INT(a) < PTR_TO_INT(b));
+    return MAKE_BOOL(GET_INT(a) < GET_INT(b));
 }
 
 TaggedObject* op_gt(TaggedObject* a, TaggedObject* b) {
-    return BOOL_TO_PTR(PTR_TO_INT(a) > PTR_TO_INT(b));
+    return MAKE_BOOL(GET_INT(a) > GET_INT(b));
 }
 
 TaggedObject* op_eq(TaggedObject* a, TaggedObject* b) {
     if (has_tag(a, INT_TAG)) {
-        return BOOL_TO_PTR(PTR_TO_INT(a) == PTR_TO_INT(b));
+        return MAKE_BOOL(GET_INT(a) == GET_INT(b));
     }
     XObject* oa = UNTAG(a);
     XObject* ob = UNTAG(b);
@@ -87,7 +87,7 @@ TaggedObject* op_eq(TaggedObject* a, TaggedObject* b) {
             r = false;
         } else {
             for (int i = 0; i < la->l.size(); i++) {
-                if (!PTR_TO_BOOL(op_eq(la->l[i], lb->l[i]))) {
+                if (!GET_BOOL(op_eq(la->l[i], lb->l[i]))) {
                     r = false;
                     break;
                 }
@@ -97,26 +97,26 @@ TaggedObject* op_eq(TaggedObject* a, TaggedObject* b) {
         XTuple* ta = (XTuple*) oa;
         XTuple* tb = (XTuple*) ob;
         for (int i = 0; i < ta->members.size(); i++) {
-            if (!PTR_TO_BOOL(op_eq(ta->members[i], tb->members[i]))) {
+            if (!GET_BOOL(op_eq(ta->members[i], tb->members[i]))) {
                 r = false;
                 break;
             }
         }
     }
-    return BOOL_TO_PTR(r);
+    return MAKE_BOOL(r);
 }
 
 TaggedObject* op_neq(TaggedObject* a, TaggedObject* b) {
-    return BOOL_TO_PTR(PTR_TO_INT(a) != PTR_TO_INT(b));
+    return MAKE_BOOL(GET_INT(a) != GET_INT(b));
 }
 
 TaggedObject* op_geq(TaggedObject* a, TaggedObject* b) {
-    return BOOL_TO_PTR(PTR_TO_INT(a) >= PTR_TO_INT(b));
+    return MAKE_BOOL(GET_INT(a) >= GET_INT(b));
 }
 
 
 TaggedObject* op_leq(TaggedObject* a, TaggedObject* b) {
-    return BOOL_TO_PTR(PTR_TO_INT(a) <= PTR_TO_INT(b));
+    return MAKE_BOOL(GET_INT(a) <= GET_INT(b));
 }
 
 TaggedObject* dict_subscript(TaggedObject* _l, TaggedObject* i) {
@@ -130,7 +130,7 @@ TaggedObject* dict_subscript(TaggedObject* _l, TaggedObject* i) {
 
 TaggedObject* list_subscript(TaggedObject* _l, TaggedObject* i) {
     XList* list = (XList*) UNTAG(_l);
-    unsigned long index = PTR_TO_INT(i);
+    unsigned long index = GET_INT(i);
     if (index >= list->l.size()) {
         throw std::runtime_error("List index out of range");
     }
@@ -139,7 +139,7 @@ TaggedObject* list_subscript(TaggedObject* _l, TaggedObject* i) {
 
 TaggedObject* string_subscript(TaggedObject* _l, TaggedObject* i) {
     XString* str = (XString*) UNTAG(_l);
-    unsigned long index = PTR_TO_INT(i);
+    unsigned long index = GET_INT(i);
     std::cout << "String is: " << str->s << std::endl;
     if (index >= str->s.size()) {
         throw std::runtime_error("String index out of range: " + std::to_string(index) + " but length is " +

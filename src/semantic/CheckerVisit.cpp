@@ -568,7 +568,7 @@ USemanticInfo Checker::visit(FunctionNode& n) {
         for (auto x: this->inits) {
             if (x.second == false) {
                 er = true;
-                this->error_class_init_member_not_init(this->current_class,x.first,n.start);
+                this->error_class_init_member_not_init(this->current_class, x.first, n.start);
                 // std::cout << "MEMBER " + x.first + " not initialized in init method!" << std::endl;
             }
         }
@@ -960,6 +960,8 @@ USemanticInfo Checker::visit(BoolOpNode& n) {
     }
 
     info.set_type(T_BOOL);
+    n.ltype = l_type.clone();
+    n.rtype = r_type.clone();
 
     return std::make_unique<SemanticInfo>(info);
 }

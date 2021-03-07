@@ -11,7 +11,7 @@
 
 int hash(TaggedObject* n) {
     if (has_tag(n, INT_TAG)) {
-        return PTR_TO_INT(n);
+        return GET_INT(n);
     }
     XTuple2* t = dynamic_cast<XTuple2*>(UNTAG(n));
     int h = 0;

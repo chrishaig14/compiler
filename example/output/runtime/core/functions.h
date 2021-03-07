@@ -54,6 +54,8 @@ public:
     void mark(std::vector<XObject*>& new_root) override {
 
     }
+
+
 };
 
 class Function3 : public XObject {

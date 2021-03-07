@@ -32,6 +32,7 @@ public:
 
     virtual void mark(std::vector<XObject*>& new_root) = 0;
 
+    virtual TaggedObject* __eq__(TaggedObject* pObject);
 };
 
 #endif //XLANG_XOBJECT_H

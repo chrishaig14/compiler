@@ -44,14 +44,14 @@ inline void set_reachable(XObject** p) {
 }
 
 
-inline TaggedObject* INT_TO_PTR(long x) { return (TaggedObject*) ((unsigned long) (x << 4) | INT_TAG); }
+inline TaggedObject* MAKE_INT(long x) { return (TaggedObject*) ((unsigned long) (x << 4) | INT_TAG); }
 
-inline TaggedObject* BOOL_TO_PTR(bool x) { return (TaggedObject*) (unsigned long) (x ? TRUE_TAG : FALSE_TAG); }
+inline TaggedObject* MAKE_BOOL(bool x) { return (TaggedObject*) (unsigned long) (x ? TRUE_TAG : FALSE_TAG); }
 
-inline bool PTR_TO_BOOL(TaggedObject* x) { return (unsigned long) x == TRUE_TAG; }
+inline bool GET_BOOL(TaggedObject* x) { return (unsigned long) x == TRUE_TAG; }
 
 
-inline long PTR_TO_INT(TaggedObject* x) { return (long) x >> 4; };
+inline long GET_INT(TaggedObject* x) { return (long) x >> 4; };
 
 
 

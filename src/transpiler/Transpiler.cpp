@@ -78,7 +78,7 @@ std::string Transpiler::visit_block(BlockNode& node) {
 }
 
 std::string Transpiler::visit_boolean(BooleanNode& node) {
-    return node.value ? "BOOL_TO_PTR(true)" : "BOOL_TO_PTR(false)";
+    return node.value ? "MAKE_BOOL(true)" : "MAKE_BOOL(false)";
 }
 
 std::string Transpiler::visit_bool_op(BoolOpNode& node) {
@@ -86,7 +86,7 @@ std::string Transpiler::visit_bool_op(BoolOpNode& node) {
     std::string op;
     switch (node.op) {
         case BoolOp::EQ:
-            op += "==";
+            op += "__eq__";
             break;
         case BoolOp::AND:
             op += "&&";
@@ -107,15 +107,26 @@ std::string Transpiler::visit_bool_op(BoolOpNode& node) {
             op += ">";
             break;
         case BoolOp::NEQ:
-            op += "!=";
+            op += "__neq__";
             break;
     }
-    if (node.op == BoolOp::AND || node.op == BoolOp::OR) {
-        return "BOOL_TO_PTR(PTR_TO_BOOL(" + this->dispatch(node.left) + ")" + op + "PTR_TO_BOOL(" +
-               this->dispatch(node.right) + "))";
+    if (op == "__eq__" || op == "__neq__") {
+        return "EQ(" + this->dispatch(node.left) + "," + this->dispatch(node.right) + ")";
+
+        if (*node.ltype == T_BOOL) {
+        }
+        if (*node.ltype == T_INT) {
+            return "MAKE_BOOL(GET_INT(" + this->dispatch(node.left) + ")" + (op == "__eq__" ? "==" : "!=") +
+                   "GET_INT(" + this->dispatch(node.right) + "))";
+        }
+        return "CAST(" + this->dispatch(node.left) + "," + this->type_mapper(*node.ltype) + ")->" + op + "(" +
+               this->dispatch(node.right) + ")";
     }
-    return "BOOL_TO_PTR(PTR_TO_INT(" + this->dispatch(node.left) + ")" + op + "PTR_TO_INT(" +
-           this->dispatch(node.right) + "))";
+    if (node.op == BoolOp::AND || node.op == BoolOp::OR) {
+        return "MAKE_BOOL(GET_BOOL(" + this->dispatch(node.left) + ")" + op + "GET_BOOL(" + this->dispatch(node.right) +
+               "))";
+    }
+    return "MAKE_BOOL(GET_INT(" + this->dispatch(node.left) + ")" + op + "GET_INT(" + this->dispatch(node.right) + "))";
 }
 
 std::string Transpiler::visit_break(BreakNode& node) { return ""; }
@@ -123,7 +134,7 @@ std::string Transpiler::visit_break(BreakNode& node) { return ""; }
 std::string Transpiler::visit_call(CallNode& node) {
     std::string out;
     out += "CALL" + std::to_string(node.arguments.size()) + "(";
-    out += this->visit_id(node.function->id()) + ",";
+    out += this->visit_id(node.function->id()) + ", ";
     for (int i = 0; i < node.arguments.size(); i++) {
         std::string w = this->dispatch(node.arguments[i]);
         if (node.arguments[i]->ntype != ID) {
@@ -131,9 +142,7 @@ std::string Transpiler::visit_call(CallNode& node) {
         }
         out += w + ", ";
     }
-    if (node.arguments.size() != 0) {
-        out = out.substr(0, out.size() - 2);
-    }
+    out = out.substr(0, out.size() - 2);
     out += ")";
     return out;
 }
@@ -163,20 +172,20 @@ std::string Transpiler::visit_class(ClassNode& node) {
     this->method_class = node.class_name;
     this->num_members_class = node.members.size();
     std::string class_name = get_class_name(node.class_name);
-    out = "class " + class_name + " : public XUserObject {\n";
+    out = "class " + class_name + " : public XObject {\n";
     std::sort(node.members_ordered.begin(), node.members_ordered.end());
     out += "public:\n";
     for (int i = 0; i < node.members_ordered.size(); i++) {
-        out += "XObject* " + node.members_ordered[i] + ";\n";
+        out += "TaggedObject* " + node.members_ordered[i] + ";\n";
     }
     out += "\n";
     out += class_name + "(";
     for (int i = 0; i < node.members_ordered.size(); i++) {
-        out += "XObject* " + node.members_ordered[i] + ", ";
+        out += "TaggedObject* " + node.members_ordered[i] + ", ";
     }
     out = out.substr(0, out.size() - 2);
     out += "):";
-    out += "XUserObject(\"" + class_name + "\")";
+    out += "XObject(\"" + class_name + "\")";
     out += "{\n";
     for (int i = 0; i < node.members_ordered.size(); i++) {
         out += "this->" + node.members_ordered[i] + " = " + node.members_ordered[i] + ";\n";
@@ -204,6 +213,16 @@ std::string Transpiler::visit_class(ClassNode& node) {
     }
     mark += "}";
     out += mark;
+    std::string eq;
+    eq = "TaggedObject* __eq__(TaggedObject* o) override{";
+    eq += class_name + "* other = CAST(o," + class_name + ");";
+    for (int i = 0; i < node.members_ordered.size(); i++) {
+        eq += "if(EQ( this->" + node.members_ordered[i] + ", other->" + node.members_ordered[i] +
+              ")==MAKE_BOOL(false)) {return MAKE_BOOL(false);}\n";
+    }
+    eq += "return MAKE_BOOL(true);";
+    eq += "}\n";
+    out += eq;
     out += "};";
     for (auto n: node.methods) {
         std::string method_name = n.second->identifier;
@@ -251,16 +270,16 @@ std::string Transpiler::ptr_to_type_object(const ObjectType& t) {
 std::string Transpiler::object_type_mapper(const ObjectType& t) {
     if (t.id.size() == 1 && islower(t.id[0])) {
         // it's a generic, return same without pointer;
-        return "XObject*";
+        return "aXObject*";
     }
     if (t == T_INT) {
-        return "XObject*";
+        return "TaggedObject*";
     }
     if (t == T_STRING) {
-        return "XObject*";
+        return "XString";
     }
     if (t == T_BOOL) {
-        return "XObject*";
+        return "TaggedObject*";
     }
     if (t.id == "Tuple") {
         for (int i = 0; i < this->tuple_types.size(); i++) {
@@ -403,7 +422,7 @@ std::string Transpiler::visit_function(FunctionNode& node) {
     signature += raw_function_name;
     signature += "(";
     for (int i = 0; i < node.parameter_types.size(); i++) {
-        signature += std::string() + "TaggedObject*" + " ptr_" + node.parameter_names[i] + ", ";
+        signature += std::string() + "TaggedObject*" + " " + node.parameter_names[i] + ", ";
     }
     if (node.parameter_types.size() > 0) {
         signature = signature.substr(0, signature.size() - 2);
@@ -412,10 +431,10 @@ std::string Transpiler::visit_function(FunctionNode& node) {
     out += signature;
     this->header += signature + ";\n";
     out += "{\n";
-    for (int i = 0; i < node.parameter_types.size(); i++) {
-        out += this->type_mapper(*node.parameter_types[i]) + " " + node.parameter_names[i] + " = (" +
-               this->type_mapper(*node.parameter_types[i]) + ")" + " ptr_" + node.parameter_names[i] + ";";
-    }
+    // for (int i = 0; i < node.parameter_types.size(); i++) {
+    //     out += this->type_mapper(*node.parameter_types[i]) + " " + node.parameter_names[i] + " = (" +
+    //            this->type_mapper(*node.parameter_types[i]) + ")" + " ptr_" + node.parameter_names[i] + ";";
+    // }
 
     out += "void* it = nullptr;\n";
     out += "ENTER_FUN(" + node.identifier + ");";
@@ -444,12 +463,12 @@ std::string Transpiler::visit_function(FunctionNode& node) {
     std::string function_obj_name = FUNCTION_PREFIX + node.identifier;
 
     std::string function_class = "Function" + num_args_str;
-    this->externs_declaration += "extern  " + function_class + "* " + function_obj_name + "\n;";
+    this->externs_declaration += "extern TaggedObject* " + function_obj_name + "\n;";
     // this->static_declarations += "static Function" + num_args_str + "* " + function_obj_name + ";\n";
     this->globals_initialization +=
             function_class + " " + raw_function_name + "_f" + " = " + function_class + " (" + raw_function_name +
             ");\n";
-    this->globals_initialization += function_class + "* " + function_obj_name + "=&" + raw_function_name + "_f;";
+    this->globals_initialization += "TaggedObject* " + function_obj_name + "=TAG(&" + raw_function_name + "_f);";
     // out += "static Function" + num_args_str + "* " + function_obj_name + " = new Function" + num_args_str + "(" +
     //        raw_function_name + ");\n";
     return out;
@@ -482,7 +501,7 @@ std::string Transpiler::visit_id(IdNode& node) {
 std::string Transpiler::visit_if(IfNode& node) {
     std::string out;
     out = "if";
-    out += "(PTR_TO_BOOL(" + this->dispatch(node.condition) + "))" + "{";
+    out += "(GET_BOOL(" + this->dispatch(node.condition) + "))" + "{";
     out += "ENTER();";
     out += this->visit_block(*node.then);
     out += "LEAVE();";
@@ -529,14 +548,14 @@ std::string Transpiler::visit_member(MemberNode& node) {
                ")";
     }
     auto s = "CAST(" + this->dispatch(node.parent) + "," + get_class_name(node.parent_t->object().id) + ")->" +
-           node.s_child;
+             node.s_child;
     return s;
 }
 
 std::string Transpiler::visit_none(NoneNode& node) { return "nullptr"; }
 
 std::string Transpiler::visit_number(NumberNode& node) {
-    return std::string() + "INT_TO_PTR" + "(" + std::to_string(node.num) + ")";
+    return std::string() + "MAKE_INT" + "(" + std::to_string(node.num) + ")";
 }
 
 std::string Transpiler::visit_return(ReturnNode& node) {
@@ -554,7 +573,7 @@ std::string Transpiler::visit_return(ReturnNode& node) {
 
 std::string Transpiler::visit_string(StringNode& node) {
     std::string out;
-    out += "NEW(XString,\"" + node.str + "\")";
+    out += "MAKE_STRING(\"" + node.str + "\")";
     return out;
 }
 
@@ -599,7 +618,7 @@ std::string Transpiler::visit_type(TypeNode& node) { return ""; }
 std::string Transpiler::visit_while(WhileNode& node) {
     std::string out;
     out += "while(";
-    out += "PTR_TO_BOOL(" + this->dispatch(node.condition) + ")";
+    out += "GET_BOOL(" + this->dispatch(node.condition) + ")";
     out += ")";
     out += "{";
     out += "ENTER();";

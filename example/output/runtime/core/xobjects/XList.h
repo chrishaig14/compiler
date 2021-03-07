@@ -17,6 +17,7 @@ public:
     XList(const std::vector<TaggedObject*> v);
 
     void mark(std::vector<XObject*>& new_root) override;
+    TaggedObject* __eq__(TaggedObject* pObject) override;
 };
 
 TaggedObject* f_List_add(TaggedObject* _a, TaggedObject* _b);

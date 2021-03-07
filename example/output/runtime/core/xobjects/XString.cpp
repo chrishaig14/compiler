@@ -12,7 +12,7 @@ TaggedObject* f_String_add(TaggedObject* _a, TaggedObject* _b) {
 
 TaggedObject* f_String_len(TaggedObject* _a) {
     XString* a = (XString*) UNTAG(_a);
-    return INT_TO_PTR(a->s.size());
+    return MAKE_INT(a->s.size());
 }
 
 
@@ -31,3 +31,7 @@ XString::XString(const std::string& x) : XObject("String") {
 }
 
 void XString::mark(std::vector<XObject*>& x) {}
+
+TaggedObject* XString::__eq__(TaggedObject* other) {
+    return MAKE_BOOL(CAST(other, XString)->s == this->s);
+}

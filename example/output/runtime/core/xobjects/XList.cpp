@@ -3,6 +3,7 @@
 //
 
 #include "XList.h"
+#include "../basics.h"
 
 TaggedObject* f_List_add(TaggedObject* _a, TaggedObject* _b) {
     XList* a = CAST(_a, XList);
@@ -21,7 +22,7 @@ TaggedObject* f_List_add(TaggedObject* _a, TaggedObject* _b) {
 
 TaggedObject* f_List_len(TaggedObject* _l) {
     XList* l = (XList*) (UNTAG(_l));
-    return INT_TO_PTR(l->l.size());
+    return MAKE_INT(l->l.size());
 }
 
 Function2 function_List_add_p = Function2(f_List_add);
@@ -50,4 +51,14 @@ void XList::mark(std::vector<XObject*>& new_root) {
             }
         }
     }
+}
+
+TaggedObject* XList::__eq__(TaggedObject* pObject) {
+    XList* other = CAST(pObject, XList);
+    for (int i = 0; i < this->l.size(); i++) {
+        if (EQ(this->l[i], other->l[i]) == MAKE_BOOL(false)) {
+            return MAKE_BOOL(false);
+        }
+    }
+    return MAKE_BOOL(true);
 }

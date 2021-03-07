@@ -16,6 +16,8 @@
 #include "xobjects/XTuple.h"
 #include "functions.h"
 #include "GC.h"
+#include "../macros.h"
+#include "basics.h"
 
 TaggedObject* f_print(TaggedObject* _s);
 
