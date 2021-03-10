@@ -26,12 +26,17 @@ public:
         this->vars[n] = v;
     }
 
-    void set(const std::string& n, XObject* v) {
-        if (this->vars.count(n) == 0) {
-            this->parent->set(n, v);
-        } else {
-            this->vars[n] = v;
+    TaggedObject* set(TaggedObject* old_value_t, TaggedObject* new_value_t) {
+        if (has_tag(old_value_t, OBJECT_TAG)) {
+            XObject* old_value = UNTAG(old_value_t);
+            old_value->count--;
+            if (old_value->count == 0) {
+                delete old_value;
+            }
+            XObject* new_value = UNTAG(new_value_t);
+            new_value->count++;
         }
+        return new_value_t;
     }
 
     void get_reachable() {
@@ -129,7 +134,7 @@ public:
 
     static TaggedObject* function_return(TaggedObject* f);
 
-    static void declare(const std::string& n, TaggedObject* obj);
+    static TaggedObject* declare(TaggedObject* obj);
 
     static void set(const std::string& n, TaggedObject* obj);
 
@@ -145,6 +150,8 @@ public:
     static void leave_scope(Scope* parent);
 
     static TaggedObject* temp(TaggedObject* obj);
+    static TaggedObject* inc(TaggedObject* pObject);
+    static TaggedObject* assign(TaggedObject* old_value_t, TaggedObject* new_value_t);
 };
 
 

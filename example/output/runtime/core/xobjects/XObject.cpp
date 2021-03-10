@@ -12,6 +12,14 @@ XObject::XObject(std::string class_name) {
     this->reachable = false;
     this->is_string = false;
     this->is_user = false;
+    this->count = 0;
+}
+
+TaggedObject* setr(TaggedObject* x) {
+    if (has_tag(x, OBJECT_TAG)) {
+        UNTAG(x)->set_reachable();
+    }
+    return x;
 }
 
 void XObject::set_reachable() {
@@ -29,10 +37,18 @@ bool XObject::is_reachable() {
 }
 
 XObject::~XObject() {
-    // std::cout << "Deleted object " << this << " (" << this->class_name << ")" << std::endl;
+    std::cout << "Deleted object " << this << " (" << this->class_name << ")" << std::endl;
 }
 
 TaggedObject* XObject::__eq__(TaggedObject* pObject) {
     return MAKE_BOOL(false);
+}
+
+void XObject::inc_count() {
+    this->count++;
+}
+
+void XObject::dec_count(){
+    this->count--;
 }
 

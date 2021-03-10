@@ -14,8 +14,10 @@ TaggedObject* f_open(TaggedObject* _s) {
 }
 
 TaggedObject* f_print(TaggedObject* _s) {
+    GC::declare(_s);
     XString* s = CAST(_s, XString);
     std::cout << s->s << std::endl;
+    GC::assign(_s, nullptr);
     return nullptr;
 }
 
@@ -23,10 +25,10 @@ TaggedObject* f_range(TaggedObject* _start, TaggedObject* _step, TaggedObject* _
     long start = GET_INT(_start);
     long step = GET_INT(_step);
     long end = GET_INT(_end);
-    std::vector<TaggedObject*> v((end - start) / step, nullptr);
+    std::vector<TaggedObject*>* v = new std::vector<TaggedObject*>((end - start) / step, nullptr);
     int k = 0;
     for (int i = start; i < end; i += step) {
-        v[k] = MAKE_INT(i);
+        (*v)[k] = MAKE_INT(i);
         k++;
     }
     return NEW(XList, v);
@@ -45,9 +47,9 @@ TaggedObject* f_Boolean_str(TaggedObject* _i) {
 TaggedObject* f_map(TaggedObject* _l, TaggedObject* _f) {
     std::vector<TaggedObject*>* l = (std::vector<TaggedObject*>*) _l;
     Function1* f = (Function1*) (_f);
-    std::vector<TaggedObject*> r;
+    std::vector<TaggedObject*>* r = new std::vector<TaggedObject*>();
     for (int i = 0; i < l->size(); i++) {
-        r.push_back((*f)((*l)[i]));
+        r->push_back((*f)((*l)[i]));
     }
     return NEW(XList, r);
 }
@@ -83,11 +85,11 @@ TaggedObject* op_eq(TaggedObject* a, TaggedObject* b) {
     } else if (oa->is_list) {
         XList* la = (XList*) oa;
         XList* lb = (XList*) ob;
-        if (la->l.size() != lb->l.size()) {
+        if (la->l->size() != lb->l->size()) {
             r = false;
         } else {
-            for (int i = 0; i < la->l.size(); i++) {
-                if (!GET_BOOL(op_eq(la->l[i], lb->l[i]))) {
+            for (int i = 0; i < la->l->size(); i++) {
+                if (!GET_BOOL(op_eq((*la->l)[i], (*lb->l)[i]))) {
                     r = false;
                     break;
                 }
@@ -131,10 +133,10 @@ TaggedObject* dict_subscript(TaggedObject* _l, TaggedObject* i) {
 TaggedObject* list_subscript(TaggedObject* _l, TaggedObject* i) {
     XList* list = (XList*) UNTAG(_l);
     unsigned long index = GET_INT(i);
-    if (index >= list->l.size()) {
+    if (index >= list->l->size()) {
         throw std::runtime_error("List index out of range");
     }
-    return list->l[index];
+    return (*list->l)[index];
 }
 
 TaggedObject* string_subscript(TaggedObject* _l, TaggedObject* i) {

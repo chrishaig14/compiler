@@ -8,6 +8,7 @@ SymbolTable::SymbolTable(const std::string& name, SymbolTable* parent) {
     this->name = name;
     this->parent = parent;
     this->ret = nullptr;
+    this->is_function = false;
 }
 
 bool SymbolTable::has(const std::string& name) {
@@ -93,4 +94,24 @@ bool SymbolTable::get_not_none(const std::string& name) {
         }
     }
     throw std::runtime_error("Symbol " + name + " not found in scope");
+}
+
+VectorOfStrings SymbolTable::get_all() {
+    if (this->is_function) {
+        VectorOfStrings r;
+
+        for (auto v: this->table) {
+            r.push_back(v.first);
+        }
+        return r;
+    } else {
+        VectorOfStrings r;
+
+        auto p = this->parent->get_all();
+        r.insert(r.end(), p.begin(), p.end());
+        for (auto v: this->table) {
+            r.push_back(v.first);
+        }
+        return r;
+    }
 }

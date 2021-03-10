@@ -32,9 +32,9 @@ BlockNode* full_parse(const std::string& __file__, CodeLines* code_lines) {
     Scanner scanner;
     scanner.load_file(__file__);
     std::vector<Token> tokens = scanner.scan_all();
-    for (auto token: tokens) {
-        std::cout << token.to_string() << std::endl;
-    }
+    // for (auto token: tokens) {
+    //     std::cout << token.to_string() << std::endl;
+    // }
     Parser parser(__file__, scanner.code_lines, tokens);
     *code_lines = scanner.code_lines;
     try {
@@ -133,7 +133,7 @@ void full_compile(bool is_main, const std::string& __file__, const std::string& 
     if (is_main) {
         output += "\nint main(){\n";
         output += t.static_initializations;
-        output += "auto x = PTR_TO_INT((*function_main)());";
+        output += "auto x = GET_INT(CALL0(function_main));";
         output += "return x;}";
     }
     std::string output_h_path = path_join(output_dir, module_name + ".h");

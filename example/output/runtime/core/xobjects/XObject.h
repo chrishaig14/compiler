@@ -18,6 +18,7 @@ public:
     bool is_list;
     bool is_user;
     bool is_string;
+    int count;
     std::string class_name;
 
     XObject(std::string class_name);
@@ -33,6 +34,9 @@ public:
     virtual void mark(std::vector<XObject*>& new_root) = 0;
 
     virtual TaggedObject* __eq__(TaggedObject* pObject);
+    virtual void inc_count();
+    virtual void dec_count();
 };
 
+TaggedObject* setr(TaggedObject* x);
 #endif //XLANG_XOBJECT_H

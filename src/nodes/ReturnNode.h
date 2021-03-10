@@ -7,8 +7,7 @@
 
 
 #include "Node.h"
-
-#include "Node.h"
+#include "../types.h"
 
 class ReturnNode : public Node {
 public:
@@ -27,6 +26,7 @@ public:
     const ReturnNode& retrn() const override;
 
     Node* expression;
+    VectorOfStrings reachables;
 };
 
 #endif //RETURNNODE_H

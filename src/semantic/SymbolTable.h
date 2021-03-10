@@ -14,7 +14,6 @@
 
 
 class SymbolTable {
-    MapStringType table;
     std::unordered_map<std::string, int> indices;
     TypeNode* ret;
 public:
@@ -23,6 +22,8 @@ public:
     VariableLocation find(const std::string& name);
 
     bool has(const std::string& name);
+
+    VectorOfStrings get_all();
 
     const TypeNode& get(const std::string& name);
 
@@ -43,6 +44,8 @@ public:
     std::string name;
     SymbolTable* parent;
     std::unordered_map<std::string, bool> not_null;
+    MapStringType table;
+    bool is_function;
 };
 
 #endif //SYMBOLTABLE_H

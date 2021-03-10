@@ -40,6 +40,9 @@ USemanticInfo Checker::visit(WhileNode& node) {
     }
     this->enter_scope("while");
     this->visit(*node.body);
+    for (auto v: this->scope->table) {
+        node.body->local_vars.push_back(v.first);
+    }
     this->leave_scope();
     return nullptr;
 }
@@ -343,14 +346,16 @@ USemanticInfo Checker::visit(ForNode& node) {
     }
     IdNode* lid = new IdNode("List.len");
     lid->is_global_function = true;
-    Node* new_condition = new BoolOpNode(BoolOp::LT, new IdNode(".index0"), new CallNode(lid, {new IdNode(".list0")}));
+    CallNode* len_call = new CallNode(lid, {new IdNode(".list0")});
+    len_call->arg_types.push_back(obj.clone());
+    Node* new_condition = new BoolOpNode(BoolOp::LT, new IdNode(".index0"), len_call);
 
     BlockNode* new_body = new BlockNode({});
     new_body->nodes.push_back(new DeclarationNode(node.var,
                                                   obj.type_params[0]->clone(),
-                                                  new SubscriptNode(new IdNode(".list0"), {new IdNode(".index0")})));
+                                                  new SubscriptNode(new IdNode("_list0"), {new IdNode("_index0")})));
     new_body->nodes.insert(new_body->nodes.end(), node.body->nodes.begin(), node.body->nodes.end());
-    AssignmentNode* asn = new AssignmentNode(new IdNode(".index0"),
+    AssignmentNode* asn = new AssignmentNode(new IdNode("_index0"),
                                              new BinopNode(OpType::ADD, new IdNode(".index0"), new NumberNode(1)));
     asn->type = new T_INT;
     new_body->nodes.push_back(asn);
@@ -359,11 +364,14 @@ USemanticInfo Checker::visit(ForNode& node) {
     this->enter_scope("for");
     this->scope->set(node.var, var_type);
 
-    BlockNode* bn = new BlockNode({new DeclarationNode(".index0", new T_INT, new NumberNode(0)),
-                                   new DeclarationNode(".list0", obj.clone(), node.exp),});
+    BlockNode* bn = new BlockNode({new DeclarationNode("_index0", new T_INT, new NumberNode(0)),
+                                   new DeclarationNode("_list0", obj.clone(), node.exp),});
     this->visit(*bn);
     this->visit(*node.body);
     this->dispatch(new_body->nodes[0]->decl().expression);
+    for (auto v: this->scope->table) {
+        node.body->local_vars.push_back(v.first);
+    }
     this->leave_scope();
     this->replacement = bn;
     this->replace_me = true;
@@ -429,7 +437,9 @@ USemanticInfo Checker::visit(CallNode& n) {
             const TypeNode& arg_type = arg_type_p->type();
             arg = this->replace_if_necessary(arg);
             arg_types.push_back(arg_type.clone());
+            n.arg_types.push_back(arg_type.clone());
         }
+
         if (function_is_generic(function_type)) {
             retv = match_arguments_to_generic_function(function_type, arg_types);
         } else {
@@ -534,6 +544,7 @@ USemanticInfo Checker::visit(FunctionNode& n) {
     std::string& function_name = n.identifier;
     this->current_function = function_name;
     this->enter_scope(function_name);
+    this->scope->is_function = true;
     bool is_init_method = this->is_method && function_name == "init";
     if (this->add_this) {
         this->scope->set("this", *this->this_type);
@@ -550,6 +561,9 @@ USemanticInfo Checker::visit(FunctionNode& n) {
     this->assert_type_exists(returnType, n.start);
     this->scope->set("__return__", returnType);
     this->visit(*n.body);
+    for (auto v: this->scope->table) {
+        n.body->local_vars.push_back(v.first);
+    }
     if (is_init_method) {
         for (int i = 0; i < n.body->nodes.size(); i++) {
             if (n.body->nodes[i]->ntype == ASSIGN) {
@@ -914,6 +928,9 @@ USemanticInfo Checker::visit(IfNode& n) {
 
     this->enter_scope("if");
     this->visit(*n.then);
+    for (auto v: this->scope->table) {
+        n.then->local_vars.push_back(v.first);
+    }
     this->leave_scope();
 
     for (int i = 0; i < n.elifs.size(); i++) {
@@ -1065,6 +1082,7 @@ USemanticInfo Checker::visit(ReturnNode& n) {
         this->failed = true;
         return this->error();
     }
+    n.reachables = this->scope->get_all();
     return nullptr;
 }
 

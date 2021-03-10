@@ -8,9 +8,8 @@
 #define NEW(cls, ...) GC::register_object((TAG(new cls(__VA_ARGS__))))
 
 
-
 #define LIST_SUBSCRIPT(list, index) CALL2(function_list_subscript, list, index)
-#define LIST(...) NEW(XList, {__VA_ARGS__})
+#define LIST(...) NEW(XList, new std::vector<TaggedObject*>({__VA_ARGS__}))
 #define TUPLE2(...) NEW(XTuple2, __VA_ARGS__)
 #define TUPLE3(...) NEW(XTuple3, __VA_ARGS__)
 #define TUPLE4(...) NEW(XTuple4, __VA_ARGS__)

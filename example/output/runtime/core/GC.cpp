@@ -43,19 +43,12 @@ TaggedObject* GC::temp(TaggedObject* obj) {
     return obj;
 }
 
-void GC::declare(const std::string& n, TaggedObject* obj) {
+TaggedObject* GC::declare(TaggedObject* obj) {
     if (has_tag(obj, OBJECT_TAG)) {
-        // std::cout<< "DECLARE OBJECT WITH TAG!" << std::endl;
-        frame->scope->declare(n, UNTAG(obj));
+        XObject* o = UNTAG(obj);
+        o->inc_count();
     }
-}
-
-void GC::set(const std::string& n, TaggedObject* obj) {
-    if (has_tag(obj, OBJECT_TAG)) {
-        // std::cout<< "SET OBJECT WITH TAG!" << std::endl;
-
-        frame->scope->set(n, UNTAG(obj));
-    }
+    return obj;
 }
 
 void GC::leave_scope(Scope* parent) {
@@ -82,8 +75,8 @@ void GC::leave_scope(Scope* parent) {
     mark(root);
     for (int i = 0; i < all_objects.size(); i++) {
         // all_objects[i]->reset_reachable();
-            all_objects[i]->inserted= false;
-            k++;
+        all_objects[i]->inserted = false;
+        k++;
     }
     sweep();
     // std::cout << "Done leaving scope" << std::endl;
@@ -139,6 +132,32 @@ void GC::sweep() {
 }
 
 Frame* GC::frame = nullptr;
+
+TaggedObject* GC::inc(TaggedObject* pObject) {
+    XObject* o = UNTAG(pObject);
+    o->count++;
+    return pObject;
+}
+
+TaggedObject* GC::assign(TaggedObject* old_value_t, TaggedObject* new_value_t) {
+    if (old_value_t != nullptr) {
+        if (has_tag(old_value_t, OBJECT_TAG)) {
+            if (new_value_t != nullptr) {
+                XObject* new_ = UNTAG(new_value_t);
+                new_->inc_count();
+            }
+            XObject* old = UNTAG(old_value_t);
+            old->dec_count();
+            if (old->count == 0) {
+                delete old;
+            }
+        }
+    } else if (has_tag(new_value_t, OBJECT_TAG)) {
+        XObject* new_ = UNTAG(new_value_t);
+        new_->inc_count();
+    }
+    return new_value_t;
+}
 
 
 std::vector<Frame*> GC::frames;

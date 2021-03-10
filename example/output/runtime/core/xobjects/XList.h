@@ -12,12 +12,15 @@
 
 class XList : public XObject {
 public:
-    std::vector<TaggedObject*> l;
+    std::vector<TaggedObject*>* l;
 
-    XList(const std::vector<TaggedObject*> v);
+    XList(std::vector<TaggedObject*>* v);
 
     void mark(std::vector<XObject*>& new_root) override;
     TaggedObject* __eq__(TaggedObject* pObject) override;
+    ~XList() override;
+    void inc_count() override;
+    void dec_count() override;
 };
 
 TaggedObject* f_List_add(TaggedObject* _a, TaggedObject* _b);
