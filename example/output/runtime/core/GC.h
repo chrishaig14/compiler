@@ -152,6 +152,7 @@ public:
     static TaggedObject* temp(TaggedObject* obj);
     static TaggedObject* inc(TaggedObject* pObject);
     static TaggedObject* assign(TaggedObject* old_value_t, TaggedObject* new_value_t);
+    static void out_of_scope(TaggedObject* old_value_t);
 };
 
 

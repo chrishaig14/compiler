@@ -80,7 +80,7 @@ std::string Transpiler::visit_block(BlockNode& node) {
             if (v == "this") {
                 continue;
             }
-            out += "GC::assign(" + v + ",nullptr);\n";
+            out += "GC::out_of_scope(" + v + ");\n";
         }
     }
     return out;
@@ -566,7 +566,7 @@ std::string Transpiler::visit_number(NumberNode& node) {
 std::string Transpiler::visit_return(ReturnNode& node) {
     std::string out;
     for (auto v: node.reachables) {
-        out += "GC::assign(" + v + ",nullptr);\n";
+        out += "GC::out_of_scope(" + v + ");\n";
     }
     out += "return ";
     if (node.expression != nullptr) {

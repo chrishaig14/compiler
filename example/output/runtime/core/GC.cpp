@@ -159,6 +159,18 @@ TaggedObject* GC::assign(TaggedObject* old_value_t, TaggedObject* new_value_t) {
     return new_value_t;
 }
 
+void GC::out_of_scope(TaggedObject* old_value_t) {
+    if (old_value_t != nullptr) {
+        if (has_tag(old_value_t, OBJECT_TAG)) {
+            XObject* old = UNTAG(old_value_t);
+            old->dec_count();
+            if (old->count == 0) {
+                delete old;
+            }
+        }
+    }
+}
+
 
 std::vector<Frame*> GC::frames;
 std::vector<XObject*> GC::all_objects;
