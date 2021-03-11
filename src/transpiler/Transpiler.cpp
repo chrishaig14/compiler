@@ -29,10 +29,11 @@ std::string Transpiler::visit_assignment(AssignmentNode& node) {
         this->is_lvalue = false;
         MemberNode& memberNode = node.lvalue->member();
         TypeNode* cast_type = memberNode.parent_t;
-        out += "CAST(" + this->dispatch(node.lvalue->member().parent) + "," + get_class_name(cast_type->object().id) +
-               ")->";
-        out += node.lvalue->member().s_child + "=";
-        out += this->dispatch(node.rvalue) + "";
+        std::string mem =
+                "CAST(" + this->dispatch(node.lvalue->member().parent) + "," + get_class_name(cast_type->object().id) +
+                ")->" + node.lvalue->member().s_child;
+        out += mem + "=GC::assign(" + mem + ",";
+        out += this->dispatch(node.rvalue) + ");";
     } else {
         out += this->dispatch(node.lvalue) + " = GC::assign(";
         out += this->dispatch(node.lvalue) + ", ";
@@ -76,6 +77,9 @@ std::string Transpiler::visit_block(BlockNode& node) {
     }
     if (node.nodes.back()->ntype != RETRN) {
         for (auto v: node.local_vars) {
+            if (v == "this") {
+                continue;
+            }
             out += "GC::assign(" + v + ",nullptr);\n";
         }
     }
@@ -436,13 +440,11 @@ std::string Transpiler::visit_function(FunctionNode& node) {
     out += signature;
     this->header += signature + ";\n";
     out += "{\n";
-    // for (int i = 0; i < node.parameter_types.size(); i++) {
-    //     out += this->type_mapper(*node.parameter_types[i]) + " " + node.parameter_names[i] + " = (" +
-    //            this->type_mapper(*node.parameter_types[i]) + ")" + " ptr_" + node.parameter_names[i] + ";";
-    // }
+    for (int i = 0; i < node.parameter_types.size(); i++) {
+        out += "GC::declare( " + node.parameter_names[i] + ");";
+    }
 
     out += "void* it = nullptr;\n";
-    out += "ENTER_FUN(" + node.identifier + ");";
     bool is_init = false;
     if (node.identifier == this->method_class + "_init") {
         is_init = true;
@@ -459,9 +461,9 @@ std::string Transpiler::visit_function(FunctionNode& node) {
     }
     out += this->dispatch(node.body);
     if (is_init) {
-        out += "RETURN(this_obj);";
+        out += "return this_obj;";
     } else if (node.return_type->kind == Kind::OBJECT && node.return_type->object().id == ".None") {
-        out += "RETURN(nullptr);";
+        out += "return nullptr;";
     }
     out += "}";
     std::string num_args_str = std::to_string(node.parameter_names.size());
