@@ -41,7 +41,7 @@ USemanticInfo Checker::visit(WhileNode& node) {
     this->enter_scope("while");
     this->visit(*node.body);
     for (auto v: this->scope->table) {
-        node.body->local_vars.push_back(v.first);
+        node.body->local_vars.push_back(std::make_pair(v.first,v.second->clone()));
     }
     this->leave_scope();
     return nullptr;
@@ -370,7 +370,7 @@ USemanticInfo Checker::visit(ForNode& node) {
     this->visit(*node.body);
     this->dispatch(new_body->nodes[0]->decl().expression);
     for (auto v: this->scope->table) {
-        node.body->local_vars.push_back(v.first);
+        node.body->local_vars.push_back(std::make_pair(v.first,v.second->clone()));
     }
     this->leave_scope();
     this->replacement = bn;
@@ -562,7 +562,7 @@ USemanticInfo Checker::visit(FunctionNode& n) {
     this->scope->set("__return__", returnType);
     this->visit(*n.body);
     for (auto v: this->scope->table) {
-        n.body->local_vars.push_back(v.first);
+        n.body->local_vars.push_back(std::make_pair(v.first,v.second->clone()));
     }
     if (is_init_method) {
         for (int i = 0; i < n.body->nodes.size(); i++) {
@@ -929,7 +929,7 @@ USemanticInfo Checker::visit(IfNode& n) {
     this->enter_scope("if");
     this->visit(*n.then);
     for (auto v: this->scope->table) {
-        n.then->local_vars.push_back(v.first);
+        n.then->local_vars.push_back(std::make_pair(v.first,v.second->clone()));
     }
     this->leave_scope();
 

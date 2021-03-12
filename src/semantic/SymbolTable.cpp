@@ -96,21 +96,21 @@ bool SymbolTable::get_not_none(const std::string& name) {
     throw std::runtime_error("Symbol " + name + " not found in scope");
 }
 
-VectorOfStrings SymbolTable::get_all() {
+std::vector<std::pair<std::string, TypeNode*>> SymbolTable::get_all() {
     if (this->is_function) {
-        VectorOfStrings r;
+        std::vector<std::pair<std::string, TypeNode*>> r;
 
         for (auto v: this->table) {
-            r.push_back(v.first);
+            r.push_back(std::make_pair(v.first,v.second->clone()));
         }
         return r;
     } else {
-        VectorOfStrings r;
+        std::vector<std::pair<std::string, TypeNode*>> r;
 
         auto p = this->parent->get_all();
         r.insert(r.end(), p.begin(), p.end());
         for (auto v: this->table) {
-            r.push_back(v.first);
+            r.push_back(std::make_pair(v.first,v.second->clone()));
         }
         return r;
     }

@@ -26,7 +26,7 @@ public:
     const ReturnNode& retrn() const override;
 
     Node* expression;
-    VectorOfStrings reachables;
+    std::vector<std::pair<std::string,TypeNode*>> reachables;
 };
 
 #endif //RETURNNODE_H

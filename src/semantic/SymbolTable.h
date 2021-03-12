@@ -23,7 +23,7 @@ public:
 
     bool has(const std::string& name);
 
-    VectorOfStrings get_all();
+    std::vector<std::pair<std::string, TypeNode*>> get_all();
 
     const TypeNode& get(const std::string& name);
 

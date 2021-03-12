@@ -26,7 +26,7 @@ public:
     BlockNode& block() override;
     const BlockNode& block() const override;
     ~BlockNode();
-    VectorOfStrings local_vars;
+    std::vector<std::pair<std::string, TypeNode*>> local_vars;
 };
 
 

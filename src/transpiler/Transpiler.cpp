@@ -67,6 +67,12 @@ std::string Transpiler::visit_binop(BinopNode& node) {
     return out;
 }
 
+bool is_an_object(TypeNode* type) {
+    ObjectType ot = type->object();
+    std::string id = ot.id;
+    return id != "Integer" && id != "Boolean";
+}
+
 std::string Transpiler::visit_block(BlockNode& node) {
     std::string out;
     for (auto n: node.nodes) {
@@ -77,10 +83,12 @@ std::string Transpiler::visit_block(BlockNode& node) {
     }
     if (node.nodes.back()->ntype != RETRN) {
         for (auto v: node.local_vars) {
-            if (v == "this") {
+            if (v.first == "this") {
                 continue;
             }
-            out += "GC::out_of_scope(" + v + ");\n";
+            if (is_an_object(v.second)) {
+                out += "GC::out_of_scope(" + v.first + ");\n";
+            }
         }
     }
     return out;
@@ -368,7 +376,12 @@ std::string Transpiler::visit_declaration(DeclarationNode& node) {
     std::string var_type = this->type_mapper(*node.type);
     // out += var_type + " " + node.identifier + " = " + "(" + this->ptr_to_type_object(node.type->object()) + ")(" +
     //        this->dispatch(node.expression) + ")";
-    out += "TaggedObject* " + node.identifier + " = GC::declare(" + this->dispatch(node.expression) + ")";
+    out += "TaggedObject* " + node.identifier + " = ";
+    if (is_object(*node.type)) {
+        out += "GC::declare(" + this->dispatch(node.expression) + ")";
+    } else {
+        out += this->dispatch(node.expression);
+    }
     return out;
 }
 
@@ -441,7 +454,11 @@ std::string Transpiler::visit_function(FunctionNode& node) {
     this->header += signature + ";\n";
     out += "{\n";
     for (int i = 0; i < node.parameter_types.size(); i++) {
-        out += "GC::declare( " + node.parameter_names[i] + ");";
+        if (is_object(*node.parameter_types[i])) {
+            out += "GC::declare( " + node.parameter_names[i] + ");";
+        } else {
+            out += node.parameter_names[i] + ";";
+        }
     }
 
     out += "void* it = nullptr;\n";
@@ -566,7 +583,9 @@ std::string Transpiler::visit_number(NumberNode& node) {
 std::string Transpiler::visit_return(ReturnNode& node) {
     std::string out;
     for (auto v: node.reachables) {
-        out += "GC::out_of_scope(" + v + ");\n";
+        if (is_object(*v.second)) {
+            out += "GC::out_of_scope(" + v.first + ");\n";
+        }
     }
     out += "return ";
     if (node.expression != nullptr) {
