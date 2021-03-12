@@ -11,6 +11,8 @@
 
 std::string generate_function_class(int num_args);
 
+bool is_object(const TypeNode& t);
+
 class Transpiler {
 public:
     std::string header;

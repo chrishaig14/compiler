@@ -35,11 +35,19 @@ std::string Transpiler::visit_assignment(AssignmentNode& node) {
         out += mem + "=GC::assign(" + mem + ",";
         out += this->dispatch(node.rvalue) + ");";
     } else {
-        out += this->dispatch(node.lvalue) + " = GC::assign(";
-        out += this->dispatch(node.lvalue) + ", ";
-        this->is_lvalue = false;
-        std::string var_type = this->type_mapper(*node.type);
-        out += this->dispatch(node.rvalue) + ");";
+        if (is_object(*node.type)) {
+            out += this->dispatch(node.lvalue) + " = GC::assign(";
+            out += this->dispatch(node.lvalue) + ", ";
+            this->is_lvalue = false;
+            std::string var_type = this->type_mapper(*node.type);
+            out += this->dispatch(node.rvalue) + ");";
+        } else {
+            out += this->dispatch(node.lvalue) + " = ";
+            this->is_lvalue = false;
+            std::string var_type = this->type_mapper(*node.type);
+            out += this->dispatch(node.rvalue) + ";";
+        }
+
     }
     return out;
 }
@@ -67,12 +75,6 @@ std::string Transpiler::visit_binop(BinopNode& node) {
     return out;
 }
 
-bool is_an_object(TypeNode* type) {
-    ObjectType ot = type->object();
-    std::string id = ot.id;
-    return id != "Integer" && id != "Boolean";
-}
-
 std::string Transpiler::visit_block(BlockNode& node) {
     std::string out;
     for (auto n: node.nodes) {
@@ -86,7 +88,7 @@ std::string Transpiler::visit_block(BlockNode& node) {
             if (v.first == "this") {
                 continue;
             }
-            if (is_an_object(v.second)) {
+            if (is_object(*v.second)) {
                 out += "GC::out_of_scope(" + v.first + ");\n";
             }
         }

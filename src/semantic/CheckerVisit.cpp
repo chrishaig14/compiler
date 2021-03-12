@@ -361,16 +361,17 @@ USemanticInfo Checker::visit(ForNode& node) {
     new_body->nodes.push_back(asn);
 
     TypeNode& var_type = *obj.type_params[0];
-    this->enter_scope("for");
-    this->scope->set(node.var, var_type);
-
     BlockNode* bn = new BlockNode({new DeclarationNode("_index0", new T_INT, new NumberNode(0)),
                                    new DeclarationNode("_list0", obj.clone(), node.exp),});
     this->visit(*bn);
+    this->enter_scope("for");
+    this->scope->set(node.var, var_type);
+
+
     this->visit(*node.body);
     this->dispatch(new_body->nodes[0]->decl().expression);
     for (auto v: this->scope->table) {
-        node.body->local_vars.push_back(std::make_pair(v.first,v.second->clone()));
+        new_body->local_vars.push_back(std::make_pair(v.first,v.second->clone()));
     }
     this->leave_scope();
     this->replacement = bn;
