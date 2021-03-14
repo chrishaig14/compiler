@@ -148,7 +148,15 @@ std::string Transpiler::visit_bool_op(BoolOpNode& node) {
     return "MAKE_BOOL(GET_INT(" + this->dispatch(node.left) + ")" + op + "GET_INT(" + this->dispatch(node.right) + "))";
 }
 
-std::string Transpiler::visit_break(BreakNode& node) { return ""; }
+std::string Transpiler::visit_break(BreakNode& node) {
+    std::string out;
+    for (auto v: node.loop_vars) {
+        if (is_object(*v.second)) {
+            out += "GC::out_of_scope(" + v.first + ");\n";
+        }
+    }
+    out += "break";
+    return out; }
 
 bool is_object(const TypeNode& t) {
     if (t.kind == Kind::OBJECT) {
@@ -594,7 +602,7 @@ std::string Transpiler::visit_return(ReturnNode& node) {
             out += "GC::out_of_scope(" + v.first + ");\n";
         }
     }
-    out += "return __return__;";
+    out += "return __return__";
     return out;
 
 }

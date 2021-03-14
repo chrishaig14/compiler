@@ -7,11 +7,12 @@
 
 
 #include "Node.h"
+#include "TypeNode.h"
 
 
 class BreakNode : public Node {
 public:
-
+    std::vector<std::pair<std::string,TypeNode*>> loop_vars;
     BreakNode();
     bool equal(const Node& other) const override;
     BreakNode& brk() override;

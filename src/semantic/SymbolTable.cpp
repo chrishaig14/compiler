@@ -9,6 +9,7 @@ SymbolTable::SymbolTable(const std::string& name, SymbolTable* parent) {
     this->parent = parent;
     this->ret = nullptr;
     this->is_function = false;
+    this->is_loop = false;
 }
 
 bool SymbolTable::has(const std::string& name) {
@@ -94,6 +95,26 @@ bool SymbolTable::get_not_none(const std::string& name) {
         }
     }
     throw std::runtime_error("Symbol " + name + " not found in scope");
+}
+
+std::vector<std::pair<std::string, TypeNode*>> SymbolTable::get_all_in_loop() {
+    if (this->is_loop) {
+        std::vector<std::pair<std::string, TypeNode*>> r;
+
+        for (auto v: this->table) {
+            r.push_back(std::make_pair(v.first,v.second->clone()));
+        }
+        return r;
+    } else {
+        std::vector<std::pair<std::string, TypeNode*>> r;
+
+        auto p = this->parent->get_all();
+        r.insert(r.end(), p.begin(), p.end());
+        for (auto v: this->table) {
+            r.push_back(std::make_pair(v.first,v.second->clone()));
+        }
+        return r;
+    }
 }
 
 std::vector<std::pair<std::string, TypeNode*>> SymbolTable::get_all() {

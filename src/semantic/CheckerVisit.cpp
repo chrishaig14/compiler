@@ -39,7 +39,9 @@ USemanticInfo Checker::visit(WhileNode& node) {
         this->error_condition(condition.type(), node.start, "elif");
     }
     this->enter_scope("while");
+    this->scope->is_loop = true;
     this->visit(*node.body);
+    this->scope->is_loop = false;
     for (auto v: this->scope->table) {
         node.body->local_vars.push_back(std::make_pair(v.first,v.second->clone()));
     }
@@ -117,6 +119,7 @@ USemanticInfo Checker::visit(SubscriptNode& node) {
 }
 
 USemanticInfo Checker::visit(BreakNode& node) {
+    node.loop_vars = this->scope->get_all_in_loop();
     return nullptr;
 }
 
