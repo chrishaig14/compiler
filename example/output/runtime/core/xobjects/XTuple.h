@@ -26,6 +26,7 @@ public:
     XTuple2(TaggedObject* mem_1, TaggedObject* mem_2);
     TaggedObject* __eq__(TaggedObject* pObject) override;
     void mark(std::vector<XObject*>& new_root) override;
+    ~XTuple2() override;
 };
 
 class XTuple3 : public XTuple {
