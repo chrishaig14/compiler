@@ -108,7 +108,7 @@ std::vector<std::pair<std::string, TypeNode*>> SymbolTable::get_all_in_loop() {
     } else {
         std::vector<std::pair<std::string, TypeNode*>> r;
 
-        auto p = this->parent->get_all();
+        auto p = this->parent->get_all_in_loop();
         r.insert(r.end(), p.begin(), p.end());
         for (auto v: this->table) {
             r.push_back(std::make_pair(v.first,v.second->clone()));
