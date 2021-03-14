@@ -10,14 +10,16 @@ TaggedObject* f_List_add(TaggedObject* _a, TaggedObject* _b) {
     GC::declare(_b);
     XList* a = CAST(_a, XList);
     XList* b = CAST(_b, XList);
-    auto ab = a->l->begin();
-    auto ae = a->l->end();
-    auto* l = new std::vector<TaggedObject*>();
-    l->insert(l->end(), ab, ae);
-    auto be = b->l->end();
-    auto bb = b->l->begin();
-    l->insert(l->end(), bb, be);
-    XList* r = CAST(NEW(XList, l), XList);
+    XList* r = CAST(NEW(XList, a->l->size() + b->l->size()), XList);
+    auto lv = r->lv;
+    int sa = a->l->size();
+    int sb = b->l->size();
+    for (int i = 0; i < sa; i++) {
+        lv[i] = a->lv[i];
+    }
+    for (int i = sa; i < sb; i++) {
+        lv[i] = b->lv[i - sa];
+    }
     GC::assign(_a, nullptr);
     GC::assign(_b, nullptr);
     return TAG(r);
@@ -33,14 +35,8 @@ Function1 function_List_len_p = Function1(f_List_len);
 TaggedObject* function_List_add = TAG(&function_List_add_p);
 TaggedObject* function_List_len = TAG(&function_List_len_p);
 
-XList::XList(std::vector<TaggedObject*>* v) : XObject("List"), l(v) {
-    for (auto e: *l) {
-        if (!has_tag(e, OBJECT_TAG)) {
-            break;
-        }
-        UNTAG(e)->inc_count();
-    }
-    this->is_list = true;
+XList::XList(int n) : XObject("XList"), lv(n, nullptr) {
+    this->l = &this->lv;
 }
 
 void XList::mark(std::vector<XObject*>& new_root) {
@@ -86,29 +82,13 @@ XList::~XList() {
         }
     }
     std::cout << "delete list of length " << this->l->size() << std::endl;
-    delete this->l;
 }
 
 void XList::inc_count() {
     this->count++;
-    // if (this->l->size() != 0) {
-    //     if (has_tag(this->l->at(0), OBJECT_TAG)) {
-    //         for (int i = 0; i < this->l->size(); i++) {
-    //             XObject* el = UNTAG(this->l->at(i));
-    //             el->inc_count();
-    //         }
-    //     }
-    // }
 }
 
 void XList::dec_count() {
     this->count--;
-    // if (this->l->size() != 0) {
-    //     if (has_tag(this->l->at(0), OBJECT_TAG)) {
-    //         for (int i = 0; i < this->l->size(); i++) {
-    //             XObject* el = UNTAG(this->l->at(i));
-    //             el->dec_count();
-    //         }
-    //     }
-    // }
 }
+

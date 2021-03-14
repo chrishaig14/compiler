@@ -2,6 +2,7 @@
 // Created by chris on 5/12/20.
 //
 
+#include <ctime>
 #include "core.h"
 #include "xobjects/XString.h"
 #include "xobjects/XFile.h"
@@ -25,13 +26,16 @@ TaggedObject* f_range(TaggedObject* _start, TaggedObject* _step, TaggedObject* _
     long start = GET_INT(_start);
     long step = GET_INT(_step);
     long end = GET_INT(_end);
-    std::vector<TaggedObject*>* v = new std::vector<TaggedObject*>((end - start) / step, nullptr);
+
+    XList* r = CAST(NEW(XList, (end - start) / step), XList);
+    std::vector<TaggedObject*>* v = &r->lv;
     int k = 0;
     for (int i = start; i < end; i += step) {
         (*v)[k] = MAKE_INT(i);
         k++;
     }
-    return NEW(XList, v);
+    r->l = &r->lv;
+    return TAG(r);
 }
 
 TaggedObject* f_Integer_str(TaggedObject* _i) {
@@ -51,7 +55,8 @@ TaggedObject* f_map(TaggedObject* _l, TaggedObject* _f) {
     for (int i = 0; i < l->size(); i++) {
         r->push_back((*f)((*l)[i]));
     }
-    return NEW(XList, r);
+    return nullptr;
+    // return NEW(XList, r);
 }
 
 TaggedObject* f_join(TaggedObject* _l, TaggedObject* _s) {

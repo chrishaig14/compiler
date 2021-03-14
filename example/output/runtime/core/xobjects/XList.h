@@ -12,9 +12,12 @@
 
 class XList : public XObject {
 public:
+    std::vector<TaggedObject*> lv;
     std::vector<TaggedObject*>* l;
 
-    XList(std::vector<TaggedObject*>* v);
+    XList(int n);
+
+    XList(const std::initializer_list<TaggedObject*>& c) : XObject("List"), lv(c) { this->l = &this->lv; }
 
     void mark(std::vector<XObject*>& new_root) override;
     TaggedObject* __eq__(TaggedObject* pObject) override;
