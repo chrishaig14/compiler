@@ -3,11 +3,17 @@
 //
 
 #include "XString.h"
+#include "../basics.h"
 
 TaggedObject* f_String_add(TaggedObject* _a, TaggedObject* _b) {
+    GC::declare(_a);
+    GC::declare(_b);
     XString* a = (XString*) UNTAG(_a);
     XString* b = (XString*) UNTAG(_b);
-    return GC::register_object(TAG(new XString(a->s + b->s)));
+    auto r = MAKE_STRING(a->s + b->s);
+    GC::out_of_scope(_a);
+    GC::out_of_scope(_b);
+    return r;
 }
 
 TaggedObject* f_String_len(TaggedObject* _a) {
