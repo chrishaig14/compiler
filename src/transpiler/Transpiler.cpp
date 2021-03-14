@@ -584,18 +584,17 @@ std::string Transpiler::visit_number(NumberNode& node) {
 
 std::string Transpiler::visit_return(ReturnNode& node) {
     std::string out;
+    if (node.expression != nullptr) {
+        out += "TaggedObject* __return__ = " + this->dispatch(node.expression) + ";";
+    } else {
+        out += "TaggedObject* __return__ = nullptr";
+    }
     for (auto v: node.reachables) {
         if (is_object(*v.second)) {
             out += "GC::out_of_scope(" + v.first + ");\n";
         }
     }
-    out += "return ";
-    if (node.expression != nullptr) {
-        out += " " + this->dispatch(node.expression);
-    } else {
-        out += "nullptr";
-    }
-    out += "";
+    out += "return __return__;";
     return out;
 
 }
