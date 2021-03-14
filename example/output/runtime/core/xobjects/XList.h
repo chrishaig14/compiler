@@ -17,7 +17,15 @@ public:
 
     XList(int n);
 
-    XList(const std::initializer_list<TaggedObject*>& c) : XObject("List"), lv(c) { this->l = &this->lv; }
+    XList(const std::initializer_list<TaggedObject*>& c) : XObject("List"), lv(c) {
+        this->l = &this->lv;
+        if (has_tag(this->lv[0], OBJECT_TAG)) {
+            for (auto& e: this->lv) {
+                UNTAG(e)->inc_count();
+            }
+        }
+
+    }
 
     void mark(std::vector<XObject*>& new_root) override;
     TaggedObject* __eq__(TaggedObject* pObject) override;
