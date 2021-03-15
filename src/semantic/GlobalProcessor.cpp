@@ -108,6 +108,12 @@ void GlobalProcessor::visit(ClassNode& node) {
     if (!has_init) {
         class_info->methods["init"] = new FunctionType(class_info->member_types, new ObjectType(node.class_name, {}));
     }
+    class_info->methods["str"] = new FunctionType({}, new T_STRING);
+    VectorOfTypes tp;
+    for (int i = 0; i < node.type_parameters.size(); i++) {
+        tp.push_back(new ObjectType(node.type_parameters[i], {}));
+    }
+    class_info->methods["eq"] = new FunctionType({new ObjectType(node.class_name, tp)}, new T_BOOL);
     class_info->class_name = node.class_name;
     class_info->type_params = node.type_parameters;
     if (this->class_table->declared(node.class_name) || this->function_table->has_function(node.class_name)) {

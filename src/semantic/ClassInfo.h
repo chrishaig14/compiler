@@ -22,7 +22,9 @@ public:
 
     std::string class_name;
 
-    ClassInfo() {}
+    ClassInfo() {
+
+    }
 
     ClassInfo(std::string class_name, const VectorOfStrings& fieldNames, const VectorOfTypes& fieldTypes,
               VectorOfStrings type_parameters);

@@ -890,12 +890,13 @@ USemanticInfo Checker::visit(MemberNode& n) {
             class_info = this->class_table->get(final_type.to_string());
         } else {
             if (is_generic((final_type)) && final_type.type_params.size() == 0) {
-                throw std::runtime_error(
-                        "Cannot access member of totally generic value of generic type " + object.id + "!");
+                    throw std::runtime_error(
+                            "Cannot access member of totally generic value of generic type " + object.id + "!");
+            } else {
+                class_info = this->class_table->get(object.id);
+                class_info = instantiate_generic(class_info, final_type);
+                this->class_table->set(object.to_string(), class_info);
             }
-            class_info = this->class_table->get(object.id);
-            class_info = instantiate_generic(class_info, final_type);
-            this->class_table->set(object.to_string(), class_info);
         }
         if (class_info->members.find(child) != class_info->members.end()) {
             // It's a member
