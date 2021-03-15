@@ -19,9 +19,6 @@ public:
         return this->f();
     }
 
-    void mark(std::vector<XObject*>& new_root) override {
-
-    }
 };
 
 class Function1 : public XObject {
@@ -35,9 +32,6 @@ public:
         return this->f(a0);
     }
 
-    void mark(std::vector<XObject*>& new_root) override {
-
-    }
 };
 
 class Function2 : public XObject {
@@ -51,9 +45,6 @@ public:
         return this->f(a0, a1);
     }
 
-    void mark(std::vector<XObject*>& new_root) override {
-
-    }
 
 
 };
@@ -69,9 +60,6 @@ public:
         return this->f(a0, a1, a2);
     }
 
-    void mark(std::vector<XObject*>& new_root) override {
-
-    }
 };
 
 class Partial0 : public Function0 {

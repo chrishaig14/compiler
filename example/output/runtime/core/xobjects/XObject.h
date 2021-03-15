@@ -31,8 +31,6 @@ public:
 
     virtual ~XObject();
 
-    virtual void mark(std::vector<XObject*>& new_root) = 0;
-
     virtual TaggedObject* __eq__(TaggedObject* pObject);
     virtual void inc_count();
     virtual void dec_count();

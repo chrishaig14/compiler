@@ -156,7 +156,8 @@ std::string Transpiler::visit_break(BreakNode& node) {
         }
     }
     out += "break";
-    return out; }
+    return out;
+}
 
 bool is_object(const TypeNode& t) {
     if (t.kind == Kind::OBJECT) {
@@ -226,7 +227,7 @@ std::string Transpiler::visit_class(ClassNode& node) {
     }
     out += "}\n";
     std::string mark;
-    mark += "void mark(std::vector<XObject*>& new_root)override{";
+    mark += "~" + class_name + "()override{";
     // void mark(std::vector<XObject*>& new_root) override {
     //         for (auto& m: this->get_members()) {
     //             if (has_tag(m, OBJECT_TAG)) {
@@ -239,23 +240,20 @@ std::string Transpiler::visit_class(ClassNode& node) {
     //         }
     // }
     for (auto m: node.members_ordered) {
-        mark += "if (has_tag(this->" + m + ", OBJECT_TAG)){XObject* element = UNTAG(this->" + m +
-                ");               if (!element->is_reachable() && !element->inserted) {\n"
-                "                      new_root.push_back(element);\n"
-                "                      element->inserted = true;\n"
-                "                  }}";
+        mark += "GC::out_of_scope(this->" + m + ");\n";
     }
     mark += "}";
     out += mark;
     std::string eq;
     eq = "TaggedObject* __eq__(TaggedObject* o) override{";
     eq += class_name + "* other = CAST(o," + class_name + ");";
+    eq += "return MAKE_BOOL(";
     for (int i = 0; i < node.members_ordered.size(); i++) {
-        eq += "if(EQ( this->" + node.members_ordered[i] + ", other->" + node.members_ordered[i] +
-              ")==FALSE) {return FALSE;}\n";
+        eq += "EQ( this->" + node.members_ordered[i] + ", other->" + node.members_ordered[i] +
+              ")==TRUE&&";
     }
-    eq += "return TRUE;";
-    eq += "}\n";
+    eq = eq.substr(0,eq.size()-2);
+    eq += ");}\n";
     out += eq;
     out += "};";
     for (auto n: node.methods) {

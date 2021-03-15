@@ -39,23 +39,6 @@ XList::XList(int n) : XObject("XList"), lv(n, nullptr) {
     this->l = &this->lv;
 }
 
-void XList::mark(std::vector<XObject*>& new_root) {
-    int list_len = this->l->size();
-    if (list_len != 0) {
-        if (has_tag((*this->l)[0], INT_TAG)) {
-            // don't gc ints as they are not heap-allocated
-        } else {
-            for (int j = 0; j < list_len; j++) {
-                XObject* element = PTR_TO_OBJ((*this->l)[j]);
-                if (!element->is_reachable() && !element->inserted) {
-                    element->set_reachable();
-                    new_root.push_back(element);
-                    element->inserted = true;
-                }
-            }
-        }
-    }
-}
 
 TaggedObject* XList::__eq__(TaggedObject* pObject) {
     XList* other = CAST(pObject, XList);

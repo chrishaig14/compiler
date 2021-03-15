@@ -17,7 +17,6 @@ public:
 
     XFile(const std::string& filename);
 
-    void mark(std::vector<XObject*>& new_root) override;
 };
 
 extern TaggedObject* function_File_read_line;

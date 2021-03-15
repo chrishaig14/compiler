@@ -36,7 +36,6 @@ XString::XString(const std::string& x) : XObject("String") {
     this->is_string = true;
 }
 
-void XString::mark(std::vector<XObject*>& x) {}
 
 TaggedObject* XString::__eq__(TaggedObject* other) {
     return MAKE_BOOL(CAST(other, XString)->s == this->s);

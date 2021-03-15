@@ -141,14 +141,6 @@ public:
     static void leave_local_scope();
 
 
-    static TaggedObject* register_object(TaggedObject* u);
-
-    static void mark(const std::vector<XObject*>& root);
-
-    static void sweep();
-
-    static void leave_scope(Scope* parent);
-
     static TaggedObject* temp(TaggedObject* obj);
     static TaggedObject* inc(TaggedObject* pObject);
     static TaggedObject* assign(TaggedObject* old_value_t, TaggedObject* new_value_t);

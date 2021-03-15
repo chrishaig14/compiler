@@ -17,7 +17,6 @@ public:
 
     XDict(std::unordered_map<TaggedObject*, TaggedObject*> v);
 
-    void mark(std::vector<XObject*>& new_root) override;
 };
 
 

@@ -27,7 +27,6 @@ public:
 
     }
 
-    void mark(std::vector<XObject*>& new_root) override;
     TaggedObject* __eq__(TaggedObject* pObject) override;
     ~XList() override;
     void inc_count() override;

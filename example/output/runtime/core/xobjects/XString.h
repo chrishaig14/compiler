@@ -17,8 +17,6 @@ public:
 
     ~XString();
 
-    void mark(std::vector<XObject*>& x) override;
-
     TaggedObject* __eq__(TaggedObject* other) override;
 };
 

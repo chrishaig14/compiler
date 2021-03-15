@@ -10,10 +10,6 @@ XFile::XFile(const std::string& filename) : XObject("File") {
     f.open(filename);
 }
 
-void XFile::mark(std::vector<XObject*>& new_root) {
-
-}
-
 TaggedObject* f_File_read_line(TaggedObject* o) {
     XFile* f = (XFile*) UNTAG(o);
     std::string line;

@@ -7,19 +7,6 @@
 
 XTuple::XTuple(const std::string& n, int num) : XObject(n), members(num, nullptr) {}
 
-void XTuple::mark(std::vector<XObject*>& new_root) {
-    for (auto& m: this->members) {
-        if (has_tag(m, OBJECT_TAG)) {
-            XObject* element = UNTAG(m);
-            if (!element->is_reachable() && !element->inserted) {
-                new_root.push_back(element);
-                element->inserted = true;
-            }
-        }
-    }
-}
-
-
 XTuple2::XTuple2(TaggedObject* mem_1, TaggedObject* mem_2) : XTuple("Tuple2", 2) {
     this->mem_1 = mem_1;
     this->mem_2 = mem_2;
@@ -34,10 +21,6 @@ TaggedObject* XTuple2::__eq__(TaggedObject* pObject) {
         return MAKE_BOOL(false);
     }
     return MAKE_BOOL(true);
-}
-
-void XTuple2::mark(std::vector<XObject*>& new_root) {
-    XTuple::mark(new_root);
 }
 
 XTuple2::~XTuple2() {
@@ -75,6 +58,3 @@ TaggedObject* XTuple3::__eq__(TaggedObject* pObject) {
     return MAKE_BOOL(true);
 }
 
-void XTuple3::mark(std::vector<XObject*>& new_root) {
-    XTuple::mark(new_root);
-}
