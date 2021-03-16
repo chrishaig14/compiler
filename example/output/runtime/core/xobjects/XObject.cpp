@@ -44,11 +44,3 @@ TaggedObject* XObject::__eq__(TaggedObject* pObject) {
     return MAKE_BOOL(false);
 }
 
-void XObject::inc_count() {
-    this->count++;
-}
-
-void XObject::dec_count(){
-    this->count--;
-}
-

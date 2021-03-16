@@ -32,8 +32,8 @@ public:
     virtual ~XObject();
 
     virtual TaggedObject* __eq__(TaggedObject* pObject);
-    virtual void inc_count();
-    virtual void dec_count();
+    inline void inc_count(){this->count++;};
+    inline void dec_count(){this->count--;};
 };
 
 TaggedObject* setr(TaggedObject* x);

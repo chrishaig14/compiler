@@ -66,12 +66,3 @@ XList::~XList() {
     }
     std::cout << "delete list of length " << this->l->size() << std::endl;
 }
-
-void XList::inc_count() {
-    this->count++;
-}
-
-void XList::dec_count() {
-    this->count--;
-}
-

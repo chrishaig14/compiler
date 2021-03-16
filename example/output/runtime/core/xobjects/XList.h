@@ -29,8 +29,6 @@ public:
 
     TaggedObject* __eq__(TaggedObject* pObject) override;
     ~XList() override;
-    void inc_count() override;
-    void dec_count() override;
 };
 
 TaggedObject* f_List_add(TaggedObject* _a, TaggedObject* _b);
