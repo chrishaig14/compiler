@@ -238,10 +238,9 @@ std::string Transpiler::visit_class(ClassNode& node) {
     eq += class_name + "* other = CAST(o," + class_name + ");";
     eq += "return MAKE_BOOL(";
     for (int i = 0; i < node.members_ordered.size(); i++) {
-        eq += "EQ( this->" + node.members_ordered[i] + ", other->" + node.members_ordered[i] +
-              ")==TRUE&&";
+        eq += "EQ( this->" + node.members_ordered[i] + ", other->" + node.members_ordered[i] + ")==TRUE&&";
     }
-    eq = eq.substr(0,eq.size()-2);
+    eq = eq.substr(0, eq.size() - 2);
     eq += ");}\n";
     out += eq;
     out += "};";
@@ -357,7 +356,9 @@ std::string Transpiler::type_mapper(const TypeNode& t) {
     return this->function_type_mapper(t.function());
 }
 
-std::string Transpiler::visit_continue(ContinueNode& node) { return ""; }
+std::string Transpiler::visit_continue(ContinueNode& node) {
+    return "";
+}
 
 std::string Transpiler::visit_declaration(DeclarationNode& node) {
     std::string out;
@@ -386,7 +387,9 @@ std::string Transpiler::visit_empty_list(EmptyListNode& node) {
     return "LIST()";
 }
 
-std::string Transpiler::visit_float(FloatNode& node) { return ""; }
+std::string Transpiler::visit_float(FloatNode& node) {
+    return "";
+}
 
 std::string Transpiler::visit_for(ForNode& node) {
     std::string out;
@@ -571,7 +574,9 @@ std::string Transpiler::visit_member(MemberNode& node) {
     return s;
 }
 
-std::string Transpiler::visit_none(NoneNode& node) { return "nullptr"; }
+std::string Transpiler::visit_none(NoneNode& node) {
+    return "nullptr";
+}
 
 std::string Transpiler::visit_number(NumberNode& node) {
     return std::string() + "MAKE_INT" + "(" + std::to_string(node.num) + ")";
@@ -636,7 +641,9 @@ std::string Transpiler::visit_tuple(TupleNode& node) {
     return out;
 }
 
-std::string Transpiler::visit_type(TypeNode& node) { return ""; }
+std::string Transpiler::visit_type(TypeNode& node) {
+    return "";
+}
 
 std::string Transpiler::visit_while(WhileNode& node) {
     std::string out;
@@ -773,7 +780,9 @@ std::string Transpiler::generate_tuple_types() {
     return out;
 }
 
-Transpiler::Transpiler() { this->is_lvalue = false; }
+Transpiler::Transpiler() {
+    this->is_lvalue = false;
+}
 
 
 std::string generate_function_class(int num_args) {

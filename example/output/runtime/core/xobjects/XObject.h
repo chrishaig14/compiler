@@ -22,8 +22,14 @@ public:
     virtual ~XObject();
 
     virtual TaggedObject* __eq__(TaggedObject* pObject);
-    inline void inc_count(){this->count++;};
-    inline void dec_count(){this->count--;};
+
+    inline void inc_count() {
+        this->count++;
+    };
+
+    inline void dec_count() {
+        this->count--;
+    };
 };
 
 #endif //XLANG_XOBJECT_H

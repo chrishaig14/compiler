@@ -11,9 +11,13 @@
 class Function0 : public XObject {
     TaggedObject* (* f)();
 public:
-    Function0() : XObject("function0") { this->f = nullptr; }
+    Function0() : XObject("function0") {
+        this->f = nullptr;
+    }
 
-    Function0(TaggedObject* (* f)()) : XObject("function0") { this->f = f; }
+    Function0(TaggedObject* (* f)()) : XObject("function0") {
+        this->f = f;
+    }
 
     virtual TaggedObject* operator()() {
         return this->f();
@@ -24,9 +28,13 @@ public:
 class Function1 : public XObject {
     TaggedObject* (* f)(TaggedObject*);
 public:
-    Function1() : XObject("function1") { this->f = nullptr; }
+    Function1() : XObject("function1") {
+        this->f = nullptr;
+    }
 
-    Function1(TaggedObject* (* f)(TaggedObject*)) : XObject("function1") { this->f = f; }
+    Function1(TaggedObject* (* f)(TaggedObject*)) : XObject("function1") {
+        this->f = f;
+    }
 
     virtual TaggedObject* operator()(TaggedObject* a0) {
         return this->f(a0);
@@ -37,14 +45,17 @@ public:
 class Function2 : public XObject {
     TaggedObject* (* f)(TaggedObject*, TaggedObject*);
 public:
-    Function2() : XObject("function2") { this->f = nullptr; }
+    Function2() : XObject("function2") {
+        this->f = nullptr;
+    }
 
-    Function2(TaggedObject* (* f)(TaggedObject*, TaggedObject*)) : XObject("function2") { this->f = f; }
+    Function2(TaggedObject* (* f)(TaggedObject*, TaggedObject*)) : XObject("function2") {
+        this->f = f;
+    }
 
     virtual TaggedObject* operator()(TaggedObject* a0, TaggedObject* a1) {
         return this->f(a0, a1);
     }
-
 
 
 };
@@ -52,9 +63,13 @@ public:
 class Function3 : public XObject {
     TaggedObject* (* f)(TaggedObject*, TaggedObject*, TaggedObject*);
 public:
-    Function3() : XObject("function3") { this->f = nullptr; }
+    Function3() : XObject("function3") {
+        this->f = nullptr;
+    }
 
-    Function3(TaggedObject* (* f)(TaggedObject*, TaggedObject*, TaggedObject*)) : XObject("function3") { this->f = f; }
+    Function3(TaggedObject* (* f)(TaggedObject*, TaggedObject*, TaggedObject*)) : XObject("function3") {
+        this->f = f;
+    }
 
     virtual TaggedObject* operator()(TaggedObject* a0, TaggedObject* a1, TaggedObject* a2) {
         return this->f(a0, a1, a2);

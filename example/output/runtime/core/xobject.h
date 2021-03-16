@@ -26,20 +26,30 @@ inline XObject* UNTAG(TaggedObject* l) {
     return (XObject*) ((unsigned long) l & 0xfffffffffffffff0);
 }
 
-inline TaggedObject* TAG(XObject* s) { return (TaggedObject*) ((unsigned long) s | OBJECT_TAG); }
+inline TaggedObject* TAG(XObject* s) {
+    return (TaggedObject*) ((unsigned long) s | OBJECT_TAG);
+}
 
 inline bool has_tag(TaggedObject* p, unsigned long tag) {
     return ((unsigned long) p & 0b1110) == tag;
 }
 
-inline TaggedObject* MAKE_INT(long x) { return (TaggedObject*) ((unsigned long) (x << 4) | INT_TAG); }
+inline TaggedObject* MAKE_INT(long x) {
+    return (TaggedObject*) ((unsigned long) (x << 4) | INT_TAG);
+}
 
-inline TaggedObject* MAKE_BOOL(bool x) { return (TaggedObject*) (unsigned long) (x ? TRUE_TAG : FALSE_TAG); }
+inline TaggedObject* MAKE_BOOL(bool x) {
+    return (TaggedObject*) (unsigned long) (x ? TRUE_TAG : FALSE_TAG);
+}
 
-inline bool GET_BOOL(TaggedObject* x) { return (unsigned long) x == TRUE_TAG; }
+inline bool GET_BOOL(TaggedObject* x) {
+    return (unsigned long) x == TRUE_TAG;
+}
 
 
-inline long GET_INT(TaggedObject* x) { return (long) x >> 4; };
+inline long GET_INT(TaggedObject* x) {
+    return (long) x >> 4;
+};
 
 
 #endif //UNTITLED1_XOBJECT_H

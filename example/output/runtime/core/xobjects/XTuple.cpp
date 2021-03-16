@@ -5,13 +5,14 @@
 #include "XTuple.h"
 #include "../basics.h"
 
-XTuple::XTuple(const std::string& n, int num) : XObject(n), members(num, nullptr) {}
+XTuple::XTuple(const std::string& n, int num) : XObject(n), members(num, nullptr) {
+}
 
 XTuple2::XTuple2(TaggedObject* mem_1, TaggedObject* mem_2) : XTuple("Tuple2", 2) {
-    if (has_tag(mem_1,OBJECT_TAG)){
+    if (has_tag(mem_1, OBJECT_TAG)) {
         UNTAG(mem_1)->inc_count();
     }
-    if (has_tag(mem_2,OBJECT_TAG)){
+    if (has_tag(mem_2, OBJECT_TAG)) {
         UNTAG(mem_2)->inc_count();
     }
     this->mem_1 = mem_1;
