@@ -26,11 +26,6 @@ inline XObject* UNTAG(TaggedObject* l) {
     return (XObject*) ((unsigned long) l & 0xfffffffffffffff0);
 }
 
-
-inline XObject* PTR_TO_OBJ(TaggedObject* x) {
-    return (XObject*) ((unsigned long) x & 0xfffffffffffffff0);
-}
-
 inline TaggedObject* TAG(XObject* s) { return (TaggedObject*) ((unsigned long) s | OBJECT_TAG); }
 
 inline bool has_tag(TaggedObject* p, unsigned long tag) {
