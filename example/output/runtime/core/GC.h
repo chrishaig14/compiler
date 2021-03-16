@@ -20,7 +20,6 @@ public:
     }
 
     std::unordered_map<std::string, XObject*> vars;
-    // std::vector<XObject*> reachable;
 
     void declare(const std::string& n, XObject* v) {
         this->vars[n] = v;
@@ -39,62 +38,7 @@ public:
         return new_value_t;
     }
 
-    void get_reachable() {
-        // this->reachable.resize(this->vars.size(), nullptr);
-        // int c = 0;
-        for (auto v: this->vars) {
-            XObject* obj = v.second;
-            obj->set_reachable();
-            // this->reachable[c] = obj;
-            // c++;
-            // if (obj->is_reachable()) {
-            //     already in reachable list, don't add again
-            // } else {
-            //     obj->set_reachable();
-            //     this->reachable[c] = obj;
-            //     c++;
-            // }
-        }
-        if (this->parent != nullptr) {
-            this->parent->get_reachable();
-            // this->reachable.insert(this->reachable.end(), parent_reachable.begin(), parent_reachable.end());
-        }
-        // return this->reachable;
-        // int c = 0;
-        // std::vector<XObject*> extra(this->vars.size(), nullptr);
-        // for (auto v: this->vars) {
-        //     XObject* obj = v.second;
-        //     if (obj->is_reachable()) {
-        //         // already in reachable list, don't add again
-        //     } else {
-        //         obj->set_reachable();
-        //         extra[c] = obj;
-        //         c++;
-        //     }
-        // }
-        // this->reachable = std::vector<XObject*>(extra.begin(), extra.begin() + c);
-        // if (this->parent != nullptr) {
-        //     const std::vector<XObject*>& reachable_parent = this->parent->get_reachable();
-        //     std::vector<XObject*> extra_p(this->vars.size(), nullptr);
-        //     int k = 0;
-        //     for (auto obj: reachable_parent) {
-        //         if (obj->is_reachable()) {
-        //             // already in reachable list, don't add again
-        //         } else {
-        //             obj->set_reachable();
-        //             extra_p[k] = obj;
-        //             k++;
-        //         }
-        //     }
-        //     this->reachable.insert(this->reachable.end(), extra_p.begin(), extra_p.begin() + k);
-        // }
-
-        // return this->
-        //         reachable;
-    }
-
     Scope* parent;
-// std::vector<XObject*> objects;
 };
 
 class Frame {

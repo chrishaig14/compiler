@@ -228,17 +228,6 @@ std::string Transpiler::visit_class(ClassNode& node) {
     out += "}\n";
     std::string mark;
     mark += "~" + class_name + "()override{";
-    // void mark(std::vector<XObject*>& new_root) override {
-    //         for (auto& m: this->get_members()) {
-    //             if (has_tag(m, OBJECT_TAG)) {
-    //                 XObject* element = UNTAG(m);
-    //                 if (!element->is_reachable() && !element->inserted) {
-    //                     new_root.push_back(element);
-    //                     element->inserted = true;
-    //                 }
-    //             }
-    //         }
-    // }
     for (auto m: node.members_ordered) {
         mark += "GC::out_of_scope(this->" + m + ");\n";
     }

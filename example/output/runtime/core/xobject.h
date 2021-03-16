@@ -16,7 +16,6 @@
 #define FALSE_TAG 0b0100
 #define INT_TAG 0b0110
 #define OBJECT_TAG 0b1100
-#define REACHABLE_FLAG 0b0001
 #define CAST(ptr, cls) ((cls*)UNTAG(ptr))
 
 extern TaggedObject* TRUE;
@@ -37,15 +36,6 @@ inline TaggedObject* TAG(XObject* s) { return (TaggedObject*) ((unsigned long) s
 inline bool has_tag(TaggedObject* p, unsigned long tag) {
     return ((unsigned long) p & 0b1110) == tag;
 }
-
-inline bool is_reachable(XObject* p) {
-    return ((unsigned long) p & 0b1);
-}
-
-inline void set_reachable(XObject** p) {
-    *p = (XObject*) ((unsigned long) *p | 0b1);
-}
-
 
 inline TaggedObject* MAKE_INT(long x) { return (TaggedObject*) ((unsigned long) (x << 4) | INT_TAG); }
 

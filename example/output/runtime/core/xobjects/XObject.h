@@ -11,23 +11,13 @@
 class TaggedObject;
 
 class XObject {
-private:
-    bool reachable;
 public:
-    bool inserted;
     bool is_list;
-    bool is_user;
     bool is_string;
     int count;
     std::string class_name;
 
     XObject(std::string class_name);
-
-    void set_reachable();
-
-    void reset_reachable();
-
-    bool is_reachable();
 
     virtual ~XObject();
 
@@ -36,5 +26,4 @@ public:
     inline void dec_count(){this->count--;};
 };
 
-TaggedObject* setr(TaggedObject* x);
 #endif //XLANG_XOBJECT_H
