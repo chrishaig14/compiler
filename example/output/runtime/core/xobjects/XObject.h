@@ -14,7 +14,7 @@ class XObject {
 public:
     bool is_list;
     bool is_string;
-    int count;
+    unsigned long count;
     std::string class_name;
 
     XObject(std::string class_name);
@@ -24,11 +24,13 @@ public:
     virtual TaggedObject* __eq__(TaggedObject* pObject);
 
     inline void inc_count() {
-        this->count++;
+        unsigned long tag = this->count & ((unsigned long) 1 << 63);
+        this->count = tag + (this->count & ~((unsigned long) 1 << 63)) + 1;
     };
 
     inline void dec_count() {
-        this->count--;
+        unsigned long tag = this->count & ((unsigned long) 1 << 63);
+        this->count = tag + (this->count & ~((unsigned long) 1 << 63)) - 1;
     };
 };
 

@@ -37,9 +37,22 @@ void GC::out_of_scope(TaggedObject* old_value_t) {
         if (has_tag(old_value_t, OBJECT_TAG)) {
             XObject* old = UNTAG(old_value_t);
             old->dec_count();
-            if (old->count == 0) {
+            if (old->count == 0) { // doesnt have tag
                 delete old;
+            } else if (old->count & (unsigned long) 1 << 63) {
+                old->count = old->count & ~((unsigned long) 1 << 63);
             }
         }
     }
+}
+
+TaggedObject* GC::set_return(TaggedObject* obj) {
+    if (obj != nullptr) {
+        if (has_tag(obj, OBJECT_TAG)) {
+            if (UNTAG(obj)->count != 0) {
+                UNTAG(obj)->count = UNTAG(obj)->count | ((unsigned long) 1 << 63);
+            }
+        }
+    }
+    return obj;
 }

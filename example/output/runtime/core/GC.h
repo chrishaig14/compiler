@@ -72,6 +72,8 @@ public:
     static TaggedObject* declare(TaggedObject* obj);
     static TaggedObject* assign(TaggedObject* old_value_t, TaggedObject* new_value_t);
     static void out_of_scope(TaggedObject* old_value_t);
+
+    static TaggedObject* set_return(TaggedObject* obj);
 };
 
 #endif //UNTITLED1_GC_H

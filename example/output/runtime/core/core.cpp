@@ -18,7 +18,7 @@ TaggedObject* f_print(TaggedObject* _s) {
     GC::declare(_s);
     XString* s = CAST(_s, XString);
     std::cout << s->s << std::endl;
-    GC::assign(_s, nullptr);
+    GC::out_of_scope(_s);
     return nullptr;
 }
 
