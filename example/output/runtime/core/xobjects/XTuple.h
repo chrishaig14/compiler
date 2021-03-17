@@ -9,32 +9,25 @@
 #include "../xobject.h"
 #include <assert.h>
 
-class XTuple : public XObject {
-public:
-
-    std::vector<TaggedObject*> members;
-
-    XTuple(const std::string& n, int num);
-
-};
-
-class XTuple2 : public XTuple {
+class XTuple2 : public XObject {
 public:
     TaggedObject* mem_1;
     TaggedObject* mem_2;
-    XTuple2(TaggedObject* mem_1, TaggedObject* mem_2);
     TaggedObject* __eq__(TaggedObject* pObject) override;
     ~XTuple2() override;
+
+    XTuple2(TaggedObject* mem_1, TaggedObject* mem_2);
 };
 
-class XTuple3 : public XTuple {
+class XTuple3 : public XObject {
 public:
     TaggedObject* mem_1;
     TaggedObject* mem_2;
     TaggedObject* mem_3;
-    XTuple3(TaggedObject* mem_1, TaggedObject* mem_2, TaggedObject* mem_3);
     TaggedObject* __eq__(TaggedObject* pObject) override;
+    ~XTuple3() override;
 
+    XTuple3(TaggedObject* mem_1, TaggedObject* mem_2, TaggedObject* mem_3);
 };
 
 
