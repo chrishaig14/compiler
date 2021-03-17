@@ -78,41 +78,6 @@ TaggedObject* op_gt(TaggedObject* a, TaggedObject* b) {
     return MAKE_BOOL(GET_INT(a) > GET_INT(b));
 }
 
-TaggedObject* op_eq(TaggedObject* a, TaggedObject* b) {
-    if (has_tag(a, INT_TAG)) {
-        return MAKE_BOOL(GET_INT(a) == GET_INT(b));
-    }
-    XObject* oa = UNTAG(a);
-    XObject* ob = UNTAG(b);
-    bool r = true;
-    if (oa->is_string) {
-        r = ((XString*) (oa))->s == ((XString*) (ob))->s;
-    } else if (oa->is_list) {
-        XList* la = (XList*) oa;
-        XList* lb = (XList*) ob;
-        if (la->l->size() != lb->l->size()) {
-            r = false;
-        } else {
-            for (int i = 0; i < la->l->size(); i++) {
-                if (!GET_BOOL(op_eq((*la->l)[i], (*lb->l)[i]))) {
-                    r = false;
-                    break;
-                }
-            }
-        }
-    } else {
-        XTuple* ta = (XTuple*) oa;
-        XTuple* tb = (XTuple*) ob;
-        for (int i = 0; i < ta->members.size(); i++) {
-            if (!GET_BOOL(op_eq(ta->members[i], tb->members[i]))) {
-                r = false;
-                break;
-            }
-        }
-    }
-    return MAKE_BOOL(r);
-}
-
 TaggedObject* op_neq(TaggedObject* a, TaggedObject* b) {
     return MAKE_BOOL(GET_INT(a) != GET_INT(b));
 }
