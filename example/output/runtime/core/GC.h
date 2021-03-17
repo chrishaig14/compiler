@@ -67,31 +67,11 @@ public:
 
 
 class GC {
-    static std::vector<XObject*> all_objects;
-    static Scope* current_scope;
-    static Frame* frame;
-    static std::vector<Frame*> frames;
 public:
-    static void enter_local_scope();
-
-    static void enter_function(std::string function_name);
-
-    static TaggedObject* function_return(TaggedObject* f);
 
     static TaggedObject* declare(TaggedObject* obj);
-
-    static void set(const std::string& n, TaggedObject* obj);
-
-    static void leave_local_scope();
-
-
-    static TaggedObject* temp(TaggedObject* obj);
-    static TaggedObject* inc(TaggedObject* pObject);
     static TaggedObject* assign(TaggedObject* old_value_t, TaggedObject* new_value_t);
     static void out_of_scope(TaggedObject* old_value_t);
 };
-
-
-// std::vector<XObject*>* GC::survivors = new std::vector<XObject*>();
 
 #endif //UNTITLED1_GC_H
