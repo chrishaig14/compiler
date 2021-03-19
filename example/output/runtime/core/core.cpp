@@ -49,13 +49,17 @@ TaggedObject* f_Boolean_str(TaggedObject* _i) {
 }
 
 TaggedObject* f_map(TaggedObject* _l, TaggedObject* _f) {
-    std::vector<TaggedObject*>* l = (std::vector<TaggedObject*>*) _l;
-    Function1* f = (Function1*) (_f);
-    std::vector<TaggedObject*>* r = new std::vector<TaggedObject*>();
-    for (int i = 0; i < l->size(); i++) {
-        r->push_back((*f)((*l)[i]));
+    GC::declare(_l);
+    XList* l = CAST(_l, XList);
+    Function1* f = CAST(_f, Function1);
+    TaggedObject* _r = NEW(XList, l->l->size());
+    XList* r = CAST(_r, XList);
+    for (int i = 0; i < l->l->size(); i++) {
+        TaggedObject* p = (*f)((*(l->l))[i]);
+        r->l->at(i)=p;
     }
-    return nullptr;
+    GC::out_of_scope(_l);
+    return _r;
     // return NEW(XList, r);
 }
 
