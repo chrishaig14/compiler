@@ -17,8 +17,11 @@ TaggedObject* f_String_add(TaggedObject* _a, TaggedObject* _b) {
 }
 
 TaggedObject* f_String_len(TaggedObject* _a) {
+    GC::declare(_a);
     XString* a = (XString*) UNTAG(_a);
-    return MAKE_INT(a->s.size());
+    TaggedObject* r = MAKE_INT(a->s.size());
+    GC::out_of_scope(_a);
+    return r;
 }
 
 
