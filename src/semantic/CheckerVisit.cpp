@@ -1088,6 +1088,7 @@ USemanticInfo Checker::visit(ReturnNode& n) {
         this->failed = true;
         return this->error();
     }
+    n.ret_type = return_type.clone();
     n.reachables = this->scope->get_all();
     return nullptr;
 }

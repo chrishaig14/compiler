@@ -585,7 +585,11 @@ std::string Transpiler::visit_number(NumberNode& node) {
 std::string Transpiler::visit_return(ReturnNode& node) {
     std::string out;
     if (node.expression != nullptr) {
-        out += "TaggedObject* __return__ = GC::declare(" + this->dispatch(node.expression) + ");";
+        if (is_object(*node.ret_type)) {
+            out += "TaggedObject* __return__ = GC::set_return(" + this->dispatch(node.expression) + ");";
+        } else {
+            out += "TaggedObject* __return__ = " + this->dispatch(node.expression) + ";";
+        }
     } else {
         out += "TaggedObject* __return__ = nullptr";
     }

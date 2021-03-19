@@ -11,9 +11,11 @@
 
 class ReturnNode : public Node {
 public:
+    TypeNode* ret_type;
     explicit ReturnNode(Node* expression, TextPosition start);
 
-    explicit ReturnNode(Node* expression) : ReturnNode(expression, {-1, -1}) {}
+    explicit ReturnNode(Node* expression) : ReturnNode(expression, {-1, -1}) {
+    }
 
     bool equal(const Node& other) const;
 
@@ -26,7 +28,7 @@ public:
     const ReturnNode& retrn() const override;
 
     Node* expression;
-    std::vector<std::pair<std::string,TypeNode*>> reachables;
+    std::vector<std::pair<std::string, TypeNode*>> reachables;
 };
 
 #endif //RETURNNODE_H
