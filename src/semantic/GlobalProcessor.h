@@ -49,5 +49,4 @@ public:
 
     std::string __file__;
 };
-
 #endif //GLOBALPROCESSOR_H

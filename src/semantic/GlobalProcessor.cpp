@@ -8,22 +8,7 @@
 #include "../logging/logging.h"
 #include "../scanner/Scanner.h"
 #include "../parser/Parser.h"
-
-TypeNode* parse_type(const std::string& s) {
-    Scanner scanner;
-    scanner.load_text(s);
-    std::vector<Token> tokens = scanner.scan_all();
-    Parser parser("", scanner.code_lines, tokens);
-    return parser.parse_type_node();
-}
-
-FunctionType* parse_function_type(const std::string& s) {
-    Scanner scanner;
-    scanner.load_text(s);
-    std::vector<Token> tokens = scanner.scan_all();
-    Parser parser("", scanner.code_lines, tokens);
-    return parser.parse_function_type();
-}
+#include "util.h"
 
 void GlobalProcessor::add_builtins(std::vector<Builtin>& builtins) {
     for (int i = 0; i < builtins.size(); i++) {

@@ -95,26 +95,26 @@ add_library(
 add_library(parser parser/Parser.cpp parser/Parser.h parser/ParserErrors.cpp)
 
 add_library(
-  srcLib
-  logging/logging.cpp
-  semantic/ClassTable.cpp
-  semantic/ClassTable.h
-  semantic/SymbolTable.cpp
-  semantic/SymbolTable.h
-  semantic/GlobalProcessor.cpp
-  utils.h
-  utils.cpp
-  semantic/SemanticInfo.cpp
-  semantic/SemanticInfo.h
-  semantic/ClassInfo.cpp
-  semantic/ClassInfo.h
-  semantic/Checker.cpp
-  semantic/Checker.h
-  nodes/node_types.h
-  types.h
-  macros.h
-  semantic/CheckerErrors.cpp
-  semantic/CheckerVisit.cpp
-  semantic/CheckerUnify.cpp)
+        srcLib
+        logging/logging.cpp
+        semantic/ClassTable.cpp
+        semantic/ClassTable.h
+        semantic/SymbolTable.cpp
+        semantic/SymbolTable.h
+        semantic/GlobalProcessor.cpp
+        utils.h
+        utils.cpp
+        semantic/SemanticInfo.cpp
+        semantic/SemanticInfo.h
+        semantic/ClassInfo.cpp
+        semantic/ClassInfo.h
+        semantic/Checker.cpp
+        semantic/Checker.h
+        nodes/node_types.h
+        types.h
+        macros.h
+        semantic/CheckerErrors.cpp
+        semantic/CheckerVisit.cpp
+        semantic/CheckerUnify.cpp semantic/util.cpp semantic/util.h)
 
 add_library(transpiler transpiler/Transpiler.cpp transpiler/Transpiler.h)

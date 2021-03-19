@@ -3,6 +3,7 @@
 #include "Checker.h"
 #include "../macros.h"
 #include "../logging/logging.h"
+#include "util.h"
 
 bool function_is_generic(const FunctionType& ft) {
     for (auto param_type: ft.param_types) {
@@ -36,35 +37,35 @@ ClassInfo* make_list_class_info() {
 ClassInfo* make_file_class_info() {
     auto int_class_info = new ClassInfo();
     int_class_info->class_name = "File";
-    int_class_info->methods.insert(std::make_pair("read_line", new FunctionType({}, new T_STRING)));
+    int_class_info->methods.insert(std::make_pair("read_line", parse_function_type("fun()->String")));
     return int_class_info;
 }
 
 ClassInfo* make_int_class_info() {
     auto int_class_info = new ClassInfo();
     int_class_info->class_name = "Integer";
-    int_class_info->methods.insert(std::make_pair("str", new FunctionType({}, new T_STRING)));
+    int_class_info->methods.insert(std::make_pair("str", parse_function_type("fun()->String")));
     return int_class_info;
 }
 
 ClassInfo* make_boolean_class_info() {
     auto int_class_info = new ClassInfo();
     int_class_info->class_name = "Boolean";
-    int_class_info->methods.insert(std::make_pair("str", new FunctionType({}, new T_STRING)));
+    int_class_info->methods.insert(std::make_pair("str", parse_function_type("fun()->String")));
     return int_class_info;
 }
 
 ClassInfo* make_float_class_info() {
     auto float_class_info = new ClassInfo();
     float_class_info->class_name = "Float";
-    float_class_info->methods.insert(std::make_pair("str", new FunctionType({}, new T_STRING)));
+    float_class_info->methods.insert(std::make_pair("str", parse_function_type("fun()->String")));
     return float_class_info;
 }
 
 ClassInfo* make_string_class_info() {
     auto string_class_info = new ClassInfo();
     string_class_info->class_name = "String";
-    string_class_info->methods.insert(std::make_pair("len", new FunctionType({}, new T_INT)));
+    string_class_info->methods.insert(std::make_pair("len", parse_function_type("fun()->Integer")));
     return string_class_info;
 }
 
