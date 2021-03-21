@@ -52,14 +52,12 @@ USemanticInfo Checker::visit(WhileNode& node) {
 USemanticInfo Checker::visit(NumberNode& node) {
     SemanticInfo info;
     info.set_type(T_INT);
-    info.is_function = false;
     return std::make_unique<SemanticInfo>(info);
 }
 
 USemanticInfo Checker::visit(StringNode& node) {
     SemanticInfo info;
     info.set_type(T_STRING);
-    info.is_function = false;
     return std::make_unique<SemanticInfo>(info);
 }
 
@@ -73,11 +71,9 @@ USemanticInfo Checker::visit(SubscriptNode& node) {
     SemanticInfo info;
     const ObjectType& object_type = parent.type().object();
 
-    if (object_type.id == "String") {
-        if (this->is_lvalue) {
-            this->error_string_immutable(node.start);
-            return this->error();
-        }
+    if (this->is_lvalue && object_type == T_STRING) {
+        this->error_string_immutable(node.start);
+        return this->error();
     }
 
     VectorOfTypes children;
