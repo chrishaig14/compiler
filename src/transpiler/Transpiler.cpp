@@ -233,16 +233,19 @@ std::string Transpiler::visit_class(ClassNode& node) {
     }
     mark += "}";
     out += mark;
+    std::string f_eq = "f_" + node.class_name + "__eq__";
+    out += "TaggedObject* __eq__(TaggedObject* other) override {return " + f_eq + "(TAG(this), other);}";
     std::string eq;
-    eq = "TaggedObject* __eq__(TaggedObject* o) override{";
-    eq += class_name + "* other = CAST(o," + class_name + ");";
+    eq = "TaggedObject* " + f_eq + "(TaggedObject* _a, TaggedObject* _b) {";
+    eq += class_name + "* a = CAST(_a," + class_name + ");";
+    eq += class_name + "* b = CAST(_b," + class_name + ");";
     eq += "return MAKE_BOOL(";
     for (int i = 0; i < node.members_ordered.size(); i++) {
-        eq += "EQ( this->" + node.members_ordered[i] + ", other->" + node.members_ordered[i] + ")==TRUE&&";
+        eq += "EQ( a->" + node.members_ordered[i] + ", b->" + node.members_ordered[i] + ")==TRUE&&";
     }
     eq = eq.substr(0, eq.size() - 2);
     eq += ");}\n";
-    out += eq;
+    // out += eq;
     out += "};";
     for (auto n: node.methods) {
         std::string method_name = n.second->identifier;
@@ -253,6 +256,10 @@ std::string Transpiler::visit_class(ClassNode& node) {
         }
         out += this->dispatch(n.second);
     }
+    out += eq;
+    out = "TaggedObject* " + f_eq + "(TaggedObject* a,TaggedObject* b);" + out;
+    out += "Function2 " + f_eq+"_f" + " = Function2(" + f_eq + ");";
+    out += "TaggedObject* function_" + node.class_name + "__eq__ = TAG(&" + f_eq+"_f" + ");";
     return out;
 }
 
