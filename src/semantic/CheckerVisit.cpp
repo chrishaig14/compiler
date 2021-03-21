@@ -169,6 +169,33 @@ USemanticInfo Checker::visit(EmptyListNode& node) {
     return std::make_unique<SemanticInfo>(info);
 }
 
+FunctionNode* generate_eq_method(std::string class_name, VectorOfTypes tp, VectorOfStrings members_ordered) {
+    auto eq_body = new BlockNode({});
+    std::string eq_method_name = "eq";
+    auto eq_meth = new FunctionNode(eq_method_name, {"other"}, {new ObjectType(class_name, tp)}, new T_BOOL, eq_body);
+    auto cmp_node = new BoolOpNode(BoolOp::EQ,
+                                   new MemberNode(new IdNode("this"), members_ordered[0]),
+                                   new MemberNode(new IdNode("other"), members_ordered[0]));
+
+    for (int i = 1; i < members_ordered.size(); i++) {
+        cmp_node = new BoolOpNode(BoolOp::AND,
+                                  cmp_node,
+                                  new BoolOpNode(BoolOp::EQ,
+                                                 new MemberNode(new IdNode("this"), members_ordered[i]),
+                                                 new MemberNode(new IdNode("other"), members_ordered[i])));
+    }
+    eq_body->nodes.push_back(new ReturnNode(cmp_node));
+    return eq_meth;
+}
+
+FunctionNode* generate_str_method(std::string class_name) {
+    auto eq_body = new BlockNode({});
+    std::string eq_method_name = "str";
+    auto eq_meth = new FunctionNode(eq_method_name, {}, {}, new T_STRING, eq_body);
+    eq_body->nodes.push_back(new ReturnNode(new StringNode("<" + class_name + " object>")));
+    return eq_meth;
+}
+
 USemanticInfo Checker::visit(ClassNode& node) {
     this->current_class = node.class_name;
     this->add_this = true;
@@ -195,28 +222,45 @@ USemanticInfo Checker::visit(ClassNode& node) {
         this->visit(*method.second);
         has_init = has_init || method.first == "init";
     }
-    auto eq_body = new BlockNode({});
     std::string eq_method_name = "eq";
-    auto eq_meth = new FunctionNode(eq_method_name,
-                                    {"other"},
-                                    {new ObjectType(node.class_name, tp)},
-                                    new T_BOOL,
-                                    eq_body);
-    auto cmp_node = new BoolOpNode(BoolOp::EQ,
-                                   new MemberNode(new IdNode("this"), node.members_ordered[0]),
-                                   new MemberNode(new IdNode("other"), node.members_ordered[0]));
-
-    for (int i = 1; i < node.members_ordered.size(); i++) {
-        cmp_node = new BoolOpNode(BoolOp::AND,
-                                  cmp_node,
-                                  new BoolOpNode(BoolOp::EQ,
-                                                 new MemberNode(new IdNode("this"), node.members_ordered[i]),
-                                                 new MemberNode(new IdNode("other"), node.members_ordered[i])));
+    if (node.methods.find(eq_method_name) == node.methods.end()) {
+        auto eq_meth = generate_eq_method(node.class_name, tp, node.members_ordered);
+        node.methods[eq_method_name] = eq_meth;
+        this->is_method = true;
+        this->visit(*eq_meth);
+    } else {
+        bool error = false;
+        if (*node.methods[eq_method_name]->parameter_types[0] != *this->this_type) {
+            error = true;
+        }
+        if (*node.methods[eq_method_name]->return_type != T_BOOL) {
+            error = true;
+        }
+        if (error) {
+            std::string eq_method_type_string = "fun (" + this->this_type->to_string() + ") -> Boolean";
+            throw std::runtime_error("eq method MUST be of type " + eq_method_type_string);
+        }
     }
-    eq_body->nodes.push_back(new ReturnNode(cmp_node));
-    node.methods[eq_method_name] = eq_meth;
-    this->is_method = true;
-    this->visit(*eq_meth);
+    std::string str_method_name = "str";
+    if (node.methods.find(str_method_name) == node.methods.end()) {
+        auto str_meth = generate_str_method(node.class_name);
+        node.methods[str_method_name] = str_meth;
+        this->is_method = true;
+        this->visit(*str_meth);
+    } else {
+        bool error = false;
+        if (node.methods[str_method_name]->parameter_types.size() != 0) {
+            error = true;
+        }
+        if (*node.methods[str_method_name]->return_type != T_STRING) {
+            error = true;
+        }
+        if (error) {
+            std::string str_method_type_string = "fun () -> String";
+            throw std::runtime_error("str method MUST be of type " + str_method_type_string);
+        }
+    }
+
     if (!has_init) {
         BlockNode* init_body = new BlockNode({});
         for (auto mt: node.members_ordered) {
@@ -437,7 +481,7 @@ USemanticInfo Checker::visit(CallNode& n) {
             retv.set_type(*copy_ftn.clone());
             object_node = member_node.parent;
         } else {
-            n.function = new IdNode("function_"+fun_info.class_info->class_name + "_" + member_node.s_child);
+            n.function = new IdNode("function_" + fun_info.class_info->class_name + "_" + member_node.s_child);
             this->replace_me = false;
             const FunctionType& ftn = fun_info.type().function();
             FunctionType& copy_ftn = ftn.clone()->function();
