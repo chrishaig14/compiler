@@ -198,6 +198,47 @@ std::string Transpiler::visit_class_literal_field(ClassLiteralFieldNode& node) {
     return out;
 }
 
+std::string generate_destructor(std::string class_name, VectorOfStrings members) {
+    std::string destructor;
+    destructor += "~" + class_name + "()override{";
+    for (auto m: members) {
+        destructor += "GC::out_of_scope(this->" + m + ");\n";
+    }
+    destructor += "}";
+    return destructor;
+}
+
+std::string generate_eq(std::string class_name, VectorOfStrings members) {
+    std::string f_eq = "f_" + class_name + "__eq__";
+    std::string eq;
+    eq = "TaggedObject* " + f_eq + "(TaggedObject* _a, TaggedObject* _b) {";
+    eq += class_name + "* a = CAST(_a," + class_name + ");";
+    eq += class_name + "* b = CAST(_b," + class_name + ");";
+    eq += "return MAKE_BOOL(";
+    for (int i = 0; i < members.size(); i++) {
+        eq += "EQ( a->" + members[i] + ", b->" + members[i] + ")==TRUE&&";
+    }
+    eq = eq.substr(0, eq.size() - 2);
+    eq += ");}\n";
+    return eq;
+}
+
+std::string generate_constructor(std::string class_name, VectorOfStrings members) {
+    std::string out = class_name + "(";
+    for (int i = 0; i < members.size(); i++) {
+        out += "TaggedObject* " + members[i] + ", ";
+    }
+    out = out.substr(0, out.size() - 2);
+    out += "):";
+    out += "XObject(\"" + class_name + "\")";
+    out += "{\n";
+    for (int i = 0; i < members.size(); i++) {
+        out += "this->" + members[i] + " = " + members[i] + ";\n";
+    }
+    out += "}\n";
+    return out;
+}
+
 std::string Transpiler::visit_class(ClassNode& node) {
     std::string out;
     this->method_class = node.class_name;
@@ -210,38 +251,10 @@ std::string Transpiler::visit_class(ClassNode& node) {
         out += "TaggedObject* " + node.members_ordered[i] + ";\n";
     }
     out += "\n";
-    out += class_name + "(";
-    for (int i = 0; i < node.members_ordered.size(); i++) {
-        out += "TaggedObject* " + node.members_ordered[i] + ", ";
-    }
-    out = out.substr(0, out.size() - 2);
-    out += "):";
-    out += "XObject(\"" + class_name + "\")";
-    out += "{\n";
-    for (int i = 0; i < node.members_ordered.size(); i++) {
-        out += "this->" + node.members_ordered[i] + " = " + node.members_ordered[i] + ";\n";
-    }
-    out += "}\n";
-    std::string mark;
-    mark += "~" + class_name + "()override{";
-    for (auto m: node.members_ordered) {
-        mark += "GC::out_of_scope(this->" + m + ");\n";
-    }
-    mark += "}";
-    out += mark;
-    std::string f_eq = "f_" + node.class_name + "__eq__";
+    out += generate_constructor(class_name, node.members_ordered);
+    out += generate_destructor(class_name, node.members_ordered);
+    std::string f_eq = "f_" + class_name + "__eq__";
     out += "TaggedObject* __eq__(TaggedObject* other) override {return " + f_eq + "(TAG(this), other);}";
-    std::string eq;
-    eq = "TaggedObject* " + f_eq + "(TaggedObject* _a, TaggedObject* _b) {";
-    eq += class_name + "* a = CAST(_a," + class_name + ");";
-    eq += class_name + "* b = CAST(_b," + class_name + ");";
-    eq += "return MAKE_BOOL(";
-    for (int i = 0; i < node.members_ordered.size(); i++) {
-        eq += "EQ( a->" + node.members_ordered[i] + ", b->" + node.members_ordered[i] + ")==TRUE&&";
-    }
-    eq = eq.substr(0, eq.size() - 2);
-    eq += ");}\n";
-    // out += eq;
     out += "};";
     for (auto n: node.methods) {
         std::string method_name = n.second->identifier;
@@ -252,10 +265,10 @@ std::string Transpiler::visit_class(ClassNode& node) {
         }
         out += this->dispatch(n.second);
     }
-    out += eq;
+    out += generate_eq(class_name, node.members_ordered);
     out = "TaggedObject* " + f_eq + "(TaggedObject* a,TaggedObject* b);" + out;
-    out += "Function2 " + f_eq+"_f" + " = Function2(" + f_eq + ");";
-    out += "TaggedObject* function_" + node.class_name + "__eq__ = TAG(&" + f_eq+"_f" + ");";
+    out += "Function2 " + f_eq + "_f" + " = Function2(" + f_eq + ");";
+    out += "TaggedObject* function_" + node.class_name + "__eq__ = TAG(&" + f_eq + "_f" + ");";
     return out;
 }
 
