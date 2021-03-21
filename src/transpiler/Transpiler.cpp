@@ -105,7 +105,7 @@ std::string Transpiler::visit_bool_op(BoolOpNode& node) {
     std::string op;
     switch (node.op) {
         case BoolOp::EQ:
-            op += "__eq__";
+            op += "eq";
             break;
         case BoolOp::AND:
             op += "&&";
@@ -129,12 +129,13 @@ std::string Transpiler::visit_bool_op(BoolOpNode& node) {
             op += "__neq__";
             break;
     }
-    if (op == "__eq__" || op == "__neq__") {
+    std::string eq_method_name = "eq";
+    if (op == eq_method_name || op == "__neq__") {
         if (is_generic(*node.ltype)) {
             return "EQ(" + this->dispatch(node.left) + "," + this->dispatch(node.right) + ")";
         } else {
-            return "CALL2(function_" + node.ltype->object().id + "__eq__," + this->dispatch(node.left) + "," +
-                   this->dispatch(node.right) + ")";
+            return "CALL2(function_" + node.ltype->object().id + "_" + eq_method_name + "," +
+                   this->dispatch(node.left) + ", " + this->dispatch(node.right) + ")";
         }
     }
     if (node.op == BoolOp::AND || node.op == BoolOp::OR) {
@@ -208,20 +209,6 @@ std::string generate_destructor(std::string class_name, VectorOfStrings members)
     return destructor;
 }
 
-std::string generate_eq(std::string class_name, VectorOfStrings members) {
-    std::string f_eq = "f_" + class_name + "__eq__";
-    std::string eq;
-    eq = "TaggedObject* " + f_eq + "(TaggedObject* _a, TaggedObject* _b) {";
-    eq += class_name + "* a = CAST(_a," + class_name + ");";
-    eq += class_name + "* b = CAST(_b," + class_name + ");";
-    eq += "return MAKE_BOOL(";
-    for (int i = 0; i < members.size(); i++) {
-        eq += "EQ( a->" + members[i] + ", b->" + members[i] + ")==TRUE&&";
-    }
-    eq = eq.substr(0, eq.size() - 2);
-    eq += ");}\n";
-    return eq;
-}
 
 std::string generate_constructor(std::string class_name, VectorOfStrings members) {
     std::string out = class_name + "(";
@@ -253,8 +240,6 @@ std::string Transpiler::visit_class(ClassNode& node) {
     out += "\n";
     out += generate_constructor(class_name, node.members_ordered);
     out += generate_destructor(class_name, node.members_ordered);
-    std::string f_eq = "f_" + class_name + "__eq__";
-    out += "TaggedObject* __eq__(TaggedObject* other) override {return " + f_eq + "(TAG(this), other);}";
     out += "};";
     for (auto n: node.methods) {
         std::string method_name = n.second->identifier;
@@ -265,10 +250,6 @@ std::string Transpiler::visit_class(ClassNode& node) {
         }
         out += this->dispatch(n.second);
     }
-    out += generate_eq(class_name, node.members_ordered);
-    out = "TaggedObject* " + f_eq + "(TaggedObject* a,TaggedObject* b);" + out;
-    out += "Function2 " + f_eq + "_f" + " = Function2(" + f_eq + ");";
-    out += "TaggedObject* function_" + node.class_name + "__eq__ = TAG(&" + f_eq + "_f" + ");";
     return out;
 }
 

@@ -195,6 +195,28 @@ USemanticInfo Checker::visit(ClassNode& node) {
         this->visit(*method.second);
         has_init = has_init || method.first == "init";
     }
+    auto eq_body = new BlockNode({});
+    std::string eq_method_name = "eq";
+    auto eq_meth = new FunctionNode(eq_method_name,
+                                    {"other"},
+                                    {new ObjectType(node.class_name, tp)},
+                                    new T_BOOL,
+                                    eq_body);
+    auto cmp_node = new BoolOpNode(BoolOp::EQ,
+                                   new MemberNode(new IdNode("this"), node.members_ordered[0]),
+                                   new MemberNode(new IdNode("other"), node.members_ordered[0]));
+
+    for (int i = 1; i < node.members_ordered.size(); i++) {
+        cmp_node = new BoolOpNode(BoolOp::AND,
+                                  cmp_node,
+                                  new BoolOpNode(BoolOp::EQ,
+                                                 new MemberNode(new IdNode("this"), node.members_ordered[i]),
+                                                 new MemberNode(new IdNode("other"), node.members_ordered[i])));
+    }
+    eq_body->nodes.push_back(new ReturnNode(cmp_node));
+    node.methods[eq_method_name] = eq_meth;
+    this->is_method = true;
+    this->visit(*eq_meth);
     if (!has_init) {
         BlockNode* init_body = new BlockNode({});
         for (auto mt: node.members_ordered) {
@@ -415,7 +437,7 @@ USemanticInfo Checker::visit(CallNode& n) {
             retv.set_type(*copy_ftn.clone());
             object_node = member_node.parent;
         } else {
-            n.function = new IdNode(fun_info.class_info->class_name + "." + member_node.s_child);
+            n.function = new IdNode("function_"+fun_info.class_info->class_name + "_" + member_node.s_child);
             this->replace_me = false;
             const FunctionType& ftn = fun_info.type().function();
             FunctionType& copy_ftn = ftn.clone()->function();
@@ -827,7 +849,7 @@ USemanticInfo Checker::visit(MemberNode& n) {
                 rv.is_method = false;
                 rv.is_class_method = true;
                 this->replace_me = true;
-                IdNode* idn = new IdNode(class_name + "." + child);
+                IdNode* idn = new IdNode("f_" + class_name + "_" + child);
                 idn->is_global_function = true;
                 this->replacement = idn;
                 return std::make_unique<SemanticInfo>(rv);
@@ -890,8 +912,8 @@ USemanticInfo Checker::visit(MemberNode& n) {
             class_info = this->class_table->get(final_type.to_string());
         } else {
             if (is_generic((final_type)) && final_type.type_params.size() == 0) {
-                    throw std::runtime_error(
-                            "Cannot access member of totally generic value of generic type " + object.id + "!");
+                throw std::runtime_error(
+                        "Cannot access member of totally generic value of generic type " + object.id + "!");
             } else {
                 class_info = this->class_table->get(object.id);
                 class_info = instantiate_generic(class_info, final_type);
