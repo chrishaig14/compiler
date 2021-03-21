@@ -313,7 +313,7 @@ std::string Transpiler::object_type_mapper(const ObjectType& t) {
     if (t.id == "List") {
         return "XList*";
     }
-    return get_class_name(t.id) + "*";
+    return get_class_name(t.id) + "";
 }
 
 std::string Transpiler::add_type(const TypeNode& t, std::string n) {
