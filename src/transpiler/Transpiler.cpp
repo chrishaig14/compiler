@@ -130,16 +130,12 @@ std::string Transpiler::visit_bool_op(BoolOpNode& node) {
             break;
     }
     if (op == "__eq__" || op == "__neq__") {
-        return "EQ(" + this->dispatch(node.left) + "," + this->dispatch(node.right) + ")";
-
-        if (*node.ltype == T_BOOL) {
+        if (is_generic(*node.ltype)) {
+            return "EQ(" + this->dispatch(node.left) + "," + this->dispatch(node.right) + ")";
+        } else {
+            return "CALL2(function_" + node.ltype->object().id + "__eq__," + this->dispatch(node.left) + "," +
+                   this->dispatch(node.right) + ")";
         }
-        if (*node.ltype == T_INT) {
-            return "MAKE_BOOL(GET_INT(" + this->dispatch(node.left) + ")" + (op == "__eq__" ? "==" : "!=") +
-                   "GET_INT(" + this->dispatch(node.right) + "))";
-        }
-        return "CAST(" + this->dispatch(node.left) + "," + this->type_mapper(*node.ltype) + ")->" + op + "(" +
-               this->dispatch(node.right) + ")";
     }
     if (node.op == BoolOp::AND || node.op == BoolOp::OR) {
         return "MAKE_BOOL(GET_BOOL(" + this->dispatch(node.left) + ")" + op + "GET_BOOL(" + this->dispatch(node.right) +
