@@ -154,14 +154,12 @@ USemanticInfo Checker::visit(TernaryNode& node) {
 USemanticInfo Checker::visit(NoneNode& node) {
     SemanticInfo info;
     info.set_type(ObjectType("NoneType", {}));
-    info.is_function = false;
     return std::make_unique<SemanticInfo>(info);
 }
 
 USemanticInfo Checker::visit(EmptyListNode& node) {
     SemanticInfo info;
     info.set_type(T_LIST(node.type->clone()));
-    info.is_function = false;
     return std::make_unique<SemanticInfo>(info);
 }
 
