@@ -283,9 +283,7 @@ USemanticInfo Checker::visit(ContinueNode& node) {
 
 USemanticInfo Checker::visit(TupleNode& node) {
     VectorOfTypes types;
-    int i = 0;
     for (auto n: node.values) {
-        i++;
         USemanticInfo vtype = this->dispatch(n);
         types.emplace_back(vtype->type().clone());
         if (!this->is_immutable(vtype->type())) {
