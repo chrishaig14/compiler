@@ -24,11 +24,22 @@ TaggedObject* f_String_len(TaggedObject* _a) {
     return r;
 }
 
+TaggedObject* f_String_eq(TaggedObject* this_obj, TaggedObject* other) {
+    GC::declare(other);
+    GC::declare(this_obj);
+    TaggedObject* r = MAKE_BOOL(CAST(other, XString)->s == CAST(this_obj, XString)->s);
+    GC::out_of_scope(other);
+    GC::out_of_scope(this_obj);
+    return r;
+}
+
 
 Function2 function_String_add_p = Function2(f_String_add);
 Function1 function_String_len_p = Function1(f_String_len);
 TaggedObject* function_String_add = TAG(&function_String_add_p);
 TaggedObject* function_String_len = TAG(&function_String_len_p);
+Function2 function_String_eq_p = Function2(f_String_eq);
+TaggedObject* function_String_eq = TAG(&function_String_eq_p);
 
 XString::~XString() {
     // std::cout << "Deleted String '" << this->s << "' (" << this << ")" << std::endl;
@@ -41,5 +52,5 @@ XString::XString(const std::string& x) : XObject("String") {
 
 
 TaggedObject* XString::__eq__(TaggedObject* other) {
-    return MAKE_BOOL(CAST(other, XString)->s == this->s);
+    return f_String_eq(TAG(this), other);
 }
