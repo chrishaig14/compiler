@@ -89,7 +89,7 @@ std::string Transpiler::visit_block(BlockNode& node) {
                 continue;
             }
             if (is_object(*v.second)) {
-                out += "GC::out_of_scope(" + v.first + ");\n";
+                out += "GC::out_of_scope(" + (v.first == "this" ? "this_obj" : v.first) + ");\n";
             }
         }
     }
@@ -148,7 +148,7 @@ std::string Transpiler::visit_break(BreakNode& node) {
     std::string out;
     for (auto v: node.loop_vars) {
         if (is_object(*v.second)) {
-            out += "GC::out_of_scope(" + v.first + ");\n";
+            out += "GC::out_of_scope(" + (v.first == "this" ? "this_obj" : v.first) + ");\n";
         }
     }
     out += "break";
@@ -598,7 +598,7 @@ std::string Transpiler::visit_return(ReturnNode& node) {
     }
     for (auto v: node.reachables) {
         if (is_object(*v.second)) {
-            out += "GC::out_of_scope(" + v.first + ");\n";
+            out += "GC::out_of_scope(" + (v.first == "this" ? "this_obj" : v.first) + ");\n";
         }
     }
     out += "return __return__";
