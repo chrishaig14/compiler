@@ -17,6 +17,7 @@
 #define INT_TAG 0b011
 #define OBJECT_TAG 0b100
 #define FUNCTION_TAG 0b101
+#define FLOAT_TAG 0b110
 #define CAST(ptr, cls) ((cls*)UNTAG(ptr))
 
 extern TaggedObject* TRUE;
@@ -39,8 +40,17 @@ inline bool has_tag(TaggedObject* p, unsigned long tag) {
     return ((unsigned long) p & 0b111) == tag;
 }
 
+inline TaggedObject* MAKE_FLOAT(float x) {
+    return (TaggedObject*) ((*(unsigned long*) &x) << 32 | FLOAT_TAG);
+}
+
+inline float GET_FLOAT(TaggedObject* x) {
+    unsigned long p = (unsigned long) x >> 32;
+    return *(float*) &p;
+};
+
 inline TaggedObject* MAKE_INT(long x) {
-    return (TaggedObject*) ((unsigned long) (x << 3) | INT_TAG);
+    return (TaggedObject*) ((unsigned long) x << 3 | INT_TAG);
 }
 
 inline TaggedObject* MAKE_BOOL(bool x) {
@@ -55,6 +65,8 @@ inline bool GET_BOOL(TaggedObject* x) {
 inline long GET_INT(TaggedObject* x) {
     return (long) x >> 3;
 };
+
+
 
 
 #endif //UNTITLED1_XOBJECT_H

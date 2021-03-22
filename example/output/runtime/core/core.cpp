@@ -3,6 +3,8 @@
 //
 
 #include <ctime>
+#include <bitset>
+#include <cstring>
 #include "core.h"
 #include "xobjects/XString.h"
 #include "xobjects/XFile.h"
@@ -43,6 +45,29 @@ TaggedObject* f_Integer_str(TaggedObject* _i) {
     return x;
 }
 
+void foo(float f) {
+    std::cout << f << std::endl;
+}
+
+TaggedObject* float_mk(float t) {
+    TaggedObject* r = nullptr;
+    memcpy((float*) &r + 1, &t, sizeof(float));
+    r = (TaggedObject*) ((unsigned long) r | FLOAT_TAG);
+    return r;
+}
+
+float float_rd(TaggedObject* r) {
+    float e = 0;
+    memcpy(&e, (float*) &r + 1, sizeof(float));
+    return e;
+}
+
+
+TaggedObject* f_Float_str(TaggedObject* _i) {
+    TaggedObject* x = NEW(XString, std::to_string((GET_FLOAT(_i))));
+    return x;
+}
+
 TaggedObject* f_Boolean_str(TaggedObject* _i) {
     TaggedObject* x = NEW(XString, ((GET_BOOL(_i) ? "true" : "false")));
     return x;
@@ -56,7 +81,7 @@ TaggedObject* f_map(TaggedObject* _l, TaggedObject* _f) {
     XList* r = CAST(_r, XList);
     for (int i = 0; i < l->l->size(); i++) {
         TaggedObject* p = (*f)((*(l->l))[i]);
-        r->l->at(i)=p;
+        r->l->at(i) = p;
     }
     GC::out_of_scope(_l);
     return _r;
@@ -130,6 +155,7 @@ Function3 function_range_p = Function3(f_range);
 Function2 function_map_p = Function2(f_map);
 Function2 function_join_p = Function2(f_join);
 Function1 function_Integer_str_p = Function1(f_Integer_str);
+Function1 function_Float_str_p = Function1(f_Float_str);
 Function1 function_Boolean_str_p = Function1(f_Boolean_str);
 Function2 function_list_subscript_p = Function2(list_subscript);
 Function2 function_string_subscript_p = Function2(string_subscript);
@@ -141,6 +167,7 @@ TaggedObject* function_map = FTAG(&function_map_p);
 TaggedObject* function_join = FTAG(&function_join_p);
 TaggedObject* function_File_read_line = FTAG(&function_File_read_line_p);
 TaggedObject* function_Integer_str = FTAG(&function_Integer_str_p);
+TaggedObject* function_Float_str = FTAG(&function_Float_str_p);
 TaggedObject* function_Boolean_str = FTAG(&function_Boolean_str_p);
 TaggedObject* function_list_subscript = FTAG(&function_list_subscript_p);
 TaggedObject* function_string_subscript = FTAG(&function_string_subscript_p);

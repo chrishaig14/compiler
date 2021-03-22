@@ -365,7 +365,7 @@ std::string Transpiler::visit_empty_list(EmptyListNode& node) {
 }
 
 std::string Transpiler::visit_float(FloatNode& node) {
-    return "";
+    return "MAKE_FLOAT(" + std::to_string(node.value) + ")";
 }
 
 std::string Transpiler::visit_for(ForNode& node) {
