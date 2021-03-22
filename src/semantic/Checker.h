@@ -147,6 +147,7 @@ public:
     void error_class_init_member_not_init(const std::string& cls, std::string mem, TextPosition pos);
     void fail(std::string msg);
     USemanticInfo member_class_method(std::string class_name, std::string child, MemberNode& n);
+    USemanticInfo member_tuple(const ObjectType& final_type, MemberNode& n);
 };
 
 bool function_is_generic(const FunctionType& ft);

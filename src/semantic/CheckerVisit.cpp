@@ -888,6 +888,20 @@ USemanticInfo Checker::member_class_method(std::string class_name, std::string c
 
 }
 
+USemanticInfo Checker::member_tuple(const ObjectType& final_type, MemberNode& n){
+    if (n.type != MemberType::NUM) {
+        throw std::runtime_error("Error can only access members " + std::to_string(1) + " to " +
+                                 std::to_string(final_type.type_params.size()) + " of " + final_type.to_string());
+    }
+    if (n.n_child < 1 || n.n_child > final_type.type_params.size()) {
+        throw std::runtime_error("Error can only access members " + std::to_string(1) + " to " +
+                                 std::to_string(final_type.type_params.size()) + " of " + final_type.to_string());
+    }
+    SemanticInfo s;
+    s.set_type(*final_type.type_params[n.n_child - 1]);
+    return std::make_unique<SemanticInfo>(s);
+}
+
 USemanticInfo Checker::visit(MemberNode& n) {
     SemanticInfo rv;
     std::string& child = n.s_child;
@@ -929,17 +943,7 @@ USemanticInfo Checker::visit(MemberNode& n) {
     const ObjectType& final_type = option_type != nullptr ? *option_type : object;
     if (final_type.id == "Tuple") {
         // special treatment for tuples
-        if (n.type != MemberType::NUM) {
-            throw std::runtime_error("Error can only access members " + std::to_string(1) + " to " +
-                                     std::to_string(final_type.type_params.size()) + " of " + final_type.to_string());
-        }
-        if (n.n_child < 1 || n.n_child > final_type.type_params.size()) {
-            throw std::runtime_error("Error can only access members " + std::to_string(1) + " to " +
-                                     std::to_string(final_type.type_params.size()) + " of " + final_type.to_string());
-        }
-        SemanticInfo s;
-        s.set_type(*final_type.type_params[n.n_child - 1]);
-        return std::make_unique<SemanticInfo>(s);
+        return this->member_tuple(final_type, n);
     } else {
         if (n.type != MemberType::STR) {
             throw std::runtime_error(
