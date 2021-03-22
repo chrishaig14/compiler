@@ -525,6 +525,10 @@ std::string Transpiler::visit_if(IfNode& node) {
     out += "(GET_BOOL(" + this->dispatch(node.condition) + "))" + "{";
     out += this->visit_block(*node.then);
     out += "}";
+    for (int i = 0; i < node.elifs.size(); i++) {
+        out += "else if (GET_BOOL(" + this->dispatch(node.elifs[i].first) + ")){" +
+               this->visit_block(*node.elifs[i].second) + "}";
+    }
     if (node.selse != nullptr) {
         out += "else {" + this->dispatch(node.selse) + "}";
     }
