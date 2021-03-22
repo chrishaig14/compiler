@@ -368,12 +368,6 @@ USemanticInfo Checker::dispatch(Node* nod) {
         case NodeType::CALL:
             return this->visit(n.call());
             break;
-        case NodeType::CLSEXP:
-            return this->visit(n.clsexp());
-            break;
-        case NodeType::CLSFLD:
-            return this->visit(n.clsfld());
-            break;
         case NodeType::CLS:
             return this->visit(n.cls());
             break;

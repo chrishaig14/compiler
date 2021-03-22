@@ -319,70 +319,6 @@ USemanticInfo Checker::visit(PartialApplication& node) {
     return std::make_unique<SemanticInfo>(s);
 }
 
-USemanticInfo Checker::visit(ClassLiteralFieldNode& node) {
-    ObjectType* object_type = node.type;
-    std::string& object_type_id = object_type->id;
-    const std::string& object_type_str = object_type->to_string();
-
-    if (!this->class_table->declared(object_type_id)) {
-        this->error_class_not_found(*object_type, node.start);
-        return error_stub();
-    }
-
-    ClassInfo* class_info = this->class_table->get(object_type_id);
-    unsigned long num_required_type_params = class_info->type_params.size();
-    unsigned long num_actual_type_params = object_type->type_params.size();
-    if (num_required_type_params != 0) {
-        // it's a generic class
-        if (num_required_type_params != num_actual_type_params) {
-            this->error_generic_class_wrong_type_param_number(object_type->id,
-                                                              num_required_type_params,
-                                                              num_actual_type_params,
-                                                              node.start);
-            return error_stub();
-        }
-        if (this->class_table->declared(object_type_str)) {
-            class_info = this->class_table->get(object_type_str);
-        } else {
-            class_info = instantiate_generic(class_info, *object_type);
-            this->class_table->set(object_type_str, class_info);
-        }
-    } else if (num_actual_type_params != 0) {
-        this->error_class_not_generic(object_type->id, node.start);
-        return error_stub();
-    }
-    auto class_fields = class_info->members;
-
-    for (int i = 0; i < node.init_names.size(); i++) {
-        if (class_fields.find(node.init_names[i]) == class_fields.end()) {
-            this->error_no_member(*node.type, node.init_names[i], node.start);
-            SemanticInfo rv;
-            rv.set_type(*object_type);
-            return std::make_unique<SemanticInfo>(rv);
-        }
-    }
-    if (class_fields.size() != node.init_names.size()) {
-        this->error_class_init_wrong_number_init(object_type_id,
-                                                 class_fields.size(),
-                                                 node.init_names.size(),
-                                                 node.start);
-        return error_stub();
-    }
-    for (int i = 0; i < node.init_names.size(); i++) {
-        Node* exp = node.init_values[i];
-        USemanticInfo semanticInfo_p = this->dispatch(exp);
-        SemanticInfo& semanticInfo = *semanticInfo_p;
-        node.init_values[i] = this->replace_if_necessary(node.init_values[i]);
-        TypeNode& field_type = *class_fields[node.init_names[i]];
-        if (!this->can_assign(semanticInfo.type(), field_type)) {
-            this->error_class_init_bad_member_type(*object_type, field_type, semanticInfo.type(), exp->start);
-        }
-    }
-    SemanticInfo rv;
-    rv.set_type(*object_type);
-    return std::make_unique<SemanticInfo>(rv);
-}
-
 USemanticInfo Checker::visit(ForNode& node) {
     USemanticInfo info_p = this->dispatch(node.exp);
     SemanticInfo& info = *info_p;
@@ -534,62 +470,6 @@ USemanticInfo Checker::visit(BlockNode& program) {
         }
     }
     return nullptr;
-}
-
-USemanticInfo Checker::visit(ClassLiteralExpressionNode& node) {
-    ObjectType& object_type = *node.type;
-    std::string& object_type_id = object_type.id;
-    const std::string& object_type_str = object_type.to_string();
-
-    if (!this->class_table->declared(object_type_id)) {
-        this->error_class_not_found(object_type, node.start);
-        return error_stub();
-    }
-    ClassInfo* class_info = this->class_table->get(object_type_id);
-    unsigned long num_required_type_params = class_info->type_params.size();
-    unsigned long num_actual_type_params = object_type.type_params.size();
-    if (num_required_type_params != 0) {
-        // it's a generic class
-        if (num_required_type_params != num_actual_type_params) {
-            this->error_generic_class_wrong_type_param_number(object_type.id,
-                                                              num_required_type_params,
-                                                              num_actual_type_params,
-                                                              node.start);
-        }
-        if (this->class_table->declared(object_type_str)) {
-            class_info = this->class_table->get(object_type_str);
-        } else {
-            class_info = instantiate_generic(class_info, object_type);
-            this->class_table->set(object_type_str, class_info);
-        }
-    } else if (num_actual_type_params != 0) {
-        this->error_class_not_generic(object_type_id, node.start);
-        return error_stub();
-    }
-    auto class_field_types_ordered = class_info->member_types;
-    auto class_field_names_ordered = class_info->member_names;
-
-    unsigned long num_required_init = class_field_names_ordered.size();
-    unsigned long num_actual_init = node.init.size();
-    if (num_required_init != num_actual_init) {
-        this->error_class_init_wrong_number_init(object_type_id, num_required_init, num_actual_init, node.start);
-        return error_stub();
-    }
-
-    for (int i = 0; i < num_actual_init; i++) {
-        Node* exp = node.init[i];
-        USemanticInfo semanticInfo_p = this->dispatch(exp);
-        SemanticInfo& semanticInfo = *semanticInfo_p;
-        node.init[i] = this->replace_if_necessary(node.init[i]);
-        TypeNode& field_type = *class_field_types_ordered[i];
-        if (!this->can_assign(semanticInfo.type(), field_type)) {
-            this->error_class_init_bad_member_type(object_type, field_type, semanticInfo.type(), node.init[i]->start);
-        }
-    }
-    node.names = class_field_names_ordered;
-    SemanticInfo rv;
-    rv.set_type(object_type);
-    return std::make_unique<SemanticInfo>(rv);
 }
 
 USemanticInfo Checker::visit(FunctionNode& n) {
