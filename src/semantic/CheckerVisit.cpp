@@ -713,7 +713,6 @@ USemanticInfo Checker::visit(IdNode& n) {
 USemanticInfo Checker::visit(DeclarationNode& n) {
     if (this->scope->declared(n.identifier)) {
         this->error_redeclared(n.identifier, n.start);
-        this->failed = true;
     }
     SemanticInfo info;
     info.is_function = false;
@@ -796,7 +795,6 @@ USemanticInfo Checker::visit(AssignmentNode& n) {
     this->is_lvalue = false;
     if (n.lvalue->ntype == MEMBER && n.lvalue->member().type == MemberType::NUM) {
         this->error_tuple_assign(n.start);
-        this->failed = true;
     }
     USemanticInfo expression_type_p = this->dispatch(n.rvalue);
     if (expression_type_p->type() == T_NONE) {
@@ -1143,7 +1141,6 @@ USemanticInfo Checker::visit(ReturnNode& n) {
     n.expression = this->replace_if_necessary(n.expression);
     if (!this->can_assign(expression_info.type(), return_type)) {
         this->error_return_mismatch(return_type, expression_info.type(), n.start);
-        this->failed = true;
         return this->error();
     }
     n.ret_type = return_type.clone();

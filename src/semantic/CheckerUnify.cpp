@@ -79,7 +79,6 @@ Checker::get_first_substitution_function(FunctionType& a, FunctionType& b, bool 
 void Checker::unify_function_call(FunctionType& fun, VectorOfTypes& args) {
     if (args.size() != fun.param_types.size()) {
         this->error_call_bad_num_args();
-        this->failed = true;
         return;
     }
 
@@ -103,8 +102,7 @@ void Checker::unify_function_call(FunctionType& fun, VectorOfTypes& args) {
                 substitution = get_first_substitution(*param, *arg, true);
             }
         } catch (...) {
-            error_generic_call_mismatch(*param, *arg, i);
-            this->failed = true;
+            this->error_generic_call_mismatch(*param, *arg, i);
         }
     }
 }
