@@ -3,6 +3,7 @@
 //
 
 #include "Checker.h"
+#include "util.h"
 
 #define T_NONE ObjectType(".None", {})
 
@@ -223,14 +224,8 @@ USemanticInfo Checker::visit(ClassNode& node) {
         this->is_method = true;
         this->visit(*eq_meth);
     } else {
-        bool error = false;
-        if (*node.methods[eq_method_name]->parameter_types[0] != *this->this_type) {
-            error = true;
-        }
-        if (*node.methods[eq_method_name]->return_type != T_BOOL) {
-            error = true;
-        }
-        if (error) {
+        if (*node.methods[eq_method_name]->parameter_types[0] != *this->this_type ||
+            *node.methods[eq_method_name]->return_type != T_BOOL) {
             std::string eq_method_type_string = "fun (" + this->this_type->to_string() + ") -> Boolean";
             throw std::runtime_error("eq method MUST be of type " + eq_method_type_string);
         }
@@ -242,14 +237,8 @@ USemanticInfo Checker::visit(ClassNode& node) {
         this->is_method = true;
         this->visit(*str_meth);
     } else {
-        bool error = false;
-        if (node.methods[str_method_name]->parameter_types.size() != 0) {
-            error = true;
-        }
-        if (*node.methods[str_method_name]->return_type != T_STRING) {
-            error = true;
-        }
-        if (error) {
+        if (node.methods[str_method_name]->parameter_types.size() != 0 ||
+            *node.methods[str_method_name]->return_type != T_STRING) {
             std::string str_method_type_string = "fun () -> String";
             throw std::runtime_error("str method MUST be of type " + str_method_type_string);
         }
