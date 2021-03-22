@@ -541,8 +541,6 @@ USemanticInfo Checker::visit(FunctionNode& n) {
 
 USemanticInfo Checker::visit(IdNode& n) {
     SemanticInfo info;
-    info.is_function = false;
-    info.is_method = false;
     if (!this->scope->has(n._id)) {
         // it might be a function name
         if (this->function_table->has_function(n._id)) {
@@ -584,7 +582,6 @@ USemanticInfo Checker::visit(DeclarationNode& n) {
         this->error_redeclared(n.identifier, n.start);
     }
     SemanticInfo info;
-    info.is_function = false;
     if (n.type != nullptr) {
         TypeNode& n_type = *n.type;
         if (!this->assert_type_exists(n_type, n.start)) {
