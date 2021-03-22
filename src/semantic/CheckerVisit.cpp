@@ -836,6 +836,58 @@ USemanticInfo Checker::visit(AssignmentNode& n) {
     return nullptr;
 }
 
+USemanticInfo Checker::member_class_method(std::string class_name, std::string child, MemberNode& n) {
+    ClassInfo* class_info = this->class_table->get(class_name);
+    SemanticInfo rv;
+    if (class_info->methods.find(child) != class_info->methods.end()) {
+
+        if (child == "init") {
+            const FunctionType& ft = *class_info->methods.find(child)->second;
+            VectorOfTypes params = ft.param_types;
+            for (int i = 0; i < params.size(); i++) {
+                params[i] = params[i]->clone();
+            }
+            VectorOfTypes tp;
+            for (auto t: class_info->type_params) {
+                tp.push_back(new ObjectType(t, {}));
+            }
+            FunctionType f(params, new ObjectType(class_name, tp));
+            rv.set_type(f);
+            rv.is_class_method = true;
+            this->replace_me = true;
+            IdNode* idn = new IdNode(class_name + "." + child);
+            idn->is_global_function = true;
+            this->replacement = idn;
+            return std::make_unique<SemanticInfo>(rv);
+        }
+
+        rv.set_type(*class_info->methods.find(child)->second);
+        rv.class_info = class_info;
+
+        const FunctionType& ftn = rv.type().function();
+        FunctionType& copy_ftn = *ftn.clone();
+        VectorOfTypes tp;
+        for (auto tttp: rv.class_info->type_params) {
+            tp.push_back(new ObjectType(tttp, {}));
+        }
+        auto instance_type = new ObjectType(rv.class_info->class_name, tp);
+        copy_ftn.param_types.insert(copy_ftn.param_types.begin(), instance_type);
+
+        rv.set_type(copy_ftn);
+        rv.is_method = false;
+        rv.is_class_method = true;
+        this->replace_me = true;
+        IdNode* idn = new IdNode(class_name + "_" + child);
+        idn->is_global_function = true;
+        this->replacement = idn;
+        return std::make_unique<SemanticInfo>(rv);
+    } else {
+        this->error_class_no_method(class_name, child, n.start);
+        return error_stub();
+    }
+
+}
+
 USemanticInfo Checker::visit(MemberNode& n) {
     SemanticInfo rv;
     std::string& child = n.s_child;
@@ -843,54 +895,7 @@ USemanticInfo Checker::visit(MemberNode& n) {
         IdNode& id_node = n.parent->id();
         // It might be something like <class>.<method>, so we need to handle this case differently
         if (this->class_table->declared(id_node._id)) {
-            ClassInfo* class_info = this->class_table->get(id_node._id);
-            std::string& class_name = class_info->class_name;
-            if (class_info->methods.find(child) != class_info->methods.end()) {
-
-                if (child == "init") {
-                    const FunctionType& ft = *class_info->methods.find(child)->second;
-                    VectorOfTypes params = ft.param_types;
-                    for (int i = 0; i < params.size(); i++) {
-                        params[i] = params[i]->clone();
-                    }
-                    VectorOfTypes tp;
-                    for (auto t: class_info->type_params) {
-                        tp.push_back(new ObjectType(t, {}));
-                    }
-                    FunctionType f(params, new ObjectType(class_name, tp));
-                    rv.set_type(f);
-                    rv.is_class_method = true;
-                    this->replace_me = true;
-                    IdNode* idn = new IdNode(class_name + "." + child);
-                    idn->is_global_function = true;
-                    this->replacement = idn;
-                    return std::make_unique<SemanticInfo>(rv);
-                }
-
-                rv.set_type(*class_info->methods.find(child)->second);
-                rv.class_info = class_info;
-
-                const FunctionType& ftn = rv.type().function();
-                FunctionType& copy_ftn = *ftn.clone();
-                VectorOfTypes tp;
-                for (auto tttp: rv.class_info->type_params) {
-                    tp.push_back(new ObjectType(tttp, {}));
-                }
-                auto instance_type = new ObjectType(rv.class_info->class_name, tp);
-                copy_ftn.param_types.insert(copy_ftn.param_types.begin(), instance_type);
-
-                rv.set_type(copy_ftn);
-                rv.is_method = false;
-                rv.is_class_method = true;
-                this->replace_me = true;
-                IdNode* idn = new IdNode(class_name + "_" + child);
-                idn->is_global_function = true;
-                this->replacement = idn;
-                return std::make_unique<SemanticInfo>(rv);
-            } else {
-                this->error_class_no_method(class_name, child, n.start);
-                return error_stub();
-            }
+            return this->member_class_method(id_node._id, child, n);
         }
     }
     bool old_lvalue = this->is_lvalue;

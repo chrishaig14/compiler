@@ -146,6 +146,7 @@ public:
     void error_function_doesnt_return_a_value(TextPosition position, const TypeNode* expected_type);
     void error_class_init_member_not_init(const std::string& cls, std::string mem, TextPosition pos);
     void fail(std::string msg);
+    USemanticInfo member_class_method(std::string class_name, std::string child, MemberNode& n);
 };
 
 bool function_is_generic(const FunctionType& ft);
