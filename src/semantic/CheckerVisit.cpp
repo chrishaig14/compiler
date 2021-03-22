@@ -950,9 +950,7 @@ USemanticInfo Checker::visit(BinopNode& n) {
     SemanticInfo& right_info = *right_info_p;
 
     if (left_info.is_error || right_info.is_error) {
-        auto e = ErrorStub();
-        auto s = std::make_unique<SemanticInfo>(e);
-        return s;
+        return error_stub();
     }
 
     SemanticInfo info;
@@ -991,7 +989,7 @@ USemanticInfo Checker::visit(BinopNode& n) {
 
     if (!ok) {
         this->error_binop(left, right, n.op_pos);
-        return std::make_unique<ErrorStub>(ErrorStub());
+        return error_stub();
     }
 
     return std::make_unique<SemanticInfo>(info);
