@@ -66,14 +66,14 @@ USemanticInfo Checker::visit(SubscriptNode& node) {
     SemanticInfo& parent = *parent_p;
     if (parent.type().kind != Kind::OBJECT) {
         this->error_subscript_non_object(node.start);
-        return this->error();
+        return error_stub();
     }
     SemanticInfo info;
     const ObjectType& object_type = parent.type().object();
 
     if (this->is_lvalue && object_type == T_STRING) {
         this->error_string_immutable(node.start);
-        return this->error();
+        return error_stub();
     }
 
     VectorOfTypes children;
@@ -288,7 +288,7 @@ USemanticInfo Checker::visit(TupleNode& node) {
         types.emplace_back(vtype->type().clone());
         if (!this->is_immutable(vtype->type())) {
             this->error_tuple_member_not_immutable(vtype->type(), node.start);
-            return this->error();
+            return error_stub();
         }
     }
     ObjectType tuple_type("Tuple", types);
@@ -308,7 +308,7 @@ USemanticInfo Checker::visit(PartialApplication& node) {
     VectorOfTypes partial_args;
     if (node.args.size() != func->type().function().param_types.size()) {
         this->error_partial_wrong_num_args(node.start);
-        return this->error();
+        return error_stub();
     }
     for (int i = 0; i < node.args.size(); i++) {
         if (node.args[i] != nullptr) {
@@ -318,7 +318,7 @@ USemanticInfo Checker::visit(PartialApplication& node) {
                                                                 arg->type(),
                                                                 node.args[i]->start,
                                                                 node.args[i]->end);
-                return this->error();
+                return error_stub();
             }
         } else {
             partial_args.push_back(func->type().function().param_types[i]->clone());
@@ -337,7 +337,7 @@ USemanticInfo Checker::visit(ClassLiteralFieldNode& node) {
 
     if (!this->class_table->declared(object_type_id)) {
         this->error_class_not_found(*object_type, node.start);
-        return this->error();
+        return error_stub();
     }
 
     ClassInfo* class_info = this->class_table->get(object_type_id);
@@ -350,7 +350,7 @@ USemanticInfo Checker::visit(ClassLiteralFieldNode& node) {
                                                               num_required_type_params,
                                                               num_actual_type_params,
                                                               node.start);
-            return this->error();
+            return error_stub();
         }
         if (this->class_table->declared(object_type_str)) {
             class_info = this->class_table->get(object_type_str);
@@ -360,7 +360,7 @@ USemanticInfo Checker::visit(ClassLiteralFieldNode& node) {
         }
     } else if (num_actual_type_params != 0) {
         this->error_class_not_generic(object_type->id, node.start);
-        return this->error();
+        return error_stub();
     }
     auto class_fields = class_info->members;
 
@@ -377,7 +377,7 @@ USemanticInfo Checker::visit(ClassLiteralFieldNode& node) {
                                                  class_fields.size(),
                                                  node.init_names.size(),
                                                  node.start);
-        return this->error();
+        return error_stub();
     }
     for (int i = 0; i < node.init_names.size(); i++) {
         Node* exp = node.init_values[i];
@@ -445,7 +445,7 @@ USemanticInfo Checker::visit(ForNode& node) {
 USemanticInfo Checker::visit(CallNode& n) {
     USemanticInfo fun_info_p = this->dispatch(n.function);
     if (fun_info_p->is_error) {
-        return this->error();
+        return error_stub();
     }
     SemanticInfo& fun_info = *fun_info_p;
     bool is_a_method = false;
@@ -491,7 +491,7 @@ USemanticInfo Checker::visit(CallNode& n) {
                 retv.set_type(*function_type.return_type);
                 return std::make_unique<SemanticInfo>(retv);
             } else {
-                return this->error();
+                return error_stub();
             }
         }
         VectorOfTypes arg_types;
@@ -554,7 +554,7 @@ USemanticInfo Checker::visit(ClassLiteralExpressionNode& node) {
 
     if (!this->class_table->declared(object_type_id)) {
         this->error_class_not_found(object_type, node.start);
-        return this->error();
+        return error_stub();
     }
     ClassInfo* class_info = this->class_table->get(object_type_id);
     unsigned long num_required_type_params = class_info->type_params.size();
@@ -575,7 +575,7 @@ USemanticInfo Checker::visit(ClassLiteralExpressionNode& node) {
         }
     } else if (num_actual_type_params != 0) {
         this->error_class_not_generic(object_type_id, node.start);
-        return this->error();
+        return error_stub();
     }
     auto class_field_types_ordered = class_info->member_types;
     auto class_field_names_ordered = class_info->member_names;
@@ -584,7 +584,7 @@ USemanticInfo Checker::visit(ClassLiteralExpressionNode& node) {
     unsigned long num_actual_init = node.init.size();
     if (num_required_init != num_actual_init) {
         this->error_class_init_wrong_number_init(object_type_id, num_required_init, num_actual_init, node.start);
-        return this->error();
+        return error_stub();
     }
 
     for (int i = 0; i < num_actual_init; i++) {
@@ -683,7 +683,7 @@ USemanticInfo Checker::visit(IdNode& n) {
             info.set_type(this->function_table->get(n._id));
         } else {
             this->error_variable_not_declared(n._id, n.start);
-            return this->error();
+            return error_stub();
         }
     } else {
         info.set_type(this->scope->get(n._id));
@@ -719,7 +719,7 @@ USemanticInfo Checker::visit(DeclarationNode& n) {
     if (n.expression->ntype != NodeType::UNINITIALIZED and n.type != nullptr) {
         TypeNode& n_type = *n.type;
         if (!this->assert_type_exists(n_type, n.start)) {
-            return this->error();
+            return error_stub();
         }
         USemanticInfo exp_info_p = this->dispatch(n.expression);
         SemanticInfo& exp_info = *exp_info_p;
@@ -767,7 +767,7 @@ USemanticInfo Checker::visit(DeclarationNode& n) {
         USemanticInfo exp_info_p = this->dispatch(n.expression);
         if (exp_info_p->type() == T_NONE) {
             this->error_function_doesnt_return_a_value(n.expression->start, nullptr);
-            USemanticInfo error_t = this->error();
+            USemanticInfo error_t = error_stub();
             this->scope->set(n.identifier, error_t->type());
             return error_t;
         }
@@ -889,7 +889,7 @@ USemanticInfo Checker::visit(MemberNode& n) {
                 return std::make_unique<SemanticInfo>(rv);
             } else {
                 this->error_class_no_method(class_name, child, n.start);
-                return this->error();
+                return error_stub();
             }
         }
     }
@@ -899,11 +899,11 @@ USemanticInfo Checker::visit(MemberNode& n) {
     this->is_lvalue = old_lvalue;
     SemanticInfo& info = *symbol_info_p;
     if (info.is_error) {
-        return this->error();
+        return error_stub();
     }
     if (info.type().kind != Kind::OBJECT) {
         this->error_member_no_object(n.start);
-        return this->error();
+        return error_stub();
     }
     n.parent_t = symbol_info_p->type().clone();
     const ObjectType& object = info.type().object();
@@ -968,7 +968,7 @@ USemanticInfo Checker::visit(MemberNode& n) {
             rv.class_info = class_info;
         } else {
             this->error_no_member(object, child, n.start);
-            return this->error();
+            return error_stub();
         }
     }
 
@@ -1060,7 +1060,7 @@ USemanticInfo Checker::visit(BinopNode& n) {
         err = true;
     }
     if (err) {
-        return this->error();
+        return error_stub();
     }
     n.left = left_replace;
     // n.left = this->replace_if_necessary(n.left);
@@ -1141,7 +1141,7 @@ USemanticInfo Checker::visit(ReturnNode& n) {
     n.expression = this->replace_if_necessary(n.expression);
     if (!this->can_assign(expression_info.type(), return_type)) {
         this->error_return_mismatch(return_type, expression_info.type(), n.start);
-        return this->error();
+        return error_stub();
     }
     n.ret_type = return_type.clone();
     n.reachables = this->scope->get_all();

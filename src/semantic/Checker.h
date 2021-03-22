@@ -27,7 +27,7 @@ TypeNode* make_type_from_object_pattern(const ObjectType& object_type, const Map
 TypeNode* make_type_from_function_pattern(const FunctionType& ftn, const MapStringType& replacements);
 TypeNode* make_type(const TypeNode& original, const MapStringType& replacements);
 SemanticInfo match_arguments_to_generic_function(const FunctionType& function_type, VectorOfTypes arg_types);
-
+USemanticInfo error_stub();
 class Checker {
     bool add_this;
     bool is_lvalue;
@@ -133,7 +133,6 @@ public:
     void error_class_not_found(const TypeNode& cls, TextPosition pos);
     void error_list_literal(const TypeNode& lt, const TypeNode& et, TextPosition pos);
     void error_function_return_last_stmt(const std::string& function_name, const TypeNode& et, TextPosition pos);
-    USemanticInfo error();
     void error_partial_wrong_num_args(const std::string& function_name, const TypeNode& et, TextPosition pos);
     void error_partial_wrong_num_args(TextPosition pos);
     void error_partial_function_call_type_mismatch(const TypeNode& expected, const TypeNode& actual, TextPosition start,

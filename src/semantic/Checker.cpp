@@ -302,7 +302,7 @@ ClassInfo* Checker::instantiate_generic(ClassInfo* generic, const ObjectType& in
     return concrete;
 }
 
-USemanticInfo Checker::error() {
+USemanticInfo error_stub() {
     return std::make_unique<SemanticInfo>(ErrorStub());
 }
 
