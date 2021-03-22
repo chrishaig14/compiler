@@ -20,8 +20,6 @@
 #define FOR(var, exp, block) new ForNode(var, exp, block)
 #define SUB(parent, child) new SubscriptNode(parent, child)
 #define DECL(id, type, exp) new DeclarationNode(id, type, exp)
-#define LIT_EXP(id, type) new ClassLiteralExpressionNode(id, type)
-#define LIT_FIL(id, type) new ClassLiteralFieldNode(id, type)
 #define TYPE(parent, type_parameters) new ObjectType(parent, type_parameters)
 #define BOOL(x) new BooleanNode(x)
 

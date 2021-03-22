@@ -22,24 +22,20 @@ std::string highlight2(const std::string& text, size_t column, size_t length) {
 }
 
 
-std::unordered_map<TokType, OpType> TOKEN_TO_OP = {
-        {TokType::PLUS,  OpType::ADD},
-        {TokType::MINUS, OpType::SUB},
-        {TokType::TIMES, OpType::MUL},
-        {TokType::DIV,   OpType::DIV},
-        {TokType::MOD,   OpType::MOD}
-};
+std::unordered_map<TokType, OpType> TOKEN_TO_OP = {{TokType::PLUS,  OpType::ADD},
+                                                   {TokType::MINUS, OpType::SUB},
+                                                   {TokType::TIMES, OpType::MUL},
+                                                   {TokType::DIV,   OpType::DIV},
+                                                   {TokType::MOD,   OpType::MOD}};
 
-std::unordered_map<TokType, BoolOp> TOKEN_TO_BOOL_OP = {
-        {TokType::AND, BoolOp::AND},
-        {TokType::OR,  BoolOp::OR},
-        {TokType::LT,  BoolOp::LT},
-        {TokType::GT,  BoolOp::GT},
-        {TokType::LEQ, BoolOp::LEQ},
-        {TokType::GEQ, BoolOp::GEQ},
-        {TokType::NEQ, BoolOp::NEQ},
-        {TokType::EQ,  BoolOp::EQ}
-};
+std::unordered_map<TokType, BoolOp> TOKEN_TO_BOOL_OP = {{TokType::AND, BoolOp::AND},
+                                                        {TokType::OR,  BoolOp::OR},
+                                                        {TokType::LT,  BoolOp::LT},
+                                                        {TokType::GT,  BoolOp::GT},
+                                                        {TokType::LEQ, BoolOp::LEQ},
+                                                        {TokType::GEQ, BoolOp::GEQ},
+                                                        {TokType::NEQ, BoolOp::NEQ},
+                                                        {TokType::EQ,  BoolOp::EQ}};
 
 Parser::Parser(const std::string& __file__, CodeLines code_lines, std::vector<Token>& tokens) {
     this->__file__ = __file__;
@@ -216,8 +212,8 @@ Node* Parser::parse_and_expression() {
 Node* Parser::parse_bool_expression() {
     Node* left = this->parse_add_or_sub_expression();
     BoolOp op;
-    std::vector<TokType> boolean_tokens = {TokType::EQ, TokType::LT, TokType::GT, TokType::LEQ,
-                                           TokType::GEQ, TokType::NEQ};
+    std::vector<TokType> boolean_tokens = {TokType::EQ, TokType::LT, TokType::GT, TokType::LEQ, TokType::GEQ,
+                                           TokType::NEQ};
     if (!item_in_vec(this->token.type, boolean_tokens)) {
         return left;
     }
@@ -263,7 +259,7 @@ Node* Parser::parse_mul_div_or_mod_expression() {
 Node* Parser::parse_factor() {
     Node* parent;
     if (this->match(TokType::HASH)) {
-        parent = this->parse_class_or_tuple_literal();
+        parent = this->parse_tuple_literal();
     } else {
         parent = this->parse_id_or_literal();
     }
@@ -403,122 +399,32 @@ Node* Parser::parse_id_or_literal() {
     return node;
 }
 
-Node* Parser::parse_class_or_tuple_literal() {
+Node* Parser::parse_tuple_literal() {
     Token hash_tok = this->expect_token(TokType::HASH);
-
-    if (this->match(TokType::LPAREN)) {
-        // it's a tuple
-        this->next();
-        VectorOfNodes values;
-        if (this->match(TokType::RPAREN)) {
-            this->error_empty_tuple(hash_tok.start);
-        }
-        bool first = true;
-        while (true) {
-            Node* exp = this->parse_expression();
-            values.emplace_back(exp);
-            if (this->match(TokType::COMMA)) {
-                this->next();
-                first = false;
-                continue;
-            } else {
-                if (first && this->match(TokType::RPAREN)) {
-                    this->error_tuple_one_element(hash_tok.start);
-                }
-                break;
-            }
-        }
-        this->expect_token(TokType::RPAREN);
-        return new TupleNode(values);
-    }
-
-    TypeNode* type = this->parse_type_node();
-    if (type->kind != Kind::OBJECT) {
-        throw std::runtime_error("Expecterd a type to initialize, but got " + type->to_string());
-    }
-    ObjectType* otn = &type->object();
     this->expect_token(TokType::LPAREN);
-
-    std::unordered_map<std::string, Node*> init;
-    VectorOfNodes exps;
-    if (!this->match(TokType::RPAREN)) {
-        Node& first = *this->parse_expression();
-        // if it's an id
-        if (first.ntype == NodeType::ID) {
-            IdNode& idn = first.id();
-            if (this->match(TokType::RPAREN)) {
-                this->next();
-                exps.push_back(&first);
-                ClassLiteralExpressionNode* clen = new ClassLiteralExpressionNode(otn, exps);
-                clen->start = hash_tok.start;
-                return clen;
-
-            } else if (this->match(TokType::COMMA)) {
-                // it's a list of expressions
-                exps.push_back(&first);
-                this->next();
-                while (true) {
-                    Node* exp = this->parse_expression();
-                    exps.push_back(exp);
-                    if (this->match(TokType::COMMA)) {
-                        this->next();
-                    } else {
-                        break;
-                    }
-                }
-                this->expect_token(TokType::RPAREN);
-                ClassLiteralExpressionNode* clen = new ClassLiteralExpressionNode(otn, exps);
-                clen->start = hash_tok.start;
-                return clen;
-            } else {
-                // it's field:exp, field:exp
-                this->expect_token(TokType::COLON);
-                Node* exp = this->parse_expression();
-                init[idn._id] = exp;
-                if (this->match(TokType::COMMA)) {
-                    this->next();
-                    while (true) {
-                        Token field_id = this->expect_token(TokType::ID);
-                        this->expect_token(TokType::COLON);
-                        exp = this->parse_expression();
-                        init[field_id.str] = exp;
-                        if (this->match(TokType::COMMA)) {
-                            this->next();
-                        } else {
-                            break;
-                        }
-                    }
-                }
-                this->expect_token(TokType::RPAREN);
-                ClassLiteralFieldNode* clfn = new ClassLiteralFieldNode(otn, init);
-                clfn->start = hash_tok.start;
-                return clfn;
-            }
+    // it's a tuple
+    this->next();
+    VectorOfNodes values;
+    if (this->match(TokType::RPAREN)) {
+        this->error_empty_tuple(hash_tok.start);
+    }
+    bool first = true;
+    while (true) {
+        Node* exp = this->parse_expression();
+        values.emplace_back(exp);
+        if (this->match(TokType::COMMA)) {
+            this->next();
+            first = false;
+            continue;
         } else {
-            // it's a list of expressions
-            exps.push_back(&first);
-            if (this->match(TokType::COMMA)) {
-                this->next();
-                while (true) {
-                    Node* exp = this->parse_expression();
-                    exps.push_back(exp);
-                    if (this->match(TokType::COMMA)) {
-                        this->next();
-                    } else {
-                        break;
-                    }
-                }
+            if (first && this->match(TokType::RPAREN)) {
+                this->error_tuple_one_element(hash_tok.start);
             }
-            this->expect_token(TokType::RPAREN);
-            ClassLiteralExpressionNode* clen = new ClassLiteralExpressionNode(otn, exps);
-            clen->start = hash_tok.start;
-            return clen;
+            break;
         }
     }
     this->expect_token(TokType::RPAREN);
-    ClassLiteralFieldNode* clfn = new ClassLiteralFieldNode(otn, init);
-    clfn->start = hash_tok.start;
-    return clfn;
+    return new TupleNode(values);
 }
 
 Node* Parser::parse_id_or_class_literal() {
@@ -821,7 +727,7 @@ ClassNode* Parser::parse_class_definition() {
             type_parameters.push_back(type_param_tk.str);
             if (!this->match(TokType::COMMA)) {
                 break;
-            }else{
+            } else {
                 this->next();
             }
         }
@@ -837,8 +743,7 @@ ClassNode* Parser::parse_class_definition() {
             this->expect_token(TokType::COLON);
             TypeNode* member_type = this->parse_type_node();
             std::string& member_name = member_name_tk.str;
-            if (members.find(member_name) != members.end() ||
-                methods.find(member_name) != methods.end()) {
+            if (members.find(member_name) != members.end() || methods.find(member_name) != methods.end()) {
                 this->error_class_member_redefined(class_name, member_name, member_name_tk.start);
 
             }
@@ -848,8 +753,7 @@ ClassNode* Parser::parse_class_definition() {
         } else if (this->match(TokType::FUN)) {
             FunctionNode* method_node = this->parse_function_definition();
             std::string& method_name = method_node->identifier;
-            if (members.find(method_name) != members.end() ||
-                methods.find(method_name) != methods.end()) {
+            if (members.find(method_name) != members.end() || methods.find(method_name) != methods.end()) {
                 this->error_class_member_redefined(class_name, method_name, method_node->start);
 
             }

@@ -61,12 +61,8 @@ add_library(
   nodes/AssignmentNode.h
   nodes/BlockNode.cpp
   nodes/BlockNode.h
-  nodes/ClassLiteralExpressionNode.cpp
-  nodes/ClassLiteralExpressionNode.h
   nodes/EmptyListNode.cpp
   nodes/EmptyListNode.h
-  nodes/ClassLiteralFieldNode.cpp
-  nodes/ClassLiteralFieldNode.h
   nodes/BooleanNode.cpp
   nodes/BooleanNode.h
   nodes/WhileNode.cpp

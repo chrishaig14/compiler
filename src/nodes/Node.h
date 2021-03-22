@@ -24,10 +24,6 @@ class BreakNode;
 
 class CallNode;
 
-class ClassLiteralExpressionNode;
-
-class ClassLiteralFieldNode;
-
 class ClassNode;
 
 class ContinueNode;
@@ -112,8 +108,6 @@ public:
     virtual BooleanNode& boolean();
     virtual BreakNode& brk();
     virtual CallNode& call();
-    virtual ClassLiteralExpressionNode& clsexp();
-    virtual ClassLiteralFieldNode& clsfld();
     virtual ClassNode& cls();
     virtual ContinueNode& cntinue();
     virtual DeclarationNode& decl();
@@ -141,8 +135,6 @@ public:
     virtual const BooleanNode& boolean() const;
     virtual const BreakNode& brk() const;
     virtual const CallNode& call() const;
-    virtual const ClassLiteralExpressionNode& clsexp() const;
-    virtual const ClassLiteralFieldNode& clsfld() const;
     virtual const ClassNode& cls() const;
     virtual const ContinueNode& cntinue() const;
     virtual const DeclarationNode& decl() const;

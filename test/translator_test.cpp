@@ -97,17 +97,6 @@ TEST(translator_test, test_if) {
                         << "GOT:\n----\n" << translator.code << "----\nEXPECTED:\n----\n" << expected_code << "----\n";
 }
 
-TEST(translator_test, test_class_literal_fields) {
-    Translator translator;
-    Node* node = new ClassLiteralFieldNode(OBJECT_TYPE("Foo", {}), {{"foo", BIN(OpType::MUL, NUM(7), ID("a"))},
-                                                                    {"bar", NUM(65)}});
-    translator.dispatch(node);
-    VectorOfStrings fields = {"foo", "bar"};
-    CodeLabel expected_code = {NL(I_PUSHI(7)), NL(I_GET("a")), NL(I_BIN(OpType::MUL)), NL(I_PUSHI(65)),
-                               NL(I_MAKE_OBJECT("Foo", fields))};
-    EXPECT_EQ(translator.code, expected_code)
-                        << "GOT:\n----\n" << translator.code << "----\nEXPECTED:\n----\n" << expected_code << "----\n";
-}
 
 TEST(translator_test, translate_empty_list) {
     Translator translator;

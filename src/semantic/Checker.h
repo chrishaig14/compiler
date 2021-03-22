@@ -72,8 +72,6 @@ public:
     USemanticInfo visit(BoolOpNode& n);
     USemanticInfo visit(BreakNode& node);
     USemanticInfo visit(CallNode& node);
-    USemanticInfo visit(ClassLiteralExpressionNode& node);
-    USemanticInfo visit(ClassLiteralFieldNode& node);
     USemanticInfo visit(ClassNode& node);
     USemanticInfo visit(ContinueNode& node);
     USemanticInfo visit(DeclarationNode& node);

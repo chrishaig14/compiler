@@ -684,17 +684,6 @@ TEST_F(parser_test, tuple_literal_empty_error) {
     }
 }
 
-TEST_F(parser_test, class_literal_fields) {
-    std::string text = "#Foo{ y: 27, x: 9}";
-    SetUp(text);
-    node = parser->parse_expression();
-    std::unordered_map<std::string, Node*> fields;
-    fields["y"] = new NumberNode(27);
-    fields["x"] = new NumberNode(9);
-    expected_node = new ClassLiteralFieldNode(TYPE("Foo", {}), fields);
-    EXPECT_EQ(*node, *expected_node);
-}
-
 TEST_F(parser_test, partial_function) {
     std::string text = "$sum(4, *, \"Hello\")";
     SetUp(text);
@@ -705,16 +694,6 @@ TEST_F(parser_test, partial_function) {
     EXPECT_EQ(*node, *expected_node);
 }
 
-TEST_F(parser_test, class_literal_expression_ok) {
-    std::string text = "#Foo{9,27}";
-    SetUp(text);
-    node = parser->parse_expression();
-    VectorOfNodes fields;
-    fields.push_back(new NumberNode(9));
-    fields.push_back(new NumberNode(27));
-    expected_node = new ClassLiteralExpressionNode(TYPE("Foo", {}), fields);
-    EXPECT_EQ(*node, *expected_node);
-}
 
 TEST_F(parser_test, simple_member_str) {
     std::string text = "a.b";

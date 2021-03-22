@@ -31,8 +31,6 @@ public:
     std::string visit_bool_op(BoolOpNode& node);
     std::string visit_break(BreakNode& node);
     std::string visit_call(CallNode& node);
-    std::string visit_class_literal_expression(ClassLiteralExpressionNode& node);
-    std::string visit_class_literal_field(ClassLiteralFieldNode& node);
     std::string visit_class(ClassNode& node);
     std::string visit_continue(ContinueNode& node);
     std::string visit_declaration(DeclarationNode& node);

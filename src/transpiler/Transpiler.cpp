@@ -179,26 +179,6 @@ std::string Transpiler::visit_call(CallNode& node) {
     return out;
 }
 
-std::string Transpiler::visit_class_literal_expression(ClassLiteralExpressionNode& node) {
-    throw std::runtime_error("CLASS LITERAL EXPRESSION IN TRANSPILER!");
-}
-
-std::string Transpiler::visit_class_literal_field(ClassLiteralFieldNode& node) {
-    std::string out;
-    out = "GC::register_object(TAG(";
-    out += "new " + get_class_name(node.type->id) + "(";
-    for (int i = 0; i < node.init_names.size(); i++) {
-        out += this->dispatch(node.init_values[i]) + ", ";
-    }
-    if (node.init_names.size() != 0) {
-        out = out.substr(0, out.size() - 2);
-    }
-    out += ")";
-    out += ")";
-    out += ")";
-    return out;
-}
-
 std::string generate_destructor(std::string class_name, VectorOfStrings members) {
     std::string destructor;
     destructor += "~" + class_name + "()override{";
@@ -678,10 +658,6 @@ std::string Transpiler::dispatch(Node* nptr) {
             return this->visit_break(n.brk());
         case NodeType::CALL:
             return this->visit_call(n.call());
-        case NodeType::CLSEXP:
-            return this->visit_class_literal_expression(n.clsexp());
-        case NodeType::CLSFLD:
-            return this->visit_class_literal_field(n.clsfld());
         case NodeType::CLS:
             return this->visit_class(n.cls());
         case NodeType::CNTINUE:

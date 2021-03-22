@@ -101,10 +101,6 @@ const ClassNode& Node::cls() const {
     this->throw_dereference_error(CLS);
 }
 
-const ClassLiteralExpressionNode& Node::clsexp() const {
-    this->throw_dereference_error(CLSEXP);
-}
-
 AssignmentNode& Node::assign() {
     this->throw_dereference_error(ASSIGN);
 }
@@ -129,16 +125,8 @@ CallNode& Node::call() {
     this->throw_dereference_error(CALL);
 }
 
-ClassLiteralFieldNode& Node::clsfld() {
-    this->throw_dereference_error(CLSFLD);
-}
-
 TupleNode& Node::tuple() {
     this->throw_dereference_error(TUPLE);
-}
-
-ClassLiteralExpressionNode& Node::clsexp() {
-    this->throw_dereference_error(CLSEXP);
 }
 
 ClassNode& Node::cls() {
@@ -250,10 +238,6 @@ const CallNode& Node::call() const {
     this->throw_dereference_error(CALL);
 }
 
-const ClassLiteralFieldNode& Node::clsfld() const {
-    this->throw_dereference_error(CLSFLD);
-}
-
 #pragma GCC diagnostic pop
 
 void Node::throw_dereference_error(NodeType expected) const {
@@ -281,10 +265,6 @@ std::string Node::node_type_string(NodeType type) const {
             return "BRK";
         case CALL:
             return "CALL";
-        case CLSEXP:
-            return "CLSEXP";
-        case CLSFLD:
-            return "CLSFLD";
         case CLS:
             return "CLS";
         case CNTINUE:
