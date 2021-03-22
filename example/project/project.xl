@@ -1,5 +1,12 @@
+class Foo {
+    n: String
+    fun str()->String {
+        return "This sis a fii" + this.n
+    }
+}
+
 fun main()->Integer{
-    var x = {5:"Hello", 8: "Chris", 3: "Alex"};
-    print(x[8]+x[3])
+    var f = Foo.str
+    print(f(Foo.init("chris")))
     return 0
 }

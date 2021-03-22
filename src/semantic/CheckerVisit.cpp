@@ -883,7 +883,7 @@ USemanticInfo Checker::visit(MemberNode& n) {
                 rv.is_method = false;
                 rv.is_class_method = true;
                 this->replace_me = true;
-                IdNode* idn = new IdNode("f_" + class_name + "_" + child);
+                IdNode* idn = new IdNode(class_name + "_" + child);
                 idn->is_global_function = true;
                 this->replacement = idn;
                 return std::make_unique<SemanticInfo>(rv);
