@@ -57,7 +57,9 @@ public:
         return this->f(a0, a1);
     }
 
+    ~Function2() override {
 
+    }
 };
 
 class Function3 : public XObject {

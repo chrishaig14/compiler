@@ -107,6 +107,9 @@ USemanticInfo Checker::visit(SubscriptNode& node) {
         }
         info.set_type(object_type);
     }
+    if (info.type().kind==Kind::FUNCTION){
+        info.is_function = true;
+    }
     return std::make_unique<SemanticInfo>(info);
 }
 

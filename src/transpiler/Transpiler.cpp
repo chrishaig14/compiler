@@ -169,7 +169,7 @@ bool is_object(const TypeNode& t) {
 std::string Transpiler::visit_call(CallNode& node) {
     std::string out;
     out += "CALL" + std::to_string(node.arguments.size()) + "(";
-    out += this->visit_id(node.function->id()) + ", ";
+    out += this->dispatch(node.function) + ", ";
     for (int i = 0; i < node.arguments.size(); i++) {
         std::string w = this->dispatch(node.arguments[i]);
         out += w + ", ";
@@ -469,7 +469,7 @@ std::string Transpiler::visit_function(FunctionNode& node) {
     this->globals_initialization +=
             function_class + " " + raw_function_name + "_f" + " = " + function_class + " (" + raw_function_name +
             ");\n";
-    this->globals_initialization += "TaggedObject* " + function_obj_name + "=TAG(&" + raw_function_name + "_f);";
+    this->globals_initialization += "TaggedObject* " + function_obj_name + "=FTAG(&" + raw_function_name + "_f);";
     // out += "static Function" + num_args_str + "* " + function_obj_name + " = new Function" + num_args_str + "(" +
     //        raw_function_name + ");\n";
     return out;

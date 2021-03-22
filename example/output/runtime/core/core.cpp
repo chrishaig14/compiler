@@ -134,16 +134,16 @@ Function1 function_Boolean_str_p = Function1(f_Boolean_str);
 Function2 function_list_subscript_p = Function2(list_subscript);
 Function2 function_string_subscript_p = Function2(string_subscript);
 Function2 function_dict_subscript_p = Function2(dict_subscript);
-TaggedObject* function_open = TAG(&function_open_p);
-TaggedObject* function_print = TAG(&function_print_p);
-TaggedObject* function_range = TAG(&function_range_p);
-TaggedObject* function_map = TAG(&function_map_p);
-TaggedObject* function_join = TAG(&function_join_p);
-TaggedObject* function_File_read_line = TAG(&function_File_read_line_p);
-TaggedObject* function_Integer_str = TAG(&function_Integer_str_p);
-TaggedObject* function_Boolean_str = TAG(&function_Boolean_str_p);
-TaggedObject* function_list_subscript = TAG(&function_list_subscript_p);
-TaggedObject* function_string_subscript = TAG(&function_string_subscript_p);
-TaggedObject* function_dict_subscript = TAG(&function_dict_subscript_p);
+TaggedObject* function_open = FTAG(&function_open_p);
+TaggedObject* function_print = FTAG(&function_print_p);
+TaggedObject* function_range = FTAG(&function_range_p);
+TaggedObject* function_map = FTAG(&function_map_p);
+TaggedObject* function_join = FTAG(&function_join_p);
+TaggedObject* function_File_read_line = FTAG(&function_File_read_line_p);
+TaggedObject* function_Integer_str = FTAG(&function_Integer_str_p);
+TaggedObject* function_Boolean_str = FTAG(&function_Boolean_str_p);
+TaggedObject* function_list_subscript = FTAG(&function_list_subscript_p);
+TaggedObject* function_string_subscript = FTAG(&function_string_subscript_p);
+TaggedObject* function_dict_subscript = FTAG(&function_dict_subscript_p);
 
 

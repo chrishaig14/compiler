@@ -32,8 +32,8 @@ TaggedObject* f_List_len(TaggedObject* _l) {
 
 Function2 function_List_add_p = Function2(f_List_add);
 Function1 function_List_len_p = Function1(f_List_len);
-TaggedObject* function_List_add = TAG(&function_List_add_p);
-TaggedObject* function_List_len = TAG(&function_List_len_p);
+TaggedObject* function_List_add = FTAG(&function_List_add_p);
+TaggedObject* function_List_len = FTAG(&function_List_len_p);
 
 XList::XList(int n) : XObject("XList"), lv(n, nullptr) {
     this->l = &this->lv;
@@ -54,9 +54,10 @@ XList::~XList() {
     if (this->l->size() != 0) {
         if (has_tag(this->l->at(0), OBJECT_TAG)) {
             for (int i = 0; i < this->l->size(); i++) {
+                if (has_tag(this->l->at(i), FUNCTION_TAG)) {
+                    continue;
+                }
                 XObject* el = UNTAG(this->l->at(i));
-                std::cout << "el: " << el << std::endl;
-                std::cout << "NOW COUNT IS: " << el->count << std::endl;
                 el->dec_count();
                 if (el->count == 0) {
                     delete el;

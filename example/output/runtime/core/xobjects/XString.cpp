@@ -36,10 +36,10 @@ TaggedObject* f_String_eq(TaggedObject* this_obj, TaggedObject* other) {
 
 Function2 function_String_add_p = Function2(f_String_add);
 Function1 function_String_len_p = Function1(f_String_len);
-TaggedObject* function_String_add = TAG(&function_String_add_p);
-TaggedObject* function_String_len = TAG(&function_String_len_p);
+TaggedObject* function_String_add = FTAG(&function_String_add_p);
+TaggedObject* function_String_len = FTAG(&function_String_len_p);
 Function2 function_String_eq_p = Function2(f_String_eq);
-TaggedObject* function_String_eq = TAG(&function_String_eq_p);
+TaggedObject* function_String_eq = FTAG(&function_String_eq_p);
 
 XString::~XString() {
     // std::cout << "Deleted String '" << this->s << "' (" << this << ")" << std::endl;
