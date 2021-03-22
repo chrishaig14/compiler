@@ -960,38 +960,32 @@ USemanticInfo Checker::visit(BinopNode& n) {
     auto& right = right_info.type().object();
     auto ltype = left.id;
     auto rtype = right.id;
-    bool ok = false;
+    bool ok = true;
     if (ltype == "Integer" && rtype == "Integer") {
         info.set_type(T_INT);
-        info.is_function = false;
-        ok = true;
     } else if (ltype == "Float" && rtype == "Float") {
         info.set_type(ObjectType("Float", {}));
-        info.is_function = false;
-        ok = true;
     } else if (ltype == "Float" && rtype == "Integer" || ltype == "Integer" && rtype == "Float") {
         info.set_type(ObjectType("Float", {}));
-        info.is_function = false;
-        ok = true;
     } else if (ltype == "String" && rtype == "String") {
         if (n.op == OpType::ADD) {
             info.set_type(T_STRING);
-            info.is_function = false;
             IdNode* idn = new IdNode("String_add");
             idn->is_global_function = true;
             this->replace_me = true;
             this->replacement = new CallNode(idn, VectorOfNodes({n.left, n.right}));
-            ok = true;
+        } else {
+            ok = false;
         }
     } else if (ltype == "List" && rtype == "List" && left == right) {
         if (n.op == OpType::ADD) {
             info.set_type(left);
-            info.is_function = false;
             IdNode* idn = new IdNode("List_add");
             idn->is_global_function = true;
             this->replace_me = true;
             this->replacement = new CallNode(idn, VectorOfNodes({n.left, n.right}));
-            ok = true;
+        } else {
+            ok = false;
         }
     }
 
