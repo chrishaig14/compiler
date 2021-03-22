@@ -585,7 +585,7 @@ USemanticInfo Checker::visit(DeclarationNode& n) {
     }
     SemanticInfo info;
     info.is_function = false;
-    if (n.expression->ntype != NodeType::UNINITIALIZED and n.type != nullptr) {
+    if (n.type != nullptr) {
         TypeNode& n_type = *n.type;
         if (!this->assert_type_exists(n_type, n.start)) {
             return error_stub();
@@ -632,7 +632,7 @@ USemanticInfo Checker::visit(DeclarationNode& n) {
         }
         info.set_type(n_type);
 
-    } else if (n.expression->ntype != NodeType::UNINITIALIZED) {
+    } else {
         USemanticInfo exp_info_p = this->dispatch(n.expression);
         if (exp_info_p->type() == T_NONE) {
             this->error_function_doesnt_return_a_value(n.expression->start, nullptr);

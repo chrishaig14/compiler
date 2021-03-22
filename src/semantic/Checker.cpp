@@ -425,8 +425,6 @@ USemanticInfo Checker::dispatch(Node* nod) {
         case NodeType::WHIL:
             return this->visit(n.whil());
             break;
-        case NodeType::UNINITIALIZED:
-            break;
         case PARTIAL:
             return this->visit(n.partial());
             break;

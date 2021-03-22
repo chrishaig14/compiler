@@ -325,8 +325,6 @@ std::string Node::node_type_string(NodeType type) const {
             return "FTYPE";
         case WHIL:
             return "WHIL";
-        case UNINITIALIZED:
-            return "UNINITIALIZED";
         case TUPLE:
             return "TUPLE";
             break;

@@ -722,8 +722,6 @@ std::string Transpiler::dispatch(Node* nptr) {
             throw std::runtime_error("Don't know what to do!");
         case NodeType::WHIL:
             return this->visit_while(n.whil());
-        case NodeType::UNINITIALIZED:
-            throw std::runtime_error("Don't know what to do!");
         case TUPLE:
             return this->visit_tuple(n.tuple());
         case PARTIAL:
