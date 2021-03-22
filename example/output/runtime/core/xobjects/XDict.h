@@ -16,6 +16,7 @@ public:
     std::unordered_map<int, TaggedObject*> l;
 
     XDict(std::unordered_map<TaggedObject*, TaggedObject*> v);
+    ~XDict() override;
 
 };
 

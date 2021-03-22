@@ -549,7 +549,7 @@ std::string Transpiler::visit_list(ListNode& node) {
 
 std::string Transpiler::visit_dict(DictNode& node) {
     std::string out;
-    out = "NEW(XDict,std::unordered_map<XObject*,XObject*>({";
+    out = "NEW(XDict,std::unordered_map<TaggedObject*,TaggedObject*>({";
     for (int i = 0; i < node.items.size(); i++) {
         out += "{" + this->dispatch(node.items[i].first) + ", " + this->dispatch(node.items[i].second) + "}, ";
     }
