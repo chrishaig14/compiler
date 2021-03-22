@@ -21,7 +21,6 @@ USemanticInfo Checker::visit(ListNode& node) {
     }
     node.type = element_type.clone();
     SemanticInfo return_info;
-    return_info.is_function = false;
     return_info.set_type(ObjectType("List", {element_type.clone()}));
     return std::make_unique<SemanticInfo>(return_info);
 }
@@ -29,7 +28,6 @@ USemanticInfo Checker::visit(ListNode& node) {
 USemanticInfo Checker::visit(BooleanNode& node) {
     SemanticInfo info;
     info.set_type(T_BOOL);
-    info.is_function = false;
     return std::make_unique<SemanticInfo>(info);
 }
 
@@ -69,7 +67,6 @@ USemanticInfo Checker::visit(SubscriptNode& node) {
         this->error_subscript_non_object(node.start);
         return error_stub();
     }
-    SemanticInfo info;
     const ObjectType& object_type = parent.type().object();
 
     if (this->is_lvalue && object_type == T_STRING) {
@@ -89,6 +86,7 @@ USemanticInfo Checker::visit(SubscriptNode& node) {
     children.emplace_back(ct->type().clone());
     this->is_lvalue = old_lvalue;
     node.parent_t = object_type.clone();
+    SemanticInfo info;
     if (object_type.id == "List") {
         if (!is_integer) {
             this->error_subscript_type(object_type, ct->type(), T_INT, node.start);
@@ -109,9 +107,6 @@ USemanticInfo Checker::visit(SubscriptNode& node) {
         }
         info.set_type(object_type);
     }
-
-    info.is_function = false;
-
     return std::make_unique<SemanticInfo>(info);
 }
 
@@ -794,8 +789,6 @@ Checker::member_normal(const ObjectType& final_type, const ObjectType& object, s
         // It's a member
         info.set_type(*class_info->members[child]);
         rv = info;
-        rv.is_function = false;
-        rv.is_method = false;
     } else if (class_info->methods.find(child) != class_info->methods.end()) {
         // It's a method
         info.set_type(*class_info->methods.find(child)->second);
