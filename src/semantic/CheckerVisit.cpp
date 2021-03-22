@@ -888,7 +888,7 @@ USemanticInfo Checker::member_class_method(std::string class_name, std::string c
 
 }
 
-USemanticInfo Checker::member_tuple(const ObjectType& final_type, MemberNode& n){
+USemanticInfo Checker::member_tuple(const ObjectType& final_type, MemberNode& n) {
     if (n.type != MemberType::NUM) {
         throw std::runtime_error("Error can only access members " + std::to_string(1) + " to " +
                                  std::to_string(final_type.type_params.size()) + " of " + final_type.to_string());
@@ -902,8 +902,49 @@ USemanticInfo Checker::member_tuple(const ObjectType& final_type, MemberNode& n)
     return std::make_unique<SemanticInfo>(s);
 }
 
-USemanticInfo Checker::visit(MemberNode& n) {
+USemanticInfo
+Checker::member_normal(const ObjectType& final_type, const ObjectType& object, std::string child, MemberNode& n,
+                       SemanticInfo& info) {
+    if (n.type != MemberType::STR) {
+        throw std::runtime_error(
+                "Error: can access number member for tuple types only, but got " + final_type.to_string());
+    }
+
+    ClassInfo* class_info;
+    if (this->class_table->declared(final_type.to_string())) {
+        class_info = this->class_table->get(final_type.to_string());
+    } else {
+        if (is_generic((final_type)) && final_type.type_params.size() == 0) {
+            throw std::runtime_error(
+                    "Cannot access member of totally generic value of generic type " + object.id + "!");
+        } else {
+            class_info = this->class_table->get(object.id);
+            class_info = instantiate_generic(class_info, final_type);
+            this->class_table->set(object.to_string(), class_info);
+        }
+    }
     SemanticInfo rv;
+    if (class_info->members.find(child) != class_info->members.end()) {
+        // It's a member
+        info.set_type(*class_info->members[child]);
+        rv = info;
+        rv.is_function = false;
+        rv.is_method = false;
+    } else if (class_info->methods.find(child) != class_info->methods.end()) {
+        // It's a method
+        info.set_type(*class_info->methods.find(child)->second);
+        rv = info;
+        rv.is_method = true;
+        rv.class_info = class_info;
+    } else {
+        this->error_no_member(object, child, n.start);
+        return error_stub();
+    }
+    return std::make_unique<SemanticInfo>(rv);
+}
+
+
+USemanticInfo Checker::visit(MemberNode& n) {
     std::string& child = n.s_child;
     if (n.parent->ntype == NodeType::ID) {
         IdNode& id_node = n.parent->id();
@@ -945,44 +986,8 @@ USemanticInfo Checker::visit(MemberNode& n) {
         // special treatment for tuples
         return this->member_tuple(final_type, n);
     } else {
-        if (n.type != MemberType::STR) {
-            throw std::runtime_error(
-                    "Error: can access number member for tuple types only, but got " + final_type.to_string());
-        }
-
-        ClassInfo* class_info;
-        if (this->class_table->declared(final_type.to_string())) {
-            class_info = this->class_table->get(final_type.to_string());
-        } else {
-            if (is_generic((final_type)) && final_type.type_params.size() == 0) {
-                throw std::runtime_error(
-                        "Cannot access member of totally generic value of generic type " + object.id + "!");
-            } else {
-                class_info = this->class_table->get(object.id);
-                class_info = instantiate_generic(class_info, final_type);
-                this->class_table->set(object.to_string(), class_info);
-            }
-        }
-        if (class_info->members.find(child) != class_info->members.end()) {
-            // It's a member
-            info.set_type(*class_info->members[child]);
-            rv = info;
-            rv.is_function = false;
-            rv.is_method = false;
-        } else if (class_info->methods.find(child) != class_info->methods.end()) {
-            // It's a method
-            info.set_type(*class_info->methods.find(child)->second);
-            rv = info;
-            rv.is_method = true;
-            rv.class_info = class_info;
-        } else {
-            this->error_no_member(object, child, n.start);
-            return error_stub();
-        }
+        return this->member_normal(final_type, object, child, n, info);
     }
-
-    return std::make_unique<SemanticInfo>(rv);
-
 }
 
 USemanticInfo Checker::visit(IfNode& n) {

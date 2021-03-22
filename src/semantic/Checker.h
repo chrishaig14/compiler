@@ -148,6 +148,9 @@ public:
     void fail(std::string msg);
     USemanticInfo member_class_method(std::string class_name, std::string child, MemberNode& n);
     USemanticInfo member_tuple(const ObjectType& final_type, MemberNode& n);
+    USemanticInfo
+    member_normal(const ObjectType& final_type, const ObjectType& object, std::string child, MemberNode& n,
+                  SemanticInfo& info);
 };
 
 bool function_is_generic(const FunctionType& ft);
