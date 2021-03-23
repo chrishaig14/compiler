@@ -53,25 +53,19 @@ std::string Transpiler::visit_assignment(AssignmentNode& node) {
 }
 
 std::string Transpiler::visit_binop(BinopNode& node) {
-    std::string out = "op_";
-    switch (node.op) {
-        case OpType::ADD:
-            out = "INT_ADD";
-            break;
-        case OpType::SUB:
-            out = "INT_SUB";
-            break;
-        case OpType::MUL:
-            out = "INT_MUL";
-            break;
-        case OpType::DIV:
-            out = "INT_DIV";
-            break;
-        case OpType::MOD:
-            out = "INT_MOD";
-            break;
+    std::string prefix;
+    if (*node.ltype == T_INT) {
+        prefix = "INT";
+    } else if (*node.ltype == T_FLOAT) {
+        prefix = "FLOAT";
     }
-    out += "(" + this->dispatch(node.left) + ", " + this->dispatch(node.right) + ")";
+    std::map<OpType, std::string> ops;
+    ops[OpType::ADD] = "ADD";
+    ops[OpType::SUB] = "SUB";
+    ops[OpType::MUL] = "MUL";
+    ops[OpType::DIV] = "DIV";
+    std::string out =
+            prefix + "_" + ops[node.op] + "(" + this->dispatch(node.left) + ", " + this->dispatch(node.right) + ")";
     return out;
 }
 

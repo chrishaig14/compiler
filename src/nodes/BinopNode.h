@@ -32,6 +32,7 @@ public:
 
     json to_json() const override;
 
+    TypeNode* ltype;
 };
 
 

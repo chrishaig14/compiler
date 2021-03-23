@@ -107,7 +107,7 @@ USemanticInfo Checker::visit(SubscriptNode& node) {
         }
         info.set_type(object_type);
     }
-    if (info.type().kind==Kind::FUNCTION){
+    if (info.type().kind == Kind::FUNCTION) {
         info.is_function = true;
     }
     return std::make_unique<SemanticInfo>(info);
@@ -959,8 +959,6 @@ USemanticInfo Checker::visit(BinopNode& n) {
         info.set_type(T_INT);
     } else if (ltype == "Float" && rtype == "Float") {
         info.set_type(ObjectType("Float", {}));
-    } else if (ltype == "Float" && rtype == "Integer" || ltype == "Integer" && rtype == "Float") {
-        info.set_type(ObjectType("Float", {}));
     } else if (ltype == "String" && rtype == "String") {
         if (n.op == OpType::ADD) {
             info.set_type(T_STRING);
@@ -981,12 +979,15 @@ USemanticInfo Checker::visit(BinopNode& n) {
         } else {
             ok = false;
         }
+    } else {
+        ok = false;
     }
 
     if (!ok) {
         this->error_binop(left, right, n.op_pos);
         return error_stub();
     }
+    n.ltype = left.clone();
 
     return std::make_unique<SemanticInfo>(info);
 }
