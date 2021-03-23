@@ -67,6 +67,10 @@ inline TaggedObject* INT_MUL(TaggedObject* a, TaggedObject* b) {
     return MAKE_INT(GET_INT(a) * GET_INT(b));
 }
 
+inline TaggedObject* INT_MOD(TaggedObject* a, TaggedObject* b) {
+    return MAKE_INT(GET_INT(a) % GET_INT(b));
+}
+
 inline TaggedObject* INT_DIV(TaggedObject* a, TaggedObject* b) {
     return MAKE_INT(GET_INT(a) / GET_INT(b));
 }

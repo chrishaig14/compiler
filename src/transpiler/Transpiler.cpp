@@ -64,6 +64,7 @@ std::string Transpiler::visit_binop(BinopNode& node) {
     ops[OpType::SUB] = "SUB";
     ops[OpType::MUL] = "MUL";
     ops[OpType::DIV] = "DIV";
+    ops[OpType::MOD] = "MOD";
     std::string out =
             prefix + "_" + ops[node.op] + "(" + this->dispatch(node.left) + ", " + this->dispatch(node.right) + ")";
     return out;
