@@ -119,8 +119,9 @@ Token Scanner::next_token() {
         this->current++;
         if (c == '\n') {
             Token tok(TokType::ID, "DUMMY", {this->line, this->column});
-            std::vector<TokType> semic = {TokType::RETURN, TokType::ID, TokType::NUM, TokType::RPAREN, TokType::RSQUARE,
-                                          TokType::STRING, TokType::NONE, TokType::TRUE, TokType::FALSE};
+            std::vector<TokType> semic = {TokType::RETURN, TokType::ID, TokType::INTEGER, TokType::RPAREN,
+                                          TokType::RSQUARE, TokType::STRING, TokType::NONE, TokType::TRUE,
+                                          TokType::FALSE};
             for (auto ts : semic) {
                 if (this->token.type == ts) {
                     tok = Token(TokType::SEMICOLON, {this->line, this->column});
@@ -175,7 +176,6 @@ Token Scanner::next_token() {
         }
         Token token(TokType::STRING, str, {start_l, start_c});
         // token.start = start;
-        token.end = end;
         token.end_pos = {this->line, this->column};
         return token;
     }
@@ -199,7 +199,7 @@ Token Scanner::scan_other() {
             this->column += 2;
             Token token(TOKEN_SPECIAL[tstr], {start_l, start_c});
             int end = this->current - 1;
-            token.end = end;
+            token.end_pos = {this->line, this->column};
             if (token.type == TokType::DOUBLE_SLASH) {
                 // ignore everything until end of line
                 while (c != '\n' && this->current < this->text.size()) {
@@ -217,7 +217,7 @@ Token Scanner::scan_other() {
         this->current++;
         this->column++;
         Token token(TOKEN_SPECIAL[str], {start_l, start_c});
-        token.end = end;
+        token.end_pos = {this->line, this->column};
         return token;
     }
     std::string msg = E_FMT("Unexpected character ");
@@ -248,12 +248,12 @@ Token Scanner::scan_keyword_or_identifier() {
     if (TOKEN_KEYWORDS.find(str) != TOKEN_KEYWORDS.end()) {
 //      it's a keyword
         Token token(TOKEN_KEYWORDS[str], {start_l, start_c});
-        token.end = end;
+        token.end_pos = {this->line, this->column};
         return token;
     }
 //  it's an identifier
     Token token(TokType::ID, str, {start_l, start_c});
-    token.end = end;
+    token.end_pos = {this->line, this->column};
     return token;
 }
 
@@ -291,22 +291,31 @@ Token Scanner::scan_number() {
                             break;
                         }
                     }
+                    TokType tok_type = TokType::FLOAT;
+                    if (c == 'd') {
+                        //    double
+                        this->current++;
+                        tok_type = TokType::DOUBLE;
+                        if (this->current < this->text.size()) {
+                            this->column++;
+                        }
+                    }
                     int end = this->current - 1;
-                    Token token = Token(TokType::FLOAT, std::stof(str), {start_l, start_c});
-                    token.end = end;
+                    Token token = Token(tok_type, str, {start_l, start_c});
+                    token.end_pos = {this->line, this->column - 1};
                     return token;
                 }
             } else {
                 // it's just a dot, so return the number
                 int end = this->current - 1;
-                Token token = Token(TokType::NUM, std::stoi(str), {start_l, start_c});
-                token.end = end;
+                Token token = Token(TokType::INTEGER, str, {start_l, start_c});
+                token.end_pos = {this->line, this->column - 1};
                 return token;
             }
         }
     }
     int end = this->current - 1;
-    Token token = Token(TokType::NUM, std::stoi(str), {start_l, start_c});
+    Token token = Token(TokType::INTEGER, str, {start_l, start_c});
     token.end_pos = {this->line, this->column - 1};
     return token;
 }
@@ -323,19 +332,13 @@ std::vector<Token> Scanner::scan_all() {
     return tokens;
 }
 
-UnexpectedCharacter::UnexpectedCharacter(char
-                                         c, size_t
-                                         position) : std::runtime_error(
+UnexpectedCharacter::UnexpectedCharacter(char c, size_t position) : std::runtime_error(
         std::string("Unexpected character '") + std::string(1, c) + "' at position " + std::to_string(position)) {
 }
 
-UnexpectedCharacter::UnexpectedCharacter(char
-                                         c, int
-                                         line, int
-                                         column) : std::runtime_error(
+UnexpectedCharacter::UnexpectedCharacter(char c, int line, int column) : std::runtime_error(
         std::string("Unexpected character '") + std::string(1, c) + "' at line " + std::to_string(line + 1) +
-        " column " +
-        std::to_string(column + 1)) {
+        " column " + std::to_string(column + 1)) {
     this->column = column;
     this->line = line;
 }

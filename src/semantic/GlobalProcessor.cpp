@@ -27,6 +27,7 @@ GlobalProcessor::GlobalProcessor(std::vector<Builtin>& builtins, ClassTable* imp
     builtins.push_back({"File.read_line", "fun()->String"});
     builtins.push_back({"Integer.str", "fun(Integer)->String"});
     builtins.push_back({"Float.str", "fun(Float)->String"});
+    builtins.push_back({"Double.str", "fun(Double)->String"});
     builtins.push_back({"List.len", "fun(List[a])->Integer"});
     builtins.push_back({"List.pop", "fun(List[a],a)"});
     builtins.push_back({"List.push", "fun(List[a])->a"});

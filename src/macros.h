@@ -74,6 +74,7 @@
 #define T_STRING  ObjectType("String", {})
 #define T_LIST(e) ObjectType("List", {e})
 #define T_FLOAT ObjectType("Float", {})
+#define T_DOUBLE ObjectType("Double", {})
 
 typedef std::unordered_map<std::string, TypeNode*> MapStringType;
 

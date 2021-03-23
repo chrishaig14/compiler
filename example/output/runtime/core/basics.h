@@ -8,9 +8,14 @@
 #include "xobject.h"
 #include "xobjects/XString.h"
 #include "../macros.h"
+#include "xobjects/XDouble.h"
 
 inline TaggedObject* MAKE_STRING(const std::string& s) {
     return NEW(XString, s);
+}
+
+inline TaggedObject* MAKE_DOUBLE(double d) {
+    return NEW(XDouble, d);
 }
 
 inline TaggedObject* EQ(TaggedObject* a, TaggedObject* b) {

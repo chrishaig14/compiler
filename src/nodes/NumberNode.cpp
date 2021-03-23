@@ -4,14 +4,16 @@
 
 #include "NumberNode.h"
 
-NumberNode::NumberNode(int number, TextPosition start) : num(number) {
+NumberNode::NumberNode(NumberType num_type, std::string str, TextPosition start) {
+    this->num_type = num_type;
+    this->str = str;
     this->ntype = NUMBER;
     this->start = start;
 }
 
 bool NumberNode::equal(const Node& x) const {
     auto& other = x.number();
-    return this->num == other.num;
+    return this->str == other.str && this->num_type == other.num_type;
 }
 
 NumberNode& NumberNode::number() {
@@ -25,6 +27,6 @@ const NumberNode& NumberNode::number() const {
 json NumberNode::to_json() const {
     json j;
     j["node"] = "number";
-    j["number"] = this->num;
+    // j["number"] = this->num;
     return j;
 }

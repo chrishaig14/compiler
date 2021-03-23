@@ -9,24 +9,6 @@ std::unordered_map<TokType, std::string> TOKEN_STRINGS;
 Token::Token(TokType type, std::string str, TextPosition start) {
     this->type = type;
     this->str = str;
-    this->num = 0;
-    this->start = start;
-    this->flot = 0.0f;
-}
-
-Token::Token(TokType type, int num, TextPosition start) {
-    this->type = type;
-    this->num = num;
-    this->str = "";
-    this->start = start;
-    this->flot = 0.0f;
-}
-
-Token::Token(TokType type, float flot, TextPosition start) {
-    this->type = type;
-    this->num = 0;
-    this->flot = flot;
-    this->str = "";
     this->start = start;
 }
 
@@ -36,31 +18,29 @@ std::string Token::to_string() {
     st += TOKEN_STRINGS[this->type];
     if (this->type == TokType::ID || this->type == TokType::STRING) {
         st += " \"" + this->str + "\"";
-    } else if (this->type == TokType::NUM) {
-        st += " \"" + std::to_string(this->num) + "\"";
+    } else if (this->type == TokType::INTEGER) {
+        st += " \"" + this->str + "\"";
     }
     return st;
 }
 
 Token::Token(TokType type, TextPosition start) {
     this->type = type;
-    this->num = 0;
     this->str = "";
     this->start = start;
 }
 
 bool Token::operator==(const Token& other) const {
-    return this->type == other.type && this->str == other.str && this->num == other.num && this->start == other.start;
+    return this->type == other.type && this->str == other.str && this->start == other.start;
 }
 
 std::ostream& operator<<(std::ostream& os, const Token& token) {
-    os << TOKEN_STRINGS[token.type] << ", num: " << token.num << ", str: " << token.str << " pos: l" << token.start.line
+    os << TOKEN_STRINGS[token.type] << ", num: " << token.str << ", str: " << token.str << " pos: l" << token.start.line
        << ":c" << token.start.column;
     return os;
 }
 
 Token::Token() {
-    this->num = 0;
     this->str = "";
 }
 
@@ -105,7 +85,7 @@ void initialize_token_strings() {
     TOKEN_STRINGS[TokType::DOUBLE_SLASH] = "double slash ( // )";
     TOKEN_STRINGS[TokType::NOT] = "not ( ! )";
     TOKEN_STRINGS[TokType::ID] = "identifier";
-    TOKEN_STRINGS[TokType::NUM] = "number";
+    TOKEN_STRINGS[TokType::INTEGER] = "integer";
     TOKEN_STRINGS[TokType::STRING] = "string";
     TOKEN_STRINGS[TokType::FUN] = "fun";
     TOKEN_STRINGS[TokType::RETURN] = "return";

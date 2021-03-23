@@ -5,6 +5,7 @@
 #include <ctime>
 #include <bitset>
 #include <cstring>
+#include <sstream>
 #include "core.h"
 #include "xobjects/XString.h"
 #include "xobjects/XFile.h"
@@ -42,6 +43,16 @@ TaggedObject* f_range(TaggedObject* _start, TaggedObject* _step, TaggedObject* _
 
 TaggedObject* f_Integer_str(TaggedObject* _i) {
     TaggedObject* x = NEW(XString, std::to_string((GET_INT(_i))));
+    return x;
+}
+
+TaggedObject* f_Double_str(TaggedObject* _i) {
+    std::ostringstream out;
+    out.precision(50);
+    out << CAST(_i, XDouble)->d;
+    std::string s;
+    s = out.str();
+    TaggedObject* x = NEW(XString, s);
     return x;
 }
 
@@ -155,6 +166,7 @@ Function3 function_range_p = Function3(f_range);
 Function2 function_map_p = Function2(f_map);
 Function2 function_join_p = Function2(f_join);
 Function1 function_Integer_str_p = Function1(f_Integer_str);
+Function1 function_Double_str_p = Function1(f_Double_str);
 Function1 function_Float_str_p = Function1(f_Float_str);
 Function1 function_Boolean_str_p = Function1(f_Boolean_str);
 Function2 function_list_subscript_p = Function2(list_subscript);
@@ -167,6 +179,7 @@ TaggedObject* function_map = FTAG(&function_map_p);
 TaggedObject* function_join = FTAG(&function_join_p);
 TaggedObject* function_File_read_line = FTAG(&function_File_read_line_p);
 TaggedObject* function_Integer_str = FTAG(&function_Integer_str_p);
+TaggedObject* function_Double_str = FTAG(&function_Double_str_p);
 TaggedObject* function_Float_str = FTAG(&function_Float_str_p);
 TaggedObject* function_Boolean_str = FTAG(&function_Boolean_str_p);
 TaggedObject* function_list_subscript = FTAG(&function_list_subscript_p);

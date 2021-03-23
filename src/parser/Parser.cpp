@@ -272,9 +272,9 @@ Node* Parser::parse_factor() {
     while (this->match(TokType::DOT)) {
         this->next();
         Token tok;
-        if (this->match(TokType::NUM)) {
-            tok = this->expect_token(TokType::NUM);
-            parent = new MemberNode(parent, tok.num, parent->start);
+        if (this->match(TokType::INTEGER)) {
+            tok = this->expect_token(TokType::INTEGER);
+            parent = new MemberNode(parent, std::atoi(tok.str.c_str()), parent->start);
         } else {
             tok = this->expect_token(TokType::ID);
             parent = new MemberNode(parent, tok.str, parent->start);
@@ -351,14 +351,21 @@ Node* Parser::parse_id_or_literal() {
             node = this->parse_id_or_class_literal();
             break;
         }
-        case TokType::NUM: {
-            node = new NumberNode(this->token.num, this->token.start);
+        case TokType::INTEGER: {
+            node = new NumberNode(NumberType::INTEGER, this->token.str, this->token.start);
             node->end = this->token.end_pos;
             this->next();
             break;
         }
         case TokType::FLOAT: {
-            node = new FloatNode(this->token.flot);
+            node = new NumberNode(NumberType::FLOAT, this->token.str, this->token.start);
+            node->end = this->token.end_pos;
+            this->next();
+            break;
+        }
+        case TokType::DOUBLE: {
+            node = new NumberNode(NumberType::DOUBLE, this->token.str, this->token.start);
+            node->end = this->token.end_pos;
             this->next();
             break;
         }
@@ -432,6 +439,7 @@ Node* Parser::parse_id_or_class_literal() {
     std::string identifier = this->token.str;
     node = new IdNode(identifier);
     node->start = this->token.start;
+    node->end = this->token.end_pos;
     this->next();
     return node;
 }

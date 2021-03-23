@@ -62,6 +62,13 @@ ClassInfo* make_float_class_info() {
     return float_class_info;
 }
 
+ClassInfo* make_double_class_info() {
+    auto float_class_info = new ClassInfo();
+    float_class_info->class_name = "Double";
+    float_class_info->methods.insert(std::make_pair("str", parse_function_type("fun()->String")));
+    return float_class_info;
+}
+
 ClassInfo* make_string_class_info() {
     auto string_class_info = new ClassInfo();
     string_class_info->class_name = "String";
@@ -82,6 +89,7 @@ Checker::Checker(SymbolTable* globals, ClassTable* class_table, FunctionTable* f
     this->this_type = nullptr;
 
     this->class_table->set("Float", make_float_class_info());
+    this->class_table->set("Double", make_double_class_info());
     this->class_table->set("File", make_file_class_info());
     this->class_table->set("Integer", make_int_class_info());
     this->class_table->set("List", make_list_class_info());

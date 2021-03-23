@@ -50,7 +50,17 @@ USemanticInfo Checker::visit(WhileNode& node) {
 
 USemanticInfo Checker::visit(NumberNode& node) {
     SemanticInfo info;
-    info.set_type(T_INT);
+    switch (node.num_type) {
+        case NumberType::INTEGER:
+            info.set_type(T_INT);
+            break;
+        case NumberType::FLOAT:
+            info.set_type(T_FLOAT);
+            break;
+        case NumberType::DOUBLE:
+            info.set_type(T_DOUBLE);
+            break;
+    }
     return std::make_unique<SemanticInfo>(info);
 }
 
@@ -340,12 +350,14 @@ USemanticInfo Checker::visit(ForNode& node) {
                                                   new SubscriptNode(new IdNode("_list0"), {new IdNode("_index0")})));
     new_body->nodes.insert(new_body->nodes.end(), node.body->nodes.begin(), node.body->nodes.end());
     AssignmentNode* asn = new AssignmentNode(new IdNode("_index0"),
-                                             new BinopNode(OpType::ADD, new IdNode(".index0"), new NumberNode(1)));
+                                             new BinopNode(OpType::ADD,
+                                                           new IdNode(".index0"),
+                                                           new NumberNode(NumberType::INTEGER, "1")));
     asn->type = new T_INT;
     new_body->nodes.push_back(asn);
 
     TypeNode& var_type = *obj.type_params[0];
-    BlockNode* bn = new BlockNode({new DeclarationNode("_index0", new T_INT, new NumberNode(0)),
+    BlockNode* bn = new BlockNode({new DeclarationNode("_index0", new T_INT, new NumberNode(NumberType::INTEGER, "0")),
                                    new DeclarationNode("_list0", obj.clone(), node.exp),});
     this->visit(*bn);
     this->enter_scope("for");

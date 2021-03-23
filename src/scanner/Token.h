@@ -40,7 +40,6 @@ enum class TokType {
     OR,
     NOT,
     ID,
-    NUM,
     STRING,
     FUN,
     DOUBLE_SLASH,
@@ -60,7 +59,19 @@ enum class TokType {
     RCURLY,
     LPAREN,
     RPAREN,
-    END, RARROW, TRUE, FALSE, QUESTION, NONE, DOUBLE_COLON, HASH, ARROBA, CLASS, IMPORT, FROM
+    END,
+    RARROW,
+    TRUE,
+    FALSE,
+    QUESTION,
+    NONE,
+    DOUBLE_COLON,
+    HASH,
+    ARROBA,
+    CLASS,
+    IMPORT,
+    FROM,
+    DOUBLE, INTEGER
 };
 
 extern std::unordered_map<TokType, std::string> TOKEN_STRINGS;
@@ -71,21 +82,14 @@ class Token {
 public:
     TokType type;
     std::string str;
-    int num;
-    float flot;
     TextPosition start;
     TextPosition end_pos;
-    int end;
 
     Token();
 
     Token(TokType type, TextPosition start);
 
     Token(TokType type, std::string str, TextPosition start);
-
-    Token(TokType type, int num, TextPosition start);
-
-    Token(TokType type, float flot, TextPosition start);
 
     bool operator==(const Token& other) const;
 

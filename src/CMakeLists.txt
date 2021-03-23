@@ -77,8 +77,6 @@ add_library(
   nodes/optypes.cpp
   nodes/TupleNode.cpp
   nodes/TupleNode.h
-  nodes/FloatNode.cpp
-  nodes/FloatNode.h
   nodes/BoolOpNode.cpp
   nodes/BoolOpNode.h
   nodes/PartialApplication.cpp

@@ -10,13 +10,18 @@
 
 #include "Node.h"
 
+enum class NumberType {
+    INTEGER, FLOAT, DOUBLE
+};
+
 class NumberNode : public Node {
 public:
-    int num;
+    std::string str;
 
-    NumberNode(int number) : NumberNode(number, {-1, -1}) {}
+    NumberNode(NumberType num_type, std::string str) : NumberNode(num_type, str, {-1, -1}) {
+    }
 
-    NumberNode(int number, TextPosition start);
+    NumberNode(NumberType num_type, std::string str, TextPosition start);
 
     bool equal(const Node& x) const override;
 
@@ -25,6 +30,7 @@ public:
     NumberNode& number() override;
     const NumberNode& number() const override;
 
+    NumberType num_type;
 };
 
 

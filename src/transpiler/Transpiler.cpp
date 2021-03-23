@@ -359,8 +359,20 @@ std::string Transpiler::visit_empty_list(EmptyListNode& node) {
     return "LIST()";
 }
 
-std::string Transpiler::visit_float(FloatNode& node) {
-    return "MAKE_FLOAT(" + std::to_string(node.value) + ")";
+std::string Transpiler::visit_number(NumberNode& node) {
+    std::string t;
+    switch (node.num_type) {
+        case NumberType::INTEGER:
+            t = "INT";
+            break;
+        case NumberType::FLOAT:
+            t = "FLOAT";
+            break;
+        case NumberType::DOUBLE:
+            t = "DOUBLE";
+            break;
+    }
+    return "MAKE_" + t + "(" + node.str + ")";
 }
 
 std::string Transpiler::visit_for(ForNode& node) {
@@ -554,10 +566,6 @@ std::string Transpiler::visit_none(NoneNode& node) {
     return "nullptr";
 }
 
-std::string Transpiler::visit_number(NumberNode& node) {
-    return std::string() + "MAKE_INT" + "(" + std::to_string(node.num) + ")";
-}
-
 std::string Transpiler::visit_return(ReturnNode& node) {
     std::string out;
     if (node.expression != nullptr) {
@@ -677,8 +685,6 @@ std::string Transpiler::dispatch(Node* nptr) {
             return this->visit_none(n.none());
         case NodeType::NUMBER:
             return this->visit_number(n.number());
-        case NodeType::FLOT:
-            return this->visit_float(n.flot());
         case NodeType::RETRN:
             return this->visit_return(n.retrn());
         case NodeType::STRNG:

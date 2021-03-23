@@ -35,7 +35,6 @@ public:
     std::string visit_continue(ContinueNode& node);
     std::string visit_declaration(DeclarationNode& node);
     std::string visit_empty_list(EmptyListNode& node);
-    std::string visit_float(FloatNode& node);
     std::string visit_for(ForNode& node);
     std::string visit_function(FunctionNode& node);
     std::string visit_id(IdNode& node);
