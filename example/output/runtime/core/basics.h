@@ -96,4 +96,47 @@ inline TaggedObject* INT_DIV(TaggedObject* a, TaggedObject* b) {
     return MAKE_INT(GET_INT(a) / GET_INT(b));
 }
 
+inline TaggedObject* Integer_to_Float(TaggedObject* a) {
+    return MAKE_FLOAT(GET_INT(a));
+}
+inline TaggedObject* Integer_to_Double(TaggedObject* a) {
+    return MAKE_DOUBLE(GET_INT(a));
+}
+inline TaggedObject* Integer_to_Boolean(TaggedObject* a) {
+    return MAKE_BOOL(GET_INT(a));
+}
+
+inline TaggedObject* Float_to_Integer(TaggedObject* a) {
+    return MAKE_INT(GET_FLOAT(a));
+}
+inline TaggedObject* Float_to_Double(TaggedObject* a) {
+    return MAKE_DOUBLE(GET_FLOAT(a));
+}
+inline TaggedObject* Float_to_Boolean(TaggedObject* a) {
+    return MAKE_BOOL(GET_FLOAT(a));
+}
+
+inline TaggedObject* Double_to_Integer(TaggedObject* a) {
+    return MAKE_INT(CAST(a,XDouble)->d);
+}
+inline TaggedObject* Double_to_Float(TaggedObject* a) {
+    return MAKE_FLOAT(CAST(a,XDouble)->d);
+}
+inline TaggedObject* Double_to_Boolean(TaggedObject* a) {
+    return MAKE_BOOL(CAST(a,XDouble)->d);
+}
+
+// inline TaggedObject* Float_to_Integer(TaggedObject* a) {
+//     return MAKE_INT(GET_FLOAT(a));
+// }
+//
+// inline TaggedObject* Integer_to_Float(TaggedObject* a) {
+//     return MAKE_FLOAT(GET_INT(a));
+// }
+//
+// inline TaggedObject* Float_to_Integer(TaggedObject* a) {
+//     return MAKE_INT(GET_FLOAT(a));
+// }
+
+
 #endif //XLANG_BASICS_H

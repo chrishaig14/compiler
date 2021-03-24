@@ -97,6 +97,10 @@ const ContinueNode& Node::cntinue() const {
     this->throw_dereference_error(CNTINUE);
 }
 
+const CastNode& Node::cast() const {
+    this->throw_dereference_error(CAST);
+}
+
 const ClassNode& Node::cls() const {
     this->throw_dereference_error(CLS);
 }
@@ -135,6 +139,10 @@ ClassNode& Node::cls() {
 
 ContinueNode& Node::cntinue() {
     this->throw_dereference_error(CNTINUE);
+}
+
+CastNode& Node::cast() {
+    this->throw_dereference_error(CAST);
 }
 
 DeclarationNode& Node::decl() {

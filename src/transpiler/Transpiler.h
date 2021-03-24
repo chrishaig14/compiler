@@ -25,6 +25,7 @@ public:
     Transpiler();
     std::string dispatch(Node* nptr);
     std::string visit_assignment(AssignmentNode& node);
+    std::string visit_cast(CastNode& node);
     std::string visit_binop(BinopNode& node);
     std::string visit_block(BlockNode& node);
     std::string visit_boolean(BooleanNode& node);
@@ -66,6 +67,7 @@ public:
     std::string ptr_to_type_object(const ObjectType& t);
     std::string visit_dict(DictNode& node);
     unsigned long num_members_class;
+    std::string visit_cast_op(CastNode& node);
 };
 
 

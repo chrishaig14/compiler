@@ -649,6 +649,8 @@ std::string Transpiler::visit_while(WhileNode& node) {
 std::string Transpiler::dispatch(Node* nptr) {
     Node& n = *nptr;
     switch (n.ntype) {
+        case NodeType::CAST:
+            return this->visit_cast_op(n.cast());
         case NodeType::BOOLOP:
             return this->visit_bool_op(n.boolop());
         case NodeType::ASSIGN:
@@ -805,6 +807,12 @@ std::string Transpiler::visit_partial(PartialApplication& node) {
         args = args.substr(0, args.size() - 2);
     }
     out += "NEW(Partial" + std::to_string(num_args) + "," + this->dispatch(node.function) + "," + args + ")";
+    return out;
+}
+
+std::string Transpiler::visit_cast_op(CastNode& node) {
+    std::string name = node.exp_type->to_string() + "_to_" + node.as_type;
+    std::string out = name + "(" + this->dispatch(node.exp) + ")";
     return out;
 }
 

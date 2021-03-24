@@ -17,6 +17,7 @@
 #include "ClassNode.h"
 #include "TernaryNode.h"
 #include "NoneNode.h"
+#include "CastNode.h"
 #include "BoolOpNode.h"
 #include "ForNode.h"
 #include "WhileNode.h"

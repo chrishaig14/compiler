@@ -149,6 +149,7 @@ public:
     USemanticInfo
     member_normal(const ObjectType& final_type, const ObjectType& object, std::string child, MemberNode& n,
                   SemanticInfo& info);
+    USemanticInfo visit(CastNode& n);
 };
 
 bool function_is_generic(const FunctionType& ft);

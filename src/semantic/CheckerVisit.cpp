@@ -864,6 +864,24 @@ USemanticInfo Checker::visit(MemberNode& n) {
     }
 }
 
+USemanticInfo Checker::visit(CastNode& n) {
+    USemanticInfo exp_info = this->dispatch(n.exp);
+    SemanticInfo info;
+    ObjectType cast_type(n.as_type, {});
+    const TypeNode& exp_type = exp_info->type();
+    if (exp_type == T_INT || exp_type == T_FLOAT || exp_type == T_DOUBLE || exp_type == T_BOOL) {
+        if (cast_type != T_BOOL && cast_type != T_FLOAT && cast_type != T_DOUBLE && cast_type != T_INT) {
+            throw std::runtime_error("Can't cast " + exp_type.to_string() + " to " + cast_type.to_string());
+        }
+        if (exp_type == cast_type) {
+            throw std::runtime_error("Casting to same type " + cast_type.to_string());
+        }
+    }
+    n.exp_type = exp_type.clone();
+    info.set_type(cast_type);
+    return std::make_unique<SemanticInfo>(info);
+}
+
 USemanticInfo Checker::visit(IfNode& n) {
     SemanticInfo info;
     USemanticInfo condition_info_p = this->dispatch(n.condition);

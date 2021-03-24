@@ -281,6 +281,11 @@ Node* Parser::parse_factor() {
         }
         parent = this->parse_call_or_subscript_chain(parent);
     }
+    if (this->match(TokType::DOUBLE_COLON)) {
+        this->next();
+        Token as_type = this->expect_token(TokType::ID);
+        parent = new CastNode(parent, as_type.str, parent->start);
+    }
     return parent;
 }
 

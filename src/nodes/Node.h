@@ -72,6 +72,8 @@ class WhileNode;
 
 class ImportNode;
 
+class CastNode;
+
 
 class Node {
 public:
@@ -109,6 +111,8 @@ public:
     virtual BreakNode& brk();
     virtual CallNode& call();
     virtual ClassNode& cls();
+    virtual CastNode& cast();
+    virtual const CastNode& cast() const;
     virtual ContinueNode& cntinue();
     virtual DeclarationNode& decl();
     virtual DictNode& dict();

@@ -400,6 +400,8 @@ USemanticInfo Checker::dispatch(Node* nod) {
         case NodeType::ID:
             return this->visit(n.id());
             break;
+        case NodeType::CAST:
+            return this->visit(n.cast());
         case NodeType::IFF:
             return this->visit(n.iff());
             break;
