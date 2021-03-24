@@ -876,6 +876,8 @@ USemanticInfo Checker::visit(CastNode& n) {
         if (exp_type == cast_type) {
             throw std::runtime_error("Casting to same type " + cast_type.to_string());
         }
+    } else {
+        throw std::runtime_error("Can't cast " + exp_type.to_string() + " to " + cast_type.to_string());
     }
     n.exp_type = exp_type.clone();
     info.set_type(cast_type);
