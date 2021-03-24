@@ -64,6 +64,22 @@ inline TaggedObject* FLOAT_MUL(TaggedObject* a, TaggedObject* b) {
     return MAKE_FLOAT(GET_FLOAT(a) * GET_FLOAT(b));
 }
 
+inline TaggedObject* DOUBLE_ADD(TaggedObject* a, TaggedObject* b) {
+    return MAKE_DOUBLE(CAST(a, XDouble)->d + CAST(b, XDouble)->d);
+}
+
+inline TaggedObject* DOUBLE_SUB(TaggedObject* a, TaggedObject* b) {
+    return MAKE_DOUBLE(CAST(a, XDouble)->d - CAST(b, XDouble)->d);
+}
+
+inline TaggedObject* DOUBLE_DIV(TaggedObject* a, TaggedObject* b) {
+    return MAKE_DOUBLE(CAST(a, XDouble)->d / CAST(b, XDouble)->d);
+}
+
+inline TaggedObject* DOUBLE_MUL(TaggedObject* a, TaggedObject* b) {
+    return MAKE_DOUBLE(CAST(a, XDouble)->d * CAST(b, XDouble)->d);
+}
+
 inline TaggedObject* INT_SUB(TaggedObject* a, TaggedObject* b) {
     return MAKE_INT(GET_INT(a) - GET_INT(b));
 }

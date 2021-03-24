@@ -58,6 +58,8 @@ std::string Transpiler::visit_binop(BinopNode& node) {
         prefix = "INT";
     } else if (*node.ltype == T_FLOAT) {
         prefix = "FLOAT";
+    } else if (*node.ltype == T_DOUBLE) {
+        prefix = "DOUBLE";
     }
     std::map<OpType, std::string> ops;
     ops[OpType::ADD] = "ADD";

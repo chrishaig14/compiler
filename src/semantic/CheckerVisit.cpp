@@ -971,6 +971,8 @@ USemanticInfo Checker::visit(BinopNode& n) {
         info.set_type(T_INT);
     } else if (ltype == "Float" && rtype == "Float") {
         info.set_type(ObjectType("Float", {}));
+    } else if (ltype == "Double" && rtype == "Double") {
+        info.set_type(ObjectType("Double", {}));
     } else if (ltype == "String" && rtype == "String") {
         if (n.op == OpType::ADD) {
             info.set_type(T_STRING);
