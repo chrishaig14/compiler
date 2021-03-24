@@ -75,7 +75,12 @@ float float_rd(TaggedObject* r) {
 
 
 TaggedObject* f_Float_str(TaggedObject* _i) {
-    TaggedObject* x = NEW(XString, std::to_string((GET_FLOAT(_i))));
+    std::ostringstream out;
+    out.precision(50);
+    out << float_rd(_i);
+    std::string s;
+    s = out.str();
+    TaggedObject* x = NEW(XString, s);
     return x;
 }
 
