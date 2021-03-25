@@ -222,6 +222,14 @@ const AssignmentNode& Node::assign() const {
     this->throw_dereference_error(ASSIGN);
 }
 
+const MethodNode& Node::method() const {
+    this->throw_dereference_error(METHOD);
+}
+
+MethodNode& Node::method() {
+    this->throw_dereference_error(METHOD);
+}
+
 const BinopNode& Node::binop() const {
     this->throw_dereference_error(BINOP);
 }

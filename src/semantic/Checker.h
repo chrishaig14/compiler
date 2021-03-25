@@ -71,6 +71,7 @@ public:
     USemanticInfo visit(BooleanNode& node);
     USemanticInfo visit(BoolOpNode& n);
     USemanticInfo visit(BreakNode& node);
+    USemanticInfo visit(MethodNode& node);
     USemanticInfo visit(CallNode& node);
     USemanticInfo visit(ClassNode& node);
     USemanticInfo visit(ContinueNode& node);
@@ -150,6 +151,7 @@ public:
     member_normal(const ObjectType& final_type, const ObjectType& object, std::string child, MemberNode& n,
                   SemanticInfo& info);
     USemanticInfo visit(CastNode& n);
+    void error_method_not_member(const TypeNode& t, const std::string& member, TextPosition position);
 };
 
 bool function_is_generic(const FunctionType& ft);

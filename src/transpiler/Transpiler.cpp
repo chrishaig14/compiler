@@ -166,7 +166,10 @@ bool is_object(const TypeNode& t) {
 std::string Transpiler::visit_call(CallNode& node) {
     std::string out;
     out += "CALL" + std::to_string(node.arguments.size()) + "(";
+    bool old_is_call = this->is_call;
+    this->is_call = true;
     out += this->dispatch(node.function) + ", ";
+    this->is_call = old_is_call;
     for (int i = 0; i < node.arguments.size(); i++) {
         std::string w = this->dispatch(node.arguments[i]);
         out += w + ", ";
@@ -766,6 +769,7 @@ std::string Transpiler::generate_tuple_types() {
 
 Transpiler::Transpiler() {
     this->is_lvalue = false;
+    this->is_call = false;
 }
 
 
@@ -814,5 +818,15 @@ std::string Transpiler::visit_cast_op(CastNode& node) {
     std::string name = node.exp_type->to_string() + "_to_" + node.as_type;
     std::string out = name + "(" + this->dispatch(node.exp) + ")";
     return out;
+}
+
+std::string Transpiler::visit_method(MethodNode& node) {
+    // std::string out;
+    // if (this->is_call) {
+    //     // no need to create Partial, just call the function directly
+    //     out += CALL(node.parent);
+    // } else {
+    //
+    // }
 }
 

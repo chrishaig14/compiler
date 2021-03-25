@@ -377,6 +377,22 @@ USemanticInfo Checker::visit(ForNode& node) {
     return nullptr;
 }
 
+USemanticInfo Checker::visit(MethodNode& n) {
+    USemanticInfo parent = this->dispatch(n.parent);
+    n.parent_t = parent->type().clone();
+    if (n.parent_t->kind != Kind::OBJECT){
+        throw std::runtime_error("Cannot call a method on a function");
+    }
+    ClassInfo* class_info = this->class_table->get(n.parent_t->object().id);
+    SemanticInfo info;
+    FunctionType* ft = class_info->methods[n.s_child];
+    info.set_type(*ft);
+    info.is_function = true;
+    info.is_method = true;
+    info.class_info = class_info;
+    return std::make_unique<SemanticInfo>(info);
+}
+
 USemanticInfo Checker::visit(CallNode& n) {
     USemanticInfo fun_info_p = this->dispatch(n.function);
     if (fun_info_p->is_error) {
@@ -390,13 +406,13 @@ USemanticInfo Checker::visit(CallNode& n) {
         // Since it's a method, we have to transform it and prepare it for the translation step,
         // where instead of calling object.method(args), we call <class>.method(object, args)
 
-        MemberNode& member_node = n.function->member();
-        IdNode* pNode = new IdNode(fun_info.class_info->class_name + "." + member_node.s_child);
+        MethodNode& method_node = n.function->method();
+        IdNode* pNode = new IdNode(fun_info.class_info->class_name + "." + method_node.s_child);
         pNode->location = VariableLocation(-2, -1);
         n.function = pNode;
         pNode->is_global_function = true;
         this->replace_me = false;
-        object_node = member_node.parent;
+        object_node = method_node.parent;
         is_a_method = true;
     } else if (fun_info.is_class_method) {
         MemberNode& member_node = n.function->member();
@@ -805,11 +821,8 @@ Checker::member_normal(const ObjectType& final_type, const ObjectType& object, s
         info.set_type(*class_info->members[child]);
         rv = info;
     } else if (class_info->methods.find(child) != class_info->methods.end()) {
-        // It's a method
-        info.set_type(*class_info->methods.find(child)->second);
-        rv = info;
-        rv.is_method = true;
-        rv.class_info = class_info;
+        this->error_method_not_member(object, child, n.start);
+        return error_stub();
     } else {
         this->error_no_member(object, child, n.start);
         return error_stub();

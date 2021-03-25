@@ -23,6 +23,14 @@ void Checker::error_no_member(const TypeNode& t, const std::string& member, Text
     this->fail(msg);
 }
 
+void Checker::error_method_not_member(const TypeNode& t, const std::string& member, TextPosition position) {
+    std::string msg;
+    msg = this->context_string(position) + E_HLT(member) + E_FMT(" is a method, not a member, of ") +
+          E_HLT(t.to_string()) + E_FMT(" use ") + E_HLT("':'") + E_FMT(" instead of ") + E_HLT("'.'") +
+          this->code_context_string(position);
+    this->fail(msg);
+}
+
 void Checker::error_bool_op(const TypeNode& left, const TypeNode& right, TextPosition position) {
     std::string msg;
     msg = context_string(position) + E_FMT("Cannot perform bool op between types ") + E_HLT(left.to_string()) +
@@ -141,7 +149,8 @@ void Checker::error_redeclared(const std::string& name, TextPosition pos) {
 
 void Checker::error_variable_not_declared(const std::string& name, TextPosition pos) {
     std::string msg;
-    msg = this->context_string(pos) + E_FMT("Variable ") + E_HLT("'" + name + "'") + E_FMT(" not declared") + this->code_context_string(pos);
+    msg = this->context_string(pos) + E_FMT("Variable ") + E_HLT("'" + name + "'") + E_FMT(" not declared") +
+          this->code_context_string(pos);
     this->fail(msg);
 }
 

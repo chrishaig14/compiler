@@ -269,18 +269,25 @@ Node* Parser::parse_factor() {
         }
     }
     parent = this->parse_call_or_subscript_chain(parent);
-    while (this->match(TokType::DOT)) {
-        this->next();
-        Token tok;
-        if (this->match(TokType::INTEGER)) {
-            tok = this->expect_token(TokType::INTEGER);
-            parent = new MemberNode(parent, std::atoi(tok.str.c_str()), parent->start);
-        } else {
-            tok = this->expect_token(TokType::ID);
-            parent = new MemberNode(parent, tok.str, parent->start);
+    while (this->match(TokType::DOT) || this->match(TokType::COLON)) {
+        if (this->match(TokType::DOT)) {
+            this->next();
+            Token tok;
+            if (this->match(TokType::INTEGER)) {
+                tok = this->expect_token(TokType::INTEGER);
+                parent = new MemberNode(parent, std::atoi(tok.str.c_str()), parent->start);
+            } else {
+                tok = this->expect_token(TokType::ID);
+                parent = new MemberNode(parent, tok.str, parent->start);
+            }
+        } else if (this->match(TokType::COLON)) {
+            this->next();
+            Token tok = this->expect_token(TokType::ID);
+            parent = new MethodNode(parent, tok.str, parent->start);
         }
         parent = this->parse_call_or_subscript_chain(parent);
     }
+
     if (this->match(TokType::DOUBLE_COLON)) {
         this->next();
         Token as_type = this->expect_token(TokType::ID);

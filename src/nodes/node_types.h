@@ -13,6 +13,7 @@ enum NodeType {
     BOOLEAN,
     BRK,
     CALL,
+    METHOD,
     CAST,
     DICT,
     EMPTYDICT,

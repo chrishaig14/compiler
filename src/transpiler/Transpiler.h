@@ -47,6 +47,7 @@ public:
     std::string visit_number(NumberNode& node);
     std::string visit_return(ReturnNode& node);
     std::string visit_string(StringNode& node);
+    std::string visit_method(MethodNode& node);
     std::string visit_subscript(SubscriptNode& node);
     std::string visit_ternary(TernaryNode& node);
     std::string visit_tuple(TupleNode& node);
@@ -68,6 +69,7 @@ public:
     std::string visit_dict(DictNode& node);
     unsigned long num_members_class;
     std::string visit_cast_op(CastNode& node);
+    bool is_call;
 };
 
 

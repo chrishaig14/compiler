@@ -74,6 +74,7 @@ class ImportNode;
 
 class CastNode;
 
+class MethodNode;
 
 class Node {
 public:
@@ -133,6 +134,8 @@ public:
     virtual TupleNode& tuple();
     virtual TernaryNode& ternary();
     virtual WhileNode& whil();
+    virtual MethodNode& method();
+    virtual const MethodNode& method() const;
     virtual const AssignmentNode& assign() const;
     virtual const BinopNode& binop() const;
     virtual const BlockNode& block() const;
