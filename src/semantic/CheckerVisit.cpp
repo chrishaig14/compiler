@@ -385,11 +385,16 @@ USemanticInfo Checker::visit(MethodNode& n) {
     }
     ClassInfo* class_info = this->class_table->get(n.parent_t->object().id);
     SemanticInfo info;
+    if (class_info->methods.find(n.s_child) == class_info->methods.end()){
+        throw std::runtime_error("Error " + n.parent_t->to_string() + " has no method " + n.s_child);
+    }
     FunctionType* ft = class_info->methods[n.s_child];
     info.set_type(*ft);
     info.is_function = true;
     info.is_method = true;
     info.class_info = class_info;
+    n.actual_function_name = class_info->class_name + "." + n.s_child;
+    n.n_partial = ft->param_types.size();
     return std::make_unique<SemanticInfo>(info);
 }
 
@@ -407,8 +412,7 @@ USemanticInfo Checker::visit(CallNode& n) {
         // where instead of calling object.method(args), we call <class>.method(object, args)
 
         MethodNode& method_node = n.function->method();
-        IdNode* pNode = new IdNode(fun_info.class_info->class_name + "." + method_node.s_child);
-        pNode->location = VariableLocation(-2, -1);
+        IdNode* pNode = new IdNode(method_node.actual_function_name);
         n.function = pNode;
         pNode->is_global_function = true;
         this->replace_me = false;

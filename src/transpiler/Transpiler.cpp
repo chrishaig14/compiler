@@ -652,6 +652,8 @@ std::string Transpiler::visit_while(WhileNode& node) {
 std::string Transpiler::dispatch(Node* nptr) {
     Node& n = *nptr;
     switch (n.ntype) {
+        case NodeType::METHOD:
+            return this->visit_method(n.method());
         case NodeType::CAST:
             return this->visit_cast_op(n.cast());
         case NodeType::BOOLOP:
@@ -821,12 +823,19 @@ std::string Transpiler::visit_cast_op(CastNode& node) {
 }
 
 std::string Transpiler::visit_method(MethodNode& node) {
-    // std::string out;
-    // if (this->is_call) {
-    //     // no need to create Partial, just call the function directly
-    //     out += CALL(node.parent);
-    // } else {
-    //
-    // }
+    std::string fn = "function_" + node.actual_function_name;
+    for (int i = 0; i < fn.size(); i++) {
+        if (fn[i] == '.') {
+            fn[i] = '_';
+        }
+    }
+    std::string out =
+            "NEW(Partial" + std::to_string(node.n_partial) + ", " + fn + ", " + this->dispatch(node.parent) + ", ";
+    for (int i = 0; i < node.n_partial; i++) {
+        out += "nullptr, ";
+    }
+    out = out.substr(0, out.size() - 2);
+    out += ")";
+    return out;
 }
 

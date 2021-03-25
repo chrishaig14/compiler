@@ -38,6 +38,8 @@ public:
 
     MethodNode& method() override;
     const MethodNode& method() const override;
+    std::string actual_function_name;
+    unsigned long n_partial;
 };
 
 

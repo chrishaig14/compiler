@@ -161,9 +161,9 @@ class Partial2 : public Function2 {
         Function3* f3;
     } f;
 public:
-    Partial2(Function3* f, TaggedObject* p0, TaggedObject* p1, TaggedObject* p2) {
+    Partial2(TaggedObject* f, TaggedObject* p0, TaggedObject* p1, TaggedObject* p2) {
         this->p = {p0, p1, p2};
-        this->f.f3 = f;
+        this->f.f3 = CAST(f,Function3);
     }
 
     TaggedObject* operator()(TaggedObject* a0, TaggedObject* a1) override {
