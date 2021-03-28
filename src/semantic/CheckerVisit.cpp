@@ -5,7 +5,7 @@
 #include "Checker.h"
 #include "util.h"
 
-#define T_NONE ObjectType(".None", {})
+#define T_NONE ObjectType(".None")
 
 USemanticInfo Checker::visit(ListNode& node) {
     USemanticInfo element_type_p = this->dispatch(node.elements[0]);
@@ -162,7 +162,7 @@ USemanticInfo Checker::visit(TernaryNode& node) {
 
 USemanticInfo Checker::visit(NoneNode& node) {
     SemanticInfo info;
-    info.set_type(ObjectType("NoneType", {}));
+    info.set_type(ObjectType("NoneType"));
     return std::make_unique<SemanticInfo>(info);
 }
 
@@ -751,7 +751,7 @@ USemanticInfo Checker::member_class_method(std::string class_name, std::string c
             }
             VectorOfTypes tp;
             for (auto t: class_info->type_params) {
-                tp.push_back(new ObjectType(t, {}));
+                tp.push_back(new ObjectType(t));
             }
             FunctionType f(params, new ObjectType(class_name, tp));
             rv.set_type(f);
@@ -770,7 +770,7 @@ USemanticInfo Checker::member_class_method(std::string class_name, std::string c
         FunctionType& copy_ftn = *ftn.clone();
         VectorOfTypes tp;
         for (auto tttp: rv.class_info->type_params) {
-            tp.push_back(new ObjectType(tttp, {}));
+            tp.push_back(new ObjectType(tttp));
         }
         auto instance_type = new ObjectType(rv.class_info->class_name, tp);
         copy_ftn.param_types.insert(copy_ftn.param_types.begin(), instance_type);
@@ -1013,9 +1013,9 @@ USemanticInfo Checker::visit(BinopNode& n) {
     if (ltype == "Integer" && rtype == "Integer") {
         info.set_type(T_INT);
     } else if (ltype == "Float" && rtype == "Float") {
-        info.set_type(ObjectType("Float", {}));
+        info.set_type(ObjectType("Float"));
     } else if (ltype == "Double" && rtype == "Double") {
-        info.set_type(ObjectType("Double", {}));
+        info.set_type(ObjectType("Double"));
     } else if (ltype == "String" && rtype == "String") {
         if (n.op == OpType::ADD) {
             info.set_type(T_STRING);

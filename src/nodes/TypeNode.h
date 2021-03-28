@@ -45,16 +45,16 @@ public:
 
     bool operator!=(const TypeNode& other) const;
 
-    virtual ~TypeNode() {}
+    virtual ~TypeNode() {
+    }
 
 };
 
 class ObjectType : public TypeNode {
 public:
-    ObjectType(const std::string
-                   & identifier,
-               const VectorOfTypes& typeParameters
-    );
+    ObjectType(const std::string& identifier, const VectorOfTypes& typeParameters);
+
+    ObjectType(const std::string& identifier);
 
     bool equal(const TypeNode& other) const override;
 

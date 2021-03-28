@@ -43,7 +43,7 @@ std::string FunctionType::to_string() const {
         parameters = parameters.substr(0, parameters.size() - 2);
     }
     ret = ftype.return_type->to_string();
-    return "fun (" + parameters + ")" + (*ftype.return_type == ObjectType(".None", {}) ? "" : (" -> " + ret));
+    return "fun (" + parameters + ")" + (*ftype.return_type == ObjectType(".None") ? "" : (" -> " + ret));
 }
 
 bool FunctionType::equal(const TypeNode& other) const {
@@ -122,6 +122,9 @@ bool ObjectType::equal(const TypeNode& other) const {
 const ObjectType& ObjectType::object() const { return *this; }
 
 ObjectType& ObjectType::object() { return *this; }
+
+ObjectType::ObjectType(const std::string& identifier) : ObjectType(identifier, {}) {
+}
 
 bool TypeNode::operator!=(const TypeNode& other) const {
     return !(*this == other);

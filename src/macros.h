@@ -69,12 +69,12 @@
 
 // Builtin primitive types
 
-#define T_BOOL  ObjectType("Boolean", {})
-#define T_INT  ObjectType("Integer", {})
-#define T_STRING  ObjectType("String", {})
+#define T_BOOL  ObjectType("Boolean")
+#define T_INT  ObjectType("Integer")
+#define T_STRING  ObjectType("String")
 #define T_LIST(e) ObjectType("List", {e})
-#define T_FLOAT ObjectType("Float", {})
-#define T_DOUBLE ObjectType("Double", {})
+#define T_FLOAT ObjectType("Float")
+#define T_DOUBLE ObjectType("Double")
 
 typedef std::unordered_map<std::string, TypeNode*> MapStringType;
 

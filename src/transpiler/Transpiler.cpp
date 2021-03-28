@@ -226,7 +226,7 @@ std::string Transpiler::visit_class(ClassNode& node) {
         n.second->identifier = node.class_name + "_" + n.second->identifier;
         if (method_name != "init") {
             n.second->parameter_names.insert(n.second->parameter_names.begin(), "this_obj");
-            n.second->parameter_types.insert(n.second->parameter_types.begin(), new ObjectType(node.class_name, {}));
+            n.second->parameter_types.insert(n.second->parameter_types.begin(), new ObjectType(node.class_name));
         }
         out += this->dispatch(n.second);
     }
