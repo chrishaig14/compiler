@@ -77,7 +77,7 @@ std::string Transpiler::visit_block(BlockNode& node) {
     for (auto n: node.nodes) {
         out += this->dispatch(n);
         if (n->ntype != FUNC && n->ntype != WHIL && n->ntype != IFF && n->ntype != CLS) {
-            out += ";";
+            out += ";\n";
         }
     }
     if (node.nodes.back()->ntype != RETRN) {
@@ -220,7 +220,7 @@ std::string Transpiler::visit_class(ClassNode& node) {
     out += "\n";
     out += generate_constructor(class_name, node.members_ordered);
     out += generate_destructor(class_name, node.members_ordered);
-    out += "};";
+    out += "};\n";
     for (auto n: node.methods) {
         std::string method_name = n.second->identifier;
         n.second->identifier = node.class_name + "_" + n.second->identifier;
@@ -382,9 +382,9 @@ std::string Transpiler::visit_number(NumberNode& node) {
 
 std::string Transpiler::visit_for(ForNode& node) {
     std::string out;
-    out += "TaggedObject* _for_list = " + this->dispatch(node.exp) + ";";
+    out += "TaggedObject* _for_list = " + this->dispatch(node.exp) + ";\n";
     out += "for(int myindex=0;myindex < ((XList*)(UNTAG(_for_list)))->l->size(); myindex++){\n";
-    out += "TaggedObject* " + node.var + " = LIST_SUBSCRIPT(_for_list,MAKE_INT(myindex));";
+    out += "TaggedObject* " + node.var + " = LIST_SUBSCRIPT(_for_list,MAKE_INT(myindex));\n";
     out += this->dispatch(node.body);
     out += "}";
     return out;
@@ -444,9 +444,9 @@ std::string Transpiler::visit_function(FunctionNode& node) {
     out += "{\n";
     for (int i = 0; i < node.parameter_types.size(); i++) {
         if (is_object(*node.parameter_types[i])) {
-            out += "GC::declare( " + node.parameter_names[i] + ");";
+            out += "GC::declare( " + node.parameter_names[i] + ");\n";
         } else {
-            out += node.parameter_names[i] + ";";
+            out += node.parameter_names[i] + ";\n";
         }
     }
 
@@ -467,11 +467,11 @@ std::string Transpiler::visit_function(FunctionNode& node) {
     }
     out += this->dispatch(node.body);
     if (is_init) {
-        out += "return this_obj;";
+        out += "return this_obj;\n";
     } else if (node.return_type->kind == Kind::OBJECT && node.return_type->object().id == ".None") {
-        out += "return nullptr;";
+        out += "return nullptr;\n";
     }
-    out += "}";
+    out += "}\n";
     std::string num_args_str = std::to_string(node.parameter_names.size());
     std::string function_obj_name = FUNCTION_PREFIX + node.identifier;
 
@@ -481,7 +481,7 @@ std::string Transpiler::visit_function(FunctionNode& node) {
     this->globals_initialization +=
             function_class + " " + raw_function_name + "_f" + " = " + function_class + " (" + raw_function_name +
             ");\n";
-    this->globals_initialization += "TaggedObject* " + function_obj_name + "=FTAG(&" + raw_function_name + "_f);";
+    this->globals_initialization += "TaggedObject* " + function_obj_name + "=FTAG(&" + raw_function_name + "_f);\n";
     // out += "static Function" + num_args_str + "* " + function_obj_name + " = new Function" + num_args_str + "(" +
     //        raw_function_name + ");\n";
     return out;
@@ -575,9 +575,9 @@ std::string Transpiler::visit_return(ReturnNode& node) {
     std::string out;
     if (node.expression != nullptr) {
         if (is_object(*node.ret_type)) {
-            out += "TaggedObject* __return__ = GC::set_return(" + this->dispatch(node.expression) + ");";
+            out += "TaggedObject* __return__ = GC::set_return(" + this->dispatch(node.expression) + ");\n";
         } else {
-            out += "TaggedObject* __return__ = " + this->dispatch(node.expression) + ";";
+            out += "TaggedObject* __return__ = " + this->dispatch(node.expression) + ";\n";
         }
     } else {
         out += "TaggedObject* __return__ = nullptr";
