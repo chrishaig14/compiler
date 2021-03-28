@@ -460,6 +460,9 @@ USemanticInfo Checker::visit(CallNode& n) {
 
         if (function_is_generic(function_type)) {
             retv = match_arguments_to_generic_function(function_type, arg_types);
+            // for(auto x: arg_types){
+            //     delete x;
+            // }
         } else {
             retv.set_type(*function_type.return_type);
             for (int i = 0; i < n.arguments.size(); i++) {
@@ -474,6 +477,9 @@ USemanticInfo Checker::visit(CallNode& n) {
                     }
                     return std::make_unique<SemanticInfo>(retv);
                 }
+            }
+            for(auto x: arg_types){
+                delete x;
             }
         }
     } else {

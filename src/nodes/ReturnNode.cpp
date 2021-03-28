@@ -4,7 +4,10 @@
 
 #include "ReturnNode.h"
 
-ReturnNode::ReturnNode(Node* expression, TextPosition start) : expression(expression) { this->ntype = RETRN; this->start = start;}
+ReturnNode::ReturnNode(Node* expression, TextPosition start) : expression(expression) {
+    this->ntype = RETRN;
+    this->start = start;
+}
 
 bool ReturnNode::equal(const Node& x) const {
     return *x.retrn().expression == *this->expression;
@@ -26,5 +29,11 @@ json ReturnNode::to_json() const {
 }
 
 ReturnNode::~ReturnNode() {
+    if (this->ret_type != nullptr) {
+        delete this->ret_type;
+    }
+    for(auto r: this->reachables){
+        delete r.second;
+    }
     delete this->expression;
 }

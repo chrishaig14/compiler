@@ -20,7 +20,12 @@ void ClassTable::set(std::string name, ClassInfo* info) {
 }
 
 ClassTable::~ClassTable() {
+    std::cout << "Delete ClassTable "<<this << std::endl;
     for (auto c: this->table) {
         delete c.second;
     }
+}
+
+ClassTable::ClassTable() {
+    std::cout << "New ClassTable "<<this << std::endl;
 }

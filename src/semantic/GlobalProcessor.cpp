@@ -12,7 +12,7 @@
 
 void GlobalProcessor::add_builtins(std::vector<Builtin>& builtins) {
     for (int i = 0; i < builtins.size(); i++) {
-        this->function_table->add(builtins[i].first, *parse_function_type(builtins[i].second));
+        this->function_table->add(builtins[i].first, parse_function_type(builtins[i].second));
     }
 
 }
@@ -20,7 +20,6 @@ void GlobalProcessor::add_builtins(std::vector<Builtin>& builtins) {
 GlobalProcessor::GlobalProcessor(std::vector<Builtin>& builtins, ClassTable* imported_classes,
                                  FunctionTable* imported_functions) {
     this->function_table = imported_functions;
-    this->globals = new SymbolTable("global", nullptr);
     this->class_table = imported_classes;
 
     builtins.push_back({"map", "fun(List[a],fun(a)->b)->List[b]"});
@@ -44,8 +43,6 @@ GlobalProcessor::GlobalProcessor(std::vector<Builtin>& builtins, ClassTable* imp
 
 GlobalProcessor::GlobalProcessor() {
     this->function_table = new FunctionTable();
-
-    this->globals = new SymbolTable("global", nullptr);
     this->class_table = new ClassTable();
 }
 
@@ -63,7 +60,7 @@ void GlobalProcessor::visit(FunctionNode& node) {
         exit(1);
         // throw std::runtime_error("Error " + node.identifier + " already declared!");
     }
-    this->function_table->add(node.identifier, function_info);
+    this->function_table->add(node.identifier, function_info.clone());
     node.identifier = node.identifier;
 }
 
@@ -129,9 +126,9 @@ const FunctionType& FunctionTable::get(std::string function_name) {
     return *functions.find(function_name)->second;
 }
 
-void FunctionTable::add(std::string function_name, const FunctionType& function_type) {
+void FunctionTable::add(std::string function_name, FunctionType* function_type) {
     if (functions.find(function_name) == functions.end()) {
-        functions.insert(std::make_pair(function_name, function_type.clone()));
+        functions.insert(std::make_pair(function_name, function_type));
     } else {
         throw std::runtime_error("Cant overload function " + function_name);
     }

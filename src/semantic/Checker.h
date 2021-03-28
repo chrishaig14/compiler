@@ -48,7 +48,7 @@ public:
     bool can_assign(const TypeNode& from, const TypeNode& to);
     bool can_assign_generic(TypeNode& from, TypeNode& to, VectorOfStrings type_params);
     bool is_immutable(const TypeNode& node);
-    Checker(SymbolTable* globals, ClassTable* class_table, FunctionTable* function_table);
+    Checker(ClassTable* class_table, FunctionTable* function_table);
     ClassInfo* instantiate_generic(ClassInfo* generic, const ObjectType& instance);
     void error_assignment(const TypeNode& expected, const TypeNode& actual, TextPosition position);
     void error_bad_return(TextPosition position);

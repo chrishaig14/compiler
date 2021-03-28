@@ -26,6 +26,9 @@ BlockNode::~BlockNode() {
     for (auto p: this->nodes) {
         delete p;
     }
+    for(auto l: this->local_vars){
+        delete l.second;
+    }
 }
 
 bool BlockNode::equal(const Node& p) const {

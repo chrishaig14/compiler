@@ -38,11 +38,13 @@ Checker::get_first_substitution_object(ObjectType& a, ObjectType& b, bool is_top
 TypeNode* Checker::substitute(TypeNode* t, std::string var, TypeNode* replacement) {
     if (t->kind == Kind::OBJECT) {
         if (is_variable(t->object()) && t->object().id == var) {
-            return replacement;
+            return replacement->clone();
         } else {
             TypeNode* c = t->clone();
             for (int i = 0; i < t->object().type_params.size(); i++) {
+                // auto old = c->object().type_params[i];
                 c->object().type_params[i] = substitute(t->object().type_params[i], var, replacement);
+                // delete old;
             }
             return c;
         }
@@ -92,15 +94,26 @@ void Checker::unify_function_call(FunctionType& fun, VectorOfTypes& args) {
                     // if (j == i) {
                     //     continue;
                     // }
+                    auto old = fun.param_types[j];
                     fun.param_types[j] = substitute(fun.param_types[j], substitution->first, substitution->second);
+                    delete old;
+                    old = args[j];
                     args[j] = substitute(args[j], substitution->first, substitution->second);
+                    delete old;
                 }
+                auto old = fun.return_type;
                 fun.return_type = substitute(fun.return_type, substitution->first, substitution->second);
+                delete old;
                 std::cout << "Simple substitution: " << fun.to_string() << std::endl;
                 param = fun.param_types[i];
                 arg = args[i];
+                auto old_s = substitution;
                 substitution = get_first_substitution(*param, *arg, true);
+                delete old_s->second;
+                delete old_s;
             }
+
+
         } catch (...) {
             this->error_generic_call_mismatch(*param, *arg, i);
         }

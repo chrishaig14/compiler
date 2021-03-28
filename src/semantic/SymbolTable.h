@@ -40,6 +40,10 @@ public:
         for (auto e: this->table) {
             delete e.second;
         }
+        if (this->ret != nullptr) {
+            delete ret;
+        }
+
     }
 
     std::string name;

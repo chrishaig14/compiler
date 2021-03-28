@@ -13,6 +13,7 @@
 class ClassTable {
     std::unordered_map<std::string, ClassInfo*> table;
 public:
+    ClassTable();
     ClassInfo* get(std::string name);
 
     bool declared(std::string name);

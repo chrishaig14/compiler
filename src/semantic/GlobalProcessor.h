@@ -16,7 +16,7 @@ class FunctionTable {
 
 public:
 
-    void add(std::string function_name, const FunctionType& function_type);
+    void add(std::string function_name, FunctionType* function_type);
 
     bool has_function(std::string name);
 
@@ -30,7 +30,6 @@ typedef std::pair<std::string, std::string> Builtin;
 
 class GlobalProcessor {
 public:
-    SymbolTable* globals;
     ClassTable* class_table;
     FunctionTable* function_table;
 

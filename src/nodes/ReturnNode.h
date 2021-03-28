@@ -8,6 +8,7 @@
 
 #include "Node.h"
 #include "../types.h"
+#include "TypeNode.h"
 
 class ReturnNode : public Node {
 public:

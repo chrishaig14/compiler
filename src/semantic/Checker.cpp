@@ -76,13 +76,13 @@ ClassInfo* make_string_class_info() {
     return string_class_info;
 }
 
-Checker::Checker(SymbolTable* globals, ClassTable* class_table, FunctionTable* function_table) {
+Checker::Checker(ClassTable* class_table, FunctionTable* function_table) {
     this->is_lvalue = false;
     this->is_method = false;
     this->function_table = function_table;
     this->failed = false;
     this->class_table = class_table;
-    this->scope = globals;
+    this->scope = new SymbolTable("global", nullptr);
     this->scopes["global"] = this->scope;
 
     this->add_this = false;
@@ -182,12 +182,14 @@ bool is_generic(const TypeNode& t) {
 }
 
 SemanticInfo Checker::match_arguments_to_generic_function(const FunctionType& ft, VectorOfTypes arg_types) {
-    FunctionType& function_type = ft.clone()->function();
     FunctionType* f = ft.clone();
     unify_function_call(*f, arg_types);
+    for(auto at: arg_types){
+        delete at;
+    }
     SemanticInfo rv;
-    const TypeNode& ret_type = *f->return_type;
-    rv.set_type(ret_type);
+    rv.set_type(*f->return_type);
+    delete f;
     return rv;
 
 }
@@ -317,6 +319,7 @@ USemanticInfo error_stub() {
 Node* Checker::replace_if_necessary(Node* node) {
     if (this->replace_me) {
         this->replace_me = false;
+        delete node;
         return this->replacement;
     }
     return node;
@@ -340,9 +343,6 @@ bool Checker::is_immutable(const TypeNode& node) {
 
 Checker::~Checker() {
     for (auto s: this->scopes) {
-        if (s.first == "global") {
-            continue;
-        }
         delete s.second;
     }
 }
@@ -446,8 +446,8 @@ USemanticInfo Checker::dispatch(Node* nod) {
         case EMPTYDICT:
             return this->visit(n.emptydict());
             break;
-        default:
-            throw std::runtime_error("Don't know what to do!");
+        // default:
+            // throw std::runtime_error("Don't know what to do!");
     }
     return nullptr;
 }

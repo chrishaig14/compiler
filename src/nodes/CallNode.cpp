@@ -44,4 +44,10 @@ CallNode::~CallNode() {
     for (auto a: this->arguments) {
         delete a;
     }
+    for (auto at: this->arg_types){
+        delete at;
+    }
+    for(auto ft: this->ftype){
+        delete ft;
+    }
 }

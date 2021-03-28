@@ -84,30 +84,36 @@ void full_compile(bool is_main, const std::string& __file__, const std::string& 
 
     std::string includes = "#include \"runtime/core/core.h\"\n";
 
+    std::cout << "STARTING!" << std::endl;
+
     for (auto q: imported) {
         std::string imported_module_name = q.first;
         std::set<std::string> imported_names = q.second;
         for (auto imported_name: imported_names) {
+            std::cout << "HERE setting" << std::endl;
             if (!module_exported_functions[imported_module_name]->has_function(imported_name) &&
                 !module_exported_classes[imported_module_name]->declared(imported_name)) {
                 Errors::name_not_exported_by_module(__file__, imported_module_name, imported_name);
                 exit(1);
             } else if (module_exported_classes[imported_module_name]->declared(imported_name)) {
+
                 imported_classes->set(imported_name, module_exported_classes[imported_module_name]->get(imported_name));
             } else if (module_exported_functions[imported_module_name]->has_function(imported_name)) {
                 imported_functions->add(
                         imported_name,
-                        module_exported_functions[imported_module_name]->get(imported_name));
+                        module_exported_functions[imported_module_name]->get(imported_name).clone());
             }
         }
         includes += "#include \"" + imported_module_name + ".h\"\n";
     }
 
+    std::cout << "FINALLY " << std::endl;
+
     try {
         GlobalProcessor gp(builtins, imported_classes, imported_functions);
         gp.__file__ = __file__;
         gp.visit(*tree);
-        Checker checker(gp.globals, gp.class_table, gp.function_table);
+        Checker checker(gp.class_table, gp.function_table);
         checker.__file__ = __file__;
         checker.code_lines = code_lines;
         checker.visit(*tree);
@@ -141,6 +147,7 @@ void full_compile(bool is_main, const std::string& __file__, const std::string& 
 
     includes += "#include \"" + module_name + ".h" + "\"\n";
 
+    delete tree;
 
     std::string full_output = includes + output;
 
@@ -168,4 +175,11 @@ int main(int argc, char* argv[]) {
     std::string __main_file__ = path_join(project_dir, u_basename(project_dir) + ".xl");
     std::cout << style(BLUE, "Main file: ") << style(MAGENTA, __main_file__) << std::endl;
     full_compile(true, __main_file__, output_dir);
+
+    for(auto ct: module_exported_classes){
+        delete ct.second;
+    }
+    for(auto ft: module_exported_functions){
+        delete ft.second;
+    }
 }

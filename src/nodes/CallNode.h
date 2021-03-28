@@ -11,6 +11,7 @@
 
 #include "Node.h"
 #include "../types.h"
+#include "TypeNode.h"
 
 class CallNode : public Node {
 public:
