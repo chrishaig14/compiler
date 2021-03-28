@@ -15,6 +15,8 @@ bool is_object(const TypeNode& t);
 
 class Transpiler {
 public:
+    std::string current_module;
+    std::map<std::string, std::string>& map;
     std::string header;
     std::string static_declarations;
     std::string static_initializations;
@@ -22,7 +24,7 @@ public:
     std::string globals_initialization;
     std::string method_class;
     std::vector<ObjectType*> tuple_types;
-    Transpiler();
+    Transpiler(std::map<std::string, std::string>& map);
     std::string dispatch(Node* nptr);
     std::string visit_assignment(AssignmentNode& node);
     std::string visit_cast(CastNode& node);

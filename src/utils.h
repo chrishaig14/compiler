@@ -19,7 +19,11 @@
 #include <sstream>
 #include <fstream>
 
-std::string mangle_name(std::string module_name, std::string name);
+std::string mangle_function_name(std::string module_name, std::string name);
+
+std::string mangle_class_name(std::string module_name, std::string name);
+
+std::string mangle_method_name(std::string module_name, std::string class_name, std::string method_name);
 
 class VariableLocation {
 public:

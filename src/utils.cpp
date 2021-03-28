@@ -13,9 +13,16 @@ std::string u_dirname(const std::string& path) {
     return r;
 }
 
+std::string mangle_function_name(std::string module_name, std::string name) {
+    return "m_" + module_name + "_f_" + name;
+}
 
-std::string mangle_name(std::string module_name, std::string name) {
-    return module_name + "_" + name;
+std::string mangle_class_name(std::string module_name, std::string name) {
+    return "m_" + module_name + "_c_" + name;
+}
+
+std::string mangle_method_name(std::string module_name, std::string class_name, std::string method_name) {
+    return "m_" + module_name + "_c_" + class_name + "_f_" + method_name;
 }
 
 std::string u_basename(const std::string& path) {

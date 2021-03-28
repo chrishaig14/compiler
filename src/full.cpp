@@ -112,7 +112,6 @@ void full_compile(bool is_main, const std::string& __file__, const std::string& 
     std::string module_name = module_from_path(__file__);
     CodeLines code_lines;
     BlockNode* tree = full_parse(__file__, &code_lines);
-    Transpiler t;
 
     std::map<std::string, std::set<std::string>> imported;
     module_maps[module_name] = std::make_unique<std::map<std::string, std::string>>(std::map<std::string, std::string>());
@@ -156,7 +155,16 @@ void full_compile(bool is_main, const std::string& __file__, const std::string& 
                 Errors::name_not_exported_by_module(__file__, imported_module_name, imported_name);
                 exit(1);
             } else {
-                map[imported_name] = mangle_name(imported_module_name, imported_name);
+                std::string actual_name = (*module_maps[imported_module_name])[imported_name];
+                if (global_classes->declared(actual_name)) {
+                    // add all methods as well!
+                    ClassInfo* ci = global_classes->get(actual_name);
+                    for (auto m: ci->methods) {
+                        map[imported_name + "." + m.first] = (*module_maps[imported_module_name])[imported_name + "." +
+                                                                                                  m.first];
+                    }
+                }
+                map[imported_name] = actual_name;
             }
         }
         includes += "#include \"" + imported_module_name + ".h\"\n";
@@ -180,6 +188,8 @@ void full_compile(bool is_main, const std::string& __file__, const std::string& 
         exit(1);
     }
     std::string output;
+    Transpiler t(map);
+    t.current_module = module_name;
     try {
         std::string code = t.transpile(tree);
         output += t.globals_initialization;
@@ -191,15 +201,15 @@ void full_compile(bool is_main, const std::string& __file__, const std::string& 
     if (is_main) {
         output += "\nint main(){\n";
         output += t.static_initializations;
-        output += "auto x = GET_INT(CALL0(function_main));";
-        output += "return x;}";
+        output += "auto x = GET_INT(CALL0(" + map["main"] + "));\n";
+        output += "return x;\n}";
     }
     std::string output_h_path = path_join(output_dir, module_name + ".h");
     std::string full_output_h = includes + t.externs_declaration + t.header;
 
     includes += "#include \"" + module_name + ".h" + "\"\n";
 
-    delete tree;
+    // delete tree;
 
     std::string full_output = includes + output;
 

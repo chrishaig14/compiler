@@ -48,7 +48,7 @@ void GlobalProcessor::visit(FunctionNode& node) {
         exit(1);
         // throw std::runtime_error("Error " + node.identifier + " already declared!");
     }
-    std::string mangled_name = mangle_name(this->module_name, node.identifier);
+    std::string mangled_name = mangle_function_name(this->module_name, node.identifier);
     this->function_table->add(mangled_name, function_info.clone());
     (*this->module_mappings[this->module_name])[node.identifier] = mangled_name;
 }
@@ -60,6 +60,7 @@ void GlobalProcessor::visit(BlockNode& node) {
 }
 
 void GlobalProcessor::visit(ClassNode& node) {
+    std::string mangled_name = mangle_class_name(this->module_name, node.class_name);
     ClassInfo* class_info = new ClassInfo();
     for (auto mn: node.members_ordered) {
         auto mt = node.members[mn];
@@ -76,26 +77,42 @@ void GlobalProcessor::visit(ClassNode& node) {
             x.emplace_back(p->clone());
         }
         class_info->methods.insert(make_pair(f.first, new FunctionType(x, method.return_type->clone())));
+        (*this->module_mappings[this->module_name])[node.class_name + "." +
+                                                    method.identifier] = mangle_method_name(this->module_name,
+                                                                                            node.class_name,
+                                                                                            method.identifier);
     }
     if (!has_init) {
         class_info->methods["init"] = new FunctionType(class_info->member_types, new ObjectType(node.class_name));
+        (*this->module_mappings[this->module_name])[node.class_name + "." +
+                                                    "init"] = mangle_method_name(this->module_name,
+                                                                                 node.class_name,
+                                                                                 "init");
     }
     class_info->methods["str"] = new FunctionType({}, new T_STRING);
+    (*this->module_mappings[this->module_name])[node.class_name + "." + "str"] = mangle_method_name(this->module_name,
+                                                                                                    node.class_name,
+                                                                                                    "str");
     VectorOfTypes tp;
     for (int i = 0; i < node.type_parameters.size(); i++) {
         tp.push_back(new ObjectType(node.type_parameters[i]));
     }
     class_info->methods["eq"] = new FunctionType({new ObjectType(node.class_name, tp)}, new T_BOOL);
+    (*this->module_mappings[this->module_name])[node.class_name + "." + "eq"] = mangle_method_name(this->module_name,
+                                                                                                   node.class_name,
+                                                                                                   "eq");
     class_info->class_name = node.class_name;
     class_info->type_params = node.type_parameters;
-    if (this->class_table->declared(node.class_name) || this->function_table->has_function(node.class_name)) {
+    if (this->module_mappings[this->module_name]->find(node.class_name) !=
+        this->module_mappings[this->module_name]->end()) {
         std::string msg;
         msg = E_FMT("Name ") + E_HLT(node.class_name) + E_FMT(" already declared at ") +
               E_HLT(text_pos_to_string(this->__file__, node.start));
         std::cout << msg << std::endl;
         exit(1);
     }
-    this->class_table->set(node.class_name, class_info);
+    (*this->module_mappings[this->module_name])[node.class_name] = mangled_name;
+    this->class_table->set(mangled_name, class_info);
 }
 
 void GlobalProcessor::dispatch(Node* nod) {

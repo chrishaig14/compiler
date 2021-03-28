@@ -30,7 +30,7 @@ std::string Transpiler::visit_assignment(AssignmentNode& node) {
         MemberNode& memberNode = node.lvalue->member();
         TypeNode* cast_type = memberNode.parent_t;
         std::string mem =
-                "CAST(" + this->dispatch(node.lvalue->member().parent) + "," + get_class_name(cast_type->object().id) +
+                "CAST(" + this->dispatch(node.lvalue->member().parent) + "," + this->map[cast_type->object().id] +
                 ")->" + node.lvalue->member().s_child;
         out += mem + "=GC::assign(" + mem + ",";
         out += this->dispatch(node.rvalue) + ");";
@@ -208,9 +208,10 @@ std::string generate_constructor(std::string class_name, VectorOfStrings members
 
 std::string Transpiler::visit_class(ClassNode& node) {
     std::string out;
+    std::string mangled_name = this->map[node.class_name];
     this->method_class = node.class_name;
     this->num_members_class = node.members.size();
-    std::string class_name = get_class_name(node.class_name);
+    std::string class_name = mangled_name;
     out = "class " + class_name + " : public XObject {\n";
     std::sort(node.members_ordered.begin(), node.members_ordered.end());
     out += "public:\n";
@@ -223,10 +224,10 @@ std::string Transpiler::visit_class(ClassNode& node) {
     out += "};\n";
     for (auto n: node.methods) {
         std::string method_name = n.second->identifier;
-        n.second->identifier = node.class_name + "_" + n.second->identifier;
+        n.second->identifier = node.class_name + "." + n.second->identifier;
         if (method_name != "init") {
             n.second->parameter_names.insert(n.second->parameter_names.begin(), "this_obj");
-            n.second->parameter_types.insert(n.second->parameter_types.begin(), new ObjectType(node.class_name));
+            n.second->parameter_types.insert(n.second->parameter_types.begin(), new ObjectType(this->method_class));
         }
         out += this->dispatch(n.second);
     }
@@ -260,7 +261,7 @@ std::string Transpiler::ptr_to_type_object(const ObjectType& t) {
     if (t.id == "List") {
         return "PTR_TO_LIST";
     }
-    return get_class_name(t.id) + "*";
+    return this->map[t.id] + "*";
 }
 
 
@@ -287,7 +288,7 @@ std::string Transpiler::object_type_mapper(const ObjectType& t) {
     if (t.id == "List") {
         return "XList*";
     }
-    return get_class_name(t.id) + "";
+    return this->map[t.id] + "";
 }
 
 std::string Transpiler::add_type(const TypeNode& t, std::string n) {
@@ -424,13 +425,14 @@ std::set<std::string> get_generic_types(const TypeNode& t) {
 std::string Transpiler::visit_function(FunctionNode& node) {
     std::string out;
     // out += this->type_mapper(*node.return_type);
-    std::string raw_function_name = "f_" + node.identifier;
+    std::string fname = this->map.at(node.identifier);
+    std::string raw_function_name = fname;
 
     std::string signature;
 
     signature += "TaggedObject*";
     signature += " ";
-    signature += raw_function_name;
+    signature += raw_function_name + "_f";
     signature += "(";
     for (int i = 0; i < node.parameter_types.size(); i++) {
         signature += std::string() + "TaggedObject*" + " " + node.parameter_names[i] + ", ";
@@ -444,7 +446,7 @@ std::string Transpiler::visit_function(FunctionNode& node) {
     out += "{\n";
     for (int i = 0; i < node.parameter_types.size(); i++) {
         if (is_object(*node.parameter_types[i])) {
-            out += "GC::declare( " + node.parameter_names[i] + ");\n";
+            out += "GC::declare(" + node.parameter_names[i] + ");\n";
         } else {
             out += node.parameter_names[i] + ";\n";
         }
@@ -452,10 +454,10 @@ std::string Transpiler::visit_function(FunctionNode& node) {
 
     out += "void* it = nullptr;\n";
     bool is_init = false;
-    if (node.identifier == this->method_class + "_init") {
+    if (node.identifier == this->method_class + ".init") {
         is_init = true;
         out += "TaggedObject* this_obj = NEW(";
-        out += get_class_name(this->method_class) + ",";
+        out += this->map[this->method_class] + ",";
         for (int i = 0; i < this->num_members_class; i++) {
             out += "nullptr, ";
         }
@@ -473,15 +475,15 @@ std::string Transpiler::visit_function(FunctionNode& node) {
     }
     out += "}\n";
     std::string num_args_str = std::to_string(node.parameter_names.size());
-    std::string function_obj_name = FUNCTION_PREFIX + node.identifier;
+    std::string function_obj_name = fname;
 
     std::string function_class = "Function" + num_args_str;
-    this->externs_declaration += "extern TaggedObject* " + function_obj_name + "\n;";
+    this->externs_declaration += "extern TaggedObject* " + function_obj_name + ";\n";
     // this->static_declarations += "static Function" + num_args_str + "* " + function_obj_name + ";\n";
     this->globals_initialization +=
-            function_class + " " + raw_function_name + "_f" + " = " + function_class + " (" + raw_function_name +
+            function_class + " " + raw_function_name + "_o" + " = " + function_class + " (" + raw_function_name +"_f"
             ");\n";
-    this->globals_initialization += "TaggedObject* " + function_obj_name + "=FTAG(&" + raw_function_name + "_f);\n";
+    this->globals_initialization += "TaggedObject* " + function_obj_name + "=FTAG(&" + raw_function_name + "_o);\n";
     // out += "static Function" + num_args_str + "* " + function_obj_name + " = new Function" + num_args_str + "(" +
     //        raw_function_name + ");\n";
     return out;
@@ -490,13 +492,7 @@ std::string Transpiler::visit_function(FunctionNode& node) {
 std::string Transpiler::visit_id(IdNode& node) {
     std::string idn = node._id;
     if (node.is_global_function) {
-        std::string out = node._id;
-        for (int i = 0; i < out.size(); i++) {
-            if (out[i] == '.') {
-                out[i] = '_';
-            }
-        }
-        return FUNCTION_PREFIX + out;
+        return this->map.at(node._id);
     }
     if (idn == "this") {
         idn = "this_obj";
@@ -562,8 +558,7 @@ std::string Transpiler::visit_member(MemberNode& node) {
                         std::to_string(node.n_child) + "";
         return s;
     }
-    auto s = "CAST(" + this->dispatch(node.parent) + "," + get_class_name(node.parent_t->object().id) + ")->" +
-             node.s_child;
+    auto s = "CAST(" + this->dispatch(node.parent) + "," + this->map[node.parent_t->object().id] + ")->" + node.s_child;
     return s;
 }
 
@@ -769,7 +764,7 @@ std::string Transpiler::generate_tuple_types() {
     return out;
 }
 
-Transpiler::Transpiler() {
+Transpiler::Transpiler(std::map<std::string, std::string>& map) : map(map) {
     this->is_lvalue = false;
     this->is_call = false;
 }
@@ -823,7 +818,7 @@ std::string Transpiler::visit_cast_op(CastNode& node) {
 }
 
 std::string Transpiler::visit_method(MethodNode& node) {
-    std::string fn = "function_" + node.actual_function_name;
+    std::string fn = this->map[node.actual_function_name];
     for (int i = 0; i < fn.size(); i++) {
         if (fn[i] == '.') {
             fn[i] = '_';

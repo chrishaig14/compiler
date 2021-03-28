@@ -428,7 +428,7 @@ USemanticInfo Checker::visit(CallNode& n) {
             retv.set_type(*copy_ftn.clone());
             object_node = member_node.parent;
         } else {
-            n.function = new IdNode("function_" + fun_info.class_info->class_name + "_" + member_node.s_child);
+            n.function = new IdNode(this->map[fun_info.class_info->class_name + "." + member_node.s_child]);
             this->replace_me = false;
             const FunctionType& ftn = fun_info.type().function();
             FunctionType& copy_ftn = ftn.clone()->function();
@@ -786,7 +786,7 @@ USemanticInfo Checker::member_class_method(std::string class_name, std::string c
         rv.is_method = false;
         rv.is_class_method = true;
         this->replace_me = true;
-        IdNode* idn = new IdNode(class_name + "_" + child);
+        IdNode* idn = new IdNode(class_name + "." + child);
         idn->is_global_function = true;
         this->replacement = idn;
         return std::make_unique<SemanticInfo>(rv);
@@ -827,7 +827,7 @@ Checker::member_normal(const ObjectType& final_type, const ObjectType& object, s
             throw std::runtime_error(
                     "Cannot access member of totally generic value of generic type " + object.id + "!");
         } else {
-            class_info = this->class_table->get(object.id);
+            class_info = this->class_table->get(this->map[object.id]);
             class_info = instantiate_generic(class_info, final_type);
             this->class_table->set(object.to_string(), class_info);
         }
