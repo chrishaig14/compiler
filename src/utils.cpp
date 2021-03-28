@@ -13,6 +13,11 @@ std::string u_dirname(const std::string& path) {
     return r;
 }
 
+
+std::string mangle_name(std::string module_name, std::string name) {
+    return module_name + "_" + name;
+}
+
 std::string u_basename(const std::string& path) {
     char* p = new char[path.size() + 1];
     strcpy(p, path.c_str());

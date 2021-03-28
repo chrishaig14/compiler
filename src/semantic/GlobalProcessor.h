@@ -33,8 +33,8 @@ public:
     ClassTable* class_table;
     FunctionTable* function_table;
 
-    GlobalProcessor();
-    GlobalProcessor(std::vector<Builtin>& builtins, ClassTable* imported_classes, FunctionTable* imported_functions);
+    GlobalProcessor(std::vector<Builtin>& builtins, std::map<std::string, std::unique_ptr<std::map<std::string, std::string>>>& module_mappings,
+                    ClassTable* imported_classes, FunctionTable* imported_functions, std::string module_name);
 
     void add_builtins(std::vector<Builtin>& builtins);
 
@@ -44,8 +44,13 @@ public:
 
     void visit(BlockNode& node);
 
+    void visit(ImportNode& node);
+
     void visit(ClassNode& node);
 
     std::string __file__;
+    std::map<std::string, std::unique_ptr<std::map<std::string, std::string>>>& module_mappings;
+    std::string module_name;
 };
+
 #endif //GLOBALPROCESSOR_H

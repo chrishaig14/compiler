@@ -19,6 +19,8 @@
 #include <sstream>
 #include <fstream>
 
+std::string mangle_name(std::string module_name, std::string name);
+
 class VariableLocation {
 public:
     int depth;

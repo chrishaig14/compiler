@@ -11,39 +11,26 @@
 #include "util.h"
 
 void GlobalProcessor::add_builtins(std::vector<Builtin>& builtins) {
-    for (int i = 0; i < builtins.size(); i++) {
-        this->function_table->add(builtins[i].first, parse_function_type(builtins[i].second));
-    }
+
 
 }
 
-GlobalProcessor::GlobalProcessor(std::vector<Builtin>& builtins, ClassTable* imported_classes,
-                                 FunctionTable* imported_functions) {
+GlobalProcessor::GlobalProcessor(std::vector<Builtin>& builtins,
+                                 std::map<std::string, std::unique_ptr<std::map<std::string, std::string>>>& module_mappings,
+                                 ClassTable* imported_classes, FunctionTable* imported_functions,
+                                 std::string module_name) : module_mappings(module_mappings) {
+    this->module_name = module_name;
     this->function_table = imported_functions;
     this->class_table = imported_classes;
 
-    builtins.push_back({"map", "fun(List[a],fun(a)->b)->List[b]"});
-    builtins.push_back({"File.read_line", "fun()->String"});
-    builtins.push_back({"Integer.str", "fun(Integer)->String"});
-    builtins.push_back({"Float.str", "fun(Float)->String"});
-    builtins.push_back({"Double.str", "fun(Double)->String"});
-    builtins.push_back({"List.len", "fun(List[a])->Integer"});
-    builtins.push_back({"List.pop", "fun(List[a],a)"});
-    builtins.push_back({"List.push", "fun(List[a])->a"});
-    builtins.push_back({"List.unordered_map", "fun(fun(t)->b)->List[b]"});
-    builtins.push_back({"String.len", "fun(String)->Integer"});
-    builtins.push_back({"print", "fun(String)"});
-    builtins.push_back({"open", "fun(String)->File"});
-    builtins.push_back({"join", "fun(List[String],String)->String"});
-    builtins.push_back({"range", "fun(Integer,Integer,Integer)->List[Integer])->String"});
-    builtins.push_back({"input", "fun()->String"});
 
     this->add_builtins(builtins);
 }
 
-GlobalProcessor::GlobalProcessor() {
-    this->function_table = new FunctionTable();
-    this->class_table = new ClassTable();
+void GlobalProcessor::visit(ImportNode& node) {
+    for (auto imported_name: node.imports) {
+        (*this->module_mappings[this->module_name])[imported_name] = (*this->module_mappings[node.module_name])[imported_name];
+    }
 }
 
 void GlobalProcessor::visit(FunctionNode& node) {
@@ -52,7 +39,8 @@ void GlobalProcessor::visit(FunctionNode& node) {
         x.emplace_back(p->clone());
     }
     FunctionType function_info(x, node.return_type->clone());
-    if (this->class_table->declared(node.identifier) || this->function_table->has_function(node.identifier)) {
+    if (this->module_mappings[this->module_name]->find(node.identifier) !=
+        this->module_mappings[this->module_name]->end()) {
         std::string msg;
         msg = E_FMT("Name ") + E_HLT(node.identifier) + E_FMT(" already declared at ") +
               E_HLT(text_pos_to_string(this->__file__, node.start));
@@ -60,8 +48,9 @@ void GlobalProcessor::visit(FunctionNode& node) {
         exit(1);
         // throw std::runtime_error("Error " + node.identifier + " already declared!");
     }
-    this->function_table->add(node.identifier, function_info.clone());
-    node.identifier = node.identifier;
+    std::string mangled_name = mangle_name(this->module_name, node.identifier);
+    this->function_table->add(mangled_name, function_info.clone());
+    (*this->module_mappings[this->module_name])[node.identifier] = mangled_name;
 }
 
 void GlobalProcessor::visit(BlockNode& node) {
@@ -118,11 +107,17 @@ void GlobalProcessor::dispatch(Node* nod) {
         case NodeType::FUNC:
             this->visit(n.func());
             break;
+        case NodeType::IMPORT:
+            this->visit(n.import());
+            break;
     }
 }
 
 
 const FunctionType& FunctionTable::get(std::string function_name) {
+    if (functions.find(function_name) == functions.end()) {
+        throw std::runtime_error("Error, function " + function_name + " not found in function table");
+    }
     return *functions.find(function_name)->second;
 }
 

@@ -380,12 +380,12 @@ USemanticInfo Checker::visit(ForNode& node) {
 USemanticInfo Checker::visit(MethodNode& n) {
     USemanticInfo parent = this->dispatch(n.parent);
     n.parent_t = parent->type().clone();
-    if (n.parent_t->kind != Kind::OBJECT){
+    if (n.parent_t->kind != Kind::OBJECT) {
         throw std::runtime_error("Cannot call a method on a function");
     }
     ClassInfo* class_info = this->class_table->get(n.parent_t->object().id);
     SemanticInfo info;
-    if (class_info->methods.find(n.s_child) == class_info->methods.end()){
+    if (class_info->methods.find(n.s_child) == class_info->methods.end()) {
         throw std::runtime_error("Error " + n.parent_t->to_string() + " has no method " + n.s_child);
     }
     FunctionType* ft = class_info->methods[n.s_child];
@@ -478,7 +478,7 @@ USemanticInfo Checker::visit(CallNode& n) {
                     return std::make_unique<SemanticInfo>(retv);
                 }
             }
-            for(auto x: arg_types){
+            for (auto x: arg_types) {
                 delete x;
             }
         }
@@ -579,12 +579,19 @@ USemanticInfo Checker::visit(IdNode& n) {
     SemanticInfo info;
     if (!this->scope->has(n._id)) {
         // it might be a function name
-        if (this->function_table->has_function(n._id)) {
+        if (this->map.count(n._id) != 0) {
             n.is_global_function = true;
             info.is_function = true;
             n.location = VariableLocation(-2, -1);
-            info.set_type(this->function_table->get(n._id));
-        } else {
+            info.set_type(this->function_table->get(this->map.at(n._id)));
+        }
+            // if (this->function_table->has_function(n._id)) {
+            //     n.is_global_function = true;
+            //     info.is_function = true;
+            //     n.location = VariableLocation(-2, -1);
+            //     info.set_type(this->function_table->get(n._id));
+            // }
+        else {
             this->error_variable_not_declared(n._id, n.start);
             return error_stub();
         }

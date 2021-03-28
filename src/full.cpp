@@ -1,4 +1,3 @@
-
 #include <sstream>
 #include <fstream>
 #include <fmt/ostream.h>
@@ -9,21 +8,22 @@
 #include "semantic/Checker.h"
 #include "transpiler/Transpiler.h"
 #include "logging/logging.h"
+#include "semantic/util.h"
+
+static std::vector<Builtin> builtins;
 
 namespace Errors {
     void module_not_found(std::string __file__, std::string imported_module_name) {
         std::cout << style(RED, "Error in file ") << style(MAGENTA BOLD, __file__) << style(RED, ": ")
                   << style(RED, "imported module ") << style(MAGENTA BOLD, "'" + imported_module_name + "'")
-                  << style(RED, " not found")
-                  << std::endl;
+                  << style(RED, " not found") << std::endl;
     }
 
     void
     name_not_exported_by_module(std::string __file__, std::string imported_module_name, std::string imported_name) {
         std::cout << style(RED, "Error in file ") << style(MAGENTA BOLD, __file__) << style(RED, ": ")
                   << style(RED, "imported module ") << style(MAGENTA BOLD, "'" + imported_module_name + "'")
-                  << style(RED, " doesn't export name ") << style(MAGENTA BOLD, "'" + imported_name + "'")
-                  << std::endl;
+                  << style(RED, " doesn't export name ") << style(MAGENTA BOLD, "'" + imported_name + "'") << std::endl;
     }
 }
 
@@ -39,25 +39,88 @@ BlockNode* full_parse(const std::string& __file__, CodeLines* code_lines) {
     *code_lines = scanner.code_lines;
     try {
         tree = parser.parse_program();
-    } catch(const std::runtime_error& e){
+    } catch (const std::runtime_error& e) {
         std::cout << e.what() << std::endl;
         exit(1);
     }
     return tree;
 }
 
+class Mapping {
+public:
+    bool is_function;
+    bool is_class;
+    bool found;
+    const void* ptr;
+
+    Mapping(const ClassInfo* p) {
+        this->ptr = p;
+        this->found = true;
+        this->is_class = true;
+        this->is_function = false;
+    }
+
+
+    Mapping(const FunctionType* p) {
+        this->ptr = p;
+        this->found = true;
+        this->is_function = true;
+        this->is_class = false;
+    }
+
+    Mapping() {
+        this->ptr = nullptr;
+        this->found = false;
+        this->is_class = false;
+        this->is_function = false;
+    }
+
+    const ClassInfo* get_class() {
+        return (const ClassInfo*) ptr;
+    }
+
+    const FunctionType* get_function() {
+        return (const FunctionType*) ptr;
+    }
+};
+
+class ModuleMapping {
+    ClassTable* class_table;
+    FunctionTable* function_table;
+
+    Mapping find(const std::string& name) {
+        if (class_table->declared(name)) {
+            return Mapping(class_table->get(name));
+        } else if (function_table->has_function(name)) {
+            return Mapping(&function_table->get(name));
+        }
+        return Mapping();
+    }
+};
+
+
 static std::map<std::string, FunctionTable*> module_exported_functions;
 static std::map<std::string, ClassTable*> module_exported_classes;
 static std::set<std::string> compiled_modules;
+
+ClassTable* global_classes = new ClassTable();
+FunctionTable* global_functions = new FunctionTable();
+
+static std::map<std::string, std::unique_ptr<std::map<std::string, std::string>>> module_maps;
 
 void full_compile(bool is_main, const std::string& __file__, const std::string& output_dir) {
     std::string module_name = module_from_path(__file__);
     CodeLines code_lines;
     BlockNode* tree = full_parse(__file__, &code_lines);
-    std::vector<Builtin> builtins;
     Transpiler t;
 
     std::map<std::string, std::set<std::string>> imported;
+    module_maps[module_name] = std::make_unique<std::map<std::string, std::string>>(std::map<std::string, std::string>());
+    auto& map = *module_maps[module_name];
+
+    for (auto builtin: builtins) {
+        map[builtin.first] = builtin.first;
+    }
 
     for (auto n: tree->nodes) {
         if (n->ntype == IMPORT) {
@@ -79,8 +142,6 @@ void full_compile(bool is_main, const std::string& __file__, const std::string& 
         }
     }
 
-    ClassTable* imported_classes = new ClassTable();
-    FunctionTable* imported_functions = new FunctionTable();
 
     std::string includes = "#include \"runtime/core/core.h\"\n";
 
@@ -91,17 +152,11 @@ void full_compile(bool is_main, const std::string& __file__, const std::string& 
         std::set<std::string> imported_names = q.second;
         for (auto imported_name: imported_names) {
             std::cout << "HERE setting" << std::endl;
-            if (!module_exported_functions[imported_module_name]->has_function(imported_name) &&
-                !module_exported_classes[imported_module_name]->declared(imported_name)) {
+            if (module_maps[imported_module_name]->find(imported_name) == module_maps[imported_module_name]->end()) {
                 Errors::name_not_exported_by_module(__file__, imported_module_name, imported_name);
                 exit(1);
-            } else if (module_exported_classes[imported_module_name]->declared(imported_name)) {
-
-                imported_classes->set(imported_name, module_exported_classes[imported_module_name]->get(imported_name));
-            } else if (module_exported_functions[imported_module_name]->has_function(imported_name)) {
-                imported_functions->add(
-                        imported_name,
-                        module_exported_functions[imported_module_name]->get(imported_name).clone());
+            } else {
+                map[imported_name] = mangle_name(imported_module_name, imported_name);
             }
         }
         includes += "#include \"" + imported_module_name + ".h\"\n";
@@ -110,19 +165,16 @@ void full_compile(bool is_main, const std::string& __file__, const std::string& 
     std::cout << "FINALLY " << std::endl;
 
     try {
-        GlobalProcessor gp(builtins, imported_classes, imported_functions);
+        GlobalProcessor gp(builtins, module_maps, global_classes, global_functions, module_name);
         gp.__file__ = __file__;
         gp.visit(*tree);
-        Checker checker(gp.class_table, gp.function_table);
+        Checker checker(map, global_classes, global_functions);
         checker.__file__ = __file__;
         checker.code_lines = code_lines;
         checker.visit(*tree);
         if (checker.failed) {
             throw std::runtime_error("ERROR");
         }
-        module_exported_functions[module_name] = gp.function_table;
-        module_exported_classes[module_name] = gp.class_table;
-
     } catch (const std::runtime_error& e) {
         std::cerr << "THERE WAS A SEMANTIC ERROR: " << e.what() << std::endl;
         exit(1);
@@ -174,12 +226,32 @@ int main(int argc, char* argv[]) {
     std::string output_dir = argv[2];
     std::string __main_file__ = path_join(project_dir, u_basename(project_dir) + ".xl");
     std::cout << style(BLUE, "Main file: ") << style(MAGENTA, __main_file__) << std::endl;
+
+    builtins.push_back({"map", "fun(List[a],fun(a)->b)->List[b]"});
+    builtins.push_back({"File.read_line", "fun()->String"});
+    builtins.push_back({"Integer.str", "fun(Integer)->String"});
+    builtins.push_back({"Float.str", "fun(Float)->String"});
+    builtins.push_back({"Double.str", "fun(Double)->String"});
+    builtins.push_back({"List.len", "fun(List[a])->Integer"});
+    builtins.push_back({"List.pop", "fun(List[a],a)"});
+    builtins.push_back({"List.push", "fun(List[a])->a"});
+    builtins.push_back({"List.unordered_map", "fun(fun(t)->b)->List[b]"});
+    builtins.push_back({"String.len", "fun(String)->Integer"});
+    builtins.push_back({"print", "fun(String)"});
+    builtins.push_back({"open", "fun(String)->File"});
+    builtins.push_back({"join", "fun(List[String],String)->String"});
+    builtins.push_back({"range", "fun(Integer,Integer,Integer)->List[Integer])->String"});
+    builtins.push_back({"input", "fun()->String"});
+
+    for (int i = 0; i < builtins.size(); i++) {
+        global_functions->add(builtins[i].first, parse_function_type(builtins[i].second));
+    }
     full_compile(true, __main_file__, output_dir);
 
-    for(auto ct: module_exported_classes){
+    for (auto ct: module_exported_classes) {
         delete ct.second;
     }
-    for(auto ft: module_exported_functions){
+    for (auto ft: module_exported_functions) {
         delete ft.second;
     }
 }

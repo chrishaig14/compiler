@@ -76,7 +76,7 @@ ClassInfo* make_string_class_info() {
     return string_class_info;
 }
 
-Checker::Checker(ClassTable* class_table, FunctionTable* function_table) {
+Checker::Checker(std::map<std::string, std::string>& map, ClassTable* class_table, FunctionTable* function_table) : map(map) {
     this->is_lvalue = false;
     this->is_method = false;
     this->function_table = function_table;
@@ -184,7 +184,7 @@ bool is_generic(const TypeNode& t) {
 SemanticInfo Checker::match_arguments_to_generic_function(const FunctionType& ft, VectorOfTypes arg_types) {
     FunctionType* f = ft.clone();
     unify_function_call(*f, arg_types);
-    for(auto at: arg_types){
+    for (auto at: arg_types) {
         delete at;
     }
     SemanticInfo rv;
@@ -446,7 +446,7 @@ USemanticInfo Checker::dispatch(Node* nod) {
         case EMPTYDICT:
             return this->visit(n.emptydict());
             break;
-        // default:
+            // default:
             // throw std::runtime_error("Don't know what to do!");
     }
     return nullptr;

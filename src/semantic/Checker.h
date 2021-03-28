@@ -28,6 +28,7 @@ TypeNode* make_type_from_function_pattern(const FunctionType& ftn, const MapStri
 TypeNode* make_type(const TypeNode& original, const MapStringType& replacements);
 SemanticInfo match_arguments_to_generic_function(const FunctionType& function_type, VectorOfTypes arg_types);
 USemanticInfo error_stub();
+
 class Checker {
     bool add_this;
     bool is_lvalue;
@@ -40,6 +41,7 @@ class Checker {
     std::string current_function;
     std::unordered_map<std::string, SymbolTable*> scopes;
     std::vector<ObjectType*> tuple_types;
+    std::map<std::string, std::string>& map;
     SymbolTable* scope;
     TypeNode* this_type;
 public:
@@ -48,7 +50,7 @@ public:
     bool can_assign(const TypeNode& from, const TypeNode& to);
     bool can_assign_generic(TypeNode& from, TypeNode& to, VectorOfStrings type_params);
     bool is_immutable(const TypeNode& node);
-    Checker(ClassTable* class_table, FunctionTable* function_table);
+    Checker(std::map<std::string, std::string>& map, ClassTable* class_table, FunctionTable* function_table);
     ClassInfo* instantiate_generic(ClassInfo* generic, const ObjectType& instance);
     void error_assignment(const TypeNode& expected, const TypeNode& actual, TextPosition position);
     void error_bad_return(TextPosition position);
@@ -137,7 +139,8 @@ public:
     void error_partial_function_call_type_mismatch(const TypeNode& expected, const TypeNode& actual, TextPosition start,
                                                    TextPosition end);
     Node* replace_if_necessary(Node* node);
-    void error_generic_class_wrong_type_param_number(const std::string& cls, int num_req, int num_given, TextPosition pos);
+    void
+    error_generic_class_wrong_type_param_number(const std::string& cls, int num_req, int num_given, TextPosition pos);
     void error_class_init_wrong_number_init(const std::string& cls, int num_req, int num_given, TextPosition pos);
     void error_subscript_type(const TypeNode& t, const TypeNode& s, const TypeNode& es, TextPosition pos);
     void error_class_not_generic(const std::string& cls, TextPosition pos);
