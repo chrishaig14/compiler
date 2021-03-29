@@ -13,11 +13,11 @@
 #include "xobjects/XDict.h"
 #include "xobjects/XTuple.h"
 
-TaggedObject* f_open(TaggedObject* _s) {
+TaggedObject* m_core_f_open_f(TaggedObject* _s) {
     return NEW(XFile, (((XString*) UNTAG(_s))->s));
 }
 
-TaggedObject* f_print(TaggedObject* _s) {
+TaggedObject* m_core_f_print_f(TaggedObject* _s) {
     GC::declare(_s);
     XString* s = CAST(_s, XString);
     std::cout << s->s << std::endl;
@@ -25,7 +25,7 @@ TaggedObject* f_print(TaggedObject* _s) {
     return nullptr;
 }
 
-TaggedObject* f_range(TaggedObject* _start, TaggedObject* _step, TaggedObject* _end) {
+TaggedObject* m_core_f_range_f(TaggedObject* _start, TaggedObject* _step, TaggedObject* _end) {
     long start = GET_INT(_start);
     long step = GET_INT(_step);
     long end = GET_INT(_end);
@@ -41,12 +41,12 @@ TaggedObject* f_range(TaggedObject* _start, TaggedObject* _step, TaggedObject* _
     return TAG(r);
 }
 
-TaggedObject* f_Integer_str(TaggedObject* _i) {
+TaggedObject* m_core_f_Integer_str_f(TaggedObject* _i) {
     TaggedObject* x = NEW(XString, std::to_string((GET_INT(_i))));
     return x;
 }
 
-TaggedObject* f_Double_str(TaggedObject* _i) {
+TaggedObject* m_core_f_Double_str_f(TaggedObject* _i) {
     std::ostringstream out;
     out.precision(50);
     out << CAST(_i, XDouble)->d;
@@ -74,7 +74,7 @@ float float_rd(TaggedObject* r) {
 }
 
 
-TaggedObject* f_Float_str(TaggedObject* _i) {
+TaggedObject* m_core_f_Float_str_f(TaggedObject* _i) {
     std::ostringstream out;
     out.precision(50);
     out << float_rd(_i);
@@ -84,12 +84,12 @@ TaggedObject* f_Float_str(TaggedObject* _i) {
     return x;
 }
 
-TaggedObject* f_Boolean_str(TaggedObject* _i) {
+TaggedObject* m_core_f_Boolean_str_f(TaggedObject* _i) {
     TaggedObject* x = NEW(XString, ((GET_BOOL(_i) ? "true" : "false")));
     return x;
 }
 
-TaggedObject* f_map(TaggedObject* _l, TaggedObject* _f) {
+TaggedObject* m_core_f_map_f(TaggedObject* _l, TaggedObject* _f) {
     GC::declare(_l);
     XList* l = CAST(_l, XList);
     Function1* f = CAST(_f, Function1);
@@ -104,7 +104,7 @@ TaggedObject* f_map(TaggedObject* _l, TaggedObject* _f) {
     // return NEW(XList, r);
 }
 
-TaggedObject* f_join(TaggedObject* _l, TaggedObject* _s) {
+TaggedObject* m_core_f_join_f(TaggedObject* _l, TaggedObject* _s) {
     std::vector<TaggedObject*>* l = (std::vector<TaggedObject*>*) _l;
     std::string s;
     std::string js = *(std::string*) (_s);
@@ -165,30 +165,30 @@ TaggedObject* string_subscript(TaggedObject* _l, TaggedObject* i) {
     return NEW(XString, std::string(1, str->s[index]));
 }
 
-Function1 function_open_p = Function1(f_open);
-Function1 function_print_p = Function1(f_print);
-Function3 function_range_p = Function3(f_range);
-Function2 function_map_p = Function2(f_map);
-Function2 function_join_p = Function2(f_join);
-Function1 function_Integer_str_p = Function1(f_Integer_str);
-Function1 function_Double_str_p = Function1(f_Double_str);
-Function1 function_Float_str_p = Function1(f_Float_str);
-Function1 function_Boolean_str_p = Function1(f_Boolean_str);
-Function2 function_list_subscript_p = Function2(list_subscript);
-Function2 function_string_subscript_p = Function2(string_subscript);
-Function2 function_dict_subscript_p = Function2(dict_subscript);
-TaggedObject* function_open = FTAG(&function_open_p);
-TaggedObject* function_print = FTAG(&function_print_p);
-TaggedObject* function_range = FTAG(&function_range_p);
-TaggedObject* function_map = FTAG(&function_map_p);
-TaggedObject* function_join = FTAG(&function_join_p);
-TaggedObject* function_File_read_line = FTAG(&function_File_read_line_p);
-TaggedObject* function_Integer_str = FTAG(&function_Integer_str_p);
-TaggedObject* function_Double_str = FTAG(&function_Double_str_p);
-TaggedObject* function_Float_str = FTAG(&function_Float_str_p);
-TaggedObject* function_Boolean_str = FTAG(&function_Boolean_str_p);
-TaggedObject* function_list_subscript = FTAG(&function_list_subscript_p);
-TaggedObject* function_string_subscript = FTAG(&function_string_subscript_p);
-TaggedObject* function_dict_subscript = FTAG(&function_dict_subscript_p);
+Function1 m_core_f_open_o= Function1(m_core_f_open_f);
+Function1 m_core_f_print_o= Function1(m_core_f_print_f);
+Function3 m_core_f_range_o= Function3(m_core_f_range_f);
+Function2 m_core_f_map_o= Function2(m_core_f_map_f);
+Function2 m_core_f_join_o= Function2(m_core_f_join_f);
+Function1 m_core_c_Integer_f_str_o= Function1(m_core_f_Integer_str_f);
+Function1 m_core_c_Double_f_str_o= Function1(m_core_f_Double_str_f);
+Function1 m_core_c_Float_f_str_o= Function1(m_core_f_Float_str_f);
+Function1 m_core_c_Boolean_f_str_o= Function1(m_core_f_Boolean_str_f);
+Function2 m_core_list_subscript_o= Function2(list_subscript);
+Function2 m_core_string_subscript_o= Function2(string_subscript);
+Function2 m_core_dict_subscript_o= Function2(dict_subscript);
+TaggedObject* m_core_f_open = FTAG(&m_core_f_open_o);
+TaggedObject* m_core_f_print = FTAG(&m_core_f_print_o);
+TaggedObject* m_core_f_range = FTAG(&m_core_f_range_o);
+TaggedObject* m_core_f_map = FTAG(&m_core_f_map_o);
+TaggedObject* m_core_f_join = FTAG(&m_core_f_join_o);
+TaggedObject* m_core_File_read_line = FTAG(&m_core_c_File_f_read_line_o);
+TaggedObject* m_core_c_Integer_f_str = FTAG(&m_core_c_Integer_f_str_o);
+TaggedObject* m_core_c_Double_f_str = FTAG(&m_core_c_Double_f_str_o);
+TaggedObject* m_core_c_Float_f_str = FTAG(&m_core_c_Float_f_str_o);
+TaggedObject* m_core_c_Boolean_f_str = FTAG(&m_core_c_Boolean_f_str_o);
+TaggedObject* m_core_list_subscript = FTAG(&m_core_list_subscript_o);
+TaggedObject* m_core_string_subscript = FTAG(&m_core_string_subscript_o);
+TaggedObject* m_core_dict_subscript = FTAG(&m_core_dict_subscript_o);
 
 

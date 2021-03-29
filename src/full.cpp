@@ -10,7 +10,8 @@
 #include "logging/logging.h"
 #include "semantic/util.h"
 
-static std::vector<Builtin> builtins;
+static std::map<std::string, std::string> function_builtins;
+static std::map<std::string, std::map<std::string, std::string>> class_builtins;
 
 namespace Errors {
     void module_not_found(std::string __file__, std::string imported_module_name) {
@@ -102,7 +103,7 @@ class ModuleMapping {
 static std::map<std::string, FunctionTable*> module_exported_functions;
 static std::map<std::string, ClassTable*> module_exported_classes;
 static std::set<std::string> compiled_modules;
-
+static std::map<std::string, std::string> builtins;
 ClassTable* global_classes = new ClassTable();
 FunctionTable* global_functions = new FunctionTable();
 
@@ -118,7 +119,7 @@ void full_compile(bool is_main, const std::string& __file__, const std::string& 
     auto& map = *module_maps[module_name];
 
     for (auto builtin: builtins) {
-        map[builtin.first] = builtin.first;
+        map[builtin.first] = builtin.second;
     }
 
     for (auto n: tree->nodes) {
@@ -173,7 +174,7 @@ void full_compile(bool is_main, const std::string& __file__, const std::string& 
     std::cout << "FINALLY " << std::endl;
 
     try {
-        GlobalProcessor gp(builtins, module_maps, global_classes, global_functions, module_name);
+        GlobalProcessor gp(module_maps, global_classes, global_functions, module_name);
         gp.__file__ = __file__;
         gp.visit(*tree);
         Checker checker(map, global_classes, global_functions);
@@ -187,42 +188,41 @@ void full_compile(bool is_main, const std::string& __file__, const std::string& 
         std::cerr << "THERE WAS A SEMANTIC ERROR: " << e.what() << std::endl;
         exit(1);
     }
-    std::string output;
-    Transpiler t(map);
-    t.current_module = module_name;
+    std::string source;
+    std::string header;
+    Transpiler t(map, module_name, includes);
     try {
-        std::string code = t.transpile(tree);
-        output += t.globals_initialization;
-        output += code;
+        t.transpile(tree);
+        source = t.m_source;
+        header = t.m_header;
+        // output += t.globals_initialization;
+        // output += code;
     } catch (...) {
         std::cerr << "THERE WAS ATRANPILE ERROR" << std::endl;
         exit(2);
     }
     if (is_main) {
-        output += "\nint main(){\n";
-        output += t.static_initializations;
-        output += "auto x = GET_INT(CALL0(" + map["main"] + "));\n";
-        output += "return x;\n}";
+        source += "\nint main(){\n";
+        source += t.static_initializations;
+        source += "auto x = GET_INT(CALL0(" + map["main"] + "));\n";
+        source += "return x;\n}";
     }
     std::string output_h_path = path_join(output_dir, module_name + ".h");
-    std::string full_output_h = includes + t.externs_declaration + t.header;
-
-    includes += "#include \"" + module_name + ".h" + "\"\n";
 
     // delete tree;
 
-    std::string full_output = includes + output;
+    // header = includes + header;
 
     std::string output_cpp_path = path_join(output_dir, module_name + ".cpp");
     std::cout << "Outputting " << output_cpp_path << std::endl;
     std::ofstream output_cpp_file(output_cpp_path);
-    std::cout << "OUTPUT: " << full_output;
-    output_cpp_file << full_output;
+    std::cout << "OUTPUT: " << source;
+    output_cpp_file << source;
 
     std::cout << "Outputting " << output_h_path << std::endl;
     std::ofstream output_h_file(output_h_path);
-    std::cout << "OUTPUT: " << full_output_h;
-    output_h_file << full_output_h;
+    std::cout << "OUTPUT: " << header;
+    output_h_file << header;
 
     compiled_modules.insert(module_name);
 }
@@ -237,25 +237,38 @@ int main(int argc, char* argv[]) {
     std::string __main_file__ = path_join(project_dir, u_basename(project_dir) + ".xl");
     std::cout << style(BLUE, "Main file: ") << style(MAGENTA, __main_file__) << std::endl;
 
-    builtins.push_back({"map", "fun(List[a],fun(a)->b)->List[b]"});
-    builtins.push_back({"File.read_line", "fun()->String"});
-    builtins.push_back({"Integer.str", "fun(Integer)->String"});
-    builtins.push_back({"Float.str", "fun(Float)->String"});
-    builtins.push_back({"Double.str", "fun(Double)->String"});
-    builtins.push_back({"List.len", "fun(List[a])->Integer"});
-    builtins.push_back({"List.pop", "fun(List[a],a)"});
-    builtins.push_back({"List.push", "fun(List[a])->a"});
-    builtins.push_back({"List.unordered_map", "fun(fun(t)->b)->List[b]"});
-    builtins.push_back({"String.len", "fun(String)->Integer"});
-    builtins.push_back({"print", "fun(String)"});
-    builtins.push_back({"open", "fun(String)->File"});
-    builtins.push_back({"join", "fun(List[String],String)->String"});
-    builtins.push_back({"range", "fun(Integer,Integer,Integer)->List[Integer])->String"});
-    builtins.push_back({"input", "fun()->String"});
+    function_builtins["map"] = "fun(List[a],fun(a)->b)->List[b]";
+    function_builtins["print"] = "fun(String)";
+    function_builtins["open"] = "fun(String)->File";
+    function_builtins["join"] = "fun(List[String],String)->String";
+    function_builtins["range"] = "fun(Integer,Integer,Integer)->List[Integer])->String";
+    function_builtins["input"] = "fun()->String";
 
-    for (int i = 0; i < builtins.size(); i++) {
-        global_functions->add(builtins[i].first, parse_function_type(builtins[i].second));
+    class_builtins["File"]["read_line"] = "fun()->String";
+    class_builtins["Integer"]["str"] = "fun(Integer)->String";
+    class_builtins["Float"]["str"] = "fun(Float)->String";
+    class_builtins["Double"]["str"] = "fun(Double)->String";
+    class_builtins["List"]["len"] = "fun(List[a])->Integer";
+    class_builtins["List"]["pop"] = "fun(List[a],a)";
+    class_builtins["List"]["push"] = "fun(List[a])->a";
+    class_builtins["List"]["unordered_map"] = "fun(fun(t)->b)->List[b]";
+    class_builtins["String"]["len"] = "fun(String)->Integer";
+
+
+    for (auto fb: function_builtins) {
+        std::string mangled_name = mangle_function_name("core", fb.first);
+        builtins[fb.first] = mangled_name;
+        global_functions->add(mangled_name, parse_function_type(fb.second));
     }
+
+    for (auto cb: class_builtins) {
+        for (auto m: cb.second) {
+            std::string mangled_name = mangle_method_name("core", cb.first, m.first);
+            builtins[cb.first + "." + m.first] = mangled_name;
+            global_functions->add(mangled_name, parse_function_type(m.second));
+        }
+    }
+
     full_compile(true, __main_file__, output_dir);
 
     for (auto ct: module_exported_classes) {

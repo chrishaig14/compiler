@@ -17,14 +17,15 @@ class Transpiler {
 public:
     std::string current_module;
     std::map<std::string, std::string>& map;
-    std::string header;
+    std::string m_header;
+    std::string m_source;
     std::string static_declarations;
     std::string static_initializations;
     std::string externs_declaration;
     std::string globals_initialization;
     std::string method_class;
     std::vector<ObjectType*> tuple_types;
-    Transpiler(std::map<std::string, std::string>& map);
+    Transpiler(std::map<std::string, std::string>& map, std::string current_module, std::string includes);
     std::string dispatch(Node* nptr);
     std::string visit_assignment(AssignmentNode& node);
     std::string visit_cast(CastNode& node);
@@ -57,7 +58,7 @@ public:
     std::string visit_while(WhileNode& node);
 
     void foo();
-    std::string transpile(BlockNode* node);
+    void transpile(BlockNode* node);
     std::string generate_tuple_types();
     std::string generate_tuple(int n);
     std::string object_type_mapper(const ObjectType& t);

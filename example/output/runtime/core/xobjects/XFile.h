@@ -19,9 +19,9 @@ public:
 
 };
 
-extern TaggedObject* function_File_read_line;
-extern Function1 function_File_read_line_p;
-TaggedObject* f_File_read_line(TaggedObject* o);
+extern TaggedObject* m_core_c_File_f_read_line;
+extern Function1 m_core_c_File_f_read_line_o;
+TaggedObject* m_core_c_File_f_read_line_f(TaggedObject* o);
 
 
 #endif //XLANG_XFILE_H

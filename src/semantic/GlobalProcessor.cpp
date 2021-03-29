@@ -10,21 +10,13 @@
 #include "../parser/Parser.h"
 #include "util.h"
 
-void GlobalProcessor::add_builtins(std::vector<Builtin>& builtins) {
 
-
-}
-
-GlobalProcessor::GlobalProcessor(std::vector<Builtin>& builtins,
-                                 std::map<std::string, std::unique_ptr<std::map<std::string, std::string>>>& module_mappings,
+GlobalProcessor::GlobalProcessor(std::map<std::string, std::unique_ptr<std::map<std::string, std::string>>>& module_mappings,
                                  ClassTable* imported_classes, FunctionTable* imported_functions,
                                  std::string module_name) : module_mappings(module_mappings) {
     this->module_name = module_name;
     this->function_table = imported_functions;
     this->class_table = imported_classes;
-
-
-    this->add_builtins(builtins);
 }
 
 void GlobalProcessor::visit(ImportNode& node) {

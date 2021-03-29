@@ -19,17 +19,17 @@
 #include "../macros.h"
 #include "basics.h"
 
-TaggedObject* f_print(TaggedObject* _s);
+TaggedObject* m_core_f_print_f(TaggedObject* _s);
 
-TaggedObject* f_range(TaggedObject* _start, TaggedObject* _step, TaggedObject* _end);
+TaggedObject* m_core_f_range_f(TaggedObject* _start, TaggedObject* _step, TaggedObject* _end);
 
-TaggedObject* f_Integer_str(TaggedObject* _i);
+TaggedObject* m_core_f_Integer_str_f(TaggedObject* _i);
 
-TaggedObject* f_Boolean_str(TaggedObject* _i);
+TaggedObject* m_core_f_Boolean_str_f(TaggedObject* _i);
 
-TaggedObject* f_map(TaggedObject* _l, TaggedObject* _f);
+TaggedObject* m_core_f_map_f(TaggedObject* _l, TaggedObject* _f);
 
-TaggedObject* f_join(TaggedObject* _l, TaggedObject* _s);
+TaggedObject* m_core_f_join_f(TaggedObject* _l, TaggedObject* _s);
 
 TaggedObject* op_lt(TaggedObject* a, TaggedObject* b);
 
@@ -45,27 +45,27 @@ TaggedObject* op_leq(TaggedObject* a, TaggedObject* b);
 
 TaggedObject* subscript(TaggedObject* _l, TaggedObject* i);
 
-extern Function1 function_open_p;
-extern Function1 function_print_p;
-extern Function3 function_range_p;
-extern Function2 function_map_p;
-extern Function2 function_join_p;
-extern Function1 function_Integer_str_p;
-extern Function1 function_Double_str_p;
-extern Function1 function_Float_str_p;
-extern Function1 function_Boolean_str_p;
-extern Function2 function_list_subscript_p;
-extern TaggedObject* function_open;
-extern TaggedObject* function_print;
-extern TaggedObject* function_range;
-extern TaggedObject* function_map;
-extern TaggedObject* function_join;
-extern TaggedObject* function_Integer_str;
-extern TaggedObject* function_Float_str;
-extern TaggedObject* function_Double_str;
-extern TaggedObject* function_Boolean_str;
-extern TaggedObject* function_list_subscript;
-extern TaggedObject* function_dict_subscript;
-extern TaggedObject* function_string_subscript;
+extern Function1 m_core_f_open_o;
+extern Function1 m_core_f_orint_o;
+extern Function3 m_core_f_range_o;
+extern Function2 m_core_f_map_o;
+extern Function2 m_core_f_join_o;
+extern Function1 m_core_c_Integer_f_str_o;
+extern Function1 m_core_c_Double_f_str_o;
+extern Function1 m_core_c_Float_f_str_o;
+extern Function1 m_core_c_Boolean_f_str_o;
+extern Function2 m_core_list_subscript_o;
+extern TaggedObject* m_core_f_open;
+extern TaggedObject* m_core_f_print;
+extern TaggedObject* m_core_f_range;
+extern TaggedObject* m_core_f_map;
+extern TaggedObject* m_core_f_join;
+extern TaggedObject* m_core_c_Integer_f_str;
+extern TaggedObject* m_core_c_Float_f_str;
+extern TaggedObject* m_core_c_Double_f_str;
+extern TaggedObject* m_core_c_Boolean_f_str;
+extern TaggedObject* m_core_list_subscript;
+extern TaggedObject* m_core_dict_subscript;
+extern TaggedObject* m_core_string_subscript;
 
 #endif //UNTITLED1_CORE_H
