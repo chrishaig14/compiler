@@ -5,7 +5,7 @@
 #include "XList.h"
 #include "../basics.h"
 
-TaggedObject* f_List_add(TaggedObject* _a, TaggedObject* _b) {
+TaggedObject* m_core_c_List_f_add_f(TaggedObject* _a, TaggedObject* _b) {
     GC::declare(_a);
     GC::declare(_b);
     XList* a = CAST(_a, XList);
@@ -25,15 +25,15 @@ TaggedObject* f_List_add(TaggedObject* _a, TaggedObject* _b) {
     return TAG(r);
 }
 
-TaggedObject* f_List_len(TaggedObject* _l) {
+TaggedObject* m_core_c_List_f_len_f(TaggedObject* _l) {
     XList* l = (XList*) (UNTAG(_l));
     return MAKE_INT(l->l->size());
 }
 
-Function2 function_List_add_p = Function2(f_List_add);
-Function1 function_List_len_p = Function1(f_List_len);
-TaggedObject* function_List_add = FTAG(&function_List_add_p);
-TaggedObject* function_List_len = FTAG(&function_List_len_p);
+Function2 m_core_c_List_f_add_o = Function2(m_core_c_List_f_add_f);
+Function1 m_core_c_List_f_len_o = Function1(m_core_c_List_f_len_f);
+TaggedObject* m_core_c_List_f_add = FTAG(&m_core_c_List_f_add_o);
+TaggedObject* m_core_c_List_f_len = FTAG(&m_core_c_List_f_len_o);
 
 XList::XList(int n) : XObject("XList"), lv(n, nullptr) {
     this->l = &this->lv;

@@ -31,12 +31,10 @@ public:
     ~XList() override;
 };
 
-TaggedObject* f_List_add(TaggedObject* _a, TaggedObject* _b);
-TaggedObject* f_List_len(TaggedObject* _l);
-extern TaggedObject* function_List_add;
-extern TaggedObject* function_List_len;
-extern Function2 function_List_add_p;
-extern Function1 function_List_len_p;
+TaggedObject* m_core_c_List_f_add_f(TaggedObject* _a, TaggedObject* _b);
+TaggedObject* m_core_c_List_f_len_f(TaggedObject* _l);
+extern TaggedObject* m_core_c_List_f_add;
+extern TaggedObject* m_core_c_List_f_len;
 
 
 #endif //XLANG_XLIST_H
