@@ -340,9 +340,9 @@ USemanticInfo Checker::visit(ForNode& node) {
     }
     IdNode* lid = new IdNode("List.len");
     lid->is_global_function = true;
-    CallNode* len_call = new CallNode(lid, {new IdNode(".list0")});
+    CallNode* len_call = new CallNode(lid, {new IdNode("_list0")});
     len_call->arg_types.push_back(obj.clone());
-    Node* new_condition = new BoolOpNode(BoolOp::LT, new IdNode(".index0"), len_call);
+    Node* new_condition = new BoolOpNode(BoolOp::LT, new IdNode("_index0"), len_call);
 
     BlockNode* new_body = new BlockNode({});
     new_body->nodes.push_back(new DeclarationNode(node.var,
@@ -351,7 +351,7 @@ USemanticInfo Checker::visit(ForNode& node) {
     new_body->nodes.insert(new_body->nodes.end(), node.body->nodes.begin(), node.body->nodes.end());
     AssignmentNode* asn = new AssignmentNode(new IdNode("_index0"),
                                              new BinopNode(OpType::ADD,
-                                                           new IdNode(".index0"),
+                                                           new IdNode("_index0"),
                                                            new NumberNode(NumberType::INTEGER, "1")));
     asn->type = new T_INT;
     new_body->nodes.push_back(asn);
@@ -367,6 +367,7 @@ USemanticInfo Checker::visit(ForNode& node) {
     this->visit(*node.body);
     this->scope->is_loop = false;
     this->dispatch(new_body->nodes[0]->decl().expression);
+    this->dispatch(new_body->nodes[new_body->nodes.size()-1]->assign().rvalue);
     for (auto v: this->scope->table) {
         new_body->local_vars.push_back(std::make_pair(v.first, v.second->clone()));
     }
@@ -374,6 +375,8 @@ USemanticInfo Checker::visit(ForNode& node) {
     this->replacement = bn;
     this->replace_me = true;
     bn->nodes.push_back(new WhileNode(new_condition, new_body));
+    node.body = nullptr;
+    node.exp = nullptr;
     return nullptr;
 }
 
@@ -493,9 +496,17 @@ USemanticInfo Checker::visit(CallNode& n) {
 }
 
 USemanticInfo Checker::visit(BlockNode& program) {
+    VectorOfNodes vn;
     for (auto& n: program.nodes) {
         USemanticInfo sinfo_p = this->dispatch(n);
         n = this->replace_if_necessary(n);
+        if (n->ntype == BLOCK) {
+            for (auto node: n->block().nodes) {
+                vn.push_back(node);
+            }
+        } else {
+            vn.push_back(n);
+        }
         SemanticInfo& sinfo = *sinfo_p;
         if (n->ntype == NodeType::CALL) {
             // it's a function call
@@ -505,6 +516,7 @@ USemanticInfo Checker::visit(BlockNode& program) {
             }
         }
     }
+    program.nodes = vn;
     return nullptr;
 }
 

@@ -4,8 +4,7 @@
 
 #include "ForNode.h"
 
-ForNode::ForNode(const std::string& var, Node* exp, BlockNode* body) : var(var), exp(exp),
-                                                                       body(body) {
+ForNode::ForNode(const std::string& var, Node* exp, BlockNode* body) : var(var), exp(exp), body(body) {
     assert(exp != nullptr);
     assert(body != nullptr);
     this->ntype = FORLOOP;
@@ -25,7 +24,11 @@ const ForNode& ForNode::forloop() const {
 }
 
 ForNode::~ForNode() {
-    delete this->exp;
-    delete this->body;
+    if (this->exp != nullptr) {
+        delete this->exp;
+    }
+    if (this->body != nullptr) {
+        delete this->body;
+    }
 }
 
