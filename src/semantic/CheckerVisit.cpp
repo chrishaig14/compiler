@@ -521,6 +521,7 @@ USemanticInfo Checker::visit(BlockNode& program) {
 }
 
 USemanticInfo Checker::visit(FunctionNode& n) {
+    std::cout << "VISITING FUNCTION " << n.identifier << std::endl;
     std::string& function_name = n.identifier;
     this->current_function = function_name;
     this->enter_scope(function_name);
@@ -532,10 +533,13 @@ USemanticInfo Checker::visit(FunctionNode& n) {
     for (int i = 0; i < n.parameter_names.size(); i++) {
         TypeNode& type = *n.parameter_types[i];
         if (type.kind == Kind::OBJECT) {
+            std::cout << "START" << std::endl;
             this->assert_type_exists(type, n.start);
+            std::cout << "END" << std::endl;
         }
         this->scope->set(n.parameter_names[i], type);
     }
+    std::cout << "FINISH " << std::endl;
 
     TypeNode& returnType = *n.return_type;
     this->assert_type_exists(returnType, n.start);

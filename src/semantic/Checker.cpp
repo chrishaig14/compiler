@@ -88,14 +88,6 @@ Checker::Checker(std::map<std::string, std::string>& map, ClassTable* class_tabl
     this->add_this = false;
     this->this_type = nullptr;
 
-    this->class_table->set("Float", make_float_class_info());
-    this->class_table->set("Double", make_double_class_info());
-    this->class_table->set("File", make_file_class_info());
-    this->class_table->set("Integer", make_int_class_info());
-    this->class_table->set("List", make_list_class_info());
-    this->class_table->set("Boolean", make_boolean_class_info());
-    this->class_table->set("String", make_string_class_info());
-
     this->class_table->set("Tuple", nullptr);
 
     this->class_table->set("Option", new ClassInfo("Option", VectorOfStrings(), {}, {"t"}));
@@ -123,14 +115,14 @@ bool Checker::assert_type_exists(TypeNode& type, TextPosition pos) {
         }
         if (type.object().type_params.size() == 0) {
             if (!is_generic(type)) {
-                if (!this->class_table->declared(type.object().id)) {
-                    this->error_class_not_found(type, pos);
+                if (this->map.count(type.object().id) == 0) {
+                    this->error_class_not_found(type, {1,1});
                     return false;
                 }
             }
             return true;
         }
-        if (!this->class_table->declared(type.object().id)) {
+        if (this->map.count(type.object().id) == 0) {
             this->error_class_not_found(type, pos);
             return false;
         } else {

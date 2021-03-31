@@ -111,6 +111,8 @@ static std::map<std::string, std::unique_ptr<std::map<std::string, std::string>>
 
 void full_compile(bool is_main, const std::string& __file__, const std::string& output_dir) {
     std::string module_name = module_from_path(__file__);
+    std::cout << "COMPILING MODULE : " << module_name << std::endl;
+
     CodeLines code_lines;
     BlockNode* tree = full_parse(__file__, &code_lines);
 
@@ -120,6 +122,14 @@ void full_compile(bool is_main, const std::string& __file__, const std::string& 
 
     for (auto builtin: builtins) {
         map[builtin.first] = builtin.second;
+    }
+
+    for (auto builtin: builtins) {
+        map[builtin.first] = builtin.second;
+    }
+
+    for (auto cb: class_builtins) {
+        map[cb.first] = mangle_class_name("core", cb.first);
     }
 
     for (auto n: tree->nodes) {
@@ -145,13 +155,13 @@ void full_compile(bool is_main, const std::string& __file__, const std::string& 
 
     std::string includes = "#include \"runtime/core/core.h\"\n";
 
-    std::cout << "STARTING!" << std::endl;
+    // std::cout << "STARTING!" << std::endl;
 
     for (auto q: imported) {
         std::string imported_module_name = q.first;
         std::set<std::string> imported_names = q.second;
         for (auto imported_name: imported_names) {
-            std::cout << "HERE setting" << std::endl;
+            // std::cout << "HERE setting" << std::endl;
             if (module_maps[imported_module_name]->find(imported_name) == module_maps[imported_module_name]->end()) {
                 Errors::name_not_exported_by_module(__file__, imported_module_name, imported_name);
                 exit(1);
@@ -170,8 +180,6 @@ void full_compile(bool is_main, const std::string& __file__, const std::string& 
         }
         includes += "#include \"" + imported_module_name + ".h\"\n";
     }
-
-    std::cout << "FINALLY " << std::endl;
 
     try {
         GlobalProcessor gp(module_maps, global_classes, global_functions, module_name);
@@ -214,16 +222,16 @@ void full_compile(bool is_main, const std::string& __file__, const std::string& 
     // header = includes + header;
 
     std::string output_cpp_path = path_join(output_dir, module_name + ".cpp");
-    std::cout << "Outputting " << output_cpp_path << std::endl;
+    // std::cout << "Outputting " << output_cpp_path << std::endl;
     std::ofstream output_cpp_file(output_cpp_path);
-    std::cout << "OUTPUT: " << source;
+    // std::cout << "OUTPUT: " << source;
     output_cpp_file << source;
 
-    std::cout << "Outputting " << output_h_path << std::endl;
+    // std::cout << "Outputting " << output_h_path << std::endl;
     std::ofstream output_h_file(output_h_path);
-    std::cout << "OUTPUT: " << header;
+    // std::cout << "OUTPUT: " << header;
     output_h_file << header;
-
+    std::cout << "DONE COMPILING MODULE : " << module_name << std::endl;
     compiled_modules.insert(module_name);
 }
 
@@ -253,6 +261,7 @@ int main(int argc, char* argv[]) {
     class_builtins["List"]["push"] = "fun(List[a])->a";
     class_builtins["List"]["unordered_map"] = "fun(fun(t)->b)->List[b]";
     class_builtins["String"]["len"] = "fun(String)->Integer";
+    class_builtins["Boolean"] = {};
 
 
     for (auto fb: function_builtins) {
@@ -260,6 +269,14 @@ int main(int argc, char* argv[]) {
         builtins[fb.first] = mangled_name;
         global_functions->add(mangled_name, parse_function_type(fb.second));
     }
+
+    global_classes->set(mangle_class_name("core", "Float"), make_float_class_info());
+    global_classes->set(mangle_class_name("core", "Double"), make_double_class_info());
+    global_classes->set(mangle_class_name("core", "File"), make_file_class_info());
+    global_classes->set(mangle_class_name("core", "Integer"), make_int_class_info());
+    global_classes->set(mangle_class_name("core", "List"), make_list_class_info());
+    global_classes->set(mangle_class_name("core", "Boolean"), make_boolean_class_info());
+    global_classes->set(mangle_class_name("core", "String"), make_string_class_info());
 
     for (auto cb: class_builtins) {
         for (auto m: cb.second) {

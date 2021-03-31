@@ -1,8 +1,17 @@
+from another import third
+
 fun first(x: t, y: u)->t{
     return x
 }
 
 fun second(x: u, y: t)->t{
     return y
+}
+
+class Person {
+    name: String
+    fun get_name()->String{
+        return this.name
+    }
 }
 

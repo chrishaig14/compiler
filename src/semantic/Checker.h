@@ -29,6 +29,19 @@ TypeNode* make_type(const TypeNode& original, const MapStringType& replacements)
 SemanticInfo match_arguments_to_generic_function(const FunctionType& function_type, VectorOfTypes arg_types);
 USemanticInfo error_stub();
 
+ClassInfo* make_list_class_info();
+
+ClassInfo* make_file_class_info();
+
+ClassInfo* make_int_class_info();
+
+ClassInfo* make_boolean_class_info();
+
+ClassInfo* make_float_class_info();
+
+ClassInfo* make_double_class_info();
+
+ClassInfo* make_string_class_info();
 class Checker {
     bool add_this;
     bool is_lvalue;
