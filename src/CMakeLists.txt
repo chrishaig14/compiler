@@ -84,7 +84,7 @@ add_library(
         nodes/DictNode.cpp
         nodes/DictNode.h
         nodes/EmptyDictNode.cpp
-        nodes/EmptyDictNode.h nodes/CastNode.cpp nodes/CastNode.h nodes/MethodNode.cpp nodes/MethodNode.h)
+        nodes/EmptyDictNode.h nodes/CastNode.cpp nodes/CastNode.h nodes/MethodNode.cpp nodes/MethodNode.h logger/Logger.cpp logger/Logger.h)
 
 add_library(parser parser/Parser.cpp parser/Parser.h parser/ParserErrors.cpp)
 
