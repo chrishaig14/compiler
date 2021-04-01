@@ -4,6 +4,7 @@
 
 #include "Checker.h"
 #include "util.h"
+#include "../logger/Logger.h"
 
 #define T_NONE ObjectType(".None")
 
@@ -367,7 +368,7 @@ USemanticInfo Checker::visit(ForNode& node) {
     this->visit(*node.body);
     this->scope->is_loop = false;
     this->dispatch(new_body->nodes[0]->decl().expression);
-    this->dispatch(new_body->nodes[new_body->nodes.size()-1]->assign().rvalue);
+    this->dispatch(new_body->nodes[new_body->nodes.size() - 1]->assign().rvalue);
     for (auto v: this->scope->table) {
         new_body->local_vars.push_back(std::make_pair(v.first, v.second->clone()));
     }
@@ -386,7 +387,7 @@ USemanticInfo Checker::visit(MethodNode& n) {
     if (n.parent_t->kind != Kind::OBJECT) {
         throw std::runtime_error("Cannot call a method on a function");
     }
-    ClassInfo* class_info = this->class_table->get(n.parent_t->object().id);
+    ClassInfo* class_info = this->class_table->get(this->map[n.parent_t->object().id]);
     SemanticInfo info;
     if (class_info->methods.find(n.s_child) == class_info->methods.end()) {
         throw std::runtime_error("Error " + n.parent_t->to_string() + " has no method " + n.s_child);
@@ -402,6 +403,7 @@ USemanticInfo Checker::visit(MethodNode& n) {
 }
 
 USemanticInfo Checker::visit(CallNode& n) {
+    Logger::info("Checking CallNode");
     USemanticInfo fun_info_p = this->dispatch(n.function);
     if (fun_info_p->is_error) {
         return error_stub();
@@ -521,7 +523,7 @@ USemanticInfo Checker::visit(BlockNode& program) {
 }
 
 USemanticInfo Checker::visit(FunctionNode& n) {
-    std::cout << "VISITING FUNCTION " << n.identifier << std::endl;
+    Logger::info("Checking FunctionNode " + n.identifier);
     std::string& function_name = n.identifier;
     this->current_function = function_name;
     this->enter_scope(function_name);
@@ -637,6 +639,7 @@ USemanticInfo Checker::visit(IdNode& n) {
 }
 
 USemanticInfo Checker::visit(DeclarationNode& n) {
+    Logger::info("Checking DeclarationNode for var: " + n.identifier);
     if (this->scope->declared(n.identifier)) {
         this->error_redeclared(n.identifier, n.start);
     }
