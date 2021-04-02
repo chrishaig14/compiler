@@ -260,11 +260,13 @@ Node* Parser::parse_mul_div_or_mod_expression() {
 Node* Parser::parse_factor() {
     Node* parent;
     if (this->match(TokType::HASH)) {
+        Token hash_tok = this->token;
         this->next();
         if (this->match(TokType::ID)) {
             Token tok = this->token;
             this->next();
             parent = new DefaultConstructorNode(tok.str);
+            parent->start = hash_tok.start;
         } else {
             parent = this->parse_tuple_literal();
         }
