@@ -20,6 +20,9 @@ public:
     MapStringType members;
     std::unordered_map<std::string, FunctionType*> methods;
 
+    MapStringType static_members;
+    std::unordered_map<std::string, FunctionType*> static_methods;
+
     std::string class_name;
 
     ClassInfo() {

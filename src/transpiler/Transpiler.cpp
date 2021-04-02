@@ -6,6 +6,7 @@
 #include "Transpiler.h"
 #include "../macros.h"
 #include "../semantic/Checker.h"
+#include "../logger/Logger.h"
 
 #define FUNCTION_PREFIX "function_"
 
@@ -249,6 +250,11 @@ std::string Transpiler::visit_class(ClassNode& node) {
         }
         m_source += this->dispatch(n.second);
     }
+    for (auto n: node.static_methods) {
+        std::string method_name = n.second->identifier;
+        n.second->identifier = node.class_name + "." + n.second->identifier;
+        m_source += this->dispatch(n.second);
+    }
     return "ASDASDFSDF";
 }
 
@@ -435,6 +441,7 @@ std::set<std::string> get_generic_types(const TypeNode& t) {
 }
 
 std::string Transpiler::visit_function(FunctionNode& node) {
+    Logger::info("Transpiling function " + node.identifier);
     std::string fname = this->map.at(node.identifier);
     std::string raw_function_name = fname;
 
@@ -577,6 +584,7 @@ std::string Transpiler::visit_none(NoneNode& node) {
 }
 
 std::string Transpiler::visit_return(ReturnNode& node) {
+    Logger::info("Transpiling return");
     std::string out;
     if (node.expression != nullptr) {
         if (is_object(*node.ret_type)) {

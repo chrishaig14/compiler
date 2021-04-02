@@ -17,15 +17,19 @@ public:
 
     bool equal(const Node& other) const;
     ClassNode(const std::string& className, VectorOfStrings type_parameters, MapStringType members,
-              std::unordered_map<std::string, FunctionNode*> functions, TextPosition start, TextPosition end);
+              std::unordered_map<std::string, FunctionNode*> functions, MapStringType static_members,
+              std::unordered_map<std::string, FunctionNode*> static_methods, TextPosition start, TextPosition end);
     ClassNode& cls() override;
     const ClassNode& cls() const override;
 
     ~ClassNode();
 
     MapStringType members;
+    MapStringType static_members;
     VectorOfStrings members_ordered;
     std::unordered_map<std::string, FunctionNode*> methods;
+    std::unordered_map<std::string, FunctionNode*> static_methods;
+
     std::string class_name;
     VectorOfStrings type_parameters;
 };

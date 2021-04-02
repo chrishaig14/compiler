@@ -10,9 +10,7 @@
 #include <iostream>
 
 namespace Logger {
-    void info(std::string s) {
-        std::cout << "[INFO] " << s << std::endl;
-    }
+    void info(std::string s);
 };
 
 

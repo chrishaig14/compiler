@@ -3,3 +3,7 @@
 //
 
 #include "Logger.h"
+
+void Logger::info(std::string s) {
+    std::cout << "[INFO] " << s << std::endl;
+}

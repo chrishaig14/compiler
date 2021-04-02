@@ -169,13 +169,16 @@ Node* Parser::parse_assignment_or_expression() {
         Node* rvalue = this->parse_expression();
         if (lvalue->ntype == ID) {
             IdNode* id_node = new IdNode(lvalue->id()._id, lvalue->start, lvalue->end);
-            OpType opt = OpType::ADD;
-            if (op == TokType::PLUS_EQQ) {
-                opt = OpType::ADD;
-            } else if (op == TokType::MINUS_EQQ) {
-                opt = OpType::SUB;
+            if (op == TokType::PLUS_EQQ || op == TokType::MINUS_EQQ) {
+                OpType opt = OpType::ADD;
+                if (op == TokType::PLUS_EQQ) {
+                    opt = OpType::ADD;
+                } else if (op == TokType::MINUS_EQQ) {
+                    opt = OpType::SUB;
+                }
+                rvalue = new BinopNode(opt, id_node, rvalue, id_node->start, rvalue->end);
             }
-            rvalue = new BinopNode(opt, id_node, rvalue, id_node->start, rvalue->end);
+
         }
         Node* node = new AssignmentNode(lvalue, rvalue, lvalue->start, rvalue->end);
         node->start = op_pos;
@@ -780,7 +783,9 @@ ClassNode* Parser::parse_class_definition() {
     }
     this->expect_token(TokType::LCURLY);
     std::unordered_map<std::string, FunctionNode*> methods;
+    std::unordered_map<std::string, FunctionNode*> static_methods;
     MapStringType members;
+    MapStringType static_members;
     VectorOfStrings members_ordered;
     while (true) {
         bool is_static = false;
@@ -797,8 +802,12 @@ ClassNode* Parser::parse_class_definition() {
                 this->error_class_member_redefined(class_name, member_name, member_name_tk.start);
 
             }
-            members[member_name] = member_type;
-            members_ordered.push_back(member_name);
+            if (is_static) {
+                static_members[member_name] = member_type;
+            } else {
+                members[member_name] = member_type;
+                members_ordered.push_back(member_name);
+            }
             this->expect_token(TokType::SEMICOLON);
         } else if (this->match(TokType::FUN)) {
             FunctionNode* method_node = this->parse_function_definition();
@@ -807,13 +816,24 @@ ClassNode* Parser::parse_class_definition() {
                 this->error_class_member_redefined(class_name, method_name, method_node->start);
 
             }
-            methods.insert(make_pair(method_name, method_node));
+            if (is_static) {
+                static_methods.insert(make_pair(method_name, method_node));
+            } else {
+                methods.insert(make_pair(method_name, method_node));
+            }
         } else {
             break;
         }
     }
     Token end = this->expect_token(TokType::RCURLY);
-    ClassNode* c = new ClassNode(class_name, type_parameters, members, methods, class_tok.start, end.end_pos);
+    ClassNode* c = new ClassNode(class_name,
+                                 type_parameters,
+                                 members,
+                                 methods,
+                                 static_members,
+                                 static_methods,
+                                 class_tok.start,
+                                 end.end_pos);
     c->members_ordered = members_ordered;
     c->start = class_tok.start;
     return c;

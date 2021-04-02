@@ -11,9 +11,10 @@
 #include "util.h"
 
 
-GlobalProcessor::GlobalProcessor(std::map<std::string, std::unique_ptr<std::map<std::string, std::string>>>& module_mappings,
-                                 ClassTable* imported_classes, FunctionTable* imported_functions,
-                                 std::string module_name) : module_mappings(module_mappings) {
+GlobalProcessor::GlobalProcessor(
+        std::map<std::string, std::unique_ptr<std::map<std::string, std::string>>>& module_mappings,
+        ClassTable* imported_classes, FunctionTable* imported_functions, std::string module_name) : module_mappings(
+        module_mappings) {
     this->module_name = module_name;
     this->function_table = imported_functions;
     this->class_table = imported_classes;
@@ -60,6 +61,9 @@ void GlobalProcessor::visit(ClassNode& node) {
         class_info->member_types.push_back(mt->clone());
         class_info->members[mn] = mt->clone();
     }
+    for (auto mn: node.static_members) {
+        class_info->static_members[mn.first] = mn.second->clone();
+    }
     bool has_init = false;
     for (auto f: node.methods) {
         FunctionNode& method = *f.second;
@@ -74,6 +78,22 @@ void GlobalProcessor::visit(ClassNode& node) {
                                                                                             node.class_name,
                                                                                             method.identifier);
     }
+
+    for (auto f: node.static_methods) {
+        FunctionNode& method = *f.second;
+        has_init = f.first == "init";
+        VectorOfTypes x;
+        for (auto p: method.parameter_types) {
+            x.emplace_back(p->clone());
+        }
+        class_info->static_methods.insert(make_pair(f.first, new FunctionType(x, method.return_type->clone())));
+        (*this->module_mappings[this->module_name])[node.class_name + "." +
+                                                    method.identifier] = mangle_method_name(this->module_name,
+                                                                                            node.class_name,
+                                                                                            method.identifier);
+    }
+
+
     if (!has_init) {
         class_info->methods["init"] = new FunctionType(class_info->member_types, new ObjectType(node.class_name));
         (*this->module_mappings[this->module_name])[node.class_name + "." +

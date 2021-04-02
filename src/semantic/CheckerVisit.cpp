@@ -235,6 +235,13 @@ USemanticInfo Checker::visit(ClassNode& node) {
         this->visit(*method.second);
         has_init = has_init || method.first == "init";
     }
+    for (auto method: node.static_methods) {
+        this->is_method = false;
+        this->add_this = false;
+        this->visit(*method.second);
+        has_init = has_init || method.first == "init";
+    }
+    this->add_this = true;
     std::string eq_method_name = "eq";
     if (node.methods.find(eq_method_name) == node.methods.end()) {
         auto eq_meth = generate_eq_method(node.class_name, tp, node.members_ordered);
@@ -463,6 +470,7 @@ USemanticInfo Checker::visit(CallNode& n) {
             object_node = member_node.parent;
         }
     }
+    n.function = replace_if_necessary(n.function);
     if (fun_info.is_function || fun_info.is_method || fun_info.is_class_method) {
         // ok
         const FunctionType& function_type = fun_info.type().function();
@@ -615,6 +623,7 @@ USemanticInfo Checker::visit(FunctionNode& n) {
 }
 
 USemanticInfo Checker::visit(IdNode& n) {
+    Logger::info("Checking id node " + n._id);
     SemanticInfo info;
     if (!this->scope->has(n._id)) {
         // it might be a function name
@@ -730,6 +739,7 @@ USemanticInfo Checker::visit(DeclarationNode& n) {
 }
 
 USemanticInfo Checker::visit(AssignmentNode& n) {
+    Logger::info("Checking assignment node");
     if (n.lvalue->ntype == NodeType::ID) {
         if (n.lvalue->id()._id == "_") {
             this->dispatch(n.rvalue);
@@ -786,30 +796,10 @@ USemanticInfo Checker::visit(AssignmentNode& n) {
 }
 
 USemanticInfo Checker::member_class_method(std::string class_name, std::string child, MemberNode& n) {
-    ClassInfo* class_info = this->class_table->get(class_name);
+    ClassInfo* class_info = this->class_table->get(this->map[class_name]);
     SemanticInfo rv;
     if (class_info->methods.find(child) != class_info->methods.end()) {
-
-        if (child == "init") {
-            const FunctionType& ft = *class_info->methods.find(child)->second;
-            VectorOfTypes params = ft.param_types;
-            for (int i = 0; i < params.size(); i++) {
-                params[i] = params[i]->clone();
-            }
-            VectorOfTypes tp;
-            for (auto t: class_info->type_params) {
-                tp.push_back(new ObjectType(t));
-            }
-            FunctionType f(params, new ObjectType(class_name, tp));
-            rv.set_type(f);
-            rv.is_class_method = true;
-            this->replace_me = true;
-            IdNode* idn = new IdNode(class_name + "." + child, POS_NONE, POS_NONE);
-            idn->is_global_function = true;
-            this->replacement = idn;
-            return std::make_unique<SemanticInfo>(rv);
-        }
-
+        // unbound method
         rv.set_type(*class_info->methods.find(child)->second);
         rv.class_info = class_info;
 
@@ -828,6 +818,14 @@ USemanticInfo Checker::member_class_method(std::string class_name, std::string c
         this->replace_me = true;
         IdNode* idn = new IdNode(class_name + "." + child, POS_NONE, POS_NONE);
         idn->is_global_function = true;
+        this->replacement = idn;
+        return std::make_unique<SemanticInfo>(rv);
+    } else if (class_info->static_methods.find(child) != class_info->static_methods.end()) {
+        // static method
+        rv.set_type(*class_info->static_methods[child]);
+        rv.is_function = true;
+        IdNode* idn = new IdNode(this->map[class_name + "." + child], POS_NONE, POS_NONE);
+        this->replace_me = true;
         this->replacement = idn;
         return std::make_unique<SemanticInfo>(rv);
     } else {
@@ -893,7 +891,7 @@ USemanticInfo Checker::visit(MemberNode& n) {
     if (n.parent->ntype == NodeType::ID) {
         IdNode& id_node = n.parent->id();
         // It might be something like <class>.<method>, so we need to handle this case differently
-        if (this->class_table->declared(id_node._id)) {
+        if (this->class_table->declared(this->map[id_node._id])) {
             return this->member_class_method(id_node._id, child, n);
         }
     }
@@ -1024,6 +1022,7 @@ USemanticInfo Checker::visit(BoolOpNode& n) {
 }
 
 USemanticInfo Checker::visit(BinopNode& n) {
+    Logger::info("Checking binop node");
     USemanticInfo left_info_p = this->dispatch(n.left);
     Node* left_replace = this->replace_if_necessary(n.left);
     USemanticInfo right_info_p = this->dispatch(n.right);
