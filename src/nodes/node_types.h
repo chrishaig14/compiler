@@ -12,6 +12,7 @@ enum NodeType {
     PARTIAL,
     BOOLEAN,
     BRK,
+    DEF_CONST,
     CALL,
     METHOD,
     CAST,

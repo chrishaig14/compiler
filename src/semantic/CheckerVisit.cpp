@@ -1124,3 +1124,18 @@ USemanticInfo Checker::visit(EmptyDictNode& node) {
     info.set_type(ObjectType("Dict", {node.key_type, node.value_type}));
     return std::make_unique<SemanticInfo>(info);
 }
+
+USemanticInfo Checker::visit(DefaultConstructorNode& node) {
+    // this is a regular function
+    SemanticInfo info;
+    VectorOfTypes t;
+    if (this->class_table->declared(node.name)) {
+        ClassInfo* ci = this->class_table->get(node.name);
+        for (auto pt: ci->member_types) {
+            t.push_back(pt->clone());
+        }
+    }
+    info.set_type(FunctionType(t, new ObjectType(node.name)));
+    info.is_function = true;
+    return std::make_unique<SemanticInfo>(info);
+}

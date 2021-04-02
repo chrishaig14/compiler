@@ -157,6 +157,14 @@ EmptyDictNode& Node::emptydict() {
     this->throw_dereference_error(EMPTYDICT);
 }
 
+DefaultConstructorNode& Node::defconst() {
+    this->throw_dereference_error(DEF_CONST);
+}
+
+const DefaultConstructorNode& Node::defconst() const {
+    this->throw_dereference_error(DEF_CONST);
+}
+
 
 EmptyListNode& Node::emptylst() {
     this->throw_dereference_error(EMPTYLST);

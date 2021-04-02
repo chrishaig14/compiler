@@ -6,6 +6,7 @@
 #include "../semantic/GlobalProcessor.h"
 #include "../nodes/PartialApplication.h"
 #include "../logging/logging.h"
+#include "../nodes/DefaultConstructorNode.h"
 #include <fmt/core.h>
 #include <fmt/color.h>
 #include <exception>
@@ -259,7 +260,14 @@ Node* Parser::parse_mul_div_or_mod_expression() {
 Node* Parser::parse_factor() {
     Node* parent;
     if (this->match(TokType::HASH)) {
-        parent = this->parse_tuple_literal();
+        this->next();
+        if (this->match(TokType::ID)) {
+            Token tok = this->token;
+            this->next();
+            parent = new DefaultConstructorNode(tok.str);
+        } else {
+            parent = this->parse_tuple_literal();
+        }
     } else {
         parent = this->parse_id_or_literal();
     }

@@ -438,8 +438,10 @@ USemanticInfo Checker::dispatch(Node* nod) {
         case EMPTYDICT:
             return this->visit(n.emptydict());
             break;
-            // default:
-            // throw std::runtime_error("Don't know what to do!");
+        case NodeType::DEF_CONST:
+            return this->visit(n.defconst());
+        default:
+            throw std::runtime_error("Don't know what to do!");
     }
     return nullptr;
 }

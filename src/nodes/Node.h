@@ -64,6 +64,8 @@ class StringNode;
 
 class SubscriptNode;
 
+class DefaultConstructorNode;
+
 class TernaryNode;
 
 class TupleNode;
@@ -167,6 +169,8 @@ public:
     virtual json to_json() const;
     virtual PartialApplication& partial();
     virtual const PartialApplication& partial() const;
+    virtual DefaultConstructorNode& defconst();
+    virtual const DefaultConstructorNode& defconst() const;
 };
 
 #endif //NODE_H

@@ -11,6 +11,7 @@
 #include "CallNode.h"
 #include "BooleanNode.h"
 #include "BreakNode.h"
+#include "DefaultConstructorNode.h"
 #include "DictNode.h"
 #include "EmptyDictNode.h"
 #include "EmptyListNode.h"

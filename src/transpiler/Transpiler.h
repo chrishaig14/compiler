@@ -73,6 +73,7 @@ public:
     unsigned long num_members_class;
     std::string visit_cast_op(CastNode& node);
     bool is_call;
+    std::string visit_default_constructor(DefaultConstructorNode& node);
 };
 
 

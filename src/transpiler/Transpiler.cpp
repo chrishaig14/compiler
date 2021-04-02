@@ -725,6 +725,8 @@ std::string Transpiler::dispatch(Node* nptr) {
             break;
         case EMPTYDICT:
             break;
+        case NodeType::DEF_CONST:
+            return this->visit_default_constructor(n.defconst());
         default:
             throw std::runtime_error("Don't know what to do!");
     }
@@ -845,5 +847,9 @@ std::string Transpiler::visit_method(MethodNode& node) {
     out = out.substr(0, out.size() - 2);
     out += ")";
     return out;
+}
+
+std::string Transpiler::visit_default_constructor(DefaultConstructorNode& node) {
+    return this->map[node.name+".init"];
 }
 
