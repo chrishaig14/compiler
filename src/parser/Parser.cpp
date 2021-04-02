@@ -768,6 +768,11 @@ ClassNode* Parser::parse_class_definition() {
     MapStringType members;
     VectorOfStrings members_ordered;
     while (true) {
+        bool is_static = false;
+        if (this->match(TokType::STATIC)) {
+            this->next();
+            is_static = true;
+        }
         if (this->match(TokType::ID)) {
             Token member_name_tk = this->expect_token(TokType::ID);
             this->expect_token(TokType::COLON);

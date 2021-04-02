@@ -29,6 +29,7 @@ void initialize_tokens() {
     TOKEN_KEYWORDS["var"] = TokType::VAR;
     TOKEN_KEYWORDS["continue"] = TokType::CONTINUE;
     TOKEN_KEYWORDS["return"] = TokType::RETURN;
+    TOKEN_KEYWORDS["static"] = TokType::STATIC;
     TOKEN_KEYWORDS["true"] = TokType::TRUE;
     TOKEN_KEYWORDS["false"] = TokType::FALSE;
     TOKEN_KEYWORDS["from"] = TokType::FROM;
