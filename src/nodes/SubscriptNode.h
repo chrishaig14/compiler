@@ -15,7 +15,7 @@
 class SubscriptNode : public Node {
 
 public:
-    SubscriptNode(Node* parent, VectorOfNodes child);
+    SubscriptNode(Node* parent, VectorOfNodes child, TextPosition start, TextPosition end);
     TypeNode* parent_t;
     Node* parent;
     VectorOfNodes child;

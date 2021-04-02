@@ -11,6 +11,7 @@
 #include <fmt/color.h>
 #include <exception>
 
+static TextPosition POS_NONE = {-1, -1};
 
 std::string highlight(size_t column, size_t length) {
     return fmt::format(fmt::fg(fmt::color::orange_red), std::string(column, ' ') + std::string(length, '^'));
@@ -63,7 +64,7 @@ BlockNode* Parser::parse_program() {
     while (this->token.type != TokType::END) {
         program.push_back(this->parse_top_level_statement());
     }
-    return new BlockNode(program);
+    return new BlockNode(program, POS_NONE, POS_NONE);
 }
 
 ReturnNode* Parser::parse_return() {
@@ -72,7 +73,7 @@ ReturnNode* Parser::parse_return() {
     if (!this->match(TokType::SEMICOLON)) {
         expression = this->parse_expression();
     }
-    return new ReturnNode(expression, ret_tok.start);
+    return new ReturnNode(expression, ret_tok.start, expression->end);
 }
 
 IfNode* Parser::parse_if() {
@@ -80,6 +81,7 @@ IfNode* Parser::parse_if() {
     Node* condition = this->parse_expression();
     BlockNode* body = this->parse_possibly_empty_block();
     std::vector<std::pair<Node*, BlockNode*>> elifs;
+    TextPosition end = POS_NONE;
     while (this->match(TokType::ELIF)) {
         this->next();
         Node* elif_condition = this->parse_expression();
@@ -91,7 +93,7 @@ IfNode* Parser::parse_if() {
         this->next();
         _else = this->parse_possibly_empty_block();
     }
-    IfNode* iff = new IfNode(condition, body, elifs, _else);
+    IfNode* iff = new IfNode(condition, body, elifs, _else, if_tok.start, POS_NONE);
     iff->start = if_tok.start;
     return iff;
 }
@@ -105,20 +107,19 @@ Node* Parser::parse_list_literal() {
         // parse required type annotation (cannot infer type of empty list
         this->expect_token(TokType::DOUBLE_COLON);
         TypeNode* type = this->parse_type_node();
-        Node* node = new EmptyListNode(type);
+        Node* node = new EmptyListNode(type, list_start.start, POS_NONE);
         return node;
-    } else {
-        while (true) {
-            Node* element = this->parse_expression();
-            elements.push_back(element);
-            if (!this->match(TokType::COMMA)) {
-                break;
-            }
-            this->next();
-        }
-        Token list_end = this->expect_token(TokType::RSQUARE);
     }
-    Node* node = new ListNode(elements);
+    while (true) {
+        Node* element = this->parse_expression();
+        elements.push_back(element);
+        if (!this->match(TokType::COMMA)) {
+            break;
+        }
+        this->next();
+    }
+    Token list_end = this->expect_token(TokType::RSQUARE);
+    Node* node = new ListNode(elements, list_start.start, list_end.start);
     return node;
 }
 
@@ -167,13 +168,16 @@ Node* Parser::parse_assignment_or_expression() {
         }
         Node* rvalue = this->parse_expression();
         if (lvalue->ntype == ID) {
+            IdNode* id_node = new IdNode(lvalue->id()._id, lvalue->start, lvalue->end);
+            OpType opt = OpType::ADD;
             if (op == TokType::PLUS_EQQ) {
-                rvalue = new BinopNode(OpType::ADD, new IdNode(lvalue->id()._id), rvalue);
+                opt = OpType::ADD;
             } else if (op == TokType::MINUS_EQQ) {
-                rvalue = new BinopNode(OpType::SUB, new IdNode(lvalue->id()._id), rvalue);
+                opt = OpType::SUB;
             }
+            rvalue = new BinopNode(opt, id_node, rvalue, id_node->start, rvalue->end);
         }
-        Node* node = new AssignmentNode(lvalue, rvalue);
+        Node* node = new AssignmentNode(lvalue, rvalue, lvalue->start, rvalue->end);
         node->start = op_pos;
         return node;
     } else {
@@ -193,7 +197,7 @@ Node* Parser::parse_or_expression() {
     while (this->match(TokType::OR)) {
         this->next();
         Node* right = this->parse_and_expression();
-        Node* node = new BoolOpNode(BoolOp::OR, left, right, left->start);
+        Node* node = new BoolOpNode(BoolOp::OR, left, right, left->start, right->end);
         left = node;
     }
     return left;
@@ -204,7 +208,7 @@ Node* Parser::parse_and_expression() {
     while (this->match(TokType::AND)) {
         this->next();
         Node* right = this->parse_bool_expression();
-        Node* node = new BoolOpNode(BoolOp::AND, left, right, left->start);
+        Node* node = new BoolOpNode(BoolOp::AND, left, right, left->start, right->end);
         left = node;
     }
     return left;
@@ -221,7 +225,7 @@ Node* Parser::parse_bool_expression() {
     op = TOKEN_TO_BOOL_OP[this->token.type];
     this->next();
     Node* right = this->parse_add_or_sub_expression();
-    Node* node = new BoolOpNode(op, left, right, left->start);
+    Node* node = new BoolOpNode(op, left, right, left->start, right->end);
     return node;
 }
 
@@ -233,10 +237,8 @@ Node* Parser::parse_add_or_sub_expression() {
         Token op_token = this->token;
         this->next();
         Node* right = this->parse_mul_div_or_mod_expression();
-        BinopNode* node = new BinopNode(op, left, right, left->start);
+        BinopNode* node = new BinopNode(op, left, right, left->start, right->end);
         node->op_pos = op_token.start;
-        node->start = left->start;
-        node->end = right->end;
         left = node;
     }
     return left;
@@ -250,7 +252,7 @@ Node* Parser::parse_mul_div_or_mod_expression() {
         Token op_token = this->token;
         this->next();
         Node* right = this->parse_factor();
-        BinopNode* node = new BinopNode(op, left, right, left->start);
+        BinopNode* node = new BinopNode(op, left, right, left->start, right->end);
         node->op_pos = op_token.start;
         left = node;
     }
@@ -265,8 +267,7 @@ Node* Parser::parse_factor() {
         if (this->match(TokType::ID)) {
             Token tok = this->token;
             this->next();
-            parent = new DefaultConstructorNode(tok.str);
-            parent->start = hash_tok.start;
+            parent = new DefaultConstructorNode(tok.str, hash_tok.start, tok.end_pos);
         } else {
             parent = this->parse_tuple_literal();
         }
@@ -285,15 +286,15 @@ Node* Parser::parse_factor() {
             Token tok;
             if (this->match(TokType::INTEGER)) {
                 tok = this->expect_token(TokType::INTEGER);
-                parent = new MemberNode(parent, std::atoi(tok.str.c_str()), parent->start);
+                parent = new MemberNode(parent, std::atoi(tok.str.c_str()), parent->start, tok.end_pos);
             } else {
                 tok = this->expect_token(TokType::ID);
-                parent = new MemberNode(parent, tok.str, parent->start);
+                parent = new MemberNode(parent, tok.str, parent->start, tok.end_pos);
             }
         } else if (this->match(TokType::COLON)) {
             this->next();
             Token tok = this->expect_token(TokType::ID);
-            parent = new MethodNode(parent, tok.str, parent->start);
+            parent = new MethodNode(parent, tok.str, parent->start, tok.end_pos);
         }
         parent = this->parse_call_or_subscript_chain(parent);
     }
@@ -301,14 +302,13 @@ Node* Parser::parse_factor() {
     if (this->match(TokType::DOUBLE_COLON)) {
         this->next();
         Token as_type = this->expect_token(TokType::ID);
-        parent = new CastNode(parent, as_type.str, parent->start);
+        parent = new CastNode(parent, as_type.str, parent->start, as_type.end_pos);
     }
     return parent;
 }
 
 Node* Parser::parse_dictionary() {
-    this->expect_token(TokType::LCURLY);
-    DictNode* dict = new DictNode();
+    Token lcurly = this->expect_token(TokType::LCURLY);
     if (this->match(TokType::RCURLY)) {
         // empty dict
         this->next();
@@ -317,27 +317,30 @@ Node* Parser::parse_dictionary() {
         TypeNode* key_type = this->parse_type_node();
         this->expect_token(TokType::COMMA);
         TypeNode* value_type = this->parse_type_node();
-        this->expect_token(TokType::RSQUARE);
-        return new EmptyDictNode(key_type, value_type);
+        Token rsquare = this->expect_token(TokType::RSQUARE);
+        return new EmptyDictNode(key_type, value_type, lcurly.start, rsquare.end_pos);
     }
+    std::vector<std::pair<Node*, Node*>> items;
+    Token rcurly;
     while (true) {
         Node* key = this->parse_expression();
         this->expect_token(TokType::COLON);
         Node* value = this->parse_expression();
-        dict->items.push_back(std::make_pair(key, value));
+        items.push_back(std::make_pair(key, value));
         if (this->match(TokType::COMMA)) {
             this->next();
         } else {
-            this->expect_token(TokType::RCURLY);
+            rcurly = this->expect_token(TokType::RCURLY);
             break;
         }
     }
+    DictNode* dict = new DictNode(items, lcurly.start, rcurly.end_pos);
     return dict;
 }
 
 
 Node* Parser::parse_partial_application() {
-    this->expect_token(TokType::DOLLAR_SIGN);
+    Token dollar = this->expect_token(TokType::DOLLAR_SIGN);
     Token total_function_tok = this->expect_token(TokType::ID);
     this->expect_token(TokType::LPAREN);
     VectorOfNodes args;
@@ -354,14 +357,16 @@ Node* Parser::parse_partial_application() {
             break;
         }
     }
-    this->expect_token(TokType::RPAREN);
-    auto partial = new PartialApplication(new IdNode(total_function_tok.str), args);
+    Token close = this->expect_token(TokType::RPAREN);
+    auto partial = new PartialApplication(new IdNode(total_function_tok.str,
+                                                     total_function_tok.start,
+                                                     total_function_tok.end_pos), args, dollar.start, close.end_pos);
     partial->start = total_function_tok.start;
     return partial;
 }
 
 Node* Parser::parse_id_or_literal() {
-    Node* node;
+    Node* node = nullptr;
     switch (this->token.type) {
         case TokType::LPAREN: {
             this->next();
@@ -374,43 +379,43 @@ Node* Parser::parse_id_or_literal() {
             break;
         }
         case TokType::INTEGER: {
-            node = new NumberNode(NumberType::INTEGER, this->token.str, this->token.start);
+            node = new NumberNode(NumberType::INTEGER, this->token.str, this->token.start, this->token.end_pos);
             node->end = this->token.end_pos;
             this->next();
             break;
         }
         case TokType::FLOAT: {
-            node = new NumberNode(NumberType::FLOAT, this->token.str, this->token.start);
+            node = new NumberNode(NumberType::FLOAT, this->token.str, this->token.start, this->token.end_pos);
             node->end = this->token.end_pos;
             this->next();
             break;
         }
         case TokType::DOUBLE: {
-            node = new NumberNode(NumberType::DOUBLE, this->token.str, this->token.start);
+            node = new NumberNode(NumberType::DOUBLE, this->token.str, this->token.start, this->token.end_pos);
             node->end = this->token.end_pos;
             this->next();
             break;
         }
         case TokType::STRING: {
-            node = new StringNode(this->token.str, this->token.start);
+            node = new StringNode(this->token.str, this->token.start, this->token.end_pos);
             node->end = this->token.end_pos;
             this->next();
             break;
         }
         case TokType::TRUE: {
-            node = new BooleanNode(true, this->token.start);
+            node = new BooleanNode(true, this->token.start, this->token.end_pos);
             this->next();
             break;
         }
         case TokType::FALSE: {
-            node = new BooleanNode(false, this->token.start);
+            node = new BooleanNode(false, this->token.start, this->token.end_pos);
             this->next();
             break;
         }
         case TokType::LSQUARE:
             return this->parse_list_literal();
         case TokType::NONE: {
-            node = new NoneNode();
+            node = new NoneNode(this->token.start, this->token.end_pos);
             this->next();
             return node;
         }
@@ -452,16 +457,14 @@ Node* Parser::parse_tuple_literal() {
             break;
         }
     }
-    this->expect_token(TokType::RPAREN);
-    return new TupleNode(values);
+    Token close = this->expect_token(TokType::RPAREN);
+    return new TupleNode(values, hash_tok.start, close.end_pos);
 }
 
 Node* Parser::parse_id_or_class_literal() {
     Node* node;
     std::string identifier = this->token.str;
-    node = new IdNode(identifier);
-    node->start = this->token.start;
-    node->end = this->token.end_pos;
+    node = new IdNode(identifier, this->token.start, this->token.end_pos);
     this->next();
     return node;
 }
@@ -473,22 +476,24 @@ Node* Parser::parse_call_or_subscript_chain(Node* parent) {
 //                 function call
             this->next();
             VectorOfNodes arguments;
-            if (!this->match(TokType::RPAREN)) {
-                arguments = this->parse_list_of_arguments();
-            } else {
+            Token close;
+            if (this->match(TokType::RPAREN)) {
+                close = this->token;
                 this->next();
+            } else {
+                arguments = this->parse_list_of_arguments();
             }
             Node* old_node = node;
-            node = new CallNode(node, arguments);
+            node = new CallNode(node, arguments, node->start, close.end_pos);
             node->start = old_node->start;
         } else if (this->match(TokType::LSQUARE)) {
 //                subscript
+            Token lsquare = this->token;
             this->next();
             Node* value = this->parse_expression();
+            Token close = this->expect_token(TokType::RSQUARE);
             Node* old_node = node;
-            node = new SubscriptNode(node, {value});
-            node->start = old_node->start;
-            this->expect_token(TokType::RSQUARE);
+            node = new SubscriptNode(node, {value}, old_node->start, close.end_pos);
         }
     }
     return node;
@@ -504,7 +509,7 @@ DeclarationNode* Parser::parse_variable_declaration() {
     }
     Token eq_tok = this->expect_token(TokType::EQQ);
     Node* expression = this->parse_expression();
-    return new DeclarationNode(identifier.str, type, expression, eq_tok.start);
+    return new DeclarationNode(identifier.str, type, expression, var_token.start, expression->end);
 }
 
 Node* Parser::parse_common_statement() {
@@ -533,16 +538,18 @@ Node* Parser::parse_common_statement() {
                 this->error_out_of_loop(this->token);
 
             }
+            Token tok = this->token;
             this->next();
-            return new BreakNode();
+            return new BreakNode(tok.start, tok.end_pos);
         }
         case TokType::CONTINUE: {
             if (!this->inside_loop) {
                 this->error_out_of_loop(this->token);
 
             }
+            Token tok = this->token;
             this->next();
-            return new ContinueNode();
+            return new ContinueNode(tok.start, tok.end_pos);
         }
         default: {
             Node* node = this->parse_assignment_or_expression();
@@ -610,15 +617,17 @@ TypeNode* Parser::parse_type_node() {
 BlockNode* Parser::parse_possibly_empty_block() {
     Token st = this->expect_token(TokType::LCURLY);
     VectorOfNodes block;
+    Token end;
     while (true) {
         if (this->match(TokType::RCURLY)) {
+            end = this->token;
             this->next();
             break;
         }
         Node* statement = this->parse_common_statement();
         block.push_back(statement);
     }
-    return new BlockNode(block);
+    return new BlockNode(block, st.start, end.end_pos);
 }
 
 FunctionNode* Parser::parse_function_definition() {
@@ -666,7 +675,13 @@ FunctionNode* Parser::parse_function_definition() {
     // Parse function body
     BlockNode* body = this->parse_possibly_empty_block();
 
-    auto node = new FunctionNode(identifier, parameter_names, parameter_types, return_type, body);
+    auto node = new FunctionNode(identifier,
+                                 parameter_names,
+                                 parameter_types,
+                                 return_type,
+                                 body,
+                                 fun_tok.start,
+                                 body->end);
     node->start = fun_tok.start;
     return node;
 }
@@ -714,7 +729,7 @@ ForNode* Parser::parse_for_loop() {
     this->inside_loop = true;
     BlockNode* body = this->parse_possibly_empty_block();
     this->inside_loop = prev;
-    ForNode* forloop = new ForNode(var.str, exp, body);
+    ForNode* forloop = new ForNode(var.str, exp, body, for_tok.start, body->end);
     forloop->start = for_tok.start;
     return forloop;
 }
@@ -726,7 +741,7 @@ Node* Parser::parse_ternary() {
         Node* true_case = this->parse_expression();
         this->expect_token(TokType::COLON);
         Node* false_case = this->parse_expression();
-        Node* node = new TernaryNode(condition, true_case, false_case);
+        Node* node = new TernaryNode(condition, true_case, false_case, condition->start, false_case->end);
         return node;
     }
     return condition;
@@ -739,7 +754,7 @@ WhileNode* Parser::parse_while_loop() {
     this->inside_loop = true;
     BlockNode* body = this->parse_possibly_empty_block();
     this->inside_loop = prev;
-    WhileNode* whil = new WhileNode(condition, body);
+    WhileNode* whil = new WhileNode(condition, body, while_tok.start, body->end);
     whil->start = while_tok.start;
     return whil;
 }
@@ -797,17 +812,15 @@ ClassNode* Parser::parse_class_definition() {
             break;
         }
     }
-    this->expect_token(TokType::RCURLY);
-    ClassNode* c = new ClassNode(class_name, type_parameters, members, methods);
+    Token end = this->expect_token(TokType::RCURLY);
+    ClassNode* c = new ClassNode(class_name, type_parameters, members, methods, class_tok.start, end.end_pos);
     c->members_ordered = members_ordered;
     c->start = class_tok.start;
     return c;
 }
 
 ImportNode* Parser::parse_import() {
-    this->expect_token(TokType::FROM);
-    Token module_tok = this->expect_token(TokType::ID);
-    this->expect_token(TokType::IMPORT);
+    Token import_tok = this->expect_token(TokType::IMPORT);
     VectorOfStrings imports;
     while (true) {
         Token import_tok = this->expect_token(TokType::ID);
@@ -820,8 +833,8 @@ ImportNode* Parser::parse_import() {
         }
     }
     this->expect_token(TokType::SEMICOLON);
-    auto x = new ImportNode(module_tok.str, imports);
-    return x;
+
+    return nullptr;
 }
 
 

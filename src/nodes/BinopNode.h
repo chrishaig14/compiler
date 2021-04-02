@@ -23,7 +23,10 @@ public:
     BinopNode& binop() override;
     const BinopNode& binop() const override;
 
-    BinopNode(OpType op, Node* left, Node* right) : BinopNode(op, left, right, start) {}
+    BinopNode(OpType op, Node* left, Node* right, TextPosition start, TextPosition end);
+
+    BinopNode(OpType op, Node* left, Node* right) : BinopNode(op, left, right, {-1, -1}, {-1, -1}) {
+    }
 
     BinopNode(OpType op, Node* left, Node* right, TextPosition start);
     bool equal(const Node& x) const override;

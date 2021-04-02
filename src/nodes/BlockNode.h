@@ -16,7 +16,7 @@
 class BlockNode : public Node {
 public:
 
-    BlockNode(VectorOfNodes nodes);
+    BlockNode(VectorOfNodes nodes, TextPosition start, TextPosition end);
 
     VectorOfNodes nodes;
 

@@ -4,8 +4,7 @@
 
 #include "IdNode.h"
 
-IdNode::IdNode(std::string identifier) : _id(identifier) {
-    this->ntype = ID;
+IdNode::IdNode(std::string identifier, TextPosition start, TextPosition end) :Node(ID, start, end), _id(identifier) {
     this->is_global_function = false;
 }
 

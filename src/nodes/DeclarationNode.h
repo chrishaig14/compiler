@@ -18,13 +18,15 @@ public:
     std::string identifier;
     TypeNode* type;
     Node* expression;
+    DeclarationNode(const std::string& identifier, TypeNode* type, Node* expression, TextPosition start,
+                    TextPosition end);
 
-    DeclarationNode(const std::string& identifier, TypeNode* type, Node* expression) : DeclarationNode(
-            identifier,
-            type,
-            expression,
-            {-1, -1}
-    ) {}
+    DeclarationNode(const std::string& identifier, TypeNode* type, Node* expression) : DeclarationNode(identifier,
+                                                                                                       type,
+                                                                                                       expression,
+                                                                                                       {-1, -1},
+                                                                                                       {-1, -1}) {
+    }
 
     DeclarationNode(const std::string& identifier, TypeNode* type, Node* expression, TextPosition start);
 

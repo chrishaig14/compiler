@@ -4,10 +4,9 @@
 
 #include "WhileNode.h"
 
-WhileNode::WhileNode(Node* condition, BlockNode* body) : body(body), condition(condition) {
+WhileNode::WhileNode(Node* condition, BlockNode* body, TextPosition start, TextPosition end) : Node(WHIL, start, end), body(body), condition(condition) {
     assert(condition != nullptr);
     assert(body != nullptr);
-    this->ntype = WHIL;
 }
 
 bool WhileNode::equal(const Node& x) const {

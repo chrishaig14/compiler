@@ -44,5 +44,5 @@ bool BlockNode::equal(const Node& p) const {
     return true;
 }
 
-BlockNode::BlockNode(VectorOfNodes nodes) : nodes(nodes) { this->ntype = BLOCK; }
+BlockNode::BlockNode(VectorOfNodes nodes, TextPosition start, TextPosition end) : Node(BLOCK, start, end), nodes(nodes) { ; }
 

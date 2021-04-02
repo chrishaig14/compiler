@@ -4,7 +4,7 @@
 
 #include "BooleanNode.h"
 
-BooleanNode::BooleanNode(bool value, TextPosition start) : value(value) { this->ntype = BOOLEAN; this->start = start;}
+BooleanNode::BooleanNode(bool value, TextPosition start, TextPosition end) : Node(BOOLEAN, start, end),value(value) { }
 
 bool BooleanNode::operator!=(const BooleanNode& other) const { return !(*this == other); }
 

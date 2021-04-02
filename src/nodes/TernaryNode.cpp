@@ -11,12 +11,12 @@ bool TernaryNode::equal(const Node& x) const {
            *this->false_case == *other.false_case;
 }
 
-TernaryNode::TernaryNode(Node* expression, Node* trueCase, Node* falseCase) : expression(
+TernaryNode::TernaryNode(Node* expression, Node* trueCase, Node* falseCase, TextPosition start, TextPosition end) : Node(TERNARY, start, end ), expression(
         expression),
                                                                               true_case(
                                                                                       trueCase),
                                                                               false_case(
-                                                                                      falseCase) { this->ntype = TERNARY; }
+                                                                                      falseCase) {  }
 
 TernaryNode& TernaryNode::ternary() {
     return *this;

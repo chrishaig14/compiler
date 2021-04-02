@@ -7,6 +7,7 @@
 #include "../logger/Logger.h"
 
 #define T_NONE ObjectType(".None")
+static TextPosition POS_NONE = {-1, -1};
 
 USemanticInfo Checker::visit(ListNode& node) {
     USemanticInfo element_type_p = this->dispatch(node.elements[0]);
@@ -174,28 +175,36 @@ USemanticInfo Checker::visit(EmptyListNode& node) {
 }
 
 FunctionNode* generate_eq_method(std::string class_name, VectorOfTypes tp, VectorOfStrings members_ordered) {
-    auto eq_body = new BlockNode({});
+    auto eq_body = new BlockNode({}, POS_NONE, POS_NONE);
     std::string eq_method_name = "eq";
-    auto eq_meth = new FunctionNode(eq_method_name, {"other"}, {new ObjectType(class_name, tp)}, new T_BOOL, eq_body);
+    auto eq_meth = new FunctionNode(eq_method_name,
+                                    {"other"},
+                                    {new ObjectType(class_name, tp)},
+                                    new T_BOOL,
+                                    eq_body,
+                                    POS_NONE,
+                                    POS_NONE);
     auto cmp_node = new BoolOpNode(BoolOp::EQ,
-                                   new MemberNode(new IdNode("this"), members_ordered[0]),
-                                   new MemberNode(new IdNode("other"), members_ordered[0]));
+                                   new MemberNode(new IdNode("this", POS_NONE, POS_NONE), members_ordered[0]),
+                                   new MemberNode(new IdNode("other", POS_NONE, POS_NONE), members_ordered[0]));
 
     for (int i = 1; i < members_ordered.size(); i++) {
         cmp_node = new BoolOpNode(BoolOp::AND,
                                   cmp_node,
                                   new BoolOpNode(BoolOp::EQ,
-                                                 new MemberNode(new IdNode("this"), members_ordered[i]),
-                                                 new MemberNode(new IdNode("other"), members_ordered[i])));
+                                                 new MemberNode(new IdNode("this", POS_NONE, POS_NONE),
+                                                                members_ordered[i]),
+                                                 new MemberNode(new IdNode("other", POS_NONE, POS_NONE),
+                                                                members_ordered[i])));
     }
     eq_body->nodes.push_back(new ReturnNode(cmp_node));
     return eq_meth;
 }
 
 FunctionNode* generate_str_method(std::string class_name) {
-    auto eq_body = new BlockNode({});
+    auto eq_body = new BlockNode({}, POS_NONE, POS_NONE);
     std::string eq_method_name = "str";
-    auto eq_meth = new FunctionNode(eq_method_name, {}, {}, new T_STRING, eq_body);
+    auto eq_meth = new FunctionNode(eq_method_name, {}, {}, new T_STRING, eq_body, POS_NONE, POS_NONE);
     eq_body->nodes.push_back(new ReturnNode(new StringNode("<" + class_name + " object>")));
     return eq_meth;
 }
@@ -254,15 +263,20 @@ USemanticInfo Checker::visit(ClassNode& node) {
     }
 
     if (!has_init) {
-        BlockNode* init_body = new BlockNode({});
+        BlockNode* init_body = new BlockNode({}, POS_NONE, POS_NONE);
         for (auto mt: node.members_ordered) {
-            init_body->nodes.push_back(new AssignmentNode(new MemberNode(new IdNode("this"), mt), new IdNode(mt)));
+            init_body->nodes.push_back(new AssignmentNode(new MemberNode(new IdNode("this", POS_NONE, POS_NONE), mt),
+                                                          new IdNode(mt, POS_NONE, POS_NONE),
+                                                          POS_NONE,
+                                                          POS_NONE));
         }
         node.methods["init"] = new FunctionNode("init",
                                                 node.members_ordered,
                                                 members_ordered_types,
                                                 new ObjectType(node.class_name, tp),
-                                                init_body);
+                                                init_body,
+                                                POS_NONE,
+                                                POS_NONE);
         this->is_method = true;
         this->visit(*node.methods["init"]);
     }
@@ -339,27 +353,32 @@ USemanticInfo Checker::visit(ForNode& node) {
     if (obj.id != "List") {
         this->error_for(obj, node.start);
     }
-    IdNode* lid = new IdNode("List.len");
+    IdNode* lid = new IdNode("List.len", POS_NONE, POS_NONE);
     lid->is_global_function = true;
-    CallNode* len_call = new CallNode(lid, {new IdNode("_list0")});
+    CallNode* len_call = new CallNode(lid, {new IdNode("_list0", POS_NONE, POS_NONE)}, POS_NONE, POS_NONE);
     len_call->arg_types.push_back(obj.clone());
-    Node* new_condition = new BoolOpNode(BoolOp::LT, new IdNode("_index0"), len_call);
+    Node* new_condition = new BoolOpNode(BoolOp::LT, new IdNode("_index0", POS_NONE, POS_NONE), len_call);
 
-    BlockNode* new_body = new BlockNode({});
+    BlockNode* new_body = new BlockNode({}, POS_NONE, POS_NONE);
     new_body->nodes.push_back(new DeclarationNode(node.var,
                                                   obj.type_params[0]->clone(),
-                                                  new SubscriptNode(new IdNode("_list0"), {new IdNode("_index0")})));
+                                                  new SubscriptNode(new IdNode("_list0", POS_NONE, POS_NONE),
+                                                                    {new IdNode("_index0", POS_NONE, POS_NONE)},
+                                                                    POS_NONE,
+                                                                    POS_NONE)));
     new_body->nodes.insert(new_body->nodes.end(), node.body->nodes.begin(), node.body->nodes.end());
-    AssignmentNode* asn = new AssignmentNode(new IdNode("_index0"),
+    AssignmentNode* asn = new AssignmentNode(new IdNode("_index0", POS_NONE, POS_NONE),
                                              new BinopNode(OpType::ADD,
-                                                           new IdNode("_index0"),
-                                                           new NumberNode(NumberType::INTEGER, "1")));
+                                                           new IdNode("_index0", POS_NONE, POS_NONE),
+                                                           new NumberNode(NumberType::INTEGER, "1")),
+                                             POS_NONE,
+                                             POS_NONE);
     asn->type = new T_INT;
     new_body->nodes.push_back(asn);
 
     TypeNode& var_type = *obj.type_params[0];
     BlockNode* bn = new BlockNode({new DeclarationNode("_index0", new T_INT, new NumberNode(NumberType::INTEGER, "0")),
-                                   new DeclarationNode("_list0", obj.clone(), node.exp),});
+                                   new DeclarationNode("_list0", obj.clone(), node.exp),}, POS_NONE, POS_NONE);
     this->visit(*bn);
     this->enter_scope("for");
     this->scope->set(node.var, var_type);
@@ -375,7 +394,7 @@ USemanticInfo Checker::visit(ForNode& node) {
     this->leave_scope();
     this->replacement = bn;
     this->replace_me = true;
-    bn->nodes.push_back(new WhileNode(new_condition, new_body));
+    bn->nodes.push_back(new WhileNode(new_condition, new_body, POS_NONE, POS_NONE));
     node.body = nullptr;
     node.exp = nullptr;
     return nullptr;
@@ -417,7 +436,7 @@ USemanticInfo Checker::visit(CallNode& n) {
         // where instead of calling object.method(args), we call <class>.method(object, args)
 
         MethodNode& method_node = n.function->method();
-        IdNode* pNode = new IdNode(method_node.actual_function_name);
+        IdNode* pNode = new IdNode(method_node.actual_function_name, POS_NONE, POS_NONE);
         n.function = pNode;
         pNode->is_global_function = true;
         this->replace_me = false;
@@ -433,7 +452,9 @@ USemanticInfo Checker::visit(CallNode& n) {
             retv.set_type(*copy_ftn.clone());
             object_node = member_node.parent;
         } else {
-            n.function = new IdNode(this->map[fun_info.class_info->class_name + "." + member_node.s_child]);
+            n.function = new IdNode(this->map[fun_info.class_info->class_name + "." + member_node.s_child],
+                                    POS_NONE,
+                                    POS_NONE);
             this->replace_me = false;
             const FunctionType& ftn = fun_info.type().function();
             FunctionType& copy_ftn = ftn.clone()->function();
@@ -783,7 +804,7 @@ USemanticInfo Checker::member_class_method(std::string class_name, std::string c
             rv.set_type(f);
             rv.is_class_method = true;
             this->replace_me = true;
-            IdNode* idn = new IdNode(class_name + "." + child);
+            IdNode* idn = new IdNode(class_name + "." + child, POS_NONE, POS_NONE);
             idn->is_global_function = true;
             this->replacement = idn;
             return std::make_unique<SemanticInfo>(rv);
@@ -805,7 +826,7 @@ USemanticInfo Checker::member_class_method(std::string class_name, std::string c
         rv.is_method = false;
         rv.is_class_method = true;
         this->replace_me = true;
-        IdNode* idn = new IdNode(class_name + "." + child);
+        IdNode* idn = new IdNode(class_name + "." + child, POS_NONE, POS_NONE);
         idn->is_global_function = true;
         this->replacement = idn;
         return std::make_unique<SemanticInfo>(rv);
@@ -1045,20 +1066,20 @@ USemanticInfo Checker::visit(BinopNode& n) {
     } else if (ltype == "String" && rtype == "String") {
         if (n.op == OpType::ADD) {
             info.set_type(T_STRING);
-            IdNode* idn = new IdNode("String_add");
+            IdNode* idn = new IdNode("String_add", POS_NONE, POS_NONE);
             idn->is_global_function = true;
             this->replace_me = true;
-            this->replacement = new CallNode(idn, VectorOfNodes({n.left, n.right}));
+            this->replacement = new CallNode(idn, VectorOfNodes({n.left, n.right}), POS_NONE, POS_NONE);
         } else {
             ok = false;
         }
     } else if (ltype == "List" && rtype == "List" && left == right) {
         if (n.op == OpType::ADD) {
             info.set_type(left);
-            IdNode* idn = new IdNode("List_add");
+            IdNode* idn = new IdNode("List_add", POS_NONE, POS_NONE);
             idn->is_global_function = true;
             this->replace_me = true;
-            this->replacement = new CallNode(idn, VectorOfNodes({n.left, n.right}));
+            this->replacement = new CallNode(idn, VectorOfNodes({n.left, n.right}), POS_NONE, POS_NONE);
         } else {
             ok = false;
         }

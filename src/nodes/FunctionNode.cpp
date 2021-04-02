@@ -37,15 +37,18 @@ const FunctionNode& FunctionNode::func() const {
     return *this;
 }
 
-FunctionNode::FunctionNode(std::string identifier, VectorOfStrings parameter_names,
-                           VectorOfTypes parameter_types, TypeNode* return_type, BlockNode* body)
-        : body(body), return_type(return_type) {
+FunctionNode::FunctionNode(std::string identifier, VectorOfStrings parameter_names, VectorOfTypes parameter_types,
+                           TypeNode* return_type, BlockNode* body, TextPosition start, TextPosition end) : Node(FUNC,
+                                                                                                                start,
+                                                                                                                end),
+                                                                                                           body(body),
+                                                                                                           return_type(
+                                                                                                                   return_type) {
     for (auto p: parameter_types) {
         assert(p != nullptr);
     }
     assert(return_type != nullptr);
     assert(body != nullptr);
-    this->ntype = FUNC;
     this->identifier = identifier;
     this->parameter_names = parameter_names;
     this->parameter_types = parameter_types;

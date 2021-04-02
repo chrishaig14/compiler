@@ -18,7 +18,7 @@ public:
     std::string _id;
     bool is_global_function;
 
-    IdNode(std::string identifier);
+    IdNode(std::string identifier, TextPosition start, TextPosition end);
 
     bool equal(const Node& other) const override;
 

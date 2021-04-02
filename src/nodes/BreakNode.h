@@ -13,7 +13,7 @@
 class BreakNode : public Node {
 public:
     std::vector<std::pair<std::string,TypeNode*>> loop_vars;
-    BreakNode();
+    BreakNode(TextPosition start, TextPosition end);
     bool equal(const Node& other) const override;
     BreakNode& brk() override;
     const BreakNode& brk() const override;

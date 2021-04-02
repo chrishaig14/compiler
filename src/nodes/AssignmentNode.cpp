@@ -4,7 +4,12 @@
 
 #include "AssignmentNode.h"
 
-AssignmentNode::AssignmentNode(Node* lvalue, Node* rvalue) : lvalue(lvalue), rvalue(rvalue) { this->ntype = ASSIGN; }
+AssignmentNode::AssignmentNode(Node* lvalue, Node* rvalue, TextPosition start, TextPosition end) : Node(ASSIGN,
+                                                                                                        start,
+                                                                                                        end),
+                                                                                                   lvalue(lvalue),
+                                                                                                   rvalue(rvalue) {
+}
 
 bool AssignmentNode::equal(const Node& x) const {
     auto& other = x.assign();

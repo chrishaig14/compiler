@@ -5,7 +5,6 @@
 #include "PartialApplication.h"
 
 
-
 bool PartialApplication::equal(const Node& other) const {
     const PartialApplication& other_p = other.partial();
     if ((*(this->function)) != (*(other_p.function))) {
@@ -28,7 +27,10 @@ bool PartialApplication::equal(const Node& other) const {
     return true;
 }
 
-PartialApplication::PartialApplication(Node* function, VectorOfNodes args) {
+PartialApplication::PartialApplication(Node* function, VectorOfNodes args, TextPosition start, TextPosition end) : Node(
+        PARTIAL,
+        start,
+        end) {
     this->function = function;
     this->args = args;
     this->ntype = PARTIAL;

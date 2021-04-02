@@ -4,16 +4,12 @@
 
 #include "MethodNode.h"
 
-MethodNode::MethodNode(Node* parent, const std::string& child, TextPosition start) : parent(parent), s_child(child) {
-    this->ntype = METHOD;
+MethodNode::MethodNode(Node* parent, const std::string& child, TextPosition start, TextPosition end) : Node(METHOD, start, end), parent(parent), s_child(child) {
     this->type = MethodType::STR;
-    this->start = start;
 }
 
-MethodNode::MethodNode(Node* parent, int child, TextPosition start) : parent(parent), n_child(child) {
-    this->ntype = METHOD;
+MethodNode::MethodNode(Node* parent, int child, TextPosition start, TextPosition end) : Node(METHOD, start, end), parent(parent), n_child(child) {
     this->type = MethodType::NUM;
-    this->start = start;
 }
 
 

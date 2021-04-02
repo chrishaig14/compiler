@@ -11,7 +11,7 @@
 
 class ContinueNode : public Node {
 public:
-    ContinueNode();
+    ContinueNode(TextPosition start, TextPosition end);
     bool equal(const Node& other) const override;
     ContinueNode& cntinue() override;
     const ContinueNode& cntinue() const override;

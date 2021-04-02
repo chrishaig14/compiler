@@ -4,7 +4,12 @@
 
 #include "SubscriptNode.h"
 
-SubscriptNode::SubscriptNode(Node* parent, VectorOfNodes child) : parent(parent), child(child) { this->ntype = SUB; }
+SubscriptNode::SubscriptNode(Node* parent, VectorOfNodes child, TextPosition start, TextPosition end) : Node(SUB,
+                                                                                                             start,
+                                                                                                             end),
+                                                                                                        parent(parent),
+                                                                                                        child(child) {
+}
 
 
 bool SubscriptNode::equal(const Node& x) const {

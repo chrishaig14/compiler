@@ -19,9 +19,10 @@ public:
 
     const BoolOpNode& boolop() const override;
 
-    BoolOpNode(BoolOp op, Node* left, Node* right) : BoolOpNode(op, left, right, {-1, -1}) {}
+    BoolOpNode(BoolOp op, Node* left, Node* right) : BoolOpNode(op, left, right, {-1, -1}, {-1, -1}) {
+    }
 
-    BoolOpNode(BoolOp op, Node* left, Node* right, TextPosition start);
+    BoolOpNode(BoolOp op, Node* left, Node* right, TextPosition start, TextPosition end);
     bool equal(const Node& x) const override;
 
     ~BoolOpNode();

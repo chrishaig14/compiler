@@ -18,7 +18,7 @@ public:
     Node* function;
     VectorOfNodes arguments;
 
-    CallNode(Node* function, const VectorOfNodes& arguments);
+    CallNode(Node* function, const VectorOfNodes& arguments, TextPosition start, TextPosition end);
 
     bool equal(const Node& other) const override;
 

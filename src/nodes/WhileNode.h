@@ -14,7 +14,7 @@ public:
     BlockNode* body;
     Node* condition;
 
-    WhileNode(Node* condition, BlockNode* body);
+    WhileNode(Node* condition, BlockNode* body, TextPosition start, TextPosition end);
 
     bool equal(const Node& other) const override;
 

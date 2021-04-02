@@ -4,9 +4,7 @@
 
 #include "ListNode.h"
 
-ListNode::ListNode(VectorOfNodes elements) : elements(elements) {
-    this->ntype = LST;
-
+ListNode::ListNode(VectorOfNodes elements, TextPosition start, TextPosition end) :Node(LST, start, end), elements(elements) {
 }
 
 bool ListNode::equal(const Node& other) const {

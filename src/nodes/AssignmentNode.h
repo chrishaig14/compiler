@@ -21,7 +21,7 @@ public:
 
     const AssignmentNode& assign() const override { return *this; }
 
-    AssignmentNode(Node* lvalue, Node* rvalue);
+    AssignmentNode(Node* lvalue, Node* rvalue, TextPosition start, TextPosition end);
 
     bool equal(const Node& x) const override;
 

@@ -18,10 +18,11 @@ class NumberNode : public Node {
 public:
     std::string str;
 
-    NumberNode(NumberType num_type, std::string str) : NumberNode(num_type, str, {-1, -1}) {
+    NumberNode(NumberType num_type, std::string str, TextPosition start, TextPosition end);
+
+    NumberNode(NumberType num_type, std::string str) : NumberNode(num_type, str, {-1, -1}, {-1, -1}) {
     }
 
-    NumberNode(NumberType num_type, std::string str, TextPosition start);
 
     bool equal(const Node& x) const override;
 

@@ -16,7 +16,6 @@ const ContinueNode& ContinueNode::cntinue() const {
     return *this;
 }
 
-ContinueNode::ContinueNode() {
-    this->ntype = CNTINUE;
+ContinueNode::ContinueNode(TextPosition start, TextPosition end):Node(CNTINUE, start, end) {
 }
 

@@ -5,7 +5,9 @@
 #include "EmptyListNode.h"
 
 
-EmptyListNode::EmptyListNode(TypeNode* type) : type(type) { this->ntype = EMPTYLST; }
+EmptyListNode::EmptyListNode(TypeNode* type, TextPosition start, TextPosition end) : Node(EMPTYLST, start, end),
+                                                                                     type(type) {
+}
 
 EmptyListNode& EmptyListNode::emptylst() {
     return *this;

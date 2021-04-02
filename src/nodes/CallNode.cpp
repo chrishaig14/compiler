@@ -4,8 +4,14 @@
 
 #include "CallNode.h"
 
-CallNode::CallNode(Node* function, const VectorOfNodes& arguments) : function(function),
-                                                                     arguments(arguments) { this->ntype = CALL; }
+CallNode::CallNode(Node* function, const VectorOfNodes& arguments, TextPosition start, TextPosition end) : Node(CALL,
+                                                                                                                start,
+                                                                                                                end),
+                                                                                                           function(
+                                                                                                                   function),
+                                                                                                           arguments(
+                                                                                                                   arguments) {
+}
 
 bool CallNode::equal(const Node& x) const {
     auto& other = x.call();
@@ -44,10 +50,10 @@ CallNode::~CallNode() {
     for (auto a: this->arguments) {
         delete a;
     }
-    for (auto at: this->arg_types){
+    for (auto at: this->arg_types) {
         delete at;
     }
-    for(auto ft: this->ftype){
+    for (auto ft: this->ftype) {
         delete ft;
     }
 }

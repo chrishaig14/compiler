@@ -23,12 +23,14 @@ public:
     int n_child;
     TypeNode* parent_t;
 
-    MethodNode(Node* parent, const std::string& child) : MethodNode(parent, child, {-1, 1}) {}
+    MethodNode(Node* parent, const std::string& child) : MethodNode(parent, child, {-1, 1}, {-1, -1}) {
+    }
 
-    MethodNode(Node* parent, const std::string& child, TextPosition start);
-    MethodNode(Node* parent, int child, TextPosition start);
+    MethodNode(Node* parent, const std::string& child, TextPosition start, TextPosition end);
+    MethodNode(Node* parent, int child, TextPosition start, TextPosition end);
 
-    MethodNode(Node* parent, int child) : MethodNode(parent, child, {-1, 1}) {}
+    MethodNode(Node* parent, int child) : MethodNode(parent, child, {-1, 1}, {-1, -1}) {
+    }
 
     bool equal(const Node& x) const override;
 

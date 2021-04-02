@@ -16,8 +16,7 @@ public:
     Node* exp;
     BlockNode* body;
     bool equal(const Node& other) const override;
-
-    ForNode(const std::string& var, Node* exp, BlockNode* body);
+    ForNode(const std::string& var, Node* exp, BlockNode* body, TextPosition start, TextPosition end);
     ~ForNode();
     ForNode& forloop() override;
     const ForNode& forloop() const override;

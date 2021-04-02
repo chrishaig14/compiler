@@ -4,11 +4,9 @@
 
 #include "NumberNode.h"
 
-NumberNode::NumberNode(NumberType num_type, std::string str, TextPosition start) {
+NumberNode::NumberNode(NumberType num_type, std::string str, TextPosition start, TextPosition end):Node(NUMBER, start, end) {
     this->num_type = num_type;
     this->str = str;
-    this->ntype = NUMBER;
-    this->start = start;
 }
 
 bool NumberNode::equal(const Node& x) const {

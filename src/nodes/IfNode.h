@@ -18,8 +18,8 @@ public:
     BlockNode* then;
     BlockNode* selse;
     std::vector<std::pair<Node*, BlockNode*>> elifs;
-
-    IfNode(Node* condition, BlockNode* then, std::vector<std::pair<Node*, BlockNode*>> elifs, BlockNode* selse);
+    IfNode(Node* condition, BlockNode* then,
+           std::vector<std::pair<Node*, BlockNode*>> elifs, BlockNode* selse, TextPosition start, TextPosition end);
 
     bool equal(const Node& other) const override;
 

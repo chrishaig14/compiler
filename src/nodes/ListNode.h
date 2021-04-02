@@ -16,7 +16,7 @@ class ListNode : public Node {
 public:
     VectorOfNodes elements;
 
-    ListNode(VectorOfNodes elements);
+    ListNode(VectorOfNodes elements, TextPosition start, TextPosition end);
 
     bool equal(const Node& other) const;
 

@@ -85,10 +85,11 @@ public:
     TextPosition start;
     TextPosition end;
 
-    // int start;
-    // int end;
-    // int line;
-    // int column;
+    Node(NodeType ntype, TextPosition start, TextPosition end) {
+        this->ntype = ntype;
+        this->start = start;
+        this->end = end;
+    }
 
     std::string node_type_string(NodeType type) const;
 

@@ -4,9 +4,7 @@
 
 #include "StringNode.h"
 
-StringNode::StringNode(std::string str, TextPosition start) : str(str) {
-    this->ntype = STRNG;
-    this->start = start;
+StringNode::StringNode(std::string str, TextPosition start, TextPosition end) :Node(STRNG, start, end), str(str) {
 }
 
 bool StringNode::equal(const Node& x) const {

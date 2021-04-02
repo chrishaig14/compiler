@@ -4,18 +4,16 @@
 
 #include "DeclarationNode.h"
 
-DeclarationNode::DeclarationNode(const std::string& identifier, TypeNode* type, Node* expression, TextPosition start) : identifier(
-        identifier),
-                                                                                                    type(type),
-                                                                                                    expression(
-                                                                                                            expression) { this->ntype = DECL; this->start = start;}
+DeclarationNode::DeclarationNode(const std::string& identifier, TypeNode* type, Node* expression, TextPosition start,
+                                 TextPosition end) : Node(DECL, start, end), identifier(identifier), type(type),
+                                                     expression(expression) {
+}
 
 bool DeclarationNode::equal(const Node& x) const {
     auto& other = x.decl();
     return this->identifier == other.identifier && *this->expression == *other.expression &&
-           ((this->type != nullptr && other.type !=
-                                      nullptr && *this->type == *other.type) || (this->type ==
-                                                                                 nullptr && other.type == nullptr));
+           ((this->type != nullptr && other.type != nullptr && *this->type == *other.type) ||
+            (this->type == nullptr && other.type == nullptr));
 }
 
 DeclarationNode& DeclarationNode::decl() {

@@ -12,11 +12,9 @@ const CastNode& CastNode::cast() const {
     return *this;
 }
 
-CastNode::CastNode(Node* exp, std::string as_type, TextPosition start) {
+CastNode::CastNode(Node* exp, std::string as_type, TextPosition start, TextPosition end):Node(CAST, start, end) {
     this->exp = exp;
-    this->ntype = CAST;
     this->as_type = as_type;
-    this->start = start;
 }
 
 bool CastNode::equal(const Node& x) const {

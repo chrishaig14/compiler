@@ -13,8 +13,8 @@ class DictNode : public Node {
     const DictNode& dict() const override;
     bool equal(const Node& other) const override;
 public:
-    DictNode() {
-        this->ntype = DICT;
+    DictNode(std::vector<std::pair<Node*, Node*>> items, TextPosition start, TextPosition end):Node(DICT, start, end) {
+        this->items = items;
     }
 
     std::vector<std::pair<Node*, Node*>> items;

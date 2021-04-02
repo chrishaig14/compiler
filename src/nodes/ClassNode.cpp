@@ -6,10 +6,9 @@
 
 ClassNode::ClassNode(const std::string& className, VectorOfStrings type_parameters,
                      MapStringType members,
-                     std::unordered_map<std::string, FunctionNode*> functions)
-        : methods(functions), class_name(className), members(members) {
+                     std::unordered_map<std::string, FunctionNode*> functions, TextPosition start, TextPosition end)
+        :Node(CLS, start, end), methods(functions), class_name(className), members(members) {
     this->type_parameters = type_parameters;
-    this->ntype = CLS;
 }
 
 bool ClassNode::equal(const Node& other) const {

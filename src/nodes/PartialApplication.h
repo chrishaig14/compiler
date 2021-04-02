@@ -14,8 +14,7 @@ public:
     Node* function;
     VectorOfNodes args;
     FunctionType* complete_type;
-
-    PartialApplication(Node* function, VectorOfNodes args);
+    PartialApplication(Node* function, VectorOfNodes args, TextPosition start, TextPosition end);
 
     bool equal(const Node& other) const override;
     PartialApplication& partial() override;

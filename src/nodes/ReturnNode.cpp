@@ -4,9 +4,8 @@
 
 #include "ReturnNode.h"
 
-ReturnNode::ReturnNode(Node* expression, TextPosition start) : expression(expression) {
-    this->ntype = RETRN;
-    this->start = start;
+ReturnNode::ReturnNode(Node* expression, TextPosition start, TextPosition end) : Node(RETRN, start, end),
+                                                                                 expression(expression) {
 }
 
 bool ReturnNode::equal(const Node& x) const {
@@ -32,7 +31,7 @@ ReturnNode::~ReturnNode() {
     if (this->ret_type != nullptr) {
         delete this->ret_type;
     }
-    for(auto r: this->reachables){
+    for (auto r: this->reachables) {
         delete r.second;
     }
     delete this->expression;

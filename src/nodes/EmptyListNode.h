@@ -11,7 +11,7 @@
 
 class EmptyListNode : public Node {
 public:
-    EmptyListNode(TypeNode* type);
+    EmptyListNode(TypeNode* type, TextPosition start, TextPosition end);
 
     bool equal(const Node& other) const override;
 

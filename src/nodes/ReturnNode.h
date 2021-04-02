@@ -13,9 +13,9 @@
 class ReturnNode : public Node {
 public:
     TypeNode* ret_type;
-    explicit ReturnNode(Node* expression, TextPosition start);
+    explicit ReturnNode(Node* expression, TextPosition start, TextPosition end);
 
-    explicit ReturnNode(Node* expression) : ReturnNode(expression, {-1, -1}) {
+    explicit ReturnNode(Node* expression) : ReturnNode(expression, {-1, -1}, {-1, -1}) {
     }
 
     bool equal(const Node& other) const;

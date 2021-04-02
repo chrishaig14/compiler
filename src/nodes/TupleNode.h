@@ -14,8 +14,7 @@ public:
     int tuple_index;
     VectorOfNodes values;
     bool equal(const Node& other) const override;
-
-    TupleNode(const VectorOfNodes& values);
+    TupleNode(const VectorOfNodes& values, TextPosition start, TextPosition end);
     TupleNode& tuple() override;
     const TupleNode& tuple() const override;
 
