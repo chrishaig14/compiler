@@ -213,6 +213,7 @@ void full_compile(bool is_main, const std::string& __file__, const std::string& 
         source += "\nint main(){\n";
         source += t.static_initializations;
         source += "auto x = GET_INT(CALL0(" + map["main"] + "));\n";
+        source += t.static_cleanups;
         source += "return x;\n}";
     }
     std::string output_h_path = path_join(output_dir, module_name + ".h");

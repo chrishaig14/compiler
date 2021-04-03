@@ -21,6 +21,7 @@ public:
     std::string m_source;
     std::string static_declarations;
     std::string static_initializations;
+    std::string static_cleanups;
     std::string externs_declaration;
     std::string globals_initialization;
     std::string method_class;

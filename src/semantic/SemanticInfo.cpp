@@ -11,6 +11,7 @@ SemanticInfo::SemanticInfo() {
     this->is_class_method = false;
     this->is_error = false;
     this->_type = nullptr;
+    this->is_constant = false;
 }
 
 void SemanticInfo::set_type(const TypeNode& typ) {
@@ -35,6 +36,7 @@ SemanticInfo::SemanticInfo(const SemanticInfo& other) {
     this->is_method = other.is_method;
     this->class_info = other.class_info;
     this->is_class_method = other.is_class_method;
+    this->is_constant = other.is_constant;
     if (other._type != nullptr) {
         this->_type = other._type->clone();
     } else {

@@ -30,12 +30,20 @@ std::string Transpiler::visit_assignment(AssignmentNode& node) {
     } else if (node.lvalue->ntype == MEMBER) {
         this->is_lvalue = false;
         MemberNode& memberNode = node.lvalue->member();
-        TypeNode* cast_type = memberNode.parent_t;
-        std::string mem =
-                "CAST(" + this->dispatch(node.lvalue->member().parent) + "," + this->map[cast_type->object().id] +
-                ")->" + node.lvalue->member().s_child;
-        out += mem + "=GC::assign(" + mem + ",";
-        out += this->dispatch(node.rvalue) + ");";
+        if (memberNode.is_class_static_member) {
+            std::string mem = this->map[node.lvalue->member().parent->id()._id] + "::" + node.lvalue->member().s_child;
+            out = mem;
+            out += "=GC::assign(" + mem + ",";
+            out += this->dispatch(node.rvalue) + ");";
+        } else {
+            // it's an instance member
+            TypeNode* cast_type = memberNode.parent_t;
+            std::string mem =
+                    "CAST(" + this->dispatch(node.lvalue->member().parent) + "," + this->map[cast_type->object().id] +
+                    ")->" + node.lvalue->member().s_child;
+            out += mem + "=GC::assign(" + mem + ",";
+            out += this->dispatch(node.rvalue) + ");";
+        }
     } else {
         if (is_object(*node.type)) {
             out += this->dispatch(node.lvalue) + " = GC::assign(";
@@ -235,6 +243,15 @@ std::string Transpiler::visit_class(ClassNode& node) {
     for (int i = 0; i < node.members_ordered.size(); i++) {
         m_header += "TaggedObject* " + node.members_ordered[i] + ";\n";
     }
+
+    for (auto sm: node.static_members) {
+        m_header += " static TaggedObject* " + sm.first + ";\n";
+        m_source += "TaggedObject* " + class_name + "::" + sm.first + " = nullptr;\n";
+        static_initializations += class_name + "::" + sm.first + " = GC::declare(" + this->dispatch(sm.second.second) + ");\n";
+        static_cleanups += "GC::out_of_scope("+class_name + "::" + sm.first + ");\n";
+    }
+
+
     m_header += "\n";
     m_header += generate_constructor_header(class_name, node.members_ordered);
     m_header += generate_destructor_header(class_name, node.members_ordered);
@@ -575,6 +592,10 @@ std::string Transpiler::visit_member(MemberNode& node) {
                         std::to_string(node.n_child) + "";
         return s;
     }
+    if (node.is_class_static_member) {
+        std::string s = this->map[node.parent->id()._id] + "::" + node.s_child;
+        return s;
+    }
     auto s = "CAST(" + this->dispatch(node.parent) + "," + this->map[node.parent_t->object().id] + ")->" + node.s_child;
     return s;
 }
@@ -858,6 +879,6 @@ std::string Transpiler::visit_method(MethodNode& node) {
 }
 
 std::string Transpiler::visit_default_constructor(DefaultConstructorNode& node) {
-    return this->map[node.name+".init"];
+    return this->map[node.name + ".init"];
 }
 

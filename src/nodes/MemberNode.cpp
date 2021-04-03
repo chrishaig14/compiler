@@ -6,10 +6,14 @@
 
 MemberNode::MemberNode(Node* parent, const std::string& child, TextPosition start, TextPosition end) : Node(MEMBER, start, end),parent(parent), s_child(child) {
     this->type = MemberType::STR;
+    this->is_class_static_member = false;
+    this->is_class_member = false;
 }
 
 MemberNode::MemberNode(Node* parent, int child, TextPosition start, TextPosition end) :Node(MEMBER, start, end), parent(parent), n_child(child) {
     this->type = MemberType::NUM;
+    this->is_class_static_member = false;
+    this->is_class_member = false;
 }
 
 

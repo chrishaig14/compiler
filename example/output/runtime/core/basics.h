@@ -10,9 +10,8 @@
 #include "../macros.h"
 #include "xobjects/XDouble.h"
 
-inline TaggedObject* MAKE_STRING(const std::string& s) {
-    return NEW(XString, s);
-}
+TaggedObject* MAKE_STRING(const std::string& s);
+
 
 inline TaggedObject* MAKE_DOUBLE(double d) {
     return NEW(XDouble, d);

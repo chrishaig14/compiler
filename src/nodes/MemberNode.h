@@ -42,6 +42,8 @@ public:
 
     MemberNode& member() override;
     const MemberNode& member() const override;
+    bool is_class_static_member;
+    bool is_class_member;
 };
 
 

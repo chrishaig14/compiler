@@ -13,9 +13,13 @@ USemanticInfo Checker::visit(ListNode& node) {
     USemanticInfo element_type_p = this->dispatch(node.elements[0]);
     const TypeNode& element_type = element_type_p->type();
     node.elements[0] = this->replace_if_necessary(node.elements[0]);
+    bool is_constant = true;
     for (int i = 1; i < node.elements.size(); i++) {
         USemanticInfo current_type_p = this->dispatch(node.elements[i]);
         const TypeNode& current_type = current_type_p->type();
+        if (!current_type_p->is_constant) {
+            is_constant = false;
+        }
         node.elements[i] = this->replace_if_necessary(node.elements[i]);
         if (current_type != element_type) {
             this->error_list_literal(element_type, current_type, node.elements[i]->start);
@@ -23,6 +27,7 @@ USemanticInfo Checker::visit(ListNode& node) {
     }
     node.type = element_type.clone();
     SemanticInfo return_info;
+    return_info.is_constant = is_constant;
     return_info.set_type(ObjectType("List", {element_type.clone()}));
     return std::make_unique<SemanticInfo>(return_info);
 }
@@ -63,12 +68,14 @@ USemanticInfo Checker::visit(NumberNode& node) {
             info.set_type(T_DOUBLE);
             break;
     }
+    info.is_constant = true;
     return std::make_unique<SemanticInfo>(info);
 }
 
 USemanticInfo Checker::visit(StringNode& node) {
     SemanticInfo info;
     info.set_type(T_STRING);
+    info.is_constant = true;
     return std::make_unique<SemanticInfo>(info);
 }
 
@@ -227,10 +234,14 @@ USemanticInfo Checker::visit(ClassNode& node) {
         this->assert_type_exists(t, node.start);
     }
 
-    for(auto sm: node.static_members){
+    for (auto sm: node.static_members) {
         USemanticInfo sm_exp_info = this->dispatch(sm.second.second);
-        if (*sm.second.first != sm_exp_info->type()){
-            throw std::runtime_error("Err: cannt initialize static member of type " + sm.second.first->to_string() + " with expression of type " + sm_exp_info->type().to_string());
+        if (*sm.second.first != sm_exp_info->type()) {
+            throw std::runtime_error("Err: cannt initialize static member of type " + sm.second.first->to_string() +
+                                     " with expression of type " + sm_exp_info->type().to_string());
+        }
+        if (!sm_exp_info->is_constant) {
+            throw std::runtime_error("Error: cannot initialize static member with non constant expression!");
         }
     }
 
@@ -437,6 +448,8 @@ USemanticInfo Checker::visit(MethodNode& n) {
 USemanticInfo Checker::visit(CallNode& n) {
     Logger::info("Checking CallNode");
     USemanticInfo fun_info_p = this->dispatch(n.function);
+    bool is_def_const = n.function->ntype == DEF_CONST;
+    bool args_are_constant = true;
     if (fun_info_p->is_error) {
         return error_stub();
     }
@@ -493,6 +506,9 @@ USemanticInfo Checker::visit(CallNode& n) {
         for (auto& arg: n.arguments) {
             USemanticInfo arg_type_p = this->dispatch(arg);
             const TypeNode& arg_type = arg_type_p->type();
+            if (!arg_type_p->is_constant) {
+                args_are_constant = false;
+            }
             arg = this->replace_if_necessary(arg);
             arg_types.push_back(arg_type.clone());
             n.arg_types.push_back(arg_type.clone());
@@ -529,6 +545,7 @@ USemanticInfo Checker::visit(CallNode& n) {
         // prepend the "this" argument (the object on which the method is being called)
         n.arguments.insert(n.arguments.begin(), object_node);
     }
+    retv.is_constant = is_def_const && args_are_constant;
     return std::make_unique<SemanticInfo>(retv);
 }
 
@@ -761,6 +778,9 @@ USemanticInfo Checker::visit(AssignmentNode& n) {
     if (n.lvalue->ntype == MEMBER && n.lvalue->member().type == MemberType::NUM) {
         this->error_tuple_assign(n.start);
     }
+    if (n.lvalue->ntype == MEMBER && (linfo_p->is_class_method || n.lvalue->member().is_class_member && !n.lvalue->member().is_class_static_member)){
+        throw std::runtime_error("Can only assign to static members (not methods!)");
+    }
     USemanticInfo expression_type_p = this->dispatch(n.rvalue);
     if (expression_type_p->type() == T_NONE) {
         this->error_function_doesnt_return_a_value(n.rvalue->start, &linfo_p->type());
@@ -833,12 +853,17 @@ USemanticInfo Checker::member_class_method(std::string class_name, std::string c
         IdNode* idn = new IdNode(this->map[class_name + "." + child], POS_NONE, POS_NONE);
         this->replace_me = true;
         this->replacement = idn;
+        n.is_class_member = true;
+        return std::make_unique<SemanticInfo>(rv);
+    } else if (class_info->static_members.find(child) != class_info->static_members.end()) {
+        rv.set_type(*class_info->static_members[child].first);
+        n.is_class_static_member = true;
+        n.is_class_member = true;
         return std::make_unique<SemanticInfo>(rv);
     } else {
         this->error_class_no_method(class_name, child, n.start);
         return error_stub();
     }
-
 }
 
 USemanticInfo Checker::member_tuple(const ObjectType& final_type, MemberNode& n) {
@@ -1032,6 +1057,7 @@ USemanticInfo Checker::visit(BinopNode& n) {
     USemanticInfo left_info_p = this->dispatch(n.left);
     Node* left_replace = this->replace_if_necessary(n.left);
     USemanticInfo right_info_p = this->dispatch(n.right);
+
     bool err = false;
     if (left_info_p->type() == T_NONE) {
         this->error_function_doesnt_return_a_value(n.left->start, nullptr);
@@ -1057,6 +1083,10 @@ USemanticInfo Checker::visit(BinopNode& n) {
     }
 
     SemanticInfo info;
+    if (left_info_p->is_constant && right_info_p->is_constant) {
+        info.is_constant = true;
+    }
+
     auto& left = left_info.type().object();
     auto& right = right_info.type().object();
     auto ltype = left.id;
@@ -1155,8 +1185,8 @@ USemanticInfo Checker::visit(DefaultConstructorNode& node) {
     // this is a regular function
     SemanticInfo info;
     VectorOfTypes t;
-    if (this->class_table->declared(node.name)) {
-        ClassInfo* ci = this->class_table->get(node.name);
+    if (this->class_table->declared(this->map[node.name])) {
+        ClassInfo* ci = this->class_table->get(this->map[node.name]);
         for (auto pt: ci->member_types) {
             t.push_back(pt->clone());
         }

@@ -30,6 +30,7 @@ public:
     void set_type(const TypeNode& typ);
 
     const TypeNode& type();
+    bool is_constant;
 };
 
 class ErrorStub : public SemanticInfo {
