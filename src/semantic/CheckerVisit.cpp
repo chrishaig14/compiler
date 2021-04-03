@@ -125,7 +125,7 @@ USemanticInfo Checker::visit(SubscriptNode& node) {
             this->error_subscript_type(object_type, ct->type(), T_INT, node.start);
         }
         info.set_type(object_type);
-    }else{
+    } else {
         this->fail("Error subscript of something that's not a list, dict or string!");
         return error_stub();
     }
@@ -694,74 +694,86 @@ USemanticInfo Checker::visit(IdNode& n) {
     return std::make_unique<SemanticInfo>(info);
 }
 
+USemanticInfo Checker::check_declaration_with_type(DeclarationNode& n) {
+    SemanticInfo info;
+    TypeNode& n_type = *n.type;
+    if (!this->assert_type_exists(n_type, n.start)) {
+        return error_stub();
+    }
+    USemanticInfo exp_info_p = this->dispatch(n.expression);
+    SemanticInfo& exp_info = *exp_info_p;
+    if (exp_info.is_error) {
+        this->scope->set(n.identifier, n_type);
+        return std::make_unique<SemanticInfo>(info);
+    }
+    n.expression = this->replace_if_necessary(n.expression);
+    if (n.type->kind == Kind::FUNCTION) {
+        // it's a function
+        if (n_type != exp_info.type()) {
+            this->error_assignment(n_type, exp_info.type(), n.start);
+        }
+    } else {
+        SemanticInfo expression_info = exp_info;
+        const ObjectType& actual_type = n.type->object();
+        const TypeNode& exp_type = expression_info.type();
+        if (actual_type.id == "Option") {
+            if (*actual_type.type_params[0] != exp_type) {
+                auto foo = exp_type.object();
+                if (foo.id != "NoneType") {
+                    this->error_assignment(n_type, exp_type, n.start);
+                }
+            }
+        } else if (actual_type.id == "Union") {
+            bool ok = false;
+            for (auto type_param: actual_type.type_params) {
+                if (*type_param != exp_type) {
+                    ok = true;
+                    break;
+                }
+            }
+            if (!ok) {
+                this->error_assignment(n_type, exp_type, n.start);
+            }
+        } else {
+            if (n_type != exp_type) {
+                this->error_assignment(n_type, exp_type, n.start);
+            }
+        }
+    }
+    info.set_type(n_type);
+    return std::make_unique<SemanticInfo>(info);
+}
+
+USemanticInfo Checker::check_declaration_without_type(DeclarationNode& n) {
+    USemanticInfo exp_info_p = this->dispatch(n.expression);
+    SemanticInfo info;
+    if (exp_info_p->type() == T_NONE) {
+        this->error_function_doesnt_return_a_value(n.expression->start, nullptr);
+        USemanticInfo error_t = error_stub();
+        this->scope->set(n.identifier, error_t->type());
+        return error_t;
+    }
+    n.type = exp_info_p->type().clone();
+    SemanticInfo& exp_info = *exp_info_p;
+    n.expression = this->replace_if_necessary(n.expression);
+    info.set_type(exp_info.type());
+    return std::make_unique<SemanticInfo>(info);
+}
+
+
 USemanticInfo Checker::visit(DeclarationNode& n) {
     Logger::info("Checking DeclarationNode for var: " + n.identifier);
     if (this->scope->declared(n.identifier)) {
         this->error_redeclared(n.identifier, n.start);
     }
-    SemanticInfo info;
+    USemanticInfo info;
     if (n.type != nullptr) {
-        TypeNode& n_type = *n.type;
-        if (!this->assert_type_exists(n_type, n.start)) {
-            return error_stub();
-        }
-        USemanticInfo exp_info_p = this->dispatch(n.expression);
-        SemanticInfo& exp_info = *exp_info_p;
-        if (exp_info.is_error) {
-            this->scope->set(n.identifier, n_type);
-            return std::make_unique<SemanticInfo>(info);
-        }
-        n.expression = this->replace_if_necessary(n.expression);
-        if (n.type->kind == Kind::FUNCTION) {
-            // it's a function
-            if (n_type != exp_info.type()) {
-                this->error_assignment(n_type, exp_info.type(), n.start);
-            }
-        } else {
-            SemanticInfo expression_info = exp_info;
-            const ObjectType& actual_type = n.type->object();
-            const TypeNode& exp_type = expression_info.type();
-            if (actual_type.id == "Option") {
-                if (*actual_type.type_params[0] != exp_type) {
-                    auto foo = exp_type.object();
-                    if (foo.id != "NoneType") {
-                        this->error_assignment(n_type, exp_type, n.start);
-                    }
-                }
-            } else if (actual_type.id == "Union") {
-                bool ok = false;
-                for (auto type_param: actual_type.type_params) {
-                    if (*type_param != exp_type) {
-                        ok = true;
-                        break;
-                    }
-                }
-                if (!ok) {
-                    this->error_assignment(n_type, exp_type, n.start);
-                }
-            } else {
-                if (n_type != exp_type) {
-                    this->error_assignment(n_type, exp_type, n.start);
-                }
-            }
-        }
-        info.set_type(n_type);
-
+        info = this->check_declaration_with_type(n);
     } else {
-        USemanticInfo exp_info_p = this->dispatch(n.expression);
-        if (exp_info_p->type() == T_NONE) {
-            this->error_function_doesnt_return_a_value(n.expression->start, nullptr);
-            USemanticInfo error_t = error_stub();
-            this->scope->set(n.identifier, error_t->type());
-            return error_t;
-        }
-        n.type = exp_info_p->type().clone();
-        SemanticInfo& exp_info = *exp_info_p;
-        n.expression = this->replace_if_necessary(n.expression);
-        info.set_type(exp_info.type());
+        info = this->check_declaration_without_type(n);
     }
-    this->scope->set(n.identifier, info.type());
-    return std::make_unique<SemanticInfo>(info);
+    this->scope->set(n.identifier, info->type());
+    return info;
 }
 
 USemanticInfo Checker::visit(AssignmentNode& n) {
@@ -781,7 +793,8 @@ USemanticInfo Checker::visit(AssignmentNode& n) {
     if (n.lvalue->ntype == MEMBER && n.lvalue->member().type == MemberType::NUM) {
         this->error_tuple_assign(n.start);
     }
-    if (n.lvalue->ntype == MEMBER && (linfo_p->is_class_method || n.lvalue->member().is_class_member && !n.lvalue->member().is_class_static_member)){
+    if (n.lvalue->ntype == MEMBER && (linfo_p->is_class_method || n.lvalue->member().is_class_member &&
+                                                                  !n.lvalue->member().is_class_static_member)) {
         throw std::runtime_error("Can only assign to static members (not methods!)");
     }
     USemanticInfo expression_type_p = this->dispatch(n.rvalue);

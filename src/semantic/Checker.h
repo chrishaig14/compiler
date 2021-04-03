@@ -169,6 +169,8 @@ public:
     USemanticInfo visit(CastNode& n);
     void error_method_not_member(const TypeNode& t, const std::string& member, TextPosition position);
     USemanticInfo visit(DefaultConstructorNode& node);
+    USemanticInfo check_declaration_with_type(DeclarationNode& n);
+    USemanticInfo check_declaration_without_type(DeclarationNode& n);
 };
 
 bool function_is_generic(const FunctionType& ft);
