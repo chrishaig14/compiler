@@ -125,6 +125,9 @@ USemanticInfo Checker::visit(SubscriptNode& node) {
             this->error_subscript_type(object_type, ct->type(), T_INT, node.start);
         }
         info.set_type(object_type);
+    }else{
+        this->fail("Error subscript of something that's not a list, dict or string!");
+        return error_stub();
     }
     if (info.type().kind == Kind::FUNCTION) {
         info.is_function = true;
