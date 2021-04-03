@@ -5,13 +5,12 @@
 #include "ClassNode.h"
 
 ClassNode::ClassNode(const std::string& className, VectorOfStrings type_parameters, MapStringType members,
-          std::unordered_map<std::string, FunctionNode*> functions, MapStringType static_members,
-          std::unordered_map<std::string, FunctionNode*> static_methods, TextPosition start, TextPosition end) : Node(
-        CLS,
-        start,
-        end), methods(functions), class_name(className), members(members), static_members(static_members),
-                                                                                                                 static_methods(
-                                                                                                                         static_methods) {
+                     std::unordered_map<std::string, FunctionNode*> functions,
+                     std::map<std::string, std::pair<TypeNode*, Node*>> static_members,
+                     std::unordered_map<std::string, FunctionNode*> static_methods, TextPosition start,
+                     TextPosition end) : Node(CLS, start, end), methods(functions), class_name(className),
+                                         members(members), static_members(static_members),
+                                         static_methods(static_methods) {
     this->type_parameters = type_parameters;
 }
 

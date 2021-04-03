@@ -785,7 +785,7 @@ ClassNode* Parser::parse_class_definition() {
     std::unordered_map<std::string, FunctionNode*> methods;
     std::unordered_map<std::string, FunctionNode*> static_methods;
     MapStringType members;
-    MapStringType static_members;
+    std::map<std::string, std::pair<TypeNode*,Node*>> static_members;
     VectorOfStrings members_ordered;
     while (true) {
         bool is_static = false;
@@ -803,7 +803,9 @@ ClassNode* Parser::parse_class_definition() {
 
             }
             if (is_static) {
-                static_members[member_name] = member_type;
+                this->expect_token(TokType::EQQ);
+                Node* init_expression = this->parse_expression();
+                static_members[member_name] = std::make_pair(member_type, init_expression);
             } else {
                 members[member_name] = member_type;
                 members_ordered.push_back(member_name);

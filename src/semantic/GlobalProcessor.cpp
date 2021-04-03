@@ -62,7 +62,7 @@ void GlobalProcessor::visit(ClassNode& node) {
         class_info->members[mn] = mt->clone();
     }
     for (auto mn: node.static_members) {
-        class_info->static_members[mn.first] = mn.second->clone();
+        class_info->static_members[mn.first] = std::make_pair(mn.second.first->clone(), mn.second.second);
     }
     bool has_init = false;
     for (auto f: node.methods) {

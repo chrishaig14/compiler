@@ -227,9 +227,15 @@ USemanticInfo Checker::visit(ClassNode& node) {
         this->assert_type_exists(t, node.start);
     }
 
+    for(auto sm: node.static_members){
+        USemanticInfo sm_exp_info = this->dispatch(sm.second.second);
+        if (*sm.second.first != sm_exp_info->type()){
+            throw std::runtime_error("Err: cannt initialize static member of type " + sm.second.first->to_string() + " with expression of type " + sm_exp_info->type().to_string());
+        }
+    }
+
     this->this_type = new ObjectType(node.class_name, tp);
     bool has_init = false;
-
     for (auto method: node.methods) {
         this->is_method = true;
         this->visit(*method.second);

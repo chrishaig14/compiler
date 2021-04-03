@@ -17,7 +17,8 @@ public:
 
     bool equal(const Node& other) const;
     ClassNode(const std::string& className, VectorOfStrings type_parameters, MapStringType members,
-              std::unordered_map<std::string, FunctionNode*> functions, MapStringType static_members,
+              std::unordered_map<std::string, FunctionNode*> functions,
+              std::map<std::string, std::pair<TypeNode*, Node*>> static_members,
               std::unordered_map<std::string, FunctionNode*> static_methods, TextPosition start, TextPosition end);
     ClassNode& cls() override;
     const ClassNode& cls() const override;
@@ -25,7 +26,7 @@ public:
     ~ClassNode();
 
     MapStringType members;
-    MapStringType static_members;
+    std::map<std::string, std::pair<TypeNode*, Node*>> static_members;
     VectorOfStrings members_ordered;
     std::unordered_map<std::string, FunctionNode*> methods;
     std::unordered_map<std::string, FunctionNode*> static_methods;
