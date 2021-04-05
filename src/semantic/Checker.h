@@ -15,6 +15,7 @@
 #include <set>
 #include "../macros.h"
 #include "../logging/logging.h"
+#include "../units.h"
 
 typedef std::unique_ptr<SemanticInfo> USemanticInfo;
 
@@ -42,6 +43,7 @@ ClassInfo* make_float_class_info();
 ClassInfo* make_double_class_info();
 
 ClassInfo* make_string_class_info();
+
 class Checker {
     bool add_this;
     bool is_lvalue;
@@ -54,7 +56,8 @@ class Checker {
     std::string current_function;
     std::unordered_map<std::string, SymbolTable*> scopes;
     std::vector<ObjectType*> tuple_types;
-    std::map<std::string, std::string>& map;
+    std::map<std::string, std::string>& imported_paths;
+    std::map<std::string, std::string>& local_paths;
     SymbolTable* scope;
     TypeNode* this_type;
 public:
@@ -63,7 +66,7 @@ public:
     bool can_assign(const TypeNode& from, const TypeNode& to);
     bool can_assign_generic(TypeNode& from, TypeNode& to, VectorOfStrings type_params);
     bool is_immutable(const TypeNode& node);
-    Checker(std::map<std::string, std::string>& map, ClassTable* class_table, FunctionTable* function_table);
+    Checker(std::map<std::string, std::string>& imported_paths, std::map<std::string, std::string>& local_paths, ClassTable* class_table, FunctionTable* function_table);
     ClassInfo* instantiate_generic(ClassInfo* generic, const ObjectType& instance);
     void error_assignment(const TypeNode& expected, const TypeNode& actual, TextPosition position);
     void error_bad_return(TextPosition position);
@@ -96,12 +99,13 @@ public:
     USemanticInfo visit(EmptyListNode& node);
     USemanticInfo visit(FloatNode& node);
     USemanticInfo visit(ForNode& node);
-    USemanticInfo visit(FunctionNode& node);
-    USemanticInfo visit(IdNode& node);
+    USemanticInfo visit_function(FunctionNode& n);
+    USemanticInfo visit_id(IdNode& n);
     USemanticInfo visit(IfNode& node);
     USemanticInfo visit(ListNode& node);
-    USemanticInfo visit(MemberNode& node);
+    USemanticInfo visit_member(MemberNode& n);
     USemanticInfo visit(NoneNode& node);
+    USemanticInfo visit_import(ImportNode& node);
     USemanticInfo visit(NumberNode& node);
     USemanticInfo visit(PartialApplication& node);
     USemanticInfo visit(ReturnNode& n);
@@ -171,6 +175,12 @@ public:
     USemanticInfo visit(DefaultConstructorNode& node);
     USemanticInfo check_declaration_with_type(DeclarationNode& n);
     USemanticInfo check_declaration_without_type(DeclarationNode& n);
+    std::map<std::string, Package*> imported_packages;
+    std::map<std::string, Module*> imported_modules;
+    std::map<std::string, FunctionType*> imported_functions;
+    std::map<std::string, ClassInfo*> imported_classes;
+    std::map<std::string, Package*>* global_packages;
+    std::map<std::string, Module*>* global_modules;
 };
 
 bool function_is_generic(const FunctionType& ft);

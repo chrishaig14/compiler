@@ -12,6 +12,8 @@ SemanticInfo::SemanticInfo() {
     this->is_error = false;
     this->_type = nullptr;
     this->is_constant = false;
+    this->is_module = false;
+    this->is_package = false;
 }
 
 void SemanticInfo::set_type(const TypeNode& typ) {
@@ -37,6 +39,11 @@ SemanticInfo::SemanticInfo(const SemanticInfo& other) {
     this->class_info = other.class_info;
     this->is_class_method = other.is_class_method;
     this->is_constant = other.is_constant;
+    this->is_module = other.is_module;
+    this->is_package = other.is_package;
+    this->module = other.module;
+    this->package = other.package;
+
     if (other._type != nullptr) {
         this->_type = other._type->clone();
     } else {

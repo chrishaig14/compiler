@@ -30,11 +30,15 @@ typedef std::pair<std::string, std::string> Builtin;
 
 class GlobalProcessor {
 public:
-    ClassTable* class_table;
-    FunctionTable* function_table;
+    ClassTable* global_classes;
+    FunctionTable* global_functions;
+    std::string module_dotted_path;
+    std::map<std::string, std::string> imported_paths;
+    std::map<std::string, std::string> local_paths;
+    std::map<std::string, std::string>& global_path_to_mangled_name;
 
-    GlobalProcessor(std::map<std::string, std::unique_ptr<std::map<std::string, std::string>>>& module_mappings,
-                    ClassTable* imported_classes, FunctionTable* imported_functions, std::string module_name);
+    GlobalProcessor(ClassTable* global_classes, FunctionTable* global_functions, std::string module_name,
+                    std::map<std::string, std::string>& global_path_to_mangled_name);
 
     void visit(FunctionNode& node);
 
@@ -47,7 +51,6 @@ public:
     void visit(ClassNode& node);
 
     std::string __file__;
-    std::map<std::string, std::unique_ptr<std::map<std::string, std::string>>>& module_mappings;
     std::string module_name;
 };
 

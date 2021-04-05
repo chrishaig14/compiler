@@ -252,13 +252,13 @@ USemanticInfo Checker::visit(ClassNode& node) {
     bool has_init = false;
     for (auto method: node.methods) {
         this->is_method = true;
-        this->visit(*method.second);
+        this->visit_function(*method.second);
         has_init = has_init || method.first == "init";
     }
     for (auto method: node.static_methods) {
         this->is_method = false;
         this->add_this = false;
-        this->visit(*method.second);
+        this->visit_function(*method.second);
         has_init = has_init || method.first == "init";
     }
     this->add_this = true;
@@ -267,7 +267,7 @@ USemanticInfo Checker::visit(ClassNode& node) {
         auto eq_meth = generate_eq_method(node.class_name, tp, node.members_ordered);
         node.methods[eq_method_name] = eq_meth;
         this->is_method = true;
-        this->visit(*eq_meth);
+        this->visit_function(*eq_meth);
     } else {
         if (*node.methods[eq_method_name]->parameter_types[0] != *this->this_type ||
             *node.methods[eq_method_name]->return_type != T_BOOL) {
@@ -280,7 +280,7 @@ USemanticInfo Checker::visit(ClassNode& node) {
         auto str_meth = generate_str_method(node.class_name);
         node.methods[str_method_name] = str_meth;
         this->is_method = true;
-        this->visit(*str_meth);
+        this->visit_function(*str_meth);
     } else {
         if (node.methods[str_method_name]->parameter_types.size() != 0 ||
             *node.methods[str_method_name]->return_type != T_STRING) {
@@ -305,7 +305,7 @@ USemanticInfo Checker::visit(ClassNode& node) {
                                                 POS_NONE,
                                                 POS_NONE);
         this->is_method = true;
-        this->visit(*node.methods["init"]);
+        this->visit_function(*node.methods["init"]);
     }
 
     this->is_method = false;
@@ -433,7 +433,7 @@ USemanticInfo Checker::visit(MethodNode& n) {
     if (n.parent_t->kind != Kind::OBJECT) {
         throw std::runtime_error("Cannot call a method on a function");
     }
-    ClassInfo* class_info = this->class_table->get(this->map[n.parent_t->object().id]);
+    ClassInfo* class_info = this->class_table->get("asdf");
     SemanticInfo info;
     if (class_info->methods.find(n.s_child) == class_info->methods.end()) {
         throw std::runtime_error("Error " + n.parent_t->to_string() + " has no method " + n.s_child);
@@ -481,9 +481,9 @@ USemanticInfo Checker::visit(CallNode& n) {
             retv.set_type(*copy_ftn.clone());
             object_node = member_node.parent;
         } else {
-            n.function = new IdNode(this->map[fun_info.class_info->class_name + "." + member_node.s_child],
-                                    POS_NONE,
-                                    POS_NONE);
+            // n.function = new IdNode(this->map[fun_info.class_info->class_name + "." + member_node.s_child],
+            //                         POS_NONE,
+            //                         POS_NONE);
             this->replace_me = false;
             const FunctionType& ftn = fun_info.type().function();
             FunctionType& copy_ftn = ftn.clone()->function();
@@ -577,7 +577,7 @@ USemanticInfo Checker::visit(BlockNode& program) {
     return nullptr;
 }
 
-USemanticInfo Checker::visit(FunctionNode& n) {
+USemanticInfo Checker::visit_function(FunctionNode& n) {
     Logger::info("Checking FunctionNode " + n.identifier);
     std::string& function_name = n.identifier;
     this->current_function = function_name;
@@ -648,24 +648,29 @@ USemanticInfo Checker::visit(FunctionNode& n) {
     return nullptr;
 }
 
-USemanticInfo Checker::visit(IdNode& n) {
+USemanticInfo Checker::visit_id(IdNode& n) {
     Logger::info("Checking id node " + n._id);
     SemanticInfo info;
     if (!this->scope->has(n._id)) {
-        // it might be a function name
-        if (this->map.count(n._id) != 0) {
-            n.is_global_function = true;
-            info.is_function = true;
-            n.location = VariableLocation(-2, -1);
-            info.set_type(this->function_table->get(this->map.at(n._id)));
-        }
-            // if (this->function_table->has_function(n._id)) {
-            //     n.is_global_function = true;
-            //     info.is_function = true;
-            //     n.location = VariableLocation(-2, -1);
-            //     info.set_type(this->function_table->get(n._id));
-            // }
-        else {
+        // might be imported
+        if (this->imported_paths.count(n._id) != 0) {
+            std::string path = this->imported_paths[n._id];
+            Logger::info("ID '" + n._id + "' is imported, path: '" + path + "'");
+            if (this->function_table->has_function(path)) {
+                const FunctionType& ft = this->function_table->get(path);
+                info.set_type(ft);
+                info.is_function = true;
+                Logger::info("ID is an imported function of type " + ft.to_string());
+            } else if (this->global_packages->count(path) != 0) {
+                Logger::info("ID is an imported package");
+                info.is_package = true;
+                info.package = this->global_packages->at(path);
+            } else if (this->global_modules->count(path) != 0) {
+                Logger::info("ID is an imported module");
+                info.is_module = true;
+                info.module = this->global_modules->at(path);
+            }
+        } else {
             this->error_variable_not_declared(n._id, n.start);
             return error_stub();
         }
@@ -838,7 +843,7 @@ USemanticInfo Checker::visit(AssignmentNode& n) {
 }
 
 USemanticInfo Checker::member_class_method(std::string class_name, std::string child, MemberNode& n) {
-    ClassInfo* class_info = this->class_table->get(this->map[class_name]);
+    ClassInfo* class_info = this->class_table->get("");
     SemanticInfo rv;
     if (class_info->methods.find(child) != class_info->methods.end()) {
         // unbound method
@@ -866,7 +871,7 @@ USemanticInfo Checker::member_class_method(std::string class_name, std::string c
         // static method
         rv.set_type(*class_info->static_methods[child]);
         rv.is_function = true;
-        IdNode* idn = new IdNode(this->map[class_name + "." + child], POS_NONE, POS_NONE);
+        IdNode* idn = new IdNode("", POS_NONE, POS_NONE);
         this->replace_me = true;
         this->replacement = idn;
         n.is_class_member = true;
@@ -905,14 +910,16 @@ Checker::member_normal(const ObjectType& final_type, const ObjectType& object, s
     }
 
     ClassInfo* class_info;
-    if (this->class_table->declared(final_type.to_string())) {
+    if (this->imported_paths.count(final_type.id) != 0) {
+        class_info = this->class_table->get(this->imported_paths[final_type.id]);
+    } else if (this->class_table->declared(final_type.to_string())) {
         class_info = this->class_table->get(final_type.to_string());
     } else {
         if (is_generic((final_type)) && final_type.type_params.size() == 0) {
             throw std::runtime_error(
                     "Cannot access member of totally generic value of generic type " + object.id + "!");
         } else {
-            class_info = this->class_table->get(this->map[object.id]);
+            class_info = this->class_table->get("");
             class_info = instantiate_generic(class_info, final_type);
             this->class_table->set(object.to_string(), class_info);
         }
@@ -923,8 +930,11 @@ Checker::member_normal(const ObjectType& final_type, const ObjectType& object, s
         info.set_type(*class_info->members[child]);
         rv = info;
     } else if (class_info->methods.find(child) != class_info->methods.end()) {
-        this->error_method_not_member(object, child, n.start);
-        return error_stub();
+        info.set_type(*class_info->methods[child]);
+        info.is_function = true;
+        rv = info;
+        // this->error_method_not_member(object, child, n.start);
+        // return error_stub();
     } else {
         this->error_no_member(object, child, n.start);
         return error_stub();
@@ -933,18 +943,52 @@ Checker::member_normal(const ObjectType& final_type, const ObjectType& object, s
 }
 
 
-USemanticInfo Checker::visit(MemberNode& n) {
+USemanticInfo Checker::visit_member(MemberNode& n) {
     std::string& child = n.s_child;
-    if (n.parent->ntype == NodeType::ID) {
-        IdNode& id_node = n.parent->id();
-        // It might be something like <class>.<method>, so we need to handle this case differently
-        if (this->class_table->declared(this->map[id_node._id])) {
-            return this->member_class_method(id_node._id, child, n);
-        }
-    }
+    // if (n.parent->ntype == NodeType::ID) {
+    //     IdNode& id_node = n.parent->id();
+    //     // It might be something like <class>.<method>, so we need to handle this case differently
+    //     if (this->class_table->declared(id_node._id)) {
+    //         return this->member_class_method(id_node._id, child, n);
+    //     }
+    // }
     bool old_lvalue = this->is_lvalue;
     this->is_lvalue = false;
     USemanticInfo symbol_info_p = this->dispatch(n.parent);
+    if (symbol_info_p->is_module) {
+        SemanticInfo info;
+        Module* module = symbol_info_p->module;
+        auto full_path = module->local_paths.find(n.s_child);
+        if (full_path != module->local_paths.end()) {
+            std::cout << "Found name " << n.s_child << " in module " << module->dotted_path << std::endl;
+            const FunctionType& ft = this->function_table->get(full_path->second);
+            std::cout << "It has type: " << ft.to_string() << std::endl;
+            info.set_type(ft);
+            info.is_function = true;
+            return std::make_unique<SemanticInfo>(info);
+        } else {
+            std::cout << "Could not find name " << n.s_child << " in module " << module->dotted_path << std::endl;
+        }
+    } else if (symbol_info_p->is_package) {
+        SemanticInfo info;
+        Package* package = symbol_info_p->package;
+        auto full_path = package->children.find(n.s_child);
+        if (full_path != package->children.end()) {
+            std::cout << "Found name " << n.s_child << " in package " << package->dotted_path << std::endl;
+            Unit* unit = package->children[n.s_child];
+            if (unit->type == UnitType::MODULE) {
+                info.is_module = true;
+                info.module = (Module*) unit;
+            } else {
+                // sub package
+                info.is_package = true;
+                info.package = (Package*) unit;
+            }
+            return std::make_unique<SemanticInfo>(info);
+        } else {
+            std::cout << "Could not find name " << n.s_child << " in package " << package->dotted_path << std::endl;
+        }
+    }
     this->is_lvalue = old_lvalue;
     SemanticInfo& info = *symbol_info_p;
     if (info.is_error) {
@@ -1201,8 +1245,8 @@ USemanticInfo Checker::visit(DefaultConstructorNode& node) {
     // this is a regular function
     SemanticInfo info;
     VectorOfTypes t;
-    if (this->class_table->declared(this->map[node.name])) {
-        ClassInfo* ci = this->class_table->get(this->map[node.name]);
+    if (this->class_table->declared(node.name)) {
+        ClassInfo* ci = this->class_table->get(node.name);
         for (auto pt: ci->member_types) {
             t.push_back(pt->clone());
         }
@@ -1211,3 +1255,4 @@ USemanticInfo Checker::visit(DefaultConstructorNode& node) {
     info.is_function = true;
     return std::make_unique<SemanticInfo>(info);
 }
+

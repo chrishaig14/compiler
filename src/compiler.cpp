@@ -20,9 +20,9 @@ int main(int argc, char* argv[]) {
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(tokens);
     BlockNode* ast = parser.parse_program();
-    GlobalProcessor gp;
+    GlobalProcessor gp(nullptr, nullptr, std::string(), std::map<std::string, std::string>());
     gp.visit(*ast);
-    Checker checker(gp.globals, gp.class_table);
+    Checker checker(gp.globals, gp.global_classes);
     checker.visit(*ast);
     return 0;
 }

@@ -76,7 +76,9 @@ ClassInfo* make_string_class_info() {
     return string_class_info;
 }
 
-Checker::Checker(std::map<std::string, std::string>& map, ClassTable* class_table, FunctionTable* function_table) : map(map) {
+Checker::Checker(std::map<std::string, std::string>& imported_paths, std::map<std::string, std::string>& local_paths,
+                 ClassTable* class_table, FunctionTable* function_table)
+        : imported_paths(imported_paths), local_paths(local_paths) {
     this->is_lvalue = false;
     this->is_method = false;
     this->function_table = function_table;
@@ -115,14 +117,14 @@ bool Checker::assert_type_exists(TypeNode& type, TextPosition pos) {
         }
         if (type.object().type_params.size() == 0) {
             if (!is_generic(type)) {
-                if (this->map.count(type.object().id) == 0) {
-                    this->error_class_not_found(type, {1,1});
+                if (this->imported_paths.count(type.object().id) == 0) {
+                    this->error_class_not_found(type, {1, 1});
                     return false;
                 }
             }
             return true;
         }
-        if (this->map.count(type.object().id) == 0) {
+        if (this->imported_paths.count(type.object().id) == 0) {
             this->error_class_not_found(type, pos);
             return false;
         } else {
@@ -389,10 +391,10 @@ USemanticInfo Checker::dispatch(Node* nod) {
             return this->visit(n.forloop());
             break;
         case NodeType::FUNC:
-            return this->visit(n.func());
+            return this->visit_function(n.func());
             break;
         case NodeType::ID:
-            return this->visit(n.id());
+            return this->visit_id(n.id());
             break;
         case NodeType::CAST:
             return this->visit(n.cast());
@@ -403,7 +405,7 @@ USemanticInfo Checker::dispatch(Node* nod) {
             return this->visit(n.lst());
             break;
         case NodeType::MEMBER:
-            return this->visit(n.member());
+            return this->visit_member(n.member());
             break;
         case NodeType::NONE:
             return this->visit(n.none());
@@ -440,6 +442,8 @@ USemanticInfo Checker::dispatch(Node* nod) {
             break;
         case NodeType::DEF_CONST:
             return this->visit(n.defconst());
+        case NodeType::IMPORT:
+            return this->visit_import(n.import());
         default:
             throw std::runtime_error("Don't know what to do!");
     }

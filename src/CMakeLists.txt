@@ -109,6 +109,6 @@ add_library(
         macros.h
         semantic/CheckerErrors.cpp
         semantic/CheckerVisit.cpp
-        semantic/CheckerUnify.cpp semantic/util.cpp semantic/util.h)
+        semantic/CheckerUnify.cpp semantic/util.cpp semantic/util.h units.h units.cpp)
 
 add_library(transpiler transpiler/Transpiler.cpp transpiler/Transpiler.h)

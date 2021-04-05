@@ -24,6 +24,7 @@
 #include "ForNode.h"
 #include "WhileNode.h"
 #include "DeclarationNode.h"
+#include "ImportNode.h"
 #include "FunctionNode.h"
 #include "IdNode.h"
 #include "IfNode.h"

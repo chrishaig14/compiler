@@ -6,6 +6,7 @@
 
 void Checker::fail(std::string msg) {
     this->failed = true;
+    std::cout << "FAILING!" << std::endl;
     std::cout << msg << std::endl;
 }
 

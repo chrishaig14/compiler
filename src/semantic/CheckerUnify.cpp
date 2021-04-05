@@ -131,3 +131,46 @@ std::pair<std::string, TypeNode*>* Checker::get_first_substitution(TypeNode& a, 
         return get_first_substitution_object(a.object(), b.object(), is_top_level_arg);
     }
 }
+
+USemanticInfo Checker::visit_import(ImportNode& node) {
+    std::string name = node.path.back();
+    std::string path = node.path[0];
+    int current_index = 0;
+    while (true) {
+        auto current_package = this->global_packages->find(path);
+        if (current_package == this->global_packages->end()) {
+            // might be a module(.function/.class)
+            auto current_module = this->global_modules->find(path);
+            if (current_module == this->global_modules->end()) {
+                std::cout << "Error: module/package " << path << " not found!" << std::endl;
+                throw std::runtime_error("Import error");
+            } else {
+                // module found!
+                if (current_index == node.path.size() - 1) {
+                    // imported whole module
+                    break;
+                }
+                std::string final_part = node.path[current_index + 1];
+                auto final_import = current_module->second->local_paths.find(final_part);
+                if (final_import == current_module->second->local_paths.end()) {
+                    std::cout << "Error: name " << final_part << " not found in module " << path << std::endl;
+                    throw std::runtime_error("Import error");
+                } else {
+                    // imported function/class from module!
+                    break;
+                }
+            }
+        } else {
+            // package found!
+            if (current_index == node.path.size() - 1) {
+                // ok, import whole package!
+                break;
+            } else {
+                path = path + "." + node.path[current_index + 1];
+                current_index++;
+            }
+        }
+    }
+    SemanticInfo info;
+    return std::make_unique<SemanticInfo>(info);
+}

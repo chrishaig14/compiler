@@ -2,6 +2,7 @@
 #include <fstream>
 #include <fmt/ostream.h>
 #include <fmt/color.h>
+#include <dirent.h>
 #include "scanner/Scanner.h"
 #include "parser/Parser.h"
 #include "semantic/GlobalProcessor.h"
@@ -9,6 +10,7 @@
 #include "transpiler/Transpiler.h"
 #include "logging/logging.h"
 #include "semantic/util.h"
+#include "units.h"
 
 static std::map<std::string, std::string> function_builtins;
 static std::map<std::string, std::map<std::string, std::string>> class_builtins;
@@ -47,59 +49,6 @@ BlockNode* full_parse(const std::string& __file__, CodeLines* code_lines) {
     return tree;
 }
 
-class Mapping {
-public:
-    bool is_function;
-    bool is_class;
-    bool found;
-    const void* ptr;
-
-    Mapping(const ClassInfo* p) {
-        this->ptr = p;
-        this->found = true;
-        this->is_class = true;
-        this->is_function = false;
-    }
-
-
-    Mapping(const FunctionType* p) {
-        this->ptr = p;
-        this->found = true;
-        this->is_function = true;
-        this->is_class = false;
-    }
-
-    Mapping() {
-        this->ptr = nullptr;
-        this->found = false;
-        this->is_class = false;
-        this->is_function = false;
-    }
-
-    const ClassInfo* get_class() {
-        return (const ClassInfo*) ptr;
-    }
-
-    const FunctionType* get_function() {
-        return (const FunctionType*) ptr;
-    }
-};
-
-class ModuleMapping {
-    ClassTable* class_table;
-    FunctionTable* function_table;
-
-    Mapping find(const std::string& name) {
-        if (class_table->declared(name)) {
-            return Mapping(class_table->get(name));
-        } else if (function_table->has_function(name)) {
-            return Mapping(&function_table->get(name));
-        }
-        return Mapping();
-    }
-};
-
-
 static std::map<std::string, FunctionTable*> module_exported_functions;
 static std::map<std::string, ClassTable*> module_exported_classes;
 static std::set<std::string> compiled_modules;
@@ -134,8 +83,8 @@ void full_compile(bool is_main, const std::string& __file__, const std::string& 
 
     for (auto n: tree->nodes) {
         if (n->ntype == IMPORT) {
-            for (auto imported_name: n->import().imports) {
-                imported[n->import().module_name].insert(imported_name);
+            for (auto imported_name: n->import().path) {
+                // imported[n->import().path.back()] = path_resolver(n->import().path);
             }
         }
     }
@@ -180,18 +129,18 @@ void full_compile(bool is_main, const std::string& __file__, const std::string& 
         }
         includes += "#include \"" + imported_module_name + ".h\"\n";
     }
-
+    std::map<std::string, std::string> foo;
     try {
-        GlobalProcessor gp(module_maps, global_classes, global_functions, module_name);
+        GlobalProcessor gp(global_classes, global_functions, module_name, foo);
         gp.__file__ = __file__;
         gp.visit(*tree);
-        Checker checker(map, global_classes, global_functions);
-        checker.__file__ = __file__;
-        checker.code_lines = code_lines;
-        checker.visit(*tree);
-        if (checker.failed) {
-            throw std::runtime_error("ERROR");
-        }
+        // Checker checker(map, global_classes, global_functions);
+        // checker.__file__ = __file__;
+        // checker.code_lines = code_lines;
+        // checker.visit(*tree);
+        // if (checker.failed) {
+        //     throw std::runtime_error("ERROR");
+        // }
     } catch (const std::runtime_error& e) {
         std::cerr << "THERE WAS A SEMANTIC ERROR: " << e.what() << std::endl;
         exit(1);
@@ -236,6 +185,138 @@ void full_compile(bool is_main, const std::string& __file__, const std::string& 
     compiled_modules.insert(module_name);
 }
 
+static std::map<std::string, Package*> global_packages;
+static std::map<std::string, Module*> global_modules;
+
+void build_packages(Package* package, int level) {
+    DIR* dir = opendir(package->path.c_str());
+    std::cout << std::string(level, '\t') << "PACKAGE: " << package->path << std::endl;
+    dirent* ent = readdir(dir);
+    while (ent != nullptr) {
+        std::string d_name = ent->d_name;
+        if (d_name != "." && d_name != "..") {
+            if (ent->d_type == DT_REG) {
+                std::string file_extension = d_name.substr(d_name.size() - 3, 3);
+                if (file_extension == ".xl") {
+                    std::cout << std::string(level + 1, '\t') << "MODULE: " << d_name << std::endl;
+                    std::string module_path = package->path + "/" + d_name;
+                    std::string module_name = d_name.substr(0, d_name.size() - 3);
+                    Module* module = new Module(module_name, module_path);
+                    package->children[module_name] = module;
+                    module->dotted_path = (package->dotted_path != "" ? package->dotted_path + "." : "") + module_name;
+                    global_modules[module->dotted_path] = module;
+                } else {
+                    std::cout << std::string(level + 1, '\t') << "OTHER: " << d_name << std::endl;
+                }
+            } else if (ent->d_type == DT_DIR) {
+                std::string subpackage_path = package->path + "/" + d_name;
+                std::string subpackage_name = d_name;
+                Package* subpackage = new Package(d_name, subpackage_path);
+                package->children[d_name] = subpackage;
+                subpackage->dotted_path =
+                        (package->dotted_path != "" ? package->dotted_path + "." : "") + subpackage_name;
+                build_packages(subpackage, level + 1);
+                global_packages[subpackage->dotted_path] = subpackage;
+            }
+        }
+        ent = readdir(dir);
+    }
+}
+
+void parse_all_modules(Package* package) {
+    std::cout << "Parsing package " << package->name << std::endl;
+    for (auto m: package->children) {
+        if (m.second->type == UnitType::PACKAGE) {
+            parse_all_modules((Package*) m.second);
+        } else {
+            CodeLines code_lines;
+            std::cout << "Parsing module " << m.second->name << std::endl;
+            BlockNode* ast = full_parse(m.second->path, &code_lines);
+            std::cout << "- Done" << std::endl;
+            ((Module*) m.second)->ast = ast;
+            ((Module*) m.second)->code_lines = code_lines;
+        }
+    }
+}
+
+static std::map<std::string, std::string> global_path_to_mangled_name;
+
+void process_global_all_modules(Package* package) {
+    std::cout << "Global processing package " << package->name << std::endl;
+    for (auto m: package->children) {
+        if (m.second->type == UnitType::PACKAGE) {
+            process_global_all_modules((Package*) m.second);
+        } else {
+            Module* module = (Module*) m.second;
+            std::cout << "Global processing module " << module->name << std::endl;
+            GlobalProcessor gp(global_classes, global_functions, module->name, global_path_to_mangled_name);
+            gp.module_dotted_path = module->dotted_path;
+            gp.__file__ = module->path;
+            gp.visit(*module->ast);
+            module->imported_paths = gp.imported_paths;
+            module->local_paths = gp.local_paths;
+            std::cout << "- Done" << std::endl;
+        }
+    }
+}
+
+
+void analyze_all_modules(Package* package) {
+    std::cout << "Analyzing package " << package->name << std::endl;
+    for (auto m: package->children) {
+        if (m.second->type == UnitType::PACKAGE) {
+            analyze_all_modules((Package*) m.second);
+        } else {
+            Module* module = (Module*) m.second;
+            std::cout << "Analyzing module " << module->name << std::endl;
+            module->imported_paths["print"] = "core.print";
+            module->imported_paths["Integer"] = "core.Integer";
+            module->imported_paths["String"] = "core.String";
+            Checker checker(module->imported_paths, module->local_paths, global_classes, global_functions);
+            checker.global_packages = &global_packages;
+            checker.global_modules = &global_modules;
+            checker.__file__ = module->path;
+            checker.code_lines = module->code_lines;
+            checker.visit(*module->ast);
+            if (checker.failed) {
+                throw std::runtime_error("ERROR");
+            }
+            std::cout << "- Done" << std::endl;
+        }
+    }
+}
+
+static Package* root_package;
+
+
+void transpile_all_modules(Package* package) {
+    // std::cout << "Transpiling package " << package->name << std::endl;
+    // for (auto m: package->children) {
+    //     if (m.second->type == UnitType::PACKAGE) {
+    //         transpile_all_modules((Package*) m.second);
+    //     } else {
+    //         Module* module = (Module*) m.second;
+    //         Transpiler t;
+    //         t.visit_block(*module->ast);
+    //         std::cout << "Analyzing module " << module->name << std::endl;
+    //         module->imported_paths["print"] = "core.print";
+    //         module->imported_paths["Integer"] = "core.Integer";
+    //         module->imported_paths["String"] = "core.String";
+    //         Checker checker(module->imported_paths, module->local_paths, global_classes, global_functions);
+    //         checker.global_packages = &global_packages;
+    //         checker.global_modules = &global_modules;
+    //         checker.__file__ = module->path;
+    //         checker.code_lines = module->code_lines;
+    //         checker.visit(*module->ast);
+    //         if (checker.failed) {
+    //             throw std::runtime_error("ERROR");
+    //         }
+    //         std::cout << "- Done" << std::endl;
+    //     }
+    // }
+}
+
+
 int main(int argc, char* argv[]) {
     if (argc < 3) {
         std::cout << style(RED, "Error: expected 2 args: source_dir output_dir") << std::endl;
@@ -245,6 +326,10 @@ int main(int argc, char* argv[]) {
     std::string output_dir = argv[2];
     std::string __main_file__ = path_join(project_dir, u_basename(project_dir) + ".xl");
     std::cout << style(BLUE, "Main file: ") << style(MAGENTA, __main_file__) << std::endl;
+    root_package = new Package("", project_dir);
+    build_packages(root_package, 0);
+    parse_all_modules(root_package);
+    process_global_all_modules(root_package);
 
     function_builtins["map"] = "fun(List[a],fun(a)->b)->List[b]";
     function_builtins["print"] = "fun(String)";
@@ -266,33 +351,33 @@ int main(int argc, char* argv[]) {
 
 
     for (auto fb: function_builtins) {
-        std::string mangled_name = mangle_function_name("core", fb.first);
-        builtins[fb.first] = mangled_name;
-        global_functions->add(mangled_name, parse_function_type(fb.second));
+        global_functions->add("core." + fb.first, parse_function_type(fb.second));
     }
 
-    global_classes->set(mangle_class_name("core", "Float"), make_float_class_info());
-    global_classes->set(mangle_class_name("core", "Double"), make_double_class_info());
-    global_classes->set(mangle_class_name("core", "File"), make_file_class_info());
-    global_classes->set(mangle_class_name("core", "Integer"), make_int_class_info());
-    global_classes->set(mangle_class_name("core", "List"), make_list_class_info());
-    global_classes->set(mangle_class_name("core", "Boolean"), make_boolean_class_info());
-    global_classes->set(mangle_class_name("core", "String"), make_string_class_info());
+    global_classes->set("core.Float", make_float_class_info());
+    global_classes->set("core.Double", make_double_class_info());
+    global_classes->set("core.File", make_file_class_info());
+    global_classes->set("core.Integer", make_int_class_info());
+    global_classes->set("core.List", make_list_class_info());
+    global_classes->set("core.Boolean", make_boolean_class_info());
+    global_classes->set("core.String", make_string_class_info());
 
     for (auto cb: class_builtins) {
-        for (auto m: cb.second) {
-            std::string mangled_name = mangle_method_name("core", cb.first, m.first);
-            builtins[cb.first + "." + m.first] = mangled_name;
-            global_functions->add(mangled_name, parse_function_type(m.second));
-        }
+        // for (auto m: cb.second) {
+        // global_functions->add("core." + cb.first, parse_function_type(m.second));
+        // }
     }
 
-    full_compile(true, __main_file__, output_dir);
+    analyze_all_modules(root_package);
+    transpile_all_modules(root_package);
 
-    for (auto ct: module_exported_classes) {
-        delete ct.second;
-    }
-    for (auto ft: module_exported_functions) {
-        delete ft.second;
-    }
+
+    // full_compile(true, __main_file__, output_dir);
+    //
+    // for (auto ct: module_exported_classes) {
+    //     delete ct.second;
+    // }
+    // for (auto ft: module_exported_functions) {
+    //     delete ft.second;
+    // }
 }

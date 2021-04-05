@@ -707,7 +707,7 @@ Node* Parser::parse_top_level_statement() {
             return this->parse_function_definition();
         case TokType::CLASS:
             return this->parse_class_definition();
-        case TokType::FROM:
+        case TokType::IMPORT:
             return this->parse_import();
         default:
             return this->parse_common_statement();
@@ -785,7 +785,7 @@ ClassNode* Parser::parse_class_definition() {
     std::unordered_map<std::string, FunctionNode*> methods;
     std::unordered_map<std::string, FunctionNode*> static_methods;
     MapStringType members;
-    std::map<std::string, std::pair<TypeNode*,Node*>> static_members;
+    std::map<std::string, std::pair<TypeNode*, Node*>> static_members;
     VectorOfStrings members_ordered;
     while (true) {
         bool is_static = false;
@@ -843,11 +843,12 @@ ClassNode* Parser::parse_class_definition() {
 
 ImportNode* Parser::parse_import() {
     Token import_tok = this->expect_token(TokType::IMPORT);
-    VectorOfStrings imports;
+    VectorOfStrings path;
+    Token path_part;
     while (true) {
-        Token import_tok = this->expect_token(TokType::ID);
-        imports.push_back(import_tok.str);
-        if (this->match(TokType::COMMA)) {
+        path_part = this->expect_token(TokType::ID);
+        path.push_back(path_part.str);
+        if (this->match(TokType::DOT)) {
             this->next();
             continue;
         } else {
@@ -856,7 +857,7 @@ ImportNode* Parser::parse_import() {
     }
     this->expect_token(TokType::SEMICOLON);
 
-    return nullptr;
+    return new ImportNode(path, import_tok.start, path_part.end_pos);
 }
 
 

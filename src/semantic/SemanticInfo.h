@@ -9,6 +9,7 @@
 #include <vector>
 #include "../nodes/TypeNode.h"
 #include "ClassInfo.h"
+#include "../units.h"
 
 class SemanticInfo {
     const TypeNode* _type;
@@ -31,6 +32,13 @@ public:
 
     const TypeNode& type();
     bool is_constant;
+    bool is_imported;
+    bool is_imported_package;
+    Package* imported_package;
+    bool is_module;
+    Module* module;
+    bool is_package;
+    Package* package;
 };
 
 class ErrorStub : public SemanticInfo {

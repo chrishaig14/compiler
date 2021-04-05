@@ -1,26 +1,5 @@
-from lib import first
-
-fun third()->Integer{
-    return 0
-}
-
-class Christian {
-    name: String
-}
-
-fun get_person_name(p: Person)->String{
-    return p.name
-}
-
-fun double(x: Integer) -> Integer {
-    return 2*x
-}
-
+import foo.baz.buzz.some_function
 fun main()->Integer {
-    var l = [4,5,6,7]
-    var r = map(l, double)
-    for x @ l {
-        print(x:str())
-    }
+    some_function()
     return 0
 }
