@@ -4,7 +4,7 @@
 
 #include "WhileNode.h"
 
-WhileNode::WhileNode(Node* condition, BlockNode* body, TextPosition start, TextPosition end) : Node(WHIL, start, end), body(body), condition(condition) {
+WhileNode::WhileNode(Node* condition, BlockNode* body, TextPosition start, TextPosition end) : Node(NodeType::WHIL, start, end), body(body), condition(condition) {
     assert(condition != nullptr);
     assert(body != nullptr);
 }

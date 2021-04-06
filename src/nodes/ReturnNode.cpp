@@ -4,7 +4,7 @@
 
 #include "ReturnNode.h"
 
-ReturnNode::ReturnNode(Node* expression, TextPosition start, TextPosition end) : Node(RETRN, start, end),
+ReturnNode::ReturnNode(Node* expression, TextPosition start, TextPosition end) : Node(NodeType::RETRN, start, end),
                                                                                  expression(expression) {
 }
 

@@ -62,6 +62,18 @@ std::string module_from_path(const std::string& path) {
     return s;
 }
 
+std::string mangle_path(std::string path) {
+    std::string out;
+    for (int i = 0; i < path.size(); i++) {
+        if (path[i] == '.') {
+            out += "_D_";
+        }else{
+            out += path[i];
+        }
+    }
+    return out;
+}
+
 
 VariableLocation::VariableLocation(int depth, int index) {
     this->depth = depth;

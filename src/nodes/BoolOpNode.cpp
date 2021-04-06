@@ -6,7 +6,7 @@
 
 
 BoolOpNode::BoolOpNode(BoolOp op, Node* left, Node* right, TextPosition start, TextPosition end)
-        :Node(BOOLOP, start, end), left(left), right(right), op(op) {
+        :Node(NodeType::BOOLOP, start, end), left(left), right(right), op(op) {
 }
 
 bool BoolOpNode::equal(const Node& x) const {

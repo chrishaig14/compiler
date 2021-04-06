@@ -12,7 +12,7 @@ const CastNode& CastNode::cast() const {
     return *this;
 }
 
-CastNode::CastNode(Node* exp, std::string as_type, TextPosition start, TextPosition end):Node(CAST, start, end) {
+CastNode::CastNode(Node* exp, std::string as_type, TextPosition start, TextPosition end):Node(NodeType::CAST, start, end) {
     this->exp = exp;
     this->as_type = as_type;
 }

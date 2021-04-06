@@ -16,7 +16,7 @@ public:
     const ImportNode& import() const override;
 
     ImportNode(const VectorOfStrings& path, TextPosition start, TextPosition end)
-            : Node(IMPORT, start, end) {
+            : Node(NodeType::IMPORT, start, end) {
         this->path = path;
     }
 

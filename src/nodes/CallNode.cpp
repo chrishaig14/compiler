@@ -4,7 +4,7 @@
 
 #include "CallNode.h"
 
-CallNode::CallNode(Node* function, const VectorOfNodes& arguments, TextPosition start, TextPosition end) : Node(CALL,
+CallNode::CallNode(Node* function, const VectorOfNodes& arguments, TextPosition start, TextPosition end) : Node(NodeType::CALL,
                                                                                                                 start,
                                                                                                                 end),
                                                                                                            function(

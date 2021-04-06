@@ -1,5 +1,4 @@
-import foo.baz.buzz.some_function
 fun main()->Integer {
-    some_function()
+    var z = 7 + 9
     return 0
 }

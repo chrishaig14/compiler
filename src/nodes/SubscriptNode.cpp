@@ -4,7 +4,7 @@
 
 #include "SubscriptNode.h"
 
-SubscriptNode::SubscriptNode(Node* parent, VectorOfNodes child, TextPosition start, TextPosition end) : Node(SUB,
+SubscriptNode::SubscriptNode(Node* parent, VectorOfNodes child, TextPosition start, TextPosition end) : Node(NodeType::SUB,
                                                                                                              start,
                                                                                                              end),
                                                                                                         parent(parent),

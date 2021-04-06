@@ -22,7 +22,7 @@ void compile(std::string text) {
     std::vector <std::pair<std::string, CodeBuiltin>> builtins;
     GlobalProcessor gp(builtins);
     gp.visit(*tree);
-    Checker checker(gp.globals, gp.class_table, gp.function_table);
-    checker.visit(*tree);
+    Checker checker(gp.globals, gp.global_classes, gp.global_functions);
+    checker.visit_block(*tree);
 }
 

@@ -163,11 +163,11 @@ Node* Parser::parse_assignment_or_expression() {
         TokType op = this->token.type;
         TextPosition op_pos = this->token.start;
         this->next();
-        if (lvalue->ntype != ID && item_in_vec(op, {TokType::PLUS_EQQ, TokType::MINUS_EQQ})) {
+        if (lvalue->ntype != NodeType::ID && item_in_vec(op, {TokType::PLUS_EQQ, TokType::MINUS_EQQ})) {
             throw std::runtime_error("Error += or -= can only be used on ids!");
         }
         Node* rvalue = this->parse_expression();
-        if (lvalue->ntype == ID) {
+        if (lvalue->ntype == NodeType::ID) {
             IdNode* id_node = new IdNode(lvalue->id()._id, lvalue->start, lvalue->end);
             if (op == TokType::PLUS_EQQ || op == TokType::MINUS_EQQ) {
                 OpType opt = OpType::ADD;
@@ -277,7 +277,7 @@ Node* Parser::parse_factor() {
     } else {
         parent = this->parse_id_or_literal();
     }
-    if (item_in_vec(parent->ntype, {TUPLE, NUMBER, NONE, BOOLEAN})) {
+    if (item_in_vec(parent->ntype, {NodeType::TUPLE, NodeType::NUMBER, NodeType::NONE, NodeType::BOOLEAN})) {
         if (item_in_vec(this->token.type, {TokType::LPAREN, TokType::LSQUARE})) {
             this->expect_token(TokType::RPAREN); // some random token
         }

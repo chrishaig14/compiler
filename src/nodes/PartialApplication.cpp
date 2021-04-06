@@ -28,12 +28,12 @@ bool PartialApplication::equal(const Node& other) const {
 }
 
 PartialApplication::PartialApplication(Node* function, VectorOfNodes args, TextPosition start, TextPosition end) : Node(
-        PARTIAL,
+        NodeType::PARTIAL,
         start,
         end) {
     this->function = function;
     this->args = args;
-    this->ntype = PARTIAL;
+    this->ntype = NodeType::PARTIAL;
 }
 
 PartialApplication& PartialApplication::partial() {

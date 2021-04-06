@@ -4,7 +4,7 @@
 
 #include "NumberNode.h"
 
-NumberNode::NumberNode(NumberType num_type, std::string str, TextPosition start, TextPosition end):Node(NUMBER, start, end) {
+NumberNode::NumberNode(NumberType num_type, std::string str, TextPosition start, TextPosition end):Node(NodeType::NUMBER, start, end) {
     this->num_type = num_type;
     this->str = str;
 }

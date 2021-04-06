@@ -4,7 +4,7 @@
 
 #include "ForNode.h"
 
-ForNode::ForNode(const std::string& var, Node* exp, BlockNode* body, TextPosition start, TextPosition end) :Node(FORLOOP, start, end), var(var), exp(exp), body(body) {
+ForNode::ForNode(const std::string& var, Node* exp, BlockNode* body, TextPosition start, TextPosition end) :Node(NodeType::FORLOOP, start, end), var(var), exp(exp), body(body) {
     assert(exp != nullptr);
     assert(body != nullptr);
 }

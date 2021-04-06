@@ -4,7 +4,7 @@
 
 #include "AssignmentNode.h"
 
-AssignmentNode::AssignmentNode(Node* lvalue, Node* rvalue, TextPosition start, TextPosition end) : Node(ASSIGN,
+AssignmentNode::AssignmentNode(Node* lvalue, Node* rvalue, TextPosition start, TextPosition end) : Node(NodeType::ASSIGN,
                                                                                                         start,
                                                                                                         end),
                                                                                                    lvalue(lvalue),

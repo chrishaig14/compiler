@@ -23,6 +23,6 @@ int main(int argc, char* argv[]) {
     GlobalProcessor gp(nullptr, nullptr, std::string(), std::map<std::string, std::string>());
     gp.visit(*ast);
     Checker checker(gp.globals, gp.global_classes);
-    checker.visit(*ast);
+    checker.visit_block(*ast);
     return 0;
 }

@@ -16,6 +16,7 @@
 #include "../macros.h"
 #include "../logging/logging.h"
 #include "../units.h"
+#include "../simple_nodes/BlockSNode.h"
 
 typedef std::unique_ptr<SemanticInfo> USemanticInfo;
 
@@ -85,12 +86,13 @@ public:
     USemanticInfo dispatch(Node* nod);
     USemanticInfo visit(AssignmentNode& n);
     USemanticInfo visit(BinopNode& node);
-    USemanticInfo visit(BlockNode& node);
+    USemanticInfo visit_block(BlockNode& node);
+    USemanticInfo visit_root(BlockNode& node);
     USemanticInfo visit(BooleanNode& node);
     USemanticInfo visit(BoolOpNode& n);
     USemanticInfo visit(BreakNode& node);
     USemanticInfo visit(MethodNode& node);
-    USemanticInfo visit(CallNode& node);
+    USemanticInfo visit_call(CallNode& n);
     USemanticInfo visit(ClassNode& node);
     USemanticInfo visit(ContinueNode& node);
     USemanticInfo visit(DeclarationNode& node);
@@ -108,7 +110,7 @@ public:
     USemanticInfo visit_import(ImportNode& node);
     USemanticInfo visit(NumberNode& node);
     USemanticInfo visit(PartialApplication& node);
-    USemanticInfo visit(ReturnNode& n);
+    USemanticInfo visit_return(ReturnNode& n);
     USemanticInfo visit(StringNode& node);
     USemanticInfo visit(SubscriptNode& node);
     USemanticInfo visit(TernaryNode& node);
@@ -181,6 +183,7 @@ public:
     std::map<std::string, ClassInfo*> imported_classes;
     std::map<std::string, Package*>* global_packages;
     std::map<std::string, Module*>* global_modules;
+    BlockSNode* root_snode;
 };
 
 bool function_is_generic(const FunctionType& ft);

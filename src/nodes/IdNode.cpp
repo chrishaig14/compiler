@@ -4,7 +4,7 @@
 
 #include "IdNode.h"
 
-IdNode::IdNode(std::string identifier, TextPosition start, TextPosition end) :Node(ID, start, end), _id(identifier) {
+IdNode::IdNode(std::string identifier, TextPosition start, TextPosition end) :Node(NodeType::ID, start, end), _id(identifier) {
     this->is_global_function = false;
 }
 

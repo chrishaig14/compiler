@@ -16,6 +16,6 @@ const NoneNode& NoneNode::none() const {
     return *this;
 }
 
-NoneNode::NoneNode(TextPosition start, TextPosition end):Node(NONE, start, end) {
+NoneNode::NoneNode(TextPosition start, TextPosition end):Node(NodeType::NONE, start, end) {
 }
 

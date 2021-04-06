@@ -45,6 +45,7 @@ ClassInfo* make_int_class_info() {
     auto int_class_info = new ClassInfo();
     int_class_info->class_name = "Integer";
     int_class_info->methods.insert(std::make_pair("str", parse_function_type("fun()->String")));
+    int_class_info->methods.insert(std::make_pair("add", parse_function_type("fun(Integer)->String")));
     return int_class_info;
 }
 
@@ -361,7 +362,7 @@ USemanticInfo Checker::dispatch(Node* nod) {
             return this->visit(n.boolop());
             break;
         case NodeType::BLOCK:
-            return this->visit(n.block());
+            return this->visit_block(n.block());
             break;
         case NodeType::BOOLEAN:
             return this->visit(n.boolean());
@@ -370,7 +371,7 @@ USemanticInfo Checker::dispatch(Node* nod) {
             return this->visit(n.brk());
             break;
         case NodeType::CALL:
-            return this->visit(n.call());
+            return this->visit_call(n.call());
             break;
         case NodeType::CLS:
             return this->visit(n.cls());
@@ -414,7 +415,7 @@ USemanticInfo Checker::dispatch(Node* nod) {
             return this->visit(n.number());
             break;
         case NodeType::RETRN:
-            return this->visit(n.retrn());
+            return this->visit_return(n.retrn());
             break;
         case NodeType::STRNG:
             return this->visit(n.strng());
@@ -431,13 +432,13 @@ USemanticInfo Checker::dispatch(Node* nod) {
         case NodeType::WHIL:
             return this->visit(n.whil());
             break;
-        case PARTIAL:
+        case NodeType::PARTIAL:
             return this->visit(n.partial());
             break;
-        case DICT:
+        case NodeType::DICT:
             return this->visit(n.dict());
             break;
-        case EMPTYDICT:
+        case NodeType::EMPTYDICT:
             return this->visit(n.emptydict());
             break;
         case NodeType::DEF_CONST:

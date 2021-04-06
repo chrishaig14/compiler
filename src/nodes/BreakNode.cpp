@@ -8,7 +8,7 @@ bool BreakNode::equal(const Node& other) const {
     return true;
 }
 
-BreakNode::BreakNode(TextPosition start, TextPosition end):Node(BRK, start, end){}
+BreakNode::BreakNode(TextPosition start, TextPosition end):Node(NodeType::BRK, start, end){}
 
 BreakNode& BreakNode::brk() {
     return *this;

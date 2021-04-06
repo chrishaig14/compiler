@@ -5,7 +5,7 @@
 #include "DeclarationNode.h"
 
 DeclarationNode::DeclarationNode(const std::string& identifier, TypeNode* type, Node* expression, TextPosition start,
-                                 TextPosition end) : Node(DECL, start, end), identifier(identifier), type(type),
+                                 TextPosition end) : Node(NodeType::DECL, start, end), identifier(identifier), type(type),
                                                      expression(expression) {
 }
 

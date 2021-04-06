@@ -20,8 +20,8 @@ void compile(std::string text) {
     std::vector <std::pair<std::string, CodeBuiltin>> builtins;
     GlobalProcessor gp(builtins);
     gp.visit(*tree);
-    Checker checker(gp.globals, gp.class_table, gp.function_table);
-    checker.visit(*tree);
+    Checker checker(gp.globals, gp.global_classes, gp.global_functions);
+    checker.visit_block(*tree);
 }
 
 void compile(std::string text) {
@@ -29,12 +29,15 @@ void compile(std::string text) {
     std::vector<std::pair<std::string, CodeBuiltin>> builtins;
     GlobalProcessor gp(builtins);
     gp.visit(*tree);
-    Checker checker(gp.globals, gp.class_table, gp.function_table);
-    checker.visit(*tree);
+    Checker checker(gp.globals, gp.global_classes, gp.global_functions);
+    checker.visit_block(*tree);
 }
 
 class global_test : public ::testing::Test {
 protected:
+    global_test() {
+    }
+
     BlockNode* tree;
     GlobalProcessor gp;
 
@@ -45,8 +48,8 @@ protected:
     void TearDown() override {
         delete tree;
         delete gp.globals;
-        delete gp.class_table;
-        delete gp.function_table;
+        delete gp.global_classes;
+        delete gp.global_functions;
     }
 };
 
@@ -55,27 +58,27 @@ TEST_F(global_test, test_class_declared_ok) {
     std::string text = "class Foo {x: Integer\ny:String\n}";
     SetUp(text);
     gp.visit(*tree);
-    EXPECT_TRUE(gp.class_table->declared("Foo"));
-    EXPECT_FALSE(gp.class_table->declared("Bar"));
+    EXPECT_TRUE(gp.global_classes->declared("Foo"));
+    EXPECT_FALSE(gp.global_classes->declared("Bar"));
 }
 
 TEST_F(global_test, test_class_info_members_ok) {
     std::string text = "class Foo {x: Integer\ny:String\n}";
     SetUp(text);
     gp.visit(*tree);
-    EXPECT_EQ(gp.class_table->get("Foo")->members.count("x"), 1);
-    EXPECT_EQ(gp.class_table->get("Foo")->members.count("y"), 1);
-    EXPECT_EQ(gp.class_table->get("Foo")->members.count("z"), 0);
-    EXPECT_EQ(*gp.class_table->get("Foo")->members["x"], T_INT);
-    EXPECT_EQ(*gp.class_table->get("Foo")->members["y"], T_STRING);
+    EXPECT_EQ(gp.global_classes->get("Foo")->members.count("x"), 1);
+    EXPECT_EQ(gp.global_classes->get("Foo")->members.count("y"), 1);
+    EXPECT_EQ(gp.global_classes->get("Foo")->members.count("z"), 0);
+    EXPECT_EQ(*gp.global_classes->get("Foo")->members["x"], T_INT);
+    EXPECT_EQ(*gp.global_classes->get("Foo")->members["y"], T_STRING);
 }
 
 TEST_F(global_test, test_class_info_methods_ok) {
     std::string text = "class Foo {x: Integer\ny:String\nfun foo()->Integer{return this.x\n}\n}";
     SetUp(text);
     gp.visit(*tree);
-    EXPECT_EQ(gp.class_table->get("Foo")->methods.count("foo"), 1);
-    EXPECT_EQ(*gp.class_table->get("Foo")->methods["foo"], FunctionType({}, new T_INT));
+    EXPECT_EQ(gp.global_classes->get("Foo")->methods.count("foo"), 1);
+    EXPECT_EQ(*gp.global_classes->get("Foo")->methods["foo"], FunctionType({}, new T_INT));
 }
 
 TEST_F(global_test, test_class_info_method_redeclared_error) {

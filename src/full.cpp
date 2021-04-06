@@ -11,24 +11,17 @@
 #include "logging/logging.h"
 #include "semantic/util.h"
 #include "units.h"
+#include "transpiler/STranspiler.h"
 
 static std::map<std::string, std::string> function_builtins;
 static std::map<std::string, std::map<std::string, std::string>> class_builtins;
-
-namespace Errors {
-    void module_not_found(std::string __file__, std::string imported_module_name) {
-        std::cout << style(RED, "Error in file ") << style(MAGENTA BOLD, __file__) << style(RED, ": ")
-                  << style(RED, "imported module ") << style(MAGENTA BOLD, "'" + imported_module_name + "'")
-                  << style(RED, " not found") << std::endl;
-    }
-
-    void
-    name_not_exported_by_module(std::string __file__, std::string imported_module_name, std::string imported_name) {
-        std::cout << style(RED, "Error in file ") << style(MAGENTA BOLD, __file__) << style(RED, ": ")
-                  << style(RED, "imported module ") << style(MAGENTA BOLD, "'" + imported_module_name + "'")
-                  << style(RED, " doesn't export name ") << style(MAGENTA BOLD, "'" + imported_name + "'") << std::endl;
-    }
-}
+static Package* root_package;
+static ClassTable* global_classes = new ClassTable();
+static FunctionTable* global_functions = new FunctionTable();
+static std::map<std::string, Package*> global_packages;
+static std::map<std::string, Module*> global_modules;
+static std::string static_initializations;
+static std::string static_cleanups;
 
 BlockNode* full_parse(const std::string& __file__, CodeLines* code_lines) {
     BlockNode* tree;
@@ -49,144 +42,6 @@ BlockNode* full_parse(const std::string& __file__, CodeLines* code_lines) {
     return tree;
 }
 
-static std::map<std::string, FunctionTable*> module_exported_functions;
-static std::map<std::string, ClassTable*> module_exported_classes;
-static std::set<std::string> compiled_modules;
-static std::map<std::string, std::string> builtins;
-ClassTable* global_classes = new ClassTable();
-FunctionTable* global_functions = new FunctionTable();
-
-static std::map<std::string, std::unique_ptr<std::map<std::string, std::string>>> module_maps;
-
-void full_compile(bool is_main, const std::string& __file__, const std::string& output_dir) {
-    std::string module_name = module_from_path(__file__);
-    std::cout << "COMPILING MODULE : " << module_name << std::endl;
-
-    CodeLines code_lines;
-    BlockNode* tree = full_parse(__file__, &code_lines);
-
-    std::map<std::string, std::set<std::string>> imported;
-    module_maps[module_name] = std::make_unique<std::map<std::string, std::string>>(std::map<std::string, std::string>());
-    auto& map = *module_maps[module_name];
-
-    for (auto builtin: builtins) {
-        map[builtin.first] = builtin.second;
-    }
-
-    for (auto builtin: builtins) {
-        map[builtin.first] = builtin.second;
-    }
-
-    for (auto cb: class_builtins) {
-        map[cb.first] = mangle_class_name("core", cb.first);
-    }
-
-    for (auto n: tree->nodes) {
-        if (n->ntype == IMPORT) {
-            for (auto imported_name: n->import().path) {
-                // imported[n->import().path.back()] = path_resolver(n->import().path);
-            }
-        }
-    }
-
-    for (auto n: imported) {
-        std::string imported_module_name = n.first;
-        if (compiled_modules.count(imported_module_name) == 0) {
-            std::string imported_module_path = path_join(u_dirname(__file__), imported_module_name + ".xl");
-            if (!file_exists(imported_module_path)) {
-                Errors::module_not_found(__file__, imported_module_name);
-                exit(1);
-            }
-            full_compile(false, imported_module_path, output_dir);
-        }
-    }
-
-
-    std::string includes = "#include \"runtime/core/core.h\"\n";
-
-    // std::cout << "STARTING!" << std::endl;
-
-    for (auto q: imported) {
-        std::string imported_module_name = q.first;
-        std::set<std::string> imported_names = q.second;
-        for (auto imported_name: imported_names) {
-            // std::cout << "HERE setting" << std::endl;
-            if (module_maps[imported_module_name]->find(imported_name) == module_maps[imported_module_name]->end()) {
-                Errors::name_not_exported_by_module(__file__, imported_module_name, imported_name);
-                exit(1);
-            } else {
-                std::string actual_name = (*module_maps[imported_module_name])[imported_name];
-                if (global_classes->declared(actual_name)) {
-                    // add all methods as well!
-                    ClassInfo* ci = global_classes->get(actual_name);
-                    for (auto m: ci->methods) {
-                        map[imported_name + "." + m.first] = (*module_maps[imported_module_name])[imported_name + "." +
-                                                                                                  m.first];
-                    }
-                }
-                map[imported_name] = actual_name;
-            }
-        }
-        includes += "#include \"" + imported_module_name + ".h\"\n";
-    }
-    std::map<std::string, std::string> foo;
-    try {
-        GlobalProcessor gp(global_classes, global_functions, module_name, foo);
-        gp.__file__ = __file__;
-        gp.visit(*tree);
-        // Checker checker(map, global_classes, global_functions);
-        // checker.__file__ = __file__;
-        // checker.code_lines = code_lines;
-        // checker.visit(*tree);
-        // if (checker.failed) {
-        //     throw std::runtime_error("ERROR");
-        // }
-    } catch (const std::runtime_error& e) {
-        std::cerr << "THERE WAS A SEMANTIC ERROR: " << e.what() << std::endl;
-        exit(1);
-    }
-    std::string source;
-    std::string header;
-    Transpiler t(map, module_name, includes);
-    try {
-        t.transpile(tree);
-        source = t.m_source;
-        header = t.m_header;
-        // output += t.globals_initialization;
-        // output += code;
-    } catch (...) {
-        std::cerr << "THERE WAS ATRANPILE ERROR" << std::endl;
-        exit(2);
-    }
-    if (is_main) {
-        source += "\nint main(){\n";
-        source += t.static_initializations;
-        source += "auto x = GET_INT(CALL0(" + map["main"] + "));\n";
-        source += t.static_cleanups;
-        source += "return x;\n}";
-    }
-    std::string output_h_path = path_join(output_dir, module_name + ".h");
-
-    // delete tree;
-
-    // header = includes + header;
-
-    std::string output_cpp_path = path_join(output_dir, module_name + ".cpp");
-    // std::cout << "Outputting " << output_cpp_path << std::endl;
-    std::ofstream output_cpp_file(output_cpp_path);
-    // std::cout << "OUTPUT: " << source;
-    output_cpp_file << source;
-
-    // std::cout << "Outputting " << output_h_path << std::endl;
-    std::ofstream output_h_file(output_h_path);
-    // std::cout << "OUTPUT: " << header;
-    output_h_file << header;
-    std::cout << "DONE COMPILING MODULE : " << module_name << std::endl;
-    compiled_modules.insert(module_name);
-}
-
-static std::map<std::string, Package*> global_packages;
-static std::map<std::string, Module*> global_modules;
 
 void build_packages(Package* package, int level) {
     DIR* dir = opendir(package->path.c_str());
@@ -271,13 +126,15 @@ void analyze_all_modules(Package* package) {
             std::cout << "Analyzing module " << module->name << std::endl;
             module->imported_paths["print"] = "core.print";
             module->imported_paths["Integer"] = "core.Integer";
+            module->imported_paths["Integer.add"] = "core.Integer.add";
             module->imported_paths["String"] = "core.String";
             Checker checker(module->imported_paths, module->local_paths, global_classes, global_functions);
             checker.global_packages = &global_packages;
             checker.global_modules = &global_modules;
             checker.__file__ = module->path;
             checker.code_lines = module->code_lines;
-            checker.visit(*module->ast);
+            checker.visit_root(*module->ast);
+            module->sast = checker.root_snode;
             if (checker.failed) {
                 throw std::runtime_error("ERROR");
             }
@@ -286,34 +143,45 @@ void analyze_all_modules(Package* package) {
     }
 }
 
-static Package* root_package;
 
+void transpile_all_modules(Package* package, std::string output_dir) {
+    std::cout << "Transpiling package " << package->name << std::endl;
+    for (auto m: package->children) {
+        if (m.second->type == UnitType::PACKAGE) {
+            transpile_all_modules((Package*) m.second, output_dir);
+        } else {
+            Module* module = (Module*) m.second;
+            STranspiler t;
+            t.transpile_program(module->sast);
+            std::cout << "Source output: " << std::endl;
+            std::cout << t.source << std::endl;
+            std::cout << "Header output: " << std::endl;
+            std::cout << t.header << std::endl;
+            std::cout << "- Done" << std::endl;
 
-void transpile_all_modules(Package* package) {
-    // std::cout << "Transpiling package " << package->name << std::endl;
-    // for (auto m: package->children) {
-    //     if (m.second->type == UnitType::PACKAGE) {
-    //         transpile_all_modules((Package*) m.second);
-    //     } else {
-    //         Module* module = (Module*) m.second;
-    //         Transpiler t;
-    //         t.visit_block(*module->ast);
-    //         std::cout << "Analyzing module " << module->name << std::endl;
-    //         module->imported_paths["print"] = "core.print";
-    //         module->imported_paths["Integer"] = "core.Integer";
-    //         module->imported_paths["String"] = "core.String";
-    //         Checker checker(module->imported_paths, module->local_paths, global_classes, global_functions);
-    //         checker.global_packages = &global_packages;
-    //         checker.global_modules = &global_modules;
-    //         checker.__file__ = module->path;
-    //         checker.code_lines = module->code_lines;
-    //         checker.visit(*module->ast);
-    //         if (checker.failed) {
-    //             throw std::runtime_error("ERROR");
-    //         }
-    //         std::cout << "- Done" << std::endl;
-    //     }
-    // }
+            static_initializations += t.static_initializations;
+            static_cleanups += t.static_cleanups;
+
+            std::string module_name = module->name;
+
+            if (module->local_paths.count("main") != 0) {
+                t.source += "\nint main(){\n";
+                t.source += static_initializations;
+                t.source += "auto x = GET_INT(CALL0(" + mangle_path(module->local_paths["main"]) + "));\n";
+                t.source += static_cleanups;
+                t.source += "return x;\n}";
+            }
+            std::string output_cpp_path = path_join(output_dir, module_name + ".cpp");
+            std::ofstream output_cpp_file(output_cpp_path);
+            output_cpp_file << "#include \"" << module_name << ".h\"\n";
+            output_cpp_file << t.source;
+
+            std::string output_h_path = path_join(output_dir, module_name + ".h");
+            std::ofstream output_h_file(output_h_path);
+            output_h_file << "#include <core/core.h>\n";
+            output_h_file << t.header;
+        }
+    }
 }
 
 
@@ -340,6 +208,7 @@ int main(int argc, char* argv[]) {
 
     class_builtins["File"]["read_line"] = "fun()->String";
     class_builtins["Integer"]["str"] = "fun(Integer)->String";
+    class_builtins["Integer"]["add"] = "fun(Integer, Integer)->Integer";
     class_builtins["Float"]["str"] = "fun(Float)->String";
     class_builtins["Double"]["str"] = "fun(Double)->String";
     class_builtins["List"]["len"] = "fun(List[a])->Integer";
@@ -363,21 +232,8 @@ int main(int argc, char* argv[]) {
     global_classes->set("core.String", make_string_class_info());
 
     for (auto cb: class_builtins) {
-        // for (auto m: cb.second) {
-        // global_functions->add("core." + cb.first, parse_function_type(m.second));
-        // }
     }
 
     analyze_all_modules(root_package);
-    transpile_all_modules(root_package);
-
-
-    // full_compile(true, __main_file__, output_dir);
-    //
-    // for (auto ct: module_exported_classes) {
-    //     delete ct.second;
-    // }
-    // for (auto ft: module_exported_functions) {
-    //     delete ft.second;
-    // }
+    transpile_all_modules(root_package, output_dir + "/application");
 }

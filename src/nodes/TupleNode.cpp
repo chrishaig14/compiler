@@ -17,8 +17,8 @@ bool TupleNode::equal(const Node& n) const {
     return true;
 }
 
-TupleNode::TupleNode(const VectorOfNodes& values, TextPosition start, TextPosition end):Node(TUPLE, start, end) {
-    this->ntype = TUPLE;
+TupleNode::TupleNode(const VectorOfNodes& values, TextPosition start, TextPosition end):Node(NodeType::TUPLE, start, end) {
+    this->ntype = NodeType::TUPLE;
     this->values = values;
 }
 

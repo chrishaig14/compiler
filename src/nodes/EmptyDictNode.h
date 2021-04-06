@@ -11,7 +11,7 @@
 
 class EmptyDictNode : public Node {
 public:
-    EmptyDictNode(TypeNode* key_type, TypeNode* value_type, TextPosition start, TextPosition end):Node(EMPTYDICT, start, end) {
+    EmptyDictNode(TypeNode* key_type, TypeNode* value_type, TextPosition start, TextPosition end):Node(NodeType::EMPTYDICT, start, end) {
         this->key_type = key_type;
         this->value_type = value_type;
     }

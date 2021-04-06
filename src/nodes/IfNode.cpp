@@ -31,7 +31,7 @@ bool IfNode::equal(const Node& x) const {
 }
 
 IfNode::IfNode(Node* condition, BlockNode* then,
-               std::vector<std::pair<Node*, BlockNode*>> elifs, BlockNode* selse, TextPosition start, TextPosition end) : Node(IFF, start, end),condition(condition),
+               std::vector<std::pair<Node*, BlockNode*>> elifs, BlockNode* selse, TextPosition start, TextPosition end) : Node(NodeType::IFF, start, end),condition(condition),
                                                                                     then(then), selse(selse),
                                                                                     elifs(elifs) {
     assert(condition != nullptr);

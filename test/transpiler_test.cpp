@@ -32,8 +32,8 @@ protected:
         try {
             GlobalProcessor gp(builtins);
             gp.visit(*tree);
-            Checker checker(gp.globals, gp.class_table, gp.function_table);
-            checker.visit(*tree);
+            Checker checker(gp.globals, gp.global_classes, gp.global_functions);
+            checker.visit_block(*tree);
         } catch (const std::runtime_error& e) {
             std::cerr << "THERE WAS A SEMANTIC ERROR: " << e.what() << std::endl;
             exit(1);

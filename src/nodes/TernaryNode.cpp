@@ -11,7 +11,7 @@ bool TernaryNode::equal(const Node& x) const {
            *this->false_case == *other.false_case;
 }
 
-TernaryNode::TernaryNode(Node* expression, Node* trueCase, Node* falseCase, TextPosition start, TextPosition end) : Node(TERNARY, start, end ), expression(
+TernaryNode::TernaryNode(Node* expression, Node* trueCase, Node* falseCase, TextPosition start, TextPosition end) : Node(NodeType::TERNARY, start, end ), expression(
         expression),
                                                                               true_case(
                                                                                       trueCase),

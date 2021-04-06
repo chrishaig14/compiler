@@ -6,6 +6,7 @@
 #define XLANG_UNITS_H
 #include "nodes/BlockNode.h"
 #include "scanner/CodeLines.h"
+#include "simple_nodes/BlockSNode.h"
 
 enum class UnitType {
     PACKAGE, MODULE
@@ -37,6 +38,7 @@ public:
     std::string dotted_path;
     CodeLines code_lines;
     std::map<std::string, std::string> local_paths;
+    BlockSNode* sast;
 };
 
 #endif //XLANG_UNITS_H

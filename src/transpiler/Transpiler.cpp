@@ -24,10 +24,10 @@ inline std::string get_class_name(const std::string& c) {
 std::string Transpiler::visit_assignment(AssignmentNode& node) {
     this->is_lvalue = true;
     std::string out;
-    if (node.lvalue->ntype == SUB) {
+    if (node.lvalue->ntype == NodeType::SUB) {
         out += "set_subscript(" + this->dispatch(node.lvalue->sub().parent) + ", " +
                this->dispatch(node.lvalue->sub().child[0]) + ", " + this->dispatch(node.rvalue) + ")";
-    } else if (node.lvalue->ntype == MEMBER) {
+    } else if (node.lvalue->ntype == NodeType::MEMBER) {
         this->is_lvalue = false;
         MemberNode& memberNode = node.lvalue->member();
         if (memberNode.is_class_static_member) {
@@ -86,11 +86,11 @@ std::string Transpiler::visit_block(BlockNode& node) {
     std::string out;
     for (auto n: node.nodes) {
         out += this->dispatch(n);
-        if (n->ntype != FUNC && n->ntype != WHIL && n->ntype != IFF && n->ntype != CLS) {
+        if (n->ntype != NodeType::FUNC && n->ntype != NodeType::WHIL && n->ntype != NodeType::IFF && n->ntype != NodeType::CLS) {
             out += ";\n";
         }
     }
-    if (node.nodes.back()->ntype != RETRN) {
+    if (node.nodes.back()->ntype != NodeType::RETRN) {
         for (auto v: node.local_vars) {
             if (v.first == "this") {
                 continue;
@@ -383,7 +383,7 @@ std::string Transpiler::visit_declaration(DeclarationNode& node) {
             node.identifier[i] = '_';
         }
     }
-    if (node.expression->ntype == TERNARY) {
+    if (node.expression->ntype == NodeType::TERNARY) {
         out += "it = " + this->dispatch(node.expression->ternary().expression) + ";\n";
     }
     std::string var_type = this->type_mapper(*node.type);
@@ -562,7 +562,7 @@ std::string Transpiler::visit_list(ListNode& node) {
     out = "LIST(";
     for (int i = 0; i < node.elements.size(); i++) {
         std::string w = this->dispatch(node.elements[i]);
-        if (node.elements[i]->ntype != ID) {
+        if (node.elements[i]->ntype != NodeType::ID) {
         }
         out += w + ", ";
     }
@@ -742,17 +742,17 @@ std::string Transpiler::dispatch(Node* nptr) {
             throw std::runtime_error("Don't know what to do!");
         case NodeType::WHIL:
             return this->visit_while(n.whil());
-        case TUPLE:
+        case NodeType::TUPLE:
             return this->visit_tuple(n.tuple());
-        case PARTIAL:
+        case NodeType::PARTIAL:
             return this->visit_partial(n.partial());
-        case IMPORT:
+        case NodeType::IMPORT:
             return "";
             break;
-        case DICT:
+        case NodeType::DICT:
             return this->visit_dict(n.dict());
             break;
-        case EMPTYDICT:
+        case NodeType::EMPTYDICT:
             break;
         case NodeType::DEF_CONST:
             return this->visit_default_constructor(n.defconst());

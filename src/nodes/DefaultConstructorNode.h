@@ -10,7 +10,7 @@
 
 class DefaultConstructorNode : public Node {
 public:
-    DefaultConstructorNode(std::string name, TextPosition start, TextPosition end) : Node(DEF_CONST, start, end) {
+    DefaultConstructorNode(std::string name, TextPosition start, TextPosition end) : Node(NodeType::DEF_CONST, start, end) {
         this->name = name;
     }
 

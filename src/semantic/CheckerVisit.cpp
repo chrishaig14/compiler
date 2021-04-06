@@ -5,6 +5,15 @@
 #include "Checker.h"
 #include "util.h"
 #include "../logger/Logger.h"
+#include "../simple_nodes/BlockSNode.h"
+#include "../simple_nodes/AssignmentSNode.h"
+#include "../simple_nodes/ReturnSNode.h"
+#include "../simple_nodes/IntegerSNode.h"
+#include "../simple_nodes/FunctionSNode.h"
+#include "../simple_nodes/DeclarationSNode.h"
+#include "../simple_nodes/IdSNode.h"
+#include "../simple_nodes/CallSNode.h"
+#include "../simple_nodes/StringSNode.h"
 
 #define T_NONE ObjectType(".None")
 static TextPosition POS_NONE = {-1, -1};
@@ -46,7 +55,7 @@ USemanticInfo Checker::visit(WhileNode& node) {
     }
     this->enter_scope("while");
     this->scope->is_loop = true;
-    this->visit(*node.body);
+    this->visit_block(*node.body);
     this->scope->is_loop = false;
     for (auto v: this->scope->table) {
         node.body->local_vars.push_back(std::make_pair(v.first, v.second->clone()));
@@ -58,15 +67,21 @@ USemanticInfo Checker::visit(WhileNode& node) {
 USemanticInfo Checker::visit(NumberNode& node) {
     SemanticInfo info;
     switch (node.num_type) {
-        case NumberType::INTEGER:
+        case NumberType::INTEGER: {
             info.set_type(T_INT);
+            IntegerSNode* sn = new IntegerSNode();
+            info.snode = sn;
+            sn->str = node.str;
             break;
-        case NumberType::FLOAT:
+        }
+        case NumberType::FLOAT: {
             info.set_type(T_FLOAT);
             break;
-        case NumberType::DOUBLE:
+        }
+        case NumberType::DOUBLE: {
             info.set_type(T_DOUBLE);
             break;
+        }
     }
     info.is_constant = true;
     return std::make_unique<SemanticInfo>(info);
@@ -76,6 +91,9 @@ USemanticInfo Checker::visit(StringNode& node) {
     SemanticInfo info;
     info.set_type(T_STRING);
     info.is_constant = true;
+    StringSNode* sn = new StringSNode();
+    sn->s = node.str;
+    info.snode = sn;
     return std::make_unique<SemanticInfo>(info);
 }
 
@@ -406,12 +424,12 @@ USemanticInfo Checker::visit(ForNode& node) {
     TypeNode& var_type = *obj.type_params[0];
     BlockNode* bn = new BlockNode({new DeclarationNode("_index0", new T_INT, new NumberNode(NumberType::INTEGER, "0")),
                                    new DeclarationNode("_list0", obj.clone(), node.exp),}, POS_NONE, POS_NONE);
-    this->visit(*bn);
+    this->visit_block(*bn);
     this->enter_scope("for");
     this->scope->set(node.var, var_type);
 
     this->scope->is_loop = true;
-    this->visit(*node.body);
+    this->visit_block(*node.body);
     this->scope->is_loop = false;
     this->dispatch(new_body->nodes[0]->decl().expression);
     this->dispatch(new_body->nodes[new_body->nodes.size() - 1]->assign().rvalue);
@@ -448,18 +466,21 @@ USemanticInfo Checker::visit(MethodNode& n) {
     return std::make_unique<SemanticInfo>(info);
 }
 
-USemanticInfo Checker::visit(CallNode& n) {
+USemanticInfo Checker::visit_call(CallNode& n) {
+    SemanticInfo retv;
+    CallSNode* sn = new CallSNode();
+    retv.snode = sn;
     Logger::info("Checking CallNode");
     USemanticInfo fun_info_p = this->dispatch(n.function);
-    bool is_def_const = n.function->ntype == DEF_CONST;
+    bool is_def_const = n.function->ntype == NodeType::DEF_CONST;
     bool args_are_constant = true;
     if (fun_info_p->is_error) {
         return error_stub();
     }
     SemanticInfo& fun_info = *fun_info_p;
+    sn->function = fun_info.snode;
     bool is_a_method = false;
     Node* object_node;
-    SemanticInfo retv;
     if (fun_info.is_method) {
         // Since it's a method, we have to transform it and prepare it for the translation step,
         // where instead of calling object.method(args), we call <class>.method(object, args)
@@ -508,6 +529,7 @@ USemanticInfo Checker::visit(CallNode& n) {
         VectorOfTypes arg_types;
         for (auto& arg: n.arguments) {
             USemanticInfo arg_type_p = this->dispatch(arg);
+            sn->arguments.push_back(arg_type_p->snode);
             const TypeNode& arg_type = arg_type_p->type();
             if (!arg_type_p->is_constant) {
                 args_are_constant = false;
@@ -552,12 +574,26 @@ USemanticInfo Checker::visit(CallNode& n) {
     return std::make_unique<SemanticInfo>(retv);
 }
 
-USemanticInfo Checker::visit(BlockNode& program) {
+USemanticInfo Checker::visit_root(BlockNode& node) {
+    USemanticInfo info = this->visit_block(node);
+    this->root_snode = static_cast<BlockSNode*>(info->snode);
+    SemanticInfo f;
+    return std::make_unique<SemanticInfo>(f);
+}
+
+
+USemanticInfo Checker::visit_block(BlockNode& node) {
+    SemanticInfo info;
+    BlockSNode* sn = new BlockSNode();
+    info.snode = sn;
     VectorOfNodes vn;
-    for (auto& n: program.nodes) {
+    for (auto& n: node.nodes) {
         USemanticInfo sinfo_p = this->dispatch(n);
+
+        sn->nodes.push_back(sinfo_p->snode);
+
         n = this->replace_if_necessary(n);
-        if (n->ntype == BLOCK) {
+        if (n->ntype == NodeType::BLOCK) {
             for (auto node: n->block().nodes) {
                 vn.push_back(node);
             }
@@ -573,19 +609,25 @@ USemanticInfo Checker::visit(BlockNode& program) {
             }
         }
     }
-    program.nodes = vn;
-    return nullptr;
+    node.nodes = vn;
+    return std::make_unique<SemanticInfo>(info);
 }
 
 USemanticInfo Checker::visit_function(FunctionNode& n) {
+    SemanticInfo info;
+    FunctionSNode* sn = new FunctionSNode();
+    info.snode = sn;
     Logger::info("Checking FunctionNode " + n.identifier);
     std::string& function_name = n.identifier;
+    sn->identifier = mangle_path(this->local_paths[n.identifier]);
+    sn->params = n.parameter_names;
     this->current_function = function_name;
     this->enter_scope(function_name);
     this->scope->is_function = true;
     bool is_init_method = this->is_method && function_name == "init";
     if (this->add_this) {
         this->scope->set("this", *this->this_type);
+        sn->params.insert(sn->params.begin(), "this");
     }
     for (int i = 0; i < n.parameter_names.size(); i++) {
         TypeNode& type = *n.parameter_types[i];
@@ -601,17 +643,18 @@ USemanticInfo Checker::visit_function(FunctionNode& n) {
     TypeNode& returnType = *n.return_type;
     this->assert_type_exists(returnType, n.start);
     this->scope->set("__return__", returnType);
-    this->visit(*n.body);
+    USemanticInfo body_info = this->visit_block(*n.body);
+    sn->body = static_cast<BlockSNode*>(body_info->snode);
     for (auto v: this->scope->table) {
         n.body->local_vars.push_back(std::make_pair(v.first, v.second->clone()));
     }
     if (is_init_method) {
         for (int i = 0; i < n.body->nodes.size(); i++) {
-            if (n.body->nodes[i]->ntype == ASSIGN) {
+            if (n.body->nodes[i]->ntype == NodeType::ASSIGN) {
                 AssignmentNode& nod = n.body->nodes[i]->assign();
-                if (nod.lvalue->ntype == MEMBER) {
+                if (nod.lvalue->ntype == NodeType::MEMBER) {
                     MemberNode& mem = nod.lvalue->member();
-                    if (mem.parent->ntype == ID) {
+                    if (mem.parent->ntype == NodeType::ID) {
                         if (mem.parent->id()._id == "this") {
                             inits[mem.s_child] = true;
                         }
@@ -645,16 +688,19 @@ USemanticInfo Checker::visit_function(FunctionNode& n) {
         }
     }
     this->leave_scope();
-    return nullptr;
+    return std::make_unique<SemanticInfo>(info);
 }
 
 USemanticInfo Checker::visit_id(IdNode& n) {
     Logger::info("Checking id node " + n._id);
     SemanticInfo info;
+    IdSNode* sn = new IdSNode();
+    info.snode = sn;
     if (!this->scope->has(n._id)) {
         // might be imported
         if (this->imported_paths.count(n._id) != 0) {
             std::string path = this->imported_paths[n._id];
+            sn->identifier = mangle_path(path);
             Logger::info("ID '" + n._id + "' is imported, path: '" + path + "'");
             if (this->function_table->has_function(path)) {
                 const FunctionType& ft = this->function_table->get(path);
@@ -670,11 +716,20 @@ USemanticInfo Checker::visit_id(IdNode& n) {
                 info.is_module = true;
                 info.module = this->global_modules->at(path);
             }
+        } else if (this->local_paths.count(n._id) != 0) {
+            std::string path = this->local_paths[n._id];
+            if (this->function_table->has_function(path)) {
+                const FunctionType& ft = this->function_table->get(path);
+                info.set_type(ft);
+                info.is_function = true;
+                Logger::info("ID is an function of type " + ft.to_string());
+            }
         } else {
             this->error_variable_not_declared(n._id, n.start);
             return error_stub();
         }
     } else {
+        sn->identifier = n._id;
         info.set_type(this->scope->get(n._id));
         if (info.type().kind == Kind::UNKNOWN) {
             info.is_error = true;
@@ -701,11 +756,16 @@ USemanticInfo Checker::visit_id(IdNode& n) {
 
 USemanticInfo Checker::check_declaration_with_type(DeclarationNode& n) {
     SemanticInfo info;
+    DeclarationSNode* sn = new DeclarationSNode();
+    info.snode = sn;
+    sn->identifier = n.identifier;
+
     TypeNode& n_type = *n.type;
     if (!this->assert_type_exists(n_type, n.start)) {
         return error_stub();
     }
     USemanticInfo exp_info_p = this->dispatch(n.expression);
+    sn->expression = exp_info_p->snode;
     SemanticInfo& exp_info = *exp_info_p;
     if (exp_info.is_error) {
         this->scope->set(n.identifier, n_type);
@@ -752,6 +812,10 @@ USemanticInfo Checker::check_declaration_with_type(DeclarationNode& n) {
 USemanticInfo Checker::check_declaration_without_type(DeclarationNode& n) {
     USemanticInfo exp_info_p = this->dispatch(n.expression);
     SemanticInfo info;
+    DeclarationSNode* sn = new DeclarationSNode();
+    info.snode = sn;
+    sn->identifier = n.identifier;
+    sn->expression = exp_info_p->snode;
     if (exp_info_p->type() == T_NONE) {
         this->error_function_doesnt_return_a_value(n.expression->start, nullptr);
         USemanticInfo error_t = error_stub();
@@ -782,11 +846,16 @@ USemanticInfo Checker::visit(DeclarationNode& n) {
 }
 
 USemanticInfo Checker::visit(AssignmentNode& n) {
+
+    SemanticInfo info;
+    AssignmentSNode* sn = new AssignmentSNode();
+    info.snode = sn;
     Logger::info("Checking assignment node");
     if (n.lvalue->ntype == NodeType::ID) {
         if (n.lvalue->id()._id == "_") {
-            this->dispatch(n.rvalue);
-            return nullptr;
+            USemanticInfo rv = this->dispatch(n.rvalue);
+            info.snode = rv->snode;
+            return std::make_unique<SemanticInfo>(info);
         }
     }
     this->is_lvalue = true;
@@ -795,11 +864,11 @@ USemanticInfo Checker::visit(AssignmentNode& n) {
         return nullptr;
     }
     this->is_lvalue = false;
-    if (n.lvalue->ntype == MEMBER && n.lvalue->member().type == MemberType::NUM) {
+    if (n.lvalue->ntype == NodeType::MEMBER && n.lvalue->member().type == MemberType::NUM) {
         this->error_tuple_assign(n.start);
     }
-    if (n.lvalue->ntype == MEMBER && (linfo_p->is_class_method || n.lvalue->member().is_class_member &&
-                                                                  !n.lvalue->member().is_class_static_member)) {
+    if (n.lvalue->ntype == NodeType::MEMBER && (linfo_p->is_class_method || n.lvalue->member().is_class_member &&
+                                                                            !n.lvalue->member().is_class_static_member)) {
         throw std::runtime_error("Can only assign to static members (not methods!)");
     }
     USemanticInfo expression_type_p = this->dispatch(n.rvalue);
@@ -839,7 +908,7 @@ USemanticInfo Checker::visit(AssignmentNode& n) {
     }
     // else, type matches don't do anything
     n.type = l_type.clone();
-    return nullptr;
+    return std::make_unique<SemanticInfo>(info);
 }
 
 USemanticInfo Checker::member_class_method(std::string class_name, std::string child, MemberNode& n) {
@@ -965,6 +1034,7 @@ USemanticInfo Checker::visit_member(MemberNode& n) {
             std::cout << "It has type: " << ft.to_string() << std::endl;
             info.set_type(ft);
             info.is_function = true;
+            n.replace_with_path = full_path->second;
             return std::make_unique<SemanticInfo>(info);
         } else {
             std::cout << "Could not find name " << n.s_child << " in module " << module->dotted_path << std::endl;
@@ -1056,7 +1126,7 @@ USemanticInfo Checker::visit(IfNode& n) {
     }
 
     this->enter_scope("if");
-    this->visit(*n.then);
+    this->visit_block(*n.then);
     for (auto v: this->scope->table) {
         n.then->local_vars.push_back(std::make_pair(v.first, v.second->clone()));
     }
@@ -1069,12 +1139,12 @@ USemanticInfo Checker::visit(IfNode& n) {
             this->error_condition(condition_info.type(), n.start, "elif");
         }
         this->enter_scope("elif");
-        this->visit(*n.elifs[i].second);
+        this->visit_block(*n.elifs[i].second);
         this->leave_scope();
     }
     if (n.selse != nullptr && !n.selse->nodes.empty()) {
         this->enter_scope("else");
-        this->visit(*n.selse);
+        this->visit_block(*n.selse);
         this->leave_scope();
     }
     return std::make_unique<SemanticInfo>(info);
@@ -1113,6 +1183,14 @@ USemanticInfo Checker::visit(BoolOpNode& n) {
 }
 
 USemanticInfo Checker::visit(BinopNode& n) {
+    
+    CallSNode* sn = new CallSNode();
+    IdSNode* function_id = new IdSNode();
+    sn->function = function_id;
+    function_id->identifier = mangle_path(this->imported_paths.at("Integer.add"));
+    SemanticInfo info;
+    info.snode = sn;
+
     Logger::info("Checking binop node");
     USemanticInfo left_info_p = this->dispatch(n.left);
     Node* left_replace = this->replace_if_necessary(n.left);
@@ -1138,11 +1216,13 @@ USemanticInfo Checker::visit(BinopNode& n) {
     SemanticInfo& left_info = *left_info_p;
     SemanticInfo& right_info = *right_info_p;
 
+    sn->arguments.push_back(left_info.snode);
+    sn->arguments.push_back(right_info.snode);
+
     if (left_info.is_error || right_info.is_error) {
         return error_stub();
     }
 
-    SemanticInfo info;
     if (left_info_p->is_constant && right_info_p->is_constant) {
         info.is_constant = true;
     }
@@ -1191,7 +1271,10 @@ USemanticInfo Checker::visit(BinopNode& n) {
     return std::make_unique<SemanticInfo>(info);
 }
 
-USemanticInfo Checker::visit(ReturnNode& n) {
+USemanticInfo Checker::visit_return(ReturnNode& n) {
+    SemanticInfo info;
+    ReturnSNode* sn = new ReturnSNode();
+    info.snode = sn;
     const TypeNode& return_type = this->scope->get("__return__");
     if (return_type == T_NONE) {
         if (n.expression != nullptr) {
@@ -1206,6 +1289,7 @@ USemanticInfo Checker::visit(ReturnNode& n) {
     if (expression_info.is_error) {
         return nullptr;
     }
+    sn->expression = expression_info.snode;
     n.expression = this->replace_if_necessary(n.expression);
     if (!this->can_assign(expression_info.type(), return_type)) {
         this->error_return_mismatch(return_type, expression_info.type(), n.start);
@@ -1213,7 +1297,7 @@ USemanticInfo Checker::visit(ReturnNode& n) {
     }
     n.ret_type = return_type.clone();
     n.reachables = this->scope->get_all();
-    return nullptr;
+    return std::make_unique<SemanticInfo>(info);
 }
 
 USemanticInfo Checker::visit(DictNode& node) {

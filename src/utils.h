@@ -19,6 +19,8 @@
 #include <sstream>
 #include <fstream>
 
+std::string mangle_path(std::string path);
+
 std::string mangle_function_name(std::string module_name, std::string name);
 
 std::string mangle_class_name(std::string module_name, std::string name);

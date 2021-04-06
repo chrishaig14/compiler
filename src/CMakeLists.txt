@@ -84,7 +84,7 @@ add_library(
         nodes/DictNode.cpp
         nodes/DictNode.h
         nodes/EmptyDictNode.cpp
-        nodes/EmptyDictNode.h nodes/CastNode.cpp nodes/CastNode.h nodes/MethodNode.cpp nodes/MethodNode.h logger/Logger.cpp logger/Logger.h nodes/DefaultConstructorNode.h nodes/DefaultConstructorNode.cpp nodes/DefaultConstructorNode.h)
+        nodes/EmptyDictNode.h nodes/CastNode.cpp nodes/CastNode.h nodes/MethodNode.cpp nodes/MethodNode.h logger/Logger.cpp logger/Logger.h nodes/DefaultConstructorNode.h nodes/DefaultConstructorNode.cpp nodes/DefaultConstructorNode.h simple_nodes/FunctionSNode.cpp simple_nodes/FunctionSNode.h simple_nodes/FunctionSNode.cpp simple_nodes/FunctionSNode.h simple_nodes/BlockSNode.cpp simple_nodes/BlockSNode.h simple_nodes/DeclarationSNode.cpp simple_nodes/DeclarationSNode.h simple_nodes/AssignmentSNode.cpp simple_nodes/AssignmentSNode.h simple_nodes/IdSNode.cpp simple_nodes/IdSNode.h simple_nodes/SNode.cpp simple_nodes/SNode.h simple_nodes/ReturnSNode.cpp simple_nodes/ReturnSNode.h simple_nodes/IntegerSNode.cpp simple_nodes/IntegerSNode.h simple_nodes/CallSNode.cpp simple_nodes/CallSNode.h simple_nodes/StringSNode.cpp simple_nodes/StringSNode.h)
 
 add_library(parser parser/Parser.cpp parser/Parser.h parser/ParserErrors.cpp)
 
@@ -111,4 +111,4 @@ add_library(
         semantic/CheckerVisit.cpp
         semantic/CheckerUnify.cpp semantic/util.cpp semantic/util.h units.h units.cpp)
 
-add_library(transpiler transpiler/Transpiler.cpp transpiler/Transpiler.h)
+add_library(transpiler transpiler/Transpiler.cpp transpiler/Transpiler.h transpiler/STranspiler.cpp transpiler/STranspiler.h)

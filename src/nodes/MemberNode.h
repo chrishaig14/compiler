@@ -44,6 +44,7 @@ public:
     const MemberNode& member() const override;
     bool is_class_static_member;
     bool is_class_member;
+    std::string replace_with_path;
 };
 
 

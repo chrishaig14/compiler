@@ -907,7 +907,7 @@ public:
     */
     virtual bool ShallowEqual( const XMLNode* compare ) const = 0;
 
-    /** Accept a hierarchical visit of the nodes in the TinyXML-2 DOM. Every node in the
+    /** Accept a hierarchical visit_id of the nodes in the TinyXML-2 DOM. Every node in the
     	XML tree will be conditionally visited and the host will be called back
     	via the XMLVisitor interface.
 

@@ -1,3 +1,0 @@
-fun say_goodbye(){
-    print("Goodbye!")
-}

@@ -38,7 +38,7 @@ const FunctionNode& FunctionNode::func() const {
 }
 
 FunctionNode::FunctionNode(std::string identifier, VectorOfStrings parameter_names, VectorOfTypes parameter_types,
-                           TypeNode* return_type, BlockNode* body, TextPosition start, TextPosition end) : Node(FUNC,
+                           TypeNode* return_type, BlockNode* body, TextPosition start, TextPosition end) : Node(NodeType::FUNC,
                                                                                                                 start,
                                                                                                                 end),
                                                                                                            body(body),

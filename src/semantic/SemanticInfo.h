@@ -10,6 +10,7 @@
 #include "../nodes/TypeNode.h"
 #include "ClassInfo.h"
 #include "../units.h"
+#include "../simple_nodes/SNode.h"
 
 class SemanticInfo {
     const TypeNode* _type;
@@ -19,6 +20,7 @@ public:
     ClassInfo* class_info;
     bool is_class_method;
     bool is_error;
+    SNode* snode;
 
     SemanticInfo& operator=(const SemanticInfo& other);
 
