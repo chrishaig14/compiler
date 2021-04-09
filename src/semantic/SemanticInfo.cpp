@@ -14,6 +14,7 @@ SemanticInfo::SemanticInfo() {
     this->is_constant = false;
     this->is_module = false;
     this->is_package = false;
+    this->function_type = nullptr;
     this->snode = nullptr;
 }
 
@@ -29,11 +30,7 @@ const TypeNode& SemanticInfo::type() {
 }
 
 SemanticInfo& SemanticInfo::operator=(const SemanticInfo& other) {
-    this->_type = other._type->clone();
-    return *this;
-}
-
-SemanticInfo::SemanticInfo(const SemanticInfo& other) {
+    this->entity = other.entity;
     this->is_error = other.is_error;
     this->is_function = other.is_function;
     this->is_method = other.is_method;
@@ -45,13 +42,37 @@ SemanticInfo::SemanticInfo(const SemanticInfo& other) {
     this->module = other.module;
     this->package = other.package;
     this->snode = other.snode;
+    this->method_name = other.method_name;
+    this->function_type = other.function_type;
+    if (other._type != nullptr) {
+        this->_type = other._type->clone();
+    } else {
+        this->_type = nullptr;
+    }
+    return *this;
+}
+
+SemanticInfo::SemanticInfo(const SemanticInfo& other) {
+    this->entity = other.entity;
+    this->is_error = other.is_error;
+    this->is_function = other.is_function;
+    this->is_method = other.is_method;
+    this->class_info = other.class_info;
+    this->function_type = other.function_type;
+    this->is_class_method = other.is_class_method;
+    this->is_constant = other.is_constant;
+    this->is_module = other.is_module;
+    this->is_package = other.is_package;
+    this->module = other.module;
+    this->package = other.package;
+    this->snode = other.snode;
+    this->method_name = other.method_name;
 
     if (other._type != nullptr) {
         this->_type = other._type->clone();
     } else {
         this->_type = nullptr;
     }
-    this->is_error = is_error;
 }
 
 SemanticInfo::~SemanticInfo() {

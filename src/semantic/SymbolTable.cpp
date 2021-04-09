@@ -3,6 +3,8 @@
 //
 
 #include "SymbolTable.h"
+#include "../units/FunctionValue.h"
+#include "../units/ObjectValue.h"
 
 SymbolTable::SymbolTable(const std::string& name, SymbolTable* parent) {
     this->name = name;
@@ -23,22 +25,7 @@ bool SymbolTable::has(const std::string& name) {
     }
 }
 
-VariableLocation SymbolTable::find(const std::string& name) {
-    auto it = this->indices.find(name);
-    if (it != this->indices.end()) {
-        int index = it->second;
-        return VariableLocation(0, index);
-    } else {
-        if (this->parent != nullptr) {
-            VariableLocation location = this->parent->find(name);
-            location.depth++;
-            return location;
-        }
-        return VariableLocation(-1, -1);
-    }
-}
-
-const TypeNode& SymbolTable::get(const std::string& name) {
+Entity* SymbolTable::get(const std::string& name) {
     if (name == "__return__") {
         if (this->ret == nullptr) {
             if (this->parent != nullptr) {
@@ -47,15 +34,15 @@ const TypeNode& SymbolTable::get(const std::string& name) {
                 throw std::runtime_error("ERROR: no parent but want __return__");
             }
         }
-        return *this->ret;
+        return this->ret;
     }
     auto it = this->table.find(name);
     if (it != this->table.end()) {
-        return *it->second;
-    } else {
-        if (this->parent != nullptr) {
-            return this->parent->get(name);
-        }
+        return it->second;
+    }
+    // this->
+    if (this->parent != nullptr) {
+        return this->parent->get(name);
     }
     throw std::runtime_error("Symbol " + name + " not found in scope");
 }
@@ -64,22 +51,12 @@ bool SymbolTable::declared(const std::string& name) {
     return this->table.find(name) != this->table.end();
 }
 
-void SymbolTable::set(const std::string& name, const TypeNode& info) {
+void SymbolTable::set(const std::string& name, Entity* info) {
     if (name == "__return__") {
-        this->ret = info.clone();
+        this->ret = info;
         return;
     }
-    if (info.kind == Kind::OBJECT) {
-        if (info.object().id == "Option") {
-            this->not_null[name] = false;
-        }
-    }
-    auto it = this->table.find(name);
-    if (it == this->table.end()) {
-        // it's new
-        this->indices.insert({name, this->table.size()});
-    }
-    this->table[name] = info.clone();
+    this->table[name] = info;
 }
 
 void SymbolTable::set_not_none(const std::string& name, bool may_be_none) {
@@ -102,7 +79,14 @@ std::vector<std::pair<std::string, TypeNode*>> SymbolTable::get_all_in_loop() {
         std::vector<std::pair<std::string, TypeNode*>> r;
 
         for (auto v: this->table) {
-            r.push_back(std::make_pair(v.first,v.second->clone()));
+            TypeNode* t;
+            if (v.second->type == E_TYPE::FUNCTION_VALUE) {
+                t = ((FunctionValue*) v.second)->ft;
+            }
+            if (v.second->type == E_TYPE::OBJECT_VALUE) {
+                t = ((ObjectValue*) v.second)->ot;
+            }
+            r.push_back(std::make_pair(v.first, t));
         }
         return r;
     } else {
@@ -111,7 +95,14 @@ std::vector<std::pair<std::string, TypeNode*>> SymbolTable::get_all_in_loop() {
         auto p = this->parent->get_all_in_loop();
         r.insert(r.end(), p.begin(), p.end());
         for (auto v: this->table) {
-            r.push_back(std::make_pair(v.first,v.second->clone()));
+            TypeNode* t;
+            if (v.second->type == E_TYPE::FUNCTION_VALUE) {
+                t = ((FunctionValue*) v.second)->ft;
+            }
+            if (v.second->type == E_TYPE::OBJECT_VALUE) {
+                t = ((ObjectValue*) v.second)->ot;
+            }
+            r.push_back(std::make_pair(v.first, t));
         }
         return r;
     }
@@ -122,7 +113,16 @@ std::vector<std::pair<std::string, TypeNode*>> SymbolTable::get_all() {
         std::vector<std::pair<std::string, TypeNode*>> r;
 
         for (auto v: this->table) {
-            r.push_back(std::make_pair(v.first,v.second->clone()));
+
+            TypeNode* t;
+            if (v.second->type == E_TYPE::FUNCTION_VALUE) {
+                t = ((FunctionValue*) v.second)->ft;
+            }
+            if (v.second->type == E_TYPE::OBJECT_VALUE) {
+                t = ((ObjectValue*) v.second)->ot;
+            }
+
+            r.push_back(std::make_pair(v.first, t));
         }
         return r;
     } else {
@@ -131,7 +131,14 @@ std::vector<std::pair<std::string, TypeNode*>> SymbolTable::get_all() {
         auto p = this->parent->get_all();
         r.insert(r.end(), p.begin(), p.end());
         for (auto v: this->table) {
-            r.push_back(std::make_pair(v.first,v.second->clone()));
+            TypeNode* t;
+            if (v.second->type == E_TYPE::FUNCTION_VALUE) {
+                t = ((FunctionValue*) v.second)->ft;
+            }
+            if (v.second->type == E_TYPE::OBJECT_VALUE) {
+                t = ((ObjectValue*) v.second)->ot;
+            }
+            r.push_back(std::make_pair(v.first, t));
         }
         return r;
     }

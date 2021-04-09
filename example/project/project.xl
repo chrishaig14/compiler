@@ -1,4 +1,20 @@
+fun foo()->Integer{
+    return 2
+}
+
+class Person {
+    name: String
+    static ttt: String = "Hello"
+    static fun bar()->Integer {
+        return 3
+    }
+    fun ned()->String{
+        return "Hekki"
+    }
+}
+
 fun main()->Integer {
-    var z = 7 + 9
+    var x = foo
+    var z = x.qwer
     return 0
 }

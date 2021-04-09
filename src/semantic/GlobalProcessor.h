@@ -11,35 +11,17 @@
 #include "ClassTable.h"
 #include "../nodes/ClassNode.h"
 
-class FunctionTable {
-    std::unordered_map<std::string, FunctionType*> functions;
-
-public:
-
-    void add(std::string function_name, FunctionType* function_type);
-
-    bool has_function(std::string name);
-
-    ~FunctionTable();
-
-    const FunctionType& get(std::string function_name);
-
-};
 
 typedef std::pair<std::string, std::string> Builtin;
 
 class GlobalProcessor {
 public:
-    ClassTable* global_classes;
-    FunctionTable* global_functions;
     std::string module_dotted_path;
-    std::map<std::string, std::string> imported_paths;
-    std::map<std::string, std::string> local_paths;
-    std::map<std::string, std::string>& global_path_to_mangled_name;
+    std::map<std::string, VectorOfStrings> imported_paths;
 
-    GlobalProcessor(ClassTable* global_classes, FunctionTable* global_functions, std::string module_name,
-                    std::map<std::string, std::string>& global_path_to_mangled_name);
-
+    Package* root_package;
+    Module* module;
+    GlobalProcessor();
     void visit(FunctionNode& node);
 
     void dispatch(Node* nod);

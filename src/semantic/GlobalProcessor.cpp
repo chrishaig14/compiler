@@ -4,18 +4,14 @@
 
 #include <iostream>
 #include "GlobalProcessor.h"
-#include "ClassInfo.h"
+#include "../units/Class.h"
 #include "../logging/logging.h"
 #include "../scanner/Scanner.h"
 #include "../parser/Parser.h"
 #include "util.h"
+#include "../units/ConstFunction.h"
 
-GlobalProcessor::GlobalProcessor(ClassTable* global_classes, FunctionTable* global_functions, std::string module_name,
-                                 std::map<std::string, std::string>& global_path_to_mangled_name)
-        : global_path_to_mangled_name(global_path_to_mangled_name) {
-    this->module_name = module_name;
-    this->global_functions = global_functions;
-    this->global_classes = global_classes;
+GlobalProcessor::GlobalProcessor() {
 }
 
 std::string join_path(VectorOfStrings path) {
@@ -28,8 +24,7 @@ std::string join_path(VectorOfStrings path) {
 }
 
 void GlobalProcessor::visit(ImportNode& node) {
-    std::string dotted_path = join_path(node.path);
-    this->imported_paths[node.path.back()] = dotted_path;
+    this->imported_paths[node.path.back()] = node.path;
     // for (auto imported_name: node.path) {
     //     (*this->module_mappings[this->module_name])[imported_name] = (*this->module_mappings[node.module_name])[imported_name];
     // }
@@ -42,9 +37,9 @@ void GlobalProcessor::visit(FunctionNode& node) {
     }
     FunctionType function_info(x, node.return_type->clone());
     std::string function_path = module_dotted_path + "." + node.identifier;
-    this->global_functions->add(function_path, function_info.clone());
-    this->local_paths[node.identifier] = function_path;
-    // (*this->module_mappings[this->module_name])[node.identifier] = mangled_name;
+    ConstFunction* const_function = new ConstFunction();
+    const_function->ft = function_info.clone();
+    this->module->functions[node.identifier] = const_function;
 }
 
 void GlobalProcessor::visit(BlockNode& node) {
@@ -55,12 +50,12 @@ void GlobalProcessor::visit(BlockNode& node) {
 
 void GlobalProcessor::visit(ClassNode& node) {
     std::string mangled_name = mangle_class_name(this->module_name, node.class_name);
-    ClassInfo* class_info = new ClassInfo();
+    Class* class_info = new Class();
     for (auto mn: node.members_ordered) {
         auto mt = node.members[mn];
         class_info->member_names.push_back(mn);
-        class_info->member_types.push_back(mt->clone());
-        class_info->members[mn] = mt->clone();
+        class_info->member_types.push_back(mt);
+        class_info->members[mn] = mt;
     }
     for (auto mn: node.static_members) {
         class_info->static_members[mn.first] = std::make_pair(mn.second.first->clone(), mn.second.second);
@@ -95,13 +90,13 @@ void GlobalProcessor::visit(ClassNode& node) {
     }
 
 
-    if (!has_init) {
-        class_info->methods["init"] = new FunctionType(class_info->member_types, new ObjectType(node.class_name));
-        // (*this->module_mappings[this->module_name])[node.class_name + "." +
-        //                                             "init"] = mangle_method_name(this->module_name,
-        //                                                                          node.class_name,
-        //                                                                          "init");
-    }
+    // if (!has_init) {
+    //     class_info->methods["init"] = new FunctionType(class_info->member_types, new ObjectType(node.class_name));
+    //     (*this->module_mappings[this->module_name])[node.class_name + "." +
+    //                                                 "init"] = mangle_method_name(this->module_name,
+    //                                                                              node.class_name,
+    //                                                                              "init");
+    // }
     class_info->methods["str"] = new FunctionType({}, new T_STRING);
     // (*this->module_mappings[this->module_name])[node.class_name + "." + "str"] = mangle_method_name(this->module_name,
     //                                                                                                 node.class_name,
@@ -125,9 +120,7 @@ void GlobalProcessor::visit(ClassNode& node) {
     //     exit(1);
     // }
     // (*this->module_mappings[this->module_name])[node.class_name] = mangled_name;
-    std::string class_path = module_dotted_path + "." + node.class_name;
-    this->global_classes->set(class_path, class_info);
-    this->local_paths[node.class_name] = class_path;
+    this->module->classes[node.class_name] = class_info;
 }
 
 void GlobalProcessor::dispatch(Node* nod) {
@@ -142,31 +135,5 @@ void GlobalProcessor::dispatch(Node* nod) {
         case NodeType::IMPORT:
             this->visit(n.import());
             break;
-    }
-}
-
-
-const FunctionType& FunctionTable::get(std::string function_name) {
-    if (functions.find(function_name) == functions.end()) {
-        throw std::runtime_error("Error, function " + function_name + " not found in function table");
-    }
-    return *functions.find(function_name)->second;
-}
-
-void FunctionTable::add(std::string function_name, FunctionType* function_type) {
-    if (functions.find(function_name) == functions.end()) {
-        functions.insert(std::make_pair(function_name, function_type));
-    } else {
-        throw std::runtime_error("Cant overload function " + function_name);
-    }
-}
-
-bool FunctionTable::has_function(std::string name) {
-    return this->functions.find(name) != this->functions.end();
-}
-
-FunctionTable::~FunctionTable() {
-    for (auto f: this->functions) {
-        delete f.second;
     }
 }

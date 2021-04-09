@@ -1,0 +1,53 @@
+class Handler {
+    get: fun(Request)->Response
+    post: fun(Request)->Response
+    fun handle(request: Request)->Response {
+        var method_matcher = {"get": this.get, "post": this.post}
+        return method_matcher[request.method](request)
+    }
+};
+
+class MyHandler {
+    base_handler: Handler
+    fun get(Request)->Response {
+
+    }
+    fun post(Request)->Response {
+
+    }
+    static fun new()->MyHandler {
+        this.base_handler = #Handler(this.get, this.post)
+    }
+    static fun new_base()->Handler {
+        var my_handler = MyHandler.new()
+        return my_handler.base_handler
+    }
+}
+
+class Request {
+    uri: String
+    method: String
+    static fun parse(data: String)->Request {...}
+};
+
+class Application {
+    routes: Dict[String, fun()->Handler]
+    fun listen(port: Integer){
+        var listen_socket = #Socket(port)
+        listen_socket.listen()
+        var client_socket = listen_socket.accept()
+        while client_socket != none {
+            this.handle(client_socket)
+        }
+    }
+    fun handle(socket: Socket){
+        var data = socket.receive()
+        var request = Request.parse(data)
+        this.routes[request.uri]
+    }
+};
+
+fun main()->Integer {
+    var app = #Application({"/my":MyHandler.new_base})
+    app.listen(8000)
+}

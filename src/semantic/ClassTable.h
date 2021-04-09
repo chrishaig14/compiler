@@ -8,17 +8,17 @@
 
 #include <unordered_map>
 #include "SymbolTable.h"
-#include "ClassInfo.h"
+#include "../units/Class.h"
 
 class ClassTable {
-    std::unordered_map<std::string, ClassInfo*> table;
+    std::unordered_map<std::string, Class*> table;
 public:
     ClassTable();
-    ClassInfo* get(std::string name);
+    Class* get(std::string name);
 
     bool declared(std::string name);
 
-    void set(std::string name, ClassInfo* info);
+    void set(std::string name, Class* info);
 
     ~ClassTable();
 };

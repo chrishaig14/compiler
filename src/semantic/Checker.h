@@ -15,8 +15,9 @@
 #include <set>
 #include "../macros.h"
 #include "../logging/logging.h"
-#include "../units.h"
 #include "../simple_nodes/BlockSNode.h"
+#include "../units/ObjectValue.h"
+
 
 typedef std::unique_ptr<SemanticInfo> USemanticInfo;
 
@@ -31,44 +32,41 @@ TypeNode* make_type(const TypeNode& original, const MapStringType& replacements)
 SemanticInfo match_arguments_to_generic_function(const FunctionType& function_type, VectorOfTypes arg_types);
 USemanticInfo error_stub();
 
-ClassInfo* make_list_class_info();
+Class* make_list_class_info();
 
-ClassInfo* make_file_class_info();
+Class* make_file_class_info();
 
-ClassInfo* make_int_class_info();
+Class* make_int_class_info();
 
-ClassInfo* make_boolean_class_info();
+Class* make_boolean_class_info();
 
-ClassInfo* make_float_class_info();
+Class* make_float_class_info();
 
-ClassInfo* make_double_class_info();
+Class* make_double_class_info();
+Entity* entity_from_type(const TypeNode& type);
 
-ClassInfo* make_string_class_info();
+Class* make_string_class_info();
 
 class Checker {
     bool add_this;
     bool is_lvalue;
     std::map<std::string, bool> inits;
     bool replace_me;
-    ClassTable* class_table;
-    FunctionTable* function_table;
     Node* replacement;
     std::string current_class;
     std::string current_function;
     std::unordered_map<std::string, SymbolTable*> scopes;
     std::vector<ObjectType*> tuple_types;
-    std::map<std::string, std::string>& imported_paths;
-    std::map<std::string, std::string>& local_paths;
     SymbolTable* scope;
     TypeNode* this_type;
 public:
-    std::string __file__;
+    Checker();
 
+    std::string __file__;
     bool can_assign(const TypeNode& from, const TypeNode& to);
     bool can_assign_generic(TypeNode& from, TypeNode& to, VectorOfStrings type_params);
     bool is_immutable(const TypeNode& node);
-    Checker(std::map<std::string, std::string>& imported_paths, std::map<std::string, std::string>& local_paths, ClassTable* class_table, FunctionTable* function_table);
-    ClassInfo* instantiate_generic(ClassInfo* generic, const ObjectType& instance);
+    Class* instantiate_generic(Class* generic, const ObjectType& instance);
     void error_assignment(const TypeNode& expected, const TypeNode& actual, TextPosition position);
     void error_bad_return(TextPosition position);
     void error_binop(const TypeNode& left, const TypeNode& right, TextPosition position);
@@ -171,7 +169,7 @@ public:
     USemanticInfo member_tuple(const ObjectType& final_type, MemberNode& n);
     USemanticInfo
     member_normal(const ObjectType& final_type, const ObjectType& object, std::string child, MemberNode& n,
-                  SemanticInfo& info);
+                  SemanticInfo& info, SemanticInfo& symbol_info);
     USemanticInfo visit(CastNode& n);
     void error_method_not_member(const TypeNode& t, const std::string& member, TextPosition position);
     USemanticInfo visit(DefaultConstructorNode& node);
@@ -180,10 +178,20 @@ public:
     std::map<std::string, Package*> imported_packages;
     std::map<std::string, Module*> imported_modules;
     std::map<std::string, FunctionType*> imported_functions;
-    std::map<std::string, ClassInfo*> imported_classes;
+    std::map<std::string, Class*> imported_classes;
     std::map<std::string, Package*>* global_packages;
     std::map<std::string, Module*>* global_modules;
     BlockSNode* root_snode;
+    Module* module;
+    Package* root_package;
+    USemanticInfo
+    member_normal(Class* class_info, std::string child, MemberNode& n, SemanticInfo& info, SemanticInfo& symbol_info);
+    USemanticInfo member_normal(Class* class_info, std::string child);
+    USemanticInfo member_normal(Class* class_info, std::string child, SNode* object_snode);
+    USemanticInfo class_member(Class* cls, std::string child);
+    USemanticInfo object_member(ObjectValue* pValue, std::string child);
+    USemanticInfo package_member(Package* pPackage, std::string basicString);
+    USemanticInfo module_member(Module* pModule, std::string basicString);
 };
 
 bool function_is_generic(const FunctionType& ft);

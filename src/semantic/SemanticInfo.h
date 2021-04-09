@@ -8,16 +8,19 @@
 #include <string>
 #include <vector>
 #include "../nodes/TypeNode.h"
-#include "ClassInfo.h"
-#include "../units.h"
+#include "../units/Class.h"
 #include "../simple_nodes/SNode.h"
+#include "../units/Module.h"
+#include "../units/Package.h"
 
 class SemanticInfo {
     const TypeNode* _type;
 public:
     bool is_function;
     bool is_method;
-    ClassInfo* class_info;
+    Entity* entity;
+    std::string method_name;
+    Class* class_info;
     bool is_class_method;
     bool is_error;
     SNode* snode;
@@ -41,6 +44,7 @@ public:
     Module* module;
     bool is_package;
     Package* package;
+    FunctionType* function_type;
 };
 
 class ErrorStub : public SemanticInfo {

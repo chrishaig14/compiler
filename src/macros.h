@@ -5,6 +5,8 @@
 #ifndef UNTITLED1_MACROS_H
 #define UNTITLED1_MACROS_H
 
+#include "units/Entity.h"
+
 #define ID(id) new IdNode(id)
 #define NUM(num) new NumberNode(num)
 #define BIN(op, left, right) new BinopNode(op, left, right)
@@ -76,6 +78,7 @@
 #define T_FLOAT ObjectType("Float")
 #define T_DOUBLE ObjectType("Double")
 
+typedef std::unordered_map<std::string, Entity*> MapStringEntity;
 typedef std::unordered_map<std::string, TypeNode*> MapStringType;
 
 #endif //UNTITLED1_MACROS_H

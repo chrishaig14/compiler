@@ -100,8 +100,8 @@ add_library(
         utils.cpp
         semantic/SemanticInfo.cpp
         semantic/SemanticInfo.h
-        semantic/ClassInfo.cpp
-        semantic/ClassInfo.h
+        units/Class.cpp
+        units/Class.h
         semantic/Checker.cpp
         semantic/Checker.h
         nodes/node_types.h
@@ -109,6 +109,6 @@ add_library(
         macros.h
         semantic/CheckerErrors.cpp
         semantic/CheckerVisit.cpp
-        semantic/CheckerUnify.cpp semantic/util.cpp semantic/util.h units.h units.cpp)
+        semantic/CheckerUnify.cpp semantic/util.cpp semantic/util.h units/Package.cpp units/Package.h units/Module.cpp units/Module.h units/ConstFunction.h units/Entity.cpp units/Entity.h units/ConstFunction.cpp units/ObjectValue.cpp units/ObjectValue.h units/FunctionValue.cpp units/FunctionValue.h)
 
 add_library(transpiler transpiler/Transpiler.cpp transpiler/Transpiler.h transpiler/STranspiler.cpp transpiler/STranspiler.h)

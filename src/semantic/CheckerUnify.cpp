@@ -151,14 +151,14 @@ USemanticInfo Checker::visit_import(ImportNode& node) {
                     break;
                 }
                 std::string final_part = node.path[current_index + 1];
-                auto final_import = current_module->second->local_paths.find(final_part);
-                if (final_import == current_module->second->local_paths.end()) {
-                    std::cout << "Error: name " << final_part << " not found in module " << path << std::endl;
-                    throw std::runtime_error("Import error");
-                } else {
-                    // imported function/class from module!
-                    break;
-                }
+                // auto final_import = current_module->second->local_paths.find(final_part);
+                // if (final_import == current_module->second->local_paths.end()) {
+                //     std::cout << "Error: name " << final_part << " not found in module " << path << std::endl;
+                //     throw std::runtime_error("Import error");
+                // } else {
+                //     // imported function/class from module!
+                //     break;
+                // }
             }
         } else {
             // package found!
@@ -173,4 +173,40 @@ USemanticInfo Checker::visit_import(ImportNode& node) {
     }
     SemanticInfo info;
     return std::make_unique<SemanticInfo>(info);
+}
+
+USemanticInfo Checker::class_member(Class* cls, std::string child) {
+    SemanticInfo info;
+    if (cls->methods.find(child) != cls->methods.end()) {
+        info.entity = entity_from_type(*cls->methods[child]);
+    } else if (cls->static_methods.find(child) != cls->static_methods.end()) {
+        info.entity = entity_from_type(*cls->static_methods[child]);
+    } else if (cls->static_members.find(child) != cls->static_members.end()) {
+        info.entity = entity_from_type(*cls->static_members[child].first);
+    } else {
+        throw std::runtime_error("Class " + cls->class_name + " has no method/member " + child);
+    }
+    return std::make_unique<SemanticInfo>(info);
+}
+
+USemanticInfo Checker::object_member(ObjectValue* pValue, std::string child) {
+    Class* class_entity = (Class*) this->scope->get(pValue->ot->id);
+    SemanticInfo info;
+    if (class_entity->members.count(child)) {
+        info.entity = entity_from_type(*class_entity->members[child]);
+    } else if (class_entity->methods.count(child)) {
+        info.entity = entity_from_type(*class_entity->methods[child]);
+    } else {
+        throw std::runtime_error(
+                "Error member/method '" + child + "' not found in class '" + class_entity->class_name + "'");
+    }
+    return std::make_unique<SemanticInfo>(info);
+}
+
+USemanticInfo Checker::package_member(Package* pPackage, std::string basicString) {
+    return USemanticInfo();
+}
+
+USemanticInfo Checker::module_member(Module* pModule, std::string basicString) {
+    return USemanticInfo();
 }

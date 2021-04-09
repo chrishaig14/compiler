@@ -12,6 +12,7 @@
 #include "Node.h"
 #include "../types.h"
 #include "TypeNode.h"
+#include "../units/Entity.h"
 
 class BlockNode : public Node {
 public:

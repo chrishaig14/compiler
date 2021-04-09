@@ -14,9 +14,21 @@
 #include "../simple_nodes/IdSNode.h"
 #include "../simple_nodes/CallSNode.h"
 #include "../simple_nodes/StringSNode.h"
+#include "../units/FunctionValue.h"
 
 #define T_NONE ObjectType(".None")
 static TextPosition POS_NONE = {-1, -1};
+
+Entity* entity_from_type(const TypeNode& type) {
+    if (type.kind == Kind::FUNCTION) {
+        FunctionValue* fv = new FunctionValue();
+        fv->ft = (FunctionType*) type.clone();
+        return fv;
+    }
+    ObjectValue* fv = new ObjectValue();
+    fv->ot = (ObjectType*) type.clone();
+    return fv;
+}
 
 USemanticInfo Checker::visit(ListNode& node) {
     USemanticInfo element_type_p = this->dispatch(node.elements[0]);
@@ -58,7 +70,12 @@ USemanticInfo Checker::visit(WhileNode& node) {
     this->visit_block(*node.body);
     this->scope->is_loop = false;
     for (auto v: this->scope->table) {
-        node.body->local_vars.push_back(std::make_pair(v.first, v.second->clone()));
+        if (v.second->type == E_TYPE::OBJECT_VALUE) {
+            node.body->local_vars.push_back(std::make_pair(v.first, ((ObjectValue*) v.second)->ot));
+        }
+        if (v.second->type == E_TYPE::FUNCTION_VALUE) {
+            node.body->local_vars.push_back(std::make_pair(v.first, ((FunctionValue*) v.second)->ft));
+        }
     }
     this->leave_scope();
     return nullptr;
@@ -68,10 +85,9 @@ USemanticInfo Checker::visit(NumberNode& node) {
     SemanticInfo info;
     switch (node.num_type) {
         case NumberType::INTEGER: {
-            info.set_type(T_INT);
-            IntegerSNode* sn = new IntegerSNode();
-            info.snode = sn;
-            sn->str = node.str;
+            ObjectValue* ov = new ObjectValue();
+            info.entity = ov;
+            ov->ot = new ObjectType("Integer", {});
             break;
         }
         case NumberType::FLOAT: {
@@ -94,6 +110,9 @@ USemanticInfo Checker::visit(StringNode& node) {
     StringSNode* sn = new StringSNode();
     sn->s = node.str;
     info.snode = sn;
+    ObjectValue* ov = new ObjectValue;
+    info.entity = ov;
+    ov->ot = new ObjectType("String", {});
     return std::make_unique<SemanticInfo>(info);
 }
 
@@ -173,7 +192,7 @@ USemanticInfo Checker::visit(TernaryNode& node) {
     TypeNode& type = *expression_type.type_params[0];
     semanticInfo.set_type(type);
     this->enter_scope("true_case");
-    this->scope->set("it", type);
+    // this->scope->set("it", type);
     USemanticInfo true_case_p = this->dispatch(node.true_case);
     SemanticInfo& true_case = *true_case_p;
     node.true_case = this->replace_if_necessary(node.true_case);
@@ -281,50 +300,50 @@ USemanticInfo Checker::visit(ClassNode& node) {
     }
     this->add_this = true;
     std::string eq_method_name = "eq";
-    if (node.methods.find(eq_method_name) == node.methods.end()) {
-        auto eq_meth = generate_eq_method(node.class_name, tp, node.members_ordered);
-        node.methods[eq_method_name] = eq_meth;
-        this->is_method = true;
-        this->visit_function(*eq_meth);
-    } else {
-        if (*node.methods[eq_method_name]->parameter_types[0] != *this->this_type ||
-            *node.methods[eq_method_name]->return_type != T_BOOL) {
-            std::string eq_method_type_string = "fun (" + this->this_type->to_string() + ") -> Boolean";
-            throw std::runtime_error("eq method MUST be of type " + eq_method_type_string);
-        }
-    }
-    std::string str_method_name = "str";
-    if (node.methods.find(str_method_name) == node.methods.end()) {
-        auto str_meth = generate_str_method(node.class_name);
-        node.methods[str_method_name] = str_meth;
-        this->is_method = true;
-        this->visit_function(*str_meth);
-    } else {
-        if (node.methods[str_method_name]->parameter_types.size() != 0 ||
-            *node.methods[str_method_name]->return_type != T_STRING) {
-            std::string str_method_type_string = "fun () -> String";
-            throw std::runtime_error("str method MUST be of type " + str_method_type_string);
-        }
-    }
+    // if (node.methods.find(eq_method_name) == node.methods.end()) {
+    //     auto eq_meth = generate_eq_method(node.class_name, tp, node.members_ordered);
+    //     node.methods[eq_method_name] = eq_meth;
+    //     this->is_method = true;
+    //     this->visit_function(*eq_meth);
+    // } else {
+    //     if (*node.methods[eq_method_name]->parameter_types[0] != *this->this_type ||
+    //         *node.methods[eq_method_name]->return_type != T_BOOL) {
+    //         std::string eq_method_type_string = "fun (" + this->this_type->to_string() + ") -> Boolean";
+    //         throw std::runtime_error("eq method MUST be of type " + eq_method_type_string);
+    //     }
+    // }
+    // std::string str_method_name = "str";
+    // if (node.methods.find(str_method_name) == node.methods.end()) {
+    //     auto str_meth = generate_str_method(node.class_name);
+    //     node.methods[str_method_name] = str_meth;
+    //     this->is_method = true;
+    //     this->visit_function(*str_meth);
+    // } else {
+    //     if (node.methods[str_method_name]->parameter_types.size() != 0 ||
+    //         *node.methods[str_method_name]->return_type != T_STRING) {
+    //         std::string str_method_type_string = "fun () -> String";
+    //         throw std::runtime_error("str method MUST be of type " + str_method_type_string);
+    //     }
+    // }
 
-    if (!has_init) {
-        BlockNode* init_body = new BlockNode({}, POS_NONE, POS_NONE);
-        for (auto mt: node.members_ordered) {
-            init_body->nodes.push_back(new AssignmentNode(new MemberNode(new IdNode("this", POS_NONE, POS_NONE), mt),
-                                                          new IdNode(mt, POS_NONE, POS_NONE),
-                                                          POS_NONE,
-                                                          POS_NONE));
-        }
-        node.methods["init"] = new FunctionNode("init",
-                                                node.members_ordered,
-                                                members_ordered_types,
-                                                new ObjectType(node.class_name, tp),
-                                                init_body,
-                                                POS_NONE,
-                                                POS_NONE);
-        this->is_method = true;
-        this->visit_function(*node.methods["init"]);
-    }
+    // if (!has_init) {
+    //     BlockNode* init_body = new BlockNode({}, POS_NONE, POS_NONE);
+    //     for (auto mt: node.members_ordered) {
+    //         init_body->nodes.push_back(new AssignmentNode(new MemberNode(new IdNode("this", POS_NONE, POS_NONE), mt),
+    //                                                       new IdNode(mt, POS_NONE, POS_NONE),
+    //                                                       POS_NONE,
+    //                                                       POS_NONE));
+    //     }
+    //     node.methods["init"] = new FunctionNode("init",
+    //                                             node.members_ordered,
+    //                                             members_ordered_types,
+    //                                             new ObjectType(node.class_name, tp),
+    //                                             init_body,
+    //                                             POS_NONE,
+    //                                             POS_NONE);
+    //     this->is_method = true;
+    //     this->visit_function(*node.methods["init"]);
+    // }
 
     this->is_method = false;
     this->add_this = false;
@@ -426,16 +445,16 @@ USemanticInfo Checker::visit(ForNode& node) {
                                    new DeclarationNode("_list0", obj.clone(), node.exp),}, POS_NONE, POS_NONE);
     this->visit_block(*bn);
     this->enter_scope("for");
-    this->scope->set(node.var, var_type);
+    // this->scope->set(node.var, var_type);
 
     this->scope->is_loop = true;
     this->visit_block(*node.body);
     this->scope->is_loop = false;
     this->dispatch(new_body->nodes[0]->decl().expression);
     this->dispatch(new_body->nodes[new_body->nodes.size() - 1]->assign().rvalue);
-    for (auto v: this->scope->table) {
-        new_body->local_vars.push_back(std::make_pair(v.first, v.second->clone()));
-    }
+    // for (auto v: this->scope->table) {
+    //     new_body->local_vars.push_back(std::make_pair(v.first, v.second->clone()));
+    // }
     this->leave_scope();
     this->replacement = bn;
     this->replace_me = true;
@@ -451,7 +470,7 @@ USemanticInfo Checker::visit(MethodNode& n) {
     if (n.parent_t->kind != Kind::OBJECT) {
         throw std::runtime_error("Cannot call a method on a function");
     }
-    ClassInfo* class_info = this->class_table->get("asdf");
+    Class* class_info = nullptr;//this->class_table->get("asdf");
     SemanticInfo info;
     if (class_info->methods.find(n.s_child) == class_info->methods.end()) {
         throw std::runtime_error("Error " + n.parent_t->to_string() + " has no method " + n.s_child);
@@ -466,6 +485,19 @@ USemanticInfo Checker::visit(MethodNode& n) {
     return std::make_unique<SemanticInfo>(info);
 }
 
+TypeNode* get_entity_type(Entity* ent) {
+    if (ent->type == E_TYPE::CONST_FUNCTION) {
+        return ((ConstFunction*) ent)->ft->clone();
+    }
+    if (ent->type == E_TYPE::FUNCTION_VALUE) {
+        return ((FunctionValue*) ent)->ft->clone();
+    }
+    if (ent->type == E_TYPE::OBJECT_VALUE) {
+        return ((ObjectValue*) ent)->ot->clone();
+    }
+    throw std::runtime_error("Get type of non function/object!");
+}
+
 USemanticInfo Checker::visit_call(CallNode& n) {
     SemanticInfo retv;
     CallSNode* sn = new CallSNode();
@@ -478,20 +510,16 @@ USemanticInfo Checker::visit_call(CallNode& n) {
         return error_stub();
     }
     SemanticInfo& fun_info = *fun_info_p;
-    sn->function = fun_info.snode;
     bool is_a_method = false;
     Node* object_node;
+    SNode* extra_first_argument = nullptr;
     if (fun_info.is_method) {
         // Since it's a method, we have to transform it and prepare it for the translation step,
         // where instead of calling object.method(args), we call <class>.method(object, args)
-
-        MethodNode& method_node = n.function->method();
-        IdNode* pNode = new IdNode(method_node.actual_function_name, POS_NONE, POS_NONE);
-        n.function = pNode;
-        pNode->is_global_function = true;
-        this->replace_me = false;
-        object_node = method_node.parent;
-        is_a_method = true;
+        // extra_first_argument = fun_info.snode;
+        // IdSNode* method_node = new IdSNode();
+        // sn->function = method_node;
+        // method_node->identifier = fun_info.method_name;
     } else if (fun_info.is_class_method) {
         MemberNode& member_node = n.function->member();
         if (member_node.s_child == "init") {
@@ -512,15 +540,21 @@ USemanticInfo Checker::visit_call(CallNode& n) {
             retv.set_type(*copy_ftn.clone());
             object_node = member_node.parent;
         }
+    } else {
+        sn->function = fun_info.snode;
     }
     n.function = replace_if_necessary(n.function);
-    if (fun_info.is_function || fun_info.is_method || fun_info.is_class_method) {
+    FunctionType* function_type = nullptr;
+    if (fun_info.entity->type == E_TYPE::CONST_FUNCTION || fun_info.entity->type == E_TYPE::FUNCTION_VALUE) {
+        function_type = ((FunctionValue*) fun_info.entity)->ft->clone();
+    }
+    if (function_type != nullptr) {
         // ok
-        const FunctionType& function_type = fun_info.type().function();
-        if (n.arguments.size() != function_type.param_types.size()) {
+        // const FunctionType& function_type = fun_info.type().function();
+        if (n.arguments.size() != function_type->param_types.size()) {
             this->error_function_call_num_args(n.start);
-            if (!function_is_generic(function_type)) {
-                retv.set_type(*function_type.return_type);
+            if (!function_is_generic(*function_type)) {
+                retv.set_type(*function_type->return_type);
                 return std::make_unique<SemanticInfo>(retv);
             } else {
                 return error_stub();
@@ -530,25 +564,30 @@ USemanticInfo Checker::visit_call(CallNode& n) {
         for (auto& arg: n.arguments) {
             USemanticInfo arg_type_p = this->dispatch(arg);
             sn->arguments.push_back(arg_type_p->snode);
-            const TypeNode& arg_type = arg_type_p->type();
-            if (!arg_type_p->is_constant) {
-                args_are_constant = false;
+            Entity* arg_entity = arg_type_p->entity;
+            if (arg_entity->type == E_TYPE::CLASS || arg_entity->type == E_TYPE::PACKAGE ||
+                arg_entity->type == E_TYPE::MODULE) {
+                throw std::runtime_error("Error can't pass as argument");
             }
+            TypeNode& arg_type = *get_entity_type(arg_entity);
+            // if (!arg_type_p->is_constant) {
+            //     args_are_constant = false;
+            // }
             arg = this->replace_if_necessary(arg);
             arg_types.push_back(arg_type.clone());
             n.arg_types.push_back(arg_type.clone());
         }
 
-        if (function_is_generic(function_type)) {
-            retv = match_arguments_to_generic_function(function_type, arg_types);
+        if (function_is_generic(*function_type)) {
+            retv = match_arguments_to_generic_function(*function_type, arg_types);
             // for(auto x: arg_types){
             //     delete x;
             // }
         } else {
-            retv.set_type(*function_type.return_type);
+            retv.entity = entity_from_type(*function_type->return_type);
             for (int i = 0; i < n.arguments.size(); i++) {
                 const TypeNode& arg_type = *arg_types[i];
-                const TypeNode& param_type = *function_type.param_types[i];
+                const TypeNode& param_type = *function_type->param_types[i];
                 if (arg_type != param_type) {
                     if (arg_type.kind != Kind::UNKNOWN) {
                         this->error_function_call_type_mismatch(param_type,
@@ -564,6 +603,29 @@ USemanticInfo Checker::visit_call(CallNode& n) {
             }
         }
     } else {
+        std::string entity_type;
+        switch (fun_info.entity->type) {
+
+            case E_TYPE::CLASS:
+                entity_type = "CLASS";
+                break;
+            case E_TYPE::CONST_FUNCTION:
+                entity_type = "CONST FUNCTION";
+                break;
+            case E_TYPE::FUNCTION_VALUE:
+                entity_type = "FUNCTION VALUE";
+                break;
+            case E_TYPE::OBJECT_VALUE:
+                entity_type = "OBJECT VALUE";
+                break;
+            case E_TYPE::PACKAGE:
+                entity_type = "PACKAGE";
+                break;
+            case E_TYPE::MODULE:
+                entity_type = "MODULE";
+                break;
+        }
+        throw std::runtime_error("Calling something that's not a function it's a " + entity_type);
         this->error_call_not_a_function(n.start);
     }
     if (is_a_method) {
@@ -575,6 +637,19 @@ USemanticInfo Checker::visit_call(CallNode& n) {
 }
 
 USemanticInfo Checker::visit_root(BlockNode& node) {
+
+    // Initialize module level Scope
+    for (auto f: this->module->functions) {
+        this->scope->set(f.first, f.second);
+    }
+    for (auto c: this->module->classes) {
+        this->scope->set(c.first, c.second);
+    }
+
+    for (auto i: this->module->imports) {
+        this->scope->set(i.first, i.second);
+    }
+
     USemanticInfo info = this->visit_block(node);
     this->root_snode = static_cast<BlockSNode*>(info->snode);
     SemanticInfo f;
@@ -590,7 +665,7 @@ USemanticInfo Checker::visit_block(BlockNode& node) {
     for (auto& n: node.nodes) {
         USemanticInfo sinfo_p = this->dispatch(n);
 
-        sn->nodes.push_back(sinfo_p->snode);
+        // sn->nodes.push_back(sinfo_p->snode);
 
         n = this->replace_if_necessary(n);
         if (n->ntype == NodeType::BLOCK) {
@@ -619,14 +694,14 @@ USemanticInfo Checker::visit_function(FunctionNode& n) {
     info.snode = sn;
     Logger::info("Checking FunctionNode " + n.identifier);
     std::string& function_name = n.identifier;
-    sn->identifier = mangle_path(this->local_paths[n.identifier]);
+    sn->identifier = mangle_path(this->module->full_path + "." + n.identifier);
     sn->params = n.parameter_names;
     this->current_function = function_name;
     this->enter_scope(function_name);
     this->scope->is_function = true;
     bool is_init_method = this->is_method && function_name == "init";
     if (this->add_this) {
-        this->scope->set("this", *this->this_type);
+        // this->scope->set("this", *this->this_type);
         sn->params.insert(sn->params.begin(), "this");
     }
     for (int i = 0; i < n.parameter_names.size(); i++) {
@@ -636,18 +711,18 @@ USemanticInfo Checker::visit_function(FunctionNode& n) {
             this->assert_type_exists(type, n.start);
             std::cout << "END" << std::endl;
         }
-        this->scope->set(n.parameter_names[i], type);
+        this->scope->set(n.parameter_names[i], entity_from_type(type));
     }
     std::cout << "FINISH " << std::endl;
 
     TypeNode& returnType = *n.return_type;
     this->assert_type_exists(returnType, n.start);
-    this->scope->set("__return__", returnType);
+    this->scope->set("__return__", entity_from_type(returnType));
     USemanticInfo body_info = this->visit_block(*n.body);
     sn->body = static_cast<BlockSNode*>(body_info->snode);
-    for (auto v: this->scope->table) {
-        n.body->local_vars.push_back(std::make_pair(v.first, v.second->clone()));
-    }
+    // for (auto v: this->scope->table) {
+    //     n.body->local_vars.push_back(std::make_pair(v.first, v.second->clone()));
+    // }
     if (is_init_method) {
         for (int i = 0; i < n.body->nodes.size(); i++) {
             if (n.body->nodes[i]->ntype == NodeType::ASSIGN) {
@@ -696,61 +771,11 @@ USemanticInfo Checker::visit_id(IdNode& n) {
     SemanticInfo info;
     IdSNode* sn = new IdSNode();
     info.snode = sn;
-    if (!this->scope->has(n._id)) {
-        // might be imported
-        if (this->imported_paths.count(n._id) != 0) {
-            std::string path = this->imported_paths[n._id];
-            sn->identifier = mangle_path(path);
-            Logger::info("ID '" + n._id + "' is imported, path: '" + path + "'");
-            if (this->function_table->has_function(path)) {
-                const FunctionType& ft = this->function_table->get(path);
-                info.set_type(ft);
-                info.is_function = true;
-                Logger::info("ID is an imported function of type " + ft.to_string());
-            } else if (this->global_packages->count(path) != 0) {
-                Logger::info("ID is an imported package");
-                info.is_package = true;
-                info.package = this->global_packages->at(path);
-            } else if (this->global_modules->count(path) != 0) {
-                Logger::info("ID is an imported module");
-                info.is_module = true;
-                info.module = this->global_modules->at(path);
-            }
-        } else if (this->local_paths.count(n._id) != 0) {
-            std::string path = this->local_paths[n._id];
-            if (this->function_table->has_function(path)) {
-                const FunctionType& ft = this->function_table->get(path);
-                info.set_type(ft);
-                info.is_function = true;
-                Logger::info("ID is an function of type " + ft.to_string());
-            }
-        } else {
-            this->error_variable_not_declared(n._id, n.start);
-            return error_stub();
-        }
-    } else {
-        sn->identifier = n._id;
-        info.set_type(this->scope->get(n._id));
-        if (info.type().kind == Kind::UNKNOWN) {
-            info.is_error = true;
-        } else {
-            n.location = this->scope->find(n._id);
-            if (info.type().kind == Kind::OBJECT) {
-                const ObjectType& otn = info.type().object();
-                if (otn.id == "Option") {
-                    if (this->scope->get_not_none(n._id)) {
-                        info.set_type(*otn.type_params[0]);
-                    }
-                }
-
-            }
-            if (info.type().kind == Kind::FUNCTION) {
-                info.is_function = true;
-                info.is_method = false;
-                info.is_class_method = false;
-            }
-        }
+    Entity* entity = this->scope->get(n._id);
+    if (entity == nullptr) {
+        throw std::runtime_error("Entity with name : " + n._id + " not found!");
     }
+    info.entity = entity;
     return std::make_unique<SemanticInfo>(info);
 }
 
@@ -768,7 +793,7 @@ USemanticInfo Checker::check_declaration_with_type(DeclarationNode& n) {
     sn->expression = exp_info_p->snode;
     SemanticInfo& exp_info = *exp_info_p;
     if (exp_info.is_error) {
-        this->scope->set(n.identifier, n_type);
+        this->scope->set(n.identifier, entity_from_type(n_type));
         return std::make_unique<SemanticInfo>(info);
     }
     n.expression = this->replace_if_necessary(n.expression);
@@ -816,16 +841,17 @@ USemanticInfo Checker::check_declaration_without_type(DeclarationNode& n) {
     info.snode = sn;
     sn->identifier = n.identifier;
     sn->expression = exp_info_p->snode;
-    if (exp_info_p->type() == T_NONE) {
-        this->error_function_doesnt_return_a_value(n.expression->start, nullptr);
-        USemanticInfo error_t = error_stub();
-        this->scope->set(n.identifier, error_t->type());
-        return error_t;
-    }
-    n.type = exp_info_p->type().clone();
+    // if (exp_info_p->type() == T_NONE) {
+    //     this->error_function_doesnt_return_a_value(n.expression->start, nullptr);
+    //     USemanticInfo error_t = error_stub();
+    //     this->scope->set(n.identifier, entity_from_type(error_t->type()));
+    //     return error_t;
+    // }
+    // n.type = exp_info_p->type().clone();
     SemanticInfo& exp_info = *exp_info_p;
     n.expression = this->replace_if_necessary(n.expression);
-    info.set_type(exp_info.type());
+    // info.set_type(exp_info.type());
+    info.entity = exp_info_p->entity;
     return std::make_unique<SemanticInfo>(info);
 }
 
@@ -841,7 +867,7 @@ USemanticInfo Checker::visit(DeclarationNode& n) {
     } else {
         info = this->check_declaration_without_type(n);
     }
-    this->scope->set(n.identifier, info->type());
+    this->scope->set(n.identifier, info->entity);
     return info;
 }
 
@@ -912,7 +938,7 @@ USemanticInfo Checker::visit(AssignmentNode& n) {
 }
 
 USemanticInfo Checker::member_class_method(std::string class_name, std::string child, MemberNode& n) {
-    ClassInfo* class_info = this->class_table->get("");
+    Class* class_info = nullptr;//this->class_table->get("");
     SemanticInfo rv;
     if (class_info->methods.find(child) != class_info->methods.end()) {
         // unbound method
@@ -970,42 +996,21 @@ USemanticInfo Checker::member_tuple(const ObjectType& final_type, MemberNode& n)
     return std::make_unique<SemanticInfo>(s);
 }
 
-USemanticInfo
-Checker::member_normal(const ObjectType& final_type, const ObjectType& object, std::string child, MemberNode& n,
-                       SemanticInfo& info) {
-    if (n.type != MemberType::STR) {
-        throw std::runtime_error(
-                "Error: can access number member for tuple types only, but got " + final_type.to_string());
-    }
-
-    ClassInfo* class_info;
-    if (this->imported_paths.count(final_type.id) != 0) {
-        class_info = this->class_table->get(this->imported_paths[final_type.id]);
-    } else if (this->class_table->declared(final_type.to_string())) {
-        class_info = this->class_table->get(final_type.to_string());
-    } else {
-        if (is_generic((final_type)) && final_type.type_params.size() == 0) {
-            throw std::runtime_error(
-                    "Cannot access member of totally generic value of generic type " + object.id + "!");
-        } else {
-            class_info = this->class_table->get("");
-            class_info = instantiate_generic(class_info, final_type);
-            this->class_table->set(object.to_string(), class_info);
-        }
-    }
+USemanticInfo Checker::member_normal(Class* class_info, std::string child, SNode* object_snode) {
     SemanticInfo rv;
     if (class_info->members.find(child) != class_info->members.end()) {
         // It's a member
-        info.set_type(*class_info->members[child]);
-        rv = info;
+        rv.set_type(*class_info->members[child]);
     } else if (class_info->methods.find(child) != class_info->methods.end()) {
-        info.set_type(*class_info->methods[child]);
-        info.is_function = true;
-        rv = info;
+        rv.set_type(*class_info->methods[child]);
+        rv.is_function = true;
+        rv.snode = object_snode;
+        rv.is_method = true;
+        // rv.method_name = class_info->methods_paths[child];
         // this->error_method_not_member(object, child, n.start);
         // return error_stub();
     } else {
-        this->error_no_member(object, child, n.start);
+        throw std::runtime_error("Error member not found in object of class " + class_info->class_name);
         return error_stub();
     }
     return std::make_unique<SemanticInfo>(rv);
@@ -1013,83 +1018,25 @@ Checker::member_normal(const ObjectType& final_type, const ObjectType& object, s
 
 
 USemanticInfo Checker::visit_member(MemberNode& n) {
-    std::string& child = n.s_child;
-    // if (n.parent->ntype == NodeType::ID) {
-    //     IdNode& id_node = n.parent->id();
-    //     // It might be something like <class>.<method>, so we need to handle this case differently
-    //     if (this->class_table->declared(id_node._id)) {
-    //         return this->member_class_method(id_node._id, child, n);
-    //     }
-    // }
-    bool old_lvalue = this->is_lvalue;
-    this->is_lvalue = false;
-    USemanticInfo symbol_info_p = this->dispatch(n.parent);
-    if (symbol_info_p->is_module) {
-        SemanticInfo info;
-        Module* module = symbol_info_p->module;
-        auto full_path = module->local_paths.find(n.s_child);
-        if (full_path != module->local_paths.end()) {
-            std::cout << "Found name " << n.s_child << " in module " << module->dotted_path << std::endl;
-            const FunctionType& ft = this->function_table->get(full_path->second);
-            std::cout << "It has type: " << ft.to_string() << std::endl;
-            info.set_type(ft);
-            info.is_function = true;
-            n.replace_with_path = full_path->second;
-            return std::make_unique<SemanticInfo>(info);
-        } else {
-            std::cout << "Could not find name " << n.s_child << " in module " << module->dotted_path << std::endl;
-        }
-    } else if (symbol_info_p->is_package) {
-        SemanticInfo info;
-        Package* package = symbol_info_p->package;
-        auto full_path = package->children.find(n.s_child);
-        if (full_path != package->children.end()) {
-            std::cout << "Found name " << n.s_child << " in package " << package->dotted_path << std::endl;
-            Unit* unit = package->children[n.s_child];
-            if (unit->type == UnitType::MODULE) {
-                info.is_module = true;
-                info.module = (Module*) unit;
-            } else {
-                // sub package
-                info.is_package = true;
-                info.package = (Package*) unit;
-            }
-            return std::make_unique<SemanticInfo>(info);
-        } else {
-            std::cout << "Could not find name " << n.s_child << " in package " << package->dotted_path << std::endl;
-        }
-    }
-    this->is_lvalue = old_lvalue;
-    SemanticInfo& info = *symbol_info_p;
-    if (info.is_error) {
-        return error_stub();
-    }
-    if (info.type().kind != Kind::OBJECT) {
-        this->error_member_no_object(n.start);
-        return error_stub();
-    }
-    n.parent_t = symbol_info_p->type().clone();
-    const ObjectType& object = info.type().object();
-    const ObjectType* option_type = nullptr;
-    if (n.parent->ntype == NodeType::ID) {
-        IdNode& idn = n.parent->id();
-        if (object.id == "Option") {
-            if (this->scope->get_not_none(idn._id)) {
-                // we can guarantee that it's not null, so we can access the members
-                option_type = &(object.type_params[0])->object();
-            } else {
-                throw std::runtime_error(
-                        "Error: line " + text_pos_to_string(this->__file__, idn.start) + " -> " + idn._id +
-                        " might be none here, make sure to  this in a if XXX != none {...}!");
-            }
-        }
-    }
-    const ObjectType& final_type = option_type != nullptr ? *option_type : object;
-    if (final_type.id == "Tuple") {
-        // special treatment for tuples
-        return this->member_tuple(final_type, n);
-    } else {
-        return this->member_normal(final_type, object, child, n, info);
+    USemanticInfo parent_info = this->dispatch(n.parent);
+    Entity* parent_entity = parent_info->entity;
+    switch (parent_entity->type) {
+        case E_TYPE::CLASS:
+            return this->class_member((Class*) parent_entity, n.s_child);
+            break;
+        case E_TYPE::CONST_FUNCTION:
+            throw std::runtime_error("Error: trying to get member of const function!");
+        case E_TYPE::FUNCTION_VALUE:
+            throw std::runtime_error("Error: trying to get member of function value!");
+        case E_TYPE::OBJECT_VALUE:
+            return this->object_member((ObjectValue*) parent_entity, n.s_child);
+            break;
+        case E_TYPE::PACKAGE:
+            return this->package_member((Package*) parent_entity, n.s_child);
+            break;
+        case E_TYPE::MODULE:
+            return this->module_member((Module*) parent_entity, n.s_child);
+            break;
     }
 }
 
@@ -1127,9 +1074,9 @@ USemanticInfo Checker::visit(IfNode& n) {
 
     this->enter_scope("if");
     this->visit_block(*n.then);
-    for (auto v: this->scope->table) {
-        n.then->local_vars.push_back(std::make_pair(v.first, v.second->clone()));
-    }
+    // for (auto v: this->scope->table) {
+    //     n.then->local_vars.push_back(std::make_pair(v.first, v.second->clone()));
+    // }
     this->leave_scope();
 
     for (int i = 0; i < n.elifs.size(); i++) {
@@ -1183,11 +1130,11 @@ USemanticInfo Checker::visit(BoolOpNode& n) {
 }
 
 USemanticInfo Checker::visit(BinopNode& n) {
-    
+
     CallSNode* sn = new CallSNode();
     IdSNode* function_id = new IdSNode();
     sn->function = function_id;
-    function_id->identifier = mangle_path(this->imported_paths.at("Integer.add"));
+    function_id->identifier = "";//mangle_path(this->module->imported_paths.at("Integer.add"));
     SemanticInfo info;
     info.snode = sn;
 
@@ -1275,7 +1222,15 @@ USemanticInfo Checker::visit_return(ReturnNode& n) {
     SemanticInfo info;
     ReturnSNode* sn = new ReturnSNode();
     info.snode = sn;
-    const TypeNode& return_type = this->scope->get("__return__");
+    Entity* return_entity = this->scope->get("__return__");
+    TypeNode* return_typet;
+    if (return_entity->type == E_TYPE::FUNCTION_VALUE) {
+        return_typet = ((FunctionValue*) return_entity)->ft;
+    }
+    if (return_entity->type == E_TYPE::OBJECT_VALUE) {
+        return_typet = ((ObjectValue*) return_entity)->ot;
+    }
+    TypeNode& return_type = *return_typet;
     if (return_type == T_NONE) {
         if (n.expression != nullptr) {
             this->error_bad_return(n.start);
@@ -1291,10 +1246,10 @@ USemanticInfo Checker::visit_return(ReturnNode& n) {
     }
     sn->expression = expression_info.snode;
     n.expression = this->replace_if_necessary(n.expression);
-    if (!this->can_assign(expression_info.type(), return_type)) {
-        this->error_return_mismatch(return_type, expression_info.type(), n.start);
-        return error_stub();
-    }
+    // if (!this->can_assign(expression_info.type(), return_type)) {
+    //     this->error_return_mismatch(return_type, expression_info.type(), n.start);
+    //     return error_stub();
+    // }
     n.ret_type = return_type.clone();
     n.reachables = this->scope->get_all();
     return std::make_unique<SemanticInfo>(info);
@@ -1329,13 +1284,18 @@ USemanticInfo Checker::visit(DefaultConstructorNode& node) {
     // this is a regular function
     SemanticInfo info;
     VectorOfTypes t;
-    if (this->class_table->declared(node.name)) {
-        ClassInfo* ci = this->class_table->get(node.name);
-        for (auto pt: ci->member_types) {
-            t.push_back(pt->clone());
-        }
+    Entity* entity = this->scope->get(node.name);
+    if (entity == nullptr) {
+        throw std::runtime_error("Error: " + node.name + " not defined");
     }
-    info.set_type(FunctionType(t, new ObjectType(node.name)));
+    if (entity->type != E_TYPE::CLASS) {
+        throw std::runtime_error("Error: " + node.name + " is not a class");
+    }
+    Class* cls = (Class*) entity;
+    for (auto pt: cls->member_types) {
+        t.push_back(pt->clone());
+    }
+    info.entity = entity_from_type(FunctionType(t, new ObjectType(node.name)));
     info.is_function = true;
     return std::make_unique<SemanticInfo>(info);
 }

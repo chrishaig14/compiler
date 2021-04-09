@@ -11,11 +11,12 @@
 #include <vector>
 #include "../nodes/TypeNode.h"
 #include "../macros.h"
+#include "Entity.h"
 
-class ClassInfo {
+class Class : public Entity {
 public:
     VectorOfStrings member_names;
-    VectorOfTypes member_types;
+    std::vector<TypeNode*> member_types;
 
     MapStringType members;
     std::unordered_map<std::string, FunctionType*> methods;
@@ -25,18 +26,14 @@ public:
 
     std::string class_name;
 
-    ClassInfo() {
-
+    Class() : Entity(E_TYPE::CLASS) {
     }
 
-    ClassInfo(std::string class_name, const VectorOfStrings& fieldNames, const VectorOfTypes& fieldTypes,
-              VectorOfStrings type_parameters);
+    ~Class();
 
-    ~ClassInfo();
+    bool operator!=(const Class& b) const;
 
-    bool operator!=(const ClassInfo& b) const;
-
-    bool operator==(const ClassInfo& b) const;
+    bool operator==(const Class& b) const;
 
     VectorOfStrings type_params;
 };

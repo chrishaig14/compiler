@@ -15,8 +15,8 @@ bool function_is_generic(const FunctionType& ft) {
     return false;
 }
 
-ClassInfo* make_list_class_info() {
-    auto list_class_info = new ClassInfo();
+Class* make_list_class_info() {
+    auto list_class_info = new Class();
     list_class_info->class_name = "List";
     list_class_info->methods.insert(std::make_pair("len", new FunctionType({}, new T_INT)));
 
@@ -34,66 +34,57 @@ ClassInfo* make_list_class_info() {
     return list_class_info;
 }
 
-ClassInfo* make_file_class_info() {
-    auto int_class_info = new ClassInfo();
+Class* make_file_class_info() {
+    auto int_class_info = new Class();
     int_class_info->class_name = "File";
     int_class_info->methods.insert(std::make_pair("read_line", parse_function_type("fun()->String")));
     return int_class_info;
 }
 
-ClassInfo* make_int_class_info() {
-    auto int_class_info = new ClassInfo();
+Class* make_int_class_info() {
+    auto int_class_info = new Class();
     int_class_info->class_name = "Integer";
     int_class_info->methods.insert(std::make_pair("str", parse_function_type("fun()->String")));
     int_class_info->methods.insert(std::make_pair("add", parse_function_type("fun(Integer)->String")));
     return int_class_info;
 }
 
-ClassInfo* make_boolean_class_info() {
-    auto int_class_info = new ClassInfo();
+Class* make_boolean_class_info() {
+    auto int_class_info = new Class();
     int_class_info->class_name = "Boolean";
     int_class_info->methods.insert(std::make_pair("str", parse_function_type("fun()->String")));
     return int_class_info;
 }
 
-ClassInfo* make_float_class_info() {
-    auto float_class_info = new ClassInfo();
+Class* make_float_class_info() {
+    auto float_class_info = new Class();
     float_class_info->class_name = "Float";
     float_class_info->methods.insert(std::make_pair("str", parse_function_type("fun()->String")));
     return float_class_info;
 }
 
-ClassInfo* make_double_class_info() {
-    auto float_class_info = new ClassInfo();
+Class* make_double_class_info() {
+    auto float_class_info = new Class();
     float_class_info->class_name = "Double";
     float_class_info->methods.insert(std::make_pair("str", parse_function_type("fun()->String")));
     return float_class_info;
 }
 
-ClassInfo* make_string_class_info() {
-    auto string_class_info = new ClassInfo();
+Class* make_string_class_info() {
+    auto string_class_info = new Class();
     string_class_info->class_name = "String";
     string_class_info->methods.insert(std::make_pair("len", parse_function_type("fun()->Integer")));
     return string_class_info;
 }
 
-Checker::Checker(std::map<std::string, std::string>& imported_paths, std::map<std::string, std::string>& local_paths,
-                 ClassTable* class_table, FunctionTable* function_table)
-        : imported_paths(imported_paths), local_paths(local_paths) {
+Checker::Checker() {
     this->is_lvalue = false;
     this->is_method = false;
-    this->function_table = function_table;
     this->failed = false;
-    this->class_table = class_table;
     this->scope = new SymbolTable("global", nullptr);
     this->scopes["global"] = this->scope;
-
     this->add_this = false;
     this->this_type = nullptr;
-
-    this->class_table->set("Tuple", nullptr);
-
-    this->class_table->set("Option", new ClassInfo("Option", VectorOfStrings(), {}, {"t"}));
     this->replace_me = false;
 }
 
@@ -118,25 +109,25 @@ bool Checker::assert_type_exists(TypeNode& type, TextPosition pos) {
         }
         if (type.object().type_params.size() == 0) {
             if (!is_generic(type)) {
-                if (this->imported_paths.count(type.object().id) == 0) {
-                    this->error_class_not_found(type, {1, 1});
-                    return false;
-                }
+                // if (this->imported_paths.count(type.object().id) == 0) {
+                //     this->error_class_not_found(type, {1, 1});
+                //     return false;
+                // }
             }
             return true;
         }
-        if (this->imported_paths.count(type.object().id) == 0) {
-            this->error_class_not_found(type, pos);
-            return false;
-        } else {
-            bool error = false;
-            for (auto t: type.object().type_params) {
-                if (!this->assert_type_exists(*t, pos)) {
-                    error = true;
-                }
-            }
-            return !error;
-        }
+        // if (this->imported_paths.count(type.object().id) == 0) {
+        //     this->error_class_not_found(type, pos);
+        //     return false;
+        // } else {
+        //     bool error = false;
+        //     for (auto t: type.object().type_params) {
+        //         if (!this->assert_type_exists(*t, pos)) {
+        //             error = true;
+        //         }
+        //     }
+        //     return !error;
+        // }
     } else {
         bool error = false;
         for (auto t: type.function().param_types) {
@@ -276,7 +267,7 @@ TypeNode* make_type(const TypeNode& original, const MapStringType& replacements)
     }
 }
 
-ClassInfo* Checker::instantiate_generic(ClassInfo* generic, const ObjectType& instance) {
+Class* Checker::instantiate_generic(Class* generic, const ObjectType& instance) {
     MapStringType replacements;
     for (int i = 0; i < generic->type_params.size(); i++) {
         std::string tp = generic->type_params[i];
@@ -296,7 +287,7 @@ ClassInfo* Checker::instantiate_generic(ClassInfo* generic, const ObjectType& in
         concrete_methods.insert(std::make_pair(m.first, &concrete_type.function()));
     }
 
-    ClassInfo* concrete = new ClassInfo();
+    Class* concrete = new Class();
     concrete->class_name = generic->class_name;
     concrete->methods = concrete_methods;
     concrete->member_names = generic->member_names;

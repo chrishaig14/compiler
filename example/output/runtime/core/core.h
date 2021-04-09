@@ -19,17 +19,17 @@
 #include "../macros.h"
 #include "basics.h"
 
-TaggedObject* m_core_f_print_f(TaggedObject* _s);
+TaggedObject* core_D_print_f(TaggedObject* _s);
 
-TaggedObject* m_core_f_range_f(TaggedObject* _start, TaggedObject* _step, TaggedObject* _end);
+TaggedObject* core_D_range_f(TaggedObject* _start, TaggedObject* _step, TaggedObject* _end);
 
-TaggedObject* m_core_f_Integer_str_f(TaggedObject* _i);
+TaggedObject* core_D_Integer_str_f(TaggedObject* _i);
 
-TaggedObject* m_core_f_Boolean_str_f(TaggedObject* _i);
+TaggedObject* core_D_Boolean_str_f(TaggedObject* _i);
 
-TaggedObject* m_core_f_map_f(TaggedObject* _l, TaggedObject* _f);
+TaggedObject* core_D_map_f(TaggedObject* _l, TaggedObject* _f);
 
-TaggedObject* m_core_f_join_f(TaggedObject* _l, TaggedObject* _s);
+TaggedObject* core_D_join_f(TaggedObject* _l, TaggedObject* _s);
 
 TaggedObject* op_lt(TaggedObject* a, TaggedObject* b);
 
@@ -45,22 +45,26 @@ TaggedObject* op_leq(TaggedObject* a, TaggedObject* b);
 
 TaggedObject* subscript(TaggedObject* _l, TaggedObject* i);
 
-extern Function1 m_core_f_open_o;
-extern Function1 m_core_f_orint_o;
-extern Function3 m_core_f_range_o;
-extern Function2 m_core_f_map_o;
-extern Function2 m_core_f_join_o;
+TaggedObject* core_D_Integer_D_add_f(TaggedObject* a, TaggedObject* b);
+
+extern Function1 core_D_open_o;
+extern Function1 core_D_orint_o;
+extern Function3 core_D_range_o;
+extern Function2 core_D_map_o;
+extern Function2 core_D_join_o;
 extern Function1 m_core_c_Integer_f_str_o;
 extern Function1 m_core_c_Double_f_str_o;
 extern Function1 m_core_c_Float_f_str_o;
 extern Function1 m_core_c_Boolean_f_str_o;
 extern Function2 m_core_list_subscript_o;
-extern TaggedObject* m_core_f_open;
-extern TaggedObject* m_core_f_print;
-extern TaggedObject* m_core_f_range;
-extern TaggedObject* m_core_f_map;
-extern TaggedObject* m_core_f_join;
+extern Function2 core_D_Integer_D_add_o;
+extern TaggedObject* core_D_open;
+extern TaggedObject* core_D_print;
+extern TaggedObject* core_D_range;
+extern TaggedObject* core_D_map;
+extern TaggedObject* core_D_join;
 extern TaggedObject* m_core_c_Integer_f_str;
+extern TaggedObject* core_D_Integer_D_add;
 extern TaggedObject* m_core_c_Float_f_str;
 extern TaggedObject* m_core_c_Double_f_str;
 extern TaggedObject* m_core_c_Boolean_f_str;
