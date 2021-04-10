@@ -302,6 +302,15 @@ USemanticInfo error_stub() {
     return std::make_unique<SemanticInfo>(ErrorStub());
 }
 
+Flirpin map_unit_to_flirpin(Unit u) {
+    switch (u.type) {
+        case U_TYPE::PACKAGE:
+            return Flirpin{.type=F_TYPE::PACKAGE, .package=u.package};
+        case U_TYPE::MODULE:
+            return Flirpin{.type=F_TYPE::MODULE, .module=u.module};
+    }
+}
+
 Node* Checker::replace_if_necessary(Node* node) {
     if (this->replace_me) {
         this->replace_me = false;
@@ -326,6 +335,8 @@ bool Checker::is_immutable(const TypeNode& node) {
     }
     return false;
 }
+
+
 
 Checker::~Checker() {
     for (auto s: this->scopes) {

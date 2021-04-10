@@ -488,13 +488,13 @@ USemanticInfo Checker::visit(MethodNode& n) {
 TypeNode* get_entity_type(Entity e) {
     Entity* ent = &e;
     if (ent->type == E_TYPE::CONST_FUNCTION) {
-        return ((ConstFunction*) ent)->ft->clone();
+        return e.const_function->ft->clone();
     }
     if (ent->type == E_TYPE::FUNCTION_VALUE) {
-        return ((FunctionValue*) ent)->ft->clone();
+        return e.function_value->ft->clone();
     }
     if (ent->type == E_TYPE::OBJECT_VALUE) {
-        return ((ObjectValue*) ent)->ot->clone();
+        return e.object_value->ot->clone();
     }
     throw std::runtime_error("Get type of non function/object!");
 }
@@ -547,10 +547,10 @@ USemanticInfo Checker::visit_call(CallNode& n) {
     n.function = replace_if_necessary(n.function);
     FunctionType* function_type = nullptr;
     if (fun_info.entity.type == E_TYPE::CONST_FUNCTION) {
-        function_type = ((FunctionValue*) fun_info.entity.const_function)->ft->clone();
+        function_type = fun_info.entity.const_function->ft->clone();
     }
     if (fun_info.entity.type == E_TYPE::FUNCTION_VALUE) {
-        function_type = ((FunctionValue*) fun_info.entity.const_function)->ft->clone();
+        function_type = fun_info.entity.const_function->ft->clone();
     }
     if (function_type != nullptr) {
         // ok
@@ -1105,8 +1105,13 @@ USemanticInfo Checker::visit(BoolOpNode& n) {
 
     SemanticInfo info;
     bool ok = false;
-    const TypeNode& l_type = left_info.type();
-    const TypeNode& r_type = right_info.type();
+    if (left_info.entity.type != E_TYPE::OBJECT_VALUE || right_info.entity.type != E_TYPE::OBJECT_VALUE) {
+        throw std::runtime_error("Can't have binop between 2 non objects!");
+    }
+    // const TypeNode& l_type = left_info.type();
+    // const TypeNode& r_type = right_info.type();
+    const TypeNode& l_type = *get_entity_type(left_info.entity);
+    const TypeNode& r_type = *get_entity_type(right_info.entity);
     if (l_type.kind == Kind::OBJECT) {
         auto& left = l_type.object();
         if (r_type.kind == Kind::OBJECT) {
@@ -1141,14 +1146,18 @@ USemanticInfo Checker::visit(BinopNode& n) {
     USemanticInfo left_info_p = this->dispatch(n.left);
     Node* left_replace = this->replace_if_necessary(n.left);
     USemanticInfo right_info_p = this->dispatch(n.right);
-
+    if (left_info_p->entity.type != E_TYPE::OBJECT_VALUE || right_info_p->entity.type != E_TYPE::OBJECT_VALUE) {
+        throw std::runtime_error("Can't have binop between 2 non objects!");
+    }
+    const TypeNode& ltype = *get_entity_type(left_info_p->entity);
+    const TypeNode& rtype = *get_entity_type(right_info_p->entity);
     bool err = false;
-    if (left_info_p->type() == T_NONE) {
+    if (ltype == T_NONE) {
         this->error_function_doesnt_return_a_value(n.left->start, nullptr);
         err = true;
     }
 
-    if (right_info_p->type() == T_NONE) {
+    if (rtype == T_NONE) {
         this->error_function_doesnt_return_a_value(n.right->start, nullptr);
         err = true;
     }
@@ -1172,21 +1181,18 @@ USemanticInfo Checker::visit(BinopNode& n) {
     if (left_info_p->is_constant && right_info_p->is_constant) {
         info.is_constant = true;
     }
-
-    auto& left = left_info.type().object();
-    auto& right = right_info.type().object();
-    auto ltype = left.id;
-    auto rtype = right.id;
+    TypeNode* rettype;
     bool ok = true;
-    if (ltype == "Integer" && rtype == "Integer") {
-        info.set_type(T_INT);
-    } else if (ltype == "Float" && rtype == "Float") {
-        info.set_type(ObjectType("Float"));
-    } else if (ltype == "Double" && rtype == "Double") {
-        info.set_type(ObjectType("Double"));
-    } else if (ltype == "String" && rtype == "String") {
+    if (ltype.object().id == "Integer" && rtype.object().id == "Integer") {
+        rettype = new T_INT;
+    } else if (ltype.object().id == "Float" && rtype.object().id == "Float") {
+        rettype = new ObjectType("Float");
+    } else if (ltype.object().id == "Double" && rtype.object().id == "Double") {
+        rettype = new ObjectType("Double");
+
+    } else if (ltype.object().id == "String" && rtype.object().id == "String") {
         if (n.op == OpType::ADD) {
-            info.set_type(T_STRING);
+            rettype = new T_STRING;
             IdNode* idn = new IdNode("String_add", POS_NONE, POS_NONE);
             idn->is_global_function = true;
             this->replace_me = true;
@@ -1194,9 +1200,9 @@ USemanticInfo Checker::visit(BinopNode& n) {
         } else {
             ok = false;
         }
-    } else if (ltype == "List" && rtype == "List" && left == right) {
+    } else if (ltype.object().id == "List" && ltype == rtype) {
         if (n.op == OpType::ADD) {
-            info.set_type(left);
+            rettype = ltype.clone();
             IdNode* idn = new IdNode("List_add", POS_NONE, POS_NONE);
             idn->is_global_function = true;
             this->replace_me = true;
@@ -1209,10 +1215,12 @@ USemanticInfo Checker::visit(BinopNode& n) {
     }
 
     if (!ok) {
-        this->error_binop(left, right, n.op_pos);
+        this->error_binop(ltype, rtype, n.op_pos);
         return error_stub();
     }
-    n.ltype = left.clone();
+    // n.ltype = left.clone();
+    info.entity = Entity{.type=E_TYPE::OBJECT_VALUE, .object_value=new ObjectValue()};
+    info.entity.object_value->ot = (ObjectType*) rettype;
 
     return std::make_unique<SemanticInfo>(info);
 }

@@ -122,26 +122,25 @@ VectorOfStrings make_path(std::string s) {
     return path;
 }
 
-Flirpin map_unit_to_flirpin(Unit u) {
-    switch (u.type) {
-        case U_TYPE::PACKAGE:
-            return Flirpin{.type=F_TYPE::PACKAGE, .package=u.package};
-        case U_TYPE::MODULE:
-            return Flirpin{.type=F_TYPE::MODULE, .module=u.module};
-    }
-}
-
 void add_path_to_module(Module* module, std::string name, VectorOfStrings path) {
     Flirpin current_flirpin = Flirpin{.type=F_TYPE::PACKAGE, .package=root_package};
+    std::string path_so_far;
     for (auto path_part: path) {
         if (current_flirpin.type == F_TYPE::PACKAGE) {
             Package* package = current_flirpin.package;
-            current_flirpin = map_unit_to_flirpin(package->units[path_part]);
+            auto unit = package->units.find(path_part);
+            if (unit == package->units.end()) {
+                throw std::runtime_error("Error '" + path_part + "' not found in package " + path_so_far);
+            }
+            current_flirpin = map_unit_to_flirpin(unit->second);
+        } else if (current_flirpin.type == F_TYPE::MODULE) {
+            auto flirpin = current_flirpin.module->flirpins.find(path_part);
+            if (flirpin == current_flirpin.module->flirpins.end()){
+                throw std::runtime_error("Error '" + path_part + "' not found in module " + path_so_far);
+            }
+            current_flirpin = flirpin->second;
         }
-        else if (current_flirpin.type == F_TYPE::MODULE) {
-            current_flirpin = current_flirpin.module->flirpins[path_part];
-        }
-
+        path_so_far += "." + path_part;
     }
     module->flirpins[name] = current_flirpin;
 }

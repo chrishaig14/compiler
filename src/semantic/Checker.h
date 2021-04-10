@@ -48,6 +48,7 @@ Entity entity_from_type(const TypeNode& type);
 Class* make_string_class_info();
 Entity map_flirpin_to_entity(Flirpin flirpin);
 
+Flirpin map_unit_to_flirpin(Unit u);
 class Checker {
     bool add_this;
     bool is_lvalue;
@@ -191,7 +192,7 @@ public:
     USemanticInfo member_normal(Class* class_info, std::string child, SNode* object_snode);
     USemanticInfo class_member(Class* cls, std::string child);
     USemanticInfo object_member(ObjectValue* pValue, std::string child);
-    USemanticInfo package_member(Package* pPackage, std::string basicString);
+    USemanticInfo package_member(Package* package, std::string child);
     USemanticInfo module_member(Module* pModule, std::string basicString);
 };
 

@@ -205,8 +205,14 @@ USemanticInfo Checker::object_member(ObjectValue* pValue, std::string child) {
     return std::make_unique<SemanticInfo>(info);
 }
 
-USemanticInfo Checker::package_member(Package* pPackage, std::string basicString) {
-    return USemanticInfo();
+USemanticInfo Checker::package_member(Package* package, std::string child) {
+    if (package->units.count(child) == 0) {
+        throw std::runtime_error("Error: package " + package->name + " has no member " + child);
+    }
+    Unit unit = package->units[child];
+    SemanticInfo info;
+    info.entity = map_flirpin_to_entity(map_unit_to_flirpin(unit));
+    return std::make_unique<SemanticInfo>(info);
 }
 
 Entity map_flirpin_to_entity(Flirpin flirpin) {
