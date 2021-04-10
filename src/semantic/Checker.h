@@ -43,9 +43,10 @@ Class* make_boolean_class_info();
 Class* make_float_class_info();
 
 Class* make_double_class_info();
-Entity* entity_from_type(const TypeNode& type);
+Entity entity_from_type(const TypeNode& type);
 
 Class* make_string_class_info();
+Entity map_flirpin_to_entity(Flirpin flirpin);
 
 class Checker {
     bool add_this;

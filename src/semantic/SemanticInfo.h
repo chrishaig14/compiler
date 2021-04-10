@@ -18,7 +18,7 @@ class SemanticInfo {
 public:
     bool is_function;
     bool is_method;
-    Entity* entity;
+    Entity entity;
     std::string method_name;
     Class* class_info;
     bool is_class_method;

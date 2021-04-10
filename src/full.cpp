@@ -54,7 +54,7 @@ void build_packages(Package* package, int level) {
                     std::string module_path = package->path + "/" + d_name;
                     std::string module_name = d_name.substr(0, d_name.size() - 3);
                     Module* module = new Module(module_name, module_path);
-                    package->modules[module_name] = module;
+                    package->units[module_name] = Unit{.type=U_TYPE::MODULE, .module=module};
                 } else {
                     std::cout << std::string(level + 1, '\t') << "OTHER: " << d_name << std::endl;
                 }
@@ -62,9 +62,8 @@ void build_packages(Package* package, int level) {
                 std::string subpackage_path = package->path + "/" + d_name;
                 std::string subpackage_name = d_name;
                 Package* subpackage = new Package(d_name, subpackage_path);
-                package->subpackages[d_name] = subpackage;
                 build_packages(subpackage, level + 1);
-                package->subpackages[subpackage_name] = subpackage;
+                package->units[subpackage_name] = Unit{.type=U_TYPE::PACKAGE, .package=subpackage};
             }
         }
         ent = readdir(dir);
@@ -73,37 +72,41 @@ void build_packages(Package* package, int level) {
 
 void parse_all_modules(Package* package) {
     std::cout << "Parsing package " << package->name << std::endl;
-    for (auto m: package->subpackages) {
-        parse_all_modules((Package*) m.second);
-    }
-    for (auto m: package->modules) {
-        CodeLines code_lines;
-        std::cout << "Parsing module " << m.second->name << std::endl;
-        BlockNode* ast = full_parse(m.second->path, &code_lines);
-        std::cout << "- Done" << std::endl;
-        ((Module*) m.second)->ast = ast;
-        ((Module*) m.second)->code_lines = code_lines;
+    for (auto ep: package->units) {
+        if (ep.second.type == U_TYPE::PACKAGE) {
+            Package* subpackage = ep.second.package;
+            parse_all_modules((Package*) subpackage);
+        } else if (ep.second.type == U_TYPE::MODULE) {
+            Module* module = ep.second.module;
+            CodeLines code_lines;
+            std::cout << "Parsing module " << module->name << std::endl;
+            BlockNode* ast = full_parse(module->path, &code_lines);
+            std::cout << "- Done" << std::endl;
+            ((Module*) module)->ast = ast;
+            ((Module*) module)->code_lines = code_lines;
+        }
     }
 }
 
 void process_global_all_modules(Package* package) {
     std::cout << "Global processing package " << package->name << std::endl;
-    for (auto m: package->subpackages) {
-        process_global_all_modules((Package*) m.second);
+    for (auto ep: package->units) {
+        if (ep.second.type == U_TYPE::PACKAGE) {
+            Package* subpackage = ep.second.package;
+            process_global_all_modules(subpackage);
+        } else if (ep.second.type == U_TYPE::MODULE) {
+            Module* module = ep.second.module;
+            std::cout << "Global processing module " << module->name << std::endl;
+            GlobalProcessor gp;
+            gp.module = module;
+            gp.root_package = root_package;
+            gp.module_dotted_path = module->full_path;
+            gp.__file__ = module->path;
+            gp.visit(*module->ast);
+            module->imported_paths = gp.imported_paths;
+            std::cout << "- Done" << std::endl;
+        }
     }
-    for (auto m: package->modules) {
-        Module* module = (Module*) m.second;
-        std::cout << "Global processing module " << module->name << std::endl;
-        GlobalProcessor gp;
-        gp.module = module;
-        gp.root_package = root_package;
-        gp.module_dotted_path = module->full_path;
-        gp.__file__ = module->path;
-        gp.visit(*module->ast);
-        module->imported_paths = gp.imported_paths;
-        std::cout << "- Done" << std::endl;
-    }
-
 }
 
 VectorOfStrings make_path(std::string s) {
@@ -119,79 +122,108 @@ VectorOfStrings make_path(std::string s) {
     return path;
 }
 
+Flirpin map_unit_to_flirpin(Unit u) {
+    switch (u.type) {
+        case U_TYPE::PACKAGE:
+            return Flirpin{.type=F_TYPE::PACKAGE, .package=u.package};
+        case U_TYPE::MODULE:
+            return Flirpin{.type=F_TYPE::MODULE, .module=u.module};
+    }
+}
+
+void add_path_to_module(Module* module, std::string name, VectorOfStrings path) {
+    Flirpin current_flirpin = Flirpin{.type=F_TYPE::PACKAGE, .package=root_package};
+    for (auto path_part: path) {
+        if (current_flirpin.type == F_TYPE::PACKAGE) {
+            Package* package = current_flirpin.package;
+            current_flirpin = map_unit_to_flirpin(package->units[path_part]);
+        }
+        else if (current_flirpin.type == F_TYPE::MODULE) {
+            current_flirpin = current_flirpin.module->flirpins[path_part];
+        }
+
+    }
+    module->flirpins[name] = current_flirpin;
+}
+
 void analyze_all_modules(Package* package) {
     std::cout << "Analyzing package " << package->name << std::endl;
-    for (auto m: package->subpackages) {
-        analyze_all_modules((Package*) m.second);
-    }
-    for (auto m: package->modules) {
-        Module* module = (Module*) m.second;
-        if (module->name == "core") {
-            continue;
-        }
+    for (auto ep: package->units) {
+        if (ep.second.type == U_TYPE::PACKAGE) {
+            Package* subpackage = ep.second.package;
+            analyze_all_modules(subpackage);
+        } else if (ep.second.type == U_TYPE::MODULE) {
+            Module* module = ep.second.module;
+            if (module->name == "core") {
+                continue;
+            }
 
-        // for(auto i: module->imported_paths){
-        //     module->imports[i.first] = root_package->modules[i.second[0]]
-        // }
+            for (auto i: module->imported_paths) {
+                add_path_to_module(module, i.first, i.second);
+            }
 
-        std::cout << "Analyzing module " << module->name << std::endl;
-        module->imports["print"] = root_package->modules["core"]->functions["print"];
-        module->imports["Integer"] = root_package->modules["core"]->classes["Integer"];
-        module->imports["String"] = root_package->modules["core"]->classes["String"];
-        Checker checker;
-        checker.module = module;
-        checker.root_package = root_package;
-        checker.__file__ = module->path;
-        checker.code_lines = module->code_lines;
-        checker.visit_root(*module->ast);
-        module->sast = checker.root_snode;
-        if (checker.failed) {
-            throw std::runtime_error("ERROR");
+            std::cout << "Analyzing module " << module->name << std::endl;
+            Module* core_module = root_package->units["core"].module;
+            module->flirpins["print"] = core_module->flirpins["print"];
+            module->flirpins["Integer"] = core_module->flirpins["Integer"];
+            module->flirpins["String"] = core_module->flirpins["String"];
+            Checker checker;
+            checker.module = module;
+            checker.root_package = root_package;
+            checker.__file__ = module->path;
+            checker.code_lines = module->code_lines;
+            checker.visit_root(*module->ast);
+            module->sast = checker.root_snode;
+            if (checker.failed) {
+                throw std::runtime_error("ERROR");
+            }
+            std::cout << "- Done" << std::endl;
         }
-        std::cout << "- Done" << std::endl;
     }
 }
 
 
 void transpile_all_modules(Package* package, std::string output_dir) {
     std::cout << "Transpiling package " << package->name << std::endl;
-    for (auto m: package->subpackages) {
-        transpile_all_modules((Package*) m.second, output_dir);
-    }
-    for (auto m:package->modules) {
-        Module* module = (Module*) m.second;
-        if (module->name == "core") {
-            continue;
+    for (auto u: package->units) {
+        if (u.second.type == U_TYPE::PACKAGE) {
+            Package* subpackage = u.second.package;
+            transpile_all_modules(subpackage, output_dir);
+        } else if (u.second.type == U_TYPE::MODULE) {
+            Module* module = u.second.module;
+            if (module->name == "core") {
+                continue;
+            }
+            STranspiler t;
+            t.transpile_program(module->sast);
+            std::cout << "Source output: " << std::endl;
+            std::cout << t.source << std::endl;
+            std::cout << "Header output: " << std::endl;
+            std::cout << t.header << std::endl;
+            std::cout << "- Done" << std::endl;
+
+            static_initializations += t.static_initializations;
+            static_cleanups += t.static_cleanups;
+
+            std::string module_name = module->name;
+
+            if (module->functions.count("main") != 0) {
+                t.source += "\nint main(){\n";
+                t.source += static_initializations;
+                t.source += "auto x = GET_INT(CALL0(" + mangle_path(module->full_path + ".main") + "));\n";
+                t.source += static_cleanups;
+                t.source += "return x;\n}";
+            }
+            std::string output_cpp_path = path_join(output_dir, module_name + ".cpp");
+            std::ofstream output_cpp_file(output_cpp_path);
+            output_cpp_file << "#include \"" << module_name << ".h\"\n";
+            output_cpp_file << t.source;
+
+            std::string output_h_path = path_join(output_dir, module_name + ".h");
+            std::ofstream output_h_file(output_h_path);
+            output_h_file << "#include <core/core.h>\n";
+            output_h_file << t.header;
         }
-        STranspiler t;
-        t.transpile_program(module->sast);
-        std::cout << "Source output: " << std::endl;
-        std::cout << t.source << std::endl;
-        std::cout << "Header output: " << std::endl;
-        std::cout << t.header << std::endl;
-        std::cout << "- Done" << std::endl;
-
-        static_initializations += t.static_initializations;
-        static_cleanups += t.static_cleanups;
-
-        std::string module_name = module->name;
-
-        if (module->functions.count("main") != 0) {
-            t.source += "\nint main(){\n";
-            t.source += static_initializations;
-            t.source += "auto x = GET_INT(CALL0(" + mangle_path(module->full_path + ".main") + "));\n";
-            t.source += static_cleanups;
-            t.source += "return x;\n}";
-        }
-        std::string output_cpp_path = path_join(output_dir, module_name + ".cpp");
-        std::ofstream output_cpp_file(output_cpp_path);
-        output_cpp_file << "#include \"" << module_name << ".h\"\n";
-        output_cpp_file << t.source;
-
-        std::string output_h_path = path_join(output_dir, module_name + ".h");
-        std::ofstream output_h_file(output_h_path);
-        output_h_file << "#include <core/core.h>\n";
-        output_h_file << t.header;
     }
 }
 
@@ -231,20 +263,20 @@ int main(int argc, char* argv[]) {
 
 
     Module* core_module = new Module("core", "");
-    root_package->modules["core"] = core_module;
+    root_package->units["core"] = Unit{.type=U_TYPE::MODULE, .module=core_module};
 
     for (auto fb: function_builtins) {
         ConstFunction* cf = new ConstFunction();
         cf->ft = parse_function_type(fb.second);
-        core_module->functions[fb.first] = cf;
+        core_module->flirpins[fb.first] = Flirpin{.type=F_TYPE::CONST_FUNCTION, .const_function=cf};
     }
-    core_module->classes["Float"] = make_float_class_info();
-    core_module->classes["Double"] = make_double_class_info();
-    core_module->classes["File"] = make_file_class_info();
-    core_module->classes["Integer"] = make_int_class_info();
-    core_module->classes["List"] = make_list_class_info();
-    core_module->classes["Boolean"] = make_boolean_class_info();
-    core_module->classes["String"] = make_string_class_info();
+    core_module->flirpins["Float"] = Flirpin{.type=F_TYPE::CLASS, .clazz=make_float_class_info()};
+    core_module->flirpins["Double"] = Flirpin{.type=F_TYPE::CLASS, .clazz= make_double_class_info()};
+    core_module->flirpins["File"] = Flirpin{.type=F_TYPE::CLASS, .clazz= make_file_class_info()};
+    core_module->flirpins["Integer"] = Flirpin{.type=F_TYPE::CLASS, .clazz=make_int_class_info()};
+    core_module->flirpins["List"] = Flirpin{.type=F_TYPE::CLASS, .clazz=make_list_class_info()};
+    core_module->flirpins["Boolean"] = Flirpin{.type=F_TYPE::CLASS, .clazz=make_boolean_class_info()};
+    core_module->flirpins["String"] = Flirpin{.type=F_TYPE::CLASS, .clazz=make_string_class_info()};
 
     for (auto cb: class_builtins) {
     }

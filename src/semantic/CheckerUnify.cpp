@@ -133,6 +133,9 @@ std::pair<std::string, TypeNode*>* Checker::get_first_substitution(TypeNode& a, 
 }
 
 USemanticInfo Checker::visit_import(ImportNode& node) {
+    SemanticInfo info;
+    return std::make_unique<SemanticInfo>(info);
+
     std::string name = node.path.back();
     std::string path = node.path[0];
     int current_index = 0;
@@ -171,8 +174,8 @@ USemanticInfo Checker::visit_import(ImportNode& node) {
             }
         }
     }
-    SemanticInfo info;
-    return std::make_unique<SemanticInfo>(info);
+    // SemanticInfo info;
+    // return std::make_unique<SemanticInfo>(info);
 }
 
 USemanticInfo Checker::class_member(Class* cls, std::string child) {
@@ -190,15 +193,14 @@ USemanticInfo Checker::class_member(Class* cls, std::string child) {
 }
 
 USemanticInfo Checker::object_member(ObjectValue* pValue, std::string child) {
-    Class* class_entity = (Class*) this->scope->get(pValue->ot->id);
+    Class* clazz = this->scope->get(pValue->ot->id).clazz;
     SemanticInfo info;
-    if (class_entity->members.count(child)) {
-        info.entity = entity_from_type(*class_entity->members[child]);
-    } else if (class_entity->methods.count(child)) {
-        info.entity = entity_from_type(*class_entity->methods[child]);
+    if (clazz->members.count(child)) {
+        info.entity = entity_from_type(*clazz->members[child]);
+    } else if (clazz->methods.count(child)) {
+        info.entity = entity_from_type(*clazz->methods[child]);
     } else {
-        throw std::runtime_error(
-                "Error member/method '" + child + "' not found in class '" + class_entity->class_name + "'");
+        throw std::runtime_error("Error member/method '" + child + "' not found in class '" + clazz->class_name + "'");
     }
     return std::make_unique<SemanticInfo>(info);
 }
@@ -207,6 +209,25 @@ USemanticInfo Checker::package_member(Package* pPackage, std::string basicString
     return USemanticInfo();
 }
 
-USemanticInfo Checker::module_member(Module* pModule, std::string basicString) {
-    return USemanticInfo();
+Entity map_flirpin_to_entity(Flirpin flirpin) {
+    switch (flirpin.type) {
+        case F_TYPE::CONST_FUNCTION:
+            return Entity{.type=E_TYPE::CONST_FUNCTION, .const_function=flirpin.const_function};
+        case F_TYPE::CLASS:
+            return Entity{.type=E_TYPE::CLASS, .clazz=flirpin.clazz};
+        case F_TYPE::PACKAGE:
+            return Entity{.type=E_TYPE::PACKAGE, .package=flirpin.package};
+        case F_TYPE::MODULE:
+            return Entity{.type=E_TYPE::MODULE, .module=flirpin.module};
+    }
+}
+
+USemanticInfo Checker::module_member(Module* mod, std::string child) {
+    if (mod->flirpins.count(child) == 0) {
+        throw std::runtime_error("Error: module " + mod->name + " has no member " + child);
+    }
+    Flirpin flirpin = mod->flirpins[child];
+    SemanticInfo info;
+    info.entity = map_flirpin_to_entity(flirpin);
+    return std::make_unique<SemanticInfo>(info);
 }

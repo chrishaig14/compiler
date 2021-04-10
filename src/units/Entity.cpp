@@ -3,6 +3,3 @@
 //
 
 #include "Entity.h"
-
-Entity::Entity(E_TYPE t) : type(t) {
-}

@@ -11,8 +11,7 @@ class Package : public Entity {
 public:
     std::string name;
     std::string path;
-    std::map<std::string, Package*> subpackages;
-    std::map<std::string, Module*> modules;
+    std::map<std::string, Unit> units;
 
     Package(std::string name, std::string path);
 };

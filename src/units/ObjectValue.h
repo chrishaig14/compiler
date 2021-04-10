@@ -11,9 +11,6 @@
 class ObjectValue : public Entity {
 
 public:
-    ObjectValue() : Entity(E_TYPE::OBJECT_VALUE) {
-    }
-
     ObjectType* ot;
 };
 

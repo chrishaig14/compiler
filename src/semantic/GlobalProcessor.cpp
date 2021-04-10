@@ -39,7 +39,7 @@ void GlobalProcessor::visit(FunctionNode& node) {
     std::string function_path = module_dotted_path + "." + node.identifier;
     ConstFunction* const_function = new ConstFunction();
     const_function->ft = function_info.clone();
-    this->module->functions[node.identifier] = const_function;
+    this->module->flirpins[node.identifier] = Flirpin{.type=F_TYPE::CONST_FUNCTION, .const_function=const_function};
 }
 
 void GlobalProcessor::visit(BlockNode& node) {
@@ -120,7 +120,7 @@ void GlobalProcessor::visit(ClassNode& node) {
     //     exit(1);
     // }
     // (*this->module_mappings[this->module_name])[node.class_name] = mangled_name;
-    this->module->classes[node.class_name] = class_info;
+    this->module->flirpins[node.class_name] = Flirpin{.type=F_TYPE::CLASS, .clazz=class_info};
 }
 
 void GlobalProcessor::dispatch(Node* nod) {

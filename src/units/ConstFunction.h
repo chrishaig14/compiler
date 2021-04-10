@@ -7,9 +7,15 @@
 #include "Entity.h"
 #include "../nodes/TypeNode.h"
 
-class ConstFunction : public Entity {
+class ConstFunction {
 public:
-    ConstFunction() : Entity(E_TYPE::CONST_FUNCTION) {
+    ConstFunction(){}
+    ConstFunction(const ConstFunction& other){
+        this->ft = other.ft->clone();
+    }
+
+    ~ConstFunction() {
+        std::cout << "Destroyinh CONST FUnction!" << std::endl;
     }
 
     FunctionType* ft;

@@ -91,8 +91,6 @@ add_library(parser parser/Parser.cpp parser/Parser.h parser/ParserErrors.cpp)
 add_library(
         srcLib
         logging/logging.cpp
-        semantic/ClassTable.cpp
-        semantic/ClassTable.h
         semantic/SymbolTable.cpp
         semantic/SymbolTable.h
         semantic/GlobalProcessor.cpp

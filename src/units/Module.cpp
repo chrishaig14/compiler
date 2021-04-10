@@ -4,7 +4,7 @@
 
 #include "Module.h"
 
-Module::Module(std::string name, std::string path) : Entity(E_TYPE::MODULE) {
+Module::Module(std::string name, std::string path) {
     this->name = name;
     this->path = path;
 }

@@ -8,7 +8,6 @@
 
 #include <unordered_map>
 #include "SymbolTable.h"
-#include "ClassTable.h"
 #include "../nodes/ClassNode.h"
 
 

@@ -10,8 +10,6 @@
 #include "../nodes/TypeNode.h"
 class FunctionValue : public Entity {
 public:
-    FunctionValue():Entity(E_TYPE::FUNCTION_VALUE){}
-
     FunctionType* ft;
 };
 

@@ -19,15 +19,15 @@
 #define T_NONE ObjectType(".None")
 static TextPosition POS_NONE = {-1, -1};
 
-Entity* entity_from_type(const TypeNode& type) {
+Entity entity_from_type(const TypeNode& type) {
     if (type.kind == Kind::FUNCTION) {
         FunctionValue* fv = new FunctionValue();
         fv->ft = (FunctionType*) type.clone();
-        return fv;
+        return Entity{.type=E_TYPE::FUNCTION_VALUE, .function_value=fv};
     }
     ObjectValue* fv = new ObjectValue();
     fv->ot = (ObjectType*) type.clone();
-    return fv;
+    return Entity{.type=E_TYPE::OBJECT_VALUE, .object_value=fv};
 }
 
 USemanticInfo Checker::visit(ListNode& node) {
@@ -70,12 +70,12 @@ USemanticInfo Checker::visit(WhileNode& node) {
     this->visit_block(*node.body);
     this->scope->is_loop = false;
     for (auto v: this->scope->table) {
-        if (v.second->type == E_TYPE::OBJECT_VALUE) {
-            node.body->local_vars.push_back(std::make_pair(v.first, ((ObjectValue*) v.second)->ot));
-        }
-        if (v.second->type == E_TYPE::FUNCTION_VALUE) {
-            node.body->local_vars.push_back(std::make_pair(v.first, ((FunctionValue*) v.second)->ft));
-        }
+        // if (v.second->type == E_TYPE::OBJECT_VALUE) {
+        //     node.body->local_vars.push_back(std::make_pair(v.first, ((ObjectValue*) v.second)->ot));
+        // }
+        // if (v.second->type == E_TYPE::FUNCTION_VALUE) {
+        //     node.body->local_vars.push_back(std::make_pair(v.first, ((FunctionValue*) v.second)->ft));
+        // }
     }
     this->leave_scope();
     return nullptr;
@@ -86,7 +86,7 @@ USemanticInfo Checker::visit(NumberNode& node) {
     switch (node.num_type) {
         case NumberType::INTEGER: {
             ObjectValue* ov = new ObjectValue();
-            info.entity = ov;
+            info.entity = Entity{.type=E_TYPE::OBJECT_VALUE, .object_value=ov};
             ov->ot = new ObjectType("Integer", {});
             break;
         }
@@ -111,7 +111,7 @@ USemanticInfo Checker::visit(StringNode& node) {
     sn->s = node.str;
     info.snode = sn;
     ObjectValue* ov = new ObjectValue;
-    info.entity = ov;
+    info.entity = {.type=E_TYPE::OBJECT_VALUE, .object_value=ov};
     ov->ot = new ObjectType("String", {});
     return std::make_unique<SemanticInfo>(info);
 }
@@ -485,7 +485,8 @@ USemanticInfo Checker::visit(MethodNode& n) {
     return std::make_unique<SemanticInfo>(info);
 }
 
-TypeNode* get_entity_type(Entity* ent) {
+TypeNode* get_entity_type(Entity e) {
+    Entity* ent = &e;
     if (ent->type == E_TYPE::CONST_FUNCTION) {
         return ((ConstFunction*) ent)->ft->clone();
     }
@@ -545,8 +546,11 @@ USemanticInfo Checker::visit_call(CallNode& n) {
     }
     n.function = replace_if_necessary(n.function);
     FunctionType* function_type = nullptr;
-    if (fun_info.entity->type == E_TYPE::CONST_FUNCTION || fun_info.entity->type == E_TYPE::FUNCTION_VALUE) {
-        function_type = ((FunctionValue*) fun_info.entity)->ft->clone();
+    if (fun_info.entity.type == E_TYPE::CONST_FUNCTION) {
+        function_type = ((FunctionValue*) fun_info.entity.const_function)->ft->clone();
+    }
+    if (fun_info.entity.type == E_TYPE::FUNCTION_VALUE) {
+        function_type = ((FunctionValue*) fun_info.entity.const_function)->ft->clone();
     }
     if (function_type != nullptr) {
         // ok
@@ -564,9 +568,9 @@ USemanticInfo Checker::visit_call(CallNode& n) {
         for (auto& arg: n.arguments) {
             USemanticInfo arg_type_p = this->dispatch(arg);
             sn->arguments.push_back(arg_type_p->snode);
-            Entity* arg_entity = arg_type_p->entity;
-            if (arg_entity->type == E_TYPE::CLASS || arg_entity->type == E_TYPE::PACKAGE ||
-                arg_entity->type == E_TYPE::MODULE) {
+            Entity arg_entity = arg_type_p->entity;
+            if (arg_entity.type == E_TYPE::CLASS || arg_entity.type == E_TYPE::PACKAGE ||
+                arg_entity.type == E_TYPE::MODULE) {
                 throw std::runtime_error("Error can't pass as argument");
             }
             TypeNode& arg_type = *get_entity_type(arg_entity);
@@ -604,8 +608,7 @@ USemanticInfo Checker::visit_call(CallNode& n) {
         }
     } else {
         std::string entity_type;
-        switch (fun_info.entity->type) {
-
+        switch (fun_info.entity.type) {
             case E_TYPE::CLASS:
                 entity_type = "CLASS";
                 break;
@@ -639,16 +642,12 @@ USemanticInfo Checker::visit_call(CallNode& n) {
 USemanticInfo Checker::visit_root(BlockNode& node) {
 
     // Initialize module level Scope
-    for (auto f: this->module->functions) {
-        this->scope->set(f.first, f.second);
+    for (auto f: this->module->flirpins) {
+        this->scope->set(f.first, map_flirpin_to_entity(f.second));
     }
-    for (auto c: this->module->classes) {
-        this->scope->set(c.first, c.second);
-    }
-
-    for (auto i: this->module->imports) {
-        this->scope->set(i.first, i.second);
-    }
+    // for (auto i: this->module->imports) {
+    //     this->scope->set(i.first, i.second);
+    // }
 
     USemanticInfo info = this->visit_block(node);
     this->root_snode = static_cast<BlockSNode*>(info->snode);
@@ -771,10 +770,10 @@ USemanticInfo Checker::visit_id(IdNode& n) {
     SemanticInfo info;
     IdSNode* sn = new IdSNode();
     info.snode = sn;
-    Entity* entity = this->scope->get(n._id);
-    if (entity == nullptr) {
-        throw std::runtime_error("Entity with name : " + n._id + " not found!");
-    }
+    Entity entity = this->scope->get(n._id);
+    // if (entity == nullptr) {
+    //     throw std::runtime_error("Entity with name : " + n._id + " not found!");
+    // }
     info.entity = entity;
     return std::make_unique<SemanticInfo>(info);
 }
@@ -1019,23 +1018,23 @@ USemanticInfo Checker::member_normal(Class* class_info, std::string child, SNode
 
 USemanticInfo Checker::visit_member(MemberNode& n) {
     USemanticInfo parent_info = this->dispatch(n.parent);
-    Entity* parent_entity = parent_info->entity;
-    switch (parent_entity->type) {
+    Entity parent_entity = parent_info->entity;
+    switch (parent_entity.type) {
         case E_TYPE::CLASS:
-            return this->class_member((Class*) parent_entity, n.s_child);
+            return this->class_member(parent_entity.clazz, n.s_child);
             break;
         case E_TYPE::CONST_FUNCTION:
             throw std::runtime_error("Error: trying to get member of const function!");
         case E_TYPE::FUNCTION_VALUE:
             throw std::runtime_error("Error: trying to get member of function value!");
         case E_TYPE::OBJECT_VALUE:
-            return this->object_member((ObjectValue*) parent_entity, n.s_child);
+            return this->object_member(parent_entity.object_value, n.s_child);
             break;
         case E_TYPE::PACKAGE:
-            return this->package_member((Package*) parent_entity, n.s_child);
+            return this->package_member(parent_entity.package, n.s_child);
             break;
         case E_TYPE::MODULE:
-            return this->module_member((Module*) parent_entity, n.s_child);
+            return this->module_member(parent_entity.module, n.s_child);
             break;
     }
 }
@@ -1222,13 +1221,13 @@ USemanticInfo Checker::visit_return(ReturnNode& n) {
     SemanticInfo info;
     ReturnSNode* sn = new ReturnSNode();
     info.snode = sn;
-    Entity* return_entity = this->scope->get("__return__");
+    Entity return_entity = this->scope->get("__return__");
     TypeNode* return_typet;
-    if (return_entity->type == E_TYPE::FUNCTION_VALUE) {
-        return_typet = ((FunctionValue*) return_entity)->ft;
+    if (return_entity.type == E_TYPE::FUNCTION_VALUE) {
+        return_typet = return_entity.function_value->ft;
     }
-    if (return_entity->type == E_TYPE::OBJECT_VALUE) {
-        return_typet = ((ObjectValue*) return_entity)->ot;
+    if (return_entity.type == E_TYPE::OBJECT_VALUE) {
+        return_typet = return_entity.object_value->ot;
     }
     TypeNode& return_type = *return_typet;
     if (return_type == T_NONE) {
@@ -1284,18 +1283,20 @@ USemanticInfo Checker::visit(DefaultConstructorNode& node) {
     // this is a regular function
     SemanticInfo info;
     VectorOfTypes t;
-    Entity* entity = this->scope->get(node.name);
-    if (entity == nullptr) {
-        throw std::runtime_error("Error: " + node.name + " not defined");
-    }
-    if (entity->type != E_TYPE::CLASS) {
+    Entity entity = this->scope->get(node.name);
+    // if (entity == nullptr) {
+    //     throw std::runtime_error("Error: " + node.name + " not defined");
+    // }
+    if (entity.type != E_TYPE::CLASS) {
         throw std::runtime_error("Error: " + node.name + " is not a class");
     }
-    Class* cls = (Class*) entity;
+    Class* cls = entity.clazz;
     for (auto pt: cls->member_types) {
         t.push_back(pt->clone());
     }
-    info.entity = entity_from_type(FunctionType(t, new ObjectType(node.name)));
+    info.entity = Entity{.type=E_TYPE::CONST_FUNCTION};
+    info.entity.const_function = new ConstFunction();
+    info.entity.const_function->ft = new FunctionType(t, new ObjectType(node.name, {}));
     info.is_function = true;
     return std::make_unique<SemanticInfo>(info);
 }

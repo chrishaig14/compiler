@@ -5,15 +5,71 @@
 #ifndef XLANG_ENTITY_H
 #define XLANG_ENTITY_H
 
+class Package;
+
+class Module;
+
+class Class;
+
+class ObjectValue;
+
+class FunctionValue;
+
+class ConstFunction;
+
+
+enum class U_TYPE {
+    PACKAGE, MODULE
+};
+
+struct Unit {
+    U_TYPE type;
+    union {
+        Package* package;
+        Module* module;
+    };
+};
+
+enum class F_TYPE {
+    CONST_FUNCTION, CLASS, PACKAGE, MODULE
+};
+
+struct Flirpin {
+    F_TYPE type;
+    union {
+        ConstFunction* const_function;
+        Class* clazz;
+        Package* package;
+        Module* module;
+    };
+};
+
+enum class V_TYPE {
+    OBJECT, FUNCTION
+};
+struct Value {
+    V_TYPE type;
+    union {
+        FunctionValue* function_value;
+        ObjectValue* object_value;
+    };
+};
+
 enum class E_TYPE {
-    CLASS, CONST_FUNCTION, FUNCTION_VALUE, OBJECT_VALUE, PACKAGE, MODULE
+    PACKAGE, MODULE, CLASS, FUNCTION_VALUE, OBJECT_VALUE, CONST_FUNCTION
 };
 
-class Entity {
-public:
+struct Entity {
     E_TYPE type;
-
-    Entity(E_TYPE t);
+    union {
+        Package* package;
+        Module* module;
+        Class* clazz;
+        FunctionValue* function_value;
+        ObjectValue* object_value;
+        ConstFunction* const_function;
+    };
 };
+
 
 #endif //XLANG_ENTITY_H

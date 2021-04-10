@@ -14,7 +14,6 @@
 
 
 class SymbolTable {
-    std::map<std::string, Entity*> entities;
     Entity* ret;
 
 public:
@@ -24,23 +23,23 @@ public:
 
     std::vector<std::pair<std::string, TypeNode*>> get_all();
 
-    Entity* get(const std::string& name);
+    Entity get(const std::string& name);
 
     bool declared(const std::string& name);
 
-    void set(const std::string& name, Entity* info);
+    void set(const std::string& name, Entity info);
 
     void set_not_none(const std::string& name, bool may_be_none);
 
     bool get_not_none(const std::string& name);
 
     ~SymbolTable() {
-        for (auto e: this->table) {
-            delete e.second;
-        }
-        if (this->ret != nullptr) {
-            delete ret;
-        }
+        // for (auto e: this->table) {
+        //     delete e.second;
+        // }
+        // if (this->ret != nullptr) {
+        //     delete ret;
+        // }
 
     }
 

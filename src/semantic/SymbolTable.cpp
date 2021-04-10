@@ -25,7 +25,7 @@ bool SymbolTable::has(const std::string& name) {
     }
 }
 
-Entity* SymbolTable::get(const std::string& name) {
+Entity SymbolTable::get(const std::string& name) {
     if (name == "__return__") {
         if (this->ret == nullptr) {
             if (this->parent != nullptr) {
@@ -34,7 +34,7 @@ Entity* SymbolTable::get(const std::string& name) {
                 throw std::runtime_error("ERROR: no parent but want __return__");
             }
         }
-        return this->ret;
+        return *this->ret;
     }
     auto it = this->table.find(name);
     if (it != this->table.end()) {
@@ -51,9 +51,10 @@ bool SymbolTable::declared(const std::string& name) {
     return this->table.find(name) != this->table.end();
 }
 
-void SymbolTable::set(const std::string& name, Entity* info) {
+void SymbolTable::set(const std::string& name, Entity info) {
     if (name == "__return__") {
-        this->ret = info;
+        this->ret = new Entity{};
+        *this->ret = info;
         return;
     }
     this->table[name] = info;
@@ -80,12 +81,12 @@ std::vector<std::pair<std::string, TypeNode*>> SymbolTable::get_all_in_loop() {
 
         for (auto v: this->table) {
             TypeNode* t;
-            if (v.second->type == E_TYPE::FUNCTION_VALUE) {
-                t = ((FunctionValue*) v.second)->ft;
-            }
-            if (v.second->type == E_TYPE::OBJECT_VALUE) {
-                t = ((ObjectValue*) v.second)->ot;
-            }
+            // if (v.second->type == E_TYPE::FUNCTION_VALUE) {
+            //     t = ((FunctionValue*) v.second)->ft;
+            // }
+            // if (v.second->type == E_TYPE::OBJECT_VALUE) {
+            //     t = ((ObjectValue*) v.second)->ot;
+            // }
             r.push_back(std::make_pair(v.first, t));
         }
         return r;
@@ -96,12 +97,12 @@ std::vector<std::pair<std::string, TypeNode*>> SymbolTable::get_all_in_loop() {
         r.insert(r.end(), p.begin(), p.end());
         for (auto v: this->table) {
             TypeNode* t;
-            if (v.second->type == E_TYPE::FUNCTION_VALUE) {
-                t = ((FunctionValue*) v.second)->ft;
-            }
-            if (v.second->type == E_TYPE::OBJECT_VALUE) {
-                t = ((ObjectValue*) v.second)->ot;
-            }
+            // if (v.second->type == E_TYPE::FUNCTION_VALUE) {
+            //     t = ((FunctionValue*) v.second)->ft;
+            // }
+            // if (v.second->type == E_TYPE::OBJECT_VALUE) {
+            //     t = ((ObjectValue*) v.second)->ot;
+            // }
             r.push_back(std::make_pair(v.first, t));
         }
         return r;
@@ -113,16 +114,15 @@ std::vector<std::pair<std::string, TypeNode*>> SymbolTable::get_all() {
         std::vector<std::pair<std::string, TypeNode*>> r;
 
         for (auto v: this->table) {
-
+            Entity e = v.second;
             TypeNode* t;
-            if (v.second->type == E_TYPE::FUNCTION_VALUE) {
-                t = ((FunctionValue*) v.second)->ft;
+            if (e.type == E_TYPE::FUNCTION_VALUE) {
+                t = e.function_value->ft->clone();
             }
-            if (v.second->type == E_TYPE::OBJECT_VALUE) {
-                t = ((ObjectValue*) v.second)->ot;
+            if (e.type == E_TYPE::OBJECT_VALUE) {
+                t = e.object_value->ot->clone();
+                r.push_back(std::make_pair(v.first, t));
             }
-
-            r.push_back(std::make_pair(v.first, t));
         }
         return r;
     } else {
@@ -130,16 +130,16 @@ std::vector<std::pair<std::string, TypeNode*>> SymbolTable::get_all() {
 
         auto p = this->parent->get_all();
         r.insert(r.end(), p.begin(), p.end());
-        for (auto v: this->table) {
-            TypeNode* t;
-            if (v.second->type == E_TYPE::FUNCTION_VALUE) {
-                t = ((FunctionValue*) v.second)->ft;
-            }
-            if (v.second->type == E_TYPE::OBJECT_VALUE) {
-                t = ((ObjectValue*) v.second)->ot;
-            }
-            r.push_back(std::make_pair(v.first, t));
-        }
+        // for (auto v: this->table) {
+        //     TypeNode* t;
+        //     if (v.second->type == E_TYPE::FUNCTION_VALUE) {
+        //         t = ((FunctionValue*) v.second)->ft;
+        //     }
+        //     if (v.second->type == E_TYPE::OBJECT_VALUE) {
+        //         t = ((ObjectValue*) v.second)->ot;
+        //     }
+        //     r.push_back(std::make_pair(v.first, t));
+        // }
         return r;
     }
 }

@@ -26,9 +26,6 @@ public:
 
     std::string class_name;
 
-    Class() : Entity(E_TYPE::CLASS) {
-    }
-
     ~Class();
 
     bool operator!=(const Class& b) const;
