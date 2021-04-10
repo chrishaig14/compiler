@@ -550,7 +550,7 @@ USemanticInfo Checker::visit_call(CallNode& n) {
         function_type = fun_info.entity.const_function->ft->clone();
     }
     if (fun_info.entity.type == E_TYPE::FUNCTION_VALUE) {
-        function_type = fun_info.entity.const_function->ft->clone();
+        function_type = fun_info.entity.function_value->ft->clone();
     }
     if (function_type != nullptr) {
         // ok
@@ -678,7 +678,8 @@ USemanticInfo Checker::visit_block(BlockNode& node) {
         if (n->ntype == NodeType::CALL) {
             // it's a function call
             // if return value != NoneType, then force the return value
-            if (!sinfo.is_error && sinfo.type() != T_NONE) {
+
+            if (!sinfo.is_error && *get_entity_type(sinfo.entity) != T_NONE) {
                 this->error_unused_return_value(n->start);
             }
         }
