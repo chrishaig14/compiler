@@ -1198,8 +1198,18 @@ USemanticInfo Checker::visit(BinopNode& n) {
     }
     TypeNode* rettype;
     bool ok = true;
+    std::string fun;
+    if (n.op == OpType::ADD) {
+        fun = "add";
+    } else if (n.op == OpType::SUB) {
+        fun = "sub";
+    } else if (n.op == OpType::MUL) {
+        fun = "mul";
+    } else if (n.op == OpType::DIV) {
+        fun = "div";
+    }
     if (ltype.object().id == "Integer" && rtype.object().id == "Integer") {
-        function_id->identifier = "core_D_Integer_D_add";
+        function_id->identifier = "core_D_Integer_D_" + fun;
         rettype = new T_INT;
     } else if (ltype.object().id == "Float" && rtype.object().id == "Float") {
         rettype = new ObjectType("Float");

@@ -165,6 +165,23 @@ TaggedObject* core_D_string_subscript_f(TaggedObject* _l, TaggedObject* i) {
     return NEW(XString, std::string(1, str->s[index]));
 }
 
+TaggedObject* core_D_Integer_D_add_f(TaggedObject* a, TaggedObject* b) {
+    return MAKE_INT(GET_INT(a) + GET_INT(b));
+}
+
+TaggedObject* core_D_Integer_D_sub_f(TaggedObject* a, TaggedObject* b) {
+    return MAKE_INT(GET_INT(a) - GET_INT(b));
+}
+
+TaggedObject* core_D_Integer_D_div_f(TaggedObject* a, TaggedObject* b) {
+    return MAKE_INT(GET_INT(a) / GET_INT(b));
+}
+
+TaggedObject* core_D_Integer_D_mul_f(TaggedObject* a, TaggedObject* b) {
+    return MAKE_INT(GET_INT(a) * GET_INT(b));
+}
+
+
 #define FUNCTION_RAW_NAME(x) x##_f
 #define FUNCTION_OBJECT_NAME(x) x##_o
 #define FUNCTION_OBJECT(n, x) Function##n FUNCTION_OBJECT_NAME(x) = Function##n(FUNCTION_RAW_NAME(x));
@@ -176,6 +193,9 @@ DEFINE_FUNCTION(3, core_D_range)
 DEFINE_FUNCTION(2, core_D_map)
 DEFINE_FUNCTION(2, core_D_join)
 DEFINE_FUNCTION(2, core_D_Integer_D_add)
+DEFINE_FUNCTION(2, core_D_Integer_D_sub)
+DEFINE_FUNCTION(2, core_D_Integer_D_div)
+DEFINE_FUNCTION(2, core_D_Integer_D_mul)
 DEFINE_FUNCTION(1, core_D_Integer_D_str)
 DEFINE_FUNCTION(1, core_D_Double_D_str)
 DEFINE_FUNCTION(1, core_D_Float_D_str)
@@ -183,9 +203,4 @@ DEFINE_FUNCTION(1, core_D_Boolean_D_str)
 DEFINE_FUNCTION(2, core_D_list_subscript)
 DEFINE_FUNCTION(2, core_D_string_subscript)
 DEFINE_FUNCTION(2, core_D_dict_subscript)
-
-TaggedObject* core_D_Integer_D_add_f(TaggedObject* a, TaggedObject* b) {
-    return MAKE_INT(GET_INT(a) + GET_INT(b));
-}
-
 
