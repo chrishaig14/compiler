@@ -468,24 +468,24 @@ USemanticInfo Checker::visit(ForNode& node) {
 }
 
 USemanticInfo Checker::visit(MethodNode& n) {
-    USemanticInfo parent = this->dispatch(n.parent);
-    n.parent_t = parent->type().clone();
-    if (n.parent_t->kind != Kind::OBJECT) {
-        throw std::runtime_error("Cannot call a method on a function");
-    }
-    Class* class_info = nullptr;//this->class_table->get("asdf");
-    SemanticInfo info;
-    if (class_info->methods.find(n.s_child) == class_info->methods.end()) {
-        throw std::runtime_error("Error " + n.parent_t->to_string() + " has no method " + n.s_child);
-    }
-    FunctionType* ft = class_info->methods[n.s_child];
-    info.set_type(*ft);
-    info.is_function = true;
-    info.is_method = true;
-    info.class_info = class_info;
-    n.actual_function_name = class_info->class_name + "." + n.s_child;
-    n.n_partial = ft->param_types.size();
-    return std::make_unique<SemanticInfo>(info);
+    // USemanticInfo parent = this->dispatch(n.parent);
+    // n.parent_t = parent->type().clone();
+    // if (n.parent_t->kind != Kind::OBJECT) {
+    //     throw std::runtime_error("Cannot call a method on a function");
+    // }
+    // Class* class_info = nullptr;//this->class_table->get("asdf");
+    // SemanticInfo info;
+    // if (class_info->methods.find(n.s_child) == class_info->methods.end()) {
+    //     throw std::runtime_error("Error " + n.parent_t->to_string() + " has no method " + n.s_child);
+    // }
+    // FunctionType* ft = class_info->methods[n.s_child];
+    // info.set_type(*ft);
+    // info.is_function = true;
+    // info.is_method = true;
+    // info.class_info = class_info;
+    // n.actual_function_name = class_info->class_name + "." + n.s_child;
+    // n.n_partial = ft->param_types.size();
+    // return std::make_unique<SemanticInfo>(info);
 }
 
 TypeNode* get_entity_type(Entity e) {
@@ -964,27 +964,6 @@ USemanticInfo Checker::member_tuple(const ObjectType& final_type, MemberNode& n)
     s.set_type(*final_type.type_params[n.n_child - 1]);
     return std::make_unique<SemanticInfo>(s);
 }
-
-USemanticInfo Checker::member_normal(Class* class_info, std::string child, SNode* object_snode) {
-    SemanticInfo rv;
-    if (class_info->members.find(child) != class_info->members.end()) {
-        // It's a member
-        rv.set_type(*class_info->members[child]);
-    } else if (class_info->methods.find(child) != class_info->methods.end()) {
-        rv.set_type(*class_info->methods[child]);
-        rv.is_function = true;
-        rv.snode = object_snode;
-        rv.is_method = true;
-        // rv.method_name = class_info->methods_paths[child];
-        // this->error_method_not_member(object, child, n.start);
-        // return error_stub();
-    } else {
-        throw std::runtime_error("Error member not found in object of class " + class_info->class_name);
-        return error_stub();
-    }
-    return std::make_unique<SemanticInfo>(rv);
-}
-
 
 USemanticInfo Checker::visit_member(MemberNode& n) {
     USemanticInfo parent_info = this->dispatch(n.parent);

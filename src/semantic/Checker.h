@@ -169,9 +169,6 @@ public:
     void fail(std::string msg);
     USemanticInfo member_class_method(std::string class_name, std::string child, MemberNode& n);
     USemanticInfo member_tuple(const ObjectType& final_type, MemberNode& n);
-    USemanticInfo
-    member_normal(const ObjectType& final_type, const ObjectType& object, std::string child, MemberNode& n,
-                  SemanticInfo& info, SemanticInfo& symbol_info);
     USemanticInfo visit(CastNode& n);
     void error_method_not_member(const TypeNode& t, const std::string& member, TextPosition position);
     USemanticInfo visit(DefaultConstructorNode& node);
@@ -186,10 +183,6 @@ public:
     BlockSNode* root_snode;
     Module* module;
     Package* root_package;
-    USemanticInfo
-    member_normal(Class* class_info, std::string child, MemberNode& n, SemanticInfo& info, SemanticInfo& symbol_info);
-    USemanticInfo member_normal(Class* class_info, std::string child);
-    USemanticInfo member_normal(Class* class_info, std::string child, SNode* object_snode);
     USemanticInfo class_member(Class* cls, std::string child);
     USemanticInfo object_member(SNode* object_snode, ObjectValue* pValue, std::string child);
     USemanticInfo package_member(Package* package, std::string child);
@@ -200,3 +193,5 @@ public:
 bool function_is_generic(const FunctionType& ft);
 
 #endif //CHECKER_H
+
+

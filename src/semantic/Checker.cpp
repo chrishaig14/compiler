@@ -15,81 +15,100 @@ bool function_is_generic(const FunctionType& ft) {
     return false;
 }
 
+Class* make_builtin_class(std::string class_name, std::map<std::string, std::string> methods,
+                          std::map<std::string, std::string> static_methods) {
+    auto class_info = new Class();
+    class_info->class_name = class_name;
+    for (auto sb: methods) {
+        ConstFunction* cf = new ConstFunction();
+        cf->ft = parse_function_type(sb.second);
+        cf->full_path = "core." + class_name + "." + sb.first;
+        class_info->methods.insert(std::make_pair(sb.first, cf));
+    }
+
+    for (auto sb: static_methods) {
+        ConstFunction* cf = new ConstFunction();
+        cf->ft = parse_function_type(sb.second);
+        cf->full_path = "core." + class_name + "." + sb.first;
+        class_info->static_methods.insert(std::make_pair(sb.first, cf));
+    }
+    return class_info;
+}
+
 Class* make_list_class_info() {
     auto list_class_info = new Class();
     list_class_info->class_name = "List";
-    list_class_info->methods.insert(std::make_pair("len", new FunctionType({}, new T_INT)));
-
-    ObjectType generic_type_t("t", {});
-    ObjectType generic_type_b("b", {});
-
-    list_class_info->methods.insert(std::make_pair("push",
-                                                   new FunctionType({(generic_type_t.clone())}, TYPE(".None", {}))));
-    list_class_info->methods.insert(std::make_pair("pop", new FunctionType({}, generic_type_t.clone())));
-    list_class_info->methods.insert(std::make_pair("unordered_map",
-                                                   new FunctionType({FUNCTION_TYPE({ generic_type_t.clone() },
-                                                                                   generic_type_b.clone())},
-                                                                    new T_LIST(generic_type_b.clone()))));
-    list_class_info->type_params = {"t"};
+    // list_class_info->methods.insert(std::make_pair("len", new FunctionType({}, new T_INT)));
+    //
+    // ObjectType generic_type_t("t", {});
+    // ObjectType generic_type_b("b", {});
+    //
+    // list_class_info->methods.insert(std::make_pair("push",
+    //                                                new FunctionType({(generic_type_t.clone())}, TYPE(".None", {}))));
+    // list_class_info->methods.insert(std::make_pair("pop", new FunctionType({}, generic_type_t.clone())));
+    // list_class_info->methods.insert(std::make_pair("unordered_map",
+    //                                                new FunctionType({FUNCTION_TYPE({ generic_type_t.clone() },
+    //                                                                                generic_type_b.clone())},
+    //                                                                 new T_LIST(generic_type_b.clone()))));
+    // list_class_info->type_params = {"t"};
     return list_class_info;
 }
 
 Class* make_file_class_info() {
-    auto int_class_info = new Class();
-    int_class_info->class_name = "File";
-    int_class_info->methods.insert(std::make_pair("read_line", parse_function_type("fun()->String")));
-    return int_class_info;
+    std::map<std::string, std::string> methods;
+    methods["read_line"] = "fun()->String";
+
+    std::map<std::string, std::string> static_methods;
+
+    return make_builtin_class("File", methods, static_methods);
 }
 
 Class* make_int_class_info() {
-    auto int_class_info = new Class();
-    int_class_info->class_name = "Integer";
-    int_class_info->methods.insert(std::make_pair("str", parse_function_type("fun()->String")));
-    std::map<std::string, std::string> static_builtins;
-    static_builtins["add"] = "fun(Integer,Integer)->Integer";
-    for (auto sb: static_builtins) {
-        ConstFunction* cf = new ConstFunction();
-        cf->ft = parse_function_type(sb.second);
-        cf->full_path = "core.Integer." + sb.first;
-        int_class_info->static_methods.insert(std::make_pair(sb.first, cf));
-    }
-    return int_class_info;
+    std::map<std::string, std::string> methods;
+    methods["str"] = "fun()->String";
+
+    std::map<std::string, std::string> static_methods;
+    static_methods["add"] = "fun(Integer,Integer)->Integer";
+
+    return make_builtin_class("Integer", methods, static_methods);
 }
 
 Class* make_boolean_class_info() {
-    auto int_class_info = new Class();
-    int_class_info->class_name = "Boolean";
-    int_class_info->methods.insert(std::make_pair("str", parse_function_type("fun()->String")));
-    return int_class_info;
+    std::map<std::string, std::string> methods;
+    methods["str"] = "fun()->String";
+
+    std::map<std::string, std::string> static_methods;
+
+    return make_builtin_class("Boolean", methods, static_methods);
 }
 
 Class* make_float_class_info() {
-    auto float_class_info = new Class();
-    float_class_info->class_name = "Float";
-    float_class_info->methods.insert(std::make_pair("str", parse_function_type("fun()->String")));
-    return float_class_info;
+    std::map<std::string, std::string> methods;
+    methods["str"] = "fun()->String";
+
+    std::map<std::string, std::string> static_methods;
+
+    return make_builtin_class("Float", methods, static_methods);
 }
 
 Class* make_double_class_info() {
-    auto float_class_info = new Class();
-    float_class_info->class_name = "Double";
-    float_class_info->methods.insert(std::make_pair("str", parse_function_type("fun()->String")));
-    return float_class_info;
+    std::map<std::string, std::string> methods;
+    methods["str"] = "fun()->String";
+
+    std::map<std::string, std::string> static_methods;
+
+    return make_builtin_class("Double", methods, static_methods);
 }
 
 Class* make_string_class_info() {
-    auto string_class_info = new Class();
-    string_class_info->class_name = "String";
-    string_class_info->methods.insert(std::make_pair("len", parse_function_type("fun()->Integer")));
-    std::map<std::string, std::string> static_builtins;
-    static_builtins["add"] = "fun(String,String)->String";
-    for (auto sb: static_builtins) {
-        ConstFunction* cf = new ConstFunction();
-        cf->ft = parse_function_type(sb.second);
-        cf->full_path = "core.String." + sb.first;
-        string_class_info->static_methods.insert(std::make_pair(sb.first, cf));
-    }
-    return string_class_info;
+
+    std::map<std::string, std::string> methods;
+    methods["len"] = "fun()->Integer";
+
+    std::map<std::string, std::string> static_methods;
+    static_methods["add"] = "fun(String,String)->String";
+
+    return make_builtin_class("String", methods, static_methods);
 }
 
 Checker::Checker() {
@@ -297,21 +316,23 @@ Class* Checker::instantiate_generic(Class* generic, const ObjectType& instance) 
         concrete_field_types.push_back(&concrete_type);
     }
 
-    std::unordered_map<std::string, FunctionType*> concrete_methods;
-    for (auto m: generic->methods) {
-        TypeNode& concrete_type = *make_type(*(m.second), replacements);
-        concrete_methods.insert(std::make_pair(m.first, &concrete_type.function()));
-    }
-
-    Class* concrete = new Class();
-    concrete->class_name = generic->class_name;
-    concrete->methods = concrete_methods;
-    concrete->member_names = generic->member_names;
-    concrete->member_types = concrete_field_types;
-    for (int i = 0; i < generic->member_names.size(); i++) {
-        concrete->members[generic->member_names[i]] = concrete_field_types[i];
-    }
-    return concrete;
+    // std::unordered_map<std::string, ConstFunction*> concrete_methods;
+    // for (auto m: generic->methods) {
+    //     TypeNode* t = (m.second)->ft;
+    //     TypeNode& concrete_type = *make_type(*t, replacements);
+    //     concrete_methods.insert(std::make_pair(m.first, &concrete_type.function()));
+    // }
+    //
+    // Class* concrete = new Class();
+    // concrete->class_name = generic->class_name;
+    // concrete->methods = concrete_methods;
+    // concrete->member_names = generic->member_names;
+    // concrete->member_types = concrete_field_types;
+    // for (int i = 0; i < generic->member_names.size(); i++) {
+    //     concrete->members[generic->member_names[i]] = concrete_field_types[i];
+    // }
+    // return concrete;
+    return nullptr;
 }
 
 USemanticInfo error_stub() {

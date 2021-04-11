@@ -182,7 +182,7 @@ USemanticInfo Checker::visit_import(ImportNode& node) {
 USemanticInfo Checker::class_member(Class* cls, std::string child) {
     SemanticInfo info;
     if (cls->methods.find(child) != cls->methods.end()) {
-        info.entity = entity_from_type(*cls->methods[child]);
+        info.entity = Entity{.type=E_TYPE::CONST_FUNCTION, .const_function=cls->methods[child]};
     } else if (cls->static_methods.find(child) != cls->static_methods.end()) {
         info.entity = Entity{.type=E_TYPE::CONST_FUNCTION, .const_function=cls->static_methods[child]};
     } else if (cls->static_members.find(child) != cls->static_members.end()) {
@@ -208,7 +208,8 @@ USemanticInfo Checker::object_member(SNode* object_snode, ObjectValue* pValue, s
         } else {
             // return partial
         }
-        info.entity = entity_from_type(*clazz->methods[child]);
+        info.entity = Entity{.type=E_TYPE::CONST_FUNCTION, .const_function=clazz->methods[child]};
+
     } else {
         throw std::runtime_error("Error member/method '" + child + "' not found in class '" + clazz->class_name + "'");
     }

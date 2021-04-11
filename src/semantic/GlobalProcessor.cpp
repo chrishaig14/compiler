@@ -69,7 +69,13 @@ void GlobalProcessor::visit(ClassNode& node) {
         for (auto p: method.parameter_types) {
             x.emplace_back(p->clone());
         }
-        class_info->methods.insert(make_pair(f.first, new FunctionType(x, method.return_type->clone())));
+        // class_info->methods.insert(make_pair(f.first, new FunctionType(x, method.return_type->clone())));
+
+        ConstFunction* cf = new ConstFunction();
+        cf->full_path = class_info->full_path + "." + f.first;
+        cf->ft = new FunctionType(x, method.return_type->clone());
+        class_info->methods.insert(make_pair(f.first, cf));
+
         // (*this->module_mappings[this->module_name])[node.class_name + "." +
         //                                             method.identifier] = mangle_method_name(this->module_name,
         //                                                                                     node.class_name,
@@ -101,7 +107,7 @@ void GlobalProcessor::visit(ClassNode& node) {
     //                                                                              node.class_name,
     //                                                                              "init");
     // }
-    class_info->methods["str"] = new FunctionType({}, new T_STRING);
+    // class_info->methods["str"] = new FunctionType({}, new T_STRING);
     // (*this->module_mappings[this->module_name])[node.class_name + "." + "str"] = mangle_method_name(this->module_name,
     //                                                                                                 node.class_name,
     //                                                                                                 "str");
@@ -109,7 +115,7 @@ void GlobalProcessor::visit(ClassNode& node) {
     for (int i = 0; i < node.type_parameters.size(); i++) {
         tp.push_back(new ObjectType(node.type_parameters[i]));
     }
-    class_info->methods["eq"] = new FunctionType({new ObjectType(node.class_name, tp)}, new T_BOOL);
+    // class_info->methods["eq"] = new FunctionType({new ObjectType(node.class_name, tp)}, new T_BOOL);
     // (*this->module_mappings[this->module_name])[node.class_name + "." + "eq"] = mangle_method_name(this->module_name,
     //                                                                                                node.class_name,
     //                                                                                                "eq");

@@ -19,7 +19,7 @@ public:
     std::vector<TypeNode*> member_types;
 
     MapStringType members;
-    std::unordered_map<std::string, FunctionType*> methods;
+    std::unordered_map<std::string, ConstFunction*> methods;
 
     std::map<std::string, std::pair<TypeNode*, Node*>> static_members;
     std::unordered_map<std::string, ConstFunction*> static_methods;
