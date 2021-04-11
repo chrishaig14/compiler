@@ -121,17 +121,34 @@ USemanticInfo Checker::visit(StringNode& node) {
 
 USemanticInfo Checker::visit(SubscriptNode& node) {
     USemanticInfo parent_p = this->dispatch(node.parent);
-    SemanticInfo& parent = *parent_p;
-    if (parent.type().kind != Kind::OBJECT) {
-        this->error_subscript_non_object(node.start);
-        return error_stub();
+    Entity entity_parent = parent_p->entity;
+    if (entity_parent.type != E_TYPE::OBJECT_VALUE) {
+        throw std::runtime_error("Error subscript of something that is not an object!");
     }
-    const ObjectType& object_type = parent.type().object();
+    Entity class_entity = this->scope->get(entity_parent.object_value->ot->to_string());
+    if (class_entity.type != E_TYPE::CLASS) {
+        throw std::runtime_error("Error this should be a CLASS, but it's not!");
+    }
+    Class* cls = class_entity.clazz;
+    auto subscript_it = cls->methods.find("__sub__");
+    if (subscript_it == cls->methods.end()) {
+        throw std::runtime_error("Error class " + cls->class_name + " does not define the __sub__ operator!");
+    }
+    ConstFunction* subscript_fun = subscript_it->second;
+    std::string sub_fun_path = subscript_fun->full_path;
+    TypeNode* rtype = subscript_fun->ft->return_type->clone();
 
-    if (this->is_lvalue && object_type == T_STRING) {
-        this->error_string_immutable(node.start);
-        return error_stub();
-    }
+    // SemanticInfo& parent = *parent_p;
+    // if (parent.type().kind != Kind::OBJECT) {
+    //     this->error_subscript_non_object(node.start);
+    //     return error_stub();
+    // }
+    // const ObjectType& object_type = parent.type().object();
+
+    // if (this->is_lvalue && object_type == T_STRING) {
+    //     this->error_string_immutable(node.start);
+    //     return error_stub();
+    // }
 
     VectorOfTypes children;
     if (node.child.size() > 1) {
@@ -141,37 +158,26 @@ USemanticInfo Checker::visit(SubscriptNode& node) {
     this->is_lvalue = false;
     Node* c = node.child[0];
     USemanticInfo ct = this->dispatch(c);
-    bool is_integer = ct->type() == T_INT;
-    children.emplace_back(ct->type().clone());
+    Entity child_entity = ct->entity;
+    if (child_entity.type != E_TYPE::OBJECT_VALUE) {
+        throw std::runtime_error("Error using something that's not an object as a subscript!");
+    }
+    if (*child_entity.object_value->ot != *subscript_fun->ft->param_types[0]) {
+        throw std::runtime_error(
+                "Error subscript type is " + child_entity.object_value->ot->to_string() + " but should be " +
+                subscript_fun->ft->param_types[0]->to_string());
+    }
     this->is_lvalue = old_lvalue;
-    node.parent_t = object_type.clone();
     SemanticInfo info;
-    if (object_type.id == "List") {
-        if (!is_integer) {
-            this->error_subscript_type(object_type, ct->type(), T_INT, node.start);
-        }
-        info.set_type(*object_type.type_params[0]);
-    } else if (object_type.id == "Dict") {
-        TypeNode* key_type = object_type.type_params[0];
-        if (ct->type() != *key_type) {
-            throw std::runtime_error(
-                    "Error key of dictionary must be of type " + key_type->to_string() + " but it is " +
-                    ct->type().to_string());
-        }
-        TypeNode* value_type = object_type.type_params[1];
-        info.set_type(*value_type);
-    } else if (object_type.id == "String") {
-        if (!is_integer) {
-            this->error_subscript_type(object_type, ct->type(), T_INT, node.start);
-        }
-        info.set_type(object_type);
-    } else {
-        this->fail("Error subscript of something that's not a list, dict or string!");
-        return error_stub();
-    }
-    if (info.type().kind == Kind::FUNCTION) {
-        info.is_function = true;
-    }
+    info.entity = Entity{.type=E_TYPE::OBJECT_VALUE, .object_value=new ObjectValue()};
+    info.entity.object_value->ot = (ObjectType*) rtype;
+    CallSNode* csn = new CallSNode();
+    IdSNode* fsn = new IdSNode();
+    fsn->identifier = sub_fun_path;
+    csn->function = fsn;
+    csn->arguments.push_back(parent_p->snode);
+    csn->arguments.push_back(ct->snode);
+    info.snode = csn;
     return std::make_unique<SemanticInfo>(info);
 }
 

@@ -104,6 +104,7 @@ Class* make_string_class_info() {
 
     std::map<std::string, std::string> methods;
     methods["len"] = "fun()->Integer";
+    methods["__sub__"] = "fun(Integer)->String";
 
     std::map<std::string, std::string> static_methods;
     static_methods["add"] = "fun(String,String)->String";

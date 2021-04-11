@@ -47,6 +47,8 @@ TaggedObject* subscript(TaggedObject* _l, TaggedObject* i);
 
 TaggedObject* core_D_String_D_add_f(TaggedObject* a, TaggedObject* b);
 
+TaggedObject* core_D_String_D___sub___f(TaggedObject* a, TaggedObject* b);
+
 TaggedObject* core_D_Integer_D_add_f(TaggedObject* a, TaggedObject* b);
 
 TaggedObject* core_D_Integer_D_sub_f(TaggedObject* a, TaggedObject* b);
@@ -70,6 +72,7 @@ extern Function2 core_D_Integer_D_sub_o;
 extern Function2 core_D_Integer_D_div_o;
 extern Function2 core_D_Integer_D_mul_o;
 extern Function2 core_D_String_D_add_o;
+extern Function2 core_D_String_D___sub___o;
 extern TaggedObject* core_D_open;
 extern TaggedObject* core_D_print;
 extern TaggedObject* core_D_range;
@@ -86,6 +89,6 @@ extern TaggedObject* m_core_c_Double_f_str;
 extern TaggedObject* m_core_c_Boolean_f_str;
 extern TaggedObject* m_core_list_subscript;
 extern TaggedObject* m_core_dict_subscript;
-extern TaggedObject* m_core_string_subscript;
+extern TaggedObject* core_D_String_D___sub__;
 
 #endif //UNTITLED1_CORE_H

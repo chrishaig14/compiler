@@ -185,6 +185,14 @@ TaggedObject* core_D_String_D_add_f(TaggedObject* a, TaggedObject* b) {
     return MAKE_STRING(CAST(a, XString)->s + CAST(b, XString)->s);
 }
 
+TaggedObject* core_D_String_D___sub___f(TaggedObject* a, TaggedObject* b) {
+    if (GET_INT(b) >= CAST(a, XString)->s.size()) {
+        throw std::runtime_error("Error subscript of String greater than length!");
+    }
+    return MAKE_STRING(std::string(1, CAST(a, XString)->s[GET_INT(b)]));
+}
+
+
 #define FUNCTION_RAW_NAME(x) x##_f
 #define FUNCTION_OBJECT_NAME(x) x##_o
 #define FUNCTION_OBJECT(n, x) Function##n FUNCTION_OBJECT_NAME(x) = Function##n(FUNCTION_RAW_NAME(x));
@@ -205,6 +213,8 @@ DEFINE_FUNCTION(1, core_D_Double_D_str)
 DEFINE_FUNCTION(1, core_D_Float_D_str)
 DEFINE_FUNCTION(1, core_D_Boolean_D_str)
 DEFINE_FUNCTION(2, core_D_list_subscript)
-DEFINE_FUNCTION(2, core_D_string_subscript)
+
+
+DEFINE_FUNCTION(2, core_D_String_D___sub__)
 DEFINE_FUNCTION(2, core_D_dict_subscript)
 
