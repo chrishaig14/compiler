@@ -106,3 +106,7 @@ std::string STranspiler::transpile_string(StringSNode* node) {
 std::string STranspiler::transpile_boolean(BoolSNode* node) {
     return node->v ? "TRUE" : "FALSE";
 }
+
+std::string STranspiler::transpile_float(FloatSNode* pNode) {
+    return "MAKE_FLOAT(" + pNode->str + ")";
+}

@@ -25,6 +25,8 @@ TaggedObject* core_D_range_f(TaggedObject* _start, TaggedObject* _step, TaggedOb
 
 TaggedObject* core_D_Integer_D_str_f(TaggedObject* _i);
 
+TaggedObject* core_D_Float_D_str_f(TaggedObject* _i);
+
 TaggedObject* core_D_Boolean_str_f(TaggedObject* _i);
 
 TaggedObject* core_D_map_f(TaggedObject* _l, TaggedObject* _f);
@@ -63,7 +65,7 @@ extern Function3 core_D_range_o;
 extern Function2 core_D_map_o;
 extern Function2 core_D_join_o;
 extern Function1 m_core_c_Double_f_str_o;
-extern Function1 m_core_c_Float_f_str_o;
+extern Function1 core_D_Float_D_str_o;
 extern Function1 core_D_Boolean_D_str_o;
 extern Function2 core_D_list_subscript_o;
 extern Function1 core_D_Integer_D_str_o;
@@ -84,7 +86,7 @@ extern TaggedObject* core_D_Integer_D_add;
 extern TaggedObject* core_D_Integer_D_sub;
 extern TaggedObject* core_D_Integer_D_mul;
 extern TaggedObject* core_D_Integer_D_div;
-extern TaggedObject* m_core_c_Float_f_str;
+extern TaggedObject* core_D_Float_D_str;
 extern TaggedObject* m_core_c_Double_f_str;
 extern TaggedObject* core_D_Boolean_D_str;
 extern TaggedObject* m_core_list_subscript;

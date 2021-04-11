@@ -16,6 +16,7 @@
 #include "../simple_nodes/StringSNode.h"
 #include "../units/FunctionValue.h"
 #include "../simple_nodes/BoolSNode.h"
+#include "../simple_nodes/FloatSNode.h"
 
 #define T_NONE ObjectType(".None")
 static TextPosition POS_NONE = {-1, -1};
@@ -97,11 +98,21 @@ USemanticInfo Checker::visit(NumberNode& node) {
             break;
         }
         case NumberType::FLOAT: {
-            info.set_type(T_FLOAT);
+            ObjectValue* ov = new ObjectValue();
+            info.entity = Entity{.type=E_TYPE::OBJECT_VALUE, .object_value=ov};
+            ov->ot = new ObjectType("Float", {});
+            FloatSNode* snode = new FloatSNode();
+            snode->str = node.str;
+            info.snode = snode;
             break;
         }
         case NumberType::DOUBLE: {
-            info.set_type(T_DOUBLE);
+            // ObjectValue* ov = new ObjectValue();
+            // info.entity = Entity{.type=E_TYPE::OBJECT_VALUE, .object_value=ov};
+            // ov->ot = new ObjectType("Double", {});
+            // IntegerSNode* snode = new IntegerSNode();
+            // snode->str = node.str;
+            // info.snode = snode;
             break;
         }
     }

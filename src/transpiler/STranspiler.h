@@ -15,6 +15,7 @@
 #include "../simple_nodes/CallSNode.h"
 #include "../simple_nodes/StringSNode.h"
 #include "../simple_nodes/BoolSNode.h"
+#include "../simple_nodes/FloatSNode.h"
 
 const std::string TOBJECT = "TaggedObject*";
 const std::string GCDECLARE = "GC::declare";
@@ -72,6 +73,8 @@ public:
 
     std::string transpile_boolean(BoolSNode* pNode);
 
+    std::string transpile_float(FloatSNode* pNode);
+
     std::string dispatch(SNode* node) {
         if (node == nullptr){
             throw std::runtime_error("Error dispatching on nullptr snode!");
@@ -92,6 +95,8 @@ public:
             case SNodeType::RETURN:
                 return this->transpile_return((ReturnSNode*) node);
                 break;
+            case SNodeType::FLOAT:
+                return this->transpile_float((FloatSNode*) node);
             case SNodeType::INTEGER:
                 return this->transpile_integer((IntegerSNode*) node);
                 break;
