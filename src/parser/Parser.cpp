@@ -265,15 +265,7 @@ Node* Parser::parse_mul_div_or_mod_expression() {
 Node* Parser::parse_factor() {
     Node* parent;
     if (this->match(TokType::HASH)) {
-        Token hash_tok = this->token;
-        this->next();
-        if (this->match(TokType::ID)) {
-            Token tok = this->token;
-            this->next();
-            parent = new DefaultConstructorNode(tok.str, hash_tok.start, tok.end_pos);
-        } else {
-            parent = this->parse_tuple_literal();
-        }
+        parent = this->parse_tuple_or_constructor();
     } else {
         parent = this->parse_id_or_literal();
     }
@@ -436,14 +428,29 @@ Node* Parser::parse_id_or_literal() {
     return node;
 }
 
+Node* Parser::parse_tuple_or_constructor() {
+    Token hash_tok = this->token;
+    Node* parent;
+    this->next();
+    if (this->match(TokType::ID)) {
+        Token tok = this->token;
+        this->next();
+        parent = new DefaultConstructorNode(tok.str, hash_tok.start, tok.end_pos);
+    } else {
+        parent = this->parse_tuple_literal();
+        parent->start = hash_tok.start;
+    }
+    return parent;
+}
+
 Node* Parser::parse_tuple_literal() {
-    Token hash_tok = this->expect_token(TokType::HASH);
+    // Token hash_tok = this->expect_token(TokType::HASH);
     this->expect_token(TokType::LPAREN);
     // it's a tuple
-    this->next();
+    // this->next();
     VectorOfNodes values;
     if (this->match(TokType::RPAREN)) {
-        this->error_empty_tuple(hash_tok.start);
+        this->error_empty_tuple(POS_NONE);
     }
     bool first = true;
     while (true) {
@@ -455,13 +462,13 @@ Node* Parser::parse_tuple_literal() {
             continue;
         } else {
             if (first && this->match(TokType::RPAREN)) {
-                this->error_tuple_one_element(hash_tok.start);
+                this->error_tuple_one_element(POS_NONE);
             }
             break;
         }
     }
     Token close = this->expect_token(TokType::RPAREN);
-    return new TupleNode(values, hash_tok.start, close.end_pos);
+    return new TupleNode(values, POS_NONE, close.end_pos);
 }
 
 Node* Parser::parse_id_or_class_literal() {
