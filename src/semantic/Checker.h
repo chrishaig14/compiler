@@ -191,9 +191,10 @@ public:
     USemanticInfo member_normal(Class* class_info, std::string child);
     USemanticInfo member_normal(Class* class_info, std::string child, SNode* object_snode);
     USemanticInfo class_member(Class* cls, std::string child);
-    USemanticInfo object_member(ObjectValue* pValue, std::string child);
+    USemanticInfo object_member(SNode* object_snode, ObjectValue* pValue, std::string child);
     USemanticInfo package_member(Package* package, std::string child);
     USemanticInfo module_member(Module* pModule, std::string basicString);
+    bool is_call;
 };
 
 bool function_is_generic(const FunctionType& ft);

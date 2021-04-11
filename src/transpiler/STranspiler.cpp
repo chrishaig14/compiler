@@ -24,7 +24,15 @@ std::string STranspiler::transpile_return(ReturnSNode* node) {
 }
 
 std::string STranspiler::transpile_id(IdSNode* node) {
-    std::string out = node->identifier;
+    std::string out;
+    for (int i = 0; i < node->identifier.size(); i++) {
+        char c = node->identifier[i];
+        if (c == '.') {
+            out += "_D_";
+        } else {
+            out += std::string(1, c);
+        }
+    }
     return out;
 }
 

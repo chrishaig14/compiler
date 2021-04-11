@@ -78,6 +78,7 @@ Class* make_string_class_info() {
 }
 
 Checker::Checker() {
+    this->is_call = false;
     this->is_lvalue = false;
     this->is_method = false;
     this->failed = false;

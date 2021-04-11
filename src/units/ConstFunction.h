@@ -19,6 +19,7 @@ public:
     }
 
     FunctionType* ft;
+    std::string full_path;
 };
 
 #endif

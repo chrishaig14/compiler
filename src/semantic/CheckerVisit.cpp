@@ -88,6 +88,9 @@ USemanticInfo Checker::visit(NumberNode& node) {
             ObjectValue* ov = new ObjectValue();
             info.entity = Entity{.type=E_TYPE::OBJECT_VALUE, .object_value=ov};
             ov->ot = new ObjectType("Integer", {});
+            IntegerSNode* snode = new IntegerSNode();
+            snode->str = node.str;
+            info.snode = snode;
             break;
         }
         case NumberType::FLOAT: {
@@ -504,7 +507,12 @@ USemanticInfo Checker::visit_call(CallNode& n) {
     CallSNode* sn = new CallSNode();
     retv.snode = sn;
     Logger::info("Checking CallNode");
+    this->is_call = true;
     USemanticInfo fun_info_p = this->dispatch(n.function);
+    this->is_call = false;
+    if (fun_info_p->this_arg != nullptr) {
+        sn->arguments = {fun_info_p->this_arg};
+    }
     bool is_def_const = n.function->ntype == NodeType::DEF_CONST;
     bool args_are_constant = true;
     if (fun_info_p->is_error) {
@@ -673,6 +681,7 @@ USemanticInfo Checker::visit_block(BlockNode& node) {
             }
         } else {
             vn.push_back(n);
+            sn->nodes.push_back(sinfo_p->snode);
         }
         SemanticInfo& sinfo = *sinfo_p;
         if (n->ntype == NodeType::CALL) {
@@ -772,6 +781,11 @@ USemanticInfo Checker::visit_id(IdNode& n) {
     IdSNode* sn = new IdSNode();
     info.snode = sn;
     Entity entity = this->scope->get(n._id);
+    sn->identifier = n._id;
+    if (entity.type == E_TYPE::CONST_FUNCTION) {
+        sn->identifier = entity.const_function->full_path;
+    }
+
     // if (entity == nullptr) {
     //     throw std::runtime_error("Entity with name : " + n._id + " not found!");
     // }
@@ -1029,7 +1043,7 @@ USemanticInfo Checker::visit_member(MemberNode& n) {
         case E_TYPE::FUNCTION_VALUE:
             throw std::runtime_error("Error: trying to get member of function value!");
         case E_TYPE::OBJECT_VALUE:
-            return this->object_member(parent_entity.object_value, n.s_child);
+            return this->object_member(parent_info->snode, parent_entity.object_value, n.s_child);
             break;
         case E_TYPE::PACKAGE:
             return this->package_member(parent_entity.package, n.s_child);
@@ -1185,6 +1199,7 @@ USemanticInfo Checker::visit(BinopNode& n) {
     TypeNode* rettype;
     bool ok = true;
     if (ltype.object().id == "Integer" && rtype.object().id == "Integer") {
+        function_id->identifier = "core_D_Integer_D_add";
         rettype = new T_INT;
     } else if (ltype.object().id == "Float" && rtype.object().id == "Float") {
         rettype = new ObjectType("Float");

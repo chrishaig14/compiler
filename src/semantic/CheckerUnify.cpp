@@ -3,6 +3,7 @@
 //
 
 #include "Checker.h"
+#include "../simple_nodes/IdSNode.h"
 
 std::pair<std::string, TypeNode*>*
 Checker::get_first_substitution_object(ObjectType& a, ObjectType& b, bool is_top_level_arg) {
@@ -192,12 +193,21 @@ USemanticInfo Checker::class_member(Class* cls, std::string child) {
     return std::make_unique<SemanticInfo>(info);
 }
 
-USemanticInfo Checker::object_member(ObjectValue* pValue, std::string child) {
+USemanticInfo Checker::object_member(SNode* object_snode, ObjectValue* pValue, std::string child) {
     Class* clazz = this->scope->get(pValue->ot->id).clazz;
     SemanticInfo info;
     if (clazz->members.count(child)) {
         info.entity = entity_from_type(*clazz->members[child]);
     } else if (clazz->methods.count(child)) {
+        IdSNode* idn = new IdSNode();
+        idn->identifier = clazz->full_path + "." + child;
+        if (this->is_call) {
+            // method call
+            info.this_arg = object_snode;
+            info.snode = idn;
+        } else {
+            // return partial
+        }
         info.entity = entity_from_type(*clazz->methods[child]);
     } else {
         throw std::runtime_error("Error member/method '" + child + "' not found in class '" + clazz->class_name + "'");

@@ -33,6 +33,7 @@ public:
     bool operator==(const Class& b) const;
 
     VectorOfStrings type_params;
+    std::string full_path;
 };
 
 #endif //CLASSINFO_H

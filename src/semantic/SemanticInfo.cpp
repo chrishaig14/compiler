@@ -14,6 +14,7 @@ SemanticInfo::SemanticInfo() {
     this->is_constant = false;
     this->is_module = false;
     this->is_package = false;
+    this->this_arg = nullptr;
     this->function_type = nullptr;
     this->snode = nullptr;
 }
@@ -44,6 +45,7 @@ SemanticInfo& SemanticInfo::operator=(const SemanticInfo& other) {
     this->snode = other.snode;
     this->method_name = other.method_name;
     this->function_type = other.function_type;
+    this->this_arg = other.this_arg;
     if (other._type != nullptr) {
         this->_type = other._type->clone();
     } else {
@@ -57,6 +59,7 @@ SemanticInfo::SemanticInfo(const SemanticInfo& other) {
     this->is_error = other.is_error;
     this->is_function = other.is_function;
     this->is_method = other.is_method;
+    this->this_arg = other.this_arg;
     this->class_info = other.class_info;
     this->function_type = other.function_type;
     this->is_class_method = other.is_class_method;

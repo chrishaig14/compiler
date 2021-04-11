@@ -14,6 +14,7 @@ public:
     std::map<std::string, Unit> units;
 
     Package(std::string name, std::string path);
+    std::string full_path;
 };
 
 

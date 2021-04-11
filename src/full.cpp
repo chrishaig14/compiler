@@ -54,6 +54,7 @@ void build_packages(Package* package, int level) {
                     std::string module_path = package->path + "/" + d_name;
                     std::string module_name = d_name.substr(0, d_name.size() - 3);
                     Module* module = new Module(module_name, module_path);
+                    module->full_path = package->full_path + "." + d_name;
                     package->units[module_name] = Unit{.type=U_TYPE::MODULE, .module=module};
                 } else {
                     std::cout << std::string(level + 1, '\t') << "OTHER: " << d_name << std::endl;
@@ -62,6 +63,7 @@ void build_packages(Package* package, int level) {
                 std::string subpackage_path = package->path + "/" + d_name;
                 std::string subpackage_name = d_name;
                 Package* subpackage = new Package(d_name, subpackage_path);
+                subpackage->full_path = package->full_path + "." + d_name;
                 build_packages(subpackage, level + 1);
                 package->units[subpackage_name] = Unit{.type=U_TYPE::PACKAGE, .package=subpackage};
             }
@@ -135,7 +137,7 @@ void add_path_to_module(Module* module, std::string name, VectorOfStrings path) 
             current_flirpin = map_unit_to_flirpin(unit->second);
         } else if (current_flirpin.type == F_TYPE::MODULE) {
             auto flirpin = current_flirpin.module->flirpins.find(path_part);
-            if (flirpin == current_flirpin.module->flirpins.end()){
+            if (flirpin == current_flirpin.module->flirpins.end()) {
                 throw std::runtime_error("Error '" + path_part + "' not found in module " + path_so_far);
             }
             current_flirpin = flirpin->second;
@@ -206,7 +208,7 @@ void transpile_all_modules(Package* package, std::string output_dir) {
 
             std::string module_name = module->name;
 
-            if (module->functions.count("main") != 0) {
+            if (module->flirpins.count("main") != 0) {
                 t.source += "\nint main(){\n";
                 t.source += static_initializations;
                 t.source += "auto x = GET_INT(CALL0(" + mangle_path(module->full_path + ".main") + "));\n";
@@ -248,34 +250,47 @@ int main(int argc, char* argv[]) {
     function_builtins["range"] = "fun(Integer,Integer,Integer)->List[Integer])->String";
     function_builtins["input"] = "fun()->String";
 
-    class_builtins["File"]["read_line"] = "fun()->String";
-    class_builtins["Integer"]["str"] = "fun(Integer)->String";
-    class_builtins["Integer"]["add"] = "fun(Integer, Integer)->Integer";
-    class_builtins["Float"]["str"] = "fun(Float)->String";
-    class_builtins["Double"]["str"] = "fun(Double)->String";
-    class_builtins["List"]["len"] = "fun(List[a])->Integer";
-    class_builtins["List"]["pop"] = "fun(List[a],a)";
-    class_builtins["List"]["push"] = "fun(List[a])->a";
-    class_builtins["List"]["unordered_map"] = "fun(fun(t)->b)->List[b]";
-    class_builtins["String"]["len"] = "fun(String)->Integer";
-    class_builtins["Boolean"] = {};
+    // class_builtins["File"]["read_line"] = "fun()->String";
+    // class_builtins["Integer"]["str"] = "fun(Integer)->String";
+    // class_builtins["Integer"]["add"] = "fun(Integer, Integer)->Integer";
+    // class_builtins["Float"]["str"] = "fun(Float)->String";
+    // class_builtins["Double"]["str"] = "fun(Double)->String";
+    // class_builtins["List"]["len"] = "fun(List[a])->Integer";
+    // class_builtins["List"]["pop"] = "fun(List[a],a)";
+    // class_builtins["List"]["push"] = "fun(List[a])->a";
+    // class_builtins["List"]["unordered_map"] = "fun(fun(t)->b)->List[b]";
+    // class_builtins["String"]["len"] = "fun(String)->Integer";
+    // class_builtins["Boolean"] = {};
 
 
     Module* core_module = new Module("core", "");
+    core_module->full_path = "core";
     root_package->units["core"] = Unit{.type=U_TYPE::MODULE, .module=core_module};
 
     for (auto fb: function_builtins) {
         ConstFunction* cf = new ConstFunction();
         cf->ft = parse_function_type(fb.second);
+        cf->full_path = core_module->full_path + "." + fb.first;
         core_module->flirpins[fb.first] = Flirpin{.type=F_TYPE::CONST_FUNCTION, .const_function=cf};
     }
-    core_module->flirpins["Float"] = Flirpin{.type=F_TYPE::CLASS, .clazz=make_float_class_info()};
-    core_module->flirpins["Double"] = Flirpin{.type=F_TYPE::CLASS, .clazz= make_double_class_info()};
-    core_module->flirpins["File"] = Flirpin{.type=F_TYPE::CLASS, .clazz= make_file_class_info()};
-    core_module->flirpins["Integer"] = Flirpin{.type=F_TYPE::CLASS, .clazz=make_int_class_info()};
-    core_module->flirpins["List"] = Flirpin{.type=F_TYPE::CLASS, .clazz=make_list_class_info()};
-    core_module->flirpins["Boolean"] = Flirpin{.type=F_TYPE::CLASS, .clazz=make_boolean_class_info()};
-    core_module->flirpins["String"] = Flirpin{.type=F_TYPE::CLASS, .clazz=make_string_class_info()};
+
+    std::vector<Class*> cbuiltins = {make_float_class_info(), make_double_class_info(), make_file_class_info(),
+                                     make_int_class_info(), make_list_class_info(), make_boolean_class_info(),
+                                     make_string_class_info()};
+
+    for (auto ci: cbuiltins) {
+        ci->full_path = core_module->full_path + "." + ci->class_name;
+        core_module->flirpins[ci->class_name] = Flirpin{.type=F_TYPE::CLASS, .clazz=ci};
+    }
+
+    // core_module->flirpins["Float"] = Flirpin{.type=F_TYPE::CLASS, .clazz=make_float_class_info()};
+    // core_module->flirpins["Float"].clazz->full_path = core_module->full_path + "." + "Float"
+    // core_module->flirpins["Double"] = Flirpin{.type=F_TYPE::CLASS, .clazz= make_double_class_info()};
+    // core_module->flirpins["File"] = Flirpin{.type=F_TYPE::CLASS, .clazz= make_file_class_info()};
+    // core_module->flirpins["Integer"] = Flirpin{.type=F_TYPE::CLASS, .clazz=make_int_class_info()};
+    // core_module->flirpins["List"] = Flirpin{.type=F_TYPE::CLASS, .clazz=make_list_class_info()};
+    // core_module->flirpins["Boolean"] = Flirpin{.type=F_TYPE::CLASS, .clazz=make_boolean_class_info()};
+    // core_module->flirpins["String"] = Flirpin{.type=F_TYPE::CLASS, .clazz=make_string_class_info()};
 
     for (auto cb: class_builtins) {
     }

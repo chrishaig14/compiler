@@ -45,6 +45,7 @@ public:
     bool is_package;
     Package* package;
     FunctionType* function_type;
+    SNode* this_arg;
 };
 
 class ErrorStub : public SemanticInfo {
