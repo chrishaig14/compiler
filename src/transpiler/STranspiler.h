@@ -70,6 +70,9 @@ public:
     std::string transpile_string(StringSNode* node);
 
     std::string dispatch(SNode* node) {
+        if (node == nullptr){
+            throw std::runtime_error("Error dispatching on nullptr snode!");
+        }
         switch (node->type) {
             case SNodeType::ID:
                 return this->transpile_id((IdSNode*) node);

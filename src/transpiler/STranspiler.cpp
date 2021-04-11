@@ -24,6 +24,9 @@ std::string STranspiler::transpile_return(ReturnSNode* node) {
 }
 
 std::string STranspiler::transpile_id(IdSNode* node) {
+    if (node->identifier == ""){
+        throw std::runtime_error("Error: tranpiling empty idnode!");
+    }
     std::string out;
     for (int i = 0; i < node->identifier.size(); i++) {
         char c = node->identifier[i];

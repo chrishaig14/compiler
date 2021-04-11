@@ -1218,11 +1218,12 @@ USemanticInfo Checker::visit(BinopNode& n) {
 
     } else if (ltype.object().id == "String" && rtype.object().id == "String") {
         if (n.op == OpType::ADD) {
+            function_id->identifier = "core_D_String_D_add";
             rettype = new T_STRING;
-            IdNode* idn = new IdNode("String_add", POS_NONE, POS_NONE);
-            idn->is_global_function = true;
-            this->replace_me = true;
-            this->replacement = new CallNode(idn, VectorOfNodes({n.left, n.right}), POS_NONE, POS_NONE);
+            // IdNode* idn = new IdNode("String_add", POS_NONE, POS_NONE);
+            // idn->is_global_function = true;
+            // this->replace_me = true;
+            // this->replacement = new CallNode(idn, VectorOfNodes({n.left, n.right}), POS_NONE, POS_NONE);
         } else {
             ok = false;
         }

@@ -181,6 +181,9 @@ TaggedObject* core_D_Integer_D_mul_f(TaggedObject* a, TaggedObject* b) {
     return MAKE_INT(GET_INT(a) * GET_INT(b));
 }
 
+TaggedObject* core_D_String_D_add_f(TaggedObject* a, TaggedObject* b) {
+    return MAKE_STRING(CAST(a, XString)->s + CAST(b, XString)->s);
+}
 
 #define FUNCTION_RAW_NAME(x) x##_f
 #define FUNCTION_OBJECT_NAME(x) x##_o
@@ -192,6 +195,7 @@ DEFINE_FUNCTION(1, core_D_print)
 DEFINE_FUNCTION(3, core_D_range)
 DEFINE_FUNCTION(2, core_D_map)
 DEFINE_FUNCTION(2, core_D_join)
+DEFINE_FUNCTION(2, core_D_String_D_add)
 DEFINE_FUNCTION(2, core_D_Integer_D_add)
 DEFINE_FUNCTION(2, core_D_Integer_D_sub)
 DEFINE_FUNCTION(2, core_D_Integer_D_div)
