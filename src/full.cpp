@@ -250,19 +250,6 @@ int main(int argc, char* argv[]) {
     function_builtins["range"] = "fun(Integer,Integer,Integer)->List[Integer])->String";
     function_builtins["input"] = "fun()->String";
 
-    // class_builtins["File"]["read_line"] = "fun()->String";
-    // class_builtins["Integer"]["str"] = "fun(Integer)->String";
-    // class_builtins["Integer"]["add"] = "fun(Integer, Integer)->Integer";
-    // class_builtins["Float"]["str"] = "fun(Float)->String";
-    // class_builtins["Double"]["str"] = "fun(Double)->String";
-    // class_builtins["List"]["len"] = "fun(List[a])->Integer";
-    // class_builtins["List"]["pop"] = "fun(List[a],a)";
-    // class_builtins["List"]["push"] = "fun(List[a])->a";
-    // class_builtins["List"]["unordered_map"] = "fun(fun(t)->b)->List[b]";
-    // class_builtins["String"]["len"] = "fun(String)->Integer";
-    // class_builtins["Boolean"] = {};
-
-
     Module* core_module = new Module("core", "");
     core_module->full_path = "core";
     root_package->units["core"] = Unit{.type=U_TYPE::MODULE, .module=core_module};
@@ -281,18 +268,6 @@ int main(int argc, char* argv[]) {
     for (auto ci: cbuiltins) {
         ci->full_path = core_module->full_path + "." + ci->class_name;
         core_module->flirpins[ci->class_name] = Flirpin{.type=F_TYPE::CLASS, .clazz=ci};
-    }
-
-    // core_module->flirpins["Float"] = Flirpin{.type=F_TYPE::CLASS, .clazz=make_float_class_info()};
-    // core_module->flirpins["Float"].clazz->full_path = core_module->full_path + "." + "Float"
-    // core_module->flirpins["Double"] = Flirpin{.type=F_TYPE::CLASS, .clazz= make_double_class_info()};
-    // core_module->flirpins["File"] = Flirpin{.type=F_TYPE::CLASS, .clazz= make_file_class_info()};
-    // core_module->flirpins["Integer"] = Flirpin{.type=F_TYPE::CLASS, .clazz=make_int_class_info()};
-    // core_module->flirpins["List"] = Flirpin{.type=F_TYPE::CLASS, .clazz=make_list_class_info()};
-    // core_module->flirpins["Boolean"] = Flirpin{.type=F_TYPE::CLASS, .clazz=make_boolean_class_info()};
-    // core_module->flirpins["String"] = Flirpin{.type=F_TYPE::CLASS, .clazz=make_string_class_info()};
-
-    for (auto cb: class_builtins) {
     }
 
     analyze_all_modules(root_package);

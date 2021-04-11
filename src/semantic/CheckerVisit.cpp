@@ -951,51 +951,6 @@ USemanticInfo Checker::visit(AssignmentNode& n) {
     return std::make_unique<SemanticInfo>(info);
 }
 
-USemanticInfo Checker::member_class_method(std::string class_name, std::string child, MemberNode& n) {
-    Class* class_info = nullptr;//this->class_table->get("");
-    SemanticInfo rv;
-    if (class_info->methods.find(child) != class_info->methods.end()) {
-        // unbound method
-        rv.set_type(*class_info->methods.find(child)->second);
-        rv.class_info = class_info;
-
-        const FunctionType& ftn = rv.type().function();
-        FunctionType& copy_ftn = *ftn.clone();
-        VectorOfTypes tp;
-        for (auto tttp: rv.class_info->type_params) {
-            tp.push_back(new ObjectType(tttp));
-        }
-        auto instance_type = new ObjectType(rv.class_info->class_name, tp);
-        copy_ftn.param_types.insert(copy_ftn.param_types.begin(), instance_type);
-
-        rv.set_type(copy_ftn);
-        rv.is_method = false;
-        rv.is_class_method = true;
-        this->replace_me = true;
-        IdNode* idn = new IdNode(class_name + "." + child, POS_NONE, POS_NONE);
-        idn->is_global_function = true;
-        this->replacement = idn;
-        return std::make_unique<SemanticInfo>(rv);
-    } else if (class_info->static_methods.find(child) != class_info->static_methods.end()) {
-        // static method
-        rv.set_type(*class_info->static_methods[child]);
-        rv.is_function = true;
-        IdNode* idn = new IdNode("", POS_NONE, POS_NONE);
-        this->replace_me = true;
-        this->replacement = idn;
-        n.is_class_member = true;
-        return std::make_unique<SemanticInfo>(rv);
-    } else if (class_info->static_members.find(child) != class_info->static_members.end()) {
-        rv.set_type(*class_info->static_members[child].first);
-        n.is_class_static_member = true;
-        n.is_class_member = true;
-        return std::make_unique<SemanticInfo>(rv);
-    } else {
-        this->error_class_no_method(class_name, child, n.start);
-        return error_stub();
-    }
-}
-
 USemanticInfo Checker::member_tuple(const ObjectType& final_type, MemberNode& n) {
     if (n.type != MemberType::NUM) {
         throw std::runtime_error("Error can only access members " + std::to_string(1) + " to " +
@@ -1166,6 +1121,10 @@ USemanticInfo Checker::visit(BinopNode& n) {
     }
     const TypeNode& ltype = *get_entity_type(left_info_p->entity);
     const TypeNode& rtype = *get_entity_type(right_info_p->entity);
+    if (ltype != rtype) {
+        throw std::runtime_error("Binary operation between values of different types: " + ltype.to_string() + " and " +
+                                 rtype.to_string());
+    }
     bool err = false;
     if (ltype == T_NONE) {
         this->error_function_doesnt_return_a_value(n.left->start, nullptr);
@@ -1208,17 +1167,29 @@ USemanticInfo Checker::visit(BinopNode& n) {
     } else if (n.op == OpType::DIV) {
         fun = "div";
     }
+    Entity entity = this->scope->get(ltype.object().id);
+    if (entity.type != E_TYPE::CLASS) {
+        throw std::runtime_error("This should be a CLASS, but it's not!");
+    }
+    Class* cls = entity.clazz;
+    auto operator_fun_it = cls->static_methods.find(fun);
+    if (operator_fun_it == cls->static_methods.end()) {
+        throw std::runtime_error("Class " + cls->class_name + " has no operator " + fun + " defined ");
+    }
+    ConstFunction* operator_fun = operator_fun_it->second;
+    function_id->identifier = operator_fun->full_path;
+    rettype = operator_fun->ft->return_type->clone();
     if (ltype.object().id == "Integer" && rtype.object().id == "Integer") {
-        function_id->identifier = "core_D_Integer_D_" + fun;
-        rettype = new T_INT;
+        // function_id->identifier = "core_D_Integer_D_" + fun;
+        // rettype = new T_INT;
     } else if (ltype.object().id == "Float" && rtype.object().id == "Float") {
-        rettype = new ObjectType("Float");
+        // rettype = new ObjectType("Float");
     } else if (ltype.object().id == "Double" && rtype.object().id == "Double") {
-        rettype = new ObjectType("Double");
+        // rettype = new ObjectType("Double");
 
     } else if (ltype.object().id == "String" && rtype.object().id == "String") {
         if (n.op == OpType::ADD) {
-            function_id->identifier = "core_D_String_D_add";
+            // function_id->identifier = "core_D_String_D_add";
             rettype = new T_STRING;
             // IdNode* idn = new IdNode("String_add", POS_NONE, POS_NONE);
             // idn->is_global_function = true;

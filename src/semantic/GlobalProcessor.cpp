@@ -83,7 +83,10 @@ void GlobalProcessor::visit(ClassNode& node) {
         for (auto p: method.parameter_types) {
             x.emplace_back(p->clone());
         }
-        class_info->static_methods.insert(make_pair(f.first, new FunctionType(x, method.return_type->clone())));
+        ConstFunction* cf = new ConstFunction();
+        cf->full_path = class_info->full_path + "." + f.first;
+        cf->ft = new FunctionType(x, method.return_type->clone());
+        class_info->static_methods.insert(make_pair(f.first, cf));
         // (*this->module_mappings[this->module_name])[node.class_name + "." +
         //                                             method.identifier] = mangle_method_name(this->module_name,
         //                                                                                     node.class_name,

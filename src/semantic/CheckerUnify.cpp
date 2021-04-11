@@ -184,7 +184,7 @@ USemanticInfo Checker::class_member(Class* cls, std::string child) {
     if (cls->methods.find(child) != cls->methods.end()) {
         info.entity = entity_from_type(*cls->methods[child]);
     } else if (cls->static_methods.find(child) != cls->static_methods.end()) {
-        info.entity = entity_from_type(*cls->static_methods[child]);
+        info.entity = Entity{.type=E_TYPE::CONST_FUNCTION, .const_function=cls->static_methods[child]};
     } else if (cls->static_members.find(child) != cls->static_members.end()) {
         info.entity = entity_from_type(*cls->static_members[child].first);
     } else {

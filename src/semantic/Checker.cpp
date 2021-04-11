@@ -45,7 +45,14 @@ Class* make_int_class_info() {
     auto int_class_info = new Class();
     int_class_info->class_name = "Integer";
     int_class_info->methods.insert(std::make_pair("str", parse_function_type("fun()->String")));
-    int_class_info->methods.insert(std::make_pair("add", parse_function_type("fun(Integer)->String")));
+    std::map<std::string, std::string> static_builtins;
+    static_builtins["add"] = "fun(Integer,Integer)->Integer";
+    for (auto sb: static_builtins) {
+        ConstFunction* cf = new ConstFunction();
+        cf->ft = parse_function_type(sb.second);
+        cf->full_path = "core.Integer." + sb.first;
+        int_class_info->static_methods.insert(std::make_pair(sb.first, cf));
+    }
     return int_class_info;
 }
 
@@ -74,6 +81,14 @@ Class* make_string_class_info() {
     auto string_class_info = new Class();
     string_class_info->class_name = "String";
     string_class_info->methods.insert(std::make_pair("len", parse_function_type("fun()->Integer")));
+    std::map<std::string, std::string> static_builtins;
+    static_builtins["add"] = "fun(String,String)->String";
+    for (auto sb: static_builtins) {
+        ConstFunction* cf = new ConstFunction();
+        cf->ft = parse_function_type(sb.second);
+        cf->full_path = "core.String." + sb.first;
+        string_class_info->static_methods.insert(std::make_pair(sb.first, cf));
+    }
     return string_class_info;
 }
 
@@ -336,7 +351,6 @@ bool Checker::is_immutable(const TypeNode& node) {
     }
     return false;
 }
-
 
 
 Checker::~Checker() {
