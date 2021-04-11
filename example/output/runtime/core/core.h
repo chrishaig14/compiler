@@ -86,7 +86,7 @@ extern TaggedObject* core_D_Integer_D_mul;
 extern TaggedObject* core_D_Integer_D_div;
 extern TaggedObject* m_core_c_Float_f_str;
 extern TaggedObject* m_core_c_Double_f_str;
-extern TaggedObject* m_core_c_Boolean_f_str;
+extern TaggedObject* core_D_Boolean_D_str;
 extern TaggedObject* m_core_list_subscript;
 extern TaggedObject* m_core_dict_subscript;
 extern TaggedObject* core_D_String_D___sub__;

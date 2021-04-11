@@ -15,6 +15,7 @@
 #include "../simple_nodes/CallSNode.h"
 #include "../simple_nodes/StringSNode.h"
 #include "../units/FunctionValue.h"
+#include "../simple_nodes/BoolSNode.h"
 
 #define T_NONE ObjectType(".None")
 static TextPosition POS_NONE = {-1, -1};
@@ -55,7 +56,9 @@ USemanticInfo Checker::visit(ListNode& node) {
 
 USemanticInfo Checker::visit(BooleanNode& node) {
     SemanticInfo info;
-    info.set_type(T_BOOL);
+    info.entity = Entity{.type=E_TYPE::OBJECT_VALUE, .object_value=new ObjectValue()};
+    info.entity.object_value->ot = new T_BOOL;
+    info.snode = new BoolSNode(node.value);
     return std::make_unique<SemanticInfo>(info);
 }
 

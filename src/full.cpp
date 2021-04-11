@@ -168,6 +168,7 @@ void analyze_all_modules(Package* package) {
             module->flirpins["print"] = core_module->flirpins["print"];
             module->flirpins["Integer"] = core_module->flirpins["Integer"];
             module->flirpins["String"] = core_module->flirpins["String"];
+            module->flirpins["Boolean"] = core_module->flirpins["Boolean"];
             Checker checker;
             checker.module = module;
             checker.root_package = root_package;

@@ -24,7 +24,7 @@ std::string STranspiler::transpile_return(ReturnSNode* node) {
 }
 
 std::string STranspiler::transpile_id(IdSNode* node) {
-    if (node->identifier == ""){
+    if (node->identifier == "") {
         throw std::runtime_error("Error: tranpiling empty idnode!");
     }
     std::string out;
@@ -101,4 +101,8 @@ std::string STranspiler::transpile_call(CallSNode* node) {
 
 std::string STranspiler::transpile_string(StringSNode* node) {
     return "MAKE_STRING" + LPAREN + QUOTE + node->s + QUOTE + RPAREN;
+}
+
+std::string STranspiler::transpile_boolean(BoolSNode* node) {
+    return node->v ? "TRUE" : "FALSE";
 }

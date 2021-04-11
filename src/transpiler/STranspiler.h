@@ -14,6 +14,7 @@
 #include "../simple_nodes/ReturnSNode.h"
 #include "../simple_nodes/CallSNode.h"
 #include "../simple_nodes/StringSNode.h"
+#include "../simple_nodes/BoolSNode.h"
 
 const std::string TOBJECT = "TaggedObject*";
 const std::string GCDECLARE = "GC::declare";
@@ -69,11 +70,15 @@ public:
 
     std::string transpile_string(StringSNode* node);
 
+    std::string transpile_boolean(BoolSNode* pNode);
+
     std::string dispatch(SNode* node) {
         if (node == nullptr){
             throw std::runtime_error("Error dispatching on nullptr snode!");
         }
         switch (node->type) {
+            case SNodeType::BOOLEAN:
+                return this->transpile_boolean((BoolSNode*) node);
             case SNodeType::ID:
                 return this->transpile_id((IdSNode*) node);
             case SNodeType::STRING:
