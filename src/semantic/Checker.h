@@ -93,7 +93,7 @@ public:
     USemanticInfo visit(BreakNode& node);
     USemanticInfo visit(MethodNode& node);
     USemanticInfo visit_call(CallNode& n);
-    USemanticInfo visit(ClassNode& node);
+    USemanticInfo visit_class(ClassNode& node);
     USemanticInfo visit(ContinueNode& node);
     USemanticInfo visit(DeclarationNode& node);
     USemanticInfo visit(DictNode& node);

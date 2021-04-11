@@ -54,7 +54,7 @@ void build_packages(Package* package, int level) {
                     std::string module_path = package->path + "/" + d_name;
                     std::string module_name = d_name.substr(0, d_name.size() - 3);
                     Module* module = new Module(module_name, module_path);
-                    module->full_path = package->full_path + "." + d_name;
+                    module->full_path = package->full_path + "." + module_name;
                     package->units[module_name] = Unit{.type=U_TYPE::MODULE, .module=module};
                 } else {
                     std::cout << std::string(level + 1, '\t') << "OTHER: " << d_name << std::endl;

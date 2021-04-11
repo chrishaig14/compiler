@@ -413,7 +413,7 @@ USemanticInfo Checker::dispatch(Node* nod) {
             return this->visit_call(n.call());
             break;
         case NodeType::CLS:
-            return this->visit(n.cls());
+            return this->visit_class(n.cls());
             break;
         case NodeType::CNTINUE:
             return this->visit(n.cntinue());

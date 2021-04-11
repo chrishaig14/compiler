@@ -17,6 +17,8 @@
 #include "../units/FunctionValue.h"
 #include "../simple_nodes/BoolSNode.h"
 #include "../simple_nodes/FloatSNode.h"
+#include "../simple_nodes/ClassSNode.h"
+#include "../simple_nodes/NewObjectSNode.h"
 
 #define T_NONE ObjectType(".None")
 static TextPosition POS_NONE = {-1, -1};
@@ -279,7 +281,30 @@ FunctionNode* generate_str_method(std::string class_name) {
     return eq_meth;
 }
 
-USemanticInfo Checker::visit(ClassNode& node) {
+FunctionSNode* make_class_default_init(std::string class_path, VectorOfStrings members) {
+    FunctionSNode* fn = new FunctionSNode();
+    fn->identifier = class_path + ".__init__";
+    fn->params = members;
+    BlockSNode* bn = new BlockSNode();
+    ReturnSNode* rn = new ReturnSNode();
+    NewObjectSNode* nn = new NewObjectSNode();
+    nn->class_name = class_path;
+    for (auto m: members) {
+        IdSNode* idn = new IdSNode();
+        idn->identifier = m;
+        nn->args.push_back(idn);
+    }
+    rn->expression = nn;
+    bn->nodes.push_back(rn);
+    fn->body = bn;
+    return fn;
+}
+
+
+USemanticInfo Checker::visit_class(ClassNode& node) {
+    SemanticInfo info;
+    BlockSNode* sn = new BlockSNode();
+    info.snode = sn;
     this->current_class = node.class_name;
     this->add_this = true;
     VectorOfTypes tp;
@@ -290,11 +315,19 @@ USemanticInfo Checker::visit(ClassNode& node) {
     VectorOfTypes members_ordered_types;
     inits = std::map<std::string, bool>();
 
+    ClassSNode* csn = new ClassSNode();
+
+    Class* clazz = this->scope->get(node.class_name).clazz;
+    csn->identifier = clazz->full_path;
+    sn->nodes.push_back(csn);
+    sn->nodes.push_back(make_class_default_init(clazz->full_path, node.members_ordered));
+
     for (auto mt: node.members_ordered) {
         TypeNode& t = *node.members[mt];
         inits[mt] = false;
         members_ordered_types.push_back(&t);
         this->assert_type_exists(t, node.start);
+        csn->members.push_back(mt);
     }
 
     for (auto sm: node.static_members) {
@@ -308,19 +341,33 @@ USemanticInfo Checker::visit(ClassNode& node) {
         }
     }
 
+    std::vector<SNode*> methods_snodes;
+    std::vector<SNode*> static_methods_snodes;
+
     this->this_type = new ObjectType(node.class_name, tp);
     bool has_init = false;
     for (auto method: node.methods) {
         this->is_method = true;
-        this->visit_function(*method.second);
+        USemanticInfo method_info = this->visit_function(*method.second);
+        methods_snodes.push_back(method_info->snode);
         has_init = has_init || method.first == "init";
     }
+
     for (auto method: node.static_methods) {
         this->is_method = false;
         this->add_this = false;
-        this->visit_function(*method.second);
+        USemanticInfo method_info = this->visit_function(*method.second);
+        static_methods_snodes.push_back(method_info->snode);
         has_init = has_init || method.first == "init";
     }
+
+    for (auto m: methods_snodes) {
+        sn->nodes.push_back(m);
+    }
+    for (auto m: static_methods_snodes) {
+        sn->nodes.push_back(m);
+    }
+
     this->add_this = true;
     std::string eq_method_name = "eq";
     // if (node.methods.find(eq_method_name) == node.methods.end()) {
@@ -373,7 +420,7 @@ USemanticInfo Checker::visit(ClassNode& node) {
     delete this_type;
     this->this_type = nullptr;
     this->current_class = "";
-    return nullptr;
+    return std::make_unique<SemanticInfo>(info);
 }
 
 USemanticInfo Checker::visit(ContinueNode& node) {
@@ -701,7 +748,13 @@ USemanticInfo Checker::visit_block(BlockNode& node) {
             }
         } else {
             vn.push_back(n);
-            sn->nodes.push_back(sinfo_p->snode);
+            if (sinfo_p->snode->type == SNodeType::BLOCK) {
+                for (auto nn : ((BlockSNode*) sinfo_p->snode)->nodes) {
+                    sn->nodes.push_back(nn);
+                }
+            } else {
+                sn->nodes.push_back(sinfo_p->snode);
+            }
         }
         SemanticInfo& sinfo = *sinfo_p;
         if (n->ntype == NodeType::CALL) {
@@ -1303,6 +1356,9 @@ USemanticInfo Checker::visit(DefaultConstructorNode& node) {
     info.entity.const_function = new ConstFunction();
     info.entity.const_function->ft = new FunctionType(t, new ObjectType(node.name, {}));
     info.is_function = true;
+    IdSNode* idn = new IdSNode();
+    idn->identifier = cls->full_path + "." + "__init__";
+    info.snode = idn;
     return std::make_unique<SemanticInfo>(info);
 }
 

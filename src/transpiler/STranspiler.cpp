@@ -23,19 +23,25 @@ std::string STranspiler::transpile_return(ReturnSNode* node) {
     return out;
 }
 
-std::string STranspiler::transpile_id(IdSNode* node) {
-    if (node->identifier == "") {
-        throw std::runtime_error("Error: tranpiling empty idnode!");
-    }
+std::string path_to_id(std::string p) {
     std::string out;
-    for (int i = 0; i < node->identifier.size(); i++) {
-        char c = node->identifier[i];
+    for (int i = 0; i < p.size(); i++) {
+        char c = p[i];
         if (c == '.') {
             out += "_D_";
         } else {
             out += std::string(1, c);
         }
     }
+    return out;
+}
+
+std::string STranspiler::transpile_id(IdSNode* node) {
+    if (node->identifier == "") {
+        throw std::runtime_error("Error: tranpiling empty idnode!");
+    }
+    std::string out;
+    out += path_to_id(node->identifier);
     return out;
 }
 
@@ -46,6 +52,7 @@ void STranspiler::transpile_function(FunctionSNode* node) {
         parameters += parameter + COMMA + SPACE;
     }
     parameters = parameters.substr(0, parameters.size() - 2);
+    node->identifier = path_to_id(node->identifier);
 
     std::string raw_function_identifier = node->identifier + "_f";
 
@@ -109,4 +116,41 @@ std::string STranspiler::transpile_boolean(BoolSNode* node) {
 
 std::string STranspiler::transpile_float(FloatSNode* pNode) {
     return "MAKE_FLOAT(" + pNode->str + ")";
+}
+
+void STranspiler::transpile_class(ClassSNode* node) {
+    std::string out;
+    std::string class_name = path_to_id(node->identifier);
+    out += CLASS + SPACE + class_name + SPACE + ": public XObject {\n";
+    out += "public: \n";
+    for (auto m: node->members) {
+        out += TOBJECT + SPACE + m + SEMIC + NEWLINE;
+    }
+    out += class_name + LPAREN;
+    for (auto m: node->members) {
+        out += TOBJECT + SPACE + m + COMMA + SPACE;
+    }
+    out = out.substr(0, out.size() - 2);
+    out += RPAREN + SPACE + ":" + SPACE + "XObject" + LPAREN + QUOTE + class_name + QUOTE + RPAREN + SPACE + LCURLY +
+           NEWLINE;
+    for (auto m: node->members) {
+        out += "this->" + m + " = " + m + SEMIC + NEWLINE;
+    }
+    out += RCURLY + NEWLINE;
+    out += RCURLY + SEMIC + NEWLINE;
+    this->header += out;
+}
+
+std::string STranspiler::transpile_new(NewObjectSNode* node) {
+    std::string out;
+    std::string class_id = path_to_id(node->class_name);
+    out += "NEW(" + class_id + COMMA + SPACE;
+    for (auto m: node->args) {
+        out += this->dispatch(m) + COMMA + SPACE;
+    }
+    if (node->args.size() != 0) {
+        out = out.substr(0, out.size() - 2);
+    }
+    out += RPAREN;
+    return out;
 }

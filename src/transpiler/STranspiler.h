@@ -16,6 +16,8 @@
 #include "../simple_nodes/StringSNode.h"
 #include "../simple_nodes/BoolSNode.h"
 #include "../simple_nodes/FloatSNode.h"
+#include "../simple_nodes/ClassSNode.h"
+#include "../simple_nodes/NewObjectSNode.h"
 
 const std::string TOBJECT = "TaggedObject*";
 const std::string GCDECLARE = "GC::declare";
@@ -34,6 +36,7 @@ const std::string COMMA = ",";
 const std::string NEWLINE = "\n";
 const std::string EXTERN = "extern";
 const std::string RETURN = "return";
+const std::string CLASS = "class";
 const std::string RETURN_VAR = "__return__";
 
 
@@ -57,12 +60,20 @@ public:
     std::string transpile_block(BlockSNode* node);
     void transpile_program(BlockSNode* node);
     std::string transpile_id(IdSNode* node);
+
+    std::string transpile_new(NewObjectSNode* node);
+
     std::string transpile_return(ReturnSNode* node);
+
+    void transpile_class(ClassSNode* node);
 
     void dispatch_top(SNode* node) {
         switch (node->type) {
             case SNodeType::FUNCTION:
                 this->transpile_function(static_cast<FunctionSNode*>(node));
+                break;
+            case SNodeType::CLASS:
+                this->transpile_class((ClassSNode*) node);
                 break;
         }
     }
@@ -76,7 +87,7 @@ public:
     std::string transpile_float(FloatSNode* pNode);
 
     std::string dispatch(SNode* node) {
-        if (node == nullptr){
+        if (node == nullptr) {
             throw std::runtime_error("Error dispatching on nullptr snode!");
         }
         switch (node->type) {
@@ -88,6 +99,8 @@ public:
                 return this->transpile_string((StringSNode*) node);
             case SNodeType::CALL:
                 return this->transpile_call((CallSNode*) node);
+            case SNodeType::NEW:
+                return this->transpile_new((NewObjectSNode*) node);
             case SNodeType::DECLARATION:
                 return this->transpile_declaration((DeclarationSNode*) node);
             case SNodeType::ASSIGNMENT:
