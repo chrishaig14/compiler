@@ -179,12 +179,15 @@ void analyze_all_modules(Package* package) {
 
             std::cout << "Analyzing module " << module->name << std::endl;
             Module* core_module = root_package->units["core"].module;
-            module->flirpins["print"] = core_module->flirpins["print"];
-            module->flirpins["Integer"] = core_module->flirpins["Integer"];
-            module->flirpins["Float"] = core_module->flirpins["Float"];
-            module->flirpins["Double"] = core_module->flirpins["Double"];
-            module->flirpins["String"] = core_module->flirpins["String"];
-            module->flirpins["Boolean"] = core_module->flirpins["Boolean"];
+            for(auto builtin: core_module->flirpins){
+                module->flirpins[builtin.first] = builtin.second;
+            }
+            // module->flirpins["print"] = core_module->flirpins["print"];
+            // module->flirpins["Integer"] = core_module->flirpins["Integer"];
+            // module->flirpins["Float"] = core_module->flirpins["Float"];
+            // module->flirpins["Double"] = core_module->flirpins["Double"];
+            // module->flirpins["String"] = core_module->flirpins["String"];
+            // module->flirpins["Boolean"] = core_module->flirpins["Boolean"];
             Checker checker;
             checker.module = module;
             checker.root_package = root_package;

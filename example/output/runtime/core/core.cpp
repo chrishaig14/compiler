@@ -209,12 +209,56 @@ DEFINE_FUNCTION(2, core_D_Integer_D_sub)
 DEFINE_FUNCTION(2, core_D_Integer_D_div)
 DEFINE_FUNCTION(2, core_D_Integer_D_mul)
 DEFINE_FUNCTION(1, core_D_Integer_D_str)
+
+DEFINE_FUNCTION(2, core_D_Integer_D_lt)
+DEFINE_FUNCTION(2, core_D_Integer_D_gt)
+DEFINE_FUNCTION(2, core_D_Integer_D_le)
+DEFINE_FUNCTION(2, core_D_Integer_D_ge)
+DEFINE_FUNCTION(2, core_D_Integer_D_eq)
+DEFINE_FUNCTION(2, core_D_Integer_D_ne)
+
+
+
 DEFINE_FUNCTION(1, core_D_Double_D_str)
 DEFINE_FUNCTION(1, core_D_Float_D_str)
 DEFINE_FUNCTION(1, core_D_Boolean_D_str)
-DEFINE_FUNCTION(2, core_D_list_subscript)
+DEFINE_FUNCTION(2, core_D_List_D___sub__)
+DEFINE_FUNCTION(1, core_D_List_D_len)
 
 
 DEFINE_FUNCTION(2, core_D_String_D___sub__)
+
+TaggedObject* core_D_Integer_D_lt_f(TaggedObject* a, TaggedObject* b) {
+    return MAKE_BOOL(GET_INT(a) < GET_INT(b));
+}
+
+TaggedObject* core_D_Integer_D_gt_f(TaggedObject* a, TaggedObject* b) {
+    return MAKE_BOOL(GET_INT(a) > GET_INT(b));
+}
+
+TaggedObject* core_D_Integer_D_le_f(TaggedObject* a, TaggedObject* b) {
+    return MAKE_BOOL(GET_INT(a) <= GET_INT(b));
+}
+
+TaggedObject* core_D_Integer_D_ge_f(TaggedObject* a, TaggedObject* b) {
+    return MAKE_BOOL(GET_INT(a) >= GET_INT(b));
+}
+
+TaggedObject* core_D_Integer_D_ne_f(TaggedObject* a, TaggedObject* b) {
+    return MAKE_BOOL(GET_INT(a) != GET_INT(b));
+}
+
+TaggedObject* core_D_Integer_D_eq_f(TaggedObject* a, TaggedObject* b) {
+    return MAKE_BOOL(GET_INT(a) == GET_INT(b));
+}
+
+TaggedObject* core_D_List_D_len_f(TaggedObject* a) {
+    return MAKE_INT(CAST(a, XList)->lv.size());
+}
+
+TaggedObject* core_D_List_D___sub___f(TaggedObject* a, TaggedObject* b) {
+    return CAST(a, XList)->lv[GET_INT(b)];
+}
+
 DEFINE_FUNCTION(2, core_D_dict_subscript)
 

@@ -15,8 +15,9 @@ bool function_is_generic(const FunctionType& ft) {
     return false;
 }
 
-Class* make_builtin_class(std::string class_name, std::map<std::string, std::string> methods,
-                          std::map<std::string, std::string> static_methods) {
+Class*
+make_builtin_class(std::string class_name, VectorOfStrings type_params, std::map<std::string, std::string> methods,
+                   std::map<std::string, std::string> static_methods) {
     auto class_info = new Class();
     class_info->class_name = class_name;
     for (auto sb: methods) {
@@ -32,12 +33,23 @@ Class* make_builtin_class(std::string class_name, std::map<std::string, std::str
         cf->full_path = "core." + class_name + "." + sb.first;
         class_info->static_methods.insert(std::make_pair(sb.first, cf));
     }
+    class_info->type_params = type_params;
     return class_info;
 }
 
 Class* make_list_class_info() {
+    std::map<std::string, std::string> methods;
+    methods["__sub__"] = "fun(Integer)->t";
+    methods["len"] = "fun()->Integer";
+
+    std::map<std::string, std::string> static_methods;
+
+    return make_builtin_class("List", {"t"}, methods, static_methods);
+
+
     auto list_class_info = new Class();
     list_class_info->class_name = "List";
+
     // list_class_info->methods.insert(std::make_pair("len", new FunctionType({}, new T_INT)));
     //
     // ObjectType generic_type_t("t", {});
@@ -60,7 +72,7 @@ Class* make_file_class_info() {
 
     std::map<std::string, std::string> static_methods;
 
-    return make_builtin_class("File", methods, static_methods);
+    return make_builtin_class("File", {}, methods, static_methods);
 }
 
 Class* make_int_class_info() {
@@ -69,8 +81,17 @@ Class* make_int_class_info() {
 
     std::map<std::string, std::string> static_methods;
     static_methods["add"] = "fun(Integer,Integer)->Integer";
+    static_methods["sub"] = "fun(Integer,Integer)->Boolean";
+    static_methods["mul"] = "fun(Integer,Integer)->Boolean";
+    static_methods["div"] = "fun(Integer,Integer)->Boolean";
+    static_methods["lt"] = "fun(Integer,Integer)->Boolean";
+    static_methods["gt"] = "fun(Integer,Integer)->Boolean";
+    static_methods["eq"] = "fun(Integer,Integer)->Boolean";
+    static_methods["ne"] = "fun(Integer,Integer)->Boolean";
+    static_methods["le"] = "fun(Integer,Integer)->Boolean";
+    static_methods["ge"] = "fun(Integer,Integer)->Boolean";
 
-    return make_builtin_class("Integer", methods, static_methods);
+    return make_builtin_class("Integer", {}, methods, static_methods);
 }
 
 Class* make_boolean_class_info() {
@@ -79,7 +100,7 @@ Class* make_boolean_class_info() {
 
     std::map<std::string, std::string> static_methods;
 
-    return make_builtin_class("Boolean", methods, static_methods);
+    return make_builtin_class("Boolean", {}, methods, static_methods);
 }
 
 Class* make_float_class_info() {
@@ -88,7 +109,7 @@ Class* make_float_class_info() {
 
     std::map<std::string, std::string> static_methods;
 
-    return make_builtin_class("Float", methods, static_methods);
+    return make_builtin_class("Float", {}, methods, static_methods);
 }
 
 Class* make_double_class_info() {
@@ -97,7 +118,7 @@ Class* make_double_class_info() {
 
     std::map<std::string, std::string> static_methods;
 
-    return make_builtin_class("Double", methods, static_methods);
+    return make_builtin_class("Double", {}, methods, static_methods);
 }
 
 Class* make_string_class_info() {
@@ -109,7 +130,7 @@ Class* make_string_class_info() {
     std::map<std::string, std::string> static_methods;
     static_methods["add"] = "fun(String,String)->String";
 
-    return make_builtin_class("String", methods, static_methods);
+    return make_builtin_class("String", {}, methods, static_methods);
 }
 
 Checker::Checker() {
@@ -317,23 +338,25 @@ Class* Checker::instantiate_generic(Class* generic, const ObjectType& instance) 
         concrete_field_types.push_back(&concrete_type);
     }
 
-    // std::unordered_map<std::string, ConstFunction*> concrete_methods;
-    // for (auto m: generic->methods) {
-    //     TypeNode* t = (m.second)->ft;
-    //     TypeNode& concrete_type = *make_type(*t, replacements);
-    //     concrete_methods.insert(std::make_pair(m.first, &concrete_type.function()));
-    // }
-    //
-    // Class* concrete = new Class();
-    // concrete->class_name = generic->class_name;
-    // concrete->methods = concrete_methods;
-    // concrete->member_names = generic->member_names;
-    // concrete->member_types = concrete_field_types;
-    // for (int i = 0; i < generic->member_names.size(); i++) {
-    //     concrete->members[generic->member_names[i]] = concrete_field_types[i];
-    // }
-    // return concrete;
-    return nullptr;
+    std::unordered_map<std::string, ConstFunction*> concrete_methods;
+    for (auto m: generic->methods) {
+        TypeNode* t = (m.second)->ft;
+        TypeNode& concrete_type = *make_type(*t, replacements);
+        ConstFunction* cf = new ConstFunction();
+        cf->full_path = m.second->full_path;
+        cf->ft = (FunctionType*) concrete_type.clone();
+        concrete_methods[m.first] = cf;
+    }
+
+    Class* concrete = new Class();
+    concrete->class_name = generic->class_name;
+    concrete->methods = concrete_methods;
+    concrete->member_names = generic->member_names;
+    concrete->member_types = concrete_field_types;
+    for (int i = 0; i < generic->member_names.size(); i++) {
+        concrete->members[generic->member_names[i]] = concrete_field_types[i];
+    }
+    return concrete;
 }
 
 USemanticInfo error_stub() {

@@ -13,6 +13,9 @@ std::string STranspiler::transpile_declaration(DeclarationSNode* node) {
 
 std::string STranspiler::transpile_assignment(AssignmentSNode* node) {
     std::string out;
+    std::string lvalue = this->dispatch(node->lvalue);
+    out += lvalue + SPACE + ASSIGN + SPACE + GCASSIGN + LPAREN + lvalue + COMMA + SPACE + this->dispatch(node->rvalue) +
+           RPAREN + SEMIC + NEWLINE;
     return out;
 }
 
@@ -162,5 +165,24 @@ std::string STranspiler::transpile_object_member(ObjectMemberSNode* sn) {
     std::string out;
     out += "CAST" + LPAREN + this->dispatch(sn->object) + COMMA + SPACE + path_to_id(sn->class_path) + RPAREN + "->" +
            sn->member_name;
+    return out;
+}
+
+std::string STranspiler::transpile_while(WhileSNode* sn) {
+    std::string out;
+    std::string cond_out = this->dispatch(sn->condition);
+    std::string body_out = this->transpile_block(sn->body);
+    out += "while" + SPACE + LPAREN + cond_out + RPAREN + SPACE + LCURLY + body_out + RCURLY;
+    return out;
+}
+
+std::string STranspiler::transpile_list(ListSNode* ln) {
+    std::string out;
+    out = "NEW(XList,{";
+    for (auto e: ln->elements) {
+        out += this->dispatch(e) + ", ";
+    }
+    out = out.substr(0, out.size() - 2);
+    out += "})";
     return out;
 }

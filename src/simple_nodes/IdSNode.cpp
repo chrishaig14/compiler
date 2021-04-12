@@ -6,3 +6,7 @@
 
 IdSNode::IdSNode() : SNode(SNodeType::ID) {
 }
+
+IdSNode::IdSNode(std::string identifier) : SNode(SNodeType::ID) {
+    this->identifier = identifier;
+}

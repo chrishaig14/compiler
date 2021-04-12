@@ -59,6 +59,22 @@ TaggedObject* core_D_Integer_D_div_f(TaggedObject* a, TaggedObject* b);
 
 TaggedObject* core_D_Integer_D_mul_f(TaggedObject* a, TaggedObject* b);
 
+TaggedObject* core_D_Integer_D_lt_f(TaggedObject* a, TaggedObject* b);
+
+TaggedObject* core_D_Integer_D_gt_f(TaggedObject* a, TaggedObject* b);
+
+TaggedObject* core_D_Integer_D_le_f(TaggedObject* a, TaggedObject* b);
+
+TaggedObject* core_D_Integer_D_ge_f(TaggedObject* a, TaggedObject* b);
+
+TaggedObject* core_D_Integer_D_ne_f(TaggedObject* a, TaggedObject* b);
+
+TaggedObject* core_D_Integer_D_eq_f(TaggedObject* a, TaggedObject* b);
+
+TaggedObject* core_D_List_D_len_f(TaggedObject* a);
+
+TaggedObject* core_D_List_D___sub___f(TaggedObject* a, TaggedObject* b);
+
 extern Function1 core_D_open_o;
 extern Function1 core_D_orint_o;
 extern Function3 core_D_range_o;
@@ -67,12 +83,23 @@ extern Function2 core_D_join_o;
 extern Function1 m_core_c_Double_f_str_o;
 extern Function1 core_D_Float_D_str_o;
 extern Function1 core_D_Boolean_D_str_o;
-extern Function2 core_D_list_subscript_o;
+extern Function2 core_D_List_D___sub__o;
 extern Function1 core_D_Integer_D_str_o;
 extern Function2 core_D_Integer_D_add_o;
 extern Function2 core_D_Integer_D_sub_o;
 extern Function2 core_D_Integer_D_div_o;
+
+extern Function1 core_D_List_D_len_o;
+
 extern Function2 core_D_Integer_D_mul_o;
+
+extern Function2 core_D_Integer_D_lt_o;
+extern Function2 core_D_Integer_D_gt_o;
+extern Function2 core_D_Integer_D_le_o;
+extern Function2 core_D_Integer_D_ge_o;
+extern Function2 core_D_Integer_D_eq_o;
+extern Function2 core_D_Integer_D_ne_o;
+
 extern Function2 core_D_String_D_add_o;
 extern Function2 core_D_String_D___sub___o;
 extern TaggedObject* core_D_open;
@@ -83,9 +110,17 @@ extern TaggedObject* core_D_join;
 extern TaggedObject* core_D_String_D_add;
 extern TaggedObject* core_D_Integer_D_str;
 extern TaggedObject* core_D_Integer_D_add;
+extern TaggedObject* core_D_Integer_D_lt;
+extern TaggedObject* core_D_Integer_D_gt;
+extern TaggedObject* core_D_Integer_D_le;
+extern TaggedObject* core_D_Integer_D_ge;
+extern TaggedObject* core_D_Integer_D_eq;
+extern TaggedObject* core_D_Integer_D_ne;
 extern TaggedObject* core_D_Integer_D_sub;
 extern TaggedObject* core_D_Integer_D_mul;
 extern TaggedObject* core_D_Integer_D_div;
+extern TaggedObject* core_D_List_D_len;
+extern TaggedObject* core_D_List_D___sub__;
 extern TaggedObject* core_D_Float_D_str;
 extern TaggedObject* m_core_c_Double_f_str;
 extern TaggedObject* core_D_Boolean_D_str;

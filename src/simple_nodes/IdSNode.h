@@ -13,6 +13,8 @@ public:
     std::string identifier;
 
     IdSNode();
+
+    IdSNode(std::string identifier);
 };
 
 
