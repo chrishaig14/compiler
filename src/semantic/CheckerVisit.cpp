@@ -748,12 +748,14 @@ USemanticInfo Checker::visit_block(BlockNode& node) {
             }
         } else {
             vn.push_back(n);
-            if (sinfo_p->snode->type == SNodeType::BLOCK) {
-                for (auto nn : ((BlockSNode*) sinfo_p->snode)->nodes) {
-                    sn->nodes.push_back(nn);
+            if (sinfo_p->snode != nullptr) {
+                if (sinfo_p->snode->type == SNodeType::BLOCK) {
+                    for (auto nn : ((BlockSNode*) sinfo_p->snode)->nodes) {
+                        sn->nodes.push_back(nn);
+                    }
+                } else {
+                    sn->nodes.push_back(sinfo_p->snode);
                 }
-            } else {
-                sn->nodes.push_back(sinfo_p->snode);
             }
         }
         SemanticInfo& sinfo = *sinfo_p;

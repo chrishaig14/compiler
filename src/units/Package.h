@@ -10,10 +10,11 @@
 class Package : public Entity {
 public:
     std::string name;
-    std::string path;
+    std::string abs_path;
+    std::string rel_path;
     std::map<std::string, Unit> units;
 
-    Package(std::string name, std::string path);
+    Package(std::string name, std::string abs_path, std::string rel_path);
     std::string full_path;
 };
 

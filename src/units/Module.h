@@ -15,9 +15,11 @@
 
 class Module {
 public:
-    Module(std::string name, std::string path);
+    Module(std::string name, std::string abs_path, std::string rel_path);
     std::string name;
-    std::string path;
+    VectorOfStrings included_module_paths;
+    std::string abs_path;
+    std::string rel_path;
     BlockNode* ast;
     std::map<std::string, VectorOfStrings> imported_paths;
     std::map<std::string, Entity> imports;

@@ -101,8 +101,11 @@ std::string STranspiler::transpile_call(CallSNode* node) {
         arguments += arg_s + COMMA + SPACE;
     }
     arguments = arguments.substr(0, arguments.size() - 2);
-    out += "CALL" + std::to_string(node->arguments.size()) + "(" + this->dispatch(node->function) + ", " + arguments +
-           ")";
+    out += "CALL" + std::to_string(node->arguments.size()) + "(" + this->dispatch(node->function);
+    if (arguments.size() != 0) {
+        out += +", " + arguments;
+    }
+    out += ")";
     return out;
 }
 

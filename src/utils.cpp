@@ -34,6 +34,12 @@ std::string u_basename(const std::string& path) {
 }
 
 std::string path_join(const std::string& base, const std::string& p) {
+    if (p == "") {
+        return base;
+    }
+    if (base == "") {
+        return p;
+    }
     return base + "/" + p;
 }
 
@@ -67,7 +73,7 @@ std::string mangle_path(std::string path) {
     for (int i = 0; i < path.size(); i++) {
         if (path[i] == '.') {
             out += "_D_";
-        }else{
+        } else {
             out += path[i];
         }
     }

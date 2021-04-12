@@ -39,10 +39,11 @@ BlockNode* full_parse(const std::string& __file__, CodeLines* code_lines) {
     return tree;
 }
 
+VectorOfStrings all_modules;
 
 void build_packages(Package* package, int level) {
-    DIR* dir = opendir(package->path.c_str());
-    std::cout << std::string(level, '\t') << "PACKAGE: " << package->path << std::endl;
+    DIR* dir = opendir(package->abs_path.c_str());
+    std::cout << std::string(level, '\t') << "PACKAGE: " << package->abs_path << std::endl;
     dirent* ent = readdir(dir);
     while (ent != nullptr) {
         std::string d_name = ent->d_name;
@@ -51,18 +52,21 @@ void build_packages(Package* package, int level) {
                 std::string file_extension = d_name.substr(d_name.size() - 3, 3);
                 if (file_extension == ".xl") {
                     std::cout << std::string(level + 1, '\t') << "MODULE: " << d_name << std::endl;
-                    std::string module_path = package->path + "/" + d_name;
+                    std::string module_abs_path = path_join(package->abs_path, d_name);
+                    std::string module_rel_path = path_join(package->rel_path, d_name);
+                    all_modules.push_back(module_rel_path);
                     std::string module_name = d_name.substr(0, d_name.size() - 3);
-                    Module* module = new Module(module_name, module_path);
+                    Module* module = new Module(module_name, module_abs_path, module_rel_path);
                     module->full_path = package->full_path + "." + module_name;
                     package->units[module_name] = Unit{.type=U_TYPE::MODULE, .module=module};
                 } else {
                     std::cout << std::string(level + 1, '\t') << "OTHER: " << d_name << std::endl;
                 }
             } else if (ent->d_type == DT_DIR) {
-                std::string subpackage_path = package->path + "/" + d_name;
+                std::string subpackage_abs_path = path_join(package->abs_path, d_name);
+                std::string subpackage_rel_path = path_join(package->rel_path, d_name);
                 std::string subpackage_name = d_name;
-                Package* subpackage = new Package(d_name, subpackage_path);
+                Package* subpackage = new Package(d_name, subpackage_abs_path, subpackage_rel_path);
                 subpackage->full_path = package->full_path + "." + d_name;
                 build_packages(subpackage, level + 1);
                 package->units[subpackage_name] = Unit{.type=U_TYPE::PACKAGE, .package=subpackage};
@@ -82,7 +86,7 @@ void parse_all_modules(Package* package) {
             Module* module = ep.second.module;
             CodeLines code_lines;
             std::cout << "Parsing module " << module->name << std::endl;
-            BlockNode* ast = full_parse(module->path, &code_lines);
+            BlockNode* ast = full_parse(module->abs_path, &code_lines);
             std::cout << "- Done" << std::endl;
             ((Module*) module)->ast = ast;
             ((Module*) module)->code_lines = code_lines;
@@ -103,7 +107,7 @@ void process_global_all_modules(Package* package) {
             gp.module = module;
             gp.root_package = root_package;
             gp.module_dotted_path = module->full_path;
-            gp.__file__ = module->path;
+            gp.__file__ = module->abs_path;
             gp.visit(*module->ast);
             module->imported_paths = gp.imported_paths;
             std::cout << "- Done" << std::endl;
@@ -127,12 +131,18 @@ VectorOfStrings make_path(std::string s) {
 void add_path_to_module(Module* module, std::string name, VectorOfStrings path) {
     Flirpin current_flirpin = Flirpin{.type=F_TYPE::PACKAGE, .package=root_package};
     std::string path_so_far;
+    std::string last_include;
     for (auto path_part: path) {
         if (current_flirpin.type == F_TYPE::PACKAGE) {
             Package* package = current_flirpin.package;
             auto unit = package->units.find(path_part);
             if (unit == package->units.end()) {
                 throw std::runtime_error("Error '" + path_part + "' not found in package " + path_so_far);
+            }
+            if (unit->second.type == U_TYPE::MODULE) {
+                last_include = unit->second.module->rel_path;
+            } else {
+                last_include = unit->second.package->rel_path;
             }
             current_flirpin = map_unit_to_flirpin(unit->second);
         } else if (current_flirpin.type == F_TYPE::MODULE) {
@@ -144,8 +154,12 @@ void add_path_to_module(Module* module, std::string name, VectorOfStrings path) 
         }
         path_so_far += "." + path_part;
     }
+    std::string included_module_header_basename = last_include.substr(0, last_include.size() - 3);
+    module->included_module_paths.push_back(included_module_header_basename + ".h");
     module->flirpins[name] = current_flirpin;
 }
+
+std::string project_output_dir;
 
 void analyze_all_modules(Package* package) {
     std::cout << "Analyzing package " << package->name << std::endl;
@@ -174,7 +188,7 @@ void analyze_all_modules(Package* package) {
             Checker checker;
             checker.module = module;
             checker.root_package = root_package;
-            checker.__file__ = module->path;
+            checker.__file__ = module->abs_path;
             checker.code_lines = module->code_lines;
             checker.visit_root(*module->ast);
             module->sast = checker.root_snode;
@@ -189,10 +203,16 @@ void analyze_all_modules(Package* package) {
 
 void transpile_all_modules(Package* package, std::string output_dir) {
     std::cout << "Transpiling package " << package->name << std::endl;
+    std::string package_header;
+    std::string output_package_dir = path_join(output_dir, package->name);
+    if (package->name != "") {
+        mkdir(output_package_dir.c_str(), 0777);
+    }
     for (auto u: package->units) {
         if (u.second.type == U_TYPE::PACKAGE) {
             Package* subpackage = u.second.package;
-            transpile_all_modules(subpackage, output_dir);
+            transpile_all_modules(subpackage, output_package_dir);
+            package_header += "#include \"" + subpackage->rel_path + "/__package__.h\"\n";
         } else if (u.second.type == U_TYPE::MODULE) {
             Module* module = u.second.module;
             if (module->name == "core") {
@@ -218,17 +238,35 @@ void transpile_all_modules(Package* package, std::string output_dir) {
                 t.source += static_cleanups;
                 t.source += "return x;\n}";
             }
-            std::string output_cpp_path = path_join(output_dir, module_name + ".cpp");
+            std::string output_cpp_path = path_join(output_package_dir, module_name + ".cpp");
             std::ofstream output_cpp_file(output_cpp_path);
             output_cpp_file << "#include \"" << module_name << ".h\"\n";
             output_cpp_file << t.source;
 
-            std::string output_h_path = path_join(output_dir, module_name + ".h");
+            std::string output_h_path = path_join(output_package_dir, module_name + ".h");
+
+
+            std::string module_define = module_name + "_H";
+            std::string h_ifndef = "#ifndef " + module_define + "\n";
+            std::string h_define = "#define " + module_define + "\n";
+            std::string h_endif = "#endif //" + module_define + "\n";
+            std::string include_core = "#include <core/core.h>\n";
+            std::string includes = include_core;
+            for (auto m: module->included_module_paths) {
+                includes += "#include <" + m + ">\n";
+            }
+            t.header = includes + t.header;
+
+            t.header = h_ifndef + h_define + t.header + h_endif;
             std::ofstream output_h_file(output_h_path);
-            output_h_file << "#include <core/core.h>\n";
             output_h_file << t.header;
+            package_header += "#include \"" + output_h_path + "\"\n";
         }
     }
+    std::string output_package_header_path = path_join(output_package_dir, "__package__.h");
+    std::ofstream output_package_header(output_package_header_path);
+    std::cout << "PACKAGE HEADER: " << package->full_path << std::endl << package_header;
+    output_package_header << package_header;
 }
 
 
@@ -238,10 +276,11 @@ int main(int argc, char* argv[]) {
         exit(1);
     }
     std::string project_dir = argv[1];
-    std::string output_dir = argv[2];
+    project_output_dir = argv[2];
+    project_output_dir += "/application";
     std::string __main_file__ = path_join(project_dir, u_basename(project_dir) + ".xl");
     std::cout << style(BLUE, "Main file: ") << style(MAGENTA, __main_file__) << std::endl;
-    root_package = new Package("", project_dir);
+    root_package = new Package("", project_dir, "");
     build_packages(root_package, 0);
     parse_all_modules(root_package);
     process_global_all_modules(root_package);
@@ -253,7 +292,7 @@ int main(int argc, char* argv[]) {
     function_builtins["range"] = "fun(Integer,Integer,Integer)->List[Integer])->String";
     function_builtins["input"] = "fun()->String";
 
-    Module* core_module = new Module("core", "");
+    Module* core_module = new Module("core", "", "");
     core_module->full_path = "core";
     root_package->units["core"] = Unit{.type=U_TYPE::MODULE, .module=core_module};
 
@@ -274,5 +313,23 @@ int main(int argc, char* argv[]) {
     }
 
     analyze_all_modules(root_package);
-    transpile_all_modules(root_package, output_dir + "/application");
+    transpile_all_modules(root_package, project_output_dir);
+
+    std::string all_files;
+    for (auto f: all_modules) {
+        f = f.substr(0, f.size() - 3) + ".cpp";
+        std::cout << f << std::endl;
+        all_files += f + " ";
+    }
+
+    std::string cmakelists = "cmake_minimum_required(VERSION 3.16)\n"
+                             "project(xlang)\n"
+                             "set(CMAKE_CXX_STANDARD 14)\n"
+                             "set(CMAKE_CXX_FLAGS \"${CMAKE_CXX_FLAGS} -Werror -O3 -fverbose-asm -Winline\")\n";
+    cmakelists += "add_executable(result " + all_files + ")\n";
+    cmakelists += "include_directories(../runtime)\n"
+                  "include_directories(.)\n"
+                  "target_link_libraries(result core)\n";
+    std::ofstream cmakelists_file(project_output_dir + "/CMakeLists.txt");
+    cmakelists_file << cmakelists;
 }

@@ -49,6 +49,7 @@ Class* make_string_class_info();
 Entity map_flirpin_to_entity(Flirpin flirpin);
 
 Flirpin map_unit_to_flirpin(Unit u);
+
 class Checker {
     bool add_this;
     bool is_lvalue;

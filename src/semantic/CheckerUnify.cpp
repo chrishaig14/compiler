@@ -252,5 +252,10 @@ USemanticInfo Checker::module_member(Module* mod, std::string child) {
     Flirpin flirpin = mod->flirpins[child];
     SemanticInfo info;
     info.entity = map_flirpin_to_entity(flirpin);
+    if (flirpin.type == F_TYPE::CONST_FUNCTION) {
+        IdSNode* idn = new IdSNode();
+        idn->identifier = flirpin.const_function->full_path;
+        info.snode = idn;
+    }
     return std::make_unique<SemanticInfo>(info);
 }
