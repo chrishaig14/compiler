@@ -4,6 +4,7 @@
 
 #include "Checker.h"
 #include "../simple_nodes/IdSNode.h"
+#include "../simple_nodes/ObjectMemberSNode.h"
 
 std::pair<std::string, TypeNode*>*
 Checker::get_first_substitution_object(ObjectType& a, ObjectType& b, bool is_top_level_arg) {
@@ -198,6 +199,11 @@ USemanticInfo Checker::object_member(SNode* object_snode, ObjectValue* pValue, s
     SemanticInfo info;
     if (clazz->members.count(child)) {
         info.entity = entity_from_type(*clazz->members[child]);
+        ObjectMemberSNode* omn = new ObjectMemberSNode();
+        omn->class_path = clazz->full_path;
+        omn->object = object_snode;
+        omn->member_name = child;
+        info.snode = omn;
     } else if (clazz->methods.count(child)) {
         IdSNode* idn = new IdSNode();
         idn->identifier = clazz->full_path + "." + child;

@@ -1,0 +1,23 @@
+//
+// Created by chris on 11/4/21.
+//
+
+#ifndef XLANG_OBJECTMEMBERSNODE_H
+#define XLANG_OBJECTMEMBERSNODE_H
+
+
+#include <string>
+#include "SNode.h"
+
+class ObjectMemberSNode : public SNode {
+public:
+    SNode* object;
+    std::string class_path;
+    std::string member_name;
+
+    ObjectMemberSNode() : SNode(SNodeType::OBJECT_MEMBER) {
+    }
+};
+
+
+#endif //XLANG_OBJECTMEMBERSNODE_H

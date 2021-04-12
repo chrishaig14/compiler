@@ -18,6 +18,7 @@
 #include "../simple_nodes/FloatSNode.h"
 #include "../simple_nodes/ClassSNode.h"
 #include "../simple_nodes/NewObjectSNode.h"
+#include "../simple_nodes/ObjectMemberSNode.h"
 
 const std::string TOBJECT = "TaggedObject*";
 const std::string GCDECLARE = "GC::declare";
@@ -86,6 +87,8 @@ public:
 
     std::string transpile_float(FloatSNode* pNode);
 
+    std::string transpile_object_member(ObjectMemberSNode* sn);
+
     std::string dispatch(SNode* node) {
         if (node == nullptr) {
             throw std::runtime_error("Error dispatching on nullptr snode!");
@@ -101,6 +104,9 @@ public:
                 return this->transpile_call((CallSNode*) node);
             case SNodeType::NEW:
                 return this->transpile_new((NewObjectSNode*) node);
+
+            case SNodeType::OBJECT_MEMBER:
+                return this->transpile_object_member((ObjectMemberSNode*) node);
             case SNodeType::DECLARATION:
                 return this->transpile_declaration((DeclarationSNode*) node);
             case SNodeType::ASSIGNMENT:
