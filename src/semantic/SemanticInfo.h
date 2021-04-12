@@ -36,7 +36,6 @@ public:
 
     const TypeNode& type();
     bool is_constant;
-    FunctionType* function_type;
     SNode* this_arg;
 };
 
