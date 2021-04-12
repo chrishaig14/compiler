@@ -680,14 +680,7 @@ USemanticInfo Checker::visit_call(CallNode& n) {
     bool is_a_method = false;
     Node* object_node;
     SNode* extra_first_argument = nullptr;
-    if (fun_info.is_method) {
-        // Since it's a method, we have to transform it and prepare it for the translation step,
-        // where instead of calling object.method(args), we call <class>.method(object, args)
-        // extra_first_argument = fun_info.snode;
-        // IdSNode* method_node = new IdSNode();
-        // sn->function = method_node;
-        // method_node->identifier = fun_info.method_name;
-    } else if (fun_info.is_class_method) {
+    if (fun_info.is_class_method) {
         MemberNode& member_node = n.function->member();
         if (member_node.s_child == "init") {
             n.function = this->replacement;
