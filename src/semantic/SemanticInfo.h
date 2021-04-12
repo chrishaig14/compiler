@@ -36,7 +36,6 @@ public:
 
     const TypeNode& type();
     bool is_constant;
-    bool is_module;
     Module* module;
     bool is_package;
     Package* package;
