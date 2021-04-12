@@ -11,7 +11,6 @@ SemanticInfo::SemanticInfo() {
     this->is_error = false;
     this->_type = nullptr;
     this->is_constant = false;
-    this->is_package = false;
     this->this_arg = nullptr;
     this->function_type = nullptr;
     this->snode = nullptr;
@@ -35,8 +34,6 @@ SemanticInfo& SemanticInfo::operator=(const SemanticInfo& other) {
     this->class_info = other.class_info;
     this->is_class_method = other.is_class_method;
     this->is_constant = other.is_constant;
-    this->is_package = other.is_package;
-    this->package = other.package;
     this->snode = other.snode;
     this->method_name = other.method_name;
     this->function_type = other.function_type;
@@ -58,8 +55,6 @@ SemanticInfo::SemanticInfo(const SemanticInfo& other) {
     this->function_type = other.function_type;
     this->is_class_method = other.is_class_method;
     this->is_constant = other.is_constant;
-    this->is_package = other.is_package;
-    this->package = other.package;
     this->snode = other.snode;
     this->method_name = other.method_name;
 

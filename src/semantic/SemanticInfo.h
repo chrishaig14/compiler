@@ -36,8 +36,6 @@ public:
 
     const TypeNode& type();
     bool is_constant;
-    bool is_package;
-    Package* package;
     FunctionType* function_type;
     SNode* this_arg;
 };
