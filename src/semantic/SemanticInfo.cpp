@@ -36,7 +36,6 @@ SemanticInfo& SemanticInfo::operator=(const SemanticInfo& other) {
     this->is_class_method = other.is_class_method;
     this->is_constant = other.is_constant;
     this->is_package = other.is_package;
-    this->module = other.module;
     this->package = other.package;
     this->snode = other.snode;
     this->method_name = other.method_name;
@@ -60,7 +59,6 @@ SemanticInfo::SemanticInfo(const SemanticInfo& other) {
     this->is_class_method = other.is_class_method;
     this->is_constant = other.is_constant;
     this->is_package = other.is_package;
-    this->module = other.module;
     this->package = other.package;
     this->snode = other.snode;
     this->method_name = other.method_name;
