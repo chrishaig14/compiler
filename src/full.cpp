@@ -190,7 +190,6 @@ void analyze_all_modules(Package* package) {
             // module->flirpins["Boolean"] = core_module->flirpins["Boolean"];
             Checker checker;
             checker.module = module;
-            checker.root_package = root_package;
             checker.__file__ = module->abs_path;
             checker.code_lines = module->code_lines;
             checker.visit_root(*module->ast);
