@@ -1448,7 +1448,6 @@ USemanticInfo Checker::visit(DefaultConstructorNode& node) {
     info.entity = Entity{.type=E_TYPE::CONST_FUNCTION};
     info.entity.const_function = new ConstFunction();
     info.entity.const_function->ft = new FunctionType(t, new ObjectType(node.name, {}));
-    info.is_function = true;
     IdSNode* idn = new IdSNode();
     idn->identifier = cls->full_path + "." + "__init__";
     info.snode = idn;

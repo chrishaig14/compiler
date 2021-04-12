@@ -5,7 +5,6 @@
 #include "SemanticInfo.h"
 
 SemanticInfo::SemanticInfo() {
-    this->is_function = false;
     this->is_method = false;
     this->class_info = nullptr;
     this->is_class_method = false;
@@ -33,7 +32,6 @@ const TypeNode& SemanticInfo::type() {
 SemanticInfo& SemanticInfo::operator=(const SemanticInfo& other) {
     this->entity = other.entity;
     this->is_error = other.is_error;
-    this->is_function = other.is_function;
     this->is_method = other.is_method;
     this->class_info = other.class_info;
     this->is_class_method = other.is_class_method;
@@ -57,7 +55,6 @@ SemanticInfo& SemanticInfo::operator=(const SemanticInfo& other) {
 SemanticInfo::SemanticInfo(const SemanticInfo& other) {
     this->entity = other.entity;
     this->is_error = other.is_error;
-    this->is_function = other.is_function;
     this->is_method = other.is_method;
     this->this_arg = other.this_arg;
     this->class_info = other.class_info;
