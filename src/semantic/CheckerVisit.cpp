@@ -1073,8 +1073,8 @@ USemanticInfo Checker::visit(AssignmentNode& n) {
     if (n.lvalue->ntype == NodeType::MEMBER && n.lvalue->member().type == MemberType::NUM) {
         this->error_tuple_assign(n.start);
     }
-    if (n.lvalue->ntype == NodeType::MEMBER && (linfo_p->is_class_method || n.lvalue->member().is_class_member &&
-                                                                            !n.lvalue->member().is_class_static_member)) {
+    if (n.lvalue->ntype == NodeType::MEMBER &&
+        (linfo_p->is_class_method || !n.lvalue->member().is_class_static_member)) {
         throw std::runtime_error("Can only assign to static members (not methods!)");
     }
     USemanticInfo expression_type_p = this->dispatch(n.rvalue);
