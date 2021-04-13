@@ -992,9 +992,7 @@ USemanticInfo Checker::visit(DeclarationNode& n) {
 USemanticInfo Checker::visit(AssignmentNode& n) {
 
     SemanticInfo info;
-    AssignmentSNode* sn = new AssignmentSNode();
-    info.snode = sn;
-    Logger::info("Checking assignment node");
+
     if (n.lvalue->ntype == NodeType::ID) {
         if (n.lvalue->id()._id == "_") {
             USemanticInfo rv = this->dispatch(n.rvalue);
@@ -1015,16 +1013,17 @@ USemanticInfo Checker::visit(AssignmentNode& n) {
         (linfo_p->is_class_method || !n.lvalue->member().is_class_static_member)) {
         throw std::runtime_error("Can only assign to static members (not methods!)");
     }
-    USemanticInfo expression_type_p = this->dispatch(n.rvalue);
+
+    USemanticInfo expression_info_p = this->dispatch(n.rvalue);
     // if (expression_type_p->type() == T_NONE) {
     //     this->error_reporter.function_doesnt_return_a_value(n.rvalue->start, &linfo_p->type());
     //     return nullptr;
     // }
-    if (expression_type_p->is_error) {
+    if (expression_info_p->is_error) {
         return nullptr;
     }
     SemanticInfo& linfo = *linfo_p;
-    SemanticInfo& expression_type = *expression_type_p;
+    SemanticInfo& expression_type = *expression_info_p;
     n.rvalue = this->replace_if_necessary(n.rvalue);
 
     const TypeNode& l_type = *linfo.entity.object_value->ot;
@@ -1052,6 +1051,12 @@ USemanticInfo Checker::visit(AssignmentNode& n) {
     }
     // else, type matches don't do anything
     n.type = l_type.clone();
+
+    AssignmentSNode* sn = new AssignmentSNode();
+    sn->lvalue = linfo_p->snode;
+    sn->rvalue = expression_info_p->snode;
+
+    info.snode = sn;
     return std::make_unique<SemanticInfo>(info);
 }
 
