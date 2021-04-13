@@ -1297,7 +1297,7 @@ USemanticInfo Checker::visit(BinopNode& n) {
     const TypeNode& ltype = *get_entity_type(left_info_p->entity);
     const TypeNode& rtype = *get_entity_type(right_info_p->entity);
     if (ltype != rtype) {
-        this->error_reporter.binop(ltype, rtype, n.start);
+        this->error_reporter.binop(ltype, rtype, n.op_pos);
         return error_stub();
         // throw std::runtime_error("Binary operation between values of different types: " + ltype.to_string() + " and " +
         //                          rtype.to_string());
@@ -1510,7 +1510,7 @@ USemanticInfo Checker::object_member(MemberNode& n, SNode* object_snode, ObjectV
         info.entity = Entity{.type=E_TYPE::CONST_FUNCTION, .const_function=clazz->methods[child]};
 
     } else {
-        this->error_reporter.no_member(ObjectType(clazz->class_name), child, n.start);
+        this->error_reporter.no_member(ObjectType(clazz->class_name), child, n.dot_pos);
         return error_stub();
     }
     return std::make_unique<SemanticInfo>(info);
@@ -1520,7 +1520,7 @@ USemanticInfo Checker::object_member(MemberNode& n, SNode* object_snode, ObjectV
 USemanticInfo Checker::package_member(MemberNode& n, Package* package) {
     std::string child = n.s_child;
     if (package->units.count(child) == 0) {
-        this->error_reporter.no_member(ObjectType(package->name), child, n.start);
+        this->error_reporter.no_member(ObjectType(package->name), child, n.dot_pos);
         return error_stub();
     }
     Unit unit = package->units[child];
@@ -1532,7 +1532,7 @@ USemanticInfo Checker::package_member(MemberNode& n, Package* package) {
 USemanticInfo Checker::module_member(MemberNode& n, Module* mod) {
     std::string child = n.s_child;
     if (mod->flirpins.count(child) == 0) {
-        this->error_reporter.no_member(ObjectType(mod->name), child, n.start);
+        this->error_reporter.no_member(ObjectType(mod->name), child, n.dot_pos);
         return error_stub();
     }
     Flirpin flirpin = mod->flirpins[child];
@@ -1557,7 +1557,7 @@ USemanticInfo Checker::class_member(MemberNode& n, Class* cls) {
     } else if (cls->static_members.find(child) != cls->static_members.end()) {
         info.entity = entity_from_type(*cls->static_members[child].first);
     } else {
-        this->error_reporter.no_member(ObjectType(cls->class_name), child, n.start);
+        this->error_reporter.no_member(ObjectType(cls->class_name), child, n.dot_pos);
         return error_stub();
     }
     return std::make_unique<SemanticInfo>(info);
