@@ -296,3 +296,7 @@ void ErrorReporter::class_not_generic(const std::string& cls, TextPosition pos) 
           this->code_context_string(pos);
     this->fail(msg);
 }
+
+ErrorReporter::ErrorReporter() {
+    this->failed = false;
+}
