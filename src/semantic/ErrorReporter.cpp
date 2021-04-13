@@ -284,7 +284,8 @@ std::string ErrorReporter::code_context_string(TextPosition position) {
 
 std::string ErrorReporter::code_error_string(TextPosition start, TextPosition end) {
     int length = end.column - start.column + 1;
-    std::string str = "\n" + this->code_lines.get_line(start.line) + "\n";
+    //this->code_lines.get_line(start.line)
+    std::string str = "\n" + std::string() + "\n";
     str += fmt::format(fmt::fg(fmt::color::orange_red), std::string(start.column, ' ') + std::string(length, '^'));
     return str;
 }
