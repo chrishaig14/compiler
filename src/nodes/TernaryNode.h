@@ -13,7 +13,7 @@ class TernaryNode : public Node {
 public:
     Node* expression;
     Node* true_case;
-    Node* false_case;;
+    Node* false_case;
 
     TernaryNode(Node* expression, Node* trueCase, Node* falseCase, TextPosition start, TextPosition end);
     bool equal(const Node& other) const override;

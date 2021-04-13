@@ -36,7 +36,7 @@ bool BlockNode::equal(const Node& p) const {
     if (this->nodes.size() != other.nodes.size()) {
         return false;
     }
-    for (int i = 0; i < this->nodes.size(); i++) {
+    for (size_t i = 0; i < this->nodes.size(); i++) {
         if (*this->nodes[i] != *other.nodes[i]) {
             return false;
         }

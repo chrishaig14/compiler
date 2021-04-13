@@ -11,7 +11,7 @@ bool ListNode::equal(const Node& other) const {
     if (this->elements.size() != other.lst().elements.size()) {
         return false;
     }
-    for (int i = 0; i < this->elements.size(); ++i) {
+    for (size_t i = 0; i < this->elements.size(); ++i) {
         if (*this->elements[i] != *other.lst().elements[i]) {
             return false;
         }

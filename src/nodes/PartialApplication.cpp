@@ -13,7 +13,7 @@ bool PartialApplication::equal(const Node& other) const {
     if (this->args.size() != other_p.args.size()) {
         return false;
     }
-    for (int i = 0; i < this->args.size(); i++) {
+    for (size_t i = 0; i < this->args.size(); i++) {
         if (this->args[i] == nullptr && other_p.args[i] != nullptr) {
             return false;
         } else if (this->args[i] != nullptr && other_p.args[i] == nullptr) {

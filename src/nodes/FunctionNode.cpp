@@ -16,12 +16,12 @@ bool FunctionNode::equal(const Node& x) const {
     if (this->parameter_names.size() != other.parameter_names.size()) {
         return false;
     }
-    for (int i = 0; i < this->parameter_types.size(); i++) {
+    for (size_t i = 0; i < this->parameter_types.size(); i++) {
         if (*this->parameter_types[i] != *other.parameter_types[i]) {
             return false;
         }
     }
-    for (int i = 0; i < this->parameter_names.size(); i++) {
+    for (size_t i = 0; i < this->parameter_names.size(); i++) {
         if (this->parameter_names[i] != other.parameter_names[i]) {
             return false;
         }

@@ -17,7 +17,7 @@ bool SubscriptNode::equal(const Node& x) const {
     if (this->child.size() != other.child.size()) {
         return false;
     }
-    for (int i = 0; i < this->child.size(); i++) {
+    for (size_t i = 0; i < this->child.size(); i++) {
         if (*this->child[i] != *other.child[i]) {
             return false;
         }

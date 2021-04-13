@@ -107,7 +107,7 @@ void Scanner::load_text(const std::string& text) {
 
 Token Scanner::get_next() {
     Token tok = this->next_token();
-    this->token = tok;
+    this->cur_token = tok;
     return tok;
 }
 
@@ -124,7 +124,7 @@ Token Scanner::next_token() {
                                           TokType::RSQUARE, TokType::STRING, TokType::NONE, TokType::TRUE,
                                           TokType::FALSE};
             for (auto ts : semic) {
-                if (this->token.type == ts) {
+                if (this->cur_token.type == ts) {
                     tok = Token(TokType::SEMICOLON, {this->line, this->column});
                     this->line++;
                     this->code_lines.line_offsets.back().length =

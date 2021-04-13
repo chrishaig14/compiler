@@ -180,7 +180,7 @@ std::string Transpiler::visit_call(CallNode& node) {
     this->is_call = true;
     out += this->dispatch(node.function) + ", ";
     this->is_call = old_is_call;
-    for (int i = 0; i < node.arguments.size(); i++) {
+    for (size_t i = 0; i < node.arguments.size(); i++) {
         std::string w = this->dispatch(node.arguments[i]);
         out += w + ", ";
     }
@@ -208,7 +208,7 @@ std::string generate_destructor_header(std::string class_name, VectorOfStrings m
 
 std::string generate_constructor_header(std::string class_name, VectorOfStrings members) {
     std::string out = class_name + "(";
-    for (int i = 0; i < members.size(); i++) {
+    for (size_t i = 0; i < members.size(); i++) {
         out += "TaggedObject* " + members[i] + ", ";
     }
     out = out.substr(0, out.size() - 2);
@@ -218,14 +218,14 @@ std::string generate_constructor_header(std::string class_name, VectorOfStrings 
 
 std::string generate_constructor(std::string class_name, VectorOfStrings members) {
     std::string out = class_name + "::" + class_name + "(";
-    for (int i = 0; i < members.size(); i++) {
+    for (size_t i = 0; i < members.size(); i++) {
         out += "TaggedObject* " + members[i] + ", ";
     }
     out = out.substr(0, out.size() - 2);
     out += "):";
     out += "XObject(\"" + class_name + "\")";
     out += "{\n";
-    for (int i = 0; i < members.size(); i++) {
+    for (size_t i = 0; i < members.size(); i++) {
         out += "this->" + members[i] + " = " + members[i] + ";\n";
     }
     out += "}\n";
@@ -240,7 +240,7 @@ std::string Transpiler::visit_class(ClassNode& node) {
     m_header += "class " + class_name + " : public XObject {\n";
     std::sort(node.members_ordered.begin(), node.members_ordered.end());
     m_header += "public:\n";
-    for (int i = 0; i < node.members_ordered.size(); i++) {
+    for (size_t i = 0; i < node.members_ordered.size(); i++) {
         m_header += "TaggedObject* " + node.members_ordered[i] + ";\n";
     }
 
@@ -290,7 +290,7 @@ std::string Transpiler::ptr_to_type_object(const ObjectType& t) {
         return "bool";
     }
     if (t.id == "Tuple") {
-        for (int i = 0; i < this->tuple_types.size(); i++) {
+        for (size_t i = 0; i < this->tuple_types.size(); i++) {
             if (t == *this->tuple_types[i]) {
                 return "XTuple" + std::to_string(i) + "*";
             }
@@ -342,7 +342,7 @@ std::string Transpiler::add_type(const TypeNode& t, std::string n) {
 std::string Transpiler::wrap_in_function_type(const FunctionType& t, std::string n) {
     std::string out;
     out = "Function" + std::to_string(t.param_types.size()) + "<";
-    for (int i = 0; i < t.param_types.size(); i++) {
+    for (size_t i = 0; i < t.param_types.size(); i++) {
         out += this->type_mapper(*t.param_types[i]) + ", ";
     }
     out += this->type_mapper(*t.return_type);
@@ -378,7 +378,7 @@ std::string Transpiler::visit_continue(ContinueNode& node) {
 
 std::string Transpiler::visit_declaration(DeclarationNode& node) {
     std::string out;
-    for (int i = 0; i < node.identifier.size(); i++) {
+    for (size_t i = 0; i < node.identifier.size(); i++) {
         if (node.identifier[i] == '.') {
             node.identifier[i] = '_';
         }
@@ -468,7 +468,7 @@ std::string Transpiler::visit_function(FunctionNode& node) {
     signature += " ";
     signature += raw_function_name + "_f";
     signature += "(";
-    for (int i = 0; i < node.parameter_types.size(); i++) {
+    for (size_t i = 0; i < node.parameter_types.size(); i++) {
         signature += std::string() + "TaggedObject*" + " " + node.parameter_names[i] + ", ";
     }
     if (node.parameter_types.size() > 0) {
@@ -478,7 +478,7 @@ std::string Transpiler::visit_function(FunctionNode& node) {
     std::string f_source = signature;
     this->m_header += signature + ";\n";
     f_source += "{\n";
-    for (int i = 0; i < node.parameter_types.size(); i++) {
+    for (size_t i = 0; i < node.parameter_types.size(); i++) {
         if (is_object(*node.parameter_types[i])) {
             f_source += "GC::declare(" + node.parameter_names[i] + ");\n";
         } else {
@@ -492,7 +492,7 @@ std::string Transpiler::visit_function(FunctionNode& node) {
         is_init = true;
         f_source += "TaggedObject* this_obj = NEW(";
         f_source += this->map[this->method_class] + ",";
-        for (int i = 0; i < this->num_members_class; i++) {
+        for (size_t i = 0; i < this->num_members_class; i++) {
             f_source += "nullptr, ";
         }
         if (this->num_members_class != 0) {
@@ -533,7 +533,7 @@ std::string Transpiler::visit_id(IdNode& node) {
     }
 
     std::string out = idn;
-    for (int i = 0; i < out.size(); i++) {
+    for (size_t i = 0; i < out.size(); i++) {
         if (out[i] == '.') {
             out[i] = '_';
         }
@@ -547,7 +547,7 @@ std::string Transpiler::visit_if(IfNode& node) {
     out += "(GET_BOOL(" + this->dispatch(node.condition) + "))" + "{";
     out += this->visit_block(*node.then);
     out += "}";
-    for (int i = 0; i < node.elifs.size(); i++) {
+    for (size_t i = 0; i < node.elifs.size(); i++) {
         out += "else if (GET_BOOL(" + this->dispatch(node.elifs[i].first) + ")){" +
                this->visit_block(*node.elifs[i].second) + "}";
     }
@@ -560,7 +560,7 @@ std::string Transpiler::visit_if(IfNode& node) {
 std::string Transpiler::visit_list(ListNode& node) {
     std::string out;
     out = "LIST(";
-    for (int i = 0; i < node.elements.size(); i++) {
+    for (size_t i = 0; i < node.elements.size(); i++) {
         std::string w = this->dispatch(node.elements[i]);
         if (node.elements[i]->ntype != NodeType::ID) {
         }
@@ -576,7 +576,7 @@ std::string Transpiler::visit_list(ListNode& node) {
 std::string Transpiler::visit_dict(DictNode& node) {
     std::string out;
     out = "NEW(XDict,std::unordered_map<TaggedObject*,TaggedObject*>({";
-    for (int i = 0; i < node.items.size(); i++) {
+    for (size_t i = 0; i < node.items.size(); i++) {
         out += "{" + this->dispatch(node.items[i].first) + ", " + this->dispatch(node.items[i].second) + "}, ";
     }
     if (node.items.size() != 0) {
@@ -658,7 +658,7 @@ std::string Transpiler::visit_ternary(TernaryNode& node) {
 std::string Transpiler::visit_tuple(TupleNode& node) {
     std::string out;
     out += "TUPLE" + std::to_string(node.values.size()) + "(";
-    for (int i = 0; i < node.values.size(); i++) {
+    for (size_t i = 0; i < node.values.size(); i++) {
         out += this->dispatch(node.values[i]) + ", ";
     }
     if (node.values.size() != 0) {
@@ -770,18 +770,18 @@ std::string Transpiler::generate_tuple(int n) {
     std::string out = "class " + tuple_name + " : public Tuple";
     std::string type;
     std::string members;
-    for (int i = 0; i < n; i++) {
+    for (size_t i = 0; i < n; i++) {
         members += "XObject* mem_" + std::to_string(i + 1) + ";";
     }
     members = "XObject* members[" + std::to_string(n) + "];";
     out += type + "{public:\n" + members;
     std::string constructor = tuple_name + "(";
-    for (int i = 0; i < n; i++) {
+    for (size_t i = 0; i < n; i++) {
         constructor += "XObject* mem_" + std::to_string(i + 1) + ", ";
     }
     constructor = constructor.substr(0, constructor.size() - 2);
     constructor += "):Tuple(\"" + tuple_name + "\"){";
-    for (int i = 0; i < n; i++) {
+    for (size_t i = 0; i < n; i++) {
         constructor += "this->members[" + std::to_string(i) + "]= mem_" + std::to_string(i + 1) + ";\n";
     }
     constructor += "}\n";
@@ -814,9 +814,9 @@ Transpiler::Transpiler(std::map<std::string, std::string>& map, std::string curr
 }
 
 
-std::string generate_function_class(int num_args) {
+std::string generate_function_class(size_t num_args) {
     std::string out = "template <";
-    for (int i = 0; i < num_args + 1; i++) {
+    for (size_t i = 0; i < num_args + 1; i++) {
         out += "typename " + std::string(1, 'A' + i) + ", ";
     };
     out = out.substr(0, out.size() - 2);
@@ -824,7 +824,7 @@ std::string generate_function_class(int num_args) {
     out += "class Function" + std::to_string(num_args) + "{\n";
     out += "public:\n";
     out += "virtual " + std::string(1, (char) ('A' + num_args)) + " call(";
-    for (int i = 0; i < num_args; i++) {
+    for (size_t i = 0; i < num_args; i++) {
         out += std::string(1, 'A' + i) + " " + std::string(1, 'a' + i) + ", ";
     };
     if (num_args != 0) {
@@ -840,7 +840,7 @@ std::string Transpiler::visit_partial(PartialApplication& node) {
     std::string args;
     std::vector<bool> provided_args(node.args.size(), false);
     int num_args = 0;
-    for (int i = 0; i < node.args.size(); i++) {
+    for (size_t i = 0; i < node.args.size(); i++) {
         if (node.args[i] == nullptr) {
             num_args++;
             args += "nullptr, ";
@@ -863,14 +863,14 @@ std::string Transpiler::visit_cast_op(CastNode& node) {
 
 std::string Transpiler::visit_method(MethodNode& node) {
     std::string fn = this->map[node.actual_function_name];
-    for (int i = 0; i < fn.size(); i++) {
+    for (size_t i = 0; i < fn.size(); i++) {
         if (fn[i] == '.') {
             fn[i] = '_';
         }
     }
     std::string out =
             "NEW(Partial" + std::to_string(node.n_partial) + ", " + fn + ", " + this->dispatch(node.parent) + ", ";
-    for (int i = 0; i < node.n_partial; i++) {
+    for (size_t i = 0; i < node.n_partial; i++) {
         out += "nullptr, ";
     }
     out = out.substr(0, out.size() - 2);

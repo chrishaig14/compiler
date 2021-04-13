@@ -326,7 +326,7 @@ TypeNode* make_type(const TypeNode& original, const MapStringType& replacements)
 
 Class* Checker::instantiate_generic(Class* generic, const ObjectType& instance) {
     MapStringType replacements;
-    for (int i = 0; i < generic->type_params.size(); i++) {
+    for (size_t i = 0; i < generic->type_params.size(); i++) {
         std::string tp = generic->type_params[i];
         TypeNode& type_replacement = *instance.type_params[i];
         replacements[tp] = &type_replacement;
@@ -353,7 +353,7 @@ Class* Checker::instantiate_generic(Class* generic, const ObjectType& instance) 
     concrete->methods = concrete_methods;
     concrete->member_names = generic->member_names;
     concrete->member_types = concrete_field_types;
-    for (int i = 0; i < generic->member_names.size(); i++) {
+    for (size_t i = 0; i < generic->member_names.size(); i++) {
         concrete->members[generic->member_names[i]] = concrete_field_types[i];
     }
     return concrete;

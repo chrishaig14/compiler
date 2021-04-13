@@ -9,7 +9,7 @@ bool TupleNode::equal(const Node& n) const {
     if (this->values.size() != other.values.size()) {
         return false;
     }
-    for (int i = 0; i < this->values.size(); i++) {
+    for (size_t i = 0; i < this->values.size(); i++) {
         if (*this->values[i] != *other.values[i]) {
             return false;
         }

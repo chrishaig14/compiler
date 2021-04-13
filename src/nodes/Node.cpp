@@ -338,8 +338,9 @@ std::string Node::node_type_string(NodeType type) const {
         case NodeType::DICT:
             return "DICT";
             break;
+        default:
+            return "UNKNOWN";
     }
-    return "UNKNOWN";
 }
 
 json Node::to_json() const {

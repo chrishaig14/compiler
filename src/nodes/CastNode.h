@@ -16,7 +16,7 @@ public:
 
     CastNode& cast() override;
 
-    const CastNode& cast() const override;;
+    const CastNode& cast() const override;
 
     CastNode(Node* exp, std::string as_type, TextPosition start, TextPosition end);
 

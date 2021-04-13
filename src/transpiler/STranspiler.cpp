@@ -28,7 +28,7 @@ std::string STranspiler::transpile_return(ReturnSNode* node) {
 
 std::string path_to_id(std::string p) {
     std::string out;
-    for (int i = 0; i < p.size(); i++) {
+    for (size_t i = 0; i < p.size(); i++) {
         char c = p[i];
         if (c == '.') {
             out += "_D_";

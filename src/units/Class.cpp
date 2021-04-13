@@ -17,7 +17,7 @@ bool Class::operator==(const Class& b) const {
         return false;
     }
 
-    for (int i = 0; i < this->member_types.size(); i++) {
+    for (size_t i = 0; i < this->member_types.size(); i++) {
         if (this->member_types[i] != b.member_types[i]) {
             return false;
         }

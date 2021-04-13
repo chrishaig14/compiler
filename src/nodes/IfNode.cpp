@@ -15,7 +15,7 @@ bool IfNode::equal(const Node& x) const {
     if (this->elifs.size() != other.elifs.size()) {
         return false;
     }
-    for (int i = 0; i < this->elifs.size(); i++) {
+    for (size_t i = 0; i < this->elifs.size(); i++) {
         if (*this->elifs[i].first != *other.elifs[i].first) {
             return false;
         }

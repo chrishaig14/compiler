@@ -44,7 +44,7 @@ USemanticInfo Checker::visit(ListNode& node) {
     ListSNode* lsn = new ListSNode();
     lsn->elements.push_back(element_type_p->snode);
 
-    for (int i = 1; i < node.elements.size(); i++) {
+    for (size_t i = 1; i < node.elements.size(); i++) {
         USemanticInfo current_type_p = this->dispatch(node.elements[i]);
         // const TypeNode& current_type = current_type_p->type();
         // if (!current_type_p->is_constant) {
@@ -63,7 +63,7 @@ USemanticInfo Checker::visit(ListNode& node) {
     return_info.set_type(ObjectType("List", {element_type->clone()}));
 
 
-    return_info.snode = lsn;
+    return_info.snode = lsn;;
     return_info.entity = Entity{.type=E_TYPE::OBJECT_VALUE, .object_value = new ObjectValue()};
     return_info.entity.object_value->ot = new ObjectType("List", {element_type->clone()});
     return std::make_unique<SemanticInfo>(return_info);
@@ -277,7 +277,7 @@ FunctionNode* generate_eq_method(std::string class_name, VectorOfTypes tp, Vecto
                                    new MemberNode(new IdNode("this", POS_NONE, POS_NONE), members_ordered[0]),
                                    new MemberNode(new IdNode("other", POS_NONE, POS_NONE), members_ordered[0]));
 
-    for (int i = 1; i < members_ordered.size(); i++) {
+    for (size_t i = 1; i < members_ordered.size(); i++) {
         cmp_node = new BoolOpNode(BoolOp::AND,
                                   cmp_node,
                                   new BoolOpNode(BoolOp::EQ,
@@ -473,7 +473,7 @@ USemanticInfo Checker::visit(PartialApplication& node) {
         this->error_partial_wrong_num_args(node.start);
         return error_stub();
     }
-    for (int i = 0; i < node.args.size(); i++) {
+    for (size_t i = 0; i < node.args.size(); i++) {
         if (node.args[i] != nullptr) {
             USemanticInfo arg = this->dispatch(node.args[i]);
             if (arg->type() != *func->type().function().param_types[i]) {
@@ -748,7 +748,7 @@ USemanticInfo Checker::visit_call(CallNode& n) {
             // }
         } else {
             retv.entity = entity_from_type(*function_type->return_type);
-            for (int i = 0; i < n.arguments.size(); i++) {
+            for (size_t i = 0; i < n.arguments.size(); i++) {
                 const TypeNode& arg_type = *arg_types[i];
                 const TypeNode& param_type = *function_type->param_types[i];
                 if (arg_type != param_type) {
@@ -872,7 +872,7 @@ USemanticInfo Checker::visit_function(FunctionNode& n) {
         // this->scope->set("this", *this->this_type);
         sn->params.insert(sn->params.begin(), "this");
     }
-    for (int i = 0; i < n.parameter_names.size(); i++) {
+    for (size_t i = 0; i < n.parameter_names.size(); i++) {
         TypeNode& type = *n.parameter_types[i];
         if (type.kind == Kind::OBJECT) {
             std::cout << "START" << std::endl;
@@ -892,7 +892,7 @@ USemanticInfo Checker::visit_function(FunctionNode& n) {
     //     n.body->local_vars.push_back(std::make_pair(v.first, v.second->clone()));
     // }
     if (is_init_method) {
-        for (int i = 0; i < n.body->nodes.size(); i++) {
+        for (size_t i = 0; i < n.body->nodes.size(); i++) {
             if (n.body->nodes[i]->ntype == NodeType::ASSIGN) {
                 AssignmentNode& nod = n.body->nodes[i]->assign();
                 if (nod.lvalue->ntype == NodeType::MEMBER) {
@@ -1186,7 +1186,7 @@ USemanticInfo Checker::visit(IfNode& n) {
     // }
     this->leave_scope();
 
-    for (int i = 0; i < n.elifs.size(); i++) {
+    for (size_t i = 0; i < n.elifs.size(); i++) {
         condition_info_p = this->dispatch(n.elifs[i].first);
         SemanticInfo& condition_info = *condition_info_p;
         if (condition_info.type() != T_BOOL) {
@@ -1403,7 +1403,7 @@ USemanticInfo Checker::visit(DictNode& node) {
     USemanticInfo first_key_type = this->dispatch(node.items[0].first);
     USemanticInfo first_value_type = this->dispatch(node.items[0].second);
 
-    for (int i = 1; i < node.items.size(); i++) {
+    for (size_t i = 1; i < node.items.size(); i++) {
         USemanticInfo key_type = this->dispatch(node.items[i].first);
         USemanticInfo value_type = this->dispatch(node.items[i].second);
         if (key_type->type() != first_key_type->type()) {

@@ -112,7 +112,7 @@ void GlobalProcessor::visit(ClassNode& node) {
     //                                                                                                 node.class_name,
     //                                                                                                 "str");
     VectorOfTypes tp;
-    for (int i = 0; i < node.type_parameters.size(); i++) {
+    for (size_t i = 0; i < node.type_parameters.size(); i++) {
         tp.push_back(new ObjectType(node.type_parameters[i]));
     }
     // class_info->methods["eq"] = new FunctionType({new ObjectType(node.class_name, tp)}, new T_BOOL);
@@ -146,5 +146,7 @@ void GlobalProcessor::dispatch(Node* nod) {
         case NodeType::IMPORT:
             this->visit(n.import());
             break;
+        default:
+            return;
     }
 }

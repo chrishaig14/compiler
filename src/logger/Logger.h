@@ -11,7 +11,7 @@
 
 namespace Logger {
     void info(std::string s);
-};
+}
 
 
 #endif //XLANG_LOGGER_H

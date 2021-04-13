@@ -17,7 +17,7 @@ bool DictNode::equal(const Node& other) const {
     if (this->items.size() != o.items.size()) {
         return false;
     }
-    for (int i = 0; i < this->items.size(); i++) {
+    for (size_t i = 0; i < this->items.size(); i++) {
         auto p = this->items[i];
         auto op = o.items[i];
         if (*p.first != *op.first) {

@@ -19,8 +19,7 @@ std::string Parser::code_error_string(TextPosition start, TextPosition end) {
 }
 
 std::string Parser::context_string(TextPosition position) {
-    std::string msg = (text_pos_to_string(this->__file__, position)) +
-                      (": ");
+    std::string msg = (text_pos_to_string(this->__file__, position)) + (": ");
     return msg;
 }
 
@@ -73,8 +72,7 @@ void Parser::error_expected_expression(Token tok) {
     this->error(msg, tok.start);
 }
 
-void
-Parser::error_after_expression(const std::vector<TokType>& expected_extra, Token tok, TextPosition position) {
+void Parser::error_after_expression(const std::vector<TokType>& expected_extra, Token tok, TextPosition position) {
     std::string msg;
     msg = ("Got ");
     msg += (tok.to_string());
@@ -103,9 +101,7 @@ void Parser::error_tuple_one_element(TextPosition pos) {
 
 void Parser::error_class_member_redefined(const std::string& cls, const std::string& name, TextPosition pos) {
     std::string msg;
-    msg += ("In class ") + (cls) + (" definition: member/method \"") +
-           (name) +
-           ("\" already defined!");
+    msg += ("In class ") + (cls) + (" definition: member/method \"") + (name) + ("\" already defined!");
     this->error(msg, pos);
 }
 
@@ -132,7 +128,7 @@ void Parser::error_expected_argument_type(Token tok, int idx, const std::string&
     msg += (param_id);
     msg += (" of function ");
     msg += (id);
-    msg += (")");
+    msg += (") int argument #" + std::to_string(idx));
     this->error(msg, tok.start);
 }
 

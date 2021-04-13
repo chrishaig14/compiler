@@ -52,7 +52,7 @@ bool FunctionType::equal(const TypeNode& other) const {
     if (a.param_types.size() != b.param_types.size()) {
         return false;
     }
-    for (int i = 0; i < a.param_types.size(); i++) {
+    for (size_t i = 0; i < a.param_types.size(); i++) {
         if (*a.param_types[i] != *b.param_types[i]) {
             return false;
         }
@@ -111,7 +111,7 @@ bool ObjectType::equal(const TypeNode& other) const {
     if (a.type_params.size() != b.type_params.size()) {
         return false;
     }
-    for (int i = 0; i < a.type_params.size(); i++) {
+    for (size_t i = 0; i < a.type_params.size(); i++) {
         if (*a.type_params[i] != *b.type_params[i]) {
             return false;
         }

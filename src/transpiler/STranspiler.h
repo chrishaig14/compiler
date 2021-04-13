@@ -78,6 +78,8 @@ public:
             case SNodeType::CLASS:
                 this->transpile_class((ClassSNode*) node);
                 break;
+            default:
+                throw std::runtime_error("Don't know what to do with this SNode!");
         }
     }
 
@@ -128,6 +130,8 @@ public:
             case SNodeType::INTEGER:
                 return this->transpile_integer((IntegerSNode*) node);
                 break;
+            default:
+                throw std::runtime_error("Don't know what to do with this SNode!");
         }
     }
 };

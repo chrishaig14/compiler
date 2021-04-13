@@ -18,7 +18,7 @@ bool CallNode::equal(const Node& x) const {
     if (this->arguments.size() != other.arguments.size()) {
         return false;
     }
-    for (int i = 0; i < this->arguments.size(); ++i) {
+    for (size_t i = 0; i < this->arguments.size(); ++i) {
         if (*this->arguments[i] != *other.arguments[i]) {
             return false;
         }

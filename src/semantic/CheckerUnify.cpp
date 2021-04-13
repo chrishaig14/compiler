@@ -26,7 +26,7 @@ Checker::get_first_substitution_object(ObjectType& a, ObjectType& b, bool is_top
     if (a.type_params.size() != b.type_params.size()) {
         throw std::runtime_error("Error trying to unify object types " + a.to_string() + " and " + b.to_string());
     }
-    for (int i = 0; i < a.type_params.size(); i++) {
+    for (size_t i = 0; i < a.type_params.size(); i++) {
         std::pair<std::string, TypeNode*>* u = get_first_substitution(*a.type_params[i],
                                                                       *b.type_params[i],
                                                                       is_top_level_arg);
@@ -43,7 +43,7 @@ TypeNode* Checker::substitute(TypeNode* t, std::string var, TypeNode* replacemen
             return replacement->clone();
         } else {
             TypeNode* c = t->clone();
-            for (int i = 0; i < t->object().type_params.size(); i++) {
+            for (size_t i = 0; i < t->object().type_params.size(); i++) {
                 // auto old = c->object().type_params[i];
                 c->object().type_params[i] = substitute(t->object().type_params[i], var, replacement);
                 // delete old;
@@ -52,7 +52,7 @@ TypeNode* Checker::substitute(TypeNode* t, std::string var, TypeNode* replacemen
         }
     } else {
         TypeNode* c = t->clone();
-        for (int i = 0; i < t->function().param_types.size(); i++) {
+        for (size_t i = 0; i < t->function().param_types.size(); i++) {
             c->function().param_types[i] = substitute(t->function().param_types[i], var, replacement);
         }
         c->function().return_type = substitute(c->function().return_type, var, replacement);
@@ -67,7 +67,7 @@ Checker::get_first_substitution_function(FunctionType& a, FunctionType& b, bool 
                 "Error: trying to unify two functions with different parameter count: " + a.to_string() + " and " +
                 b.to_string());
     }
-    for (int i = 0; i < a.param_types.size(); i++) {
+    for (size_t i = 0; i < a.param_types.size(); i++) {
         std::pair<std::string, TypeNode*>* u = get_first_substitution(*a.param_types[i], *b.param_types[i], false);
         if (u != nullptr) {
             return u;
@@ -86,7 +86,7 @@ void Checker::unify_function_call(FunctionType& fun, VectorOfTypes& args) {
         return;
     }
 
-    for (int i = 0; i < args.size(); i++) {
+    for (size_t i = 0; i < args.size(); i++) {
         auto param = fun.param_types[i];
         auto arg = args[i];
         try {

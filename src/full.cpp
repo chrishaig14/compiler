@@ -118,7 +118,7 @@ void process_global_all_modules(Package* package) {
 VectorOfStrings make_path(std::string s) {
     VectorOfStrings path;
     path.push_back("");
-    for (int i = 0; i < s.size(); i++) {
+    for (size_t i = 0; i < s.size(); i++) {
         if (s[i] != '.') {
             path.back() += s[i];
         } else {

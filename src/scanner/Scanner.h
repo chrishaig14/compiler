@@ -50,7 +50,7 @@ public:
     Token scan_other();
 
     bool comment;
-    Token token;
+    Token cur_token;
 
     Token next_token();
     CodeLines code_lines;
