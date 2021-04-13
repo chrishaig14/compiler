@@ -493,20 +493,10 @@ USemanticInfo Checker::visit(PartialApplication& node) {
     return std::make_unique<SemanticInfo>(s);
 }
 
-USemanticInfo Checker::visit(ForNode& node) {
-    SemanticInfo rinfo;
+SNode* make_for_snode(ForNode& node, USemanticInfo& binfo, USemanticInfo& exp_info_p) {
     BlockSNode* bbn = new BlockSNode();
-    rinfo.snode = bbn;
     DeclarationSNode* dsn = new DeclarationSNode();
     WhileSNode* wsn = new WhileSNode();
-
-    USemanticInfo exp_info_p = this->dispatch(node.exp);
-    if (exp_info_p->entity.type != E_TYPE::OBJECT_VALUE) {
-        throw std::runtime_error("iterating over something that's not an object");
-    }
-    if (exp_info_p->entity.object_value->ot->id != "List") {
-        throw std::runtime_error("iterating over something that's not an object");
-    }
 
     const char* loop_list_var_id = "__loop_list__";
     const char* loop_index_var_id = "__loop_index__";
@@ -549,12 +539,6 @@ USemanticInfo Checker::visit(ForNode& node) {
     bbn->nodes.push_back(wsn);
 
 
-    TypeNode* elem_type = exp_info_p->entity.object_value->ot->type_params[0];
-    Entity elem_entity = entity_from_type(*elem_type);
-    this->enter_scope("for");
-    this->scope->set(node.var, elem_entity);
-    USemanticInfo binfo = this->visit_block(*node.body);
-    this->leave_scope();
     BlockSNode* bn = (BlockSNode*) (binfo->snode);
     DeclarationSNode* loop_elem_sn = new DeclarationSNode();
 
@@ -580,6 +564,29 @@ USemanticInfo Checker::visit(ForNode& node) {
 
     bn->nodes.push_back(increment_index_sn);
     wsn->body = bn;
+    return bbn;
+}
+
+
+USemanticInfo Checker::visit(ForNode& node) {
+    USemanticInfo exp_info_p = this->dispatch(node.exp);
+    if (exp_info_p->entity.type != E_TYPE::OBJECT_VALUE) {
+        throw std::runtime_error("iterating over something that's not an object");
+    }
+    if (exp_info_p->entity.object_value->ot->id != "List") {
+        throw std::runtime_error("iterating over something that's not an object");
+    }
+
+    TypeNode* elem_type = exp_info_p->entity.object_value->ot->type_params[0];
+    Entity elem_entity = entity_from_type(*elem_type);
+    this->enter_scope("for");
+    this->scope->set(node.var, elem_entity);
+    USemanticInfo binfo = this->visit_block(*node.body);
+    this->leave_scope();
+
+    SemanticInfo rinfo;
+    rinfo.snode = make_for_snode(node, binfo, exp_info_p);
+
     return std::make_unique<SemanticInfo>(rinfo);
 }
 
