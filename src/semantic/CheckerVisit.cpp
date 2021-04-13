@@ -1291,6 +1291,9 @@ USemanticInfo Checker::visit(BinopNode& n) {
     USemanticInfo left_info_p = this->dispatch(n.left);
     Node* left_replace = this->replace_if_necessary(n.left);
     USemanticInfo right_info_p = this->dispatch(n.right);
+    if (left_info_p->entity.type == E_TYPE::ERROR || right_info_p->entity.type == E_TYPE::ERROR) {
+        return error_stub();
+    }
     if (left_info_p->entity.type != E_TYPE::OBJECT_VALUE || right_info_p->entity.type != E_TYPE::OBJECT_VALUE) {
         throw std::runtime_error("Can't have binop between 2 non objects!");
     }
