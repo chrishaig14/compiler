@@ -13,6 +13,7 @@
 
 class ErrorReporter {
 public:
+    CodeLines code_lines;
     void assignment(const TypeNode& expected, const TypeNode& actual, TextPosition position);
     void bad_return(TextPosition position);
     void binop(const TypeNode& left, const TypeNode& right, TextPosition position);
@@ -29,7 +30,6 @@ public:
     void return_mismatch(const TypeNode& expected, const TypeNode& actual, TextPosition position);
     bool failed;
     std::string context_string(TextPosition position);
-    CodeLines code_lines;
     std::string code_context_string(TextPosition position);
     std::string code_string(TextPosition start, TextPosition end);
     void generic_call_mismatch(const TypeNode& expected, const TypeNode& actual, int i);

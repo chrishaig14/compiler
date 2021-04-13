@@ -69,4 +69,5 @@ ErrorStub::ErrorStub() {
     this->is_error = true;
     auto x = UnknownTypeNode();
     this->set_type(x);
+    this->entity = Entity{.type=E_TYPE::ERROR};
 }

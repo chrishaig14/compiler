@@ -612,6 +612,9 @@ USemanticInfo Checker::visit_call(CallNode& n) {
     Logger::info("Checking CallNode");
     this->is_call = true;
     USemanticInfo fun_info_p = this->dispatch(n.function);
+    if (fun_info_p->entity.type == E_TYPE::ERROR) {
+        return error_stub();
+    }
     this->is_call = false;
     if (fun_info_p->this_arg != nullptr) {
         sn->arguments = {fun_info_p->this_arg};
@@ -675,7 +678,11 @@ USemanticInfo Checker::visit_call(CallNode& n) {
             Entity arg_entity = arg_type_p->entity;
             if (arg_entity.type == E_TYPE::CLASS || arg_entity.type == E_TYPE::PACKAGE ||
                 arg_entity.type == E_TYPE::MODULE) {
-                throw std::runtime_error("Error can't pass as argument");
+                std::cout << ("Error can't pass as argument") << std::endl;
+                return error_stub();
+            }
+            if (arg_entity.type == E_TYPE::ERROR) {
+                return error_stub();
             }
             TypeNode& arg_type = *get_entity_type(arg_entity);
             // if (!arg_type_p->is_constant) {
@@ -744,6 +751,7 @@ USemanticInfo Checker::visit_call(CallNode& n) {
 }
 
 USemanticInfo Checker::visit_root(BlockNode& node) {
+    this->error_reporter.code_lines = code_lines;
 
     // Initialize module level Scope
     for (auto f: this->module->flirpins) {
@@ -954,6 +962,11 @@ USemanticInfo Checker::check_declaration_with_type(DeclarationNode& n) {
 
 USemanticInfo Checker::check_declaration_without_type(DeclarationNode& n) {
     USemanticInfo exp_info_p = this->dispatch(n.expression);
+    if (exp_info_p->entity.type == E_TYPE::ERROR) {
+        std::cout << "Ignoring all subsequenct error involving variable " + n.identifier + " as type cannot be inferred"
+                  << std::endl;
+
+    }
     SemanticInfo info;
     DeclarationSNode* sn = new DeclarationSNode();
     info.snode = sn;
@@ -1091,6 +1104,7 @@ USemanticInfo Checker::visit_member(MemberNode& n) {
         case E_TYPE::MODULE:
             return this->module_member(parent_entity.module, n.s_child);
     }
+    return error_stub();
 }
 
 USemanticInfo Checker::visit(CastNode& n) {
@@ -1281,8 +1295,10 @@ USemanticInfo Checker::visit(BinopNode& n) {
     const TypeNode& ltype = *get_entity_type(left_info_p->entity);
     const TypeNode& rtype = *get_entity_type(right_info_p->entity);
     if (ltype != rtype) {
-        throw std::runtime_error("Binary operation between values of different types: " + ltype.to_string() + " and " +
-                                 rtype.to_string());
+        this->error_reporter.binop(ltype, rtype, n.start);
+        return error_stub();
+        // throw std::runtime_error("Binary operation between values of different types: " + ltype.to_string() + " and " +
+        //                          rtype.to_string());
     }
     bool err = false;
     if (ltype == T_NONE) {

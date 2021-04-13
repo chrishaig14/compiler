@@ -179,7 +179,7 @@ void analyze_all_modules(Package* package) {
 
             std::cout << "Analyzing module " << module->name << std::endl;
             Module* core_module = root_package->units["core"].module;
-            for(auto builtin: core_module->flirpins){
+            for (auto builtin: core_module->flirpins) {
                 module->flirpins[builtin.first] = builtin.second;
             }
             // module->flirpins["print"] = core_module->flirpins["print"];
@@ -194,8 +194,8 @@ void analyze_all_modules(Package* package) {
             checker.code_lines = module->code_lines;
             checker.visit_root(*module->ast);
             module->sast = checker.root_snode;
-            if (checker.failed) {
-                throw std::runtime_error("ERROR");
+            if (checker.error_reporter.failed) {
+                throw std::runtime_error("Semantic analysis failed for module " + module->abs_path);
             }
             std::cout << "- Done" << std::endl;
         }

@@ -53,7 +53,6 @@ Flirpin map_unit_to_flirpin(Unit u);
 
 class Checker {
     bool add_this;
-    ErrorReporter error_reporter;
     bool is_lvalue;
     std::map<std::string, bool> inits;
     bool replace_me;
@@ -149,6 +148,7 @@ public:
     USemanticInfo visit(CastNode& n);
     USemanticInfo visit(DefaultConstructorNode& node);
 
+    ErrorReporter error_reporter;
 };
 
 bool function_is_generic(const FunctionType& ft);
