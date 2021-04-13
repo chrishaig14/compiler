@@ -175,9 +175,6 @@ public:
     USemanticInfo visit(DefaultConstructorNode& node);
     USemanticInfo check_declaration_with_type(DeclarationNode& n);
     USemanticInfo check_declaration_without_type(DeclarationNode& n);
-    std::map<std::string, FunctionType*> imported_functions;
-    std::map<std::string, Package*>* global_packages;
-    std::map<std::string, Module*>* global_modules;
     BlockSNode* root_snode;
     Module* module;
     USemanticInfo class_member(Class* cls, std::string child);
