@@ -187,3 +187,14 @@ std::string STranspiler::transpile_list(ListSNode* ln) {
     out += "})";
     return out;
 }
+
+std::string STranspiler::transpile_if(IfSNode* in) {
+    std::string out;
+    out += "if" + SPACE + LPAREN + "GET_BOOL" + LPAREN + this->dispatch(in->condition) + RPAREN + RPAREN + LCURLY +
+           NEWLINE + this->transpile_block(in->then) + RCURLY;
+    if (in->_else != nullptr) {
+        out += "else" + SPACE + LCURLY + NEWLINE + this->transpile_block(in->_else) + NEWLINE + RCURLY;
+    }
+    out += NEWLINE;
+    return out;
+}

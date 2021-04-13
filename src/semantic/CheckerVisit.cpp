@@ -21,6 +21,7 @@
 #include "../simple_nodes/NewObjectSNode.h"
 #include "../simple_nodes/WhileSNode.h"
 #include "../simple_nodes/ListSNode.h"
+#include "../simple_nodes/IfSNode.h"
 
 #define T_NONE ObjectType(".None")
 static TextPosition POS_NONE = {-1, -1};
@@ -1111,40 +1112,53 @@ USemanticInfo Checker::visit(CastNode& n) {
     return std::make_unique<SemanticInfo>(info);
 }
 
+SNode* make_if_snode(SNode* condition, SNode* body, SNode* _else) {
+    IfSNode* ifs = new IfSNode();
+    ifs->condition = condition;
+    ifs->then = (BlockSNode*) body;
+    ifs->_else = (BlockSNode*) _else;
+    return ifs;
+}
+
 USemanticInfo Checker::visit(IfNode& n) {
     SemanticInfo info;
     USemanticInfo condition_info_p = this->dispatch(n.condition);
     SemanticInfo& condition_info = *condition_info_p;
 
-    std::unordered_map<std::string, bool> not_null_vars;
-    if (condition_info.type() == T_NONE) {
-        this->error_reporter.function_doesnt_return_a_value(n.condition->start, new T_BOOL);
-    } else if (condition_info.type() != T_BOOL) {
-        this->error_reporter.condition(condition_info.type(), n.start, "if");
-    }
+    // std::unordered_map<std::string, bool> not_null_vars;
+    // if (condition_info.type() == T_NONE) {
+    //     this->error_reporter.function_doesnt_return_a_value(n.condition->start, new T_BOOL);
+    // } else if (condition_info.type() != T_BOOL) {
+    //     this->error_reporter.condition(condition_info.type(), n.start, "if");
+    // }
 
     this->enter_scope("if");
-    this->visit_block(*n.then);
+    USemanticInfo body_info = this->visit_block(*n.then);
     // for (auto v: this->scope->table) {
     //     n.then->local_vars.push_back(std::make_pair(v.first, v.second->clone()));
     // }
     this->leave_scope();
 
-    for (size_t i = 0; i < n.elifs.size(); i++) {
-        condition_info_p = this->dispatch(n.elifs[i].first);
-        SemanticInfo& condition_info = *condition_info_p;
-        if (condition_info.type() != T_BOOL) {
-            this->error_reporter.condition(condition_info.type(), n.start, "elif");
-        }
-        this->enter_scope("elif");
-        this->visit_block(*n.elifs[i].second);
-        this->leave_scope();
-    }
+
+    // for (size_t i = 0; i < n.elifs.size(); i++) {
+    //     condition_info_p = this->dispatch(n.elifs[i].first);
+    //     SemanticInfo& condition_info = *condition_info_p;
+    //     if (condition_info.type() != T_BOOL) {
+    //         this->error_reporter.condition(condition_info.type(), n.start, "elif");
+    //     }
+    //     this->enter_scope("elif");
+    //     this->visit_block(*n.elifs[i].second);
+    //     this->leave_scope();
+    // }
+    USemanticInfo else_info;
     if (n.selse != nullptr && !n.selse->nodes.empty()) {
         this->enter_scope("else");
-        this->visit_block(*n.selse);
+        else_info = this->visit_block(*n.selse);
         this->leave_scope();
     }
+
+    info.snode = make_if_snode(condition_info.snode, body_info->snode, else_info->snode);
+
     return std::make_unique<SemanticInfo>(info);
 }
 
