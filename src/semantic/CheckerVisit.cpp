@@ -1095,9 +1095,9 @@ USemanticInfo Checker::visit_member(MemberNode& n) {
         case E_TYPE::CLASS:
             return this->class_member(n, parent_entity.clazz);
         case E_TYPE::CONST_FUNCTION:
-            throw std::runtime_error("Error: trying to get member of const function!");
+            this->error_reporter.member_no_object(n.start);
         case E_TYPE::FUNCTION_VALUE:
-            throw std::runtime_error("Error: trying to get member of function value!");
+            this->error_reporter.member_no_object(n.start);
         case E_TYPE::OBJECT_VALUE:
             return this->object_member(n, parent_info->snode, parent_entity.object_value);
         case E_TYPE::PACKAGE:
