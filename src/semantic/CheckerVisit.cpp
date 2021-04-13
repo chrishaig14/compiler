@@ -1149,38 +1149,87 @@ USemanticInfo Checker::visit(IfNode& n) {
 }
 
 USemanticInfo Checker::visit(BoolOpNode& n) {
+    CallSNode* sn = new CallSNode();
+    IdSNode* function_id = new IdSNode();
+    sn->function = function_id;
+    function_id->identifier = "";//mangle_path(this->module->imported_paths.at("Integer.add"));
+    SemanticInfo info;
+    info.snode = sn;
+
+    Logger::info("Checking binop node");
     USemanticInfo left_info_p = this->dispatch(n.left);
+    Node* left_replace = this->replace_if_necessary(n.left);
     USemanticInfo right_info_p = this->dispatch(n.right);
+    if (left_info_p->entity.type != E_TYPE::OBJECT_VALUE || right_info_p->entity.type != E_TYPE::OBJECT_VALUE) {
+        throw std::runtime_error("Can't have binop between 2 non objects!");
+    }
+    const TypeNode& ltype = *get_entity_type(left_info_p->entity);
+    const TypeNode& rtype = *get_entity_type(right_info_p->entity);
+    if (ltype != rtype) {
+        throw std::runtime_error("Binary operation between values of different types: " + ltype.to_string() + " and " +
+                                 rtype.to_string());
+    }
+    bool err = false;
+    if (ltype == T_NONE) {
+        this->error_reporter.function_doesnt_return_a_value(n.left->start, nullptr);
+        err = true;
+    }
+
+    if (rtype == T_NONE) {
+        this->error_reporter.function_doesnt_return_a_value(n.right->start, nullptr);
+        err = true;
+    }
+    if (err) {
+        return error_stub();
+    }
+    n.left = left_replace;
+    // n.left = this->replace_if_necessary(n.left);
+    n.right = this->replace_if_necessary(n.right);
 
     SemanticInfo& left_info = *left_info_p;
     SemanticInfo& right_info = *right_info_p;
 
-    SemanticInfo info;
-    bool ok = false;
-    if (left_info.entity.type != E_TYPE::OBJECT_VALUE || right_info.entity.type != E_TYPE::OBJECT_VALUE) {
-        throw std::runtime_error("Can't have binop between 2 non objects!");
-    }
-    // const TypeNode& l_type = left_info.type();
-    // const TypeNode& r_type = right_info.type();
-    const TypeNode& l_type = *get_entity_type(left_info.entity);
-    const TypeNode& r_type = *get_entity_type(right_info.entity);
-    if (l_type.kind == Kind::OBJECT) {
-        auto& left = l_type.object();
-        if (r_type.kind == Kind::OBJECT) {
-            auto& right = r_type.object();
-            if (left.id == "Option" && right.id == "NoneType") {
-                info.set_type(T_BOOL);
-                ok = true;
-            }
-        }
-    }
-    if (!ok && l_type != r_type) {
-        this->error_reporter.bool_op(l_type, r_type, n.start);
+    sn->arguments.push_back(left_info.snode);
+    sn->arguments.push_back(right_info.snode);
+
+    if (left_info.is_error || right_info.is_error) {
+        return error_stub();
     }
 
-    info.set_type(T_BOOL);
-    n.ltype = l_type.clone();
-    n.rtype = r_type.clone();
+    if (left_info_p->is_constant && right_info_p->is_constant) {
+        info.is_constant = true;
+    }
+    TypeNode* rettype;
+    bool ok = true;
+    std::string fun;
+    if (n.op == BoolOp::EQ) {
+        fun = "eq";
+    } else if (n.op == BoolOp::NEQ) {
+        fun = "ne";
+    } else if (n.op == BoolOp::LT) {
+        fun = "lt";
+    } else if (n.op == BoolOp::LEQ) {
+        fun = "le";
+    } else if (n.op == BoolOp::GT) {
+        fun = "gt";
+    } else if (n.op == BoolOp::GEQ) {
+        fun = "ge";
+    }
+    Entity entity = this->scope->get(ltype.object().id);
+    if (entity.type != E_TYPE::CLASS) {
+        throw std::runtime_error("This should be a CLASS, but it's not!");
+    }
+    Class* cls = entity.clazz;
+    auto operator_fun_it = cls->static_methods.find(fun);
+    if (operator_fun_it == cls->static_methods.end()) {
+        throw std::runtime_error("Class " + cls->class_name + " has no operator " + fun + " defined ");
+    }
+    ConstFunction* operator_fun = operator_fun_it->second;
+    function_id->identifier = operator_fun->full_path;
+    rettype = operator_fun->ft->return_type->clone();
+
+    info.entity = Entity{.type=E_TYPE::OBJECT_VALUE, .object_value=new ObjectValue()};
+    info.entity.object_value->ot = (ObjectType*) rettype;
 
     return std::make_unique<SemanticInfo>(info);
 }
