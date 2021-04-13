@@ -1554,7 +1554,13 @@ USemanticInfo Checker::class_member(MemberNode& n, Class* cls) {
     std::string child = n.s_child;
     SemanticInfo info;
     if (cls->methods.find(child) != cls->methods.end()) {
-        info.entity = Entity{.type=E_TYPE::CONST_FUNCTION, .const_function=cls->methods[child]};
+        ConstFunction* bound_method = cls->methods[child];
+        ConstFunction* unbound_method = new ConstFunction();
+        unbound_method->full_path = bound_method->full_path;
+        unbound_method->ft = bound_method->ft->clone();
+        unbound_method->ft->param_types.insert(unbound_method->ft->param_types.begin(),
+                                               new ObjectType(cls->class_name));
+        info.entity = Entity{.type=E_TYPE::CONST_FUNCTION, .const_function=unbound_method};
     } else if (cls->static_methods.find(child) != cls->static_methods.end()) {
         info.entity = Entity{.type=E_TYPE::CONST_FUNCTION, .const_function=cls->static_methods[child]};
     } else if (cls->static_members.find(child) != cls->static_members.end()) {
