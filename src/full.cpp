@@ -327,7 +327,7 @@ int main(int argc, char* argv[]) {
     std::string cmakelists = "cmake_minimum_required(VERSION 3.16)\n"
                              "project(xlang)\n"
                              "set(CMAKE_CXX_STANDARD 14)\n"
-                             "set(CMAKE_CXX_FLAGS \"${CMAKE_CXX_FLAGS} -Werror -O3 -fverbose-asm -Winline\")\n";
+                             "set(CMAKE_CXX_FLAGS \"${CMAKE_CXX_FLAGS} -Werror -O0 -fverbose-asm -Winline\")\n";
     cmakelists += "add_executable(result " + all_files + ")\n";
     cmakelists += "include_directories(../runtime)\n"
                   "include_directories(.)\n"
