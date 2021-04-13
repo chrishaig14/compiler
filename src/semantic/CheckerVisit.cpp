@@ -53,7 +53,7 @@ USemanticInfo Checker::visit(ListNode& node) {
         node.elements[i] = this->replace_if_necessary(node.elements[i]);
         ObjectType* ctype = current_type_p->entity.object_value->ot;
         if (*ctype != *element_type) {
-            this->error_list_literal(*element_type, *ctype, node.elements[i]->start);
+            this->error_reporter.list_literal(*element_type, *ctype, node.elements[i]->start);
         }
         lsn->elements.push_back(current_type_p->snode);
     }
@@ -81,7 +81,7 @@ USemanticInfo Checker::visit(WhileNode& node) {
     USemanticInfo condition_p = this->dispatch(node.condition);
     SemanticInfo& condition = *condition_p;
     if (condition.type() != T_BOOL) {
-        this->error_condition(condition.type(), node.start, "elif");
+        this->error_reporter.condition(condition.type(), node.start, "elif");
     }
     this->enter_scope("while");
     this->scope->is_loop = true;
@@ -173,13 +173,13 @@ USemanticInfo Checker::visit(SubscriptNode& node) {
 
     // SemanticInfo& parent = *parent_p;
     // if (parent.type().kind != Kind::OBJECT) {
-    //     this->error_subscript_non_object(node.start);
+    //     this->error_reporter.subscript_non_object(node.start);
     //     return error_stub();
     // }
     // const ObjectType& object_type = parent.type().object();
 
     // if (this->is_lvalue && object_type == T_STRING) {
-    //     this->error_string_immutable(node.start);
+    //     this->error_reporter.string_immutable(node.start);
     //     return error_stub();
     // }
 
@@ -450,7 +450,7 @@ USemanticInfo Checker::visit(TupleNode& node) {
         USemanticInfo vtype = this->dispatch(n);
         types.emplace_back(vtype->type().clone());
         if (!this->is_immutable(vtype->type())) {
-            this->error_tuple_member_not_immutable(vtype->type(), node.start);
+            this->error_reporter.tuple_member_not_immutable(vtype->type(), node.start);
             return error_stub();
         }
     }
@@ -470,17 +470,17 @@ USemanticInfo Checker::visit(PartialApplication& node) {
     USemanticInfo func = this->dispatch(node.function);
     VectorOfTypes partial_args;
     if (node.args.size() != func->type().function().param_types.size()) {
-        this->error_partial_wrong_num_args(node.start);
+        this->error_reporter.partial_wrong_num_args(node.start);
         return error_stub();
     }
     for (size_t i = 0; i < node.args.size(); i++) {
         if (node.args[i] != nullptr) {
             USemanticInfo arg = this->dispatch(node.args[i]);
             if (arg->type() != *func->type().function().param_types[i]) {
-                this->error_partial_function_call_type_mismatch(*func->type().function().param_types[i],
-                                                                arg->type(),
-                                                                node.args[i]->start,
-                                                                node.args[i]->end);
+                this->error_reporter.partial_function_call_type_mismatch(*func->type().function().param_types[i],
+                                                                          arg->type(),
+                                                                          node.args[i]->start,
+                                                                          node.args[i]->end);
                 return error_stub();
             }
         } else {
@@ -715,7 +715,7 @@ USemanticInfo Checker::visit_call(CallNode& n) {
         // ok
         // const FunctionType& function_type = fun_info.type().function();
         if (n.arguments.size() != function_type->param_types.size()) {
-            this->error_function_call_num_args(n.start);
+            this->error_reporter.function_call_num_args(n.start);
             if (!function_is_generic(*function_type)) {
                 retv.set_type(*function_type->return_type);
                 return std::make_unique<SemanticInfo>(retv);
@@ -753,10 +753,10 @@ USemanticInfo Checker::visit_call(CallNode& n) {
                 const TypeNode& param_type = *function_type->param_types[i];
                 if (arg_type != param_type) {
                     if (arg_type.kind != Kind::UNKNOWN) {
-                        this->error_function_call_type_mismatch(param_type,
-                                                                arg_type,
-                                                                n.arguments[i]->start,
-                                                                n.arguments[i]->end);
+                        this->error_reporter.function_call_type_mismatch(param_type,
+                                                                          arg_type,
+                                                                          n.arguments[i]->start,
+                                                                          n.arguments[i]->end);
                     }
                     return std::make_unique<SemanticInfo>(retv);
                 }
@@ -788,7 +788,7 @@ USemanticInfo Checker::visit_call(CallNode& n) {
                 break;
         }
         throw std::runtime_error("Calling something that's not a function it's a " + entity_type);
-        this->error_call_not_a_function(n.start);
+        this->error_reporter.call_not_a_function(n.start);
     }
     if (is_a_method) {
         // prepend the "this" argument (the object on which the method is being called)
@@ -848,7 +848,7 @@ USemanticInfo Checker::visit_block(BlockNode& node) {
             // if return value != NoneType, then force the return value
 
             if (!sinfo.is_error && *get_entity_type(sinfo.entity) != T_NONE) {
-                this->error_unused_return_value(n->start);
+                this->error_reporter.unused_return_value(n->start);
             }
         }
     }
@@ -909,7 +909,7 @@ USemanticInfo Checker::visit_function(FunctionNode& n) {
         for (auto x: this->inits) {
             if (x.second == false) {
                 er = true;
-                this->error_class_init_member_not_init(this->current_class, x.first, n.start);
+                this->error_reporter.class_init_member_not_init(this->current_class, x.first, n.start);
                 // std::cout << "MEMBER " + x.first + " not initialized in init method!" << std::endl;
             }
         }
@@ -924,10 +924,10 @@ USemanticInfo Checker::visit_function(FunctionNode& n) {
             Node* last_node = n.body->nodes.back();
             if (last_node->ntype != NodeType::RETRN) {
                 // it's not a return statement, error
-                this->error_function_return_last_stmt(function_name, returnType, last_node->start);
+                this->error_reporter.function_return_last_stmt(function_name, returnType, last_node->start);
             }
         } else {
-            this->error_function_return_last_stmt(function_name, returnType, n.start);
+            this->error_reporter.function_return_last_stmt(function_name, returnType, n.start);
         }
     }
     this->leave_scope();
@@ -973,7 +973,7 @@ USemanticInfo Checker::check_declaration_with_type(DeclarationNode& n) {
     if (n.type->kind == Kind::FUNCTION) {
         // it's a function
         if (n_type != exp_info.type()) {
-            this->error_assignment(n_type, exp_info.type(), n.start);
+            this->error_reporter.assignment(n_type, exp_info.type(), n.start);
         }
     } else {
         SemanticInfo expression_info = exp_info;
@@ -983,7 +983,7 @@ USemanticInfo Checker::check_declaration_with_type(DeclarationNode& n) {
             if (*actual_type.type_params[0] != exp_type) {
                 auto foo = exp_type.object();
                 if (foo.id != "NoneType") {
-                    this->error_assignment(n_type, exp_type, n.start);
+                    this->error_reporter.assignment(n_type, exp_type, n.start);
                 }
             }
         } else if (actual_type.id == "Union") {
@@ -995,11 +995,11 @@ USemanticInfo Checker::check_declaration_with_type(DeclarationNode& n) {
                 }
             }
             if (!ok) {
-                this->error_assignment(n_type, exp_type, n.start);
+                this->error_reporter.assignment(n_type, exp_type, n.start);
             }
         } else {
             if (n_type != exp_type) {
-                this->error_assignment(n_type, exp_type, n.start);
+                this->error_reporter.assignment(n_type, exp_type, n.start);
             }
         }
     }
@@ -1015,7 +1015,7 @@ USemanticInfo Checker::check_declaration_without_type(DeclarationNode& n) {
     sn->identifier = n.identifier;
     sn->expression = exp_info_p->snode;
     // if (exp_info_p->type() == T_NONE) {
-    //     this->error_function_doesnt_return_a_value(n.expression->start, nullptr);
+    //     this->error_reporter.function_doesnt_return_a_value(n.expression->start, nullptr);
     //     USemanticInfo error_t = error_stub();
     //     this->scope->set(n.identifier, entity_from_type(error_t->type()));
     //     return error_t;
@@ -1032,7 +1032,7 @@ USemanticInfo Checker::check_declaration_without_type(DeclarationNode& n) {
 USemanticInfo Checker::visit(DeclarationNode& n) {
     Logger::info("Checking DeclarationNode for var: " + n.identifier);
     if (this->scope->declared(n.identifier)) {
-        this->error_redeclared(n.identifier, n.start);
+        this->error_reporter.redeclared(n.identifier, n.start);
     }
     USemanticInfo info;
     if (n.type != nullptr) {
@@ -1064,7 +1064,7 @@ USemanticInfo Checker::visit(AssignmentNode& n) {
     }
     this->is_lvalue = false;
     if (n.lvalue->ntype == NodeType::MEMBER && n.lvalue->member().type == MemberType::NUM) {
-        this->error_tuple_assign(n.start);
+        this->error_reporter.tuple_assign(n.start);
     }
     if (n.lvalue->ntype == NodeType::MEMBER &&
         (linfo_p->is_class_method || !n.lvalue->member().is_class_static_member)) {
@@ -1072,7 +1072,7 @@ USemanticInfo Checker::visit(AssignmentNode& n) {
     }
     USemanticInfo expression_type_p = this->dispatch(n.rvalue);
     // if (expression_type_p->type() == T_NONE) {
-    //     this->error_function_doesnt_return_a_value(n.rvalue->start, &linfo_p->type());
+    //     this->error_reporter.function_doesnt_return_a_value(n.rvalue->start, &linfo_p->type());
     //     return nullptr;
     // }
     if (expression_type_p->is_error) {
@@ -1093,16 +1093,16 @@ USemanticInfo Checker::visit(AssignmentNode& n) {
                 if (*actual_type.type_params[0] != exp_type) {
                     auto& foo = exp_type.object();
                     if (foo.id != "NoneType") {
-                        this->error_assignment(l_type, exp_type, n.start);
+                        this->error_reporter.assignment(l_type, exp_type, n.start);
                     }
                 }
             } else {
                 // if it's not Option[t], then it's an error
-                this->error_assignment(l_type, exp_type, n.start);
+                this->error_reporter.assignment(l_type, exp_type, n.start);
             }
         } else {
             // if it's not Option[t], then it's an error
-            this->error_assignment(l_type, exp_type, n.start);
+            this->error_reporter.assignment(l_type, exp_type, n.start);
         }
     }
     // else, type matches don't do anything
@@ -1174,9 +1174,9 @@ USemanticInfo Checker::visit(IfNode& n) {
 
     std::unordered_map<std::string, bool> not_null_vars;
     if (condition_info.type() == T_NONE) {
-        this->error_function_doesnt_return_a_value(n.condition->start, new T_BOOL);
+        this->error_reporter.function_doesnt_return_a_value(n.condition->start, new T_BOOL);
     } else if (condition_info.type() != T_BOOL) {
-        this->error_condition(condition_info.type(), n.start, "if");
+        this->error_reporter.condition(condition_info.type(), n.start, "if");
     }
 
     this->enter_scope("if");
@@ -1190,7 +1190,7 @@ USemanticInfo Checker::visit(IfNode& n) {
         condition_info_p = this->dispatch(n.elifs[i].first);
         SemanticInfo& condition_info = *condition_info_p;
         if (condition_info.type() != T_BOOL) {
-            this->error_condition(condition_info.type(), n.start, "elif");
+            this->error_reporter.condition(condition_info.type(), n.start, "elif");
         }
         this->enter_scope("elif");
         this->visit_block(*n.elifs[i].second);
@@ -1231,7 +1231,7 @@ USemanticInfo Checker::visit(BoolOpNode& n) {
         }
     }
     if (!ok && l_type != r_type) {
-        this->error_bool_op(l_type, r_type, n.start);
+        this->error_reporter.bool_op(l_type, r_type, n.start);
     }
 
     info.set_type(T_BOOL);
@@ -1265,12 +1265,12 @@ USemanticInfo Checker::visit(BinopNode& n) {
     }
     bool err = false;
     if (ltype == T_NONE) {
-        this->error_function_doesnt_return_a_value(n.left->start, nullptr);
+        this->error_reporter.function_doesnt_return_a_value(n.left->start, nullptr);
         err = true;
     }
 
     if (rtype == T_NONE) {
-        this->error_function_doesnt_return_a_value(n.right->start, nullptr);
+        this->error_reporter.function_doesnt_return_a_value(n.right->start, nullptr);
         err = true;
     }
     if (err) {
@@ -1351,7 +1351,7 @@ USemanticInfo Checker::visit(BinopNode& n) {
     }
 
     if (!ok) {
-        this->error_binop(ltype, rtype, n.op_pos);
+        this->error_reporter.binop(ltype, rtype, n.op_pos);
         return error_stub();
     }
     // n.ltype = left.clone();
@@ -1376,11 +1376,11 @@ USemanticInfo Checker::visit_return(ReturnNode& n) {
     TypeNode& return_type = *return_typet;
     if (return_type == T_NONE) {
         if (n.expression != nullptr) {
-            this->error_bad_return(n.start);
+            this->error_reporter.bad_return(n.start);
         }
         return nullptr;
     } else if (n.expression == nullptr) {
-        this->error_no_return(return_type, n.start);
+        this->error_reporter.no_return(return_type, n.start);
     }
     USemanticInfo expression_info_p = this->dispatch(n.expression);
     SemanticInfo& expression_info = *expression_info_p;
@@ -1390,7 +1390,7 @@ USemanticInfo Checker::visit_return(ReturnNode& n) {
     sn->expression = expression_info.snode;
     n.expression = this->replace_if_necessary(n.expression);
     // if (!this->can_assign(expression_info.type(), return_type)) {
-    //     this->error_return_mismatch(return_type, expression_info.type(), n.start);
+    //     this->error_reporter.return_mismatch(return_type, expression_info.type(), n.start);
     //     return error_stub();
     // }
     n.ret_type = return_type.clone();

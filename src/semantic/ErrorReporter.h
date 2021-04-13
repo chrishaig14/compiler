@@ -1,0 +1,72 @@
+//
+// Created by chris on 12/4/21.
+//
+
+#ifndef XLANG_ERRORREPORTER_H
+#define XLANG_ERRORREPORTER_H
+
+
+#include <string>
+#include "../scanner/TextPosition.h"
+#include "../nodes/TypeNode.h"
+#include "../scanner/CodeLines.h"
+
+class ErrorReporter {
+public:
+    void assignment(const TypeNode& expected, const TypeNode& actual, TextPosition position);
+    void bad_return(TextPosition position);
+    void binop(const TypeNode& left, const TypeNode& right, TextPosition position);
+    void bool_op(const TypeNode& left, const TypeNode& right, TextPosition position);
+    void call_not_a_function(TextPosition position);
+    void condition(const TypeNode& t, TextPosition position, const std::string& st);
+    void _for(const TypeNode& t, TextPosition position);
+    void function_call_num_args(TextPosition position);
+    void
+    function_call_type_mismatch(const TypeNode& expected, const TypeNode& actual, TextPosition start, TextPosition end);
+    void no_member(const TypeNode& t, const std::string& member, TextPosition position);
+    void no_return(const TypeNode& t, TextPosition position);
+    void class_no_method(const std::string& class_name, const std::string method_name, TextPosition pos);
+    void return_mismatch(const TypeNode& expected, const TypeNode& actual, TextPosition position);
+    bool failed;
+    std::string context_string(TextPosition position);
+    CodeLines code_lines;
+    std::string code_context_string(TextPosition position);
+    std::string code_string(TextPosition start, TextPosition end);
+    void generic_call_mismatch(const TypeNode& expected, const TypeNode& actual, int i);
+
+    void call_bad_num_args();
+    void redeclared(const std::string& name, TextPosition pos);
+    void tuple_assign(TextPosition pos);
+    void unused_return_value(TextPosition pos);
+    void variable_not_declared(const std::string& name, TextPosition pos);
+    void member_no_object(TextPosition pos);
+    void subscript_non_object(TextPosition pos);
+    void string_immutable(TextPosition pos);
+    void member_no_object(const std::string& class_name, const std::string method_name, TextPosition pos);
+    void tuple_member_not_immutable(const TypeNode& t, TextPosition pos);
+    void
+    class_init_bad_member_type(const TypeNode& cls, const TypeNode& expected, const TypeNode& actual, TextPosition pos);
+    void class_not_found(const TypeNode& cls, TextPosition pos);
+    void list_literal(const TypeNode& lt, const TypeNode& et, TextPosition pos);
+    void function_return_last_stmt(const std::string& function_name, const TypeNode& et, TextPosition pos);
+    void partial_wrong_num_args(const std::string& function_name, const TypeNode& et, TextPosition pos);
+    void partial_wrong_num_args(TextPosition pos);
+    void partial_function_call_type_mismatch(const TypeNode& expected, const TypeNode& actual, TextPosition start,
+                                             TextPosition end);
+    void generic_class_wrong_type_param_number(const std::string& cls, int num_req, int num_given, TextPosition pos);
+    void class_init_wrong_number_init(const std::string& cls, int num_req, int num_given, TextPosition pos);
+    void subscript_type(const TypeNode& t, const TypeNode& s, const TypeNode& es, TextPosition pos);
+    void class_not_generic(const std::string& cls, TextPosition pos);
+    void function_doesnt_return_a_value(TextPosition position, const TypeNode* expected_type);
+    void class_init_member_not_init(const std::string& cls, std::string mem, TextPosition pos);
+    void fail(std::string msg);
+    void method_not_member(const TypeNode& t, const std::string& member, TextPosition position);
+    std::string code_error_string(TextPosition start, TextPosition end);
+
+    std::string current_class;
+    std::string current_function;
+    std::string __file__;
+};
+
+
+#endif //XLANG_ERRORREPORTER_H

@@ -17,6 +17,7 @@
 #include "../logging/logging.h"
 #include "../simple_nodes/BlockSNode.h"
 #include "../units/ObjectValue.h"
+#include "ErrorReporter.h"
 
 
 typedef std::unique_ptr<SemanticInfo> USemanticInfo;
@@ -52,6 +53,7 @@ Flirpin map_unit_to_flirpin(Unit u);
 
 class Checker {
     bool add_this;
+    ErrorReporter error_reporter;
     bool is_lvalue;
     std::map<std::string, bool> inits;
     bool replace_me;
@@ -63,28 +65,46 @@ class Checker {
     SymbolTable* scope;
     TypeNode* this_type;
 public:
-    Checker();
-
+    bool is_method;
     std::string __file__;
+    BlockSNode* root_snode;
+    Module* module;
+    bool is_call;
+
+    Checker();
     bool can_assign(const TypeNode& from, const TypeNode& to);
     bool can_assign_generic(TypeNode& from, TypeNode& to, VectorOfStrings type_params);
     bool is_immutable(const TypeNode& node);
+
+
     Class* instantiate_generic(Class* generic, const ObjectType& instance);
-    void error_assignment(const TypeNode& expected, const TypeNode& actual, TextPosition position);
-    void error_bad_return(TextPosition position);
-    void error_binop(const TypeNode& left, const TypeNode& right, TextPosition position);
-    void error_bool_op(const TypeNode& left, const TypeNode& right, TextPosition position);
-    void error_call_not_a_function(TextPosition position);
-    void error_condition(const TypeNode& t, TextPosition position, const std::string& st);
-    void error_for(const TypeNode& t, TextPosition position);
-    void error_function_call_num_args(TextPosition position);
-    void error_function_call_type_mismatch(const TypeNode& expected, const TypeNode& actual, TextPosition start,
-                                           TextPosition end);
-    void error_no_member(const TypeNode& t, const std::string& member, TextPosition position);
-    void error_no_return(const TypeNode& t, TextPosition position);
-    void error_class_no_method(const std::string& class_name, const std::string method_name, TextPosition pos);
-    void error_return_mismatch(const TypeNode& expected, const TypeNode& actual, TextPosition position);
+    void enter_scope(std::string name);
+    void leave_scope();
+
+    VectorOfTypes get_replacements_in_order(const FunctionType& function_type, VectorOfTypes arg_types);
+    ~Checker();
+    bool assert_type_exists(TypeNode& type, TextPosition pos);
+    bool failed;
+    std::string context_string(TextPosition position);
+    CodeLines code_lines;
+    std::string code_context_string(TextPosition position);
+
+    std::string code_error_string(TextPosition start, TextPosition end);
+    bool is_variable(const ObjectType& a);
+    std::pair<std::string, TypeNode*>*
+    get_first_substitution_function(FunctionType& a, FunctionType& b, bool is_top_level_arg);
+    std::pair<std::string, TypeNode*>*
+    get_first_substitution_object(ObjectType& a, ObjectType& b, bool is_top_level_arg);
+    std::pair<std::string, TypeNode*>* get_first_substitution(TypeNode& a, TypeNode& b, bool is_top_level_arg);
+    TypeNode* substitute(TypeNode* t, std::string var, TypeNode* replacement);
+    void unify_function_call(FunctionType& fun, VectorOfTypes& args);
+    SemanticInfo match_arguments_to_generic_function(const FunctionType& ft, VectorOfTypes arg_types);
+    Node* replace_if_necessary(Node* node);
+    void fail(std::string msg);
+
+
     USemanticInfo dispatch(Node* nod);
+
     USemanticInfo visit(AssignmentNode& n);
     USemanticInfo visit(BinopNode& node);
     USemanticInfo visit_block(BlockNode& node);
@@ -96,7 +116,11 @@ public:
     USemanticInfo visit_call(CallNode& n);
     USemanticInfo visit_class(ClassNode& node);
     USemanticInfo visit(ContinueNode& node);
+
     USemanticInfo visit(DeclarationNode& node);
+    USemanticInfo check_declaration_with_type(DeclarationNode& n);
+    USemanticInfo check_declaration_without_type(DeclarationNode& n);
+
     USemanticInfo visit(DictNode& node);
     USemanticInfo visit(EmptyDictNode& node);
     USemanticInfo visit(EmptyListNode& node);
@@ -106,7 +130,13 @@ public:
     USemanticInfo visit_id(IdNode& n);
     USemanticInfo visit(IfNode& node);
     USemanticInfo visit(ListNode& node);
+
     USemanticInfo visit_member(MemberNode& n);
+    USemanticInfo class_member(Class* cls, std::string child);
+    USemanticInfo object_member(SNode* object_snode, ObjectValue* pValue, std::string child);
+    USemanticInfo package_member(Package* package, std::string child);
+    USemanticInfo module_member(Module* pModule, std::string basicString);
+
     USemanticInfo visit(NoneNode& node);
     USemanticInfo visit_import(ImportNode& node);
     USemanticInfo visit(NumberNode& node);
@@ -117,71 +147,11 @@ public:
     USemanticInfo visit(TernaryNode& node);
     USemanticInfo visit(TupleNode& node);
     USemanticInfo visit(WhileNode& node);
-    VectorOfTypes get_replacements_in_order(const FunctionType& function_type, VectorOfTypes arg_types);
-    void enter_scope(std::string name);
-    void leave_scope();
-    ~Checker();
-    bool assert_type_exists(TypeNode& type, TextPosition pos);
-    bool failed;
-    std::string context_string(TextPosition position);
-    CodeLines code_lines;
-    std::string code_context_string(TextPosition position);
-    std::string code_error_string(TextPosition start, TextPosition end);
-
-    bool is_variable(const ObjectType& a);
-    std::pair<std::string, TypeNode*>*
-    get_first_substitution_function(FunctionType& a, FunctionType& b, bool is_top_level_arg);
-    std::pair<std::string, TypeNode*>*
-    get_first_substitution_object(ObjectType& a, ObjectType& b, bool is_top_level_arg);
-    std::pair<std::string, TypeNode*>* get_first_substitution(TypeNode& a, TypeNode& b, bool is_top_level_arg);
-    TypeNode* substitute(TypeNode* t, std::string var, TypeNode* replacement);
-    void unify_function_call(FunctionType& fun, VectorOfTypes& args);
-    SemanticInfo match_arguments_to_generic_function(const FunctionType& ft, VectorOfTypes arg_types);
-    void error_generic_call_mismatch(const TypeNode& expected, const TypeNode& actual, int i);
-
-    void error_call_bad_num_args();
-    void error_redeclared(const std::string& name, TextPosition pos);
-    void error_tuple_assign(TextPosition pos);
-    void error_unused_return_value(TextPosition pos);
-    void error_variable_not_declared(const std::string& name, TextPosition pos);
-    void error_member_no_object(TextPosition pos);
-    void error_subscript_non_object(TextPosition pos);
-    void error_string_immutable(TextPosition pos);
-    void error_member_no_object(const std::string& class_name, const std::string method_name, TextPosition pos);
-    void error_tuple_member_not_immutable(const TypeNode& t, TextPosition pos);
-    void error_class_init_bad_member_type(const TypeNode& cls, const TypeNode& expected, const TypeNode& actual,
-                                          TextPosition pos);
-    void error_class_not_found(const TypeNode& cls, TextPosition pos);
-    void error_list_literal(const TypeNode& lt, const TypeNode& et, TextPosition pos);
-    void error_function_return_last_stmt(const std::string& function_name, const TypeNode& et, TextPosition pos);
-    void error_partial_wrong_num_args(const std::string& function_name, const TypeNode& et, TextPosition pos);
-    void error_partial_wrong_num_args(TextPosition pos);
-    void error_partial_function_call_type_mismatch(const TypeNode& expected, const TypeNode& actual, TextPosition start,
-                                                   TextPosition end);
-    Node* replace_if_necessary(Node* node);
-    void
-    error_generic_class_wrong_type_param_number(const std::string& cls, int num_req, int num_given, TextPosition pos);
-    void error_class_init_wrong_number_init(const std::string& cls, int num_req, int num_given, TextPosition pos);
-    void error_subscript_type(const TypeNode& t, const TypeNode& s, const TypeNode& es, TextPosition pos);
-    void error_class_not_generic(const std::string& cls, TextPosition pos);
-    bool is_method;
-    void error_function_doesnt_return_a_value(TextPosition position, const TypeNode* expected_type);
-    void error_class_init_member_not_init(const std::string& cls, std::string mem, TextPosition pos);
-    void fail(std::string msg);
     USemanticInfo member_class_method(std::string class_name, std::string child, MemberNode& n);
     USemanticInfo member_tuple(const ObjectType& final_type, MemberNode& n);
     USemanticInfo visit(CastNode& n);
-    void error_method_not_member(const TypeNode& t, const std::string& member, TextPosition position);
     USemanticInfo visit(DefaultConstructorNode& node);
-    USemanticInfo check_declaration_with_type(DeclarationNode& n);
-    USemanticInfo check_declaration_without_type(DeclarationNode& n);
-    BlockSNode* root_snode;
-    Module* module;
-    USemanticInfo class_member(Class* cls, std::string child);
-    USemanticInfo object_member(SNode* object_snode, ObjectValue* pValue, std::string child);
-    USemanticInfo package_member(Package* package, std::string child);
-    USemanticInfo module_member(Module* pModule, std::string basicString);
-    bool is_call;
+
 };
 
 bool function_is_generic(const FunctionType& ft);
