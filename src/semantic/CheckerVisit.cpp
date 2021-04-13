@@ -1093,17 +1093,17 @@ USemanticInfo Checker::visit_member(MemberNode& n) {
     Entity parent_entity = parent_info->entity;
     switch (parent_entity.type) {
         case E_TYPE::CLASS:
-            return this->class_member(parent_entity.clazz, n.s_child);
+            return this->class_member(n, parent_entity.clazz);
         case E_TYPE::CONST_FUNCTION:
             throw std::runtime_error("Error: trying to get member of const function!");
         case E_TYPE::FUNCTION_VALUE:
             throw std::runtime_error("Error: trying to get member of function value!");
         case E_TYPE::OBJECT_VALUE:
-            return this->object_member(parent_info->snode, parent_entity.object_value, n.s_child);
+            return this->object_member(n, parent_info->snode, parent_entity.object_value);
         case E_TYPE::PACKAGE:
-            return this->package_member(parent_entity.package, n.s_child);
+            return this->package_member(n, parent_entity.package);
         case E_TYPE::MODULE:
-            return this->module_member(parent_entity.module, n.s_child);
+            return this->module_member(n, parent_entity.module);
     }
     return error_stub();
 }
@@ -1485,7 +1485,8 @@ USemanticInfo Checker::visit(DefaultConstructorNode& node) {
     return std::make_unique<SemanticInfo>(info);
 }
 
-USemanticInfo Checker::object_member(SNode* object_snode, ObjectValue* pValue, std::string child) {
+USemanticInfo Checker::object_member(MemberNode& n, SNode* object_snode, ObjectValue* pValue) {
+    std::string child = n.s_child;
     Class* clazz = this->scope->get(pValue->ot->id).clazz;
     SemanticInfo info;
     if (clazz->members.count(child)) {
@@ -1508,15 +1509,18 @@ USemanticInfo Checker::object_member(SNode* object_snode, ObjectValue* pValue, s
         info.entity = Entity{.type=E_TYPE::CONST_FUNCTION, .const_function=clazz->methods[child]};
 
     } else {
-        throw std::runtime_error("Error member/method '" + child + "' not found in class '" + clazz->class_name + "'");
+        this->error_reporter.no_member(ObjectType(clazz->class_name), child, n.start);
+        return error_stub();
     }
     return std::make_unique<SemanticInfo>(info);
 }
 
 
-USemanticInfo Checker::package_member(Package* package, std::string child) {
+USemanticInfo Checker::package_member(MemberNode& n, Package* package) {
+    std::string child = n.s_child;
     if (package->units.count(child) == 0) {
-        throw std::runtime_error("Error: package " + package->name + " has no member " + child);
+        this->error_reporter.no_member(ObjectType(package->name), child, n.start);
+        return error_stub();
     }
     Unit unit = package->units[child];
     SemanticInfo info;
@@ -1524,9 +1528,11 @@ USemanticInfo Checker::package_member(Package* package, std::string child) {
     return std::make_unique<SemanticInfo>(info);
 }
 
-USemanticInfo Checker::module_member(Module* mod, std::string child) {
+USemanticInfo Checker::module_member(MemberNode& n, Module* mod) {
+    std::string child = n.s_child;
     if (mod->flirpins.count(child) == 0) {
-        throw std::runtime_error("Error: module " + mod->name + " has no member " + child);
+        this->error_reporter.no_member(ObjectType(mod->name), child, n.start);
+        return error_stub();
     }
     Flirpin flirpin = mod->flirpins[child];
     SemanticInfo info;
@@ -1540,7 +1546,8 @@ USemanticInfo Checker::module_member(Module* mod, std::string child) {
 }
 
 
-USemanticInfo Checker::class_member(Class* cls, std::string child) {
+USemanticInfo Checker::class_member(MemberNode& n, Class* cls) {
+    std::string child = n.s_child;
     SemanticInfo info;
     if (cls->methods.find(child) != cls->methods.end()) {
         info.entity = Entity{.type=E_TYPE::CONST_FUNCTION, .const_function=cls->methods[child]};
@@ -1549,7 +1556,8 @@ USemanticInfo Checker::class_member(Class* cls, std::string child) {
     } else if (cls->static_members.find(child) != cls->static_members.end()) {
         info.entity = entity_from_type(*cls->static_members[child].first);
     } else {
-        throw std::runtime_error("Class " + cls->class_name + " has no method/member " + child);
+        this->error_reporter.no_member(ObjectType(cls->class_name), child, n.start);
+        return error_stub();
     }
     return std::make_unique<SemanticInfo>(info);
 }

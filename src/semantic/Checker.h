@@ -128,10 +128,10 @@ public:
     USemanticInfo visit(ListNode& node);
 
     USemanticInfo visit_member(MemberNode& n);
-    USemanticInfo class_member(Class* cls, std::string child);
-    USemanticInfo object_member(SNode* object_snode, ObjectValue* pValue, std::string child);
-    USemanticInfo package_member(Package* package, std::string child);
-    USemanticInfo module_member(Module* pModule, std::string basicString);
+    USemanticInfo class_member(MemberNode& n, Class* cls);
+    USemanticInfo object_member(MemberNode& n, SNode* object_snode, ObjectValue* pValue);
+    USemanticInfo package_member(MemberNode& n, Package* package);
+    USemanticInfo module_member(MemberNode& n, Module* pModule);
 
     USemanticInfo visit(NoneNode& node);
     USemanticInfo visit_import(ImportNode& node);
