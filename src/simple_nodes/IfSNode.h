@@ -17,6 +17,8 @@ public:
 
     IfSNode() : SNode(SNodeType::IF) {
     }
+
+    std::vector<std::pair<SNode*, BlockSNode*>> elifs;
 };
 
 

@@ -192,6 +192,10 @@ std::string STranspiler::transpile_if(IfSNode* in) {
     std::string out;
     out += "if" + SPACE + LPAREN + "GET_BOOL" + LPAREN + this->dispatch(in->condition) + RPAREN + RPAREN + LCURLY +
            NEWLINE + this->transpile_block(in->then) + RCURLY;
+    for (auto elif: in->elifs) {
+        out += "else if" + SPACE + LPAREN + "GET_BOOL" + LPAREN + this->dispatch(elif.first) + RPAREN + RPAREN +
+               LCURLY + NEWLINE + this->transpile_block(elif.second) + RCURLY;
+    }
     if (in->_else != nullptr) {
         out += "else" + SPACE + LCURLY + NEWLINE + this->transpile_block(in->_else) + NEWLINE + RCURLY;
     }

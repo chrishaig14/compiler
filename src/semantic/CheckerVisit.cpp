@@ -1112,10 +1112,11 @@ USemanticInfo Checker::visit(CastNode& n) {
     return std::make_unique<SemanticInfo>(info);
 }
 
-SNode* make_if_snode(SNode* condition, SNode* body, SNode* _else) {
+SNode* make_if_snode(SNode* condition, SNode* body, std::vector<std::pair<SNode*, BlockSNode*>> elifs, SNode* _else) {
     IfSNode* ifs = new IfSNode();
     ifs->condition = condition;
     ifs->then = (BlockSNode*) body;
+    ifs->elifs = elifs;
     ifs->_else = (BlockSNode*) _else;
     return ifs;
 }
@@ -1124,6 +1125,13 @@ USemanticInfo Checker::visit(IfNode& n) {
     SemanticInfo info;
     USemanticInfo condition_info_p = this->dispatch(n.condition);
     SemanticInfo& condition_info = *condition_info_p;
+
+    if (condition_info.entity.type != E_TYPE::OBJECT_VALUE) {
+        throw std::runtime_error("If condition should be a Boolean");
+    }
+    if (*condition_info.entity.object_value->ot != T_BOOL) {
+        throw std::runtime_error("If condition should be a Boolean");
+    }
 
     // std::unordered_map<std::string, bool> not_null_vars;
     // if (condition_info.type() == T_NONE) {
@@ -1139,17 +1147,22 @@ USemanticInfo Checker::visit(IfNode& n) {
     // }
     this->leave_scope();
 
+    std::vector<std::pair<SNode*, BlockSNode*>> elifs;
 
-    // for (size_t i = 0; i < n.elifs.size(); i++) {
-    //     condition_info_p = this->dispatch(n.elifs[i].first);
-    //     SemanticInfo& condition_info = *condition_info_p;
-    //     if (condition_info.type() != T_BOOL) {
-    //         this->error_reporter.condition(condition_info.type(), n.start, "elif");
-    //     }
-    //     this->enter_scope("elif");
-    //     this->visit_block(*n.elifs[i].second);
-    //     this->leave_scope();
-    // }
+    for (size_t i = 0; i < n.elifs.size(); i++) {
+        USemanticInfo elif_condition_info_p = this->dispatch(n.elifs[i].first);
+        SemanticInfo& elif_condition_info = *elif_condition_info_p;
+        if (elif_condition_info.entity.type != E_TYPE::OBJECT_VALUE) {
+            throw std::runtime_error("If condition should be a Boolean");
+        }
+        if (*elif_condition_info.entity.object_value->ot != T_BOOL) {
+            throw std::runtime_error("If condition should be a Boolean");
+        }
+        this->enter_scope("elif");
+        USemanticInfo elif_block_info = this->visit_block(*n.elifs[i].second);
+        this->leave_scope();
+        elifs.push_back(std::make_pair(elif_condition_info.snode, (BlockSNode*) elif_block_info->snode));
+    }
     USemanticInfo else_info;
     if (n.selse != nullptr && !n.selse->nodes.empty()) {
         this->enter_scope("else");
@@ -1157,7 +1170,7 @@ USemanticInfo Checker::visit(IfNode& n) {
         this->leave_scope();
     }
 
-    info.snode = make_if_snode(condition_info.snode, body_info->snode, else_info->snode);
+    info.snode = make_if_snode(condition_info.snode, body_info->snode, elifs, else_info->snode);
 
     return std::make_unique<SemanticInfo>(info);
 }
