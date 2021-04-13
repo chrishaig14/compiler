@@ -172,7 +172,8 @@ std::string STranspiler::transpile_while(WhileSNode* sn) {
     std::string out;
     std::string cond_out = this->dispatch(sn->condition);
     std::string body_out = this->transpile_block(sn->body);
-    out += "while" + SPACE + LPAREN + cond_out + RPAREN + SPACE + LCURLY + body_out + RCURLY;
+    out += "while" + SPACE + LPAREN + "GET_BOOL" + LPAREN + cond_out + RPAREN + RPAREN + SPACE + LCURLY + body_out +
+           RCURLY;
     return out;
 }
 
