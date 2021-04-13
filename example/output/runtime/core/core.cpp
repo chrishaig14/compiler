@@ -33,7 +33,7 @@ TaggedObject* core_D_range_f(TaggedObject* _start, TaggedObject* _step, TaggedOb
     XList* r = CAST(NEW(XList, (end - start) / step), XList);
     std::vector<TaggedObject*>* v = &r->lv;
     int k = 0;
-    for (int i = start; i < end; i += step) {
+    for (size_t i = start; i < end; i += step) {
         (*v)[k] = MAKE_INT(i);
         k++;
     }
@@ -95,7 +95,7 @@ TaggedObject* core_D_map_f(TaggedObject* _l, TaggedObject* _f) {
     Function1* f = CAST(_f, Function1);
     TaggedObject* _r = NEW(XList, l->l->size());
     XList* r = CAST(_r, XList);
-    for (int i = 0; i < l->l->size(); i++) {
+    for (size_t i = 0; i < l->l->size(); i++) {
         TaggedObject* p = (*f)((*(l->l))[i]);
         r->l->at(i) = p;
     }
@@ -108,7 +108,7 @@ TaggedObject* core_D_join_f(TaggedObject* _l, TaggedObject* _s) {
     std::vector<TaggedObject*>* l = (std::vector<TaggedObject*>*) _l;
     std::string s;
     std::string js = *(std::string*) (_s);
-    for (int i = 0; i < l->size(); i++) {
+    for (size_t i = 0; i < l->size(); i++) {
         s += *(std::string*) ((*l)[i]) + js;
     }
     s = s.substr(0, s.size() - js.size());
@@ -196,7 +196,7 @@ TaggedObject* core_D_String_D___sub___f(TaggedObject* a, TaggedObject* b) {
 #define FUNCTION_RAW_NAME(x) x##_f
 #define FUNCTION_OBJECT_NAME(x) x##_o
 #define FUNCTION_OBJECT(n, x) Function##n FUNCTION_OBJECT_NAME(x) = Function##n(FUNCTION_RAW_NAME(x));
-#define DEFINE_FUNCTION(n, x) FUNCTION_OBJECT(n, x); TaggedObject* x = FTAG(&FUNCTION_OBJECT_NAME(x));
+#define DEFINE_FUNCTION(n, x) FUNCTION_OBJECT(n, x) TaggedObject* x = FTAG(&FUNCTION_OBJECT_NAME(x));
 
 DEFINE_FUNCTION(1, core_D_open)
 DEFINE_FUNCTION(1, core_D_print)

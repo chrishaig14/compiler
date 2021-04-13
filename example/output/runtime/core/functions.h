@@ -137,7 +137,7 @@ public:
         std::vector<TaggedObject*> cur_args = {a0};
         std::vector<TaggedObject*> args(this->p.size(), nullptr);
         int k = 0;
-        for (int i = 0; i < this->p.size(); i++) {
+        for (size_t i = 0; i < this->p.size(); i++) {
             if (this->p[i] == nullptr) {
                 args[i] = cur_args[k];
                 k++;
@@ -170,7 +170,7 @@ public:
         std::vector<TaggedObject*> cur_args = {a0, a1};
         std::vector<TaggedObject*> args(this->p.size(), nullptr);
         int k = 0;
-        for (int i = 0; i < this->p.size(); i++) {
+        for (size_t i = 0; i < this->p.size(); i++) {
             if (this->p[i] == nullptr) {
                 args[i] = cur_args[k];
                 k++;

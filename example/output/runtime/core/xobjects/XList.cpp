@@ -14,10 +14,10 @@ TaggedObject* m_core_c_List_f_add_f(TaggedObject* _a, TaggedObject* _b) {
     auto lv = r->lv;
     int sa = a->l->size();
     int sb = b->l->size();
-    for (int i = 0; i < sa; i++) {
+    for (size_t i = 0; i < sa; i++) {
         lv[i] = a->lv[i];
     }
-    for (int i = sa; i < sb; i++) {
+    for (size_t i = sa; i < sb; i++) {
         lv[i] = b->lv[i - sa];
     }
     GC::assign(_a, nullptr);
@@ -42,7 +42,7 @@ XList::XList(int n) : XObject("XList"), lv(n, nullptr) {
 
 TaggedObject* XList::__eq__(TaggedObject* pObject) {
     XList* other = CAST(pObject, XList);
-    for (int i = 0; i < this->l->size(); i++) {
+    for (size_t i = 0; i < this->l->size(); i++) {
         if (EQ((*this->l)[i], (*other->l)[i]) == MAKE_BOOL(false)) {
             return MAKE_BOOL(false);
         }
@@ -53,7 +53,7 @@ TaggedObject* XList::__eq__(TaggedObject* pObject) {
 XList::~XList() {
     if (this->l->size() != 0) {
         if (has_tag(this->l->at(0), OBJECT_TAG)) {
-            for (int i = 0; i < this->l->size(); i++) {
+            for (size_t i = 0; i < this->l->size(); i++) {
                 if (has_tag(this->l->at(i), FUNCTION_TAG)) {
                     continue;
                 }

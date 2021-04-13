@@ -22,7 +22,7 @@ int hash(TaggedObject* n) {
     } else {
         XString* s = CAST(n, XString);
         const std::string& str = s->s;
-        for (int i = 0; i < str.size(); i++) {
+        for (size_t i = 0; i < str.size(); i++) {
             h += int(str[i]);
         }
     }

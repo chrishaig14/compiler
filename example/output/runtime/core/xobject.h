@@ -47,7 +47,7 @@ inline TaggedObject* MAKE_FLOAT(float x) {
 inline float GET_FLOAT(TaggedObject* x) {
     unsigned long p = (unsigned long) x >> 32;
     return *(float*) &p;
-};
+}
 
 inline TaggedObject* MAKE_INT(long x) {
     return (TaggedObject*) ((unsigned long) x << 3 | INT_TAG);
@@ -64,7 +64,7 @@ inline bool GET_BOOL(TaggedObject* x) {
 
 inline long GET_INT(TaggedObject* x) {
     return (long) x >> 3;
-};
+}
 
 
 
