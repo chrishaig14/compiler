@@ -411,8 +411,6 @@ bool Checker::is_variable(const ObjectType& a) {
 USemanticInfo Checker::dispatch(Node* nod) {
     auto& n = *nod;
     switch (n.ntype) {
-        case NodeType::METHOD:
-            return this->visit(n.method());
         case NodeType::ASSIGN:
             return this->visit(n.assign());
         case NodeType::BINOP: {

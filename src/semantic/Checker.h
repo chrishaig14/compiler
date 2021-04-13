@@ -110,7 +110,6 @@ public:
     USemanticInfo visit(BooleanNode& node);
     USemanticInfo visit(BoolOpNode& n);
     USemanticInfo visit(BreakNode& node);
-    USemanticInfo visit(MethodNode& node);
     USemanticInfo visit_call(CallNode& n);
     USemanticInfo visit_class(ClassNode& node);
     USemanticInfo visit(ContinueNode& node);

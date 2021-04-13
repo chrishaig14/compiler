@@ -508,11 +508,15 @@ USemanticInfo Checker::visit(ForNode& node) {
         throw std::runtime_error("iterating over something that's not an object");
     }
 
-    dsn->identifier = "__loop_list__";
+    const char* loop_list_var_id = "__loop_list__";
+    const char* loop_index_var_id = "__loop_index__";
+    const char* loop_list_len_var_id = "__loop_list_len__";
+
+    dsn->identifier = loop_list_var_id;
     dsn->expression = exp_info_p->snode;
     bbn->nodes.push_back(dsn);
     DeclarationSNode* lidx_decl = new DeclarationSNode();
-    lidx_decl->identifier = "__loop_index__";
+    lidx_decl->identifier = loop_index_var_id;
     IntegerSNode* init_idx = new IntegerSNode();
     init_idx->str = "0";
     lidx_decl->expression = init_idx;
@@ -520,26 +524,25 @@ USemanticInfo Checker::visit(ForNode& node) {
     bbn->nodes.push_back(lidx_decl);
 
     DeclarationSNode* lensn = new DeclarationSNode();
-    lensn->identifier = "__loop_list_len__";
+    lensn->identifier = loop_list_len_var_id;
     CallSNode* call_list_len_sn = new CallSNode();
     IdSNode* list_len_fn = new IdSNode("core.List.len");
     call_list_len_sn->function = list_len_fn;
-    IdSNode* list_sn = new IdSNode("__loop_list__");
-    call_list_len_sn->arguments.push_back(list_sn);
+    IdSNode* list_sn = new IdSNode(loop_list_var_id);
+    call_list_len_sn->arguments = {list_sn};
     lensn->expression = call_list_len_sn;
     bbn->nodes.push_back(lensn);
 
 
-    IdSNode* idxsn = new IdSNode("__loop_index__");
+    IdSNode* idxsn = new IdSNode(loop_index_var_id);
     CallSNode* cn = new CallSNode();
     IdSNode* cmpfunsn = new IdSNode("core.Integer.lt");
 
-    IdSNode* llensn = new IdSNode("__loop_list_len__");
+    IdSNode* llensn = new IdSNode(loop_list_len_var_id);
 
 
     cn->function = cmpfunsn;
-    cn->arguments.push_back(idxsn);
-    cn->arguments.push_back(llensn);
+    cn->arguments = {idxsn, llensn};
 
     wsn->condition = cn;
 
@@ -557,8 +560,8 @@ USemanticInfo Checker::visit(ForNode& node) {
 
     CallSNode* list_subscript_n = new CallSNode();
     list_subscript_n->function = new IdSNode("core.List.__sub__");
-    list_subscript_n->arguments.push_back(new IdSNode("__loop_list__"));
-    list_subscript_n->arguments.push_back(new IdSNode("__loop_index__"));
+    list_subscript_n->arguments.push_back(new IdSNode(loop_list_var_id));
+    list_subscript_n->arguments.push_back(new IdSNode(loop_index_var_id));
 
 
     loop_elem_sn->expression = list_subscript_n;
@@ -566,10 +569,10 @@ USemanticInfo Checker::visit(ForNode& node) {
     bn->nodes.insert(bn->nodes.begin(), loop_elem_sn);
 
     AssignmentSNode* increment_index_sn = new AssignmentSNode();
-    increment_index_sn->lvalue = new IdSNode("__loop_index__");
+    increment_index_sn->lvalue = new IdSNode(loop_index_var_id);
     CallSNode* inc_exp_node = new CallSNode();
     inc_exp_node->function = new IdSNode("core.Integer.add");
-    inc_exp_node->arguments.push_back(new IdSNode("__loop_index__"));
+    inc_exp_node->arguments.push_back(new IdSNode(loop_index_var_id));
     IntegerSNode* one_node = new IntegerSNode();
     one_node->str = "1";
     inc_exp_node->arguments.push_back(one_node);
@@ -577,73 +580,7 @@ USemanticInfo Checker::visit(ForNode& node) {
 
     bn->nodes.push_back(increment_index_sn);
     wsn->body = bn;
-
-    // IdNode* lid = new IdNode("List.len", POS_NONE, POS_NONE);
-    // lid->is_global_function = true;
-    // CallNode* len_call = new CallNode(lid, {new IdNode("_list0", POS_NONE, POS_NONE)}, POS_NONE, POS_NONE);
-    // len_call->arg_types.push_back(obj.clone());
-    // Node* new_condition = new BoolOpNode(BoolOp::LT, new IdNode("_index0", POS_NONE, POS_NONE), len_call);
-    //
-    // BlockNode* new_body = new BlockNode({}, POS_NONE, POS_NONE);
-    // new_body->nodes.push_back(new DeclarationNode(node.var,
-    //                                               obj.type_params[0]->clone(),
-    //                                               new SubscriptNode(new IdNode("_list0", POS_NONE, POS_NONE),
-    //                                                                 {new IdNode("_index0", POS_NONE, POS_NONE)},
-    //                                                                 POS_NONE,
-    //                                                                 POS_NONE)));
-    // new_body->nodes.insert(new_body->nodes.end(), node.body->nodes.begin(), node.body->nodes.end());
-    // AssignmentNode* asn = new AssignmentNode(new IdNode("_index0", POS_NONE, POS_NONE),
-    //                                          new BinopNode(OpType::ADD,
-    //                                                        new IdNode("_index0", POS_NONE, POS_NONE),
-    //                                                        new NumberNode(NumberType::INTEGER, "1")),
-    //                                          POS_NONE,
-    //                                          POS_NONE);
-    // asn->type = new T_INT;
-    // new_body->nodes.push_back(asn);
-    //
-    // TypeNode& var_type = *obj.type_params[0];
-    // BlockNode* bn = new BlockNode({new DeclarationNode("_index0", new T_INT, new NumberNode(NumberType::INTEGER, "0")),
-    //                                new DeclarationNode("_list0", obj.clone(), node.exp),}, POS_NONE, POS_NONE);
-    // this->visit_block(*bn);
-    // this->enter_scope("for");
-    // // this->scope->set(node.var, var_type);
-    //
-    // this->scope->is_loop = true;
-    // this->visit_block(*node.body);
-    // this->scope->is_loop = false;
-    // this->dispatch(new_body->nodes[0]->decl().expression);
-    // this->dispatch(new_body->nodes[new_body->nodes.size() - 1]->assign().rvalue);
-    // // for (auto v: this->scope->table) {
-    // //     new_body->local_vars.push_back(std::make_pair(v.first, v.second->clone()));
-    // // }
-    // this->leave_scope();
-    // this->replacement = bn;
-    // this->replace_me = true;
-    // bn->nodes.push_back(new WhileNode(new_condition, new_body, POS_NONE, POS_NONE));
-    // node.body = nullptr;
-    // node.exp = nullptr;
     return std::make_unique<SemanticInfo>(rinfo);
-}
-
-USemanticInfo Checker::visit(MethodNode& n) {
-    // USemanticInfo parent = this->dispatch(n.parent);
-    // n.parent_t = parent->type().clone();
-    // if (n.parent_t->kind != Kind::OBJECT) {
-    //     throw std::runtime_error("Cannot call a method on a function");
-    // }
-    // Class* class_info = nullptr;//this->class_table->get("asdf");
-    // SemanticInfo info;
-    // if (class_info->methods.find(n.s_child) == class_info->methods.end()) {
-    //     throw std::runtime_error("Error " + n.parent_t->to_string() + " has no method " + n.s_child);
-    // }
-    // FunctionType* ft = class_info->methods[n.s_child];
-    // info.set_type(*ft);
-    // info.is_function = true;
-    // info.is_method = true;
-    // info.class_info = class_info;
-    // n.actual_function_name = class_info->class_name + "." + n.s_child;
-    // n.n_partial = ft->param_types.size();
-    // return std::make_unique<SemanticInfo>(info);
 }
 
 TypeNode* get_entity_type(Entity e) {
