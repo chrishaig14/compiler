@@ -277,8 +277,10 @@ std::string ErrorReporter::context_string(TextPosition position) {
 }
 
 std::string ErrorReporter::code_context_string(TextPosition position) {
-    std::string str = "\n" + this->code_lines.get_line(position.line) + "\n";
-    str += fmt::format(fmt::fg(fmt::color::orange_red), std::string(position.column, ' ') + std::string(1, '^'));
+    std::string line_number = std::to_string(position.line + 1) + "|    ";
+    std::string str = "\n" + line_number + this->code_lines.get_line(position.line) + "\n";
+    str += fmt::format(fmt::fg(fmt::color::orange_red),
+                       std::string(line_number.size() + position.column, ' ') + std::string(1, '^'));
     return str;
 }
 
