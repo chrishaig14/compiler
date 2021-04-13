@@ -752,7 +752,8 @@ USemanticInfo Checker::visit_call(CallNode& n) {
 }
 
 USemanticInfo Checker::visit_root(BlockNode& node) {
-    this->error_reporter.code_lines = code_lines;
+    this->error_reporter.code_lines = this->code_lines;
+    this->error_reporter.__file__ = this->__file__;
 
     // Initialize module level Scope
     for (auto f: this->module->flirpins) {
