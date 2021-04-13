@@ -70,27 +70,25 @@ public:
     BlockSNode* root_snode;
     Module* module;
     bool is_call;
+    bool failed;
+    CodeLines code_lines;
 
     Checker();
+    ~Checker();
+
     bool can_assign(const TypeNode& from, const TypeNode& to);
     bool can_assign_generic(TypeNode& from, TypeNode& to, VectorOfStrings type_params);
     bool is_immutable(const TypeNode& node);
 
-
-    Class* instantiate_generic(Class* generic, const ObjectType& instance);
     void enter_scope(std::string name);
     void leave_scope();
 
-    VectorOfTypes get_replacements_in_order(const FunctionType& function_type, VectorOfTypes arg_types);
-    ~Checker();
     bool assert_type_exists(TypeNode& type, TextPosition pos);
-    bool failed;
-    std::string context_string(TextPosition position);
-    CodeLines code_lines;
-    std::string code_context_string(TextPosition position);
 
-    std::string code_error_string(TextPosition start, TextPosition end);
+    Class* instantiate_generic(Class* generic, const ObjectType& instance);
+
     bool is_variable(const ObjectType& a);
+    VectorOfTypes get_replacements_in_order(const FunctionType& function_type, VectorOfTypes arg_types);
     std::pair<std::string, TypeNode*>*
     get_first_substitution_function(FunctionType& a, FunctionType& b, bool is_top_level_arg);
     std::pair<std::string, TypeNode*>*

@@ -478,9 +478,9 @@ USemanticInfo Checker::visit(PartialApplication& node) {
             USemanticInfo arg = this->dispatch(node.args[i]);
             if (arg->type() != *func->type().function().param_types[i]) {
                 this->error_reporter.partial_function_call_type_mismatch(*func->type().function().param_types[i],
-                                                                          arg->type(),
-                                                                          node.args[i]->start,
-                                                                          node.args[i]->end);
+                                                                         arg->type(),
+                                                                         node.args[i]->start,
+                                                                         node.args[i]->end);
                 return error_stub();
             }
         } else {
@@ -754,9 +754,9 @@ USemanticInfo Checker::visit_call(CallNode& n) {
                 if (arg_type != param_type) {
                     if (arg_type.kind != Kind::UNKNOWN) {
                         this->error_reporter.function_call_type_mismatch(param_type,
-                                                                          arg_type,
-                                                                          n.arguments[i]->start,
-                                                                          n.arguments[i]->end);
+                                                                         arg_type,
+                                                                         n.arguments[i]->start,
+                                                                         n.arguments[i]->end);
                     }
                     return std::make_unique<SemanticInfo>(retv);
                 }
