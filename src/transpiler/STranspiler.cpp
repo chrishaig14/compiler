@@ -152,7 +152,11 @@ std::string STranspiler::transpile_new(NewObjectSNode* node) {
     std::string class_id = path_to_id(node->class_name);
     out += "NEW(" + class_id + COMMA + SPACE;
     for (auto m: node->args) {
-        out += this->dispatch(m) + COMMA + SPACE;
+        if (m != nullptr) {
+            out += this->dispatch(m) + COMMA + SPACE;
+        } else {
+            out += "nullptr" + COMMA + SPACE;
+        }
     }
     if (node->args.size() != 0) {
         out = out.substr(0, out.size() - 2);

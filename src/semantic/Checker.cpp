@@ -81,9 +81,9 @@ Class* make_int_class_info() {
 
     std::map<std::string, std::string> static_methods;
     static_methods["add"] = "fun(Integer,Integer)->Integer";
-    static_methods["sub"] = "fun(Integer,Integer)->Boolean";
-    static_methods["mul"] = "fun(Integer,Integer)->Boolean";
-    static_methods["div"] = "fun(Integer,Integer)->Boolean";
+    static_methods["sub"] = "fun(Integer,Integer)->Integer";
+    static_methods["mul"] = "fun(Integer,Integer)->Integer";
+    static_methods["div"] = "fun(Integer,Integer)->Integer";
     static_methods["lt"] = "fun(Integer,Integer)->Boolean";
     static_methods["gt"] = "fun(Integer,Integer)->Boolean";
     static_methods["eq"] = "fun(Integer,Integer)->Boolean";

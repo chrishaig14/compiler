@@ -473,27 +473,45 @@ USemanticInfo Checker::visit(FloatNode& node) {
 USemanticInfo Checker::visit(PartialApplication& node) {
     USemanticInfo func = this->dispatch(node.function);
     VectorOfTypes partial_args;
-    if (node.args.size() != func->type().function().param_types.size()) {
+    FunctionType* fun_type = nullptr;
+    if (func->entity.type == E_TYPE::CONST_FUNCTION) {
+        fun_type = func->entity.const_function->ft->clone();
+    }
+    if (func->entity.type == E_TYPE::FUNCTION_VALUE) {
+        fun_type = func->entity.const_function->ft->clone();
+    }
+    if (node.args.size() != fun_type->param_types.size()) {
         this->error_reporter.partial_wrong_num_args(node.start);
         return error_stub();
     }
+    std::vector<SNode*> snodes;
+    int npartial = 0;
     for (size_t i = 0; i < node.args.size(); i++) {
         if (node.args[i] != nullptr) {
             USemanticInfo arg = this->dispatch(node.args[i]);
-            if (arg->type() != *func->type().function().param_types[i]) {
-                this->error_reporter.partial_function_call_type_mismatch(*func->type().function().param_types[i],
-                                                                         arg->type(),
+            if (*arg->entity.object_value->ot != *fun_type->param_types[i]) {
+                this->error_reporter.partial_function_call_type_mismatch(*fun_type->param_types[i],
+                                                                         *arg->entity.object_value->ot,
                                                                          node.args[i]->start,
                                                                          node.args[i]->end);
                 return error_stub();
             }
+            snodes.push_back(arg->snode);
         } else {
-            partial_args.push_back(func->type().function().param_types[i]->clone());
+            partial_args.push_back(fun_type->param_types[i]->clone());
+            snodes.push_back(nullptr);
+            npartial++;
         }
     }
-    node.complete_type = &func->type().clone()->function();
+    node.complete_type = &fun_type->clone()->function();
     SemanticInfo s;
-    s.set_type(FunctionType(partial_args, func->type().function().return_type->clone()));
+    s.entity = Entity{.type=E_TYPE::FUNCTION_VALUE, .function_value=new FunctionValue()};
+    s.entity.function_value->ft = new FunctionType(partial_args, fun_type->return_type->clone());
+    NewObjectSNode* non = new NewObjectSNode();
+    non->class_name = "Partial" + std::to_string(npartial);
+    non->args = snodes;
+    non->args.insert(non->args.begin(), func->snode);
+    s.snode = non;
     return std::make_unique<SemanticInfo>(s);
 }
 
