@@ -149,6 +149,7 @@ public:
     USemanticInfo visit(DefaultConstructorNode& node);
 
     ErrorReporter error_reporter;
+    Entity this_entity;
 };
 
 bool function_is_generic(const FunctionType& ft);
