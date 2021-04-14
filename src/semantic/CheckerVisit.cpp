@@ -1035,6 +1035,13 @@ USemanticInfo Checker::visit(AssignmentNode& n) {
     //     this->error_reporter.function_doesnt_return_a_value(n.rvalue->start, &linfo_p->type());
     //     return nullptr;
     // }
+
+    if (linfo_p->entity.type == E_TYPE::OBJECT_VALUE && expression_info_p->entity.type == E_TYPE::CONST_FUNCTION) {
+        throw std::runtime_error(
+                "error, can't assign expression " + expression_info_p->entity.const_function->ft->to_string() + " to " +
+                linfo_p->entity.object_value->ot->to_string());
+    }
+
     if (expression_info_p->is_error) {
         return nullptr;
     }

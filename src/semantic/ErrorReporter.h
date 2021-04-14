@@ -13,6 +13,8 @@
 
 class ErrorReporter {
 public:
+    ErrorReporter();
+
     CodeLines code_lines;
     void assignment(const TypeNode& expected, const TypeNode& actual, TextPosition position);
     void bad_return(TextPosition position);
