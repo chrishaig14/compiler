@@ -915,6 +915,11 @@ USemanticInfo Checker::visit_id(IdNode& n) {
     IdSNode* sn = new IdSNode();
     info.snode = sn;
     Entity entity = this->scope->get(n._id);
+    if (entity.type == E_TYPE::NOT_FOUND) {
+        this->error_reporter.variable_not_declared(n._id, n.start);
+        this->scope->set(n._id, Entity{.type=E_TYPE::ERROR});
+        return error_stub();
+    }
     sn->identifier = n._id;
     if (entity.type == E_TYPE::CONST_FUNCTION) {
         sn->identifier = entity.const_function->full_path;
@@ -1249,7 +1254,9 @@ USemanticInfo Checker::visit(BoolOpNode& n) {
     USemanticInfo left_info_p = this->dispatch(n.left);
     USemanticInfo right_info_p = this->dispatch(n.right);
     SemanticInfo info;
-
+    if (left_info_p->entity.type == E_TYPE::ERROR || right_info_p->entity.type == E_TYPE::ERROR) {
+        return error_stub();
+    }
     if (left_info_p->entity.type != E_TYPE::OBJECT_VALUE || right_info_p->entity.type != E_TYPE::OBJECT_VALUE) {
         throw std::runtime_error("Can't have binop between 2 non objects!");
     }
@@ -1318,6 +1325,9 @@ USemanticInfo Checker::visit(BinopNode& n) {
     USemanticInfo left_info_p = this->dispatch(n.left);
     Node* left_replace = this->replace_if_necessary(n.left);
     USemanticInfo right_info_p = this->dispatch(n.right);
+    if (left_info_p->entity.type == E_TYPE::ERROR || right_info_p->entity.type == E_TYPE::ERROR) {
+        return error_stub();
+    }
     if (left_info_p->entity.type != E_TYPE::OBJECT_VALUE || right_info_p->entity.type != E_TYPE::OBJECT_VALUE) {
         throw std::runtime_error("Can't have binop between 2 non objects!");
     }

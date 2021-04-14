@@ -44,7 +44,7 @@ Entity SymbolTable::get(const std::string& name) {
     if (this->parent != nullptr) {
         return this->parent->get(name);
     }
-    throw std::runtime_error("Symbol " + name + " not found in scope");
+    return Entity{.type=E_TYPE::NOT_FOUND};
 }
 
 bool SymbolTable::declared(const std::string& name) {
