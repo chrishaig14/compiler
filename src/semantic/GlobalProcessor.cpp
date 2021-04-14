@@ -40,6 +40,7 @@ void GlobalProcessor::visit(FunctionNode& node) {
     ConstFunction* const_function = new ConstFunction();
     const_function->ft = function_info.clone();
     const_function->full_path = this->module->full_path + "." + node.identifier;
+    node.full_path = const_function->full_path;
     this->module->flirpins[node.identifier] = Flirpin{.type=F_TYPE::CONST_FUNCTION, .const_function=const_function};
 }
 
@@ -50,8 +51,8 @@ void GlobalProcessor::visit(BlockNode& node) {
 }
 
 void GlobalProcessor::visit(ClassNode& node) {
-    std::string mangled_name = mangle_class_name(this->module_name, node.class_name);
     Class* class_info = new Class();
+    class_info->full_path = this->module->full_path + "." + node.class_name;
     for (auto mn: node.members_ordered) {
         auto mt = node.members[mn];
         class_info->member_names.push_back(mn);
@@ -73,6 +74,7 @@ void GlobalProcessor::visit(ClassNode& node) {
 
         ConstFunction* cf = new ConstFunction();
         cf->full_path = class_info->full_path + "." + f.first;
+        method.full_path = cf->full_path;
         cf->ft = new FunctionType(x, method.return_type->clone());
         class_info->methods.insert(make_pair(f.first, cf));
 

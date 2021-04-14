@@ -5,6 +5,8 @@
 #include "Checker.h"
 #include "../simple_nodes/IdSNode.h"
 #include "../simple_nodes/ObjectMemberSNode.h"
+#include "../simple_nodes/NewObjectSNode.h"
+#include "../units/FunctionValue.h"
 
 std::pair<std::string, TypeNode*>*
 Checker::get_first_substitution_object(ObjectType& a, ObjectType& b, bool is_top_level_arg) {
@@ -176,10 +178,22 @@ USemanticInfo Checker::object_member(SNode* object_snode, ObjectValue* pValue, s
             // method call
             info.this_arg = object_snode;
             info.snode = idn;
+            info.entity = Entity{.type=E_TYPE::CONST_FUNCTION, .const_function=clazz->methods[child]};
         } else {
             // return partial
+            int npartial = clazz->methods[child]->ft->param_types.size();
+            NewObjectSNode* non = new NewObjectSNode();
+            non->class_name = "Partial" + std::to_string(npartial);
+            IdSNode* method_snode = new IdSNode(clazz->methods[child]->full_path);
+            non->args = {method_snode, object_snode};
+            for (int i = 0; i < npartial; i++) {
+                non->args.push_back(nullptr);
+            }
+            info.snode = non;
+            FunctionValue* fv = new FunctionValue();
+            fv->ft = clazz->methods[child]->ft->clone();
+            info.entity = Entity{.type=E_TYPE::FUNCTION_VALUE, .function_value=fv};
         }
-        info.entity = Entity{.type=E_TYPE::CONST_FUNCTION, .const_function=clazz->methods[child]};
 
     } else {
         throw std::runtime_error("Error member/method '" + child + "' not found in class '" + clazz->class_name + "'");

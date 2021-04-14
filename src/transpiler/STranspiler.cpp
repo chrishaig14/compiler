@@ -44,12 +44,22 @@ std::string STranspiler::transpile_id(IdSNode* node) {
         throw std::runtime_error("Error: tranpiling empty idnode!");
     }
     std::string out;
+    if (node->identifier == "this") {
+        node->identifier = "this_obj";
+    }
     out += path_to_id(node->identifier);
     return out;
 }
 
 void STranspiler::transpile_function(FunctionSNode* node) {
     std::string parameters;
+
+    for (int i = 0; i < node->params.size(); i++) {
+        if (node->params[i] == "this") {
+            node->params[i] = "this_obj";
+        }
+    }
+
     for (auto pn: node->params) {
         std::string parameter = TOBJECT + SPACE + pn;
         parameters += parameter + COMMA + SPACE;

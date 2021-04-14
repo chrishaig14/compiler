@@ -369,6 +369,7 @@ USemanticInfo Checker::visit_class(ClassNode& node) {
         this->add_this = true;
         this->this_entity = Entity{.type=E_TYPE::OBJECT_VALUE, .object_value=new ObjectValue()};
         this->this_entity.object_value->ot = new ObjectType(node.class_name);
+        // method.second->full_path = clazz->full_path + "." + method.second->identifier;
         USemanticInfo method_info = this->visit_function(*method.second);
         methods_snodes.push_back(method_info->snode);
         has_init = has_init || method.first == "init";
@@ -836,7 +837,7 @@ USemanticInfo Checker::visit_function(FunctionNode& n) {
     info.snode = sn;
     Logger::info("Checking FunctionNode " + n.identifier);
     std::string& function_name = n.identifier;
-    sn->identifier = mangle_path(this->module->full_path + "." + n.identifier);
+    sn->identifier = n.full_path;
     sn->params = n.parameter_names;
     this->current_function = function_name;
     this->enter_scope(function_name);
