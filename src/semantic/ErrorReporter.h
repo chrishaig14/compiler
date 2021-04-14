@@ -16,6 +16,10 @@ public:
     ErrorReporter();
 
     CodeLines code_lines;
+    bool failed;
+
+    ErrorReporter();
+
     void assignment(const TypeNode& expected, const TypeNode& actual, TextPosition position);
     void bad_return(TextPosition position);
     void binop(const TypeNode& left, const TypeNode& right, TextPosition position);
@@ -30,7 +34,6 @@ public:
     void no_return(const TypeNode& t, TextPosition position);
     void class_no_method(const std::string& class_name, const std::string method_name, TextPosition pos);
     void return_mismatch(const TypeNode& expected, const TypeNode& actual, TextPosition position);
-    bool failed;
     std::string context_string(TextPosition position);
     std::string code_context_string(TextPosition position);
     std::string code_string(TextPosition start, TextPosition end);

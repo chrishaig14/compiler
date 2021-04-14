@@ -277,14 +277,15 @@ Node* Parser::parse_factor() {
     parent = this->parse_call_or_subscript_chain(parent);
     while (this->match(TokType::DOT) || this->match(TokType::COLON)) {
         if (this->match(TokType::DOT)) {
+            Token dot_tok = this->token;
             this->next();
             Token tok;
             if (this->match(TokType::INTEGER)) {
                 tok = this->expect_token(TokType::INTEGER);
-                parent = new MemberNode(parent, std::atoi(tok.str.c_str()), parent->start, tok.end_pos);
+                parent = new MemberNode(parent, std::atoi(tok.str.c_str()), parent->start,dot_tok.start, tok.end_pos);
             } else {
                 tok = this->expect_token(TokType::ID);
-                parent = new MemberNode(parent, tok.str, parent->start, tok.end_pos);
+                parent = new MemberNode(parent, tok.str, parent->start, dot_tok.start, tok.end_pos);
             }
         } else if (this->match(TokType::COLON)) {
             this->next();

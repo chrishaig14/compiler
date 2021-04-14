@@ -22,6 +22,7 @@
 #include "../simple_nodes/WhileSNode.h"
 #include "../simple_nodes/ListSNode.h"
 #include "../simple_nodes/IfSNode.h"
+#include "../simple_nodes/ObjectMemberSNode.h"
 
 #define T_NONE ObjectType(".None")
 static TextPosition POS_NONE = {-1, -1};
@@ -773,7 +774,8 @@ USemanticInfo Checker::visit_call(CallNode& n) {
 }
 
 USemanticInfo Checker::visit_root(BlockNode& node) {
-    this->error_reporter.code_lines = code_lines;
+    this->error_reporter.code_lines = this->code_lines;
+    this->error_reporter.__file__ = this->__file__;
 
     // Initialize module level Scope
     for (auto f: this->module->flirpins) {
@@ -1121,17 +1123,17 @@ USemanticInfo Checker::visit_member(MemberNode& n) {
     Entity parent_entity = parent_info->entity;
     switch (parent_entity.type) {
         case E_TYPE::CLASS:
-            return this->class_member(parent_entity.clazz, n.s_child);
+            return this->class_member(n, parent_entity.clazz);
         case E_TYPE::CONST_FUNCTION:
-            throw std::runtime_error("Error: trying to get member of const function!");
+            this->error_reporter.member_no_object(n.start);
         case E_TYPE::FUNCTION_VALUE:
-            throw std::runtime_error("Error: trying to get member of function value!");
+            this->error_reporter.member_no_object(n.start);
         case E_TYPE::OBJECT_VALUE:
-            return this->object_member(parent_info->snode, parent_entity.object_value, n.s_child);
+            return this->object_member(n, parent_info->snode, parent_entity.object_value);
         case E_TYPE::PACKAGE:
-            return this->package_member(parent_entity.package, n.s_child);
+            return this->package_member(n, parent_entity.package);
         case E_TYPE::MODULE:
-            return this->module_member(parent_entity.module, n.s_child);
+            return this->module_member(n, parent_entity.module);
     }
     return error_stub();
 }
@@ -1318,13 +1320,16 @@ USemanticInfo Checker::visit(BinopNode& n) {
     USemanticInfo left_info_p = this->dispatch(n.left);
     Node* left_replace = this->replace_if_necessary(n.left);
     USemanticInfo right_info_p = this->dispatch(n.right);
+    if (left_info_p->entity.type == E_TYPE::ERROR || right_info_p->entity.type == E_TYPE::ERROR) {
+        return error_stub();
+    }
     if (left_info_p->entity.type != E_TYPE::OBJECT_VALUE || right_info_p->entity.type != E_TYPE::OBJECT_VALUE) {
         throw std::runtime_error("Can't have binop between 2 non objects!");
     }
     const TypeNode& ltype = *get_entity_type(left_info_p->entity);
     const TypeNode& rtype = *get_entity_type(right_info_p->entity);
     if (ltype != rtype) {
-        this->error_reporter.binop(ltype, rtype, n.start);
+        this->error_reporter.binop(ltype, rtype, n.op_pos);
         return error_stub();
         // throw std::runtime_error("Binary operation between values of different types: " + ltype.to_string() + " and " +
         //                          rtype.to_string());
@@ -1513,3 +1518,85 @@ USemanticInfo Checker::visit(DefaultConstructorNode& node) {
     return std::make_unique<SemanticInfo>(info);
 }
 
+USemanticInfo Checker::object_member(MemberNode& n, SNode* object_snode, ObjectValue* pValue) {
+    std::string child = n.s_child;
+    Class* clazz = this->scope->get(pValue->ot->id).clazz;
+    SemanticInfo info;
+    if (clazz->members.count(child)) {
+        info.entity = entity_from_type(*clazz->members[child]);
+        ObjectMemberSNode* omn = new ObjectMemberSNode();
+        omn->class_path = clazz->full_path;
+        omn->object = object_snode;
+        omn->member_name = child;
+        info.snode = omn;
+    } else if (clazz->methods.count(child)) {
+        IdSNode* idn = new IdSNode();
+        idn->identifier = clazz->full_path + "." + child;
+        if (this->is_call) {
+            // method call
+            info.this_arg = object_snode;
+            info.snode = idn;
+        } else {
+            // return partial
+        }
+        info.entity = Entity{.type=E_TYPE::CONST_FUNCTION, .const_function=clazz->methods[child]};
+
+    } else {
+        this->error_reporter.no_member(ObjectType(clazz->class_name), child, n.dot_pos);
+        return error_stub();
+    }
+    return std::make_unique<SemanticInfo>(info);
+}
+
+
+USemanticInfo Checker::package_member(MemberNode& n, Package* package) {
+    std::string child = n.s_child;
+    if (package->units.count(child) == 0) {
+        this->error_reporter.no_member(ObjectType(package->name), child, n.dot_pos);
+        return error_stub();
+    }
+    Unit unit = package->units[child];
+    SemanticInfo info;
+    info.entity = map_flirpin_to_entity(map_unit_to_flirpin(unit));
+    return std::make_unique<SemanticInfo>(info);
+}
+
+USemanticInfo Checker::module_member(MemberNode& n, Module* mod) {
+    std::string child = n.s_child;
+    if (mod->flirpins.count(child) == 0) {
+        this->error_reporter.no_member(ObjectType(mod->name), child, n.dot_pos);
+        return error_stub();
+    }
+    Flirpin flirpin = mod->flirpins[child];
+    SemanticInfo info;
+    info.entity = map_flirpin_to_entity(flirpin);
+    if (flirpin.type == F_TYPE::CONST_FUNCTION) {
+        IdSNode* idn = new IdSNode();
+        idn->identifier = flirpin.const_function->full_path;
+        info.snode = idn;
+    }
+    return std::make_unique<SemanticInfo>(info);
+}
+
+
+USemanticInfo Checker::class_member(MemberNode& n, Class* cls) {
+    std::string child = n.s_child;
+    SemanticInfo info;
+    if (cls->methods.find(child) != cls->methods.end()) {
+        ConstFunction* bound_method = cls->methods[child];
+        ConstFunction* unbound_method = new ConstFunction();
+        unbound_method->full_path = bound_method->full_path;
+        unbound_method->ft = bound_method->ft->clone();
+        unbound_method->ft->param_types.insert(unbound_method->ft->param_types.begin(),
+                                               new ObjectType(cls->class_name));
+        info.entity = Entity{.type=E_TYPE::CONST_FUNCTION, .const_function=unbound_method};
+    } else if (cls->static_methods.find(child) != cls->static_methods.end()) {
+        info.entity = Entity{.type=E_TYPE::CONST_FUNCTION, .const_function=cls->static_methods[child]};
+    } else if (cls->static_members.find(child) != cls->static_members.end()) {
+        info.entity = entity_from_type(*cls->static_members[child].first);
+    } else {
+        this->error_reporter.no_member(ObjectType(cls->class_name), child, n.dot_pos);
+        return error_stub();
+    }
+    return std::make_unique<SemanticInfo>(info);
+}
