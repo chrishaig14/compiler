@@ -41,10 +41,10 @@ public:
     void tuple_assign(TextPosition pos);
     void unused_return_value(TextPosition pos);
     void variable_not_declared(const std::string& name, TextPosition pos);
-    void member_no_object(TextPosition pos);
+    void function_no_member(TextPosition pos);
     void subscript_non_object(TextPosition pos);
     void string_immutable(TextPosition pos);
-    void member_no_object(const std::string& class_name, const std::string method_name, TextPosition pos);
+
     void tuple_member_not_immutable(const TypeNode& t, TextPosition pos);
     void
     class_init_bad_member_type(const TypeNode& cls, const TypeNode& expected, const TypeNode& actual, TextPosition pos);
@@ -68,6 +68,12 @@ public:
     std::string current_class;
     std::string current_function;
     std::string __file__;
+
+
+    void object_no_member(const TypeNode& t, const std::string& member, TextPosition position);
+    void class_no_member(const TypeNode& t, const std::string& member, TextPosition position);
+    void module_no_member(const std::string& module_name, const std::string& member, TextPosition position);
+    void package_no_member(const std::string& package_name, const std::string& member, TextPosition position);
 };
 
 

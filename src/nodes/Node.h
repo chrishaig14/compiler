@@ -172,6 +172,7 @@ public:
     virtual const PartialApplication& partial() const;
     virtual DefaultConstructorNode& defconst();
     virtual const DefaultConstructorNode& defconst() const;
+    TextPosition dot_pos;
 };
 
 #endif //NODE_H

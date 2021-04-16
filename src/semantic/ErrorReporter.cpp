@@ -23,6 +23,37 @@ void ErrorReporter::binop(const TypeNode& left, const TypeNode& right, TextPosit
     this->fail(msg);
 }
 
+void ErrorReporter::object_no_member(const TypeNode& t, const std::string& member, TextPosition position) {
+    std::string msg;
+    msg = this->context_string(position) + E_FMT("Object of type ") + E_HLT(t.to_string()) + E_FMT(" has no member ") +
+          E_HLT("'" + member + "'") + this->code_context_string(position);
+    this->fail(msg);
+}
+
+
+void ErrorReporter::class_no_member(const TypeNode& t, const std::string& member, TextPosition position) {
+    std::string msg;
+    msg = this->context_string(position) + E_FMT("Class ") + E_HLT(t.to_string()) + E_FMT(" has no member ") +
+          E_HLT("'" + member + "'") + this->code_context_string(position);
+    this->fail(msg);
+}
+
+void ErrorReporter::module_no_member(const std::string& module_name, const std::string& member, TextPosition position) {
+    std::string msg;
+    msg = this->context_string(position) + E_FMT("Module ") + E_HLT(module_name) + E_FMT(" has no member ") +
+          E_HLT("'" + member + "'") + this->code_context_string(position);
+    this->fail(msg);
+}
+
+void ErrorReporter::package_no_member(const std::string& package_name, const std::string& member, TextPosition position) {
+    std::string msg;
+    msg = this->context_string(position) + E_FMT("Package ") + E_HLT(package_name) + E_FMT(" has no member ") +
+          E_HLT("'" + member + "'") + this->code_context_string(position);
+    this->fail(msg);
+}
+
+
+
 void ErrorReporter::no_member(const TypeNode& t, const std::string& member, TextPosition position) {
     std::string msg;
     msg = this->context_string(position) + E_FMT("Type ") + E_HLT(t.to_string()) + E_FMT(" has no member ") +
@@ -134,9 +165,9 @@ void ErrorReporter::call_bad_num_args() {
     this->fail(msg);
 }
 
-void ErrorReporter::member_no_object(TextPosition pos) {
+void ErrorReporter::function_no_member(TextPosition pos) {
     std::string msg;
-    msg = this->context_string(pos) + E_FMT("Accessing member of non object ") + this->code_context_string(pos);
+    msg = this->context_string(pos) + E_FMT("Function has no members") + this->code_context_string(pos);
     this->fail(msg);
 }
 

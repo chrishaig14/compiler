@@ -129,9 +129,6 @@ public:
 
     USemanticInfo visit_member(MemberNode& n);
     USemanticInfo class_member(Class* cls, std::string child);
-    USemanticInfo object_member(SNode* object_snode, ObjectValue* pValue, std::string child);
-    USemanticInfo package_member(Package* package, std::string child);
-    USemanticInfo module_member(Module* pModule, std::string basicString);
 
     USemanticInfo visit(NoneNode& node);
     USemanticInfo visit_import(ImportNode& node);
@@ -150,6 +147,10 @@ public:
 
     ErrorReporter error_reporter;
     Entity this_entity;
+    USemanticInfo object_member(SNode* object_snode, ObjectValue* pValue, std::string child, MemberNode& n);
+    USemanticInfo class_member(Class* cls, std::string child, MemberNode& n);
+    USemanticInfo package_member(Package* package, std::string child, MemberNode& n);
+    USemanticInfo module_member(Module* mod, std::string child, MemberNode& n);
 };
 
 bool function_is_generic(const FunctionType& ft);
