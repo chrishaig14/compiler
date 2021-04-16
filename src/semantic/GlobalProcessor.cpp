@@ -70,18 +70,12 @@ void GlobalProcessor::visit(ClassNode& node) {
         for (auto p: method.parameter_types) {
             x.emplace_back(p->clone());
         }
-        // class_info->methods.insert(make_pair(f.first, new FunctionType(x, method.return_type->clone())));
 
         ConstFunction* cf = new ConstFunction();
         cf->full_path = class_info->full_path + "." + f.first;
         method.full_path = cf->full_path;
         cf->ft = new FunctionType(x, method.return_type->clone());
         class_info->methods.insert(make_pair(f.first, cf));
-
-        // (*this->module_mappings[this->module_name])[node.class_name + "." +
-        //                                             method.identifier] = mangle_method_name(this->module_name,
-        //                                                                                     node.class_name,
-        //                                                                                     method.identifier);
     }
 
     for (auto f: node.static_methods) {
@@ -93,45 +87,17 @@ void GlobalProcessor::visit(ClassNode& node) {
         }
         ConstFunction* cf = new ConstFunction();
         cf->full_path = class_info->full_path + "." + f.first;
+        method.full_path = cf->full_path;
         cf->ft = new FunctionType(x, method.return_type->clone());
         class_info->static_methods.insert(make_pair(f.first, cf));
-        // (*this->module_mappings[this->module_name])[node.class_name + "." +
-        //                                             method.identifier] = mangle_method_name(this->module_name,
-        //                                                                                     node.class_name,
-        //                                                                                     method.identifier);
     }
 
-
-    // if (!has_init) {
-    //     class_info->methods["init"] = new FunctionType(class_info->member_types, new ObjectType(node.class_name));
-    //     (*this->module_mappings[this->module_name])[node.class_name + "." +
-    //                                                 "init"] = mangle_method_name(this->module_name,
-    //                                                                              node.class_name,
-    //                                                                              "init");
-    // }
-    // class_info->methods["str"] = new FunctionType({}, new T_STRING);
-    // (*this->module_mappings[this->module_name])[node.class_name + "." + "str"] = mangle_method_name(this->module_name,
-    //                                                                                                 node.class_name,
-    //                                                                                                 "str");
     VectorOfTypes tp;
     for (size_t i = 0; i < node.type_parameters.size(); i++) {
         tp.push_back(new ObjectType(node.type_parameters[i]));
     }
-    // class_info->methods["eq"] = new FunctionType({new ObjectType(node.class_name, tp)}, new T_BOOL);
-    // (*this->module_mappings[this->module_name])[node.class_name + "." + "eq"] = mangle_method_name(this->module_name,
-    //                                                                                                node.class_name,
-    //                                                                                                "eq");
     class_info->class_name = node.class_name;
     class_info->type_params = node.type_parameters;
-    // if (this->module_mappings[this->module_name]->find(node.class_name) !=
-    //     this->module_mappings[this->module_name]->end()) {
-    //     std::string msg;
-    //     msg = E_FMT("Name ") + E_HLT(node.class_name) + E_FMT(" already declared at ") +
-    //           E_HLT(text_pos_to_string(this->__file__, node.start));
-    //     std::cout << msg << std::endl;
-    //     exit(1);
-    // }
-    // (*this->module_mappings[this->module_name])[node.class_name] = mangled_name;
     class_info->full_path = this->module->full_path + "." + class_info->class_name;
     this->module->flirpins[node.class_name] = Flirpin{.type=F_TYPE::CLASS, .clazz=class_info};
 }

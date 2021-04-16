@@ -392,50 +392,6 @@ USemanticInfo Checker::visit_class(ClassNode& node) {
 
     this->add_this = true;
     std::string eq_method_name = "eq";
-    // if (node.methods.find(eq_method_name) == node.methods.end()) {
-    //     auto eq_meth = generate_eq_method(node.class_name, tp, node.members_ordered);
-    //     node.methods[eq_method_name] = eq_meth;
-    //     this->is_method = true;
-    //     this->visit_function(*eq_meth);
-    // } else {
-    //     if (*node.methods[eq_method_name]->parameter_types[0] != *this->this_type ||
-    //         *node.methods[eq_method_name]->return_type != T_BOOL) {
-    //         std::string eq_method_type_string = "fun (" + this->this_type->to_string() + ") -> Boolean";
-    //         throw std::runtime_error("eq method MUST be of type " + eq_method_type_string);
-    //     }
-    // }
-    // std::string str_method_name = "str";
-    // if (node.methods.find(str_method_name) == node.methods.end()) {
-    //     auto str_meth = generate_str_method(node.class_name);
-    //     node.methods[str_method_name] = str_meth;
-    //     this->is_method = true;
-    //     this->visit_function(*str_meth);
-    // } else {
-    //     if (node.methods[str_method_name]->parameter_types.size() != 0 ||
-    //         *node.methods[str_method_name]->return_type != T_STRING) {
-    //         std::string str_method_type_string = "fun () -> String";
-    //         throw std::runtime_error("str method MUST be of type " + str_method_type_string);
-    //     }
-    // }
-
-    // if (!has_init) {
-    //     BlockNode* init_body = new BlockNode({}, POS_NONE, POS_NONE);
-    //     for (auto mt: node.members_ordered) {
-    //         init_body->nodes.push_back(new AssignmentNode(new MemberNode(new IdNode("this", POS_NONE, POS_NONE), mt),
-    //                                                       new IdNode(mt, POS_NONE, POS_NONE),
-    //                                                       POS_NONE,
-    //                                                       POS_NONE));
-    //     }
-    //     node.methods["init"] = new FunctionNode("init",
-    //                                             node.members_ordered,
-    //                                             members_ordered_types,
-    //                                             new ObjectType(node.class_name, tp),
-    //                                             init_body,
-    //                                             POS_NONE,
-    //                                             POS_NONE);
-    //     this->is_method = true;
-    //     this->visit_function(*node.methods["init"]);
-    // }
 
     this->is_method = false;
     this->add_this = false;

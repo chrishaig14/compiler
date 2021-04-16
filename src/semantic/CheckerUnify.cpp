@@ -151,8 +151,10 @@ USemanticInfo Checker::class_member(Class* cls, std::string child, MemberNode& n
         unbound_method->ft->param_types.insert(unbound_method->ft->param_types.begin(),
                                                new ObjectType(cls->class_name));
         info.entity = Entity{.type=E_TYPE::CONST_FUNCTION, .const_function=unbound_method};
+        info.snode = new IdSNode(unbound_method->full_path);
     } else if (cls->static_methods.find(child) != cls->static_methods.end()) {
         info.entity = Entity{.type=E_TYPE::CONST_FUNCTION, .const_function=cls->static_methods[child]};
+        info.snode = new IdSNode(cls->static_methods[child]->full_path);
     } else if (cls->static_members.find(child) != cls->static_members.end()) {
         info.entity = entity_from_type(*cls->static_members[child].first);
     } else {
