@@ -53,6 +53,7 @@ enum class TokType {
     WHILE,
     VAR,
     LSQUARE,
+    AS,
     RSQUARE,
     LCURLY,
     FLOAT,

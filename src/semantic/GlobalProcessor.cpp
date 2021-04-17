@@ -24,7 +24,7 @@ std::string join_path(VectorOfStrings path) {
 }
 
 void GlobalProcessor::visit(ImportNode& node) {
-    this->imported_paths[node.path.back()] = node.path;
+    this->imported_paths[node.alias] = node.path;
     // for (auto imported_name: node.path) {
     //     (*this->module_mappings[this->module_name])[imported_name] = (*this->module_mappings[node.module_name])[imported_name];
     // }

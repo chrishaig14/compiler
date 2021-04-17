@@ -864,9 +864,14 @@ ImportNode* Parser::parse_import() {
             break;
         }
     }
+    if (this->match(TokType::AS)) {
+        this->next();
+        Token alias = this->expect_token(TokType::ID);
+        this->expect_token(TokType::SEMICOLON);
+        return new ImportNode(path, alias.str, import_tok.start, path_part.end_pos);
+    }
     this->expect_token(TokType::SEMICOLON);
-
-    return new ImportNode(path, import_tok.start, path_part.end_pos);
+    return new ImportNode(path, path.back(), import_tok.start, path_part.end_pos);
 }
 
 

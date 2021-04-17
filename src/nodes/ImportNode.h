@@ -15,12 +15,14 @@ public:
     ImportNode& import() override;
     const ImportNode& import() const override;
 
-    ImportNode(const VectorOfStrings& path, TextPosition start, TextPosition end)
+    ImportNode(const VectorOfStrings& path, std::string alias, TextPosition start, TextPosition end)
             : Node(NodeType::IMPORT, start, end) {
+        this->alias = alias;
         this->path = path;
     }
 
     VectorOfStrings path;
+    std::string alias;
 };
 
 

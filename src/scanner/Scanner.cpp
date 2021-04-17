@@ -38,6 +38,7 @@ void initialize_tokens() {
     TOKEN_KEYWORDS["class"] = TokType::CLASS;
     TOKEN_KEYWORDS["while"] = TokType::WHILE;
     TOKEN_KEYWORDS["none"] = TokType::NONE;
+    TOKEN_KEYWORDS["as"] = TokType::AS;
 
 
     TOKEN_SPECIAL[";"] = TokType::SEMICOLON;

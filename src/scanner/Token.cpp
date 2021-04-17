@@ -50,6 +50,7 @@ std::string Token::pos_string() {
 
 
 void initialize_token_strings() {
+    TOKEN_STRINGS[TokType::AS] = "as";
     TOKEN_STRINGS[TokType::COMMA] = "comma ( , )";
     TOKEN_STRINGS[TokType::BREAK] = "break";
     TOKEN_STRINGS[TokType::CONTINUE] = "continue";
