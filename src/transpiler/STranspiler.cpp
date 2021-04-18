@@ -71,7 +71,12 @@ void STranspiler::transpile_function(FunctionSNode* node) {
 
     std::string signature = TOBJECT + SPACE + raw_function_identifier + LPAREN + parameters + RPAREN;
     this->header += signature + SEMIC + NEWLINE;
-    std::string f_source = signature + LCURLY + NEWLINE + this->transpile_block(node->body) + RCURLY + NEWLINE;
+    std::string f_source = signature + LCURLY + NEWLINE;
+    for (auto pn: node->params) {
+        std::string parameter = GCDECLARE + LPAREN + pn + RPAREN + SEMIC + NEWLINE;
+        f_source += parameter;
+    }
+    f_source += this->transpile_block(node->body) + RCURLY + NEWLINE;
 
     std::string function_class = "Function" + std::to_string(node->params.size());
 
