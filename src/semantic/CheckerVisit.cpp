@@ -1010,20 +1010,14 @@ USemanticInfo Checker::visit(AssignmentNode& n) {
     if (linfo_p->is_error) {
         return nullptr;
     }
+    if (linfo_p->entity.type != E_TYPE::FUNCTION_VALUE && linfo_p->entity.type != E_TYPE::OBJECT_VALUE) {
+        throw std::runtime_error("Cannot assign to this thing!");
+    }
     this->is_lvalue = false;
     if (n.lvalue->ntype == NodeType::MEMBER && n.lvalue->member().type == MemberType::NUM) {
         this->error_reporter.tuple_assign(n.start);
     }
-    if (n.lvalue->ntype == NodeType::MEMBER &&
-        (linfo_p->is_class_method || !n.lvalue->member().is_class_static_member)) {
-        throw std::runtime_error("Can only assign to static members (not methods!)");
-    }
-
     USemanticInfo expression_info_p = this->dispatch(n.rvalue);
-    // if (expression_type_p->type() == T_NONE) {
-    //     this->error_reporter.function_doesnt_return_a_value(n.rvalue->start, &linfo_p->type());
-    //     return nullptr;
-    // }
 
     if (linfo_p->entity.type == E_TYPE::OBJECT_VALUE && expression_info_p->entity.type == E_TYPE::CONST_FUNCTION) {
         throw std::runtime_error(

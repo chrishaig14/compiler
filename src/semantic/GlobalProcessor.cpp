@@ -127,6 +127,7 @@ void GlobalProcessor::visit(ClassNode& node) {
         cf->full_path = class_info->full_path + "." + f.first;
         method.full_path = cf->full_path;
         cf->ft = new FunctionType(x, method.return_type->clone());
+        f.second->const_function = cf;
         class_info->methods.insert(make_pair(f.first, cf));
     }
 
@@ -141,6 +142,7 @@ void GlobalProcessor::visit(ClassNode& node) {
         cf->full_path = class_info->full_path + "." + f.first;
         method.full_path = cf->full_path;
         cf->ft = new FunctionType(x, method.return_type->clone());
+        f.second->const_function = cf;
         class_info->static_methods.insert(make_pair(f.first, cf));
     }
 
