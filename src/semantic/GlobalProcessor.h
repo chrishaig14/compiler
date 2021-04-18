@@ -26,13 +26,17 @@ public:
     void dispatch(Node* nod);
 
     void visit(BlockNode& node);
+    void visit_root(BlockNode& node);
 
     void visit(ImportNode& node);
 
     void visit(ClassNode& node);
 
+
+
     std::string __file__;
     std::string module_name;
+    std::string get_actual_path(std::string id);
 };
 
 #endif //GLOBALPROCESSOR_H

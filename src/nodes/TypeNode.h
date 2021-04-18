@@ -28,6 +28,7 @@ public:
     Kind kind;
 
     virtual std::string to_string() const = 0;
+    virtual std::string actual_to_string() const = 0;
 
     virtual bool equal(const TypeNode& other) const = 0;
 
@@ -59,6 +60,7 @@ public:
     bool equal(const TypeNode& other) const override;
 
     std::string to_string() const override;
+    std::string actual_to_string() const override;
 
     TypeNode* clone() const override;
 
@@ -68,6 +70,7 @@ public:
 
     ~ObjectType();
 
+    std::string actual_base_path;
     std::string id;
     VectorOfTypes type_params;
 };
@@ -79,6 +82,10 @@ public:
     }
 
     std::string to_string() const override {
+        return std::string();
+    }
+
+    std::string actual_to_string() const override {
         return std::string();
     }
 
@@ -98,6 +105,7 @@ public:
     bool equal(const TypeNode& other) const override;
 
     std::string to_string() const override;
+    std::string actual_to_string() const override;
 
     FunctionType* clone() const override;
 

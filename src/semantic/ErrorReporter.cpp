@@ -14,6 +14,7 @@ void ErrorReporter::fail(std::string msg) {
     this->failed = true;
     std::cout << "FAILING!" << std::endl;
     std::cout << msg << std::endl;
+    throw std::runtime_error("FAILED");
 }
 
 void ErrorReporter::binop(const TypeNode& left, const TypeNode& right, TextPosition position) {
@@ -45,13 +46,13 @@ void ErrorReporter::module_no_member(const std::string& module_name, const std::
     this->fail(msg);
 }
 
-void ErrorReporter::package_no_member(const std::string& package_name, const std::string& member, TextPosition position) {
+void
+ErrorReporter::package_no_member(const std::string& package_name, const std::string& member, TextPosition position) {
     std::string msg;
     msg = this->context_string(position) + E_FMT("Package ") + E_HLT(package_name) + E_FMT(" has no member ") +
           E_HLT("'" + member + "'") + this->code_context_string(position);
     this->fail(msg);
 }
-
 
 
 void ErrorReporter::no_member(const TypeNode& t, const std::string& member, TextPosition position) {
@@ -196,8 +197,8 @@ void ErrorReporter::function_call_type_mismatch(const TypeNode& expected, const 
                                                 TextPosition end) {
     std::string msg;
     msg = context_string(start) + E_FMT(" Function call type mismatch") + E_FMT(" expected ") +
-          E_HLT(expected.to_string()) + E_FMT(" but got ") + E_HLT(actual.to_string()) +
-          this->code_error_string(start, end);
+          E_HLT(expected.actual_to_string()) + E_FMT(" but got ") + E_HLT(actual.to_string()) + E_FMT(" (alias for ") +
+          E_HLT(actual.actual_to_string()) + E_FMT(")") + this->code_error_string(start, end);
     this->fail(msg);
 }
 

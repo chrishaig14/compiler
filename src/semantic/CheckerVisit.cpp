@@ -109,6 +109,7 @@ USemanticInfo Checker::visit(NumberNode& node) {
             ov->ot = new ObjectType("Integer", {});
             IntegerSNode* snode = new IntegerSNode();
             snode->str = node.str;
+            ov->ot->actual_base_path = "core.Integer";
             info.snode = snode;
             break;
         }
@@ -145,6 +146,7 @@ USemanticInfo Checker::visit(StringNode& node) {
     ObjectValue* ov = new ObjectValue;
     info.entity = {.type=E_TYPE::OBJECT_VALUE, .object_value=ov};
     ov->ot = new ObjectType("String", {});
+    ov->ot->actual_base_path = "core.String";
     return std::make_unique<SemanticInfo>(info);
 }
 
@@ -654,6 +656,8 @@ USemanticInfo Checker::visit_call(CallNode& n) {
             USemanticInfo arg_type_p = this->dispatch(arg);
             sn->arguments.push_back(arg_type_p->snode);
             Entity arg_entity = arg_type_p->entity;
+
+
             if (arg_entity.type == E_TYPE::CLASS || arg_entity.type == E_TYPE::PACKAGE ||
                 arg_entity.type == E_TYPE::MODULE) {
                 std::cout << ("Error can't pass as argument") << std::endl;
@@ -662,6 +666,7 @@ USemanticInfo Checker::visit_call(CallNode& n) {
             if (arg_entity.type == E_TYPE::ERROR) {
                 return error_stub();
             }
+
             TypeNode& arg_type = *get_entity_type(arg_entity);
             // if (!arg_type_p->is_constant) {
             //     args_are_constant = false;
@@ -681,7 +686,8 @@ USemanticInfo Checker::visit_call(CallNode& n) {
             for (size_t i = 0; i < n.arguments.size(); i++) {
                 const TypeNode& arg_type = *arg_types[i];
                 const TypeNode& param_type = *function_type->param_types[i];
-                if (arg_type != param_type) {
+                if (arg_type.object().actual_base_path != param_type.object().actual_base_path) {
+                    // if (arg_type != param_type) {
                     if (arg_type.kind != Kind::UNKNOWN) {
                         this->error_reporter.function_call_type_mismatch(param_type,
                                                                          arg_type,
@@ -689,6 +695,7 @@ USemanticInfo Checker::visit_call(CallNode& n) {
                                                                          n.arguments[i]->end);
                     }
                     return std::make_unique<SemanticInfo>(retv);
+                    // }
                 }
             }
             for (auto x: arg_types) {
@@ -805,6 +812,8 @@ USemanticInfo Checker::visit_function(FunctionNode& n) {
     }
     for (size_t i = 0; i < n.parameter_names.size(); i++) {
         TypeNode& type = *n.parameter_types[i];
+        Entity pt = this->scope->get(n.const_function->ft->param_types[i]->object().id);
+        n.const_function->ft->param_types[i]->object().actual_base_path = pt.clazz->full_path;
         if (type.kind == Kind::OBJECT) {
             std::cout << "START" << std::endl;
             this->assert_type_exists(type, n.start);
@@ -1474,7 +1483,9 @@ USemanticInfo Checker::visit(DefaultConstructorNode& node) {
     }
     info.entity = Entity{.type=E_TYPE::CONST_FUNCTION};
     info.entity.const_function = new ConstFunction();
-    info.entity.const_function->ft = new FunctionType(t, new ObjectType(node.name, {}));
+    auto rt = new ObjectType(node.name, {});
+    rt->actual_base_path = cls->full_path;
+    info.entity.const_function->ft = new FunctionType(t, rt);
     IdSNode* idn = new IdSNode();
     idn->identifier = cls->full_path + "." + "__init__";
     info.snode = idn;

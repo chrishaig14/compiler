@@ -35,6 +35,7 @@ public:
 
     std::unordered_map<std::string, std::string> constraints;
     std::string full_path;
+    ConstFunction* const_function;
 };
 
 

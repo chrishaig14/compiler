@@ -102,13 +102,21 @@ void process_global_all_modules(Package* package) {
             process_global_all_modules(subpackage);
         } else if (ep.second.type == U_TYPE::MODULE) {
             Module* module = ep.second.module;
+            if (module->name == "core") {
+                continue;
+            }
             std::cout << "Global processing module " << module->name << std::endl;
             GlobalProcessor gp;
+            std::cout << "Global processing module " << module->name << std::endl;
+            Module* core_module = root_package->units["core"].module;
+            for (auto builtin: core_module->flirpins) {
+                module->flirpins[builtin.first] = builtin.second;
+            }
             gp.module = module;
             gp.root_package = root_package;
             gp.module_dotted_path = module->full_path;
             gp.__file__ = module->abs_path;
-            gp.visit(*module->ast);
+            gp.visit_root(*module->ast);
             module->imported_paths = gp.imported_paths;
             std::cout << "- Done" << std::endl;
         }
@@ -177,11 +185,7 @@ void analyze_all_modules(Package* package) {
                 add_path_to_module(module, i.first, i.second);
             }
 
-            std::cout << "Analyzing module " << module->name << std::endl;
-            Module* core_module = root_package->units["core"].module;
-            for (auto builtin: core_module->flirpins) {
-                module->flirpins[builtin.first] = builtin.second;
-            }
+
             // module->flirpins["print"] = core_module->flirpins["print"];
             // module->flirpins["Integer"] = core_module->flirpins["Integer"];
             // module->flirpins["Float"] = core_module->flirpins["Float"];
@@ -285,25 +289,18 @@ int main(int argc, char* argv[]) {
     root_package = new Package("", project_dir, "");
     build_packages(root_package, 0);
     parse_all_modules(root_package);
-    process_global_all_modules(root_package);
 
-    function_builtins["map"] = "fun(List[a],fun(a)->b)->List[b]";
+    Module* core_module = new Module("core", "", "");
+    core_module->full_path = "core";
+    root_package->units["core"] = Unit{.type=U_TYPE::MODULE, .module=core_module};
+
+    // function_builtins["map"] = "fun(List[a],fun(a)->b)->List[b]";
     function_builtins["print"] = "fun(String)";
     function_builtins["open"] = "fun(String)->File";
     function_builtins["join"] = "fun(List[String],String)->String";
     function_builtins["range"] = "fun(Integer,Integer,Integer)->List[Integer])->String";
     function_builtins["input"] = "fun()->String";
 
-    Module* core_module = new Module("core", "", "");
-    core_module->full_path = "core";
-    root_package->units["core"] = Unit{.type=U_TYPE::MODULE, .module=core_module};
-
-    for (auto fb: function_builtins) {
-        ConstFunction* cf = new ConstFunction();
-        cf->ft = parse_function_type(fb.second);
-        cf->full_path = core_module->full_path + "." + fb.first;
-        core_module->flirpins[fb.first] = Flirpin{.type=F_TYPE::CONST_FUNCTION, .const_function=cf};
-    }
 
     std::vector<Class*> cbuiltins = {make_float_class_info(), make_double_class_info(), make_file_class_info(),
                                      make_int_class_info(), make_list_class_info(), make_boolean_class_info(),
@@ -313,6 +310,19 @@ int main(int argc, char* argv[]) {
         ci->full_path = core_module->full_path + "." + ci->class_name;
         core_module->flirpins[ci->class_name] = Flirpin{.type=F_TYPE::CLASS, .clazz=ci};
     }
+
+    for (auto fb: function_builtins) {
+        ConstFunction* cf = new ConstFunction();
+        cf->ft = parse_function_type(fb.second);
+        for (size_t i = 0; i < cf->ft->param_types.size(); i++) {
+            cf->ft->param_types[i]->object().actual_base_path = "core." + cf->ft->param_types[i]->object().id;
+        }
+        cf->full_path = core_module->full_path + "." + fb.first;
+        core_module->flirpins[fb.first] = Flirpin{.type=F_TYPE::CONST_FUNCTION, .const_function=cf};
+    }
+
+    process_global_all_modules(root_package);
+
 
     analyze_all_modules(root_package);
     transpile_all_modules(root_package, project_output_dir);
