@@ -224,6 +224,7 @@ DEFINE_FUNCTION(1,  core_D_Float_D_str)
 DEFINE_FUNCTION(1,  core_D_Boolean_D_str)
 DEFINE_FUNCTION(2,  core_D_List_D___sub__)
 DEFINE_FUNCTION(1,  core_D_List_D_len)
+DEFINE_FUNCTION(1,  core_D_String_D_len)
 
 
 DEFINE_FUNCTION(2,  core_D_String_D___sub__)
@@ -258,6 +259,10 @@ TaggedObject*  core_D_List_D_len_f(TaggedObject* a) {
 
 TaggedObject*  core_D_List_D___sub___f(TaggedObject* a, TaggedObject* b) {
     return CAST(a, XList)->lv[GET_INT(b)];
+}
+
+TaggedObject* core_D_String_D_len_f(TaggedObject* a) {
+    return MAKE_INT(CAST(a, XString)->s.size());
 }
 
 DEFINE_FUNCTION(2,  core_D_dict_subscript)
