@@ -23,14 +23,14 @@ make_builtin_class(std::string class_name, VectorOfStrings type_params, std::map
     for (auto sb: methods) {
         ConstFunction* cf = new ConstFunction();
         cf->ft = parse_function_type(sb.second);
-        cf->full_path = "core." + class_name + "." + sb.first;
+        cf->path = "core." + class_name + "." + sb.first;
         class_info->methods.insert(std::make_pair(sb.first, cf));
     }
 
     for (auto sb: static_methods) {
         ConstFunction* cf = new ConstFunction();
         cf->ft = parse_function_type(sb.second);
-        cf->full_path = "core." + class_name + "." + sb.first;
+        cf->path = "core." + class_name + "." + sb.first;
         class_info->static_methods.insert(std::make_pair(sb.first, cf));
     }
     class_info->type_params = type_params;
@@ -129,6 +129,8 @@ Class* make_string_class_info() {
 
     std::map<std::string, std::string> static_methods;
     static_methods["add"] = "fun(String,String)->String";
+    static_methods["eq"] = "fun(String,String)->Boolean";
+    static_methods["ne"] = "fun(String,String)->Boolean";
 
     return make_builtin_class("String", {}, methods, static_methods);
 }
@@ -343,7 +345,7 @@ Class* Checker::instantiate_generic(Class* generic, const ObjectType& instance) 
         TypeNode* t = (m.second)->ft;
         TypeNode& concrete_type = *make_type(*t, replacements);
         ConstFunction* cf = new ConstFunction();
-        cf->full_path = m.second->full_path;
+        cf->path = m.second->path;
         cf->ft = (FunctionType*) concrete_type.clone();
         concrete_methods[m.first] = cf;
     }
@@ -412,7 +414,7 @@ USemanticInfo Checker::dispatch(Node* nod) {
     auto& n = *nod;
     switch (n.ntype) {
         case NodeType::ASSIGN:
-            return this->visit(n.assign());
+            return this->visit_assignment(n.assign());
         case NodeType::BINOP: {
             auto r = this->visit(n.binop());
             return r;

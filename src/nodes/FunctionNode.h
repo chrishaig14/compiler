@@ -34,7 +34,7 @@ public:
     const FunctionNode& func() const override;
 
     std::unordered_map<std::string, std::string> constraints;
-    std::string full_path;
+    Path path;
     ConstFunction* const_function;
 };
 

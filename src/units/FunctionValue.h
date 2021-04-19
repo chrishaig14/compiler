@@ -8,7 +8,8 @@
 
 #include "Entity.h"
 #include "../nodes/TypeNode.h"
-class FunctionValue : public Entity {
+
+class FunctionValue {
 public:
     FunctionType* ft;
 };

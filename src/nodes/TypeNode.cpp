@@ -130,9 +130,9 @@ std::string ObjectType::actual_to_string() const {
     }
     if (parameters.size() != 0) {
         parameters = parameters.substr(0, parameters.size() - 2);
-        return this->actual_base_path + "[" + parameters + "]";
+        return this->actual_base_path.as_str() + "[" + parameters + "]";
     }
-    return this->actual_base_path;
+    return this->actual_base_path.as_str();
 }
 
 bool ObjectType::equal(const TypeNode& other) const {

@@ -8,7 +8,7 @@
 
 #include "Entity.h"
 #include "../nodes/TypeNode.h"
-class ObjectValue : public Entity {
+class ObjectValue {
 
 public:
     ObjectType* ot;

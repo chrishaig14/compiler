@@ -74,6 +74,7 @@ USemanticInfo Checker::visit(BooleanNode& node) {
     SemanticInfo info;
     info.entity = Entity{.type=E_TYPE::OBJECT_VALUE, .object_value=new ObjectValue()};
     info.entity.object_value->ot = new T_BOOL;
+    info.entity.object_value->ot->actual_base_path = Path("core.Boolean");
     info.snode = new BoolSNode(node.value);
     return std::make_unique<SemanticInfo>(info);
 }
@@ -109,7 +110,7 @@ USemanticInfo Checker::visit(NumberNode& node) {
             ov->ot = new ObjectType("Integer", {});
             IntegerSNode* snode = new IntegerSNode();
             snode->str = node.str;
-            ov->ot->actual_base_path = "core.Integer";
+            ov->ot->actual_base_path = Path("core.Integer");
             info.snode = snode;
             break;
         }
@@ -146,7 +147,7 @@ USemanticInfo Checker::visit(StringNode& node) {
     ObjectValue* ov = new ObjectValue;
     info.entity = {.type=E_TYPE::OBJECT_VALUE, .object_value=ov};
     ov->ot = new ObjectType("String", {});
-    ov->ot->actual_base_path = "core.String";
+    ov->ot->actual_base_path = Path("core.String");
     return std::make_unique<SemanticInfo>(info);
 }
 
@@ -171,7 +172,7 @@ USemanticInfo Checker::visit(SubscriptNode& node) {
         throw std::runtime_error("Error class " + cls->class_name + " does not define the __sub__ operator!");
     }
     ConstFunction* subscript_fun = subscript_it->second;
-    std::string sub_fun_path = subscript_fun->full_path;
+    std::string sub_fun_path = subscript_fun->path.as_str();
     TypeNode* rtype = subscript_fun->ft->return_type->clone();
 
     // SemanticInfo& parent = *parent_p;
@@ -338,9 +339,9 @@ USemanticInfo Checker::visit_class(ClassNode& node) {
     ClassSNode* csn = new ClassSNode();
 
     Class* clazz = this->scope->get(node.class_name).clazz;
-    csn->identifier = clazz->full_path;
+    csn->identifier = clazz->path.as_str();
     sn->nodes.push_back(csn);
-    sn->nodes.push_back(make_class_default_init(clazz->full_path, node.members_ordered));
+    sn->nodes.push_back(make_class_default_init(clazz->path.as_str(), node.members_ordered));
 
     for (auto mt: node.members_ordered) {
         TypeNode& t = *node.members[mt];
@@ -371,7 +372,7 @@ USemanticInfo Checker::visit_class(ClassNode& node) {
         this->add_this = true;
         this->this_entity = Entity{.type=E_TYPE::OBJECT_VALUE, .object_value=new ObjectValue()};
         this->this_entity.object_value->ot = new ObjectType(node.class_name);
-        // method.second->full_path = clazz->full_path + "." + method.second->identifier;
+        // method.second->path = clazz->path + "." + method.second->identifier;
         USemanticInfo method_info = this->visit_function(*method.second);
         methods_snodes.push_back(method_info->snode);
         has_init = has_init || method.first == "init";
@@ -683,10 +684,13 @@ USemanticInfo Checker::visit_call(CallNode& n) {
             // }
         } else {
             retv.entity = entity_from_type(*function_type->return_type);
+            retv.entity.object_value->ot = (ObjectType*) function_type->return_type->clone();
             for (size_t i = 0; i < n.arguments.size(); i++) {
                 const TypeNode& arg_type = *arg_types[i];
                 const TypeNode& param_type = *function_type->param_types[i];
-                if (arg_type.object().actual_base_path != param_type.object().actual_base_path) {
+                const std::string& arg_path_as_str = arg_type.object().actual_base_path.as_str();
+                const std::string& param_path_as_str = param_type.object().actual_base_path.as_str();
+                if (arg_path_as_str != param_path_as_str) {
                     // if (arg_type != param_type) {
                     if (arg_type.kind != Kind::UNKNOWN) {
                         this->error_reporter.function_call_type_mismatch(param_type,
@@ -800,7 +804,7 @@ USemanticInfo Checker::visit_function(FunctionNode& n) {
     info.snode = sn;
     Logger::info("Checking FunctionNode " + n.identifier);
     std::string& function_name = n.identifier;
-    sn->identifier = n.full_path;
+    sn->identifier = n.path.as_str();
     sn->params = n.parameter_names;
     this->current_function = function_name;
     this->enter_scope(function_name);
@@ -813,7 +817,7 @@ USemanticInfo Checker::visit_function(FunctionNode& n) {
     for (size_t i = 0; i < n.parameter_names.size(); i++) {
         TypeNode& type = *n.parameter_types[i];
         Entity pt = this->scope->get(n.const_function->ft->param_types[i]->object().id);
-        n.const_function->ft->param_types[i]->object().actual_base_path = pt.clazz->full_path;
+        n.const_function->ft->param_types[i]->object().actual_base_path = pt.clazz->path;
         if (type.kind == Kind::OBJECT) {
             std::cout << "START" << std::endl;
             this->assert_type_exists(type, n.start);
@@ -887,7 +891,7 @@ USemanticInfo Checker::visit_id(IdNode& n) {
     }
     sn->identifier = n._id;
     if (entity.type == E_TYPE::CONST_FUNCTION) {
-        sn->identifier = entity.const_function->full_path;
+        sn->identifier = entity.const_function->path.as_str();
     }
 
     // if (entity == nullptr) {
@@ -994,7 +998,7 @@ USemanticInfo Checker::visit(DeclarationNode& n) {
     return info;
 }
 
-USemanticInfo Checker::visit(AssignmentNode& n) {
+USemanticInfo Checker::visit_assignment(AssignmentNode& n) {
 
     SemanticInfo info;
 
@@ -1035,7 +1039,10 @@ USemanticInfo Checker::visit(AssignmentNode& n) {
     const TypeNode& l_type = *linfo.entity.object_value->ot;
     const TypeNode& exp_type = *expression_type.entity.object_value->ot;
 
-    if (l_type != exp_type) {
+    std::string lpath_as_str = linfo.entity.object_value->ot->actual_base_path.as_str();
+    std::string exppath_as_str = expression_type.entity.object_value->ot->actual_base_path.as_str();
+
+    if (lpath_as_str != exppath_as_str) {
         if (l_type.kind == Kind::OBJECT) {
             const ObjectType& actual_type = l_type.object();
             if (actual_type.id == "Option") {
@@ -1204,7 +1211,7 @@ std::string map_boolop_to_method_name(BoolOp op) {
 }
 
 SNode* make_boolop_snode(ConstFunction* operator_fun, SemanticInfo& left_info, SemanticInfo& right_info) {
-    IdSNode* function_id = new IdSNode(operator_fun->full_path);
+    IdSNode* function_id = new IdSNode(operator_fun->path.as_str());
     CallSNode* sn = new CallSNode();
     sn->function = function_id;
     sn->arguments = {left_info.snode, right_info.snode};
@@ -1352,7 +1359,7 @@ USemanticInfo Checker::visit(BinopNode& n) {
         throw std::runtime_error("Class " + cls->class_name + " has no operator " + fun + " defined ");
     }
     ConstFunction* operator_fun = operator_fun_it->second;
-    function_id->identifier = operator_fun->full_path;
+    function_id->identifier = operator_fun->path.as_str();
     rettype = operator_fun->ft->return_type->clone();
     if (ltype.object().id == "Integer" && rtype.object().id == "Integer") {
         // function_id->identifier = "core_D_Integer_D_" + fun;
@@ -1478,10 +1485,10 @@ USemanticInfo Checker::visit(DefaultConstructorNode& node) {
     info.entity = Entity{.type=E_TYPE::CONST_FUNCTION};
     info.entity.const_function = new ConstFunction();
     auto rt = new ObjectType(node.name, {});
-    rt->actual_base_path = cls->full_path;
+    rt->actual_base_path = cls->path;
     info.entity.const_function->ft = new FunctionType(t, rt);
     IdSNode* idn = new IdSNode();
-    idn->identifier = cls->full_path + "." + "__init__";
+    idn->identifier = cls->path.as_str() + "." + "__init__";
     info.snode = idn;
     return std::make_unique<SemanticInfo>(info);
 }

@@ -102,7 +102,7 @@ public:
 
     USemanticInfo dispatch(Node* nod);
 
-    USemanticInfo visit(AssignmentNode& n);
+    USemanticInfo visit_assignment(AssignmentNode& n);
     USemanticInfo visit(BinopNode& node);
     USemanticInfo visit_block(BlockNode& node);
     USemanticInfo visit_root(BlockNode& node);
@@ -151,6 +151,7 @@ public:
     USemanticInfo class_member(Class* cls, std::string child, MemberNode& n);
     USemanticInfo package_member(Package* package, std::string child, MemberNode& n);
     USemanticInfo module_member(Module* mod, std::string child, MemberNode& n);
+    Package* root_package;
 };
 
 bool function_is_generic(const FunctionType& ft);

@@ -36,3 +36,7 @@ Class::~Class() {
         delete m;
     }
 }
+
+Class::Class() {
+
+}

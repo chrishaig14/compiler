@@ -29,26 +29,27 @@ void GlobalProcessor::visit(ImportNode& node) {
                                  join_path(this->imported_paths[node.alias]));
     }
     this->imported_paths[node.alias] = node.path;
+    // this->module->inverted[Path(node.path).as_str()] = node.alias;
     // for (auto imported_name: node.path) {
     //     (*this->module_mappings[this->module_name])[imported_name] = (*this->module_mappings[node.module_name])[imported_name];
     // }
 }
 
 void GlobalProcessor::visit(FunctionNode& node) {
+    ConstFunction* const_function = this->module->flirpins[node.identifier].const_function;
+
     VectorOfTypes x;
     for (auto p: node.parameter_types) {
-        p->object().actual_base_path = this->get_actual_path(p->object().id);
+        p->object().actual_base_path = this->get_actual_path({p->object().id});
         x.emplace_back(p->clone());
     }
     node.return_type->object().actual_base_path = this->get_actual_path(node.return_type->object().id);
     FunctionType function_info(x, node.return_type->clone());
-    std::string function_path = module_dotted_path + "." + node.identifier;
-    ConstFunction* const_function = new ConstFunction();
+    Path function_path = Path(module_dotted_path, node.identifier);
     const_function->ft = function_info.clone();
-    const_function->full_path = this->module->full_path + "." + node.identifier;
-    node.full_path = const_function->full_path;
+    const_function->path = Path(this->module->path, node.identifier);
+    node.path = const_function->path;
     node.const_function = const_function;
-    this->module->flirpins[node.identifier] = Flirpin{.type=F_TYPE::CONST_FUNCTION, .const_function=const_function};
 }
 
 void GlobalProcessor::visit_root(BlockNode& node) {
@@ -78,6 +79,21 @@ void GlobalProcessor::visit_root(BlockNode& node) {
     }
     for (auto n: node.nodes) {
         if (n->ntype == NodeType::CLS) {
+            // this->dispatch(n);
+            Class* class_info = new Class();
+            this->module->flirpins[n->cls().class_name] = Flirpin{.type=F_TYPE::CLASS, .clazz=class_info};
+            class_info->path = Path(this->module->path, n->cls().class_name);
+        }
+    }
+    for (auto n: node.nodes) {
+        if (n->ntype == NodeType::FUNC) {
+            // this->dispatch(n);
+            ConstFunction* const_function = new ConstFunction();
+            this->module->flirpins[n->func().identifier] = Flirpin{.type=F_TYPE::CONST_FUNCTION, .const_function=const_function};
+        }
+    }
+    for (auto n: node.nodes) {
+        if (n->ntype == NodeType::CLS) {
             this->dispatch(n);
         }
     }
@@ -96,14 +112,13 @@ void GlobalProcessor::visit(BlockNode& node) {
 }
 
 void GlobalProcessor::visit(ClassNode& node) {
-    Class* class_info = new Class();
+    Class* class_info = this->module->flirpins[node.class_name].clazz;
 
     if (this->imported_paths.count(node.class_name) == 1) {
         throw std::runtime_error("Name \"" + node.class_name + "\" already used as an alias for " +
                                  join_path(this->imported_paths[node.class_name]));
     }
 
-    class_info->full_path = this->module->full_path + "." + node.class_name;
     for (auto mn: node.members_ordered) {
         auto mt = node.members[mn];
         mt->object().actual_base_path = this->get_actual_path(mt->object().id);
@@ -118,14 +133,17 @@ void GlobalProcessor::visit(ClassNode& node) {
     for (auto f: node.methods) {
         FunctionNode& method = *f.second;
         has_init = f.first == "init";
+
         VectorOfTypes x;
         for (auto p: method.parameter_types) {
+            p->object().actual_base_path = this->get_actual_path(p->object().id);
             x.emplace_back(p->clone());
         }
+        method.return_type->object().actual_base_path = this->get_actual_path(method.return_type->object().id);
 
         ConstFunction* cf = new ConstFunction();
-        cf->full_path = class_info->full_path + "." + f.first;
-        method.full_path = cf->full_path;
+        cf->path = class_info->path.as_str() + "." + f.first;
+        method.path = cf->path;
         cf->ft = new FunctionType(x, method.return_type->clone());
         f.second->const_function = cf;
         class_info->methods.insert(make_pair(f.first, cf));
@@ -134,13 +152,17 @@ void GlobalProcessor::visit(ClassNode& node) {
     for (auto f: node.static_methods) {
         FunctionNode& method = *f.second;
         has_init = f.first == "init";
+
         VectorOfTypes x;
         for (auto p: method.parameter_types) {
+            p->object().actual_base_path = this->get_actual_path(p->object().id);
             x.emplace_back(p->clone());
         }
+        method.return_type->object().actual_base_path = this->get_actual_path(method.return_type->object().id);
+
         ConstFunction* cf = new ConstFunction();
-        cf->full_path = class_info->full_path + "." + f.first;
-        method.full_path = cf->full_path;
+        cf->path = class_info->path.as_str() + "." + f.first;
+        method.path = cf->path;
         cf->ft = new FunctionType(x, method.return_type->clone());
         f.second->const_function = cf;
         class_info->static_methods.insert(make_pair(f.first, cf));
@@ -152,8 +174,7 @@ void GlobalProcessor::visit(ClassNode& node) {
     }
     class_info->class_name = node.class_name;
     class_info->type_params = node.type_parameters;
-    class_info->full_path = this->module->full_path + "." + class_info->class_name;
-    this->module->flirpins[node.class_name] = Flirpin{.type=F_TYPE::CLASS, .clazz=class_info};
+    class_info->path = this->module->path.as_str() + "." + class_info->class_name;
 }
 
 void GlobalProcessor::dispatch(Node* nod) {
@@ -173,13 +194,15 @@ void GlobalProcessor::dispatch(Node* nod) {
     }
 }
 
-std::string GlobalProcessor::get_actual_path(std::string id) {
+Path GlobalProcessor::get_actual_path(std::string id) {
+    if (id == ".None") {
+        return Path(VectorOfStrings({".None"}));
+    }
     if (this->module->flirpins.count(id) == 1) {
-        return this->module->flirpins[id].clazz->full_path;
+        return this->module->flirpins[id].clazz->path;
     }
     if (this->imported_paths.count(id) == 1) {
-        return join_path(this->imported_paths[id]);
+        return this->imported_paths[id];
     }
     throw std::runtime_error("Error: type " + id + " not found");
 }
-

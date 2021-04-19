@@ -13,8 +13,9 @@
 #include "../macros.h"
 #include "Entity.h"
 
-class Class : public Entity {
+class Class {
 public:
+    Class();
     VectorOfStrings member_names;
     std::vector<TypeNode*> member_types;
 
@@ -33,7 +34,7 @@ public:
     bool operator==(const Class& b) const;
 
     VectorOfStrings type_params;
-    std::string full_path;
+    Path path;
 };
 
 #endif //CLASSINFO_H

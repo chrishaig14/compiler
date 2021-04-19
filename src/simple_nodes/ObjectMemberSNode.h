@@ -8,11 +8,12 @@
 
 #include <string>
 #include "SNode.h"
+#include "../nodes/TypeNode.h"
 
 class ObjectMemberSNode : public SNode {
 public:
     SNode* object;
-    std::string class_path;
+    Path class_path;
     std::string member_name;
 
     ObjectMemberSNode() : SNode(SNodeType::OBJECT_MEMBER) {

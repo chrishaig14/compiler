@@ -15,7 +15,7 @@ typedef std::pair<std::string, std::string> Builtin;
 
 class GlobalProcessor {
 public:
-    std::string module_dotted_path;
+    Path module_dotted_path;
     std::map<std::string, VectorOfStrings> imported_paths;
 
     Package* root_package;
@@ -36,7 +36,8 @@ public:
 
     std::string __file__;
     std::string module_name;
-    std::string get_actual_path(std::string id);
+    Path get_actual_path(std::string id);
+    Class* get_actual_clazz(std::string basicString);
 };
 
 #endif //GLOBALPROCESSOR_H

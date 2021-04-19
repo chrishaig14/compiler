@@ -182,7 +182,7 @@ std::string STranspiler::transpile_new(NewObjectSNode* node) {
 
 std::string STranspiler::transpile_object_member(ObjectMemberSNode* sn) {
     std::string out;
-    out += "CAST" + LPAREN + this->dispatch(sn->object) + COMMA + SPACE + path_to_id(sn->class_path) + RPAREN + "->" +
+    out += "CAST" + LPAREN + this->dispatch(sn->object) + COMMA + SPACE + path_to_id(sn->class_path.as_str()) + RPAREN + "->" +
            sn->member_name;
     return out;
 }

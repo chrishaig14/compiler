@@ -23,12 +23,17 @@ public:
     BlockNode* ast;
     std::map<std::string, VectorOfStrings> imported_paths;
     std::map<std::string, Entity> imports;
-    std::string full_path;
+    Path path;
     CodeLines code_lines;
     BlockSNode* sast;
     std::map<std::string, Class*> classes;
     std::map<std::string, ConstFunction*> functions;
     std::map<std::string, Flirpin> flirpins;
+
+    Flirpin get(Path p) {
+        VectorOfStrings pt = p.as_vec();
+        return this->flirpins[pt.back()];
+    }
 };
 
 

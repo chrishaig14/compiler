@@ -13,6 +13,54 @@
 #include "../types.h"
 #include <iostream>
 
+class Path {
+private:
+    VectorOfStrings path_parts;
+    std::string s;
+public:
+    Path() {
+    }
+
+    Path(Path p, std::string c) {
+        this->path_parts = p.as_vec();
+        this->path_parts.push_back(c);
+        for (auto cc: this->path_parts) {
+            this->s += cc + ".";
+        }
+        this->s = this->s.substr(0, this->s.size() - 1);
+    }
+
+    Path(std::string s) {
+        this->s = s;
+        size_t k = 0;
+        this->path_parts.push_back("");
+        for (size_t i = 0; i < s.size(); i++) {
+            if (s[i] == '.') {
+                this->path_parts.push_back("");
+                k++;
+            } else {
+                this->path_parts[k] += s[i];
+            }
+        }
+    }
+
+    Path(VectorOfStrings p) {
+        this->path_parts = p;
+        for (auto cc: this->path_parts) {
+            this->s += cc + ".";
+        }
+        this->s = this->s.substr(0, this->s.size() - 1);
+    }
+
+    std::string as_str() const {
+        return this->s;
+    }
+
+    VectorOfStrings as_vec() {
+        return this->path_parts;
+    }
+};
+
 enum class Kind {
     OBJECT, FUNCTION, UNKNOWN
 };
@@ -22,6 +70,8 @@ class ObjectType;
 class FunctionType;
 
 class UnknownTypeNode;
+
+class Class;
 
 class TypeNode {
 public:
@@ -64,13 +114,15 @@ public:
 
     TypeNode* clone() const override;
 
+    Class* clazz;
+
     ObjectType& object() override;
 
     const ObjectType& object() const override;
 
     ~ObjectType();
 
-    std::string actual_base_path;
+    Path actual_base_path;
     std::string id;
     VectorOfTypes type_params;
 };

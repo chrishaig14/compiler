@@ -146,15 +146,15 @@ USemanticInfo Checker::class_member(Class* cls, std::string child, MemberNode& n
     if (cls->methods.find(child) != cls->methods.end()) {
         ConstFunction* bound_method = cls->methods[child];
         ConstFunction* unbound_method = new ConstFunction();
-        unbound_method->full_path = bound_method->full_path;
+        unbound_method->path = bound_method->path;
         unbound_method->ft = bound_method->ft->clone();
         unbound_method->ft->param_types.insert(unbound_method->ft->param_types.begin(),
                                                new ObjectType(cls->class_name));
         info.entity = Entity{.type=E_TYPE::CONST_FUNCTION, .const_function=unbound_method};
-        info.snode = new IdSNode(unbound_method->full_path);
+        info.snode = new IdSNode(unbound_method->path.as_str());
     } else if (cls->static_methods.find(child) != cls->static_methods.end()) {
         info.entity = Entity{.type=E_TYPE::CONST_FUNCTION, .const_function=cls->static_methods[child]};
-        info.snode = new IdSNode(cls->static_methods[child]->full_path);
+        info.snode = new IdSNode(cls->static_methods[child]->path.as_str());
     } else if (cls->static_members.find(child) != cls->static_members.end()) {
         info.entity = entity_from_type(*cls->static_members[child].first);
     } else {
@@ -165,18 +165,18 @@ USemanticInfo Checker::class_member(Class* cls, std::string child, MemberNode& n
 }
 
 USemanticInfo Checker::object_member(SNode* object_snode, ObjectValue* pValue, std::string child, MemberNode& n) {
-    Class* clazz = this->scope->get(pValue->ot->id).clazz;
+    Class* clazz = this->root_package->get(pValue->ot->actual_base_path).clazz;
     SemanticInfo info;
     if (clazz->members.count(child)) {
         info.entity = entity_from_type(*clazz->members[child]);
         ObjectMemberSNode* omn = new ObjectMemberSNode();
-        omn->class_path = clazz->full_path;
+        omn->class_path = clazz->path;
         omn->object = object_snode;
         omn->member_name = child;
         info.snode = omn;
     } else if (clazz->methods.count(child)) {
         IdSNode* idn = new IdSNode();
-        idn->identifier = clazz->full_path + "." + child;
+        idn->identifier = Path(clazz->path, child).as_str();
         if (this->is_call) {
             // method call
             info.this_arg = object_snode;
@@ -187,7 +187,7 @@ USemanticInfo Checker::object_member(SNode* object_snode, ObjectValue* pValue, s
             int npartial = clazz->methods[child]->ft->param_types.size();
             NewObjectSNode* non = new NewObjectSNode();
             non->class_name = "Partial" + std::to_string(npartial);
-            IdSNode* method_snode = new IdSNode(clazz->methods[child]->full_path);
+            IdSNode* method_snode = new IdSNode(clazz->methods[child]->path.as_str());
             non->args = {method_snode, object_snode};
             for (int i = 0; i < npartial; i++) {
                 non->args.push_back(nullptr);
@@ -207,7 +207,7 @@ USemanticInfo Checker::object_member(SNode* object_snode, ObjectValue* pValue, s
 
 USemanticInfo Checker::package_member(Package* package, std::string child, MemberNode& n) {
     if (package->units.count(child) == 0) {
-        this->error_reporter.package_no_member(package->full_path, child, n.dot_pos);
+        this->error_reporter.package_no_member(package->path.as_str(), child, n.dot_pos);
         return error_stub();
     }
     Unit unit = package->units[child];
@@ -231,7 +231,7 @@ Entity map_flirpin_to_entity(Flirpin flirpin) {
 
 USemanticInfo Checker::module_member(Module* mod, std::string child, MemberNode& n) {
     if (mod->flirpins.count(child) == 0) {
-        this->error_reporter.module_no_member(mod->full_path, child, n.dot_pos);
+        this->error_reporter.module_no_member(mod->path.as_str(), child, n.dot_pos);
         return error_stub();
     }
     Flirpin flirpin = mod->flirpins[child];
@@ -239,7 +239,7 @@ USemanticInfo Checker::module_member(Module* mod, std::string child, MemberNode&
     info.entity = map_flirpin_to_entity(flirpin);
     if (flirpin.type == F_TYPE::CONST_FUNCTION) {
         IdSNode* idn = new IdSNode();
-        idn->identifier = flirpin.const_function->full_path;
+        idn->identifier = flirpin.const_function->path.as_str();
         info.snode = idn;
     }
     return std::make_unique<SemanticInfo>(info);

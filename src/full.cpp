@@ -57,7 +57,7 @@ void build_packages(Package* package, int level) {
                     all_modules.push_back(module_rel_path);
                     std::string module_name = d_name.substr(0, d_name.size() - 3);
                     Module* module = new Module(module_name, module_abs_path, module_rel_path);
-                    module->full_path = package->full_path + "." + module_name;
+                    module->path = Path(package->path, module_name);
                     package->units[module_name] = Unit{.type=U_TYPE::MODULE, .module=module};
                 } else {
                     std::cout << std::string(level + 1, '\t') << "OTHER: " << d_name << std::endl;
@@ -67,7 +67,7 @@ void build_packages(Package* package, int level) {
                 std::string subpackage_rel_path = path_join(package->rel_path, d_name);
                 std::string subpackage_name = d_name;
                 Package* subpackage = new Package(d_name, subpackage_abs_path, subpackage_rel_path);
-                subpackage->full_path = package->full_path + "." + d_name;
+                subpackage->path = Path(package->path, d_name);
                 build_packages(subpackage, level + 1);
                 package->units[subpackage_name] = Unit{.type=U_TYPE::PACKAGE, .package=subpackage};
             }
@@ -102,19 +102,19 @@ void process_global_all_modules(Package* package) {
             process_global_all_modules(subpackage);
         } else if (ep.second.type == U_TYPE::MODULE) {
             Module* module = ep.second.module;
-            if (module->name == "core") {
-                continue;
-            }
+            // if (module->name == "core") {
+            //     continue;
+            // }
             std::cout << "Global processing module " << module->name << std::endl;
             GlobalProcessor gp;
             std::cout << "Global processing module " << module->name << std::endl;
-            Module* core_module = root_package->units["core"].module;
-            for (auto builtin: core_module->flirpins) {
-                module->flirpins[builtin.first] = builtin.second;
-            }
+            // Module* core_module = root_package->units["core"].module;
+            // for (auto builtin: core_module->flirpins) {
+            //     module->flirpins[builtin.first] = builtin.second;
+            // }
             gp.module = module;
             gp.root_package = root_package;
-            gp.module_dotted_path = module->full_path;
+            gp.module_dotted_path = module->path;
             gp.__file__ = module->abs_path;
             gp.visit_root(*module->ast);
             module->imported_paths = gp.imported_paths;
@@ -184,15 +184,8 @@ void analyze_all_modules(Package* package) {
             for (auto i: module->imported_paths) {
                 add_path_to_module(module, i.first, i.second);
             }
-
-
-            // module->flirpins["print"] = core_module->flirpins["print"];
-            // module->flirpins["Integer"] = core_module->flirpins["Integer"];
-            // module->flirpins["Float"] = core_module->flirpins["Float"];
-            // module->flirpins["Double"] = core_module->flirpins["Double"];
-            // module->flirpins["String"] = core_module->flirpins["String"];
-            // module->flirpins["Boolean"] = core_module->flirpins["Boolean"];
             Checker checker;
+            checker.root_package = root_package;
             checker.module = module;
             checker.__file__ = module->abs_path;
             checker.code_lines = module->code_lines;
@@ -205,7 +198,6 @@ void analyze_all_modules(Package* package) {
         }
     }
 }
-
 
 void transpile_all_modules(Package* package, std::string output_dir) {
     std::cout << "Transpiling package " << package->name << std::endl;
@@ -240,7 +232,7 @@ void transpile_all_modules(Package* package, std::string output_dir) {
             if (module->flirpins.count("main") != 0) {
                 t.source += "\nint main(){\n";
                 t.source += static_initializations;
-                t.source += "auto x = GET_INT(CALL0(" + mangle_path(module->full_path + ".main") + "));\n";
+                t.source += "auto x = GET_INT(CALL0(" + mangle_path(module->path.as_str() + ".main") + "));\n";
                 t.source += static_cleanups;
                 t.source += "return x;\n}";
             }
@@ -259,6 +251,9 @@ void transpile_all_modules(Package* package, std::string output_dir) {
             std::string include_core = "#include <core/core.h>\n";
             std::string includes = include_core;
             for (auto m: module->included_module_paths) {
+                if (m == "core.h") {
+                    continue;
+                }
                 includes += "#include <" + m + ">\n";
             }
             t.header = includes + t.header;
@@ -271,7 +266,7 @@ void transpile_all_modules(Package* package, std::string output_dir) {
     }
     std::string output_package_header_path = path_join(output_package_dir, "__package__.h");
     std::ofstream output_package_header(output_package_header_path);
-    std::cout << "PACKAGE HEADER: " << package->full_path << std::endl << package_header;
+    std::cout << "PACKAGE HEADER: " << package->path.as_str() << std::endl << package_header;
     output_package_header << package_header;
 }
 
@@ -290,37 +285,6 @@ int main(int argc, char* argv[]) {
     build_packages(root_package, 0);
     parse_all_modules(root_package);
 
-    Module* core_module = new Module("core", "", "");
-    core_module->full_path = "core";
-    root_package->units["core"] = Unit{.type=U_TYPE::MODULE, .module=core_module};
-
-    // function_builtins["map"] = "fun(List[a],fun(a)->b)->List[b]";
-    function_builtins["print"] = "fun(String)";
-    function_builtins["open"] = "fun(String)->File";
-    function_builtins["join"] = "fun(List[String],String)->String";
-    function_builtins["range"] = "fun(Integer,Integer,Integer)->List[Integer])->String";
-    function_builtins["input"] = "fun()->String";
-
-
-    std::vector<Class*> cbuiltins = {make_float_class_info(), make_double_class_info(), make_file_class_info(),
-                                     make_int_class_info(), make_list_class_info(), make_boolean_class_info(),
-                                     make_string_class_info()};
-
-    for (auto ci: cbuiltins) {
-        ci->full_path = core_module->full_path + "." + ci->class_name;
-        core_module->flirpins[ci->class_name] = Flirpin{.type=F_TYPE::CLASS, .clazz=ci};
-    }
-
-    for (auto fb: function_builtins) {
-        ConstFunction* cf = new ConstFunction();
-        cf->ft = parse_function_type(fb.second);
-        for (size_t i = 0; i < cf->ft->param_types.size(); i++) {
-            cf->ft->param_types[i]->object().actual_base_path = "core." + cf->ft->param_types[i]->object().id;
-        }
-        cf->full_path = core_module->full_path + "." + fb.first;
-        core_module->flirpins[fb.first] = Flirpin{.type=F_TYPE::CONST_FUNCTION, .const_function=cf};
-    }
-
     process_global_all_modules(root_package);
 
 
@@ -329,6 +293,9 @@ int main(int argc, char* argv[]) {
 
     std::string all_files;
     for (auto f: all_modules) {
+        if (f == "core.xl") {
+            continue;
+        }
         f = f.substr(0, f.size() - 3) + ".cpp";
         std::cout << f << std::endl;
         all_files += f + " ";

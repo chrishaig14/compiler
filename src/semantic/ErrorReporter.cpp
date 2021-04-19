@@ -79,8 +79,10 @@ void ErrorReporter::bool_op(const TypeNode& left, const TypeNode& right, TextPos
 
 void ErrorReporter::assignment(const TypeNode& expected, const TypeNode& actual, TextPosition position) {
     std::string msg;
-    msg = context_string(position) + E_FMT("Expected ") + E_HLT(expected.to_string()) + E_FMT(", got ") +
-          E_HLT(actual.to_string()) + this->code_error_string(position, position);
+    msg = context_string(position) + E_FMT("Expected ") + E_HLT(expected.to_string()) + E_FMT("(alias for ") +
+          E_HLT(expected.actual_to_string()) + E_FMT(")") + E_FMT(", got ") + E_HLT(actual.to_string()) +
+          E_FMT(" (alias for ") + E_HLT(actual.actual_to_string()) + E_FMT(")") +
+          this->code_error_string(position, position);
     this->fail(msg);
 }
 

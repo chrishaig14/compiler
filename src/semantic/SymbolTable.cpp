@@ -44,6 +44,7 @@ Entity SymbolTable::get(const std::string& name) {
     if (this->parent != nullptr) {
         return this->parent->get(name);
     }
+    throw std::runtime_error("Error path: " + name + " not found!");
     return Entity{.type=E_TYPE::NOT_FOUND};
 }
 
