@@ -1,17 +1,12 @@
 #include <sstream>
-#include <fstream>
-#include <fmt/ostream.h>
-#include <fmt/color.h>
 #include <dirent.h>
 #include "scanner/Scanner.h"
 #include "parser/Parser.h"
 #include "semantic/GlobalProcessor.h"
 #include "semantic/Checker.h"
 #include "logging/logging.h"
-#include "semantic/util.h"
 #include "transpiler/STranspiler.h"
 #include "units/Package.h"
-#include "units/ConstFunction.h"
 
 static std::map<std::string, std::string> function_builtins;
 static std::map<std::string, std::map<std::string, std::string>> class_builtins;
