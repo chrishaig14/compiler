@@ -16,7 +16,8 @@ typedef std::pair<std::string, std::string> Builtin;
 class GlobalProcessor {
 public:
     Path module_dotted_path;
-    std::map<std::string, VectorOfStrings> imported_paths;
+    std::map<std::string, Path> imported_paths_no_alias;
+    std::map<std::string, Path> imported_paths_with_alias;
 
     Package* root_package;
     Module* module;
@@ -31,7 +32,6 @@ public:
     void visit(ImportNode& node);
 
     void visit(ClassNode& node);
-
 
 
     std::string __file__;

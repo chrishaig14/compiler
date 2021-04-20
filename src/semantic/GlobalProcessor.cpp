@@ -24,11 +24,23 @@ std::string join_path(VectorOfStrings path) {
 }
 
 void GlobalProcessor::visit(ImportNode& node) {
-    if (this->imported_paths.count(node.alias)) {
-        throw std::runtime_error("Import alias \"" + node.alias + "\" already defined for " +
-                                 join_path(this->imported_paths[node.alias]));
+    if (node.has_alias) {
+        if (this->imported_paths_with_alias.count(node.alias)) {
+            throw std::runtime_error("Import alias \"" + node.alias + "\" already defined for " +
+                                     this->imported_paths_with_alias[node.alias].as_str());
+        }
+        this->imported_paths_with_alias[node.alias] = node.path;
+        this->module->imported_paths_with_alias_v.push_back(std::make_pair(node.alias, node.path));
+    } else {
+        if (this->imported_paths_with_alias.count(node.path.back()) != 0) {
+            throw std::runtime_error("Path " + Path(node.path).as_str() + " already imported!");
+        }
+        if (this->imported_paths_no_alias.count(node.path.back()) != 0) {
+            throw std::runtime_error("Path " + Path(node.path).as_str() + " already imported!");
+        }
+        this->imported_paths_no_alias[node.path.back()] = node.path;
+        this->module->imported_paths_no_alias_v.push_back(std::make_pair(node.path.back(), node.path));
     }
-    this->imported_paths[node.alias] = node.path;
     // this->module->inverted[Path(node.path).as_str()] = node.alias;
     // for (auto imported_name: node.path) {
     //     (*this->module_mappings[this->module_name])[imported_name] = (*this->module_mappings[node.module_name])[imported_name];
@@ -64,7 +76,11 @@ void GlobalProcessor::visit_root(BlockNode& node) {
         } else if (n->ntype == NodeType::FUNC) {
             name = n->func().identifier;
         } else if (n->ntype == NodeType::IMPORT) {
-            name = n->import().alias;
+            if (n->import().has_alias) {
+                name = n->import().alias;
+            } else {
+                name = n->import().path.back();
+            }
         }
         if (names.count(name) == 0) {
             names[name] = nullptr;
@@ -113,11 +129,11 @@ void GlobalProcessor::visit(BlockNode& node) {
 
 void GlobalProcessor::visit(ClassNode& node) {
     Class* class_info = this->module->flirpins[node.class_name].clazz;
-
-    if (this->imported_paths.count(node.class_name) == 1) {
-        throw std::runtime_error("Name \"" + node.class_name + "\" already used as an alias for " +
-                                 join_path(this->imported_paths[node.class_name]));
-    }
+    //
+    // if (this->imported_paths.count(node.class_name) == 1) {
+    //     throw std::runtime_error("Name \"" + node.class_name + "\" already used as an alias for " +
+    //                              this->imported_paths[node.class_name].as_str());
+    // }
 
     for (auto mn: node.members_ordered) {
         auto mt = node.members[mn];
@@ -201,8 +217,11 @@ Path GlobalProcessor::get_actual_path(std::string id) {
     if (this->module->flirpins.count(id) == 1) {
         return this->module->flirpins[id].clazz->path;
     }
-    if (this->imported_paths.count(id) == 1) {
-        return this->imported_paths[id];
+    if (this->imported_paths_with_alias.count(id) == 1) {
+        return this->imported_paths_with_alias[id];
+    }
+    if (this->imported_paths_no_alias.count(id) == 1) {
+        return this->imported_paths_no_alias[id];
     }
     throw std::runtime_error("Error: type " + id + " not found");
 }

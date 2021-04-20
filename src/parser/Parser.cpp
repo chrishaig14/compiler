@@ -871,7 +871,7 @@ ImportNode* Parser::parse_import() {
         return new ImportNode(path, alias.str, import_tok.start, path_part.end_pos);
     }
     this->expect_token(TokType::SEMICOLON);
-    return new ImportNode(path, path.back(), import_tok.start, path_part.end_pos);
+    return new ImportNode(path, import_tok.start, path_part.end_pos);
 }
 
 

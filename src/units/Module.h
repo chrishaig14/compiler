@@ -21,7 +21,10 @@ public:
     std::string abs_path;
     std::string rel_path;
     BlockNode* ast;
-    std::map<std::string, VectorOfStrings> imported_paths;
+    std::map<std::string, Path> imported_paths_no_alias;
+    std::map<std::string, Path> imported_paths_with_alias;
+    std::vector<std::pair<std::string, Path>> imported_paths_no_alias_v;
+    std::vector<std::pair<std::string, Path>> imported_paths_with_alias_v;
     std::map<std::string, Entity> imports;
     Path path;
     CodeLines code_lines;

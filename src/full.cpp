@@ -111,7 +111,8 @@ void process_global_all_modules(Package* package) {
             gp.module_dotted_path = module->path;
             gp.__file__ = module->abs_path;
             gp.visit_root(*module->ast);
-            module->imported_paths = gp.imported_paths;
+            module->imported_paths_no_alias = gp.imported_paths_no_alias;
+            module->imported_paths_with_alias = gp.imported_paths_with_alias;
             std::cout << "- Done" << std::endl;
         }
     }
@@ -130,11 +131,11 @@ VectorOfStrings make_path(std::string s) {
     return path;
 }
 
-void add_path_to_module(Module* module, std::string name, VectorOfStrings path) {
+void add_path_to_module(Module* module, Path path) {
     Flirpin current_flirpin = Flirpin{.type=F_TYPE::PACKAGE, .package=root_package};
     std::string path_so_far;
     std::string last_include;
-    for (auto path_part: path) {
+    for (auto path_part: path.as_vec()) {
         if (current_flirpin.type == F_TYPE::PACKAGE) {
             Package* package = current_flirpin.package;
             auto unit = package->units.find(path_part);
@@ -156,9 +157,45 @@ void add_path_to_module(Module* module, std::string name, VectorOfStrings path) 
         }
         path_so_far += "." + path_part;
     }
+
     std::string included_module_header_basename = last_include.substr(0, last_include.size() - 3);
     module->included_module_paths.push_back(included_module_header_basename + ".h");
-    module->flirpins[name] = current_flirpin;
+    module->flirpins[path.as_vec().back()] = current_flirpin;
+}
+
+void add_path_with_alias_to_module(Module* module, std::string alias, Path path) {
+    Flirpin current_flirpin = Flirpin{.type=F_TYPE::PACKAGE, .package=root_package};
+    std::string path_so_far;
+    std::string last_include;
+    for (auto path_part: path.as_vec()) {
+        if (current_flirpin.type == F_TYPE::PACKAGE) {
+            Package* package = current_flirpin.package;
+            auto unit = package->units.find(path_part);
+            if (unit == package->units.end()) {
+                throw std::runtime_error("Error '" + path_part + "' not found in package " + path_so_far);
+            }
+            if (unit->second.type == U_TYPE::MODULE) {
+                last_include = unit->second.module->rel_path;
+            } else {
+                last_include = unit->second.package->rel_path;
+            }
+            current_flirpin = map_unit_to_flirpin(unit->second);
+        } else if (current_flirpin.type == F_TYPE::MODULE) {
+            auto flirpin = current_flirpin.module->flirpins.find(path_part);
+            if (flirpin == current_flirpin.module->flirpins.end()) {
+                throw std::runtime_error("Error '" + path_part + "' not found in module " + path_so_far);
+            }
+            current_flirpin = flirpin->second;
+        }
+        path_so_far += "." + path_part;
+    }
+    if (current_flirpin.type == F_TYPE::CLASS) {
+        throw std::runtime_error(
+                "Cannot import class " + current_flirpin.clazz->path.as_str() + " aliased with " + alias);
+    }
+    std::string included_module_header_basename = last_include.substr(0, last_include.size() - 3);
+    module->included_module_paths.push_back(included_module_header_basename + ".h");
+    module->flirpins[alias] = current_flirpin;
 }
 
 std::string project_output_dir;
@@ -175,8 +212,13 @@ void analyze_all_modules(Package* package) {
                 continue;
             }
 
-            for (auto i: module->imported_paths) {
-                add_path_to_module(module, i.first, i.second);
+            for (auto path: module->imported_paths_no_alias_v) {
+                std::cout << "PATH: " << path.first << std::endl;
+                add_path_to_module(module, path.second);
+            }
+            for (auto i: module->imported_paths_with_alias_v) {
+                std::cout << "PATH: " << i.first << std::endl;
+                add_path_with_alias_to_module(module, i.first, i.second);
             }
             Checker checker;
             checker.root_package = root_package;
