@@ -110,4 +110,4 @@ add_library(
         semantic/CheckerVisit.cpp
         semantic/CheckerUnify.cpp semantic/util.cpp semantic/util.h units/Package.cpp units/Package.h units/Module.cpp units/Module.h units/ConstFunction.h units/Entity.cpp units/Entity.h units/ConstFunction.cpp units/ObjectValue.cpp units/ObjectValue.h units/FunctionValue.cpp units/FunctionValue.h semantic/ErrorReporter.cpp semantic/ErrorReporter.h)
 
-add_library(transpiler transpiler/Transpiler.cpp transpiler/Transpiler.h transpiler/STranspiler.cpp transpiler/STranspiler.h)
+add_library(transpiler transpiler/STranspiler.cpp transpiler/STranspiler.h)

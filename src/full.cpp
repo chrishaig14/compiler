@@ -7,7 +7,6 @@
 #include "parser/Parser.h"
 #include "semantic/GlobalProcessor.h"
 #include "semantic/Checker.h"
-#include "transpiler/Transpiler.h"
 #include "logging/logging.h"
 #include "semantic/util.h"
 #include "transpiler/STranspiler.h"
