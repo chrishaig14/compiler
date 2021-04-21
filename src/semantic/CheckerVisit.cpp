@@ -1471,12 +1471,9 @@ USemanticInfo Checker::visit(DefaultConstructorNode& node) {
     // this is a regular function
     SemanticInfo info;
     VectorOfTypes t;
-    Entity entity = this->scope->get(node.name);
-    // if (entity == nullptr) {
-    //     throw std::runtime_error("Error: " + node.name + " not defined");
-    // }
+    Entity entity = this->dispatch(node.class_node)->entity;
     if (entity.type != E_TYPE::CLASS) {
-        throw std::runtime_error("Error: " + node.name + " is not a class");
+        throw std::runtime_error("Error not a class");
     }
     Class* cls = entity.clazz;
     for (auto pt: cls->member_types) {
@@ -1484,7 +1481,7 @@ USemanticInfo Checker::visit(DefaultConstructorNode& node) {
     }
     info.entity = Entity{.type=E_TYPE::CONST_FUNCTION};
     info.entity.const_function = new ConstFunction();
-    auto rt = new ObjectType(node.name, {});
+    auto rt = new ObjectType(entity.clazz->path.as_str(), {});
     rt->actual_base_path = cls->path;
     info.entity.const_function->ft = new FunctionType(t, rt);
     IdSNode* idn = new IdSNode();

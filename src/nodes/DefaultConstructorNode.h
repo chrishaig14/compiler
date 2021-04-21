@@ -10,8 +10,10 @@
 
 class DefaultConstructorNode : public Node {
 public:
-    DefaultConstructorNode(std::string name, TextPosition start, TextPosition end) : Node(NodeType::DEF_CONST, start, end) {
-        this->name = name;
+    DefaultConstructorNode(Node* class_node, TextPosition start, TextPosition end) : Node(NodeType::DEF_CONST,
+                                                                                          start,
+                                                                                          end) {
+        this->class_node = class_node;
     }
 
     bool equal(const Node& other) const override {
@@ -27,7 +29,7 @@ public:
         return *this;
     }
 
-    std::string name;
+    Node* class_node;
 };
 
 

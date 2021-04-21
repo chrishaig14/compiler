@@ -7,5 +7,5 @@
 
 #include <vector>
 
-typedef std::vector<std::string> VectorOfStrings;
+typedef std::vector<std::string> Path;
 #endif //UNTITLED1_TYPES_H

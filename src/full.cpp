@@ -132,9 +132,11 @@ VectorOfStrings make_path(std::string s) {
 }
 
 void add_path_to_module(Module* module, Path path) {
+    std::cout << "######## adding path: " << path.as_str() << std::endl;
     Flirpin current_flirpin = Flirpin{.type=F_TYPE::PACKAGE, .package=root_package};
     std::string path_so_far;
     std::string last_include;
+    Flirpin last_flirpin;
     for (auto path_part: path.as_vec()) {
         if (current_flirpin.type == F_TYPE::PACKAGE) {
             Package* package = current_flirpin.package;
@@ -147,7 +149,9 @@ void add_path_to_module(Module* module, Path path) {
             } else {
                 last_include = unit->second.package->rel_path;
             }
+
             current_flirpin = map_unit_to_flirpin(unit->second);
+            last_flirpin = current_flirpin;
         } else if (current_flirpin.type == F_TYPE::MODULE) {
             auto flirpin = current_flirpin.module->flirpins.find(path_part);
             if (flirpin == current_flirpin.module->flirpins.end()) {
@@ -157,10 +161,52 @@ void add_path_to_module(Module* module, Path path) {
         }
         path_so_far += "." + path_part;
     }
+    std::string t;
+    switch (current_flirpin.type) {
+        case F_TYPE::CONST_FUNCTION:
+            t = "const function";
+            break;
+        case F_TYPE::CLASS:
+            t = "class";
+            break;
+        case F_TYPE::PACKAGE:
+            t = "package";
+            break;
+        case F_TYPE::MODULE:
+            t = "module";
+            break;
+    }
+    std::string lt;
+    switch (last_flirpin.type) {
+        case F_TYPE::CONST_FUNCTION:
+            lt = "const function";
+            break;
+        case F_TYPE::CLASS:
+            lt = "class";
+            break;
+        case F_TYPE::PACKAGE:
+            lt = "package";
+            break;
+        case F_TYPE::MODULE:
+            lt = "module";
+            break;
+    }
+    std::string included_header;
+    if (last_flirpin.type == F_TYPE::PACKAGE) {
+        included_header = last_flirpin.package->rel_path + "/__package__";
+        module->included_module_paths.push_back(included_header + ".h");
+        module->flirpins[path.as_vec().back()] = current_flirpin;
+    } else {
+        included_header = last_include.substr(0, last_include.size() - 3);
+        module->included_module_paths.push_back(included_header + ".h");
+        module->flirpins[path.as_vec().back()] = current_flirpin;
+    }
 
-    std::string included_module_header_basename = last_include.substr(0, last_include.size() - 3);
-    module->included_module_paths.push_back(included_module_header_basename + ".h");
-    module->flirpins[path.as_vec().back()] = current_flirpin;
+    std::cout << "CURRENT FLIRPIN TYPE: " << t << std::endl;
+    std::cout << "last FLIRPIN TYPE: " << lt << std::endl;
+
+
+    std::cout << "######## added path: " << included_header << std::endl;
 }
 
 void add_path_with_alias_to_module(Module* module, std::string alias, Path path) {
@@ -236,9 +282,10 @@ void analyze_all_modules(Package* package) {
 }
 
 void transpile_all_modules(Package* package, std::string output_dir) {
-    std::cout << "Transpiling package " << package->name << std::endl;
+    std::cout << "Transpiling package " << package->name << " output dir: " << output_dir << std::endl;
     std::string package_header;
     std::string output_package_dir = path_join(output_dir, package->name);
+    std::cout << "output package dir: " << output_package_dir << std::endl;
     if (package->name != "") {
         mkdir(output_package_dir.c_str(), 0777);
     }
@@ -246,7 +293,7 @@ void transpile_all_modules(Package* package, std::string output_dir) {
         if (u.second.type == U_TYPE::PACKAGE) {
             Package* subpackage = u.second.package;
             transpile_all_modules(subpackage, output_package_dir);
-            package_header += "#include \"" + subpackage->rel_path + "/__package__.h\"\n";
+            package_header += "#include <" + subpackage->rel_path + "/__package__.h>\n";
         } else if (u.second.type == U_TYPE::MODULE) {
             Module* module = u.second.module;
             if (module->name == "core") {
@@ -297,7 +344,7 @@ void transpile_all_modules(Package* package, std::string output_dir) {
             t.header = h_ifndef + h_define + t.header + h_endif;
             std::ofstream output_h_file(output_h_path);
             output_h_file << t.header;
-            package_header += "#include \"" + output_h_path + "\"\n";
+            package_header += "#include <" + package->rel_path + "/" + module_name + ".h>\n";
         }
     }
     std::string output_package_header_path = path_join(output_package_dir, "__package__.h");

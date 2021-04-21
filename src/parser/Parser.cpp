@@ -435,9 +435,14 @@ Node* Parser::parse_tuple_or_constructor() {
     Node* parent;
     this->next();
     if (this->match(TokType::ID)) {
-        Token tok = this->token;
-        this->next();
-        parent = new DefaultConstructorNode(tok.str, hash_tok.start, tok.end_pos);
+        Token idd = this->expect_token(TokType::ID);
+        Node* m = new IdNode(idd.str, this->token.start, this->token.end_pos);
+        while (this->match(TokType::DOT)) {
+            this->next();
+            idd = this->expect_token(TokType::ID);
+            m = new MemberNode(m, idd.str, m->start, idd.end_pos);
+        }
+        parent = new DefaultConstructorNode(m, hash_tok.start, m->end);
     } else {
         parent = this->parse_tuple_literal();
         parent->start = hash_tok.start;
