@@ -82,6 +82,15 @@ const FunctionType& FunctionType::function() const {
     return *this;
 }
 
+bool FunctionType::is_generic() const {
+    for (auto t: this->param_types) {
+        if (t->is_generic()) {
+            return true;
+        }
+    }
+    return false;
+}
+
 ObjectType::ObjectType(const std::string& identifier, const VectorOfTypes& typeParameters)
         : id(identifier), type_params(typeParameters) {
     for (auto p: typeParameters) {
@@ -163,6 +172,18 @@ ObjectType& ObjectType::object() {
 ObjectType::ObjectType(const std::string& identifier) : ObjectType(identifier, {}) {
 }
 
+bool ObjectType::is_generic() const {
+    if (islower(this->id[0])) {
+        return true;
+    }
+    for (auto t: this->type_params) {
+        if (t->is_generic()) {
+            return true;
+        }
+    }
+    return false;
+}
+
 bool TypeNode::operator!=(const TypeNode& other) const {
     return !(*this == other);
 }
@@ -188,4 +209,8 @@ const FunctionType& TypeNode::function() const {
 
 const ObjectType& TypeNode::object() const {
     throw std::runtime_error("Getting wrong type!");
+}
+
+bool TypeNode::is_generic() const {
+    return false;
 }

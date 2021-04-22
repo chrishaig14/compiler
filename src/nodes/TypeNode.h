@@ -99,6 +99,7 @@ public:
     virtual ~TypeNode() {
     }
 
+    virtual bool is_generic() const;
 };
 
 class ObjectType : public TypeNode {
@@ -125,6 +126,7 @@ public:
     Path actual_base_path;
     std::string id;
     VectorOfTypes type_params;
+    bool is_generic() const override;
 };
 
 class UnknownTypeNode : public TypeNode {
@@ -169,6 +171,8 @@ public:
 
     VectorOfTypes param_types;
     TypeNode* return_type;
+
+    bool is_generic() const override;
 };
 
 

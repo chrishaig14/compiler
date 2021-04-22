@@ -233,31 +233,38 @@ SemanticInfo Checker::match_arguments_to_generic_function(const FunctionType& ft
         delete at;
     }
     SemanticInfo rv;
-    rv.set_type(*f->return_type);
+    rv.entity = Entity{.type=E_TYPE::OBJECT_VALUE, .object_value=new ObjectValue()};
+    rv.entity.object_value->ot = (ObjectType*) f->return_type->clone();
     delete f;
     return rv;
-
 }
 
 bool Checker::can_assign(const TypeNode& from, const TypeNode& to) {
-    auto& to_object = (to).object();
-    if (to_object.id == "Option") {
-        if (*to_object.type_params[0] != from) {
-            auto foo = from.object();
-            if (foo.id != "NoneType") {
-                return false;
-            }
+    if (from.object().is_generic() && to.object().is_generic()) {
+        if (from.object().id != to.object().id) {
+            return false;
         }
-        return true;
-    } else if (to_object.id == "Union") {
-        for (auto type_param: to_object.type_params) {
-            if (*type_param == from) {
-                return true;
-            }
-        }
+    } else if (from.object().actual_base_path.as_str() != to.object().actual_base_path.as_str()) {
         return false;
     }
-    return to == from;
+    // auto& to_object = (to).object();
+    // if (to_object.id == "Option") {
+    //     if (*to_object.type_params[0] != from) {
+    //         auto foo = from.object();
+    //         if (foo.id != "NoneType") {
+    //             return false;
+    //         }
+    //     }
+    //     return true;
+    // } else if (to_object.id == "Union") {
+    //     for (auto type_param: to_object.type_params) {
+    //         if (*type_param == from) {
+    //             return true;
+    //         }
+    //     }
+    //     return false;
+    // }
+    return true;
 }
 
 bool Checker::can_assign_generic(TypeNode& from, TypeNode& to, VectorOfStrings type_params) {

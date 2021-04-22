@@ -678,7 +678,7 @@ USemanticInfo Checker::visit_call(CallNode& n) {
         }
 
         if (function_is_generic(*function_type)) {
-            retv = match_arguments_to_generic_function(*function_type, arg_types);
+            retv.entity = match_arguments_to_generic_function(*function_type, arg_types).entity;
             // for(auto x: arg_types){
             //     delete x;
             // }
@@ -816,14 +816,19 @@ USemanticInfo Checker::visit_function(FunctionNode& n) {
     }
     for (size_t i = 0; i < n.parameter_names.size(); i++) {
         TypeNode& type = *n.parameter_types[i];
-        Entity pt = this->scope->get(n.const_function->ft->param_types[i]->object().id);
-        n.const_function->ft->param_types[i]->object().actual_base_path = pt.clazz->path;
-        if (type.kind == Kind::OBJECT) {
-            std::cout << "START" << std::endl;
-            this->assert_type_exists(type, n.start);
-            std::cout << "END" << std::endl;
+        ObjectType& param_type = n.const_function->ft->param_types[i]->object();
+        if (!param_type.is_generic()) {
+            Entity pt = this->scope->get(param_type.id);
+            param_type.actual_base_path = pt.clazz->path;
+            if (type.kind == Kind::OBJECT) {
+                std::cout << "START" << std::endl;
+                this->assert_type_exists(type, n.start);
+                std::cout << "END" << std::endl;
+            }
+            this->scope->set(n.parameter_names[i], entity_from_type(type));
+        } else {
+            this->scope->set(n.parameter_names[i], entity_from_type(param_type));
         }
-        this->scope->set(n.parameter_names[i], entity_from_type(type));
     }
     std::cout << "FINISH " << std::endl;
 
@@ -1433,10 +1438,10 @@ USemanticInfo Checker::visit_return(ReturnNode& n) {
     }
     sn->expression = expression_info.snode;
     n.expression = this->replace_if_necessary(n.expression);
-    // if (!this->can_assign(expression_info.type(), return_type)) {
-    //     this->error_reporter.return_mismatch(return_type, expression_info.type(), n.start);
-    //     return error_stub();
-    // }
+    if (!this->can_assign(*expression_info.entity.object_value->ot, return_type)) {
+        this->error_reporter.return_mismatch(return_type, *expression_info.entity.object_value->ot, n.start);
+        return error_stub();
+    }
     n.ret_type = return_type.clone();
     n.reachables = this->scope->get_all();
     return std::make_unique<SemanticInfo>(info);
