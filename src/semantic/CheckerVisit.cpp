@@ -323,6 +323,7 @@ FunctionSNode* make_class_default_init(std::string class_path, VectorOfStrings m
 
 
 USemanticInfo Checker::visit_class(ClassNode& node) {
+    this->error_reporter.current_class = node.class_name;
     SemanticInfo info;
     BlockSNode* sn = new BlockSNode();
     info.snode = sn;
@@ -400,7 +401,7 @@ USemanticInfo Checker::visit_class(ClassNode& node) {
     this->add_this = false;
     delete this_type;
     this->this_type = nullptr;
-    this->current_class = "";
+    this->error_reporter.current_class = "";
     return std::make_unique<SemanticInfo>(info);
 }
 
@@ -644,7 +645,7 @@ USemanticInfo Checker::visit_call(CallNode& n) {
         // ok
         // const FunctionType& function_type = fun_info.type().function();
         if (n.arguments.size() != function_type->param_types.size()) {
-            this->error_reporter.function_call_num_args(n.start);
+            this->error_reporter.function_call_num_args(*function_type, n.start);
             if (!function_is_generic(*function_type)) {
                 retv.set_type(*function_type->return_type);
                 return std::make_unique<SemanticInfo>(retv);
@@ -799,6 +800,7 @@ USemanticInfo Checker::visit_block(BlockNode& node) {
 }
 
 USemanticInfo Checker::visit_function(FunctionNode& n) {
+    this->error_reporter.current_function = n.identifier;
     SemanticInfo info;
     FunctionSNode* sn = new FunctionSNode();
     info.snode = sn;

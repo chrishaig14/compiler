@@ -210,10 +210,10 @@ void ErrorReporter::unused_return_value(TextPosition pos) {
     this->fail(msg);
 }
 
-void ErrorReporter::function_call_num_args(TextPosition position) {
+void ErrorReporter::function_call_num_args(FunctionType& ft, TextPosition position) {
     std::string msg;
-    msg = context_string(position) + E_FMT("Calling function with wrong number of arguments ") +
-          this->code_context_string(position);
+    msg = context_string(position) + E_FMT("Calling function of type ") + E_HLT(ft.to_string()) +
+          E_FMT(" with wrong number of arguments") + this->code_context_string(position);
     this->fail(msg);
 }
 

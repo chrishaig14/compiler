@@ -74,6 +74,7 @@ public:
     void class_no_member(const TypeNode& t, const std::string& member, TextPosition position);
     void module_no_member(const std::string& module_name, const std::string& member, TextPosition position);
     void package_no_member(const std::string& package_name, const std::string& member, TextPosition position);
+    void function_call_num_args(FunctionType& ft, TextPosition position);
 };
 
 
