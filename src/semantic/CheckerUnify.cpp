@@ -166,6 +166,9 @@ USemanticInfo Checker::class_member(Class* cls, std::string child, MemberNode& n
 
 USemanticInfo Checker::object_member(SNode* object_snode, ObjectValue* pValue, std::string child, MemberNode& n) {
     Class* clazz = this->root_package->get(pValue->ot->actual_base_path).clazz;
+    if (clazz->type_params.size() != 0) {
+        clazz = instantiate_generic(clazz, *pValue->ot);
+    }
     SemanticInfo info;
     if (clazz->members.count(child)) {
         info.entity = entity_from_type(*clazz->members[child]);

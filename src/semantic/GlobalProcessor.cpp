@@ -138,10 +138,12 @@ void GlobalProcessor::visit(ClassNode& node) {
     //     throw std::runtime_error("Name \"" + node.class_name + "\" already used as an alias for " +
     //                              this->imported_paths[node.class_name].as_str());
     // }
-
+    class_info->type_params = node.type_parameters;
     for (auto mn: node.members_ordered) {
         auto mt = node.members[mn];
-        mt->object().actual_base_path = this->get_actual_path(mt->object().id);
+        if (!mt->object().is_generic()) {
+            mt->object().actual_base_path = this->get_actual_path(mt->object().id);
+        }
         class_info->member_names.push_back(mn);
         class_info->member_types.push_back(mt);
         class_info->members[mn] = mt;

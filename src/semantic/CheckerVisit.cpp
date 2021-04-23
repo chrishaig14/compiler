@@ -984,6 +984,10 @@ USemanticInfo Checker::check_declaration_without_type(DeclarationNode& n) {
     n.expression = this->replace_if_necessary(n.expression);
     // info.set_type(exp_info.type());
     info.entity = exp_info_p->entity;
+    if (info.entity.type == E_TYPE::CONST_FUNCTION) {
+        info.entity = Entity{.type=E_TYPE::FUNCTION_VALUE, .function_value=new FunctionValue()};
+        info.entity.function_value->ft = exp_info_p->entity.const_function->ft;
+    }
     return std::make_unique<SemanticInfo>(info);
 }
 
@@ -1044,32 +1048,38 @@ USemanticInfo Checker::visit_assignment(AssignmentNode& n) {
     const TypeNode& l_type = *linfo.entity.object_value->ot;
     const TypeNode& exp_type = *expression_type.entity.object_value->ot;
 
-    std::string lpath_as_str = linfo.entity.object_value->ot->actual_base_path.as_str();
-    std::string exppath_as_str = expression_type.entity.object_value->ot->actual_base_path.as_str();
+    if (linfo.entity.type == E_TYPE::OBJECT_VALUE && expression_info_p->entity.type == E_TYPE::OBJECT_VALUE) {
 
-    if (lpath_as_str != exppath_as_str) {
-        if (l_type.kind == Kind::OBJECT) {
-            const ObjectType& actual_type = l_type.object();
-            if (actual_type.id == "Option") {
-                // if type doesn't match exactly, we may be assigning to an Option[t]
-                if (*actual_type.type_params[0] != exp_type) {
-                    auto& foo = exp_type.object();
-                    if (foo.id != "NoneType") {
-                        this->error_reporter.assignment(l_type, exp_type, n.start);
+        std::string lpath_as_str = linfo.entity.object_value->ot->actual_base_path.as_str();
+        std::string exppath_as_str = expression_type.entity.object_value->ot->actual_base_path.as_str();
+
+        if (lpath_as_str != exppath_as_str) {
+            if (l_type.kind == Kind::OBJECT) {
+                const ObjectType& actual_type = l_type.object();
+                if (actual_type.id == "Option") {
+                    // if type doesn't match exactly, we may be assigning to an Option[t]
+                    if (*actual_type.type_params[0] != exp_type) {
+                        auto& foo = exp_type.object();
+                        if (foo.id != "NoneType") {
+                            this->error_reporter.assignment(l_type, exp_type, n.start);
+                        }
                     }
+                } else {
+                    // if it's not Option[t], then it's an error
+                    this->error_reporter.assignment(l_type, exp_type, n.start);
                 }
             } else {
                 // if it's not Option[t], then it's an error
                 this->error_reporter.assignment(l_type, exp_type, n.start);
             }
-        } else {
-            // if it's not Option[t], then it's an error
-            this->error_reporter.assignment(l_type, exp_type, n.start);
         }
+        // else, type matches don't do anything
+        n.type = l_type.clone();
+    } else {
+        throw std::runtime_error(
+                "Error, cant assign " + expression_info_p->entity.object_value->ot->to_string() + " to type " +
+                linfo_p->entity.function_value->ft->to_string());
     }
-    // else, type matches don't do anything
-    n.type = l_type.clone();
-
     AssignmentSNode* sn = new AssignmentSNode();
     sn->lvalue = linfo_p->snode;
     sn->rvalue = expression_info_p->snode;
@@ -1486,7 +1496,11 @@ USemanticInfo Checker::visit(DefaultConstructorNode& node) {
     }
     info.entity = Entity{.type=E_TYPE::CONST_FUNCTION};
     info.entity.const_function = new ConstFunction();
-    auto rt = new ObjectType(entity.clazz->path.as_str(), {});
+    VectorOfTypes tp;
+    for (auto tt: entity.clazz->type_params) {
+        tp.push_back(new ObjectType(tt));
+    }
+    auto rt = new ObjectType(entity.clazz->path.as_str(), tp);
     rt->actual_base_path = cls->path;
     info.entity.const_function->ft = new FunctionType(t, rt);
     IdSNode* idn = new IdSNode();
