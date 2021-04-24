@@ -17,6 +17,7 @@
 #include "../logging/logging.h"
 #include "../simple_nodes/BlockSNode.h"
 #include "../units/ObjectValue.h"
+#include "../units/FunctionValue.h"
 #include "ErrorReporter.h"
 
 

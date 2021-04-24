@@ -125,9 +125,15 @@ void Checker::unify_function_call(FunctionType& fun, VectorOfTypes& args) {
 }
 
 std::pair<std::string, TypeNode*>* Checker::get_first_substitution(TypeNode& a, TypeNode& b, bool is_top_level_arg) {
-    if (a.kind != b.kind) {
+    if (a.kind == Kind::FUNCTION && b.kind == Kind::OBJECT) {
         throw std::runtime_error(
                 "Error trying to unify types of different kind" + a.to_string() + " and " + b.to_string());
+    }
+    if (a.kind == Kind::OBJECT && b.kind == Kind::FUNCTION) {
+        if (!a.is_generic_param) {
+            throw std::runtime_error("Error trying to unify " + a.to_string() + " and " + b.to_string());
+        }
+        return new std::pair<std::string, TypeNode*>(a.object().id, b.clone());
     }
     if (a.kind == Kind::FUNCTION) {
         return get_first_substitution_function(a.function(), b.function(), is_top_level_arg);
