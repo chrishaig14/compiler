@@ -811,7 +811,6 @@ USemanticInfo Checker::visit_function(FunctionNode& n) {
     this->current_function = function_name;
     this->enter_scope(function_name);
     this->scope->is_function = true;
-    bool is_init_method = this->is_method && function_name == "init";
     if (this->add_this) {
         this->scope->set("this", this->this_entity);
         sn->params.insert(sn->params.begin(), "this");
@@ -844,37 +843,7 @@ USemanticInfo Checker::visit_function(FunctionNode& n) {
     this->scope->set("__return__", entity_from_type(returnType));
     USemanticInfo body_info = this->visit_block(*n.body);
     sn->body = static_cast<BlockSNode*>(body_info->snode);
-    // for (auto v: this->scope->table) {
-    //     n.body->local_vars.push_back(std::make_pair(v.first, v.second->clone()));
-    // }
-    if (is_init_method) {
-        for (size_t i = 0; i < n.body->nodes.size(); i++) {
-            if (n.body->nodes[i]->ntype == NodeType::ASSIGN) {
-                AssignmentNode& nod = n.body->nodes[i]->assign();
-                if (nod.lvalue->ntype == NodeType::MEMBER) {
-                    MemberNode& mem = nod.lvalue->member();
-                    if (mem.parent->ntype == NodeType::ID) {
-                        if (mem.parent->id()._id == "this") {
-                            inits[mem.s_child] = true;
-                        }
-                    }
-                }
-            }
-        }
-        bool er = false;
-        for (auto x: this->inits) {
-            if (x.second == false) {
-                er = true;
-                this->error_reporter.class_init_member_not_init(this->current_class, x.first, n.start);
-                // std::cout << "MEMBER " + x.first + " not initialized in init method!" << std::endl;
-            }
-        }
-        if (er) {
-            throw std::runtime_error("FAILED");
-        }
-        this->leave_scope();
-        return nullptr;
-    }
+
     if (returnType != T_NONE) {
         if (n.body->nodes.size() != 0) {
             Node* last_node = n.body->nodes.back();
