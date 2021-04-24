@@ -52,7 +52,7 @@ void GlobalProcessor::visit(FunctionNode& node) {
 
     VectorOfTypes x;
     for (auto p: node.parameter_types) {
-        if (!p->object().is_generic()) {
+        if (!p->is_generic()) {
             p->object().actual_base_path = this->get_actual_path({p->object().id});
         }
         x.emplace_back(p->clone());

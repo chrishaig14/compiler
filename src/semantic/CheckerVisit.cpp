@@ -818,16 +818,21 @@ USemanticInfo Checker::visit_function(FunctionNode& n) {
     }
     for (size_t i = 0; i < n.parameter_names.size(); i++) {
         TypeNode& type = *n.parameter_types[i];
-        ObjectType& param_type = n.const_function->ft->param_types[i]->object();
+        TypeNode& param_type = *n.const_function->ft->param_types[i];
         if (!param_type.is_generic()) {
-            Entity pt = this->scope->get(param_type.id);
-            param_type.actual_base_path = pt.clazz->path;
-            if (type.kind == Kind::OBJECT) {
-                std::cout << "START" << std::endl;
-                this->assert_type_exists(type, n.start);
-                std::cout << "END" << std::endl;
+            if (param_type.kind == Kind::OBJECT) {
+                ObjectType& o_type = param_type.object();
+                Entity pt = this->scope->get(o_type.id);
+                o_type.actual_base_path = pt.clazz->path;
+                if (type.kind == Kind::OBJECT) {
+                    std::cout << "START" << std::endl;
+                    this->assert_type_exists(type, n.start);
+                    std::cout << "END" << std::endl;
+                }
+                this->scope->set(n.parameter_names[i], entity_from_type(type));
+            } else {
+                this->scope->set(n.parameter_names[i], entity_from_type(type));
             }
-            this->scope->set(n.parameter_names[i], entity_from_type(type));
         } else {
             this->scope->set(n.parameter_names[i], entity_from_type(param_type));
         }
@@ -989,6 +994,12 @@ USemanticInfo Checker::check_declaration_without_type(DeclarationNode& n) {
     if (info.entity.type == E_TYPE::CONST_FUNCTION) {
         info.entity = Entity{.type=E_TYPE::FUNCTION_VALUE, .function_value=new FunctionValue()};
         info.entity.function_value->ft = exp_info_p->entity.const_function->ft;
+
+        if (info.entity.function_value->ft->is_generic()) {
+            throw std::runtime_error("Error: you need to specialize the generic function of type " +
+                                     info.entity.function_value->ft->to_string() +
+                                     " to be able to use it without calling it");
+        }
     }
     return std::make_unique<SemanticInfo>(info);
 }
