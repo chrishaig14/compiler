@@ -99,6 +99,9 @@ public:
     virtual ~TypeNode() {
     }
 
+    bool generic;
+    bool is_generic_param;
+
     virtual bool is_generic() const;
 };
 

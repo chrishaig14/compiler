@@ -52,13 +52,14 @@ void GlobalProcessor::visit(FunctionNode& node) {
 
     VectorOfTypes x;
     for (auto p: node.parameter_types) {
-        if (!p->is_generic()) {
+        if (p->kind == Kind::OBJECT && !p->is_generic_param) {
             p->object().actual_base_path = this->get_actual_path({p->object().id});
         }
         x.emplace_back(p->clone());
     }
-    if (!node.return_type->object().is_generic()) {
-        node.return_type->object().actual_base_path = this->get_actual_path(node.return_type->object().id);
+    TypeNode* p = node.return_type;
+    if (p->kind == Kind::OBJECT && !p->is_generic_param) {
+        p->object().actual_base_path = this->get_actual_path({p->object().id});
     }
     FunctionType function_info(x, node.return_type->clone());
     Path function_path = Path(module_dotted_path, node.identifier);

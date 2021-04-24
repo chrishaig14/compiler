@@ -618,7 +618,11 @@ ObjectType* Parser::parse_object_type() {
         }
         this->expect_token(TokType::RSQUARE);
     }
-    return new ObjectType(identifier.str, type_parameters);
+    ObjectType* ot = new ObjectType(identifier.str, type_parameters);
+    if (ot->id.size() == 1 && islower(ot->id[0])) {
+        ot->is_generic_param = true;
+    }
+    return ot;
 }
 
 TypeNode* Parser::parse_type_node() {

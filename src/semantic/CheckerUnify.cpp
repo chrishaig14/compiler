@@ -165,6 +165,10 @@ USemanticInfo Checker::class_member(Class* cls, std::string child, MemberNode& n
 }
 
 USemanticInfo Checker::object_member(SNode* object_snode, ObjectValue* pValue, std::string child, MemberNode& n) {
+    if (pValue->ot->actual_base_path.as_str() == "") {
+        // is a single type param, error
+        throw std::runtime_error("Error: no member " + child + " in totally generic type " + pValue->ot->to_string());
+    }
     Class* clazz = this->root_package->get(pValue->ot->actual_base_path).clazz;
     if (clazz->type_params.size() != 0) {
         clazz = instantiate_generic(clazz, *pValue->ot);

@@ -587,6 +587,34 @@ TypeNode* get_entity_type(Entity e) {
     throw std::runtime_error("Get type of non function/object!");
 }
 
+void mangle_generic_names(TypeNode* t);
+void mangle_generic_names(FunctionType* t);
+void mangle_generic_names(ObjectType* t);
+
+void mangle_generic_names(TypeNode* t) {
+    if (t->kind == Kind::OBJECT) {
+        return mangle_generic_names(&t->object());
+    }
+    return mangle_generic_names(&t->function());
+}
+
+void mangle_generic_names(FunctionType* t) {
+    for(auto pt: t->param_types){
+        mangle_generic_names(pt);
+    }
+    mangle_generic_names(t->return_type);
+}
+
+void mangle_generic_names(ObjectType* t) {
+    if (t->is_generic_param) {
+        t->id = t->id + "0";
+    } else {
+        for (auto tp: t->type_params) {
+            mangle_generic_names(tp);
+        }
+    }
+}
+
 USemanticInfo Checker::visit_call(CallNode& n) {
     SemanticInfo retv;
     CallSNode* sn = new CallSNode();
@@ -678,7 +706,9 @@ USemanticInfo Checker::visit_call(CallNode& n) {
             n.arg_types.push_back(arg_type.clone());
         }
 
-        if (function_is_generic(*function_type)) {
+        if (function_type->is_generic()) {
+            // mangle the generic types in function_type to prevent collisions
+            mangle_generic_names(function_type);
             retv.entity = match_arguments_to_generic_function(*function_type, arg_types).entity;
             // for(auto x: arg_types){
             //     delete x;
@@ -799,6 +829,31 @@ USemanticInfo Checker::visit_block(BlockNode& node) {
     return std::make_unique<SemanticInfo>(info);
 }
 
+void make_not_generic(FunctionType* ft);
+void make_not_generic(ObjectType* ft);
+void make_not_generic(TypeNode* ft);
+
+void make_not_generic(TypeNode* t) {
+    if (t->kind == Kind::FUNCTION) {
+        return make_not_generic(&t->function());
+    }
+    return make_not_generic(&t->object());
+}
+
+void make_not_generic(FunctionType* ft) {
+    for (auto pt: ft->param_types) {
+        make_not_generic(pt);
+    }
+    make_not_generic(ft->return_type);
+}
+
+void make_not_generic(ObjectType* ot) {
+    ot->is_generic_param = false;
+    for (auto tp: ot->type_params) {
+        make_not_generic(tp);
+    }
+}
+
 USemanticInfo Checker::visit_function(FunctionNode& n) {
     this->error_reporter.current_function = n.identifier;
     SemanticInfo info;
@@ -818,23 +873,26 @@ USemanticInfo Checker::visit_function(FunctionNode& n) {
     for (size_t i = 0; i < n.parameter_names.size(); i++) {
         TypeNode& type = *n.parameter_types[i];
         TypeNode& param_type = *n.const_function->ft->param_types[i];
-        if (!param_type.is_generic()) {
-            if (param_type.kind == Kind::OBJECT) {
-                ObjectType& o_type = param_type.object();
-                Entity pt = this->scope->get(o_type.id);
-                o_type.actual_base_path = pt.clazz->path;
-                if (type.kind == Kind::OBJECT) {
-                    std::cout << "START" << std::endl;
-                    this->assert_type_exists(type, n.start);
-                    std::cout << "END" << std::endl;
-                }
-                this->scope->set(n.parameter_names[i], entity_from_type(type));
-            } else {
-                this->scope->set(n.parameter_names[i], entity_from_type(type));
-            }
-        } else {
-            this->scope->set(n.parameter_names[i], entity_from_type(param_type));
-        }
+        TypeNode* cl = type.clone();
+        make_not_generic(cl);
+        this->scope->set(n.parameter_names[i], entity_from_type(*cl));
+        // if (!param_type.is_generic()) {
+        //     if (param_type.kind == Kind::OBJECT) {
+        //         ObjectType& o_type = param_type.object();
+        //         Entity pt = this->scope->get(o_type.id);
+        //         o_type.actual_base_path = pt.clazz->path;
+        //         if (type.kind == Kind::OBJECT) {
+        //             std::cout << "START" << std::endl;
+        //             this->assert_type_exists(type, n.start);
+        //             std::cout << "END" << std::endl;
+        //         }
+        //         this->scope->set(n.parameter_names[i], entity_from_type(*cl));
+        //     } else {
+        //         this->scope->set(n.parameter_names[i], entity_from_type(type));
+        //     }
+        // } else {
+        //     this->scope->set(n.parameter_names[i], entity_from_type(param_type));
+        // }
     }
     std::cout << "FINISH " << std::endl;
 

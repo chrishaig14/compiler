@@ -240,10 +240,8 @@ SemanticInfo Checker::match_arguments_to_generic_function(const FunctionType& ft
 }
 
 bool Checker::can_assign(const TypeNode& from, const TypeNode& to) {
-    if (from.object().is_generic() && to.object().is_generic()) {
-        if (from.object().id != to.object().id) {
-            return false;
-        }
+    if (from.object().is_generic_param || to.object().is_generic_param) {
+        return from.object().id == to.object().id;
     } else if (from.object().actual_base_path.as_str() != to.object().actual_base_path.as_str()) {
         return false;
     }

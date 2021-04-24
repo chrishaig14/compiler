@@ -107,6 +107,7 @@ TypeNode* ObjectType::clone() const {
 
     auto n = new ObjectType(this->id, aux);
     n->actual_base_path = this->actual_base_path;
+    n->is_generic_param = this->is_generic_param;
     return n;
 }
 
@@ -173,7 +174,7 @@ ObjectType::ObjectType(const std::string& identifier) : ObjectType(identifier, {
 }
 
 bool ObjectType::is_generic() const {
-    if (islower(this->id[0])) {
+    if (this->is_generic_param) {
         return true;
     }
     for (auto t: this->type_params) {
