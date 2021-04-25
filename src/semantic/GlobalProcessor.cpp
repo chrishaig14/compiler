@@ -47,14 +47,42 @@ void GlobalProcessor::visit(ImportNode& node) {
     // }
 }
 
+
+void GlobalProcessor::fill_actual(TypeNode* t) {
+    if (t->kind == Kind::FUNCTION) {
+        return fill_actual(&t->function());
+    }
+    return fill_actual(&t->object());
+}
+
+void GlobalProcessor::fill_actual(ObjectType* t) {
+    if (t->is_generic_param) {
+        return;
+    }
+    t->actual_base_path = this->get_actual_path(t->id);
+    for (auto tp: t->type_params) {
+        this->fill_actual(tp);
+    }
+}
+
+void GlobalProcessor::fill_actual(FunctionType* t) {
+    for (auto pt: t->param_types) {
+        this->fill_actual(pt);
+    }
+    this->fill_actual(t->return_type);
+}
+
 void GlobalProcessor::visit(FunctionNode& node) {
     ConstFunction* const_function = this->module->flirpins[node.identifier].const_function;
 
     VectorOfTypes x;
     for (auto p: node.parameter_types) {
-        if (p->kind == Kind::OBJECT && !p->is_generic_param) {
-            p->object().actual_base_path = this->get_actual_path({p->object().id});
-        }
+        this->fill_actual(p);
+        // if (p->kind == Kind::OBJECT && !p->is_generic_param) {
+        //     p->object().actual_base_path = this->get_actual_path({p->object().id});
+        // } else if (p->kind == Kind::FUNCTION) {
+        //
+        // }
         x.emplace_back(p->clone());
     }
     TypeNode* p = node.return_type;

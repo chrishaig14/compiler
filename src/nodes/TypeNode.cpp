@@ -97,6 +97,7 @@ ObjectType::ObjectType(const std::string& identifier, const VectorOfTypes& typeP
         assert(p != nullptr);
     }
     this->kind = Kind::OBJECT;
+    this->is_generic_param = false;
 }
 
 TypeNode* ObjectType::clone() const {
@@ -171,6 +172,7 @@ ObjectType& ObjectType::object() {
 }
 
 ObjectType::ObjectType(const std::string& identifier) : ObjectType(identifier, {}) {
+    this->is_generic_param = false;
 }
 
 bool ObjectType::is_generic() const {
