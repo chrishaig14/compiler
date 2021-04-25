@@ -67,13 +67,19 @@ DEFINE_FUNCTION(2, core_D_String_D_add)
 DEFINE_FUNCTION(1, core_D_String_D_len)
 
 DEFINE_FUNCTION(2, core_D_String_D_eq)
+
 TaggedObject* core_D_String_D_add_f(TaggedObject* a, TaggedObject* b) {
     return MAKE_STRING(CAST(a, XString)->s + CAST(b, XString)->s);
 }
+DEFINE_FUNCTION(2, core_D_String_D___sub__)
 
 TaggedObject* core_D_String_D___sub___f(TaggedObject* a, TaggedObject* b) {
-    if (GET_INT(b) >= CAST(a, XString)->s.size()) {
-        throw std::runtime_error("Error subscript of String greater than length!");
+    long index = GET_INT(b);
+    unsigned long str_len = CAST(a, XString)->s.size();
+    if (index >= str_len) {
+        throw std::runtime_error(
+                "String index out of range: " + std::to_string(index) + " but length is " + std::to_string(str_len));
     }
-    return MAKE_STRING(std::string(1, CAST(a, XString)->s[GET_INT(b)]));
+
+    return MAKE_STRING(std::string(1, CAST(a, XString)->s[index]));
 }

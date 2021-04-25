@@ -70,3 +70,17 @@ XList::~XList() {
     }
     std::cout << "delete list of length " << this->l->size() << std::endl;
 }
+
+TaggedObject* core_D_List_D_len_f(TaggedObject* a) {
+    return MAKE_INT(CAST(a, XList)->lv.size());
+}
+
+TaggedObject* core_D_List_D___sub___f(TaggedObject* a, TaggedObject* b) {
+    long idx = GET_INT(b);
+    unsigned long list_len = CAST(a, XList)->lv.size();
+    if (idx >= list_len) {
+        throw std::runtime_error("List index " + std::to_string(idx) +
+                                 (" out of range of list with length " + std::to_string(list_len)));
+    }
+    return CAST(a, XList)->lv[idx];
+}
