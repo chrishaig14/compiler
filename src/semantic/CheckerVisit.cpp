@@ -599,7 +599,7 @@ void mangle_generic_names(TypeNode* t) {
 }
 
 void mangle_generic_names(FunctionType* t) {
-    for(auto pt: t->param_types){
+    for (auto pt: t->param_types) {
         mangle_generic_names(pt);
     }
     mangle_generic_names(t->return_type);
@@ -719,6 +719,9 @@ USemanticInfo Checker::visit_call(CallNode& n) {
             for (size_t i = 0; i < n.arguments.size(); i++) {
                 const TypeNode& arg_type = *arg_types[i];
                 const TypeNode& param_type = *function_type->param_types[i];
+                if (param_type == arg_type) {
+                    continue;
+                }
                 const std::string& arg_path_as_str = arg_type.object().actual_base_path.as_str();
                 const std::string& param_path_as_str = param_type.object().actual_base_path.as_str();
                 if (arg_path_as_str != param_path_as_str) {
