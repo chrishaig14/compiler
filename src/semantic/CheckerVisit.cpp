@@ -80,14 +80,17 @@ USemanticInfo Checker::visit(BooleanNode& node) {
 }
 
 USemanticInfo Checker::visit(WhileNode& node) {
+    WhileSNode* while_sn = new WhileSNode();
+    SemanticInfo info;
+    info.snode = while_sn;
     USemanticInfo condition_p = this->dispatch(node.condition);
     SemanticInfo& condition = *condition_p;
-    if (condition.type() != T_BOOL) {
+    if (*condition.entity.object_value->ot != T_BOOL) {
         this->error_reporter.condition(condition.type(), node.start, "elif");
     }
     this->enter_scope("while");
     this->scope->is_loop = true;
-    this->visit_block(*node.body);
+    USemanticInfo body_info_p = this->visit_block(*node.body);
     this->scope->is_loop = false;
     for (auto v: this->scope->table) {
         // if (v.second->type == E_TYPE::OBJECT_VALUE) {
@@ -98,7 +101,9 @@ USemanticInfo Checker::visit(WhileNode& node) {
         // }
     }
     this->leave_scope();
-    return nullptr;
+    while_sn->condition = condition.snode;
+    while_sn->body = (BlockSNode*) body_info_p->snode;
+    return std::make_unique<SemanticInfo>(info);
 }
 
 USemanticInfo Checker::visit(NumberNode& node) {
@@ -373,6 +378,7 @@ USemanticInfo Checker::visit_class(ClassNode& node) {
         this->add_this = true;
         this->this_entity = Entity{.type=E_TYPE::OBJECT_VALUE, .object_value=new ObjectValue()};
         this->this_entity.object_value->ot = new ObjectType(node.class_name);
+        this->this_entity.object_value->ot->actual_base_path = clazz->path;
         // method.second->path = clazz->path + "." + method.second->identifier;
         USemanticInfo method_info = this->visit_function(*method.second);
         methods_snodes.push_back(method_info->snode);
@@ -774,6 +780,7 @@ USemanticInfo Checker::visit_call(CallNode& n) {
 }
 
 USemanticInfo Checker::visit_root(BlockNode& node) {
+    this->error_reporter.__file__ = this->__file__;
     this->error_reporter.code_lines = code_lines;
 
     // Initialize module level Scope
@@ -1244,28 +1251,27 @@ USemanticInfo Checker::visit(IfNode& n) {
         else_info = this->visit_block(*n.selse);
         this->leave_scope();
     }
-
-    info.snode = make_if_snode(condition_info.snode, body_info->snode, elifs, else_info->snode);
+    SNode* else_snode = else_info == nullptr ? nullptr : else_info->snode;
+    info.snode = make_if_snode(condition_info.snode, body_info->snode, elifs, else_snode);
 
     return std::make_unique<SemanticInfo>(info);
 }
 
 std::string map_boolop_to_method_name(BoolOp op) {
-    std::string fun;
-    if (op == BoolOp::EQ) {
-        fun = "eq";
-    } else if (op == BoolOp::NEQ) {
-        fun = "ne";
-    } else if (op == BoolOp::LT) {
-        fun = "lt";
-    } else if (op == BoolOp::LEQ) {
-        fun = "le";
-    } else if (op == BoolOp::GT) {
-        fun = "gt";
-    } else if (op == BoolOp::GEQ) {
-        fun = "ge";
-    }
-    return fun;
+    std::map<BoolOp, std::string> funs;
+
+    funs[BoolOp::EQ] = "eq";
+    funs[BoolOp::NE] = "ne";
+
+    funs[BoolOp::AND] = "and";
+    funs[BoolOp::OR] = "or";
+
+    funs[BoolOp::LE] = "le";
+    funs[BoolOp::GE] = "ge";
+    funs[BoolOp::LT] = "lt";
+    funs[BoolOp::GT] = "gt";
+
+    return funs[op];
 }
 
 SNode* make_boolop_snode(ConstFunction* operator_fun, SemanticInfo& left_info, SemanticInfo& right_info) {
@@ -1336,6 +1342,19 @@ USemanticInfo Checker::visit(BoolOpNode& n) {
     info.snode = make_boolop_snode(operator_fun, left_info, right_info);
 
     return std::make_unique<SemanticInfo>(info);
+}
+
+std::string map_binop_to_method_name(OpType op) {
+    std::map<OpType, std::string> funs;
+
+    funs[OpType::ADD] = "add";
+    funs[OpType::SUB] = "sub";
+
+    funs[OpType::MUL] = "mul";
+    funs[OpType::DIV] = "div";
+    funs[OpType::MOD] = "mod";
+
+    return funs[op];
 }
 
 USemanticInfo Checker::visit(BinopNode& n) {
@@ -1419,43 +1438,6 @@ USemanticInfo Checker::visit(BinopNode& n) {
     ConstFunction* operator_fun = operator_fun_it->second;
     function_id->identifier = operator_fun->path.as_str();
     rettype = operator_fun->ft->return_type->clone();
-    if (ltype.object().id == "Integer" && rtype.object().id == "Integer") {
-        // function_id->identifier = "core_D_Integer_D_" + fun;
-        // rettype = new T_INT;
-    } else if (ltype.object().id == "Float" && rtype.object().id == "Float") {
-        // rettype = new ObjectType("Float");
-    } else if (ltype.object().id == "Double" && rtype.object().id == "Double") {
-        // rettype = new ObjectType("Double");
-
-    } else if (ltype.object().id == "String" && rtype.object().id == "String") {
-        if (n.op == OpType::ADD) {
-            // function_id->identifier = "core_D_String_D_add";
-            rettype = new T_STRING;
-            // IdNode* idn = new IdNode("String_add", POS_NONE, POS_NONE);
-            // idn->is_global_function = true;
-            // this->replace_me = true;
-            // this->replacement = new CallNode(idn, VectorOfNodes({n.left, n.right}), POS_NONE, POS_NONE);
-        } else {
-            ok = false;
-        }
-    } else if (ltype.object().id == "List" && ltype == rtype) {
-        if (n.op == OpType::ADD) {
-            rettype = ltype.clone();
-            IdNode* idn = new IdNode("List_add", POS_NONE, POS_NONE);
-            idn->is_global_function = true;
-            this->replace_me = true;
-            this->replacement = new CallNode(idn, VectorOfNodes({n.left, n.right}), POS_NONE, POS_NONE);
-        } else {
-            ok = false;
-        }
-    } else {
-        ok = false;
-    }
-
-    if (!ok) {
-        this->error_reporter.binop(ltype, rtype, n.op_pos);
-        return error_stub();
-    }
     // n.ltype = left.clone();
     info.entity = Entity{.type=E_TYPE::OBJECT_VALUE, .object_value=new ObjectValue()};
     info.entity.object_value->ot = (ObjectType*) rettype;

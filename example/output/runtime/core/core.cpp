@@ -13,11 +13,11 @@
 #include "xobjects/XDict.h"
 #include "xobjects/XTuple.h"
 
-TaggedObject*  core_D_open_f(TaggedObject* _s) {
+TaggedObject* core_D_open_f(TaggedObject* _s) {
     return NEW(XFile, (((XString*) UNTAG(_s))->s));
 }
 
-TaggedObject*  core_D_print_f(TaggedObject* _s) {
+TaggedObject* core_D_print_f(TaggedObject* _s) {
     GC::declare(_s);
     XString* s = CAST(_s, XString);
     std::cout << s->s << std::endl;
@@ -25,7 +25,7 @@ TaggedObject*  core_D_print_f(TaggedObject* _s) {
     return nullptr;
 }
 
-TaggedObject*  core_D_range_f(TaggedObject* _start, TaggedObject* _step, TaggedObject* _end) {
+TaggedObject* core_D_range_f(TaggedObject* _start, TaggedObject* _step, TaggedObject* _end) {
     long start = GET_INT(_start);
     long step = GET_INT(_step);
     long end = GET_INT(_end);
@@ -41,12 +41,12 @@ TaggedObject*  core_D_range_f(TaggedObject* _start, TaggedObject* _step, TaggedO
     return TAG(r);
 }
 
-TaggedObject*  core_D_Integer_D_str_f(TaggedObject* _i) {
+TaggedObject* core_D_Integer_D_str_f(TaggedObject* _i) {
     TaggedObject* x = NEW(XString, std::to_string((GET_INT(_i))));
     return x;
 }
 
-TaggedObject*  core_D_Double_D_str_f(TaggedObject* _i) {
+TaggedObject* core_D_Double_D_str_f(TaggedObject* _i) {
     std::ostringstream out;
     out.precision(50);
     out << CAST(_i, XDouble)->d;
@@ -74,7 +74,7 @@ float float_rd(TaggedObject* r) {
 }
 
 
-TaggedObject*  core_D_Float_D_str_f(TaggedObject* _i) {
+TaggedObject* core_D_Float_D_str_f(TaggedObject* _i) {
     std::ostringstream out;
     out.precision(50);
     out << float_rd(_i);
@@ -84,12 +84,12 @@ TaggedObject*  core_D_Float_D_str_f(TaggedObject* _i) {
     return x;
 }
 
-TaggedObject*  core_D_Boolean_D_str_f(TaggedObject* _i) {
+TaggedObject* core_D_Boolean_D_str_f(TaggedObject* _i) {
     TaggedObject* x = NEW(XString, ((GET_BOOL(_i) ? "true" : "false")));
     return x;
 }
 
-TaggedObject*  core_D_map_f(TaggedObject* _l, TaggedObject* _f) {
+TaggedObject* core_D_map_f(TaggedObject* _l, TaggedObject* _f) {
     GC::declare(_l);
     XList* l = CAST(_l, XList);
     Function1* f = CAST(_f, Function1);
@@ -104,7 +104,7 @@ TaggedObject*  core_D_map_f(TaggedObject* _l, TaggedObject* _f) {
     // return NEW(XList, r);
 }
 
-TaggedObject*  core_D_join_f(TaggedObject* _l, TaggedObject* _s) {
+TaggedObject* core_D_join_f(TaggedObject* _l, TaggedObject* _s) {
     std::vector<TaggedObject*>* l = (std::vector<TaggedObject*>*) _l;
     std::string s;
     std::string js = *(std::string*) (_s);
@@ -136,7 +136,7 @@ TaggedObject* op_leq(TaggedObject* a, TaggedObject* b) {
     return MAKE_BOOL(GET_INT(a) <= GET_INT(b));
 }
 
-TaggedObject*  core_D_dict_subscript_f(TaggedObject* _l, TaggedObject* i) {
+TaggedObject* core_D_dict_subscript_f(TaggedObject* _l, TaggedObject* i) {
     XDict* dict = (XDict*) UNTAG(_l);
     int h = hash(i);
     if (dict->l.find(h) == dict->l.end()) {
@@ -145,7 +145,7 @@ TaggedObject*  core_D_dict_subscript_f(TaggedObject* _l, TaggedObject* i) {
     return dict->l.at(h);
 }
 
-TaggedObject*  core_D_list_subscript_f(TaggedObject* _l, TaggedObject* i) {
+TaggedObject* core_D_list_subscript_f(TaggedObject* _l, TaggedObject* i) {
     XList* list = (XList*) UNTAG(_l);
     unsigned long index = GET_INT(i);
     if (index >= list->l->size()) {
@@ -154,7 +154,7 @@ TaggedObject*  core_D_list_subscript_f(TaggedObject* _l, TaggedObject* i) {
     return (*list->l)[index];
 }
 
-TaggedObject*  core_D_string_subscript_f(TaggedObject* _l, TaggedObject* i) {
+TaggedObject* core_D_string_subscript_f(TaggedObject* _l, TaggedObject* i) {
     XString* str = (XString*) UNTAG(_l);
     unsigned long index = GET_INT(i);
     std::cout << "String is: " << str->s << std::endl;
@@ -165,27 +165,27 @@ TaggedObject*  core_D_string_subscript_f(TaggedObject* _l, TaggedObject* i) {
     return NEW(XString, std::string(1, str->s[index]));
 }
 
-TaggedObject*  core_D_Integer_D_add_f(TaggedObject* a, TaggedObject* b) {
+TaggedObject* core_D_Integer_D_add_f(TaggedObject* a, TaggedObject* b) {
     return MAKE_INT(GET_INT(a) + GET_INT(b));
 }
 
-TaggedObject*  core_D_Integer_D_sub_f(TaggedObject* a, TaggedObject* b) {
+TaggedObject* core_D_Integer_D_sub_f(TaggedObject* a, TaggedObject* b) {
     return MAKE_INT(GET_INT(a) - GET_INT(b));
 }
 
-TaggedObject*  core_D_Integer_D_div_f(TaggedObject* a, TaggedObject* b) {
+TaggedObject* core_D_Integer_D_div_f(TaggedObject* a, TaggedObject* b) {
     return MAKE_INT(GET_INT(a) / GET_INT(b));
 }
 
-TaggedObject*  core_D_Integer_D_mul_f(TaggedObject* a, TaggedObject* b) {
+TaggedObject* core_D_Integer_D_mul_f(TaggedObject* a, TaggedObject* b) {
     return MAKE_INT(GET_INT(a) * GET_INT(b));
 }
 
-TaggedObject*  core_D_String_D_add_f(TaggedObject* a, TaggedObject* b) {
+TaggedObject* core_D_String_D_add_f(TaggedObject* a, TaggedObject* b) {
     return MAKE_STRING(CAST(a, XString)->s + CAST(b, XString)->s);
 }
 
-TaggedObject*  core_D_String_D___sub___f(TaggedObject* a, TaggedObject* b) {
+TaggedObject* core_D_String_D___sub___f(TaggedObject* a, TaggedObject* b) {
     if (GET_INT(b) >= CAST(a, XString)->s.size()) {
         throw std::runtime_error("Error subscript of String greater than length!");
     }
@@ -198,66 +198,75 @@ TaggedObject*  core_D_String_D___sub___f(TaggedObject* a, TaggedObject* b) {
 #define FUNCTION_OBJECT(n, x) Function##n FUNCTION_OBJECT_NAME(x) = Function##n(FUNCTION_RAW_NAME(x));
 #define DEFINE_FUNCTION(n, x) FUNCTION_OBJECT(n, x) TaggedObject* x = FTAG(&FUNCTION_OBJECT_NAME(x));
 
-DEFINE_FUNCTION(1,  core_D_open)
-DEFINE_FUNCTION(1,  core_D_print)
-DEFINE_FUNCTION(3,  core_D_range)
-DEFINE_FUNCTION(2,  core_D_map)
-DEFINE_FUNCTION(2,  core_D_join)
-DEFINE_FUNCTION(2,  core_D_String_D_add)
-DEFINE_FUNCTION(2,  core_D_Integer_D_add)
-DEFINE_FUNCTION(2,  core_D_Integer_D_sub)
-DEFINE_FUNCTION(2,  core_D_Integer_D_div)
-DEFINE_FUNCTION(2,  core_D_Integer_D_mul)
-DEFINE_FUNCTION(1,  core_D_Integer_D_str)
+DEFINE_FUNCTION(1, core_D_open)
+DEFINE_FUNCTION(1, core_D_print)
+DEFINE_FUNCTION(3, core_D_range)
+DEFINE_FUNCTION(2, core_D_map)
+DEFINE_FUNCTION(2, core_D_join)
+DEFINE_FUNCTION(2, core_D_String_D_add)
+DEFINE_FUNCTION(2, core_D_Integer_D_add)
+DEFINE_FUNCTION(2, core_D_Integer_D_sub)
+DEFINE_FUNCTION(2, core_D_Integer_D_div)
+DEFINE_FUNCTION(2, core_D_Integer_D_mul)
+DEFINE_FUNCTION(1, core_D_Integer_D_str)
 
-DEFINE_FUNCTION(2,  core_D_Integer_D_lt)
-DEFINE_FUNCTION(2,  core_D_Integer_D_gt)
-DEFINE_FUNCTION(2,  core_D_Integer_D_le)
-DEFINE_FUNCTION(2,  core_D_Integer_D_ge)
-DEFINE_FUNCTION(2,  core_D_Integer_D_eq)
-DEFINE_FUNCTION(2,  core_D_Integer_D_ne)
+DEFINE_FUNCTION(2, core_D_Integer_D_lt)
+DEFINE_FUNCTION(2, core_D_Integer_D_gt)
+DEFINE_FUNCTION(2, core_D_Integer_D_le)
+DEFINE_FUNCTION(2, core_D_Integer_D_ge)
+DEFINE_FUNCTION(2, core_D_Integer_D_eq)
+DEFINE_FUNCTION(2, core_D_Integer_D_ne)
 
-
-
-DEFINE_FUNCTION(1,  core_D_Double_D_str)
-DEFINE_FUNCTION(1,  core_D_Float_D_str)
-DEFINE_FUNCTION(1,  core_D_Boolean_D_str)
-DEFINE_FUNCTION(2,  core_D_List_D___sub__)
-DEFINE_FUNCTION(1,  core_D_List_D_len)
-DEFINE_FUNCTION(1,  core_D_String_D_len)
+DEFINE_FUNCTION(2, core_D_Boolean_D_or)
+DEFINE_FUNCTION(2, core_D_Boolean_D_and)
+DEFINE_FUNCTION(2, core_D_Boolean_D_eq)
+DEFINE_FUNCTION(2, core_D_Boolean_D_ne)
 
 
-DEFINE_FUNCTION(2,  core_D_String_D___sub__)
+DEFINE_FUNCTION(1, core_D_Double_D_str)
+DEFINE_FUNCTION(1, core_D_Float_D_str)
+DEFINE_FUNCTION(1, core_D_Boolean_D_str)
+DEFINE_FUNCTION(2, core_D_List_D___sub__)
+DEFINE_FUNCTION(1, core_D_List_D_len)
+DEFINE_FUNCTION(1, core_D_String_D_len)
 
-TaggedObject*  core_D_Integer_D_lt_f(TaggedObject* a, TaggedObject* b) {
+DEFINE_FUNCTION(2, core_D_String_D_eq)
+
+
+
+
+
+DEFINE_FUNCTION(2, core_D_String_D___sub__)
+
+TaggedObject* core_D_Integer_D_lt_f(TaggedObject* a, TaggedObject* b) {
     return MAKE_BOOL(GET_INT(a) < GET_INT(b));
 }
 
-TaggedObject*  core_D_Integer_D_gt_f(TaggedObject* a, TaggedObject* b) {
+TaggedObject* core_D_Integer_D_gt_f(TaggedObject* a, TaggedObject* b) {
     return MAKE_BOOL(GET_INT(a) > GET_INT(b));
 }
 
-TaggedObject*  core_D_Integer_D_le_f(TaggedObject* a, TaggedObject* b) {
+TaggedObject* core_D_Integer_D_le_f(TaggedObject* a, TaggedObject* b) {
     return MAKE_BOOL(GET_INT(a) <= GET_INT(b));
 }
 
-TaggedObject*  core_D_Integer_D_ge_f(TaggedObject* a, TaggedObject* b) {
+TaggedObject* core_D_Integer_D_ge_f(TaggedObject* a, TaggedObject* b) {
     return MAKE_BOOL(GET_INT(a) >= GET_INT(b));
 }
 
-TaggedObject*  core_D_Integer_D_ne_f(TaggedObject* a, TaggedObject* b) {
+TaggedObject* core_D_Integer_D_ne_f(TaggedObject* a, TaggedObject* b) {
     return MAKE_BOOL(GET_INT(a) != GET_INT(b));
 }
 
-TaggedObject*  core_D_Integer_D_eq_f(TaggedObject* a, TaggedObject* b) {
+TaggedObject* core_D_Integer_D_eq_f(TaggedObject* a, TaggedObject* b) {
     return MAKE_BOOL(GET_INT(a) == GET_INT(b));
 }
 
-TaggedObject*  core_D_List_D_len_f(TaggedObject* a) {
+TaggedObject* core_D_List_D_len_f(TaggedObject* a) {
     return MAKE_INT(CAST(a, XList)->lv.size());
 }
 
-TaggedObject*  core_D_List_D___sub___f(TaggedObject* a, TaggedObject* b) {
+TaggedObject* core_D_List_D___sub___f(TaggedObject* a, TaggedObject* b) {
     return CAST(a, XList)->lv[GET_INT(b)];
 }
 
@@ -265,5 +274,25 @@ TaggedObject* core_D_String_D_len_f(TaggedObject* a) {
     return MAKE_INT(CAST(a, XString)->s.size());
 }
 
-DEFINE_FUNCTION(2,  core_D_dict_subscript)
+TaggedObject* core_D_String_D_eq_f(TaggedObject* a, TaggedObject* b) {
+    return MAKE_BOOL(CAST(a, XString)->s == CAST(b, XString)->s);
+}
+
+TaggedObject* core_D_Boolean_D_eq_f(TaggedObject* a, TaggedObject* b) {
+    return MAKE_BOOL(GET_BOOL(a) == GET_BOOL(b));
+}
+
+TaggedObject* core_D_Boolean_D_ne_f(TaggedObject* a, TaggedObject* b) {
+    return MAKE_BOOL(GET_BOOL(a) != GET_BOOL(b));
+}
+
+TaggedObject* core_D_Boolean_D_and_f(TaggedObject* a, TaggedObject* b) {
+    return MAKE_BOOL(GET_BOOL(a) && GET_BOOL(b));
+}
+
+TaggedObject* core_D_Boolean_D_or_f(TaggedObject* a, TaggedObject* b) {
+    return MAKE_BOOL(GET_BOOL(a) || GET_BOOL(b));
+}
+
+DEFINE_FUNCTION(2, core_D_dict_subscript)
 

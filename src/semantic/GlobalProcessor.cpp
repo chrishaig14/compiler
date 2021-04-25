@@ -170,9 +170,10 @@ void GlobalProcessor::visit(ClassNode& node) {
     class_info->type_params = node.type_parameters;
     for (auto mn: node.members_ordered) {
         auto mt = node.members[mn];
-        if (!mt->object().is_generic()) {
-            mt->object().actual_base_path = this->get_actual_path(mt->object().id);
-        }
+        this->fill_actual(mt);
+        // if (!mt->object().is_generic()) {
+        //     mt->object().actual_base_path = this->get_actual_path(mt->object().id);
+        // }
         class_info->member_names.push_back(mn);
         class_info->member_types.push_back(mt);
         class_info->members[mn] = mt;
@@ -187,10 +188,12 @@ void GlobalProcessor::visit(ClassNode& node) {
 
         VectorOfTypes x;
         for (auto p: method.parameter_types) {
-            p->object().actual_base_path = this->get_actual_path(p->object().id);
+            this->fill_actual(p);
+            // p->object().actual_base_path = this->get_actual_path(p->object().id);
             x.emplace_back(p->clone());
         }
-        method.return_type->object().actual_base_path = this->get_actual_path(method.return_type->object().id);
+        this->fill_actual(method.return_type);
+        // method.return_type->object().actual_base_path = this->get_actual_path(method.return_type->object().id);
 
         ConstFunction* cf = new ConstFunction();
         cf->path = class_info->path.as_str() + "." + f.first;
@@ -206,10 +209,12 @@ void GlobalProcessor::visit(ClassNode& node) {
 
         VectorOfTypes x;
         for (auto p: method.parameter_types) {
-            p->object().actual_base_path = this->get_actual_path(p->object().id);
+            this->fill_actual(p);
+            // p->object().actual_base_path = this->get_actual_path(p->object().id);
             x.emplace_back(p->clone());
         }
-        method.return_type->object().actual_base_path = this->get_actual_path(method.return_type->object().id);
+        this->fill_actual(method.return_type);
+        // method.return_type->object().actual_base_path = this->get_actual_path(method.return_type->object().id);
 
         ConstFunction* cf = new ConstFunction();
         cf->path = class_info->path.as_str() + "." + f.first;

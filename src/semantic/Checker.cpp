@@ -233,10 +233,10 @@ SemanticInfo Checker::match_arguments_to_generic_function(const FunctionType& ft
         delete at;
     }
     SemanticInfo rv;
-    if(f->return_type->kind==Kind::OBJECT){
+    if (f->return_type->kind == Kind::OBJECT) {
         rv.entity = Entity{.type=E_TYPE::OBJECT_VALUE, .object_value=new ObjectValue()};
         rv.entity.object_value->ot = (ObjectType*) f->return_type->clone();
-    }else{
+    } else {
         rv.entity = Entity{.type=E_TYPE::FUNCTION_VALUE, .function_value=new FunctionValue()};
         rv.entity.function_value->ft = (FunctionType*) f->return_type->clone();
     }

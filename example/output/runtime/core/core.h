@@ -49,9 +49,19 @@ TaggedObject* subscript(TaggedObject* _l, TaggedObject* i);
 
 TaggedObject* core_D_String_D_add_f(TaggedObject* a, TaggedObject* b);
 
+TaggedObject* core_D_String_D_eq_f(TaggedObject* a, TaggedObject* b);
+
 TaggedObject* core_D_String_D_len_f(TaggedObject* a);
 
 TaggedObject* core_D_String_D___sub___f(TaggedObject* a, TaggedObject* b);
+
+TaggedObject* core_D_Boolean_D_eq_f(TaggedObject* a, TaggedObject* b);
+
+TaggedObject* core_D_Boolean_D_ne_f(TaggedObject* a, TaggedObject* b);
+
+TaggedObject* core_D_Boolean_D_and_f(TaggedObject* a, TaggedObject* b);
+
+TaggedObject* core_D_Boolean_D_or_f(TaggedObject* a, TaggedObject* b);
 
 TaggedObject* core_D_Integer_D_add_f(TaggedObject* a, TaggedObject* b);
 
@@ -102,6 +112,12 @@ extern Function2 core_D_Integer_D_ge_o;
 extern Function2 core_D_Integer_D_eq_o;
 extern Function2 core_D_Integer_D_ne_o;
 
+extern Function2 core_D_Boolean_D_eq_o;
+extern Function2 core_D_Boolean_D_ne_o;
+extern Function2 core_D_Boolean_D_or_o;
+extern Function2 core_D_Boolean_D_and_o;
+
+extern Function2 core_D_String_D_eq_o;
 extern Function1 core_D_String_D_len_o;
 extern Function2 core_D_String_D_add_o;
 extern Function2 core_D_String_D___sub___o;
@@ -110,12 +126,20 @@ extern TaggedObject* core_D_print;
 extern TaggedObject* core_D_range;
 extern TaggedObject* core_D_map;
 extern TaggedObject* core_D_join;
+extern TaggedObject* core_D_String_D_eq;
 extern TaggedObject* core_D_String_D_add;
 extern TaggedObject* core_D_String_D_len;
+
+extern TaggedObject* core_D_Boolean_D_eq;
+extern TaggedObject* core_D_Boolean_D_ne;
+extern TaggedObject* core_D_Boolean_D_or;
+extern TaggedObject* core_D_Boolean_D_and;
+
 extern TaggedObject* core_D_Integer_D_str;
 extern TaggedObject* core_D_Integer_D_add;
 extern TaggedObject* core_D_Integer_D_lt;
 extern TaggedObject* core_D_Integer_D_gt;
+
 extern TaggedObject* core_D_Integer_D_le;
 extern TaggedObject* core_D_Integer_D_ge;
 extern TaggedObject* core_D_Integer_D_eq;
@@ -131,5 +155,6 @@ extern TaggedObject* core_D_Boolean_D_str;
 extern TaggedObject* m_core_list_subscript;
 extern TaggedObject* m_core_dict_subscript;
 extern TaggedObject* core_D_String_D___sub__;
+extern TaggedObject* core_D_String_D_eq;
 
 #endif //UNTITLED1_CORE_H

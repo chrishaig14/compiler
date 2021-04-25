@@ -27,15 +27,15 @@ std::string bool_op_to_string(BoolOp op) {
             return "AND";
         case BoolOp::OR:
             return "OR";
-        case BoolOp::LEQ:
+        case BoolOp::LE:
             return "CMP <=";
-        case BoolOp::GEQ:
+        case BoolOp::GE:
             return "CMP >=";
         case BoolOp::LT:
             return "CMP <";
         case BoolOp::GT:
             return "CMP >";
-        case BoolOp::NEQ:
+        case BoolOp::NE:
             return "CMP !=";
         case BoolOp::EQ:
             return "==";

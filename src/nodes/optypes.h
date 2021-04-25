@@ -11,7 +11,7 @@ enum class OpType {
 std::string op_to_string(OpType op);
 
 enum class BoolOp {
-    EQ, AND, OR, LEQ, GEQ, LT, GT, NEQ
+    EQ, AND, OR, LE, GE, LT, GT, NE
 };
 std::string bool_op_to_string(BoolOp op);
 

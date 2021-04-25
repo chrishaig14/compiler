@@ -13,7 +13,7 @@ XObject::XObject(std::string class_name) {
 }
 
 XObject::~XObject() {
-    std::cout << "Deleted object " << this << " (" << this->class_name << ")" << std::endl;
+    // std::cout << "Deleted object " << this << " (" << this->class_name << ")" << std::endl;
 }
 
 TaggedObject* XObject::__eq__(TaggedObject* pObject) {

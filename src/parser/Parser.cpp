@@ -34,9 +34,9 @@ std::unordered_map<TokType, BoolOp> TOKEN_TO_BOOL_OP = {{TokType::AND, BoolOp::A
                                                         {TokType::OR,  BoolOp::OR},
                                                         {TokType::LT,  BoolOp::LT},
                                                         {TokType::GT,  BoolOp::GT},
-                                                        {TokType::LEQ, BoolOp::LEQ},
-                                                        {TokType::GEQ, BoolOp::GEQ},
-                                                        {TokType::NEQ, BoolOp::NEQ},
+                                                        {TokType::LEQ, BoolOp::LE},
+                                                        {TokType::GEQ, BoolOp::GE},
+                                                        {TokType::NEQ, BoolOp::NE},
                                                         {TokType::EQ,  BoolOp::EQ}};
 
 Parser::Parser(const std::string& __file__, CodeLines code_lines, std::vector<Token>& tokens) {
