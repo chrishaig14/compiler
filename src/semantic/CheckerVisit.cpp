@@ -67,6 +67,7 @@ USemanticInfo Checker::visit(ListNode& node) {
     return_info.snode = lsn;;
     return_info.entity = Entity{.type=E_TYPE::OBJECT_VALUE, .object_value = new ObjectValue()};
     return_info.entity.object_value->ot = new ObjectType("List", {element_type->clone()});
+    return_info.entity.object_value->ot->actual_base_path = Path("core.List");
     return std::make_unique<SemanticInfo>(return_info);
 }
 
