@@ -14,14 +14,9 @@
 #include "xobjects/XTuple.h"
 
 
-
-
-
-
 void foo(float f) {
     std::cout << f << std::endl;
 }
-
 
 
 TaggedObject* core_D_dict_subscript_f(TaggedObject* _l, TaggedObject* i) {
@@ -54,25 +49,7 @@ TaggedObject* core_D_string_subscript_f(TaggedObject* _l, TaggedObject* i) {
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 DEFINE_FUNCTION(2, core_D_String_D___sub__)
-
 
 
 TaggedObject* core_D_List_D_len_f(TaggedObject* a) {
@@ -80,10 +57,14 @@ TaggedObject* core_D_List_D_len_f(TaggedObject* a) {
 }
 
 TaggedObject* core_D_List_D___sub___f(TaggedObject* a, TaggedObject* b) {
-    return CAST(a, XList)->lv[GET_INT(b)];
+    long idx = GET_INT(b);
+    unsigned long list_len = CAST(a, XList)->lv.size();
+    if (idx >= list_len) {
+        throw std::runtime_error("List index " + std::to_string(idx) +
+                                 (" out of range of list with length " + std::to_string(list_len)));
+    }
+    return CAST(a, XList)->lv[idx];
 }
-
-
 
 
 DEFINE_FUNCTION(2, core_D_dict_subscript)
