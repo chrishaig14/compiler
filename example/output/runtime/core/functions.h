@@ -1,118 +1,28 @@
 //
-// Created by chris on 17/12/20.
+// Created by chris on 25/4/21.
 //
 
-#ifndef UNTITLED1_FUNCTIONS_H
-#define UNTITLED1_FUNCTIONS_H
+#ifndef XLANG_FUNCTIONS_H
+#define XLANG_FUNCTIONS_H
 
-#include <vector>
-#include "xobject.h"
+#include "core.h"
 
+extern TaggedObject* core_D_open;
+extern TaggedObject* core_D_print;
+extern TaggedObject* core_D_range;
+extern TaggedObject* core_D_map;
+extern TaggedObject* core_D_join;
 
+extern Function1 core_D_open_o;
+extern Function1 core_D_print_o;
+extern Function3 core_D_range_o;
+extern Function2 core_D_map_o;
+extern Function2 core_D_join_o;
 
-class Function0 : public XObject {
-    TaggedObject* (* f)();
-public:
-    Function0();
+TaggedObject* core_D_print_f(TaggedObject* _s);
+TaggedObject* core_D_range_f(TaggedObject* _start, TaggedObject* _step, TaggedObject* _end);
+TaggedObject* core_D_map_f(TaggedObject* _l, TaggedObject* _f);
+TaggedObject* core_D_join_f(TaggedObject* _l, TaggedObject* _s);
+TaggedObject* core_D_open_f(TaggedObject* _s);
 
-    Function0(TaggedObject* (* f)());
-
-    virtual TaggedObject* operator()();
-
-};
-
-class Function1 : public XObject {
-    TaggedObject* (* f)(TaggedObject*);
-public:
-    Function1();
-
-    Function1(TaggedObject* (* f)(TaggedObject*));
-
-    virtual TaggedObject* operator()(TaggedObject* a0);
-
-};
-
-class Function2 : public XObject {
-    TaggedObject* (* f)(TaggedObject*, TaggedObject*);
-public:
-    Function2();
-
-    Function2(TaggedObject* (* f)(TaggedObject*, TaggedObject*));
-
-    virtual TaggedObject* operator()(TaggedObject* a0, TaggedObject* a1);
-
-    ~Function2() override;
-};
-
-class Function3 : public XObject {
-    TaggedObject* (* f)(TaggedObject*, TaggedObject*, TaggedObject*);
-public:
-    Function3();
-
-    Function3(TaggedObject* (* f)(TaggedObject*, TaggedObject*, TaggedObject*));
-
-    virtual TaggedObject* operator()(TaggedObject* a0, TaggedObject* a1, TaggedObject* a2);
-
-};
-
-class Partial0 : public Function0 {
-    std::vector<TaggedObject*> p;
-    union {
-        TaggedObject* f1;
-        TaggedObject* f2;
-        TaggedObject* f3;
-    } f;
-public:
-    Partial0(TaggedObject* f, TaggedObject* p0);
-
-    Partial0(TaggedObject* f, TaggedObject* p0, TaggedObject* p1);
-
-    Partial0(TaggedObject* f, TaggedObject* p0, TaggedObject* p1, TaggedObject* p2);
-
-    TaggedObject* operator()() override;
-};
-
-class Partial1 : public Function1 {
-    std::vector<TaggedObject*> p;
-    union {
-        TaggedObject* f2;
-        TaggedObject* f3;
-    } f;
-public:
-    Partial1(TaggedObject* f, TaggedObject* p0, TaggedObject* p1);
-
-    Partial1(TaggedObject* f, TaggedObject* p0, TaggedObject* p1, TaggedObject* p2);
-
-    TaggedObject* operator()(TaggedObject* a0) override;
-};
-
-class Partial2 : public Function2 {
-    std::vector<TaggedObject*> p;
-    union {
-        TaggedObject* f3;
-    } f;
-public:
-    Partial2(TaggedObject* f, TaggedObject* p0, TaggedObject* p1, TaggedObject* p2);
-
-    TaggedObject* operator()(TaggedObject* a0, TaggedObject* a1) override;
-};
-
-
-
-inline TaggedObject* CALL0(TaggedObject* f) {
-    return (*CAST(f, Function0))();
-}
-
-inline TaggedObject* CALL1(TaggedObject* f, TaggedObject* arg) {
-    return (*CAST(f, Function1))(arg);
-}
-
-inline TaggedObject* CALL2(TaggedObject* f, TaggedObject* arg_0, TaggedObject* arg_1) {
-    return (*CAST(f, Function2))(arg_0, arg_1);
-}
-
-inline TaggedObject* CALL3(TaggedObject* f, TaggedObject* arg_0, TaggedObject* arg_1, TaggedObject* arg_2) {
-    return (*CAST(f, Function3))(arg_0, arg_1, arg_2);
-}
-
-#endif //UNTITLED1_FUNCTIONS_H
+#endif //XLANG_FUNCTIONS_H

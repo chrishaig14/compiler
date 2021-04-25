@@ -5,6 +5,9 @@
 #include "XList.h"
 #include "../basics.h"
 
+DEFINE_FUNCTION(2, core_D_List_D___sub__)
+DEFINE_FUNCTION(1, core_D_List_D_len)
+
 TaggedObject* m_core_c_List_f_add_f(TaggedObject* _a, TaggedObject* _b) {
     GC::declare(_a);
     GC::declare(_b);

@@ -54,3 +54,26 @@ XString::XString(const std::string& x) : XObject("String") {
 TaggedObject* XString::__eq__(TaggedObject* other) {
     return f_String_eq(TAG(this), other);
 }
+
+TaggedObject* core_D_String_D_len_f(TaggedObject* a) {
+    return MAKE_INT(CAST(a, XString)->s.size());
+}
+
+TaggedObject* core_D_String_D_eq_f(TaggedObject* a, TaggedObject* b) {
+    return MAKE_BOOL(CAST(a, XString)->s == CAST(b, XString)->s);
+}
+
+DEFINE_FUNCTION(2, core_D_String_D_add)
+DEFINE_FUNCTION(1, core_D_String_D_len)
+
+DEFINE_FUNCTION(2, core_D_String_D_eq)
+TaggedObject* core_D_String_D_add_f(TaggedObject* a, TaggedObject* b) {
+    return MAKE_STRING(CAST(a, XString)->s + CAST(b, XString)->s);
+}
+
+TaggedObject* core_D_String_D___sub___f(TaggedObject* a, TaggedObject* b) {
+    if (GET_INT(b) >= CAST(a, XString)->s.size()) {
+        throw std::runtime_error("Error subscript of String greater than length!");
+    }
+    return MAKE_STRING(std::string(1, CAST(a, XString)->s[GET_INT(b)]));
+}

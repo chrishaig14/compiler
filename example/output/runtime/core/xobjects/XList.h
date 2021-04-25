@@ -6,7 +6,7 @@
 #define XLANG_XLIST_H
 
 #include "XObject.h"
-#include "../functions.h"
+#include "../Function.h"
 #include "../../macros.h"
 #include "../GC.h"
 
@@ -31,10 +31,15 @@ public:
     ~XList() override;
 };
 
-TaggedObject* m_core_c_List_f_add_f(TaggedObject* _a, TaggedObject* _b);
-TaggedObject* m_core_c_List_f_len_f(TaggedObject* _l);
-extern TaggedObject* m_core_c_List_f_add;
-extern TaggedObject* m_core_c_List_f_len;
+
+extern TaggedObject* core_D_List_D_len;
+extern TaggedObject* core_D_List_D___sub__;
+TaggedObject* core_D_List_D_len_f(TaggedObject* a);
+
+TaggedObject* core_D_List_D___sub___f(TaggedObject* a, TaggedObject* b);
+extern Function2 core_D_List_D___sub__o;
+
+extern Function1 core_D_List_D_len_o;
 
 
 #endif //XLANG_XLIST_H

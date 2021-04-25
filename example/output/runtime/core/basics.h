@@ -111,17 +111,4 @@ inline TaggedObject* Double_to_Boolean(TaggedObject* a) {
     return MAKE_BOOL(CAST(a,XDouble)->d);
 }
 
-// inline TaggedObject* Float_to_Integer(TaggedObject* a) {
-//     return MAKE_INT(GET_FLOAT(a));
-// }
-//
-// inline TaggedObject* Integer_to_Float(TaggedObject* a) {
-//     return MAKE_FLOAT(GET_INT(a));
-// }
-//
-// inline TaggedObject* Float_to_Integer(TaggedObject* a) {
-//     return MAKE_INT(GET_FLOAT(a));
-// }
-
-
 #endif //XLANG_BASICS_H

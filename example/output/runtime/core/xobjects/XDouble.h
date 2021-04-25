@@ -6,7 +6,8 @@
 #define XLANG_XDOUBLE_H
 
 
-#include "../xobject.h"
+#include "XObject.h"
+#include "../Function.h"
 
 class XDouble : public XObject {
 public:
@@ -15,6 +16,9 @@ public:
     TaggedObject* __eq__(TaggedObject* pObject) override;
     double d;
 };
+
+extern TaggedObject* m_core_c_Double_f_str;
+extern Function1 m_core_c_Double_f_str_o;
 
 
 #endif //XLANG_XDOUBLE_H

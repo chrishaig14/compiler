@@ -6,7 +6,7 @@
 #define XLANG_XSTRING_H
 
 #include "XObject.h"
-#include "../functions.h"
+#include "../Function.h"
 #include "../GC.h"
 
 class XString : public XObject {
@@ -20,11 +20,20 @@ public:
     TaggedObject* __eq__(TaggedObject* other) override;
 };
 
-extern TaggedObject* function_String_add;
-extern TaggedObject* function_String_len;
-extern TaggedObject* function_String_eq;
-extern Function2 function_String_add_p;
-XObject* f_String_add(XObject* _a, XObject* _b);
+extern Function2 core_D_String_D_eq_o;
+extern Function1 core_D_String_D_len_o;
+extern Function2 core_D_String_D_add_o;
+extern Function2 core_D_String_D___sub___o;
 
+extern TaggedObject* core_D_String_D_eq;
+extern TaggedObject* core_D_String_D_add;
+extern TaggedObject* core_D_String_D_len;
+extern TaggedObject* core_D_String_D___sub__;
+extern TaggedObject* core_D_String_D_eq;
+
+TaggedObject* core_D_String_D_add_f(TaggedObject* a, TaggedObject* b);
+TaggedObject* core_D_String_D_eq_f(TaggedObject* a, TaggedObject* b);
+TaggedObject* core_D_String_D_len_f(TaggedObject* a);
+TaggedObject* core_D_String_D___sub___f(TaggedObject* a, TaggedObject* b);
 
 #endif //XLANG_XSTRING_H

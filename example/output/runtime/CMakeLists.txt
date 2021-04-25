@@ -7,7 +7,7 @@ add_library(
         core
         core/core.cpp
         core/core.h
-        core/functions.h
+        core/Function.h
         core/GC.cpp
         core/GC.h
         core/xobject.cpp
@@ -26,4 +26,4 @@ add_library(
         core/xobjects/XFile.cpp
         core/xobjects/XFile.h
         core/xobjects/XTuple.cpp
-        core/xobjects/XTuple.h macros.h core/basics.h core/xobjects/XDouble.cpp core/xobjects/XDouble.h core/basics.cpp core/functions.cpp)
+        core/xobjects/XTuple.h macros.h core/basics.h core/xobjects/XDouble.cpp core/xobjects/XDouble.h core/basics.cpp core/Function.cpp core/xobjects/Integer.cpp core/xobjects/Integer.h core/xobjects/Boolean.cpp core/xobjects/Boolean.h core/xobjects/Float.cpp core/xobjects/Float.h core/functions.cpp core/functions.h)
