@@ -366,6 +366,7 @@ Class* Checker::instantiate_generic(Class* generic, const ObjectType& instance) 
     concrete->methods = concrete_methods;
     concrete->member_names = generic->member_names;
     concrete->member_types = concrete_field_types;
+    concrete->path = generic->path;
     for (size_t i = 0; i < generic->member_names.size(); i++) {
         concrete->members[generic->member_names[i]] = concrete_field_types[i];
     }

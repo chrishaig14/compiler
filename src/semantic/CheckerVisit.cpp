@@ -1523,7 +1523,9 @@ USemanticInfo Checker::visit(DefaultConstructorNode& node) {
     info.entity.const_function = new ConstFunction();
     VectorOfTypes tp;
     for (auto tt: entity.clazz->type_params) {
-        tp.push_back(new ObjectType(tt));
+        ObjectType* ot = new ObjectType(tt);
+        tp.push_back(ot);
+        ot->is_generic_param = true;
     }
     auto rt = new ObjectType(entity.clazz->path.as_str(), tp);
     rt->actual_base_path = cls->path;
