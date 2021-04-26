@@ -13,7 +13,7 @@ int hash(TaggedObject* n) {
     if (has_tag(n, INT_TAG)) {
         return GET_INT(n);
     }
-    XTuple2* t = dynamic_cast<XTuple2*>(UNTAG(n));
+    core_D_Tuple2* t = dynamic_cast<core_D_Tuple2*>(UNTAG(n));
     int h = 0;
 
     if (t != nullptr) {

@@ -22,6 +22,7 @@
 #include "../simple_nodes/WhileSNode.h"
 #include "../simple_nodes/ListSNode.h"
 #include "../simple_nodes/IfSNode.h"
+#include "../simple_nodes/ObjectMemberSNode.h"
 
 #define T_NONE ObjectType(".None")
 static TextPosition POS_NONE = {-1, -1};
@@ -418,17 +419,26 @@ USemanticInfo Checker::visit(ContinueNode& node) {
 
 USemanticInfo Checker::visit(TupleNode& node) {
     VectorOfTypes types;
+    std::vector<SNode*> values;
     for (auto n: node.values) {
         USemanticInfo vtype = this->dispatch(n);
-        types.emplace_back(vtype->type().clone());
-        if (!this->is_immutable(vtype->type())) {
-            this->error_reporter.tuple_member_not_immutable(vtype->type(), node.start);
-            return error_stub();
-        }
+        values.push_back(vtype->snode);
+        types.emplace_back(vtype->entity.object_value->ot->clone());
+        // if (!this->is_immutable(vtype->type())) {
+        //     this->error_reporter.tuple_member_not_immutable(vtype->type(), node.start);
+        //     return error_stub();
+        // }
     }
-    ObjectType tuple_type("Tuple", types);
     SemanticInfo sinfo;
-    sinfo.set_type(tuple_type);
+    ObjectValue* ov = new ObjectValue();
+    sinfo.entity = Entity{.type = E_TYPE::OBJECT_VALUE, .object_value = ov};
+    ov->ot = new ObjectType("Tuple", types);
+    unsigned long num_values = node.values.size();
+    ov->ot->actual_base_path = Path("core.Tuple" + std::to_string(num_values));
+    NewObjectSNode* nosn = new NewObjectSNode();
+    sinfo.snode = nosn;
+    nosn->class_name = ov->ot->actual_base_path.as_str();
+    nosn->args = values;
     return std::make_unique<SemanticInfo>(sinfo);
 }
 
@@ -1157,6 +1167,26 @@ USemanticInfo Checker::member_tuple(const ObjectType& final_type, MemberNode& n)
 USemanticInfo Checker::visit_member(MemberNode& n) {
     USemanticInfo parent_info = this->dispatch(n.parent);
     Entity parent_entity = parent_info->entity;
+    if (n.type == MemberType::NUM) {
+        if (parent_entity.object_value->ot->id != "Tuple") {
+            throw std::runtime_error("Integer member of not a Tuple!");
+        }
+        unsigned long tuple_size = parent_entity.object_value->ot->type_params.size();
+        if (n.n_child > tuple_size || n.n_child == 0) {
+            throw std::runtime_error("Tuple member out of range, has " + std::to_string(tuple_size) + " but required " +
+                                     std::to_string(n.n_child));
+        }
+        SemanticInfo info;
+        ObjectMemberSNode* omsn = new ObjectMemberSNode();
+        info.snode = omsn;
+        omsn->object = parent_info->snode;
+        omsn->member_name = "mem_" + std::to_string(n.n_child);
+        omsn->class_path = parent_entity.object_value->ot->actual_base_path;
+        ObjectValue* ov = new ObjectValue();
+        info.entity = Entity{.type=E_TYPE::OBJECT_VALUE, .object_value=ov};
+        ov->ot = (ObjectType*) parent_entity.object_value->ot->type_params[n.n_child - 1]->clone();
+        return std::make_unique<SemanticInfo>(info);
+    }
     switch (parent_entity.type) {
         case E_TYPE::CLASS:
             return this->class_member(parent_entity.clazz, n.s_child, n);

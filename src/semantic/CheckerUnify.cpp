@@ -143,6 +143,7 @@ std::pair<std::string, TypeNode*>* Checker::get_first_substitution(TypeNode& a, 
 }
 
 USemanticInfo Checker::visit_import(ImportNode& node) {
+
     SemanticInfo info;
     return std::make_unique<SemanticInfo>(info);
 }

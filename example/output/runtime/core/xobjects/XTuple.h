@@ -9,25 +9,25 @@
 #include "../xobject.h"
 #include <assert.h>
 
-class XTuple2 : public XObject {
+class core_D_Tuple2 : public XObject {
 public:
     TaggedObject* mem_1;
     TaggedObject* mem_2;
     TaggedObject* __eq__(TaggedObject* pObject) override;
-    ~XTuple2() override;
+    ~core_D_Tuple2() override;
 
-    XTuple2(TaggedObject* mem_1, TaggedObject* mem_2);
+    core_D_Tuple2(TaggedObject* mem_1, TaggedObject* mem_2);
 };
 
-class XTuple3 : public XObject {
+class core_D_Tuple3 : public XObject {
 public:
     TaggedObject* mem_1;
     TaggedObject* mem_2;
     TaggedObject* mem_3;
     TaggedObject* __eq__(TaggedObject* pObject) override;
-    ~XTuple3() override;
+    ~core_D_Tuple3() override;
 
-    XTuple3(TaggedObject* mem_1, TaggedObject* mem_2, TaggedObject* mem_3);
+    core_D_Tuple3(TaggedObject* mem_1, TaggedObject* mem_2, TaggedObject* mem_3);
 };
 
 
