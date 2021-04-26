@@ -627,12 +627,13 @@ USemanticInfo Checker::visit_call(CallNode& n) {
     CallSNode* sn = new CallSNode();
     retv.snode = sn;
     Logger::info("Checking CallNode");
+    bool old_is_call = this->is_call;
     this->is_call = true;
     USemanticInfo fun_info_p = this->dispatch(n.function);
+    this->is_call = old_is_call;
     if (fun_info_p->entity.type == E_TYPE::ERROR) {
         return error_stub();
     }
-    this->is_call = false;
     if (fun_info_p->this_arg != nullptr) {
         sn->arguments = {fun_info_p->this_arg};
     }
