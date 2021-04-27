@@ -23,6 +23,7 @@
 #include "../simple_nodes/ListSNode.h"
 #include "../simple_nodes/IfSNode.h"
 #include "../simple_nodes/BreakSNode.h"
+#include "../simple_nodes/ContinueSNode.h"
 
 const std::string TOBJECT = "TaggedObject*";
 const std::string GCDECLARE = "GC::declare";
@@ -103,6 +104,8 @@ public:
 
     std::string transpile_break(BreakSNode* bn);
 
+    std::string transpile_continue(ContinueSNode* pNode);
+
     std::string dispatch(SNode* node) {
         if (node == nullptr) {
             throw std::runtime_error("Error dispatching on nullptr snode!");
@@ -114,6 +117,8 @@ public:
                 return this->transpile_if((IfSNode*) node);
             case SNodeType::BREAK:
                 return this->transpile_break((BreakSNode*) node);
+            case SNodeType::CONTINUE:
+                return this->transpile_continue((ContinueSNode*) node);
             case SNodeType::ID:
                 return this->transpile_id((IdSNode*) node);
             case SNodeType::STRING:

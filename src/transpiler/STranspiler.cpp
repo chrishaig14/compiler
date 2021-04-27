@@ -226,3 +226,8 @@ std::string STranspiler::transpile_break(BreakSNode* bn) {
     std::string out = "break" + SEMIC + NEWLINE;
     return out;
 }
+
+std::string STranspiler::transpile_continue(ContinueSNode* pNode) {
+    std::string out = "continue" + SEMIC + NEWLINE;
+    return out;
+}

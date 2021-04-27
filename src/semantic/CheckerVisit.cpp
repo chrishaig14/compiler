@@ -8,6 +8,7 @@
 #include "../simple_nodes/BlockSNode.h"
 #include "../simple_nodes/AssignmentSNode.h"
 #include "../simple_nodes/ReturnSNode.h"
+#include "../simple_nodes/ContinueSNode.h"
 #include "../simple_nodes/IntegerSNode.h"
 #include "../simple_nodes/FunctionSNode.h"
 #include "../simple_nodes/DeclarationSNode.h"
@@ -417,7 +418,14 @@ USemanticInfo Checker::visit_class(ClassNode& node) {
 }
 
 USemanticInfo Checker::visit(ContinueNode& node) {
-    return nullptr;
+    SemanticInfo info;
+    BlockSNode* bn = new BlockSNode();
+    info.snode = bn;
+    if (this->update_loop_index_snode != nullptr) {
+        bn->nodes.push_back(this->update_loop_index_snode);
+    }
+    bn->nodes.push_back(new ContinueSNode());
+    return std::make_unique<SemanticInfo>(info);
 }
 
 USemanticInfo Checker::visit(TupleNode& node) {
@@ -496,20 +504,18 @@ USemanticInfo Checker::visit(PartialApplication& node) {
     return std::make_unique<SemanticInfo>(s);
 }
 
-SNode* make_for_snode(ForNode& node, USemanticInfo& binfo, USemanticInfo& exp_info_p) {
+SNode* Checker::make_for_snode(ForNode& node, USemanticInfo& binfo, USemanticInfo& exp_info_p) {
     BlockSNode* bbn = new BlockSNode();
     DeclarationSNode* dsn = new DeclarationSNode();
     WhileSNode* wsn = new WhileSNode();
 
-    const char* loop_list_var_id = "__loop_list__";
-    const char* loop_index_var_id = "__loop_index__";
-    const char* loop_list_len_var_id = "__loop_list_len__";
 
-    dsn->identifier = loop_list_var_id;
+
+    dsn->identifier = this->loop_list_var_id;
     dsn->expression = exp_info_p->snode;
     bbn->nodes.push_back(dsn);
     DeclarationSNode* lidx_decl = new DeclarationSNode();
-    lidx_decl->identifier = loop_index_var_id;
+    lidx_decl->identifier = this->loop_index_var_id;
     IntegerSNode* init_idx = new IntegerSNode();
     init_idx->str = "0";
     lidx_decl->expression = init_idx;
@@ -517,21 +523,21 @@ SNode* make_for_snode(ForNode& node, USemanticInfo& binfo, USemanticInfo& exp_in
     bbn->nodes.push_back(lidx_decl);
 
     DeclarationSNode* lensn = new DeclarationSNode();
-    lensn->identifier = loop_list_len_var_id;
+    lensn->identifier = this->loop_list_len_var_id;
     CallSNode* call_list_len_sn = new CallSNode();
     IdSNode* list_len_fn = new IdSNode("core.List.len");
     call_list_len_sn->function = list_len_fn;
-    IdSNode* list_sn = new IdSNode(loop_list_var_id);
+    IdSNode* list_sn = new IdSNode(this->loop_list_var_id);
     call_list_len_sn->arguments = {list_sn};
     lensn->expression = call_list_len_sn;
     bbn->nodes.push_back(lensn);
 
 
-    IdSNode* idxsn = new IdSNode(loop_index_var_id);
+    IdSNode* idxsn = new IdSNode(this->loop_index_var_id);
     CallSNode* cn = new CallSNode();
     IdSNode* cmpfunsn = new IdSNode("core.Integer.lt");
 
-    IdSNode* llensn = new IdSNode(loop_list_len_var_id);
+    IdSNode* llensn = new IdSNode(this->loop_list_len_var_id);
 
 
     cn->function = cmpfunsn;
@@ -547,25 +553,15 @@ SNode* make_for_snode(ForNode& node, USemanticInfo& binfo, USemanticInfo& exp_in
 
     CallSNode* list_subscript_n = new CallSNode();
     list_subscript_n->function = new IdSNode("core.List.__sub__");
-    list_subscript_n->arguments.push_back(new IdSNode(loop_list_var_id));
-    list_subscript_n->arguments.push_back(new IdSNode(loop_index_var_id));
+    list_subscript_n->arguments.push_back(new IdSNode(this->loop_list_var_id));
+    list_subscript_n->arguments.push_back(new IdSNode(this->loop_index_var_id));
 
 
     loop_elem_sn->expression = list_subscript_n;
     loop_elem_sn->identifier = node.var;
     bn->nodes.insert(bn->nodes.begin(), loop_elem_sn);
 
-    AssignmentSNode* increment_index_sn = new AssignmentSNode();
-    increment_index_sn->lvalue = new IdSNode(loop_index_var_id);
-    CallSNode* inc_exp_node = new CallSNode();
-    inc_exp_node->function = new IdSNode("core.Integer.add");
-    inc_exp_node->arguments.push_back(new IdSNode(loop_index_var_id));
-    IntegerSNode* one_node = new IntegerSNode();
-    one_node->str = "1";
-    inc_exp_node->arguments.push_back(one_node);
-    increment_index_sn->rvalue = inc_exp_node;
-
-    bn->nodes.push_back(increment_index_sn);
+    bn->nodes.push_back(this->update_loop_index_snode);
     wsn->body = bn;
     return bbn;
 }
@@ -584,12 +580,33 @@ USemanticInfo Checker::visit(ForNode& node) {
     Entity elem_entity = entity_from_type(*elem_type);
     this->enter_scope("for");
     this->scope->set(node.var, elem_entity);
+
+
+    this->loop_list_var_id = "__loop_list__";
+    this->loop_index_var_id = "__loop_index__";
+    this->loop_list_len_var_id = "__loop_list_len__";
+
+    AssignmentSNode* increment_index_sn = new AssignmentSNode();
+    this->update_loop_index_snode = increment_index_sn;
+    increment_index_sn->lvalue = new IdSNode(this->loop_index_var_id);
+    CallSNode* inc_exp_node = new CallSNode();
+    inc_exp_node->function = new IdSNode("core.Integer.add");
+    inc_exp_node->arguments.push_back(new IdSNode(this->loop_index_var_id));
+    IntegerSNode* one_node = new IntegerSNode();
+    one_node->str = "1";
+    inc_exp_node->arguments.push_back(one_node);
+    increment_index_sn->rvalue = inc_exp_node;
+
+
     USemanticInfo binfo = this->visit_block(*node.body);
     this->leave_scope();
 
     SemanticInfo rinfo;
-    rinfo.snode = make_for_snode(node, binfo, exp_info_p);
 
+
+
+    rinfo.snode = make_for_snode(node, binfo, exp_info_p);
+    this->update_loop_index_snode = nullptr;
     return std::make_unique<SemanticInfo>(rinfo);
 }
 

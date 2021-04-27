@@ -153,6 +153,11 @@ public:
     USemanticInfo package_member(Package* package, std::string child, MemberNode& n);
     USemanticInfo module_member(Module* mod, std::string child, MemberNode& n);
     Package* root_package;
+    SNode* update_loop_index_snode;
+    SNode* make_for_snode(ForNode& node, USemanticInfo& binfo, USemanticInfo& exp_info_p);
+    std::string loop_list_var_id;
+    std::string loop_index_var_id;
+    std::string loop_list_len_var_id;
 };
 
 bool function_is_generic(const FunctionType& ft);
