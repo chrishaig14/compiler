@@ -1031,7 +1031,10 @@ USemanticInfo Checker::check_declaration_with_type(DeclarationNode& n) {
             }
         }
     }
-    info.set_type(n_type);
+    // info.set_type(n_type);
+    ObjectValue* ov = new ObjectValue();
+    info.entity = Entity{.type = E_TYPE::OBJECT_VALUE, .object_value=ov};
+    ov->ot = (ObjectType*) n.type->clone();
     return std::make_unique<SemanticInfo>(info);
 }
 
