@@ -86,9 +86,10 @@ void GlobalProcessor::visit(FunctionNode& node) {
         x.emplace_back(p->clone());
     }
     TypeNode* p = node.return_type;
-    if (p->kind == Kind::OBJECT && !p->is_generic_param) {
-        p->object().actual_base_path = this->get_actual_path({p->object().id});
-    }
+    this->fill_actual(p);
+    // if (p->kind == Kind::OBJECT && !p->is_generic_param) {
+    //     p->object().actual_base_path = this->get_actual_path({p->object().id});
+    // }
     FunctionType function_info(x, node.return_type->clone());
     Path function_path = Path(module_dotted_path, node.identifier);
     const_function->ft = function_info.clone();
