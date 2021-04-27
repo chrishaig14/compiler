@@ -182,8 +182,8 @@ std::string STranspiler::transpile_new(NewObjectSNode* node) {
 
 std::string STranspiler::transpile_object_member(ObjectMemberSNode* sn) {
     std::string out;
-    out += "CAST" + LPAREN + this->dispatch(sn->object) + COMMA + SPACE + path_to_id(sn->class_path.as_str()) + RPAREN + "->" +
-           sn->member_name;
+    out += "CAST" + LPAREN + this->dispatch(sn->object) + COMMA + SPACE + path_to_id(sn->class_path.as_str()) + RPAREN +
+           "->" + sn->member_name;
     return out;
 }
 
@@ -219,5 +219,10 @@ std::string STranspiler::transpile_if(IfSNode* in) {
         out += "else" + SPACE + LCURLY + NEWLINE + this->transpile_block(in->_else) + NEWLINE + RCURLY;
     }
     out += NEWLINE;
+    return out;
+}
+
+std::string STranspiler::transpile_break(BreakSNode* bn) {
+    std::string out = "break" + SEMIC + NEWLINE;
     return out;
 }

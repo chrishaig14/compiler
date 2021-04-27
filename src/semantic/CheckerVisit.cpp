@@ -20,6 +20,7 @@
 #include "../simple_nodes/ClassSNode.h"
 #include "../simple_nodes/NewObjectSNode.h"
 #include "../simple_nodes/WhileSNode.h"
+#include "../simple_nodes/BreakSNode.h"
 #include "../simple_nodes/ListSNode.h"
 #include "../simple_nodes/IfSNode.h"
 #include "../simple_nodes/ObjectMemberSNode.h"
@@ -226,8 +227,10 @@ USemanticInfo Checker::visit(SubscriptNode& node) {
 }
 
 USemanticInfo Checker::visit(BreakNode& node) {
-    node.loop_vars = this->scope->get_all_in_loop();
-    return nullptr;
+    // node.loop_vars = this->scope->get_all_in_loop();
+    SemanticInfo info;
+    info.snode = new BreakSNode();
+    return std::make_unique<SemanticInfo>(info);
 }
 
 USemanticInfo Checker::visit(TernaryNode& node) {
