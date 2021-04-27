@@ -16,8 +16,6 @@ typedef std::pair<std::string, std::string> Builtin;
 class GlobalProcessor {
 public:
     Path module_dotted_path;
-    std::map<std::string, Path> imported_paths_no_alias;
-    std::map<std::string, Path> imported_paths_with_alias;
 
     Package* root_package;
     Module* module;
@@ -36,11 +34,8 @@ public:
 
     std::string __file__;
     std::string module_name;
-    Path get_actual_path(std::string id);
+
     Class* get_actual_clazz(std::string basicString);
-    void fill_actual(TypeNode* t);
-    void fill_actual(ObjectType* t);
-    void fill_actual(FunctionType* t);
 };
 
 #endif //GLOBALPROCESSOR_H

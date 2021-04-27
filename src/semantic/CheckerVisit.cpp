@@ -510,7 +510,6 @@ SNode* Checker::make_for_snode(ForNode& node, USemanticInfo& binfo, USemanticInf
     WhileSNode* wsn = new WhileSNode();
 
 
-
     dsn->identifier = this->loop_list_var_id;
     dsn->expression = exp_info_p->snode;
     bbn->nodes.push_back(dsn);
@@ -602,7 +601,6 @@ USemanticInfo Checker::visit(ForNode& node) {
     this->leave_scope();
 
     SemanticInfo rinfo;
-
 
 
     rinfo.snode = make_for_snode(node, binfo, exp_info_p);
@@ -989,9 +987,9 @@ USemanticInfo Checker::check_declaration_with_type(DeclarationNode& n) {
     sn->identifier = n.identifier;
 
     TypeNode& n_type = *n.type;
-    if (!this->assert_type_exists(n_type, n.start)) {
-        return error_stub();
-    }
+
+    this->module->fill_actual(n.type);
+
     USemanticInfo exp_info_p = this->dispatch(n.expression);
     sn->expression = exp_info_p->snode;
     SemanticInfo& exp_info = *exp_info_p;
@@ -1008,7 +1006,7 @@ USemanticInfo Checker::check_declaration_with_type(DeclarationNode& n) {
     } else {
         SemanticInfo expression_info = exp_info;
         const ObjectType& actual_type = n.type->object();
-        const TypeNode& exp_type = expression_info.type();
+        const TypeNode& exp_type = *expression_info.entity.object_value->ot;
         if (actual_type.id == "Option") {
             if (*actual_type.type_params[0] != exp_type) {
                 auto foo = exp_type.object();
@@ -1019,7 +1017,7 @@ USemanticInfo Checker::check_declaration_with_type(DeclarationNode& n) {
         } else if (actual_type.id == "Union") {
             bool ok = false;
             for (auto type_param: actual_type.type_params) {
-                if (*type_param != exp_type) {
+                if (*type_param == exp_type) {
                     ok = true;
                     break;
                 }

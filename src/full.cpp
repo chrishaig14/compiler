@@ -111,8 +111,8 @@ void process_global_all_modules(Package* package) {
             gp.module_dotted_path = module->path;
             gp.__file__ = module->abs_path;
             gp.visit_root(*module->ast);
-            module->imported_paths_no_alias = gp.imported_paths_no_alias;
-            module->imported_paths_with_alias = gp.imported_paths_with_alias;
+            // module->imported_paths_no_alias = gp.imported_paths_no_alias;
+            // module->imported_paths_with_alias = gp.imported_paths_with_alias;
             std::cout << "- Done" << std::endl;
         }
     }

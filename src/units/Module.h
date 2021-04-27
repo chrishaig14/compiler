@@ -37,6 +37,11 @@ public:
         VectorOfStrings pt = p.as_vec();
         return this->flirpins[pt.back()];
     }
+
+    Path get_actual_path(std::string id);
+    void fill_actual(TypeNode* t);
+    void fill_actual(ObjectType* t);
+    void fill_actual(FunctionType* t);
 };
 
 

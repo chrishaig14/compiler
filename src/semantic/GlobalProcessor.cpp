@@ -25,20 +25,20 @@ std::string join_path(VectorOfStrings path) {
 
 void GlobalProcessor::visit(ImportNode& node) {
     if (node.has_alias) {
-        if (this->imported_paths_with_alias.count(node.alias)) {
+        if (this->module->imported_paths_with_alias.count(node.alias)) {
             throw std::runtime_error("Import alias \"" + node.alias + "\" already defined for " +
-                                     this->imported_paths_with_alias[node.alias].as_str());
+                                     this->module->imported_paths_with_alias[node.alias].as_str());
         }
-        this->imported_paths_with_alias[node.alias] = node.path;
+        this->module->imported_paths_with_alias[node.alias] = node.path;
         this->module->imported_paths_with_alias_v.push_back(std::make_pair(node.alias, node.path));
     } else {
-        if (this->imported_paths_with_alias.count(node.path.back()) != 0) {
+        if (this->module->imported_paths_with_alias.count(node.path.back()) != 0) {
             throw std::runtime_error("Path " + Path(node.path).as_str() + " already imported!");
         }
-        if (this->imported_paths_no_alias.count(node.path.back()) != 0) {
+        if (this->module->imported_paths_no_alias.count(node.path.back()) != 0) {
             throw std::runtime_error("Path " + Path(node.path).as_str() + " already imported!");
         }
-        this->imported_paths_no_alias[node.path.back()] = node.path;
+        this->module->imported_paths_no_alias[node.path.back()] = node.path;
         this->module->imported_paths_no_alias_v.push_back(std::make_pair(node.path.back(), node.path));
     }
     // this->module->inverted[Path(node.path).as_str()] = node.alias;
@@ -48,36 +48,14 @@ void GlobalProcessor::visit(ImportNode& node) {
 }
 
 
-void GlobalProcessor::fill_actual(TypeNode* t) {
-    if (t->kind == Kind::FUNCTION) {
-        return fill_actual(&t->function());
-    }
-    return fill_actual(&t->object());
-}
 
-void GlobalProcessor::fill_actual(ObjectType* t) {
-    if (t->is_generic_param) {
-        return;
-    }
-    t->actual_base_path = this->get_actual_path(t->id);
-    for (auto tp: t->type_params) {
-        this->fill_actual(tp);
-    }
-}
-
-void GlobalProcessor::fill_actual(FunctionType* t) {
-    for (auto pt: t->param_types) {
-        this->fill_actual(pt);
-    }
-    this->fill_actual(t->return_type);
-}
 
 void GlobalProcessor::visit(FunctionNode& node) {
     ConstFunction* const_function = this->module->flirpins[node.identifier].const_function;
 
     VectorOfTypes x;
     for (auto p: node.parameter_types) {
-        this->fill_actual(p);
+        this->module->fill_actual(p);
         // if (p->kind == Kind::OBJECT && !p->is_generic_param) {
         //     p->object().actual_base_path = this->get_actual_path({p->object().id});
         // } else if (p->kind == Kind::FUNCTION) {
@@ -86,7 +64,7 @@ void GlobalProcessor::visit(FunctionNode& node) {
         x.emplace_back(p->clone());
     }
     TypeNode* p = node.return_type;
-    this->fill_actual(p);
+    this->module->fill_actual(p);
     // if (p->kind == Kind::OBJECT && !p->is_generic_param) {
     //     p->object().actual_base_path = this->get_actual_path({p->object().id});
     // }
@@ -171,7 +149,7 @@ void GlobalProcessor::visit(ClassNode& node) {
     class_info->type_params = node.type_parameters;
     for (auto mn: node.members_ordered) {
         auto mt = node.members[mn];
-        this->fill_actual(mt);
+        this->module->fill_actual(mt);
         // if (!mt->object().is_generic()) {
         //     mt->object().actual_base_path = this->get_actual_path(mt->object().id);
         // }
@@ -189,11 +167,11 @@ void GlobalProcessor::visit(ClassNode& node) {
 
         VectorOfTypes x;
         for (auto p: method.parameter_types) {
-            this->fill_actual(p);
+            this->module->fill_actual(p);
             // p->object().actual_base_path = this->get_actual_path(p->object().id);
             x.emplace_back(p->clone());
         }
-        this->fill_actual(method.return_type);
+        this->module->fill_actual(method.return_type);
         // method.return_type->object().actual_base_path = this->get_actual_path(method.return_type->object().id);
 
         ConstFunction* cf = new ConstFunction();
@@ -210,11 +188,11 @@ void GlobalProcessor::visit(ClassNode& node) {
 
         VectorOfTypes x;
         for (auto p: method.parameter_types) {
-            this->fill_actual(p);
+            this->module->fill_actual(p);
             // p->object().actual_base_path = this->get_actual_path(p->object().id);
             x.emplace_back(p->clone());
         }
-        this->fill_actual(method.return_type);
+        this->module->fill_actual(method.return_type);
         // method.return_type->object().actual_base_path = this->get_actual_path(method.return_type->object().id);
 
         ConstFunction* cf = new ConstFunction();
@@ -251,12 +229,15 @@ void GlobalProcessor::dispatch(Node* nod) {
     }
 }
 
-Path GlobalProcessor::get_actual_path(std::string id) {
+Path Module::get_actual_path(std::string id) {
     if (id == ".None") {
         return Path(VectorOfStrings({".None"}));
     }
-    if (this->module->flirpins.count(id) == 1) {
-        return this->module->flirpins[id].clazz->path;
+    if (id == "Union") {
+        return Path("core.Union");
+    }
+    if (this->flirpins.count(id) == 1) {
+        return this->flirpins[id].clazz->path;
     }
     if (this->imported_paths_with_alias.count(id) == 1) {
         return this->imported_paths_with_alias[id];
@@ -265,4 +246,28 @@ Path GlobalProcessor::get_actual_path(std::string id) {
         return this->imported_paths_no_alias[id];
     }
     throw std::runtime_error("Error: type " + id + " not found");
+}
+
+void Module::fill_actual(TypeNode* t) {
+    if (t->kind == Kind::FUNCTION) {
+        return fill_actual(&t->function());
+    }
+    return fill_actual(&t->object());
+}
+
+void Module::fill_actual(ObjectType* t) {
+    if (t->is_generic_param) {
+        return;
+    }
+    t->actual_base_path = this->get_actual_path(t->id);
+    for (auto tp: t->type_params) {
+        this->fill_actual(tp);
+    }
+}
+
+void Module::fill_actual(FunctionType* t) {
+    for (auto pt: t->param_types) {
+        this->fill_actual(pt);
+    }
+    this->fill_actual(t->return_type);
 }
