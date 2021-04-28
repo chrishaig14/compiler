@@ -275,7 +275,16 @@ USemanticInfo Checker::visit(NoneNode& node) {
 
 USemanticInfo Checker::visit(EmptyListNode& node) {
     SemanticInfo info;
-    info.set_type(T_LIST(node.type->clone()));
+    this->module->fill_actual(node.type);
+    ObjectValue* ov = new ObjectValue();
+    info.entity = Entity{.type = E_TYPE::OBJECT_VALUE, .object_value=ov};
+    ov->ot = new ObjectType("List", {node.type});
+    ov->ot->actual_base_path = Path("core.List");
+    // NewObjectSNode* non = new NewObjectSNode();
+    ListSNode* lsn = new ListSNode();
+    info.snode = lsn;
+    lsn->elements = {};
+    // non->class_name = "core.List";
     return std::make_unique<SemanticInfo>(info);
 }
 
@@ -763,7 +772,20 @@ USemanticInfo Checker::visit_call(CallNode& n) {
                 const std::string& param_path_as_str = param_type.object().actual_base_path.as_str();
                 if (arg_path_as_str != param_path_as_str) {
                     // if (arg_type != param_type) {
-                    if (arg_type.kind != Kind::UNKNOWN) {
+                    if (param_type.kind == Kind::OBJECT) {
+                        if (param_type.object().id == "Union") {
+                            int type_index = target_union_type(param_type.object(), arg_type);
+                            if (type_index == -1) {
+                                this->error_reporter.function_call_type_mismatch(param_type,
+                                                                                 arg_type,
+                                                                                 n.arguments[i]->start,
+                                                                                 n.arguments[i]->end);
+                            } else {
+                                int fixed_index = i + (fun_info_p->this_arg != nullptr);
+                                sn->arguments[fixed_index] = make_union_wrapper(type_index, sn->arguments[fixed_index]);
+                            }
+                        }
+                    } else if (arg_type.kind != Kind::UNKNOWN) {
                         this->error_reporter.function_call_type_mismatch(param_type,
                                                                          arg_type,
                                                                          n.arguments[i]->start,
@@ -773,9 +795,9 @@ USemanticInfo Checker::visit_call(CallNode& n) {
                     // }
                 }
             }
-            for (auto x: arg_types) {
-                delete x;
-            }
+        }
+        for (auto x: arg_types) {
+            delete x;
         }
     } else {
         std::string entity_type;
@@ -803,7 +825,7 @@ USemanticInfo Checker::visit_call(CallNode& n) {
         this->error_reporter.call_not_a_function(n.start);
     }
     if (is_a_method) {
-        // prepend the "this" argument (the object on which the method is being called)
+// prepend the "this" argument (the object on which the method is being called)
         n.arguments.insert(n.arguments.begin(), object_node);
     }
     retv.is_constant = is_def_const && args_are_constant;
@@ -981,6 +1003,24 @@ USemanticInfo Checker::visit_id(IdNode& n) {
     return std::make_unique<SemanticInfo>(info);
 }
 
+int target_union_type(const ObjectType& target, const TypeNode& source) {
+    for (int ti = 0; ti < target.type_params.size(); ti++) {
+        if (target.type_params[ti]->actual_to_string() == source.actual_to_string()) {
+            return ti;
+        }
+    }
+    return -1;
+}
+
+SNode* make_union_wrapper(int type_index, SNode* expression) {
+    NewObjectSNode* new_union = new NewObjectSNode();
+    new_union->class_name = "core_D_Union";
+    IntegerSNode* in = new IntegerSNode();
+    in->str = std::to_string(type_index); // FIXME, use int directly
+    new_union->args = {expression, in};
+    return new_union;
+}
+
 USemanticInfo Checker::check_declaration_with_type(DeclarationNode& n) {
     SemanticInfo info;
     DeclarationSNode* sn = new DeclarationSNode();
@@ -1017,23 +1057,13 @@ USemanticInfo Checker::check_declaration_with_type(DeclarationNode& n) {
             }
         } else if (actual_type.id == "Union") {
             bool ok = false;
-            int type_index = 0;
-            for (int ti = 0; ti < actual_type.type_params.size(); ti++) {
-                if (actual_type.type_params[ti]->actual_to_string() == exp_type.actual_to_string()) {
-                    ok = true;
-                    type_index = ti;
-                    break;
-                }
-            }
-            NewObjectSNode* new_union = new NewObjectSNode();
-            new_union->class_name = "core_D_Union";
-            IntegerSNode* in = new IntegerSNode();
-            in->str = std::to_string(type_index); // FIXME, use int directly
-            new_union->args = {sn->expression, in};
-            sn->expression = new_union;
-            if (!ok) {
+            int type_index = target_union_type(actual_type, exp_type);
+            if (type_index == -1) {
                 this->error_reporter.assignment(n_type, exp_type, n.start);
             }
+            SNode* union_wrapper = make_union_wrapper(type_index, sn->expression);
+            sn->expression = union_wrapper;
+
         } else {
             if (n_type != exp_type) {
                 this->error_reporter.assignment(n_type, exp_type, n.start);
@@ -1157,8 +1187,19 @@ USemanticInfo Checker::visit_assignment(AssignmentNode& n) {
                         }
                     }
                 } else {
-                    // if it's not Option[t], then it's an error
-                    this->error_reporter.assignment(l_type, exp_type, n.start);
+                    if (actual_type.kind == Kind::OBJECT) {
+                        if (actual_type.object().id == "Union") {
+                            int type_index = target_union_type(actual_type.object(), exp_type);
+                            if (type_index == -1) {
+                                this->error_reporter.assignment(actual_type, exp_type, n.rvalue->start);
+                            } else {
+                                expression_info_p->snode = make_union_wrapper(type_index, expression_info_p->snode);
+                            }
+                        }
+                    } else {
+                        // if it's not Option[t], then it's an error
+                        this->error_reporter.assignment(l_type, exp_type, n.start);
+                    }
                 }
             } else {
                 // if it's not Option[t], then it's an error

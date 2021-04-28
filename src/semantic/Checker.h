@@ -51,6 +51,8 @@ Class* make_string_class_info();
 Entity map_flirpin_to_entity(Flirpin flirpin);
 
 Flirpin map_unit_to_flirpin(Unit u);
+int target_union_type(const ObjectType& target, const TypeNode& source);
+SNode* make_union_wrapper(int type_index, SNode* expression);
 
 class Checker {
     bool add_this;
