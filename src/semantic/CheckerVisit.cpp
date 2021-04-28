@@ -1019,7 +1019,7 @@ USemanticInfo Checker::check_declaration_with_type(DeclarationNode& n) {
             bool ok = false;
             int type_index = 0;
             for (int ti = 0; ti < actual_type.type_params.size(); ti++) {
-                if (*actual_type.type_params[ti] == exp_type) {
+                if (actual_type.type_params[ti]->actual_to_string() == exp_type.actual_to_string()) {
                     ok = true;
                     type_index = ti;
                     break;
@@ -1614,9 +1614,10 @@ USemanticInfo Checker::visit_match(MatchExpressionNode* node) {
     for (int i = 0; i < node->ids.size(); i++) {
         std::pair<TypeNode*, BlockNode*> c = node->cases[i];
         TypeNode* type = c.first;
+        this->module->fill_actual(type);
         bool ok = false;
         for (auto t: ot->type_params) {
-            if (*t == *type) {
+            if (t->actual_to_string() == type->actual_to_string()) {
                 ok = true;
                 break;
             }
