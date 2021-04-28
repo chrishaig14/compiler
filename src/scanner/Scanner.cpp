@@ -21,6 +21,7 @@ std::unordered_map<std::string, TokType> TOKEN_SPECIAL;
 
 void initialize_tokens() {
     TOKEN_KEYWORDS["fun"] = TokType::FUN;
+    TOKEN_KEYWORDS["match"] = TokType::MATCH;
     TOKEN_KEYWORDS["if"] = TokType::IF;
     TOKEN_KEYWORDS["struct"] = TokType::STRUCT;
     TOKEN_KEYWORDS["else"] = TokType::ELSE;

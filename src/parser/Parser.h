@@ -12,7 +12,6 @@
 
 extern std::unordered_map<TokType, OpType> TOKEN_TO_OP;
 
-
 class Parser {
     std::vector<Token> tokens;
     Token token;
@@ -117,6 +116,7 @@ public:
     void error_expected_type(Token tok);
     Node* parse_dictionary();
     Node* parse_tuple_or_constructor();
+    Node* parse_match_statement();
 };
 
 

@@ -22,4 +22,15 @@
 #include "basics.h"
 #include "functions.h"
 
+class core_D_Union : public XObject {
+public:
+    TaggedObject* o;
+    TaggedObject* type;
+
+    core_D_Union(TaggedObject* o, TaggedObject* type) : XObject("Union") {
+        this->o = o;
+        this->type = type;
+    }
+};
+
 #endif //UNTITLED1_CORE_H

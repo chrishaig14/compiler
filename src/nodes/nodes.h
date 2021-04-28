@@ -22,6 +22,7 @@
 #include "MethodNode.h"
 #include "BoolOpNode.h"
 #include "ForNode.h"
+#include "MatchExpressionNode.h"
 #include "WhileNode.h"
 #include "DeclarationNode.h"
 #include "ImportNode.h"

@@ -25,6 +25,7 @@
 #include "../simple_nodes/ListSNode.h"
 #include "../simple_nodes/IfSNode.h"
 #include "../simple_nodes/ObjectMemberSNode.h"
+#include "../simple_nodes/MatchSNode.h"
 
 #define T_NONE ObjectType(".None")
 static TextPosition POS_NONE = {-1, -1};
@@ -1016,12 +1017,20 @@ USemanticInfo Checker::check_declaration_with_type(DeclarationNode& n) {
             }
         } else if (actual_type.id == "Union") {
             bool ok = false;
-            for (auto type_param: actual_type.type_params) {
-                if (*type_param == exp_type) {
+            int type_index = 0;
+            for (int ti = 0; ti < actual_type.type_params.size(); ti++) {
+                if (*actual_type.type_params[ti] == exp_type) {
                     ok = true;
+                    type_index = ti;
                     break;
                 }
             }
+            NewObjectSNode* new_union = new NewObjectSNode();
+            new_union->class_name = "core_D_Union";
+            IntegerSNode* in = new IntegerSNode();
+            in->str = std::to_string(type_index); // FIXME, use int directly
+            new_union->args = {sn->expression, in};
+            sn->expression = new_union;
             if (!ok) {
                 this->error_reporter.assignment(n_type, exp_type, n.start);
             }
@@ -1589,3 +1598,52 @@ USemanticInfo Checker::visit(DefaultConstructorNode& node) {
     return std::make_unique<SemanticInfo>(info);
 }
 
+USemanticInfo Checker::visit_match(MatchExpressionNode* node) {
+    SemanticInfo info;
+    USemanticInfo exp_info = this->dispatch(node->exp);
+    if (exp_info->entity.type != E_TYPE::OBJECT_VALUE) {
+        throw std::runtime_error("Error, match expression should have type Union[...]");
+    }
+
+    ObjectType* ot = exp_info->entity.object_value->ot;
+    if (ot->id != "Union") {
+        throw std::runtime_error("Error, match expression should have type Union[...]");
+    }
+    std::vector<std::pair<int, BlockSNode*>> cas;
+    std::string varname = "match_var";
+    for (int i = 0; i < node->ids.size(); i++) {
+        std::pair<TypeNode*, BlockNode*> c = node->cases[i];
+        TypeNode* type = c.first;
+        bool ok = false;
+        for (auto t: ot->type_params) {
+            if (*t == *type) {
+                ok = true;
+                break;
+            }
+        }
+        if (!ok) {
+            throw std::runtime_error("Error, type " + type->to_string() + " not part of " + ot->to_string());
+        }
+        this->enter_scope("case");
+        this->scope->set(node->ids[i], entity_from_type(*type));
+        USemanticInfo case_info = this->dispatch(c.second);
+        BlockSNode* bn = (BlockSNode*) case_info->snode;
+        DeclarationSNode* dn = new DeclarationSNode();
+        dn->identifier = node->ids[i];
+        ObjectMemberSNode* omn = new ObjectMemberSNode();
+        dn->expression = omn;
+        omn->member_name = "o";
+        omn->object = new IdSNode(varname);
+        omn->class_path = Path("core.Union");
+        bn->nodes.insert(bn->nodes.begin(), dn);
+        cas.push_back(std::make_pair(i, (BlockSNode*) case_info->snode));
+        this->leave_scope();
+    }
+    DeclarationSNode* init = new DeclarationSNode();
+    init->expression = exp_info->snode;
+    init->identifier = varname;
+    MatchSNode* mn = new MatchSNode(init, varname, cas);
+    info.snode = mn;
+
+    return std::make_unique<SemanticInfo>(info);
+}

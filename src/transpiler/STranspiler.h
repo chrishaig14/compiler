@@ -18,6 +18,7 @@
 #include "../simple_nodes/FloatSNode.h"
 #include "../simple_nodes/ClassSNode.h"
 #include "../simple_nodes/NewObjectSNode.h"
+#include "../simple_nodes/MatchSNode.h"
 #include "../simple_nodes/ObjectMemberSNode.h"
 #include "../simple_nodes/WhileSNode.h"
 #include "../simple_nodes/ListSNode.h"
@@ -106,6 +107,8 @@ public:
 
     std::string transpile_continue(ContinueSNode* pNode);
 
+    std::string transpile_match(MatchSNode* mn);
+
     std::string dispatch(SNode* node) {
         if (node == nullptr) {
             throw std::runtime_error("Error dispatching on nullptr snode!");
@@ -113,6 +116,8 @@ public:
         switch (node->type) {
             case SNodeType::BOOLEAN:
                 return this->transpile_boolean((BoolSNode*) node);
+            case SNodeType::MATCH:
+                return this->transpile_match((MatchSNode*) node);
             case SNodeType::IF:
                 return this->transpile_if((IfSNode*) node);
             case SNodeType::BREAK:

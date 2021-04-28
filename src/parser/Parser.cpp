@@ -550,6 +550,9 @@ Node* Parser::parse_common_statement() {
         case TokType::WHILE: {
             return this->parse_while_loop();
         }
+        case TokType::MATCH: {
+            return this->parse_match_statement();
+        }
         case TokType::BREAK: {
             if (!this->inside_loop) {
                 this->error_out_of_loop(this->token);
@@ -883,4 +886,26 @@ ImportNode* Parser::parse_import() {
     return new ImportNode(path, import_tok.start, path_part.end_pos);
 }
 
+Node* Parser::parse_match_statement() {
+    Token mtk = this->expect_token(TokType::MATCH);
+    Node* exp = this->parse_expression();
+    this->expect_token(TokType::LCURLY);
+
+    std::vector<std::string> ids;
+    std::vector<std::pair<TypeNode*, BlockNode*>> cases;
+    while (true) {
+        Token id = this->expect_token(TokType::ID);
+        this->expect_token(TokType::COLON);
+        TypeNode* type = this->parse_type_node();
+        this->expect_token(TokType::RARROW);
+        BlockNode* body = this->parse_possibly_empty_block();
+        ids.push_back(id.str);
+        cases.push_back(std::make_pair(type, body));
+        if (this->match(TokType::RCURLY)) {
+            break;
+        }
+    }
+    Token lcurly = this->expect_token(TokType::RCURLY);
+    return new MatchExpressionNode(exp, ids, cases, mtk.start, lcurly.end_pos);
+}
 

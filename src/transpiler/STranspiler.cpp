@@ -231,3 +231,16 @@ std::string STranspiler::transpile_continue(ContinueSNode* pNode) {
     std::string out = "continue" + SEMIC + NEWLINE;
     return out;
 }
+
+std::string STranspiler::transpile_match(MatchSNode* mn) {
+    std::string out;
+    out += this->dispatch(mn->exp);
+    out += "switch" + SPACE + LPAREN + "GET_INT(CAST(" + mn->varname + ",core_D_Union" + RPAREN + "->type" + RPAREN +
+           RPAREN + SPACE + LCURLY;
+    for (auto c: mn->cases) {
+        out += "case" + SPACE + "" + std::to_string(c.first) + "" + SPACE + ":" + SPACE + LCURLY +
+               this->transpile_block(c.second) + "break" + SEMIC + RCURLY;
+    }
+    out += RCURLY;
+    return out;
+}
