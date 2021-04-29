@@ -519,6 +519,8 @@ USemanticInfo Checker::dispatch(Node* nod) {
             return this->visit(n.defconst());
         case NodeType::IMPORT:
             return this->visit_import(n.import());
+        case NodeType::ALIAS:
+            return this->visit_alias((AliasNode*)nod);
         case NodeType::MATCH_EXP:
             return this->visit_match((MatchExpressionNode*)nod);
         default:

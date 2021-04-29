@@ -130,6 +130,7 @@ public:
     std::string id;
     VectorOfTypes type_params;
     bool is_generic() const override;
+    TypeNode* aliased_type;
 };
 
 class UnknownTypeNode : public TypeNode {

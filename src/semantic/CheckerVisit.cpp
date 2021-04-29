@@ -1027,46 +1027,52 @@ USemanticInfo Checker::check_declaration_with_type(DeclarationNode& n) {
     info.snode = sn;
     sn->identifier = n.identifier;
 
-    TypeNode& n_type = *n.type;
+    TypeNode* orig_type = n.type;
 
-    this->module->fill_actual(n.type);
+    if (n.type->kind == Kind::OBJECT && this->module->aliased_types.count(n.type->object().id) == 1) {
+        TypeNode* aliased_type = this->module->aliased_types.at(n.type->object().id);
+        n.type = aliased_type;
+    } else {
+        this->module->fill_actual(n.type);
+    }
 
     USemanticInfo exp_info_p = this->dispatch(n.expression);
     sn->expression = exp_info_p->snode;
     SemanticInfo& exp_info = *exp_info_p;
     if (exp_info.is_error) {
-        this->scope->set(n.identifier, entity_from_type(n_type));
+        this->scope->set(n.identifier, entity_from_type(*n.type));
         return std::make_unique<SemanticInfo>(info);
     }
     n.expression = this->replace_if_necessary(n.expression);
     if (n.type->kind == Kind::FUNCTION) {
         // it's a function
-        if (n_type != exp_info.type()) {
-            this->error_reporter.assignment(n_type, exp_info.type(), n.start);
+        if (*n.type != exp_info.type()) {
+            this->error_reporter.assignment(*n.type, exp_info.type(), n.start);
         }
     } else {
         SemanticInfo expression_info = exp_info;
         const ObjectType& actual_type = n.type->object();
         const TypeNode& exp_type = *expression_info.entity.object_value->ot;
-        if (actual_type.id == "Option") {
-            if (*actual_type.type_params[0] != exp_type) {
-                auto foo = exp_type.object();
-                if (foo.id != "NoneType") {
-                    this->error_reporter.assignment(n_type, exp_type, n.start);
+        if (*n.type != exp_type) {
+            if (actual_type.id == "Option") {
+                if (*actual_type.type_params[0] != exp_type) {
+                    auto foo = exp_type.object();
+                    if (foo.id != "NoneType") {
+                        this->error_reporter.assignment(*n.type, exp_type, n.start);
+                    }
                 }
-            }
-        } else if (actual_type.id == "Union") {
-            bool ok = false;
-            int type_index = target_union_type(actual_type, exp_type);
-            if (type_index == -1) {
-                this->error_reporter.assignment(n_type, exp_type, n.start);
-            }
-            SNode* union_wrapper = make_union_wrapper(type_index, sn->expression);
-            sn->expression = union_wrapper;
+            } else if (actual_type.id == "Union") {
+                bool ok = false;
+                int type_index = target_union_type(actual_type, exp_type);
+                if (type_index == -1) {
+                    // throw std::runtime_error("OH NO!");
+                    this->error_reporter.assignment(*orig_type, exp_type, n.start);
+                }
+                SNode* union_wrapper = make_union_wrapper(type_index, sn->expression);
+                sn->expression = union_wrapper;
 
-        } else {
-            if (n_type != exp_type) {
-                this->error_reporter.assignment(n_type, exp_type, n.start);
+            } else {
+                this->error_reporter.assignment(*n.type, exp_type, n.start);
             }
         }
     }

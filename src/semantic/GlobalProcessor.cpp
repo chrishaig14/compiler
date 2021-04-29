@@ -48,8 +48,6 @@ void GlobalProcessor::visit(ImportNode& node) {
 }
 
 
-
-
 void GlobalProcessor::visit(FunctionNode& node) {
     ConstFunction* const_function = this->module->flirpins[node.identifier].const_function;
 
@@ -93,6 +91,8 @@ void GlobalProcessor::visit_root(BlockNode& node) {
             } else {
                 name = n->import().path.back();
             }
+        } else if (n->ntype == NodeType::ALIAS) {
+            name = ((AliasNode*) (n))->alias_id;
         }
         if (names.count(name) == 0) {
             names[name] = nullptr;
@@ -102,6 +102,9 @@ void GlobalProcessor::visit_root(BlockNode& node) {
     }
     for (auto n: node.nodes) {
         if (n->ntype == NodeType::IMPORT) {
+            this->dispatch(n);
+        }
+        if (n->ntype == NodeType::ALIAS) {
             this->dispatch(n);
         }
     }
@@ -224,9 +227,17 @@ void GlobalProcessor::dispatch(Node* nod) {
         case NodeType::IMPORT:
             this->visit(n.import());
             break;
+        case NodeType::ALIAS:
+            this->visit((AliasNode&) n);
+            break;
         default:
             return;
     }
+}
+
+void GlobalProcessor::visit(AliasNode& node) {
+    this->module->fill_actual(node.aliased_type);
+    this->module->aliased_types[node.alias_id] = node.aliased_type;
 }
 
 Path Module::get_actual_path(std::string id) {
@@ -249,6 +260,9 @@ Path Module::get_actual_path(std::string id) {
 }
 
 void Module::fill_actual(TypeNode* t) {
+    if (this->aliased_types.count(t->object().id)) {
+        t->object().aliased_type = this->aliased_types[t->object().id];
+    }
     if (t->kind == Kind::FUNCTION) {
         return fill_actual(&t->function());
     }

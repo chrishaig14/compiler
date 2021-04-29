@@ -97,6 +97,7 @@ ObjectType::ObjectType(const std::string& identifier, const VectorOfTypes& typeP
         assert(p != nullptr);
     }
     this->kind = Kind::OBJECT;
+    this->aliased_type = nullptr;
     this->is_generic_param = false;
 }
 

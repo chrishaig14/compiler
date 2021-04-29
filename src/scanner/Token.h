@@ -72,7 +72,7 @@ enum class TokType {
     CLASS,
     IMPORT,
     FROM,
-    DOUBLE, INTEGER, STATIC, MATCH
+    DOUBLE, INTEGER, STATIC, MATCH, ALIAS
 };
 
 extern std::unordered_map<TokType, std::string> TOKEN_STRINGS;

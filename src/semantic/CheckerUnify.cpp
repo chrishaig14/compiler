@@ -260,3 +260,8 @@ USemanticInfo Checker::module_member(Module* mod, std::string child, MemberNode&
     return std::make_unique<SemanticInfo>(info);
 }
 
+USemanticInfo Checker::visit_alias(AliasNode* pNode) {
+    SemanticInfo info;
+    return std::make_unique<SemanticInfo>(info);
+}
+

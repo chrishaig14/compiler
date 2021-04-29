@@ -7,6 +7,7 @@
 #include "../nodes/PartialApplication.h"
 #include "../logging/logging.h"
 #include "../nodes/DefaultConstructorNode.h"
+#include "../nodes/AliasNode.h"
 #include <fmt/core.h>
 #include <fmt/color.h>
 #include <exception>
@@ -722,6 +723,16 @@ Token Parser::expect_token(TokType token_type) {
     return matched_token;
 }
 
+Node* Parser::parse_alias() {
+    Token alias_tk = this->expect_token(TokType::ALIAS);
+    Token alias_id = this->expect_token(TokType::ID);
+    this->expect_token(TokType::EQQ);
+    TypeNode* aliased_type = this->parse_type_node();
+    Token semic_tk = this->expect_token(TokType::SEMICOLON);
+    AliasNode* node = new AliasNode(alias_id.str, aliased_type, alias_tk.start, semic_tk.end_pos);
+    return node;
+}
+
 Node* Parser::parse_top_level_statement() {
     switch (this->token.type) {
         case TokType::FUN:
@@ -730,6 +741,8 @@ Node* Parser::parse_top_level_statement() {
             return this->parse_class_definition();
         case TokType::IMPORT:
             return this->parse_import();
+        case TokType::ALIAS:
+            return this->parse_alias();
         default:
             return this->parse_common_statement();
     }

@@ -161,6 +161,7 @@ public:
     std::string loop_index_var_id;
     std::string loop_list_len_var_id;
     USemanticInfo visit_match(MatchExpressionNode* node);
+    USemanticInfo visit_alias(AliasNode* pNode);
 };
 
 bool function_is_generic(const FunctionType& ft);

@@ -117,6 +117,7 @@ public:
     Node* parse_dictionary();
     Node* parse_tuple_or_constructor();
     Node* parse_match_statement();
+    Node* parse_alias();
 };
 
 

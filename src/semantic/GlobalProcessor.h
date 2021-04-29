@@ -9,6 +9,7 @@
 #include <unordered_map>
 #include "SymbolTable.h"
 #include "../nodes/ClassNode.h"
+#include "../nodes/AliasNode.h"
 
 
 typedef std::pair<std::string, std::string> Builtin;
@@ -25,6 +26,7 @@ public:
     void dispatch(Node* nod);
 
     void visit(BlockNode& node);
+    void visit(AliasNode& node);
     void visit_root(BlockNode& node);
 
     void visit(ImportNode& node);
