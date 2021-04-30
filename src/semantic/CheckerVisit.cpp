@@ -1653,6 +1653,9 @@ USemanticInfo Checker::visit_match(MatchExpressionNode* node) {
     }
 
     ObjectType* ot = exp_info->entity.object_value->ot;
+    if (ot->aliased_type != nullptr) {
+        ot = (ObjectType*) ot->aliased_type;
+    }
     if (ot->id != "Union") {
         throw std::runtime_error("Error, match expression should have type Union[...]");
     }

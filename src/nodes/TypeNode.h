@@ -118,8 +118,6 @@ public:
 
     TypeNode* clone() const override;
 
-    Class* clazz;
-
     ObjectType& object() override;
 
     const ObjectType& object() const override;

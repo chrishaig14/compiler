@@ -122,6 +122,12 @@ void GlobalProcessor::visit_root(BlockNode& node) {
         }
     }
     for (auto n: node.nodes) {
+        if (n->ntype == NodeType::ALIAS) {
+            this->dispatch(n);
+        }
+    }
+
+    for (auto n: node.nodes) {
         if (n->ntype == NodeType::CLS) {
             this->dispatch(n);
         }
@@ -131,11 +137,7 @@ void GlobalProcessor::visit_root(BlockNode& node) {
             this->dispatch(n);
         }
     }
-    for(auto n: node.nodes){
-        if (n->ntype == NodeType::ALIAS) {
-            this->dispatch(n);
-        }
-    }
+
 }
 
 
@@ -265,11 +267,13 @@ Path Module::get_actual_path(std::string id) {
 void Module::fill_actual(TypeNode* t) {
     if (this->aliased_types.count(t->object().id)) {
         t->object().aliased_type = this->aliased_types[t->object().id];
+        return;
     }
     if (t->kind == Kind::FUNCTION) {
-        return fill_actual(&t->function());
+        fill_actual(&t->function());
+        return;
     }
-    return fill_actual(&t->object());
+    fill_actual(&t->object());
 }
 
 void Module::fill_actual(ObjectType* t) {

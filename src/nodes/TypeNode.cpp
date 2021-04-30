@@ -110,6 +110,7 @@ TypeNode* ObjectType::clone() const {
     auto n = new ObjectType(this->id, aux);
     n->actual_base_path = this->actual_base_path;
     n->is_generic_param = this->is_generic_param;
+    n->aliased_type = this->aliased_type;
     return n;
 }
 
