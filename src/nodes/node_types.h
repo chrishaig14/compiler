@@ -40,7 +40,7 @@ enum class NodeType {
     OTYPE,
     FTYPE,
     WHIL,
-    BOOLOP, MATCH_EXP, ALIAS
+    BOOLOP, MATCH_EXP, ALIAS, ENUM
 };
 
 #endif //UNTITLED1_NODE_TYPES_H

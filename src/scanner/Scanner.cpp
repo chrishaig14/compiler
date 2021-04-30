@@ -28,6 +28,7 @@ void initialize_tokens() {
     TOKEN_KEYWORDS["else"] = TokType::ELSE;
     TOKEN_KEYWORDS["elif"] = TokType::ELIF;
     TOKEN_KEYWORDS["for"] = TokType::FOR;
+    TOKEN_KEYWORDS["enum"] = TokType::ENUM;
     TOKEN_KEYWORDS["var"] = TokType::VAR;
     TOKEN_KEYWORDS["continue"] = TokType::CONTINUE;
     TOKEN_KEYWORDS["return"] = TokType::RETURN;

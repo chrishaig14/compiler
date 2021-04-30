@@ -739,6 +739,8 @@ Node* Parser::parse_top_level_statement() {
             return this->parse_function_definition();
         case TokType::CLASS:
             return this->parse_class_definition();
+        case TokType::ENUM:
+            return this->parse_enum_definition();
         case TokType::IMPORT:
             return this->parse_import();
         case TokType::ALIAS:

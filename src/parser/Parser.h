@@ -9,6 +9,7 @@
 #include <iostream>
 #include "../nodes/ImportNode.h"
 #include "../scanner/CodeLines.h"
+#include "../nodes/EnumNode.h"
 
 extern std::unordered_map<TokType, OpType> TOKEN_TO_OP;
 
@@ -118,6 +119,7 @@ public:
     Node* parse_tuple_or_constructor();
     Node* parse_match_statement();
     Node* parse_alias();
+    Node* parse_enum_definition();
 };
 
 

@@ -163,3 +163,23 @@ void Parser::error_expected_statement(TextPosition pos) {
     this->error(msg, pos);
 }
 
+Node* Parser::parse_enum_definition() {
+    this->expect_token(TokType::ENUM);
+    Token enum_id = this->expect_token(TokType::ID);
+    this->expect_token(TokType::LCURLY);
+    VectorOfStrings values;
+    while (true) {
+        Token value = this->expect_token(TokType::ID);
+        values.push_back(value.str);
+        if (!this->match(TokType::COMMA)) {
+            break;
+        }
+        this->next();
+    }
+    if (this->match(TokType::SEMICOLON)) {
+        this->next();
+    }
+    Token rcurly_tk = this->expect_token(TokType::RCURLY);
+    return new EnumNode(enum_id.str, values, enum_id.start, rcurly_tk.end_pos);
+}
+
