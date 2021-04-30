@@ -104,9 +104,7 @@ void GlobalProcessor::visit_root(BlockNode& node) {
         if (n->ntype == NodeType::IMPORT) {
             this->dispatch(n);
         }
-        if (n->ntype == NodeType::ALIAS) {
-            this->dispatch(n);
-        }
+
     }
     for (auto n: node.nodes) {
         if (n->ntype == NodeType::CLS) {
@@ -130,6 +128,11 @@ void GlobalProcessor::visit_root(BlockNode& node) {
     }
     for (auto n: node.nodes) {
         if (n->ntype == NodeType::FUNC) {
+            this->dispatch(n);
+        }
+    }
+    for(auto n: node.nodes){
+        if (n->ntype == NodeType::ALIAS) {
             this->dispatch(n);
         }
     }
