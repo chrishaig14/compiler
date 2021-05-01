@@ -252,3 +252,26 @@ std::string STranspiler::transpile_match(MatchSNode* mn) {
     out += RCURLY;
     return out;
 }
+
+void STranspiler::transpile_enum(EnumSNode* node) {
+    std::string out;
+    std::string enum_name = path_to_id(node->id);
+    // out += "enum class" + SPACE + enum_name + SPACE + " {\n";
+    // out += "";
+    int k = 0;
+    for (auto m: node->values) {
+        out += TOBJECT + enum_name + "_" + m + ASSIGN + "MAKE_INT(" + std::to_string(k) + ")" + SEMIC + NEWLINE;
+        k++;
+    }
+    // out += RCURLY + SEMIC + NEWLINE;
+    std::string eq_name = enum_name + "_D_eq";
+    out += TOBJECT + eq_name + SEMIC;
+    this->static_initializations = eq_name + SPACE + ASSIGN + SPACE + "core_D_Integer_D_eq" + SEMIC;
+    this->header += out;
+}
+
+std::string STranspiler::transpile_enum_member(EnumMemberSNode* emsn) {
+    std::string out;
+    out += path_to_id(emsn->enum_name) + "_" + emsn->value;
+    return out;
+}

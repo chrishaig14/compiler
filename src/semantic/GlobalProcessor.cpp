@@ -112,6 +112,18 @@ void GlobalProcessor::visit_root(BlockNode& node) {
             Class* class_info = new Class();
             this->module->flirpins[n->cls().class_name] = Flirpin{.type=F_TYPE::CLASS, .clazz=class_info};
             class_info->path = Path(this->module->path, n->cls().class_name);
+        } else if (n->ntype == NodeType::ENUM) {
+            Enum* enumm = new Enum();
+            enumm->enumm_name = ((EnumNode*) n)->id;
+            enumm->values = ((EnumNode*) n)->values;
+            enumm->path = this->module->path.as_str() + "." + enumm->enumm_name;
+            ConstFunction* eqfun = new ConstFunction();
+            eqfun->path = Path(enumm->path, "eq");
+            ConstFunction* nefun = new ConstFunction();
+            nefun->path = Path(enumm->path, "ne");
+            enumm->functions["eq"] = eqfun;
+            enumm->functions["ne"] = nefun;
+            this->module->flirpins[enumm->enumm_name] = Flirpin{.type=F_TYPE::ENUM, .enumm=enumm};
         }
     }
     for (auto n: node.nodes) {
@@ -245,6 +257,10 @@ void GlobalProcessor::visit(AliasNode& node) {
     this->module->aliased_types[node.alias_id] = node.aliased_type;
 }
 
+void GlobalProcessor::visit(EnumNode& node) {
+
+}
+
 Path Module::get_actual_path(std::string id) {
     if (id == ".None") {
         return Path(VectorOfStrings({".None"}));
@@ -253,7 +269,11 @@ Path Module::get_actual_path(std::string id) {
         return Path("core.Union");
     }
     if (this->flirpins.count(id) == 1) {
-        return this->flirpins[id].clazz->path;
+        if (this->flirpins[id].type == F_TYPE::CLASS) {
+            return this->flirpins[id].clazz->path;
+        } else if (this->flirpins[id].type == F_TYPE::ENUM) {
+            return this->flirpins[id].enumm->path;
+        }
     }
     if (this->imported_paths_with_alias.count(id) == 1) {
         return this->imported_paths_with_alias[id];

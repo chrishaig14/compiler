@@ -17,6 +17,7 @@ class FunctionValue;
 
 class ConstFunction;
 
+class Enum;
 
 enum class U_TYPE {
     PACKAGE, MODULE
@@ -31,7 +32,7 @@ struct Unit {
 };
 
 enum class F_TYPE {
-    CONST_FUNCTION, CLASS, PACKAGE, MODULE
+    CONST_FUNCTION, CLASS, PACKAGE, MODULE, ENUM
 };
 
 struct Flirpin {
@@ -41,6 +42,7 @@ struct Flirpin {
         Class* clazz;
         Package* package;
         Module* module;
+        Enum* enumm;
     };
 };
 
@@ -56,7 +58,7 @@ struct Value {
 };
 
 enum class E_TYPE {
-    PACKAGE, MODULE, CLASS, FUNCTION_VALUE, OBJECT_VALUE, CONST_FUNCTION, ERROR, NOT_FOUND
+    PACKAGE, MODULE, CLASS, FUNCTION_VALUE, OBJECT_VALUE, CONST_FUNCTION, ERROR, NOT_FOUND, ENUM
 };
 
 struct Entity {
@@ -68,6 +70,7 @@ struct Entity {
         FunctionValue* function_value;
         ObjectValue* object_value;
         ConstFunction* const_function;
+        Enum* enumm;
     };
 };
 

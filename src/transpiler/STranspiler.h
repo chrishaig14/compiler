@@ -12,6 +12,7 @@
 #include "../simple_nodes/IntegerSNode.h"
 #include "../simple_nodes/IdSNode.h"
 #include "../simple_nodes/ReturnSNode.h"
+#include "../simple_nodes/EnumSNode.h"
 #include "../simple_nodes/CallSNode.h"
 #include "../simple_nodes/StringSNode.h"
 #include "../simple_nodes/BoolSNode.h"
@@ -25,6 +26,7 @@
 #include "../simple_nodes/IfSNode.h"
 #include "../simple_nodes/BreakSNode.h"
 #include "../simple_nodes/ContinueSNode.h"
+#include "../simple_nodes/EnumMemberSNode.h"
 
 const std::string TOBJECT = "TaggedObject*";
 const std::string GCDECLARE = "GC::declare";
@@ -73,11 +75,15 @@ public:
     std::string transpile_return(ReturnSNode* node);
 
     void transpile_class(ClassSNode* node);
+    void transpile_enum(EnumSNode* node);
 
     void dispatch_top(SNode* node) {
         switch (node->type) {
             case SNodeType::FUNCTION:
                 this->transpile_function(static_cast<FunctionSNode*>(node));
+                break;
+            case SNodeType::ENUM:
+                this->transpile_enum((EnumSNode*) node);
                 break;
             case SNodeType::CLASS:
                 this->transpile_class((ClassSNode*) node);
@@ -109,11 +115,15 @@ public:
 
     std::string transpile_match(MatchSNode* mn);
 
+    std::string transpile_enum_member(EnumMemberSNode* emsn);
+
     std::string dispatch(SNode* node) {
         if (node == nullptr) {
             throw std::runtime_error("Error dispatching on nullptr snode!");
         }
         switch (node->type) {
+            case SNodeType::ENUM_MEMBER:
+                return this->transpile_enum_member((EnumMemberSNode*) node);
             case SNodeType::BOOLEAN:
                 return this->transpile_boolean((BoolSNode*) node);
             case SNodeType::MATCH:

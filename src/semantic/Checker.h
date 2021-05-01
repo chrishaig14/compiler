@@ -18,6 +18,8 @@
 #include "../simple_nodes/BlockSNode.h"
 #include "../units/ObjectValue.h"
 #include "../units/FunctionValue.h"
+#include "../nodes/EnumNode.h"
+#include "../simple_nodes/EnumSNode.h"
 #include "ErrorReporter.h"
 
 
@@ -162,6 +164,9 @@ public:
     std::string loop_list_len_var_id;
     USemanticInfo visit_match(MatchExpressionNode* node);
     USemanticInfo visit_alias(AliasNode* pNode);
+    USemanticInfo visit_enum(EnumNode* pNode);
+    USemanticInfo enum_member(Enum* enumm, std::string value, MemberNode& node);
+    USemanticInfo visit_enum(EnumNode& node);
 };
 
 bool function_is_generic(const FunctionType& ft);

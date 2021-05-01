@@ -427,6 +427,8 @@ USemanticInfo Checker::dispatch(Node* nod) {
     switch (n.ntype) {
         case NodeType::ASSIGN:
             return this->visit_assignment(n.assign());
+        case NodeType::ENUM:
+            return this->visit_enum((EnumNode&) n);
         case NodeType::BINOP: {
             auto r = this->visit(n.binop());
             return r;
@@ -520,9 +522,9 @@ USemanticInfo Checker::dispatch(Node* nod) {
         case NodeType::IMPORT:
             return this->visit_import(n.import());
         case NodeType::ALIAS:
-            return this->visit_alias((AliasNode*)nod);
+            return this->visit_alias((AliasNode*) nod);
         case NodeType::MATCH_EXP:
-            return this->visit_match((MatchExpressionNode*)nod);
+            return this->visit_match((MatchExpressionNode*) nod);
         default:
             throw std::runtime_error("Don't know what to do!");
     }

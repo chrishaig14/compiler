@@ -10,6 +10,8 @@
 #include "SymbolTable.h"
 #include "../nodes/ClassNode.h"
 #include "../nodes/AliasNode.h"
+#include "../nodes/EnumNode.h"
+#include "../units/Enum.h"
 
 
 typedef std::pair<std::string, std::string> Builtin;
@@ -26,6 +28,7 @@ public:
     void dispatch(Node* nod);
 
     void visit(BlockNode& node);
+    void visit(EnumNode& node);
     void visit(AliasNode& node);
     void visit_root(BlockNode& node);
 

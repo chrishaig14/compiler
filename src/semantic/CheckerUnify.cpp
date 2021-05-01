@@ -8,6 +8,7 @@
 #include "../simple_nodes/MatchSNode.h"
 #include "../simple_nodes/NewObjectSNode.h"
 #include "../units/FunctionValue.h"
+#include "../simple_nodes/EnumMemberSNode.h"
 
 std::pair<std::string, TypeNode*>*
 Checker::get_first_substitution_object(ObjectType& a, ObjectType& b, bool is_top_level_arg) {
@@ -241,6 +242,8 @@ Entity map_flirpin_to_entity(Flirpin flirpin) {
             return Entity{.type=E_TYPE::PACKAGE, .package=flirpin.package};
         case F_TYPE::MODULE:
             return Entity{.type=E_TYPE::MODULE, .module=flirpin.module};
+        case F_TYPE::ENUM:
+            return Entity{.type=E_TYPE::ENUM, .enumm=flirpin.enumm};
     }
 }
 
@@ -264,4 +267,26 @@ USemanticInfo Checker::visit_alias(AliasNode* pNode) {
     SemanticInfo info;
     return std::make_unique<SemanticInfo>(info);
 }
+
+USemanticInfo Checker::visit_enum(EnumNode* pNode) {
+    SemanticInfo info;
+    return std::make_unique<SemanticInfo>(info);
+}
+
+USemanticInfo Checker::enum_member(Enum* enumm, std::string value, MemberNode& node) {
+    SemanticInfo info;
+    for (int i = 0; i < enumm->values.size(); i++) {
+        if (value == enumm->values[i]) {
+            ObjectValue* ov = new ObjectValue();
+            ov->ot = new ObjectType(enumm->enumm_name, {});
+            ov->ot->actual_base_path = enumm->path;
+            info.entity = Entity{.type=E_TYPE::OBJECT_VALUE, .object_value=ov};
+            info.snode = new EnumMemberSNode(enumm->path.as_str(), value);
+            return std::make_unique<SemanticInfo>(info);
+        }
+    }
+    throw std::runtime_error("Error enum " + enumm->enumm_name + " has no value " + value);
+    return error_stub();
+}
+
 

@@ -342,6 +342,16 @@ FunctionSNode* make_class_default_init(std::string class_path, VectorOfStrings m
     return fn;
 }
 
+USemanticInfo Checker::visit_enum(EnumNode& node) {
+    SemanticInfo info;
+    EnumSNode* esn = new EnumSNode();
+    Enum* enumm = this->scope->get(node.id).enumm;
+    esn->id = enumm->path.as_str();
+    esn->values = node.values;
+    info.snode = esn;
+    return std::make_unique<SemanticInfo>(info);
+}
+
 
 USemanticInfo Checker::visit_class(ClassNode& node) {
     this->error_reporter.current_class = node.class_name;
@@ -1040,7 +1050,9 @@ USemanticInfo Checker::check_declaration_with_type(DeclarationNode& n) {
     sn->expression = exp_info_p->snode;
     SemanticInfo& exp_info = *exp_info_p;
     if (exp_info.is_error) {
-        this->scope->set(n.identifier, entity_from_type(*n.type));
+        ObjectValue* ov = new ObjectValue();
+        info.entity = Entity{.type = E_TYPE::OBJECT_VALUE, .object_value=ov};
+        ov->ot = (ObjectType*) n.type->clone();
         return std::make_unique<SemanticInfo>(info);
     }
     n.expression = this->replace_if_necessary(n.expression);
@@ -1279,6 +1291,13 @@ USemanticInfo Checker::visit_member(MemberNode& n) {
             return this->package_member(parent_entity.package, n.s_child, n);
         case E_TYPE::MODULE:
             return this->module_member(parent_entity.module, n.s_child, n);
+        case E_TYPE::ERROR:
+            break;
+        case E_TYPE::NOT_FOUND:
+            break;
+        case E_TYPE::ENUM:
+            return this->enum_member(parent_entity.enumm, n.s_child, n);
+            break;
     }
     return error_stub();
 }
@@ -1433,22 +1452,43 @@ USemanticInfo Checker::visit(BoolOpNode& n) {
     std::string fun = map_boolop_to_method_name(n.op);
 
     Entity entity = this->scope->get(ltype.object().id);
-    if (entity.type != E_TYPE::CLASS) {
-        throw std::runtime_error("This should be a CLASS, but it's not!");
+    if (entity.type != E_TYPE::CLASS && entity.type != E_TYPE::ENUM) {
+        throw std::runtime_error("This should be a CLASS/ENUM, but it's not!");
     }
-    Class* cls = entity.clazz;
-    auto operator_fun_it = cls->static_methods.find(fun);
-    if (operator_fun_it == cls->static_methods.end()) {
-        throw std::runtime_error("Class " + cls->class_name + " has no operator " + fun + " defined ");
+    if (entity.type == E_TYPE::ENUM) {
+        if (fun != "eq" && fun != "ne") {
+            throw std::runtime_error("Error: enum type doesnt support this operator");
+        }
+        ObjectType* ot = new ObjectType("Boolean", {});
+        ot->actual_base_path = Path("core.Boolean");
+        TypeNode* rettype = ot;
+        info.entity = Entity{.type = E_TYPE::OBJECT_VALUE, .object_value = new ObjectValue()};
+        info.entity.object_value->ot = (ObjectType*) rettype;
+
+        ConstFunction* opfun = entity.enumm->functions[fun];
+
+        info.snode = make_boolop_snode(opfun, left_info, right_info);
+
+        // IdSNode* function_id = new IdSNode(opfun->path.as_str());
+        // CallSNode* sn = new CallSNode();
+        // sn->function = function_id;
+        // sn->arguments = {left_info.snode, right_info.snode};
+        //
+        // info.snode = sn;
+    } else {
+        Class* cls = entity.clazz;
+        auto operator_fun_it = cls->static_methods.find(fun);
+        if (operator_fun_it == cls->static_methods.end()) {
+            throw std::runtime_error("Class " + cls->class_name + " has no operator " + fun + " defined ");
+        }
+
+        ConstFunction* operator_fun = operator_fun_it->second;
+        TypeNode* rettype = operator_fun->ft->return_type->clone();
+        info.entity = Entity{.type = E_TYPE::OBJECT_VALUE, .object_value = new ObjectValue()};
+        info.entity.object_value->ot = (ObjectType*) rettype;
+
+        info.snode = make_boolop_snode(operator_fun, left_info, right_info);
     }
-
-    ConstFunction* operator_fun = operator_fun_it->second;
-
-    TypeNode* rettype = operator_fun->ft->return_type->clone();
-    info.entity = Entity{.type = E_TYPE::OBJECT_VALUE, .object_value = new ObjectValue()};
-    info.entity.object_value->ot = (ObjectType*) rettype;
-
-    info.snode = make_boolop_snode(operator_fun, left_info, right_info);
 
     return std::make_unique<SemanticInfo>(info);
 }
