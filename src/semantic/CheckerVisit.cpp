@@ -890,7 +890,6 @@ USemanticInfo Checker::check_declaration_with_type(DeclarationNode& n) {
             } else if (actual_type.id == "Union") {
                 int type_index = target_union_type(actual_type, exp_type);
                 if (type_index == -1) {
-                    // throw std::runtime_error("OH NO!");
                     this->error_reporter.assignment(*orig_type, exp_type, n.start);
                 }
                 SNode* union_wrapper = make_union_wrapper(type_index, sn->expression);
@@ -1081,7 +1080,7 @@ USemanticInfo Checker::visit_member(MemberNode& n) {
         if (ot->id != "Tuple") {
             throw std::runtime_error("Integer member of not a Tuple!");
         }
-        unsigned long tuple_size = ot->type_params.size();
+        size_t tuple_size = ot->type_params.size();
         if (n.n_child > tuple_size || n.n_child == 0) {
             throw std::runtime_error("Tuple member out of range, has " + std::to_string(tuple_size) + " but required " +
                                      std::to_string(n.n_child));
