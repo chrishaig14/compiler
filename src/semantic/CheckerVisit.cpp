@@ -1217,14 +1217,12 @@ USemanticInfo Checker::visit_assignment(AssignmentNode& n) {
                         }
                     }
                 } else {
-                    if (actual_type.kind == Kind::OBJECT) {
-                        if (actual_type.object().id == "Union") {
-                            int type_index = target_union_type(actual_type.object(), *exp_type);
-                            if (type_index == -1) {
-                                this->error_reporter.assignment(actual_type, *exp_type, n.rvalue->start);
-                            } else {
-                                expression_info_p->snode = make_union_wrapper(type_index, expression_info_p->snode);
-                            }
+                    if (actual_type.kind == Kind::OBJECT && actual_type.object().id == "Union") {
+                        int type_index = target_union_type(actual_type.object(), *exp_type);
+                        if (type_index == -1) {
+                            this->error_reporter.assignment(actual_type, *exp_type, n.rvalue->start);
+                        } else {
+                            expression_info_p->snode = make_union_wrapper(type_index, expression_info_p->snode);
                         }
                     } else {
                         // if it's not Option[t], then it's an error
