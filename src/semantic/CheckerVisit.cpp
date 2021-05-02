@@ -1317,7 +1317,6 @@ USemanticInfo Checker::visit_member(MemberNode& n) {
             break;
         case E_TYPE::ENUM:
             return this->enum_member(parent_entity.enumm, n.s_child, n);
-            break;
     }
     return error_stub();
 }
