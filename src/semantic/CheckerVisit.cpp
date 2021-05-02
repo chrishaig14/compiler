@@ -41,6 +41,268 @@ Entity entity_from_type(const TypeNode& type) {
     return Entity(fv);
 }
 
+FunctionNode* generate_eq_method(std::string class_name, VectorOfTypes tp, VectorOfStrings members_ordered) {
+    auto eq_body = new BlockNode({}, POS_NONE, POS_NONE);
+    std::string eq_method_name = "eq";
+    auto eq_meth = new FunctionNode(eq_method_name,
+                                    {"other"},
+                                    {new ObjectType(class_name, tp)},
+                                    new T_BOOL,
+                                    eq_body,
+                                    POS_NONE,
+                                    POS_NONE);
+    auto cmp_node = new BoolOpNode(BoolOp::EQ,
+                                   new MemberNode(new IdNode("this", POS_NONE, POS_NONE), members_ordered[0]),
+                                   new MemberNode(new IdNode("other", POS_NONE, POS_NONE), members_ordered[0]));
+
+    for (size_t i = 1; i < members_ordered.size(); i++) {
+        cmp_node = new BoolOpNode(BoolOp::AND,
+                                  cmp_node,
+                                  new BoolOpNode(BoolOp::EQ,
+                                                 new MemberNode(new IdNode("this", POS_NONE, POS_NONE),
+                                                                members_ordered[i]),
+                                                 new MemberNode(new IdNode("other", POS_NONE, POS_NONE),
+                                                                members_ordered[i])));
+    }
+    eq_body->nodes.push_back(new ReturnNode(cmp_node));
+    return eq_meth;
+}
+
+FunctionNode* generate_str_method(std::string class_name) {
+    auto eq_body = new BlockNode({}, POS_NONE, POS_NONE);
+    std::string eq_method_name = "str";
+    auto eq_meth = new FunctionNode(eq_method_name, {}, {}, new T_STRING, eq_body, POS_NONE, POS_NONE);
+    eq_body->nodes.push_back(new ReturnNode(new StringNode("<" + class_name + " object>")));
+    return eq_meth;
+}
+
+FunctionSNode* make_class_default_init(std::string class_path, VectorOfStrings members) {
+    FunctionSNode* fn = new FunctionSNode();
+    fn->identifier = class_path + ".__init__";
+    fn->params = members;
+    BlockSNode* bn = new BlockSNode();
+    ReturnSNode* rn = new ReturnSNode();
+    NewObjectSNode* nn = new NewObjectSNode();
+    nn->class_name = class_path;
+    for (auto m: members) {
+        IdSNode* idn = new IdSNode();
+        idn->identifier = m;
+        nn->args.push_back(idn);
+    }
+    rn->expression = nn;
+    bn->nodes.push_back(rn);
+    fn->body = bn;
+    return fn;
+}
+
+SNode* Checker::make_for_snode(ForNode& node, USemanticInfo& binfo, USemanticInfo& exp_info_p) {
+    BlockSNode* bbn = new BlockSNode();
+    DeclarationSNode* dsn = new DeclarationSNode();
+    WhileSNode* wsn = new WhileSNode();
+
+
+    dsn->identifier = this->loop_list_var_id;
+    dsn->expression = exp_info_p->snode;
+    bbn->nodes.push_back(dsn);
+    DeclarationSNode* lidx_decl = new DeclarationSNode();
+    lidx_decl->identifier = this->loop_index_var_id;
+    IntegerSNode* init_idx = new IntegerSNode();
+    init_idx->str = "0";
+    lidx_decl->expression = init_idx;
+
+    bbn->nodes.push_back(lidx_decl);
+
+    DeclarationSNode* lensn = new DeclarationSNode();
+    lensn->identifier = this->loop_list_len_var_id;
+    CallSNode* call_list_len_sn = new CallSNode();
+    IdSNode* list_len_fn = new IdSNode("core.List.len");
+    call_list_len_sn->function = list_len_fn;
+    IdSNode* list_sn = new IdSNode(this->loop_list_var_id);
+    call_list_len_sn->arguments = {list_sn};
+    lensn->expression = call_list_len_sn;
+    bbn->nodes.push_back(lensn);
+
+
+    IdSNode* idxsn = new IdSNode(this->loop_index_var_id);
+    CallSNode* cn = new CallSNode();
+    IdSNode* cmpfunsn = new IdSNode("core.Integer.lt");
+
+    IdSNode* llensn = new IdSNode(this->loop_list_len_var_id);
+
+
+    cn->function = cmpfunsn;
+    cn->arguments = {idxsn, llensn};
+
+    wsn->condition = cn;
+
+    bbn->nodes.push_back(wsn);
+
+
+    BlockSNode* bn = (BlockSNode*) (binfo->snode);
+    DeclarationSNode* loop_elem_sn = new DeclarationSNode();
+
+    CallSNode* list_subscript_n = new CallSNode();
+    list_subscript_n->function = new IdSNode("core.List.__sub__");
+    list_subscript_n->arguments.push_back(new IdSNode(this->loop_list_var_id));
+    list_subscript_n->arguments.push_back(new IdSNode(this->loop_index_var_id));
+
+
+    loop_elem_sn->expression = list_subscript_n;
+    loop_elem_sn->identifier = node.var;
+    bn->nodes.insert(bn->nodes.begin(), loop_elem_sn);
+
+    bn->nodes.push_back(this->update_loop_index_snode);
+    wsn->body = bn;
+    return bbn;
+}
+
+TypeNode* get_entity_type(Entity e) {
+    Entity* ent = &e;
+    if (ent->type == E_TYPE::CONST_FUNCTION) {
+        return e.const_function->ft->clone();
+    }
+    if (ent->type == E_TYPE::FUNCTION_VALUE) {
+        return e.function_value->ft->clone();
+    }
+    if (ent->type == E_TYPE::OBJECT_VALUE) {
+        return e.object_value->ot->clone();
+    }
+    throw std::runtime_error("Get type of non function/object!");
+}
+
+void mangle_generic_names(TypeNode* t);
+void mangle_generic_names(FunctionType* t);
+void mangle_generic_names(ObjectType* t);
+
+void mangle_generic_names(TypeNode* t) {
+    if (t->kind == Kind::OBJECT) {
+        return mangle_generic_names(&t->object());
+    }
+    return mangle_generic_names(&t->function());
+}
+
+void mangle_generic_names(FunctionType* t) {
+    for (auto pt: t->param_types) {
+        mangle_generic_names(pt);
+    }
+    mangle_generic_names(t->return_type);
+}
+
+void mangle_generic_names(ObjectType* t) {
+    if (t->is_generic_param) {
+        t->id = t->id + "0";
+    } else {
+        for (auto tp: t->type_params) {
+            mangle_generic_names(tp);
+        }
+    }
+}
+
+void make_not_generic(FunctionType* ft);
+void make_not_generic(ObjectType* ft);
+void make_not_generic(TypeNode* ft);
+
+void make_not_generic(TypeNode* t) {
+    if (t->kind == Kind::FUNCTION) {
+        return make_not_generic(&t->function());
+    }
+    return make_not_generic(&t->object());
+}
+
+void make_not_generic(FunctionType* ft) {
+    for (auto pt: ft->param_types) {
+        make_not_generic(pt);
+    }
+    make_not_generic(ft->return_type);
+}
+
+void make_not_generic(ObjectType* ot) {
+    ot->is_generic_param = false;
+    for (auto tp: ot->type_params) {
+        make_not_generic(tp);
+    }
+}
+
+int target_union_type(const ObjectType& target, const TypeNode& source) {
+    for (size_t ti = 0; ti < target.type_params.size(); ti++) {
+        if (target.type_params[ti]->actual_to_string() == source.actual_to_string()) {
+            return ti;
+        }
+    }
+    return -1;
+}
+
+SNode* make_union_wrapper(int type_index, SNode* expression) {
+    NewObjectSNode* new_union = new NewObjectSNode();
+    new_union->class_name = "core_D_Union";
+    IntegerSNode* in = new IntegerSNode();
+    in->str = std::to_string(type_index); // FIXME, use int directly
+    new_union->args = {expression, in};
+    return new_union;
+}
+
+std::string binoptype_to_str(OpType op) {
+    std::string fun;
+    if (op == OpType::ADD) {
+        fun = "add";
+    } else if (op == OpType::SUB) {
+        fun = "sub";
+    } else if (op == OpType::MUL) {
+        fun = "mul";
+    } else if (op == OpType::DIV) {
+        fun = "div";
+    }
+    return fun;
+}
+
+SNode* make_if_snode(SNode* condition, SNode* body, std::vector<std::pair<SNode*, BlockSNode*>> elifs, SNode* _else) {
+    IfSNode* ifs = new IfSNode();
+    ifs->condition = condition;
+    ifs->then = (BlockSNode*) body;
+    ifs->elifs = elifs;
+    ifs->_else = (BlockSNode*) _else;
+    return ifs;
+}
+
+std::string map_binop_to_method_name(OpType op) {
+    std::map<OpType, std::string> funs;
+
+    funs[OpType::ADD] = "add";
+    funs[OpType::SUB] = "sub";
+
+    funs[OpType::MUL] = "mul";
+    funs[OpType::DIV] = "div";
+    funs[OpType::MOD] = "mod";
+
+    return funs[op];
+}
+
+SNode* make_boolop_snode(ConstFunction* operator_fun, SemanticInfo& left_info, SemanticInfo& right_info) {
+    IdSNode* function_id = new IdSNode(operator_fun->path.as_str());
+    CallSNode* sn = new CallSNode();
+    sn->function = function_id;
+    sn->arguments = {left_info.snode, right_info.snode};
+    return sn;
+}
+
+std::string map_boolop_to_method_name(BoolOp op) {
+    std::map<BoolOp, std::string> funs;
+
+    funs[BoolOp::EQ] = "eq";
+    funs[BoolOp::NE] = "ne";
+
+    funs[BoolOp::AND] = "and";
+    funs[BoolOp::OR] = "or";
+
+    funs[BoolOp::LE] = "le";
+    funs[BoolOp::GE] = "ge";
+    funs[BoolOp::LT] = "lt";
+    funs[BoolOp::GT] = "gt";
+
+    return funs[op];
+}
+
+
 USemanticInfo Checker::visit_list(ListNode& node) {
     USemanticInfo element_type_p = this->dispatch(node.elements[0]);
     TypeNode* element_type = element_type_p->entity.object_value->ot->clone();
@@ -287,58 +549,47 @@ USemanticInfo Checker::visit_emptylist(EmptyListNode& node) {
     return std::make_unique<SemanticInfo>(info);
 }
 
-FunctionNode* generate_eq_method(std::string class_name, VectorOfTypes tp, VectorOfStrings members_ordered) {
-    auto eq_body = new BlockNode({}, POS_NONE, POS_NONE);
-    std::string eq_method_name = "eq";
-    auto eq_meth = new FunctionNode(eq_method_name,
-                                    {"other"},
-                                    {new ObjectType(class_name, tp)},
-                                    new T_BOOL,
-                                    eq_body,
-                                    POS_NONE,
-                                    POS_NONE);
-    auto cmp_node = new BoolOpNode(BoolOp::EQ,
-                                   new MemberNode(new IdNode("this", POS_NONE, POS_NONE), members_ordered[0]),
-                                   new MemberNode(new IdNode("other", POS_NONE, POS_NONE), members_ordered[0]));
-
-    for (size_t i = 1; i < members_ordered.size(); i++) {
-        cmp_node = new BoolOpNode(BoolOp::AND,
-                                  cmp_node,
-                                  new BoolOpNode(BoolOp::EQ,
-                                                 new MemberNode(new IdNode("this", POS_NONE, POS_NONE),
-                                                                members_ordered[i]),
-                                                 new MemberNode(new IdNode("other", POS_NONE, POS_NONE),
-                                                                members_ordered[i])));
+USemanticInfo Checker::visit_for(ForNode& node) {
+    USemanticInfo exp_info_p = this->dispatch(node.exp);
+    if (exp_info_p->entity.type != E_TYPE::OBJECT_VALUE) {
+        throw std::runtime_error("iterating over something that's not an object");
     }
-    eq_body->nodes.push_back(new ReturnNode(cmp_node));
-    return eq_meth;
-}
-
-FunctionNode* generate_str_method(std::string class_name) {
-    auto eq_body = new BlockNode({}, POS_NONE, POS_NONE);
-    std::string eq_method_name = "str";
-    auto eq_meth = new FunctionNode(eq_method_name, {}, {}, new T_STRING, eq_body, POS_NONE, POS_NONE);
-    eq_body->nodes.push_back(new ReturnNode(new StringNode("<" + class_name + " object>")));
-    return eq_meth;
-}
-
-FunctionSNode* make_class_default_init(std::string class_path, VectorOfStrings members) {
-    FunctionSNode* fn = new FunctionSNode();
-    fn->identifier = class_path + ".__init__";
-    fn->params = members;
-    BlockSNode* bn = new BlockSNode();
-    ReturnSNode* rn = new ReturnSNode();
-    NewObjectSNode* nn = new NewObjectSNode();
-    nn->class_name = class_path;
-    for (auto m: members) {
-        IdSNode* idn = new IdSNode();
-        idn->identifier = m;
-        nn->args.push_back(idn);
+    ObjectType* exp_ot = exp_info_p->entity.object_value->ot;
+    if (exp_ot->id != "List") {
+        throw std::runtime_error("iterating over something that's not an object");
     }
-    rn->expression = nn;
-    bn->nodes.push_back(rn);
-    fn->body = bn;
-    return fn;
+
+    TypeNode* elem_type = exp_ot->type_params[0];
+    Entity elem_entity = entity_from_type(*elem_type);
+    this->enter_scope("for");
+    this->scope->set(node.var, elem_entity);
+
+
+    this->loop_list_var_id = "__loop_list__";
+    this->loop_index_var_id = "__loop_index__";
+    this->loop_list_len_var_id = "__loop_list_len__";
+
+    AssignmentSNode* increment_index_sn = new AssignmentSNode();
+    this->update_loop_index_snode = increment_index_sn;
+    increment_index_sn->lvalue = new IdSNode(this->loop_index_var_id);
+    CallSNode* inc_exp_node = new CallSNode();
+    inc_exp_node->function = new IdSNode("core.Integer.add");
+    inc_exp_node->arguments.push_back(new IdSNode(this->loop_index_var_id));
+    IntegerSNode* one_node = new IntegerSNode();
+    one_node->str = "1";
+    inc_exp_node->arguments.push_back(one_node);
+    increment_index_sn->rvalue = inc_exp_node;
+
+
+    USemanticInfo binfo = this->visit_block(*node.body);
+    this->leave_scope();
+
+    SemanticInfo rinfo;
+
+
+    rinfo.snode = make_for_snode(node, binfo, exp_info_p);
+    this->update_loop_index_snode = nullptr;
+    return std::make_unique<SemanticInfo>(rinfo);
 }
 
 USemanticInfo Checker::visit_enum(EnumNode& node) {
@@ -350,7 +601,6 @@ USemanticInfo Checker::visit_enum(EnumNode& node) {
     info.snode = esn;
     return std::make_unique<SemanticInfo>(info);
 }
-
 
 USemanticInfo Checker::visit_class(ClassNode& node) {
     this->error_reporter.current_class = node.class_name;
@@ -520,153 +770,6 @@ USemanticInfo Checker::visit_partial(PartialApplication& node) {
     non->args.insert(non->args.begin(), func->snode);
     s.snode = non;
     return std::make_unique<SemanticInfo>(s);
-}
-
-SNode* Checker::make_for_snode(ForNode& node, USemanticInfo& binfo, USemanticInfo& exp_info_p) {
-    BlockSNode* bbn = new BlockSNode();
-    DeclarationSNode* dsn = new DeclarationSNode();
-    WhileSNode* wsn = new WhileSNode();
-
-
-    dsn->identifier = this->loop_list_var_id;
-    dsn->expression = exp_info_p->snode;
-    bbn->nodes.push_back(dsn);
-    DeclarationSNode* lidx_decl = new DeclarationSNode();
-    lidx_decl->identifier = this->loop_index_var_id;
-    IntegerSNode* init_idx = new IntegerSNode();
-    init_idx->str = "0";
-    lidx_decl->expression = init_idx;
-
-    bbn->nodes.push_back(lidx_decl);
-
-    DeclarationSNode* lensn = new DeclarationSNode();
-    lensn->identifier = this->loop_list_len_var_id;
-    CallSNode* call_list_len_sn = new CallSNode();
-    IdSNode* list_len_fn = new IdSNode("core.List.len");
-    call_list_len_sn->function = list_len_fn;
-    IdSNode* list_sn = new IdSNode(this->loop_list_var_id);
-    call_list_len_sn->arguments = {list_sn};
-    lensn->expression = call_list_len_sn;
-    bbn->nodes.push_back(lensn);
-
-
-    IdSNode* idxsn = new IdSNode(this->loop_index_var_id);
-    CallSNode* cn = new CallSNode();
-    IdSNode* cmpfunsn = new IdSNode("core.Integer.lt");
-
-    IdSNode* llensn = new IdSNode(this->loop_list_len_var_id);
-
-
-    cn->function = cmpfunsn;
-    cn->arguments = {idxsn, llensn};
-
-    wsn->condition = cn;
-
-    bbn->nodes.push_back(wsn);
-
-
-    BlockSNode* bn = (BlockSNode*) (binfo->snode);
-    DeclarationSNode* loop_elem_sn = new DeclarationSNode();
-
-    CallSNode* list_subscript_n = new CallSNode();
-    list_subscript_n->function = new IdSNode("core.List.__sub__");
-    list_subscript_n->arguments.push_back(new IdSNode(this->loop_list_var_id));
-    list_subscript_n->arguments.push_back(new IdSNode(this->loop_index_var_id));
-
-
-    loop_elem_sn->expression = list_subscript_n;
-    loop_elem_sn->identifier = node.var;
-    bn->nodes.insert(bn->nodes.begin(), loop_elem_sn);
-
-    bn->nodes.push_back(this->update_loop_index_snode);
-    wsn->body = bn;
-    return bbn;
-}
-
-
-USemanticInfo Checker::visit_for(ForNode& node) {
-    USemanticInfo exp_info_p = this->dispatch(node.exp);
-    if (exp_info_p->entity.type != E_TYPE::OBJECT_VALUE) {
-        throw std::runtime_error("iterating over something that's not an object");
-    }
-    ObjectType* exp_ot = exp_info_p->entity.object_value->ot;
-    if (exp_ot->id != "List") {
-        throw std::runtime_error("iterating over something that's not an object");
-    }
-
-    TypeNode* elem_type = exp_ot->type_params[0];
-    Entity elem_entity = entity_from_type(*elem_type);
-    this->enter_scope("for");
-    this->scope->set(node.var, elem_entity);
-
-
-    this->loop_list_var_id = "__loop_list__";
-    this->loop_index_var_id = "__loop_index__";
-    this->loop_list_len_var_id = "__loop_list_len__";
-
-    AssignmentSNode* increment_index_sn = new AssignmentSNode();
-    this->update_loop_index_snode = increment_index_sn;
-    increment_index_sn->lvalue = new IdSNode(this->loop_index_var_id);
-    CallSNode* inc_exp_node = new CallSNode();
-    inc_exp_node->function = new IdSNode("core.Integer.add");
-    inc_exp_node->arguments.push_back(new IdSNode(this->loop_index_var_id));
-    IntegerSNode* one_node = new IntegerSNode();
-    one_node->str = "1";
-    inc_exp_node->arguments.push_back(one_node);
-    increment_index_sn->rvalue = inc_exp_node;
-
-
-    USemanticInfo binfo = this->visit_block(*node.body);
-    this->leave_scope();
-
-    SemanticInfo rinfo;
-
-
-    rinfo.snode = make_for_snode(node, binfo, exp_info_p);
-    this->update_loop_index_snode = nullptr;
-    return std::make_unique<SemanticInfo>(rinfo);
-}
-
-TypeNode* get_entity_type(Entity e) {
-    Entity* ent = &e;
-    if (ent->type == E_TYPE::CONST_FUNCTION) {
-        return e.const_function->ft->clone();
-    }
-    if (ent->type == E_TYPE::FUNCTION_VALUE) {
-        return e.function_value->ft->clone();
-    }
-    if (ent->type == E_TYPE::OBJECT_VALUE) {
-        return e.object_value->ot->clone();
-    }
-    throw std::runtime_error("Get type of non function/object!");
-}
-
-void mangle_generic_names(TypeNode* t);
-void mangle_generic_names(FunctionType* t);
-void mangle_generic_names(ObjectType* t);
-
-void mangle_generic_names(TypeNode* t) {
-    if (t->kind == Kind::OBJECT) {
-        return mangle_generic_names(&t->object());
-    }
-    return mangle_generic_names(&t->function());
-}
-
-void mangle_generic_names(FunctionType* t) {
-    for (auto pt: t->param_types) {
-        mangle_generic_names(pt);
-    }
-    mangle_generic_names(t->return_type);
-}
-
-void mangle_generic_names(ObjectType* t) {
-    if (t->is_generic_param) {
-        t->id = t->id + "0";
-    } else {
-        for (auto tp: t->type_params) {
-            mangle_generic_names(tp);
-        }
-    }
 }
 
 USemanticInfo Checker::visit_call(CallNode& n) {
@@ -856,7 +959,6 @@ USemanticInfo Checker::visit_root(BlockNode& node) {
     return std::make_unique<SemanticInfo>(f);
 }
 
-
 USemanticInfo Checker::visit_block(BlockNode& node) {
     SemanticInfo info;
     BlockSNode* sn = new BlockSNode();
@@ -896,31 +998,6 @@ USemanticInfo Checker::visit_block(BlockNode& node) {
     }
     node.nodes = vn;
     return std::make_unique<SemanticInfo>(info);
-}
-
-void make_not_generic(FunctionType* ft);
-void make_not_generic(ObjectType* ft);
-void make_not_generic(TypeNode* ft);
-
-void make_not_generic(TypeNode* t) {
-    if (t->kind == Kind::FUNCTION) {
-        return make_not_generic(&t->function());
-    }
-    return make_not_generic(&t->object());
-}
-
-void make_not_generic(FunctionType* ft) {
-    for (auto pt: ft->param_types) {
-        make_not_generic(pt);
-    }
-    make_not_generic(ft->return_type);
-}
-
-void make_not_generic(ObjectType* ot) {
-    ot->is_generic_param = false;
-    for (auto tp: ot->type_params) {
-        make_not_generic(tp);
-    }
 }
 
 USemanticInfo Checker::visit_function(FunctionNode& n) {
@@ -1006,38 +1083,6 @@ USemanticInfo Checker::visit_id(IdNode& n) {
     // }
     info.entity = entity;
     return std::make_unique<SemanticInfo>(info);
-}
-
-int target_union_type(const ObjectType& target, const TypeNode& source) {
-    for (size_t ti = 0; ti < target.type_params.size(); ti++) {
-        if (target.type_params[ti]->actual_to_string() == source.actual_to_string()) {
-            return ti;
-        }
-    }
-    return -1;
-}
-
-SNode* make_union_wrapper(int type_index, SNode* expression) {
-    NewObjectSNode* new_union = new NewObjectSNode();
-    new_union->class_name = "core_D_Union";
-    IntegerSNode* in = new IntegerSNode();
-    in->str = std::to_string(type_index); // FIXME, use int directly
-    new_union->args = {expression, in};
-    return new_union;
-}
-
-std::string binoptype_to_str(OpType op) {
-    std::string fun;
-    if (op == OpType::ADD) {
-        fun = "add";
-    } else if (op == OpType::SUB) {
-        fun = "sub";
-    } else if (op == OpType::MUL) {
-        fun = "mul";
-    } else if (op == OpType::DIV) {
-        fun = "div";
-    }
-    return fun;
 }
 
 USemanticInfo Checker::check_declaration_with_type(DeclarationNode& n) {
@@ -1137,7 +1182,6 @@ USemanticInfo Checker::check_declaration_without_type(DeclarationNode& n) {
     }
     return std::make_unique<SemanticInfo>(info);
 }
-
 
 USemanticInfo Checker::visit_declaration(DeclarationNode& n) {
     Logger::info("Checking DeclarationNode for var: " + n.identifier);
@@ -1337,15 +1381,6 @@ USemanticInfo Checker::visit_cast(CastNode& n) {
     return std::make_unique<SemanticInfo>(info);
 }
 
-SNode* make_if_snode(SNode* condition, SNode* body, std::vector<std::pair<SNode*, BlockSNode*>> elifs, SNode* _else) {
-    IfSNode* ifs = new IfSNode();
-    ifs->condition = condition;
-    ifs->then = (BlockSNode*) body;
-    ifs->elifs = elifs;
-    ifs->_else = (BlockSNode*) _else;
-    return ifs;
-}
-
 USemanticInfo Checker::visit_if(IfNode& n) {
     SemanticInfo info;
     USemanticInfo condition_info_p = this->dispatch(n.condition);
@@ -1398,31 +1433,6 @@ USemanticInfo Checker::visit_if(IfNode& n) {
     info.snode = make_if_snode(condition_info.snode, body_info->snode, elifs, else_snode);
 
     return std::make_unique<SemanticInfo>(info);
-}
-
-std::string map_boolop_to_method_name(BoolOp op) {
-    std::map<BoolOp, std::string> funs;
-
-    funs[BoolOp::EQ] = "eq";
-    funs[BoolOp::NE] = "ne";
-
-    funs[BoolOp::AND] = "and";
-    funs[BoolOp::OR] = "or";
-
-    funs[BoolOp::LE] = "le";
-    funs[BoolOp::GE] = "ge";
-    funs[BoolOp::LT] = "lt";
-    funs[BoolOp::GT] = "gt";
-
-    return funs[op];
-}
-
-SNode* make_boolop_snode(ConstFunction* operator_fun, SemanticInfo& left_info, SemanticInfo& right_info) {
-    IdSNode* function_id = new IdSNode(operator_fun->path.as_str());
-    CallSNode* sn = new CallSNode();
-    sn->function = function_id;
-    sn->arguments = {left_info.snode, right_info.snode};
-    return sn;
 }
 
 USemanticInfo Checker::visit_boolop(BoolOpNode& n) {
@@ -1506,19 +1516,6 @@ USemanticInfo Checker::visit_boolop(BoolOpNode& n) {
     }
 
     return std::make_unique<SemanticInfo>(info);
-}
-
-std::string map_binop_to_method_name(OpType op) {
-    std::map<OpType, std::string> funs;
-
-    funs[OpType::ADD] = "add";
-    funs[OpType::SUB] = "sub";
-
-    funs[OpType::MUL] = "mul";
-    funs[OpType::DIV] = "div";
-    funs[OpType::MOD] = "mod";
-
-    return funs[op];
 }
 
 USemanticInfo Checker::visit_binop(BinopNode& n) {
