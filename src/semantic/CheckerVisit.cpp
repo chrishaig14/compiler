@@ -832,10 +832,7 @@ USemanticInfo Checker::visit_call(CallNode& n) {
     for (auto x: arg_types) {
         delete x;
     }
-    if (is_a_method) {
-// prepend the "this" argument (the object on which the method is being called)
-        n.arguments.insert(n.arguments.begin(), object_node);
-    }
+
     retv.is_constant = is_def_const && args_are_constant;
     return std::make_unique<SemanticInfo>(retv);
 }
