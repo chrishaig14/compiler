@@ -78,6 +78,7 @@ public:
     void function_call_num_args(FunctionType& ft, TextPosition position);
     void match_type(ObjectType& type, TextPosition pos);
     void match_type(Entity entity, TextPosition pos);
+    void condition(Entity entity, TextPosition position, const std::string& st);
 };
 
 

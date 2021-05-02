@@ -280,7 +280,7 @@ USemanticInfo Checker::visit_while(WhileNode& node) {
     }
     ObjectType* condition_ot = condition.entity.object_value->ot;
     if (*condition_ot != T_BOOL) {
-        this->error_reporter.condition(*condition_ot, node.start, "elif");
+        this->error_reporter.condition(condition.entity, node.start, "while");
     }
     this->enter_scope("while");
     this->scope->is_loop = true;
@@ -306,6 +306,7 @@ USemanticInfo Checker::visit_if(IfNode& n) {
     SemanticInfo& condition_info = *condition_info_p;
 
     if (condition_info.entity.type != E_TYPE::OBJECT_VALUE) {
+        this->error_reporter.condition(condition_info.entity, n.condition->start, "if");
         throw std::runtime_error("If condition should be a Boolean");
     }
     if (*condition_info.entity.object_value->ot != T_BOOL) {

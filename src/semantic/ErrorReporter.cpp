@@ -21,6 +21,7 @@ std::string entity_to_string(Entity entity) {
             return "class " + E_HLT(entity.clazz->class_name);
         case E_TYPE::FUNCTION_VALUE:
         case E_TYPE::OBJECT_VALUE:
+            return E_HLT(entity.object_value->ot->to_string());
         case E_TYPE::CONST_FUNCTION:
             return "function " + E_HLT(entity.const_function->path.as_vec().back());
         case E_TYPE::ERROR:
@@ -107,10 +108,10 @@ void ErrorReporter::assignment(const TypeNode& expected, const TypeNode& actual,
     this->fail(msg);
 }
 
-void ErrorReporter::condition(const TypeNode& t, TextPosition position, const std::string& st) {
+void ErrorReporter::condition(Entity entity, TextPosition position, const std::string& st) {
     std::string msg;
     msg = context_string(position) + E_FMT(" Expected ") + E_HLT("Boolean ") +
-          E_FMT("as condition for " + st + " statement, got ") + E_HLT(t.to_string());
+          E_FMT("as condition for " + st + " statement, got ") + E_HLT(entity_to_string(entity));
     this->fail(msg);
 }
 
