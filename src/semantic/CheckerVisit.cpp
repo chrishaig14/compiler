@@ -1267,10 +1267,11 @@ USemanticInfo Checker::visit_member(MemberNode& n) {
     USemanticInfo parent_info = this->dispatch(n.parent);
     Entity parent_entity = parent_info->entity;
     if (n.type == MemberType::NUM) {
-        if (parent_entity.object_value->ot->id != "Tuple") {
+        ObjectType* ot = parent_entity.object_value->ot;
+        if (ot->id != "Tuple") {
             throw std::runtime_error("Integer member of not a Tuple!");
         }
-        unsigned long tuple_size = parent_entity.object_value->ot->type_params.size();
+        unsigned long tuple_size = ot->type_params.size();
         if (n.n_child > tuple_size || n.n_child == 0) {
             throw std::runtime_error("Tuple member out of range, has " + std::to_string(tuple_size) + " but required " +
                                      std::to_string(n.n_child));
@@ -1280,10 +1281,10 @@ USemanticInfo Checker::visit_member(MemberNode& n) {
         info.snode = omsn;
         omsn->object = parent_info->snode;
         omsn->member_name = "mem_" + std::to_string(n.n_child);
-        omsn->class_path = parent_entity.object_value->ot->actual_base_path;
+        omsn->class_path = ot->actual_base_path;
         ObjectValue* ov = new ObjectValue();
         info.entity = Entity(ov);
-        ov->ot = (ObjectType*) parent_entity.object_value->ot->type_params[n.n_child - 1]->clone();
+        ov->ot = (ObjectType*) ot->type_params[n.n_child - 1]->clone();
         return std::make_unique<SemanticInfo>(info);
     }
     switch (parent_entity.type) {
