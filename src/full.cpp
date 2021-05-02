@@ -8,6 +8,7 @@
 #include "transpiler/STranspiler.h"
 #include "units/Package.h"
 
+static bool global_fail = false;
 static std::map<std::string, std::string> function_builtins;
 static std::map<std::string, std::map<std::string, std::string>> class_builtins;
 static Package* root_package;
@@ -244,7 +245,8 @@ void analyze_all_modules(Package* package) {
             checker.visit_root(*module->ast);
             module->sast = checker.root_snode;
             if (checker.error_reporter.failed) {
-                throw std::runtime_error("Semantic analysis failed for module " + module->abs_path);
+                global_fail = true;
+                // throw std::runtime_error("Semantic analysis failed for module " + module->abs_path);
             }
             // std::cout << "- Done" << std::endl;
         }
@@ -342,6 +344,10 @@ int main(int argc, char* argv[]) {
 
 
     analyze_all_modules(root_package);
+    if (global_fail) {
+        std::cout << "Failed to compile" << std::endl;
+        exit(1);
+    }
     transpile_all_modules(root_package, project_output_dir);
 
     std::string all_files;

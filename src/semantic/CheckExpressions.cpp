@@ -144,6 +144,7 @@ USemanticInfo Checker::visit_binop(BinopNode& n) {
     }
     if (left_info_p->entity.type != E_TYPE::OBJECT_VALUE || right_info_p->entity.type != E_TYPE::OBJECT_VALUE) {
         this->error_reporter.binop(left_info_p->entity, right_info_p->entity, n.start);
+        return error_stub();
     }
     const TypeNode& ltype = *get_entity_type(left_info_p->entity);
     const TypeNode& rtype = *get_entity_type(right_info_p->entity);
