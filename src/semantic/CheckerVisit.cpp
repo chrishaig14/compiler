@@ -613,34 +613,6 @@ USemanticInfo Checker::visit_call(CallNode& n) {
     } else if (fun_info.entity.type == E_TYPE::FUNCTION_VALUE) {
         function_type = fun_info.entity.function_value->ft->clone();
     } else {
-        std::string entity_type;
-        switch (fun_info.entity.type) {
-            case E_TYPE::CLASS:
-                entity_type = "CLASS";
-                break;
-            case E_TYPE::CONST_FUNCTION:
-                entity_type = "CONST FUNCTION";
-                break;
-            case E_TYPE::FUNCTION_VALUE:
-                entity_type = "FUNCTION VALUE";
-                break;
-            case E_TYPE::OBJECT_VALUE:
-                entity_type = "OBJECT VALUE";
-                break;
-            case E_TYPE::PACKAGE:
-                entity_type = "PACKAGE";
-                break;
-            case E_TYPE::MODULE:
-                entity_type = "MODULE";
-                break;
-            case E_TYPE::ERROR:
-                break;
-            case E_TYPE::NOT_FOUND:
-                break;
-            case E_TYPE::ENUM:
-                break;
-        }
-        throw std::runtime_error("Calling something that's not a function it's a " + entity_type);
         this->error_reporter.call_not_a_function(n.start);
     }
     // ok

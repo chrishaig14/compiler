@@ -219,7 +219,7 @@ void ErrorReporter::function_call_num_args(FunctionType& ft, TextPosition positi
 
 void ErrorReporter::call_not_a_function(TextPosition position) {
     std::string msg;
-    msg = E_HLT(text_pos_to_string(this->__file__, position)) + E_FMT("Calling something that's not a function");
+    msg = E_HLT(text_pos_to_string(this->__file__, position)) + E_FMT(" Calling something that's not a function");
     this->fail(msg);
 }
 
