@@ -26,11 +26,11 @@
 std::string style(std::string s, std::string str);
 
 inline std::string E_FMT(const std::string& x) {
-    return fmt::format(fmt::fg(fmt::terminal_color::red), "{}", x);
+    return fmt::format("{}", x);
 }
 
 inline std::string E_HLT(const std::string& x) {
-    return fmt::format(fmt::fg(fmt::terminal_color::bright_magenta), "{}", x);
+    return fmt::format(fmt::fg(fmt::terminal_color::red) | fmt::emphasis::bold, "{}", x);
 }
 
 #define E_LINE(x) fmt::format(fmt::fg(fmt::terminal_color::white),"{}", x)
