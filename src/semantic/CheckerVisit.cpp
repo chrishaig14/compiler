@@ -491,18 +491,20 @@ USemanticInfo Checker::visit_partial(PartialApplication& node) {
     std::vector<SNode*> snodes;
     int npartial = 0;
     for (size_t i = 0; i < node.args.size(); i++) {
+        TypeNode*& param_type = fun_type->param_types[i];
         if (node.args[i] != nullptr) {
             USemanticInfo arg = this->dispatch(node.args[i]);
-            if (*arg->entity.object_value->ot != *fun_type->param_types[i]) {
-                this->error_reporter.partial_function_call_type_mismatch(*fun_type->param_types[i],
-                                                                         *arg->entity.object_value->ot,
+            ObjectType* arg_ot = arg->entity.object_value->ot;
+            if (*arg_ot != *param_type) {
+                this->error_reporter.partial_function_call_type_mismatch(*param_type,
+                                                                         *arg_ot,
                                                                          node.args[i]->start,
                                                                          node.args[i]->end);
                 return error_stub();
             }
             snodes.push_back(arg->snode);
         } else {
-            partial_args.push_back(fun_type->param_types[i]->clone());
+            partial_args.push_back(param_type->clone());
             snodes.push_back(nullptr);
             npartial++;
         }
