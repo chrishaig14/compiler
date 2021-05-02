@@ -1179,9 +1179,9 @@ USemanticInfo Checker::visit_assignment(AssignmentNode& n) {
     USemanticInfo expression_info_p = this->dispatch(n.rvalue);
 
     if (linfo_p->entity.type == E_TYPE::OBJECT_VALUE && expression_info_p->entity.type == E_TYPE::CONST_FUNCTION) {
-        throw std::runtime_error(
-                "error, can't assign expression " + expression_info_p->entity.const_function->ft->to_string() + " to " +
-                linfo_p->entity.object_value->ot->to_string());
+        this->error_reporter.assignment(*linfo_p->entity.function_value->ft,
+                                        *expression_info_p->entity.object_value->ot,
+                                        n.rvalue->start);
     }
     TypeNode* exp_type = expression_info_p->entity.object_value->ot;
 
@@ -1237,9 +1237,9 @@ USemanticInfo Checker::visit_assignment(AssignmentNode& n) {
         // else, type matches don't do anything
         n.type = l_type.clone();
     } else {
-        throw std::runtime_error(
-                "Error, cant assign " + expression_info_p->entity.object_value->ot->to_string() + " to type " +
-                linfo_p->entity.function_value->ft->to_string());
+        this->error_reporter.assignment(*linfo_p->entity.function_value->ft,
+                                        *expression_info_p->entity.object_value->ot,
+                                        n.rvalue->start);
     }
     AssignmentSNode* sn = new AssignmentSNode();
     sn->lvalue = linfo_p->snode;
