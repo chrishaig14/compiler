@@ -169,6 +169,8 @@ public:
     USemanticInfo visit_enum(EnumNode& node);
 };
 
+int target_union_type(const ObjectType& target, const TypeNode& source);
+
 bool function_is_generic(const FunctionType& ft);
 
 #endif //CHECKER_H

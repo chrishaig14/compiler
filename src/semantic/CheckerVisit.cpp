@@ -782,26 +782,24 @@ USemanticInfo Checker::visit_call(CallNode& n) {
                 const std::string& param_path_as_str = param_type.object().actual_base_path.as_str();
                 if (arg_path_as_str != param_path_as_str) {
                     // if (arg_type != param_type) {
-                    if (param_type.kind == Kind::OBJECT) {
-                        if (param_type.object().id == "Union") {
-                            int type_index = target_union_type(param_type.object(), arg_type);
-                            if (type_index == -1) {
-                                this->error_reporter.function_call_type_mismatch(param_type,
-                                                                                 arg_type,
-                                                                                 n.arguments[i]->start,
-                                                                                 n.arguments[i]->end);
-                            } else {
-                                int fixed_index = i + (fun_info_p->this_arg != nullptr);
-                                sn->arguments[fixed_index] = make_union_wrapper(type_index, sn->arguments[fixed_index]);
-                            }
+                    if (param_type.kind == Kind::OBJECT && param_type.object().id == "Union") {
+                        int type_index = target_union_type(param_type.object(), arg_type);
+                        if (type_index == -1) {
+                            this->error_reporter.function_call_type_mismatch(param_type,
+                                                                             arg_type,
+                                                                             n.arguments[i]->start,
+                                                                             n.arguments[i]->end);
+                        } else {
+                            int fixed_index = i + (fun_info_p->this_arg != nullptr);
+                            sn->arguments[fixed_index] = make_union_wrapper(type_index, sn->arguments[fixed_index]);
                         }
+                        return std::make_unique<SemanticInfo>(retv);
                     } else if (arg_type.kind != Kind::UNKNOWN) {
                         this->error_reporter.function_call_type_mismatch(param_type,
                                                                          arg_type,
                                                                          n.arguments[i]->start,
                                                                          n.arguments[i]->end);
                     }
-                    return std::make_unique<SemanticInfo>(retv);
                     // }
                 }
             }
@@ -1177,51 +1175,57 @@ USemanticInfo Checker::visit_assignment(AssignmentNode& n) {
                 "error, can't assign expression " + expression_info_p->entity.const_function->ft->to_string() + " to " +
                 linfo_p->entity.object_value->ot->to_string());
     }
+    TypeNode* exp_type = expression_info_p->entity.object_value->ot;
+
+    if (exp_type->kind == Kind::OBJECT && this->module->aliased_types.count(exp_type->object().id) == 1) {
+        TypeNode* aliased_type = this->module->aliased_types.at(exp_type->object().id);
+        exp_type = aliased_type;
+    } else {
+        this->module->fill_actual(exp_type);
+    }
 
     if (expression_info_p->is_error) {
         return nullptr;
     }
     SemanticInfo& linfo = *linfo_p;
-    SemanticInfo& expression_type = *expression_info_p;
     n.rvalue = this->replace_if_necessary(n.rvalue);
 
     const TypeNode& l_type = *linfo.entity.object_value->ot;
-    const TypeNode& exp_type = *expression_type.entity.object_value->ot;
 
     if (linfo.entity.type == E_TYPE::OBJECT_VALUE && expression_info_p->entity.type == E_TYPE::OBJECT_VALUE) {
 
         std::string lpath_as_str = linfo.entity.object_value->ot->actual_base_path.as_str();
-        std::string exppath_as_str = expression_type.entity.object_value->ot->actual_base_path.as_str();
+        std::string exppath_as_str = expression_info_p->entity.object_value->ot->actual_base_path.as_str();
 
         if (lpath_as_str != exppath_as_str) {
             if (l_type.kind == Kind::OBJECT) {
                 const ObjectType& actual_type = l_type.object();
                 if (actual_type.id == "Option") {
                     // if type doesn't match exactly, we may be assigning to an Option[t]
-                    if (*actual_type.type_params[0] != exp_type) {
-                        auto& foo = exp_type.object();
+                    if (*actual_type.type_params[0] != *exp_type) {
+                        auto& foo = exp_type->object();
                         if (foo.id != "NoneType") {
-                            this->error_reporter.assignment(l_type, exp_type, n.start);
+                            this->error_reporter.assignment(l_type, *exp_type, n.start);
                         }
                     }
                 } else {
                     if (actual_type.kind == Kind::OBJECT) {
                         if (actual_type.object().id == "Union") {
-                            int type_index = target_union_type(actual_type.object(), exp_type);
+                            int type_index = target_union_type(actual_type.object(), *exp_type);
                             if (type_index == -1) {
-                                this->error_reporter.assignment(actual_type, exp_type, n.rvalue->start);
+                                this->error_reporter.assignment(actual_type, *exp_type, n.rvalue->start);
                             } else {
                                 expression_info_p->snode = make_union_wrapper(type_index, expression_info_p->snode);
                             }
                         }
                     } else {
                         // if it's not Option[t], then it's an error
-                        this->error_reporter.assignment(l_type, exp_type, n.start);
+                        this->error_reporter.assignment(l_type, *exp_type, n.start);
                     }
                 }
             } else {
                 // if it's not Option[t], then it's an error
-                this->error_reporter.assignment(l_type, exp_type, n.start);
+                this->error_reporter.assignment(l_type, *exp_type, n.start);
             }
         }
         // else, type matches don't do anything
@@ -1606,14 +1610,20 @@ USemanticInfo Checker::visit_return(ReturnNode& n) {
     if (return_entity.type == E_TYPE::OBJECT_VALUE) {
         return_typet = return_entity.object_value->ot;
     }
-    TypeNode& return_type = *return_typet;
-    if (return_type == T_NONE) {
+    TypeNode* return_type = return_typet;
+    if (return_type->kind == Kind::OBJECT && this->module->aliased_types.count(return_type->object().id) == 1) {
+        TypeNode* aliased_type = this->module->aliased_types.at(return_type->object().id);
+        return_type = aliased_type;
+    } else {
+        this->module->fill_actual(return_type);
+    }
+    if (*return_type == T_NONE) {
         if (n.expression != nullptr) {
             this->error_reporter.bad_return(n.start);
         }
         return nullptr;
     } else if (n.expression == nullptr) {
-        this->error_reporter.no_return(return_type, n.start);
+        this->error_reporter.no_return(*return_type, n.start);
     }
     USemanticInfo expression_info_p = this->dispatch(n.expression);
     SemanticInfo& expression_info = *expression_info_p;
@@ -1622,11 +1632,21 @@ USemanticInfo Checker::visit_return(ReturnNode& n) {
     }
     sn->expression = expression_info.snode;
     n.expression = this->replace_if_necessary(n.expression);
-    if (!this->can_assign(*expression_info.entity.object_value->ot, return_type)) {
-        this->error_reporter.return_mismatch(return_type, *expression_info.entity.object_value->ot, n.start);
-        return error_stub();
+    if (return_type->object().id == "Union") {
+        int type_index = target_union_type(return_type->object(), *expression_info.entity.object_value->ot);
+        if (type_index == -1) {
+            // throw std::runtime_error("OH NO!");
+            this->error_reporter.assignment(*return_typet, *expression_info.entity.object_value->ot, n.start);
+        }
+        SNode* union_wrapper = make_union_wrapper(type_index, sn->expression);
+        sn->expression = union_wrapper;
+    } else {
+        if (!this->can_assign(*expression_info.entity.object_value->ot, *return_type)) {
+            this->error_reporter.return_mismatch(*return_typet, *expression_info.entity.object_value->ot, n.start);
+            return error_stub();
+        }
     }
-    n.ret_type = return_type.clone();
+    n.ret_type = return_type->clone();
     n.reachables = this->scope->get_all();
     return std::make_unique<SemanticInfo>(info);
 }
