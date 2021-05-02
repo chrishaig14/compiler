@@ -145,7 +145,6 @@ Checker::Checker() {
     this->scopes["global"] = this->scope;
     this->add_this = false;
     this->this_type = nullptr;
-    this->replace_me = false;
 }
 
 void Checker::enter_scope(std::string name) {
@@ -369,15 +368,6 @@ Flirpin map_unit_to_flirpin(Unit u) {
         case U_TYPE::MODULE:
             return Flirpin{.type=F_TYPE::MODULE, .module=u.module};
     }
-}
-
-Node* Checker::replace_if_necessary(Node* node) {
-    if (this->replace_me) {
-        this->replace_me = false;
-        delete node;
-        return this->replacement;
-    }
-    return node;
 }
 
 bool Checker::is_immutable(const TypeNode& node) {

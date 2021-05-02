@@ -62,8 +62,6 @@ class Checker {
     bool add_this;
     bool is_lvalue;
     std::map<std::string, bool> inits;
-    bool replace_me;
-    Node* replacement;
     std::string current_class;
     std::string current_function;
     std::unordered_map<std::string, SymbolTable*> scopes;
@@ -103,7 +101,6 @@ public:
     TypeNode* substitute(TypeNode* t, std::string var, TypeNode* replacement);
     void unify_function_call(FunctionType& fun, VectorOfTypes& args);
     SemanticInfo match_arguments_to_generic_function(const FunctionType& ft, VectorOfTypes arg_types);
-    Node* replace_if_necessary(Node* node);
     void fail(std::string msg);
 
 

@@ -94,7 +94,6 @@ SNode* Checker::make_for_snode(ForNode& node, USemanticInfo& binfo, USemanticInf
 USemanticInfo Checker::visit_list(ListNode& node) {
     USemanticInfo element_type_p = this->dispatch(node.elements[0]);
     TypeNode* element_type = element_type_p->entity.object_value->ot->clone();
-    node.elements[0] = this->replace_if_necessary(node.elements[0]);
     bool is_constant = true;
     ListSNode* lsn = new ListSNode();
     lsn->elements.push_back(element_type_p->snode);
@@ -105,7 +104,6 @@ USemanticInfo Checker::visit_list(ListNode& node) {
         // if (!current_type_p->is_constant) {
         //     is_constant = false;
         // }
-        node.elements[i] = this->replace_if_necessary(node.elements[i]);
         ObjectType* ctype = current_type_p->entity.object_value->ot;
         if (*ctype != *element_type) {
             this->error_reporter.list_literal(*element_type, *ctype, node.elements[i]->start);
@@ -305,11 +303,9 @@ USemanticInfo Checker::visit_ternary(TernaryNode& node) {
     // this->scope->set("it", type);
     USemanticInfo true_case_p = this->dispatch(node.true_case);
     SemanticInfo& true_case = *true_case_p;
-    node.true_case = this->replace_if_necessary(node.true_case);
     this->leave_scope();
     USemanticInfo false_case_p = this->dispatch(node.false_case);
     SemanticInfo& false_case = *false_case_p;
-    node.false_case = this->replace_if_necessary(node.false_case);
     if (*false_case.entity.object_value->ot != *true_case.entity.object_value->ot) {
         throw std::runtime_error(
                 "True case and false case type don't match: " + true_case.entity.object_value->ot->to_string() +
@@ -590,8 +586,6 @@ USemanticInfo Checker::visit_call(CallNode& n) {
     if (fun_info.is_class_method) {
         MemberNode& member_node = n.function->member();
         if (member_node.s_child == "init") {
-            n.function = this->replacement;
-            this->replace_me = false;
             // const FunctionType& ftn = fun_info.type().function();
             // FunctionType& copy_ftn = ftn.clone()->function();
             // retv.set_type(*copy_ftn.clone());
@@ -600,7 +594,6 @@ USemanticInfo Checker::visit_call(CallNode& n) {
             // n.function = new IdNode(this->map[fun_info.class_info->class_name + "." + member_node.s_child],
             //                         POS_NONE,
             //                         POS_NONE);
-            this->replace_me = false;
             // const FunctionType& ftn = fun_info.type().function();
             // FunctionType& copy_ftn = ftn.clone()->function();
             // copy_ftn.param_types.insert(copy_ftn.param_types.begin(), TYPE(fun_info.class_info->class_name, {}));
@@ -610,7 +603,6 @@ USemanticInfo Checker::visit_call(CallNode& n) {
     } else {
         sn->function = fun_info.snode;
     }
-    n.function = replace_if_necessary(n.function);
     FunctionType* function_type = nullptr;
     if (fun_info.entity.type == E_TYPE::CONST_FUNCTION) {
         function_type = fun_info.entity.const_function->ft->clone();
@@ -650,7 +642,6 @@ USemanticInfo Checker::visit_call(CallNode& n) {
         // if (!arg_type_p->is_constant) {
         //     args_are_constant = false;
         // }
-        arg = this->replace_if_necessary(arg);
         arg_types.push_back(arg_type.clone());
         n.arg_types.push_back(arg_type.clone());
     }
@@ -733,7 +724,6 @@ USemanticInfo Checker::visit_block(BlockNode& node) {
 
         // sn->nodes.push_back(sinfo_p->snode);
 
-        n = this->replace_if_necessary(n);
         if (n->ntype == NodeType::BLOCK) {
             for (auto bnode: n->block().nodes) {
                 vn.push_back(bnode);
@@ -873,7 +863,6 @@ USemanticInfo Checker::check_declaration_with_type(DeclarationNode& n) {
         ov->ot = (ObjectType*) n.type->clone();
         return std::make_unique<SemanticInfo>(info);
     }
-    n.expression = this->replace_if_necessary(n.expression);
     if (n.type->kind == Kind::FUNCTION) {
         // it's a function
         // if (*n.type != exp_info.type()) {
@@ -930,7 +919,6 @@ USemanticInfo Checker::check_declaration_without_type(DeclarationNode& n) {
     //     return error_t;
     // }
     // n.type = exp_info_p->type().clone();
-    n.expression = this->replace_if_necessary(n.expression);
     // info.set_type(exp_info.type());
     info.entity = exp_info_p->entity;
     if (info.entity.type == E_TYPE::CONST_FUNCTION) {
@@ -1009,7 +997,6 @@ USemanticInfo Checker::visit_assignment(AssignmentNode& n) {
         return nullptr;
     }
     SemanticInfo& linfo = *linfo_p;
-    n.rvalue = this->replace_if_necessary(n.rvalue);
 
     const TypeNode& l_type = *linfo.entity.object_value->ot;
 
@@ -1292,7 +1279,6 @@ USemanticInfo Checker::visit_binop(BinopNode& n) {
 
     Logger::info("Checking binop node");
     USemanticInfo left_info_p = this->dispatch(n.left);
-    Node* left_replace = this->replace_if_necessary(n.left);
     USemanticInfo right_info_p = this->dispatch(n.right);
     if (left_info_p->entity.type == E_TYPE::ERROR || right_info_p->entity.type == E_TYPE::ERROR) {
         return error_stub();
@@ -1321,9 +1307,6 @@ USemanticInfo Checker::visit_binop(BinopNode& n) {
     if (err) {
         return error_stub();
     }
-    n.left = left_replace;
-    // n.left = this->replace_if_necessary(n.left);
-    n.right = this->replace_if_necessary(n.right);
 
     SemanticInfo& left_info = *left_info_p;
     SemanticInfo& right_info = *right_info_p;
@@ -1392,7 +1375,6 @@ USemanticInfo Checker::visit_return(ReturnNode& n) {
         return nullptr;
     }
     sn->expression = expression_info.snode;
-    n.expression = this->replace_if_necessary(n.expression);
     if (return_type->object().id == "Union") {
         int type_index = target_union_type(return_type->object(), *expression_info.entity.object_value->ot);
         if (type_index == -1) {
