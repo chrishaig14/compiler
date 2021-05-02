@@ -433,59 +433,6 @@ USemanticInfo Checker::visit_cast(CastNode& n) {
     return std::make_unique<SemanticInfo>(info);
 }
 
-USemanticInfo Checker::visit_if(IfNode& n) {
-    SemanticInfo info;
-    USemanticInfo condition_info_p = this->dispatch(n.condition);
-    SemanticInfo& condition_info = *condition_info_p;
-
-    if (condition_info.entity.type != E_TYPE::OBJECT_VALUE) {
-        throw std::runtime_error("If condition should be a Boolean");
-    }
-    if (*condition_info.entity.object_value->ot != T_BOOL) {
-        throw std::runtime_error("If condition should be a Boolean");
-    }
-
-    // std::unordered_map<std::string, bool> not_null_vars;
-    // if (condition_info.type() == T_NONE) {
-    //     this->error_reporter.function_doesnt_return_a_value(n.condition->start, new T_BOOL);
-    // } else if (condition_info.type() != T_BOOL) {
-    //     this->error_reporter.condition(condition_info.type(), n.start, "if");
-    // }
-
-    this->enter_scope("if");
-    USemanticInfo body_info = this->visit_block(*n.then);
-    // for (auto v: this->scope->table) {
-    //     n.then->local_vars.push_back(std::make_pair(v.first, v.second->clone()));
-    // }
-    this->leave_scope();
-
-    std::vector<std::pair<SNode*, BlockSNode*>> elifs;
-
-    for (size_t i = 0; i < n.elifs.size(); i++) {
-        USemanticInfo elif_condition_info_p = this->dispatch(n.elifs[i].first);
-        SemanticInfo& elif_condition_info = *elif_condition_info_p;
-        if (elif_condition_info.entity.type != E_TYPE::OBJECT_VALUE) {
-            throw std::runtime_error("If condition should be a Boolean");
-        }
-        if (*elif_condition_info.entity.object_value->ot != T_BOOL) {
-            throw std::runtime_error("If condition should be a Boolean");
-        }
-        this->enter_scope("elif");
-        USemanticInfo elif_block_info = this->visit_block(*n.elifs[i].second);
-        this->leave_scope();
-        elifs.push_back(std::make_pair(elif_condition_info.snode, (BlockSNode*) elif_block_info->snode));
-    }
-    USemanticInfo else_info;
-    if (n.selse != nullptr && !n.selse->nodes.empty()) {
-        this->enter_scope("else");
-        else_info = this->visit_block(*n.selse);
-        this->leave_scope();
-    }
-    SNode* else_snode = else_info == nullptr ? nullptr : else_info->snode;
-    info.snode = make_if_snode(condition_info.snode, body_info->snode, elifs, else_snode);
-
-    return std::make_unique<SemanticInfo>(info);
-}
 
 USemanticInfo Checker::visit_boolop(BoolOpNode& n) {
     USemanticInfo left_info_p = this->dispatch(n.left);
