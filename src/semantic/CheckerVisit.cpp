@@ -1164,18 +1164,23 @@ USemanticInfo Checker::visit_assignment(AssignmentNode& n) {
             return std::make_unique<SemanticInfo>(info);
         }
     }
+
     this->is_lvalue = true;
     USemanticInfo linfo_p = this->dispatch(n.lvalue);
+    this->is_lvalue = false;
+
     if (linfo_p->is_error) {
         return nullptr;
     }
+
     if (linfo_p->entity.type != E_TYPE::FUNCTION_VALUE && linfo_p->entity.type != E_TYPE::OBJECT_VALUE) {
         throw std::runtime_error("Cannot assign to this thing!");
     }
-    this->is_lvalue = false;
+
     if (n.lvalue->ntype == NodeType::MEMBER && n.lvalue->member().type == MemberType::NUM) {
         this->error_reporter.tuple_assign(n.start);
     }
+
     USemanticInfo expression_info_p = this->dispatch(n.rvalue);
 
     if (linfo_p->entity.type == E_TYPE::OBJECT_VALUE && expression_info_p->entity.type == E_TYPE::CONST_FUNCTION) {
