@@ -5,7 +5,7 @@
 #include "CheckDeclaration.h"
 
 USemanticInfo Checker::visit_declaration(DeclarationNode& n) {
-    Logger::info("Checking DeclarationNode for var: " + n.identifier);
+    // Logger::info("Checking DeclarationNode for var: " + n.identifier);
     if (this->scope->declared(n.identifier)) {
         this->error_reporter.redeclared(n.identifier, n.start);
     }

@@ -220,7 +220,7 @@ USemanticInfo Checker::visit_function(FunctionNode& n) {
     SemanticInfo info;
     FunctionSNode* sn = new FunctionSNode();
     info.snode = sn;
-    Logger::info("Checking FunctionNode " + n.identifier);
+    // Logger::info("Checking FunctionNode " + n.identifier);
     std::string& function_name = n.identifier;
     sn->identifier = n.path.as_str();
     sn->params = n.parameter_names;
@@ -254,7 +254,7 @@ USemanticInfo Checker::visit_function(FunctionNode& n) {
         //     this->scope->set(n.parameter_names[i], entity_from_type(param_type));
         // }
     }
-    std::cout << "FINISH " << std::endl;
+    // std::cout << "FINISH " << std::endl;
 
     TypeNode& returnType = *n.return_type;
     this->assert_type_exists(returnType, n.start);

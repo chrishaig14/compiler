@@ -27,7 +27,7 @@ BlockNode* full_parse(const std::string& __file__, CodeLines* code_lines) {
     try {
         tree = parser.parse_program();
     } catch (const std::runtime_error& e) {
-        std::cout << e.what() << std::endl;
+        // std::cout << e.what() << std::endl;
         exit(1);
     }
     return tree;
@@ -37,7 +37,7 @@ VectorOfStrings all_modules;
 
 void build_packages(Package* package, int level) {
     DIR* dir = opendir(package->abs_path.c_str());
-    std::cout << std::string(level, '\t') << "PACKAGE: " << package->abs_path << std::endl;
+    // std::cout << std::string(level, '\t') << "PACKAGE: " << package->abs_path << std::endl;
     dirent* ent = readdir(dir);
     while (ent != nullptr) {
         std::string d_name = ent->d_name;
@@ -45,7 +45,7 @@ void build_packages(Package* package, int level) {
             if (ent->d_type == DT_REG) {
                 std::string file_extension = d_name.substr(d_name.size() - 3, 3);
                 if (file_extension == ".xl") {
-                    std::cout << std::string(level + 1, '\t') << "MODULE: " << d_name << std::endl;
+                    // std::cout << std::string(level + 1, '\t') << "MODULE: " << d_name << std::endl;
                     std::string module_abs_path = path_join(package->abs_path, d_name);
                     std::string module_rel_path = path_join(package->rel_path, d_name);
                     all_modules.push_back(module_rel_path);
@@ -54,7 +54,7 @@ void build_packages(Package* package, int level) {
                     module->path = Path(package->path, module_name);
                     package->units[module_name] = Unit{.type=U_TYPE::MODULE, .module=module};
                 } else {
-                    std::cout << std::string(level + 1, '\t') << "OTHER: " << d_name << std::endl;
+                    // std::cout << std::string(level + 1, '\t') << "OTHER: " << d_name << std::endl;
                 }
             } else if (ent->d_type == DT_DIR) {
                 std::string subpackage_abs_path = path_join(package->abs_path, d_name);
@@ -71,7 +71,7 @@ void build_packages(Package* package, int level) {
 }
 
 void parse_all_modules(Package* package) {
-    std::cout << "Parsing package " << package->name << std::endl;
+    // std::cout << "Parsing package " << package->name << std::endl;
     for (auto ep: package->units) {
         if (ep.second.type == U_TYPE::PACKAGE) {
             Package* subpackage = ep.second.package;
@@ -79,9 +79,9 @@ void parse_all_modules(Package* package) {
         } else if (ep.second.type == U_TYPE::MODULE) {
             Module* module = ep.second.module;
             CodeLines code_lines;
-            std::cout << "Parsing module " << module->name << std::endl;
+            // std::cout << "Parsing module " << module->name << std::endl;
             BlockNode* ast = full_parse(module->abs_path, &code_lines);
-            std::cout << "- Done" << std::endl;
+            // std::cout << "- Done" << std::endl;
             ((Module*) module)->ast = ast;
             ((Module*) module)->code_lines = code_lines;
         }
@@ -89,7 +89,7 @@ void parse_all_modules(Package* package) {
 }
 
 void process_global_all_modules(Package* package) {
-    std::cout << "Global processing package " << package->name << std::endl;
+    // std::cout << "Global processing package " << package->name << std::endl;
     for (auto ep: package->units) {
         if (ep.second.type == U_TYPE::PACKAGE) {
             Package* subpackage = ep.second.package;
@@ -99,9 +99,9 @@ void process_global_all_modules(Package* package) {
             // if (module->name == "core") {
             //     continue;
             // }
-            std::cout << "Global processing module " << module->name << std::endl;
+            // std::cout << "Global processing module " << module->name << std::endl;
             GlobalProcessor gp;
-            std::cout << "Global processing module " << module->name << std::endl;
+            // std::cout << "Global processing module " << module->name << std::endl;
             // Module* core_module = root_package->units["core"].module;
             // for (auto builtin: core_module->flirpins) {
             //     module->flirpins[builtin.first] = builtin.second;
@@ -111,7 +111,7 @@ void process_global_all_modules(Package* package) {
             gp.visit_root(*module->ast);
             // module->imported_paths_no_alias = gp.imported_paths_no_alias;
             // module->imported_paths_with_alias = gp.imported_paths_with_alias;
-            std::cout << "- Done" << std::endl;
+            // std::cout << "- Done" << std::endl;
         }
     }
 }
@@ -130,7 +130,7 @@ VectorOfStrings make_path(std::string s) {
 }
 
 void add_path_to_module(Module* module, Path path) {
-    std::cout << "######## adding path: " << path.as_str() << std::endl;
+    // std::cout << "######## adding path: " << path.as_str() << std::endl;
     Flirpin current_flirpin = Flirpin{.type=F_TYPE::PACKAGE, .package=root_package};
     std::string path_so_far;
     std::string last_include;
@@ -172,11 +172,11 @@ void add_path_to_module(Module* module, Path path) {
         module->flirpins[path.as_vec().back()] = current_flirpin;
     }
 
-    std::cout << "CURRENT FLIRPIN TYPE: " << t << std::endl;
-    std::cout << "last FLIRPIN TYPE: " << lt << std::endl;
+    // std::cout << "CURRENT FLIRPIN TYPE: " << t << std::endl;
+    // std::cout << "last FLIRPIN TYPE: " << lt << std::endl;
 
 
-    std::cout << "######## added path: " << included_header << std::endl;
+    // std::cout << "######## added path: " << included_header << std::endl;
 }
 
 void add_path_with_alias_to_module(Module* module, std::string alias, Path path) {
@@ -217,7 +217,7 @@ void add_path_with_alias_to_module(Module* module, std::string alias, Path path)
 std::string project_output_dir;
 
 void analyze_all_modules(Package* package) {
-    std::cout << "Analyzing package " << package->name << std::endl;
+    // std::cout << "Analyzing package " << package->name << std::endl;
     for (auto ep: package->units) {
         if (ep.second.type == U_TYPE::PACKAGE) {
             Package* subpackage = ep.second.package;
@@ -229,11 +229,11 @@ void analyze_all_modules(Package* package) {
             }
 
             for (auto path: module->imported_paths_no_alias_v) {
-                std::cout << "PATH: " << path.first << std::endl;
+                // std::cout << "PATH: " << path.first << std::endl;
                 add_path_to_module(module, path.second);
             }
             for (auto i: module->imported_paths_with_alias_v) {
-                std::cout << "PATH: " << i.first << std::endl;
+                // std::cout << "PATH: " << i.first << std::endl;
                 add_path_with_alias_to_module(module, i.first, i.second);
             }
             Checker checker;
@@ -246,16 +246,16 @@ void analyze_all_modules(Package* package) {
             if (checker.error_reporter.failed) {
                 throw std::runtime_error("Semantic analysis failed for module " + module->abs_path);
             }
-            std::cout << "- Done" << std::endl;
+            // std::cout << "- Done" << std::endl;
         }
     }
 }
 
 void transpile_all_modules(Package* package, std::string output_dir) {
-    std::cout << "Transpiling package " << package->name << " output dir: " << output_dir << std::endl;
+    // std::cout << "Transpiling package " << package->name << " output dir: " << output_dir << std::endl;
     std::string package_header;
     std::string output_package_dir = path_join(output_dir, package->name);
-    std::cout << "output package dir: " << output_package_dir << std::endl;
+    // std::cout << "output package dir: " << output_package_dir << std::endl;
     if (package->name != "") {
         mkdir(output_package_dir.c_str(), 0777);
     }
@@ -271,11 +271,11 @@ void transpile_all_modules(Package* package, std::string output_dir) {
             }
             STranspiler t;
             t.transpile_program(module->sast);
-            std::cout << "Source output: " << std::endl;
-            std::cout << t.source << std::endl;
-            std::cout << "Header output: " << std::endl;
-            std::cout << t.header << std::endl;
-            std::cout << "- Done" << std::endl;
+            // std::cout << "Source output: " << std::endl;
+            // std::cout << t.source << std::endl;
+            // std::cout << "Header output: " << std::endl;
+            // std::cout << t.header << std::endl;
+            // std::cout << "- Done" << std::endl;
 
             static_initializations += t.static_initializations;
             static_cleanups += t.static_cleanups;
@@ -319,7 +319,7 @@ void transpile_all_modules(Package* package, std::string output_dir) {
     }
     std::string output_package_header_path = path_join(output_package_dir, "__package__.h");
     std::ofstream output_package_header(output_package_header_path);
-    std::cout << "PACKAGE HEADER: " << package->path.as_str() << std::endl << package_header;
+    // std::cout << "PACKAGE HEADER: " << package->path.as_str() << std::endl << package_header;
     output_package_header << package_header;
 }
 
@@ -333,7 +333,7 @@ int main(int argc, char* argv[]) {
     project_output_dir = argv[2];
     project_output_dir += "/application";
     std::string __main_file__ = path_join(project_dir, u_basename(project_dir) + ".xl");
-    std::cout << style(BLUE, "Main file: ") << style(MAGENTA, __main_file__) << std::endl;
+    // std::cout << style(BLUE, "Main file: ") << style(MAGENTA, __main_file__) << std::endl;
     root_package = new Package("", project_dir, "");
     build_packages(root_package, 0);
     parse_all_modules(root_package);
@@ -350,7 +350,7 @@ int main(int argc, char* argv[]) {
             continue;
         }
         f = f.substr(0, f.size() - 3) + ".cpp";
-        std::cout << f << std::endl;
+        // std::cout << f << std::endl;
         all_files += f + " ";
     }
 

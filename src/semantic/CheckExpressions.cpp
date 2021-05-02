@@ -5,7 +5,7 @@
 #include "CheckExpressions.h"
 
 USemanticInfo Checker::visit_id(IdNode& n) {
-    Logger::info("Checking id node " + n._id);
+    // Logger::info("Checking id node " + n._id);
     SemanticInfo info;
     IdSNode* sn = new IdSNode();
     info.snode = sn;
@@ -136,7 +136,7 @@ USemanticInfo Checker::visit_binop(BinopNode& n) {
     SemanticInfo info;
     info.snode = sn;
 
-    Logger::info("Checking binop node");
+    // Logger::info("Checking binop node");
     USemanticInfo left_info_p = this->dispatch(n.left);
     USemanticInfo right_info_p = this->dispatch(n.right);
     if (left_info_p->entity.type == E_TYPE::ERROR || right_info_p->entity.type == E_TYPE::ERROR) {

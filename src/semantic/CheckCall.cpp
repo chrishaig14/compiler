@@ -8,7 +8,7 @@ USemanticInfo Checker::visit_call(CallNode& n) {
     SemanticInfo retv;
     CallSNode* sn = new CallSNode();
     retv.snode = sn;
-    Logger::info("Checking CallNode");
+    // Logger::info("Checking CallNode");
     bool old_is_call = this->is_call;
     this->is_call = true;
     USemanticInfo fun_info_p = this->dispatch(n.function);

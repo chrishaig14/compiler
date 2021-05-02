@@ -34,15 +34,15 @@ std::string entity_to_string(Entity entity) {
 
 void ErrorReporter::fail(std::string msg) {
     this->failed = true;
-    std::cout << "FAILING!" << std::endl;
+    // std::cout << "FAILING!" << std::endl;
     std::cout << msg << std::endl;
-    throw std::runtime_error("FAILED");
+    // throw std::runtime_error("FAILED");
 }
 
 void ErrorReporter::binop(Entity left, Entity right, TextPosition position) {
     std::string msg;
     msg = context_string(position) + E_FMT("Cannot perform binary op between types ") + E_HLT(entity_to_string(left)) +
-          E_FMT(" and ") + E_HLT(entity_to_string(right));
+          E_FMT(" and ") + E_HLT(entity_to_string(right)) + this->code_context_string(position);
     this->fail(msg);
 }
 
@@ -111,7 +111,8 @@ void ErrorReporter::assignment(const TypeNode& expected, const TypeNode& actual,
 void ErrorReporter::condition(Entity entity, TextPosition position, const std::string& st) {
     std::string msg;
     msg = context_string(position) + E_FMT(" Expected ") + E_HLT("Boolean ") +
-          E_FMT("as condition for " + st + " statement, got ") + E_HLT(entity_to_string(entity));
+          E_FMT("as condition for " + st + " statement, got ") + E_HLT(entity_to_string(entity)) +
+          this->code_context_string(position);
     this->fail(msg);
 }
 

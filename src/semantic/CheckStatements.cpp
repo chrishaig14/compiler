@@ -305,13 +305,14 @@ USemanticInfo Checker::visit_if(IfNode& n) {
     USemanticInfo condition_info_p = this->dispatch(n.condition);
     SemanticInfo& condition_info = *condition_info_p;
 
-    if (condition_info.entity.type != E_TYPE::OBJECT_VALUE) {
-        this->error_reporter.condition(condition_info.entity, n.condition->start, "if");
+    if (condition_info.entity.type != E_TYPE::ERROR) {
+        if (condition_info.entity.type != E_TYPE::OBJECT_VALUE) {
+            this->error_reporter.condition(condition_info.entity, n.condition->start, "if");
+        }
+        if (*condition_info.entity.object_value->ot != T_BOOL) {
+            this->error_reporter.condition(condition_info.entity, n.condition->start, "if");
+        }
     }
-    if (*condition_info.entity.object_value->ot != T_BOOL) {
-        this->error_reporter.condition(condition_info.entity, n.condition->start, "if");
-    }
-
     // std::unordered_map<std::string, bool> not_null_vars;
     // if (condition_info.type() == T_NONE) {
     //     this->error_reporter.function_doesnt_return_a_value(n.condition->start, new T_BOOL);
