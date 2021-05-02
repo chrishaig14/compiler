@@ -21,7 +21,7 @@ USemanticInfo Checker::visit_call(CallNode& n) {
     }
     bool is_def_const = n.function->ntype == NodeType::DEF_CONST;
     bool args_are_constant = true;
-    if (fun_info_p->is_error) {
+    if (fun_info_p->entity.type == E_TYPE::ERROR) {
         return error_stub();
     }
     SemanticInfo& fun_info = *fun_info_p;

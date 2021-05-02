@@ -75,7 +75,7 @@ USemanticInfo Checker::visit_boolop(BoolOpNode& n) {
     SemanticInfo& right_info = *right_info_p;
 
 
-    if (left_info.is_error || right_info.is_error) {
+    if (left_info.entity.type == E_TYPE::ERROR || right_info.entity.type == E_TYPE::ERROR) {
         return error_stub();
     }
 
@@ -172,7 +172,7 @@ USemanticInfo Checker::visit_binop(BinopNode& n) {
     sn->arguments.push_back(left_info.snode);
     sn->arguments.push_back(right_info.snode);
 
-    if (left_info.is_error || right_info.is_error) {
+    if (left_info.entity.type == E_TYPE::ERROR || right_info.entity.type == E_TYPE::ERROR) {
         return error_stub();
     }
 

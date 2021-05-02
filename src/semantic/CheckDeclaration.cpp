@@ -44,7 +44,7 @@ USemanticInfo Checker::check_declaration_with_type(DeclarationNode& n) {
 
     sn->expression = exp_info_p->snode;
     SemanticInfo& exp_info = *exp_info_p;
-    if (exp_info.is_error) {
+    if (exp_info.entity.type == E_TYPE::ERROR) {
         ObjectValue* ov = new ObjectValue();
         info.entity = Entity(ov);
         ov->ot = (ObjectType*) n.type->clone();

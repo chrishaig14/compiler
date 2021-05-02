@@ -20,7 +20,7 @@ USemanticInfo Checker::visit_assignment(AssignmentNode& n) {
     USemanticInfo linfo_p = this->dispatch(n.lvalue);
     this->is_lvalue = false;
 
-    if (linfo_p->is_error) {
+    if (linfo_p->entity.type == E_TYPE::ERROR) {
         return nullptr;
     }
 
@@ -48,7 +48,7 @@ USemanticInfo Checker::visit_assignment(AssignmentNode& n) {
         this->module->fill_actual(exp_type);
     }
 
-    if (expression_info_p->is_error) {
+    if (expression_info_p->entity.type == E_TYPE::ERROR) {
         return nullptr;
     }
     SemanticInfo& linfo = *linfo_p;
@@ -132,7 +132,7 @@ USemanticInfo Checker::visit_return(ReturnNode& n) {
     }
     USemanticInfo expression_info_p = this->dispatch(n.expression);
     SemanticInfo& expression_info = *expression_info_p;
-    if (expression_info.is_error) {
+    if (expression_info.entity.type == E_TYPE::ERROR) {
         return nullptr;
     }
     sn->expression = expression_info.snode;
