@@ -62,19 +62,6 @@ struct Value {
 enum class E_TYPE {
     PACKAGE, MODULE, CLASS, FUNCTION_VALUE, OBJECT_VALUE, CONST_FUNCTION, ERROR, NOT_FOUND, ENUM
 };
-//
-// struct Entity {
-//     E_TYPE type;
-//     union {
-//         Package* package;
-//         Module* module;
-//         Class* clazz;
-//         FunctionValue* function_value;
-//         ObjectValue* object_value;
-//         ConstFunction* const_function;
-//         Enum* enumm;
-//     };
-// };
 
 class Entity {
 public:
