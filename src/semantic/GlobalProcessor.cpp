@@ -67,7 +67,7 @@ void GlobalProcessor::visit(FunctionNode& node) {
     //     p->object().actual_base_path = this->get_actual_path({p->object().id});
     // }
     FunctionType function_info(x, node.return_type->clone());
-    Path function_path = Path(module_dotted_path, node.identifier);
+    Path function_path = Path(this->module->path, node.identifier);
     const_function->ft = function_info.clone();
     const_function->path = Path(this->module->path, node.identifier);
     node.path = const_function->path;

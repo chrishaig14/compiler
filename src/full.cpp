@@ -107,8 +107,6 @@ void process_global_all_modules(Package* package) {
             //     module->flirpins[builtin.first] = builtin.second;
             // }
             gp.module = module;
-            gp.root_package = root_package;
-            gp.module_dotted_path = module->path;
             gp.__file__ = module->abs_path;
             gp.visit_root(*module->ast);
             // module->imported_paths_no_alias = gp.imported_paths_no_alias;
