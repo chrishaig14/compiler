@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.16)
 project(xlang)
 
 set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror -Wpedantic -Wno-return-type")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 
 add_library(tinyxml tinyxml/tinyxml2.cpp tinyxml/tinyxml2.h)
 
