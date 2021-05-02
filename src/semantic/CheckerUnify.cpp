@@ -178,6 +178,10 @@ USemanticInfo Checker::object_member(SNode* object_snode, ObjectValue* pValue, s
         // is a single type param, error
         throw std::runtime_error("Error: no member " + child + " in totally generic type " + pValue->ot->to_string());
     }
+    if (pValue->ot->actual_base_path.as_str() == "core.Union") {
+        this->error_reporter.object_no_member(*pValue->ot, child, n.dot_pos);
+        return error_stub();
+    }
     Class* clazz = this->root_package->get(pValue->ot->actual_base_path).clazz;
     if (clazz->type_params.size() != 0) {
         clazz = instantiate_generic(clazz, *pValue->ot);
