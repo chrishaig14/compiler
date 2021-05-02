@@ -41,10 +41,6 @@ void GlobalProcessor::visit(ImportNode& node) {
         this->module->imported_paths_no_alias[node.path.back()] = node.path;
         this->module->imported_paths_no_alias_v.push_back(std::make_pair(node.path.back(), node.path));
     }
-    // this->module->inverted[Path(node.path).as_str()] = node.alias;
-    // for (auto imported_name: node.path) {
-    //     (*this->module_mappings[this->module_name])[imported_name] = (*this->module_mappings[node.module_name])[imported_name];
-    // }
 }
 
 
@@ -54,18 +50,10 @@ void GlobalProcessor::visit(FunctionNode& node) {
     VectorOfTypes x;
     for (auto p: node.parameter_types) {
         this->module->fill_actual(p);
-        // if (p->kind == Kind::OBJECT && !p->is_generic_param) {
-        //     p->object().actual_base_path = this->get_actual_path({p->object().id});
-        // } else if (p->kind == Kind::FUNCTION) {
-        //
-        // }
         x.emplace_back(p->clone());
     }
     TypeNode* p = node.return_type;
     this->module->fill_actual(p);
-    // if (p->kind == Kind::OBJECT && !p->is_generic_param) {
-    //     p->object().actual_base_path = this->get_actual_path({p->object().id});
-    // }
     FunctionType function_info(x, node.return_type->clone());
     Path function_path = Path(this->module->path, node.identifier);
     const_function->ft = function_info.clone();
