@@ -307,7 +307,6 @@ USemanticInfo Checker::visit_if(IfNode& n) {
 
     if (condition_info.entity.type != E_TYPE::OBJECT_VALUE) {
         this->error_reporter.condition(condition_info.entity, n.condition->start, "if");
-        throw std::runtime_error("If condition should be a Boolean");
     }
     if (*condition_info.entity.object_value->ot != T_BOOL) {
         throw std::runtime_error("If condition should be a Boolean");
