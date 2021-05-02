@@ -65,7 +65,6 @@ class Checker {
     std::string current_class;
     std::string current_function;
     std::unordered_map<std::string, SymbolTable*> scopes;
-    std::vector<ObjectType*> tuple_types;
     SymbolTable* scope;
     TypeNode* this_type;
 public:
