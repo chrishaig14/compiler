@@ -276,7 +276,7 @@ USemanticInfo Checker::visit_while(WhileNode& node) {
     USemanticInfo condition_p = this->dispatch(node.condition);
     SemanticInfo& condition = *condition_p;
     if (condition.entity.type != E_TYPE::OBJECT_VALUE) {
-        throw std::runtime_error("Error condition should be a Boolean value");
+        this->error_reporter.condition(condition.entity, node.start, "while");
     }
     ObjectType* condition_ot = condition.entity.object_value->ot;
     if (*condition_ot != T_BOOL) {
