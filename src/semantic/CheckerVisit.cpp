@@ -76,8 +76,9 @@ USemanticInfo Checker::visit_list(ListNode& node) {
 USemanticInfo Checker::visit_boolean(BooleanNode& node) {
     SemanticInfo info;
     info.entity = Entity(new ObjectValue());
-    info.entity.object_value->ot = new T_BOOL;
-    info.entity.object_value->ot->actual_base_path = Path("core.Boolean");
+    ObjectType* ot = new T_BOOL;
+    ot->actual_base_path = Path("core.Boolean");
+    info.entity.object_value->ot = ot;
     info.snode = new BoolSNode(node.value);
     return std::make_unique<SemanticInfo>(info);
 }
