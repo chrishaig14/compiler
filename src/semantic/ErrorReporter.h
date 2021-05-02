@@ -10,6 +10,7 @@
 #include "../scanner/TextPosition.h"
 #include "../nodes/TypeNode.h"
 #include "../scanner/CodeLines.h"
+#include "../units/Entity.h"
 
 class ErrorReporter {
 public:
@@ -75,6 +76,8 @@ public:
     void module_no_member(const std::string& module_name, const std::string& member, TextPosition position);
     void package_no_member(const std::string& package_name, const std::string& member, TextPosition position);
     void function_call_num_args(FunctionType& ft, TextPosition position);
+    void match_type(ObjectType& type, TextPosition pos);
+    void match_type(Entity entity, TextPosition pos);
 };
 
 

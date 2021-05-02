@@ -158,7 +158,8 @@ USemanticInfo Checker::visit_match(MatchExpressionNode* node) {
     SemanticInfo info;
     USemanticInfo exp_info = this->dispatch(node->exp);
     if (exp_info->entity.type != E_TYPE::OBJECT_VALUE) {
-        throw std::runtime_error("Error, match expression should have type Union[...]");
+        this->error_reporter.match_type(exp_info->entity, TextPosition());
+        return error_stub();
     }
 
     ObjectType* ot = exp_info->entity.object_value->ot;
@@ -166,7 +167,8 @@ USemanticInfo Checker::visit_match(MatchExpressionNode* node) {
         ot = (ObjectType*) ot->aliased_type;
     }
     if (ot->id != "Union") {
-        throw std::runtime_error("Error, match expression should have type Union[...]");
+        this->error_reporter.match_type(exp_info->entity, TextPosition());
+        return error_stub();
     }
     std::vector<std::pair<int, BlockSNode*>> cas;
     std::string varname = "match_var";

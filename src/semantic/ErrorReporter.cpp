@@ -10,6 +10,27 @@
 
 #include "Checker.h"
 
+std::string entity_to_string(Entity entity) {
+    std::string out;
+    switch (entity.type) {
+        case E_TYPE::PACKAGE:
+            return "package " + E_HLT(entity.package->name);
+        case E_TYPE::MODULE:
+            return "module " + E_HLT(entity.module->name);
+        case E_TYPE::CLASS:
+            return "class " + E_HLT(entity.clazz->class_name);
+        case E_TYPE::FUNCTION_VALUE:
+        case E_TYPE::OBJECT_VALUE:
+        case E_TYPE::CONST_FUNCTION:
+            return "function " + E_HLT(entity.const_function->path.as_vec().back());
+        case E_TYPE::ERROR:
+        case E_TYPE::NOT_FOUND:
+        case E_TYPE::ENUM:
+            return "enum " + E_HLT(entity.enumm->enumm_name);
+    }
+    return out;
+}
+
 void ErrorReporter::fail(std::string msg) {
     this->failed = true;
     std::cout << "FAILING!" << std::endl;
@@ -332,4 +353,16 @@ void ErrorReporter::class_not_generic(const std::string& cls, TextPosition pos) 
 
 ErrorReporter::ErrorReporter() {
     this->failed = false;
+}
+
+void ErrorReporter::match_type(Entity entity, TextPosition pos) {
+    std::string msg;
+    msg = this->context_string(pos) + E_FMT("Match statement expects a ") + E_HLT("Union[...]") + E_FMT(" expression");
+    if (entity.type == E_TYPE::OBJECT_VALUE) {
+        msg += E_FMT(", but got " + entity.object_value->ot->to_string());
+    } else {
+        msg += E_FMT(", but got " + entity_to_string(entity));
+    }
+    this->code_context_string(pos);
+    this->fail(msg);
 }
