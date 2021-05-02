@@ -1208,8 +1208,8 @@ USemanticInfo Checker::visit_boolop(BoolOpNode& n) {
     const TypeNode& ltype = *get_entity_type(left_info_p->entity);
     const TypeNode& rtype = *get_entity_type(right_info_p->entity);
     if (ltype != rtype) {
-        throw std::runtime_error("Binary operation between values of different types: " + ltype.to_string() + " and " +
-                                 rtype.to_string());
+        this->error_reporter.binop(ltype, rtype, n.start);
+        return error_stub();
     }
 
     if (ltype == T_NONE) {
