@@ -1599,11 +1599,10 @@ USemanticInfo Checker::visit_return(ReturnNode& n) {
     ReturnSNode* sn = new ReturnSNode();
     info.snode = sn;
     Entity return_entity = this->scope->get("__return__");
-    TypeNode* return_typet;
+    TypeNode* return_typet = nullptr;
     if (return_entity.type == E_TYPE::FUNCTION_VALUE) {
         return_typet = return_entity.function_value->ft;
-    }
-    if (return_entity.type == E_TYPE::OBJECT_VALUE) {
+    } else if (return_entity.type == E_TYPE::OBJECT_VALUE) {
         return_typet = return_entity.object_value->ot;
     }
     TypeNode* return_type = return_typet;
