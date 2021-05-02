@@ -32,297 +32,270 @@ std::string entity_to_string(Entity entity) {
     return out;
 }
 
-void ErrorReporter::fail(std::string msg) {
+void ErrorReporter::fail(std::string msg, TextPosition pos) {
     this->failed = true;
-    // std::cout << "FAILING!" << std::endl;
-    std::cout << msg << std::endl;
-    // throw std::runtime_error("FAILED");
+    std::string out = this->context_string(pos) + msg + this->code_context_string(pos);
+    std::cout << out << std::endl;
 }
 
-void ErrorReporter::binop(Entity left, Entity right, TextPosition position) {
+void ErrorReporter::binop(Entity left, Entity right, TextPosition pos) {
     std::string msg;
-    msg = context_string(position) + E_FMT("Cannot perform binary op between types ") + E_HLT(entity_to_string(left)) +
-          E_FMT(" and ") + E_HLT(entity_to_string(right)) + this->code_context_string(position);
-    this->fail(msg);
+    msg = E_FMT("Cannot perform binary op between types ") + E_HLT(entity_to_string(left)) + E_FMT(" and ") +
+          E_HLT(entity_to_string(right));
+    this->fail(msg, pos);
 }
 
-void ErrorReporter::object_no_member(const TypeNode& t, const std::string& member, TextPosition position) {
+void ErrorReporter::object_no_member(const TypeNode& t, const std::string& member, TextPosition pos) {
     std::string msg;
-    msg = this->context_string(position) + E_FMT("Object of type ") + E_HLT(t.to_string()) + E_FMT(" has no member ") +
-          E_HLT("'" + member + "'") + this->code_context_string(position);
-    this->fail(msg);
-}
-
-
-void ErrorReporter::class_no_member(const TypeNode& t, const std::string& member, TextPosition position) {
-    std::string msg;
-    msg = this->context_string(position) + E_FMT("Class ") + E_HLT(t.to_string()) + E_FMT(" has no member ") +
-          E_HLT("'" + member + "'") + this->code_context_string(position);
-    this->fail(msg);
-}
-
-void ErrorReporter::module_no_member(const std::string& module_name, const std::string& member, TextPosition position) {
-    std::string msg;
-    msg = this->context_string(position) + E_FMT("Module ") + E_HLT(module_name) + E_FMT(" has no member ") +
-          E_HLT("'" + member + "'") + this->code_context_string(position);
-    this->fail(msg);
-}
-
-void
-ErrorReporter::package_no_member(const std::string& package_name, const std::string& member, TextPosition position) {
-    std::string msg;
-    msg = this->context_string(position) + E_FMT("Package ") + E_HLT(package_name) + E_FMT(" has no member ") +
-          E_HLT("'" + member + "'") + this->code_context_string(position);
-    this->fail(msg);
+    msg = E_FMT("Object of type ") + E_HLT(t.to_string()) + E_FMT(" has no member ") + E_HLT("'" + member + "'");
+    this->fail(msg, pos);
 }
 
 
-void ErrorReporter::no_member(const TypeNode& t, const std::string& member, TextPosition position) {
+void ErrorReporter::class_no_member(const TypeNode& t, const std::string& member, TextPosition pos) {
     std::string msg;
-    msg = this->context_string(position) + E_FMT("Type ") + E_HLT(t.to_string()) + E_FMT(" has no member ") +
-          E_HLT("'" + member + "'") + this->code_context_string(position);
-    this->fail(msg);
+    msg = E_FMT("Class ") + E_HLT(t.to_string()) + E_FMT(" has no member ") + E_HLT("'" + member + "'");
+    this->fail(msg, pos);
 }
 
-void ErrorReporter::method_not_member(const TypeNode& t, const std::string& member, TextPosition position) {
+void ErrorReporter::module_no_member(const std::string& module_name, const std::string& member, TextPosition pos) {
     std::string msg;
-    msg = this->context_string(position) + E_HLT(member) + E_FMT(" is a method, not a member, of ") +
-          E_HLT(t.to_string()) + E_FMT(" use ") + E_HLT("':'") + E_FMT(" instead of ") + E_HLT("'.'") +
-          this->code_context_string(position);
-    this->fail(msg);
+    msg = E_FMT("Module ") + E_HLT(module_name) + E_FMT(" has no member ") + E_HLT("'" + member + "'");
+    this->fail(msg, pos);
 }
 
-void ErrorReporter::bool_op(Entity left, Entity right, TextPosition position) {
+void ErrorReporter::package_no_member(const std::string& package_name, const std::string& member, TextPosition pos) {
     std::string msg;
-    msg = context_string(position) + E_FMT("Cannot perform bool op between types ") + E_HLT(entity_to_string(left)) +
-          E_FMT(" and ") + E_HLT(entity_to_string(right));
-    this->fail(msg);
+    msg = E_FMT("Package ") + E_HLT(package_name) + E_FMT(" has no member ") + E_HLT("'" + member + "'");
+    this->fail(msg, pos);
 }
 
-void ErrorReporter::assignment(const TypeNode& expected, const TypeNode& actual, TextPosition position) {
+
+void ErrorReporter::no_member(const TypeNode& t, const std::string& member, TextPosition pos) {
     std::string msg;
-    msg = context_string(position) + E_FMT("Expected ") + E_HLT(expected.to_string()) + E_FMT("(alias for ") +
-          E_HLT(expected.actual_to_string()) + E_FMT(")") + E_FMT(", got ") + E_HLT(actual.to_string()) +
-          E_FMT(" (alias for ") + E_HLT(actual.actual_to_string()) + E_FMT(")") +
-          this->code_error_string(position, position);
-    this->fail(msg);
+    msg = E_FMT("Type ") + E_HLT(t.to_string()) + E_FMT(" has no member ") + E_HLT("'" + member + "'");
+    this->fail(msg, pos);
 }
 
-void ErrorReporter::condition(Entity entity, TextPosition position, const std::string& st) {
+void ErrorReporter::method_not_member(const TypeNode& t, const std::string& member, TextPosition pos) {
     std::string msg;
-    msg = context_string(position) + E_FMT(" Expected ") + E_HLT("Boolean ") +
-          E_FMT("as condition for " + st + " statement, got ") + E_HLT(entity_to_string(entity)) +
-          this->code_context_string(position);
-    this->fail(msg);
+    msg = E_HLT(member) + E_FMT(" is a method, not a member, of ") + E_HLT(t.to_string()) + E_FMT(" use ") +
+          E_HLT("':'") + E_FMT(" instead of ") + E_HLT("'.'");
+    this->fail(msg, pos);
 }
 
-void ErrorReporter::no_return(const TypeNode& t, TextPosition position) {
+void ErrorReporter::bool_op(Entity left, Entity right, TextPosition pos) {
     std::string msg;
-    msg = context_string(position) + E_FMT(" Expected to return ") + E_HLT(t.to_string()) +
-          E_FMT(" but not returning anything");
-    this->fail(msg);
+    msg = E_FMT("Cannot perform bool op between types ") + E_HLT(entity_to_string(left)) + E_FMT(" and ") +
+          E_HLT(entity_to_string(right));
+    this->fail(msg, pos);
 }
 
-void ErrorReporter::function_doesnt_return_a_value(TextPosition position, const TypeNode* expected_type) {
+void ErrorReporter::assignment(const TypeNode& expected, const TypeNode& actual, TextPosition pos) {
     std::string msg;
-    msg = context_string(position) + E_FMT(" Function doesn't return a value but its being used as an expression") +
-          (expected_type != nullptr ? E_FMT(", expected ") + E_HLT(expected_type->to_string()) : "") +
-          this->code_context_string(position);
-    this->fail(msg);
+    msg = E_FMT("Expected ") + E_HLT(expected.to_string()) + E_FMT("(alias for ") + E_HLT(expected.actual_to_string()) +
+          E_FMT(")") + E_FMT(", got ") + E_HLT(actual.to_string()) + E_FMT(" (alias for ") +
+          E_HLT(actual.actual_to_string()) + E_FMT(")");
+    this->fail(msg, pos);
 }
 
-void ErrorReporter::bad_return(TextPosition position) {
+void ErrorReporter::condition(Entity entity, TextPosition pos, const std::string& st) {
     std::string msg;
-    msg = E_HLT(text_pos_to_string(this->__file__, position)) +
+    msg = E_FMT(" Expected ") + E_HLT("Boolean ") + E_FMT("as condition for " + st + " statement, got ") +
+          E_HLT(entity_to_string(entity));
+    this->fail(msg, pos);
+}
+
+void ErrorReporter::no_return(const TypeNode& t, TextPosition pos) {
+    std::string msg;
+    msg = E_FMT(" Expected to return ") + E_HLT(t.to_string()) + E_FMT(" but not returning anything");
+    this->fail(msg, pos);
+}
+
+void ErrorReporter::function_doesnt_return_a_value(TextPosition pos, const TypeNode* expected_type) {
+    std::string msg;
+    msg = E_FMT(" Function doesn't return a value but its being used as an expression") +
+          (expected_type != nullptr ? E_FMT(", expected ") + E_HLT(expected_type->to_string()) : "");
+    this->fail(msg, pos);
+}
+
+void ErrorReporter::bad_return(TextPosition pos) {
+    std::string msg;
+    msg = E_HLT(text_pos_to_string(this->__file__, pos)) +
           E_FMT(" Returning a value from a function returning no value ");
-    this->fail(msg);
+    this->fail(msg, pos);
 }
 
-void ErrorReporter::return_mismatch(const TypeNode& expected, const TypeNode& actual, TextPosition position) {
+void ErrorReporter::return_mismatch(const TypeNode& expected, const TypeNode& actual, TextPosition pos) {
     std::string msg;
-    msg = E_HLT(text_pos_to_string(this->__file__, position)) + E_FMT(" In function ") +
+    msg = E_HLT(text_pos_to_string(this->__file__, pos)) + E_FMT(" In function ") +
           E_HLT((this->current_class == "" ? "" : this->current_class + ".") + this->current_function) + E_FMT(": ") +
           E_FMT(" Expected to return ") + E_HLT(expected.to_string()) + E_FMT(" but got ") + E_HLT(actual.to_string());
-    this->fail(msg);
+    this->fail(msg, pos);
 }
 
 void ErrorReporter::tuple_assign(TextPosition pos) {
-    std::string msg = this->context_string(pos) + E_FMT("Error: can't reassign a member of a tuple!") +
-                      this->code_context_string(pos);
-    this->fail(msg);
+    std::string msg = E_FMT("Error: can't reassign a member of a tuple!");
+    this->fail(msg, pos);
 }
 
 void ErrorReporter::subscript_non_object(TextPosition pos) {
     std::string msg;
-    msg = this->context_string(pos) + E_FMT("Accessing subscript of non object") + this->code_context_string(pos);
-    this->fail(msg);
+    msg = E_FMT("Accessing subscript of non object");
+    this->fail(msg, pos);
 }
 
 void ErrorReporter::string_immutable(TextPosition pos) {
     std::string msg;
-    msg = this->context_string(pos) + E_FMT("Strings are immutable") + this->code_context_string(pos);
-    this->fail(msg);
+    msg = E_FMT("Strings are immutable");
+    this->fail(msg, pos);
 }
 
-void ErrorReporter::_for(Entity t, TextPosition position) {
+void ErrorReporter::_for(Entity t, TextPosition pos) {
     std::string msg;
-    msg = this->context_string(position) + E_FMT(" Expected") + E_HLT(" List[t] ") + E_FMT("in loop, but got ") +
-          E_HLT(entity_to_string(t)) + this->code_context_string(position);
-    this->fail(msg);
+    msg = E_FMT(" Expected") + E_HLT(" List[t] ") + E_FMT("in loop, but got ") + E_HLT(entity_to_string(t));
+    this->fail(msg, pos);
 }
 
 void ErrorReporter::tuple_member_not_immutable(const TypeNode& t, TextPosition pos) {
     std::string msg;
-    msg = this->context_string(pos) + E_FMT("Tuple member not immutable, it's of type ") + E_HLT(t.to_string()) +
-          this->code_context_string(pos);
-    this->fail(msg);
+    msg = E_FMT("Tuple member not immutable, it's of type ") + E_HLT(t.to_string());
+    this->fail(msg, pos);
 }
 
 void ErrorReporter::generic_call_mismatch(const TypeNode& expected, const TypeNode& actual, int i) {
     std::string msg =
             E_FMT("Error matching argument number " + std::to_string(i) + " expected ") + E_HLT(expected.to_string()) +
             E_FMT(" got ") + E_HLT(actual.to_string()) + "\n";
-    this->fail(msg);
+    this->fail(msg, TextPosition());
 }
 
 void ErrorReporter::call_bad_num_args() {
     std::string msg = "Function call with wrong number of arguments!";
-    this->fail(msg);
+    this->fail(msg, TextPosition());
 }
 
 void ErrorReporter::function_no_member(TextPosition pos) {
     std::string msg;
-    msg = this->context_string(pos) + E_FMT("Function has no members") + this->code_context_string(pos);
-    this->fail(msg);
+    msg = E_FMT("Function has no members");
+    this->fail(msg, pos);
 }
 
 void ErrorReporter::class_no_method(const std::string& class_name, const std::string method_name, TextPosition pos) {
     std::string msg;
-    msg = this->context_string(pos) + E_FMT("Class ") + E_HLT(class_name) + E_FMT(" has no method ") +
-          E_HLT(method_name) + this->code_context_string(pos);
-    this->fail(msg);
+    msg = E_FMT("Class ") + E_HLT(class_name) + E_FMT(" has no method ") + E_HLT(method_name);
+    this->fail(msg, pos);
 }
 
 void ErrorReporter::redeclared(const std::string& name, TextPosition pos) {
     std::string msg;
-    msg = this->context_string(pos) + E_FMT("Variable ") + E_HLT(name) + E_FMT(" already declared ") +
-          this->code_context_string(pos);
-    this->fail(msg);
+    msg = E_FMT("Variable ") + E_HLT(name) + E_FMT(" already declared ");
+    this->fail(msg, pos);
 }
 
 void ErrorReporter::variable_not_declared(const std::string& name, TextPosition pos) {
     std::string msg;
-    msg = this->context_string(pos) + E_FMT("Variable ") + E_HLT("'" + name + "'") + E_FMT(" not declared") +
-          this->code_context_string(pos);
-    this->fail(msg);
+    msg = E_FMT("Variable ") + E_HLT("'" + name + "'") + E_FMT(" not declared");
+    this->fail(msg, pos);
 }
 
-void ErrorReporter::function_call_type_mismatch(const TypeNode& expected, const TypeNode& actual, TextPosition start,
+void ErrorReporter::function_call_type_mismatch(const TypeNode& expected, const TypeNode& actual, TextPosition pos,
                                                 TextPosition end) {
     std::string msg;
-    msg = context_string(start) + E_FMT(" Function call type mismatch") + E_FMT(" expected ") +
-          E_HLT(expected.actual_to_string()) + E_FMT(" but got ") + E_HLT(actual.to_string()) + E_FMT(" (alias for ") +
-          E_HLT(actual.actual_to_string()) + E_FMT(")") + this->code_error_string(start, end);
-    this->fail(msg);
+    msg = E_FMT(" Function call type mismatch") + E_FMT(" expected ") + E_HLT(expected.actual_to_string()) +
+          E_FMT(" but got ") + E_HLT(actual.to_string()) + E_FMT(" (alias for ") + E_HLT(actual.actual_to_string()) +
+          E_FMT(")");
+    this->fail(msg, pos);
 }
 
 void ErrorReporter::unused_return_value(TextPosition pos) {
     std::string msg;
-    msg = this->context_string(pos) + E_FMT("Unused return value of function call") + this->code_context_string(pos);
-    this->fail(msg);
+    msg = E_FMT("Unused return value of function call");
+    this->fail(msg, pos);
 }
 
-void ErrorReporter::function_call_num_args(FunctionType& ft, TextPosition position) {
+void ErrorReporter::function_call_num_args(FunctionType& ft, TextPosition pos) {
     std::string msg;
-    msg = context_string(position) + E_FMT("Calling function of type ") + E_HLT(ft.to_string()) +
-          E_FMT(" with wrong number of arguments") + this->code_context_string(position);
-    this->fail(msg);
+    msg = E_FMT("Calling function of type ") + E_HLT(ft.to_string()) + E_FMT(" with wrong number of arguments");
+    this->fail(msg, pos);
 }
 
-void ErrorReporter::call_not_a_function(TextPosition position) {
+void ErrorReporter::call_not_a_function(TextPosition pos) {
     std::string msg;
-    msg = E_HLT(text_pos_to_string(this->__file__, position)) + E_FMT(" Calling something that's not a function");
-    this->fail(msg);
+    msg = E_HLT(text_pos_to_string(this->__file__, pos)) + E_FMT(" Calling something that's not a function");
+    this->fail(msg, pos);
 }
 
 void ErrorReporter::class_init_bad_member_type(const TypeNode& cls, const TypeNode& expected, const TypeNode& actual,
                                                TextPosition pos) {
     std::string msg;
-    msg = this->context_string(pos) + E_FMT("In initialization of class ") + E_HLT(cls.to_string()) +
-          E_FMT(" expected ") + E_HLT(expected.to_string()) + E_FMT(" but got ") + E_HLT(actual.to_string()) +
-          this->code_context_string(pos);
-    this->fail(msg);
+    msg = E_FMT("In initialization of class ") + E_HLT(cls.to_string()) + E_FMT(" expected ") +
+          E_HLT(expected.to_string()) + E_FMT(" but got ") + E_HLT(actual.to_string());
+    this->fail(msg, pos);
 }
 
 void ErrorReporter::class_not_found(const TypeNode& cls, TextPosition pos) {
     std::string msg;
-    msg = this->context_string(pos) + E_FMT("Class ") + E_HLT(cls.to_string()) + E_FMT(" not found") +
-          this->code_context_string(pos);
-    this->fail(msg);
+    msg = E_FMT("Class ") + E_HLT(cls.to_string()) + E_FMT(" not found");
+    this->fail(msg, pos);
 }
 
 void ErrorReporter::list_literal(const TypeNode& lt, const TypeNode& et, TextPosition pos) {
     std::string msg;
-    msg = this->context_string(pos) + E_FMT("List literal with element of wrong type, expected ") +
-          E_HLT(lt.to_string()) + E_FMT(" got ") + E_HLT(et.to_string()) + this->code_context_string(pos);
-    this->fail(msg);
+    msg = E_FMT("List literal with element of wrong type, expected ") + E_HLT(lt.to_string()) + E_FMT(" got ") +
+          E_HLT(et.to_string());
+    this->fail(msg, pos);
 }
 
 void ErrorReporter::function_return_last_stmt(const std::string& function_name, const TypeNode& et, TextPosition pos) {
     std::string msg;
-    msg = this->context_string(pos) + E_FMT("Error in function ") + E_HLT(function_name) +
-          E_FMT(": The last statement must be a return <EXPRESSION> of type ") + E_HLT(et.to_string()) +
-          this->code_context_string(pos);
-    this->fail(msg);
+    msg = E_FMT("Error in function ") + E_HLT(function_name) +
+          E_FMT(": The last statement must be a return <EXPRESSION> of type ") + E_HLT(et.to_string());
+    this->fail(msg, pos);
 }
 
 void ErrorReporter::partial_wrong_num_args(TextPosition pos) {
     std::string msg;
-    msg = this->context_string(pos) + E_FMT("wrong number of arguments for partial function") +
-          this->code_context_string(pos);
-    this->fail(msg);
+    msg = E_FMT("wrong number of arguments for partial function");
+    this->fail(msg, pos);
     throw std::runtime_error("Error: wrong number of arguments for partial function");
 }
 
 void
-ErrorReporter::partial_function_call_type_mismatch(const TypeNode& expected, const TypeNode& actual, TextPosition start,
+ErrorReporter::partial_function_call_type_mismatch(const TypeNode& expected, const TypeNode& actual, TextPosition pos,
                                                    TextPosition end) {
     std::string msg;
-    msg = context_string(start) + E_FMT(" Function call type mismatch") + E_FMT(" expected ") +
-          E_HLT(expected.to_string()) + E_FMT(" but got ") + E_HLT(actual.to_string()) +
-          this->code_error_string(start, end);
-    this->fail(msg);
+    msg = E_FMT(" Function call type mismatch") + E_FMT(" expected ") + E_HLT(expected.to_string()) +
+          E_FMT(" but got ") + E_HLT(actual.to_string());
+    this->fail(msg, pos);
 }
 
 void ErrorReporter::generic_class_wrong_type_param_number(const std::string& cls, int num_req, int num_given,
                                                           TextPosition pos) {
     std::string msg;
-    msg = this->context_string(pos) + E_FMT("Generic class ") + E_HLT(cls) +
-          E_FMT(" given " + std::to_string(num_given)) + E_FMT(" types but " + std::to_string(num_req) + " required") +
-          this->code_context_string(pos);
-    this->fail(msg);
+    msg = E_FMT("Generic class ") + E_HLT(cls) + E_FMT(" given " + std::to_string(num_given)) +
+          E_FMT(" types but " + std::to_string(num_req) + " required");
+    this->fail(msg, pos);
 }
 
 void ErrorReporter::class_init_wrong_number_init(const std::string& cls, int num_req, int num_given, TextPosition pos) {
     std::string msg;
-    msg = this->context_string(pos) + E_FMT("In initialization of class ") + E_HLT(cls) +
-          E_FMT(" expected " + std::to_string(num_req) + " initializers but got " + std::to_string(num_given)) +
-          this->code_context_string(pos);
-    this->fail(msg);
+    msg = E_FMT("In initialization of class ") + E_HLT(cls) +
+          E_FMT(" expected " + std::to_string(num_req) + " initializers but got " + std::to_string(num_given));
+    this->fail(msg, pos);
 }
 
 void ErrorReporter::class_init_member_not_init(const std::string& cls, std::string mem, TextPosition pos) {
     std::string msg;
-    msg = this->context_string(pos) + E_FMT(" Member ") + E_HLT(mem) + E_FMT(" not initialized") +
-          this->code_context_string(pos);
-    this->fail(msg);
+    msg = E_FMT(" Member ") + E_HLT(mem) + E_FMT(" not initialized");
+    this->fail(msg, pos);
 }
 
 void ErrorReporter::subscript_type(const TypeNode& t, const TypeNode& s, const TypeNode& es, TextPosition pos) {
     std::string msg;
-    msg = this->context_string(pos) + E_FMT("Expected ") + E_HLT(es.to_string()) + E_FMT(" in ") +
-          E_HLT(t.to_string()) + E_FMT(" subscript, but got ") + E_HLT(s.to_string()) + this->code_context_string(pos);
-    this->fail(msg);
+    msg = E_FMT("Expected ") + E_HLT(es.to_string()) + E_FMT(" in ") + E_HLT(t.to_string()) +
+          E_FMT(" subscript, but got ") + E_HLT(s.to_string());
+    this->fail(msg, pos);
 }
 
 std::string ErrorReporter::context_string(TextPosition position) {
@@ -347,9 +320,8 @@ std::string ErrorReporter::code_error_string(TextPosition start, TextPosition en
 
 void ErrorReporter::class_not_generic(const std::string& cls, TextPosition pos) {
     std::string msg;
-    msg = this->context_string(pos) + E_FMT("Class ") + E_HLT(cls) + E_FMT(" is not generic") +
-          this->code_context_string(pos);
-    this->fail(msg);
+    msg = E_FMT("Class ") + E_HLT(cls) + E_FMT(" is not generic");
+    this->fail(msg, pos);
 }
 
 ErrorReporter::ErrorReporter() {
@@ -358,27 +330,24 @@ ErrorReporter::ErrorReporter() {
 
 void ErrorReporter::match_type(Entity entity, TextPosition pos) {
     std::string msg;
-    msg = this->context_string(pos) + E_FMT("Match statement expects a ") + E_HLT("Union[...]") + E_FMT(" expression");
+    msg = E_FMT("Match statement expects a ") + E_HLT("Union[...]") + E_FMT(" expression");
     if (entity.type == E_TYPE::OBJECT_VALUE) {
         msg += E_FMT(", but got " + entity.object_value->ot->to_string());
     } else {
         msg += E_FMT(", but got " + entity_to_string(entity));
     }
-    this->code_context_string(pos);
-    this->fail(msg);
+    this->fail(msg, pos);
 }
 
 void ErrorReporter::expected_expression_with_type(Entity entity, TypeNode& exp_entity, TextPosition pos) {
     std::string msg;
-    msg = this->context_string(pos) + E_FMT("Expected an expression of type") + E_HLT(exp_entity.to_string()) +
+    msg = E_FMT("Expected an expression of type") + E_HLT(exp_entity.to_string()) +
           E_FMT(", but got " + entity_to_string(entity));
-    this->code_context_string(pos);
-    this->fail(msg);
+    this->fail(msg, pos);
 }
 
 void ErrorReporter::expected_expression(Entity entity, TextPosition pos) {
     std::string msg;
-    msg = this->context_string(pos) + E_FMT("Expected expression") + E_FMT(", but got " + entity_to_string(entity)) +
-          this->code_context_string(pos);
-    this->fail(msg);
+    msg = E_FMT("Expected expression") + E_FMT(", but got " + entity_to_string(entity));
+    this->fail(msg, pos);
 }
