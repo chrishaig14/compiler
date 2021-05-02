@@ -108,47 +108,47 @@ public:
     USemanticInfo dispatch(Node* nod);
 
     USemanticInfo visit_assignment(AssignmentNode& n);
-    USemanticInfo visit(BinopNode& node);
+    USemanticInfo visit_binop(BinopNode& node);
     USemanticInfo visit_block(BlockNode& node);
     USemanticInfo visit_root(BlockNode& node);
-    USemanticInfo visit(BooleanNode& node);
-    USemanticInfo visit(BoolOpNode& n);
-    USemanticInfo visit(BreakNode& node);
+    USemanticInfo visit_boolean(BooleanNode& node);
+    USemanticInfo visit_boolop(BoolOpNode& n);
+    USemanticInfo visit_break(BreakNode& node);
     USemanticInfo visit_call(CallNode& n);
     USemanticInfo visit_class(ClassNode& node);
-    USemanticInfo visit(ContinueNode& node);
+    USemanticInfo visit_continue(ContinueNode& node);
 
-    USemanticInfo visit(DeclarationNode& node);
+    USemanticInfo visit_declaration(DeclarationNode& n);
     USemanticInfo check_declaration_with_type(DeclarationNode& n);
     USemanticInfo check_declaration_without_type(DeclarationNode& n);
 
-    USemanticInfo visit(DictNode& node);
-    USemanticInfo visit(EmptyDictNode& node);
-    USemanticInfo visit(EmptyListNode& node);
-    USemanticInfo visit(FloatNode& node);
-    USemanticInfo visit(ForNode& node);
+    USemanticInfo visit_dict(DictNode& node);
+    USemanticInfo visit_emptydict(EmptyDictNode& node);
+    USemanticInfo visit_emptylist(EmptyListNode& node);
+    USemanticInfo visit_float(FloatNode& node);
+    USemanticInfo visit_for(ForNode& node);
     USemanticInfo visit_function(FunctionNode& n);
     USemanticInfo visit_id(IdNode& n);
-    USemanticInfo visit(IfNode& node);
-    USemanticInfo visit(ListNode& node);
+    USemanticInfo visit_if(IfNode& n);
+    USemanticInfo visit_list(ListNode& node);
 
     USemanticInfo visit_member(MemberNode& n);
     USemanticInfo class_member(Class* cls, std::string child);
 
-    USemanticInfo visit(NoneNode& node);
+    USemanticInfo visit_none(NoneNode& node);
     USemanticInfo visit_import(ImportNode& node);
-    USemanticInfo visit(NumberNode& node);
-    USemanticInfo visit(PartialApplication& node);
+    USemanticInfo visit_number(NumberNode& node);
+    USemanticInfo visit_partial(PartialApplication& node);
     USemanticInfo visit_return(ReturnNode& n);
-    USemanticInfo visit(StringNode& node);
-    USemanticInfo visit(SubscriptNode& node);
-    USemanticInfo visit(TernaryNode& node);
-    USemanticInfo visit(TupleNode& node);
-    USemanticInfo visit(WhileNode& node);
+    USemanticInfo visit_string(StringNode& node);
+    USemanticInfo visit_subscript(SubscriptNode& node);
+    USemanticInfo visit_ternary(TernaryNode& node);
+    USemanticInfo visit_tuple(TupleNode& node);
+    USemanticInfo visit_while(WhileNode& node);
     USemanticInfo member_class_method(std::string class_name, std::string child, MemberNode& n);
     USemanticInfo member_tuple(const ObjectType& final_type, MemberNode& n);
-    USemanticInfo visit(CastNode& n);
-    USemanticInfo visit(DefaultConstructorNode& node);
+    USemanticInfo visit_cast(CastNode& n);
+    USemanticInfo visit_defconst(DefaultConstructorNode& node);
 
     ErrorReporter error_reporter;
     Entity this_entity;
@@ -164,9 +164,8 @@ public:
     std::string loop_list_len_var_id;
     USemanticInfo visit_match(MatchExpressionNode* node);
     USemanticInfo visit_alias(AliasNode* pNode);
-    USemanticInfo visit_enum(EnumNode* pNode);
     USemanticInfo enum_member(Enum* enumm, std::string value, MemberNode& node);
-    USemanticInfo visit_enum(EnumNode& node);
+    USemanticInfo visit_enum(EnumNode& pNode);
 };
 
 int target_union_type(const ObjectType& target, const TypeNode& source);

@@ -41,7 +41,7 @@ Entity entity_from_type(const TypeNode& type) {
     return Entity{.type=E_TYPE::OBJECT_VALUE, .object_value=fv};
 }
 
-USemanticInfo Checker::visit(ListNode& node) {
+USemanticInfo Checker::visit_list(ListNode& node) {
     USemanticInfo element_type_p = this->dispatch(node.elements[0]);
     TypeNode* element_type = element_type_p->entity.object_value->ot->clone();
     node.elements[0] = this->replace_if_necessary(node.elements[0]);
@@ -75,7 +75,7 @@ USemanticInfo Checker::visit(ListNode& node) {
     return std::make_unique<SemanticInfo>(return_info);
 }
 
-USemanticInfo Checker::visit(BooleanNode& node) {
+USemanticInfo Checker::visit_boolean(BooleanNode& node) {
     SemanticInfo info;
     info.entity = Entity{.type=E_TYPE::OBJECT_VALUE, .object_value=new ObjectValue()};
     info.entity.object_value->ot = new T_BOOL;
@@ -84,7 +84,7 @@ USemanticInfo Checker::visit(BooleanNode& node) {
     return std::make_unique<SemanticInfo>(info);
 }
 
-USemanticInfo Checker::visit(WhileNode& node) {
+USemanticInfo Checker::visit_while(WhileNode& node) {
     WhileSNode* while_sn = new WhileSNode();
     SemanticInfo info;
     info.snode = while_sn;
@@ -111,7 +111,7 @@ USemanticInfo Checker::visit(WhileNode& node) {
     return std::make_unique<SemanticInfo>(info);
 }
 
-USemanticInfo Checker::visit(NumberNode& node) {
+USemanticInfo Checker::visit_number(NumberNode& node) {
     SemanticInfo info;
     switch (node.num_type) {
         case NumberType::INTEGER: {
@@ -147,7 +147,7 @@ USemanticInfo Checker::visit(NumberNode& node) {
     return std::make_unique<SemanticInfo>(info);
 }
 
-USemanticInfo Checker::visit(StringNode& node) {
+USemanticInfo Checker::visit_string(StringNode& node) {
     SemanticInfo info;
     info.set_type(T_STRING);
     info.is_constant = true;
@@ -161,7 +161,7 @@ USemanticInfo Checker::visit(StringNode& node) {
     return std::make_unique<SemanticInfo>(info);
 }
 
-USemanticInfo Checker::visit(SubscriptNode& node) {
+USemanticInfo Checker::visit_subscript(SubscriptNode& node) {
     USemanticInfo parent_p = this->dispatch(node.parent);
     Entity entity_parent = parent_p->entity;
     if (entity_parent.type != E_TYPE::OBJECT_VALUE) {
@@ -228,14 +228,14 @@ USemanticInfo Checker::visit(SubscriptNode& node) {
     return std::make_unique<SemanticInfo>(info);
 }
 
-USemanticInfo Checker::visit(BreakNode& node) {
+USemanticInfo Checker::visit_break(BreakNode& node) {
     // node.loop_vars = this->scope->get_all_in_loop();
     SemanticInfo info;
     info.snode = new BreakSNode();
     return std::make_unique<SemanticInfo>(info);
 }
 
-USemanticInfo Checker::visit(TernaryNode& node) {
+USemanticInfo Checker::visit_ternary(TernaryNode& node) {
     USemanticInfo expression_info_p = this->dispatch(node.expression);
     SemanticInfo& expression_info = *expression_info_p;
     if (expression_info.type().kind != Kind::OBJECT) {
@@ -267,13 +267,13 @@ USemanticInfo Checker::visit(TernaryNode& node) {
     return std::make_unique<SemanticInfo>(semanticInfo);
 }
 
-USemanticInfo Checker::visit(NoneNode& node) {
+USemanticInfo Checker::visit_none(NoneNode& node) {
     SemanticInfo info;
     info.set_type(ObjectType("NoneType"));
     return std::make_unique<SemanticInfo>(info);
 }
 
-USemanticInfo Checker::visit(EmptyListNode& node) {
+USemanticInfo Checker::visit_emptylist(EmptyListNode& node) {
     SemanticInfo info;
     this->module->fill_actual(node.type);
     ObjectValue* ov = new ObjectValue();
@@ -437,7 +437,7 @@ USemanticInfo Checker::visit_class(ClassNode& node) {
     return std::make_unique<SemanticInfo>(info);
 }
 
-USemanticInfo Checker::visit(ContinueNode& node) {
+USemanticInfo Checker::visit_continue(ContinueNode& node) {
     SemanticInfo info;
     BlockSNode* bn = new BlockSNode();
     info.snode = bn;
@@ -448,7 +448,7 @@ USemanticInfo Checker::visit(ContinueNode& node) {
     return std::make_unique<SemanticInfo>(info);
 }
 
-USemanticInfo Checker::visit(TupleNode& node) {
+USemanticInfo Checker::visit_tuple(TupleNode& node) {
     VectorOfTypes types;
     std::vector<SNode*> values;
     for (auto n: node.values) {
@@ -473,13 +473,13 @@ USemanticInfo Checker::visit(TupleNode& node) {
     return std::make_unique<SemanticInfo>(sinfo);
 }
 
-USemanticInfo Checker::visit(FloatNode& node) {
+USemanticInfo Checker::visit_float(FloatNode& node) {
     SemanticInfo s;
     s.set_type(T_FLOAT);
     return std::make_unique<SemanticInfo>(s);
 }
 
-USemanticInfo Checker::visit(PartialApplication& node) {
+USemanticInfo Checker::visit_partial(PartialApplication& node) {
     USemanticInfo func = this->dispatch(node.function);
     VectorOfTypes partial_args;
     FunctionType* fun_type = nullptr;
@@ -586,7 +586,7 @@ SNode* Checker::make_for_snode(ForNode& node, USemanticInfo& binfo, USemanticInf
 }
 
 
-USemanticInfo Checker::visit(ForNode& node) {
+USemanticInfo Checker::visit_for(ForNode& node) {
     USemanticInfo exp_info_p = this->dispatch(node.exp);
     if (exp_info_p->entity.type != E_TYPE::OBJECT_VALUE) {
         throw std::runtime_error("iterating over something that's not an object");
@@ -1130,7 +1130,7 @@ USemanticInfo Checker::check_declaration_without_type(DeclarationNode& n) {
 }
 
 
-USemanticInfo Checker::visit(DeclarationNode& n) {
+USemanticInfo Checker::visit_declaration(DeclarationNode& n) {
     Logger::info("Checking DeclarationNode for var: " + n.identifier);
     if (this->scope->declared(n.identifier)) {
         this->error_reporter.redeclared(n.identifier, n.start);
@@ -1306,7 +1306,7 @@ USemanticInfo Checker::visit_member(MemberNode& n) {
     return error_stub();
 }
 
-USemanticInfo Checker::visit(CastNode& n) {
+USemanticInfo Checker::visit_cast(CastNode& n) {
     USemanticInfo exp_info = this->dispatch(n.exp);
     SemanticInfo info;
     ObjectType cast_type(n.as_type, {});
@@ -1335,7 +1335,7 @@ SNode* make_if_snode(SNode* condition, SNode* body, std::vector<std::pair<SNode*
     return ifs;
 }
 
-USemanticInfo Checker::visit(IfNode& n) {
+USemanticInfo Checker::visit_if(IfNode& n) {
     SemanticInfo info;
     USemanticInfo condition_info_p = this->dispatch(n.condition);
     SemanticInfo& condition_info = *condition_info_p;
@@ -1414,7 +1414,7 @@ SNode* make_boolop_snode(ConstFunction* operator_fun, SemanticInfo& left_info, S
     return sn;
 }
 
-USemanticInfo Checker::visit(BoolOpNode& n) {
+USemanticInfo Checker::visit_boolop(BoolOpNode& n) {
     USemanticInfo left_info_p = this->dispatch(n.left);
     USemanticInfo right_info_p = this->dispatch(n.right);
     SemanticInfo info;
@@ -1510,7 +1510,7 @@ std::string map_binop_to_method_name(OpType op) {
     return funs[op];
 }
 
-USemanticInfo Checker::visit(BinopNode& n) {
+USemanticInfo Checker::visit_binop(BinopNode& n) {
 
     CallSNode* sn = new CallSNode();
     IdSNode* function_id = new IdSNode();
@@ -1651,7 +1651,7 @@ USemanticInfo Checker::visit_return(ReturnNode& n) {
     return std::make_unique<SemanticInfo>(info);
 }
 
-USemanticInfo Checker::visit(DictNode& node) {
+USemanticInfo Checker::visit_dict(DictNode& node) {
     SemanticInfo info;
     USemanticInfo first_key_type = this->dispatch(node.items[0].first);
     USemanticInfo first_value_type = this->dispatch(node.items[0].second);
@@ -1670,13 +1670,13 @@ USemanticInfo Checker::visit(DictNode& node) {
     return std::make_unique<SemanticInfo>(info);
 }
 
-USemanticInfo Checker::visit(EmptyDictNode& node) {
+USemanticInfo Checker::visit_emptydict(EmptyDictNode& node) {
     SemanticInfo info;
     info.set_type(ObjectType("Dict", {node.key_type, node.value_type}));
     return std::make_unique<SemanticInfo>(info);
 }
 
-USemanticInfo Checker::visit(DefaultConstructorNode& node) {
+USemanticInfo Checker::visit_defconst(DefaultConstructorNode& node) {
     // this is a regular function
     SemanticInfo info;
     VectorOfTypes t;

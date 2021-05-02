@@ -412,69 +412,69 @@ USemanticInfo Checker::dispatch(Node* nod) {
         case NodeType::ASSIGN:
             return this->visit_assignment(n.assign());
         case NodeType::ENUM:
-            return this->visit_enum((EnumNode&) n);
+            return this->visit_enum((EnumNode&) nod);
         case NodeType::BINOP: {
-            auto r = this->visit(n.binop());
+            auto r = this->visit_binop(n.binop());
             return r;
         }
         case NodeType::BOOLOP:
-            return this->visit(n.boolop());
+            return this->visit_boolop(n.boolop());
         case NodeType::BLOCK:
             return this->visit_block(n.block());
         case NodeType::BOOLEAN:
-            return this->visit(n.boolean());
+            return this->visit_boolean(n.boolean());
         case NodeType::BRK:
-            return this->visit(n.brk());
+            return this->visit_break(n.brk());
         case NodeType::CALL:
             return this->visit_call(n.call());
         case NodeType::CLS:
             return this->visit_class(n.cls());
         case NodeType::CNTINUE:
-            return this->visit(n.cntinue());
+            return this->visit_continue(n.cntinue());
         case NodeType::DECL:
-            return this->visit(n.decl());
+            return this->visit_declaration(n.decl());
         case NodeType::EMPTYLST:
-            return this->visit(n.emptylst());
+            return this->visit_emptylist(n.emptylst());
         case NodeType::FLOT:
-            return this->visit(n.flot());
+            return this->visit_float(n.flot());
         case NodeType::FORLOOP:
-            return this->visit(n.forloop());
+            return this->visit_for(n.forloop());
         case NodeType::FUNC:
             return this->visit_function(n.func());
         case NodeType::ID:
             return this->visit_id(n.id());
         case NodeType::CAST:
-            return this->visit(n.cast());
+            return this->visit_cast(n.cast());
         case NodeType::IFF:
-            return this->visit(n.iff());
+            return this->visit_if(n.iff());
         case NodeType::LST:
-            return this->visit(n.lst());
+            return this->visit_list(n.lst());
         case NodeType::MEMBER:
             return this->visit_member(n.member());
         case NodeType::NONE:
-            return this->visit(n.none());
+            return this->visit_none(n.none());
         case NodeType::NUMBER:
-            return this->visit(n.number());
+            return this->visit_number(n.number());
         case NodeType::RETRN:
             return this->visit_return(n.retrn());
         case NodeType::STRNG:
-            return this->visit(n.strng());
+            return this->visit_string(n.strng());
         case NodeType::SUB:
-            return this->visit(n.sub());
+            return this->visit_subscript(n.sub());
         case NodeType::TERNARY:
-            return this->visit(n.ternary());
+            return this->visit_ternary(n.ternary());
         case NodeType::TUPLE:
-            return this->visit(n.tuple());
+            return this->visit_tuple(n.tuple());
         case NodeType::WHIL:
-            return this->visit(n.whil());
+            return this->visit_while(n.whil());
         case NodeType::PARTIAL:
-            return this->visit(n.partial());
+            return this->visit_partial(n.partial());
         case NodeType::DICT:
-            return this->visit(n.dict());
+            return this->visit_dict(n.dict());
         case NodeType::EMPTYDICT:
-            return this->visit(n.emptydict());
+            return this->visit_emptydict(n.emptydict());
         case NodeType::DEF_CONST:
-            return this->visit(n.defconst());
+            return this->visit_defconst(n.defconst());
         case NodeType::IMPORT:
             return this->visit_import(n.import());
         case NodeType::ALIAS:
