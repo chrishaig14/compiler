@@ -876,8 +876,8 @@ USemanticInfo Checker::visit_block(BlockNode& node) {
 
         n = this->replace_if_necessary(n);
         if (n->ntype == NodeType::BLOCK) {
-            for (auto node: n->block().nodes) {
-                vn.push_back(node);
+            for (auto bnode: n->block().nodes) {
+                vn.push_back(bnode);
             }
         } else {
             vn.push_back(n);
