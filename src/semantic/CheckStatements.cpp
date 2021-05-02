@@ -309,7 +309,7 @@ USemanticInfo Checker::visit_if(IfNode& n) {
         this->error_reporter.condition(condition_info.entity, n.condition->start, "if");
     }
     if (*condition_info.entity.object_value->ot != T_BOOL) {
-        throw std::runtime_error("If condition should be a Boolean");
+        this->error_reporter.condition(condition_info.entity, n.condition->start, "if");
     }
 
     // std::unordered_map<std::string, bool> not_null_vars;
