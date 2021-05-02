@@ -1691,8 +1691,7 @@ USemanticInfo Checker::visit_defconst(DefaultConstructorNode& node) {
     for (auto pt: cls->member_types) {
         t.push_back(pt->clone());
     }
-    info.entity = Entity{.type=E_TYPE::CONST_FUNCTION};
-    info.entity.const_function = new ConstFunction();
+    info.entity = Entity(new ConstFunction());
     VectorOfTypes tp;
     for (auto tt: entity.clazz->type_params) {
         ObjectType* ot = new ObjectType(tt);
