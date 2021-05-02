@@ -56,6 +56,8 @@ Flirpin map_unit_to_flirpin(Unit u);
 int target_union_type(const ObjectType& target, const TypeNode& source);
 SNode* make_union_wrapper(int type_index, SNode* expression);
 
+std::string binoptype_to_str(OpType op);
+
 class Checker {
     bool add_this;
     bool is_lvalue;

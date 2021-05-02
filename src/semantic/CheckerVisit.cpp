@@ -1033,6 +1033,20 @@ SNode* make_union_wrapper(int type_index, SNode* expression) {
     return new_union;
 }
 
+std::string binoptype_to_str(OpType op) {
+    std::string fun;
+    if (op == OpType::ADD) {
+        fun = "add";
+    } else if (op == OpType::SUB) {
+        fun = "sub";
+    } else if (op == OpType::MUL) {
+        fun = "mul";
+    } else if (op == OpType::DIV) {
+        fun = "div";
+    }
+    return fun;
+}
+
 USemanticInfo Checker::check_declaration_with_type(DeclarationNode& n) {
     SemanticInfo info;
     DeclarationSNode* sn = new DeclarationSNode();
@@ -1570,16 +1584,8 @@ USemanticInfo Checker::visit_binop(BinopNode& n) {
         info.is_constant = true;
     }
     TypeNode* rettype;
-    std::string fun;
-    if (n.op == OpType::ADD) {
-        fun = "add";
-    } else if (n.op == OpType::SUB) {
-        fun = "sub";
-    } else if (n.op == OpType::MUL) {
-        fun = "mul";
-    } else if (n.op == OpType::DIV) {
-        fun = "div";
-    }
+    std::string fun = binoptype_to_str(n.op);
+
     Entity entity = this->scope->get(ltype.object().id);
     if (entity.type != E_TYPE::CLASS) {
         throw std::runtime_error("This should be a CLASS, but it's not!");
