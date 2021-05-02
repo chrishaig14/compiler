@@ -588,11 +588,12 @@ USemanticInfo Checker::visit_for(ForNode& node) {
     if (exp_info_p->entity.type != E_TYPE::OBJECT_VALUE) {
         throw std::runtime_error("iterating over something that's not an object");
     }
-    if (exp_info_p->entity.object_value->ot->id != "List") {
+    ObjectType* exp_ot = exp_info_p->entity.object_value->ot;
+    if (exp_ot->id != "List") {
         throw std::runtime_error("iterating over something that's not an object");
     }
 
-    TypeNode* elem_type = exp_info_p->entity.object_value->ot->type_params[0];
+    TypeNode* elem_type = exp_ot->type_params[0];
     Entity elem_entity = entity_from_type(*elem_type);
     this->enter_scope("for");
     this->scope->set(node.var, elem_entity);
