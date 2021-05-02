@@ -1396,7 +1396,6 @@ USemanticInfo Checker::visit_return(ReturnNode& n) {
     if (return_type->object().id == "Union") {
         int type_index = target_union_type(return_type->object(), *expression_info.entity.object_value->ot);
         if (type_index == -1) {
-            // throw std::runtime_error("OH NO!");
             this->error_reporter.assignment(*return_typet, *expression_info.entity.object_value->ot, n.start);
         }
         SNode* union_wrapper = make_union_wrapper(type_index, sn->expression);
