@@ -82,6 +82,8 @@ public:
     void expected_expression_with_type(Entity entity, TypeNode& exp_entity, TextPosition pos);
     void expected_expression(Entity entity, TextPosition pos);
     void _for(Entity t, TextPosition position);
+    void bool_op(Entity left, Entity right, TextPosition position);
+    void binop(Entity left, Entity right, TextPosition position);
 };
 
 

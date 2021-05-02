@@ -51,13 +51,14 @@ USemanticInfo Checker::visit_boolop(BoolOpNode& n) {
         return error_stub();
     }
     if (left_info_p->entity.type != E_TYPE::OBJECT_VALUE || right_info_p->entity.type != E_TYPE::OBJECT_VALUE) {
-        throw std::runtime_error("Can't have binop between 2 non objects!");
+        this->error_reporter.bool_op(left_info_p->entity, right_info_p->entity, n.start);
+        // throw std::runtime_error("Can't have binop between 2 non objects!");
     }
 
     const TypeNode& ltype = *get_entity_type(left_info_p->entity);
     const TypeNode& rtype = *get_entity_type(right_info_p->entity);
     if (ltype != rtype) {
-        this->error_reporter.binop(ltype, rtype, n.start);
+        this->error_reporter.binop(left_info_p->entity, right_info_p->entity, n.start);
         return error_stub();
     }
 
@@ -142,12 +143,12 @@ USemanticInfo Checker::visit_binop(BinopNode& n) {
         return error_stub();
     }
     if (left_info_p->entity.type != E_TYPE::OBJECT_VALUE || right_info_p->entity.type != E_TYPE::OBJECT_VALUE) {
-        throw std::runtime_error("Can't have binop between 2 non objects!");
+        this->error_reporter.binop(left_info_p->entity, right_info_p->entity, n.start);
     }
     const TypeNode& ltype = *get_entity_type(left_info_p->entity);
     const TypeNode& rtype = *get_entity_type(right_info_p->entity);
     if (ltype != rtype) {
-        this->error_reporter.binop(ltype, rtype, n.start);
+        this->error_reporter.binop(left_info_p->entity, right_info_p->entity, n.start);
         return error_stub();
         // throw std::runtime_error("Binary operation between values of different types: " + ltype.to_string() + " and " +
         //                          rtype.to_string());

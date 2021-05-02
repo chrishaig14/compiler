@@ -39,10 +39,10 @@ void ErrorReporter::fail(std::string msg) {
     throw std::runtime_error("FAILED");
 }
 
-void ErrorReporter::binop(const TypeNode& left, const TypeNode& right, TextPosition position) {
+void ErrorReporter::binop(Entity left, Entity right, TextPosition position) {
     std::string msg;
-    msg = context_string(position) + E_FMT("Cannot perform binary op between types ") + E_HLT(left.to_string()) +
-          E_FMT(" and ") + E_HLT(right.to_string()) + this->code_context_string(position);
+    msg = context_string(position) + E_FMT("Cannot perform binary op between types ") + E_HLT(entity_to_string(left)) +
+          E_FMT(" and ") + E_HLT(entity_to_string(right));
     this->fail(msg);
 }
 
@@ -92,10 +92,10 @@ void ErrorReporter::method_not_member(const TypeNode& t, const std::string& memb
     this->fail(msg);
 }
 
-void ErrorReporter::bool_op(const TypeNode& left, const TypeNode& right, TextPosition position) {
+void ErrorReporter::bool_op(Entity left, Entity right, TextPosition position) {
     std::string msg;
-    msg = context_string(position) + E_FMT("Cannot perform bool op between types ") + E_HLT(left.to_string()) +
-          E_FMT(" and ") + E_HLT(right.to_string());
+    msg = context_string(position) + E_FMT("Cannot perform bool op between types ") + E_HLT(entity_to_string(left)) +
+          E_FMT(" and ") + E_HLT(entity_to_string(right));
     this->fail(msg);
 }
 
