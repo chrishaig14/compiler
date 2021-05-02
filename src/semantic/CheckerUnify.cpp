@@ -159,10 +159,10 @@ USemanticInfo Checker::class_member(Class* cls, std::string child, MemberNode& n
         unbound_method->ft = bound_method->ft->clone();
         unbound_method->ft->param_types.insert(unbound_method->ft->param_types.begin(),
                                                new ObjectType(cls->class_name));
-        info.entity = Entity{.type=E_TYPE::CONST_FUNCTION, .const_function=unbound_method};
+        info.entity = Entity(unbound_method);
         info.snode = new IdSNode(unbound_method->path.as_str());
     } else if (cls->static_methods.find(child) != cls->static_methods.end()) {
-        info.entity = Entity{.type=E_TYPE::CONST_FUNCTION, .const_function=cls->static_methods[child]};
+        info.entity = Entity(cls->static_methods[child]);
         info.snode = new IdSNode(cls->static_methods[child]->path.as_str());
     } else if (cls->static_members.find(child) != cls->static_members.end()) {
         info.entity = entity_from_type(*cls->static_members[child].first);
@@ -201,7 +201,7 @@ USemanticInfo Checker::object_member(SNode* object_snode, ObjectValue* pValue, s
             // method call
             info.this_arg = object_snode;
             info.snode = idn;
-            info.entity = Entity{.type=E_TYPE::CONST_FUNCTION, .const_function=clazz->methods[child]};
+            info.entity = Entity(clazz->methods[child]);
         } else {
             // return partial
             int npartial = clazz->methods[child]->ft->param_types.size();
@@ -215,7 +215,7 @@ USemanticInfo Checker::object_member(SNode* object_snode, ObjectValue* pValue, s
             info.snode = non;
             FunctionValue* fv = new FunctionValue();
             fv->ft = clazz->methods[child]->ft->clone();
-            info.entity = Entity{.type=E_TYPE::FUNCTION_VALUE, .function_value=fv};
+            info.entity = Entity(fv);
         }
 
     } else {
@@ -239,15 +239,15 @@ USemanticInfo Checker::package_member(Package* package, std::string child, Membe
 Entity map_flirpin_to_entity(Flirpin flirpin) {
     switch (flirpin.type) {
         case F_TYPE::CONST_FUNCTION:
-            return Entity{.type=E_TYPE::CONST_FUNCTION, .const_function=flirpin.const_function};
+            return Entity(flirpin.const_function);
         case F_TYPE::CLASS:
-            return Entity{.type=E_TYPE::CLASS, .clazz=flirpin.clazz};
+            return Entity(flirpin.clazz);
         case F_TYPE::PACKAGE:
-            return Entity{.type=E_TYPE::PACKAGE, .package=flirpin.package};
+            return Entity(flirpin.package);
         case F_TYPE::MODULE:
-            return Entity{.type=E_TYPE::MODULE, .module=flirpin.module};
+            return Entity(flirpin.module);
         case F_TYPE::ENUM:
-            return Entity{.type=E_TYPE::ENUM, .enumm=flirpin.enumm};
+            return Entity(flirpin.enumm);
     }
 }
 
@@ -279,7 +279,7 @@ USemanticInfo Checker::enum_member(Enum* enumm, std::string value, MemberNode& n
             ObjectValue* ov = new ObjectValue();
             ov->ot = new ObjectType(enumm->enumm_name, {});
             ov->ot->actual_base_path = enumm->path;
-            info.entity = Entity{.type=E_TYPE::OBJECT_VALUE, .object_value=ov};
+            info.entity = Entity(ov);
             info.snode = new EnumMemberSNode(enumm->path.as_str(), value);
             return std::make_unique<SemanticInfo>(info);
         }

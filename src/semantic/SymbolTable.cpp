@@ -45,7 +45,7 @@ Entity SymbolTable::get(const std::string& name) {
         return this->parent->get(name);
     }
     // throw std::runtime_error("Error path: " + name + " not found!");
-    return Entity{.type=E_TYPE::NOT_FOUND};
+    return Entity(E_TYPE::NOT_FOUND);
 }
 
 bool SymbolTable::declared(const std::string& name) {
