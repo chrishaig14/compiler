@@ -163,11 +163,10 @@ void ErrorReporter::string_immutable(TextPosition pos) {
     this->fail(msg);
 }
 
-void ErrorReporter::_for(const TypeNode& t, TextPosition position) {
-
+void ErrorReporter::_for(Entity t, TextPosition position) {
     std::string msg;
     msg = this->context_string(position) + E_FMT(" Expected") + E_HLT(" List[t] ") + E_FMT("in loop, but got ") +
-          E_HLT(t.to_string()) + this->code_context_string(position);
+          E_HLT(entity_to_string(t)) + this->code_context_string(position);
     this->fail(msg);
 }
 

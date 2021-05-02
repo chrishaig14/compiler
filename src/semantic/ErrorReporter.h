@@ -81,6 +81,7 @@ public:
     void condition(Entity entity, TextPosition position, const std::string& st);
     void expected_expression_with_type(Entity entity, TypeNode& exp_entity, TextPosition pos);
     void expected_expression(Entity entity, TextPosition pos);
+    void _for(Entity t, TextPosition position);
 };
 
 

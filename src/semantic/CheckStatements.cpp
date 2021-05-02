@@ -222,11 +222,11 @@ USemanticInfo Checker::visit_continue(ContinueNode& node) {
 USemanticInfo Checker::visit_for(ForNode& node) {
     USemanticInfo exp_info_p = this->dispatch(node.exp);
     if (exp_info_p->entity.type != E_TYPE::OBJECT_VALUE) {
-        throw std::runtime_error("iterating over something that's not an object");
+        this->error_reporter._for(exp_info_p->entity, node.exp->start);
     }
     ObjectType* exp_ot = exp_info_p->entity.object_value->ot;
     if (exp_ot->id != "List") {
-        throw std::runtime_error("iterating over something that's not an object");
+        this->error_reporter._for(exp_info_p->entity, node.exp->start);
     }
 
     TypeNode* elem_type = exp_ot->type_params[0];
