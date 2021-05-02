@@ -139,8 +139,12 @@ USemanticInfo Checker::visit_while(WhileNode& node) {
     info.snode = while_sn;
     USemanticInfo condition_p = this->dispatch(node.condition);
     SemanticInfo& condition = *condition_p;
-    if (*condition.entity.object_value->ot != T_BOOL) {
-        this->error_reporter.condition(*condition.entity.object_value->ot, node.start, "elif");
+    if (condition.entity.type != E_TYPE::OBJECT_VALUE) {
+        throw std::runtime_error("Error condition should be a Boolean value");
+    }
+    ObjectType* condition_ot = condition.entity.object_value->ot;
+    if (*condition_ot != T_BOOL) {
+        this->error_reporter.condition(*condition_ot, node.start, "elif");
     }
     this->enter_scope("while");
     this->scope->is_loop = true;
