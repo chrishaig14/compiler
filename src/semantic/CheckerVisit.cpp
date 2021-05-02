@@ -797,54 +797,7 @@ USemanticInfo Checker::member_tuple(const ObjectType& final_type, MemberNode& n)
     return std::make_unique<SemanticInfo>(s);
 }
 
-USemanticInfo Checker::visit_member(MemberNode& n) {
-    USemanticInfo parent_info = this->dispatch(n.parent);
-    Entity parent_entity = parent_info->entity;
-    if (n.type == MemberType::NUM) {
-        ObjectType* ot = parent_entity.object_value->ot;
-        if (ot->id != "Tuple") {
-            throw std::runtime_error("Integer member of not a Tuple!");
-        }
-        size_t tuple_size = ot->type_params.size();
-        if (n.n_child > tuple_size || n.n_child == 0) {
-            throw std::runtime_error("Tuple member out of range, has " + std::to_string(tuple_size) + " but required " +
-                                     std::to_string(n.n_child));
-        }
-        SemanticInfo info;
-        ObjectMemberSNode* omsn = new ObjectMemberSNode();
-        info.snode = omsn;
-        omsn->object = parent_info->snode;
-        omsn->member_name = "mem_" + std::to_string(n.n_child);
-        omsn->class_path = ot->actual_base_path;
-        ObjectValue* ov = new ObjectValue();
-        info.entity = Entity(ov);
-        ov->ot = (ObjectType*) ot->type_params[n.n_child - 1]->clone();
-        return std::make_unique<SemanticInfo>(info);
-    }
-    switch (parent_entity.type) {
-        case E_TYPE::CLASS:
-            return this->class_member(parent_entity.clazz, n.s_child, n);
-        case E_TYPE::CONST_FUNCTION:
-            this->error_reporter.function_no_member(n.dot_pos);
-            break;
-        case E_TYPE::FUNCTION_VALUE:
-            this->error_reporter.function_no_member(n.dot_pos);
-            break;
-        case E_TYPE::OBJECT_VALUE:
-            return this->object_member(parent_info->snode, parent_entity.object_value, n.s_child, n);
-        case E_TYPE::PACKAGE:
-            return this->package_member(parent_entity.package, n.s_child, n);
-        case E_TYPE::MODULE:
-            return this->module_member(parent_entity.module, n.s_child, n);
-        case E_TYPE::ERROR:
-            break;
-        case E_TYPE::NOT_FOUND:
-            break;
-        case E_TYPE::ENUM:
-            return this->enum_member(parent_entity.enumm, n.s_child, n);
-    }
-    return error_stub();
-}
+
 
 USemanticInfo Checker::visit_cast(CastNode& n) {
     USemanticInfo exp_info = this->dispatch(n.exp);
