@@ -689,8 +689,8 @@ USemanticInfo Checker::visit_call(CallNode& n) {
         return error_stub();
     }
     SemanticInfo& fun_info = *fun_info_p;
-    bool is_a_method = false;
-    Node* object_node;
+    // bool is_a_method = false;
+    // Node* object_node;
     if (fun_info.is_class_method) {
         MemberNode& member_node = n.function->member();
         if (member_node.s_child == "init") {
@@ -699,7 +699,7 @@ USemanticInfo Checker::visit_call(CallNode& n) {
             // const FunctionType& ftn = fun_info.type().function();
             // FunctionType& copy_ftn = ftn.clone()->function();
             // retv.set_type(*copy_ftn.clone());
-            object_node = member_node.parent;
+            // object_node = member_node.parent;
         } else {
             // n.function = new IdNode(this->map[fun_info.class_info->class_name + "." + member_node.s_child],
             //                         POS_NONE,
@@ -709,7 +709,7 @@ USemanticInfo Checker::visit_call(CallNode& n) {
             // FunctionType& copy_ftn = ftn.clone()->function();
             // copy_ftn.param_types.insert(copy_ftn.param_types.begin(), TYPE(fun_info.class_info->class_name, {}));
             // retv.set_type(*copy_ftn.clone());
-            object_node = member_node.parent;
+            // object_node = member_node.parent;
         }
     } else {
         sn->function = fun_info.snode;
@@ -1727,25 +1727,28 @@ USemanticInfo Checker::visit_match(MatchExpressionNode* node) {
     std::vector<std::pair<int, BlockSNode*>> cas;
     std::string varname = "match_var";
     for (size_t i = 0; i < node->ids.size(); i++) {
+        std::string case_id = node->ids[i];
         std::pair<TypeNode*, BlockNode*> c = node->cases[i];
-        TypeNode* type = c.first;
-        this->module->fill_actual(type);
+        TypeNode* case_type = c.first;
+        BlockNode* case_node = c.second;
+
+        this->module->fill_actual(case_type);
         bool ok = false;
         for (auto t: ot->type_params) {
-            if (t->actual_to_string() == type->actual_to_string()) {
+            if (t->actual_to_string() == case_type->actual_to_string()) {
                 ok = true;
                 break;
             }
         }
         if (!ok) {
-            throw std::runtime_error("Error, type " + type->to_string() + " not part of " + ot->to_string());
+            throw std::runtime_error("Error, type " + case_type->to_string() + " not part of " + ot->to_string());
         }
         this->enter_scope("case");
-        this->scope->set(node->ids[i], entity_from_type(*type));
-        USemanticInfo case_info = this->dispatch(c.second);
+        this->scope->set(case_id, entity_from_type(*case_type));
+        USemanticInfo case_info = this->dispatch(case_node);
         BlockSNode* bn = (BlockSNode*) case_info->snode;
         DeclarationSNode* dn = new DeclarationSNode();
-        dn->identifier = node->ids[i];
+        dn->identifier = case_id;
         ObjectMemberSNode* omn = new ObjectMemberSNode();
         dn->expression = omn;
         omn->member_name = "o";
