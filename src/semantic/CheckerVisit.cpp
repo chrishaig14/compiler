@@ -519,9 +519,10 @@ USemanticInfo Checker::visit_partial(PartialApplication& node) {
     FunctionType* fun_type = nullptr;
     if (func->entity.type == E_TYPE::CONST_FUNCTION) {
         fun_type = func->entity.const_function->ft->clone();
-    }
-    if (func->entity.type == E_TYPE::FUNCTION_VALUE) {
+    } else if (func->entity.type == E_TYPE::FUNCTION_VALUE) {
         fun_type = func->entity.const_function->ft->clone();
+    } else {
+        throw std::runtime_error("Error: expected a function for partial application");
     }
     if (node.args.size() != fun_type->param_types.size()) {
         this->error_reporter.partial_wrong_num_args(node.start);
