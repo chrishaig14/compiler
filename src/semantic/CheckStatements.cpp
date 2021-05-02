@@ -168,23 +168,18 @@ USemanticInfo Checker::visit_match(MatchExpressionNode* node) {
     if (ot->id != "Union") {
         throw std::runtime_error("Error, match expression should have type Union[...]");
     }
-    std::vector <std::pair<int, BlockSNode*>> cas;
+    std::vector<std::pair<int, BlockSNode*>> cas;
     std::string varname = "match_var";
     for (size_t i = 0; i < node->ids.size(); i++) {
         std::string case_id = node->ids[i];
-        std::pair < TypeNode * , BlockNode * > c = node->cases[i];
+        std::pair<TypeNode*, BlockNode*> c = node->cases[i];
         TypeNode* case_type = c.first;
         BlockNode* case_node = c.second;
 
         this->module->fill_actual(case_type);
-        bool ok = false;
-        for (auto t: ot->type_params) {
-            if (t->actual_to_string() == case_type->actual_to_string()) {
-                ok = true;
-                break;
-            }
-        }
-        if (!ok) {
+
+        int union_index = target_union_type(*ot, *case_type);
+        if (union_index == -1) {
             throw std::runtime_error("Error, type " + case_type->to_string() + " not part of " + ot->to_string());
         }
         this->enter_scope("case");
@@ -199,7 +194,7 @@ USemanticInfo Checker::visit_match(MatchExpressionNode* node) {
         omn->object = new IdSNode(varname);
         omn->class_path = Path("core.Union");
         bn->nodes.insert(bn->nodes.begin(), dn);
-        cas.push_back(std::make_pair(i, (BlockSNode*) case_info->snode));
+        cas.push_back(std::make_pair(union_index, (BlockSNode*) case_info->snode));
         this->leave_scope();
     }
     DeclarationSNode* init = new DeclarationSNode();
