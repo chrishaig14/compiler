@@ -396,7 +396,6 @@ USemanticInfo Checker::visit_class(ClassNode& node) {
     std::vector<SNode*> static_methods_snodes;
 
     this->this_type = new ObjectType(node.class_name, tp);
-    bool has_init = false;
     for (auto method: node.methods) {
         this->is_method = true;
         this->add_this = true;
@@ -406,7 +405,6 @@ USemanticInfo Checker::visit_class(ClassNode& node) {
         // method.second->path = clazz->path + "." + method.second->identifier;
         USemanticInfo method_info = this->visit_function(*method.second);
         methods_snodes.push_back(method_info->snode);
-        has_init = has_init || method.first == "init";
     }
 
     for (auto method: node.static_methods) {
@@ -414,7 +412,6 @@ USemanticInfo Checker::visit_class(ClassNode& node) {
         this->add_this = false;
         USemanticInfo method_info = this->visit_function(*method.second);
         static_methods_snodes.push_back(method_info->snode);
-        has_init = has_init || method.first == "init";
     }
 
     for (auto m: methods_snodes) {
