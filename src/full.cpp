@@ -159,42 +159,8 @@ void add_path_to_module(Module* module, Path path) {
         }
         path_so_far += "." + path_part;
     }
-    std::string t;
-    switch (current_flirpin.type) {
-        case F_TYPE::CONST_FUNCTION:
-            t = "const function";
-            break;
-        case F_TYPE::CLASS:
-            t = "class";
-            break;
-        case F_TYPE::PACKAGE:
-            t = "package";
-            break;
-        case F_TYPE::MODULE:
-            t = "module";
-            break;
-        case F_TYPE::ENUM:
-            t = "enum";
-            break;
-    }
-    std::string lt;
-    switch (last_flirpin.type) {
-        case F_TYPE::CONST_FUNCTION:
-            lt = "const function";
-            break;
-        case F_TYPE::CLASS:
-            lt = "class";
-            break;
-        case F_TYPE::PACKAGE:
-            lt = "package";
-            break;
-        case F_TYPE::MODULE:
-            lt = "module";
-            break;
-        case F_TYPE::ENUM:
-            lt = "enum";
-            break;
-    }
+    std::string t = flirpintype_to_str(current_flirpin.type);
+    std::string lt = flirpintype_to_str(last_flirpin.type);
     std::string included_header;
     if (last_flirpin.type == F_TYPE::PACKAGE) {
         included_header = last_flirpin.package->rel_path + "/__package__";

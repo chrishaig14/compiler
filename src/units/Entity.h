@@ -5,6 +5,8 @@
 #ifndef XLANG_ENTITY_H
 #define XLANG_ENTITY_H
 
+#include <string>
+
 class Package;
 
 class Module;
@@ -74,5 +76,6 @@ struct Entity {
     };
 };
 
+std::string flirpintype_to_str(F_TYPE flirpintype);
 
 #endif //XLANG_ENTITY_H
