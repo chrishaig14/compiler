@@ -65,8 +65,6 @@ USemanticInfo Checker::visit_list(ListNode& node) {
     node.type = element_type->clone();
     SemanticInfo return_info;
     return_info.is_constant = is_constant;
-    return_info.set_type(ObjectType("List", {element_type->clone()}));
-
 
     return_info.snode = lsn;;
     return_info.entity = Entity{.type=E_TYPE::OBJECT_VALUE, .object_value = new ObjectValue()};
@@ -91,7 +89,7 @@ USemanticInfo Checker::visit_while(WhileNode& node) {
     USemanticInfo condition_p = this->dispatch(node.condition);
     SemanticInfo& condition = *condition_p;
     if (*condition.entity.object_value->ot != T_BOOL) {
-        this->error_reporter.condition(condition.type(), node.start, "elif");
+        this->error_reporter.condition(*condition.entity.object_value->ot, node.start, "elif");
     }
     this->enter_scope("while");
     this->scope->is_loop = true;
@@ -149,7 +147,6 @@ USemanticInfo Checker::visit_number(NumberNode& node) {
 
 USemanticInfo Checker::visit_string(StringNode& node) {
     SemanticInfo info;
-    info.set_type(T_STRING);
     info.is_constant = true;
     StringSNode* sn = new StringSNode();
     sn->s = node.str;
@@ -238,17 +235,17 @@ USemanticInfo Checker::visit_break(BreakNode& node) {
 USemanticInfo Checker::visit_ternary(TernaryNode& node) {
     USemanticInfo expression_info_p = this->dispatch(node.expression);
     SemanticInfo& expression_info = *expression_info_p;
-    if (expression_info.type().kind != Kind::OBJECT) {
+    if (expression_info.entity.type != E_TYPE::OBJECT_VALUE) {
         throw std::runtime_error("Unexpected non-object");
     }
-    auto& expression_type = expression_info.type().object();
+    auto& expression_type = *expression_info.entity.object_value->ot;
 
     if (expression_type.id != "Option") {
         throw std::runtime_error("Expected an Option[T], got: " + expression_type.to_string());
     }
     SemanticInfo semanticInfo;
-    TypeNode& type = *expression_type.type_params[0];
-    semanticInfo.set_type(type);
+    // TypeNode& type = *expression_type.type_params[0];
+    // semanticInfo.set_type(type);
     this->enter_scope("true_case");
     // this->scope->set("it", type);
     USemanticInfo true_case_p = this->dispatch(node.true_case);
@@ -258,18 +255,19 @@ USemanticInfo Checker::visit_ternary(TernaryNode& node) {
     USemanticInfo false_case_p = this->dispatch(node.false_case);
     SemanticInfo& false_case = *false_case_p;
     node.false_case = this->replace_if_necessary(node.false_case);
-    if (false_case.type() != true_case.type()) {
-        throw std::runtime_error("True case and false case type don't match: " + true_case.type().to_string() + " != " +
-                                 false_case.type().to_string());
+    if (*false_case.entity.object_value->ot != *true_case.entity.object_value->ot) {
+        throw std::runtime_error(
+                "True case and false case type don't match: " + true_case.entity.object_value->ot->to_string() +
+                " != " + false_case.entity.object_value->ot->to_string());
     } else {
-        semanticInfo.set_type(true_case.type());
+        // semanticInfo.set_type(true_case.type());
     }
     return std::make_unique<SemanticInfo>(semanticInfo);
 }
 
 USemanticInfo Checker::visit_none(NoneNode& node) {
     SemanticInfo info;
-    info.set_type(ObjectType("NoneType"));
+    // info.set_type(ObjectType("NoneType"));
     return std::make_unique<SemanticInfo>(info);
 }
 
@@ -385,9 +383,9 @@ USemanticInfo Checker::visit_class(ClassNode& node) {
 
     for (auto sm: node.static_members) {
         USemanticInfo sm_exp_info = this->dispatch(sm.second.second);
-        if (*sm.second.first != sm_exp_info->type()) {
+        if (*sm.second.first != *sm_exp_info->entity.object_value->ot) {
             throw std::runtime_error("Err: cannt initialize static member of type " + sm.second.first->to_string() +
-                                     " with expression of type " + sm_exp_info->type().to_string());
+                                     " with expression of type " + sm_exp_info->entity.object_value->ot->to_string());
         }
         if (!sm_exp_info->is_constant) {
             throw std::runtime_error("Error: cannot initialize static member with non constant expression!");
@@ -475,7 +473,7 @@ USemanticInfo Checker::visit_tuple(TupleNode& node) {
 
 USemanticInfo Checker::visit_float(FloatNode& node) {
     SemanticInfo s;
-    s.set_type(T_FLOAT);
+    // s.set_type(T_FLOAT);
     return std::make_unique<SemanticInfo>(s);
 }
 
@@ -698,19 +696,19 @@ USemanticInfo Checker::visit_call(CallNode& n) {
         if (member_node.s_child == "init") {
             n.function = this->replacement;
             this->replace_me = false;
-            const FunctionType& ftn = fun_info.type().function();
-            FunctionType& copy_ftn = ftn.clone()->function();
-            retv.set_type(*copy_ftn.clone());
+            // const FunctionType& ftn = fun_info.type().function();
+            // FunctionType& copy_ftn = ftn.clone()->function();
+            // retv.set_type(*copy_ftn.clone());
             object_node = member_node.parent;
         } else {
             // n.function = new IdNode(this->map[fun_info.class_info->class_name + "." + member_node.s_child],
             //                         POS_NONE,
             //                         POS_NONE);
             this->replace_me = false;
-            const FunctionType& ftn = fun_info.type().function();
-            FunctionType& copy_ftn = ftn.clone()->function();
-            copy_ftn.param_types.insert(copy_ftn.param_types.begin(), TYPE(fun_info.class_info->class_name, {}));
-            retv.set_type(*copy_ftn.clone());
+            // const FunctionType& ftn = fun_info.type().function();
+            // FunctionType& copy_ftn = ftn.clone()->function();
+            // copy_ftn.param_types.insert(copy_ftn.param_types.begin(), TYPE(fun_info.class_info->class_name, {}));
+            // retv.set_type(*copy_ftn.clone());
             object_node = member_node.parent;
         }
     } else {
@@ -730,7 +728,7 @@ USemanticInfo Checker::visit_call(CallNode& n) {
         if (n.arguments.size() != function_type->param_types.size()) {
             this->error_reporter.function_call_num_args(*function_type, n.start);
             if (!function_is_generic(*function_type)) {
-                retv.set_type(*function_type->return_type);
+                // retv.set_type(*function_type->return_type);
                 return std::make_unique<SemanticInfo>(retv);
             } else {
                 return error_stub();
@@ -1074,9 +1072,9 @@ USemanticInfo Checker::check_declaration_with_type(DeclarationNode& n) {
     n.expression = this->replace_if_necessary(n.expression);
     if (n.type->kind == Kind::FUNCTION) {
         // it's a function
-        if (*n.type != exp_info.type()) {
-            this->error_reporter.assignment(*n.type, exp_info.type(), n.start);
-        }
+        // if (*n.type != exp_info.type()) {
+        //     this->error_reporter.assignment(*n.type, exp_info.type(), n.start);
+        // }
     } else {
         SemanticInfo expression_info = exp_info;
         const ObjectType& actual_type = n.type->object();
@@ -1269,7 +1267,7 @@ USemanticInfo Checker::member_tuple(const ObjectType& final_type, MemberNode& n)
                                  std::to_string(final_type.type_params.size()) + " of " + final_type.to_string());
     }
     SemanticInfo s;
-    s.set_type(*final_type.type_params[n.n_child - 1]);
+    // s.set_type(*final_type.type_params[n.n_child - 1]);
     return std::make_unique<SemanticInfo>(s);
 }
 
@@ -1325,7 +1323,7 @@ USemanticInfo Checker::visit_cast(CastNode& n) {
     USemanticInfo exp_info = this->dispatch(n.exp);
     SemanticInfo info;
     ObjectType cast_type(n.as_type, {});
-    const TypeNode& exp_type = exp_info->type();
+    const TypeNode& exp_type = *exp_info->entity.object_value->ot;
     if (exp_type == T_INT || exp_type == T_FLOAT || exp_type == T_DOUBLE || exp_type == T_BOOL) {
         if (cast_type != T_BOOL && cast_type != T_FLOAT && cast_type != T_DOUBLE && cast_type != T_INT) {
             throw std::runtime_error("Can't cast " + exp_type.to_string() + " to " + cast_type.to_string());
@@ -1337,7 +1335,6 @@ USemanticInfo Checker::visit_cast(CastNode& n) {
         throw std::runtime_error("Can't cast " + exp_type.to_string() + " to " + cast_type.to_string());
     }
     n.exp_type = exp_type.clone();
-    info.set_type(cast_type);
     return std::make_unique<SemanticInfo>(info);
 }
 
@@ -1659,26 +1656,34 @@ USemanticInfo Checker::visit_return(ReturnNode& n) {
 
 USemanticInfo Checker::visit_dict(DictNode& node) {
     SemanticInfo info;
-    USemanticInfo first_key_type = this->dispatch(node.items[0].first);
-    USemanticInfo first_value_type = this->dispatch(node.items[0].second);
+    USemanticInfo first_key_info = this->dispatch(node.items[0].first);
+    USemanticInfo first_value_info = this->dispatch(node.items[0].second);
+    ObjectType& first_key_type = *first_key_info->entity.object_value->ot;
+    ObjectType& first_value_type = *first_value_info->entity.object_value->ot;
 
     for (size_t i = 1; i < node.items.size(); i++) {
-        USemanticInfo key_type = this->dispatch(node.items[i].first);
-        USemanticInfo value_type = this->dispatch(node.items[i].second);
-        if (key_type->type() != first_key_type->type()) {
+        USemanticInfo key_info = this->dispatch(node.items[i].first);
+        USemanticInfo value_info = this->dispatch(node.items[i].second);
+        ObjectType& key_type = *key_info->entity.object_value->ot;
+        ObjectType& value_type = *value_info->entity.object_value->ot;
+        if (key_type != first_key_type) {
             throw std::runtime_error("Second key type different to first");
         }
-        if (value_type->type() != first_value_type->type()) {
+        if (value_type != first_value_type) {
             throw std::runtime_error("Second value type different to first");
         }
     }
-    info.set_type(ObjectType("Dict", {first_key_type->type().clone(), first_value_type->type().clone()}));
+    ObjectValue* ov = new ObjectValue();
+    ov->ot = new ObjectType("Dict", {first_key_type.clone(), first_value_type.clone()});
+    info.entity = Entity{.type=E_TYPE::OBJECT_VALUE, .object_value=ov};
     return std::make_unique<SemanticInfo>(info);
 }
 
 USemanticInfo Checker::visit_emptydict(EmptyDictNode& node) {
     SemanticInfo info;
-    info.set_type(ObjectType("Dict", {node.key_type, node.value_type}));
+    ObjectValue* ov = new ObjectValue();
+    ov->ot = new ObjectType("Dict", {node.key_type, node.value_type});
+    info.entity = Entity{.type=E_TYPE::OBJECT_VALUE, .object_value=ov};
     return std::make_unique<SemanticInfo>(info);
 }
 

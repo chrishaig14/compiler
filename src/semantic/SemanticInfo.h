@@ -31,9 +31,6 @@ public:
 
     SemanticInfo();
 
-    void set_type(const TypeNode& typ);
-
-    const TypeNode& type();
     bool is_constant;
     SNode* this_arg;
 };

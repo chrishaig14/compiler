@@ -14,17 +14,6 @@ SemanticInfo::SemanticInfo() {
     this->snode = nullptr;
 }
 
-void SemanticInfo::set_type(const TypeNode& typ) {
-    this->_type = typ.clone();
-}
-
-const TypeNode& SemanticInfo::type() {
-    if (_type == nullptr) {
-        throw std::runtime_error("SymbolInfo has no TypeNode");
-    }
-    return *this->_type;
-}
-
 SemanticInfo& SemanticInfo::operator=(const SemanticInfo& other) {
     this->entity = other.entity;
     this->is_error = other.is_error;
@@ -68,6 +57,5 @@ SemanticInfo::~SemanticInfo() {
 ErrorStub::ErrorStub() {
     this->is_error = true;
     auto x = UnknownTypeNode();
-    this->set_type(x);
     this->entity = Entity{.type=E_TYPE::ERROR};
 }
