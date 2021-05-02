@@ -60,7 +60,7 @@ USemanticInfo Checker::visit_call(CallNode& n) {
     if (n.arguments.size() != function_type->param_types.size()) {
         this->error_reporter.function_call_num_args(*function_type, n.start);
         if (!function_is_generic(*function_type)) {
-            // retv.set_type(*function_type->return_type);
+            retv.entity = entity_from_type(*function_type->return_type);
             return std::make_unique<SemanticInfo>(retv);
         } else {
             return error_stub();

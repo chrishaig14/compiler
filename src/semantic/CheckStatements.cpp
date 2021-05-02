@@ -333,10 +333,10 @@ USemanticInfo Checker::visit_if(IfNode& n) {
         USemanticInfo elif_condition_info_p = this->dispatch(n.elifs[i].first);
         SemanticInfo& elif_condition_info = *elif_condition_info_p;
         if (elif_condition_info.entity.type != E_TYPE::OBJECT_VALUE) {
-            this->error_reporter.condition(condition_info.entity, n.condition->start, "elif");
+            this->error_reporter.condition(condition_info.entity, n.elifs[i].first->start, "elif");
         }
         if (*elif_condition_info.entity.object_value->ot != T_BOOL) {
-            this->error_reporter.condition(condition_info.entity, n.condition->start, "elif");
+            this->error_reporter.condition(condition_info.entity, n.elifs[i].first->start, "elif");
         }
         this->enter_scope("elif");
         USemanticInfo elif_block_info = this->visit_block(*n.elifs[i].second);
