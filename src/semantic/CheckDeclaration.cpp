@@ -35,6 +35,13 @@ USemanticInfo Checker::check_declaration_with_type(DeclarationNode& n) {
     }
 
     USemanticInfo exp_info_p = this->dispatch(n.expression);
+
+    E_TYPE entity_type = exp_info_p->entity.type;
+    if (entity_type != E_TYPE::CONST_FUNCTION && entity_type != E_TYPE::FUNCTION_VALUE &&
+        entity_type != E_TYPE::OBJECT_VALUE) {
+        this->error_reporter.expected_expression_with_type(exp_info_p->entity, *n.type, n.start);
+    }
+
     sn->expression = exp_info_p->snode;
     SemanticInfo& exp_info = *exp_info_p;
     if (exp_info.is_error) {
@@ -85,7 +92,13 @@ USemanticInfo Checker::check_declaration_without_type(DeclarationNode& n) {
     if (exp_info_p->entity.type == E_TYPE::ERROR) {
         std::cout << "Ignoring all subsequenct error involving variable " + n.identifier + " as type cannot be inferred"
                   << std::endl;
-
+        return error_stub();
+    }
+    E_TYPE entity_type = exp_info_p->entity.type;
+    if (entity_type != E_TYPE::CONST_FUNCTION && entity_type != E_TYPE::FUNCTION_VALUE &&
+        entity_type != E_TYPE::OBJECT_VALUE) {
+        this->error_reporter.expected_expression(exp_info_p->entity, n.start);
+        return error_stub();
     }
     SemanticInfo info;
     DeclarationSNode* sn = new DeclarationSNode();

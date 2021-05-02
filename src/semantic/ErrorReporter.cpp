@@ -367,3 +367,18 @@ void ErrorReporter::match_type(Entity entity, TextPosition pos) {
     this->code_context_string(pos);
     this->fail(msg);
 }
+
+void ErrorReporter::expected_expression_with_type(Entity entity, TypeNode& exp_entity, TextPosition pos) {
+    std::string msg;
+    msg = this->context_string(pos) + E_FMT("Expected an expression of type") + E_HLT(exp_entity.to_string()) +
+          E_FMT(", but got " + entity_to_string(entity));
+    this->code_context_string(pos);
+    this->fail(msg);
+}
+
+void ErrorReporter::expected_expression(Entity entity, TextPosition pos) {
+    std::string msg;
+    msg = this->context_string(pos) + E_FMT("Expected expression") + E_FMT(", but got " + entity_to_string(entity));
+    this->code_context_string(pos);
+    this->fail(msg);
+}
