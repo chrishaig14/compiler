@@ -828,14 +828,11 @@ USemanticInfo Checker::visit_id(IdNode& n) {
         this->scope->set(n._id, Entity(E_TYPE::ERROR));
         return error_stub();
     }
-    sn->identifier = n._id;
     if (entity.type == E_TYPE::CONST_FUNCTION) {
         sn->identifier = entity.const_function->path.as_str();
+    } else {
+        sn->identifier = n._id;
     }
-
-    // if (entity == nullptr) {
-    //     throw std::runtime_error("Entity with name : " + n._id + " not found!");
-    // }
     info.entity = entity;
     return std::make_unique<SemanticInfo>(info);
 }
