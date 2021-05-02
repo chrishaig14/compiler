@@ -44,10 +44,3 @@ bool MemberNode::equal(const Node& x) const {
     return *this->parent == *other.parent;
 }
 
-json MemberNode::to_json() const {
-    json j;
-    j["node"] = "member";
-//        j["parent"] = this->parent->to_json();
-    j["child"] = this->s_child;
-    return j;
-}

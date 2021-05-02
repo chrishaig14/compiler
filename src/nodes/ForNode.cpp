@@ -2,6 +2,7 @@
 // Created by chris on 14/8/20.
 //
 
+#include <cassert>
 #include "ForNode.h"
 
 ForNode::ForNode(const std::string& var, Node* exp, BlockNode* body, TextPosition start, TextPosition end) :Node(NodeType::FORLOOP, start, end), var(var), exp(exp), body(body) {

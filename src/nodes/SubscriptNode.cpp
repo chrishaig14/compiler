@@ -40,10 +40,3 @@ SubscriptNode::~SubscriptNode() {
     }
 }
 
-json SubscriptNode::to_json() const {
-    json j;
-    j["node"] = "subscript";
-//        j["parent"] = this->parent->to_json();
-//        j["child"] = this->child->to_json();
-    return j;
-}

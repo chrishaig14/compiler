@@ -6,6 +6,7 @@
 #define CLASSNODE_H
 
 
+#include <map>
 #include "Node.h"
 
 #include "TypeNode.h"

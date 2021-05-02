@@ -36,8 +36,6 @@ public:
 
     ~MethodNode();
 
-    json to_json() const override;
-
     MethodNode& method() override;
     const MethodNode& method() const override;
     std::string actual_function_name;

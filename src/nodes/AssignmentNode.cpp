@@ -21,10 +21,3 @@ AssignmentNode::~AssignmentNode() {
     delete this->rvalue;
 }
 
-json AssignmentNode::to_json() const {
-    json j;
-    j["node"] = "assignment";
-//        j["lvalue"] = this->lvalue->to_json();
-//        j["rvalue"] = this->rvalue->to_json();
-    return j;
-}

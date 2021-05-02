@@ -5,12 +5,9 @@
 #ifndef NODE_H
 #define NODE_H
 
-#include "json.hpp"
 #include "node_types.h"
 #include <string>
 #include "../scanner/TextPosition.h"
-
-using json = nlohmann::json;
 
 class AssignmentNode;
 
@@ -167,7 +164,6 @@ public:
     virtual const TupleNode& tuple() const;
     virtual const WhileNode& whil() const;
 
-    virtual json to_json() const;
     virtual PartialApplication& partial();
     virtual const PartialApplication& partial() const;
     virtual DefaultConstructorNode& defconst();

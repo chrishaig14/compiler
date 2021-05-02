@@ -1,5 +1,6 @@
 #include <iostream>
 #include <set>
+#include <cassert>
 #include "Checker.h"
 #include "../macros.h"
 #include "../logging/logging.h"

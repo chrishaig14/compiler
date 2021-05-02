@@ -33,13 +33,3 @@ ListNode::~ListNode() {
     }
 }
 
-json ListNode::to_json() const {
-    json j;
-    j["node"] = "list";
-    j["elements"] = {};
-//        for (auto e: this->elements) {
-//            j["elements"].push_back(e->to_json());
-//        }
-    return j;
-}
-

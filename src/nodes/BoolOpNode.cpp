@@ -14,15 +14,6 @@ bool BoolOpNode::equal(const Node& x) const {
     return this->op == other.op && *this->left == *other.left and *this->right == *other.right;
 }
 
-json BoolOpNode::to_json() const {
-    json j;
-    j["node"] = "binop";
-//        j["left"] = this->left->to_json();
-//        j["right"] = this->right->to_json();
-    j["op"] = bool_op_to_string(this->op);
-    return j;
-}
-
 BoolOpNode::~BoolOpNode() {
     delete this->left;
     delete this->right;

@@ -2,6 +2,7 @@
 // Created by chris on 1/8/20.
 //
 
+#include <cassert>
 #include "IfNode.h"
 
 bool IfNode::equal(const Node& x) const {
@@ -56,13 +57,5 @@ IfNode::~IfNode() {
         delete p.first;
         delete p.second;
     }
-}
-
-json IfNode::to_json() const {
-    json j;
-    j["node"] = "if";
-//        j["condition"] = this->condition->to_json();
-//        j["then"] = this->then->to_json();
-    return j;
 }
 

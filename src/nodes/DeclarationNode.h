@@ -34,8 +34,6 @@ public:
 
     ~DeclarationNode();
 
-    json to_json() const override;
-
     DeclarationNode& decl() override;
     const DeclarationNode& decl() const override;
 

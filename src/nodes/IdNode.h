@@ -22,8 +22,6 @@ public:
 
     bool equal(const Node& other) const override;
 
-    json to_json() const override;
-
     IdNode& id() override;
     const IdNode& id() const override;
 };

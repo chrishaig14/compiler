@@ -27,8 +27,6 @@ public:
 
     ~FunctionNode();
 
-    json to_json() const override;
-
     FunctionNode& func() override;
 
     const FunctionNode& func() const override;

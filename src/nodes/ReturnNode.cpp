@@ -20,12 +20,6 @@ const ReturnNode& ReturnNode::retrn() const {
     return *this;
 }
 
-json ReturnNode::to_json() const {
-    json j;
-    j["node"] = "return";
-//        j["expression"] = this->expression->to_json();
-    return j;
-}
 
 ReturnNode::~ReturnNode() {
     if (this->ret_type != nullptr) {

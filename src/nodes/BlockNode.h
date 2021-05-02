@@ -23,7 +23,6 @@ public:
 
     bool equal(const Node& p) const override;
 
-    json to_json();
 
     BlockNode& block() override;
     const BlockNode& block() const override;

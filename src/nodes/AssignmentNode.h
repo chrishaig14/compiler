@@ -28,8 +28,6 @@ public:
 
     ~AssignmentNode();
 
-    json to_json() const override;
-
 };
 
 

@@ -33,17 +33,4 @@ DeclarationNode::~DeclarationNode() {
     }
 }
 
-json DeclarationNode::to_json() const {
-    json j;
-    j["node"] = "declaration";
-    j["identifier"] = this->identifier;
-    j["expression"] = {};
-//        if (this->expression != nullptr) {
-//            j["expression"] = this->expression->to_json();
-//        }
-    if (this->type != nullptr) {
-//            j["type"] = this->type->to_json();
-    }
-    return j;
-}
 

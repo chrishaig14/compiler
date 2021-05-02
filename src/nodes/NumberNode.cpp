@@ -22,9 +22,3 @@ const NumberNode& NumberNode::number() const {
     return *this;
 }
 
-json NumberNode::to_json() const {
-    json j;
-    j["node"] = "number";
-    // j["number"] = this->num;
-    return j;
-}

@@ -27,8 +27,6 @@ public:
 
     ~BoolOpNode();
 
-    json to_json() const override;
-
     TypeNode* ltype;
     TypeNode* rtype;
 };

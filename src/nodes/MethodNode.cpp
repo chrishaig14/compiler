@@ -42,10 +42,3 @@ bool MethodNode::equal(const Node& x) const {
     return *this->parent == *other.parent;
 }
 
-json MethodNode::to_json() const {
-    json j;
-    j["node"] = "Method";
-//        j["parent"] = this->parent->to_json();
-    j["child"] = this->s_child;
-    return j;
-}

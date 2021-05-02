@@ -25,8 +25,6 @@ public:
 
     ~IfNode();
 
-    json to_json() const override;
-
     IfNode& iff() override;
     const IfNode& iff() const override;
 };

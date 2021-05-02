@@ -23,11 +23,3 @@ const IdNode& IdNode::id() const {
     return *this;
 }
 
-json IdNode::to_json() const {
-    json j;
-    j["node"] = "id";
-    j["id"] = this->_id;
-    // j["start"] = this->start;
-    // j["end"] = this->end;
-    return j;
-}

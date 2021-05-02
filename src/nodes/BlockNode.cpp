@@ -12,16 +12,6 @@ const BlockNode& BlockNode::block() const {
     return *this;
 }
 
-json BlockNode::to_json() {
-    json j;
-    j["node"] = "block";
-    j["block"] = {};
-    for (auto n: this->nodes) {
-//            j["block"].push_back(n->to_json());
-    }
-    return j;
-}
-
 BlockNode::~BlockNode() {
     for (auto p: this->nodes) {
         delete p;

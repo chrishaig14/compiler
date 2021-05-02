@@ -34,17 +34,6 @@ const CallNode& CallNode::call() const {
     return *this;
 }
 
-json CallNode::to_json() const {
-    json j;
-    j["node"] = "call";
-//        j["function"] = this->function->to_json();
-    j["arguments"] = {};
-    for (auto a: this->arguments) {
-//            j["arguments"].push_back(a->to_json());
-    }
-    return j;
-}
-
 CallNode::~CallNode() {
     delete this->function;
     for (auto a: this->arguments) {

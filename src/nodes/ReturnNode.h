@@ -22,8 +22,6 @@ public:
 
     ~ReturnNode();
 
-    json to_json() const override;
-
     ReturnNode& retrn() override;
 
     const ReturnNode& retrn() const override;

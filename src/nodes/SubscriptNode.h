@@ -24,8 +24,6 @@ public:
 
     ~SubscriptNode();
 
-    json to_json() const
-    override;
 
     SubscriptNode& sub() override;
     const SubscriptNode& sub() const override;

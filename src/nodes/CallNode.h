@@ -24,8 +24,6 @@ public:
 
     ~CallNode();
 
-    json to_json() const override;
-
     CallNode& call() override;
     const CallNode& call() const override;
 

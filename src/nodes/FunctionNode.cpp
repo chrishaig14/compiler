@@ -2,6 +2,7 @@
 // Created by chris on 1/8/20.
 //
 
+#include <cassert>
 #include "FunctionNode.h"
 
 bool FunctionNode::equal(const Node& x) const {
@@ -62,19 +63,3 @@ FunctionNode::~FunctionNode() {
     delete this->return_type;
 }
 
-json FunctionNode::to_json() const {
-    json j;
-    j["node"] = "function";
-//        j["identifier"] = this->identifier;
-//        j["parameter_names"] = {};
-//        j["parameter_types"] = {};
-//        for (auto pn: this->parameter_names) {
-//            j["parameter_names"].push_back(pn);
-//        }
-//        for (auto pt: this->parameter_types) {
-//            j["parameter_types"].push_back(pt->to_json());
-//        }
-//        j["body"] = this->body->to_json();
-//        j["return_type"] = this->return_type->to_json();
-    return j;
-}

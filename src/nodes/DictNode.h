@@ -7,6 +7,7 @@
 
 
 #include "Node.h"
+#include <vector>
 
 class DictNode : public Node {
     DictNode& dict() override;

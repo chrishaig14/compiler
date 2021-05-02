@@ -21,8 +21,6 @@ public:
 
     bool equal(const Node& x) const override;
 
-    json to_json() const override;
-
     StringNode& strng() override;
     const StringNode& strng() const override;
 };

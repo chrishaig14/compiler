@@ -22,8 +22,6 @@ public:
 
     ~ListNode();
 
-    json to_json() const override;
-
     ListNode& lst() override;
     const ListNode& lst() const override;
     TypeNode* type;

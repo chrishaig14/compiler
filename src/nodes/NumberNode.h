@@ -26,8 +26,6 @@ public:
 
     bool equal(const Node& x) const override;
 
-    json to_json() const override;
-
     NumberNode& number() override;
     const NumberNode& number() const override;
 

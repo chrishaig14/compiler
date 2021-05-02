@@ -2,6 +2,7 @@
 // Created by chris on 1/8/20.
 //
 
+#include <cassert>
 #include "TypeNode.h"
 
 FunctionType::FunctionType(const VectorOfTypes& parameterTypes, TypeNode* returnType) {

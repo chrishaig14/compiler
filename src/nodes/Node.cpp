@@ -2,6 +2,7 @@
 // Created by chris on 1/8/20.
 //
 
+#include <stdexcept>
 #include "Node.h"
 
 bool Node::operator==(const Node& other) const {
@@ -269,10 +270,6 @@ void Node::throw_dereference_error(NodeType expected) const {
             "Getting " + this->node_type_string(expected) + " but it's a " + this->node_type_string(this->ntype));
 }
 
-std::ostream& operator<<(std::ostream& os, const Node& node) {
-    return os << node.to_json();
-}
-
 std::string Node::node_type_string(NodeType type) const {
     switch (type) {
         case NodeType::ASSIGN:
@@ -341,12 +338,6 @@ std::string Node::node_type_string(NodeType type) const {
         default:
             return "UNKNOWN";
     }
-}
-
-json Node::to_json() const {
-    json j;
-    j["name"] = "johnny";
-    return j;
 }
 
 BoolOpNode& Node::boolop() {

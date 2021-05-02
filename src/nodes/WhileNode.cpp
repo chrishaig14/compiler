@@ -2,6 +2,7 @@
 // Created by chris on 16/8/20.
 //
 
+#include <cassert>
 #include "WhileNode.h"
 
 WhileNode::WhileNode(Node* condition, BlockNode* body, TextPosition start, TextPosition end) : Node(NodeType::WHIL, start, end), body(body), condition(condition) {
