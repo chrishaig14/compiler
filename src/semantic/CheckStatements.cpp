@@ -133,7 +133,7 @@ USemanticInfo Checker::visit_return(ReturnNode& n) {
     USemanticInfo expression_info_p = this->dispatch(n.expression);
     SemanticInfo& expression_info = *expression_info_p;
     if (expression_info.entity.type == E_TYPE::ERROR) {
-        return nullptr;
+        return error_stub();
     }
     sn->expression = expression_info.snode;
     if (return_type->object().id == "Union") {
