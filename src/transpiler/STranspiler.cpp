@@ -54,7 +54,7 @@ std::string STranspiler::transpile_id(IdSNode* node) {
 void STranspiler::transpile_function(FunctionSNode* node) {
     std::string parameters;
 
-    for (int i = 0; i < node->params.size(); i++) {
+    for (size_t i = 0; i < node->params.size(); i++) {
         if (node->params[i] == "this") {
             node->params[i] = "this_obj";
         }

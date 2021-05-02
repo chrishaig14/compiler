@@ -96,7 +96,7 @@ void Checker::unify_function_call(FunctionType& fun, VectorOfTypes& args) {
         try {
             std::pair<std::string, TypeNode*>* substitution = get_first_substitution(*param, *arg, true);
             while (substitution != nullptr) {
-                for (int j = 0; j < args.size(); j++) {
+                for (size_t j = 0; j < args.size(); j++) {
                     // if (j == i) {
                     //     continue;
                     // }
@@ -270,7 +270,7 @@ USemanticInfo Checker::visit_alias(AliasNode* pNode) {
 
 USemanticInfo Checker::enum_member(Enum* enumm, std::string value, MemberNode& node) {
     SemanticInfo info;
-    for (int i = 0; i < enumm->values.size(); i++) {
+    for (size_t i = 0; i < enumm->values.size(); i++) {
         if (value == enumm->values[i]) {
             ObjectValue* ov = new ObjectValue();
             ov->ot = new ObjectType(enumm->enumm_name, {});

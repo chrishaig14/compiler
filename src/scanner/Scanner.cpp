@@ -96,16 +96,15 @@ Scanner::Scanner() {
     this->column = 0;
 }
 
-void Scanner::load_file(const std::string& __file__) {
-    std::string text = file_to_string(__file__);
-    this->text = text;
-    this->code_lines.text = text;
+void Scanner::load_file(const std::string& _file__) {
+    this->text = file_to_string(_file__);;
+    this->code_lines.text = this->text;
     this->code_lines.line_offsets.push_back(Range{.offset=0, .length=0});
 }
 
-void Scanner::load_text(const std::string& text) {
-    this->text = text;
-    this->code_lines.text = text;
+void Scanner::load_text(const std::string& txt) {
+    this->text = txt;
+    this->code_lines.text = txt;
     this->code_lines.line_offsets.push_back(Range{.offset=0, .length=0});
 }
 
@@ -160,20 +159,18 @@ Token Scanner::next_token() {
         std::string str;
         int start_l = this->line;
         int start_c = this->column;
-        int start = this->current;
         this->current++;
-        char c = this->text[this->current];
-        while (c != '\"') {
-            str += c;
+        char cr = this->text[this->current];
+        while (cr != '\"') {
+            str += cr;
             this->current++;
             if (this->current < this->text.size()) {
                 this->column++;
-                c = this->text[this->current];
+                cr = this->text[this->current];
             } else {
                 break;
             }
         }
-        int end = this->current;
         this->current++;
         this->column++;
         if (this->current < this->text.size()) {
@@ -188,7 +185,6 @@ Token Scanner::next_token() {
 }
 
 Token Scanner::scan_other() {
-    int start = this->current;
     int start_l = this->line;
     int start_c = this->column;
     char c = this->text[this->current];
@@ -203,7 +199,6 @@ Token Scanner::scan_other() {
             this->current += 2;
             this->column += 2;
             Token token(TOKEN_SPECIAL[tstr], {start_l, start_c});
-            int end = this->current - 1;
             token.end_pos = {this->line, this->column};
             if (token.type == TokType::DOUBLE_SLASH) {
                 // ignore everything until end of line
@@ -217,7 +212,6 @@ Token Scanner::scan_other() {
             return token;
         }
     }
-    int end = this->current;
     if (TOKEN_SPECIAL.find(str) != TOKEN_SPECIAL.end()) {
         this->current++;
         this->column++;
@@ -234,7 +228,6 @@ Token Scanner::scan_other() {
 }
 
 Token Scanner::scan_keyword_or_identifier() {
-    int start = this->current;
     int start_l = this->line;
     int start_c = this->column;
     char c = this->text[this->current];
@@ -249,7 +242,6 @@ Token Scanner::scan_keyword_or_identifier() {
             break;
         }
     }
-    int end = this->current - 1;
     if (TOKEN_KEYWORDS.find(str) != TOKEN_KEYWORDS.end()) {
 //      it's a keyword
         Token token(TOKEN_KEYWORDS[str], {start_l, start_c});
@@ -263,7 +255,6 @@ Token Scanner::scan_keyword_or_identifier() {
 }
 
 Token Scanner::scan_number() {
-    int start = this->current;
     int start_l = this->line;
     int start_c = this->column;
     char c = this->text[this->current];
@@ -305,21 +296,18 @@ Token Scanner::scan_number() {
                             this->column++;
                         }
                     }
-                    int end = this->current - 1;
                     Token token = Token(tok_type, str, {start_l, start_c});
                     token.end_pos = {this->line, this->column - 1};
                     return token;
                 }
             } else {
                 // it's just a dot, so return the number
-                int end = this->current - 1;
                 Token token = Token(TokType::INTEGER, str, {start_l, start_c});
                 token.end_pos = {this->line, this->column - 1};
                 return token;
             }
         }
     }
-    int end = this->current - 1;
     Token token = Token(TokType::INTEGER, str, {start_l, start_c});
     token.end_pos = {this->line, this->column - 1};
     return token;

@@ -8,9 +8,9 @@ ClassNode::ClassNode(const std::string& className, VectorOfStrings type_paramete
                      std::unordered_map<std::string, FunctionNode*> functions,
                      std::map<std::string, std::pair<TypeNode*, Node*>> static_members,
                      std::unordered_map<std::string, FunctionNode*> static_methods, TextPosition start,
-                     TextPosition end) : Node(NodeType::CLS, start, end), methods(functions), class_name(className),
-                                         members(members), static_members(static_members),
-                                         static_methods(static_methods) {
+                     TextPosition end) : Node(NodeType::CLS, start, end), members(members),
+                                         static_members(static_members), methods(functions),
+                                         static_methods(static_methods), class_name(className) {
     this->type_parameters = type_parameters;
 }
 

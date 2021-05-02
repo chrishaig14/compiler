@@ -21,7 +21,7 @@ public:
     MemberType type;
     Node* parent;
     std::string s_child;
-    int n_child;
+    size_t n_child;
     TypeNode* parent_t;
 
     MemberNode(Node* parent, const std::string& child, TextPosition start, TextPosition end);

@@ -34,8 +34,8 @@ public:
 
     Scanner();
 
-    void load_file(const std::string& file);
-    void load_text(const std::string& text);
+    void load_file(const std::string& _file__);
+    void load_text(const std::string& txt);
 
     Token get_next();
 

@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.16)
 project(xlang)
 
-set(CMAKE_CXX_STANDARD 14)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -Wall -Werror -Wpedantic -Wno-return-type")
 add_subdirectory(src)
 add_subdirectory(test)
 find_package(fmt)

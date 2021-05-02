@@ -198,6 +198,7 @@ bool Checker::assert_type_exists(TypeNode& type, TextPosition pos) {
         }
         return this->assert_type_exists(*type.function().return_type, pos);
     }
+    return false;
 }
 
 bool is_generic(const TypeNode& t) {
@@ -412,7 +413,7 @@ USemanticInfo Checker::dispatch(Node* nod) {
         case NodeType::ASSIGN:
             return this->visit_assignment(n.assign());
         case NodeType::ENUM:
-            return this->visit_enum((EnumNode&) nod);
+            return this->visit_enum((EnumNode&)*nod);
         case NodeType::BINOP: {
             auto r = this->visit_binop(n.binop());
             return r;

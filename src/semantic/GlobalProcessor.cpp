@@ -159,10 +159,8 @@ void GlobalProcessor::visit(ClassNode& node) {
     for (auto mn: node.static_members) {
         class_info->static_members[mn.first] = std::make_pair(mn.second.first->clone(), mn.second.second);
     }
-    bool has_init = false;
     for (auto f: node.methods) {
         FunctionNode& method = *f.second;
-        has_init = f.first == "init";
 
         VectorOfTypes x;
         for (auto p: method.parameter_types) {
@@ -183,8 +181,6 @@ void GlobalProcessor::visit(ClassNode& node) {
 
     for (auto f: node.static_methods) {
         FunctionNode& method = *f.second;
-        has_init = f.first == "init";
-
         VectorOfTypes x;
         for (auto p: method.parameter_types) {
             this->module->fill_actual(p);

@@ -24,10 +24,10 @@ bool IfNode::equal(const Node& x) const {
             return false;
         }
     }
-    if (this->selse != nullptr && other.selse == nullptr || this->selse == nullptr && other.selse != nullptr) {
+    if ((this->selse != nullptr && other.selse == nullptr) || (this->selse == nullptr && other.selse != nullptr)) {
         return false;
     }
-    return this->selse == nullptr && other.selse == nullptr || *this->selse == *other.selse;
+    return (this->selse == nullptr && other.selse == nullptr) || *this->selse == *other.selse;
 
 }
 

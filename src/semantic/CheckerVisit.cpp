@@ -693,7 +693,6 @@ USemanticInfo Checker::visit_call(CallNode& n) {
     SemanticInfo& fun_info = *fun_info_p;
     bool is_a_method = false;
     Node* object_node;
-    SNode* extra_first_argument = nullptr;
     if (fun_info.is_class_method) {
         MemberNode& member_node = n.function->member();
         if (member_node.s_child == "init") {
@@ -828,6 +827,12 @@ USemanticInfo Checker::visit_call(CallNode& n) {
             case E_TYPE::MODULE:
                 entity_type = "MODULE";
                 break;
+            case E_TYPE::ERROR:
+                break;
+            case E_TYPE::NOT_FOUND:
+                break;
+            case E_TYPE::ENUM:
+                break;
         }
         throw std::runtime_error("Calling something that's not a function it's a " + entity_type);
         this->error_reporter.call_not_a_function(n.start);
@@ -943,7 +948,6 @@ USemanticInfo Checker::visit_function(FunctionNode& n) {
     }
     for (size_t i = 0; i < n.parameter_names.size(); i++) {
         TypeNode& type = *n.parameter_types[i];
-        TypeNode& param_type = *n.const_function->ft->param_types[i];
         TypeNode* cl = type.clone();
         make_not_generic(cl);
         this->scope->set(n.parameter_names[i], entity_from_type(*cl));
@@ -1012,7 +1016,7 @@ USemanticInfo Checker::visit_id(IdNode& n) {
 }
 
 int target_union_type(const ObjectType& target, const TypeNode& source) {
-    for (int ti = 0; ti < target.type_params.size(); ti++) {
+    for (size_t ti = 0; ti < target.type_params.size(); ti++) {
         if (target.type_params[ti]->actual_to_string() == source.actual_to_string()) {
             return ti;
         }
@@ -1072,7 +1076,6 @@ USemanticInfo Checker::check_declaration_with_type(DeclarationNode& n) {
                     }
                 }
             } else if (actual_type.id == "Union") {
-                bool ok = false;
                 int type_index = target_union_type(actual_type, exp_type);
                 if (type_index == -1) {
                     // throw std::runtime_error("OH NO!");
@@ -1112,7 +1115,6 @@ USemanticInfo Checker::check_declaration_without_type(DeclarationNode& n) {
     //     return error_t;
     // }
     // n.type = exp_info_p->type().clone();
-    SemanticInfo& exp_info = *exp_info_p;
     n.expression = this->replace_if_necessary(n.expression);
     // info.set_type(exp_info.type());
     info.entity = exp_info_p->entity;
@@ -1568,7 +1570,6 @@ USemanticInfo Checker::visit_binop(BinopNode& n) {
         info.is_constant = true;
     }
     TypeNode* rettype;
-    bool ok = true;
     std::string fun;
     if (n.op == OpType::ADD) {
         fun = "add";
@@ -1721,7 +1722,7 @@ USemanticInfo Checker::visit_match(MatchExpressionNode* node) {
     }
     std::vector<std::pair<int, BlockSNode*>> cas;
     std::string varname = "match_var";
-    for (int i = 0; i < node->ids.size(); i++) {
+    for (size_t i = 0; i < node->ids.size(); i++) {
         std::pair<TypeNode*, BlockNode*> c = node->cases[i];
         TypeNode* type = c.first;
         this->module->fill_actual(type);

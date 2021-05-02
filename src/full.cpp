@@ -173,6 +173,9 @@ void add_path_to_module(Module* module, Path path) {
         case F_TYPE::MODULE:
             t = "module";
             break;
+        case F_TYPE::ENUM:
+            t = "enum";
+            break;
     }
     std::string lt;
     switch (last_flirpin.type) {
@@ -187,6 +190,9 @@ void add_path_to_module(Module* module, Path path) {
             break;
         case F_TYPE::MODULE:
             lt = "module";
+            break;
+        case F_TYPE::ENUM:
+            lt = "enum";
             break;
     }
     std::string included_header;

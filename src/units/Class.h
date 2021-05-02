@@ -13,6 +13,7 @@
 #include "../nodes/TypeNode.h"
 #include "../macros.h"
 #include "Entity.h"
+#include "ConstFunction.h"
 
 class Class {
 public:

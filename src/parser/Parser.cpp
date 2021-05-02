@@ -82,7 +82,6 @@ IfNode* Parser::parse_if() {
     Node* condition = this->parse_expression();
     BlockNode* body = this->parse_possibly_empty_block();
     std::vector<std::pair<Node*, BlockNode*>> elifs;
-    TextPosition end = POS_NONE;
     while (this->match(TokType::ELIF)) {
         this->next();
         Node* elif_condition = this->parse_expression();

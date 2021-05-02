@@ -12,12 +12,12 @@ WhileNode::WhileNode(Node* condition, BlockNode* body, TextPosition start, TextP
 
 bool WhileNode::equal(const Node& x) const {
     auto& other = x.whil();
-    if (this->body == nullptr && other.body != nullptr || this->body != nullptr && other.body == nullptr) {
+    if ((this->body == nullptr && other.body != nullptr) || (this->body != nullptr && other.body == nullptr)) {
         return false;
     }
 
     return *this->condition == *other.condition &&
-           (this->body == nullptr && other.body == nullptr || *this->body == *other.body);
+           ((this->body == nullptr && other.body == nullptr) || *this->body == *other.body);
 }
 
 WhileNode& WhileNode::whil() {
