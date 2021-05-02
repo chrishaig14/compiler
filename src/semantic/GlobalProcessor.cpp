@@ -14,15 +14,6 @@
 GlobalProcessor::GlobalProcessor() {
 }
 
-std::string join_path(VectorOfStrings path) {
-    std::string o;
-    for (auto p: path) {
-        o += p + ".";
-    }
-    o = o.substr(0, o.size() - 1);
-    return o;
-}
-
 void GlobalProcessor::visit(ImportNode& node) {
     if (node.has_alias) {
         if (this->module->imported_paths_with_alias.count(node.alias)) {
