@@ -46,6 +46,7 @@
 #include "../simple_nodes/MatchSNode.h"
 #include "CheckerUtils.h"
 
+#define T_NONE ObjectType(".None")
 
 typedef std::unique_ptr<SemanticInfo> USemanticInfo;
 
