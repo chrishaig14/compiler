@@ -275,8 +275,7 @@ Node* Parser::parse_factor() {
         }
     }
     parent = this->parse_call_or_subscript_chain(parent);
-    while (this->match(TokType::DOT) || this->match(TokType::COLON)) {
-        if (this->match(TokType::DOT)) {
+    while (this->match(TokType::DOT)) {
             TextPosition dot_pos = this->token.start;
             this->next();
             Token tok;
@@ -288,11 +287,6 @@ Node* Parser::parse_factor() {
                 parent = new MemberNode(parent, tok.str, parent->start, tok.end_pos);
                 parent->dot_pos = dot_pos;
             }
-        } else if (this->match(TokType::COLON)) {
-            this->next();
-            Token tok = this->expect_token(TokType::ID);
-            parent = new MethodNode(parent, tok.str, parent->start, tok.end_pos);
-        }
         parent = this->parse_call_or_subscript_chain(parent);
     }
 
