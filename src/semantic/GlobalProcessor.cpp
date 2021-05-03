@@ -260,15 +260,17 @@ Path Module::get_actual_path(std::string id) {
 }
 
 void Module::fill_actual(TypeNode* t) {
-    if (this->aliased_types.count(t->object().id)) {
-        t->object().aliased_type = this->aliased_types[t->object().id];
-        return;
+    if (t->kind == Kind::OBJECT) {
+        if (this->aliased_types.count(t->object().id)) {
+            t->object().aliased_type = this->aliased_types[t->object().id];
+            return;
+        }
+        fill_actual(&t->object());
     }
     if (t->kind == Kind::FUNCTION) {
         fill_actual(&t->function());
         return;
     }
-    fill_actual(&t->object());
 }
 
 void Module::fill_actual(ObjectType* t) {

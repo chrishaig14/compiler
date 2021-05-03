@@ -24,7 +24,7 @@ USemanticInfo Checker::visit_assignment(AssignmentNode& n) {
         return nullptr;
     }
 
-    if (linfo_p->entity.type != E_TYPE::FUNCTION_VALUE && linfo_p->entity.type != E_TYPE::OBJECT_VALUE) {
+    if (linfo_p->entity.type != E_TYPE::VALUE) {
         throw std::runtime_error("Cannot assign to this thing!");
     }
 
@@ -34,12 +34,13 @@ USemanticInfo Checker::visit_assignment(AssignmentNode& n) {
 
     USemanticInfo expression_info_p = this->dispatch(n.rvalue);
 
-    if (linfo_p->entity.type == E_TYPE::OBJECT_VALUE && expression_info_p->entity.type == E_TYPE::CONST_FUNCTION) {
-        this->error_reporter.assignment(*linfo_p->entity.function_value->ft,
-                                        *expression_info_p->entity.object_value->ot,
+    if (linfo_p->entity.type == E_TYPE::VALUE && linfo_p->entity.value->type->kind == Kind::OBJECT &&
+        expression_info_p->entity.type == E_TYPE::CONST_FUNCTION) {
+        this->error_reporter.assignment(*linfo_p->entity.value->type,
+                                        *expression_info_p->entity.value->type,
                                         n.rvalue->start);
     }
-    TypeNode* exp_type = expression_info_p->entity.object_value->ot;
+    TypeNode* exp_type = expression_info_p->entity.value->type;
 
     if (exp_type->kind == Kind::OBJECT && this->module->aliased_types.count(exp_type->object().id) == 1) {
         TypeNode* aliased_type = this->module->aliased_types.at(exp_type->object().id);
@@ -53,23 +54,24 @@ USemanticInfo Checker::visit_assignment(AssignmentNode& n) {
     }
     SemanticInfo& linfo = *linfo_p;
 
-    const TypeNode& l_type = *linfo.entity.object_value->ot;
+    const TypeNode& l_type = *linfo.entity.value->type;
 
-    if (linfo.entity.type == E_TYPE::OBJECT_VALUE && expression_info_p->entity.type == E_TYPE::OBJECT_VALUE) {
+    if (linfo.entity.type == E_TYPE::VALUE && expression_info_p->entity.type == E_TYPE::VALUE) {
 
 
         SNode* rvalue_snode = this->make_rvalue(expression_info_p->entity,
                                                 expression_info_p->snode,
-                                                *linfo.entity.object_value->ot);
+                                                *linfo.entity.value->type);
         if (rvalue_snode == nullptr) {
             this->error_reporter.assignment(l_type, *exp_type, n.start);
         }
         expression_info_p->snode = rvalue_snode;
-    } else {
-        this->error_reporter.assignment(*linfo_p->entity.function_value->ft,
-                                        *expression_info_p->entity.object_value->ot,
-                                        n.rvalue->start);
     }
+    // } else {
+    //     this->error_reporter.assignment(*linfo_p->entity.function_value->ft,
+    //                                     *expression_info_p->entity.value->type,
+    //                                     n.rvalue->start);
+    // }
     AssignmentSNode* sn = new AssignmentSNode();
     sn->lvalue = linfo_p->snode;
     sn->rvalue = expression_info_p->snode;
@@ -83,12 +85,7 @@ USemanticInfo Checker::visit_return(ReturnNode& n) {
     ReturnSNode* sn = new ReturnSNode();
     info.snode = sn;
     Entity return_entity = this->scope->get("__return__");
-    TypeNode* return_typet = nullptr;
-    if (return_entity.type == E_TYPE::FUNCTION_VALUE) {
-        return_typet = return_entity.function_value->ft;
-    } else if (return_entity.type == E_TYPE::OBJECT_VALUE) {
-        return_typet = return_entity.object_value->ot;
-    }
+    TypeNode* return_typet = return_entity.value->type;
     TypeNode* return_type = return_typet;
     if (return_type->kind == Kind::OBJECT && this->module->aliased_types.count(return_type->object().id) == 1) {
         TypeNode* aliased_type = this->module->aliased_types.at(return_type->object().id);
@@ -111,15 +108,15 @@ USemanticInfo Checker::visit_return(ReturnNode& n) {
     }
     sn->expression = expression_info.snode;
     if (return_type->object().id == "Union") {
-        int type_index = target_union_type(return_type->object(), *expression_info.entity.object_value->ot);
+        int type_index = target_union_type(return_type->object(), *expression_info.entity.value->type);
         if (type_index == -1) {
-            this->error_reporter.assignment(*return_typet, *expression_info.entity.object_value->ot, n.start);
+            this->error_reporter.assignment(*return_typet, *expression_info.entity.value->type, n.start);
         }
         SNode* union_wrapper = make_union_wrapper(type_index, sn->expression);
         sn->expression = union_wrapper;
     } else {
-        if (!this->can_assign(*expression_info.entity.object_value->ot, *return_type)) {
-            this->error_reporter.return_mismatch(*return_typet, *expression_info.entity.object_value->ot, n.start);
+        if (!this->can_assign(*expression_info.entity.value->type, *return_type)) {
+            this->error_reporter.return_mismatch(*return_typet, *expression_info.entity.value->type, n.start);
             return error_stub();
         }
     }
@@ -131,12 +128,12 @@ USemanticInfo Checker::visit_return(ReturnNode& n) {
 USemanticInfo Checker::visit_match(MatchExpressionNode* node) {
     SemanticInfo info;
     USemanticInfo exp_info = this->dispatch(node->exp);
-    if (exp_info->entity.type != E_TYPE::OBJECT_VALUE) {
+    if (exp_info->entity.type != E_TYPE::VALUE || exp_info->entity.value->type->kind != Kind::OBJECT) {
         this->error_reporter.match_type(exp_info->entity, TextPosition());
         return error_stub();
     }
 
-    ObjectType* ot = exp_info->entity.object_value->ot;
+    ObjectType* ot = &exp_info->entity.value->type->object();
     if (ot->aliased_type != nullptr) {
         ot = (ObjectType*) ot->aliased_type;
     }
@@ -195,10 +192,10 @@ USemanticInfo Checker::visit_continue(ContinueNode& node) {
 
 USemanticInfo Checker::visit_for(ForNode& node) {
     USemanticInfo exp_info_p = this->dispatch(node.exp);
-    if (exp_info_p->entity.type != E_TYPE::OBJECT_VALUE) {
+    if (exp_info_p->entity.type != E_TYPE::VALUE) {
         this->error_reporter._for(exp_info_p->entity, node.exp->start);
     }
-    ObjectType* exp_ot = exp_info_p->entity.object_value->ot;
+    ObjectType* exp_ot = &exp_info_p->entity.value->type->object();
     if (exp_ot->id != "List") {
         this->error_reporter._for(exp_info_p->entity, node.exp->start);
     }
@@ -249,10 +246,10 @@ USemanticInfo Checker::visit_while(WhileNode& node) {
     info.snode = while_sn;
     USemanticInfo condition_p = this->dispatch(node.condition);
     SemanticInfo& condition = *condition_p;
-    if (condition.entity.type != E_TYPE::OBJECT_VALUE) {
+    if (condition.entity.type != E_TYPE::VALUE) {
         this->error_reporter.condition(condition.entity, node.start, "while");
     }
-    ObjectType* condition_ot = condition.entity.object_value->ot;
+    ObjectType* condition_ot = &condition.entity.value->type->object();
     if (*condition_ot != T_BOOL) {
         this->error_reporter.condition(condition.entity, node.start, "while");
     }
@@ -280,10 +277,10 @@ USemanticInfo Checker::visit_if(IfNode& n) {
     SemanticInfo& condition_info = *condition_info_p;
 
     if (condition_info.entity.type != E_TYPE::ERROR) {
-        if (condition_info.entity.type != E_TYPE::OBJECT_VALUE) {
+        if (condition_info.entity.type != E_TYPE::VALUE) {
             this->error_reporter.condition(condition_info.entity, n.condition->start, "if");
         }
-        if (*condition_info.entity.object_value->ot != T_BOOL) {
+        if (*condition_info.entity.value->type != T_BOOL) {
             this->error_reporter.condition(condition_info.entity, n.condition->start, "if");
         }
     }
@@ -306,10 +303,10 @@ USemanticInfo Checker::visit_if(IfNode& n) {
     for (size_t i = 0; i < n.elifs.size(); i++) {
         USemanticInfo elif_condition_info_p = this->dispatch(n.elifs[i].first);
         SemanticInfo& elif_condition_info = *elif_condition_info_p;
-        if (elif_condition_info.entity.type != E_TYPE::OBJECT_VALUE) {
+        if (elif_condition_info.entity.type != E_TYPE::VALUE) {
             this->error_reporter.condition(condition_info.entity, n.elifs[i].first->start, "elif");
         }
-        if (*elif_condition_info.entity.object_value->ot != T_BOOL) {
+        if (*elif_condition_info.entity.value->type != T_BOOL) {
             this->error_reporter.condition(condition_info.entity, n.elifs[i].first->start, "elif");
         }
         this->enter_scope("elif");

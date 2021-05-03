@@ -5,17 +5,30 @@
 #include "CheckDeclaration.h"
 
 SNode* Checker::make_rvalue(Entity value_entity, SNode* value_snode, const TypeNode& target) {
-    if (value_entity.type == E_TYPE::OBJECT_VALUE) {
-        if (target.kind != Kind::OBJECT) {
+    if (value_entity.type == E_TYPE::VALUE) {
+        const ObjectType& value_ot = value_entity.value->type->object();
+        const ObjectType& target_ot = target.object();
+
+        const TypeNode* unaliased_value_type = &value_ot;
+        if (value_ot.aliased_type != nullptr) {
+            unaliased_value_type = value_ot.aliased_type;
+        }
+
+        const TypeNode* unaliased_target_type = &target_ot;
+        if (target_ot.aliased_type != nullptr) {
+            unaliased_target_type = target_ot.aliased_type;
+        }
+
+        if (unaliased_value_type->kind != Kind::OBJECT || unaliased_target_type->kind != Kind::OBJECT) {
             return nullptr;
         }
-        const ObjectType& value_ot = *value_entity.object_value->ot;
-        const ObjectType& target_ot = target.object();
-        if (value_ot == target_ot) {
+
+        if (unaliased_value_type->object() == unaliased_target_type->object()) {
             return value_snode;
         }
-        if (target_ot.id == "Union") {
-            int union_index = target_union_type(target_ot, value_ot);
+
+        if (unaliased_target_type->object().id == "Union") {
+            int union_index = target_union_type(unaliased_target_type->object(), unaliased_value_type->object());
             if (union_index == -1) {
                 return nullptr;
             } else {
@@ -61,17 +74,16 @@ USemanticInfo Checker::check_declaration_with_type(DeclarationNode& n) {
     USemanticInfo exp_info_p = this->dispatch(n.expression);
 
     E_TYPE entity_type = exp_info_p->entity.type;
-    if (entity_type != E_TYPE::CONST_FUNCTION && entity_type != E_TYPE::FUNCTION_VALUE &&
-        entity_type != E_TYPE::OBJECT_VALUE) {
+    if (entity_type != E_TYPE::CONST_FUNCTION && entity_type != E_TYPE::VALUE) {
         this->error_reporter.expected_expression_with_type(exp_info_p->entity, *n.type, n.start);
     }
 
     sn->expression = exp_info_p->snode;
     SemanticInfo& exp_info = *exp_info_p;
     if (exp_info.entity.type == E_TYPE::ERROR) {
-        ObjectValue* ov = new ObjectValue();
+        Value* ov = new Value();
         info.entity = Entity(ov);
-        ov->ot = (ObjectType*) n.type->clone();
+        ov->type = (ObjectType*) n.type->clone();
         return std::make_unique<SemanticInfo>(info);
     }
 
@@ -80,9 +92,9 @@ USemanticInfo Checker::check_declaration_with_type(DeclarationNode& n) {
         throw std::runtime_error("Cannot assign!");
     }
     sn->expression = rvalue_snode;
-    ObjectValue* ov = new ObjectValue();
+    Value* ov = new Value();
     info.entity = Entity(ov);
-    ov->ot = (ObjectType*) n.type->clone();
+    ov->type = (ObjectType*) n.type->clone();
     return std::make_unique<SemanticInfo>(info);
 }
 
@@ -94,8 +106,7 @@ USemanticInfo Checker::check_declaration_without_type(DeclarationNode& n) {
         return error_stub();
     }
     E_TYPE entity_type = exp_info_p->entity.type;
-    if (entity_type != E_TYPE::CONST_FUNCTION && entity_type != E_TYPE::FUNCTION_VALUE &&
-        entity_type != E_TYPE::OBJECT_VALUE) {
+    if (entity_type != E_TYPE::CONST_FUNCTION && entity_type != E_TYPE::VALUE) {
         this->error_reporter.expected_expression(exp_info_p->entity, n.start);
         return error_stub();
     }
@@ -106,13 +117,12 @@ USemanticInfo Checker::check_declaration_without_type(DeclarationNode& n) {
     sn->expression = exp_info_p->snode;
     info.entity = exp_info_p->entity;
     if (info.entity.type == E_TYPE::CONST_FUNCTION) {
-        info.entity = Entity(new FunctionValue());
-        info.entity.function_value->ft = exp_info_p->entity.const_function->ft;
+        info.entity = Entity(new Value());
+        info.entity.value->type = exp_info_p->entity.const_function->ft->clone();
 
-        if (info.entity.function_value->ft->is_generic()) {
+        if (info.entity.value->type->is_generic()) {
             throw std::runtime_error("Error: you need to specialize the generic function of type " +
-                                     info.entity.function_value->ft->to_string() +
-                                     " to be able to use it without calling it");
+                                     info.entity.value->type->to_string() + " to be able to use it without calling it");
         }
     }
     return std::make_unique<SemanticInfo>(info);

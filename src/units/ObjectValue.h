@@ -8,10 +8,10 @@
 
 #include "Entity.h"
 #include "../nodes/TypeNode.h"
-class ObjectValue {
+class Value {
 
 public:
-    ObjectType* ot;
+    TypeNode* type;
 };
 
 

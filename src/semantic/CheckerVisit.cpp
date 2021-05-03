@@ -108,9 +108,9 @@ USemanticInfo Checker::visit_class(ClassNode& node) {
 
     for (auto sm: node.static_members) {
         USemanticInfo sm_exp_info = this->dispatch(sm.second.second);
-        if (*sm.second.first != *sm_exp_info->entity.object_value->ot) {
+        if (*sm.second.first != *sm_exp_info->entity.value->type) {
             throw std::runtime_error("Err: cannt initialize static member of type " + sm.second.first->to_string() +
-                                     " with expression of type " + sm_exp_info->entity.object_value->ot->to_string());
+                                     " with expression of type " + sm_exp_info->entity.value->type->to_string());
         }
         if (!sm_exp_info->is_constant) {
             throw std::runtime_error("Error: cannot initialize static member with non constant expression!");
@@ -124,9 +124,9 @@ USemanticInfo Checker::visit_class(ClassNode& node) {
     for (auto method: node.methods) {
         this->is_method = true;
         this->add_this = true;
-        this->this_entity = Entity(new ObjectValue());
-        this->this_entity.object_value->ot = new ObjectType(node.class_name);
-        this->this_entity.object_value->ot->actual_base_path = clazz->path;
+        this->this_entity = Entity(new Value());
+        this->this_entity.value->type = new ObjectType(node.class_name);
+        this->this_entity.value->type->object().actual_base_path = clazz->path;
         // method.second->path = clazz->path + "." + method.second->identifier;
         USemanticInfo method_info = this->visit_function(*method.second);
         methods_snodes.push_back(method_info->snode);

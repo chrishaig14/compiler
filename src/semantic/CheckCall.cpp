@@ -50,8 +50,8 @@ USemanticInfo Checker::visit_call(CallNode& n) {
     FunctionType* function_type = nullptr;
     if (fun_info.entity.type == E_TYPE::CONST_FUNCTION) {
         function_type = fun_info.entity.const_function->ft->clone();
-    } else if (fun_info.entity.type == E_TYPE::FUNCTION_VALUE) {
-        function_type = fun_info.entity.function_value->ft->clone();
+    } else if (fun_info.entity.type == E_TYPE::VALUE && fun_info.entity.value->type->kind == Kind::FUNCTION) {
+        function_type = fun_info.entity.value->type->function().clone();
     } else {
         this->error_reporter.call_not_a_function(n.start);
     }
@@ -100,7 +100,7 @@ USemanticInfo Checker::visit_call(CallNode& n) {
         retv.entity = match_arguments_to_generic_function(*function_type, arg_types).entity;
     } else {
         retv.entity = entity_from_type(*function_type->return_type);
-        retv.entity.object_value->ot = (ObjectType*) function_type->return_type->clone();
+        retv.entity.value->type = (ObjectType*) function_type->return_type->clone();
         for (size_t i = 0; i < n.arguments.size(); i++) {
             const TypeNode& arg_type = *arg_types[i];
             const TypeNode& param_type = *function_type->param_types[i];
@@ -119,7 +119,11 @@ USemanticInfo Checker::visit_call(CallNode& n) {
     for (auto x: arg_types) {
         delete x;
     }
-
+    // if (retv.entity.value->type->kind==Kind::OBJECT){
+    //     if (retv.entity.value->type->object().actual_to_string() == ""){
+    //         throw std::runtime_error("This should not be empty!");
+    //     }
+    // }
     retv.is_constant = is_def_const && args_are_constant;
     return std::make_unique<SemanticInfo>(retv);
 }

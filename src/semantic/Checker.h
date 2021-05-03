@@ -175,7 +175,7 @@ public:
 
     ErrorReporter error_reporter;
     Entity this_entity;
-    USemanticInfo object_member(SNode* object_snode, ObjectValue* pValue, std::string child, MemberNode& n);
+    USemanticInfo object_member(SNode* object_snode, Value* pValue, std::string child, MemberNode& n);
     USemanticInfo class_member(Class* cls, std::string child, MemberNode& n);
     USemanticInfo package_member(Package* package, std::string child, MemberNode& n);
     USemanticInfo module_member(Module* mod, std::string child, MemberNode& n);

@@ -234,14 +234,8 @@ SemanticInfo Checker::match_arguments_to_generic_function(const FunctionType& ft
         delete at;
     }
     SemanticInfo rv;
-    if (f->return_type->kind == Kind::OBJECT) {
-        rv.entity = Entity(new ObjectValue());
-        rv.entity.object_value->ot = (ObjectType*) f->return_type->clone();
-    } else {
-        rv.entity = Entity(new FunctionValue());
-        rv.entity.function_value->ft = (FunctionType*) f->return_type->clone();
-    }
-
+    rv.entity = Entity(new Value());
+    rv.entity.value->type = f->return_type->clone();
     delete f;
     return rv;
 }
@@ -300,7 +294,8 @@ TypeNode* make_type_from_object_pattern(const ObjectType& object_type, const Map
         TypeNode* new_tp = make_type(*tp, replacements);
         new_type_params.push_back(new_tp);
     }
-    return TYPE(type_identifier, new_type_params);
+    ObjectType* ot = TYPE(type_identifier, new_type_params);
+    return ot;
 }
 
 TypeNode* make_type_from_function_pattern(const FunctionType& ftn, const MapStringType& replacements) {
@@ -339,6 +334,7 @@ Class* Checker::instantiate_generic(Class* generic, const ObjectType& instance) 
     for (auto m: generic->methods) {
         TypeNode* t = (m.second)->ft;
         TypeNode& concrete_type = *make_type(*t, replacements);
+        this->module->fill_actual(&concrete_type);
         ConstFunction* cf = new ConstFunction();
         cf->path = m.second->path;
         cf->ft = (FunctionType*) concrete_type.clone();
@@ -403,7 +399,7 @@ USemanticInfo Checker::dispatch(Node* nod) {
         case NodeType::ASSIGN:
             return this->visit_assignment(n.assign());
         case NodeType::ENUM:
-            return this->visit_enum((EnumNode&)*nod);
+            return this->visit_enum((EnumNode&) *nod);
         case NodeType::BINOP: {
             auto r = this->visit_binop(n.binop());
             return r;

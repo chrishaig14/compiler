@@ -166,7 +166,6 @@ Entity map_flirpin_to_entity(Flirpin flirpin) {
 }
 
 
-
 USemanticInfo Checker::visit_alias(AliasNode* pNode) {
     SemanticInfo info;
     return std::make_unique<SemanticInfo>(info);
@@ -176,9 +175,9 @@ USemanticInfo Checker::enum_member(Enum* enumm, std::string value, MemberNode& n
     SemanticInfo info;
     for (size_t i = 0; i < enumm->values.size(); i++) {
         if (value == enumm->values[i]) {
-            ObjectValue* ov = new ObjectValue();
-            ov->ot = new ObjectType(enumm->enumm_name, {});
-            ov->ot->actual_base_path = enumm->path;
+            Value* ov = new Value();
+            ov->type = new ObjectType(enumm->enumm_name, {});
+            ov->type->object().actual_base_path = enumm->path;
             info.entity = Entity(ov);
             info.snode = new EnumMemberSNode(enumm->path.as_str(), value);
             return std::make_unique<SemanticInfo>(info);

@@ -8,7 +8,7 @@ USemanticInfo Checker::visit_member(MemberNode& n) {
     USemanticInfo parent_info = this->dispatch(n.parent);
     Entity parent_entity = parent_info->entity;
     if (n.type == MemberType::NUM) {
-        ObjectType* ot = parent_entity.object_value->ot;
+        ObjectType* ot = &parent_entity.value->type->object();
         if (ot->id != "Tuple") {
             throw std::runtime_error("Integer member of not a Tuple!");
         }
@@ -23,9 +23,9 @@ USemanticInfo Checker::visit_member(MemberNode& n) {
         omsn->object = parent_info->snode;
         omsn->member_name = "mem_" + std::to_string(n.n_child);
         omsn->class_path = ot->actual_base_path;
-        ObjectValue* ov = new ObjectValue();
+        Value* ov = new Value();
         info.entity = Entity(ov);
-        ov->ot = (ObjectType*) ot->type_params[n.n_child - 1]->clone();
+        ov->type = (ObjectType*) ot->type_params[n.n_child - 1]->clone();
         return std::make_unique<SemanticInfo>(info);
     }
     switch (parent_entity.type) {
@@ -34,11 +34,12 @@ USemanticInfo Checker::visit_member(MemberNode& n) {
         case E_TYPE::CONST_FUNCTION:
             this->error_reporter.function_no_member(n.dot_pos);
             break;
-        case E_TYPE::FUNCTION_VALUE:
-            this->error_reporter.function_no_member(n.dot_pos);
-            break;
-        case E_TYPE::OBJECT_VALUE:
-            return this->object_member(parent_info->snode, parent_entity.object_value, n.s_child, n);
+        case E_TYPE::VALUE:
+            if (parent_entity.value->type->kind == Kind::FUNCTION) {
+                this->error_reporter.function_no_member(n.dot_pos);
+                return error_stub();
+            }
+            return this->object_member(parent_info->snode, parent_entity.value, n.s_child, n);
         case E_TYPE::PACKAGE:
             return this->package_member(parent_entity.package, n.s_child, n);
         case E_TYPE::MODULE:
@@ -69,18 +70,19 @@ USemanticInfo Checker::module_member(Module* mod, std::string child, MemberNode&
     return std::make_unique<SemanticInfo>(info);
 }
 
-USemanticInfo Checker::object_member(SNode* object_snode, ObjectValue* pValue, std::string child, MemberNode& n) {
-    if (pValue->ot->actual_base_path.as_str() == "") {
+USemanticInfo Checker::object_member(SNode* object_snode, Value* pValue, std::string child, MemberNode& n) {
+    Path object_type_path = pValue->type->object().actual_base_path;
+    if (object_type_path.as_str() == "") {
         // is a single type param, error
-        throw std::runtime_error("Error: no member " + child + " in totally generic type " + pValue->ot->to_string());
+        throw std::runtime_error("Error: no member " + child + " in totally generic type " + pValue->type->to_string());
     }
-    if (pValue->ot->actual_base_path.as_str() == "core.Union") {
-        this->error_reporter.object_no_member(*pValue->ot, child, n.dot_pos);
+    if (object_type_path.as_str() == "core.Union") {
+        this->error_reporter.object_no_member(*pValue->type, child, n.dot_pos);
         return error_stub();
     }
-    Class* clazz = this->root_package->get(pValue->ot->actual_base_path).clazz;
+    Class* clazz = this->root_package->get(object_type_path).clazz;
     if (clazz->type_params.size() != 0) {
-        clazz = instantiate_generic(clazz, *pValue->ot);
+        clazz = instantiate_generic(clazz, pValue->type->object());
     }
     SemanticInfo info;
     if (clazz->members.count(child)) {
@@ -109,13 +111,13 @@ USemanticInfo Checker::object_member(SNode* object_snode, ObjectValue* pValue, s
                 non->args.push_back(nullptr);
             }
             info.snode = non;
-            FunctionValue* fv = new FunctionValue();
-            fv->ft = clazz->methods[child]->ft->clone();
+            Value* fv = new Value();
+            fv->type = clazz->methods[child]->ft->clone();
             info.entity = Entity(fv);
         }
 
     } else {
-        this->error_reporter.object_no_member(*pValue->ot, child, n.dot_pos);
+        this->error_reporter.object_no_member(*pValue->type, child, n.dot_pos);
         return error_stub();
     }
     return std::make_unique<SemanticInfo>(info);

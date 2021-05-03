@@ -9,10 +9,6 @@
 #include "Entity.h"
 #include "../nodes/TypeNode.h"
 
-class FunctionValue {
-public:
-    FunctionType* ft;
-};
 
 
 #endif //XLANG_FUNCTIONVALUE_H

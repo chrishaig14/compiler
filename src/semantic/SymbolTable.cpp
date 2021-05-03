@@ -117,13 +117,14 @@ std::vector<std::pair<std::string, TypeNode*>> SymbolTable::get_all() {
         for (auto v: this->table) {
             Entity e = v.second;
             TypeNode* t;
-            if (e.type == E_TYPE::FUNCTION_VALUE) {
-                t = e.function_value->ft->clone();
+            if (e.type == E_TYPE::VALUE) {
+                TypeNode& type = *e.value->type;
+                t = type.clone();
+                if (e.type == E_TYPE::VALUE) {
+                    r.push_back(std::make_pair(v.first, t));
+                }
             }
-            if (e.type == E_TYPE::OBJECT_VALUE) {
-                t = e.object_value->ot->clone();
-                r.push_back(std::make_pair(v.first, t));
-            }
+
         }
         return r;
     } else {

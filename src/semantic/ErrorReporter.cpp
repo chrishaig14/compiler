@@ -19,9 +19,8 @@ std::string entity_to_string(Entity entity) {
             return "module " + E_HLT(entity.module->name);
         case E_TYPE::CLASS:
             return "class " + E_HLT(entity.clazz->class_name);
-        case E_TYPE::FUNCTION_VALUE:
-        case E_TYPE::OBJECT_VALUE:
-            return E_HLT(entity.object_value->ot->to_string());
+        case E_TYPE::VALUE:
+            return E_HLT(entity.value->type->to_string());
         case E_TYPE::CONST_FUNCTION:
             return "function " + E_HLT(entity.const_function->path.as_vec().back());
         case E_TYPE::ERROR:
@@ -36,6 +35,7 @@ void ErrorReporter::fail(std::string msg, TextPosition pos) {
     this->failed = true;
     std::string out = this->context_string(pos) + msg + this->code_context_string(pos);
     std::cout << out << std::endl;
+    throw std::runtime_error("Error");
 }
 
 void ErrorReporter::binop(Entity left, Entity right, TextPosition pos) {
@@ -331,8 +331,8 @@ ErrorReporter::ErrorReporter() {
 void ErrorReporter::match_type(Entity entity, TextPosition pos) {
     std::string msg;
     msg = E_FMT("Match statement expects a ") + E_HLT("Union[...]") + E_FMT(" expression");
-    if (entity.type == E_TYPE::OBJECT_VALUE) {
-        msg += E_FMT(", but got " + entity.object_value->ot->to_string());
+    if (entity.type == E_TYPE::VALUE) {
+        msg += E_FMT(", but got " + entity.value->type->to_string());
     } else {
         msg += E_FMT(", but got " + entity_to_string(entity));
     }

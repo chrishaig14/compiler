@@ -13,9 +13,7 @@ class Module;
 
 class Class;
 
-class ObjectValue;
-
-class FunctionValue;
+class Value;
 
 class ConstFunction;
 
@@ -48,19 +46,8 @@ struct Flirpin {
     };
 };
 
-enum class V_TYPE {
-    OBJECT, FUNCTION
-};
-struct Value {
-    V_TYPE type;
-    union {
-        FunctionValue* function_value;
-        ObjectValue* object_value;
-    };
-};
-
 enum class E_TYPE {
-    PACKAGE, MODULE, CLASS, FUNCTION_VALUE, OBJECT_VALUE, CONST_FUNCTION, ERROR, NOT_FOUND, ENUM
+    PACKAGE, MODULE, CLASS, VALUE, CONST_FUNCTION, ERROR, NOT_FOUND, ENUM
 };
 
 class Entity {
@@ -70,8 +57,7 @@ public:
         Package* package;
         Module* module;
         Class* clazz;
-        FunctionValue* function_value;
-        ObjectValue* object_value;
+        Value* value;
         ConstFunction* const_function;
         Enum* enumm;
     };
@@ -91,10 +77,7 @@ public:
     Entity(Class* clazz) : type(E_TYPE::CLASS), clazz(clazz) {
     }
 
-    Entity(FunctionValue* function_value) : type(E_TYPE::FUNCTION_VALUE), function_value(function_value) {
-    }
-
-    Entity(ObjectValue* object_value) : type(E_TYPE::OBJECT_VALUE), object_value(object_value) {
+    Entity(Value* object_value) : type(E_TYPE::VALUE), value(object_value) {
     }
 
     Entity(ConstFunction* const_function) : type(E_TYPE::CONST_FUNCTION), const_function(const_function) {

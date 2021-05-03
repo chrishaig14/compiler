@@ -33,12 +33,12 @@ int target_union_type(const ObjectType& target, const TypeNode& source) {
 
 Entity entity_from_type(const TypeNode& type) {
     if (type.kind == Kind::FUNCTION) {
-        FunctionValue* fv = new FunctionValue();
-        fv->ft = (FunctionType*) type.clone();
+        Value* fv = new Value();
+        fv->type = type.clone();
         return Entity(fv);
     }
-    ObjectValue* fv = new ObjectValue();
-    fv->ot = (ObjectType*) type.clone();
+    Value* fv = new Value();
+    fv->type = (ObjectType*) type.clone();
     return Entity(fv);
 }
 
@@ -101,12 +101,8 @@ TypeNode* get_entity_type(Entity e) {
     Entity* ent = &e;
     if (ent->type == E_TYPE::CONST_FUNCTION) {
         return e.const_function->ft->clone();
-    }
-    if (ent->type == E_TYPE::FUNCTION_VALUE) {
-        return e.function_value->ft->clone();
-    }
-    if (ent->type == E_TYPE::OBJECT_VALUE) {
-        return e.object_value->ot->clone();
+    } else if (ent->type == E_TYPE::VALUE) {
+        return e.value->type->clone();
     }
     throw std::runtime_error("Get type of non function/object!");
 }
