@@ -4,6 +4,30 @@
 
 #include "CheckDeclaration.h"
 
+SNode* Checker::make_rvalue(Entity value_entity, SNode* value_snode, const TypeNode& target) {
+    if (value_entity.type == E_TYPE::OBJECT_VALUE) {
+        if (target.kind != Kind::OBJECT) {
+            return nullptr;
+        }
+        const ObjectType& value_ot = *value_entity.object_value->ot;
+        const ObjectType& target_ot = target.object();
+        if (value_ot == target_ot) {
+            return value_snode;
+        }
+        if (target_ot.id == "Union") {
+            int union_index = target_union_type(target_ot, value_ot);
+            if (union_index == -1) {
+                return nullptr;
+            } else {
+                return make_union_wrapper(union_index, value_snode);
+            }
+        }
+    } else {
+        // kind = FUNCTION
+    }
+    return nullptr;
+}
+
 USemanticInfo Checker::visit_declaration(DeclarationNode& n) {
     // Logger::info("Checking DeclarationNode for var: " + n.identifier);
     if (this->scope->declared(n.identifier)) {
@@ -50,37 +74,12 @@ USemanticInfo Checker::check_declaration_with_type(DeclarationNode& n) {
         ov->ot = (ObjectType*) n.type->clone();
         return std::make_unique<SemanticInfo>(info);
     }
-    if (n.type->kind == Kind::FUNCTION) {
-        // it's a function
-        // if (*n.type != exp_info.type()) {
-        //     this->error_reporter.assignment(*n.type, exp_info.type(), n.start);
-        // }
-    } else {
-        SemanticInfo expression_info = exp_info;
-        const ObjectType& actual_type = n.type->object();
-        const TypeNode& exp_type = *expression_info.entity.object_value->ot;
-        if (*n.type != exp_type) {
-            if (actual_type.id == "Option") {
-                if (*actual_type.type_params[0] != exp_type) {
-                    auto foo = exp_type.object();
-                    if (foo.id != "NoneType") {
-                        this->error_reporter.assignment(*n.type, exp_type, n.start);
-                    }
-                }
-            } else if (actual_type.id == "Union") {
-                int type_index = target_union_type(actual_type, exp_type);
-                if (type_index == -1) {
-                    this->error_reporter.assignment(*orig_type, exp_type, n.start);
-                }
-                SNode* union_wrapper = make_union_wrapper(type_index, sn->expression);
-                sn->expression = union_wrapper;
 
-            } else {
-                this->error_reporter.assignment(*n.type, exp_type, n.start);
-            }
-        }
+    SNode* rvalue_snode = this->make_rvalue(exp_info_p->entity, exp_info_p->snode, *n.type);
+    if (rvalue_snode == nullptr) {
+        throw std::runtime_error("Cannot assign!");
     }
-    // info.set_type(n_type);
+    sn->expression = rvalue_snode;
     ObjectValue* ov = new ObjectValue();
     info.entity = Entity(ov);
     ov->ot = (ObjectType*) n.type->clone();
@@ -105,14 +104,6 @@ USemanticInfo Checker::check_declaration_without_type(DeclarationNode& n) {
     info.snode = sn;
     sn->identifier = n.identifier;
     sn->expression = exp_info_p->snode;
-    // if (exp_info_p->type() == T_NONE) {
-    //     this->error_reporter.function_doesnt_return_a_value(n.expression->start, nullptr);
-    //     USemanticInfo error_t = error_stub();
-    //     this->scope->set(n.identifier, entity_from_type(error_t->type()));
-    //     return error_t;
-    // }
-    // n.type = exp_info_p->type().clone();
-    // info.set_type(exp_info.type());
     info.entity = exp_info_p->entity;
     if (info.entity.type == E_TYPE::CONST_FUNCTION) {
         info.entity = Entity(new FunctionValue());

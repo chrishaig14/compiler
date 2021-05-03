@@ -67,8 +67,12 @@ USemanticInfo Checker::visit_call(CallNode& n) {
         }
     }
     VectorOfTypes arg_types;
+
+    std::vector<Entity> arg_entities;
+
     for (auto& arg: n.arguments) {
         USemanticInfo arg_type_p = this->dispatch(arg);
+        arg_entities.push_back(arg_type_p->entity);
         sn->arguments.push_back(arg_type_p->snode);
         Entity arg_entity = arg_type_p->entity;
 
@@ -94,42 +98,22 @@ USemanticInfo Checker::visit_call(CallNode& n) {
         // mangle the generic types in function_type to prevent collisions
         mangle_generic_names(function_type);
         retv.entity = match_arguments_to_generic_function(*function_type, arg_types).entity;
-        // for(auto x: arg_types){
-        //     delete x;
-        // }
     } else {
         retv.entity = entity_from_type(*function_type->return_type);
         retv.entity.object_value->ot = (ObjectType*) function_type->return_type->clone();
         for (size_t i = 0; i < n.arguments.size(); i++) {
             const TypeNode& arg_type = *arg_types[i];
             const TypeNode& param_type = *function_type->param_types[i];
-            if (param_type == arg_type) {
+
+            SNode* arg_rvalue_snode = this->make_rvalue(arg_entities[i], sn->arguments[i], param_type);
+            if (arg_rvalue_snode == nullptr) {
+                this->error_reporter.function_call_type_mismatch(param_type,
+                                                                 arg_type,
+                                                                 n.arguments[i]->start,
+                                                                 n.arguments[i]->end);
                 continue;
             }
-            const std::string& arg_path_as_str = arg_type.object().actual_base_path.as_str();
-            const std::string& param_path_as_str = param_type.object().actual_base_path.as_str();
-            if (arg_path_as_str != param_path_as_str) {
-                // if (arg_type != param_type) {
-                if (param_type.kind == Kind::OBJECT && param_type.object().id == "Union") {
-                    int type_index = target_union_type(param_type.object(), arg_type);
-                    if (type_index == -1) {
-                        this->error_reporter.function_call_type_mismatch(param_type,
-                                                                         arg_type,
-                                                                         n.arguments[i]->start,
-                                                                         n.arguments[i]->end);
-                    } else {
-                        int fixed_index = i + (fun_info_p->this_arg != nullptr);
-                        sn->arguments[fixed_index] = make_union_wrapper(type_index, sn->arguments[fixed_index]);
-                    }
-                    return std::make_unique<SemanticInfo>(retv);
-                } else if (arg_type.kind != Kind::UNKNOWN) {
-                    this->error_reporter.function_call_type_mismatch(param_type,
-                                                                     arg_type,
-                                                                     n.arguments[i]->start,
-                                                                     n.arguments[i]->end);
-                }
-                // }
-            }
+            sn->arguments[i] = arg_rvalue_snode;
         }
     }
     for (auto x: arg_types) {

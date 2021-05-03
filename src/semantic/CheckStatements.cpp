@@ -57,40 +57,14 @@ USemanticInfo Checker::visit_assignment(AssignmentNode& n) {
 
     if (linfo.entity.type == E_TYPE::OBJECT_VALUE && expression_info_p->entity.type == E_TYPE::OBJECT_VALUE) {
 
-        std::string lpath_as_str = linfo.entity.object_value->ot->actual_base_path.as_str();
-        std::string exppath_as_str = expression_info_p->entity.object_value->ot->actual_base_path.as_str();
 
-        if (lpath_as_str != exppath_as_str) {
-            if (l_type.kind == Kind::OBJECT) {
-                const ObjectType& actual_type = l_type.object();
-                if (actual_type.id == "Option") {
-                    // if type doesn't match exactly, we may be assigning to an Option[t]
-                    if (*actual_type.type_params[0] != *exp_type) {
-                        auto& foo = exp_type->object();
-                        if (foo.id != "NoneType") {
-                            this->error_reporter.assignment(l_type, *exp_type, n.start);
-                        }
-                    }
-                } else {
-                    if (actual_type.kind == Kind::OBJECT && actual_type.object().id == "Union") {
-                        int type_index = target_union_type(actual_type.object(), *exp_type);
-                        if (type_index == -1) {
-                            this->error_reporter.assignment(actual_type, *exp_type, n.rvalue->start);
-                        } else {
-                            expression_info_p->snode = make_union_wrapper(type_index, expression_info_p->snode);
-                        }
-                    } else {
-                        // if it's not Option[t], then it's an error
-                        this->error_reporter.assignment(l_type, *exp_type, n.start);
-                    }
-                }
-            } else {
-                // if it's not Option[t], then it's an error
-                this->error_reporter.assignment(l_type, *exp_type, n.start);
-            }
+        SNode* rvalue_snode = this->make_rvalue(expression_info_p->entity,
+                                                expression_info_p->snode,
+                                                *linfo.entity.object_value->ot);
+        if (rvalue_snode == nullptr) {
+            this->error_reporter.assignment(l_type, *exp_type, n.start);
         }
-        // else, type matches don't do anything
-        n.type = l_type.clone();
+        expression_info_p->snode = rvalue_snode;
     } else {
         this->error_reporter.assignment(*linfo_p->entity.function_value->ft,
                                         *expression_info_p->entity.object_value->ot,

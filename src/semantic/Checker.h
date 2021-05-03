@@ -189,6 +189,9 @@ public:
     USemanticInfo visit_alias(AliasNode* pNode);
     USemanticInfo enum_member(Enum* enumm, std::string value, MemberNode& node);
     USemanticInfo visit_enum(EnumNode& pNode);
+    bool can_be_assigned_to(const TypeNode& value, const TypeNode& target);
+    SNode* make_rvalue(Entity value_entity, const TypeNode& target);
+    SNode* make_rvalue(Entity value_entity, SNode* value_snode, const TypeNode& target);
 };
 
 int target_union_type(const ObjectType& target, const TypeNode& source);
