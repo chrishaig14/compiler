@@ -7,6 +7,8 @@
 #include "logging/logging.h"
 #include "transpiler/STranspiler.h"
 #include "units/Package.h"
+#include <unistd.h>
+#include <limits.h>
 
 static bool global_fail = false;
 static std::map<std::string, std::string> function_builtins;
@@ -327,6 +329,9 @@ void transpile_all_modules(Package* package, std::string output_dir) {
 
 
 int main(int argc, char* argv[]) {
+    char cwd[PATH_MAX];
+    getcwd(cwd, sizeof(cwd));
+    std::cout << "working directory: " << cwd << std::endl;
     if (argc < 3) {
         std::cout << style(RED, "Error: expected 2 args: source_dir output_dir") << std::endl;
         exit(1);
@@ -334,6 +339,11 @@ int main(int argc, char* argv[]) {
     std::string project_dir = argv[1];
     project_output_dir = argv[2];
     project_output_dir += "/application";
+    int x = mkdir(project_output_dir.c_str(), 0700);
+    if (x != 0) {
+        std::cout << "failed to create  application dir" << std::endl;
+        exit(1);
+    }
     std::string __main_file__ = path_join(project_dir, u_basename(project_dir) + ".xl");
     // std::cout << style(BLUE, "Main file: ") << style(MAGENTA, __main_file__) << std::endl;
     root_package = new Package("", project_dir, "");
@@ -342,13 +352,20 @@ int main(int argc, char* argv[]) {
 
     process_global_all_modules(root_package);
 
+    std::cout << "here" << std::endl;
 
     analyze_all_modules(root_package);
     if (global_fail) {
         std::cout << "Failed to compile" << std::endl;
         exit(1);
     }
+
+    std::cout << "here" << std::endl;
+
     transpile_all_modules(root_package, project_output_dir);
+
+    std::cout << "here" << std::endl;
+
 
     std::string all_files;
     for (auto f: all_modules) {
@@ -368,6 +385,23 @@ int main(int argc, char* argv[]) {
     cmakelists += "include_directories(../runtime)\n"
                   "include_directories(.)\n"
                   "target_link_libraries(result core)\n";
-    std::ofstream cmakelists_file(project_output_dir + "/CMakeLists.txt");
+    std::string cmake_output = project_output_dir + "/CMakeLists.txt";
+    std::ofstream cmakelists_file(cmake_output);
+    std::cout << cmake_output << std::endl;
     cmakelists_file << cmakelists;
+
+    std::string command = "cp -r /home/chris/CLionProjects/compiler/runtime " + std::string(argv[2]) + "/runtime";
+    system(command.c_str());
+
+    std::string top_level_cmake = "cmake_minimum_required(VERSION 3.16)\n"
+                                  "project(xlang)\n"
+                                  "set(CMAKE_CXX_STANDARD 14)\n"
+                                  "set(CMAKE_CXX_FLAGS \"${CMAKE_CXX_FLAGS} -Werror -O0 -fverbose-asm -Winline\")\n"
+                                  "add_subdirectory(runtime)\n"
+                                  "add_subdirectory(application)\n";
+
+    std::string top_cmake_output = std::string(argv[2]) + "/CMakeLists.txt";
+    std::ofstream top_cmakelists_file(top_cmake_output);
+    top_cmakelists_file << top_level_cmake;
+    std::cout << "top cmake output: " << top_cmake_output << std::endl;
 }

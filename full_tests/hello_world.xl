@@ -1,0 +1,13 @@
+import core.print
+import core.Integer
+
+fun main()->Integer{
+    print("Hello world")
+    print("22 + 4")
+    return 0
+}
+
+#####
+Hello world
+22 + 4
+#####

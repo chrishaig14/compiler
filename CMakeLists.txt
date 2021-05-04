@@ -9,11 +9,11 @@ find_package(fmt)
 add_executable(compiler src/full.cpp)
 add_subdirectory(example/output)
 target_link_libraries(
-  compiler
-  parser
-  srcLib
-  nodes
-  scanner
-  transpiler
-  tinyxml
-  fmt::fmt)
+        compiler
+        parser
+        srcLib
+        nodes
+        scanner
+        transpiler
+        tinyxml
+        fmt::fmt)
