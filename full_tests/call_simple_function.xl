@@ -1,0 +1,15 @@
+import core.Integer
+import core.print
+
+fun foo(x: Integer)->Integer {
+    return x
+}
+
+fun main()->Integer{
+    print(foo(7).str())
+    return 0
+}
+
+#####
+9
+#####

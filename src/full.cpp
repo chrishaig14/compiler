@@ -381,17 +381,19 @@ int main(int argc, char* argv[]) {
                              "project(xlang)\n"
                              "set(CMAKE_CXX_STANDARD 14)\n"
                              "set(CMAKE_CXX_FLAGS \"${CMAKE_CXX_FLAGS} -Werror -O0 -fverbose-asm -Winline\")\n";
+    cmakelists = "cmake_minimum_required(VERSION 3.16)\n"
+                 "project(xlang)\n"
+                 "set(CMAKE_CXX_STANDARD 14)\n"
+                 "set(CMAKE_CXX_FLAGS \"${CMAKE_CXX_FLAGS} -Werror -O0 -fverbose-asm -Winline\")\n";
     cmakelists += "add_executable(result " + all_files + ")\n";
-    cmakelists += "include_directories(../runtime)\n"
-                  "include_directories(.)\n"
-                  "target_link_libraries(result core)\n";
+    cmakelists += "target_link_libraries(result core)\n";
     std::string cmake_output = project_output_dir + "/CMakeLists.txt";
     std::ofstream cmakelists_file(cmake_output);
     std::cout << cmake_output << std::endl;
     cmakelists_file << cmakelists;
 
-    std::string command = "cp -r /home/chris/CLionProjects/compiler/runtime " + std::string(argv[2]) + "/runtime";
-    system(command.c_str());
+    // std::string command = "cp -r /home/chris/CLionProjects/compiler/runtime " + std::string(argv[2]) + "/runtime";
+    // system(command.c_str());
 
     std::string top_level_cmake = "cmake_minimum_required(VERSION 3.16)\n"
                                   "project(xlang)\n"
@@ -399,6 +401,14 @@ int main(int argc, char* argv[]) {
                                   "set(CMAKE_CXX_FLAGS \"${CMAKE_CXX_FLAGS} -Werror -O0 -fverbose-asm -Winline\")\n"
                                   "add_subdirectory(runtime)\n"
                                   "add_subdirectory(application)\n";
+    top_level_cmake = "cmake_minimum_required(VERSION 3.16)\n"
+                      "project(xlang)\n"
+                      "set(CMAKE_CXX_STANDARD 14)\n"
+                      "set(CMAKE_CXX_FLAGS \"${CMAKE_CXX_FLAGS} -Werror -O0 -fverbose-asm -Winline\")\n"
+                      "include_directories(/home/chris/CLionProjects/compiler/runtime)\n"
+                      "link_directories(/home/chris/CLionProjects/compiler/runtime/build)\n"
+                      "add_subdirectory(application)\n"
+                      "target_link_libraries(result core)\n";
 
     std::string top_cmake_output = std::string(argv[2]) + "/CMakeLists.txt";
     std::ofstream top_cmakelists_file(top_cmake_output);
