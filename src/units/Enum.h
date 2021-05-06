@@ -6,7 +6,6 @@
 #define XLANG_ENUM_H
 
 #include "../types.h"
-#include "../../example/output/runtime/types.h"
 #include "Class.h"
 
 class Enum {
