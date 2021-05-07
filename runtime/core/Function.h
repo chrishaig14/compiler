@@ -59,6 +59,63 @@ public:
 
 };
 
+class Function4 : public XObject {
+    TaggedObject* (* f)(TaggedObject*, TaggedObject*, TaggedObject*, TaggedObject*);
+public:
+    Function4();
+
+    Function4(TaggedObject* (* f)(TaggedObject*, TaggedObject*, TaggedObject*, TaggedObject*));
+
+    virtual TaggedObject* operator()(TaggedObject* a0, TaggedObject* a1, TaggedObject* a2, TaggedObject* a3);
+
+};
+
+class Function5 : public XObject {
+    TaggedObject* (* f)(TaggedObject*, TaggedObject*, TaggedObject*, TaggedObject*, TaggedObject*);
+public:
+    Function5();
+
+    Function5(TaggedObject* (* f)(TaggedObject*, TaggedObject*, TaggedObject*, TaggedObject*, TaggedObject*));
+
+    virtual TaggedObject* operator()(TaggedObject* a0, TaggedObject* a1, TaggedObject* a2, TaggedObject* a3, TaggedObject* a4);
+
+};
+
+
+class Function6 : public XObject {
+    TaggedObject* (* f)(TaggedObject*, TaggedObject*, TaggedObject*, TaggedObject*);
+public:
+    Function6();
+
+    Function6(TaggedObject* (* f)(TaggedObject*, TaggedObject*, TaggedObject*, TaggedObject*));
+
+    virtual TaggedObject* operator()(TaggedObject* a0, TaggedObject* a1, TaggedObject* a2, TaggedObject* a3);
+
+};
+
+
+class Function7 : public XObject {
+    TaggedObject* (* f)(TaggedObject*, TaggedObject*, TaggedObject*, TaggedObject*);
+public:
+    Function7();
+
+    Function7(TaggedObject* (* f)(TaggedObject*, TaggedObject*, TaggedObject*, TaggedObject*));
+
+    virtual TaggedObject* operator()(TaggedObject* a0, TaggedObject* a1, TaggedObject* a2, TaggedObject* a3);
+
+};
+
+class Function8 : public XObject {
+    TaggedObject* (* f)(TaggedObject*, TaggedObject*, TaggedObject*, TaggedObject*);
+public:
+    Function8();
+
+    Function8(TaggedObject* (* f)(TaggedObject*, TaggedObject*, TaggedObject*, TaggedObject*));
+
+    virtual TaggedObject* operator()(TaggedObject* a0, TaggedObject* a1, TaggedObject* a2, TaggedObject* a3);
+
+};
+
 class Partial0 : public Function0 {
     std::vector<TaggedObject*> p;
     union {
@@ -102,7 +159,6 @@ public:
 };
 
 
-
 inline TaggedObject* CALL0(TaggedObject* f) {
     return (*CAST(f, Function0))();
 }
@@ -117,6 +173,15 @@ inline TaggedObject* CALL2(TaggedObject* f, TaggedObject* arg_0, TaggedObject* a
 
 inline TaggedObject* CALL3(TaggedObject* f, TaggedObject* arg_0, TaggedObject* arg_1, TaggedObject* arg_2) {
     return (*CAST(f, Function3))(arg_0, arg_1, arg_2);
+}
+
+inline TaggedObject*
+CALL4(TaggedObject* f, TaggedObject* arg_0, TaggedObject* arg_1, TaggedObject* arg_2, TaggedObject* arg_4) {
+    return (*CAST(f, Function4))(arg_0, arg_1, arg_2, arg_4);
+}
+inline TaggedObject*
+CALL5(TaggedObject* f, TaggedObject* arg_0, TaggedObject* arg_1, TaggedObject* arg_2, TaggedObject* arg_4, TaggedObject* arg_5 ){
+    return (*CAST(f, Function5))(arg_0, arg_1, arg_2, arg_4, arg_5);
 }
 
 #endif //UNTITLED1_FUNCTIONS_H

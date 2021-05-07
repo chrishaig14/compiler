@@ -85,6 +85,34 @@ Partial0::Partial0(TaggedObject* f, TaggedObject* p0) : Function0() {
     this->f.f1 = f;
 }
 
+
+TaggedObject* Function4::operator()(TaggedObject* a0, TaggedObject* a1, TaggedObject* a2, TaggedObject* a3) {
+    return this->f(a0, a1, a2, a3);
+}
+
+Function4::Function4(TaggedObject* (* f)(TaggedObject*, TaggedObject*, TaggedObject*, TaggedObject*)) : XObject(
+        "function4") {
+    this->f = f;
+}
+
+Function4::Function4() : XObject("function4") {
+    this->f = nullptr;
+}
+
+TaggedObject*
+Function5::operator()(TaggedObject* a0, TaggedObject* a1, TaggedObject* a2, TaggedObject* a3, TaggedObject* a4) {
+    return this->f(a0, a1, a2, a3, a4);
+}
+
+Function5::Function5(TaggedObject* (* f)(TaggedObject*, TaggedObject*, TaggedObject*, TaggedObject*, TaggedObject*))
+        : XObject("function5") {
+    this->f = f;
+}
+
+Function5::Function5() : XObject("function5") {
+    this->f = nullptr;
+}
+
 TaggedObject* Function3::operator()(TaggedObject* a0, TaggedObject* a1, TaggedObject* a2) {
     return this->f(a0, a1, a2);
 }
