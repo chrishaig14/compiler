@@ -266,7 +266,12 @@ void STranspiler::transpile_enum(EnumSNode* node) {
     // out += RCURLY + SEMIC + NEWLINE;
     std::string eq_name = enum_name + "_D_eq";
     out += TOBJECT + eq_name + SEMIC;
-    this->static_initializations = eq_name + SPACE + ASSIGN + SPACE + "core_D_Integer_D_eq" + SEMIC;
+    this->static_initializations += eq_name + SPACE + ASSIGN + SPACE + "core_D_Integer_D_eq" + SEMIC;
+
+    std::string ne_name = enum_name + "_D_ne";
+    out += TOBJECT + ne_name + SEMIC;
+    this->static_initializations += ne_name + SPACE + ASSIGN + SPACE + "core_D_Integer_D_ne" + SEMIC;
+
     this->header += out;
 }
 
