@@ -340,10 +340,10 @@ int main(int argc, char* argv[]) {
     project_output_dir = argv[2];
     project_output_dir += "/application";
     int x = mkdir(project_output_dir.c_str(), 0700);
-    if (x != 0) {
-        std::cout << "failed to create  application dir" << std::endl;
-        exit(1);
-    }
+    // if (x != 0) {
+    //     std::cout << "failed to create  application dir" << std::endl;
+    //     exit(1);
+    // }
     std::string __main_file__ = path_join(project_dir, u_basename(project_dir) + ".xl");
     // std::cout << style(BLUE, "Main file: ") << style(MAGENTA, __main_file__) << std::endl;
     root_package = new Package("", project_dir, "");
