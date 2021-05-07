@@ -258,20 +258,31 @@ void STranspiler::transpile_enum(EnumSNode* node) {
     std::string enum_name = path_to_id(node->id);
     // out += "enum class" + SPACE + enum_name + SPACE + " {\n";
     // out += "";
+    for (auto m: node->values) {
+        out += "extern" + SPACE + TOBJECT + enum_name + "_" + m + SEMIC + NEWLINE;
+    }
+    this->header += out;
     int k = 0;
+    out = "";
     for (auto m: node->values) {
         out += TOBJECT + enum_name + "_" + m + ASSIGN + "MAKE_INT(" + std::to_string(k) + ")" + SEMIC + NEWLINE;
         k++;
     }
+    this->source += out;
+
     // out += RCURLY + SEMIC + NEWLINE;
+    out = "";
     std::string eq_name = enum_name + "_D_eq";
-    out += TOBJECT + eq_name + SEMIC;
+    out += "extern" + SPACE + TOBJECT + eq_name + SEMIC;
     this->static_initializations += eq_name + SPACE + ASSIGN + SPACE + "core_D_Integer_D_eq" + SEMIC;
 
+    this->source += TOBJECT + SPACE + eq_name + ASSIGN + "nullptr" + SEMIC + NEWLINE;
+
     std::string ne_name = enum_name + "_D_ne";
-    out += TOBJECT + ne_name + SEMIC;
+    out += "extern" + SPACE + TOBJECT + ne_name + SEMIC;
     this->static_initializations += ne_name + SPACE + ASSIGN + SPACE + "core_D_Integer_D_ne" + SEMIC;
 
+    this->source += TOBJECT + SPACE + ne_name + ASSIGN + "nullptr" + SEMIC + NEWLINE;
     this->header += out;
 }
 

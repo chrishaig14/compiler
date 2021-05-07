@@ -255,7 +255,60 @@ void analyze_all_modules(Package* package) {
     }
 }
 
-void transpile_all_modules(Package* package, std::string output_dir) {
+void
+transpile_one_module(Module* module, std::string& package_header, std::string output_package_dir, Package* package) {
+    if (module->name == "core") {
+        return;
+    }
+    STranspiler t;
+    t.transpile_program(module->sast);
+    // std::cout << "Source output: " << std::endl;
+    // std::cout << t.source << std::endl;
+    // std::cout << "Header output: " << std::endl;
+    // std::cout << t.header << std::endl;
+    // std::cout << "- Done" << std::endl;
+
+    static_initializations += t.static_initializations;
+    static_cleanups += t.static_cleanups;
+
+    std::string module_name = module->name;
+
+    if (module->flirpins.count("main") != 0) {
+        t.source += "\nint main(){\n";
+        t.source += static_initializations;
+        t.source += "auto x = GET_INT(CALL0(" + mangle_path(module->path.as_str() + ".main") + "));\n";
+        t.source += static_cleanups;
+        t.source += "return x;\n}";
+    }
+    std::string output_cpp_path = path_join(output_package_dir, module_name + ".cpp");
+    std::ofstream output_cpp_file(output_cpp_path);
+    output_cpp_file << "#include \"" << module_name << ".h\"\n";
+    output_cpp_file << t.source;
+
+    std::string output_h_path = path_join(output_package_dir, module_name + ".h");
+
+
+    std::string module_define = module_name + "_H";
+    std::string h_ifndef = "#ifndef " + module_define + "\n";
+    std::string h_define = "#define " + module_define + "\n";
+    std::string h_endif = "#endif //" + module_define + "\n";
+    std::string include_core = "#include <core/core.h>\n";
+    std::string includes = include_core;
+    for (auto m: module->included_module_paths) {
+        if (m == "core.h") {
+            continue;
+        }
+        includes += "#include <" + m + ">\n";
+    }
+    t.header = includes + t.header;
+
+    t.header = h_ifndef + h_define + t.header + h_endif;
+    std::ofstream output_h_file(output_h_path);
+    output_h_file << t.header;
+    package_header += "#include <" + package->rel_path + "/" + module_name + ".h>\n";
+}
+
+void transpile_all_modules(Package* package, std::string output_dir, bool is_top) {
     // std::cout << "Transpiling package " << package->name << " output dir: " << output_dir << std::endl;
     std::string package_header;
     std::string output_package_dir = path_join(output_dir, package->name);
@@ -263,63 +316,23 @@ void transpile_all_modules(Package* package, std::string output_dir) {
     if (package->name != "") {
         mkdir(output_package_dir.c_str(), 0777);
     }
+    Module* main_module;
     for (auto u: package->units) {
         if (u.second.type == U_TYPE::PACKAGE) {
             Package* subpackage = u.second.package;
-            transpile_all_modules(subpackage, output_package_dir);
+            transpile_all_modules(subpackage, output_package_dir, false);
             package_header += "#include <" + subpackage->rel_path + "/__package__.h>\n";
         } else if (u.second.type == U_TYPE::MODULE) {
             Module* module = u.second.module;
-            if (module->name == "core") {
+            if (module->flirpins.count("main") != 0){
+                main_module = module;
                 continue;
             }
-            STranspiler t;
-            t.transpile_program(module->sast);
-            // std::cout << "Source output: " << std::endl;
-            // std::cout << t.source << std::endl;
-            // std::cout << "Header output: " << std::endl;
-            // std::cout << t.header << std::endl;
-            // std::cout << "- Done" << std::endl;
-
-            static_initializations += t.static_initializations;
-            static_cleanups += t.static_cleanups;
-
-            std::string module_name = module->name;
-
-            if (module->flirpins.count("main") != 0) {
-                t.source += "\nint main(){\n";
-                t.source += static_initializations;
-                t.source += "auto x = GET_INT(CALL0(" + mangle_path(module->path.as_str() + ".main") + "));\n";
-                t.source += static_cleanups;
-                t.source += "return x;\n}";
-            }
-            std::string output_cpp_path = path_join(output_package_dir, module_name + ".cpp");
-            std::ofstream output_cpp_file(output_cpp_path);
-            output_cpp_file << "#include \"" << module_name << ".h\"\n";
-            output_cpp_file << t.source;
-
-            std::string output_h_path = path_join(output_package_dir, module_name + ".h");
-
-
-            std::string module_define = module_name + "_H";
-            std::string h_ifndef = "#ifndef " + module_define + "\n";
-            std::string h_define = "#define " + module_define + "\n";
-            std::string h_endif = "#endif //" + module_define + "\n";
-            std::string include_core = "#include <core/core.h>\n";
-            std::string includes = include_core;
-            for (auto m: module->included_module_paths) {
-                if (m == "core.h") {
-                    continue;
-                }
-                includes += "#include <" + m + ">\n";
-            }
-            t.header = includes + t.header;
-
-            t.header = h_ifndef + h_define + t.header + h_endif;
-            std::ofstream output_h_file(output_h_path);
-            output_h_file << t.header;
-            package_header += "#include <" + package->rel_path + "/" + module_name + ".h>\n";
+            transpile_one_module(module, package_header, output_package_dir, package);
         }
+    }
+    if (is_top){
+        transpile_one_module(main_module, package_header, output_package_dir, package);
     }
     std::string output_package_header_path = path_join(output_package_dir, "__package__.h");
     std::ofstream output_package_header(output_package_header_path);
@@ -362,7 +375,7 @@ int main(int argc, char* argv[]) {
 
     std::cout << "here" << std::endl;
 
-    transpile_all_modules(root_package, project_output_dir);
+    transpile_all_modules(root_package, project_output_dir, true);
 
     std::cout << "here" << std::endl;
 
@@ -384,6 +397,7 @@ int main(int argc, char* argv[]) {
     cmakelists = "cmake_minimum_required(VERSION 3.16)\n"
                  "project(xlang)\n"
                  "set(CMAKE_CXX_STANDARD 14)\n"
+                 "include_directories(.)\n"
                  "set(CMAKE_CXX_FLAGS \"${CMAKE_CXX_FLAGS} -Werror -O0 -fverbose-asm -Winline\")\n";
     cmakelists += "add_executable(result " + all_files + ")\n";
     cmakelists += "target_link_libraries(result core)\n";
