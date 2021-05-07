@@ -89,6 +89,7 @@ class List[t] {
     fun __sub__(i: Integer)->t{}
     fun len()->Integer{}
     fun push(x: t){}
+    fun has(x: t)->Boolean
     static fun add(l: List[t])->List[t]{}
 }
 
