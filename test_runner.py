@@ -57,7 +57,7 @@ def parse_test_file(test_f):
 
 
 def test(test_file):
-    print(f"testing: {test_file}")
+    print_formatted_text(HTML(f"<cyan>testing: {test_file}</cyan>"))
     with tempfile.TemporaryDirectory() as topdirname:
         root_dir = os.path.dirname(__file__)
         topdirname = root_dir + "/random"
@@ -115,6 +115,7 @@ def test(test_file):
             print_formatted_text(hr)
             print(outp)
             print_formatted_text(hr)
+            exit(1)
 
 
 def main():
