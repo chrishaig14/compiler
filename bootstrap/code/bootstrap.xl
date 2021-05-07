@@ -1,0 +1,163 @@
+import core.Integer
+import core.print
+import core.String
+import core.List
+import core.Boolean
+import core.range
+
+enum TokenType {
+    For, Class, Enum, Var, Import, If, Else, Start, EOF, Id, Special, OpenParen, CloseParen, OpenCurly, CloseCurly, Assign, Number, Semicolon
+}
+
+class Token {
+    str: String
+    type: TokenType
+}
+
+fun is_letter(c: String)->Boolean {
+    for x @ ["a", "b","c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"] {
+        if c == x {
+            return true
+        }
+    }
+    return false
+}
+
+fun char_in_string(c: String, s: String) -> Boolean {
+    for i @ range(0, 1, s.len()) {
+        if c == s[i] {
+            return true
+        }
+    }
+    return false
+}
+
+fun map_special(c: String)->TokenType{
+    if c == "(" {
+        return TokenType.OpenParen
+    }
+    if c == ")" {
+        return TokenType.CloseParen
+    }
+    if c == "{" {
+        return TokenType.OpenCurly
+    }
+    if c == "}" {
+        return TokenType.CloseCurly
+    }
+    if c == "=" {
+        return TokenType.Assign
+    }
+    if c == ";" {
+        return TokenType.Semicolon
+    }
+    return TokenType.Id
+}
+
+fun map_token_to_string(tok: TokenType) -> String {
+    if tok == TokenType.OpenParen {
+        return "OpenParen"
+    }
+    if tok == TokenType.CloseParen {
+        return "CloseParen"
+    }
+    if tok == TokenType.OpenCurly {
+        return "OpenCurly"
+    }
+    if tok == TokenType.CloseCurly {
+        return "CloseCurly"
+    }
+    if tok == TokenType.Assign {
+        return "Assign"
+    }
+    if tok == TokenType.Semicolon {
+        return "Semicolon"
+    }
+    if tok == TokenType.Id {
+        return "Id"
+    }
+    if tok == TokenType.Assign {
+        return "Assign"
+    }
+    if tok == TokenType.Number {
+        return "Number"
+    }
+    return "Unknown"
+}
+
+class Scanner {
+    text: String
+    cursor: Integer
+    c: String
+    tokens: List[Token]
+    token: Token
+    static fun init(text: String)->Scanner {
+        return #Scanner(text, 0, "", []::Token, #Token("",TokenType.Start))
+    }
+    fun advance()->Integer{
+        if this.cursor >= this.text.len() {
+            return 0
+        }
+        this.c = this.text[this.cursor]
+        this.cursor = this.cursor + 1
+        return 0
+    }
+    fun skip_spaces()->Integer{
+        while this.c == " " {
+            _ = this.advance()
+        }
+        return 0
+    }
+    fun scan() -> Integer {
+        _ = this.advance()
+        while this.cursor < this.text.len() {
+            _ = this.skip_spaces()
+            if is_letter(this.c) {
+                _ = this.scan_id()
+            } elif (char_in_string(this.c, "(){}=;")) {
+                this.token = #Token(this.c,map_special(this.c))
+                _ = this.advance()
+            } elif (char_in_string(this.c, "1234567890")){
+                _ = this.scan_number()
+            }
+            else {
+                print("Don't know what to do with character '" + this.c + "'")
+                return 1
+            }
+            this.tokens.push(this.token)
+            print(this.token.str)
+        }
+        return 0
+    }
+    fun scan_number()->Integer{
+        var s = this.c
+        _ = this.advance()
+        while char_in_string(this.c, "1234567890") {
+            s += this.c
+            _ = this.advance()
+        }
+        this.token = #Token(s, TokenType.Number)
+        return 0
+    }
+    fun scan_id() -> Integer {
+        var s = this.c
+        _ = this.advance()
+        while is_letter(this.c) {
+            s += this.c
+            _ = this.advance()
+        }
+        this.token = #Token(s, TokenType.Id)
+        return 0
+    }
+}
+
+fun main()->Integer{
+    var code = "fun main()integer{var x = 2;}"
+    var scanner = Scanner.init(code)
+    var r = scanner.scan()
+    var t = scanner.tokens
+    for tok @ t {
+        print(map_token_to_string(tok.type))
+    }
+    return 0
+}

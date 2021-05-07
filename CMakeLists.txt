@@ -16,3 +16,4 @@ target_link_libraries(
         transpiler
         tinyxml
         fmt::fmt)
+add_subdirectory(bootstrap/output)
