@@ -1,0 +1,20 @@
+import core.Integer
+import core.String
+import core.print
+
+class Person {
+    name: String
+    age: Integer
+}
+
+fun main()->Integer{
+    var p = #Person("Chris", 27)
+    print(p.name)
+    print(p.age.str())
+    return 0
+}
+
+#####
+Chris
+27
+#####
