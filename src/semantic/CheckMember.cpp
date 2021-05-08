@@ -118,6 +118,13 @@ USemanticInfo Checker::object_member(SNode* object_snode, Value* pValue, std::st
 
     } else {
         this->error_reporter.object_no_member(*pValue->type, child, n.dot_pos);
+        std::cout << "Possible members are: " << std::endl;
+        for (auto m: clazz->members) {
+            std::cout << "- " << m.first << " : " << m.second->to_string() << std::endl;
+        }
+        for (auto m: clazz->methods) {
+            std::cout << "- " << m.first << " : " << m.second->ft->to_string() << std::endl;
+        }
         return error_stub();
     }
     return std::make_unique<SemanticInfo>(info);
