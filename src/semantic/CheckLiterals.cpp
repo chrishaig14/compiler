@@ -3,6 +3,7 @@
 //
 
 #include "CheckLiterals.h"
+#include "../simple_nodes/NoneSNode.h"
 
 USemanticInfo Checker::visit_boolean(BooleanNode& node) {
     SemanticInfo info;
@@ -54,6 +55,10 @@ USemanticInfo Checker::visit_number(NumberNode& node) {
 USemanticInfo Checker::visit_none(NoneNode& node) {
     SemanticInfo info;
     // info.set_type(ObjectType("NoneType"));
+    Value* v = new Value();
+    v->type = new ObjectType("NoneType");
+    info.entity = Entity(v);
+    info.snode = new NoneSNode();
     return std::make_unique<SemanticInfo>(info);
 }
 

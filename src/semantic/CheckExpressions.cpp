@@ -3,6 +3,7 @@
 //
 
 #include "CheckExpressions.h"
+#include "../simple_nodes/TernarySNode.h"
 
 USemanticInfo Checker::visit_id(IdNode& n) {
     // Logger::info("Checking id node " + n._id);
@@ -285,7 +286,10 @@ USemanticInfo Checker::visit_ternary(TernaryNode& node) {
     // TypeNode& type = *expression_type.type_params[0];
     // semanticInfo.set_type(type);
     this->enter_scope("true_case");
-    // this->scope->set("it", type);
+    TypeNode*& inner_type = expression_type.type_params[0];
+    Value* v = new Value();
+    v->type = inner_type;
+    this->scope->set("it", Entity(v));
     USemanticInfo true_case_p = this->dispatch(node.true_case);
     SemanticInfo& true_case = *true_case_p;
     this->leave_scope();
@@ -295,8 +299,10 @@ USemanticInfo Checker::visit_ternary(TernaryNode& node) {
         throw std::runtime_error(
                 "True case and false case type don't match: " + true_case.entity.value->type->to_string() + " != " +
                 false_case.entity.value->type->to_string());
-    } else {
-        // semanticInfo.set_type(true_case.type());
     }
+    Value* rv = new Value();
+    rv->type = true_case.entity.value->type->clone();
+    semanticInfo.entity = Entity(rv);
+    semanticInfo.snode = new TernarySNode(expression_info_p->snode, true_case.snode, false_case.snode);
     return std::make_unique<SemanticInfo>(semanticInfo);
 }

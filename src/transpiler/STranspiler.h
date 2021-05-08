@@ -27,6 +27,8 @@
 #include "../simple_nodes/BreakSNode.h"
 #include "../simple_nodes/ContinueSNode.h"
 #include "../simple_nodes/EnumMemberSNode.h"
+#include "../simple_nodes/TernarySNode.h"
+#include "../simple_nodes/NoneSNode.h"
 
 const std::string TOBJECT = "TaggedObject*";
 const std::string GCDECLARE = "GC::declare";
@@ -117,6 +119,10 @@ public:
 
     std::string transpile_enum_member(EnumMemberSNode* emsn);
 
+    std::string transpile_ternary(TernarySNode* tn);
+
+    std::string transpile_none(NoneSNode* nn);
+
     std::string dispatch(SNode* node) {
         if (node == nullptr) {
             throw std::runtime_error("Error dispatching on nullptr snode!");
@@ -157,6 +163,10 @@ public:
                 break;
             case SNodeType::FLOAT:
                 return this->transpile_float((FloatSNode*) node);
+            case SNodeType::NONE:
+                return this->transpile_none((NoneSNode*) node);
+            case SNodeType::TERNARY:
+                return this->transpile_ternary((TernarySNode*) node);
             case SNodeType::INTEGER:
                 return this->transpile_integer((IntegerSNode*) node);
                 break;

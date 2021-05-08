@@ -29,12 +29,23 @@ SNode* Checker::make_rvalue(Entity value_entity, SNode* value_snode, const TypeN
 
         if (unaliased_target_type->object().id == "Union") {
             int union_index = target_union_type(unaliased_target_type->object(), unaliased_value_type->object());
-            if (union_index == -1) {
-                return nullptr;
-            } else {
+            if (union_index != -1) {
                 return make_union_wrapper(union_index, value_snode);
+            } else {
+                return nullptr;
             }
         }
+
+        if (unaliased_target_type->object().id == "Option") {
+            if (*unaliased_target_type->object().type_params[0] == *unaliased_value_type) {
+                return value_snode;
+            } else if (unaliased_value_type->object().id == "NoneType") {
+                return value_snode;
+            } else {
+                return nullptr;
+            }
+        }
+
     } else {
         // kind = FUNCTION
     }

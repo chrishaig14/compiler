@@ -76,6 +76,7 @@ void STranspiler::transpile_function(FunctionSNode* node) {
         std::string parameter = GCDECLARE + LPAREN + pn + RPAREN + SEMIC + NEWLINE;
         f_source += parameter;
     }
+    f_source += TOBJECT + SPACE + "it" + SEMIC + NEWLINE;
     f_source += this->transpile_block(node->body) + RCURLY + NEWLINE;
 
     std::string function_class = "Function" + std::to_string(node->params.size());
@@ -290,4 +291,15 @@ std::string STranspiler::transpile_enum_member(EnumMemberSNode* emsn) {
     std::string out;
     out += path_to_id(emsn->enum_name) + "_" + emsn->value;
     return out;
+}
+
+std::string STranspiler::transpile_ternary(TernarySNode* tn) {
+    std::string out;
+    out += LPAREN + "(it="+this->dispatch(tn->ext) + ")!=nullptr? " + this->dispatch(tn->true_case) + SPACE + ":" + SPACE +
+           this->dispatch(tn->false_case) + RPAREN;
+    return out;
+}
+
+std::string STranspiler::transpile_none(NoneSNode* nn) {
+    return "nullptr";
 }
