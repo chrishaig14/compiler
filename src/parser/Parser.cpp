@@ -905,7 +905,6 @@ Node* Parser::parse_match_statement() {
         Token id = this->expect_token(TokType::ID);
         this->expect_token(TokType::COLON);
         TypeNode* type = this->parse_type_node();
-        this->expect_token(TokType::RARROW);
         BlockNode* body = this->parse_possibly_empty_block();
         ids.push_back(id.str);
         cases.push_back(std::make_pair(type, body));
