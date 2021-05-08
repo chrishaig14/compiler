@@ -297,8 +297,8 @@ std::string STranspiler::transpile_enum_member(EnumMemberSNode* emsn) {
 
 std::string STranspiler::transpile_ternary(TernarySNode* tn) {
     std::string out;
-    out += LPAREN + "(it="+this->dispatch(tn->ext) + ")!=nullptr? " + this->dispatch(tn->true_case) + SPACE + ":" + SPACE +
-           this->dispatch(tn->false_case) + RPAREN;
+    out += LPAREN + "(it=" + this->dispatch(tn->ext) + ")!=nullptr? " + this->dispatch(tn->true_case) + SPACE + ":" +
+           SPACE + this->dispatch(tn->false_case) + RPAREN;
     return out;
 }
 
