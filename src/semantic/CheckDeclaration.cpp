@@ -32,6 +32,22 @@ SNode* Checker::make_rvalue(Entity value_entity, SNode* value_snode, const TypeN
             if (union_index != -1) {
                 return make_union_wrapper(union_index, value_snode);
             } else {
+                if (unaliased_value_type->object().id == "Union") {
+                    if (unaliased_value_type->object().type_params.size() <=
+                        unaliased_target_type->object().type_params.size()) {
+                        // might be assigning a Union[Int, Str] to a Union[Int, Str, Bool] which should work!
+                        // for now the types order must be the same, but it should be necessary
+                        for (int i = 0; i < unaliased_value_type->object().type_params.size(); i++) {
+                            if (*unaliased_value_type->object().type_params[i] !=
+                                *unaliased_target_type->object().type_params[i]) {
+                                throw std::runtime_error(
+                                        "Error: Cannot lift union type " + unaliased_value_type->to_string() + " to " +
+                                        unaliased_target_type->to_string());
+                            }
+                        }
+                        return value_snode;
+                    }
+                }
                 return nullptr;
             }
         }
