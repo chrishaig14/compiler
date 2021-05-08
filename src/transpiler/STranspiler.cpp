@@ -77,7 +77,9 @@ void STranspiler::transpile_function(FunctionSNode* node) {
         f_source += parameter;
     }
     f_source += TOBJECT + SPACE + "it" + SEMIC + NEWLINE;
-    f_source += this->transpile_block(node->body) + RCURLY + NEWLINE;
+    f_source += this->transpile_block(node->body);
+    f_source += RETURN + SPACE + "nullptr" + SEMIC + NEWLINE;
+    f_source += RCURLY + NEWLINE;
 
     std::string function_class = "Function" + std::to_string(node->params.size());
 
