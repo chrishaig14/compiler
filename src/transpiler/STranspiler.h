@@ -29,6 +29,7 @@
 #include "../simple_nodes/EnumMemberSNode.h"
 #include "../simple_nodes/TernarySNode.h"
 #include "../simple_nodes/NoneSNode.h"
+#include "../simple_nodes/DictSNode.h"
 
 const std::string TOBJECT = "TaggedObject*";
 const std::string GCDECLARE = "GC::declare";
@@ -123,6 +124,8 @@ public:
 
     std::string transpile_none(NoneSNode* nn);
 
+    std::string transpile_dict(DictSNode* dn);
+
     std::string dispatch(SNode* node) {
         if (node == nullptr) {
             throw std::runtime_error("Error dispatching on nullptr snode!");
@@ -148,6 +151,8 @@ public:
                 return this->transpile_call((CallSNode*) node);
             case SNodeType::NEW:
                 return this->transpile_new((NewObjectSNode*) node);
+            case SNodeType::DICT:
+                return this->transpile_dict((DictSNode*) node);
             case SNodeType::LIST:
                 return this->transpile_list((ListSNode*) node);
             case SNodeType::OBJECT_MEMBER:

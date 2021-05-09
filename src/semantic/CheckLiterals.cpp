@@ -4,6 +4,7 @@
 
 #include "CheckLiterals.h"
 #include "../simple_nodes/NoneSNode.h"
+#include "../simple_nodes/DictSNode.h"
 
 USemanticInfo Checker::visit_boolean(BooleanNode& node) {
     SemanticInfo info;
@@ -176,6 +177,9 @@ USemanticInfo Checker::visit_dict(DictNode& node) {
     ObjectType& first_key_type = first_key_info->entity.value->type->object();
     ObjectType& first_value_type = first_value_info->entity.value->type->object();
 
+    std::vector<std::pair<SNode*, SNode*>> items;
+    items = {{first_key_info->snode, first_value_info->snode}};
+
     for (size_t i = 1; i < node.items.size(); i++) {
         USemanticInfo key_info = this->dispatch(node.items[i].first);
         USemanticInfo value_info = this->dispatch(node.items[i].second);
@@ -187,10 +191,14 @@ USemanticInfo Checker::visit_dict(DictNode& node) {
         if (value_type != first_value_type) {
             throw std::runtime_error("Second value type different to first");
         }
+        items.push_back(std::make_pair(key_info->snode, value_info->snode));
     }
     Value* ov = new Value();
     ov->type = new ObjectType("Dict", {first_key_type.clone(), first_value_type.clone()});
+    this->module->fill_actual(ov->type);
     info.entity = Entity(ov);
+    DictSNode* nsn = new DictSNode(items);
+    info.snode = nsn;
     return std::make_unique<SemanticInfo>(info);
 }
 

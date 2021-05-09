@@ -170,7 +170,7 @@ std::string STranspiler::transpile_new(NewObjectSNode* node) {
     std::string class_id = path_to_id(node->class_name);
     out += "NEW(" + class_id + COMMA + SPACE;
     if (class_id == "core_D_List") {
-        out += "{";
+        out += "-------{";
     }
     for (auto m: node->args) {
         if (m != nullptr) {
@@ -217,6 +217,20 @@ std::string STranspiler::transpile_list(ListSNode* ln) {
     out += "})";
     return out;
 }
+
+std::string STranspiler::transpile_dict(DictSNode* dn) {
+    std::string out;
+    out = "NEW(XDict,{";
+    for (auto e: dn->items) {
+        out += "{" + this->dispatch(e.first) + ", " + this->dispatch(e.second) + "}" + COMMA + SPACE;
+    }
+    if (dn->items.size() != 0) {
+        out = out.substr(0, out.size() - 2);
+    }
+    out += "})";
+    return out;
+}
+
 
 std::string STranspiler::transpile_if(IfSNode* in) {
     std::string out;
@@ -305,3 +319,4 @@ std::string STranspiler::transpile_ternary(TernarySNode* tn) {
 std::string STranspiler::transpile_none(NoneSNode* nn) {
     return "nullptr";
 }
+
