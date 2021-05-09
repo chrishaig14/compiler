@@ -71,9 +71,9 @@ DEFINE_FUNCTION(2, core_D_String_D___eq__)
 TaggedObject* core_D_String_D___add___f(TaggedObject* a, TaggedObject* b) {
     return MAKE_STRING(CAST(a, XString)->s + CAST(b, XString)->s);
 }
-DEFINE_FUNCTION(2, core_D_String_D___item__)
+DEFINE_FUNCTION(2, core_D_String_D___get_item__)
 
-TaggedObject* core_D_String_D___item___f(TaggedObject* a, TaggedObject* b) {
+TaggedObject* core_D_String_D___get_item___f(TaggedObject* a, TaggedObject* b) {
     long index = GET_INT(b);
     unsigned long str_len = CAST(a, XString)->s.size();
     if (index >= str_len) {

@@ -4,6 +4,61 @@
 
 #include "CheckStatements.h"
 
+USemanticInfo Checker::visit_lvalue_subscript(SubscriptNode& node) {
+    USemanticInfo parent_p = this->dispatch(node.parent);
+    Entity entity_parent = parent_p->entity;
+    if (entity_parent.type != E_TYPE::VALUE || entity_parent.value->type->kind == Kind::FUNCTION) {
+        throw std::runtime_error("Error subscript of something that is not an object!");
+    }
+    Entity class_entity = this->scope->get(entity_parent.value->type->object().id);
+    if (class_entity.type != E_TYPE::CLASS) {
+        throw std::runtime_error("Error this should be a CLASS, but it's not!");
+    }
+    Class* cls = class_entity.clazz;
+
+    if (cls->type_params.size() != 0) {
+        cls = instantiate_generic(cls, entity_parent.value->type->object());
+    }
+
+    auto subscript_it = cls->methods.find("__set_item__");
+    if (subscript_it == cls->methods.end()) {
+        throw std::runtime_error("Error class " + cls->class_name + " does not define the __set_item__ operator!");
+    }
+    ConstFunction* subscript_fun = subscript_it->second;
+    std::string sub_fun_path = subscript_fun->path.as_str();
+    TypeNode* rtype = subscript_fun->ft->return_type->clone();
+
+    VectorOfTypes children;
+    if (node.child.size() > 1) {
+        throw std::runtime_error("Error subscript with more than one child!");
+    }
+    bool old_lvalue = this->is_lvalue;
+    this->is_lvalue = false;
+    Node* c = node.child[0];
+    USemanticInfo ct = this->dispatch(c);
+    Entity child_entity = ct->entity;
+    if (child_entity.type != E_TYPE::VALUE) {
+        throw std::runtime_error("Error using something that's not an object as a subscript!");
+    }
+    if (*child_entity.value->type != *subscript_fun->ft->param_types[0]) {
+        throw std::runtime_error(
+                "Error subscript type is " + child_entity.value->type->to_string() + " but should be " +
+                subscript_fun->ft->param_types[0]->to_string());
+    }
+    this->is_lvalue = old_lvalue;
+    SemanticInfo info;
+    info.entity = Entity(new Value());
+    info.entity.value->type = (ObjectType*) rtype;
+    CallSNode* csn = new CallSNode();
+    IdSNode* fsn = new IdSNode();
+    fsn->identifier = sub_fun_path;
+    csn->function = fsn;
+    csn->arguments.push_back(parent_p->snode);
+    csn->arguments.push_back(ct->snode);
+    info.snode = csn;
+    return std::make_unique<SemanticInfo>(info);
+}
+
 USemanticInfo Checker::visit_assignment(AssignmentNode& n) {
 
     SemanticInfo info;
@@ -16,8 +71,18 @@ USemanticInfo Checker::visit_assignment(AssignmentNode& n) {
         }
     }
 
+    USemanticInfo linfo_p;
     this->is_lvalue = true;
-    USemanticInfo linfo_p = this->dispatch(n.lvalue);
+    bool is_subscript = false;
+    CallSNode* csn = nullptr;
+    if (n.lvalue->ntype == NodeType::SUB) {
+        // special case
+        linfo_p = this->visit_lvalue_subscript((SubscriptNode&) *n.lvalue);
+        csn = (CallSNode*) linfo_p->snode;
+        is_subscript = true;
+    } else {
+        linfo_p = this->dispatch(n.lvalue);
+    }
     this->is_lvalue = false;
 
     if (linfo_p->entity.type == E_TYPE::ERROR) {
@@ -57,8 +122,6 @@ USemanticInfo Checker::visit_assignment(AssignmentNode& n) {
     const TypeNode& l_type = *linfo.entity.value->type;
 
     if (linfo.entity.type == E_TYPE::VALUE && expression_info_p->entity.type == E_TYPE::VALUE) {
-
-
         SNode* rvalue_snode = this->make_rvalue(expression_info_p->entity,
                                                 expression_info_p->snode,
                                                 *linfo.entity.value->type);
@@ -72,11 +135,16 @@ USemanticInfo Checker::visit_assignment(AssignmentNode& n) {
     //                                     *expression_info_p->entity.value->type,
     //                                     n.rvalue->start);
     // }
-    AssignmentSNode* sn = new AssignmentSNode();
-    sn->lvalue = linfo_p->snode;
-    sn->rvalue = expression_info_p->snode;
+    if (is_subscript) {
+        info.snode = linfo_p->snode;
+        csn->arguments.push_back(expression_info_p->snode);
+    } else {
+        AssignmentSNode* sn = new AssignmentSNode();
+        sn->lvalue = linfo_p->snode;
+        sn->rvalue = expression_info_p->snode;
+        info.snode = sn;
+    }
 
-    info.snode = sn;
     return std::make_unique<SemanticInfo>(info);
 }
 

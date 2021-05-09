@@ -52,7 +52,7 @@ SNode* Checker::make_for_snode(ForNode& node, USemanticInfo& binfo, USemanticInf
     DeclarationSNode* loop_elem_sn = new DeclarationSNode();
 
     CallSNode* list_subscript_n = new CallSNode();
-    list_subscript_n->function = new IdSNode("core.List.__item__");
+    list_subscript_n->function = new IdSNode("core.List.__get_item__");
     list_subscript_n->arguments.push_back(new IdSNode(this->loop_list_var_id));
     list_subscript_n->arguments.push_back(new IdSNode(this->loop_index_var_id));
 

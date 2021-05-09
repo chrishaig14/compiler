@@ -143,6 +143,8 @@ public:
     USemanticInfo visit_class(ClassNode& node);
     USemanticInfo visit_continue(ContinueNode& node);
 
+    USemanticInfo visit_lvalue_subscript(SubscriptNode& node);
+
     USemanticInfo visit_declaration(DeclarationNode& n);
     USemanticInfo check_declaration_with_type(DeclarationNode& n);
     USemanticInfo check_declaration_without_type(DeclarationNode& n);

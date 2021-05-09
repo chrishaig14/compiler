@@ -132,10 +132,10 @@ USemanticInfo Checker::visit_boolop(BoolOpNode& n) {
 USemanticInfo Checker::visit_unary(UnaryOpNode& n) {
     SemanticInfo info;
     USemanticInfo exp_info = this->dispatch(n.exp);
-    if (exp_info->entity.type != E_TYPE::VALUE){
+    if (exp_info->entity.type != E_TYPE::VALUE) {
         throw std::runtime_error("ERROR EXPECTED A BOOLEAN");
     }
-    if (*exp_info->entity.value->type != T_BOOL){
+    if (*exp_info->entity.value->type != T_BOOL) {
         throw std::runtime_error("ERROR EXPECTED A BOOLEAN");
     }
     Value* v = new Value();
@@ -269,9 +269,9 @@ USemanticInfo Checker::visit_subscript(SubscriptNode& node) {
         cls = instantiate_generic(cls, entity_parent.value->type->object());
     }
 
-    auto subscript_it = cls->methods.find("__item__");
+    auto subscript_it = cls->methods.find("__get_item__");
     if (subscript_it == cls->methods.end()) {
-        throw std::runtime_error("Error class " + cls->class_name + " does not define the __sub__ operator!");
+        throw std::runtime_error("Error class " + cls->class_name + " does not define the __get_item__ operator!");
     }
     ConstFunction* subscript_fun = subscript_it->second;
     std::string sub_fun_path = subscript_fun->path.as_str();
