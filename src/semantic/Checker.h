@@ -84,6 +84,7 @@ SNode* make_union_wrapper(int type_index, SNode* expression);
 std::string binoptype_to_str(OpType op);
 
 class Checker {
+    int loop_count;
     bool add_this;
     bool is_lvalue;
     std::map<std::string, bool> inits;

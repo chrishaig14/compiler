@@ -206,9 +206,10 @@ USemanticInfo Checker::visit_for(ForNode& node) {
     this->scope->set(node.var, elem_entity);
 
 
-    this->loop_list_var_id = "__loop_list__";
-    this->loop_index_var_id = "__loop_index__";
-    this->loop_list_len_var_id = "__loop_list_len__";
+    std::string loop_c = std::to_string(this->loop_count++);
+    this->loop_list_var_id = "__loop_list__" + loop_c;
+    this->loop_index_var_id = "__loop_index__" + loop_c;
+    this->loop_list_len_var_id = "__loop_list_len__" + loop_c;
 
     AssignmentSNode* increment_index_sn = new AssignmentSNode();
     this->update_loop_index_snode = increment_index_sn;

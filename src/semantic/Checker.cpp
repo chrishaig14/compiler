@@ -145,6 +145,7 @@ Checker::Checker() {
     this->scopes["global"] = this->scope;
     this->add_this = false;
     this->this_type = nullptr;
+    this->loop_count = 0;
 }
 
 void Checker::enter_scope(std::string name) {
