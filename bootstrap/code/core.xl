@@ -90,6 +90,7 @@ class List[t] {
     fun __item__(i: Integer)->t{}
     fun len()->Integer{}
     fun push(x: t){}
+    fun has(x: t)->Boolean{}
     static fun __add__(l: List[t])->List[t]{}
 }
 

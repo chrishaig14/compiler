@@ -15,12 +15,7 @@ class Token {
 }
 
 fun is_letter(c: String)->Boolean {
-    for x @ ["a", "b","c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"] {
-        if c == x {
-            return true
-        }
-    }
-    return false
+    return ["a", "b","c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"].has(c)
 }
 
 fun char_in_string(c: String, s: String) -> Boolean {

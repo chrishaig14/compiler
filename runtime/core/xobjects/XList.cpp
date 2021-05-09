@@ -6,6 +6,7 @@
 #include "../basics.h"
 
 DEFINE_FUNCTION(1, core_D_List_D_len)
+DEFINE_FUNCTION(2, core_D_List_D_has)
 DEFINE_FUNCTION(2, core_D_List_D_push)
 DEFINE_FUNCTION(2, core_D_List_D___item__)
 
@@ -84,6 +85,23 @@ TaggedObject* core_D_List_D___item___f(TaggedObject* a, TaggedObject* b) {
                                  (" out of range of list with length " + std::to_string(list_len)));
     }
     return CAST(a, XList)->lv[idx];
+}
+
+TaggedObject* core_D_List_D_has_f(TaggedObject* a, TaggedObject* b) {
+    GC::declare(b);
+    for (auto e: CAST(a, XList)->lv) {
+        if (has_tag(e, OBJECT_TAG)) {
+            if (GET_BOOL(UNTAG(e)->__eq__(b))) {
+                GC::out_of_scope(b);
+                return TRUE;
+            }
+        } else if (e == b) {
+            GC::out_of_scope(b);
+            return TRUE;
+        }
+    }
+    GC::out_of_scope(b);
+    return FALSE;
 }
 
 TaggedObject* core_D_List_D_push_f(TaggedObject* a, TaggedObject* b) {

@@ -236,6 +236,9 @@ class Parser {
 }
 
 fun main()->Integer{
+//    var l = ["hello", "my", "friend"]
+//    var r = l.has("friends")
+//    print(r.str())
     var code = "fun main(x: int, y: int, z: int){var x = 2;print(x);}"
     var scanner = Scanner.init(code)
     var r = scanner.scan()

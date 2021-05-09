@@ -35,13 +35,16 @@ public:
 
 
 extern TaggedObject* core_D_List_D_len;
+extern TaggedObject* core_D_List_D_has;
 extern TaggedObject* core_D_List_D_push;
 extern TaggedObject* core_D_List_D___item__;
 
 extern Function1 core_D_List_D_len_o;
+extern Function2 core_D_List_D_has_o;
 extern Function2 core_D_List_D_push_o;
 extern Function2 core_D_List_D___item__o;
 
+TaggedObject* core_D_List_D_has_f(TaggedObject* a, TaggedObject* b);
 TaggedObject* core_D_List_D_push_f(TaggedObject* a, TaggedObject* b);
 
 TaggedObject* core_D_List_D_len_f(TaggedObject* a);
