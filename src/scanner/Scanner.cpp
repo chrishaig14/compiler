@@ -43,6 +43,11 @@ void initialize_tokens() {
     TOKEN_KEYWORDS["none"] = TokType::NONE;
     TOKEN_KEYWORDS["as"] = TokType::AS;
 
+    TOKEN_KEYWORDS["not"] = TokType::NOT;
+    TOKEN_KEYWORDS["and"] = TokType::AND;
+    TOKEN_KEYWORDS["or"] = TokType::OR;
+    // TOKEN_KEYWORDS["xor"] = TokType::XOR;
+
 
     TOKEN_SPECIAL[";"] = TokType::SEMICOLON;
     TOKEN_SPECIAL[","] = TokType::COMMA;
@@ -79,9 +84,7 @@ void initialize_tokens() {
     TOKEN_SPECIAL["=="] = TokType::EQ;
     TOKEN_SPECIAL["::"] = TokType::DOUBLE_COLON;
     TOKEN_SPECIAL["!="] = TokType::NEQ;
-    TOKEN_SPECIAL["!"] = TokType::NOT;
-    TOKEN_SPECIAL["&&"] = TokType::AND;
-    TOKEN_SPECIAL["||"] = TokType::OR;
+
     TOKEN_SPECIAL["->"] = TokType::RARROW;
     TOKEN_SPECIAL["++"] = TokType::INC;
     TOKEN_SPECIAL["#"] = TokType::HASH;

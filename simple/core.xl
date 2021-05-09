@@ -1,0 +1,108 @@
+class Integer {
+    static fun __add__(a: Integer, b: Integer) -> Integer {
+        return 0
+    }
+    static fun __sub__(a: Integer, b: Integer) -> Integer {
+        return 0
+    }
+    static fun __mul__(a: Integer, b: Integer) -> Integer {
+        return 0
+    }
+    static fun __div__(a: Integer, b: Integer) -> Integer {
+        return 0
+    }
+    static fun __eq__(a: Integer, b: Integer) -> Boolean {
+        return false
+    }
+    static fun __ne__(a: Integer, b: Integer) -> Boolean {
+        return false
+    }
+    static fun __le__(a: Integer, b: Integer) -> Boolean {
+        return false
+    }
+    static fun __ge__(a: Integer, b: Integer) -> Boolean {
+        return false
+    }
+    static fun __lt__(a: Integer, b: Integer) -> Boolean {
+        return false
+    }
+    static fun __gt__(a: Integer, b: Integer) -> Boolean {
+        return false
+    }
+    fun str() -> String {
+        return ""
+    }
+}
+
+class Float {
+    static fun __add__(a: Float, b: Float) -> Float {
+        return 0
+    }
+    static fun __sub__(a: Float, b: Float) -> Float {
+        return 0
+    }
+    static fun __mul__(a: Float, b: Float) -> Float {
+        return 0
+    }
+    static fun __div__(a: Float, b: Float) -> Float {
+        return 0
+    }
+    static fun __eq__(a: Float, b: Float) -> Boolean {
+        return false
+    }
+    static fun __ne__(a: Float, b: Float) -> Boolean {
+        return false
+    }
+    static fun __le__(a: Float, b: Float) -> Boolean {
+        return false
+    }
+    static fun __ge__(a: Float, b: Float) -> Boolean {
+        return false
+    }
+    static fun __lt__(a: Float, b: Float) -> Boolean {
+        return false
+    }
+    static fun __gt__(a: Float, b: Float) -> Boolean {
+        return false
+    }
+    fun str() -> String {
+        return ""
+    }
+}
+
+class String {
+    fun len()->Integer{}
+    fun __sub__(i: Integer)->String{}
+    static fun __eq__(a: String, b:String)->Boolean {}
+    static fun __add__(a: String, b:String)->String {}
+}
+
+class Boolean {
+    fun str()->String{}
+    static fun __or__(a: Boolean, b: Boolean) -> Boolean {}
+    static fun __and__(a: Boolean, b: Boolean) -> Boolean {}
+    static fun __eq__(a: Boolean, b: Boolean) -> Boolean {}
+    static fun __ne__(a: Boolean, b: Boolean) -> Boolean {}
+}
+
+class List[t] {
+    fun __sub__(i: Integer)->t{}
+    fun len()->Integer{}
+    fun push(x: t){}
+    static fun __add__(l: List[t])->List[t]{}
+}
+
+fun print(s: String){
+}
+
+fun range(start: Integer, step: Integer, end: Integer)->List[Integer]{}
+
+class Dict[k,v] {
+    fun __sub__(key: k) -> v {}
+}
+
+class Option[t] {
+    fun get()->t {}
+}
+
+fun exit(c: Integer){}

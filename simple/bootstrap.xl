@@ -1,0 +1,15 @@
+import core.Integer
+import core.print
+import core.String
+import core.List
+import core.Boolean
+import core.range
+import core.Option
+import core.exit
+
+
+fun main()->Integer{
+    var a = false or true and false
+    print(a.str())
+    return 0
+}

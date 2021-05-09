@@ -7,7 +7,7 @@
 
 DEFINE_FUNCTION(1, core_D_List_D_len)
 DEFINE_FUNCTION(2, core_D_List_D_push)
-DEFINE_FUNCTION(2, core_D_List_D___sub__)
+DEFINE_FUNCTION(2, core_D_List_D___item__)
 
 TaggedObject* m_core_c_List_f_add_f(TaggedObject* _a, TaggedObject* _b) {
     GC::declare(_a);
@@ -76,7 +76,7 @@ TaggedObject* core_D_List_D_len_f(TaggedObject* a) {
     return MAKE_INT(CAST(a, XList)->lv.size());
 }
 
-TaggedObject* core_D_List_D___sub___f(TaggedObject* a, TaggedObject* b) {
+TaggedObject* core_D_List_D___item___f(TaggedObject* a, TaggedObject* b) {
     long idx = GET_INT(b);
     unsigned long list_len = CAST(a, XList)->lv.size();
     if (idx >= list_len) {

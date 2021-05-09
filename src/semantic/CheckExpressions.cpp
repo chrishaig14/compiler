@@ -91,7 +91,7 @@ USemanticInfo Checker::visit_boolop(BoolOpNode& n) {
         throw std::runtime_error("This should be a CLASS/ENUM, but it's not!");
     }
     if (entity.type == E_TYPE::ENUM) {
-        if (fun != "eq" && fun != "ne") {
+        if (fun != "__eq__" && fun != "__ne__") {
             throw std::runtime_error("Error: enum type doesnt support this operator");
         }
         ObjectType* ot = new ObjectType("Boolean", {});
@@ -220,7 +220,7 @@ USemanticInfo Checker::visit_subscript(SubscriptNode& node) {
         cls = instantiate_generic(cls, entity_parent.value->type->object());
     }
 
-    auto subscript_it = cls->methods.find("__sub__");
+    auto subscript_it = cls->methods.find("__item__");
     if (subscript_it == cls->methods.end()) {
         throw std::runtime_error("Error class " + cls->class_name + " does not define the __sub__ operator!");
     }

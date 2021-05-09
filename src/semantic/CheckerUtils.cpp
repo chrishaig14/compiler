@@ -18,7 +18,7 @@ std::string binoptype_to_str(OpType op) {
     } else if (op == OpType::DIV) {
         fun = "div";
     }
-    return fun;
+    return "__" + fun + "__";
 }
 
 
@@ -174,22 +174,8 @@ std::string map_boolop_to_method_name(BoolOp op) {
     funs[BoolOp::LT] = "lt";
     funs[BoolOp::GT] = "gt";
 
-    return funs[op];
+    return "__" + funs[op] + "__";
 }
-
-std::string map_binop_to_method_name(OpType op) {
-    std::map<OpType, std::string> funs;
-
-    funs[OpType::ADD] = "add";
-    funs[OpType::SUB] = "sub";
-
-    funs[OpType::MUL] = "mul";
-    funs[OpType::DIV] = "div";
-    funs[OpType::MOD] = "mod";
-
-    return funs[op];
-}
-
 
 int target_union_type(const ObjectType& target, const TypeNode& source);
 

@@ -1,0 +1,251 @@
+import core.Integer
+import core.print
+import core.String
+import core.List
+import core.Boolean
+import core.range
+import scanner.Scanner
+import scanner.map_token_to_string
+import scanner.Token
+import scanner.TokenType
+import core.Option
+import core.exit
+
+class FunctionNode {
+    id: String
+    parameters: List[String]
+    body: List[AnyNode]
+    fun str()->String{
+        var s = "fun("+this.id + ", ("
+        for x @ this.parameters {
+            s += x + ", "
+        }
+        for x @ this.body {
+            s += anynode_to_string(x) + ";"
+        }
+        s += ")"
+        s += ")"
+        return s
+    }
+}
+
+fun anynode_to_string(n: AnyNode) -> String {
+    match n {
+        d: DeclarationNode {
+            return d.str()
+        }
+        c: CallNode {
+            return c.str()
+        }
+    }
+    return "---"
+}
+
+fun expnode_to_string(n: ExpressionNode) -> String {
+    match n {
+        nn: NumberNode {
+            return nn.num_str
+        }
+        i: IdNode {
+            return i.id
+        }
+        c: CallNode {
+            return c.str()
+        }
+    }
+    return "---"
+}
+
+class DeclarationNode {
+    id: String
+    value: ExpressionNode
+    fun str()->String{
+        return "decl(" + this.id + ", " + expnode_to_string(this.value) + ")"
+    }
+}
+
+class NumberNode {
+    num_str: String
+}
+
+class IdNode {
+    id: String
+}
+
+class AssignmentNode {
+    lvalue: ExpressionNode
+    rvalue: ExpressionNode
+}
+
+class CallNode {
+    function: ExpressionNode
+    args: List[ExpressionNode]
+    fun str()->String {
+        var s =  "call(" + expnode_to_string(this.function) + ", "
+        for arg @ this.args {
+            s += expnode_to_string(arg)
+        }
+        s += ")"
+        return s
+    }
+}
+
+alias AnyNode = Union[FunctionNode, DeclarationNode, AssignmentNode, CallNode]
+alias ExpressionNode = Union[NumberNode, IdNode, CallNode]
+
+class Parser {
+    tokens: List[Token]
+    current_token_index: Integer
+    token: Token
+    static fun init(tokens: List[Token]) -> Parser {
+        return #Parser(tokens, 0, tokens[0])
+    }
+
+    fun matches(type: TokenType) -> Boolean {
+        return this.token.type == type
+    }
+
+    fun advance(){
+        this.current_token_index = this.current_token_index + 1
+        if this.current_token_index >= this.tokens.len() {
+        }else{
+            this.token = this.tokens[this.current_token_index]
+        }
+    }
+
+    fun expect(type: TokenType)->Token{
+
+        if this.token.type != type {
+            print("Expected " + map_token_to_string(type) + " but got " + map_token_to_string(this.token.type))
+            exit(1)
+        }
+        var matching_token = this.token
+        this.advance()
+        return matching_token
+    }
+
+    fun parse_function()-> FunctionNode {
+        var fun_token = this.expect(TokenType.KwFun)
+        var id_token = this.expect(TokenType.Id)
+        _ = this.expect(TokenType.OpenParen)
+        var expect_param = this.matches(TokenType.Id)
+        var params = []::String
+        while expect_param {
+            var param_name_token = this.expect(TokenType.Id)
+            params.push(param_name_token.str)
+            _ = this.expect(TokenType.Colon)
+            var param_type_token = this.expect(TokenType.Id)
+            if this.matches(TokenType.Comma) != true {
+                expect_param = false
+            } else {
+                this.advance()
+            }
+        }
+
+        _ = this.expect(TokenType.CloseParen)
+        _ = this.expect(TokenType.OpenCurly)
+        var body = []::AnyNode
+        while this.matches(TokenType.CloseCurly) != true {
+            body.push(this.parse_statement())
+            _ = this.expect(TokenType.Semicolon)
+        }
+
+        _ = this.expect(TokenType.CloseCurly)
+        var n = #FunctionNode(id_token.str, []::String, body)
+        return n
+    }
+
+    fun parse_statement()->AnyNode {
+        if this.matches(TokenType.KwVar) {
+            return this.parse_declaration()
+        }
+        if this.matches(TokenType.Id) {
+            var x = this.parse_assignment_or_call()
+            match x {
+                a: AssignmentNode {
+                    return a
+                }
+                c: CallNode {
+                    return c
+                }
+            }
+        }
+        print("Expected a statement")
+        exit(1)
+        return this.parse_declaration()
+    }
+
+    fun parse_assignment_or_call()->Union[AssignmentNode, CallNode]{
+        var exp = this.parse_expression()
+        match exp {
+            c: CallNode {
+                return c
+            }
+            l: IdNode {
+                _ = this.expect(TokenType.Assign)
+                var rvalue = this.parse_expression()
+                return #AssignmentNode(l, rvalue)
+            }
+        }
+        return #AssignmentNode(#IdNode(""),#IdNode(""))
+    }
+
+    fun parse_declaration()->DeclarationNode {
+        _ = this.expect(TokenType.KwVar)
+        var id_token = this.expect(TokenType.Id)
+        _ = this.expect(TokenType.Assign)
+        var exp = this.parse_expression()
+        return #DeclarationNode(id_token.str, exp)
+    }
+
+    fun parse_call(function: ExpressionNode) -> CallNode {
+        print(this.token.str)
+        _ = this.expect(TokenType.OpenParen)
+        var args = []::ExpressionNode
+        var expect_param = this.matches(TokenType.CloseParen) != true
+        while expect_param {
+            var arg = this.parse_expression()
+            args.push(arg)
+            if this.token.type == TokenType.Comma {
+                this.advance()
+            } else {
+                expect_param = false
+            }
+        }
+        print("finished parsing arguments")
+        _ = this.expect(TokenType.CloseParen)
+        return #CallNode(function, args)
+    }
+
+    fun parse_expression()->ExpressionNode {
+        if this.matches(TokenType.Number) {
+            var num_token = this.token
+            this.advance()
+            return #NumberNode(num_token.str)
+        }
+        if this.matches(TokenType.Id) {
+            var id_token = this.token
+            this.advance()
+            if this.matches(TokenType.OpenParen) {
+                return this.parse_call(#IdNode(id_token.str))
+            } else {
+                return #IdNode(id_token.str)
+            }
+        }
+        return #IdNode("Hello")
+    }
+}
+
+fun main()->Integer{
+    var code = "fun main(x: int, y: int, z: int){var x = 2;print(x);}"
+    var scanner = Scanner.init(code)
+    var r = scanner.scan()
+    var t = scanner.tokens
+    for tok @ t {
+        print("Token: " + map_token_to_string(tok.type))
+    }
+    var parser = Parser.init(scanner.tokens)
+    var function_node = parser.parse_function()
+    print(function_node.str())
+    return 0
+}

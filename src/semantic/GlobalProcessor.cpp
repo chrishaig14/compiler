@@ -97,11 +97,11 @@ void GlobalProcessor::visit_root(BlockNode& node) {
             enumm->values = ((EnumNode*) n)->values;
             enumm->path = this->module->path.as_str() + "." + enumm->enumm_name;
             ConstFunction* eqfun = new ConstFunction();
-            eqfun->path = Path(enumm->path, "eq");
+            eqfun->path = Path(enumm->path, "__eq__");
             ConstFunction* nefun = new ConstFunction();
-            nefun->path = Path(enumm->path, "ne");
-            enumm->functions["eq"] = eqfun;
-            enumm->functions["ne"] = nefun;
+            nefun->path = Path(enumm->path, "__ne__");
+            enumm->functions["__eq__"] = eqfun;
+            enumm->functions["__ne__"] = nefun;
             this->module->flirpins[enumm->enumm_name] = Flirpin{.type=F_TYPE::ENUM, .enumm=enumm};
         }
     }

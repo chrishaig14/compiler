@@ -20,20 +20,20 @@ public:
     TaggedObject* __eq__(TaggedObject* other) override;
 };
 
-extern Function2 core_D_String_D_eq_o;
+extern Function2 core_D_String_D___eq___o;
 extern Function1 core_D_String_D_len_o;
-extern Function2 core_D_String_D_add_o;
-extern Function2 core_D_String_D___sub___o;
+extern Function2 core_D_String_D___add___o;
+extern Function2 core_D_String_D___item___o;
 
-extern TaggedObject* core_D_String_D_eq;
-extern TaggedObject* core_D_String_D_add;
+extern TaggedObject* core_D_String_D___eq__;
+extern TaggedObject* core_D_String_D___add__;
 extern TaggedObject* core_D_String_D_len;
-extern TaggedObject* core_D_String_D___sub__;
-extern TaggedObject* core_D_String_D_eq;
+extern TaggedObject* core_D_String_D___item__;
+extern TaggedObject* core_D_String_D___eq__;
 
-TaggedObject* core_D_String_D_add_f(TaggedObject* a, TaggedObject* b);
-TaggedObject* core_D_String_D_eq_f(TaggedObject* a, TaggedObject* b);
+TaggedObject* core_D_String_D___add___f(TaggedObject* a, TaggedObject* b);
+TaggedObject* core_D_String_D___eq___f(TaggedObject* a, TaggedObject* b);
 TaggedObject* core_D_String_D_len_f(TaggedObject* a);
-TaggedObject* core_D_String_D___sub___f(TaggedObject* a, TaggedObject* b);
+TaggedObject* core_D_String_D___item___f(TaggedObject* a, TaggedObject* b);
 
 #endif //XLANG_XSTRING_H
