@@ -221,10 +221,14 @@ std::string STranspiler::transpile_list(ListSNode* ln) {
 std::string STranspiler::transpile_dict(DictSNode* dn) {
     std::string out;
     out = "NEW(XDict,{";
-    for (auto e: dn->items) {
-        out += "{" + this->dispatch(e.first) + ", " + this->dispatch(e.second) + "}" + COMMA + SPACE;
+    if (dn->items.size() == 1) {
+        auto e = dn->items[0];
+        out += "std::make_pair(" + this->dispatch(e.first) + ", " + this->dispatch(e.second) + ")" + SPACE;
     }
-    if (dn->items.size() != 0) {
+    if (dn->items.size() > 1) {
+        for (auto e: dn->items) {
+            out += "{" + this->dispatch(e.first) + ", " + this->dispatch(e.second) + "}" + COMMA + SPACE;
+        }
         out = out.substr(0, out.size() - 2);
     }
     out += "})";
