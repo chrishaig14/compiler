@@ -101,11 +101,12 @@ USemanticInfo Checker::visit_call(CallNode& n) {
     } else {
         retv.entity = entity_from_type(*function_type->return_type);
         retv.entity.value->type = (ObjectType*) function_type->return_type->clone();
+        int sni = fun_info_p->this_arg != nullptr;
         for (size_t i = 0; i < n.arguments.size(); i++) {
             const TypeNode& arg_type = *arg_types[i];
             const TypeNode& param_type = *function_type->param_types[i];
 
-            SNode* arg_rvalue_snode = this->make_rvalue(arg_entities[i], sn->arguments[i], param_type);
+            SNode* arg_rvalue_snode = this->make_rvalue(arg_entities[i], sn->arguments[sni], param_type);
             if (arg_rvalue_snode == nullptr) {
                 this->error_reporter.function_call_type_mismatch(param_type,
                                                                  arg_type,
@@ -113,7 +114,8 @@ USemanticInfo Checker::visit_call(CallNode& n) {
                                                                  n.arguments[i]->end);
                 continue;
             }
-            sn->arguments[i] = arg_rvalue_snode;
+            sn->arguments[sni] = arg_rvalue_snode;
+            sni++;
         }
     }
     for (auto x: arg_types) {
