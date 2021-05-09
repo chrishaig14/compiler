@@ -45,6 +45,7 @@
 #include "../simple_nodes/ObjectMemberSNode.h"
 #include "../simple_nodes/MatchSNode.h"
 #include "CheckerUtils.h"
+#include "../nodes/UnaryOpNode.h"
 
 #define T_NONE ObjectType(".None")
 
@@ -150,6 +151,7 @@ public:
     USemanticInfo visit_emptydict(EmptyDictNode& node);
     USemanticInfo visit_emptylist(EmptyListNode& node);
     USemanticInfo visit_float(FloatNode& node);
+    USemanticInfo visit_unary(UnaryOpNode& n);
     USemanticInfo visit_for(ForNode& node);
     USemanticInfo visit_function(FunctionNode& n);
     USemanticInfo visit_id(IdNode& n);

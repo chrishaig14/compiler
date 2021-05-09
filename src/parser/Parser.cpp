@@ -5,6 +5,7 @@
 #include "Parser.h"
 #include "../semantic/GlobalProcessor.h"
 #include "../nodes/PartialApplication.h"
+#include "../nodes/UnaryOpNode.h"
 #include "../logging/logging.h"
 #include "../nodes/DefaultConstructorNode.h"
 #include "../nodes/AliasNode.h"
@@ -207,14 +208,24 @@ Node* Parser::parse_or_expression() {
 }
 
 Node* Parser::parse_and_expression() {
-    Node* left = this->parse_bool_expression();
+    Node* left = this->parse_not_expression();
     while (this->match(TokType::AND)) {
         this->next();
-        Node* right = this->parse_bool_expression();
+        Node* right = this->parse_not_expression();
         Node* node = new BoolOpNode(BoolOp::AND, left, right, left->start, right->end);
         left = node;
     }
     return left;
+}
+
+Node* Parser::parse_not_expression() {
+    if (this->match(TokType::NOT)) {
+        Token not_tok = this->expect_token(TokType::NOT);
+        Node* left = this->parse_bool_expression();
+        left = new UnaryOpNode(UnaryOp::NOT, left, not_tok.start, left->end);
+        return left;
+    }
+    return this->parse_bool_expression();
 }
 
 Node* Parser::parse_bool_expression() {
@@ -276,17 +287,17 @@ Node* Parser::parse_factor() {
     }
     parent = this->parse_call_or_subscript_chain(parent);
     while (this->match(TokType::DOT)) {
-            TextPosition dot_pos = this->token.start;
-            this->next();
-            Token tok;
-            if (this->match(TokType::INTEGER)) {
-                tok = this->expect_token(TokType::INTEGER);
-                parent = new MemberNode(parent, std::atoi(tok.str.c_str()), parent->start, tok.end_pos);
-            } else {
-                tok = this->expect_token(TokType::ID);
-                parent = new MemberNode(parent, tok.str, parent->start, tok.end_pos);
-                parent->dot_pos = dot_pos;
-            }
+        TextPosition dot_pos = this->token.start;
+        this->next();
+        Token tok;
+        if (this->match(TokType::INTEGER)) {
+            tok = this->expect_token(TokType::INTEGER);
+            parent = new MemberNode(parent, std::atoi(tok.str.c_str()), parent->start, tok.end_pos);
+        } else {
+            tok = this->expect_token(TokType::ID);
+            parent = new MemberNode(parent, tok.str, parent->start, tok.end_pos);
+            parent->dot_pos = dot_pos;
+        }
         parent = this->parse_call_or_subscript_chain(parent);
     }
 

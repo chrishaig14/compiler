@@ -32,6 +32,8 @@ public:
 
     DeclarationNode* parse_variable_declaration();
 
+    Node* parse_not_expression();
+
     Node* parse_id_or_class_literal();
 
     FunctionNode* parse_function_definition();

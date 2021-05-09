@@ -6,7 +6,7 @@ import core.Boolean
 import core.range
 
 enum TokenType {
-    For, Class, Enum, Var, Import, If, Else, Start, EOF, Id, Special, OpenParen, CloseParen, OpenCurly, CloseCurly, Assign, Number, Semicolon
+    For, Class, Enum, Var, Import, If, Else, Start, EOF, Id, Special, OpenParen, CloseParen, OpenCurly, CloseCurly, Assign, Number, Semicolon, Colon, Comma, KwVar, KwFun
 }
 
 class Token {
@@ -51,6 +51,22 @@ fun map_special(c: String)->TokenType{
     if c == ";" {
         return TokenType.Semicolon
     }
+    if c == ":" {
+        return TokenType.Colon
+    }
+    if c == "," {
+        return TokenType.Comma
+    }
+    return TokenType.Id
+}
+
+fun map_keyword(c: String)->TokenType{
+    if c == "var" {
+        return TokenType.KwVar
+    }
+    if c == "fun" {
+        return TokenType.KwFun
+    }
     return TokenType.Id
 }
 
@@ -82,6 +98,18 @@ fun map_token_to_string(tok: TokenType) -> String {
     if tok == TokenType.Number {
         return "Number"
     }
+    if tok == TokenType.Colon {
+        return "Colon"
+    }
+    if tok == TokenType.Comma {
+        return "Comma"
+    }
+    if tok == TokenType.KwVar {
+        return "KwVar"
+    }
+    if tok == TokenType.KwFun {
+        return "KwFun"
+    }
     return "Unknown"
 }
 
@@ -92,14 +120,14 @@ class Scanner {
     tokens: List[Token]
     token: Token
     static fun init(text: String)->Scanner {
-        return #Scanner(text, 0, "", []::Token, #Token("",TokenType.Start))
+        return #Scanner(text, 0-1, "", []::Token, #Token("",TokenType.Start))
     }
     fun advance()->Integer{
+        this.cursor = this.cursor + 1
         if this.cursor >= this.text.len() {
             return 0
         }
         this.c = this.text[this.cursor]
-        this.cursor = this.cursor + 1
         return 0
     }
     fun skip_spaces()->Integer{
@@ -113,8 +141,8 @@ class Scanner {
         while this.cursor < this.text.len() {
             _ = this.skip_spaces()
             if is_letter(this.c) {
-                _ = this.scan_id()
-            } elif (char_in_string(this.c, "(){}=;")) {
+                _ = this.scan_id_or_kw()
+            } elif (char_in_string(this.c, "(){}=;,:")) {
                 this.token = #Token(this.c,map_special(this.c))
                 _ = this.advance()
             } elif (char_in_string(this.c, "1234567890")){
@@ -139,14 +167,16 @@ class Scanner {
         this.token = #Token(s, TokenType.Number)
         return 0
     }
-    fun scan_id() -> Integer {
+    fun scan_id_or_kw() -> Integer {
         var s = this.c
         _ = this.advance()
         while is_letter(this.c) {
             s += this.c
             _ = this.advance()
         }
-        this.token = #Token(s, TokenType.Id)
+        var token_type = map_keyword(s)
+        print("SCANNED " + s + " " + map_token_to_string(token_type))
+        this.token = #Token(s, token_type)
         return 0
     }
 }

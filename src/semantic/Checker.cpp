@@ -355,6 +355,8 @@ USemanticInfo Checker::dispatch(Node* nod) {
             return this->visit_ternary(n.ternary());
         case NodeType::TUPLE:
             return this->visit_tuple(n.tuple());
+        case NodeType::UNARY:
+            return this->visit_unary((UnaryOpNode&) n);
         case NodeType::WHIL:
             return this->visit_while(n.whil());
         case NodeType::PARTIAL:

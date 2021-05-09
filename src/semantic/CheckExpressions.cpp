@@ -4,6 +4,7 @@
 
 #include "CheckExpressions.h"
 #include "../simple_nodes/TernarySNode.h"
+#include "../nodes/UnaryOpNode.h"
 
 USemanticInfo Checker::visit_id(IdNode& n) {
     // Logger::info("Checking id node " + n._id);
@@ -124,6 +125,54 @@ USemanticInfo Checker::visit_boolop(BoolOpNode& n) {
 
         info.snode = make_boolop_snode(operator_fun, left_info, right_info);
     }
+
+    return std::make_unique<SemanticInfo>(info);
+}
+
+USemanticInfo Checker::visit_unary(UnaryOpNode& n) {
+    SemanticInfo info;
+    USemanticInfo exp_info = this->dispatch(n.exp);
+    if (exp_info->entity.type != E_TYPE::VALUE){
+        throw std::runtime_error("ERROR EXPECTED A BOOLEAN");
+    }
+    if (*exp_info->entity.value->type != T_BOOL){
+        throw std::runtime_error("ERROR EXPECTED A BOOLEAN");
+    }
+    Value* v = new Value();
+    v->type = new ObjectType("Boolean");
+    info.entity = Entity(v);
+
+    USemanticInfo parent_p = this->dispatch(n.exp);
+    Entity entity_parent = parent_p->entity;
+    if (entity_parent.type != E_TYPE::VALUE) {
+        throw std::runtime_error("Error unary of something that is not an object!");
+    }
+    Entity class_entity = this->scope->get(entity_parent.value->type->object().id);
+    if (class_entity.type != E_TYPE::CLASS) {
+        throw std::runtime_error("Error this should be a CLASS, but it's not!");
+    }
+    Class* cls = class_entity.clazz;
+
+    if (cls->type_params.size() != 0) {
+        cls = instantiate_generic(cls, entity_parent.value->type->object());
+    }
+
+    auto subscript_it = cls->methods.find("__not__");
+    if (subscript_it == cls->methods.end()) {
+        throw std::runtime_error("Error class " + cls->class_name + " does not define the __not__ operator!");
+    }
+    ConstFunction* subscript_fun = subscript_it->second;
+    std::string sub_fun_path = subscript_fun->path.as_str();
+    TypeNode* rtype = subscript_fun->ft->return_type->clone();
+
+    info.entity = Entity(new Value());
+    info.entity.value->type = (ObjectType*) rtype;
+    CallSNode* csn = new CallSNode();
+    IdSNode* fsn = new IdSNode();
+    fsn->identifier = sub_fun_path;
+    csn->function = fsn;
+    csn->arguments.push_back(parent_p->snode);
+    info.snode = csn;
 
     return std::make_unique<SemanticInfo>(info);
 }

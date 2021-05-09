@@ -72,7 +72,7 @@ class Float {
 
 class String {
     fun len()->Integer{}
-    fun __sub__(i: Integer)->String{}
+    fun __item__(i: Integer)->String{}
     static fun __eq__(a: String, b:String)->Boolean {}
     static fun __add__(a: String, b:String)->String {}
 }
@@ -86,7 +86,7 @@ class Boolean {
 }
 
 class List[t] {
-    fun __sub__(i: Integer)->t{}
+    fun __item__(i: Integer)->t{}
     fun len()->Integer{}
     fun push(x: t){}
     static fun __add__(l: List[t])->List[t]{}
@@ -98,7 +98,7 @@ fun print(s: String){
 fun range(start: Integer, step: Integer, end: Integer)->List[Integer]{}
 
 class Dict[k,v] {
-    fun __sub__(key: k) -> v {}
+    fun __item__(key: k) -> v {}
 }
 
 class Option[t] {

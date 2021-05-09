@@ -1,32 +1,32 @@
 class Integer {
-    static fun add(a: Integer, b: Integer) -> Integer {
+    static fun __add__(a: Integer, b: Integer) -> Integer {
         return 0
     }
-    static fun sub(a: Integer, b: Integer) -> Integer {
+    static fun __sub__(a: Integer, b: Integer) -> Integer {
         return 0
     }
-    static fun mul(a: Integer, b: Integer) -> Integer {
+    static fun __mul__(a: Integer, b: Integer) -> Integer {
         return 0
     }
-    static fun div(a: Integer, b: Integer) -> Integer {
+    static fun __div__(a: Integer, b: Integer) -> Integer {
         return 0
     }
-    static fun eq(a: Integer, b: Integer) -> Boolean {
+    static fun __eq__(a: Integer, b: Integer) -> Boolean {
         return false
     }
-    static fun ne(a: Integer, b: Integer) -> Boolean {
+    static fun __ne__(a: Integer, b: Integer) -> Boolean {
         return false
     }
-    static fun le(a: Integer, b: Integer) -> Boolean {
+    static fun __le__(a: Integer, b: Integer) -> Boolean {
         return false
     }
-    static fun ge(a: Integer, b: Integer) -> Boolean {
+    static fun __ge__(a: Integer, b: Integer) -> Boolean {
         return false
     }
-    static fun lt(a: Integer, b: Integer) -> Boolean {
+    static fun __lt__(a: Integer, b: Integer) -> Boolean {
         return false
     }
-    static fun gt(a: Integer, b: Integer) -> Boolean {
+    static fun __gt__(a: Integer, b: Integer) -> Boolean {
         return false
     }
     fun str() -> String {
@@ -35,34 +35,34 @@ class Integer {
 }
 
 class Float {
-    static fun add(a: Float, b: Float) -> Float {
+    static fun __add__(a: Float, b: Float) -> Float {
         return 0
     }
-    static fun sub(a: Float, b: Float) -> Float {
+    static fun __sub__(a: Float, b: Float) -> Float {
         return 0
     }
-    static fun mul(a: Float, b: Float) -> Float {
+    static fun __mul__(a: Float, b: Float) -> Float {
         return 0
     }
-    static fun div(a: Float, b: Float) -> Float {
+    static fun __div__(a: Float, b: Float) -> Float {
         return 0
     }
-    static fun eq(a: Float, b: Float) -> Boolean {
+    static fun __eq__(a: Float, b: Float) -> Boolean {
         return false
     }
-    static fun ne(a: Float, b: Float) -> Boolean {
+    static fun __ne__(a: Float, b: Float) -> Boolean {
         return false
     }
-    static fun le(a: Float, b: Float) -> Boolean {
+    static fun __le__(a: Float, b: Float) -> Boolean {
         return false
     }
-    static fun ge(a: Float, b: Float) -> Boolean {
+    static fun __ge__(a: Float, b: Float) -> Boolean {
         return false
     }
-    static fun lt(a: Float, b: Float) -> Boolean {
+    static fun __lt__(a: Float, b: Float) -> Boolean {
         return false
     }
-    static fun gt(a: Float, b: Float) -> Boolean {
+    static fun __gt__(a: Float, b: Float) -> Boolean {
         return false
     }
     fun str() -> String {
@@ -72,24 +72,25 @@ class Float {
 
 class String {
     fun len()->Integer{}
-    fun __sub__(i: Integer)->String{}
-    static fun eq(a: String, b:String)->Boolean {}
-    static fun add(a: String, b:String)->String {}
+    fun __item__(i: Integer)->String{}
+    static fun __eq__(a: String, b:String)->Boolean {}
+    static fun __add__(a: String, b:String)->String {}
 }
 
 class Boolean {
     fun str()->String{}
-    static fun or(a: Boolean, b: Boolean) -> Boolean {}
-    static fun and(a: Boolean, b: Boolean) -> Boolean {}
-    static fun eq(a: Boolean, b: Boolean) -> Boolean {}
-    static fun ne(a: Boolean, b: Boolean) -> Boolean {}
+    fun __not__()->Boolean{}
+    static fun __or__(a: Boolean, b: Boolean) -> Boolean {}
+    static fun __and__(a: Boolean, b: Boolean) -> Boolean {}
+    static fun __eq__(a: Boolean, b: Boolean) -> Boolean {}
+    static fun __ne__(a: Boolean, b: Boolean) -> Boolean {}
 }
 
 class List[t] {
-    fun __sub__(i: Integer)->t{}
+    fun __item__(i: Integer)->t{}
     fun len()->Integer{}
     fun push(x: t){}
-    static fun add(l: List[t])->List[t]{}
+    static fun __add__(l: List[t])->List[t]{}
 }
 
 fun print(s: String){
@@ -98,5 +99,11 @@ fun print(s: String){
 fun range(start: Integer, step: Integer, end: Integer)->List[Integer]{}
 
 class Dict[k,v] {
-    fun __sub__(key: k) -> v {}
+    fun __item__(key: k) -> v {}
 }
+
+class Option[t] {
+    fun get()->t {}
+}
+
+fun exit(c: Integer){}
