@@ -114,7 +114,6 @@ class Parser {
     }
 
     fun expect(type: TokenType)->Token{
-
         if this.token.type != type {
             print("Expected " + map_token_to_string(type) + " but got " + map_token_to_string(this.token.type))
             exit(1)
@@ -135,7 +134,7 @@ class Parser {
             params.push(param_name_token.str)
             _ = this.expect(TokenType.Colon)
             var param_type_token = this.expect(TokenType.Id)
-            if this.matches(TokenType.Comma) != true {
+            if not this.matches(TokenType.Comma) {
                 expect_param = false
             } else {
                 this.advance()
@@ -145,7 +144,7 @@ class Parser {
         _ = this.expect(TokenType.CloseParen)
         _ = this.expect(TokenType.OpenCurly)
         var body = []::AnyNode
-        while this.matches(TokenType.CloseCurly) != true {
+        while not this.matches(TokenType.CloseCurly) {
             body.push(this.parse_statement())
             _ = this.expect(TokenType.Semicolon)
         }
@@ -202,7 +201,7 @@ class Parser {
         print(this.token.str)
         _ = this.expect(TokenType.OpenParen)
         var args = []::ExpressionNode
-        var expect_param = this.matches(TokenType.CloseParen) != true
+        var expect_param = not this.matches(TokenType.CloseParen)
         while expect_param {
             var arg = this.parse_expression()
             args.push(arg)
@@ -237,6 +236,9 @@ class Parser {
 }
 
 fun main()->Integer{
+//    var l = ["hello", "my", "friend"]
+//    var r = l.has("friends")
+//    print(r.str())
     var code = "fun main(x: int, y: int, z: int){var x = 2;print(x);}"
     var scanner = Scanner.init(code)
     var r = scanner.scan()

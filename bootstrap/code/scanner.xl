@@ -4,6 +4,7 @@ import core.String
 import core.List
 import core.Boolean
 import core.range
+import core.Dict
 
 enum TokenType {
     For, Class, Enum, Var, Import, If, Else, Start, EOF, Id, Special, OpenParen, CloseParen, OpenCurly, CloseCurly, Assign, Number, Semicolon, Colon, Comma, KwVar, KwFun
@@ -15,7 +16,12 @@ class Token {
 }
 
 fun is_letter(c: String)->Boolean {
-    return ["a", "b","c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"].has(c)
+    for x @ ["a", "b","c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"] {
+        if c == x {
+            return true
+        }
+    }
+    return false
 }
 
 fun char_in_string(c: String, s: String) -> Boolean {
@@ -28,29 +34,18 @@ fun char_in_string(c: String, s: String) -> Boolean {
 }
 
 fun map_special(c: String)->TokenType{
-    if c == "(" {
-        return TokenType.OpenParen
-    }
-    if c == ")" {
-        return TokenType.CloseParen
-    }
-    if c == "{" {
-        return TokenType.OpenCurly
-    }
-    if c == "}" {
-        return TokenType.CloseCurly
-    }
-    if c == "=" {
-        return TokenType.Assign
-    }
-    if c == ";" {
-        return TokenType.Semicolon
-    }
-    if c == ":" {
-        return TokenType.Colon
-    }
-    if c == "," {
-        return TokenType.Comma
+    var m = {"(":TokenType.OpenParen};
+    m[")"] = TokenType.CloseParen
+    m["{"] = TokenType.OpenCurly
+    m["}"] = TokenType.CloseCurly
+    m["="] = TokenType.Assign
+    m[";"] = TokenType.Semicolon
+    m[":"] = TokenType.Colon
+    m[","] = TokenType.Comma
+    m["var"] = TokenType.KwVar
+    m["fun"] = TokenType.KwFun
+    if m.has(c) {
+        return m[c]
     }
     return TokenType.Id
 }
@@ -66,44 +61,20 @@ fun map_keyword(c: String)->TokenType{
 }
 
 fun map_token_to_string(tok: TokenType) -> String {
-    if tok == TokenType.OpenParen {
-        return "OpenParen"
-    }
-    if tok == TokenType.CloseParen {
-        return "CloseParen"
-    }
-    if tok == TokenType.OpenCurly {
-        return "OpenCurly"
-    }
-    if tok == TokenType.CloseCurly {
-        return "CloseCurly"
-    }
-    if tok == TokenType.Assign {
-        return "Assign"
-    }
-    if tok == TokenType.Semicolon {
-        return "Semicolon"
-    }
-    if tok == TokenType.Id {
-        return "Id"
-    }
-    if tok == TokenType.Assign {
-        return "Assign"
-    }
-    if tok == TokenType.Number {
-        return "Number"
-    }
-    if tok == TokenType.Colon {
-        return "Colon"
-    }
-    if tok == TokenType.Comma {
-        return "Comma"
-    }
-    if tok == TokenType.KwVar {
-        return "KwVar"
-    }
-    if tok == TokenType.KwFun {
-        return "KwFun"
+    var m = {TokenType.OpenParen:"OpenParen"};
+    m[TokenType.CloseParen] = "CloseParen"
+    m[TokenType.OpenCurly] = "OpenCurly"
+    m[TokenType.CloseCurly] = "CloseCurly"
+    m[TokenType.Assign] = "Assign"
+    m[TokenType.Comma] = "Comma"
+    m[TokenType.Colon] = "Colon"
+    m[TokenType.Semicolon] = "Semicolon"
+    m[TokenType.KwVar] = "KwVar"
+    m[TokenType.KwFun] = "KwFun"
+    m[TokenType.Id] = "Id"
+    m[TokenType.Number] = "Number"
+    if m.has(tok) {
+        return m[tok]
     }
     return "Unknown"
 }

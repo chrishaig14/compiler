@@ -6,7 +6,7 @@
 #include "../GC.h"
 
 // DEFINE_FUNCTION(1, core_D_Dict_D_len)
-// DEFINE_FUNCTION(2, core_D_Dict_D_has)
+DEFINE_FUNCTION(2, core_D_Dict_D_has)
 // DEFINE_FUNCTION(2, core_D_Dict_D_push)
 DEFINE_FUNCTION(2, core_D_Dict_D___get_item__)
 DEFINE_FUNCTION(3, core_D_Dict_D___set_item__)
@@ -39,6 +39,15 @@ TaggedObject* core_D_Dict_D___get_item___f(TaggedObject* a, TaggedObject* b) {
         throw std::runtime_error("KEY NOT IN DICT!");
     }
     return l.at(h);
+}
+
+TaggedObject* core_D_Dict_D_has_f(TaggedObject* a, TaggedObject* b) {
+    int h = hash(b);
+    auto& l = (CAST(a, XDict)->l);
+    if (l.count(h) == 0) {
+        return FALSE;
+    }
+    return TRUE;
 }
 
 TaggedObject* core_D_Dict_D___set_item___f(TaggedObject* a, TaggedObject* k, TaggedObject* v) {
