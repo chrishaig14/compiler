@@ -296,7 +296,14 @@ bool Checker::is_variable(const ObjectType& a) {
     return a.type_params.size() == 0 && islower(a.id[0]);
 }
 
+USemanticInfo Checker::dispatch_rvalue(Node* nod) {
+    return this->dispatch_any(nod, true);
+}
 USemanticInfo Checker::dispatch(Node* nod) {
+    return this->dispatch_any(nod, false);
+}
+
+USemanticInfo Checker::dispatch_any(Node* nod, bool is_rvalue) {
     auto& n = *nod;
     switch (n.ntype) {
         case NodeType::ASSIGN:
@@ -316,7 +323,7 @@ USemanticInfo Checker::dispatch(Node* nod) {
         case NodeType::BRK:
             return this->visit_break(n.brk());
         case NodeType::CALL:
-            return this->visit_call(n.call());
+            return this->visit_call(n.call(), is_rvalue);
         case NodeType::CLS:
             return this->visit_class(n.cls());
         case NodeType::CNTINUE:

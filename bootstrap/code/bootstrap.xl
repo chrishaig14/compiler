@@ -235,6 +235,10 @@ class Parser {
     }
 }
 
+fun foo(){
+    return
+}
+
 fun main()->Integer{
 //    var l = ["hello", "my", "friend"]
 //    var r = l.has("friends")

@@ -37,6 +37,11 @@ Entity entity_from_type(const TypeNode& type) {
         fv->type = type.clone();
         return Entity(fv);
     }
+    if (type.kind == Kind::OBJECT) {
+        if (type.object().id == ".None") {
+            return Entity(E_TYPE::NOTHING);
+        }
+    }
     Value* fv = new Value();
     fv->type = (ObjectType*) type.clone();
     return Entity(fv);

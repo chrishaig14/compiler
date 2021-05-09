@@ -4,7 +4,7 @@
 
 #include "CheckCall.h"
 
-USemanticInfo Checker::visit_call(CallNode& n) {
+USemanticInfo Checker::visit_call(CallNode& n, bool is_rvalue) {
     SemanticInfo retv;
     CallSNode* sn = new CallSNode();
     retv.snode = sn;
@@ -100,7 +100,6 @@ USemanticInfo Checker::visit_call(CallNode& n) {
         retv.entity = match_arguments_to_generic_function(*function_type, arg_types).entity;
     } else {
         retv.entity = entity_from_type(*function_type->return_type);
-        retv.entity.value->type = (ObjectType*) function_type->return_type->clone();
         int sni = fun_info_p->this_arg != nullptr;
         for (size_t i = 0; i < n.arguments.size(); i++) {
             const TypeNode& arg_type = *arg_types[i];
@@ -126,6 +125,12 @@ USemanticInfo Checker::visit_call(CallNode& n) {
     //         throw std::runtime_error("This should not be empty!");
     //     }
     // }
+    if (retv.entity.type == E_TYPE::NOTHING) {
+        if (is_rvalue) {
+            this->error_reporter.fail("Cannot use function call as expression as it doesn't return a value!", n.start);
+            return error_stub();
+        }
+    }
     retv.is_constant = is_def_const && args_are_constant;
     return std::make_unique<SemanticInfo>(retv);
 }

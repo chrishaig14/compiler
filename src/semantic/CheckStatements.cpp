@@ -5,7 +5,7 @@
 #include "CheckStatements.h"
 
 USemanticInfo Checker::visit_lvalue_subscript(SubscriptNode& node) {
-    USemanticInfo parent_p = this->dispatch(node.parent);
+    USemanticInfo parent_p = this->dispatch_rvalue(node.parent);
     Entity entity_parent = parent_p->entity;
     if (entity_parent.type != E_TYPE::VALUE || entity_parent.value->type->kind == Kind::FUNCTION) {
         throw std::runtime_error("Error subscript of something that is not an object!");
@@ -35,7 +35,7 @@ USemanticInfo Checker::visit_lvalue_subscript(SubscriptNode& node) {
     bool old_lvalue = this->is_lvalue;
     this->is_lvalue = false;
     Node* c = node.child[0];
-    USemanticInfo ct = this->dispatch(c);
+    USemanticInfo ct = this->dispatch_rvalue(c);
     Entity child_entity = ct->entity;
     if (child_entity.type != E_TYPE::VALUE) {
         throw std::runtime_error("Error using something that's not an object as a subscript!");
@@ -65,7 +65,7 @@ USemanticInfo Checker::visit_assignment(AssignmentNode& n) {
 
     if (n.lvalue->ntype == NodeType::ID) {
         if (n.lvalue->id()._id == "_") {
-            USemanticInfo rv = this->dispatch(n.rvalue);
+            USemanticInfo rv = this->dispatch_rvalue(n.rvalue);
             info.snode = rv->snode;
             return std::make_unique<SemanticInfo>(info);
         }
@@ -97,7 +97,7 @@ USemanticInfo Checker::visit_assignment(AssignmentNode& n) {
         this->error_reporter.tuple_assign(n.start);
     }
 
-    USemanticInfo expression_info_p = this->dispatch(n.rvalue);
+    USemanticInfo expression_info_p = this->dispatch_rvalue(n.rvalue);
 
     if (linfo_p->entity.type == E_TYPE::VALUE && linfo_p->entity.value->type->kind == Kind::OBJECT &&
         expression_info_p->entity.type == E_TYPE::CONST_FUNCTION) {
@@ -153,6 +153,14 @@ USemanticInfo Checker::visit_return(ReturnNode& n) {
     ReturnSNode* sn = new ReturnSNode();
     info.snode = sn;
     Entity return_entity = this->scope->get("__return__");
+    if (return_entity.type == E_TYPE::NOTHING) {
+        if (n.expression != nullptr) {
+            this->error_reporter.bad_return(n.start);
+        }
+        SemanticInfo info_r;
+        info_r.snode = new ReturnSNode();
+        return std::make_unique<SemanticInfo>(info_r);
+    }
     TypeNode* return_typet = return_entity.value->type;
     TypeNode* return_type = return_typet;
     if (return_type->kind == Kind::OBJECT && this->module->aliased_types.count(return_type->object().id) == 1) {
@@ -161,15 +169,10 @@ USemanticInfo Checker::visit_return(ReturnNode& n) {
     } else {
         this->module->fill_actual(return_type);
     }
-    if (*return_type == T_NONE) {
-        if (n.expression != nullptr) {
-            this->error_reporter.bad_return(n.start);
-        }
-        return nullptr;
-    } else if (n.expression == nullptr) {
+    if (n.expression == nullptr) {
         this->error_reporter.no_return(*return_type, n.start);
     }
-    USemanticInfo expression_info_p = this->dispatch(n.expression);
+    USemanticInfo expression_info_p = this->dispatch_rvalue(n.expression);
     SemanticInfo& expression_info = *expression_info_p;
     if (expression_info.entity.type == E_TYPE::ERROR) {
         return error_stub();
@@ -195,7 +198,7 @@ USemanticInfo Checker::visit_return(ReturnNode& n) {
 
 USemanticInfo Checker::visit_match(MatchExpressionNode* node) {
     SemanticInfo info;
-    USemanticInfo exp_info = this->dispatch(node->exp);
+    USemanticInfo exp_info = this->dispatch_rvalue(node->exp);
     if (exp_info->entity.type != E_TYPE::VALUE || exp_info->entity.value->type->kind != Kind::OBJECT) {
         this->error_reporter.match_type(exp_info->entity, TextPosition());
         return error_stub();
@@ -259,7 +262,7 @@ USemanticInfo Checker::visit_continue(ContinueNode& node) {
 }
 
 USemanticInfo Checker::visit_for(ForNode& node) {
-    USemanticInfo exp_info_p = this->dispatch(node.exp);
+    USemanticInfo exp_info_p = this->dispatch_rvalue(node.exp);
     if (exp_info_p->entity.type != E_TYPE::VALUE) {
         this->error_reporter._for(exp_info_p->entity, node.exp->start);
     }
@@ -313,7 +316,7 @@ USemanticInfo Checker::visit_while(WhileNode& node) {
     WhileSNode* while_sn = new WhileSNode();
     SemanticInfo info;
     info.snode = while_sn;
-    USemanticInfo condition_p = this->dispatch(node.condition);
+    USemanticInfo condition_p = this->dispatch_rvalue(node.condition);
     SemanticInfo& condition = *condition_p;
     if (condition.entity.type != E_TYPE::VALUE) {
         this->error_reporter.condition(condition.entity, node.start, "while");
@@ -342,7 +345,7 @@ USemanticInfo Checker::visit_while(WhileNode& node) {
 
 USemanticInfo Checker::visit_if(IfNode& n) {
     SemanticInfo info;
-    USemanticInfo condition_info_p = this->dispatch(n.condition);
+    USemanticInfo condition_info_p = this->dispatch_rvalue(n.condition);
     SemanticInfo& condition_info = *condition_info_p;
 
     if (condition_info.entity.type != E_TYPE::ERROR) {
@@ -370,7 +373,7 @@ USemanticInfo Checker::visit_if(IfNode& n) {
     std::vector<std::pair<SNode*, BlockSNode*>> elifs;
 
     for (size_t i = 0; i < n.elifs.size(); i++) {
-        USemanticInfo elif_condition_info_p = this->dispatch(n.elifs[i].first);
+        USemanticInfo elif_condition_info_p = this->dispatch_rvalue(n.elifs[i].first);
         SemanticInfo& elif_condition_info = *elif_condition_info_p;
         if (elif_condition_info.entity.type != E_TYPE::VALUE) {
             this->error_reporter.condition(condition_info.entity, n.elifs[i].first->start, "elif");

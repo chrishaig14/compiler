@@ -130,7 +130,7 @@ public:
     void fail(std::string msg);
 
 
-    USemanticInfo dispatch(Node* nod);
+    USemanticInfo dispatch_rvalue(Node* nod);
 
     USemanticInfo visit_assignment(AssignmentNode& n);
     USemanticInfo visit_binop(BinopNode& node);
@@ -139,7 +139,7 @@ public:
     USemanticInfo visit_boolean(BooleanNode& node);
     USemanticInfo visit_boolop(BoolOpNode& n);
     USemanticInfo visit_break(BreakNode& node);
-    USemanticInfo visit_call(CallNode& n);
+    USemanticInfo visit_call(CallNode& n, bool is_rvalue);
     USemanticInfo visit_class(ClassNode& node);
     USemanticInfo visit_continue(ContinueNode& node);
 
@@ -197,6 +197,8 @@ public:
     bool can_be_assigned_to(const TypeNode& value, const TypeNode& target);
     SNode* make_rvalue(Entity value_entity, const TypeNode& target);
     SNode* make_rvalue(Entity value_entity, SNode* value_snode, const TypeNode& target);
+    USemanticInfo dispatch(Node* nod);
+    USemanticInfo dispatch_any(Node* pNode, bool b);
 };
 
 int target_union_type(const ObjectType& target, const TypeNode& source);

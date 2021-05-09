@@ -20,6 +20,9 @@ std::string STranspiler::transpile_assignment(AssignmentSNode* node) {
 }
 
 std::string STranspiler::transpile_return(ReturnSNode* node) {
+    if (node->expression == nullptr) {
+        return "return nullptr;";
+    }
     std::string out = TOBJECT + SPACE + RETURN_VAR + SPACE + ASSIGN + SPACE + GCRETURN + LPAREN + SPACE +
                       this->dispatch(node->expression) + RPAREN + SEMIC + NEWLINE;
     out += RETURN + SPACE + RETURN_VAR + SEMIC + NEWLINE;

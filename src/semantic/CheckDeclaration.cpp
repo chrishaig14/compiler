@@ -98,7 +98,7 @@ USemanticInfo Checker::check_declaration_with_type(DeclarationNode& n) {
         this->module->fill_actual(n.type);
     }
 
-    USemanticInfo exp_info_p = this->dispatch(n.expression);
+    USemanticInfo exp_info_p = this->dispatch_rvalue(n.expression);
 
     E_TYPE entity_type = exp_info_p->entity.type;
     if (entity_type != E_TYPE::CONST_FUNCTION && entity_type != E_TYPE::VALUE) {

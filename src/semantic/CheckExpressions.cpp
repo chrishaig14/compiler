@@ -27,7 +27,7 @@ USemanticInfo Checker::visit_id(IdNode& n) {
 }
 
 USemanticInfo Checker::visit_cast(CastNode& n) {
-    USemanticInfo exp_info = this->dispatch(n.exp);
+    USemanticInfo exp_info = this->dispatch_rvalue(n.exp);
     SemanticInfo info;
     ObjectType cast_type(n.as_type, {});
     const TypeNode& exp_type = *exp_info->entity.value->type;
@@ -46,8 +46,8 @@ USemanticInfo Checker::visit_cast(CastNode& n) {
 }
 
 USemanticInfo Checker::visit_boolop(BoolOpNode& n) {
-    USemanticInfo left_info_p = this->dispatch(n.left);
-    USemanticInfo right_info_p = this->dispatch(n.right);
+    USemanticInfo left_info_p = this->dispatch_rvalue(n.left);
+    USemanticInfo right_info_p = this->dispatch_rvalue(n.right);
     SemanticInfo info;
     if (left_info_p->entity.type == E_TYPE::ERROR || right_info_p->entity.type == E_TYPE::ERROR) {
         return error_stub();
@@ -131,7 +131,7 @@ USemanticInfo Checker::visit_boolop(BoolOpNode& n) {
 
 USemanticInfo Checker::visit_unary(UnaryOpNode& n) {
     SemanticInfo info;
-    USemanticInfo exp_info = this->dispatch(n.exp);
+    USemanticInfo exp_info = this->dispatch_rvalue(n.exp);
     if (exp_info->entity.type != E_TYPE::VALUE) {
         throw std::runtime_error("ERROR EXPECTED A BOOLEAN");
     }
@@ -142,7 +142,7 @@ USemanticInfo Checker::visit_unary(UnaryOpNode& n) {
     v->type = new ObjectType("Boolean");
     info.entity = Entity(v);
 
-    USemanticInfo parent_p = this->dispatch(n.exp);
+    USemanticInfo parent_p = this->dispatch_rvalue(n.exp);
     Entity entity_parent = parent_p->entity;
     if (entity_parent.type != E_TYPE::VALUE) {
         throw std::runtime_error("Error unary of something that is not an object!");
@@ -187,8 +187,8 @@ USemanticInfo Checker::visit_binop(BinopNode& n) {
     info.snode = sn;
 
     // Logger::info("Checking binop node");
-    USemanticInfo left_info_p = this->dispatch(n.left);
-    USemanticInfo right_info_p = this->dispatch(n.right);
+    USemanticInfo left_info_p = this->dispatch_rvalue(n.left);
+    USemanticInfo right_info_p = this->dispatch_rvalue(n.right);
     if (left_info_p->entity.type == E_TYPE::ERROR || right_info_p->entity.type == E_TYPE::ERROR) {
         return error_stub();
     }
@@ -296,7 +296,7 @@ USemanticInfo Checker::visit_subscript(SubscriptNode& node) {
     bool old_lvalue = this->is_lvalue;
     this->is_lvalue = false;
     Node* c = node.child[0];
-    USemanticInfo ct = this->dispatch(c);
+    USemanticInfo ct = this->dispatch_rvalue(c);
     Entity child_entity = ct->entity;
     if (child_entity.type != E_TYPE::VALUE) {
         throw std::runtime_error("Error using something that's not an object as a subscript!");
@@ -321,7 +321,7 @@ USemanticInfo Checker::visit_subscript(SubscriptNode& node) {
 }
 
 USemanticInfo Checker::visit_ternary(TernaryNode& node) {
-    USemanticInfo expression_info_p = this->dispatch(node.expression);
+    USemanticInfo expression_info_p = this->dispatch_rvalue(node.expression);
     SemanticInfo& expression_info = *expression_info_p;
     if (expression_info.entity.type != E_TYPE::VALUE || expression_info_p->entity.value->type->kind == Kind::FUNCTION) {
         throw std::runtime_error("Unexpected non-object");
@@ -339,10 +339,10 @@ USemanticInfo Checker::visit_ternary(TernaryNode& node) {
     Value* v = new Value();
     v->type = inner_type;
     this->scope->set("it", Entity(v));
-    USemanticInfo true_case_p = this->dispatch(node.true_case);
+    USemanticInfo true_case_p = this->dispatch_rvalue(node.true_case);
     SemanticInfo& true_case = *true_case_p;
     this->leave_scope();
-    USemanticInfo false_case_p = this->dispatch(node.false_case);
+    USemanticInfo false_case_p = this->dispatch_rvalue(node.false_case);
     SemanticInfo& false_case = *false_case_p;
     if (*false_case.entity.value->type != *true_case.entity.value->type) {
         throw std::runtime_error(

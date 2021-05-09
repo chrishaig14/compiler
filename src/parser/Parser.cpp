@@ -72,10 +72,12 @@ BlockNode* Parser::parse_program() {
 ReturnNode* Parser::parse_return() {
     Token ret_tok = this->expect_token(TokType::RETURN);
     Node* expression = nullptr;
+    TextPosition end = ret_tok.end_pos;
     if (!this->match(TokType::SEMICOLON)) {
         expression = this->parse_expression();
+        end = expression->end;
     }
-    return new ReturnNode(expression, ret_tok.start, expression->end);
+    return new ReturnNode(expression, ret_tok.start, end);
 }
 
 IfNode* Parser::parse_if() {
