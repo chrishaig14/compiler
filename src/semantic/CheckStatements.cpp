@@ -47,8 +47,7 @@ USemanticInfo Checker::visit_lvalue_subscript(SubscriptNode& node) {
     }
     this->is_lvalue = old_lvalue;
     SemanticInfo info;
-    info.entity = Entity(new Value());
-    info.entity.value->type = (ObjectType*) rtype;
+    info.entity = Entity(new Value((ObjectType*) rtype));
     CallSNode* csn = new CallSNode();
     IdSNode* fsn = new IdSNode();
     fsn->identifier = sub_fun_path;

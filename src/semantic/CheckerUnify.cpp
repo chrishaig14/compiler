@@ -175,9 +175,10 @@ USemanticInfo Checker::enum_member(Enum* enumm, std::string value, MemberNode& n
     SemanticInfo info;
     for (size_t i = 0; i < enumm->values.size(); i++) {
         if (value == enumm->values[i]) {
-            Value* ov = new Value();
-            ov->type = new ObjectType(enumm->enumm_name, {});
-            ov->type->object().actual_base_path = enumm->path;
+            ObjectType* otype = new ObjectType(enumm->enumm_name, {});
+            otype = otype;
+            otype->actual_base_path = enumm->path;
+            Value* ov = new Value(otype);
             info.entity = Entity(ov);
             info.snode = new EnumMemberSNode(enumm->path.as_str(), value);
             return std::make_unique<SemanticInfo>(info);

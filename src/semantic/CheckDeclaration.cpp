@@ -108,9 +108,8 @@ USemanticInfo Checker::check_declaration_with_type(DeclarationNode& n) {
     sn->expression = exp_info_p->snode;
     SemanticInfo& exp_info = *exp_info_p;
     if (exp_info.entity.type == E_TYPE::ERROR) {
-        Value* ov = new Value();
+        Value* ov = new Value(n.type->clone());
         info.entity = Entity(ov);
-        ov->type = (ObjectType*) n.type->clone();
         return std::make_unique<SemanticInfo>(info);
     }
 
@@ -119,9 +118,8 @@ USemanticInfo Checker::check_declaration_with_type(DeclarationNode& n) {
         throw std::runtime_error("Cannot assign!");
     }
     sn->expression = rvalue_snode;
-    Value* ov = new Value();
+    Value* ov = new Value(n.type->clone());
     info.entity = Entity(ov);
-    ov->type = (ObjectType*) n.type->clone();
     return std::make_unique<SemanticInfo>(info);
 }
 
@@ -145,8 +143,7 @@ USemanticInfo Checker::check_declaration_without_type(DeclarationNode& n) {
     sn->expression = exp_info_p->snode;
     info.entity = exp_info_p->entity;
     if (info.entity.type == E_TYPE::CONST_FUNCTION) {
-        info.entity = Entity(new Value());
-        info.entity.value->type = exp_info_p->entity.const_function->ft->clone();
+        info.entity = Entity(new Value(exp_info_p->entity.const_function->ft->clone()));
 
         if (info.entity.value->type->is_generic()) {
             throw std::runtime_error("Error: you need to specialize the generic function of type " +

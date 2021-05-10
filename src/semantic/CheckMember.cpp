@@ -2,6 +2,7 @@
 // Created by chris on 2/5/21.
 //
 
+#include <cassert>
 #include "CheckMember.h"
 
 USemanticInfo Checker::visit_member(MemberNode& n) {
@@ -23,9 +24,8 @@ USemanticInfo Checker::visit_member(MemberNode& n) {
         omsn->object = parent_info->snode;
         omsn->member_name = "mem_" + std::to_string(n.n_child);
         omsn->class_path = ot->actual_base_path;
-        Value* ov = new Value();
+        Value* ov = new Value(ot->type_params[n.n_child - 1]->clone());
         info.entity = Entity(ov);
-        ov->type = (ObjectType*) ot->type_params[n.n_child - 1]->clone();
         return std::make_unique<SemanticInfo>(info);
     }
     switch (parent_entity.type) {
@@ -80,10 +80,8 @@ USemanticInfo Checker::object_member(SNode* object_snode, Value* pValue, std::st
         this->error_reporter.object_no_member(*pValue->type, child, n.dot_pos);
         return error_stub();
     }
-    Class* clazz = this->root_package->get(object_type_path).clazz;
-    if (clazz->type_params.size() != 0) {
-        clazz = instantiate_generic(clazz, pValue->type->object());
-    }
+    Class* clazz = pValue->clazz;
+    assert(clazz != nullptr);
     SemanticInfo info;
     if (clazz->members.count(child)) {
         info.entity = entity_from_type(*clazz->members[child]);
@@ -111,8 +109,7 @@ USemanticInfo Checker::object_member(SNode* object_snode, Value* pValue, std::st
                 non->args.push_back(nullptr);
             }
             info.snode = non;
-            Value* fv = new Value();
-            fv->type = clazz->methods[child]->ft->clone();
+            Value* fv = new Value(clazz->methods[child]->ft->clone());
             info.entity = Entity(fv);
         }
 

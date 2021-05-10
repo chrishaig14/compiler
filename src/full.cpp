@@ -406,8 +406,8 @@ int main(int argc, char* argv[]) {
     std::cout << cmake_output << std::endl;
     cmakelists_file << cmakelists;
 
-    // std::string command = "cp -r /home/chris/CLionProjects/compiler/runtime " + std::string(argv[2]) + "/runtime";
-    // system(command.c_str());
+    std::string command = "cp -r /home/chris/CLionProjects/compiler/runtime " + std::string(argv[2]) + "/runtime";
+    system(command.c_str());
 
     std::string top_level_cmake = "cmake_minimum_required(VERSION 3.16)\n"
                                   "project(xlang)\n"

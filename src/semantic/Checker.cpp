@@ -137,8 +137,7 @@ SemanticInfo Checker::match_arguments_to_generic_function(const FunctionType& ft
         delete at;
     }
     SemanticInfo rv;
-    rv.entity = Entity(new Value());
-    rv.entity.value->type = f->return_type->clone();
+    rv.entity = Entity(new Value(f->return_type->clone()));
     delete f;
     return rv;
 }

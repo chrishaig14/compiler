@@ -2,6 +2,7 @@
 // Created by chris on 2/5/21.
 //
 
+#include <cassert>
 #include "CheckExpressions.h"
 #include "../simple_nodes/TernarySNode.h"
 #include "../nodes/UnaryOpNode.h"
@@ -98,8 +99,7 @@ USemanticInfo Checker::visit_boolop(BoolOpNode& n) {
         ObjectType* ot = new ObjectType("Boolean", {});
         ot->actual_base_path = Path("core.Boolean");
         TypeNode* rettype = ot;
-        info.entity = Entity(new Value());
-        info.entity.value->type = (ObjectType*) rettype;
+        info.entity = Entity(new Value(rettype));
 
         ConstFunction* opfun = entity.enumm->functions[fun];
 
@@ -120,8 +120,7 @@ USemanticInfo Checker::visit_boolop(BoolOpNode& n) {
 
         ConstFunction* operator_fun = operator_fun_it->second;
         TypeNode* rettype = operator_fun->ft->return_type->clone();
-        info.entity = Entity(new Value());
-        info.entity.value->type = (ObjectType*) rettype;
+        info.entity = Entity(new Value(rettype));
 
         info.snode = make_boolop_snode(operator_fun, left_info, right_info);
     }
@@ -138,8 +137,7 @@ USemanticInfo Checker::visit_unary(UnaryOpNode& n) {
     if (*exp_info->entity.value->type != T_BOOL) {
         throw std::runtime_error("ERROR EXPECTED A BOOLEAN");
     }
-    Value* v = new Value();
-    v->type = new ObjectType("Boolean");
+    Value* v = new Value(new ObjectType("Boolean"));
     info.entity = Entity(v);
 
     USemanticInfo parent_p = this->dispatch_rvalue(n.exp);
@@ -165,8 +163,7 @@ USemanticInfo Checker::visit_unary(UnaryOpNode& n) {
     std::string sub_fun_path = subscript_fun->path.as_str();
     TypeNode* rtype = subscript_fun->ft->return_type->clone();
 
-    info.entity = Entity(new Value());
-    info.entity.value->type = (ObjectType*) rtype;
+    info.entity = Entity(new Value(rtype));
     CallSNode* csn = new CallSNode();
     IdSNode* fsn = new IdSNode();
     fsn->identifier = sub_fun_path;
@@ -247,8 +244,7 @@ USemanticInfo Checker::visit_binop(BinopNode& n) {
     function_id->identifier = operator_fun->path.as_str();
     rettype = operator_fun->ft->return_type->clone();
     // n.ltype = left.clone();
-    info.entity = Entity(new Value());
-    info.entity.value->type = (ObjectType*) rettype;
+    info.entity = Entity(new Value(rettype));
 
     return std::make_unique<SemanticInfo>(info);
 }
@@ -259,16 +255,16 @@ USemanticInfo Checker::visit_subscript(SubscriptNode& node) {
     if (entity_parent.type != E_TYPE::VALUE || entity_parent.value->type->kind == Kind::FUNCTION) {
         throw std::runtime_error("Error subscript of something that is not an object!");
     }
-    Entity class_entity = this->scope->get(entity_parent.value->type->object().id);
-    if (class_entity.type != E_TYPE::CLASS) {
-        throw std::runtime_error("Error this should be a CLASS, but it's not!");
-    }
-    Class* cls = class_entity.clazz;
 
-    if (cls->type_params.size() != 0) {
-        cls = instantiate_generic(cls, entity_parent.value->type->object());
+    Class* cls = entity_parent.value->clazz;
+    if (cls == nullptr) {
+        // its totally generic, fail
+        this->error_reporter.fail(
+                "Error, accessing subscript of totally generic type: " + entity_parent.value->type->to_string(),
+                node.start);
+        return error_stub();
     }
-
+    assert(cls != nullptr);
     auto subscript_it = cls->methods.find("__get_item__");
     if (subscript_it == cls->methods.end()) {
         throw std::runtime_error("Error class " + cls->class_name + " does not define the __get_item__ operator!");
@@ -308,8 +304,7 @@ USemanticInfo Checker::visit_subscript(SubscriptNode& node) {
     }
     this->is_lvalue = old_lvalue;
     SemanticInfo info;
-    info.entity = Entity(new Value());
-    info.entity.value->type = (ObjectType*) rtype;
+    info.entity = Entity(new Value(rtype));
     CallSNode* csn = new CallSNode();
     IdSNode* fsn = new IdSNode();
     fsn->identifier = sub_fun_path;
@@ -336,8 +331,7 @@ USemanticInfo Checker::visit_ternary(TernaryNode& node) {
     // semanticInfo.set_type(type);
     this->enter_scope("true_case");
     TypeNode*& inner_type = expression_type.type_params[0];
-    Value* v = new Value();
-    v->type = inner_type;
+    Value* v = new Value(inner_type);
     this->scope->set("it", Entity(v));
     USemanticInfo true_case_p = this->dispatch_rvalue(node.true_case);
     SemanticInfo& true_case = *true_case_p;
@@ -349,8 +343,7 @@ USemanticInfo Checker::visit_ternary(TernaryNode& node) {
                 "True case and false case type don't match: " + true_case.entity.value->type->to_string() + " != " +
                 false_case.entity.value->type->to_string());
     }
-    Value* rv = new Value();
-    rv->type = true_case.entity.value->type->clone();
+    Value* rv = new Value(true_case.entity.value->type->clone());
     semanticInfo.entity = Entity(rv);
     semanticInfo.snode = new TernarySNode(expression_info_p->snode, true_case.snode, false_case.snode);
     return std::make_unique<SemanticInfo>(semanticInfo);

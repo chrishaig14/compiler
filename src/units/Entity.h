@@ -62,6 +62,11 @@ public:
         Enum* enumm;
     };
 
+    Entity(const Entity& o) {
+        this->type = o.type;
+        this->package = o.package;
+    }
+
     Entity() : type(E_TYPE::NOT_FOUND), package(nullptr) {
     }
 

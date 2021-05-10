@@ -33,8 +33,7 @@ int target_union_type(const ObjectType& target, const TypeNode& source) {
 
 Entity entity_from_type(const TypeNode& type) {
     if (type.kind == Kind::FUNCTION) {
-        Value* fv = new Value();
-        fv->type = type.clone();
+        Value* fv = new Value(type.clone());
         return Entity(fv);
     }
     if (type.kind == Kind::OBJECT) {
@@ -42,8 +41,7 @@ Entity entity_from_type(const TypeNode& type) {
             return Entity(E_TYPE::NOTHING);
         }
     }
-    Value* fv = new Value();
-    fv->type = (ObjectType*) type.clone();
+    Value* fv = new Value(type.clone());
     return Entity(fv);
 }
 

@@ -124,9 +124,10 @@ USemanticInfo Checker::visit_class(ClassNode& node) {
     for (auto method: node.methods) {
         this->is_method = true;
         this->add_this = true;
-        this->this_entity = Entity(new Value());
-        this->this_entity.value->type = new ObjectType(node.class_name);
-        this->this_entity.value->type->object().actual_base_path = clazz->path;
+        ObjectType* vt = new ObjectType(node.class_name);
+        vt->actual_base_path = clazz->path;
+        Value* val = new Value(vt);
+        this->this_entity = Entity(val);
         // method.second->path = clazz->path + "." + method.second->identifier;
         USemanticInfo method_info = this->visit_function(*method.second);
         methods_snodes.push_back(method_info->snode);
@@ -234,7 +235,11 @@ USemanticInfo Checker::visit_function(FunctionNode& n) {
         TypeNode& type = *n.parameter_types[i];
         TypeNode* cl = type.clone();
         make_not_generic(cl);
-        this->scope->set(n.parameter_names[i], entity_from_type(*cl));
+        auto te = entity_from_type(*cl);
+        if (te.value->type->object().id.size() != 1) {
+            te.value->clazz = this->root_package->get(te.value->type->object().actual_base_path).clazz;
+        }
+        this->scope->set(n.parameter_names[i], te);
         // if (!param_type.is_generic()) {
         //     if (param_type.kind == Kind::OBJECT) {
         //         ObjectType& o_type = param_type.object();

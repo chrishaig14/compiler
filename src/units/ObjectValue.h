@@ -6,12 +6,20 @@
 #define XLANG_OBJECTVALUE_H
 
 
+#include <cassert>
 #include "Entity.h"
 #include "../nodes/TypeNode.h"
+
 class Value {
 
 public:
     TypeNode* type;
+    Class* clazz;
+
+    Value(TypeNode* type) {
+        assert(type != nullptr);
+        this->type = type;
+    }
 };
 
 

@@ -117,9 +117,9 @@ USemanticInfo Checker::visit_call(CallNode& n, bool is_rvalue) {
             sni++;
         }
     }
-    for (auto x: arg_types) {
-        delete x;
-    }
+    // for (auto x: arg_types) {
+    //     delete x;
+    // }
     // if (retv.entity.value->type->kind==Kind::OBJECT){
     //     if (retv.entity.value->type->object().actual_to_string() == ""){
     //         throw std::runtime_error("This should not be empty!");
@@ -130,6 +130,8 @@ USemanticInfo Checker::visit_call(CallNode& n, bool is_rvalue) {
             this->error_reporter.fail("Cannot use function call as expression as it doesn't return a value!", n.start);
             return error_stub();
         }
+    } else {
+        retv.entity.value->clazz = this->root_package->get(retv.entity.value->type->object().actual_base_path).clazz;
     }
     retv.is_constant = is_def_const && args_are_constant;
     return std::make_unique<SemanticInfo>(retv);

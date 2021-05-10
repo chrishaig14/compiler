@@ -8,10 +8,9 @@
 
 USemanticInfo Checker::visit_boolean(BooleanNode& node) {
     SemanticInfo info;
-    info.entity = Entity(new Value());
     ObjectType* ot = new T_BOOL;
     ot->actual_base_path = Path("core.Boolean");
-    info.entity.value->type = ot;
+    info.entity = Entity(new Value(ot));
     info.snode = new BoolSNode(node.value);
     return std::make_unique<SemanticInfo>(info);
 }
@@ -21,19 +20,19 @@ USemanticInfo Checker::visit_number(NumberNode& node) {
     SemanticInfo info;
     switch (node.num_type) {
         case NumberType::INTEGER: {
-            Value* ov = new Value();
+            ObjectType* otype = new ObjectType("Integer", {});
+            Value* ov = new Value(otype);
             info.entity = Entity(ov);
-            ov->type = new ObjectType("Integer", {});
             IntegerSNode* snode = new IntegerSNode();
             snode->str = node.str;
-            ov->type->object().actual_base_path = Path("core.Integer");
+            otype->actual_base_path = Path("core.Integer");
+            ov->clazz = this->root_package->get(Path("core.Integer")).clazz;
             info.snode = snode;
             break;
         }
         case NumberType::FLOAT: {
-            Value* ov = new Value();
+            Value* ov = new Value(new ObjectType("Float", {}));
             info.entity = Entity(ov);
-            ov->type = new ObjectType("Float", {});
             FloatSNode* snode = new FloatSNode();
             snode->str = node.str;
             info.snode = snode;
@@ -56,8 +55,7 @@ USemanticInfo Checker::visit_number(NumberNode& node) {
 USemanticInfo Checker::visit_none(NoneNode& node) {
     SemanticInfo info;
     // info.set_type(ObjectType("NoneType"));
-    Value* v = new Value();
-    v->type = new ObjectType("NoneType");
+    Value* v = new Value(new ObjectType("NoneType"));
     info.entity = Entity(v);
     info.snode = new NoneSNode();
     return std::make_unique<SemanticInfo>(info);
@@ -66,10 +64,11 @@ USemanticInfo Checker::visit_none(NoneNode& node) {
 USemanticInfo Checker::visit_emptylist(EmptyListNode& node) {
     SemanticInfo info;
     this->module->fill_actual(node.type);
-    Value* ov = new Value();
+    ObjectType* otype = new ObjectType("List", {node.type});
+    Value* ov = new Value(otype);
     info.entity = Entity(ov);
-    ov->type = new ObjectType("List", {node.type});
-    ov->type->object().actual_base_path = Path("core.List");
+    otype->actual_base_path = Path("core.List");
+    ov->clazz = this->root_package->get(Path("core.List")).clazz;
     // NewObjectSNode* non = new NewObjectSNode();
     ListSNode* lsn = new ListSNode();
     info.snode = lsn;
@@ -84,10 +83,11 @@ USemanticInfo Checker::visit_string(StringNode& node) {
     StringSNode* sn = new StringSNode();
     sn->s = node.str;
     info.snode = sn;
-    Value* ov = new Value;
+    ObjectType* otype = new ObjectType("String", {});
+    otype->actual_base_path = Path("core.String");
+    Value* ov = new Value(otype);
     info.entity = Entity(ov);
-    ov->type = new ObjectType("String", {});
-    ov->type->object().actual_base_path = Path("core.String");
+    ov->clazz = this->root_package->get(Path("core.String")).clazz;
     return std::make_unique<SemanticInfo>(info);
 }
 
@@ -104,14 +104,15 @@ USemanticInfo Checker::visit_tuple(TupleNode& node) {
         // }
     }
     SemanticInfo sinfo;
-    Value* ov = new Value();
+    ObjectType* otype = new ObjectType("Tuple", types);
+    Value* ov = new Value(otype);
     sinfo.entity = Entity(ov);
-    ov->type = new ObjectType("Tuple", types);
+
     unsigned long num_values = node.values.size();
-    ov->type->object().actual_base_path = Path("core.Tuple" + std::to_string(num_values));
+    otype->actual_base_path = Path("core.Tuple" + std::to_string(num_values));
     NewObjectSNode* nosn = new NewObjectSNode();
     sinfo.snode = nosn;
-    nosn->class_name = ov->type->object().actual_base_path.as_str();
+    nosn->class_name = otype->actual_base_path.as_str();
     nosn->args = values;
     return std::make_unique<SemanticInfo>(sinfo);
 }
@@ -160,8 +161,7 @@ USemanticInfo Checker::visit_partial(PartialApplication& node) {
     }
     node.complete_type = &fun_type->clone()->function();
     SemanticInfo s;
-    s.entity = Entity(new Value());
-    s.entity.value->type = new FunctionType(partial_args, fun_type->return_type->clone());
+    s.entity = Entity(new Value(new FunctionType(partial_args, fun_type->return_type->clone())));
     NewObjectSNode* non = new NewObjectSNode();
     non->class_name = "Partial" + std::to_string(npartial);
     non->args = snodes;
@@ -193,8 +193,7 @@ USemanticInfo Checker::visit_dict(DictNode& node) {
         }
         items.push_back(std::make_pair(key_info->snode, value_info->snode));
     }
-    Value* ov = new Value();
-    ov->type = new ObjectType("Dict", {first_key_type.clone(), first_value_type.clone()});
+    Value* ov = new Value(new ObjectType("Dict", {first_key_type.clone(), first_value_type.clone()}));
     this->module->fill_actual(ov->type);
     info.entity = Entity(ov);
     DictSNode* nsn = new DictSNode(items);
@@ -204,8 +203,7 @@ USemanticInfo Checker::visit_dict(DictNode& node) {
 
 USemanticInfo Checker::visit_emptydict(EmptyDictNode& node) {
     SemanticInfo info;
-    Value* ov = new Value();
-    ov->type = new ObjectType("Dict", {node.key_type, node.value_type});
+    Value* ov = new Value(new ObjectType("Dict", {node.key_type, node.value_type}));
     info.entity = Entity(ov);
     return std::make_unique<SemanticInfo>(info);
 }
@@ -261,9 +259,10 @@ USemanticInfo Checker::visit_list(ListNode& node) {
     SemanticInfo return_info;
     return_info.is_constant = is_constant;
 
-    return_info.snode = lsn;;
-    return_info.entity = Entity(new Value());
-    return_info.entity.value->type = new ObjectType("List", {element_type->clone()});
-    return_info.entity.value->type->object().actual_base_path = Path("core.List");
+    return_info.snode = lsn;
+    ObjectType* otype = new ObjectType("List", {element_type->clone()});
+    return_info.entity = Entity(new Value(otype));
+    otype->actual_base_path = Path("core.List");
+    return_info.entity.value->clazz = this->root_package->get(Path("core.List")).clazz;
     return std::make_unique<SemanticInfo>(return_info);
 }
