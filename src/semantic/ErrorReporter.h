@@ -12,6 +12,8 @@
 #include "../scanner/CodeLines.h"
 #include "../units/Entity.h"
 
+#define FAIL_FIRST 1
+
 class ErrorReporter {
 public:
     ErrorReporter();

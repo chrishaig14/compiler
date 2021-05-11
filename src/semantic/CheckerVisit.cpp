@@ -240,6 +240,9 @@ USemanticInfo Checker::visit_function(FunctionNode& n) {
         if (te.value->type->kind == Kind::OBJECT) {
             if (te.value->type->object().id.size() != 1) {
                 te.value->clazz = this->root_package->get(te.value->type->object().actual_base_path).clazz;
+                if (te.value->type->object().type_params.size() != 0){
+                    te.value->clazz = instantiate_generic(te.value->clazz, te.value->type->object());
+                }
             }
         }
         this->scope->set(n.parameter_names[i], te);

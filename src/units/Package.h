@@ -18,6 +18,9 @@ public:
     Path path;
 
     Flirpin get(Path p) {
+        if (p.as_str() == "core.Union") {
+            return Flirpin{.type=F_TYPE::CLASS, .clazz=new Class()};
+        }
         VectorOfStrings pt = p.as_vec();
         Unit u = this->units[pt[0]];
         if (u.type == U_TYPE::MODULE) {

@@ -35,7 +35,9 @@ void ErrorReporter::fail(std::string msg, TextPosition pos) {
     this->failed = true;
     std::string out = this->context_string(pos) + msg + this->code_context_string(pos);
     std::cout << out << std::endl;
-    // throw std::runtime_error("Error");
+    if (FAIL_FIRST) {
+        throw std::runtime_error("Error");
+    }
 }
 
 void ErrorReporter::binop(Entity left, Entity right, TextPosition pos) {

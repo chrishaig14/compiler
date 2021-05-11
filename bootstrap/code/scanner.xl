@@ -94,14 +94,14 @@ class Scanner {
     fun scan() -> Integer {
         this.advance()
         while this.cursor < this.text.len() {
-            _ = this.skip_spaces()
+            this.skip_spaces()
             if is_letter(this.c) {
-                _ = this.scan_id_or_kw()
+                this.scan_id_or_kw()
             } elif (char_in_string(this.c, "(){}=;,:")) {
                 this.token = #Token(this.c,map_special(this.c))
-                _ = this.advance()
+                this.advance()
             } elif (char_in_string(this.c, "1234567890")){
-                _ = this.scan_number()
+                this.scan_number()
             }
             else {
                 print("Don't know what to do with character '" + this.c + "'")
