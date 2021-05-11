@@ -128,6 +128,7 @@ USemanticInfo Checker::visit_class(ClassNode& node) {
         vt->actual_base_path = clazz->path;
         Value* val = new Value(vt);
         this->this_entity = Entity(val);
+        val->clazz = clazz;
         // method.second->path = clazz->path + "." + method.second->identifier;
         USemanticInfo method_info = this->visit_function(*method.second);
         methods_snodes.push_back(method_info->snode);

@@ -195,6 +195,11 @@ USemanticInfo Checker::visit_dict(DictNode& node) {
     }
     Value* ov = new Value(new ObjectType("Dict", {first_key_type.clone(), first_value_type.clone()}));
     this->module->fill_actual(ov->type);
+    ov->clazz = this->root_package->get(ov->type->object().actual_base_path).clazz;
+    if (ov->clazz->type_params.size() != 0) {
+        ov->clazz = instantiate_generic(ov->clazz, ov->type->object());
+    }
+    assert(ov->clazz != nullptr);
     info.entity = Entity(ov);
     DictSNode* nsn = new DictSNode(items);
     info.snode = nsn;
