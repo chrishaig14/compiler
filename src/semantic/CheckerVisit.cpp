@@ -236,8 +236,10 @@ USemanticInfo Checker::visit_function(FunctionNode& n) {
         TypeNode* cl = type.clone();
         make_not_generic(cl);
         auto te = entity_from_type(*cl);
-        if (te.value->type->object().id.size() != 1) {
-            te.value->clazz = this->root_package->get(te.value->type->object().actual_base_path).clazz;
+        if (te.value->type->kind == Kind::OBJECT) {
+            if (te.value->type->object().id.size() != 1) {
+                te.value->clazz = this->root_package->get(te.value->type->object().actual_base_path).clazz;
+            }
         }
         this->scope->set(n.parameter_names[i], te);
         // if (!param_type.is_generic()) {

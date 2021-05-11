@@ -7,14 +7,30 @@ import core.range
 import core.Option
 import core.exit
 
-fun same(x: List[t])->t{
-    return x.len
+fun map(x: List[t], f: fun(t)->u)->List[u]{
+    var ww = f(x[0])
+    var r = []::u
+    for i @ range(0, 1, x.len()) {
+        var e = x[i]
+        r.push(f(e))
+    }
+    return r
+}
+
+fun repeat(n: Integer)->String {
+    var s = ""
+    var i = 0
+    while i < n {
+        s += "c"
+        i += 1
+    }
+    return s
 }
 
 fun main()->Integer{
-//    print(same(2))
-//    var x = ["Hello", "world", "I'm", "Chris"]
-//    var y = x.len()
-//    print(y.str())
+    var r = map([4,5,6,7], repeat)
+    for x @ r {
+        print(x)
+    }
     return 0
 }

@@ -131,7 +131,20 @@ USemanticInfo Checker::visit_call(CallNode& n, bool is_rvalue) {
             return error_stub();
         }
     } else {
-        retv.entity.value->clazz = this->root_package->get(retv.entity.value->type->object().actual_base_path).clazz;
+        if (retv.entity.value->type->kind == Kind::OBJECT) {
+            if (retv.entity.value->type->object().id.size() != 1 && retv.entity.value->type->object().id != ".None") {
+                retv.entity.value->clazz = this->root_package->get(retv.entity.value->type->object().actual_base_path).clazz;
+            }
+            if (retv.entity.value->type->object().id == ".None"){
+                retv.entity = Entity(E_TYPE::NOTHING);
+            }
+        }
+    }
+    if (retv.entity.type == E_TYPE::NOTHING) {
+        if (is_rvalue) {
+            this->error_reporter.fail("Cannot use function call as expression as it doesn't return a value!", n.start);
+            return error_stub();
+        }
     }
     retv.is_constant = is_def_const && args_are_constant;
     return std::make_unique<SemanticInfo>(retv);

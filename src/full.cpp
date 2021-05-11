@@ -324,14 +324,14 @@ void transpile_all_modules(Package* package, std::string output_dir, bool is_top
             package_header += "#include <" + subpackage->rel_path + "/__package__.h>\n";
         } else if (u.second.type == U_TYPE::MODULE) {
             Module* module = u.second.module;
-            if (module->flirpins.count("main") != 0){
+            if (module->flirpins.count("main") != 0) {
                 main_module = module;
                 continue;
             }
             transpile_one_module(module, package_header, output_package_dir, package);
         }
     }
-    if (is_top){
+    if (is_top) {
         transpile_one_module(main_module, package_header, output_package_dir, package);
     }
     std::string output_package_header_path = path_join(output_package_dir, "__package__.h");
@@ -413,16 +413,11 @@ int main(int argc, char* argv[]) {
                                   "project(xlang)\n"
                                   "set(CMAKE_CXX_STANDARD 14)\n"
                                   "set(CMAKE_CXX_FLAGS \"${CMAKE_CXX_FLAGS} -Werror -O0 -fverbose-asm -Winline\")\n"
+                                  "include_directories(/home/chris/CLionProjects/compiler/runtime)\n"
+                                  "link_directories(/home/chris/CLionProjects/compiler/runtime/build)\n"
                                   "add_subdirectory(runtime)\n"
-                                  "add_subdirectory(application)\n";
-    top_level_cmake = "cmake_minimum_required(VERSION 3.16)\n"
-                      "project(xlang)\n"
-                      "set(CMAKE_CXX_STANDARD 14)\n"
-                      "set(CMAKE_CXX_FLAGS \"${CMAKE_CXX_FLAGS} -Werror -O0 -fverbose-asm -Winline\")\n"
-                      "include_directories(/home/chris/CLionProjects/compiler/runtime)\n"
-                      "link_directories(/home/chris/CLionProjects/compiler/runtime/build)\n"
-                      "add_subdirectory(application)\n"
-                      "target_link_libraries(result core)\n";
+                                  "add_subdirectory(application)\n"
+                                  "target_link_libraries(result core)\n";
 
     std::string top_cmake_output = std::string(argv[2]) + "/CMakeLists.txt";
     std::ofstream top_cmakelists_file(top_cmake_output);

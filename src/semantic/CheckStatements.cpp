@@ -110,7 +110,9 @@ USemanticInfo Checker::visit_assignment(AssignmentNode& n) {
         TypeNode* aliased_type = this->module->aliased_types.at(exp_type->object().id);
         exp_type = aliased_type;
     } else {
-        this->module->fill_actual(exp_type);
+        if (exp_type->kind == Kind::OBJECT && exp_type->object().id.size() != 1) {
+            this->module->fill_actual(exp_type);
+        }
     }
 
     if (expression_info_p->entity.type == E_TYPE::ERROR) {
@@ -171,25 +173,32 @@ USemanticInfo Checker::visit_return(ReturnNode& n) {
     if (n.expression == nullptr) {
         this->error_reporter.no_return(*return_type, n.start);
     }
+
     USemanticInfo expression_info_p = this->dispatch_rvalue(n.expression);
-    SemanticInfo& expression_info = *expression_info_p;
-    if (expression_info.entity.type == E_TYPE::ERROR) {
+    SNode* exp_snode = make_rvalue(expression_info_p->entity, expression_info_p->snode, *return_type);
+    if (exp_snode == nullptr) {
+        this->error_reporter.return_mismatch(*return_type, *expression_info_p->entity.value->type, n.start);
         return error_stub();
     }
-    sn->expression = expression_info.snode;
-    if (return_type->object().id == "Union") {
-        int type_index = target_union_type(return_type->object(), *expression_info.entity.value->type);
-        if (type_index == -1) {
-            this->error_reporter.assignment(*return_typet, *expression_info.entity.value->type, n.start);
-        }
-        SNode* union_wrapper = make_union_wrapper(type_index, sn->expression);
-        sn->expression = union_wrapper;
-    } else {
-        if (!this->can_assign(*expression_info.entity.value->type, *return_type)) {
-            this->error_reporter.return_mismatch(*return_typet, *expression_info.entity.value->type, n.start);
-            return error_stub();
-        }
-    }
+    sn->expression = exp_snode;
+    // SemanticInfo& expression_info = *expression_info_p;
+    // if (expression_info.entity.type == E_TYPE::ERROR) {
+    //     return error_stub();
+    // }
+    // sn->expression = expression_info.snode;
+    // if (return_type->object().id == "Union") {
+    //     int type_index = target_union_type(return_type->object(), *expression_info.entity.value->type);
+    //     if (type_index == -1) {
+    //         this->error_reporter.assignment(*return_typet, *expression_info.entity.value->type, n.start);
+    //     }
+    //     SNode* union_wrapper = make_union_wrapper(type_index, sn->expression);
+    //     sn->expression = union_wrapper;
+    // } else {
+    //     if (!this->can_assign(*expression_info.entity.value->type, *return_type)) {
+    //         this->error_reporter.return_mismatch(*return_typet, *expression_info.entity.value->type, n.start);
+    //         return error_stub();
+    //     }
+    // }
     n.ret_type = return_type->clone();
     n.reachables = this->scope->get_all();
     return std::make_unique<SemanticInfo>(info);

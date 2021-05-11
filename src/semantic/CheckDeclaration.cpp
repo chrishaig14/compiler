@@ -6,6 +6,9 @@
 
 SNode* Checker::make_rvalue(Entity value_entity, SNode* value_snode, const TypeNode& target) {
     if (value_entity.type == E_TYPE::VALUE) {
+        if (value_entity.value->type->kind != target.kind){
+            return nullptr;
+        }
         const ObjectType& value_ot = value_entity.value->type->object();
         const ObjectType& target_ot = target.object();
 
