@@ -269,5 +269,8 @@ USemanticInfo Checker::visit_list(ListNode& node) {
     return_info.entity = Entity(new Value(otype));
     otype->actual_base_path = Path("core.List");
     return_info.entity.value->clazz = this->root_package->get(Path("core.List")).clazz;
+    if (otype->type_params.size()!=0){
+        return_info.entity.value->clazz = instantiate_generic(return_info.entity.value->clazz, *otype);
+    }
     return std::make_unique<SemanticInfo>(return_info);
 }
