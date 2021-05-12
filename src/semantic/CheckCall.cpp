@@ -145,8 +145,7 @@ USemanticInfo Checker::visit_call(CallNode& n, bool is_rvalue) {
             this->error_reporter.fail("Cannot use function call as expression as it doesn't return a value!", n.start);
             return error_stub();
         }
-    }
-    if (retv.entity.value->type->object().type_params.size() != 0) {
+    } else if (retv.entity.value->type->object().type_params.size() != 0) {
         retv.entity.value->clazz = instantiate_generic(retv.entity.value->clazz, retv.entity.value->type->object());
     }
     retv.is_constant = is_def_const && args_are_constant;
