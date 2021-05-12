@@ -10,7 +10,7 @@ import core.exit
 enum MyEnum {First, Second}
 
 fun main()->Integer {
-    var x = MyEnum.First
-    print(x.foo)
+    var x = print
+    var w = x.foo
     return 0
 }
