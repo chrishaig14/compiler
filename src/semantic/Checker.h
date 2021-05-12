@@ -88,19 +88,14 @@ class Checker {
     int loop_count;
     bool add_this;
     bool is_lvalue;
-    std::map<std::string, bool> inits;
-    std::string current_class;
-    std::string current_function;
     std::unordered_map<std::string, SymbolTable*> scopes;
     SymbolTable* scope;
     TypeNode* this_type;
 public:
-    bool is_method;
     std::string __file__;
     BlockSNode* root_snode;
     Module* module;
     bool is_call;
-    bool failed;
     CodeLines code_lines;
 
     Checker();

@@ -81,7 +81,6 @@ USemanticInfo Checker::visit_class(ClassNode& node) {
     SemanticInfo info;
     BlockSNode* sn = new BlockSNode();
     info.snode = sn;
-    this->current_class = node.class_name;
     this->add_this = true;
     VectorOfTypes tp;
     for (auto type_param: node.type_parameters) {
@@ -89,7 +88,6 @@ USemanticInfo Checker::visit_class(ClassNode& node) {
     }
 
     VectorOfTypes members_ordered_types;
-    inits = std::map<std::string, bool>();
 
     ClassSNode* csn = new ClassSNode();
 
@@ -100,7 +98,6 @@ USemanticInfo Checker::visit_class(ClassNode& node) {
 
     for (auto mt: node.members_ordered) {
         TypeNode& t = *node.members[mt];
-        inits[mt] = false;
         members_ordered_types.push_back(&t);
         this->assert_type_exists(t, node.start);
         csn->members.push_back(mt);
@@ -122,7 +119,6 @@ USemanticInfo Checker::visit_class(ClassNode& node) {
 
     this->this_type = new ObjectType(node.class_name, tp);
     for (auto method: node.methods) {
-        this->is_method = true;
         this->add_this = true;
         ObjectType* vt = new ObjectType(node.class_name);
         vt->actual_base_path = clazz->path;
@@ -135,7 +131,6 @@ USemanticInfo Checker::visit_class(ClassNode& node) {
     }
 
     for (auto method: node.static_methods) {
-        this->is_method = false;
         this->add_this = false;
         USemanticInfo method_info = this->visit_function(*method.second);
         static_methods_snodes.push_back(method_info->snode);
@@ -150,7 +145,6 @@ USemanticInfo Checker::visit_class(ClassNode& node) {
 
     this->add_this = true;
 
-    this->is_method = false;
     this->add_this = false;
     delete this_type;
     this->this_type = nullptr;
@@ -224,7 +218,6 @@ USemanticInfo Checker::visit_function(FunctionNode& n) {
     std::string& function_name = n.identifier;
     sn->identifier = n.path.as_str();
     sn->params = n.parameter_names;
-    this->current_function = function_name;
     this->enter_scope(function_name);
     this->scope->is_function = true;
     if (this->add_this) {
