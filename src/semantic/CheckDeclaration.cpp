@@ -43,7 +43,7 @@ SNode* Checker::make_rvalue(Entity value_entity, SNode* value_snode, const TypeN
                         for (int i = 0; i < unaliased_value_type->object().type_params.size(); i++) {
                             if (*unaliased_value_type->object().type_params[i] !=
                                 *unaliased_target_type->object().type_params[i]) {
-                                throw std::runtime_error(
+                                this->error_reporter.fail(
                                         "Error: Cannot lift union type " + unaliased_value_type->to_string() + " to " +
                                         unaliased_target_type->to_string());
                             }
@@ -66,7 +66,7 @@ SNode* Checker::make_rvalue(Entity value_entity, SNode* value_snode, const TypeN
         }
 
     } else {
-        // throw std::runtime_error("MAKE RVALUE OF FUNCTION!");
+        // this->error_reporter.fail("MAKE RVALUE OF FUNCTION!");
         return value_snode;
     }
     return nullptr;
@@ -119,7 +119,7 @@ USemanticInfo Checker::check_declaration_with_type(DeclarationNode& n) {
 
     SNode* rvalue_snode = this->make_rvalue(exp_info_p->entity, exp_info_p->snode, *n.type);
     if (rvalue_snode == nullptr) {
-        throw std::runtime_error("Cannot assign!");
+        this->error_reporter.fail("Cannot assign!");
     }
     sn->expression = rvalue_snode;
     Value* ov = new Value(n.type->clone());
@@ -150,7 +150,7 @@ USemanticInfo Checker::check_declaration_without_type(DeclarationNode& n) {
         info.entity = Entity(new Value(exp_info_p->entity.const_function->ft->clone()));
 
         if (info.entity.value->type->is_generic()) {
-            throw std::runtime_error("Error: you need to specialize the generic function of type " +
+            this->error_reporter.fail("Error: you need to specialize the generic function of type " +
                                      info.entity.value->type->to_string() + " to be able to use it without calling it");
         }
     }

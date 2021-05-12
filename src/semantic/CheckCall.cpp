@@ -122,7 +122,7 @@ USemanticInfo Checker::visit_call(CallNode& n, bool is_rvalue) {
     // }
     // if (retv.entity.value->type->kind==Kind::OBJECT){
     //     if (retv.entity.value->type->object().actual_to_string() == ""){
-    //         throw std::runtime_error("This should not be empty!");
+    //         this->error_reporter.fail("This should not be empty!");
     //     }
     // }
     if (retv.entity.type == E_TYPE::NOTHING) {

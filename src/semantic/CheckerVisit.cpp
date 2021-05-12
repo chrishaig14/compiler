@@ -106,11 +106,11 @@ USemanticInfo Checker::visit_class(ClassNode& node) {
     for (auto sm: node.static_members) {
         USemanticInfo sm_exp_info = this->dispatch(sm.second.second);
         if (*sm.second.first != *sm_exp_info->entity.value->type) {
-            throw std::runtime_error("Err: cannt initialize static member of type " + sm.second.first->to_string() +
+            this->error_reporter.fail("Err: cannt initialize static member of type " + sm.second.first->to_string() +
                                      " with expression of type " + sm_exp_info->entity.value->type->to_string());
         }
         if (!sm_exp_info->is_constant) {
-            throw std::runtime_error("Error: cannot initialize static member with non constant expression!");
+            this->error_reporter.fail("Error: cannot initialize static member with non constant expression!");
         }
     }
 
@@ -271,11 +271,11 @@ USemanticInfo Checker::visit_function(FunctionNode& n) {
 
 USemanticInfo Checker::member_tuple(const ObjectType& final_type, MemberNode& n) {
     if (n.type != MemberType::NUM) {
-        throw std::runtime_error("Error can only access members " + std::to_string(1) + " to " +
+        this->error_reporter.fail("Error can only access members " + std::to_string(1) + " to " +
                                  std::to_string(final_type.type_params.size()) + " of " + final_type.to_string());
     }
     if (n.n_child < 1 || n.n_child > final_type.type_params.size()) {
-        throw std::runtime_error("Error can only access members " + std::to_string(1) + " to " +
+        this->error_reporter.fail("Error can only access members " + std::to_string(1) + " to " +
                                  std::to_string(final_type.type_params.size()) + " of " + final_type.to_string());
     }
     SemanticInfo s;

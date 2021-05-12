@@ -131,7 +131,7 @@ USemanticInfo Checker::visit_partial(PartialApplication& node) {
     } else if (func->entity.type == E_TYPE::VALUE && func->entity.value->type->kind == Kind::FUNCTION) {
         fun_type = func->entity.const_function->ft->clone();
     } else {
-        throw std::runtime_error("Error: expected a function for partial application");
+        this->error_reporter.fail("Error: expected a function for partial application");
     }
     if (node.args.size() != fun_type->param_types.size()) {
         this->error_reporter.partial_wrong_num_args(node.start);
@@ -185,10 +185,10 @@ USemanticInfo Checker::visit_dict(DictNode& node) {
         ObjectType& key_type = key_info->entity.value->type->object();
         ObjectType& value_type = value_info->entity.value->type->object();
         if (key_type != first_key_type) {
-            throw std::runtime_error("Second key type different to first");
+            this->error_reporter.fail("Second key type different to first");
         }
         if (value_type != first_value_type) {
-            throw std::runtime_error("Second value type different to first");
+            this->error_reporter.fail("Second value type different to first");
         }
         items.push_back(std::make_pair(key_info->snode, value_info->snode));
     }
@@ -215,7 +215,7 @@ USemanticInfo Checker::visit_defconst(DefaultConstructorNode& node) {
     VectorOfTypes t;
     Entity entity = this->dispatch(node.class_node)->entity;
     if (entity.type != E_TYPE::CLASS) {
-        throw std::runtime_error("Error not a class");
+        this->error_reporter.fail("Error not a class");
     }
     Class* cls = entity.clazz;
     for (auto pt: cls->member_types) {

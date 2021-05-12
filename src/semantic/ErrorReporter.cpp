@@ -24,7 +24,9 @@ std::string entity_to_string(Entity entity) {
         case E_TYPE::CONST_FUNCTION:
             return "function " + E_HLT(entity.const_function->path.as_vec().back());
         case E_TYPE::ERROR:
+            return "EROR";
         case E_TYPE::NOT_FOUND:
+            return "NOT FOUND";
         case E_TYPE::ENUM:
             return "enum " + E_HLT(entity.enumm->enumm_name);
     }

@@ -8,11 +8,11 @@ USemanticInfo Checker::visit_lvalue_subscript(SubscriptNode& node) {
     USemanticInfo parent_p = this->dispatch_rvalue(node.parent);
     Entity entity_parent = parent_p->entity;
     if (entity_parent.type != E_TYPE::VALUE || entity_parent.value->type->kind == Kind::FUNCTION) {
-        throw std::runtime_error("Error subscript of something that is not an object!");
+        this->error_reporter.fail("Error subscript of something that is not an object!");
     }
     Entity class_entity = this->scope->get(entity_parent.value->type->object().id);
     if (class_entity.type != E_TYPE::CLASS) {
-        throw std::runtime_error("Error this should be a CLASS, but it's not!");
+        this->error_reporter.fail("Error this should be a CLASS, but it's not!");
     }
     Class* cls = class_entity.clazz;
 
@@ -22,7 +22,7 @@ USemanticInfo Checker::visit_lvalue_subscript(SubscriptNode& node) {
 
     auto subscript_it = cls->methods.find("__set_item__");
     if (subscript_it == cls->methods.end()) {
-        throw std::runtime_error("Error class " + cls->class_name + " does not define the __set_item__ operator!");
+        this->error_reporter.fail("Error class " + cls->class_name + " does not define the __set_item__ operator!");
     }
     ConstFunction* subscript_fun = subscript_it->second;
     std::string sub_fun_path = subscript_fun->path.as_str();
@@ -30,16 +30,16 @@ USemanticInfo Checker::visit_lvalue_subscript(SubscriptNode& node) {
 
     VectorOfTypes children;
     if (node.child.size() > 1) {
-        throw std::runtime_error("Error subscript with more than one child!");
+        this->error_reporter.fail("Error subscript with more than one child!");
     }
     Node* c = node.child[0];
     USemanticInfo ct = this->dispatch_rvalue(c);
     Entity child_entity = ct->entity;
     if (child_entity.type != E_TYPE::VALUE) {
-        throw std::runtime_error("Error using something that's not an object as a subscript!");
+        this->error_reporter.fail("Error using something that's not an object as a subscript!");
     }
     if (*child_entity.value->type != *subscript_fun->ft->param_types[0]) {
-        throw std::runtime_error(
+        this->error_reporter.fail(
                 "Error subscript type is " + child_entity.value->type->to_string() + " but should be " +
                 subscript_fun->ft->param_types[0]->to_string());
     }
@@ -84,7 +84,7 @@ USemanticInfo Checker::visit_assignment(AssignmentNode& n) {
     }
 
     if (linfo_p->entity.type != E_TYPE::VALUE) {
-        throw std::runtime_error("Cannot assign to this thing!");
+        this->error_reporter.fail("Cannot assign to this thing!");
     }
 
     if (n.lvalue->ntype == NodeType::MEMBER && n.lvalue->member().type == MemberType::NUM) {
@@ -105,9 +105,9 @@ USemanticInfo Checker::visit_assignment(AssignmentNode& n) {
         TypeNode* aliased_type = this->module->aliased_types.at(exp_type->object().id);
         exp_type = aliased_type;
     } else {
-        if (exp_type->kind == Kind::OBJECT && exp_type->object().id.size() != 1) {
-            this->module->fill_actual(exp_type);
-        }
+        // if (exp_type->kind == Kind::OBJECT && exp_type->object().id.size() != 1) {
+        //     this->module->fill_actual(exp_type);
+        // }
     }
 
     if (expression_info_p->entity.type == E_TYPE::ERROR) {
@@ -227,7 +227,7 @@ USemanticInfo Checker::visit_match(MatchExpressionNode* node) {
 
         int union_index = target_union_type(*ot, *case_type);
         if (union_index == -1) {
-            throw std::runtime_error("Error, type " + case_type->to_string() + " not part of " + ot->to_string());
+            this->error_reporter.fail("Error, type " + case_type->to_string() + " not part of " + ot->to_string());
         }
         this->enter_scope("case");
         Entity ent (new Value(case_type));

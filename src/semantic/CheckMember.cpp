@@ -11,11 +11,11 @@ USemanticInfo Checker::visit_member(MemberNode& n) {
     if (n.type == MemberType::NUM) {
         ObjectType* ot = &parent_entity.value->type->object();
         if (ot->id != "Tuple") {
-            throw std::runtime_error("Integer member of not a Tuple!");
+            this->error_reporter.fail("Integer member of not a Tuple!");
         }
         size_t tuple_size = ot->type_params.size();
         if (n.n_child > tuple_size || n.n_child == 0) {
-            throw std::runtime_error("Tuple member out of range, has " + std::to_string(tuple_size) + " but required " +
+            this->error_reporter.fail("Tuple member out of range, has " + std::to_string(tuple_size) + " but required " +
                                      std::to_string(n.n_child));
         }
         SemanticInfo info;
@@ -74,14 +74,14 @@ USemanticInfo Checker::object_member(SNode* object_snode, Value* pValue, std::st
     Path object_type_path = pValue->type->object().actual_base_path;
     if (object_type_path.as_str() == "") {
         // is a single type param, error
-        throw std::runtime_error("Error: no member " + child + " in totally generic type " + pValue->type->to_string());
+        this->error_reporter.fail("Error: no member " + child + " in totally generic type " + pValue->type->to_string());
     }
     if (object_type_path.as_str() == "core.Union") {
         this->error_reporter.object_no_member(*pValue->type, child, n.dot_pos);
         return error_stub();
     }
     if(pValue->metatype==Meta::ENUM){
-        throw std::runtime_error("Error: no member " + child + " in enum " + pValue->type->to_string());
+        this->error_reporter.fail("Error: no member " + child + " in enum " + pValue->type->to_string());
     }
     Class* clazz = pValue->clazz;
     assert(clazz != nullptr);

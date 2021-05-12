@@ -34,13 +34,13 @@ USemanticInfo Checker::visit_cast(CastNode& n) {
     const TypeNode& exp_type = *exp_info->entity.value->type;
     if (exp_type == T_INT || exp_type == T_FLOAT || exp_type == T_DOUBLE || exp_type == T_BOOL) {
         if (cast_type != T_BOOL && cast_type != T_FLOAT && cast_type != T_DOUBLE && cast_type != T_INT) {
-            throw std::runtime_error("Can't cast " + exp_type.to_string() + " to " + cast_type.to_string());
+            this->error_reporter.fail("Can't cast " + exp_type.to_string() + " to " + cast_type.to_string());
         }
         if (exp_type == cast_type) {
-            throw std::runtime_error("Casting to same type " + cast_type.to_string());
+            this->error_reporter.fail("Casting to same type " + cast_type.to_string());
         }
     } else {
-        throw std::runtime_error("Can't cast " + exp_type.to_string() + " to " + cast_type.to_string());
+        this->error_reporter.fail("Can't cast " + exp_type.to_string() + " to " + cast_type.to_string());
     }
     n.exp_type = exp_type.clone();
     return std::make_unique<SemanticInfo>(info);
@@ -55,7 +55,7 @@ USemanticInfo Checker::visit_boolop(BoolOpNode& n) {
     }
     if (left_info_p->entity.type != E_TYPE::VALUE || right_info_p->entity.type != E_TYPE::VALUE) {
         this->error_reporter.bool_op(left_info_p->entity, right_info_p->entity, n.start);
-        // throw std::runtime_error("Can't have binop between 2 non objects!");
+        // this->error_reporter.fail("Can't have binop between 2 non objects!");
     }
 
     const TypeNode& ltype = *get_entity_type(left_info_p->entity);
@@ -90,11 +90,11 @@ USemanticInfo Checker::visit_boolop(BoolOpNode& n) {
 
     Entity entity = this->scope->get(ltype.object().id);
     if (entity.type != E_TYPE::CLASS && entity.type != E_TYPE::ENUM) {
-        throw std::runtime_error("This should be a CLASS/ENUM, but it's not!");
+        this->error_reporter.fail("This should be a CLASS/ENUM, but it's not!");
     }
     if (entity.type == E_TYPE::ENUM) {
         if (fun != "__eq__" && fun != "__ne__") {
-            throw std::runtime_error("Error: enum type doesnt support this operator");
+            this->error_reporter.fail("Error: enum type doesnt support this operator");
         }
         ObjectType* ot = new ObjectType("Boolean", {});
         ot->actual_base_path = Path("core.Boolean");
@@ -115,7 +115,7 @@ USemanticInfo Checker::visit_boolop(BoolOpNode& n) {
         Class* cls = entity.clazz;
         auto operator_fun_it = cls->static_methods.find(fun);
         if (operator_fun_it == cls->static_methods.end()) {
-            throw std::runtime_error("Class " + cls->class_name + " has no operator " + fun + " defined ");
+            this->error_reporter.fail("Class " + cls->class_name + " has no operator " + fun + " defined ");
         }
 
         ConstFunction* operator_fun = operator_fun_it->second;
@@ -132,10 +132,10 @@ USemanticInfo Checker::visit_unary(UnaryOpNode& n) {
     SemanticInfo info;
     USemanticInfo exp_info = this->dispatch_rvalue(n.exp);
     if (exp_info->entity.type != E_TYPE::VALUE) {
-        throw std::runtime_error("ERROR EXPECTED A BOOLEAN");
+        this->error_reporter.fail("ERROR EXPECTED A BOOLEAN");
     }
     if (*exp_info->entity.value->type != T_BOOL) {
-        throw std::runtime_error("ERROR EXPECTED A BOOLEAN");
+        this->error_reporter.fail("ERROR EXPECTED A BOOLEAN");
     }
     Value* v = new Value(new ObjectType("Boolean"));
     info.entity = Entity(v);
@@ -143,11 +143,11 @@ USemanticInfo Checker::visit_unary(UnaryOpNode& n) {
     USemanticInfo parent_p = this->dispatch_rvalue(n.exp);
     Entity entity_parent = parent_p->entity;
     if (entity_parent.type != E_TYPE::VALUE) {
-        throw std::runtime_error("Error unary of something that is not an object!");
+        this->error_reporter.fail("Error unary of something that is not an object!");
     }
     Entity class_entity = this->scope->get(entity_parent.value->type->object().id);
     if (class_entity.type != E_TYPE::CLASS) {
-        throw std::runtime_error("Error this should be a CLASS, but it's not!");
+        this->error_reporter.fail("Error this should be a CLASS, but it's not!");
     }
     Class* cls = class_entity.clazz;
 
@@ -157,7 +157,7 @@ USemanticInfo Checker::visit_unary(UnaryOpNode& n) {
 
     auto subscript_it = cls->methods.find("__not__");
     if (subscript_it == cls->methods.end()) {
-        throw std::runtime_error("Error class " + cls->class_name + " does not define the __not__ operator!");
+        this->error_reporter.fail("Error class " + cls->class_name + " does not define the __not__ operator!");
     }
     ConstFunction* subscript_fun = subscript_it->second;
     std::string sub_fun_path = subscript_fun->path.as_str();
@@ -198,7 +198,7 @@ USemanticInfo Checker::visit_binop(BinopNode& n) {
     if (ltype != rtype) {
         this->error_reporter.binop(left_info_p->entity, right_info_p->entity, n.start);
         return error_stub();
-        // throw std::runtime_error("Binary operation between values of different types: " + ltype.to_string() + " and " +
+        // this->error_reporter.fail("Binary operation between values of different types: " + ltype.to_string() + " and " +
         //                          rtype.to_string());
     }
     bool err = false;
@@ -233,12 +233,12 @@ USemanticInfo Checker::visit_binop(BinopNode& n) {
 
     Entity entity = this->scope->get(ltype.object().id);
     if (entity.type != E_TYPE::CLASS) {
-        throw std::runtime_error("This should be a CLASS, but it's not!");
+        this->error_reporter.fail("This should be a CLASS, but it's not!");
     }
     Class* cls = entity.clazz;
     auto operator_fun_it = cls->static_methods.find(fun);
     if (operator_fun_it == cls->static_methods.end()) {
-        throw std::runtime_error("Class " + cls->class_name + " has no operator " + fun + " defined ");
+        this->error_reporter.fail("Class " + cls->class_name + " has no operator " + fun + " defined ");
     }
     ConstFunction* operator_fun = operator_fun_it->second;
     function_id->identifier = operator_fun->path.as_str();
@@ -271,7 +271,7 @@ USemanticInfo Checker::visit_subscript(SubscriptNode& node) {
     USemanticInfo parent_p = this->dispatch(node.parent);
     Entity entity_parent = parent_p->entity;
     if (entity_parent.type != E_TYPE::VALUE || entity_parent.value->type->kind == Kind::FUNCTION) {
-        throw std::runtime_error("Error subscript of something that is not an object!");
+        this->error_reporter.fail("Error subscript of something that is not an object!");
     }
 
     Class* cls = entity_parent.value->clazz;
@@ -285,7 +285,7 @@ USemanticInfo Checker::visit_subscript(SubscriptNode& node) {
     assert(cls != nullptr);
     auto subscript_it = cls->methods.find("__get_item__");
     if (subscript_it == cls->methods.end()) {
-        throw std::runtime_error("Error class " + cls->class_name + " does not define the __get_item__ operator!");
+        this->error_reporter.fail("Error class " + cls->class_name + " does not define the __get_item__ operator!");
     }
     ConstFunction* subscript_fun = subscript_it->second;
     std::string sub_fun_path = subscript_fun->path.as_str();
@@ -294,16 +294,16 @@ USemanticInfo Checker::visit_subscript(SubscriptNode& node) {
 
     VectorOfTypes children;
     if (node.child.size() > 1) {
-        throw std::runtime_error("Error subscript with more than one child!");
+        this->error_reporter.fail("Error subscript with more than one child!");
     }
     Node* c = node.child[0];
     USemanticInfo ct = this->dispatch_rvalue(c);
     Entity child_entity = ct->entity;
     if (child_entity.type != E_TYPE::VALUE) {
-        throw std::runtime_error("Error using something that's not an object as a subscript!");
+        this->error_reporter.fail("Error using something that's not an object as a subscript!");
     }
     if (*child_entity.value->type != *subscript_fun->ft->param_types[0]) {
-        throw std::runtime_error(
+        this->error_reporter.fail(
                 "Error subscript type is " + child_entity.value->type->to_string() + " but should be " +
                 subscript_fun->ft->param_types[0]->to_string());
     }
@@ -326,12 +326,12 @@ USemanticInfo Checker::visit_ternary(TernaryNode& node) {
     USemanticInfo expression_info_p = this->dispatch_rvalue(node.expression);
     SemanticInfo& expression_info = *expression_info_p;
     if (expression_info.entity.type != E_TYPE::VALUE || expression_info_p->entity.value->type->kind == Kind::FUNCTION) {
-        throw std::runtime_error("Unexpected non-object");
+        this->error_reporter.fail("Unexpected non-object");
     }
     ObjectType& expression_type = expression_info.entity.value->type->object();
 
     if (expression_type.id != "Option") {
-        throw std::runtime_error("Expected an Option[T], got: " + expression_type.to_string());
+        this->error_reporter.fail("Expected an Option[T], got: " + expression_type.to_string());
     }
     SemanticInfo semanticInfo;
     // TypeNode& type = *expression_type.type_params[0];
@@ -346,7 +346,7 @@ USemanticInfo Checker::visit_ternary(TernaryNode& node) {
     USemanticInfo false_case_p = this->dispatch_rvalue(node.false_case);
     SemanticInfo& false_case = *false_case_p;
     if (*false_case.entity.value->type != *true_case.entity.value->type) {
-        throw std::runtime_error(
+        this->error_reporter.fail(
                 "True case and false case type don't match: " + true_case.entity.value->type->to_string() + " != " +
                 false_case.entity.value->type->to_string());
     }

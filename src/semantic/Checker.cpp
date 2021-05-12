@@ -376,7 +376,7 @@ USemanticInfo Checker::dispatch_any(Node* nod, bool is_rvalue) {
         case NodeType::MATCH_EXP:
             return this->visit_match((MatchExpressionNode*) nod);
         default:
-            throw std::runtime_error("Don't know what to do!");
+            this->error_reporter.fail("Don't know what to do!");
     }
     return nullptr;
 }

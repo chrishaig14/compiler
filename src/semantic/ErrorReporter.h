@@ -12,7 +12,7 @@
 #include "../scanner/CodeLines.h"
 #include "../units/Entity.h"
 
-#define FAIL_FIRST 1
+#define FAIL_FIRST 0
 
 class ErrorReporter {
 public:
@@ -65,6 +65,11 @@ public:
     void function_doesnt_return_a_value(TextPosition pos, const TypeNode* expected_type);
     void class_init_member_not_init(const std::string& cls, std::string mem, TextPosition pos);
     void fail(std::string msg, TextPosition pos);
+
+    void fail(std::string msg) {
+        this->fail(msg, TextPosition{1, 1});
+    }
+
     void method_not_member(const TypeNode& t, const std::string& member, TextPosition pos);
     std::string code_error_string(TextPosition start, TextPosition end);
 

@@ -20,15 +20,15 @@ Checker::get_first_substitution_object(ObjectType& a, ObjectType& b, bool is_top
     }
     if (is_variable(b)) {
         if (is_top_level_arg) {
-            throw std::runtime_error("trying to replace var with concrete type at top level!");
+            this->error_reporter.fail("trying to replace var with concrete type at top level!");
         }
         return new std::pair<std::string, TypeNode*>(b.object().id, a.clone());
     }
     if (a.id != b.id) {
-        throw std::runtime_error("Error trying to unify object types " + a.to_string() + " and " + b.to_string());
+        this->error_reporter.fail("Error trying to unify object types " + a.to_string() + " and " + b.to_string());
     }
     if (a.type_params.size() != b.type_params.size()) {
-        throw std::runtime_error("Error trying to unify object types " + a.to_string() + " and " + b.to_string());
+        this->error_reporter.fail("Error trying to unify object types " + a.to_string() + " and " + b.to_string());
     }
     for (size_t i = 0; i < a.type_params.size(); i++) {
         std::pair<std::string, TypeNode*>* u = get_first_substitution(*a.type_params[i],
@@ -67,7 +67,7 @@ TypeNode* Checker::substitute(TypeNode* t, std::string var, TypeNode* replacemen
 std::pair<std::string, TypeNode*>*
 Checker::get_first_substitution_function(FunctionType& a, FunctionType& b, bool is_top_level_arg) {
     if (a.param_types.size() != b.param_types.size()) {
-        throw std::runtime_error(
+        this->error_reporter.fail(
                 "Error: trying to unify two functions with different parameter count: " + a.to_string() + " and " +
                 b.to_string());
     }
@@ -128,12 +128,12 @@ void Checker::unify_function_call(FunctionType& fun, VectorOfTypes& args) {
 
 std::pair<std::string, TypeNode*>* Checker::get_first_substitution(TypeNode& a, TypeNode& b, bool is_top_level_arg) {
     if (a.kind == Kind::FUNCTION && b.kind == Kind::OBJECT) {
-        throw std::runtime_error(
+        this->error_reporter.fail(
                 "Error trying to unify types of different kind" + a.to_string() + " and " + b.to_string());
     }
     if (a.kind == Kind::OBJECT && b.kind == Kind::FUNCTION) {
         if (!a.is_generic_param) {
-            throw std::runtime_error("Error trying to unify " + a.to_string() + " and " + b.to_string());
+            this->error_reporter.fail("Error trying to unify " + a.to_string() + " and " + b.to_string());
         }
         return new std::pair<std::string, TypeNode*>(a.object().id, b.clone());
     }
@@ -185,7 +185,7 @@ USemanticInfo Checker::enum_member(Enum* enumm, std::string value, MemberNode& n
             return std::make_unique<SemanticInfo>(info);
         }
     }
-    throw std::runtime_error("Error enum " + enumm->enumm_name + " has no value " + value);
+    this->error_reporter.fail("Error enum " + enumm->enumm_name + " has no value " + value);
     return error_stub();
 }
 

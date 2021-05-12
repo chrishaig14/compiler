@@ -31,7 +31,7 @@ BlockNode* full_parse(const std::string& __file__, CodeLines* code_lines) {
         tree = parser.parse_program();
     } catch (const std::runtime_error& e) {
         std::cout << e.what() << std::endl;
-        exit(1);
+        exit(0);
     }
     return tree;
 }
@@ -347,7 +347,7 @@ int main(int argc, char* argv[]) {
     std::cout << "working directory: " << cwd << std::endl;
     if (argc < 3) {
         std::cout << style(RED, "Error: expected 2 args: source_dir output_dir") << std::endl;
-        exit(1);
+        exit(0);
     }
     std::string project_dir = argv[1];
     project_output_dir = argv[2];
@@ -355,7 +355,7 @@ int main(int argc, char* argv[]) {
     int x = mkdir(project_output_dir.c_str(), 0700);
     // if (x != 0) {
     //     std::cout << "failed to create  application dir" << std::endl;
-    //     exit(1);
+    //     exit(0);
     // }
     std::string __main_file__ = path_join(project_dir, u_basename(project_dir) + ".xl");
     // std::cout << style(BLUE, "Main file: ") << style(MAGENTA, __main_file__) << std::endl;
@@ -366,11 +366,15 @@ int main(int argc, char* argv[]) {
     process_global_all_modules(root_package);
 
     std::cout << "here" << std::endl;
-
-    analyze_all_modules(root_package);
+    try {
+        analyze_all_modules(root_package);
+    } catch (const std::runtime_error& e) {
+        std::cout << "ERROR: " << e.what() << std::endl;
+        exit(0);
+    }
     if (global_fail) {
         std::cout << "Failed to compile" << std::endl;
-        exit(1);
+        exit(0);
     }
 
     std::cout << "here" << std::endl;
