@@ -19,7 +19,6 @@ SemanticInfo& SemanticInfo::operator=(const SemanticInfo& other) {
     this->is_class_method = other.is_class_method;
     this->is_constant = other.is_constant;
     this->snode = other.snode;
-    this->method_name = other.method_name;
     this->this_arg = other.this_arg;
     if (other._type != nullptr) {
         this->_type = other._type->clone();
@@ -36,7 +35,6 @@ SemanticInfo::SemanticInfo(const SemanticInfo& other) {
     this->is_class_method = other.is_class_method;
     this->is_constant = other.is_constant;
     this->snode = other.snode;
-    this->method_name = other.method_name;
 
     if (other._type != nullptr) {
         this->_type = other._type->clone();

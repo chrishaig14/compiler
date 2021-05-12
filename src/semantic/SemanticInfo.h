@@ -17,7 +17,6 @@ class SemanticInfo {
     const TypeNode* _type;
 public:
     Entity entity;
-    std::string method_name;
     Class* class_info;
     bool is_class_method;
     SNode* snode;
