@@ -235,8 +235,8 @@ USemanticInfo Checker::visit_match(MatchExpressionNode* node) {
             throw std::runtime_error("Error, type " + case_type->to_string() + " not part of " + ot->to_string());
         }
         this->enter_scope("case");
-        Entity ent = entity_from_type(*case_type);
-        ent.value->clazz = this->root_package->get(ent.value->type->object().actual_base_path).clazz;
+        Entity ent (new Value(case_type));
+        this->fill_value(ent.value);
         assert(ent.value->clazz != nullptr);
         this->scope->set(case_id, ent);
         USemanticInfo case_info = this->dispatch(case_node);
@@ -283,9 +283,8 @@ USemanticInfo Checker::visit_for(ForNode& node) {
     }
 
     TypeNode* elem_type = exp_ot->type_params[0];
-    Entity elem_entity = entity_from_type(*elem_type);
-    elem_entity.value->clazz = this->root_package->get(elem_entity.value->type->object().actual_base_path).clazz;
-    assert(elem_entity.value->clazz != nullptr);
+    Entity elem_entity(new Value(elem_type));
+    this->fill_value(elem_entity.value);
     this->enter_scope("for");
     this->scope->set(node.var, elem_entity);
 

@@ -180,6 +180,7 @@ USemanticInfo Checker::enum_member(Enum* enumm, std::string value, MemberNode& n
             otype->actual_base_path = enumm->path;
             Value* ov = new Value(otype);
             info.entity = Entity(ov);
+            // this->fill_value(info.entity.value);
             info.snode = new EnumMemberSNode(enumm->path.as_str(), value);
             return std::make_unique<SemanticInfo>(info);
         }

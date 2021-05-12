@@ -10,14 +10,23 @@
 #include "Entity.h"
 #include "../nodes/TypeNode.h"
 
+enum class Meta {
+    ENUM, CLASS
+};
+
 class Value {
 
 public:
     TypeNode* type;
-    Class* clazz;
+    union {
+        Class* clazz;
+        Enum* enumm;
+    };
+    Meta metatype;
 
     Value(TypeNode* type) {
         this->clazz = nullptr;
+        this->enumm = nullptr;
         assert(type != nullptr);
         this->type = type;
     }

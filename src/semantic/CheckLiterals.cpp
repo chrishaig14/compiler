@@ -26,7 +26,7 @@ USemanticInfo Checker::visit_number(NumberNode& node) {
             IntegerSNode* snode = new IntegerSNode();
             snode->str = node.str;
             otype->actual_base_path = Path("core.Integer");
-            ov->clazz = this->root_package->get(Path("core.Integer")).clazz;
+            this->fill_value(ov);
             info.snode = snode;
             break;
         }
@@ -68,8 +68,7 @@ USemanticInfo Checker::visit_emptylist(EmptyListNode& node) {
     Value* ov = new Value(otype);
     info.entity = Entity(ov);
     otype->actual_base_path = Path("core.List");
-    ov->clazz = this->root_package->get(Path("core.List")).clazz;
-    // NewObjectSNode* non = new NewObjectSNode();
+    this->fill_value(ov);
     ListSNode* lsn = new ListSNode();
     info.snode = lsn;
     lsn->elements = {};
@@ -87,7 +86,7 @@ USemanticInfo Checker::visit_string(StringNode& node) {
     otype->actual_base_path = Path("core.String");
     Value* ov = new Value(otype);
     info.entity = Entity(ov);
-    ov->clazz = this->root_package->get(Path("core.String")).clazz;
+    this->fill_value(ov);
     return std::make_unique<SemanticInfo>(info);
 }
 
@@ -195,10 +194,7 @@ USemanticInfo Checker::visit_dict(DictNode& node) {
     }
     Value* ov = new Value(new ObjectType("Dict", {first_key_type.clone(), first_value_type.clone()}));
     this->module->fill_actual(ov->type);
-    ov->clazz = this->root_package->get(ov->type->object().actual_base_path).clazz;
-    if (ov->clazz->type_params.size() != 0) {
-        ov->clazz = instantiate_generic(ov->clazz, ov->type->object());
-    }
+    this->fill_value(ov);
     assert(ov->clazz != nullptr);
     info.entity = Entity(ov);
     DictSNode* nsn = new DictSNode(items);
@@ -268,9 +264,6 @@ USemanticInfo Checker::visit_list(ListNode& node) {
     ObjectType* otype = new ObjectType("List", {element_type->clone()});
     return_info.entity = Entity(new Value(otype));
     otype->actual_base_path = Path("core.List");
-    return_info.entity.value->clazz = this->root_package->get(Path("core.List")).clazz;
-    if (otype->type_params.size()!=0){
-        return_info.entity.value->clazz = instantiate_generic(return_info.entity.value->clazz, *otype);
-    }
+    this->fill_value(return_info.entity.value);
     return std::make_unique<SemanticInfo>(return_info);
 }

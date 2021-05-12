@@ -253,10 +253,17 @@ void Checker::fill_value(Value* value) {
     if (value->type->kind != Kind::OBJECT) {
         return;
     }
-    Class* cls = this->root_package->get(value->type->object().actual_base_path).clazz;
+    Flirpin flirpin = this->root_package->get(value->type->object().actual_base_path);
+    if (flirpin.type == F_TYPE::ENUM) {
+        value->enumm = flirpin.enumm;
+        value->metatype = Meta::ENUM;
+        return;
+    }
+    Class* cls = flirpin.clazz;
     if (cls->type_params.size() != 0) {
         cls = instantiate_generic(cls, value->type->object());
     }
+    value->metatype = Meta::CLASS;
     value->clazz = cls;
 }
 

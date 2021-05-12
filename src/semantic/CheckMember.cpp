@@ -80,6 +80,9 @@ USemanticInfo Checker::object_member(SNode* object_snode, Value* pValue, std::st
         this->error_reporter.object_no_member(*pValue->type, child, n.dot_pos);
         return error_stub();
     }
+    if(pValue->metatype==Meta::ENUM){
+        throw std::runtime_error("Error: no member " + child + " in enum " + pValue->type->to_string());
+    }
     Class* clazz = pValue->clazz;
     assert(clazz != nullptr);
     SemanticInfo info;
