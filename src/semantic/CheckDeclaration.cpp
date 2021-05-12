@@ -66,7 +66,8 @@ SNode* Checker::make_rvalue(Entity value_entity, SNode* value_snode, const TypeN
         }
 
     } else {
-        // kind = FUNCTION
+        // throw std::runtime_error("MAKE RVALUE OF FUNCTION!");
+        return value_snode;
     }
     return nullptr;
 }
