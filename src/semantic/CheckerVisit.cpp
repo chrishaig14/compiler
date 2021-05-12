@@ -161,7 +161,6 @@ USemanticInfo Checker::visit_class(ClassNode& node) {
 USemanticInfo Checker::visit_root(BlockNode& node) {
     this->error_reporter.__file__ = this->__file__;
     this->error_reporter.code_lines = code_lines;
-
     // Initialize module level Scope
     for (auto f: this->module->flirpins) {
         this->scope->set(f.first, map_flirpin_to_entity(f.second));
@@ -237,14 +236,7 @@ USemanticInfo Checker::visit_function(FunctionNode& n) {
         TypeNode* cl = type.clone();
         make_not_generic(cl);
         auto te = entity_from_type(*cl);
-        if (te.value->type->kind == Kind::OBJECT) {
-            if (te.value->type->object().id.size() != 1) {
-                te.value->clazz = this->root_package->get(te.value->type->object().actual_base_path).clazz;
-                if (te.value->type->object().type_params.size() != 0){
-                    te.value->clazz = instantiate_generic(te.value->clazz, te.value->type->object());
-                }
-            }
-        }
+        this->fill_value(te.value);
         this->scope->set(n.parameter_names[i], te);
         // if (!param_type.is_generic()) {
         //     if (param_type.kind == Kind::OBJECT) {

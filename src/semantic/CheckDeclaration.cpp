@@ -153,5 +153,6 @@ USemanticInfo Checker::check_declaration_without_type(DeclarationNode& n) {
                                      info.entity.value->type->to_string() + " to be able to use it without calling it");
         }
     }
+    // this->fill_value(info.entity.value);
     return std::make_unique<SemanticInfo>(info);
 }

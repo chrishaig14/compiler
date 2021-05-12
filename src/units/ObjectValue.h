@@ -17,6 +17,7 @@ public:
     Class* clazz;
 
     Value(TypeNode* type) {
+        this->clazz = nullptr;
         assert(type != nullptr);
         this->type = type;
     }

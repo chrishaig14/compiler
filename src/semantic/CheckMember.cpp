@@ -84,11 +84,11 @@ USemanticInfo Checker::object_member(SNode* object_snode, Value* pValue, std::st
     assert(clazz != nullptr);
     SemanticInfo info;
     if (clazz->members.count(child)) {
-        info.entity = entity_from_type(*clazz->members[child]);
-        info.entity.value->clazz = this->root_package->get(clazz->members[child]->object().actual_base_path).clazz;
-        if (info.entity.value->type->object().type_params.size() != 0) {
-            info.entity.value->clazz = instantiate_generic(this->root_package->get(clazz->members[child]->object().actual_base_path).clazz,
-                                                           info.entity.value->type->object());
+        info.entity = clazz->member_entities[child];
+        if (info.entity.type == E_TYPE::NOTHING) {
+            info.entity = entity_from_type(*clazz->members[child]);
+            clazz->member_entities[child] = info.entity;
+            this->fill_value(info.entity.value);
         }
         ObjectMemberSNode* omn = new ObjectMemberSNode();
         omn->class_path = clazz->path;

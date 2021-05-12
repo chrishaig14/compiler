@@ -20,6 +20,7 @@ public:
     Class();
     VectorOfStrings member_names;
     std::vector<TypeNode*> member_types;
+    std::unordered_map<std::string, Entity> member_entities;
 
     MapStringType members;
     std::unordered_map<std::string, ConstFunction*> methods;

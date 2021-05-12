@@ -245,8 +245,19 @@ USemanticInfo Checker::visit_binop(BinopNode& n) {
     rettype = operator_fun->ft->return_type->clone();
     // n.ltype = left.clone();
     info.entity = Entity(new Value(rettype));
-
+    this->fill_value(info.entity.value);
     return std::make_unique<SemanticInfo>(info);
+}
+
+void Checker::fill_value(Value* value) {
+    if (value->type->kind != Kind::OBJECT) {
+        return;
+    }
+    Class* cls = this->root_package->get(value->type->object().actual_base_path).clazz;
+    if (cls->type_params.size() != 0) {
+        cls = instantiate_generic(cls, value->type->object());
+    }
+    value->clazz = cls;
 }
 
 USemanticInfo Checker::visit_subscript(SubscriptNode& node) {
@@ -304,7 +315,10 @@ USemanticInfo Checker::visit_subscript(SubscriptNode& node) {
     }
     this->is_lvalue = old_lvalue;
     SemanticInfo info;
+
     info.entity = Entity(new Value(rtype));
+    this->fill_value(info.entity.value);
+
     CallSNode* csn = new CallSNode();
     IdSNode* fsn = new IdSNode();
     fsn->identifier = sub_fun_path;

@@ -199,6 +199,7 @@ public:
     SNode* make_rvalue(Entity value_entity, SNode* value_snode, const TypeNode& target);
     USemanticInfo dispatch(Node* nod);
     USemanticInfo dispatch_any(Node* pNode, bool b);
+    void fill_value(Value* value);
 };
 
 int target_union_type(const ObjectType& target, const TypeNode& source);
