@@ -14,7 +14,7 @@ import core.exit
 class FunctionNode {
     id: String
     parameters: List[String]
-    body: List[AnyNode]
+    body: List[Union[FunctionNode, DeclarationNode, AssignmentNode, CallNode]]
     fun str()->String{
         var s = "fun("+this.id + ", ("
         for x @ this.parameters {
@@ -29,7 +29,7 @@ class FunctionNode {
     }
 }
 
-fun anynode_to_string(n: AnyNode) -> String {
+fun anynode_to_string(n: Union[FunctionNode, DeclarationNode, AssignmentNode, CallNode]) -> String {
     match n {
         d: DeclarationNode {
             return d.str()
@@ -41,7 +41,7 @@ fun anynode_to_string(n: AnyNode) -> String {
     return "---"
 }
 
-fun expnode_to_string(n: ExpressionNode) -> String {
+fun expnode_to_string(n: Union[NumberNode, IdNode, CallNode]) -> String {
     match n {
         nn: NumberNode {
             return nn.num_str
@@ -58,7 +58,7 @@ fun expnode_to_string(n: ExpressionNode) -> String {
 
 class DeclarationNode {
     id: String
-    value: ExpressionNode
+    value: Union[NumberNode, IdNode, CallNode]
     fun str()->String{
         return "decl(" + this.id + ", " + expnode_to_string(this.value) + ")"
     }
@@ -73,13 +73,13 @@ class IdNode {
 }
 
 class AssignmentNode {
-    lvalue: ExpressionNode
-    rvalue: ExpressionNode
+    lvalue: Union[NumberNode, IdNode, CallNode]
+    rvalue: Union[NumberNode, IdNode, CallNode]
 }
 
 class CallNode {
-    function: ExpressionNode
-    args: List[ExpressionNode]
+    function: Union[NumberNode, IdNode, CallNode]
+    args: List[Union[NumberNode, IdNode, CallNode]]
     fun str()->String {
         var s =  "call(" + expnode_to_string(this.function) + ", "
         for arg @ this.args {
@@ -89,9 +89,6 @@ class CallNode {
         return s
     }
 }
-
-alias AnyNode = Union[FunctionNode, DeclarationNode, AssignmentNode, CallNode]
-alias ExpressionNode = Union[NumberNode, IdNode, CallNode]
 
 class Parser {
     tokens: List[Token]
@@ -143,7 +140,7 @@ class Parser {
 
         _ = this.expect(TokenType.CloseParen)
         _ = this.expect(TokenType.OpenCurly)
-        var body = []::AnyNode
+        var body = []::Union[FunctionNode, DeclarationNode, AssignmentNode, CallNode]
         while not this.matches(TokenType.CloseCurly) {
             body.push(this.parse_statement())
             _ = this.expect(TokenType.Semicolon)
@@ -154,7 +151,7 @@ class Parser {
         return n
     }
 
-    fun parse_statement()->AnyNode {
+    fun parse_statement()->Union[FunctionNode, DeclarationNode, AssignmentNode, CallNode] {
         if this.matches(TokenType.KwVar) {
             return this.parse_declaration()
         }
@@ -197,10 +194,10 @@ class Parser {
         return #DeclarationNode(id_token.str, exp)
     }
 
-    fun parse_call(function: ExpressionNode) -> CallNode {
+    fun parse_call(function: Union[NumberNode, IdNode, CallNode]) -> CallNode {
         print(this.token.str)
         _ = this.expect(TokenType.OpenParen)
-        var args = []::ExpressionNode
+        var args = []::Union[NumberNode, IdNode, CallNode]
         var expect_param = not this.matches(TokenType.CloseParen)
         while expect_param {
             var arg = this.parse_expression()
@@ -216,7 +213,7 @@ class Parser {
         return #CallNode(function, args)
     }
 
-    fun parse_expression()->ExpressionNode {
+    fun parse_expression()->Union[NumberNode, IdNode, CallNode] {
         if this.matches(TokenType.Number) {
             var num_token = this.token
             this.advance()
