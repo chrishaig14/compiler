@@ -32,6 +32,5 @@ SemanticInfo::~SemanticInfo() {
 }
 
 ErrorStub::ErrorStub() {
-    auto x = UnknownTypeNode();
     this->entity = Entity{.type=E_TYPE::ERROR};
 }
