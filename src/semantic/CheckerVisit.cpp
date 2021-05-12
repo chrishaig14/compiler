@@ -117,7 +117,6 @@ USemanticInfo Checker::visit_class(ClassNode& node) {
     std::vector<SNode*> methods_snodes;
     std::vector<SNode*> static_methods_snodes;
 
-    this->this_type = new ObjectType(node.class_name, tp);
     for (auto method: node.methods) {
         this->add_this = true;
         ObjectType* vt = new ObjectType(node.class_name);
@@ -146,8 +145,6 @@ USemanticInfo Checker::visit_class(ClassNode& node) {
     this->add_this = true;
 
     this->add_this = false;
-    delete this_type;
-    this->this_type = nullptr;
     this->error_reporter.current_class = "";
     return std::make_unique<SemanticInfo>(info);
 }

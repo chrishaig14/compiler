@@ -90,7 +90,6 @@ class Checker {
     bool is_lvalue;
     std::unordered_map<std::string, SymbolTable*> scopes;
     SymbolTable* scope;
-    TypeNode* this_type;
 public:
     std::string __file__;
     BlockSNode* root_snode;

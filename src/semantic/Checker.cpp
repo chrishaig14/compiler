@@ -44,7 +44,6 @@ Checker::Checker() {
     this->scope = new SymbolTable("global", nullptr);
     this->scopes["global"] = this->scope;
     this->add_this = false;
-    this->this_type = nullptr;
     this->loop_count = 0;
 }
 
