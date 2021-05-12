@@ -14,7 +14,6 @@
 #include "../units/Package.h"
 
 class SemanticInfo {
-    const TypeNode* _type;
 public:
     Entity entity;
     bool is_class_method;
