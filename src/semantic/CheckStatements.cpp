@@ -32,8 +32,6 @@ USemanticInfo Checker::visit_lvalue_subscript(SubscriptNode& node) {
     if (node.child.size() > 1) {
         throw std::runtime_error("Error subscript with more than one child!");
     }
-    bool old_lvalue = this->is_lvalue;
-    this->is_lvalue = false;
     Node* c = node.child[0];
     USemanticInfo ct = this->dispatch_rvalue(c);
     Entity child_entity = ct->entity;
@@ -45,7 +43,6 @@ USemanticInfo Checker::visit_lvalue_subscript(SubscriptNode& node) {
                 "Error subscript type is " + child_entity.value->type->to_string() + " but should be " +
                 subscript_fun->ft->param_types[0]->to_string());
     }
-    this->is_lvalue = old_lvalue;
     SemanticInfo info;
     info.entity = Entity(new Value((ObjectType*) rtype));
     CallSNode* csn = new CallSNode();
@@ -71,7 +68,6 @@ USemanticInfo Checker::visit_assignment(AssignmentNode& n) {
     }
 
     USemanticInfo linfo_p;
-    this->is_lvalue = true;
     bool is_subscript = false;
     CallSNode* csn = nullptr;
     if (n.lvalue->ntype == NodeType::SUB) {
@@ -82,7 +78,6 @@ USemanticInfo Checker::visit_assignment(AssignmentNode& n) {
     } else {
         linfo_p = this->dispatch(n.lvalue);
     }
-    this->is_lvalue = false;
 
     if (linfo_p->entity.type == E_TYPE::ERROR) {
         return nullptr;

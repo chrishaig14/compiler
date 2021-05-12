@@ -40,7 +40,6 @@ make_builtin_class(std::string class_name, VectorOfStrings type_params, std::map
 
 Checker::Checker() {
     this->is_call = false;
-    this->is_lvalue = false;
     this->scope = new SymbolTable("global", nullptr);
     this->scopes["global"] = this->scope;
     this->add_this = false;

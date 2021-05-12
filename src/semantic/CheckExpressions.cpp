@@ -291,24 +291,11 @@ USemanticInfo Checker::visit_subscript(SubscriptNode& node) {
     std::string sub_fun_path = subscript_fun->path.as_str();
     TypeNode* rtype = subscript_fun->ft->return_type->clone();
 
-    // SemanticInfo& parent = *parent_p;
-    // if (parent.type().kind != Kind::OBJECT) {
-    //     this->error_reporter.subscript_non_object(node.start);
-    //     return error_stub();
-    // }
-    // const ObjectType& object_type = parent.type().object();
-
-    // if (this->is_lvalue && object_type == T_STRING) {
-    //     this->error_reporter.string_immutable(node.start);
-    //     return error_stub();
-    // }
 
     VectorOfTypes children;
     if (node.child.size() > 1) {
         throw std::runtime_error("Error subscript with more than one child!");
     }
-    bool old_lvalue = this->is_lvalue;
-    this->is_lvalue = false;
     Node* c = node.child[0];
     USemanticInfo ct = this->dispatch_rvalue(c);
     Entity child_entity = ct->entity;
@@ -320,7 +307,6 @@ USemanticInfo Checker::visit_subscript(SubscriptNode& node) {
                 "Error subscript type is " + child_entity.value->type->to_string() + " but should be " +
                 subscript_fun->ft->param_types[0]->to_string());
     }
-    this->is_lvalue = old_lvalue;
     SemanticInfo info;
 
     info.entity = Entity(new Value(rtype));

@@ -87,7 +87,6 @@ std::string binoptype_to_str(OpType op);
 class Checker {
     int loop_count;
     bool add_this;
-    bool is_lvalue;
     std::unordered_map<std::string, SymbolTable*> scopes;
     SymbolTable* scope;
 public:
