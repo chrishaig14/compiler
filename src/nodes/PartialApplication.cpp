@@ -33,7 +33,6 @@ PartialApplication::PartialApplication(Node* function, VectorOfNodes args, TextP
         end) {
     this->function = function;
     this->args = args;
-    this->ntype = NodeType::PARTIAL;
 }
 
 PartialApplication& PartialApplication::partial() {

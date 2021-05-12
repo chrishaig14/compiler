@@ -77,13 +77,12 @@ class MethodNode;
 
 class Node {
 public:
-    NodeType ntype;
+    const NodeType ntype;
 
     TextPosition start;
     TextPosition end;
 
-    Node(NodeType ntype, TextPosition start, TextPosition end) {
-        this->ntype = ntype;
+    Node(NodeType ntype, TextPosition start, TextPosition end):ntype(ntype) {
         this->start = start;
         this->end = end;
     }
