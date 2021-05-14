@@ -22,9 +22,9 @@ BlockNode* full_parse(const std::string& __file__, CodeLines* code_lines) {
     Scanner scanner;
     scanner.load_file(__file__);
     std::vector<Token> tokens = scanner.scan_all();
-    // for (auto token: tokens) {
-    //     std::cout << token.to_string() << std::endl;
-    // }
+    for (auto token: tokens) {
+        std::cout << token.to_string() << std::endl;
+    }
     Parser parser(__file__, scanner.code_lines, tokens);
     *code_lines = scanner.code_lines;
     try {
