@@ -115,7 +115,8 @@ USemanticInfo Checker::visit_boolop(BoolOpNode& n) {
         Class* cls = entity.clazz;
         auto operator_fun_it = cls->static_methods.find(fun);
         if (operator_fun_it == cls->static_methods.end()) {
-            this->error_reporter.fail("Class " + cls->class_name + " has no operator " + fun + " defined ");
+            this->error_reporter.class_no_method(cls->class_name, fun, n.start);
+            return error_stub();
         }
 
         ConstFunction* operator_fun = operator_fun_it->second;
@@ -231,14 +232,15 @@ USemanticInfo Checker::visit_binop(BinopNode& n) {
     TypeNode* rettype;
     std::string fun = binoptype_to_str(n.op);
 
-    Entity entity = this->scope->get(ltype.object().id);
-    if (entity.type != E_TYPE::CLASS) {
-        this->error_reporter.fail("This should be a CLASS, but it's not!");
-    }
-    Class* cls = entity.clazz;
+    // ;this->scope->get(ltype.object().id);
+    Entity entity(new Value(ltype.object().clone()));
+    this->fill_value(entity.value);
+    Class* cls = entity.value->clazz;
+    assert(cls != nullptr);
     auto operator_fun_it = cls->static_methods.find(fun);
     if (operator_fun_it == cls->static_methods.end()) {
-        this->error_reporter.fail("Class " + cls->class_name + " has no operator " + fun + " defined ");
+        this->error_reporter.class_no_method(cls->class_name, fun, n.start);
+        return error_stub();
     }
     ConstFunction* operator_fun = operator_fun_it->second;
     function_id->identifier = operator_fun->path.as_str();

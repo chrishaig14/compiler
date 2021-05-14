@@ -16,28 +16,6 @@ bool function_is_generic(const FunctionType& ft) {
     return false;
 }
 
-Class*
-make_builtin_class(std::string class_name, VectorOfStrings type_params, std::map<std::string, std::string> methods,
-                   std::map<std::string, std::string> static_methods) {
-    auto class_info = new Class();
-    class_info->class_name = class_name;
-    for (auto sb: methods) {
-        ConstFunction* cf = new ConstFunction();
-        cf->ft = parse_function_type(sb.second);
-        cf->path = "core." + class_name + "." + sb.first;
-        class_info->methods.insert(std::make_pair(sb.first, cf));
-    }
-
-    for (auto sb: static_methods) {
-        ConstFunction* cf = new ConstFunction();
-        cf->ft = parse_function_type(sb.second);
-        cf->path = "core." + class_name + "." + sb.first;
-        class_info->static_methods.insert(std::make_pair(sb.first, cf));
-    }
-    class_info->type_params = type_params;
-    return class_info;
-}
-
 Checker::Checker() {
     this->is_call = false;
     this->scope = new SymbolTable("global", nullptr);

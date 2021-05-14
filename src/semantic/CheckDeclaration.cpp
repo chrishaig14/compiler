@@ -6,7 +6,7 @@
 
 SNode* Checker::make_rvalue(Entity value_entity, SNode* value_snode, const TypeNode& target) {
     if (value_entity.type == E_TYPE::VALUE) {
-        if (value_entity.value->type->kind != target.kind){
+        if (value_entity.value->type->kind != target.kind) {
             return nullptr;
         }
         const ObjectType& value_ot = value_entity.value->type->object();
@@ -46,6 +46,7 @@ SNode* Checker::make_rvalue(Entity value_entity, SNode* value_snode, const TypeN
                                 this->error_reporter.fail(
                                         "Error: Cannot lift union type " + unaliased_value_type->to_string() + " to " +
                                         unaliased_target_type->to_string());
+                                return nullptr;
                             }
                         }
                         return value_snode;
@@ -67,7 +68,7 @@ SNode* Checker::make_rvalue(Entity value_entity, SNode* value_snode, const TypeN
 
     } else {
         // this->error_reporter.fail("MAKE RVALUE OF FUNCTION!");
-        return value_snode;
+        return nullptr;
     }
     return nullptr;
 }
@@ -107,6 +108,7 @@ USemanticInfo Checker::check_declaration_with_type(DeclarationNode& n) {
     E_TYPE entity_type = exp_info_p->entity.type;
     if (entity_type != E_TYPE::CONST_FUNCTION && entity_type != E_TYPE::VALUE) {
         this->error_reporter.expected_expression_with_type(exp_info_p->entity, *n.type, n.start);
+        return error_stub();
     }
 
     sn->expression = exp_info_p->snode;
@@ -119,7 +121,8 @@ USemanticInfo Checker::check_declaration_with_type(DeclarationNode& n) {
 
     SNode* rvalue_snode = this->make_rvalue(exp_info_p->entity, exp_info_p->snode, *n.type);
     if (rvalue_snode == nullptr) {
-        this->error_reporter.fail("Cannot assign!");
+        this->error_reporter.assignment(*n.type, *exp_info_p->entity.value->type, n.start);
+        return error_stub();
     }
     sn->expression = rvalue_snode;
     Value* ov = new Value(n.type->clone());
@@ -151,7 +154,8 @@ USemanticInfo Checker::check_declaration_without_type(DeclarationNode& n) {
 
         if (info.entity.value->type->is_generic()) {
             this->error_reporter.fail("Error: you need to specialize the generic function of type " +
-                                     info.entity.value->type->to_string() + " to be able to use it without calling it");
+                                      info.entity.value->type->to_string() +
+                                      " to be able to use it without calling it");
         }
     }
     // this->fill_value(info.entity.value);

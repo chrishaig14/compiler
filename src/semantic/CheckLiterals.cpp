@@ -31,10 +31,13 @@ USemanticInfo Checker::visit_number(NumberNode& node) {
             break;
         }
         case NumberType::FLOAT: {
-            Value* ov = new Value(new ObjectType("Float", {}));
+            ObjectType* otype = new ObjectType("Float", {});
+            Value* ov = new Value(otype);
             info.entity = Entity(ov);
             FloatSNode* snode = new FloatSNode();
             snode->str = node.str;
+            otype->actual_base_path = Path("core.Float");
+            this->fill_value(ov);
             info.snode = snode;
             break;
         }
@@ -118,7 +121,10 @@ USemanticInfo Checker::visit_tuple(TupleNode& node) {
 
 USemanticInfo Checker::visit_float(FloatNode& node) {
     SemanticInfo s;
-    // s.set_type(T_FLOAT);
+    Value* value = new Value(new ObjectType("Float", {}));
+    value->type->object().actual_base_path = Path("core.Float");
+    s.entity = Entity(value);
+    this->fill_value(value);
     return std::make_unique<SemanticInfo>(s);
 }
 

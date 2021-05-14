@@ -14,17 +14,6 @@ SymbolTable::SymbolTable(const std::string& name, SymbolTable* parent) {
     this->is_loop = false;
 }
 
-bool SymbolTable::has(const std::string& name) {
-    if (this->table.find(name) != this->table.end()) {
-        return true;
-    } else {
-        if (this->parent != nullptr) {
-            return this->parent->has(name);
-        }
-        return false;
-    }
-}
-
 Entity SymbolTable::get(const std::string& name) {
     if (name == "__return__") {
         if (this->ret == nullptr) {
@@ -59,21 +48,6 @@ void SymbolTable::set(const std::string& name, Entity info) {
         return;
     }
     this->table[name] = info;
-}
-
-void SymbolTable::set_not_none(const std::string& name, bool may_be_none) {
-    this->not_null[name] = may_be_none;
-}
-
-bool SymbolTable::get_not_none(const std::string& name) {
-    if (this->not_null.find(name) != this->not_null.end()) {
-        return this->not_null[name];
-    } else {
-        if (this->parent != nullptr) {
-            return this->parent->get_not_none(name);
-        }
-    }
-    throw std::runtime_error("Symbol " + name + " not found in scope");
 }
 
 std::vector<std::pair<std::string, TypeNode*>> SymbolTable::get_all_in_loop() {

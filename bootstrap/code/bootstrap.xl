@@ -6,11 +6,197 @@ import core.Boolean
 import core.range
 import core.Option
 import core.exit
+import core.Dict
+import core.Float
+import util
+import pack
 
-enum MyEnum {First, Second}
+class Person {
+    name: String
+    fun get_name()->String {
+        return this.name
+    }
+    static fun john_smith()->Person {
+        return #Person("John Smith")
+    }
+}
+
+fun get_second_int(a: Integer, b: Integer)->Integer{
+    return b
+}
+
+enum Color {
+    Red, Green, Blue
+}
 
 fun main()->Integer {
-    var x = print
-    var w = x.foo
+    // declaration without type
+    var x = 8
+    // declaration with type
+    var y : Integer = 9
+    // boolean op
+    var z = x == y
+    // binary op
+    var w = x + y
+    // method access
+    print(w.str())
+    // list literal
+    var l = [1,2,3]
+    // dict literal
+    var d = {"H": "hola", "C": "chau"};
+    // if with elif and else
+    if 8 < 9 {
+        print("hello")
+    } elif (7 == 8) {
+        print("good evening")
+    }
+    else {
+        print("bye")
+    }
+    // for loop
+    for item @ [1,2,3,4,5,6,7] {
+        print(item.str())
+        if item > 4 {
+            break
+        }
+    }
+    // while loop
+    var i = 0
+    while i < 10 {
+        print(i.str())
+        if i == 7 {
+            break
+        }
+    }
+    // non-generic function call
+    var r = get_second_int(7, 12)
+    // class instance
+    var p = Person.john_smith()
+    var c = #Person("Christian")
+    // method call of custom class
+    print(c.get_name())
+    // object member
+    print(c.name)
+    // assignment
+    i = 19
+    // binop error
+    var q = 9 + "Hello"
+    // redeclared var error
+    var q = false
+    // boolop error
+    var m = false == "Hello"
+    // unary not
+    var ff = not true
+    // not declared error
+//    ff = foo
+    // make union rvalue
+    var mm: Union[Integer, String] = 9
+    // bad union decl
+    var bu: Union[Integer, String] = false
+    // match
+    match mm {
+        ii: Integer {
+            print(ii.str())
+        }
+        ss: String {
+            print(ss)
+        }
+    }
+    // empty list
+    var el = []::Integer
+    // empty dict
+    var ed = {}::[Integer,String]
+    // function call with bad argument type
+    var bad = get_second_int("Hello", 8)
+    // function call with bad number of arguments
+    var bad_n = get_second_int(89)
+    // member of function error
+    var fun_mem = get_second_int.foo
+    // enum
+    var color = Color.Red
+    // bad enum value
+    color = Color.Yellow
+    // member of enum error
+//    print(color.goo)
+    // option none
+    var op: Option[Integer] = none
+    // option with value
+    var op_ok: Option[Integer] = 89
+    // bad option
+    var bad_op : Option[Integer] = false
+    // tuple
+    var tup = #(7, "Hello")
+    // bad tuple member
+    print(tup.3)
+    // tuple member ok
+    print(tup.2)
+    // partial
+    var part = $get_second_int(7,*)
+    // partial with bad type
+    part = $get_second_int("asdff",*)
+    // bind method
+    var meth = p.get_name
+    // unbound method
+    var get_name_person = Person.get_name
+    print(get_name_person(7))
+    // no binop
+    var r_person  = p + p
+    // list subscript
+    var subs = l[0]
+    // list subscript type error
+    subs = l["Hello"]
+    // call not a function
+    subs()
+    // float
+    var flot = 8.45;
+    // float + int error
+    var flot_int = flot + 9
+    // dict with bad key types
+    var bad_dict = {8: "Hello", "Bye": "Hlell"};
+    // dict with bad value type
+    var bad_dict_v = {8 : "Hello", 9: false};
+    // list with bad type
+    var bad_list = [8, false]
+    // dont use return value of func
+    get_second_int(89, 122)
+    // ignore return value of func
+    _ = get_second_int(12, 321)
+    // assign to return value of function not returning
+    var ba = print("Hello")
+    // ignore no return function error
+    _ = print("Bye")
+    // assign to subscript ok
+    l[2] = 3
+    // bad assign to subscript
+    l[2] = "Hello"
+    // assign to subscript error type
+    l["Hello"] = 8
+    // assign to subscript not found
+    flot[8] = 9
+    var r_float = 8.89 + 672.12;
+    // assign union to union in decl
+    var unis : Union[Integer, String] = "Hello"
+    var unisb : Union[Integer, String, Boolean] = unis
+    // no union member
+    print(unis.foo)
+    // assign union to union bad
+    var unif: Union[Integer, Float] = 4.5;
+    var unisb_2 : Union[Integer, String, Boolean] = unif
+    // module member fun
+    var modfoobar = util.foobar(7, 2)
+    // no member in module
+    util.balaclava()
+    // no member in object
+    l.missing_member()
+    // cannot call module
+    util()
+    // no member in package
+    pack.fdooo.ele()
+    // package member ok
+    var pack_ = pack.moddy.add_seven(9)
+    var pack__ = pack.moddy.aaadd_seven(9)
+    // declare and assign wrong function
+    var f: Integer = print
+    var fff: fun(Integer)->Integer = print
     return 0
 }

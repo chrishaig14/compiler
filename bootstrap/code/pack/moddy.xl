@@ -1,0 +1,5 @@
+import core.Integer
+
+fun add_seven(n: Integer)->Integer {
+    return n + 7
+}

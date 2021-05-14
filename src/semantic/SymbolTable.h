@@ -19,8 +19,6 @@ class SymbolTable {
 public:
     SymbolTable(const std::string& name, SymbolTable* parent);
 
-    bool has(const std::string& name);
-
     std::vector<std::pair<std::string, TypeNode*>> get_all();
 
     Entity get(const std::string& name);
@@ -28,10 +26,6 @@ public:
     bool declared(const std::string& name);
 
     void set(const std::string& name, Entity info);
-
-    void set_not_none(const std::string& name, bool may_be_none);
-
-    bool get_not_none(const std::string& name);
 
     ~SymbolTable() {
         // for (auto e: this->table) {

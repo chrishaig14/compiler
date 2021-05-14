@@ -9,20 +9,22 @@ USemanticInfo Checker::visit_lvalue_subscript(SubscriptNode& node) {
     Entity entity_parent = parent_p->entity;
     if (entity_parent.type != E_TYPE::VALUE || entity_parent.value->type->kind == Kind::FUNCTION) {
         this->error_reporter.fail("Error subscript of something that is not an object!");
+        return error_stub();
     }
-    Entity class_entity = this->scope->get(entity_parent.value->type->object().id);
-    if (class_entity.type != E_TYPE::CLASS) {
-        this->error_reporter.fail("Error this should be a CLASS, but it's not!");
+    if (entity_parent.value->metatype == Meta::ENUM) {
+        this->error_reporter.fail("Error: no subscript in enum");
+        return error_stub();
     }
-    Class* cls = class_entity.clazz;
-
+    Class* cls = entity_parent.value->clazz;
+    assert(cls != nullptr);
     if (cls->type_params.size() != 0) {
         cls = instantiate_generic(cls, entity_parent.value->type->object());
     }
 
     auto subscript_it = cls->methods.find("__set_item__");
     if (subscript_it == cls->methods.end()) {
-        this->error_reporter.fail("Error class " + cls->class_name + " does not define the __set_item__ operator!");
+        this->error_reporter.object_no_member(*entity_parent.value->type, "__set_item__", node.start);
+        return error_stub();
     }
     ConstFunction* subscript_fun = subscript_it->second;
     std::string sub_fun_path = subscript_fun->path.as_str();
@@ -45,6 +47,8 @@ USemanticInfo Checker::visit_lvalue_subscript(SubscriptNode& node) {
     }
     SemanticInfo info;
     info.entity = Entity(new Value((ObjectType*) rtype));
+
+    this->fill_value(info.entity.value);
     CallSNode* csn = new CallSNode();
     IdSNode* fsn = new IdSNode();
     fsn->identifier = sub_fun_path;
@@ -80,19 +84,23 @@ USemanticInfo Checker::visit_assignment(AssignmentNode& n) {
     }
 
     if (linfo_p->entity.type == E_TYPE::ERROR) {
-        return nullptr;
+        return error_stub();
     }
 
     if (linfo_p->entity.type != E_TYPE::VALUE) {
         this->error_reporter.fail("Cannot assign to this thing!");
+        return error_stub();
     }
 
     if (n.lvalue->ntype == NodeType::MEMBER && n.lvalue->member().type == MemberType::NUM) {
         this->error_reporter.tuple_assign(n.start);
+        return error_stub();
     }
 
     USemanticInfo expression_info_p = this->dispatch_rvalue(n.rvalue);
-
+    if (expression_info_p->entity.type == E_TYPE::ERROR) {
+        return error_stub();
+    }
     if (linfo_p->entity.type == E_TYPE::VALUE && linfo_p->entity.value->type->kind == Kind::OBJECT &&
         expression_info_p->entity.type == E_TYPE::CONST_FUNCTION) {
         this->error_reporter.assignment(*linfo_p->entity.value->type,
@@ -230,7 +238,7 @@ USemanticInfo Checker::visit_match(MatchExpressionNode* node) {
             this->error_reporter.fail("Error, type " + case_type->to_string() + " not part of " + ot->to_string());
         }
         this->enter_scope("case");
-        Entity ent (new Value(case_type));
+        Entity ent(new Value(case_type));
         this->fill_value(ent.value);
         assert(ent.value->clazz != nullptr);
         this->scope->set(case_id, ent);

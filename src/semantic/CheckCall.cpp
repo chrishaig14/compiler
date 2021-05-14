@@ -54,6 +54,7 @@ USemanticInfo Checker::visit_call(CallNode& n, bool is_rvalue) {
         function_type = fun_info.entity.value->type->function().clone();
     } else {
         this->error_reporter.call_not_a_function(n.start);
+        return error_stub();
     }
     // ok
     // const FunctionType& function_type = fun_info.type().function();
