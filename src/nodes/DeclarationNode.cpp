@@ -5,8 +5,10 @@
 #include "DeclarationNode.h"
 
 DeclarationNode::DeclarationNode(const std::string& identifier, TypeNode* type, Node* expression, TextPosition start,
-                                 TextPosition end) : Node(NodeType::DECL, start, end), identifier(identifier), type(type),
-                                                     expression(expression) {
+                                 TextPosition eq_pos, TextPosition end) : Node(NodeType::DECL, start, end),
+                                                                          identifier(identifier), type(type),
+                                                                          expression(expression) {
+    this->eq_pos = eq_pos;
 }
 
 bool DeclarationNode::equal(const Node& x) const {

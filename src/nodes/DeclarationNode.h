@@ -18,12 +18,14 @@ public:
     std::string identifier;
     TypeNode* type;
     Node* expression;
+    TextPosition eq_pos;
     DeclarationNode(const std::string& identifier, TypeNode* type, Node* expression, TextPosition start,
-                    TextPosition end);
+                    TextPosition eq_pos, TextPosition end);
 
     DeclarationNode(const std::string& identifier, TypeNode* type, Node* expression) : DeclarationNode(identifier,
                                                                                                        type,
                                                                                                        expression,
+                                                                                                       {-1, -1},
                                                                                                        {-1, -1},
                                                                                                        {-1, -1}) {
     }

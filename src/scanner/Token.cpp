@@ -45,7 +45,15 @@ Token::Token() {
 }
 
 std::string Token::pos_string() {
-    return std::to_string(this->start.line + 1) + ":" + std::to_string(this->start.column + 1);
+    return std::to_string(this->start.line + 1) + ":" + std::to_string(this->start.column + 1) + " - " +
+           std::to_string(this->end_pos.line + 1) + ":" + std::to_string(this->end_pos.column + 1);
+}
+
+Token::Token(TokType type, std::string str, TextPosition start, TextPosition end) {
+    this->type = type;
+    this->str = str;
+    this->start = start;
+    this->end_pos = end;
 }
 
 

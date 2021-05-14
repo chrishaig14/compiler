@@ -72,7 +72,12 @@ enum class TokType {
     CLASS,
     IMPORT,
     FROM,
-    DOUBLE, INTEGER, STATIC, MATCH, ALIAS, ENUM
+    DOUBLE,
+    INTEGER,
+    STATIC,
+    MATCH,
+    ALIAS,
+    ENUM
 };
 
 extern std::unordered_map<TokType, std::string> TOKEN_STRINGS;
@@ -91,6 +96,8 @@ public:
     Token(TokType type, TextPosition start);
 
     Token(TokType type, std::string str, TextPosition start);
+
+    Token(TokType type, std::string str, TextPosition start, TextPosition end);
 
     bool operator==(const Token& other) const;
 

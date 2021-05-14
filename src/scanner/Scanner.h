@@ -15,16 +15,6 @@
 extern std::unordered_map<std::string, TokType> TOKEN_KEYWORDS;
 extern std::unordered_map<std::string, TokType> TOKEN_SPECIAL;
 
-class UnexpectedCharacter : public std::runtime_error {
-public:
-    int line, column;
-
-    UnexpectedCharacter(char c, size_t position);
-
-    UnexpectedCharacter(char c, int line, int column);
-
-    bool operator==(const UnexpectedCharacter& other) const;
-};
 
 class Scanner {
 
@@ -55,6 +45,16 @@ public:
     Token next_token();
     CodeLines code_lines;
     std::string __file__;
+    void set_char();
+    char chris;
+    Token scan_string();
+    void new_line();
+    void advance_simple();
+    bool at_eof();
+    void accum_token();
+    std::string current_tok_str;
+    void start_token();
+    bool should_insert_semicolon();
 };
 
 

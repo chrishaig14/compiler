@@ -117,82 +117,81 @@ Token Scanner::get_next() {
     return tok;
 }
 
+void Scanner::set_char() {
+    this->chris = this->text[this->current];
+}
+
+bool Scanner::should_insert_semicolon() {
+    std::vector<TokType> semic = {TokType::RETURN, TokType::ID, TokType::INTEGER, TokType::RPAREN, TokType::RSQUARE,
+                                  TokType::STRING, TokType::NONE, TokType::TRUE, TokType::FALSE};
+    for (auto ts : semic) {
+        if (this->cur_token.type == ts) {
+            return true;
+            break;
+        }
+    }
+    return false;
+}
+
 Token Scanner::next_token() {
-    if (this->current >= this->text.size()) {
+    if (this->at_eof()) {
         return Token(TokType::END, {this->line, this->column});
     }
-    char c = this->text[this->current];
-    while (isspace(c)) {
+    this->set_char();
+    while (isspace(this->chris)) {
         this->current++;
-        if (c == '\n') {
-            Token tok(TokType::ID, "DUMMY", {this->line, this->column});
-            std::vector<TokType> semic = {TokType::RETURN, TokType::ID, TokType::INTEGER, TokType::RPAREN,
-                                          TokType::RSQUARE, TokType::STRING, TokType::NONE, TokType::TRUE,
-                                          TokType::FALSE};
-            for (auto ts : semic) {
-                if (this->cur_token.type == ts) {
-                    tok = Token(TokType::SEMICOLON, {this->line, this->column});
-                    this->line++;
-                    this->code_lines.line_offsets.back().length =
-                            this->current - this->code_lines.line_offsets.back().offset;
-                    this->code_lines.line_offsets.push_back(Range{.offset=this->current, .length=0});
-                    this->column = 0;
-                    return tok;
-                }
+        if (this->chris == '\n') {
+            if (this->should_insert_semicolon()) {
+                Token tok = Token(TokType::SEMICOLON, ";", {this->line, this->column}, {this->line, this->column + 1});
+                this->new_line();
+                return tok;
             }
-            this->line++;
-            this->code_lines.line_offsets.back().length = this->current - this->code_lines.line_offsets.back().offset;
-            this->code_lines.line_offsets.push_back(Range{.offset=this->current, .length=0});
-            this->column = 0;
+            this->new_line();
         } else {
             this->column++;
         }
-        if (this->current >= this->text.size()) {
+        if (this->at_eof()) {
             return Token(TokType::END, {this->line, this->column});
         }
-        c = this->text[this->current];
+        this->set_char();
     }
-    if (isalpha(c) || c == '_') {
+
+    if (isalpha(this->chris) || this->chris == '_') {
         return this->scan_keyword_or_identifier();
-    }
-    if (isdigit(c)) {
+    } else if (isdigit(this->chris)) {
         return this->scan_number();
-    }
-    if (c == '\"') {
-        std::string str;
-        int start_l = this->line;
-        int start_c = this->column;
-        this->current++;
-        char cr = this->text[this->current];
-        while (cr != '\"') {
-            str += cr;
-            this->current++;
-            if (this->current < this->text.size()) {
-                this->column++;
-                cr = this->text[this->current];
-            } else {
-                break;
-            }
-        }
-        this->current++;
-        this->column++;
-        if (this->current < this->text.size()) {
-            this->column++;
-        }
-        Token token(TokType::STRING, str, {start_l, start_c});
-        // token.start = start;
-        token.end_pos = {this->line, this->column};
-        return token;
+    } else if (this->chris == '\"') {
+        return this->scan_string();
     }
     return this->scan_other();
 }
 
+Token Scanner::scan_string() {
+    this->start_token();
+    TextPosition start = {this->line, this->column};
+    this->current++;
+    this->set_char();
+    while (this->chris != '\"' && !this->at_eof()) {
+        this->accum_token();
+        this->advance_simple();
+    }
+    if (this->at_eof()) {
+        std::cerr << "Error: unterminated string!" << std::endl;
+        exit(1);
+    }
+    this->current++;
+    this->column++;
+    if (!this->at_eof()) {
+        this->column++;
+    }
+    return Token(TokType::STRING, this->current_tok_str, start, {this->line, this->column});
+}
+
 Token Scanner::scan_other() {
-    int start_l = this->line;
-    int start_c = this->column;
-    char c = this->text[this->current];
+    TextPosition start = {this->line, this->column};
+    this->set_char();
     std::string str;
-    str.push_back(c);
+    str.push_back(this->chris);
     size_t p = this->current + 1;
 
     if (p < this->text.size()) {
@@ -201,16 +200,15 @@ Token Scanner::scan_other() {
         if (TOKEN_SPECIAL.find(tstr) != TOKEN_SPECIAL.end()) {
             this->current += 2;
             this->column += 2;
-            Token token(TOKEN_SPECIAL[tstr], {start_l, start_c});
+            Token token(TOKEN_SPECIAL[tstr], start);
             token.end_pos = {this->line, this->column};
             if (token.type == TokType::DOUBLE_SLASH) {
                 // ignore everything until end of line
-                while (c != '\n' && this->current < this->text.size()) {
-                    c = this->text[this->current];
+                while (this->chris != '\n' && !this->at_eof()) {
+                    this->set_char();
                     this->current++;
                 }
                 token = this->get_next();
-
             }
             return token;
         }
@@ -218,102 +216,84 @@ Token Scanner::scan_other() {
     if (TOKEN_SPECIAL.find(str) != TOKEN_SPECIAL.end()) {
         this->current++;
         this->column++;
-        Token token(TOKEN_SPECIAL[str], {start_l, start_c});
+        Token token(TOKEN_SPECIAL[str], start);
         token.end_pos = {this->line, this->column};
         return token;
     }
     std::string msg = E_FMT("Unexpected character ");
-    msg += E_HLT("'" + std::string(1, c) + "'");
+    msg += E_HLT("'" + std::string(1, this->chris) + "'");
     msg += E_FMT(" at ");
-    msg += E_HLT(this->__file__ + ":" + std::to_string(start_l + 1) + ":" + std::to_string(start_c + 1));
+    msg += E_HLT(this->__file__ + ":" + std::to_string(start.line + 1) + ":" + std::to_string(start.column + 1));
     std::cout << msg << std::endl;
     exit(1);
 }
 
+void Scanner::accum_token() {
+    this->current_tok_str += this->chris;
+}
+
+void Scanner::advance_simple() {
+    this->current++;
+    this->column++;
+    this->set_char();
+}
+
 Token Scanner::scan_keyword_or_identifier() {
-    int start_l = this->line;
-    int start_c = this->column;
-    char c = this->text[this->current];
-    std::string str;
-    while (isalnum(c) or c == '_') {
-        str += c;
-        this->current++;
-        if (this->current < this->text.size()) {
-            this->column++;
-            c = this->text[this->current];
-        } else {
-            break;
-        }
+    TextPosition start = {this->line, this->column};
+    this->set_char();
+    this->start_token();
+    while ((isalnum(this->chris) or this->chris == '_') && !this->at_eof()) {
+        this->accum_token();
+        this->advance_simple();
     }
-    if (TOKEN_KEYWORDS.find(str) != TOKEN_KEYWORDS.end()) {
+    if (TOKEN_KEYWORDS.find(this->current_tok_str) != TOKEN_KEYWORDS.end()) {
 //      it's a keyword
-        Token token(TOKEN_KEYWORDS[str], {start_l, start_c});
+        Token token(TOKEN_KEYWORDS[this->current_tok_str], start);
         token.end_pos = {this->line, this->column};
         return token;
     }
 //  it's an identifier
-    Token token(TokType::ID, str, {start_l, start_c});
-    token.end_pos = {this->line, this->column};
-    return token;
+    return Token(TokType::ID, this->current_tok_str, start, {this->line, this->column});
 }
 
 Token Scanner::scan_number() {
-    int start_l = this->line;
-    int start_c = this->column;
-    char c = this->text[this->current];
-    std::string str;
-    while (isdigit(c)) {
-        str += c;
-        this->current++;
-        if (this->current < this->text.size()) {
-            this->column++;
-            c = this->text[this->current];
-        } else {
-            break;
-        }
+    TextPosition start = {this->line, this->column};
+    this->set_char();
+    this->start_token();
+    while (isdigit(this->chris) && !this->at_eof()) {
+        this->accum_token();
+        this->advance_simple();
     }
-    if (this->current < this->text.size()) {
-        if (c == '.') {
-            str += c;
+    if (!this->at_eof()) {
+        if (this->chris == '.') {
+            this->accum_token();
             if (this->current + 1 < this->text.size()) {
                 if (isdigit(this->text[this->current + 1])) {
                     // it's a decimal number
                     this->current++;
-                    c = this->text[this->current];
-                    while (isdigit(c)) {
-                        str += c;
-                        this->current++;
-                        if (this->current < this->text.size()) {
-                            this->column++;
-                            c = this->text[this->current];
-                        } else {
-                            break;
-                        }
+                    this->set_char();
+                    while (isdigit(this->chris) && !this->at_eof()) {
+                        this->accum_token();
+                        this->advance_simple();
                     }
                     TokType tok_type = TokType::FLOAT;
-                    if (c == 'd') {
+                    if (this->chris == 'd') {
                         //    double
                         this->current++;
                         tok_type = TokType::DOUBLE;
-                        if (this->current < this->text.size()) {
+                        if (!this->at_eof()) {
                             this->column++;
                         }
                     }
-                    Token token = Token(tok_type, str, {start_l, start_c});
-                    token.end_pos = {this->line, this->column - 1};
-                    return token;
+                    return Token(tok_type, this->current_tok_str, start, {this->line, this->column - 1});
                 }
             } else {
                 // it's just a dot, so return the number
-                Token token = Token(TokType::INTEGER, str, {start_l, start_c});
-                token.end_pos = {this->line, this->column - 1};
-                return token;
+                return Token(TokType::INTEGER, this->current_tok_str, start, {this->line, this->column - 1});
             }
         }
     }
-    Token token = Token(TokType::INTEGER, str, {start_l, start_c});
-    token.end_pos = {this->line, this->column - 1};
-    return token;
+    return Token(TokType::INTEGER, this->current_tok_str, start, {this->line, this->column});
 }
 
 std::vector<Token> Scanner::scan_all() {
@@ -328,13 +308,17 @@ std::vector<Token> Scanner::scan_all() {
     return tokens;
 }
 
-UnexpectedCharacter::UnexpectedCharacter(char c, size_t position) : std::runtime_error(
-        std::string("Unexpected character '") + std::string(1, c) + "' at position " + std::to_string(position)) {
+void Scanner::new_line() {
+    this->line++;
+    this->column = 0;
+    this->code_lines.line_offsets.back().length = this->current - this->code_lines.line_offsets.back().offset;
+    this->code_lines.line_offsets.push_back(Range{.offset=this->current, .length=0});
 }
 
-UnexpectedCharacter::UnexpectedCharacter(char c, int line, int column) : std::runtime_error(
-        std::string("Unexpected character '") + std::string(1, c) + "' at line " + std::to_string(line + 1) +
-        " column " + std::to_string(column + 1)) {
-    this->column = column;
-    this->line = line;
+bool Scanner::at_eof() {
+    return this->current >= this->text.size();
+}
+
+void Scanner::start_token() {
+    this->current_tok_str = "";
 }
