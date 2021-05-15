@@ -26,7 +26,7 @@ fun get_second_int(a: Integer, b: Integer)->Integer{
 }
 
 enum Color {
-    Red, Green, Blue
+    Red, Green, Bluze
 }
 
 fun main()->Integer {
@@ -80,7 +80,7 @@ fun main()->Integer {
     // assignment
     i = 19
     // binop error
-    var q = 9 + "Hello"
+    var q = 9*123+1231323123+2323-1212+"Hello"+"sd"
     // redeclared var error
     var q = false
     // boolop error

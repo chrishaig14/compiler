@@ -83,7 +83,7 @@ int target_union_type(const ObjectType& target, const TypeNode& source);
 SNode* make_union_wrapper(int type_index, SNode* expression);
 
 std::string binoptype_to_str(OpType op);
-
+TextPosition add_one_col(TextPosition t);
 class Checker {
     int loop_count;
     bool add_this;

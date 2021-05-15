@@ -208,6 +208,7 @@ Token Scanner::scan_other() {
                     this->set_char();
                     this->current++;
                 }
+                this->new_line();
                 token = this->get_next();
             }
             return token;

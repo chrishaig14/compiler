@@ -14,21 +14,25 @@
 
 #define FAIL_FIRST 0
 
+enum class ErrorElement {
+    BinopLeft, BinopRight, BinopOperator,
+};
+
 class ErrorReporter {
 public:
     ErrorReporter();
 
     CodeLines code_lines;
-    void assignment(const TypeNode& expected, const TypeNode& actual, TextPosition pos);
+    void assignment(const TypeNode& expected, const TypeNode& actual, TextPosition pos, const Node& lvalue, const Node& rvalue);
     void bad_return(TextPosition pos);
     void binop(const TypeNode& left, const TypeNode& right, TextPosition position);
     void bool_op(const TypeNode& left, const TypeNode& right, TextPosition position);
-    void call_not_a_function(TextPosition pos);
     void condition(const TypeNode& t, TextPosition position, const std::string& st);
     void _for(const TypeNode& t, TextPosition position);
     void function_call_num_args(TextPosition position);
     void
-    function_call_type_mismatch(const TypeNode& expected, const TypeNode& actual, TextPosition pos, TextPosition end);
+    function_call_type_mismatch(const TypeNode& expected, const Node& arg, const TypeNode& actual, TextPosition pos,
+                                TextPosition end);
     void no_member(const TypeNode& t, const std::string& member, TextPosition pos);
     void no_return(const TypeNode& t, TextPosition pos);
     void class_no_method(const std::string& class_name, const std::string method_name, TextPosition pos);
@@ -52,7 +56,7 @@ public:
     void
     class_init_bad_member_type(const TypeNode& cls, const TypeNode& expected, const TypeNode& actual, TextPosition pos);
     void class_not_found(const TypeNode& cls, TextPosition pos);
-    void list_literal(const TypeNode& lt, const TypeNode& et, TextPosition pos);
+    void list_literal(const TypeNode& lt, const TypeNode& et, TextPosition pos, const Node& ell);
     void function_return_last_stmt(const std::string& function_name, const TypeNode& et, TextPosition pos);
     void partial_wrong_num_args(const std::string& function_name, const TypeNode& et, TextPosition pos);
     void partial_wrong_num_args(TextPosition pos);
@@ -77,11 +81,6 @@ public:
     std::string current_function;
     std::string __file__;
 
-
-    void object_no_member(const TypeNode& t, const std::string& member, TextPosition pos);
-    void class_no_member(const TypeNode& t, const std::string& member, TextPosition pos);
-    void module_no_member(const std::string& module_name, const std::string& member, TextPosition pos);
-    void package_no_member(const std::string& package_name, const std::string& member, TextPosition pos);
     void function_call_num_args(FunctionType& ft, TextPosition pos);
     void match_type(ObjectType& type, TextPosition pos);
     void match_type(Entity entity, TextPosition pos);
@@ -90,7 +89,24 @@ public:
     void expected_expression(Entity entity, TextPosition pos);
     void _for(Entity t, TextPosition pos);
     void bool_op(Entity left, Entity right, TextPosition pos);
-    void binop(Entity left, Entity right, TextPosition pos);
+    void binop(Entity left, Entity right, TextPosition pos, Node* left_n, Node* right_n);
+    void fail_highlight(std::string msg);
+    void fail_ok(std::string msg, TextPosition pos);
+    void call_not_a_function(const CallNode& node);
+    std::string highlight_two(ErrorElement fe, const Node& f, ErrorElement se, const Node& s);
+    std::string highlight_one(const Node& f);
+    void entity_no_member(std::string pre_msg, const std::string& member, TextPosition pos, Node& obj,
+                          TextPosition member_start, TextPosition member_end);
+    void class_no_member(const TypeNode& t, const std::string& member, TextPosition pos, Node& obj,
+                         TextPosition member_start, TextPosition member_end);
+    void module_no_member(const TypeNode& t, const std::string& member, TextPosition pos, Node& obj,
+                          TextPosition member_start, TextPosition member_end);
+    void object_no_member(const TypeNode& t, const std::string& member, TextPosition pos, Node& obj,
+                          TextPosition member_start, TextPosition member_end);
+    void module_no_member(std::string mod_name, const std::string& member, TextPosition pos, Node& obj,
+                          TextPosition member_start, TextPosition member_end);
+    void package_no_member(std::string pack_name, const std::string& member, TextPosition pos, Node& obj,
+                           TextPosition member_start, TextPosition member_end);
 };
 
 

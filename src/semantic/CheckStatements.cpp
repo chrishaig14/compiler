@@ -23,7 +23,12 @@ USemanticInfo Checker::visit_lvalue_subscript(SubscriptNode& node) {
 
     auto subscript_it = cls->methods.find("__set_item__");
     if (subscript_it == cls->methods.end()) {
-        this->error_reporter.object_no_member(*entity_parent.value->type, "__set_item__", node.start);
+        this->error_reporter.object_no_member(*entity_parent.value->type,
+                                              "__set_item__",
+                                              node.start,
+                                              *node.parent,
+                                              TextPosition{node.parent->end.line, node.parent->end.column + 1},
+                                              node.end);
         return error_stub();
     }
     ConstFunction* subscript_fun = subscript_it->second;
@@ -105,7 +110,9 @@ USemanticInfo Checker::visit_assignment(AssignmentNode& n) {
         expression_info_p->entity.type == E_TYPE::CONST_FUNCTION) {
         this->error_reporter.assignment(*linfo_p->entity.value->type,
                                         *expression_info_p->entity.value->type,
-                                        n.rvalue->start);
+                                        n.rvalue->start,
+                                        *n.lvalue,
+                                        *n.rvalue);
     }
     TypeNode* exp_type = expression_info_p->entity.value->type;
 
@@ -130,7 +137,7 @@ USemanticInfo Checker::visit_assignment(AssignmentNode& n) {
                                                 expression_info_p->snode,
                                                 *linfo.entity.value->type);
         if (rvalue_snode == nullptr) {
-            this->error_reporter.assignment(l_type, *exp_type, n.start);
+            this->error_reporter.assignment(l_type, *exp_type, n.start, *n.lvalue, *n.rvalue);
         }
         expression_info_p->snode = rvalue_snode;
     }

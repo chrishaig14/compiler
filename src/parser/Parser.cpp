@@ -179,7 +179,10 @@ Node* Parser::parse_assignment_or_expression() {
                 } else if (op == TokType::MINUS_EQQ) {
                     opt = OpType::SUB;
                 }
-                rvalue = new BinopNode(opt, id_node, rvalue, id_node->start, rvalue->end);
+                BinopNode* bnode = new BinopNode(opt, id_node, rvalue, id_node->start, rvalue->end);
+                bnode->op_pos = op_pos;
+                rvalue = bnode;
+
             }
 
         }
@@ -294,11 +297,14 @@ Node* Parser::parse_factor() {
         Token tok;
         if (this->match(TokType::INTEGER)) {
             tok = this->expect_token(TokType::INTEGER);
-            parent = new MemberNode(parent, std::atoi(tok.str.c_str()), parent->start, tok.end_pos);
+            MemberNode* mn = new MemberNode(parent, std::atoi(tok.str.c_str()), parent->start, tok.end_pos);
+            mn->dot_pos = dot_pos;
+            parent = mn;
         } else {
             tok = this->expect_token(TokType::ID);
-            parent = new MemberNode(parent, tok.str, parent->start, tok.end_pos);
-            parent->dot_pos = dot_pos;
+            MemberNode* mn = new MemberNode(parent, tok.str, parent->start, tok.end_pos);
+            mn->dot_pos = dot_pos;
+            parent = mn;
         }
         parent = this->parse_call_or_subscript_chain(parent);
     }

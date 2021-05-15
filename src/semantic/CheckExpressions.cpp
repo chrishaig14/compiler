@@ -61,7 +61,7 @@ USemanticInfo Checker::visit_boolop(BoolOpNode& n) {
     const TypeNode& ltype = *get_entity_type(left_info_p->entity);
     const TypeNode& rtype = *get_entity_type(right_info_p->entity);
     if (ltype != rtype) {
-        this->error_reporter.binop(left_info_p->entity, right_info_p->entity, n.start);
+        this->error_reporter.binop(left_info_p->entity, right_info_p->entity, n.start, n.left, n.right);
         return error_stub();
     }
 
@@ -191,13 +191,13 @@ USemanticInfo Checker::visit_binop(BinopNode& n) {
         return error_stub();
     }
     if (left_info_p->entity.type != E_TYPE::VALUE || right_info_p->entity.type != E_TYPE::VALUE) {
-        this->error_reporter.binop(left_info_p->entity, right_info_p->entity, n.start);
+        this->error_reporter.binop(left_info_p->entity, right_info_p->entity, n.op_pos, n.left, n.right);
         return error_stub();
     }
     const TypeNode& ltype = *get_entity_type(left_info_p->entity);
     const TypeNode& rtype = *get_entity_type(right_info_p->entity);
     if (ltype != rtype) {
-        this->error_reporter.binop(left_info_p->entity, right_info_p->entity, n.start);
+        this->error_reporter.binop(left_info_p->entity, right_info_p->entity, n.op_pos, n.left, n.right);
         return error_stub();
         // this->error_reporter.fail("Binary operation between values of different types: " + ltype.to_string() + " and " +
         //                          rtype.to_string());
@@ -239,7 +239,7 @@ USemanticInfo Checker::visit_binop(BinopNode& n) {
     assert(cls != nullptr);
     auto operator_fun_it = cls->static_methods.find(fun);
     if (operator_fun_it == cls->static_methods.end()) {
-        this->error_reporter.class_no_method(cls->class_name, fun, n.start);
+        this->error_reporter.class_no_method(cls->class_name, fun, n.op_pos);
         return error_stub();
     }
     ConstFunction* operator_fun = operator_fun_it->second;

@@ -53,7 +53,7 @@ USemanticInfo Checker::visit_call(CallNode& n, bool is_rvalue) {
     } else if (fun_info.entity.type == E_TYPE::VALUE && fun_info.entity.value->type->kind == Kind::FUNCTION) {
         function_type = fun_info.entity.value->type->function().clone();
     } else {
-        this->error_reporter.call_not_a_function(n.start);
+        this->error_reporter.call_not_a_function(n);
         return error_stub();
     }
     // ok
@@ -109,6 +109,7 @@ USemanticInfo Checker::visit_call(CallNode& n, bool is_rvalue) {
             SNode* arg_rvalue_snode = this->make_rvalue(arg_entities[i], sn->arguments[sni], param_type);
             if (arg_rvalue_snode == nullptr) {
                 this->error_reporter.function_call_type_mismatch(param_type,
+                                                                 *n.arguments[i],
                                                                  arg_type,
                                                                  n.arguments[i]->start,
                                                                  n.arguments[i]->end);

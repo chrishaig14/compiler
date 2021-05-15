@@ -23,6 +23,7 @@ public:
     std::string s_child;
     size_t n_child;
     TypeNode* parent_t;
+    TextPosition dot_pos;
 
     MemberNode(Node* parent, const std::string& child, TextPosition start, TextPosition end);
 

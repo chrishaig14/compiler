@@ -42,38 +42,113 @@ void ErrorReporter::fail(std::string msg, TextPosition pos) {
     }
 }
 
-void ErrorReporter::binop(Entity left, Entity right, TextPosition pos) {
-    std::string msg;
-    msg = E_FMT("Cannot perform binary op between types ") + E_HLT(entity_to_string(left)) + E_FMT(" and ") +
-          E_HLT(entity_to_string(right));
-    this->fail(msg, pos);
+void ErrorReporter::fail_ok(std::string msg, TextPosition pos) {
+    this->failed = true;
+    std::string out = this->context_string(pos) + "\n" + msg;
+    std::cout << out << std::endl;
+    if (FAIL_FIRST) {
+        throw std::runtime_error("Error");
+    }
 }
 
-void ErrorReporter::object_no_member(const TypeNode& t, const std::string& member, TextPosition pos) {
-    std::string msg;
-    msg = E_FMT("Object of type ") + E_HLT(t.to_string()) + E_FMT(" has no member ") + E_HLT("'" + member + "'");
-    this->fail(msg, pos);
+std::string highlight3(size_t column, size_t length) {
+    return fmt::format(fmt::fg(fmt::color::orange_red), std::string(column, ' ') + std::string(length, '^'));
+}
+
+std::string highlight22(const std::string& text, size_t column, size_t length, fmt::terminal_color color) {
+    return text.substr(0, column) + fmt::format(fmt::fg(color) | fmt::emphasis::bold, text.substr(column, length)) +
+           text.substr(column + length, text.size() - (column + length));
+}
+
+void ErrorReporter::fail_highlight(std::string msg) {
+    std::cout << msg << std::endl;
+    // this->fail(msg, {1, 1});
+    std::cout << std::endl;
+    throw std::runtime_error("FAILED");
+}
+
+std::string substring(std::string s, TextPosition start, TextPosition end) {
+    assert(start.line == end.line);
+    return s.substr(start.column, end.column - start.column);
 }
 
 
-void ErrorReporter::class_no_member(const TypeNode& t, const std::string& member, TextPosition pos) {
-    std::string msg;
-    msg = E_FMT("Class ") + E_HLT(t.to_string()) + E_FMT(" has no member ") + E_HLT("'" + member + "'");
-    this->fail(msg, pos);
+std::map<ErrorElement, fmt::text_style> styles;
+
+void init_styles() {
+    styles[ErrorElement::BinopLeft] = fmt::fg(fmt::terminal_color::green) | fmt::emphasis::bold;
+    styles[ErrorElement::BinopOperator] = fmt::fg(fmt::terminal_color::red) | fmt::emphasis::bold;
+    styles[ErrorElement::BinopRight] = fmt::fg(fmt::terminal_color::blue) | fmt::emphasis::bold;
 }
 
-void ErrorReporter::module_no_member(const std::string& module_name, const std::string& member, TextPosition pos) {
-    std::string msg;
-    msg = E_FMT("Module ") + E_HLT(module_name) + E_FMT(" has no member ") + E_HLT("'" + member + "'");
-    this->fail(msg, pos);
+void ErrorReporter::binop(Entity left, Entity right, TextPosition pos, Node* left_n, Node* right_n) {
+    assert(left_n != nullptr);
+    assert(right_n != nullptr);
+
+    std::string code_s = this->code_lines.get_line(pos.line);
+    std::string pre_s = substring(code_s, TextPosition{left_n->start.line, 0}, left_n->start);
+    std::string left_s = substring(code_s, left_n->start, left_n->end);
+    std::string middle_s = substring(code_s, left_n->end, right_n->start);
+    std::string right_s = substring(code_s, right_n->start, right_n->end);
+    std::string post_s = substring(code_s, right_n->end, TextPosition{right_n->end.line, code_s.size()});
+
+    std::string msg = pre_s + fmt::format(styles[ErrorElement::BinopLeft], left_s) +
+                      fmt::format(styles[ErrorElement::BinopOperator], middle_s) +
+                      fmt::format(styles[ErrorElement::BinopRight], right_s) + post_s;
+    this->fail_ok(msg, pos);
 }
 
-void ErrorReporter::package_no_member(const std::string& package_name, const std::string& member, TextPosition pos) {
-    std::string msg;
-    msg = E_FMT("Package ") + E_HLT(package_name) + E_FMT(" has no member ") + E_HLT("'" + member + "'");
-    this->fail(msg, pos);
+void ErrorReporter::entity_no_member(std::string pre_msg, const std::string& member, TextPosition pos, Node& obj,
+                                     TextPosition member_start, TextPosition member_end) {
+    std::string code_s = this->code_lines.get_line(pos.line);
+    std::string pre_s = substring(code_s, TextPosition{obj.start.line, 0}, obj.start);
+    std::string left_s = substring(code_s, obj.start, obj.end);
+    std::string middle_s = substring(code_s, obj.end, member_start);
+    std::string right_s = substring(code_s, member_start, member_end);
+    std::string post_s = substring(code_s, member_end, TextPosition{member_end.line, code_s.size()});
+
+    std::string msg = pre_s + fmt::format(styles[ErrorElement::BinopLeft], left_s) +
+                      fmt::format(styles[ErrorElement::BinopOperator], middle_s) +
+                      fmt::format(styles[ErrorElement::BinopRight], right_s) + post_s;
+    std::string msg_f = pre_msg + E_FMT(" has no member ") + E_HLT("'" + member + "'") + "\n" + msg;
+    this->fail_ok(msg_f, pos);
 }
 
+
+void ErrorReporter::object_no_member(const TypeNode& t, const std::string& member, TextPosition pos, Node& obj,
+                                     TextPosition member_start, TextPosition member_end) {
+    this->entity_no_member(E_FMT("Object of type ") + E_HLT(t.to_string()), member, pos, obj, member_start, member_end);
+    // std::string code_s = this->code_lines.get_line(pos.line);
+    // std::string pre_s = substring(code_s, TextPosition{obj.start.line, 0}, obj.start);
+    // std::string left_s = substring(code_s, obj.start, obj.end);
+    // std::string middle_s = substring(code_s, obj.end, member_start);
+    // std::string right_s = substring(code_s, member_start, member_end);
+    // std::string post_s = substring(code_s, member_end, TextPosition{member_end.line, code_s.size()});
+    //
+    // std::string msg = pre_s + fmt::format(styles[ErrorElement::BinopLeft], left_s) +
+    //                   fmt::format(styles[ErrorElement::BinopOperator], middle_s) +
+    //                   fmt::format(styles[ErrorElement::BinopRight], right_s) + post_s;
+    // std::string msg_f =
+    //         E_FMT("Object of type ") + E_HLT(t.to_string()) + E_FMT(" has no member ") + E_HLT("'" + member + "'") +
+    //         "\n" + msg;
+    // this->fail_ok(msg_f, pos);
+}
+
+
+void ErrorReporter::class_no_member(const TypeNode& t, const std::string& member, TextPosition pos, Node& obj,
+                                    TextPosition member_start, TextPosition member_end) {
+    this->entity_no_member(E_FMT("Class ") + E_HLT(t.to_string()), member, pos, obj, member_start, member_end);
+}
+
+void ErrorReporter::module_no_member(std::string mod_name, const std::string& member, TextPosition pos, Node& obj,
+                                     TextPosition member_start, TextPosition member_end) {
+    this->entity_no_member(E_FMT("Module ") + E_HLT(mod_name), member, pos, obj, member_start, member_end);
+}
+
+void ErrorReporter::package_no_member(std::string pack_name, const std::string& member, TextPosition pos, Node& obj,
+                                      TextPosition member_start, TextPosition member_end) {
+    this->entity_no_member(E_FMT("Package ") + E_HLT(pack_name), member, pos, obj, member_start, member_end);
+}
 
 void ErrorReporter::no_member(const TypeNode& t, const std::string& member, TextPosition pos) {
     std::string msg;
@@ -95,12 +170,26 @@ void ErrorReporter::bool_op(Entity left, Entity right, TextPosition pos) {
     this->fail(msg, pos);
 }
 
-void ErrorReporter::assignment(const TypeNode& expected, const TypeNode& actual, TextPosition pos) {
+void ErrorReporter::assignment(const TypeNode& expected, const TypeNode& actual, TextPosition pos, const Node& lvalue,
+                               const Node& rvalue) {
     std::string msg;
     msg = E_FMT("Expected ") + E_HLT(expected.to_string()) + E_FMT("(alias for ") + E_HLT(expected.actual_to_string()) +
           E_FMT(")") + E_FMT(", got ") + E_HLT(actual.to_string()) + E_FMT(" (alias for ") +
           E_HLT(actual.actual_to_string()) + E_FMT(")");
-    this->fail(msg, pos);
+
+    std::string code_s = this->code_lines.get_line(pos.line);
+    std::string pre_s = substring(code_s, TextPosition{lvalue.start.line, 0}, lvalue.start);
+    std::string left_s = substring(code_s, lvalue.start, lvalue.end);
+    std::string middle_s = substring(code_s, lvalue.end, rvalue.start);
+    std::string right_s = substring(code_s, rvalue.start, rvalue.end);
+    std::string post_s = substring(code_s, rvalue.end, TextPosition{rvalue.end.line, code_s.size()});
+
+    std::string msg_ok = msg + "\n" + pre_s + fmt::format(styles[ErrorElement::BinopLeft], left_s) +
+                         fmt::format(styles[ErrorElement::BinopOperator], middle_s) +
+                         fmt::format(styles[ErrorElement::BinopRight], right_s) + post_s;
+    this->fail_ok(msg_ok, pos);
+
+    // this->fail(msg, pos);
 }
 
 void ErrorReporter::condition(Entity entity, TextPosition pos, const std::string& st) {
@@ -203,13 +292,15 @@ void ErrorReporter::variable_not_declared(const std::string& name, TextPosition 
     this->fail(msg, pos);
 }
 
-void ErrorReporter::function_call_type_mismatch(const TypeNode& expected, const TypeNode& actual, TextPosition pos,
-                                                TextPosition end) {
+void ErrorReporter::function_call_type_mismatch(const TypeNode& expected, const Node& arg, const TypeNode& actual,
+                                                TextPosition pos, TextPosition end) {
     std::string msg;
-    msg = E_FMT(" Function call type mismatch") + E_FMT(" expected ") + E_HLT(expected.actual_to_string()) +
-          E_FMT(" but got ") + E_HLT(actual.to_string()) + E_FMT(" (alias for ") + E_HLT(actual.actual_to_string()) +
-          E_FMT(")");
-    this->fail(msg, pos);
+    msg = E_FMT(" Function call type mismatch") + E_FMT(" expected ") + E_HLT(expected.to_string()) +
+          E_FMT(" but got ") + E_HLT(actual.to_string()) + E_FMT(" (alias for ") + E_HLT(actual.to_string()) +
+          E_FMT(")") + "\n";
+    msg += highlight_one(arg);
+    this->fail_ok(msg, pos);
+    // this->fail(msg, pos);
 }
 
 void ErrorReporter::unused_return_value(TextPosition pos) {
@@ -224,10 +315,47 @@ void ErrorReporter::function_call_num_args(FunctionType& ft, TextPosition pos) {
     this->fail(msg, pos);
 }
 
-void ErrorReporter::call_not_a_function(TextPosition pos) {
+std::string ErrorReporter::highlight_one(const Node& f) {
+    std::string code_s = this->code_lines.get_line(f.start.line);
+    std::string pre_s = substring(code_s, TextPosition{f.start.line, 0}, f.start);
+    std::string node_s = substring(code_s, f.start, f.end);
+    std::string post_s = substring(code_s, f.end, TextPosition{f.end.line, code_s.size()});
+    std::string msg = pre_s + fmt::format(styles[ErrorElement::BinopOperator], node_s) + post_s;
+    return msg;
+}
+
+std::string ErrorReporter::highlight_two(ErrorElement fe, const Node& f, ErrorElement se, const Node& s) {
+    std::string code_s = this->code_lines.get_line(f.start.line);
+    std::string pre_s = substring(code_s, TextPosition{f.start.line, 0}, f.start);
+    std::string left_s = substring(code_s, f.start, f.end);
+    std::string middle_s = substring(code_s, f.end, s.start);
+    std::string right_s = substring(code_s, s.start, s.end);
+    std::string post_s = substring(code_s, s.end, TextPosition{s.end.line, code_s.size()});
+    std::string msg = pre_s + fmt::format(styles[fe], left_s) + middle_s + fmt::format(styles[se], right_s) + post_s;
+    return msg;
+}
+
+void ErrorReporter::call_not_a_function(const CallNode& node) {
     std::string msg;
-    msg = E_HLT(text_pos_to_string(this->__file__, pos)) + E_FMT(" Calling something that's not a function");
-    this->fail(msg, pos);
+    msg = E_HLT(text_pos_to_string(this->__file__, node.start)) + E_FMT(" Calling something that's not a function") +
+          "\n";
+    // this->fail(msg, pos);
+
+    // std::string code_s = this->code_lines.get_line(node.start.line);
+    // std::string pre_s = substring(code_s, TextPosition{left_n->start.line, 0}, left_n->start);
+    // std::string left_s = substring(code_s, node.function->start, node.function->end);
+    // std::string middle_s = substring(code_s, left_n->end, right_n->start);
+    // std::string right_s = substring(code_s, right_n->start, right_n->end);
+    // std::string post_s = substring(code_s, right_n->end, TextPosition{right_n->end.line, code_s.size()});
+    //
+    // std::string msg = pre_s + fmt::format(styles[ErrorElement::BinopLeft], left_s) +
+    //                   fmt::format(styles[ErrorElement::BinopOperator], middle_s) +
+    //                   fmt::format(styles[ErrorElement::BinopRight], right_s) + post_s;
+    msg += this->highlight_two(ErrorElement::BinopLeft,
+                               *node.function,
+                               ErrorElement::BinopRight,
+                               IdNode("", node.function->end, node.end));
+    this->fail_ok(msg, node.start);
 }
 
 void ErrorReporter::class_init_bad_member_type(const TypeNode& cls, const TypeNode& expected, const TypeNode& actual,
@@ -244,11 +372,12 @@ void ErrorReporter::class_not_found(const TypeNode& cls, TextPosition pos) {
     this->fail(msg, pos);
 }
 
-void ErrorReporter::list_literal(const TypeNode& lt, const TypeNode& et, TextPosition pos) {
+void ErrorReporter::list_literal(const TypeNode& lt, const TypeNode& et, TextPosition pos, const Node& ell) {
     std::string msg;
     msg = E_FMT("List literal with element of wrong type, expected ") + E_HLT(lt.to_string()) + E_FMT(" got ") +
-          E_HLT(et.to_string());
-    this->fail(msg, pos);
+          E_HLT(et.to_string()) + "\n";
+    msg += this->highlight_one(ell);
+    this->fail_ok(msg, pos);
 }
 
 void ErrorReporter::function_return_last_stmt(const std::string& function_name, const TypeNode& et, TextPosition pos) {
@@ -310,6 +439,7 @@ std::string ErrorReporter::context_string(TextPosition position) {
 }
 
 std::string ErrorReporter::code_context_string(TextPosition position) {
+    // return this->code_lines.get_line(position.line);
     std::string str = "\n" + this->code_lines.get_line(position.line) + "\n";
     str += fmt::format(fmt::fg(fmt::color::orange_red), std::string(position.column, ' ') + std::string(1, '^'));
     return str;
@@ -330,6 +460,7 @@ void ErrorReporter::class_not_generic(const std::string& cls, TextPosition pos) 
 
 ErrorReporter::ErrorReporter() {
     this->failed = false;
+    init_styles();
 }
 
 void ErrorReporter::match_type(Entity entity, TextPosition pos) {

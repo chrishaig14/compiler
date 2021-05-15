@@ -58,7 +58,12 @@ USemanticInfo Checker::visit_member(MemberNode& n) {
 
 USemanticInfo Checker::module_member(Module* mod, std::string child, MemberNode& n) {
     if (mod->flirpins.count(child) == 0) {
-        this->error_reporter.module_no_member(mod->path.as_str(), child, n.dot_pos);
+        this->error_reporter.module_no_member(mod->path.as_str(),
+                                              child,
+                                              n.dot_pos,
+                                              *n.parent,
+                                              add_one_col(n.dot_pos),
+                                              n.end);
         return error_stub();
     }
     Flirpin flirpin = mod->flirpins[child];
@@ -72,6 +77,10 @@ USemanticInfo Checker::module_member(Module* mod, std::string child, MemberNode&
     return std::make_unique<SemanticInfo>(info);
 }
 
+TextPosition add_one_col(TextPosition t) {
+    return {t.line, t.column + 1};
+}
+
 USemanticInfo Checker::object_member(SNode* object_snode, Value* pValue, std::string child, MemberNode& n) {
     Path object_type_path = pValue->type->object().actual_base_path;
     if (object_type_path.as_str() == "") {
@@ -80,11 +89,21 @@ USemanticInfo Checker::object_member(SNode* object_snode, Value* pValue, std::st
                 "Error: no member " + child + " in totally generic type " + pValue->type->to_string());
     }
     if (object_type_path.as_str() == "core.Union") {
-        this->error_reporter.object_no_member(*pValue->type, child, n.dot_pos);
+        this->error_reporter.object_no_member(*pValue->type,
+                                              child,
+                                              n.dot_pos,
+                                              *n.parent,
+                                              add_one_col(n.dot_pos),
+                                              n.end);
         return error_stub();
     }
     if (pValue->metatype == Meta::ENUM) {
-        this->error_reporter.object_no_member(*pValue->type, child, n.start);
+        this->error_reporter.object_no_member(*pValue->type,
+                                              child,
+                                              n.dot_pos,
+                                              *n.parent,
+                                              add_one_col(n.dot_pos),
+                                              n.end);
     }
     Class* clazz = pValue->clazz;
     assert(clazz != nullptr);
@@ -125,7 +144,12 @@ USemanticInfo Checker::object_member(SNode* object_snode, Value* pValue, std::st
         }
 
     } else {
-        this->error_reporter.object_no_member(*pValue->type, child, n.dot_pos);
+        this->error_reporter.object_no_member(*pValue->type,
+                                              child,
+                                              n.dot_pos,
+                                              *n.parent,
+                                              add_one_col(n.dot_pos),
+                                              n.end);
         std::cout << "Possible members are: " << std::endl;
         for (auto m: clazz->members) {
             std::cout << "- " << m.first << " : " << m.second->to_string() << std::endl;
@@ -140,7 +164,12 @@ USemanticInfo Checker::object_member(SNode* object_snode, Value* pValue, std::st
 
 USemanticInfo Checker::package_member(Package* package, std::string child, MemberNode& n) {
     if (package->units.count(child) == 0) {
-        this->error_reporter.package_no_member(package->path.as_str(), child, n.dot_pos);
+        this->error_reporter.package_no_member(package->path.as_str(),
+                                               child,
+                                               n.dot_pos,
+                                               *n.parent,
+                                               add_one_col(n.dot_pos),
+                                               n.end);
         return error_stub();
     }
     Unit unit = package->units[child];
@@ -166,7 +195,12 @@ USemanticInfo Checker::class_member(Class* cls, std::string child, MemberNode& n
     } else if (cls->static_members.find(child) != cls->static_members.end()) {
         info.entity = entity_from_type(*cls->static_members[child].first);
     } else {
-        this->error_reporter.class_no_member(ObjectType(cls->class_name, {}), child, n.dot_pos);
+        this->error_reporter.class_no_member(ObjectType(cls->class_name, {}),
+                                             child,
+                                             n.dot_pos,
+                                             *n.parent,
+                                             add_one_col(n.dot_pos),
+                                             n.end);
         return error_stub();
     }
     return std::make_unique<SemanticInfo>(info);

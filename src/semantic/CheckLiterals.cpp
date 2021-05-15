@@ -258,7 +258,7 @@ USemanticInfo Checker::visit_list(ListNode& node) {
         // }
         ObjectType* ctype = &current_type_p->entity.value->type->object();
         if (*ctype != *element_type) {
-            this->error_reporter.list_literal(*element_type, *ctype, node.elements[i]->start);
+            this->error_reporter.list_literal(*element_type, *ctype, node.elements[i]->start, *node.elements[i]);
         }
         lsn->elements.push_back(current_type_p->snode);
     }
