@@ -16,6 +16,9 @@ class Person {
     fun get_name()->String {
         return this.name
     }
+    fun add_name(s: String){
+        this.name = this.name + s
+    }
     static fun john_smith()->Person {
         return #Person("John Smith")
     }
@@ -27,6 +30,39 @@ fun get_second_int(a: Integer, b: Integer)->Integer{
 
 enum Color {
     Red, Green, Blue
+}
+
+fun get_first(x: a, y: b)->a {
+    return x
+}
+
+fun get_first_of_list(l: List[o])-> o{
+    return l[0]
+}
+
+class Wrapper[t] {
+    value: t
+}
+
+fun func_for_enum(c: Color, w: Integer )->Color{
+    return c.fa
+}
+
+fun bad_return() -> String {
+    return 8
+}
+
+fun gen_with_function(f: fun(t)->u, x: t) -> u {
+    return f(x)
+}
+
+fun double(x: Integer)->Integer {
+    return 2*x
+}
+
+fun access_member_of_generic_error(x: t) -> Integer {
+    var w = x.foo
+    return 9
 }
 
 fun main()->Integer {
@@ -138,6 +174,9 @@ fun main()->Integer {
     part = $get_second_int("asdff")
     // bind method
     var meth = p.get_name
+    // bind method that takes some args
+    var mettth = p.add_name
+    mettth(123,1231323)
     // unbound method
     var get_name_person = Person.get_name
     print(get_name_person(7))
@@ -202,8 +241,48 @@ fun main()->Integer {
     // declare and assign wrong function
     var f: Integer = print
     var fff: fun(Integer)->Integer = print
+    // error partial of not a function
     var partial_no_func = $flot(12)
+    // ok
     var ggg = get_second_int
+    // ok
     var partial_func = $ggg(1,2)
+    ggg.partial()
+    // ok
+    var call_generic = "foo"
+    call_generic = get_first("a", 0)
+    // error, call to generic returns Integer, expected String
+    call_generic = get_first(0, "a")
+    // ternary ok
+    var oppp : Option[Integer] = none
+    var ito = oppp?it:9
+    // error should be Integer
+    ito = oppp?it:"Hello"
+    // error should be Option[t]
+    ito = "Hello"? it : "Bye"
+    // error var not declared
+    ito = var_not_declared
+    var uu: Integer = get_first_of_list([7,14,13,2,8,5])
+    uu = get_first_of_list(["asdf","sdf","qww"])
+    uu = get_first_of_list(78)
+    // ok
+    var wrap = #Wrapper("asd")
+    // error
+    wrap = 9
+    // error
+    wrap = #Wrapper(123, "sdf")
+    // error
+    uu = get_first_of_list(wrap)
+    // gen with function ok
+    var resl = gen_with_function(double, 2)
+    // gen with function error
+    resl = gen_with_function(get_name_person, 2)
+    var mytuple = #(4, "Hello")
+    // tuple member ok
+    var tupm = mytuple.1
+    // tuple member error
+    var jjj = mytuple.3
+    // number member of not a tuple error
+    var asd = flot.123
     return 0
 }
