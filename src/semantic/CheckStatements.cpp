@@ -23,12 +23,7 @@ USemanticInfo Checker::visit_lvalue_subscript(SubscriptNode& node) {
 
     auto subscript_it = cls->methods.find("__set_item__");
     if (subscript_it == cls->methods.end()) {
-        this->error_reporter.object_no_member(*entity_parent.value->type,
-                                              "__set_item__",
-                                              node.start,
-                                              *node.parent,
-                                              TextPosition{node.parent->end.line, node.parent->end.column + 1},
-                                              node.end);
+        this->error_reporter.object_no_special_method(*entity_parent.value->type, "__set_item__", node);
         return error_stub();
     }
     ConstFunction* subscript_fun = subscript_it->second;

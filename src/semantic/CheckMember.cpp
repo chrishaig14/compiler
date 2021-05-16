@@ -15,12 +15,7 @@ USemanticInfo Checker::visit_member(MemberNode& n) {
         }
         size_t tuple_size = ot->type_params.size();
         if (n.n_child > tuple_size || n.n_child == 0) {
-            this->error_reporter.object_no_member(*ot,
-                                                  std::to_string(n.n_child),
-                                                  n.start,
-                                                  *n.parent,
-                                                  add_one_col(n.dot_pos),
-                                                  n.end);
+            this->error_reporter.object_no_member(*ot, n);
             // this->error_reporter.fail(
             //         "Tuple member out of range, has " + std::to_string(tuple_size) + " but required " +
             //         std::to_string(n.n_child));
@@ -40,22 +35,12 @@ USemanticInfo Checker::visit_member(MemberNode& n) {
         case E_TYPE::CLASS:
             return this->class_member(parent_entity.clazz, n.s_child, n);
         case E_TYPE::CONST_FUNCTION:
-            this->error_reporter.object_no_member(*parent_entity.const_function->ft,
-                                                  n.s_child,
-                                                  n.start,
-                                                  *n.parent,
-                                                  add_one_col(n.dot_pos),
-                                                  n.end);
+            this->error_reporter.object_no_member(*parent_entity.const_function->ft, n);
             // this->error_reporter.function_no_member(n.dot_pos);
             break;
         case E_TYPE::VALUE:
             if (parent_entity.value->type->kind == Kind::FUNCTION) {
-                this->error_reporter.object_no_member(*parent_entity.value->type,
-                                                      n.s_child,
-                                                      n.start,
-                                                      *n.parent,
-                                                      add_one_col(n.dot_pos),
-                                                      n.end);
+                this->error_reporter.object_no_member(*parent_entity.value->type, n);
                 return error_stub();
             }
             return this->object_member(parent_info->snode, parent_entity.value, n.s_child, n);
@@ -75,12 +60,7 @@ USemanticInfo Checker::visit_member(MemberNode& n) {
 
 USemanticInfo Checker::module_member(Module* mod, std::string child, MemberNode& n) {
     if (mod->flirpins.count(child) == 0) {
-        this->error_reporter.module_no_member(mod,
-                                              child,
-                                              n.dot_pos,
-                                              *n.parent,
-                                              add_one_col(n.dot_pos),
-                                              n.end);
+        this->error_reporter.module_no_member(mod, child, n.dot_pos, *n.parent, add_one_col(n.dot_pos), n.end);
         return error_stub();
     }
     Flirpin flirpin = mod->flirpins[child];
@@ -106,21 +86,11 @@ USemanticInfo Checker::object_member(SNode* object_snode, Value* pValue, std::st
                 "Error: no member " + child + " in totally generic type " + pValue->type->to_string());
     }
     if (object_type_path.as_str() == "core.Union") {
-        this->error_reporter.object_no_member(*pValue->type,
-                                              child,
-                                              n.dot_pos,
-                                              *n.parent,
-                                              add_one_col(n.dot_pos),
-                                              n.end);
+        this->error_reporter.object_no_member(*pValue->type, n);
         return error_stub();
     }
     if (pValue->metatype == Meta::ENUM) {
-        this->error_reporter.object_no_member(*pValue->type,
-                                              child,
-                                              n.dot_pos,
-                                              *n.parent,
-                                              add_one_col(n.dot_pos),
-                                              n.end);
+        this->error_reporter.object_no_member(*pValue->type, n);
     }
     Class* clazz = pValue->clazz;
     assert(clazz != nullptr);
@@ -162,11 +132,12 @@ USemanticInfo Checker::object_member(SNode* object_snode, Value* pValue, std::st
 
     } else {
         this->error_reporter.object_no_member_with_suggestions(*pValue->type,
-                                              child,
-                                              n.dot_pos,
-                                              *n.parent,
-                                              add_one_col(n.dot_pos),
-                                              n.end, clazz);
+                                                               child,
+                                                               n.dot_pos,
+                                                               *n.parent,
+                                                               add_one_col(n.dot_pos),
+                                                               n.end,
+                                                               clazz);
 
         return error_stub();
     }
@@ -175,12 +146,7 @@ USemanticInfo Checker::object_member(SNode* object_snode, Value* pValue, std::st
 
 USemanticInfo Checker::package_member(Package* package, std::string child, MemberNode& n) {
     if (package->units.count(child) == 0) {
-        this->error_reporter.package_no_member(package,
-                                               child,
-                                               n.dot_pos,
-                                               *n.parent,
-                                               add_one_col(n.dot_pos),
-                                               n.end);
+        this->error_reporter.package_no_member(package, child, n.dot_pos, *n.parent, add_one_col(n.dot_pos), n.end);
         return error_stub();
     }
     Unit unit = package->units[child];

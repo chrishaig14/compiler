@@ -297,7 +297,8 @@ USemanticInfo Checker::visit_subscript(SubscriptNode& node) {
     assert(cls != nullptr);
     auto subscript_it = cls->methods.find("__get_item__");
     if (subscript_it == cls->methods.end()) {
-        this->error_reporter.fail("Error class " + cls->class_name + " does not define the __get_item__ operator!");
+        this->error_reporter.object_no_special_method(*entity_parent.value->type, "__get_item__", node);
+        return error_stub();
     }
     ConstFunction* subscript_fun = subscript_it->second;
     std::string sub_fun_path = subscript_fun->path.as_str();

@@ -102,8 +102,7 @@ public:
                          TextPosition member_start, TextPosition member_end);
     void module_no_member(const TypeNode& t, const std::string& member, TextPosition pos, Node& obj,
                           TextPosition member_start, TextPosition member_end);
-    void object_no_member(const TypeNode& t, const std::string& member, TextPosition pos, Node& obj,
-                          TextPosition member_start, TextPosition member_end);
+    void object_no_member(const TypeNode& t, const MemberNode& obj);
     void module_no_member(std::string mod_name, const std::string& member, TextPosition pos, Node& obj,
                           TextPosition member_start, TextPosition member_end);
     void package_no_member(std::string pack_name, const std::string& member, TextPosition pos, Node& obj,
@@ -119,6 +118,7 @@ public:
     void
     package_no_member(Package* pack, const std::string& member, TextPosition pos, Node& obj, TextPosition member_start,
                       TextPosition member_end);
+    void object_no_special_method(const TypeNode& type, const char* method_name, const SubscriptNode& node);
 };
 
 

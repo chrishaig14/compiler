@@ -108,9 +108,13 @@ void ErrorReporter::entity_no_member(std::string pre_msg, const std::string& mem
 }
 
 
-void ErrorReporter::object_no_member(const TypeNode& t, const std::string& member, TextPosition pos, Node& obj,
-                                     TextPosition member_start, TextPosition member_end) {
-    this->entity_no_member(E_FMT("Object of type ") + E_HLT(t.to_string()), member, pos, obj, member_start, member_end);
+void ErrorReporter::object_no_member(const TypeNode& t, const MemberNode& m) {
+    this->entity_no_member(E_FMT("Object of type ") + E_HLT(t.to_string()),
+                           m.s_child,
+                           m.dot_pos,
+                           *m.parent,
+                           add_one_col(m.dot_pos),
+                           m.end);
 }
 
 
@@ -136,7 +140,7 @@ void ErrorReporter::module_no_member(Module* mod, const std::string& member, Tex
 
     msg += "\n\nPossible members are:  \n";
     for (auto m: mod->flirpins) {
-        msg += "- " + m.first + " : " + flirpintype_to_str(m.second.type) + "\n";
+        msg += "- " + fmt::format(fmt::emphasis::bold, m.first) + " : " + flirpintype_to_str(m.second.type) + "\n";
     }
 
     this->fail_ok(pre_msg + E_FMT(" has no member ") + E_HLT("'" + member + "'"), msg, pos);
@@ -160,7 +164,8 @@ void ErrorReporter::package_no_member(Package* pack, const std::string& member, 
 
     msg += "\n\nPossible modules/packages are:  \n";
     for (auto m: pack->units) {
-        msg += "- " + m.first + " : " + (m.second.type == U_TYPE::MODULE ? "module" : "package");
+        msg += "- " + fmt::format(fmt::emphasis::bold, m.first) + " : " +
+               (m.second.type == U_TYPE::MODULE ? "module" : "package");
     }
 
     this->fail_ok(pre_msg + E_FMT(" has no member ") + E_HLT("'" + member + "'"), msg, pos);
@@ -519,7 +524,7 @@ void ErrorReporter::enum_no_value(std::string enum_name, std::string value, Memb
     std::string pre_msg = "Enum " + enum_name + E_FMT(" has no value ") + E_HLT("'" + value + "'");
     msg += "\n\nPossible values are: \n";
     for (auto v: enumm->values) {
-        msg += "- " + v + "\n";
+        msg += "- " + fmt::format(fmt::emphasis::bold, v) + "\n";
     }
     this->fail_ok(pre_msg, msg, node.start);
 
@@ -543,11 +548,26 @@ void ErrorReporter::object_no_member_with_suggestions(const TypeNode& t, const s
 
     msg += "\n\nPossible members are:  \n";
     for (auto m: clazz->members) {
-        msg += "- " + m.first + " : " + m.second->to_string() + "\n";
+        msg += "- " + fmt::format(fmt::emphasis::bold, m.first) + " : " + m.second->to_string() + "\n";
     }
     for (auto m: clazz->methods) {
-        msg += "- " + m.first + " : " + m.second->ft->to_string() + "\n";
+        msg += "- " + fmt::format(fmt::emphasis::bold, m.first) + " : " + m.second->ft->to_string() + "\n";
     }
 
     this->fail_ok(pre_msg + E_FMT(" has no member ") + E_HLT("'" + member + "'"), msg, pos);
+}
+
+void ErrorReporter::object_no_special_method(const TypeNode& type, const char* method_name, const SubscriptNode& node) {
+    std::string pre_msg =
+            E_FMT("Object of type ") + E_HLT(type.to_string()) + " does not implement method " + E_HLT(method_name);
+
+    std::string code_s = this->code_lines.get_line(node.start.line);
+    std::string pre_s = substring(code_s, TextPosition{node.start.line, 0}, node.start);
+    std::string left_s = substring(code_s, node.parent->start, node.parent->end);
+    std::string right_s = substring(code_s, node.parent->end, node.end);
+    std::string post_s = substring(code_s, node.end, TextPosition{node.end.line, code_s.size()});
+
+    std::string msg = pre_s + fmt::format(styles[ErrorElement::BinopLeft], left_s) +
+                      fmt::format(styles[ErrorElement::BinopOperator], right_s) + post_s;
+    this->fail_ok(pre_msg, msg, node.start);
 }
