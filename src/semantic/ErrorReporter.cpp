@@ -339,7 +339,6 @@ void ErrorReporter::partial_wrong_num_args(TextPosition pos) {
     std::string msg;
     msg = E_FMT("wrong number of arguments for partial function");
     this->fail(msg, pos);
-    throw std::runtime_error("Error: wrong number of arguments for partial function");
 }
 
 void

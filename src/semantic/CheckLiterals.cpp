@@ -138,6 +138,7 @@ USemanticInfo Checker::visit_partial(PartialApplication& node) {
         fun_type = func->entity.const_function->ft->clone();
     } else {
         this->error_reporter.fail("Error: expected a function for partial application");
+        return error_stub();
     }
     if (node.args.size() != fun_type->param_types.size()) {
         this->error_reporter.partial_wrong_num_args(node.start);
