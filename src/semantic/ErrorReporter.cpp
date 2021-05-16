@@ -1,13 +1,4 @@
-//
-// Created by chris on 12/4/21.
-//
-
 #include "ErrorReporter.h"
-
-//
-// Created by chris on 12/1/21.
-//
-
 #include "Checker.h"
 
 std::string entity_to_string(Entity entity) {
@@ -120,20 +111,6 @@ void ErrorReporter::entity_no_member(std::string pre_msg, const std::string& mem
 void ErrorReporter::object_no_member(const TypeNode& t, const std::string& member, TextPosition pos, Node& obj,
                                      TextPosition member_start, TextPosition member_end) {
     this->entity_no_member(E_FMT("Object of type ") + E_HLT(t.to_string()), member, pos, obj, member_start, member_end);
-    // std::string code_s = this->code_lines.get_line(pos.line);
-    // std::string pre_s = substring(code_s, TextPosition{obj.start.line, 0}, obj.start);
-    // std::string left_s = substring(code_s, obj.start, obj.end);
-    // std::string middle_s = substring(code_s, obj.end, member_start);
-    // std::string right_s = substring(code_s, member_start, member_end);
-    // std::string post_s = substring(code_s, member_end, TextPosition{member_end.line, code_s.size()});
-    //
-    // std::string msg = pre_s + fmt::format(styles[ErrorElement::BinopLeft], left_s) +
-    //                   fmt::format(styles[ErrorElement::BinopOperator], middle_s) +
-    //                   fmt::format(styles[ErrorElement::BinopRight], right_s) + post_s;
-    // std::string msg_f =
-    //         E_FMT("Object of type ") + E_HLT(t.to_string()) + E_FMT(" has no member ") + E_HLT("'" + member + "'") +
-    //         "\n" + msg;
-    // this->fail_ok(msg_f, pos);
 }
 
 
