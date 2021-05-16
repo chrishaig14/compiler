@@ -35,9 +35,8 @@ void ErrorReporter::fail(std::string msg, TextPosition pos) {
 
 void ErrorReporter::fail_ok(std::string pre_msg, std::string msg, TextPosition pos) {
     this->failed = true;
-    std::string out =
-            "=====================================================================\n" + this->context_string(pos) +
-            pre_msg + "\n\n" + msg + "\n\n=====================================================================\n";
+    std::string out = this->context_string(pos) + "\n" + pre_msg + "\n\n" + msg +
+                      "\n\n=====================================================================\n";
     std::cout << out << std::endl;
     if (FAIL_FIRST) {
         throw std::runtime_error("Error");
@@ -142,9 +141,8 @@ void ErrorReporter::module_no_member(Module* mod, const std::string& member, Tex
     for (auto m: mod->flirpins) {
         msg += "- " + fmt::format(fmt::emphasis::bold, m.first) + " : " + flirpintype_to_str(m.second.type) + "\n";
     }
-
+    msg = msg.substr(0, msg.size() - 1);
     this->fail_ok(pre_msg + E_FMT(" has no member ") + E_HLT("'" + member + "'"), msg, pos);
-    // this->entity_no_member(E_FMT("Module ") + E_HLT(mod_name), member, pos, obj, member_start, member_end);
 }
 
 void ErrorReporter::package_no_member(Package* pack, const std::string& member, TextPosition pos, Node& obj,
@@ -165,9 +163,9 @@ void ErrorReporter::package_no_member(Package* pack, const std::string& member, 
     msg += "\n\nPossible modules/packages are:  \n";
     for (auto m: pack->units) {
         msg += "- " + fmt::format(fmt::emphasis::bold, m.first) + " : " +
-               (m.second.type == U_TYPE::MODULE ? "module" : "package");
+               (m.second.type == U_TYPE::MODULE ? "module" : "package") + "\n";
     }
-
+    msg = msg.substr(0, msg.size() - 1);
     this->fail_ok(pre_msg + E_FMT(" has no member ") + E_HLT("'" + member + "'"), msg, pos);
 }
 
@@ -526,6 +524,7 @@ void ErrorReporter::enum_no_value(std::string enum_name, std::string value, Memb
     for (auto v: enumm->values) {
         msg += "- " + fmt::format(fmt::emphasis::bold, v) + "\n";
     }
+    msg = msg.substr(0, msg.size() - 1);
     this->fail_ok(pre_msg, msg, node.start);
 
 }
@@ -553,7 +552,7 @@ void ErrorReporter::object_no_member_with_suggestions(const TypeNode& t, const s
     for (auto m: clazz->methods) {
         msg += "- " + fmt::format(fmt::emphasis::bold, m.first) + " : " + m.second->ft->to_string() + "\n";
     }
-
+    msg = msg.substr(0, msg.size() - 1);
     this->fail_ok(pre_msg + E_FMT(" has no member ") + E_HLT("'" + member + "'"), msg, pos);
 }
 
