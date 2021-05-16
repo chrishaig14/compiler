@@ -130,7 +130,8 @@ USemanticInfo Checker::visit_call(CallNode& n, bool is_rvalue) {
     // }
     if (retv.entity.type == E_TYPE::NOTHING) {
         if (is_rvalue) {
-            this->error_reporter.fail("Cannot use function call as expression as it doesn't return a value!", n.start);
+            this->error_reporter.expected_expression(retv.entity,n);
+            // this->error_reporter.fail("Cannot use function call as expression as it doesn't return a value!", n.start);
             return error_stub();
         }
     } else {

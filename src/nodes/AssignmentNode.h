@@ -15,7 +15,6 @@ class AssignmentNode : public Node {
 public:
     Node* lvalue;
     Node* rvalue;
-    TypeNode* type;
 
     AssignmentNode& assign() override { return *this; }
 

@@ -150,7 +150,6 @@ VectorOfNodes Parser::parse_list_of_arguments() {
     if (!this->match(TokType::COMMA) && !this->match(TokType::RPAREN)) {
         this->expect_token(TokType::COMMA);
     }
-    this->expect_token(TokType::RPAREN);
     return result;
 }
 
@@ -512,6 +511,7 @@ Node* Parser::parse_call_or_subscript_chain(Node* parent) {
                 this->next();
             } else {
                 arguments = this->parse_list_of_arguments();
+                close = this->expect_token(TokType::RPAREN);
             }
             Node* old_node = node;
             node = new CallNode(node, arguments, node->start, close.end_pos);

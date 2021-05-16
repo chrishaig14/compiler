@@ -46,7 +46,9 @@ USemanticInfo Checker::visit_lvalue_subscript(SubscriptNode& node) {
         this->error_reporter.fail("Error using something that's not an object as a subscript!");
     }
     if (*child_entity.value->type != *subscript_fun->ft->param_types[0]) {
-        this->error_reporter.error_type_mismatch(*subscript_fun->ft->param_types[0], node, *child_entity.value->type);
+        this->error_reporter.error_type_mismatch(*subscript_fun->ft->param_types[0],
+                                                 *node.child[0],
+                                                 *child_entity.value->type);
         // this->error_reporter.subscript_type(*child_entity.value->type, *subscript_fun->ft->param_types[0], node);
         return error_stub();
         // this->error_reporter.fail(
@@ -142,7 +144,7 @@ USemanticInfo Checker::visit_assignment(AssignmentNode& n) {
                                                 *linfo.entity.value->type);
         if (rvalue_snode == nullptr) {
             // this->error_reporter.assignment(l_type, *exp_type, n.start, *n.lvalue, *n.rvalue);
-            this->error_reporter.error_type_mismatch(*n.type, *n.rvalue, *exp_type);
+            this->error_reporter.error_type_mismatch(l_type, *n.rvalue, *exp_type);
             return error_stub();
         }
         expression_info_p->snode = rvalue_snode;
