@@ -465,7 +465,7 @@ void ErrorReporter::class_no_method_for_op(std::string class_name, std::string m
     this->fail_ok(pre_msg, msg, position);
 }
 
-void ErrorReporter::enum_no_value(std::string enum_name, std::string value, MemberNode& node) {
+void ErrorReporter::enum_no_value(std::string enum_name, std::string value, MemberNode& node, Enum* enumm) {
     TextPosition member_start = add_one_col(node.dot_pos);
     TextPosition member_end = node.end;
     Node& obj = *node.parent;
@@ -481,4 +481,35 @@ void ErrorReporter::enum_no_value(std::string enum_name, std::string value, Memb
                       fmt::format(styles[ErrorElement::BinopRight], right_s) + post_s;
     std::string pre_msg = "Enum " + enum_name + E_FMT(" has no value ") + E_HLT("'" + value + "'");
     this->fail_ok(pre_msg, msg, node.start);
+    std::cout << "Possible values are: " << std::endl;
+    for (auto v: enumm->values) {
+        std::cout << "- " << v << std::endl;
+    }
+}
+
+void ErrorReporter::object_no_member_with_suggestions(const TypeNode& t, const std::string& member, TextPosition pos,
+                                                      Node& obj, TextPosition member_start, TextPosition member_end,
+                                                      Class* clazz) {
+    std::string pre_msg = E_FMT("Object of type ") + E_HLT(t.to_string());
+
+    std::string code_s = this->code_lines.get_line(pos.line);
+    std::string pre_s = substring(code_s, TextPosition{obj.start.line, 0}, obj.start);
+    std::string left_s = substring(code_s, obj.start, obj.end);
+    std::string middle_s = substring(code_s, obj.end, member_start);
+    std::string right_s = substring(code_s, member_start, member_end);
+    std::string post_s = substring(code_s, member_end, TextPosition{member_end.line, code_s.size()});
+
+    std::string msg = pre_s + fmt::format(styles[ErrorElement::BinopLeft], left_s) +
+                      fmt::format(styles[ErrorElement::BinopOperator], middle_s) +
+                      fmt::format(styles[ErrorElement::BinopRight], right_s) + post_s;
+
+    msg += "\n\nPossible members are:  \n";
+    for (auto m: clazz->members) {
+        msg += "- " + m.first + " : " + m.second->to_string() + "\n";
+    }
+    for (auto m: clazz->methods) {
+        msg += "- " + m.first + " : " + m.second->ft->to_string() + "\n";
+    }
+
+    this->fail_ok(pre_msg + E_FMT(" has no member ") + E_HLT("'" + member + "'"), msg, pos);
 }
