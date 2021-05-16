@@ -265,6 +265,9 @@ void Checker::fill_value(Value* value) {
     if (value->type->kind != Kind::OBJECT) {
         return;
     }
+    if (value->type->object().id.size() == 1) {
+        return;
+    }
     Flirpin flirpin = this->root_package->get(value->type->object().actual_base_path);
     if (flirpin.type == F_TYPE::ENUM) {
         value->enumm = flirpin.enumm;
@@ -345,11 +348,16 @@ USemanticInfo Checker::visit_ternary(TernaryNode& node) {
     SemanticInfo& expression_info = *expression_info_p;
     if (expression_info.entity.type != E_TYPE::VALUE || expression_info_p->entity.value->type->kind == Kind::FUNCTION) {
         this->error_reporter.fail("Unexpected non-object");
+        return error_stub();
     }
     ObjectType& expression_type = expression_info.entity.value->type->object();
 
     if (expression_type.id != "Option") {
-        this->error_reporter.fail("Expected an Option[T], got: " + expression_type.to_string());
+        this->error_reporter.error_type_mismatch(ObjectType("Option", {new ObjectType("t")}),
+                                                 *node.expression,
+                                                 expression_type);
+        // this->error_reporter.fail("Expected an Option[T], got: " + expression_type.to_string());
+        return error_stub();
     }
     SemanticInfo semanticInfo;
     // TypeNode& type = *expression_type.type_params[0];
@@ -364,9 +372,13 @@ USemanticInfo Checker::visit_ternary(TernaryNode& node) {
     USemanticInfo false_case_p = this->dispatch_rvalue(node.false_case);
     SemanticInfo& false_case = *false_case_p;
     if (*false_case.entity.value->type != *true_case.entity.value->type) {
-        this->error_reporter.fail(
-                "True case and false case type don't match: " + true_case.entity.value->type->to_string() + " != " +
-                false_case.entity.value->type->to_string());
+        this->error_reporter.error_type_mismatch(*true_case.entity.value->type,
+                                                 *node.false_case,
+                                                 *false_case.entity.value->type);
+        // this->error_reporter.fail(
+        //         "True case and false case type don't match: " + true_case.entity.value->type->to_string() + " != " +
+        //         false_case.entity.value->type->to_string());
+        return error_stub();
     }
     Value* rv = new Value(true_case.entity.value->type->clone());
     semanticInfo.entity = Entity(rv);

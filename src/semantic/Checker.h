@@ -119,7 +119,7 @@ public:
     std::pair<std::string, TypeNode*>* get_first_substitution(TypeNode& a, TypeNode& b, bool is_top_level_arg);
     TypeNode* substitute(TypeNode* t, std::string var, TypeNode* replacement);
     void unify_function_call(FunctionType& fun, VectorOfTypes& args);
-    SemanticInfo match_arguments_to_generic_function(const FunctionType& ft, VectorOfTypes arg_types);
+    std::unique_ptr<SemanticInfo> match_arguments_to_generic_function(const FunctionType& ft, VectorOfTypes arg_types);
     void fail(std::string msg);
 
 

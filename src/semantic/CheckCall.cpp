@@ -98,7 +98,8 @@ USemanticInfo Checker::visit_call(CallNode& n, bool is_rvalue) {
     if (function_type->is_generic()) {
         // mangle the generic types in function_type to prevent collisions
         mangle_generic_names(function_type);
-        retv.entity = match_arguments_to_generic_function(*function_type, arg_types).entity;
+        USemanticInfo inf = match_arguments_to_generic_function(*function_type, arg_types);
+        retv.entity = inf->entity;
     } else {
         retv.entity = entity_from_type(*function_type->return_type);
         int sni = fun_info_p->this_arg != nullptr;
@@ -108,7 +109,7 @@ USemanticInfo Checker::visit_call(CallNode& n, bool is_rvalue) {
 
             SNode* arg_rvalue_snode = this->make_rvalue(arg_entities[i], sn->arguments[sni], param_type);
             if (arg_rvalue_snode == nullptr) {
-                this->error_reporter.error_type_mismatch(param_type, *n.arguments[i],arg_type);
+                this->error_reporter.error_type_mismatch(param_type, *n.arguments[i], arg_type);
                 // this->error_reporter.function_call_type_mismatch(param_type,
                 //                                                  *n.arguments[i],
                 //                                                  arg_type,
@@ -130,7 +131,7 @@ USemanticInfo Checker::visit_call(CallNode& n, bool is_rvalue) {
     // }
     if (retv.entity.type == E_TYPE::NOTHING) {
         if (is_rvalue) {
-            this->error_reporter.expected_expression(retv.entity,n);
+            this->error_reporter.expected_expression(retv.entity, n);
             // this->error_reporter.fail("Cannot use function call as expression as it doesn't return a value!", n.start);
             return error_stub();
         }

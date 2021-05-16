@@ -104,7 +104,7 @@ bool is_generic(const TypeNode& t) {
     return false;
 }
 
-SemanticInfo Checker::match_arguments_to_generic_function(const FunctionType& ft, VectorOfTypes arg_types) {
+std::unique_ptr<SemanticInfo> Checker::match_arguments_to_generic_function(const FunctionType& ft, VectorOfTypes arg_types) {
     FunctionType* f = ft.clone();
     unify_function_call(*f, arg_types);
     for (auto at: arg_types) {
@@ -113,7 +113,7 @@ SemanticInfo Checker::match_arguments_to_generic_function(const FunctionType& ft
     SemanticInfo rv;
     rv.entity = Entity(new Value(f->return_type->clone()));
     delete f;
-    return rv;
+    return std::make_unique<SemanticInfo>(rv);
 }
 
 bool Checker::can_assign(const TypeNode& from, const TypeNode& to) {

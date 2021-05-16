@@ -275,6 +275,9 @@ void Module::fill_actual(TypeNode* t) {
 }
 
 void Module::fill_actual(ObjectType* t) {
+    if (t->id.size() == 1) {
+        return;
+    }
     if (t->is_generic_param) {
         return;
     }
