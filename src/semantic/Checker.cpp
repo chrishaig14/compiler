@@ -104,9 +104,14 @@ bool is_generic(const TypeNode& t) {
     return false;
 }
 
-std::unique_ptr<SemanticInfo> Checker::match_arguments_to_generic_function(const FunctionType& ft, VectorOfTypes arg_types) {
+std::unique_ptr<SemanticInfo>
+Checker::match_arguments_to_generic_function(const FunctionType& ft, VectorOfTypes arg_types) {
     FunctionType* f = ft.clone();
-    unify_function_call(*f, arg_types);
+    try {
+        unify_function_call(*f, arg_types);
+    } catch (...) {
+        return error_stub();
+    }
     for (auto at: arg_types) {
         delete at;
     }
@@ -272,6 +277,7 @@ bool Checker::is_variable(const ObjectType& a) {
 USemanticInfo Checker::dispatch_rvalue(Node* nod) {
     return this->dispatch_any(nod, true);
 }
+
 USemanticInfo Checker::dispatch(Node* nod) {
     return this->dispatch_any(nod, false);
 }

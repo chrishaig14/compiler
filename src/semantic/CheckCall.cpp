@@ -135,7 +135,7 @@ USemanticInfo Checker::visit_call(CallNode& n, bool is_rvalue) {
             // this->error_reporter.fail("Cannot use function call as expression as it doesn't return a value!", n.start);
             return error_stub();
         }
-    } else {
+    } else if (retv.entity.type == E_TYPE::VALUE) {
         if (retv.entity.value->type->kind == Kind::OBJECT) {
             if (retv.entity.value->type->object().id == ".None") {
                 retv.entity = Entity(E_TYPE::NOTHING);

@@ -25,10 +25,12 @@ Checker::get_first_substitution_object(ObjectType& a, ObjectType& b, bool is_top
         return new std::pair<std::string, TypeNode*>(b.object().id, a.clone());
     }
     if (a.id != b.id) {
-        this->error_reporter.fail("Error trying to unify object types " + a.to_string() + " and " + b.to_string());
+        throw std::runtime_error("Error trying to unify object types" + a.to_string() + " and " + b.to_string());
+        // this->error_reporter.fail("Error trying to unify object types " + a.to_string() + " and " + b.to_string());
     }
     if (a.type_params.size() != b.type_params.size()) {
-        this->error_reporter.fail("Error trying to unify object types " + a.to_string() + " and " + b.to_string());
+        throw std::runtime_error("Error trying to unify object types" + a.to_string() + " and " + b.to_string());
+        // this->error_reporter.fail("Error trying to unify object types " + a.to_string() + " and " + b.to_string());
     }
     for (size_t i = 0; i < a.type_params.size(); i++) {
         std::pair<std::string, TypeNode*>* u = get_first_substitution(*a.type_params[i],
@@ -93,35 +95,29 @@ void Checker::unify_function_call(FunctionType& fun, VectorOfTypes& args) {
     for (size_t i = 0; i < args.size(); i++) {
         auto param = fun.param_types[i];
         auto arg = args[i];
-        try {
-            std::pair<std::string, TypeNode*>* substitution = get_first_substitution(*param, *arg, true);
-            while (substitution != nullptr) {
-                for (size_t j = 0; j < args.size(); j++) {
-                    // if (j == i) {
-                    //     continue;
-                    // }
-                    auto old = fun.param_types[j];
-                    fun.param_types[j] = substitute(fun.param_types[j], substitution->first, substitution->second);
-                    delete old;
-                    old = args[j];
-                    args[j] = substitute(args[j], substitution->first, substitution->second);
-                    delete old;
-                }
-                auto old = fun.return_type;
-                fun.return_type = substitute(fun.return_type, substitution->first, substitution->second);
+        std::pair<std::string, TypeNode*>* substitution = get_first_substitution(*param, *arg, true);
+        while (substitution != nullptr) {
+            for (size_t j = 0; j < args.size(); j++) {
+                // if (j == i) {
+                //     continue;
+                // }
+                auto old = fun.param_types[j];
+                fun.param_types[j] = substitute(fun.param_types[j], substitution->first, substitution->second);
                 delete old;
-                std::cout << "Simple substitution: " << fun.to_string() << std::endl;
-                param = fun.param_types[i];
-                arg = args[i];
-                auto old_s = substitution;
-                substitution = get_first_substitution(*param, *arg, true);
-                delete old_s->second;
-                delete old_s;
+                old = args[j];
+                args[j] = substitute(args[j], substitution->first, substitution->second);
+                delete old;
             }
-
-
-        } catch (...) {
-            this->error_reporter.generic_call_mismatch(*param, *arg, i);
+            auto old = fun.return_type;
+            fun.return_type = substitute(fun.return_type, substitution->first, substitution->second);
+            delete old;
+            std::cout << "Simple substitution: " << fun.to_string() << std::endl;
+            param = fun.param_types[i];
+            arg = args[i];
+            auto old_s = substitution;
+            substitution = get_first_substitution(*param, *arg, true);
+            delete old_s->second;
+            delete old_s;
         }
     }
 }
