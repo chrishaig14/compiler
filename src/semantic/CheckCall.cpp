@@ -108,11 +108,12 @@ USemanticInfo Checker::visit_call(CallNode& n, bool is_rvalue) {
 
             SNode* arg_rvalue_snode = this->make_rvalue(arg_entities[i], sn->arguments[sni], param_type);
             if (arg_rvalue_snode == nullptr) {
-                this->error_reporter.function_call_type_mismatch(param_type,
-                                                                 *n.arguments[i],
-                                                                 arg_type,
-                                                                 n.arguments[i]->start,
-                                                                 n.arguments[i]->end);
+                this->error_reporter.error_type_mismatch(param_type, *n.arguments[i],arg_type);
+                // this->error_reporter.function_call_type_mismatch(param_type,
+                //                                                  *n.arguments[i],
+                //                                                  arg_type,
+                //                                                  n.arguments[i]->start,
+                //                                                  n.arguments[i]->end);
                 continue;
             }
             sn->arguments[sni] = arg_rvalue_snode;

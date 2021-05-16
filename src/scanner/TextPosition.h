@@ -8,8 +8,8 @@
 #include <string>
 
 struct TextPosition {
-    int line;
-    int column;
+    size_t line;
+    size_t column;
 };
 
 bool operator==(const TextPosition& a, const TextPosition& b);

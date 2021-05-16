@@ -4,9 +4,6 @@
 
 #include "CheckerUtils.h"
 
-static TextPosition POS_NONE = {-1, -1};
-
-
 std::string binoptype_to_str(OpType op) {
     std::string fun;
     if (op == OpType::ADD) {
@@ -43,41 +40,6 @@ Entity entity_from_type(const TypeNode& type) {
     }
     Value* fv = new Value(type.clone());
     return Entity(fv);
-}
-
-FunctionNode* generate_eq_method(std::string class_name, VectorOfTypes tp, VectorOfStrings members_ordered) {
-    auto eq_body = new BlockNode({}, POS_NONE, POS_NONE);
-    std::string eq_method_name = "eq";
-    auto eq_meth = new FunctionNode(eq_method_name,
-                                    {"other"},
-                                    {new ObjectType(class_name, tp)},
-                                    new T_BOOL,
-                                    eq_body,
-                                    POS_NONE,
-                                    POS_NONE);
-    auto cmp_node = new BoolOpNode(BoolOp::EQ,
-                                   new MemberNode(new IdNode("this", POS_NONE, POS_NONE), members_ordered[0]),
-                                   new MemberNode(new IdNode("other", POS_NONE, POS_NONE), members_ordered[0]));
-
-    for (size_t i = 1; i < members_ordered.size(); i++) {
-        cmp_node = new BoolOpNode(BoolOp::AND,
-                                  cmp_node,
-                                  new BoolOpNode(BoolOp::EQ,
-                                                 new MemberNode(new IdNode("this", POS_NONE, POS_NONE),
-                                                                members_ordered[i]),
-                                                 new MemberNode(new IdNode("other", POS_NONE, POS_NONE),
-                                                                members_ordered[i])));
-    }
-    eq_body->nodes.push_back(new ReturnNode(cmp_node));
-    return eq_meth;
-}
-
-FunctionNode* generate_str_method(std::string class_name) {
-    auto eq_body = new BlockNode({}, POS_NONE, POS_NONE);
-    std::string eq_method_name = "str";
-    auto eq_meth = new FunctionNode(eq_method_name, {}, {}, new T_STRING, eq_body, POS_NONE, POS_NONE);
-    eq_body->nodes.push_back(new ReturnNode(new StringNode("<" + class_name + " object>")));
-    return eq_meth;
 }
 
 FunctionSNode* make_class_default_init(std::string class_path, VectorOfStrings members) {

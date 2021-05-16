@@ -42,9 +42,11 @@ void ErrorReporter::fail(std::string msg, TextPosition pos) {
     }
 }
 
-void ErrorReporter::fail_ok(std::string msg, TextPosition pos) {
+void ErrorReporter::fail_ok(std::string pre_msg, std::string msg, TextPosition pos) {
     this->failed = true;
-    std::string out = this->context_string(pos) + "\n" + msg;
+    std::string out =
+            "=====================================================================\n" + this->context_string(pos) +
+            pre_msg + "\n\n" + msg + "\n\n=====================================================================\n";
     std::cout << out << std::endl;
     if (FAIL_FIRST) {
         throw std::runtime_error("Error");
@@ -95,7 +97,8 @@ void ErrorReporter::binop(Entity left, Entity right, TextPosition pos, Node* lef
     std::string msg = pre_s + fmt::format(styles[ErrorElement::BinopLeft], left_s) +
                       fmt::format(styles[ErrorElement::BinopOperator], middle_s) +
                       fmt::format(styles[ErrorElement::BinopRight], right_s) + post_s;
-    this->fail_ok(msg, pos);
+    std::string pre_msg;
+    this->fail_ok(pre_msg, msg, pos);
 }
 
 void ErrorReporter::entity_no_member(std::string pre_msg, const std::string& member, TextPosition pos, Node& obj,
@@ -110,8 +113,7 @@ void ErrorReporter::entity_no_member(std::string pre_msg, const std::string& mem
     std::string msg = pre_s + fmt::format(styles[ErrorElement::BinopLeft], left_s) +
                       fmt::format(styles[ErrorElement::BinopOperator], middle_s) +
                       fmt::format(styles[ErrorElement::BinopRight], right_s) + post_s;
-    std::string msg_f = pre_msg + E_FMT(" has no member ") + E_HLT("'" + member + "'") + "\n" + msg;
-    this->fail_ok(msg_f, pos);
+    this->fail_ok(pre_msg + E_FMT(" has no member ") + E_HLT("'" + member + "'"), msg, pos);
 }
 
 
@@ -172,10 +174,10 @@ void ErrorReporter::bool_op(Entity left, Entity right, TextPosition pos) {
 
 void ErrorReporter::assignment(const TypeNode& expected, const TypeNode& actual, TextPosition pos, const Node& lvalue,
                                const Node& rvalue) {
-    std::string msg;
-    msg = E_FMT("Expected ") + E_HLT(expected.to_string()) + E_FMT("(alias for ") + E_HLT(expected.actual_to_string()) +
-          E_FMT(")") + E_FMT(", got ") + E_HLT(actual.to_string()) + E_FMT(" (alias for ") +
-          E_HLT(actual.actual_to_string()) + E_FMT(")");
+    std::string pre_msg;
+    pre_msg = E_FMT("Expected ") + E_HLT(expected.to_string()) + E_FMT("(alias for ") +
+              E_HLT(expected.actual_to_string()) + E_FMT(")") + E_FMT(", got ") + E_HLT(actual.to_string()) +
+              E_FMT(" (alias for ") + E_HLT(actual.actual_to_string()) + E_FMT(")");
 
     std::string code_s = this->code_lines.get_line(pos.line);
     std::string pre_s = substring(code_s, TextPosition{lvalue.start.line, 0}, lvalue.start);
@@ -184,10 +186,10 @@ void ErrorReporter::assignment(const TypeNode& expected, const TypeNode& actual,
     std::string right_s = substring(code_s, rvalue.start, rvalue.end);
     std::string post_s = substring(code_s, rvalue.end, TextPosition{rvalue.end.line, code_s.size()});
 
-    std::string msg_ok = msg + "\n" + pre_s + fmt::format(styles[ErrorElement::BinopLeft], left_s) +
-                         fmt::format(styles[ErrorElement::BinopOperator], middle_s) +
-                         fmt::format(styles[ErrorElement::BinopRight], right_s) + post_s;
-    this->fail_ok(msg_ok, pos);
+    std::string msg = pre_s + fmt::format(styles[ErrorElement::BinopLeft], left_s) +
+                      fmt::format(styles[ErrorElement::BinopOperator], middle_s) +
+                      fmt::format(styles[ErrorElement::BinopRight], right_s) + post_s;
+    this->fail_ok(pre_msg, msg, pos);
 
     // this->fail(msg, pos);
 }
@@ -259,7 +261,7 @@ void ErrorReporter::tuple_member_not_immutable(const TypeNode& t, TextPosition p
 void ErrorReporter::generic_call_mismatch(const TypeNode& expected, const TypeNode& actual, int i) {
     std::string msg =
             E_FMT("Error matching argument number " + std::to_string(i) + " expected ") + E_HLT(expected.to_string()) +
-            E_FMT(" got ") + E_HLT(actual.to_string()) + "\n";
+            E_FMT(" got ") + E_HLT(actual.to_string());
     this->fail(msg, TextPosition());
 }
 
@@ -281,9 +283,8 @@ void ErrorReporter::class_no_method(const std::string& class_name, const std::st
 }
 
 void ErrorReporter::redeclared(const std::string& name, TextPosition pos) {
-    std::string msg;
-    msg = E_FMT("Variable ") + E_HLT(name) + E_FMT(" already declared ");
-    this->fail(msg, pos);
+    std::string pre_msg = E_FMT("Variable ") + E_HLT(name) + E_FMT(" already declared ");
+    this->fail_ok(pre_msg, "", pos);
 }
 
 void ErrorReporter::variable_not_declared(const std::string& name, TextPosition pos) {
@@ -292,21 +293,25 @@ void ErrorReporter::variable_not_declared(const std::string& name, TextPosition 
     this->fail(msg, pos);
 }
 
+void ErrorReporter::error_type_mismatch(const TypeNode& expected, const Node& value_node, const TypeNode& actual) {
+    std::string pre_msg = "Expected " + E_HLT(expected.to_string()) + ", got " + E_HLT(actual.to_string());
+    std::string msg = highlight_one(value_node);
+    this->fail_ok(pre_msg, msg, value_node.start);
+}
+
 void ErrorReporter::function_call_type_mismatch(const TypeNode& expected, const Node& arg, const TypeNode& actual,
                                                 TextPosition pos, TextPosition end) {
-    std::string msg;
-    msg = E_FMT(" Function call type mismatch") + E_FMT(" expected ") + E_HLT(expected.to_string()) +
-          E_FMT(" but got ") + E_HLT(actual.to_string()) + E_FMT(" (alias for ") + E_HLT(actual.to_string()) +
-          E_FMT(")") + "\n";
-    msg += highlight_one(arg);
-    this->fail_ok(msg, pos);
-    // this->fail(msg, pos);
+    std::string pre_msg = E_FMT(" Function call type mismatch") + E_FMT(" expected ") + E_HLT(expected.to_string()) +
+                          E_FMT(" but got ") + E_HLT(actual.to_string()) + E_FMT(" (alias for ") +
+                          E_HLT(actual.to_string()) + E_FMT(")");
+    std::string msg = highlight_one(arg);
+    this->fail_ok(pre_msg, msg, pos);
 }
 
 void ErrorReporter::unused_return_value(TextPosition pos) {
-    std::string msg;
-    msg = E_FMT("Unused return value of function call");
-    this->fail(msg, pos);
+    std::string pre_msg = E_FMT("Unused return value of function call");
+    std::string msg = this->code_lines.get_line(pos.line);
+    this->fail_ok(pre_msg, msg, pos);
 }
 
 void ErrorReporter::function_call_num_args(FunctionType& ft, TextPosition pos) {
@@ -336,26 +341,14 @@ std::string ErrorReporter::highlight_two(ErrorElement fe, const Node& f, ErrorEl
 }
 
 void ErrorReporter::call_not_a_function(const CallNode& node) {
-    std::string msg;
-    msg = E_HLT(text_pos_to_string(this->__file__, node.start)) + E_FMT(" Calling something that's not a function") +
-          "\n";
-    // this->fail(msg, pos);
+    std::string pre_msg;
+    pre_msg = E_FMT(" Calling something that's not a function");
 
-    // std::string code_s = this->code_lines.get_line(node.start.line);
-    // std::string pre_s = substring(code_s, TextPosition{left_n->start.line, 0}, left_n->start);
-    // std::string left_s = substring(code_s, node.function->start, node.function->end);
-    // std::string middle_s = substring(code_s, left_n->end, right_n->start);
-    // std::string right_s = substring(code_s, right_n->start, right_n->end);
-    // std::string post_s = substring(code_s, right_n->end, TextPosition{right_n->end.line, code_s.size()});
-    //
-    // std::string msg = pre_s + fmt::format(styles[ErrorElement::BinopLeft], left_s) +
-    //                   fmt::format(styles[ErrorElement::BinopOperator], middle_s) +
-    //                   fmt::format(styles[ErrorElement::BinopRight], right_s) + post_s;
-    msg += this->highlight_two(ErrorElement::BinopLeft,
-                               *node.function,
-                               ErrorElement::BinopRight,
-                               IdNode("", node.function->end, node.end));
-    this->fail_ok(msg, node.start);
+    std::string msg = this->highlight_two(ErrorElement::BinopLeft,
+                                          *node.function,
+                                          ErrorElement::BinopRight,
+                                          IdNode("", node.function->end, node.end));
+    this->fail_ok(pre_msg, msg, node.start);
 }
 
 void ErrorReporter::class_init_bad_member_type(const TypeNode& cls, const TypeNode& expected, const TypeNode& actual,
@@ -373,11 +366,11 @@ void ErrorReporter::class_not_found(const TypeNode& cls, TextPosition pos) {
 }
 
 void ErrorReporter::list_literal(const TypeNode& lt, const TypeNode& et, TextPosition pos, const Node& ell) {
-    std::string msg;
-    msg = E_FMT("List literal with element of wrong type, expected ") + E_HLT(lt.to_string()) + E_FMT(" got ") +
-          E_HLT(et.to_string()) + "\n";
-    msg += this->highlight_one(ell);
-    this->fail_ok(msg, pos);
+    std::string pre_msg;
+    pre_msg = E_FMT("List literal with element of wrong type, expected ") + E_HLT(lt.to_string()) + E_FMT(" got ") +
+              E_HLT(et.to_string());
+    std::string msg = this->highlight_one(ell);
+    this->fail_ok(pre_msg, msg, pos);
 }
 
 void ErrorReporter::function_return_last_stmt(const std::string& function_name, const TypeNode& et, TextPosition pos) {
@@ -424,11 +417,11 @@ void ErrorReporter::class_init_member_not_init(const std::string& cls, std::stri
     this->fail(msg, pos);
 }
 
-void ErrorReporter::subscript_type(const TypeNode& t, const TypeNode& s, const TypeNode& es, TextPosition pos) {
-    std::string msg;
-    msg = E_FMT("Expected ") + E_HLT(es.to_string()) + E_FMT(" in ") + E_HLT(t.to_string()) +
-          E_FMT(" subscript, but got ") + E_HLT(s.to_string());
-    this->fail(msg, pos);
+void ErrorReporter::subscript_type(const TypeNode& t, const TypeNode& s, const SubscriptNode& n) {
+    std::string pre_msg;
+    pre_msg = E_FMT("Expected ") + E_HLT(s.to_string()) + E_FMT(" in subscript, but got ") + E_HLT(s.to_string());
+    std::string msg = this->highlight_one(*n.child[0]);
+    this->fail_ok(pre_msg, msg, n.start);
 }
 
 std::string ErrorReporter::context_string(TextPosition position) {
@@ -481,8 +474,34 @@ void ErrorReporter::expected_expression_with_type(Entity entity, TypeNode& exp_e
     this->fail(msg, pos);
 }
 
-void ErrorReporter::expected_expression(Entity entity, TextPosition pos) {
-    std::string msg;
-    msg = E_FMT("Expected expression") + E_FMT(", but got " + entity_to_string(entity));
-    this->fail(msg, pos);
+void ErrorReporter::expected_expression(Entity entity, const Node& pos) {
+    std::string pre_msg;
+    pre_msg = E_FMT("Expected expression");
+    std::string msg = this->highlight_one(pos);
+    this->fail_ok(pre_msg, msg, pos.start);
+}
+
+void ErrorReporter::class_no_method_for_op(std::string class_name, std::string method_name, TextPosition position) {
+    std::string pre_msg = E_FMT("Class ") + E_HLT(class_name) + " does not define static method " + E_HLT(method_name) +
+                          " needed for this operation";
+    std::string msg = this->code_lines.get_line(position.line);
+    this->fail_ok(pre_msg, msg, position);
+}
+
+void ErrorReporter::enum_no_value(std::string enum_name, std::string value, MemberNode& node) {
+    TextPosition member_start = add_one_col(node.dot_pos);
+    TextPosition member_end = node.end;
+    Node& obj = *node.parent;
+    std::string code_s = this->code_lines.get_line(node.start.line);
+    std::string pre_s = substring(code_s, TextPosition{obj.start.line, 0}, obj.start);
+    std::string left_s = substring(code_s, obj.start, obj.end);
+    std::string middle_s = substring(code_s, obj.end, member_start);
+    std::string right_s = substring(code_s, member_start, member_end);
+    std::string post_s = substring(code_s, member_end, TextPosition{member_end.line, code_s.size()});
+
+    std::string msg = pre_s + fmt::format(styles[ErrorElement::BinopLeft], left_s) +
+                      fmt::format(styles[ErrorElement::BinopOperator], middle_s) +
+                      fmt::format(styles[ErrorElement::BinopRight], right_s) + post_s;
+    std::string pre_msg = "Enum " + enum_name + E_FMT(" has no value ") + E_HLT("'" + value + "'");
+    this->fail_ok(pre_msg, msg, node.start);
 }

@@ -27,13 +27,8 @@ public:
 
     MemberNode(Node* parent, const std::string& child, TextPosition start, TextPosition end);
 
-    MemberNode(Node* parent, const std::string& child) : MemberNode(parent, child, {-1, 1}, {-1, 1}) {
-    }
 
     MemberNode(Node* parent, int child, TextPosition start, TextPosition end);
-
-    MemberNode(Node* parent, int child) : MemberNode(parent, child, {-1, 1}, {-1, 1}) {
-    }
 
     bool equal(const Node& x) const override;
 

@@ -185,7 +185,7 @@ USemanticInfo Checker::enum_member(Enum* enumm, std::string value, MemberNode& n
             return std::make_unique<SemanticInfo>(info);
         }
     }
-    this->error_reporter.fail("Error enum " + enumm->enumm_name + " has no value " + value);
+    this->error_reporter.enum_no_value(enumm->enumm_name, value, node);
     return error_stub();
 }
 

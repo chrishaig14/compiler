@@ -121,11 +121,12 @@ USemanticInfo Checker::check_declaration_with_type(DeclarationNode& n) {
 
     SNode* rvalue_snode = this->make_rvalue(exp_info_p->entity, exp_info_p->snode, *n.type);
     if (rvalue_snode == nullptr) {
-        this->error_reporter.assignment(*n.type,
-                                        *exp_info_p->entity.value->type,
-                                        n.eq_pos,
-                                        IdNode("asd", n.start, TextPosition{n.eq_pos.line, n.eq_pos.column - 1}),
-                                        *n.expression);
+        this->error_reporter.error_type_mismatch(*n.type, *n.expression, *exp_info_p->entity.value->type);
+        // this->error_reporter.assignment(*n.type,
+        //                                 *exp_info_p->entity.value->type,
+        //                                 n.eq_pos,
+        //                                 IdNode("asd", n.start, TextPosition{n.eq_pos.line, n.eq_pos.column - 1}),
+        //                                 *n.expression);
         return error_stub();
     }
     sn->expression = rvalue_snode;
@@ -137,14 +138,14 @@ USemanticInfo Checker::check_declaration_with_type(DeclarationNode& n) {
 USemanticInfo Checker::check_declaration_without_type(DeclarationNode& n) {
     USemanticInfo exp_info_p = this->dispatch(n.expression);
     if (exp_info_p->entity.type == E_TYPE::ERROR) {
-        std::cout
-                << "Ignoring all subsequent errors involving variable '" + n.identifier + "' as type cannot be inferred"
-                << std::endl;
+        // std::cout
+        //         << "Ignoring all subsequent errors involving variable '" + n.identifier + "' as type cannot be inferred"
+        //         << std::endl;
         return error_stub();
     }
     E_TYPE entity_type = exp_info_p->entity.type;
     if (entity_type != E_TYPE::CONST_FUNCTION && entity_type != E_TYPE::VALUE) {
-        this->error_reporter.expected_expression(exp_info_p->entity, n.start);
+        this->error_reporter.expected_expression(exp_info_p->entity, *n.expression);
         return error_stub();
     }
     SemanticInfo info;

@@ -16,9 +16,6 @@ public:
     std::string str;
     StringNode(std::string str, TextPosition start, TextPosition end);
 
-    StringNode(std::string str) : StringNode(str, {-1, -1}, {-1, -1}) {
-    }
-
     bool equal(const Node& x) const override;
 
     StringNode& strng() override;

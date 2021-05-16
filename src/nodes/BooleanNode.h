@@ -13,9 +13,6 @@ class BooleanNode : public Node {
 public:
     bool value;
 
-    BooleanNode(bool value) : BooleanNode(value, {-1, -1}, {-1, -1}) {
-    }
-
     BooleanNode(bool value, TextPosition start, TextPosition end);
 
     bool operator!=(const BooleanNode& other) const;

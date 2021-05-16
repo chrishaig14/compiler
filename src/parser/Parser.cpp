@@ -13,8 +13,6 @@
 #include <fmt/color.h>
 #include <exception>
 
-static TextPosition POS_NONE = {-1, -1};
-
 std::string highlight(size_t column, size_t length) {
     return fmt::format(fmt::fg(fmt::color::orange_red), std::string(column, ' ') + std::string(length, '^'));
 }
@@ -66,7 +64,7 @@ BlockNode* Parser::parse_program() {
     while (this->token.type != TokType::END) {
         program.push_back(this->parse_top_level_statement());
     }
-    return new BlockNode(program, POS_NONE, POS_NONE);
+    return new BlockNode(program, {1, 1}, {100, 100});
 }
 
 ReturnNode* Parser::parse_return() {
@@ -96,7 +94,7 @@ IfNode* Parser::parse_if() {
         this->next();
         _else = this->parse_possibly_empty_block();
     }
-    IfNode* iff = new IfNode(condition, body, elifs, _else, if_tok.start, POS_NONE);
+    IfNode* iff = new IfNode(condition, body, elifs, _else, if_tok.start, if_tok.end_pos);
     iff->start = if_tok.start;
     return iff;
 }
@@ -110,7 +108,7 @@ Node* Parser::parse_list_literal() {
         // parse required type annotation (cannot infer type of empty list
         this->expect_token(TokType::DOUBLE_COLON);
         TypeNode* type = this->parse_type_node();
-        Node* node = new EmptyListNode(type, list_start.start, POS_NONE);
+        Node* node = new EmptyListNode(type, list_start.start, list_start.end_pos);
         return node;
     }
     while (true) {
@@ -465,12 +463,14 @@ Node* Parser::parse_tuple_or_constructor() {
 
 Node* Parser::parse_tuple_literal() {
     // Token hash_tok = this->expect_token(TokType::HASH);
-    this->expect_token(TokType::LPAREN);
+    Token st = this->expect_token(TokType::LPAREN);
     // it's a tuple
     // this->next();
     VectorOfNodes values;
     if (this->match(TokType::RPAREN)) {
-        this->error_empty_tuple(POS_NONE);
+        // this->error_empty_tuple(POS_NONE);
+        throw std::runtime_error("EMPTY TUPLE!");
+
     }
     bool first = true;
     while (true) {
@@ -482,13 +482,13 @@ Node* Parser::parse_tuple_literal() {
             continue;
         } else {
             if (first && this->match(TokType::RPAREN)) {
-                this->error_tuple_one_element(POS_NONE);
+                throw std::runtime_error("tuple on element!");
             }
             break;
         }
     }
     Token close = this->expect_token(TokType::RPAREN);
-    return new TupleNode(values, POS_NONE, close.end_pos);
+    return new TupleNode(values, st.start, close.end_pos);
 }
 
 Node* Parser::parse_id_or_class_literal() {

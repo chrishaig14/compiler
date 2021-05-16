@@ -151,10 +151,7 @@ USemanticInfo Checker::visit_partial(PartialApplication& node) {
             USemanticInfo arg = this->dispatch(node.args[i]);
             ObjectType* arg_ot = &arg->entity.value->type->object();
             if (*arg_ot != *param_type) {
-                this->error_reporter.partial_function_call_type_mismatch(*param_type,
-                                                                         *arg_ot,
-                                                                         node.args[i]->start,
-                                                                         node.args[i]->end);
+                this->error_reporter.error_type_mismatch(*param_type, *node.args[i], *arg_ot);
                 return error_stub();
             }
             snodes.push_back(arg->snode);
@@ -184,20 +181,27 @@ USemanticInfo Checker::visit_dict(DictNode& node) {
 
     std::vector<std::pair<SNode*, SNode*>> items;
     items = {{first_key_info->snode, first_value_info->snode}};
-
+    bool has_error = false;
     for (size_t i = 1; i < node.items.size(); i++) {
         USemanticInfo key_info = this->dispatch(node.items[i].first);
         USemanticInfo value_info = this->dispatch(node.items[i].second);
         ObjectType& key_type = key_info->entity.value->type->object();
         ObjectType& value_type = value_info->entity.value->type->object();
         if (key_type != first_key_type) {
-            this->error_reporter.fail("Second key type different to first");
+            this->error_reporter.error_type_mismatch(first_key_type, *node.items[i].first, key_type);
+            // this->error_reporter.fail("Second key type different to first");
+            has_error = true;
         }
         if (value_type != first_value_type) {
-            this->error_reporter.fail("Second value type different to first");
+            // this->error_reporter.fail("Second value type different to first");
+            this->error_reporter.error_type_mismatch(first_value_type, *node.items[i].first, value_type);
+            has_error = true;
         }
         items.push_back(std::make_pair(key_info->snode, value_info->snode));
     }
+    // if (has_error) {
+    //     return error_stub();
+    // }
     Value* ov = new Value(new ObjectType("Dict", {first_key_type.clone(), first_value_type.clone()}));
     this->module->fill_actual(ov->type);
     this->fill_value(ov);

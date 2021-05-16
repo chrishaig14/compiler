@@ -23,7 +23,8 @@ public:
     ErrorReporter();
 
     CodeLines code_lines;
-    void assignment(const TypeNode& expected, const TypeNode& actual, TextPosition pos, const Node& lvalue, const Node& rvalue);
+    void assignment(const TypeNode& expected, const TypeNode& actual, TextPosition pos, const Node& lvalue,
+                    const Node& rvalue);
     void bad_return(TextPosition pos);
     void binop(const TypeNode& left, const TypeNode& right, TextPosition position);
     void bool_op(const TypeNode& left, const TypeNode& right, TextPosition position);
@@ -64,7 +65,7 @@ public:
                                              TextPosition end);
     void generic_class_wrong_type_param_number(const std::string& cls, int num_req, int num_given, TextPosition pos);
     void class_init_wrong_number_init(const std::string& cls, int num_req, int num_given, TextPosition pos);
-    void subscript_type(const TypeNode& t, const TypeNode& s, const TypeNode& es, TextPosition pos);
+    void subscript_type(const TypeNode& t, const TypeNode& s, const SubscriptNode& n);
     void class_not_generic(const std::string& cls, TextPosition pos);
     void function_doesnt_return_a_value(TextPosition pos, const TypeNode* expected_type);
     void class_init_member_not_init(const std::string& cls, std::string mem, TextPosition pos);
@@ -86,12 +87,12 @@ public:
     void match_type(Entity entity, TextPosition pos);
     void condition(Entity entity, TextPosition pos, const std::string& st);
     void expected_expression_with_type(Entity entity, TypeNode& exp_entity, TextPosition pos);
-    void expected_expression(Entity entity, TextPosition pos);
+    void expected_expression(Entity entity, const Node& pos);
     void _for(Entity t, TextPosition pos);
     void bool_op(Entity left, Entity right, TextPosition pos);
     void binop(Entity left, Entity right, TextPosition pos, Node* left_n, Node* right_n);
     void fail_highlight(std::string msg);
-    void fail_ok(std::string msg, TextPosition pos);
+    void fail_ok(std::string pre_msg,std::string msg, TextPosition pos);
     void call_not_a_function(const CallNode& node);
     std::string highlight_two(ErrorElement fe, const Node& f, ErrorElement se, const Node& s);
     std::string highlight_one(const Node& f);
@@ -107,6 +108,9 @@ public:
                           TextPosition member_start, TextPosition member_end);
     void package_no_member(std::string pack_name, const std::string& member, TextPosition pos, Node& obj,
                            TextPosition member_start, TextPosition member_end);
+    void error_type_mismatch(const TypeNode& expected, const Node& value_node, const TypeNode& actual);
+    void class_no_method_for_op(std::string class_name, std::string method_name, TextPosition position);
+    void enum_no_value(std::string enum_name, std::string value, MemberNode& node);
 };
 
 

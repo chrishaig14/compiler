@@ -46,9 +46,12 @@ USemanticInfo Checker::visit_lvalue_subscript(SubscriptNode& node) {
         this->error_reporter.fail("Error using something that's not an object as a subscript!");
     }
     if (*child_entity.value->type != *subscript_fun->ft->param_types[0]) {
-        this->error_reporter.fail(
-                "Error subscript type is " + child_entity.value->type->to_string() + " but should be " +
-                subscript_fun->ft->param_types[0]->to_string());
+        this->error_reporter.error_type_mismatch(*subscript_fun->ft->param_types[0], node, *child_entity.value->type);
+        // this->error_reporter.subscript_type(*child_entity.value->type, *subscript_fun->ft->param_types[0], node);
+        return error_stub();
+        // this->error_reporter.fail(
+        //         "Error subscript type is " + child_entity.value->type->to_string() + " but should be " +
+        //         subscript_fun->ft->param_types[0]->to_string());
     }
     SemanticInfo info;
     info.entity = Entity(new Value((ObjectType*) rtype));
@@ -108,6 +111,7 @@ USemanticInfo Checker::visit_assignment(AssignmentNode& n) {
     }
     if (linfo_p->entity.type == E_TYPE::VALUE && linfo_p->entity.value->type->kind == Kind::OBJECT &&
         expression_info_p->entity.type == E_TYPE::CONST_FUNCTION) {
+        // this->error_reporter.error_type_mismatch(*n.type, *n.rvalue, *expression_info_p_info_p->entity.value->type);
         this->error_reporter.assignment(*linfo_p->entity.value->type,
                                         *expression_info_p->entity.value->type,
                                         n.rvalue->start,
@@ -137,7 +141,9 @@ USemanticInfo Checker::visit_assignment(AssignmentNode& n) {
                                                 expression_info_p->snode,
                                                 *linfo.entity.value->type);
         if (rvalue_snode == nullptr) {
-            this->error_reporter.assignment(l_type, *exp_type, n.start, *n.lvalue, *n.rvalue);
+            // this->error_reporter.assignment(l_type, *exp_type, n.start, *n.lvalue, *n.rvalue);
+            this->error_reporter.error_type_mismatch(*n.type, *n.rvalue, *exp_type);
+            return error_stub();
         }
         expression_info_p->snode = rvalue_snode;
     }

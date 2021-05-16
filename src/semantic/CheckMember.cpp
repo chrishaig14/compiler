@@ -15,9 +15,15 @@ USemanticInfo Checker::visit_member(MemberNode& n) {
         }
         size_t tuple_size = ot->type_params.size();
         if (n.n_child > tuple_size || n.n_child == 0) {
-            this->error_reporter.fail(
-                    "Tuple member out of range, has " + std::to_string(tuple_size) + " but required " +
-                    std::to_string(n.n_child));
+            this->error_reporter.object_no_member(*ot,
+                                                  std::to_string(n.n_child),
+                                                  n.start,
+                                                  *n.parent,
+                                                  add_one_col(n.dot_pos),
+                                                  n.end);
+            // this->error_reporter.fail(
+            //         "Tuple member out of range, has " + std::to_string(tuple_size) + " but required " +
+            //         std::to_string(n.n_child));
             return error_stub();
         }
         SemanticInfo info;
@@ -34,11 +40,22 @@ USemanticInfo Checker::visit_member(MemberNode& n) {
         case E_TYPE::CLASS:
             return this->class_member(parent_entity.clazz, n.s_child, n);
         case E_TYPE::CONST_FUNCTION:
-            this->error_reporter.function_no_member(n.dot_pos);
+            this->error_reporter.object_no_member(*parent_entity.const_function->ft,
+                                                  n.s_child,
+                                                  n.start,
+                                                  *n.parent,
+                                                  add_one_col(n.dot_pos),
+                                                  n.end);
+            // this->error_reporter.function_no_member(n.dot_pos);
             break;
         case E_TYPE::VALUE:
             if (parent_entity.value->type->kind == Kind::FUNCTION) {
-                this->error_reporter.function_no_member(n.dot_pos);
+                this->error_reporter.object_no_member(*parent_entity.value->type,
+                                                      n.s_child,
+                                                      n.start,
+                                                      *n.parent,
+                                                      add_one_col(n.dot_pos),
+                                                      n.end);
                 return error_stub();
             }
             return this->object_member(parent_info->snode, parent_entity.value, n.s_child, n);

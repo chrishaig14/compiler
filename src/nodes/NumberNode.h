@@ -20,10 +20,6 @@ public:
 
     NumberNode(NumberType num_type, std::string str, TextPosition start, TextPosition end);
 
-    NumberNode(NumberType num_type, std::string str) : NumberNode(num_type, str, {-1, -1}, {-1, -1}) {
-    }
-
-
     bool equal(const Node& x) const override;
 
     NumberNode& number() override;

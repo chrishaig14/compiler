@@ -54,6 +54,7 @@ USemanticInfo Checker::visit_boolop(BoolOpNode& n) {
         return error_stub();
     }
     if (left_info_p->entity.type != E_TYPE::VALUE || right_info_p->entity.type != E_TYPE::VALUE) {
+
         this->error_reporter.bool_op(left_info_p->entity, right_info_p->entity, n.start);
         // this->error_reporter.fail("Can't have binop between 2 non objects!");
     }
@@ -61,7 +62,10 @@ USemanticInfo Checker::visit_boolop(BoolOpNode& n) {
     const TypeNode& ltype = *get_entity_type(left_info_p->entity);
     const TypeNode& rtype = *get_entity_type(right_info_p->entity);
     if (ltype != rtype) {
-        this->error_reporter.binop(left_info_p->entity, right_info_p->entity, n.start, n.left, n.right);
+        this->error_reporter.error_type_mismatch(*left_info_p->entity.value->type,
+                                                 *n.right,
+                                                 *right_info_p->entity.value->type);
+        // this->error_reporter.binop(left_info_p->entity, right_info_p->entity, n.start, n.left, n.right);
         return error_stub();
     }
 
@@ -191,13 +195,19 @@ USemanticInfo Checker::visit_binop(BinopNode& n) {
         return error_stub();
     }
     if (left_info_p->entity.type != E_TYPE::VALUE || right_info_p->entity.type != E_TYPE::VALUE) {
-        this->error_reporter.binop(left_info_p->entity, right_info_p->entity, n.op_pos, n.left, n.right);
+        this->error_reporter.error_type_mismatch(*left_info_p->entity.value->type,
+                                                 *n.right,
+                                                 *right_info_p->entity.value->type);
+        // this->error_reporter.binop(left_info_p->entity, right_info_p->entity, n.op_pos, n.left, n.right);
         return error_stub();
     }
     const TypeNode& ltype = *get_entity_type(left_info_p->entity);
     const TypeNode& rtype = *get_entity_type(right_info_p->entity);
     if (ltype != rtype) {
-        this->error_reporter.binop(left_info_p->entity, right_info_p->entity, n.op_pos, n.left, n.right);
+        // this->error_reporter.binop(left_info_p->entity, right_info_p->entity, n.op_pos, n.left, n.right);
+        this->error_reporter.error_type_mismatch(*left_info_p->entity.value->type,
+                                                 *n.right,
+                                                 *right_info_p->entity.value->type);
         return error_stub();
         // this->error_reporter.fail("Binary operation between values of different types: " + ltype.to_string() + " and " +
         //                          rtype.to_string());
@@ -239,7 +249,7 @@ USemanticInfo Checker::visit_binop(BinopNode& n) {
     assert(cls != nullptr);
     auto operator_fun_it = cls->static_methods.find(fun);
     if (operator_fun_it == cls->static_methods.end()) {
-        this->error_reporter.class_no_method(cls->class_name, fun, n.op_pos);
+        this->error_reporter.class_no_method_for_op(cls->class_name, fun, n.op_pos);
         return error_stub();
     }
     ConstFunction* operator_fun = operator_fun_it->second;
@@ -305,9 +315,14 @@ USemanticInfo Checker::visit_subscript(SubscriptNode& node) {
         this->error_reporter.fail("Error using something that's not an object as a subscript!");
     }
     if (*child_entity.value->type != *subscript_fun->ft->param_types[0]) {
-        this->error_reporter.fail(
-                "Error subscript type is " + child_entity.value->type->to_string() + " but should be " +
-                subscript_fun->ft->param_types[0]->to_string());
+        this->error_reporter.error_type_mismatch(*subscript_fun->ft->param_types[0],
+                                                 *node.child[0],
+                                                 *child_entity.value->type);
+        // this->error_reporter.subscript_type(*child_entity.value->type, *subscript_fun->ft->param_types[0], node);
+        // this->error_reporter.fail(
+        //         "Error subscript type is " + child_entity.value->type->to_string() + " but should be " +
+        //         subscript_fun->ft->param_types[0]->to_string());
+        return error_stub();
     }
     SemanticInfo info;
 
