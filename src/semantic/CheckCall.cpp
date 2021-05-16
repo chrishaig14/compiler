@@ -98,7 +98,10 @@ USemanticInfo Checker::visit_call(CallNode& n, bool is_rvalue) {
     if (function_type->is_generic()) {
         // mangle the generic types in function_type to prevent collisions
         mangle_generic_names(function_type);
-        USemanticInfo inf = match_arguments_to_generic_function(*function_type, arg_types);
+        USemanticInfo inf = this->match_arguments_to_generic_function(*function_type, arg_types);
+        if (inf->entity.type == E_TYPE::ERROR) {
+            std::cout << "ERRORR CANNOT CALL " << std::endl;
+        }
         retv.entity = inf->entity;
     } else {
         retv.entity = entity_from_type(*function_type->return_type);

@@ -110,6 +110,11 @@ Checker::match_arguments_to_generic_function(const FunctionType& ft, VectorOfTyp
     try {
         unify_function_call(*f, arg_types);
     } catch (...) {
+        std::string sss = "ERROR CANNOT UNIFY " + ft.to_string() + " WITH ARGS";
+        for (auto at: arg_types) {
+            sss += at->to_string() + ", ";
+        }
+        this->error_reporter.fail(sss);
         return error_stub();
     }
     for (auto at: arg_types) {

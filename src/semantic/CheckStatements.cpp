@@ -188,9 +188,12 @@ USemanticInfo Checker::visit_return(ReturnNode& n) {
     }
 
     USemanticInfo expression_info_p = this->dispatch_rvalue(n.expression);
+    if (expression_info_p->entity.type == E_TYPE::ERROR) {
+        return error_stub();
+    }
     SNode* exp_snode = make_rvalue(expression_info_p->entity, expression_info_p->snode, *return_type);
     if (exp_snode == nullptr) {
-        this->error_reporter.return_mismatch(*return_type, *expression_info_p->entity.value->type, n.start);
+        this->error_reporter.error_type_mismatch(*return_type, *n.expression, *expression_info_p->entity.value->type);
         return error_stub();
     }
     sn->expression = exp_snode;
