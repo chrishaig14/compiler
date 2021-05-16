@@ -8,29 +8,26 @@
 USemanticInfo Checker::visit_member(MemberNode& n) {
     USemanticInfo parent_info = this->dispatch(n.parent);
     Entity parent_entity = parent_info->entity;
-    if (n.type == MemberType::NUM) {
-        ObjectType* ot = &parent_entity.value->type->object();
-        if (ot->id != "Tuple") {
-            this->error_reporter.fail("Integer member of not a Tuple!");
-        }
-        size_t tuple_size = ot->type_params.size();
-        if (n.n_child > tuple_size || n.n_child == 0) {
-            this->error_reporter.object_no_member(*ot, n);
-            // this->error_reporter.fail(
-            //         "Tuple member out of range, has " + std::to_string(tuple_size) + " but required " +
-            //         std::to_string(n.n_child));
-            return error_stub();
-        }
-        SemanticInfo info;
-        ObjectMemberSNode* omsn = new ObjectMemberSNode();
-        info.snode = omsn;
-        omsn->object = parent_info->snode;
-        omsn->member_name = "mem_" + std::to_string(n.n_child);
-        omsn->class_path = ot->actual_base_path;
-        Value* ov = new Value(ot->type_params[n.n_child - 1]->clone());
-        info.entity = Entity(ov);
-        return std::make_unique<SemanticInfo>(info);
-    }
+    // if (n.type == MemberType::NUM) {
+    //     ObjectType* ot = &parent_entity.value->type->object();
+    //     if (ot->id != "Tuple") {
+    //         this->error_reporter.fail("Integer member of not a Tuple!");
+    //     }
+    //     size_t tuple_size = ot->type_params.size();
+    //     if (n.n_child > tuple_size || n.n_child == 0) {
+    //         this->error_reporter.object_no_member(*ot, n);
+    //         return error_stub();
+    //     }
+    //     SemanticInfo info;
+    //     ObjectMemberSNode* omsn = new ObjectMemberSNode();
+    //     info.snode = omsn;
+    //     omsn->object = parent_info->snode;
+    //     omsn->member_name = "mem_" + std::to_string(n.n_child);
+    //     omsn->class_path = ot->actual_base_path;
+    //     Value* ov = new Value(ot->type_params[n.n_child - 1]->clone());
+    //     info.entity = Entity(ov);
+    //     return std::make_unique<SemanticInfo>(info);
+    // }
     switch (parent_entity.type) {
         case E_TYPE::CLASS:
             return this->class_member(parent_entity.clazz, n.s_child, n);

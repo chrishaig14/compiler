@@ -13,12 +13,10 @@ MemberNode::MemberNode(Node* parent, Token child_token) : Node(NodeType::MEMBER,
             this->s_child = child_token.str;
             break;
         case TokType::INTEGER:
-            this->type = MemberType::NUM;
-            this->n_child = std::atoi(child_token.str.c_str());
+            this->type = MemberType::STR;
+            this->s_child = child_token.str;
             break;
     }
-    this->type = MemberType::STR;
-
     this->is_class_static_member = false;
 }
 

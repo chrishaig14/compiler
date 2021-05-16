@@ -108,8 +108,17 @@ USemanticInfo Checker::visit_tuple(TupleNode& node) {
     SemanticInfo sinfo;
     ObjectType* otype = new ObjectType("Tuple", types);
     Value* ov = new Value(otype);
+    ov->metatype = Meta::CLASS;
     sinfo.entity = Entity(ov);
 
+    ov->clazz = new Class();
+    for (int i = 0; i < ov->type->object().type_params.size(); i++) {
+        Value* tv = new Value(ov->type->object().type_params[i]->clone());
+        this->fill_value(tv);
+        const std::string& mem_name = std::to_string(i + 1);
+        ov->clazz->member_entities[mem_name] = Entity(tv);
+        ov->clazz->members[mem_name] = tv->type->clone();
+    }
     unsigned long num_values = node.values.size();
     otype->actual_base_path = Path("core.Tuple" + std::to_string(num_values));
     NewObjectSNode* nosn = new NewObjectSNode();
