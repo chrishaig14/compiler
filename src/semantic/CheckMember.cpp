@@ -60,7 +60,12 @@ USemanticInfo Checker::visit_member(MemberNode& n) {
 
 USemanticInfo Checker::module_member(Module* mod, std::string child, MemberNode& n) {
     if (mod->flirpins.count(child) == 0) {
-        this->error_reporter.module_no_member(mod, child, n.dot_pos, *n.parent, add_one_col(n.dot_pos), n.end);
+        this->error_reporter.module_no_member(mod,
+                                              child,
+                                              n.dot_pos,
+                                              *n.parent,
+                                              n.child_token.start,
+                                              n.child_token.end_pos);
         return error_stub();
     }
     Flirpin flirpin = mod->flirpins[child];
@@ -84,6 +89,7 @@ USemanticInfo Checker::object_member(SNode* object_snode, Value* pValue, std::st
         // is a single type param, error
         this->error_reporter.fail(
                 "Error: no member " + child + " in totally generic type " + pValue->type->to_string());
+        return error_stub();
     }
     if (object_type_path.as_str() == "core.Union") {
         this->error_reporter.object_no_member(*pValue->type, n);
@@ -91,6 +97,7 @@ USemanticInfo Checker::object_member(SNode* object_snode, Value* pValue, std::st
     }
     if (pValue->metatype == Meta::ENUM) {
         this->error_reporter.object_no_member(*pValue->type, n);
+        return error_stub();
     }
     Class* clazz = pValue->clazz;
     assert(clazz != nullptr);
@@ -146,7 +153,12 @@ USemanticInfo Checker::object_member(SNode* object_snode, Value* pValue, std::st
 
 USemanticInfo Checker::package_member(Package* package, std::string child, MemberNode& n) {
     if (package->units.count(child) == 0) {
-        this->error_reporter.package_no_member(package, child, n.dot_pos, *n.parent, add_one_col(n.dot_pos), n.end);
+        this->error_reporter.package_no_member(package,
+                                               child,
+                                               n.dot_pos,
+                                               *n.parent,
+                                               n.child_token.start,
+                                               n.child_token.end_pos);
         return error_stub();
     }
     Unit unit = package->units[child];

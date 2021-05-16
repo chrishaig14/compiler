@@ -4,16 +4,23 @@
 
 #include "MemberNode.h"
 
-MemberNode::MemberNode(Node* parent, const std::string& child, TextPosition start, TextPosition end) : Node(NodeType::MEMBER, start, end),parent(parent), s_child(child) {
+MemberNode::MemberNode(Node* parent, Token child_token) : Node(NodeType::MEMBER, parent->start, child_token.end_pos),
+                                                          parent(parent) {
+    this->child_token = child_token;
+    switch (child_token.type) {
+        case TokType::ID:
+            this->type = MemberType::STR;
+            this->s_child = child_token.str;
+            break;
+        case TokType::INTEGER:
+            this->type = MemberType::NUM;
+            this->n_child = std::atoi(child_token.str.c_str());
+            break;
+    }
     this->type = MemberType::STR;
+
     this->is_class_static_member = false;
 }
-
-MemberNode::MemberNode(Node* parent, int child, TextPosition start, TextPosition end) :Node(NodeType::MEMBER, start, end), parent(parent), n_child(child) {
-    this->type = MemberType::NUM;
-    this->is_class_static_member = false;
-}
-
 
 MemberNode& MemberNode::member() {
     return *this;

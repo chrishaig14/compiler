@@ -294,12 +294,12 @@ Node* Parser::parse_factor() {
         Token tok;
         if (this->match(TokType::INTEGER)) {
             tok = this->expect_token(TokType::INTEGER);
-            MemberNode* mn = new MemberNode(parent, std::atoi(tok.str.c_str()), parent->start, tok.end_pos);
+            MemberNode* mn = new MemberNode(parent, tok);
             mn->dot_pos = dot_pos;
             parent = mn;
         } else {
             tok = this->expect_token(TokType::ID);
-            MemberNode* mn = new MemberNode(parent, tok.str, parent->start, tok.end_pos);
+            MemberNode* mn = new MemberNode(parent, tok);
             mn->dot_pos = dot_pos;
             parent = mn;
         }
@@ -450,7 +450,7 @@ Node* Parser::parse_tuple_or_constructor() {
         while (this->match(TokType::DOT)) {
             this->next();
             idd = this->expect_token(TokType::ID);
-            m = new MemberNode(m, idd.str, m->start, idd.end_pos);
+            m = new MemberNode(m, idd);
         }
         parent = new DefaultConstructorNode(m, hash_tok.start, m->end);
     } else {

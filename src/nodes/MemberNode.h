@@ -8,9 +8,8 @@
 
 #include <string>
 #include "Node.h"
-
-#include "Node.h"
 #include "TypeNode.h"
+#include "../scanner/Token.h"
 
 enum class MemberType {
     NUM, STR
@@ -24,11 +23,8 @@ public:
     size_t n_child;
     TypeNode* parent_t;
     TextPosition dot_pos;
-
-    MemberNode(Node* parent, const std::string& child, TextPosition start, TextPosition end);
-
-
-    MemberNode(Node* parent, int child, TextPosition start, TextPosition end);
+    Token child_token;
+    MemberNode(Node* parent, Token child_token);
 
     bool equal(const Node& x) const override;
 

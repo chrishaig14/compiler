@@ -113,8 +113,8 @@ void ErrorReporter::object_no_member(const TypeNode& t, const MemberNode& m) {
                            m.s_child,
                            m.dot_pos,
                            *m.parent,
-                           add_one_col(m.dot_pos),
-                           m.end);
+                           m.child_token.start,
+                           m.child_token.end_pos);
 }
 
 
