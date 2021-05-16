@@ -119,14 +119,51 @@ void ErrorReporter::class_no_member(const TypeNode& t, const std::string& member
     this->entity_no_member(E_FMT("Class ") + E_HLT(t.to_string()), member, pos, obj, member_start, member_end);
 }
 
-void ErrorReporter::module_no_member(std::string mod_name, const std::string& member, TextPosition pos, Node& obj,
+void ErrorReporter::module_no_member(Module* mod, const std::string& member, TextPosition pos, Node& obj,
                                      TextPosition member_start, TextPosition member_end) {
-    this->entity_no_member(E_FMT("Module ") + E_HLT(mod_name), member, pos, obj, member_start, member_end);
+    std::string pre_msg = E_FMT("Module ") + E_HLT(mod->name);
+
+    std::string code_s = this->code_lines.get_line(pos.line);
+    std::string pre_s = substring(code_s, TextPosition{obj.start.line, 0}, obj.start);
+    std::string left_s = substring(code_s, obj.start, obj.end);
+    std::string middle_s = substring(code_s, obj.end, member_start);
+    std::string right_s = substring(code_s, member_start, member_end);
+    std::string post_s = substring(code_s, member_end, TextPosition{member_end.line, code_s.size()});
+
+    std::string msg = pre_s + fmt::format(styles[ErrorElement::BinopLeft], left_s) +
+                      fmt::format(styles[ErrorElement::BinopOperator], middle_s) +
+                      fmt::format(styles[ErrorElement::BinopRight], right_s) + post_s;
+
+    msg += "\n\nPossible members are:  \n";
+    for (auto m: mod->flirpins) {
+        msg += "- " + m.first + " : " + flirpintype_to_str(m.second.type) + "\n";
+    }
+
+    this->fail_ok(pre_msg + E_FMT(" has no member ") + E_HLT("'" + member + "'"), msg, pos);
+    // this->entity_no_member(E_FMT("Module ") + E_HLT(mod_name), member, pos, obj, member_start, member_end);
 }
 
-void ErrorReporter::package_no_member(std::string pack_name, const std::string& member, TextPosition pos, Node& obj,
+void ErrorReporter::package_no_member(Package* pack, const std::string& member, TextPosition pos, Node& obj,
                                       TextPosition member_start, TextPosition member_end) {
-    this->entity_no_member(E_FMT("Package ") + E_HLT(pack_name), member, pos, obj, member_start, member_end);
+    std::string pre_msg = E_FMT("Package ") + E_HLT(pack->name);
+
+    std::string code_s = this->code_lines.get_line(pos.line);
+    std::string pre_s = substring(code_s, TextPosition{obj.start.line, 0}, obj.start);
+    std::string left_s = substring(code_s, obj.start, obj.end);
+    std::string middle_s = substring(code_s, obj.end, member_start);
+    std::string right_s = substring(code_s, member_start, member_end);
+    std::string post_s = substring(code_s, member_end, TextPosition{member_end.line, code_s.size()});
+
+    std::string msg = pre_s + fmt::format(styles[ErrorElement::BinopLeft], left_s) +
+                      fmt::format(styles[ErrorElement::BinopOperator], middle_s) +
+                      fmt::format(styles[ErrorElement::BinopRight], right_s) + post_s;
+
+    msg += "\n\nPossible modules/packages are:  \n";
+    for (auto m: pack->units) {
+        msg += "- " + m.first + " : " + (m.second.type == U_TYPE::MODULE ? "module" : "package");
+    }
+
+    this->fail_ok(pre_msg + E_FMT(" has no member ") + E_HLT("'" + member + "'"), msg, pos);
 }
 
 void ErrorReporter::no_member(const TypeNode& t, const std::string& member, TextPosition pos) {
@@ -259,9 +296,9 @@ void ErrorReporter::class_no_method(const std::string& class_name, const std::st
     this->fail(msg, pos);
 }
 
-void ErrorReporter::redeclared(const std::string& name, TextPosition pos) {
+void ErrorReporter::redeclared(const std::string& name, const DeclarationNode& node) {
     std::string pre_msg = E_FMT("Variable ") + E_HLT(name) + E_FMT(" already declared ");
-    this->fail_ok(pre_msg, "", pos);
+    this->fail_ok(pre_msg, highlight_one(node), node.start);
 }
 
 void ErrorReporter::variable_not_declared(const std::string& name, TextPosition pos) {
@@ -480,11 +517,12 @@ void ErrorReporter::enum_no_value(std::string enum_name, std::string value, Memb
                       fmt::format(styles[ErrorElement::BinopOperator], middle_s) +
                       fmt::format(styles[ErrorElement::BinopRight], right_s) + post_s;
     std::string pre_msg = "Enum " + enum_name + E_FMT(" has no value ") + E_HLT("'" + value + "'");
-    this->fail_ok(pre_msg, msg, node.start);
-    std::cout << "Possible values are: " << std::endl;
+    msg += "\n\nPossible values are: \n";
     for (auto v: enumm->values) {
-        std::cout << "- " << v << std::endl;
+        msg += "- " + v + "\n";
     }
+    this->fail_ok(pre_msg, msg, node.start);
+
 }
 
 void ErrorReporter::object_no_member_with_suggestions(const TypeNode& t, const std::string& member, TextPosition pos,

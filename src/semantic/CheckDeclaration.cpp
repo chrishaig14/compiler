@@ -43,9 +43,9 @@ SNode* Checker::make_rvalue(Entity value_entity, SNode* value_snode, const TypeN
                         for (int i = 0; i < unaliased_value_type->object().type_params.size(); i++) {
                             if (*unaliased_value_type->object().type_params[i] !=
                                 *unaliased_target_type->object().type_params[i]) {
-                                this->error_reporter.fail(
-                                        "Error: Cannot lift union type " + unaliased_value_type->to_string() + " to " +
-                                        unaliased_target_type->to_string());
+                                // this->error_reporter.fail(
+                                //         "Error: Cannot lift union type " + unaliased_value_type->to_string() + " to " +
+                                //         unaliased_target_type->to_string());
                                 return nullptr;
                             }
                         }
@@ -76,7 +76,7 @@ SNode* Checker::make_rvalue(Entity value_entity, SNode* value_snode, const TypeN
 USemanticInfo Checker::visit_declaration(DeclarationNode& n) {
     // Logger::info("Checking DeclarationNode for var: " + n.identifier);
     if (this->scope->declared(n.identifier)) {
-        this->error_reporter.redeclared(n.identifier, n.start);
+        this->error_reporter.redeclared(n.identifier, n);
     }
     USemanticInfo info;
     if (n.type != nullptr) {

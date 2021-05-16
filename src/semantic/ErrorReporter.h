@@ -45,7 +45,7 @@ public:
     void generic_call_mismatch(const TypeNode& expected, const TypeNode& actual, int i);
 
     void call_bad_num_args();
-    void redeclared(const std::string& name, TextPosition pos);
+    void redeclared(const std::string& name, const DeclarationNode& node);
     void tuple_assign(TextPosition pos);
     void unused_return_value(TextPosition pos);
     void variable_not_declared(const std::string& name, TextPosition pos);
@@ -113,6 +113,12 @@ public:
     void enum_no_value(std::string enum_name, std::string value, MemberNode& node, Enum* enumm);
     void object_no_member_with_suggestions(const TypeNode& t, const std::string& member, TextPosition pos, Node& obj,
                                            TextPosition member_start, TextPosition member_end, Class* clazz);
+    void
+    module_no_member(Module* mod, const std::string& member, TextPosition pos, Node& obj, TextPosition member_start,
+                     TextPosition member_end);
+    void
+    package_no_member(Package* pack, const std::string& member, TextPosition pos, Node& obj, TextPosition member_start,
+                      TextPosition member_end);
 };
 
 

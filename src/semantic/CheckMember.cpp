@@ -75,7 +75,7 @@ USemanticInfo Checker::visit_member(MemberNode& n) {
 
 USemanticInfo Checker::module_member(Module* mod, std::string child, MemberNode& n) {
     if (mod->flirpins.count(child) == 0) {
-        this->error_reporter.module_no_member(mod->path.as_str(),
+        this->error_reporter.module_no_member(mod,
                                               child,
                                               n.dot_pos,
                                               *n.parent,
@@ -175,7 +175,7 @@ USemanticInfo Checker::object_member(SNode* object_snode, Value* pValue, std::st
 
 USemanticInfo Checker::package_member(Package* package, std::string child, MemberNode& n) {
     if (package->units.count(child) == 0) {
-        this->error_reporter.package_no_member(package->path.as_str(),
+        this->error_reporter.package_no_member(package,
                                                child,
                                                n.dot_pos,
                                                *n.parent,
