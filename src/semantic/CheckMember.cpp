@@ -84,8 +84,9 @@ USemanticInfo Checker::object_member(SNode* object_snode, Value* pValue, std::st
     Path object_type_path = pValue->type->object().actual_base_path;
     if (object_type_path.as_str() == "") {
         // is a single type param, error
-        this->error_reporter.fail(
-                "Error: no member " + child + " in totally generic type " + pValue->type->to_string());
+        this->error_reporter.object_no_member(*pValue->type, n);
+        // this->error_reporter.fail(
+        //         "Error: no member " + child + " in totally generic type " + pValue->type->to_string());
         return error_stub();
     }
     if (object_type_path.as_str() == "core.Union") {

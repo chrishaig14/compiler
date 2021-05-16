@@ -292,9 +292,10 @@ USemanticInfo Checker::visit_subscript(SubscriptNode& node) {
     Class* cls = entity_parent.value->clazz;
     if (cls == nullptr) {
         // its totally generic, fail
-        this->error_reporter.fail(
-                "Error, accessing subscript of totally generic type: " + entity_parent.value->type->to_string(),
-                node.start);
+        this->error_reporter.object_no_special_method(*entity_parent.value->type, "__get_item__", node);
+        // this->error_reporter.fail(
+        //         "Error, accessing subscript of totally generic type: " + entity_parent.value->type->to_string(),
+        //         node.start);
         return error_stub();
     }
     assert(cls != nullptr);
