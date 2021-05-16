@@ -31,10 +31,6 @@ public:
     void condition(const TypeNode& t, TextPosition position, const std::string& st);
     void _for(const TypeNode& t, TextPosition position);
     void function_call_num_args(TextPosition position);
-    void
-    function_call_type_mismatch(const TypeNode& expected, const Node& arg, const TypeNode& actual, TextPosition pos,
-                                TextPosition end);
-    void no_member(const TypeNode& t, const std::string& member, TextPosition pos);
     void no_return(const TypeNode& t, TextPosition pos);
     void class_no_method(const std::string& class_name, const std::string method_name, TextPosition pos);
     void return_mismatch(const TypeNode& expected, const TypeNode& actual, TextPosition pos);
@@ -49,7 +45,6 @@ public:
     void tuple_assign(TextPosition pos);
     void unused_return_value(TextPosition pos);
     void variable_not_declared(const std::string& name, TextPosition pos);
-    void function_no_member(TextPosition pos);
     void subscript_non_object(TextPosition pos);
     void string_immutable(TextPosition pos);
 
@@ -75,7 +70,6 @@ public:
         this->fail(msg, TextPosition{1, 1});
     }
 
-    void method_not_member(const TypeNode& t, const std::string& member, TextPosition pos);
     std::string code_error_string(TextPosition start, TextPosition end);
 
     std::string current_class;
@@ -90,8 +84,6 @@ public:
     void expected_expression(Entity entity, const Node& pos);
     void _for(Entity t, TextPosition pos);
     void bool_op(Entity left, Entity right, TextPosition pos);
-    void binop(Entity left, Entity right, TextPosition pos, Node* left_n, Node* right_n);
-    void fail_highlight(std::string msg);
     void fail_ok(std::string pre_msg,std::string msg, TextPosition pos);
     void call_not_a_function(const CallNode& node);
     std::string highlight_two(ErrorElement fe, const Node& f, ErrorElement se, const Node& s);

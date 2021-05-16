@@ -15,7 +15,7 @@ std::string entity_to_string(Entity entity) {
         case E_TYPE::CONST_FUNCTION:
             return "function " + E_HLT(entity.const_function->path.as_vec().back());
         case E_TYPE::ERROR:
-            return "EROR";
+            return "ERROR";
         case E_TYPE::NOT_FOUND:
             return "NOT FOUND";
         case E_TYPE::ENUM:
@@ -43,22 +43,6 @@ void ErrorReporter::fail_ok(std::string pre_msg, std::string msg, TextPosition p
     }
 }
 
-std::string highlight3(size_t column, size_t length) {
-    return fmt::format(fmt::fg(fmt::color::orange_red), std::string(column, ' ') + std::string(length, '^'));
-}
-
-std::string highlight22(const std::string& text, size_t column, size_t length, fmt::terminal_color color) {
-    return text.substr(0, column) + fmt::format(fmt::fg(color) | fmt::emphasis::bold, text.substr(column, length)) +
-           text.substr(column + length, text.size() - (column + length));
-}
-
-void ErrorReporter::fail_highlight(std::string msg) {
-    std::cout << msg << std::endl;
-    // this->fail(msg, {1, 1});
-    std::cout << std::endl;
-    throw std::runtime_error("FAILED");
-}
-
 std::string substring(std::string s, TextPosition start, TextPosition end) {
     assert(start.line == end.line);
     return s.substr(start.column, end.column - start.column);
@@ -71,24 +55,6 @@ void init_styles() {
     styles[ErrorElement::BinopLeft] = fmt::fg(fmt::terminal_color::green) | fmt::emphasis::bold;
     styles[ErrorElement::BinopOperator] = fmt::fg(fmt::terminal_color::red) | fmt::emphasis::bold;
     styles[ErrorElement::BinopRight] = fmt::fg(fmt::terminal_color::blue) | fmt::emphasis::bold;
-}
-
-void ErrorReporter::binop(Entity left, Entity right, TextPosition pos, Node* left_n, Node* right_n) {
-    assert(left_n != nullptr);
-    assert(right_n != nullptr);
-
-    std::string code_s = this->code_lines.get_line(pos.line);
-    std::string pre_s = substring(code_s, TextPosition{left_n->start.line, 0}, left_n->start);
-    std::string left_s = substring(code_s, left_n->start, left_n->end);
-    std::string middle_s = substring(code_s, left_n->end, right_n->start);
-    std::string right_s = substring(code_s, right_n->start, right_n->end);
-    std::string post_s = substring(code_s, right_n->end, TextPosition{right_n->end.line, code_s.size()});
-
-    std::string msg = pre_s + fmt::format(styles[ErrorElement::BinopLeft], left_s) +
-                      fmt::format(styles[ErrorElement::BinopOperator], middle_s) +
-                      fmt::format(styles[ErrorElement::BinopRight], right_s) + post_s;
-    std::string pre_msg;
-    this->fail_ok(pre_msg, msg, pos);
 }
 
 void ErrorReporter::entity_no_member(std::string pre_msg, const std::string& member, TextPosition pos, Node& obj,
@@ -167,19 +133,6 @@ void ErrorReporter::package_no_member(Package* pack, const std::string& member, 
     }
     msg = msg.substr(0, msg.size() - 1);
     this->fail_ok(pre_msg + E_FMT(" has no member ") + E_HLT("'" + member + "'"), msg, pos);
-}
-
-void ErrorReporter::no_member(const TypeNode& t, const std::string& member, TextPosition pos) {
-    std::string msg;
-    msg = E_FMT("Type ") + E_HLT(t.to_string()) + E_FMT(" has no member ") + E_HLT("'" + member + "'");
-    this->fail(msg, pos);
-}
-
-void ErrorReporter::method_not_member(const TypeNode& t, const std::string& member, TextPosition pos) {
-    std::string msg;
-    msg = E_HLT(member) + E_FMT(" is a method, not a member, of ") + E_HLT(t.to_string()) + E_FMT(" use ") +
-          E_HLT("':'") + E_FMT(" instead of ") + E_HLT("'.'");
-    this->fail(msg, pos);
 }
 
 void ErrorReporter::bool_op(Entity left, Entity right, TextPosition pos) {
@@ -287,12 +240,6 @@ void ErrorReporter::call_bad_num_args() {
     this->fail(msg, TextPosition());
 }
 
-void ErrorReporter::function_no_member(TextPosition pos) {
-    std::string msg;
-    msg = E_FMT("Function has no members");
-    this->fail(msg, pos);
-}
-
 void ErrorReporter::class_no_method(const std::string& class_name, const std::string method_name, TextPosition pos) {
     std::string msg;
     msg = E_FMT("Class ") + E_HLT(class_name) + E_FMT(" has no method ") + E_HLT(method_name);
@@ -314,15 +261,6 @@ void ErrorReporter::error_type_mismatch(const TypeNode& expected, const Node& va
     std::string pre_msg = "Expected " + E_HLT(expected.to_string()) + ", got " + E_HLT(actual.to_string());
     std::string msg = highlight_one(value_node);
     this->fail_ok(pre_msg, msg, value_node.start);
-}
-
-void ErrorReporter::function_call_type_mismatch(const TypeNode& expected, const Node& arg, const TypeNode& actual,
-                                                TextPosition pos, TextPosition end) {
-    std::string pre_msg = E_FMT(" Function call type mismatch") + E_FMT(" expected ") + E_HLT(expected.to_string()) +
-                          E_FMT(" but got ") + E_HLT(actual.to_string()) + E_FMT(" (alias for ") +
-                          E_HLT(actual.to_string()) + E_FMT(")");
-    std::string msg = highlight_one(arg);
-    this->fail_ok(pre_msg, msg, pos);
 }
 
 void ErrorReporter::unused_return_value(TextPosition pos) {
