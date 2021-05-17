@@ -9,6 +9,7 @@ SemanticInfo::SemanticInfo() {
     this->is_constant = false;
     this->this_arg = nullptr;
     this->snode = nullptr;
+    this->is_tuple_member = false;
 }
 
 SemanticInfo& SemanticInfo::operator=(const SemanticInfo& other) {
@@ -17,6 +18,7 @@ SemanticInfo& SemanticInfo::operator=(const SemanticInfo& other) {
     this->is_constant = other.is_constant;
     this->snode = other.snode;
     this->this_arg = other.this_arg;
+    this->is_tuple_member = other.is_tuple_member;
     return *this;
 }
 

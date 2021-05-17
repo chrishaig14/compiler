@@ -38,12 +38,12 @@ USemanticInfo Checker::visit_lvalue_subscript(SubscriptNode& node) {
     USemanticInfo ct = this->dispatch_rvalue(c);
     Entity child_entity = ct->entity;
     if (child_entity.type != E_TYPE::VALUE) {
-        this->error_reporter.fail("Error using something that's not an object as a subscript!");
+        this->error_reporter.error_type_mismatch(*subscript_fun->ft->param_types[0], *node.child[0], child_entity);
+        return error_stub();
     }
     if (*child_entity.value->type != *subscript_fun->ft->param_types[0]) {
-        this->error_reporter.error_type_mismatch(*subscript_fun->ft->param_types[0],
-                                                 *node.child[0],
-                                                 *child_entity.value->type);
+        this->error_reporter.error_type_mismatch(*subscript_fun->ft->param_types[0], *node.child[0], child_entity);
+
         // this->error_reporter.subscript_type(*child_entity.value->type, *subscript_fun->ft->param_types[0], node);
         return error_stub();
         // this->error_reporter.fail(
@@ -88,24 +88,30 @@ USemanticInfo Checker::visit_assignment(AssignmentNode& n) {
         linfo_p = this->dispatch(n.lvalue);
     }
 
+    USemanticInfo expression_info_p = this->dispatch_rvalue(n.rvalue);
+
     if (linfo_p->entity.type == E_TYPE::ERROR) {
+        return error_stub();
+    }
+    if (expression_info_p->entity.type == E_TYPE::ERROR) {
         return error_stub();
     }
 
     if (linfo_p->entity.type != E_TYPE::VALUE) {
-        this->error_reporter.fail("Cannot assign to this thing!");
+        this->error_reporter.cant_assign(*n.lvalue);
+        // this->error_reporter.fail("Cannot assign to this thing!");
         return error_stub();
     }
 
-    if (n.lvalue->ntype == NodeType::MEMBER && n.lvalue->member().type == MemberType::NUM) {
-        this->error_reporter.tuple_assign(n.start);
-        return error_stub();
+    if (linfo_p->entity.value->type->kind == Kind::OBJECT) {
+        bool ff = n.lvalue->ntype == NodeType::MEMBER;
+        if (linfo_p->is_tuple_member) {
+            this->error_reporter.cant_assign(*n.lvalue);
+            return error_stub();
+        }
     }
 
-    USemanticInfo expression_info_p = this->dispatch_rvalue(n.rvalue);
-    if (expression_info_p->entity.type == E_TYPE::ERROR) {
-        return error_stub();
-    }
+
     if (linfo_p->entity.type == E_TYPE::VALUE && linfo_p->entity.value->type->kind == Kind::OBJECT &&
         expression_info_p->entity.type == E_TYPE::CONST_FUNCTION) {
         // this->error_reporter.error_type_mismatch(*n.type, *n.rvalue, *expression_info_p_info_p->entity.value->type);
@@ -139,7 +145,7 @@ USemanticInfo Checker::visit_assignment(AssignmentNode& n) {
                                                 *linfo.entity.value->type);
         if (rvalue_snode == nullptr) {
             // this->error_reporter.assignment(l_type, *exp_type, n.start, *n.lvalue, *n.rvalue);
-            this->error_reporter.error_type_mismatch(l_type, *n.rvalue, *exp_type);
+            this->error_reporter.error_type_mismatch(l_type, *n.rvalue, expression_info_p->entity);
             return error_stub();
         }
         expression_info_p->snode = rvalue_snode;
@@ -193,7 +199,7 @@ USemanticInfo Checker::visit_return(ReturnNode& n) {
     }
     SNode* exp_snode = make_rvalue(expression_info_p->entity, expression_info_p->snode, *return_type);
     if (exp_snode == nullptr) {
-        this->error_reporter.error_type_mismatch(*return_type, *n.expression, *expression_info_p->entity.value->type);
+        this->error_reporter.error_type_mismatch(*return_type, *n.expression, expression_info_p->entity);
         return error_stub();
     }
     sn->expression = exp_snode;
@@ -347,11 +353,15 @@ USemanticInfo Checker::visit_while(WhileNode& node) {
     USemanticInfo condition_p = this->dispatch_rvalue(node.condition);
     SemanticInfo& condition = *condition_p;
     if (condition.entity.type != E_TYPE::VALUE) {
-        this->error_reporter.condition(condition.entity, node.start, "while");
+        this->error_reporter.error_type_mismatch(T_BOOL, *node.condition, condition_p->entity);
+        // return error_stub();
+        // this->error_reporter.condition(condition.entity, node.start, "while");
     }
     ObjectType* condition_ot = &condition.entity.value->type->object();
     if (*condition_ot != T_BOOL) {
-        this->error_reporter.condition(condition.entity, node.start, "while");
+        this->error_reporter.error_type_mismatch(T_BOOL, *node.condition, condition_p->entity);
+
+        // this->error_reporter.condition(condition.entity, node.start, "while");
     }
     this->enter_scope("while");
     this->scope->is_loop = true;
@@ -378,10 +388,12 @@ USemanticInfo Checker::visit_if(IfNode& n) {
 
     if (condition_info.entity.type != E_TYPE::ERROR) {
         if (condition_info.entity.type != E_TYPE::VALUE) {
-            this->error_reporter.condition(condition_info.entity, n.condition->start, "if");
+            this->error_reporter.error_type_mismatch(T_BOOL, *n.condition, condition_info.entity);
+            // this->error_reporter.condition(condition_info.entity, n.condition->start, "if");
         }
         if (*condition_info.entity.value->type != T_BOOL) {
-            this->error_reporter.condition(condition_info.entity, n.condition->start, "if");
+            this->error_reporter.error_type_mismatch(T_BOOL, *n.condition, condition_info.entity);
+            // this->error_reporter.condition(condition_info.entity, n.condition->start, "if");
         }
     }
     // std::unordered_map<std::string, bool> not_null_vars;
@@ -404,10 +416,12 @@ USemanticInfo Checker::visit_if(IfNode& n) {
         USemanticInfo elif_condition_info_p = this->dispatch_rvalue(n.elifs[i].first);
         SemanticInfo& elif_condition_info = *elif_condition_info_p;
         if (elif_condition_info.entity.type != E_TYPE::VALUE) {
-            this->error_reporter.condition(condition_info.entity, n.elifs[i].first->start, "elif");
+            this->error_reporter.error_type_mismatch(T_BOOL, *n.elifs[i].first, elif_condition_info.entity);
+            // this->error_reporter.condition(condition_info.entity, n.elifs[i].first->start, "elif");
         }
         if (*elif_condition_info.entity.value->type != T_BOOL) {
-            this->error_reporter.condition(condition_info.entity, n.elifs[i].first->start, "elif");
+            this->error_reporter.error_type_mismatch(T_BOOL, *n.elifs[i].first, elif_condition_info.entity);
+            // this->error_reporter.condition(condition_info.entity, n.elifs[i].first->start, "elif");
         }
         this->enter_scope("elif");
         USemanticInfo elif_block_info = this->visit_block(*n.elifs[i].second);

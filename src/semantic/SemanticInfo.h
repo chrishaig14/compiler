@@ -18,7 +18,7 @@ public:
     Entity entity;
     bool is_class_method;
     SNode* snode;
-
+    bool is_tuple_member;
     SemanticInfo& operator=(const SemanticInfo& other);
 
     SemanticInfo(const SemanticInfo& other);

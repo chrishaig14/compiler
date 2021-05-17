@@ -257,8 +257,14 @@ void ErrorReporter::variable_not_declared(const std::string& name, TextPosition 
     this->fail(msg, pos);
 }
 
-void ErrorReporter::error_type_mismatch(const TypeNode& expected, const Node& value_node, const TypeNode& actual) {
-    std::string pre_msg = "Expected " + E_HLT(expected.to_string()) + ", got " + E_HLT(actual.to_string());
+void ErrorReporter::error_type_mismatch(const TypeNode& expected, const Node& value_node, Entity actual) {
+    std::string as;
+    if (actual.type == E_TYPE::VALUE) {
+        as = actual.value->type->to_string();
+    } else {
+        as = entity_to_string(actual);
+    }
+    std::string pre_msg = "Expected " + E_HLT(expected.to_string()) + ", got " + E_HLT(as);
     std::string msg = highlight_one(value_node);
     this->fail_ok(pre_msg, msg, value_node.start);
 }
@@ -430,7 +436,7 @@ void ErrorReporter::expected_expression_with_type(Entity entity, TypeNode& exp_e
 
 void ErrorReporter::expected_expression(Entity entity, const Node& pos) {
     std::string pre_msg;
-    pre_msg = E_FMT("Expected expression");
+    pre_msg = E_FMT("Expected expression, got ") + E_HLT(entity_to_string(entity));
     std::string msg = this->highlight_one(pos);
     this->fail_ok(pre_msg, msg, pos.start);
 }
@@ -505,5 +511,11 @@ void ErrorReporter::object_no_special_method(const TypeNode& type, const char* m
 
     std::string msg = pre_s + fmt::format(styles[ErrorElement::BinopLeft], left_s) +
                       fmt::format(styles[ErrorElement::BinopOperator], right_s) + post_s;
+    this->fail_ok(pre_msg, msg, node.start);
+}
+
+void ErrorReporter::cant_assign(const Node& node) {
+    std::string pre_msg = E_FMT("Can't assign");
+    std::string msg = this->highlight_one(node);
     this->fail_ok(pre_msg, msg, node.start);
 }

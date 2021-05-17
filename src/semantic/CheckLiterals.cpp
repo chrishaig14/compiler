@@ -161,7 +161,7 @@ USemanticInfo Checker::visit_partial(PartialApplication& node) {
             USemanticInfo arg = this->dispatch(node.args[i]);
             ObjectType* arg_ot = &arg->entity.value->type->object();
             if (*arg_ot != *param_type) {
-                this->error_reporter.error_type_mismatch(*param_type, *node.args[i], *arg_ot);
+                this->error_reporter.error_type_mismatch(*param_type, *node.args[i], arg->entity);
                 return error_stub();
             }
             snodes.push_back(arg->snode);
@@ -198,13 +198,13 @@ USemanticInfo Checker::visit_dict(DictNode& node) {
         ObjectType& key_type = key_info->entity.value->type->object();
         ObjectType& value_type = value_info->entity.value->type->object();
         if (key_type != first_key_type) {
-            this->error_reporter.error_type_mismatch(first_key_type, *node.items[i].first, key_type);
+            this->error_reporter.error_type_mismatch(first_key_type, *node.items[i].first, key_info->entity);
             // this->error_reporter.fail("Second key type different to first");
             has_error = true;
         }
         if (value_type != first_value_type) {
             // this->error_reporter.fail("Second value type different to first");
-            this->error_reporter.error_type_mismatch(first_value_type, *node.items[i].first, value_type);
+            this->error_reporter.error_type_mismatch(first_value_type, *node.items[i].first, value_info->entity);
             has_error = true;
         }
         items.push_back(std::make_pair(key_info->snode, value_info->snode));

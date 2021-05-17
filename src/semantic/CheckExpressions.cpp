@@ -62,9 +62,7 @@ USemanticInfo Checker::visit_boolop(BoolOpNode& n) {
     const TypeNode& ltype = *get_entity_type(left_info_p->entity);
     const TypeNode& rtype = *get_entity_type(right_info_p->entity);
     if (ltype != rtype) {
-        this->error_reporter.error_type_mismatch(*left_info_p->entity.value->type,
-                                                 *n.right,
-                                                 *right_info_p->entity.value->type);
+        this->error_reporter.error_type_mismatch(*left_info_p->entity.value->type, *n.right, right_info_p->entity);
         // this->error_reporter.binop(left_info_p->entity, right_info_p->entity, n.start, n.left, n.right);
         return error_stub();
     }
@@ -195,9 +193,7 @@ USemanticInfo Checker::visit_binop(BinopNode& n) {
         return error_stub();
     }
     if (left_info_p->entity.type != E_TYPE::VALUE || right_info_p->entity.type != E_TYPE::VALUE) {
-        this->error_reporter.error_type_mismatch(*left_info_p->entity.value->type,
-                                                 *n.right,
-                                                 *right_info_p->entity.value->type);
+        this->error_reporter.error_type_mismatch(*left_info_p->entity.value->type, *n.right, right_info_p->entity);
         // this->error_reporter.binop(left_info_p->entity, right_info_p->entity, n.op_pos, n.left, n.right);
         return error_stub();
     }
@@ -205,9 +201,7 @@ USemanticInfo Checker::visit_binop(BinopNode& n) {
     const TypeNode& rtype = *get_entity_type(right_info_p->entity);
     if (ltype != rtype) {
         // this->error_reporter.binop(left_info_p->entity, right_info_p->entity, n.op_pos, n.left, n.right);
-        this->error_reporter.error_type_mismatch(*left_info_p->entity.value->type,
-                                                 *n.right,
-                                                 *right_info_p->entity.value->type);
+        this->error_reporter.error_type_mismatch(*left_info_p->entity.value->type, *n.right, right_info_p->entity);
         return error_stub();
         // this->error_reporter.fail("Binary operation between values of different types: " + ltype.to_string() + " and " +
         //                          rtype.to_string());
@@ -287,6 +281,7 @@ USemanticInfo Checker::visit_subscript(SubscriptNode& node) {
     Entity entity_parent = parent_p->entity;
     if (entity_parent.type != E_TYPE::VALUE || entity_parent.value->type->kind == Kind::FUNCTION) {
         this->error_reporter.fail("Error subscript of something that is not an object!");
+        return error_stub();
     }
 
     Class* cls = entity_parent.value->clazz;
@@ -312,17 +307,17 @@ USemanticInfo Checker::visit_subscript(SubscriptNode& node) {
     VectorOfTypes children;
     if (node.child.size() > 1) {
         this->error_reporter.fail("Error subscript with more than one child!");
+        return error_stub();
     }
     Node* c = node.child[0];
     USemanticInfo ct = this->dispatch_rvalue(c);
     Entity child_entity = ct->entity;
     if (child_entity.type != E_TYPE::VALUE) {
-        this->error_reporter.fail("Error using something that's not an object as a subscript!");
+        this->error_reporter.error_type_mismatch(*subscript_fun->ft->param_types[0], *node.child[0], child_entity);
+        return error_stub();
     }
     if (*child_entity.value->type != *subscript_fun->ft->param_types[0]) {
-        this->error_reporter.error_type_mismatch(*subscript_fun->ft->param_types[0],
-                                                 *node.child[0],
-                                                 *child_entity.value->type);
+        this->error_reporter.error_type_mismatch(*subscript_fun->ft->param_types[0], *node.child[0], child_entity);
         // this->error_reporter.subscript_type(*child_entity.value->type, *subscript_fun->ft->param_types[0], node);
         // this->error_reporter.fail(
         //         "Error subscript type is " + child_entity.value->type->to_string() + " but should be " +
@@ -348,7 +343,9 @@ USemanticInfo Checker::visit_ternary(TernaryNode& node) {
     USemanticInfo expression_info_p = this->dispatch_rvalue(node.expression);
     SemanticInfo& expression_info = *expression_info_p;
     if (expression_info.entity.type != E_TYPE::VALUE || expression_info_p->entity.value->type->kind == Kind::FUNCTION) {
-        this->error_reporter.fail("Unexpected non-object");
+        this->error_reporter.error_type_mismatch(ObjectType("Option", {new ObjectType("t")}),
+                                                 *node.expression,
+                                                 expression_info_p->entity);
         return error_stub();
     }
     ObjectType& expression_type = expression_info.entity.value->type->object();
@@ -356,7 +353,7 @@ USemanticInfo Checker::visit_ternary(TernaryNode& node) {
     if (expression_type.id != "Option") {
         this->error_reporter.error_type_mismatch(ObjectType("Option", {new ObjectType("t")}),
                                                  *node.expression,
-                                                 expression_type);
+                                                 expression_info_p->entity);
         // this->error_reporter.fail("Expected an Option[T], got: " + expression_type.to_string());
         return error_stub();
     }
@@ -373,9 +370,7 @@ USemanticInfo Checker::visit_ternary(TernaryNode& node) {
     USemanticInfo false_case_p = this->dispatch_rvalue(node.false_case);
     SemanticInfo& false_case = *false_case_p;
     if (*false_case.entity.value->type != *true_case.entity.value->type) {
-        this->error_reporter.error_type_mismatch(*true_case.entity.value->type,
-                                                 *node.false_case,
-                                                 *false_case.entity.value->type);
+        this->error_reporter.error_type_mismatch(*true_case.entity.value->type, *node.false_case, false_case.entity);
         // this->error_reporter.fail(
         //         "True case and false case type don't match: " + true_case.entity.value->type->to_string() + " != " +
         //         false_case.entity.value->type->to_string());

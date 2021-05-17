@@ -2,20 +2,20 @@ cmake_minimum_required(VERSION 3.16)
 project(xlang)
 
 set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage -g -O0")
 
 add_library(tinyxml tinyxml/tinyxml2.cpp tinyxml/tinyxml2.h)
 
 add_library(
-  scanner
-  scanner/Scanner.cpp
-  scanner/Scanner.h
-  scanner/Token.cpp
-  scanner/Token.h
-  scanner/CodeLines.cpp
-  scanner/CodeLines.h
-  scanner/TextPosition.cpp
-  scanner/TextPosition.h)
+        scanner
+        scanner/Scanner.cpp
+        scanner/Scanner.h
+        scanner/Token.cpp
+        scanner/Token.h
+        scanner/CodeLines.cpp
+        scanner/CodeLines.h
+        scanner/TextPosition.cpp
+        scanner/TextPosition.h)
 
 add_library(
         nodes

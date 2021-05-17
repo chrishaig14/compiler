@@ -70,7 +70,7 @@ USemanticInfo Checker::visit_call(CallNode& n, bool is_rvalue) {
     VectorOfTypes arg_types;
 
     std::vector<Entity> arg_entities;
-
+    bool has_error = false;
     for (auto& arg: n.arguments) {
         USemanticInfo arg_type_p = this->dispatch(arg);
         arg_entities.push_back(arg_type_p->entity);
@@ -79,12 +79,15 @@ USemanticInfo Checker::visit_call(CallNode& n, bool is_rvalue) {
 
 
         if (arg_entity.type == E_TYPE::CLASS || arg_entity.type == E_TYPE::PACKAGE ||
-            arg_entity.type == E_TYPE::MODULE) {
-            std::cout << ("Error can't pass as argument") << std::endl;
-            return error_stub();
+            arg_entity.type == E_TYPE::MODULE || arg_entity.type == E_TYPE::ENUM) {
+            has_error = true;
+            this->error_reporter.expected_expression(arg_entity, *arg);
+            // this->error_reporter.fail("ERROR ITS NOT AN EXPRESSION");
+            continue;
         }
         if (arg_entity.type == E_TYPE::ERROR) {
-            return error_stub();
+            has_error = true;
+            continue;
         }
 
         TypeNode& arg_type = *get_entity_type(arg_entity);
@@ -93,6 +96,9 @@ USemanticInfo Checker::visit_call(CallNode& n, bool is_rvalue) {
         // }
         arg_types.push_back(arg_type.clone());
         n.arg_types.push_back(arg_type.clone());
+    }
+    if (has_error) {
+        return error_stub();
     }
 
     if (function_type->is_generic()) {
@@ -112,7 +118,7 @@ USemanticInfo Checker::visit_call(CallNode& n, bool is_rvalue) {
 
             SNode* arg_rvalue_snode = this->make_rvalue(arg_entities[i], sn->arguments[sni], param_type);
             if (arg_rvalue_snode == nullptr) {
-                this->error_reporter.error_type_mismatch(param_type, *n.arguments[i], arg_type);
+                this->error_reporter.error_type_mismatch(param_type, *n.arguments[i], arg_entities[i]);
                 // this->error_reporter.function_call_type_mismatch(param_type,
                 //                                                  *n.arguments[i],
                 //                                                  arg_type,

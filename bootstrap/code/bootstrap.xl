@@ -53,6 +53,7 @@ fun bad_return() -> String {
 }
 
 fun gen_with_function(f: fun(t)->u, x: t) -> u {
+    x = 9
     return f(x)
 }
 
@@ -62,6 +63,8 @@ fun double(x: Integer)->Integer {
 
 fun access_member_of_generic_error(x: t) -> Integer {
     var w = x.foo
+    x[3] = 19287
+    var j = x[12333]
     return 9
 }
 
@@ -262,6 +265,12 @@ fun main()->Integer {
     ito = "Hello"? it : "Bye"
     // error var not declared
     ito = var_not_declared
+    // error not an object
+    ito = Integer?8:1
+    ito = print?8:1
+    ito = pack?8:1
+    ito = Color?8:1
+    ito = util?8:1
     var uu: Integer = get_first_of_list([7,14,13,2,8,5])
     uu = get_first_of_list(["asdf","sdf","qww"])
     uu = get_first_of_list(78)
@@ -284,5 +293,54 @@ fun main()->Integer {
     var jjj = mytuple.3
     // number member of not a tuple error
     var asd = flot.123
+    var x = print[3]
+    Integer[4] = 9
+    x = Integer[8]
+    l[Integer] = 9
+    x = l[Integer]
+    print(Integer)
+    print(Color)
+    print(util)
+    print(pack)
+    var ooop = 8 + 10
+    ooop = 8 - 10
+    ooop = 8 * 10
+    ooop = 8 / 10
+    // while ok
+    while true {
+        break
+        continue
+    }
+    // while need boolean condition
+    while 8 {
+        break
+        continue
+    }
+    // if ok
+    if true {
+        print("Hello")
+    }
+    // if need boolean condition
+    if 7 {
+        print("Hello")
+    }
+    // elif ok
+    if true {
+        print("ok")
+    } elif 8 == 89 {
+        print("OK")
+    }
+    // elif need boolean condition
+    if true {
+        print("ok")
+    }elif 88912 + 23{
+        print("sdf")
+    }
+    // error cant assign
+    Integer = 9
+    print = 9
+    Color = 9
+    mytuple.1 = 9
+    Color = 111
     return 0
 }

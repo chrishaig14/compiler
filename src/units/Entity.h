@@ -67,28 +67,28 @@ public:
         this->package = o.package;
     }
 
-    Entity() : type(E_TYPE::NOT_FOUND), package(nullptr) {
+    explicit Entity() : type(E_TYPE::NOT_FOUND), package(nullptr) {
     }
 
-    Entity(E_TYPE type) : type(type), package(nullptr) {
+    explicit Entity(E_TYPE type) : type(type), package(nullptr) {
     }
 
-    Entity(Package* package) : type(E_TYPE::PACKAGE), package(package) {
+    explicit Entity(Package* package) : type(E_TYPE::PACKAGE), package(package) {
     }
 
-    Entity(Module* module) : type(E_TYPE::MODULE), module(module) {
+    explicit Entity(Module* module) : type(E_TYPE::MODULE), module(module) {
     }
 
-    Entity(Class* clazz) : type(E_TYPE::CLASS), clazz(clazz) {
+    explicit Entity(Class* clazz) : type(E_TYPE::CLASS), clazz(clazz) {
     }
 
-    Entity(Value* object_value) : type(E_TYPE::VALUE), value(object_value) {
+    explicit Entity(Value* object_value) : type(E_TYPE::VALUE), value(object_value) {
     }
 
-    Entity(ConstFunction* const_function) : type(E_TYPE::CONST_FUNCTION), const_function(const_function) {
+    explicit Entity(ConstFunction* const_function) : type(E_TYPE::CONST_FUNCTION), const_function(const_function) {
     }
 
-    Entity(Enum* enumm) : type(E_TYPE::ENUM), enumm(enumm) {
+    explicit Entity(Enum* enumm) : type(E_TYPE::ENUM), enumm(enumm) {
     }
 };
 

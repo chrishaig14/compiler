@@ -97,9 +97,12 @@ USemanticInfo Checker::object_member(SNode* object_snode, Value* pValue, std::st
         this->error_reporter.object_no_member(*pValue->type, n);
         return error_stub();
     }
+    SemanticInfo info;
+    if (pValue->type->kind == Kind::OBJECT && pValue->type->object().id == "Tuple") {
+        info.is_tuple_member = true;
+    }
     Class* clazz = pValue->clazz;
     assert(clazz != nullptr);
-    SemanticInfo info;
     if (clazz->members.count(child)) {
         info.entity = clazz->member_entities[child];
         if (info.entity.type == E_TYPE::NOTHING) {
