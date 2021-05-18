@@ -158,11 +158,11 @@ USemanticInfo Checker::visit_partial(PartialApplication& node) {
     for (size_t i = 0; i < node.args.size(); i++) {
         TypeNode*& param_type = fun_type->param_types[i];
         if (node.args[i] != nullptr) {
-            USemanticInfo arg = this->expect_type(*param_type, *node.args[i]);
-            if (arg->entity.type == E_TYPE::ERROR) {
+            SNode* arg_snode = this->expect_rvalue_of_type(*param_type, *node.args[i]);
+            if (arg_snode == nullptr) {
                 return error_stub();
             }
-            snodes.push_back(arg->snode);
+            snodes.push_back(arg_snode);
         } else {
             partial_args.push_back(param_type->clone());
             snodes.push_back(nullptr);
@@ -191,15 +191,15 @@ USemanticInfo Checker::visit_dict(DictNode& node) {
     items = {{first_key_info->snode, first_value_info->snode}};
     bool has_error = false;
     for (size_t i = 1; i < node.items.size(); i++) {
-        USemanticInfo key_info = this->expect_type(first_key_type, *node.items[i].first);
-        if (key_info->entity.type == E_TYPE::ERROR) {
+        SNode* key_snode = this->expect_rvalue_of_type(first_key_type, *node.items[i].first);
+        if (key_snode == nullptr) {
             has_error = true;
         }
-        USemanticInfo value_info = this->expect_type(first_value_type, *node.items[i].second);
-        if (value_info->entity.type == E_TYPE::ERROR) {
+        SNode* value_snode = this->expect_rvalue_of_type(first_value_type, *node.items[i].second);
+        if (value_snode == nullptr) {
             has_error = true;
         }
-        items.push_back(std::make_pair(key_info->snode, value_info->snode));
+        items.push_back(std::make_pair(key_snode, value_snode));
     }
     if (has_error) {
         return error_stub();

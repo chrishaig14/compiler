@@ -34,8 +34,8 @@ USemanticInfo Checker::visit_lvalue_subscript(SubscriptNode& node) {
     if (node.child.size() > 1) {
         this->error_reporter.fail("Error subscript with more than one child!");
     }
-    USemanticInfo ct = this->expect_type(*subscript_fun->ft->param_types[0], *node.child[0]);
-    if (ct->entity.type == E_TYPE::ERROR) {
+    SNode* child_snode = this->expect_rvalue_of_type(*subscript_fun->ft->param_types[0], *node.child[0]);
+    if (child_snode == nullptr) {
         return error_stub();
     }
     SemanticInfo info;
@@ -47,7 +47,7 @@ USemanticInfo Checker::visit_lvalue_subscript(SubscriptNode& node) {
     fsn->identifier = sub_fun_path;
     csn->function = fsn;
     csn->arguments.push_back(parent_p->snode);
-    csn->arguments.push_back(ct->snode);
+    csn->arguments.push_back(child_snode);
     info.snode = csn;
     return std::make_unique<SemanticInfo>(info);
 }
@@ -322,29 +322,14 @@ USemanticInfo Checker::visit_break(BreakNode& node) {
     return std::make_unique<SemanticInfo>(info);
 }
 
-USemanticInfo Checker::expect_type(const TypeNode& exp, Node& node) {
-    USemanticInfo sinfo = this->dispatch_rvalue(&node);
-    if (sinfo->entity.type == E_TYPE::ERROR) {
-        return error_stub();
-    }
-    if (sinfo->entity.type != E_TYPE::VALUE) {
-        this->error_reporter.error_type_mismatch(exp, node, sinfo->entity);
-        return error_stub();
-    }
-    if (*sinfo->entity.value->type != exp) {
-        this->error_reporter.error_type_mismatch(exp, node, sinfo->entity);
-        return error_stub();
-    }
-    return sinfo;
-}
 
 USemanticInfo Checker::visit_while(WhileNode& node) {
     WhileSNode* while_sn = new WhileSNode();
     SemanticInfo info;
     info.snode = while_sn;
 
-    USemanticInfo condition_p = this->expect_type(T_BOOL, *node.condition);
-    if (condition_p->entity.type == E_TYPE::ERROR) {
+    SNode* condition_snode = this->expect_rvalue_of_type(T_BOOL, *node.condition);
+    if (condition_snode == nullptr) {
         return error_stub();
     }
 
@@ -361,7 +346,7 @@ USemanticInfo Checker::visit_while(WhileNode& node) {
         // }
     }
     this->leave_scope();
-    while_sn->condition = condition_p->snode;
+    while_sn->condition = condition_snode;
     while_sn->body = (BlockSNode*) body_info_p->snode;
     return std::make_unique<SemanticInfo>(info);
 }
@@ -369,8 +354,10 @@ USemanticInfo Checker::visit_while(WhileNode& node) {
 USemanticInfo Checker::visit_if(IfNode& n) {
     SemanticInfo info;
 
-    USemanticInfo condition_info_p = this->expect_type(T_BOOL, *n.condition);
-    SemanticInfo& condition_info = *condition_info_p;
+    SNode* condition_snode = this->expect_rvalue_of_type(T_BOOL, *n.condition);
+    if (condition_snode == nullptr) {
+        return error_stub();
+    }
 
     this->enter_scope("if");
     USemanticInfo body_info = this->visit_block(*n.then);
@@ -379,11 +366,11 @@ USemanticInfo Checker::visit_if(IfNode& n) {
     std::vector<std::pair<SNode*, BlockSNode*>> elifs;
 
     for (size_t i = 0; i < n.elifs.size(); i++) {
-        USemanticInfo elif_condition_info_p = this->expect_type(T_BOOL, *n.elifs[i].first);
+        SNode* elif_condition_snode = this->expect_rvalue_of_type(T_BOOL, *n.elifs[i].first);
         this->enter_scope("elif");
         USemanticInfo elif_block_info = this->visit_block(*n.elifs[i].second);
         this->leave_scope();
-        elifs.push_back(std::make_pair(elif_condition_info_p->snode, (BlockSNode*) elif_block_info->snode));
+        elifs.push_back(std::make_pair(elif_condition_snode, (BlockSNode*) elif_block_info->snode));
     }
     USemanticInfo else_info;
     if (n.selse != nullptr && !n.selse->nodes.empty()) {
@@ -392,7 +379,7 @@ USemanticInfo Checker::visit_if(IfNode& n) {
         this->leave_scope();
     }
     SNode* else_snode = else_info == nullptr ? nullptr : else_info->snode;
-    info.snode = make_if_snode(condition_info.snode, body_info->snode, elifs, else_snode);
+    info.snode = make_if_snode(condition_snode, body_info->snode, elifs, else_snode);
 
     return std::make_unique<SemanticInfo>(info);
 }

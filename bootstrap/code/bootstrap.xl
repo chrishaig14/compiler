@@ -83,6 +83,8 @@ fun main()->Integer {
     var x = 8
     // declaration with type
     var y : Integer = 9
+    // declaration with type wrong
+    var zzzzz : Integer = "Hello"
     // boolean op
     var z = x == y
     // binary op
