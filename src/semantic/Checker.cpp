@@ -126,43 +126,6 @@ Checker::match_arguments_to_generic_function(const FunctionType& ft, VectorOfTyp
     return std::make_unique<SemanticInfo>(rv);
 }
 
-bool Checker::can_assign(const TypeNode& from, const TypeNode& to) {
-    if (from.object().is_generic_param || to.object().is_generic_param) {
-        return from.object().id == to.object().id;
-    } else if (from.object().actual_base_path.as_str() != to.object().actual_base_path.as_str()) {
-        return false;
-    }
-    return true;
-}
-
-bool Checker::can_assign_generic(TypeNode& from, TypeNode& to, VectorOfStrings type_params) {
-    auto to_object = (to).object();
-    if (to_object.type_params.size() == 0) {
-        for (auto tp:type_params) {
-            if (to_object.id == tp) {
-                return true;
-            }
-        }
-    }
-    if (to_object.id == "Option") {
-        if (*to_object.type_params[0] != from) {
-            auto foo = from.object();
-            if (foo.id != "NoneType") {
-                return false;
-            }
-        }
-        return true;
-    } else if (to_object.id == "Union") {
-        for (auto type_param: to_object.type_params) {
-            if (*type_param == from) {
-                return true;
-            }
-        }
-        return false;
-    }
-    return to == (from);
-}
-
 TypeNode* make_type_from_object_pattern(const ObjectType& object_type, const MapStringType& replacements) {
     std::string type_identifier = object_type.id;
     for (auto r: replacements) {

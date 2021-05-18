@@ -77,10 +77,6 @@ public:
     std::string __file__;
 
     void function_call_num_args(FunctionType& ft, TextPosition pos);
-    void match_type(ObjectType& type, TextPosition pos);
-    void match_type(Entity entity, TextPosition pos);
-    void condition(Entity entity, TextPosition pos, const std::string& st);
-    void expected_expression_with_type(Entity entity, TypeNode& exp_entity, TextPosition pos);
     void expected_expression(Entity entity, const Node& pos);
     void _for(Entity t, TextPosition pos);
     void bool_op(Entity left, Entity right, TextPosition pos);

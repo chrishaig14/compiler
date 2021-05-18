@@ -68,6 +68,16 @@ fun access_member_of_generic_error(x: t) -> Integer {
     return 9
 }
 
+// no return
+fun missing_return()->Integer{
+
+}
+
+// return with no value
+fun missing_return_2()->Integer{
+    return
+}
+
 fun main()->Integer {
     // declaration without type
     var x = 8
@@ -112,6 +122,7 @@ fun main()->Integer {
     // class instance
     var p = Person.john_smith()
     var c = #Person("Christian")
+    c = #Person(123)
     // method call of custom class
     print(c.get_name())
     // object member
@@ -139,6 +150,27 @@ fun main()->Integer {
         }
         ss: String {
             print(ss)
+        }
+    }
+    // match bad type
+    match 123 {
+        ii: Integer {
+            print("a")
+        }
+        ss: String {
+            print("b")
+        }
+    }
+    // match bad case
+    match mm {
+        ii: Integer {
+            print("i")
+        }
+        ss: String {
+            print("s")
+        }
+        w: Boolean {
+            print("b")
         }
     }
     // empty list
@@ -342,5 +374,15 @@ fun main()->Integer {
     Color = 9
     mytuple.1 = 9
     Color = 111
+    var iiiiii = Integer.foasdf
+    flot = print
+    flot = Integer + 9.2;
+    flot = 9.2 + Integer;
+    flot = 9.2 + print("Hello")
+    flot = print("Hello") + 9.2;
+    l = [print("Hello")]
+    print(print("Hello"))
+    float = 9 + "Hello" + 19
+    float = 9 + 19 + "Hello"
     return 0
 }

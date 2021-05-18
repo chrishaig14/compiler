@@ -164,13 +164,6 @@ void ErrorReporter::assignment(const TypeNode& expected, const TypeNode& actual,
     // this->fail(msg, pos);
 }
 
-void ErrorReporter::condition(Entity entity, TextPosition pos, const std::string& st) {
-    std::string msg;
-    msg = E_FMT(" Expected ") + E_HLT("Boolean ") + E_FMT("as condition for " + st + " statement, got ") +
-          E_HLT(entity_to_string(entity));
-    this->fail(msg, pos);
-}
-
 void ErrorReporter::no_return(const TypeNode& t, TextPosition pos) {
     std::string msg;
     msg = E_FMT(" Expected to return ") + E_HLT(t.to_string()) + E_FMT(" but not returning anything");
@@ -191,48 +184,10 @@ void ErrorReporter::bad_return(TextPosition pos) {
     this->fail(msg, pos);
 }
 
-void ErrorReporter::return_mismatch(const TypeNode& expected, const TypeNode& actual, TextPosition pos) {
-    std::string msg;
-    msg = E_HLT(text_pos_to_string(this->__file__, pos)) + E_FMT(" In function ") +
-          E_HLT((this->current_class == "" ? "" : this->current_class + ".") + this->current_function) + E_FMT(": ") +
-          E_FMT(" Expected to return ") + E_HLT(expected.to_string()) + E_FMT(" but got ") + E_HLT(actual.to_string());
-    this->fail(msg, pos);
-}
-
-void ErrorReporter::tuple_assign(TextPosition pos) {
-    std::string msg = E_FMT("Error: can't reassign a member of a tuple!");
-    this->fail(msg, pos);
-}
-
-void ErrorReporter::subscript_non_object(TextPosition pos) {
-    std::string msg;
-    msg = E_FMT("Accessing subscript of non object");
-    this->fail(msg, pos);
-}
-
-void ErrorReporter::string_immutable(TextPosition pos) {
-    std::string msg;
-    msg = E_FMT("Strings are immutable");
-    this->fail(msg, pos);
-}
-
 void ErrorReporter::_for(Entity t, TextPosition pos) {
     std::string msg;
     msg = E_FMT(" Expected") + E_HLT(" List[t] ") + E_FMT("in loop, but got ") + E_HLT(entity_to_string(t));
     this->fail(msg, pos);
-}
-
-void ErrorReporter::tuple_member_not_immutable(const TypeNode& t, TextPosition pos) {
-    std::string msg;
-    msg = E_FMT("Tuple member not immutable, it's of type ") + E_HLT(t.to_string());
-    this->fail(msg, pos);
-}
-
-void ErrorReporter::generic_call_mismatch(const TypeNode& expected, const TypeNode& actual, int i) {
-    std::string msg =
-            E_FMT("Error matching argument number " + std::to_string(i) + " expected ") + E_HLT(expected.to_string()) +
-            E_FMT(" got ") + E_HLT(actual.to_string());
-    this->fail(msg, TextPosition());
 }
 
 void ErrorReporter::call_bad_num_args() {
@@ -312,20 +267,6 @@ void ErrorReporter::call_not_a_function(const CallNode& node) {
     this->fail_ok(pre_msg, msg, node.start);
 }
 
-void ErrorReporter::class_init_bad_member_type(const TypeNode& cls, const TypeNode& expected, const TypeNode& actual,
-                                               TextPosition pos) {
-    std::string msg;
-    msg = E_FMT("In initialization of class ") + E_HLT(cls.to_string()) + E_FMT(" expected ") +
-          E_HLT(expected.to_string()) + E_FMT(" but got ") + E_HLT(actual.to_string());
-    this->fail(msg, pos);
-}
-
-void ErrorReporter::class_not_found(const TypeNode& cls, TextPosition pos) {
-    std::string msg;
-    msg = E_FMT("Class ") + E_HLT(cls.to_string()) + E_FMT(" not found");
-    this->fail(msg, pos);
-}
-
 void ErrorReporter::list_literal(const TypeNode& lt, const TypeNode& et, TextPosition pos, const Node& ell) {
     std::string pre_msg;
     pre_msg = E_FMT("List literal with element of wrong type, expected ") + E_HLT(lt.to_string()) + E_FMT(" got ") +
@@ -345,43 +286,6 @@ void ErrorReporter::partial_wrong_num_args(TextPosition pos) {
     std::string msg;
     msg = E_FMT("wrong number of arguments for partial function");
     this->fail(msg, pos);
-}
-
-void
-ErrorReporter::partial_function_call_type_mismatch(const TypeNode& expected, const TypeNode& actual, TextPosition pos,
-                                                   TextPosition end) {
-    std::string msg;
-    msg = E_FMT(" Function call type mismatch") + E_FMT(" expected ") + E_HLT(expected.to_string()) +
-          E_FMT(" but got ") + E_HLT(actual.to_string());
-    this->fail(msg, pos);
-}
-
-void ErrorReporter::generic_class_wrong_type_param_number(const std::string& cls, int num_req, int num_given,
-                                                          TextPosition pos) {
-    std::string msg;
-    msg = E_FMT("Generic class ") + E_HLT(cls) + E_FMT(" given " + std::to_string(num_given)) +
-          E_FMT(" types but " + std::to_string(num_req) + " required");
-    this->fail(msg, pos);
-}
-
-void ErrorReporter::class_init_wrong_number_init(const std::string& cls, int num_req, int num_given, TextPosition pos) {
-    std::string msg;
-    msg = E_FMT("In initialization of class ") + E_HLT(cls) +
-          E_FMT(" expected " + std::to_string(num_req) + " initializers but got " + std::to_string(num_given));
-    this->fail(msg, pos);
-}
-
-void ErrorReporter::class_init_member_not_init(const std::string& cls, std::string mem, TextPosition pos) {
-    std::string msg;
-    msg = E_FMT(" Member ") + E_HLT(mem) + E_FMT(" not initialized");
-    this->fail(msg, pos);
-}
-
-void ErrorReporter::subscript_type(const TypeNode& t, const TypeNode& s, const SubscriptNode& n) {
-    std::string pre_msg;
-    pre_msg = E_FMT("Expected ") + E_HLT(s.to_string()) + E_FMT(" in subscript, but got ") + E_HLT(s.to_string());
-    std::string msg = this->highlight_one(*n.child[0]);
-    this->fail_ok(pre_msg, msg, n.start);
 }
 
 std::string ErrorReporter::context_string(TextPosition position) {
@@ -414,24 +318,6 @@ void ErrorReporter::class_not_generic(const std::string& cls, TextPosition pos) 
 ErrorReporter::ErrorReporter() {
     this->failed = false;
     init_styles();
-}
-
-void ErrorReporter::match_type(Entity entity, TextPosition pos) {
-    std::string msg;
-    msg = E_FMT("Match statement expects a ") + E_HLT("Union[...]") + E_FMT(" expression");
-    if (entity.type == E_TYPE::VALUE) {
-        msg += E_FMT(", but got " + entity.value->type->to_string());
-    } else {
-        msg += E_FMT(", but got " + entity_to_string(entity));
-    }
-    this->fail(msg, pos);
-}
-
-void ErrorReporter::expected_expression_with_type(Entity entity, TypeNode& exp_entity, TextPosition pos) {
-    std::string msg;
-    msg = E_FMT("Expected an expression of type") + E_HLT(exp_entity.to_string()) +
-          E_FMT(", but got " + entity_to_string(entity));
-    this->fail(msg, pos);
 }
 
 void ErrorReporter::expected_expression(Entity entity, const Node& pos) {

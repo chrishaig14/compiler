@@ -107,7 +107,7 @@ USemanticInfo Checker::check_declaration_with_type(DeclarationNode& n) {
 
     E_TYPE entity_type = exp_info_p->entity.type;
     if (entity_type != E_TYPE::CONST_FUNCTION && entity_type != E_TYPE::VALUE) {
-        this->error_reporter.expected_expression_with_type(exp_info_p->entity, *n.type, n.start);
+        this->error_reporter.error_type_mismatch(*n.type, *n.expression, exp_info_p->entity);
         return error_stub();
     }
 

@@ -261,25 +261,13 @@ USemanticInfo Checker::visit_function(FunctionNode& n) {
             if (last_node->ntype != NodeType::RETRN) {
                 // it's not a return statement, error
                 this->error_reporter.function_return_last_stmt(function_name, returnType, last_node->start);
+                return error_stub();
             }
         } else {
             this->error_reporter.function_return_last_stmt(function_name, returnType, n.start);
+            return error_stub();
         }
     }
     this->leave_scope();
     return std::make_unique<SemanticInfo>(info);
-}
-
-USemanticInfo Checker::member_tuple(const ObjectType& final_type, MemberNode& n) {
-    if (n.type != MemberType::NUM) {
-        this->error_reporter.fail("Error can only access members " + std::to_string(1) + " to " +
-                                 std::to_string(final_type.type_params.size()) + " of " + final_type.to_string());
-    }
-    if (n.n_child < 1 || n.n_child > final_type.type_params.size()) {
-        this->error_reporter.fail("Error can only access members " + std::to_string(1) + " to " +
-                                 std::to_string(final_type.type_params.size()) + " of " + final_type.to_string());
-    }
-    SemanticInfo s;
-    // s.set_type(*final_type.type_params[n.n_child - 1]);
-    return std::make_unique<SemanticInfo>(s);
 }

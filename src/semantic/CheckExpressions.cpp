@@ -192,9 +192,16 @@ USemanticInfo Checker::visit_binop(BinopNode& n) {
     if (left_info_p->entity.type == E_TYPE::ERROR || right_info_p->entity.type == E_TYPE::ERROR) {
         return error_stub();
     }
-    if (left_info_p->entity.type != E_TYPE::VALUE || right_info_p->entity.type != E_TYPE::VALUE) {
-        this->error_reporter.error_type_mismatch(*left_info_p->entity.value->type, *n.right, right_info_p->entity);
-        // this->error_reporter.binop(left_info_p->entity, right_info_p->entity, n.op_pos, n.left, n.right);
+    bool has_error = false;
+    if (left_info_p->entity.type != E_TYPE::VALUE) {
+        this->error_reporter.expected_expression(left_info_p->entity, *n.left);
+        has_error = true;
+    }
+    if (right_info_p->entity.type != E_TYPE::VALUE) {
+        this->error_reporter.expected_expression(right_info_p->entity, *n.right);
+        has_error = true;
+    }
+    if (has_error) {
         return error_stub();
     }
     const TypeNode& ltype = *get_entity_type(left_info_p->entity);
@@ -225,10 +232,6 @@ USemanticInfo Checker::visit_binop(BinopNode& n) {
 
     sn->arguments.push_back(left_info.snode);
     sn->arguments.push_back(right_info.snode);
-
-    if (left_info.entity.type == E_TYPE::ERROR || right_info.entity.type == E_TYPE::ERROR) {
-        return error_stub();
-    }
 
     if (left_info_p->is_constant && right_info_p->is_constant) {
         info.is_constant = true;

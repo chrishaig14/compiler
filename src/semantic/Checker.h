@@ -84,6 +84,7 @@ SNode* make_union_wrapper(int type_index, SNode* expression);
 
 std::string binoptype_to_str(OpType op);
 TextPosition add_one_col(TextPosition t);
+
 class Checker {
     int loop_count;
     bool add_this;
@@ -99,8 +100,6 @@ public:
     Checker();
     ~Checker();
 
-    bool can_assign(const TypeNode& from, const TypeNode& to);
-    bool can_assign_generic(TypeNode& from, TypeNode& to, VectorOfStrings type_params);
     bool is_immutable(const TypeNode& node);
 
     void enter_scope(std::string name);
@@ -111,7 +110,6 @@ public:
     Class* instantiate_generic(Class* generic, const ObjectType& instance);
 
     bool is_variable(const ObjectType& a);
-    VectorOfTypes get_replacements_in_order(const FunctionType& function_type, VectorOfTypes arg_types);
     std::pair<std::string, TypeNode*>*
     get_first_substitution_function(FunctionType& a, FunctionType& b, bool is_top_level_arg);
     std::pair<std::string, TypeNode*>*
@@ -152,10 +150,7 @@ public:
     USemanticInfo visit_id(IdNode& n);
     USemanticInfo visit_if(IfNode& n);
     USemanticInfo visit_list(ListNode& node);
-
     USemanticInfo visit_member(MemberNode& n);
-    USemanticInfo class_member(Class* cls, std::string child);
-
     USemanticInfo visit_none(NoneNode& node);
     USemanticInfo visit_import(ImportNode& node);
     USemanticInfo visit_number(NumberNode& node);
@@ -166,8 +161,6 @@ public:
     USemanticInfo visit_ternary(TernaryNode& node);
     USemanticInfo visit_tuple(TupleNode& node);
     USemanticInfo visit_while(WhileNode& node);
-    USemanticInfo member_class_method(std::string class_name, std::string child, MemberNode& n);
-    USemanticInfo member_tuple(const ObjectType& final_type, MemberNode& n);
     USemanticInfo visit_cast(CastNode& n);
     USemanticInfo visit_defconst(DefaultConstructorNode& node);
 
@@ -187,8 +180,6 @@ public:
     USemanticInfo visit_alias(AliasNode* pNode);
     USemanticInfo enum_member(Enum* enumm, std::string value, MemberNode& node);
     USemanticInfo visit_enum(EnumNode& pNode);
-    bool can_be_assigned_to(const TypeNode& value, const TypeNode& target);
-    SNode* make_rvalue(Entity value_entity, const TypeNode& target);
     SNode* make_rvalue(Entity value_entity, SNode* value_snode, const TypeNode& target);
     USemanticInfo dispatch(Node* nod);
     USemanticInfo dispatch_any(Node* pNode, bool b);

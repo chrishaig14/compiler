@@ -259,6 +259,11 @@ USemanticInfo Checker::visit_defconst(DefaultConstructorNode& node) {
 
 USemanticInfo Checker::visit_list(ListNode& node) {
     USemanticInfo element_type_p = this->dispatch(node.elements[0]);
+    if (element_type_p->entity.type != E_TYPE::VALUE) {
+        this->error_reporter.expected_expression(element_type_p->entity, *node.elements[0]);
+        return error_stub();
+    }
+
     TypeNode* element_type = element_type_p->entity.value->type->clone();
     bool is_constant = true;
     ListSNode* lsn = new ListSNode();

@@ -79,7 +79,8 @@ USemanticInfo Checker::visit_call(CallNode& n, bool is_rvalue) {
 
 
         if (arg_entity.type == E_TYPE::CLASS || arg_entity.type == E_TYPE::PACKAGE ||
-            arg_entity.type == E_TYPE::MODULE || arg_entity.type == E_TYPE::ENUM) {
+            arg_entity.type == E_TYPE::MODULE || arg_entity.type == E_TYPE::ENUM || arg_entity.type == E_TYPE::ERROR ||
+            arg_entity.type == E_TYPE::NOTHING) {
             has_error = true;
             this->error_reporter.expected_expression(arg_entity, *arg);
             // this->error_reporter.fail("ERROR ITS NOT AN EXPRESSION");

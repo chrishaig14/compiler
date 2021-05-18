@@ -191,6 +191,7 @@ USemanticInfo Checker::visit_return(ReturnNode& n) {
     }
     if (n.expression == nullptr) {
         this->error_reporter.no_return(*return_type, n.start);
+        return error_stub();
     }
 
     USemanticInfo expression_info_p = this->dispatch_rvalue(n.expression);
@@ -230,7 +231,9 @@ USemanticInfo Checker::visit_match(MatchExpressionNode* node) {
     SemanticInfo info;
     USemanticInfo exp_info = this->dispatch_rvalue(node->exp);
     if (exp_info->entity.type != E_TYPE::VALUE || exp_info->entity.value->type->kind != Kind::OBJECT) {
-        this->error_reporter.match_type(exp_info->entity, TextPosition());
+        this->error_reporter.error_type_mismatch(ObjectType("Union", {new ObjectType("...", {})}),
+                                                 *node->exp,
+                                                 exp_info->entity);
         return error_stub();
     }
 
@@ -239,7 +242,9 @@ USemanticInfo Checker::visit_match(MatchExpressionNode* node) {
         ot = (ObjectType*) ot->aliased_type;
     }
     if (ot->id != "Union") {
-        this->error_reporter.match_type(exp_info->entity, TextPosition());
+        this->error_reporter.error_type_mismatch(ObjectType("Union", {new ObjectType("...", {})}),
+                                                 *node->exp,
+                                                 exp_info->entity);
         return error_stub();
     }
     std::vector<std::pair<int, BlockSNode*>> cas;
@@ -255,6 +260,7 @@ USemanticInfo Checker::visit_match(MatchExpressionNode* node) {
         int union_index = target_union_type(*ot, *case_type);
         if (union_index == -1) {
             this->error_reporter.fail("Error, type " + case_type->to_string() + " not part of " + ot->to_string());
+            return error_stub();
         }
         this->enter_scope("case");
         Entity ent(new Value(case_type));

@@ -27,6 +27,7 @@ SemanticInfo::SemanticInfo(const SemanticInfo& other) {
     this->this_arg = other.this_arg;
     this->is_class_method = other.is_class_method;
     this->is_constant = other.is_constant;
+    this->is_tuple_member = other.is_tuple_member;
     this->snode = other.snode;
 }
 
