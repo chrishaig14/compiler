@@ -184,6 +184,7 @@ public:
     USemanticInfo dispatch(Node* nod);
     USemanticInfo dispatch_any(Node* pNode, bool b);
     void fill_value(Value* value);
+    USemanticInfo expect_type(const TypeNode& exp, Node& node);
 };
 
 int target_union_type(const ObjectType& target, const TypeNode& source);

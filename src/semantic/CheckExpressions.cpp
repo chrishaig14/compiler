@@ -312,19 +312,9 @@ USemanticInfo Checker::visit_subscript(SubscriptNode& node) {
         this->error_reporter.fail("Error subscript with more than one child!");
         return error_stub();
     }
-    Node* c = node.child[0];
-    USemanticInfo ct = this->dispatch_rvalue(c);
+    USemanticInfo ct = this->expect_type(*subscript_fun->ft->param_types[0], *node.child[0]);
     Entity child_entity = ct->entity;
-    if (child_entity.type != E_TYPE::VALUE) {
-        this->error_reporter.error_type_mismatch(*subscript_fun->ft->param_types[0], *node.child[0], child_entity);
-        return error_stub();
-    }
-    if (*child_entity.value->type != *subscript_fun->ft->param_types[0]) {
-        this->error_reporter.error_type_mismatch(*subscript_fun->ft->param_types[0], *node.child[0], child_entity);
-        // this->error_reporter.subscript_type(*child_entity.value->type, *subscript_fun->ft->param_types[0], node);
-        // this->error_reporter.fail(
-        //         "Error subscript type is " + child_entity.value->type->to_string() + " but should be " +
-        //         subscript_fun->ft->param_types[0]->to_string());
+    if (child_entity.type == E_TYPE::ERROR) {
         return error_stub();
     }
     SemanticInfo info;

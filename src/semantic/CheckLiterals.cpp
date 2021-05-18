@@ -193,25 +193,19 @@ USemanticInfo Checker::visit_dict(DictNode& node) {
     items = {{first_key_info->snode, first_value_info->snode}};
     bool has_error = false;
     for (size_t i = 1; i < node.items.size(); i++) {
-        USemanticInfo key_info = this->dispatch(node.items[i].first);
-        USemanticInfo value_info = this->dispatch(node.items[i].second);
-        ObjectType& key_type = key_info->entity.value->type->object();
-        ObjectType& value_type = value_info->entity.value->type->object();
-        if (key_type != first_key_type) {
-            this->error_reporter.error_type_mismatch(first_key_type, *node.items[i].first, key_info->entity);
-            // this->error_reporter.fail("Second key type different to first");
+        USemanticInfo key_info = this->expect_type(first_key_type, *node.items[i].first);
+        if (key_info->entity.type == E_TYPE::ERROR) {
             has_error = true;
         }
-        if (value_type != first_value_type) {
-            // this->error_reporter.fail("Second value type different to first");
-            this->error_reporter.error_type_mismatch(first_value_type, *node.items[i].first, value_info->entity);
+        USemanticInfo value_info = this->expect_type(first_value_type, *node.items[i].second);
+        if (value_info->entity.type == E_TYPE::ERROR) {
             has_error = true;
         }
         items.push_back(std::make_pair(key_info->snode, value_info->snode));
     }
-    // if (has_error) {
-    //     return error_stub();
-    // }
+    if (has_error) {
+        return error_stub();
+    }
     Value* ov = new Value(new ObjectType("Dict", {first_key_type.clone(), first_value_type.clone()}));
     this->module->fill_actual(ov->type);
     this->fill_value(ov);

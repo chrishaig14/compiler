@@ -34,21 +34,9 @@ USemanticInfo Checker::visit_lvalue_subscript(SubscriptNode& node) {
     if (node.child.size() > 1) {
         this->error_reporter.fail("Error subscript with more than one child!");
     }
-    Node* c = node.child[0];
-    USemanticInfo ct = this->dispatch_rvalue(c);
-    Entity child_entity = ct->entity;
-    if (child_entity.type != E_TYPE::VALUE) {
-        this->error_reporter.error_type_mismatch(*subscript_fun->ft->param_types[0], *node.child[0], child_entity);
+    USemanticInfo ct = this->expect_type(*subscript_fun->ft->param_types[0], *node.child[0]);
+    if (ct->entity.type == E_TYPE::ERROR) {
         return error_stub();
-    }
-    if (*child_entity.value->type != *subscript_fun->ft->param_types[0]) {
-        this->error_reporter.error_type_mismatch(*subscript_fun->ft->param_types[0], *node.child[0], child_entity);
-
-        // this->error_reporter.subscript_type(*child_entity.value->type, *subscript_fun->ft->param_types[0], node);
-        return error_stub();
-        // this->error_reporter.fail(
-        //         "Error subscript type is " + child_entity.value->type->to_string() + " but should be " +
-        //         subscript_fun->ft->param_types[0]->to_string());
     }
     SemanticInfo info;
     info.entity = Entity(new Value((ObjectType*) rtype));
@@ -352,23 +340,29 @@ USemanticInfo Checker::visit_break(BreakNode& node) {
     return std::make_unique<SemanticInfo>(info);
 }
 
+USemanticInfo Checker::expect_type(const TypeNode& exp, Node& node) {
+    USemanticInfo sinfo = this->dispatch_rvalue(&node);
+    if (sinfo->entity.type != E_TYPE::VALUE) {
+        this->error_reporter.error_type_mismatch(exp, node, sinfo->entity);
+        return error_stub();
+    }
+    if (*sinfo->entity.value->type != exp) {
+        this->error_reporter.error_type_mismatch(exp, node, sinfo->entity);
+        return error_stub();
+    }
+    return sinfo;
+}
+
 USemanticInfo Checker::visit_while(WhileNode& node) {
     WhileSNode* while_sn = new WhileSNode();
     SemanticInfo info;
     info.snode = while_sn;
-    USemanticInfo condition_p = this->dispatch_rvalue(node.condition);
-    SemanticInfo& condition = *condition_p;
-    if (condition.entity.type != E_TYPE::VALUE) {
-        this->error_reporter.error_type_mismatch(T_BOOL, *node.condition, condition_p->entity);
-        // return error_stub();
-        // this->error_reporter.condition(condition.entity, node.start, "while");
-    }
-    ObjectType* condition_ot = &condition.entity.value->type->object();
-    if (*condition_ot != T_BOOL) {
-        this->error_reporter.error_type_mismatch(T_BOOL, *node.condition, condition_p->entity);
 
-        // this->error_reporter.condition(condition.entity, node.start, "while");
+    USemanticInfo condition_p = this->expect_type(T_BOOL, *node.condition);
+    if (condition_p->entity.type == E_TYPE::ERROR) {
+        return error_stub();
     }
+
     this->enter_scope("while");
     this->scope->is_loop = true;
     USemanticInfo body_info_p = this->visit_block(*node.body);
@@ -382,57 +376,29 @@ USemanticInfo Checker::visit_while(WhileNode& node) {
         // }
     }
     this->leave_scope();
-    while_sn->condition = condition.snode;
+    while_sn->condition = condition_p->snode;
     while_sn->body = (BlockSNode*) body_info_p->snode;
     return std::make_unique<SemanticInfo>(info);
 }
 
 USemanticInfo Checker::visit_if(IfNode& n) {
     SemanticInfo info;
-    USemanticInfo condition_info_p = this->dispatch_rvalue(n.condition);
-    SemanticInfo& condition_info = *condition_info_p;
 
-    if (condition_info.entity.type != E_TYPE::ERROR) {
-        if (condition_info.entity.type != E_TYPE::VALUE) {
-            this->error_reporter.error_type_mismatch(T_BOOL, *n.condition, condition_info.entity);
-            // this->error_reporter.condition(condition_info.entity, n.condition->start, "if");
-        }
-        if (*condition_info.entity.value->type != T_BOOL) {
-            this->error_reporter.error_type_mismatch(T_BOOL, *n.condition, condition_info.entity);
-            // this->error_reporter.condition(condition_info.entity, n.condition->start, "if");
-        }
-    }
-    // std::unordered_map<std::string, bool> not_null_vars;
-    // if (condition_info.type() == T_NONE) {
-    //     this->error_reporter.function_doesnt_return_a_value(n.condition->start, new T_BOOL);
-    // } else if (condition_info.type() != T_BOOL) {
-    //     this->error_reporter.condition(condition_info.type(), n.start, "if");
-    // }
+    USemanticInfo condition_info_p = this->expect_type(T_BOOL, *n.condition);
+    SemanticInfo& condition_info = *condition_info_p;
 
     this->enter_scope("if");
     USemanticInfo body_info = this->visit_block(*n.then);
-    // for (auto v: this->scope->table) {
-    //     n.then->local_vars.push_back(std::make_pair(v.first, v.second->clone()));
-    // }
     this->leave_scope();
 
     std::vector<std::pair<SNode*, BlockSNode*>> elifs;
 
     for (size_t i = 0; i < n.elifs.size(); i++) {
-        USemanticInfo elif_condition_info_p = this->dispatch_rvalue(n.elifs[i].first);
-        SemanticInfo& elif_condition_info = *elif_condition_info_p;
-        if (elif_condition_info.entity.type != E_TYPE::VALUE) {
-            this->error_reporter.error_type_mismatch(T_BOOL, *n.elifs[i].first, elif_condition_info.entity);
-            // this->error_reporter.condition(condition_info.entity, n.elifs[i].first->start, "elif");
-        }
-        if (*elif_condition_info.entity.value->type != T_BOOL) {
-            this->error_reporter.error_type_mismatch(T_BOOL, *n.elifs[i].first, elif_condition_info.entity);
-            // this->error_reporter.condition(condition_info.entity, n.elifs[i].first->start, "elif");
-        }
+        USemanticInfo elif_condition_info_p = this->expect_type(T_BOOL, *n.elifs[i].first);
         this->enter_scope("elif");
         USemanticInfo elif_block_info = this->visit_block(*n.elifs[i].second);
         this->leave_scope();
-        elifs.push_back(std::make_pair(elif_condition_info.snode, (BlockSNode*) elif_block_info->snode));
+        elifs.push_back(std::make_pair(elif_condition_info_p->snode, (BlockSNode*) elif_block_info->snode));
     }
     USemanticInfo else_info;
     if (n.selse != nullptr && !n.selse->nodes.empty()) {

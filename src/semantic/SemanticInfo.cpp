@@ -35,5 +35,5 @@ SemanticInfo::~SemanticInfo() {
 }
 
 ErrorStub::ErrorStub() {
-    this->entity = Entity{.type=E_TYPE::ERROR};
+    this->entity = Entity(E_TYPE::ERROR);
 }
