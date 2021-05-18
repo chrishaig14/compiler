@@ -27,26 +27,7 @@ USemanticInfo Checker::visit_call(CallNode& n, bool is_rvalue) {
     SemanticInfo& fun_info = *fun_info_p;
     // bool is_a_method = false;
     // Node* object_node;
-    if (fun_info.is_class_method) {
-        MemberNode& member_node = n.function->member();
-        if (member_node.s_child == "init") {
-            // const FunctionType& ftn = fun_info.type().function();
-            // FunctionType& copy_ftn = ftn.clone()->function();
-            // retv.set_type(*copy_ftn.clone());
-            // object_node = member_node.parent;
-        } else {
-            // n.function = new IdNode(this->map[fun_info.class_info->class_name + "." + member_node.s_child],
-            //                         POS_NONE,
-            //                         POS_NONE);
-            // const FunctionType& ftn = fun_info.type().function();
-            // FunctionType& copy_ftn = ftn.clone()->function();
-            // copy_ftn.param_types.insert(copy_ftn.param_types.begin(), TYPE(fun_info.class_info->class_name, {}));
-            // retv.set_type(*copy_ftn.clone());
-            // object_node = member_node.parent;
-        }
-    } else {
-        sn->function = fun_info.snode;
-    }
+    sn->function = fun_info.snode;
     FunctionType* function_type = nullptr;
     if (fun_info.entity.type == E_TYPE::CONST_FUNCTION) {
         function_type = fun_info.entity.const_function->ft->clone();
@@ -57,7 +38,6 @@ USemanticInfo Checker::visit_call(CallNode& n, bool is_rvalue) {
         return error_stub();
     }
     // ok
-    // const FunctionType& function_type = fun_info.type().function();
     if (n.arguments.size() != function_type->param_types.size()) {
         this->error_reporter.function_call_num_args(*function_type, n.start);
         if (!function_is_generic(*function_type)) {
@@ -83,7 +63,6 @@ USemanticInfo Checker::visit_call(CallNode& n, bool is_rvalue) {
             arg_entity.type == E_TYPE::NOTHING) {
             has_error = true;
             this->error_reporter.expected_expression(arg_entity, *arg);
-            // this->error_reporter.fail("ERROR ITS NOT AN EXPRESSION");
             continue;
         }
         if (arg_entity.type == E_TYPE::ERROR) {
@@ -92,9 +71,6 @@ USemanticInfo Checker::visit_call(CallNode& n, bool is_rvalue) {
         }
 
         TypeNode& arg_type = *get_entity_type(arg_entity);
-        // if (!arg_type_p->is_constant) {
-        //     args_are_constant = false;
-        // }
         arg_types.push_back(arg_type.clone());
         n.arg_types.push_back(arg_type.clone());
     }
@@ -120,29 +96,15 @@ USemanticInfo Checker::visit_call(CallNode& n, bool is_rvalue) {
             SNode* arg_rvalue_snode = this->make_rvalue(arg_entities[i], sn->arguments[sni], param_type);
             if (arg_rvalue_snode == nullptr) {
                 this->error_reporter.error_type_mismatch(param_type, *n.arguments[i], arg_entities[i]);
-                // this->error_reporter.function_call_type_mismatch(param_type,
-                //                                                  *n.arguments[i],
-                //                                                  arg_type,
-                //                                                  n.arguments[i]->start,
-                //                                                  n.arguments[i]->end);
                 continue;
             }
             sn->arguments[sni] = arg_rvalue_snode;
             sni++;
         }
     }
-    // for (auto x: arg_types) {
-    //     delete x;
-    // }
-    // if (retv.entity.value->type->kind==Kind::OBJECT){
-    //     if (retv.entity.value->type->object().actual_to_string() == ""){
-    //         this->error_reporter.fail("This should not be empty!");
-    //     }
-    // }
     if (retv.entity.type == E_TYPE::NOTHING) {
         if (is_rvalue) {
             this->error_reporter.expected_expression(retv.entity, n);
-            // this->error_reporter.fail("Cannot use function call as expression as it doesn't return a value!", n.start);
             return error_stub();
         }
     } else if (retv.entity.type == E_TYPE::VALUE) {

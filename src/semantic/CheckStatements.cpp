@@ -192,24 +192,6 @@ USemanticInfo Checker::visit_return(ReturnNode& n) {
         return error_stub();
     }
     sn->expression = exp_snode;
-    // SemanticInfo& expression_info = *expression_info_p;
-    // if (expression_info.entity.type == E_TYPE::ERROR) {
-    //     return error_stub();
-    // }
-    // sn->expression = expression_info.snode;
-    // if (return_type->object().id == "Union") {
-    //     int type_index = target_union_type(return_type->object(), *expression_info.entity.value->type);
-    //     if (type_index == -1) {
-    //         this->error_reporter.assignment(*return_typet, *expression_info.entity.value->type, n.start);
-    //     }
-    //     SNode* union_wrapper = make_union_wrapper(type_index, sn->expression);
-    //     sn->expression = union_wrapper;
-    // } else {
-    //     if (!this->can_assign(*expression_info.entity.value->type, *return_type)) {
-    //         this->error_reporter.return_mismatch(*return_typet, *expression_info.entity.value->type, n.start);
-    //         return error_stub();
-    //     }
-    // }
     n.ret_type = return_type->clone();
     n.reachables = this->scope->get_all();
     return std::make_unique<SemanticInfo>(info);
@@ -342,6 +324,9 @@ USemanticInfo Checker::visit_break(BreakNode& node) {
 
 USemanticInfo Checker::expect_type(const TypeNode& exp, Node& node) {
     USemanticInfo sinfo = this->dispatch_rvalue(&node);
+    if (sinfo->entity.type == E_TYPE::ERROR) {
+        return error_stub();
+    }
     if (sinfo->entity.type != E_TYPE::VALUE) {
         this->error_reporter.error_type_mismatch(exp, node, sinfo->entity);
         return error_stub();

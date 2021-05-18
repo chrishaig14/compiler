@@ -182,48 +182,26 @@ USemanticInfo Checker::visit_binop(BinopNode& n) {
     CallSNode* sn = new CallSNode();
     IdSNode* function_id = new IdSNode();
     sn->function = function_id;
-    function_id->identifier = "";//mangle_path(this->module->imported_paths.at("Integer.add"));
+    function_id->identifier = "";
     SemanticInfo info;
     info.snode = sn;
 
-    // Logger::info("Checking binop node");
     USemanticInfo left_info_p = this->dispatch_rvalue(n.left);
-    USemanticInfo right_info_p = this->dispatch_rvalue(n.right);
-    if (left_info_p->entity.type == E_TYPE::ERROR || right_info_p->entity.type == E_TYPE::ERROR) {
+    if (left_info_p->entity.type == E_TYPE::ERROR) {
         return error_stub();
     }
-    bool has_error = false;
     if (left_info_p->entity.type != E_TYPE::VALUE) {
         this->error_reporter.expected_expression(left_info_p->entity, *n.left);
-        has_error = true;
+        return error_stub();
     }
-    if (right_info_p->entity.type != E_TYPE::VALUE) {
-        this->error_reporter.expected_expression(right_info_p->entity, *n.right);
-        has_error = true;
-    }
-    if (has_error) {
+    USemanticInfo right_info_p = this->expect_type(*left_info_p->entity.value->type, *n.right);
+    if (right_info_p->entity.type == E_TYPE::ERROR) {
         return error_stub();
     }
     const TypeNode& ltype = *get_entity_type(left_info_p->entity);
     const TypeNode& rtype = *get_entity_type(right_info_p->entity);
     if (ltype != rtype) {
-        // this->error_reporter.binop(left_info_p->entity, right_info_p->entity, n.op_pos, n.left, n.right);
         this->error_reporter.error_type_mismatch(*left_info_p->entity.value->type, *n.right, right_info_p->entity);
-        return error_stub();
-        // this->error_reporter.fail("Binary operation between values of different types: " + ltype.to_string() + " and " +
-        //                          rtype.to_string());
-    }
-    bool err = false;
-    if (ltype == T_NONE) {
-        this->error_reporter.function_doesnt_return_a_value(n.left->start, nullptr);
-        err = true;
-    }
-
-    if (rtype == T_NONE) {
-        this->error_reporter.function_doesnt_return_a_value(n.right->start, nullptr);
-        err = true;
-    }
-    if (err) {
         return error_stub();
     }
 
@@ -239,7 +217,6 @@ USemanticInfo Checker::visit_binop(BinopNode& n) {
     TypeNode* rettype;
     std::string fun = binoptype_to_str(n.op);
 
-    // ;this->scope->get(ltype.object().id);
     Entity entity(new Value(ltype.object().clone()));
     this->fill_value(entity.value);
     Class* cls = entity.value->clazz;
@@ -252,7 +229,6 @@ USemanticInfo Checker::visit_binop(BinopNode& n) {
     ConstFunction* operator_fun = operator_fun_it->second;
     function_id->identifier = operator_fun->path.as_str();
     rettype = operator_fun->ft->return_type->clone();
-    // n.ltype = left.clone();
     info.entity = Entity(new Value(rettype));
     this->fill_value(info.entity.value);
     return std::make_unique<SemanticInfo>(info);
@@ -291,9 +267,6 @@ USemanticInfo Checker::visit_subscript(SubscriptNode& node) {
     if (cls == nullptr) {
         // its totally generic, fail
         this->error_reporter.object_no_special_method(*entity_parent.value->type, "__get_item__", node);
-        // this->error_reporter.fail(
-        //         "Error, accessing subscript of totally generic type: " + entity_parent.value->type->to_string(),
-        //         node.start);
         return error_stub();
     }
     assert(cls != nullptr);
@@ -347,12 +320,9 @@ USemanticInfo Checker::visit_ternary(TernaryNode& node) {
         this->error_reporter.error_type_mismatch(ObjectType("Option", {new ObjectType("t")}),
                                                  *node.expression,
                                                  expression_info_p->entity);
-        // this->error_reporter.fail("Expected an Option[T], got: " + expression_type.to_string());
         return error_stub();
     }
     SemanticInfo semanticInfo;
-    // TypeNode& type = *expression_type.type_params[0];
-    // semanticInfo.set_type(type);
     this->enter_scope("true_case");
     TypeNode*& inner_type = expression_type.type_params[0];
     Value* v = new Value(inner_type);
@@ -360,15 +330,11 @@ USemanticInfo Checker::visit_ternary(TernaryNode& node) {
     USemanticInfo true_case_p = this->dispatch_rvalue(node.true_case);
     SemanticInfo& true_case = *true_case_p;
     this->leave_scope();
-    USemanticInfo false_case_p = this->dispatch_rvalue(node.false_case);
-    SemanticInfo& false_case = *false_case_p;
-    if (*false_case.entity.value->type != *true_case.entity.value->type) {
-        this->error_reporter.error_type_mismatch(*true_case.entity.value->type, *node.false_case, false_case.entity);
-        // this->error_reporter.fail(
-        //         "True case and false case type don't match: " + true_case.entity.value->type->to_string() + " != " +
-        //         false_case.entity.value->type->to_string());
+    USemanticInfo false_case_p = this->expect_type(*true_case.entity.value->type, *node.false_case);
+    if (false_case_p->entity.type == E_TYPE::ERROR) {
         return error_stub();
     }
+    SemanticInfo& false_case = *false_case_p;
     Value* rv = new Value(true_case.entity.value->type->clone());
     semanticInfo.entity = Entity(rv);
     semanticInfo.snode = new TernarySNode(expression_info_p->snode, true_case.snode, false_case.snode);

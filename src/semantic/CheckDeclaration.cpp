@@ -122,11 +122,6 @@ USemanticInfo Checker::check_declaration_with_type(DeclarationNode& n) {
     SNode* rvalue_snode = this->make_rvalue(exp_info_p->entity, exp_info_p->snode, *n.type);
     if (rvalue_snode == nullptr) {
         this->error_reporter.error_type_mismatch(*n.type, *n.expression, exp_info_p->entity);
-        // this->error_reporter.assignment(*n.type,
-        //                                 *exp_info_p->entity.value->type,
-        //                                 n.eq_pos,
-        //                                 IdNode("asd", n.start, TextPosition{n.eq_pos.line, n.eq_pos.column - 1}),
-        //                                 *n.expression);
         return error_stub();
     }
     sn->expression = rvalue_snode;
