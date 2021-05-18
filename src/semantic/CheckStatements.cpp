@@ -55,14 +55,10 @@ USemanticInfo Checker::visit_lvalue_subscript(SubscriptNode& node) {
 }
 
 USemanticInfo Checker::visit_assignment(AssignmentNode& n) {
-
-    SemanticInfo info;
-
     if (n.lvalue->ntype == NodeType::ID) {
         if (n.lvalue->id()._id == "_") {
             USemanticInfo rv = this->dispatch_rvalue(n.rvalue);
-            info.snode = rv->snode;
-            return std::make_unique<SemanticInfo>(info);
+            return rv;
         }
     }
 
@@ -134,17 +130,13 @@ USemanticInfo Checker::visit_assignment(AssignmentNode& n) {
                                                 expression_info_p->snode,
                                                 *linfo.entity.value->type);
         if (rvalue_snode == nullptr) {
-            // this->error_reporter.assignment(l_type, *exp_type, n.start, *n.lvalue, *n.rvalue);
             this->error_reporter.error_type_mismatch(l_type, *n.rvalue, expression_info_p->entity);
             return error_stub();
         }
         expression_info_p->snode = rvalue_snode;
     }
-    // } else {
-    //     this->error_reporter.assignment(*linfo_p->entity.function_value->ft,
-    //                                     *expression_info_p->entity.value->type,
-    //                                     n.rvalue->start);
-    // }
+
+    SemanticInfo info;
     if (is_subscript) {
         info.snode = linfo_p->snode;
         csn->arguments.push_back(expression_info_p->snode);

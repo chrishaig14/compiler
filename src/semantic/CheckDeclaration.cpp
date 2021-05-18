@@ -112,36 +112,12 @@ USemanticInfo Checker::check_declaration_with_type(DeclarationNode& n) {
     info.snode = sn;
     sn->identifier = n.identifier;
 
-    TypeNode* orig_type = n.type;
-
     if (n.type->kind == Kind::OBJECT && this->module->aliased_types.count(n.type->object().id) == 1) {
         TypeNode* aliased_type = this->module->aliased_types.at(n.type->object().id);
         n.type = aliased_type;
     } else {
         this->module->fill_actual(n.type);
     }
-
-    // USemanticInfo exp_info_p = this->dispatch_rvalue(n.expression);
-
-    // E_TYPE entity_type = exp_info_p->entity.type;
-    // if (entity_type != E_TYPE::CONST_FUNCTION && entity_type != E_TYPE::VALUE) {
-    //     this->error_reporter.error_type_mismatch(*n.type, *n.expression, exp_info_p->entity);
-    //     return error_stub();
-    // }
-    //
-    // sn->expression = exp_info_p->snode;
-    // SemanticInfo& exp_info = *exp_info_p;
-    // if (exp_info.entity.type == E_TYPE::ERROR) {
-    //     Value* ov = new Value(n.type->clone());
-    //     info.entity = Entity(ov);
-    //     return std::make_unique<SemanticInfo>(info);
-    // }
-    //
-    // SNode* rvalue_snode = this->expect_rvalue_of_type(exp_info_p->entity, exp_info_p->snode, *n.type);
-    // if (rvalue_snode == nullptr) {
-    //     this->error_reporter.error_type_mismatch(*n.type, *n.expression, exp_info_p->entity);
-    //     return error_stub();
-    // }
     USemanticInfo rvalue_sinfo = this->expect_rvalue_of_type(*n.type, *n.expression);
     if (rvalue_sinfo->is_error()) {
         return error_stub();
