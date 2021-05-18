@@ -184,7 +184,7 @@ public:
     USemanticInfo dispatch(Node* nod);
     USemanticInfo dispatch_any(Node* pNode, bool b);
     void fill_value(Value* value);
-    SNode* expect_rvalue_of_type(const TypeNode& target, Node& node);
+    std::unique_ptr<SemanticInfo> expect_rvalue_of_type(const TypeNode& target, Node& node);
 };
 
 int target_union_type(const ObjectType& target, const TypeNode& source);

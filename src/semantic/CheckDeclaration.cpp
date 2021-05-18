@@ -4,22 +4,22 @@
 
 #include "CheckDeclaration.h"
 
-SNode* Checker::expect_rvalue_of_type(const TypeNode& target, Node& node) {
+std::unique_ptr<SemanticInfo> Checker::expect_rvalue_of_type(const TypeNode& target, Node& node) {
     USemanticInfo rinfo = this->dispatch_rvalue(&node);
     if (rinfo->entity.type == E_TYPE::ERROR) {
-        return nullptr;
+        return error_stub();
     }
     if (rinfo->entity.type != E_TYPE::VALUE) {
         this->error_reporter.error_type_mismatch(target, node, rinfo->entity);
-        return nullptr;
+        return error_stub();
     }
     SNode* snode = make_rvalue(rinfo->entity, rinfo->snode, target);
     if (snode == nullptr) {
         this->error_reporter.error_type_mismatch(target, node, rinfo->entity);
-        return nullptr;
+        return error_stub();
     }
-    return snode;
-
+    rinfo->snode = snode;
+    return rinfo;
 }
 
 SNode* Checker::make_rvalue(Entity value_entity, SNode* value_snode, const TypeNode& target) {
@@ -142,11 +142,11 @@ USemanticInfo Checker::check_declaration_with_type(DeclarationNode& n) {
     //     this->error_reporter.error_type_mismatch(*n.type, *n.expression, exp_info_p->entity);
     //     return error_stub();
     // }
-    SNode* rvalue_snode = this->expect_rvalue_of_type(*n.type, *n.expression);
-    if (rvalue_snode == nullptr) {
+    USemanticInfo rvalue_sinfo = this->expect_rvalue_of_type(*n.type, *n.expression);
+    if (rvalue_sinfo->entity.type == E_TYPE::ERROR) {
         return error_stub();
     }
-    sn->expression = rvalue_snode;
+    sn->expression = rvalue_sinfo->snode;
     Value* ov = new Value(n.type->clone());
     info.entity = Entity(ov);
     return std::make_unique<SemanticInfo>(info);

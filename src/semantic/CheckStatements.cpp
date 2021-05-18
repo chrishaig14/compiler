@@ -34,10 +34,12 @@ USemanticInfo Checker::visit_lvalue_subscript(SubscriptNode& node) {
     if (node.child.size() > 1) {
         this->error_reporter.fail("Error subscript with more than one child!");
     }
-    SNode* child_snode = this->expect_rvalue_of_type(*subscript_fun->ft->param_types[0], *node.child[0]);
-    if (child_snode == nullptr) {
+    USemanticInfo child_sinfo = this->expect_rvalue_of_type(*subscript_fun->ft->param_types[0], *node.child[0]);
+    if (child_sinfo->entity.type == E_TYPE::ERROR) {
         return error_stub();
     }
+    SNode* child_snode = child_sinfo->snode;
+
     SemanticInfo info;
     info.entity = Entity(new Value((ObjectType*) rtype));
 
@@ -328,10 +330,11 @@ USemanticInfo Checker::visit_while(WhileNode& node) {
     SemanticInfo info;
     info.snode = while_sn;
 
-    SNode* condition_snode = this->expect_rvalue_of_type(T_BOOL, *node.condition);
-    if (condition_snode == nullptr) {
+    USemanticInfo condition_sinfo = this->expect_rvalue_of_type(T_BOOL, *node.condition);
+    if (condition_sinfo->entity.type == E_TYPE::ERROR) {
         return error_stub();
     }
+    SNode* condition_snode = condition_sinfo->snode;
 
     this->enter_scope("while");
     this->scope->is_loop = true;
@@ -354,10 +357,11 @@ USemanticInfo Checker::visit_while(WhileNode& node) {
 USemanticInfo Checker::visit_if(IfNode& n) {
     SemanticInfo info;
 
-    SNode* condition_snode = this->expect_rvalue_of_type(T_BOOL, *n.condition);
-    if (condition_snode == nullptr) {
+    USemanticInfo condition_sinfo = this->expect_rvalue_of_type(T_BOOL, *n.condition);
+    if (condition_sinfo->entity.type == E_TYPE::ERROR) {
         return error_stub();
     }
+    SNode* condition_snode = condition_sinfo->snode;
 
     this->enter_scope("if");
     USemanticInfo body_info = this->visit_block(*n.then);
@@ -366,7 +370,8 @@ USemanticInfo Checker::visit_if(IfNode& n) {
     std::vector<std::pair<SNode*, BlockSNode*>> elifs;
 
     for (size_t i = 0; i < n.elifs.size(); i++) {
-        SNode* elif_condition_snode = this->expect_rvalue_of_type(T_BOOL, *n.elifs[i].first);
+        USemanticInfo elif_condition_sinfo = this->expect_rvalue_of_type(T_BOOL, *n.elifs[i].first);
+        SNode* elif_condition_snode = elif_condition_sinfo->snode;
         this->enter_scope("elif");
         USemanticInfo elif_block_info = this->visit_block(*n.elifs[i].second);
         this->leave_scope();

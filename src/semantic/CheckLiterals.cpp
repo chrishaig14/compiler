@@ -11,6 +11,7 @@ USemanticInfo Checker::visit_boolean(BooleanNode& node) {
     ObjectType* ot = new T_BOOL;
     ot->actual_base_path = Path("core.Boolean");
     info.entity = Entity(new Value(ot));
+    this->fill_value(info.entity.value);
     info.snode = new BoolSNode(node.value);
     return std::make_unique<SemanticInfo>(info);
 }
@@ -158,10 +159,11 @@ USemanticInfo Checker::visit_partial(PartialApplication& node) {
     for (size_t i = 0; i < node.args.size(); i++) {
         TypeNode*& param_type = fun_type->param_types[i];
         if (node.args[i] != nullptr) {
-            SNode* arg_snode = this->expect_rvalue_of_type(*param_type, *node.args[i]);
-            if (arg_snode == nullptr) {
+            USemanticInfo arg_sinfo = this->expect_rvalue_of_type(*param_type, *node.args[i]);
+            if (arg_sinfo->entity.type == E_TYPE::ERROR) {
                 return error_stub();
             }
+            SNode* arg_snode = arg_sinfo->snode;
             snodes.push_back(arg_snode);
         } else {
             partial_args.push_back(param_type->clone());
@@ -191,15 +193,15 @@ USemanticInfo Checker::visit_dict(DictNode& node) {
     items = {{first_key_info->snode, first_value_info->snode}};
     bool has_error = false;
     for (size_t i = 1; i < node.items.size(); i++) {
-        SNode* key_snode = this->expect_rvalue_of_type(first_key_type, *node.items[i].first);
-        if (key_snode == nullptr) {
+        USemanticInfo key_sinfo = this->expect_rvalue_of_type(first_key_type, *node.items[i].first);
+        if (key_sinfo->entity.type == E_TYPE::ERROR) {
             has_error = true;
         }
-        SNode* value_snode = this->expect_rvalue_of_type(first_value_type, *node.items[i].second);
-        if (value_snode == nullptr) {
+        USemanticInfo value_sinfo = this->expect_rvalue_of_type(first_value_type, *node.items[i].second);
+        if (value_sinfo->entity.type == E_TYPE::ERROR) {
             has_error = true;
         }
-        items.push_back(std::make_pair(key_snode, value_snode));
+        items.push_back(std::make_pair(key_sinfo->snode, value_sinfo->snode));
     }
     if (has_error) {
         return error_stub();
