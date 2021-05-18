@@ -158,10 +158,8 @@ USemanticInfo Checker::visit_partial(PartialApplication& node) {
     for (size_t i = 0; i < node.args.size(); i++) {
         TypeNode*& param_type = fun_type->param_types[i];
         if (node.args[i] != nullptr) {
-            USemanticInfo arg = this->dispatch(node.args[i]);
-            ObjectType* arg_ot = &arg->entity.value->type->object();
-            if (*arg_ot != *param_type) {
-                this->error_reporter.error_type_mismatch(*param_type, *node.args[i], arg->entity);
+            USemanticInfo arg = this->expect_type(*param_type, *node.args[i]);
+            if (arg->entity.type == E_TYPE::ERROR) {
                 return error_stub();
             }
             snodes.push_back(arg->snode);
