@@ -382,7 +382,7 @@ fun main()->Integer {
     flot = print("Hello") + 9.2;
     l = [print("Hello")]
     print(print("Hello"))
-    float = 9 + "Hello" + 19
-    float = 9 + 19 + "Hello"
+    flot = 9 + "Hello" + 19
+    flot = 9 + 19 + "Hello"
     return 0
 }
