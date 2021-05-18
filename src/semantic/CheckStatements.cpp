@@ -35,7 +35,7 @@ USemanticInfo Checker::visit_lvalue_subscript(SubscriptNode& node) {
         this->error_reporter.fail("Error subscript with more than one child!");
     }
     USemanticInfo child_sinfo = this->expect_rvalue_of_type(*subscript_fun->ft->param_types[0], *node.child[0]);
-    if (child_sinfo->entity.type == E_TYPE::ERROR) {
+    if (child_sinfo->is_error()) {
         return error_stub();
     }
     SNode* child_snode = child_sinfo->snode;
@@ -80,10 +80,10 @@ USemanticInfo Checker::visit_assignment(AssignmentNode& n) {
 
     USemanticInfo expression_info_p = this->dispatch_rvalue(n.rvalue);
 
-    if (linfo_p->entity.type == E_TYPE::ERROR) {
+    if (linfo_p->is_error()) {
         return error_stub();
     }
-    if (expression_info_p->entity.type == E_TYPE::ERROR) {
+    if (expression_info_p->is_error()) {
         return error_stub();
     }
 
@@ -122,7 +122,7 @@ USemanticInfo Checker::visit_assignment(AssignmentNode& n) {
         // }
     }
 
-    if (expression_info_p->entity.type == E_TYPE::ERROR) {
+    if (expression_info_p->is_error()) {
         return nullptr;
     }
     SemanticInfo& linfo = *linfo_p;
@@ -185,7 +185,7 @@ USemanticInfo Checker::visit_return(ReturnNode& n) {
     }
 
     USemanticInfo expression_info_p = this->dispatch_rvalue(n.expression);
-    if (expression_info_p->entity.type == E_TYPE::ERROR) {
+    if (expression_info_p->is_error()) {
         return error_stub();
     }
     SNode* exp_snode = make_rvalue(expression_info_p->entity, expression_info_p->snode, *return_type);
@@ -331,7 +331,7 @@ USemanticInfo Checker::visit_while(WhileNode& node) {
     info.snode = while_sn;
 
     USemanticInfo condition_sinfo = this->expect_rvalue_of_type(T_BOOL, *node.condition);
-    if (condition_sinfo->entity.type == E_TYPE::ERROR) {
+    if (condition_sinfo->is_error()) {
         return error_stub();
     }
     SNode* condition_snode = condition_sinfo->snode;
@@ -358,7 +358,7 @@ USemanticInfo Checker::visit_if(IfNode& n) {
     SemanticInfo info;
 
     USemanticInfo condition_sinfo = this->expect_rvalue_of_type(T_BOOL, *n.condition);
-    if (condition_sinfo->entity.type == E_TYPE::ERROR) {
+    if (condition_sinfo->is_error()) {
         return error_stub();
     }
     SNode* condition_snode = condition_sinfo->snode;

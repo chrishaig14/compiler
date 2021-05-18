@@ -28,6 +28,8 @@ public:
 
     bool is_constant;
     SNode* this_arg;
+
+    bool is_error();
 };
 
 class ErrorStub : public SemanticInfo {

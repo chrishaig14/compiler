@@ -31,6 +31,10 @@ SemanticInfo::SemanticInfo(const SemanticInfo& other) {
 SemanticInfo::~SemanticInfo() {
 }
 
+bool SemanticInfo::is_error() {
+    return this->entity.type == E_TYPE::ERROR;
+}
+
 ErrorStub::ErrorStub() {
     this->entity = Entity(E_TYPE::ERROR);
 }

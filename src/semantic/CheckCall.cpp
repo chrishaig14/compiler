@@ -13,7 +13,7 @@ USemanticInfo Checker::visit_call(CallNode& n, bool is_rvalue) {
     this->is_call = true;
     USemanticInfo fun_info_p = this->dispatch(n.function);
     this->is_call = old_is_call;
-    if (fun_info_p->entity.type == E_TYPE::ERROR) {
+    if (fun_info_p->is_error()) {
         return error_stub();
     }
     if (fun_info_p->this_arg != nullptr) {
@@ -21,7 +21,7 @@ USemanticInfo Checker::visit_call(CallNode& n, bool is_rvalue) {
     }
     bool is_def_const = n.function->ntype == NodeType::DEF_CONST;
     bool args_are_constant = true;
-    if (fun_info_p->entity.type == E_TYPE::ERROR) {
+    if (fun_info_p->is_error()) {
         return error_stub();
     }
     SemanticInfo& fun_info = *fun_info_p;
@@ -82,7 +82,7 @@ USemanticInfo Checker::visit_call(CallNode& n, bool is_rvalue) {
         // mangle the generic types in function_type to prevent collisions
         mangle_generic_names(function_type);
         USemanticInfo inf = this->match_arguments_to_generic_function(*function_type, arg_types);
-        if (inf->entity.type == E_TYPE::ERROR) {
+        if (inf->is_error()) {
             std::cout << "ERRORR CANNOT CALL " << std::endl;
         }
         retv.entity = inf->entity;

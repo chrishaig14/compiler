@@ -50,7 +50,7 @@ USemanticInfo Checker::visit_boolop(BoolOpNode& n) {
     USemanticInfo left_info_p = this->dispatch_rvalue(n.left);
     USemanticInfo right_info_p = this->dispatch_rvalue(n.right);
     SemanticInfo info;
-    if (left_info_p->entity.type == E_TYPE::ERROR || right_info_p->entity.type == E_TYPE::ERROR) {
+    if (left_info_p->is_error() || right_info_p->is_error()) {
         return error_stub();
     }
     if (left_info_p->entity.type != E_TYPE::VALUE || right_info_p->entity.type != E_TYPE::VALUE) {
@@ -134,7 +134,7 @@ USemanticInfo Checker::visit_boolop(BoolOpNode& n) {
 USemanticInfo Checker::visit_unary(UnaryOpNode& n) {
     SemanticInfo info;
     USemanticInfo exp_info = this->expect_rvalue_of_type(T_BOOL, *n.exp);
-    if (exp_info->entity.type == E_TYPE::ERROR) {
+    if (exp_info->is_error()) {
         return error_stub();
     }
     SNode* exp_snode = exp_info->snode;
@@ -172,7 +172,7 @@ USemanticInfo Checker::visit_binop(BinopNode& n) {
     info.snode = sn;
 
     USemanticInfo left_info_p = this->dispatch_rvalue(n.left);
-    if (left_info_p->entity.type == E_TYPE::ERROR) {
+    if (left_info_p->is_error()) {
         return error_stub();
     }
     if (left_info_p->entity.type != E_TYPE::VALUE) {
@@ -180,7 +180,7 @@ USemanticInfo Checker::visit_binop(BinopNode& n) {
         return error_stub();
     }
     USemanticInfo right_sinfo = this->expect_rvalue_of_type(*left_info_p->entity.value->type, *n.right);
-    if (right_sinfo->entity.type == E_TYPE::ERROR) {
+    if (right_sinfo->is_error()) {
         return error_stub();
     }
     SNode* right_snode = right_sinfo->snode;
@@ -259,7 +259,7 @@ USemanticInfo Checker::visit_subscript(SubscriptNode& node) {
         return error_stub();
     }
     USemanticInfo child_sinfo = this->expect_rvalue_of_type(*subscript_fun->ft->param_types[0], *node.child[0]);
-    if (child_sinfo->entity.type == E_TYPE::ERROR) {
+    if (child_sinfo->is_error()) {
         return error_stub();
     }
     SNode* child_snode = child_sinfo->snode;
@@ -305,7 +305,7 @@ USemanticInfo Checker::visit_ternary(TernaryNode& node) {
     SemanticInfo& true_case = *true_case_p;
     this->leave_scope();
     USemanticInfo false_case_sinfo = this->expect_rvalue_of_type(*true_case.entity.value->type, *node.false_case);
-    if (false_case_sinfo->entity.type == E_TYPE::ERROR) {
+    if (false_case_sinfo->is_error()) {
         return error_stub();
     }
     SNode* false_case_snode = false_case_sinfo->snode;

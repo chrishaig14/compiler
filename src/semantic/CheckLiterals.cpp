@@ -160,7 +160,7 @@ USemanticInfo Checker::visit_partial(PartialApplication& node) {
         TypeNode*& param_type = fun_type->param_types[i];
         if (node.args[i] != nullptr) {
             USemanticInfo arg_sinfo = this->expect_rvalue_of_type(*param_type, *node.args[i]);
-            if (arg_sinfo->entity.type == E_TYPE::ERROR) {
+            if (arg_sinfo->is_error()) {
                 return error_stub();
             }
             SNode* arg_snode = arg_sinfo->snode;
@@ -194,11 +194,11 @@ USemanticInfo Checker::visit_dict(DictNode& node) {
     bool has_error = false;
     for (size_t i = 1; i < node.items.size(); i++) {
         USemanticInfo key_sinfo = this->expect_rvalue_of_type(first_key_type, *node.items[i].first);
-        if (key_sinfo->entity.type == E_TYPE::ERROR) {
+        if (key_sinfo->is_error()) {
             has_error = true;
         }
         USemanticInfo value_sinfo = this->expect_rvalue_of_type(first_value_type, *node.items[i].second);
-        if (value_sinfo->entity.type == E_TYPE::ERROR) {
+        if (value_sinfo->is_error()) {
             has_error = true;
         }
         items.push_back(std::make_pair(key_sinfo->snode, value_sinfo->snode));

@@ -6,7 +6,7 @@
 
 std::unique_ptr<SemanticInfo> Checker::expect_rvalue_of_type(const TypeNode& target, Node& node) {
     USemanticInfo rinfo = this->dispatch_rvalue(&node);
-    if (rinfo->entity.type == E_TYPE::ERROR) {
+    if (rinfo->is_error()) {
         return error_stub();
     }
     if (rinfo->entity.type != E_TYPE::VALUE) {
@@ -143,7 +143,7 @@ USemanticInfo Checker::check_declaration_with_type(DeclarationNode& n) {
     //     return error_stub();
     // }
     USemanticInfo rvalue_sinfo = this->expect_rvalue_of_type(*n.type, *n.expression);
-    if (rvalue_sinfo->entity.type == E_TYPE::ERROR) {
+    if (rvalue_sinfo->is_error()) {
         return error_stub();
     }
     sn->expression = rvalue_sinfo->snode;
@@ -154,7 +154,7 @@ USemanticInfo Checker::check_declaration_with_type(DeclarationNode& n) {
 
 USemanticInfo Checker::check_declaration_without_type(DeclarationNode& n) {
     USemanticInfo exp_info_p = this->dispatch(n.expression);
-    if (exp_info_p->entity.type == E_TYPE::ERROR) {
+    if (exp_info_p->is_error()) {
         return error_stub();
     }
     E_TYPE entity_type = exp_info_p->entity.type;
