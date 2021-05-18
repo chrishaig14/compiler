@@ -198,7 +198,7 @@ USemanticInfo Checker::visit_block(BlockNode& node) {
             // it's a function call
             // if return value != NoneType, then force the return value
 
-            if (sinfo.entity.type != E_TYPE::ERROR && sinfo_p->entity.type != E_TYPE::NOTHING) {
+            if (!sinfo.is_error() && sinfo_p->entity.type != E_TYPE::NOTHING) {
                 this->error_reporter.unused_return_value(n->start);
             }
         }

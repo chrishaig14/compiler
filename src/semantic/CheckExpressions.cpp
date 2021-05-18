@@ -81,7 +81,7 @@ USemanticInfo Checker::visit_boolop(BoolOpNode& n) {
     SemanticInfo& right_info = *right_info_p;
 
 
-    if (left_info.entity.type == E_TYPE::ERROR || right_info.entity.type == E_TYPE::ERROR) {
+    if (left_info.is_error() || right_info.is_error()) {
         return error_stub();
     }
 

@@ -53,22 +53,23 @@ USemanticInfo Checker::visit_call(CallNode& n, bool is_rvalue) {
     bool has_error = false;
     for (auto& arg: n.arguments) {
         USemanticInfo arg_type_p = this->dispatch(arg);
+        if (arg_type_p->is_error()) {
+            has_error = true;
+            continue;
+        }
+
         arg_entities.push_back(arg_type_p->entity);
         sn->arguments.push_back(arg_type_p->snode);
         Entity arg_entity = arg_type_p->entity;
 
-
         if (arg_entity.type == E_TYPE::CLASS || arg_entity.type == E_TYPE::PACKAGE ||
-            arg_entity.type == E_TYPE::MODULE || arg_entity.type == E_TYPE::ENUM || arg_entity.type == E_TYPE::ERROR ||
+            arg_entity.type == E_TYPE::MODULE || arg_entity.type == E_TYPE::ENUM ||
             arg_entity.type == E_TYPE::NOTHING) {
             has_error = true;
             this->error_reporter.expected_expression(arg_entity, *arg);
             continue;
         }
-        if (arg_entity.type == E_TYPE::ERROR) {
-            has_error = true;
-            continue;
-        }
+
 
         TypeNode& arg_type = *get_entity_type(arg_entity);
         arg_types.push_back(arg_type.clone());
