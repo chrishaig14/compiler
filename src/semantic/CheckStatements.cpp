@@ -151,9 +151,6 @@ USemanticInfo Checker::visit_assignment(AssignmentNode& n) {
 }
 
 USemanticInfo Checker::visit_return(ReturnNode& n) {
-    SemanticInfo info;
-    ReturnSNode* sn = new ReturnSNode();
-    info.snode = sn;
     Entity return_entity = this->scope->get("__return__");
     if (return_entity.type == E_TYPE::NOTHING) {
         if (n.expression != nullptr) {
@@ -163,8 +160,7 @@ USemanticInfo Checker::visit_return(ReturnNode& n) {
         info_r.snode = new ReturnSNode();
         return std::make_unique<SemanticInfo>(info_r);
     }
-    TypeNode* return_typet = return_entity.value->type;
-    TypeNode* return_type = return_typet;
+    TypeNode* return_type = return_entity.value->type;
     if (return_type->kind == Kind::OBJECT && this->module->aliased_types.count(return_type->object().id) == 1) {
         TypeNode* aliased_type = this->module->aliased_types.at(return_type->object().id);
         return_type = aliased_type;
@@ -176,23 +172,23 @@ USemanticInfo Checker::visit_return(ReturnNode& n) {
         return error_stub();
     }
 
-    USemanticInfo expression_info_p = this->dispatch_rvalue(n.expression);
+    USemanticInfo expression_info_p = this->expect_rvalue_of_type(*return_type, *n.expression);
     if (expression_info_p->is_error()) {
         return error_stub();
     }
-    SNode* exp_snode = make_rvalue(expression_info_p->entity, expression_info_p->snode, *return_type);
-    if (exp_snode == nullptr) {
-        this->error_reporter.error_type_mismatch(*return_type, *n.expression, expression_info_p->entity);
-        return error_stub();
-    }
-    sn->expression = exp_snode;
+
     n.ret_type = return_type->clone();
     n.reachables = this->scope->get_all();
+
+    ReturnSNode* sn = new ReturnSNode();
+    sn->expression = expression_info_p->snode;
+
+    SemanticInfo info;
+    info.snode = sn;
     return std::make_unique<SemanticInfo>(info);
 }
 
 USemanticInfo Checker::visit_match(MatchExpressionNode* node) {
-    SemanticInfo info;
     USemanticInfo exp_info = this->dispatch_rvalue(node->exp);
     if (exp_info->entity.type != E_TYPE::VALUE || exp_info->entity.value->type->kind != Kind::OBJECT) {
         this->error_reporter.error_type_mismatch(ObjectType("Union", {new ObjectType("...", {})}),
@@ -248,19 +244,21 @@ USemanticInfo Checker::visit_match(MatchExpressionNode* node) {
     init->expression = exp_info->snode;
     init->identifier = varname;
     MatchSNode* mn = new MatchSNode(init, varname, cas);
-    info.snode = mn;
 
+    SemanticInfo info;
+    info.snode = mn;
     return std::make_unique<SemanticInfo>(info);
 }
 
 USemanticInfo Checker::visit_continue(ContinueNode& node) {
-    SemanticInfo info;
     BlockSNode* bn = new BlockSNode();
-    info.snode = bn;
     if (this->update_loop_index_snode != nullptr) {
         bn->nodes.push_back(this->update_loop_index_snode);
     }
     bn->nodes.push_back(new ContinueSNode());
+
+    SemanticInfo info;
+    info.snode = bn;
     return std::make_unique<SemanticInfo>(info);
 }
 
@@ -302,8 +300,6 @@ USemanticInfo Checker::visit_for(ForNode& node) {
     this->leave_scope();
 
     SemanticInfo rinfo;
-
-
     rinfo.snode = make_for_snode(node, binfo, exp_info_p);
     this->update_loop_index_snode = nullptr;
     return std::make_unique<SemanticInfo>(rinfo);
@@ -318,9 +314,7 @@ USemanticInfo Checker::visit_break(BreakNode& node) {
 
 
 USemanticInfo Checker::visit_while(WhileNode& node) {
-    WhileSNode* while_sn = new WhileSNode();
-    SemanticInfo info;
-    info.snode = while_sn;
+
 
     USemanticInfo condition_sinfo = this->expect_rvalue_of_type(T_BOOL, *node.condition);
     if (condition_sinfo->is_error()) {
@@ -341,13 +335,17 @@ USemanticInfo Checker::visit_while(WhileNode& node) {
         // }
     }
     this->leave_scope();
+
+    WhileSNode* while_sn = new WhileSNode();
     while_sn->condition = condition_snode;
     while_sn->body = (BlockSNode*) body_info_p->snode;
+
+    SemanticInfo info;
+    info.snode = while_sn;
     return std::make_unique<SemanticInfo>(info);
 }
 
 USemanticInfo Checker::visit_if(IfNode& n) {
-    SemanticInfo info;
 
     USemanticInfo condition_sinfo = this->expect_rvalue_of_type(T_BOOL, *n.condition);
     if (condition_sinfo->is_error()) {
@@ -376,7 +374,8 @@ USemanticInfo Checker::visit_if(IfNode& n) {
         this->leave_scope();
     }
     SNode* else_snode = else_info == nullptr ? nullptr : else_info->snode;
-    info.snode = make_if_snode(condition_snode, body_info->snode, elifs, else_snode);
 
+    SemanticInfo info;
+    info.snode = make_if_snode(condition_snode, body_info->snode, elifs, else_snode);
     return std::make_unique<SemanticInfo>(info);
 }
