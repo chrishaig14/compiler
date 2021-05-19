@@ -120,7 +120,7 @@ USemanticInfo Checker::visit_boolop(BoolOpNode& n) {
         Class* cls = entity.clazz;
         auto operator_fun_it = cls->static_methods.find(fun);
         if (operator_fun_it == cls->static_methods.end()) {
-            this->error_reporter.class_no_method(cls->class_name, fun, n.start);
+            this->error_reporter.class_no_method_for_op(cls->class_name, fun, n);
             return error_stub();
         }
 
@@ -197,7 +197,7 @@ USemanticInfo Checker::visit_binop(BinopNode& n) {
     assert(cls != nullptr);
     auto operator_fun_it = cls->static_methods.find(fun);
     if (operator_fun_it == cls->static_methods.end()) {
-        this->error_reporter.class_no_method_for_op(cls->class_name, fun, n.op_pos);
+        this->error_reporter.class_no_method_for_op(cls->class_name, fun, n);
         return error_stub();
     }
     ConstFunction* operator_fun = operator_fun_it->second;

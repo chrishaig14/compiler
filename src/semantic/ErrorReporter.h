@@ -96,7 +96,7 @@ public:
     void package_no_member(std::string pack_name, const std::string& member, TextPosition pos, Node& obj,
                            TextPosition member_start, TextPosition member_end);
     void error_type_mismatch(const TypeNode& expected, const Node& value_node, Entity actual);
-    void class_no_method_for_op(std::string class_name, std::string method_name, TextPosition position);
+    void class_no_method_for_op(std::string class_name, std::string method_name, const Node& node);
     void enum_no_value(std::string enum_name, std::string value, MemberNode& node, Enum* enumm);
     void object_no_member_with_suggestions(const TypeNode& t, const std::string& member, TextPosition pos, Node& obj,
                                            TextPosition member_start, TextPosition member_end, Class* clazz);
