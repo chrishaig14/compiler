@@ -327,11 +327,12 @@ void ErrorReporter::expected_expression(Entity entity, const Node& pos) {
     this->fail_ok(pre_msg, msg, pos.start);
 }
 
-void ErrorReporter::class_no_method_for_op(std::string class_name, std::string method_name, TextPosition position) {
-    std::string pre_msg = E_FMT("Class ") + E_HLT(class_name) + " does not define static method " + E_HLT(method_name) +
-                          " needed for this operation";
-    std::string msg = this->code_lines.get_line(position.line);
-    this->fail_ok(pre_msg, msg, position);
+void ErrorReporter::class_no_method_for_op(std::string class_name, std::string method_name, const Node& node) {
+    std::string pre_msg = E_FMT("Class ") + E_HLT(class_name) + " does not define " +
+                          E_HLT("static fun " + method_name + "(" + class_name + ", " + class_name + ") -> " +
+                                class_name) + " needed for this operation";
+    std::string msg = this->highlight_one(node);
+    this->fail_ok(pre_msg, msg, node.start);
 }
 
 void ErrorReporter::enum_no_value(std::string enum_name, std::string value, MemberNode& node, Enum* enumm) {

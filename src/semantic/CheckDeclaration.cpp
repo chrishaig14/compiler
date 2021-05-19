@@ -107,9 +107,7 @@ USemanticInfo Checker::visit_declaration(DeclarationNode& n) {
 }
 
 USemanticInfo Checker::check_declaration_with_type(DeclarationNode& n) {
-    SemanticInfo info;
     DeclarationSNode* sn = new DeclarationSNode();
-    info.snode = sn;
     sn->identifier = n.identifier;
 
     if (n.type->kind == Kind::OBJECT && this->module->aliased_types.count(n.type->object().id) == 1) {
@@ -123,6 +121,9 @@ USemanticInfo Checker::check_declaration_with_type(DeclarationNode& n) {
         return error_stub();
     }
     sn->expression = rvalue_sinfo->snode;
+
+    SemanticInfo info;
+    info.snode = sn;
     Value* ov = new Value(n.type->clone());
     info.entity = Entity(ov);
     return std::make_unique<SemanticInfo>(info);
@@ -138,11 +139,13 @@ USemanticInfo Checker::check_declaration_without_type(DeclarationNode& n) {
         this->error_reporter.expected_expression(exp_info_p->entity, *n.expression);
         return error_stub();
     }
-    SemanticInfo info;
+
     DeclarationSNode* sn = new DeclarationSNode();
-    info.snode = sn;
     sn->identifier = n.identifier;
     sn->expression = exp_info_p->snode;
+
+    SemanticInfo info;
+    info.snode = sn;
     info.entity = exp_info_p->entity;
     if (info.entity.type == E_TYPE::CONST_FUNCTION) {
         info.entity = Entity(new Value(exp_info_p->entity.const_function->ft->clone()));
