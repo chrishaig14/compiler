@@ -9,6 +9,7 @@ DEFINE_FUNCTION(1, core_D_List_D_len)
 DEFINE_FUNCTION(2, core_D_List_D_has)
 DEFINE_FUNCTION(2, core_D_List_D_push)
 DEFINE_FUNCTION(2, core_D_List_D___get_item__)
+DEFINE_FUNCTION(3, core_D_List_D___set_item__)
 
 TaggedObject* m_core_c_List_f_add_f(TaggedObject* _a, TaggedObject* _b) {
     GC::declare(_a);
@@ -85,6 +86,17 @@ TaggedObject* core_D_List_D___get_item___f(TaggedObject* a, TaggedObject* b) {
                                  (" out of range of list with length " + std::to_string(list_len)));
     }
     return CAST(a, XList)->lv[idx];
+}
+
+TaggedObject* core_D_List_D___set_item___f(TaggedObject* a, TaggedObject* b, TaggedObject* c) {
+    long idx = GET_INT(b);
+    unsigned long list_len = CAST(a, XList)->lv.size();
+    if (idx >= list_len) {
+        throw std::runtime_error("List index " + std::to_string(idx) +
+                                 (" out of range of list with length " + std::to_string(list_len)));
+    }
+    CAST(a, XList)->lv[idx] = c;
+    return nullptr;
 }
 
 TaggedObject* core_D_List_D_has_f(TaggedObject* a, TaggedObject* b) {
