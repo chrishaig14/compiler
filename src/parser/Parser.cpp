@@ -892,6 +892,12 @@ ClassNode* Parser::parse_class_definition() {
 ImportNode* Parser::parse_import() {
     Token import_tok = this->expect_token(TokType::IMPORT);
     VectorOfStrings path;
+    // path.push_back("global");
+    if (this->match(TokType::DOT)) {
+        // it's a local import
+        this->next();
+        path.push_back("root");
+    }
     Token path_part;
     while (true) {
         path_part = this->expect_token(TokType::ID);

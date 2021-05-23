@@ -18,7 +18,7 @@ protected:
 
     void SetUp(std::string text) {
         tree = get_ast(text);
-        gp.visit(*tree);
+        gp.visit_block(*tree);
         checker = new Checker(gp.globals, gp.global_classes, gp.global_functions);
     }
 

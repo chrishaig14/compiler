@@ -14,7 +14,7 @@
 GlobalProcessor::GlobalProcessor() {
 }
 
-void GlobalProcessor::visit(ImportNode& node) {
+void GlobalProcessor::visit_import(ImportNode& node) {
     if (node.has_alias) {
         if (this->module->imported_paths_with_alias.count(node.alias)) {
             throw std::runtime_error("Import alias \"" + node.alias + "\" already defined for " +
@@ -35,7 +35,8 @@ void GlobalProcessor::visit(ImportNode& node) {
 }
 
 
-void GlobalProcessor::visit(FunctionNode& node) {
+void GlobalProcessor::visit_function(FunctionNode& node) {
+    std::cout << "Global-processing function " << node.identifier << " in module " << this->module->name << std::endl;
     ConstFunction* const_function = this->module->flirpins[node.identifier].const_function;
 
     VectorOfTypes x;
@@ -132,13 +133,13 @@ void GlobalProcessor::visit_root(BlockNode& node) {
 }
 
 
-void GlobalProcessor::visit(BlockNode& node) {
+void GlobalProcessor::visit_block(BlockNode& node) {
     for (auto n: node.nodes) {
         this->dispatch(n);
     }
 }
 
-void GlobalProcessor::visit(ClassNode& node) {
+void GlobalProcessor::visit_class(ClassNode& node) {
     Class* class_info = this->module->flirpins[node.class_name].clazz;
     //
     // if (this->imported_paths.count(node.class_name) == 1) {
@@ -212,28 +213,28 @@ void GlobalProcessor::dispatch(Node* nod) {
     auto& n = *nod;
     switch (n.ntype) {
         case NodeType::CLS:
-            this->visit(n.cls());
+            this->visit_class(n.cls());
             break;
         case NodeType::FUNC:
-            this->visit(n.func());
+            this->visit_function(n.func());
             break;
         case NodeType::IMPORT:
-            this->visit(n.import());
+            this->visit_import(n.import());
             break;
         case NodeType::ALIAS:
-            this->visit((AliasNode&) n);
+            this->visit_alias((AliasNode&) n);
             break;
         default:
             return;
     }
 }
 
-void GlobalProcessor::visit(AliasNode& node) {
+void GlobalProcessor::visit_alias(AliasNode& node) {
     this->module->fill_actual(node.aliased_type);
     this->module->aliased_types[node.alias_id] = node.aliased_type;
 }
 
-void GlobalProcessor::visit(EnumNode& node) {
+void GlobalProcessor::visit_enum(EnumNode& node) {
 
 }
 

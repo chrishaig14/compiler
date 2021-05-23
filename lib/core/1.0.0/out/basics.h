@@ -7,7 +7,7 @@
 
 #include "xobject.h"
 #include "xobjects/XString.h"
-#include "../macros.h"
+#include "macros.h"
 #include "xobjects/XDouble.h"
 
 TaggedObject* MAKE_STRING(const std::string& s);

@@ -21,7 +21,7 @@ void compile(std::string text) {
     BlockNode* tree = get_ast(text);
     std::vector <std::pair<std::string, CodeBuiltin>> builtins;
     GlobalProcessor gp(builtins);
-    gp.visit(*tree);
+    gp.visit_block(*tree);
     Checker checker(gp.globals, gp.global_classes, gp.global_functions);
     checker.visit_block(*tree);
 }

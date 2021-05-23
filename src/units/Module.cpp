@@ -4,8 +4,9 @@
 
 #include "Module.h"
 
-Module::Module(std::string name, std::string abs_path, std::string rel_path) {
-    this->name = name;
+Module::Module(Path path, std::string abs_path, std::string rel_path) {
+    this->path = path;
+    this->name = path.as_vec().back();
     this->abs_path = abs_path;
     this->rel_path = rel_path;
 }

@@ -14,7 +14,7 @@ public:
     std::string rel_path;
     std::map<std::string, Unit> units;
 
-    Package(std::string name, std::string abs_path, std::string rel_path);
+    Package(Path path, std::string abs_path, std::string rel_path);
     Path path;
 
     Flirpin get(Path p) {
@@ -22,7 +22,7 @@ public:
             return Flirpin{.type=F_TYPE::CLASS, .clazz=new Class()};
         }
         VectorOfStrings pt = p.as_vec();
-        Unit u = this->units[pt[0]];
+        Unit u = this->units.at(pt[0]);
         if (u.type == U_TYPE::MODULE) {
             return u.module->get(Path(VectorOfStrings(pt.begin() + 1, pt.end())));
         } else if (u.type == U_TYPE::PACKAGE) {

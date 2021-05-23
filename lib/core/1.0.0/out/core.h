@@ -18,7 +18,7 @@
 #include "xobjects/XTuple.h"
 #include "Function.h"
 #include "GC.h"
-#include "../macros.h"
+#include "macros.h"
 #include "basics.h"
 #include "functions.h"
 

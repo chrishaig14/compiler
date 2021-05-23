@@ -26,7 +26,7 @@ USemanticInfo Checker::visit_number(NumberNode& node) {
             info.entity = Entity(ov);
             IntegerSNode* snode = new IntegerSNode();
             snode->str = node.str;
-            otype->actual_base_path = Path("core.Integer");
+            otype->actual_base_path = Path("core.core.Integer");
             this->fill_value(ov);
             info.snode = snode;
             break;
@@ -87,7 +87,7 @@ USemanticInfo Checker::visit_string(StringNode& node) {
     sn->s = node.str;
     info.snode = sn;
     ObjectType* otype = new ObjectType("String", {});
-    otype->actual_base_path = Path("core.String");
+    otype->actual_base_path = Path("core.core.String");
     Value* ov = new Value(otype);
     info.entity = Entity(ov);
     this->fill_value(ov);

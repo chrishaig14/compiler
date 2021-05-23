@@ -1,5 +1,0 @@
-import core.Integer
-
-fun foobar(x: Integer, y: Integer)->Integer{
-    return 0
-}

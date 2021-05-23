@@ -4,8 +4,9 @@
 
 #include "Package.h"
 
-Package::Package(std::string name, std::string abs_path, std::string rel_path) {
-    this->name = name;
+Package::Package(Path path, std::string abs_path, std::string rel_path) {
+    this->path = path;
+    this->name = path.as_vec().back();
     this->abs_path = abs_path;
     this->rel_path = rel_path;
 }

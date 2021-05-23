@@ -218,7 +218,7 @@ void Checker::fill_value(Value* value) {
     if (value->type->object().id.size() == 1) {
         return;
     }
-    Flirpin flirpin = this->root_package->get(value->type->object().actual_base_path);
+    Flirpin flirpin = this->top_package->get(value->type->object().actual_base_path);
     if (flirpin.type == F_TYPE::ENUM) {
         value->enumm = flirpin.enumm;
         value->metatype = Meta::ENUM;

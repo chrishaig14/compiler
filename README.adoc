@@ -1,0 +1,24 @@
+= XL programming language
+
+== Installation
+[source,bash]
+----
+mkdir build
+cd build
+cmake ..
+make compiler
+----
+Finally, set the `XLPATH` environment variable to the path where you would like to keep all libraries.
+
+[source,bash]
+----
+echo "export XLPATH=~/xl" >> ~/.bashrc
+source ~/.bashrc
+----
+
+[source, python]
+----
+def fun():
+    print(17+8)
+    return "Hello"
+----

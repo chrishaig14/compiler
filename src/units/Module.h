@@ -15,7 +15,7 @@
 
 class Module {
 public:
-    Module(std::string name, std::string abs_path, std::string rel_path);
+    Module(Path path, std::string abs_path, std::string rel_path);
     std::string name;
     VectorOfStrings included_module_paths;
     std::string abs_path;

@@ -288,7 +288,7 @@ USemanticInfo Checker::visit_for(ForNode& node) {
     this->update_loop_index_snode = increment_index_sn;
     increment_index_sn->lvalue = new IdSNode(this->loop_index_var_id);
     CallSNode* inc_exp_node = new CallSNode();
-    inc_exp_node->function = new IdSNode("core.Integer.__add__");
+    inc_exp_node->function = new IdSNode("core.core.Integer.__add__");
     inc_exp_node->arguments.push_back(new IdSNode(this->loop_index_var_id));
     IntegerSNode* one_node = new IntegerSNode();
     one_node->str = "1";

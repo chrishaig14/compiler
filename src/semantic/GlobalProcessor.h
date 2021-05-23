@@ -24,12 +24,12 @@ public:
     void visit_root(BlockNode& node);
 
     void dispatch(Node* nod);
-    void visit(FunctionNode& node);
-    void visit(BlockNode& node);
-    void visit(EnumNode& node);
-    void visit(AliasNode& node);
-    void visit(ImportNode& node);
-    void visit(ClassNode& node);
+    void visit_function(FunctionNode& node);
+    void visit_block(BlockNode& node);
+    void visit_enum(EnumNode& node);
+    void visit_alias(AliasNode& node);
+    void visit_import(ImportNode& node);
+    void visit_class(ClassNode& node);
 };
 
 #endif //GLOBALPROCESSOR_H

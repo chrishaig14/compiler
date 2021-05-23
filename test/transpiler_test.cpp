@@ -31,7 +31,7 @@ protected:
 
         try {
             GlobalProcessor gp(builtins);
-            gp.visit(*tree);
+            gp.visit_block(*tree);
             Checker checker(gp.globals, gp.global_classes, gp.global_functions);
             checker.visit_block(*tree);
         } catch (const std::runtime_error& e) {

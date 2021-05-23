@@ -35,7 +35,7 @@ SNode* Checker::make_for_snode(ForNode& node, USemanticInfo& binfo, USemanticInf
 
     IdSNode* idxsn = new IdSNode(this->loop_index_var_id);
     CallSNode* cn = new CallSNode();
-    IdSNode* cmpfunsn = new IdSNode("core.Integer.__lt__");
+    IdSNode* cmpfunsn = new IdSNode("core.core.Integer.__lt__");
 
     IdSNode* llensn = new IdSNode(this->loop_list_len_var_id);
 
