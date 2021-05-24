@@ -35,8 +35,6 @@ SNode* Checker::make_for_snode(ForNode& node, USemanticInfo& binfo, USemanticInf
     cn->arguments = {idxsn, llensn};
 
 
-
-
     BlockSNode* bn = (BlockSNode*) (binfo->snode);
 
     CallSNode* list_subscript_n = new CallSNode();
@@ -198,17 +196,15 @@ USemanticInfo Checker::visit_block(BlockNode& node) {
 USemanticInfo Checker::visit_function(FunctionNode& n) {
     this->error_reporter.current_function = n.identifier;
     SemanticInfo info;
-    FunctionSNode* sn = new FunctionSNode();
-    info.snode = sn;
     // Logger::info("Checking FunctionNode " + n.identifier);
     std::string& function_name = n.identifier;
-    sn->identifier = n.path.as_str();
-    sn->params = n.parameter_names;
     this->enter_scope(function_name);
     this->scope->is_function = true;
+
+    VectorOfStrings params = n.parameter_names;
     if (this->add_this) {
         this->scope->set("this", this->this_entity);
-        sn->params.insert(sn->params.begin(), "this");
+        params.insert(params.begin(), "this");
     }
     for (size_t i = 0; i < n.parameter_names.size(); i++) {
         TypeNode& type = *n.parameter_types[i];
@@ -241,8 +237,8 @@ USemanticInfo Checker::visit_function(FunctionNode& n) {
     this->assert_type_exists(returnType, n.start);
     this->scope->set("__return__", entity_from_type(returnType));
     USemanticInfo body_info = this->visit_block(*n.body);
-    sn->body = static_cast<BlockSNode*>(body_info->snode);
-
+    FunctionSNode* sn = new FunctionSNode(n.path.as_str(), params, (BlockSNode*) (body_info->snode));
+    info.snode = sn;
     if (returnType != T_NONE) {
         if (n.body->nodes.size() != 0) {
             Node* last_node = n.body->nodes.back();

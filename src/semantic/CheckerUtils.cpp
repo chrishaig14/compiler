@@ -43,9 +43,6 @@ Entity entity_from_type(const TypeNode& type) {
 }
 
 FunctionSNode* make_class_default_init(std::string class_path, VectorOfStrings members) {
-    FunctionSNode* fn = new FunctionSNode();
-    fn->identifier = class_path + ".__init__";
-    fn->params = members;
     BlockSNode* bn = new BlockSNode();
     NewObjectSNode* nn = new NewObjectSNode();
     nn->class_name = class_path;
@@ -55,7 +52,7 @@ FunctionSNode* make_class_default_init(std::string class_path, VectorOfStrings m
     }
     ReturnSNode* rn = new ReturnSNode(nn);
     bn->nodes.push_back(rn);
-    fn->body = bn;
+    FunctionSNode* fn = new FunctionSNode(class_path + ".__init__", members, bn);
     return fn;
 }
 

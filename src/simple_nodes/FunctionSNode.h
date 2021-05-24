@@ -16,7 +16,7 @@ public:
     VectorOfStrings params;
     BlockSNode* body;
 
-    FunctionSNode();
+    FunctionSNode(std::string identifier, VectorOfStrings params, BlockSNode* body);
 };
 
 
