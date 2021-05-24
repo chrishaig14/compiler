@@ -11,7 +11,7 @@ class AssignmentSNode : public SNode {
 public:
     SNode* lvalue;
     SNode* rvalue;
-    AssignmentSNode();
+    AssignmentSNode(SNode* lvalue, SNode* rvalue);
 };
 
 

@@ -13,7 +13,7 @@ public:
     std::string identifier;
     SNode* expression;
 
-    DeclarationSNode();
+    DeclarationSNode(std::string identifier, SNode* expression);
 };
 
 

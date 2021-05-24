@@ -7,29 +7,21 @@
 
 SNode* Checker::make_for_snode(ForNode& node, USemanticInfo& binfo, USemanticInfo& exp_info_p) {
     BlockSNode* bbn = new BlockSNode();
-    DeclarationSNode* dsn = new DeclarationSNode();
     WhileSNode* wsn = new WhileSNode();
 
-
-    dsn->identifier = this->loop_list_var_id;
-    dsn->expression = exp_info_p->snode;
+    DeclarationSNode* dsn = new DeclarationSNode(this->loop_list_var_id, exp_info_p->snode);
     bbn->nodes.push_back(dsn);
-    DeclarationSNode* lidx_decl = new DeclarationSNode();
-    lidx_decl->identifier = this->loop_index_var_id;
-    IntegerSNode* init_idx = new IntegerSNode(std::string());
-    init_idx->str = "0";
-    lidx_decl->expression = init_idx;
+    IntegerSNode* init_idx = new IntegerSNode("0");
+    DeclarationSNode* lidx_decl = new DeclarationSNode(this->loop_index_var_id, init_idx);
 
     bbn->nodes.push_back(lidx_decl);
 
-    DeclarationSNode* lensn = new DeclarationSNode();
-    lensn->identifier = this->loop_list_len_var_id;
     CallSNode* call_list_len_sn = new CallSNode();
     IdSNode* list_len_fn = new IdSNode("core.List.len");
     call_list_len_sn->function = list_len_fn;
     IdSNode* list_sn = new IdSNode(this->loop_list_var_id);
     call_list_len_sn->arguments = {list_sn};
-    lensn->expression = call_list_len_sn;
+    DeclarationSNode* lensn = new DeclarationSNode(this->loop_list_len_var_id, call_list_len_sn);
     bbn->nodes.push_back(lensn);
 
 
@@ -49,7 +41,6 @@ SNode* Checker::make_for_snode(ForNode& node, USemanticInfo& binfo, USemanticInf
 
 
     BlockSNode* bn = (BlockSNode*) (binfo->snode);
-    DeclarationSNode* loop_elem_sn = new DeclarationSNode();
 
     CallSNode* list_subscript_n = new CallSNode();
     list_subscript_n->function = new IdSNode("core.List.__get_item__");
@@ -57,8 +48,7 @@ SNode* Checker::make_for_snode(ForNode& node, USemanticInfo& binfo, USemanticInf
     list_subscript_n->arguments.push_back(new IdSNode(this->loop_index_var_id));
 
 
-    loop_elem_sn->expression = list_subscript_n;
-    loop_elem_sn->identifier = node.var;
+    DeclarationSNode* loop_elem_sn = new DeclarationSNode(node.var, list_subscript_n);
     bn->nodes.insert(bn->nodes.begin(), loop_elem_sn);
 
     bn->nodes.push_back(this->update_loop_index_snode);
@@ -107,7 +97,7 @@ USemanticInfo Checker::visit_class(ClassNode& node) {
         USemanticInfo sm_exp_info = this->dispatch(sm.second.second);
         if (*sm.second.first != *sm_exp_info->entity.value->type) {
             this->error_reporter.fail("Err: cannt initialize static member of type " + sm.second.first->to_string() +
-                                     " with expression of type " + sm_exp_info->entity.value->type->to_string());
+                                      " with expression of type " + sm_exp_info->entity.value->type->to_string());
         }
         if (!sm_exp_info->is_constant) {
             this->error_reporter.fail("Error: cannot initialize static member with non constant expression!");

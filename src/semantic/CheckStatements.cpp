@@ -141,10 +141,7 @@ USemanticInfo Checker::visit_assignment(AssignmentNode& n) {
         info.snode = linfo_p->snode;
         csn->arguments.push_back(expression_info_p->snode);
     } else {
-        auto* sn = new AssignmentSNode();
-        sn->lvalue = linfo_p->snode;
-        sn->rvalue = expression_info_p->snode;
-        info.snode = sn;
+        info.snode = new AssignmentSNode(linfo_p->snode, expression_info_p->snode);
     }
 
     return std::make_unique<SemanticInfo>(info);
@@ -229,10 +226,8 @@ USemanticInfo Checker::visit_match(MatchExpressionNode* node) {
         this->scope->set(case_id, ent);
         USemanticInfo case_info = this->dispatch(case_node);
         auto* bn = (BlockSNode*) case_info->snode;
-        auto* dn = new DeclarationSNode();
-        dn->identifier = case_id;
         auto* omn = new ObjectMemberSNode();
-        dn->expression = omn;
+        auto* dn = new DeclarationSNode(case_id, omn);
         omn->member_name = "o";
         omn->object = new IdSNode(varname);
         omn->class_path = Path("core.Union");
@@ -240,9 +235,7 @@ USemanticInfo Checker::visit_match(MatchExpressionNode* node) {
         cas.emplace_back(union_index, (BlockSNode*) case_info->snode);
         this->leave_scope();
     }
-    auto* init = new DeclarationSNode();
-    init->expression = exp_info->snode;
-    init->identifier = varname;
+    auto* init = new DeclarationSNode(varname, exp_info->snode);
     auto* mn = new MatchSNode(init, varname, cas);
 
     SemanticInfo info;
@@ -284,7 +277,7 @@ USemanticInfo Checker::visit_for(ForNode& node) {
     this->loop_index_var_id = "__loop_index__" + loop_c;
     this->loop_list_len_var_id = "__loop_list_len__" + loop_c;
 
-    auto* increment_index_sn = new AssignmentSNode();
+    auto* increment_index_sn = new AssignmentSNode(nullptr, nullptr);
     this->update_loop_index_snode = increment_index_sn;
     increment_index_sn->lvalue = new IdSNode(this->loop_index_var_id);
     auto* inc_exp_node = new CallSNode();
@@ -359,7 +352,7 @@ USemanticInfo Checker::visit_if(IfNode& n) {
 
     std::vector<std::pair<SNode*, BlockSNode*>> elifs;
 
-    for (auto & elif : n.elifs) {
+    for (auto& elif : n.elifs) {
         USemanticInfo elif_condition_sinfo = this->expect_rvalue_of_type(T_BOOL, *elif.first);
         SNode* elif_condition_snode = elif_condition_sinfo->snode;
         this->enter_scope("elif");

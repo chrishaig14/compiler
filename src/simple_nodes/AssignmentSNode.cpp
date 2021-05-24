@@ -4,4 +4,5 @@
 
 #include "AssignmentSNode.h"
 
-AssignmentSNode::AssignmentSNode() :SNode(SNodeType::ASSIGNMENT){}
+AssignmentSNode::AssignmentSNode(SNode* lvalue, SNode* rvalue)
+        : SNode(SNodeType::ASSIGNMENT), lvalue(lvalue), rvalue(rvalue) {}
