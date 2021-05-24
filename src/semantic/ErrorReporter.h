@@ -32,7 +32,7 @@ public:
     void _for(const TypeNode& t, TextPosition position);
     void function_call_num_args(TextPosition position);
     void no_return(const TypeNode& t, TextPosition pos);
-    void class_no_method(const std::string& class_name, const std::string method_name, TextPosition pos);
+    void class_no_method(const std::string& class_name, const std::string& method_name, TextPosition pos);
     void return_mismatch(const TypeNode& expected, const TypeNode& actual, TextPosition pos);
     bool failed;
     std::string context_string(TextPosition position);
@@ -64,7 +64,7 @@ public:
     void class_not_generic(const std::string& cls, TextPosition pos);
     void function_doesnt_return_a_value(TextPosition pos, const TypeNode* expected_type);
     void class_init_member_not_init(const std::string& cls, std::string mem, TextPosition pos);
-    void fail(std::string msg, TextPosition pos);
+    void fail(const std::string& msg, TextPosition pos);
 
     void fail(std::string msg) {
         this->fail(msg, TextPosition{1, 1});
@@ -77,8 +77,8 @@ public:
     std::string __file__;
 
     void function_call_num_args(FunctionType& ft, TextPosition pos);
-    void expected_expression(Entity entity, const Node& pos);
-    void _for(Entity t, TextPosition pos);
+    void expected_expression(const Entity& entity, const Node& pos);
+    void _for(const Entity& t, TextPosition pos);
     void bool_op(const Entity& left, const Entity& right, TextPosition pos);
     void fail_ok(const std::string& pre_msg, const std::string& msg, TextPosition pos);
     void call_not_a_function(const CallNode& node);
@@ -95,8 +95,8 @@ public:
                           TextPosition member_start, TextPosition member_end);
     void package_no_member(std::string pack_name, const std::string& member, TextPosition pos, Node& obj,
                            TextPosition member_start, TextPosition member_end);
-    void error_type_mismatch(const TypeNode& expected, const Node& value_node, Entity actual);
-    void class_no_method_for_op(std::string class_name, std::string method_name, const Node& node);
+    void error_type_mismatch(const TypeNode& expected, const Node& value_node, const Entity& actual);
+    void class_no_method_for_op(const std::string& class_name, const std::string& method_name, const Node& node);
     void enum_no_value(const std::string& enum_name, const std::string& value, MemberNode& node, Enum* enumm);
     void object_no_member_with_suggestions(const TypeNode& t, const std::string& member, TextPosition pos, Node& obj,
                                            TextPosition member_start, TextPosition member_end, Class* clazz);

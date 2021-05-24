@@ -1,7 +1,7 @@
 #include "ErrorReporter.h"
 #include "Checker.h"
 
-std::string entity_to_string(Entity entity) {
+std::string entity_to_string(const Entity& entity) {
     std::string out;
     switch (entity.type) {
         case E_TYPE::PACKAGE:
@@ -26,7 +26,7 @@ std::string entity_to_string(Entity entity) {
     return out;
 }
 
-void ErrorReporter::fail(std::string msg, TextPosition pos) {
+void ErrorReporter::fail(const std::string& msg, TextPosition pos) {
     this->failed = true;
     std::string out = this->context_string(pos) + msg + this->code_context_string(pos);
     std::cout << out << std::endl;
@@ -45,7 +45,7 @@ void ErrorReporter::fail_ok(const std::string& pre_msg, const std::string& msg, 
     }
 }
 
-std::string substring(std::string s, TextPosition start, TextPosition end) {
+std::string substring(const std::string& s, TextPosition start, TextPosition end) {
     assert(start.line == end.line);
     return s.substr(start.column, end.column - start.column);
 }
@@ -106,7 +106,7 @@ void ErrorReporter::module_no_member(Module* mod, const std::string& member, Tex
                       fmt::format(styles[ErrorElement::BinopRight], right_s) + post_s;
 
     msg += "\n\nPossible members are:  \n";
-    for (auto m: mod->flirpins) {
+    for (const auto& m: mod->flirpins) {
         msg += "- " + fmt::format(fmt::emphasis::bold, m.first) + " : " + flirpintype_to_str(m.second.type) + "\n";
     }
     msg = msg.substr(0, msg.size() - 1);
@@ -129,7 +129,7 @@ void ErrorReporter::package_no_member(Package* pack, const std::string& member, 
                       fmt::format(styles[ErrorElement::BinopRight], right_s) + post_s;
 
     msg += "\n\nPossible modules/packages are:  \n";
-    for (auto m: pack->units) {
+    for (const auto& m: pack->units) {
         msg += "- " + fmt::format(fmt::emphasis::bold, m.first) + " : " +
                (m.second.type == U_TYPE::MODULE ? "module" : "package") + "\n";
     }
@@ -186,7 +186,7 @@ void ErrorReporter::bad_return(TextPosition pos) {
     this->fail(msg, pos);
 }
 
-void ErrorReporter::_for(Entity t, TextPosition pos) {
+void ErrorReporter::_for(const Entity& t, TextPosition pos) {
     std::string msg;
     msg = E_FMT(" Expected") + E_HLT(" List[t] ") + E_FMT("in loop, but got ") + E_HLT(entity_to_string(t));
     this->fail(msg, pos);
@@ -197,7 +197,7 @@ void ErrorReporter::call_bad_num_args() {
     this->fail(msg, TextPosition());
 }
 
-void ErrorReporter::class_no_method(const std::string& class_name, const std::string method_name, TextPosition pos) {
+void ErrorReporter::class_no_method(const std::string& class_name, const std::string& method_name, TextPosition pos) {
     std::string msg;
     msg = E_FMT("Class ") + E_HLT(class_name) + E_FMT(" has no method ") + E_HLT(method_name);
     this->fail(msg, pos);
@@ -214,7 +214,7 @@ void ErrorReporter::variable_not_declared(const std::string& name, TextPosition 
     this->fail(msg, pos);
 }
 
-void ErrorReporter::error_type_mismatch(const TypeNode& expected, const Node& value_node, Entity actual) {
+void ErrorReporter::error_type_mismatch(const TypeNode& expected, const Node& value_node, const Entity& actual) {
     std::string as;
     if (actual.type == E_TYPE::VALUE) {
         as = actual.value->type->to_string();
@@ -305,7 +305,7 @@ std::string ErrorReporter::code_context_string(TextPosition position) {
 }
 
 std::string ErrorReporter::code_error_string(TextPosition start, TextPosition end) {
-    int length = end.column - start.column + 1;
+    size_t length = end.column - start.column + 1;
     std::string str = "\n" + this->code_lines.get_line(start.line) + "\n";
     str += fmt::format(fmt::fg(fmt::color::orange_red), std::string(start.column, ' ') + std::string(length, '^'));
     return str;
@@ -322,14 +322,14 @@ ErrorReporter::ErrorReporter() {
     init_styles();
 }
 
-void ErrorReporter::expected_expression(Entity entity, const Node& pos) {
+void ErrorReporter::expected_expression(const Entity& entity, const Node& pos) {
     std::string pre_msg;
     pre_msg = E_FMT("Expected expression, got ") + E_HLT(entity_to_string(entity));
     std::string msg = this->highlight_one(pos);
     this->fail_ok(pre_msg, msg, pos.start);
 }
 
-void ErrorReporter::class_no_method_for_op(std::string class_name, std::string method_name, const Node& node) {
+void ErrorReporter::class_no_method_for_op(const std::string& class_name, const std::string& method_name, const Node& node) {
     std::string pre_msg = E_FMT("Class ") + E_HLT(class_name) + " does not define " +
                           E_HLT("static fun " + method_name + "(" + class_name + ", " + class_name + ") -> " +
                                 class_name) + " needed for this operation";
@@ -353,7 +353,7 @@ void ErrorReporter::enum_no_value(const std::string& enum_name, const std::strin
                       fmt::format(styles[ErrorElement::BinopRight], right_s) + post_s;
     std::string pre_msg = "Enum " + enum_name + E_FMT(" has no value ") + E_HLT("'" + value + "'");
     msg += "\n\nPossible values are: \n";
-    for (auto v: enumm->values) {
+    for (const auto& v: enumm->values) {
         msg += "- " + fmt::format(fmt::emphasis::bold, v) + "\n";
     }
     msg = msg.substr(0, msg.size() - 1);
@@ -378,10 +378,10 @@ void ErrorReporter::object_no_member_with_suggestions(const TypeNode& t, const s
                       fmt::format(styles[ErrorElement::BinopRight], right_s) + post_s;
 
     msg += "\n\nPossible members are:  \n";
-    for (auto m: clazz->members) {
+    for (const auto& m: clazz->members) {
         msg += "- " + fmt::format(fmt::emphasis::bold, m.first) + " : " + m.second->to_string() + "\n";
     }
-    for (auto m: clazz->methods) {
+    for (const auto& m: clazz->methods) {
         msg += "- " + fmt::format(fmt::emphasis::bold, m.first) + " : " + m.second->ft->to_string() + "\n";
     }
     msg = msg.substr(0, msg.size() - 1);
