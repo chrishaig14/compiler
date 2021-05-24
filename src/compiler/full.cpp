@@ -4,11 +4,8 @@
 #include "../parser/Parser.h"
 #include "../semantic/GlobalProcessor.h"
 #include "../semantic/Checker.h"
-#include "../logging/logging.h"
 #include "../transpiler/STranspiler.h"
-#include "../units/Package.h"
 #include <unistd.h>
-#include <climits>
 
 #define REQUIREMENTS_FILE "requirements.txt"
 static std::string lib_path;
@@ -115,7 +112,7 @@ void process_global_all_modules(Package* package) {
     }
 }
 
-VectorOfStrings make_path(std::string s) {
+VectorOfStrings make_path(const std::string& s) {
     VectorOfStrings path;
     path.push_back("");
     for (char c : s) {
@@ -234,7 +231,7 @@ void analyze_module(Module& module) {
         // std::cout << "PATH: " << path.first << std::endl;
         add_path_to_module(module, path.second);
     }
-    for (auto i: module.imported_paths_with_alias_v) {
+    for (const auto& i: module.imported_paths_with_alias_v) {
         // std::cout << "PATH: " << i.first << std::endl;
         add_path_with_alias_to_module(module, i.first, i.second);
     }
@@ -355,7 +352,7 @@ void load_top_unit(const std::string& name, const std::string& top_unit_path) {
     std::cout << "Loading top unit: " << E_HLT(name) << " at path: " << E_HLT(top_unit_path) << std::endl;
     std::string unit_requirements_file = path_join(top_unit_path, REQUIREMENTS_FILE);
     auto requirements = read_requirements(unit_requirements_file);
-    for (auto req: requirements) {
+    for (const auto& req: requirements) {
         std::string req_top_unit_path = path_join(path_join(lib_path, req.first), req.second);
         load_top_unit(req.first, req_top_unit_path);
     }
@@ -373,7 +370,7 @@ void load_requirements(const std::string& filepath) {
     auto requirements = read_requirements(filepath);
 
     bool has_error = false;
-    for (auto r: requirements) {
+    for (const auto& r: requirements) {
         std::string final_path = path_join(path_join(lib_path, r.first), r.second);
         DIR* dir = opendir(final_path.c_str());
         if (dir == nullptr) {
