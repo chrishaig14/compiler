@@ -75,19 +75,16 @@ USemanticInfo Checker::visit_class(ClassNode& node) {
 
     VectorOfTypes members_ordered_types;
 
-    ClassSNode* csn = new ClassSNode();
-
-    Class* clazz = this->scope->get(node.class_name).clazz;
-    csn->identifier = clazz->path.as_str();
-    sn->nodes.push_back(csn);
-    sn->nodes.push_back(make_class_default_init(clazz->path.as_str(), node.members_ordered));
-
     for (auto mt: node.members_ordered) {
         TypeNode& t = *node.members[mt];
         members_ordered_types.push_back(&t);
         this->assert_type_exists(t, node.start);
-        csn->members.push_back(mt);
     }
+
+    Class* clazz = this->scope->get(node.class_name).clazz;
+    ClassSNode* csn = new ClassSNode(clazz->path.as_str(), node.members_ordered);
+    sn->nodes.push_back(csn);
+    sn->nodes.push_back(make_class_default_init(clazz->path.as_str(), node.members_ordered));
 
     for (auto sm: node.static_members) {
         USemanticInfo sm_exp_info = this->dispatch(sm.second.second);

@@ -15,7 +15,8 @@ public:
     std::string identifier;
     VectorOfStrings members;
 
-    ClassSNode() : SNode(SNodeType::CLASS) {
+    ClassSNode(std::string identifier, VectorOfStrings members)
+            : SNode(SNodeType::CLASS), identifier(identifier), members(members) {
     }
 };
 
