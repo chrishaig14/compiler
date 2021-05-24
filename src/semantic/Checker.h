@@ -168,7 +168,7 @@ public:
     USemanticInfo visit_alias(AliasNode* p_node);
     USemanticInfo enum_member(Enum* enumm, std::string value, MemberNode& node);
     USemanticInfo visit_enum(EnumNode& p_node);
-    SNode* make_rvalue(Entity value_entity, SNode* value_snode, const TypeNode& target);
+    SNode* make_rvalue(const Entity& value_entity, SNode* value_snode, const TypeNode& target);
     USemanticInfo dispatch(Node* nod);
     USemanticInfo dispatch_any(Node* p_node, bool b);
     void fill_value(Value* value);
@@ -180,6 +180,10 @@ public:
     bool check_arguments(CallNode& n, CallSNode* sn, VectorOfTypes& arg_types, std::vector<Entity>& arg_entities);
     USemanticInfo
     make_return_info(const CallNode& n, bool is_rvalue, SemanticInfo& retv, bool is_def_const, bool args_are_constant);
+    SNode* make_union_rvalue(SNode* value_snode, const TypeNode* unaliased_value_type,
+                             const TypeNode* unaliased_target_type) const;
+    SNode* make_option_rvalue(SNode* value_snode, const TypeNode* unaliased_value_type,
+                              const TypeNode* unaliased_target_type) const;
 };
 
 

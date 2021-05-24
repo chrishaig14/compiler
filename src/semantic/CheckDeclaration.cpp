@@ -22,7 +22,7 @@ std::unique_ptr<SemanticInfo> Checker::expect_rvalue_of_type(const TypeNode& tar
     return rinfo;
 }
 
-SNode* Checker::make_rvalue(Entity value_entity, SNode* value_snode, const TypeNode& target) {
+SNode* Checker::make_rvalue(const Entity& value_entity, SNode* value_snode, const TypeNode& target) {
     if (value_entity.type == E_TYPE::VALUE) {
         if (value_entity.value->type->kind != target.kind) {
             return nullptr;
@@ -48,40 +48,13 @@ SNode* Checker::make_rvalue(Entity value_entity, SNode* value_snode, const TypeN
             return value_snode;
         }
 
-        if (unaliased_target_type->object().id == "Union") {
-            int union_index = target_union_type(unaliased_target_type->object(), unaliased_value_type->object());
-            if (union_index != -1) {
-                return make_union_wrapper(union_index, value_snode);
-            } else {
-                if (unaliased_value_type->object().id == "Union") {
-                    if (unaliased_value_type->object().type_params.size() <=
-                        unaliased_target_type->object().type_params.size()) {
-                        // might be assigning a Union[Int, Str] to a Union[Int, Str, Bool] which should work!
-                        // for now the types order must be the same, but it should be necessary
-                        for (size_t i = 0; i < unaliased_value_type->object().type_params.size(); i++) {
-                            if (*unaliased_value_type->object().type_params[i] !=
-                                *unaliased_target_type->object().type_params[i]) {
-                                // this->error_reporter.fail(
-                                //         "Error: Cannot lift union type " + unaliased_value_type->to_string() + " to " +
-                                //         unaliased_target_type->to_string());
-                                return nullptr;
-                            }
-                        }
-                        return value_snode;
-                    }
-                }
-                return nullptr;
-            }
+        const std::string& unaliased_target_type_id = unaliased_target_type->object().id;
+        if (unaliased_target_type_id == "Union") {
+            return make_union_rvalue(value_snode, unaliased_value_type, unaliased_target_type);
         }
 
-        if (unaliased_target_type->object().id == "Option") {
-            if (*unaliased_target_type->object().type_params[0] == *unaliased_value_type) {
-                return value_snode;
-            } else if (unaliased_value_type->object().id == "NoneType") {
-                return value_snode;
-            } else {
-                return nullptr;
-            }
+        if (unaliased_target_type_id == "Option") {
+            return make_option_rvalue(value_snode, unaliased_value_type, unaliased_target_type);
         }
 
     } else {
@@ -89,6 +62,43 @@ SNode* Checker::make_rvalue(Entity value_entity, SNode* value_snode, const TypeN
         return nullptr;
     }
     return nullptr;
+}
+
+SNode* Checker::make_option_rvalue(SNode* value_snode, const TypeNode* unaliased_value_type,
+                                   const TypeNode* unaliased_target_type) const {
+    if (*unaliased_target_type->object().type_params[0] == *unaliased_value_type ||
+        unaliased_value_type->object().id == "NoneType") {
+        return value_snode;
+    } else {
+        return nullptr;
+    }
+}
+
+SNode* Checker::make_union_rvalue(SNode* value_snode, const TypeNode* unaliased_value_type,
+                                  const TypeNode* unaliased_target_type) const {
+    int union_index = target_union_type(unaliased_target_type->object(), unaliased_value_type->object());
+    if (union_index != -1) {
+        return make_union_wrapper(union_index, value_snode);
+    } else {
+        if (unaliased_value_type->object().id == "Union") {
+            if (unaliased_value_type->object().type_params.size() <=
+                unaliased_target_type->object().type_params.size()) {
+                // might be assigning a Union[Int, Str] to a Union[Int, Str, Bool] which should work!
+                // for now the types order must be the same, but it should be necessary
+                for (size_t i = 0; i < unaliased_value_type->object().type_params.size(); i++) {
+                    if (*unaliased_value_type->object().type_params[i] !=
+                        *unaliased_target_type->object().type_params[i]) {
+                        // this->error_reporter.fail(
+                        //         "Error: Cannot lift union type " + unaliased_value_type->to_string() + " to " +
+                        //         unaliased_target_type->to_string());
+                        return nullptr;
+                    }
+                }
+                return value_snode;
+            }
+        }
+        return nullptr;
+    }
 }
 
 USemanticInfo Checker::visit_declaration(DeclarationNode& n) {
@@ -107,7 +117,7 @@ USemanticInfo Checker::visit_declaration(DeclarationNode& n) {
 }
 
 USemanticInfo Checker::check_declaration_with_type(DeclarationNode& n) {
-    DeclarationSNode* sn = new DeclarationSNode();
+    auto* sn = new DeclarationSNode();
     sn->identifier = n.identifier;
 
     if (n.type->kind == Kind::OBJECT && this->module->aliased_types.count(n.type->object().id) == 1) {
@@ -124,7 +134,7 @@ USemanticInfo Checker::check_declaration_with_type(DeclarationNode& n) {
 
     SemanticInfo info;
     info.snode = sn;
-    Value* ov = new Value(n.type->clone());
+    auto* ov = new Value(n.type->clone());
     info.entity = Entity(ov);
     return std::make_unique<SemanticInfo>(info);
 }
@@ -140,7 +150,7 @@ USemanticInfo Checker::check_declaration_without_type(DeclarationNode& n) {
         return error_stub();
     }
 
-    DeclarationSNode* sn = new DeclarationSNode();
+    auto* sn = new DeclarationSNode();
     sn->identifier = n.identifier;
     sn->expression = exp_info_p->snode;
 
