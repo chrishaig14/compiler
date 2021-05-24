@@ -16,7 +16,7 @@ public:
     explicit ReturnNode(Node* expression, TextPosition start, TextPosition end);
 
 
-    bool equal(const Node& other) const;
+    bool equal(const Node& other) const override;
 
     ~ReturnNode();
 

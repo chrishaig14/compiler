@@ -4,6 +4,6 @@
 
 #include "logging.h"
 
-std::string style(std::string s, std::string str) {
+std::string style(const std::string& s, const std::string& str) {
     return s + str + RESET;
 }

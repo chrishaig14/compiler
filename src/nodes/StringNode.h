@@ -14,7 +14,7 @@
 class StringNode : public Node {
 public:
     std::string str;
-    StringNode(std::string str, TextPosition start, TextPosition end);
+    StringNode(const std::string& str, TextPosition start, TextPosition end);
 
     bool equal(const Node& x) const override;
 

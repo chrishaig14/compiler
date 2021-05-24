@@ -113,7 +113,7 @@ USemanticInfo Checker::visit_tuple(TupleNode& node) {
     sinfo.entity = Entity(ov);
 
     ov->clazz = new Class();
-    for (int i = 0; i < ov->type->object().type_params.size(); i++) {
+    for (size_t i = 0; i < ov->type->object().type_params.size(); i++) {
         Value* tv = new Value(ov->type->object().type_params[i]->clone());
         this->fill_value(tv);
         const std::string& mem_name = std::to_string(i + 1);

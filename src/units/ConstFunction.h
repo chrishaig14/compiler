@@ -9,7 +9,9 @@
 
 class ConstFunction {
 public:
-    ConstFunction(){}
+    ConstFunction(){
+        this->ft= nullptr;
+    }
     ConstFunction(const ConstFunction& other){
         this->ft = other.ft->clone();
     }

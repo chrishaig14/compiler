@@ -8,32 +8,11 @@
 USemanticInfo Checker::visit_member(MemberNode& n) {
     USemanticInfo parent_info = this->dispatch(n.parent);
     Entity parent_entity = parent_info->entity;
-    // if (n.type == MemberType::NUM) {
-    //     ObjectType* ot = &parent_entity.value->type->object();
-    //     if (ot->id != "Tuple") {
-    //         this->error_reporter.fail("Integer member of not a Tuple!");
-    //     }
-    //     size_t tuple_size = ot->type_params.size();
-    //     if (n.n_child > tuple_size || n.n_child == 0) {
-    //         this->error_reporter.object_no_member(*ot, n);
-    //         return error_stub();
-    //     }
-    //     SemanticInfo info;
-    //     ObjectMemberSNode* omsn = new ObjectMemberSNode();
-    //     info.snode = omsn;
-    //     omsn->object = parent_info->snode;
-    //     omsn->member_name = "mem_" + std::to_string(n.n_child);
-    //     omsn->class_path = ot->actual_base_path;
-    //     Value* ov = new Value(ot->type_params[n.n_child - 1]->clone());
-    //     info.entity = Entity(ov);
-    //     return std::make_unique<SemanticInfo>(info);
-    // }
     switch (parent_entity.type) {
         case E_TYPE::CLASS:
             return this->class_member(parent_entity.clazz, n.s_child, n);
         case E_TYPE::CONST_FUNCTION:
             this->error_reporter.object_no_member(*parent_entity.const_function->ft, n);
-            // this->error_reporter.function_no_member(n.dot_pos);
             break;
         case E_TYPE::VALUE:
             if (parent_entity.value->type->kind == Kind::FUNCTION) {
@@ -45,12 +24,10 @@ USemanticInfo Checker::visit_member(MemberNode& n) {
             return this->package_member(parent_entity.package, n.s_child, n);
         case E_TYPE::MODULE:
             return this->module_member(parent_entity.module, n.s_child, n);
-        case E_TYPE::ERROR:
-            break;
-        case E_TYPE::NOT_FOUND:
-            break;
         case E_TYPE::ENUM:
             return this->enum_member(parent_entity.enumm, n.s_child, n);
+        default:
+            break;
     }
     return error_stub();
 }
@@ -85,8 +62,6 @@ USemanticInfo Checker::object_member(SNode* object_snode, Value* pValue, std::st
     if (object_type_path.as_str() == "") {
         // is a single type param, error
         this->error_reporter.object_no_member(*pValue->type, n);
-        // this->error_reporter.fail(
-        //         "Error: no member " + child + " in totally generic type " + pValue->type->to_string());
         return error_stub();
     }
     if (object_type_path.as_str() == "core.Union") {

@@ -14,7 +14,7 @@ public:
 
     IdSNode();
 
-    IdSNode(std::string identifier);
+    explicit IdSNode(std::string identifier);
 };
 
 

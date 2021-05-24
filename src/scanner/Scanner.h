@@ -19,7 +19,7 @@ extern std::unordered_map<std::string, TokType> TOKEN_SPECIAL;
 class Scanner {
 
     std::string text;
-    int line, column;
+    size_t line, column;
 public:
 
     Scanner();

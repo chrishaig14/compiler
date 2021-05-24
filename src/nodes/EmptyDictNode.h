@@ -17,7 +17,7 @@ public:
     }
 
     bool equal(const Node& other) const override {
-        auto& o = other.emptydict();
+        const auto& o = other.emptydict();
         return *o.key_type == *this->key_type && *o.value_type == *this->value_type;
     }
 

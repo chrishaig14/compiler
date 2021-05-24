@@ -21,7 +21,6 @@ public:
     Node* parent;
     std::string s_child;
     size_t n_child;
-    TypeNode* parent_t;
     TextPosition dot_pos;
     Token child_token;
     MemberNode(Node* parent, Token child_token);
@@ -32,8 +31,6 @@ public:
 
     MemberNode& member() override;
     const MemberNode& member() const override;
-    bool is_class_static_member;
-    std::string replace_with_path;
 };
 
 

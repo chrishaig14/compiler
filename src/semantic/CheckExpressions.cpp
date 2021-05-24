@@ -256,7 +256,7 @@ USemanticInfo Checker::visit_subscript(SubscriptNode& node) {
     std::string sub_fun_path = subscript_fun->path.as_str();
     TypeNode* rtype = subscript_fun->ft->return_type->clone();
 
-    VectorOfTypes children;
+    // VectorOfTypes children;
     if (node.child.size() > 1) {
         this->error_reporter.fail("Error subscript with more than one child!");
         return error_stub();

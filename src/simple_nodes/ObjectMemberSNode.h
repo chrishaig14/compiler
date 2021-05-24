@@ -17,6 +17,7 @@ public:
     std::string member_name;
 
     ObjectMemberSNode() : SNode(SNodeType::OBJECT_MEMBER) {
+        this->object = nullptr;
     }
 };
 

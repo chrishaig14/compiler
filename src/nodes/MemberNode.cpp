@@ -7,17 +7,8 @@
 MemberNode::MemberNode(Node* parent, Token child_token) : Node(NodeType::MEMBER, parent->start, child_token.end_pos),
                                                           parent(parent) {
     this->child_token = child_token;
-    switch (child_token.type) {
-        case TokType::ID:
-            this->type = MemberType::STR;
-            this->s_child = child_token.str;
-            break;
-        case TokType::INTEGER:
-            this->type = MemberType::STR;
-            this->s_child = child_token.str;
-            break;
-    }
-    this->is_class_static_member = false;
+    this->type = MemberType::STR;
+    this->s_child = child_token.str;
 }
 
 MemberNode& MemberNode::member() {

@@ -58,7 +58,7 @@ SNode* Checker::make_rvalue(Entity value_entity, SNode* value_snode, const TypeN
                         unaliased_target_type->object().type_params.size()) {
                         // might be assigning a Union[Int, Str] to a Union[Int, Str, Bool] which should work!
                         // for now the types order must be the same, but it should be necessary
-                        for (int i = 0; i < unaliased_value_type->object().type_params.size(); i++) {
+                        for (size_t i = 0; i < unaliased_value_type->object().type_params.size(); i++) {
                             if (*unaliased_value_type->object().type_params[i] !=
                                 *unaliased_target_type->object().type_params[i]) {
                                 // this->error_reporter.fail(

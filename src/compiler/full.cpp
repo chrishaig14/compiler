@@ -157,8 +157,8 @@ void add_local_path_to_module(Module& module, Path path) {
         }
         path_so_far += "." + path_part;
     }
-    std::string t = flirpintype_to_str(current_flirpin.type);
-    std::string lt = flirpintype_to_str(last_flirpin.type);
+    // std::string t = flirpintype_to_str(current_flirpin.type);
+    // std::string lt = flirpintype_to_str(last_flirpin.type);
     std::string included_header;
     if (last_flirpin.type == F_TYPE::PACKAGE) {
         included_header = last_flirpin.package->rel_path + "/__package__";
@@ -265,7 +265,7 @@ void analyze_all_modules(Package& package) {
 }
 
 void
-transpile_one_module(Module& module, std::string& package_header, std::string output_package_dir, Package& package) {
+transpile_one_module(Module& module, std::string& package_header, const std::string& output_package_dir, Package& package) {
     if (module.name == "core") {
         return;
     }
@@ -329,7 +329,7 @@ std::map<std::string, std::string> read_requirements(const std::string& filepath
         std::string op;
         std::string first;
         std::string second;
-        for (int i = 0; i < line.size(); i++) {
+        for (size_t i = 0; i < line.size(); i++) {
             if (line[i] == '=') {
                 op += '=';
             } else {
@@ -393,7 +393,7 @@ void load_requirements(const std::string& filepath) {
 }
 
 
-void transpile_all_modules(Package& package, std::string output_dir, bool is_top) {
+void transpile_all_modules(Package& package, const std::string& output_dir, bool is_top) {
     // std::cout << "Transpiling package " << package.name << " output dir: " << output_dir << std::endl;
     std::string package_header;
     std::string output_package_dir = path_join(output_dir, package.name);
@@ -440,7 +440,7 @@ int main(int argc, char* argv[]) {
     project_dir = path_join(project_dir, "src");
     project_output_dir = argv[2];
     project_output_dir += "/application";
-    int x = mkdir(project_output_dir.c_str(), 0700);
+    // int x = mkdir(project_output_dir.c_str(), 0700);
     // if (x != 0) {
     //     std::cout << "failed to create  application dir" << std::endl;
     //     exit(0);

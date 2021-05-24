@@ -23,7 +23,7 @@
 #define BOLD "\033[1m"
 #define L_ERR(x) style(RED,x)
 #define L_HLT(x) style(MAGENTA BOLD, x)
-std::string style(std::string s, std::string str);
+std::string style(const std::string& s, const std::string& str);
 
 inline std::string E_FMT(const std::string& x) {
     return fmt::format("{}", x);

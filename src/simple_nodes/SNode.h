@@ -13,7 +13,7 @@ enum class SNodeType {
 class SNode {
 public:
     SNodeType type;
-    SNode(SNodeType type);
+    explicit SNode(SNodeType type);
 };
 
 

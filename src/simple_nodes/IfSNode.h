@@ -16,6 +16,9 @@ public:
     BlockSNode* _else;
 
     IfSNode() : SNode(SNodeType::IF) {
+        this->condition = nullptr;
+        this->then= nullptr;
+        this->_else = nullptr;
     }
 
     std::vector<std::pair<SNode*, BlockSNode*>> elifs;

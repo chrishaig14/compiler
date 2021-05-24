@@ -20,6 +20,8 @@ std::string entity_to_string(Entity entity) {
             return "NOT FOUND";
         case E_TYPE::ENUM:
             return "enum " + E_HLT(entity.enumm->enumm_name);
+        case E_TYPE::NOTHING:
+            return "NOTHING";
     }
     return out;
 }
@@ -33,7 +35,7 @@ void ErrorReporter::fail(std::string msg, TextPosition pos) {
     }
 }
 
-void ErrorReporter::fail_ok(std::string pre_msg, std::string msg, TextPosition pos) {
+void ErrorReporter::fail_ok(const std::string& pre_msg, const std::string& msg, TextPosition pos) {
     this->failed = true;
     std::string out = this->context_string(pos) + "\n" + pre_msg + "\n\n" + msg +
                       "\n\n=====================================================================\n";
@@ -57,7 +59,7 @@ void init_styles() {
     styles[ErrorElement::BinopRight] = fmt::fg(fmt::terminal_color::blue) | fmt::emphasis::bold;
 }
 
-void ErrorReporter::entity_no_member(std::string pre_msg, const std::string& member, TextPosition pos, Node& obj,
+void ErrorReporter::entity_no_member(const std::string& pre_msg, const std::string& member, TextPosition pos, Node& obj,
                                      TextPosition member_start, TextPosition member_end) {
     std::string code_s = this->code_lines.get_line(pos.line);
     std::string pre_s = substring(code_s, TextPosition{obj.start.line, 0}, obj.start);
@@ -135,7 +137,7 @@ void ErrorReporter::package_no_member(Package* pack, const std::string& member, 
     this->fail_ok(pre_msg + E_FMT(" has no member ") + E_HLT("'" + member + "'"), msg, pos);
 }
 
-void ErrorReporter::bool_op(Entity left, Entity right, TextPosition pos) {
+void ErrorReporter::bool_op(const Entity& left, const Entity& right, TextPosition pos) {
     std::string msg;
     msg = E_FMT("Cannot perform bool op between types ") + E_HLT(entity_to_string(left)) + E_FMT(" and ") +
           E_HLT(entity_to_string(right));
@@ -335,7 +337,7 @@ void ErrorReporter::class_no_method_for_op(std::string class_name, std::string m
     this->fail_ok(pre_msg, msg, node.start);
 }
 
-void ErrorReporter::enum_no_value(std::string enum_name, std::string value, MemberNode& node, Enum* enumm) {
+void ErrorReporter::enum_no_value(const std::string& enum_name, const std::string& value, MemberNode& node, Enum* enumm) {
     TextPosition member_start = add_one_col(node.dot_pos);
     TextPosition member_end = node.end;
     Node& obj = *node.parent;

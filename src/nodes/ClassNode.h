@@ -16,7 +16,7 @@
 class ClassNode : public Node {
 public:
 
-    bool equal(const Node& other) const;
+    bool equal(const Node& other) const override;
     ClassNode(const std::string& className, VectorOfStrings type_parameters, MapStringType members,
               std::unordered_map<std::string, FunctionNode*> functions,
               std::map<std::string, std::pair<TypeNode*, Node*>> static_members,

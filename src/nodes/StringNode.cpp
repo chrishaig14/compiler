@@ -4,11 +4,11 @@
 
 #include "StringNode.h"
 
-StringNode::StringNode(std::string str, TextPosition start, TextPosition end) :Node(NodeType::STRNG, start, end), str(str) {
+StringNode::StringNode(const std::string& str, TextPosition start, TextPosition end) : Node(NodeType::STRNG, start, end), str(str) {
 }
 
 bool StringNode::equal(const Node& x) const {
-    auto& other = x.strng();
+    const auto& other = x.strng();
     return this->str == other.str;
 }
 

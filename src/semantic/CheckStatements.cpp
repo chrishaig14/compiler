@@ -90,7 +90,7 @@ USemanticInfo Checker::visit_assignment(AssignmentNode& n) {
     }
 
     if (linfo_p->entity.value->type->kind == Kind::OBJECT) {
-        bool ff = n.lvalue->ntype == NodeType::MEMBER;
+        // bool ff = n.lvalue->ntype == NodeType::MEMBER;
         if (linfo_p->is_tuple_member) {
             this->error_reporter.cant_assign(*n.lvalue);
             return error_stub();

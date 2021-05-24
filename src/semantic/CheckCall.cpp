@@ -91,7 +91,7 @@ USemanticInfo Checker::visit_call(CallNode& n, bool is_rvalue) {
         retv.entity = entity_from_type(*function_type->return_type);
         int sni = fun_info_p->this_arg != nullptr;
         for (size_t i = 0; i < n.arguments.size(); i++) {
-            const TypeNode& arg_type = *arg_types[i];
+            // const TypeNode& arg_type = *arg_types[i];
             const TypeNode& param_type = *function_type->param_types[i];
 
             SNode* arg_rvalue_snode = this->make_rvalue(arg_entities[i], sn->arguments[sni], param_type);

@@ -30,7 +30,7 @@ public:
         this->s = this->s.substr(0, this->s.size() - 1);
     }
 
-    Path(std::string s) {
+    explicit Path(const std::string& s) {
         this->s = s;
         size_t k = 0;
         this->path_parts.push_back("");
@@ -44,7 +44,7 @@ public:
         }
     }
 
-    Path(VectorOfStrings p) {
+    explicit Path(const VectorOfStrings& p) {
         this->path_parts = p;
         for (auto cc: this->path_parts) {
             this->s += cc + ".";
@@ -109,7 +109,7 @@ class ObjectType : public TypeNode {
 public:
     ObjectType(const std::string& identifier, const VectorOfTypes& typeParameters);
 
-    ObjectType(const std::string& identifier);
+    explicit ObjectType(const std::string& identifier);
 
     bool equal(const TypeNode& other) const override;
 
