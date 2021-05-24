@@ -43,7 +43,7 @@ Checker::get_first_substitution_object(ObjectType& a, ObjectType& b, bool is_top
     return nullptr;
 }
 
-TypeNode* Checker::substitute(TypeNode* t, std::string var, TypeNode* replacement) {
+TypeNode* Checker::substitute(TypeNode* t, const std::string& var, TypeNode* replacement) {
     if (t->kind == Kind::OBJECT) {
         if (is_variable(t->object()) && t->object().id == var) {
             return replacement->clone();
@@ -93,28 +93,28 @@ void Checker::unify_function_call(FunctionType& fun, VectorOfTypes& args) {
     }
 
     for (size_t i = 0; i < args.size(); i++) {
-        auto param = fun.param_types[i];
-        auto arg = args[i];
+        auto *param = fun.param_types[i];
+        auto *arg = args[i];
         std::pair<std::string, TypeNode*>* substitution = get_first_substitution(*param, *arg, true);
         while (substitution != nullptr) {
             for (size_t j = 0; j < args.size(); j++) {
                 // if (j == i) {
                 //     continue;
                 // }
-                auto old = fun.param_types[j];
+                auto *old = fun.param_types[j];
                 fun.param_types[j] = substitute(fun.param_types[j], substitution->first, substitution->second);
                 delete old;
                 old = args[j];
                 args[j] = substitute(args[j], substitution->first, substitution->second);
                 delete old;
             }
-            auto old = fun.return_type;
+            auto *old = fun.return_type;
             fun.return_type = substitute(fun.return_type, substitution->first, substitution->second);
             delete old;
             std::cout << "Simple substitution: " << fun.to_string() << std::endl;
             param = fun.param_types[i];
             arg = args[i];
-            auto old_s = substitution;
+            auto *old_s = substitution;
             substitution = get_first_substitution(*param, *arg, true);
             delete old_s->second;
             delete old_s;
@@ -167,14 +167,13 @@ USemanticInfo Checker::visit_alias(AliasNode* p_node) {
     return std::make_unique<SemanticInfo>(info);
 }
 
-USemanticInfo Checker::enum_member(Enum* enumm, std::string value, MemberNode& node) {
+USemanticInfo Checker::enum_member(Enum* enumm, const std::string& value, MemberNode& node) {
     SemanticInfo info;
     for (size_t i = 0; i < enumm->values.size(); i++) {
         if (value == enumm->values[i]) {
-            ObjectType* otype = new ObjectType(enumm->enumm_name, {});
-            otype = otype;
+            auto* otype = new ObjectType(enumm->enumm_name, {});
             otype->actual_base_path = enumm->path;
-            Value* ov = new Value(otype);
+            auto* ov = new Value(otype);
             info.entity = Entity(ov);
             // this->fill_value(info.entity.value);
             info.snode = new EnumMemberSNode(enumm->path.as_str(), value);

@@ -12,7 +12,7 @@
 class DictSNode : public SNode {
 
 public:
-    DictSNode(const std::vector<std::pair<SNode*, SNode*>>& items);
+    explicit DictSNode(const std::vector<std::pair<SNode*, SNode*>>& items);
     std::vector<std::pair<SNode*, SNode*>> items;
 };
 

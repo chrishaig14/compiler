@@ -66,7 +66,7 @@ public:
     void class_init_member_not_init(const std::string& cls, std::string mem, TextPosition pos);
     void fail(const std::string& msg, TextPosition pos);
 
-    void fail(std::string msg) {
+    void fail(const std::string& msg) {
         this->fail(msg, TextPosition{1, 1});
     }
 

@@ -26,17 +26,15 @@ bool Class::operator==(const Class& b) const {
 }
 
 Class::~Class() {
-    for (auto m: this->members) {
+    for (const auto& m: this->members) {
         delete m.second;
     }
-    for (auto m: this->methods) {
+    for (const auto& m: this->methods) {
         delete m.second;
     }
-    for (auto m: this->member_types) {
+    for (auto *m: this->member_types) {
         delete m;
     }
 }
 
-Class::Class() {
-
-}
+Class::Class() = default;
