@@ -24,7 +24,7 @@ public:
 
     Parser(const std::string& __file__, CodeLines code_lines, std::vector<Token>& tokens);
 
-    bool match(TokType type);
+    bool match(TokType type) const;
 
     Node* parse_tuple_literal();
 

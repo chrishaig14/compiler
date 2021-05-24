@@ -13,16 +13,6 @@
 #include <fmt/color.h>
 #include <exception>
 
-std::string highlight(size_t column, size_t length) {
-    return fmt::format(fmt::fg(fmt::color::orange_red), std::string(column, ' ') + std::string(length, '^'));
-}
-
-std::string highlight2(const std::string& text, size_t column, size_t length) {
-    return fmt::format(fmt::fg(fmt::color::white), text.substr(0, column)) +
-           fmt::format(fmt::fg(fmt::color::red) | fmt::emphasis::bold, text.substr(column, length)) +
-           fmt::format(fmt::fg(fmt::color::white), text.substr(column + length, text.size() - (column + length)));
-}
-
 
 std::unordered_map<TokType, OpType> TOKEN_TO_OP = {{TokType::PLUS,  OpType::ADD},
                                                    {TokType::MINUS, OpType::SUB},
@@ -55,16 +45,18 @@ void Parser::next() {
     }
 }
 
-bool Parser::match(TokType type) {
+bool Parser::match(TokType type) const {
     return this->token.type == type;
 }
 
 BlockNode* Parser::parse_program() {
     VectorOfNodes program;
+    TextPosition start = this->token.start;
     while (this->token.type != TokType::END) {
         program.push_back(this->parse_top_level_statement());
     }
-    return new BlockNode(program, {1, 1}, {100, 100});
+    TextPosition end = this->token.end_pos;
+    return new BlockNode(program, start, end);
 }
 
 ReturnNode* Parser::parse_return() {
@@ -87,14 +79,14 @@ IfNode* Parser::parse_if() {
         this->next();
         Node* elif_condition = this->parse_expression();
         BlockNode* elif_body = this->parse_possibly_empty_block();
-        elifs.push_back(std::make_pair(elif_condition, elif_body));
+        elifs.emplace_back(elif_condition, elif_body);
     }
     BlockNode* _else = nullptr;
     if (this->match(TokType::ELSE)) {
         this->next();
         _else = this->parse_possibly_empty_block();
     }
-    IfNode* iff = new IfNode(condition, body, elifs, _else, if_tok.start, if_tok.end_pos);
+    auto* iff = new IfNode(condition, body, elifs, _else, if_tok.start, if_tok.end_pos);
     iff->start = if_tok.start;
     return iff;
 }
@@ -168,15 +160,15 @@ Node* Parser::parse_assignment_or_expression() {
         }
         Node* rvalue = this->parse_expression();
         if (lvalue->ntype == NodeType::ID) {
-            IdNode* id_node = new IdNode(lvalue->id()._id, lvalue->start, lvalue->end);
+            auto* id_node = new IdNode(lvalue->id()._id, lvalue->start, lvalue->end);
             if (op == TokType::PLUS_EQQ || op == TokType::MINUS_EQQ) {
-                OpType opt = OpType::ADD;
+                OpType opt;
                 if (op == TokType::PLUS_EQQ) {
                     opt = OpType::ADD;
                 } else if (op == TokType::MINUS_EQQ) {
                     opt = OpType::SUB;
                 }
-                BinopNode* bnode = new BinopNode(opt, id_node, rvalue, id_node->start, rvalue->end);
+                auto* bnode = new BinopNode(opt, id_node, rvalue, id_node->start, rvalue->end);
                 bnode->op_pos = op_pos;
                 rvalue = bnode;
 
@@ -253,7 +245,7 @@ Node* Parser::parse_add_or_sub_expression() {
         Token op_token = this->token;
         this->next();
         Node* right = this->parse_mul_div_or_mod_expression();
-        BinopNode* node = new BinopNode(op, left, right, left->start, right->end);
+        auto* node = new BinopNode(op, left, right, left->start, right->end);
         node->op_pos = op_token.start;
         left = node;
     }
@@ -268,7 +260,7 @@ Node* Parser::parse_mul_div_or_mod_expression() {
         Token op_token = this->token;
         this->next();
         Node* right = this->parse_factor();
-        BinopNode* node = new BinopNode(op, left, right, left->start, right->end);
+        auto* node = new BinopNode(op, left, right, left->start, right->end);
         node->op_pos = op_token.start;
         left = node;
     }
@@ -294,12 +286,12 @@ Node* Parser::parse_factor() {
         Token tok;
         if (this->match(TokType::INTEGER)) {
             tok = this->expect_token(TokType::INTEGER);
-            MemberNode* mn = new MemberNode(parent, tok);
+            auto* mn = new MemberNode(parent, tok);
             mn->dot_pos = dot_pos;
             parent = mn;
         } else {
             tok = this->expect_token(TokType::ID);
-            MemberNode* mn = new MemberNode(parent, tok);
+            auto* mn = new MemberNode(parent, tok);
             mn->dot_pos = dot_pos;
             parent = mn;
         }
@@ -333,7 +325,7 @@ Node* Parser::parse_dictionary() {
         Node* key = this->parse_expression();
         this->expect_token(TokType::COLON);
         Node* value = this->parse_expression();
-        items.push_back(std::make_pair(key, value));
+        items.emplace_back(key, value);
         if (this->match(TokType::COMMA)) {
             this->next();
         } else {
@@ -341,7 +333,7 @@ Node* Parser::parse_dictionary() {
             break;
         }
     }
-    DictNode* dict = new DictNode(items, lcurly.start, rcurly.end_pos);
+    auto* dict = new DictNode(items, lcurly.start, rcurly.end_pos);
     return dict;
 }
 
@@ -365,9 +357,9 @@ Node* Parser::parse_partial_application() {
         }
     }
     Token close = this->expect_token(TokType::RPAREN);
-    auto partial = new PartialApplication(new IdNode(total_function_tok.str,
-                                                     total_function_tok.start,
-                                                     total_function_tok.end_pos), args, dollar.start, close.end_pos);
+    auto* partial = new PartialApplication(new IdNode(total_function_tok.str,
+                                                      total_function_tok.start,
+                                                      total_function_tok.end_pos), args, dollar.start, close.end_pos);
     partial->start = total_function_tok.start;
     return partial;
 }
@@ -608,7 +600,7 @@ FunctionType* Parser::parse_function_type() {
         }
     }
     this->expect_token(TokType::RPAREN);
-    TypeNode* return_type = nullptr;
+    TypeNode* return_type;
     if (this->match(TokType::RARROW)) {
         this->expect_token(TokType::RARROW);
         return_type = this->parse_type_node();
@@ -634,8 +626,8 @@ ObjectType* Parser::parse_object_type() {
         }
         this->expect_token(TokType::RSQUARE);
     }
-    ObjectType* ot = new ObjectType(identifier.str, type_parameters);
-    if (ot->id.size() == 1 && islower(ot->id[0])) {
+    auto* ot = new ObjectType(identifier.str, type_parameters);
+    if (ot->id.size() == 1 && (islower(ot->id[0]) != 0)) {
         ot->is_generic_param = true;
     }
     return ot;
@@ -701,7 +693,7 @@ FunctionNode* Parser::parse_function_definition() {
         this->expect_token(TokType::RPAREN);
     }
     // Parse return
-    TypeNode* return_type = nullptr;
+    TypeNode* return_type;
     if (this->match(TokType::RARROW)) {
         // function with return value
         this->expect_token(TokType::RARROW);
@@ -712,13 +704,13 @@ FunctionNode* Parser::parse_function_definition() {
     // Parse function body
     BlockNode* body = this->parse_possibly_empty_block();
 
-    auto node = new FunctionNode(identifier,
-                                 parameter_names,
-                                 parameter_types,
-                                 return_type,
-                                 body,
-                                 fun_tok.start,
-                                 body->end);
+    auto* node = new FunctionNode(identifier,
+                                  parameter_names,
+                                  parameter_types,
+                                  return_type,
+                                  body,
+                                  fun_tok.start,
+                                  body->end);
     node->start = fun_tok.start;
     return node;
 }
@@ -741,7 +733,7 @@ Node* Parser::parse_alias() {
     this->expect_token(TokType::EQQ);
     TypeNode* aliased_type = this->parse_type_node();
     Token semic_tk = this->expect_token(TokType::SEMICOLON);
-    AliasNode* node = new AliasNode(alias_id.str, aliased_type, alias_tk.start, semic_tk.end_pos);
+    auto* node = new AliasNode(alias_id.str, aliased_type, alias_tk.start, semic_tk.end_pos);
     return node;
 }
 
@@ -780,7 +772,7 @@ ForNode* Parser::parse_for_loop() {
     this->inside_loop = true;
     BlockNode* body = this->parse_possibly_empty_block();
     this->inside_loop = prev;
-    ForNode* forloop = new ForNode(var.str, exp, body, for_tok.start, body->end);
+    auto* forloop = new ForNode(var.str, exp, body, for_tok.start, body->end);
     forloop->start = for_tok.start;
     return forloop;
 }
@@ -805,7 +797,7 @@ WhileNode* Parser::parse_while_loop() {
     this->inside_loop = true;
     BlockNode* body = this->parse_possibly_empty_block();
     this->inside_loop = prev;
-    WhileNode* whil = new WhileNode(condition, body, while_tok.start, body->end);
+    auto* whil = new WhileNode(condition, body, while_tok.start, body->end);
     whil->start = while_tok.start;
     return whil;
 }
@@ -876,14 +868,14 @@ ClassNode* Parser::parse_class_definition() {
         }
     }
     Token end = this->expect_token(TokType::RCURLY);
-    ClassNode* c = new ClassNode(class_name,
-                                 type_parameters,
-                                 members,
-                                 methods,
-                                 static_members,
-                                 static_methods,
-                                 class_tok.start,
-                                 end.end_pos);
+    auto* c = new ClassNode(class_name,
+                            type_parameters,
+                            members,
+                            methods,
+                            static_members,
+                            static_methods,
+                            class_tok.start,
+                            end.end_pos);
     c->members_ordered = members_ordered;
     c->start = class_tok.start;
     return c;
@@ -932,7 +924,7 @@ Node* Parser::parse_match_statement() {
         TypeNode* type = this->parse_type_node();
         BlockNode* body = this->parse_possibly_empty_block();
         ids.push_back(id.str);
-        cases.push_back(std::make_pair(type, body));
+        cases.emplace_back(type, body);
         if (this->match(TokType::RCURLY)) {
             break;
         }
