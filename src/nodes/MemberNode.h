@@ -27,7 +27,7 @@ public:
 
     bool equal(const Node& x) const override;
 
-    ~MemberNode();
+    ~MemberNode() override;
 
     MemberNode& member() override;
     const MemberNode& member() const override;

@@ -24,7 +24,7 @@ public:
     ClassNode& cls() override;
     const ClassNode& cls() const override;
 
-    ~ClassNode();
+    ~ClassNode() override;
 
     MapStringType members;
     std::map<std::string, std::pair<TypeNode*, Node*>> static_members;

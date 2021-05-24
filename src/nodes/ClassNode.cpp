@@ -27,10 +27,10 @@ const ClassNode& ClassNode::cls() const {
 }
 
 ClassNode::~ClassNode() {
-    for (auto mem: this->members) {
+    for (const auto& mem: this->members) {
         delete mem.second;
     }
-    for (auto method: this->methods) {
+    for (const auto& method: this->methods) {
         delete method.second;
     }
 }

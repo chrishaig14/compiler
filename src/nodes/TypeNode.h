@@ -18,13 +18,12 @@ private:
     VectorOfStrings path_parts;
     std::string s;
 public:
-    Path() {
-    }
+    Path() = default;
 
-    Path(Path p, std::string c) {
+    Path(Path p, const std::string& c) {
         this->path_parts = p.as_vec();
         this->path_parts.push_back(c);
-        for (auto cc: this->path_parts) {
+        for (const auto& cc: this->path_parts) {
             this->s += cc + ".";
         }
         this->s = this->s.substr(0, this->s.size() - 1);
@@ -34,19 +33,19 @@ public:
         this->s = s;
         size_t k = 0;
         this->path_parts.push_back("");
-        for (size_t i = 0; i < s.size(); i++) {
-            if (s[i] == '.') {
+        for (char i : s) {
+            if (i == '.') {
                 this->path_parts.push_back("");
                 k++;
             } else {
-                this->path_parts[k] += s[i];
+                this->path_parts[k] += i;
             }
         }
     }
 
     explicit Path(const VectorOfStrings& p) {
         this->path_parts = p;
-        for (auto cc: this->path_parts) {
+        for (const auto& cc: this->path_parts) {
             this->s += cc + ".";
         }
         this->s = this->s.substr(0, this->s.size() - 1);
@@ -96,8 +95,7 @@ public:
 
     bool operator!=(const TypeNode& other) const;
 
-    virtual ~TypeNode() {
-    }
+    virtual ~TypeNode() = default;
 
     bool generic;
     bool is_generic_param;
@@ -122,7 +120,7 @@ public:
 
     const ObjectType& object() const override;
 
-    ~ObjectType();
+    ~ObjectType() override;
 
     Path actual_base_path;
     std::string id;
@@ -167,7 +165,7 @@ public:
 
     FunctionType& function() override;
 
-    ~FunctionType();
+    ~FunctionType() override;
 
     const FunctionType& function() const override;
 

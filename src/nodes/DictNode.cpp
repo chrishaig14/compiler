@@ -13,7 +13,7 @@ const DictNode& DictNode::dict() const {
 }
 
 bool DictNode::equal(const Node& other) const {
-    auto& o = other.dict();
+    const auto& o = other.dict();
     if (this->items.size() != o.items.size()) {
         return false;
     }

@@ -12,7 +12,7 @@ DeclarationNode::DeclarationNode(const std::string& identifier, TypeNode* type, 
 }
 
 bool DeclarationNode::equal(const Node& x) const {
-    auto& other = x.decl();
+    const auto& other = x.decl();
     return this->identifier == other.identifier && *this->expression == *other.expression &&
            ((this->type != nullptr && other.type != nullptr && *this->type == *other.type) ||
             (this->type == nullptr && other.type == nullptr));
@@ -27,12 +27,12 @@ const DeclarationNode& DeclarationNode::decl() const {
 }
 
 DeclarationNode::~DeclarationNode() {
-    if (this->type != nullptr) {
+
         delete this->type;
-    }
-    if (this->expression != nullptr) {
+
+
         delete this->expression;
-    }
+
 }
 
 

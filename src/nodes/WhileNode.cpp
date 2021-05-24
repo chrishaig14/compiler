@@ -11,7 +11,7 @@ WhileNode::WhileNode(Node* condition, BlockNode* body, TextPosition start, TextP
 }
 
 bool WhileNode::equal(const Node& x) const {
-    auto& other = x.whil();
+    const auto& other = x.whil();
     if ((this->body == nullptr && other.body != nullptr) || (this->body != nullptr && other.body == nullptr)) {
         return false;
     }

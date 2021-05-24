@@ -15,7 +15,7 @@ public:
 
     bool equal(const Node& other) const override;
 
-    ~EmptyListNode();
+    ~EmptyListNode() override;
     EmptyListNode& emptylst() override;
     const EmptyListNode& emptylst() const override;
 

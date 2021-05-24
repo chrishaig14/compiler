@@ -11,7 +11,7 @@ ForNode::ForNode(const std::string& var, Node* exp, BlockNode* body, TextPositio
 }
 
 bool ForNode::equal(const Node& x) const {
-    auto& other = x.forloop();
+    const auto& other = x.forloop();
     return this->var == other.var && *this->exp == *other.exp && *this->body == *other.body;
 }
 
@@ -24,11 +24,11 @@ const ForNode& ForNode::forloop() const {
 }
 
 ForNode::~ForNode() {
-    if (this->exp != nullptr) {
+
         delete this->exp;
-    }
-    if (this->body != nullptr) {
+
+
         delete this->body;
-    }
+
 }
 

@@ -6,7 +6,7 @@
 #include "FunctionNode.h"
 
 bool FunctionNode::equal(const Node& x) const {
-    auto& other = x.func();
+    const auto& other = x.func();
 //    return false;
     if (this->identifier != other.identifier) {
         return false;
@@ -38,7 +38,7 @@ const FunctionNode& FunctionNode::func() const {
     return *this;
 }
 
-FunctionNode::FunctionNode(std::string identifier, VectorOfStrings parameter_names, VectorOfTypes parameter_types,
+FunctionNode::FunctionNode(std::string identifier, VectorOfStrings parameter_names, const VectorOfTypes& parameter_types,
                            TypeNode* return_type, BlockNode* body, TextPosition start, TextPosition end) : Node(NodeType::FUNC,
                                                                                                                 start,
                                                                                                                 end),
@@ -56,7 +56,7 @@ FunctionNode::FunctionNode(std::string identifier, VectorOfStrings parameter_nam
 }
 
 FunctionNode::~FunctionNode() {
-    for (auto pt: this->parameter_types) {
+    for (auto *pt: this->parameter_types) {
         delete pt;
     }
     delete this->body;

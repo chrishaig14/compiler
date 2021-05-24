@@ -20,7 +20,7 @@ public:
 
     WhileNode& whil() override;
 
-    ~WhileNode();
+    ~WhileNode() override;
 
     const WhileNode& whil() const override;
 

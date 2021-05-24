@@ -7,6 +7,8 @@
 
 
 #include "Node.h"
+
+#include <utility>
 #include "../types.h"
 
 class ImportNode : public Node {
@@ -18,7 +20,7 @@ public:
 
     ImportNode(const VectorOfStrings& path, std::string alias, TextPosition start, TextPosition end)
             : Node(NodeType::IMPORT, start, end) {
-        this->alias = alias;
+        this->alias = std::move(alias);
         this->path = path;
         this->has_alias = true;
     }

@@ -6,7 +6,7 @@
 #include "IfNode.h"
 
 bool IfNode::equal(const Node& x) const {
-    auto& other = x.iff();
+    const auto& other = x.iff();
     if (*this->condition != *other.condition) {
         return false;
     }
@@ -50,9 +50,9 @@ const IfNode& IfNode::iff() const {
 IfNode::~IfNode() {
     delete this->condition;
     delete this->then;
-    if (this->selse != nullptr) {
+
         delete this->selse;
-    }
+
     for (auto p: this->elifs) {
         delete p.first;
         delete p.second;

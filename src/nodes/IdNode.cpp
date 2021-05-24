@@ -10,7 +10,7 @@ IdNode::IdNode(std::string identifier, TextPosition start, TextPosition end) :No
 
 
 bool IdNode::equal(const Node& x) const {
-    auto& other = x.id();
+    const auto& other = x.id();
     return this->_id == other._id;
 }
 

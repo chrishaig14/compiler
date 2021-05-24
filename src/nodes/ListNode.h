@@ -20,7 +20,7 @@ public:
 
     bool equal(const Node& other) const override;
 
-    ~ListNode();
+    ~ListNode() override;
 
     ListNode& lst() override;
     const ListNode& lst() const override;

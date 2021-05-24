@@ -14,7 +14,7 @@ CallNode::CallNode(Node* function, const VectorOfNodes& arguments, TextPosition 
 }
 
 bool CallNode::equal(const Node& x) const {
-    auto& other = x.call();
+    const auto& other = x.call();
     if (this->arguments.size() != other.arguments.size()) {
         return false;
     }
@@ -36,13 +36,13 @@ const CallNode& CallNode::call() const {
 
 CallNode::~CallNode() {
     delete this->function;
-    for (auto a: this->arguments) {
+    for (auto *a: this->arguments) {
         delete a;
     }
-    for (auto at: this->arg_types) {
+    for (auto *at: this->arg_types) {
         delete at;
     }
-    for (auto ft: this->ftype) {
+    for (auto *ft: this->ftype) {
         delete ft;
     }
 }

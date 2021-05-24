@@ -21,5 +21,4 @@ bool CastNode::equal(const Node& x) const {
     return true;
 }
 
-CastNode::~CastNode() {
-}
+CastNode::~CastNode() = default;

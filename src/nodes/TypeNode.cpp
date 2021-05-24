@@ -7,7 +7,7 @@
 
 FunctionType::FunctionType(const VectorOfTypes& parameterTypes, TypeNode* returnType) {
 
-    for (auto p: parameterTypes) {
+    for (auto *p: parameterTypes) {
         assert(p != nullptr);
     }
     assert(returnType != nullptr);
@@ -18,7 +18,7 @@ FunctionType::FunctionType(const VectorOfTypes& parameterTypes, TypeNode* return
 
 FunctionType* FunctionType::clone() const {
     VectorOfTypes aux;
-    for (auto p: this->param_types) {
+    for (auto *p: this->param_types) {
         aux.emplace_back(p->clone());
     }
     return new FunctionType(aux, this->return_type->clone());
@@ -26,20 +26,20 @@ FunctionType* FunctionType::clone() const {
 
 FunctionType::~FunctionType() {
     delete this->return_type;
-    for (auto p: this->param_types) {
+    for (auto *p: this->param_types) {
         delete p;
     }
 }
 
 std::string FunctionType::to_string() const {
-    auto& ftype = *this;
+    const auto& ftype = *this;
     std::string parameters;
     std::string ret;
-    for (auto ptr: ftype.param_types) {
+    for (auto *ptr: ftype.param_types) {
         auto& p = *ptr;
         parameters += p.to_string() + ", ";
     }
-    if (ftype.param_types.size() != 0) {
+    if (!ftype.param_types.empty()) {
         parameters = parameters.substr(0, parameters.size() - 2);
     }
     ret = ftype.return_type->to_string();
@@ -47,14 +47,14 @@ std::string FunctionType::to_string() const {
 }
 
 std::string FunctionType::actual_to_string() const {
-    auto& ftype = *this;
+    const auto& ftype = *this;
     std::string parameters;
     std::string ret;
-    for (auto ptr: ftype.param_types) {
+    for (auto *ptr: ftype.param_types) {
         auto& p = *ptr;
         parameters += p.actual_to_string() + ", ";
     }
-    if (ftype.param_types.size() != 0) {
+    if (!ftype.param_types.empty()) {
         parameters = parameters.substr(0, parameters.size() - 2);
     }
     ret = ftype.return_type->actual_to_string();
@@ -62,8 +62,8 @@ std::string FunctionType::actual_to_string() const {
 }
 
 bool FunctionType::equal(const TypeNode& other) const {
-    auto& a = *this;
-    auto& b = other.function();
+    const auto& a = *this;
+    const auto& b = other.function();
     if (a.param_types.size() != b.param_types.size()) {
         return false;
     }
@@ -84,7 +84,7 @@ const FunctionType& FunctionType::function() const {
 }
 
 bool FunctionType::is_generic() const {
-    for (auto t: this->param_types) {
+    for (auto *t: this->param_types) {
         if (t->is_generic()) {
             return true;
         }
@@ -94,7 +94,7 @@ bool FunctionType::is_generic() const {
 
 ObjectType::ObjectType(const std::string& identifier, const VectorOfTypes& typeParameters)
         : id(identifier), type_params(typeParameters) {
-    for (auto p: typeParameters) {
+    for (auto *p: typeParameters) {
         assert(p != nullptr);
     }
     this->kind = Kind::OBJECT;
@@ -104,11 +104,11 @@ ObjectType::ObjectType(const std::string& identifier, const VectorOfTypes& typeP
 
 TypeNode* ObjectType::clone() const {
     VectorOfTypes aux;
-    for (auto p: this->type_params) {
+    for (auto *p: this->type_params) {
         aux.emplace_back(p->clone());
     }
 
-    auto n = new ObjectType(this->id, aux);
+    auto *n = new ObjectType(this->id, aux);
     n->actual_base_path = this->actual_base_path;
     n->is_generic_param = this->is_generic_param;
     n->aliased_type = this->aliased_type;
@@ -116,19 +116,19 @@ TypeNode* ObjectType::clone() const {
 }
 
 ObjectType::~ObjectType() {
-    for (auto p: this->type_params) {
+    for (auto *p: this->type_params) {
         delete p;
     }
 }
 
 std::string ObjectType::to_string() const {
-    auto& otype = *this;
+    const auto& otype = *this;
     std::string parameters;
-    for (auto ptr: otype.type_params) {
+    for (auto *ptr: otype.type_params) {
         auto& p = *ptr;
         parameters += p.to_string() + ", ";
     }
-    if (parameters.size() != 0) {
+    if (!parameters.empty()) {
         parameters = parameters.substr(0, parameters.size() - 2);
         return otype.id + "[" + parameters + "]";
     }
@@ -136,13 +136,13 @@ std::string ObjectType::to_string() const {
 }
 
 std::string ObjectType::actual_to_string() const {
-    auto& otype = *this;
+    const auto& otype = *this;
     std::string parameters;
-    for (auto ptr: otype.type_params) {
+    for (auto *ptr: otype.type_params) {
         auto& p = *ptr;
         parameters += p.actual_to_string() + ", ";
     }
-    if (parameters.size() != 0) {
+    if (!parameters.empty()) {
         parameters = parameters.substr(0, parameters.size() - 2);
         return this->actual_base_path.as_str() + "[" + parameters + "]";
     }
@@ -150,8 +150,8 @@ std::string ObjectType::actual_to_string() const {
 }
 
 bool ObjectType::equal(const TypeNode& other) const {
-    auto& a = *this;
-    auto& b = other.object();
+    const auto& a = *this;
+    const auto& b = other.object();
     if (a.id != b.id) {
         return false;
     }
@@ -182,7 +182,7 @@ bool ObjectType::is_generic() const {
     if (this->is_generic_param) {
         return true;
     }
-    for (auto t: this->type_params) {
+    for (auto *t: this->type_params) {
         if (t->is_generic()) {
             return true;
         }

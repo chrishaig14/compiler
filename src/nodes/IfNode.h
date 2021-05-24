@@ -23,7 +23,7 @@ public:
 
     bool equal(const Node& other) const override;
 
-    ~IfNode();
+    ~IfNode() override;
 
     IfNode& iff() override;
     const IfNode& iff() const override;

@@ -27,7 +27,7 @@ public:
 
     bool equal(const Node& other) const override;
 
-    ~DeclarationNode();
+    ~DeclarationNode() override;
 
     DeclarationNode& decl() override;
     const DeclarationNode& decl() const override;

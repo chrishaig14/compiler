@@ -28,7 +28,7 @@ const ListNode& ListNode::lst() const {
 }
 
 ListNode::~ListNode() {
-    for (auto e: this->elements) {
+    for (auto *e: this->elements) {
         delete e;
     }
 }

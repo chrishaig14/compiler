@@ -20,12 +20,12 @@ public:
     VectorOfTypes parameter_types;
     BlockNode* body;
     TypeNode* return_type;
-    FunctionNode(std::string identifier, VectorOfStrings parameter_names, VectorOfTypes parameter_types,
+    FunctionNode(std::string identifier, VectorOfStrings parameter_names, const VectorOfTypes& parameter_types,
                  TypeNode* return_type, BlockNode* body, TextPosition start, TextPosition end);
 
     bool equal(const Node& x) const override;
 
-    ~FunctionNode();
+    ~FunctionNode() override;
 
     FunctionNode& func() override;
 
