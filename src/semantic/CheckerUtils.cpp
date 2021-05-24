@@ -30,7 +30,7 @@ int target_union_type(const ObjectType& target, const TypeNode& source) {
 
 Entity entity_from_type(const TypeNode& type) {
     if (type.kind == Kind::FUNCTION) {
-        Value* fv = new Value(type.clone());
+        auto* fv = new Value(type.clone());
         return Entity(fv);
     }
     if (type.kind == Kind::OBJECT) {
@@ -38,21 +38,21 @@ Entity entity_from_type(const TypeNode& type) {
             return Entity(E_TYPE::NOTHING);
         }
     }
-    Value* fv = new Value(type.clone());
+    auto* fv = new Value(type.clone());
     return Entity(fv);
 }
 
-FunctionSNode* make_class_default_init(std::string class_path, VectorOfStrings members) {
-    BlockSNode* bn = new BlockSNode();
-    NewObjectSNode* nn = new NewObjectSNode();
+FunctionSNode* make_class_default_init(const std::string& class_path, const VectorOfStrings& members) {
+    auto* bn = new BlockSNode();
+    auto* nn = new NewObjectSNode();
     nn->class_name = class_path;
-    for (auto m: members) {
-        IdSNode* idn = new IdSNode(m);
+    for (const auto& m: members) {
+        auto* idn = new IdSNode(m);
         nn->args.push_back(idn);
     }
-    ReturnSNode* rn = new ReturnSNode(nn);
+    auto* rn = new ReturnSNode(nn);
     bn->nodes.push_back(rn);
-    FunctionSNode* fn = new FunctionSNode(class_path + ".__init__", members, bn);
+    auto* fn = new FunctionSNode(class_path + ".__init__", members, bn);
     return fn;
 }
 
@@ -67,9 +67,9 @@ TypeNode* get_entity_type(Entity e) {
     throw std::runtime_error("Get type of non function/object!");
 }
 
-void mangle_generic_names(TypeNode* t);
-void mangle_generic_names(FunctionType* t);
-void mangle_generic_names(ObjectType* t);
+
+
+
 
 void mangle_generic_names(TypeNode* t) {
     if (t->kind == Kind::OBJECT) {
@@ -79,7 +79,7 @@ void mangle_generic_names(TypeNode* t) {
 }
 
 void mangle_generic_names(FunctionType* t) {
-    for (auto pt: t->param_types) {
+    for (auto *pt: t->param_types) {
         mangle_generic_names(pt);
     }
     mangle_generic_names(t->return_type);
@@ -89,15 +89,15 @@ void mangle_generic_names(ObjectType* t) {
     if (t->is_generic_param) {
         t->id = t->id + "0";
     } else {
-        for (auto tp: t->type_params) {
+        for (auto *tp: t->type_params) {
             mangle_generic_names(tp);
         }
     }
 }
 
-void make_not_generic(FunctionType* ft);
-void make_not_generic(ObjectType* ft);
-void make_not_generic(TypeNode* ft);
+
+
+
 
 void make_not_generic(TypeNode* t) {
     if (t->kind == Kind::FUNCTION) {
@@ -107,7 +107,7 @@ void make_not_generic(TypeNode* t) {
 }
 
 void make_not_generic(FunctionType* ft) {
-    for (auto pt: ft->param_types) {
+    for (auto *pt: ft->param_types) {
         make_not_generic(pt);
     }
     make_not_generic(ft->return_type);
@@ -115,7 +115,7 @@ void make_not_generic(FunctionType* ft) {
 
 void make_not_generic(ObjectType* ot) {
     ot->is_generic_param = false;
-    for (auto tp: ot->type_params) {
+    for (auto *tp: ot->type_params) {
         make_not_generic(tp);
     }
 }
@@ -137,25 +137,24 @@ std::string map_boolop_to_method_name(BoolOp op) {
     return "__" + funs[op] + "__";
 }
 
-int target_union_type(const ObjectType& target, const TypeNode& source);
+
 
 SNode* make_union_wrapper(int type_index, SNode* expression) {
-    NewObjectSNode* new_union = new NewObjectSNode();
+    auto* new_union = new NewObjectSNode();
     new_union->class_name = "core_D_Union";
-    IntegerSNode* in = new IntegerSNode(std::string());
+    auto* in = new IntegerSNode(std::string());
     in->str = std::to_string(type_index); // FIXME, use int directly
     new_union->args = {expression, in};
     return new_union;
 }
 
-std::string binoptype_to_str(OpType op);
 
-std::string map_binop_to_method_name(OpType op);
+
+
 
 SNode* make_boolop_snode(ConstFunction* operator_fun, SemanticInfo& left_info, SemanticInfo& right_info) {
-    IdSNode* function_id = new IdSNode(operator_fun->path.as_str());
-    CallSNode* sn = new CallSNode(function_id, {left_info.snode, right_info.snode});
+    auto* function_id = new IdSNode(operator_fun->path.as_str());
+    auto* sn = new CallSNode(function_id, {left_info.snode, right_info.snode});
     return sn;
 }
 
-std::string map_boolop_to_method_name(BoolOp op);

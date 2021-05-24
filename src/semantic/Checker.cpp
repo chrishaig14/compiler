@@ -7,7 +7,7 @@
 #include "util.h"
 
 bool function_is_generic(const FunctionType& ft) {
-    for (auto param_type: ft.param_types) {
+    for (auto *param_type: ft.param_types) {
         if (is_generic(*param_type)) {
             return true;
             break;
@@ -24,7 +24,7 @@ Checker::Checker() {
     this->loop_count = 0;
 }
 
-void Checker::enter_scope(std::string name) {
+void Checker::enter_scope(const std::string& name) {
     std::string new_scope_name = this->scope->name + "." + name;
     if (this->scopes.find(new_scope_name) != this->scopes.end()) {
         delete this->scopes[new_scope_name];
@@ -43,7 +43,7 @@ bool Checker::assert_type_exists(TypeNode& type, TextPosition pos) {
         if (type.object().id == ".None") {
             return true;
         }
-        if (type.object().type_params.size() == 0) {
+        if (type.object().type_params.empty()) {
             if (!is_generic(type)) {
                 // if (this->imported_paths.count(type.object().id) == 0) {
                 //     this->error_class_not_found(type, {1, 1});
@@ -66,7 +66,7 @@ bool Checker::assert_type_exists(TypeNode& type, TextPosition pos) {
         // }
     } else {
         bool error = false;
-        for (auto t: type.function().param_types) {
+        for (auto *t: type.function().param_types) {
             if (!this->assert_type_exists(*t, pos)) {
                 error = true;
             }
@@ -80,19 +80,19 @@ bool Checker::assert_type_exists(TypeNode& type, TextPosition pos) {
 bool is_generic(const TypeNode& t) {
     if (t.kind == Kind::OBJECT) {
         const ObjectType& o = t.object();
-        if (o.id.size() == 1 && islower(o.id[0])) {
+        if (o.id.size() == 1 && (islower(o.id[0]) != 0)) {
             // a is generic
-            assert(o.type_params.size() == 0);
+            assert(o.type_params.empty());
             return true;
         }
-        for (auto type_param: o.type_params) {
+        for (auto *type_param: o.type_params) {
             if (is_generic(*type_param)) {
                 return true;
             }
         }
     } else {
         const FunctionType& fo = t.function();
-        for (auto param_type: fo.param_types) {
+        for (auto *param_type: fo.param_types) {
             if (is_generic(*param_type)) {
                 return true;
             }
@@ -111,13 +111,13 @@ Checker::match_arguments_to_generic_function(const FunctionType& ft, VectorOfTyp
         unify_function_call(*f, arg_types);
     } catch (...) {
         std::string sss = "ERROR CANNOT UNIFY " + ft.to_string() + " WITH ARGS";
-        for (auto at: arg_types) {
+        for (auto *at: arg_types) {
             sss += at->to_string() + ", ";
         }
         this->error_reporter.fail(sss);
         return error_stub();
     }
-    for (auto at: arg_types) {
+    for (auto *at: arg_types) {
         delete at;
     }
     SemanticInfo rv;
@@ -128,9 +128,9 @@ Checker::match_arguments_to_generic_function(const FunctionType& ft, VectorOfTyp
 
 TypeNode* make_type_from_object_pattern(const ObjectType& object_type, const MapStringType& replacements) {
     std::string type_identifier = object_type.id;
-    for (auto r: replacements) {
+    for (const auto& r: replacements) {
         if (type_identifier == r.first) {
-            if (object_type.type_params.size() != 0) {
+            if (!object_type.type_params.empty()) {
                 throw std::runtime_error(
                         "Trying to make a type for a template for exmaple struct Foo[T]{foo:T[Integer];}!");
             }
@@ -139,17 +139,17 @@ TypeNode* make_type_from_object_pattern(const ObjectType& object_type, const Map
     }
     // It's not the top level type
     VectorOfTypes new_type_params;
-    for (auto tp: object_type.type_params) {
+    for (auto *tp: object_type.type_params) {
         TypeNode* new_tp = make_type(*tp, replacements);
         new_type_params.push_back(new_tp);
     }
-    ObjectType* ot = TYPE(type_identifier, new_type_params);
+    auto* ot = TYPE(type_identifier, new_type_params);
     return ot;
 }
 
 TypeNode* make_type_from_function_pattern(const FunctionType& ftn, const MapStringType& replacements) {
     VectorOfTypes new_param_types;
-    for (auto pt: ftn.param_types) {
+    for (auto *pt: ftn.param_types) {
         TypeNode* new_pt = make_type(*pt, replacements);
         new_param_types.push_back(new_pt);
     }
@@ -174,23 +174,23 @@ Class* Checker::instantiate_generic(Class* generic, const ObjectType& instance) 
     }
     auto field_names = generic->member_names;
     VectorOfTypes concrete_field_types;
-    for (auto f: generic->member_types) {
+    for (auto *f: generic->member_types) {
         TypeNode& concrete_type = *make_type(*f, replacements);
         concrete_field_types.push_back(&concrete_type);
     }
 
     std::unordered_map<std::string, ConstFunction*> concrete_methods;
-    for (auto m: generic->methods) {
+    for (const auto& m: generic->methods) {
         TypeNode* t = (m.second)->ft;
         TypeNode& concrete_type = *make_type(*t, replacements);
         this->module->fill_actual(&concrete_type);
-        ConstFunction* cf = new ConstFunction();
+        auto* cf = new ConstFunction();
         cf->path = m.second->path;
         cf->ft = (FunctionType*) concrete_type.clone();
         concrete_methods[m.first] = cf;
     }
 
-    Class* concrete = new Class();
+    auto* concrete = new Class();
     concrete->class_name = generic->class_name;
     concrete->methods = concrete_methods;
     concrete->member_names = generic->member_names;
@@ -233,13 +233,13 @@ bool Checker::is_immutable(const TypeNode& node) {
 
 
 Checker::~Checker() {
-    for (auto s: this->scopes) {
+    for (const auto& s: this->scopes) {
         delete s.second;
     }
 }
 
 bool Checker::is_variable(const ObjectType& a) {
-    return a.type_params.size() == 0 && islower(a.id[0]);
+    return a.type_params.empty() && (islower(a.id[0]) != 0);
 }
 
 USemanticInfo Checker::dispatch_rvalue(Node* nod) {

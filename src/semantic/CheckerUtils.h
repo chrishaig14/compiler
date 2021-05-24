@@ -36,7 +36,7 @@ FunctionNode* generate_eq_method(std::string class_name, VectorOfTypes tp, Vecto
 
 FunctionNode* generate_str_method(std::string class_name);
 
-FunctionSNode* make_class_default_init(std::string class_path, VectorOfStrings members);
+FunctionSNode* make_class_default_init(const std::string& class_path, const VectorOfStrings& members);
 
 TypeNode* get_entity_type(Entity e);
 
@@ -51,15 +51,15 @@ void make_not_generic(TypeNode* ft);
 std::string map_boolop_to_method_name(BoolOp op);
 std::string map_binop_to_method_name(OpType op);
 
-int target_union_type(const ObjectType& target, const TypeNode& source);
+
 
 SNode* make_union_wrapper(int type_index, SNode* expression);
 
-std::string binoptype_to_str(OpType op);
 
-std::string map_binop_to_method_name(OpType op);
+
+
 
 SNode* make_boolop_snode(ConstFunction* operator_fun, SemanticInfo& left_info, SemanticInfo& right_info);
 
-std::string map_boolop_to_method_name(BoolOp op);
+
 #endif //XLANG_CHECKERUTILS_H

@@ -6,49 +6,49 @@
 
 
 SNode* Checker::make_for_snode(ForNode& node, USemanticInfo& binfo, USemanticInfo& exp_info_p) {
-    BlockSNode* bbn = new BlockSNode();
+    auto* bbn = new BlockSNode();
 
-    DeclarationSNode* dsn = new DeclarationSNode(this->loop_list_var_id, exp_info_p->snode);
+    auto* dsn = new DeclarationSNode(this->loop_list_var_id, exp_info_p->snode);
     bbn->nodes.push_back(dsn);
-    IntegerSNode* init_idx = new IntegerSNode("0");
-    DeclarationSNode* lidx_decl = new DeclarationSNode(this->loop_index_var_id, init_idx);
+    auto* init_idx = new IntegerSNode("0");
+    auto* lidx_decl = new DeclarationSNode(this->loop_index_var_id, init_idx);
 
     bbn->nodes.push_back(lidx_decl);
 
-    IdSNode* list_len_fn = new IdSNode("core.List.len");
-    IdSNode* list_sn = new IdSNode(this->loop_list_var_id);
-    CallSNode* call_list_len_sn = new CallSNode(list_len_fn, {list_sn});
-    DeclarationSNode* lensn = new DeclarationSNode(this->loop_list_len_var_id, call_list_len_sn);
+    auto* list_len_fn = new IdSNode("core.List.len");
+    auto* list_sn = new IdSNode(this->loop_list_var_id);
+    auto* call_list_len_sn = new CallSNode(list_len_fn, {list_sn});
+    auto* lensn = new DeclarationSNode(this->loop_list_len_var_id, call_list_len_sn);
     bbn->nodes.push_back(lensn);
 
 
-    IdSNode* idxsn = new IdSNode(this->loop_index_var_id);
-    IdSNode* cmpfunsn = new IdSNode("core.core.Integer.__lt__");
+    auto* idxsn = new IdSNode(this->loop_index_var_id);
+    auto* cmpfunsn = new IdSNode("core.core.Integer.__lt__");
 
-    IdSNode* llensn = new IdSNode(this->loop_list_len_var_id);
+    auto* llensn = new IdSNode(this->loop_list_len_var_id);
 
 
-    CallSNode* cn = new CallSNode(cmpfunsn, {idxsn, llensn});
+    auto* cn = new CallSNode(cmpfunsn, {idxsn, llensn});
 
-    BlockSNode* bn = (BlockSNode*) (binfo->snode);
+    auto* bn = (BlockSNode*) (binfo->snode);
 
-    CallSNode* list_subscript_n = new CallSNode(new IdSNode("core.List.__get_item__"),
+    auto* list_subscript_n = new CallSNode(new IdSNode("core.List.__get_item__"),
                                                 {new IdSNode(this->loop_list_var_id),
                                                  new IdSNode(this->loop_index_var_id)});
 
 
-    DeclarationSNode* loop_elem_sn = new DeclarationSNode(node.var, list_subscript_n);
+    auto* loop_elem_sn = new DeclarationSNode(node.var, list_subscript_n);
     bn->nodes.insert(bn->nodes.begin(), loop_elem_sn);
 
     bn->nodes.push_back(this->update_loop_index_snode);
-    WhileSNode* wsn = new WhileSNode(cn, bn);
+    auto* wsn = new WhileSNode(cn, bn);
     bbn->nodes.push_back(wsn);
     return bbn;
 }
 
 USemanticInfo Checker::visit_enum(EnumNode& p_node) {
     SemanticInfo info;
-    EnumSNode* esn = new EnumSNode();
+    auto* esn = new EnumSNode();
     Enum* enumm = this->scope->get(p_node.id).enumm;
     esn->id = enumm->path.as_str();
     esn->values = p_node.values;
@@ -59,28 +59,28 @@ USemanticInfo Checker::visit_enum(EnumNode& p_node) {
 USemanticInfo Checker::visit_class(ClassNode& node) {
     this->error_reporter.current_class = node.class_name;
     SemanticInfo info;
-    BlockSNode* sn = new BlockSNode();
+    auto* sn = new BlockSNode();
     info.snode = sn;
     this->add_this = true;
     VectorOfTypes tp;
-    for (auto type_param: node.type_parameters) {
+    for (const auto& type_param: node.type_parameters) {
         tp.push_back(TYPE(type_param, {}));
     }
 
     VectorOfTypes members_ordered_types;
 
-    for (auto mt: node.members_ordered) {
+    for (const auto& mt: node.members_ordered) {
         TypeNode& t = *node.members[mt];
         members_ordered_types.push_back(&t);
         this->assert_type_exists(t, node.start);
     }
 
     Class* clazz = this->scope->get(node.class_name).clazz;
-    ClassSNode* csn = new ClassSNode(clazz->path.as_str(), node.members_ordered);
+    auto* csn = new ClassSNode(clazz->path.as_str(), node.members_ordered);
     sn->nodes.push_back(csn);
     sn->nodes.push_back(make_class_default_init(clazz->path.as_str(), node.members_ordered));
 
-    for (auto sm: node.static_members) {
+    for (const auto& sm: node.static_members) {
         USemanticInfo sm_exp_info = this->dispatch(sm.second.second);
         if (*sm.second.first != *sm_exp_info->entity.value->type) {
             this->error_reporter.fail("Err: cannt initialize static member of type " + sm.second.first->to_string() +
@@ -94,11 +94,11 @@ USemanticInfo Checker::visit_class(ClassNode& node) {
     std::vector<SNode*> methods_snodes;
     std::vector<SNode*> static_methods_snodes;
 
-    for (auto method: node.methods) {
+    for (const auto& method: node.methods) {
         this->add_this = true;
-        ObjectType* vt = new ObjectType(node.class_name);
+        auto* vt = new ObjectType(node.class_name);
         vt->actual_base_path = clazz->path;
-        Value* val = new Value(vt);
+        auto* val = new Value(vt);
         this->this_entity = Entity(val);
         val->metatype = Meta::CLASS;
         val->clazz = clazz;
@@ -107,16 +107,16 @@ USemanticInfo Checker::visit_class(ClassNode& node) {
         methods_snodes.push_back(method_info->snode);
     }
 
-    for (auto method: node.static_methods) {
+    for (const auto& method: node.static_methods) {
         this->add_this = false;
         USemanticInfo method_info = this->visit_function(*method.second);
         static_methods_snodes.push_back(method_info->snode);
     }
 
-    for (auto m: methods_snodes) {
+    for (auto *m: methods_snodes) {
         sn->nodes.push_back(m);
     }
-    for (auto m: static_methods_snodes) {
+    for (auto *m: static_methods_snodes) {
         sn->nodes.push_back(m);
     }
 
@@ -131,7 +131,7 @@ USemanticInfo Checker::visit_root(BlockNode& node) {
     this->error_reporter.__file__ = this->__file__;
     this->error_reporter.code_lines = code_lines;
     // Initialize module level Scope
-    for (auto f: this->module->flirpins) {
+    for (const auto& f: this->module->flirpins) {
         this->scope->set(f.first, map_flirpin_to_entity(f.second));
     }
     // for (auto i: this->module->imports) {
@@ -146,7 +146,7 @@ USemanticInfo Checker::visit_root(BlockNode& node) {
 
 USemanticInfo Checker::visit_block(BlockNode& node) {
     SemanticInfo info;
-    BlockSNode* sn = new BlockSNode();
+    auto* sn = new BlockSNode();
     info.snode = sn;
     VectorOfNodes vn;
     for (auto& n: node.nodes) {
@@ -155,14 +155,14 @@ USemanticInfo Checker::visit_block(BlockNode& node) {
         // sn->nodes.push_back(sinfo_p->snode);
 
         if (n->ntype == NodeType::BLOCK) {
-            for (auto bnode: n->block().nodes) {
+            for (auto *bnode: n->block().nodes) {
                 vn.push_back(bnode);
             }
         } else {
             vn.push_back(n);
             if (sinfo_p->snode != nullptr) {
                 if (sinfo_p->snode->type == SNodeType::BLOCK) {
-                    for (auto nn : ((BlockSNode*) sinfo_p->snode)->nodes) {
+                    for (auto *nn : ((BlockSNode*) sinfo_p->snode)->nodes) {
                         sn->nodes.push_back(nn);
                     }
                 } else {
@@ -228,10 +228,10 @@ USemanticInfo Checker::visit_function(FunctionNode& n) {
     this->assert_type_exists(returnType, n.start);
     this->scope->set("__return__", entity_from_type(returnType));
     USemanticInfo body_info = this->visit_block(*n.body);
-    FunctionSNode* sn = new FunctionSNode(n.path.as_str(), params, (BlockSNode*) (body_info->snode));
+    auto* sn = new FunctionSNode(n.path.as_str(), params, (BlockSNode*) (body_info->snode));
     info.snode = sn;
     if (returnType != T_NONE) {
-        if (n.body->nodes.size() != 0) {
+        if (!n.body->nodes.empty()) {
             Node* last_node = n.body->nodes.back();
             if (last_node->ntype != NodeType::RETRN) {
                 // it's not a return statement, error

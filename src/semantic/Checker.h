@@ -90,7 +90,7 @@ public:
 
     bool is_immutable(const TypeNode& node);
 
-    void enter_scope(std::string name);
+    void enter_scope(const std::string& name);
     void leave_scope();
 
     bool assert_type_exists(TypeNode& type, TextPosition pos);
