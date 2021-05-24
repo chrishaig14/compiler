@@ -57,26 +57,26 @@ TextPosition add_one_col(TextPosition t) {
     return {t.line, t.column + 1};
 }
 
-USemanticInfo Checker::object_member(SNode* object_snode, Value* pValue, std::string child, MemberNode& n) {
-    Path object_type_path = pValue->type->object().actual_base_path;
+USemanticInfo Checker::object_member(SNode* object_snode, Value* p_value, std::string child, MemberNode& n) {
+    Path object_type_path = p_value->type->object().actual_base_path;
     if (object_type_path.as_str() == "") {
         // is a single type param, error
-        this->error_reporter.object_no_member(*pValue->type, n);
+        this->error_reporter.object_no_member(*p_value->type, n);
         return error_stub();
     }
     if (object_type_path.as_str() == "core.Union") {
-        this->error_reporter.object_no_member(*pValue->type, n);
+        this->error_reporter.object_no_member(*p_value->type, n);
         return error_stub();
     }
-    if (pValue->metatype == Meta::ENUM) {
-        this->error_reporter.object_no_member(*pValue->type, n);
+    if (p_value->metatype == Meta::ENUM) {
+        this->error_reporter.object_no_member(*p_value->type, n);
         return error_stub();
     }
     SemanticInfo info;
-    if (pValue->type->kind == Kind::OBJECT && pValue->type->object().id == "Tuple") {
+    if (p_value->type->kind == Kind::OBJECT && p_value->type->object().id == "Tuple") {
         info.is_tuple_member = true;
     }
-    Class* clazz = pValue->clazz;
+    Class* clazz = p_value->clazz;
     assert(clazz != nullptr);
     if (clazz->members.count(child)) {
         info.entity = clazz->member_entities[child];
@@ -114,7 +114,7 @@ USemanticInfo Checker::object_member(SNode* object_snode, Value* pValue, std::st
         }
 
     } else {
-        this->error_reporter.object_no_member_with_suggestions(*pValue->type,
+        this->error_reporter.object_no_member_with_suggestions(*p_value->type,
                                                                child,
                                                                n.dot_pos,
                                                                *n.parent,

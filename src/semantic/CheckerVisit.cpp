@@ -66,12 +66,12 @@ SNode* Checker::make_for_snode(ForNode& node, USemanticInfo& binfo, USemanticInf
     return bbn;
 }
 
-USemanticInfo Checker::visit_enum(EnumNode& node) {
+USemanticInfo Checker::visit_enum(EnumNode& p_node) {
     SemanticInfo info;
     EnumSNode* esn = new EnumSNode();
-    Enum* enumm = this->scope->get(node.id).enumm;
+    Enum* enumm = this->scope->get(p_node.id).enumm;
     esn->id = enumm->path.as_str();
-    esn->values = node.values;
+    esn->values = p_node.values;
     info.snode = esn;
     return std::make_unique<SemanticInfo>(info);
 }

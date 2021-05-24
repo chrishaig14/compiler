@@ -62,27 +62,15 @@ TypeNode* make_type(const TypeNode& original, const MapStringType& replacements)
 SemanticInfo match_arguments_to_generic_function(const FunctionType& function_type, VectorOfTypes arg_types);
 USemanticInfo error_stub();
 
-Class* make_list_class_info();
 
-Class* make_file_class_info();
 
-Class* make_int_class_info();
-
-Class* make_boolean_class_info();
-
-Class* make_float_class_info();
-
-Class* make_double_class_info();
-Entity entity_from_type(const TypeNode& type);
-
-Class* make_string_class_info();
 Entity map_flirpin_to_entity(Flirpin flirpin);
 
 Flirpin map_unit_to_flirpin(Unit u);
-int target_union_type(const ObjectType& target, const TypeNode& source);
-SNode* make_union_wrapper(int type_index, SNode* expression);
 
-std::string binoptype_to_str(OpType op);
+
+
+
 TextPosition add_one_col(TextPosition t);
 
 class Checker {
@@ -166,7 +154,7 @@ public:
 
     ErrorReporter error_reporter;
     Entity this_entity;
-    USemanticInfo object_member(SNode* object_snode, Value* pValue, std::string child, MemberNode& n);
+    USemanticInfo object_member(SNode* object_snode, Value* p_value, std::string child, MemberNode& n);
     USemanticInfo class_member(Class* cls, std::string child, MemberNode& n);
     USemanticInfo package_member(Package* package, std::string child, MemberNode& n);
     USemanticInfo module_member(Module* mod, std::string child, MemberNode& n);
@@ -177,17 +165,17 @@ public:
     std::string loop_index_var_id;
     std::string loop_list_len_var_id;
     USemanticInfo visit_match(MatchExpressionNode* node);
-    USemanticInfo visit_alias(AliasNode* pNode);
+    USemanticInfo visit_alias(AliasNode* p_node);
     USemanticInfo enum_member(Enum* enumm, std::string value, MemberNode& node);
-    USemanticInfo visit_enum(EnumNode& pNode);
+    USemanticInfo visit_enum(EnumNode& p_node);
     SNode* make_rvalue(Entity value_entity, SNode* value_snode, const TypeNode& target);
     USemanticInfo dispatch(Node* nod);
-    USemanticInfo dispatch_any(Node* pNode, bool b);
+    USemanticInfo dispatch_any(Node* p_node, bool b);
     void fill_value(Value* value);
     std::unique_ptr<SemanticInfo> expect_rvalue_of_type(const TypeNode& target, Node& node);
 };
 
-int target_union_type(const ObjectType& target, const TypeNode& source);
+
 
 bool function_is_generic(const FunctionType& ft);
 

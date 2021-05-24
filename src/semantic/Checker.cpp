@@ -250,13 +250,13 @@ USemanticInfo Checker::dispatch(Node* nod) {
     return this->dispatch_any(nod, false);
 }
 
-USemanticInfo Checker::dispatch_any(Node* nod, bool is_rvalue) {
-    auto& n = *nod;
+USemanticInfo Checker::dispatch_any(Node* p_node, bool is_rvalue) {
+    auto& n = *p_node;
     switch (n.ntype) {
         case NodeType::ASSIGN:
             return this->visit_assignment(n.assign());
         case NodeType::ENUM:
-            return this->visit_enum((EnumNode&) *nod);
+            return this->visit_enum((EnumNode&) *p_node);
         case NodeType::BINOP: {
             auto r = this->visit_binop(n.binop());
             return r;
@@ -324,9 +324,9 @@ USemanticInfo Checker::dispatch_any(Node* nod, bool is_rvalue) {
         case NodeType::IMPORT:
             return this->visit_import(n.import());
         case NodeType::ALIAS:
-            return this->visit_alias((AliasNode*) nod);
+            return this->visit_alias((AliasNode*) p_node);
         case NodeType::MATCH_EXP:
-            return this->visit_match((MatchExpressionNode*) nod);
+            return this->visit_match((MatchExpressionNode*) p_node);
         default:
             this->error_reporter.fail("Don't know what to do!");
     }
