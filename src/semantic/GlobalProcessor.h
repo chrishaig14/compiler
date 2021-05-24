@@ -30,6 +30,7 @@ public:
     void visit_alias(AliasNode& node);
     void visit_import(ImportNode& node);
     void visit_class(ClassNode& node);
+    void check_duplicated_names(BlockNode& node) const;
 };
 
 #endif //GLOBALPROCESSOR_H
