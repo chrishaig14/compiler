@@ -16,7 +16,8 @@ public:
     Path class_path;
     std::string member_name;
 
-    ObjectMemberSNode() : SNode(SNodeType::OBJECT_MEMBER) {
+    ObjectMemberSNode(SNode* object, Path class_path, std::string member_name)
+            : SNode(SNodeType::OBJECT_MEMBER), object(object), class_path(class_path), member_name(member_name) {
         this->object = nullptr;
     }
 };

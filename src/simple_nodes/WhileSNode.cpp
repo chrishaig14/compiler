@@ -4,5 +4,5 @@
 
 #include "WhileSNode.h"
 
-WhileSNode::WhileSNode() : SNode(SNodeType::WHILE) {
+WhileSNode::WhileSNode(SNode* condition, BlockSNode* body) : SNode(SNodeType::WHILE), condition(condition), body(body) {
 }

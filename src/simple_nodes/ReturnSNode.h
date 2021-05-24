@@ -12,7 +12,7 @@ class ReturnSNode : public SNode {
 public:
     SNode* expression;
 
-    ReturnSNode();
+    ReturnSNode(SNode* expression);
 };
 
 

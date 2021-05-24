@@ -73,9 +73,8 @@ USemanticInfo Checker::visit_emptylist(EmptyListNode& node) {
     info.entity = Entity(ov);
     otype->actual_base_path = Path("core.List");
     this->fill_value(ov);
-    auto* lsn = new ListSNode();
+    auto* lsn = new ListSNode({});
     info.snode = lsn;
-    lsn->elements = {};
     // non->class_name = "core.List";
     return std::make_unique<SemanticInfo>(info);
 }
@@ -83,8 +82,7 @@ USemanticInfo Checker::visit_emptylist(EmptyListNode& node) {
 USemanticInfo Checker::visit_string(StringNode& node) {
     SemanticInfo info;
     info.is_constant = true;
-    auto* sn = new StringSNode();
-    sn->s = node.str;
+    auto* sn = new StringSNode(node.str);
     info.snode = sn;
     auto* otype = new ObjectType("String", {});
     otype->actual_base_path = Path("core.core.String");
@@ -231,7 +229,7 @@ USemanticInfo Checker::visit_defconst(DefaultConstructorNode& node) {
         this->error_reporter.fail("Error not a class");
     }
     Class* cls = entity.clazz;
-    for (auto *pt: cls->member_types) {
+    for (auto* pt: cls->member_types) {
         t.push_back(pt->clone());
     }
     info.entity = Entity(new ConstFunction());
@@ -241,11 +239,10 @@ USemanticInfo Checker::visit_defconst(DefaultConstructorNode& node) {
         tp.push_back(ot);
         ot->is_generic_param = true;
     }
-    auto *rt = new ObjectType(entity.clazz->class_name, tp);
+    auto* rt = new ObjectType(entity.clazz->class_name, tp);
     rt->actual_base_path = cls->path;
     info.entity.const_function->ft = new FunctionType(t, rt);
-    auto* idn = new IdSNode();
-    idn->identifier = cls->path.as_str() + "." + "__init__";
+    auto* idn = new IdSNode(cls->path.as_str() + "." + "__init__");
     info.snode = idn;
     return std::make_unique<SemanticInfo>(info);
 }
@@ -259,8 +256,7 @@ USemanticInfo Checker::visit_list(ListNode& node) {
 
     TypeNode* element_type = element_type_p->entity.value->type->clone();
     bool is_constant = true;
-    auto* lsn = new ListSNode();
-    lsn->elements.push_back(element_type_p->snode);
+    std::vector<SNode*> list_elements = {element_type_p->snode};
 
     for (size_t i = 1; i < node.elements.size(); i++) {
         USemanticInfo current_type_p = this->dispatch(node.elements[i]);
@@ -272,13 +268,13 @@ USemanticInfo Checker::visit_list(ListNode& node) {
         if (*ctype != *element_type) {
             this->error_reporter.list_literal(*element_type, *ctype, node.elements[i]->start, *node.elements[i]);
         }
-        lsn->elements.push_back(current_type_p->snode);
+        list_elements.push_back(current_type_p->snode);
     }
     node.type = element_type->clone();
     SemanticInfo return_info;
     return_info.is_constant = is_constant;
 
-    return_info.snode = lsn;
+    return_info.snode = new ListSNode(list_elements);
     auto* otype = new ObjectType("List", {element_type->clone()});
     return_info.entity = Entity(new Value(otype));
     otype->actual_base_path = Path("core.List");

@@ -12,7 +12,7 @@
 class StringSNode : public SNode {
 public:
     std::string s;
-    StringSNode();
+    StringSNode(const std::string& s);
 };
 
 

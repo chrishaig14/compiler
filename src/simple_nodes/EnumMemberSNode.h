@@ -11,10 +11,7 @@
 
 class EnumMemberSNode : public SNode {
 public:
-    EnumMemberSNode(std::string enum_name, std::string value) : SNode(SNodeType::ENUM_MEMBER) {
-        this->enum_name = enum_name;
-        this->value = value;
-    }
+    EnumMemberSNode(const std::string& enum_name, const std::string& value);
 
     std::string enum_name;
     std::string value;

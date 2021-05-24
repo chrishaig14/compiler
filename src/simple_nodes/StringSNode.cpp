@@ -4,4 +4,4 @@
 
 #include "StringSNode.h"
 
-StringSNode::StringSNode() :SNode(SNodeType::STRING){}
+StringSNode::StringSNode(const std::string& s) : SNode(SNodeType::STRING), s(s) {}

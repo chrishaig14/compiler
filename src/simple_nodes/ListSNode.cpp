@@ -4,5 +4,5 @@
 
 #include "ListSNode.h"
 
-ListSNode::ListSNode() : SNode(SNodeType::LIST) {
+ListSNode::ListSNode(std::vector<SNode*> elements) : SNode(SNodeType::LIST), elements(elements) {
 }

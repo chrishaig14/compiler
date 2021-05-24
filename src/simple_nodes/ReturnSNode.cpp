@@ -4,5 +4,5 @@
 
 #include "ReturnSNode.h"
 
-ReturnSNode::ReturnSNode() : SNode(SNodeType::RETURN) {
+ReturnSNode::ReturnSNode(SNode* expression) : SNode(SNodeType::RETURN), expression(expression) {
 }

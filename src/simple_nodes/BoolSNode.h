@@ -11,7 +11,7 @@
 class BoolSNode : public SNode {
 
 public:
-    BoolSNode(bool v);
+    explicit BoolSNode(bool v);
     bool v;
 };
 

@@ -12,9 +12,7 @@ class IdSNode : public SNode {
 public:
     std::string identifier;
 
-    IdSNode();
-
-    explicit IdSNode(std::string identifier);
+    explicit IdSNode(const std::string& identifier);
 };
 
 

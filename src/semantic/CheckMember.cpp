@@ -46,8 +46,7 @@ USemanticInfo Checker::module_member(Module* mod, const std::string& child, Memb
     SemanticInfo info;
     info.entity = map_flirpin_to_entity(flirpin);
     if (flirpin.type == F_TYPE::CONST_FUNCTION) {
-        auto* idn = new IdSNode();
-        idn->identifier = flirpin.const_function->path.as_str();
+        auto* idn = new IdSNode(flirpin.const_function->path.as_str());
         info.snode = idn;
     }
     return std::make_unique<SemanticInfo>(info);
@@ -85,14 +84,10 @@ USemanticInfo Checker::object_member(SNode* object_snode, Value* p_value, const 
             clazz->member_entities[child] = info.entity;
             this->fill_value(info.entity.value);
         }
-        auto* omn = new ObjectMemberSNode();
-        omn->class_path = clazz->path;
-        omn->object = object_snode;
-        omn->member_name = child;
+        auto* omn = new ObjectMemberSNode(object_snode, clazz->path, child);
         info.snode = omn;
     } else if (clazz->methods.count(child) != 0) {
-        auto* idn = new IdSNode();
-        idn->identifier = Path(clazz->path, child).as_str();
+        auto* idn = new IdSNode(Path(clazz->path, child).as_str());
         if (this->is_call) {
             // method call
             info.this_arg = object_snode;

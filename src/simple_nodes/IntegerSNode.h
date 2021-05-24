@@ -11,7 +11,7 @@
 
 class IntegerSNode : public SNode {
 public:
-    IntegerSNode(std::string str);
+    explicit IntegerSNode(const std::string& str);
     std::string str;
 };
 

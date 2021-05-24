@@ -7,7 +7,6 @@
 
 SNode* Checker::make_for_snode(ForNode& node, USemanticInfo& binfo, USemanticInfo& exp_info_p) {
     BlockSNode* bbn = new BlockSNode();
-    WhileSNode* wsn = new WhileSNode();
 
     DeclarationSNode* dsn = new DeclarationSNode(this->loop_list_var_id, exp_info_p->snode);
     bbn->nodes.push_back(dsn);
@@ -35,9 +34,7 @@ SNode* Checker::make_for_snode(ForNode& node, USemanticInfo& binfo, USemanticInf
     cn->function = cmpfunsn;
     cn->arguments = {idxsn, llensn};
 
-    wsn->condition = cn;
 
-    bbn->nodes.push_back(wsn);
 
 
     BlockSNode* bn = (BlockSNode*) (binfo->snode);
@@ -52,7 +49,8 @@ SNode* Checker::make_for_snode(ForNode& node, USemanticInfo& binfo, USemanticInf
     bn->nodes.insert(bn->nodes.begin(), loop_elem_sn);
 
     bn->nodes.push_back(this->update_loop_index_snode);
-    wsn->body = bn;
+    WhileSNode* wsn = new WhileSNode(cn, bn);
+    bbn->nodes.push_back(wsn);
     return bbn;
 }
 

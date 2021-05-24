@@ -5,6 +5,5 @@
 #include <iostream>
 #include "IntegerSNode.h"
 
-IntegerSNode::IntegerSNode(std::string str) : SNode(SNodeType::INTEGER), str(str) {
-    if (8) std::cout << "Hello";
+IntegerSNode::IntegerSNode(const std::string& str) : SNode(SNodeType::INTEGER), str(str) {
 }

@@ -45,8 +45,7 @@ USemanticInfo Checker::visit_lvalue_subscript(SubscriptNode& node) {
 
     this->fill_value(info.entity.value);
     auto* csn = new CallSNode();
-    auto* fsn = new IdSNode();
-    fsn->identifier = sub_fun_path;
+    auto* fsn = new IdSNode(sub_fun_path);
     csn->function = fsn;
     csn->arguments.push_back(parent_p->snode);
     csn->arguments.push_back(child_snode);
@@ -154,7 +153,7 @@ USemanticInfo Checker::visit_return(ReturnNode& n) {
             this->error_reporter.bad_return(n.start);
         }
         SemanticInfo info_r;
-        info_r.snode = new ReturnSNode();
+        info_r.snode = new ReturnSNode(nullptr);
         return std::make_unique<SemanticInfo>(info_r);
     }
     TypeNode* return_type = return_entity.value->type;
@@ -177,8 +176,7 @@ USemanticInfo Checker::visit_return(ReturnNode& n) {
     n.ret_type = return_type->clone();
     n.reachables = this->scope->get_all();
 
-    auto* sn = new ReturnSNode();
-    sn->expression = expression_info_p->snode;
+    auto* sn = new ReturnSNode(expression_info_p->snode);
 
     SemanticInfo info;
     info.snode = sn;
@@ -226,11 +224,8 @@ USemanticInfo Checker::visit_match(MatchExpressionNode* node) {
         this->scope->set(case_id, ent);
         USemanticInfo case_info = this->dispatch(case_node);
         auto* bn = (BlockSNode*) case_info->snode;
-        auto* omn = new ObjectMemberSNode();
+        auto* omn = new ObjectMemberSNode(new IdSNode(varname), Path("core.Union"), "o");
         auto* dn = new DeclarationSNode(case_id, omn);
-        omn->member_name = "o";
-        omn->object = new IdSNode(varname);
-        omn->class_path = Path("core.Union");
         bn->nodes.insert(bn->nodes.begin(), dn);
         cas.emplace_back(union_index, (BlockSNode*) case_info->snode);
         this->leave_scope();
@@ -329,9 +324,7 @@ USemanticInfo Checker::visit_while(WhileNode& node) {
     }
     this->leave_scope();
 
-    auto* while_sn = new WhileSNode();
-    while_sn->condition = condition_snode;
-    while_sn->body = (BlockSNode*) body_info_p->snode;
+    auto* while_sn = new WhileSNode(condition_snode, (BlockSNode*) body_info_p->snode);
 
     SemanticInfo info;
     info.snode = while_sn;
@@ -369,6 +362,6 @@ USemanticInfo Checker::visit_if(IfNode& n) {
     SNode* else_snode = else_info == nullptr ? nullptr : else_info->snode;
 
     SemanticInfo info;
-    info.snode = make_if_snode(condition_snode, body_info->snode, elifs, else_snode);
+    info.snode = new IfSNode(condition_snode, (BlockSNode*) body_info->snode, elifs, (BlockSNode*) else_snode);
     return std::make_unique<SemanticInfo>(info);
 }

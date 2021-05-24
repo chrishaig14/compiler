@@ -13,7 +13,7 @@ class ListSNode : public SNode {
 
 public:
     std::vector<SNode*> elements;
-    ListSNode();
+    ListSNode(std::vector<SNode*> elements);
 };
 
 

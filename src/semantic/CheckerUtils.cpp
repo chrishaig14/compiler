@@ -47,15 +47,13 @@ FunctionSNode* make_class_default_init(std::string class_path, VectorOfStrings m
     fn->identifier = class_path + ".__init__";
     fn->params = members;
     BlockSNode* bn = new BlockSNode();
-    ReturnSNode* rn = new ReturnSNode();
     NewObjectSNode* nn = new NewObjectSNode();
     nn->class_name = class_path;
     for (auto m: members) {
-        IdSNode* idn = new IdSNode();
-        idn->identifier = m;
+        IdSNode* idn = new IdSNode(m);
         nn->args.push_back(idn);
     }
-    rn->expression = nn;
+    ReturnSNode* rn = new ReturnSNode(nn);
     bn->nodes.push_back(rn);
     fn->body = bn;
     return fn;
@@ -154,15 +152,6 @@ SNode* make_union_wrapper(int type_index, SNode* expression) {
 }
 
 std::string binoptype_to_str(OpType op);
-
-SNode* make_if_snode(SNode* condition, SNode* body, std::vector<std::pair<SNode*, BlockSNode*>> elifs, SNode* _else) {
-    IfSNode* ifs = new IfSNode();
-    ifs->condition = condition;
-    ifs->then = (BlockSNode*) body;
-    ifs->elifs = elifs;
-    ifs->_else = (BlockSNode*) _else;
-    return ifs;
-}
 
 std::string map_binop_to_method_name(OpType op);
 

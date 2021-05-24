@@ -14,7 +14,7 @@ public:
     SNode* condition;
     BlockSNode* body;
 
-    WhileSNode();
+    WhileSNode(SNode* condition, BlockSNode* body);
 };
 
 

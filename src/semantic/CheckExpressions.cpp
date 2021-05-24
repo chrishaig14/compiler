@@ -14,14 +14,8 @@ USemanticInfo Checker::visit_id(IdNode& n) {
         this->scope->set(n._id, Entity(E_TYPE::ERROR));
         return error_stub();
     }
-
-    auto* sn = new IdSNode();
-    if (entity.type == E_TYPE::CONST_FUNCTION) {
-        sn->identifier = entity.const_function->path.as_str();
-    } else {
-        sn->identifier = n._id;
-    }
-
+    std::string id = entity.type == E_TYPE::CONST_FUNCTION ? entity.const_function->path.as_str() : n._id;
+    auto* sn = new IdSNode(id);
     SemanticInfo info;
     info.entity = entity;
     info.snode = sn;
@@ -153,8 +147,7 @@ USemanticInfo Checker::visit_unary(UnaryOpNode& n) {
     TypeNode* rtype = subscript_fun->ft->return_type->clone();
 
     auto* csn = new CallSNode();
-    auto* fsn = new IdSNode();
-    fsn->identifier = sub_fun_path;
+    auto* fsn = new IdSNode(sub_fun_path);
     csn->function = fsn;
     csn->arguments.push_back(exp_snode);
 
@@ -167,9 +160,6 @@ USemanticInfo Checker::visit_unary(UnaryOpNode& n) {
 USemanticInfo Checker::visit_binop(BinopNode& n) {
 
     auto* sn = new CallSNode();
-    auto* function_id = new IdSNode();
-    sn->function = function_id;
-    function_id->identifier = "";
 
     USemanticInfo left_info_p = this->dispatch_rvalue(n.left);
     if (left_info_p->is_error()) {
@@ -200,7 +190,8 @@ USemanticInfo Checker::visit_binop(BinopNode& n) {
         return error_stub();
     }
     ConstFunction* operator_fun = operator_fun_it->second;
-    function_id->identifier = operator_fun->path.as_str();
+    auto* function_id = new IdSNode(operator_fun->path.as_str());
+    sn->function = function_id;
     TypeNode* rettype = operator_fun->ft->return_type->clone();
 
     SemanticInfo info;
@@ -272,8 +263,7 @@ USemanticInfo Checker::visit_subscript(SubscriptNode& node) {
     this->fill_value(info.entity.value);
 
     auto* csn = new CallSNode();
-    auto* fsn = new IdSNode();
-    fsn->identifier = sub_fun_path;
+    auto* fsn = new IdSNode(sub_fun_path);
     csn->function = fsn;
     csn->arguments.push_back(parent_p->snode);
     csn->arguments.push_back(child_snode);

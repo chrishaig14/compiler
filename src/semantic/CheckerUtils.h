@@ -57,8 +57,6 @@ SNode* make_union_wrapper(int type_index, SNode* expression);
 
 std::string binoptype_to_str(OpType op);
 
-SNode* make_if_snode(SNode* condition, SNode* body, std::vector<std::pair<SNode*, BlockSNode*>> elifs, SNode* _else);
-
 std::string map_binop_to_method_name(OpType op);
 
 SNode* make_boolop_snode(ConstFunction* operator_fun, SemanticInfo& left_info, SemanticInfo& right_info);
