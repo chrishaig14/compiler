@@ -1,1 +1,0 @@
-/usr/bin/c++  -O3 -DNDEBUG   CMakeFiles/scanner_test.dir/scanner_test.cpp.o  -o scanner_test  -lgtest -lgtest_main -lpthread -lscanner 

@@ -1,1 +1,0 @@
-/usr/bin/c++  -O3 -DNDEBUG   CMakeFiles/checker_test.dir/checker_test.cpp.o CMakeFiles/checker_test.dir/node_equals.cpp.o  -o checker_test  -lgtest -lgtest_main -lpthread -lscanner -lparser -lsrcLib -lnodes 

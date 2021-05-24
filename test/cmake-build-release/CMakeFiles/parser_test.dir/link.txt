@@ -1,1 +1,0 @@
-/usr/bin/c++  -O3 -DNDEBUG   CMakeFiles/parser_test.dir/parser_test.cpp.o  -o parser_test  -lgtest -lgtest_main -lpthread -lscanner -lparser -lnodes -lsrcLib 

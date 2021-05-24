@@ -1,1 +1,0 @@
-/usr/bin/c++  -O3 -DNDEBUG   CMakeFiles/transpiler_test.dir/transpiler_test.cpp.o  -o transpiler_test  -lgtest -lgtest_main -lpthread -lsrcLib libutils_test.a -lparser -lnodes -lscanner -lfuck 
