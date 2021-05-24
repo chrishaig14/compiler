@@ -173,6 +173,13 @@ public:
     USemanticInfo dispatch_any(Node* p_node, bool b);
     void fill_value(Value* value);
     std::unique_ptr<SemanticInfo> expect_rvalue_of_type(const TypeNode& target, Node& node);
+    void process_function_arguments(SemanticInfo& retv, std::vector<Entity>& arg_entities, CallSNode* sn, CallNode& n,
+                                    FunctionType* p_type, SemanticInfo& ptr);
+    void process_function_arguments(SemanticInfo& retv, std::vector<Entity>& arg_entities, CallSNode* sn, CallNode& n,
+                                    FunctionType* function_type, SemanticInfo* fun_info_p);
+    bool check_arguments(CallNode& n, CallSNode* sn, VectorOfTypes& arg_types, std::vector<Entity>& arg_entities);
+    USemanticInfo
+    make_return_info(const CallNode& n, bool is_rvalue, SemanticInfo& retv, bool is_def_const, bool args_are_constant);
 };
 
 
