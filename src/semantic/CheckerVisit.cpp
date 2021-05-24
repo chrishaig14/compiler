@@ -15,32 +15,26 @@ SNode* Checker::make_for_snode(ForNode& node, USemanticInfo& binfo, USemanticInf
 
     bbn->nodes.push_back(lidx_decl);
 
-    CallSNode* call_list_len_sn = new CallSNode();
     IdSNode* list_len_fn = new IdSNode("core.List.len");
-    call_list_len_sn->function = list_len_fn;
     IdSNode* list_sn = new IdSNode(this->loop_list_var_id);
-    call_list_len_sn->arguments = {list_sn};
+    CallSNode* call_list_len_sn = new CallSNode(list_len_fn, {list_sn});
     DeclarationSNode* lensn = new DeclarationSNode(this->loop_list_len_var_id, call_list_len_sn);
     bbn->nodes.push_back(lensn);
 
 
     IdSNode* idxsn = new IdSNode(this->loop_index_var_id);
-    CallSNode* cn = new CallSNode();
     IdSNode* cmpfunsn = new IdSNode("core.core.Integer.__lt__");
 
     IdSNode* llensn = new IdSNode(this->loop_list_len_var_id);
 
 
-    cn->function = cmpfunsn;
-    cn->arguments = {idxsn, llensn};
-
+    CallSNode* cn = new CallSNode(cmpfunsn, {idxsn, llensn});
 
     BlockSNode* bn = (BlockSNode*) (binfo->snode);
 
-    CallSNode* list_subscript_n = new CallSNode();
-    list_subscript_n->function = new IdSNode("core.List.__get_item__");
-    list_subscript_n->arguments.push_back(new IdSNode(this->loop_list_var_id));
-    list_subscript_n->arguments.push_back(new IdSNode(this->loop_index_var_id));
+    CallSNode* list_subscript_n = new CallSNode(new IdSNode("core.List.__get_item__"),
+                                                {new IdSNode(this->loop_list_var_id),
+                                                 new IdSNode(this->loop_index_var_id)});
 
 
     DeclarationSNode* loop_elem_sn = new DeclarationSNode(node.var, list_subscript_n);

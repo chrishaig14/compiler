@@ -154,9 +154,7 @@ std::string map_binop_to_method_name(OpType op);
 
 SNode* make_boolop_snode(ConstFunction* operator_fun, SemanticInfo& left_info, SemanticInfo& right_info) {
     IdSNode* function_id = new IdSNode(operator_fun->path.as_str());
-    CallSNode* sn = new CallSNode();
-    sn->function = function_id;
-    sn->arguments = {left_info.snode, right_info.snode};
+    CallSNode* sn = new CallSNode(function_id, {left_info.snode, right_info.snode});
     return sn;
 }
 

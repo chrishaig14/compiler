@@ -44,11 +44,8 @@ USemanticInfo Checker::visit_lvalue_subscript(SubscriptNode& node) {
     info.entity = Entity(new Value((ObjectType*) rtype));
 
     this->fill_value(info.entity.value);
-    auto* csn = new CallSNode();
     auto* fsn = new IdSNode(sub_fun_path);
-    csn->function = fsn;
-    csn->arguments.push_back(parent_p->snode);
-    csn->arguments.push_back(child_snode);
+    auto* csn = new CallSNode(fsn, {parent_p->snode, child_snode});
     info.snode = csn;
     return std::make_unique<SemanticInfo>(info);
 }
@@ -275,9 +272,8 @@ USemanticInfo Checker::visit_for(ForNode& node) {
     auto* increment_index_sn = new AssignmentSNode(nullptr, nullptr);
     this->update_loop_index_snode = increment_index_sn;
     increment_index_sn->lvalue = new IdSNode(this->loop_index_var_id);
-    auto* inc_exp_node = new CallSNode();
-    inc_exp_node->function = new IdSNode("core.core.Integer.__add__");
-    inc_exp_node->arguments.push_back(new IdSNode(this->loop_index_var_id));
+    auto* inc_exp_node = new CallSNode(new IdSNode("core.core.Integer.__add__"),
+                                       {new IdSNode(this->loop_index_var_id)});
     auto* one_node = new IntegerSNode(std::string());
     one_node->str = "1";
     inc_exp_node->arguments.push_back(one_node);

@@ -13,7 +13,7 @@ class CallSNode : public SNode {
 public:
     SNode* function;
     std::vector<SNode*> arguments;
-    CallSNode();
+    CallSNode(SNode* function, std::vector<SNode*> arguments);
 };
 
 

@@ -146,10 +146,8 @@ USemanticInfo Checker::visit_unary(UnaryOpNode& n) {
     std::string sub_fun_path = subscript_fun->path.as_str();
     TypeNode* rtype = subscript_fun->ft->return_type->clone();
 
-    auto* csn = new CallSNode();
     auto* fsn = new IdSNode(sub_fun_path);
-    csn->function = fsn;
-    csn->arguments.push_back(exp_snode);
+    auto* csn = new CallSNode(fsn, {exp_snode});
 
     SemanticInfo info;
     info.entity = Entity(new Value(rtype));
@@ -159,7 +157,6 @@ USemanticInfo Checker::visit_unary(UnaryOpNode& n) {
 
 USemanticInfo Checker::visit_binop(BinopNode& n) {
 
-    auto* sn = new CallSNode();
 
     USemanticInfo left_info_p = this->dispatch_rvalue(n.left);
     if (left_info_p->is_error()) {
@@ -175,8 +172,6 @@ USemanticInfo Checker::visit_binop(BinopNode& n) {
     }
     SNode* right_snode = right_sinfo->snode;
 
-    sn->arguments.push_back(left_info_p->snode);
-    sn->arguments.push_back(right_snode);
 
     std::string fun = binoptype_to_str(n.op);
 
@@ -191,7 +186,7 @@ USemanticInfo Checker::visit_binop(BinopNode& n) {
     }
     ConstFunction* operator_fun = operator_fun_it->second;
     auto* function_id = new IdSNode(operator_fun->path.as_str());
-    sn->function = function_id;
+    auto* sn = new CallSNode(function_id, {left_info_p->snode, right_snode});
     TypeNode* rettype = operator_fun->ft->return_type->clone();
 
     SemanticInfo info;
@@ -262,11 +257,8 @@ USemanticInfo Checker::visit_subscript(SubscriptNode& node) {
     info.entity = Entity(new Value(rtype));
     this->fill_value(info.entity.value);
 
-    auto* csn = new CallSNode();
     auto* fsn = new IdSNode(sub_fun_path);
-    csn->function = fsn;
-    csn->arguments.push_back(parent_p->snode);
-    csn->arguments.push_back(child_snode);
+    auto* csn = new CallSNode(fsn, {parent_p->snode, child_snode});
     info.snode = csn;
     return std::make_unique<SemanticInfo>(info);
 }
