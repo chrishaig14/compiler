@@ -32,7 +32,7 @@ USemanticInfo Checker::visit_member(MemberNode& n) {
     return error_stub();
 }
 
-USemanticInfo Checker::module_member(Module* mod, std::string child, MemberNode& n) {
+USemanticInfo Checker::module_member(Module* mod, const std::string& child, MemberNode& n) {
     if (mod->flirpins.count(child) == 0) {
         this->error_reporter.module_no_member(mod,
                                               child,
@@ -46,7 +46,7 @@ USemanticInfo Checker::module_member(Module* mod, std::string child, MemberNode&
     SemanticInfo info;
     info.entity = map_flirpin_to_entity(flirpin);
     if (flirpin.type == F_TYPE::CONST_FUNCTION) {
-        IdSNode* idn = new IdSNode();
+        auto* idn = new IdSNode();
         idn->identifier = flirpin.const_function->path.as_str();
         info.snode = idn;
     }
@@ -57,7 +57,7 @@ TextPosition add_one_col(TextPosition t) {
     return {t.line, t.column + 1};
 }
 
-USemanticInfo Checker::object_member(SNode* object_snode, Value* p_value, std::string child, MemberNode& n) {
+USemanticInfo Checker::object_member(SNode* object_snode, Value* p_value, const std::string& child, MemberNode& n) {
     Path object_type_path = p_value->type->object().actual_base_path;
     if (object_type_path.as_str() == "") {
         // is a single type param, error
@@ -78,20 +78,20 @@ USemanticInfo Checker::object_member(SNode* object_snode, Value* p_value, std::s
     }
     Class* clazz = p_value->clazz;
     assert(clazz != nullptr);
-    if (clazz->members.count(child)) {
+    if (clazz->members.count(child) != 0) {
         info.entity = clazz->member_entities[child];
         if (info.entity.type == E_TYPE::NOTHING) {
             info.entity = entity_from_type(*clazz->members[child]);
             clazz->member_entities[child] = info.entity;
             this->fill_value(info.entity.value);
         }
-        ObjectMemberSNode* omn = new ObjectMemberSNode();
+        auto* omn = new ObjectMemberSNode();
         omn->class_path = clazz->path;
         omn->object = object_snode;
         omn->member_name = child;
         info.snode = omn;
-    } else if (clazz->methods.count(child)) {
-        IdSNode* idn = new IdSNode();
+    } else if (clazz->methods.count(child) != 0) {
+        auto* idn = new IdSNode();
         idn->identifier = Path(clazz->path, child).as_str();
         if (this->is_call) {
             // method call
@@ -100,16 +100,16 @@ USemanticInfo Checker::object_member(SNode* object_snode, Value* p_value, std::s
             info.entity = Entity(clazz->methods[child]);
         } else {
             // return partial
-            int npartial = clazz->methods[child]->ft->param_types.size();
-            NewObjectSNode* non = new NewObjectSNode();
+            size_t npartial = clazz->methods[child]->ft->param_types.size();
+            auto* non = new NewObjectSNode();
             non->class_name = "Partial" + std::to_string(npartial);
-            IdSNode* method_snode = new IdSNode(clazz->methods[child]->path.as_str());
+            auto* method_snode = new IdSNode(clazz->methods[child]->path.as_str());
             non->args = {method_snode, object_snode};
-            for (int i = 0; i < npartial; i++) {
+            for (size_t i = 0; i < npartial; i++) {
                 non->args.push_back(nullptr);
             }
             info.snode = non;
-            Value* fv = new Value(clazz->methods[child]->ft->clone());
+            auto* fv = new Value(clazz->methods[child]->ft->clone());
             info.entity = Entity(fv);
         }
 
@@ -127,7 +127,7 @@ USemanticInfo Checker::object_member(SNode* object_snode, Value* p_value, std::s
     return std::make_unique<SemanticInfo>(info);
 }
 
-USemanticInfo Checker::package_member(Package* package, std::string child, MemberNode& n) {
+USemanticInfo Checker::package_member(Package* package, const std::string& child, MemberNode& n) {
     if (package->units.count(child) == 0) {
         this->error_reporter.package_no_member(package,
                                                child,
@@ -143,11 +143,11 @@ USemanticInfo Checker::package_member(Package* package, std::string child, Membe
     return std::make_unique<SemanticInfo>(info);
 }
 
-USemanticInfo Checker::class_member(Class* cls, std::string child, MemberNode& n) {
+USemanticInfo Checker::class_member(Class* cls, const std::string& child, MemberNode& n) {
     SemanticInfo info;
     if (cls->methods.find(child) != cls->methods.end()) {
         ConstFunction* bound_method = cls->methods[child];
-        ConstFunction* unbound_method = new ConstFunction();
+        auto* unbound_method = new ConstFunction();
         unbound_method->path = bound_method->path;
         unbound_method->ft = bound_method->ft->clone();
         unbound_method->ft->param_types.insert(unbound_method->ft->param_types.begin(),
