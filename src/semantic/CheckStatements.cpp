@@ -290,7 +290,7 @@ USemanticInfo Checker::visit_for(ForNode& node) {
     CallSNode* inc_exp_node = new CallSNode();
     inc_exp_node->function = new IdSNode("core.core.Integer.__add__");
     inc_exp_node->arguments.push_back(new IdSNode(this->loop_index_var_id));
-    IntegerSNode* one_node = new IntegerSNode();
+    IntegerSNode* one_node = new IntegerSNode(std::string());
     one_node->str = "1";
     inc_exp_node->arguments.push_back(one_node);
     increment_index_sn->rvalue = inc_exp_node;

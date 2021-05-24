@@ -54,7 +54,7 @@ public:
     void accum_token();
     std::string current_tok_str;
     void start_token();
-    bool should_insert_semicolon();
+    bool should_insert_semicolon() const;
 };
 
 

@@ -11,7 +11,7 @@
 
 class IntegerSNode : public SNode {
 public:
-    IntegerSNode();
+    IntegerSNode(std::string str);
     std::string str;
 };
 

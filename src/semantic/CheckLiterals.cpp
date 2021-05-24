@@ -24,7 +24,7 @@ USemanticInfo Checker::visit_number(NumberNode& node) {
             ObjectType* otype = new ObjectType("Integer", {});
             Value* ov = new Value(otype);
             info.entity = Entity(ov);
-            IntegerSNode* snode = new IntegerSNode();
+            IntegerSNode* snode = new IntegerSNode(std::string());
             snode->str = node.str;
             otype->actual_base_path = Path("core.core.Integer");
             this->fill_value(ov);

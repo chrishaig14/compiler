@@ -147,7 +147,7 @@ int target_union_type(const ObjectType& target, const TypeNode& source);
 SNode* make_union_wrapper(int type_index, SNode* expression) {
     NewObjectSNode* new_union = new NewObjectSNode();
     new_union->class_name = "core_D_Union";
-    IntegerSNode* in = new IntegerSNode();
+    IntegerSNode* in = new IntegerSNode(std::string());
     in->str = std::to_string(type_index); // FIXME, use int directly
     new_union->args = {expression, in};
     return new_union;

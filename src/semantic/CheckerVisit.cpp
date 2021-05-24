@@ -16,7 +16,7 @@ SNode* Checker::make_for_snode(ForNode& node, USemanticInfo& binfo, USemanticInf
     bbn->nodes.push_back(dsn);
     DeclarationSNode* lidx_decl = new DeclarationSNode();
     lidx_decl->identifier = this->loop_index_var_id;
-    IntegerSNode* init_idx = new IntegerSNode();
+    IntegerSNode* init_idx = new IntegerSNode(std::string());
     init_idx->str = "0";
     lidx_decl->expression = init_idx;
 

@@ -8,7 +8,7 @@
 #include "../transpiler/STranspiler.h"
 #include "../units/Package.h"
 #include <unistd.h>
-#include <limits.h>
+#include <climits>
 
 #define REQUIREMENTS_FILE "requirements.txt"
 static std::string lib_path;
@@ -60,7 +60,7 @@ void load_package(Package* package, int level) {
                     std::string module_rel_path = path_join(package->rel_path, d_name);
                     all_modules.push_back(module_rel_path);
                     std::string module_name = d_name.substr(0, d_name.size() - 3);
-                    Module* module = new Module(Path(package->path, module_name), module_abs_path, module_rel_path);
+                    auto* module = new Module(Path(package->path, module_name), module_abs_path, module_rel_path);
                     package->units[module_name] = Unit{.type=U_TYPE::MODULE, .module=module};
                 } else {
                     // std::cout << std::string(level + 1, '\t') << "OTHER: " << d_name << std::endl;
@@ -68,8 +68,8 @@ void load_package(Package* package, int level) {
             } else if (ent->d_type == DT_DIR) {
                 std::string subpackage_abs_path = path_join(package->abs_path, d_name);
                 std::string subpackage_rel_path = path_join(package->rel_path, d_name);
-                std::string subpackage_name = d_name;
-                Package* subpackage = new Package(Path(package->path, d_name),
+                const std::string& subpackage_name = d_name;
+                auto* subpackage = new Package(Path(package->path, d_name),
                                                   subpackage_abs_path,
                                                   subpackage_rel_path);
                 load_package(subpackage, level + 1);
@@ -81,11 +81,11 @@ void load_package(Package* package, int level) {
 }
 
 void parse_all_modules(Package* package) {
-    if (package->units.size() == 0) {
+    if (package->units.empty()) {
         std::cerr << "Warning: package " << package->name << " (" << package->abs_path << ") is empty" << std::endl;
         return;
     }
-    for (auto ep: package->units) {
+    for (const auto& ep: package->units) {
         if (ep.second.type == U_TYPE::PACKAGE) {
             Package* subpackage = ep.second.package;
             parse_all_modules((Package*) subpackage);
@@ -100,7 +100,7 @@ void parse_all_modules(Package* package) {
 }
 
 void process_global_all_modules(Package* package) {
-    for (auto ep: package->units) {
+    for (const auto& ep: package->units) {
         if (ep.second.type == U_TYPE::PACKAGE) {
             Package* subpackage = ep.second.package;
             process_global_all_modules(subpackage);
@@ -118,9 +118,9 @@ void process_global_all_modules(Package* package) {
 VectorOfStrings make_path(std::string s) {
     VectorOfStrings path;
     path.push_back("");
-    for (size_t i = 0; i < s.size(); i++) {
-        if (s[i] != '.') {
-            path.back() += s[i];
+    for (char c : s) {
+        if (c != '.') {
+            path.back() += c;
         } else {
             path.push_back("");
         }
@@ -129,11 +129,11 @@ VectorOfStrings make_path(std::string s) {
 }
 
 void add_local_path_to_module(Module& module, Path path) {
-    Flirpin current_flirpin = Flirpin{.type=F_TYPE::PACKAGE, .package=top_package};
+    auto current_flirpin = Flirpin{.type=F_TYPE::PACKAGE, .package=top_package};
     std::string path_so_far = "global";
     std::string last_include;
     Flirpin last_flirpin;
-    for (auto path_part: path.as_vec()) {
+    for (const auto& path_part: path.as_vec()) {
         if (current_flirpin.type == F_TYPE::PACKAGE) {
             Package* package = current_flirpin.package;
             auto unit = package->units.find(path_part);
@@ -188,11 +188,11 @@ void add_path_to_module(Module& module, Path path) {
     }
 }
 
-void add_path_with_alias_to_module(Module& module, std::string alias, Path path) {
-    Flirpin current_flirpin = Flirpin{.type=F_TYPE::PACKAGE, .package=root_package};
+void add_path_with_alias_to_module(Module& module, const std::string& alias, Path path) {
+    auto current_flirpin = Flirpin{.type=F_TYPE::PACKAGE, .package=root_package};
     std::string path_so_far;
     std::string last_include;
-    for (auto path_part: path.as_vec()) {
+    for (const auto& path_part: path.as_vec()) {
         if (current_flirpin.type == F_TYPE::PACKAGE) {
             Package* package = current_flirpin.package;
             auto unit = package->units.find(path_part);
@@ -230,7 +230,7 @@ void analyze_module(Module& module) {
     //     return;
     // }
 
-    for (auto path: module.imported_paths_no_alias_v) {
+    for (const auto& path: module.imported_paths_no_alias_v) {
         // std::cout << "PATH: " << path.first << std::endl;
         add_path_to_module(module, path.second);
     }
@@ -253,7 +253,7 @@ void analyze_module(Module& module) {
 
 void analyze_all_modules(Package& package) {
     // std::cout << "Analyzing package " << package->name << std::endl;
-    for (auto ep: package.units) {
+    for (const auto& ep: package.units) {
         if (ep.second.type == U_TYPE::PACKAGE) {
             Package& subpackage = *ep.second.package;
             analyze_all_modules(subpackage);
@@ -264,8 +264,8 @@ void analyze_all_modules(Package& package) {
     }
 }
 
-void
-transpile_one_module(Module& module, std::string& package_header, const std::string& output_package_dir, Package& package) {
+void transpile_one_module(Module& module, std::string& package_header, const std::string& output_package_dir,
+                          Package& package) {
     if (module.name == "core") {
         return;
     }
@@ -303,7 +303,7 @@ transpile_one_module(Module& module, std::string& package_header, const std::str
     std::string h_endif = "#endif //" + module_define + "\n";
     std::string include_core = "#include <core/core.h>\n";
     std::string includes = include_core;
-    for (auto m: module.included_module_paths) {
+    for (const auto& m: module.included_module_paths) {
         if (m == "core.h") {
             continue;
         }
@@ -329,14 +329,14 @@ std::map<std::string, std::string> read_requirements(const std::string& filepath
         std::string op;
         std::string first;
         std::string second;
-        for (size_t i = 0; i < line.size(); i++) {
-            if (line[i] == '=') {
+        for (char i : line) {
+            if (i == '=') {
                 op += '=';
             } else {
                 if (op == "") {
-                    first += line[i];
+                    first += i;
                 } else {
-                    second += line[i];
+                    second += i;
                 }
             }
         }
@@ -347,7 +347,7 @@ std::map<std::string, std::string> read_requirements(const std::string& filepath
 
 std::map<std::string, bool> loaded_top_units;
 
-void load_top_unit(std::string name, const std::string& top_unit_path) {
+void load_top_unit(const std::string& name, const std::string& top_unit_path) {
     if (loaded_top_units.count(top_unit_path) != 0) {
         // skip, already loaded
         return;
@@ -360,7 +360,7 @@ void load_top_unit(std::string name, const std::string& top_unit_path) {
         load_top_unit(req.first, req_top_unit_path);
     }
 
-    Package* top_unit_package = new Package(Path(name), path_join(top_unit_path, "src"), "");
+    auto* top_unit_package = new Package(Path(name), path_join(top_unit_path, "src"), "");
     load_package(top_unit_package, 0);
     parse_all_modules(top_unit_package);
     process_global_all_modules(top_unit_package);
@@ -374,7 +374,7 @@ void load_requirements(const std::string& filepath) {
 
     bool has_error = false;
     for (auto r: requirements) {
-        std::string final_path = path_join(path_join(lib_path, r.first), r.second).c_str();
+        std::string final_path = path_join(path_join(lib_path, r.first), r.second);
         DIR* dir = opendir(final_path.c_str());
         if (dir == nullptr) {
             std::cout << "REQUIREMENT " << r.first + "==" + r.second << " NOT FOUND" << std::endl;
@@ -392,6 +392,7 @@ void load_requirements(const std::string& filepath) {
     }
 }
 
+const int NEW_DIR_MODE = 0777;
 
 void transpile_all_modules(Package& package, const std::string& output_dir, bool is_top) {
     // std::cout << "Transpiling package " << package.name << " output dir: " << output_dir << std::endl;
@@ -399,10 +400,10 @@ void transpile_all_modules(Package& package, const std::string& output_dir, bool
     std::string output_package_dir = path_join(output_dir, package.name);
     // std::cout << "output package dir: " << output_package_dir << std::endl;
     if (package.name != "") {
-        mkdir(output_package_dir.c_str(), 0777);
+        mkdir(output_package_dir.c_str(), NEW_DIR_MODE);
     }
     Module* main_module = nullptr;
-    for (auto u: package.units) {
+    for (const auto& u: package.units) {
         if (u.second.type == U_TYPE::PACKAGE) {
             Package& subpackage = *u.second.package;
             transpile_all_modules(subpackage, output_package_dir, false);

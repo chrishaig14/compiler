@@ -121,7 +121,7 @@ void Scanner::set_char() {
     this->chris = this->text[this->current];
 }
 
-bool Scanner::should_insert_semicolon() {
+bool Scanner::should_insert_semicolon() const {
     std::vector<TokType> semic = {TokType::RETURN, TokType::ID, TokType::INTEGER, TokType::RPAREN, TokType::RSQUARE,
                                   TokType::STRING, TokType::NONE, TokType::TRUE, TokType::FALSE};
     for (auto ts : semic) {
@@ -138,7 +138,7 @@ Token Scanner::next_token() {
         return Token(TokType::END, {this->line, this->column});
     }
     this->set_char();
-    while (isspace(this->chris)) {
+    while (isspace(this->chris) != 0) {
         this->current++;
         if (this->chris == '\n') {
             if (this->should_insert_semicolon()) {
@@ -156,11 +156,13 @@ Token Scanner::next_token() {
         this->set_char();
     }
 
-    if (isalpha(this->chris) || this->chris == '_') {
+    if ((isalpha(this->chris) != 0) || this->chris == '_') {
         return this->scan_keyword_or_identifier();
-    } else if (isdigit(this->chris)) {
+    }
+    if (isdigit(this->chris) != 0) {
         return this->scan_number();
-    } else if (this->chris == '\"') {
+    }
+    if (this->chris == '\"') {
         return this->scan_string();
     }
     return this->scan_other();
@@ -243,7 +245,7 @@ Token Scanner::scan_keyword_or_identifier() {
     TextPosition start = {this->line, this->column};
     this->set_char();
     this->start_token();
-    while ((isalnum(this->chris) or this->chris == '_') && !this->at_eof()) {
+    while (((isalnum(this->chris) != 0) or this->chris == '_') && !this->at_eof()) {
         this->accum_token();
         this->advance_simple();
     }
@@ -261,7 +263,7 @@ Token Scanner::scan_number() {
     TextPosition start = {this->line, this->column};
     this->set_char();
     this->start_token();
-    while (isdigit(this->chris) && !this->at_eof()) {
+    while ((isdigit(this->chris) != 0) && !this->at_eof()) {
         this->accum_token();
         this->advance_simple();
     }
@@ -269,11 +271,11 @@ Token Scanner::scan_number() {
         if (this->chris == '.') {
             this->accum_token();
             if (this->current + 1 < this->text.size()) {
-                if (isdigit(this->text[this->current + 1])) {
+                if (isdigit(this->text[this->current + 1]) != 0) {
                     // it's a decimal number
                     this->current++;
                     this->set_char();
-                    while (isdigit(this->chris) && !this->at_eof()) {
+                    while ((isdigit(this->chris) != 0) && !this->at_eof()) {
                         this->accum_token();
                         this->advance_simple();
                     }
