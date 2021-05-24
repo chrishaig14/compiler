@@ -5,7 +5,6 @@
 #include <cassert>
 #include "CheckExpressions.h"
 #include "../simple_nodes/TernarySNode.h"
-#include "../nodes/UnaryOpNode.h"
 
 USemanticInfo Checker::visit_id(IdNode& n) {
     // Logger::info("Checking id node " + n._id);
@@ -16,7 +15,7 @@ USemanticInfo Checker::visit_id(IdNode& n) {
         return error_stub();
     }
 
-    IdSNode* sn = new IdSNode();
+    auto* sn = new IdSNode();
     if (entity.type == E_TYPE::CONST_FUNCTION) {
         sn->identifier = entity.const_function->path.as_str();
     } else {
@@ -102,7 +101,7 @@ USemanticInfo Checker::visit_boolop(BoolOpNode& n) {
         if (fun != "__eq__" && fun != "__ne__") {
             this->error_reporter.fail("Error: enum type doesnt support this operator");
         }
-        ObjectType* ot = new ObjectType("Boolean", {});
+        auto* ot = new ObjectType("Boolean", {});
         ot->actual_base_path = Path("core.Boolean");
         TypeNode* rettype = ot;
 
@@ -153,8 +152,8 @@ USemanticInfo Checker::visit_unary(UnaryOpNode& n) {
     std::string sub_fun_path = subscript_fun->path.as_str();
     TypeNode* rtype = subscript_fun->ft->return_type->clone();
 
-    CallSNode* csn = new CallSNode();
-    IdSNode* fsn = new IdSNode();
+    auto* csn = new CallSNode();
+    auto* fsn = new IdSNode();
     fsn->identifier = sub_fun_path;
     csn->function = fsn;
     csn->arguments.push_back(exp_snode);
@@ -167,8 +166,8 @@ USemanticInfo Checker::visit_unary(UnaryOpNode& n) {
 
 USemanticInfo Checker::visit_binop(BinopNode& n) {
 
-    CallSNode* sn = new CallSNode();
-    IdSNode* function_id = new IdSNode();
+    auto* sn = new CallSNode();
+    auto* function_id = new IdSNode();
     sn->function = function_id;
     function_id->identifier = "";
 
@@ -225,7 +224,7 @@ void Checker::fill_value(Value* value) {
         return;
     }
     Class* cls = flirpin.clazz;
-    if (cls->type_params.size() != 0) {
+    if (!cls->type_params.empty()) {
         cls = instantiate_generic(cls, value->type->object());
     }
     value->metatype = Meta::CLASS;
@@ -272,8 +271,8 @@ USemanticInfo Checker::visit_subscript(SubscriptNode& node) {
     info.entity = Entity(new Value(rtype));
     this->fill_value(info.entity.value);
 
-    CallSNode* csn = new CallSNode();
-    IdSNode* fsn = new IdSNode();
+    auto* csn = new CallSNode();
+    auto* fsn = new IdSNode();
     fsn->identifier = sub_fun_path;
     csn->function = fsn;
     csn->arguments.push_back(parent_p->snode);
@@ -301,7 +300,7 @@ USemanticInfo Checker::visit_ternary(TernaryNode& node) {
     }
     this->enter_scope("true_case");
     TypeNode*& inner_type = expression_type.type_params[0];
-    Value* v = new Value(inner_type);
+    auto* v = new Value(inner_type);
     this->scope->set("it", Entity(v));
     USemanticInfo true_case_p = this->dispatch_rvalue(node.true_case);
     SemanticInfo& true_case = *true_case_p;
@@ -312,7 +311,7 @@ USemanticInfo Checker::visit_ternary(TernaryNode& node) {
     }
     SNode* false_case_snode = false_case_sinfo->snode;
 
-    Value* rv = new Value(true_case.entity.value->type->clone());
+    auto* rv = new Value(true_case.entity.value->type->clone());
 
     SemanticInfo info;
     info.entity = Entity(rv);
