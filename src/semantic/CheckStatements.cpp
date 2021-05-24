@@ -17,7 +17,7 @@ USemanticInfo Checker::visit_lvalue_subscript(SubscriptNode& node) {
     }
     Class* cls = entity_parent.value->clazz;
     assert(cls != nullptr);
-    if (cls->type_params.size() != 0) {
+    if (!cls->type_params.empty()) {
         cls = instantiate_generic(cls, entity_parent.value->type->object());
     }
 
@@ -44,8 +44,8 @@ USemanticInfo Checker::visit_lvalue_subscript(SubscriptNode& node) {
     info.entity = Entity(new Value((ObjectType*) rtype));
 
     this->fill_value(info.entity.value);
-    CallSNode* csn = new CallSNode();
-    IdSNode* fsn = new IdSNode();
+    auto* csn = new CallSNode();
+    auto* fsn = new IdSNode();
     fsn->identifier = sub_fun_path;
     csn->function = fsn;
     csn->arguments.push_back(parent_p->snode);
@@ -141,7 +141,7 @@ USemanticInfo Checker::visit_assignment(AssignmentNode& n) {
         info.snode = linfo_p->snode;
         csn->arguments.push_back(expression_info_p->snode);
     } else {
-        AssignmentSNode* sn = new AssignmentSNode();
+        auto* sn = new AssignmentSNode();
         sn->lvalue = linfo_p->snode;
         sn->rvalue = expression_info_p->snode;
         info.snode = sn;
@@ -180,7 +180,7 @@ USemanticInfo Checker::visit_return(ReturnNode& n) {
     n.ret_type = return_type->clone();
     n.reachables = this->scope->get_all();
 
-    ReturnSNode* sn = new ReturnSNode();
+    auto* sn = new ReturnSNode();
     sn->expression = expression_info_p->snode;
 
     SemanticInfo info;
@@ -228,22 +228,22 @@ USemanticInfo Checker::visit_match(MatchExpressionNode* node) {
         assert(ent.value->clazz != nullptr);
         this->scope->set(case_id, ent);
         USemanticInfo case_info = this->dispatch(case_node);
-        BlockSNode* bn = (BlockSNode*) case_info->snode;
-        DeclarationSNode* dn = new DeclarationSNode();
+        auto* bn = (BlockSNode*) case_info->snode;
+        auto* dn = new DeclarationSNode();
         dn->identifier = case_id;
-        ObjectMemberSNode* omn = new ObjectMemberSNode();
+        auto* omn = new ObjectMemberSNode();
         dn->expression = omn;
         omn->member_name = "o";
         omn->object = new IdSNode(varname);
         omn->class_path = Path("core.Union");
         bn->nodes.insert(bn->nodes.begin(), dn);
-        cas.push_back(std::make_pair(union_index, (BlockSNode*) case_info->snode));
+        cas.emplace_back(union_index, (BlockSNode*) case_info->snode);
         this->leave_scope();
     }
-    DeclarationSNode* init = new DeclarationSNode();
+    auto* init = new DeclarationSNode();
     init->expression = exp_info->snode;
     init->identifier = varname;
-    MatchSNode* mn = new MatchSNode(init, varname, cas);
+    auto* mn = new MatchSNode(init, varname, cas);
 
     SemanticInfo info;
     info.snode = mn;
@@ -251,7 +251,7 @@ USemanticInfo Checker::visit_match(MatchExpressionNode* node) {
 }
 
 USemanticInfo Checker::visit_continue(ContinueNode& node) {
-    BlockSNode* bn = new BlockSNode();
+    auto* bn = new BlockSNode();
     if (this->update_loop_index_snode != nullptr) {
         bn->nodes.push_back(this->update_loop_index_snode);
     }
@@ -284,13 +284,13 @@ USemanticInfo Checker::visit_for(ForNode& node) {
     this->loop_index_var_id = "__loop_index__" + loop_c;
     this->loop_list_len_var_id = "__loop_list_len__" + loop_c;
 
-    AssignmentSNode* increment_index_sn = new AssignmentSNode();
+    auto* increment_index_sn = new AssignmentSNode();
     this->update_loop_index_snode = increment_index_sn;
     increment_index_sn->lvalue = new IdSNode(this->loop_index_var_id);
-    CallSNode* inc_exp_node = new CallSNode();
+    auto* inc_exp_node = new CallSNode();
     inc_exp_node->function = new IdSNode("core.core.Integer.__add__");
     inc_exp_node->arguments.push_back(new IdSNode(this->loop_index_var_id));
-    IntegerSNode* one_node = new IntegerSNode(std::string());
+    auto* one_node = new IntegerSNode(std::string());
     one_node->str = "1";
     inc_exp_node->arguments.push_back(one_node);
     increment_index_sn->rvalue = inc_exp_node;
@@ -336,7 +336,7 @@ USemanticInfo Checker::visit_while(WhileNode& node) {
     }
     this->leave_scope();
 
-    WhileSNode* while_sn = new WhileSNode();
+    auto* while_sn = new WhileSNode();
     while_sn->condition = condition_snode;
     while_sn->body = (BlockSNode*) body_info_p->snode;
 
@@ -359,13 +359,13 @@ USemanticInfo Checker::visit_if(IfNode& n) {
 
     std::vector<std::pair<SNode*, BlockSNode*>> elifs;
 
-    for (size_t i = 0; i < n.elifs.size(); i++) {
-        USemanticInfo elif_condition_sinfo = this->expect_rvalue_of_type(T_BOOL, *n.elifs[i].first);
+    for (auto & elif : n.elifs) {
+        USemanticInfo elif_condition_sinfo = this->expect_rvalue_of_type(T_BOOL, *elif.first);
         SNode* elif_condition_snode = elif_condition_sinfo->snode;
         this->enter_scope("elif");
-        USemanticInfo elif_block_info = this->visit_block(*n.elifs[i].second);
+        USemanticInfo elif_block_info = this->visit_block(*elif.second);
         this->leave_scope();
-        elifs.push_back(std::make_pair(elif_condition_snode, (BlockSNode*) elif_block_info->snode));
+        elifs.emplace_back(elif_condition_snode, (BlockSNode*) elif_block_info->snode);
     }
     USemanticInfo else_info;
     if (n.selse != nullptr && !n.selse->nodes.empty()) {
