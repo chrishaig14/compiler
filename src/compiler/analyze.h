@@ -9,7 +9,7 @@
 #include "../semantic/Checker.h"
 
 void add_local_path_to_module(Module& module, Path path, Package* top_package);
-void add_global_path_to_module(Module* module, Path path);
+void add_global_path_to_module(Module& module, Path path);
 void add_path_to_module(Module& module, Path path, Package* top_package);
 void add_path_with_alias_to_module(Module& module, const std::string& alias, Path path, Package* root_package);
 

@@ -84,7 +84,7 @@ void add_path_to_module(Module& module, Path path, Package* top_package) {
     }
 }
 
-void add_global_path_to_module(Module* module, Path path) {
+void add_global_path_to_module(Module& module, Path path) {
 
 }
 
