@@ -111,7 +111,7 @@ void load_top_unit(const std::string& name, const std::string& top_unit_path) {
 
     auto* top_unit_package = new Package(Path(name), path_join(top_unit_path, "src"), "");
     load_package(top_unit_package, 0);
-    parse_all_modules(top_unit_package);
+    parse_all_modules(*top_unit_package);
     process_global_all_modules(top_unit_package);
     top_package->units[name] = Unit{.type=U_TYPE::PACKAGE, .package=top_unit_package};
     std::cout << "Finished loading top unit: " << E_HLT(top_unit_path) << std::endl;
@@ -205,7 +205,7 @@ int main(int argc, char* argv[]) {
     top_package->units["root"] = Unit{.type=U_TYPE::PACKAGE, .package=root_package};
     load_requirements(req_file_path);
     load_package(root_package, 0);
-    parse_all_modules(root_package);
+    parse_all_modules(*root_package);
 
     process_global_all_modules(root_package);
 

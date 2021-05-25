@@ -9,8 +9,8 @@
 #include "../scanner/Scanner.h"
 #include "../parser/Parser.h"
 
-BlockNode* full_parse(const std::string& __file__, CodeLines* code_lines);
+void parse_single_module(Module& module);
 
-void parse_all_modules(Package* package);
+void parse_all_modules(Package& package);
 
 #endif //XLANG_PARSE_H
