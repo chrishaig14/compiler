@@ -14,15 +14,10 @@
 #define REQUIREMENTS_FILE "requirements.txt"
 static std::string lib_path;
 static bool global_fail = false;
-static std::map<std::string, std::string> function_builtins;
-static std::map<std::string, std::map<std::string, std::string>> class_builtins;
 static Package* root_package;
 static std::string static_initializations;
 static std::string static_cleanups;
-
 static Package* top_package;
-
-
 VectorOfStrings all_modules;
 
 void load_package(Package* package, int level) {
@@ -61,23 +56,6 @@ void load_package(Package* package, int level) {
     }
 }
 
-
-void process_global_all_modules(Package* package) {
-    for (const auto& ep: package->units) {
-        if (ep.second.type == U_TYPE::PACKAGE) {
-            Package* subpackage = ep.second.package;
-            process_global_all_modules(subpackage);
-        } else if (ep.second.type == U_TYPE::MODULE) {
-            Module* module = ep.second.module;
-            GlobalProcessor gp;
-            gp.module = module;
-            gp.__file__ = module->abs_path;
-            std::cout << "Global-processing module " << module->name << " at path: " << module->abs_path << std::endl;
-            gp.visit_root(*module->ast);
-        }
-    }
-}
-
 VectorOfStrings make_path(const std::string& s) {
     VectorOfStrings path;
     path.push_back("");
@@ -112,7 +90,7 @@ void load_top_unit(const std::string& name, const std::string& top_unit_path) {
     auto* top_unit_package = new Package(Path(name), path_join(top_unit_path, "src"), "");
     load_package(top_unit_package, 0);
     parse_all_modules(*top_unit_package);
-    process_global_all_modules(top_unit_package);
+    process_global_all_modules(*top_unit_package);
     top_package->units[name] = Unit{.type=U_TYPE::PACKAGE, .package=top_unit_package};
     std::cout << "Finished loading top unit: " << E_HLT(top_unit_path) << std::endl;
     loaded_top_units[top_unit_path] = true;
@@ -196,8 +174,6 @@ int main(int argc, char* argv[]) {
         std::cout << "failed to create application dir" << std::endl;
         exit(0);
     }
-    std::string __main_file__ = path_join(project_dir, u_basename(project_dir) + ".xl");
-    // std::cout << style(BLUE, "Main file: ") << style(MAGENTA, __main_file__) << std::endl;
     root_package = new Package(Path("root"), project_dir, "");
 
     std::string req_file_path = path_join(top_project_dir, REQUIREMENTS_FILE);
@@ -207,7 +183,7 @@ int main(int argc, char* argv[]) {
     load_package(root_package, 0);
     parse_all_modules(*root_package);
 
-    process_global_all_modules(root_package);
+    process_global_all_modules(*root_package);
 
     try {
         analyze_all_modules(*root_package, top_package);
