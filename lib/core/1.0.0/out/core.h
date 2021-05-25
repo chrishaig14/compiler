@@ -22,12 +22,21 @@
 #include "basics.h"
 #include "functions.h"
 
-class core_D_Union : public XObject {
+#define LIBP(a, b, c, d, e) a ## _v ## b ## _ ## c ## _ ##  d ## _ ##  e
+#define LIB(a, b, c, d, e)  LIBP(a,b,c,d,e)
+#define LIBENT(x) LIB(LIBNAME, LIBMAJV, LIBMINV, LIBPATV, x)
+
+#define LIBNAME core
+#define LIBMAJV 1
+#define LIBMINV 0
+#define LIBPATV 0
+
+class LIBENT(Union) : public XObject {
 public:
     TaggedObject* o;
     TaggedObject* type;
 
-    core_D_Union(TaggedObject* o, TaggedObject* type) : XObject("Union") {
+    LIBENT(Union)(TaggedObject* o, TaggedObject* type) : XObject("Union") {
         this->o = o;
         this->type = type;
     }
