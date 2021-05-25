@@ -21,10 +21,10 @@ static Package* top_package;
 VectorOfStrings all_modules;
 
 void load_package(Package* package, int level) {
-    DIR* dir = opendir(package->abs_path.c_str());
+    std::string abs_path = package->abs_path;
+    DIR* dir = opendir(abs_path.c_str());
     if (dir == nullptr) {
-        std::cerr << "No such dir for package '" << package->name << "': " << "'" << package->abs_path << "'"
-                  << std::endl;
+        std::cerr << "No such dir for package '" << package->name << "': " << "'" << abs_path << "'" << std::endl;
         return;
     }
     dirent* ent = readdir(dir);
@@ -36,9 +36,15 @@ void load_package(Package* package, int level) {
                 if (file_extension == ".xl") {
                     std::string module_abs_path = path_join(package->abs_path, d_name);
                     std::string module_rel_path = path_join(package->rel_path, d_name);
-                    all_modules.push_back(module_rel_path);
+                    if (!package->is_lib) {
+                        all_modules.push_back(module_rel_path);
+                    }
                     std::string module_name = d_name.substr(0, d_name.size() - 3);
-                    auto* module = new Module(Path(package->path, module_name), module_abs_path, module_rel_path);
+                    auto* module = new Module(Path(package->path, module_name),
+                                              module_abs_path,
+                                              module_rel_path,
+                                              package->is_lib,
+                                              path_join(package->header_parent_path, module_name + ".h"));
                     package->units[module_name] = Unit{.type=U_TYPE::MODULE, .module=module};
                 } else {
                     // std::cout << std::string(level + 1, '\t') << "OTHER: " << d_name << std::endl;
@@ -47,7 +53,13 @@ void load_package(Package* package, int level) {
                 std::string subpackage_abs_path = path_join(package->abs_path, d_name);
                 std::string subpackage_rel_path = path_join(package->rel_path, d_name);
                 const std::string& subpackage_name = d_name;
-                auto* subpackage = new Package(Path(package->path, d_name), subpackage_abs_path, subpackage_rel_path);
+                auto* subpackage = new Package(Path(package->path, d_name),
+                                               subpackage_abs_path,
+                                               subpackage_rel_path,
+                                               package->is_lib,
+                                               path_join(path_join(package->header_parent_path, subpackage_name),
+                                                         "__package__.h"),
+                                               path_join(package->header_parent_path, subpackage_name));
                 load_package(subpackage, level + 1);
                 package->units[subpackage_name] = Unit{.type=U_TYPE::PACKAGE, .package=subpackage};
             }
@@ -74,26 +86,37 @@ std::string project_output_dir;
 
 std::map<std::string, bool> loaded_top_units;
 
-void load_top_unit(const std::string& name, const std::string& top_unit_path) {
-    if (loaded_top_units.count(top_unit_path) != 0) {
+void load_top_unit(const std::string& name, const std::string& version, bool is_lib) {
+    std::string lib_rel_top_unit_path = path_join(name, version);
+    std::string abs_top_unit_path = path_join(lib_path, lib_rel_top_unit_path);
+    if (loaded_top_units.count(lib_rel_top_unit_path) != 0) {
         // skip, already loaded
         return;
     }
-    std::cout << "Loading top unit: " << E_HLT(name) << " at path: " << E_HLT(top_unit_path) << std::endl;
-    std::string unit_requirements_file = path_join(top_unit_path, REQUIREMENTS_FILE);
+    DIR* dir = opendir(abs_top_unit_path.c_str());
+    if (dir == nullptr) {
+        std::cout << "Top unit " << name + "==" + version << " NOT FOUND" << std::endl;
+        return;
+    }
+    std::cout << "Loading top unit: " << E_HLT(name) << " at path: " << E_HLT(abs_top_unit_path) << std::endl;
+    std::string unit_requirements_file = path_join(abs_top_unit_path, REQUIREMENTS_FILE);
     auto requirements = read_requirements(unit_requirements_file);
     for (const auto& req: requirements) {
-        std::string req_top_unit_path = path_join(path_join(lib_path, req.first), req.second);
-        load_top_unit(req.first, req_top_unit_path);
+        load_top_unit(req.first, req.second, true);
     }
 
-    auto* top_unit_package = new Package(Path(name), path_join(top_unit_path, "src"), "");
+    auto* top_unit_package = new Package(Path(name),
+                                         path_join(abs_top_unit_path, "src"),
+                                         lib_rel_top_unit_path,
+                                         is_lib,
+                                         path_join(path_join(lib_rel_top_unit_path, "out"), "__package__.h"),
+                                         path_join(lib_rel_top_unit_path, "out"));
     load_package(top_unit_package, 0);
     parse_all_modules(*top_unit_package);
     process_global_all_modules(*top_unit_package);
     top_package->units[name] = Unit{.type=U_TYPE::PACKAGE, .package=top_unit_package};
-    std::cout << "Finished loading top unit: " << E_HLT(top_unit_path) << std::endl;
-    loaded_top_units[top_unit_path] = true;
+    std::cout << "Finished loading top unit: " << E_HLT(lib_rel_top_unit_path) << std::endl;
+    loaded_top_units[lib_rel_top_unit_path] = true;
 }
 
 void load_requirements(const std::string& filepath) {
@@ -101,14 +124,7 @@ void load_requirements(const std::string& filepath) {
 
     bool has_error = false;
     for (const auto& r: requirements) {
-        std::string final_path = path_join(path_join(lib_path, r.first), r.second);
-        DIR* dir = opendir(final_path.c_str());
-        if (dir == nullptr) {
-            std::cout << "REQUIREMENT " << r.first + "==" + r.second << " NOT FOUND" << std::endl;
-            has_error = true;
-            continue;
-        }
-        load_top_unit(r.first, final_path);
+        load_top_unit(r.first, r.second, true);
         // Package* req_package = new Package(r.first, final_path, "");
         // load_package(req_package, 0);
         // std::cout << "LOADED REQUIREMENT " << r.first + "==" + r.second << std::endl;
@@ -128,7 +144,7 @@ void write_cmakelists(const std::string& all_files) {
                              "include_directories(.)\n"
                              "set(CMAKE_CXX_FLAGS \"${CMAKE_CXX_FLAGS} -Werror -O0 -fverbose-asm -Winline\")\n";
     // cmakelists += "add_executable(result " + all_files + ")\n";
-    cmakelists += "include_directories(/home/chris/CLionProjects/compiler/lib/core/1.0.0/out)\n";
+    cmakelists += "include_directories(/home/chris/CLionProjects/compiler/lib)\n";
     cmakelists += "add_library(result " + all_files + ")\n";
     cmakelists += "target_link_libraries(result core)\n";
 
@@ -174,10 +190,10 @@ int main(int argc, char* argv[]) {
         std::cout << "failed to create application dir" << std::endl;
         exit(0);
     }
-    root_package = new Package(Path("root"), project_dir, "");
+    root_package = new Package(Path("root"), project_dir, "", false, "", "");
 
     std::string req_file_path = path_join(top_project_dir, REQUIREMENTS_FILE);
-    top_package = new Package(Path("global"), "", "");
+    top_package = new Package(Path("global"), "", "", false, "", "");
     top_package->units["root"] = Unit{.type=U_TYPE::PACKAGE, .package=root_package};
     load_requirements(req_file_path);
     load_package(root_package, 0);

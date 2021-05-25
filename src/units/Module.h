@@ -15,11 +15,12 @@
 
 class Module {
 public:
-    Module(Path path, std::string abs_path, std::string rel_path);
+    Module(Path path, std::string abs_path, std::string rel_path, bool is_lib, std::string full_header_path);
     std::string name;
-    VectorOfStrings included_module_paths;
+    std::map<std::string, std::string> included_module_paths;
     std::string abs_path;
     std::string rel_path;
+    bool is_lib;
     BlockNode* ast;
     std::map<std::string, Path> imported_paths_no_alias;
     std::map<std::string, Path> imported_paths_with_alias;
@@ -43,6 +44,7 @@ public:
     void fill_actual(TypeNode* t);
     void fill_actual(ObjectType* t);
     void fill_actual(FunctionType* t);
+    std::string full_header_path;
 };
 
 

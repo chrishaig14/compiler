@@ -38,38 +38,48 @@ void analyze_all_modules(Package& package, Package* top_package) {
 }
 
 void add_path_with_alias_to_module(Module& module, const std::string& alias, Path path, Package* root_package) {
-    auto current_flirpin = Flirpin{.type=F_TYPE::PACKAGE, .package=root_package};
-    std::string path_so_far;
-    std::string last_include;
-    for (const auto& path_part: path.as_vec()) {
-        if (current_flirpin.type == F_TYPE::PACKAGE) {
-            Package* package = current_flirpin.package;
-            auto unit = package->units.find(path_part);
-            if (unit == package->units.end()) {
-                throw std::runtime_error("Error '" + path_part + "' not found in package " + path_so_far);
-            }
-            if (unit->second.type == U_TYPE::MODULE) {
-                last_include = unit->second.module->rel_path;
-            } else {
-                last_include = unit->second.package->rel_path;
-            }
-            current_flirpin = map_unit_to_flirpin(unit->second);
-        } else if (current_flirpin.type == F_TYPE::MODULE) {
-            auto flirpin = current_flirpin.module->flirpins.find(path_part);
-            if (flirpin == current_flirpin.module->flirpins.end()) {
-                throw std::runtime_error("Error '" + path_part + "' not found in module " + path_so_far);
-            }
-            current_flirpin = flirpin->second;
-        }
-        path_so_far += "." + path_part;
-    }
-    if (current_flirpin.type == F_TYPE::CLASS) {
-        throw std::runtime_error(
-                "Cannot import class " + current_flirpin.clazz->path.as_str() + " aliased with " + alias);
-    }
-    std::string included_module_header_basename = last_include.substr(0, last_include.size() - 3);
-    module.included_module_paths.push_back(included_module_header_basename + ".h");
-    module.flirpins[alias] = current_flirpin;
+    // auto current_flirpin = Flirpin{.type=F_TYPE::PACKAGE, .package=root_package};
+    // std::string path_so_far;
+    // std::string last_include;
+    // std::string lib_path = "lib";
+    // for (const auto& path_part: path.as_vec()) {
+    //     if (current_flirpin.type == F_TYPE::PACKAGE) {
+    //         Package* package = current_flirpin.package;
+    //         auto unit = package->units.find(path_part);
+    //         if (unit == package->units.end()) {
+    //             throw std::runtime_error("Error '" + path_part + "' not found in package " + path_so_far);
+    //         }
+    //         if (unit->second.type == U_TYPE::MODULE) {
+    //             if (unit->second.module->is_lib) {
+    //                 last_include = path_join(lib_path, unit->second.module->rel_path);
+    //             } else {
+    //                 last_include = unit->second.module->rel_path;
+    //             }
+    //         } else {
+    //             if (unit->second.package->is_lib) {
+    //                 last_include = path_join(lib_path, unit->second.package->rel_path);
+    //             } else {
+    //                 last_include = unit->second.package->rel_path;
+    //             }
+    //         }
+    //         current_flirpin = map_unit_to_flirpin(unit->second);
+    //     } else if (current_flirpin.type == F_TYPE::MODULE) {
+    //         auto flirpin = current_flirpin.module->flirpins.find(path_part);
+    //         if (flirpin == current_flirpin.module->flirpins.end()) {
+    //             throw std::runtime_error("Error '" + path_part + "' not found in module " + path_so_far);
+    //         }
+    //         current_flirpin = flirpin->second;
+    //     }
+    //     path_so_far += "." + path_part;
+    // }
+    // if (current_flirpin.type == F_TYPE::CLASS) {
+    //     throw std::runtime_error(
+    //             "Cannot import class " + current_flirpin.clazz->path.as_str() + " aliased with " + alias);
+    // }
+    // std::string included_module_header_basename = last_include.substr(0, last_include.size() - 3);
+    // std::string included_module_name = current_flirpin.module->name;
+    // module.included_module_paths[included_module_name] = included_module_header_basename + ".h";
+    // module.flirpins[alias] = current_flirpin;
 }
 
 void add_path_to_module(Module& module, Path path, Package* top_package) {
@@ -93,6 +103,8 @@ void add_local_path_to_module(Module& module, Path path, Package* top_package) {
     std::string path_so_far = "global";
     std::string last_include;
     Flirpin last_flirpin;
+    std::string lib_path = "lib";
+
     for (const auto& path_part: path.as_vec()) {
         if (current_flirpin.type == F_TYPE::PACKAGE) {
             Package* package = current_flirpin.package;
@@ -101,9 +113,17 @@ void add_local_path_to_module(Module& module, Path path, Package* top_package) {
                 throw std::runtime_error("Error '" + path_part + "' not found in package '" + path_so_far + "'");
             }
             if (unit->second.type == U_TYPE::MODULE) {
-                last_include = unit->second.module->rel_path;
+                if (unit->second.module->is_lib) {
+                    last_include = path_join(lib_path, unit->second.module->rel_path);
+                } else {
+                    last_include = unit->second.module->rel_path;
+                }
             } else {
-                last_include = unit->second.package->rel_path;
+                if (unit->second.package->is_lib) {
+                    last_include = path_join(lib_path, unit->second.package->rel_path);
+                } else {
+                    last_include = unit->second.package->rel_path;
+                }
             }
 
             current_flirpin = map_unit_to_flirpin(unit->second);
@@ -119,12 +139,12 @@ void add_local_path_to_module(Module& module, Path path, Package* top_package) {
     }
     std::string included_header;
     if (last_flirpin.type == F_TYPE::PACKAGE) {
-        included_header = last_flirpin.package->rel_path + "/__package__";
-        module.included_module_paths.push_back(included_header + ".h");
+        included_header = last_flirpin.package->full_header_path;
+        module.included_module_paths[last_flirpin.package->name] = included_header;
         module.flirpins[path.as_vec().back()] = current_flirpin;
     } else {
-        included_header = last_include.substr(0, last_include.size() - 3);
-        module.included_module_paths.push_back(included_header + ".h");
+        included_header = last_flirpin.module->full_header_path;
+        module.included_module_paths[last_flirpin.module->name] = included_header;
         module.flirpins[path.as_vec().back()] = current_flirpin;
     }
 }

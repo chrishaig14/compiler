@@ -56,6 +56,10 @@ bool is_file(const std::string& path) {
 std::string file_to_string(const std::string& path) {
     std::string filename = path;
     std::ifstream file(filename);
+    if (!file.is_open()) {
+        std::cerr << "Error: couldn't read file " << filename << std::endl;
+        exit(1);
+    }
     std::stringstream sstream;
     sstream << file.rdbuf();
     std::string text = sstream.str();

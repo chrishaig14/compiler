@@ -93,13 +93,11 @@ void transpile_one_module(Module& module, std::string& package_header, const std
     std::string h_ifndef = "#ifndef " + module_define + "\n";
     std::string h_define = "#define " + module_define + "\n";
     std::string h_endif = "#endif //" + module_define + "\n";
-    std::string include_core = "#include <core/core.h>\n";
-    std::string includes = include_core;
+    // std::string include_core = "#include <core/core.h>\n";
+    std::string includes = "#include <core/1.0.0/out/xobject.h>\n";
+    includes += "#include <core/1.0.0/out/Function.h>\n";
     for (const auto& m: module.included_module_paths) {
-        if (m == "core.h") {
-            continue;
-        }
-        includes += "#include <" + m + ">\n";
+        includes += "#include <" + m.second + ">\n";
     }
     t.header = includes + t.header;
 
