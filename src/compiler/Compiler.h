@@ -43,14 +43,14 @@ public:
              const std::string& lib_path, bool is_lib, const std::string& version);
     VectorOfStrings load_requirements(const std::string& filepath);
     void process_global_all_modules(Package& package);
-    void add_local_path_to_module(Module& module, Path path, Package* top_package);
+    void add_local_path_to_module(Module& module, Path path, Package& top_package);
     void add_global_path_to_module(Module& module, Path path);
-    void add_path_to_module(Module& module, Path path, Package* top_package);
+    void add_path_to_module(Module& module, Path path, Package& top_package);
 
-    void add_path_with_alias_to_module(Module& module, const std::string& alias, Path path, Package* root_package);
-    void analyze_module(Module& module, Package* top_package);
+    void add_path_with_alias_to_module(Module& module, const std::string& alias, Path path, Package& root_package);
+    void analyze_module(Module& module, Package& top_package);
 
-    void analyze_all_modules(Package& package, Package* top_package);
+    void analyze_all_modules(Package& package, Package& top_package);
     void parse_single_module(Module& module);
     void parse_all_modules(Package& package);
     void transpile_all_modules(Package& package, const std::string& output_dir, bool is_top);
