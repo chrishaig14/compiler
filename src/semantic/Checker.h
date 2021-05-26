@@ -156,7 +156,7 @@ public:
     Entity this_entity;
     USemanticInfo object_member(SNode* object_snode, Value* p_value, const std::string& child, MemberNode& n);
     USemanticInfo class_member(Class* cls, const std::string& child, MemberNode& n);
-    USemanticInfo package_member(Package* package, const std::string& child, MemberNode& n);
+    USemanticInfo package_member(Package& package, const std::string& child, MemberNode& n);
     USemanticInfo module_member(Module* mod, const std::string& child, MemberNode& n);
     Package* top_package;
     SNode* update_loop_index_snode;

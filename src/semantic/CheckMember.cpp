@@ -21,7 +21,7 @@ USemanticInfo Checker::visit_member(MemberNode& n) {
             }
             return this->object_member(parent_info->snode, parent_entity.value, n.s_child, n);
         case E_TYPE::PACKAGE:
-            return this->package_member(parent_entity.package, n.s_child, n);
+            return this->package_member(*parent_entity.package, n.s_child, n);
         case E_TYPE::MODULE:
             return this->module_member(parent_entity.module, n.s_child, n);
         case E_TYPE::ENUM:
@@ -122,9 +122,9 @@ USemanticInfo Checker::object_member(SNode* object_snode, Value* p_value, const 
     return std::make_unique<SemanticInfo>(info);
 }
 
-USemanticInfo Checker::package_member(Package* package, const std::string& child, MemberNode& n) {
-    if (package->units.count(child) == 0) {
-        this->error_reporter.package_no_member(package,
+USemanticInfo Checker::package_member(Package& package, const std::string& child, MemberNode& n) {
+    if (package.units.count(child) == 0) {
+        this->error_reporter.package_no_member(&package,
                                                child,
                                                n.dot_pos,
                                                *n.parent,
@@ -132,7 +132,7 @@ USemanticInfo Checker::package_member(Package* package, const std::string& child
                                                n.child_token.end_pos);
         return error_stub();
     }
-    Unit unit = package->units[child];
+    Unit unit = package.units[child];
     SemanticInfo info;
     info.entity = map_flirpin_to_entity(map_unit_to_flirpin(unit));
     return std::make_unique<SemanticInfo>(info);
