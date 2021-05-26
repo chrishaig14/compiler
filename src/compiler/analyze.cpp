@@ -2,11 +2,12 @@
 // Created by chris on 25/5/21.
 //
 
-#include "analyze.h"
+#include "Compiler.h"
+#include "../semantic/Checker.h"
 
-void analyze_module(Module& module, Package* top_package) {
+void Compiler::analyze_module(Module& module, Package* top_package) {
     for (const auto& path: module.imported_paths_no_alias_v) {
-        add_path_to_module(module, path.second, top_package);
+        this->add_path_to_module(module, path.second, top_package);
     }
     for (const auto& i: module.imported_paths_with_alias_v) {
         add_path_with_alias_to_module(module, i.first, i.second, top_package);
@@ -24,7 +25,7 @@ void analyze_module(Module& module, Package* top_package) {
     }
 }
 
-void analyze_all_modules(Package& package, Package* top_package) {
+void Compiler::analyze_all_modules(Package& package, Package* top_package) {
     // std::cout << "Analyzing package " << package->name << std::endl;
     for (const auto& ep: package.units) {
         if (ep.second.type == U_TYPE::PACKAGE) {
@@ -37,7 +38,8 @@ void analyze_all_modules(Package& package, Package* top_package) {
     }
 }
 
-void add_path_with_alias_to_module(Module& module, const std::string& alias, Path path, Package* root_package) {
+void
+Compiler::add_path_with_alias_to_module(Module& module, const std::string& alias, Path path, Package* root_package) {
     // auto current_flirpin = Flirpin{.type=F_TYPE::PACKAGE, .package=root_package};
     // std::string path_so_far;
     // std::string last_include;
@@ -82,7 +84,7 @@ void add_path_with_alias_to_module(Module& module, const std::string& alias, Pat
     // module.flirpins[alias] = current_flirpin;
 }
 
-void add_path_to_module(Module& module, Path path, Package* top_package) {
+void Compiler::add_path_to_module(Module& module, Path path, Package* top_package) {
     VectorOfStrings pv = path.as_vec();
     if (pv[0] == "root") {
         VectorOfStrings path_vec = VectorOfStrings(pv.begin(), pv.end());
@@ -94,11 +96,11 @@ void add_path_to_module(Module& module, Path path, Package* top_package) {
     }
 }
 
-void add_global_path_to_module(Module& module, Path path) {
+void Compiler::add_global_path_to_module(Module& module, Path path) {
 
 }
 
-void add_local_path_to_module(Module& module, Path path, Package* top_package) {
+void Compiler::add_local_path_to_module(Module& module, Path path, Package* top_package) {
     auto current_flirpin = Flirpin{.type=F_TYPE::PACKAGE, .package=top_package};
     std::string path_so_far = "global";
     std::string last_include;
@@ -149,7 +151,7 @@ void add_local_path_to_module(Module& module, Path path, Package* top_package) {
     }
 }
 
-void process_global_all_modules(Package& package) {
+void Compiler::process_global_all_modules(Package& package) {
     for (const auto& ep: package.units) {
         if (ep.second.type == U_TYPE::PACKAGE) {
             Package* subpackage = ep.second.package;

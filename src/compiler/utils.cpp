@@ -3,37 +3,10 @@
 //
 
 #include <iostream>
-#include <fstream>
 #include <getopt.h>
+#include <sys/stat.h>
 #include "utils.h"
 
-std::map<std::string, std::string> read_requirements(const std::string& filepath) {
-    std::string line;
-    std::map<std::string, std::string> requirements;
-    std::ifstream infile(filepath);
-    if (!infile.is_open()) {
-        std::cerr << "No requirements file at " << filepath << std::endl;
-        return requirements;
-    }
-    while (std::getline(infile, line)) {
-        std::string op;
-        std::string first;
-        std::string second;
-        for (char i : line) {
-            if (i == '=') {
-                op += '=';
-            } else {
-                if (op == "") {
-                    first += i;
-                } else {
-                    second += i;
-                }
-            }
-        }
-        requirements[first] = second;
-    }
-    return requirements;
-}
 
 void parse_args(int argc, char** argv, bool& is_lib, std::string& project_dir, std::string& project_output_dir,
                 std::string& global_name) {
@@ -62,5 +35,19 @@ void parse_args(int argc, char** argv, bool& is_lib, std::string& project_dir, s
     }
     for (; optind < argc; optind++) {
         printf("extra arguments: %s\n", argv[optind]);
+    }
+}
+
+void init(int argc, char** argv, bool& is_lib, std::string& project_dir, std::string& project_output_dir,
+          std::string& global_name) {
+    parse_args(argc, argv, is_lib, project_dir, project_output_dir, global_name);
+
+    std::string command = "rm -rf " + project_output_dir;
+    system(command.c_str());
+
+    int x = mkdir(project_output_dir.c_str(), 0700);
+    if (x != 0) {
+        std::cout << "failed to create application dir" << std::endl;
+        exit(0);
     }
 }

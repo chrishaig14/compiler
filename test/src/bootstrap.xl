@@ -1,0 +1,6 @@
+import core.core.print
+
+fun main()->Integer {
+    print("Hello world")
+    return 0
+}

@@ -3,11 +3,11 @@
 //
 
 #include "transpile.h"
+#include "Compiler.h"
 
 const int NEW_DIR_MODE = 0777;
 
-void transpile_all_modules(Package& package, const std::string& output_dir, bool is_top, const std::string& global_name,
-                           std::string static_initializations, std::string& static_cleanups) {
+void Compiler::transpile_all_modules(Package& package, const std::string& output_dir, bool is_top) {
     std::string package_header;
     std::string output_package_dir = path_join(output_dir, package.name);
     if (package.name != "") {
@@ -16,20 +16,15 @@ void transpile_all_modules(Package& package, const std::string& output_dir, bool
     package_header += "#define LIBP(a, b, c, d, e) a ## _v ## b ## _ ## c ## _ ##  d ## _ ##  e\n"
                       "#define LIB(a, b, c, d, e)  LIBP(a,b,c,d,e)\n"
                       "#define LIBENT(x) LIB(LIBNAME, LIBMAJV, LIBMINV, LIBPATV, x)\n"
-                      "#define LIBNAME " + global_name + "\n" + "#define LIBMAJV 1\n"
-                                                                "#define LIBMINV 0\n"
-                                                                "#define LIBPATV 0\n";
+                      "#define LIBNAME " + this->output_name + "\n" + "#define LIBMAJV 1\n"
+                                                                      "#define LIBMINV 0\n"
+                                                                      "#define LIBPATV 0\n";
 
     Module* main_module = nullptr;
     for (const auto& u: package.units) {
         if (u.second.type == U_TYPE::PACKAGE) {
             Package& subpackage = *u.second.package;
-            transpile_all_modules(subpackage,
-                                  output_package_dir,
-                                  false,
-                                  global_name,
-                                  static_initializations,
-                                  static_cleanups);
+            transpile_all_modules(subpackage, output_package_dir, false);
             package_header += "#include <" + subpackage.rel_path + "/__package__.h>\n";
         } else if (u.second.type == U_TYPE::MODULE) {
             Module& module = *u.second.module;
@@ -37,21 +32,11 @@ void transpile_all_modules(Package& package, const std::string& output_dir, bool
                 main_module = &module;
                 continue;
             }
-            transpile_one_module(module,
-                                 package_header,
-                                 output_package_dir,
-                                 package,
-                                 static_initializations,
-                                 static_cleanups);
+            this->transpile_one_module(module, package_header, output_package_dir, package);
         }
     }
     if (is_top && main_module != nullptr) {
-        transpile_one_module(*main_module,
-                             package_header,
-                             output_package_dir,
-                             package,
-                             static_initializations,
-                             static_cleanups);
+        this->transpile_one_module(*main_module, package_header, output_package_dir, package);
     }
     std::string output_package_header_path = path_join(output_package_dir, "__package__.h");
     std::ofstream output_package_header(output_package_header_path);
@@ -62,15 +47,15 @@ void transpile_all_modules(Package& package, const std::string& output_dir, bool
     }
 }
 
-void transpile_one_module(Module& module, std::string& package_header, const std::string& output_package_dir,
-                          Package& package, std::string static_initializations, std::string& static_cleanups) {
+void Compiler::transpile_one_module(Module& module, std::string& package_header, const std::string& output_package_dir,
+                                    Package& package) {
     if (module.name == "core") {
         return;
     }
     STranspiler t;
     t.transpile_program(module.sast);
-    static_initializations += t.static_initializations;
-    static_cleanups += t.static_cleanups;
+    this->static_initializations += t.static_initializations;
+    this->static_cleanups += t.static_cleanups;
 
     std::string module_name = module.name;
 
@@ -106,3 +91,4 @@ void transpile_one_module(Module& module, std::string& package_header, const std
     output_h_file << t.header;
     package_header += "#include <" + package.rel_path + "/" + module_name + ".h>\n";
 }
+

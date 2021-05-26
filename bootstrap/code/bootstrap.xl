@@ -1,9 +1,0 @@
-import samplelib.samplelib.add_seven
-import core.core.Integer
-import core.core.print
-
-fun main()->Integer {
-    var r = add_seven(15)
-    print(r.str())
-    return 0
-}

@@ -9,8 +9,5 @@
 #include "../scanner/Scanner.h"
 #include "../parser/Parser.h"
 
-void parse_single_module(Module& module);
-
-void parse_all_modules(Package& package);
 
 #endif //XLANG_PARSE_H

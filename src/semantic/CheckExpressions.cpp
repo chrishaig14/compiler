@@ -156,8 +156,6 @@ USemanticInfo Checker::visit_unary(UnaryOpNode& n) {
 }
 
 USemanticInfo Checker::visit_binop(BinopNode& n) {
-
-
     USemanticInfo left_info_p = this->dispatch_rvalue(n.left);
     if (left_info_p->is_error()) {
         return error_stub();
@@ -171,7 +169,6 @@ USemanticInfo Checker::visit_binop(BinopNode& n) {
         return error_stub();
     }
     SNode* right_snode = right_sinfo->snode;
-
 
     std::string fun = binoptype_to_str(n.op);
 

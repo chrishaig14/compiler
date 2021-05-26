@@ -1,0 +1,70 @@
+//
+// Created by chris on 25/5/21.
+//
+
+#ifndef XLANG_COMPILER_H
+#define XLANG_COMPILER_H
+
+
+#include <string>
+#include <fstream>
+#include "../units/Package.h"
+#include "../units/Module.h"
+#include "../utils.h"
+
+#define REQUIREMENTS_FILE "requirements.txt"
+
+void write_cmakelists(std::string cmake_output_path, const std::string& output_name, const std::string& all_files);
+std::map<std::string, std::string> read_requirements(const std::string& filepath);
+
+class Compiler {
+    std::string project_dir;
+    std::string project_output_dir;
+    std::string output_name;
+
+    std::string lib_path;
+
+    Package* root_package;
+    Package* top_package;
+
+    std::map<std::string, bool> loaded_top_units;
+
+    std::string static_initializations;
+    std::string static_cleanups;
+
+    VectorOfStrings all_modules;
+
+    bool is_lib;
+
+public:
+    Compiler(std::string project_dir, std::string project_output_dir, const std::string& output_name,
+             std::string lib_path, bool is_lib);
+    void load_requirements(const std::string& filepath);
+    void process_global_all_modules(Package& package);
+    void add_local_path_to_module(Module& module, Path path, Package* top_package);
+    void add_global_path_to_module(Module& module, Path path);
+    void add_path_to_module(Module& module, Path path, Package* top_package);
+
+    void add_path_with_alias_to_module(Module& module, const std::string& alias, Path path, Package* root_package);
+    void analyze_module(Module& module, Package* top_package);
+
+    void analyze_all_modules(Package& package, Package* top_package);
+    void parse_single_module(Module& module);
+    void parse_all_modules(Package& package);
+    void transpile_all_modules(Package& package, const std::string& output_dir, bool is_top);
+    void transpile_one_module(Module& module, std::string& package_header, const std::string& output_package_dir,
+                              Package& package, std::string static_initializations, std::string& static_cleanups);
+
+    void load_module(Package& package, const std::string& d_name);
+
+    void load_package(Package& package, int level);
+    void load_library(const std::string& name, const std::string& version);
+    void load_top_unit(const std::string& name, const std::string& version, bool is_lib);
+    void transpile_one_module(Module& module, std::string& package_header, const std::string& output_package_dir,
+                              Package& package);
+
+    void main();
+};
+
+
+#endif //XLANG_COMPILER_H
