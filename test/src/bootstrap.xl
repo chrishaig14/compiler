@@ -1,4 +1,5 @@
 import core.core.print
+import core.core.Integer
 
 fun main()->Integer {
     print("Hello world")

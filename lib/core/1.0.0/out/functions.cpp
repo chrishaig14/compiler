@@ -5,7 +5,7 @@
 #include "functions.h"
 
 DEFINE_FUNCTION(1, core_D_open)
-DEFINE_FUNCTION(1, core_D_print)
+DEFINE_FUNCTION(1, core_D_core_D_print)
 DEFINE_FUNCTION(1, core_D_exit)
 DEFINE_FUNCTION(3, core_D_range)
 DEFINE_FUNCTION(2, core_D_map)
@@ -20,7 +20,7 @@ TaggedObject* core_D_exit_f(TaggedObject* c) {
     return nullptr;
 }
 
-TaggedObject* core_D_print_f(TaggedObject* _s) {
+TaggedObject* core_D_core_D_print_f(TaggedObject* _s) {
     GC::declare(_s);
     XString* s = CAST(_s, XString);
     std::cout << s->s << std::endl;

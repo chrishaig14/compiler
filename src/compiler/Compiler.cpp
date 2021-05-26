@@ -84,7 +84,7 @@ void Compiler::main() {
 
     this->load_requirements(req_file_path);
 
-    this->load_package(*root_package, 0);
+    this->load_package(*root_package, 1);
     this->parse_all_modules(*root_package);
 
     this->process_global_all_modules(*root_package);
@@ -113,6 +113,8 @@ void Compiler::main() {
 }
 
 void Compiler::load_requirements(const std::string& filepath) {
+    std::cout << "Loading requirements from file " << filepath << std::endl;
+
     auto requirements = read_requirements(filepath);
 
     bool has_error = false;
@@ -151,6 +153,9 @@ void Compiler::load_package(Package& package, int level) {
     std::vector<std::string> modules;
     std::vector<std::string> subpackages;
 
+    std::cout << std::string(level, '-') << " Loading package " << package.name << " at path " << package.abs_path
+              << std::endl;
+
     dirent* ent = readdir(dir);
     while (ent != nullptr) {
         std::string d_name = ent->d_name;
@@ -174,10 +179,14 @@ void Compiler::load_package(Package& package, int level) {
     }
 
     for (const auto& module_name: modules) {
+        std::cout << std::string(level + 1, '-') << " Found module " << module_name << std::endl;
+
         load_module(package, module_name);
     }
 
     for (const auto& subpackage_name:subpackages) {
+        std::cout << std::string(level + 1, '-') << " Found subpackage " << subpackage_name << std::endl;
+
         std::string subpackage_abs_path = path_join(package.abs_path, subpackage_name);
         std::string subpackage_rel_path = path_join(package.rel_path, subpackage_name);
         const std::string& subpackage_header_parent_path = path_join(package.header_parent_path, subpackage_name);
@@ -195,7 +204,8 @@ void Compiler::load_package(Package& package, int level) {
 }
 
 void Compiler::load_library(const std::string& name, const std::string& version) {
-    std::string lib_rel_top_unit_path = path_join(name, version);
+    std::string lib_rel_out_path = path_join(path_join(name, version), "out");
+    std::string lib_rel_top_unit_path = path_join(path_join(name, version), "src");
     std::string abs_top_unit_path = path_join(lib_path, lib_rel_top_unit_path);
     if (loaded_top_units.count(lib_rel_top_unit_path) != 0) {
         // skip, already loaded
@@ -215,9 +225,9 @@ void Compiler::load_library(const std::string& name, const std::string& version)
                                             abs_top_unit_path,
                                             lib_rel_top_unit_path,
                                             true,
-                                            path_join(path_join(lib_rel_top_unit_path, "out"), "__package__.h"),
-                                            path_join(lib_rel_top_unit_path, "out"));
-    load_package(*library_top_package, 0);
+                                            path_join(lib_rel_out_path, "__package__.h"),
+                                            lib_rel_out_path);
+    load_package(*library_top_package, 1);
     parse_all_modules(*library_top_package);
     process_global_all_modules(*library_top_package);
     top_package->units[name] = Unit{.type=U_TYPE::PACKAGE, .package=library_top_package};
@@ -250,7 +260,7 @@ void Compiler::load_top_unit(const std::string& name, const std::string& version
                                          is_lib,
                                          path_join(path_join(lib_rel_top_unit_path, "out"), "__package__.h"),
                                          path_join(lib_rel_top_unit_path, "out"));
-    load_package(*top_unit_package, 0);
+    load_package(*top_unit_package, 1);
     parse_all_modules(*top_unit_package);
     process_global_all_modules(*top_unit_package);
     top_package->units[name] = Unit{.type=U_TYPE::PACKAGE, .package=top_unit_package};
