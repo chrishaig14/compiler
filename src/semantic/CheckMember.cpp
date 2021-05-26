@@ -23,7 +23,7 @@ USemanticInfo Checker::visit_member(MemberNode& n) {
         case E_TYPE::PACKAGE:
             return this->package_member(*parent_entity.package, n.s_child, n);
         case E_TYPE::MODULE:
-            return this->module_member(parent_entity.module, n.s_child, n);
+            return this->module_member(*parent_entity.module, n.s_child, n);
         case E_TYPE::ENUM:
             return this->enum_member(parent_entity.enumm, n.s_child, n);
         default:
@@ -32,9 +32,9 @@ USemanticInfo Checker::visit_member(MemberNode& n) {
     return error_stub();
 }
 
-USemanticInfo Checker::module_member(Module* mod, const std::string& child, MemberNode& n) {
-    if (mod->flirpins.count(child) == 0) {
-        this->error_reporter.module_no_member(mod,
+USemanticInfo Checker::module_member(Module& mod, const std::string& child, MemberNode& n) {
+    if (mod.flirpins.count(child) == 0) {
+        this->error_reporter.module_no_member(&mod,
                                               child,
                                               n.dot_pos,
                                               *n.parent,
@@ -42,7 +42,7 @@ USemanticInfo Checker::module_member(Module* mod, const std::string& child, Memb
                                               n.child_token.end_pos);
         return error_stub();
     }
-    Flirpin flirpin = mod->flirpins[child];
+    Flirpin flirpin = mod.flirpins[child];
     SemanticInfo info;
     info.entity = map_flirpin_to_entity(flirpin);
     if (flirpin.type == F_TYPE::CONST_FUNCTION) {
