@@ -28,23 +28,6 @@ void write_cmakelists(const std::string& cmake_output_path, const std::string& o
     cmakelists_file << cmakelists;
 }
 
-void write_top_cmakelists(char* const* argv) {
-    std::string top_level_cmake = "cmake_minimum_required(VERSION 3.16)\n"
-                                  "project(xlang)\n"
-                                  "set(CMAKE_CXX_STANDARD 14)\n"
-                                  "set(CMAKE_CXX_FLAGS \"${CMAKE_CXX_FLAGS} -Werror -O0 -fverbose-asm -Winline\")\n"
-                                  "include_directories(/home/chris/CLionProjects/compiler/runtime)\n"
-                                  "link_directories(/home/chris/CLionProjects/compiler/runtime/build)\n"
-                                  "add_subdirectory(runtime)\n"
-                                  "add_subdirectory(application)\n"
-                                  "target_link_libraries(result core)\n";
-
-    std::string top_cmake_output_path = std::string(argv[2]) + "/CMakeLists.txt";
-    std::ofstream top_cmakelists_file(top_cmake_output_path);
-    top_cmakelists_file << top_level_cmake;
-}
-
-
 std::map<std::string, std::string> read_requirements(const std::string& filepath) {
     std::string line;
     std::map<std::string, std::string> requirements;
@@ -73,8 +56,8 @@ std::map<std::string, std::string> read_requirements(const std::string& filepath
     return requirements;
 }
 
-Compiler::Compiler(std::string project_dir, std::string project_output_dir, const std::string& output_name,
-                   std::string lib_path, bool is_lib, std::string version)
+Compiler::Compiler(const std::string& project_dir, const std::string& project_output_dir, const std::string& output_name,
+                   const std::string& lib_path, bool is_lib, const std::string& version)
         : project_dir(project_dir), project_output_dir(project_output_dir), output_name(output_name),
           lib_path(lib_path), is_lib(is_lib), version(version) {
     this->root_package = nullptr;
