@@ -1,7 +1,9 @@
 import core.core.print
 import core.core.Integer
-
+import samplelib.samplelib.add_seven
 fun main()->Integer {
+    var x = add_seven(123)
+    print(x.str())
     print("Hello world")
     return 0
 }

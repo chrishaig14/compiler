@@ -6,16 +6,22 @@
 #include "Compiler.h"
 #include "../logging/logging.h"
 
-void write_cmakelists(std::string cmake_output_path, const std::string& output_name, const std::string& all_files) {
+void write_cmakelists(std::string cmake_output_path, const std::string& output_name, const std::string& all_files,
+                      const std::string& all_libraries, bool is_lib) {
     std::string cmakelists = "cmake_minimum_required(VERSION 3.16)\n"
                              "project(xlang)\n"
                              "set(CMAKE_CXX_STANDARD 14)\n"
                              "include_directories(.)\n"
                              "set(CMAKE_CXX_FLAGS \"${CMAKE_CXX_FLAGS} -Werror -O0 -fverbose-asm -Winline\")\n";
-    // cmakelists += "add_executable(result " + all_files + ")\n";
+
     cmakelists += "include_directories(/home/chris/CLionProjects/compiler/lib)\n";
-    cmakelists += "add_library(" + output_name + " " + all_files + ")\n";
-    cmakelists += "target_link_libraries(" + output_name + " core)\n";
+    if (is_lib) {
+        cmakelists += "add_library(" + output_name + " " + all_files + ")\n";
+    } else {
+        cmakelists += "add_executable(" + output_name + " " + all_files + ")\n";
+    }
+    cmakelists += "target_link_directories(" + output_name + " PUBLIC /home/chris/CLionProjects/compiler/lib/build)\n";
+    cmakelists += "target_link_libraries(" + output_name + " " + all_libraries + ")\n";
 
 
     std::ofstream cmakelists_file(cmake_output_path);
@@ -68,21 +74,21 @@ std::map<std::string, std::string> read_requirements(const std::string& filepath
 }
 
 Compiler::Compiler(std::string project_dir, std::string project_output_dir, const std::string& output_name,
-                   std::string lib_path, bool is_lib)
+                   std::string lib_path, bool is_lib, std::string version)
         : project_dir(project_dir), project_output_dir(project_output_dir), output_name(output_name),
-          lib_path(lib_path), is_lib(is_lib) {
+          lib_path(lib_path), is_lib(is_lib), version(version) {
     this->root_package = nullptr;
     this->top_package = nullptr;
 }
 
 void Compiler::main() {
-    this->root_package = new Package(Path("root"), project_dir, "", false, "", "");
+    this->root_package = new Package(Path(this->output_name), project_dir, "", false, "", "");
 
     std::string req_file_path = path_join(this->project_dir, REQUIREMENTS_FILE);
     this->top_package = new Package(Path("global"), "", "", false, "", "");
-    this->top_package->units["root"] = Unit{.type=U_TYPE::PACKAGE, .package=root_package};
+    this->top_package->units[this->output_name] = Unit{.type=U_TYPE::PACKAGE, .package=root_package};
 
-    this->load_requirements(req_file_path);
+    VectorOfStrings requirements = this->load_requirements(req_file_path);
 
     this->load_package(*root_package, 1);
     this->parse_all_modules(*root_package);
@@ -102,29 +108,40 @@ void Compiler::main() {
         if (f == "core.xl") {
             continue;
         }
-        f = path_join("root", f.substr(0, f.size() - 3) + ".cpp");
+        f = path_join(this->output_name, f.substr(0, f.size() - 3) + ".cpp");
         all_files += f + " ";
     }
 
     std::string cmake_output_path = project_output_dir + "/CMakeLists.txt";
-    write_cmakelists(cmake_output_path, this->output_name, all_files);
 
-
+    std::string all_libraries;
+    for (auto req: requirements) {
+        all_libraries += req + " ";
+    }
+    std::string final_output_name = this->output_name;
+    if (is_lib) {
+        final_output_name += "-" + this->version;
+    }
+    write_cmakelists(cmake_output_path, final_output_name, all_files, all_libraries, is_lib);
 }
 
-void Compiler::load_requirements(const std::string& filepath) {
+VectorOfStrings Compiler::load_requirements(const std::string& filepath) {
     std::cout << "Loading requirements from file " << filepath << std::endl;
 
     auto requirements = read_requirements(filepath);
 
     bool has_error = false;
+
+    VectorOfStrings reqs;
     for (const auto& r: requirements) {
         load_library(r.first, r.second);
+        reqs.push_back(r.first + "-" + r.second);
     }
     if (has_error) {
         std::cerr << "Error loading requirements" << std::endl;
         exit(1);
     }
+    return reqs;
 }
 
 void Compiler::load_module(Package& package, const std::string& d_name) {
@@ -204,7 +221,7 @@ void Compiler::load_package(Package& package, int level) {
 }
 
 void Compiler::load_library(const std::string& name, const std::string& version) {
-    std::string lib_rel_out_path = path_join(path_join(name, version), "out");
+    std::string lib_rel_out_path = path_join(path_join(path_join(name, version), "out"), name);
     std::string lib_rel_top_unit_path = path_join(path_join(name, version), "src");
     std::string abs_top_unit_path = path_join(lib_path, lib_rel_top_unit_path);
     if (loaded_top_units.count(lib_rel_top_unit_path) != 0) {
@@ -228,6 +245,7 @@ void Compiler::load_library(const std::string& name, const std::string& version)
                                             path_join(lib_rel_out_path, "__package__.h"),
                                             lib_rel_out_path);
     load_package(*library_top_package, 1);
+    this->top_package_name = library_top_package->name;
     parse_all_modules(*library_top_package);
     process_global_all_modules(*library_top_package);
     top_package->units[name] = Unit{.type=U_TYPE::PACKAGE, .package=library_top_package};
@@ -258,9 +276,11 @@ void Compiler::load_top_unit(const std::string& name, const std::string& version
                                          abs_top_unit_path,
                                          lib_rel_top_unit_path,
                                          is_lib,
-                                         path_join(path_join(lib_rel_top_unit_path, "out"), "__package__.h"),
-                                         path_join(lib_rel_top_unit_path, "out"));
+                                         path_join(path_join(path_join(lib_rel_top_unit_path, "out"), name),
+                                                   "__package__.h"),
+                                         path_join(path_join(lib_rel_top_unit_path, "out"), name));
     load_package(*top_unit_package, 1);
+    this->top_package_name = top_unit_package->name;
     parse_all_modules(*top_unit_package);
     process_global_all_modules(*top_unit_package);
     top_package->units[name] = Unit{.type=U_TYPE::PACKAGE, .package=top_unit_package};

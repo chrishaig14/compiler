@@ -888,7 +888,7 @@ ImportNode* Parser::parse_import() {
     if (this->match(TokType::DOT)) {
         // it's a local import
         this->next();
-        path.push_back("root");
+        path.push_back(this->top_package_name);
     }
     Token path_part;
     while (true) {

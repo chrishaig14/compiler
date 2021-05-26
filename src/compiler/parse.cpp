@@ -11,6 +11,7 @@ void Compiler::parse_single_module(Module& module) {
     scanner.load_file(__file__);
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser(__file__, scanner.code_lines, tokens);
+    parser.top_package_name = this->top_package_name;
     module.code_lines = scanner.code_lines;
     BlockNode* ast;
     try {

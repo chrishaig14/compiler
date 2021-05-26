@@ -122,6 +122,7 @@ public:
     Node* parse_match_statement();
     Node* parse_alias();
     Node* parse_enum_definition();
+    std::string top_package_name;
 };
 
 

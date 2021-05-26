@@ -14,7 +14,8 @@
 
 #define REQUIREMENTS_FILE "requirements.txt"
 
-void write_cmakelists(std::string cmake_output_path, const std::string& output_name, const std::string& all_files);
+void write_cmakelists(std::string cmake_output_path, const std::string& output_name, const std::string& all_files,
+                      const std::string& all_libraries, bool is_lib);
 std::map<std::string, std::string> read_requirements(const std::string& filepath);
 
 class Compiler {
@@ -35,11 +36,12 @@ class Compiler {
     VectorOfStrings all_modules;
 
     bool is_lib;
+    std::string version;
 
 public:
     Compiler(std::string project_dir, std::string project_output_dir, const std::string& output_name,
-             std::string lib_path, bool is_lib);
-    void load_requirements(const std::string& filepath);
+             std::string lib_path, bool is_lib, std::string version);
+    VectorOfStrings load_requirements(const std::string& filepath);
     void process_global_all_modules(Package& package);
     void add_local_path_to_module(Module& module, Path path, Package* top_package);
     void add_global_path_to_module(Module& module, Path path);
@@ -64,6 +66,7 @@ public:
                               Package& package);
 
     void main();
+    std::string top_package_name;
 };
 
 
