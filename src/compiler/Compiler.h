@@ -14,7 +14,7 @@
 
 #define REQUIREMENTS_FILE "requirements.txt"
 
-void write_cmakelists(std::string cmake_output_path, const std::string& output_name, const std::string& all_files,
+void write_cmakelists(const std::string& cmake_output_path, const std::string& output_name, const std::string& all_files,
                       const std::string& all_libraries, bool is_lib);
 std::map<std::string, std::string> read_requirements(const std::string& filepath);
 

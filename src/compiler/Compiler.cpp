@@ -6,7 +6,7 @@
 #include "Compiler.h"
 #include "../logging/logging.h"
 
-void write_cmakelists(std::string cmake_output_path, const std::string& output_name, const std::string& all_files,
+void write_cmakelists(const std::string& cmake_output_path, const std::string& output_name, const std::string& all_files,
                       const std::string& all_libraries, bool is_lib) {
     std::string cmakelists = "cmake_minimum_required(VERSION 3.16)\n"
                              "project(xlang)\n"
@@ -115,7 +115,7 @@ void Compiler::main() {
     std::string cmake_output_path = project_output_dir + "/CMakeLists.txt";
 
     std::string all_libraries;
-    for (auto req: requirements) {
+    for (const auto& req: requirements) {
         all_libraries += req + " ";
     }
     std::string final_output_name = this->output_name;
