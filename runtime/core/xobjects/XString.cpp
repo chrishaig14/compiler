@@ -55,25 +55,25 @@ TaggedObject* XString::__eq__(TaggedObject* other) {
     return f_String_eq(TAG(this), other);
 }
 
-TaggedObject* core_D_String_D_len_f(TaggedObject* a) {
+TaggedObject* core_D_core_D_String_D_len_f(TaggedObject* a) {
     return MAKE_INT(CAST(a, XString)->s.size());
 }
 
-TaggedObject* core_D_String_D___eq___f(TaggedObject* a, TaggedObject* b) {
+TaggedObject* core_D_core_D_String_D___eq___f(TaggedObject* a, TaggedObject* b) {
     return MAKE_BOOL(CAST(a, XString)->s == CAST(b, XString)->s);
 }
 
-DEFINE_FUNCTION(2, core_D_String_D___add__)
-DEFINE_FUNCTION(1, core_D_String_D_len)
+DEFINE_FUNCTION(2, core_D_core_D_String_D___add__)
+DEFINE_FUNCTION(1, core_D_core_D_String_D_len)
 
-DEFINE_FUNCTION(2, core_D_String_D___eq__)
+DEFINE_FUNCTION(2, core_D_core_D_String_D___eq__)
 
-TaggedObject* core_D_String_D___add___f(TaggedObject* a, TaggedObject* b) {
+TaggedObject* core_D_core_D_String_D___add___f(TaggedObject* a, TaggedObject* b) {
     return MAKE_STRING(CAST(a, XString)->s + CAST(b, XString)->s);
 }
-DEFINE_FUNCTION(2, core_D_String_D___get_item__)
+DEFINE_FUNCTION(2, core_D_core_D_String_D___get_item__)
 
-TaggedObject* core_D_String_D___get_item___f(TaggedObject* a, TaggedObject* b) {
+TaggedObject* core_D_core_D_String_D___get_item___f(TaggedObject* a, TaggedObject* b) {
     long index = GET_INT(b);
     unsigned long str_len = CAST(a, XString)->s.size();
     if (index >= str_len) {
