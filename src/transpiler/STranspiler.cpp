@@ -31,8 +31,7 @@ std::string STranspiler::transpile_return(ReturnSNode* node) {
 
 std::string path_to_id(std::string p) {
     std::string out;
-    for (size_t i = 0; i < p.size(); i++) {
-        char c = p[i];
+    for (char c : p) {
         if (c == '.') {
             out += "_D_";
         } else {
@@ -57,13 +56,13 @@ std::string STranspiler::transpile_id(IdSNode* node) {
 void STranspiler::transpile_function(FunctionSNode* node) {
     std::string parameters;
 
-    for (size_t i = 0; i < node->params.size(); i++) {
-        if (node->params[i] == "this") {
-            node->params[i] = "this_obj";
+    for (auto & param : node->params) {
+        if (param == "this") {
+            param = "this_obj";
         }
     }
 
-    for (auto pn: node->params) {
+    for (const auto& pn: node->params) {
         std::string parameter = TOBJECT + SPACE + pn;
         parameters += parameter + COMMA + SPACE;
     }
@@ -75,7 +74,7 @@ void STranspiler::transpile_function(FunctionSNode* node) {
     std::string signature = TOBJECT + SPACE + raw_function_identifier + LPAREN + parameters + RPAREN;
     this->header += signature + SEMIC + NEWLINE;
     std::string f_source = signature + LCURLY + NEWLINE;
-    for (auto pn: node->params) {
+    for (const auto& pn: node->params) {
         std::string parameter = GCDECLARE + LPAREN + pn + RPAREN + SEMIC + NEWLINE;
         f_source += parameter;
     }
@@ -98,7 +97,7 @@ void STranspiler::transpile_function(FunctionSNode* node) {
 
 std::string STranspiler::transpile_block(BlockSNode* node) {
     std::string out;
-    for (auto n: node->nodes) {
+    for (auto *n: node->nodes) {
         out += this->dispatch(n);
         if (n->type == SNodeType::CALL) {
             out += SEMIC + NEWLINE;
@@ -108,7 +107,7 @@ std::string STranspiler::transpile_block(BlockSNode* node) {
 }
 
 void STranspiler::transpile_program(BlockSNode* node) {
-    for (auto n: node->nodes) {
+    for (auto *n: node->nodes) {
         this->dispatch_top(n);
     }
 }
@@ -120,13 +119,13 @@ std::string STranspiler::transpile_integer(IntegerSNode* node) {
 std::string STranspiler::transpile_call(CallSNode* node) {
     std::string out;
     std::string arguments;
-    for (auto arg: node->arguments) {
+    for (auto *arg: node->arguments) {
         std::string arg_s = this->dispatch(arg);
         arguments += arg_s + COMMA + SPACE;
     }
     arguments = arguments.substr(0, arguments.size() - 2);
     out += "CALL" + std::to_string(node->arguments.size()) + "(" + this->dispatch(node->function);
-    if (arguments.size() != 0) {
+    if (!arguments.empty()) {
         out += +", " + arguments;
     }
     out += ")";
@@ -150,17 +149,17 @@ void STranspiler::transpile_class(ClassSNode* node) {
     std::string class_name = path_to_id(node->identifier);
     out += CLASS + SPACE + class_name + SPACE + ": public XObject {\n";
     out += "public: \n";
-    for (auto m: node->members) {
+    for (const auto& m: node->members) {
         out += TOBJECT + SPACE + m + SEMIC + NEWLINE;
     }
     out += class_name + LPAREN;
-    for (auto m: node->members) {
+    for (const auto& m: node->members) {
         out += TOBJECT + SPACE + m + COMMA + SPACE;
     }
     out = out.substr(0, out.size() - 2);
     out += RPAREN + SPACE + ":" + SPACE + "XObject" + LPAREN + QUOTE + class_name + QUOTE + RPAREN + SPACE + LCURLY +
            NEWLINE;
-    for (auto m: node->members) {
+    for (const auto& m: node->members) {
         out += "this->" + m + " = " + m + SEMIC + NEWLINE;
     }
     out += RCURLY + NEWLINE;
@@ -175,14 +174,14 @@ std::string STranspiler::transpile_new(NewObjectSNode* node) {
     if (class_id == "core_D_List") {
         out += "-------{";
     }
-    for (auto m: node->args) {
+    for (auto *m: node->args) {
         if (m != nullptr) {
             out += this->dispatch(m) + COMMA + SPACE;
         } else {
             out += "nullptr" + COMMA + SPACE;
         }
     }
-    if (node->args.size() != 0) {
+    if (!node->args.empty()) {
         out = out.substr(0, out.size() - 2);
     }
     if (class_id == "core_D_List") {
@@ -211,10 +210,10 @@ std::string STranspiler::transpile_while(WhileSNode* sn) {
 std::string STranspiler::transpile_list(ListSNode* ln) {
     std::string out;
     out = "NEW(XList,{";
-    for (auto e: ln->elements) {
+    for (auto *e: ln->elements) {
         out += this->dispatch(e) + ", ";
     }
-    if (ln->elements.size() != 0) {
+    if (!ln->elements.empty()) {
         out = out.substr(0, out.size() - 2);
     }
     out += "})";
@@ -282,13 +281,13 @@ void STranspiler::transpile_enum(EnumSNode* node) {
     std::string enum_name = path_to_id(node->id);
     // out += "enum class" + SPACE + enum_name + SPACE + " {\n";
     // out += "";
-    for (auto m: node->values) {
+    for (const auto& m: node->values) {
         out += "extern" + SPACE + TOBJECT + enum_name + "_" + m + SEMIC + NEWLINE;
     }
     this->header += out;
     int k = 0;
     out = "";
-    for (auto m: node->values) {
+    for (const auto& m: node->values) {
         out += TOBJECT + enum_name + "_" + m + ASSIGN + "MAKE_INT(" + std::to_string(k) + ")" + SEMIC + NEWLINE;
         k++;
     }
