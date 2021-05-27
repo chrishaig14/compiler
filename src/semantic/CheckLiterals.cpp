@@ -9,7 +9,7 @@
 USemanticInfo Checker::visit_boolean(BooleanNode& node) {
     SemanticInfo info;
     auto* ot = new T_BOOL;
-    ot->actual_base_path = Path("core.Boolean");
+    ot->actual_base_path = Path("core.core.Boolean");
     info.entity = Entity(new Value(ot));
     this->fill_value(info.entity.value);
     info.snode = new BoolSNode(node.value);
@@ -277,7 +277,7 @@ USemanticInfo Checker::visit_list(ListNode& node) {
     return_info.snode = new ListSNode(list_elements);
     auto* otype = new ObjectType("List", {element_type->clone()});
     return_info.entity = Entity(new Value(otype));
-    otype->actual_base_path = Path("core.List");
+    otype->actual_base_path = Path("core.core.List");
     this->fill_value(return_info.entity.value);
     return std::make_unique<SemanticInfo>(return_info);
 }

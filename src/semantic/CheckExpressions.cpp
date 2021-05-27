@@ -96,7 +96,7 @@ USemanticInfo Checker::visit_boolop(BoolOpNode& n) {
             this->error_reporter.fail("Error: enum type doesnt support this operator");
         }
         auto* ot = new ObjectType("Boolean", {});
-        ot->actual_base_path = Path("core.Boolean");
+        ot->actual_base_path = Path("core.core.Boolean");
         TypeNode* rettype = ot;
 
         info.entity = Entity(new Value(rettype));

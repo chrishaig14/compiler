@@ -177,6 +177,7 @@ Class* Checker::instantiate_generic(Class* generic, const ObjectType& instance) 
     for (auto *f: generic->member_types) {
         TypeNode& concrete_type = *make_type(*f, replacements);
         concrete_field_types.push_back(&concrete_type);
+        this->module->fill_actual(&concrete_type);
     }
 
     std::unordered_map<std::string, ConstFunction*> concrete_methods;
