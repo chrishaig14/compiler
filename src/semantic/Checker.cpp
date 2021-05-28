@@ -191,9 +191,21 @@ Class* Checker::instantiate_generic(Class* generic, const ObjectType& instance) 
         concrete_methods[m.first] = cf;
     }
 
+    std::unordered_map<std::string, ConstFunction*> concrete_static_methods;
+    for (const auto& m: generic->static_methods) {
+        TypeNode* t = (m.second)->ft;
+        TypeNode& concrete_type = *make_type(*t, replacements);
+        this->module->fill_actual(&concrete_type);
+        auto* cf = new ConstFunction();
+        cf->path = m.second->path;
+        cf->ft = (FunctionType*) concrete_type.clone();
+        concrete_static_methods[m.first] = cf;
+    }
+
     auto* concrete = new Class();
     concrete->class_name = generic->class_name;
     concrete->methods = concrete_methods;
+    concrete->static_methods = concrete_static_methods;
     concrete->member_names = generic->member_names;
     concrete->member_types = concrete_field_types;
     concrete->path = generic->path;
