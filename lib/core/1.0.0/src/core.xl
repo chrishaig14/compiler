@@ -102,6 +102,7 @@ fun range(start: Integer, step: Integer, end: Integer)->List[Integer]{}
 
 class Dict[k,v] {
     fun has(key: k) -> Boolean {}
+    fun keys() -> List[k] {}
     fun __get_item__(key: k) -> v {}
     fun __set_item__(key: k) -> v {}
 }
