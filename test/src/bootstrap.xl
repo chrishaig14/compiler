@@ -1,9 +1,36 @@
 import core.core.print
 import core.core.Integer
+import core.core.List
+import core.core.Boolean
+import core.core.Dict
+import core.core.String
+import core.core.range
 import samplelib.samplelib.add_seven
+
+fun quicksort(l: List[Integer]) -> List[Integer] {
+    if l.len() == 0 {
+        return l
+    }
+    var pivot = l[0]
+    print("pivot is " + pivot.str())
+    var smaller = []::Integer
+    var greater = []::Integer
+    for i @ range(1, 1, l.len()) {
+        var x = l[i]
+        if x < pivot {
+            smaller.push(l[i])
+        } else {
+            greater.push(l[i])
+        }
+    }
+    return quicksort(smaller) + [pivot] + quicksort(greater)
+}
+
 fun main()->Integer {
-    var x = add_seven(123)
-    print(x.str())
-    print("Hello world")
+    var l = [15, 28, 62, 25, 55, 73, 100, 82, 52, 30, 90, 9, 63, 99, 97, 33, 6, 10, 1, 8]
+    var r = quicksort(l)
+    for x @ r {
+        print(x.str())
+    }
     return 0
 }
