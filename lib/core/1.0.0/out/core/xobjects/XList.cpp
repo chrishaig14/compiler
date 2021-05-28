@@ -5,11 +5,13 @@
 #include "XList.h"
 #include "../basics.h"
 
-DEFINE_FUNCTION(1, core_D_List_D_len)
-DEFINE_FUNCTION(2, core_D_List_D_has)
-DEFINE_FUNCTION(2, core_D_List_D_push)
-DEFINE_FUNCTION(2, core_D_List_D___get_item__)
-DEFINE_FUNCTION(3, core_D_List_D___set_item__)
+DEFINE_FUNCTION(1, core_D_core_D_List_D_len)
+DEFINE_FUNCTION(2, core_D_core_D_List_D_has)
+DEFINE_FUNCTION(2, core_D_core_D_List_D_push)
+DEFINE_FUNCTION(2, core_D_core_D_List_D___get_item__)
+DEFINE_FUNCTION(3, core_D_core_D_List_D___set_item__)
+
+DEFINE_FUNCTION(2, core_D_core_D_List_D___add__)
 
 TaggedObject* m_core_c_List_f_add_f(TaggedObject* _a, TaggedObject* _b) {
     GC::declare(_a);
@@ -74,11 +76,11 @@ XList::~XList() {
     std::cout << "delete list of length " << this->l->size() << std::endl;
 }
 
-TaggedObject* core_D_List_D_len_f(TaggedObject* a) {
+TaggedObject* core_D_core_D_List_D_len_f(TaggedObject* a) {
     return MAKE_INT(CAST(a, XList)->lv.size());
 }
 
-TaggedObject* core_D_List_D___get_item___f(TaggedObject* a, TaggedObject* b) {
+TaggedObject* core_D_core_D_List_D___get_item___f(TaggedObject* a, TaggedObject* b) {
     long idx = GET_INT(b);
     unsigned long list_len = CAST(a, XList)->lv.size();
     if (idx >= list_len) {
@@ -88,7 +90,7 @@ TaggedObject* core_D_List_D___get_item___f(TaggedObject* a, TaggedObject* b) {
     return CAST(a, XList)->lv[idx];
 }
 
-TaggedObject* core_D_List_D___set_item___f(TaggedObject* a, TaggedObject* b, TaggedObject* c) {
+TaggedObject* core_D_core_D_List_D___set_item___f(TaggedObject* a, TaggedObject* b, TaggedObject* c) {
     long idx = GET_INT(b);
     unsigned long list_len = CAST(a, XList)->lv.size();
     if (idx >= list_len) {
@@ -99,7 +101,21 @@ TaggedObject* core_D_List_D___set_item___f(TaggedObject* a, TaggedObject* b, Tag
     return nullptr;
 }
 
-TaggedObject* core_D_List_D_has_f(TaggedObject* a, TaggedObject* b) {
+TaggedObject* core_D_core_D_List_D___add___f(TaggedObject* a, TaggedObject* b) {
+    TaggedObject* res = NEW(XList, CAST(a, XList)->l->size() + CAST(b, XList)->l->size());
+    int i = 0;
+    for (auto xa: CAST(a, XList)->lv) {
+        CAST(res, XList)->lv[i] = xa;
+        i++;
+    }
+    for (auto xb: CAST(b, XList)->lv) {
+        CAST(res, XList)->lv[i] = xb;
+        i++;
+    }
+    return res;
+}
+
+TaggedObject* core_D_core_D_List_D_has_f(TaggedObject* a, TaggedObject* b) {
     GC::declare(b);
     for (auto e: CAST(a, XList)->lv) {
         if (has_tag(e, OBJECT_TAG)) {
@@ -116,7 +132,7 @@ TaggedObject* core_D_List_D_has_f(TaggedObject* a, TaggedObject* b) {
     return FALSE;
 }
 
-TaggedObject* core_D_List_D_push_f(TaggedObject* a, TaggedObject* b) {
+TaggedObject* core_D_core_D_List_D_push_f(TaggedObject* a, TaggedObject* b) {
     CAST(a, XList)->lv.push_back(b);
     GC::declare(b);
     return nullptr;
