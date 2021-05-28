@@ -172,9 +172,9 @@ USemanticInfo Checker::visit_binop(BinopNode& n) {
 
     std::string fun = binoptype_to_str(n.op);
 
-    Entity entity(new Value(left_info_p->entity.value->type->object().clone()));
-    this->fill_value(entity.value);
-    Class* cls = entity.value->clazz;
+    // Entity entity(new Value(left_info_p->entity.value->type->object().clone()));
+    // this->fill_value(entity.value);
+    Class* cls = left_info_p->entity.value->clazz;
     assert(cls != nullptr);
     auto operator_fun_it = cls->static_methods.find(fun);
     if (operator_fun_it == cls->static_methods.end()) {

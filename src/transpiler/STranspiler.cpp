@@ -171,7 +171,7 @@ std::string STranspiler::transpile_new(NewObjectSNode* node) {
     std::string out;
     std::string class_id = path_to_id(node->class_name);
     out += "NEW(" + class_id + COMMA + SPACE;
-    if (class_id == "core_D_List") {
+    if (class_id == "core_D_core_D_List") {
         out += "-------{";
     }
     for (auto *m: node->args) {
@@ -184,7 +184,7 @@ std::string STranspiler::transpile_new(NewObjectSNode* node) {
     if (!node->args.empty()) {
         out = out.substr(0, out.size() - 2);
     }
-    if (class_id == "core_D_List") {
+    if (class_id == "core_D_core_D_List") {
         out += "}";
     }
     out += RPAREN;

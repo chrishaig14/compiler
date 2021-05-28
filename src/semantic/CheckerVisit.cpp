@@ -15,7 +15,7 @@ SNode* Checker::make_for_snode(ForNode& node, USemanticInfo& binfo, USemanticInf
 
     bbn->nodes.push_back(lidx_decl);
 
-    auto* list_len_fn = new IdSNode("core.List.len");
+    auto* list_len_fn = new IdSNode("core.core.List.len");
     auto* list_sn = new IdSNode(this->loop_list_var_id);
     auto* call_list_len_sn = new CallSNode(list_len_fn, {list_sn});
     auto* lensn = new DeclarationSNode(this->loop_list_len_var_id, call_list_len_sn);
@@ -32,7 +32,7 @@ SNode* Checker::make_for_snode(ForNode& node, USemanticInfo& binfo, USemanticInf
 
     auto* bn = (BlockSNode*) (binfo->snode);
 
-    auto* list_subscript_n = new CallSNode(new IdSNode("core.List.__get_item__"),
+    auto* list_subscript_n = new CallSNode(new IdSNode("core.core.List.__get_item__"),
                                                 {new IdSNode(this->loop_list_var_id),
                                                  new IdSNode(this->loop_index_var_id)});
 

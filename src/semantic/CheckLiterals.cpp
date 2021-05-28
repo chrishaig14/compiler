@@ -71,7 +71,7 @@ USemanticInfo Checker::visit_emptylist(EmptyListNode& node) {
     auto* otype = new ObjectType("List", {node.type});
     auto* ov = new Value(otype);
     info.entity = Entity(ov);
-    otype->actual_base_path = Path("core.List");
+    otype->actual_base_path = Path("core.core.List");
     this->fill_value(ov);
     auto* lsn = new ListSNode({});
     info.snode = lsn;
