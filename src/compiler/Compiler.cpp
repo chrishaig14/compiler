@@ -12,7 +12,7 @@ void write_cmakelists(const std::string& cmake_output_path, const std::string& o
                              "project(xlang)\n"
                              "set(CMAKE_CXX_STANDARD 14)\n"
                              "include_directories(.)\n"
-                             "set(CMAKE_CXX_FLAGS \"${CMAKE_CXX_FLAGS} -Werror -O0 -fverbose-asm -Winline\")\n";
+                             "set(CMAKE_CXX_FLAGS \"${CMAKE_CXX_FLAGS} -O0 -fverbose-asm -Winline\")\n";
 
     cmakelists += "include_directories(/home/chris/CLionProjects/compiler/lib)\n";
     if (is_lib) {
