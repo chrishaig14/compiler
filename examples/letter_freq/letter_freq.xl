@@ -1,0 +1,30 @@
+import core.core.print
+import core.core.Integer
+import core.core.List
+import core.core.Boolean
+import core.core.Dict
+import core.core.String
+import core.core.range
+
+fun count_letter_freq(s: String) -> Dict[String, Integer] {
+    var d = {}::[String, Integer]
+    for i @ range(0,1,s.len()) {
+        var c = s[i]
+        if d.has(c) {
+            d[c] = d[c] + 1
+        } else {
+            d[c] = 1
+        }
+    }
+    return d
+}
+
+fun main()->Integer {
+    var s = "The quick brown fox jumps over the lazy dog"
+    var freqs = count_letter_freq(s)
+    var k = freqs.keys()
+    for c @ k {
+        print("'" + c + "' -> " + freqs[c].str())
+    }
+    return 0
+}
