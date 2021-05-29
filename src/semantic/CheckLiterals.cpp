@@ -215,8 +215,15 @@ USemanticInfo Checker::visit_dict(DictNode& node) {
 
 USemanticInfo Checker::visit_emptydict(EmptyDictNode& node) {
     SemanticInfo info;
-    auto* ov = new Value(new ObjectType("Dict", {node.key_type, node.value_type}));
+    auto* ov = new Value(new ObjectType("Dict", {node.key_type->clone(), node.value_type->clone()}));
+    this->module->fill_actual(ov->type);
+    this->fill_value(ov);
+    assert(ov->clazz != nullptr);
     info.entity = Entity(ov);
+    auto* nsn = new DictSNode({});
+    info.snode = nsn;
+    return std::make_unique<SemanticInfo>(info);
+
     return std::make_unique<SemanticInfo>(info);
 }
 
