@@ -5,17 +5,14 @@
 #include "CheckerUtils.h"
 
 std::string binoptype_to_str(OpType op) {
-    std::string fun;
-    if (op == OpType::ADD) {
-        fun = "add";
-    } else if (op == OpType::SUB) {
-        fun = "sub";
-    } else if (op == OpType::MUL) {
-        fun = "mul";
-    } else if (op == OpType::DIV) {
-        fun = "div";
-    }
-    return "__" + fun + "__";
+    std::map<OpType, std::string> funs;
+    funs[OpType::ADD] = "add";
+    funs[OpType::SUB] = "sub";
+    funs[OpType::MUL] = "mul";
+    funs[OpType::DIV] = "div";
+    funs[OpType::MOD] = "mod";
+
+    return "__" + funs.at(op) + "__";
 }
 
 
@@ -68,9 +65,6 @@ TypeNode* get_entity_type(Entity e) {
 }
 
 
-
-
-
 void mangle_generic_names(TypeNode* t) {
     if (t->kind == Kind::OBJECT) {
         return mangle_generic_names(&t->object());
@@ -79,7 +73,7 @@ void mangle_generic_names(TypeNode* t) {
 }
 
 void mangle_generic_names(FunctionType* t) {
-    for (auto *pt: t->param_types) {
+    for (auto* pt: t->param_types) {
         mangle_generic_names(pt);
     }
     mangle_generic_names(t->return_type);
@@ -89,14 +83,11 @@ void mangle_generic_names(ObjectType* t) {
     if (t->is_generic_param) {
         t->id = t->id + "0";
     } else {
-        for (auto *tp: t->type_params) {
+        for (auto* tp: t->type_params) {
             mangle_generic_names(tp);
         }
     }
 }
-
-
-
 
 
 void make_not_generic(TypeNode* t) {
@@ -107,7 +98,7 @@ void make_not_generic(TypeNode* t) {
 }
 
 void make_not_generic(FunctionType* ft) {
-    for (auto *pt: ft->param_types) {
+    for (auto* pt: ft->param_types) {
         make_not_generic(pt);
     }
     make_not_generic(ft->return_type);
@@ -115,7 +106,7 @@ void make_not_generic(FunctionType* ft) {
 
 void make_not_generic(ObjectType* ot) {
     ot->is_generic_param = false;
-    for (auto *tp: ot->type_params) {
+    for (auto* tp: ot->type_params) {
         make_not_generic(tp);
     }
 }
@@ -138,7 +129,6 @@ std::string map_boolop_to_method_name(BoolOp op) {
 }
 
 
-
 SNode* make_union_wrapper(int type_index, SNode* expression) {
     auto* new_union = new NewObjectSNode();
     new_union->class_name = "core_D_Union";
@@ -147,9 +137,6 @@ SNode* make_union_wrapper(int type_index, SNode* expression) {
     new_union->args = {expression, in};
     return new_union;
 }
-
-
-
 
 
 SNode* make_boolop_snode(ConstFunction* operator_fun, SemanticInfo& left_info, SemanticInfo& right_info) {
