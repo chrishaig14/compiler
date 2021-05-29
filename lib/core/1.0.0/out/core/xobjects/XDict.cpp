@@ -65,7 +65,10 @@ TaggedObject* core_D_core_D_Dict_D_keys_f(TaggedObject* a) {
 }
 
 TaggedObject* core_D_core_D_Dict_D___set_item___f(TaggedObject* a, TaggedObject* k, TaggedObject* v) {
-    (CAST(a, XDict)->l)[hash(k)] = v;
+    XDict* d = CAST(a, XDict);
+    int h = hash(k);
+    d->l[h] = v;
+    d->keys[h] = k;
     GC::declare(k);
     GC::declare(v);
     return nullptr;
