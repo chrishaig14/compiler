@@ -1,0 +1,23 @@
+import core.core.print
+import core.core.Integer
+import core.core.List
+import core.core.Boolean
+import core.core.Dict
+import core.core.String
+import core.core.range
+
+fun is_prime(n: Integer) -> Boolean {
+    for i @ range(2,1,n) {
+        if n % i == 0 {
+            return false
+        }
+    }
+    return true
+}
+
+fun main()->Integer {
+    for n @ range(2,1,30) {
+        print(n.str() + " is prime: " + is_prime(n).str())
+    }
+    return 0
+}
