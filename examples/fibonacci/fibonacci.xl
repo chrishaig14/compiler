@@ -1,0 +1,21 @@
+import core.core.print
+import core.core.Integer
+import core.core.List
+import core.core.Boolean
+import core.core.Dict
+import core.core.String
+import core.core.range
+
+fun fibonacci(n: Integer) -> Integer {
+    if n <= 1 {
+        return n
+    }
+    return fibonacci(n-1) + fibonacci(n-2)
+}
+
+fun main()->Integer {
+    for n @ range(0,1,30) {
+        print(fibonacci(n).str())
+    }
+    return 0
+}
