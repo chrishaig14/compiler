@@ -30,18 +30,18 @@ class Function1 : public XObject {
 public:
     Function1();
 
-    Function1(TaggedObject* (* f)(TaggedObject*));
+    explicit Function1(TaggedObject* (* f)(TaggedObject*));
 
     virtual TaggedObject* operator()(TaggedObject* a0);
 
 };
 
 class Function2 : public XObject {
-    TaggedObject* (* f)(TaggedObject*, TaggedObject*);
 public:
+    TaggedObject* (* f)(TaggedObject*, TaggedObject*);
     Function2();
 
-    Function2(TaggedObject* (* f)(TaggedObject*, TaggedObject*));
+    explicit Function2(TaggedObject* (* f)(TaggedObject*, TaggedObject*));
 
     virtual TaggedObject* operator()(TaggedObject* a0, TaggedObject* a1);
 
@@ -53,7 +53,7 @@ class Function3 : public XObject {
 public:
     Function3();
 
-    Function3(TaggedObject* (* f)(TaggedObject*, TaggedObject*, TaggedObject*));
+    explicit Function3(TaggedObject* (* f)(TaggedObject*, TaggedObject*, TaggedObject*));
 
     virtual TaggedObject* operator()(TaggedObject* a0, TaggedObject* a1, TaggedObject* a2);
 
@@ -64,7 +64,7 @@ class Function4 : public XObject {
 public:
     Function4();
 
-    Function4(TaggedObject* (* f)(TaggedObject*, TaggedObject*, TaggedObject*, TaggedObject*));
+    explicit Function4(TaggedObject* (* f)(TaggedObject*, TaggedObject*, TaggedObject*, TaggedObject*));
 
     virtual TaggedObject* operator()(TaggedObject* a0, TaggedObject* a1, TaggedObject* a2, TaggedObject* a3);
 
@@ -75,9 +75,10 @@ class Function5 : public XObject {
 public:
     Function5();
 
-    Function5(TaggedObject* (* f)(TaggedObject*, TaggedObject*, TaggedObject*, TaggedObject*, TaggedObject*));
+    explicit Function5(TaggedObject* (* f)(TaggedObject*, TaggedObject*, TaggedObject*, TaggedObject*, TaggedObject*));
 
-    virtual TaggedObject* operator()(TaggedObject* a0, TaggedObject* a1, TaggedObject* a2, TaggedObject* a3, TaggedObject* a4);
+    virtual TaggedObject*
+    operator()(TaggedObject* a0, TaggedObject* a1, TaggedObject* a2, TaggedObject* a3, TaggedObject* a4);
 
 };
 
@@ -87,7 +88,7 @@ class Function6 : public XObject {
 public:
     Function6();
 
-    Function6(TaggedObject* (* f)(TaggedObject*, TaggedObject*, TaggedObject*, TaggedObject*));
+    explicit Function6(TaggedObject* (* f)(TaggedObject*, TaggedObject*, TaggedObject*, TaggedObject*));
 
     virtual TaggedObject* operator()(TaggedObject* a0, TaggedObject* a1, TaggedObject* a2, TaggedObject* a3);
 
@@ -168,7 +169,13 @@ inline TaggedObject* CALL1(TaggedObject* f, TaggedObject* arg) {
 }
 
 inline TaggedObject* CALL2(TaggedObject* f, TaggedObject* arg_0, TaggedObject* arg_1) {
-    return (*CAST(f, Function2))(arg_0, arg_1);
+    Function2& func = *CAST(f, Function2);
+    // std::cout << "func.f: " << (void*) func.f << std::endl;
+    // std::cout << "arg0: " << (void*) arg_0 << std::endl;
+    // std::cout << "arg1: " << (void*) arg_1 << std::endl;
+    TaggedObject* r = (func)(arg_0, arg_1);
+    // std::cout << "Done!" << std::endl;
+    return r;
 }
 
 inline TaggedObject* CALL3(TaggedObject* f, TaggedObject* arg_0, TaggedObject* arg_1, TaggedObject* arg_2) {
@@ -179,8 +186,10 @@ inline TaggedObject*
 CALL4(TaggedObject* f, TaggedObject* arg_0, TaggedObject* arg_1, TaggedObject* arg_2, TaggedObject* arg_4) {
     return (*CAST(f, Function4))(arg_0, arg_1, arg_2, arg_4);
 }
+
 inline TaggedObject*
-CALL5(TaggedObject* f, TaggedObject* arg_0, TaggedObject* arg_1, TaggedObject* arg_2, TaggedObject* arg_4, TaggedObject* arg_5 ){
+CALL5(TaggedObject* f, TaggedObject* arg_0, TaggedObject* arg_1, TaggedObject* arg_2, TaggedObject* arg_4,
+      TaggedObject* arg_5) {
     return (*CAST(f, Function5))(arg_0, arg_1, arg_2, arg_4, arg_5);
 }
 

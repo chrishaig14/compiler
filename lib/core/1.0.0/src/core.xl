@@ -11,6 +11,9 @@ class Integer {
     static fun __div__(a: Integer, b: Integer) -> Integer {
         return 0
     }
+    static fun __mod__(a: Integer, b: Integer) -> Integer {
+        return 0
+    }
     static fun __eq__(a: Integer, b: Integer) -> Boolean {
         return false
     }
