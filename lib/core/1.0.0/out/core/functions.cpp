@@ -4,16 +4,11 @@
 
 #include "functions.h"
 
-DEFINE_FUNCTION(1, core_D_open)
 DEFINE_FUNCTION(1, core_D_core_D_print)
 DEFINE_FUNCTION(1, core_D_exit)
 DEFINE_FUNCTION(3, core_D_core_D_range)
 DEFINE_FUNCTION(2, core_D_map)
 DEFINE_FUNCTION(2, core_D_join)
-
-TaggedObject* core_D_open_f(TaggedObject* _s) {
-    return NEW(XFile, (((XString*) UNTAG(_s))->s));
-}
 
 TaggedObject* core_D_exit_f(TaggedObject* c) {
     exit(GET_INT(c));

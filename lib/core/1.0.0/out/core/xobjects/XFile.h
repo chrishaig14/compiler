@@ -13,17 +13,26 @@
 
 class XFile : public XObject {
 public:
-    std::ifstream f;
-
-    XFile(const std::string& filename);
+    std::fstream f;
+    std::ios_base::openmode omode;
+    XFile(const std::string& filename, const std::string& mode);
 
 };
 
-extern TaggedObject* m_core_c_File_f_read_line;
+extern Function1 core_D_file_D_File_D_eof_o;
+extern Function2 core_D_file_D_File_D_open_o;
+extern Function1 core_D_file_D_File_D_read_line_o;
+extern Function2 core_D_file_D_File_D_write_o;
 
-extern Function1 m_core_c_File_f_read_line_o;
+extern TaggedObject* core_D_file_D_File_D_eof;
+extern TaggedObject* core_D_file_D_File_D_open;
+extern TaggedObject* core_D_file_D_File_D_read_line;
+extern TaggedObject* core_D_file_D_File_D_write;
 
-TaggedObject* m_core_c_File_f_read_line_f(TaggedObject* o);
+TaggedObject* core_D_file_D_File_D_eof_f(TaggedObject* o);
+TaggedObject* core_D_file_D_File_D_open_f(TaggedObject* o, TaggedObject* m);
+TaggedObject* core_D_file_D_File_D_read_line_f(TaggedObject* o);
+TaggedObject* core_D_file_D_File_D_write_f(TaggedObject* o, TaggedObject* w);
 
 
 #endif //XLANG_XFILE_H

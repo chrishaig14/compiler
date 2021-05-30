@@ -4,13 +4,13 @@
 
 #include "XFile.h"
 
-Function1 m_core_c_File_f_read_line_o = Function1(m_core_c_File_f_read_line_f);
+Function1 core_D_file_D_File_f_read_line_o = Function1(core_D_file_D_File_f_read_line_f);
 
 XFile::XFile(const std::string& filename) : XObject("File") {
     f.open(filename);
 }
 
-TaggedObject* m_core_c_File_f_read_line_f(TaggedObject* o) {
+TaggedObject* core_D_file_D_File_f_read_line_f(TaggedObject* o) {
     XFile* f = (XFile*) UNTAG(o);
     std::string line;
     std::getline(f->f, line);

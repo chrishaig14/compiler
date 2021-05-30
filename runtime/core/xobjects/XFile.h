@@ -19,11 +19,11 @@ public:
 
 };
 
-extern TaggedObject* m_core_c_File_f_read_line;
+extern TaggedObject* core_D_file_D_File_f_read_line;
 
-extern Function1 m_core_c_File_f_read_line_o;
+extern Function1 core_D_file_D_File_f_read_line_o;
 
-TaggedObject* m_core_c_File_f_read_line_f(TaggedObject* o);
+TaggedObject* core_D_file_D_File_f_read_line_f(TaggedObject* o);
 
 
 #endif //XLANG_XFILE_H
