@@ -1,0 +1,14 @@
+import core.core.print
+import core.core.Integer
+import core.core.List
+import core.core.Boolean
+import core.core.Dict
+import core.core.String
+import core.core.range
+import core.file.File
+
+fun main()->Integer {
+    var f = File.open("foo.txt", "w")
+    f.write("Hello world!")
+    return 0
+}
