@@ -297,13 +297,13 @@ void STranspiler::transpile_enum(EnumSNode* node) {
     out = "";
     std::string eq_name = enum_name + "_D___eq__";
     out += "extern" + SPACE + TOBJECT + eq_name + SEMIC;
-    this->static_initializations += eq_name + SPACE + ASSIGN + SPACE + "core_D_Integer_D___eq__" + SEMIC;
+    this->static_initializations += eq_name + SPACE + ASSIGN + SPACE + "core_D_core_D_Integer_D___eq__" + SEMIC;
 
     this->source += TOBJECT + SPACE + eq_name + ASSIGN + "nullptr" + SEMIC + NEWLINE;
 
     std::string ne_name = enum_name + "_D___ne__";
     out += "extern" + SPACE + TOBJECT + ne_name + SEMIC;
-    this->static_initializations += ne_name + SPACE + ASSIGN + SPACE + "core_D_Integer_D___ne__" + SEMIC;
+    this->static_initializations += ne_name + SPACE + ASSIGN + SPACE + "core_D_core_D_Integer_D___ne__" + SEMIC;
 
     this->source += TOBJECT + SPACE + ne_name + ASSIGN + "nullptr" + SEMIC + NEWLINE;
     this->header += out;
