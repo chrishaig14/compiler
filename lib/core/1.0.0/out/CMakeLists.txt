@@ -25,5 +25,7 @@ add_library(
         core/xobjects/XFile.cpp
         core/xobjects/XFile.cpp
         core/xobjects/XFile.h
+        core/xobjects/XSocket.cpp
+        core/xobjects/XSocket.h
         core/xobjects/XTuple.cpp
         core/xobjects/XTuple.h core/macros.h core/basics.h core/xobjects/XDouble.cpp core/xobjects/XDouble.h core/basics.cpp core/Function.cpp core/xobjects/Integer.cpp core/xobjects/Integer.h core/xobjects/Boolean.cpp core/xobjects/Boolean.h core/xobjects/Float.cpp core/xobjects/Float.h core/functions.cpp core/functions.h)
