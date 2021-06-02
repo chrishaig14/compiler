@@ -33,12 +33,17 @@ TaggedObject* f_String_eq(TaggedObject* this_obj, TaggedObject* other) {
     return r;
 }
 
+TaggedObject* f_String_ne(TaggedObject* this_obj, TaggedObject* other) {
+    return MAKE_BOOL(not GET_BOOL(f_String_eq(this_obj, other)));
+}
+
 
 Function2 function_String_add_p = Function2(f_String_add);
 Function1 function_String_len_p = Function1(f_String_len);
 TaggedObject* function_String_add = FTAG(&function_String_add_p);
 TaggedObject* function_String_len = FTAG(&function_String_len_p);
 Function2 function_String_eq_p = Function2(f_String_eq);
+Function2 function_String_ne_p = Function2(f_String_ne);
 TaggedObject* function_String_eq = FTAG(&function_String_eq_p);
 
 XString::~XString() {
@@ -63,14 +68,21 @@ TaggedObject* core_D_core_D_String_D___eq___f(TaggedObject* a, TaggedObject* b) 
     return MAKE_BOOL(CAST(a, XString)->s == CAST(b, XString)->s);
 }
 
+
+TaggedObject* core_D_core_D_String_D___ne___f(TaggedObject* a, TaggedObject* b) {
+    return MAKE_BOOL(CAST(a, XString)->s != CAST(b, XString)->s);
+}
+
 DEFINE_FUNCTION(2, core_D_core_D_String_D___add__)
 DEFINE_FUNCTION(1, core_D_core_D_String_D_len)
 
 DEFINE_FUNCTION(2, core_D_core_D_String_D___eq__)
+DEFINE_FUNCTION(2, core_D_core_D_String_D___ne__)
 
 TaggedObject* core_D_core_D_String_D___add___f(TaggedObject* a, TaggedObject* b) {
     return MAKE_STRING(CAST(a, XString)->s + CAST(b, XString)->s);
 }
+
 DEFINE_FUNCTION(2, core_D_core_D_String_D___get_item__)
 
 TaggedObject* core_D_core_D_String_D___get_item___f(TaggedObject* a, TaggedObject* b) {
