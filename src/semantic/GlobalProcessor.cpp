@@ -124,6 +124,8 @@ void GlobalProcessor::check_duplicated_names(BlockNode& node) const {
             }
         } else if (n->ntype == NodeType::ALIAS) {
             name = ((AliasNode*) (n))->alias_id;
+        } else if (n->ntype == NodeType::ENUM) {
+            name = ((EnumNode*) (n))->id;
         }
         if (names.count(name) == 0) {
             names[name] = nullptr;
@@ -284,13 +286,13 @@ void Module::fill_actual(ObjectType* t) {
         return;
     }
     t->actual_base_path = this->get_actual_path(t->id);
-    for (auto *tp: t->type_params) {
+    for (auto* tp: t->type_params) {
         this->fill_actual(tp);
     }
 }
 
 void Module::fill_actual(FunctionType* t) {
-    for (auto *pt: t->param_types) {
+    for (auto* pt: t->param_types) {
         this->fill_actual(pt);
     }
     this->fill_actual(t->return_type);
