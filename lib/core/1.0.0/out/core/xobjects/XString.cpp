@@ -95,3 +95,24 @@ TaggedObject* core_D_core_D_String_D___get_item___f(TaggedObject* a, TaggedObjec
 
     return MAKE_STRING(std::string(1, CAST(a, XString)->s[index]));
 }
+
+DEFINE_FUNCTION(2, core_D_core_D_String_D_find_first)
+TaggedObject* core_D_core_D_String_D_find_first_f(TaggedObject* a, TaggedObject* p) {
+    XString* s = CAST(a, XString);
+    for (int i = 0; i < s->s.size(); i++) {
+        if (s->s[i] == CAST(p, XString)->s[0]) {
+            return MAKE_INT(i);
+        }
+    }
+    return MAKE_INT(-1);
+}
+
+DEFINE_FUNCTION(3, core_D_core_D_String_D_slice)
+TaggedObject* core_D_core_D_String_D_slice_f(TaggedObject* a, TaggedObject* st, TaggedObject* en) {
+    XString* s = CAST(a, XString);
+    std::string rs;
+    for (int i = GET_INT(st); i < GET_INT(en); i++) {
+        rs += s->s[i];
+    }
+    return NEW(XString, rs);
+}

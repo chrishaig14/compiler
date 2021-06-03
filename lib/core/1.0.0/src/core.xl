@@ -32,6 +32,10 @@ class Integer {
     static fun __gt__(a: Integer, b: Integer) -> Boolean {
         return false
     }
+
+    static fun parse(a: String) -> Integer {
+        return ""
+    }
     fun str() -> String {
         return ""
     }
@@ -79,6 +83,8 @@ class String {
     static fun __eq__(a: String, b:String)->Boolean {}
     static fun __ne__(a: String, b:String)->Boolean {}
     static fun __add__(a: String, b:String)->String {}
+    fun slice(s: Integer, e: Integer)->String {}
+    fun find_first(s: String)->Integer {}
 }
 
 class Boolean {

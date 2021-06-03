@@ -79,3 +79,5 @@ TaggedObject* core_D_socket_D_Socket_D_send_f(TaggedObject* socket, TaggedObject
     return MAKE_INT(nsent);
 }
 
+TaggedObject* core_D_socket_D_SocketDomain_AF_INET = MAKE_INT(2);
+TaggedObject* core_D_socket_D_SocketType_SOCK_STREAM = MAKE_INT(1);

@@ -48,7 +48,7 @@ TaggedObject* core_D_core_D_Integer_D___add___f(TaggedObject* a, TaggedObject* b
 
 TaggedObject* core_D_core_D_Integer_D___div___f(TaggedObject* a, TaggedObject* b) {
     int b_int = GET_INT(b);
-    if (b_int == 0){
+    if (b_int == 0) {
         throw std::runtime_error("Division by zero error!");
     }
     return MAKE_INT(GET_INT(a) / b_int);
@@ -56,7 +56,7 @@ TaggedObject* core_D_core_D_Integer_D___div___f(TaggedObject* a, TaggedObject* b
 
 TaggedObject* core_D_core_D_Integer_D___mod___f(TaggedObject* a, TaggedObject* b) {
     int b_int = GET_INT(b);
-    if (b_int == 0){
+    if (b_int == 0) {
         throw std::runtime_error("Division by zero error!");
     }
     return MAKE_INT(GET_INT(a) % b_int);
@@ -73,4 +73,10 @@ TaggedObject* core_D_core_D_Integer_D___sub___f(TaggedObject* a, TaggedObject* b
 TaggedObject* core_D_core_D_Integer_D_str_f(TaggedObject* _i) {
     TaggedObject* x = NEW(XString, std::to_string((GET_INT(_i))));
     return x;
+}
+
+DEFINE_FUNCTION(1, core_D_core_D_Integer_D_parse)
+
+TaggedObject* core_D_core_D_Integer_D_parse_f(TaggedObject* _i) {
+    return MAKE_INT(std::atoi(CAST(_i, XString)->s.c_str()));
 }

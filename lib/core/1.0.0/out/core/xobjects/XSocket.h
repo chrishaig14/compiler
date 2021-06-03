@@ -20,6 +20,9 @@ public:
     }
 };
 
+extern TaggedObject* core_D_socket_D_SocketDomain_AF_INET;
+extern TaggedObject* core_D_socket_D_SocketType_SOCK_STREAM;
+
 extern Function1 core_D_socket_D_Socket_D_accept_o;
 extern TaggedObject* core_D_socket_D_Socket_D_accept;
 TaggedObject* core_D_socket_D_Socket_D_accept_f(TaggedObject* socket);
