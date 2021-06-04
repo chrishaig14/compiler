@@ -27,11 +27,11 @@ XDict::XDict(std::unordered_map<TaggedObject*, TaggedObject*> v) : XObject("Dict
 }
 
 XDict::~XDict() {
-    if (has_tag(this->l.begin()->second, OBJECT_TAG)) {
-        for (auto& it: this->l) {
-            GC::out_of_scope(it.second);
-        }
-    }
+    // if (has_tag(this->l.begin()->second, OBJECT_TAG)) {
+    //     for (auto& it: this->l) {
+    //         GC::out_of_scope(it.second);
+    //     }
+    // }
 }
 
 
@@ -72,4 +72,13 @@ TaggedObject* core_D_core_D_Dict_D___set_item___f(TaggedObject* a, TaggedObject*
     GC::declare(k);
     GC::declare(v);
     return nullptr;
+}
+
+TaggedObject* core_D_core_D_Dict_D_get_f(TaggedObject* a, TaggedObject* b) {
+    int h = hash(b);
+    auto& l = (CAST(a, XDict)->l);
+    if (l.count(h) == 0) {
+        return b;
+    }
+    return l[h];
 }

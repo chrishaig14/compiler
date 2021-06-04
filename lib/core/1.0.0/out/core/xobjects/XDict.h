@@ -26,24 +26,23 @@ public:
 };
 
 
+extern TaggedObject* core_D_core_D_Dict_D_get;
 extern TaggedObject* core_D_core_D_Dict_D_has;
 extern TaggedObject* core_D_core_D_Dict_D_keys;
 extern TaggedObject* core_D_core_D_Dict_D_len;
-extern TaggedObject* core_D_core_D_Dict_D_push;
 extern TaggedObject* core_D_core_D_Dict_D___get_item__;
 extern TaggedObject* core_D_core_D_Dict_D___set_item__;
 
+extern Function2 core_D_core_D_Dict_D_get_o;
 extern Function2 core_D_core_D_Dict_D_has_o;
 extern Function1 core_D_core_D_Dict_D_keys_o;
 extern Function1 core_D_core_D_Dict_D_len_o;
-extern Function2 core_D_core_D_Dict_D_push_o;
 extern Function2 core_D_core_D_Dict_D___get_item__o;
 extern Function3 core_D_core_D_Dict_D___set_item__o;
 
+TaggedObject* core_D_core_D_Dict_D_get_f(TaggedObject* a, TaggedObject* b);
 TaggedObject* core_D_core_D_Dict_D_has_f(TaggedObject* a, TaggedObject* b);
 TaggedObject* core_D_core_D_Dict_D_keys_f(TaggedObject* a);
-TaggedObject* core_D_core_D_Dict_D_push_f(TaggedObject* a, TaggedObject* b);
-
 TaggedObject* core_D_core_D_Dict_D_len_f(TaggedObject* a);
 TaggedObject* core_D_core_D_Dict_D___get_item___f(TaggedObject* a, TaggedObject* b);
 TaggedObject* core_D_core_D_Dict_D___set_item___f(TaggedObject* a, TaggedObject* k, TaggedObject* v);
