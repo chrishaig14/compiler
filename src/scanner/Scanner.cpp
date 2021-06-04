@@ -174,7 +174,28 @@ Token Scanner::scan_string() {
     this->current++;
     this->set_char();
     while (this->chris != '\"' && !this->at_eof()) {
-        this->accum_token();
+        if (this->chris == '\\') {
+            this->advance_simple();
+            std::string c;
+            switch (this->chris) {
+                case 'n':
+                    c = "\\n";
+                    break;
+                case '\\':
+                    c = "\\\\";
+                    break;
+                case '\"':
+                    c = "\\\"";
+                    break;
+                default:
+                    throw std::runtime_error("Invalid escape sequence: \\" + std::string(1, this->chris));
+            }
+            this->current_tok_str += c;
+        } else if (this->chris == '\n') {
+            throw std::runtime_error("No multiline strings allowed");
+        } else {
+            this->accum_token();
+        }
         this->advance_simple();
     }
     if (this->at_eof()) {
