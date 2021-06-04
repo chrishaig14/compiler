@@ -1,0 +1,118 @@
+import core.core.print
+import core.core.Integer
+import core.core.List
+import core.core.Boolean
+import core.core.Dict
+import core.core.String
+import core.core.range
+import core.file.File
+import core.socket.Socket
+import core.socket.SocketDomain
+import core.socket.SocketType
+import core.core.exit
+import core.core.Option
+
+class JsonNull {
+    i: Integer
+}
+
+class Json {
+    root: Union[Boolean, String, Integer, Dict[String, Json], List[Json], JsonNull]
+    static fun null()->Json {
+        return #Json(#JsonNull(0))
+    }
+    fun boolean() -> Boolean {
+        match this.root {
+            b: Boolean {
+                return b
+            }
+        }
+        print("json is not a boolean")
+        exit(1)
+        return false
+    }
+    fun string() -> String {
+        match this.root {
+            s: String {
+                return s
+            }
+        }
+        print("json is not a string")
+        exit(1)
+        return ""
+    }
+    fun is_null() -> Boolean {
+        match this.root {
+            n: JsonNull {
+                return true
+            }
+        }
+        return false
+    }
+    fun integer() -> Integer {
+
+        match this.root {
+            i: Integer {
+                return i
+            }
+        }
+        print("json is not an integer")
+        exit(1)
+        return 0
+    }
+    fun list() -> List[Json] {
+        match this.root {
+            l: List[Json] {
+                return l
+            }
+        }
+        print("json is not an integer")
+        exit(1)
+        return []::Json
+    }
+    fun object() -> Dict[String, Json] {
+        match this.root {
+            d: Dict[String,Json] {
+                return d
+            }
+        }
+        print("json is not a dict")
+        exit(1)
+        return {}::[String, Json]
+    }
+}
+
+fun main()->Integer {
+    var json = #Json({"age": #Json(65), "likes": #Json([#Json("movies"), #Json("football"), #Json("technology")])})
+    if json.is_null() {
+        print("is json null")
+        exit(1)
+    }
+
+    var user = json.object()
+    var name = "default if key not found"
+    if user.has("name") {
+        var value = user["name"]
+        if value.is_null() {
+            name = "default if value is null"
+        } else {
+            name = value.string()
+        }
+    }
+
+    var age = 0-1
+
+    if user.has("age") {
+        var value = user["age"]
+        if value.is_null() {
+            age = 99
+        } else {
+            age = value.integer()
+        }
+    }
+
+//    var age = user.get("age", #Json(0)).integer()
+    print("name: " + name)
+    print("age: " + age.str())
+    return 0
+}
