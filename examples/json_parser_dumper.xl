@@ -1,0 +1,250 @@
+import core.core.print
+import core.core.Integer
+import core.core.List
+import core.core.Boolean
+import core.core.Dict
+import core.core.String
+import core.core.range
+import core.file.File
+import core.socket.Socket
+import core.socket.SocketDomain
+import core.socket.SocketType
+import core.core.exit
+import core.core.Option
+
+class JsonNull {
+    i: Integer
+}
+
+class Json {
+    root: Union[Boolean, String, Integer, Dict[String, Json], List[Json], JsonNull]
+    static fun null()->Json {
+        return #Json(#JsonNull(0))
+    }
+    fun boolean() -> Boolean {
+        match this.root {
+            b: Boolean {
+                return b
+            }
+        }
+        print("json is not a boolean")
+        exit(1)
+        return false
+    }
+    fun string() -> String {
+        match this.root {
+            s: String {
+                return s
+            }
+        }
+        print("json is not a string")
+        exit(1)
+        return ""
+    }
+    fun is_null() -> Boolean {
+        match this.root {
+            n: JsonNull {
+                return true
+            }
+        }
+        return false
+    }
+    fun integer() -> Integer {
+
+        match this.root {
+            i: Integer {
+                return i
+            }
+        }
+        print("json is not an integer")
+        exit(1)
+        return 0
+    }
+    fun list() -> List[Json] {
+        match this.root {
+            l: List[Json] {
+                return l
+            }
+        }
+        print("json is not an integer")
+        exit(1)
+        return []::Json
+    }
+    fun object() -> Dict[String, Json] {
+        match this.root {
+            d: Dict[String,Json] {
+                return d
+            }
+        }
+        print("json is not a dict")
+        exit(1)
+        return {}::[String, Json]
+    }
+}
+
+class Result {
+    j: Json
+    r: Integer
+}
+
+fun json_parse_string(s: String) -> Result {
+    var str = ""
+    var ok = false
+    for i @ range(1, 1, s.len()) {
+        var c = s[i]
+        if c == "\"" {
+//            string end
+            ok = true
+            break
+        }
+        str += c
+    }
+    if ok {
+        print("returning string >>>" + str + "<<<")
+        return #Result(#Json(str), str.len()+2)
+    }
+    print("Bad json string: " + s)
+    exit(1)
+    return #Result(#Json(""),0-1)
+}
+
+fun json_parse_integer(s: String)->Result {
+    var str = s[0]
+    for i @ range(1, 1, s.len()) {
+        var c = s[i]
+        print("c: " + c)
+        print("str: " + str)
+        if "0123456789".find_first(c) == 0-1 {
+            var r = #Result(#Json(Integer.parse(str)),str.len())
+            print("returning")
+            return r
+        }
+        str += c
+    }
+    return #Result(Json.null(),0-1)
+}
+
+fun json_parse_object(s: String) -> Result {
+    var i = 1
+    var object = {}::[String, Json]
+    var another = true
+    while i < s.len() {
+        print("rest: >>>"+s.slice(i,s.len()) + "<<<")
+        if not another {
+            if s[i] == "}" {
+                return #Result(#Json(object), i)
+            } else {
+                print("Error")
+                exit(1)
+            }
+        }
+        if s[i] != " " and s[i] != "\"" {
+            print("error invalid character >>>" + s[i] + "<<<")
+            exit(1)
+        }
+        if s[i] == "\"" {
+            var key = ""
+            var key_end = 0-1
+            i += 1
+            while i < s.len() {
+                if s[i] != "\"" {
+                    key += s[i]
+                } else {
+                    break
+                }
+                i += 1
+            }
+            if s[i+1] != ":" {
+                print("expected : here")
+                exit(1)
+            }
+            print("got key: >>>" + key + "<<<")
+            i += 2
+            var r = json_parse(s.slice(i, s.len()))
+            object[key] = r.j
+            i += r.r
+        }
+//        i += 1
+        print("i now is: " + i.str())
+        another = s[i] == ","
+        if another {
+//            read comma and advance
+            i += 1
+        }
+    }
+    print("error!!!")
+    exit(1)
+    return #Result(Json.null(),0-1)
+}
+
+fun json_parse(s: String) -> Result {
+    print("now json parsing")
+    print(">>>")
+    print(s)
+    print("<<<")
+    if s[0] == "\"" {
+//        string start
+        return json_parse_string(s)
+    }
+    if "0123456789".find_first(s[0]) != 0-1 {
+        // its a number
+        return json_parse_integer(s)
+    }
+    if s[0] == "{" {
+        return json_parse_object(s)
+    }
+    print("returning null")
+    return #Result(Json.null(),0-1)
+}
+
+fun json_parse_top_level(s: String) -> Json {
+    var j = json_parse(s)
+    if j.r == 0-1 {
+        print("theres more string after parsed json")
+        exit(1)
+    }
+    return j.j
+}
+
+fun json_dumps(j: Json) -> String {
+    match j.root {
+        s: String {
+            return "\"" + s + "\""
+        }
+        i: Integer {
+            return i.str()
+        }
+        b: Boolean {
+            return b.str()
+        }
+        n: JsonNull {
+            return "null"
+        }
+        d: Dict[String, Json] {
+            var s = "{"
+            var keys = d.keys()
+            for k @ keys {
+                s += "\"" + k + "\"" + ":" + json_dumps(d[k]) + ", "
+            }
+            if keys.len() != 0 {
+                s = s.slice(0, s.len()-2)
+            }
+            s += "}"
+            return s
+        }
+    }
+    print("Dont know how to dump a dict!")
+    exit(1)
+    return ""
+}
+
+fun main()->Integer {
+    var s = "{\"name\":\"chris\",\"surname\":\"pedersen\",\"brother\":{\"name\":\"alex\",\"age\":25}}"
+    var j = json_parse_top_level(s)
+    print("name:" + j.object()["name"].string())
+    print("surname:" + j.object()["surname"].string())
+
+    print(json_dumps(j.object()["name"]))
+    print(json_dumps(j))
+    return 0
+}
