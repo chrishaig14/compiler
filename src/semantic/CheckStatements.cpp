@@ -221,7 +221,7 @@ USemanticInfo Checker::visit_match(MatchExpressionNode* node) {
         this->scope->set(case_id, ent);
         USemanticInfo case_info = this->dispatch(case_node);
         auto* bn = (BlockSNode*) case_info->snode;
-        auto* omn = new ObjectMemberSNode(new IdSNode(varname), Path("core.Union"), "o");
+        auto* omn = new ObjectMemberSNode(new IdSNode(varname), Path("core.core.Union"), "o");
         auto* dn = new DeclarationSNode(case_id, omn);
         bn->nodes.insert(bn->nodes.begin(), dn);
         cas.emplace_back(union_index, (BlockSNode*) case_info->snode);

@@ -246,7 +246,7 @@ Path Module::get_actual_path(const std::string& id) {
         return Path(VectorOfStrings({".None"}));
     }
     if (id == "Union") {
-        return Path("core.Union");
+        return Path("core.core.Union");
     }
     if (this->flirpins.count(id) == 1) {
         if (this->flirpins[id].type == F_TYPE::CLASS) {

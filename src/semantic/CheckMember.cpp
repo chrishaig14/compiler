@@ -63,7 +63,7 @@ USemanticInfo Checker::object_member(SNode* object_snode, Value* p_value, const 
         this->error_reporter.object_no_member(*p_value->type, n);
         return error_stub();
     }
-    if (object_type_path.as_str() == "core.Union") {
+    if (object_type_path.as_str() == "core.core.Union") {
         this->error_reporter.object_no_member(*p_value->type, n);
         return error_stub();
     }

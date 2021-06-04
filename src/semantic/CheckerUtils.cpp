@@ -131,7 +131,7 @@ std::string map_boolop_to_method_name(BoolOp op) {
 
 SNode* make_union_wrapper(int type_index, SNode* expression) {
     auto* new_union = new NewObjectSNode();
-    new_union->class_name = "core_D_Union";
+    new_union->class_name = "core_D_core_D_Union";
     auto* in = new IntegerSNode(std::string());
     in->str = std::to_string(type_index); // FIXME, use int directly
     new_union->args = {expression, in};

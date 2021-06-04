@@ -15,7 +15,7 @@ Package::Package(Path path, std::string abs_path, std::string rel_path, bool is_
 }
 
 Flirpin Package::get(Path p) {
-    if (p.as_str() == "core.Union") {
+    if (p.as_str() == "core.core.Union") {
         return Flirpin{.type=F_TYPE::CLASS, .clazz=new Class()};
     }
     VectorOfStrings pt = p.as_vec();

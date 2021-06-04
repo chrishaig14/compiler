@@ -62,6 +62,7 @@ USemanticInfo Checker::visit_call(CallNode& n, bool is_rvalue) {
         retv.entity = inf->entity;
     } else {
         this->process_function_arguments(retv, arg_entities, sn, n, function_type, fun_info_p.get());
+
     }
     return make_return_info(n, is_rvalue, retv, is_def_const, args_are_constant);
 }

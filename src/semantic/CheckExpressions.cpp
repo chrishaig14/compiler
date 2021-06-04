@@ -291,7 +291,7 @@ USemanticInfo Checker::visit_ternary(TernaryNode& node) {
     SNode* false_case_snode = false_case_sinfo->snode;
 
     auto* rv = new Value(true_case.entity.value->type->clone());
-
+    this->fill_value(rv);
     SemanticInfo info;
     info.entity = Entity(rv);
     info.snode = new TernarySNode(expression_info_p->snode, true_case.snode, false_case_snode);
