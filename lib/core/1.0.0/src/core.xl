@@ -123,3 +123,6 @@ class Option[t] {
 }
 
 fun exit(c: Integer){}
+
+
+fun sleep(t: Integer){}

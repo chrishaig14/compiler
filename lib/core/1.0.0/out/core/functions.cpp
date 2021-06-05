@@ -4,14 +4,22 @@
 
 #include "functions.h"
 
-DEFINE_FUNCTION(1, core_D_core_D_print)
+#include <unistd.h>
+
 DEFINE_FUNCTION(1, core_D_core_D_exit)
+DEFINE_FUNCTION(1, core_D_core_D_print)
 DEFINE_FUNCTION(3, core_D_core_D_range)
+DEFINE_FUNCTION(1, core_D_core_D_sleep)
 DEFINE_FUNCTION(2, core_D_map)
 DEFINE_FUNCTION(2, core_D_join)
 
 TaggedObject* core_D_core_D_exit_f(TaggedObject* c) {
     exit(GET_INT(c));
+    return nullptr;
+}
+
+TaggedObject* core_D_core_D_sleep_f(TaggedObject* c) {
+    sleep(GET_INT(c));
     return nullptr;
 }
 
