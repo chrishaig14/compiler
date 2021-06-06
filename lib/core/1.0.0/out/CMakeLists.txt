@@ -10,6 +10,8 @@ add_library(
         core/Function.h
         core/GC.cpp
         core/GC.h
+        core/threads.cpp
+        core/threads.h
         core/xobject.cpp
         core/xobject.h
         core/xobjects/XList.cpp
