@@ -1,0 +1,49 @@
+import core.core.print
+import core.core.Integer
+import core.core.List
+import core.core.Boolean
+import core.core.Dict
+import core.core.String
+import core.core.range
+import core.file.File
+import core.socket.Socket
+import core.socket.SocketDomain
+import core.socket.SocketType
+import core.core.exit
+import core.core.Option
+import core.core.sleep
+import core.threads.Thread
+import core.threads.Lock
+
+class Counter {
+    i: Integer
+}
+
+fun foo(c: Counter, l: Lock) ->Integer {
+    for i @ range(0,1,10000) {
+        l.lock()
+        c.i = c.i + 1
+        l.unlock()
+    }
+    return 0
+}
+
+fun main()->Integer {
+    var c = #Counter(0)
+    var lock = Lock.new()
+    var f = $foo(c, lock)
+
+    var threads = []::Thread
+    for i @ range(0,1,10) {
+        var t = Thread.new(f)
+        threads.push(t)
+    }
+    for t @ threads {
+        t.start()
+    }
+    for t @ threads {
+        t.join()
+    }
+    print("final c value: " + c.i.str())
+    return 0
+}
