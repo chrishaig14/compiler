@@ -158,6 +158,7 @@ void STranspiler::transpile_class(ClassSNode* node) {
     for (const auto& m: node->members) {
         out += TOBJECT + SPACE + m + SEMIC + NEWLINE;
     }
+
     out += class_name + LPAREN;
     for (const auto& m: node->members) {
         out += TOBJECT + SPACE + m + COMMA + SPACE;
@@ -169,6 +170,13 @@ void STranspiler::transpile_class(ClassSNode* node) {
         out += "this->" + m + " = " + m + SEMIC + NEWLINE;
     }
     out += RCURLY + NEWLINE;
+
+    out += "~" + class_name + LPAREN + RPAREN + LCURLY + NEWLINE;
+    for (const auto& m: node->members) {
+        out += GCOUTOFSCOPE + LPAREN + "this->" + m + RPAREN + SEMIC + NEWLINE;
+    }
+    out += RCURLY + NEWLINE;
+
     out += RCURLY + SEMIC + NEWLINE;
     this->header += out;
 }
@@ -264,7 +272,7 @@ std::string STranspiler::transpile_break(BreakSNode* bn) {
     for (auto reachable: bn->reachables) {
         out += GCOUTOFSCOPE + LPAREN + reachable + RPAREN + SEMIC + NEWLINE;
     }
-    out+= "break" + SEMIC + NEWLINE;
+    out += "break" + SEMIC + NEWLINE;
     return out;
 }
 
@@ -273,7 +281,7 @@ std::string STranspiler::transpile_continue(ContinueSNode* cn) {
     for (auto reachable: cn->reachables) {
         out += GCOUTOFSCOPE + LPAREN + reachable + RPAREN + SEMIC + NEWLINE;
     }
-    out+= "continue" + SEMIC + NEWLINE;
+    out += "continue" + SEMIC + NEWLINE;
     return out;
 }
 

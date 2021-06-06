@@ -11,9 +11,10 @@
 
 class BlockSNode : public SNode {
 public:
+    bool unwrap;
     std::vector<std::string> locals;
     std::vector<SNode*> nodes;
-
+    BlockSNode(bool unwrap);
     BlockSNode();
 };
 

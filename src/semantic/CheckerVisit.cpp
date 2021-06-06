@@ -58,7 +58,7 @@ USemanticInfo Checker::visit_enum(EnumNode& p_node) {
 USemanticInfo Checker::visit_class(ClassNode& node) {
     this->error_reporter.current_class = node.class_name;
     SemanticInfo info;
-    auto* sn = new BlockSNode();
+    auto* sn = new BlockSNode(true);
     info.snode = sn;
     this->add_this = true;
     VectorOfTypes tp;
@@ -161,10 +161,13 @@ USemanticInfo Checker::visit_block(BlockNode& node) {
             vn.push_back(n);
             if (sinfo_p->snode != nullptr) {
                 if (sinfo_p->snode->type == SNodeType::BLOCK) {
-                    // for (auto* nn : ((BlockSNode*) sinfo_p->snode)->nodes) {
-                    //     sn->nodes.push_back(nn);
-                    // }
-                    sn->nodes.push_back(sinfo_p->snode);
+                    if (((BlockSNode*) sinfo_p->snode)->unwrap) {
+                        for (auto* nn : ((BlockSNode*) sinfo_p->snode)->nodes) {
+                            sn->nodes.push_back(nn);
+                        }
+                    } else {
+                        sn->nodes.push_back(sinfo_p->snode);
+                    }
 
                 } else {
                     sn->nodes.push_back(sinfo_p->snode);
