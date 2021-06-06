@@ -21,7 +21,7 @@ void write_cmakelists(const std::string& cmake_output_path, const std::string& o
         cmakelists += "add_executable(" + output_name + " " + all_files + ")\n";
     }
     cmakelists += "target_link_directories(" + output_name + " PUBLIC /home/chris/CLionProjects/compiler/lib/build)\n";
-    cmakelists += "target_link_libraries(" + output_name + " " + all_libraries + ")\n";
+    cmakelists += "target_link_libraries(" + output_name + " " + all_libraries + " pthread)\n";
 
 
     std::ofstream cmakelists_file(cmake_output_path);
@@ -78,12 +78,12 @@ void Compiler::main() {
 
     this->process_global_all_modules(*root_package);
 
-    try {
+    // try {
         this->analyze_all_modules(*root_package, *top_package);
-    } catch (const std::runtime_error& e) {
-        std::cout << "ERROR: " << e.what() << std::endl;
-        exit(0);
-    }
+    // } catch (const std::runtime_error& e) {
+    //     std::cout << "ERROR: " << e.what() << std::endl;
+    //     exit(0);
+    // }
 
     this->transpile_all_modules(*root_package, project_output_dir, true);
     std::string all_files;
