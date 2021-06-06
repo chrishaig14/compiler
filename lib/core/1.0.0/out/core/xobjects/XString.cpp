@@ -80,7 +80,12 @@ DEFINE_FUNCTION(2, core_D_core_D_String_D___eq__)
 DEFINE_FUNCTION(2, core_D_core_D_String_D___ne__)
 
 TaggedObject* core_D_core_D_String_D___add___f(TaggedObject* a, TaggedObject* b) {
-    return MAKE_STRING(CAST(a, XString)->s + CAST(b, XString)->s);
+    GC::declare(a);
+    GC::declare(b);
+    TaggedObject* r = MAKE_STRING(CAST(a, XString)->s + CAST(b, XString)->s);
+    GC::out_of_scope(a);
+    GC::out_of_scope(b);
+    return r;
 }
 
 DEFINE_FUNCTION(2, core_D_core_D_String_D___get_item__)
@@ -97,6 +102,7 @@ TaggedObject* core_D_core_D_String_D___get_item___f(TaggedObject* a, TaggedObjec
 }
 
 DEFINE_FUNCTION(2, core_D_core_D_String_D_find_first)
+
 TaggedObject* core_D_core_D_String_D_find_first_f(TaggedObject* a, TaggedObject* p) {
     XString* s = CAST(a, XString);
     for (int i = 0; i < s->s.size(); i++) {
@@ -108,6 +114,7 @@ TaggedObject* core_D_core_D_String_D_find_first_f(TaggedObject* a, TaggedObject*
 }
 
 DEFINE_FUNCTION(3, core_D_core_D_String_D_slice)
+
 TaggedObject* core_D_core_D_String_D_slice_f(TaggedObject* a, TaggedObject* st, TaggedObject* en) {
     XString* s = CAST(a, XString);
     std::string rs;
