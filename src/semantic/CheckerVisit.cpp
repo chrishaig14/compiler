@@ -33,8 +33,7 @@ SNode* Checker::make_for_snode(ForNode& node, USemanticInfo& binfo, USemanticInf
     auto* bn = (BlockSNode*) (binfo->snode);
 
     auto* list_subscript_n = new CallSNode(new IdSNode("core.core.List.__get_item__"),
-                                                {new IdSNode(this->loop_list_var_id),
-                                                 new IdSNode(this->loop_index_var_id)});
+                                           {new IdSNode(this->loop_list_var_id), new IdSNode(this->loop_index_var_id)});
 
 
     auto* loop_elem_sn = new DeclarationSNode(node.var, list_subscript_n);
@@ -113,10 +112,10 @@ USemanticInfo Checker::visit_class(ClassNode& node) {
         static_methods_snodes.push_back(method_info->snode);
     }
 
-    for (auto *m: methods_snodes) {
+    for (auto* m: methods_snodes) {
         sn->nodes.push_back(m);
     }
-    for (auto *m: static_methods_snodes) {
+    for (auto* m: static_methods_snodes) {
         sn->nodes.push_back(m);
     }
 
@@ -155,16 +154,18 @@ USemanticInfo Checker::visit_block(BlockNode& node) {
         // sn->nodes.push_back(sinfo_p->snode);
 
         if (n->ntype == NodeType::BLOCK) {
-            for (auto *bnode: n->block().nodes) {
+            for (auto* bnode: n->block().nodes) {
                 vn.push_back(bnode);
             }
         } else {
             vn.push_back(n);
             if (sinfo_p->snode != nullptr) {
                 if (sinfo_p->snode->type == SNodeType::BLOCK) {
-                    for (auto *nn : ((BlockSNode*) sinfo_p->snode)->nodes) {
-                        sn->nodes.push_back(nn);
-                    }
+                    // for (auto* nn : ((BlockSNode*) sinfo_p->snode)->nodes) {
+                    //     sn->nodes.push_back(nn);
+                    // }
+                    sn->nodes.push_back(sinfo_p->snode);
+
                 } else {
                     sn->nodes.push_back(sinfo_p->snode);
                 }
@@ -228,7 +229,12 @@ USemanticInfo Checker::visit_function(FunctionNode& n) {
     this->assert_type_exists(returnType, n.start);
     this->scope->set("__return__", entity_from_type(returnType));
     USemanticInfo body_info = this->visit_block(*n.body);
-    auto* sn = new FunctionSNode(n.path.as_str(), params, (BlockSNode*) (body_info->snode));
+    BlockSNode* bn = (BlockSNode*) (body_info->snode);
+    for (auto local_var: this->scope->table) {
+        bn->locals.push_back(local_var.first);
+    }
+    this->leave_scope();
+    auto* sn = new FunctionSNode(n.path.as_str(), params, bn);
     info.snode = sn;
     if (returnType != T_NONE) {
         if (!n.body->nodes.empty()) {
@@ -243,6 +249,5 @@ USemanticInfo Checker::visit_function(FunctionNode& n) {
             return error_stub();
         }
     }
-    this->leave_scope();
     return std::make_unique<SemanticInfo>(info);
 }

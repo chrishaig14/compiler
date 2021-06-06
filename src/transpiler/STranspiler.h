@@ -131,6 +131,8 @@ public:
             throw std::runtime_error("Error dispatching on nullptr snode!");
         }
         switch (node->type) {
+            case SNodeType::BLOCK:
+                return this->transpile_block((BlockSNode*) node);
             case SNodeType::ENUM_MEMBER:
                 return this->transpile_enum_member((EnumMemberSNode*) node);
             case SNodeType::BOOLEAN:

@@ -7,9 +7,11 @@
 
 #include "SNode.h"
 #include <vector>
+#include <string>
 
 class BlockSNode : public SNode {
 public:
+    std::vector<std::string> locals;
     std::vector<SNode*> nodes;
 
     BlockSNode();

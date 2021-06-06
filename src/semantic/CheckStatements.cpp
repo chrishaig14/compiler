@@ -171,9 +171,11 @@ USemanticInfo Checker::visit_return(ReturnNode& n) {
     }
 
     n.ret_type = return_type->clone();
-    n.reachables = this->scope->get_all();
 
     auto* sn = new ReturnSNode(expression_info_p->snode);
+    for (auto l: this->scope->get_all()) {
+        sn->reachables.push_back(l.first);
+    }
 
     SemanticInfo info;
     info.snode = sn;
@@ -236,13 +238,18 @@ USemanticInfo Checker::visit_match(MatchExpressionNode* node) {
 }
 
 USemanticInfo Checker::visit_continue(ContinueNode& node) {
+
     auto* bn = new BlockSNode();
     if (this->update_loop_index_snode != nullptr) {
         bn->nodes.push_back(this->update_loop_index_snode);
     }
-    bn->nodes.push_back(new ContinueSNode());
+    auto* cn = new ContinueSNode();
+    bn->nodes.push_back(cn);
 
     SemanticInfo info;
+    for (auto reachable: this->scope->get_all_in_loop()) {
+        cn->reachables.push_back(reachable.first);
+    }
     info.snode = bn;
     return std::make_unique<SemanticInfo>(info);
 }
@@ -279,12 +286,19 @@ USemanticInfo Checker::visit_for(ForNode& node) {
     inc_exp_node->arguments.push_back(one_node);
     increment_index_sn->rvalue = inc_exp_node;
 
-
+    this->scope->is_loop = true;
     USemanticInfo binfo = this->visit_block(*node.body);
+    this->scope->is_loop = false;
+    BlockSNode* bn = (BlockSNode*) binfo->snode;
+    for (auto local_var: this->scope->table) {
+        bn->locals.push_back(local_var.first);
+    }
     this->leave_scope();
 
     SemanticInfo rinfo;
     rinfo.snode = make_for_snode(node, binfo, exp_info_p);
+    BlockSNode* pn = (BlockSNode*) rinfo.snode;
+    pn->locals.push_back(this->loop_list_var_id);
     this->update_loop_index_snode = nullptr;
     return std::make_unique<SemanticInfo>(rinfo);
 }
@@ -292,7 +306,11 @@ USemanticInfo Checker::visit_for(ForNode& node) {
 USemanticInfo Checker::visit_break(BreakNode& node) {
     // node.loop_vars = this->scope->get_all_in_loop();
     SemanticInfo info;
-    info.snode = new BreakSNode();
+    BreakSNode* bn = new BreakSNode();
+    info.snode = bn;
+    for (auto reachable: this->scope->get_all_in_loop()) {
+        bn->reachables.push_back(reachable.first);
+    }
     return std::make_unique<SemanticInfo>(info);
 }
 
@@ -337,6 +355,10 @@ USemanticInfo Checker::visit_if(IfNode& n) {
 
     this->enter_scope("if");
     USemanticInfo body_info = this->visit_block(*n.then);
+    BlockSNode* bn = (BlockSNode*) body_info->snode;
+    for (const auto& local_var: this->scope->table) {
+        bn->locals.push_back(local_var.first);
+    }
     this->leave_scope();
 
     std::vector<std::pair<SNode*, BlockSNode*>> elifs;
@@ -346,6 +368,10 @@ USemanticInfo Checker::visit_if(IfNode& n) {
         SNode* elif_condition_snode = elif_condition_sinfo->snode;
         this->enter_scope("elif");
         USemanticInfo elif_block_info = this->visit_block(*elif.second);
+        BlockSNode* bn = (BlockSNode*) elif_block_info->snode;
+        for (const auto& local_var: this->scope->table) {
+            bn->locals.push_back(local_var.first);
+        }
         this->leave_scope();
         elifs.emplace_back(elif_condition_snode, (BlockSNode*) elif_block_info->snode);
     }
@@ -353,6 +379,10 @@ USemanticInfo Checker::visit_if(IfNode& n) {
     if (n.selse != nullptr && !n.selse->nodes.empty()) {
         this->enter_scope("else");
         else_info = this->visit_block(*n.selse);
+        BlockSNode* bn = (BlockSNode*) else_info->snode;
+        for (const auto& local_var: this->scope->table) {
+            bn->locals.push_back(local_var.first);
+        }
         this->leave_scope();
     }
     SNode* else_snode = else_info == nullptr ? nullptr : else_info->snode;

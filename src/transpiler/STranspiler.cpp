@@ -25,6 +25,9 @@ std::string STranspiler::transpile_return(ReturnSNode* node) {
     }
     std::string out = TOBJECT + SPACE + RETURN_VAR + SPACE + ASSIGN + SPACE + GCRETURN + LPAREN + SPACE +
                       this->dispatch(node->expression) + RPAREN + SEMIC + NEWLINE;
+    for (auto reachable: node->reachables) {
+        out += GCOUTOFSCOPE + LPAREN + reachable + RPAREN + SEMIC + NEWLINE;
+    }
     out += RETURN + SPACE + RETURN_VAR + SEMIC + NEWLINE;
     return out;
 }
@@ -56,7 +59,7 @@ std::string STranspiler::transpile_id(IdSNode* node) {
 void STranspiler::transpile_function(FunctionSNode* node) {
     std::string parameters;
 
-    for (auto & param : node->params) {
+    for (auto& param : node->params) {
         if (param == "this") {
             param = "this_obj";
         }
@@ -97,17 +100,20 @@ void STranspiler::transpile_function(FunctionSNode* node) {
 
 std::string STranspiler::transpile_block(BlockSNode* node) {
     std::string out;
-    for (auto *n: node->nodes) {
+    for (auto* n: node->nodes) {
         out += this->dispatch(n);
         if (n->type == SNodeType::CALL) {
             out += SEMIC + NEWLINE;
         }
     }
+    for (auto local: node->locals) {
+        out += GCOUTOFSCOPE + LPAREN + local + RPAREN + SEMIC + NEWLINE;
+    }
     return out;
 }
 
 void STranspiler::transpile_program(BlockSNode* node) {
-    for (auto *n: node->nodes) {
+    for (auto* n: node->nodes) {
         this->dispatch_top(n);
     }
 }
@@ -119,7 +125,7 @@ std::string STranspiler::transpile_integer(IntegerSNode* node) {
 std::string STranspiler::transpile_call(CallSNode* node) {
     std::string out;
     std::string arguments;
-    for (auto *arg: node->arguments) {
+    for (auto* arg: node->arguments) {
         std::string arg_s = this->dispatch(arg);
         arguments += arg_s + COMMA + SPACE;
     }
@@ -174,7 +180,7 @@ std::string STranspiler::transpile_new(NewObjectSNode* node) {
     if (class_id == "core_D_core_D_List") {
         out += "-------{";
     }
-    for (auto *m: node->args) {
+    for (auto* m: node->args) {
         if (m != nullptr) {
             out += this->dispatch(m) + COMMA + SPACE;
         } else {
@@ -210,7 +216,7 @@ std::string STranspiler::transpile_while(WhileSNode* sn) {
 std::string STranspiler::transpile_list(ListSNode* ln) {
     std::string out;
     out = "NEW(XList,{";
-    for (auto *e: ln->elements) {
+    for (auto* e: ln->elements) {
         out += this->dispatch(e) + ", ";
     }
     if (!ln->elements.empty()) {
@@ -254,20 +260,28 @@ std::string STranspiler::transpile_if(IfSNode* in) {
 }
 
 std::string STranspiler::transpile_break(BreakSNode* bn) {
-    std::string out = "break" + SEMIC + NEWLINE;
+    std::string out;
+    for (auto reachable: bn->reachables) {
+        out += GCOUTOFSCOPE + LPAREN + reachable + RPAREN + SEMIC + NEWLINE;
+    }
+    out+= "break" + SEMIC + NEWLINE;
     return out;
 }
 
-std::string STranspiler::transpile_continue(ContinueSNode* pNode) {
-    std::string out = "continue" + SEMIC + NEWLINE;
+std::string STranspiler::transpile_continue(ContinueSNode* cn) {
+    std::string out;
+    for (auto reachable: cn->reachables) {
+        out += GCOUTOFSCOPE + LPAREN + reachable + RPAREN + SEMIC + NEWLINE;
+    }
+    out+= "continue" + SEMIC + NEWLINE;
     return out;
 }
 
 std::string STranspiler::transpile_match(MatchSNode* mn) {
     std::string out;
     out += this->dispatch(mn->exp);
-    out += "switch" + SPACE + LPAREN + "GET_INT(CAST(" + mn->varname + ",core_D_core_D_Union" + RPAREN + "->type" + RPAREN +
-           RPAREN + SPACE + LCURLY;
+    out += "switch" + SPACE + LPAREN + "GET_INT(CAST(" + mn->varname + ",core_D_core_D_Union" + RPAREN + "->type" +
+           RPAREN + RPAREN + SPACE + LCURLY;
     for (auto c: mn->cases) {
         out += "case" + SPACE + "" + std::to_string(c.first) + "" + SPACE + ":" + SPACE + LCURLY +
                this->transpile_block(c.second) + "break" + SEMIC + RCURLY;

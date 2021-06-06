@@ -7,10 +7,12 @@
 
 
 #include <vector>
+#include <string>
 #include "SNode.h"
 
 class BreakSNode : public SNode {
 public:
+    std::vector<std::string> reachables;
     BreakSNode();
 };
 

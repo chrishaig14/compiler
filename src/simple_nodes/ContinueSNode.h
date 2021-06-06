@@ -7,9 +7,12 @@
 
 
 #include "SNode.h"
+#include <vector>
+#include <string>
 
 class ContinueSNode : public SNode {
 public:
+    std::vector<std::string> reachables;
     ContinueSNode();
 };
 
