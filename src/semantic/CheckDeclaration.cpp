@@ -27,6 +27,13 @@ SNode* Checker::make_rvalue(const Entity& value_entity, SNode* value_snode, cons
         if (value_entity.value->type->kind != target.kind) {
             return nullptr;
         }
+        if (value_entity.value->type->kind == Kind::FUNCTION) {
+            if (*value_entity.value->type == target) {
+                return value_snode;
+            } else {
+                throw std::runtime_error("Error cannot make function rvalue");
+            }
+        }
         const ObjectType& value_ot = value_entity.value->type->object();
         const ObjectType& target_ot = target.object();
 
@@ -58,7 +65,8 @@ SNode* Checker::make_rvalue(const Entity& value_entity, SNode* value_snode, cons
         }
 
     } else {
-        // this->error_reporter.fail("MAKE RVALUE OF FUNCTION!");
+        return value_snode;
+        this->error_reporter.fail("MAKE RVALUE OF FUNCTION!");
         return nullptr;
     }
     return nullptr;
