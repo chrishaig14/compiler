@@ -65,11 +65,7 @@ XList::~XList() {
                 if (has_tag(this->l->at(i), FUNCTION_TAG)) {
                     continue;
                 }
-                XObject* el = UNTAG(this->l->at(i));
-                el->dec_count();
-                if (el->count == 0) {
-                    delete el;
-                }
+                GC::out_of_scope(this->l->at(i));
             }
         }
     }

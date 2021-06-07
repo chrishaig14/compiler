@@ -9,7 +9,7 @@ XObject::XObject(std::string class_name) {
     this->class_name = class_name;
     this->is_list = false;
     this->is_string = false;
-    this->count = 0;
+    this->gc_info = 0;
 }
 
 XObject::~XObject() {

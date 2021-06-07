@@ -19,11 +19,7 @@ TaggedObject* GC::assign(TaggedObject* old_value_t, TaggedObject* new_value_t) {
                 XObject* new_ = UNTAG(new_value_t);
                 new_->inc_count();
             }
-            XObject* old = UNTAG(old_value_t);
-            old->dec_count();
-            if (old->count == 0) {
-                delete old;
-            }
+            GC::out_of_scope(old_value_t);
         }
     } else if (has_tag(new_value_t, OBJECT_TAG)) {
         XObject* new_ = UNTAG(new_value_t);
@@ -37,10 +33,10 @@ void GC::out_of_scope(TaggedObject* old_value_t) {
         if (has_tag(old_value_t, OBJECT_TAG)) {
             XObject* old = UNTAG(old_value_t);
             old->dec_count();
-            if (old->count == 0) { // doesnt have tag
+            if (get_count_value(old->gc_info) == 0) { // doesnt have tag
                 delete old;
-            } else if (old->count & (unsigned long) 1 << 63) {
-                old->count = old->count & ~((unsigned long) 1 << 63);
+            } else {
+                old->gc_info = clear_tag_value(old->gc_info, GC_RETURN);
             }
         }
     }
@@ -49,8 +45,8 @@ void GC::out_of_scope(TaggedObject* old_value_t) {
 TaggedObject* GC::set_return(TaggedObject* obj) {
     if (obj != nullptr) {
         if (has_tag(obj, OBJECT_TAG)) {
-            if (UNTAG(obj)->count != 0) {
-                UNTAG(obj)->count = UNTAG(obj)->count | ((unsigned long) 1 << 63);
+            if (UNTAG(obj)->gc_info != 0) {
+                UNTAG(obj)->gc_info = set_tag_value(UNTAG(obj)->gc_info, GC_RETURN);
             }
         }
     }
