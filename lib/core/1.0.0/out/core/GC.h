@@ -28,12 +28,12 @@ public:
     TaggedObject* set(TaggedObject* old_value_t, TaggedObject* new_value_t) {
         if (has_tag(old_value_t, OBJECT_TAG)) {
             XObject* old_value = UNTAG(old_value_t);
-            old_value->gc_info--;
-            if (old_value->gc_info == 0) {
+            old_value->gc_info.count--;
+            if (old_value->gc_info.count == 0) {
                 delete old_value;
             }
             XObject* new_value = UNTAG(new_value_t);
-            new_value->gc_info++;
+            new_value->gc_info.count++;
         }
         return new_value_t;
     }

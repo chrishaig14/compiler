@@ -10,40 +10,19 @@
 
 class TaggedObject;
 
-#define GC_TAGS ((unsigned long)0b111<<61)
-#define GC_RETURN ((unsigned long)1 << 63)
-
-inline unsigned long get_tag_value(unsigned long gc_info, unsigned long tag) {
-    return gc_info & tag;
-}
-
-inline unsigned long set_tag_value(unsigned long gc_info, unsigned long tag) {
-    return gc_info | tag;
-}
-
-inline unsigned long clear_tag_value(unsigned long gc_info, unsigned long tag) {
-    return gc_info & ~tag;
-}
-
-inline unsigned long get_count_value(unsigned long gc_info) {
-    return gc_info & ~GC_TAGS;
-}
-
-inline unsigned long inc_count_value(unsigned long gc_info) {
-    unsigned long tag = gc_info & GC_TAGS;
-    return tag + (gc_info & ~GC_TAGS) + 1;
-}
-
-inline unsigned long dec_count_value(unsigned long gc_info) {
-    unsigned long tag = gc_info & GC_TAGS;
-    return tag + (gc_info & ~GC_TAGS) - 1;
-}
+struct gc_info_t {
+    bool RETURN: 1;
+    bool UNUSED_TAG1: 1;
+    bool UNUSED_TAG2: 1;
+    bool UNUSED_TAG3: 1;
+    unsigned long count: 60;
+};
 
 class XObject {
 public:
     bool is_list;
     bool is_string;
-    unsigned long gc_info;
+    gc_info_t gc_info;
     std::string class_name;
 
     XObject(std::string class_name);
@@ -53,11 +32,11 @@ public:
     virtual TaggedObject* __eq__(TaggedObject* pObject);
 
     inline void inc_count() {
-        this->gc_info = inc_count_value(this->gc_info);
+        this->gc_info.count++;
     };
 
     inline void dec_count() {
-        this->gc_info = dec_count_value(this->gc_info);
+        this->gc_info.count--;
     };
 };
 

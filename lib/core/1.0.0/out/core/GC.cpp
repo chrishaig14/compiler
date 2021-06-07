@@ -33,10 +33,10 @@ void GC::out_of_scope(TaggedObject* old_value_t) {
         if (has_tag(old_value_t, OBJECT_TAG)) {
             XObject* old = UNTAG(old_value_t);
             old->dec_count();
-            if (get_count_value(old->gc_info) == 0) { // doesnt have tag
+            if (old->gc_info.count == 0) { // doesnt have tag
                 delete old;
             } else {
-                old->gc_info = clear_tag_value(old->gc_info, GC_RETURN);
+                old->gc_info.RETURN = false;
             }
         }
     }
@@ -45,8 +45,8 @@ void GC::out_of_scope(TaggedObject* old_value_t) {
 TaggedObject* GC::set_return(TaggedObject* obj) {
     if (obj != nullptr) {
         if (has_tag(obj, OBJECT_TAG)) {
-            if (UNTAG(obj)->gc_info != 0) {
-                UNTAG(obj)->gc_info = set_tag_value(UNTAG(obj)->gc_info, GC_RETURN);
+            if (UNTAG(obj)->gc_info.count != 0) {
+                UNTAG(obj)->gc_info.RETURN = true;
             }
         }
     }
