@@ -68,10 +68,10 @@ public:
 
 class GC {
 public:
-
+    static bool collecting;
     static TaggedObject* declare(TaggedObject* obj);
     static TaggedObject* assign(TaggedObject* old_value_t, TaggedObject* new_value_t);
-    static void out_of_scope(TaggedObject* old_value_t);
+    static void out_of_scope(TaggedObject* old_value_t, std::string s = "");
 
     static TaggedObject* set_return(TaggedObject* obj);
 };

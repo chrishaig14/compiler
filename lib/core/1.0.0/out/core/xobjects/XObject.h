@@ -12,7 +12,7 @@ class TaggedObject;
 
 struct gc_info_t {
     bool RETURN: 1;
-    bool UNUSED_TAG1: 1;
+    bool in_roots: 1;
     bool UNUSED_TAG2: 1;
     bool UNUSED_TAG3: 1;
     unsigned long count: 60;
@@ -34,6 +34,14 @@ public:
     inline void inc_count() {
         this->gc_info.count++;
     };
+
+    virtual std::vector<XObject*> get_all_members() {
+        return {};
+    }
+
+    void traverse_count();
+
+    void traverse(std::vector<XObject*>& roots);
 
     inline void dec_count() {
         this->gc_info.count--;

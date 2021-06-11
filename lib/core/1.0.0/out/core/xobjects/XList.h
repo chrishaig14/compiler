@@ -29,6 +29,20 @@ public:
 
     }
 
+    std::vector<XObject*> get_all_members() override {
+        if (this->lv.empty()) {
+            return {};
+        }
+        if (!has_tag(this->lv[0], OBJECT_TAG)) {
+            return {};
+        }
+        std::vector<XObject*> ret;
+        for (auto* to: this->lv) {
+            ret.push_back(UNTAG(to));
+        }
+        return ret;
+    }
+
     TaggedObject* __eq__(TaggedObject* pObject) override;
     ~XList() override;
 };

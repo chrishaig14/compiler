@@ -172,9 +172,19 @@ void STranspiler::transpile_class(ClassSNode* node) {
     out += RCURLY + NEWLINE;
 
     out += "~" + class_name + LPAREN + RPAREN + LCURLY + NEWLINE;
+    out += "if (!GC::collecting){\n";
     for (const auto& m: node->members) {
         out += GCOUTOFSCOPE + LPAREN + "this->" + m + RPAREN + SEMIC + NEWLINE;
     }
+    out += RCURLY;
+    out += RCURLY + NEWLINE;
+
+    out += "std::vector<XObject*> get_all_members() override {\n";
+    out += "std::vector<XObject*> r;\n";
+    for (const auto& m: node->members) {
+        out += "if (has_tag(this->" + m + ",OBJECT_TAG)){r.push_back(UNTAG(this->" + m + "));}";
+    }
+    out += "return r;";
     out += RCURLY + NEWLINE;
 
     out += RCURLY + SEMIC + NEWLINE;

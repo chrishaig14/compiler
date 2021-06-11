@@ -59,6 +59,9 @@ TaggedObject* XList::__eq__(TaggedObject* pObject) {
 }
 
 XList::~XList() {
+    if (GC::collecting) {
+        return;
+    }
     if (this->l->size() != 0) {
         if (has_tag(this->l->at(0), OBJECT_TAG)) {
             for (size_t i = 0; i < this->l->size(); i++) {

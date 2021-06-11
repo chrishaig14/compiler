@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.16)
 project(xlang)
 
 set(CMAKE_CXX_STANDARD 14)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror -Winline -O0 -fverbose-asm")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror -Winline -O0 -fverbose-asm -g")
 add_library(
         core-1.0.0
         core/core.cpp
