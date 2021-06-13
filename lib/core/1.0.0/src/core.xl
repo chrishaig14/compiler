@@ -102,6 +102,8 @@ class List[t] {
     fun len()->Integer{}
     fun push(x: t){}
     fun has(x: t)->Boolean{}
+    fun map(f: fun(t)->u) -> List[u] {}
+    fun where(f: fun(t)->Boolean) -> List[t] {}
     static fun __add__(a: List[t], b: List[t])->List[t]{}
 }
 

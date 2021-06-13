@@ -136,3 +136,39 @@ TaggedObject* core_D_core_D_List_D_push_f(TaggedObject* a, TaggedObject* b) {
     GC::declare(b);
     return nullptr;
 }
+
+DEFINE_FUNCTION(2, core_D_core_D_List_D_map)
+
+TaggedObject* core_D_core_D_List_D_map_f(TaggedObject* a, TaggedObject* f) {
+    GC::declare(a);
+    GC::declare(f);
+    XList* la = CAST(a, XList);
+    TaggedObject* r = NEW(XList, la->l->size());
+    XList* rl = CAST(r, XList);
+    for (int i = 0; i < la->l->size(); i++) {
+        TaggedObject* re = CALL1(f, la->lv[i]);
+        rl->lv[i] = GC::declare(re);
+    }
+    GC::out_of_scope(a);
+    GC::out_of_scope(f);
+    return r;
+}
+
+DEFINE_FUNCTION(2, core_D_core_D_List_D_where)
+
+TaggedObject* core_D_core_D_List_D_where_f(TaggedObject* a, TaggedObject* f) {
+    GC::declare(a);
+    GC::declare(f);
+    XList* la = CAST(a, XList);
+    TaggedObject* r = NEW(XList, {});
+    XList* rl = CAST(r, XList);
+    for (int i = 0; i < la->l->size(); i++) {
+        TaggedObject* re = CALL1(f, la->lv[i]);
+        if (GET_BOOL(re)) {
+            rl->lv.push_back(GC::declare(la->lv[i]));
+        }
+    }
+    GC::out_of_scope(a);
+    GC::out_of_scope(f);
+    return r;
+}
