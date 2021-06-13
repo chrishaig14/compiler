@@ -189,6 +189,8 @@ Class* Checker::instantiate_generic(Class* generic, const ObjectType& instance) 
         this->module->fill_actual(&concrete_type);
     }
 
+
+
     std::unordered_map<std::string, ConstFunction*> concrete_methods;
     for (const auto& m: generic->methods) {
         TypeNode* t = (m.second)->ft;
@@ -220,7 +222,9 @@ Class* Checker::instantiate_generic(Class* generic, const ObjectType& instance) 
     concrete->member_types = concrete_field_types;
     concrete->path = generic->path;
     for (size_t i = 0; i < generic->member_names.size(); i++) {
-        concrete->members[generic->member_names[i]] = concrete_field_types[i];
+        std::string mn = generic->member_names[i];
+        concrete->members[mn] = concrete_field_types[i];
+        concrete->member_entities[mn] = Entity(E_TYPE::NOTHING);
     }
     return concrete;
 }

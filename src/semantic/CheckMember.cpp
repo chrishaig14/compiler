@@ -78,9 +78,9 @@ USemanticInfo Checker::object_member(SNode* object_snode, Value* p_value, const 
     Class* clazz = p_value->clazz;
     assert(clazz != nullptr);
     if (clazz->members.count(child) != 0) {
-        info.entity = clazz->member_entities[child];
+        info.entity = clazz->member_entities.at(child);
         if (info.entity.type == E_TYPE::NOTHING) {
-            info.entity = entity_from_type(*clazz->members[child]);
+            info.entity = entity_from_type(*clazz->members.at(child));
             clazz->member_entities[child] = info.entity;
             this->fill_value(info.entity.value);
         }
