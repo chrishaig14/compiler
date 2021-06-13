@@ -13,6 +13,7 @@ std::string entity_to_string(const Entity& entity) {
         case E_TYPE::VALUE:
             return E_HLT(entity.value->type->to_string());
         case E_TYPE::CONST_FUNCTION:
+            return E_HLT(entity.const_function->ft->to_string());
             return "function " + E_HLT(entity.const_function->path.as_vec().back());
         case E_TYPE::ERROR:
             return "ERROR";
@@ -329,7 +330,8 @@ void ErrorReporter::expected_expression(const Entity& entity, const Node& pos) {
     this->fail_ok(pre_msg, msg, pos.start);
 }
 
-void ErrorReporter::class_no_method_for_op(const std::string& class_name, const std::string& method_name, const Node& node) {
+void
+ErrorReporter::class_no_method_for_op(const std::string& class_name, const std::string& method_name, const Node& node) {
     std::string pre_msg = E_FMT("Class ") + E_HLT(class_name) + " does not define " +
                           E_HLT("static fun " + method_name + "(" + class_name + ", " + class_name + ") -> " +
                                 class_name) + " needed for this operation";
@@ -337,7 +339,8 @@ void ErrorReporter::class_no_method_for_op(const std::string& class_name, const 
     this->fail_ok(pre_msg, msg, node.start);
 }
 
-void ErrorReporter::enum_no_value(const std::string& enum_name, const std::string& value, MemberNode& node, Enum* enumm) {
+void
+ErrorReporter::enum_no_value(const std::string& enum_name, const std::string& value, MemberNode& node, Enum* enumm) {
     TextPosition member_start = add_one_col(node.dot_pos);
     TextPosition member_end = node.end;
     Node& obj = *node.parent;

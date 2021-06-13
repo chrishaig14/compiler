@@ -51,10 +51,11 @@ USemanticInfo Checker::visit_call(CallNode& n, bool is_rvalue) {
     if (has_error) {
         return error_stub();
     }
-
+    std::cout << "Calling function of type: " << function_type->to_string() << std::endl;
     if (function_type->is_generic()) {
         // mangle the generic types in function_type to prevent collisions
         mangle_generic_names(function_type);
+        std::cout << "Mangled function of type: " << function_type->to_string() << std::endl;
         USemanticInfo inf = this->match_arguments_to_generic_function(*function_type, arg_types);
         if (inf->is_error()) {
             std::cout << "ERRORR CANNOT CALL " << std::endl;

@@ -208,7 +208,9 @@ void Checker::fill_value(Value* value) {
     }
     Class* cls = flirpin.clazz;
     if (!cls->type_params.empty()) {
+        std::cout << "Instantiating type " << value->type->object().to_string() << std::endl;
         cls = instantiate_generic(cls, value->type->object());
+        std::cout << "Done instantiating" << std::endl;
     }
     value->metatype = Meta::CLASS;
     value->clazz = cls;

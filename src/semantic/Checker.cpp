@@ -7,7 +7,7 @@
 #include "util.h"
 
 bool function_is_generic(const FunctionType& ft) {
-    for (auto *param_type: ft.param_types) {
+    for (auto* param_type: ft.param_types) {
         if (is_generic(*param_type)) {
             return true;
             break;
@@ -66,7 +66,7 @@ bool Checker::assert_type_exists(TypeNode& type, TextPosition pos) {
         // }
     } else {
         bool error = false;
-        for (auto *t: type.function().param_types) {
+        for (auto* t: type.function().param_types) {
             if (!this->assert_type_exists(*t, pos)) {
                 error = true;
             }
@@ -85,14 +85,14 @@ bool is_generic(const TypeNode& t) {
             assert(o.type_params.empty());
             return true;
         }
-        for (auto *type_param: o.type_params) {
+        for (auto* type_param: o.type_params) {
             if (is_generic(*type_param)) {
                 return true;
             }
         }
     } else {
         const FunctionType& fo = t.function();
-        for (auto *param_type: fo.param_types) {
+        for (auto* param_type: fo.param_types) {
             if (is_generic(*param_type)) {
                 return true;
             }
@@ -111,13 +111,13 @@ Checker::match_arguments_to_generic_function(const FunctionType& ft, VectorOfTyp
         unify_function_call(*f, arg_types);
     } catch (...) {
         std::string sss = "ERROR CANNOT UNIFY " + ft.to_string() + " WITH ARGS";
-        for (auto *at: arg_types) {
+        for (auto* at: arg_types) {
             sss += at->to_string() + ", ";
         }
         this->error_reporter.fail(sss);
         return error_stub();
     }
-    for (auto *at: arg_types) {
+    for (auto* at: arg_types) {
         delete at;
     }
     SemanticInfo rv;
@@ -139,17 +139,26 @@ TypeNode* make_type_from_object_pattern(const ObjectType& object_type, const Map
     }
     // It's not the top level type
     VectorOfTypes new_type_params;
-    for (auto *tp: object_type.type_params) {
+    for (auto* tp: object_type.type_params) {
         TypeNode* new_tp = make_type(*tp, replacements);
         new_type_params.push_back(new_tp);
     }
+    for (auto* nt: new_type_params) {
+        if (nt->kind == Kind::OBJECT && nt->object().id.size() == 1 && (islower(nt->object().id.c_str()[0]) != 0)) {
+            nt->object().is_generic_param = true;
+        }
+    }
     auto* ot = TYPE(type_identifier, new_type_params);
+    if (type_identifier.size() == 1 && (islower(type_identifier.c_str()[0]) != 0)) {
+        ot->object().is_generic_param = true;
+    }
     return ot;
+
 }
 
 TypeNode* make_type_from_function_pattern(const FunctionType& ftn, const MapStringType& replacements) {
     VectorOfTypes new_param_types;
-    for (auto *pt: ftn.param_types) {
+    for (auto* pt: ftn.param_types) {
         TypeNode* new_pt = make_type(*pt, replacements);
         new_param_types.push_back(new_pt);
     }
@@ -174,7 +183,7 @@ Class* Checker::instantiate_generic(Class* generic, const ObjectType& instance) 
     }
     auto field_names = generic->member_names;
     VectorOfTypes concrete_field_types;
-    for (auto *f: generic->member_types) {
+    for (auto* f: generic->member_types) {
         TypeNode& concrete_type = *make_type(*f, replacements);
         concrete_field_types.push_back(&concrete_type);
         this->module->fill_actual(&concrete_type);
@@ -188,6 +197,7 @@ Class* Checker::instantiate_generic(Class* generic, const ObjectType& instance) 
         auto* cf = new ConstFunction();
         cf->path = m.second->path;
         cf->ft = (FunctionType*) concrete_type.clone();
+        std::cout << "Instantiated generic method " << m.first << " : " << cf->ft->to_string() << std::endl;
         concrete_methods[m.first] = cf;
     }
 

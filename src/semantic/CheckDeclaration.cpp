@@ -9,7 +9,7 @@ std::unique_ptr<SemanticInfo> Checker::expect_rvalue_of_type(const TypeNode& tar
     if (rinfo->is_error()) {
         return error_stub();
     }
-    if (rinfo->entity.type != E_TYPE::VALUE) {
+    if (rinfo->entity.type != E_TYPE::VALUE && rinfo->entity.type != E_TYPE::CONST_FUNCTION) {
         this->error_reporter.error_type_mismatch(target, node, rinfo->entity);
         return error_stub();
     }
@@ -31,7 +31,8 @@ SNode* Checker::make_rvalue(const Entity& value_entity, SNode* value_snode, cons
             if (*value_entity.value->type == target) {
                 return value_snode;
             } else {
-                throw std::runtime_error("Error cannot make function rvalue");
+                return nullptr;
+                // throw std::runtime_error("Error cannot make function rvalue");
             }
         }
         const ObjectType& value_ot = value_entity.value->type->object();
@@ -64,7 +65,13 @@ SNode* Checker::make_rvalue(const Entity& value_entity, SNode* value_snode, cons
             return make_option_rvalue(value_snode, unaliased_value_type, unaliased_target_type);
         }
 
-    } else {
+    } else if (value_entity.type == E_TYPE::CONST_FUNCTION) {
+        if (*value_entity.const_function->ft == target) {
+            return value_snode;
+        } else {
+            return nullptr;
+            throw std::runtime_error("Error cannot make function rvalue");
+        }
         return value_snode;
         this->error_reporter.fail("MAKE RVALUE OF FUNCTION!");
         return nullptr;
