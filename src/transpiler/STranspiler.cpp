@@ -26,6 +26,9 @@ std::string STranspiler::transpile_return(ReturnSNode* node) {
     std::string out = TOBJECT + SPACE + RETURN_VAR + SPACE + ASSIGN + SPACE + GCRETURN + LPAREN + SPACE +
                       this->dispatch(node->expression) + RPAREN + SEMIC + NEWLINE;
     for (auto reachable: node->reachables) {
+        if (reachable == "this") {
+            reachable = "this_obj";
+        }
         out += GCOUTOFSCOPE + LPAREN + reachable + RPAREN + SEMIC + NEWLINE;
     }
     out += RETURN + SPACE + RETURN_VAR + SEMIC + NEWLINE;
@@ -107,6 +110,9 @@ std::string STranspiler::transpile_block(BlockSNode* node) {
         }
     }
     for (auto local: node->locals) {
+        if (local == "this") {
+            local = "this_obj";
+        }
         out += GCOUTOFSCOPE + LPAREN + local + RPAREN + SEMIC + NEWLINE;
     }
     return out;
@@ -280,6 +286,9 @@ std::string STranspiler::transpile_if(IfSNode* in) {
 std::string STranspiler::transpile_break(BreakSNode* bn) {
     std::string out;
     for (auto reachable: bn->reachables) {
+        if (reachable == "this") {
+            reachable = "this_obj";
+        }
         out += GCOUTOFSCOPE + LPAREN + reachable + RPAREN + SEMIC + NEWLINE;
     }
     out += "break" + SEMIC + NEWLINE;
@@ -289,6 +298,9 @@ std::string STranspiler::transpile_break(BreakSNode* bn) {
 std::string STranspiler::transpile_continue(ContinueSNode* cn) {
     std::string out;
     for (auto reachable: cn->reachables) {
+        if (reachable == "this") {
+            reachable = "this_obj";
+        }
         out += GCOUTOFSCOPE + LPAREN + reachable + RPAREN + SEMIC + NEWLINE;
     }
     out += "continue" + SEMIC + NEWLINE;
