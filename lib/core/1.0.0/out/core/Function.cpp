@@ -2,7 +2,7 @@
 // Created by chris on 14/4/21.
 //
 #include "Function.h"
-
+#include "GC.h"
 TaggedObject* Partial2::operator()(TaggedObject* a0, TaggedObject* a1) {
     std::vector<TaggedObject*> cur_args = {a0, a1};
     std::vector<TaggedObject*> args(this->p.size(), nullptr);
@@ -48,12 +48,12 @@ TaggedObject* Partial1::operator()(TaggedObject* a0) {
 }
 
 Partial1::Partial1(TaggedObject* f, TaggedObject* p0, TaggedObject* p1, TaggedObject* p2) {
-    this->p = {p0, p1, p2};
+    this->p = {GC::declare(p0), GC::declare(p1), GC::declare(p2)};
     this->f.f3 = f;
 }
 
 Partial1::Partial1(TaggedObject* f, TaggedObject* p0, TaggedObject* p1) {
-    this->p = {p0, p1};
+    this->p = {GC::declare(p0), GC::declare(p1)};
     this->f.f2 = f;
 }
 

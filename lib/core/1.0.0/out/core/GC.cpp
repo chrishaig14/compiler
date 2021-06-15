@@ -55,21 +55,21 @@ void GC::out_of_scope(TaggedObject* old_value_t, std::string c) {
             if (GC::collecting and old->gc_info.count == 0) {
                 delete old;
             }
-            std::cout << "object " << c << " : " << old << " out of scope " << std::endl;
-            std::cout << "(" << old << ") count before decreasing: " << old->gc_info.count << std::endl;
+            // std::cout << "object " << c << " : " << old << " out of scope " << std::endl;
+            // std::cout << "(" << old << ") count before decreasing: " << old->gc_info.count << std::endl;
             old->dec_count();
-            std::cout << "(" << old << ") count after decreasing: " << old->gc_info.count << std::endl;
+            // std::cout << "(" << old << ") count after decreasing: " << old->gc_info.count << std::endl;
             if (old->gc_info.count == 0) { // doesnt have tag
-                std::cout << old << " deleting because cound == 0" << std::endl;
+                // std::cout << old << " deleting because cound == 0" << std::endl;
                 delete old;
             } else {
-                std::cout << old << " out of scope but count != 0 " << std::endl;
+                // std::cout << old << " out of scope but count != 0 " << std::endl;
                 std::vector<XObject*> roots;
                 std::vector<unsigned long> old_counts;
                 old->gc_info.in_roots = true;
                 roots.push_back(old);
                 old->traverse(roots);
-                std::cout << "there are " << roots.size() << " roots " << std::endl;
+                // std::cout << "there are " << roots.size() << " roots " << std::endl;
                 for (auto o: roots) {
                     old_counts.push_back(o->gc_info.count);
                     o->gc_info.count = 0;
@@ -80,8 +80,8 @@ void GC::out_of_scope(TaggedObject* old_value_t, std::string c) {
 
                 bool found_isolated_cycle = true;
                 for (size_t i = 0; i < roots.size(); i++) {
-                    std::cout << "total count for (" << roots[i] << ") = " << old_counts[i] << std::endl;
-                    std::cout << "inner count for (" << roots[i] << ") = " << roots[i]->gc_info.count << std::endl;
+                    // std::cout << "total count for (" << roots[i] << ") = " << old_counts[i] << std::endl;
+                    // std::cout << "inner count for (" << roots[i] << ") = " << roots[i]->gc_info.count << std::endl;
                     if (roots[i]->gc_info.count != old_counts[i]) {
                         found_isolated_cycle = false;
                         break;
@@ -89,7 +89,7 @@ void GC::out_of_scope(TaggedObject* old_value_t, std::string c) {
                 }
                 if (found_isolated_cycle) {
                     GC::collecting = true;
-                    std::cout << "Found a cycle" << std::endl;
+                    // std::cout << "Found a cycle" << std::endl;
                     for (auto o: roots) {
                         std::cout << "Deleted " << o << std::endl;
                         delete o;
@@ -103,7 +103,7 @@ void GC::out_of_scope(TaggedObject* old_value_t, std::string c) {
                     old->gc_info.RETURN = false;
                 }
 
-                std::cout << "finished for object " << c << std::endl;
+                // std::cout << "finished for object " << c << std::endl;
                 std::cout << std::endl;
             }
         }

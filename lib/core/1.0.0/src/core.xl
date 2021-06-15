@@ -77,6 +77,42 @@ class Float {
     }
 }
 
+class Double {
+    static fun __add__(a: Double, b: Double) -> Double {
+        return 0
+    }
+    static fun __sub__(a: Double, b: Double) -> Double {
+        return 0
+    }
+    static fun __mul__(a: Double, b: Double) -> Double {
+        return 0
+    }
+    static fun __div__(a: Double, b: Double) -> Double {
+        return 0
+    }
+    static fun __eq__(a: Double, b: Double) -> Boolean {
+        return false
+    }
+    static fun __ne__(a: Double, b: Double) -> Boolean {
+        return false
+    }
+    static fun __le__(a: Double, b: Double) -> Boolean {
+        return false
+    }
+    static fun __ge__(a: Double, b: Double) -> Boolean {
+        return false
+    }
+    static fun __lt__(a: Double, b: Double) -> Boolean {
+        return false
+    }
+    static fun __gt__(a: Double, b: Double) -> Boolean {
+        return false
+    }
+    fun str() -> String {
+        return ""
+    }
+}
+
 class String {
     fun len()->Integer{}
     fun __get_item__(i: Integer)->String{}
