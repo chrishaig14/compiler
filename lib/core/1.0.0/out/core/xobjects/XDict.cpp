@@ -27,6 +27,9 @@ XDict::XDict(std::unordered_map<TaggedObject*, TaggedObject*> v) : XObject("Dict
 }
 
 XDict::~XDict() {
+    if (GC::collecting) {
+        return;
+    }
     // if (has_tag(this->l.begin()->second, OBJECT_TAG)) {
     //     for (auto& it: this->l) {
     //         GC::out_of_scope(it.second);
@@ -81,4 +84,8 @@ TaggedObject* core_D_core_D_Dict_D_get_f(TaggedObject* a, TaggedObject* b) {
         return b;
     }
     return l[h];
+}
+
+std::vector<XObject*> XDict::get_all_members() {
+    return {};
 }

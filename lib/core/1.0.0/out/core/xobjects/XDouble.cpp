@@ -18,7 +18,9 @@ XDouble::XDouble(double d) : XObject("Double") {
     this->d = d;
 }
 
-TaggedObject* core_D_Double_D_str_f(TaggedObject* _i) {
+DEFINE_FUNCTION(1, core_D_core_D_Double_D_str)
+
+TaggedObject* core_D_core_D_Double_D_str_f(TaggedObject* _i) {
     std::ostringstream out;
     out.precision(50);
     out << CAST(_i, XDouble)->d;
@@ -27,4 +29,9 @@ TaggedObject* core_D_Double_D_str_f(TaggedObject* _i) {
     TaggedObject* x = NEW(XString, s);
     return x;
 }
-DEFINE_FUNCTION(1, core_D_Double_D_str)
+
+DEFINE_FUNCTION(2, core_D_core_D_Double_D___sub__)
+
+TaggedObject* core_D_core_D_Double_D___sub___f(TaggedObject* a, TaggedObject* b) {
+    return MAKE_DOUBLE(CAST(a, XDouble)->d - CAST(b, XDouble)->d);
+}

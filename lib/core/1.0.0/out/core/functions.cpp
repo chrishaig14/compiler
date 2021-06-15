@@ -5,6 +5,7 @@
 #include "functions.h"
 
 #include <unistd.h>
+#include <sys/time.h>
 
 DEFINE_FUNCTION(1, core_D_core_D_exit)
 DEFINE_FUNCTION(1, core_D_core_D_print)
@@ -29,6 +30,14 @@ TaggedObject* core_D_core_D_print_f(TaggedObject* _s) {
     std::cout << s->s << std::endl;
     GC::out_of_scope(_s);
     return nullptr;
+}
+
+DEFINE_FUNCTION(0, core_D_core_D_time)
+
+TaggedObject* core_D_core_D_time_f() {
+    timeval time;
+    gettimeofday(&time, NULL);
+    return MAKE_DOUBLE(time.tv_sec + time.tv_usec / 1000000.0);
 }
 
 TaggedObject* core_D_core_D_range_f(TaggedObject* _start, TaggedObject* _step, TaggedObject* _end) {

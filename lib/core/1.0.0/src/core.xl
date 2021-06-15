@@ -128,3 +128,5 @@ fun exit(c: Integer){}
 
 
 fun sleep(t: Integer){}
+
+fun time()->Double{}

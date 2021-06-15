@@ -22,6 +22,7 @@ public:
 
     XDict(std::unordered_map<TaggedObject*, TaggedObject*> v);
     ~XDict() override;
+    std::vector<XObject*> get_all_members() override;
 
 };
 

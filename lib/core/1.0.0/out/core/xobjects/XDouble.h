@@ -16,9 +16,14 @@ public:
     TaggedObject* __eq__(TaggedObject* pObject) override;
     double d;
 };
+extern Function1 core_D_core_D_Double_D_str_o;
+extern TaggedObject* core_D_core_D_Double_D_str;
 
-extern TaggedObject* m_core_c_Double_f_str;
-extern Function1 m_core_c_Double_f_str_o;
+TaggedObject* core_D_core_D_Double_D_str_f(TaggedObject* _i);
 
+extern Function2 core_D_core_D_Double_D___sub___o;
+extern TaggedObject* core_D_core_D_Double_D___sub__;
+
+TaggedObject* core_D_core_D_Double_D___sub___f(TaggedObject* a, TaggedObject* b);
 
 #endif //XLANG_XDOUBLE_H
