@@ -1,0 +1,103 @@
+import core.core.print
+import core.core.Integer
+import core.core.List
+import core.core.Boolean
+import core.core.Dict
+import core.core.String
+import core.core.range
+import core.core.Option
+import core.core.time
+import core.core.Double
+import core.core.sleep
+
+fun fibonacci(n: Integer) -> Integer {
+    if n <= 1 {
+        return n
+    }
+    return fibonacci(n-1) + fibonacci(n-2)
+}
+
+fun cached_fibonacci(n: Integer, cache: Dict[Integer, Integer]) -> Integer {
+    if cache.has(n) {
+        return cache[n]
+    }
+    if n <= 1 {
+        return n
+    }
+    var result = cached_fibonacci(n-1, cache) + cached_fibonacci(n-2, cache)
+    cache[n] = result
+    return result
+}
+
+
+
+fun timed(f: fun()->t) -> t {
+    var s = time()
+    var r = f()
+    var e = time()
+    print("Took " + (e-s).str())
+    return r
+}
+
+fun rec_fibonacci(n: Integer, rec: fun(Integer)->Integer)->Integer {
+    if n <= 1 {
+        return n
+    }
+    return rec(n-1) + rec(n-2)
+}
+
+fun call_cached_rec(f: fun(a, fun(a)->b)->b, x:a, cache: Dict[a,b]) -> b {
+    if cache.has(x) {
+        return cache[x]
+    }
+    var r = f(x,$call_cached_rec(f, *, cache))
+    cache[x] = r
+    return r
+}
+
+fun memoize_rec(f: fun(a, fun(a)->b)->b) -> fun(a)->b {
+    var cache = {}::[a,b]
+    return $call_cached_rec(f, *, cache)
+}
+
+fun call_cached(f: fun(a)->b, x:a, cache: Dict[a,b]) -> b {
+    if cache.has(x) {
+        return cache[x]
+    }
+    var r = f(x)
+    cache[x] = r
+    return r
+}
+
+fun memoize(f: fun(a)->b) -> fun(a)->b {
+    var cache = {}::[a,b]
+    return $call_cached(f, *, cache)
+}
+
+fun fib(n: Integer) -> Integer {
+    if n <= 1 {
+        return 1
+    }
+    var a = 0
+    var b = 1
+    for i @ range(2,1,n+1) {
+        var r = a + b
+        a = b
+        b = r
+    }
+    return b
+}
+
+fun main()->Integer {
+//    var cache = {}::[Integer,Integer]
+//    var r = call_cached(rec_fibonacci, 40, cache)
+    var f = memoize_rec(rec_fibonacci)
+    var r = timed($f(88))
+    print(r.str())
+    print(timed($fib(88)).str())
+    var mf = memoize(fib)
+    print(timed($mf(88)).str())
+    print(timed($mf(88)).str())
+    print(timed($mf(88)).str())
+    return 0
+}
