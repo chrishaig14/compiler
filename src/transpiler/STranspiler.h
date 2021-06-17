@@ -54,6 +54,15 @@ const std::string RETURN_VAR = "__return__";
 
 #define GASSIGN(exp, new_value) "GC::assign(" exp, new_value ")"
 
+class OutputCode {
+public:
+    OutputCode(const std::string& pre_code, const std::string& code);
+public:
+    std::string pre_code;
+    std::string code;
+
+};
+
 class STranspiler {
 
 public:
@@ -62,20 +71,20 @@ public:
     std::string static_initializations;
     std::string static_cleanups;
 
-    std::string transpile_integer(IntegerSNode* node);
+    OutputCode transpile_integer(IntegerSNode* node);
 
     void transpile_function(FunctionSNode* node);
 
-    std::string transpile_declaration(DeclarationSNode* node);
+    OutputCode transpile_declaration(DeclarationSNode* node);
 
-    std::string transpile_assignment(AssignmentSNode* node);
-    std::string transpile_block(BlockSNode* node);
+    OutputCode transpile_assignment(AssignmentSNode* node);
+    OutputCode transpile_block(BlockSNode* node);
     void transpile_program(BlockSNode* node);
-    std::string transpile_id(IdSNode* node);
+    OutputCode transpile_id(IdSNode* node);
 
-    std::string transpile_new(NewObjectSNode* node);
+    OutputCode transpile_new(NewObjectSNode* node);
 
-    std::string transpile_return(ReturnSNode* node);
+    OutputCode transpile_return(ReturnSNode* node);
 
     void transpile_class(ClassSNode* node);
     void transpile_enum(EnumSNode* node);
@@ -96,37 +105,37 @@ public:
         }
     }
 
-    std::string transpile_call(CallSNode* node);
+    OutputCode transpile_call(CallSNode* node);
 
-    std::string transpile_string(StringSNode* node);
+    OutputCode transpile_string(StringSNode* node);
 
-    std::string transpile_boolean(BoolSNode* pNode);
+    OutputCode transpile_boolean(BoolSNode* pNode);
 
-    std::string transpile_float(FloatSNode* pNode);
+    OutputCode transpile_float(FloatSNode* pNode);
 
-    std::string transpile_object_member(ObjectMemberSNode* sn);
+    OutputCode transpile_object_member(ObjectMemberSNode* sn);
 
-    std::string transpile_while(WhileSNode* node);
+    OutputCode transpile_while(WhileSNode* node);
 
-    std::string transpile_list(ListSNode* ln);
+    OutputCode transpile_list(ListSNode* ln);
 
-    std::string transpile_if(IfSNode* in);
+    OutputCode transpile_if(IfSNode* in);
 
-    std::string transpile_break(BreakSNode* bn);
+    OutputCode transpile_break(BreakSNode* bn);
 
-    std::string transpile_continue(ContinueSNode* pNode);
+    OutputCode transpile_continue(ContinueSNode* pNode);
 
-    std::string transpile_match(MatchSNode* mn);
+    OutputCode transpile_match(MatchSNode* mn);
 
-    std::string transpile_enum_member(EnumMemberSNode* emsn);
+    OutputCode transpile_enum_member(EnumMemberSNode* emsn);
 
-    std::string transpile_ternary(TernarySNode* tn);
+    OutputCode transpile_ternary(TernarySNode* tn);
 
-    std::string transpile_none(NoneSNode* nn);
+    OutputCode transpile_none(NoneSNode* nn);
 
-    std::string transpile_dict(DictSNode* dn);
+    OutputCode transpile_dict(DictSNode* dn);
 
-    std::string dispatch(SNode* node) {
+    OutputCode dispatch(SNode* node) {
         if (node == nullptr) {
             throw std::runtime_error("Error dispatching on nullptr snode!");
         }

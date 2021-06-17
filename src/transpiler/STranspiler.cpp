@@ -4,27 +4,34 @@
 
 #include "STranspiler.h"
 
-std::string STranspiler::transpile_declaration(DeclarationSNode* node) {
+OutputCode STranspiler::transpile_declaration(DeclarationSNode* node) {
+    OutputCode exp = this->dispatch(node->expression);
     std::string out;
-    out = TOBJECT + SPACE + node->identifier + SPACE + ASSIGN + SPACE + GCDECLARE + LPAREN +
-          this->dispatch(node->expression) + RPAREN + SEMIC + NEWLINE;
-    return out;
+    out += exp.pre_code;
+    out += TOBJECT + SPACE + node->identifier + SPACE + ASSIGN + SPACE + GCDECLARE + LPAREN + exp.code + RPAREN +
+           SEMIC + NEWLINE;
+    return OutputCode("", out);
 }
 
-std::string STranspiler::transpile_assignment(AssignmentSNode* node) {
+OutputCode STranspiler::transpile_assignment(AssignmentSNode* node) {
     std::string out;
-    std::string lvalue = this->dispatch(node->lvalue);
-    out += lvalue + SPACE + ASSIGN + SPACE + GCASSIGN + LPAREN + lvalue + COMMA + SPACE + this->dispatch(node->rvalue) +
+    OutputCode lvalue = this->dispatch(node->lvalue);
+    out += lvalue.pre_code;
+    OutputCode rvalue = this->dispatch(node->rvalue);
+    out += rvalue.pre_code;
+    out += lvalue.code + SPACE + ASSIGN + SPACE + GCASSIGN + LPAREN + lvalue.code + COMMA + SPACE + rvalue.code +
            RPAREN + SEMIC + NEWLINE;
-    return out;
+    return OutputCode("", out);
 }
 
-std::string STranspiler::transpile_return(ReturnSNode* node) {
+OutputCode STranspiler::transpile_return(ReturnSNode* node) {
     if (node->expression == nullptr) {
-        return "return nullptr;";
+        return OutputCode("", "return nullptr;");
     }
-    std::string out = TOBJECT + SPACE + RETURN_VAR + SPACE + ASSIGN + SPACE + GCRETURN + LPAREN + SPACE +
-                      this->dispatch(node->expression) + RPAREN + SEMIC + NEWLINE;
+    OutputCode exp = this->dispatch(node->expression);
+    std::string out = exp.pre_code;
+    out += TOBJECT + SPACE + RETURN_VAR + SPACE + ASSIGN + SPACE + GCRETURN + LPAREN + SPACE + exp.code + RPAREN +
+           SEMIC + NEWLINE;
     for (auto reachable: node->reachables) {
         if (reachable == "this") {
             reachable = "this_obj";
@@ -32,7 +39,7 @@ std::string STranspiler::transpile_return(ReturnSNode* node) {
         out += GCOUTOFSCOPE + LPAREN + reachable + RPAREN + SEMIC + NEWLINE;
     }
     out += RETURN + SPACE + RETURN_VAR + SEMIC + NEWLINE;
-    return out;
+    return OutputCode("", out);
 }
 
 std::string path_to_id(std::string p) {
@@ -47,7 +54,7 @@ std::string path_to_id(std::string p) {
     return out;
 }
 
-std::string STranspiler::transpile_id(IdSNode* node) {
+OutputCode STranspiler::transpile_id(IdSNode* node) {
     if (node->identifier == "") {
         throw std::runtime_error("Error: tranpiling empty idnode!");
     }
@@ -56,7 +63,7 @@ std::string STranspiler::transpile_id(IdSNode* node) {
         node->identifier = "this_obj";
     }
     out += path_to_id(node->identifier);
-    return out;
+    return OutputCode("", out);
 }
 
 void STranspiler::transpile_function(FunctionSNode* node) {
@@ -85,7 +92,8 @@ void STranspiler::transpile_function(FunctionSNode* node) {
         f_source += parameter;
     }
     f_source += TOBJECT + SPACE + "it" + SEMIC + NEWLINE;
-    f_source += this->transpile_block(node->body);
+    OutputCode fbod = this->transpile_block(node->body);
+    f_source += fbod.code;
     f_source += RETURN + SPACE + "nullptr" + SEMIC + NEWLINE;
     f_source += RCURLY + NEWLINE;
 
@@ -101,10 +109,12 @@ void STranspiler::transpile_function(FunctionSNode* node) {
     this->source += f_source;
 }
 
-std::string STranspiler::transpile_block(BlockSNode* node) {
+OutputCode STranspiler::transpile_block(BlockSNode* node) {
     std::string out;
     for (auto* n: node->nodes) {
-        out += this->dispatch(n);
+        OutputCode nod = this->dispatch(n);
+        out += nod.pre_code;
+        out += nod.code;
         if (n->type == SNodeType::CALL) {
             out += SEMIC + NEWLINE;
         }
@@ -115,7 +125,7 @@ std::string STranspiler::transpile_block(BlockSNode* node) {
         }
         out += GCOUTOFSCOPE + LPAREN + local + RPAREN + SEMIC + NEWLINE;
     }
-    return out;
+    return OutputCode("", out);
 }
 
 void STranspiler::transpile_program(BlockSNode* node) {
@@ -124,36 +134,68 @@ void STranspiler::transpile_program(BlockSNode* node) {
     }
 }
 
-std::string STranspiler::transpile_integer(IntegerSNode* node) {
-    return "MAKE_INT" + LPAREN + node->str + RPAREN;
+OutputCode STranspiler::transpile_integer(IntegerSNode* node) {
+    return OutputCode("", "MAKE_INT" + LPAREN + node->str + RPAREN);
 }
 
-std::string STranspiler::transpile_call(CallSNode* node) {
-    std::string out;
-    std::string arguments;
+OutputCode STranspiler::transpile_call(CallSNode* node) {
+    std::string pre_code;
+    VectorOfStrings arg_names;
+    std::string fofo;
     for (auto* arg: node->arguments) {
-        std::string arg_s = this->dispatch(arg);
-        arguments += arg_s + COMMA + SPACE;
+        std::string afofo;
+        OutputCode arg_code = this->dispatch(arg);
+        if (arg->type == SNodeType::CALL) {
+            afofo = "arg_" + std::to_string(rand());
+            arg_names.push_back(afofo);
+            pre_code += arg_code.pre_code;
+            pre_code += TOBJECT + SPACE + afofo + SPACE + ASSIGN + SPACE + arg_code.code + SEMIC + NEWLINE;
+        } else {
+            afofo = arg_code.code;
+        }
+        fofo += afofo + COMMA + SPACE;
     }
-    arguments = arguments.substr(0, arguments.size() - 2);
-    out += "CALL" + std::to_string(node->arguments.size()) + "(" + this->dispatch(node->function);
-    if (!arguments.empty()) {
-        out += +", " + arguments;
-    }
-    out += ")";
-    return out;
+    std::cout << "PRE CODE:" << std::endl;
+    std::cout << pre_code << std::endl;
+
+    std::string post_code;
+    OutputCode func = this->dispatch(node->function);
+    pre_code += func.pre_code;
+    post_code += "CALL" + std::to_string(node->arguments.size()) + "(" + func.code;
+    post_code += COMMA + SPACE;
+    post_code += fofo;
+    post_code = post_code.substr(0, post_code.size() - 2);
+    post_code += ")";
+    std::cout << "POST CODE:" << std::endl;
+    std::cout << post_code << std::endl;
+
+    return OutputCode(pre_code, post_code);
+
+    // std::string out;
+    // std::string arguments;
+    // for (auto* arg: node->arguments) {
+    //     std::string arg_s = this->dispatch(arg);
+    //     arguments += arg_s + COMMA + SPACE;
+    // }
+    // arguments = arguments.substr(0, arguments.size() - 2);
+    // out += "CALL" + std::to_string(node->arguments.size()) + "(" + this->dispatch(node->function);
+    // if (!arguments.empty()) {
+    //     out += +", " + arguments;
+    // }
+    // out += ")";
+    // return out;
 }
 
-std::string STranspiler::transpile_string(StringSNode* node) {
-    return "MAKE_STRING" + LPAREN + QUOTE + node->s + QUOTE + RPAREN;
+OutputCode STranspiler::transpile_string(StringSNode* node) {
+    return OutputCode("", "MAKE_STRING" + LPAREN + QUOTE + node->s + QUOTE + RPAREN);
 }
 
-std::string STranspiler::transpile_boolean(BoolSNode* node) {
-    return node->v ? "TRUE" : "FALSE";
+OutputCode STranspiler::transpile_boolean(BoolSNode* node) {
+    return OutputCode("", node->v ? "TRUE" : "FALSE");
 }
 
-std::string STranspiler::transpile_float(FloatSNode* pNode) {
-    return "MAKE_FLOAT(" + pNode->str + ")";
+OutputCode STranspiler::transpile_float(FloatSNode* pNode) {
+    return OutputCode("", "MAKE_FLOAT(" + pNode->str + ")");
 }
 
 void STranspiler::transpile_class(ClassSNode* node) {
@@ -197,7 +239,7 @@ void STranspiler::transpile_class(ClassSNode* node) {
     this->header += out;
 }
 
-std::string STranspiler::transpile_new(NewObjectSNode* node) {
+OutputCode STranspiler::transpile_new(NewObjectSNode* node) {
     std::string out;
     std::string class_id = path_to_id(node->class_name);
     out += "NEW(" + class_id + COMMA + SPACE;
@@ -206,7 +248,10 @@ std::string STranspiler::transpile_new(NewObjectSNode* node) {
     }
     for (auto* m: node->args) {
         if (m != nullptr) {
-            out += this->dispatch(m) + COMMA + SPACE;
+
+            OutputCode arg_code = this->dispatch(m);
+            out += arg_code.pre_code;
+            out += arg_code.code + COMMA + SPACE;
         } else {
             out += "nullptr" + COMMA + SPACE;
         }
@@ -218,72 +263,100 @@ std::string STranspiler::transpile_new(NewObjectSNode* node) {
         out += "}";
     }
     out += RPAREN;
-    return out;
+    return OutputCode("", out);
 }
 
-std::string STranspiler::transpile_object_member(ObjectMemberSNode* sn) {
+OutputCode STranspiler::transpile_object_member(ObjectMemberSNode* sn) {
     std::string out;
-    out += "CAST" + LPAREN + this->dispatch(sn->object) + COMMA + SPACE + path_to_id(sn->class_path.as_str()) + RPAREN +
-           "->" + sn->member_name;
-    return out;
+    OutputCode object = this->dispatch(sn->object);
+    out += object.pre_code;
+    out += "CAST" + LPAREN + object.code + COMMA + SPACE + path_to_id(sn->class_path.as_str()) + RPAREN + "->" +
+           sn->member_name;
+    return OutputCode("", out);
 }
 
-std::string STranspiler::transpile_while(WhileSNode* sn) {
+OutputCode STranspiler::transpile_while(WhileSNode* sn) {
     std::string out;
-    std::string cond_out = this->dispatch(sn->condition);
-    std::string body_out = this->transpile_block(sn->body);
-    out += "while" + SPACE + LPAREN + "GET_BOOL" + LPAREN + cond_out + RPAREN + RPAREN + SPACE + LCURLY + body_out +
-           RCURLY;
-    return out;
+    OutputCode cond_out = this->dispatch(sn->condition);
+    OutputCode body_out = this->transpile_block(sn->body);
+    std::string condition_name = "cond_" + std::to_string(rand());
+    out += cond_out.pre_code;
+    out += TOBJECT + SPACE + condition_name + SPACE + ASSIGN + SPACE + cond_out.code + SEMIC + NEWLINE;
+    out += "while" + SPACE + LPAREN + "GET_BOOL" + LPAREN + condition_name + RPAREN + RPAREN + SPACE + LCURLY +
+           body_out.code + RCURLY;
+    return OutputCode("", out);
 }
 
-std::string STranspiler::transpile_list(ListSNode* ln) {
+OutputCode STranspiler::transpile_list(ListSNode* ln) {
     std::string out;
     out = "NEW(XList,{";
     for (auto* e: ln->elements) {
-        out += this->dispatch(e) + ", ";
+        OutputCode el = this->dispatch(e);
+        out += el.pre_code;
+        out += el.code + ", ";
     }
     if (!ln->elements.empty()) {
         out = out.substr(0, out.size() - 2);
     }
     out += "})";
-    return out;
+    return OutputCode("", out);
 }
 
-std::string STranspiler::transpile_dict(DictSNode* dn) {
+OutputCode STranspiler::transpile_dict(DictSNode* dn) {
     std::string out;
     out = "NEW(XDict,{";
     if (dn->items.size() == 1) {
         auto e = dn->items[0];
-        out += "std::make_pair(" + this->dispatch(e.first) + ", " + this->dispatch(e.second) + ")" + SPACE;
+        OutputCode key = this->dispatch(e.first);
+        OutputCode value = this->dispatch(e.second);
+        out += key.pre_code;
+        out += value.pre_code;
+        out += "std::make_pair(" + key.code + ", " + value.code + ")" + SPACE;
     }
     if (dn->items.size() > 1) {
         for (auto e: dn->items) {
-            out += "{" + this->dispatch(e.first) + ", " + this->dispatch(e.second) + "}" + COMMA + SPACE;
+            OutputCode key = this->dispatch(e.first);
+            OutputCode value = this->dispatch(e.second);
+            out += key.pre_code;
+            out += value.pre_code;
+            out += "{" + key.code + ", " + value.code + "}" + COMMA + SPACE;
         }
         out = out.substr(0, out.size() - 2);
     }
     out += "})";
-    return out;
+    return OutputCode("", out);
 }
 
 
-std::string STranspiler::transpile_if(IfSNode* in) {
+OutputCode STranspiler::transpile_if(IfSNode* in) {
+    std::string pre;
     std::string out;
-    out += "if" + SPACE + LPAREN + "GET_BOOL" + LPAREN + this->dispatch(in->condition) + RPAREN + RPAREN + LCURLY +
-           NEWLINE + this->transpile_block(in->then) + RCURLY;
+    OutputCode cond = this->dispatch(in->condition);
+    out += cond.pre_code;
+    std::string condition_name = "cond_" + std::to_string(rand());
+    if (in->condition->type == SNodeType::CALL) {
+        out += TOBJECT + SPACE + condition_name + SPACE + ASSIGN + cond.code + SEMIC + NEWLINE;
+    }
+    OutputCode thenc = this->transpile_block(in->then);
+    out += "if" + SPACE + LPAREN + "GET_BOOL" + LPAREN + condition_name + RPAREN + RPAREN + LCURLY + NEWLINE +
+           thenc.code + RCURLY;
     for (auto elif: in->elifs) {
-        out += "else if" + SPACE + LPAREN + "GET_BOOL" + LPAREN + this->dispatch(elif.first) + RPAREN + RPAREN +
-               LCURLY + NEWLINE + this->transpile_block(elif.second) + RCURLY;
+        OutputCode elifc = this->dispatch(elif.first);
+        out += elifc.pre_code;
+        OutputCode elifb = this->transpile_block(elif.second);
+        out += "else if" + SPACE + LPAREN + "GET_BOOL" + LPAREN + elifc.code + RPAREN + RPAREN + LCURLY + NEWLINE +
+               elifb.code + RCURLY;
     }
     if (in->_else != nullptr) {
-        out += "else" + SPACE + LCURLY + NEWLINE + this->transpile_block(in->_else) + NEWLINE + RCURLY;
+        OutputCode _else = this->transpile_block(in->_else);
+        out += _else.pre_code;
+        out += "else" + SPACE + LCURLY + NEWLINE + _else.code + NEWLINE + RCURLY;
     }
     out += NEWLINE;
-    return out;
+    return OutputCode("", out);
 }
 
-std::string STranspiler::transpile_break(BreakSNode* bn) {
+OutputCode STranspiler::transpile_break(BreakSNode* bn) {
     std::string out;
     for (auto reachable: bn->reachables) {
         if (reachable == "this") {
@@ -292,10 +365,10 @@ std::string STranspiler::transpile_break(BreakSNode* bn) {
         out += GCOUTOFSCOPE + LPAREN + reachable + RPAREN + SEMIC + NEWLINE;
     }
     out += "break" + SEMIC + NEWLINE;
-    return out;
+    return OutputCode("", out);
 }
 
-std::string STranspiler::transpile_continue(ContinueSNode* cn) {
+OutputCode STranspiler::transpile_continue(ContinueSNode* cn) {
     std::string out;
     for (auto reachable: cn->reachables) {
         if (reachable == "this") {
@@ -304,20 +377,23 @@ std::string STranspiler::transpile_continue(ContinueSNode* cn) {
         out += GCOUTOFSCOPE + LPAREN + reachable + RPAREN + SEMIC + NEWLINE;
     }
     out += "continue" + SEMIC + NEWLINE;
-    return out;
+    return OutputCode("", out);
 }
 
-std::string STranspiler::transpile_match(MatchSNode* mn) {
+OutputCode STranspiler::transpile_match(MatchSNode* mn) {
     std::string out;
-    out += this->dispatch(mn->exp);
+    OutputCode exp = this->dispatch(mn->exp);
+    out += exp.pre_code;
+    out += exp.code;
     out += "switch" + SPACE + LPAREN + "GET_INT(CAST(" + mn->varname + ",core_D_core_D_Union" + RPAREN + "->type" +
            RPAREN + RPAREN + SPACE + LCURLY;
     for (auto c: mn->cases) {
-        out += "case" + SPACE + "" + std::to_string(c.first) + "" + SPACE + ":" + SPACE + LCURLY +
-               this->transpile_block(c.second) + "break" + SEMIC + RCURLY;
+        OutputCode mc = this->transpile_block(c.second);
+        out += "case" + SPACE + "" + std::to_string(c.first) + "" + SPACE + ":" + SPACE + LCURLY + mc.code + "break" +
+               SEMIC + RCURLY;
     }
     out += RCURLY;
-    return out;
+    return OutputCode("", out);
 }
 
 void STranspiler::transpile_enum(EnumSNode* node) {
@@ -353,20 +429,27 @@ void STranspiler::transpile_enum(EnumSNode* node) {
     this->header += out;
 }
 
-std::string STranspiler::transpile_enum_member(EnumMemberSNode* emsn) {
+OutputCode STranspiler::transpile_enum_member(EnumMemberSNode* emsn) {
     std::string out;
     out += path_to_id(emsn->enum_name) + "_" + emsn->value;
-    return out;
+    return OutputCode("", out);
 }
 
-std::string STranspiler::transpile_ternary(TernarySNode* tn) {
+OutputCode STranspiler::transpile_ternary(TernarySNode* tn) {
     std::string out;
-    out += LPAREN + "(it=" + this->dispatch(tn->ext) + ")!=nullptr? " + this->dispatch(tn->true_case) + SPACE + ":" +
-           SPACE + this->dispatch(tn->false_case) + RPAREN;
-    return out;
+    OutputCode tern = this->dispatch(tn->ext);
+    out = tern.pre_code;
+    OutputCode truec = this->dispatch(tn->true_case);
+    out += truec.pre_code;
+    OutputCode falsec = this->dispatch(tn->false_case);
+    out += falsec.pre_code;
+    out += LPAREN + "(it=" + tern.code + ")!=nullptr? " + truec.code + SPACE + ":" + SPACE + falsec.code + RPAREN;
+    return OutputCode("", out);
 }
 
-std::string STranspiler::transpile_none(NoneSNode* nn) {
-    return "nullptr";
+OutputCode STranspiler::transpile_none(NoneSNode* nn) {
+    return OutputCode("", "nullptr");
 }
 
+OutputCode::OutputCode(const std::string& pre_code, const std::string& code) : pre_code(pre_code), code(code) {
+}
