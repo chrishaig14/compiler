@@ -3,6 +3,8 @@
 //
 
 #include "CheckStatements.h"
+#include "../simple_nodes/ThrowSNode.h"
+#include "../simple_nodes/TryCatchSNode.h"
 
 USemanticInfo Checker::visit_lvalue_subscript(SubscriptNode& node) {
     USemanticInfo parent_p = this->dispatch_rvalue(node.parent);
@@ -173,6 +175,22 @@ USemanticInfo Checker::visit_return(ReturnNode& n) {
     n.ret_type = return_type->clone();
 
     auto* sn = new ReturnSNode(expression_info_p->snode);
+    for (auto l: this->scope->get_all()) {
+        sn->reachables.push_back(l.first);
+    }
+
+    SemanticInfo info;
+    info.snode = sn;
+    return std::make_unique<SemanticInfo>(info);
+}
+
+USemanticInfo Checker::visit_throw(ThrowNode& n) {
+    USemanticInfo expression_info_p = this->dispatch_rvalue(n.exp);
+    if (expression_info_p->is_error()) {
+        return error_stub();
+    }
+
+    auto* sn = new ThrowSNode(expression_info_p->snode);
     for (auto l: this->scope->get_all()) {
         sn->reachables.push_back(l.first);
     }
@@ -389,5 +407,25 @@ USemanticInfo Checker::visit_if(IfNode& n) {
 
     SemanticInfo info;
     info.snode = new IfSNode(condition_snode, (BlockSNode*) body_info->snode, elifs, (BlockSNode*) else_snode);
+    return std::make_unique<SemanticInfo>(info);
+}
+
+USemanticInfo Checker::visit_try_catch(TryCatchNode& node) {
+    this->enter_scope("try");
+    USemanticInfo body_info = this->visit_block(*node.body);
+    this->leave_scope();
+    this->enter_scope("catch");
+
+    USemanticInfo ex_info = this->dispatch(new IdNode(node.et->id, {0, 0}, {0, 0}));
+    Entity ex_class_entity = ex_info->entity;
+    Entity ex_entity = entity_from_type(*node.et);
+    ex_entity.value->type->object().actual_base_path = ex_class_entity.clazz->path;
+    this->fill_value(ex_entity.value);
+
+    this->scope->set(node.eid, ex_entity);
+    USemanticInfo catch_body_info = this->visit_block(*node.catch_body);
+    this->leave_scope();
+    SemanticInfo info;
+    info.snode = new TryCatchSNode((BlockSNode*) body_info->snode, node.eid, (BlockSNode*) catch_body_info->snode);
     return std::make_unique<SemanticInfo>(info);
 }

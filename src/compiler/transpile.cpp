@@ -62,9 +62,10 @@ void Compiler::transpile_one_module(Module& module, std::string& package_header,
     if (module.flirpins.count("main") != 0) {
         t.source += "\nint main(){\n";
         t.source += static_initializations;
-        t.source += "auto x = GET_INT(CALL0(" + mangle_path(module.path.as_str() + ".main") + "));\n";
+        t.source += "TaggedObject* r = CALL0(" + mangle_path(module.path.as_str() + ".main") + ");\n";
+        t.source += "if (has_tag(r,EXCEPTION_TAG)){std::cout << \"Exited with Exception: \" << std::endl; exit(1);}";
         t.source += static_cleanups;
-        t.source += "return x;\n}";
+        t.source += "return GET_INT(r);\n}";
     }
     std::string output_cpp_path = path_join(output_package_dir, module_name + ".cpp");
     std::ofstream output_cpp_file(output_cpp_path);

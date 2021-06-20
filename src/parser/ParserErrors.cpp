@@ -182,4 +182,3 @@ Node* Parser::parse_enum_definition() {
     Token rcurly_tk = this->expect_token(TokType::RCURLY);
     return new EnumNode(enum_id.str, values, enum_id.start, rcurly_tk.end_pos);
 }
-

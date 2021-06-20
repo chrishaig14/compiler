@@ -33,7 +33,10 @@ void initialize_tokens() {
     TOKEN_KEYWORDS["continue"] = TokType::CONTINUE;
     TOKEN_KEYWORDS["return"] = TokType::RETURN;
     TOKEN_KEYWORDS["static"] = TokType::STATIC;
+    TOKEN_KEYWORDS["throw"] = TokType::THROW;
     TOKEN_KEYWORDS["true"] = TokType::TRUE;
+    TOKEN_KEYWORDS["try"] = TokType::TRY;
+    TOKEN_KEYWORDS["catch"] = TokType::CATCH;
     TOKEN_KEYWORDS["false"] = TokType::FALSE;
     TOKEN_KEYWORDS["from"] = TokType::FROM;
     TOKEN_KEYWORDS["import"] = TokType::IMPORT;

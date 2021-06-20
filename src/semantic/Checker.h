@@ -46,6 +46,7 @@
 #include "../simple_nodes/MatchSNode.h"
 #include "CheckerUtils.h"
 #include "../nodes/UnaryOpNode.h"
+#include "../nodes/TryCatchNode.h"
 
 #define T_NONE ObjectType(".None")
 
@@ -184,6 +185,8 @@ public:
                              const TypeNode* unaliased_target_type) const;
     SNode* make_option_rvalue(SNode* value_snode, const TypeNode* unaliased_value_type,
                               const TypeNode* unaliased_target_type) const;
+    USemanticInfo visit_throw(ThrowNode& n);
+    USemanticInfo visit_try_catch(TryCatchNode& node);
 };
 
 

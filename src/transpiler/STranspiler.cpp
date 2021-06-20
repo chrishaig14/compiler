@@ -3,6 +3,7 @@
 //
 
 #include "STranspiler.h"
+#include "../simple_nodes/ThrowSNode.h"
 
 OutputCode STranspiler::transpile_declaration(DeclarationSNode* node) {
     OutputCode exp = this->dispatch(node->expression);
@@ -38,6 +39,15 @@ OutputCode STranspiler::transpile_return(ReturnSNode* node) {
         }
         out += GCOUTOFSCOPE + LPAREN + reachable + RPAREN + SEMIC + NEWLINE;
     }
+    out += RETURN + SPACE + RETURN_VAR + SEMIC + NEWLINE;
+    return OutputCode("", out);
+}
+
+OutputCode STranspiler::transpile_throw(ThrowSNode* node) {
+    OutputCode exp = this->dispatch(node->expression);
+    std::string out = exp.pre_code;
+    out += TOBJECT + SPACE + RETURN_VAR + SPACE + ASSIGN + SPACE + "set_tag(" + LPAREN + SPACE + exp.code + RPAREN +
+           ",EXCEPTION_TAG)" + SEMIC + NEWLINE;
     out += RETURN + SPACE + RETURN_VAR + SEMIC + NEWLINE;
     return OutputCode("", out);
 }
@@ -114,9 +124,20 @@ OutputCode STranspiler::transpile_block(BlockSNode* node) {
     for (auto* n: node->nodes) {
         OutputCode nod = this->dispatch(n);
         out += nod.pre_code;
-        out += nod.code;
         if (n->type == SNodeType::CALL) {
+            std::string temp_name = "temp_" + std::to_string(rand());
+            out += TOBJECT + SPACE + temp_name + ASSIGN + nod.code;
             out += SEMIC + NEWLINE;
+            if (this->in_try_catch) {
+                out += "if" + SPACE + LPAREN + "has_tag" + LPAREN + temp_name + COMMA + SPACE + "EXCEPTION_TAG" +
+                       RPAREN + RPAREN + SPACE + LCURLY + "caught_exception" + SPACE + ASSIGN + SPACE + temp_name + SEMIC +
+                       RCURLY + NEWLINE;
+            } else {
+                out += "if" + SPACE + LPAREN + "has_tag" + LPAREN + temp_name + COMMA + SPACE + "EXCEPTION_TAG" +
+                       RPAREN + RPAREN + SPACE + LCURLY + RETURN + SPACE + temp_name + SEMIC + RCURLY + NEWLINE;
+            }
+        } else {
+            out += nod.code;
         }
     }
     for (auto local: node->locals) {
@@ -449,6 +470,16 @@ OutputCode STranspiler::transpile_ternary(TernarySNode* tn) {
 
 OutputCode STranspiler::transpile_none(NoneSNode* nn) {
     return OutputCode("", "nullptr");
+}
+
+OutputCode STranspiler::transpile_try_catch(TryCatchSNode* dn) {
+    this->in_try_catch = true;
+    OutputCode body_out = this->transpile_block(dn->body);
+    this->in_try_catch = false;
+    std::string out = "TaggedObject* caught_exception = nullptr;\n" + body_out.code;
+    OutputCode catch_out = this->transpile_block(dn->catch_body);
+    out += "if (caught_exception!=nullptr){TaggedObject*" + dn->eid + "=caught_exception;\n" + catch_out.code + "}";
+    return OutputCode("", out);
 }
 
 OutputCode::OutputCode(const std::string& pre_code, const std::string& code) : pre_code(pre_code), code(code) {

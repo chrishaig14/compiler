@@ -30,6 +30,8 @@
 #include "../simple_nodes/TernarySNode.h"
 #include "../simple_nodes/NoneSNode.h"
 #include "../simple_nodes/DictSNode.h"
+#include "../simple_nodes/ThrowSNode.h"
+#include "../simple_nodes/TryCatchSNode.h"
 
 const std::string TOBJECT = "TaggedObject*";
 const std::string GCDECLARE = "GC::declare";
@@ -134,6 +136,7 @@ public:
     OutputCode transpile_none(NoneSNode* nn);
 
     OutputCode transpile_dict(DictSNode* dn);
+    OutputCode transpile_try_catch(TryCatchSNode* dn);
 
     OutputCode dispatch(SNode* node) {
         if (node == nullptr) {
@@ -176,6 +179,10 @@ public:
                 return this->transpile_assignment((AssignmentSNode*) node);
             case SNodeType::RETURN:
                 return this->transpile_return((ReturnSNode*) node);
+            case SNodeType::TRY_CATCH:
+                return this->transpile_try_catch((TryCatchSNode*) node);
+            case SNodeType::THROW:
+                return this->transpile_throw((ThrowSNode*) node);
                 break;
             case SNodeType::FLOAT:
                 return this->transpile_float((FloatSNode*) node);
@@ -190,6 +197,9 @@ public:
                 throw std::runtime_error("Don't know what to do with this SNode!");
         }
     }
+
+    OutputCode transpile_throw(ThrowSNode* node);
+    bool in_try_catch;
 };
 
 

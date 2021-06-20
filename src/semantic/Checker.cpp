@@ -5,6 +5,7 @@
 #include "../macros.h"
 #include "../logging/logging.h"
 #include "util.h"
+#include "../nodes/TryCatchNode.h"
 
 bool function_is_generic(const FunctionType& ft) {
     for (auto* param_type: ft.param_types) {
@@ -190,7 +191,6 @@ Class* Checker::instantiate_generic(Class* generic, const ObjectType& instance) 
     }
 
 
-
     std::unordered_map<std::string, ConstFunction*> concrete_methods;
     for (const auto& m: generic->methods) {
         TypeNode* t = (m.second)->ft;
@@ -326,8 +326,12 @@ USemanticInfo Checker::dispatch_any(Node* p_node, bool is_rvalue) {
             return this->visit_none(n.none());
         case NodeType::NUMBER:
             return this->visit_number(n.number());
+        case NodeType::THROW:
+            return this->visit_throw((ThrowNode&) n);
         case NodeType::RETRN:
             return this->visit_return(n.retrn());
+        case NodeType::TRY_CATCH:
+            return this->visit_try_catch((TryCatchNode&) n);
         case NodeType::STRNG:
             return this->visit_string(n.strng());
         case NodeType::SUB:

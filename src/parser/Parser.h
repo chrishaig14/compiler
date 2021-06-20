@@ -10,6 +10,7 @@
 #include "../nodes/ImportNode.h"
 #include "../scanner/CodeLines.h"
 #include "../nodes/EnumNode.h"
+#include "../nodes/TryCatchNode.h"
 
 extern std::unordered_map<TokType, OpType> TOKEN_TO_OP;
 
@@ -123,6 +124,8 @@ public:
     Node* parse_alias();
     Node* parse_enum_definition();
     std::string top_package_name;
+    ThrowNode* parse_throw();
+    TryCatchNode* parse_try_catch();
 };
 
 
