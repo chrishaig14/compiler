@@ -414,18 +414,29 @@ USemanticInfo Checker::visit_try_catch(TryCatchNode& node) {
     this->enter_scope("try");
     USemanticInfo body_info = this->visit_block(*node.body);
     this->leave_scope();
-    this->enter_scope("catch");
+    std::vector<std::pair<std::string, std::string>> e_names_types;
+    std::vector<SNode*> catches_bodies_snodes;
+    for (int i = 0; i < node.catches.size(); i++) {
+        this->enter_scope("catch");
+        ObjectType* et = node.catches[i].second;
+        std::string eid = node.catches[i].first;
 
-    USemanticInfo ex_info = this->dispatch(new IdNode(node.et->id, {0, 0}, {0, 0}));
-    Entity ex_class_entity = ex_info->entity;
-    Entity ex_entity = entity_from_type(*node.et);
-    ex_entity.value->type->object().actual_base_path = ex_class_entity.clazz->path;
-    this->fill_value(ex_entity.value);
+        Node* catch_body = node.catches_bodies[i];
 
-    this->scope->set(node.eid, ex_entity);
-    USemanticInfo catch_body_info = this->visit_block(*node.catch_body);
-    this->leave_scope();
+        USemanticInfo ex_info = this->dispatch(new IdNode(et->id, {0, 0}, {0, 0}));
+        Entity ex_class_entity = ex_info->entity;
+        Entity ex_entity = entity_from_type(*et);
+        ex_entity.value->type->object().actual_base_path = ex_class_entity.clazz->path;
+        this->fill_value(ex_entity.value);
+        e_names_types.push_back(std::make_pair(eid, ex_class_entity.clazz->path.as_str()));
+
+
+        this->scope->set(eid, ex_entity);
+        USemanticInfo catch_body_info = this->visit_block(*((BlockNode*) catch_body));
+        catches_bodies_snodes.push_back(catch_body_info->snode);
+        this->leave_scope();
+    }
     SemanticInfo info;
-    info.snode = new TryCatchSNode((BlockSNode*) body_info->snode, node.eid, (BlockSNode*) catch_body_info->snode);
+    info.snode = new TryCatchSNode((BlockSNode*) body_info->snode, e_names_types, catches_bodies_snodes);
     return std::make_unique<SemanticInfo>(info);
 }

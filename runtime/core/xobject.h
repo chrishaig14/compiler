@@ -18,6 +18,7 @@
 #define OBJECT_TAG 0b100
 #define FUNCTION_TAG 0b101
 #define FLOAT_TAG 0b110
+#define EXCEPTION_TAG 0b111
 #define CAST(ptr, cls) ((cls*)UNTAG(ptr))
 
 extern TaggedObject* TRUE;

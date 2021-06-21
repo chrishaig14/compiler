@@ -953,11 +953,17 @@ ThrowNode* Parser::parse_throw() {
 TryCatchNode* Parser::parse_try_catch() {
     Token try_tok = this->expect_token(TokType::TRY);
     BlockNode* body = parse_possibly_empty_block();
-    Token catch_tok = this->expect_token(TokType::CATCH);
-    Token id = this->expect_token(TokType::ID);
-    this->expect_token(TokType::COLON);
-    ObjectType* ot = this->parse_object_type();
-    BlockNode* catch_body = parse_possibly_empty_block();
-    return new TryCatchNode(body, id.str, ot, catch_body, try_tok.start, catch_body->end);
+    std::vector<std::pair<std::string, ObjectType*>> catches;
+    VectorOfNodes catches_bodies;
+    while (this->match(TokType::CATCH)) {
+        Token catch_tok = this->expect_token(TokType::CATCH);
+        Token id = this->expect_token(TokType::ID);
+        this->expect_token(TokType::COLON);
+        ObjectType* ot = this->parse_object_type();
+        BlockNode* catch_body = parse_possibly_empty_block();
+        catches.push_back(std::make_pair(id.str, ot));
+        catches_bodies.push_back(catch_body);
+    }
+    return new TryCatchNode(body, catches, catches_bodies, try_tok.start, catches_bodies.back()->end);
 }
 

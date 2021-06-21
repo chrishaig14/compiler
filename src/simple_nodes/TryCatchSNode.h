@@ -10,15 +10,16 @@
 
 class TryCatchSNode : public SNode {
 public:
-    TryCatchSNode(BlockSNode* body, std::string eid, BlockSNode* catch_body) : SNode(SNodeType::TRY_CATCH) {
+    TryCatchSNode(BlockSNode* body, std::vector<std::pair<std::string, std::string>> e_names_types,
+                  std::vector<SNode*> catches_bodies) : SNode(SNodeType::TRY_CATCH) {
         this->body = body;
-        this->catch_body = catch_body;
-        this->eid = eid;
+        this->catches_bodies = catches_bodies;
+        this->e_names_types = e_names_types;
     }
 
-    std::string eid;
+    std::vector<std::pair<std::string, std::string>> e_names_types;
     BlockSNode* body;
-    BlockSNode* catch_body;
+    std::vector<SNode*> catches_bodies;
 };
 
 

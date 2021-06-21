@@ -31,8 +31,7 @@ OutputCode STranspiler::transpile_return(ReturnSNode* node) {
     }
     OutputCode exp = this->dispatch(node->expression);
     std::string out = exp.pre_code;
-    out += TOBJECT + SPACE + RETURN_VAR + SPACE + ASSIGN + SPACE + GCRETURN + LPAREN + SPACE + exp.code + RPAREN +
-           SEMIC + NEWLINE;
+    out += RETURN_VAR + SPACE + ASSIGN + SPACE + GCRETURN + LPAREN + SPACE + exp.code + RPAREN + SEMIC + NEWLINE;
     for (auto reachable: node->reachables) {
         if (reachable == "this") {
             reachable = "this_obj";
@@ -46,8 +45,8 @@ OutputCode STranspiler::transpile_return(ReturnSNode* node) {
 OutputCode STranspiler::transpile_throw(ThrowSNode* node) {
     OutputCode exp = this->dispatch(node->expression);
     std::string out = exp.pre_code;
-    out += TOBJECT + SPACE + RETURN_VAR + SPACE + ASSIGN + SPACE + "set_tag(" + LPAREN + SPACE + exp.code + RPAREN +
-           ",EXCEPTION_TAG)" + SEMIC + NEWLINE;
+    out += RETURN_VAR + SPACE + ASSIGN + SPACE + "set_tag(" + LPAREN + SPACE + exp.code + RPAREN + ",EXCEPTION_TAG)" +
+           SEMIC + NEWLINE;
     out += RETURN + SPACE + RETURN_VAR + SEMIC + NEWLINE;
     return OutputCode("", out);
 }
@@ -102,6 +101,7 @@ void STranspiler::transpile_function(FunctionSNode* node) {
         f_source += parameter;
     }
     f_source += TOBJECT + SPACE + "it" + SEMIC + NEWLINE;
+    f_source += TOBJECT + SPACE + RETURN_VAR + SEMIC + NEWLINE;
     OutputCode fbod = this->transpile_block(node->body);
     f_source += fbod.code;
     f_source += RETURN + SPACE + "nullptr" + SEMIC + NEWLINE;
@@ -130,8 +130,8 @@ OutputCode STranspiler::transpile_block(BlockSNode* node) {
             out += SEMIC + NEWLINE;
             if (this->in_try_catch) {
                 out += "if" + SPACE + LPAREN + "has_tag" + LPAREN + temp_name + COMMA + SPACE + "EXCEPTION_TAG" +
-                       RPAREN + RPAREN + SPACE + LCURLY + "caught_exception" + SPACE + ASSIGN + SPACE + temp_name + SEMIC +
-                       RCURLY + NEWLINE;
+                       RPAREN + RPAREN + SPACE + LCURLY + "thrown_exception" + SPACE + ASSIGN + SPACE + temp_name +
+                       SEMIC + RCURLY + NEWLINE;
             } else {
                 out += "if" + SPACE + LPAREN + "has_tag" + LPAREN + temp_name + COMMA + SPACE + "EXCEPTION_TAG" +
                        RPAREN + RPAREN + SPACE + LCURLY + RETURN + SPACE + temp_name + SEMIC + RCURLY + NEWLINE;
@@ -476,9 +476,16 @@ OutputCode STranspiler::transpile_try_catch(TryCatchSNode* dn) {
     this->in_try_catch = true;
     OutputCode body_out = this->transpile_block(dn->body);
     this->in_try_catch = false;
-    std::string out = "TaggedObject* caught_exception = nullptr;\n" + body_out.code;
-    OutputCode catch_out = this->transpile_block(dn->catch_body);
-    out += "if (caught_exception!=nullptr){TaggedObject*" + dn->eid + "=caught_exception;\n" + catch_out.code + "}";
+    std::string out = "TaggedObject* thrown_exception = nullptr;\n" + body_out.code;
+    out += "if (thrown_exception!=nullptr){\n";
+    for (int i = 0; i < dn->catches_bodies.size(); i++) {
+        OutputCode catch_out = this->transpile_block((BlockSNode*) dn->catches_bodies[i]);
+        out += "if (UNTAG(thrown_exception)->class_name==\"" + path_to_id(dn->e_names_types[i].second) +
+               "\"){TaggedObject*" + dn->e_names_types[i].first + "=thrown_exception;\n" + catch_out.code + "} else ";
+    }
+    out += RETURN + SPACE + "CALL1(test_D_bootstrap_D_Exception_D___init__,test_D_bootstrap_D_Exception_D___init__)" + SEMIC + NEWLINE;
+    // out = out.substr(0, out.size() - 5);
+    out += "\n}";
     return OutputCode("", out);
 }
 

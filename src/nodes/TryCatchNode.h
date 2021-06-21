@@ -11,15 +11,14 @@
 
 class TryCatchNode : public Node {
 public:
-    TryCatchNode(BlockNode* body, std::string eid, ObjectType* et, BlockNode* catch_body, TextPosition start,
-                 TextPosition end);
+    TryCatchNode(BlockNode* body, std::vector<std::pair<std::string, ObjectType*>> catches, VectorOfNodes catches_bodies,
+                 TextPosition start, TextPosition end);
 
     bool equal(const Node& other) const override;
 
     BlockNode* body;
-    BlockNode* catch_body;
-    ObjectType* et;
-    std::string eid;
+    VectorOfNodes catches_bodies;
+    std::vector<std::pair<std::string, ObjectType*>> catches;
 };
 
 
