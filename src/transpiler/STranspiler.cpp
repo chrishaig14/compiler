@@ -256,6 +256,15 @@ void STranspiler::transpile_class(ClassSNode* node) {
     out += "return r;";
     out += RCURLY + NEWLINE;
 
+    out += "TaggedObject* str() override {\n";
+    out += "TaggedObject* r = MAKE_STRING(\"\");\n";
+    out += "XString* _r = CAST(r, XString);\n";
+    for (const auto& m: node->members) {
+        out += "if (has_tag(this->" + m + ",OBJECT_TAG)){_r->s+=CAST(CAST(this->" + m + ", XObject)->str(),XString)->s;}";
+    }
+    out += "return r;";
+    out += RCURLY + NEWLINE;
+
     out += RCURLY + SEMIC + NEWLINE;
     this->header += out;
 }
@@ -483,7 +492,8 @@ OutputCode STranspiler::transpile_try_catch(TryCatchSNode* dn) {
         out += "if (UNTAG(thrown_exception)->class_name==\"" + path_to_id(dn->e_names_types[i].second) +
                "\"){TaggedObject*" + dn->e_names_types[i].first + "=thrown_exception;\n" + catch_out.code + "} else ";
     }
-    out += RETURN + SPACE + "CALL1(test_D_bootstrap_D_Exception_D___init__,test_D_bootstrap_D_Exception_D___init__)" + SEMIC + NEWLINE;
+    out += RETURN + SPACE + "CALL1(test_D_bootstrap_D_Exception_D___init__,test_D_bootstrap_D_Exception_D___init__)" +
+           SEMIC + NEWLINE;
     // out = out.substr(0, out.size() - 5);
     out += "\n}";
     return OutputCode("", out);

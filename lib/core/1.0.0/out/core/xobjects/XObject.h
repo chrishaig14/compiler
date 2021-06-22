@@ -39,6 +39,10 @@ public:
         return {};
     }
 
+    virtual TaggedObject* str() {
+        return nullptr;
+    }
+
     void traverse_count();
 
     void traverse(std::vector<XObject*>& roots);
