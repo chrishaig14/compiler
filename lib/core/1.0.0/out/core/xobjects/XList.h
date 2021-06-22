@@ -10,43 +10,14 @@
 #include "../macros.h"
 #include "../GC.h"
 
-class XList : public XObject {
-public:
+
+struct XList {
     std::vector<TaggedObject*> lv;
-    std::vector<TaggedObject*>* l;
-
-    XList(int n);
-
-    XList(const std::initializer_list<TaggedObject*>& c) : XObject("List"), lv(c) {
-        this->l = &this->lv;
-        if (this->lv.size() != 0) {
-            if (has_tag(this->lv[0], OBJECT_TAG)) {
-                for (auto& e: this->lv) {
-                    UNTAG(e)->inc_count();
-                }
-            }
-        }
-
-    }
-
-    std::vector<XObject*> get_all_members() override {
-        if (this->lv.empty()) {
-            return {};
-        }
-        if (!has_tag(this->lv[0], OBJECT_TAG)) {
-            return {};
-        }
-        std::vector<XObject*> ret;
-        for (auto* to: this->lv) {
-            ret.push_back(UNTAG(to));
-        }
-        return ret;
-    }
-
-    TaggedObject* __eq__(TaggedObject* pObject) override;
-    ~XList() override;
+    Vtable* vtable;
 };
 
+
+TaggedObject* XList_init_with_length(size_t n);
 
 extern TaggedObject* core_D_core_D_List_D_len;
 extern TaggedObject* core_D_core_D_List_D_has;

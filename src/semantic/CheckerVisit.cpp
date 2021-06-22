@@ -77,7 +77,7 @@ USemanticInfo Checker::visit_class(ClassNode& node) {
     Class* clazz = this->scope->get(node.class_name).clazz;
     auto* csn = new ClassSNode(clazz->path.as_str(), node.members_ordered);
     sn->nodes.push_back(csn);
-    sn->nodes.push_back(make_class_default_init(clazz->path.as_str(), node.members_ordered));
+    // sn->nodes.push_back(make_class_default_init(clazz->path.as_str(), node.members_ordered));
 
     for (const auto& sm: node.static_members) {
         USemanticInfo sm_exp_info = this->dispatch(sm.second.second);

@@ -24,12 +24,17 @@
 extern TaggedObject* TRUE;
 extern TaggedObject* FALSE;
 
+struct Vtable {
+    void (* clean)(TaggedObject*);
+    std::vector<XObject*> (* get_all_members)(TaggedObject*);
+    TaggedObject* (* str)(TaggedObject*);
+};
 
 inline XObject* UNTAG(TaggedObject* l) {
     return (XObject*) ((unsigned long) l & 0xfffffffffffffff8);
 }
 
-inline TaggedObject* TAG(XObject* s) {
+inline TaggedObject* TAG(void* s) {
     return (TaggedObject*) ((unsigned long) s | OBJECT_TAG);
 }
 

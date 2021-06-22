@@ -58,7 +58,7 @@ TaggedObject* core_D_core_D_Dict_D_has_f(TaggedObject* a, TaggedObject* b) {
 
 TaggedObject* core_D_core_D_Dict_D_keys_f(TaggedObject* a) {
     auto& keys = (CAST(a, XDict)->keys);
-    TaggedObject* el = NEW(XList, keys.size());
+    TaggedObject* el = XList_init_with_length(keys.size());
     int i = 0;
     for (auto& it: keys) {
         (CAST(el, XList))->lv[i] = it.second;

@@ -219,45 +219,118 @@ OutputCode STranspiler::transpile_float(FloatSNode* pNode) {
     return OutputCode("", "MAKE_FLOAT(" + pNode->str + ")");
 }
 
-void STranspiler::transpile_class(ClassSNode* node) {
-    std::string out;
-    std::string class_name = path_to_id(node->identifier);
-    out += CLASS + SPACE + class_name + SPACE + ": public XObject {\n";
-    out += "public: \n";
-    for (const auto& m: node->members) {
-        out += TOBJECT + SPACE + m + SEMIC + NEWLINE;
-    }
-
-    out += class_name + LPAREN;
-    for (const auto& m: node->members) {
-        out += TOBJECT + SPACE + m + COMMA + SPACE;
+std::string function(std::string name, std::vector<std::string> params, std::string body) {
+    std::string out = TOBJECT + SPACE + name + LPAREN;
+    for (auto p: params) {
+        out += TOBJECT + SPACE + p + COMMA + SPACE;
     }
     out = out.substr(0, out.size() - 2);
-    out += RPAREN + SPACE + ":" + SPACE + "XObject" + LPAREN + QUOTE + class_name + QUOTE + RPAREN + SPACE + LCURLY +
-           NEWLINE;
-    for (const auto& m: node->members) {
-        out += "this->" + m + " = " + m + SEMIC + NEWLINE;
-    }
-    out += RCURLY + NEWLINE;
-
-    out += "~" + class_name + LPAREN + RPAREN + LCURLY + NEWLINE;
-    out += "if (!GC::collecting){\n";
-    for (const auto& m: node->members) {
-        out += GCOUTOFSCOPE + LPAREN + "this->" + m + RPAREN + SEMIC + NEWLINE;
-    }
+    out += RPAREN;
+    out += LCURLY;
+    out += body;
     out += RCURLY;
-    out += RCURLY + NEWLINE;
+    out += NEWLINE;
+    return out;
+}
 
-    out += "std::vector<XObject*> get_all_members() override {\n";
-    out += "std::vector<XObject*> r;\n";
-    for (const auto& m: node->members) {
-        out += "if (has_tag(this->" + m + ",OBJECT_TAG)){r.push_back(UNTAG(this->" + m + "));}";
+std::string nat_function(std::string ret, std::string name, std::vector<std::string> params, std::string body) {
+    std::string out = ret + SPACE + name + LPAREN;
+    for (auto p: params) {
+        out += TOBJECT + SPACE + p + COMMA + SPACE;
     }
-    out += "return r;";
-    out += RCURLY + NEWLINE;
+    out = out.substr(0, out.size() - 2);
+    out += RPAREN;
+    out += LCURLY;
+    out += body;
+    out += RCURLY;
+    out += NEWLINE;
+    return out;
+}
 
-    out += RCURLY + SEMIC + NEWLINE;
-    this->header += out;
+
+void STranspiler::transpile_class(ClassSNode* node) {
+    std::string out;
+    std::string functions;
+    std::string class_name = path_to_id(node->identifier);
+    std::string class_header = "struct" + SPACE + class_name + SPACE + " { \n";
+    for (const auto& m: node->members) {
+        class_header += TOBJECT + SPACE + m + SEMIC + NEWLINE;
+    }
+    class_header += "Vtable* vtable;};\n";
+
+    std::string vtable_name = class_name + "_vtable";
+    std::string init_name = class_name + "_D___init__";
+    std::string clean_name = class_name + "_clean";
+    std::string get_all_members_name = class_name + "_get_all_members";
+
+    // VTABLE INIT
+    std::string vtable_init = "Vtable" + SPACE + vtable_name + SPACE + ASSIGN + LCURLY + clean_name + COMMA + SPACE +
+                              get_all_members_name + COMMA + SPACE + "nullptr" + RCURLY + SEMIC + NEWLINE;
+
+    // INIT
+
+
+
+    // CLEAN
+
+    std::string clean_body;
+    clean_body +=
+            class_name + "*" + SPACE + "this_obj" + SPACE + ASSIGN + "CAST(_this_obj, " + class_name + RPAREN + SEMIC +
+            NEWLINE;
+    clean_body += "if (!GC::collecting){\n";
+    for (const auto& m: node->members) {
+        clean_body += GCOUTOFSCOPE + LPAREN + "this_obj->" + m + RPAREN + SEMIC + NEWLINE;
+    }
+    clean_body += RCURLY;
+    std::string clean = nat_function("void", clean_name, {"_this_obj"}, clean_body);
+
+    // GET ALL MEMBERS
+
+    std::string get_all_members =
+            "std::vector<XObject*> " + get_all_members_name + "(" + TOBJECT + SPACE + "_this_obj) {\n";
+    get_all_members += "std::vector<XObject*> r;\n";
+    get_all_members +=
+            class_name + "*" + SPACE + "this_obj" + SPACE + ASSIGN + "CAST(_this_obj, " + class_name + RPAREN + SEMIC +
+            NEWLINE;
+    for (const auto& m: node->members) {
+        get_all_members += "if (has_tag(this_obj->" + m + ",OBJECT_TAG)){r.push_back(UNTAG(this_obj->" + m + "));}";
+    }
+    get_all_members += "return r;";
+    get_all_members += RCURLY + NEWLINE;
+
+    functions += clean;
+    functions += get_all_members;
+    functions += vtable_init;
+    // functions += init;
+    this->source += functions;
+
+    std::string init_body = "return NEW(" + class_name + COMMA + SPACE;
+    for (auto m: node->members) {
+        init_body += m + COMMA + SPACE;
+    }
+    init_body += "&" + vtable_name;
+    init_body += RPAREN;
+    init_body += SEMIC;
+    std::string init = function(init_name + "_f", node->members, init_body);
+
+    std::string function_class = "Function" + std::to_string(node->members.size());
+    std::string function_obj_name = init_name;
+    this->header += EXTERN + SPACE + TOBJECT + SPACE + function_obj_name + SEMIC + NEWLINE;
+    this->header += TOBJECT + SPACE + init_name + "_f" + LPAREN;
+    for (auto m: node->members) {
+        this->header += TOBJECT + SPACE + m + COMMA + SPACE;
+    }
+    this->header = this->header.substr(0, this->header.size() - 2);
+    this->header += ");\n";
+
+
+    this->source +=
+            function_class + SPACE + init_name + "_o" + SPACE + ASSIGN + SPACE + function_class + SPACE + LPAREN +
+            init_name + "_f" + RPAREN + SEMIC + NEWLINE;
+    this->source += TOBJECT + SPACE + function_obj_name + "=FTAG(&" + init_name + "_o);\n";
+    this->source += init;
+
+    this->header += class_header;
 }
 
 OutputCode STranspiler::transpile_new(NewObjectSNode* node) {
@@ -483,7 +556,8 @@ OutputCode STranspiler::transpile_try_catch(TryCatchSNode* dn) {
         out += "if (UNTAG(thrown_exception)->class_name==\"" + path_to_id(dn->e_names_types[i].second) +
                "\"){TaggedObject*" + dn->e_names_types[i].first + "=thrown_exception;\n" + catch_out.code + "} else ";
     }
-    out += RETURN + SPACE + "CALL1(test_D_bootstrap_D_Exception_D___init__,test_D_bootstrap_D_Exception_D___init__)" + SEMIC + NEWLINE;
+    out += RETURN + SPACE + "CALL1(test_D_bootstrap_D_Exception_D___init__,test_D_bootstrap_D_Exception_D___init__)" +
+           SEMIC + NEWLINE;
     // out = out.substr(0, out.size() - 5);
     out += "\n}";
     return OutputCode("", out);

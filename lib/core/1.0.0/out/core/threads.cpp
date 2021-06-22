@@ -34,7 +34,7 @@ TaggedObject* core_D_threads_D_Thread_D_join_f(TaggedObject* th) {
 DEFINE_FUNCTION(0, core_D_threads_D_Lock_D_new)
 
 TaggedObject* core_D_threads_D_Lock_D_new_f() {
-    XLock* l = CAST(NEW(XLock, {}), XLock);
+    XLock* l = CAST(NEW(XLock), XLock);
     pthread_mutex_init(&l->mutex,NULL);
     return TAG(l);
 }

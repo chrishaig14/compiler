@@ -51,9 +51,10 @@ TaggedObject* GC::assign(TaggedObject* old_value_t, TaggedObject* new_value_t) {
 void GC::out_of_scope(TaggedObject* old_value_t, std::string c) {
     if (old_value_t != nullptr) {
         if (has_tag(old_value_t, OBJECT_TAG)) {
-            XObject* old = UNTAG(old_value_t);
+            XObject* old = dynamic_cast<XObject*>(UNTAG(old_value_t));
             if (GC::collecting and old->gc_info.count == 0) {
                 delete old;
+                return;
             }
             // std::cout << "object " << c << " : " << old << " out of scope " << std::endl;
             // std::cout << "(" << old << ") count before decreasing: " << old->gc_info.count << std::endl;

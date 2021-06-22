@@ -18,10 +18,10 @@ TaggedObject* m_core_c_List_f_add_f(TaggedObject* _a, TaggedObject* _b) {
     GC::declare(_b);
     XList* a = CAST(_a, XList);
     XList* b = CAST(_b, XList);
-    XList* r = CAST(NEW(XList, a->l->size() + b->l->size()), XList);
+    XList* r = CAST(XList_init_with_length(a->lv.size() + b->lv.size()), XList);
     auto lv = r->lv;
-    int sa = a->l->size();
-    int sb = b->l->size();
+    int sa = a->lv.size();
+    int sb = b->lv.size();
     for (size_t i = 0; i < sa; i++) {
         lv[i] = a->lv[i];
     }
@@ -35,7 +35,7 @@ TaggedObject* m_core_c_List_f_add_f(TaggedObject* _a, TaggedObject* _b) {
 
 TaggedObject* m_core_c_List_f_len_f(TaggedObject* _l) {
     XList* l = (XList*) (UNTAG(_l));
-    return MAKE_INT(l->l->size());
+    return MAKE_INT(l->lv.size());
 }
 
 Function2 m_core_c_List_f_add_o = Function2(m_core_c_List_f_add_f);
@@ -43,36 +43,50 @@ Function1 m_core_c_List_f_len_o = Function1(m_core_c_List_f_len_f);
 TaggedObject* m_core_c_List_f_add = FTAG(&m_core_c_List_f_add_o);
 TaggedObject* m_core_c_List_f_len = FTAG(&m_core_c_List_f_len_o);
 
-XList::XList(int n) : XObject("XList"), lv(n, nullptr) {
-    this->l = &this->lv;
-}
 
-
-TaggedObject* XList::__eq__(TaggedObject* pObject) {
+TaggedObject* XList__eq__(TaggedObject* _this_obj, TaggedObject* pObject) {
+    XList* this_obj = CAST(_this_obj, XList);
     XList* other = CAST(pObject, XList);
-    for (size_t i = 0; i < this->l->size(); i++) {
-        if (EQ((*this->l)[i], (*other->l)[i]) == MAKE_BOOL(false)) {
+    for (size_t i = 0; i < this_obj->lv.size(); i++) {
+        if (EQ(this_obj->lv[i], other->lv[i]) == MAKE_BOOL(false)) {
             return MAKE_BOOL(false);
         }
     }
     return MAKE_BOOL(true);
 }
 
-XList::~XList() {
+void XList_clean(TaggedObject* _this_obj) {
+    XList* this_obj = CAST(_this_obj, XList);
     if (GC::collecting) {
         return;
     }
-    if (this->l->size() != 0) {
-        if (has_tag(this->l->at(0), OBJECT_TAG)) {
-            for (size_t i = 0; i < this->l->size(); i++) {
-                if (has_tag(this->l->at(i), FUNCTION_TAG)) {
+    if (this_obj->lv.size() != 0) {
+        if (has_tag(this_obj->lv.at(0), OBJECT_TAG)) {
+            for (size_t i = 0; i < this_obj->lv.size(); i++) {
+                if (has_tag(this_obj->lv.at(i), FUNCTION_TAG)) {
                     continue;
                 }
-                GC::out_of_scope(this->l->at(i));
+                GC::out_of_scope(this_obj->lv.at(i));
             }
         }
     }
-    std::cout << "delete list of length " << this->l->size() << std::endl;
+    std::cout << "delete list of length " << this_obj->lv.size() << std::endl;
+}
+
+
+std::vector<XObject*> core_D_core_D_List_D_get_all_members(TaggedObject* _this_obj) {
+    XList* this_obj = CAST(_this_obj, XList);
+    if (this_obj->lv.empty()) {
+        return {};
+    }
+    if (!has_tag(this_obj->lv[0], OBJECT_TAG)) {
+        return {};
+    }
+    std::vector<XObject*> ret;
+    for (auto* to: this_obj->lv) {
+        ret.push_back(UNTAG(to));
+    }
+    return ret;
 }
 
 TaggedObject* core_D_core_D_List_D_len_f(TaggedObject* a) {
@@ -101,14 +115,17 @@ TaggedObject* core_D_core_D_List_D___set_item___f(TaggedObject* a, TaggedObject*
 }
 
 TaggedObject* core_D_core_D_List_D___add___f(TaggedObject* a, TaggedObject* b) {
-    TaggedObject* res = NEW(XList, CAST(a, XList)->l->size() + CAST(b, XList)->l->size());
+    XList* _a = CAST(a, XList);
+    XList* _b = CAST(b, XList);
+    TaggedObject* res = XList_init_with_length(_a->lv.size() + _b->lv.size());
     int i = 0;
-    for (auto xa: CAST(a, XList)->lv) {
-        CAST(res, XList)->lv[i] = xa;
+    std::vector<TaggedObject*>& res_vec = CAST(res, XList)->lv;
+    for (auto xa: _a->lv) {
+        res_vec[i] = xa;
         i++;
     }
-    for (auto xb: CAST(b, XList)->lv) {
-        CAST(res, XList)->lv[i] = xb;
+    for (auto xb: _b->lv) {
+        res_vec[i] = xb;
         i++;
     }
     return res;
@@ -143,9 +160,9 @@ TaggedObject* core_D_core_D_List_D_map_f(TaggedObject* a, TaggedObject* f) {
     GC::declare(a);
     GC::declare(f);
     XList* la = CAST(a, XList);
-    TaggedObject* r = NEW(XList, la->l->size());
+    TaggedObject* r = XList_init_with_length(la->lv.size());
     XList* rl = CAST(r, XList);
-    for (int i = 0; i < la->l->size(); i++) {
+    for (int i = 0; i < la->lv.size(); i++) {
         TaggedObject* re = CALL1(f, la->lv[i]);
         rl->lv[i] = GC::declare(re);
     }
@@ -162,7 +179,7 @@ TaggedObject* core_D_core_D_List_D_where_f(TaggedObject* a, TaggedObject* f) {
     XList* la = CAST(a, XList);
     TaggedObject* r = NEW(XList, {});
     XList* rl = CAST(r, XList);
-    for (int i = 0; i < la->l->size(); i++) {
+    for (int i = 0; i < la->lv.size(); i++) {
         TaggedObject* re = CALL1(f, la->lv[i]);
         if (GET_BOOL(re)) {
             rl->lv.push_back(GC::declare(la->lv[i]));
@@ -171,4 +188,26 @@ TaggedObject* core_D_core_D_List_D_where_f(TaggedObject* a, TaggedObject* f) {
     GC::out_of_scope(a);
     GC::out_of_scope(f);
     return r;
+}
+
+Vtable XList_vtable = {XList_clean, core_D_core_D_List_D_get_all_members, nullptr};
+
+TaggedObject* XList_init_with_length(size_t n) {
+    XList* l = new XList;
+    l->lv.reserve(n);
+    l->vtable = &XList_vtable;
+    return TAG(l);
+}
+
+
+TaggedObject* core_D_core_D_List_D__init__f(const std::initializer_list<TaggedObject*>& c) {
+    XList* this_obj = new XList{c, &XList_vtable};
+    if (this_obj->lv.size() != 0) {
+        if (has_tag(this_obj->lv[0], OBJECT_TAG)) {
+            for (auto& e: this_obj->lv) {
+                UNTAG(e)->inc_count();
+            }
+        }
+    }
+    return TAG(this_obj);
 }
