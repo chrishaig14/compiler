@@ -9,6 +9,10 @@ void Compiler::analyze_module(Module& module, Package& top_package) {
     for (const auto& path: module.imported_paths_no_alias_v) {
         this->add_path_to_module(module, path.second, top_package);
     }
+    // std::vector<Path> default_imports = {Path("core.core.String")};
+    // for (const auto& path:default_imports) {
+    //     this->add_path_to_module(module, path, top_package);
+    // }
     for (const auto& i: module.imported_paths_with_alias_v) {
         add_path_with_alias_to_module(module, i.first, i.second, top_package);
     }

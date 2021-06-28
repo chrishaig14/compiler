@@ -1,4 +1,4 @@
-import .core.core.Integer
+//import .core.core.Integer
 
 class Thread {
     static fun new(f: fun()->Integer) -> Thread{}

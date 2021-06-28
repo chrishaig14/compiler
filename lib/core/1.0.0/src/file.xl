@@ -1,6 +1,5 @@
-import .core.String
-import .core.Boolean
-import .core.Integer
+//import .core.Boolean
+//import .core.Integer
 
 class File {
     static fun open(path: String, mode: String) -> File {

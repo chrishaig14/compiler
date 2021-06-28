@@ -30,6 +30,22 @@ void GlobalProcessor::visit_import(ImportNode& node) {
     }
 }
 
+void GlobalProcessor::add_default_imports() {
+    std::vector<Path> default_paths = {Path("core.core.String"), Path("core.core.Integer"), Path("core.core.List"),
+                                       Path("core.core.Double"), Path("core.core.Boolean"), Path("core.core.Float"),
+                                       Path("core.core.Option"), Path("core.core.print")};
+    for (auto path: default_paths) {
+        if (this->module->imported_paths_with_alias.count(path.as_vec().back()) != 0) {
+            throw std::runtime_error("Path " + path.as_str() + " already imported!");
+        }
+        if (this->module->imported_paths_no_alias.count(path.as_vec().back()) != 0) {
+            throw std::runtime_error("Path " + path.as_str() + " already imported!");
+        }
+        this->module->imported_paths_no_alias[path.as_vec().back()] = path;
+        this->module->imported_paths_no_alias_v.emplace_back(path.as_vec().back(), path);
+    }
+}
+
 
 void GlobalProcessor::visit_function(FunctionNode& node) {
     std::cout << "Global-processing function " << node.identifier << " in module " << this->module->name << std::endl;
@@ -55,6 +71,8 @@ void GlobalProcessor::visit_root(BlockNode& node) {
     // process classes second
     // finally process functions
     check_duplicated_names(node);
+
+    this->add_default_imports();
 
     for (auto* n: node.nodes) {
         if (n->ntype == NodeType::IMPORT) {

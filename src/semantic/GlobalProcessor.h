@@ -31,6 +31,7 @@ public:
     void visit_import(ImportNode& node);
     void visit_class(ClassNode& node);
     void check_duplicated_names(BlockNode& node) const;
+    void add_default_imports();
 };
 
 #endif //GLOBALPROCESSOR_H
