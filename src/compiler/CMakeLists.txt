@@ -8,17 +8,17 @@ find_package(fmt)
 
 add_executable(
     compiler
-    full.cpp
-    utils.cpp
-    utils.h
-    transpile.cpp
-    transpile.h
     analyze.cpp
     analyze.h
+    Compiler.cpp
+    Compiler.h
+    full.cpp
     parse.cpp
     parse.h
-    Compiler.cpp
-    Compiler.h)
+    transpile.cpp
+    transpile.h
+    utils.cpp
+    utils.h)
 
 target_link_libraries(
     compiler

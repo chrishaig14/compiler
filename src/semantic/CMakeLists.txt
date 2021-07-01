@@ -6,6 +6,8 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage -g -O0")
 
 add_library(
     semantic
+    ../macros.h
+    ../types.h
     ../utils.cpp
     ../utils.h
     CheckCall.cpp
@@ -33,8 +35,6 @@ add_library(
     SemanticInfo.h
     SymbolTable.cpp
     SymbolTable.h
-    ../macros.h
-    ../types.h
     util.cpp
     util.h)
 

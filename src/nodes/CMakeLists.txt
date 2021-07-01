@@ -6,89 +6,89 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage -g -O0")
 
 add_library(
     nodes
-    ReturnNode.cpp
-    ReturnNode.h
-    StringNode.cpp
-    StringNode.h
-    BreakNode.cpp
-    BreakNode.h
-    BinopNode.cpp
-    BinopNode.h
-    Node.cpp
-    Node.h
-    MemberNode.cpp
-    MemberNode.h
-    ListNode.cpp
-    ListNode.h
-    SubscriptNode.cpp
-    SubscriptNode.h
-    nodes.h
-    CallNode.cpp
-    CallNode.h
-    FunctionNode.cpp
-    FunctionNode.h
-    DeclarationNode.cpp
-    DeclarationNode.h
-    TypeNode.cpp
-    TypeNode.h
-    IfNode.cpp
-    TernaryNode.cpp
-    TernaryNode.h
-    NoneNode.cpp
-    NoneNode.h
-    IfNode.h
-    ImportNode.h
-    ImportNode.cpp
-    IdNode.cpp
-    ClassNode.cpp
-    ClassNode.h
-    IdNode.h
-    NumberNode.cpp
-    NumberNode.h
+    AliasNode.cpp
+    AliasNode.h
     AssignmentNode.cpp
     AssignmentNode.h
+    BinopNode.cpp
+    BinopNode.h
     BlockNode.cpp
     BlockNode.h
-    EmptyListNode.cpp
-    EmptyListNode.h
     BooleanNode.cpp
     BooleanNode.h
-    WhileNode.cpp
-    WhileNode.h
-    ContinueNode.cpp
-    ContinueNode.h
-    Node.cpp
-    Node.h
-    ForNode.cpp
-    ForNode.h
-    optypes.h
-    optypes.cpp
-    TupleNode.cpp
-    TupleNode.h
     BoolOpNode.cpp
     BoolOpNode.h
-    PartialApplication.cpp
-    PartialApplication.h
+    BreakNode.cpp
+    BreakNode.h
+    CallNode.cpp
+    CallNode.h
+    CastNode.cpp
+    CastNode.h
+    ClassNode.cpp
+    ClassNode.h
+    ContinueNode.cpp
+    ContinueNode.h
+    DeclarationNode.cpp
+    DeclarationNode.h
+    DefaultConstructorNode.cpp
+    DefaultConstructorNode.h
+    DefaultConstructorNode.h
     DictNode.cpp
     DictNode.h
     EmptyDictNode.cpp
     EmptyDictNode.h
-    CastNode.cpp
-    CastNode.h
-    MethodNode.cpp
-    MethodNode.h
-    DefaultConstructorNode.h
-    DefaultConstructorNode.cpp
-    DefaultConstructorNode.h
-    MatchExpressionNode.cpp
-    MatchExpressionNode.h
-    AliasNode.cpp
-    AliasNode.h
+    EmptyListNode.cpp
+    EmptyListNode.h
     EnumNode.cpp
     EnumNode.h
-    UnaryOpNode.cpp
-    UnaryOpNode.h
+    ForNode.cpp
+    ForNode.h
+    FunctionNode.cpp
+    FunctionNode.h
+    IdNode.cpp
+    IdNode.h
+    IfNode.cpp
+    IfNode.h
+    ImportNode.cpp
+    ImportNode.h
+    ListNode.cpp
+    ListNode.h
+    MatchExpressionNode.cpp
+    MatchExpressionNode.h
+    MemberNode.cpp
+    MemberNode.h
+    MethodNode.cpp
+    MethodNode.h
+    Node.cpp
+    Node.cpp
+    Node.h
+    Node.h
+    nodes.h
+    NoneNode.cpp
+    NoneNode.h
+    NumberNode.cpp
+    NumberNode.h
+    optypes.cpp
+    optypes.h
+    PartialApplication.cpp
+    PartialApplication.h
+    ReturnNode.cpp
+    ReturnNode.h
+    StringNode.cpp
+    StringNode.h
+    SubscriptNode.cpp
+    SubscriptNode.h
+    TernaryNode.cpp
+    TernaryNode.h
     ThrowNode.cpp
     ThrowNode.h
     TryCatchNode.cpp
-    TryCatchNode.h)
+    TryCatchNode.h
+    TupleNode.cpp
+    TupleNode.h
+    TypeNode.cpp
+    TypeNode.h
+    UnaryOpNode.cpp
+    UnaryOpNode.h
+    WhileNode.cpp
+    WhileNode.h)
