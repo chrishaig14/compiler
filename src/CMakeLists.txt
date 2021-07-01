@@ -4,107 +4,116 @@ project(xlang)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage -g -O0")
 
-add_library(
-        scanner
-        scanner/Scanner.cpp
-        scanner/Scanner.h
-        scanner/Token.cpp
-        scanner/Token.h
-        scanner/CodeLines.cpp
-        scanner/CodeLines.h
-        scanner/TextPosition.cpp
-        scanner/TextPosition.h)
-
-add_library(
-        nodes
-        nodes/ReturnNode.cpp
-        nodes/ReturnNode.h
-        nodes/StringNode.cpp
-        nodes/StringNode.h
-        nodes/BreakNode.cpp
-        nodes/BreakNode.h
-        nodes/BinopNode.cpp
-        nodes/BinopNode.h
-        nodes/Node.cpp
-        nodes/Node.h
-        nodes/MemberNode.cpp
-        nodes/MemberNode.h
-        nodes/ListNode.cpp
-        nodes/ListNode.h
-        nodes/SubscriptNode.cpp
-        nodes/SubscriptNode.h
-        nodes/nodes.h
-        nodes/CallNode.cpp
-        nodes/CallNode.h
-        nodes/FunctionNode.cpp
-        nodes/FunctionNode.h
-        nodes/DeclarationNode.cpp
-        nodes/DeclarationNode.h
-        nodes/TypeNode.cpp
-        nodes/TypeNode.h
-        nodes/IfNode.cpp
-        nodes/TernaryNode.cpp
-        nodes/TernaryNode.h
-        nodes/NoneNode.cpp
-        nodes/NoneNode.h
-        nodes/IfNode.h
-        nodes/ImportNode.h
-        nodes/ImportNode.cpp
-        nodes/IdNode.cpp
-        nodes/ClassNode.cpp
-        nodes/ClassNode.h
-        nodes/IdNode.h
-        nodes/NumberNode.cpp
-        nodes/NumberNode.h
-        nodes/AssignmentNode.cpp
-        nodes/AssignmentNode.h
-        nodes/BlockNode.cpp
-        nodes/BlockNode.h
-        nodes/EmptyListNode.cpp
-        nodes/EmptyListNode.h
-        nodes/BooleanNode.cpp
-        nodes/BooleanNode.h
-        nodes/WhileNode.cpp
-        nodes/WhileNode.h
-        nodes/ContinueNode.cpp
-        nodes/ContinueNode.h
-        nodes/Node.cpp
-        nodes/Node.h
-        nodes/ForNode.cpp
-        nodes/ForNode.h
-        nodes/optypes.h
-        nodes/optypes.cpp
-        nodes/TupleNode.cpp
-        nodes/TupleNode.h
-        nodes/BoolOpNode.cpp
-        nodes/BoolOpNode.h
-        nodes/PartialApplication.cpp
-        nodes/PartialApplication.h
-        nodes/DictNode.cpp
-        nodes/DictNode.h
-        nodes/EmptyDictNode.cpp
-        nodes/EmptyDictNode.h nodes/CastNode.cpp nodes/CastNode.h nodes/MethodNode.cpp nodes/MethodNode.h logger/Logger.cpp logger/Logger.h nodes/DefaultConstructorNode.h nodes/DefaultConstructorNode.cpp nodes/DefaultConstructorNode.h simple_nodes/FunctionSNode.cpp simple_nodes/FunctionSNode.h simple_nodes/FunctionSNode.cpp simple_nodes/FunctionSNode.h simple_nodes/BlockSNode.cpp simple_nodes/BlockSNode.h simple_nodes/DeclarationSNode.cpp simple_nodes/DeclarationSNode.h simple_nodes/AssignmentSNode.cpp simple_nodes/AssignmentSNode.h simple_nodes/IdSNode.cpp simple_nodes/IdSNode.h simple_nodes/SNode.cpp simple_nodes/SNode.h simple_nodes/ReturnSNode.cpp simple_nodes/ReturnSNode.h simple_nodes/IntegerSNode.cpp simple_nodes/IntegerSNode.h simple_nodes/CallSNode.cpp simple_nodes/CallSNode.h simple_nodes/StringSNode.cpp simple_nodes/StringSNode.h simple_nodes/BoolSNode.cpp simple_nodes/BoolSNode.h simple_nodes/FloatSNode.cpp simple_nodes/FloatSNode.h simple_nodes/ClassSNode.cpp simple_nodes/ClassSNode.h simple_nodes/NewObjectSNode.cpp simple_nodes/NewObjectSNode.h simple_nodes/ObjectMemberSNode.cpp simple_nodes/ObjectMemberSNode.h simple_nodes/WhileSNode.cpp simple_nodes/ListSNode.cpp simple_nodes/ListSNode.h simple_nodes/IfSNode.cpp simple_nodes/IfSNode.h simple_nodes/BreakSNode.cpp simple_nodes/BreakSNode.h simple_nodes/ContinueSNode.cpp simple_nodes/ContinueSNode.h nodes/MatchExpressionNode.cpp nodes/MatchExpressionNode.h simple_nodes/MatchSNode.cpp simple_nodes/MatchSNode.h nodes/AliasNode.cpp nodes/AliasNode.h nodes/EnumNode.cpp nodes/EnumNode.h simple_nodes/EnumSNode.cpp simple_nodes/EnumSNode.h simple_nodes/EnumMemberSNode.cpp simple_nodes/EnumMemberSNode.h simple_nodes/NoneSNode.cpp simple_nodes/NoneSNode.h simple_nodes/TernarySNode.cpp simple_nodes/TernarySNode.h nodes/UnaryOpNode.cpp nodes/UnaryOpNode.h simple_nodes/DictSNode.cpp simple_nodes/DictSNode.h nodes/ThrowNode.cpp nodes/ThrowNode.h simple_nodes/ThrowSNode.cpp simple_nodes/ThrowSNode.h nodes/TryCatchNode.cpp nodes/TryCatchNode.h simple_nodes/TryCatchSNode.cpp simple_nodes/TryCatchSNode.h)
-
-add_library(parser parser/Parser.cpp parser/Parser.h parser/ParserErrors.cpp)
-
-add_library(
-        srcLib
-        logging/logging.cpp
-        semantic/SymbolTable.cpp
-        semantic/SymbolTable.h
-        semantic/GlobalProcessor.cpp
-        utils.h
-        utils.cpp
-        semantic/SemanticInfo.cpp
-        semantic/SemanticInfo.h
-        units/Class.cpp
-        units/Class.h
-        semantic/Checker.cpp
-        semantic/Checker.h
-        nodes/node_types.h
-        types.h
-        macros.h
-        semantic/CheckerVisit.cpp
-        semantic/CheckerUnify.cpp semantic/util.cpp semantic/util.h units/Package.cpp units/Package.h units/Module.cpp units/Module.h units/ConstFunction.h units/Entity.cpp units/Entity.h units/ConstFunction.cpp units/ObjectValue.cpp units/ObjectValue.h units/FunctionValue.cpp units/FunctionValue.h semantic/ErrorReporter.cpp semantic/ErrorReporter.h units/Enum.cpp units/Enum.h semantic/CheckerUtils.cpp semantic/CheckerUtils.h semantic/CheckDeclaration.cpp semantic/CheckDeclaration.h semantic/CheckCall.cpp semantic/CheckCall.h semantic/CheckMember.cpp semantic/CheckMember.h semantic/CheckLiterals.cpp semantic/CheckLiterals.h semantic/CheckStatements.cpp semantic/CheckStatements.h semantic/CheckExpressions.cpp semantic/CheckExpressions.h)
-
-add_library(transpiler transpiler/STranspiler.cpp transpiler/STranspiler.h)
+add_subdirectory(parser)
+add_subdirectory(scanner)
+add_subdirectory(compiler)
+add_subdirectory(transpiler)
+add_subdirectory(semantic)
+add_subdirectory(units)
+add_subdirectory(simple_nodes)
+add_subdirectory(nodes)
+#
+#add_library(
+#        scanner
+#        scanner/Scanner.cpp
+#        scanner/Scanner.h
+#        scanner/Token.cpp
+#        scanner/Token.h
+#        scanner/CodeLines.cpp
+#        scanner/CodeLines.h
+#        scanner/TextPosition.cpp
+#        scanner/TextPosition.h)
+#
+#add_library(
+#        nodes
+#        nodes/ReturnNode.cpp
+#        nodes/ReturnNode.h
+#        nodes/StringNode.cpp
+#        nodes/StringNode.h
+#        nodes/BreakNode.cpp
+#        nodes/BreakNode.h
+#        nodes/BinopNode.cpp
+#        nodes/BinopNode.h
+#        nodes/Node.cpp
+#        nodes/Node.h
+#        nodes/MemberNode.cpp
+#        nodes/MemberNode.h
+#        nodes/ListNode.cpp
+#        nodes/ListNode.h
+#        nodes/SubscriptNode.cpp
+#        nodes/SubscriptNode.h
+#        nodes/nodes.h
+#        nodes/CallNode.cpp
+#        nodes/CallNode.h
+#        nodes/FunctionNode.cpp
+#        nodes/FunctionNode.h
+#        nodes/DeclarationNode.cpp
+#        nodes/DeclarationNode.h
+#        nodes/TypeNode.cpp
+#        nodes/TypeNode.h
+#        nodes/IfNode.cpp
+#        nodes/TernaryNode.cpp
+#        nodes/TernaryNode.h
+#        nodes/NoneNode.cpp
+#        nodes/NoneNode.h
+#        nodes/IfNode.h
+#        nodes/ImportNode.h
+#        nodes/ImportNode.cpp
+#        nodes/IdNode.cpp
+#        nodes/ClassNode.cpp
+#        nodes/ClassNode.h
+#        nodes/IdNode.h
+#        nodes/NumberNode.cpp
+#        nodes/NumberNode.h
+#        nodes/AssignmentNode.cpp
+#        nodes/AssignmentNode.h
+#        nodes/BlockNode.cpp
+#        nodes/BlockNode.h
+#        nodes/EmptyListNode.cpp
+#        nodes/EmptyListNode.h
+#        nodes/BooleanNode.cpp
+#        nodes/BooleanNode.h
+#        nodes/WhileNode.cpp
+#        nodes/WhileNode.h
+#        nodes/ContinueNode.cpp
+#        nodes/ContinueNode.h
+#        nodes/Node.cpp
+#        nodes/Node.h
+#        nodes/ForNode.cpp
+#        nodes/ForNode.h
+#        nodes/optypes.h
+#        nodes/optypes.cpp
+#        nodes/TupleNode.cpp
+#        nodes/TupleNode.h
+#        nodes/BoolOpNode.cpp
+#        nodes/BoolOpNode.h
+#        nodes/PartialApplication.cpp
+#        nodes/PartialApplication.h
+#        nodes/DictNode.cpp
+#        nodes/DictNode.h
+#        nodes/EmptyDictNode.cpp
+#        nodes/EmptyDictNode.h nodes/CastNode.cpp nodes/CastNode.h nodes/MethodNode.cpp nodes/MethodNode.h logger/Logger.cpp logger/Logger.h nodes/DefaultConstructorNode.h nodes/DefaultConstructorNode.cpp nodes/DefaultConstructorNode.h simple_nodes/FunctionSNode.cpp simple_nodes/FunctionSNode.h simple_nodes/FunctionSNode.cpp simple_nodes/FunctionSNode.h simple_nodes/BlockSNode.cpp simple_nodes/BlockSNode.h simple_nodes/DeclarationSNode.cpp simple_nodes/DeclarationSNode.h simple_nodes/AssignmentSNode.cpp simple_nodes/AssignmentSNode.h simple_nodes/IdSNode.cpp simple_nodes/IdSNode.h simple_nodes/SNode.cpp simple_nodes/SNode.h simple_nodes/ReturnSNode.cpp simple_nodes/ReturnSNode.h simple_nodes/IntegerSNode.cpp simple_nodes/IntegerSNode.h simple_nodes/CallSNode.cpp simple_nodes/CallSNode.h simple_nodes/StringSNode.cpp simple_nodes/StringSNode.h simple_nodes/BoolSNode.cpp simple_nodes/BoolSNode.h simple_nodes/FloatSNode.cpp simple_nodes/FloatSNode.h simple_nodes/ClassSNode.cpp simple_nodes/ClassSNode.h simple_nodes/NewObjectSNode.cpp simple_nodes/NewObjectSNode.h simple_nodes/ObjectMemberSNode.cpp simple_nodes/ObjectMemberSNode.h simple_nodes/WhileSNode.cpp simple_nodes/ListSNode.cpp simple_nodes/ListSNode.h simple_nodes/IfSNode.cpp simple_nodes/IfSNode.h simple_nodes/BreakSNode.cpp simple_nodes/BreakSNode.h simple_nodes/ContinueSNode.cpp simple_nodes/ContinueSNode.h nodes/MatchExpressionNode.cpp nodes/MatchExpressionNode.h simple_nodes/MatchSNode.cpp simple_nodes/MatchSNode.h nodes/AliasNode.cpp nodes/AliasNode.h nodes/EnumNode.cpp nodes/EnumNode.h simple_nodes/EnumSNode.cpp simple_nodes/EnumSNode.h simple_nodes/EnumMemberSNode.cpp simple_nodes/EnumMemberSNode.h simple_nodes/NoneSNode.cpp simple_nodes/NoneSNode.h simple_nodes/TernarySNode.cpp simple_nodes/TernarySNode.h nodes/UnaryOpNode.cpp nodes/UnaryOpNode.h simple_nodes/DictSNode.cpp simple_nodes/DictSNode.h nodes/ThrowNode.cpp nodes/ThrowNode.h simple_nodes/ThrowSNode.cpp simple_nodes/ThrowSNode.h nodes/TryCatchNode.cpp nodes/TryCatchNode.h simple_nodes/TryCatchSNode.cpp simple_nodes/TryCatchSNode.h)
+#
+##add_library(parser parser/Parser.cpp parser/Parser.h parser/ParserErrors.cpp)
+#
+#add_library(
+#        srcLib
+#        logging/logging.cpp
+#        semantic/SymbolTable.cpp
+#        semantic/SymbolTable.h
+#        semantic/GlobalProcessor.cpp
+#        utils.h
+#        utils.cpp
+#        semantic/SemanticInfo.cpp
+#        semantic/SemanticInfo.h
+#        units/Class.cpp
+#        units/Class.h
+#        semantic/Checker.cpp
+#        semantic/Checker.h
+#        nodes/node_types.h
+#        types.h
+#        macros.h
+#        semantic/CheckerVisit.cpp
+#        semantic/CheckerUnify.cpp semantic/util.cpp semantic/util.h units/Package.cpp units/Package.h units/Module.cpp units/Module.h units/ConstFunction.h units/Entity.cpp units/Entity.h units/ConstFunction.cpp units/ObjectValue.cpp units/ObjectValue.h units/FunctionValue.cpp units/FunctionValue.h semantic/ErrorReporter.cpp semantic/ErrorReporter.h units/Enum.cpp units/Enum.h semantic/CheckerUtils.cpp semantic/CheckerUtils.h semantic/CheckDeclaration.cpp semantic/CheckDeclaration.h semantic/CheckCall.cpp semantic/CheckCall.h semantic/CheckMember.cpp semantic/CheckMember.h semantic/CheckLiterals.cpp semantic/CheckLiterals.h semantic/CheckStatements.cpp semantic/CheckStatements.h semantic/CheckExpressions.cpp semantic/CheckExpressions.h)
+#
+#add_library(transpiler transpiler/STranspiler.cpp transpiler/STranspiler.h)
