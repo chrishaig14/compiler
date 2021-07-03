@@ -20,89 +20,68 @@ class Parser {
     size_t current;
     CodeLines code_lines;
     std::string __file__;
+    bool inside_loop;
 
 public:
 
     Parser(const std::string& __file__, CodeLines code_lines, std::vector<Token>& tokens);
-
     bool match(TokType type) const;
-
-    Node* parse_tuple_literal();
-
     void next();
-
-    DeclarationNode* parse_variable_declaration();
-
-    Node* parse_not_expression();
-
-    Node* parse_id_or_class_literal();
-
-    FunctionNode* parse_function_definition();
-
-    IfNode* parse_if();
-
-    Node* parse_list_literal();
-
-    Node* parse_add_or_sub_expression();
-
-    Node* parse_and_expression();
-
-    Node* parse_assignment_or_expression();
-
-    Node* parse_bool_expression();
-
-    Node* parse_call_or_subscript_chain(Node* parent);
-
-    Node* parse_common_statement();
-
-    Node* parse_expression();
-
-    Node* parse_factor();
-
-    Node* parse_id_or_literal();
-
-    Node* parse_mul_div_or_mod_expression();
-
-    Node* parse_or_expression();
+    Token expect_token(TokType token_type);
 
     Node* parse_top_level_statement();
 
+    ImportNode* parse_import();
+    ClassNode* parse_class_definition();
+    FunctionNode* parse_function_definition();
+    Node* parse_alias();
+    Node* parse_enum_definition();
+
+    Node* parse_common_statement();
+    Node* parse_assignment_or_expression();
+    DeclarationNode* parse_variable_declaration();
+    IfNode* parse_if();
+    WhileNode* parse_while_loop();
+    ForNode* parse_for_loop();
     ReturnNode* parse_return();
-
-    Token expect_token(TokType token_type);
-
-    TypeNode* parse_type_node();
-
-    VectorOfNodes parse_list_of_expressions();
+    Node* parse_ternary();
+    Node* parse_match_statement();
+    ThrowNode* parse_throw();
+    TryCatchNode* parse_try_catch();
 
     BlockNode* parse_possibly_empty_block();
-
     BlockNode* parse_program();
 
-    ForNode* parse_for_loop();
+    Node* parse_expression();
+    Node* parse_tuple_literal();
+    Node* parse_not_expression();
+    Node* parse_id_or_class_literal();
+    Node* parse_list_literal();
+    Node* parse_add_or_sub_expression();
+    Node* parse_and_expression();
+    Node* parse_bool_expression();
+    Node* parse_factor();
+    Node* parse_id_or_literal();
+    Node* parse_mul_div_or_mod_expression();
+    Node* parse_or_expression();
+    Node* parse_call_or_subscript_chain(Node* parent);
+    Node* parse_dictionary();
+    Node* parse_tuple_or_constructor();
+    Node* parse_partial_application();
 
-    ImportNode* parse_import();
-
-    WhileNode* parse_while_loop();
-
-    Node* parse_ternary();
-
-    ClassNode* parse_class_definition();
-
+    TypeNode* parse_type_node();
     FunctionType* parse_function_type();
-
     ObjectType* parse_object_type();
 
-    bool inside_loop;
-    Node* parse_partial_application();
+    VectorOfNodes parse_list_of_expressions();
     VectorOfNodes parse_list_of_arguments();
-    void error_empty_tuple(TextPosition pos);
-    void error_tuple_one_element(TextPosition pos);
 
     std::string code_context_string(TextPosition position);
     std::string code_error_string(TextPosition start, TextPosition end);
     std::string context_string(TextPosition position);
 
+    void error_empty_tuple(TextPosition pos);
+    void error_tuple_one_element(TextPosition pos);
     void error_after_var(Token tok);
     void error_after_var_name(Token tok);
     void error_after_var_type(Token tok);
@@ -118,14 +97,8 @@ public:
     void error_assign_call(Token tok);
     void error_expected_statement(TextPosition pos);
     void error_expected_type(Token tok);
-    Node* parse_dictionary();
-    Node* parse_tuple_or_constructor();
-    Node* parse_match_statement();
-    Node* parse_alias();
-    Node* parse_enum_definition();
+
     std::string top_package_name;
-    ThrowNode* parse_throw();
-    TryCatchNode* parse_try_catch();
 };
 
 

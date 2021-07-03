@@ -22,7 +22,7 @@
 #include "../simple_nodes/EnumSNode.h"
 #include "ErrorReporter.h"
 #include "util.h"
-#include "../logger/Logger.h"
+// #include "../logger/Logger.h"
 #include "../simple_nodes/BlockSNode.h"
 #include "../simple_nodes/AssignmentSNode.h"
 #include "../simple_nodes/ReturnSNode.h"

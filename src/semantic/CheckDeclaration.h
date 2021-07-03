@@ -6,7 +6,7 @@
 #define XLANG_CHECKDECLARATION_H
 
 #include "Checker.h"
-#include "../logger/Logger.h"
+// #include "../logger/Logger.h"
 
 
 
