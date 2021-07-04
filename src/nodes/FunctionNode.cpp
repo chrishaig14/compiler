@@ -45,11 +45,11 @@ FunctionNode::FunctionNode(std::string identifier, VectorOfStrings parameter_nam
 }
 
 FunctionNode::~FunctionNode() {
-    for (auto* pt: this->parameter_types) {
-        delete pt;
-    }
-    delete this->body;
-    delete this->return_type;
+    // for (auto* pt: this->parameter_types) {
+    //     delete pt;
+    // }
+    // delete this->body;
+    // delete this->return_type;
 }
 
 nlohmann::json FunctionNode::to_json() {

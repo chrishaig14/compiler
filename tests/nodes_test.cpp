@@ -342,3 +342,48 @@ TEST_CASE("while", "[while]") {
                         {"while", {{"condition", cond->to_json()}, {"body", body->to_json()}}}};
     REQUIRE(e == nj);
 }
+
+TEST_CASE("class_empty", "[class]") {
+    ClassNode n("MyClass", {}, {}, {}, {}, {}, DUMMY_POS, DUMMY_POS);
+    nlohmann::json nj = n.to_json();
+    nlohmann::json members = nlohmann::json::array();
+    nlohmann::json methods = nlohmann::json::array();
+    nlohmann::json e = {{"type",  "class"},
+                        {"class", {{"id", "MyClass"}, {"members", members}, {"methods", methods}}}};
+    REQUIRE(e == nj);
+}
+
+TEST_CASE("class_full", "[class]") {
+    ObjectType* t1 = new ObjectType("Integer");
+    ObjectType* t2 = new ObjectType("String");
+    VectorOfStrings members_ordered = {"foo", "bar"};
+    ObjectType* rt = new ObjectType("Integer");
+    BlockNode* b = new BlockNode({}, DUMMY_POS, DUMMY_POS);
+    FunctionNode* method1 = new FunctionNode("method1", {}, {}, rt, b, DUMMY_POS, DUMMY_POS);
+    FunctionNode* method2 = new FunctionNode("method2", {}, {}, rt, b, DUMMY_POS, DUMMY_POS);
+    std::unordered_map<std::string, FunctionNode*> cmethods = {{"method1", method1},
+                                                               {"method2", method2}};
+    MapStringType cmembers = {{"foo", t1},
+                              {"bar", t2}};
+
+
+    nlohmann::json members = {{{"id", "foo"}, {"type", t1->to_json()}},
+                              {{"id", "bar"}, {"type", t2->to_json()}}};
+    nlohmann::json methods = {{"method2", method2->to_json()},
+                              {"method1", method1->to_json()}};
+
+    FunctionNode* smethod1 = new FunctionNode("smethod1", {}, {}, rt, b, DUMMY_POS, DUMMY_POS);
+    FunctionNode* smethod2 = new FunctionNode("smethod2", {}, {}, rt, b, DUMMY_POS, DUMMY_POS);
+    std::unordered_map<std::string, FunctionNode*> cstatic_methods = {{"smethod1", smethod1},
+                                                                      {"smethod2", smethod2}};
+    ClassNode n("MyClass", {"k", "v"}, cmembers, cmethods, {}, cstatic_methods, DUMMY_POS, DUMMY_POS);
+    n.members_ordered = members_ordered;
+    nlohmann::json nj = n.to_json();
+
+    nlohmann::json static_methods = {{"smethod1", smethod1->to_json()},
+                                     {"smethod2", smethod2->to_json()}};
+
+    nlohmann::json e = {{"type",  "class"},
+                        {"class", {{"id", "MyClass"}, {"members", members}, {"methods", methods}, {"static_methods", static_methods}}}};
+    REQUIRE(e == nj);
+}
