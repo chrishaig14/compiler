@@ -24,9 +24,8 @@ public:
     bool equal(const Node& p) const override;
 
 
-    BlockNode& block() override;
-    const BlockNode& block() const override;
     ~BlockNode();
+    nlohmann::json to_json() override;
     std::vector<std::pair<std::string, TypeNode*>> local_vars;
 };
 

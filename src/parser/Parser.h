@@ -11,6 +11,7 @@
 #include "../scanner/CodeLines.h"
 #include "../nodes/EnumNode.h"
 #include "../nodes/TryCatchNode.h"
+#include "../nodes/ObjectType.h"
 
 extern std::unordered_map<TokType, OpType> TOKEN_TO_OP;
 
@@ -46,8 +47,8 @@ public:
     ReturnNode* parse_return();
     Node* parse_ternary();
     Node* parse_match_statement();
-    ThrowNode* parse_throw();
-    TryCatchNode* parse_try_catch();
+    // ThrowNode* parse_throw();
+    // TryCatchNode* parse_try_catch();
 
     BlockNode* parse_possibly_empty_block();
     BlockNode* parse_program();

@@ -6,7 +6,7 @@
 #include "FunctionNode.h"
 
 bool FunctionNode::equal(const Node& x) const {
-    const auto& other = x.func();
+    const auto& other = (FunctionNode&) x;
 //    return false;
     if (this->identifier != other.identifier) {
         return false;
@@ -30,21 +30,10 @@ bool FunctionNode::equal(const Node& x) const {
     return *this->body == *other.body;
 }
 
-FunctionNode& FunctionNode::func() {
-    return *this;
-}
-
-const FunctionNode& FunctionNode::func() const {
-    return *this;
-}
-
-FunctionNode::FunctionNode(std::string identifier, VectorOfStrings parameter_names, const VectorOfTypes& parameter_types,
-                           TypeNode* return_type, BlockNode* body, TextPosition start, TextPosition end) : Node(NodeType::FUNC,
-                                                                                                                start,
-                                                                                                                end),
-                                                                                                           body(body),
-                                                                                                           return_type(
-                                                                                                                   return_type) {
+FunctionNode::FunctionNode(std::string identifier, VectorOfStrings parameter_names,
+                           const VectorOfTypes& parameter_types, TypeNode* return_type, BlockNode* body,
+                           TextPosition start, TextPosition end) : Node(NodeType::FUNC, start, end), body(body),
+                                                                   return_type(return_type) {
     for (auto p: parameter_types) {
         assert(p != nullptr);
     }
@@ -56,10 +45,20 @@ FunctionNode::FunctionNode(std::string identifier, VectorOfStrings parameter_nam
 }
 
 FunctionNode::~FunctionNode() {
-    for (auto *pt: this->parameter_types) {
+    for (auto* pt: this->parameter_types) {
         delete pt;
     }
     delete this->body;
     delete this->return_type;
+}
+
+nlohmann::json FunctionNode::to_json() {
+    std::vector<nlohmann::json> params;
+    for (size_t i = 0; i < this->parameter_names.size(); i++) {
+        params.push_back({{"id",   this->parameter_names[i]},
+                          {"type", this->parameter_types[i]->to_json()}});
+    }
+    return {{"type",     "function"},
+            {"function", {{"id", this->identifier}, {"parameters", params}, {"body", this->body->to_json()}, {"return_type", this->return_type->to_json()}}}};
 }
 

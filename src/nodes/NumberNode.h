@@ -8,8 +8,6 @@
 
 #include "Node.h"
 
-#include "Node.h"
-
 enum class NumberType {
     INTEGER, FLOAT, DOUBLE
 };
@@ -22,10 +20,9 @@ public:
 
     bool equal(const Node& x) const override;
 
-    NumberNode& number() override;
-    const NumberNode& number() const override;
-
     NumberType num_type;
+
+    nlohmann::json to_json() override;
 };
 
 

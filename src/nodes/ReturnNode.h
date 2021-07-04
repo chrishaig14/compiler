@@ -10,19 +10,15 @@
 #include "../types.h"
 #include "TypeNode.h"
 
-class ReturnNode : public Node {
+class   ReturnNode : public Node {
 public:
-    TypeNode* ret_type;
     explicit ReturnNode(Node* expression, TextPosition start, TextPosition end);
 
 
     bool equal(const Node& other) const override;
 
     ~ReturnNode();
-
-    ReturnNode& retrn() override;
-
-    const ReturnNode& retrn() const override;
+    nlohmann::json to_json() override;
 
     Node* expression;
     std::vector<std::pair<std::string, TypeNode*>> reachables;

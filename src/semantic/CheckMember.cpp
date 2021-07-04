@@ -4,6 +4,7 @@
 
 #include <cassert>
 #include "CheckMember.h"
+#include "../nodes/ObjectType.h"
 
 USemanticInfo Checker::visit_member(MemberNode& n) {
     USemanticInfo parent_info = this->dispatch(n.parent);

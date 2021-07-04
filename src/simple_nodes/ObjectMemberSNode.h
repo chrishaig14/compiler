@@ -9,6 +9,7 @@
 #include <string>
 #include "SNode.h"
 #include "../nodes/TypeNode.h"
+#include "../nodes/Path.h"
 
 class ObjectMemberSNode : public SNode {
 public:

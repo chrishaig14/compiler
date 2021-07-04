@@ -18,11 +18,7 @@ public:
     TernaryNode(Node* expression, Node* trueCase, Node* falseCase, TextPosition start, TextPosition end);
     bool equal(const Node& other) const override;
 
-    TernaryNode& ternary() override;
-
     ~TernaryNode();
-
-    const TernaryNode& ternary() const override;
 
 };
 

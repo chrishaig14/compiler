@@ -3,6 +3,7 @@
 //
 
 #include "CheckDeclaration.h"
+#include "../nodes/ObjectType.h"
 
 std::unique_ptr<SemanticInfo> Checker::expect_rvalue_of_type(const TypeNode& target, Node& node) {
     USemanticInfo rinfo = this->dispatch_rvalue(&node);
@@ -84,9 +85,8 @@ SNode* Checker::make_option_rvalue(SNode* value_snode, const TypeNode* unaliased
     if (*unaliased_target_type->object().type_params[0] == *unaliased_value_type ||
         unaliased_value_type->object().id == "NoneType") {
         return value_snode;
-    } else {
-        return nullptr;
     }
+    return nullptr;
 }
 
 SNode* Checker::make_union_rvalue(SNode* value_snode, const TypeNode* unaliased_value_type,

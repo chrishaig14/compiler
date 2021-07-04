@@ -6,11 +6,11 @@
 
 
 BoolOpNode::BoolOpNode(BoolOp op, Node* left, Node* right, TextPosition start, TextPosition end)
-        :Node(NodeType::BOOLOP, start, end), left(left), right(right), op(op) {
+        : Node(NodeType::BOOLOP, start, end), left(left), right(right), op(op) {
 }
 
 bool BoolOpNode::equal(const Node& x) const {
-    auto& other = x.boolop();
+    auto& other = (BoolOpNode&) x;
     return this->op == other.op && *this->left == *other.left and *this->right == *other.right;
 }
 
@@ -19,6 +19,9 @@ BoolOpNode::~BoolOpNode() {
     delete this->right;
 }
 
-BoolOpNode& BoolOpNode::boolop() { return *this; }
-
-const BoolOpNode& BoolOpNode::boolop() const { return *this; }
+nlohmann::json BoolOpNode::to_json() {
+    return {{"type",  "boolop"},
+            {"left",  this->left->to_json()},
+            {"right", this->right->to_json()},
+            {"op",    bool_op_to_string(this->op)}};
+}

@@ -3,20 +3,20 @@
 //
 
 #include "StringNode.h"
+#include "../json/json.hpp"
 
 StringNode::StringNode(const std::string& str, TextPosition start, TextPosition end) : Node(NodeType::STRNG, start, end), str(str) {
 }
 
 bool StringNode::equal(const Node& x) const {
-    const auto& other = x.strng();
+    const auto& other = (StringNode&)x;
     return this->str == other.str;
 }
 
-StringNode& StringNode::strng() {
-    return *this;
-}
-
-const StringNode& StringNode::strng() const {
-    return *this;
+nlohmann::json StringNode::to_json() {
+    nlohmann::json j;
+    j["type"] = "string";
+    j["string"]["str"] = this->str;
+    return j;
 }
 

@@ -15,3 +15,7 @@ EnumNode::EnumNode(std::string id, VectorOfStrings values, TextPosition start, T
 bool EnumNode::equal(const Node& other) const {
     return false;
 }
+
+nlohmann::json EnumNode::to_json() {
+    return nlohmann::json();
+}

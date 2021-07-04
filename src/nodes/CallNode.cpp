@@ -3,18 +3,14 @@
 //
 
 #include "CallNode.h"
+#include "../json/json.hpp"
 
-CallNode::CallNode(Node* function, const VectorOfNodes& arguments, TextPosition start, TextPosition end) : Node(NodeType::CALL,
-                                                                                                                start,
-                                                                                                                end),
-                                                                                                           function(
-                                                                                                                   function),
-                                                                                                           arguments(
-                                                                                                                   arguments) {
+CallNode::CallNode(Node* function, const VectorOfNodes& arguments, TextPosition start, TextPosition end)
+        : Node(NodeType::CALL, start, end), function(function), arguments(arguments) {
 }
 
 bool CallNode::equal(const Node& x) const {
-    const auto& other = x.call();
+    const auto& other = (CallNode&) x;
     if (this->arguments.size() != other.arguments.size()) {
         return false;
     }
@@ -26,23 +22,27 @@ bool CallNode::equal(const Node& x) const {
     return *this->function == *other.function;
 }
 
-CallNode& CallNode::call() {
-    return *this;
-}
-
-const CallNode& CallNode::call() const {
-    return *this;
-}
-
 CallNode::~CallNode() {
     delete this->function;
-    for (auto *a: this->arguments) {
+    for (auto* a: this->arguments) {
         delete a;
     }
-    for (auto *at: this->arg_types) {
+    for (auto* at: this->arg_types) {
         delete at;
     }
-    for (auto *ft: this->ftype) {
+    for (auto* ft: this->ftype) {
         delete ft;
     }
+}
+
+nlohmann::json CallNode::to_json() {
+    nlohmann::json j;
+    j["type"] = "call";
+    j["call"]["function"] = this->function->to_json();
+    std::vector<nlohmann::json> v;
+    for (auto e: this->arguments) {
+        v.push_back(e->to_json());
+    }
+    j["call"]["arguments"] = v;
+    return j;
 }

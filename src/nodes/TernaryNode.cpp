@@ -6,7 +6,7 @@
 #include "../utils.h"
 
 bool TernaryNode::equal(const Node& x) const {
-    auto& other = x.ternary();
+    auto& other = (TernaryNode&)x;
     return *this->expression == *other.expression && *this->true_case == *other.true_case &&
            *this->false_case == *other.false_case;
 }
@@ -17,14 +17,6 @@ TernaryNode::TernaryNode(Node* expression, Node* trueCase, Node* falseCase, Text
                                                                                       trueCase),
                                                                               false_case(
                                                                                       falseCase) {  }
-
-TernaryNode& TernaryNode::ternary() {
-    return *this;
-}
-
-const TernaryNode& TernaryNode::ternary() const {
-    return *this;
-}
 
 TernaryNode::~TernaryNode() {
     delete expression;

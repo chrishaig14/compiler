@@ -4,25 +4,17 @@
 
 #include "BlockNode.h"
 
-BlockNode& BlockNode::block() {
-    return *this;
-}
-
-const BlockNode& BlockNode::block() const {
-    return *this;
-}
-
 BlockNode::~BlockNode() {
     for (auto p: this->nodes) {
         delete p;
     }
-    for(auto l: this->local_vars){
+    for (auto l: this->local_vars) {
         delete l.second;
     }
 }
 
 bool BlockNode::equal(const Node& p) const {
-    auto& other = p.block();
+    auto& other = (BlockNode&) p;
     if (this->nodes.size() != other.nodes.size()) {
         return false;
     }
@@ -34,5 +26,16 @@ bool BlockNode::equal(const Node& p) const {
     return true;
 }
 
-BlockNode::BlockNode(VectorOfNodes nodes, TextPosition start, TextPosition end) : Node(NodeType::BLOCK, start, end), nodes(nodes) { ; }
+BlockNode::BlockNode(VectorOfNodes nodes, TextPosition start, TextPosition end) : Node(NodeType::BLOCK, start, end),
+                                                                                  nodes(nodes) {
+    ;
+}
+
+nlohmann::json BlockNode::to_json() {
+    std::vector<nlohmann::json> v;
+    for (auto s: this->nodes) {
+        v.push_back(s->to_json());
+    }
+    return v;
+}
 

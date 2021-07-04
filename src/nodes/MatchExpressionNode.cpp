@@ -14,3 +14,7 @@ MatchExpressionNode::MatchExpressionNode(Node* exp, std::vector<std::string> ids
 bool MatchExpressionNode::equal(const Node& other) const {
     return false;
 }
+
+nlohmann::json MatchExpressionNode::to_json() {
+    return nlohmann::json();
+}

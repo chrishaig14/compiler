@@ -12,6 +12,7 @@
 
 #include "TypeNode.h"
 #include "BlockNode.h"
+#include "Path.h"
 
 class FunctionNode : public Node {
 public:
@@ -26,10 +27,7 @@ public:
     bool equal(const Node& x) const override;
 
     ~FunctionNode() override;
-
-    FunctionNode& func() override;
-
-    const FunctionNode& func() const override;
+    nlohmann::json to_json() override;
 
     std::unordered_map<std::string, std::string> constraints;
     Path path;

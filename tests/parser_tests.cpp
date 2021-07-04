@@ -18,6 +18,7 @@ TEST_CASE("asdf", "[parser]") {
         std::cout << e.what() << std::endl;
         exit(0);
     }
+    REQUIRE(ast->nodes.size() == 1);
 }
 
 TEST_CASE("asdfasdfwerw", "[parser]") {

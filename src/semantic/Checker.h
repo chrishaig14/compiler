@@ -47,6 +47,7 @@
 #include "CheckerUtils.h"
 #include "../nodes/UnaryOpNode.h"
 #include "../nodes/TryCatchNode.h"
+#include "../nodes/ObjectType.h"
 
 #define T_NONE ObjectType(".None")
 
@@ -64,12 +65,9 @@ SemanticInfo match_arguments_to_generic_function(const FunctionType& function_ty
 USemanticInfo error_stub();
 
 
-
 Entity map_flirpin_to_entity(Flirpin flirpin);
 
 Flirpin map_unit_to_flirpin(Unit u);
-
-
 
 
 TextPosition add_one_col(TextPosition t);
@@ -185,10 +183,9 @@ public:
                              const TypeNode* unaliased_target_type) const;
     SNode* make_option_rvalue(SNode* value_snode, const TypeNode* unaliased_value_type,
                               const TypeNode* unaliased_target_type) const;
-    USemanticInfo visit_throw(ThrowNode& n);
+    // USemanticInfo visit_throw(ThrowNode& n);
     USemanticInfo visit_try_catch(TryCatchNode& node);
 };
-
 
 
 bool function_is_generic(const FunctionType& ft);

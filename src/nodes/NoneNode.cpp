@@ -8,14 +8,10 @@ bool NoneNode::equal(const Node& other) const {
     return true;
 }
 
-NoneNode& NoneNode::none() {
-    return *this;
+NoneNode::NoneNode(TextPosition start, TextPosition end) : Node(NodeType::NONE, start, end) {
 }
 
-const NoneNode& NoneNode::none() const {
-    return *this;
-}
-
-NoneNode::NoneNode(TextPosition start, TextPosition end):Node(NodeType::NONE, start, end) {
+nlohmann::json NoneNode::to_json() {
+    return {{"type", "none"}};
 }
 

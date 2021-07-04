@@ -18,6 +18,7 @@ public:
                         TextPosition start, TextPosition end);
 
     bool equal(const Node& other) const override;
+    nlohmann::json to_json() override;
 };
 
 

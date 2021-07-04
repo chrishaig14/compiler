@@ -9,8 +9,6 @@
 #include <string>
 #include "Node.h"
 #include "TypeNode.h"
-
-//#include "Node.h"
 #include "../utils.h"
 
 class DeclarationNode : public Node {
@@ -29,8 +27,7 @@ public:
 
     ~DeclarationNode() override;
 
-    DeclarationNode& decl() override;
-    const DeclarationNode& decl() const override;
+    nlohmann::json to_json() override;
 
 };
 

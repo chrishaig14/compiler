@@ -240,6 +240,7 @@ Flirpin map_unit_to_flirpin(Unit u) {
         case U_TYPE::MODULE:
             return Flirpin{.type=F_TYPE::MODULE, .module=u.module};
     }
+    return Flirpin{};
 }
 
 bool Checker::is_immutable(const TypeNode& node) {
@@ -277,87 +278,87 @@ USemanticInfo Checker::dispatch(Node* nod) {
     return this->dispatch_any(nod, false);
 }
 
-USemanticInfo Checker::dispatch_any(Node* p_node, bool is_rvalue) {
-    auto& n = *p_node;
-    switch (n.ntype) {
+USemanticInfo Checker::dispatch_any(Node* n, bool is_rvalue) {
+    switch (n->ntype) {
         case NodeType::ASSIGN:
-            return this->visit_assignment(n.assign());
+            return this->visit_assignment(*(AssignmentNode*) n);
         case NodeType::ENUM:
-            return this->visit_enum((EnumNode&) *p_node);
+            return this->visit_enum(*(EnumNode*) n);
         case NodeType::BINOP: {
-            auto r = this->visit_binop(n.binop());
+            auto r = this->visit_binop(*(BinopNode*) n);
             return r;
         }
         case NodeType::BOOLOP:
-            return this->visit_boolop(n.boolop());
+            return this->visit_boolop(*(BoolOpNode*) n);
         case NodeType::BLOCK:
-            return this->visit_block(n.block());
+            return this->visit_block(*(BlockNode*) n);
         case NodeType::BOOLEAN:
-            return this->visit_boolean(n.boolean());
+            return this->visit_boolean(*(BooleanNode*) n);
         case NodeType::BRK:
-            return this->visit_break(n.brk());
+            return this->visit_break(*(BreakNode*) n);
         case NodeType::CALL:
-            return this->visit_call(n.call(), is_rvalue);
+            return this->visit_call(*(CallNode*) n, is_rvalue);
         case NodeType::CLS:
-            return this->visit_class(n.cls());
+            return this->visit_class(*(ClassNode*) n);
         case NodeType::CNTINUE:
-            return this->visit_continue(n.cntinue());
+            return this->visit_continue(*(ContinueNode*) n);
         case NodeType::DECL:
-            return this->visit_declaration(n.decl());
+            return this->visit_declaration(*(DeclarationNode*) n);
         case NodeType::EMPTYLST:
-            return this->visit_emptylist(n.emptylst());
+            return this->visit_emptylist(*(EmptyListNode*) n);
         case NodeType::FLOT:
-            return this->visit_float(n.flot());
+            return this->visit_float(*(FloatNode*) n);
         case NodeType::FORLOOP:
-            return this->visit_for(n.forloop());
+            return this->visit_for(*(ForNode*) n);
         case NodeType::FUNC:
-            return this->visit_function(n.func());
+            return this->visit_function(*(FunctionNode*) n);
         case NodeType::ID:
-            return this->visit_id(n.id());
+            return this->visit_id(*(IdNode*) n);
         case NodeType::CAST:
-            return this->visit_cast(n.cast());
+            return this->visit_cast(*(CastNode*) n);
         case NodeType::IFF:
-            return this->visit_if(n.iff());
+            return this->visit_if(*(IfNode*) n);
         case NodeType::LST:
-            return this->visit_list(n.lst());
+            return this->visit_list(*(ListNode*) n);
         case NodeType::MEMBER:
-            return this->visit_member(n.member());
+            return this->visit_member(*(MemberNode*) n);
         case NodeType::NONE:
-            return this->visit_none(n.none());
+            return this->visit_none(*(NoneNode*) n);
         case NodeType::NUMBER:
-            return this->visit_number(n.number());
+            return this->visit_number(*(NumberNode*) n);
         case NodeType::THROW:
-            return this->visit_throw((ThrowNode&) n);
+            return nullptr;
+            // return this->visit_throw(*(ThrowNode*) n);
         case NodeType::RETRN:
-            return this->visit_return(n.retrn());
+            return this->visit_return(*(ReturnNode*) n);
         case NodeType::TRY_CATCH:
-            return this->visit_try_catch((TryCatchNode&) n);
+            return this->visit_try_catch(*(TryCatchNode*) n);
         case NodeType::STRNG:
-            return this->visit_string(n.strng());
+            return this->visit_string(*(StringNode*) n);
         case NodeType::SUB:
-            return this->visit_subscript(n.sub());
+            return this->visit_subscript(*(SubscriptNode*) n);
         case NodeType::TERNARY:
-            return this->visit_ternary(n.ternary());
+            return this->visit_ternary(*(TernaryNode*) n);
         case NodeType::TUPLE:
-            return this->visit_tuple(n.tuple());
+            return this->visit_tuple(*(TupleNode*) n);
         case NodeType::UNARY:
-            return this->visit_unary((UnaryOpNode&) n);
+            return this->visit_unary(*(UnaryOpNode*) n);
         case NodeType::WHIL:
-            return this->visit_while(n.whil());
+            return this->visit_while(*(WhileNode*) n);
         case NodeType::PARTIAL:
-            return this->visit_partial(n.partial());
+            return this->visit_partial(*(PartialApplication*) n);
         case NodeType::DICT:
-            return this->visit_dict(n.dict());
+            return this->visit_dict(*(DictNode*) n);
         case NodeType::EMPTYDICT:
-            return this->visit_emptydict(n.emptydict());
+            return this->visit_emptydict(*(EmptyDictNode*) n);
         case NodeType::DEF_CONST:
-            return this->visit_defconst(n.defconst());
+            return this->visit_defconst(*(DefaultConstructorNode*) n);
         case NodeType::IMPORT:
-            return this->visit_import(n.import());
+            return this->visit_import(*(ImportNode*) n);
         case NodeType::ALIAS:
-            return this->visit_alias((AliasNode*) p_node);
+            return this->visit_alias((AliasNode*) n);
         case NodeType::MATCH_EXP:
-            return this->visit_match((MatchExpressionNode*) p_node);
+            return this->visit_match((MatchExpressionNode*) n);
         default:
             this->error_reporter.fail("Don't know what to do!");
     }

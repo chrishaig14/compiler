@@ -9,24 +9,21 @@ ReturnNode::ReturnNode(Node* expression, TextPosition start, TextPosition end) :
 }
 
 bool ReturnNode::equal(const Node& x) const {
-    return *x.retrn().expression == *this->expression;
+    return *((ReturnNode&) x).expression == *this->expression;
 }
-
-ReturnNode& ReturnNode::retrn() {
-    return *this;
-}
-
-const ReturnNode& ReturnNode::retrn() const {
-    return *this;
-}
-
 
 ReturnNode::~ReturnNode() {
-    if (this->ret_type != nullptr) {
-        delete this->ret_type;
-    }
     for (auto r: this->reachables) {
         delete r.second;
     }
-    delete this->expression;
+    if (this->expression != nullptr) {
+        delete this->expression;
+    }
+}
+
+nlohmann::json ReturnNode::to_json() {
+    nlohmann::json j;
+    j["type"] = "return";
+    j["return"] = {{"expression", this->expression != nullptr ? this->expression->to_json() : nlohmann::json()}};
+    return j;
 }

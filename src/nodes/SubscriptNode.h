@@ -23,10 +23,9 @@ public:
     bool equal(const Node& other) const override;
 
     ~SubscriptNode();
+    nlohmann::json to_json() override;
 
 
-    SubscriptNode& sub() override;
-    const SubscriptNode& sub() const override;
 };
 
 

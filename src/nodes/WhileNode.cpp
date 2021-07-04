@@ -5,13 +5,16 @@
 #include <cassert>
 #include "WhileNode.h"
 
-WhileNode::WhileNode(Node* condition, BlockNode* body, TextPosition start, TextPosition end) : Node(NodeType::WHIL, start, end), body(body), condition(condition) {
+WhileNode::WhileNode(Node* condition, BlockNode* body, TextPosition start, TextPosition end) : Node(NodeType::WHIL,
+                                                                                                    start,
+                                                                                                    end), body(body),
+                                                                                               condition(condition) {
     assert(condition != nullptr);
     assert(body != nullptr);
 }
 
 bool WhileNode::equal(const Node& x) const {
-    const auto& other = x.whil();
+    const auto& other = (WhileNode&) x;
     if ((this->body == nullptr && other.body != nullptr) || (this->body != nullptr && other.body == nullptr)) {
         return false;
     }
@@ -20,17 +23,14 @@ bool WhileNode::equal(const Node& x) const {
            ((this->body == nullptr && other.body == nullptr) || *this->body == *other.body);
 }
 
-WhileNode& WhileNode::whil() {
-    return *this;
-}
-
-const WhileNode& WhileNode::whil() const {
-    return *this;
-}
-
 WhileNode::~WhileNode() {
     delete this->body;
     delete this->condition;
+}
+
+nlohmann::json WhileNode::to_json() {
+    return {{"type",  "while"},
+            {"while", {{"condition", this->condition->to_json()}, {"body", this->body->to_json()}}}};
 }
 
 

@@ -21,10 +21,8 @@ public:
               std::unordered_map<std::string, FunctionNode*> functions,
               std::map<std::string, std::pair<TypeNode*, Node*>> static_members,
               std::unordered_map<std::string, FunctionNode*> static_methods, TextPosition start, TextPosition end);
-    ClassNode& cls() override;
-    const ClassNode& cls() const override;
-
     ~ClassNode() override;
+    nlohmann::json to_json() override;
 
     MapStringType members;
     std::map<std::string, std::pair<TypeNode*, Node*>> static_members;

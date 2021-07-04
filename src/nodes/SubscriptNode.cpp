@@ -4,16 +4,13 @@
 
 #include "SubscriptNode.h"
 
-SubscriptNode::SubscriptNode(Node* parent, VectorOfNodes child, TextPosition start, TextPosition end) : Node(NodeType::SUB,
-                                                                                                             start,
-                                                                                                             end),
-                                                                                                        parent(parent),
-                                                                                                        child(child) {
+SubscriptNode::SubscriptNode(Node* parent, VectorOfNodes child, TextPosition start, TextPosition end)
+        : Node(NodeType::SUB, start, end), parent(parent), child(child) {
 }
 
 
 bool SubscriptNode::equal(const Node& x) const {
-    auto& other = x.sub();
+    auto& other = (SubscriptNode&) x;
     if (this->child.size() != other.child.size()) {
         return false;
     }
@@ -25,18 +22,18 @@ bool SubscriptNode::equal(const Node& x) const {
     return *this->parent == *other.parent;
 }
 
-SubscriptNode& SubscriptNode::sub() {
-    return *this;
-}
-
-const SubscriptNode& SubscriptNode::sub() const {
-    return *this;
-}
-
 SubscriptNode::~SubscriptNode() {
     delete this->parent;
     for (auto c: this->child) {
         delete c;
     }
+}
+
+nlohmann::json SubscriptNode::to_json() {
+    nlohmann::json j;
+    j["type"] = "subscript";
+    j["subscript"]["parent"] = this->parent->to_json();
+    j["subscript"]["child"] = this->child[0]->to_json();
+    return j;
 }
 

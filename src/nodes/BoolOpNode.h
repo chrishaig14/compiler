@@ -15,15 +15,11 @@ public:
     Node* right;
     BoolOp op;
 
-    BoolOpNode& boolop() override;
-
-    const BoolOpNode& boolop() const override;
-
-
     BoolOpNode(BoolOp op, Node* left, Node* right, TextPosition start, TextPosition end);
     bool equal(const Node& x) const override;
 
     ~BoolOpNode();
+    nlohmann::json to_json() override;
 
     TypeNode* ltype;
     TypeNode* rtype;

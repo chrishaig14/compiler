@@ -14,6 +14,7 @@ public:
 
     EnumNode(std::string id, VectorOfStrings values, TextPosition start, TextPosition end);
     bool equal(const Node& other) const override;
+    nlohmann::json to_json() override;
 
     VectorOfStrings values;
     std::string id;

@@ -16,9 +16,6 @@ public:
     Node* lvalue;
     Node* rvalue;
 
-    AssignmentNode& assign() override { return *this; }
-
-    const AssignmentNode& assign() const override { return *this; }
 
     AssignmentNode(Node* lvalue, Node* rvalue, TextPosition start, TextPosition end);
 
@@ -26,6 +23,7 @@ public:
 
 
     ~AssignmentNode();
+    nlohmann::json to_json() override;
 
 };
 

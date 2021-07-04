@@ -5,6 +5,7 @@
 #include "CheckStatements.h"
 #include "../simple_nodes/ThrowSNode.h"
 #include "../simple_nodes/TryCatchSNode.h"
+#include "../nodes/ObjectType.h"
 
 USemanticInfo Checker::visit_lvalue_subscript(SubscriptNode& node) {
     USemanticInfo parent_p = this->dispatch_rvalue(node.parent);
@@ -54,7 +55,7 @@ USemanticInfo Checker::visit_lvalue_subscript(SubscriptNode& node) {
 
 USemanticInfo Checker::visit_assignment(AssignmentNode& n) {
     if (n.lvalue->ntype == NodeType::ID) {
-        if (n.lvalue->id()._id == "_") {
+        if (((IdNode*) n.lvalue)->_id == "_") {
             USemanticInfo rv = this->dispatch_rvalue(n.rvalue);
             return rv;
         }
@@ -172,8 +173,6 @@ USemanticInfo Checker::visit_return(ReturnNode& n) {
         return error_stub();
     }
 
-    n.ret_type = return_type->clone();
-
     auto* sn = new ReturnSNode(expression_info_p->snode);
     for (auto l: this->scope->get_all()) {
         sn->reachables.push_back(l.first);
@@ -184,21 +183,21 @@ USemanticInfo Checker::visit_return(ReturnNode& n) {
     return std::make_unique<SemanticInfo>(info);
 }
 
-USemanticInfo Checker::visit_throw(ThrowNode& n) {
-    USemanticInfo expression_info_p = this->dispatch_rvalue(n.exp);
-    if (expression_info_p->is_error()) {
-        return error_stub();
-    }
-
-    auto* sn = new ThrowSNode(expression_info_p->snode);
-    for (auto l: this->scope->get_all()) {
-        sn->reachables.push_back(l.first);
-    }
-
-    SemanticInfo info;
-    info.snode = sn;
-    return std::make_unique<SemanticInfo>(info);
-}
+// USemanticInfo Checker::visit_throw(ThrowNode& n) {
+//     USemanticInfo expression_info_p = this->dispatch_rvalue(n.exp);
+//     if (expression_info_p->is_error()) {
+//         return error_stub();
+//     }
+//
+//     auto* sn = new ThrowSNode(expression_info_p->snode);
+//     for (auto l: this->scope->get_all()) {
+//         sn->reachables.push_back(l.first);
+//     }
+//
+//     SemanticInfo info;
+//     info.snode = sn;
+//     return std::make_unique<SemanticInfo>(info);
+// }
 
 USemanticInfo Checker::visit_match(MatchExpressionNode* node) {
     USemanticInfo exp_info = this->dispatch_rvalue(node->exp);
@@ -416,7 +415,7 @@ USemanticInfo Checker::visit_try_catch(TryCatchNode& node) {
     this->leave_scope();
     std::vector<std::pair<std::string, std::string>> e_names_types;
     std::vector<SNode*> catches_bodies_snodes;
-    for (int i = 0; i < node.catches.size(); i++) {
+    for (size_t i = 0; i < node.catches.size(); i++) {
         this->enter_scope("catch");
         ObjectType* et = node.catches[i].second;
         std::string eid = node.catches[i].first;

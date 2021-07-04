@@ -11,20 +11,12 @@ MemberNode::MemberNode(Node* parent, Token child_token) : Node(NodeType::MEMBER,
     this->s_child = child_token.str;
 }
 
-MemberNode& MemberNode::member() {
-    return *this;
-}
-
-const MemberNode& MemberNode::member() const {
-    return *this;
-}
-
 MemberNode::~MemberNode() {
     delete this->parent;
 }
 
 bool MemberNode::equal(const Node& x) const {
-    auto& other = x.member();
+    auto& other = (MemberNode&) x;
     if (this->type != other.type) {
         return false;
     }
@@ -38,5 +30,10 @@ bool MemberNode::equal(const Node& x) const {
         }
     };
     return *this->parent == *other.parent;
+}
+
+nlohmann::json MemberNode::to_json() {
+    return {{"type",   "member"},
+            {"member", {{"parent", this->parent->to_json()}, {"child", this->s_child}}}};
 }
 

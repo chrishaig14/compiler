@@ -8,8 +8,6 @@
 
 #include <vector>
 #include "Node.h"
-
-#include "Node.h"
 #include "../types.h"
 
 class ListNode : public Node {
@@ -21,9 +19,8 @@ public:
     bool equal(const Node& other) const override;
 
     ~ListNode() override;
+    nlohmann::json to_json() override;
 
-    ListNode& lst() override;
-    const ListNode& lst() const override;
     TypeNode* type;
 };
 

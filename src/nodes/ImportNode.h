@@ -15,8 +15,6 @@ class ImportNode : public Node {
 public:
     bool has_alias;
     bool equal(const Node& other) const override;
-    ImportNode& import() override;
-    const ImportNode& import() const override;
 
     ImportNode(const VectorOfStrings& path, std::string alias, TextPosition start, TextPosition end)
             : Node(NodeType::IMPORT, start, end) {
@@ -30,6 +28,8 @@ public:
         this->has_alias = false;
         this->path = path;
     }
+
+    nlohmann::json to_json() override;
 
     VectorOfStrings path;
     std::string alias;

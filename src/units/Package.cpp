@@ -20,9 +20,11 @@ Flirpin Package::get(Path p) {
     }
     VectorOfStrings pt = p.as_vec();
     Unit u = this->units.at(pt[0]);
-    if (u.type == U_TYPE::MODULE) {
-        return u.module->get(Path(VectorOfStrings(pt.begin() + 1, pt.end())));
-    } else if (u.type == U_TYPE::PACKAGE) {
-        return u.package->get(Path(VectorOfStrings(pt.begin() + 1, pt.end())));
+    switch (u.type) {
+        case U_TYPE::MODULE:
+            return u.module->get(Path(VectorOfStrings(pt.begin() + 1, pt.end())));
+        case U_TYPE::PACKAGE:
+            return u.package->get(Path(VectorOfStrings(pt.begin() + 1, pt.end())));
     }
+    return Flirpin{};
 }

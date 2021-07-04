@@ -64,6 +64,7 @@ TypeNode* Checker::substitute(TypeNode* t, const std::string& var, TypeNode* rep
         c->function().return_type = substitute(c->function().return_type, var, replacement);
         return c;
     }
+    return nullptr;
 }
 
 std::pair<std::string, TypeNode*>*
@@ -159,6 +160,7 @@ Entity map_flirpin_to_entity(Flirpin flirpin) {
         case F_TYPE::ENUM:
             return Entity(flirpin.enumm);
     }
+    return Entity{};
 }
 
 

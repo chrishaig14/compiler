@@ -20,13 +20,8 @@ public:
         return false;
     }
 
-    DefaultConstructorNode& defconst() override {
-        return *this;
-
-    }
-
-    const DefaultConstructorNode& defconst() const override {
-        return *this;
+    nlohmann::json to_json() override {
+        return nlohmann::json();
     }
 
     Node* class_node;

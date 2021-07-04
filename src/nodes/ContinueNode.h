@@ -13,8 +13,7 @@ class ContinueNode : public Node {
 public:
     ContinueNode(TextPosition start, TextPosition end);
     bool equal(const Node& other) const override;
-    ContinueNode& cntinue() override;
-    const ContinueNode& cntinue() const override;
+    nlohmann::json to_json() override;
 };
 
 

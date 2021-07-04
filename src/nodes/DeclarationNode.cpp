@@ -12,27 +12,28 @@ DeclarationNode::DeclarationNode(const std::string& identifier, TypeNode* type, 
 }
 
 bool DeclarationNode::equal(const Node& x) const {
-    const auto& other = x.decl();
+    const auto& other = (DeclarationNode&) x;
     return this->identifier == other.identifier && *this->expression == *other.expression &&
            ((this->type != nullptr && other.type != nullptr && *this->type == *other.type) ||
             (this->type == nullptr && other.type == nullptr));
 }
 
-DeclarationNode& DeclarationNode::decl() {
-    return *this;
-}
-
-const DeclarationNode& DeclarationNode::decl() const {
-    return *this;
-}
-
 DeclarationNode::~DeclarationNode() {
 
-        delete this->type;
+    delete this->type;
 
 
-        delete this->expression;
+    delete this->expression;
 
+}
+
+nlohmann::json DeclarationNode::to_json() {
+    nlohmann::json j;
+    j["type"] = "declaration";
+    j["declaration"]["identifier"] = this->identifier;
+    j["declaration"]["expression"] = this->expression->to_json();
+    j["declaration"]["type"] = this->type != nullptr ? this->type->to_json() : nlohmann::json();
+    return j;
 }
 
 

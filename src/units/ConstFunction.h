@@ -6,13 +6,16 @@
 
 #include "Entity.h"
 #include "../nodes/TypeNode.h"
+#include "../nodes/Path.h"
+#include "../nodes/FunctionType.h"
 
 class ConstFunction {
 public:
-    ConstFunction(){
-        this->ft= nullptr;
+    ConstFunction() {
+        this->ft = nullptr;
     }
-    ConstFunction(const ConstFunction& other){
+
+    ConstFunction(const ConstFunction& other) {
         this->ft = other.ft->clone();
     }
 

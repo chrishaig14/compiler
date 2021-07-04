@@ -13,7 +13,7 @@
 #include <fmt/core.h>
 #include <fmt/color.h>
 #include <exception>
-
+#include "../nodes/ObjectType.h"
 
 std::unordered_map<TokType, OpType> TOKEN_TO_OP = {{TokType::PLUS,  OpType::ADD},
                                                    {TokType::MINUS, OpType::SUB},
@@ -161,7 +161,7 @@ Node* Parser::parse_assignment_or_expression() {
         }
         Node* rvalue = this->parse_expression();
         if (lvalue->ntype == NodeType::ID) {
-            auto* id_node = new IdNode(lvalue->id()._id, lvalue->start, lvalue->end);
+            auto* id_node = new IdNode(((IdNode*) lvalue)->_id, lvalue->start, lvalue->end);
             if (op == TokType::PLUS_EQQ || op == TokType::MINUS_EQQ) {
                 OpType opt;
                 if (op == TokType::PLUS_EQQ) {
@@ -299,11 +299,11 @@ Node* Parser::parse_factor() {
         parent = this->parse_call_or_subscript_chain(parent);
     }
 
-    if (this->match(TokType::DOUBLE_COLON)) {
-        this->next();
-        Token as_type = this->expect_token(TokType::ID);
-        parent = new CastNode(parent, as_type.str, parent->start, as_type.end_pos);
-    }
+    // if (this->match(TokType::DOUBLE_COLON)) {
+    //     this->next();
+    //     Token as_type = this->expect_token(TokType::ID);
+        // parent = new CastNode(parent, as_type.str, parent->start, as_type.end_pos);
+    // }
     return parent;
 }
 
@@ -551,13 +551,15 @@ Node* Parser::parse_common_statement() {
             return node;
         }
         case TokType::THROW: {
-            ThrowNode* node = this->parse_throw();
-            this->expect_token(TokType::SEMICOLON);
-            return node;
+            // ThrowNode* node = this->parse_throw();
+            // this->expect_token(TokType::SEMICOLON);
+            // return node;
+            return nullptr;
         }
         case TokType::TRY: {
-            TryCatchNode* node = this->parse_try_catch();
-            return node;
+            // TryCatchNode* node = this->parse_try_catch();
+            // return node;
+            return nullptr;
         }
         case TokType::FOR: {
             return this->parse_for_loop();
@@ -651,6 +653,7 @@ TypeNode* Parser::parse_type_node() {
     } else {
         this->error_expected_type(this->token);
     }
+    return nullptr;
 }
 
 BlockNode* Parser::parse_possibly_empty_block() {
@@ -791,11 +794,11 @@ Node* Parser::parse_ternary() {
     Node* condition = this->parse_or_expression();
     if (this->match(TokType::QUESTION)) {
         this->next();
-        Node* true_case = this->parse_expression();
-        this->expect_token(TokType::COLON);
-        Node* false_case = this->parse_expression();
-        Node* node = new TernaryNode(condition, true_case, false_case, condition->start, false_case->end);
-        return node;
+        // Node* true_case = this->parse_expression();
+        // this->expect_token(TokType::COLON);
+        // Node* false_case = this->parse_expression();
+        // Node* node = new TernaryNode(condition, true_case, false_case, condition->start, false_case->end);
+        // return node;
     }
     return condition;
 }
@@ -944,26 +947,26 @@ Node* Parser::parse_match_statement() {
 }
 
 
-ThrowNode* Parser::parse_throw() {
-    Token throw_tok = this->expect_token(TokType::THROW);
-    Node* exp = this->parse_expression();
-    return new ThrowNode(exp, throw_tok.start, exp->end);
-}
+// ThrowNode* Parser::parse_throw() {
+//     Token throw_tok = this->expect_token(TokType::THROW);
+//     Node* exp = this->parse_expression();
+//     return new ThrowNode(exp, throw_tok.start, exp->end);
+// }
 
-TryCatchNode* Parser::parse_try_catch() {
-    Token try_tok = this->expect_token(TokType::TRY);
-    BlockNode* body = parse_possibly_empty_block();
-    std::vector<std::pair<std::string, ObjectType*>> catches;
-    VectorOfNodes catches_bodies;
-    while (this->match(TokType::CATCH)) {
-        Token catch_tok = this->expect_token(TokType::CATCH);
-        Token id = this->expect_token(TokType::ID);
-        this->expect_token(TokType::COLON);
-        ObjectType* ot = this->parse_object_type();
-        BlockNode* catch_body = parse_possibly_empty_block();
-        catches.push_back(std::make_pair(id.str, ot));
-        catches_bodies.push_back(catch_body);
-    }
-    return new TryCatchNode(body, catches, catches_bodies, try_tok.start, catches_bodies.back()->end);
-}
+// TryCatchNode* Parser::parse_try_catch() {
+//     Token try_tok = this->expect_token(TokType::TRY);
+//     BlockNode* body = parse_possibly_empty_block();
+//     std::vector<std::pair<std::string, ObjectType*>> catches;
+//     VectorOfNodes catches_bodies;
+//     while (this->match(TokType::CATCH)) {
+//         Token catch_tok = this->expect_token(TokType::CATCH);
+//         Token id = this->expect_token(TokType::ID);
+//         this->expect_token(TokType::COLON);
+//         ObjectType* ot = this->parse_object_type();
+//         BlockNode* catch_body = parse_possibly_empty_block();
+//         catches.push_back(std::make_pair(id.str, ot));
+//         catches_bodies.push_back(catch_body);
+//     }
+//     return new TryCatchNode(body, catches, catches_bodies, try_tok.start, catches_bodies.back()->end);
+// }
 

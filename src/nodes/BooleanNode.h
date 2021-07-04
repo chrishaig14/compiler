@@ -7,7 +7,7 @@
 
 
 #include "Node.h"
-
+#include "../json/json.hpp"
 
 class BooleanNode : public Node {
 public:
@@ -18,8 +18,8 @@ public:
     bool operator!=(const BooleanNode& other) const;
 
     bool equal(const Node& x) const override;
-    const BooleanNode& boolean() const override;
-    BooleanNode& boolean() override;
+
+    nlohmann::json to_json() override;
 };
 
 

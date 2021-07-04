@@ -6,6 +6,7 @@
 #include "GlobalProcessor.h"
 #include "../scanner/Scanner.h"
 #include "../parser/Parser.h"
+#include "../nodes/ObjectType.h"
 
 GlobalProcessor::GlobalProcessor() = default;
 
@@ -84,8 +85,8 @@ void GlobalProcessor::visit_root(BlockNode& node) {
         if (n->ntype == NodeType::CLS) {
             // this->dispatch(n);
             auto* class_info = new Class();
-            this->module->flirpins[n->cls().class_name] = Flirpin{.type=F_TYPE::CLASS, .clazz=class_info};
-            class_info->path = Path(this->module->path, n->cls().class_name);
+            this->module->flirpins[((ClassNode*) n)->class_name] = Flirpin{.type=F_TYPE::CLASS, .clazz=class_info};
+            class_info->path = Path(this->module->path, ((ClassNode*) n)->class_name);
         } else if (n->ntype == NodeType::ENUM) {
             Enum* enumm = new Enum();
             enumm->enumm_name = ((EnumNode*) n)->id;
@@ -104,7 +105,7 @@ void GlobalProcessor::visit_root(BlockNode& node) {
         if (n->ntype == NodeType::FUNC) {
             // this->dispatch(n);
             auto* const_function = new ConstFunction();
-            this->module->flirpins[n->func().identifier] = Flirpin{.type=F_TYPE::CONST_FUNCTION, .const_function=const_function};
+            this->module->flirpins[((FunctionNode*) n)->identifier] = Flirpin{.type=F_TYPE::CONST_FUNCTION, .const_function=const_function};
         }
     }
     for (auto* n: node.nodes) {
@@ -131,14 +132,14 @@ void GlobalProcessor::check_duplicated_names(BlockNode& node) const {
     for (auto* n: node.nodes) {
         std::string name;
         if (n->ntype == NodeType::CLS) {
-            name = n->cls().class_name;
+            name = ((ClassNode*) n)->class_name;
         } else if (n->ntype == NodeType::FUNC) {
-            name = n->func().identifier;
+            name = ((FunctionNode*) n)->identifier;
         } else if (n->ntype == NodeType::IMPORT) {
-            if (n->import().has_alias) {
-                name = n->import().alias;
+            if (((ImportNode*) n)->has_alias) {
+                name = ((ImportNode*) n)->alias;
             } else {
-                name = n->import().path.back();
+                name = ((ImportNode*) n)->path.back();
             }
         } else if (n->ntype == NodeType::ALIAS) {
             name = ((AliasNode*) (n))->alias_id;
@@ -231,19 +232,18 @@ void GlobalProcessor::visit_class(ClassNode& node) {
 }
 
 void GlobalProcessor::dispatch(Node* nod) {
-    auto& n = *nod;
-    switch (n.ntype) {
+    switch (nod->ntype) {
         case NodeType::CLS:
-            this->visit_class(n.cls());
+            this->visit_class(*(ClassNode*) nod);
             break;
         case NodeType::FUNC:
-            this->visit_function(n.func());
+            this->visit_function(*(FunctionNode*) nod);
             break;
         case NodeType::IMPORT:
-            this->visit_import(n.import());
+            this->visit_import(*(ImportNode*) nod);
             break;
         case NodeType::ALIAS:
-            this->visit_alias((AliasNode&) n);
+            this->visit_alias(*(AliasNode*) nod);
             break;
         default:
             return;

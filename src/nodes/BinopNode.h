@@ -20,15 +20,13 @@ public:
     OpType op;
     TextPosition op_pos;
 
-    BinopNode& binop() override;
-    const BinopNode& binop() const override;
-
     BinopNode(OpType op, Node* left, Node* right, TextPosition start, TextPosition end);
 
     BinopNode(OpType op, Node* left, Node* right, TextPosition start);
     bool equal(const Node& x) const override;
 
     ~BinopNode();
+    nlohmann::json to_json() override;
 
     TypeNode* ltype;
 };

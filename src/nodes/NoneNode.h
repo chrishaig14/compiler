@@ -13,8 +13,7 @@ class NoneNode : public Node {
 public:
     NoneNode(TextPosition start, TextPosition end);
     bool equal(const Node& other) const override;
-    NoneNode& none() override;
-    const NoneNode& none() const override;
+    nlohmann::json to_json() override;
 
 };
 

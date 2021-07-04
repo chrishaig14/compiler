@@ -3,6 +3,7 @@
 //
 
 #include "NumberNode.h"
+#include "../json/json.hpp"
 
 NumberNode::NumberNode(NumberType num_type, std::string str, TextPosition start, TextPosition end):Node(NodeType::NUMBER, start, end) {
     this->num_type = num_type;
@@ -10,15 +11,16 @@ NumberNode::NumberNode(NumberType num_type, std::string str, TextPosition start,
 }
 
 bool NumberNode::equal(const Node& x) const {
-    auto& other = x.number();
+    auto& other = (NumberNode&)x;
     return this->str == other.str && this->num_type == other.num_type;
 }
 
-NumberNode& NumberNode::number() {
-    return *this;
-}
-
-const NumberNode& NumberNode::number() const {
-    return *this;
+nlohmann::json NumberNode::to_json() {
+    nlohmann::json r;
+    r["type"] = "number";
+    r["number"]["str"] = this->str;
+    r["number"]["num_type"] =
+            num_type == NumberType::INTEGER ? "integer" : num_type == NumberType::FLOAT ? "float" : "double";
+    return r;
 }
 

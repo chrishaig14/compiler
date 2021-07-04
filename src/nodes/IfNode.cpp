@@ -6,7 +6,7 @@
 #include "IfNode.h"
 
 bool IfNode::equal(const Node& x) const {
-    const auto& other = x.iff();
+    const auto& other = (IfNode&) x;
     if (*this->condition != *other.condition) {
         return false;
     }
@@ -31,31 +31,36 @@ bool IfNode::equal(const Node& x) const {
 
 }
 
-IfNode::IfNode(Node* condition, BlockNode* then,
-               std::vector<std::pair<Node*, BlockNode*>> elifs, BlockNode* selse, TextPosition start, TextPosition end) : Node(NodeType::IFF, start, end),condition(condition),
-                                                                                    then(then), selse(selse),
-                                                                                    elifs(elifs) {
+IfNode::IfNode(Node* condition, BlockNode* then, std::vector<std::pair<Node*, BlockNode*>> elifs, BlockNode* selse,
+               TextPosition start, TextPosition end) : Node(NodeType::IFF, start, end), condition(condition),
+                                                       then(then), selse(selse), elifs(elifs) {
     assert(condition != nullptr);
     assert(then != nullptr);
-}
-
-IfNode& IfNode::iff() {
-    return *this;
-}
-
-const IfNode& IfNode::iff() const {
-    return *this;
 }
 
 IfNode::~IfNode() {
     delete this->condition;
     delete this->then;
 
-        delete this->selse;
+    delete this->selse;
 
     for (auto p: this->elifs) {
         delete p.first;
         delete p.second;
     }
+}
+
+nlohmann::json IfNode::to_json() {
+    std::vector<nlohmann::json> elifs;
+    for (auto e: this->elifs) {
+        elifs.push_back({{"condition", e.first->to_json()},
+                         {"then",      e.second->to_json()}});
+    }
+    nlohmann::json j = {{"type", "if"}};
+    j["if"]["condition"] = this->condition->to_json();
+    j["if"]["then"] = this->then->to_json();
+    j["if"]["elifs"] = elifs;
+    j["if"]["else"] = this->selse != nullptr ? this->selse->to_json() : nlohmann::json();
+    return j;
 }
 

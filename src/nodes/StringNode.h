@@ -9,8 +9,6 @@
 #include <string>
 #include "Node.h"
 
-#include "Node.h"
-
 class StringNode : public Node {
 public:
     std::string str;
@@ -18,8 +16,7 @@ public:
 
     bool equal(const Node& x) const override;
 
-    StringNode& strng() override;
-    const StringNode& strng() const override;
+    nlohmann::json to_json() override;
 };
 
 

@@ -4,16 +4,8 @@
 
 #include "DictNode.h"
 
-DictNode& DictNode::dict() {
-    return *this;
-}
-
-const DictNode& DictNode::dict() const {
-    return *this;
-}
-
 bool DictNode::equal(const Node& other) const {
-    const auto& o = other.dict();
+    const auto& o = (DictNode&) other;
     if (this->items.size() != o.items.size()) {
         return false;
     }
@@ -28,4 +20,16 @@ bool DictNode::equal(const Node& other) const {
         }
     }
     return true;
+}
+
+nlohmann::json DictNode::to_json() {
+    nlohmann::json j;
+    j["type"] = "dict";
+    std::vector<nlohmann::json> v;
+    for (auto i: this->items) {
+        v.push_back({{"key",   i.first->to_json()},
+                     {"value", i.second->to_json()}});
+    }
+    j["dict"]["items"] = v;
+    return j;
 }

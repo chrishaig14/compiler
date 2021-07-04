@@ -154,7 +154,7 @@ USemanticInfo Checker::visit_block(BlockNode& node) {
         // sn->nodes.push_back(sinfo_p->snode);
 
         if (n->ntype == NodeType::BLOCK) {
-            for (auto* bnode: n->block().nodes) {
+            for (auto* bnode: ((BlockNode*)n)->nodes) {
                 vn.push_back(bnode);
             }
         } else {

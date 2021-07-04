@@ -17,8 +17,7 @@ public:
     PartialApplication(Node* function, VectorOfNodes args, TextPosition start, TextPosition end);
 
     bool equal(const Node& other) const override;
-    PartialApplication& partial() override;
-    const PartialApplication& partial() const override;
+    nlohmann::json to_json() override;
 
 };
 

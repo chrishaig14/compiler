@@ -5,7 +5,7 @@
 #include "TupleNode.h"
 
 bool TupleNode::equal(const Node& n) const {
-    auto& other = n.tuple();
+    auto& other = (TupleNode&)n;
     if (this->values.size() != other.values.size()) {
         return false;
     }
@@ -21,10 +21,7 @@ TupleNode::TupleNode(const VectorOfNodes& values, TextPosition start, TextPositi
     this->values = values;
 }
 
-TupleNode& TupleNode::tuple() {
-    return *this;
+nlohmann::json TupleNode::to_json() {
+    return nlohmann::json();
 }
 
-const TupleNode& TupleNode::tuple() const {
-    return *this;
-}

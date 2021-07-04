@@ -18,13 +18,6 @@ bool ClassNode::equal(const Node& other) const {
     return false;
 }
 
-ClassNode& ClassNode::cls() {
-    return *this;
-}
-
-const ClassNode& ClassNode::cls() const {
-    return *this;
-}
 
 ClassNode::~ClassNode() {
     for (const auto& mem: this->members) {
@@ -33,4 +26,22 @@ ClassNode::~ClassNode() {
     for (const auto& method: this->methods) {
         delete method.second;
     }
+}
+
+nlohmann::json ClassNode::to_json() {
+    nlohmann::json j;
+    j["type"] = "class";
+    std::vector<nlohmann::json> memj;
+    for (size_t i = 0; i < this->members_ordered.size(); i++) {
+        memj.push_back({{"id",   this->members_ordered[i]},
+                        {"type", this->members[this->members_ordered[i]]->to_json()}});
+    }
+    std::vector<nlohmann::json> methj;
+    for (auto m: this->methods) {
+        methj.push_back(m.second->to_json());
+    }
+    j["class"] = {{"id",      this->class_name},
+                  {"members", memj},
+                  {"methods", methj}};
+    return j;
 }

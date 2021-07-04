@@ -6,7 +6,7 @@
 
 
 bool PartialApplication::equal(const Node& other) const {
-    const PartialApplication& other_p = other.partial();
+    const PartialApplication& other_p = (PartialApplication&)other;
     if ((*(this->function)) != (*(other_p.function))) {
         return false;
     }
@@ -35,10 +35,7 @@ PartialApplication::PartialApplication(Node* function, VectorOfNodes args, TextP
     this->args = args;
 }
 
-PartialApplication& PartialApplication::partial() {
-    return *this;
+nlohmann::json PartialApplication::to_json() {
+    return nlohmann::json();
 }
 
-const PartialApplication& PartialApplication::partial() const {
-    return *this;
-}

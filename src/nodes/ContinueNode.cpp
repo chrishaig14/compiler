@@ -8,14 +8,10 @@ bool ContinueNode::equal(const Node& other) const {
     return true;
 }
 
-ContinueNode& ContinueNode::cntinue() {
-    return *this;
+ContinueNode::ContinueNode(TextPosition start, TextPosition end) : Node(NodeType::CNTINUE, start, end) {
 }
 
-const ContinueNode& ContinueNode::cntinue() const {
-    return *this;
-}
-
-ContinueNode::ContinueNode(TextPosition start, TextPosition end):Node(NodeType::CNTINUE, start, end) {
+nlohmann::json ContinueNode::to_json() {
+    return {{"type", "continue"}};
 }
 

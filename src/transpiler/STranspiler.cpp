@@ -487,7 +487,7 @@ OutputCode STranspiler::transpile_try_catch(TryCatchSNode* dn) {
     this->in_try_catch = false;
     std::string out = "TaggedObject* thrown_exception = nullptr;\n" + body_out.code;
     out += "if (thrown_exception!=nullptr){\n";
-    for (int i = 0; i < dn->catches_bodies.size(); i++) {
+    for (size_t i = 0; i < dn->catches_bodies.size(); i++) {
         OutputCode catch_out = this->transpile_block((BlockSNode*) dn->catches_bodies[i]);
         out += "if (UNTAG(thrown_exception)->class_name==\"" + path_to_id(dn->e_names_types[i].second) +
                "\"){TaggedObject*" + dn->e_names_types[i].first + "=thrown_exception;\n" + catch_out.code + "} else ";

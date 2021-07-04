@@ -12,3 +12,7 @@ UnaryOpNode::UnaryOpNode(UnaryOp op, Node* exp, TextPosition start, TextPosition
     this->op = op;
     this->exp = exp;
 }
+
+nlohmann::json UnaryOpNode::to_json() {
+    return nlohmann::json();
+}

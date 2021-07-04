@@ -8,10 +8,7 @@ bool ImportNode::equal(const Node& other) const {
     return false;
 }
 
-ImportNode& ImportNode::import() {
-    return *this;
-}
-
-const ImportNode& ImportNode::import() const {
-    return *this;
+nlohmann::json ImportNode::to_json() {
+    return {{"type",   "import"},
+            {"import", this->path}};
 }

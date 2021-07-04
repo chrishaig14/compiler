@@ -13,6 +13,7 @@ class AliasNode : public Node {
 public:
     AliasNode(std::string alias_id, TypeNode* aliased_type, TextPosition start, TextPosition end);
     bool equal(const Node& other) const override;
+    nlohmann::json to_json() override;
 
     std::string alias_id;
     TypeNode* aliased_type;

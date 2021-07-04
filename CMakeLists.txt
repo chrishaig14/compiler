@@ -2,9 +2,7 @@ cmake_minimum_required(VERSION 3.16)
 project(xlang)
 
 set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_FLAGS
-    "${CMAKE_CXX_FLAGS} --coverage -g -O0 -Wall -pedantic -Wno-return-type")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage -g -O0 -Wall -pedantic -Werror")
 add_subdirectory(src)
 find_package(fmt)
-add_subdirectory(test/out)
 add_subdirectory(tests)

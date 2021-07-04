@@ -21,8 +21,7 @@ public:
 
     bool equal(const Node& other) const override;
 
-    IdNode& id() override;
-    const IdNode& id() const override;
+    nlohmann::json to_json() override;
 };
 
 

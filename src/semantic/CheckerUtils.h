@@ -19,7 +19,7 @@
 #include "../simple_nodes/ReturnSNode.h"
 #include "../nodes/nodes.h"
 #include "SemanticInfo.h"
-
+#include "../nodes/ObjectType.h"
 //
 // Created by chris on 2/5/21.
 //
@@ -52,11 +52,7 @@ std::string map_boolop_to_method_name(BoolOp op);
 std::string map_binop_to_method_name(OpType op);
 
 
-
 SNode* make_union_wrapper(int type_index, SNode* expression);
-
-
-
 
 
 SNode* make_boolop_snode(ConstFunction* operator_fun, SemanticInfo& left_info, SemanticInfo& right_info);

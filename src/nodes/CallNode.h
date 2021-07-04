@@ -23,9 +23,7 @@ public:
     bool equal(const Node& other) const override;
 
     ~CallNode();
-
-    CallNode& call() override;
-    const CallNode& call() const override;
+    nlohmann::json to_json() override;
 
     VectorOfTypes ftype;
     VectorOfTypes arg_types;

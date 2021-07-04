@@ -13,20 +13,12 @@ MethodNode::MethodNode(Node* parent, int child, TextPosition start, TextPosition
 }
 
 
-MethodNode& MethodNode::method() {
-    return *this;
-}
-
-const MethodNode& MethodNode::method() const {
-    return *this;
-}
-
 MethodNode::~MethodNode() {
     delete this->parent;
 }
 
 bool MethodNode::equal(const Node& x) const {
-    auto& other = x.method();
+    auto& other = (MethodNode&)x;
     if (this->type != other.type) {
         return false;
     }
