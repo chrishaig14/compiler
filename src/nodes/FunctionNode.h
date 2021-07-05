@@ -14,8 +14,15 @@
 #include "BlockNode.h"
 #include "Path.h"
 
+struct Implicit {
+    std::string type;
+    std::string method;
+    FunctionType* ft;
+};
+
 class FunctionNode : public Node {
 public:
+    Implicit* implicit;
     std::string identifier;
     VectorOfStrings parameter_names;
     VectorOfTypes parameter_types;

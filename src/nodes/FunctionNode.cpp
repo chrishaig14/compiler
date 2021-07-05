@@ -37,6 +37,7 @@ FunctionNode::FunctionNode(std::string identifier, VectorOfStrings parameter_nam
     for (auto p: parameter_types) {
         assert(p != nullptr);
     }
+    this->implicit = nullptr;
     assert(return_type != nullptr);
     assert(body != nullptr);
     this->identifier = identifier;

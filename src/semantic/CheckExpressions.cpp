@@ -198,6 +198,10 @@ void Checker::fill_value(Value* value) {
         return;
     }
     if (value->type->object().id.size() == 1) {
+        Entity e = this->scope->get(value->type->object().id);
+        assert(e.type == E_TYPE::CLASS);
+        value->clazz = e.clazz;
+        value->metatype = Meta::CLASS;
         return;
     }
     Flirpin flirpin = this->top_package->get(value->type->object().actual_base_path);

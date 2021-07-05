@@ -1,13 +1,23 @@
-
 import core.core.time
 import core.core.sleep
 
-class Person {
-    name: String
+class MyInt {
+    value: Integer
+    static fun __add__(a: MyInt, b: MyInt) -> MyInt {
+        return #MyInt(a.value + b.value)
+    }
+}
+
+fun foo(a: t, b: t; t.__add__: static fun (t,t)->t) -> t {
+    return a + b
+}
+
+fun add(a: t, b: t; t.__add__: static fun (t,t)->t) -> t {
+    return foo(a,b)
 }
 
 fun main()->Integer {
-    var p = #Person("chris")
-    print(p.str())
+//    var p = #MyInt(7) + #MyInt(9)
+    var x = add(#MyInt(7), #MyInt(10))
     return 0
 }

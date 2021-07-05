@@ -63,6 +63,9 @@ void GlobalProcessor::visit_function(FunctionNode& node) {
     Path function_path = Path(this->module->path, node.identifier);
     const_function->ft = function_info.clone();
     const_function->path = Path(this->module->path, node.identifier);
+    if (node.implicit != nullptr) {
+        const_function->implicit = node.implicit;
+    }
     node.path = const_function->path;
     node.const_function = const_function;
 }

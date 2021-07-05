@@ -154,7 +154,7 @@ USemanticInfo Checker::visit_block(BlockNode& node) {
         // sn->nodes.push_back(sinfo_p->snode);
 
         if (n->ntype == NodeType::BLOCK) {
-            for (auto* bnode: ((BlockNode*)n)->nodes) {
+            for (auto* bnode: ((BlockNode*) n)->nodes) {
                 vn.push_back(bnode);
             }
         } else {
@@ -200,6 +200,15 @@ USemanticInfo Checker::visit_function(FunctionNode& n) {
     if (this->add_this) {
         this->scope->set("this", this->this_entity);
         params.insert(params.begin(), "this");
+    }
+    if (n.implicit != nullptr) {
+        Class* clazz = new Class();
+        clazz->class_name = n.implicit->type;
+        ConstFunction* c = new ConstFunction();
+        c->ft = n.implicit->ft;
+        clazz->static_methods[n.implicit->method] = c;
+        Entity generic_type = Entity(clazz);
+        this->scope->set(n.implicit->type, generic_type);
     }
     for (size_t i = 0; i < n.parameter_names.size(); i++) {
         TypeNode& type = *n.parameter_types[i];

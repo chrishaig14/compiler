@@ -103,8 +103,10 @@ public:
     get_first_substitution_object(ObjectType& a, ObjectType& b, bool is_top_level_arg);
     std::pair<std::string, TypeNode*>* get_first_substitution(TypeNode& a, TypeNode& b, bool is_top_level_arg);
     TypeNode* substitute(TypeNode* t, const std::string& var, TypeNode* replacement);
-    void unify_function_call(FunctionType& fun, VectorOfTypes& args);
-    std::unique_ptr<SemanticInfo> match_arguments_to_generic_function(const FunctionType& ft, VectorOfTypes arg_types);
+    void
+    unify_function_call(FunctionType& fun, VectorOfTypes& args, std::map<std::string, TypeNode*>& all_substitutions);
+    std::unique_ptr<SemanticInfo> match_arguments_to_generic_function(const FunctionType& ft, VectorOfTypes arg_types,
+                                                                      std::map<std::string, TypeNode*>& all_substitutions);
     void fail(std::string msg);
 
 

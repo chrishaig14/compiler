@@ -56,7 +56,40 @@ USemanticInfo Checker::visit_call(CallNode& n, bool is_rvalue) {
         // mangle the generic types in function_type to prevent collisions
         mangle_generic_names(function_type);
         std::cout << "Mangled function of type: " << function_type->to_string() << std::endl;
-        USemanticInfo inf = this->match_arguments_to_generic_function(*function_type, arg_types);
+        std::map<std::string, TypeNode*> all_substitutions;
+        USemanticInfo inf = this->match_arguments_to_generic_function(*function_type, arg_types, all_substitutions);
+        for (auto s: all_substitutions) {
+            std::cout << "substitution: " << s.first << " -> " << s.second->to_string() << std::endl;
+        }
+        if (fun_info.entity.type == E_TYPE::CONST_FUNCTION) {
+            ConstFunction* cf = fun_info.entity.const_function;
+            if (cf->implicit != nullptr) {
+                ObjectType* it = new ObjectType(cf->implicit->type);
+                it->is_generic_param = true;
+                mangle_generic_names(it);
+                TypeNode* tt = all_substitutions.at(it->id);
+                Entity e = entity_from_type(*tt);
+                assert(e.type == E_TYPE::VALUE);
+                this->fill_value(e.value);
+                std::cout << "calling function with implicit: " << cf->implicit->type << "." << cf->implicit->method
+                          << " : " << cf->implicit->ft->to_string() << std::endl;
+                if (e.value->clazz->static_methods.find(cf->implicit->method) == e.value->clazz->static_methods.end()) {
+                    std::cout << "ERROR class has no implicit method: " << std::endl;
+                    exit(1);
+                }
+                ConstFunction* fff = e.value->clazz->static_methods.at(cf->implicit->method);
+                std::cout << fff->ft->to_string() << std::endl;
+                std::cout << cf->ft->to_string() << std::endl;
+                USemanticInfo inf__ = this->match_arguments_to_generic_function(*cf->ft,
+                                                                                fff->ft->param_types,
+                                                                                all_substitutions);
+                if (inf__->is_error()) {
+                    std::cout << "Error passing implicit method!" << std::endl;
+                    exit(1);
+                }
+                // assert(*(fff->ft) == *cf->ft);
+            }
+        }
         if (inf->is_error()) {
             std::cout << "ERRORR CANNOT CALL " << std::endl;
         }

@@ -87,35 +87,38 @@ Checker::get_first_substitution_function(FunctionType& a, FunctionType& b, bool 
     return nullptr;
 }
 
-void Checker::unify_function_call(FunctionType& fun, VectorOfTypes& args) {
+void Checker::unify_function_call(FunctionType& fun, VectorOfTypes& args,
+                                  std::map<std::string, TypeNode*>& all_substitutions) {
     if (args.size() != fun.param_types.size()) {
         this->error_reporter.call_bad_num_args();
         return;
     }
 
+
     for (size_t i = 0; i < args.size(); i++) {
-        auto *param = fun.param_types[i];
-        auto *arg = args[i];
+        auto* param = fun.param_types[i];
+        auto* arg = args[i];
         std::pair<std::string, TypeNode*>* substitution = get_first_substitution(*param, *arg, true);
         while (substitution != nullptr) {
             for (size_t j = 0; j < args.size(); j++) {
                 // if (j == i) {
                 //     continue;
                 // }
-                auto *old = fun.param_types[j];
+                auto* old = fun.param_types[j];
                 fun.param_types[j] = substitute(fun.param_types[j], substitution->first, substitution->second);
                 delete old;
                 old = args[j];
                 args[j] = substitute(args[j], substitution->first, substitution->second);
+                all_substitutions[substitution->first] = substitution->second->clone();
                 delete old;
             }
-            auto *old = fun.return_type;
+            auto* old = fun.return_type;
             fun.return_type = substitute(fun.return_type, substitution->first, substitution->second);
             delete old;
             std::cout << "Simple substitution: " << fun.to_string() << std::endl;
             param = fun.param_types[i];
             arg = args[i];
-            auto *old_s = substitution;
+            auto* old_s = substitution;
             substitution = get_first_substitution(*param, *arg, true);
             delete old_s->second;
             delete old_s;

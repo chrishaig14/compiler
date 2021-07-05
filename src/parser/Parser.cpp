@@ -302,7 +302,7 @@ Node* Parser::parse_factor() {
     // if (this->match(TokType::DOUBLE_COLON)) {
     //     this->next();
     //     Token as_type = this->expect_token(TokType::ID);
-        // parent = new CastNode(parent, as_type.str, parent->start, as_type.end_pos);
+    // parent = new CastNode(parent, as_type.str, parent->start, as_type.end_pos);
     // }
     return parent;
 }
@@ -683,7 +683,7 @@ FunctionNode* Parser::parse_function_definition() {
     if (!this->match(TokType::RPAREN) && !this->match(TokType::ID)) {
         this->expect_token(TokType::RPAREN);
     }
-
+    Implicit* implicit = nullptr;
     if (this->match(TokType::RPAREN)) {
         this->next();
         // Function with no parameters
@@ -702,6 +702,23 @@ FunctionNode* Parser::parse_function_definition() {
             } else {
                 break;
             }
+        }
+        if (this->match(TokType::SEMICOLON)) {
+            this->next();
+            // implicit parameters
+            Token parent = this->expect_token(TokType::ID);
+            this->expect_token(TokType::DOT);
+            Token child = this->expect_token(TokType::ID);
+            this->expect_token(TokType::COLON);
+            bool is_static = false;
+            if (this->match(TokType::STATIC)) {
+                this->next();
+                is_static = true;
+            }
+            FunctionType* ft = this->parse_function_type();
+            std::cout << is_static << std::endl;
+            std::cout << ft->to_json() << std::endl;
+            implicit = new Implicit{parent.str, child.str, ft};
         }
         this->expect_token(TokType::RPAREN);
     }
@@ -724,6 +741,7 @@ FunctionNode* Parser::parse_function_definition() {
                                   body,
                                   fun_tok.start,
                                   body->end);
+    node->implicit = implicit;
     node->start = fun_tok.start;
     return node;
 }
