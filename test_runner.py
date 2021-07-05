@@ -77,7 +77,7 @@ def test(test_file):
         out_dirname = topdirname + "/output"
         os.mkdir(out_dirname)
 
-        copy_file(os.path.join(TEST_FILE_DIR, CORE_FILE), os.path.join(dirname, CORE_FILE))
+        # copy_file(os.path.join(TEST_FILE_DIR, CORE_FILE), os.path.join(dirname, CORE_FILE))
 
         compile_cmd = ["build/compiler", dirname, out_dirname]
         run_cmd(compile_cmd, root_dir)

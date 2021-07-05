@@ -78,12 +78,12 @@ void Compiler::main() {
 
     this->process_global_all_modules(*root_package);
 
-    // try {
+    try {
         this->analyze_all_modules(*root_package, *top_package);
-    // } catch (const std::runtime_error& e) {
-    //     std::cout << "ERROR: " << e.what() << std::endl;
-    //     exit(0);
-    // }
+    } catch (const std::runtime_error& e) {
+        std::cout << "ERROR: " << e.what() << std::endl;
+        exit(1);
+    }
 
     this->transpile_all_modules(*root_package, project_output_dir, true);
     std::string all_files;

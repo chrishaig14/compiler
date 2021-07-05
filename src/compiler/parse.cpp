@@ -18,7 +18,7 @@ void Compiler::parse_single_module(Module& module) {
         ast = parser.parse_program();
     } catch (const std::runtime_error& e) {
         std::cout << e.what() << std::endl;
-        exit(0);
+        exit(1);
     }
     module.ast = ast;
 }
