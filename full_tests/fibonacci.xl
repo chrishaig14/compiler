@@ -14,7 +14,3 @@ fun main()->Integer{
     print(r.str())
     return 0
 }
-
-#####
-14930352
-#####

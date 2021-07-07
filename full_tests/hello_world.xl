@@ -6,8 +6,3 @@ fun main()->Integer{
     print("22 + 4")
     return 0
 }
-
-#####
-Hello world
-22 + 4
-#####

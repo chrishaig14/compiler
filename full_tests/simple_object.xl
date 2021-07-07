@@ -13,8 +13,3 @@ fun main()->Integer{
     print(p.age.str())
     return 0
 }
-
-#####
-Chris
-27
-#####

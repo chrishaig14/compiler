@@ -128,14 +128,14 @@ OutputCode STranspiler::transpile_block(BlockSNode* node) {
             std::string temp_name = "temp_" + std::to_string(rand());
             out += TOBJECT + SPACE + temp_name + ASSIGN + nod.code;
             out += SEMIC + NEWLINE;
-            if (this->in_try_catch) {
-                out += "if" + SPACE + LPAREN + "has_tag" + LPAREN + temp_name + COMMA + SPACE + "EXCEPTION_TAG" +
-                       RPAREN + RPAREN + SPACE + LCURLY + "thrown_exception" + SPACE + ASSIGN + SPACE + temp_name +
-                       SEMIC + RCURLY + NEWLINE;
-            } else {
-                out += "if" + SPACE + LPAREN + "has_tag" + LPAREN + temp_name + COMMA + SPACE + "EXCEPTION_TAG" +
-                       RPAREN + RPAREN + SPACE + LCURLY + RETURN + SPACE + temp_name + SEMIC + RCURLY + NEWLINE;
-            }
+            // if (this->in_try_catch) {
+            //     out += "if" + SPACE + LPAREN + "has_tag" + LPAREN + temp_name + COMMA + SPACE + "EXCEPTION_TAG" +
+            //            RPAREN + RPAREN + SPACE + LCURLY + "thrown_exception" + SPACE + ASSIGN + SPACE + temp_name +
+            //            SEMIC + RCURLY + NEWLINE;
+            // } else {
+            //     out += "if" + SPACE + LPAREN + "has_tag" + LPAREN + temp_name + COMMA + SPACE + "EXCEPTION_TAG" +
+            //            RPAREN + RPAREN + SPACE + LCURLY + RETURN + SPACE + temp_name + SEMIC + RCURLY + NEWLINE;
+            // }
         } else {
             out += nod.code;
         }
