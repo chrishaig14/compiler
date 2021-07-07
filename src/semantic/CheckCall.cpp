@@ -74,7 +74,7 @@ USemanticInfo Checker::visit_call(CallNode& n, bool is_rvalue) {
                 std::cout << "calling function with implicit: " << cf->implicit->type << "." << cf->implicit->method
                           << " : " << cf->implicit->ft->to_string() << std::endl;
                 if (e.value->clazz->static_methods.find(cf->implicit->method) == e.value->clazz->static_methods.end()) {
-                    std::cout << "ERROR class has no implicit method: " << std::endl;
+                    std::cout << "ERROR class has no implicit method: " << cf->implicit->method << std::endl;
                     exit(1);
                 }
                 ConstFunction* fff = e.value->clazz->static_methods.at(cf->implicit->method);
