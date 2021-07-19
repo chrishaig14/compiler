@@ -40,3 +40,23 @@ TEST_CASE("asdfasdfwerw", "[parser]") {
     REQUIRE(ast->parameter_names == VectorOfStrings({}));
     REQUIRE(*ast->return_type == ObjectType("Inteager"));
 }
+
+TEST_CASE("generic_class_with_constraint_methods", "[class]") {
+    Scanner scanner;
+    std::string code = "class Foo[t] {with t.str: fun()->String\nfun foo()->String{return \"\"}}";
+    scanner.load_text(code);
+    std::vector<Token> tokens = scanner.scan_all();
+    Parser parser("test", scanner.code_lines, tokens);
+    parser.top_package_name = "main";
+    FunctionNode* ast;
+    try {
+        ast = parser.parse_function_definition();
+    } catch (const std::runtime_error& e) {
+        std::cout << e.what() << std::endl;
+        exit(0);
+    }
+
+    REQUIRE(ast->identifier == "main");
+    REQUIRE(ast->parameter_names == VectorOfStrings({}));
+    REQUIRE(*ast->return_type == ObjectType("Inteager"));
+}

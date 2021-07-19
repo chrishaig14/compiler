@@ -690,17 +690,18 @@ FunctionNode* Parser::parse_function_definition() {
     } else {
         // Function with parameters
         // Parse parameter list
-
-        while (true) {
-            Token parameter_identifier = this->expect_token(TokType::ID);
-            this->expect_token(TokType::COLON);
-            TypeNode* parameter_type = this->parse_type_node();
-            parameter_types.push_back(parameter_type);
-            parameter_names.push_back(parameter_identifier.str);
-            if (this->match(TokType::COMMA)) {
-                this->next();
-            } else {
-                break;
+        if (!this->match(TokType::SEMICOLON)) {
+            while (true) {
+                Token parameter_identifier = this->expect_token(TokType::ID);
+                this->expect_token(TokType::COLON);
+                TypeNode* parameter_type = this->parse_type_node();
+                parameter_types.push_back(parameter_type);
+                parameter_names.push_back(parameter_identifier.str);
+                if (this->match(TokType::COMMA)) {
+                    this->next();
+                } else {
+                    break;
+                }
             }
         }
         if (this->match(TokType::SEMICOLON)) {
@@ -718,7 +719,7 @@ FunctionNode* Parser::parse_function_definition() {
             FunctionType* ft = this->parse_function_type();
             std::cout << is_static << std::endl;
             std::cout << ft->to_json() << std::endl;
-            implicit = new Implicit{parent.str, child.str, ft};
+            implicit = new Implicit{parent.str, child.str, ft, is_static};
         }
         this->expect_token(TokType::RPAREN);
     }
@@ -853,7 +854,7 @@ ClassNode* Parser::parse_class_definition() {
         this->expect_token(TokType::RSQUARE);
     }
     this->expect_token(TokType::LCURLY);
-    std::unordered_map<std::string, FunctionNode*> methods;
+    std::unordered_map<std::string, Method> methods;
     std::unordered_map<std::string, FunctionNode*> static_methods;
     MapStringType members;
     std::map<std::string, std::pair<TypeNode*, Node*>> static_members;
@@ -882,17 +883,44 @@ ClassNode* Parser::parse_class_definition() {
                 members_ordered.push_back(member_name);
             }
             this->expect_token(TokType::SEMICOLON);
+        } else if (this->match(TokType::WHERE)) {
+            this->next();
+            Token parent = this->expect_token(TokType::ID);
+            this->expect_token(TokType::DOT);
+            Token child = this->expect_token(TokType::ID);
+            this->expect_token(TokType::COLON);
+            bool is_static = false;
+            if (this->match(TokType::STATIC)) {
+                this->next();
+                is_static = true;
+            }
+            FunctionType* ft = this->parse_function_type();
+            this->expect_token(TokType::SEMICOLON);
+            std::cout << is_static << std::endl;
+            std::cout << ft->to_json() << std::endl;
+            Implicit* implicit = new Implicit{parent.str, child.str, ft, is_static};
+
+            FunctionNode* method_node = this->parse_function_definition();
+            std::string& method_name = method_node->identifier;
+            if (members.find(method_name) != members.end() || methods.find(method_name) != methods.end()) {
+                this->error_class_member_redefined(class_name, method_name, method_node->start);
+            }
+            if (is_static) {
+                static_methods.insert(make_pair(method_name, method_node));
+            } else {
+                methods[method_name] = Method{implicit, method_node};
+            }
+
         } else if (this->match(TokType::FUN)) {
             FunctionNode* method_node = this->parse_function_definition();
             std::string& method_name = method_node->identifier;
             if (members.find(method_name) != members.end() || methods.find(method_name) != methods.end()) {
                 this->error_class_member_redefined(class_name, method_name, method_node->start);
-
             }
             if (is_static) {
                 static_methods.insert(make_pair(method_name, method_node));
             } else {
-                methods.insert(make_pair(method_name, method_node));
+                methods[method_name] = Method{nullptr, method_node};
             }
         } else {
             break;

@@ -199,6 +199,11 @@ void Checker::fill_value(Value* value) {
     }
     if (value->type->object().id.size() == 1) {
         Entity e = this->scope->get(value->type->object().id);
+        if (e.type == E_TYPE::NOT_FOUND) {
+            e.type = E_TYPE::CLASS;
+            e.clazz = new Class();
+            e.clazz->class_name = value->type->object().id;
+        }
         assert(e.type == E_TYPE::CLASS);
         value->clazz = e.clazz;
         value->metatype = Meta::CLASS;

@@ -65,6 +65,7 @@ void GlobalProcessor::visit_function(FunctionNode& node) {
     const_function->path = Path(this->module->path, node.identifier);
     if (node.implicit != nullptr) {
         const_function->implicit = node.implicit;
+        this->module->fill_actual(node.implicit->ft);
     }
     node.path = const_function->path;
     node.const_function = const_function;
@@ -187,7 +188,7 @@ void GlobalProcessor::visit_class(ClassNode& node) {
         class_info->static_members[mn.first] = std::make_pair(mn.second.first->clone(), mn.second.second);
     }
     for (const auto& f: node.methods) {
-        FunctionNode& method = *f.second;
+        FunctionNode& method = *f.second.method;
 
         VectorOfTypes x;
         for (auto* p: method.parameter_types) {
@@ -202,7 +203,8 @@ void GlobalProcessor::visit_class(ClassNode& node) {
         cf->path = Path(class_info->path, f.first);
         method.path = cf->path;
         cf->ft = new FunctionType(x, method.return_type->clone());
-        f.second->const_function = cf;
+        cf->implicit = f.second.method->implicit;
+        f.second.method->const_function = cf;
         class_info->methods.insert(make_pair(f.first, cf));
     }
 

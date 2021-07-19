@@ -308,7 +308,9 @@ USemanticInfo Checker::visit_for(ForNode& node) {
     this->scope->is_loop = false;
     BlockSNode* bn = (BlockSNode*) binfo->snode;
     for (auto local_var: this->scope->table) {
-        bn->locals.push_back(local_var.first);
+        if (local_var.second.type == E_TYPE::VALUE) {
+            bn->locals.push_back(local_var.first);
+        }
     }
     this->leave_scope();
 

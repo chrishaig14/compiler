@@ -13,12 +13,17 @@
 #include "FunctionNode.h"
 #include "../macros.h"
 
+struct Method {
+    Implicit* constraint;
+    FunctionNode* method;
+};
+
 class ClassNode : public Node {
 public:
 
     bool equal(const Node& other) const override;
     ClassNode(const std::string& className, VectorOfStrings type_parameters, MapStringType members,
-              std::unordered_map<std::string, FunctionNode*> functions,
+              std::unordered_map<std::string, Method> functions,
               std::map<std::string, std::pair<TypeNode*, Node*>> static_members,
               std::unordered_map<std::string, FunctionNode*> static_methods, TextPosition start, TextPosition end);
     ~ClassNode() override;
@@ -27,7 +32,7 @@ public:
     MapStringType members;
     std::map<std::string, std::pair<TypeNode*, Node*>> static_members;
     VectorOfStrings members_ordered;
-    std::unordered_map<std::string, FunctionNode*> methods;
+    std::unordered_map<std::string, Method> methods;
     std::unordered_map<std::string, FunctionNode*> static_methods;
 
     std::string class_name;

@@ -146,6 +146,7 @@ USemanticInfo Checker::check_declaration_with_type(DeclarationNode& n) {
     info.snode = new DeclarationSNode(n.identifier, rvalue_sinfo->snode);
     auto* ov = new Value(n.type->clone());
     info.entity = Entity(ov);
+    this->fill_value(ov);
     return std::make_unique<SemanticInfo>(info);
 }
 

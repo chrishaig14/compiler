@@ -59,11 +59,11 @@ TextPosition add_one_col(TextPosition t) {
 
 USemanticInfo Checker::object_member(SNode* object_snode, Value* p_value, const std::string& child, MemberNode& n) {
     Path object_type_path = p_value->type->object().actual_base_path;
-    if (object_type_path.as_str() == "") {
-        // is a single type param, error
-        this->error_reporter.object_no_member(*p_value->type, n);
-        return error_stub();
-    }
+    // if (object_type_path.as_str() == "") {
+    //     // is a single type param, error
+    //     this->error_reporter.object_no_member(*p_value->type, n);
+    //     return error_stub();
+    // }
     if (object_type_path.as_str() == "core.core.Union") {
         this->error_reporter.object_no_member(*p_value->type, n);
         return error_stub();
@@ -88,7 +88,7 @@ USemanticInfo Checker::object_member(SNode* object_snode, Value* p_value, const 
         auto* omn = new ObjectMemberSNode(object_snode, clazz->path, child);
         info.snode = omn;
     } else if (clazz->methods.count(child) != 0) {
-        auto* idn = new IdSNode(Path(clazz->path, child).as_str());
+        auto* idn = new IdSNode(clazz->methods[child]->path.as_str());
         if (this->is_call) {
             // method call
             info.this_arg = object_snode;

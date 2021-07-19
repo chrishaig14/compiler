@@ -94,15 +94,15 @@ USemanticInfo Checker::visit_class(ClassNode& node) {
     std::vector<SNode*> static_methods_snodes;
 
     for (const auto& method: node.methods) {
-        this->add_this = true;
         auto* vt = new ObjectType(node.class_name);
         vt->actual_base_path = clazz->path;
         auto* val = new Value(vt);
+        this->add_this = true;
         this->this_entity = Entity(val);
         val->metatype = Meta::CLASS;
         val->clazz = clazz;
         // method.second->path = clazz->path + "." + method.second->identifier;
-        USemanticInfo method_info = this->visit_function(*method.second);
+        USemanticInfo method_info = this->visit_function(*method.second.method);
         methods_snodes.push_back(method_info->snode);
     }
 
@@ -206,9 +206,16 @@ USemanticInfo Checker::visit_function(FunctionNode& n) {
         clazz->class_name = n.implicit->type;
         ConstFunction* c = new ConstFunction();
         c->ft = n.implicit->ft;
-        clazz->static_methods[n.implicit->method] = c;
+        c->path = Path("implicit_a");
+        this->module->fill_actual(c->ft);
+        if (n.implicit->is_static) {
+            clazz->static_methods[n.implicit->method] = c;
+        } else {
+            clazz->methods[n.implicit->method] = c;
+        }
         Entity generic_type = Entity(clazz);
         this->scope->set(n.implicit->type, generic_type);
+        params.push_back("implicit_a");
     }
     for (size_t i = 0; i < n.parameter_names.size(); i++) {
         TypeNode& type = *n.parameter_types[i];
@@ -243,7 +250,9 @@ USemanticInfo Checker::visit_function(FunctionNode& n) {
     USemanticInfo body_info = this->visit_block(*n.body);
     BlockSNode* bn = (BlockSNode*) (body_info->snode);
     for (auto local_var: this->scope->table) {
-        bn->locals.push_back(local_var.first);
+        if (local_var.second.type == E_TYPE::VALUE) {
+            bn->locals.push_back(local_var.first);
+        }
     }
     this->leave_scope();
     auto* sn = new FunctionSNode(n.path.as_str(), params, bn);

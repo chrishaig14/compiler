@@ -77,7 +77,7 @@ enum class TokType {
     STATIC,
     MATCH,
     ALIAS,
-    ENUM, THROW, TRY, CATCH
+    ENUM, THROW, TRY, CATCH, WHERE
 };
 
 extern std::unordered_map<TokType, std::string> TOKEN_STRINGS;

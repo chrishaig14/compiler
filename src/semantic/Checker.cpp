@@ -112,10 +112,15 @@ Checker::match_arguments_to_generic_function(const FunctionType& ft, VectorOfTyp
     try {
         unify_function_call(*f, arg_types, all_substitutions);
     } catch (...) {
-        std::string sss = "ERROR CANNOT UNIFY " + ft.to_string() + " WITH ARGS";
+        std::string sss = "Error: cannot unify " + E_HLT(ft.to_string()) + " with args: ";
+        std::string args_str;
         for (auto* at: arg_types) {
-            sss += at->to_string() + ", ";
+            args_str += at->to_string() + ", ";
         }
+        if (!arg_types.empty()) {
+            args_str = args_str.substr(0, args_str.size() - 2);
+        }
+        sss += E_HLT("(" + args_str + ")");
         this->error_reporter.fail(sss);
         return error_stub();
     }
@@ -177,6 +182,7 @@ TypeNode* make_type(const TypeNode& original, const MapStringType& replacements)
 }
 
 Class* Checker::instantiate_generic(Class* generic, const ObjectType& instance) {
+    std::cout << "******* Instantiating type: " << instance.to_string() << std::endl;
     MapStringType replacements;
     for (size_t i = 0; i < generic->type_params.size(); i++) {
         std::string tp = generic->type_params[i];
@@ -193,15 +199,51 @@ Class* Checker::instantiate_generic(Class* generic, const ObjectType& instance) 
 
 
     std::unordered_map<std::string, ConstFunction*> concrete_methods;
-    for (const auto& m: generic->methods) {
-        TypeNode* t = (m.second)->ft;
-        TypeNode& concrete_type = *make_type(*t, replacements);
-        this->module->fill_actual(&concrete_type);
-        auto* cf = new ConstFunction();
-        cf->path = m.second->path;
-        cf->ft = (FunctionType*) concrete_type.clone();
-        std::cout << "Instantiated generic method " << m.first << " : " << cf->ft->to_string() << std::endl;
-        concrete_methods[m.first] = cf;
+    for (const auto& method_cf: generic->methods) {
+        if (method_cf.second->implicit != nullptr) {
+            Implicit* implicit = method_cf.second->implicit;
+            if (implicit->type == generic->type_params[0]) {
+                std::cout << "----------- Generic with implicit which is class parameter: " << method_cf.first
+                          << std::endl;
+                Entity e = entity_from_type(*instance.type_params[0]);
+                this->fill_value(e.value);
+                Class* clazz_t = e.value->clazz;
+                auto meth = clazz_t->methods.find(implicit->method);
+                if (meth == clazz_t->methods.end()) {
+                    std::cout << "Not found in instance's type parameter, so skipping" << std::endl;
+                } else {
+                    std::cout << "Found implicit in instance's type parameter" << std::endl;
+                    TypeNode* t = (method_cf.second)->ft;
+                    TypeNode& concrete_type = *make_type(*t, replacements);
+                    this->module->fill_actual(&concrete_type);
+                    auto* cf = new ConstFunction();
+                    cf->path = method_cf.second->path;
+                    cf->ft = (FunctionType*) concrete_type.clone();
+                    std::cout << "Instantiated generic method " << method_cf.first << " : " << cf->ft->to_string() << std::endl;
+                    concrete_methods[method_cf.first] = cf;
+                }
+
+            } else {
+                std::cout << "----------- Normal generic function: r" << method_cf.first << std::endl;
+                TypeNode* t = (method_cf.second)->ft;
+                TypeNode& concrete_type = *make_type(*t, replacements);
+                this->module->fill_actual(&concrete_type);
+                auto* cf = new ConstFunction();
+                cf->path = method_cf.second->path;
+                cf->ft = (FunctionType*) concrete_type.clone();
+                std::cout << "Instantiated generic method " << method_cf.first << " : " << cf->ft->to_string() << std::endl;
+                concrete_methods[method_cf.first] = cf;
+            }
+        } else {
+            TypeNode* t = (method_cf.second)->ft;
+            TypeNode& concrete_type = *make_type(*t, replacements);
+            this->module->fill_actual(&concrete_type);
+            auto* cf = new ConstFunction();
+            cf->path = method_cf.second->path;
+            cf->ft = (FunctionType*) concrete_type.clone();
+            std::cout << "Instantiated generic method " << method_cf.first << " : " << cf->ft->to_string() << std::endl;
+            concrete_methods[method_cf.first] = cf;
+        }
     }
 
     std::unordered_map<std::string, ConstFunction*> concrete_static_methods;

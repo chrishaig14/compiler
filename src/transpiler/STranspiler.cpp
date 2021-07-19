@@ -176,8 +176,8 @@ OutputCode STranspiler::transpile_call(CallSNode* node) {
         }
         fofo += afofo + COMMA + SPACE;
     }
-    std::cout << "PRE CODE:" << std::endl;
-    std::cout << pre_code << std::endl;
+    // std::cout << "PRE CODE:" << std::endl;
+    // std::cout << pre_code << std::endl;
 
     std::string post_code;
     OutputCode func = this->dispatch(node->function);
@@ -187,8 +187,8 @@ OutputCode STranspiler::transpile_call(CallSNode* node) {
     post_code += fofo;
     post_code = post_code.substr(0, post_code.size() - 2);
     post_code += ")";
-    std::cout << "POST CODE:" << std::endl;
-    std::cout << post_code << std::endl;
+    // std::cout << "POST CODE:" << std::endl;
+    // std::cout << post_code << std::endl;
 
     return OutputCode(pre_code, post_code);
 
@@ -260,7 +260,8 @@ void STranspiler::transpile_class(ClassSNode* node) {
     out += "TaggedObject* r = MAKE_STRING(\"\");\n";
     out += "XString* _r = CAST(r, XString);\n";
     for (const auto& m: node->members) {
-        out += "if (has_tag(this->" + m + ",OBJECT_TAG)){_r->s+=CAST(CAST(this->" + m + ", XObject)->str(),XString)->s;}";
+        out += "if (has_tag(this->" + m + ",OBJECT_TAG)){_r->s+=CAST(CAST(this->" + m +
+               ", XObject)->str(),XString)->s;}";
     }
     out += "return r;";
     out += RCURLY + NEWLINE;
@@ -313,7 +314,7 @@ OutputCode STranspiler::transpile_while(WhileSNode* sn) {
     out += cond_out.pre_code;
     out += TOBJECT + SPACE + condition_name + SPACE + ASSIGN + SPACE + cond_out.code + SEMIC + NEWLINE;
     out += "while" + SPACE + LPAREN + "GET_BOOL" + LPAREN + condition_name + RPAREN + RPAREN + SPACE + LCURLY +
-           body_out.code + RCURLY;
+           body_out.code + condition_name + SPACE + ASSIGN + SPACE + cond_out.code + SEMIC + NEWLINE + RCURLY;
     return OutputCode("", out);
 }
 

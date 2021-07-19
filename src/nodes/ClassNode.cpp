@@ -5,7 +5,7 @@
 #include "ClassNode.h"
 
 ClassNode::ClassNode(const std::string& className, VectorOfStrings type_parameters, MapStringType members,
-                     std::unordered_map<std::string, FunctionNode*> functions,
+                     std::unordered_map<std::string, Method> functions,
                      std::map<std::string, std::pair<TypeNode*, Node*>> static_members,
                      std::unordered_map<std::string, FunctionNode*> static_methods, TextPosition start,
                      TextPosition end) : Node(NodeType::CLS, start, end), members(members),
@@ -23,9 +23,9 @@ ClassNode::~ClassNode() {
     for (const auto& mem: this->members) {
         delete mem.second;
     }
-    for (const auto& method: this->methods) {
-        delete method.second;
-    }
+    // for (const auto& method: this->methods) {
+    //     delete method.second;
+    // }
 }
 
 nlohmann::json ClassNode::to_json() {
@@ -38,7 +38,7 @@ nlohmann::json ClassNode::to_json() {
     }
     nlohmann::json methj;
     for (auto m: this->methods) {
-        methj[m.first] = m.second->to_json();
+        methj[m.first] = m.second.method->to_json();
     }
     nlohmann::json smethj;
     for (auto m: this->static_methods) {

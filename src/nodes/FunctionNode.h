@@ -18,6 +18,7 @@ struct Implicit {
     std::string type;
     std::string method;
     FunctionType* ft;
+    bool is_static;
 };
 
 class FunctionNode : public Node {

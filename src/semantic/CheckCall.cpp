@@ -57,36 +57,76 @@ USemanticInfo Checker::visit_call(CallNode& n, bool is_rvalue) {
         mangle_generic_names(function_type);
         std::cout << "Mangled function of type: " << function_type->to_string() << std::endl;
         std::map<std::string, TypeNode*> all_substitutions;
-        USemanticInfo inf = this->match_arguments_to_generic_function(*function_type, arg_types, all_substitutions);
+        VectorOfTypes copy_arg_types;
+        for(auto x: arg_types){
+            copy_arg_types.push_back(x->clone());
+        }
+        USemanticInfo inf = this->match_arguments_to_generic_function(*function_type, copy_arg_types, all_substitutions);
         for (auto s: all_substitutions) {
             std::cout << "substitution: " << s.first << " -> " << s.second->to_string() << std::endl;
         }
+        for (auto x: arg_types) {
+            std::cout << "ARG: " << x->to_string() << std::endl;
+        }
+        std::cout << "DONE" << std::endl;
         if (fun_info.entity.type == E_TYPE::CONST_FUNCTION) {
-            ConstFunction* cf = fun_info.entity.const_function;
-            if (cf->implicit != nullptr) {
-                ObjectType* it = new ObjectType(cf->implicit->type);
+            ConstFunction* full_function = fun_info.entity.const_function;
+            if (full_function->implicit != nullptr) {
+                ObjectType* it = new ObjectType(full_function->implicit->type);
                 it->is_generic_param = true;
                 mangle_generic_names(it);
                 TypeNode* tt = all_substitutions.at(it->id);
                 Entity e = entity_from_type(*tt);
                 assert(e.type == E_TYPE::VALUE);
                 this->fill_value(e.value);
-                std::cout << "calling function with implicit: " << cf->implicit->type << "." << cf->implicit->method
-                          << " : " << cf->implicit->ft->to_string() << std::endl;
-                if (e.value->clazz->static_methods.find(cf->implicit->method) == e.value->clazz->static_methods.end()) {
-                    std::cout << "ERROR class has no implicit method: " << cf->implicit->method << std::endl;
-                    exit(1);
+                std::cout << "calling function with implicit: " << full_function->implicit->type << "."
+                          << full_function->implicit->method << " : " << full_function->implicit->ft->to_string()
+                          << std::endl;
+                ConstFunction* implicit_arg = nullptr;
+                if (full_function->implicit->is_static) {
+                    auto it = e.value->clazz->static_methods.find(full_function->implicit->method);
+                    if (it == e.value->clazz->static_methods.end()) {
+                        std::cout << "ERROR class has no implicit STATIC method: " << full_function->implicit->method
+                                  << std::endl;
+                        exit(1);
+                    }
+                    implicit_arg = it->second;
+                } else {
+                    auto it = e.value->clazz->methods.find(full_function->implicit->method);
+                    if (it == e.value->clazz->methods.end()) {
+                        std::cout << "ERROR class has no implicit method: " << full_function->implicit->method
+                                  << std::endl;
+                        exit(1);
+                    }
+                    // implicit_arg = e.value->clazz->methods.at(full_function->implicit->method);
+                    implicit_arg = it->second;
                 }
-                ConstFunction* fff = e.value->clazz->static_methods.at(cf->implicit->method);
-                std::cout << fff->ft->to_string() << std::endl;
-                std::cout << cf->ft->to_string() << std::endl;
-                USemanticInfo inf__ = this->match_arguments_to_generic_function(*cf->ft,
-                                                                                fff->ft->param_types,
+                FunctionType* implicit_param = full_function->implicit->ft;
+
+                std::cout << "FULL FUNCTION: " << full_function->ft->to_string() << std::endl;
+                std::cout << "IMPLICIT FUNCTION PARAM: " << implicit_param->to_string() << std::endl;
+                std::cout << "IMPLICIT FUNCTION ARG: " << implicit_arg->ft->to_string() << std::endl;
+
+                FunctionType* with_implicit_param = full_function->ft->clone();
+                with_implicit_param->param_types.push_back(full_function->implicit->ft);
+                VectorOfTypes with_implicit_arg;
+                for (auto x: arg_types) {
+                    std::cout << "ARG: " << x->to_string() << std::endl;
+                    with_implicit_arg.push_back(x->clone());
+                }
+                with_implicit_arg.push_back(implicit_arg->ft->clone());
+                USemanticInfo inf__ = this->match_arguments_to_generic_function(*with_implicit_param,
+                                                                                with_implicit_arg,
                                                                                 all_substitutions);
+                // USemanticInfo inf__ = this->match_arguments_to_generic_function(*with_implicit_param,
+                //                                                                 implicit_arg->ft->param_types,
+                //                                                                 all_substitutions);
                 if (inf__->is_error()) {
                     std::cout << "Error passing implicit method!" << std::endl;
                     exit(1);
                 }
+
+                sn->arguments.push_back(new IdSNode(implicit_arg->path.as_str()));
                 // assert(*(fff->ft) == *cf->ft);
             }
         }

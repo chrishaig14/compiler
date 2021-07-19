@@ -43,6 +43,7 @@ void initialize_tokens() {
     TOKEN_KEYWORDS["break"] = TokType::BREAK;
     TOKEN_KEYWORDS["class"] = TokType::CLASS;
     TOKEN_KEYWORDS["while"] = TokType::WHILE;
+    TOKEN_KEYWORDS["where"] = TokType::WHERE;
     TOKEN_KEYWORDS["none"] = TokType::NONE;
     TOKEN_KEYWORDS["as"] = TokType::AS;
 
