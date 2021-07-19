@@ -81,3 +81,5 @@ for TEST in full_tests/*.xl; do
 #  break
   rm -rf temp
 done
+
+echo "FINISHED"
