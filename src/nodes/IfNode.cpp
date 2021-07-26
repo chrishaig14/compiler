@@ -39,15 +39,15 @@ IfNode::IfNode(Node* condition, BlockNode* then, std::vector<std::pair<Node*, Bl
 }
 
 IfNode::~IfNode() {
-    delete this->condition;
-    delete this->then;
-
-    delete this->selse;
-
-    for (auto p: this->elifs) {
-        delete p.first;
-        delete p.second;
-    }
+    // delete this->condition;
+    // delete this->then;
+    //
+    // delete this->selse;
+    //
+    // for (auto p: this->elifs) {
+    //     delete p.first;
+    //     delete p.second;
+    // }
 }
 
 nlohmann::json IfNode::to_json() {

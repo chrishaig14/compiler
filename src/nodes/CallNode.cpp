@@ -23,16 +23,16 @@ bool CallNode::equal(const Node& x) const {
 }
 
 CallNode::~CallNode() {
-    delete this->function;
-    for (auto* a: this->arguments) {
-        delete a;
-    }
-    for (auto* at: this->arg_types) {
-        delete at;
-    }
-    for (auto* ft: this->ftype) {
-        delete ft;
-    }
+    // delete this->function;
+    // for (auto* a: this->arguments) {
+    //     delete a;
+    // }
+    // for (auto* at: this->arg_types) {
+    //     delete at;
+    // }
+    // for (auto* ft: this->ftype) {
+    //     delete ft;
+    // }
 }
 
 nlohmann::json CallNode::to_json() {

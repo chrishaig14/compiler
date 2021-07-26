@@ -24,8 +24,8 @@ bool WhileNode::equal(const Node& x) const {
 }
 
 WhileNode::~WhileNode() {
-    delete this->body;
-    delete this->condition;
+    // delete this->body;
+    // delete this->condition;
 }
 
 nlohmann::json WhileNode::to_json() {

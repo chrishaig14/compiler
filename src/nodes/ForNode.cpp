@@ -19,8 +19,8 @@ bool ForNode::equal(const Node& x) const {
 }
 
 ForNode::~ForNode() {
-    delete this->exp;
-    delete this->body;
+    // delete this->exp;
+    // delete this->body;
 }
 
 nlohmann::json ForNode::to_json() {
