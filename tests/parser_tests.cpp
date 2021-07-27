@@ -17,9 +17,12 @@ struct TestTypeNode {
 };
 
 const std::string& ID = "foo";
-const std::string& ID_1 = "bar";
+const std::string& ID_1 = "foo";
+const std::string& ID_2 = "bar";
 
 const TestTypeNode TYPE{"Integer", new ObjectType("Integer")};
+const TestTypeNode TYPE_1{"String", new ObjectType("String")};
+const TestTypeNode TYPE_2{"Integer", new ObjectType("Integer")};
 
 const TestNode EXP_ID_1{"foo", new IdNode("foo", DUMMY_POS, DUMMY_POS)};
 const TestNode EXP_ID_2{"bar", new IdNode("bar", DUMMY_POS, DUMMY_POS)};
@@ -173,6 +176,25 @@ TEST_CASE("fun_one_arg", "[parser]") {
     REQUIRE(ast->to_json() == FunctionNode(ID,
                                            {ID_1},
                                            {TYPE.node->clone()},
+                                           NO_TYPE.clone(),
+                                           (BlockNode*) BLOCK.node,
+                                           DUMMY_POS,
+                                           DUMMY_POS).to_json());
+}
+
+TEST_CASE("fun_mult_arg", "[parser]") {
+    Scanner scanner;
+    std::string code = "fun " + ID + "(" + ID_1 + ":" + TYPE_1.text + "," + ID_2 + ":" + TYPE_2.text + ")" + BLOCK.text;
+    scanner.load_text(code);
+    std::vector<Token> tokens = scanner.scan_all();
+    Parser parser("test", scanner.code_lines, tokens);
+    parser.top_package_name = "main";
+
+    FunctionNode* ast = parser.parse_function_definition();
+
+    REQUIRE(ast->to_json() == FunctionNode(ID,
+                                           {ID_1, ID_2},
+                                           {TYPE_1.node->clone(), TYPE_2.node->clone()},
                                            NO_TYPE.clone(),
                                            (BlockNode*) BLOCK.node,
                                            DUMMY_POS,
