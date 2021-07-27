@@ -32,9 +32,9 @@ nlohmann::json ClassNode::to_json() {
     nlohmann::json j;
     j["type"] = "class";
     std::vector<nlohmann::json> memj;
-    for (auto& i : this->members_ordered) {
-        memj.push_back({{"id",   i},
-                        {"type", this->members[i]->to_json()}});
+    for (auto& i : this->members) {
+        memj.push_back({{"id",   i.first},
+                        {"type", i.second->to_json()}});
     }
     nlohmann::json methj;
     for (auto m: this->methods) {

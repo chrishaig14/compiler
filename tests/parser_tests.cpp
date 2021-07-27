@@ -213,3 +213,17 @@ TEST_CASE("class_empty", "[parser]") {
 
     REQUIRE(ast->to_json() == ClassNode(ID, {}, {}, {}, {}, {}, DUMMY_POS, DUMMY_POS).to_json());
 }
+
+TEST_CASE("class_one_member", "[parser]") {
+    Scanner scanner;
+    std::string code = "class " + ID + "{" + ID_1 + ":" + TYPE_1.text + ";}";
+    scanner.load_text(code);
+    std::vector<Token> tokens = scanner.scan_all();
+    Parser parser("test", scanner.code_lines, tokens);
+    parser.top_package_name = "main";
+
+    ClassNode* ast = parser.parse_class_definition();
+
+    REQUIRE(ast->to_json() ==
+            ClassNode(ID, {}, {{ID_1, TYPE_1.node->clone()}}, {}, {}, {}, DUMMY_POS, DUMMY_POS).to_json());
+}
