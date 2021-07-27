@@ -200,3 +200,16 @@ TEST_CASE("fun_mult_arg", "[parser]") {
                                            DUMMY_POS,
                                            DUMMY_POS).to_json());
 }
+
+TEST_CASE("class_empty", "[parser]") {
+    Scanner scanner;
+    std::string code = "class " + ID + "{}";
+    scanner.load_text(code);
+    std::vector<Token> tokens = scanner.scan_all();
+    Parser parser("test", scanner.code_lines, tokens);
+    parser.top_package_name = "main";
+
+    ClassNode* ast = parser.parse_class_definition();
+
+    REQUIRE(ast->to_json() == ClassNode(ID, {}, {}, {}, {}, {}, DUMMY_POS, DUMMY_POS).to_json());
+}
