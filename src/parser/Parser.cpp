@@ -13,6 +13,7 @@
 #include <fmt/core.h>
 #include <fmt/color.h>
 #include <exception>
+#include <set>
 #include "../nodes/ObjectType.h"
 
 std::unordered_map<TokType, OpType> TOKEN_TO_OP = {{TokType::PLUS,  OpType::ADD},
@@ -856,7 +857,8 @@ ClassNode* Parser::parse_class_definition() {
     this->expect_token(TokType::LCURLY);
     std::unordered_map<std::string, Method> methods;
     std::unordered_map<std::string, FunctionNode*> static_methods;
-    MapStringType members;
+    std::vector<std::pair<std::string, TypeNode*>> members;
+    std::set<std::string> member_names;
     std::map<std::string, std::pair<TypeNode*, Node*>> static_members;
     VectorOfStrings members_ordered;
     while (true) {
@@ -870,17 +872,15 @@ ClassNode* Parser::parse_class_definition() {
             this->expect_token(TokType::COLON);
             TypeNode* member_type = this->parse_type_node();
             std::string& member_name = member_name_tk.str;
-            if (members.find(member_name) != members.end() || methods.find(member_name) != methods.end()) {
+            if (member_names.find(member_name) != member_names.end() || methods.find(member_name) != methods.end()) {
                 this->error_class_member_redefined(class_name, member_name, member_name_tk.start);
-
             }
             if (is_static) {
                 this->expect_token(TokType::EQQ);
                 Node* init_expression = this->parse_expression();
                 static_members[member_name] = std::make_pair(member_type, init_expression);
             } else {
-                members[member_name] = member_type;
-                members_ordered.push_back(member_name);
+                members.push_back({member_name, member_type});
             }
             this->expect_token(TokType::SEMICOLON);
         } else if (this->match(TokType::WHERE)) {
@@ -902,7 +902,7 @@ ClassNode* Parser::parse_class_definition() {
 
             FunctionNode* method_node = this->parse_function_definition();
             std::string& method_name = method_node->identifier;
-            if (members.find(method_name) != members.end() || methods.find(method_name) != methods.end()) {
+            if (member_names.find(method_name) != member_names.end() || methods.find(method_name) != methods.end()) {
                 this->error_class_member_redefined(class_name, method_name, method_node->start);
             }
             if (is_static) {
@@ -914,7 +914,7 @@ ClassNode* Parser::parse_class_definition() {
         } else if (this->match(TokType::FUN)) {
             FunctionNode* method_node = this->parse_function_definition();
             std::string& method_name = method_node->identifier;
-            if (members.find(method_name) != members.end() || methods.find(method_name) != methods.end()) {
+            if (member_names.find(method_name) != member_names.end() || methods.find(method_name) != methods.end()) {
                 this->error_class_member_redefined(class_name, method_name, method_node->start);
             }
             if (is_static) {

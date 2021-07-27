@@ -4,7 +4,7 @@
 
 #include "ClassNode.h"
 
-ClassNode::ClassNode(const std::string& className, VectorOfStrings type_parameters, MapStringType members,
+ClassNode::ClassNode(const std::string& className, VectorOfStrings type_parameters, std::vector<std::pair<std::string,TypeNode*>> members,
                      std::unordered_map<std::string, Method> functions,
                      std::map<std::string, std::pair<TypeNode*, Node*>> static_members,
                      std::unordered_map<std::string, FunctionNode*> static_methods, TextPosition start,
