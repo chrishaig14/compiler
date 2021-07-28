@@ -275,7 +275,7 @@ TEST_CASE("class_with_method", "[parser]") {
                                         {},
                                         {{ID_2, TYPE_2.node->clone()},
                                          {ID_1, TYPE_1.node->clone()}},
-                                        {{((FunctionNode*) FUNCTION.node)->identifier+"a", Method{nullptr,
+                                        {{((FunctionNode*) FUNCTION.node)->identifier, Method{nullptr,
                                                                                               (FunctionNode*) FUNCTION.node}}},
                                         {},
                                         {},
