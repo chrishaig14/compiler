@@ -302,3 +302,29 @@ TEST_CASE("class_with_static_method", "[parser]") {
                                         DUMMY_POS,
                                         DUMMY_POS).to_json());
 }
+
+TEST_CASE("return_nothing", "[parser]") {
+    Scanner scanner;
+    std::string code = "return;";
+    scanner.load_text(code);
+    std::vector<Token> tokens = scanner.scan_all();
+    Parser parser("test", scanner.code_lines, tokens);
+    parser.top_package_name = "main";
+
+    ReturnNode* ast = parser.parse_return();
+
+    REQUIRE(ast->to_json() == ReturnNode(nullptr, DUMMY_POS, DUMMY_POS).to_json());
+}
+
+TEST_CASE("return_expression", "[parser]") {
+    Scanner scanner;
+    std::string code = "return " + EXPRESSION.text;
+    scanner.load_text(code);
+    std::vector<Token> tokens = scanner.scan_all();
+    Parser parser("test", scanner.code_lines, tokens);
+    parser.top_package_name = "main";
+
+    ReturnNode* ast = parser.parse_return();
+
+    REQUIRE(ast->to_json() == ReturnNode(EXPRESSION.node, DUMMY_POS, DUMMY_POS).to_json());
+}
