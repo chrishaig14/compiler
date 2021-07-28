@@ -617,3 +617,45 @@ TEST_CASE("tuple", "[parser]") {
 
     REQUIRE(ast->to_json() == TupleNode({EXPRESSION_1.node, EXPRESSION_2.node}, DUMMY_POS, DUMMY_POS).to_json());
 }
+
+TEST_CASE("dict_empty", "[parser]") {
+    Scanner scanner;
+    std::string code = "{}::[" + TYPE_1.text + "," + TYPE_2.text + "]";
+    scanner.load_text(code);
+    std::vector<Token> tokens = scanner.scan_all();
+    Parser parser("test", scanner.code_lines, tokens);
+    parser.top_package_name = "main";
+
+    Node* ast = parser.parse_dictionary();
+
+    REQUIRE(ast->to_json() ==
+            EmptyDictNode(TYPE_1.node->clone(), TYPE_2.node->clone(), DUMMY_POS, DUMMY_POS).to_json());
+}
+
+TEST_CASE("dict_one_element", "[parser]") {
+    Scanner scanner;
+    std::string code = "{" + EXPRESSION_1.text + ":" + EXPRESSION_2.text + "}";
+    scanner.load_text(code);
+    std::vector<Token> tokens = scanner.scan_all();
+    Parser parser("test", scanner.code_lines, tokens);
+    parser.top_package_name = "main";
+
+    Node* ast = parser.parse_dictionary();
+
+    REQUIRE(ast->to_json() == DictNode({{EXPRESSION_1.node, EXPRESSION_2.node}}, DUMMY_POS, DUMMY_POS).to_json());
+}
+
+TEST_CASE("dict_mult_elements", "[parser]") {
+    Scanner scanner;
+    std::string code =
+            "{" + EXPRESSION_1.text + ":" + EXPRESSION_2.text + "," + EXPRESSION.text + ":" + EXPRESSION_1.text + "}";
+    scanner.load_text(code);
+    std::vector<Token> tokens = scanner.scan_all();
+    Parser parser("test", scanner.code_lines, tokens);
+    parser.top_package_name = "main";
+
+    Node* ast = parser.parse_dictionary();
+
+    REQUIRE(ast->to_json() == DictNode({{EXPRESSION_1.node, EXPRESSION_2.node},
+                                        {EXPRESSION.node,   EXPRESSION_1.node}}, DUMMY_POS, DUMMY_POS).to_json());
+}
