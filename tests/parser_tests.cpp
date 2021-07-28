@@ -3,6 +3,7 @@
 #include "catch.hpp"
 #include "../src/scanner/Scanner.h"
 #include "../src/parser/Parser.h"
+#include "../src/nodes/UnaryOpNode.h"
 
 const TextPosition DUMMY_POS = {0, 0};
 
@@ -477,4 +478,129 @@ TEST_CASE("false", "[parser]") {
     Node* ast = parser.parse_id_or_literal();
 
     REQUIRE(ast->to_json() == BooleanNode(false, DUMMY_POS, DUMMY_POS).to_json());
+}
+
+TEST_CASE("and_exp", "[parser]") {
+    Scanner scanner;
+    std::string code = EXPRESSION_1.text + " and " + EXPRESSION_2.text;
+    scanner.load_text(code);
+    std::vector<Token> tokens = scanner.scan_all();
+    Parser parser("test", scanner.code_lines, tokens);
+    parser.top_package_name = "main";
+
+    Node* ast = parser.parse_and_expression();
+
+    REQUIRE(ast->to_json() ==
+            BoolOpNode(BoolOp::AND, EXPRESSION_1.node, EXPRESSION_2.node, DUMMY_POS, DUMMY_POS).to_json());
+}
+
+TEST_CASE("or_exp", "[parser]") {
+    Scanner scanner;
+    std::string code = EXPRESSION_1.text + " or " + EXPRESSION_2.text;
+    scanner.load_text(code);
+    std::vector<Token> tokens = scanner.scan_all();
+    Parser parser("test", scanner.code_lines, tokens);
+    parser.top_package_name = "main";
+
+    Node* ast = parser.parse_or_expression();
+
+    REQUIRE(ast->to_json() ==
+            BoolOpNode(BoolOp::OR, EXPRESSION_1.node, EXPRESSION_2.node, DUMMY_POS, DUMMY_POS).to_json());
+}
+
+TEST_CASE("eq_exp", "[parser]") {
+    Scanner scanner;
+    std::string code = EXPRESSION_1.text + " == " + EXPRESSION_2.text;
+    scanner.load_text(code);
+    std::vector<Token> tokens = scanner.scan_all();
+    Parser parser("test", scanner.code_lines, tokens);
+    parser.top_package_name = "main";
+
+    Node* ast = parser.parse_and_expression();
+
+    REQUIRE(ast->to_json() ==
+            BoolOpNode(BoolOp::EQ, EXPRESSION_1.node, EXPRESSION_2.node, DUMMY_POS, DUMMY_POS).to_json());
+}
+
+TEST_CASE("ge_exp", "[parser]") {
+    Scanner scanner;
+    std::string code = EXPRESSION_1.text + " >= " + EXPRESSION_2.text;
+    scanner.load_text(code);
+    std::vector<Token> tokens = scanner.scan_all();
+    Parser parser("test", scanner.code_lines, tokens);
+    parser.top_package_name = "main";
+
+    Node* ast = parser.parse_and_expression();
+
+    REQUIRE(ast->to_json() ==
+            BoolOpNode(BoolOp::GE, EXPRESSION_1.node, EXPRESSION_2.node, DUMMY_POS, DUMMY_POS).to_json());
+}
+
+TEST_CASE("le_exp", "[parser]") {
+    Scanner scanner;
+    std::string code = EXPRESSION_1.text + " <= " + EXPRESSION_2.text;
+    scanner.load_text(code);
+    std::vector<Token> tokens = scanner.scan_all();
+    Parser parser("test", scanner.code_lines, tokens);
+    parser.top_package_name = "main";
+
+    Node* ast = parser.parse_and_expression();
+
+    REQUIRE(ast->to_json() ==
+            BoolOpNode(BoolOp::LE, EXPRESSION_1.node, EXPRESSION_2.node, DUMMY_POS, DUMMY_POS).to_json());
+}
+
+TEST_CASE("gt_exp", "[parser]") {
+    Scanner scanner;
+    std::string code = EXPRESSION_1.text + " > " + EXPRESSION_2.text;
+    scanner.load_text(code);
+    std::vector<Token> tokens = scanner.scan_all();
+    Parser parser("test", scanner.code_lines, tokens);
+    parser.top_package_name = "main";
+
+    Node* ast = parser.parse_and_expression();
+
+    REQUIRE(ast->to_json() ==
+            BoolOpNode(BoolOp::GT, EXPRESSION_1.node, EXPRESSION_2.node, DUMMY_POS, DUMMY_POS).to_json());
+}
+
+TEST_CASE("lt_exp", "[parser]") {
+    Scanner scanner;
+    std::string code = EXPRESSION_1.text + " < " + EXPRESSION_2.text;
+    scanner.load_text(code);
+    std::vector<Token> tokens = scanner.scan_all();
+    Parser parser("test", scanner.code_lines, tokens);
+    parser.top_package_name = "main";
+
+    Node* ast = parser.parse_and_expression();
+
+    REQUIRE(ast->to_json() ==
+            BoolOpNode(BoolOp::LT, EXPRESSION_1.node, EXPRESSION_2.node, DUMMY_POS, DUMMY_POS).to_json());
+}
+
+TEST_CASE("ne_exp", "[parser]") {
+    Scanner scanner;
+    std::string code = EXPRESSION_1.text + " != " + EXPRESSION_2.text;
+    scanner.load_text(code);
+    std::vector<Token> tokens = scanner.scan_all();
+    Parser parser("test", scanner.code_lines, tokens);
+    parser.top_package_name = "main";
+
+    Node* ast = parser.parse_and_expression();
+
+    REQUIRE(ast->to_json() ==
+            BoolOpNode(BoolOp::NE, EXPRESSION_1.node, EXPRESSION_2.node, DUMMY_POS, DUMMY_POS).to_json());
+}
+
+TEST_CASE("not_exp", "[parser]") {
+    Scanner scanner;
+    std::string code = "not " + EXPRESSION.text;
+    scanner.load_text(code);
+    std::vector<Token> tokens = scanner.scan_all();
+    Parser parser("test", scanner.code_lines, tokens);
+    parser.top_package_name = "main";
+
+    Node* ast = parser.parse_and_expression();
+
+    REQUIRE(ast->to_json() == UnaryOpNode(UnaryOp::NOT, EXPRESSION.node, DUMMY_POS, DUMMY_POS).to_json());
 }
