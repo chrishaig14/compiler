@@ -37,6 +37,8 @@ const TestNode EXPRESSION_2{EXP_ID_2.text + "*" + EXP_ID_1.text,
 
 const TestNode DECLARATION{"var " + ID + " = " + EXPRESSION.text,
                            new DeclarationNode(ID, nullptr, EXPRESSION.node, DUMMY_POS, DUMMY_POS, DUMMY_POS)};
+const TestNode ASSIGNMENT{EXP_ID_1.text + " = " + EXPRESSION_1.text,
+                          new AssignmentNode(EXP_ID_1.node, EXPRESSION_1.node, DUMMY_POS, DUMMY_POS)};
 
 const TestNode EMPTY_BLOCK{"{}", new BlockNode({}, DUMMY_POS, DUMMY_POS)};
 
@@ -56,6 +58,19 @@ const TestNode FUNCTION{
                                      DUMMY_POS)};
 
 const ObjectType NO_TYPE(".None");
+
+TEST_CASE("assignment", "[parser]") {
+    Scanner scanner;
+    std::string code = ASSIGNMENT.text;
+    scanner.load_text(code);
+    std::vector<Token> tokens = scanner.scan_all();
+    Parser parser("test", scanner.code_lines, tokens);
+    parser.top_package_name = "main";
+
+    Node* ast = parser.parse_assignment_or_expression();
+
+    REQUIRE(ast->to_json() == ASSIGNMENT.node->to_json());
+}
 
 TEST_CASE("decl_simple", "[parser]") {
     Scanner scanner;
