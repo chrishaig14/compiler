@@ -698,3 +698,44 @@ TEST_CASE("subscript", "[parser]") {
 
     REQUIRE(ast->to_json() == SubscriptNode(EXPRESSION.node, {EXPRESSION_2.node}, DUMMY_POS, DUMMY_POS).to_json());
 }
+
+TEST_CASE("partial_one_arg", "[parser]") {
+    Scanner scanner;
+    std::string code = "$" + FACTOR_EXPRESSION.text + "(" + EXPRESSION_1.text + ")";
+    scanner.load_text(code);
+    std::vector<Token> tokens = scanner.scan_all();
+    Parser parser("test", scanner.code_lines, tokens);
+    parser.top_package_name = "main";
+
+    Node* ast = parser.parse_partial_application();
+    REQUIRE(ast->to_json() ==
+            PartialApplication(FACTOR_EXPRESSION.node, {EXPRESSION_1.node}, DUMMY_POS, DUMMY_POS).to_json());
+}
+
+TEST_CASE("partial_mult_arg_one", "[parser]") {
+    Scanner scanner;
+    std::string code = "$" + FACTOR_EXPRESSION.text + "(" + EXPRESSION_1.text + ",*)";
+    scanner.load_text(code);
+    std::vector<Token> tokens = scanner.scan_all();
+    Parser parser("test", scanner.code_lines, tokens);
+    parser.top_package_name = "main";
+
+    Node* ast = parser.parse_partial_application();
+    REQUIRE(ast->to_json() ==
+            PartialApplication(FACTOR_EXPRESSION.node, {EXPRESSION_1.node, nullptr}, DUMMY_POS, DUMMY_POS).to_json());
+}
+
+TEST_CASE("partial_mult_arg_two", "[parser]") {
+    Scanner scanner;
+    std::string code = "$" + FACTOR_EXPRESSION.text + "(" + EXPRESSION_1.text + "," + EXPRESSION_2.text + ")";
+    scanner.load_text(code);
+    std::vector<Token> tokens = scanner.scan_all();
+    Parser parser("test", scanner.code_lines, tokens);
+    parser.top_package_name = "main";
+
+    Node* ast = parser.parse_partial_application();
+    REQUIRE(ast->to_json() == PartialApplication(FACTOR_EXPRESSION.node,
+                                                 {EXPRESSION_1.node, EXPRESSION_2.node},
+                                                 DUMMY_POS,
+                                                 DUMMY_POS).to_json());
+}
