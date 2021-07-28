@@ -22,9 +22,9 @@ bool ListNode::equal(const Node& other) const {
 }
 
 ListNode::~ListNode() {
-    for (auto* e: this->elements) {
-        delete e;
-    }
+    // for (auto* e: this->elements) {
+    //     delete e;
+    // }
 }
 
 nlohmann::json ListNode::to_json() {
