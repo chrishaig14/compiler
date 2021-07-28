@@ -13,12 +13,12 @@ bool ReturnNode::equal(const Node& x) const {
 }
 
 ReturnNode::~ReturnNode() {
-    for (auto r: this->reachables) {
-        delete r.second;
-    }
-    if (this->expression != nullptr) {
-        delete this->expression;
-    }
+    // for (auto r: this->reachables) {
+    //     delete r.second;
+    // }
+    // if (this->expression != nullptr) {
+    //     delete this->expression;
+    // }
 }
 
 nlohmann::json ReturnNode::to_json() {
