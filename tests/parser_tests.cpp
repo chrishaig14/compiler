@@ -282,3 +282,23 @@ TEST_CASE("class_with_method", "[parser]") {
                                         DUMMY_POS,
                                         DUMMY_POS).to_json());
 }
+
+TEST_CASE("class_with_static_method", "[parser]") {
+    Scanner scanner;
+    std::string code = "class " + ID + "{ static " + FUNCTION.text + "}";
+    scanner.load_text(code);
+    std::vector<Token> tokens = scanner.scan_all();
+    Parser parser("test", scanner.code_lines, tokens);
+    parser.top_package_name = "main";
+
+    ClassNode* ast = parser.parse_class_definition();
+
+    REQUIRE(ast->to_json() == ClassNode(ID,
+                                        {},
+                                        {},
+                                        {},
+                                        {},
+                                        {{((FunctionNode*) FUNCTION.node)->identifier, (FunctionNode*) FUNCTION.node}},
+                                        DUMMY_POS,
+                                        DUMMY_POS).to_json());
+}
