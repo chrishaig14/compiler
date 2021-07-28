@@ -15,8 +15,8 @@ bool BoolOpNode::equal(const Node& x) const {
 }
 
 BoolOpNode::~BoolOpNode() {
-    delete this->left;
-    delete this->right;
+    // delete this->left;
+    // delete this->right;
 }
 
 nlohmann::json BoolOpNode::to_json() {

@@ -14,8 +14,8 @@ bool AssignmentNode::equal(const Node& x) const {
 }
 
 AssignmentNode::~AssignmentNode() {
-    delete this->lvalue;
-    delete this->rvalue;
+    // delete this->lvalue;
+    // delete this->rvalue;
 }
 
 nlohmann::json AssignmentNode::to_json() {

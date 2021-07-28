@@ -16,8 +16,8 @@ bool BinopNode::equal(const Node& x) const {
 }
 
 BinopNode::~BinopNode() {
-    delete this->left;
-    delete this->right;
+    // delete this->left;
+    // delete this->right;
 }
 
 nlohmann::json BinopNode::to_json() {

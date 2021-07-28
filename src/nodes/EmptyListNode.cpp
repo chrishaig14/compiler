@@ -15,7 +15,7 @@ bool EmptyListNode::equal(const Node& other) const {
 }
 
 EmptyListNode::~EmptyListNode() {
-    delete this->type;
+    // delete this->type;
 }
 
 nlohmann::json EmptyListNode::to_json() {
