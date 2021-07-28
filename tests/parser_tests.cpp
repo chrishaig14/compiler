@@ -46,6 +46,7 @@ const TestNode IF{"if(" + EXPRESSION.text + ")" + EMPTY_BLOCK.text,
                   new IfNode(EXPRESSION.node, (BlockNode*) EMPTY_BLOCK.node, {}, nullptr, DUMMY_POS, DUMMY_POS)};
 const TestNode BLOCK{"{" + DECLARATION.text + ";" + IF.text + "}",
                      new BlockNode({DECLARATION.node, IF.node}, DUMMY_POS, DUMMY_POS)};
+const TestNode BLOCK_1{"{" + ASSIGNMENT.text + ";}", new BlockNode({ASSIGNMENT.node}, DUMMY_POS, DUMMY_POS)};
 
 const TestNode FUNCTION{
         "fun " + ID + "(" + ID_1 + ":" + TYPE_1.text + "," + ID_2 + ":" + TYPE_2.text + ")->" + TYPE_3.text +
@@ -110,6 +111,23 @@ TEST_CASE("if", "[parser]") {
 
     IfNode* ast = parser.parse_if();
     REQUIRE(ast->to_json() == IF.node->to_json());
+}
+
+TEST_CASE("if_with_else", "[parser]") {
+    Scanner scanner;
+    std::string code = "if " + EXPRESSION.text + BLOCK.text + "else " + BLOCK_1.text;
+    scanner.load_text(code);
+    std::vector<Token> tokens = scanner.scan_all();
+    Parser parser("test", scanner.code_lines, tokens);
+    parser.top_package_name = "main";
+
+    IfNode* ast = parser.parse_if();
+    REQUIRE(ast->to_json() == IfNode(EXPRESSION.node,
+                                     (BlockNode*) BLOCK.node,
+                                     {},
+                                     (BlockNode*) BLOCK_1.node,
+                                     DUMMY_POS,
+                                     DUMMY_POS).to_json());
 }
 
 TEST_CASE("call_no_args", "[parser]") {
