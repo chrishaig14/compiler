@@ -20,10 +20,10 @@ bool DeclarationNode::equal(const Node& x) const {
 
 DeclarationNode::~DeclarationNode() {
 
-    delete this->type;
+    // delete this->type;
 
 
-    delete this->expression;
+    // delete this->expression;
 
 }
 

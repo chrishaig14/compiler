@@ -12,7 +12,7 @@ MemberNode::MemberNode(Node* parent, Token child_token) : Node(NodeType::MEMBER,
 }
 
 MemberNode::~MemberNode() {
-    delete this->parent;
+    // delete this->parent;
 }
 
 bool MemberNode::equal(const Node& x) const {
