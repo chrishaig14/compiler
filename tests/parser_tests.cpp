@@ -367,3 +367,81 @@ TEST_CASE("list_mult_elements", "[parser]") {
 
     REQUIRE(ast->to_json() == ListNode({EXPRESSION_1.node, EXPRESSION_2.node}, DUMMY_POS, DUMMY_POS).to_json());
 }
+
+TEST_CASE("number_integer", "[parser]") {
+    Scanner scanner;
+    std::string code = "89";
+    scanner.load_text(code);
+    std::vector<Token> tokens = scanner.scan_all();
+    Parser parser("test", scanner.code_lines, tokens);
+    parser.top_package_name = "main";
+
+    Node* ast = parser.parse_id_or_literal();
+
+    REQUIRE(ast->to_json() == NumberNode(NumberType::INTEGER, "89", DUMMY_POS, DUMMY_POS).to_json());
+}
+
+TEST_CASE("number_float", "[parser]") {
+    Scanner scanner;
+    std::string code = "3.14";
+    scanner.load_text(code);
+    std::vector<Token> tokens = scanner.scan_all();
+    Parser parser("test", scanner.code_lines, tokens);
+    parser.top_package_name = "main";
+
+    Node* ast = parser.parse_id_or_literal();
+
+    REQUIRE(ast->to_json() == NumberNode(NumberType::FLOAT, "3.14", DUMMY_POS, DUMMY_POS).to_json());
+}
+
+TEST_CASE("empty_string", "[parser]") {
+    Scanner scanner;
+    std::string code = "\"\"";
+    scanner.load_text(code);
+    std::vector<Token> tokens = scanner.scan_all();
+    Parser parser("test", scanner.code_lines, tokens);
+    parser.top_package_name = "main";
+
+    Node* ast = parser.parse_id_or_literal();
+
+    REQUIRE(ast->to_json() == StringNode("", DUMMY_POS, DUMMY_POS).to_json());
+}
+
+TEST_CASE("string", "[parser]") {
+    Scanner scanner;
+    std::string code = "\"hello, world\"";
+    scanner.load_text(code);
+    std::vector<Token> tokens = scanner.scan_all();
+    Parser parser("test", scanner.code_lines, tokens);
+    parser.top_package_name = "main";
+
+    Node* ast = parser.parse_id_or_literal();
+
+    REQUIRE(ast->to_json() == StringNode("hello, world", DUMMY_POS, DUMMY_POS).to_json());
+}
+
+TEST_CASE("true", "[parser]") {
+    Scanner scanner;
+    std::string code = "true";
+    scanner.load_text(code);
+    std::vector<Token> tokens = scanner.scan_all();
+    Parser parser("test", scanner.code_lines, tokens);
+    parser.top_package_name = "main";
+
+    Node* ast = parser.parse_id_or_literal();
+
+    REQUIRE(ast->to_json() == BooleanNode(true, DUMMY_POS, DUMMY_POS).to_json());
+}
+
+TEST_CASE("false", "[parser]") {
+    Scanner scanner;
+    std::string code = "false";
+    scanner.load_text(code);
+    std::vector<Token> tokens = scanner.scan_all();
+    Parser parser("test", scanner.code_lines, tokens);
+    parser.top_package_name = "main";
+
+    Node* ast = parser.parse_id_or_literal();
+
+    REQUIRE(ast->to_json() == BooleanNode(false, DUMMY_POS, DUMMY_POS).to_json());
+}
