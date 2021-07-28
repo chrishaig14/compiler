@@ -672,3 +672,16 @@ TEST_CASE("dict_mult_elements", "[parser]") {
     REQUIRE(ast->to_json() == DictNode({{EXPRESSION_1.node, EXPRESSION_2.node},
                                         {EXPRESSION.node,   EXPRESSION_1.node}}, DUMMY_POS, DUMMY_POS).to_json());
 }
+
+TEST_CASE("member", "[parser]") {
+    Scanner scanner;
+    std::string code = EXPRESSION.text + "." + ID;
+    scanner.load_text(code);
+    std::vector<Token> tokens = scanner.scan_all();
+    Parser parser("test", scanner.code_lines, tokens);
+    parser.top_package_name = "main";
+
+    Node* ast = parser.parse_factor();
+
+    REQUIRE(ast->to_json() == MemberNode(EXPRESSION.node, Token(TokType::ID, ID, DUMMY_POS, DUMMY_POS)).to_json());
+}
