@@ -991,28 +991,3 @@ Node* Parser::parse_match_statement() {
     Token lcurly = this->expect_token(TokType::RCURLY);
     return new MatchExpressionNode(exp, ids, cases, mtk.start, lcurly.end_pos);
 }
-
-
-// ThrowNode* Parser::parse_throw() {
-//     Token throw_tok = this->expect_token(TokType::THROW);
-//     Node* exp = this->parse_expression();
-//     return new ThrowNode(exp, throw_tok.start, exp->end);
-// }
-
-// TryCatchNode* Parser::parse_try_catch() {
-//     Token try_tok = this->expect_token(TokType::TRY);
-//     BlockNode* body = parse_possibly_empty_block();
-//     std::vector<std::pair<std::string, ObjectType*>> catches;
-//     VectorOfNodes catches_bodies;
-//     while (this->match(TokType::CATCH)) {
-//         Token catch_tok = this->expect_token(TokType::CATCH);
-//         Token id = this->expect_token(TokType::ID);
-//         this->expect_token(TokType::COLON);
-//         ObjectType* ot = this->parse_object_type();
-//         BlockNode* catch_body = parse_possibly_empty_block();
-//         catches.push_back(std::make_pair(id.str, ot));
-//         catches_bodies.push_back(catch_body);
-//     }
-//     return new TryCatchNode(body, catches, catches_bodies, try_tok.start, catches_bodies.back()->end);
-// }
-
