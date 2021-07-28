@@ -1,13 +1,14 @@
-class Foo[t] {
+typeclass Stringable t {
+    fun str()->String
+}
+
+data Foo[t] {
     v: t
-    fun zoo(){
-        var x: String = this.v.asd()
-    }
-    where t.str: fun() -> String
-    fun str(a:Integer)->String{
-        var l : String = this.v.str()
-        var x = l.len()
-        return "Hello"
+}
+
+instance Stringable[Foo[t]] where Stringable[t] {
+    fun str()->String {
+        return "Foo("+this.v.str()+")"
     }
 }
 
