@@ -364,8 +364,8 @@ TEST_CASE("class_full", "[class]") {
     FunctionNode* method2 = new FunctionNode("method2", {}, {}, rt, b, DUMMY_POS, DUMMY_POS);
     std::unordered_map<std::string, Method> cmethods = {{"method1", {nullptr, method1}},
                                                         {"method2", {nullptr, method2}}};
-    MapStringType cmembers = {{"foo", t1},
-                              {"bar", t2}};
+    std::vector<std::pair<std::string, TypeNode*>> cmembers = {{"foo", t1},
+                                                    {"bar", t2}};
 
 
     nlohmann::json members = {{{"id", "foo"}, {"type", t1->to_json()}},

@@ -68,8 +68,8 @@ USemanticInfo Checker::visit_class(ClassNode& node) {
 
     VectorOfTypes members_ordered_types;
 
-    for (const auto& mt: node.members_ordered) {
-        TypeNode& t = *node.members[mt];
+    for (const auto& mt: node.members) {
+        TypeNode& t = *mt.second;
         members_ordered_types.push_back(&t);
         this->assert_type_exists(t, node.start);
     }

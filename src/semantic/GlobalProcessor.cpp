@@ -173,16 +173,15 @@ void GlobalProcessor::visit_class(ClassNode& node) {
     //                              this->imported_paths[node.class_name].as_str());
     // }
     class_info->type_params = node.type_parameters;
-    for (const auto& mn: node.members_ordered) {
-        auto* mt = node.members[mn];
-        this->module->fill_actual(mt);
+    for (const auto& mt: node.members) {
+        this->module->fill_actual(mt.second);
         // if (!mt->object().is_generic()) {
         //     mt->object().actual_base_path = this->get_actual_path(mt->object().id);
         // }
-        class_info->member_names.push_back(mn);
-        class_info->member_types.push_back(mt);
-        class_info->members[mn] = mt;
-        class_info->member_entities[mn] = Entity(E_TYPE::NOTHING);
+        class_info->member_names.push_back(mt.first);
+        class_info->member_types.push_back(mt.second);
+        class_info->members[mt.first] = mt.second;
+        class_info->member_entities[mt.first] = Entity(E_TYPE::NOTHING);
     }
     for (const auto& mn: node.static_members) {
         class_info->static_members[mn.first] = std::make_pair(mn.second.first->clone(), mn.second.second);
