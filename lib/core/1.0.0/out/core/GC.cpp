@@ -104,7 +104,7 @@ void GC::out_of_scope(TaggedObject* old_value_t, std::string c) {
                 }
 
                 // std::cout << "finished for object " << c << std::endl;
-                std::cout << std::endl;
+                // std::cout << std::endl;
             }
         }
     }
