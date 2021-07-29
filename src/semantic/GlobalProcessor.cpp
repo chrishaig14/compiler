@@ -21,9 +21,11 @@ void GlobalProcessor::visit_import(ImportNode& node) {
         this->module->imported_paths_with_alias_v.emplace_back(node.alias, node_path);
     } else {
         if (this->module->imported_paths_with_alias.count(node.path.back()) != 0) {
+            std::cout << this->module->abs_path << std::endl;
             throw std::runtime_error("Path " + node_path.as_str() + " already imported!");
         }
         if (this->module->imported_paths_no_alias.count(node.path.back()) != 0) {
+            std::cout << this->module->abs_path << std::endl;
             throw std::runtime_error("Path " + node_path.as_str() + " already imported!");
         }
         this->module->imported_paths_no_alias[node.path.back()] = node_path;
@@ -37,9 +39,11 @@ void GlobalProcessor::add_default_imports() {
                                        Path("core.core.Option"), Path("core.core.print")};
     for (auto path: default_paths) {
         if (this->module->imported_paths_with_alias.count(path.as_vec().back()) != 0) {
+            std::cout << this->module->abs_path << std::endl;
             throw std::runtime_error("Path " + path.as_str() + " already imported!");
         }
         if (this->module->imported_paths_no_alias.count(path.as_vec().back()) != 0) {
+            std::cout << this->module->abs_path << std::endl;
             throw std::runtime_error("Path " + path.as_str() + " already imported!");
         }
         this->module->imported_paths_no_alias[path.as_vec().back()] = path;
