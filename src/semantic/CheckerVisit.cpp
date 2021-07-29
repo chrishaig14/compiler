@@ -6,7 +6,8 @@
 
 
 SNode* Checker::make_for_snode(ForNode& node, USemanticInfo& binfo, USemanticInfo& exp_info_p,
-                               std::string loop_list_var_id, std::string loop_index_var_id) {
+                               std::string loop_list_var_id, std::string loop_index_var_id,
+                               std::string loop_list_len_var_id) {
     auto* bbn = new BlockSNode();
 
     auto* dsn = new DeclarationSNode(loop_list_var_id, exp_info_p->snode);
@@ -19,14 +20,14 @@ SNode* Checker::make_for_snode(ForNode& node, USemanticInfo& binfo, USemanticInf
     auto* list_len_fn = new IdSNode("core.core.List.len");
     auto* list_sn = new IdSNode(loop_list_var_id);
     auto* call_list_len_sn = new CallSNode(list_len_fn, {list_sn});
-    auto* lensn = new DeclarationSNode(this->loop_list_len_var_id, call_list_len_sn);
+    auto* lensn = new DeclarationSNode(loop_list_len_var_id, call_list_len_sn);
     bbn->nodes.push_back(lensn);
 
 
     auto* idxsn = new IdSNode(loop_index_var_id);
     auto* cmpfunsn = new IdSNode("core.core.Integer.__lt__");
 
-    auto* llensn = new IdSNode(this->loop_list_len_var_id);
+    auto* llensn = new IdSNode(loop_list_len_var_id);
 
 
     auto* cn = new CallSNode(cmpfunsn, {idxsn, llensn});

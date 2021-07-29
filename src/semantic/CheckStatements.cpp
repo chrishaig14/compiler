@@ -291,7 +291,7 @@ USemanticInfo Checker::visit_for(ForNode& node) {
     std::string loop_c = std::to_string(this->loop_count++);
     std::string loop_list_var_id = "__loop_list__" + loop_c;
     std::string loop_index_var_id = "__loop_index__" + loop_c;
-    this->loop_list_len_var_id = "__loop_list_len__" + loop_c;
+    std::string loop_list_len_var_id = "__loop_list_len__" + loop_c;
 
     auto* increment_index_sn = new AssignmentSNode(nullptr, nullptr);
     this->update_loop_index_snode = increment_index_sn;
@@ -314,7 +314,7 @@ USemanticInfo Checker::visit_for(ForNode& node) {
     this->leave_scope();
 
     SemanticInfo rinfo;
-    rinfo.snode = make_for_snode(node, binfo, exp_info_p, loop_list_var_id, loop_index_var_id);
+    rinfo.snode = make_for_snode(node, binfo, exp_info_p, loop_list_var_id, loop_index_var_id, loop_list_len_var_id);
     BlockSNode* pn = (BlockSNode*) rinfo.snode;
     pn->locals.push_back(loop_list_var_id);
     this->update_loop_index_snode = nullptr;
