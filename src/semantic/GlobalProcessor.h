@@ -16,7 +16,6 @@
 class GlobalProcessor {
 public:
     std::string __file__;
-    std::string module_name;
     Module* module;
 
     GlobalProcessor();
