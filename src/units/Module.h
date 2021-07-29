@@ -22,7 +22,6 @@ public:
     BlockSNode* sast;
 
     std::map<std::string, std::string> included_module_paths;
-    std::string rel_path;
     bool is_lib;
     std::map<std::string, Path> imported_paths_no_alias;
     std::map<std::string, Path> imported_paths_with_alias;
