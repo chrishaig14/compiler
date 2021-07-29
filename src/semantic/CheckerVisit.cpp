@@ -5,9 +5,9 @@
 #include "Checker.h"
 
 
-SNode*
-Checker::make_for_snode(ForNode& node, USemanticInfo& binfo, USemanticInfo& exp_info_p, std::string loop_list_var_id,
-                        std::string loop_index_var_id, std::string loop_list_len_var_id) {
+SNode* make_for_snode(ForNode& node, USemanticInfo& binfo, USemanticInfo& exp_info_p, std::string loop_list_var_id,
+                        std::string loop_index_var_id, std::string loop_list_len_var_id,
+                        SNode* update_loop_index_snode) {
     auto* bbn = new BlockSNode();
 
     auto* dsn = new DeclarationSNode(loop_list_var_id, exp_info_p->snode);
@@ -41,7 +41,7 @@ Checker::make_for_snode(ForNode& node, USemanticInfo& binfo, USemanticInfo& exp_
     auto* loop_elem_sn = new DeclarationSNode(node.var, list_subscript_n);
     bn->nodes.insert(bn->nodes.begin(), loop_elem_sn);
 
-    bn->nodes.push_back(this->update_loop_index_snode);
+    bn->nodes.push_back(update_loop_index_snode);
     auto* wsn = new WhileSNode(cn, bn);
     bbn->nodes.push_back(wsn);
     return bbn;

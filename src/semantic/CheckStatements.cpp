@@ -314,7 +314,13 @@ USemanticInfo Checker::visit_for(ForNode& node) {
     this->leave_scope();
 
     SemanticInfo rinfo;
-    rinfo.snode = make_for_snode(node, binfo, exp_info_p, loop_list_var_id, loop_index_var_id, loop_list_len_var_id);
+    rinfo.snode = make_for_snode(node,
+                                 binfo,
+                                 exp_info_p,
+                                 loop_list_var_id,
+                                 loop_index_var_id,
+                                 loop_list_len_var_id,
+                                 nullptr);
     BlockSNode* pn = (BlockSNode*) rinfo.snode;
     pn->locals.push_back(loop_list_var_id);
     this->update_loop_index_snode = nullptr;
