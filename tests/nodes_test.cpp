@@ -1,12 +1,10 @@
-#define CATCH_CONFIG_MAIN
-
 #include "catch.hpp"
 #include "../src/nodes/nodes.h"
 #include "../src/nodes/ObjectType.h"
 
 const TextPosition DUMMY_POS = {0, 0};
 
-TEST_CASE("number_integer", "[number]") {
+TEST_CASE("nodes_number_integer", "[number]") {
     NumberNode n(NumberType::INTEGER, "7", DUMMY_POS, DUMMY_POS);
     nlohmann::json nj = n.to_json();
     nlohmann::json e = {{"type",   "number"},
@@ -14,7 +12,7 @@ TEST_CASE("number_integer", "[number]") {
     REQUIRE(e == nj);
 }
 
-TEST_CASE("number_float", "[number]") {
+TEST_CASE("nodes_number_float", "[number]") {
     NumberNode n(NumberType::FLOAT, "7.98", DUMMY_POS, DUMMY_POS);
     nlohmann::json nj = n.to_json();
     nlohmann::json e = {{"type",   "number"},
@@ -22,7 +20,7 @@ TEST_CASE("number_float", "[number]") {
     REQUIRE(e == nj);
 }
 
-TEST_CASE("number_double", "[number]") {
+TEST_CASE("nodes_number_double", "[number]") {
     NumberNode n(NumberType::DOUBLE, "7.98", DUMMY_POS, DUMMY_POS);
     nlohmann::json nj = n.to_json();
     nlohmann::json e = {{"type",   "number"},
@@ -30,7 +28,7 @@ TEST_CASE("number_double", "[number]") {
     REQUIRE(e == nj);
 }
 
-TEST_CASE("string", "[string]") {
+TEST_CASE("nodes_string", "[string]") {
     StringNode n("hello", DUMMY_POS, DUMMY_POS);
     nlohmann::json nj = n.to_json();
     nlohmann::json e = {{"type",   "string"},
@@ -38,7 +36,7 @@ TEST_CASE("string", "[string]") {
     REQUIRE(e == nj);
 }
 
-TEST_CASE("boolean", "[boolean]") {
+TEST_CASE("nodes_boolean", "[boolean]") {
     BooleanNode n(true, DUMMY_POS, DUMMY_POS);
     nlohmann::json nj = n.to_json();
     nlohmann::json e = {{"type",    "boolean"},
@@ -46,7 +44,7 @@ TEST_CASE("boolean", "[boolean]") {
     REQUIRE(e == nj);
 }
 
-TEST_CASE("id", "[id]") {
+TEST_CASE("nodes_id", "[id]") {
     IdNode n("foo", DUMMY_POS, DUMMY_POS);
     nlohmann::json nj = n.to_json();
     nlohmann::json e = {{"type", "id"},
@@ -54,7 +52,7 @@ TEST_CASE("id", "[id]") {
     REQUIRE(e == nj);
 }
 
-TEST_CASE("list", "[list]") {
+TEST_CASE("nodes_list", "[list]") {
     NumberNode* a = new NumberNode(NumberType::INTEGER, "1", DUMMY_POS, DUMMY_POS);
     NumberNode* b = new NumberNode(NumberType::INTEGER, "2", DUMMY_POS, DUMMY_POS);
     NumberNode* c = new NumberNode(NumberType::INTEGER, "3", DUMMY_POS, DUMMY_POS);
@@ -65,7 +63,7 @@ TEST_CASE("list", "[list]") {
     REQUIRE(e == nj);
 }
 
-TEST_CASE("call_no_args", "[call]") {
+TEST_CASE("nodes_call_no_args", "[call]") {
     IdNode* f = new IdNode("foo", DUMMY_POS, DUMMY_POS);
     CallNode n(f, {}, DUMMY_POS, DUMMY_POS);
     nlohmann::json nj = n.to_json();
@@ -74,7 +72,7 @@ TEST_CASE("call_no_args", "[call]") {
     REQUIRE(e == nj);
 }
 
-TEST_CASE("call", "[call]") {
+TEST_CASE("nodes_call", "[call]") {
     IdNode* f = new IdNode("foo", DUMMY_POS, DUMMY_POS);
     IdNode* arg_0 = new IdNode("bar", DUMMY_POS, DUMMY_POS);
     NumberNode* arg_1 = new NumberNode(NumberType::INTEGER, "3", DUMMY_POS, DUMMY_POS);
@@ -85,7 +83,7 @@ TEST_CASE("call", "[call]") {
     REQUIRE(e == nj);
 }
 
-TEST_CASE("assignment", "[assignment]") {
+TEST_CASE("nodes_assignment", "[assignment]") {
     IdNode* l = new IdNode("foo", DUMMY_POS, DUMMY_POS);
     NumberNode* r = new NumberNode(NumberType::INTEGER, "7", DUMMY_POS, DUMMY_POS);
     AssignmentNode n(l, r, DUMMY_POS, DUMMY_POS);
@@ -95,7 +93,7 @@ TEST_CASE("assignment", "[assignment]") {
     REQUIRE(e == nj);
 }
 
-TEST_CASE("declaration_no_type", "[declaration]") {
+TEST_CASE("nodes_declaration_no_type", "[declaration]") {
     NumberNode* r = new NumberNode(NumberType::INTEGER, "7", DUMMY_POS, DUMMY_POS);
     DeclarationNode n("foo", nullptr, r, DUMMY_POS, DUMMY_POS, DUMMY_POS);
     nlohmann::json nj = n.to_json();
@@ -104,7 +102,7 @@ TEST_CASE("declaration_no_type", "[declaration]") {
     REQUIRE(e == nj);
 }
 
-TEST_CASE("declaration_with_type", "[declaration]") {
+TEST_CASE("nodes_declaration_with_type", "[declaration]") {
     NumberNode* r = new NumberNode(NumberType::INTEGER, "7", DUMMY_POS, DUMMY_POS);
     ObjectType* t = new ObjectType("Integer");
     DeclarationNode n("foo", t, r, DUMMY_POS, DUMMY_POS, DUMMY_POS);
@@ -114,7 +112,7 @@ TEST_CASE("declaration_with_type", "[declaration]") {
     REQUIRE(e == nj);
 }
 
-TEST_CASE("if_no_else", "[if]") {
+TEST_CASE("nodes_if_no_else", "[if]") {
     NumberNode* r = new NumberNode(NumberType::INTEGER, "7", DUMMY_POS, DUMMY_POS);
     ObjectType* t = new ObjectType("Integer");
     DeclarationNode n("foo", t, r, DUMMY_POS, DUMMY_POS, DUMMY_POS);
@@ -124,7 +122,7 @@ TEST_CASE("if_no_else", "[if]") {
     REQUIRE(e == nj);
 }
 
-TEST_CASE("if_with_else", "[if]") {
+TEST_CASE("nodes_if_with_else", "[if]") {
     IdNode* c = new IdNode("foo", DUMMY_POS, DUMMY_POS);
     BlockNode* t = new BlockNode({new DeclarationNode("foo",
                                                       nullptr,
@@ -148,7 +146,7 @@ TEST_CASE("if_with_else", "[if]") {
     REQUIRE(e == nj);
 }
 
-TEST_CASE("if_with_elif", "[if]") {
+TEST_CASE("nodes_if_with_elif", "[if]") {
     IdNode* c = new IdNode("foo", DUMMY_POS, DUMMY_POS);
     BlockNode* t = new BlockNode({new DeclarationNode("foo",
                                                       nullptr,
@@ -200,7 +198,7 @@ TEST_CASE("if_with_elif", "[if]") {
     REQUIRE(e == nj);
 }
 
-TEST_CASE("for", "[for]") {
+TEST_CASE("nodes_for", "[for]") {
     BlockNode* b = new BlockNode({}, DUMMY_POS, DUMMY_POS);
     IdNode* exp = new IdNode("bar", DUMMY_POS, DUMMY_POS);
     ForNode n("foo", exp, b, DUMMY_POS, DUMMY_POS);
@@ -210,28 +208,28 @@ TEST_CASE("for", "[for]") {
     REQUIRE(e == nj);
 }
 
-TEST_CASE("none", "[none]") {
+TEST_CASE("nodes_none", "[none]") {
     NoneNode n(DUMMY_POS, DUMMY_POS);
     nlohmann::json nj = n.to_json();
     nlohmann::json e = {{"type", "none"}};
     REQUIRE(e == nj);
 }
 
-TEST_CASE("break", "[break]") {
+TEST_CASE("nodes_break", "[break]") {
     BreakNode n(DUMMY_POS, DUMMY_POS);
     nlohmann::json nj = n.to_json();
     nlohmann::json e = {{"type", "break"}};
     REQUIRE(e == nj);
 }
 
-TEST_CASE("continue", "[continue]") {
+TEST_CASE("nodes_continue", "[continue]") {
     ContinueNode n(DUMMY_POS, DUMMY_POS);
     nlohmann::json nj = n.to_json();
     nlohmann::json e = {{"type", "continue"}};
     REQUIRE(e == nj);
 }
 
-TEST_CASE("return_no_value", "[return]") {
+TEST_CASE("nodes_return_no_value", "[return]") {
     ReturnNode n(nullptr, DUMMY_POS, DUMMY_POS);
     nlohmann::json nj = n.to_json();
     nlohmann::json e = {{"type",   "return"},
@@ -239,7 +237,7 @@ TEST_CASE("return_no_value", "[return]") {
     REQUIRE(e == nj);
 }
 
-TEST_CASE("return_with_value", "[return]") {
+TEST_CASE("nodes_return_with_value", "[return]") {
     IdNode* exp = new IdNode("foo", DUMMY_POS, DUMMY_POS);
     ReturnNode n(exp, DUMMY_POS, DUMMY_POS);
     nlohmann::json nj = n.to_json();
@@ -248,7 +246,7 @@ TEST_CASE("return_with_value", "[return]") {
     REQUIRE(e == nj);
 }
 
-TEST_CASE("subscript", "[subscript]") {
+TEST_CASE("nodes_subscript", "[subscript]") {
     IdNode* i = new IdNode("foo", DUMMY_POS, DUMMY_POS);
     NumberNode* s = new NumberNode(NumberType::INTEGER, "9", DUMMY_POS, DUMMY_POS);
     SubscriptNode n(i, {s}, DUMMY_POS, DUMMY_POS);
@@ -258,7 +256,7 @@ TEST_CASE("subscript", "[subscript]") {
     REQUIRE(e == nj);
 }
 
-TEST_CASE("binop", "[binop]") {
+TEST_CASE("nodes_binop", "[binop]") {
     IdNode* a = new IdNode("foo", DUMMY_POS, DUMMY_POS);
     NumberNode* b = new NumberNode(NumberType::INTEGER, "9", DUMMY_POS, DUMMY_POS);
     BinopNode n(OpType::ADD, a, b, DUMMY_POS, DUMMY_POS);
@@ -268,7 +266,7 @@ TEST_CASE("binop", "[binop]") {
     REQUIRE(e == nj);
 }
 
-TEST_CASE("empty_list", "[empty_list]") {
+TEST_CASE("nodes_empty_list", "[empty_list]") {
     ObjectType* t = new ObjectType("Integer", {});
     EmptyListNode n(t, DUMMY_POS, DUMMY_POS);
     nlohmann::json nj = n.to_json();
@@ -277,7 +275,7 @@ TEST_CASE("empty_list", "[empty_list]") {
     REQUIRE(e == nj);
 }
 
-TEST_CASE("empty_dict", "[empty_dict]") {
+TEST_CASE("nodes_empty_dict", "[empty_dict]") {
     ObjectType* k = new ObjectType("String", {});
     ObjectType* v = new ObjectType("Integer", {});
     EmptyDictNode n(k, v, DUMMY_POS, DUMMY_POS);
@@ -287,7 +285,7 @@ TEST_CASE("empty_dict", "[empty_dict]") {
     REQUIRE(e == nj);
 }
 
-TEST_CASE("dict", "[dict]") {
+TEST_CASE("nodes_dict", "[dict]") {
     StringNode* k1 = new StringNode("foo", DUMMY_POS, DUMMY_POS);
     NumberNode* v1 = new NumberNode(NumberType::INTEGER, "9", DUMMY_POS, DUMMY_POS);
     StringNode* k2 = new StringNode("bar", DUMMY_POS, DUMMY_POS);
@@ -300,7 +298,7 @@ TEST_CASE("dict", "[dict]") {
     REQUIRE(e == nj);
 }
 
-TEST_CASE("member", "[member]") {
+TEST_CASE("nodes_member", "[member]") {
     IdNode* p = new IdNode("foo", DUMMY_POS, DUMMY_POS);
     MemberNode n(p, Token(TokType::ID, "bar", DUMMY_POS));
     nlohmann::json nj = n.to_json();
@@ -309,7 +307,7 @@ TEST_CASE("member", "[member]") {
     REQUIRE(e == nj);
 }
 
-TEST_CASE("function_no_args", "[function]") {
+TEST_CASE("nodes_function_no_args", "[function]") {
     BlockNode* b = new BlockNode({}, DUMMY_POS, DUMMY_POS);
     ObjectType* rt = new ObjectType("Integer", {});
     FunctionNode n("foo", {}, {}, rt, b, DUMMY_POS, DUMMY_POS);
@@ -319,7 +317,7 @@ TEST_CASE("function_no_args", "[function]") {
     REQUIRE(e == nj);
 }
 
-TEST_CASE("function_args", "[function]") {
+TEST_CASE("nodes_function_args", "[function]") {
     BlockNode* body = new BlockNode({}, DUMMY_POS, DUMMY_POS);
     ObjectType* a = new ObjectType("Integer", {});
     ObjectType* b = new ObjectType("String", {});
@@ -331,7 +329,7 @@ TEST_CASE("function_args", "[function]") {
     REQUIRE(e == nj);
 }
 
-TEST_CASE("while", "[while]") {
+TEST_CASE("nodes_while", "[while]") {
     BlockNode* body = new BlockNode({}, DUMMY_POS, DUMMY_POS);
     IdNode* a = new IdNode("bar", DUMMY_POS, DUMMY_POS);
     IdNode* b = new IdNode("baz", DUMMY_POS, DUMMY_POS);
@@ -343,7 +341,7 @@ TEST_CASE("while", "[while]") {
     REQUIRE(e == nj);
 }
 
-TEST_CASE("class_empty", "[class]") {
+TEST_CASE("nodes_class_empty", "[class]") {
     ClassNode n("MyClass", {}, {}, {}, {}, {}, DUMMY_POS, DUMMY_POS);
     nlohmann::json nj = n.to_json();
     nlohmann::json members = nlohmann::json::array();
@@ -354,7 +352,7 @@ TEST_CASE("class_empty", "[class]") {
     REQUIRE(e == nj);
 }
 
-TEST_CASE("class_full", "[class]") {
+TEST_CASE("nodes_class_full", "[class]") {
     ObjectType* t1 = new ObjectType("Integer");
     ObjectType* t2 = new ObjectType("String");
     VectorOfStrings members_ordered = {"foo", "bar"};
