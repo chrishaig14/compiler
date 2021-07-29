@@ -289,7 +289,7 @@ USemanticInfo Checker::visit_for(ForNode& node) {
 
 
     std::string loop_c = std::to_string(this->loop_count++);
-    this->loop_list_var_id = "__loop_list__" + loop_c;
+    std::string loop_list_var_id = "__loop_list__" + loop_c;
     this->loop_index_var_id = "__loop_index__" + loop_c;
     this->loop_list_len_var_id = "__loop_list_len__" + loop_c;
 
@@ -315,9 +315,9 @@ USemanticInfo Checker::visit_for(ForNode& node) {
     this->leave_scope();
 
     SemanticInfo rinfo;
-    rinfo.snode = make_for_snode(node, binfo, exp_info_p);
+    rinfo.snode = make_for_snode(node, binfo, exp_info_p, std::string());
     BlockSNode* pn = (BlockSNode*) rinfo.snode;
-    pn->locals.push_back(this->loop_list_var_id);
+    pn->locals.push_back(loop_list_var_id);
     this->update_loop_index_snode = nullptr;
     return std::make_unique<SemanticInfo>(rinfo);
 }

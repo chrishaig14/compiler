@@ -76,7 +76,6 @@ public:
     Module* module;
     bool is_call;
     CodeLines code_lines;
-    std::string loop_list_var_id;
     std::string loop_index_var_id;
     std::string loop_list_len_var_id;
     ErrorReporter error_reporter;
@@ -154,7 +153,7 @@ public:
     USemanticInfo package_member(Package& package, const std::string& child, MemberNode& n);
     USemanticInfo module_member(Module& mod, const std::string& child, MemberNode& n);
 
-    SNode* make_for_snode(ForNode& node, USemanticInfo& binfo, USemanticInfo& exp_info_p);
+    SNode* make_for_snode(ForNode& node, USemanticInfo& binfo, USemanticInfo& exp_info_p, std::string loop_list_var_id);
 
     USemanticInfo visit_match(MatchExpressionNode* node);
     USemanticInfo visit_alias(AliasNode* p_node);
