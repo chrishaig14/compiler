@@ -1,7 +1,3 @@
-import core.Integer
-import core.String
-import core.print
-
 class Person {
     name: String
     age: Integer

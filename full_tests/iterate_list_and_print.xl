@@ -1,6 +1,3 @@
-import core.Integer
-import core.print
-
 fun main()->Integer{
     for x @ ["A", "B", "C", "D", "E"] {
         print(x)
