@@ -5,9 +5,9 @@
 #include "Checker.h"
 
 
-SNode* Checker::make_for_snode(ForNode& node, USemanticInfo& binfo, USemanticInfo& exp_info_p,
-                               std::string loop_list_var_id, std::string loop_index_var_id,
-                               std::string loop_list_len_var_id) {
+SNode*
+Checker::make_for_snode(ForNode& node, USemanticInfo& binfo, USemanticInfo& exp_info_p, std::string loop_list_var_id,
+                        std::string loop_index_var_id, std::string loop_list_len_var_id) {
     auto* bbn = new BlockSNode();
 
     auto* dsn = new DeclarationSNode(loop_list_var_id, exp_info_p->snode);
@@ -130,7 +130,7 @@ USemanticInfo Checker::visit_class(ClassNode& node) {
 
 USemanticInfo Checker::visit_root(BlockNode& node) {
     this->error_reporter.__file__ = this->module->abs_path;
-    this->error_reporter.code_lines = code_lines;
+    this->error_reporter.code_lines = this->module->code_lines;
     // Initialize module level Scope
     for (const auto& f: this->module->flirpins) {
         this->scope->set(f.first, map_flirpin_to_entity(f.second));

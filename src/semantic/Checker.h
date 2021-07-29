@@ -75,7 +75,6 @@ public:
     BlockSNode* root_snode;
     Module* module;
     bool is_call;
-    CodeLines code_lines;
     ErrorReporter error_reporter;
     Entity this_entity;
     Package* top_package;
