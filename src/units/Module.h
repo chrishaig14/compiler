@@ -22,7 +22,6 @@ public:
     BlockSNode* sast;
 
     std::map<std::string, std::string> included_module_paths;
-    std::string rel_path;
     bool is_lib;
     std::map<std::string, Path> imported_paths_no_alias;
     std::map<std::string, Path> imported_paths_with_alias;
@@ -31,8 +30,6 @@ public:
     std::vector<std::pair<std::string, Path>> imported_paths_with_alias_v;
     std::map<std::string, Entity> imports;
     Path path;
-    std::map<std::string, Class*> classes;
-    std::map<std::string, ConstFunction*> functions;
     std::map<std::string, Flirpin> flirpins;
     std::string full_header_path;
 
