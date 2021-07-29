@@ -127,7 +127,7 @@ USemanticInfo Checker::visit_class(ClassNode& node) {
 }
 
 USemanticInfo Checker::visit_root(BlockNode& node) {
-    this->error_reporter.__file__ = this->__file__;
+    this->error_reporter.__file__ = this->module->abs_path;
     this->error_reporter.code_lines = code_lines;
     // Initialize module level Scope
     for (const auto& f: this->module->flirpins) {

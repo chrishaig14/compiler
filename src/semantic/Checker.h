@@ -78,7 +78,6 @@ class Checker {
     std::unordered_map<std::string, SymbolTable*> scopes;
     SymbolTable* scope;
 public:
-    std::string __file__;
     BlockSNode* root_snode;
     Module* module;
     bool is_call;

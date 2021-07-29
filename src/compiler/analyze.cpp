@@ -19,7 +19,6 @@ void Compiler::analyze_module(Module& module, Package& top_package) {
     Checker checker;
     checker.top_package = &top_package;
     checker.module = &module;
-    checker.__file__ = module.abs_path;
     checker.code_lines = module.code_lines;
     checker.visit_root(*module.ast);
     module.sast = checker.root_snode;
