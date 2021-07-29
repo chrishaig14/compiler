@@ -15,13 +15,15 @@
 
 class Module {
 public:
-    Module(Path path, std::string abs_path, std::string rel_path, bool is_lib, std::string full_header_path);
     std::string name;
-    std::map<std::string, std::string> included_module_paths;
     std::string abs_path;
+    CodeLines code_lines;
+    BlockNode* ast;
+    BlockSNode* sast;
+
+    std::map<std::string, std::string> included_module_paths;
     std::string rel_path;
     bool is_lib;
-    BlockNode* ast;
     std::map<std::string, Path> imported_paths_no_alias;
     std::map<std::string, Path> imported_paths_with_alias;
     std::map<std::string, TypeNode*> aliased_types;
@@ -29,22 +31,17 @@ public:
     std::vector<std::pair<std::string, Path>> imported_paths_with_alias_v;
     std::map<std::string, Entity> imports;
     Path path;
-    CodeLines code_lines;
-    BlockSNode* sast;
     std::map<std::string, Class*> classes;
     std::map<std::string, ConstFunction*> functions;
     std::map<std::string, Flirpin> flirpins;
+    std::string full_header_path;
 
-    Flirpin get(Path p) {
-        VectorOfStrings pt = p.as_vec();
-        return this->flirpins[pt.back()];
-    }
-
+    Flirpin get(Path p);
+    Module(Path path, std::string abs_path, std::string rel_path, bool is_lib, std::string full_header_path);
     Path get_actual_path(const std::string& id);
     void fill_actual(TypeNode* t);
     void fill_actual(ObjectType* t);
     void fill_actual(FunctionType* t);
-    std::string full_header_path;
 };
 
 

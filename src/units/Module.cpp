@@ -12,3 +12,8 @@ Module::Module(Path path, std::string abs_path, std::string rel_path, bool is_li
     this->is_lib = is_lib;
     this->full_header_path = full_header_path;
 }
+
+Flirpin Module::get(Path p) {
+    VectorOfStrings pt = p.as_vec();
+    return this->flirpins[pt.back()];
+}
