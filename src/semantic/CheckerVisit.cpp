@@ -6,13 +6,13 @@
 
 
 SNode* Checker::make_for_snode(ForNode& node, USemanticInfo& binfo, USemanticInfo& exp_info_p,
-                               std::string loop_list_var_id) {
+                               std::string loop_list_var_id, std::string loop_index_var_id) {
     auto* bbn = new BlockSNode();
 
     auto* dsn = new DeclarationSNode(loop_list_var_id, exp_info_p->snode);
     bbn->nodes.push_back(dsn);
     auto* init_idx = new IntegerSNode("0");
-    auto* lidx_decl = new DeclarationSNode(this->loop_index_var_id, init_idx);
+    auto* lidx_decl = new DeclarationSNode(loop_index_var_id, init_idx);
 
     bbn->nodes.push_back(lidx_decl);
 
@@ -23,7 +23,7 @@ SNode* Checker::make_for_snode(ForNode& node, USemanticInfo& binfo, USemanticInf
     bbn->nodes.push_back(lensn);
 
 
-    auto* idxsn = new IdSNode(this->loop_index_var_id);
+    auto* idxsn = new IdSNode(loop_index_var_id);
     auto* cmpfunsn = new IdSNode("core.core.Integer.__lt__");
 
     auto* llensn = new IdSNode(this->loop_list_len_var_id);
@@ -34,7 +34,7 @@ SNode* Checker::make_for_snode(ForNode& node, USemanticInfo& binfo, USemanticInf
     auto* bn = (BlockSNode*) (binfo->snode);
 
     auto* list_subscript_n = new CallSNode(new IdSNode("core.core.List.__get_item__"),
-                                           {new IdSNode(loop_list_var_id), new IdSNode(this->loop_index_var_id)});
+                                           {new IdSNode(loop_list_var_id), new IdSNode(loop_index_var_id)});
 
 
     auto* loop_elem_sn = new DeclarationSNode(node.var, list_subscript_n);
