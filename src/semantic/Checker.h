@@ -54,23 +54,17 @@
 typedef std::unique_ptr<SemanticInfo> USemanticInfo;
 
 bool type_matches(TypeNode* a, TypeNode* b);
-
 bool is_generic(const TypeNode& t);
-
 MapStringType make_replacements(TypeNode* a, TypeNode* b);
 TypeNode* make_type_from_object_pattern(const ObjectType& object_type, const MapStringType& replacements);
 TypeNode* make_type_from_function_pattern(const FunctionType& ftn, const MapStringType& replacements);
 TypeNode* make_type(const TypeNode& original, const MapStringType& replacements);
 SemanticInfo match_arguments_to_generic_function(const FunctionType& function_type, VectorOfTypes arg_types);
 USemanticInfo error_stub();
-
-
 Entity map_flirpin_to_entity(Flirpin flirpin);
-
 Flirpin map_unit_to_flirpin(Unit u);
-
-
 TextPosition add_one_col(TextPosition t);
+bool function_is_generic(const FunctionType& ft);
 
 class Checker {
     int loop_count;
@@ -82,19 +76,22 @@ public:
     Module* module;
     bool is_call;
     CodeLines code_lines;
+    std::string loop_list_var_id;
+    std::string loop_index_var_id;
+    std::string loop_list_len_var_id;
+    ErrorReporter error_reporter;
+    Entity this_entity;
+    Package* top_package;
+    SNode* update_loop_index_snode;
 
     Checker();
     ~Checker();
 
     bool is_immutable(const TypeNode& node);
-
     void enter_scope(const std::string& name);
     void leave_scope();
-
     bool assert_type_exists(TypeNode& type, TextPosition pos);
-
     Class* instantiate_generic(Class* generic, const ObjectType& instance);
-
     bool is_variable(const ObjectType& a);
     std::pair<std::string, TypeNode*>*
     get_first_substitution_function(FunctionType& a, FunctionType& b, bool is_top_level_arg);
@@ -107,7 +104,6 @@ public:
     std::unique_ptr<SemanticInfo> match_arguments_to_generic_function(const FunctionType& ft, VectorOfTypes arg_types,
                                                                       std::map<std::string, TypeNode*>& all_substitutions);
     void fail(std::string msg);
-
 
     USemanticInfo dispatch_rvalue(Node* nod);
 
@@ -152,18 +148,14 @@ public:
     USemanticInfo visit_cast(CastNode& n);
     USemanticInfo visit_defconst(DefaultConstructorNode& node);
 
-    ErrorReporter error_reporter;
-    Entity this_entity;
+
     USemanticInfo object_member(SNode* object_snode, Value* p_value, const std::string& child, MemberNode& n);
     USemanticInfo class_member(Class* cls, const std::string& child, MemberNode& n);
     USemanticInfo package_member(Package& package, const std::string& child, MemberNode& n);
     USemanticInfo module_member(Module& mod, const std::string& child, MemberNode& n);
-    Package* top_package;
-    SNode* update_loop_index_snode;
+
     SNode* make_for_snode(ForNode& node, USemanticInfo& binfo, USemanticInfo& exp_info_p);
-    std::string loop_list_var_id;
-    std::string loop_index_var_id;
-    std::string loop_list_len_var_id;
+
     USemanticInfo visit_match(MatchExpressionNode* node);
     USemanticInfo visit_alias(AliasNode* p_node);
     USemanticInfo enum_member(Enum* enumm, const std::string& value, MemberNode& node);
@@ -187,9 +179,6 @@ public:
     // USemanticInfo visit_throw(ThrowNode& n);
     USemanticInfo visit_try_catch(TryCatchNode& node);
 };
-
-
-bool function_is_generic(const FunctionType& ft);
 
 #endif //CHECKER_H
 
