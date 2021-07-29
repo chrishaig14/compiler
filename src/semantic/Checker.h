@@ -80,7 +80,7 @@ public:
     Package* top_package;
     SNode* update_loop_index_snode;
 
-    Checker();
+    Checker(Package* top_package, Module* module);
     ~Checker();
 
     bool is_immutable(const TypeNode& node);

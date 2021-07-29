@@ -17,7 +17,9 @@ bool function_is_generic(const FunctionType& ft) {
     return false;
 }
 
-Checker::Checker() {
+Checker::Checker(Package* top_package, Module* module) {
+    this->top_package = top_package;
+    this->module = module;
     this->is_call = false;
     this->scope = new SymbolTable("global", nullptr);
     this->scopes["global"] = this->scope;
@@ -219,7 +221,8 @@ Class* Checker::instantiate_generic(Class* generic, const ObjectType& instance) 
                     auto* cf = new ConstFunction();
                     cf->path = method_cf.second->path;
                     cf->ft = (FunctionType*) concrete_type.clone();
-                    std::cout << "Instantiated generic method " << method_cf.first << " : " << cf->ft->to_string() << std::endl;
+                    std::cout << "Instantiated generic method " << method_cf.first << " : " << cf->ft->to_string()
+                              << std::endl;
                     concrete_methods[method_cf.first] = cf;
                 }
 
@@ -231,7 +234,8 @@ Class* Checker::instantiate_generic(Class* generic, const ObjectType& instance) 
                 auto* cf = new ConstFunction();
                 cf->path = method_cf.second->path;
                 cf->ft = (FunctionType*) concrete_type.clone();
-                std::cout << "Instantiated generic method " << method_cf.first << " : " << cf->ft->to_string() << std::endl;
+                std::cout << "Instantiated generic method " << method_cf.first << " : " << cf->ft->to_string()
+                          << std::endl;
                 concrete_methods[method_cf.first] = cf;
             }
         } else {
