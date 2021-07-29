@@ -68,11 +68,12 @@ for TEST in full_tests/*.xl; do
   cd ..
   ./build/test > program_output
   echo $(pwd)
-  diff -q program_output "$(basename "$output_file")" > diff_output
+  diff -y program_output "$(basename "$output_file")" > diff_output
   diff_status=$?
   if [ $diff_status != 0 ]
   then
-    echo "Test for file " "$TEST" "$RED" " FAILED" "$NC"
+    echo -e "Test for file " "$TEST" "$RED" " FAILED" "$NC"
+    cat program_output
     cat diff_output
   else
     echo -e "Test for file " "$TEST" "$GREEN" " PASSED" "$NC"
