@@ -139,10 +139,7 @@ USemanticInfo Checker::visit_root(BlockNode& node) {
     //     this->scope->set(i.first, i.second);
     // }
 
-    USemanticInfo info = this->visit_block(node);
-    this->root_snode = static_cast<BlockSNode*>(info->snode);
-    SemanticInfo f;
-    return std::make_unique<SemanticInfo>(f);
+    return this->visit_block(node);
 }
 
 USemanticInfo Checker::visit_block(BlockNode& node) {
