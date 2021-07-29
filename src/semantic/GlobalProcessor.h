@@ -17,7 +17,7 @@ class GlobalProcessor {
 public:
     Module* module;
 
-    GlobalProcessor();
+    GlobalProcessor(Module* module);
 
     void visit_root(BlockNode& node);
 

@@ -8,8 +8,6 @@
 #include "../parser/Parser.h"
 #include "../nodes/ObjectType.h"
 
-GlobalProcessor::GlobalProcessor() = default;
-
 void GlobalProcessor::visit_import(ImportNode& node) {
     const Path& node_path = Path(node.path);
     if (node.has_alias) {
@@ -265,6 +263,9 @@ void GlobalProcessor::visit_alias(AliasNode& node) {
 
 void GlobalProcessor::visit_enum(EnumNode& node) {
 
+}
+
+GlobalProcessor::GlobalProcessor(Module* module) : module(module) {
 }
 
 Path Module::get_actual_path(const std::string& id) {
