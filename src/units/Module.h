@@ -30,8 +30,6 @@ public:
     std::vector<std::pair<std::string, Path>> imported_paths_with_alias_v;
     std::map<std::string, Entity> imports;
     Path path;
-    std::map<std::string, Class*> classes;
-    std::map<std::string, ConstFunction*> functions;
     std::map<std::string, Flirpin> flirpins;
     std::string full_header_path;
 
