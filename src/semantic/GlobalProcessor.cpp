@@ -98,19 +98,15 @@ void GlobalProcessor::visit_root(BlockNode& node) {
             enumm->enumm_name = ((EnumNode*) n)->id;
             enumm->values = ((EnumNode*) n)->values;
             enumm->path = Path(this->module->path, enumm->enumm_name);
-            auto* eqfun = new ConstFunction();
-            eqfun->path = Path(enumm->path, "__eq__");
-            auto* nefun = new ConstFunction();
-            nefun->path = Path(enumm->path, "__ne__");
-            enumm->functions["__eq__"] = eqfun;
-            enumm->functions["__ne__"] = nefun;
+            enumm->functions["__eq__"] = new ConstFunction(Path(enumm->path, "__eq__"), nullptr);;
+            enumm->functions["__ne__"] = new ConstFunction(Path(enumm->path, "__ne__"), nullptr);
             this->module->flirpins[enumm->enumm_name] = Flirpin{.type=F_TYPE::ENUM, .enumm=enumm};
         }
     }
     for (auto* n: node.nodes) {
         if (n->ntype == NodeType::FUNC) {
             // this->dispatch(n);
-            auto* const_function = new ConstFunction();
+            auto* const_function = new ConstFunction(Path(), nullptr);
             this->module->flirpins[((FunctionNode*) n)->identifier] = Flirpin{.type=F_TYPE::CONST_FUNCTION, .const_function=const_function};
         }
     }
@@ -200,10 +196,8 @@ void GlobalProcessor::visit_class(ClassNode& node) {
         this->module->fill_actual(method.return_type);
         // method.return_type->object().actual_base_path = this->get_actual_path(method.return_type->object().id);
 
-        auto* cf = new ConstFunction();
-        cf->path = Path(class_info->path, f.first);
+        auto* cf = new ConstFunction(Path(class_info->path, f.first), new FunctionType(x, method.return_type->clone()));
         method.path = cf->path;
-        cf->ft = new FunctionType(x, method.return_type->clone());
         cf->implicit = f.second.method->implicit;
         f.second.method->const_function = cf;
         class_info->methods.insert(make_pair(f.first, cf));
@@ -220,10 +214,8 @@ void GlobalProcessor::visit_class(ClassNode& node) {
         this->module->fill_actual(method.return_type);
         // method.return_type->object().actual_base_path = this->get_actual_path(method.return_type->object().id);
 
-        auto* cf = new ConstFunction();
-        cf->path = Path(class_info->path, f.first);
+        auto* cf = new ConstFunction(Path(class_info->path, f.first), new FunctionType(x, method.return_type->clone()));
         method.path = cf->path;
-        cf->ft = new FunctionType(x, method.return_type->clone());
         f.second->const_function = cf;
         class_info->static_methods.insert(make_pair(f.first, cf));
     }

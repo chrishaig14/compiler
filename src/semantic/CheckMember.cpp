@@ -143,9 +143,7 @@ USemanticInfo Checker::class_member(Class* cls, const std::string& child, Member
     SemanticInfo info;
     if (cls->methods.find(child) != cls->methods.end()) {
         ConstFunction* bound_method = cls->methods[child];
-        auto* unbound_method = new ConstFunction();
-        unbound_method->path = bound_method->path;
-        unbound_method->ft = bound_method->ft->clone();
+        auto* unbound_method = new ConstFunction(bound_method->path, bound_method->ft->clone());
         VectorOfTypes tp;
         for (auto tt: cls->type_params) {
             ObjectType* t = new ObjectType(tt);

@@ -12,8 +12,9 @@
 
 class ConstFunction {
 public:
-    ConstFunction() {
-        this->ft = nullptr;
+    ConstFunction(Path path, FunctionType* ft) {
+        this->path = path;
+        this->ft = ft;
         this->implicit = nullptr;
     }
 

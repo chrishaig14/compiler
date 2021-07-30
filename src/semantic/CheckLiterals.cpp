@@ -239,7 +239,6 @@ USemanticInfo Checker::visit_defconst(DefaultConstructorNode& node) {
     for (auto* pt: cls->member_types) {
         t.push_back(pt->clone());
     }
-    info.entity = Entity(new ConstFunction());
     VectorOfTypes tp;
     for (const auto& tt: entity.clazz->type_params) {
         auto* ot = new ObjectType(tt);
@@ -248,7 +247,7 @@ USemanticInfo Checker::visit_defconst(DefaultConstructorNode& node) {
     }
     auto* rt = new ObjectType(entity.clazz->class_name, tp);
     rt->actual_base_path = cls->path;
-    info.entity.const_function->ft = new FunctionType(t, rt);
+    info.entity = Entity(new ConstFunction(Path(), new FunctionType(t, rt)));
     auto* idn = new IdSNode(cls->path.as_str() + "." + "__init__");
     info.snode = idn;
     return std::make_unique<SemanticInfo>(info);

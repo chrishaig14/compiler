@@ -218,9 +218,7 @@ Class* Checker::instantiate_generic(Class* generic, const ObjectType& instance) 
                     TypeNode* t = (method_cf.second)->ft;
                     TypeNode& concrete_type = *make_type(*t, replacements);
                     this->module->fill_actual(&concrete_type);
-                    auto* cf = new ConstFunction();
-                    cf->path = method_cf.second->path;
-                    cf->ft = (FunctionType*) concrete_type.clone();
+                    auto* cf = new ConstFunction(method_cf.second->path, (FunctionType*) concrete_type.clone());
                     std::cout << "Instantiated generic method " << method_cf.first << " : " << cf->ft->to_string()
                               << std::endl;
                     concrete_methods[method_cf.first] = cf;
@@ -231,9 +229,7 @@ Class* Checker::instantiate_generic(Class* generic, const ObjectType& instance) 
                 TypeNode* t = (method_cf.second)->ft;
                 TypeNode& concrete_type = *make_type(*t, replacements);
                 this->module->fill_actual(&concrete_type);
-                auto* cf = new ConstFunction();
-                cf->path = method_cf.second->path;
-                cf->ft = (FunctionType*) concrete_type.clone();
+                auto* cf = new ConstFunction(method_cf.second->path, (FunctionType*) concrete_type.clone());
                 std::cout << "Instantiated generic method " << method_cf.first << " : " << cf->ft->to_string()
                           << std::endl;
                 concrete_methods[method_cf.first] = cf;
@@ -242,9 +238,7 @@ Class* Checker::instantiate_generic(Class* generic, const ObjectType& instance) 
             TypeNode* t = (method_cf.second)->ft;
             TypeNode& concrete_type = *make_type(*t, replacements);
             this->module->fill_actual(&concrete_type);
-            auto* cf = new ConstFunction();
-            cf->path = method_cf.second->path;
-            cf->ft = (FunctionType*) concrete_type.clone();
+            auto* cf = new ConstFunction(method_cf.second->path, (FunctionType*) concrete_type.clone());
             std::cout << "Instantiated generic method " << method_cf.first << " : " << cf->ft->to_string() << std::endl;
             concrete_methods[method_cf.first] = cf;
         }
@@ -255,9 +249,7 @@ Class* Checker::instantiate_generic(Class* generic, const ObjectType& instance) 
         TypeNode* t = (m.second)->ft;
         TypeNode& concrete_type = *make_type(*t, replacements);
         this->module->fill_actual(&concrete_type);
-        auto* cf = new ConstFunction();
-        cf->path = m.second->path;
-        cf->ft = (FunctionType*) concrete_type.clone();
+        auto* cf = new ConstFunction(m.second->path, (FunctionType*) concrete_type.clone());
         concrete_static_methods[m.first] = cf;
     }
 
