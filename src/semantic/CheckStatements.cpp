@@ -3,9 +3,10 @@
 //
 
 #include "CheckStatements.h"
+
+#include "../nodes/ObjectType.h"
 #include "../simple_nodes/ThrowSNode.h"
 #include "../simple_nodes/TryCatchSNode.h"
-#include "../nodes/ObjectType.h"
 
 USemanticInfo Checker::visit_lvalue_subscript(SubscriptNode& node) {
     USemanticInfo parent_p = this->dispatch_rvalue(node.parent);
@@ -96,7 +97,6 @@ USemanticInfo Checker::visit_assignment(AssignmentNode& n) {
         }
     }
 
-
     if (linfo_p->entity.type == E_TYPE::VALUE && linfo_p->entity.value->type->kind == Kind::OBJECT &&
         expression_info_p->entity.type == E_TYPE::CONST_FUNCTION) {
         // this->error_reporter.error_type_mismatch(*n.type, *n.rvalue, *expression_info_p_info_p->entity.value->type);
@@ -174,7 +174,7 @@ USemanticInfo Checker::visit_return(ReturnNode& n) {
     }
 
     auto* sn = new ReturnSNode(expression_info_p->snode);
-    for (auto l: this->scope->get_all()) {
+    for (auto l : this->scope->get_all()) {
         sn->reachables.push_back(l.first);
     }
 
@@ -255,7 +255,6 @@ USemanticInfo Checker::visit_match(MatchExpressionNode* node) {
 }
 
 USemanticInfo Checker::visit_continue(ContinueNode& node) {
-
     auto* bn = new BlockSNode();
     if (this->update_loop_index_snode != nullptr) {
         bn->nodes.push_back(this->update_loop_index_snode);
@@ -264,7 +263,7 @@ USemanticInfo Checker::visit_continue(ContinueNode& node) {
     bn->nodes.push_back(cn);
 
     SemanticInfo info;
-    for (auto reachable: this->scope->get_all_in_loop()) {
+    for (auto reachable : this->scope->get_all_in_loop()) {
         cn->reachables.push_back(reachable.first);
     }
     info.snode = bn;
@@ -287,7 +286,6 @@ USemanticInfo Checker::visit_for(ForNode& node) {
     this->enter_scope("for");
     this->scope->set(node.var, elem_entity);
 
-
     std::string loop_c = std::to_string(this->loop_count++);
     std::string loop_list_var_id = "__loop_list__" + loop_c;
     std::string loop_index_var_id = "__loop_index__" + loop_c;
@@ -306,7 +304,7 @@ USemanticInfo Checker::visit_for(ForNode& node) {
     USemanticInfo binfo = this->visit_block(*node.body);
     this->scope->is_loop = false;
     BlockSNode* bn = (BlockSNode*) binfo->snode;
-    for (auto local_var: this->scope->table) {
+    for (auto local_var : this->scope->table) {
         if (local_var.second.type == E_TYPE::VALUE) {
             bn->locals.push_back(local_var.first);
         }
@@ -320,7 +318,7 @@ USemanticInfo Checker::visit_for(ForNode& node) {
                                  loop_list_var_id,
                                  loop_index_var_id,
                                  loop_list_len_var_id,
-                                 nullptr);
+                                 this->update_loop_index_snode);
     BlockSNode* pn = (BlockSNode*) rinfo.snode;
     pn->locals.push_back(loop_list_var_id);
     this->update_loop_index_snode = nullptr;
@@ -332,16 +330,13 @@ USemanticInfo Checker::visit_break(BreakNode& node) {
     SemanticInfo info;
     BreakSNode* bn = new BreakSNode();
     info.snode = bn;
-    for (auto reachable: this->scope->get_all_in_loop()) {
+    for (auto reachable : this->scope->get_all_in_loop()) {
         bn->reachables.push_back(reachable.first);
     }
     return std::make_unique<SemanticInfo>(info);
 }
 
-
 USemanticInfo Checker::visit_while(WhileNode& node) {
-
-
     USemanticInfo condition_sinfo = this->expect_rvalue_of_type(T_BOOL, *node.condition);
     if (condition_sinfo->is_error()) {
         return error_stub();
@@ -352,7 +347,7 @@ USemanticInfo Checker::visit_while(WhileNode& node) {
     this->scope->is_loop = true;
     USemanticInfo body_info_p = this->visit_block(*node.body);
     this->scope->is_loop = false;
-    for (auto v: this->scope->table) {
+    for (auto v : this->scope->table) {
         // if (v.second->type == E_TYPE::OBJECT_VALUE) {
         //     node.body->local_vars.push_back(std::make_pair(v.first, ((ObjectValue*) v.second)->ot));
         // }
@@ -370,7 +365,6 @@ USemanticInfo Checker::visit_while(WhileNode& node) {
 }
 
 USemanticInfo Checker::visit_if(IfNode& n) {
-
     USemanticInfo condition_sinfo = this->expect_rvalue_of_type(T_BOOL, *n.condition);
     if (condition_sinfo->is_error()) {
         return error_stub();
@@ -380,7 +374,7 @@ USemanticInfo Checker::visit_if(IfNode& n) {
     this->enter_scope("if");
     USemanticInfo body_info = this->visit_block(*n.then);
     BlockSNode* bn = (BlockSNode*) body_info->snode;
-    for (const auto& local_var: this->scope->table) {
+    for (const auto& local_var : this->scope->table) {
         bn->locals.push_back(local_var.first);
     }
     this->leave_scope();
@@ -393,7 +387,7 @@ USemanticInfo Checker::visit_if(IfNode& n) {
         this->enter_scope("elif");
         USemanticInfo elif_block_info = this->visit_block(*elif.second);
         BlockSNode* bn = (BlockSNode*) elif_block_info->snode;
-        for (const auto& local_var: this->scope->table) {
+        for (const auto& local_var : this->scope->table) {
             bn->locals.push_back(local_var.first);
         }
         this->leave_scope();
@@ -404,7 +398,7 @@ USemanticInfo Checker::visit_if(IfNode& n) {
         this->enter_scope("else");
         else_info = this->visit_block(*n.selse);
         BlockSNode* bn = (BlockSNode*) else_info->snode;
-        for (const auto& local_var: this->scope->table) {
+        for (const auto& local_var : this->scope->table) {
             bn->locals.push_back(local_var.first);
         }
         this->leave_scope();
@@ -435,7 +429,6 @@ USemanticInfo Checker::visit_try_catch(TryCatchNode& node) {
         ex_entity.value->type->object().actual_base_path = ex_class_entity.clazz->path;
         this->fill_value(ex_entity.value);
         e_names_types.push_back(std::make_pair(eid, ex_class_entity.clazz->path.as_str()));
-
 
         this->scope->set(eid, ex_entity);
         USemanticInfo catch_body_info = this->visit_block(*((BlockNode*) catch_body));
