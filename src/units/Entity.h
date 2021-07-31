@@ -6,6 +6,7 @@
 #define XLANG_ENTITY_H
 
 #include <string>
+#include <map>
 
 class Package;
 
@@ -34,6 +35,7 @@ struct Unit {
 enum class F_TYPE {
     CONST_FUNCTION, CLASS, PACKAGE, MODULE, ENUM
 };
+std::ostream& operator<<(std::ostream& o, F_TYPE f);
 
 struct Flirpin {
     F_TYPE type;
