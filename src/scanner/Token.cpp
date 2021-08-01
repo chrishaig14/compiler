@@ -99,6 +99,7 @@ void initialize_token_strings() {
     TOKEN_STRINGS[TokType::FUN] = "fun";
     TOKEN_STRINGS[TokType::RETURN] = "return";
     TOKEN_STRINGS[TokType::CLASS] = "class";
+    TOKEN_STRINGS[TokType::TYPECLASS] = "typeclass";
     TOKEN_STRINGS[TokType::STRUCT] = "struct";
     TOKEN_STRINGS[TokType::IF] = "if";
     TOKEN_STRINGS[TokType::ELSE] = "else";
