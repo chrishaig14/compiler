@@ -991,3 +991,58 @@ Node* Parser::parse_match_statement() {
     Token lcurly = this->expect_token(TokType::RCURLY);
     return new MatchExpressionNode(exp, ids, cases, mtk.start, lcurly.end_pos);
 }
+
+
+TypeclassNode* Parser::parse_typeclass() {
+    this->expect_token(TokType::TYPECLASS);
+    Token typeclass_id = this->expect_token(TokType::ID);
+    this->expect_token(TokType::LSQUARE);
+    Token base_type = this->expect_token(TokType::ID);
+    this->expect_token(TokType::RSQUARE);
+    this->expect_token(TokType::LCURLY);
+
+    std::unordered_map<std::string, FunctionType*> methods;
+
+    while (true) {
+        this->expect_token(TokType::FUN);
+        Token method_id = this->expect_token(TokType::ID);
+        VectorOfTypes parameter_types;
+        // VectorOfStrings parameter_names;
+        this->expect_token(TokType::LPAREN);
+        while (true) {
+            Token parameter_identifier = this->expect_token(TokType::ID);
+            this->expect_token(TokType::COLON);
+            TypeNode* parameter_type = this->parse_type_node();
+            parameter_types.push_back(parameter_type);
+            // parameter_names.push_back(parameter_identifier.str);
+            if (this->match(TokType::COMMA)) {
+                this->next();
+            } else {
+                break;
+            }
+        }
+        this->expect_token(TokType::RPAREN);
+        TypeNode* return_type;
+        if (this->match(TokType::RARROW)) {
+            this->expect_token(TokType::RARROW);
+            return_type = this->parse_type_node();
+        } else {
+            return_type = new ObjectType(".None");
+        }
+
+        FunctionType* ft = new FunctionType(parameter_types, return_type);
+        methods[method_id.str] = ft;
+        this->expect_token(TokType::SEMICOLON);
+        if (!this->match(TokType::FUN)) {
+            break;
+        }
+    }
+
+    Token final_curly = this->expect_token(TokType::RCURLY);
+    TypeclassNode* n = new TypeclassNode(typeclass_id.str,
+                                         base_type.str,
+                                         methods,
+                                         typeclass_id.start,
+                                         final_curly.end_pos);
+    return n;
+}

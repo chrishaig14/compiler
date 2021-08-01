@@ -2,6 +2,7 @@
 #include "../src/scanner/Scanner.h"
 #include "../src/parser/Parser.h"
 #include "../src/nodes/UnaryOpNode.h"
+#include "../src/nodes/TypeclassNode.h"
 
 const TextPosition DUMMY_POS = {0, 0};
 
@@ -736,4 +737,23 @@ TEST_CASE("parse_partial_mult_arg_two", "[parser]") {
                                                  {EXPRESSION_1.node, EXPRESSION_2.node},
                                                  DUMMY_POS,
                                                  DUMMY_POS).to_json());
+}
+
+TEST_CASE("parse_typeclass", "[parser]") {
+    Scanner scanner;
+    std::string code = "typeclass Comparable[t] {fun eq(a:t, b:t)->Boolean;fun ne(a: t, b:t)->Boolean;} ";
+    scanner.load_text(code);
+    std::vector<Token> tokens = scanner.scan_all();
+    Parser parser("test", scanner.code_lines, tokens);
+    parser.top_package_name = "main";
+
+    TypeclassNode* ast = parser.parse_typeclass();
+    REQUIRE(ast->to_json() == TypeclassNode("Comparable",
+                                            "t",
+                                            {{"eq", new FunctionType({new ObjectType("t"), new ObjectType("t")},
+                                                                     new ObjectType("Boolean"))},
+                                             {"ne", new FunctionType({new ObjectType("t"), new ObjectType("t")},
+                                                                     new ObjectType("Boolean"))}},
+                                            DUMMY_POS,
+                                            DUMMY_POS).to_json());
 }

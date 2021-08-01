@@ -12,6 +12,7 @@
 #include "../nodes/EnumNode.h"
 #include "../nodes/TryCatchNode.h"
 #include "../nodes/ObjectType.h"
+#include "../nodes/TypeclassNode.h"
 
 extern std::unordered_map<TokType, OpType> TOKEN_TO_OP;
 
@@ -100,6 +101,7 @@ public:
     void error_expected_type(Token tok);
 
     std::string top_package_name;
+    TypeclassNode* parse_typeclass();
 };
 
 
