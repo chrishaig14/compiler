@@ -1,6 +1,7 @@
 #include "catch.hpp"
 #include "../src/nodes/nodes.h"
 #include "../src/nodes/ObjectType.h"
+#include "../src/nodes/TypeclassNode.h"
 
 const TextPosition DUMMY_POS = {0, 0};
 
@@ -363,7 +364,7 @@ TEST_CASE("nodes_class_full", "[class]") {
     std::unordered_map<std::string, Method> cmethods = {{"method1", {nullptr, method1}},
                                                         {"method2", {nullptr, method2}}};
     std::vector<std::pair<std::string, TypeNode*>> cmembers = {{"foo", t1},
-                                                    {"bar", t2}};
+                                                               {"bar", t2}};
 
 
     nlohmann::json members = {{{"id", "foo"}, {"type", t1->to_json()}},
@@ -384,5 +385,19 @@ TEST_CASE("nodes_class_full", "[class]") {
 
     nlohmann::json e = {{"type",  "class"},
                         {"class", {{"id", "MyClass"}, {"members", members}, {"methods", methods}, {"static_methods", static_methods}}}};
+    REQUIRE(e == nj);
+}
+
+TEST_CASE("nodes_typeclass", "[typeclass]") {
+    FunctionType* method1 = new FunctionType({new ObjectType("t"), new ObjectType("t")}, new ObjectType("Boolean"));
+    FunctionType* method2 = new FunctionType({new ObjectType("t"), new ObjectType("t")}, new ObjectType("Boolean"));
+    std::unordered_map<std::string, FunctionType*> cmethods = {{"method1", method1},
+                                                               {"method2", method2}};
+
+    TypeclassNode n("Comparable", "t", cmethods, DUMMY_POS, DUMMY_POS);
+    nlohmann::json nj = n.to_json();
+
+    nlohmann::json e = {{"type",      "typeclass"},
+                        {"typeclass", {{"id", "Comparable"}, {"base_type", "t"}, {"methods", {{"method1", method1->to_json()}, {"method2", method2->to_json()}}}}}};
     REQUIRE(e == nj);
 }

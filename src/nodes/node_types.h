@@ -44,7 +44,7 @@ enum class NodeType {
     MATCH_EXP,
     ALIAS,
     ENUM,
-    UNARY, THROW, TRY_CATCH,
+    UNARY, THROW, TRY_CATCH, TYPECLASS,
 };
 
 #endif //UNTITLED1_NODE_TYPES_H

@@ -88,6 +88,8 @@ add_library(
         TupleNode.h
         TypeNode.cpp
         TypeNode.h
+        TypeclassNode.cpp
+        TypeclassNode.h
         UnaryOpNode.cpp
         UnaryOpNode.h
         WhileNode.cpp
