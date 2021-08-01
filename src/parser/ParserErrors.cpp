@@ -7,7 +7,7 @@
 
 std::string Parser::code_context_string(TextPosition position) {
     std::string str = "\n" + this->code_lines.get_line(position.line) + "\n";
-    str += fmt::format(fmt::fg(fmt::color::orange_red), std::string(position.column, ' ') + std::string(1, '^'));
+    str += fmt::format(std::string(position.column, ' ') + std::string(1, '^'));
     return str;
 }
 
