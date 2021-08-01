@@ -93,5 +93,13 @@ bool FunctionType::is_generic() const {
 }
 
 nlohmann::json FunctionType::to_json() {
-    return nlohmann::json();
+    nlohmann::json j;
+    j["kind"] = "function";
+    std::vector<nlohmann::json> v;
+    for (auto t: this->param_types) {
+        v.push_back(t->to_json());
+    }
+    j["parameter_types"] = v;
+    j["return_type"] = this->return_type->to_json();
+    return j;
 }
