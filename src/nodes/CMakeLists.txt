@@ -51,6 +51,8 @@ add_library(
         IfNode.h
         ImportNode.cpp
         ImportNode.h
+        InstanceNode.cpp
+        InstanceNode.h
         ListNode.cpp
         ListNode.h
         MatchExpressionNode.cpp

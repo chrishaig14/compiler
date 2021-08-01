@@ -2,6 +2,7 @@
 #include "../src/nodes/nodes.h"
 #include "../src/nodes/ObjectType.h"
 #include "../src/nodes/TypeclassNode.h"
+#include "../src/nodes/InstanceNode.h"
 
 const TextPosition DUMMY_POS = {0, 0};
 
@@ -399,5 +400,25 @@ TEST_CASE("nodes_typeclass", "[typeclass]") {
 
     nlohmann::json e = {{"type",      "typeclass"},
                         {"typeclass", {{"id", "Comparable"}, {"base_type", "t"}, {"methods", {{"method1", method1->to_json()}, {"method2", method2->to_json()}}}}}};
+    REQUIRE(e == nj);
+}
+
+TEST_CASE("nodes_instance", "[instance]") {
+    // FunctionType* method1 = new FunctionType({new ObjectType("a"), new ObjectType("b")}, new ObjectType("Boolean"));
+    // FunctionType* method2 = new FunctionType({new ObjectType("c"), new ObjectType("c")}, new ObjectType("Boolean"));
+    ObjectType* rt = new ObjectType("Integer");
+    BlockNode* b = new BlockNode({}, DUMMY_POS, DUMMY_POS);
+    FunctionNode* method1 = new FunctionNode("method1", {}, {}, rt, b, DUMMY_POS, DUMMY_POS);
+    FunctionNode* method2 = new FunctionNode("method2", {}, {}, rt, b, DUMMY_POS, DUMMY_POS);
+
+    std::unordered_map<std::string, FunctionNode*> cmethods = {{"method1", method1},
+                                                               {"method2", method2}};
+
+    ObjectType* bt = new ObjectType("SomeType");
+    InstanceNode n("Comparable", bt, cmethods, DUMMY_POS, DUMMY_POS);
+    nlohmann::json nj = n.to_json();
+
+    nlohmann::json e = {{"type",     "instance"},
+                        {"instance", {{"id", "Comparable"}, {"base_type", bt->to_json()}, {"methods", {{"method1", method1->to_json()}, {"method2", method2->to_json()}}}}}};
     REQUIRE(e == nj);
 }
