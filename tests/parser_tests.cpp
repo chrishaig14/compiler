@@ -3,6 +3,7 @@
 #include "../src/parser/Parser.h"
 #include "../src/nodes/UnaryOpNode.h"
 #include "../src/nodes/TypeclassNode.h"
+#include "../src/nodes/InstanceNode.h"
 
 const TextPosition DUMMY_POS = {0, 0};
 
@@ -756,4 +757,33 @@ TEST_CASE("parse_typeclass", "[parser]") {
                                                                      new ObjectType("Boolean"))}},
                                             DUMMY_POS,
                                             DUMMY_POS).to_json());
+}
+
+TEST_CASE("parse_instance", "[parser]") {
+    Scanner scanner;
+    std::string code = "instance Comparable[Foo] {fun eq(a:Foo, b:Foo)->Boolean {};fun ne(a: Foo, b:Foo)->Boolean {};} ";
+    scanner.load_text(code);
+    std::vector<Token> tokens = scanner.scan_all();
+    Parser parser("test", scanner.code_lines, tokens);
+    parser.top_package_name = "main";
+
+    InstanceNode* ast = parser.parse_instance();
+    REQUIRE(ast->to_json() == InstanceNode("Comparable",
+                                           new ObjectType("Foo"),
+                                           {{"eq", new FunctionNode("eq",
+                                                                    {"a", "b"},
+                                                                    {new ObjectType("Foo"), new ObjectType("Foo")},
+                                                                    new ObjectType("Boolean"),
+                                                                    new BlockNode({}, DUMMY_POS, DUMMY_POS),
+                                                                    DUMMY_POS,
+                                                                    DUMMY_POS)},
+                                            {"ne", new FunctionNode("ne",
+                                                                    {"a", "b"},
+                                                                    {new ObjectType("Foo"), new ObjectType("Foo")},
+                                                                    new ObjectType("Boolean"),
+                                                                    new BlockNode({}, DUMMY_POS, DUMMY_POS),
+                                                                    DUMMY_POS,
+                                                                    DUMMY_POS)}},
+                                           DUMMY_POS,
+                                           DUMMY_POS).to_json());
 }

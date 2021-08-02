@@ -13,6 +13,7 @@
 #include "../nodes/TryCatchNode.h"
 #include "../nodes/ObjectType.h"
 #include "../nodes/TypeclassNode.h"
+#include "../nodes/InstanceNode.h"
 
 extern std::unordered_map<TokType, OpType> TOKEN_TO_OP;
 
@@ -102,6 +103,7 @@ public:
 
     std::string top_package_name;
     TypeclassNode* parse_typeclass();
+    InstanceNode* parse_instance();
 };
 
 

@@ -2,6 +2,7 @@
 // Created by chris on 23/1/21.
 //
 
+#include <expat.h>
 #include "Parser.h"
 #include "../logging/logging.h"
 
@@ -181,4 +182,24 @@ Node* Parser::parse_enum_definition() {
     }
     Token rcurly_tk = this->expect_token(TokType::RCURLY);
     return new EnumNode(enum_id.str, values, enum_id.start, rcurly_tk.end_pos);
+}
+
+InstanceNode* Parser::parse_instance() {
+    Token instance_tok = this->expect_token(TokType::INSTANCE);
+    Token id_tok = this->expect_token(TokType::ID);
+    this->expect_token(TokType::LSQUARE);
+    ObjectType* ot = this->parse_object_type();
+    this->expect_token(TokType::RSQUARE);
+    this->expect_token(TokType::LCURLY);
+    std::unordered_map<std::string, FunctionNode*> methods;
+    while (true) {
+        auto* m = this->parse_function_definition();
+        methods[m->identifier] = m;
+        this->expect_token(TokType::SEMICOLON);
+        if (!this->match(TokType::FUN)) {
+            break;
+        }
+    }
+    Token f_curly = this->expect_token(TokType::RCURLY);
+    return new InstanceNode(id_tok.str, ot, methods, instance_tok.start, f_curly.end_pos);
 }
