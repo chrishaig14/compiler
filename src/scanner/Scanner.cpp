@@ -46,6 +46,7 @@ void initialize_tokens() {
     TOKEN_KEYWORDS["where"] = TokType::WHERE;
     TOKEN_KEYWORDS["none"] = TokType::NONE;
     TOKEN_KEYWORDS["typeclass"] = TokType::TYPECLASS;
+    TOKEN_KEYWORDS["instance"] = TokType::INSTANCE;
     TOKEN_KEYWORDS["as"] = TokType::AS;
 
     TOKEN_KEYWORDS["not"] = TokType::NOT;

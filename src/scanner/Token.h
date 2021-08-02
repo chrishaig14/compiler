@@ -82,7 +82,7 @@ enum class TokType {
     TRY,
     CATCH,
     WHERE,
-    TYPECLASS
+    TYPECLASS, INSTANCE
 };
 
 extern std::unordered_map<TokType, std::string> TOKEN_STRINGS;
