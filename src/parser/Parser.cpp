@@ -776,6 +776,10 @@ Node* Parser::parse_top_level_statement() {
             return this->parse_function_definition();
         case TokType::CLASS:
             return this->parse_class_definition();
+        case TokType::TYPECLASS:
+            return this->parse_typeclass();
+        case TokType::INSTANCE:
+            return this->parse_instance();
         case TokType::ENUM:
             return this->parse_enum_definition();
         case TokType::IMPORT:
@@ -1004,12 +1008,18 @@ TypeclassNode* Parser::parse_typeclass() {
     std::unordered_map<std::string, FunctionType*> methods;
 
     while (true) {
+        if (!this->match(TokType::FUN)) {
+            break;
+        }
         this->expect_token(TokType::FUN);
         Token method_id = this->expect_token(TokType::ID);
         VectorOfTypes parameter_types;
         // VectorOfStrings parameter_names;
         this->expect_token(TokType::LPAREN);
         while (true) {
+            if (this->match(TokType::RPAREN)) {
+                break;
+            }
             Token parameter_identifier = this->expect_token(TokType::ID);
             this->expect_token(TokType::COLON);
             TypeNode* parameter_type = this->parse_type_node();
