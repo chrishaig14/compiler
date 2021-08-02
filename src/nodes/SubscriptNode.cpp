@@ -23,10 +23,10 @@ bool SubscriptNode::equal(const Node& x) const {
 }
 
 SubscriptNode::~SubscriptNode() {
-    delete this->parent;
-    for (auto c: this->child) {
-        delete c;
-    }
+    // delete this->parent;
+    // for (auto c: this->child) {
+    //     delete c;
+    // }
 }
 
 nlohmann::json SubscriptNode::to_json() {

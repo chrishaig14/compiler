@@ -20,9 +20,9 @@ bool ClassNode::equal(const Node& other) const {
 
 
 ClassNode::~ClassNode() {
-    for (const auto& mem: this->members) {
-        delete mem.second;
-    }
+    // for (const auto& mem: this->members) {
+    //     delete mem.second;
+    // }
     // for (const auto& method: this->methods) {
     //     delete method.second;
     // }
