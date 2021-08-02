@@ -58,6 +58,7 @@ BlockNode* Parser::parse_program() {
         program.push_back(this->parse_top_level_statement());
     }
     TextPosition end = this->token.end_pos;
+    std::cout << "--------------- FINISHED PARSING -----------------" << std::endl;
     return new BlockNode(program, start, end);
 }
 
