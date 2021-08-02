@@ -193,6 +193,9 @@ InstanceNode* Parser::parse_instance() {
     this->expect_token(TokType::LCURLY);
     std::unordered_map<std::string, FunctionNode*> methods;
     while (true) {
+        if (!this->match(TokType::FUN)) {
+            break;
+        }
         auto* m = this->parse_function_definition();
         methods[m->identifier] = m;
         this->expect_token(TokType::SEMICOLON);
