@@ -5,9 +5,9 @@
 #include "Compiler.h"
 #include "../semantic/Checker.h"
 
-void Compiler::analyze_module(Module& module, Package& top_package) {
+void analyze_module(Module& module, Package& top_package) {
     for (const auto& path: module.imported_paths_no_alias_v) {
-        this->add_path_to_module(module, path.second, top_package);
+        add_path_to_module(module, path.second, top_package);
     }
     // std::vector<Path> default_imports = {Path("core.core.String")};
     // for (const auto& path:default_imports) {
@@ -38,8 +38,7 @@ void Compiler::analyze_all_modules(Package& package, Package& top_package) {
     }
 }
 
-void
-Compiler::add_path_with_alias_to_module(Module& module, const std::string& alias, Path path, Package& root_package) {
+void add_path_with_alias_to_module(Module& module, const std::string& alias, Path path, Package& root_package) {
     // auto current_flirpin = Flirpin{.type=F_TYPE::PACKAGE, .package=root_package};
     // std::string path_so_far;
     // std::string last_include;
@@ -84,7 +83,7 @@ Compiler::add_path_with_alias_to_module(Module& module, const std::string& alias
     // module.flirpins[alias] = current_flirpin;
 }
 
-void Compiler::add_path_to_module(Module& module, Path path, Package& top_package) {
+void add_path_to_module(Module& module, Path path, Package& top_package) {
     VectorOfStrings pv = path.as_vec();
     if (pv[0] == "root") {
         VectorOfStrings path_vec = VectorOfStrings(pv.begin(), pv.end());
@@ -100,7 +99,7 @@ void Compiler::add_global_path_to_module(Module& module, Path path) {
 
 }
 
-void Compiler::add_local_path_to_module(Module& module, Path path, Package& top_package) {
+void add_local_path_to_module(Module& module, Path path, Package& top_package) {
     auto current_flirpin = Flirpin{.type=F_TYPE::PACKAGE, .package=&top_package};
     std::string path_so_far = "global";
     Flirpin last_flirpin;
