@@ -25,7 +25,7 @@ void analyze_module(Module& module, Package& top_package) {
     }
 }
 
-void Compiler::analyze_all_modules(Package& package, Package& top_package) {
+void analyze_all_modules(Package& package, Package& top_package) {
     // std::cout << "Analyzing package " << package->name << std::endl;
     for (const auto& ep: package.units) {
         if (ep.second.type == U_TYPE::PACKAGE) {

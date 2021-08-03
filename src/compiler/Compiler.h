@@ -22,7 +22,7 @@ void add_local_path_to_module(Module& module, Path path, Package& top_package);
 void add_path_to_module(Module& module, Path path, Package& top_package);
 void add_path_with_alias_to_module(Module& module, const std::string& alias, Path path, Package& root_package);
 void analyze_module(Module& module, Package& top_package);
-
+void analyze_all_modules(Package& package, Package& top_package);
 class Compiler {
     std::string project_dir;
     std::string project_output_dir;
@@ -51,7 +51,6 @@ public:
     void add_global_path_to_module(Module& module, Path path);
 
 
-    void analyze_all_modules(Package& package, Package& top_package);
     void parse_single_module(Module& module);
     void parse_all_modules(Package& package);
     void transpile_all_modules(Package& package, const std::string& output_dir, bool is_top);
