@@ -60,16 +60,13 @@ Compiler::Compiler(const std::string& project_dir, const std::string& project_ou
                    const std::string& lib_path, bool is_lib, const std::string& version)
         : project_dir(project_dir), project_output_dir(project_output_dir), output_name(output_name),
           lib_path(lib_path), is_lib(is_lib), version(version) {
-    this->root_package = nullptr;
-    this->top_package = nullptr;
+    this->root_package = new Package(Path(this->output_name), project_dir, "", false, "", "");;
+    this->top_package = new Package(Path("global"), "", "", false, "", "");
+    this->top_package->units[this->output_name] = Unit{.type=U_TYPE::PACKAGE, .package=root_package};
 }
 
 void Compiler::main() {
-    this->root_package = new Package(Path(this->output_name), project_dir, "", false, "", "");
-
     std::string req_file_path = path_join(this->project_dir, REQUIREMENTS_FILE);
-    this->top_package = new Package(Path("global"), "", "", false, "", "");
-    this->top_package->units[this->output_name] = Unit{.type=U_TYPE::PACKAGE, .package=root_package};
 
     VectorOfStrings requirements = this->load_requirements(req_file_path);
 
