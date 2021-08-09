@@ -20,7 +20,7 @@
 #include "../units/FunctionValue.h"
 #include "../nodes/EnumNode.h"
 #include "../simple_nodes/EnumSNode.h"
-#include "ErrorReporter.h"
+#include "errors/ErrorReporter.h"
 #include "util.h"
 // #include "../logger/Logger.h"
 #include "../simple_nodes/BlockSNode.h"

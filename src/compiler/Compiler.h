@@ -30,9 +30,6 @@ class Compiler {
 
     std::string lib_path;
 
-    Package* root_package;
-    Package* top_package;
-
     std::map<std::string, bool> loaded_top_units;
 
     std::string static_initializations;
@@ -67,6 +64,9 @@ public:
 
     void main();
     std::string top_package_name;
+    void pre();
+    Package* root_package;
+    Package* top_package;
 };
 
 

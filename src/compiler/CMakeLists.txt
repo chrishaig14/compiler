@@ -5,26 +5,27 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -g -O0 -Wall -pedantic -Werror")
 find_package(fmt)
 
-add_executable(
-    compiler
-    analyze.cpp
-    analyze.h
-    Compiler.cpp
-    Compiler.h
-    full.cpp
-    parse.cpp
-    parse.h
-    transpile.cpp
-    transpile.h
-    utils.cpp
-    utils.h)
-
+add_library(
+        lcomp
+        analyze.cpp
+        analyze.h
+        Compiler.cpp
+        Compiler.h
+        parse.cpp
+        parse.h
+        transpile.cpp
+        transpile.h
+        utils.cpp
+        utils.h)
+add_executable(compiler full.cpp)
 target_link_libraries(
-    compiler
-    parser
-    semantic
-    scanner
-    transpiler
-    units
-    nodes
-    fmt::fmt)
+        compiler
+        transpiler
+        lcomp
+        parser
+        semantic
+        scanner
+        units
+        nodes
+        fmt::fmt
+    )

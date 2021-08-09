@@ -14,12 +14,12 @@ void Compiler::parse_single_module(Module& module) {
     parser.top_package_name = this->top_package_name;
     module.code_lines = scanner.code_lines;
     BlockNode* ast;
-    try {
+    // try {
         ast = parser.parse_program();
-    } catch (const std::runtime_error& e) {
-        std::cout << e.what() << std::endl;
-        exit(1);
-    }
+    // } catch (const std::runtime_error& e) {
+    //     std::cout << e.what() << std::endl;
+        // exit(1);
+    // }
     module.ast = ast;
 }
 

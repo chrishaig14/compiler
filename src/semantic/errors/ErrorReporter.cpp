@@ -1,31 +1,6 @@
 #include "ErrorReporter.h"
-#include "Checker.h"
+#include "../Checker.h"
 
-std::string entity_to_string(const Entity& entity) {
-    std::string out;
-    switch (entity.type) {
-        case E_TYPE::PACKAGE:
-            return "package " + E_HLT(entity.package->name);
-        case E_TYPE::MODULE:
-            return "module " + E_HLT(entity.module->name);
-        case E_TYPE::CLASS:
-            return "class " + E_HLT(entity.clazz->class_name);
-        case E_TYPE::VALUE:
-            return E_HLT(entity.value->type->to_string());
-        case E_TYPE::CONST_FUNCTION:
-            return E_HLT(entity.const_function->ft->to_string());
-            return "function " + E_HLT(entity.const_function->path.as_vec().back());
-        case E_TYPE::ERROR:
-            return "ERROR";
-        case E_TYPE::NOT_FOUND:
-            return "NOT FOUND";
-        case E_TYPE::ENUM:
-            return "enum " + E_HLT(entity.enumm->enumm_name);
-        case E_TYPE::NOTHING:
-            return "NOTHING";
-    }
-    return out;
-}
 
 void ErrorReporter::fail(const std::string& msg, TextPosition pos) {
     this->failed = true;
@@ -214,6 +189,7 @@ void ErrorReporter::variable_not_declared(const std::string& name, TextPosition 
     msg = E_FMT("Variable ") + E_HLT("'" + name + "'") + E_FMT(" not declared");
     this->fail(msg, pos);
 }
+
 
 void ErrorReporter::error_type_mismatch(const TypeNode& expected, const Node& value_node, const Entity& actual) {
     std::string as;
@@ -410,4 +386,21 @@ void ErrorReporter::cant_assign(const Node& node) {
     std::string pre_msg = E_FMT("Can't assign");
     std::string msg = this->highlight_one(node);
     this->fail_ok(pre_msg, msg, node.start);
+}
+
+void ErrorReporter::error(Error& error) {
+    // std::string as;
+    // if (actual.type == E_TYPE::VALUE) {
+    //     as = actual.value->type->to_string();
+    // } else {
+    //     as = entity_to_string(actual);
+    // }
+    // std::string pre_msg = "Expected " + E_HLT(expected.to_string()) + ", got " + E_HLT(as);
+    // std::string msg = highlight_one(value_node);
+    // this->fail_ok(pre_msg, msg, value_node.start);
+    this->errors.emplace_back(&error);
+    this->failed = true;
+    std::cout << "---- Semantic Error ----" << std::endl;
+    std::cout << error.to_str() << std::endl;
+    std::cout << "------------------------" << std::endl;
 }

@@ -65,7 +65,7 @@ Compiler::Compiler(const std::string& project_dir, const std::string& project_ou
     this->top_package->units[this->output_name] = Unit{.type=U_TYPE::PACKAGE, .package=root_package};
 }
 
-void Compiler::main() {
+void Compiler::pre(){
     std::string req_file_path = path_join(this->project_dir, REQUIREMENTS_FILE);
 
     VectorOfStrings requirements = this->load_requirements(req_file_path);
@@ -74,35 +74,39 @@ void Compiler::main() {
     this->parse_all_modules(*root_package);
 
     this->process_global_all_modules(*root_package);
+}
+
+void Compiler::main() {
+
 
     try {
         analyze_all_modules(*root_package, *top_package);
     } catch (const std::runtime_error& e) {
         std::cout << "ERROR: " << e.what() << std::endl;
-        exit(1);
+        // exit(1);
     }
 
-    this->transpile_all_modules(*root_package, project_output_dir, true);
-    std::string all_files;
-    for (auto f: this->all_modules) {
-        if (f == "core.xl") {
-            continue;
-        }
-        f = path_join(this->output_name, f.substr(0, f.size() - 3) + ".cpp");
-        all_files += f + " ";
-    }
-
-    std::string cmake_output_path = project_output_dir + "/CMakeLists.txt";
-
-    std::string all_libraries;
-    for (const auto& req: requirements) {
-        all_libraries += req + " ";
-    }
-    std::string final_output_name = this->output_name;
-    if (is_lib) {
-        final_output_name += "-" + this->version;
-    }
-    write_cmakelists(cmake_output_path, final_output_name, all_files, all_libraries, is_lib);
+    // this->transpile_all_modules(*root_package, project_output_dir, true);
+    // std::string all_files;
+    // for (auto f: this->all_modules) {
+    //     if (f == "core.xl") {
+    //         continue;
+    //     }
+    //     f = path_join(this->output_name, f.substr(0, f.size() - 3) + ".cpp");
+    //     all_files += f + " ";
+    // }
+    //
+    // std::string cmake_output_path = project_output_dir + "/CMakeLists.txt";
+    //
+    // std::string all_libraries;
+    // for (const auto& req: requirements) {
+    //     all_libraries += req + " ";
+    // }
+    // std::string final_output_name = this->output_name;
+    // if (is_lib) {
+    //     final_output_name += "-" + this->version;
+    // }
+    // write_cmakelists(cmake_output_path, final_output_name, all_files, all_libraries, is_lib);
 }
 
 VectorOfStrings Compiler::load_requirements(const std::string& filepath) {

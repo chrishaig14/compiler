@@ -7,10 +7,11 @@
 
 
 #include <string>
-#include "../scanner/TextPosition.h"
-#include "../nodes/TypeNode.h"
-#include "../scanner/CodeLines.h"
-#include "../units/Entity.h"
+#include "../../scanner/TextPosition.h"
+#include "../../nodes/TypeNode.h"
+#include "../../scanner/CodeLines.h"
+#include "../../units/Entity.h"
+#include "Error.h"
 
 #define FAIL_FIRST 0
 
@@ -21,7 +22,7 @@ enum class ErrorElement {
 class ErrorReporter {
 public:
     ErrorReporter();
-
+    std::vector<Error*> errors;
     CodeLines code_lines;
     void assignment(const TypeNode& expected, const TypeNode& actual, TextPosition pos, const Node& lvalue,
                     const Node& rvalue);
@@ -96,6 +97,9 @@ public:
     void package_no_member(std::string pack_name, const std::string& member, TextPosition pos, Node& obj,
                            TextPosition member_start, TextPosition member_end);
     void error_type_mismatch(const TypeNode& expected, const Node& value_node, const Entity& actual);
+
+    void error(Error& error);
+
     void class_no_method_for_op(const std::string& class_name, const std::string& method_name, const Node& node);
     void enum_no_value(const std::string& enum_name, const std::string& value, MemberNode& node, Enum* enumm);
     void object_no_member_with_suggestions(const TypeNode& t, const std::string& member, TextPosition pos, Node& obj,
