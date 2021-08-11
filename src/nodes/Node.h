@@ -9,6 +9,7 @@
 #include <string>
 #include "../scanner/TextPosition.h"
 #include "../json/json_fwd.hpp"
+#include <iostream>
 
 class AssignmentNode;
 
@@ -90,9 +91,14 @@ public:
 
     std::string node_type_string(NodeType type) const;
 
-    virtual ~Node() = default;
+    virtual ~Node() {
+        std::cout << "Destructor for " << this << " called" << std::endl;
+    };
 
-    virtual bool equal(const Node& other) const = 0;
+    virtual bool equal(const Node& other) const {
+        std::cout << "BASE NODE for " << this << " EQUAL CALLED!" << std::endl;
+        return false;
+    };
 
     bool operator==(const Node& other) const;
     bool operator!=(const Node& other) const;

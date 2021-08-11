@@ -17,6 +17,7 @@ public:
     ErrorTypeMismatch(const TypeNode& expected, const Node& value_node, const Entity& actual);
 
     std::string to_str() override;
+    bool equal(const Error& other) const override;
 };
 
 

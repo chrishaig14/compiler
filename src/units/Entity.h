@@ -67,6 +67,11 @@ public:
     Entity(const Entity& o) {
         this->type = o.type;
         this->package = o.package;
+        this->module = o.module;
+        this->clazz = o.clazz;
+        this->value = o.value;
+        this->const_function = o.const_function;
+        this->enumm = o.enumm;
     }
 
     explicit Entity() : type(E_TYPE::NOT_FOUND), package(nullptr) {
@@ -91,6 +96,14 @@ public:
     }
 
     explicit Entity(Enum* enumm) : type(E_TYPE::ENUM), enumm(enumm) {
+    }
+
+    bool operator==(const Entity& rhs) const {
+        return type == rhs.type;
+    }
+
+    bool operator!=(const Entity& rhs) const {
+        return !(rhs == *this);
     }
 };
 

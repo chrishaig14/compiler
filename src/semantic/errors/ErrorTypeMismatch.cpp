@@ -20,3 +20,11 @@ std::string ErrorTypeMismatch::to_str() {
     // this->fail_ok(pre_msg, msg, value_node.start);
     return pre_msg;
 }
+
+bool ErrorTypeMismatch::equal(const Error& other) const {
+    const auto& o = (const ErrorTypeMismatch&) other;
+    bool act = o.actual == this->actual;
+    bool exp = o.expected == this->expected;
+    bool val = o.value_node == this->value_node;
+    return act && exp && val;
+}

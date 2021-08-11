@@ -18,6 +18,15 @@ std::string entity_to_string(const Entity& entity);
 
 class Error {
 public:
+    virtual bool equal(const Error& other) const = 0;
+
+    bool operator==(const Error& other) const {
+        if (typeid(*this) != typeid(other)) {
+            return false;
+        }
+        return this->equal(other);
+    }
+
     virtual std::string to_str() = 0;
 };
 
