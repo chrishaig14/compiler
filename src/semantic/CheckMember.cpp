@@ -5,6 +5,8 @@
 #include <cassert>
 #include "CheckMember.h"
 #include "../nodes/ObjectType.h"
+#include "errors/ErrorNoMember.h"
+#include "errors/ErrorNoMemberSuggestions.h"
 
 USemanticInfo Checker::visit_member(MemberNode& n) {
     USemanticInfo parent_info = this->dispatch(n.parent);
@@ -13,11 +15,13 @@ USemanticInfo Checker::visit_member(MemberNode& n) {
         case E_TYPE::CLASS:
             return this->class_member(parent_entity.clazz, n.s_child, n);
         case E_TYPE::CONST_FUNCTION:
-            this->error_reporter.object_no_member(*parent_entity.const_function->ft, n);
+            this->error_reporter.error(*new ErrorNoMember(*parent_entity.const_function->ft, n));
+            // this->error_reporter.object_no_member(*parent_entity.const_function->ft, n);
             break;
         case E_TYPE::VALUE:
             if (parent_entity.value->type->kind == Kind::FUNCTION) {
-                this->error_reporter.object_no_member(*parent_entity.value->type, n);
+                this->error_reporter.error(*new ErrorNoMember(*parent_entity.const_function->ft, n));
+                // this->error_reporter.object_no_member(*parent_entity.value->type, n);
                 return error_stub();
             }
             return this->object_member(parent_info->snode, parent_entity.value, n.s_child, n);
@@ -65,11 +69,13 @@ USemanticInfo Checker::object_member(SNode* object_snode, Value* p_value, const 
     //     return error_stub();
     // }
     if (object_type_path.as_str() == "core.core.Union") {
-        this->error_reporter.object_no_member(*p_value->type, n);
+        this->error_reporter.error(ErrorNoMember(*p_value->type, n));
+        // this->error_reporter.object_no_member(*p_value->type, n);
         return error_stub();
     }
     if (p_value->metatype == Meta::ENUM) {
-        this->error_reporter.object_no_member(*p_value->type, n);
+        this->error_reporter.error(ErrorNoMember(*p_value->type, n));
+        // this->error_reporter.object_no_member(*p_value->type, n);
         return error_stub();
     }
     SemanticInfo info;
@@ -110,13 +116,14 @@ USemanticInfo Checker::object_member(SNode* object_snode, Value* p_value, const 
         }
 
     } else {
-        this->error_reporter.object_no_member_with_suggestions(*p_value->type,
-                                                               child,
-                                                               n.dot_pos,
-                                                               *n.parent,
-                                                               add_one_col(n.dot_pos),
-                                                               n.end,
-                                                               clazz);
+        this->error_reporter.error(ErrorNoMemberSuggestions(*p_value->type, n, *clazz));
+        // this->error_reporter.object_no_member_with_suggestions(*p_value->type,
+        //                                                        child,
+        //                                                        n.dot_pos,
+        //                                                        *n.parent,
+        //                                                        add_one_col(n.dot_pos),
+        //                                                        n.end,
+        //                                                        clazz);
 
         return error_stub();
     }

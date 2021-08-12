@@ -18,5 +18,6 @@ int main(int argc, char* argv[]) {
     init(argc, argv, is_lib, project_dir, project_output_dir, output_name, version);
 
     Compiler compiler(project_dir, project_output_dir, output_name, lib_path, is_lib, version);
+    compiler.pre();
     compiler.main();
 }

@@ -38,6 +38,6 @@ add_library(
         SymbolTable.cpp
         SymbolTable.h
         util.cpp
-        util.h errors/Error.cpp errors/Error.h)
+        util.h errors/Error.cpp errors/Error.h errors/ErrorNoMember.cpp errors/ErrorNoMember.h errors/ErrorNoMemberSuggestions.cpp errors/ErrorNoMemberSuggestions.h errors/ErrorNotDeclared.cpp errors/ErrorNotDeclared.h)
 
 target_link_libraries(semantic units simple_nodes)

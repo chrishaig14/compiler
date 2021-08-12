@@ -51,7 +51,15 @@ TEST_CASE("basic_function_bad_return_type", "[checker]") {
     analyze_module_result(module, *c.top_package);
     Checker checker(c.top_package, c.root_package->units["tmp"].module);
     checker.visit_function(*(FunctionNode*) module.ast->nodes[0]);
+
     REQUIRE(checker.error_reporter.failed);
+    REQUIRE(checker.error_reporter.errors.size() == 1);
+    Error& error = *checker.error_reporter.errors.back();
+    BooleanNode node(false, {1, 1}, {1, 1});
+    ObjectType expected("Integer");
+    ErrorTypeMismatch exp(expected, node, entity_from_type(ObjectType("Boolean")));
+    REQUIRE(error == exp);
+
 }
 
 TEST_CASE("basic_declaration", "[checker]") {
@@ -73,13 +81,12 @@ TEST_CASE("basic_declaration_bad_type", "[checker]") {
     analyze_module_result(module, *c.top_package);
     Checker checker(c.top_package, c.root_package->units["tmp"].module);
     checker.visit_declaration(*(DeclarationNode*) ((FunctionNode*) module.ast->nodes[0])->body->nodes[0]);
+
     REQUIRE(checker.error_reporter.failed);
     REQUIRE(checker.error_reporter.errors.size() == 1);
     Error& error = *checker.error_reporter.errors.back();
-    ErrorTypeMismatch exp(new ObjectType("Boolean"),
-                          new NumberNode(NumberType::INTEGER, "9", {1, 1}, {1, 1}),
-                          entity_from_type(ObjectType("Integer")));
-    bool o = exp == exp;
-    std::cout << o << std::endl;
+    NumberNode node(NumberType::INTEGER, "9", {1, 1}, {1, 1});
+    ObjectType expected("Boolean");
+    ErrorTypeMismatch exp(expected, node, entity_from_type(ObjectType("Integer")));
     REQUIRE(error == exp);
 }

@@ -1,17 +1,7 @@
-typeclass Stringable t {
-    fun str()->String
+class Foo {
+    x: Integer
 }
-
-data Foo[t] {
-    v: t
-}
-
-instance Stringable[Foo[t]] where Stringable[t] {
-    fun str()->String {
-        return "Foo("+this.v.str()+")"
-    }
-}
-
 fun main()->Integer {
+    var w = #Foo(9) == 2
     return 0
 }

@@ -18,6 +18,7 @@ std::string entity_to_string(const Entity& entity);
 
 class Error {
 public:
+    virtual Error* clone() const = 0;
     virtual bool equal(const Error& other) const = 0;
 
     bool operator==(const Error& other) const {
@@ -27,7 +28,7 @@ public:
         return this->equal(other);
     }
 
-    virtual std::string to_str() = 0;
+    virtual std::string to_str() const = 0;
 };
 
 

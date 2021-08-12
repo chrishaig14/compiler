@@ -5,12 +5,14 @@
 #include <cassert>
 #include "CheckExpressions.h"
 #include "../simple_nodes/TernarySNode.h"
+#include "errors/ErrorNotDeclared.h"
+#include "errors/ErrorTypeMismatch.h"
 
 USemanticInfo Checker::visit_id(IdNode& n) {
     // Logger::info("Checking id node " + n._id);
     Entity entity = this->scope->get(n._id);
     if (entity.type == E_TYPE::NOT_FOUND) {
-        this->error_reporter.variable_not_declared(n._id, n.start);
+        this->error_reporter.error(ErrorNotDeclared(n));
         this->scope->set(n._id, Entity(E_TYPE::ERROR));
         return error_stub();
     }
@@ -57,7 +59,8 @@ USemanticInfo Checker::visit_boolop(BoolOpNode& n) {
     const TypeNode& ltype = *get_entity_type(left_info_p->entity);
     const TypeNode& rtype = *get_entity_type(right_info_p->entity);
     if (ltype != rtype) {
-        this->error_reporter.error_type_mismatch(*left_info_p->entity.value->type, *n.right, right_info_p->entity);
+        this->error_reporter.error(ErrorTypeMismatch(ltype, *n.right, right_info_p->entity));
+        // this->error_reporter.error_type_mismatch(*left_info_p->entity.value->type, *n.right, right_info_p->entity);
         // this->error_reporter.binop(left_info_p->entity, right_info_p->entity, n.start, n.left, n.right);
         return error_stub();
     }

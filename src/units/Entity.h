@@ -99,7 +99,9 @@ public:
     }
 
     bool operator==(const Entity& rhs) const {
-        return type == rhs.type;
+
+        bool tp = type == rhs.type;
+        return tp;
     }
 
     bool operator!=(const Entity& rhs) const {
