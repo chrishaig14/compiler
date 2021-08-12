@@ -17,7 +17,7 @@ std::unique_ptr<SemanticInfo> Checker::expect_rvalue_of_type(const TypeNode& tar
     }
     SNode* snode = make_rvalue(rinfo->entity, rinfo->snode, target);
     if (snode == nullptr) {
-        this->error_reporter.error(*(new ErrorTypeMismatch(target, node, rinfo->entity)));
+        this->error_reporter.error(*(new ErrorTypeMismatch(&target, &node, rinfo->entity)));
         // this->error_reporter.error_type_mismatch(target, node, rinfo->entity);
         return error_stub();
     }

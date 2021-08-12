@@ -76,8 +76,8 @@ TEST_CASE("basic_declaration_bad_type", "[checker]") {
     REQUIRE(checker.error_reporter.failed);
     REQUIRE(checker.error_reporter.errors.size() == 1);
     Error& error = *checker.error_reporter.errors.back();
-    ErrorTypeMismatch exp(ObjectType("Boolean"),
-                          *(new NumberNode(NumberType::INTEGER, "9", {1, 1}, {1, 1})),
+    ErrorTypeMismatch exp(new ObjectType("Boolean"),
+                          new NumberNode(NumberType::INTEGER, "9", {1, 1}, {1, 1}),
                           entity_from_type(ObjectType("Integer")));
     bool o = exp == exp;
     std::cout << o << std::endl;
