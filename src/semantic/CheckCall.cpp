@@ -3,6 +3,7 @@
 //
 
 #include "CheckCall.h"
+#include "errors/ErrorTypeMismatch.h"
 
 USemanticInfo Checker::visit_call(CallNode& n, bool is_rvalue) {
     SemanticInfo retv;
@@ -58,10 +59,12 @@ USemanticInfo Checker::visit_call(CallNode& n, bool is_rvalue) {
         std::cout << "Mangled function of type: " << function_type->to_string() << std::endl;
         std::map<std::string, TypeNode*> all_substitutions;
         VectorOfTypes copy_arg_types;
-        for(auto x: arg_types){
+        for (auto x: arg_types) {
             copy_arg_types.push_back(x->clone());
         }
-        USemanticInfo inf = this->match_arguments_to_generic_function(*function_type, copy_arg_types, all_substitutions);
+        USemanticInfo inf = this->match_arguments_to_generic_function(*function_type,
+                                                                      copy_arg_types,
+                                                                      all_substitutions);
         for (auto s: all_substitutions) {
             std::cout << "substitution: " << s.first << " -> " << s.second->to_string() << std::endl;
         }
@@ -201,7 +204,7 @@ Checker::process_function_arguments(SemanticInfo& retv, std::vector<Entity>& arg
 
         SNode* arg_rvalue_snode = this->make_rvalue(arg_entities[i], sn->arguments[sni], param_type);
         if (arg_rvalue_snode == nullptr) {
-            this->error_reporter.error_type_mismatch(param_type, *n.arguments[i], arg_entities[i]);
+            this->error_reporter.error(ErrorTypeMismatch(param_type, *n.arguments[i], arg_entities[i]));
             continue;
         }
         sn->arguments[sni] = arg_rvalue_snode;

@@ -190,19 +190,6 @@ void ErrorReporter::variable_not_declared(const std::string& name, TextPosition 
     this->fail(msg, pos);
 }
 
-
-void ErrorReporter::error_type_mismatch(const TypeNode& expected, const Node& value_node, const Entity& actual) {
-    std::string as;
-    if (actual.type == E_TYPE::VALUE) {
-        as = actual.value->type->to_string();
-    } else {
-        as = entity_to_string(actual);
-    }
-    std::string pre_msg = "Expected " + E_HLT(expected.to_string()) + ", got " + E_HLT(as);
-    std::string msg = highlight_one(value_node);
-    this->fail_ok(pre_msg, msg, value_node.start);
-}
-
 void ErrorReporter::unused_return_value(TextPosition pos) {
     std::string pre_msg = E_FMT("Unused return value of function call");
     std::string msg = this->code_lines.get_line(pos.line);

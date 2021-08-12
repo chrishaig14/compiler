@@ -60,7 +60,7 @@ USemanticInfo Checker::visit_boolop(BoolOpNode& n) {
     const TypeNode& rtype = *get_entity_type(right_info_p->entity);
     if (ltype != rtype) {
         this->error_reporter.error(ErrorTypeMismatch(ltype, *n.right, right_info_p->entity));
-        // this->error_reporter.error_type_mismatch(*left_info_p->entity.value->type, *n.right, right_info_p->entity);
+        // this->error_reporter.error(ErrorTypeMismatch(*left_info_p->entity.value->type, *n.right, right_info_p->entity);
         // this->error_reporter.binop(left_info_p->entity, right_info_p->entity, n.start, n.left, n.right);
         return error_stub();
     }
@@ -278,17 +278,17 @@ USemanticInfo Checker::visit_ternary(TernaryNode& node) {
     USemanticInfo expression_info_p = this->dispatch_rvalue(node.expression);
     SemanticInfo& expression_info = *expression_info_p;
     if (expression_info.entity.type != E_TYPE::VALUE || expression_info_p->entity.value->type->kind == Kind::FUNCTION) {
-        this->error_reporter.error_type_mismatch(ObjectType("Option", {new ObjectType("t")}),
-                                                 *node.expression,
-                                                 expression_info_p->entity);
+        this->error_reporter.error(ErrorTypeMismatch(*new ObjectType("Option", {new ObjectType("t")}),
+                                                     *node.expression,
+                                                     expression_info_p->entity));
         return error_stub();
     }
     ObjectType& expression_type = expression_info.entity.value->type->object();
 
     if (expression_type.id != "Option") {
-        this->error_reporter.error_type_mismatch(ObjectType("Option", {new ObjectType("t")}),
-                                                 *node.expression,
-                                                 expression_info_p->entity);
+        this->error_reporter.error(ErrorTypeMismatch(*new ObjectType("Option", {new ObjectType("t")}),
+                                                     *node.expression,
+                                                     expression_info_p->entity));
         return error_stub();
     }
     this->enter_scope("true_case");

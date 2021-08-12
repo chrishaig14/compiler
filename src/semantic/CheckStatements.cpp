@@ -7,6 +7,7 @@
 #include "../nodes/ObjectType.h"
 #include "../simple_nodes/ThrowSNode.h"
 #include "../simple_nodes/TryCatchSNode.h"
+#include "errors/ErrorTypeMismatch.h"
 
 USemanticInfo Checker::visit_lvalue_subscript(SubscriptNode& node) {
     USemanticInfo parent_p = this->dispatch_rvalue(node.parent);
@@ -129,7 +130,7 @@ USemanticInfo Checker::visit_assignment(AssignmentNode& n) {
                                                 expression_info_p->snode,
                                                 *linfo.entity.value->type);
         if (rvalue_snode == nullptr) {
-            this->error_reporter.error_type_mismatch(l_type, *n.rvalue, expression_info_p->entity);
+            this->error_reporter.error(*(new ErrorTypeMismatch(l_type, *n.rvalue, expression_info_p->entity)));
             return error_stub();
         }
         expression_info_p->snode = rvalue_snode;
@@ -202,9 +203,10 @@ USemanticInfo Checker::visit_return(ReturnNode& n) {
 USemanticInfo Checker::visit_match(MatchExpressionNode* node) {
     USemanticInfo exp_info = this->dispatch_rvalue(node->exp);
     if (exp_info->entity.type != E_TYPE::VALUE || exp_info->entity.value->type->kind != Kind::OBJECT) {
-        this->error_reporter.error_type_mismatch(ObjectType("Union", {new ObjectType("...", {})}),
-                                                 *node->exp,
-                                                 exp_info->entity);
+
+        this->error_reporter.error(ErrorTypeMismatch(*new ObjectType("Union", {new ObjectType("...", {})}),
+                                                     *node->exp,
+                                                     exp_info->entity));
         return error_stub();
     }
 
@@ -213,9 +215,9 @@ USemanticInfo Checker::visit_match(MatchExpressionNode* node) {
         ot = (ObjectType*) ot->aliased_type;
     }
     if (ot->id != "Union") {
-        this->error_reporter.error_type_mismatch(ObjectType("Union", {new ObjectType("...", {})}),
-                                                 *node->exp,
-                                                 exp_info->entity);
+        this->error_reporter.error(ErrorTypeMismatch(*new ObjectType("Union", {new ObjectType("...", {})}),
+                                                     *node->exp,
+                                                     exp_info->entity));
         return error_stub();
     }
     std::vector<std::pair<int, BlockSNode*>> cas;
