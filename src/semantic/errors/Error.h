@@ -23,13 +23,18 @@ public:
 
     bool operator==(const Error& other) const {
         if (typeid(*this) != typeid(other)) {
+            std::cout << "Types are different!" << std::endl;
             return false;
         }
         return this->equal(other);
     }
 
     virtual std::string to_str() const = 0;
+
+
 };
+
+std::ostream& operator<<(std::ostream& o, const Error& e);
 
 
 #endif //XLANG_ERROR_H

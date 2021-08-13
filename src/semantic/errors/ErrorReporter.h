@@ -26,45 +26,45 @@ public:
     CodeLines code_lines;
     void assignment(const TypeNode& expected, const TypeNode& actual, TextPosition pos, const Node& lvalue,
                     const Node& rvalue);
-    void bad_return(TextPosition pos);
-    void binop(const TypeNode& left, const TypeNode& right, TextPosition position);
-    void bool_op(const TypeNode& left, const TypeNode& right, TextPosition position);
-    void condition(const TypeNode& t, TextPosition position, const std::string& st);
-    void _for(const TypeNode& t, TextPosition position);
-    void function_call_num_args(TextPosition position);
-    void no_return(const TypeNode& t, TextPosition pos);
-    void class_no_method(const std::string& class_name, const std::string& method_name, TextPosition pos);
-    void return_mismatch(const TypeNode& expected, const TypeNode& actual, TextPosition pos);
+    // void bad_return(TextPosition pos);
+    // void binop(const TypeNode& left, const TypeNode& right, TextPosition position);
+    // void bool_op(const TypeNode& left, const TypeNode& right, TextPosition position);
+    // void condition(const TypeNode& t, TextPosition position, const std::string& st);
+    // void _for(const TypeNode& t, TextPosition position);
+    // void function_call_num_args(TextPosition position);
+    // void no_return(const TypeNode& t, TextPosition pos);
+    // void class_no_method(const std::string& class_name, const std::string& method_name, TextPosition pos);
+    // void return_mismatch(const TypeNode& expected, const TypeNode& actual, TextPosition pos);
     bool failed;
     std::string context_string(TextPosition position);
     std::string code_context_string(TextPosition position);
     std::string code_string(TextPosition start, TextPosition end);
-    void generic_call_mismatch(const TypeNode& expected, const TypeNode& actual, int i);
-
-    void call_bad_num_args();
-    void redeclared(const std::string& name, const DeclarationNode& node);
-    void tuple_assign(TextPosition pos);
-    void unused_return_value(TextPosition pos);
-    void variable_not_declared(const std::string& name, TextPosition pos);
-    void subscript_non_object(TextPosition pos);
-    void string_immutable(TextPosition pos);
-
-    void tuple_member_not_immutable(const TypeNode& t, TextPosition pos);
-    void
-    class_init_bad_member_type(const TypeNode& cls, const TypeNode& expected, const TypeNode& actual, TextPosition pos);
-    void class_not_found(const TypeNode& cls, TextPosition pos);
-    void list_literal(const TypeNode& lt, const TypeNode& et, TextPosition pos, const Node& ell);
-    void function_return_last_stmt(const std::string& function_name, const TypeNode& et, TextPosition pos);
-    void partial_wrong_num_args(const std::string& function_name, const TypeNode& et, TextPosition pos);
-    void partial_wrong_num_args(TextPosition pos);
-    void partial_function_call_type_mismatch(const TypeNode& expected, const TypeNode& actual, TextPosition pos,
-                                             TextPosition end);
-    void generic_class_wrong_type_param_number(const std::string& cls, int num_req, int num_given, TextPosition pos);
-    void class_init_wrong_number_init(const std::string& cls, int num_req, int num_given, TextPosition pos);
-    void subscript_type(const TypeNode& t, const TypeNode& s, const SubscriptNode& n);
-    void class_not_generic(const std::string& cls, TextPosition pos);
-    void function_doesnt_return_a_value(TextPosition pos, const TypeNode* expected_type);
-    void class_init_member_not_init(const std::string& cls, std::string mem, TextPosition pos);
+    // void generic_call_mismatch(const TypeNode& expected, const TypeNode& actual, int i);
+    //
+    // void call_bad_num_args();
+    // void redeclared(const std::string& name, const DeclarationNode& node);
+    // void tuple_assign(TextPosition pos);
+    // void unused_return_value(TextPosition pos);
+    // void variable_not_declared(const std::string& name, TextPosition pos);
+    // void subscript_non_object(TextPosition pos);
+    // void string_immutable(TextPosition pos);
+    //
+    // void tuple_member_not_immutable(const TypeNode& t, TextPosition pos);
+    // void
+    // class_init_bad_member_type(const TypeNode& cls, const TypeNode& expected, const TypeNode& actual, TextPosition pos);
+    // void class_not_found(const TypeNode& cls, TextPosition pos);
+    // void list_literal(const TypeNode& lt, const TypeNode& et, TextPosition pos, const Node& ell);
+    // void function_return_last_stmt(const std::string& function_name, const TypeNode& et, TextPosition pos);
+    // void partial_wrong_num_args(const std::string& function_name, const TypeNode& et, TextPosition pos);
+    // void partial_wrong_num_args(TextPosition pos);
+    // void partial_function_call_type_mismatch(const TypeNode& expected, const TypeNode& actual, TextPosition pos,
+    //                                          TextPosition end);
+    // void generic_class_wrong_type_param_number(const std::string& cls, int num_req, int num_given, TextPosition pos);
+    // void class_init_wrong_number_init(const std::string& cls, int num_req, int num_given, TextPosition pos);
+    // void subscript_type(const TypeNode& t, const TypeNode& s, const SubscriptNode& n);
+    // void class_not_generic(const std::string& cls, TextPosition pos);
+    // void function_doesnt_return_a_value(TextPosition pos, const TypeNode* expected_type);
+    // void class_init_member_not_init(const std::string& cls, std::string mem, TextPosition pos);
     void fail(const std::string& msg, TextPosition pos);
 
     void fail(const std::string& msg) {
@@ -77,18 +77,18 @@ public:
     std::string current_function;
     std::string __file__;
 
-    void function_call_num_args(FunctionType& ft, TextPosition pos);
-    void expected_expression(const Entity& entity, const Node& pos);
-    void _for(const Entity& t, TextPosition pos);
-    void bool_op(const Entity& left, const Entity& right, TextPosition pos);
+    // void function_call_num_args(FunctionType& ft, TextPosition pos);
+    // void expected_expression(const Entity& entity, const Node& pos);
+    // void _for(const Entity& t, TextPosition pos);
+    // void bool_op(const Entity& left, const Entity& right, TextPosition pos);
     void fail_ok(const std::string& pre_msg, const std::string& msg, TextPosition pos);
-    void call_not_a_function(const CallNode& node);
-    std::string highlight_two(ErrorElement fe, const Node& f, ErrorElement se, const Node& s);
-    std::string highlight_one(const Node& f);
-    void entity_no_member(const std::string& pre_msg, const std::string& member, TextPosition pos, Node& obj,
-                          TextPosition member_start, TextPosition member_end);
-    void class_no_member(const TypeNode& t, const std::string& member, TextPosition pos, Node& obj,
-                         TextPosition member_start, TextPosition member_end);
+    // void call_not_a_function(const CallNode& node);
+    // std::string highlight_two(ErrorElement fe, const Node& f, ErrorElement se, const Node& s);
+    // std::string highlight_one(const Node& f);
+    // void entity_no_member(const std::string& pre_msg, const std::string& member, TextPosition pos, Node& obj,
+    //                       TextPosition member_start, TextPosition member_end);
+    // void class_no_member(const TypeNode& t, const std::string& member, TextPosition pos, Node& obj,
+    //                      TextPosition member_start, TextPosition member_end);
     void module_no_member(const TypeNode& t, const std::string& member, TextPosition pos, Node& obj,
                           TextPosition member_start, TextPosition member_end);
     void object_no_member(const TypeNode& t, const MemberNode& obj);
@@ -98,18 +98,18 @@ public:
                            TextPosition member_start, TextPosition member_end);
     void error(const Error& error);
 
-    void class_no_method_for_op(const std::string& class_name, const std::string& method_name, const Node& node);
-    void enum_no_value(const std::string& enum_name, const std::string& value, MemberNode& node, Enum* enumm);
-    void object_no_member_with_suggestions(const TypeNode& t, const std::string& member, TextPosition pos, Node& obj,
-                                           TextPosition member_start, TextPosition member_end, Class* clazz);
-    void
-    module_no_member(Module* mod, const std::string& member, TextPosition pos, Node& obj, TextPosition member_start,
-                     TextPosition member_end);
-    void cant_assign(const Node& n);
+    // void class_no_method_for_op(const std::string& class_name, const std::string& method_name, const Node& node);
+    // void enum_no_value(const std::string& enum_name, const std::string& value, MemberNode& node, Enum* enumm);
+    // void object_no_member_with_suggestions(const TypeNode& t, const std::string& member, TextPosition pos, Node& obj,
+    //                                        TextPosition member_start, TextPosition member_end, Class* clazz);
+    // void
+    // module_no_member(Module* mod, const std::string& member, TextPosition pos, Node& obj, TextPosition member_start,
+    //                  TextPosition member_end);
+    // void cant_assign(const Node& n);
     void
     package_no_member(Package* pack, const std::string& member, TextPosition pos, Node& obj, TextPosition member_start,
                       TextPosition member_end);
-    void object_no_special_method(const TypeNode& type, const char* method_name, const SubscriptNode& node);
+    // void object_no_special_method(const TypeNode& type, const char* method_name, const SubscriptNode& node);
 };
 
 

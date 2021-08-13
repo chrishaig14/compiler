@@ -7,6 +7,7 @@
 #include "../src/compiler/Compiler.h"
 #include "../src/compiler/analyze.h"
 #include "../src/semantic/errors/ErrorTypeMismatch.h"
+#include "../src/semantic/errors/ErrorRedeclared.h"
 
 const ObjectType NO_TYPE(".None");
 
@@ -88,5 +89,41 @@ TEST_CASE("basic_declaration_bad_type", "[checker]") {
     NumberNode node(NumberType::INTEGER, "9", {1, 1}, {1, 1});
     ObjectType expected("Boolean");
     ErrorTypeMismatch exp(expected, node, entity_from_type(ObjectType("Integer")));
+    REQUIRE(error == exp);
+}
+
+TEST_CASE("bad_binop_type", "[checker]") {
+    std::string code = "fun foo()->Integer{var x = 9 + \"a\";return 0;}";
+
+    Compiler c = analyze(code);
+    Module& module = *c.root_package->units["tmp"].module;
+    analyze_module_result(module, *c.top_package);
+    Checker checker(c.top_package, c.root_package->units["tmp"].module);
+    checker.visit_declaration(*(DeclarationNode*) ((FunctionNode*) module.ast->nodes[0])->body->nodes[0]);
+
+    REQUIRE(checker.error_reporter.failed);
+    REQUIRE(checker.error_reporter.errors.size() == 1);
+    Error& error = *checker.error_reporter.errors.back();
+    NumberNode node(NumberType::INTEGER, "9", {1, 1}, {1, 1});
+    ObjectType expected("Boolean");
+    ErrorTypeMismatch exp(expected, node, entity_from_type(ObjectType("Integer")));
+    REQUIRE(error == exp);
+}
+
+TEST_CASE("error_redeclared", "[checker]") {
+    std::string code = "fun foo()->Integer{var x = 9; var x = 10;return 0;}";
+
+    Compiler c = analyze(code);
+    Module& module = *c.root_package->units["tmp"].module;
+    analyze_module_result(module, *c.top_package);
+    Checker checker(c.top_package, c.root_package->units["tmp"].module);
+    checker.visit_function(*(FunctionNode*) module.ast->nodes[0]);
+
+    REQUIRE(checker.error_reporter.failed);
+    REQUIRE(checker.error_reporter.errors.size() == 1);
+    Error& error = *checker.error_reporter.errors.back();
+    NumberNode node(NumberType::INTEGER, "9", {1, 1}, {1, 1});
+    ObjectType expected("Boolean");
+    ErrorRedeclared exp("x", *(DeclarationNode*) ((FunctionNode*) module.ast->nodes[0])->body->nodes[1]);
     REQUIRE(error == exp);
 }

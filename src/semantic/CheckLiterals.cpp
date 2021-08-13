@@ -5,6 +5,9 @@
 #include "CheckLiterals.h"
 #include "../simple_nodes/NoneSNode.h"
 #include "../simple_nodes/DictSNode.h"
+#include "errors/ErrorExpectedExpression.h"
+#include "errors/ErrorListLiteral.h"
+#include "errors/ErrorPartialWrongNumArgs.h"
 
 USemanticInfo Checker::visit_boolean(BooleanNode& node) {
     SemanticInfo info;
@@ -148,7 +151,7 @@ USemanticInfo Checker::visit_partial(PartialApplication& node) {
         return error_stub();
     }
     if (node.args.size() != fun_type->param_types.size()) {
-        this->error_reporter.partial_wrong_num_args(node.start);
+        this->error_reporter.error(ErrorPartialWrongNumArgs(node.start));
         return error_stub();
     }
     std::vector<SNode*> snodes;
@@ -256,7 +259,7 @@ USemanticInfo Checker::visit_defconst(DefaultConstructorNode& node) {
 USemanticInfo Checker::visit_list(ListNode& node) {
     USemanticInfo element_type_p = this->dispatch(node.elements[0]);
     if (element_type_p->entity.type != E_TYPE::VALUE) {
-        this->error_reporter.expected_expression(element_type_p->entity, *node.elements[0]);
+        this->error_reporter.error(ErrorExpectedExpression(element_type_p->entity, *node.elements[0]));
         return error_stub();
     }
 
@@ -272,7 +275,7 @@ USemanticInfo Checker::visit_list(ListNode& node) {
         // }
         ObjectType* ctype = &current_type_p->entity.value->type->object();
         if (*ctype != *element_type) {
-            this->error_reporter.list_literal(*element_type, *ctype, node.elements[i]->start, *node.elements[i]);
+            this->error_reporter.error(ErrorListLiteral(*element_type, *ctype, node.elements[i]->start, *node.elements[i]));
         }
         list_elements.push_back(current_type_p->snode);
     }

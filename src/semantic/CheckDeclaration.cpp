@@ -5,6 +5,8 @@
 #include "CheckDeclaration.h"
 #include "../nodes/ObjectType.h"
 #include "errors/ErrorTypeMismatch.h"
+#include "errors/ErrorRedeclared.h"
+#include "errors/ErrorExpectedExpression.h"
 
 std::unique_ptr<SemanticInfo> Checker::expect_rvalue_of_type(const TypeNode& target, Node& node) {
     USemanticInfo rinfo = this->dispatch_rvalue(&node);
@@ -120,7 +122,7 @@ SNode* Checker::make_union_rvalue(SNode* value_snode, const TypeNode* unaliased_
 USemanticInfo Checker::visit_declaration(DeclarationNode& n) {
     // Logger::info("Checking DeclarationNode for var: " + n.identifier);
     if (this->scope->declared(n.identifier)) {
-        this->error_reporter.redeclared(n.identifier, n);
+        this->error_reporter.error(ErrorRedeclared(n.identifier, n));
     }
     USemanticInfo info;
     if (n.type != nullptr) {
@@ -158,7 +160,7 @@ USemanticInfo Checker::check_declaration_without_type(DeclarationNode& n) {
     }
     E_TYPE entity_type = exp_info_p->entity.type;
     if (entity_type != E_TYPE::CONST_FUNCTION && entity_type != E_TYPE::VALUE) {
-        this->error_reporter.expected_expression(exp_info_p->entity, *n.expression);
+        this->error_reporter.error(ErrorExpectedExpression(exp_info_p->entity, *n.expression));
         return error_stub();
     }
 

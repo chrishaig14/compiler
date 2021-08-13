@@ -9,6 +9,8 @@
 #include "../simple_nodes/NewObjectSNode.h"
 #include "../units/FunctionValue.h"
 #include "../simple_nodes/EnumMemberSNode.h"
+#include "errors/ErrorFunctionCallNumArgs.h"
+#include "errors/ErrorEnumNoValue.h"
 
 std::pair<std::string, TypeNode*>*
 Checker::get_first_substitution_object(ObjectType& a, ObjectType& b, bool is_top_level_arg) {
@@ -90,7 +92,7 @@ Checker::get_first_substitution_function(FunctionType& a, FunctionType& b, bool 
 void Checker::unify_function_call(FunctionType& fun, VectorOfTypes& args,
                                   std::map<std::string, TypeNode*>& all_substitutions) {
     if (args.size() != fun.param_types.size()) {
-        this->error_reporter.call_bad_num_args();
+        this->error_reporter.error(ErrorFunctionCallNumArgs(fun, {1, 1}));
         return;
     }
 
@@ -185,7 +187,7 @@ USemanticInfo Checker::enum_member(Enum* enumm, const std::string& value, Member
             return std::make_unique<SemanticInfo>(info);
         }
     }
-    this->error_reporter.enum_no_value(enumm->enumm_name, value, node, enumm);
+    this->error_reporter.error(ErrorEnumNoValue(enumm->enumm_name, value, node, enumm));
     return error_stub();
 }
 

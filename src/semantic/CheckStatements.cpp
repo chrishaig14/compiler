@@ -8,6 +8,10 @@
 #include "../simple_nodes/ThrowSNode.h"
 #include "../simple_nodes/TryCatchSNode.h"
 #include "errors/ErrorTypeMismatch.h"
+#include "errors/ErrorCantAssign.h"
+#include "errors/ErrorBadReturn.h"
+#include "errors/ErrorObjectNoSpecialMethod.h"
+#include "errors/ErrorFor.h"
 
 USemanticInfo Checker::visit_lvalue_subscript(SubscriptNode& node) {
     USemanticInfo parent_p = this->dispatch_rvalue(node.parent);
@@ -28,7 +32,7 @@ USemanticInfo Checker::visit_lvalue_subscript(SubscriptNode& node) {
 
     auto subscript_it = cls->methods.find("__set_item__");
     if (subscript_it == cls->methods.end()) {
-        this->error_reporter.object_no_special_method(*entity_parent.value->type, "__set_item__", node);
+        this->error_reporter.error(ErrorObjectNoSpecialMethod(*entity_parent.value->type, "__set_item__", node));
         return error_stub();
     }
     ConstFunction* subscript_fun = subscript_it->second;
@@ -85,7 +89,7 @@ USemanticInfo Checker::visit_assignment(AssignmentNode& n) {
     }
 
     if (linfo_p->entity.type != E_TYPE::VALUE) {
-        this->error_reporter.cant_assign(*n.lvalue);
+        this->error_reporter.error(ErrorCantAssign(*n.lvalue));
         // this->error_reporter.fail("Cannot assign to this thing!");
         return error_stub();
     }
@@ -93,7 +97,7 @@ USemanticInfo Checker::visit_assignment(AssignmentNode& n) {
     if (linfo_p->entity.value->type->kind == Kind::OBJECT) {
         // bool ff = n.lvalue->ntype == NodeType::MEMBER;
         if (linfo_p->is_tuple_member) {
-            this->error_reporter.cant_assign(*n.lvalue);
+            this->error_reporter.error(ErrorCantAssign(*n.lvalue));
             return error_stub();
         }
     }
@@ -150,7 +154,7 @@ USemanticInfo Checker::visit_return(ReturnNode& n) {
     Entity return_entity = this->scope->get("__return__");
     if (return_entity.type == E_TYPE::NOTHING) {
         if (n.expression != nullptr) {
-            this->error_reporter.bad_return(n.start);
+            this->error_reporter.error(ErrorBadReturn(n.start));
         }
         SemanticInfo info_r;
         info_r.snode = new ReturnSNode(nullptr);
@@ -164,7 +168,7 @@ USemanticInfo Checker::visit_return(ReturnNode& n) {
         this->module->fill_actual(return_type);
     }
     if (n.expression == nullptr) {
-        this->error_reporter.no_return(*return_type, n.start);
+        // this->error_reporter.no_return(*return_type, n.start);
         return error_stub();
     }
 
@@ -274,11 +278,11 @@ USemanticInfo Checker::visit_continue(ContinueNode& node) {
 USemanticInfo Checker::visit_for(ForNode& node) {
     USemanticInfo exp_info_p = this->dispatch_rvalue(node.exp);
     if (exp_info_p->entity.type != E_TYPE::VALUE) {
-        this->error_reporter._for(exp_info_p->entity, node.exp->start);
+        this->error_reporter.error(ErrorFor(exp_info_p->entity, node.exp->start));
     }
     ObjectType* exp_ot = &exp_info_p->entity.value->type->object();
     if (exp_ot->id != "List") {
-        this->error_reporter._for(exp_info_p->entity, node.exp->start);
+        this->error_reporter.error(ErrorFor(exp_info_p->entity, node.exp->start));
     }
 
     TypeNode* elem_type = exp_ot->type_params[0];

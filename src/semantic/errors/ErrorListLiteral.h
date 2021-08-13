@@ -1,0 +1,21 @@
+//
+// Created by chris on 12/8/21.
+//
+
+#ifndef XLANG_ERRORLISTLITERAL_H
+#define XLANG_ERRORLISTLITERAL_H
+
+
+#include "Error.h"
+
+class ErrorListLiteral : public Error {
+public:
+    ErrorListLiteral(const TypeNode& node, const ObjectType& type, TextPosition position, const Node& node_1);
+    Error* clone() const override;
+    bool equal(const Error& other) const override;
+    std::string to_str() const override;
+
+};
+
+
+#endif //XLANG_ERRORLISTLITERAL_H

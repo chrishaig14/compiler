@@ -4,6 +4,9 @@
 
 #include "CheckCall.h"
 #include "errors/ErrorTypeMismatch.h"
+#include "errors/ErrorExpectedExpression.h"
+#include "errors/ErrorNotAFunction.h"
+#include "errors/ErrorFunctionCallNumArgs.h"
 
 USemanticInfo Checker::visit_call(CallNode& n, bool is_rvalue) {
     SemanticInfo retv;
@@ -32,12 +35,12 @@ USemanticInfo Checker::visit_call(CallNode& n, bool is_rvalue) {
     } else if (fun_info.entity.type == E_TYPE::VALUE && fun_info.entity.value->type->kind == Kind::FUNCTION) {
         function_type = fun_info.entity.value->type->function().clone();
     } else {
-        this->error_reporter.call_not_a_function(n);
+        this->error_reporter.error(ErrorNotAFunction(n));
         return error_stub();
     }
     // ok
     if (n.arguments.size() != function_type->param_types.size()) {
-        this->error_reporter.function_call_num_args(*function_type, n.start);
+        this->error_reporter.error(ErrorFunctionCallNumArgs(*function_type, n.start));
         if (!function_is_generic(*function_type)) {
             retv.entity = entity_from_type(*function_type->return_type);
             return std::make_unique<SemanticInfo>(retv);
@@ -148,7 +151,7 @@ USemanticInfo Checker::make_return_info(const CallNode& n, bool is_rvalue, Seman
                                         bool args_are_constant) {
     if (retv.entity.type == E_TYPE::NOTHING) {
         if (is_rvalue) {
-            error_reporter.expected_expression(retv.entity, n);
+            this->error_reporter.error(ErrorExpectedExpression(retv.entity, n));
             return error_stub();
         }
     } else if (retv.entity.type == E_TYPE::VALUE) {
@@ -181,7 +184,7 @@ bool Checker::check_arguments(CallNode& n, CallSNode* sn, VectorOfTypes& arg_typ
             arg_entity.type == E_TYPE::MODULE || arg_entity.type == E_TYPE::ENUM ||
             arg_entity.type == E_TYPE::NOTHING) {
             has_error = true;
-            error_reporter.expected_expression(arg_entity, *arg);
+            this->error_reporter.error(ErrorExpectedExpression(arg_entity, *arg));
             continue;
         }
 

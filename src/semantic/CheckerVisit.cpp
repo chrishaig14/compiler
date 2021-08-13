@@ -3,6 +3,8 @@
 //
 
 #include "Checker.h"
+#include "errors/ErrorFunctionReturnLastStmt.h"
+#include "errors/ErrorUnusedReturnValue.h"
 
 
 SNode* make_for_snode(ForNode& node, USemanticInfo& binfo, USemanticInfo& exp_info_p, std::string loop_list_var_id,
@@ -178,7 +180,7 @@ USemanticInfo Checker::visit_block(BlockNode& node) {
             // if return value != NoneType, then force the return value
 
             if (!sinfo.is_error() && sinfo_p->entity.type != E_TYPE::NOTHING) {
-                this->error_reporter.unused_return_value(n->start);
+                this->error_reporter.error(ErrorUnusedReturnValue(n->start));
             }
         }
     }
@@ -258,11 +260,11 @@ USemanticInfo Checker::visit_function(FunctionNode& n) {
             Node* last_node = n.body->nodes.back();
             if (last_node->ntype != NodeType::RETRN) {
                 // it's not a return statement, error
-                this->error_reporter.function_return_last_stmt(function_name, returnType, last_node->start);
+                this->error_reporter.error(ErrorFunctionReturnLastStmt(function_name, returnType, last_node->start));
                 return error_stub();
             }
         } else {
-            this->error_reporter.function_return_last_stmt(function_name, returnType, n.start);
+            this->error_reporter.error(ErrorFunctionReturnLastStmt(function_name, returnType, n.start));
             return error_stub();
         }
     }

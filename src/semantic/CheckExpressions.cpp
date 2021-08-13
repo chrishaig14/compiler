@@ -7,6 +7,10 @@
 #include "../simple_nodes/TernarySNode.h"
 #include "errors/ErrorNotDeclared.h"
 #include "errors/ErrorTypeMismatch.h"
+#include "errors/ErrorExpectedExpression.h"
+#include "errors/ErrorBoolOp.h"
+#include "errors/ErrorObjectNoSpecialMethod.h"
+#include "errors/ErrorClassNoMethodForOp.h"
 
 USemanticInfo Checker::visit_id(IdNode& n) {
     // Logger::info("Checking id node " + n._id);
@@ -52,7 +56,7 @@ USemanticInfo Checker::visit_boolop(BoolOpNode& n) {
     }
     if (left_info_p->entity.type != E_TYPE::VALUE || right_info_p->entity.type != E_TYPE::VALUE) {
 
-        this->error_reporter.bool_op(left_info_p->entity, right_info_p->entity, n.start);
+        this->error_reporter.error(ErrorBoolOp(left_info_p->entity, right_info_p->entity, n.start));
         // this->error_reporter.fail("Can't have binop between 2 non objects!");
     }
 
@@ -66,12 +70,12 @@ USemanticInfo Checker::visit_boolop(BoolOpNode& n) {
     }
 
     if (ltype == T_NONE) {
-        this->error_reporter.function_doesnt_return_a_value(n.left->start, nullptr);
+        // this->error_reporter.function_doesnt_return_a_value(n.left->start, nullptr);
         return error_stub();
     }
 
     if (rtype == T_NONE) {
-        this->error_reporter.function_doesnt_return_a_value(n.right->start, nullptr);
+        // this->error_reporter.function_doesnt_return_a_value(n.right->start, nullptr);
         return error_stub();
     }
 
@@ -116,7 +120,7 @@ USemanticInfo Checker::visit_boolop(BoolOpNode& n) {
         Class* cls = entity.clazz;
         auto operator_fun_it = cls->static_methods.find(fun);
         if (operator_fun_it == cls->static_methods.end()) {
-            this->error_reporter.class_no_method_for_op(cls->class_name, fun, n);
+            this->error_reporter.error(ErrorClassNoMethodForOp(cls->class_name, fun, n));
             return error_stub();
         }
 
@@ -164,7 +168,7 @@ USemanticInfo Checker::visit_binop(BinopNode& n) {
         return error_stub();
     }
     if (left_info_p->entity.type != E_TYPE::VALUE) {
-        this->error_reporter.expected_expression(left_info_p->entity, *n.left);
+        this->error_reporter.error(ErrorExpectedExpression(left_info_p->entity, *n.left));
         return error_stub();
     }
     USemanticInfo right_sinfo = this->expect_rvalue_of_type(*left_info_p->entity.value->type, *n.right);
@@ -181,7 +185,7 @@ USemanticInfo Checker::visit_binop(BinopNode& n) {
     assert(cls != nullptr);
     auto operator_fun_it = cls->static_methods.find(fun);
     if (operator_fun_it == cls->static_methods.end()) {
-        this->error_reporter.class_no_method_for_op(cls->class_name, fun, n);
+        this->error_reporter.error(ErrorClassNoMethodForOp(cls->class_name, fun, n));
         return error_stub();
     }
     ConstFunction* operator_fun = operator_fun_it->second;
@@ -239,13 +243,13 @@ USemanticInfo Checker::visit_subscript(SubscriptNode& node) {
     Class* cls = entity_parent.value->clazz;
     if (cls == nullptr) {
         // its totally generic, fail
-        this->error_reporter.object_no_special_method(*entity_parent.value->type, "__get_item__", node);
+        this->error_reporter.error(ErrorObjectNoSpecialMethod(*entity_parent.value->type, "__get_item__", node));
         return error_stub();
     }
     assert(cls != nullptr);
     auto subscript_it = cls->methods.find("__get_item__");
     if (subscript_it == cls->methods.end()) {
-        this->error_reporter.object_no_special_method(*entity_parent.value->type, "__get_item__", node);
+        this->error_reporter.error(ErrorObjectNoSpecialMethod(*entity_parent.value->type, "__get_item__", node));
         return error_stub();
     }
     ConstFunction* subscript_fun = subscript_it->second;

@@ -7,6 +7,8 @@
 #include "../nodes/ObjectType.h"
 #include "errors/ErrorNoMember.h"
 #include "errors/ErrorNoMemberSuggestions.h"
+#include "errors/ErrorClassNoMember.h"
+#include "errors/ErrorPackageNoMember.h"
 
 USemanticInfo Checker::visit_member(MemberNode& n) {
     USemanticInfo parent_info = this->dispatch(n.parent);
@@ -39,12 +41,13 @@ USemanticInfo Checker::visit_member(MemberNode& n) {
 
 USemanticInfo Checker::module_member(Module& mod, const std::string& child, MemberNode& n) {
     if (mod.flirpins.count(child) == 0) {
-        this->error_reporter.module_no_member(&mod,
-                                              child,
-                                              n.dot_pos,
-                                              *n.parent,
-                                              n.child_token.start,
-                                              n.child_token.end_pos);
+        // this->error_reporter.error(ErrorNoMember())
+        // this->error_reporter.module_no_member(&mod,
+        //                                       child,
+        //                                       n.dot_pos,
+        //                                       *n.parent,
+        //                                       n.child_token.start,
+        //                                       n.child_token.end_pos);
         return error_stub();
     }
     Flirpin flirpin = mod.flirpins[child];
@@ -132,12 +135,12 @@ USemanticInfo Checker::object_member(SNode* object_snode, Value* p_value, const 
 
 USemanticInfo Checker::package_member(Package& package, const std::string& child, MemberNode& n) {
     if (package.units.count(child) == 0) {
-        this->error_reporter.package_no_member(&package,
+        this->error_reporter.error(ErrorPackageNoMember(&package,
                                                child,
                                                n.dot_pos,
                                                *n.parent,
                                                n.child_token.start,
-                                               n.child_token.end_pos);
+                                               n.child_token.end_pos));
         return error_stub();
     }
     Unit unit = package.units[child];
@@ -167,12 +170,12 @@ USemanticInfo Checker::class_member(Class* cls, const std::string& child, Member
     } else if (cls->static_members.find(child) != cls->static_members.end()) {
         info.entity = entity_from_type(*cls->static_members[child].first);
     } else {
-        this->error_reporter.class_no_member(ObjectType(cls->class_name, {}),
-                                             child,
-                                             n.dot_pos,
-                                             *n.parent,
-                                             add_one_col(n.dot_pos),
-                                             n.end);
+        this->error_reporter.error(ErrorClassNoMember(ObjectType(cls->class_name, {}),
+                                                      child,
+                                                      n.dot_pos,
+                                                      *n.parent,
+                                                      add_one_col(n.dot_pos),
+                                                      n.end));
         return error_stub();
     }
     return std::make_unique<SemanticInfo>(info);
