@@ -129,7 +129,7 @@ USemanticInfo Checker::visit_assignment(AssignmentNode& n) {
                                                 expression_info_p->snode,
                                                 *linfo.entity.value->type);
         if (rvalue_snode == nullptr) {
-            this->error_reporter.error(*(new ErrorTypeMismatch(l_type, *n.rvalue, expression_info_p->entity)));
+            this->error_reporter.error(ErrorTypeMismatch(l_type, *n.rvalue, expression_info_p->entity));
             return error_stub();
         }
         expression_info_p->snode = rvalue_snode;
