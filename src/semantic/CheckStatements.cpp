@@ -100,7 +100,6 @@ USemanticInfo Checker::visit_assignment(AssignmentNode& n) {
 
     if (linfo_p->entity.type == E_TYPE::VALUE && linfo_p->entity.value->type->kind == Kind::OBJECT &&
         expression_info_p->entity.type == E_TYPE::CONST_FUNCTION) {
-        // this->error_reporter.error_type_mismatch(*n.type, *n.rvalue, *expression_info_p_info_p->entity.value->type);
         this->error_reporter.assignment(*linfo_p->entity.value->type,
                                         *expression_info_p->entity.value->type,
                                         n.rvalue->start,
