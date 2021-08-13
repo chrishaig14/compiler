@@ -15,12 +15,12 @@ USemanticInfo Checker::visit_member(MemberNode& n) {
         case E_TYPE::CLASS:
             return this->class_member(parent_entity.clazz, n.s_child, n);
         case E_TYPE::CONST_FUNCTION:
-            this->error_reporter.error(*new ErrorNoMember(*parent_entity.const_function->ft, n));
+            this->error_reporter.error(ErrorNoMember(*parent_entity.const_function->ft, n));
             // this->error_reporter.object_no_member(*parent_entity.const_function->ft, n);
             break;
         case E_TYPE::VALUE:
             if (parent_entity.value->type->kind == Kind::FUNCTION) {
-                this->error_reporter.error(*new ErrorNoMember(*parent_entity.const_function->ft, n));
+                this->error_reporter.error(ErrorNoMember(*parent_entity.const_function->ft, n));
                 // this->error_reporter.object_no_member(*parent_entity.value->type, n);
                 return error_stub();
             }
