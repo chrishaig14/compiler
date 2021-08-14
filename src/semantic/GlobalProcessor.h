@@ -8,6 +8,7 @@
 
 #include <unordered_map>
 #include "SymbolTable.h"
+#include "../nodes/ImportNode.h"
 #include "../nodes/ClassNode.h"
 #include "../nodes/AliasNode.h"
 #include "../nodes/EnumNode.h"

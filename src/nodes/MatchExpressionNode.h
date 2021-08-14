@@ -8,6 +8,7 @@
 
 #include "Node.h"
 #include "TypeNode.h"
+#include "BlockNode.h"
 
 class MatchExpressionNode : public Node {
 public:

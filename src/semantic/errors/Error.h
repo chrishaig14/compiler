@@ -21,13 +21,7 @@ public:
     virtual Error* clone() const = 0;
     virtual bool equal(const Error& other) const = 0;
 
-    bool operator==(const Error& other) const {
-        if (typeid(*this) != typeid(other)) {
-            std::cout << "Types are different!" << std::endl;
-            return false;
-        }
-        return this->equal(other);
-    }
+    bool operator==(const Error& other) const;
 
     virtual std::string to_str() const = 0;
 
