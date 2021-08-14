@@ -22,7 +22,7 @@ public:
 
     NumberType num_type;
 
-    nlohmann::json to_json() override;
+    nlohmann::json to_json() const override;
 };
 
 

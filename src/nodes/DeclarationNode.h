@@ -27,7 +27,7 @@ public:
 
     ~DeclarationNode() override;
 
-    nlohmann::json to_json() override;
+    nlohmann::json to_json() const override;
 
 };
 

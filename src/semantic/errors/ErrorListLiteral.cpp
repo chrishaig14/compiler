@@ -5,11 +5,15 @@
 #include "ErrorListLiteral.h"
 
 Error* ErrorListLiteral::clone() const {
-    return nullptr;
+    return new ErrorListLiteral(this->node, this->type, this->position, this->node_1);
 }
 
 bool ErrorListLiteral::equal(const Error& other) const {
-    return false;
+    const ErrorListLiteral& o = (const ErrorListLiteral&) other;
+    bool node_ok = this->node == o.node;
+    bool type_ok = this->type == o.type;
+    bool node_1_ok = this->node_1 == this->node_1;
+    return node_ok and type_ok and node_1_ok;
 }
 
 std::string ErrorListLiteral::to_str() const {
@@ -17,6 +21,6 @@ std::string ErrorListLiteral::to_str() const {
 }
 
 ErrorListLiteral::ErrorListLiteral(const TypeNode& node, const ObjectType& type, TextPosition position,
-                                   const Node& node_1) {
+                                   const Node& node_1) : node(node), type(type), position(position), node_1(node_1) {
 
 }

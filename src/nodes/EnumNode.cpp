@@ -16,6 +16,6 @@ bool EnumNode::equal(const Node& other) const {
     return false;
 }
 
-nlohmann::json EnumNode::to_json() {
+nlohmann::json EnumNode::to_json() const {
     return nlohmann::json();
 }

@@ -23,7 +23,7 @@ ForNode::~ForNode() {
     // delete this->body;
 }
 
-nlohmann::json ForNode::to_json() {
+nlohmann::json ForNode::to_json() const {
     nlohmann::json j;
     j["type"] = "for";
     j["for"]["var"] = this->var;

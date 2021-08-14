@@ -127,3 +127,210 @@ TEST_CASE("error_redeclared", "[checker]") {
     ErrorRedeclared exp("x", *(DeclarationNode*) ((FunctionNode*) module.ast->nodes[0])->body->nodes[1]);
     REQUIRE(error == exp);
 }
+
+TEST_CASE("list_ok", "[checker]") {
+    std::string code = "fun foo()->Integer{var x = [4,1];return 0;}";
+
+    Compiler c = analyze(code);
+    Module& module = *c.root_package->units["tmp"].module;
+    analyze_module_result(module, *c.top_package);
+    Checker checker(c.top_package, c.root_package->units["tmp"].module);
+    checker.visit_function(*(FunctionNode*) module.ast->nodes[0]);
+
+    REQUIRE(!checker.error_reporter.failed);
+    REQUIRE(checker.error_reporter.errors.empty());
+}
+
+TEST_CASE("list_bad", "[checker]") {
+    std::string code = "fun foo()->Integer{var x = [4,\"a\"];return 0;}";
+
+    Compiler c = analyze(code);
+    Module& module = *c.root_package->units["tmp"].module;
+    analyze_module_result(module, *c.top_package);
+    Checker checker(c.top_package, c.root_package->units["tmp"].module);
+    checker.visit_function(*(FunctionNode*) module.ast->nodes[0]);
+
+    REQUIRE(checker.error_reporter.failed);
+    REQUIRE(checker.error_reporter.errors.size() == 1);
+    Error& error = *checker.error_reporter.errors.back();
+
+
+    StringNode node("a", {1, 1}, {1, 1});
+    ObjectType expected("Integer");
+    ErrorTypeMismatch exp(expected, node, entity_from_type(ObjectType("String")));
+
+    REQUIRE(error == exp);
+}
+
+TEST_CASE("empty_dict_ok", "[checker]") {
+    std::string code = "fun foo()->Integer{var x = {}::[Integer,String];return 0;}";
+
+    Compiler c = analyze(code);
+    Module& module = *c.root_package->units["tmp"].module;
+    analyze_module_result(module, *c.top_package);
+    Checker checker(c.top_package, c.root_package->units["tmp"].module);
+    checker.visit_function(*(FunctionNode*) module.ast->nodes[0]);
+
+    REQUIRE(!checker.error_reporter.failed);
+    REQUIRE(checker.error_reporter.errors.empty());
+}
+
+TEST_CASE("dict_ok", "[checker]") {
+    std::string code = "fun foo()->Integer{var x = {7:\"seven\",9:\"nine\"};return 0;}";
+
+    Compiler c = analyze(code);
+    Module& module = *c.root_package->units["tmp"].module;
+    analyze_module_result(module, *c.top_package);
+    Checker checker(c.top_package, c.root_package->units["tmp"].module);
+    checker.visit_function(*(FunctionNode*) module.ast->nodes[0]);
+
+    REQUIRE(!checker.error_reporter.failed);
+    REQUIRE(checker.error_reporter.errors.empty());
+}
+
+TEST_CASE("dict_key_type_error", "[checker]") {
+    std::string code = "fun foo()->Integer{var x = {7:\"seven\",\"nine\":\"ten\"};return 0;}";
+
+    Compiler c = analyze(code);
+    Module& module = *c.root_package->units["tmp"].module;
+    analyze_module_result(module, *c.top_package);
+    Checker checker(c.top_package, c.root_package->units["tmp"].module);
+    checker.visit_function(*(FunctionNode*) module.ast->nodes[0]);
+
+    REQUIRE(checker.error_reporter.failed);
+    REQUIRE(checker.error_reporter.errors.size() == 1);
+}
+
+TEST_CASE("dict_value_type_error", "[checker]") {
+    std::string code = "fun foo()->Integer{var x = {7:\"seven\",9:false};return 0;}";
+
+    Compiler c = analyze(code);
+    Module& module = *c.root_package->units["tmp"].module;
+    analyze_module_result(module, *c.top_package);
+    Checker checker(c.top_package, c.root_package->units["tmp"].module);
+    checker.visit_function(*(FunctionNode*) module.ast->nodes[0]);
+
+    REQUIRE(checker.error_reporter.failed);
+    REQUIRE(checker.error_reporter.errors.size() == 1);
+}
+
+
+TEST_CASE("int_literal", "[checker]") {
+    std::string code = "fun foo()->Integer{var x = 9;return 0;}";
+
+    Compiler c = analyze(code);
+    Module& module = *c.root_package->units["tmp"].module;
+    analyze_module_result(module, *c.top_package);
+    Checker checker(c.top_package, c.root_package->units["tmp"].module);
+    Node* expression = ((DeclarationNode*) (*(FunctionNode*) module.ast->nodes[0]).body->nodes[0])->expression;
+    USemanticInfo info = checker.dispatch_rvalue(expression);
+
+    REQUIRE(!checker.error_reporter.failed);
+    REQUIRE(checker.error_reporter.errors.size() == 0);
+    REQUIRE(info->entity.type == E_TYPE::VALUE);
+    REQUIRE(info->entity.value->metatype == Meta::CLASS);
+    REQUIRE(*info->entity.value->type == ObjectType("Integer"));
+}
+
+TEST_CASE("bool_literal", "[checker]") {
+    std::string code = "fun foo()->Integer{var x = false;return 0;}";
+
+    Compiler c = analyze(code);
+    Module& module = *c.root_package->units["tmp"].module;
+    analyze_module_result(module, *c.top_package);
+    Checker checker(c.top_package, c.root_package->units["tmp"].module);
+    Node* expression = ((DeclarationNode*) (*(FunctionNode*) module.ast->nodes[0]).body->nodes[0])->expression;
+    USemanticInfo info = checker.dispatch_rvalue(expression);
+
+    REQUIRE(!checker.error_reporter.failed);
+    REQUIRE(checker.error_reporter.errors.size() == 0);
+    REQUIRE(info->entity.type == E_TYPE::VALUE);
+    REQUIRE(info->entity.value->metatype == Meta::CLASS);
+    REQUIRE(*info->entity.value->type == ObjectType("Boolean"));
+}
+
+TEST_CASE("list_literal", "[checker]") {
+    std::string code = "fun foo()->Integer{var x = [4,1];return 0;}";
+
+    Compiler c = analyze(code);
+    Module& module = *c.root_package->units["tmp"].module;
+    analyze_module_result(module, *c.top_package);
+    Checker checker(c.top_package, c.root_package->units["tmp"].module);
+    Node* expression = ((DeclarationNode*) (*(FunctionNode*) module.ast->nodes[0]).body->nodes[0])->expression;
+    USemanticInfo info = checker.dispatch_rvalue(expression);
+
+    REQUIRE(!checker.error_reporter.failed);
+    REQUIRE(checker.error_reporter.errors.size() == 0);
+    REQUIRE(info->entity.type == E_TYPE::VALUE);
+    REQUIRE(info->entity.value->metatype == Meta::CLASS);
+    REQUIRE(*info->entity.value->type == ObjectType("List", {new ObjectType("Integer")}));
+}
+
+TEST_CASE("empty_list_literal", "[checker]") {
+    std::string code = "fun foo()->Integer{var x = []::String;return 0;}";
+
+    Compiler c = analyze(code);
+    Module& module = *c.root_package->units["tmp"].module;
+    analyze_module_result(module, *c.top_package);
+    Checker checker(c.top_package, c.root_package->units["tmp"].module);
+    Node* expression = ((DeclarationNode*) (*(FunctionNode*) module.ast->nodes[0]).body->nodes[0])->expression;
+    USemanticInfo info = checker.dispatch_rvalue(expression);
+
+    REQUIRE(!checker.error_reporter.failed);
+    REQUIRE(checker.error_reporter.errors.size() == 0);
+    REQUIRE(info->entity.type == E_TYPE::VALUE);
+    REQUIRE(info->entity.value->metatype == Meta::CLASS);
+    REQUIRE(*info->entity.value->type == ObjectType("List", {new ObjectType("String")}));
+}
+
+TEST_CASE("empty_dict_literal", "[checker]") {
+    std::string code = "fun foo()->Integer{var x = {}::[Integer,String];return 0;}";
+
+    Compiler c = analyze(code);
+    Module& module = *c.root_package->units["tmp"].module;
+    analyze_module_result(module, *c.top_package);
+    Checker checker(c.top_package, c.root_package->units["tmp"].module);
+    Node* expression = ((DeclarationNode*) (*(FunctionNode*) module.ast->nodes[0]).body->nodes[0])->expression;
+    USemanticInfo info = checker.dispatch_rvalue(expression);
+
+    REQUIRE(!checker.error_reporter.failed);
+    REQUIRE(checker.error_reporter.errors.size() == 0);
+    REQUIRE(info->entity.type == E_TYPE::VALUE);
+    REQUIRE(info->entity.value->metatype == Meta::CLASS);
+    REQUIRE(*info->entity.value->type == ObjectType("Dict", {new ObjectType("Integer"), new ObjectType("String")}));
+}
+
+
+TEST_CASE("dict_literal", "[checker]") {
+    std::string code = "fun foo()->Integer{var x = {\"one\":1,\"two\":2};return 0;}";
+
+    Compiler c = analyze(code);
+    Module& module = *c.root_package->units["tmp"].module;
+    analyze_module_result(module, *c.top_package);
+    Checker checker(c.top_package, c.root_package->units["tmp"].module);
+    Node* expression = ((DeclarationNode*) (*(FunctionNode*) module.ast->nodes[0]).body->nodes[0])->expression;
+    USemanticInfo info = checker.dispatch_rvalue(expression);
+
+    REQUIRE(!checker.error_reporter.failed);
+    REQUIRE(checker.error_reporter.errors.size() == 0);
+    REQUIRE(info->entity.type == E_TYPE::VALUE);
+    REQUIRE(info->entity.value->metatype == Meta::CLASS);
+    REQUIRE(*info->entity.value->type == ObjectType("Dict", {new ObjectType("String"), new ObjectType("Integer")}));
+}
+
+TEST_CASE("float_literal", "[checker]") {
+    std::string code = "fun foo()->Integer{var x = 9.5;return 0;}";
+
+    Compiler c = analyze(code);
+    Module& module = *c.root_package->units["tmp"].module;
+    analyze_module_result(module, *c.top_package);
+    Checker checker(c.top_package, c.root_package->units["tmp"].module);
+    Node* expression = ((DeclarationNode*) (*(FunctionNode*) module.ast->nodes[0]).body->nodes[0])->expression;
+    USemanticInfo info = checker.dispatch_rvalue(expression);
+
+    REQUIRE(!checker.error_reporter.failed);
+    REQUIRE(checker.error_reporter.errors.size() == 0);
+    REQUIRE(info->entity.type == E_TYPE::VALUE);
+    REQUIRE(info->entity.value->metatype == Meta::CLASS);
+    REQUIRE(*info->entity.value->type == ObjectType("Float"));
+}

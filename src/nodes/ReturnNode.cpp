@@ -21,7 +21,7 @@ ReturnNode::~ReturnNode() {
     // }
 }
 
-nlohmann::json ReturnNode::to_json() {
+nlohmann::json ReturnNode::to_json() const {
     nlohmann::json j;
     j["type"] = "return";
     j["return"] = {{"expression", this->expression != nullptr ? this->expression->to_json() : nlohmann::json()}};

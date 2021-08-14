@@ -53,7 +53,7 @@ FunctionNode::~FunctionNode() {
     // delete this->return_type;
 }
 
-nlohmann::json FunctionNode::to_json() {
+nlohmann::json FunctionNode::to_json() const {
     std::vector<nlohmann::json> params;
     for (size_t i = 0; i < this->parameter_names.size(); i++) {
         params.push_back({{"id",   this->parameter_names[i]},

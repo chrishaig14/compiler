@@ -22,7 +22,7 @@ public:
         return *o.key_type == *this->key_type && *o.value_type == *this->value_type;
     }
 
-    nlohmann::json to_json() override {
+    nlohmann::json to_json() const override {
         return {{"type",       "empty_dict"},
                 {"empty_dict", {{"key_type", this->key_type->to_json()}, {"value_type", this->value_type->to_json()}}}};
     }

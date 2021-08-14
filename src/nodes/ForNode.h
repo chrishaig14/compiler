@@ -19,7 +19,7 @@ public:
     ForNode(const std::string& var, Node* exp, BlockNode* body, TextPosition start, TextPosition end);
     ~ForNode() override;
 
-    nlohmann::json to_json() override;
+    nlohmann::json to_json() const override;
 
 };
 

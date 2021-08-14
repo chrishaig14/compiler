@@ -11,7 +11,7 @@ bool ContinueNode::equal(const Node& other) const {
 ContinueNode::ContinueNode(TextPosition start, TextPosition end) : Node(NodeType::CNTINUE, start, end) {
 }
 
-nlohmann::json ContinueNode::to_json() {
+nlohmann::json ContinueNode::to_json() const {
     return {{"type", "continue"}};
 }
 

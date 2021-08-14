@@ -103,7 +103,7 @@ public:
     bool operator==(const Node& other) const;
     bool operator!=(const Node& other) const;
 
-    virtual nlohmann::json to_json() = 0;
+    virtual nlohmann::json to_json() const = 0;
 };
 
 #endif //NODE_H

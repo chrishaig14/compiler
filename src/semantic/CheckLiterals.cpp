@@ -8,6 +8,7 @@
 #include "errors/ErrorExpectedExpression.h"
 #include "errors/ErrorListLiteral.h"
 #include "errors/ErrorPartialWrongNumArgs.h"
+#include "errors/ErrorTypeMismatch.h"
 
 USemanticInfo Checker::visit_boolean(BooleanNode& node) {
     SemanticInfo info;
@@ -40,7 +41,7 @@ USemanticInfo Checker::visit_number(NumberNode& node) {
             info.entity = Entity(ov);
             auto* snode = new FloatSNode();
             snode->str = node.str;
-            otype->actual_base_path = Path("core.Float");
+            otype->actual_base_path = Path("core.core.Float");
             this->fill_value(ov);
             info.snode = snode;
             break;
@@ -218,7 +219,9 @@ USemanticInfo Checker::visit_dict(DictNode& node) {
 
 USemanticInfo Checker::visit_emptydict(EmptyDictNode& node) {
     SemanticInfo info;
-    auto* ov = new Value(new ObjectType("Dict", {node.key_type->clone(), node.value_type->clone()}));
+    ObjectType* ot = new ObjectType("Dict", {node.key_type->clone(), node.value_type->clone()});
+    ot->actual_base_path = Path("core.core.Dict");
+    auto* ov = new Value(ot);
     this->module->fill_actual(ov->type);
     this->fill_value(ov);
     assert(ov->clazz != nullptr);
@@ -275,7 +278,7 @@ USemanticInfo Checker::visit_list(ListNode& node) {
         // }
         ObjectType* ctype = &current_type_p->entity.value->type->object();
         if (*ctype != *element_type) {
-            this->error_reporter.error(ErrorListLiteral(*element_type, *ctype, node.elements[i]->start, *node.elements[i]));
+            this->error_reporter.error(ErrorTypeMismatch(*element_type, *node.elements[i], current_type_p->entity));
         }
         list_elements.push_back(current_type_p->snode);
     }

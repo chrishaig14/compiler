@@ -25,7 +25,7 @@ public:
 
     const ObjectType& object() const override;
 
-    nlohmann::json to_json() override;
+    nlohmann::json to_json() const override;
 
     ~ObjectType() override;
 

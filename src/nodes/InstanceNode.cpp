@@ -15,7 +15,7 @@ bool InstanceNode::equal(const Node& other) const {
     return false;
 }
 
-nlohmann::json InstanceNode::to_json() {
+nlohmann::json InstanceNode::to_json() const {
     nlohmann::json j;
     j["id"] = this->id;
     j["base_type"] = this->base_type->to_json();

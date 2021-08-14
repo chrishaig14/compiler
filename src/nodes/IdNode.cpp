@@ -15,7 +15,7 @@ bool IdNode::equal(const Node& x) const {
 }
 
 
-nlohmann::json IdNode::to_json() {
+nlohmann::json IdNode::to_json() const {
     nlohmann::json j;
     j["type"] = "id";
     j["id"]["_id"] = this->_id;

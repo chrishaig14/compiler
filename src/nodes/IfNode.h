@@ -23,7 +23,7 @@ public:
 
     bool equal(const Node& other) const override;
 
-    nlohmann::json to_json() override;
+    nlohmann::json to_json() const override;
 
     ~IfNode() override;
 

@@ -34,7 +34,7 @@ void GlobalProcessor::visit_import(ImportNode& node) {
 void GlobalProcessor::add_default_imports() {
     std::vector<Path> default_paths = {Path("core.core.String"), Path("core.core.Integer"), Path("core.core.List"),
                                        Path("core.core.Double"), Path("core.core.Boolean"), Path("core.core.Float"),
-                                       Path("core.core.Option"), Path("core.core.print")};
+                                       Path("core.core.Option"), Path("core.core.print"),Path("core.core.Dict")};
     for (auto path: default_paths) {
         if (this->module->imported_paths_with_alias.count(path.as_vec().back()) != 0) {
             std::cout << this->module->abs_path << std::endl;

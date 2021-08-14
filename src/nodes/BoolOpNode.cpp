@@ -19,7 +19,7 @@ BoolOpNode::~BoolOpNode() {
     // delete this->right;
 }
 
-nlohmann::json BoolOpNode::to_json() {
+nlohmann::json BoolOpNode::to_json() const {
     return {{"type",  "boolop"},
             {"left",  this->left->to_json()},
             {"right", this->right->to_json()},

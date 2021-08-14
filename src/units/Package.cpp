@@ -2,6 +2,7 @@
 // Created by chris on 6/4/21.
 //
 
+#include <cassert>
 #include "Package.h"
 
 Package::Package(Path path, std::string abs_path, std::string rel_path, bool is_lib, std::string full_header_path,
@@ -19,6 +20,7 @@ Flirpin Package::get(Path p) {
         return Flirpin{.type=F_TYPE::CLASS, .clazz=new Class()};
     }
     VectorOfStrings pt = p.as_vec();
+    assert(this->units.count(pt[0]) == 1);
     Unit u = this->units.at(pt[0]);
     switch (u.type) {
         case U_TYPE::MODULE:

@@ -27,7 +27,7 @@ ListNode::~ListNode() {
     // }
 }
 
-nlohmann::json ListNode::to_json() {
+nlohmann::json ListNode::to_json() const {
     nlohmann::json j;
     j["type"] = "list";
     std::vector<nlohmann::json> v;

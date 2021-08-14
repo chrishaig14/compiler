@@ -54,9 +54,11 @@ public:
     bool generic;
     bool is_generic_param;
 
-    virtual nlohmann::json to_json() = 0;
+    virtual nlohmann::json to_json() const = 0;
 
     virtual bool is_generic() const;
 };
+
+std::ostream& operator<<(std::ostream& o, const TypeNode& t);
 
 #endif //TypeNode_H

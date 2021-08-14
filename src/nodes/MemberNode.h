@@ -28,7 +28,7 @@ public:
     bool equal(const Node& x) const override;
 
     ~MemberNode() override;
-    nlohmann::json to_json() override;
+    nlohmann::json to_json() const override;
 
 };
 

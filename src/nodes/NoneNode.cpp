@@ -11,7 +11,7 @@ bool NoneNode::equal(const Node& other) const {
 NoneNode::NoneNode(TextPosition start, TextPosition end) : Node(NodeType::NONE, start, end) {
 }
 
-nlohmann::json NoneNode::to_json() {
+nlohmann::json NoneNode::to_json() const {
     return {{"type", "none"}};
 }
 

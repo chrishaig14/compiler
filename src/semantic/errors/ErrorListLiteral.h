@@ -7,6 +7,7 @@
 
 
 #include "Error.h"
+#include "../../nodes/ObjectType.h"
 
 class ErrorListLiteral : public Error {
 public:
@@ -15,6 +16,10 @@ public:
     bool equal(const Error& other) const override;
     std::string to_str() const override;
 
+    const TypeNode& node;
+    const ObjectType& type;
+    TextPosition position;
+    const Node& node_1;
 };
 
 

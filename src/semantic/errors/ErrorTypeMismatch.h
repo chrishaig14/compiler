@@ -7,6 +7,7 @@
 
 #include "../../nodes/TypeNode.h"
 #include "../../units/Entity.h"
+#include "../../nodes/Node.h"
 #include "Error.h"
 
 class ErrorTypeMismatch : public Error {

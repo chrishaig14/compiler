@@ -35,7 +35,7 @@ CallNode::~CallNode() {
     // }
 }
 
-nlohmann::json CallNode::to_json() {
+nlohmann::json CallNode::to_json() const {
     nlohmann::json j;
     j["type"] = "call";
     j["call"]["function"] = this->function->to_json();

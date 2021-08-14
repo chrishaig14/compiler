@@ -22,7 +22,7 @@ bool DictNode::equal(const Node& other) const {
     return true;
 }
 
-nlohmann::json DictNode::to_json() {
+nlohmann::json DictNode::to_json() const {
     nlohmann::json j;
     j["type"] = "dict";
     std::vector<nlohmann::json> v;

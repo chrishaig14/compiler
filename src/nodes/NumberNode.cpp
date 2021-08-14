@@ -15,7 +15,7 @@ bool NumberNode::equal(const Node& x) const {
     return this->str == other.str && this->num_type == other.num_type;
 }
 
-nlohmann::json NumberNode::to_json() {
+nlohmann::json NumberNode::to_json() const {
     nlohmann::json r;
     r["type"] = "number";
     r["number"]["str"] = this->str;

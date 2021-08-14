@@ -35,7 +35,7 @@ PartialApplication::PartialApplication(Node* function, VectorOfNodes args, TextP
     this->args = args;
 }
 
-nlohmann::json PartialApplication::to_json() {
+nlohmann::json PartialApplication::to_json() const {
     return nlohmann::json();
 }
 

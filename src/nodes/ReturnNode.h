@@ -18,7 +18,7 @@ public:
     bool equal(const Node& other) const override;
 
     ~ReturnNode();
-    nlohmann::json to_json() override;
+    nlohmann::json to_json() const override;
 
     Node* expression;
     std::vector<std::pair<std::string, TypeNode*>> reachables;

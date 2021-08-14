@@ -36,3 +36,8 @@ const ObjectType& TypeNode::object() const {
 bool TypeNode::is_generic() const {
     return false;
 }
+
+std::ostream& operator<<(std::ostream& o, const TypeNode& t) {
+    o << t.to_string();
+    return o;
+}

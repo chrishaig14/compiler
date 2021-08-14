@@ -21,7 +21,7 @@ TupleNode::TupleNode(const VectorOfNodes& values, TextPosition start, TextPositi
     this->values = values;
 }
 
-nlohmann::json TupleNode::to_json() {
+nlohmann::json TupleNode::to_json() const {
     return nlohmann::json();
 }
 

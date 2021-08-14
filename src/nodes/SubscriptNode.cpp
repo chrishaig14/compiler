@@ -29,7 +29,7 @@ SubscriptNode::~SubscriptNode() {
     // }
 }
 
-nlohmann::json SubscriptNode::to_json() {
+nlohmann::json SubscriptNode::to_json() const {
     nlohmann::json j;
     j["type"] = "subscript";
     j["subscript"]["parent"] = this->parent->to_json();

@@ -27,7 +27,7 @@ DeclarationNode::~DeclarationNode() {
 
 }
 
-nlohmann::json DeclarationNode::to_json() {
+nlohmann::json DeclarationNode::to_json() const {
     nlohmann::json j;
     j["type"] = "declaration";
     j["declaration"]["identifier"] = this->identifier;

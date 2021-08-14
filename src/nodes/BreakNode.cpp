@@ -11,7 +11,7 @@ bool BreakNode::equal(const Node& other) const {
 BreakNode::BreakNode(TextPosition start, TextPosition end) : Node(NodeType::BRK, start, end) {
 }
 
-nlohmann::json BreakNode::to_json() {
+nlohmann::json BreakNode::to_json() const {
     return {{"type", "break"}};
 }
 

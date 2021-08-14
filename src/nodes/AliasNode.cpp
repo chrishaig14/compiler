@@ -13,6 +13,6 @@ AliasNode::AliasNode(std::string alias_id, TypeNode* aliased_type, TextPosition 
     this->aliased_type = aliased_type;
 }
 
-nlohmann::json AliasNode::to_json() {
+nlohmann::json AliasNode::to_json() const {
     return nlohmann::json();
 }

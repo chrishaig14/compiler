@@ -25,7 +25,7 @@ public:
 
 
     ~BlockNode();
-    nlohmann::json to_json() override;
+    nlohmann::json to_json() const override;
     std::vector<std::pair<std::string, TypeNode*>> local_vars;
 };
 

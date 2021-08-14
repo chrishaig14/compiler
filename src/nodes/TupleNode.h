@@ -15,7 +15,7 @@ public:
     VectorOfNodes values;
     bool equal(const Node& other) const override;
     TupleNode(const VectorOfNodes& values, TextPosition start, TextPosition end);
-    nlohmann::json to_json() override;
+    nlohmann::json to_json() const override;
 
 };
 

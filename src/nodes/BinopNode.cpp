@@ -20,7 +20,7 @@ BinopNode::~BinopNode() {
     // delete this->right;
 }
 
-nlohmann::json BinopNode::to_json() {
+nlohmann::json BinopNode::to_json() const {
     nlohmann::json j;
     j["type"] = "binop";
     j["binop"]["op"] = op_to_string(this->op);

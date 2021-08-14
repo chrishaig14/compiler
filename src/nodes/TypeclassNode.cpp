@@ -4,7 +4,7 @@
 
 #include "TypeclassNode.h"
 
-nlohmann::json TypeclassNode::to_json() {
+nlohmann::json TypeclassNode::to_json() const {
     nlohmann::json j;
     j["id"] = this->id;
     j["base_type"] = this->base_type;

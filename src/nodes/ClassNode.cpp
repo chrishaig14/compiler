@@ -28,7 +28,7 @@ ClassNode::~ClassNode() {
     // }
 }
 
-nlohmann::json ClassNode::to_json() {
+nlohmann::json ClassNode::to_json() const {
     nlohmann::json j;
     j["type"] = "class";
     std::vector<nlohmann::json> memj;

@@ -50,7 +50,7 @@ IfNode::~IfNode() {
     // }
 }
 
-nlohmann::json IfNode::to_json() {
+nlohmann::json IfNode::to_json() const {
     std::vector<nlohmann::json> elifs;
     for (auto e: this->elifs) {
         elifs.push_back({{"condition", e.first->to_json()},

@@ -28,7 +28,7 @@ WhileNode::~WhileNode() {
     // delete this->condition;
 }
 
-nlohmann::json WhileNode::to_json() {
+nlohmann::json WhileNode::to_json() const {
     return {{"type",  "while"},
             {"while", {{"condition", this->condition->to_json()}, {"body", this->body->to_json()}}}};
 }

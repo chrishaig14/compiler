@@ -13,7 +13,7 @@ bool StringNode::equal(const Node& x) const {
     return this->str == other.str;
 }
 
-nlohmann::json StringNode::to_json() {
+nlohmann::json StringNode::to_json() const {
     nlohmann::json j;
     j["type"] = "string";
     j["string"]["str"] = this->str;

@@ -12,7 +12,7 @@ public:
     std::unordered_map<std::string, FunctionType*> methods;
     TypeclassNode(const std::string& id, const std::string& base_type,
                   const std::unordered_map<std::string, FunctionType*>& methods, TextPosition start, TextPosition end);
-    nlohmann::json to_json() override;
+    nlohmann::json to_json() const override;
     bool equal(const Node& other) const override;
 };
 

@@ -32,7 +32,7 @@ bool MemberNode::equal(const Node& x) const {
     return *this->parent == *other.parent;
 }
 
-nlohmann::json MemberNode::to_json() {
+nlohmann::json MemberNode::to_json() const {
     return {{"type",   "member"},
             {"member", {{"parent", this->parent->to_json()}, {"child", this->s_child}}}};
 }

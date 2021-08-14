@@ -30,7 +30,7 @@ public:
 
     bool is_generic() const override;
 
-    nlohmann::json to_json() override;
+    nlohmann::json to_json() const override;
 };
 
 #endif //XLANG_FUNCTIONTYPE_H

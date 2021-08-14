@@ -16,7 +16,7 @@ public:
         this->items = items;
     }
 
-    nlohmann::json to_json() override;
+    nlohmann::json to_json() const override;
 
     std::vector<std::pair<Node*, Node*>> items;
 };

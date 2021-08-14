@@ -15,6 +15,6 @@ bool MatchExpressionNode::equal(const Node& other) const {
     return false;
 }
 
-nlohmann::json MatchExpressionNode::to_json() {
+nlohmann::json MatchExpressionNode::to_json() const {
     return nlohmann::json();
 }

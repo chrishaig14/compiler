@@ -18,7 +18,7 @@ EmptyListNode::~EmptyListNode() {
     // delete this->type;
 }
 
-nlohmann::json EmptyListNode::to_json() {
+nlohmann::json EmptyListNode::to_json() const {
     return {{"type",       "empty_list"},
             {"empty_list", {{"type", this->type->to_json()}}}};
 }

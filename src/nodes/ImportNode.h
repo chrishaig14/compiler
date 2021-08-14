@@ -29,7 +29,7 @@ public:
         this->path = path;
     }
 
-    nlohmann::json to_json() override;
+    nlohmann::json to_json() const override;
 
     VectorOfStrings path;
     std::string alias;

@@ -18,7 +18,7 @@ AssignmentNode::~AssignmentNode() {
     // delete this->rvalue;
 }
 
-nlohmann::json AssignmentNode::to_json() {
+nlohmann::json AssignmentNode::to_json() const {
     nlohmann::json j;
     j["type"] = "assignment";
     j["assignment"]["lvalue"] = this->lvalue->to_json();

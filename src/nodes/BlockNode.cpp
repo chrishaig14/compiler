@@ -31,7 +31,7 @@ BlockNode::BlockNode(VectorOfNodes nodes, TextPosition start, TextPosition end) 
     ;
 }
 
-nlohmann::json BlockNode::to_json() {
+nlohmann::json BlockNode::to_json() const {
     std::vector<nlohmann::json> v;
     for (auto s: this->nodes) {
         v.push_back(s->to_json());

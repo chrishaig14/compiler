@@ -20,7 +20,7 @@ public:
         return false;
     }
 
-    nlohmann::json to_json() override {
+    nlohmann::json to_json() const override {
         return nlohmann::json();
     }
 

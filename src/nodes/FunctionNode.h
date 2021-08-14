@@ -35,7 +35,7 @@ public:
     bool equal(const Node& x) const override;
 
     ~FunctionNode() override;
-    nlohmann::json to_json() override;
+    nlohmann::json to_json() const override;
 
     std::unordered_map<std::string, std::string> constraints;
     Path path;

@@ -13,7 +13,7 @@ bool BooleanNode::equal(const Node& x) const {
     return this->value == other.value;
 }
 
-nlohmann::json BooleanNode::to_json() {
+nlohmann::json BooleanNode::to_json() const {
     nlohmann::json j;
     j["type"] = "boolean";
     j["boolean"]["value"] = this->value;

@@ -102,7 +102,7 @@ bool ObjectType::is_generic() const {
     return false;
 }
 
-nlohmann::json ObjectType::to_json() {
+nlohmann::json ObjectType::to_json() const {
     nlohmann::json j;
     j["kind"] = "object";
     j["id"] = this->id;
@@ -113,3 +113,4 @@ nlohmann::json ObjectType::to_json() {
     j["type_params"] = v;
     return j;
 }
+

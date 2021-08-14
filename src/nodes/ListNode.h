@@ -19,7 +19,7 @@ public:
     bool equal(const Node& other) const override;
 
     ~ListNode() override;
-    nlohmann::json to_json() override;
+    nlohmann::json to_json() const override;
 
     TypeNode* type;
 };
