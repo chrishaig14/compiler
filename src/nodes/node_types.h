@@ -23,7 +23,6 @@ enum class NodeType {
     CNTINUE,
     DECL,
     EMPTYLST,
-    FLOT,
     FORLOOP,
     FUNC,
     ID,

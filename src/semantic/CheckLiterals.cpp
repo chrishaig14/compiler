@@ -131,15 +131,6 @@ USemanticInfo Checker::visit_tuple(TupleNode& node) {
     return std::make_unique<SemanticInfo>(sinfo);
 }
 
-USemanticInfo Checker::visit_float(FloatNode& node) {
-    SemanticInfo s;
-    auto* value = new Value(new ObjectType("Float", {}));
-    value->type->object().actual_base_path = Path("core.Float");
-    s.entity = Entity(value);
-    this->fill_value(value);
-    return std::make_unique<SemanticInfo>(s);
-}
-
 USemanticInfo Checker::visit_partial(PartialApplication& node) {
     USemanticInfo func = this->dispatch(node.function);
     VectorOfTypes partial_args;

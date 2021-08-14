@@ -345,8 +345,6 @@ USemanticInfo Checker::dispatch_any(Node* n, bool is_rvalue) {
             return this->visit_declaration(*(DeclarationNode*) n);
         case NodeType::EMPTYLST:
             return this->visit_emptylist(*(EmptyListNode*) n);
-        case NodeType::FLOT:
-            return this->visit_float(*(FloatNode*) n);
         case NodeType::FORLOOP:
             return this->visit_for(*(ForNode*) n);
         case NodeType::FUNC:

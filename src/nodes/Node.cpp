@@ -42,8 +42,6 @@ std::string Node::node_type_string(NodeType type) const {
             return "DECL";
         case NodeType::EMPTYLST:
             return "EMPTYLST";
-        case NodeType::FLOT:
-            return "FLOT";
         case NodeType::FORLOOP:
             return "FORLOOP";
         case NodeType::FUNC:

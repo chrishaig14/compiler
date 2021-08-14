@@ -125,7 +125,6 @@ public:
     USemanticInfo visit_dict(DictNode& node);
     USemanticInfo visit_emptydict(EmptyDictNode& node);
     USemanticInfo visit_emptylist(EmptyListNode& node);
-    USemanticInfo visit_float(FloatNode& node);
     USemanticInfo visit_unary(UnaryOpNode& n);
     USemanticInfo visit_for(ForNode& node);
     USemanticInfo visit_function(FunctionNode& n);

@@ -47,8 +47,6 @@ class EmptyDictNode;
 
 class MemberNode;
 
-class FloatNode;
-
 class NoneNode;
 
 class NumberNode;
