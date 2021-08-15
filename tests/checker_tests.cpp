@@ -519,7 +519,7 @@ TEST_CASE("subscript_index_type_error", "[checker]") {
     Error& error = *checker.error_reporter.errors.back();
     StringNode node("foo", _POS, _POS);
     ObjectType expected("Integer");
-    ErrorTypeMismatch exp(expected, node, entity_from_type(ObjectType("Integer")));
+    ErrorTypeMismatch exp(expected, node, entity_from_type(ObjectType("String")));
     REQUIRE(error == exp);
 }
 
@@ -543,5 +543,54 @@ TEST_CASE("subscript_no_method_error", "[checker]") {
     ObjectType expected("Integer");
     ObjectType type("Foo");
     ErrorObjectNoSpecialMethod exp(type, "__get_item__", node);
+    REQUIRE(error == exp);
+}
+
+TEST_CASE("call_no_args_ok", "[checker]") {
+    std::string code = "fun bar()->Integer{return 0;}\nfun foo()->Integer{var x : Integer = bar();return 0;}";
+
+    Compiler c = analyze(code);
+    Module& module = *c.root_package->units["tmp"].module;
+    analyze_module_result(module, *c.top_package);
+    Checker checker(c.top_package, c.root_package->units["tmp"].module);
+    checker.init();
+    checker.visit_root(*module.ast);
+
+    REQUIRE(!checker.error_reporter.failed);
+    REQUIRE(checker.error_reporter.errors.empty());
+}
+
+TEST_CASE("call_args_ok", "[checker]") {
+    std::string code = "fun bar(a: Integer, b: String)->Integer{return 0;}\nfun foo()->Integer{var x : Integer = bar(8, \"Hello\");return 0;}";
+
+    Compiler c = analyze(code);
+    Module& module = *c.root_package->units["tmp"].module;
+    analyze_module_result(module, *c.top_package);
+    Checker checker(c.top_package, c.root_package->units["tmp"].module);
+    checker.init();
+    checker.visit_root(*module.ast);
+
+    REQUIRE(!checker.error_reporter.failed);
+    REQUIRE(checker.error_reporter.errors.empty());
+}
+
+TEST_CASE("call_args_type_error", "[checker]") {
+    std::string code = "fun bar(a: Integer, b: String)->Integer{return 0;}\nfun foo()->Integer{var x : Integer = bar(\"Hello\",\"Bye\");return 0;}";
+
+    Compiler c = analyze(code);
+    Module& module = *c.root_package->units["tmp"].module;
+    analyze_module_result(module, *c.top_package);
+    Checker checker(c.top_package, c.root_package->units["tmp"].module);
+    checker.init();
+    checker.visit_root(*module.ast);
+
+    REQUIRE(checker.error_reporter.failed);
+    REQUIRE(checker.error_reporter.errors.size() == 1);
+
+
+    Error& error = *checker.error_reporter.errors.back();
+    StringNode node("Hello", _POS, _POS);
+    ObjectType expected("Integer");
+    ErrorTypeMismatch exp(expected, node, entity_from_type(ObjectType("String")));
     REQUIRE(error == exp);
 }
