@@ -21,7 +21,8 @@ bool ErrorNoMemberSuggestions::equal(const Error& other) const {
     const auto& o = (const ErrorNoMemberSuggestions&) other;
     bool act = o.m == this->m;
     bool exp = o.t == this->t;
-    return act && exp;
+    bool clz = &o.clazz == &this->clazz;
+    return act && exp && clz;
 }
 
 Error* ErrorNoMemberSuggestions::clone() const {

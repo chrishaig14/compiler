@@ -128,6 +128,7 @@ USemanticInfo Checker::visit_boolop(BoolOpNode& n) {
         TypeNode* rettype = operator_fun->ft->return_type->clone();
 
         info.entity = Entity(new Value(rettype));
+        this->fill_value(info.entity.value);
         info.snode = make_boolop_snode(operator_fun, left_info, right_info);
     }
 

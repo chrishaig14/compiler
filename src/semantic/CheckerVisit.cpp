@@ -129,17 +129,17 @@ USemanticInfo Checker::visit_class(ClassNode& node) {
     return std::make_unique<SemanticInfo>(info);
 }
 
-USemanticInfo Checker::visit_root(BlockNode& node) {
+void Checker::init() {
     this->error_reporter.__file__ = this->module->abs_path;
     this->error_reporter.code_lines = this->module->code_lines;
     // Initialize module level Scope
     for (const auto& f: this->module->flirpins) {
         this->scope->set(f.first, map_flirpin_to_entity(f.second));
     }
-    // for (auto i: this->module->imports) {
-    //     this->scope->set(i.first, i.second);
-    // }
+}
 
+USemanticInfo Checker::visit_root(BlockNode& node) {
+    this->init();
     return this->visit_block(node);
 }
 

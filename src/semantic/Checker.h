@@ -172,6 +172,7 @@ public:
                               const TypeNode* unaliased_target_type) const;
     // USemanticInfo visit_throw(ThrowNode& n);
     USemanticInfo visit_try_catch(TryCatchNode& node);
+    void init();
 };
 
 #endif //CHECKER_H

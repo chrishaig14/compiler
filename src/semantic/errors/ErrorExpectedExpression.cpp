@@ -5,17 +5,20 @@
 #include "ErrorExpectedExpression.h"
 
 Error* ErrorExpectedExpression::clone() const {
-    return nullptr;
+    return new ErrorExpectedExpression(this->entity, this->node);
 }
 
 bool ErrorExpectedExpression::equal(const Error& other) const {
-    return false;
+    auto& o = (const ErrorExpectedExpression&) other;
+    bool entity_ok = this->entity == o.entity;
+    bool node_ok = this->node == o.node;
+    return entity_ok and node_ok;
 }
 
 std::string ErrorExpectedExpression::to_str() const {
-    return std::string();
+    return "Error: expected expression";
 }
 
-ErrorExpectedExpression::ErrorExpectedExpression(Entity entity, const Node& node) {
+ErrorExpectedExpression::ErrorExpectedExpression(Entity entity, const Node& node) : entity(entity), node(node) {
 
 }

@@ -8,8 +8,15 @@
 #include "../src/compiler/analyze.h"
 #include "../src/semantic/errors/ErrorTypeMismatch.h"
 #include "../src/semantic/errors/ErrorRedeclared.h"
+#include "../src/semantic/errors/ErrorExpectedExpression.h"
+#include "../src/semantic/errors/ErrorNoMember.h"
+#include "../src/semantic/errors/ErrorClassNoMember.h"
+#include "../src/semantic/errors/ErrorNoMemberSuggestions.h"
+#include "../src/semantic/errors/ErrorClassNoMethodForOp.h"
 
 const ObjectType NO_TYPE(".None");
+
+const TextPosition& _POS = {1, 1};
 
 Compiler analyze(std::string code) {
     const std::string& tmp_in = "tmp_in";
@@ -56,7 +63,7 @@ TEST_CASE("basic_function_bad_return_type", "[checker]") {
     REQUIRE(checker.error_reporter.failed);
     REQUIRE(checker.error_reporter.errors.size() == 1);
     Error& error = *checker.error_reporter.errors.back();
-    BooleanNode node(false, {1, 1}, {1, 1});
+    BooleanNode node(false, _POS, _POS);
     ObjectType expected("Integer");
     ErrorTypeMismatch exp(expected, node, entity_from_type(ObjectType("Boolean")));
     REQUIRE(error == exp);
@@ -86,25 +93,7 @@ TEST_CASE("basic_declaration_bad_type", "[checker]") {
     REQUIRE(checker.error_reporter.failed);
     REQUIRE(checker.error_reporter.errors.size() == 1);
     Error& error = *checker.error_reporter.errors.back();
-    NumberNode node(NumberType::INTEGER, "9", {1, 1}, {1, 1});
-    ObjectType expected("Boolean");
-    ErrorTypeMismatch exp(expected, node, entity_from_type(ObjectType("Integer")));
-    REQUIRE(error == exp);
-}
-
-TEST_CASE("bad_binop_type", "[checker]") {
-    std::string code = "fun foo()->Integer{var x = 9 + \"a\";return 0;}";
-
-    Compiler c = analyze(code);
-    Module& module = *c.root_package->units["tmp"].module;
-    analyze_module_result(module, *c.top_package);
-    Checker checker(c.top_package, c.root_package->units["tmp"].module);
-    checker.visit_declaration(*(DeclarationNode*) ((FunctionNode*) module.ast->nodes[0])->body->nodes[0]);
-
-    REQUIRE(checker.error_reporter.failed);
-    REQUIRE(checker.error_reporter.errors.size() == 1);
-    Error& error = *checker.error_reporter.errors.back();
-    NumberNode node(NumberType::INTEGER, "9", {1, 1}, {1, 1});
+    NumberNode node(NumberType::INTEGER, "9", _POS, _POS);
     ObjectType expected("Boolean");
     ErrorTypeMismatch exp(expected, node, entity_from_type(ObjectType("Integer")));
     REQUIRE(error == exp);
@@ -122,7 +111,7 @@ TEST_CASE("error_redeclared", "[checker]") {
     REQUIRE(checker.error_reporter.failed);
     REQUIRE(checker.error_reporter.errors.size() == 1);
     Error& error = *checker.error_reporter.errors.back();
-    NumberNode node(NumberType::INTEGER, "9", {1, 1}, {1, 1});
+    NumberNode node(NumberType::INTEGER, "9", _POS, _POS);
     ObjectType expected("Boolean");
     ErrorRedeclared exp("x", *(DeclarationNode*) ((FunctionNode*) module.ast->nodes[0])->body->nodes[1]);
     REQUIRE(error == exp);
@@ -155,7 +144,7 @@ TEST_CASE("list_bad", "[checker]") {
     Error& error = *checker.error_reporter.errors.back();
 
 
-    StringNode node("a", {1, 1}, {1, 1});
+    StringNode node("a", _POS, _POS);
     ObjectType expected("Integer");
     ErrorTypeMismatch exp(expected, node, entity_from_type(ObjectType("String")));
 
@@ -333,4 +322,164 @@ TEST_CASE("float_literal", "[checker]") {
     REQUIRE(info->entity.type == E_TYPE::VALUE);
     REQUIRE(info->entity.value->metatype == Meta::CLASS);
     REQUIRE(*info->entity.value->type == ObjectType("Float"));
+}
+
+// TEST_CASE("none_literal", "[checker]") {
+//     std::string code = "fun foo()->Integer{var x = none;return 0;}";
+//
+//     Compiler c = analyze(code);
+//     Module& module = *c.root_package->units["tmp"].module;
+//     analyze_module_result(module, *c.top_package);
+//     Checker checker(c.top_package, c.root_package->units["tmp"].module);
+//     Node* expression = ((DeclarationNode*) (*(FunctionNode*) module.ast->nodes[0]).body->nodes[0])->expression;
+//     USemanticInfo info = checker.dispatch_rvalue(expression);
+//
+//     REQUIRE(!checker.error_reporter.failed);
+//     REQUIRE(checker.error_reporter.errors.size() == 0);
+//     REQUIRE(info->entity.type == E_TYPE::VALUE);
+//     REQUIRE(info->entity.value->metatype == Meta::CLASS);
+//     REQUIRE(*info->entity.value->type == ObjectType("NoneType"));
+// }
+
+TEST_CASE("decl_error_expected_expression", "[checker]") {
+    std::string code = "fun foo()->Integer{var x = Integer;return 0;}";
+
+    Compiler c = analyze(code);
+    Module& module = *c.root_package->units["tmp"].module;
+    analyze_module_result(module, *c.top_package);
+    Checker checker(c.top_package, c.root_package->units["tmp"].module);
+    checker.init();
+    FunctionNode& function_node = *(FunctionNode*) module.ast->nodes[0];
+    DeclarationNode& declaration_node = *(DeclarationNode*) function_node.body->nodes[0];
+    checker.visit_function(function_node);
+
+    REQUIRE(checker.error_reporter.failed);
+    REQUIRE(checker.error_reporter.errors.size() == 1);
+
+    Error& error = *checker.error_reporter.errors.back();
+    ErrorExpectedExpression exp(Entity((Class*) nullptr), *declaration_node.expression);
+    REQUIRE(error == exp);
+}
+
+TEST_CASE("error_no_member", "[checker]") {
+    std::string code = "class Foo{foo: Integer;}\nfun bar(f: Foo)->Integer{var x = f.lala;return 0;}";
+
+    Compiler c = analyze(code);
+    Module& module = *c.root_package->units["tmp"].module;
+    analyze_module_result(module, *c.top_package);
+    Checker checker(c.top_package, c.root_package->units["tmp"].module);
+    checker.init();
+    FunctionNode& function_node = *(FunctionNode*) module.ast->nodes[1];
+    DeclarationNode& declaration_node = *(DeclarationNode*) function_node.body->nodes[0];
+    checker.visit_root(*module.ast);
+
+    REQUIRE(checker.error_reporter.failed);
+    REQUIRE(checker.error_reporter.errors.size() == 1);
+
+    Error& error = *checker.error_reporter.errors.back();
+    Flirpin clazz_flirpin = module.get(Path("Foo"));
+    REQUIRE(clazz_flirpin.type == F_TYPE::CLASS);
+    ObjectType type = ObjectType("Foo");
+    ErrorNoMemberSuggestions exp(type, *(MemberNode*) declaration_node.expression, *clazz_flirpin.clazz);
+    REQUIRE(error == exp);
+}
+
+TEST_CASE("member_ok", "[checker]") {
+    std::string code = "class Foo{foo: String;}\nfun bar(f: Foo)->Integer{var x : String = f.foo;return 0;}";
+
+    Compiler c = analyze(code);
+    Module& module = *c.root_package->units["tmp"].module;
+    analyze_module_result(module, *c.top_package);
+    Checker checker(c.top_package, c.root_package->units["tmp"].module);
+    checker.init();
+    checker.visit_root(*module.ast);
+
+    CHECK(!checker.error_reporter.failed);
+    CHECK(checker.error_reporter.errors.empty());
+}
+
+TEST_CASE("binop_ok", "[checker]") {
+    std::string code = "fun bar()->Integer{var x = 2 + 5;return 0;}";
+
+    Compiler c = analyze(code);
+    Module& module = *c.root_package->units["tmp"].module;
+    analyze_module_result(module, *c.top_package);
+    Checker checker(c.top_package, c.root_package->units["tmp"].module);
+    checker.init();
+
+    Node* expression = ((DeclarationNode*) (*(FunctionNode*) module.ast->nodes[0]).body->nodes[0])->expression;
+    USemanticInfo info = checker.dispatch_rvalue(expression);
+
+    REQUIRE(!checker.error_reporter.failed);
+    REQUIRE(checker.error_reporter.errors.empty());
+    CHECK(info->entity.type == E_TYPE::VALUE);
+    CHECK(info->entity.value->metatype == Meta::CLASS);
+    CHECK(*info->entity.value->type == ObjectType("Integer"));
+}
+
+TEST_CASE("boolop_ok", "[checker]") {
+    std::string code = "fun bar()->Integer{var x = 2 < 5;return 0;}";
+
+    Compiler c = analyze(code);
+    Module& module = *c.root_package->units["tmp"].module;
+    analyze_module_result(module, *c.top_package);
+    Checker checker(c.top_package, c.root_package->units["tmp"].module);
+    checker.init();
+
+    Node* expression = ((DeclarationNode*) (*(FunctionNode*) module.ast->nodes[0]).body->nodes[0])->expression;
+    USemanticInfo info = checker.dispatch_rvalue(expression);
+
+    REQUIRE(!checker.error_reporter.failed);
+    REQUIRE(checker.error_reporter.errors.empty());
+    CHECK(info->entity.type == E_TYPE::VALUE);
+    CHECK(info->entity.value->metatype == Meta::CLASS);
+    CHECK(*info->entity.value->type == ObjectType("Boolean"));
+}
+
+
+TEST_CASE("binop_type_error", "[checker]") {
+    std::string code = "fun bar()->Integer{var x = 2 + \"Hello\";return 0;}";
+
+    Compiler c = analyze(code);
+    Module& module = *c.root_package->units["tmp"].module;
+    analyze_module_result(module, *c.top_package);
+    Checker checker(c.top_package, c.root_package->units["tmp"].module);
+    checker.init();
+
+    Node* expression = ((DeclarationNode*) (*(FunctionNode*) module.ast->nodes[0]).body->nodes[0])->expression;
+    USemanticInfo info = checker.dispatch_rvalue(expression);
+
+    REQUIRE(checker.error_reporter.failed);
+    REQUIRE(checker.error_reporter.errors.size() == 1);
+
+    Error& error = *checker.error_reporter.errors.back();
+    StringNode node("Hello", _POS, _POS);
+    ObjectType expected("Integer");
+    ErrorTypeMismatch exp(expected, node, entity_from_type(ObjectType("String")));
+    REQUIRE(error == exp);
+}
+
+
+TEST_CASE("binop_error", "[checker]") {
+    std::string code = "fun bar()->Integer{var x = \"Hello\" - \"Bye\" ;return 0;}";
+
+    Compiler c = analyze(code);
+    Module& module = *c.root_package->units["tmp"].module;
+    analyze_module_result(module, *c.top_package);
+    Checker checker(c.top_package, c.root_package->units["tmp"].module);
+    checker.init();
+
+    Node* expression = ((DeclarationNode*) (*(FunctionNode*) module.ast->nodes[0]).body->nodes[0])->expression;
+    USemanticInfo info = checker.dispatch_rvalue(expression);
+
+    REQUIRE(checker.error_reporter.failed);
+    REQUIRE(checker.error_reporter.errors.size() == 1);
+
+    Error& error = *checker.error_reporter.errors.back();
+    StringNode left("Hello", _POS, _POS);
+    StringNode right("Bye", _POS, _POS);
+    BinopNode node(OpType::SUB, &left, &right, _POS, _POS);
+    ObjectType expected("Integer");
+    ErrorClassNoMethodForOp exp("String", "__sub__", node);
+    REQUIRE(error == exp);
 }
