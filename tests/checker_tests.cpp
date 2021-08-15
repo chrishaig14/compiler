@@ -594,3 +594,51 @@ TEST_CASE("call_args_type_error", "[checker]") {
     ErrorTypeMismatch exp(expected, node, entity_from_type(ObjectType("String")));
     REQUIRE(error == exp);
 }
+
+TEST_CASE("union_ok_1", "[checker]") {
+    std::string code = "fun foo()->Integer{var x : Union[Integer, String] = 3;return 0;}";
+
+    Compiler c = analyze(code);
+    Module& module = *c.root_package->units["tmp"].module;
+    analyze_module_result(module, *c.top_package);
+    Checker checker(c.top_package, c.root_package->units["tmp"].module);
+    checker.init();
+    checker.visit_root(*module.ast);
+
+    REQUIRE(!checker.error_reporter.failed);
+    REQUIRE(checker.error_reporter.errors.empty());
+}
+
+TEST_CASE("union_ok_2", "[checker]") {
+    std::string code = "fun foo()->Integer{var x : Union[Integer, String] = \"String\";return 0;}";
+
+    Compiler c = analyze(code);
+    Module& module = *c.root_package->units["tmp"].module;
+    analyze_module_result(module, *c.top_package);
+    Checker checker(c.top_package, c.root_package->units["tmp"].module);
+    checker.init();
+    checker.visit_root(*module.ast);
+
+    REQUIRE(!checker.error_reporter.failed);
+    REQUIRE(checker.error_reporter.errors.empty());
+}
+
+TEST_CASE("union_error", "[checker]") {
+    std::string code = "fun foo()->Integer{var x : Union[Integer, String] = false;return 0;}";
+
+    Compiler c = analyze(code);
+    Module& module = *c.root_package->units["tmp"].module;
+    analyze_module_result(module, *c.top_package);
+    Checker checker(c.top_package, c.root_package->units["tmp"].module);
+    checker.init();
+    checker.visit_root(*module.ast);
+
+    REQUIRE(checker.error_reporter.failed);
+    REQUIRE(checker.error_reporter.errors.size() == 1);
+
+    Error& error = *checker.error_reporter.errors.back();
+    BooleanNode node(false, _POS, _POS);
+    ObjectType expected("Union", {new ObjectType("Integer"), new ObjectType("String")});
+    ErrorTypeMismatch exp(expected, node, entity_from_type(ObjectType("Boolean")));
+    REQUIRE(error == exp);
+}
