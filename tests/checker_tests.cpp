@@ -13,6 +13,7 @@
 #include "../src/semantic/errors/ErrorClassNoMember.h"
 #include "../src/semantic/errors/ErrorNoMemberSuggestions.h"
 #include "../src/semantic/errors/ErrorClassNoMethodForOp.h"
+#include "../src/semantic/errors/ErrorObjectNoSpecialMethod.h"
 
 const ObjectType NO_TYPE(".None");
 
@@ -481,5 +482,66 @@ TEST_CASE("binop_error", "[checker]") {
     BinopNode node(OpType::SUB, &left, &right, _POS, _POS);
     ObjectType expected("Integer");
     ErrorClassNoMethodForOp exp("String", "__sub__", node);
+    REQUIRE(error == exp);
+}
+
+TEST_CASE("subscript_ok", "[checker]") {
+    std::string code = "fun bar()->Integer{var x = [1,3,4][2] ;return 0;}";
+
+    Compiler c = analyze(code);
+    Module& module = *c.root_package->units["tmp"].module;
+    analyze_module_result(module, *c.top_package);
+    Checker checker(c.top_package, c.root_package->units["tmp"].module);
+    checker.init();
+
+    Node* expression = ((DeclarationNode*) (*(FunctionNode*) module.ast->nodes[0]).body->nodes[0])->expression;
+    USemanticInfo info = checker.dispatch_rvalue(expression);
+
+    REQUIRE(!checker.error_reporter.failed);
+    REQUIRE(checker.error_reporter.errors.empty());
+}
+
+TEST_CASE("subscript_index_type_error", "[checker]") {
+    std::string code = "fun bar()->Integer{var x = [1,3,4][\"foo\"] ;return 0;}";
+
+    Compiler c = analyze(code);
+    Module& module = *c.root_package->units["tmp"].module;
+    analyze_module_result(module, *c.top_package);
+    Checker checker(c.top_package, c.root_package->units["tmp"].module);
+    checker.init();
+
+    Node* expression = ((DeclarationNode*) (*(FunctionNode*) module.ast->nodes[0]).body->nodes[0])->expression;
+    USemanticInfo info = checker.dispatch_rvalue(expression);
+
+    REQUIRE(checker.error_reporter.failed);
+    REQUIRE(checker.error_reporter.errors.size() == 1);
+
+    Error& error = *checker.error_reporter.errors.back();
+    StringNode node("foo", _POS, _POS);
+    ObjectType expected("Integer");
+    ErrorTypeMismatch exp(expected, node, entity_from_type(ObjectType("Integer")));
+    REQUIRE(error == exp);
+}
+
+TEST_CASE("subscript_no_method_error", "[checker]") {
+    std::string code = "class Foo{foo: String;}\nfun bar(f: Foo)->Integer{var x = f[1];return 0;}";
+
+    Compiler c = analyze(code);
+    Module& module = *c.root_package->units["tmp"].module;
+    analyze_module_result(module, *c.top_package);
+    Checker checker(c.top_package, c.root_package->units["tmp"].module);
+    checker.init();
+    checker.visit_root(*module.ast);
+
+    REQUIRE(checker.error_reporter.failed);
+    REQUIRE(checker.error_reporter.errors.size() == 1);
+
+    Error& error = *checker.error_reporter.errors.back();
+    StringNode left("Hello", _POS, _POS);
+    StringNode right("Bye", _POS, _POS);
+    SubscriptNode node(new IdNode("f", _POS, _POS), {new NumberNode(NumberType::INTEGER, "1", _POS, _POS)}, _POS, _POS);
+    ObjectType expected("Integer");
+    ObjectType type("Foo");
+    ErrorObjectNoSpecialMethod exp(type, "__get_item__", node);
     REQUIRE(error == exp);
 }

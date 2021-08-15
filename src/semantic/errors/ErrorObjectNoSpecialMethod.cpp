@@ -5,18 +5,23 @@
 #include "ErrorObjectNoSpecialMethod.h"
 
 Error* ErrorObjectNoSpecialMethod::clone() const {
-    return nullptr;
+    return new ErrorObjectNoSpecialMethod(this->type, this->method_name, this->node);
 }
 
 bool ErrorObjectNoSpecialMethod::equal(const Error& other) const {
-    return false;
+    auto& o = (const ErrorObjectNoSpecialMethod&) other;
+    bool type_ok = this->type == o.type;
+    bool method_ok = this->method_name == o.method_name;
+    bool node_ok = this->node == o.node;
+    return type_ok and method_ok and node_ok;
 }
 
 std::string ErrorObjectNoSpecialMethod::to_str() const {
-    return std::string();
+    return "Error: object of type " + this->type.to_string() + " has no special method " + this->method_name;
 }
 
 ErrorObjectNoSpecialMethod::ErrorObjectNoSpecialMethod(const TypeNode& type, const std::string& method_name,
-                                                       const SubscriptNode& node) {
+                                                       const SubscriptNode& node)
+        : node(node), method_name(method_name), type(type) {
 
 }
