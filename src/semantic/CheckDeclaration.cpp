@@ -14,12 +14,12 @@ std::unique_ptr<SemanticInfo> Checker::expect_rvalue_of_type(const TypeNode& tar
         return error_stub();
     }
     if (rinfo->entity.type != E_TYPE::VALUE && rinfo->entity.type != E_TYPE::CONST_FUNCTION) {
-        this->error_reporter.error(ErrorTypeMismatch(target, node, rinfo->entity));
+        this->error_reporter.error(ErrorTypeMismatch(*target.clone(), node, rinfo->entity));
         return error_stub();
     }
     SNode* snode = make_rvalue(rinfo->entity, rinfo->snode, target);
     if (snode == nullptr) {
-        this->error_reporter.error(ErrorTypeMismatch(target, node, rinfo->entity));
+        this->error_reporter.error(ErrorTypeMismatch(*target.clone(), node, rinfo->entity));
         return error_stub();
     }
     rinfo->snode = snode;
