@@ -5,18 +5,23 @@
 #include "ErrorEnumNoValue.h"
 
 Error* ErrorEnumNoValue::clone() const {
-    return nullptr;
+    return new ErrorEnumNoValue(this->enum_name, this->value_name, this->node, this->p_enum);
 }
 
 bool ErrorEnumNoValue::equal(const Error& other) const {
-    return false;
+    auto& o = (const ErrorEnumNoValue&) other;
+    bool enum_ok = this->enum_name == o.enum_name;
+    bool value_ok = this->value_name == o.value_name;
+    bool node_ok = this->node == o.node;
+    return enum_ok and value_ok and node_ok;
 }
 
 std::string ErrorEnumNoValue::to_str() const {
-    return std::string();
+    return "Error: enum " + this->enum_name + " has no value " + this->value_name;
 }
 
-ErrorEnumNoValue::ErrorEnumNoValue(std::string basic_string_1, const std::string basic_string_2, const MemberNode& node,
-                                   Enum* p_enum) {
+ErrorEnumNoValue::ErrorEnumNoValue(std::string enum_name, const std::string value_name, const MemberNode& node,
+                                   Enum* p_enum)
+        : enum_name(enum_name), value_name(value_name), node(node), p_enum(p_enum) {
 
 }

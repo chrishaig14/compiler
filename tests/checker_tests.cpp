@@ -14,6 +14,7 @@
 #include "../src/semantic/errors/ErrorNoMemberSuggestions.h"
 #include "../src/semantic/errors/ErrorClassNoMethodForOp.h"
 #include "../src/semantic/errors/ErrorObjectNoSpecialMethod.h"
+#include "../src/semantic/errors/ErrorEnumNoValue.h"
 
 const ObjectType NO_TYPE(".None");
 
@@ -717,4 +718,43 @@ TEST_CASE("if_boolean_error", "[checker]") {
     ObjectType expected("Boolean");
     ErrorTypeMismatch exp(expected, node, entity_from_type(ObjectType("Integer")));
     REQUIRE(error == exp);
+}
+
+TEST_CASE("enum_error", "[checker]") {
+    std::string code = "enum Foo {a, c}\n fun foo()->Integer{var x = Foo.b;return 0;}";
+
+    Compiler c = analyze(code);
+    Module& module = *c.root_package->units["tmp"].module;
+    analyze_module_result(module, *c.top_package);
+    Checker checker(c.top_package, c.root_package->units["tmp"].module);
+    checker.init();
+    checker.visit_root(*module.ast);
+
+    REQUIRE(checker.error_reporter.failed);
+    REQUIRE(checker.error_reporter.errors.size() == 1);
+
+
+    Error* p_error = checker.error_reporter.errors.back();
+    std::cout << p_error << std::endl;
+    Error& error = *p_error;
+    std::cout << error << std::endl;
+    MemberNode node(new IdNode("Foo", _POS, _POS), Token(TokType::ID, "b", _POS));
+    ObjectType expected("Boolean");
+    ErrorEnumNoValue exp("Foo", "b", node, nullptr);
+    REQUIRE(error == exp);
+}
+
+
+TEST_CASE("enum_ok", "[checker]") {
+    std::string code = "enum Foo {a, c}\n fun foo()->Integer{var x = Foo.a; var y = Foo.c; return 0;}";
+
+    Compiler c = analyze(code);
+    Module& module = *c.root_package->units["tmp"].module;
+    analyze_module_result(module, *c.top_package);
+    Checker checker(c.top_package, c.root_package->units["tmp"].module);
+    checker.init();
+    checker.visit_root(*module.ast);
+
+    REQUIRE(!checker.error_reporter.failed);
+    REQUIRE(checker.error_reporter.errors.empty());
 }

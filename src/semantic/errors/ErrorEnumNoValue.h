@@ -16,6 +16,10 @@ public:
     bool equal(const Error& other) const override;
     std::string to_str() const override;
 
+    std::string enum_name;
+    const std::string value_name;
+    const MemberNode& node;
+    Enum* p_enum;
 };
 
 
