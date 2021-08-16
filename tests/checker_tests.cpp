@@ -680,3 +680,41 @@ TEST_CASE("while_boolean_error", "[checker]") {
     ErrorTypeMismatch exp(expected, node, entity_from_type(ObjectType("Integer")));
     REQUIRE(error == exp);
 }
+
+TEST_CASE("if_ok", "[checker]") {
+    std::string code = "fun foo()->Integer{if true {var x = 1;}return 0;}";
+
+    Compiler c = analyze(code);
+    Module& module = *c.root_package->units["tmp"].module;
+    analyze_module_result(module, *c.top_package);
+    Checker checker(c.top_package, c.root_package->units["tmp"].module);
+    checker.init();
+    checker.visit_root(*module.ast);
+
+    REQUIRE(!checker.error_reporter.failed);
+    REQUIRE(checker.error_reporter.errors.empty());
+}
+
+TEST_CASE("if_boolean_error", "[checker]") {
+    std::string code = "fun foo()->Integer{if 5 {var x = 1;}return 0;}";
+
+    Compiler c = analyze(code);
+    Module& module = *c.root_package->units["tmp"].module;
+    analyze_module_result(module, *c.top_package);
+    Checker checker(c.top_package, c.root_package->units["tmp"].module);
+    checker.init();
+    checker.visit_root(*module.ast);
+
+    REQUIRE(checker.error_reporter.failed);
+    REQUIRE(checker.error_reporter.errors.size() == 1);
+
+
+    Error* p_error = checker.error_reporter.errors.back();
+    std::cout << p_error << std::endl;
+    Error& error = *p_error;
+    std::cout << error << std::endl;
+    NumberNode node(NumberType::INTEGER, "5", _POS, _POS);
+    ObjectType expected("Boolean");
+    ErrorTypeMismatch exp(expected, node, entity_from_type(ObjectType("Integer")));
+    REQUIRE(error == exp);
+}
