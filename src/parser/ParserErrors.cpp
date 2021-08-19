@@ -164,7 +164,7 @@ void Parser::error_expected_statement(TextPosition pos) {
     this->error(msg, pos);
 }
 
-Node* Parser::parse_enum_definition() {
+std::unique_ptr<EnumNode> Parser::parse_enum_definition() {
     this->expect_token(TokType::ENUM);
     Token enum_id = this->expect_token(TokType::ID);
     this->expect_token(TokType::LCURLY);
@@ -181,10 +181,10 @@ Node* Parser::parse_enum_definition() {
         this->next();
     }
     Token rcurly_tk = this->expect_token(TokType::RCURLY);
-    return new EnumNode(enum_id.str, values, enum_id.start, rcurly_tk.end_pos);
+    return std::make_unique<EnumNode>(enum_id.str, values, enum_id.start, rcurly_tk.end_pos);
 }
 
-InstanceNode* Parser::parse_instance() {
+std::unique_ptr<InstanceNode> Parser::parse_instance() {
     Token instance_tok = this->expect_token(TokType::INSTANCE);
     Token id_tok = this->expect_token(TokType::ID);
     this->expect_token(TokType::LSQUARE);
@@ -196,13 +196,14 @@ InstanceNode* Parser::parse_instance() {
         if (!this->match(TokType::FUN)) {
             break;
         }
-        auto* m = this->parse_function_definition();
-        methods[m->identifier] = m;
+        auto m = this->parse_function_definition();
+        std::string id = m->identifier;
+        methods[id] = m.release();
         this->expect_token(TokType::SEMICOLON);
         if (!this->match(TokType::FUN)) {
             break;
         }
     }
     Token f_curly = this->expect_token(TokType::RCURLY);
-    return new InstanceNode(id_tok.str, ot, methods, instance_tok.start, f_curly.end_pos);
+    return std::make_unique<InstanceNode>(id_tok.str, ot, methods, instance_tok.start, f_curly.end_pos);
 }

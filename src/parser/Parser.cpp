@@ -55,14 +55,14 @@ BlockNode* Parser::parse_program() {
     VectorOfNodes program;
     TextPosition start = this->token.start;
     while (this->token.type != TokType::END) {
-        program.push_back(this->parse_top_level_statement());
+        program.push_back(this->parse_top_level_statement().release());
     }
     TextPosition end = this->token.end_pos;
     std::cout << "--------------- FINISHED PARSING -----------------" << std::endl;
     return new BlockNode(program, start, end);
 }
 
-ReturnNode* Parser::parse_return() {
+std::unique_ptr<ReturnNode> Parser::parse_return() {
     Token ret_tok = this->expect_token(TokType::RETURN);
     Node* expression = nullptr;
     TextPosition end = ret_tok.end_pos;
@@ -70,10 +70,10 @@ ReturnNode* Parser::parse_return() {
         expression = this->parse_expression();
         end = expression->end;
     }
-    return new ReturnNode(expression, ret_tok.start, end);
+    return std::make_unique<ReturnNode>(expression, ret_tok.start, end);
 }
 
-IfNode* Parser::parse_if() {
+std::unique_ptr<IfNode> Parser::parse_if() {
     Token if_tok = this->expect_token(TokType::IF);
     Node* condition = this->parse_expression();
     BlockNode* body = this->parse_possibly_empty_block();
@@ -89,7 +89,7 @@ IfNode* Parser::parse_if() {
         this->next();
         _else = this->parse_possibly_empty_block();
     }
-    auto* iff = new IfNode(condition, body, elifs, _else, if_tok.start, if_tok.end_pos);
+    auto iff = std::make_unique<IfNode>(condition, body, elifs, _else, if_tok.start, if_tok.end_pos);
     iff->start = if_tok.start;
     return iff;
 }
@@ -524,7 +524,7 @@ Node* Parser::parse_call_or_subscript_chain(Node* parent) {
     return node;
 }
 
-DeclarationNode* Parser::parse_variable_declaration() {
+std::unique_ptr<DeclarationNode> Parser::parse_variable_declaration() {
     Token var_token = this->expect_token(TokType::VAR);
     Token identifier = this->expect_token(TokType::ID);
     TypeNode* type = nullptr;
@@ -534,21 +534,26 @@ DeclarationNode* Parser::parse_variable_declaration() {
     }
     Token eq_tok = this->expect_token(TokType::EQQ);
     Node* expression = this->parse_expression();
-    return new DeclarationNode(identifier.str, type, expression, var_token.start, eq_tok.start, expression->end);
+    return std::make_unique<DeclarationNode>(identifier.str,
+                                             type,
+                                             expression,
+                                             var_token.start,
+                                             eq_tok.start,
+                                             expression->end);
 }
 
-Node* Parser::parse_common_statement() {
+std::unique_ptr<Node> Parser::parse_common_statement() {
     switch (this->token.type) {
         case TokType::IF: {
             return this->parse_if();
         }
         case TokType::VAR: {
-            DeclarationNode* node = this->parse_variable_declaration();
+            std::unique_ptr<DeclarationNode> node = this->parse_variable_declaration();
             this->expect_token(TokType::SEMICOLON);
             return node;
         }
         case TokType::RETURN: {
-            ReturnNode* node = this->parse_return();
+            std::unique_ptr<ReturnNode> node = this->parse_return();
             this->expect_token(TokType::SEMICOLON);
             return node;
         }
@@ -579,7 +584,7 @@ Node* Parser::parse_common_statement() {
             }
             Token tok = this->token;
             this->next();
-            return new BreakNode(tok.start, tok.end_pos);
+            return std::make_unique<BreakNode>(tok.start, tok.end_pos);
         }
         case TokType::CONTINUE: {
             if (!this->inside_loop) {
@@ -588,12 +593,12 @@ Node* Parser::parse_common_statement() {
             }
             Token tok = this->token;
             this->next();
-            return new ContinueNode(tok.start, tok.end_pos);
+            return std::make_unique<ContinueNode>(tok.start, tok.end_pos);
         }
         default: {
             Node* node = this->parse_assignment_or_expression();
             this->expect_token(TokType::SEMICOLON);
-            return node;
+            return std::unique_ptr<Node>(node);
         }
     }
 }
@@ -668,13 +673,14 @@ BlockNode* Parser::parse_possibly_empty_block() {
             this->next();
             break;
         }
-        Node* statement = this->parse_common_statement();
-        block.push_back(statement);
+        std::unique_ptr<Node> statement = this->parse_common_statement();
+        Node* x = statement.release();
+        block.push_back(x);
     }
     return new BlockNode(block, st.start, end.end_pos);
 }
 
-FunctionNode* Parser::parse_function_definition() {
+std::unique_ptr<FunctionNode> Parser::parse_function_definition() {
     Token fun_tok = this->expect_token(TokType::FUN);
     Token matched_token = this->expect_token(TokType::ID);
     std::string identifier = matched_token.str;
@@ -737,13 +743,13 @@ FunctionNode* Parser::parse_function_definition() {
     // Parse function body
     BlockNode* body = this->parse_possibly_empty_block();
 
-    auto* node = new FunctionNode(identifier,
-                                  parameter_names,
-                                  parameter_types,
-                                  return_type,
-                                  body,
-                                  fun_tok.start,
-                                  body->end);
+    auto node = std::make_unique<FunctionNode>(identifier,
+                                               parameter_names,
+                                               parameter_types,
+                                               return_type,
+                                               body,
+                                               fun_tok.start,
+                                               body->end);
     node->implicit = implicit;
     node->start = fun_tok.start;
     return node;
@@ -761,17 +767,17 @@ Token Parser::expect_token(TokType token_type) {
     return matched_token;
 }
 
-Node* Parser::parse_alias() {
+std::unique_ptr<AliasNode> Parser::parse_alias() {
     Token alias_tk = this->expect_token(TokType::ALIAS);
     Token alias_id = this->expect_token(TokType::ID);
     this->expect_token(TokType::EQQ);
     TypeNode* aliased_type = this->parse_type_node();
     Token semic_tk = this->expect_token(TokType::SEMICOLON);
-    auto* node = new AliasNode(alias_id.str, aliased_type, alias_tk.start, semic_tk.end_pos);
+    auto node = std::make_unique<AliasNode>(alias_id.str, aliased_type, alias_tk.start, semic_tk.end_pos);
     return node;
 }
 
-Node* Parser::parse_top_level_statement() {
+std::unique_ptr<Node> Parser::parse_top_level_statement() {
     switch (this->token.type) {
         case TokType::FUN:
             return this->parse_function_definition();
@@ -793,7 +799,7 @@ Node* Parser::parse_top_level_statement() {
 }
 
 
-ForNode* Parser::parse_for_loop() {
+std::unique_ptr<ForNode> Parser::parse_for_loop() {
     Token for_tok = this->expect_token(TokType::FOR);
     bool expect_paren = false;
     if (this->match(TokType::LPAREN)) {
@@ -810,7 +816,7 @@ ForNode* Parser::parse_for_loop() {
     this->inside_loop = true;
     BlockNode* body = this->parse_possibly_empty_block();
     this->inside_loop = prev;
-    auto* forloop = new ForNode(var.str, exp, body, for_tok.start, body->end);
+    auto forloop = std::make_unique<ForNode>(var.str, exp, body, for_tok.start, body->end);
     forloop->start = for_tok.start;
     return forloop;
 }
@@ -828,19 +834,19 @@ Node* Parser::parse_ternary() {
     return condition;
 }
 
-WhileNode* Parser::parse_while_loop() {
+std::unique_ptr<WhileNode> Parser::parse_while_loop() {
     Token while_tok = this->expect_token(TokType::WHILE);
     Node* condition = this->parse_expression();
     bool prev = this->inside_loop;
     this->inside_loop = true;
     BlockNode* body = this->parse_possibly_empty_block();
     this->inside_loop = prev;
-    auto* whil = new WhileNode(condition, body, while_tok.start, body->end);
+    auto whil = std::make_unique<WhileNode>(condition, body, while_tok.start, body->end);
     whil->start = while_tok.start;
     return whil;
 }
 
-ClassNode* Parser::parse_class_definition() {
+std::unique_ptr<ClassNode> Parser::parse_class_definition() {
     Token class_tok = this->expect_token(TokType::CLASS);
     Token class_name_tk = this->expect_token(TokType::ID);
     std::string& class_name = class_name_tk.str;
@@ -905,7 +911,8 @@ ClassNode* Parser::parse_class_definition() {
             std::cout << ft->to_json() << std::endl;
             Implicit* implicit = new Implicit{parent.str, child.str, ft, is_static};
 
-            FunctionNode* method_node = this->parse_function_definition();
+            auto method_node_u = this->parse_function_definition();
+            auto method_node = method_node_u.release();
             std::string& method_name = method_node->identifier;
             if (member_names.find(method_name) != member_names.end() || methods.find(method_name) != methods.end()) {
                 this->error_class_member_redefined(class_name, method_name, method_node->start);
@@ -917,13 +924,14 @@ ClassNode* Parser::parse_class_definition() {
             }
 
         } else if (this->match(TokType::FUN)) {
-            FunctionNode* method_node = this->parse_function_definition();
+            auto method_node_u = this->parse_function_definition();
+            auto method_node = method_node_u.release();
             std::string& method_name = method_node->identifier;
             if (member_names.find(method_name) != member_names.end() || methods.find(method_name) != methods.end()) {
                 this->error_class_member_redefined(class_name, method_name, method_node->start);
             }
             if (is_static) {
-                static_methods.insert(make_pair(method_name, method_node));
+                static_methods.insert(std::make_pair(method_name, method_node));
             } else {
                 methods[method_name] = Method{nullptr, method_node};
             }
@@ -932,20 +940,20 @@ ClassNode* Parser::parse_class_definition() {
         }
     }
     Token end = this->expect_token(TokType::RCURLY);
-    auto* c = new ClassNode(class_name,
-                            type_parameters,
-                            members,
-                            methods,
-                            static_members,
-                            static_methods,
-                            class_tok.start,
-                            end.end_pos);
+    auto c = std::make_unique<ClassNode>(class_name,
+                                         type_parameters,
+                                         members,
+                                         methods,
+                                         static_members,
+                                         static_methods,
+                                         class_tok.start,
+                                         end.end_pos);
     c->members_ordered = members_ordered;
     c->start = class_tok.start;
     return c;
 }
 
-ImportNode* Parser::parse_import() {
+std::unique_ptr<ImportNode> Parser::parse_import() {
     Token import_tok = this->expect_token(TokType::IMPORT);
     VectorOfStrings path;
     // path.push_back("global");
@@ -969,13 +977,13 @@ ImportNode* Parser::parse_import() {
         this->next();
         Token alias = this->expect_token(TokType::ID);
         this->expect_token(TokType::SEMICOLON);
-        return new ImportNode(path, alias.str, import_tok.start, path_part.end_pos);
+        return std::make_unique<ImportNode>(path, alias.str, import_tok.start, path_part.end_pos);
     }
     this->expect_token(TokType::SEMICOLON);
-    return new ImportNode(path, import_tok.start, path_part.end_pos);
+    return std::make_unique<ImportNode>(path, import_tok.start, path_part.end_pos);
 }
 
-Node* Parser::parse_match_statement() {
+std::unique_ptr<MatchExpressionNode> Parser::parse_match_statement() {
     Token mtk = this->expect_token(TokType::MATCH);
     Node* exp = this->parse_expression();
     this->expect_token(TokType::LCURLY);
@@ -994,11 +1002,11 @@ Node* Parser::parse_match_statement() {
         }
     }
     Token lcurly = this->expect_token(TokType::RCURLY);
-    return new MatchExpressionNode(exp, ids, cases, mtk.start, lcurly.end_pos);
+    return std::make_unique<MatchExpressionNode>(exp, ids, cases, mtk.start, lcurly.end_pos);
 }
 
 
-TypeclassNode* Parser::parse_typeclass() {
+std::unique_ptr<TypeclassNode> Parser::parse_typeclass() {
     this->expect_token(TokType::TYPECLASS);
     Token typeclass_id = this->expect_token(TokType::ID);
     this->expect_token(TokType::LSQUARE);
@@ -1050,10 +1058,10 @@ TypeclassNode* Parser::parse_typeclass() {
     }
 
     Token final_curly = this->expect_token(TokType::RCURLY);
-    TypeclassNode* n = new TypeclassNode(typeclass_id.str,
-                                         base_type.str,
-                                         methods,
-                                         typeclass_id.start,
-                                         final_curly.end_pos);
+    auto n = std::make_unique<TypeclassNode>(typeclass_id.str,
+                                             base_type.str,
+                                             methods,
+                                             typeclass_id.start,
+                                             final_curly.end_pos);
     return n;
 }

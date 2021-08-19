@@ -14,6 +14,7 @@
 #include "../nodes/ObjectType.h"
 #include "../nodes/TypeclassNode.h"
 #include "../nodes/InstanceNode.h"
+#include "../nodes/AliasNode.h"
 
 extern std::unordered_map<TokType, OpType> TOKEN_TO_OP;
 
@@ -32,23 +33,23 @@ public:
     void next();
     Token expect_token(TokType token_type);
 
-    Node* parse_top_level_statement();
+    std::unique_ptr<Node> parse_top_level_statement();
 
-    ImportNode* parse_import();
-    ClassNode* parse_class_definition();
-    FunctionNode* parse_function_definition();
-    Node* parse_alias();
-    Node* parse_enum_definition();
+    std::unique_ptr<ImportNode> parse_import();
+    std::unique_ptr<ClassNode> parse_class_definition();
+    std::unique_ptr<FunctionNode> parse_function_definition();
+    std::unique_ptr<AliasNode> parse_alias();
+    std::unique_ptr<EnumNode> parse_enum_definition();
 
-    Node* parse_common_statement();
+    std::unique_ptr<Node> parse_common_statement();
     Node* parse_assignment_or_expression();
-    DeclarationNode* parse_variable_declaration();
-    IfNode* parse_if();
-    WhileNode* parse_while_loop();
-    ForNode* parse_for_loop();
-    ReturnNode* parse_return();
+    std::unique_ptr<DeclarationNode> parse_variable_declaration();
+    std::unique_ptr<IfNode> parse_if();
+    std::unique_ptr<WhileNode> parse_while_loop();
+    std::unique_ptr<ForNode> parse_for_loop();
+    std::unique_ptr<ReturnNode> parse_return();
     Node* parse_ternary();
-    Node* parse_match_statement();
+    std::unique_ptr<MatchExpressionNode> parse_match_statement();
     // ThrowNode* parse_throw();
     // TryCatchNode* parse_try_catch();
 
@@ -102,8 +103,8 @@ public:
     void error_expected_type(Token tok);
 
     std::string top_package_name;
-    TypeclassNode* parse_typeclass();
-    InstanceNode* parse_instance();
+    std::unique_ptr<TypeclassNode> parse_typeclass();
+    std::unique_ptr<InstanceNode> parse_instance();
 };
 
 

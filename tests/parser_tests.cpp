@@ -82,7 +82,7 @@ TEST_CASE("parse_decl_simple", "[parser]") {
     Parser parser("test", scanner.code_lines, tokens);
     parser.top_package_name = "main";
 
-    DeclarationNode* ast = parser.parse_variable_declaration();
+    std::unique_ptr<DeclarationNode> ast = parser.parse_variable_declaration();
 
     REQUIRE(ast->to_json() == DECLARATION.node->to_json());
 }
@@ -95,7 +95,7 @@ TEST_CASE("parse_decl_with_type", "[parser]") {
     Parser parser("test", scanner.code_lines, tokens);
     parser.top_package_name = "main";
 
-    DeclarationNode* ast = parser.parse_variable_declaration();
+    std::unique_ptr<DeclarationNode> ast = parser.parse_variable_declaration();
 
     REQUIRE(ast->identifier == ID);
     REQUIRE(ast->type->to_json() == TYPE.node->to_json());
@@ -110,7 +110,7 @@ TEST_CASE("parse_if", "[parser]") {
     Parser parser("test", scanner.code_lines, tokens);
     parser.top_package_name = "main";
 
-    IfNode* ast = parser.parse_if();
+    std::unique_ptr<IfNode> ast = parser.parse_if();
     REQUIRE(ast->to_json() == IF.node->to_json());
 }
 
@@ -122,7 +122,7 @@ TEST_CASE("parse_if_with_else", "[parser]") {
     Parser parser("test", scanner.code_lines, tokens);
     parser.top_package_name = "main";
 
-    IfNode* ast = parser.parse_if();
+    std::unique_ptr<IfNode> ast = parser.parse_if();
     REQUIRE(ast->to_json() == IfNode(EXPRESSION.node,
                                      (BlockNode*) BLOCK.node,
                                      {},
@@ -176,7 +176,7 @@ TEST_CASE("parse_for", "[parser]") {
     Parser parser("test", scanner.code_lines, tokens);
     parser.top_package_name = "main";
 
-    ForNode* ast = parser.parse_for_loop();
+    std::unique_ptr<ForNode> ast = parser.parse_for_loop();
     REQUIRE(ast->to_json() == ForNode(ID, EXPRESSION_1.node, (BlockNode*) BLOCK.node, DUMMY_POS, DUMMY_POS).to_json());
 }
 
@@ -189,7 +189,7 @@ TEST_CASE("parse_while", "[parser]") {
     Parser parser("test", scanner.code_lines, tokens);
     parser.top_package_name = "main";
 
-    WhileNode* ast = parser.parse_while_loop();
+    std::unique_ptr<WhileNode> ast = parser.parse_while_loop();
 
     REQUIRE(ast->to_json() == WhileNode(EXPRESSION_1.node, (BlockNode*) BLOCK.node, DUMMY_POS, DUMMY_POS).to_json());
 }
@@ -202,7 +202,7 @@ TEST_CASE("parse_fun_simple", "[parser]") {
     Parser parser("test", scanner.code_lines, tokens);
     parser.top_package_name = "main";
 
-    FunctionNode* ast = parser.parse_function_definition();
+    std::unique_ptr<FunctionNode> ast = parser.parse_function_definition();
 
     REQUIRE(ast->to_json() ==
             FunctionNode(ID, {}, {}, NO_TYPE.clone(), (BlockNode*) BLOCK.node, DUMMY_POS, DUMMY_POS).to_json());
@@ -216,7 +216,7 @@ TEST_CASE("parse_fun_one_arg", "[parser]") {
     Parser parser("test", scanner.code_lines, tokens);
     parser.top_package_name = "main";
 
-    FunctionNode* ast = parser.parse_function_definition();
+    std::unique_ptr<FunctionNode> ast = parser.parse_function_definition();
 
     REQUIRE(ast->to_json() == FunctionNode(ID,
                                            {ID_1},
@@ -235,7 +235,7 @@ TEST_CASE("parse_fun_mult_arg", "[parser]") {
     Parser parser("test", scanner.code_lines, tokens);
     parser.top_package_name = "main";
 
-    FunctionNode* ast = parser.parse_function_definition();
+    std::unique_ptr<FunctionNode> ast = parser.parse_function_definition();
 
     REQUIRE(ast->to_json() == FunctionNode(ID,
                                            {ID_1, ID_2},
@@ -254,7 +254,7 @@ TEST_CASE("parse_class_empty", "[parser]") {
     Parser parser("test", scanner.code_lines, tokens);
     parser.top_package_name = "main";
 
-    ClassNode* ast = parser.parse_class_definition();
+    std::unique_ptr<ClassNode> ast = parser.parse_class_definition();
 
     REQUIRE(ast->to_json() == ClassNode(ID, {}, {}, {}, {}, {}, DUMMY_POS, DUMMY_POS).to_json());
 }
@@ -267,7 +267,7 @@ TEST_CASE("parse_class_one_member", "[parser]") {
     Parser parser("test", scanner.code_lines, tokens);
     parser.top_package_name = "main";
 
-    ClassNode* ast = parser.parse_class_definition();
+    std::unique_ptr<ClassNode> ast = parser.parse_class_definition();
 
     REQUIRE(ast->to_json() ==
             ClassNode(ID, {}, {{ID_1, TYPE_1.node->clone()}}, {}, {}, {}, DUMMY_POS, DUMMY_POS).to_json());
@@ -281,7 +281,7 @@ TEST_CASE("parse_class_mult_member", "[parser]") {
     Parser parser("test", scanner.code_lines, tokens);
     parser.top_package_name = "main";
 
-    ClassNode* ast = parser.parse_class_definition();
+    std::unique_ptr<ClassNode> ast = parser.parse_class_definition();
 
     REQUIRE(ast->to_json() == ClassNode(ID,
                                         {},
@@ -303,7 +303,7 @@ TEST_CASE("parse_class_with_method", "[parser]") {
     Parser parser("test", scanner.code_lines, tokens);
     parser.top_package_name = "main";
 
-    ClassNode* ast = parser.parse_class_definition();
+    std::unique_ptr<ClassNode> ast = parser.parse_class_definition();
 
     REQUIRE(ast->to_json() == ClassNode(ID,
                                         {},
@@ -325,7 +325,7 @@ TEST_CASE("parse_class_with_static_method", "[parser]") {
     Parser parser("test", scanner.code_lines, tokens);
     parser.top_package_name = "main";
 
-    ClassNode* ast = parser.parse_class_definition();
+    std::unique_ptr<ClassNode> ast = parser.parse_class_definition();
 
     REQUIRE(ast->to_json() == ClassNode(ID,
                                         {},
@@ -345,7 +345,7 @@ TEST_CASE("parse_return_nothing", "[parser]") {
     Parser parser("test", scanner.code_lines, tokens);
     parser.top_package_name = "main";
 
-    ReturnNode* ast = parser.parse_return();
+    std::unique_ptr<ReturnNode> ast = parser.parse_return();
 
     REQUIRE(ast->to_json() == ReturnNode(nullptr, DUMMY_POS, DUMMY_POS).to_json());
 }
@@ -358,7 +358,7 @@ TEST_CASE("parse_return_expression", "[parser]") {
     Parser parser("test", scanner.code_lines, tokens);
     parser.top_package_name = "main";
 
-    ReturnNode* ast = parser.parse_return();
+    std::unique_ptr<ReturnNode> ast = parser.parse_return();
 
     REQUIRE(ast->to_json() == ReturnNode(EXPRESSION.node, DUMMY_POS, DUMMY_POS).to_json());
 }
@@ -748,7 +748,7 @@ TEST_CASE("parse_typeclass", "[parser]") {
     Parser parser("test", scanner.code_lines, tokens);
     parser.top_package_name = "main";
 
-    TypeclassNode* ast = parser.parse_typeclass();
+    std::unique_ptr<TypeclassNode> ast = parser.parse_typeclass();
     REQUIRE(ast->to_json() == TypeclassNode("Comparable",
                                             "t",
                                             {{"eq", new FunctionType({new ObjectType("t"), new ObjectType("t")},
@@ -767,7 +767,7 @@ TEST_CASE("parse_instance", "[parser]") {
     Parser parser("test", scanner.code_lines, tokens);
     parser.top_package_name = "main";
 
-    InstanceNode* ast = parser.parse_instance();
+    std::unique_ptr<InstanceNode> ast = parser.parse_instance();
     REQUIRE(ast->to_json() == InstanceNode("Comparable",
                                            new ObjectType("Foo"),
                                            {{"eq", new FunctionNode("eq",
