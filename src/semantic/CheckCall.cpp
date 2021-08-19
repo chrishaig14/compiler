@@ -15,7 +15,7 @@ USemanticInfo Checker::visit_call(CallNode& n, bool is_rvalue) {
     // Logger::info("Checking CallNode");
     bool old_is_call = this->is_call;
     this->is_call = true;
-    USemanticInfo fun_info_p = this->dispatch(n.function);
+    USemanticInfo fun_info_p = this->dispatch(*n.function);
     this->is_call = old_is_call;
     if (fun_info_p->is_error()) {
         return error_stub();
@@ -170,7 +170,7 @@ USemanticInfo Checker::make_return_info(const CallNode& n, bool is_rvalue, Seman
 bool Checker::check_arguments(CallNode& n, CallSNode* sn, VectorOfTypes& arg_types, std::vector<Entity>& arg_entities) {
     bool has_error;
     for (auto& arg: n.arguments) {
-        USemanticInfo arg_type_p = dispatch(arg);
+        USemanticInfo arg_type_p = this->dispatch(*arg);
         if (arg_type_p->is_error()) {
             has_error = true;
             continue;

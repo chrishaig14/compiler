@@ -12,6 +12,11 @@ struct TestNode {
     Node* node;
 };
 
+struct TestNodeU {
+    std::string text;
+    std::unique_ptr<Node> node;
+};
+
 struct TestTypeNode {
     std::string text;
     TypeNode* node;
@@ -38,8 +43,13 @@ const TestNode EXPRESSION_2{EXP_ID_2.text + "*" + EXP_ID_1.text,
 
 const TestNode DECLARATION{"var " + ID + " = " + EXPRESSION.text,
                            new DeclarationNode(ID, nullptr, EXPRESSION.node, DUMMY_POS, DUMMY_POS, DUMMY_POS)};
-const TestNode ASSIGNMENT{EXP_ID_1.text + " = " + EXPRESSION_1.text,
-                          new AssignmentNode(EXP_ID_1.node, EXPRESSION_1.node, DUMMY_POS, DUMMY_POS)};
+
+
+TestNodeU EXP_ID_1_U{"foo", std::make_unique<IdNode>("foo", DUMMY_POS, DUMMY_POS)};
+TestNodeU EXPRESSION_1_U{EXP_ID_1.text + "+" + EXP_ID_2.text,
+                         std::make_unique<BinopNode>(OpType::ADD, EXP_ID_1.node, EXP_ID_2.node, DUMMY_POS, DUMMY_POS)};
+const TestNode ASSIGNMENT{EXP_ID_1.text + " = " + EXPRESSION_1_U.text,
+                          new AssignmentNode(EXP_ID_1_U.node, EXPRESSION_1_U.node, DUMMY_POS, DUMMY_POS)};
 
 const TestNode EMPTY_BLOCK{"{}", new BlockNode({}, DUMMY_POS, DUMMY_POS)};
 

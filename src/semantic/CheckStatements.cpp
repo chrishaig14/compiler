@@ -61,7 +61,7 @@ USemanticInfo Checker::visit_lvalue_subscript(SubscriptNode& node) {
 
 USemanticInfo Checker::visit_assignment(AssignmentNode& n) {
     if (n.lvalue->ntype == NodeType::ID) {
-        if (((IdNode*) n.lvalue)->_id == "_") {
+        if (((IdNode&) *n.lvalue)._id == "_") {
             USemanticInfo rv = this->dispatch_rvalue(*n.rvalue);
             return rv;
         }
@@ -76,7 +76,7 @@ USemanticInfo Checker::visit_assignment(AssignmentNode& n) {
         csn = (CallSNode*) linfo_p->snode;
         is_subscript = true;
     } else {
-        linfo_p = this->dispatch(n.lvalue);
+        linfo_p = this->dispatch(*n.lvalue);
     }
 
     USemanticInfo expression_info_p = this->dispatch_rvalue(*n.rvalue);
@@ -243,7 +243,7 @@ USemanticInfo Checker::visit_match(MatchExpressionNode& node) {
         this->fill_value(ent.value);
         assert(ent.value->clazz != nullptr);
         this->scope->set(case_id, ent);
-        USemanticInfo case_info = this->dispatch(case_node);
+        USemanticInfo case_info = this->dispatch(*case_node);
         auto* bn = (BlockSNode*) case_info->snode;
         auto* omn = new ObjectMemberSNode(new IdSNode(varname), Path("core.core.Union"), "o");
         auto* dn = new DeclarationSNode(case_id, omn);
@@ -428,7 +428,7 @@ USemanticInfo Checker::visit_try_catch(TryCatchNode& node) {
 
         Node* catch_body = node.catches_bodies[i];
 
-        USemanticInfo ex_info = this->dispatch(new IdNode(et->id, {0, 0}, {0, 0}));
+        USemanticInfo ex_info = this->dispatch(*new IdNode(et->id, {0, 0}, {0, 0}));
         Entity ex_class_entity = ex_info->entity;
         Entity ex_entity = entity_from_type(*et);
         ex_entity.value->type->object().actual_base_path = ex_class_entity.clazz->path;

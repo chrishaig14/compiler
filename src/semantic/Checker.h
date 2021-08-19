@@ -157,7 +157,7 @@ public:
     USemanticInfo enum_member(Enum* enumm, const std::string& value, MemberNode& node);
     USemanticInfo visit_enum(EnumNode& p_node);
     SNode* make_rvalue(const Entity& value_entity, SNode* value_snode, const TypeNode& target);
-    USemanticInfo dispatch(Node* nod);
+    USemanticInfo dispatch(Node& nod);
     void fill_value(Value* value);
     std::unique_ptr<SemanticInfo> expect_rvalue_of_type(const TypeNode& target, Node& node);
     void process_function_arguments(SemanticInfo& retv, std::vector<Entity>& arg_entities, CallSNode* sn, CallNode& n,

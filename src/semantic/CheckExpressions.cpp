@@ -234,7 +234,7 @@ void Checker::fill_value(Value* value) {
 }
 
 USemanticInfo Checker::visit_subscript(SubscriptNode& node) {
-    USemanticInfo parent_p = this->dispatch(node.parent);
+    USemanticInfo parent_p = this->dispatch(*node.parent);
     Entity entity_parent = parent_p->entity;
     if (entity_parent.type != E_TYPE::VALUE || entity_parent.value->type->kind == Kind::FUNCTION) {
         this->error_reporter.fail("Error subscript of something that is not an object!");

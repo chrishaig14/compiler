@@ -86,12 +86,15 @@ TEST_CASE("nodes_call", "[call]") {
 }
 
 TEST_CASE("nodes_assignment", "[assignment]") {
-    IdNode* l = new IdNode("foo", DUMMY_POS, DUMMY_POS);
-    NumberNode* r = new NumberNode(NumberType::INTEGER, "7", DUMMY_POS, DUMMY_POS);
-    AssignmentNode n(l, r, DUMMY_POS, DUMMY_POS);
-    nlohmann::json nj = n.to_json();
+    std::unique_ptr<Node> l = std::make_unique<IdNode>("foo", DUMMY_POS, DUMMY_POS);
+    std::unique_ptr<Node> r = std::make_unique<NumberNode>(NumberType::INTEGER, "7", DUMMY_POS, DUMMY_POS);
+
     nlohmann::json e = {{"type",       "assignment"},
                         {"assignment", {{"lvalue", l->to_json()}, {"rvalue", r->to_json()}}}};
+
+    AssignmentNode n(l, r, DUMMY_POS, DUMMY_POS);
+    nlohmann::json nj = n.to_json();
+
     REQUIRE(e == nj);
 }
 

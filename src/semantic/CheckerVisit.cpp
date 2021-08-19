@@ -83,7 +83,7 @@ USemanticInfo Checker::visit_class(ClassNode& node) {
     sn->nodes.push_back(make_class_default_init(clazz->path.as_str(), node.members_ordered));
 
     for (const auto& sm: node.static_members) {
-        USemanticInfo sm_exp_info = this->dispatch(sm.second.second);
+        USemanticInfo sm_exp_info = this->dispatch(*sm.second.second);
         if (*sm.second.first != *sm_exp_info->entity.value->type) {
             this->error_reporter.fail("Err: cannt initialize static member of type " + sm.second.first->to_string() +
                                       " with expression of type " + sm_exp_info->entity.value->type->to_string());
@@ -149,7 +149,7 @@ USemanticInfo Checker::visit_block(BlockNode& node) {
     info.snode = sn;
     VectorOfNodes vn;
     for (auto& n: node.nodes) {
-        USemanticInfo sinfo_p = this->dispatch(n);
+        USemanticInfo sinfo_p = this->dispatch(*n);
 
         // sn->nodes.push_back(sinfo_p->snode);
 

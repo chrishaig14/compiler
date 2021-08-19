@@ -168,7 +168,7 @@ std::unique_ptr<Node> Parser::parse_assignment_or_expression() {
         }
         auto rvalue = this->parse_expression();
         if (lvalue->ntype == NodeType::ID) {
-            auto* id_node = new IdNode(((IdNode&) *lvalue)._id, lvalue->start, lvalue->end);
+            auto* id_node = new IdNode(((IdNode & ) * lvalue)._id, lvalue->start, lvalue->end);
             if (op == TokType::PLUS_EQQ || op == TokType::MINUS_EQQ) {
                 OpType opt;
                 if (op == TokType::PLUS_EQQ) {
@@ -183,9 +183,7 @@ std::unique_ptr<Node> Parser::parse_assignment_or_expression() {
             }
 
         }
-        auto lp = lvalue.release();
-        auto rp = rvalue.release();
-        auto node = std::make_unique<AssignmentNode>(lp, rp, lp->start, rp->end);
+        auto node = std::make_unique<AssignmentNode>(lvalue, rvalue, lvalue->start, rvalue->end);
         node->start = op_pos;
         return node;
     } else {

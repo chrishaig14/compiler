@@ -4,8 +4,10 @@
 
 #include "AssignmentNode.h"
 #include "../json/json.hpp"
-AssignmentNode::AssignmentNode(Node* lvalue, Node* rvalue, TextPosition start, TextPosition end)
-        : Node(NodeType::ASSIGN, start, end), lvalue(lvalue), rvalue(rvalue) {
+
+AssignmentNode::AssignmentNode(std::unique_ptr<Node>& lvalue, std::unique_ptr<Node>& rvalue, TextPosition start,
+                               TextPosition end) : Node(NodeType::ASSIGN, start, end), lvalue(std::move(lvalue)),
+                                                   rvalue(std::move(rvalue)) {
 }
 
 bool AssignmentNode::equal(const Node& x) const {

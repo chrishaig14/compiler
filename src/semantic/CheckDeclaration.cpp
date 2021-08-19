@@ -154,7 +154,7 @@ USemanticInfo Checker::check_declaration_with_type(DeclarationNode& n) {
 }
 
 USemanticInfo Checker::check_declaration_without_type(DeclarationNode& n) {
-    USemanticInfo exp_info_p = this->dispatch(n.expression);
+    USemanticInfo exp_info_p = this->dispatch(*n.expression);
     if (exp_info_p->is_error()) {
         return error_stub();
     }

@@ -13,11 +13,11 @@
 
 class AssignmentNode : public Node {
 public:
-    Node* lvalue;
-    Node* rvalue;
+    std::unique_ptr<Node> lvalue;
+    std::unique_ptr<Node> rvalue;
 
 
-    AssignmentNode(Node* lvalue, Node* rvalue, TextPosition start, TextPosition end);
+    AssignmentNode(std::unique_ptr<Node>& lvalue, std::unique_ptr<Node>& rvalue, TextPosition start, TextPosition end);
 
     bool equal(const Node& x) const override;
 

@@ -11,7 +11,7 @@
 #include "errors/ErrorPackageNoMember.h"
 
 USemanticInfo Checker::visit_member(MemberNode& n) {
-    USemanticInfo parent_info = this->dispatch(n.parent);
+    USemanticInfo parent_info = this->dispatch(*n.parent);
     Entity parent_entity = parent_info->entity;
     switch (parent_entity.type) {
         case E_TYPE::CLASS:

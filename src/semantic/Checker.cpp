@@ -313,8 +313,8 @@ USemanticInfo Checker::dispatch_rvalue(Node& nod) {
     return this->dispatch_any(nod, true);
 }
 
-USemanticInfo Checker::dispatch(Node* nod) {
-    return this->dispatch_any(*nod, false);
+USemanticInfo Checker::dispatch(Node& nod) {
+    return this->dispatch_any(nod, false);
 }
 
 USemanticInfo Checker::dispatch_any(Node& n, bool is_rvalue) {

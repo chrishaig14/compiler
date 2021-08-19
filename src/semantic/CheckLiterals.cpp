@@ -100,7 +100,7 @@ USemanticInfo Checker::visit_tuple(TupleNode& node) {
     VectorOfTypes types;
     std::vector<SNode*> values;
     for (auto* n: node.values) {
-        USemanticInfo vtype = this->dispatch(n);
+        USemanticInfo vtype = this->dispatch(*n);
         values.push_back(vtype->snode);
         types.emplace_back(vtype->entity.value->type->clone());
         // if (!this->is_immutable(vtype->type())) {
@@ -132,7 +132,7 @@ USemanticInfo Checker::visit_tuple(TupleNode& node) {
 }
 
 USemanticInfo Checker::visit_partial(PartialApplication& node) {
-    USemanticInfo func = this->dispatch(node.function);
+    USemanticInfo func = this->dispatch(*node.function);
     VectorOfTypes partial_args;
     FunctionType* fun_type = nullptr;
     if (func->entity.type == E_TYPE::CONST_FUNCTION ||
@@ -176,8 +176,8 @@ USemanticInfo Checker::visit_partial(PartialApplication& node) {
 
 USemanticInfo Checker::visit_dict(DictNode& node) {
     SemanticInfo info;
-    USemanticInfo first_key_info = this->dispatch(node.items[0].first);
-    USemanticInfo first_value_info = this->dispatch(node.items[0].second);
+    USemanticInfo first_key_info = this->dispatch(*node.items[0].first);
+    USemanticInfo first_value_info = this->dispatch(*node.items[0].second);
     ObjectType& first_key_type = first_key_info->entity.value->type->object();
     ObjectType& first_value_type = first_value_info->entity.value->type->object();
 
@@ -228,7 +228,7 @@ USemanticInfo Checker::visit_defconst(DefaultConstructorNode& node) {
     // this is a regular function
     SemanticInfo info;
     VectorOfTypes t;
-    Entity entity = this->dispatch(node.class_node)->entity;
+    Entity entity = this->dispatch(*node.class_node)->entity;
     if (entity.type != E_TYPE::CLASS) {
         this->error_reporter.fail("Error not a class");
     }
@@ -251,7 +251,7 @@ USemanticInfo Checker::visit_defconst(DefaultConstructorNode& node) {
 }
 
 USemanticInfo Checker::visit_list(ListNode& node) {
-    USemanticInfo element_type_p = this->dispatch(node.elements[0]);
+    USemanticInfo element_type_p = this->dispatch(*node.elements[0]);
     if (element_type_p->entity.type != E_TYPE::VALUE) {
         this->error_reporter.error(ErrorExpectedExpression(element_type_p->entity, *node.elements[0]));
         return error_stub();
@@ -262,7 +262,7 @@ USemanticInfo Checker::visit_list(ListNode& node) {
     std::vector<SNode*> list_elements = {element_type_p->snode};
 
     for (size_t i = 1; i < node.elements.size(); i++) {
-        USemanticInfo current_type_p = this->dispatch(node.elements[i]);
+        USemanticInfo current_type_p = this->dispatch(*node.elements[i]);
         // const TypeNode& current_type = current_type_p->type();
         // if (!current_type_p->is_constant) {
         //     is_constant = false;
