@@ -69,7 +69,7 @@ TEST_CASE("parse_assignment", "[parser]") {
     Parser parser("test", scanner.code_lines, tokens);
     parser.top_package_name = "main";
 
-    Node* ast = parser.parse_assignment_or_expression();
+    std::unique_ptr<Node> ast = parser.parse_assignment_or_expression();
 
     REQUIRE(ast->to_json() == ASSIGNMENT.node->to_json());
 }
@@ -139,7 +139,7 @@ TEST_CASE("parse_call_no_args", "[parser]") {
     Parser parser("test", scanner.code_lines, tokens);
     parser.top_package_name = "main";
 
-    Node* ast = parser.parse_expression();
+    std::unique_ptr<Node> ast = parser.parse_expression();
     REQUIRE(ast->to_json() == CallNode(FACTOR_EXPRESSION.node, {}, DUMMY_POS, DUMMY_POS).to_json());
 }
 
@@ -151,7 +151,7 @@ TEST_CASE("parse_call_one_arg", "[parser]") {
     Parser parser("test", scanner.code_lines, tokens);
     parser.top_package_name = "main";
 
-    Node* ast = parser.parse_expression();
+    std::unique_ptr<Node> ast = parser.parse_expression();
     REQUIRE(ast->to_json() == CallNode(FACTOR_EXPRESSION.node, {EXPRESSION_1.node}, DUMMY_POS, DUMMY_POS).to_json());
 }
 
@@ -163,7 +163,7 @@ TEST_CASE("parse_call_mult_arg", "[parser]") {
     Parser parser("test", scanner.code_lines, tokens);
     parser.top_package_name = "main";
 
-    Node* ast = parser.parse_expression();
+    std::unique_ptr<Node> ast = parser.parse_expression();
     REQUIRE(ast->to_json() ==
             CallNode(FACTOR_EXPRESSION.node, {EXPRESSION_1.node, EXPRESSION_2.node}, DUMMY_POS, DUMMY_POS).to_json());
 }
@@ -371,7 +371,7 @@ TEST_CASE("parse_list_empty", "[parser]") {
     Parser parser("test", scanner.code_lines, tokens);
     parser.top_package_name = "main";
 
-    Node* ast = parser.parse_list_literal();
+    std::unique_ptr<Node> ast = parser.parse_list_literal();
 
     REQUIRE(ast->to_json() == EmptyListNode(TYPE.node->clone(), DUMMY_POS, DUMMY_POS).to_json());
 }
@@ -384,7 +384,7 @@ TEST_CASE("parse_list_one_element", "[parser]") {
     Parser parser("test", scanner.code_lines, tokens);
     parser.top_package_name = "main";
 
-    Node* ast = parser.parse_list_literal();
+    std::unique_ptr<Node> ast = parser.parse_list_literal();
 
     REQUIRE(ast->to_json() == ListNode({EXPRESSION_1.node}, DUMMY_POS, DUMMY_POS).to_json());
 }
@@ -397,7 +397,7 @@ TEST_CASE("parse_list_mult_elements", "[parser]") {
     Parser parser("test", scanner.code_lines, tokens);
     parser.top_package_name = "main";
 
-    Node* ast = parser.parse_list_literal();
+    std::unique_ptr<Node> ast = parser.parse_list_literal();
 
     REQUIRE(ast->to_json() == ListNode({EXPRESSION_1.node, EXPRESSION_2.node}, DUMMY_POS, DUMMY_POS).to_json());
 }
@@ -410,7 +410,7 @@ TEST_CASE("parse_number_integer", "[parser]") {
     Parser parser("test", scanner.code_lines, tokens);
     parser.top_package_name = "main";
 
-    Node* ast = parser.parse_id_or_literal();
+    std::unique_ptr<Node> ast = parser.parse_id_or_literal();
 
     REQUIRE(ast->to_json() == NumberNode(NumberType::INTEGER, "89", DUMMY_POS, DUMMY_POS).to_json());
 }
@@ -423,7 +423,7 @@ TEST_CASE("parse_number_float", "[parser]") {
     Parser parser("test", scanner.code_lines, tokens);
     parser.top_package_name = "main";
 
-    Node* ast = parser.parse_id_or_literal();
+    std::unique_ptr<Node> ast = parser.parse_id_or_literal();
 
     REQUIRE(ast->to_json() == NumberNode(NumberType::FLOAT, "3.14", DUMMY_POS, DUMMY_POS).to_json());
 }
@@ -436,7 +436,7 @@ TEST_CASE("parse_empty_string", "[parser]") {
     Parser parser("test", scanner.code_lines, tokens);
     parser.top_package_name = "main";
 
-    Node* ast = parser.parse_id_or_literal();
+    std::unique_ptr<Node> ast = parser.parse_id_or_literal();
 
     REQUIRE(ast->to_json() == StringNode("", DUMMY_POS, DUMMY_POS).to_json());
 }
@@ -449,7 +449,7 @@ TEST_CASE("parse_string", "[parser]") {
     Parser parser("test", scanner.code_lines, tokens);
     parser.top_package_name = "main";
 
-    Node* ast = parser.parse_id_or_literal();
+    std::unique_ptr<Node> ast = parser.parse_id_or_literal();
 
     REQUIRE(ast->to_json() == StringNode("hello, world", DUMMY_POS, DUMMY_POS).to_json());
 }
@@ -462,7 +462,7 @@ TEST_CASE("parse_none", "[parser]") {
     Parser parser("test", scanner.code_lines, tokens);
     parser.top_package_name = "main";
 
-    Node* ast = parser.parse_id_or_literal();
+    std::unique_ptr<Node> ast = parser.parse_id_or_literal();
 
     REQUIRE(ast->to_json() == NoneNode(DUMMY_POS, DUMMY_POS).to_json());
 }
@@ -475,7 +475,7 @@ TEST_CASE("parse_true", "[parser]") {
     Parser parser("test", scanner.code_lines, tokens);
     parser.top_package_name = "main";
 
-    Node* ast = parser.parse_id_or_literal();
+    std::unique_ptr<Node> ast = parser.parse_id_or_literal();
 
     REQUIRE(ast->to_json() == BooleanNode(true, DUMMY_POS, DUMMY_POS).to_json());
 }
@@ -488,7 +488,7 @@ TEST_CASE("parse_false", "[parser]") {
     Parser parser("test", scanner.code_lines, tokens);
     parser.top_package_name = "main";
 
-    Node* ast = parser.parse_id_or_literal();
+    std::unique_ptr<Node> ast = parser.parse_id_or_literal();
 
     REQUIRE(ast->to_json() == BooleanNode(false, DUMMY_POS, DUMMY_POS).to_json());
 }
@@ -501,7 +501,7 @@ TEST_CASE("parse_and_exp", "[parser]") {
     Parser parser("test", scanner.code_lines, tokens);
     parser.top_package_name = "main";
 
-    Node* ast = parser.parse_and_expression();
+    std::unique_ptr<Node> ast = parser.parse_and_expression();
 
     REQUIRE(ast->to_json() ==
             BoolOpNode(BoolOp::AND, EXPRESSION_1.node, EXPRESSION_2.node, DUMMY_POS, DUMMY_POS).to_json());
@@ -515,7 +515,7 @@ TEST_CASE("parse_or_exp", "[parser]") {
     Parser parser("test", scanner.code_lines, tokens);
     parser.top_package_name = "main";
 
-    Node* ast = parser.parse_or_expression();
+    std::unique_ptr<Node> ast = parser.parse_or_expression();
 
     REQUIRE(ast->to_json() ==
             BoolOpNode(BoolOp::OR, EXPRESSION_1.node, EXPRESSION_2.node, DUMMY_POS, DUMMY_POS).to_json());
@@ -529,7 +529,7 @@ TEST_CASE("parse_eq_exp", "[parser]") {
     Parser parser("test", scanner.code_lines, tokens);
     parser.top_package_name = "main";
 
-    Node* ast = parser.parse_and_expression();
+    std::unique_ptr<Node> ast = parser.parse_and_expression();
 
     REQUIRE(ast->to_json() ==
             BoolOpNode(BoolOp::EQ, EXPRESSION_1.node, EXPRESSION_2.node, DUMMY_POS, DUMMY_POS).to_json());
@@ -543,7 +543,7 @@ TEST_CASE("parse_ge_exp", "[parser]") {
     Parser parser("test", scanner.code_lines, tokens);
     parser.top_package_name = "main";
 
-    Node* ast = parser.parse_and_expression();
+    std::unique_ptr<Node> ast = parser.parse_and_expression();
 
     REQUIRE(ast->to_json() ==
             BoolOpNode(BoolOp::GE, EXPRESSION_1.node, EXPRESSION_2.node, DUMMY_POS, DUMMY_POS).to_json());
@@ -557,7 +557,7 @@ TEST_CASE("parse_le_exp", "[parser]") {
     Parser parser("test", scanner.code_lines, tokens);
     parser.top_package_name = "main";
 
-    Node* ast = parser.parse_and_expression();
+    std::unique_ptr<Node> ast = parser.parse_and_expression();
 
     REQUIRE(ast->to_json() ==
             BoolOpNode(BoolOp::LE, EXPRESSION_1.node, EXPRESSION_2.node, DUMMY_POS, DUMMY_POS).to_json());
@@ -571,7 +571,7 @@ TEST_CASE("parse_gt_exp", "[parser]") {
     Parser parser("test", scanner.code_lines, tokens);
     parser.top_package_name = "main";
 
-    Node* ast = parser.parse_and_expression();
+    std::unique_ptr<Node> ast = parser.parse_and_expression();
 
     REQUIRE(ast->to_json() ==
             BoolOpNode(BoolOp::GT, EXPRESSION_1.node, EXPRESSION_2.node, DUMMY_POS, DUMMY_POS).to_json());
@@ -585,7 +585,7 @@ TEST_CASE("parse_lt_exp", "[parser]") {
     Parser parser("test", scanner.code_lines, tokens);
     parser.top_package_name = "main";
 
-    Node* ast = parser.parse_and_expression();
+    std::unique_ptr<Node> ast = parser.parse_and_expression();
 
     REQUIRE(ast->to_json() ==
             BoolOpNode(BoolOp::LT, EXPRESSION_1.node, EXPRESSION_2.node, DUMMY_POS, DUMMY_POS).to_json());
@@ -599,7 +599,7 @@ TEST_CASE("parse_ne_exp", "[parser]") {
     Parser parser("test", scanner.code_lines, tokens);
     parser.top_package_name = "main";
 
-    Node* ast = parser.parse_and_expression();
+    std::unique_ptr<Node> ast = parser.parse_and_expression();
 
     REQUIRE(ast->to_json() ==
             BoolOpNode(BoolOp::NE, EXPRESSION_1.node, EXPRESSION_2.node, DUMMY_POS, DUMMY_POS).to_json());
@@ -613,7 +613,7 @@ TEST_CASE("parse_not_exp", "[parser]") {
     Parser parser("test", scanner.code_lines, tokens);
     parser.top_package_name = "main";
 
-    Node* ast = parser.parse_and_expression();
+    std::unique_ptr<Node> ast = parser.parse_and_expression();
 
     REQUIRE(ast->to_json() == UnaryOpNode(UnaryOp::NOT, EXPRESSION.node, DUMMY_POS, DUMMY_POS).to_json());
 }
@@ -626,7 +626,7 @@ TEST_CASE("parse_tuple", "[parser]") {
     Parser parser("test", scanner.code_lines, tokens);
     parser.top_package_name = "main";
 
-    Node* ast = parser.parse_tuple_or_constructor();
+    std::unique_ptr<Node> ast = parser.parse_tuple_or_constructor();
 
     REQUIRE(ast->to_json() == TupleNode({EXPRESSION_1.node, EXPRESSION_2.node}, DUMMY_POS, DUMMY_POS).to_json());
 }
@@ -639,7 +639,7 @@ TEST_CASE("parse_dict_empty", "[parser]") {
     Parser parser("test", scanner.code_lines, tokens);
     parser.top_package_name = "main";
 
-    Node* ast = parser.parse_dictionary();
+    std::unique_ptr<Node> ast = parser.parse_dictionary();
 
     REQUIRE(ast->to_json() ==
             EmptyDictNode(TYPE_1.node->clone(), TYPE_2.node->clone(), DUMMY_POS, DUMMY_POS).to_json());
@@ -653,7 +653,7 @@ TEST_CASE("parse_dict_one_element", "[parser]") {
     Parser parser("test", scanner.code_lines, tokens);
     parser.top_package_name = "main";
 
-    Node* ast = parser.parse_dictionary();
+    std::unique_ptr<Node> ast = parser.parse_dictionary();
 
     REQUIRE(ast->to_json() == DictNode({{EXPRESSION_1.node, EXPRESSION_2.node}}, DUMMY_POS, DUMMY_POS).to_json());
 }
@@ -667,7 +667,7 @@ TEST_CASE("parse_dict_mult_elements", "[parser]") {
     Parser parser("test", scanner.code_lines, tokens);
     parser.top_package_name = "main";
 
-    Node* ast = parser.parse_dictionary();
+    std::unique_ptr<Node> ast = parser.parse_dictionary();
 
     REQUIRE(ast->to_json() == DictNode({{EXPRESSION_1.node, EXPRESSION_2.node},
                                         {EXPRESSION.node,   EXPRESSION_1.node}}, DUMMY_POS, DUMMY_POS).to_json());
@@ -681,7 +681,7 @@ TEST_CASE("parse_member", "[parser]") {
     Parser parser("test", scanner.code_lines, tokens);
     parser.top_package_name = "main";
 
-    Node* ast = parser.parse_factor();
+    std::unique_ptr<Node> ast = parser.parse_factor();
 
     REQUIRE(ast->to_json() == MemberNode(EXPRESSION.node, Token(TokType::ID, ID, DUMMY_POS, DUMMY_POS)).to_json());
 }
@@ -694,7 +694,7 @@ TEST_CASE("parse_subscript", "[parser]") {
     Parser parser("test", scanner.code_lines, tokens);
     parser.top_package_name = "main";
 
-    Node* ast = parser.parse_factor();
+    std::unique_ptr<Node> ast = parser.parse_factor();
 
     REQUIRE(ast->to_json() == SubscriptNode(EXPRESSION.node, {EXPRESSION_2.node}, DUMMY_POS, DUMMY_POS).to_json());
 }
@@ -707,7 +707,7 @@ TEST_CASE("parse_partial_one_arg", "[parser]") {
     Parser parser("test", scanner.code_lines, tokens);
     parser.top_package_name = "main";
 
-    Node* ast = parser.parse_partial_application();
+    std::unique_ptr<Node> ast = parser.parse_partial_application();
     REQUIRE(ast->to_json() ==
             PartialApplication(FACTOR_EXPRESSION.node, {EXPRESSION_1.node}, DUMMY_POS, DUMMY_POS).to_json());
 }
@@ -720,7 +720,7 @@ TEST_CASE("parse_partial_mult_arg_one", "[parser]") {
     Parser parser("test", scanner.code_lines, tokens);
     parser.top_package_name = "main";
 
-    Node* ast = parser.parse_partial_application();
+    std::unique_ptr<Node> ast = parser.parse_partial_application();
     REQUIRE(ast->to_json() ==
             PartialApplication(FACTOR_EXPRESSION.node, {EXPRESSION_1.node, nullptr}, DUMMY_POS, DUMMY_POS).to_json());
 }
@@ -733,7 +733,7 @@ TEST_CASE("parse_partial_mult_arg_two", "[parser]") {
     Parser parser("test", scanner.code_lines, tokens);
     parser.top_package_name = "main";
 
-    Node* ast = parser.parse_partial_application();
+    std::unique_ptr<Node> ast = parser.parse_partial_application();
     REQUIRE(ast->to_json() == PartialApplication(FACTOR_EXPRESSION.node,
                                                  {EXPRESSION_1.node, EXPRESSION_2.node},
                                                  DUMMY_POS,

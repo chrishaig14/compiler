@@ -11,7 +11,7 @@ TypeNode* parse_type(const std::string& s) {
     scanner.load_text(s);
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser("", scanner.code_lines, tokens);
-    return parser.parse_type_node();
+    return parser.parse_type_node().release();
 }
 
 FunctionType* parse_function_type(const std::string& s) {
@@ -19,5 +19,5 @@ FunctionType* parse_function_type(const std::string& s) {
     scanner.load_text(s);
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser("", scanner.code_lines, tokens);
-    return parser.parse_function_type();
+    return parser.parse_function_type().release();
 }

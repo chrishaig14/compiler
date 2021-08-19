@@ -188,7 +188,7 @@ std::unique_ptr<InstanceNode> Parser::parse_instance() {
     Token instance_tok = this->expect_token(TokType::INSTANCE);
     Token id_tok = this->expect_token(TokType::ID);
     this->expect_token(TokType::LSQUARE);
-    ObjectType* ot = this->parse_object_type();
+    ObjectType* ot = this->parse_object_type().release();
     this->expect_token(TokType::RSQUARE);
     this->expect_token(TokType::LCURLY);
     std::unordered_map<std::string, FunctionNode*> methods;

@@ -15,10 +15,10 @@ void Compiler::parse_single_module(Module& module) {
     module.code_lines = scanner.code_lines;
     BlockNode* ast;
     // try {
-        ast = parser.parse_program();
+    ast = parser.parse_program().release();
     // } catch (const std::runtime_error& e) {
     //     std::cout << e.what() << std::endl;
-        // exit(1);
+    // exit(1);
     // }
     module.ast = ast;
 }
