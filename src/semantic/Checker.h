@@ -103,7 +103,7 @@ public:
                                                                       std::map<std::string, TypeNode*>& all_substitutions);
     void fail(std::string msg);
 
-    USemanticInfo dispatch_rvalue(Node* nod);
+    USemanticInfo dispatch_rvalue(Node& nod);
 
     USemanticInfo visit_assignment(AssignmentNode& n);
     USemanticInfo visit_binop(BinopNode& node);
@@ -152,13 +152,12 @@ public:
     USemanticInfo module_member(Module& mod, const std::string& child, MemberNode& n);
 
 
-    USemanticInfo visit_match(MatchExpressionNode* node);
-    USemanticInfo visit_alias(AliasNode* p_node);
+    USemanticInfo visit_match(MatchExpressionNode& node);
+    USemanticInfo visit_alias(AliasNode& p_node);
     USemanticInfo enum_member(Enum* enumm, const std::string& value, MemberNode& node);
     USemanticInfo visit_enum(EnumNode& p_node);
     SNode* make_rvalue(const Entity& value_entity, SNode* value_snode, const TypeNode& target);
     USemanticInfo dispatch(Node* nod);
-    USemanticInfo dispatch_any(Node* p_node, bool b);
     void fill_value(Value* value);
     std::unique_ptr<SemanticInfo> expect_rvalue_of_type(const TypeNode& target, Node& node);
     void process_function_arguments(SemanticInfo& retv, std::vector<Entity>& arg_entities, CallSNode* sn, CallNode& n,
@@ -173,6 +172,7 @@ public:
     // USemanticInfo visit_throw(ThrowNode& n);
     USemanticInfo visit_try_catch(TryCatchNode& node);
     void init();
+    USemanticInfo dispatch_any(Node& n, bool is_rvalue);
 };
 
 #endif //CHECKER_H

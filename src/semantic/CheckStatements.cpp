@@ -14,7 +14,7 @@
 #include "errors/ErrorFor.h"
 
 USemanticInfo Checker::visit_lvalue_subscript(SubscriptNode& node) {
-    USemanticInfo parent_p = this->dispatch_rvalue(node.parent);
+    USemanticInfo parent_p = this->dispatch_rvalue(*node.parent);
     Entity entity_parent = parent_p->entity;
     if (entity_parent.type != E_TYPE::VALUE || entity_parent.value->type->kind == Kind::FUNCTION) {
         this->error_reporter.fail("Error subscript of something that is not an object!");
@@ -62,7 +62,7 @@ USemanticInfo Checker::visit_lvalue_subscript(SubscriptNode& node) {
 USemanticInfo Checker::visit_assignment(AssignmentNode& n) {
     if (n.lvalue->ntype == NodeType::ID) {
         if (((IdNode*) n.lvalue)->_id == "_") {
-            USemanticInfo rv = this->dispatch_rvalue(n.rvalue);
+            USemanticInfo rv = this->dispatch_rvalue(*n.rvalue);
             return rv;
         }
     }
@@ -79,7 +79,7 @@ USemanticInfo Checker::visit_assignment(AssignmentNode& n) {
         linfo_p = this->dispatch(n.lvalue);
     }
 
-    USemanticInfo expression_info_p = this->dispatch_rvalue(n.rvalue);
+    USemanticInfo expression_info_p = this->dispatch_rvalue(*n.rvalue);
 
     if (linfo_p->is_error()) {
         return error_stub();
@@ -203,12 +203,12 @@ USemanticInfo Checker::visit_return(ReturnNode& n) {
 //     return std::make_unique<SemanticInfo>(info);
 // }
 
-USemanticInfo Checker::visit_match(MatchExpressionNode* node) {
-    USemanticInfo exp_info = this->dispatch_rvalue(node->exp);
+USemanticInfo Checker::visit_match(MatchExpressionNode& node) {
+    USemanticInfo exp_info = this->dispatch_rvalue(*node.exp);
     if (exp_info->entity.type != E_TYPE::VALUE || exp_info->entity.value->type->kind != Kind::OBJECT) {
 
         this->error_reporter.error(ErrorTypeMismatch(*new ObjectType("Union", {new ObjectType("...", {})}),
-                                                     *node->exp,
+                                                     *node.exp,
                                                      exp_info->entity));
         return error_stub();
     }
@@ -219,15 +219,15 @@ USemanticInfo Checker::visit_match(MatchExpressionNode* node) {
     }
     if (ot->id != "Union") {
         this->error_reporter.error(ErrorTypeMismatch(*new ObjectType("Union", {new ObjectType("...", {})}),
-                                                     *node->exp,
+                                                     *node.exp,
                                                      exp_info->entity));
         return error_stub();
     }
     std::vector<std::pair<int, BlockSNode*>> cas;
     std::string varname = "match_var";
-    for (size_t i = 0; i < node->ids.size(); i++) {
-        std::string case_id = node->ids[i];
-        std::pair<TypeNode*, BlockNode*> c = node->cases[i];
+    for (size_t i = 0; i < node.ids.size(); i++) {
+        std::string case_id = node.ids[i];
+        std::pair<TypeNode*, BlockNode*> c = node.cases[i];
         TypeNode* case_type = c.first;
         BlockNode* case_node = c.second;
 
@@ -276,7 +276,7 @@ USemanticInfo Checker::visit_continue(ContinueNode& node) {
 }
 
 USemanticInfo Checker::visit_for(ForNode& node) {
-    USemanticInfo exp_info_p = this->dispatch_rvalue(node.exp);
+    USemanticInfo exp_info_p = this->dispatch_rvalue(*node.exp);
     if (exp_info_p->entity.type != E_TYPE::VALUE) {
         this->error_reporter.error(ErrorFor(exp_info_p->entity, node.exp->start));
     }

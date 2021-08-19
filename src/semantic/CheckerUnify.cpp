@@ -169,7 +169,7 @@ Entity map_flirpin_to_entity(Flirpin flirpin) {
 }
 
 
-USemanticInfo Checker::visit_alias(AliasNode* p_node) {
+USemanticInfo Checker::visit_alias(AliasNode& p_node) {
     SemanticInfo info;
     return std::make_unique<SemanticInfo>(info);
 }

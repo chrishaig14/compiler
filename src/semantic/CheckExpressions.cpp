@@ -29,7 +29,7 @@ USemanticInfo Checker::visit_id(IdNode& n) {
 }
 
 USemanticInfo Checker::visit_cast(CastNode& n) {
-    USemanticInfo exp_info = this->dispatch_rvalue(n.exp);
+    USemanticInfo exp_info = this->dispatch_rvalue(*n.exp);
     ObjectType cast_type(n.as_type, {});
     const TypeNode& exp_type = *exp_info->entity.value->type;
     if (exp_type == T_INT || exp_type == T_FLOAT || exp_type == T_DOUBLE || exp_type == T_BOOL) {
@@ -49,8 +49,8 @@ USemanticInfo Checker::visit_cast(CastNode& n) {
 }
 
 USemanticInfo Checker::visit_boolop(BoolOpNode& n) {
-    USemanticInfo left_info_p = this->dispatch_rvalue(n.left);
-    USemanticInfo right_info_p = this->dispatch_rvalue(n.right);
+    USemanticInfo left_info_p = this->dispatch_rvalue(*n.left);
+    USemanticInfo right_info_p = this->dispatch_rvalue(*n.right);
     if (left_info_p->is_error() || right_info_p->is_error()) {
         return error_stub();
     }
@@ -164,7 +164,7 @@ USemanticInfo Checker::visit_unary(UnaryOpNode& n) {
 }
 
 USemanticInfo Checker::visit_binop(BinopNode& n) {
-    USemanticInfo left_info_p = this->dispatch_rvalue(n.left);
+    USemanticInfo left_info_p = this->dispatch_rvalue(*n.left);
     if (left_info_p->is_error()) {
         return error_stub();
     }
@@ -280,7 +280,7 @@ USemanticInfo Checker::visit_subscript(SubscriptNode& node) {
 }
 
 USemanticInfo Checker::visit_ternary(TernaryNode& node) {
-    USemanticInfo expression_info_p = this->dispatch_rvalue(node.expression);
+    USemanticInfo expression_info_p = this->dispatch_rvalue(*node.expression);
     SemanticInfo& expression_info = *expression_info_p;
     if (expression_info.entity.type != E_TYPE::VALUE || expression_info_p->entity.value->type->kind == Kind::FUNCTION) {
         this->error_reporter.error(ErrorTypeMismatch(*new ObjectType("Option", {new ObjectType("t")}),
@@ -300,7 +300,7 @@ USemanticInfo Checker::visit_ternary(TernaryNode& node) {
     TypeNode*& inner_type = expression_type.type_params[0];
     auto* v = new Value(inner_type);
     this->scope->set("it", Entity(v));
-    USemanticInfo true_case_p = this->dispatch_rvalue(node.true_case);
+    USemanticInfo true_case_p = this->dispatch_rvalue(*node.true_case);
     SemanticInfo& true_case = *true_case_p;
     this->leave_scope();
     USemanticInfo false_case_sinfo = this->expect_rvalue_of_type(*true_case.entity.value->type, *node.false_case);
