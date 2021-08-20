@@ -52,14 +52,14 @@ bool Parser::match(TokType type) const {
 }
 
 std::unique_ptr<BlockNode> Parser::parse_program() {
-    VectorOfNodes program;
+    VectorOfNodesU program;
     TextPosition start = this->token.start;
     while (this->token.type != TokType::END) {
-        program.push_back(this->parse_top_level_statement().release());
+        program.push_back(this->parse_top_level_statement());
     }
     TextPosition end = this->token.end_pos;
     std::cout << "--------------- FINISHED PARSING -----------------" << std::endl;
-    return std::make_unique<BlockNode>(program, start, end);
+    return std::make_unique<BlockNode>(std::move(program), start, end);
 }
 
 std::unique_ptr<ReturnNode> Parser::parse_return() {
@@ -168,7 +168,7 @@ std::unique_ptr<Node> Parser::parse_assignment_or_expression() {
         }
         auto rvalue = this->parse_expression();
         if (lvalue->ntype == NodeType::ID) {
-            auto* id_node = new IdNode(((IdNode & ) * lvalue)._id, lvalue->start, lvalue->end);
+            auto* id_node = new IdNode(((IdNode&) *lvalue)._id, lvalue->start, lvalue->end);
             if (op == TokType::PLUS_EQQ || op == TokType::MINUS_EQQ) {
                 OpType opt;
                 if (op == TokType::PLUS_EQQ) {
@@ -691,7 +691,7 @@ std::unique_ptr<TypeNode> Parser::parse_type_node() {
 
 std::unique_ptr<BlockNode> Parser::parse_possibly_empty_block() {
     Token st = this->expect_token(TokType::LCURLY);
-    VectorOfNodes block;
+    VectorOfNodesU block;
     Token end;
     while (true) {
         if (this->match(TokType::RCURLY)) {
@@ -699,11 +699,9 @@ std::unique_ptr<BlockNode> Parser::parse_possibly_empty_block() {
             this->next();
             break;
         }
-        std::unique_ptr<Node> statement = this->parse_common_statement();
-        Node* x = statement.release();
-        block.push_back(x);
+        block.push_back(this->parse_common_statement());
     }
-    return std::make_unique<BlockNode>(block, st.start, end.end_pos);
+    return std::make_unique<BlockNode>(std::move(block), st.start, end.end_pos);
 }
 
 std::unique_ptr<FunctionNode> Parser::parse_function_definition() {

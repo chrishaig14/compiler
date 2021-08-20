@@ -45,35 +45,84 @@ const TestNode DECLARATION{"var " + ID + " = " + EXPRESSION.text,
                            new DeclarationNode(ID, nullptr, EXPRESSION.node, DUMMY_POS, DUMMY_POS, DUMMY_POS)};
 
 
-TestNodeU EXP_ID_1_U{"foo", std::make_unique<IdNode>("foo", DUMMY_POS, DUMMY_POS)};
-TestNodeU EXPRESSION_1_U{EXP_ID_1.text + "+" + EXP_ID_2.text,
-                         std::make_unique<BinopNode>(OpType::ADD, EXP_ID_1.node, EXP_ID_2.node, DUMMY_POS, DUMMY_POS)};
-const TestNode ASSIGNMENT{EXP_ID_1.text + " = " + EXPRESSION_1_U.text,
-                          new AssignmentNode(EXP_ID_1_U.node, EXPRESSION_1_U.node, DUMMY_POS, DUMMY_POS)};
+TestNodeU DECLARATION_U() {
+    return {"var " + ID + " = " + EXPRESSION.text,
+            std::make_unique<DeclarationNode>(ID, nullptr, EXPRESSION.node, DUMMY_POS, DUMMY_POS, DUMMY_POS)};
+}
 
-const TestNode EMPTY_BLOCK{"{}", new BlockNode({}, DUMMY_POS, DUMMY_POS)};
+
+TestNodeU EXP_ID_1_U() {
+    return {"foo", std::make_unique<IdNode>("foo", DUMMY_POS, DUMMY_POS)};
+}
+
+TestNodeU EXPRESSION_1_U() {
+    return {EXP_ID_1.text + "+" + EXP_ID_2.text,
+            std::make_unique<BinopNode>(OpType::ADD, EXP_ID_1.node, EXP_ID_2.node, DUMMY_POS, DUMMY_POS)};
+}
+
+
+// const TestNode ASSIGNMENT{EXP_ID_1.text + " = " + EXPRESSION_1_U.text,
+//                           new AssignmentNode(EXP_ID_1_U.node, EXPRESSION_1_U.node, DUMMY_POS, DUMMY_POS)};
+
+TestNodeU ASSIGNMENT() {
+    auto expression_1_U = EXPRESSION_1_U();
+    auto exp_id_1_U = EXP_ID_1_U();
+    return {EXP_ID_1.text + " = " + expression_1_U.text,
+            std::make_unique<AssignmentNode>(exp_id_1_U.node, expression_1_U.node, DUMMY_POS, DUMMY_POS)};
+}
+
+const TestNode EMPTY_BLOCK{"{}", new BlockNode(VectorOfNodesU{}, DUMMY_POS, DUMMY_POS)};
 
 const TestNode IF{"if(" + EXPRESSION.text + ")" + EMPTY_BLOCK.text,
                   new IfNode(EXPRESSION.node, (BlockNode*) EMPTY_BLOCK.node, {}, nullptr, DUMMY_POS, DUMMY_POS)};
-const TestNode BLOCK{"{" + DECLARATION.text + ";" + IF.text + "}",
-                     new BlockNode({DECLARATION.node, IF.node}, DUMMY_POS, DUMMY_POS)};
-const TestNode BLOCK_1{"{" + ASSIGNMENT.text + ";}", new BlockNode({ASSIGNMENT.node}, DUMMY_POS, DUMMY_POS)};
 
-const TestNode FUNCTION{
-        "fun " + ID + "(" + ID_1 + ":" + TYPE_1.text + "," + ID_2 + ":" + TYPE_2.text + ")->" + TYPE_3.text +
-        BLOCK.text, new FunctionNode(ID,
-                                     {ID_1, ID_2},
-                                     {TYPE_1.node->clone(), TYPE_2.node->clone()},
-                                     TYPE_3.node->clone(),
-                                     (BlockNode*) BLOCK.node,
-                                     DUMMY_POS,
-                                     DUMMY_POS)};
+TestNodeU IF_U() {
+    return {"if(" + EXPRESSION.text + ")" + EMPTY_BLOCK.text, std::make_unique<IfNode>(EXPRESSION.node,
+                                                                                       (BlockNode*) EMPTY_BLOCK.node,
+                                                                                       std::vector<std::pair<Node*, BlockNode*>>{},
+                                                                                       nullptr,
+                                                                                       DUMMY_POS,
+                                                                                       DUMMY_POS)};
+}
+
+
+TestNodeU BLOCK_U() {
+    VectorOfNodesU v;
+    // { DECLARATION.node, IF.node }
+    v.push_back(std::move(DECLARATION_U().node));
+    v.push_back(std::move(IF_U().node));
+    return {"{" + DECLARATION.text + ";" + IF.text + "}",
+            std::make_unique<BlockNode>(std::move(v), DUMMY_POS, DUMMY_POS)};
+}
+
+TestNodeU BLOCK_1() {
+    auto assignment = ASSIGNMENT();
+    VectorOfNodesU v;
+    v.push_back(std::move(assignment.node));
+    return {"{" + assignment.text + ";}", std::make_unique<BlockNode>(std::move(v), DUMMY_POS, DUMMY_POS)};
+}
+
+// const TestNode block_1{"{" + assignment.text + ";}",
+//                        new BlockNode(VectorOfNodesU{assignment.node}, DUMMY_POS, DUMMY_POS)};
+
+TestNodeU FUNCTION() {
+    auto block = BLOCK_U();
+    return {"fun " + ID + "(" + ID_1 + ":" + TYPE_1.text + "," + ID_2 + ":" + TYPE_2.text + ")->" + TYPE_3.text +
+            block.text, std::make_unique<FunctionNode>(ID,
+                                                       VectorOfStrings{ID_1, ID_2},
+                                                       VectorOfTypes{TYPE_1.node->clone(), TYPE_2.node->clone()},
+                                                       TYPE_3.node->clone(),
+                                                       (BlockNode*) block.node.release(),
+                                                       DUMMY_POS,
+                                                       DUMMY_POS)};
+}
 
 const ObjectType NO_TYPE(".None");
 
 TEST_CASE("parse_assignment", "[parser]") {
     Scanner scanner;
-    std::string code = ASSIGNMENT.text;
+    auto assignment = ASSIGNMENT();
+    std::string code = assignment.text;
     scanner.load_text(code);
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser("test", scanner.code_lines, tokens);
@@ -81,7 +130,7 @@ TEST_CASE("parse_assignment", "[parser]") {
 
     std::unique_ptr<Node> ast = parser.parse_assignment_or_expression();
 
-    REQUIRE(ast->to_json() == ASSIGNMENT.node->to_json());
+    REQUIRE(ast->to_json() == assignment.node->to_json());
 }
 
 TEST_CASE("parse_decl_simple", "[parser]") {
@@ -126,7 +175,9 @@ TEST_CASE("parse_if", "[parser]") {
 
 TEST_CASE("parse_if_with_else", "[parser]") {
     Scanner scanner;
-    std::string code = "if " + EXPRESSION.text + BLOCK.text + "else " + BLOCK_1.text;
+    auto block_1 = BLOCK_1();
+    auto block = BLOCK_U();
+    std::string code = "if " + EXPRESSION.text + block.text + "else " + block_1.text;
     scanner.load_text(code);
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser("test", scanner.code_lines, tokens);
@@ -134,9 +185,9 @@ TEST_CASE("parse_if_with_else", "[parser]") {
 
     std::unique_ptr<IfNode> ast = parser.parse_if();
     REQUIRE(ast->to_json() == IfNode(EXPRESSION.node,
-                                     (BlockNode*) BLOCK.node,
+                                     (BlockNode*) block.node.release(),
                                      {},
-                                     (BlockNode*) BLOCK_1.node,
+                                     (BlockNode*) block_1.node.release(),
                                      DUMMY_POS,
                                      DUMMY_POS).to_json());
 }
@@ -180,6 +231,7 @@ TEST_CASE("parse_call_mult_arg", "[parser]") {
 
 TEST_CASE("parse_for", "[parser]") {
     Scanner scanner;
+    auto BLOCK = BLOCK_U();
     std::string code = "for " + ID + " @ " + EXPRESSION_1.text + BLOCK.text;
     scanner.load_text(code);
     std::vector<Token> tokens = scanner.scan_all();
@@ -187,12 +239,14 @@ TEST_CASE("parse_for", "[parser]") {
     parser.top_package_name = "main";
 
     std::unique_ptr<ForNode> ast = parser.parse_for_loop();
-    REQUIRE(ast->to_json() == ForNode(ID, EXPRESSION_1.node, (BlockNode*) BLOCK.node, DUMMY_POS, DUMMY_POS).to_json());
+    REQUIRE(ast->to_json() ==
+            ForNode(ID, EXPRESSION_1.node, (BlockNode*) BLOCK.node.release(), DUMMY_POS, DUMMY_POS).to_json());
 }
 
 
 TEST_CASE("parse_while", "[parser]") {
     Scanner scanner;
+    auto BLOCK = BLOCK_U();
     std::string code = "while " + EXPRESSION_1.text + BLOCK.text;
     scanner.load_text(code);
     std::vector<Token> tokens = scanner.scan_all();
@@ -201,11 +255,13 @@ TEST_CASE("parse_while", "[parser]") {
 
     std::unique_ptr<WhileNode> ast = parser.parse_while_loop();
 
-    REQUIRE(ast->to_json() == WhileNode(EXPRESSION_1.node, (BlockNode*) BLOCK.node, DUMMY_POS, DUMMY_POS).to_json());
+    REQUIRE(ast->to_json() ==
+            WhileNode(EXPRESSION_1.node, (BlockNode*) BLOCK.node.release(), DUMMY_POS, DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_fun_simple", "[parser]") {
     Scanner scanner;
+    auto BLOCK = BLOCK_U();
     std::string code = "fun " + ID + "()" + BLOCK.text;
     scanner.load_text(code);
     std::vector<Token> tokens = scanner.scan_all();
@@ -214,12 +270,18 @@ TEST_CASE("parse_fun_simple", "[parser]") {
 
     std::unique_ptr<FunctionNode> ast = parser.parse_function_definition();
 
-    REQUIRE(ast->to_json() ==
-            FunctionNode(ID, {}, {}, NO_TYPE.clone(), (BlockNode*) BLOCK.node, DUMMY_POS, DUMMY_POS).to_json());
+    REQUIRE(ast->to_json() == FunctionNode(ID,
+                                           VectorOfStrings{},
+                                           VectorOfTypes{},
+                                           NO_TYPE.clone(),
+                                           (BlockNode*) BLOCK.node.release(),
+                                           DUMMY_POS,
+                                           DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_fun_one_arg", "[parser]") {
     Scanner scanner;
+    auto BLOCK = BLOCK_U();
     std::string code = "fun " + ID + "(" + ID_1 + ":" + TYPE.text + ")" + BLOCK.text;
     scanner.load_text(code);
     std::vector<Token> tokens = scanner.scan_all();
@@ -228,17 +290,15 @@ TEST_CASE("parse_fun_one_arg", "[parser]") {
 
     std::unique_ptr<FunctionNode> ast = parser.parse_function_definition();
 
-    REQUIRE(ast->to_json() == FunctionNode(ID,
-                                           {ID_1},
-                                           {TYPE.node->clone()},
-                                           NO_TYPE.clone(),
-                                           (BlockNode*) BLOCK.node,
-                                           DUMMY_POS,
-                                           DUMMY_POS).to_json());
+    REQUIRE(ast->to_json() ==
+            FunctionNode(ID, {ID_1}, {TYPE.node->clone()}, NO_TYPE.clone(), (BlockNode*) BLOCK.node.release(),
+
+                         DUMMY_POS, DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_fun_mult_arg", "[parser]") {
     Scanner scanner;
+    auto BLOCK = BLOCK_U();
     std::string code = "fun " + ID + "(" + ID_1 + ":" + TYPE_1.text + "," + ID_2 + ":" + TYPE_2.text + ")" + BLOCK.text;
     scanner.load_text(code);
     std::vector<Token> tokens = scanner.scan_all();
@@ -251,7 +311,7 @@ TEST_CASE("parse_fun_mult_arg", "[parser]") {
                                            {ID_1, ID_2},
                                            {TYPE_1.node->clone(), TYPE_2.node->clone()},
                                            NO_TYPE.clone(),
-                                           (BlockNode*) BLOCK.node,
+                                           (BlockNode*) BLOCK.node.release(),
                                            DUMMY_POS,
                                            DUMMY_POS).to_json());
 }
@@ -306,8 +366,9 @@ TEST_CASE("parse_class_mult_member", "[parser]") {
 
 TEST_CASE("parse_class_with_method", "[parser]") {
     Scanner scanner;
+    auto function = FUNCTION();
     std::string code =
-            "class " + ID + "{" + ID_2 + ":" + TYPE_2.text + ";" + ID_1 + ":" + TYPE_1.text + ";" + FUNCTION.text + "}";
+            "class " + ID + "{" + ID_2 + ":" + TYPE_2.text + ";" + ID_1 + ":" + TYPE_1.text + ";" + function.text + "}";
     scanner.load_text(code);
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser("test", scanner.code_lines, tokens);
@@ -315,12 +376,12 @@ TEST_CASE("parse_class_with_method", "[parser]") {
 
     std::unique_ptr<ClassNode> ast = parser.parse_class_definition();
 
+    FunctionNode* fp = (FunctionNode*) function.node.release();
     REQUIRE(ast->to_json() == ClassNode(ID,
                                         {},
                                         {{ID_2, TYPE_2.node->clone()},
                                          {ID_1, TYPE_1.node->clone()}},
-                                        {{((FunctionNode*) FUNCTION.node)->identifier, Method{nullptr,
-                                                                                              (FunctionNode*) FUNCTION.node}}},
+                                        {{fp->identifier, Method{nullptr, fp}}},
                                         {},
                                         {},
                                         DUMMY_POS,
@@ -329,22 +390,18 @@ TEST_CASE("parse_class_with_method", "[parser]") {
 
 TEST_CASE("parse_class_with_static_method", "[parser]") {
     Scanner scanner;
-    std::string code = "class " + ID + "{ static " + FUNCTION.text + "}";
+    auto function = FUNCTION();
+
+    std::string code = "class " + ID + "{ static " + function.text + "}";
     scanner.load_text(code);
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser("test", scanner.code_lines, tokens);
     parser.top_package_name = "main";
 
     std::unique_ptr<ClassNode> ast = parser.parse_class_definition();
+    FunctionNode* fp = (FunctionNode*) function.node.release();
 
-    REQUIRE(ast->to_json() == ClassNode(ID,
-                                        {},
-                                        {},
-                                        {},
-                                        {},
-                                        {{((FunctionNode*) FUNCTION.node)->identifier, (FunctionNode*) FUNCTION.node}},
-                                        DUMMY_POS,
-                                        DUMMY_POS).to_json());
+    REQUIRE(ast->to_json() == ClassNode(ID, {}, {}, {}, {}, {{(fp)->identifier, fp}}, DUMMY_POS, DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_return_nothing", "[parser]") {

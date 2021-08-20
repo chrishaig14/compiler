@@ -4,6 +4,8 @@
 
 #include "BlockNode.h"
 
+#include <utility>
+
 BlockNode::~BlockNode() {
     // for (auto p: this->nodes) {
     //     delete p;
@@ -26,14 +28,14 @@ bool BlockNode::equal(const Node& p) const {
     return true;
 }
 
-BlockNode::BlockNode(VectorOfNodes nodes, TextPosition start, TextPosition end) : Node(NodeType::BLOCK, start, end),
-                                                                                  nodes(nodes) {
+BlockNode::BlockNode(VectorOfNodesU nodes, TextPosition start, TextPosition end) : Node(NodeType::BLOCK, start, end),
+                                                                                   nodes(std::move(nodes)) {
     ;
 }
 
 nlohmann::json BlockNode::to_json() const {
     std::vector<nlohmann::json> v;
-    for (auto s: this->nodes) {
+    for (auto& s: this->nodes) {
         v.push_back(s->to_json());
     }
     return v;

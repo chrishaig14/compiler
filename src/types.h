@@ -7,6 +7,7 @@
 
 #include <vector>
 #include <unordered_map>
+#include <memory>
 
 class TypeNode;
 
@@ -16,6 +17,7 @@ class Instruction;
 
 typedef std::vector<TypeNode*> VectorOfTypes;
 typedef std::vector<Node*> VectorOfNodes;
+typedef std::vector<std::unique_ptr<Node>> VectorOfNodesU;
 typedef std::vector<std::string> VectorOfStrings;
 typedef std::vector<Instruction*> Code;
 typedef std::pair<std::string, TypeNode*> FieldInfo;

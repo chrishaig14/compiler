@@ -147,18 +147,18 @@ USemanticInfo Checker::visit_block(BlockNode& node) {
     SemanticInfo info;
     auto* sn = new BlockSNode();
     info.snode = sn;
-    VectorOfNodes vn;
+    VectorOfNodesU vn;
     for (auto& n: node.nodes) {
         USemanticInfo sinfo_p = this->dispatch(*n);
 
         // sn->nodes.push_back(sinfo_p->snode);
 
         if (n->ntype == NodeType::BLOCK) {
-            for (auto* bnode: ((BlockNode*) n)->nodes) {
-                vn.push_back(bnode);
+            for (auto& bnode: ((std::unique_ptr<BlockNode>&) n)->nodes) {
+                vn.push_back(std::move(bnode));
             }
         } else {
-            vn.push_back(n);
+            vn.push_back(std::move(n));
             if (sinfo_p->snode != nullptr) {
                 if (sinfo_p->snode->type == SNodeType::BLOCK) {
                     if (((BlockSNode*) sinfo_p->snode)->unwrap) {
@@ -174,17 +174,17 @@ USemanticInfo Checker::visit_block(BlockNode& node) {
                 }
             }
         }
-        SemanticInfo& sinfo = *sinfo_p;
-        if (n->ntype == NodeType::CALL) {
-            // it's a function call
-            // if return value != NoneType, then force the return value
-
-            if (!sinfo.is_error() && sinfo_p->entity.type != E_TYPE::NOTHING) {
-                this->error_reporter.error(ErrorUnusedReturnValue(n->start));
-            }
-        }
+        // SemanticInfo& sinfo = *sinfo_p;
+        // if (n->ntype == NodeType::CALL) {
+        //     // it's a function call
+        //     // if return value != NoneType, then force the return value
+        //
+        //     if (!sinfo.is_error() && sinfo_p->entity.type != E_TYPE::NOTHING) {
+        //         this->error_reporter.error(ErrorUnusedReturnValue(n->start));
+        //     }
+        // }
     }
-    node.nodes = vn;
+    node.nodes = std::move(vn);
     return std::make_unique<SemanticInfo>(info);
 }
 
@@ -257,10 +257,10 @@ USemanticInfo Checker::visit_function(FunctionNode& n) {
     info.snode = sn;
     if (returnType != T_NONE) {
         if (!n.body->nodes.empty()) {
-            Node* last_node = n.body->nodes.back();
-            if (last_node->ntype != NodeType::RETRN) {
+            Node& last_node = *n.body->nodes.back();
+            if (last_node.ntype != NodeType::RETRN) {
                 // it's not a return statement, error
-                this->error_reporter.error(ErrorFunctionReturnLastStmt(function_name, returnType, last_node->start));
+                this->error_reporter.error(ErrorFunctionReturnLastStmt(function_name, returnType, last_node.start));
                 return error_stub();
             }
         } else {

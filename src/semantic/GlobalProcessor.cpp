@@ -34,7 +34,7 @@ void GlobalProcessor::visit_import(ImportNode& node) {
 void GlobalProcessor::add_default_imports() {
     std::vector<Path> default_paths = {Path("core.core.String"), Path("core.core.Integer"), Path("core.core.List"),
                                        Path("core.core.Double"), Path("core.core.Boolean"), Path("core.core.Float"),
-                                       Path("core.core.Option"), Path("core.core.print"),Path("core.core.Dict")};
+                                       Path("core.core.Option"), Path("core.core.print"), Path("core.core.Dict")};
     for (auto path: default_paths) {
         if (this->module->imported_paths_with_alias.count(path.as_vec().back()) != 0) {
             std::cout << this->module->abs_path << std::endl;
@@ -81,49 +81,51 @@ void GlobalProcessor::visit_root(BlockNode& node) {
 
     this->add_default_imports();
 
-    for (auto* n: node.nodes) {
+    for (auto& n: node.nodes) {
         if (n->ntype == NodeType::IMPORT) {
-            this->dispatch(n);
+            this->dispatch(*n);
         }
 
     }
-    for (auto* n: node.nodes) {
-        if (n->ntype == NodeType::CLS) {
+    for (auto& np: node.nodes) {
+        auto& n = *np;
+        if (n.ntype == NodeType::CLS) {
             // this->dispatch(n);
             auto* class_info = new Class();
-            this->module->flirpins[((ClassNode*) n)->class_name] = Flirpin{.type=F_TYPE::CLASS, .clazz=class_info};
-            class_info->path = Path(this->module->path, ((ClassNode*) n)->class_name);
-        } else if (n->ntype == NodeType::ENUM) {
+            this->module->flirpins[((ClassNode&) n).class_name] = Flirpin{.type=F_TYPE::CLASS, .clazz=class_info};
+            class_info->path = Path(this->module->path, ((ClassNode&) n).class_name);
+        } else if (n.ntype == NodeType::ENUM) {
             Enum* enumm = new Enum();
-            enumm->enumm_name = ((EnumNode*) n)->id;
-            enumm->values = ((EnumNode*) n)->values;
+            enumm->enumm_name = ((EnumNode&) n).id;
+            enumm->values = ((EnumNode&) n).values;
             enumm->path = Path(this->module->path, enumm->enumm_name);
             enumm->functions["__eq__"] = new ConstFunction(Path(enumm->path, "__eq__"), nullptr);;
             enumm->functions["__ne__"] = new ConstFunction(Path(enumm->path, "__ne__"), nullptr);
             this->module->flirpins[enumm->enumm_name] = Flirpin{.type=F_TYPE::ENUM, .enumm=enumm};
         }
     }
-    for (auto* n: node.nodes) {
-        if (n->ntype == NodeType::FUNC) {
+    for (auto& np: node.nodes) {
+        auto& n = *np;
+        if (n.ntype == NodeType::FUNC) {
             // this->dispatch(n);
             auto* const_function = new ConstFunction(Path(), nullptr);
-            this->module->flirpins[((FunctionNode*) n)->identifier] = Flirpin{.type=F_TYPE::CONST_FUNCTION, .const_function=const_function};
+            this->module->flirpins[((FunctionNode&) n).identifier] = Flirpin{.type=F_TYPE::CONST_FUNCTION, .const_function=const_function};
         }
     }
-    for (auto* n: node.nodes) {
+    for (auto& n: node.nodes) {
         if (n->ntype == NodeType::ALIAS) {
-            this->dispatch(n);
+            this->dispatch(*n);
         }
     }
 
-    for (auto* n: node.nodes) {
+    for (auto& n: node.nodes) {
         if (n->ntype == NodeType::CLS) {
-            this->dispatch(n);
+            this->dispatch(*n);
         }
     }
-    for (auto* n: node.nodes) {
+    for (auto& n: node.nodes) {
         if (n->ntype == NodeType::FUNC) {
-            this->dispatch(n);
+            this->dispatch(*n);
         }
     }
 
@@ -131,22 +133,23 @@ void GlobalProcessor::visit_root(BlockNode& node) {
 
 void GlobalProcessor::check_duplicated_names(BlockNode& node) const {
     std::map<std::string, void*> names;
-    for (auto* n: node.nodes) {
+    for (auto& np: node.nodes) {
+        auto& n = *np;
         std::string name;
-        if (n->ntype == NodeType::CLS) {
-            name = ((ClassNode*) n)->class_name;
-        } else if (n->ntype == NodeType::FUNC) {
-            name = ((FunctionNode*) n)->identifier;
-        } else if (n->ntype == NodeType::IMPORT) {
-            if (((ImportNode*) n)->has_alias) {
-                name = ((ImportNode*) n)->alias;
+        if (n.ntype == NodeType::CLS) {
+            name = ((ClassNode&) n).class_name;
+        } else if (n.ntype == NodeType::FUNC) {
+            name = ((FunctionNode&) n).identifier;
+        } else if (n.ntype == NodeType::IMPORT) {
+            if (((ImportNode&) n).has_alias) {
+                name = ((ImportNode&) n).alias;
             } else {
-                name = ((ImportNode*) n)->path.back();
+                name = ((ImportNode&) n).path.back();
             }
-        } else if (n->ntype == NodeType::ALIAS) {
-            name = ((AliasNode*) (n))->alias_id;
-        } else if (n->ntype == NodeType::ENUM) {
-            name = ((EnumNode*) (n))->id;
+        } else if (n.ntype == NodeType::ALIAS) {
+            name = ((AliasNode&) (n)).alias_id;
+        } else if (n.ntype == NodeType::ENUM) {
+            name = ((EnumNode&) (n)).id;
         }
         if (names.count(name) == 0) {
             names[name] = nullptr;
@@ -158,8 +161,8 @@ void GlobalProcessor::check_duplicated_names(BlockNode& node) const {
 
 
 void GlobalProcessor::visit_block(BlockNode& node) {
-    for (auto* n: node.nodes) {
-        this->dispatch(n);
+    for (auto& n: node.nodes) {
+        this->dispatch(*n);
     }
 }
 
@@ -229,19 +232,19 @@ void GlobalProcessor::visit_class(ClassNode& node) {
     class_info->path = Path(this->module->path, class_info->class_name);
 }
 
-void GlobalProcessor::dispatch(Node* nod) {
-    switch (nod->ntype) {
+void GlobalProcessor::dispatch(Node& nod) {
+    switch (nod.ntype) {
         case NodeType::CLS:
-            this->visit_class(*(ClassNode*) nod);
+            this->visit_class((ClassNode&) nod);
             break;
         case NodeType::FUNC:
-            this->visit_function(*(FunctionNode*) nod);
+            this->visit_function((FunctionNode&) nod);
             break;
         case NodeType::IMPORT:
-            this->visit_import(*(ImportNode*) nod);
+            this->visit_import((ImportNode&) nod);
             break;
         case NodeType::ALIAS:
-            this->visit_alias(*(AliasNode*) nod);
+            this->visit_alias((AliasNode&) nod);
             break;
         default:
             return;

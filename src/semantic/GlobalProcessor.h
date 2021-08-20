@@ -22,7 +22,7 @@ public:
 
     void visit_root(BlockNode& node);
 
-    void dispatch(Node* nod);
+    void dispatch(Node& nod);
     void visit_function(FunctionNode& node);
     void visit_block(BlockNode& node);
     void visit_enum(EnumNode& node);

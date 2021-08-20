@@ -129,18 +129,26 @@ TEST_CASE("nodes_if_no_else", "[if]") {
 
 TEST_CASE("nodes_if_with_else", "[if]") {
     IdNode* c = new IdNode("foo", DUMMY_POS, DUMMY_POS);
-    BlockNode* t = new BlockNode({new DeclarationNode("foo",
-                                                      nullptr,
-                                                      new NumberNode(NumberType::INTEGER, "7", DUMMY_POS, DUMMY_POS),
-                                                      DUMMY_POS,
-                                                      DUMMY_POS,
-                                                      DUMMY_POS)}, DUMMY_POS, DUMMY_POS);
-    BlockNode* l = new BlockNode({new DeclarationNode("bar",
-                                                      nullptr,
-                                                      new NumberNode(NumberType::INTEGER, "9", DUMMY_POS, DUMMY_POS),
-                                                      DUMMY_POS,
-                                                      DUMMY_POS,
-                                                      DUMMY_POS)}, DUMMY_POS, DUMMY_POS);
+    std::unique_ptr<DeclarationNode> d = std::make_unique<DeclarationNode>("foo",
+                                                                           nullptr,
+                                                                           new NumberNode(NumberType::INTEGER,
+                                                                                          "7",
+                                                                                          DUMMY_POS,
+                                                                                          DUMMY_POS),
+                                                                           DUMMY_POS,
+                                                                           DUMMY_POS,
+                                                                           DUMMY_POS);
+    VectorOfNodesU vector;
+    vector.push_back(std::move(d));
+    BlockNode* t = new BlockNode(std::move(vector), DUMMY_POS, DUMMY_POS);
+    VectorOfNodesU v;
+    v.push_back(std::make_unique<DeclarationNode>("bar",
+                                                  nullptr,
+                                                  new NumberNode(NumberType::INTEGER, "9", DUMMY_POS, DUMMY_POS),
+                                                  DUMMY_POS,
+                                                  DUMMY_POS,
+                                                  DUMMY_POS));
+    BlockNode* l = new BlockNode(std::move(v), DUMMY_POS, DUMMY_POS);
     IfNode n(c, t, {}, l, DUMMY_POS, DUMMY_POS);
     nlohmann::json nj = n.to_json();
     nlohmann::json e = {{"type", "if"}};
@@ -153,36 +161,38 @@ TEST_CASE("nodes_if_with_else", "[if]") {
 
 TEST_CASE("nodes_if_with_elif", "[if]") {
     IdNode* c = new IdNode("foo", DUMMY_POS, DUMMY_POS);
-    BlockNode* t = new BlockNode({new DeclarationNode("foo",
-                                                      nullptr,
-                                                      new NumberNode(NumberType::INTEGER, "7", DUMMY_POS, DUMMY_POS),
-                                                      DUMMY_POS,
-                                                      DUMMY_POS,
-                                                      DUMMY_POS)}, DUMMY_POS, DUMMY_POS);
-    BlockNode* l = new BlockNode({new DeclarationNode("bar",
-                                                      nullptr,
-                                                      new NumberNode(NumberType::INTEGER, "9", DUMMY_POS, DUMMY_POS),
-                                                      DUMMY_POS,
-                                                      DUMMY_POS,
-                                                      DUMMY_POS)}, DUMMY_POS, DUMMY_POS);
-    BlockNode* elif_body_0 = new BlockNode({new DeclarationNode("bar",
-                                                                nullptr,
-                                                                new NumberNode(NumberType::INTEGER,
-                                                                               "9",
-                                                                               DUMMY_POS,
-                                                                               DUMMY_POS),
-                                                                DUMMY_POS,
-                                                                DUMMY_POS,
-                                                                DUMMY_POS)}, DUMMY_POS, DUMMY_POS);
-    BlockNode* elif_body_1 = new BlockNode({new DeclarationNode("foo",
-                                                                nullptr,
-                                                                new NumberNode(NumberType::INTEGER,
-                                                                               "7",
-                                                                               DUMMY_POS,
-                                                                               DUMMY_POS),
-                                                                DUMMY_POS,
-                                                                DUMMY_POS,
-                                                                DUMMY_POS)}, DUMMY_POS, DUMMY_POS);
+    VectorOfNodesU v;
+    v.push_back(std::make_unique<DeclarationNode>("foo",
+                                                  nullptr,
+                                                  new NumberNode(NumberType::INTEGER, "7", DUMMY_POS, DUMMY_POS),
+                                                  DUMMY_POS,
+                                                  DUMMY_POS,
+                                                  DUMMY_POS));
+    BlockNode* t = new BlockNode(std::move(v), DUMMY_POS, DUMMY_POS);
+    VectorOfNodesU v2;
+    v2.push_back(std::make_unique<DeclarationNode>("bar",
+                                                   nullptr,
+                                                   new NumberNode(NumberType::INTEGER, "9", DUMMY_POS, DUMMY_POS),
+                                                   DUMMY_POS,
+                                                   DUMMY_POS,
+                                                   DUMMY_POS));
+    BlockNode* l = new BlockNode(std::move(v2), DUMMY_POS, DUMMY_POS);
+    VectorOfNodesU v3;
+    v3.push_back(std::make_unique<DeclarationNode>("bar",
+                                                   nullptr,
+                                                   new NumberNode(NumberType::INTEGER, "9", DUMMY_POS, DUMMY_POS),
+                                                   DUMMY_POS,
+                                                   DUMMY_POS,
+                                                   DUMMY_POS));
+    BlockNode* elif_body_0 = new BlockNode(std::move(v3), DUMMY_POS, DUMMY_POS);
+    VectorOfNodesU v4;
+    v4.push_back(std::make_unique<DeclarationNode>("foo",
+                                                   nullptr,
+                                                   new NumberNode(NumberType::INTEGER, "7", DUMMY_POS, DUMMY_POS),
+                                                   DUMMY_POS,
+                                                   DUMMY_POS,
+                                                   DUMMY_POS));
+    BlockNode* elif_body_1 = new BlockNode(std::move(v4), DUMMY_POS, DUMMY_POS);
 
     IdNode* elif_cond_0 = new IdNode("a", DUMMY_POS, DUMMY_POS);
     IdNode* elif_cond_1 = new IdNode("b", DUMMY_POS, DUMMY_POS);

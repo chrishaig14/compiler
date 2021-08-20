@@ -17,9 +17,9 @@
 class BlockNode : public Node {
 public:
 
-    BlockNode(VectorOfNodes nodes, TextPosition start, TextPosition end);
+    BlockNode(VectorOfNodesU nodes, TextPosition start, TextPosition end);
 
-    VectorOfNodes nodes;
+    VectorOfNodesU nodes;
 
     bool equal(const Node& p) const override;
 
