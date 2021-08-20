@@ -5,12 +5,11 @@
 #include <cassert>
 #include "ForNode.h"
 
-ForNode::ForNode(const std::string& var, Node* exp, BlockNode* body, TextPosition start, TextPosition end) : Node(
-        NodeType::FORLOOP,
-        start,
-        end), var(var), exp(exp), body(body) {
-    assert(exp != nullptr);
-    assert(body != nullptr);
+ForNode::ForNode(const std::string& var, std::unique_ptr<Node>& exp, std::unique_ptr<BlockNode>& body,
+                 TextPosition start, TextPosition end) : Node(NodeType::FORLOOP, start, end), var(var),
+                                                         exp(std::move(exp)), body(std::move(body)) {
+    // assert(exp != nullptr);
+    // assert(body != nullptr);
 }
 
 bool ForNode::equal(const Node& x) const {

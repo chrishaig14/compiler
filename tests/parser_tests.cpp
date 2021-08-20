@@ -232,6 +232,7 @@ TEST_CASE("parse_call_mult_arg", "[parser]") {
 TEST_CASE("parse_for", "[parser]") {
     Scanner scanner;
     auto BLOCK = BLOCK_U();
+    auto expression_1_u = EXPRESSION_1_U();
     std::string code = "for " + ID + " @ " + EXPRESSION_1.text + BLOCK.text;
     scanner.load_text(code);
     std::vector<Token> tokens = scanner.scan_all();
@@ -240,7 +241,7 @@ TEST_CASE("parse_for", "[parser]") {
 
     std::unique_ptr<ForNode> ast = parser.parse_for_loop();
     REQUIRE(ast->to_json() ==
-            ForNode(ID, EXPRESSION_1.node, (BlockNode*) BLOCK.node.release(), DUMMY_POS, DUMMY_POS).to_json());
+            ForNode(ID, expression_1_u.node, (std::unique_ptr<BlockNode>&) BLOCK.node, DUMMY_POS, DUMMY_POS).to_json());
 }
 
 

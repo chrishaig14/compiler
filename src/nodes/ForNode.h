@@ -13,10 +13,10 @@
 class ForNode : public Node {
 public:
     std::string var;
-    Node* exp;
-    BlockNode* body;
+    std::unique_ptr<Node> exp;
+    std::unique_ptr<BlockNode> body;
     bool equal(const Node& other) const override;
-    ForNode(const std::string& var, Node* exp, BlockNode* body, TextPosition start, TextPosition end);
+    ForNode(const std::string& var, std::unique_ptr<Node>& exp, std::unique_ptr<BlockNode>& body, TextPosition start, TextPosition end);
     ~ForNode() override;
 
     nlohmann::json to_json() const override;

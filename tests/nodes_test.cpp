@@ -214,12 +214,13 @@ TEST_CASE("nodes_if_with_elif", "[if]") {
 }
 
 TEST_CASE("nodes_for", "[for]") {
-    BlockNode* b = new BlockNode({}, DUMMY_POS, DUMMY_POS);
-    IdNode* exp = new IdNode("bar", DUMMY_POS, DUMMY_POS);
-    ForNode n("foo", exp, b, DUMMY_POS, DUMMY_POS);
-    nlohmann::json nj = n.to_json();
+    VectorOfNodesU v;
+    std::unique_ptr<BlockNode> b = std::make_unique<BlockNode>(std::move(v), DUMMY_POS, DUMMY_POS);
+    std::unique_ptr<Node> exp = std::make_unique<IdNode>("bar", DUMMY_POS, DUMMY_POS);
     nlohmann::json e = {{"type", "for"},
                         {"for",  {{"var", "foo"}, {"exp", exp->to_json()}, {"body", b->to_json()}}}};
+    ForNode n("foo", exp, b, DUMMY_POS, DUMMY_POS);
+    nlohmann::json nj = n.to_json();
     REQUIRE(e == nj);
 }
 
