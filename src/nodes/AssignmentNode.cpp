@@ -5,7 +5,7 @@
 #include "AssignmentNode.h"
 #include "../json/json.hpp"
 
-AssignmentNode::AssignmentNode(std::unique_ptr<Node>& lvalue, std::unique_ptr<Node>& rvalue, TextPosition start,
+AssignmentNode::AssignmentNode(UNode& lvalue, UNode& rvalue, TextPosition start,
                                TextPosition end) : Node(NodeType::ASSIGN, start, end), lvalue(std::move(lvalue)),
                                                    rvalue(std::move(rvalue)) {
 }

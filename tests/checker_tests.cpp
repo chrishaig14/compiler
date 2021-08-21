@@ -479,8 +479,8 @@ TEST_CASE("binop_error", "[checker]") {
     REQUIRE(checker.error_reporter.errors.size() == 1);
 
     Error& error = *checker.error_reporter.errors.back();
-    std::unique_ptr<Node> left = std::make_unique<StringNode>("Hello", _POS, _POS);
-    std::unique_ptr<Node> right = std::make_unique<StringNode>("Bye", _POS, _POS);
+    UNode left = std::make_unique<StringNode>("Hello", _POS, _POS);
+    UNode right = std::make_unique<StringNode>("Bye", _POS, _POS);
     BinopNode node(OpType::SUB, left, right, _POS, _POS);
     ObjectType expected("Integer");
     ErrorClassNoMethodForOp exp("String", "__sub__", node);
@@ -739,7 +739,7 @@ TEST_CASE("enum_error", "[checker]") {
     std::cout << p_error << std::endl;
     Error& error = *p_error;
     std::cout << error << std::endl;
-    std::unique_ptr<Node> u = std::make_unique<IdNode>("Foo", _POS, _POS);
+    UNode u = std::make_unique<IdNode>("Foo", _POS, _POS);
     MemberNode node(u, Token(TokType::ID, "b", _POS));
     ObjectType expected("Boolean");
     ErrorEnumNoValue exp("Foo", "b", node, nullptr);

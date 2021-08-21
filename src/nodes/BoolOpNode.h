@@ -11,11 +11,11 @@
 
 class BoolOpNode : public Node {
 public:
-    std::unique_ptr<Node> left;
-    std::unique_ptr<Node> right;
+    UNode left;
+    UNode right;
     BoolOp op;
 
-    BoolOpNode(BoolOp op, std::unique_ptr<Node>& left, std::unique_ptr<Node>& right, TextPosition start,
+    BoolOpNode(BoolOp op, UNode& left, UNode& right, TextPosition start,
                TextPosition end);
     bool equal(const Node& x) const override;
 

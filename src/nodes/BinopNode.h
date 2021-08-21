@@ -15,14 +15,14 @@
 
 class BinopNode : public Node {
 public:
-    std::unique_ptr<Node> left;
-    std::unique_ptr<Node> right;
+    UNode left;
+    UNode right;
     OpType op;
     TextPosition op_pos;
 
-    BinopNode(OpType op, std::unique_ptr<Node>& left, std::unique_ptr<Node>& right, TextPosition start, TextPosition end);
+    BinopNode(OpType op, UNode& left, UNode& right, TextPosition start, TextPosition end);
 
-    BinopNode(OpType op, std::unique_ptr<Node>& left, std::unique_ptr<Node>& right, TextPosition start);
+    BinopNode(OpType op, UNode& left, UNode& right, TextPosition start);
     bool equal(const Node& x) const override;
 
     ~BinopNode();

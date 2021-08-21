@@ -4,7 +4,7 @@
 
 #include "BinopNode.h"
 
-BinopNode::BinopNode(OpType op, std::unique_ptr<Node>& left, std::unique_ptr<Node>& right, TextPosition start,
+BinopNode::BinopNode(OpType op, UNode& left, UNode& right, TextPosition start,
                      TextPosition end) : Node(NodeType::BINOP, start, end), left(std::move(left)),
                                          right(std::move(right)), op(op) {
 }

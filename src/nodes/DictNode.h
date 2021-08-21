@@ -12,12 +12,12 @@
 class DictNode : public Node {
     bool equal(const Node& other) const override;
 public:
-    DictNode(std::vector<std::pair<std::unique_ptr<Node>, std::unique_ptr<Node>>>& items, TextPosition start,
+    DictNode(std::vector<std::pair<UNode, UNode>>& items, TextPosition start,
              TextPosition end);
 
     nlohmann::json to_json() const override;
 
-    std::vector<std::pair<std::unique_ptr<Node>, std::unique_ptr<Node>>> items;
+    std::vector<std::pair<UNode, UNode>> items;
 };
 
 

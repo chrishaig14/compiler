@@ -14,10 +14,10 @@ class TypeNode;
 class Node;
 
 class Instruction;
-
+typedef std::unique_ptr<Node> UNode;
 typedef std::vector<TypeNode*> VectorOfTypes;
 typedef std::vector<Node*> VectorOfNodes;
-typedef std::vector<std::unique_ptr<Node>> VectorOfNodesU;
+typedef std::vector<UNode> VectorOfNodesU;
 typedef std::vector<std::string> VectorOfStrings;
 typedef std::vector<Instruction*> Code;
 typedef std::pair<std::string, TypeNode*> FieldInfo;

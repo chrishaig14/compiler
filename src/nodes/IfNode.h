@@ -14,11 +14,11 @@
 
 class IfNode : public Node {
 public:
-    std::unique_ptr<Node> condition;
+    UNode condition;
     std::unique_ptr<BlockNode> then;
     std::unique_ptr<BlockNode> selse;
     std::vector<std::pair<Node*, BlockNode*>> elifs;
-    IfNode(std::unique_ptr<Node>& condition, std::unique_ptr<BlockNode>& then,
+    IfNode(UNode& condition, std::unique_ptr<BlockNode>& then,
            std::vector<std::pair<Node*, BlockNode*>> elifs, std::unique_ptr<BlockNode>& selse, TextPosition start,
            TextPosition end);
 

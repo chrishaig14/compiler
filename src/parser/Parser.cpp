@@ -64,7 +64,7 @@ std::unique_ptr<BlockNode> Parser::parse_program() {
 
 std::unique_ptr<ReturnNode> Parser::parse_return() {
     Token ret_tok = this->expect_token(TokType::RETURN);
-    std::unique_ptr<Node> expression = nullptr;
+    UNode expression = nullptr;
     TextPosition end = ret_tok.end_pos;
     if (!this->match(TokType::SEMICOLON)) {
         expression = this->parse_expression();
@@ -94,7 +94,7 @@ std::unique_ptr<IfNode> Parser::parse_if() {
     return iff;
 }
 
-std::unique_ptr<Node> Parser::parse_list_literal() {
+UNode Parser::parse_list_literal() {
     Token list_start = this->expect_token(TokType::LSQUARE);
     VectorOfNodesU elements;
     if (this->match(TokType::RSQUARE)) {
@@ -148,7 +148,7 @@ VectorOfNodes Parser::parse_list_of_arguments() {
     return result;
 }
 
-std::unique_ptr<Node> Parser::parse_assignment_or_expression() {
+UNode Parser::parse_assignment_or_expression() {
     auto lvalue = this->parse_expression();
     if (item_in_vec(this->token.type, {TokType::EQQ, TokType::PLUS_EQQ, TokType::MINUS_EQQ})) {
         if (lvalue->ntype == NodeType::CALL) {
@@ -163,7 +163,7 @@ std::unique_ptr<Node> Parser::parse_assignment_or_expression() {
         }
         auto rvalue = this->parse_expression();
         if (lvalue->ntype == NodeType::ID) {
-            std::unique_ptr<Node> id_node = std::make_unique<IdNode>(((IdNode&) *lvalue)._id,
+            UNode id_node = std::make_unique<IdNode>(((IdNode&) *lvalue)._id,
                                                                      lvalue->start,
                                                                      lvalue->end);
             if (op == TokType::PLUS_EQQ || op == TokType::MINUS_EQQ) {
@@ -190,11 +190,11 @@ std::unique_ptr<Node> Parser::parse_assignment_or_expression() {
     return lvalue;
 }
 
-std::unique_ptr<Node> Parser::parse_expression() {
+UNode Parser::parse_expression() {
     return this->parse_ternary();
 }
 
-std::unique_ptr<Node> Parser::parse_or_expression() {
+UNode Parser::parse_or_expression() {
     auto left = this->parse_and_expression();
     while (this->match(TokType::OR)) {
         this->next();
@@ -205,7 +205,7 @@ std::unique_ptr<Node> Parser::parse_or_expression() {
     return left;
 }
 
-std::unique_ptr<Node> Parser::parse_and_expression() {
+UNode Parser::parse_and_expression() {
     auto left = this->parse_not_expression();
     while (this->match(TokType::AND)) {
         this->next();
@@ -216,7 +216,7 @@ std::unique_ptr<Node> Parser::parse_and_expression() {
     return left;
 }
 
-std::unique_ptr<Node> Parser::parse_not_expression() {
+UNode Parser::parse_not_expression() {
     if (this->match(TokType::NOT)) {
         Token not_tok = this->expect_token(TokType::NOT);
         auto left = this->parse_bool_expression();
@@ -226,7 +226,7 @@ std::unique_ptr<Node> Parser::parse_not_expression() {
     return this->parse_bool_expression();
 }
 
-std::unique_ptr<Node> Parser::parse_bool_expression() {
+UNode Parser::parse_bool_expression() {
     auto left = this->parse_add_or_sub_expression();
     BoolOp op;
     std::vector<TokType> boolean_tokens = {TokType::EQ, TokType::LT, TokType::GT, TokType::LEQ, TokType::GEQ,
@@ -241,7 +241,7 @@ std::unique_ptr<Node> Parser::parse_bool_expression() {
     return node;
 }
 
-std::unique_ptr<Node> Parser::parse_add_or_sub_expression() {
+UNode Parser::parse_add_or_sub_expression() {
     auto left = this->parse_mul_div_or_mod_expression();
     OpType op;
     while (item_in_vec(this->token.type, {TokType::PLUS, TokType::MINUS})) {
@@ -256,7 +256,7 @@ std::unique_ptr<Node> Parser::parse_add_or_sub_expression() {
     return left;
 }
 
-std::unique_ptr<Node> Parser::parse_mul_div_or_mod_expression() {
+UNode Parser::parse_mul_div_or_mod_expression() {
     auto left = this->parse_factor();
     OpType op;
     while (item_in_vec(this->token.type, {TokType::TIMES, TokType::DIV, TokType::MOD})) {
@@ -271,8 +271,8 @@ std::unique_ptr<Node> Parser::parse_mul_div_or_mod_expression() {
     return left;
 }
 
-std::unique_ptr<Node> Parser::parse_factor() {
-    std::unique_ptr<Node> parent;
+UNode Parser::parse_factor() {
+    UNode parent;
     if (this->match(TokType::HASH)) {
         parent = this->parse_tuple_or_constructor();
     } else {
@@ -310,7 +310,7 @@ std::unique_ptr<Node> Parser::parse_factor() {
     return parent;
 }
 
-std::unique_ptr<Node> Parser::parse_dictionary() {
+UNode Parser::parse_dictionary() {
     Token lcurly = this->expect_token(TokType::LCURLY);
     if (this->match(TokType::RCURLY)) {
         // empty dict
@@ -323,7 +323,7 @@ std::unique_ptr<Node> Parser::parse_dictionary() {
         Token rsquare = this->expect_token(TokType::RSQUARE);
         return std::make_unique<EmptyDictNode>(key_type, value_type, lcurly.start, rsquare.end_pos);
     }
-    std::vector<std::pair<std::unique_ptr<Node>, std::unique_ptr<Node>>> items;
+    std::vector<std::pair<UNode, UNode>> items;
     Token rcurly;
     while (true) {
         auto key = this->parse_expression();
@@ -342,7 +342,7 @@ std::unique_ptr<Node> Parser::parse_dictionary() {
 }
 
 
-std::unique_ptr<Node> Parser::parse_partial_application() {
+UNode Parser::parse_partial_application() {
     Token dollar = this->expect_token(TokType::DOLLAR_SIGN);
     Token total_function_tok = this->expect_token(TokType::ID);
     this->expect_token(TokType::LPAREN);
@@ -371,8 +371,8 @@ std::unique_ptr<Node> Parser::parse_partial_application() {
     return partial;
 }
 
-std::unique_ptr<Node> Parser::parse_id_or_literal() {
-    std::unique_ptr<Node> node = nullptr;
+UNode Parser::parse_id_or_literal() {
+    UNode node = nullptr;
     switch (this->token.type) {
         case TokType::LPAREN: {
             this->next();
@@ -448,13 +448,13 @@ std::unique_ptr<Node> Parser::parse_id_or_literal() {
     return node;
 }
 
-std::unique_ptr<Node> Parser::parse_tuple_or_constructor() {
+UNode Parser::parse_tuple_or_constructor() {
     Token hash_tok = this->token;
-    std::unique_ptr<Node> parent;
+    UNode parent;
     this->next();
     if (this->match(TokType::ID)) {
         Token idd = this->expect_token(TokType::ID);
-        std::unique_ptr<Node> m = std::make_unique<IdNode>(idd.str, this->token.start, this->token.end_pos);
+        UNode m = std::make_unique<IdNode>(idd.str, this->token.start, this->token.end_pos);
         while (this->match(TokType::DOT)) {
             this->next();
             idd = this->expect_token(TokType::ID);
@@ -468,7 +468,7 @@ std::unique_ptr<Node> Parser::parse_tuple_or_constructor() {
     return parent;
 }
 
-std::unique_ptr<Node> Parser::parse_tuple_literal() {
+UNode Parser::parse_tuple_literal() {
     // Token hash_tok = this->expect_token(TokType::HASH);
     Token st = this->expect_token(TokType::LPAREN);
     // it's a tuple
@@ -498,15 +498,15 @@ std::unique_ptr<Node> Parser::parse_tuple_literal() {
     return std::make_unique<TupleNode>(values, st.start, close.end_pos);
 }
 
-std::unique_ptr<Node> Parser::parse_id_or_class_literal() {
+UNode Parser::parse_id_or_class_literal() {
     std::string identifier = this->token.str;
     auto node = std::make_unique<IdNode>(identifier, this->token.start, this->token.end_pos);
     this->next();
     return node;
 }
 
-std::unique_ptr<Node> Parser::parse_call_or_subscript_chain(std::unique_ptr<Node>& parent) {
-    std::unique_ptr<Node> node = std::move(parent);
+UNode Parser::parse_call_or_subscript_chain(UNode& parent) {
+    UNode node = std::move(parent);
     while (item_in_vec(this->token.type, {TokType::LPAREN, TokType::LSQUARE})) {
         if (this->match(TokType::LPAREN)) {
 //                 function call
@@ -557,7 +557,7 @@ std::unique_ptr<DeclarationNode> Parser::parse_variable_declaration() {
                                              expression->end);
 }
 
-std::unique_ptr<Node> Parser::parse_common_statement() {
+UNode Parser::parse_common_statement() {
     switch (this->token.type) {
         case TokType::IF: {
             return this->parse_if();
@@ -790,7 +790,7 @@ std::unique_ptr<AliasNode> Parser::parse_alias() {
     return node;
 }
 
-std::unique_ptr<Node> Parser::parse_top_level_statement() {
+UNode Parser::parse_top_level_statement() {
     switch (this->token.type) {
         case TokType::FUN:
             return this->parse_function_definition();
@@ -834,7 +834,7 @@ std::unique_ptr<ForNode> Parser::parse_for_loop() {
     return forloop;
 }
 
-std::unique_ptr<Node> Parser::parse_ternary() {
+UNode Parser::parse_ternary() {
     auto condition = this->parse_or_expression();
     if (this->match(TokType::QUESTION)) {
         this->next();

@@ -10,6 +10,8 @@
 #include "../scanner/TextPosition.h"
 #include "../json/json_fwd.hpp"
 #include <iostream>
+#include "../types.h"
+
 
 class Node {
 public:

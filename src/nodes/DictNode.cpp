@@ -34,6 +34,6 @@ nlohmann::json DictNode::to_json() const {
     return j;
 }
 
-DictNode::DictNode(std::vector<std::pair<std::unique_ptr<Node>, std::unique_ptr<Node>>>& items, TextPosition start,
+DictNode::DictNode(std::vector<std::pair<UNode, UNode>>& items, TextPosition start,
                    TextPosition end) : Node(NodeType::DICT, start, end), items(std::move(items)) {
 }

@@ -4,7 +4,7 @@
 
 #include "MemberNode.h"
 
-MemberNode::MemberNode(std::unique_ptr<Node>& parent, Token child_token) : Node(NodeType::MEMBER,
+MemberNode::MemberNode(UNode& parent, Token child_token) : Node(NodeType::MEMBER,
                                                                                 parent->start,
                                                                                 child_token.end_pos),
                                                                            parent(std::move(parent)) {
