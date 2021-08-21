@@ -739,7 +739,8 @@ TEST_CASE("enum_error", "[checker]") {
     std::cout << p_error << std::endl;
     Error& error = *p_error;
     std::cout << error << std::endl;
-    MemberNode node(new IdNode("Foo", _POS, _POS), Token(TokType::ID, "b", _POS));
+    std::unique_ptr<Node> u = std::make_unique<IdNode>("Foo", _POS, _POS);
+    MemberNode node(u, Token(TokType::ID, "b", _POS));
     ObjectType expected("Boolean");
     ErrorEnumNoValue exp("Foo", "b", node, nullptr);
     REQUIRE(error == exp);

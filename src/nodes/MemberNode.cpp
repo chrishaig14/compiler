@@ -4,8 +4,10 @@
 
 #include "MemberNode.h"
 
-MemberNode::MemberNode(Node* parent, Token child_token) : Node(NodeType::MEMBER, parent->start, child_token.end_pos),
-                                                          parent(parent) {
+MemberNode::MemberNode(std::unique_ptr<Node>& parent, Token child_token) : Node(NodeType::MEMBER,
+                                                                                parent->start,
+                                                                                child_token.end_pos),
+                                                                           parent(std::move(parent)) {
     this->child_token = child_token;
     this->type = MemberType::STR;
     this->s_child = child_token.str;

@@ -18,12 +18,12 @@ enum class MemberType {
 class MemberNode : public Node {
 public:
     MemberType type;
-    Node* parent;
+    std::unique_ptr<Node> parent;
     std::string s_child;
     size_t n_child;
     TextPosition dot_pos;
     Token child_token;
-    MemberNode(Node* parent, Token child_token);
+    MemberNode(std::unique_ptr<Node>& parent, Token child_token);
 
     bool equal(const Node& x) const override;
 

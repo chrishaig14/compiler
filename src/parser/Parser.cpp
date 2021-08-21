@@ -295,12 +295,12 @@ std::unique_ptr<Node> Parser::parse_factor() {
         Token tok;
         if (this->match(TokType::INTEGER)) {
             tok = this->expect_token(TokType::INTEGER);
-            auto mn = std::make_unique<MemberNode>(parent.release(), tok);
+            auto mn = std::make_unique<MemberNode>(parent, tok);
             mn->dot_pos = dot_pos;
             parent = std::move(mn);
         } else {
             tok = this->expect_token(TokType::ID);
-            auto mn = std::make_unique<MemberNode>(parent.release(), tok);
+            auto mn = std::make_unique<MemberNode>(parent, tok);
             mn->dot_pos = dot_pos;
             parent = std::move(mn);
         }
@@ -459,13 +459,13 @@ std::unique_ptr<Node> Parser::parse_tuple_or_constructor() {
     this->next();
     if (this->match(TokType::ID)) {
         Token idd = this->expect_token(TokType::ID);
-        Node* m = new IdNode(idd.str, this->token.start, this->token.end_pos);
+        std::unique_ptr<Node> m = std::make_unique<IdNode>(idd.str, this->token.start, this->token.end_pos);
         while (this->match(TokType::DOT)) {
             this->next();
             idd = this->expect_token(TokType::ID);
-            m = new MemberNode(m, idd);
+            m = std::make_unique<MemberNode>(m, idd);
         }
-        parent = std::make_unique<DefaultConstructorNode>(m, hash_tok.start, m->end);
+        parent = std::make_unique<DefaultConstructorNode>(m.release(), hash_tok.start, m->end);
     } else {
         parent = this->parse_tuple_literal();
         parent->start = hash_tok.start;
