@@ -10,9 +10,9 @@
 #include "../types.h"
 #include "TypeNode.h"
 
-class   ReturnNode : public Node {
+class ReturnNode : public Node {
 public:
-    explicit ReturnNode(Node* expression, TextPosition start, TextPosition end);
+    explicit ReturnNode(UNode& expression, TextPosition start, TextPosition end);
 
 
     bool equal(const Node& other) const override;
@@ -20,7 +20,7 @@ public:
     ~ReturnNode();
     nlohmann::json to_json() const override;
 
-    Node* expression;
+    UNode expression;
     std::vector<std::pair<std::string, TypeNode*>> reachables;
 };
 

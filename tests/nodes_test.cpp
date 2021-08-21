@@ -236,7 +236,8 @@ TEST_CASE("nodes_continue", "[continue]") {
 }
 
 TEST_CASE("nodes_return_no_value", "[return]") {
-    ReturnNode n(nullptr, DUMMY_POS, DUMMY_POS);
+    UNode ptr;
+    ReturnNode n(ptr, DUMMY_POS, DUMMY_POS);
     nlohmann::json nj = n.to_json();
     nlohmann::json e = {{"type",   "return"},
                         {"return", {{"expression", {}}}}};
@@ -244,11 +245,12 @@ TEST_CASE("nodes_return_no_value", "[return]") {
 }
 
 TEST_CASE("nodes_return_with_value", "[return]") {
-    IdNode* exp = new IdNode("foo", DUMMY_POS, DUMMY_POS);
-    ReturnNode n(exp, DUMMY_POS, DUMMY_POS);
-    nlohmann::json nj = n.to_json();
+    UNode exp = IdNode::make("foo", DUMMY_POS, DUMMY_POS);
     nlohmann::json e = {{"type",   "return"},
                         {"return", {{"expression", exp->to_json()}}}};
+    ReturnNode n(exp, DUMMY_POS, DUMMY_POS);
+    nlohmann::json nj = n.to_json();
+
     REQUIRE(e == nj);
 }
 

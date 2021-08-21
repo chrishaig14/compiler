@@ -70,7 +70,7 @@ std::unique_ptr<ReturnNode> Parser::parse_return() {
         expression = this->parse_expression();
         end = expression->end;
     }
-    return std::make_unique<ReturnNode>(expression.release(), ret_tok.start, end);
+    return std::make_unique<ReturnNode>(expression, ret_tok.start, end);
 }
 
 std::unique_ptr<IfNode> Parser::parse_if() {

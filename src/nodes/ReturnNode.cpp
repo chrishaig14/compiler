@@ -4,8 +4,8 @@
 
 #include "ReturnNode.h"
 
-ReturnNode::ReturnNode(Node* expression, TextPosition start, TextPosition end) : Node(NodeType::RETRN, start, end),
-                                                                                 expression(expression) {
+ReturnNode::ReturnNode(UNode& expression, TextPosition start, TextPosition end) : Node(NodeType::RETRN, start, end),
+                                                                                 expression(std::move(expression)) {
 }
 
 bool ReturnNode::equal(const Node& x) const {

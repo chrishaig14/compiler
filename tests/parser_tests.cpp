@@ -473,8 +473,8 @@ TEST_CASE("parse_return_nothing", "[parser]") {
     parser.top_package_name = "main";
 
     std::unique_ptr<ReturnNode> ast = parser.parse_return();
-
-    REQUIRE(ast->to_json() == ReturnNode(nullptr, DUMMY_POS, DUMMY_POS).to_json());
+    UNode ptr;
+    REQUIRE(ast->to_json() == ReturnNode(ptr, DUMMY_POS, DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_return_expression", "[parser]") {
@@ -488,7 +488,7 @@ TEST_CASE("parse_return_expression", "[parser]") {
 
     std::unique_ptr<ReturnNode> ast = parser.parse_return();
 
-    REQUIRE(ast->to_json() == ReturnNode(EXPRESSION.node.release(), DUMMY_POS, DUMMY_POS).to_json());
+    REQUIRE(ast->to_json() == ReturnNode(EXPRESSION.node, DUMMY_POS, DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_list_empty", "[parser]") {
