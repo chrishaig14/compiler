@@ -23,6 +23,7 @@ void add_path_to_module(Module& module, Path path, Package& top_package);
 void add_path_with_alias_to_module(Module& module, const std::string& alias, Path path, Package& root_package);
 void analyze_module(Module& module, Package& top_package);
 void analyze_all_modules(Package& package, Package& top_package);
+
 class Compiler {
     std::string project_dir;
     std::string project_output_dir;
@@ -41,6 +42,10 @@ class Compiler {
     std::string version;
 
 public:
+    ~Compiler() {
+        delete this->top_package; // TODO this should not be allocated on the heap
+    }
+
     Compiler(const std::string& project_dir, const std::string& project_output_dir, const std::string& output_name,
              const std::string& lib_path, bool is_lib, const std::string& version);
     VectorOfStrings load_requirements(const std::string& filepath);
