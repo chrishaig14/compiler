@@ -11,10 +11,10 @@
 
 class WhileNode : public Node {
 public:
-    BlockNode* body;
-    Node* condition;
+    std::unique_ptr<BlockNode> body;
+    UNode condition;
 
-    WhileNode(Node* condition, BlockNode* body, TextPosition start, TextPosition end);
+    WhileNode(UNode& condition, std::unique_ptr<BlockNode>& body, TextPosition start, TextPosition end);
 
     bool equal(const Node& other) const override;
 

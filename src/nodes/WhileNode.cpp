@@ -5,12 +5,12 @@
 #include <cassert>
 #include "WhileNode.h"
 
-WhileNode::WhileNode(Node* condition, BlockNode* body, TextPosition start, TextPosition end) : Node(NodeType::WHIL,
-                                                                                                    start,
-                                                                                                    end), body(body),
-                                                                                               condition(condition) {
-    assert(condition != nullptr);
-    assert(body != nullptr);
+WhileNode::WhileNode(UNode& condition, std::unique_ptr<BlockNode>& body, TextPosition start, TextPosition end) : Node(
+        NodeType::WHIL,
+        start,
+        end), body(std::move(body)), condition(std::move(condition)) {
+    // assert(condition != nullptr);
+    // assert(body != nullptr);
 }
 
 bool WhileNode::equal(const Node& x) const {

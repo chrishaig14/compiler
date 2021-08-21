@@ -339,10 +339,10 @@ TEST_CASE("nodes_function_args", "[function]") {
 }
 
 TEST_CASE("nodes_while", "[while]") {
-    BlockNode* body = new BlockNode({}, DUMMY_POS, DUMMY_POS);
+    std::unique_ptr<BlockNode> body = std::make_unique<BlockNode>(VectorOfNodesU{}, DUMMY_POS, DUMMY_POS);
     UNode a = std::make_unique<IdNode>("bar", DUMMY_POS, DUMMY_POS);
     UNode b = std::make_unique<IdNode>("baz", DUMMY_POS, DUMMY_POS);
-    BoolOpNode* cond = new BoolOpNode(BoolOp::EQ, a, b, DUMMY_POS, DUMMY_POS);
+    std::unique_ptr<Node> cond = std::make_unique<BoolOpNode>(BoolOp::EQ, a, b, DUMMY_POS, DUMMY_POS);
     nlohmann::json e = {{"type",  "while"},
                         {"while", {{"condition", cond->to_json()}, {"body", body->to_json()}}}};
     WhileNode n(cond, body, DUMMY_POS, DUMMY_POS);

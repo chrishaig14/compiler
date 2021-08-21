@@ -853,7 +853,7 @@ std::unique_ptr<WhileNode> Parser::parse_while_loop() {
     this->inside_loop = true;
     auto body = this->parse_possibly_empty_block();
     this->inside_loop = prev;
-    auto whil = std::make_unique<WhileNode>(condition.release(), body.release(), while_tok.start, body->end);
+    auto whil = std::make_unique<WhileNode>(condition, body, while_tok.start, body->end);
     whil->start = while_tok.start;
     return whil;
 }

@@ -304,7 +304,7 @@ TEST_CASE("parse_while", "[parser]") {
     std::unique_ptr<WhileNode> ast = parser.parse_while_loop();
 
     REQUIRE(ast->to_json() ==
-            WhileNode(EXPRESSION_1.node.release(), (BlockNode*) BLOCK.node.release(), DUMMY_POS, DUMMY_POS).to_json());
+            WhileNode(EXPRESSION_1.node, (std::unique_ptr<BlockNode>&) BLOCK.node, DUMMY_POS, DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_fun_simple", "[parser]") {
