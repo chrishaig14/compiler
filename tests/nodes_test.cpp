@@ -287,15 +287,18 @@ TEST_CASE("nodes_empty_dict", "[empty_dict]") {
 }
 
 TEST_CASE("nodes_dict", "[dict]") {
-    StringNode* k1 = new StringNode("foo", DUMMY_POS, DUMMY_POS);
-    NumberNode* v1 = new NumberNode(NumberType::INTEGER, "9", DUMMY_POS, DUMMY_POS);
-    StringNode* k2 = new StringNode("bar", DUMMY_POS, DUMMY_POS);
-    NumberNode* v2 = new NumberNode(NumberType::INTEGER, "11", DUMMY_POS, DUMMY_POS);
-    DictNode n({{k1, v1},
-                {k2, v2}}, DUMMY_POS, DUMMY_POS);
-    nlohmann::json nj = n.to_json();
+    std::unique_ptr<Node> k1 = std::make_unique<StringNode>("foo", DUMMY_POS, DUMMY_POS);
+    std::unique_ptr<Node> v1 = std::make_unique<NumberNode>(NumberType::INTEGER, "9", DUMMY_POS, DUMMY_POS);
+    std::unique_ptr<Node> k2 = std::make_unique<StringNode>("bar", DUMMY_POS, DUMMY_POS);
+    std::unique_ptr<Node> v2 = std::make_unique<NumberNode>(NumberType::INTEGER, "11", DUMMY_POS, DUMMY_POS);
     nlohmann::json e = {{"type", "dict"},
                         {"dict", {{"items", {{{"key", k1->to_json()}, {"value", v1->to_json()}}, {{"key", k2->to_json()}, {"value", v2->to_json()}}}}}}};
+    std::vector<std::pair<std::unique_ptr<Node>, std::unique_ptr<Node>>> d;
+    d.emplace_back(std::move(k1), std::move(v1));
+    d.emplace_back(std::move(k2), std::move(v2));
+    DictNode n(d, DUMMY_POS, DUMMY_POS);
+    nlohmann::json nj = n.to_json();
+
     REQUIRE(e == nj);
 }
 

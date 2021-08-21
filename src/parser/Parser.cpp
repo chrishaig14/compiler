@@ -89,12 +89,7 @@ std::unique_ptr<IfNode> Parser::parse_if() {
         this->next();
         _else = this->parse_possibly_empty_block();
     }
-    auto iff = std::make_unique<IfNode>(condition,
-                                        body,
-                                        elifs,
-                                        _else,
-                                        if_tok.start,
-                                        if_tok.end_pos);
+    auto iff = std::make_unique<IfNode>(condition, body, elifs, _else, if_tok.start, if_tok.end_pos);
     iff->start = if_tok.start;
     return iff;
 }
@@ -328,13 +323,13 @@ std::unique_ptr<Node> Parser::parse_dictionary() {
         Token rsquare = this->expect_token(TokType::RSQUARE);
         return std::make_unique<EmptyDictNode>(key_type, value_type, lcurly.start, rsquare.end_pos);
     }
-    std::vector<std::pair<Node*, Node*>> items;
+    std::vector<std::pair<std::unique_ptr<Node>, std::unique_ptr<Node>>> items;
     Token rcurly;
     while (true) {
         auto key = this->parse_expression();
         this->expect_token(TokType::COLON);
         auto value = this->parse_expression();
-        items.emplace_back(key.release(), value.release());
+        items.emplace_back(std::move(key), std::move(value));
         if (this->match(TokType::COMMA)) {
             this->next();
         } else {

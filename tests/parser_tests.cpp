@@ -798,9 +798,9 @@ TEST_CASE("parse_dict_one_element", "[parser]") {
     parser.top_package_name = "main";
 
     std::unique_ptr<Node> ast = parser.parse_dictionary();
-
-    REQUIRE(ast->to_json() ==
-            DictNode({{EXPRESSION_1.node.release(), EXPRESSION_2.node.release()}}, DUMMY_POS, DUMMY_POS).to_json());
+    std::vector<std::pair<std::unique_ptr<Node>, std::unique_ptr<Node>>> d;
+    d.emplace_back(std::move(EXPRESSION_1.node), std::move(EXPRESSION_2.node));
+    REQUIRE(ast->to_json() == DictNode(d, DUMMY_POS, DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_dict_mult_elements", "[parser]") {
@@ -818,10 +818,12 @@ TEST_CASE("parse_dict_mult_elements", "[parser]") {
 
     std::unique_ptr<Node> ast = parser.parse_dictionary();
 
-    REQUIRE(ast->to_json() == DictNode({{EXPRESSION_1.node.release(), EXPRESSION_2.node.release()},
-                                        {EXPRESSION.node.release(),   EXPRESSION_1_V.node.release()}},
-                                       DUMMY_POS,
-                                       DUMMY_POS).to_json());
+    std::vector<std::pair<std::unique_ptr<Node>, std::unique_ptr<Node>>> d;
+    d.emplace_back(std::move(EXPRESSION_1.node), std::move(EXPRESSION_2.node));
+    d.emplace_back(std::move(EXPRESSION.node), std::move(EXPRESSION_1_V.node));
+    // {{EXPRESSION_1.node.release(), EXPRESSION_2.node.release()},
+    //  {EXPRESSION.node.release(),   EXPRESSION_1_V.node.release()}}
+    REQUIRE(ast->to_json() == DictNode(d, DUMMY_POS, DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_member", "[parser]") {

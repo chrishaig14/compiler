@@ -10,8 +10,8 @@ bool DictNode::equal(const Node& other) const {
         return false;
     }
     for (size_t i = 0; i < this->items.size(); i++) {
-        auto p = this->items[i];
-        auto op = o.items[i];
+        auto& p = this->items[i];
+        auto& op = o.items[i];
         if (*p.first != *op.first) {
             return false;
         }
@@ -26,10 +26,14 @@ nlohmann::json DictNode::to_json() const {
     nlohmann::json j;
     j["type"] = "dict";
     std::vector<nlohmann::json> v;
-    for (auto i: this->items) {
+    for (auto& i: this->items) {
         v.push_back({{"key",   i.first->to_json()},
                      {"value", i.second->to_json()}});
     }
     j["dict"]["items"] = v;
     return j;
+}
+
+DictNode::DictNode(std::vector<std::pair<std::unique_ptr<Node>, std::unique_ptr<Node>>>& items, TextPosition start,
+                   TextPosition end) : Node(NodeType::DICT, start, end), items(std::move(items)) {
 }
