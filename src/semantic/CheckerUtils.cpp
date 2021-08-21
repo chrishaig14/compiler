@@ -41,13 +41,13 @@ Entity entity_from_type(const TypeNode& type) {
 
 FunctionSNode* make_class_default_init(const std::string& class_path, const VectorOfStrings& members) {
     auto* bn = new BlockSNode();
-    auto* nn = new NewObjectSNode();
+    auto nn = std::make_unique<NewObjectSNode>();
     nn->class_name = class_path;
     for (const auto& m: members) {
         auto* idn = new IdSNode(m);
         nn->args.push_back(idn);
     }
-    auto* rn = new ReturnSNode(nn);
+    auto* rn = new ReturnSNode((USNode&) nn);
     bn->nodes.push_back(rn);
     auto* fn = new FunctionSNode(class_path + ".__init__", members, bn);
     return fn;

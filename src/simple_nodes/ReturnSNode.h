@@ -9,11 +9,12 @@
 #include "SNode.h"
 #include <vector>
 #include <string>
+
 class ReturnSNode : public SNode {
 public:
-    SNode* expression;
+    USNode expression;
     std::vector<std::string> reachables;
-    ReturnSNode(SNode* expression);
+    ReturnSNode(USNode& expression);
 };
 
 

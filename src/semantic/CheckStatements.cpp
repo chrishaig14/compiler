@@ -157,7 +157,8 @@ USemanticInfo Checker::visit_return(ReturnNode& n) {
             this->error_reporter.error(ErrorBadReturn(n.start));
         }
         SemanticInfo info_r;
-        info_r.snode = new ReturnSNode(nullptr);
+        USNode u;
+        info_r.snode = new ReturnSNode(u);
         return std::make_unique<SemanticInfo>(info_r);
     }
     TypeNode* return_type = return_entity.value->type;
@@ -176,8 +177,8 @@ USemanticInfo Checker::visit_return(ReturnNode& n) {
     if (expression_info_p->is_error()) {
         return error_stub();
     }
-
-    auto* sn = new ReturnSNode(expression_info_p->snode);
+    auto u = USNode(expression_info_p->snode);
+    auto* sn = new ReturnSNode(u);
     for (auto l : this->scope->get_all()) {
         sn->reachables.push_back(l.first);
     }
