@@ -11,9 +11,9 @@
 class DeclarationSNode : public SNode {
 public:
     std::string identifier;
-    SNode* expression;
+    USNode expression;
 
-    DeclarationSNode(std::string identifier, SNode* expression);
+    DeclarationSNode(std::string identifier, USNode& expression);
 };
 
 

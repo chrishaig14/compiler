@@ -146,7 +146,8 @@ USemanticInfo Checker::check_declaration_with_type(DeclarationNode& n) {
         return error_stub();
     }
     SemanticInfo info;
-    info.snode = new DeclarationSNode(n.identifier, rvalue_sinfo->snode);
+    USNode up(rvalue_sinfo->snode);
+    info.snode = new DeclarationSNode(n.identifier, up);
     auto* ov = new Value(n.type->clone());
     info.entity = Entity(ov);
     this->fill_value(ov);
@@ -165,7 +166,8 @@ USemanticInfo Checker::check_declaration_without_type(DeclarationNode& n) {
     }
 
     SemanticInfo info;
-    info.snode = new DeclarationSNode(n.identifier, exp_info_p->snode);
+    USNode u(exp_info_p->snode);
+    info.snode = new DeclarationSNode(n.identifier, u);
     info.entity = exp_info_p->entity;
     if (info.entity.type == E_TYPE::CONST_FUNCTION) {
         info.entity = Entity(new Value(exp_info_p->entity.const_function->ft->clone()));

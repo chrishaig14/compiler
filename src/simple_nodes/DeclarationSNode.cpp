@@ -4,6 +4,6 @@
 
 #include "DeclarationSNode.h"
 
-DeclarationSNode::DeclarationSNode(std::string identifier, SNode* expression)
-        : SNode(SNodeType::DECLARATION), identifier(identifier), expression(expression) {
+DeclarationSNode::DeclarationSNode(std::string identifier, USNode& expression)
+        : SNode(SNodeType::DECLARATION), identifier(identifier), expression(std::move(expression)) {
 }

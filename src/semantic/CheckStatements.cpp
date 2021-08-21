@@ -249,12 +249,14 @@ USemanticInfo Checker::visit_match(MatchExpressionNode& node) {
         USemanticInfo case_info = this->dispatch(*case_node);
         auto* bn = (BlockSNode*) case_info->snode;
         auto* omn = new ObjectMemberSNode(new IdSNode(varname), Path("core.core.Union"), "o");
-        auto* dn = new DeclarationSNode(case_id, omn);
+        USNode u(omn);
+        auto* dn = new DeclarationSNode(case_id, u);
         bn->nodes.insert(bn->nodes.begin(), dn);
         cas.emplace_back(union_index, (BlockSNode*) case_info->snode);
         this->leave_scope();
     }
-    auto* init = new DeclarationSNode(varname, exp_info->snode);
+    USNode up(exp_info->snode);
+    auto* init = new DeclarationSNode(varname, up);
     auto* mn = new MatchSNode(init, varname, cas);
 
     SemanticInfo info;
