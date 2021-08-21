@@ -19,6 +19,11 @@ public:
 
     BlockNode(VectorOfNodesU nodes, TextPosition start, TextPosition end);
 
+    static UBlockNode make(VectorOfNodesU nodes, TextPosition start, TextPosition end) {
+        return std::make_unique<BlockNode>(std::move(nodes), start, end);
+    }
+
+
     VectorOfNodesU nodes;
 
     bool equal(const Node& p) const override;

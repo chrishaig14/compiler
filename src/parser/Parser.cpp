@@ -59,7 +59,7 @@ std::unique_ptr<BlockNode> Parser::parse_program() {
     }
     TextPosition end = this->token.end_pos;
     std::cout << "--------------- FINISHED PARSING -----------------" << std::endl;
-    return std::make_unique<BlockNode>(std::move(program), start, end);
+    return BlockNode::make(std::move(program), start, end);
 }
 
 std::unique_ptr<ReturnNode> Parser::parse_return() {
@@ -688,7 +688,7 @@ std::unique_ptr<BlockNode> Parser::parse_possibly_empty_block() {
         }
         block.push_back(this->parse_common_statement());
     }
-    return std::make_unique<BlockNode>(std::move(block), st.start, end.end_pos);
+    return BlockNode::make(std::move(block), st.start, end.end_pos);
 }
 
 std::unique_ptr<FunctionNode> Parser::parse_function_definition() {

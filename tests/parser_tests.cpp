@@ -92,7 +92,7 @@ TestNodeU ASSIGNMENT() {
 // const TestNode EMPTY_BLOCK{"{}", new BlockNode(VectorOfNodesU{}, DUMMY_POS, DUMMY_POS)};
 
 TestNodeU EMPTY_BLOCK_U() {
-    return {"{}", std::make_unique<BlockNode>(VectorOfNodesU{}, DUMMY_POS, DUMMY_POS)};
+    return {"{}", BlockNode::make(VectorOfNodesU{}, DUMMY_POS, DUMMY_POS)};
 }
 
 // const TestNode IF{"if(" + EXPRESSION.text + ")" + EMPTY_BLOCK.text,
@@ -120,14 +120,14 @@ TestNodeU BLOCK_U() {
     VectorOfNodesU v;
     v.push_back(std::move(DECLARATION.node));
     v.push_back(std::move(IF.node));
-    return {"{" + t + ";" + IF.text + "}", std::make_unique<BlockNode>(std::move(v), DUMMY_POS, DUMMY_POS)};
+    return {"{" + t + ";" + IF.text + "}", BlockNode::make(std::move(v), DUMMY_POS, DUMMY_POS)};
 }
 
 TestNodeU BLOCK_1() {
     auto assignment = ASSIGNMENT();
     VectorOfNodesU v;
     v.push_back(std::move(assignment.node));
-    return {"{" + assignment.text + ";}", std::make_unique<BlockNode>(std::move(v), DUMMY_POS, DUMMY_POS)};
+    return {"{" + assignment.text + ";}", BlockNode::make(std::move(v), DUMMY_POS, DUMMY_POS)};
 }
 
 // const TestNode block_1{"{" + assignment.text + ";}",
@@ -941,8 +941,8 @@ TEST_CASE("parse_instance", "[parser]") {
     parser.top_package_name = "main";
 
     std::unique_ptr<InstanceNode> ast = parser.parse_instance();
-    std::unique_ptr<BlockNode> b2 = std::make_unique<BlockNode>(VectorOfNodesU{}, DUMMY_POS, DUMMY_POS);
-    std::unique_ptr<BlockNode> b1 = std::make_unique<BlockNode>(VectorOfNodesU{}, DUMMY_POS, DUMMY_POS);
+    std::unique_ptr<BlockNode> b2 = BlockNode::make(VectorOfNodesU{}, DUMMY_POS, DUMMY_POS);
+    std::unique_ptr<BlockNode> b1 = BlockNode::make(VectorOfNodesU{}, DUMMY_POS, DUMMY_POS);
     REQUIRE(ast->to_json() == InstanceNode("Comparable",
                                            new ObjectType("Foo"),
                                            {{"eq", new FunctionNode("eq",

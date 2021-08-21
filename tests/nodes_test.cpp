@@ -147,11 +147,11 @@ TEST_CASE("nodes_if_with_else", "[if]") {
                                                                            DUMMY_POS);
     VectorOfNodesU vector;
     vector.push_back(std::move(d));
-    std::unique_ptr<BlockNode> t = std::make_unique<BlockNode>(std::move(vector), DUMMY_POS, DUMMY_POS);
+    std::unique_ptr<BlockNode> t = BlockNode::make(std::move(vector), DUMMY_POS, DUMMY_POS);
     VectorOfNodesU v;
     UNode n2 = std::make_unique<NumberNode>(NumberType::INTEGER, "9", DUMMY_POS, DUMMY_POS);
     v.push_back(std::make_unique<DeclarationNode>("bar", nullptr, n2, DUMMY_POS, DUMMY_POS, DUMMY_POS));
-    std::unique_ptr<BlockNode> l = std::make_unique<BlockNode>(std::move(v), DUMMY_POS, DUMMY_POS);
+    std::unique_ptr<BlockNode> l = BlockNode::make(std::move(v), DUMMY_POS, DUMMY_POS);
     nlohmann::json e = {{"type", "if"}};
     e["if"]["condition"] = c->to_json();
     e["if"]["then"] = t->to_json();
@@ -167,11 +167,11 @@ TEST_CASE("nodes_if_with_elif", "[if]") {
     VectorOfNodesU v;
     UNode n1 = std::make_unique<NumberNode>(NumberType::INTEGER, "7", DUMMY_POS, DUMMY_POS);
     v.push_back(std::make_unique<DeclarationNode>("foo", nullptr, n1, DUMMY_POS, DUMMY_POS, DUMMY_POS));
-    std::unique_ptr<BlockNode> t = std::make_unique<BlockNode>(std::move(v), DUMMY_POS, DUMMY_POS);
+    std::unique_ptr<BlockNode> t = BlockNode::make(std::move(v), DUMMY_POS, DUMMY_POS);
     VectorOfNodesU v2;
     UNode n2 = std::make_unique<NumberNode>(NumberType::INTEGER, "9", DUMMY_POS, DUMMY_POS);
     v2.push_back(std::make_unique<DeclarationNode>("bar", nullptr, n2, DUMMY_POS, DUMMY_POS, DUMMY_POS));
-    std::unique_ptr<BlockNode> l = std::make_unique<BlockNode>(std::move(v2), DUMMY_POS, DUMMY_POS);
+    std::unique_ptr<BlockNode> l = BlockNode::make(std::move(v2), DUMMY_POS, DUMMY_POS);
     VectorOfNodesU v3;
     UNode n3 = std::make_unique<NumberNode>(NumberType::INTEGER, "9", DUMMY_POS, DUMMY_POS);
     v3.push_back(std::make_unique<DeclarationNode>("bar", nullptr, n3, DUMMY_POS, DUMMY_POS, DUMMY_POS));
@@ -205,7 +205,7 @@ TEST_CASE("nodes_if_with_elif", "[if]") {
 
 TEST_CASE("nodes_for", "[for]") {
     VectorOfNodesU v;
-    std::unique_ptr<BlockNode> b = std::make_unique<BlockNode>(std::move(v), DUMMY_POS, DUMMY_POS);
+    std::unique_ptr<BlockNode> b = BlockNode::make(std::move(v), DUMMY_POS, DUMMY_POS);
     UNode exp = std::make_unique<IdNode>("bar", DUMMY_POS, DUMMY_POS);
     nlohmann::json e = {{"type", "for"},
                         {"for",  {{"var", "foo"}, {"exp", exp->to_json()}, {"body", b->to_json()}}}};
@@ -321,7 +321,7 @@ TEST_CASE("nodes_member", "[member]") {
 
 TEST_CASE("nodes_function_no_args", "[function]") {
     VectorOfNodesU v;
-    std::unique_ptr<BlockNode> b = std::make_unique<BlockNode>(std::move(v), DUMMY_POS, DUMMY_POS);
+    std::unique_ptr<BlockNode> b = BlockNode::make(std::move(v), DUMMY_POS, DUMMY_POS);
     ObjectType* rt = new ObjectType("Integer", {});
     nlohmann::json e = {{"type",     "function"},
                         {"function", {{"id", "foo"}, {"parameters", nlohmann::json::array()}, {"body", b->to_json()}, {"return_type", rt->to_json()}}}};
@@ -331,7 +331,7 @@ TEST_CASE("nodes_function_no_args", "[function]") {
 }
 
 TEST_CASE("nodes_function_args", "[function]") {
-    std::unique_ptr<BlockNode> body = std::make_unique<BlockNode>(VectorOfNodesU {}, DUMMY_POS, DUMMY_POS);
+    std::unique_ptr<BlockNode> body = BlockNode::make(VectorOfNodesU {}, DUMMY_POS, DUMMY_POS);
     ObjectType* a = new ObjectType("Integer", {});
     ObjectType* b = new ObjectType("String", {});
     ObjectType* rt = new ObjectType("Integer", {});
@@ -343,7 +343,7 @@ TEST_CASE("nodes_function_args", "[function]") {
 }
 
 TEST_CASE("nodes_while", "[while]") {
-    std::unique_ptr<BlockNode> body = std::make_unique<BlockNode>(VectorOfNodesU{}, DUMMY_POS, DUMMY_POS);
+    std::unique_ptr<BlockNode> body = BlockNode::make(VectorOfNodesU{}, DUMMY_POS, DUMMY_POS);
     UNode a = std::make_unique<IdNode>("bar", DUMMY_POS, DUMMY_POS);
     UNode b = std::make_unique<IdNode>("baz", DUMMY_POS, DUMMY_POS);
     std::unique_ptr<Node> cond = std::make_unique<BoolOpNode>(BoolOp::EQ, a, b, DUMMY_POS, DUMMY_POS);
@@ -371,10 +371,10 @@ TEST_CASE("nodes_class_full", "[class]") {
     ObjectType* t2 = new ObjectType("String");
     VectorOfStrings members_ordered = {"foo", "bar"};
     ObjectType* rt = new ObjectType("Integer");
-    std::unique_ptr<BlockNode> b1 = std::make_unique<BlockNode>(VectorOfNodesU{}, DUMMY_POS, DUMMY_POS);
-    std::unique_ptr<BlockNode> b2 = std::make_unique<BlockNode>(VectorOfNodesU{}, DUMMY_POS, DUMMY_POS);
-    std::unique_ptr<BlockNode> b3 = std::make_unique<BlockNode>(VectorOfNodesU{}, DUMMY_POS, DUMMY_POS);
-    std::unique_ptr<BlockNode> b4 = std::make_unique<BlockNode>(VectorOfNodesU{}, DUMMY_POS, DUMMY_POS);
+    std::unique_ptr<BlockNode> b1 = BlockNode::make(VectorOfNodesU{}, DUMMY_POS, DUMMY_POS);
+    std::unique_ptr<BlockNode> b2 = BlockNode::make(VectorOfNodesU{}, DUMMY_POS, DUMMY_POS);
+    std::unique_ptr<BlockNode> b3 = BlockNode::make(VectorOfNodesU{}, DUMMY_POS, DUMMY_POS);
+    std::unique_ptr<BlockNode> b4 = BlockNode::make(VectorOfNodesU{}, DUMMY_POS, DUMMY_POS);
     FunctionNode* method1 = new FunctionNode("method1", {}, {}, rt, b1, DUMMY_POS, DUMMY_POS);
     FunctionNode* method2 = new FunctionNode("method2", {}, {}, rt, b2, DUMMY_POS, DUMMY_POS);
     std::unordered_map<std::string, Method> cmethods = {{"method1", {nullptr, method1}},
@@ -422,8 +422,8 @@ TEST_CASE("nodes_instance", "[instance]") {
     // FunctionType* method1 = new FunctionType({new ObjectType("a"), new ObjectType("b")}, new ObjectType("Boolean"));
     // FunctionType* method2 = new FunctionType({new ObjectType("c"), new ObjectType("c")}, new ObjectType("Boolean"));
     ObjectType* rt = new ObjectType("Integer");
-    std::unique_ptr<BlockNode> b1 = std::make_unique<BlockNode>(VectorOfNodesU {}, DUMMY_POS, DUMMY_POS);
-    std::unique_ptr<BlockNode> b2 = std::make_unique<BlockNode>(VectorOfNodesU {}, DUMMY_POS, DUMMY_POS);
+    std::unique_ptr<BlockNode> b1 = BlockNode::make(VectorOfNodesU {}, DUMMY_POS, DUMMY_POS);
+    std::unique_ptr<BlockNode> b2 = BlockNode::make(VectorOfNodesU {}, DUMMY_POS, DUMMY_POS);
     FunctionNode* method1 = new FunctionNode("method1", {}, {}, rt, b1, DUMMY_POS, DUMMY_POS);
     FunctionNode* method2 = new FunctionNode("method2", {}, {}, rt, b2, DUMMY_POS, DUMMY_POS);
 
