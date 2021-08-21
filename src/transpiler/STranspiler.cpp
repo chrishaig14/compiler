@@ -321,7 +321,7 @@ OutputCode STranspiler::transpile_while(WhileSNode& node) {
 OutputCode STranspiler::transpile_list(ListSNode& node) {
     std::string out;
     out = "NEW(XList,{";
-    for (auto* e: node.elements) {
+    for (auto& e: node.elements) {
         OutputCode el = this->dispatch(*e);
         out += el.pre_code;
         out += el.code + ", ";

@@ -4,5 +4,5 @@
 
 #include "ListSNode.h"
 
-ListSNode::ListSNode(std::vector<SNode*> elements) : SNode(SNodeType::LIST), elements(elements) {
+ListSNode::ListSNode(std::vector<USNode>& elements) : SNode(SNodeType::LIST), elements(std::move(elements)) {
 }

@@ -12,8 +12,8 @@
 class ListSNode : public SNode {
 
 public:
-    std::vector<SNode*> elements;
-    explicit ListSNode(std::vector<SNode*> elements);
+    std::vector<USNode> elements;
+    explicit ListSNode(std::vector<USNode>& elements);
 };
 
 

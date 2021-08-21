@@ -77,7 +77,8 @@ USemanticInfo Checker::visit_emptylist(EmptyListNode& node) {
     info.entity = Entity(ov);
     otype->actual_base_path = Path("core.core.List");
     this->fill_value(ov);
-    auto* lsn = new ListSNode({});
+    std::vector<USNode> v;
+    auto* lsn = new ListSNode(v);
     info.snode = lsn;
     // non->class_name = "core.List";
     return std::make_unique<SemanticInfo>(info);
@@ -259,7 +260,8 @@ USemanticInfo Checker::visit_list(ListNode& node) {
 
     TypeNode* element_type = element_type_p->entity.value->type->clone();
     bool is_constant = true;
-    std::vector<SNode*> list_elements = {element_type_p->snode};
+    std::vector<USNode> list_elements;
+    list_elements.push_back(USNode(element_type_p->snode));
 
     for (size_t i = 1; i < node.elements.size(); i++) {
         USemanticInfo current_type_p = this->dispatch(*node.elements[i]);
@@ -271,7 +273,7 @@ USemanticInfo Checker::visit_list(ListNode& node) {
         if (*ctype != *element_type) {
             this->error_reporter.error(ErrorTypeMismatch(*element_type, *node.elements[i], current_type_p->entity));
         }
-        list_elements.push_back(current_type_p->snode);
+        list_elements.push_back(USNode(current_type_p->snode));
     }
     node.type = element_type->clone();
     SemanticInfo return_info;
