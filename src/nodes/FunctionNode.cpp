@@ -30,7 +30,7 @@ bool FunctionNode::equal(const Node& x) const {
     return *this->body == *other.body;
 }
 
-FunctionNode::FunctionNode(std::string identifier, VectorOfStrings parameter_names,
+FunctionNode::FunctionNode(std::string identifier, const VectorOfStrings& parameter_names,
                            const VectorOfTypes& parameter_types, TypeNode* return_type,
                            std::unique_ptr<BlockNode>& body, TextPosition start, TextPosition end)
         : Node(NodeType::FUNC, start, end), body(std::move(body)), return_type(return_type) {

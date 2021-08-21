@@ -7,10 +7,10 @@
 ClassNode::ClassNode(const std::string& className, VectorOfStrings type_parameters, std::vector<std::pair<std::string,TypeNode*>> members,
                      std::unordered_map<std::string, Method> functions,
                      std::map<std::string, std::pair<TypeNode*, Node*>> static_members,
-                     std::unordered_map<std::string, FunctionNode*> static_methods, TextPosition start,
+                     std::unordered_map<std::string, UFunctionNode>& static_methods, TextPosition start,
                      TextPosition end) : Node(NodeType::CLS, start, end), members(members),
                                          static_members(static_members), methods(functions),
-                                         static_methods(static_methods), class_name(className) {
+                                         static_methods(std::move(static_methods)), class_name(className) {
     this->type_parameters = type_parameters;
 }
 
@@ -41,7 +41,7 @@ nlohmann::json ClassNode::to_json() const {
         methj[m.first] = m.second.method->to_json();
     }
     nlohmann::json smethj;
-    for (auto m: this->static_methods) {
+    for (auto& m: this->static_methods) {
         smethj[m.first] = m.second->to_json();
     }
     j["class"] = {{"id",             this->class_name},

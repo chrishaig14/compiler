@@ -383,28 +383,19 @@ UNode Parser::parse_id_or_literal() {
             break;
         }
         case TokType::INTEGER: {
-            node = NumberNode::make(NumberType::INTEGER,
-                                                this->token.str,
-                                                this->token.start,
-                                                this->token.end_pos);
+            node = NumberNode::make(NumberType::INTEGER, this->token.str, this->token.start, this->token.end_pos);
             node->end = this->token.end_pos;
             this->next();
             break;
         }
         case TokType::FLOAT: {
-            node = NumberNode::make(NumberType::FLOAT,
-                                                this->token.str,
-                                                this->token.start,
-                                                this->token.end_pos);
+            node = NumberNode::make(NumberType::FLOAT, this->token.str, this->token.start, this->token.end_pos);
             node->end = this->token.end_pos;
             this->next();
             break;
         }
         case TokType::DOUBLE: {
-            node = NumberNode::make(NumberType::DOUBLE,
-                                                this->token.str,
-                                                this->token.start,
-                                                this->token.end_pos);
+            node = NumberNode::make(NumberType::DOUBLE, this->token.str, this->token.start, this->token.end_pos);
             node->end = this->token.end_pos;
             this->next();
             break;
@@ -878,7 +869,7 @@ std::unique_ptr<ClassNode> Parser::parse_class_definition() {
     }
     this->expect_token(TokType::LCURLY);
     std::unordered_map<std::string, Method> methods;
-    std::unordered_map<std::string, FunctionNode*> static_methods;
+    std::unordered_map<std::string, UFunctionNode> static_methods;
     std::vector<std::pair<std::string, TypeNode*>> members;
     std::set<std::string> member_names;
     std::map<std::string, std::pair<TypeNode*, Node*>> static_members;
@@ -935,16 +926,16 @@ std::unique_ptr<ClassNode> Parser::parse_class_definition() {
             }
 
         } else if (this->match(TokType::FUN)) {
-            auto method_node_u = this->parse_function_definition();
-            auto method_node = method_node_u.release();
+            auto method_node = this->parse_function_definition();
             std::string& method_name = method_node->identifier;
             if (member_names.find(method_name) != member_names.end() || methods.find(method_name) != methods.end()) {
                 this->error_class_member_redefined(class_name, method_name, method_node->start);
             }
             if (is_static) {
-                static_methods.insert(std::make_pair(method_name, method_node));
+                static_methods.insert(std::make_pair(method_name, std::move(method_node)));
             } else {
-                methods[method_name] = Method{nullptr, method_node};
+                auto method_node_p = method_node.release();
+                methods[method_name] = Method{nullptr, method_node_p};
             }
         } else {
             break;

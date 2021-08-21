@@ -25,7 +25,7 @@ public:
     ClassNode(const std::string& className, VectorOfStrings type_parameters, std::vector<std::pair<std::string,TypeNode*>> members,
               std::unordered_map<std::string, Method> functions,
               std::map<std::string, std::pair<TypeNode*, Node*>> static_members,
-              std::unordered_map<std::string, FunctionNode*> static_methods, TextPosition start, TextPosition end);
+              std::unordered_map<std::string, UFunctionNode>& static_methods, TextPosition start, TextPosition end);
     ~ClassNode() override;
     nlohmann::json to_json() const override;
 
@@ -33,7 +33,7 @@ public:
     std::map<std::string, std::pair<TypeNode*, Node*>> static_members;
     VectorOfStrings members_ordered;
     std::unordered_map<std::string, Method> methods;
-    std::unordered_map<std::string, FunctionNode*> static_methods;
+    std::unordered_map<std::string, UFunctionNode> static_methods;
 
     std::string class_name;
     VectorOfStrings type_parameters;

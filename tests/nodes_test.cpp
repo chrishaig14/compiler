@@ -331,7 +331,7 @@ TEST_CASE("nodes_function_no_args", "[function]") {
 }
 
 TEST_CASE("nodes_function_args", "[function]") {
-    std::unique_ptr<BlockNode> body = BlockNode::make(VectorOfNodesU {}, DUMMY_POS, DUMMY_POS);
+    std::unique_ptr<BlockNode> body = BlockNode::make(VectorOfNodesU{}, DUMMY_POS, DUMMY_POS);
     ObjectType* a = new ObjectType("Integer", {});
     ObjectType* b = new ObjectType("String", {});
     ObjectType* rt = new ObjectType("Integer", {});
@@ -356,7 +356,8 @@ TEST_CASE("nodes_while", "[while]") {
 }
 
 TEST_CASE("nodes_class_empty", "[class]") {
-    ClassNode n("MyClass", {}, {}, {}, {}, {}, DUMMY_POS, DUMMY_POS);
+    std::unordered_map<std::string, UFunctionNode> v;
+    ClassNode n("MyClass", {}, {}, {}, {}, v, DUMMY_POS, DUMMY_POS);
     nlohmann::json nj = n.to_json();
     nlohmann::json members = nlohmann::json::array();
     nlohmann::json methods;
@@ -388,16 +389,18 @@ TEST_CASE("nodes_class_full", "[class]") {
     nlohmann::json methods = {{"method2", method2->to_json()},
                               {"method1", method1->to_json()}};
 
-    FunctionNode* smethod1 = new FunctionNode("smethod1", {}, {}, rt, b3, DUMMY_POS, DUMMY_POS);
-    FunctionNode* smethod2 = new FunctionNode("smethod2", {}, {}, rt, b4, DUMMY_POS, DUMMY_POS);
-    std::unordered_map<std::string, FunctionNode*> cstatic_methods = {{"smethod1", smethod1},
-                                                                      {"smethod2", smethod2}};
+    UFunctionNode smethod1 = std::make_unique<FunctionNode>("smethod1", VectorOfStrings {},VectorOfTypes {}, rt, b3, DUMMY_POS, DUMMY_POS);
+    UFunctionNode smethod2 = std::make_unique<FunctionNode>("smethod2", VectorOfStrings {},VectorOfTypes {}, rt, b4, DUMMY_POS, DUMMY_POS);
+    std::unordered_map<std::string, UFunctionNode> cstatic_methods;
+    nlohmann::json static_methods = {{"smethod1", smethod1->to_json()},
+                                     {"smethod2", smethod2->to_json()}};
+    cstatic_methods["smethod1"] = std::move(smethod1);
+    cstatic_methods["smethod2"] = std::move(smethod2);
     ClassNode n("MyClass", {"k", "v"}, cmembers, cmethods, {}, cstatic_methods, DUMMY_POS, DUMMY_POS);
     n.members_ordered = members_ordered;
     nlohmann::json nj = n.to_json();
 
-    nlohmann::json static_methods = {{"smethod1", smethod1->to_json()},
-                                     {"smethod2", smethod2->to_json()}};
+
 
     nlohmann::json e = {{"type",  "class"},
                         {"class", {{"id", "MyClass"}, {"members", members}, {"methods", methods}, {"static_methods", static_methods}}}};
@@ -422,8 +425,8 @@ TEST_CASE("nodes_instance", "[instance]") {
     // FunctionType* method1 = new FunctionType({new ObjectType("a"), new ObjectType("b")}, new ObjectType("Boolean"));
     // FunctionType* method2 = new FunctionType({new ObjectType("c"), new ObjectType("c")}, new ObjectType("Boolean"));
     ObjectType* rt = new ObjectType("Integer");
-    std::unique_ptr<BlockNode> b1 = BlockNode::make(VectorOfNodesU {}, DUMMY_POS, DUMMY_POS);
-    std::unique_ptr<BlockNode> b2 = BlockNode::make(VectorOfNodesU {}, DUMMY_POS, DUMMY_POS);
+    std::unique_ptr<BlockNode> b1 = BlockNode::make(VectorOfNodesU{}, DUMMY_POS, DUMMY_POS);
+    std::unique_ptr<BlockNode> b2 = BlockNode::make(VectorOfNodesU{}, DUMMY_POS, DUMMY_POS);
     FunctionNode* method1 = new FunctionNode("method1", {}, {}, rt, b1, DUMMY_POS, DUMMY_POS);
     FunctionNode* method2 = new FunctionNode("method2", {}, {}, rt, b2, DUMMY_POS, DUMMY_POS);
 

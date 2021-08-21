@@ -374,7 +374,8 @@ TEST_CASE("parse_class_empty", "[parser]") {
 
     std::unique_ptr<ClassNode> ast = parser.parse_class_definition();
 
-    REQUIRE(ast->to_json() == ClassNode(ID, {}, {}, {}, {}, {}, DUMMY_POS, DUMMY_POS).to_json());
+    std::unordered_map<std::string, UFunctionNode> v;
+    REQUIRE(ast->to_json() == ClassNode(ID, {}, {}, {}, {}, v, DUMMY_POS, DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_class_one_member", "[parser]") {
@@ -386,9 +387,9 @@ TEST_CASE("parse_class_one_member", "[parser]") {
     parser.top_package_name = "main";
 
     std::unique_ptr<ClassNode> ast = parser.parse_class_definition();
-
+    std::unordered_map<std::string, UFunctionNode> v;
     REQUIRE(ast->to_json() ==
-            ClassNode(ID, {}, {{ID_1, TYPE_1.node->clone()}}, {}, {}, {}, DUMMY_POS, DUMMY_POS).to_json());
+            ClassNode(ID, {}, {{ID_1, TYPE_1.node->clone()}}, {}, {}, v, DUMMY_POS, DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_class_mult_member", "[parser]") {
@@ -400,14 +401,14 @@ TEST_CASE("parse_class_mult_member", "[parser]") {
     parser.top_package_name = "main";
 
     std::unique_ptr<ClassNode> ast = parser.parse_class_definition();
-
+    std::unordered_map<std::string, UFunctionNode> v;
     REQUIRE(ast->to_json() == ClassNode(ID,
                                         {},
                                         {{ID_2, TYPE_2.node->clone()},
                                          {ID_1, TYPE_1.node->clone()}},
                                         {},
                                         {},
-                                        {},
+                                        v,
                                         DUMMY_POS,
                                         DUMMY_POS).to_json());
 }
@@ -425,13 +426,15 @@ TEST_CASE("parse_class_with_method", "[parser]") {
     std::unique_ptr<ClassNode> ast = parser.parse_class_definition();
 
     FunctionNode* fp = (FunctionNode*) function.node.release();
+    std::unordered_map<std::string, UFunctionNode> v;
+
     REQUIRE(ast->to_json() == ClassNode(ID,
                                         {},
                                         {{ID_2, TYPE_2.node->clone()},
                                          {ID_1, TYPE_1.node->clone()}},
                                         {{fp->identifier, Method{nullptr, fp}}},
                                         {},
-                                        {},
+                                        v,
                                         DUMMY_POS,
                                         DUMMY_POS).to_json());
 }
@@ -447,9 +450,10 @@ TEST_CASE("parse_class_with_static_method", "[parser]") {
     parser.top_package_name = "main";
 
     std::unique_ptr<ClassNode> ast = parser.parse_class_definition();
-    FunctionNode* fp = (FunctionNode*) function.node.release();
-
-    REQUIRE(ast->to_json() == ClassNode(ID, {}, {}, {}, {}, {{(fp)->identifier, fp}}, DUMMY_POS, DUMMY_POS).to_json());
+    std::unordered_map<std::string, UFunctionNode> v;
+    std::string id = ((UFunctionNode&) function.node)->identifier;
+    v[id] = std::move((UFunctionNode&) function.node);
+    REQUIRE(ast->to_json() == ClassNode(ID, {}, {}, {}, {}, v, DUMMY_POS, DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_return_nothing", "[parser]") {
