@@ -173,6 +173,7 @@ void Compiler::load_package(Package& package, int level) {
         }
         ent = readdir(dir);
     }
+    closedir(dir);
 
     if (modules.empty() && subpackages.empty()) {
         std::cerr << "Package " << package.name << " is empty" << std::endl;
