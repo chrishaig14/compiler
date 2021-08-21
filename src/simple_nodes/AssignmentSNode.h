@@ -9,9 +9,9 @@
 
 class AssignmentSNode : public SNode {
 public:
-    SNode* lvalue;
-    SNode* rvalue;
-    AssignmentSNode(SNode* lvalue, SNode* rvalue);
+    USNode lvalue;
+    USNode rvalue;
+    AssignmentSNode(USNode& lvalue, USNode& rvalue);
 };
 
 

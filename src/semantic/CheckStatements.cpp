@@ -144,7 +144,9 @@ USemanticInfo Checker::visit_assignment(AssignmentNode& n) {
         info.snode = linfo_p->snode;
         csn->arguments.push_back(expression_info_p->snode);
     } else {
-        info.snode = new AssignmentSNode(linfo_p->snode, expression_info_p->snode);
+        auto lu = USNode(linfo_p->snode);
+        auto eu = USNode(expression_info_p->snode);
+        info.snode = new AssignmentSNode(lu, eu);
     }
 
     return std::make_unique<SemanticInfo>(info);
@@ -297,14 +299,17 @@ USemanticInfo Checker::visit_for(ForNode& node) {
     std::string loop_index_var_id = "__loop_index__" + loop_c;
     std::string loop_list_len_var_id = "__loop_list_len__" + loop_c;
 
-    auto* increment_index_sn = new AssignmentSNode(nullptr, nullptr);
+    USNode lu;
+    USNode eu;
+    auto* increment_index_sn = new AssignmentSNode(lu, eu);
     this->update_loop_index_snode = increment_index_sn;
-    increment_index_sn->lvalue = new IdSNode(loop_index_var_id);
-    auto* inc_exp_node = new CallSNode(new IdSNode("core.core.Integer.__add__"), {new IdSNode(loop_index_var_id)});
+    increment_index_sn->lvalue = std::make_unique<IdSNode>(loop_index_var_id);
+    auto inc_exp_node = std::make_unique<CallSNode>(new IdSNode("core.core.Integer.__add__"),
+                                                    std::vector<SNode*>{new IdSNode(loop_index_var_id)});
     auto* one_node = new IntegerSNode(std::string());
     one_node->str = "1";
     inc_exp_node->arguments.push_back(one_node);
-    increment_index_sn->rvalue = inc_exp_node;
+    increment_index_sn->rvalue = std::move(inc_exp_node);
 
     this->scope->is_loop = true;
     USemanticInfo binfo = this->visit_block(*node.body);
