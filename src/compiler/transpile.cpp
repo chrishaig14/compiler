@@ -53,7 +53,7 @@ void Compiler::transpile_one_module(Module& module, std::string& package_header,
         return;
     }
     STranspiler t;
-    t.transpile_program(module.sast);
+    t.transpile_program(*module.sast);
     this->static_initializations += t.static_initializations;
     this->static_cleanups += t.static_cleanups;
 
