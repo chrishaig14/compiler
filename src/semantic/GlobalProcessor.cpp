@@ -55,8 +55,9 @@ void GlobalProcessor::visit_function(FunctionNode& node) {
     ConstFunction* const_function = this->module->flirpins[node.identifier].const_function;
 
     VectorOfTypes x;
-    for (auto* p: node.parameter_types) {
-        this->module->fill_actual(p);
+    for (auto& p: node.parameter_types) {
+        TypeNode& type_node = *p;
+        this->module->fill_actual(type_node);
         x.emplace_back(p->clone());
     }
     TypeNode* p = node.return_type;
@@ -191,8 +192,8 @@ void GlobalProcessor::visit_class(ClassNode& node) {
         FunctionNode& method = *f.second.method;
 
         VectorOfTypes x;
-        for (auto* p: method.parameter_types) {
-            this->module->fill_actual(p);
+        for (auto& p: method.parameter_types) {
+            this->module->fill_actual(*p);
             // p->object().actual_base_path = this->get_actual_path(p->object().id);
             x.emplace_back(p->clone());
         }
@@ -209,8 +210,8 @@ void GlobalProcessor::visit_class(ClassNode& node) {
     for (const auto& f: node.static_methods) {
         FunctionNode& method = *f.second;
         VectorOfTypes x;
-        for (auto* p: method.parameter_types) {
-            this->module->fill_actual(p);
+        for (auto& p: method.parameter_types) {
+            this->module->fill_actual(*p);
             // p->object().actual_base_path = this->get_actual_path(p->object().id);
             x.emplace_back(p->clone());
         }
@@ -284,6 +285,10 @@ Path Module::get_actual_path(const std::string& id) {
         return this->imported_paths_no_alias[id];
     }
     throw std::runtime_error("Error: type " + id + " not found");
+}
+
+void Module::fill_actual(TypeNode& t) {
+    return this->fill_actual(&t);
 }
 
 void Module::fill_actual(TypeNode* t) {

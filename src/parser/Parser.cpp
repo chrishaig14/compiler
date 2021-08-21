@@ -687,7 +687,7 @@ std::unique_ptr<FunctionNode> Parser::parse_function_definition() {
     Token matched_token = this->expect_token(TokType::ID);
     std::string identifier = matched_token.str;
     this->expect_token(TokType::LPAREN);
-    VectorOfTypes parameter_types;
+    VectorOfUTypes parameter_types;
     VectorOfStrings parameter_names;
 
     if (!this->match(TokType::RPAREN) && !this->match(TokType::ID)) {
@@ -704,8 +704,8 @@ std::unique_ptr<FunctionNode> Parser::parse_function_definition() {
             while (true) {
                 Token parameter_identifier = this->expect_token(TokType::ID);
                 this->expect_token(TokType::COLON);
-                TypeNode* parameter_type = this->parse_type_node().release();
-                parameter_types.push_back(parameter_type);
+                UTypeNode parameter_type = this->parse_type_node();
+                parameter_types.push_back(std::move(parameter_type));
                 parameter_names.push_back(parameter_identifier.str);
                 if (this->match(TokType::COMMA)) {
                     this->next();

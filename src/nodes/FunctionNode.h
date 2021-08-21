@@ -26,10 +26,10 @@ public:
     Implicit* implicit;
     std::string identifier;
     VectorOfStrings parameter_names;
-    VectorOfTypes parameter_types;
+    VectorOfUTypes parameter_types;
     std::unique_ptr<BlockNode> body;
     TypeNode* return_type;
-    FunctionNode(std::string identifier, const VectorOfStrings& parameter_names, const VectorOfTypes& parameter_types,
+    FunctionNode(std::string identifier, const VectorOfStrings& parameter_names, VectorOfUTypes& parameter_types,
                  TypeNode* return_type, std::unique_ptr<BlockNode>& body, TextPosition start, TextPosition end);
 
     bool equal(const Node& x) const override;
