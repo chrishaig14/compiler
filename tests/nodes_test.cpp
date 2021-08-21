@@ -374,8 +374,10 @@ TEST_CASE("nodes_class_empty", "[class]") {
 }
 
 TEST_CASE("nodes_class_full", "[class]") {
-    ObjectType* t1 = new ObjectType("Integer");
-    ObjectType* t2 = new ObjectType("String");
+    ObjectType t1o("Integer");
+    ObjectType t2o("String");
+    auto* t1 = &t1o;
+    auto* t2 = &t2o;
     VectorOfStrings members_ordered = {"foo", "bar"};
     ObjectType* rt = new ObjectType("Integer");
     std::unique_ptr<BlockNode> b1 = BlockNode::make(VectorOfNodesU{}, DUMMY_POS, DUMMY_POS);
