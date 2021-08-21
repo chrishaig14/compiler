@@ -31,15 +31,15 @@ bool FunctionNode::equal(const Node& x) const {
 }
 
 FunctionNode::FunctionNode(std::string identifier, VectorOfStrings parameter_names,
-                           const VectorOfTypes& parameter_types, TypeNode* return_type, BlockNode* body,
-                           TextPosition start, TextPosition end) : Node(NodeType::FUNC, start, end), body(body),
-                                                                   return_type(return_type) {
+                           const VectorOfTypes& parameter_types, TypeNode* return_type,
+                           std::unique_ptr<BlockNode>& body, TextPosition start, TextPosition end)
+        : Node(NodeType::FUNC, start, end), body(std::move(body)), return_type(return_type) {
     for (auto p: parameter_types) {
         assert(p != nullptr);
     }
     this->implicit = nullptr;
-    assert(return_type != nullptr);
-    assert(body != nullptr);
+    // assert(return_type != nullptr);
+    // assert(body != nullptr);
     this->identifier = identifier;
     this->parameter_names = parameter_names;
     this->parameter_types = parameter_types;

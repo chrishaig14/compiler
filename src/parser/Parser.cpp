@@ -758,7 +758,7 @@ std::unique_ptr<FunctionNode> Parser::parse_function_definition() {
                                                parameter_names,
                                                parameter_types,
                                                return_type,
-                                               body.release(),
+                                               body,
                                                fun_tok.start,
                                                body->end);
     node->implicit = implicit;

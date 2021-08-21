@@ -140,7 +140,7 @@ TestNodeU FUNCTION() {
                                                        VectorOfStrings{ID_1, ID_2},
                                                        VectorOfTypes{TYPE_1.node->clone(), TYPE_2.node->clone()},
                                                        TYPE_3.node->clone(),
-                                                       (BlockNode*) block.node.release(),
+                                                       (std::unique_ptr<BlockNode>&) block.node,
                                                        DUMMY_POS,
                                                        DUMMY_POS)};
 }
@@ -322,7 +322,7 @@ TEST_CASE("parse_fun_simple", "[parser]") {
                                            VectorOfStrings{},
                                            VectorOfTypes{},
                                            NO_TYPE.clone(),
-                                           (BlockNode*) BLOCK.node.release(),
+                                           (std::unique_ptr<BlockNode>&) BLOCK.node,
                                            DUMMY_POS,
                                            DUMMY_POS).to_json());
 }
@@ -339,7 +339,7 @@ TEST_CASE("parse_fun_one_arg", "[parser]") {
     std::unique_ptr<FunctionNode> ast = parser.parse_function_definition();
 
     REQUIRE(ast->to_json() ==
-            FunctionNode(ID, {ID_1}, {TYPE.node->clone()}, NO_TYPE.clone(), (BlockNode*) BLOCK.node.release(),
+            FunctionNode(ID, {ID_1}, {TYPE.node->clone()}, NO_TYPE.clone(), (std::unique_ptr<BlockNode>&) BLOCK.node,
 
                          DUMMY_POS, DUMMY_POS).to_json());
 }
@@ -359,7 +359,7 @@ TEST_CASE("parse_fun_mult_arg", "[parser]") {
                                            {ID_1, ID_2},
                                            {TYPE_1.node->clone(), TYPE_2.node->clone()},
                                            NO_TYPE.clone(),
-                                           (BlockNode*) BLOCK.node.release(),
+                                           (std::unique_ptr<BlockNode>&) BLOCK.node,
                                            DUMMY_POS,
                                            DUMMY_POS).to_json());
 }
@@ -941,20 +941,22 @@ TEST_CASE("parse_instance", "[parser]") {
     parser.top_package_name = "main";
 
     std::unique_ptr<InstanceNode> ast = parser.parse_instance();
+    std::unique_ptr<BlockNode> b2 = std::make_unique<BlockNode>(VectorOfNodesU{}, DUMMY_POS, DUMMY_POS);
+    std::unique_ptr<BlockNode> b1 = std::make_unique<BlockNode>(VectorOfNodesU{}, DUMMY_POS, DUMMY_POS);
     REQUIRE(ast->to_json() == InstanceNode("Comparable",
                                            new ObjectType("Foo"),
                                            {{"eq", new FunctionNode("eq",
                                                                     {"a", "b"},
                                                                     {new ObjectType("Foo"), new ObjectType("Foo")},
                                                                     new ObjectType("Boolean"),
-                                                                    new BlockNode({}, DUMMY_POS, DUMMY_POS),
+                                                                    b1,
                                                                     DUMMY_POS,
                                                                     DUMMY_POS)},
                                             {"ne", new FunctionNode("ne",
                                                                     {"a", "b"},
                                                                     {new ObjectType("Foo"), new ObjectType("Foo")},
                                                                     new ObjectType("Boolean"),
-                                                                    new BlockNode({}, DUMMY_POS, DUMMY_POS),
+                                                                    b2,
                                                                     DUMMY_POS,
                                                                     DUMMY_POS)}},
                                            DUMMY_POS,

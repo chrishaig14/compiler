@@ -27,10 +27,10 @@ public:
     std::string identifier;
     VectorOfStrings parameter_names;
     VectorOfTypes parameter_types;
-    BlockNode* body;
+    std::unique_ptr<BlockNode> body;
     TypeNode* return_type;
     FunctionNode(std::string identifier, VectorOfStrings parameter_names, const VectorOfTypes& parameter_types,
-                 TypeNode* return_type, BlockNode* body, TextPosition start, TextPosition end);
+                 TypeNode* return_type, std::unique_ptr<BlockNode>& body, TextPosition start, TextPosition end);
 
     bool equal(const Node& x) const override;
 
