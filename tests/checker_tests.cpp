@@ -479,9 +479,9 @@ TEST_CASE("binop_error", "[checker]") {
     REQUIRE(checker.error_reporter.errors.size() == 1);
 
     Error& error = *checker.error_reporter.errors.back();
-    StringNode left("Hello", _POS, _POS);
-    StringNode right("Bye", _POS, _POS);
-    BinopNode node(OpType::SUB, &left, &right, _POS, _POS);
+    std::unique_ptr<Node> left = std::make_unique<StringNode>("Hello", _POS, _POS);
+    std::unique_ptr<Node> right = std::make_unique<StringNode>("Bye", _POS, _POS);
+    BinopNode node(OpType::SUB, left, right, _POS, _POS);
     ObjectType expected("Integer");
     ErrorClassNoMethodForOp exp("String", "__sub__", node);
     REQUIRE(error == exp);

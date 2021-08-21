@@ -273,12 +273,12 @@ TEST_CASE("nodes_subscript", "[subscript]") {
 }
 
 TEST_CASE("nodes_binop", "[binop]") {
-    IdNode* a = new IdNode("foo", DUMMY_POS, DUMMY_POS);
-    NumberNode* b = new NumberNode(NumberType::INTEGER, "9", DUMMY_POS, DUMMY_POS);
-    BinopNode n(OpType::ADD, a, b, DUMMY_POS, DUMMY_POS);
-    nlohmann::json nj = n.to_json();
+    std::unique_ptr<Node> a = std::make_unique<IdNode>("foo", DUMMY_POS, DUMMY_POS);
+    std::unique_ptr<Node> b = std::make_unique<NumberNode>(NumberType::INTEGER, "9", DUMMY_POS, DUMMY_POS);
     nlohmann::json e = {{"type",  "binop"},
                         {"binop", {{"left", a->to_json()}, {"right", b->to_json()}, {"op", op_to_string(OpType::ADD)}}}};
+    BinopNode n(OpType::ADD, a, b, DUMMY_POS, DUMMY_POS);
+    nlohmann::json nj = n.to_json();
     REQUIRE(e == nj);
 }
 

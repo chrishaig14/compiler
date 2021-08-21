@@ -168,7 +168,9 @@ std::unique_ptr<Node> Parser::parse_assignment_or_expression() {
         }
         auto rvalue = this->parse_expression();
         if (lvalue->ntype == NodeType::ID) {
-            auto* id_node = new IdNode(((IdNode&) *lvalue)._id, lvalue->start, lvalue->end);
+            std::unique_ptr<Node> id_node = std::make_unique<IdNode>(((IdNode&) *lvalue)._id,
+                                                                     lvalue->start,
+                                                                     lvalue->end);
             if (op == TokType::PLUS_EQQ || op == TokType::MINUS_EQQ) {
                 OpType opt;
                 if (op == TokType::PLUS_EQQ) {
@@ -176,8 +178,7 @@ std::unique_ptr<Node> Parser::parse_assignment_or_expression() {
                 } else if (op == TokType::MINUS_EQQ) {
                     opt = OpType::SUB;
                 }
-                auto rp = rvalue.release();
-                auto bnode = std::make_unique<BinopNode>(opt, id_node, rp, id_node->start, rp->end);
+                auto bnode = std::make_unique<BinopNode>(opt, id_node, rvalue, id_node->start, rvalue->end);
                 bnode->op_pos = op_pos;
                 rvalue = std::move(bnode);
             }
@@ -255,9 +256,7 @@ std::unique_ptr<Node> Parser::parse_add_or_sub_expression() {
         Token op_token = this->token;
         this->next();
         auto right = this->parse_mul_div_or_mod_expression();
-        auto lp = left.release();
-        auto rp = right.release();
-        auto node = std::make_unique<BinopNode>(op, lp, rp, lp->start, rp->end);
+        auto node = std::make_unique<BinopNode>(op, left, right, left->start, right->end);
         node->op_pos = op_token.start;
         left = std::move(node);
     }
@@ -272,9 +271,7 @@ std::unique_ptr<Node> Parser::parse_mul_div_or_mod_expression() {
         Token op_token = this->token;
         this->next();
         auto right = this->parse_factor();
-        auto lp = left.release();
-        auto rp = right.release();
-        auto node = std::make_unique<BinopNode>(op, lp, rp, lp->start, rp->end);
+        auto node = std::make_unique<BinopNode>(op, left, right, left->start, right->end);
         node->op_pos = op_token.start;
         left = std::move(node);
     }
