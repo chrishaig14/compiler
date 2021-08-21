@@ -132,7 +132,7 @@ TEST_CASE("nodes_if_no_else", "[if]") {
 }
 
 TEST_CASE("nodes_if_with_else", "[if]") {
-    IdNode* c = new IdNode("foo", DUMMY_POS, DUMMY_POS);
+    std::unique_ptr<Node> c = std::make_unique<IdNode>("foo", DUMMY_POS, DUMMY_POS);
     std::unique_ptr<Node> n1 = std::make_unique<NumberNode>(NumberType::INTEGER, "7", DUMMY_POS, DUMMY_POS);
     std::unique_ptr<DeclarationNode> d = std::make_unique<DeclarationNode>("foo",
                                                                            nullptr,
@@ -142,31 +142,31 @@ TEST_CASE("nodes_if_with_else", "[if]") {
                                                                            DUMMY_POS);
     VectorOfNodesU vector;
     vector.push_back(std::move(d));
-    BlockNode* t = new BlockNode(std::move(vector), DUMMY_POS, DUMMY_POS);
+    std::unique_ptr<BlockNode> t = std::make_unique<BlockNode>(std::move(vector), DUMMY_POS, DUMMY_POS);
     VectorOfNodesU v;
     std::unique_ptr<Node> n2 = std::make_unique<NumberNode>(NumberType::INTEGER, "9", DUMMY_POS, DUMMY_POS);
     v.push_back(std::make_unique<DeclarationNode>("bar", nullptr, n2, DUMMY_POS, DUMMY_POS, DUMMY_POS));
-    BlockNode* l = new BlockNode(std::move(v), DUMMY_POS, DUMMY_POS);
-    IfNode n(c, t, {}, l, DUMMY_POS, DUMMY_POS);
-    nlohmann::json nj = n.to_json();
+    std::unique_ptr<BlockNode> l = std::make_unique<BlockNode>(std::move(v), DUMMY_POS, DUMMY_POS);
     nlohmann::json e = {{"type", "if"}};
     e["if"]["condition"] = c->to_json();
     e["if"]["then"] = t->to_json();
     e["if"]["elifs"] = nlohmann::json::array();
     e["if"]["else"] = l->to_json();
+    IfNode n(c, t, {}, l, DUMMY_POS, DUMMY_POS);
+    nlohmann::json nj = n.to_json();
     REQUIRE(e == nj);
 }
 
 TEST_CASE("nodes_if_with_elif", "[if]") {
-    IdNode* c = new IdNode("foo", DUMMY_POS, DUMMY_POS);
+    std::unique_ptr<Node> c = std::make_unique<IdNode>("foo", DUMMY_POS, DUMMY_POS);
     VectorOfNodesU v;
     std::unique_ptr<Node> n1 = std::make_unique<NumberNode>(NumberType::INTEGER, "7", DUMMY_POS, DUMMY_POS);
     v.push_back(std::make_unique<DeclarationNode>("foo", nullptr, n1, DUMMY_POS, DUMMY_POS, DUMMY_POS));
-    BlockNode* t = new BlockNode(std::move(v), DUMMY_POS, DUMMY_POS);
+    std::unique_ptr<BlockNode> t = std::make_unique<BlockNode>(std::move(v), DUMMY_POS, DUMMY_POS);
     VectorOfNodesU v2;
     std::unique_ptr<Node> n2 = std::make_unique<NumberNode>(NumberType::INTEGER, "9", DUMMY_POS, DUMMY_POS);
     v2.push_back(std::make_unique<DeclarationNode>("bar", nullptr, n2, DUMMY_POS, DUMMY_POS, DUMMY_POS));
-    BlockNode* l = new BlockNode(std::move(v2), DUMMY_POS, DUMMY_POS);
+    std::unique_ptr<BlockNode> l = std::make_unique<BlockNode>(std::move(v2), DUMMY_POS, DUMMY_POS);
     VectorOfNodesU v3;
     std::unique_ptr<Node> n3 = std::make_unique<NumberNode>(NumberType::INTEGER, "9", DUMMY_POS, DUMMY_POS);
     v3.push_back(std::make_unique<DeclarationNode>("bar", nullptr, n3, DUMMY_POS, DUMMY_POS, DUMMY_POS));
@@ -178,6 +178,14 @@ TEST_CASE("nodes_if_with_elif", "[if]") {
 
     IdNode* elif_cond_0 = new IdNode("a", DUMMY_POS, DUMMY_POS);
     IdNode* elif_cond_1 = new IdNode("b", DUMMY_POS, DUMMY_POS);
+
+    nlohmann::json e = {{"type", "if"}};
+    e["if"]["condition"] = c->to_json();
+    e["if"]["elifs"] = nlohmann::json::array({{{"condition", elif_cond_0->to_json()}, {"then", elif_body_0->to_json()}},
+                                              {{"condition", elif_cond_1->to_json()}, {"then", elif_body_1->to_json()}}});
+    e["if"]["then"] = t->to_json();
+    e["if"]["else"] = l->to_json();
+
     IfNode n(c,
              t,
              {{elif_cond_0, elif_body_0},
@@ -186,12 +194,7 @@ TEST_CASE("nodes_if_with_elif", "[if]") {
              DUMMY_POS,
              DUMMY_POS);
     nlohmann::json nj = n.to_json();
-    nlohmann::json e = {{"type", "if"}};
-    e["if"]["condition"] = c->to_json();
-    e["if"]["elifs"] = nlohmann::json::array({{{"condition", elif_cond_0->to_json()}, {"then", elif_body_0->to_json()}},
-                                              {{"condition", elif_cond_1->to_json()}, {"then", elif_body_1->to_json()}}});
-    e["if"]["then"] = t->to_json();
-    e["if"]["else"] = l->to_json();
+
     REQUIRE(e == nj);
 }
 

@@ -89,17 +89,23 @@ TestNodeU ASSIGNMENT() {
             std::make_unique<AssignmentNode>(exp_id_1_U.node, expression_1_U.node, DUMMY_POS, DUMMY_POS)};
 }
 
-const TestNode EMPTY_BLOCK{"{}", new BlockNode(VectorOfNodesU{}, DUMMY_POS, DUMMY_POS)};
+// const TestNode EMPTY_BLOCK{"{}", new BlockNode(VectorOfNodesU{}, DUMMY_POS, DUMMY_POS)};
+
+TestNodeU EMPTY_BLOCK_U() {
+    return {"{}", std::make_unique<BlockNode>(VectorOfNodesU{}, DUMMY_POS, DUMMY_POS)};
+}
 
 // const TestNode IF{"if(" + EXPRESSION.text + ")" + EMPTY_BLOCK.text,
 //                   new IfNode(EXPRESSION.node, (BlockNode*) EMPTY_BLOCK.node, {}, nullptr, DUMMY_POS, DUMMY_POS)};
 //
 TestNodeU IF_U() {
     auto EXPRESSION = EXPRESSION_U();
-    return {"if(" + EXPRESSION.text + ")" + EMPTY_BLOCK.text, std::make_unique<IfNode>(EXPRESSION.node.release(),
-                                                                                       (BlockNode*) EMPTY_BLOCK.node,
+    auto EMPTY_BLOCK = EMPTY_BLOCK_U();
+    std::unique_ptr<BlockNode> u(nullptr);
+    return {"if(" + EXPRESSION.text + ")" + EMPTY_BLOCK.text, std::make_unique<IfNode>(EXPRESSION.node,
+                                                                                       (std::unique_ptr<BlockNode>&) EMPTY_BLOCK.node,
                                                                                        std::vector<std::pair<Node*, BlockNode*>>{},
-                                                                                       nullptr,
+                                                                                       u,
                                                                                        DUMMY_POS,
                                                                                        DUMMY_POS)};
 }
@@ -210,10 +216,10 @@ TEST_CASE("parse_if_with_else", "[parser]") {
     parser.top_package_name = "main";
 
     std::unique_ptr<IfNode> ast = parser.parse_if();
-    REQUIRE(ast->to_json() == IfNode(EXPRESSION.node.release(),
-                                     (BlockNode*) block.node.release(),
+    REQUIRE(ast->to_json() == IfNode(EXPRESSION.node,
+                                     (std::unique_ptr<BlockNode>&) block.node,
                                      {},
-                                     (BlockNode*) block_1.node.release(),
+                                     (std::unique_ptr<BlockNode>&) block_1.node,
                                      DUMMY_POS,
                                      DUMMY_POS).to_json());
 }
@@ -829,8 +835,7 @@ TEST_CASE("parse_member", "[parser]") {
 
     std::unique_ptr<Node> ast = parser.parse_factor();
 
-    REQUIRE(ast->to_json() ==
-            MemberNode(EXPRESSION.node, Token(TokType::ID, ID, DUMMY_POS, DUMMY_POS)).to_json());
+    REQUIRE(ast->to_json() == MemberNode(EXPRESSION.node, Token(TokType::ID, ID, DUMMY_POS, DUMMY_POS)).to_json());
 }
 
 TEST_CASE("parse_subscript", "[parser]") {

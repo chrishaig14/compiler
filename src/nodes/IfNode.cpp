@@ -31,11 +31,12 @@ bool IfNode::equal(const Node& x) const {
 
 }
 
-IfNode::IfNode(Node* condition, BlockNode* then, std::vector<std::pair<Node*, BlockNode*>> elifs, BlockNode* selse,
-               TextPosition start, TextPosition end) : Node(NodeType::IFF, start, end), condition(condition),
-                                                       then(then), selse(selse), elifs(elifs) {
-    assert(condition != nullptr);
-    assert(then != nullptr);
+IfNode::IfNode(std::unique_ptr<Node>& condition, std::unique_ptr<BlockNode>& then,
+               std::vector<std::pair<Node*, BlockNode*>> elifs, std::unique_ptr<BlockNode>& selse, TextPosition start,
+               TextPosition end) : Node(NodeType::IFF, start, end), condition(std::move(condition)),
+                                   then(std::move(then)), selse(std::move(selse)), elifs(elifs) {
+    // assert(condition != nullptr);
+    // assert(then != nullptr);
 }
 
 IfNode::~IfNode() {

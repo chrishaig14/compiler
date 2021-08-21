@@ -89,10 +89,10 @@ std::unique_ptr<IfNode> Parser::parse_if() {
         this->next();
         _else = this->parse_possibly_empty_block();
     }
-    auto iff = std::make_unique<IfNode>(condition.release(),
-                                        body.release(),
+    auto iff = std::make_unique<IfNode>(condition,
+                                        body,
                                         elifs,
-                                        _else.release(),
+                                        _else,
                                         if_tok.start,
                                         if_tok.end_pos);
     iff->start = if_tok.start;

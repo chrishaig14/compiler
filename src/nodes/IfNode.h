@@ -14,12 +14,13 @@
 
 class IfNode : public Node {
 public:
-    Node* condition;
-    BlockNode* then;
-    BlockNode* selse;
+    std::unique_ptr<Node> condition;
+    std::unique_ptr<BlockNode> then;
+    std::unique_ptr<BlockNode> selse;
     std::vector<std::pair<Node*, BlockNode*>> elifs;
-    IfNode(Node* condition, BlockNode* then, std::vector<std::pair<Node*, BlockNode*>> elifs, BlockNode* selse,
-           TextPosition start, TextPosition end);
+    IfNode(std::unique_ptr<Node>& condition, std::unique_ptr<BlockNode>& then,
+           std::vector<std::pair<Node*, BlockNode*>> elifs, std::unique_ptr<BlockNode>& selse, TextPosition start,
+           TextPosition end);
 
     bool equal(const Node& other) const override;
 
