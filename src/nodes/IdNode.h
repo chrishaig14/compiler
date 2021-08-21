@@ -19,6 +19,10 @@ public:
 
     IdNode(std::string identifier, TextPosition start, TextPosition end);
 
+    static UIdNode make(std::string identifier, TextPosition start, TextPosition end) {
+        return std::make_unique<IdNode>(identifier, start, end);
+    }
+
     bool equal(const Node& other) const override;
 
     nlohmann::json to_json() const override;

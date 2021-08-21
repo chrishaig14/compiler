@@ -35,18 +35,18 @@ const TestNode EXP_ID_1{"foo", new IdNode("foo", DUMMY_POS, DUMMY_POS)};
 const TestNode EXP_ID_2{"bar", new IdNode("bar", DUMMY_POS, DUMMY_POS)};
 
 TestNodeU EXP_ID_1_U() {
-    return {"foo", std::make_unique<IdNode>("foo", DUMMY_POS, DUMMY_POS)};
+    return {"foo", IdNode::make("foo", DUMMY_POS, DUMMY_POS)};
 }
 
 TestNodeU EXP_ID_2_U() {
-    return {"bar", std::make_unique<IdNode>("bar", DUMMY_POS, DUMMY_POS)};
+    return {"bar", IdNode::make("bar", DUMMY_POS, DUMMY_POS)};
 }
 
 // const TestNode EXPRESSION{"x", new IdNode("x", DUMMY_POS, DUMMY_POS)};
 // const TestNode FACTOR_EXPRESSION = EXPRESSION;
 
 TestNodeU EXPRESSION_U() {
-    return {"x", std::make_unique<IdNode>("x", DUMMY_POS, DUMMY_POS)};
+    return {"x", IdNode::make("x", DUMMY_POS, DUMMY_POS)};
 }
 
 TestNodeU FACTOR_U() {

@@ -163,7 +163,7 @@ UNode Parser::parse_assignment_or_expression() {
         }
         auto rvalue = this->parse_expression();
         if (lvalue->ntype == NodeType::ID) {
-            UNode id_node = std::make_unique<IdNode>(((IdNode&) *lvalue)._id, lvalue->start, lvalue->end);
+            UNode id_node = IdNode::make(((IdNode&) *lvalue)._id, lvalue->start, lvalue->end);
             if (op == TokType::PLUS_EQQ || op == TokType::MINUS_EQQ) {
                 OpType opt;
                 if (op == TokType::PLUS_EQQ) {
@@ -452,7 +452,7 @@ UNode Parser::parse_tuple_or_constructor() {
     this->next();
     if (this->match(TokType::ID)) {
         Token idd = this->expect_token(TokType::ID);
-        UNode m = std::make_unique<IdNode>(idd.str, this->token.start, this->token.end_pos);
+        UNode m = IdNode::make(idd.str, this->token.start, this->token.end_pos);
         while (this->match(TokType::DOT)) {
             this->next();
             idd = this->expect_token(TokType::ID);
@@ -498,7 +498,7 @@ UNode Parser::parse_tuple_literal() {
 
 UNode Parser::parse_id_or_class_literal() {
     std::string identifier = this->token.str;
-    auto node = std::make_unique<IdNode>(identifier, this->token.start, this->token.end_pos);
+    auto node = IdNode::make(identifier, this->token.start, this->token.end_pos);
     this->next();
     return node;
 }

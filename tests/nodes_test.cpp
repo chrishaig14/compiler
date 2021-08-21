@@ -70,7 +70,7 @@ TEST_CASE("nodes_list", "[list]") {
 }
 
 TEST_CASE("nodes_call_no_args", "[call]") {
-    UNode f = std::make_unique<IdNode>("foo", DUMMY_POS, DUMMY_POS);
+    UNode f = IdNode::make("foo", DUMMY_POS, DUMMY_POS);
     VectorOfNodesU vector;
     nlohmann::json e = {{"type", "call"},
                         {"call", {{"function", f->to_json()}, {"arguments", nlohmann::json::array()}}}};
@@ -81,8 +81,8 @@ TEST_CASE("nodes_call_no_args", "[call]") {
 }
 
 TEST_CASE("nodes_call", "[call]") {
-    UNode f = std::make_unique<IdNode>("foo", DUMMY_POS, DUMMY_POS);
-    UNode arg_0 = std::make_unique<IdNode>("bar", DUMMY_POS, DUMMY_POS);
+    UNode f = IdNode::make("foo", DUMMY_POS, DUMMY_POS);
+    UNode arg_0 = IdNode::make("bar", DUMMY_POS, DUMMY_POS);
     UNode arg_1 = NumberNode::make(NumberType::INTEGER, "3", DUMMY_POS, DUMMY_POS);
     nlohmann::json e = {{"type", "call"},
                         {"call", {{"function", f->to_json()}, {"arguments", {arg_0->to_json(), arg_1->to_json()}}}}};
@@ -95,7 +95,7 @@ TEST_CASE("nodes_call", "[call]") {
 }
 
 TEST_CASE("nodes_assignment", "[assignment]") {
-    UNode l = std::make_unique<IdNode>("foo", DUMMY_POS, DUMMY_POS);
+    UNode l = IdNode::make("foo", DUMMY_POS, DUMMY_POS);
     UNode r = NumberNode::make(NumberType::INTEGER, "7", DUMMY_POS, DUMMY_POS);
 
     nlohmann::json e = {{"type",       "assignment"},
@@ -137,7 +137,7 @@ TEST_CASE("nodes_if_no_else", "[if]") {
 }
 
 TEST_CASE("nodes_if_with_else", "[if]") {
-    UNode c = std::make_unique<IdNode>("foo", DUMMY_POS, DUMMY_POS);
+    UNode c = IdNode::make("foo", DUMMY_POS, DUMMY_POS);
     UNode n1 = NumberNode::make(NumberType::INTEGER, "7", DUMMY_POS, DUMMY_POS);
     std::unique_ptr<DeclarationNode> d = std::make_unique<DeclarationNode>("foo",
                                                                            nullptr,
@@ -163,7 +163,7 @@ TEST_CASE("nodes_if_with_else", "[if]") {
 }
 
 TEST_CASE("nodes_if_with_elif", "[if]") {
-    UNode c = std::make_unique<IdNode>("foo", DUMMY_POS, DUMMY_POS);
+    UNode c = IdNode::make("foo", DUMMY_POS, DUMMY_POS);
     VectorOfNodesU v;
     UNode n1 = NumberNode::make(NumberType::INTEGER, "7", DUMMY_POS, DUMMY_POS);
     v.push_back(std::make_unique<DeclarationNode>("foo", nullptr, n1, DUMMY_POS, DUMMY_POS, DUMMY_POS));
@@ -206,7 +206,7 @@ TEST_CASE("nodes_if_with_elif", "[if]") {
 TEST_CASE("nodes_for", "[for]") {
     VectorOfNodesU v;
     std::unique_ptr<BlockNode> b = BlockNode::make(std::move(v), DUMMY_POS, DUMMY_POS);
-    UNode exp = std::make_unique<IdNode>("bar", DUMMY_POS, DUMMY_POS);
+    UNode exp = IdNode::make("bar", DUMMY_POS, DUMMY_POS);
     nlohmann::json e = {{"type", "for"},
                         {"for",  {{"var", "foo"}, {"exp", exp->to_json()}, {"body", b->to_json()}}}};
     ForNode n("foo", exp, b, DUMMY_POS, DUMMY_POS);
@@ -253,7 +253,7 @@ TEST_CASE("nodes_return_with_value", "[return]") {
 }
 
 TEST_CASE("nodes_subscript", "[subscript]") {
-    UNode i = std::make_unique<IdNode>("foo", DUMMY_POS, DUMMY_POS);
+    UNode i = IdNode::make("foo", DUMMY_POS, DUMMY_POS);
     UNode s = NumberNode::make(NumberType::INTEGER, "9", DUMMY_POS, DUMMY_POS);
     nlohmann::json e = {{"type",      "subscript"},
                         {"subscript", {{"parent", i->to_json()}, {"child", s->to_json()}}}};
@@ -266,7 +266,7 @@ TEST_CASE("nodes_subscript", "[subscript]") {
 }
 
 TEST_CASE("nodes_binop", "[binop]") {
-    UNode a = std::make_unique<IdNode>("foo", DUMMY_POS, DUMMY_POS);
+    UNode a = IdNode::make("foo", DUMMY_POS, DUMMY_POS);
     UNode b = NumberNode::make(NumberType::INTEGER, "9", DUMMY_POS, DUMMY_POS);
     nlohmann::json e = {{"type",  "binop"},
                         {"binop", {{"left", a->to_json()}, {"right", b->to_json()}, {"op", op_to_string(OpType::ADD)}}}};
@@ -311,7 +311,7 @@ TEST_CASE("nodes_dict", "[dict]") {
 }
 
 TEST_CASE("nodes_member", "[member]") {
-    UNode p = std::make_unique<IdNode>("foo", DUMMY_POS, DUMMY_POS);
+    UNode p = IdNode::make("foo", DUMMY_POS, DUMMY_POS);
     nlohmann::json e = {{"type",   "member"},
                         {"member", {{"parent", p->to_json()}, {"child", "bar"}}}};
     MemberNode n(p, Token(TokType::ID, "bar", DUMMY_POS));
@@ -344,8 +344,8 @@ TEST_CASE("nodes_function_args", "[function]") {
 
 TEST_CASE("nodes_while", "[while]") {
     std::unique_ptr<BlockNode> body = BlockNode::make(VectorOfNodesU{}, DUMMY_POS, DUMMY_POS);
-    UNode a = std::make_unique<IdNode>("bar", DUMMY_POS, DUMMY_POS);
-    UNode b = std::make_unique<IdNode>("baz", DUMMY_POS, DUMMY_POS);
+    UNode a = IdNode::make("bar", DUMMY_POS, DUMMY_POS);
+    UNode b = IdNode::make("baz", DUMMY_POS, DUMMY_POS);
     std::unique_ptr<Node> cond = std::make_unique<BoolOpNode>(BoolOp::EQ, a, b, DUMMY_POS, DUMMY_POS);
     nlohmann::json e = {{"type",  "while"},
                         {"while", {{"condition", cond->to_json()}, {"body", body->to_json()}}}};
