@@ -541,7 +541,10 @@ TEST_CASE("subscript_no_method_error", "[checker]") {
     Error& error = *checker.error_reporter.errors.back();
     StringNode left("Hello", _POS, _POS);
     StringNode right("Bye", _POS, _POS);
-    SubscriptNode node(new IdNode("f", _POS, _POS), {new NumberNode(NumberType::INTEGER, "1", _POS, _POS)}, _POS, _POS);
+    UNode p_node = std::make_unique<IdNode>("f", _POS, _POS);
+    VectorOfNodesU v;
+    v.push_back(std::make_unique<NumberNode>(NumberType::INTEGER, "1", _POS, _POS));
+    SubscriptNode node(p_node, v, _POS, _POS);
     ObjectType expected("Integer");
     ObjectType type("Foo");
     ErrorObjectNoSpecialMethod exp(type, "__get_item__", node);

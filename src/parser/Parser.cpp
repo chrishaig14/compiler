@@ -528,11 +528,10 @@ UNode Parser::parse_call_or_subscript_chain(UNode& parent) {
             this->next();
             auto value = this->parse_expression();
             Token close = this->expect_token(TokType::RSQUARE);
-            Node* old_node = node.release();
-            node = std::make_unique<SubscriptNode>(old_node,
-                                                   VectorOfNodes({value.release()}),
-                                                   old_node->start,
-                                                   close.end_pos);
+            UNode old_node = std::move(node);
+            VectorOfNodesU v;
+            v.push_back(std::move(value));
+            node = std::make_unique<SubscriptNode>(old_node, v, old_node->start, close.end_pos);
         }
     }
     return node;

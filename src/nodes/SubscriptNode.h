@@ -15,10 +15,10 @@
 class SubscriptNode : public Node {
 
 public:
-    SubscriptNode(Node* parent, VectorOfNodes child, TextPosition start, TextPosition end);
+    SubscriptNode(UNode& parent, VectorOfNodesU& child, TextPosition start, TextPosition end);
     TypeNode* parent_t;
-    Node* parent;
-    VectorOfNodes child;
+    UNode parent;
+    VectorOfNodesU child;
 
     bool equal(const Node& other) const override;
 

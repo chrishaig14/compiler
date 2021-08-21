@@ -253,12 +253,15 @@ TEST_CASE("nodes_return_with_value", "[return]") {
 }
 
 TEST_CASE("nodes_subscript", "[subscript]") {
-    IdNode* i = new IdNode("foo", DUMMY_POS, DUMMY_POS);
-    NumberNode* s = new NumberNode(NumberType::INTEGER, "9", DUMMY_POS, DUMMY_POS);
-    SubscriptNode n(i, {s}, DUMMY_POS, DUMMY_POS);
-    nlohmann::json nj = n.to_json();
+    UNode i = std::make_unique<IdNode>("foo", DUMMY_POS, DUMMY_POS);
+    UNode s = std::make_unique<NumberNode>(NumberType::INTEGER, "9", DUMMY_POS, DUMMY_POS);
     nlohmann::json e = {{"type",      "subscript"},
                         {"subscript", {{"parent", i->to_json()}, {"child", s->to_json()}}}};
+    VectorOfNodesU v;
+    v.push_back(std::move(s));
+    SubscriptNode n(i, v, DUMMY_POS, DUMMY_POS);
+    nlohmann::json nj = n.to_json();
+
     REQUIRE(e == nj);
 }
 

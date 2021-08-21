@@ -854,9 +854,9 @@ TEST_CASE("parse_subscript", "[parser]") {
     parser.top_package_name = "main";
 
     UNode ast = parser.parse_factor();
-
-    REQUIRE(ast->to_json() ==
-            SubscriptNode(EXPRESSION.node.release(), {EXPRESSION_2.node.release()}, DUMMY_POS, DUMMY_POS).to_json());
+    VectorOfNodesU v;
+    v.push_back(std::move(EXPRESSION_2.node));
+    REQUIRE(ast->to_json() == SubscriptNode(EXPRESSION.node, v, DUMMY_POS, DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_partial_one_arg", "[parser]") {
