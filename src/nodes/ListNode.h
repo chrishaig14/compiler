@@ -12,9 +12,9 @@
 
 class ListNode : public Node {
 public:
-    VectorOfNodes elements;
+    VectorOfNodesU elements;
 
-    ListNode(VectorOfNodes elements, TextPosition start, TextPosition end);
+    ListNode(VectorOfNodesU& elements, TextPosition start, TextPosition end);
 
     bool equal(const Node& other) const override;
 

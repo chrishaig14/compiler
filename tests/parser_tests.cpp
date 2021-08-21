@@ -223,7 +223,8 @@ TEST_CASE("parse_call_one_arg", "[parser]") {
     parser.top_package_name = "main";
 
     std::unique_ptr<Node> ast = parser.parse_expression();
-    REQUIRE(ast->to_json() == CallNode(FACTOR_EXPRESSION.node, {EXPRESSION_1.node.release()}, DUMMY_POS, DUMMY_POS).to_json());
+    REQUIRE(ast->to_json() ==
+            CallNode(FACTOR_EXPRESSION.node, {EXPRESSION_1.node.release()}, DUMMY_POS, DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_call_mult_arg", "[parser]") {
@@ -238,8 +239,10 @@ TEST_CASE("parse_call_mult_arg", "[parser]") {
     parser.top_package_name = "main";
 
     std::unique_ptr<Node> ast = parser.parse_expression();
-    REQUIRE(ast->to_json() ==
-    CallNode(FACTOR_EXPRESSION.node, {EXPRESSION_1.node.release(), EXPRESSION_2.node.release()}, DUMMY_POS, DUMMY_POS).to_json());
+    REQUIRE(ast->to_json() == CallNode(FACTOR_EXPRESSION.node,
+                                       {EXPRESSION_1.node.release(), EXPRESSION_2.node.release()},
+                                       DUMMY_POS,
+                                       DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_for", "[parser]") {
@@ -256,7 +259,7 @@ TEST_CASE("parse_for", "[parser]") {
 
     std::unique_ptr<ForNode> ast = parser.parse_for_loop();
     REQUIRE(ast->to_json() ==
-    ForNode(ID, EXPRESSION_1.node, (std::unique_ptr<BlockNode>&) BLOCK.node, DUMMY_POS, DUMMY_POS).to_json());
+            ForNode(ID, EXPRESSION_1.node, (std::unique_ptr<BlockNode>&) BLOCK.node, DUMMY_POS, DUMMY_POS).to_json());
 }
 
 
@@ -472,8 +475,9 @@ TEST_CASE("parse_list_one_element", "[parser]") {
     parser.top_package_name = "main";
 
     std::unique_ptr<Node> ast = parser.parse_list_literal();
-
-    REQUIRE(ast->to_json() == ListNode({EXPRESSION_1.node.release()}, DUMMY_POS, DUMMY_POS).to_json());
+    VectorOfNodesU v;
+    v.push_back(std::move(EXPRESSION_1.node));
+    REQUIRE(ast->to_json() == ListNode(v, DUMMY_POS, DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_list_mult_elements", "[parser]") {
@@ -487,8 +491,10 @@ TEST_CASE("parse_list_mult_elements", "[parser]") {
     parser.top_package_name = "main";
 
     std::unique_ptr<Node> ast = parser.parse_list_literal();
-
-    REQUIRE(ast->to_json() == ListNode({EXPRESSION_1.node.release(), EXPRESSION_2.node.release()}, DUMMY_POS, DUMMY_POS).to_json());
+    VectorOfNodesU v;
+    v.push_back(std::move(EXPRESSION_1.node));
+    v.push_back(std::move(EXPRESSION_2.node));
+    REQUIRE(ast->to_json() == ListNode(v, DUMMY_POS, DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_number_integer", "[parser]") {
@@ -595,7 +601,7 @@ TEST_CASE("parse_and_exp", "[parser]") {
     std::unique_ptr<Node> ast = parser.parse_and_expression();
 
     REQUIRE(ast->to_json() ==
-    BoolOpNode(BoolOp::AND, EXPRESSION_1.node, EXPRESSION_2.node , DUMMY_POS, DUMMY_POS).to_json());
+            BoolOpNode(BoolOp::AND, EXPRESSION_1.node, EXPRESSION_2.node, DUMMY_POS, DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_or_exp", "[parser]") {
@@ -611,7 +617,7 @@ TEST_CASE("parse_or_exp", "[parser]") {
     std::unique_ptr<Node> ast = parser.parse_or_expression();
 
     REQUIRE(ast->to_json() ==
-    BoolOpNode(BoolOp::OR, EXPRESSION_1.node, EXPRESSION_2.node, DUMMY_POS, DUMMY_POS).to_json());
+            BoolOpNode(BoolOp::OR, EXPRESSION_1.node, EXPRESSION_2.node, DUMMY_POS, DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_eq_exp", "[parser]") {
@@ -627,7 +633,7 @@ TEST_CASE("parse_eq_exp", "[parser]") {
     std::unique_ptr<Node> ast = parser.parse_and_expression();
 
     REQUIRE(ast->to_json() ==
-    BoolOpNode(BoolOp::EQ, EXPRESSION_1.node, EXPRESSION_2.node, DUMMY_POS, DUMMY_POS).to_json());
+            BoolOpNode(BoolOp::EQ, EXPRESSION_1.node, EXPRESSION_2.node, DUMMY_POS, DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_ge_exp", "[parser]") {
@@ -643,7 +649,7 @@ TEST_CASE("parse_ge_exp", "[parser]") {
     std::unique_ptr<Node> ast = parser.parse_and_expression();
 
     REQUIRE(ast->to_json() ==
-    BoolOpNode(BoolOp::GE, EXPRESSION_1.node, EXPRESSION_2.node, DUMMY_POS, DUMMY_POS).to_json());
+            BoolOpNode(BoolOp::GE, EXPRESSION_1.node, EXPRESSION_2.node, DUMMY_POS, DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_le_exp", "[parser]") {
@@ -659,7 +665,7 @@ TEST_CASE("parse_le_exp", "[parser]") {
     std::unique_ptr<Node> ast = parser.parse_and_expression();
 
     REQUIRE(ast->to_json() ==
-    BoolOpNode(BoolOp::LE, EXPRESSION_1.node, EXPRESSION_2.node, DUMMY_POS, DUMMY_POS).to_json());
+            BoolOpNode(BoolOp::LE, EXPRESSION_1.node, EXPRESSION_2.node, DUMMY_POS, DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_gt_exp", "[parser]") {
@@ -675,7 +681,7 @@ TEST_CASE("parse_gt_exp", "[parser]") {
     std::unique_ptr<Node> ast = parser.parse_and_expression();
 
     REQUIRE(ast->to_json() ==
-    BoolOpNode(BoolOp::GT, EXPRESSION_1.node, EXPRESSION_2.node, DUMMY_POS, DUMMY_POS).to_json());
+            BoolOpNode(BoolOp::GT, EXPRESSION_1.node, EXPRESSION_2.node, DUMMY_POS, DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_lt_exp", "[parser]") {
@@ -691,7 +697,7 @@ TEST_CASE("parse_lt_exp", "[parser]") {
     std::unique_ptr<Node> ast = parser.parse_and_expression();
 
     REQUIRE(ast->to_json() ==
-    BoolOpNode(BoolOp::LT, EXPRESSION_1.node, EXPRESSION_2.node, DUMMY_POS, DUMMY_POS).to_json());
+            BoolOpNode(BoolOp::LT, EXPRESSION_1.node, EXPRESSION_2.node, DUMMY_POS, DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_ne_exp", "[parser]") {
@@ -707,7 +713,7 @@ TEST_CASE("parse_ne_exp", "[parser]") {
     std::unique_ptr<Node> ast = parser.parse_and_expression();
 
     REQUIRE(ast->to_json() ==
-    BoolOpNode(BoolOp::NE, EXPRESSION_1.node, EXPRESSION_2.node, DUMMY_POS, DUMMY_POS).to_json());
+            BoolOpNode(BoolOp::NE, EXPRESSION_1.node, EXPRESSION_2.node, DUMMY_POS, DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_not_exp", "[parser]") {
@@ -736,7 +742,8 @@ TEST_CASE("parse_tuple", "[parser]") {
     std::unique_ptr<Node> ast = parser.parse_tuple_or_constructor();
     // auto EXPRESSION_1 = EXPRESSION_1_U();
     // auto EXPRESSION_2 = EXPRESSION_2_U();
-    REQUIRE(ast->to_json() == TupleNode({EXPRESSION_1.node.release(), EXPRESSION_2.node.release()}, DUMMY_POS, DUMMY_POS).to_json());
+    REQUIRE(ast->to_json() ==
+            TupleNode({EXPRESSION_1.node.release(), EXPRESSION_2.node.release()}, DUMMY_POS, DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_dict_empty", "[parser]") {

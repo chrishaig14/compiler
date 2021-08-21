@@ -55,13 +55,17 @@ TEST_CASE("nodes_id", "[id]") {
 }
 
 TEST_CASE("nodes_list", "[list]") {
-    NumberNode* a = new NumberNode(NumberType::INTEGER, "1", DUMMY_POS, DUMMY_POS);
-    NumberNode* b = new NumberNode(NumberType::INTEGER, "2", DUMMY_POS, DUMMY_POS);
-    NumberNode* c = new NumberNode(NumberType::INTEGER, "3", DUMMY_POS, DUMMY_POS);
-    ListNode n({a, b, c}, DUMMY_POS, DUMMY_POS);
-    nlohmann::json nj = n.to_json();
+    std::unique_ptr<Node> a = std::make_unique<NumberNode>(NumberType::INTEGER, "1", DUMMY_POS, DUMMY_POS);
+    std::unique_ptr<Node> b = std::make_unique<NumberNode>(NumberType::INTEGER, "2", DUMMY_POS, DUMMY_POS);
+    std::unique_ptr<Node> c = std::make_unique<NumberNode>(NumberType::INTEGER, "3", DUMMY_POS, DUMMY_POS);
     nlohmann::json e = {{"type", "list"},
                         {"list", {{"elements", nlohmann::json::array({a->to_json(), b->to_json(), c->to_json()})}}}};
+    VectorOfNodesU v;
+    v.push_back(std::move(a));
+    v.push_back(std::move(b));
+    v.push_back(std::move(c));
+    ListNode n(v, DUMMY_POS, DUMMY_POS);
+    nlohmann::json nj = n.to_json();
     REQUIRE(e == nj);
 }
 

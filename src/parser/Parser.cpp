@@ -101,7 +101,7 @@ std::unique_ptr<IfNode> Parser::parse_if() {
 
 std::unique_ptr<Node> Parser::parse_list_literal() {
     Token list_start = this->expect_token(TokType::LSQUARE);
-    VectorOfNodes elements;
+    VectorOfNodesU elements;
     if (this->match(TokType::RSQUARE)) {
         // empty list
         this->next();
@@ -113,7 +113,7 @@ std::unique_ptr<Node> Parser::parse_list_literal() {
     }
     while (true) {
         auto element = this->parse_expression();
-        elements.push_back(element.release());
+        elements.push_back(std::move(element));
         if (!this->match(TokType::COMMA)) {
             break;
         }

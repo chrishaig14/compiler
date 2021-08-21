@@ -5,8 +5,8 @@
 #include "ListNode.h"
 #include "../json/json.hpp"
 
-ListNode::ListNode(VectorOfNodes elements, TextPosition start, TextPosition end) : Node(NodeType::LST, start, end),
-                                                                                   elements(elements) {
+ListNode::ListNode(VectorOfNodesU& elements, TextPosition start, TextPosition end) : Node(NodeType::LST, start, end),
+                                                                                     elements(std::move(elements)) {
 }
 
 bool ListNode::equal(const Node& other) const {
@@ -31,7 +31,7 @@ nlohmann::json ListNode::to_json() const {
     nlohmann::json j;
     j["type"] = "list";
     std::vector<nlohmann::json> v;
-    for (auto x: this->elements) {
+    for (auto& x: this->elements) {
         v.push_back(x->to_json());
     }
     j["list"]["elements"] = v;
