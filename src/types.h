@@ -17,8 +17,11 @@ class BlockNode;
 
 class NumberNode;
 
+class BinopNode;
+
 class Instruction;
 
+typedef std::unique_ptr<BinopNode> UBinopNode;
 typedef std::unique_ptr<BlockNode> UBlockNode;
 typedef std::unique_ptr<NumberNode> UNumberNode;
 typedef std::unique_ptr<Node> UNode;

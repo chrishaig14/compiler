@@ -171,7 +171,7 @@ UNode Parser::parse_assignment_or_expression() {
                 } else if (op == TokType::MINUS_EQQ) {
                     opt = OpType::SUB;
                 }
-                auto bnode = std::make_unique<BinopNode>(opt, id_node, rvalue, id_node->start, rvalue->end);
+                auto bnode = BinopNode::make(opt, id_node, rvalue, id_node->start, rvalue->end);
                 bnode->op_pos = op_pos;
                 rvalue = std::move(bnode);
             }
@@ -247,7 +247,7 @@ UNode Parser::parse_add_or_sub_expression() {
         Token op_token = this->token;
         this->next();
         auto right = this->parse_mul_div_or_mod_expression();
-        auto node = std::make_unique<BinopNode>(op, left, right, left->start, right->end);
+        auto node = BinopNode::make(op, left, right, left->start, right->end);
         node->op_pos = op_token.start;
         left = std::move(node);
     }
@@ -262,7 +262,7 @@ UNode Parser::parse_mul_div_or_mod_expression() {
         Token op_token = this->token;
         this->next();
         auto right = this->parse_factor();
-        auto node = std::make_unique<BinopNode>(op, left, right, left->start, right->end);
+        auto node = BinopNode::make(op, left, right, left->start, right->end);
         node->op_pos = op_token.start;
         left = std::move(node);
     }

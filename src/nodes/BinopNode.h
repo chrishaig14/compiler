@@ -22,7 +22,10 @@ public:
 
     BinopNode(OpType op, UNode& left, UNode& right, TextPosition start, TextPosition end);
 
-    BinopNode(OpType op, UNode& left, UNode& right, TextPosition start);
+    static UBinopNode make(OpType op, UNode& left, UNode& right, TextPosition start, TextPosition end) {
+        return std::make_unique<BinopNode>(op, left, right, start, end);
+    }
+
     bool equal(const Node& x) const override;
 
     ~BinopNode();
