@@ -4,10 +4,14 @@
 
 #include "DeclarationNode.h"
 
-DeclarationNode::DeclarationNode(const std::string& identifier, TypeNode* type, Node* expression, TextPosition start,
-                                 TextPosition eq_pos, TextPosition end) : Node(NodeType::DECL, start, end),
-                                                                          identifier(identifier), type(type),
-                                                                          expression(expression) {
+DeclarationNode::DeclarationNode(const std::string& identifier, TypeNode* type, std::unique_ptr<Node>& expression,
+                                 TextPosition start, TextPosition eq_pos, TextPosition end) : Node(NodeType::DECL,
+                                                                                                   start,
+                                                                                                   end),
+                                                                                              identifier(identifier),
+                                                                                              type(type),
+                                                                                              expression(std::move(
+                                                                                                      expression)) {
     this->eq_pos = eq_pos;
 }
 

@@ -42,14 +42,24 @@ TestNodeU EXP_ID_2_U() {
     return {"bar", std::make_unique<IdNode>("bar", DUMMY_POS, DUMMY_POS)};
 }
 
-const TestNode EXPRESSION{"x", new IdNode("x", DUMMY_POS, DUMMY_POS)};
-const TestNode FACTOR_EXPRESSION = EXPRESSION;
+// const TestNode EXPRESSION{"x", new IdNode("x", DUMMY_POS, DUMMY_POS)};
+// const TestNode FACTOR_EXPRESSION = EXPRESSION;
 
-const TestNode DECLARATION{"var " + ID + " = " + EXPRESSION.text,
-                           new DeclarationNode(ID, nullptr, EXPRESSION.node, DUMMY_POS, DUMMY_POS, DUMMY_POS)};
+TestNodeU EXPRESSION_U() {
+    return {"x", std::make_unique<IdNode>("x", DUMMY_POS, DUMMY_POS)};
+}
 
+TestNodeU FACTOR_U() {
+    return EXPRESSION_U();
+}
+
+
+// const TestNode DECLARATION{"var " + ID + " = " + EXPRESSION.text,
+//                            new DeclarationNode(ID, nullptr, EXPRESSION.node, DUMMY_POS, DUMMY_POS, DUMMY_POS)};
+//
 
 TestNodeU DECLARATION_U() {
+    auto EXPRESSION = EXPRESSION_U();
     return {"var " + ID + " = " + EXPRESSION.text,
             std::make_unique<DeclarationNode>(ID, nullptr, EXPRESSION.node, DUMMY_POS, DUMMY_POS, DUMMY_POS)};
 }
@@ -81,11 +91,12 @@ TestNodeU ASSIGNMENT() {
 
 const TestNode EMPTY_BLOCK{"{}", new BlockNode(VectorOfNodesU{}, DUMMY_POS, DUMMY_POS)};
 
-const TestNode IF{"if(" + EXPRESSION.text + ")" + EMPTY_BLOCK.text,
-                  new IfNode(EXPRESSION.node, (BlockNode*) EMPTY_BLOCK.node, {}, nullptr, DUMMY_POS, DUMMY_POS)};
-
+// const TestNode IF{"if(" + EXPRESSION.text + ")" + EMPTY_BLOCK.text,
+//                   new IfNode(EXPRESSION.node, (BlockNode*) EMPTY_BLOCK.node, {}, nullptr, DUMMY_POS, DUMMY_POS)};
+//
 TestNodeU IF_U() {
-    return {"if(" + EXPRESSION.text + ")" + EMPTY_BLOCK.text, std::make_unique<IfNode>(EXPRESSION.node,
+    auto EXPRESSION = EXPRESSION_U();
+    return {"if(" + EXPRESSION.text + ")" + EMPTY_BLOCK.text, std::make_unique<IfNode>(EXPRESSION.node.release(),
                                                                                        (BlockNode*) EMPTY_BLOCK.node,
                                                                                        std::vector<std::pair<Node*, BlockNode*>>{},
                                                                                        nullptr,
@@ -95,12 +106,15 @@ TestNodeU IF_U() {
 
 
 TestNodeU BLOCK_U() {
+
+    auto DECLARATION = DECLARATION_U();
+    auto t = DECLARATION.text;
+    auto IF = IF_U();
+    auto ti = IF.text;
     VectorOfNodesU v;
-    // { DECLARATION.node, IF.node }
-    v.push_back(std::move(DECLARATION_U().node));
-    v.push_back(std::move(IF_U().node));
-    return {"{" + DECLARATION.text + ";" + IF.text + "}",
-            std::make_unique<BlockNode>(std::move(v), DUMMY_POS, DUMMY_POS)};
+    v.push_back(std::move(DECLARATION.node));
+    v.push_back(std::move(IF.node));
+    return {"{" + t + ";" + IF.text + "}", std::make_unique<BlockNode>(std::move(v), DUMMY_POS, DUMMY_POS)};
 }
 
 TestNodeU BLOCK_1() {
@@ -143,6 +157,7 @@ TEST_CASE("parse_assignment", "[parser]") {
 
 TEST_CASE("parse_decl_simple", "[parser]") {
     Scanner scanner;
+    auto DECLARATION = DECLARATION_U();
     std::string code = DECLARATION.text;
     scanner.load_text(code);
     std::vector<Token> tokens = scanner.scan_all();
@@ -156,6 +171,7 @@ TEST_CASE("parse_decl_simple", "[parser]") {
 
 TEST_CASE("parse_decl_with_type", "[parser]") {
     Scanner scanner;
+    auto EXPRESSION = EXPRESSION_U();
     std::string code = "var " + ID + " : " + TYPE.text + " = " + EXPRESSION.text;
     scanner.load_text(code);
     std::vector<Token> tokens = scanner.scan_all();
@@ -171,6 +187,7 @@ TEST_CASE("parse_decl_with_type", "[parser]") {
 
 TEST_CASE("parse_if", "[parser]") {
     Scanner scanner;
+    auto IF = IF_U();
     std::string code = IF.text;
     scanner.load_text(code);
     std::vector<Token> tokens = scanner.scan_all();
@@ -185,6 +202,7 @@ TEST_CASE("parse_if_with_else", "[parser]") {
     Scanner scanner;
     auto block_1 = BLOCK_1();
     auto block = BLOCK_U();
+    auto EXPRESSION = EXPRESSION_U();
     std::string code = "if " + EXPRESSION.text + block.text + "else " + block_1.text;
     scanner.load_text(code);
     std::vector<Token> tokens = scanner.scan_all();
@@ -192,7 +210,7 @@ TEST_CASE("parse_if_with_else", "[parser]") {
     parser.top_package_name = "main";
 
     std::unique_ptr<IfNode> ast = parser.parse_if();
-    REQUIRE(ast->to_json() == IfNode(EXPRESSION.node,
+    REQUIRE(ast->to_json() == IfNode(EXPRESSION.node.release(),
                                      (BlockNode*) block.node.release(),
                                      {},
                                      (BlockNode*) block_1.node.release(),
@@ -202,6 +220,7 @@ TEST_CASE("parse_if_with_else", "[parser]") {
 
 TEST_CASE("parse_call_no_args", "[parser]") {
     Scanner scanner;
+    auto FACTOR_EXPRESSION = FACTOR_U();
     std::string code = FACTOR_EXPRESSION.text + "()";
     scanner.load_text(code);
     std::vector<Token> tokens = scanner.scan_all();
@@ -209,13 +228,13 @@ TEST_CASE("parse_call_no_args", "[parser]") {
     parser.top_package_name = "main";
 
     std::unique_ptr<Node> ast = parser.parse_expression();
-    REQUIRE(ast->to_json() == CallNode(FACTOR_EXPRESSION.node, {}, DUMMY_POS, DUMMY_POS).to_json());
+    REQUIRE(ast->to_json() == CallNode(FACTOR_EXPRESSION.node.release(), {}, DUMMY_POS, DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_call_one_arg", "[parser]") {
     Scanner scanner;
     auto EXPRESSION_1 = EXPRESSION_1_U();
-
+    auto FACTOR_EXPRESSION = FACTOR_U();
     std::string code = FACTOR_EXPRESSION.text + "(" + EXPRESSION_1.text + ")";
     scanner.load_text(code);
     std::vector<Token> tokens = scanner.scan_all();
@@ -224,14 +243,14 @@ TEST_CASE("parse_call_one_arg", "[parser]") {
 
     std::unique_ptr<Node> ast = parser.parse_expression();
     REQUIRE(ast->to_json() ==
-            CallNode(FACTOR_EXPRESSION.node, {EXPRESSION_1.node.release()}, DUMMY_POS, DUMMY_POS).to_json());
+            CallNode(FACTOR_EXPRESSION.node.release(), {EXPRESSION_1.node.release()}, DUMMY_POS, DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_call_mult_arg", "[parser]") {
     Scanner scanner;
     auto EXPRESSION_1 = EXPRESSION_1_U();
     auto EXPRESSION_2 = EXPRESSION_2_U();
-
+    auto FACTOR_EXPRESSION = FACTOR_U();
     std::string code = FACTOR_EXPRESSION.text + "(" + EXPRESSION_1.text + "," + EXPRESSION_2.text + ")";
     scanner.load_text(code);
     std::vector<Token> tokens = scanner.scan_all();
@@ -239,7 +258,7 @@ TEST_CASE("parse_call_mult_arg", "[parser]") {
     parser.top_package_name = "main";
 
     std::unique_ptr<Node> ast = parser.parse_expression();
-    REQUIRE(ast->to_json() == CallNode(FACTOR_EXPRESSION.node,
+    REQUIRE(ast->to_json() == CallNode(FACTOR_EXPRESSION.node.release(),
                                        {EXPRESSION_1.node.release(), EXPRESSION_2.node.release()},
                                        DUMMY_POS,
                                        DUMMY_POS).to_json());
@@ -440,6 +459,7 @@ TEST_CASE("parse_return_nothing", "[parser]") {
 
 TEST_CASE("parse_return_expression", "[parser]") {
     Scanner scanner;
+    auto EXPRESSION = EXPRESSION_U();
     std::string code = "return " + EXPRESSION.text;
     scanner.load_text(code);
     std::vector<Token> tokens = scanner.scan_all();
@@ -448,7 +468,7 @@ TEST_CASE("parse_return_expression", "[parser]") {
 
     std::unique_ptr<ReturnNode> ast = parser.parse_return();
 
-    REQUIRE(ast->to_json() == ReturnNode(EXPRESSION.node, DUMMY_POS, DUMMY_POS).to_json());
+    REQUIRE(ast->to_json() == ReturnNode(EXPRESSION.node.release(), DUMMY_POS, DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_list_empty", "[parser]") {
@@ -718,6 +738,7 @@ TEST_CASE("parse_ne_exp", "[parser]") {
 
 TEST_CASE("parse_not_exp", "[parser]") {
     Scanner scanner;
+    auto EXPRESSION = EXPRESSION_U();
     std::string code = "not " + EXPRESSION.text;
     scanner.load_text(code);
     std::vector<Token> tokens = scanner.scan_all();
@@ -726,7 +747,7 @@ TEST_CASE("parse_not_exp", "[parser]") {
 
     std::unique_ptr<Node> ast = parser.parse_and_expression();
 
-    REQUIRE(ast->to_json() == UnaryOpNode(UnaryOp::NOT, EXPRESSION.node, DUMMY_POS, DUMMY_POS).to_json());
+    REQUIRE(ast->to_json() == UnaryOpNode(UnaryOp::NOT, EXPRESSION.node.release(), DUMMY_POS, DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_tuple", "[parser]") {
@@ -781,6 +802,7 @@ TEST_CASE("parse_dict_mult_elements", "[parser]") {
     auto EXPRESSION_1 = EXPRESSION_1_U();
     auto EXPRESSION_1_V = EXPRESSION_1_U();
     auto EXPRESSION_2 = EXPRESSION_2_U();
+    auto EXPRESSION = EXPRESSION_U();
     std::string code =
             "{" + EXPRESSION_1.text + ":" + EXPRESSION_2.text + "," + EXPRESSION.text + ":" + EXPRESSION_1_V.text + "}";
     scanner.load_text(code);
@@ -791,13 +813,14 @@ TEST_CASE("parse_dict_mult_elements", "[parser]") {
     std::unique_ptr<Node> ast = parser.parse_dictionary();
 
     REQUIRE(ast->to_json() == DictNode({{EXPRESSION_1.node.release(), EXPRESSION_2.node.release()},
-                                        {EXPRESSION.node,             EXPRESSION_1_V.node.release()}},
+                                        {EXPRESSION.node.release(),   EXPRESSION_1_V.node.release()}},
                                        DUMMY_POS,
                                        DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_member", "[parser]") {
     Scanner scanner;
+    auto EXPRESSION = EXPRESSION_U();
     std::string code = EXPRESSION.text + "." + ID;
     scanner.load_text(code);
     std::vector<Token> tokens = scanner.scan_all();
@@ -806,13 +829,15 @@ TEST_CASE("parse_member", "[parser]") {
 
     std::unique_ptr<Node> ast = parser.parse_factor();
 
-    REQUIRE(ast->to_json() == MemberNode(EXPRESSION.node, Token(TokType::ID, ID, DUMMY_POS, DUMMY_POS)).to_json());
+    REQUIRE(ast->to_json() ==
+            MemberNode(EXPRESSION.node.release(), Token(TokType::ID, ID, DUMMY_POS, DUMMY_POS)).to_json());
 }
 
 TEST_CASE("parse_subscript", "[parser]") {
     Scanner scanner;
     auto EXPRESSION_1 = EXPRESSION_1_U();
     auto EXPRESSION_2 = EXPRESSION_2_U();
+    auto EXPRESSION = EXPRESSION_U();
     std::string code = EXPRESSION.text + "[" + EXPRESSION_2.text + "]";
     scanner.load_text(code);
     std::vector<Token> tokens = scanner.scan_all();
@@ -822,13 +847,14 @@ TEST_CASE("parse_subscript", "[parser]") {
     std::unique_ptr<Node> ast = parser.parse_factor();
 
     REQUIRE(ast->to_json() ==
-            SubscriptNode(EXPRESSION.node, {EXPRESSION_2.node.release()}, DUMMY_POS, DUMMY_POS).to_json());
+            SubscriptNode(EXPRESSION.node.release(), {EXPRESSION_2.node.release()}, DUMMY_POS, DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_partial_one_arg", "[parser]") {
     Scanner scanner;
     auto EXPRESSION_1 = EXPRESSION_1_U();
     auto EXPRESSION_2 = EXPRESSION_2_U();
+    auto FACTOR_EXPRESSION = FACTOR_U();
     std::string code = "$" + FACTOR_EXPRESSION.text + "(" + EXPRESSION_1.text + ")";
     scanner.load_text(code);
     std::vector<Token> tokens = scanner.scan_all();
@@ -836,14 +862,17 @@ TEST_CASE("parse_partial_one_arg", "[parser]") {
     parser.top_package_name = "main";
 
     std::unique_ptr<Node> ast = parser.parse_partial_application();
-    REQUIRE(ast->to_json() ==
-            PartialApplication(FACTOR_EXPRESSION.node, {EXPRESSION_1.node.release()}, DUMMY_POS, DUMMY_POS).to_json());
+    REQUIRE(ast->to_json() == PartialApplication(FACTOR_EXPRESSION.node.release(),
+                                                 {EXPRESSION_1.node.release()},
+                                                 DUMMY_POS,
+                                                 DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_partial_mult_arg_one", "[parser]") {
     Scanner scanner;
     auto EXPRESSION_1 = EXPRESSION_1_U();
     auto EXPRESSION_2 = EXPRESSION_2_U();
+    auto FACTOR_EXPRESSION = FACTOR_U();
     std::string code = "$" + FACTOR_EXPRESSION.text + "(" + EXPRESSION_1.text + ",*)";
     scanner.load_text(code);
     std::vector<Token> tokens = scanner.scan_all();
@@ -851,7 +880,7 @@ TEST_CASE("parse_partial_mult_arg_one", "[parser]") {
     parser.top_package_name = "main";
 
     std::unique_ptr<Node> ast = parser.parse_partial_application();
-    REQUIRE(ast->to_json() == PartialApplication(FACTOR_EXPRESSION.node,
+    REQUIRE(ast->to_json() == PartialApplication(FACTOR_EXPRESSION.node.release(),
                                                  {EXPRESSION_1.node.release(), nullptr},
                                                  DUMMY_POS,
                                                  DUMMY_POS).to_json());
@@ -861,6 +890,7 @@ TEST_CASE("parse_partial_mult_arg_two", "[parser]") {
     Scanner scanner;
     auto EXPRESSION_1 = EXPRESSION_1_U();
     auto EXPRESSION_2 = EXPRESSION_2_U();
+    auto FACTOR_EXPRESSION = FACTOR_U();
     std::string code = "$" + FACTOR_EXPRESSION.text + "(" + EXPRESSION_1.text + "," + EXPRESSION_2.text + ")";
     scanner.load_text(code);
     std::vector<Token> tokens = scanner.scan_all();
@@ -868,7 +898,7 @@ TEST_CASE("parse_partial_mult_arg_two", "[parser]") {
     parser.top_package_name = "main";
 
     std::unique_ptr<Node> ast = parser.parse_partial_application();
-    REQUIRE(ast->to_json() == PartialApplication(FACTOR_EXPRESSION.node,
+    REQUIRE(ast->to_json() == PartialApplication(FACTOR_EXPRESSION.node.release(),
                                                  {EXPRESSION_1.node.release(), EXPRESSION_2.node.release()},
                                                  DUMMY_POS,
                                                  DUMMY_POS).to_json());

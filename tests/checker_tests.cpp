@@ -383,7 +383,7 @@ TEST_CASE("error_no_member", "[checker]") {
     Flirpin clazz_flirpin = module.get(Path("Foo"));
     REQUIRE(clazz_flirpin.type == F_TYPE::CLASS);
     ObjectType type = ObjectType("Foo");
-    ErrorNoMemberSuggestions exp(type, *(MemberNode*) declaration_node.expression, *clazz_flirpin.clazz);
+    ErrorNoMemberSuggestions exp(type, (MemberNode&) *declaration_node.expression, *clazz_flirpin.clazz);
     REQUIRE(error == exp);
 }
 

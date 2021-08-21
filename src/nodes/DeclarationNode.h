@@ -15,9 +15,9 @@ class DeclarationNode : public Node {
 public:
     std::string identifier;
     TypeNode* type;
-    Node* expression;
+    std::unique_ptr<Node> expression;
     TextPosition eq_pos;
-    DeclarationNode(const std::string& identifier, TypeNode* type, Node* expression, TextPosition start,
+    DeclarationNode(const std::string& identifier, TypeNode* type, std::unique_ptr<Node>& expression, TextPosition start,
                     TextPosition eq_pos, TextPosition end);
 
 

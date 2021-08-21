@@ -553,8 +553,7 @@ std::unique_ptr<DeclarationNode> Parser::parse_variable_declaration() {
         type = this->parse_type_node().release();
     }
     Token eq_tok = this->expect_token(TokType::EQQ);
-    auto expression_u = this->parse_expression();
-    auto expression = expression_u.release();
+    auto expression = this->parse_expression();
     return std::make_unique<DeclarationNode>(identifier.str,
                                              type,
                                              expression,
