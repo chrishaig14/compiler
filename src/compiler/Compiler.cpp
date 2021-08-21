@@ -217,6 +217,7 @@ void Compiler::load_library(const std::string& name, const std::string& version)
         std::cout << "Top unit " << name + "==" + version << " NOT FOUND" << std::endl;
         return;
     }
+    closedir(dir);
     std::cout << "Loading top unit: " << E_HLT(name) << " at path: " << E_HLT(abs_top_unit_path) << std::endl;
 
     std::string library_requirements_file = path_join(abs_top_unit_path, REQUIREMENTS_FILE);
