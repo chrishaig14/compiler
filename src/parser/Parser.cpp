@@ -383,7 +383,7 @@ UNode Parser::parse_id_or_literal() {
             break;
         }
         case TokType::INTEGER: {
-            node = std::make_unique<NumberNode>(NumberType::INTEGER,
+            node = NumberNode::make(NumberType::INTEGER,
                                                 this->token.str,
                                                 this->token.start,
                                                 this->token.end_pos);
@@ -392,7 +392,7 @@ UNode Parser::parse_id_or_literal() {
             break;
         }
         case TokType::FLOAT: {
-            node = std::make_unique<NumberNode>(NumberType::FLOAT,
+            node = NumberNode::make(NumberType::FLOAT,
                                                 this->token.str,
                                                 this->token.start,
                                                 this->token.end_pos);
@@ -401,7 +401,7 @@ UNode Parser::parse_id_or_literal() {
             break;
         }
         case TokType::DOUBLE: {
-            node = std::make_unique<NumberNode>(NumberType::DOUBLE,
+            node = NumberNode::make(NumberType::DOUBLE,
                                                 this->token.str,
                                                 this->token.start,
                                                 this->token.end_pos);

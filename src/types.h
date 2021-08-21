@@ -13,11 +13,14 @@ class TypeNode;
 
 class Node;
 
-class BlockNode ;
+class BlockNode;
+
+class NumberNode;
 
 class Instruction;
 
 typedef std::unique_ptr<BlockNode> UBlockNode;
+typedef std::unique_ptr<NumberNode> UNumberNode;
 typedef std::unique_ptr<Node> UNode;
 typedef std::vector<TypeNode*> VectorOfTypes;
 typedef std::vector<Node*> VectorOfNodes;

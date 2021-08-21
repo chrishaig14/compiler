@@ -543,7 +543,7 @@ TEST_CASE("subscript_no_method_error", "[checker]") {
     StringNode right("Bye", _POS, _POS);
     UNode p_node = std::make_unique<IdNode>("f", _POS, _POS);
     VectorOfNodesU v;
-    v.push_back(std::make_unique<NumberNode>(NumberType::INTEGER, "1", _POS, _POS));
+    v.push_back(NumberNode::make(NumberType::INTEGER, "1", _POS, _POS));
     SubscriptNode node(p_node, v, _POS, _POS);
     ObjectType expected("Integer");
     ObjectType type("Foo");

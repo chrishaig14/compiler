@@ -18,6 +18,10 @@ public:
 
     NumberNode(NumberType num_type, std::string str, TextPosition start, TextPosition end);
 
+    static UNumberNode make(NumberType num_type, std::string str, TextPosition start, TextPosition end) {
+        return std::make_unique<NumberNode>(num_type, str, start, end);
+    }
+
     bool equal(const Node& x) const override;
 
     NumberType num_type;
