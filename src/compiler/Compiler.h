@@ -44,6 +44,7 @@ class Compiler {
 public:
     ~Compiler() {
         delete this->top_package; // TODO this should not be allocated on the heap
+        delete this->root_package; // TODO this should not be allocated on the heap
     }
 
     Compiler(const std::string& project_dir, const std::string& project_output_dir, const std::string& output_name,
