@@ -234,7 +234,8 @@ TEST_CASE("parse_call_no_args", "[parser]") {
     parser.top_package_name = "main";
 
     UNode ast = parser.parse_expression();
-    REQUIRE(ast->to_json() == CallNode(FACTOR_EXPRESSION.node.release(), {}, DUMMY_POS, DUMMY_POS).to_json());
+    VectorOfNodesU v;
+    REQUIRE(ast->to_json() == CallNode(FACTOR_EXPRESSION.node, v, DUMMY_POS, DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_call_one_arg", "[parser]") {
@@ -248,8 +249,9 @@ TEST_CASE("parse_call_one_arg", "[parser]") {
     parser.top_package_name = "main";
 
     UNode ast = parser.parse_expression();
-    REQUIRE(ast->to_json() ==
-            CallNode(FACTOR_EXPRESSION.node.release(), {EXPRESSION_1.node.release()}, DUMMY_POS, DUMMY_POS).to_json());
+    VectorOfNodesU v;
+    v.push_back(std::move(EXPRESSION_1.node));
+    REQUIRE(ast->to_json() == CallNode(FACTOR_EXPRESSION.node, v, DUMMY_POS, DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_call_mult_arg", "[parser]") {
@@ -264,10 +266,10 @@ TEST_CASE("parse_call_mult_arg", "[parser]") {
     parser.top_package_name = "main";
 
     UNode ast = parser.parse_expression();
-    REQUIRE(ast->to_json() == CallNode(FACTOR_EXPRESSION.node.release(),
-                                       {EXPRESSION_1.node.release(), EXPRESSION_2.node.release()},
-                                       DUMMY_POS,
-                                       DUMMY_POS).to_json());
+    VectorOfNodesU v;
+    v.push_back(std::move(EXPRESSION_1.node));
+    v.push_back(std::move(EXPRESSION_2.node));
+    REQUIRE(ast->to_json() == CallNode(FACTOR_EXPRESSION.node, v, DUMMY_POS, DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_for", "[parser]") {

@@ -132,10 +132,10 @@ VectorOfNodes Parser::parse_list_of_expressions() {
     return result;
 }
 
-VectorOfNodes Parser::parse_list_of_arguments() {
-    VectorOfNodes result;
+VectorOfNodesU Parser::parse_list_of_arguments() {
+    VectorOfNodesU result;
     while (true) {
-        result.push_back(this->parse_expression().release());
+        result.push_back(this->parse_expression());
         if (this->match(TokType::COMMA)) {
             this->next();
         } else {
@@ -163,9 +163,7 @@ UNode Parser::parse_assignment_or_expression() {
         }
         auto rvalue = this->parse_expression();
         if (lvalue->ntype == NodeType::ID) {
-            UNode id_node = std::make_unique<IdNode>(((IdNode&) *lvalue)._id,
-                                                                     lvalue->start,
-                                                                     lvalue->end);
+            UNode id_node = std::make_unique<IdNode>(((IdNode&) *lvalue)._id, lvalue->start, lvalue->end);
             if (op == TokType::PLUS_EQQ || op == TokType::MINUS_EQQ) {
                 OpType opt;
                 if (op == TokType::PLUS_EQQ) {
@@ -511,7 +509,7 @@ UNode Parser::parse_call_or_subscript_chain(UNode& parent) {
         if (this->match(TokType::LPAREN)) {
 //                 function call
             this->next();
-            VectorOfNodes arguments;
+            VectorOfNodesU arguments;
             Token close;
             if (this->match(TokType::RPAREN)) {
                 close = this->token;
@@ -520,9 +518,10 @@ UNode Parser::parse_call_or_subscript_chain(UNode& parent) {
                 arguments = this->parse_list_of_arguments();
                 close = this->expect_token(TokType::RPAREN);
             }
-            Node* old_node = node.release();
+            UNode old_node = std::move(node);
+            TextPosition o_start = old_node->start;
             node = std::make_unique<CallNode>(old_node, arguments, old_node->start, close.end_pos);
-            node->start = old_node->start;
+            node->start = o_start;
         } else if (this->match(TokType::LSQUARE)) {
 //                subscript
             Token lsquare = this->token;

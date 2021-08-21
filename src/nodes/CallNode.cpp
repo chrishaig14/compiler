@@ -5,8 +5,10 @@
 #include "CallNode.h"
 #include "../json/json.hpp"
 
-CallNode::CallNode(Node* function, const VectorOfNodes& arguments, TextPosition start, TextPosition end)
-        : Node(NodeType::CALL, start, end), function(function), arguments(arguments) {
+CallNode::CallNode(UNode& function, VectorOfNodesU& arguments, TextPosition start, TextPosition end) : Node(
+        NodeType::CALL,
+        start,
+        end), function(std::move(function)), arguments(std::move(arguments)) {
 }
 
 bool CallNode::equal(const Node& x) const {
@@ -40,7 +42,7 @@ nlohmann::json CallNode::to_json() const {
     j["type"] = "call";
     j["call"]["function"] = this->function->to_json();
     std::vector<nlohmann::json> v;
-    for (auto e: this->arguments) {
+    for (auto& e: this->arguments) {
         v.push_back(e->to_json());
     }
     j["call"]["arguments"] = v;

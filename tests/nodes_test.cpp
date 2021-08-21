@@ -70,22 +70,27 @@ TEST_CASE("nodes_list", "[list]") {
 }
 
 TEST_CASE("nodes_call_no_args", "[call]") {
-    IdNode* f = new IdNode("foo", DUMMY_POS, DUMMY_POS);
-    CallNode n(f, {}, DUMMY_POS, DUMMY_POS);
-    nlohmann::json nj = n.to_json();
+    UNode f = std::make_unique<IdNode>("foo", DUMMY_POS, DUMMY_POS);
+    VectorOfNodesU vector;
     nlohmann::json e = {{"type", "call"},
                         {"call", {{"function", f->to_json()}, {"arguments", nlohmann::json::array()}}}};
+    CallNode n(f, vector, DUMMY_POS, DUMMY_POS);
+    nlohmann::json nj = n.to_json();
+
     REQUIRE(e == nj);
 }
 
 TEST_CASE("nodes_call", "[call]") {
-    IdNode* f = new IdNode("foo", DUMMY_POS, DUMMY_POS);
-    IdNode* arg_0 = new IdNode("bar", DUMMY_POS, DUMMY_POS);
-    NumberNode* arg_1 = new NumberNode(NumberType::INTEGER, "3", DUMMY_POS, DUMMY_POS);
-    CallNode n(f, {arg_0, arg_1}, DUMMY_POS, DUMMY_POS);
-    nlohmann::json nj = n.to_json();
+    UNode f = std::make_unique<IdNode>("foo", DUMMY_POS, DUMMY_POS);
+    UNode arg_0 = std::make_unique<IdNode>("bar", DUMMY_POS, DUMMY_POS);
+    UNode arg_1 = std::make_unique<NumberNode>(NumberType::INTEGER, "3", DUMMY_POS, DUMMY_POS);
     nlohmann::json e = {{"type", "call"},
                         {"call", {{"function", f->to_json()}, {"arguments", {arg_0->to_json(), arg_1->to_json()}}}}};
+    VectorOfNodesU v;
+    v.push_back(std::move(arg_0));
+    v.push_back(std::move(arg_1));
+    CallNode n(f, v, DUMMY_POS, DUMMY_POS);
+    nlohmann::json nj = n.to_json();
     REQUIRE(e == nj);
 }
 

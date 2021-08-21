@@ -8,17 +8,15 @@
 
 #include <vector>
 #include "Node.h"
-
-#include "Node.h"
 #include "../types.h"
 #include "TypeNode.h"
 
 class CallNode : public Node {
 public:
-    Node* function;
-    VectorOfNodes arguments;
+    UNode function;
+    VectorOfNodesU arguments;
 
-    CallNode(Node* function, const VectorOfNodes& arguments, TextPosition start, TextPosition end);
+    CallNode(UNode& function, VectorOfNodesU& arguments, TextPosition start, TextPosition end);
 
     bool equal(const Node& other) const override;
 
