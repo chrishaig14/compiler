@@ -204,7 +204,7 @@ std::unique_ptr<Node> Parser::parse_or_expression() {
     while (this->match(TokType::OR)) {
         this->next();
         auto right = this->parse_and_expression();
-        auto node = std::make_unique<BoolOpNode>(BoolOp::OR, left.release(), right.release(), left->start, right->end);
+        auto node = std::make_unique<BoolOpNode>(BoolOp::OR, left, right, left->start, right->end);
         left = std::move(node);
     }
     return left;
@@ -215,7 +215,7 @@ std::unique_ptr<Node> Parser::parse_and_expression() {
     while (this->match(TokType::AND)) {
         this->next();
         auto right = this->parse_not_expression();
-        auto node = std::make_unique<BoolOpNode>(BoolOp::AND, left.release(), right.release(), left->start, right->end);
+        auto node = std::make_unique<BoolOpNode>(BoolOp::AND, left, right, left->start, right->end);
         left = std::move(node);
     }
     return left;
@@ -242,9 +242,7 @@ std::unique_ptr<Node> Parser::parse_bool_expression() {
     op = TOKEN_TO_BOOL_OP[this->token.type];
     this->next();
     auto right = this->parse_add_or_sub_expression();
-    auto lp = left.release();
-    auto rp = right.release();
-    auto node = std::make_unique<BoolOpNode>(op, lp, rp, lp->start, rp->end);
+    auto node = std::make_unique<BoolOpNode>(op, left, right, left->start, right->end);
     return node;
 }
 

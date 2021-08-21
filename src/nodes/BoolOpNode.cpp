@@ -5,8 +5,9 @@
 #include "BoolOpNode.h"
 
 
-BoolOpNode::BoolOpNode(BoolOp op, Node* left, Node* right, TextPosition start, TextPosition end)
-        : Node(NodeType::BOOLOP, start, end), left(left), right(right), op(op) {
+BoolOpNode::BoolOpNode(BoolOp op, std::unique_ptr<Node>& left, std::unique_ptr<Node>& right, TextPosition start,
+                       TextPosition end) : Node(NodeType::BOOLOP, start, end), left(std::move(left)),
+                                           right(std::move(right)), op(op) {
 }
 
 bool BoolOpNode::equal(const Node& x) const {
