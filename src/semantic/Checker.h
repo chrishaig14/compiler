@@ -61,7 +61,7 @@ TypeNode* make_type_from_function_pattern(const FunctionType& ftn, const MapStri
 TypeNode* make_type(const TypeNode& original, const MapStringType& replacements);
 SemanticInfo match_arguments_to_generic_function(const FunctionType& function_type, VectorOfTypes arg_types);
 USemanticInfo error_stub();
-Entity map_flirpin_to_entity(Flirpin flirpin);
+Entity* map_flirpin_to_entity(Flirpin flirpin);
 Flirpin map_unit_to_flirpin(Unit u);
 TextPosition add_one_col(TextPosition t);
 bool function_is_generic(const FunctionType& ft);
@@ -78,7 +78,7 @@ public:
     Module* module;
     bool is_call;
     ErrorReporter error_reporter;
-    Entity this_entity;
+    Entity* this_entity;
     Package* top_package;
     SNode* update_loop_index_snode;
 
@@ -160,9 +160,9 @@ public:
     USemanticInfo dispatch(Node& nod);
     void fill_value(Value* value);
     std::unique_ptr<SemanticInfo> expect_rvalue_of_type(const TypeNode& target, Node& node);
-    void process_function_arguments(SemanticInfo& retv, std::vector<Entity>& arg_entities, CallSNode* sn, CallNode& n,
+    void process_function_arguments(SemanticInfo& retv, std::vector<Entity*>& arg_entities, CallSNode* sn, CallNode& n,
                                     FunctionType* function_type, SemanticInfo* fun_info_p);
-    bool check_arguments(CallNode& n, CallSNode* sn, VectorOfTypes& arg_types, std::vector<Entity>& arg_entities);
+    bool check_arguments(CallNode& n, CallSNode* sn, VectorOfTypes& arg_types, std::vector<Entity*>& arg_entities);
     USemanticInfo
     make_return_info(const CallNode& n, bool is_rvalue, SemanticInfo& retv, bool is_def_const, bool args_are_constant);
     SNode* make_union_rvalue(SNode* value_snode, const TypeNode* unaliased_value_type,

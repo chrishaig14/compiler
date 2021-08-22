@@ -30,10 +30,11 @@ USemanticInfo Checker::visit_call(CallNode& n, bool is_rvalue) {
     // Node* object_node;
     sn->function = fun_info.snode;
     FunctionType* function_type = nullptr;
-    if (fun_info.entity.type == E_TYPE::CONST_FUNCTION) {
-        function_type = fun_info.entity.const_function->ft->clone();
-    } else if (fun_info.entity.type == E_TYPE::VALUE && fun_info.entity.value->type->kind == Kind::FUNCTION) {
-        function_type = fun_info.entity.value->type->function().clone();
+    if (fun_info.entity->type == E_TYPE::CONST_FUNCTION) {
+        function_type = ((EntityConstFunction*) fun_info.entity)->const_function->ft->clone();
+    } else if (fun_info.entity->type == E_TYPE::VALUE &&
+               ((EntityValue*) fun_info.entity)->value->type->kind == Kind::FUNCTION) {
+        function_type = ((EntityValue*) fun_info.entity)->value->type->function().clone();
     } else {
         this->error_reporter.error(ErrorNotAFunction(n));
         return error_stub();
@@ -50,7 +51,7 @@ USemanticInfo Checker::visit_call(CallNode& n, bool is_rvalue) {
     }
     VectorOfTypes arg_types;
 
-    std::vector<Entity> arg_entities;
+    std::vector<Entity*> arg_entities;
     bool has_error = check_arguments(n, sn, arg_types, arg_entities);
     if (has_error) {
         return error_stub();
@@ -75,15 +76,16 @@ USemanticInfo Checker::visit_call(CallNode& n, bool is_rvalue) {
             std::cout << "ARG: " << x->to_string() << std::endl;
         }
         std::cout << "DONE" << std::endl;
-        if (fun_info.entity.type == E_TYPE::CONST_FUNCTION) {
-            ConstFunction* full_function = fun_info.entity.const_function;
+        if (fun_info.entity->type == E_TYPE::CONST_FUNCTION) {
+            ConstFunction* full_function = ((EntityConstFunction*) fun_info.entity)->const_function;
             if (full_function->implicit != nullptr) {
                 ObjectType* it = new ObjectType(full_function->implicit->type);
                 it->is_generic_param = true;
                 mangle_generic_names(it);
                 TypeNode* tt = all_substitutions.at(it->id);
-                Entity e = entity_from_type(*tt);
-                assert(e.type == E_TYPE::VALUE);
+                Entity* ep = entity_from_type(*tt);
+                assert(ep->type == E_TYPE::VALUE);
+                EntityValue& e = (EntityValue&) *ep;
                 this->fill_value(e.value);
                 std::cout << "calling function with implicit: " << full_function->implicit->type << "."
                           << full_function->implicit->method << " : " << full_function->implicit->ft->to_string()
@@ -149,17 +151,18 @@ USemanticInfo Checker::visit_call(CallNode& n, bool is_rvalue) {
 
 USemanticInfo Checker::make_return_info(const CallNode& n, bool is_rvalue, SemanticInfo& retv, bool is_def_const,
                                         bool args_are_constant) {
-    if (retv.entity.type == E_TYPE::NOTHING) {
+    if (retv.entity->type == E_TYPE::NOTHING) {
         if (is_rvalue) {
-            this->error_reporter.error(ErrorExpectedExpression(retv.entity, n));
+            this->error_reporter.error(ErrorExpectedExpression(*retv.entity, n));
             return error_stub();
         }
-    } else if (retv.entity.type == E_TYPE::VALUE) {
-        if (retv.entity.value->type->kind == Kind::OBJECT) {
-            if (retv.entity.value->type->object().id == ".None") {
-                retv.entity = Entity(E_TYPE::NOTHING);
+    } else if (retv.entity->type == E_TYPE::VALUE) {
+        Value& value = *((EntityValue*) retv.entity)->value;
+        if (value.type->kind == Kind::OBJECT) {
+            if (value.type->object().id == ".None") {
+                retv.entity = new EntityNothing();
             } else {
-                fill_value(retv.entity.value);
+                fill_value(&value);
             }
         }
     }
@@ -167,7 +170,8 @@ USemanticInfo Checker::make_return_info(const CallNode& n, bool is_rvalue, Seman
     return std::make_unique<SemanticInfo>(retv);
 }
 
-bool Checker::check_arguments(CallNode& n, CallSNode* sn, VectorOfTypes& arg_types, std::vector<Entity>& arg_entities) {
+bool
+Checker::check_arguments(CallNode& n, CallSNode* sn, VectorOfTypes& arg_types, std::vector<Entity*>& arg_entities) {
     bool has_error;
     for (auto& arg: n.arguments) {
         USemanticInfo arg_type_p = this->dispatch(*arg);
@@ -178,8 +182,8 @@ bool Checker::check_arguments(CallNode& n, CallSNode* sn, VectorOfTypes& arg_typ
 
         arg_entities.push_back(arg_type_p->entity);
         sn->arguments.push_back(arg_type_p->snode);
-        Entity arg_entity = arg_type_p->entity;
-
+        Entity* arg_entity_p = arg_type_p->entity;
+        Entity& arg_entity = *arg_entity_p;
         if (arg_entity.type == E_TYPE::CLASS || arg_entity.type == E_TYPE::PACKAGE ||
             arg_entity.type == E_TYPE::MODULE || arg_entity.type == E_TYPE::ENUM ||
             arg_entity.type == E_TYPE::NOTHING) {
@@ -197,7 +201,7 @@ bool Checker::check_arguments(CallNode& n, CallSNode* sn, VectorOfTypes& arg_typ
 }
 
 void
-Checker::process_function_arguments(SemanticInfo& retv, std::vector<Entity>& arg_entities, CallSNode* sn, CallNode& n,
+Checker::process_function_arguments(SemanticInfo& retv, std::vector<Entity*>& arg_entities, CallSNode* sn, CallNode& n,
                                     FunctionType* function_type, SemanticInfo* fun_info_p) {
     retv.entity = entity_from_type(*function_type->return_type);
     int sni = static_cast<int>(fun_info_p->this_arg != nullptr);
@@ -205,9 +209,9 @@ Checker::process_function_arguments(SemanticInfo& retv, std::vector<Entity>& arg
         // const TypeNode& arg_type = *arg_types[i];
         const TypeNode& param_type = *function_type->param_types[i];
 
-        SNode* arg_rvalue_snode = this->make_rvalue(arg_entities[i], sn->arguments[sni], param_type);
+        SNode* arg_rvalue_snode = this->make_rvalue(*arg_entities[i], sn->arguments[sni], param_type);
         if (arg_rvalue_snode == nullptr) {
-            this->error_reporter.error(ErrorTypeMismatch(param_type, *n.arguments[i], arg_entities[i]));
+            this->error_reporter.error(ErrorTypeMismatch(param_type, *n.arguments[i], *arg_entities[i]));
             continue;
         }
         sn->arguments[sni] = arg_rvalue_snode;

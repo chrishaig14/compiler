@@ -28,7 +28,7 @@ Checker::Checker(Package* top_package, Module* module) {
 }
 
 void Checker::enter_scope(const std::string& name) {
-    std::string new_scope_name = this->scope->name + "." + name;
+    std::string new_scope_name = this->scope->s_name + "." + name;
     if (this->scopes.find(new_scope_name) != this->scopes.end()) {
         delete this->scopes[new_scope_name];
         this->scopes.erase(new_scope_name);
@@ -130,7 +130,7 @@ Checker::match_arguments_to_generic_function(const FunctionType& ft, VectorOfTyp
         delete at;
     }
     SemanticInfo rv;
-    rv.entity = Entity(new Value(f->return_type->clone()));
+    rv.entity = new EntityValue(new Value(f->return_type->clone()));
     delete f;
     return std::make_unique<SemanticInfo>(rv);
 }
@@ -207,7 +207,7 @@ Class* Checker::instantiate_generic(Class* generic, const ObjectType& instance) 
             if (implicit->type == generic->type_params[0]) {
                 std::cout << "----------- Generic with implicit which is class parameter: " << method_cf.first
                           << std::endl;
-                Entity e = entity_from_type(*instance.type_params[0]);
+                EntityValue& e = *(EntityValue*) entity_from_type(*instance.type_params[0]);
                 this->fill_value(e.value);
                 Class* clazz_t = e.value->clazz;
                 auto meth = clazz_t->methods.find(implicit->method);
@@ -263,7 +263,7 @@ Class* Checker::instantiate_generic(Class* generic, const ObjectType& instance) 
     for (size_t i = 0; i < generic->member_names.size(); i++) {
         std::string mn = generic->member_names[i];
         concrete->members[mn] = concrete_field_types[i];
-        concrete->member_entities[mn] = Entity(E_TYPE::NOTHING);
+        concrete->member_entities[mn] = new EntityNothing();
     }
     return concrete;
 }

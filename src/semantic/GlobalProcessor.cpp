@@ -184,7 +184,7 @@ void GlobalProcessor::visit_class(ClassNode& node) {
         class_info->member_names.push_back(mt.first);
         class_info->member_types.push_back(mt.second);
         class_info->members[mt.first] = mt.second;
-        class_info->member_entities[mt.first] = Entity(E_TYPE::NOTHING);
+        class_info->member_entities[mt.first] = new EntityNothing();
     }
     for (const auto& mn: node.static_members) {
         class_info->static_members[mn.first] = std::make_pair(mn.second.first->clone(), mn.second.second);

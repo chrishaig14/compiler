@@ -21,11 +21,11 @@ public:
 
     std::vector<std::pair<std::string, TypeNode*>> get_all();
 
-    Entity get(const std::string& name);
+    Entity& get(const std::string& name);
 
     bool declared(const std::string& name);
 
-    void set(const std::string& name, Entity info);
+    void set(const std::string& name, Entity* info);
 
     ~SymbolTable() {
         // for (auto e: this->table) {
@@ -37,7 +37,7 @@ public:
 
     }
 
-    std::string name;
+    std::string s_name;
     SymbolTable* parent;
     std::unordered_map<std::string, bool> not_null;
     MapStringEntity table;

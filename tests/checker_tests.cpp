@@ -67,7 +67,7 @@ TEST_CASE("basic_function_bad_return_type", "[checker]") {
     Error& error = *checker.error_reporter.errors.back();
     BooleanNode node(false, _POS, _POS);
     ObjectType expected("Integer");
-    ErrorTypeMismatch exp(expected, node, entity_from_type(ObjectType("Boolean")));
+    ErrorTypeMismatch exp(expected, node, *entity_from_type(ObjectType("Boolean")));
     REQUIRE(error == exp);
 
 }
@@ -97,7 +97,7 @@ TEST_CASE("basic_declaration_bad_type", "[checker]") {
     Error& error = *checker.error_reporter.errors.back();
     NumberNode node(NumberType::INTEGER, "9", _POS, _POS);
     ObjectType expected("Boolean");
-    ErrorTypeMismatch exp(expected, node, entity_from_type(ObjectType("Integer")));
+    ErrorTypeMismatch exp(expected, node, *entity_from_type(ObjectType("Integer")));
     REQUIRE(error == exp);
 }
 
@@ -149,7 +149,7 @@ TEST_CASE("list_bad", "[checker]") {
 
     StringNode node("a", _POS, _POS);
     ObjectType expected("Integer");
-    ErrorTypeMismatch exp(expected, node, entity_from_type(ObjectType("String")));
+    ErrorTypeMismatch exp(expected, node, *entity_from_type(ObjectType("String")));
 
     REQUIRE(error == exp);
 }
@@ -219,9 +219,9 @@ TEST_CASE("int_literal", "[checker]") {
 
     REQUIRE(!checker.error_reporter.failed);
     REQUIRE(checker.error_reporter.errors.size() == 0);
-    REQUIRE(info->entity.type == E_TYPE::VALUE);
-    REQUIRE(info->entity.value->metatype == Meta::CLASS);
-    REQUIRE(*info->entity.value->type == ObjectType("Integer"));
+    REQUIRE(info->entity->type == E_TYPE::VALUE);
+    REQUIRE(((EntityValue*) (info->entity))->value->metatype == Meta::CLASS);
+    REQUIRE(*((EntityValue*) (info->entity))->value->type == ObjectType("Integer"));
 }
 
 TEST_CASE("bool_literal", "[checker]") {
@@ -236,9 +236,9 @@ TEST_CASE("bool_literal", "[checker]") {
 
     REQUIRE(!checker.error_reporter.failed);
     REQUIRE(checker.error_reporter.errors.size() == 0);
-    REQUIRE(info->entity.type == E_TYPE::VALUE);
-    REQUIRE(info->entity.value->metatype == Meta::CLASS);
-    REQUIRE(*info->entity.value->type == ObjectType("Boolean"));
+    REQUIRE(info->entity->type == E_TYPE::VALUE);
+    REQUIRE(((EntityValue*) (info->entity))->value->metatype == Meta::CLASS);
+    REQUIRE(*((EntityValue*) (info->entity))->value->type == ObjectType("Boolean"));
 }
 
 TEST_CASE("list_literal", "[checker]") {
@@ -253,9 +253,9 @@ TEST_CASE("list_literal", "[checker]") {
 
     REQUIRE(!checker.error_reporter.failed);
     REQUIRE(checker.error_reporter.errors.size() == 0);
-    REQUIRE(info->entity.type == E_TYPE::VALUE);
-    REQUIRE(info->entity.value->metatype == Meta::CLASS);
-    REQUIRE(*info->entity.value->type == ObjectType("List", {new ObjectType("Integer")}));
+    REQUIRE(info->entity->type == E_TYPE::VALUE);
+    REQUIRE(((EntityValue*) (info->entity))->value->metatype == Meta::CLASS);
+    REQUIRE(*((EntityValue*) (info->entity))->value->type == ObjectType("List", {new ObjectType("Integer")}));
 }
 
 TEST_CASE("empty_list_literal", "[checker]") {
@@ -270,9 +270,9 @@ TEST_CASE("empty_list_literal", "[checker]") {
 
     REQUIRE(!checker.error_reporter.failed);
     REQUIRE(checker.error_reporter.errors.size() == 0);
-    REQUIRE(info->entity.type == E_TYPE::VALUE);
-    REQUIRE(info->entity.value->metatype == Meta::CLASS);
-    REQUIRE(*info->entity.value->type == ObjectType("List", {new ObjectType("String")}));
+    REQUIRE(info->entity->type == E_TYPE::VALUE);
+    REQUIRE(((EntityValue*) (info->entity))->value->metatype == Meta::CLASS);
+    REQUIRE(*((EntityValue*) (info->entity))->value->type == ObjectType("List", {new ObjectType("String")}));
 }
 
 TEST_CASE("empty_dict_literal", "[checker]") {
@@ -287,9 +287,10 @@ TEST_CASE("empty_dict_literal", "[checker]") {
 
     REQUIRE(!checker.error_reporter.failed);
     REQUIRE(checker.error_reporter.errors.size() == 0);
-    REQUIRE(info->entity.type == E_TYPE::VALUE);
-    REQUIRE(info->entity.value->metatype == Meta::CLASS);
-    REQUIRE(*info->entity.value->type == ObjectType("Dict", {new ObjectType("Integer"), new ObjectType("String")}));
+    REQUIRE(info->entity->type == E_TYPE::VALUE);
+    REQUIRE(((EntityValue*) (info->entity))->value->metatype == Meta::CLASS);
+    REQUIRE(*((EntityValue*) (info->entity))->value->type ==
+            ObjectType("Dict", {new ObjectType("Integer"), new ObjectType("String")}));
 }
 
 
@@ -305,9 +306,10 @@ TEST_CASE("dict_literal", "[checker]") {
 
     REQUIRE(!checker.error_reporter.failed);
     REQUIRE(checker.error_reporter.errors.size() == 0);
-    REQUIRE(info->entity.type == E_TYPE::VALUE);
-    REQUIRE(info->entity.value->metatype == Meta::CLASS);
-    REQUIRE(*info->entity.value->type == ObjectType("Dict", {new ObjectType("String"), new ObjectType("Integer")}));
+    REQUIRE(info->entity->type == E_TYPE::VALUE);
+    REQUIRE(((EntityValue*) (info->entity))->value->metatype == Meta::CLASS);
+    REQUIRE(*((EntityValue*) (info->entity))->value->type ==
+            ObjectType("Dict", {new ObjectType("String"), new ObjectType("Integer")}));
 }
 
 TEST_CASE("float_literal", "[checker]") {
@@ -322,9 +324,9 @@ TEST_CASE("float_literal", "[checker]") {
 
     REQUIRE(!checker.error_reporter.failed);
     REQUIRE(checker.error_reporter.errors.size() == 0);
-    REQUIRE(info->entity.type == E_TYPE::VALUE);
-    REQUIRE(info->entity.value->metatype == Meta::CLASS);
-    REQUIRE(*info->entity.value->type == ObjectType("Float"));
+    REQUIRE(info->entity->type == E_TYPE::VALUE);
+    REQUIRE(((EntityValue*) (info->entity))->value->metatype == Meta::CLASS);
+    REQUIRE(*((EntityValue*) (info->entity))->value->type == ObjectType("Float"));
 }
 
 // TEST_CASE("none_literal", "[checker]") {
@@ -339,9 +341,9 @@ TEST_CASE("float_literal", "[checker]") {
 //
 //     REQUIRE(!checker.error_reporter.failed);
 //     REQUIRE(checker.error_reporter.errors.size() == 0);
-//     REQUIRE(info->entity.type == E_TYPE::VALUE);
-//     REQUIRE(info->entity.value->metatype == Meta::CLASS);
-//     REQUIRE(*info->entity.value->type == ObjectType("NoneType"));
+//     REQUIRE(info->entity->type == E_TYPE::VALUE);
+//     REQUIRE(((EntityValue*)(info->entity))->value->metatype == Meta::CLASS);
+//     REQUIRE(*((EntityValue*)(info->entity))->value->type == ObjectType("NoneType"));
 // }
 
 TEST_CASE("decl_error_expected_expression", "[checker]") {
@@ -360,7 +362,7 @@ TEST_CASE("decl_error_expected_expression", "[checker]") {
     REQUIRE(checker.error_reporter.errors.size() == 1);
 
     Error& error = *checker.error_reporter.errors.back();
-    ErrorExpectedExpression exp(Entity((Class*) nullptr), *declaration_node.expression);
+    ErrorExpectedExpression exp(EntityClass((Class*) nullptr), *declaration_node.expression);
     REQUIRE(error == exp);
 }
 
@@ -415,9 +417,9 @@ TEST_CASE("binop_ok", "[checker]") {
 
     REQUIRE(!checker.error_reporter.failed);
     REQUIRE(checker.error_reporter.errors.empty());
-    CHECK(info->entity.type == E_TYPE::VALUE);
-    CHECK(info->entity.value->metatype == Meta::CLASS);
-    CHECK(*info->entity.value->type == ObjectType("Integer"));
+    CHECK(info->entity->type == E_TYPE::VALUE);
+    CHECK(((EntityValue*) (info->entity))->value->metatype == Meta::CLASS);
+    CHECK(*((EntityValue*) (info->entity))->value->type == ObjectType("Integer"));
 }
 
 TEST_CASE("boolop_ok", "[checker]") {
@@ -434,9 +436,9 @@ TEST_CASE("boolop_ok", "[checker]") {
 
     REQUIRE(!checker.error_reporter.failed);
     REQUIRE(checker.error_reporter.errors.empty());
-    CHECK(info->entity.type == E_TYPE::VALUE);
-    CHECK(info->entity.value->metatype == Meta::CLASS);
-    CHECK(*info->entity.value->type == ObjectType("Boolean"));
+    CHECK(info->entity->type == E_TYPE::VALUE);
+    CHECK(((EntityValue*) (info->entity))->value->metatype == Meta::CLASS);
+    CHECK(*((EntityValue*) (info->entity))->value->type == ObjectType("Boolean"));
 }
 
 
@@ -458,7 +460,7 @@ TEST_CASE("binop_type_error", "[checker]") {
     Error& error = *checker.error_reporter.errors.back();
     StringNode node("Hello", _POS, _POS);
     ObjectType expected("Integer");
-    ErrorTypeMismatch exp(expected, node, entity_from_type(ObjectType("String")));
+    ErrorTypeMismatch exp(expected, node, *entity_from_type(ObjectType("String")));
     REQUIRE(error == exp);
 }
 
@@ -521,7 +523,7 @@ TEST_CASE("subscript_index_type_error", "[checker]") {
     Error& error = *checker.error_reporter.errors.back();
     StringNode node("foo", _POS, _POS);
     ObjectType expected("Integer");
-    ErrorTypeMismatch exp(expected, node, entity_from_type(ObjectType("String")));
+    ErrorTypeMismatch exp(expected, node, *entity_from_type(ObjectType("String")));
     REQUIRE(error == exp);
 }
 
@@ -596,7 +598,7 @@ TEST_CASE("call_args_type_error", "[checker]") {
     Error& error = *checker.error_reporter.errors.back();
     StringNode node("Hello", _POS, _POS);
     ObjectType expected("Integer");
-    ErrorTypeMismatch exp(expected, node, entity_from_type(ObjectType("String")));
+    ErrorTypeMismatch exp(expected, node, *entity_from_type(ObjectType("String")));
     REQUIRE(error == exp);
 }
 
@@ -644,7 +646,7 @@ TEST_CASE("union_error", "[checker]") {
     Error& error = *checker.error_reporter.errors.back();
     BooleanNode node(false, _POS, _POS);
     ObjectType expected("Union", {new ObjectType("Integer"), new ObjectType("String")});
-    ErrorTypeMismatch exp(expected, node, entity_from_type(ObjectType("Boolean")));
+    ErrorTypeMismatch exp(expected, node, *entity_from_type(ObjectType("Boolean")));
     REQUIRE(error == exp);
 }
 
@@ -679,7 +681,7 @@ TEST_CASE("while_boolean_error", "[checker]") {
     Error& error = *checker.error_reporter.errors.back();
     NumberNode node(NumberType::INTEGER, "5", _POS, _POS);
     ObjectType expected("Boolean");
-    ErrorTypeMismatch exp(expected, node, entity_from_type(ObjectType("Integer")));
+    ErrorTypeMismatch exp(expected, node, *entity_from_type(ObjectType("Integer")));
     REQUIRE(error == exp);
 }
 
@@ -714,7 +716,7 @@ TEST_CASE("if_boolean_error", "[checker]") {
     Error& error = *checker.error_reporter.errors.back();
     NumberNode node(NumberType::INTEGER, "5", _POS, _POS);
     ObjectType expected("Boolean");
-    ErrorTypeMismatch exp(expected, node, entity_from_type(ObjectType("Integer")));
+    ErrorTypeMismatch exp(expected, node, *entity_from_type(ObjectType("Integer")));
     REQUIRE(error == exp);
 }
 

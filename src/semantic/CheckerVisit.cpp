@@ -52,7 +52,7 @@ SNode* make_for_snode(ForNode& node, USemanticInfo& binfo, USemanticInfo& exp_in
 USemanticInfo Checker::visit_enum(EnumNode& p_node) {
     SemanticInfo info;
     auto* esn = new EnumSNode();
-    Enum* enumm = this->scope->get(p_node.id).enumm;
+    Enum* enumm = ((EntityEnum&) this->scope->get(p_node.id)).enumm;
     esn->id = enumm->path.as_str();
     esn->values = p_node.values;
     info.snode = esn;
@@ -78,16 +78,16 @@ USemanticInfo Checker::visit_class(ClassNode& node) {
         this->assert_type_exists(t, node.start);
     }
 
-    Class* clazz = this->scope->get(node.class_name).clazz;
+    Class* clazz = ((EntityClass&) this->scope->get(node.class_name)).clazz;
     auto* csn = new ClassSNode(clazz->path.as_str(), node.members_ordered);
     sn->nodes.push_back(csn);
     sn->nodes.push_back(make_class_default_init(clazz->path.as_str(), node.members_ordered));
 
     for (const auto& sm: node.static_members) {
         USemanticInfo sm_exp_info = this->dispatch(*sm.second.second);
-        if (*sm.second.first != *sm_exp_info->entity.value->type) {
+        if (*sm.second.first != *((EntityValue*)sm_exp_info->entity)->value->type) {
             this->error_reporter.fail("Err: cannt initialize static member of type " + sm.second.first->to_string() +
-                                      " with expression of type " + sm_exp_info->entity.value->type->to_string());
+                                      " with expression of type " + ((EntityValue*)sm_exp_info->entity)->value->type->to_string());
         }
         if (!sm_exp_info->is_constant) {
             this->error_reporter.fail("Error: cannot initialize static member with non constant expression!");
@@ -102,7 +102,7 @@ USemanticInfo Checker::visit_class(ClassNode& node) {
         vt->actual_base_path = clazz->path;
         auto* val = new Value(vt);
         this->add_this = true;
-        this->this_entity = Entity(val);
+        this->this_entity = new EntityValue(val);
         val->metatype = Meta::CLASS;
         val->clazz = clazz;
         // method.second->path = clazz->path + "." + method.second->identifier;
@@ -212,7 +212,7 @@ USemanticInfo Checker::visit_function(FunctionNode& n) {
         } else {
             clazz->methods[n.implicit->method] = c;
         }
-        Entity generic_type = Entity(clazz);
+        Entity* generic_type = new EntityClass(clazz);
         this->scope->set(n.implicit->type, generic_type);
         params.push_back("implicit_a");
     }
@@ -221,7 +221,7 @@ USemanticInfo Checker::visit_function(FunctionNode& n) {
         TypeNode* cl = type.clone();
         make_not_generic(cl);
         auto te = entity_from_type(*cl);
-        this->fill_value(te.value);
+        this->fill_value(((EntityValue*) te)->value);
         this->scope->set(n.parameter_names[i], te);
         // if (!param_type.is_generic()) {
         //     if (param_type.kind == Kind::OBJECT) {
@@ -249,7 +249,7 @@ USemanticInfo Checker::visit_function(FunctionNode& n) {
     USemanticInfo body_info = this->visit_block(*n.body);
     BlockSNode* bn = (BlockSNode*) (body_info->snode);
     for (auto local_var: this->scope->table) {
-        if (local_var.second.type == E_TYPE::VALUE) {
+        if (local_var.second->type == E_TYPE::VALUE) {
             bn->locals.push_back(local_var.first);
         }
     }

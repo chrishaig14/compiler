@@ -25,18 +25,18 @@ int target_union_type(const ObjectType& target, const TypeNode& source) {
     return -1;
 }
 
-Entity entity_from_type(const TypeNode& type) {
+Entity* entity_from_type(const TypeNode& type) {
     if (type.kind == Kind::FUNCTION) {
         auto* fv = new Value(type.clone());
-        return Entity(fv);
+        return new EntityValue(fv);
     }
     if (type.kind == Kind::OBJECT) {
         if (type.object().id == ".None") {
-            return Entity(E_TYPE::NOTHING);
+            return new EntityNothing();
         }
     }
     auto* fv = new Value(type.clone());
-    return Entity(fv);
+    return new EntityValue(fv);
 }
 
 FunctionSNode* make_class_default_init(const std::string& class_path, const VectorOfStrings& members) {
@@ -54,12 +54,11 @@ FunctionSNode* make_class_default_init(const std::string& class_path, const Vect
 }
 
 
-TypeNode* get_entity_type(Entity e) {
-    Entity* ent = &e;
-    if (ent->type == E_TYPE::CONST_FUNCTION) {
-        return e.const_function->ft->clone();
-    } else if (ent->type == E_TYPE::VALUE) {
-        return e.value->type->clone();
+TypeNode* get_entity_type(Entity& e) {
+    if (e.type == E_TYPE::CONST_FUNCTION) {
+        return ((EntityConstFunction&) e).const_function->ft->clone();
+    } else if (e.type == E_TYPE::VALUE) {
+        return ((EntityValue&) e).value->type->clone();
     }
     throw std::runtime_error("Get type of non function/object!");
 }

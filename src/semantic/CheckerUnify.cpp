@@ -152,20 +152,20 @@ USemanticInfo Checker::visit_import(ImportNode& node) {
     return std::make_unique<SemanticInfo>(info);
 }
 
-Entity map_flirpin_to_entity(Flirpin flirpin) {
+Entity* map_flirpin_to_entity(Flirpin flirpin) {
     switch (flirpin.type) {
         case F_TYPE::CONST_FUNCTION:
-            return Entity(flirpin.const_function);
+            return new EntityConstFunction(flirpin.const_function);
         case F_TYPE::CLASS:
-            return Entity(flirpin.clazz);
+            return new EntityClass(flirpin.clazz);
         case F_TYPE::PACKAGE:
-            return Entity(flirpin.package);
+            return new EntityPackage(flirpin.package);
         case F_TYPE::MODULE:
-            return Entity(flirpin.module);
+            return new EntityModule(flirpin.module);
         case F_TYPE::ENUM:
-            return Entity(flirpin.enumm);
+            return new EntityEnum(flirpin.enumm);
     }
-    return Entity{};
+    return nullptr;
 }
 
 
@@ -181,7 +181,7 @@ USemanticInfo Checker::enum_member(Enum* enumm, const std::string& value, Member
             auto* otype = new ObjectType(enumm->enumm_name, {});
             otype->actual_base_path = enumm->path;
             auto* ov = new Value(otype);
-            info.entity = Entity(ov);
+            info.entity = new EntityValue(ov);
             // this->fill_value(info.entity.value);
             info.snode = new EnumMemberSNode(enumm->path.as_str(), value);
             return std::make_unique<SemanticInfo>(info);

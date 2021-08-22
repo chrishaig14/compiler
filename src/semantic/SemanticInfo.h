@@ -15,7 +15,7 @@
 
 class SemanticInfo {
 public:
-    Entity entity;
+    Entity* entity;
     SNode* snode;
     bool is_tuple_member;
     SemanticInfo& operator=(const SemanticInfo& other);

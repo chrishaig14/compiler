@@ -28,7 +28,7 @@ public:
     std::map<std::string, TypeNode*> aliased_types;
     std::vector<std::pair<std::string, Path>> imported_paths_no_alias_v;
     std::vector<std::pair<std::string, Path>> imported_paths_with_alias_v;
-    std::map<std::string, Entity> imports;
+    std::map<std::string, Entity*> imports;
     Path path;
     std::map<std::string, Flirpin> flirpins;
     std::string full_header_path;

@@ -10,7 +10,7 @@
 
 class ErrorFor : public Error {
 public:
-    ErrorFor(Entity entity, TextPosition position);
+    ErrorFor(const Entity& entity, TextPosition position);
     Error* clone() const override;
     bool equal(const Error& other) const override;
     std::string to_str() const override;

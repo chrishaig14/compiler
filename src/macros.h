@@ -78,7 +78,7 @@
 #define T_FLOAT ObjectType("Float")
 #define T_DOUBLE ObjectType("Double")
 
-typedef std::unordered_map<std::string, Entity> MapStringEntity;
+typedef std::unordered_map<std::string, Entity*> MapStringEntity;
 typedef std::unordered_map<std::string, TypeNode*> MapStringType;
 
 #endif //UNTITLED1_MACROS_H

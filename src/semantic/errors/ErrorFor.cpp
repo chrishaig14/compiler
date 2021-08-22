@@ -16,6 +16,6 @@ std::string ErrorFor::to_str() const {
     return std::string();
 }
 
-ErrorFor::ErrorFor(Entity entity, TextPosition position) {
+ErrorFor::ErrorFor(const Entity& entity, TextPosition position) {
 
 }

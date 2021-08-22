@@ -14,8 +14,9 @@ USemanticInfo Checker::visit_boolean(BooleanNode& node) {
     SemanticInfo info;
     auto* ot = new T_BOOL;
     ot->actual_base_path = Path("core.core.Boolean");
-    info.entity = Entity(new Value(ot));
-    this->fill_value(info.entity.value);
+    Value* v = new Value(ot);
+    info.entity = new EntityValue(v);
+    this->fill_value(v);
     info.snode = new BoolSNode(node.value);
     return std::make_unique<SemanticInfo>(info);
 }
@@ -27,7 +28,7 @@ USemanticInfo Checker::visit_number(NumberNode& node) {
         case NumberType::INTEGER: {
             auto* otype = new ObjectType("Integer", {});
             auto* ov = new Value(otype);
-            info.entity = Entity(ov);
+            info.entity = new EntityValue(ov);
             auto* snode = new IntegerSNode(std::string());
             snode->str = node.str;
             otype->actual_base_path = Path("core.core.Integer");
@@ -38,7 +39,7 @@ USemanticInfo Checker::visit_number(NumberNode& node) {
         case NumberType::FLOAT: {
             auto* otype = new ObjectType("Float", {});
             auto* ov = new Value(otype);
-            info.entity = Entity(ov);
+            info.entity = new EntityValue(ov);
             auto* snode = new FloatSNode();
             snode->str = node.str;
             otype->actual_base_path = Path("core.core.Float");
@@ -64,7 +65,7 @@ USemanticInfo Checker::visit_none(NoneNode& node) {
     SemanticInfo info;
     // info.set_type(ObjectType("NoneType"));
     auto* v = new Value(new ObjectType("NoneType"));
-    info.entity = Entity(v);
+    info.entity = new EntityValue(v);
     info.snode = new NoneSNode();
     return std::make_unique<SemanticInfo>(info);
 }
@@ -74,7 +75,7 @@ USemanticInfo Checker::visit_emptylist(EmptyListNode& node) {
     this->module->fill_actual(node.type);
     auto* otype = new ObjectType("List", {node.type});
     auto* ov = new Value(otype);
-    info.entity = Entity(ov);
+    info.entity = new EntityValue(ov);
     otype->actual_base_path = Path("core.core.List");
     this->fill_value(ov);
     std::vector<USNode> v;
@@ -92,7 +93,7 @@ USemanticInfo Checker::visit_string(StringNode& node) {
     auto* otype = new ObjectType("String", {});
     otype->actual_base_path = Path("core.core.String");
     auto* ov = new Value(otype);
-    info.entity = Entity(ov);
+    info.entity = new EntityValue(ov);
     this->fill_value(ov);
     return std::make_unique<SemanticInfo>(info);
 }
@@ -103,7 +104,7 @@ USemanticInfo Checker::visit_tuple(TupleNode& node) {
     for (auto* n: node.values) {
         USemanticInfo vtype = this->dispatch(*n);
         values.push_back(vtype->snode);
-        types.emplace_back(vtype->entity.value->type->clone());
+        types.emplace_back(((EntityValue*) vtype->entity)->value->type->clone());
         // if (!this->is_immutable(vtype->type())) {
         //     this->error_reporter.tuple_member_not_immutable(vtype->type(), node.start);
         //     return error_stub();
@@ -113,14 +114,14 @@ USemanticInfo Checker::visit_tuple(TupleNode& node) {
     auto* otype = new ObjectType("Tuple", types);
     auto* ov = new Value(otype);
     ov->metatype = Meta::CLASS;
-    sinfo.entity = Entity(ov);
+    sinfo.entity = new EntityValue(ov);
 
     ov->clazz = new Class();
     for (size_t i = 0; i < ov->type->object().type_params.size(); i++) {
         auto* tv = new Value(ov->type->object().type_params[i]->clone());
         this->fill_value(tv);
         const std::string& mem_name = std::to_string(i + 1);
-        ov->clazz->member_entities[mem_name] = Entity(tv);
+        ov->clazz->member_entities[mem_name] = new EntityValue(tv);
         ov->clazz->members[mem_name] = tv->type->clone();
     }
     unsigned long num_values = node.values.size();
@@ -136,9 +137,10 @@ USemanticInfo Checker::visit_partial(PartialApplication& node) {
     USemanticInfo func = this->dispatch(*node.function);
     VectorOfTypes partial_args;
     FunctionType* fun_type = nullptr;
-    if (func->entity.type == E_TYPE::CONST_FUNCTION ||
-        (func->entity.type == E_TYPE::VALUE && func->entity.value->type->kind == Kind::FUNCTION)) {
-        fun_type = func->entity.const_function->ft->clone();
+    Entity& f_entity = *func->entity;
+    if (f_entity.type == E_TYPE::CONST_FUNCTION ||
+        (f_entity.type == E_TYPE::VALUE && ((EntityValue&) f_entity).value->type->kind == Kind::FUNCTION)) {
+        fun_type = ((EntityConstFunction&) f_entity).const_function->ft->clone();
     } else {
         this->error_reporter.fail("Error: expected a function for partial application");
         return error_stub();
@@ -166,7 +168,7 @@ USemanticInfo Checker::visit_partial(PartialApplication& node) {
     }
     node.complete_type = &fun_type->clone()->function();
     SemanticInfo s;
-    s.entity = Entity(new Value(new FunctionType(partial_args, fun_type->return_type->clone())));
+    s.entity = new EntityValue(new Value(new FunctionType(partial_args, fun_type->return_type->clone())));
     auto* non = new NewObjectSNode();
     non->class_name = "Partial" + std::to_string(npartial);
     non->args = snodes;
@@ -179,8 +181,10 @@ USemanticInfo Checker::visit_dict(DictNode& node) {
     SemanticInfo info;
     USemanticInfo first_key_info = this->dispatch(*node.items[0].first);
     USemanticInfo first_value_info = this->dispatch(*node.items[0].second);
-    ObjectType& first_key_type = first_key_info->entity.value->type->object();
-    ObjectType& first_value_type = first_value_info->entity.value->type->object();
+    EntityValue& first_key_entity = *(EntityValue*) first_key_info->entity;
+    EntityValue& first_value_entity = *(EntityValue*) first_key_info->entity;
+    ObjectType& first_key_type = first_key_entity.value->type->object();
+    ObjectType& first_value_type = first_value_entity.value->type->object();
 
     std::vector<std::pair<SNode*, SNode*>> items;
     items = {{first_key_info->snode, first_value_info->snode}};
@@ -203,7 +207,7 @@ USemanticInfo Checker::visit_dict(DictNode& node) {
     this->module->fill_actual(ov->type);
     this->fill_value(ov);
     assert(ov->clazz != nullptr);
-    info.entity = Entity(ov);
+    info.entity = new EntityValue(ov);
     auto* nsn = new DictSNode(items);
     info.snode = nsn;
     return std::make_unique<SemanticInfo>(info);
@@ -217,7 +221,7 @@ USemanticInfo Checker::visit_emptydict(EmptyDictNode& node) {
     this->module->fill_actual(ov->type);
     this->fill_value(ov);
     assert(ov->clazz != nullptr);
-    info.entity = Entity(ov);
+    info.entity = new EntityValue(ov);
     auto* nsn = new DictSNode({});
     info.snode = nsn;
     return std::make_unique<SemanticInfo>(info);
@@ -229,36 +233,38 @@ USemanticInfo Checker::visit_defconst(DefaultConstructorNode& node) {
     // this is a regular function
     SemanticInfo info;
     VectorOfTypes t;
-    Entity entity = this->dispatch(*node.class_node)->entity;
+    Entity& entity = *this->dispatch(*node.class_node)->entity;
     if (entity.type != E_TYPE::CLASS) {
         this->error_reporter.fail("Error not a class");
+        info.entity = new EntityError();
+        return std::make_unique<SemanticInfo>(info);
     }
-    Class* cls = entity.clazz;
-    for (auto* pt: cls->member_types) {
+    Class& cls = *((EntityClass&) entity).clazz;
+    for (auto* pt: cls.member_types) {
         t.push_back(pt->clone());
     }
     VectorOfTypes tp;
-    for (const auto& tt: entity.clazz->type_params) {
+    for (const auto& tt: cls.type_params) {
         auto* ot = new ObjectType(tt);
         tp.push_back(ot);
         ot->is_generic_param = true;
     }
-    auto* rt = new ObjectType(entity.clazz->class_name, tp);
-    rt->actual_base_path = cls->path;
-    info.entity = Entity(new ConstFunction(Path(), new FunctionType(t, rt)));
-    auto* idn = new IdSNode(cls->path.as_str() + "." + "__init__");
+    auto* rt = new ObjectType(cls.class_name, tp);
+    rt->actual_base_path = cls.path;
+    info.entity = new EntityConstFunction(new ConstFunction(Path(), new FunctionType(t, rt)));
+    auto* idn = new IdSNode(cls.path.as_str() + "." + "__init__");
     info.snode = idn;
     return std::make_unique<SemanticInfo>(info);
 }
 
 USemanticInfo Checker::visit_list(ListNode& node) {
     USemanticInfo element_type_p = this->dispatch(*node.elements[0]);
-    if (element_type_p->entity.type != E_TYPE::VALUE) {
-        this->error_reporter.error(ErrorExpectedExpression(element_type_p->entity, *node.elements[0]));
+    if (element_type_p->entity->type != E_TYPE::VALUE) {
+        this->error_reporter.error(ErrorExpectedExpression(*element_type_p->entity, *node.elements[0]));
         return error_stub();
     }
-
-    TypeNode* element_type = element_type_p->entity.value->type->clone();
+    EntityValue& entity_value = *(EntityValue*) element_type_p->entity;
+    TypeNode* element_type = entity_value.value->type->clone();
     bool is_constant = true;
     std::vector<USNode> list_elements;
     list_elements.push_back(USNode(element_type_p->snode));
@@ -269,9 +275,10 @@ USemanticInfo Checker::visit_list(ListNode& node) {
         // if (!current_type_p->is_constant) {
         //     is_constant = false;
         // }
-        ObjectType* ctype = &current_type_p->entity.value->type->object();
+        EntityValue& p_entity = *(EntityValue*) current_type_p->entity;
+        ObjectType* ctype = &p_entity.value->type->object();
         if (*ctype != *element_type) {
-            this->error_reporter.error(ErrorTypeMismatch(*element_type, *node.elements[i], current_type_p->entity));
+            this->error_reporter.error(ErrorTypeMismatch(*element_type, *node.elements[i], p_entity));
         }
         list_elements.push_back(USNode(current_type_p->snode));
     }
@@ -281,8 +288,9 @@ USemanticInfo Checker::visit_list(ListNode& node) {
 
     return_info.snode = new ListSNode(list_elements);
     auto* otype = new ObjectType("List", {element_type->clone()});
-    return_info.entity = Entity(new Value(otype));
+    Value* p_value = new Value(otype);
+    return_info.entity = new EntityValue(p_value);
     otype->actual_base_path = Path("core.core.List");
-    this->fill_value(return_info.entity.value);
+    this->fill_value(p_value);
     return std::make_unique<SemanticInfo>(return_info);
 }

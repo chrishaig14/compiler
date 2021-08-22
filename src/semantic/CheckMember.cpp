@@ -12,27 +12,28 @@
 
 USemanticInfo Checker::visit_member(MemberNode& n) {
     USemanticInfo parent_info = this->dispatch(*n.parent);
-    Entity parent_entity = parent_info->entity;
+    Entity& parent_entity = *parent_info->entity;
     switch (parent_entity.type) {
         case E_TYPE::CLASS:
-            return this->class_member(parent_entity.clazz, n.s_child, n);
+            return this->class_member(((EntityClass&) parent_entity).clazz, n.s_child, n);
         case E_TYPE::CONST_FUNCTION:
-            this->error_reporter.error(ErrorNoMember(*parent_entity.const_function->ft, n));
+            this->error_reporter.error(ErrorNoMember(*((EntityConstFunction&) parent_entity).const_function->ft, n));
             // this->error_reporter.object_no_member(*parent_entity.const_function->ft, n);
             break;
         case E_TYPE::VALUE:
-            if (parent_entity.value->type->kind == Kind::FUNCTION) {
-                this->error_reporter.error(ErrorNoMember(*parent_entity.const_function->ft, n));
+            if (((EntityValue&) parent_entity).value->type->kind == Kind::FUNCTION) {
+                this->error_reporter.error(ErrorNoMember(*((EntityConstFunction&) parent_entity).const_function->ft,
+                                                         n));
                 // this->error_reporter.object_no_member(*parent_entity.value->type, n);
                 return error_stub();
             }
-            return this->object_member(parent_info->snode, parent_entity.value, n.s_child, n);
+            return this->object_member(parent_info->snode, ((EntityValue&) parent_entity).value, n.s_child, n);
         case E_TYPE::PACKAGE:
-            return this->package_member(*parent_entity.package, n.s_child, n);
+            return this->package_member(*((EntityPackage&) parent_entity).package, n.s_child, n);
         case E_TYPE::MODULE:
-            return this->module_member(*parent_entity.module, n.s_child, n);
+            return this->module_member(*((EntityModule&) parent_entity).module, n.s_child, n);
         case E_TYPE::ENUM:
-            return this->enum_member(parent_entity.enumm, n.s_child, n);
+            return this->enum_member(((EntityEnum&) parent_entity).enumm, n.s_child, n);
         default:
             break;
     }
@@ -89,10 +90,10 @@ USemanticInfo Checker::object_member(SNode* object_snode, Value* p_value, const 
     assert(clazz != nullptr);
     if (clazz->members.count(child) != 0) {
         info.entity = clazz->member_entities.at(child);
-        if (info.entity.type == E_TYPE::NOTHING) {
+        if (info.entity->type == E_TYPE::NOTHING) {
             info.entity = entity_from_type(*clazz->members.at(child));
             clazz->member_entities[child] = info.entity;
-            this->fill_value(info.entity.value);
+            this->fill_value(((EntityValue*) info.entity)->value);
         }
         auto* omn = new ObjectMemberSNode(object_snode, clazz->path, child);
         info.snode = omn;
@@ -102,7 +103,7 @@ USemanticInfo Checker::object_member(SNode* object_snode, Value* p_value, const 
             // method call
             info.this_arg = object_snode;
             info.snode = idn;
-            info.entity = Entity(clazz->methods[child]);
+            info.entity = new EntityConstFunction(clazz->methods[child]);
         } else {
             // return partial
             size_t npartial = clazz->methods[child]->ft->param_types.size();
@@ -115,7 +116,7 @@ USemanticInfo Checker::object_member(SNode* object_snode, Value* p_value, const 
             }
             info.snode = non;
             auto* fv = new Value(clazz->methods[child]->ft->clone());
-            info.entity = Entity(fv);
+            info.entity = new EntityValue(fv);
         }
 
     } else {
@@ -136,11 +137,11 @@ USemanticInfo Checker::object_member(SNode* object_snode, Value* p_value, const 
 USemanticInfo Checker::package_member(Package& package, const std::string& child, MemberNode& n) {
     if (package.units.count(child) == 0) {
         this->error_reporter.error(ErrorPackageNoMember(&package,
-                                               child,
-                                               n.dot_pos,
-                                               *n.parent,
-                                               n.child_token.start,
-                                               n.child_token.end_pos));
+                                                        child,
+                                                        n.dot_pos,
+                                                        *n.parent,
+                                                        n.child_token.start,
+                                                        n.child_token.end_pos));
         return error_stub();
     }
     Unit unit = package.units[child];
@@ -162,10 +163,10 @@ USemanticInfo Checker::class_member(Class* cls, const std::string& child, Member
         }
         ObjectType* ot = new ObjectType(cls->class_name, tp);
         unbound_method->ft->param_types.insert(unbound_method->ft->param_types.begin(), ot);
-        info.entity = Entity(unbound_method);
+        info.entity = new EntityConstFunction(unbound_method);
         info.snode = new IdSNode(unbound_method->path.as_str());
     } else if (cls->static_methods.find(child) != cls->static_methods.end()) {
-        info.entity = Entity(cls->static_methods[child]);
+        info.entity = new EntityConstFunction(cls->static_methods[child]);
         info.snode = new IdSNode(cls->static_methods[child]->path.as_str());
     } else if (cls->static_members.find(child) != cls->static_members.end()) {
         info.entity = entity_from_type(*cls->static_members[child].first);

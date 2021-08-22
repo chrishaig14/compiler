@@ -13,7 +13,7 @@
 class ErrorTypeMismatch : public Error {
     const TypeNode& expected;
     const Node& value_node;
-    Entity actual;
+    const Entity& actual;
 public:
     ErrorTypeMismatch(const TypeNode& expected, const Node& value_node, const Entity& actual);
 

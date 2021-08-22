@@ -13,21 +13,23 @@ std::unique_ptr<SemanticInfo> Checker::expect_rvalue_of_type(const TypeNode& tar
     if (rinfo->is_error()) {
         return error_stub();
     }
-    if (rinfo->entity.type != E_TYPE::VALUE && rinfo->entity.type != E_TYPE::CONST_FUNCTION) {
-        this->error_reporter.error(ErrorTypeMismatch(*target.clone(), node, rinfo->entity));
+    Entity& r_entity = *rinfo->entity;
+    if (r_entity.type != E_TYPE::VALUE && r_entity.type != E_TYPE::CONST_FUNCTION) {
+        this->error_reporter.error(ErrorTypeMismatch(*target.clone(), node, r_entity));
         return error_stub();
     }
-    SNode* snode = make_rvalue(rinfo->entity, rinfo->snode, target);
+    SNode* snode = make_rvalue(r_entity, rinfo->snode, target);
     if (snode == nullptr) {
-        this->error_reporter.error(ErrorTypeMismatch(*target.clone(), node, rinfo->entity));
+        this->error_reporter.error(ErrorTypeMismatch(*target.clone(), node, r_entity));
         return error_stub();
     }
     rinfo->snode = snode;
     return rinfo;
 }
 
-SNode* Checker::make_rvalue(const Entity& value_entity, SNode* value_snode, const TypeNode& target) {
-    if (value_entity.type == E_TYPE::VALUE) {
+SNode* Checker::make_rvalue(const Entity& t_entity, SNode* value_snode, const TypeNode& target) {
+    if (t_entity.type == E_TYPE::VALUE) {
+        EntityValue& value_entity = (EntityValue&) t_entity;
         if (value_entity.value->type->kind != target.kind) {
             return nullptr;
         }
@@ -69,8 +71,9 @@ SNode* Checker::make_rvalue(const Entity& value_entity, SNode* value_snode, cons
             return make_option_rvalue(value_snode, unaliased_value_type, unaliased_target_type);
         }
 
-    } else if (value_entity.type == E_TYPE::CONST_FUNCTION) {
-        if (*value_entity.const_function->ft == target) {
+    } else if (t_entity.type == E_TYPE::CONST_FUNCTION) {
+        EntityConstFunction& const_function_entity = (EntityConstFunction&) t_entity;
+        if (*const_function_entity.const_function->ft == target) {
             return value_snode;
         } else {
             return nullptr;
@@ -149,7 +152,7 @@ USemanticInfo Checker::check_declaration_with_type(DeclarationNode& n) {
     USNode up(rvalue_sinfo->snode);
     info.snode = new DeclarationSNode(n.identifier, up);
     auto* ov = new Value(n.type->clone());
-    info.entity = Entity(ov);
+    info.entity = new EntityValue(ov);
     this->fill_value(ov);
     return std::make_unique<SemanticInfo>(info);
 }
@@ -159,9 +162,9 @@ USemanticInfo Checker::check_declaration_without_type(DeclarationNode& n) {
     if (exp_info_p->is_error()) {
         return error_stub();
     }
-    E_TYPE entity_type = exp_info_p->entity.type;
+    E_TYPE entity_type = exp_info_p->entity->type;
     if (entity_type != E_TYPE::CONST_FUNCTION && entity_type != E_TYPE::VALUE) {
-        this->error_reporter.error(ErrorExpectedExpression(exp_info_p->entity, *n.expression));
+        this->error_reporter.error(ErrorExpectedExpression(*exp_info_p->entity, *n.expression));
         return error_stub();
     }
 
@@ -169,12 +172,13 @@ USemanticInfo Checker::check_declaration_without_type(DeclarationNode& n) {
     USNode u(exp_info_p->snode);
     info.snode = new DeclarationSNode(n.identifier, u);
     info.entity = exp_info_p->entity;
-    if (info.entity.type == E_TYPE::CONST_FUNCTION) {
-        info.entity = Entity(new Value(exp_info_p->entity.const_function->ft->clone()));
+    if (info.entity->type == E_TYPE::CONST_FUNCTION) {
+        EntityValue* value_entity = new EntityValue(new Value(((EntityConstFunction*) exp_info_p->entity)->const_function->ft->clone()));
+        info.entity = value_entity;
 
-        if (info.entity.value->type->is_generic()) {
+        if (value_entity->value->type->is_generic()) {
             this->error_reporter.fail("Error: you need to specialize the generic function of type " +
-                                      info.entity.value->type->to_string() +
+                                      value_entity->value->type->to_string() +
                                       " to be able to use it without calling it");
         }
     }

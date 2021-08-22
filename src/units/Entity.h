@@ -53,50 +53,57 @@ enum class E_TYPE {
 };
 
 class Entity {
+protected:
+    explicit Entity(E_TYPE type) : type(type) {
+    }
+
 public:
-    E_TYPE type;
-    union {
-        Package* package;
-        Module* module;
-        Class* clazz;
-        Value* value;
-        ConstFunction* const_function;
-        Enum* enumm;
-    };
+    const E_TYPE type;
 
-    Entity(const Entity& o) {
-        this->type = o.type;
-        this->package = o.package;
-        this->module = o.module;
-        this->clazz = o.clazz;
-        this->value = o.value;
-        this->const_function = o.const_function;
-        this->enumm = o.enumm;
-    }
+    // union {
+    //     Package* package;
+    //     Module* module;
+    //     Class* clazz;
+    //     Value* value;
+    //     ConstFunction* const_function;
+    //     Enum* enumm;
+    // };
+    //
+    // Entity(const Entity& o) {
+    //     this->type = o.type;
+    //     this->package = o.package;
+    //     this->module = o.module;
+    //     this->clazz = o.clazz;
+    //     this->value = o.value;
+    //     this->const_function = o.const_function;
+    //     this->enumm = o.enumm;
+    // }
+    //
+    // explicit Entity() : type(E_TYPE::NOT_FOUND), package(nullptr) {
+    // }
+    //
+    // explicit Entity(E_TYPE type) : type(type), package(nullptr) {
+    // }
+    //
+    // explicit Entity(Package* package) : type(E_TYPE::PACKAGE), package(package) {
+    // }
+    //
+    // explicit Entity(Module* module) : type(E_TYPE::MODULE), module(module) {
+    // }
+    //
+    // explicit Entity(Class* clazz) : type(E_TYPE::CLASS), clazz(clazz) {
+    // }
+    //
+    // explicit Entity(Value* object_value) : type(E_TYPE::VALUE), value(object_value) {
+    // }
+    //
+    // explicit Entity(ConstFunction* const_function) : type(E_TYPE::CONST_FUNCTION), const_function(const_function) {
+    // }
+    //
+    // explicit Entity(Enum* enumm) : type(E_TYPE::ENUM), enumm(enumm) {
+    // }
 
-    explicit Entity() : type(E_TYPE::NOT_FOUND), package(nullptr) {
-    }
-
-    explicit Entity(E_TYPE type) : type(type), package(nullptr) {
-    }
-
-    explicit Entity(Package* package) : type(E_TYPE::PACKAGE), package(package) {
-    }
-
-    explicit Entity(Module* module) : type(E_TYPE::MODULE), module(module) {
-    }
-
-    explicit Entity(Class* clazz) : type(E_TYPE::CLASS), clazz(clazz) {
-    }
-
-    explicit Entity(Value* object_value) : type(E_TYPE::VALUE), value(object_value) {
-    }
-
-    explicit Entity(ConstFunction* const_function) : type(E_TYPE::CONST_FUNCTION), const_function(const_function) {
-    }
-
-    explicit Entity(Enum* enumm) : type(E_TYPE::ENUM), enumm(enumm) {
-    }
+    virtual bool equal(const Entity& other) const = 0;
 
     bool operator==(const Entity& rhs) const {
 
@@ -108,6 +115,110 @@ public:
         return !(rhs == *this);
     }
 };
+
+class EntityClass : public Entity {
+public:
+    explicit EntityClass(Class* clazz) : Entity(E_TYPE::CLASS), clazz(clazz) {
+    }
+
+    bool equal(const Entity& other) const override {
+        return false;
+    }
+
+    Class* clazz;
+};
+
+class EntityPackage : public Entity {
+public:
+    explicit EntityPackage(Package* package) : Entity(E_TYPE::PACKAGE), package(package) {
+    }
+
+    bool equal(const Entity& other) const override {
+        return false;
+    }
+
+    Package* package;
+};
+
+class EntityNothing : public Entity {
+public:
+    explicit EntityNothing() : Entity(E_TYPE::NOTHING) {
+    }
+
+    bool equal(const Entity& other) const override {
+        return false;
+    }
+};
+
+class EntityModule : public Entity {
+public:
+    explicit EntityModule(Module* module) : Entity(E_TYPE::MODULE), module(module) {
+    }
+
+    bool equal(const Entity& other) const override {
+        return false;
+    }
+
+    Module* module;
+};
+
+class EntityValue : public Entity {
+public:
+    explicit EntityValue(Value* value) : Entity(E_TYPE::VALUE), value(value) {
+    }
+
+    Value* value;
+
+    bool equal(const Entity& other) const override {
+        return false;
+    }
+};
+
+class EntityConstFunction : public Entity {
+public:
+    explicit EntityConstFunction(ConstFunction* const_function)
+            : Entity(E_TYPE::CONST_FUNCTION), const_function(const_function) {
+    }
+
+    ConstFunction* const_function;
+
+    bool equal(const Entity& other) const override {
+        return false;
+    }
+};
+
+class EntityEnum : public Entity {
+public:
+    explicit EntityEnum(Enum* enumm) : Entity(E_TYPE::ENUM), enumm(enumm) {
+    }
+
+    bool equal(const Entity& other) const override {
+        return false;
+    }
+
+    Enum* enumm;
+};
+
+class EntityNotFound : public Entity {
+public:
+    explicit EntityNotFound() : Entity(E_TYPE::NOT_FOUND) {
+    }
+
+    bool equal(const Entity& other) const override {
+        return false;
+    }
+};
+
+class EntityError : public Entity {
+public:
+    explicit EntityError() : Entity(E_TYPE::ERROR) {
+    }
+
+    bool equal(const Entity& other) const override {
+        return false;
+    }
+};
+
 
 std::string flirpintype_to_str(F_TYPE flirpintype);
 

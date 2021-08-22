@@ -30,7 +30,7 @@ std::string binoptype_to_str(OpType op);
 
 int target_union_type(const ObjectType& target, const TypeNode& source);
 
-Entity entity_from_type(const TypeNode& type);
+Entity* entity_from_type(const TypeNode& type);
 
 FunctionNode* generate_eq_method(std::string class_name, VectorOfTypes tp, VectorOfStrings members_ordered);
 
@@ -38,7 +38,7 @@ FunctionNode* generate_str_method(std::string class_name);
 
 FunctionSNode* make_class_default_init(const std::string& class_path, const VectorOfStrings& members);
 
-TypeNode* get_entity_type(Entity e);
+TypeNode* get_entity_type(Entity& e);
 
 void mangle_generic_names(TypeNode* t);
 void mangle_generic_names(FunctionType* t);

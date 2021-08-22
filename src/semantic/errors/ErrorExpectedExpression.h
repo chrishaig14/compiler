@@ -10,12 +10,12 @@
 
 class ErrorExpectedExpression : public Error {
 public:
-    ErrorExpectedExpression(Entity entity, const Node& node);
+    ErrorExpectedExpression(const Entity& entity, const Node& node);
     Error* clone() const override;
     bool equal(const Error& other) const override;
     std::string to_str() const override;
 
-    Entity entity;
+    const Entity& entity;
     const Node& node;
 };
 

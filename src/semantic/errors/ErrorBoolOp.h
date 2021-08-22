@@ -8,9 +8,9 @@
 
 #include "Error.h"
 
-class ErrorBoolOp : public Error{
+class ErrorBoolOp : public Error {
 public:
-    ErrorBoolOp(Entity left, Entity right, TextPosition position);
+    ErrorBoolOp(const Entity& left, const Entity& right, TextPosition position);
     Error* clone() const override;
     bool equal(const Error& other) const override;
     std::string to_str() const override;

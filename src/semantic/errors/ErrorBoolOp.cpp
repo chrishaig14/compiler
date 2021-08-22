@@ -16,6 +16,6 @@ std::string ErrorBoolOp::to_str() const {
     return std::string();
 }
 
-ErrorBoolOp::ErrorBoolOp(Entity left, Entity right, TextPosition position) {
+ErrorBoolOp::ErrorBoolOp(const Entity& left, const Entity& right, TextPosition position) {
 
 }
