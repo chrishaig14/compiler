@@ -138,11 +138,12 @@ TestNodeU FUNCTION() {
     VectorOfUTypes vt;
     vt.push_back(UTypeNode(TYPE_1.node->clone()));
     vt.push_back(UTypeNode(TYPE_2.node->clone()));
+    UTypeNode u(TYPE_3.node->clone());
     return {"fun " + ID + "(" + ID_1 + ":" + TYPE_1.text + "," + ID_2 + ":" + TYPE_2.text + ")->" + TYPE_3.text +
             block.text, std::make_unique<FunctionNode>(ID,
                                                        VectorOfStrings{ID_1, ID_2},
                                                        vt,
-                                                       TYPE_3.node->clone(),
+                                                       u,
                                                        (std::unique_ptr<BlockNode>&) block.node,
                                                        DUMMY_POS,
                                                        DUMMY_POS)};
@@ -322,10 +323,11 @@ TEST_CASE("parse_fun_simple", "[parser]") {
     std::unique_ptr<FunctionNode> ast = parser.parse_function_definition();
 
     VectorOfUTypes vt;
+    UTypeNode u(NO_TYPE.clone());
     REQUIRE(ast->to_json() == FunctionNode(ID,
                                            VectorOfStrings{},
                                            vt,
-                                           NO_TYPE.clone(),
+                                           u,
                                            (std::unique_ptr<BlockNode>&) BLOCK.node,
                                            DUMMY_POS,
                                            DUMMY_POS).to_json());
@@ -344,7 +346,8 @@ TEST_CASE("parse_fun_one_arg", "[parser]") {
 
     VectorOfUTypes vt;
     vt.push_back(UTypeNode(TYPE.node->clone()));
-    REQUIRE(ast->to_json() == FunctionNode(ID, {ID_1}, vt, NO_TYPE.clone(), (std::unique_ptr<BlockNode>&) BLOCK.node,
+    UTypeNode u(NO_TYPE.clone());
+    REQUIRE(ast->to_json() == FunctionNode(ID, {ID_1}, vt, u, (std::unique_ptr<BlockNode>&) BLOCK.node,
 
                                            DUMMY_POS, DUMMY_POS).to_json());
 }
@@ -363,10 +366,11 @@ TEST_CASE("parse_fun_mult_arg", "[parser]") {
     VectorOfUTypes vt;
     vt.push_back(UTypeNode(TYPE_1.node->clone()));
     vt.push_back(UTypeNode(TYPE_2.node->clone()));
+    UTypeNode u(NO_TYPE.clone());
     REQUIRE(ast->to_json() == FunctionNode(ID,
                                            {ID_1, ID_2},
                                            vt,
-                                           NO_TYPE.clone(),
+                                           u,
                                            (std::unique_ptr<BlockNode>&) BLOCK.node,
                                            DUMMY_POS,
                                            DUMMY_POS).to_json());
@@ -962,19 +966,21 @@ TEST_CASE("parse_instance", "[parser]") {
     VectorOfUTypes vt2;
     vt2.push_back(std::make_unique<ObjectType>("Foo"));
     vt2.push_back(std::make_unique<ObjectType>("Foo"));
+    UTypeNode r1 = std::make_unique<ObjectType>("Boolean");
+    UTypeNode r2 = std::make_unique<ObjectType>("Boolean");
     REQUIRE(ast->to_json() == InstanceNode("Comparable",
                                            new ObjectType("Foo"),
                                            {{"eq", new FunctionNode("eq",
                                                                     {"a", "b"},
                                                                     vt1,
-                                                                    new ObjectType("Boolean"),
+                                                                    r1,
                                                                     b1,
                                                                     DUMMY_POS,
                                                                     DUMMY_POS)},
                                             {"ne", new FunctionNode("ne",
                                                                     {"a", "b"},
                                                                     vt2,
-                                                                    new ObjectType("Boolean"),
+                                                                    r2,
                                                                     b2,
                                                                     DUMMY_POS,
                                                                     DUMMY_POS)}},

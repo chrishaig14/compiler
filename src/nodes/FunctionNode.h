@@ -28,9 +28,9 @@ public:
     VectorOfStrings parameter_names;
     VectorOfUTypes parameter_types;
     std::unique_ptr<BlockNode> body;
-    TypeNode* return_type;
+    UTypeNode return_type;
     FunctionNode(std::string identifier, const VectorOfStrings& parameter_names, VectorOfUTypes& parameter_types,
-                 TypeNode* return_type, std::unique_ptr<BlockNode>& body, TextPosition start, TextPosition end);
+                 UTypeNode& return_type, std::unique_ptr<BlockNode>& body, TextPosition start, TextPosition end);
 
     bool equal(const Node& x) const override;
 
