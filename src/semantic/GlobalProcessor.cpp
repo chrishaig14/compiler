@@ -225,10 +225,6 @@ void GlobalProcessor::visit_class(ClassNode& node) {
         class_info->static_methods.insert(make_pair(f.first, cf));
     }
 
-    VectorOfTypes tp;
-    for (auto& type_parameter : node.type_parameters) {
-        tp.push_back(new ObjectType(type_parameter));
-    }
     class_info->class_name = node.class_name;
     class_info->type_params = node.type_parameters;
     class_info->path = Path(this->module.path, class_info->class_name);
