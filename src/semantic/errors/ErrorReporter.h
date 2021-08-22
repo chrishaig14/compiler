@@ -24,7 +24,7 @@ enum class ErrorElement {
 class ErrorReporter {
 public:
     ErrorReporter();
-    std::vector<Error*> errors;
+    std::vector<std::unique_ptr<Error>> errors;
     CodeLines code_lines;
     void assignment(const TypeNode& expected, const TypeNode& actual, TextPosition pos, const Node& lvalue,
                     const Node& rvalue);

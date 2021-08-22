@@ -676,10 +676,7 @@ TEST_CASE("while_boolean_error", "[checker]") {
     REQUIRE(checker.error_reporter.errors.size() == 1);
 
 
-    Error* p_error = checker.error_reporter.errors.back();
-    std::cout << p_error << std::endl;
-    Error& error = *p_error;
-    std::cout << error << std::endl;
+    Error& error = *checker.error_reporter.errors.back();
     NumberNode node(NumberType::INTEGER, "5", _POS, _POS);
     ObjectType expected("Boolean");
     ErrorTypeMismatch exp(expected, node, entity_from_type(ObjectType("Integer")));
@@ -714,10 +711,7 @@ TEST_CASE("if_boolean_error", "[checker]") {
     REQUIRE(checker.error_reporter.errors.size() == 1);
 
 
-    Error* p_error = checker.error_reporter.errors.back();
-    std::cout << p_error << std::endl;
-    Error& error = *p_error;
-    std::cout << error << std::endl;
+    Error& error = *checker.error_reporter.errors.back();
     NumberNode node(NumberType::INTEGER, "5", _POS, _POS);
     ObjectType expected("Boolean");
     ErrorTypeMismatch exp(expected, node, entity_from_type(ObjectType("Integer")));
@@ -738,10 +732,7 @@ TEST_CASE("enum_error", "[checker]") {
     REQUIRE(checker.error_reporter.errors.size() == 1);
 
 
-    Error* p_error = checker.error_reporter.errors.back();
-    std::cout << p_error << std::endl;
-    Error& error = *p_error;
-    std::cout << error << std::endl;
+    Error& error = *checker.error_reporter.errors.back();
     UNode u = IdNode::make("Foo", _POS, _POS);
     MemberNode node(u, Token(TokType::ID, "b", _POS));
     ObjectType expected("Boolean");
