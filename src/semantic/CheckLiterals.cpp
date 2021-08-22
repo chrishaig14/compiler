@@ -182,7 +182,7 @@ USemanticInfo Checker::visit_dict(DictNode& node) {
     USemanticInfo first_key_info = this->dispatch(*node.items[0].first);
     USemanticInfo first_value_info = this->dispatch(*node.items[0].second);
     EntityValue& first_key_entity = *(EntityValue*) first_key_info->entity;
-    EntityValue& first_value_entity = *(EntityValue*) first_key_info->entity;
+    EntityValue& first_value_entity = *(EntityValue*) first_value_info->entity;
     ObjectType& first_key_type = first_key_entity.value->type->object();
     ObjectType& first_value_type = first_value_entity.value->type->object();
 
