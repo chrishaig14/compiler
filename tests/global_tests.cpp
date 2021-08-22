@@ -14,7 +14,7 @@ TEST_CASE("global_main", "[parser]") {
     Parser parser("test", scanner.code_lines, tokens);
     parser.top_package_name = "main";
     Module module(Path("main.foo"), "foo.xl", ".", false, "main.h");
-    module.ast = parser.parse_program().release();
+    module.ast = parser.parse_program();
     GlobalProcessor gp(&module);
     gp.visit_root(*module.ast);
 
@@ -36,7 +36,7 @@ TEST_CASE("global_class", "[parser]") {
     Parser parser("test", scanner.code_lines, tokens);
     parser.top_package_name = "main";
     Module module(Path("main.foo"), "foo.xl", ".", false, "main.h");
-    module.ast = parser.parse_program().release();
+    module.ast = parser.parse_program();
     GlobalProcessor gp(&module);
     gp.visit_root(*module.ast);
 
@@ -82,7 +82,7 @@ TEST_CASE("global_multiple", "[parser]") {
     Parser parser("test", scanner.code_lines, tokens);
     parser.top_package_name = "main";
     Module module(Path("main.foo"), "foo.xl", ".", false, "main.h");
-    module.ast = parser.parse_program().release();
+    module.ast = parser.parse_program();
     GlobalProcessor gp(&module);
     gp.visit_root(*module.ast);
 

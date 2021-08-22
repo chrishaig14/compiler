@@ -18,7 +18,7 @@ public:
     std::string name;
     std::string abs_path;
     CodeLines code_lines;
-    BlockNode* ast;
+    UBlockNode ast;
     BlockSNode* sast;
 
     std::map<std::string, std::string> included_module_paths;
