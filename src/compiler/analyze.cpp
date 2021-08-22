@@ -156,7 +156,7 @@ void Compiler::process_global_all_modules(Package& package) {
             Module* module = ep.second.module;
             GlobalProcessor gp(*module);
             std::cout << "Global-processing module " << module->name << " at path: " << module->abs_path << std::endl;
-            gp.visit_root(*module->ast);
+            gp.visit_root();
         }
     }
 }

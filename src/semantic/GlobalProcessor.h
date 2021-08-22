@@ -20,7 +20,7 @@ public:
 
     GlobalProcessor(Module& module);
 
-    void visit_root(BlockNode& node);
+    void visit_root();
 
     void dispatch(Node& nod);
     void visit_function(FunctionNode& node);

@@ -74,10 +74,11 @@ void GlobalProcessor::visit_function(FunctionNode& node) {
     node.const_function = const_function;
 }
 
-void GlobalProcessor::visit_root(BlockNode& node) {
+void GlobalProcessor::visit_root() {
     // process imports first
     // process classes second
     // finally process functions
+    BlockNode& node = *this->module.ast;
     check_duplicated_names(node);
 
     this->add_default_imports();
