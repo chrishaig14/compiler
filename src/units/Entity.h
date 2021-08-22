@@ -7,6 +7,7 @@
 
 #include <string>
 #include <map>
+#include <memory>
 
 class Package;
 
@@ -59,50 +60,6 @@ protected:
 
 public:
     const E_TYPE type;
-
-    // union {
-    //     Package* package;
-    //     Module* module;
-    //     Class* clazz;
-    //     Value* value;
-    //     ConstFunction* const_function;
-    //     Enum* enumm;
-    // };
-    //
-    // Entity(const Entity& o) {
-    //     this->type = o.type;
-    //     this->package = o.package;
-    //     this->module = o.module;
-    //     this->clazz = o.clazz;
-    //     this->value = o.value;
-    //     this->const_function = o.const_function;
-    //     this->enumm = o.enumm;
-    // }
-    //
-    // explicit Entity() : type(E_TYPE::NOT_FOUND), package(nullptr) {
-    // }
-    //
-    // explicit Entity(E_TYPE type) : type(type), package(nullptr) {
-    // }
-    //
-    // explicit Entity(Package* package) : type(E_TYPE::PACKAGE), package(package) {
-    // }
-    //
-    // explicit Entity(Module* module) : type(E_TYPE::MODULE), module(module) {
-    // }
-    //
-    // explicit Entity(Class* clazz) : type(E_TYPE::CLASS), clazz(clazz) {
-    // }
-    //
-    // explicit Entity(Value* object_value) : type(E_TYPE::VALUE), value(object_value) {
-    // }
-    //
-    // explicit Entity(ConstFunction* const_function) : type(E_TYPE::CONST_FUNCTION), const_function(const_function) {
-    // }
-    //
-    // explicit Entity(Enum* enumm) : type(E_TYPE::ENUM), enumm(enumm) {
-    // }
-
     virtual bool equal(const Entity& other) const = 0;
 
     bool operator==(const Entity& rhs) const {
@@ -162,17 +119,7 @@ public:
     Module* module;
 };
 
-class EntityValue : public Entity {
-public:
-    explicit EntityValue(Value* value) : Entity(E_TYPE::VALUE), value(value) {
-    }
 
-    Value* value;
-
-    bool equal(const Entity& other) const override {
-        return false;
-    }
-};
 
 class EntityConstFunction : public Entity {
 public:

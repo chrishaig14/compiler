@@ -151,9 +151,9 @@ USemanticInfo Checker::check_declaration_with_type(DeclarationNode& n) {
     SemanticInfo info;
     USNode up(rvalue_sinfo->snode);
     info.snode = new DeclarationSNode(n.identifier, up);
-    auto* ov = new Value(n.type->clone());
-    info.entity = new EntityValue(ov);
-    this->fill_value(ov);
+    auto ov = std::make_unique<Value>(n.type->clone());
+    this->fill_value(*ov);
+    info.entity = new EntityValue(std::move(ov));
     return std::make_unique<SemanticInfo>(info);
 }
 
@@ -173,7 +173,7 @@ USemanticInfo Checker::check_declaration_without_type(DeclarationNode& n) {
     info.snode = new DeclarationSNode(n.identifier, u);
     info.entity = exp_info_p->entity;
     if (info.entity->type == E_TYPE::CONST_FUNCTION) {
-        EntityValue* value_entity = new EntityValue(new Value(((EntityConstFunction*) exp_info_p->entity)->const_function->ft->clone()));
+        EntityValue* value_entity = new EntityValue(std::make_unique<Value>(((EntityConstFunction*) exp_info_p->entity)->const_function->ft->clone()));
         info.entity = value_entity;
 
         if (value_entity->value->type->is_generic()) {

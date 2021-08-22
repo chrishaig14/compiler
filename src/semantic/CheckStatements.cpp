@@ -51,10 +51,10 @@ USemanticInfo Checker::visit_lvalue_subscript(SubscriptNode& node) {
     SNode* child_snode = child_sinfo->snode;
 
     SemanticInfo info;
-    auto* value = new Value((ObjectType*) rtype);
-    info.entity = new EntityValue(value);
+    auto value = std::make_unique<Value>((ObjectType*) rtype);
+    this->fill_value(*value);
+    info.entity = new EntityValue(std::move(value));
 
-    this->fill_value(value);
     auto* fsn = new IdSNode(sub_fun_path);
     auto* csn = new CallSNode(fsn, {parent_p->snode, child_snode});
     info.snode = csn;
@@ -248,9 +248,9 @@ USemanticInfo Checker::visit_match(MatchExpressionNode& node) {
             return error_stub();
         }
         this->enter_scope("case");
-        auto* v = new Value(case_type);
-        Entity* ent = new EntityValue(v);
-        this->fill_value(v);
+        auto v = std::make_unique<Value>(case_type);
+        this->fill_value(*v);
+        Entity* ent = new EntityValue(std::move(v));
         assert(v->clazz != nullptr);
         this->scope->set(case_id, ent);
         USemanticInfo case_info = this->dispatch(*case_node);
@@ -299,9 +299,9 @@ USemanticInfo Checker::visit_for(ForNode& node) {
     }
 
     TypeNode* elem_type = exp_ot->type_params[0];
-    auto* v = new Value(elem_type);
-    Entity* elem_entity = new EntityValue(v);
-    this->fill_value(v);
+    auto v = std::make_unique<Value>(elem_type);
+    this->fill_value(*v);
+    Entity* elem_entity = new EntityValue(std::move(v));
     this->enter_scope("for");
     this->scope->set(node.var, elem_entity);
 

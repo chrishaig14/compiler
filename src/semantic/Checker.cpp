@@ -130,7 +130,7 @@ Checker::match_arguments_to_generic_function(const FunctionType& ft, VectorOfTyp
         delete at;
     }
     SemanticInfo rv;
-    rv.entity = new EntityValue(new Value(f->return_type->clone()));
+    rv.entity = new EntityValue(std::make_unique<Value>(f->return_type->clone()));
     delete f;
     return std::make_unique<SemanticInfo>(rv);
 }
@@ -208,7 +208,7 @@ Class* Checker::instantiate_generic(Class* generic, const ObjectType& instance) 
                 std::cout << "----------- Generic with implicit which is class parameter: " << method_cf.first
                           << std::endl;
                 EntityValue& e = *(EntityValue*) entity_from_type(*instance.type_params[0]);
-                this->fill_value(e.value);
+                this->fill_value(*e.value);
                 Class* clazz_t = e.value->clazz;
                 auto meth = clazz_t->methods.find(implicit->method);
                 if (meth == clazz_t->methods.end()) {

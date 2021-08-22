@@ -146,7 +146,7 @@ public:
     USemanticInfo visit_defconst(DefaultConstructorNode& node);
 
 
-    USemanticInfo object_member(SNode* object_snode, Value* p_value, const std::string& child, MemberNode& n);
+    USemanticInfo object_member(SNode* object_snode, Value& p_value, const std::string& child, MemberNode& n);
     USemanticInfo class_member(Class* cls, const std::string& child, MemberNode& n);
     USemanticInfo package_member(Package& package, const std::string& child, MemberNode& n);
     USemanticInfo module_member(Module& mod, const std::string& child, MemberNode& n);
@@ -158,7 +158,7 @@ public:
     USemanticInfo visit_enum(EnumNode& p_node);
     SNode* make_rvalue(const Entity& value_entity, SNode* value_snode, const TypeNode& target);
     USemanticInfo dispatch(Node& nod);
-    void fill_value(Value* value);
+    void fill_value(Value& value);
     std::unique_ptr<SemanticInfo> expect_rvalue_of_type(const TypeNode& target, Node& node);
     void process_function_arguments(SemanticInfo& retv, std::vector<Entity*>& arg_entities, CallSNode* sn, CallNode& n,
                                     FunctionType* function_type, SemanticInfo* fun_info_p);

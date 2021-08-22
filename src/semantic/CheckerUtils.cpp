@@ -27,16 +27,16 @@ int target_union_type(const ObjectType& target, const TypeNode& source) {
 
 Entity* entity_from_type(const TypeNode& type) {
     if (type.kind == Kind::FUNCTION) {
-        auto* fv = new Value(type.clone());
-        return new EntityValue(fv);
+        auto fv = std::make_unique<Value>(type.clone());
+        return new EntityValue(std::move(fv));
     }
     if (type.kind == Kind::OBJECT) {
         if (type.object().id == ".None") {
             return new EntityNothing();
         }
     }
-    auto* fv = new Value(type.clone());
-    return new EntityValue(fv);
+    auto fv = std::make_unique<Value>(type.clone());
+    return new EntityValue(std::move(fv));
 }
 
 FunctionSNode* make_class_default_init(const std::string& class_path, const VectorOfStrings& members) {

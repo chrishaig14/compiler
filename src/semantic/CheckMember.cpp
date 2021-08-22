@@ -27,7 +27,7 @@ USemanticInfo Checker::visit_member(MemberNode& n) {
                 // this->error_reporter.object_no_member(*parent_entity.value->type, n);
                 return error_stub();
             }
-            return this->object_member(parent_info->snode, ((EntityValue&) parent_entity).value, n.s_child, n);
+            return this->object_member(parent_info->snode, *((EntityValue&) parent_entity).value, n.s_child, n);
         case E_TYPE::PACKAGE:
             return this->package_member(*((EntityPackage&) parent_entity).package, n.s_child, n);
         case E_TYPE::MODULE:
@@ -65,35 +65,37 @@ TextPosition add_one_col(TextPosition t) {
     return {t.line, t.column + 1};
 }
 
-USemanticInfo Checker::object_member(SNode* object_snode, Value* p_value, const std::string& child, MemberNode& n) {
-    Path object_type_path = p_value->type->object().actual_base_path;
+USemanticInfo Checker::object_member(SNode* object_snode, Value& p_value, const std::string& child, MemberNode& n) {
+    Path object_type_path = p_value.type->object().actual_base_path;
     // if (object_type_path.as_str() == "") {
     //     // is a single type param, error
-    //     this->error_reporter.object_no_member(*p_value->type, n);
+    //     this->error_reporter.object_no_member(*p_value.type, n);
     //     return error_stub();
     // }
     if (object_type_path.as_str() == "core.core.Union") {
-        this->error_reporter.error(ErrorNoMember(*p_value->type, n));
-        // this->error_reporter.object_no_member(*p_value->type, n);
+        this->error_reporter.error(ErrorNoMember(*p_value.type, n));
+        // this->error_reporter.object_no_member(*p_value.type, n);
         return error_stub();
     }
-    if (p_value->metatype == Meta::ENUM) {
-        this->error_reporter.error(ErrorNoMember(*p_value->type, n));
-        // this->error_reporter.object_no_member(*p_value->type, n);
+    if (p_value.metatype == Meta::ENUM) {
+        this->error_reporter.error(ErrorNoMember(*p_value.type, n));
+        // this->error_reporter.object_no_member(*p_value.type, n);
         return error_stub();
     }
     SemanticInfo info;
-    if (p_value->type->kind == Kind::OBJECT && p_value->type->object().id == "Tuple") {
+    if (p_value.type->kind == Kind::OBJECT && p_value.type->object().id == "Tuple") {
         info.is_tuple_member = true;
     }
-    Class* clazz = p_value->clazz;
+    Class* clazz = p_value.clazz;
     assert(clazz != nullptr);
     if (clazz->members.count(child) != 0) {
         info.entity = clazz->member_entities.at(child);
         if (info.entity->type == E_TYPE::NOTHING) {
             info.entity = entity_from_type(*clazz->members.at(child));
             clazz->member_entities[child] = info.entity;
-            this->fill_value(((EntityValue*) info.entity)->value);
+            auto* ev = (EntityValue*) info.entity;
+            Value& vup = *(ev->value);
+            this->fill_value(vup);
         }
         auto* omn = new ObjectMemberSNode(object_snode, clazz->path, child);
         info.snode = omn;
@@ -115,13 +117,13 @@ USemanticInfo Checker::object_member(SNode* object_snode, Value* p_value, const 
                 non->args.push_back(nullptr);
             }
             info.snode = non;
-            auto* fv = new Value(clazz->methods[child]->ft->clone());
-            info.entity = new EntityValue(fv);
+            auto fv = std::make_unique<Value>(clazz->methods[child]->ft->clone());
+            info.entity = new EntityValue(std::move(fv));
         }
 
     } else {
-        this->error_reporter.error(ErrorNoMemberSuggestions(*p_value->type, n, *clazz));
-        // this->error_reporter.object_no_member_with_suggestions(*p_value->type,
+        this->error_reporter.error(ErrorNoMemberSuggestions(*p_value.type, n, *clazz));
+        // this->error_reporter.object_no_member_with_suggestions(*p_value.type,
         //                                                        child,
         //                                                        n.dot_pos,
         //                                                        *n.parent,

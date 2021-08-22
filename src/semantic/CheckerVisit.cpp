@@ -85,9 +85,10 @@ USemanticInfo Checker::visit_class(ClassNode& node) {
 
     for (const auto& sm: node.static_members) {
         USemanticInfo sm_exp_info = this->dispatch(*sm.second.second);
-        if (*sm.second.first != *((EntityValue*)sm_exp_info->entity)->value->type) {
+        if (*sm.second.first != *((EntityValue*) sm_exp_info->entity)->value->type) {
             this->error_reporter.fail("Err: cannt initialize static member of type " + sm.second.first->to_string() +
-                                      " with expression of type " + ((EntityValue*)sm_exp_info->entity)->value->type->to_string());
+                                      " with expression of type " +
+                                      ((EntityValue*) sm_exp_info->entity)->value->type->to_string());
         }
         if (!sm_exp_info->is_constant) {
             this->error_reporter.fail("Error: cannot initialize static member with non constant expression!");
@@ -100,9 +101,9 @@ USemanticInfo Checker::visit_class(ClassNode& node) {
     for (const auto& method: node.methods) {
         auto* vt = new ObjectType(node.class_name);
         vt->actual_base_path = clazz->path;
-        auto* val = new Value(vt);
+        auto val = std::make_unique<Value>(vt);
         this->add_this = true;
-        this->this_entity = new EntityValue(val);
+        this->this_entity = new EntityValue(std::move(val));
         val->metatype = Meta::CLASS;
         val->clazz = clazz;
         // method.second->path = clazz->path + "." + method.second->identifier;
@@ -221,7 +222,7 @@ USemanticInfo Checker::visit_function(FunctionNode& n) {
         TypeNode* cl = type.clone();
         make_not_generic(cl);
         auto te = entity_from_type(*cl);
-        this->fill_value(((EntityValue*) te)->value);
+        this->fill_value(*((EntityValue*) te)->value);
         this->scope->set(n.parameter_names[i], te);
         // if (!param_type.is_generic()) {
         //     if (param_type.kind == Kind::OBJECT) {

@@ -86,28 +86,28 @@ USemanticInfo Checker::visit_call(CallNode& n, bool is_rvalue) {
                 Entity* ep = entity_from_type(*tt);
                 assert(ep->type == E_TYPE::VALUE);
                 EntityValue& e = (EntityValue&) *ep;
-                this->fill_value(e.value);
+                this->fill_value(*e.value);
                 std::cout << "calling function with implicit: " << full_function->implicit->type << "."
                           << full_function->implicit->method << " : " << full_function->implicit->ft->to_string()
                           << std::endl;
                 ConstFunction* implicit_arg = nullptr;
                 if (full_function->implicit->is_static) {
-                    auto it = e.value->clazz->static_methods.find(full_function->implicit->method);
-                    if (it == e.value->clazz->static_methods.end()) {
+                    auto it2 = e.value->clazz->static_methods.find(full_function->implicit->method);
+                    if (it2 == e.value->clazz->static_methods.end()) {
                         std::cout << "ERROR class has no implicit STATIC method: " << full_function->implicit->method
                                   << std::endl;
                         exit(1);
                     }
-                    implicit_arg = it->second;
+                    implicit_arg = it2->second;
                 } else {
-                    auto it = e.value->clazz->methods.find(full_function->implicit->method);
-                    if (it == e.value->clazz->methods.end()) {
+                    auto it3 = e.value->clazz->methods.find(full_function->implicit->method);
+                    if (it3 == e.value->clazz->methods.end()) {
                         std::cout << "ERROR class has no implicit method: " << full_function->implicit->method
                                   << std::endl;
                         exit(1);
                     }
                     // implicit_arg = e.value->clazz->methods.at(full_function->implicit->method);
-                    implicit_arg = it->second;
+                    implicit_arg = it3->second;
                 }
                 FunctionType* implicit_param = full_function->implicit->ft;
 
@@ -162,7 +162,7 @@ USemanticInfo Checker::make_return_info(const CallNode& n, bool is_rvalue, Seman
             if (value.type->object().id == ".None") {
                 retv.entity = new EntityNothing();
             } else {
-                fill_value(&value);
+                fill_value(value);
             }
         }
     }
