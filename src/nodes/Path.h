@@ -23,7 +23,7 @@ public:
 
     std::string as_str() const;
 
-    VectorOfStrings as_vec();
+    VectorOfStrings as_vec() const;
 };
 
 

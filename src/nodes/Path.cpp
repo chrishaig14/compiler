@@ -39,6 +39,6 @@ std::string Path::as_str() const {
     return this->s;
 }
 
-VectorOfStrings Path::as_vec() {
+VectorOfStrings Path::as_vec() const {
     return this->path_parts;
 }

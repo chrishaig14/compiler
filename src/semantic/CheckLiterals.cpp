@@ -12,11 +12,7 @@
 
 USemanticInfo Checker::visit_boolean(BooleanNode& node) {
     SemanticInfo info;
-    auto* ot = new T_BOOL;
-    ot->actual_base_path = Path("core.core.Boolean");
-    auto v = std::make_unique<Value>(ot);
-    this->fill_value(*v);
-    info.entity = new EntityValue(std::move(v));
+    info.entity = &this->entity_value_from_actual_base_path_no_generic(Path("core.core.Boolean"));
     info.snode = new BoolSNode(node.value);
     return std::make_unique<SemanticInfo>(info);
 }
@@ -26,22 +22,19 @@ USemanticInfo Checker::visit_number(NumberNode& node) {
     SemanticInfo info;
     switch (node.num_type) {
         case NumberType::INTEGER: {
-            auto* otype = new ObjectType("Integer", {});
-            otype->actual_base_path = Path("core.core.Integer");
-            auto ov = std::make_unique<Value>(otype);
-            this->fill_value(*ov);
-            info.entity = new EntityValue(std::move(ov));
+            info.entity = &this->entity_value_from_actual_base_path_no_generic(Path("core.core.Integer"));
             auto* snode = new IntegerSNode(std::string());
             snode->str = node.str;
             info.snode = snode;
             break;
         }
         case NumberType::FLOAT: {
-            auto* otype = new ObjectType("Float", {});
-            otype->actual_base_path = Path("core.core.Float");
-            auto ov = std::make_unique<Value>(otype);
-            this->fill_value(*ov);
-            info.entity = new EntityValue(std::move(ov));
+            info.entity = &this->entity_value_from_actual_base_path_no_generic(Path("core.core.Float"));
+            // auto* otype = new ObjectType("Float", {});
+            // otype->actual_base_path = Path("core.core.Float");
+            // auto ov = std::make_unique<Value>(otype);
+            // this->fill_value(*ov);
+            // info.entity = new EntityValue(std::move(ov));
             auto* snode = new FloatSNode();
             snode->str = node.str;
             info.snode = snode;
@@ -90,11 +83,12 @@ USemanticInfo Checker::visit_string(StringNode& node) {
     info.is_constant = true;
     auto* sn = new StringSNode(node.str);
     info.snode = sn;
-    auto* otype = new ObjectType("String", {});
-    otype->actual_base_path = Path("core.core.String");
-    auto ov = std::make_unique<Value>(otype);
-    this->fill_value(*ov);
-    info.entity = new EntityValue(std::move(ov));
+    // auto* otype = new ObjectType("String", {});
+    // otype->actual_base_path = Path("core.core.String");
+    // auto ov = std::make_unique<Value>(otype);
+    // this->fill_value(*ov);
+    // info.entity = new EntityValue(std::move(ov));
+    info.entity = &this->entity_value_from_actual_base_path_no_generic(Path("core.core.String"));
     return std::make_unique<SemanticInfo>(info);
 }
 

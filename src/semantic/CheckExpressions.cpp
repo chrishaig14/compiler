@@ -12,6 +12,19 @@
 #include "errors/ErrorObjectNoSpecialMethod.h"
 #include "errors/ErrorClassNoMethodForOp.h"
 
+EntityValue& Checker::entity_value_from_actual_base_path_no_generic(const Path& p) {
+    if (this->entity_values_no_generic.count(p.as_str()) == 0) {
+        auto* ot = new ObjectType(p.as_vec().back());
+        ot->actual_base_path = p;
+        auto v = std::make_unique<Value>(ot);
+        this->fill_value(*v);
+        auto* entity = new EntityValue(std::move(v));
+        this->entity_values_no_generic[p.as_str()] = entity;
+        return *entity;
+    }
+    return *this->entity_values_no_generic.at(p.as_str());
+}
+
 USemanticInfo Checker::visit_id(IdNode& n) {
     // Logger::info("Checking id node " + n._id);
     Entity& entity = this->scope->get(n._id);
@@ -106,11 +119,12 @@ USemanticInfo Checker::visit_boolop(BoolOpNode& n) {
         if (fun != "__eq__" && fun != "__ne__") {
             this->error_reporter.fail("Error: enum type doesnt support this operator");
         }
-        auto* ot = new ObjectType("Boolean", {});
-        ot->actual_base_path = Path("core.core.Boolean");
-        TypeNode* rettype = ot;
-
-        info.entity = new EntityValue(std::make_unique<Value>(rettype));
+        // auto* ot = new ObjectType("Boolean", {});
+        // ot->actual_base_path = Path("core.core.Boolean");
+        // TypeNode* rettype = ot;
+        //
+        // info.entity = new EntityValue(std::make_unique<Value>(rettype));
+        info.entity = &this->entity_value_from_actual_base_path_no_generic(Path("core.core.Boolean"));
         ConstFunction* opfun = (((EntityEnum&) entity).enumm)->functions[fun];
         info.snode = make_boolop_snode(opfun, left_info, right_info);
 
