@@ -11,23 +11,23 @@
 void GlobalProcessor::visit_import(ImportNode& node) {
     const Path& node_path = Path(node.path);
     if (node.has_alias) {
-        if (this->module->imported_paths_with_alias.count(node.alias) != 0) {
+        if (this->module.imported_paths_with_alias.count(node.alias) != 0) {
             throw std::runtime_error("Import alias \"" + node.alias + "\" already defined for " +
-                                     this->module->imported_paths_with_alias[node.alias].as_str());
+                                     this->module.imported_paths_with_alias[node.alias].as_str());
         }
-        this->module->imported_paths_with_alias[node.alias] = node_path;
-        this->module->imported_paths_with_alias_v.emplace_back(node.alias, node_path);
+        this->module.imported_paths_with_alias[node.alias] = node_path;
+        this->module.imported_paths_with_alias_v.emplace_back(node.alias, node_path);
     } else {
-        if (this->module->imported_paths_with_alias.count(node.path.back()) != 0) {
-            std::cout << this->module->abs_path << std::endl;
+        if (this->module.imported_paths_with_alias.count(node.path.back()) != 0) {
+            std::cout << this->module.abs_path << std::endl;
             throw std::runtime_error("Path " + node_path.as_str() + " already imported!");
         }
-        if (this->module->imported_paths_no_alias.count(node.path.back()) != 0) {
-            std::cout << this->module->abs_path << std::endl;
+        if (this->module.imported_paths_no_alias.count(node.path.back()) != 0) {
+            std::cout << this->module.abs_path << std::endl;
             throw std::runtime_error("Path " + node_path.as_str() + " already imported!");
         }
-        this->module->imported_paths_no_alias[node.path.back()] = node_path;
-        this->module->imported_paths_no_alias_v.emplace_back(node.path.back(), node_path);
+        this->module.imported_paths_no_alias[node.path.back()] = node_path;
+        this->module.imported_paths_no_alias_v.emplace_back(node.path.back(), node_path);
     }
 }
 
@@ -36,39 +36,39 @@ void GlobalProcessor::add_default_imports() {
                                        Path("core.core.Double"), Path("core.core.Boolean"), Path("core.core.Float"),
                                        Path("core.core.Option"), Path("core.core.print"), Path("core.core.Dict")};
     for (auto path: default_paths) {
-        if (this->module->imported_paths_with_alias.count(path.as_vec().back()) != 0) {
-            std::cout << this->module->abs_path << std::endl;
+        if (this->module.imported_paths_with_alias.count(path.as_vec().back()) != 0) {
+            std::cout << this->module.abs_path << std::endl;
             throw std::runtime_error("Path " + path.as_str() + " already imported!");
         }
-        if (this->module->imported_paths_no_alias.count(path.as_vec().back()) != 0) {
-            std::cout << this->module->abs_path << std::endl;
+        if (this->module.imported_paths_no_alias.count(path.as_vec().back()) != 0) {
+            std::cout << this->module.abs_path << std::endl;
             throw std::runtime_error("Path " + path.as_str() + " already imported!");
         }
-        this->module->imported_paths_no_alias[path.as_vec().back()] = path;
-        this->module->imported_paths_no_alias_v.emplace_back(path.as_vec().back(), path);
+        this->module.imported_paths_no_alias[path.as_vec().back()] = path;
+        this->module.imported_paths_no_alias_v.emplace_back(path.as_vec().back(), path);
     }
 }
 
 
 void GlobalProcessor::visit_function(FunctionNode& node) {
-    std::cout << "Global-processing function " << node.identifier << " in module " << this->module->name << std::endl;
-    ConstFunction* const_function = this->module->flirpins[node.identifier].const_function;
+    std::cout << "Global-processing function " << node.identifier << " in module " << this->module.name << std::endl;
+    ConstFunction* const_function = this->module.flirpins[node.identifier].const_function;
 
     VectorOfTypes x;
     for (auto& p: node.parameter_types) {
         TypeNode& type_node = *p;
-        this->module->fill_actual(type_node);
+        this->module.fill_actual(type_node);
         x.emplace_back(p->clone());
     }
     TypeNode& p = *node.return_type;
-    this->module->fill_actual(p);
+    this->module.fill_actual(p);
     FunctionType function_info(x, node.return_type->clone());
-    Path function_path = Path(this->module->path, node.identifier);
+    Path function_path = Path(this->module.path, node.identifier);
     const_function->ft = function_info.clone();
-    const_function->path = Path(this->module->path, node.identifier);
+    const_function->path = Path(this->module.path, node.identifier);
     if (node.implicit != nullptr) {
         const_function->implicit = node.implicit;
-        this->module->fill_actual(node.implicit->ft);
+        this->module.fill_actual(node.implicit->ft);
     }
     node.path = const_function->path;
     node.const_function = const_function;
@@ -93,16 +93,16 @@ void GlobalProcessor::visit_root(BlockNode& node) {
         if (n.ntype == NodeType::CLS) {
             // this->dispatch(n);
             auto* class_info = new Class();
-            this->module->flirpins[((ClassNode&) n).class_name] = Flirpin{.type=F_TYPE::CLASS, .clazz=class_info};
-            class_info->path = Path(this->module->path, ((ClassNode&) n).class_name);
+            this->module.flirpins[((ClassNode&) n).class_name] = Flirpin{.type=F_TYPE::CLASS, .clazz=class_info};
+            class_info->path = Path(this->module.path, ((ClassNode&) n).class_name);
         } else if (n.ntype == NodeType::ENUM) {
             Enum* enumm = new Enum();
             enumm->enumm_name = ((EnumNode&) n).id;
             enumm->values = ((EnumNode&) n).values;
-            enumm->path = Path(this->module->path, enumm->enumm_name);
+            enumm->path = Path(this->module.path, enumm->enumm_name);
             enumm->functions["__eq__"] = new ConstFunction(Path(enumm->path, "__eq__"), nullptr);;
             enumm->functions["__ne__"] = new ConstFunction(Path(enumm->path, "__ne__"), nullptr);
-            this->module->flirpins[enumm->enumm_name] = Flirpin{.type=F_TYPE::ENUM, .enumm=enumm};
+            this->module.flirpins[enumm->enumm_name] = Flirpin{.type=F_TYPE::ENUM, .enumm=enumm};
         }
     }
     for (auto& np: node.nodes) {
@@ -110,7 +110,7 @@ void GlobalProcessor::visit_root(BlockNode& node) {
         if (n.ntype == NodeType::FUNC) {
             // this->dispatch(n);
             auto* const_function = new ConstFunction(Path(), nullptr);
-            this->module->flirpins[((FunctionNode&) n).identifier] = Flirpin{.type=F_TYPE::CONST_FUNCTION, .const_function=const_function};
+            this->module.flirpins[((FunctionNode&) n).identifier] = Flirpin{.type=F_TYPE::CONST_FUNCTION, .const_function=const_function};
         }
     }
     for (auto& n: node.nodes) {
@@ -168,7 +168,7 @@ void GlobalProcessor::visit_block(BlockNode& node) {
 }
 
 void GlobalProcessor::visit_class(ClassNode& node) {
-    Class* class_info = this->module->flirpins[node.class_name].clazz;
+    Class* class_info = this->module.flirpins[node.class_name].clazz;
     //
     // if (this->imported_paths.count(node.class_name) == 1) {
     //     throw std::runtime_error("Name \"" + node.class_name + "\" already used as an alias for " +
@@ -176,7 +176,7 @@ void GlobalProcessor::visit_class(ClassNode& node) {
     // }
     class_info->type_params = node.type_parameters;
     for (const auto& mt: node.members) {
-        this->module->fill_actual(mt.second);
+        this->module.fill_actual(mt.second);
         // if (!mt->object().is_generic()) {
         //     mt->object().actual_base_path = this->get_actual_path(mt->object().id);
         // }
@@ -193,11 +193,11 @@ void GlobalProcessor::visit_class(ClassNode& node) {
 
         VectorOfTypes x;
         for (auto& p: method.parameter_types) {
-            this->module->fill_actual(*p);
+            this->module.fill_actual(*p);
             // p->object().actual_base_path = this->get_actual_path(p->object().id);
             x.emplace_back(p->clone());
         }
-        this->module->fill_actual(*method.return_type);
+        this->module.fill_actual(*method.return_type);
         // method.return_type->object().actual_base_path = this->get_actual_path(method.return_type->object().id);
 
         auto* cf = new ConstFunction(Path(class_info->path, f.first), new FunctionType(x, method.return_type->clone()));
@@ -211,11 +211,11 @@ void GlobalProcessor::visit_class(ClassNode& node) {
         FunctionNode& method = *f.second;
         VectorOfTypes x;
         for (auto& p: method.parameter_types) {
-            this->module->fill_actual(*p);
+            this->module.fill_actual(*p);
             // p->object().actual_base_path = this->get_actual_path(p->object().id);
             x.emplace_back(p->clone());
         }
-        this->module->fill_actual(*method.return_type);
+        this->module.fill_actual(*method.return_type);
         // method.return_type->object().actual_base_path = this->get_actual_path(method.return_type->object().id);
 
         auto* cf = new ConstFunction(Path(class_info->path, f.first), new FunctionType(x, method.return_type->clone()));
@@ -230,7 +230,7 @@ void GlobalProcessor::visit_class(ClassNode& node) {
     }
     class_info->class_name = node.class_name;
     class_info->type_params = node.type_parameters;
-    class_info->path = Path(this->module->path, class_info->class_name);
+    class_info->path = Path(this->module.path, class_info->class_name);
 }
 
 void GlobalProcessor::dispatch(Node& nod) {
@@ -253,15 +253,15 @@ void GlobalProcessor::dispatch(Node& nod) {
 }
 
 void GlobalProcessor::visit_alias(AliasNode& node) {
-    this->module->fill_actual(node.aliased_type);
-    this->module->aliased_types[node.alias_id] = node.aliased_type;
+    this->module.fill_actual(node.aliased_type);
+    this->module.aliased_types[node.alias_id] = node.aliased_type;
 }
 
 void GlobalProcessor::visit_enum(EnumNode& node) {
 
 }
 
-GlobalProcessor::GlobalProcessor(Module* module) : module(module) {
+GlobalProcessor::GlobalProcessor(Module& module) : module(module) {
 }
 
 Path Module::get_actual_path(const std::string& id) {

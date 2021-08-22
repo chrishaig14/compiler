@@ -15,7 +15,7 @@ TEST_CASE("global_main", "[parser]") {
     parser.top_package_name = "main";
     Module module(Path("main.foo"), "foo.xl", ".", false, "main.h");
     module.ast = parser.parse_program();
-    GlobalProcessor gp(&module);
+    GlobalProcessor gp(module);
     gp.visit_root(*module.ast);
 
     REQUIRE(module.flirpins.size() == 1);
@@ -37,7 +37,7 @@ TEST_CASE("global_class", "[parser]") {
     parser.top_package_name = "main";
     Module module(Path("main.foo"), "foo.xl", ".", false, "main.h");
     module.ast = parser.parse_program();
-    GlobalProcessor gp(&module);
+    GlobalProcessor gp(module);
     gp.visit_root(*module.ast);
 
     REQUIRE(module.flirpins.size() == 1);
@@ -83,7 +83,7 @@ TEST_CASE("global_multiple", "[parser]") {
     parser.top_package_name = "main";
     Module module(Path("main.foo"), "foo.xl", ".", false, "main.h");
     module.ast = parser.parse_program();
-    GlobalProcessor gp(&module);
+    GlobalProcessor gp(module);
     gp.visit_root(*module.ast);
 
     REQUIRE(module.flirpins.size() == 2);
