@@ -11,10 +11,10 @@
 
 class EmptyDictNode : public Node {
 public:
-    EmptyDictNode(TypeNode* key_type, TypeNode* value_type, TextPosition start, TextPosition end)
-            : Node(NodeType::EMPTYDICT, start, end) {
-        this->key_type = key_type;
-        this->value_type = value_type;
+    EmptyDictNode(UTypeNode& key_type, UTypeNode& value_type, TextPosition start, TextPosition end)
+            : Node(NodeType::EMPTYDICT, start, end),
+
+              key_type(std::move(key_type)), value_type(std::move(value_type)) {
     }
 
     bool equal(const Node& other) const override {
@@ -27,8 +27,8 @@ public:
                 {"empty_dict", {{"key_type", this->key_type->to_json()}, {"value_type", this->value_type->to_json()}}}};
     }
 
-    TypeNode* key_type;
-    TypeNode* value_type;
+    UTypeNode key_type;
+    UTypeNode value_type;
 };
 
 

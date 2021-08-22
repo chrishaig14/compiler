@@ -287,12 +287,12 @@ TEST_CASE("nodes_empty_list", "[empty_list]") {
 }
 
 TEST_CASE("nodes_empty_dict", "[empty_dict]") {
-    ObjectType* k = new ObjectType("String", {});
-    ObjectType* v = new ObjectType("Integer", {});
-    EmptyDictNode n(k, v, DUMMY_POS, DUMMY_POS);
-    nlohmann::json nj = n.to_json();
+    UTypeNode k = std::make_unique<ObjectType>("String");
+    UTypeNode v = std::make_unique<ObjectType>("Integer");
     nlohmann::json e = {{"type",       "empty_dict"},
                         {"empty_dict", {{"key_type", k->to_json()}, {"value_type", v->to_json()}}}};
+    EmptyDictNode n(k, v, DUMMY_POS, DUMMY_POS);
+    nlohmann::json nj = n.to_json();
     REQUIRE(e == nj);
 }
 

@@ -800,9 +800,9 @@ TEST_CASE("parse_dict_empty", "[parser]") {
     parser.top_package_name = "main";
 
     UNode ast = parser.parse_dictionary();
-
-    REQUIRE(ast->to_json() ==
-            EmptyDictNode(TYPE_1.node->clone(), TYPE_2.node->clone(), DUMMY_POS, DUMMY_POS).to_json());
+    UTypeNode u1(TYPE_1.node->clone());
+    UTypeNode u2(TYPE_2.node->clone());
+    REQUIRE(ast->to_json() == EmptyDictNode(u1, u2, DUMMY_POS, DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_dict_one_element", "[parser]") {

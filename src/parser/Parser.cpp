@@ -315,9 +315,9 @@ UNode Parser::parse_dictionary() {
         this->next();
         this->expect_token(TokType::DOUBLE_COLON);
         this->expect_token(TokType::LSQUARE);
-        TypeNode* key_type = this->parse_type_node().release();
+        UTypeNode key_type = this->parse_type_node();
         this->expect_token(TokType::COMMA);
-        TypeNode* value_type = this->parse_type_node().release();
+        UTypeNode value_type = this->parse_type_node();
         Token rsquare = this->expect_token(TokType::RSQUARE);
         return std::make_unique<EmptyDictNode>(key_type, value_type, lcurly.start, rsquare.end_pos);
     }

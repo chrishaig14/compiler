@@ -18,7 +18,7 @@ class GlobalProcessor {
 public:
     Module& module;
 
-    GlobalProcessor(Module& module);
+    explicit GlobalProcessor(Module& module);
 
     void visit_root();
 
