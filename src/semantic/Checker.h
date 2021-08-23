@@ -72,7 +72,7 @@ SNode* make_for_snode(ForNode& node, USemanticInfo& binfo, USemanticInfo& exp_in
 class Checker {
     int loop_count;
     bool add_this;
-    std::map<std::string, EntityValue*> entity_values_no_generic;
+    std::map<std::string, std::unique_ptr<EntityValue>> entity_values_no_generic;
     std::unordered_map<std::string, SymbolTable*> scopes;
     SymbolTable* scope;
 public:
