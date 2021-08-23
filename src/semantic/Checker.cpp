@@ -110,9 +110,13 @@ bool is_generic(const TypeNode& t) {
 std::unique_ptr<SemanticInfo>
 Checker::match_arguments_to_generic_function(const FunctionType& ft, VectorOfTypes arg_types,
                                              std::map<std::string, TypeNode*>& all_substitutions) {
-    FunctionType* f = ft.clone();
+    FunctionType* f;
+    // = ft.clone();
     try {
-        unify_function_call(*f, arg_types, all_substitutions);
+        f = unify_function_call(ft, arg_types, all_substitutions);
+        if (f == nullptr){
+            throw std::runtime_error("unify error");
+        }
     } catch (...) {
         std::string sss = "Error: cannot unify " + E_HLT(ft.to_string()) + " with args: ";
         std::string args_str;
