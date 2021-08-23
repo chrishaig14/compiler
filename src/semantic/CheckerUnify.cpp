@@ -89,8 +89,8 @@ Checker::get_first_substitution_function(FunctionType& a, FunctionType& b, bool 
     return nullptr;
 }
 
-FunctionType* Checker::unify_function_call(const FunctionType& f, VectorOfTypes& args,
-                                           std::map<std::string, TypeNode*>& all_substitutions) {
+std::unique_ptr<FunctionType> Checker::unify_function_call(const FunctionType& f, VectorOfTypes& args,
+                                                           std::map<std::string, TypeNode*>& all_substitutions) {
     FunctionType& fun = *f.clone();
     if (args.size() != fun.param_types.size()) {
         this->error_reporter.error(ErrorFunctionCallNumArgs(fun, {1, 1}));
@@ -129,7 +129,7 @@ FunctionType* Checker::unify_function_call(const FunctionType& f, VectorOfTypes&
             delete old_s;
         }
     }
-    return &fun;
+    return std::unique_ptr<FunctionType>(&fun);
 }
 
 std::pair<std::string, TypeNode*>* Checker::get_first_substitution(TypeNode& a, TypeNode& b, bool is_top_level_arg) {

@@ -110,7 +110,7 @@ bool is_generic(const TypeNode& t) {
 std::unique_ptr<SemanticInfo>
 Checker::match_arguments_to_generic_function(const FunctionType& ft, VectorOfTypes arg_types,
                                              std::map<std::string, TypeNode*>& all_substitutions) {
-    FunctionType* f;
+    std::unique_ptr<FunctionType> f;
     // = ft.clone();
     try {
         f = unify_function_call(ft, arg_types, all_substitutions);
@@ -135,7 +135,7 @@ Checker::match_arguments_to_generic_function(const FunctionType& ft, VectorOfTyp
     }
     SemanticInfo rv;
     rv.entity = *new EntityValue(std::make_unique<Value>(f->return_type->clone()));
-    delete f;
+    // delete f;
     return std::make_unique<SemanticInfo>(rv);
 }
 
