@@ -45,25 +45,25 @@ Checker::get_first_substitution_object(ObjectType& a, ObjectType& b, bool is_top
     return nullptr;
 }
 
-TypeNode* Checker::substitute(TypeNode* t, const std::string& var, TypeNode* replacement) {
-    if (t->kind == Kind::OBJECT) {
-        if (is_variable(t->object()) && t->object().id == var) {
-            return replacement->clone();
+TypeNode* Checker::substitute(const TypeNode& t, const std::string& var, const TypeNode& replacement) {
+    if (t.kind == Kind::OBJECT) {
+        if (is_variable(t.object()) && t.object().id == var) {
+            return replacement.clone();
         } else {
-            TypeNode* c = t->clone();
-            for (size_t i = 0; i < t->object().type_params.size(); i++) {
+            TypeNode* c = t.clone();
+            for (size_t i = 0; i < t.object().type_params.size(); i++) {
                 // auto old = c->object().type_params[i];
-                c->object().type_params[i] = substitute(t->object().type_params[i], var, replacement);
+                c->object().type_params[i] = substitute(*t.object().type_params[i], var, replacement);
                 // delete old;
             }
             return c;
         }
     } else {
-        TypeNode* c = t->clone();
-        for (size_t i = 0; i < t->function().param_types.size(); i++) {
-            c->function().param_types[i] = substitute(t->function().param_types[i], var, replacement);
+        TypeNode* c = t.clone();
+        for (size_t i = 0; i < t.function().param_types.size(); i++) {
+            c->function().param_types[i] = substitute(*t.function().param_types[i], var, replacement);
         }
-        c->function().return_type = substitute(c->function().return_type, var, replacement);
+        c->function().return_type = substitute(*c->function().return_type, var, replacement);
         return c;
     }
     return nullptr;
@@ -107,15 +107,15 @@ void Checker::unify_function_call(FunctionType& fun, VectorOfTypes& args,
                 //     continue;
                 // }
                 auto* old = fun.param_types[j];
-                fun.param_types[j] = substitute(fun.param_types[j], substitution->first, substitution->second);
+                fun.param_types[j] = substitute(*fun.param_types[j], substitution->first, *substitution->second);
                 delete old;
                 old = args[j];
-                args[j] = substitute(args[j], substitution->first, substitution->second);
+                args[j] = substitute(*args[j], substitution->first, *substitution->second);
                 all_substitutions[substitution->first] = substitution->second->clone();
                 delete old;
             }
             auto* old = fun.return_type;
-            fun.return_type = substitute(fun.return_type, substitution->first, substitution->second);
+            fun.return_type = substitute(*fun.return_type, substitution->first, *substitution->second);
             delete old;
             std::cout << "Simple substitution: " << fun.to_string() << std::endl;
             param = fun.param_types[i];
