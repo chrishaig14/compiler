@@ -50,7 +50,7 @@ USemanticInfo Checker::visit_lvalue_subscript(SubscriptNode& node) {
     }
     SNode* child_snode = child_sinfo->snode;
 
-    SemanticInfo info;
+    USemanticInfo info_u = std::make_unique<SemanticInfo>(); SemanticInfo& info = *info_u;
     auto value = std::make_unique<Value>((ObjectType*) rtype);
     this->fill_value(*value);
     info.entity = *new EntityValue(std::move(value));
@@ -58,7 +58,7 @@ USemanticInfo Checker::visit_lvalue_subscript(SubscriptNode& node) {
     auto* fsn = new IdSNode(sub_fun_path);
     auto* csn = new CallSNode(fsn, {parent_p->snode, child_snode});
     info.snode = csn;
-    return std::make_unique<SemanticInfo>(info);
+    return info_u;
 }
 
 USemanticInfo Checker::visit_assignment(AssignmentNode& n) {
@@ -144,7 +144,7 @@ USemanticInfo Checker::visit_assignment(AssignmentNode& n) {
         expression_info_p->snode = rvalue_snode;
     }
 
-    SemanticInfo info;
+    USemanticInfo info_u = std::make_unique<SemanticInfo>(); SemanticInfo& info = *info_u;
     if (is_subscript) {
         info.snode = linfo_p->snode;
         csn->arguments.push_back(expression_info_p->snode);
@@ -154,7 +154,7 @@ USemanticInfo Checker::visit_assignment(AssignmentNode& n) {
         info.snode = new AssignmentSNode(lu, eu);
     }
 
-    return std::make_unique<SemanticInfo>(info);
+    return info_u;
 }
 
 USemanticInfo Checker::visit_return(ReturnNode& n) {
@@ -190,9 +190,9 @@ USemanticInfo Checker::visit_return(ReturnNode& n) {
         sn->reachables.push_back(l.first);
     }
 
-    SemanticInfo info;
+    USemanticInfo info_u = std::make_unique<SemanticInfo>(); SemanticInfo& info = *info_u;
     info.snode = sn;
-    return std::make_unique<SemanticInfo>(info);
+    return info_u;
 }
 
 // USemanticInfo Checker::visit_throw(ThrowNode& n) {
@@ -206,9 +206,9 @@ USemanticInfo Checker::visit_return(ReturnNode& n) {
 //         sn->reachables.push_back(l.first);
 //     }
 //
-//     SemanticInfo info;
+//     USemanticInfo info_u = std::make_unique<SemanticInfo>(); SemanticInfo& info = *info_u;
 //     info.snode = sn;
-//     return std::make_unique<SemanticInfo>(info);
+//     return info_u;
 // }
 
 USemanticInfo Checker::visit_match(MatchExpressionNode& node) {
@@ -266,9 +266,9 @@ USemanticInfo Checker::visit_match(MatchExpressionNode& node) {
     auto* init = new DeclarationSNode(varname, up);
     auto* mn = new MatchSNode(init, varname, cas);
 
-    SemanticInfo info;
+    USemanticInfo info_u = std::make_unique<SemanticInfo>(); SemanticInfo& info = *info_u;
     info.snode = mn;
-    return std::make_unique<SemanticInfo>(info);
+    return info_u;
 }
 
 USemanticInfo Checker::visit_continue(ContinueNode& node) {
@@ -279,12 +279,12 @@ USemanticInfo Checker::visit_continue(ContinueNode& node) {
     auto* cn = new ContinueSNode();
     bn->nodes.push_back(cn);
 
-    SemanticInfo info;
+    USemanticInfo info_u = std::make_unique<SemanticInfo>(); SemanticInfo& info = *info_u;
     for (auto reachable : this->scope->get_all_in_loop()) {
         cn->reachables.push_back(reachable.first);
     }
     info.snode = bn;
-    return std::make_unique<SemanticInfo>(info);
+    return info_u;
 }
 
 USemanticInfo Checker::visit_for(ForNode& node) {
@@ -349,13 +349,13 @@ USemanticInfo Checker::visit_for(ForNode& node) {
 
 USemanticInfo Checker::visit_break(BreakNode& node) {
     // node.loop_vars = this->scope->get_all_in_loop();
-    SemanticInfo info;
+    USemanticInfo info_u = std::make_unique<SemanticInfo>(); SemanticInfo& info = *info_u;
     BreakSNode* bn = new BreakSNode();
     info.snode = bn;
     for (auto reachable : this->scope->get_all_in_loop()) {
         bn->reachables.push_back(reachable.first);
     }
-    return std::make_unique<SemanticInfo>(info);
+    return info_u;
 }
 
 USemanticInfo Checker::visit_while(WhileNode& node) {
@@ -381,9 +381,9 @@ USemanticInfo Checker::visit_while(WhileNode& node) {
 
     auto* while_sn = new WhileSNode(condition_snode, (BlockSNode*) body_info_p->snode);
 
-    SemanticInfo info;
+    USemanticInfo info_u = std::make_unique<SemanticInfo>(); SemanticInfo& info = *info_u;
     info.snode = while_sn;
-    return std::make_unique<SemanticInfo>(info);
+    return info_u;
 }
 
 USemanticInfo Checker::visit_if(IfNode& n) {
@@ -427,9 +427,9 @@ USemanticInfo Checker::visit_if(IfNode& n) {
     }
     SNode* else_snode = else_info == nullptr ? nullptr : else_info->snode;
 
-    SemanticInfo info;
+    USemanticInfo info_u = std::make_unique<SemanticInfo>(); SemanticInfo& info = *info_u;
     info.snode = new IfSNode(condition_snode, (BlockSNode*) body_info->snode, elifs, (BlockSNode*) else_snode);
-    return std::make_unique<SemanticInfo>(info);
+    return info_u;
 }
 
 USemanticInfo Checker::visit_try_catch(TryCatchNode& node) {
@@ -457,7 +457,7 @@ USemanticInfo Checker::visit_try_catch(TryCatchNode& node) {
     //     catches_bodies_snodes.push_back(catch_body_info->snode);
     //     this->leave_scope();
     // }
-    SemanticInfo info;
+    USemanticInfo info_u = std::make_unique<SemanticInfo>();
     // info.snode = new TryCatchSNode((BlockSNode*) body_info->snode, e_names_types, catches_bodies_snodes);
-    return std::make_unique<SemanticInfo>(info);
+    return info_u;
 }

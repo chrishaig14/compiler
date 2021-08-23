@@ -148,8 +148,8 @@ std::pair<std::string, TypeNode*>* Checker::get_first_substitution(TypeNode& a, 
 
 USemanticInfo Checker::visit_import(ImportNode& node) {
 
-    SemanticInfo info;
-    return std::make_unique<SemanticInfo>(info);
+    USemanticInfo info_u = std::make_unique<SemanticInfo>();
+    return info_u;
 }
 
 Entity* map_flirpin_to_entity(Flirpin flirpin) {
@@ -170,12 +170,13 @@ Entity* map_flirpin_to_entity(Flirpin flirpin) {
 
 
 USemanticInfo Checker::visit_alias(AliasNode& p_node) {
-    SemanticInfo info;
-    return std::make_unique<SemanticInfo>(info);
+    USemanticInfo info_u = std::make_unique<SemanticInfo>();
+    return info_u;
 }
 
 USemanticInfo Checker::enum_member(Enum* enumm, const std::string& value, MemberNode& node) {
-    SemanticInfo info;
+    USemanticInfo info_u = std::make_unique<SemanticInfo>();
+    SemanticInfo& info = *info_u;
     for (size_t i = 0; i < enumm->values.size(); i++) {
         if (value == enumm->values[i]) {
             auto* otype = new ObjectType(enumm->enumm_name, {});
@@ -184,7 +185,7 @@ USemanticInfo Checker::enum_member(Enum* enumm, const std::string& value, Member
             info.entity = *new EntityValue(std::move(ov));
             // this->fill_value(info.entity.value);
             info.snode = new EnumMemberSNode(enumm->path.as_str(), value);
-            return std::make_unique<SemanticInfo>(info);
+            return info_u;
         }
     }
     this->error_reporter.error(ErrorEnumNoValue(enumm->enumm_name, value, node, enumm));

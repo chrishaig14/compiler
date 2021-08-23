@@ -11,15 +11,15 @@
 #include "errors/ErrorTypeMismatch.h"
 
 USemanticInfo Checker::visit_boolean(BooleanNode& node) {
-    SemanticInfo info;
+    USemanticInfo info_u = std::make_unique<SemanticInfo>(); SemanticInfo& info = *info_u;
     info.entity = this->entity_value_from_actual_base_path_no_generic(Path("core.core.Boolean"));
     info.snode = new BoolSNode(node.value);
-    return std::make_unique<SemanticInfo>(info);
+    return info_u;
 }
 
 
 USemanticInfo Checker::visit_number(NumberNode& node) {
-    SemanticInfo info;
+    USemanticInfo info_u = std::make_unique<SemanticInfo>(); SemanticInfo& info = *info_u;
     switch (node.num_type) {
         case NumberType::INTEGER: {
             info.entity = this->entity_value_from_actual_base_path_no_generic(Path("core.core.Integer"));
@@ -51,20 +51,20 @@ USemanticInfo Checker::visit_number(NumberNode& node) {
         }
     }
     info.is_constant = true;
-    return std::make_unique<SemanticInfo>(info);
+    return info_u;
 }
 
 USemanticInfo Checker::visit_none(NoneNode& node) {
-    SemanticInfo info;
+    USemanticInfo info_u = std::make_unique<SemanticInfo>(); SemanticInfo& info = *info_u;
     // info.set_type(ObjectType("NoneType"));
     auto v = std::make_unique<Value>(new ObjectType("NoneType"));
     info.entity = *new EntityValue(std::move(v));
     info.snode = new NoneSNode();
-    return std::make_unique<SemanticInfo>(info);
+    return info_u;
 }
 
 USemanticInfo Checker::visit_emptylist(EmptyListNode& node) {
-    SemanticInfo info;
+    USemanticInfo info_u = std::make_unique<SemanticInfo>(); SemanticInfo& info = *info_u;
     this->module->fill_actual(node.type);
     auto* otype = new ObjectType("List", {node.type});
     auto ov = std::make_unique<Value>(otype);
@@ -75,11 +75,11 @@ USemanticInfo Checker::visit_emptylist(EmptyListNode& node) {
     auto* lsn = new ListSNode(v);
     info.snode = lsn;
     // non->class_name = "core.List";
-    return std::make_unique<SemanticInfo>(info);
+    return info_u;
 }
 
 USemanticInfo Checker::visit_string(StringNode& node) {
-    SemanticInfo info;
+    USemanticInfo info_u = std::make_unique<SemanticInfo>(); SemanticInfo& info = *info_u;
     info.is_constant = true;
     auto* sn = new StringSNode(node.str);
     info.snode = sn;
@@ -89,7 +89,7 @@ USemanticInfo Checker::visit_string(StringNode& node) {
     // this->fill_value(*ov);
     // info.entity = new EntityValue(std::move(ov));
     info.entity = this->entity_value_from_actual_base_path_no_generic(Path("core.core.String"));
-    return std::make_unique<SemanticInfo>(info);
+    return info_u;
 }
 
 USemanticInfo Checker::visit_tuple(TupleNode& node) {
@@ -172,7 +172,7 @@ USemanticInfo Checker::visit_partial(PartialApplication& node) {
 }
 
 USemanticInfo Checker::visit_dict(DictNode& node) {
-    SemanticInfo info;
+    USemanticInfo info_u = std::make_unique<SemanticInfo>(); SemanticInfo& info = *info_u;
     USemanticInfo first_key_info = this->dispatch(*node.items[0].first);
     USemanticInfo first_value_info = this->dispatch(*node.items[0].second);
     EntityValue& first_key_entity = (EntityValue&) first_key_info->entity.get();
@@ -204,11 +204,11 @@ USemanticInfo Checker::visit_dict(DictNode& node) {
     info.entity = *new EntityValue(std::move(ov));
     auto* nsn = new DictSNode(items);
     info.snode = nsn;
-    return std::make_unique<SemanticInfo>(info);
+    return info_u;
 }
 
 USemanticInfo Checker::visit_emptydict(EmptyDictNode& node) {
-    SemanticInfo info;
+    USemanticInfo info_u = std::make_unique<SemanticInfo>(); SemanticInfo& info = *info_u;
     ObjectType* ot = new ObjectType("Dict", {node.key_type->clone(), node.value_type->clone()});
     ot->actual_base_path = Path("core.core.Dict");
     auto ov = std::make_unique<Value>(ot);
@@ -218,20 +218,20 @@ USemanticInfo Checker::visit_emptydict(EmptyDictNode& node) {
     info.entity = *new EntityValue(std::move(ov));
     auto* nsn = new DictSNode({});
     info.snode = nsn;
-    return std::make_unique<SemanticInfo>(info);
+    return info_u;
 
-    return std::make_unique<SemanticInfo>(info);
+    return info_u;
 }
 
 USemanticInfo Checker::visit_defconst(DefaultConstructorNode& node) {
     // this is a regular function
-    SemanticInfo info;
+    USemanticInfo info_u = std::make_unique<SemanticInfo>(); SemanticInfo& info = *info_u;
     VectorOfTypes t;
     Entity& entity = this->dispatch(*node.class_node)->entity;
     if (entity.type != E_TYPE::CLASS) {
         this->error_reporter.fail("Error not a class");
         info.entity = *new EntityError();
-        return std::make_unique<SemanticInfo>(info);
+        return info_u;
     }
     Class& cls = *((EntityClass&) entity).clazz;
     for (auto* pt: cls.member_types) {
@@ -248,7 +248,7 @@ USemanticInfo Checker::visit_defconst(DefaultConstructorNode& node) {
     info.entity = *new EntityConstFunction(new ConstFunction(Path(), new FunctionType(t, rt)));
     auto* idn = new IdSNode(cls.path.as_str() + "." + "__init__");
     info.snode = idn;
-    return std::make_unique<SemanticInfo>(info);
+    return info_u;
 }
 
 USemanticInfo Checker::visit_list(ListNode& node) {

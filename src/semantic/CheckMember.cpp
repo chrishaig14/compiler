@@ -52,13 +52,13 @@ USemanticInfo Checker::module_member(Module& mod, const std::string& child, Memb
         return error_stub();
     }
     Flirpin flirpin = mod.flirpins[child];
-    SemanticInfo info;
+    USemanticInfo info_u = std::make_unique<SemanticInfo>(); SemanticInfo& info = *info_u;
     info.entity = *map_flirpin_to_entity(flirpin);
     if (flirpin.type == F_TYPE::CONST_FUNCTION) {
         auto* idn = new IdSNode(flirpin.const_function->path.as_str());
         info.snode = idn;
     }
-    return std::make_unique<SemanticInfo>(info);
+    return info_u;
 }
 
 TextPosition add_one_col(TextPosition t) {
@@ -82,7 +82,7 @@ USemanticInfo Checker::object_member(SNode* object_snode, Value& p_value, const 
         // this->error_reporter.object_no_member(*p_value.type, n);
         return error_stub();
     }
-    SemanticInfo info;
+    USemanticInfo info_u = std::make_unique<SemanticInfo>(); SemanticInfo& info = *info_u;
     if (p_value.type->kind == Kind::OBJECT && p_value.type->object().id == "Tuple") {
         info.is_tuple_member = true;
     }
@@ -133,7 +133,7 @@ USemanticInfo Checker::object_member(SNode* object_snode, Value& p_value, const 
 
         return error_stub();
     }
-    return std::make_unique<SemanticInfo>(info);
+    return info_u;
 }
 
 USemanticInfo Checker::package_member(Package& package, const std::string& child, MemberNode& n) {
@@ -147,13 +147,13 @@ USemanticInfo Checker::package_member(Package& package, const std::string& child
         return error_stub();
     }
     Unit unit = package.units[child];
-    SemanticInfo info;
+    USemanticInfo info_u = std::make_unique<SemanticInfo>(); SemanticInfo& info = *info_u;
     info.entity = *map_flirpin_to_entity(map_unit_to_flirpin(unit));
-    return std::make_unique<SemanticInfo>(info);
+    return info_u;
 }
 
 USemanticInfo Checker::class_member(Class* cls, const std::string& child, MemberNode& n) {
-    SemanticInfo info;
+    USemanticInfo info_u = std::make_unique<SemanticInfo>(); SemanticInfo& info = *info_u;
     if (cls->methods.find(child) != cls->methods.end()) {
         ConstFunction* bound_method = cls->methods[child];
         auto* unbound_method = new ConstFunction(bound_method->path, bound_method->ft->clone());
@@ -181,5 +181,5 @@ USemanticInfo Checker::class_member(Class* cls, const std::string& child, Member
                                                       n.end));
         return error_stub();
     }
-    return std::make_unique<SemanticInfo>(info);
+    return info_u;
 }

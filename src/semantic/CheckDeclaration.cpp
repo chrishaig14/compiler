@@ -127,14 +127,14 @@ USemanticInfo Checker::visit_declaration(DeclarationNode& n) {
     if (this->scope->declared(n.identifier)) {
         this->error_reporter.error(ErrorRedeclared(n.identifier, n));
     }
-    USemanticInfo info;
+    USemanticInfo info_u;
     if (n.type != nullptr) {
-        info = this->check_declaration_with_type(n);
+        info_u = this->check_declaration_with_type(n);
     } else {
-        info = this->check_declaration_without_type(n);
+        info_u = this->check_declaration_without_type(n);
     }
-    this->scope->set(n.identifier, &info->entity.get());
-    return info;
+    this->scope->set(n.identifier, &info_u->entity.get());
+    return info_u;
 }
 
 USemanticInfo Checker::check_declaration_with_type(DeclarationNode& n) {
@@ -148,13 +148,13 @@ USemanticInfo Checker::check_declaration_with_type(DeclarationNode& n) {
     if (rvalue_sinfo->is_error()) {
         return error_stub();
     }
-    SemanticInfo info;
+    USemanticInfo info_u = std::make_unique<SemanticInfo>(); SemanticInfo& info = *info_u;
     USNode up(rvalue_sinfo->snode);
     info.snode = new DeclarationSNode(n.identifier, up);
     auto ov = std::make_unique<Value>(n.type->clone());
     this->fill_value(*ov);
     info.entity = *new EntityValue(std::move(ov));
-    return std::make_unique<SemanticInfo>(info);
+    return info_u;
 }
 
 USemanticInfo Checker::check_declaration_without_type(DeclarationNode& n) {
@@ -168,7 +168,7 @@ USemanticInfo Checker::check_declaration_without_type(DeclarationNode& n) {
         return error_stub();
     }
 
-    SemanticInfo info;
+    USemanticInfo info_u = std::make_unique<SemanticInfo>(); SemanticInfo& info = *info_u;
     USNode u(exp_info_p->snode);
     info.snode = new DeclarationSNode(n.identifier, u);
     info.entity = exp_info_p->entity;
@@ -182,5 +182,5 @@ USemanticInfo Checker::check_declaration_without_type(DeclarationNode& n) {
                                       " to be able to use it without calling it");
         }
     }
-    return std::make_unique<SemanticInfo>(info);
+    return info_u;
 }
