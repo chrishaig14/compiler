@@ -45,26 +45,26 @@ Checker::get_first_substitution_object(ObjectType& a, ObjectType& b, bool is_top
     return nullptr;
 }
 
-TypeNode* Checker::substitute(const TypeNode& t, const std::string& var, const TypeNode& replacement) {
+UTypeNode Checker::substitute(const TypeNode& t, const std::string& var, const TypeNode& replacement) {
     if (t.kind == Kind::OBJECT) {
         if (is_variable(t.object()) && t.object().id == var) {
-            return replacement.clone();
+            return UTypeNode(replacement.clone());
         } else {
             TypeNode* c = t.clone();
             for (size_t i = 0; i < t.object().type_params.size(); i++) {
                 // auto old = c->object().type_params[i];
-                c->object().type_params[i] = substitute(*t.object().type_params[i], var, replacement);
+                c->object().type_params[i] = substitute(*t.object().type_params[i], var, replacement).release();
                 // delete old;
             }
-            return c;
+            return UTypeNode(c);
         }
     } else {
         TypeNode* c = t.clone();
         for (size_t i = 0; i < t.function().param_types.size(); i++) {
-            c->function().param_types[i] = substitute(*t.function().param_types[i], var, replacement);
+            c->function().param_types[i] = substitute(*t.function().param_types[i], var, replacement).release();
         }
-        c->function().return_type = substitute(*c->function().return_type, var, replacement);
-        return c;
+        c->function().return_type = substitute(*c->function().return_type, var, replacement).release();
+        return UTypeNode(c);
     }
     return nullptr;
 }
@@ -90,7 +90,7 @@ Checker::get_first_substitution_function(FunctionType& a, FunctionType& b, bool 
 }
 
 FunctionType* Checker::unify_function_call(const FunctionType& f, VectorOfTypes& args,
-                                  std::map<std::string, TypeNode*>& all_substitutions) {
+                                           std::map<std::string, TypeNode*>& all_substitutions) {
     FunctionType& fun = *f.clone();
     if (args.size() != fun.param_types.size()) {
         this->error_reporter.error(ErrorFunctionCallNumArgs(fun, {1, 1}));
@@ -108,15 +108,17 @@ FunctionType* Checker::unify_function_call(const FunctionType& f, VectorOfTypes&
                 //     continue;
                 // }
                 auto* old = fun.param_types[j];
-                fun.param_types[j] = substitute(*fun.param_types[j], substitution->first, *substitution->second);
+                fun.param_types[j] = substitute(*fun.param_types[j],
+                                                substitution->first,
+                                                *substitution->second).release();
                 delete old;
                 old = args[j];
-                args[j] = substitute(*args[j], substitution->first, *substitution->second);
+                args[j] = substitute(*args[j], substitution->first, *substitution->second).release();
                 all_substitutions[substitution->first] = substitution->second->clone();
                 delete old;
             }
             auto* old = fun.return_type;
-            fun.return_type = substitute(*fun.return_type, substitution->first, *substitution->second);
+            fun.return_type = substitute(*fun.return_type, substitution->first, *substitution->second).release();
             delete old;
             std::cout << "Simple substitution: " << fun.to_string() << std::endl;
             param = fun.param_types[i];
