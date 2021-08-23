@@ -12,7 +12,7 @@
 
 USemanticInfo Checker::visit_member(MemberNode& n) {
     USemanticInfo parent_info = this->dispatch(*n.parent);
-    Entity& parent_entity = *parent_info->entity;
+    Entity& parent_entity = parent_info->entity.get();
     switch (parent_entity.type) {
         case E_TYPE::CLASS:
             return this->class_member(((EntityClass&) parent_entity).clazz, n.s_child, n);
@@ -53,7 +53,7 @@ USemanticInfo Checker::module_member(Module& mod, const std::string& child, Memb
     }
     Flirpin flirpin = mod.flirpins[child];
     SemanticInfo info;
-    info.entity = map_flirpin_to_entity(flirpin);
+    info.entity = *map_flirpin_to_entity(flirpin);
     if (flirpin.type == F_TYPE::CONST_FUNCTION) {
         auto* idn = new IdSNode(flirpin.const_function->path.as_str());
         info.snode = idn;
@@ -89,11 +89,11 @@ USemanticInfo Checker::object_member(SNode* object_snode, Value& p_value, const 
     Class* clazz = p_value.clazz;
     assert(clazz != nullptr);
     if (clazz->members.count(child) != 0) {
-        info.entity = clazz->member_entities.at(child);
-        if (info.entity->type == E_TYPE::NOTHING) {
-            info.entity = entity_from_type(*clazz->members.at(child));
-            clazz->member_entities[child] = info.entity;
-            auto* ev = (EntityValue*) info.entity;
+        info.entity = *clazz->member_entities.at(child);
+        if (info.entity.get().type == E_TYPE::NOTHING) {
+            info.entity = *entity_from_type(*clazz->members.at(child));
+            clazz->member_entities[child] = &info.entity.get();
+            auto* ev = &(EntityValue&) info.entity.get();
             Value& vup = *(ev->value);
             this->fill_value(vup);
         }
@@ -105,7 +105,7 @@ USemanticInfo Checker::object_member(SNode* object_snode, Value& p_value, const 
             // method call
             info.this_arg = object_snode;
             info.snode = idn;
-            info.entity = new EntityConstFunction(clazz->methods[child]);
+            info.entity = *new EntityConstFunction(clazz->methods[child]);
         } else {
             // return partial
             size_t npartial = clazz->methods[child]->ft->param_types.size();
@@ -118,7 +118,7 @@ USemanticInfo Checker::object_member(SNode* object_snode, Value& p_value, const 
             }
             info.snode = non;
             auto fv = std::make_unique<Value>(clazz->methods[child]->ft->clone());
-            info.entity = new EntityValue(std::move(fv));
+            info.entity = *new EntityValue(std::move(fv));
         }
 
     } else {
@@ -148,7 +148,7 @@ USemanticInfo Checker::package_member(Package& package, const std::string& child
     }
     Unit unit = package.units[child];
     SemanticInfo info;
-    info.entity = map_flirpin_to_entity(map_unit_to_flirpin(unit));
+    info.entity = *map_flirpin_to_entity(map_unit_to_flirpin(unit));
     return std::make_unique<SemanticInfo>(info);
 }
 
@@ -165,13 +165,13 @@ USemanticInfo Checker::class_member(Class* cls, const std::string& child, Member
         }
         ObjectType* ot = new ObjectType(cls->class_name, tp);
         unbound_method->ft->param_types.insert(unbound_method->ft->param_types.begin(), ot);
-        info.entity = new EntityConstFunction(unbound_method);
+        info.entity = *new EntityConstFunction(unbound_method);
         info.snode = new IdSNode(unbound_method->path.as_str());
     } else if (cls->static_methods.find(child) != cls->static_methods.end()) {
-        info.entity = new EntityConstFunction(cls->static_methods[child]);
+        info.entity = *new EntityConstFunction(cls->static_methods[child]);
         info.snode = new IdSNode(cls->static_methods[child]->path.as_str());
     } else if (cls->static_members.find(child) != cls->static_members.end()) {
-        info.entity = entity_from_type(*cls->static_members[child].first);
+        info.entity = *entity_from_type(*cls->static_members[child].first);
     } else {
         this->error_reporter.error(ErrorClassNoMember(ObjectType(cls->class_name, {}),
                                                       child,

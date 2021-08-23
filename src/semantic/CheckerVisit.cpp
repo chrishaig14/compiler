@@ -85,10 +85,10 @@ USemanticInfo Checker::visit_class(ClassNode& node) {
 
     for (const auto& sm: node.static_members) {
         USemanticInfo sm_exp_info = this->dispatch(*sm.second.second);
-        if (*sm.second.first != *((EntityValue*) sm_exp_info->entity)->value->type) {
+        if (*sm.second.first != *((EntityValue&) sm_exp_info->entity).value->type) {
             this->error_reporter.fail("Err: cannt initialize static member of type " + sm.second.first->to_string() +
                                       " with expression of type " +
-                                      ((EntityValue*) sm_exp_info->entity)->value->type->to_string());
+                                      ((EntityValue&) sm_exp_info->entity).value->type->to_string());
         }
         if (!sm_exp_info->is_constant) {
             this->error_reporter.fail("Error: cannot initialize static member with non constant expression!");

@@ -13,7 +13,7 @@ std::unique_ptr<SemanticInfo> Checker::expect_rvalue_of_type(const TypeNode& tar
     if (rinfo->is_error()) {
         return error_stub();
     }
-    Entity& r_entity = *rinfo->entity;
+    Entity& r_entity = rinfo->entity.get();
     if (r_entity.type != E_TYPE::VALUE && r_entity.type != E_TYPE::CONST_FUNCTION) {
         this->error_reporter.error(ErrorTypeMismatch(*target.clone(), node, r_entity));
         return error_stub();
@@ -133,7 +133,7 @@ USemanticInfo Checker::visit_declaration(DeclarationNode& n) {
     } else {
         info = this->check_declaration_without_type(n);
     }
-    this->scope->set(n.identifier, info->entity);
+    this->scope->set(n.identifier, &info->entity.get());
     return info;
 }
 
@@ -153,7 +153,7 @@ USemanticInfo Checker::check_declaration_with_type(DeclarationNode& n) {
     info.snode = new DeclarationSNode(n.identifier, up);
     auto ov = std::make_unique<Value>(n.type->clone());
     this->fill_value(*ov);
-    info.entity = new EntityValue(std::move(ov));
+    info.entity = *new EntityValue(std::move(ov));
     return std::make_unique<SemanticInfo>(info);
 }
 
@@ -162,9 +162,9 @@ USemanticInfo Checker::check_declaration_without_type(DeclarationNode& n) {
     if (exp_info_p->is_error()) {
         return error_stub();
     }
-    E_TYPE entity_type = exp_info_p->entity->type;
+    E_TYPE entity_type = exp_info_p->entity.get().type;
     if (entity_type != E_TYPE::CONST_FUNCTION && entity_type != E_TYPE::VALUE) {
-        this->error_reporter.error(ErrorExpectedExpression(*exp_info_p->entity, *n.expression));
+        this->error_reporter.error(ErrorExpectedExpression(exp_info_p->entity, *n.expression));
         return error_stub();
     }
 
@@ -172,9 +172,9 @@ USemanticInfo Checker::check_declaration_without_type(DeclarationNode& n) {
     USNode u(exp_info_p->snode);
     info.snode = new DeclarationSNode(n.identifier, u);
     info.entity = exp_info_p->entity;
-    if (info.entity->type == E_TYPE::CONST_FUNCTION) {
-        EntityValue* value_entity = new EntityValue(std::make_unique<Value>(((EntityConstFunction*) exp_info_p->entity)->const_function->ft->clone()));
-        info.entity = value_entity;
+    if (info.entity.get().type == E_TYPE::CONST_FUNCTION) {
+        EntityValue* value_entity = new EntityValue(std::make_unique<Value>(((EntityConstFunction&) exp_info_p->entity).const_function->ft->clone()));
+        info.entity = *value_entity;
 
         if (value_entity->value->type->is_generic()) {
             this->error_reporter.fail("Error: you need to specialize the generic function of type " +

@@ -38,7 +38,7 @@ USemanticInfo Checker::visit_id(IdNode& n) {
                                                   : n._id;
     auto* sn = new IdSNode(id);
     SemanticInfo info;
-    info.entity = &entity;
+    info.entity = entity;
     info.snode = sn;
     return std::make_unique<SemanticInfo>(info);
 }
@@ -69,8 +69,8 @@ USemanticInfo Checker::visit_boolop(BoolOpNode& n) {
     if (left_info_p->is_error() || right_info_p->is_error()) {
         return error_stub();
     }
-    Entity& l_entity = *left_info_p->entity;
-    Entity& r_entity = *right_info_p->entity;
+    Entity& l_entity = left_info_p->entity;
+    Entity& r_entity = right_info_p->entity;
     if (l_entity.type != E_TYPE::VALUE || r_entity.type != E_TYPE::VALUE) {
 
         this->error_reporter.error(ErrorBoolOp(l_entity, r_entity, n.start));
@@ -124,7 +124,7 @@ USemanticInfo Checker::visit_boolop(BoolOpNode& n) {
         // TypeNode* rettype = ot;
         //
         // info.entity = new EntityValue(std::make_unique<Value>(rettype));
-        info.entity = &this->entity_value_from_actual_base_path_no_generic(Path("core.core.Boolean"));
+        info.entity = this->entity_value_from_actual_base_path_no_generic(Path("core.core.Boolean"));
         ConstFunction* opfun = (((EntityEnum&) entity).enumm)->functions[fun];
         info.snode = make_boolop_snode(opfun, left_info, right_info);
 
@@ -147,7 +147,7 @@ USemanticInfo Checker::visit_boolop(BoolOpNode& n) {
 
         auto v = std::make_unique<Value>(rettype);
         this->fill_value(*v);
-        info.entity = new EntityValue(std::move(v));
+        info.entity = *new EntityValue(std::move(v));
         info.snode = make_boolop_snode(operator_fun, left_info, right_info);
     }
 
@@ -161,7 +161,7 @@ USemanticInfo Checker::visit_unary(UnaryOpNode& n) {
     }
     SNode* exp_snode = exp_info->snode;
 
-    EntityValue& entity_parent = *(EntityValue*) exp_info->entity;
+    EntityValue& entity_parent = (EntityValue&) exp_info->entity.get();
     Class* cls = entity_parent.value->clazz;
 
     auto subscript_it = cls->methods.find("__not__");
@@ -177,7 +177,7 @@ USemanticInfo Checker::visit_unary(UnaryOpNode& n) {
     auto* csn = new CallSNode(fsn, {exp_snode});
 
     SemanticInfo info;
-    info.entity = new EntityValue(std::make_unique<Value>(rtype));
+    info.entity = *new EntityValue(std::make_unique<Value>(rtype));
     info.snode = csn;
     return std::make_unique<SemanticInfo>(info);
 }
@@ -187,7 +187,7 @@ USemanticInfo Checker::visit_binop(BinopNode& n) {
     if (left_info_p->is_error()) {
         return error_stub();
     }
-    Entity& l_entity = *left_info_p->entity;
+    Entity& l_entity = left_info_p->entity.get();
     if (l_entity.type != E_TYPE::VALUE) {
         this->error_reporter.error(ErrorExpectedExpression(l_entity, *n.left));
         return error_stub();
@@ -218,7 +218,7 @@ USemanticInfo Checker::visit_binop(BinopNode& n) {
     SemanticInfo info;
     auto v = std::make_unique<Value>(rettype);
     this->fill_value(*v);
-    info.entity = new EntityValue(std::move(v));
+    info.entity = *new EntityValue(std::move(v));
     info.snode = sn;
     return std::make_unique<SemanticInfo>(info);
 }
@@ -259,7 +259,7 @@ void Checker::fill_value(Value& value) {
 
 USemanticInfo Checker::visit_subscript(SubscriptNode& node) {
     USemanticInfo parent_p = this->dispatch(*node.parent);
-    Entity& entity_parent = *parent_p->entity;
+    Entity& entity_parent = parent_p->entity;
     if (entity_parent.type != E_TYPE::VALUE || ((EntityValue&) entity_parent).value->type->kind == Kind::FUNCTION) {
         this->error_reporter.fail("Error subscript of something that is not an object!");
         return error_stub();
@@ -296,7 +296,7 @@ USemanticInfo Checker::visit_subscript(SubscriptNode& node) {
 
     auto v = std::make_unique<Value>(rtype);
     this->fill_value(*v);
-    info.entity = new EntityValue(std::move(v));
+    info.entity = *new EntityValue(std::move(v));
 
     auto* fsn = new IdSNode(sub_fun_path);
     auto* csn = new CallSNode(fsn, {parent_p->snode, child_snode});
@@ -307,12 +307,12 @@ USemanticInfo Checker::visit_subscript(SubscriptNode& node) {
 USemanticInfo Checker::visit_ternary(TernaryNode& node) {
     USemanticInfo expression_info_p = this->dispatch_rvalue(*node.expression);
     SemanticInfo& expression_info = *expression_info_p;
-    Entity& p_entity = *expression_info.entity;
+    Entity& p_entity = expression_info.entity;
     if (p_entity.type != E_TYPE::VALUE ||
-        (*(EntityValue*) expression_info_p->entity).value->type->kind == Kind::FUNCTION) {
+        ((EntityValue&) expression_info_p->entity).value->type->kind == Kind::FUNCTION) {
         this->error_reporter.error(ErrorTypeMismatch(*new ObjectType("Option", {new ObjectType("t")}),
                                                      *node.expression,
-                                                     *expression_info_p->entity));
+                                                     expression_info_p->entity));
         return error_stub();
     }
     ObjectType& expression_type = ((EntityValue&) p_entity).value->type->object();
@@ -320,7 +320,7 @@ USemanticInfo Checker::visit_ternary(TernaryNode& node) {
     if (expression_type.id != "Option") {
         this->error_reporter.error(ErrorTypeMismatch(*new ObjectType("Option", {new ObjectType("t")}),
                                                      *node.expression,
-                                                     *expression_info_p->entity));
+                                                     expression_info_p->entity));
         return error_stub();
     }
     this->enter_scope("true_case");
@@ -330,7 +330,7 @@ USemanticInfo Checker::visit_ternary(TernaryNode& node) {
     USemanticInfo true_case_p = this->dispatch_rvalue(*node.true_case);
     SemanticInfo& true_case = *true_case_p;
     this->leave_scope();
-    EntityValue& true_value = *(EntityValue*) true_case.entity;
+    EntityValue& true_value = (EntityValue&) true_case.entity;
     USemanticInfo false_case_sinfo = this->expect_rvalue_of_type(*true_value.value->type, *node.false_case);
     if (false_case_sinfo->is_error()) {
         return error_stub();
@@ -340,7 +340,7 @@ USemanticInfo Checker::visit_ternary(TernaryNode& node) {
     auto rv = std::make_unique<Value>(true_value.value->type->clone());
     this->fill_value(*rv);
     SemanticInfo info;
-    info.entity = new EntityValue(std::move(rv));
+    info.entity = *new EntityValue(std::move(rv));
     info.snode = new TernarySNode(expression_info_p->snode, true_case.snode, false_case_snode);
     return std::make_unique<SemanticInfo>(info);
 }

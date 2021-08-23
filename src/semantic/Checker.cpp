@@ -130,7 +130,7 @@ Checker::match_arguments_to_generic_function(const FunctionType& ft, VectorOfTyp
         delete at;
     }
     SemanticInfo rv;
-    rv.entity = new EntityValue(std::make_unique<Value>(f->return_type->clone()));
+    rv.entity = *new EntityValue(std::make_unique<Value>(f->return_type->clone()));
     delete f;
     return std::make_unique<SemanticInfo>(rv);
 }

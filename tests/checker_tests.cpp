@@ -219,9 +219,9 @@ TEST_CASE("int_literal", "[checker]") {
 
     REQUIRE(!checker.error_reporter.failed);
     REQUIRE(checker.error_reporter.errors.size() == 0);
-    REQUIRE(info->entity->type == E_TYPE::VALUE);
-    REQUIRE(((EntityValue*) (info->entity))->value->metatype == Meta::CLASS);
-    REQUIRE(*((EntityValue*) (info->entity))->value->type == ObjectType("Integer"));
+    REQUIRE(info->entity.get().type == E_TYPE::VALUE);
+    REQUIRE(((EntityValue&) (info->entity.get())).value->metatype == Meta::CLASS);
+    REQUIRE(*((EntityValue&) (info->entity.get())).value->type == ObjectType("Integer"));
 }
 
 TEST_CASE("bool_literal", "[checker]") {
@@ -236,9 +236,9 @@ TEST_CASE("bool_literal", "[checker]") {
 
     REQUIRE(!checker.error_reporter.failed);
     REQUIRE(checker.error_reporter.errors.size() == 0);
-    REQUIRE(info->entity->type == E_TYPE::VALUE);
-    REQUIRE(((EntityValue*) (info->entity))->value->metatype == Meta::CLASS);
-    REQUIRE(*((EntityValue*) (info->entity))->value->type == ObjectType("Boolean"));
+    REQUIRE(info->entity.get().type == E_TYPE::VALUE);
+    REQUIRE(((EntityValue&) (info->entity.get())).value->metatype == Meta::CLASS);
+    REQUIRE(*((EntityValue&) (info->entity.get())).value->type == ObjectType("Boolean"));
 }
 
 TEST_CASE("list_literal", "[checker]") {
@@ -253,9 +253,9 @@ TEST_CASE("list_literal", "[checker]") {
 
     REQUIRE(!checker.error_reporter.failed);
     REQUIRE(checker.error_reporter.errors.size() == 0);
-    REQUIRE(info->entity->type == E_TYPE::VALUE);
-    REQUIRE(((EntityValue*) (info->entity))->value->metatype == Meta::CLASS);
-    REQUIRE(*((EntityValue*) (info->entity))->value->type == ObjectType("List", {new ObjectType("Integer")}));
+    REQUIRE(info->entity.get().type == E_TYPE::VALUE);
+    REQUIRE(((EntityValue&) (info->entity.get())).value->metatype == Meta::CLASS);
+    REQUIRE(*((EntityValue&) (info->entity.get())).value->type == ObjectType("List", {new ObjectType("Integer")}));
 }
 
 TEST_CASE("empty_list_literal", "[checker]") {
@@ -270,9 +270,9 @@ TEST_CASE("empty_list_literal", "[checker]") {
 
     REQUIRE(!checker.error_reporter.failed);
     REQUIRE(checker.error_reporter.errors.size() == 0);
-    REQUIRE(info->entity->type == E_TYPE::VALUE);
-    REQUIRE(((EntityValue*) (info->entity))->value->metatype == Meta::CLASS);
-    REQUIRE(*((EntityValue*) (info->entity))->value->type == ObjectType("List", {new ObjectType("String")}));
+    REQUIRE(info->entity.get().type == E_TYPE::VALUE);
+    REQUIRE(((EntityValue&) (info->entity.get())).value->metatype == Meta::CLASS);
+    REQUIRE(*((EntityValue&) (info->entity.get())).value->type == ObjectType("List", {new ObjectType("String")}));
 }
 
 TEST_CASE("empty_dict_literal", "[checker]") {
@@ -287,9 +287,9 @@ TEST_CASE("empty_dict_literal", "[checker]") {
 
     REQUIRE(!checker.error_reporter.failed);
     REQUIRE(checker.error_reporter.errors.size() == 0);
-    REQUIRE(info->entity->type == E_TYPE::VALUE);
-    REQUIRE(((EntityValue*) (info->entity))->value->metatype == Meta::CLASS);
-    REQUIRE(*((EntityValue*) (info->entity))->value->type ==
+    REQUIRE(info->entity.get().type == E_TYPE::VALUE);
+    REQUIRE(((EntityValue&) (info->entity.get())).value->metatype == Meta::CLASS);
+    REQUIRE(*((EntityValue&) (info->entity.get())).value->type ==
             ObjectType("Dict", {new ObjectType("Integer"), new ObjectType("String")}));
 }
 
@@ -306,9 +306,9 @@ TEST_CASE("dict_literal", "[checker]") {
 
     REQUIRE(!checker.error_reporter.failed);
     REQUIRE(checker.error_reporter.errors.size() == 0);
-    REQUIRE(info->entity->type == E_TYPE::VALUE);
-    REQUIRE(((EntityValue*) (info->entity))->value->metatype == Meta::CLASS);
-    REQUIRE(*((EntityValue*) (info->entity))->value->type ==
+    REQUIRE(info->entity.get().type == E_TYPE::VALUE);
+    REQUIRE(((EntityValue&) (info->entity.get())).value->metatype == Meta::CLASS);
+    REQUIRE(*((EntityValue&) (info->entity.get())).value->type ==
             ObjectType("Dict", {new ObjectType("String"), new ObjectType("Integer")}));
 }
 
@@ -324,9 +324,9 @@ TEST_CASE("float_literal", "[checker]") {
 
     REQUIRE(!checker.error_reporter.failed);
     REQUIRE(checker.error_reporter.errors.size() == 0);
-    REQUIRE(info->entity->type == E_TYPE::VALUE);
-    REQUIRE(((EntityValue*) (info->entity))->value->metatype == Meta::CLASS);
-    REQUIRE(*((EntityValue*) (info->entity))->value->type == ObjectType("Float"));
+    REQUIRE(info->entity.get().type == E_TYPE::VALUE);
+    REQUIRE(((EntityValue&) (info->entity.get())).value->metatype == Meta::CLASS);
+    REQUIRE(*((EntityValue&) (info->entity.get())).value->type == ObjectType("Float"));
 }
 
 // TEST_CASE("none_literal", "[checker]") {
@@ -341,7 +341,7 @@ TEST_CASE("float_literal", "[checker]") {
 //
 //     REQUIRE(!checker.error_reporter.failed);
 //     REQUIRE(checker.error_reporter.errors.size() == 0);
-//     REQUIRE(info->entity->type == E_TYPE::VALUE);
+//     REQUIRE(info->entity.get().type == E_TYPE::VALUE);
 //     REQUIRE(((EntityValue*)(info->entity))->value->metatype == Meta::CLASS);
 //     REQUIRE(*((EntityValue*)(info->entity))->value->type == ObjectType("NoneType"));
 // }
@@ -417,9 +417,10 @@ TEST_CASE("binop_ok", "[checker]") {
 
     REQUIRE(!checker.error_reporter.failed);
     REQUIRE(checker.error_reporter.errors.empty());
-    CHECK(info->entity->type == E_TYPE::VALUE);
-    CHECK(((EntityValue*) (info->entity))->value->metatype == Meta::CLASS);
-    CHECK(*((EntityValue*) (info->entity))->value->type == ObjectType("Integer"));
+    CHECK(info->entity.get().type == E_TYPE::VALUE);
+    EntityValue& entity_value = (EntityValue&) (info->entity.get());
+    CHECK(entity_value.value->metatype == Meta::CLASS);
+    CHECK(*entity_value.value->type == ObjectType("Integer"));
 }
 
 TEST_CASE("boolop_ok", "[checker]") {
@@ -436,9 +437,10 @@ TEST_CASE("boolop_ok", "[checker]") {
 
     REQUIRE(!checker.error_reporter.failed);
     REQUIRE(checker.error_reporter.errors.empty());
-    CHECK(info->entity->type == E_TYPE::VALUE);
-    CHECK(((EntityValue*) (info->entity))->value->metatype == Meta::CLASS);
-    CHECK(*((EntityValue*) (info->entity))->value->type == ObjectType("Boolean"));
+    CHECK(info->entity.get().type == E_TYPE::VALUE);
+    EntityValue& entity_value = (EntityValue&) (info->entity.get());
+    CHECK(entity_value.value->metatype == Meta::CLASS);
+    CHECK(*entity_value.value->type == ObjectType("Boolean"));
 }
 
 

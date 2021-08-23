@@ -30,11 +30,11 @@ USemanticInfo Checker::visit_call(CallNode& n, bool is_rvalue) {
     // Node* object_node;
     sn->function = fun_info.snode;
     FunctionType* function_type = nullptr;
-    if (fun_info.entity->type == E_TYPE::CONST_FUNCTION) {
-        function_type = ((EntityConstFunction*) fun_info.entity)->const_function->ft->clone();
-    } else if (fun_info.entity->type == E_TYPE::VALUE &&
-               ((EntityValue*) fun_info.entity)->value->type->kind == Kind::FUNCTION) {
-        function_type = ((EntityValue*) fun_info.entity)->value->type->function().clone();
+    if (fun_info.entity.get().type == E_TYPE::CONST_FUNCTION) {
+        function_type = ((EntityConstFunction&) fun_info.entity.get()).const_function->ft->clone();
+    } else if (fun_info.entity.get().type == E_TYPE::VALUE &&
+               ((EntityValue&) fun_info.entity).value->type->kind == Kind::FUNCTION) {
+        function_type = ((EntityValue&) fun_info.entity.get()).value->type->function().clone();
     } else {
         this->error_reporter.error(ErrorNotAFunction(n));
         return error_stub();
@@ -43,7 +43,7 @@ USemanticInfo Checker::visit_call(CallNode& n, bool is_rvalue) {
     if (n.arguments.size() != function_type->param_types.size()) {
         this->error_reporter.error(ErrorFunctionCallNumArgs(*function_type, n.start));
         if (!function_is_generic(*function_type)) {
-            retv.entity = entity_from_type(*function_type->return_type);
+            retv.entity = *entity_from_type(*function_type->return_type);
             return std::make_unique<SemanticInfo>(retv);
         } else {
             return error_stub();
@@ -76,8 +76,8 @@ USemanticInfo Checker::visit_call(CallNode& n, bool is_rvalue) {
             std::cout << "ARG: " << x->to_string() << std::endl;
         }
         std::cout << "DONE" << std::endl;
-        if (fun_info.entity->type == E_TYPE::CONST_FUNCTION) {
-            ConstFunction* full_function = ((EntityConstFunction*) fun_info.entity)->const_function;
+        if (fun_info.entity.get().type == E_TYPE::CONST_FUNCTION) {
+            ConstFunction* full_function = ((EntityConstFunction&) fun_info.entity.get()).const_function;
             if (full_function->implicit != nullptr) {
                 ObjectType* it = new ObjectType(full_function->implicit->type);
                 it->is_generic_param = true;
@@ -151,16 +151,16 @@ USemanticInfo Checker::visit_call(CallNode& n, bool is_rvalue) {
 
 USemanticInfo Checker::make_return_info(const CallNode& n, bool is_rvalue, SemanticInfo& retv, bool is_def_const,
                                         bool args_are_constant) {
-    if (retv.entity->type == E_TYPE::NOTHING) {
+    if (retv.entity.get().type == E_TYPE::NOTHING) {
         if (is_rvalue) {
-            this->error_reporter.error(ErrorExpectedExpression(*retv.entity, n));
+            this->error_reporter.error(ErrorExpectedExpression(retv.entity, n));
             return error_stub();
         }
-    } else if (retv.entity->type == E_TYPE::VALUE) {
-        Value& value = *((EntityValue*) retv.entity)->value;
+    } else if (retv.entity.get().type == E_TYPE::VALUE) {
+        Value& value = *((EntityValue&) retv.entity.get()).value;
         if (value.type->kind == Kind::OBJECT) {
             if (value.type->object().id == ".None") {
-                retv.entity = new EntityNothing();
+                retv.entity = *new EntityNothing();
             } else {
                 fill_value(value);
             }
@@ -180,9 +180,9 @@ Checker::check_arguments(CallNode& n, CallSNode* sn, VectorOfTypes& arg_types, s
             continue;
         }
 
-        arg_entities.push_back(arg_type_p->entity);
+        arg_entities.push_back(&arg_type_p->entity.get());
         sn->arguments.push_back(arg_type_p->snode);
-        Entity* arg_entity_p = arg_type_p->entity;
+        Entity* arg_entity_p = &arg_type_p->entity.get();
         Entity& arg_entity = *arg_entity_p;
         if (arg_entity.type == E_TYPE::CLASS || arg_entity.type == E_TYPE::PACKAGE ||
             arg_entity.type == E_TYPE::MODULE || arg_entity.type == E_TYPE::ENUM ||
@@ -203,7 +203,7 @@ Checker::check_arguments(CallNode& n, CallSNode* sn, VectorOfTypes& arg_types, s
 void
 Checker::process_function_arguments(SemanticInfo& retv, std::vector<Entity*>& arg_entities, CallSNode* sn, CallNode& n,
                                     FunctionType* function_type, SemanticInfo* fun_info_p) {
-    retv.entity = entity_from_type(*function_type->return_type);
+    retv.entity = *entity_from_type(*function_type->return_type);
     int sni = static_cast<int>(fun_info_p->this_arg != nullptr);
     for (size_t i = 0; i < n.arguments.size(); i++) {
         // const TypeNode& arg_type = *arg_types[i];

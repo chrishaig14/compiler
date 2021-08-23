@@ -4,7 +4,10 @@
 
 #include "SemanticInfo.h"
 
-SemanticInfo::SemanticInfo() {
+EntityNothing nothing;
+EntityError error;
+
+SemanticInfo::SemanticInfo() : entity(nothing) {
     this->is_constant = false;
     this->this_arg = nullptr;
     this->snode = nullptr;
@@ -13,7 +16,7 @@ SemanticInfo::SemanticInfo() {
 
 SemanticInfo& SemanticInfo::operator=(const SemanticInfo& other) = default;
 
-SemanticInfo::SemanticInfo(const SemanticInfo& other) {
+SemanticInfo::SemanticInfo(const SemanticInfo& other) : entity(nothing) {
     this->entity = other.entity;
     this->this_arg = other.this_arg;
     this->is_constant = other.is_constant;
@@ -25,9 +28,9 @@ SemanticInfo::~SemanticInfo() {
 }
 
 bool SemanticInfo::is_error() {
-    return this->entity->type == E_TYPE::ERROR;
+    return this->entity.get().type == E_TYPE::ERROR;
 }
 
 ErrorStub::ErrorStub() {
-    this->entity = new EntityError();
+    this->entity = error;
 }
