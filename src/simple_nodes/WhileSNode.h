@@ -11,10 +11,10 @@
 
 class WhileSNode : public SNode {
 public:
-    SNode* condition;
+    USNode condition;
     BlockSNode* body;
 
-    WhileSNode(SNode* condition, BlockSNode* body);
+    WhileSNode(USNode condition, BlockSNode* body);
 };
 
 

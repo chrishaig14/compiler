@@ -32,7 +32,7 @@ SNode* make_for_snode(ForNode& node, USemanticInfo& binfo, USemanticInfo& exp_in
     auto* llensn = new IdSNode(loop_list_len_var_id);
 
 
-    auto* cn = new CallSNode(cmpfunsn, {idxsn, llensn});
+    auto cn = std::make_unique<CallSNode>(cmpfunsn, std::vector<SNode*>{idxsn, llensn});
 
     auto* bn = (BlockSNode*) (binfo->snode);
 
@@ -44,13 +44,14 @@ SNode* make_for_snode(ForNode& node, USemanticInfo& binfo, USemanticInfo& exp_in
     bn->nodes.insert(bn->nodes.begin(), loop_elem_sn);
 
     bn->nodes.push_back(update_loop_index_snode);
-    auto* wsn = new WhileSNode(cn, bn);
+    auto* wsn = new WhileSNode(std::move(cn), bn);
     bbn->nodes.push_back(wsn);
     return bbn;
 }
 
 USemanticInfo Checker::visit_enum(EnumNode& p_node) {
-    USemanticInfo info_u = std::make_unique<SemanticInfo>(); SemanticInfo& info = *info_u;
+    USemanticInfo info_u = std::make_unique<SemanticInfo>();
+    SemanticInfo& info = *info_u;
     auto* esn = new EnumSNode();
     Enum* enumm = ((EntityEnum&) this->scope->get(p_node.id)).enumm;
     esn->id = enumm->path.as_str();
@@ -61,7 +62,8 @@ USemanticInfo Checker::visit_enum(EnumNode& p_node) {
 
 USemanticInfo Checker::visit_class(ClassNode& node) {
     this->error_reporter.current_class = node.class_name;
-    USemanticInfo info_u = std::make_unique<SemanticInfo>(); SemanticInfo& info = *info_u;
+    USemanticInfo info_u = std::make_unique<SemanticInfo>();
+    SemanticInfo& info = *info_u;
     auto* sn = new BlockSNode(true);
     info.snode = sn;
     this->add_this = true;
@@ -146,7 +148,8 @@ USemanticInfo Checker::visit_root(BlockNode& node) {
 }
 
 USemanticInfo Checker::visit_block(BlockNode& node) {
-    USemanticInfo info_u = std::make_unique<SemanticInfo>(); SemanticInfo& info = *info_u;
+    USemanticInfo info_u = std::make_unique<SemanticInfo>();
+    SemanticInfo& info = *info_u;
     auto* sn = new BlockSNode();
     info.snode = sn;
     VectorOfNodesU vn;
@@ -192,7 +195,8 @@ USemanticInfo Checker::visit_block(BlockNode& node) {
 
 USemanticInfo Checker::visit_function(FunctionNode& n) {
     this->error_reporter.current_function = n.identifier;
-    USemanticInfo info_u = std::make_unique<SemanticInfo>(); SemanticInfo& info = *info_u;
+    USemanticInfo info_u = std::make_unique<SemanticInfo>();
+    SemanticInfo& info = *info_u;
     // Logger::info("Checking FunctionNode " + n.identifier);
     std::string& function_name = n.identifier;
     this->enter_scope(function_name);

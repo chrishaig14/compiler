@@ -363,7 +363,7 @@ USemanticInfo Checker::visit_while(WhileNode& node) {
     if (condition_sinfo->is_error()) {
         return error_stub();
     }
-    SNode* condition_snode = condition_sinfo->snode;
+    USNode condition_snode = USNode(condition_sinfo->snode);
 
     this->enter_scope("while");
     this->scope->is_loop = true;
@@ -379,7 +379,7 @@ USemanticInfo Checker::visit_while(WhileNode& node) {
     }
     this->leave_scope();
 
-    auto* while_sn = new WhileSNode(condition_snode, (BlockSNode*) body_info_p->snode);
+    auto* while_sn = new WhileSNode(std::move(condition_snode), (BlockSNode*) body_info_p->snode);
 
     USemanticInfo info_u = std::make_unique<SemanticInfo>(); SemanticInfo& info = *info_u;
     info.snode = while_sn;
