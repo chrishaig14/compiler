@@ -4,11 +4,11 @@
 
 #include "ClassNode.h"
 
-ClassNode::ClassNode(const std::string& className, VectorOfStrings type_parameters, std::vector<std::pair<std::string,TypeNode*>> members,
+ClassNode::ClassNode(const std::string& className, VectorOfStrings type_parameters, std::vector<std::pair<std::string,UTypeNode>> members,
                      std::unordered_map<std::string, Method> functions,
                      std::map<std::string, std::pair<TypeNode*, Node*>> static_members,
                      std::unordered_map<std::string, UFunctionNode>& static_methods, TextPosition start,
-                     TextPosition end) : Node(NodeType::CLS, start, end), members(members),
+                     TextPosition end) : Node(NodeType::CLS, start, end), members(std::move(members)),
                                          static_members(static_members), methods(functions),
                                          static_methods(std::move(static_methods)), class_name(className) {
     this->type_parameters = type_parameters;

@@ -374,10 +374,8 @@ TEST_CASE("nodes_class_empty", "[class]") {
 }
 
 TEST_CASE("nodes_class_full", "[class]") {
-    ObjectType t1o("Integer");
-    ObjectType t2o("String");
-    auto* t1 = &t1o;
-    auto* t2 = &t2o;
+    auto t1 = std::make_unique<ObjectType>("Integer");
+    auto t2 = std::make_unique<ObjectType>("String");
     VectorOfStrings members_ordered = {"foo", "bar"};
     UTypeNode rt1 = std::make_unique<ObjectType>("Integer");
     UTypeNode rt2 = std::make_unique<ObjectType>("Integer");
@@ -393,12 +391,12 @@ TEST_CASE("nodes_class_full", "[class]") {
     FunctionNode* method2 = new FunctionNode("method2", {}, v2, rt2, b2, DUMMY_POS, DUMMY_POS);
     std::unordered_map<std::string, Method> cmethods = {{"method1", {nullptr, method1}},
                                                         {"method2", {nullptr, method2}}};
-    std::vector<std::pair<std::string, TypeNode*>> cmembers = {{"foo", t1},
-                                                               {"bar", t2}};
-
-
     nlohmann::json members = {{{"id", "foo"}, {"type", t1->to_json()}},
                               {{"id", "bar"}, {"type", t2->to_json()}}};
+    std::vector<std::pair<std::string, UTypeNode>> cmembers;
+    cmembers.emplace_back("foo", std::move(t1));
+    cmembers.emplace_back("bar", std::move(t2));
+
     nlohmann::json methods = {{"method2", method2->to_json()},
                               {"method1", method1->to_json()}};
 
@@ -422,7 +420,7 @@ TEST_CASE("nodes_class_full", "[class]") {
                                      {"smethod2", smethod2->to_json()}};
     cstatic_methods["smethod1"] = std::move(smethod1);
     cstatic_methods["smethod2"] = std::move(smethod2);
-    ClassNode n("MyClass", {"k", "v"}, cmembers, cmethods, {}, cstatic_methods, DUMMY_POS, DUMMY_POS);
+    ClassNode n("MyClass", {"k", "v"}, std::move(cmembers), cmethods, {}, cstatic_methods, DUMMY_POS, DUMMY_POS);
     n.members_ordered = members_ordered;
     nlohmann::json nj = n.to_json();
 

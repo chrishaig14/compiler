@@ -870,7 +870,7 @@ std::unique_ptr<ClassNode> Parser::parse_class_definition() {
     this->expect_token(TokType::LCURLY);
     std::unordered_map<std::string, Method> methods;
     std::unordered_map<std::string, UFunctionNode> static_methods;
-    std::vector<std::pair<std::string, TypeNode*>> members;
+    std::vector<std::pair<std::string, UTypeNode>> members;
     std::set<std::string> member_names;
     std::map<std::string, std::pair<TypeNode*, Node*>> static_members;
     VectorOfStrings members_ordered;
@@ -883,7 +883,7 @@ std::unique_ptr<ClassNode> Parser::parse_class_definition() {
         if (this->match(TokType::ID)) {
             Token member_name_tk = this->expect_token(TokType::ID);
             this->expect_token(TokType::COLON);
-            TypeNode* member_type = this->parse_type_node().release();
+            UTypeNode member_type = this->parse_type_node();
             std::string& member_name = member_name_tk.str;
             if (member_names.find(member_name) != member_names.end() || methods.find(member_name) != methods.end()) {
                 this->error_class_member_redefined(class_name, member_name, member_name_tk.start);
@@ -891,9 +891,9 @@ std::unique_ptr<ClassNode> Parser::parse_class_definition() {
             if (is_static) {
                 this->expect_token(TokType::EQQ);
                 auto init_expression = this->parse_expression();
-                static_members[member_name] = std::make_pair(member_type, init_expression.release());
+                static_members[member_name] = std::make_pair(member_type.release(), init_expression.release());
             } else {
-                members.push_back({member_name, member_type});
+                members.push_back({member_name, std::move(member_type)});
             }
             this->expect_token(TokType::SEMICOLON);
         } else if (this->match(TokType::WHERE)) {
@@ -944,7 +944,7 @@ std::unique_ptr<ClassNode> Parser::parse_class_definition() {
     Token end = this->expect_token(TokType::RCURLY);
     auto c = std::make_unique<ClassNode>(class_name,
                                          type_parameters,
-                                         members,
+                                         std::move(members),
                                          methods,
                                          static_members,
                                          static_methods,

@@ -400,8 +400,9 @@ TEST_CASE("parse_class_one_member", "[parser]") {
 
     std::unique_ptr<ClassNode> ast = parser.parse_class_definition();
     std::unordered_map<std::string, UFunctionNode> v;
-    REQUIRE(ast->to_json() ==
-            ClassNode(ID, {}, {{ID_1, TYPE_1.node->clone()}}, {}, {}, v, DUMMY_POS, DUMMY_POS).to_json());
+    std::vector<std::pair<std::string, UTypeNode >> members;
+    members.emplace_back(ID_1, UTypeNode(TYPE_1.node->clone()));
+    REQUIRE(ast->to_json() == ClassNode(ID, {}, std::move(members), {}, {}, v, DUMMY_POS, DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_class_mult_member", "[parser]") {
@@ -414,15 +415,10 @@ TEST_CASE("parse_class_mult_member", "[parser]") {
 
     std::unique_ptr<ClassNode> ast = parser.parse_class_definition();
     std::unordered_map<std::string, UFunctionNode> v;
-    REQUIRE(ast->to_json() == ClassNode(ID,
-                                        {},
-                                        {{ID_2, TYPE_2.node->clone()},
-                                         {ID_1, TYPE_1.node->clone()}},
-                                        {},
-                                        {},
-                                        v,
-                                        DUMMY_POS,
-                                        DUMMY_POS).to_json());
+    std::vector<std::pair<std::string, UTypeNode >> members;
+    members.emplace_back(ID_2, UTypeNode(TYPE_2.node->clone()));
+    members.emplace_back(ID_1, UTypeNode(TYPE_1.node->clone()));
+    REQUIRE(ast->to_json() == ClassNode(ID, {}, std::move(members), {}, {}, v, DUMMY_POS, DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_class_with_method", "[parser]") {
@@ -439,11 +435,12 @@ TEST_CASE("parse_class_with_method", "[parser]") {
 
     FunctionNode* fp = (FunctionNode*) function.node.release();
     std::unordered_map<std::string, UFunctionNode> v;
-
+    std::vector<std::pair<std::string, UTypeNode >> members;
+    members.emplace_back(ID_2, UTypeNode(TYPE_2.node->clone()));
+    members.emplace_back(ID_1, UTypeNode(TYPE_1.node->clone()));
     REQUIRE(ast->to_json() == ClassNode(ID,
                                         {},
-                                        {{ID_2, TYPE_2.node->clone()},
-                                         {ID_1, TYPE_1.node->clone()}},
+                                        std::move(members),
                                         {{fp->identifier, Method{nullptr, fp}}},
                                         {},
                                         v,

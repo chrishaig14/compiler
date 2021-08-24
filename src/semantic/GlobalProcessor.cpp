@@ -177,13 +177,13 @@ void GlobalProcessor::visit_class(ClassNode& node) {
     // }
     class_info->type_params = node.type_parameters;
     for (const auto& mt: node.members) {
-        this->module.fill_actual(mt.second);
+        this->module.fill_actual(*mt.second);
         // if (!mt->object().is_generic()) {
         //     mt->object().actual_base_path = this->get_actual_path(mt->object().id);
         // }
         class_info->member_names.push_back(mt.first);
-        class_info->member_types.push_back(mt.second);
-        class_info->members[mt.first] = mt.second;
+        class_info->member_types.push_back(mt.second->clone());
+        class_info->members[mt.first] = mt.second->clone();
         class_info->member_entities[mt.first] = new EntityNothing();
     }
     for (const auto& mn: node.static_members) {
