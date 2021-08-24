@@ -41,7 +41,7 @@ void Checker::leave_scope() {
     this->scope = this->scope->parent;
 }
 
-bool Checker::assert_type_exists(TypeNode& type, TextPosition pos) {
+bool Checker::assert_type_exists(const TypeNode& type, TextPosition pos) {
     if (type.kind == Kind::OBJECT) {
         if (type.object().id == ".None") {
             return true;

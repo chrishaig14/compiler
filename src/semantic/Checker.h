@@ -89,7 +89,7 @@ public:
     bool is_immutable(const TypeNode& node);
     void enter_scope(const std::string& name);
     void leave_scope();
-    bool assert_type_exists(TypeNode& type, TextPosition pos);
+    bool assert_type_exists(const TypeNode& type, TextPosition pos);
     Class* instantiate_generic(Class* generic, const ObjectType& instance);
     bool is_variable(const ObjectType& a);
     std::pair<std::string, TypeNode*>*
