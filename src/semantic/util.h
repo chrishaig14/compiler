@@ -7,7 +7,7 @@
 
 #include "../nodes/TypeNode.h"
 
-TypeNode* parse_type(const std::string& s);
+UTypeNode parse_type(const std::string& s);
 
 FunctionType* parse_function_type(const std::string& s);
 #endif //XLANG_UTIL_H
