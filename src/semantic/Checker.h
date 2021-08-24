@@ -80,10 +80,10 @@ public:
     bool is_call;
     ErrorReporter error_reporter;
     Entity* this_entity;
-    Package* top_package;
+    Package& top_package;
     SNode* update_loop_index_snode;
 
-    Checker(Package* top_package, Module* module);
+    Checker(Package& top_package, Module* module);
     ~Checker();
 
     bool is_immutable(const TypeNode& node);

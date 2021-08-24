@@ -17,8 +17,7 @@ bool function_is_generic(const FunctionType& ft) {
     return false;
 }
 
-Checker::Checker(Package* top_package, Module* module) {
-    this->top_package = top_package;
+Checker::Checker(Package& top_package, Module* module) : top_package(top_package) {
     this->module = module;
     this->is_call = false;
     this->scope = new SymbolTable("global", nullptr);
@@ -114,7 +113,7 @@ Checker::match_arguments_to_generic_function(const FunctionType& ft, VectorOfTyp
     // = ft.clone();
     try {
         f = unify_function_call(ft, arg_types, all_substitutions);
-        if (f == nullptr){
+        if (f == nullptr) {
             throw std::runtime_error("unify error");
         }
     } catch (...) {

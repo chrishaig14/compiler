@@ -246,7 +246,7 @@ void Checker::fill_value(Value& value) {
         value.metatype = Meta::CLASS;
         return;
     }
-    Flirpin flirpin = this->top_package->get(value.type->object().actual_base_path);
+    Flirpin flirpin = this->top_package.get(value.type->object().actual_base_path);
     if (flirpin.type == F_TYPE::ENUM) {
         value.enumm = flirpin.enumm;
         value.metatype = Meta::ENUM;
