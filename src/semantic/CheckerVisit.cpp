@@ -132,10 +132,10 @@ USemanticInfo Checker::visit_class(ClassNode& node) {
 }
 
 void Checker::init() {
-    this->error_reporter.__file__ = this->module->abs_path;
-    this->error_reporter.code_lines = this->module->code_lines;
+    this->error_reporter.__file__ = this->module.abs_path;
+    this->error_reporter.code_lines = this->module.code_lines;
     // Initialize module level Scope
-    for (const auto& f: this->module->flirpins) {
+    for (const auto& f: this->module.flirpins) {
         this->scope->set(f.first, map_flirpin_to_entity(f.second));
     }
 }
@@ -207,7 +207,7 @@ USemanticInfo Checker::visit_function(FunctionNode& n) {
         Class* clazz = new Class();
         clazz->class_name = n.implicit->type;
         ConstFunction* c = new ConstFunction(Path("implicit_a"), n.implicit->ft);
-        this->module->fill_actual(c->ft);
+        this->module.fill_actual(c->ft);
         if (n.implicit->is_static) {
             clazz->static_methods[n.implicit->method] = c;
         } else {

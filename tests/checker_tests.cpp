@@ -48,7 +48,7 @@ TEST_CASE("basic_function", "[checker]") {
     Compiler c = analyze(code);
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
-    Checker checker(*c.top_package, c.root_package->units["tmp"].module);
+    Checker checker(*c.top_package, module);
     checker.visit_function((FunctionNode&) *module.ast->nodes[0]);
     REQUIRE(not checker.error_reporter.failed);
 }
@@ -59,7 +59,7 @@ TEST_CASE("basic_function_bad_return_type", "[checker]") {
     Compiler c = analyze(code);
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
-    Checker checker(*c.top_package, c.root_package->units["tmp"].module);
+    Checker checker(*c.top_package, module);
     checker.visit_function((FunctionNode&) *module.ast->nodes[0]);
 
     REQUIRE(checker.error_reporter.failed);
@@ -78,7 +78,7 @@ TEST_CASE("basic_declaration", "[checker]") {
     Compiler c = analyze(code);
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
-    Checker checker(*c.top_package, c.root_package->units["tmp"].module);
+    Checker checker(*c.top_package, module);
     checker.visit_declaration((DeclarationNode&) *((std::unique_ptr<FunctionNode>&) module.ast->nodes[0])->body->nodes[0]);
     REQUIRE(not checker.error_reporter.failed);
 }
@@ -89,7 +89,7 @@ TEST_CASE("basic_declaration_bad_type", "[checker]") {
     Compiler c = analyze(code);
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
-    Checker checker(*c.top_package, c.root_package->units["tmp"].module);
+    Checker checker(*c.top_package, module);
     checker.visit_declaration((DeclarationNode&) *((std::unique_ptr<FunctionNode>&) module.ast->nodes[0])->body->nodes[0]);
 
     REQUIRE(checker.error_reporter.failed);
@@ -107,7 +107,7 @@ TEST_CASE("error_redeclared", "[checker]") {
     Compiler c = analyze(code);
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
-    Checker checker(*c.top_package, c.root_package->units["tmp"].module);
+    Checker checker(*c.top_package, module);
     checker.visit_function((FunctionNode&) *module.ast->nodes[0]);
 
     REQUIRE(checker.error_reporter.failed);
@@ -126,7 +126,7 @@ TEST_CASE("list_ok", "[checker]") {
     Compiler c = analyze(code);
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
-    Checker checker(*c.top_package, c.root_package->units["tmp"].module);
+    Checker checker(*c.top_package, module);
     checker.visit_function((FunctionNode&) *module.ast->nodes[0]);
 
     REQUIRE(!checker.error_reporter.failed);
@@ -139,7 +139,7 @@ TEST_CASE("list_bad", "[checker]") {
     Compiler c = analyze(code);
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
-    Checker checker(*c.top_package, c.root_package->units["tmp"].module);
+    Checker checker(*c.top_package, module);
     checker.visit_function((FunctionNode&) *module.ast->nodes[0]);
 
     REQUIRE(checker.error_reporter.failed);
@@ -160,7 +160,7 @@ TEST_CASE("empty_dict_ok", "[checker]") {
     Compiler c = analyze(code);
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
-    Checker checker(*c.top_package, c.root_package->units["tmp"].module);
+    Checker checker(*c.top_package, module);
     checker.visit_function((FunctionNode&) *module.ast->nodes[0]);
 
     REQUIRE(!checker.error_reporter.failed);
@@ -173,7 +173,7 @@ TEST_CASE("dict_ok", "[checker]") {
     Compiler c = analyze(code);
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
-    Checker checker(*c.top_package, c.root_package->units["tmp"].module);
+    Checker checker(*c.top_package, module);
     checker.visit_function((FunctionNode&) *module.ast->nodes[0]);
 
     REQUIRE(!checker.error_reporter.failed);
@@ -186,7 +186,7 @@ TEST_CASE("dict_key_type_error", "[checker]") {
     Compiler c = analyze(code);
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
-    Checker checker(*c.top_package, c.root_package->units["tmp"].module);
+    Checker checker(*c.top_package, module);
     checker.visit_function((FunctionNode&) *module.ast->nodes[0]);
 
     REQUIRE(checker.error_reporter.failed);
@@ -199,7 +199,7 @@ TEST_CASE("dict_value_type_error", "[checker]") {
     Compiler c = analyze(code);
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
-    Checker checker(*c.top_package, c.root_package->units["tmp"].module);
+    Checker checker(*c.top_package, module);
     checker.visit_function((FunctionNode&) *module.ast->nodes[0]);
 
     REQUIRE(checker.error_reporter.failed);
@@ -213,7 +213,7 @@ TEST_CASE("int_literal", "[checker]") {
     Compiler c = analyze(code);
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
-    Checker checker(*c.top_package, c.root_package->units["tmp"].module);
+    Checker checker(*c.top_package, module);
     Node& expression = *((DeclarationNode&) *((FunctionNode&) *module.ast->nodes[0]).body->nodes[0]).expression;
     USemanticInfo info = checker.dispatch_rvalue(expression);
 
@@ -230,7 +230,7 @@ TEST_CASE("bool_literal", "[checker]") {
     Compiler c = analyze(code);
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
-    Checker checker(*c.top_package, c.root_package->units["tmp"].module);
+    Checker checker(*c.top_package, module);
     Node& expression = *((DeclarationNode&) *((FunctionNode&) *module.ast->nodes[0]).body->nodes[0]).expression;
     USemanticInfo info = checker.dispatch_rvalue(expression);
 
@@ -247,7 +247,7 @@ TEST_CASE("list_literal", "[checker]") {
     Compiler c = analyze(code);
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
-    Checker checker(*c.top_package, c.root_package->units["tmp"].module);
+    Checker checker(*c.top_package, module);
     Node& expression = *((DeclarationNode&) *((FunctionNode&) *module.ast->nodes[0]).body->nodes[0]).expression;
     USemanticInfo info = checker.dispatch_rvalue(expression);
 
@@ -264,7 +264,7 @@ TEST_CASE("empty_list_literal", "[checker]") {
     Compiler c = analyze(code);
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
-    Checker checker(*c.top_package, c.root_package->units["tmp"].module);
+    Checker checker(*c.top_package, module);
     Node& expression = *((DeclarationNode&) *((FunctionNode&) *module.ast->nodes[0]).body->nodes[0]).expression;
     USemanticInfo info = checker.dispatch_rvalue(expression);
 
@@ -281,7 +281,7 @@ TEST_CASE("empty_dict_literal", "[checker]") {
     Compiler c = analyze(code);
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
-    Checker checker(*c.top_package, c.root_package->units["tmp"].module);
+    Checker checker(*c.top_package, module);
     Node& expression = *((DeclarationNode&) *((FunctionNode&) *module.ast->nodes[0]).body->nodes[0]).expression;
     USemanticInfo info = checker.dispatch_rvalue(expression);
 
@@ -300,7 +300,7 @@ TEST_CASE("dict_literal", "[checker]") {
     Compiler c = analyze(code);
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
-    Checker checker(*c.top_package, c.root_package->units["tmp"].module);
+    Checker checker(*c.top_package, module);
     Node& expression = *((DeclarationNode&) *((FunctionNode&) *module.ast->nodes[0]).body->nodes[0]).expression;
     USemanticInfo info = checker.dispatch_rvalue(expression);
 
@@ -318,7 +318,7 @@ TEST_CASE("float_literal", "[checker]") {
     Compiler c = analyze(code);
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
-    Checker checker(*c.top_package, c.root_package->units["tmp"].module);
+    Checker checker(*c.top_package, module);
     Node& expression = *((DeclarationNode&) *((FunctionNode&) *module.ast->nodes[0]).body->nodes[0]).expression;
     USemanticInfo info = checker.dispatch_rvalue(expression);
 
@@ -335,7 +335,7 @@ TEST_CASE("float_literal", "[checker]") {
 //     Compiler c = analyze(code);
 //     Module& module = *c.root_package->units["tmp"].module;
 //     analyze_module_result(module, *c.top_package);
-//     Checker checker(*c.top_package, c.root_package->units["tmp"].module);
+//     Checker checker(*c.top_package,module);
 //     Node* expression = ((DeclarationNode*) ((FunctionNode&)* module.ast->nodes[0]).body->nodes[0])->expression;
 //     USemanticInfo info = checker.dispatch_rvalue(expression);
 //
@@ -352,7 +352,7 @@ TEST_CASE("decl_error_expected_expression", "[checker]") {
     Compiler c = analyze(code);
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
-    Checker checker(*c.top_package, c.root_package->units["tmp"].module);
+    Checker checker(*c.top_package, module);
     checker.init();
     FunctionNode& function_node = (FunctionNode&) *module.ast->nodes[0];
     DeclarationNode& declaration_node = (DeclarationNode&) *function_node.body->nodes[0];
@@ -372,7 +372,7 @@ TEST_CASE("error_no_member", "[checker]") {
     Compiler c = analyze(code);
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
-    Checker checker(*c.top_package, c.root_package->units["tmp"].module);
+    Checker checker(*c.top_package, module);
     checker.init();
     FunctionNode& function_node = (FunctionNode&) *module.ast->nodes[1];
     DeclarationNode& declaration_node = (DeclarationNode&) *function_node.body->nodes[0];
@@ -395,7 +395,7 @@ TEST_CASE("member_ok", "[checker]") {
     Compiler c = analyze(code);
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
-    Checker checker(*c.top_package, c.root_package->units["tmp"].module);
+    Checker checker(*c.top_package, module);
     checker.init();
     checker.visit_root(*module.ast);
 
@@ -409,7 +409,7 @@ TEST_CASE("binop_ok", "[checker]") {
     Compiler c = analyze(code);
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
-    Checker checker(*c.top_package, c.root_package->units["tmp"].module);
+    Checker checker(*c.top_package, module);
     checker.init();
 
     Node& expression = *((DeclarationNode&) *((FunctionNode&) *module.ast->nodes[0]).body->nodes[0]).expression;
@@ -429,7 +429,7 @@ TEST_CASE("boolop_ok", "[checker]") {
     Compiler c = analyze(code);
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
-    Checker checker(*c.top_package, c.root_package->units["tmp"].module);
+    Checker checker(*c.top_package, module);
     checker.init();
 
     Node& expression = *((DeclarationNode&) *((FunctionNode&) *module.ast->nodes[0]).body->nodes[0]).expression;
@@ -450,7 +450,7 @@ TEST_CASE("binop_type_error", "[checker]") {
     Compiler c = analyze(code);
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
-    Checker checker(*c.top_package, c.root_package->units["tmp"].module);
+    Checker checker(*c.top_package, module);
     checker.init();
 
     Node& expression = *((DeclarationNode&) *((FunctionNode&) *module.ast->nodes[0]).body->nodes[0]).expression;
@@ -473,7 +473,7 @@ TEST_CASE("binop_error", "[checker]") {
     Compiler c = analyze(code);
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
-    Checker checker(*c.top_package, c.root_package->units["tmp"].module);
+    Checker checker(*c.top_package, module);
     checker.init();
 
     Node& expression = *((DeclarationNode&) *((FunctionNode&) *module.ast->nodes[0]).body->nodes[0]).expression;
@@ -497,7 +497,7 @@ TEST_CASE("subscript_ok", "[checker]") {
     Compiler c = analyze(code);
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
-    Checker checker(*c.top_package, c.root_package->units["tmp"].module);
+    Checker checker(*c.top_package, module);
     checker.init();
 
     Node& expression = *((DeclarationNode&) *((FunctionNode&) *module.ast->nodes[0]).body->nodes[0]).expression;
@@ -513,7 +513,7 @@ TEST_CASE("subscript_index_type_error", "[checker]") {
     Compiler c = analyze(code);
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
-    Checker checker(*c.top_package, c.root_package->units["tmp"].module);
+    Checker checker(*c.top_package, module);
     checker.init();
 
     Node& expression = *((DeclarationNode&) *((FunctionNode&) *module.ast->nodes[0]).body->nodes[0]).expression;
@@ -535,7 +535,7 @@ TEST_CASE("subscript_no_method_error", "[checker]") {
     Compiler c = analyze(code);
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
-    Checker checker(*c.top_package, c.root_package->units["tmp"].module);
+    Checker checker(*c.top_package, module);
     checker.init();
     checker.visit_root(*module.ast);
 
@@ -561,7 +561,7 @@ TEST_CASE("call_no_args_ok", "[checker]") {
     Compiler c = analyze(code);
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
-    Checker checker(*c.top_package, c.root_package->units["tmp"].module);
+    Checker checker(*c.top_package, module);
     checker.init();
     checker.visit_root(*module.ast);
 
@@ -575,7 +575,7 @@ TEST_CASE("call_args_ok", "[checker]") {
     Compiler c = analyze(code);
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
-    Checker checker(*c.top_package, c.root_package->units["tmp"].module);
+    Checker checker(*c.top_package, module);
     checker.init();
     checker.visit_root(*module.ast);
 
@@ -589,7 +589,7 @@ TEST_CASE("call_args_type_error", "[checker]") {
     Compiler c = analyze(code);
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
-    Checker checker(*c.top_package, c.root_package->units["tmp"].module);
+    Checker checker(*c.top_package, module);
     checker.init();
     checker.visit_root(*module.ast);
 
@@ -610,7 +610,7 @@ TEST_CASE("union_ok_1", "[checker]") {
     Compiler c = analyze(code);
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
-    Checker checker(*c.top_package, c.root_package->units["tmp"].module);
+    Checker checker(*c.top_package, module);
     checker.init();
     checker.visit_root(*module.ast);
 
@@ -624,7 +624,7 @@ TEST_CASE("union_ok_2", "[checker]") {
     Compiler c = analyze(code);
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
-    Checker checker(*c.top_package, c.root_package->units["tmp"].module);
+    Checker checker(*c.top_package, module);
     checker.init();
     checker.visit_root(*module.ast);
 
@@ -638,7 +638,7 @@ TEST_CASE("union_error", "[checker]") {
     Compiler c = analyze(code);
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
-    Checker checker(*c.top_package, c.root_package->units["tmp"].module);
+    Checker checker(*c.top_package, module);
     checker.init();
     checker.visit_root(*module.ast);
 
@@ -658,7 +658,7 @@ TEST_CASE("while_ok", "[checker]") {
     Compiler c = analyze(code);
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
-    Checker checker(*c.top_package, c.root_package->units["tmp"].module);
+    Checker checker(*c.top_package, module);
     checker.init();
     checker.visit_root(*module.ast);
 
@@ -672,7 +672,7 @@ TEST_CASE("while_boolean_error", "[checker]") {
     Compiler c = analyze(code);
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
-    Checker checker(*c.top_package, c.root_package->units["tmp"].module);
+    Checker checker(*c.top_package, module);
     checker.init();
     checker.visit_root(*module.ast);
 
@@ -693,7 +693,7 @@ TEST_CASE("if_ok", "[checker]") {
     Compiler c = analyze(code);
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
-    Checker checker(*c.top_package, c.root_package->units["tmp"].module);
+    Checker checker(*c.top_package, module);
     checker.init();
     checker.visit_root(*module.ast);
 
@@ -707,7 +707,7 @@ TEST_CASE("if_boolean_error", "[checker]") {
     Compiler c = analyze(code);
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
-    Checker checker(*c.top_package, c.root_package->units["tmp"].module);
+    Checker checker(*c.top_package, module);
     checker.init();
     checker.visit_root(*module.ast);
 
@@ -728,7 +728,7 @@ TEST_CASE("enum_error", "[checker]") {
     Compiler c = analyze(code);
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
-    Checker checker(*c.top_package, c.root_package->units["tmp"].module);
+    Checker checker(*c.top_package, module);
     checker.init();
     checker.visit_root(*module.ast);
 
@@ -751,7 +751,7 @@ TEST_CASE("enum_ok", "[checker]") {
     Compiler c = analyze(code);
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
-    Checker checker(*c.top_package, c.root_package->units["tmp"].module);
+    Checker checker(*c.top_package, module);
     checker.init();
     checker.visit_root(*module.ast);
 

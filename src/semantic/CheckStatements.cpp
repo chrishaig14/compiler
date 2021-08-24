@@ -116,12 +116,12 @@ USemanticInfo Checker::visit_assignment(AssignmentNode& n) {
     }
     TypeNode* exp_type = ((EntityValue&) expression_info_p->entity).value->type;
 
-    if (exp_type->kind == Kind::OBJECT && this->module->aliased_types.count(exp_type->object().id) == 1) {
-        TypeNode* aliased_type = this->module->aliased_types.at(exp_type->object().id);
+    if (exp_type->kind == Kind::OBJECT && this->module.aliased_types.count(exp_type->object().id) == 1) {
+        TypeNode* aliased_type = this->module.aliased_types.at(exp_type->object().id);
         exp_type = aliased_type;
     } else {
         // if (exp_type->kind == Kind::OBJECT && exp_type->object().id.size() != 1) {
-        //     this->module->fill_actual(exp_type);
+        //     this->module.fill_actual(exp_type);
         // }
     }
 
@@ -169,11 +169,11 @@ USemanticInfo Checker::visit_return(ReturnNode& n) {
         return std::make_unique<SemanticInfo>(info_r);
     }
     TypeNode* return_type = ((EntityValue&) return_entity).value->type;
-    if (return_type->kind == Kind::OBJECT && this->module->aliased_types.count(return_type->object().id) == 1) {
-        TypeNode* aliased_type = this->module->aliased_types.at(return_type->object().id);
+    if (return_type->kind == Kind::OBJECT && this->module.aliased_types.count(return_type->object().id) == 1) {
+        TypeNode* aliased_type = this->module.aliased_types.at(return_type->object().id);
         return_type = aliased_type;
     } else {
-        this->module->fill_actual(return_type);
+        this->module.fill_actual(return_type);
     }
     if (n.expression == nullptr) {
         // this->error_reporter.no_return(*return_type, n.start);
@@ -240,7 +240,7 @@ USemanticInfo Checker::visit_match(MatchExpressionNode& node) {
         TypeNode* case_type = c.first;
         BlockNode* case_node = c.second;
 
-        this->module->fill_actual(case_type);
+        this->module.fill_actual(case_type);
 
         int union_index = target_union_type(*ot, *case_type);
         if (union_index == -1) {

@@ -65,7 +65,7 @@ USemanticInfo Checker::visit_none(NoneNode& node) {
 
 USemanticInfo Checker::visit_emptylist(EmptyListNode& node) {
     USemanticInfo info_u = std::make_unique<SemanticInfo>(); SemanticInfo& info = *info_u;
-    this->module->fill_actual(node.type);
+    this->module.fill_actual(node.type);
     auto* otype = new ObjectType("List", {node.type});
     auto ov = std::make_unique<Value>(otype);
     otype->actual_base_path = Path("core.core.List");
@@ -198,7 +198,7 @@ USemanticInfo Checker::visit_dict(DictNode& node) {
         return error_stub();
     }
     auto ov = std::make_unique<Value>(new ObjectType("Dict", {first_key_type.clone(), first_value_type.clone()}));
-    this->module->fill_actual(ov->type);
+    this->module.fill_actual(ov->type);
     this->fill_value(*ov);
     assert(ov->clazz != nullptr);
     info.entity = *new EntityValue(std::move(ov));
@@ -212,7 +212,7 @@ USemanticInfo Checker::visit_emptydict(EmptyDictNode& node) {
     ObjectType* ot = new ObjectType("Dict", {node.key_type->clone(), node.value_type->clone()});
     ot->actual_base_path = Path("core.core.Dict");
     auto ov = std::make_unique<Value>(ot);
-    this->module->fill_actual(ov->type);
+    this->module.fill_actual(ov->type);
     this->fill_value(*ov);
     assert(ov->clazz != nullptr);
     info.entity = *new EntityValue(std::move(ov));

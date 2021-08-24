@@ -76,14 +76,14 @@ class Checker {
     std::unordered_map<std::string, SymbolTable*> scopes;
     SymbolTable* scope;
 public:
-    Module* module;
+    Module& module;
     bool is_call;
     ErrorReporter error_reporter;
     Entity* this_entity;
     Package& top_package;
     SNode* update_loop_index_snode;
 
-    Checker(Package& top_package, Module* module);
+    Checker(Package& top_package, Module& module);
     ~Checker();
 
     bool is_immutable(const TypeNode& node);

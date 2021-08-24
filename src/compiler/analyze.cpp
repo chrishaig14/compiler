@@ -16,7 +16,7 @@ void analyze_module(Module& module, Package& top_package) {
     for (const auto& i: module.imported_paths_with_alias_v) {
         add_path_with_alias_to_module(module, i.first, i.second, top_package);
     }
-    Checker checker(top_package, &module);
+    Checker checker(top_package, module);
     USemanticInfo check_info = checker.visit_root(*module.ast);
     module.sast = (BlockSNode*) (check_info->snode);
     if (checker.error_reporter.failed) {
