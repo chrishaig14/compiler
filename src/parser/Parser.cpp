@@ -511,7 +511,7 @@ UNode Parser::parse_call_or_subscript_chain(UNode& parent) {
             }
             UNode old_node = std::move(node);
             TextPosition o_start = old_node->start;
-            node = std::make_unique<CallNode>(old_node, arguments, old_node->start, close.end_pos);
+            node = std::make_unique<ast::CallNode>(old_node, arguments, old_node->start, close.end_pos);
             node->start = o_start;
         } else if (this->match(TokType::LSQUARE)) {
 //                subscript

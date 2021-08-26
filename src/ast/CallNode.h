@@ -10,8 +10,9 @@
 #include "Node.h"
 #include "../types.h"
 #include "TypeNode.h"
+#include "ast.h"
 
-class CallNode : public Node {
+class ast::CallNode : public Node {
 public:
     UNode function;
     VectorOfNodesU arguments;

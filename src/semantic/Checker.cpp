@@ -338,7 +338,7 @@ USemanticInfo Checker::dispatch_any(Node& n, bool is_rvalue) {
         case NodeType::BRK:
             return this->visit_break((BreakNode&) n);
         case NodeType::CALL:
-            return this->visit_call((CallNode&) n, is_rvalue);
+            return this->visit_call((ast::CallNode&) n, is_rvalue);
         case NodeType::CLS:
             return this->visit_class((ClassNode&) n);
         case NodeType::CNTINUE:

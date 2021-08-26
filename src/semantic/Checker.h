@@ -113,7 +113,7 @@ public:
     USemanticInfo visit_boolean(BooleanNode& node);
     USemanticInfo visit_boolop(BoolOpNode& n);
     USemanticInfo visit_break(BreakNode& node);
-    USemanticInfo visit_call(CallNode& n, bool is_rvalue);
+    USemanticInfo visit_call(ast::CallNode& n, bool is_rvalue);
     USemanticInfo visit_class(ClassNode& node);
     USemanticInfo visit_continue(ContinueNode& node);
 
@@ -161,11 +161,11 @@ public:
     USemanticInfo dispatch(Node& nod);
     void fill_value(Value& value);
     std::unique_ptr<SemanticInfo> expect_rvalue_of_type(const TypeNode& target, Node& node);
-    void process_function_arguments(SemanticInfo& retv, std::vector<Entity*>& arg_entities, CallSNode* sn, CallNode& n,
+    void process_function_arguments(SemanticInfo& retv, std::vector<Entity*>& arg_entities, CallSNode* sn, ast::CallNode& n,
                                     FunctionType* function_type, SemanticInfo* fun_info_p);
-    bool check_arguments(CallNode& n, CallSNode* sn, VectorOfTypes& arg_types, std::vector<Entity*>& arg_entities);
+    bool check_arguments(ast::CallNode& n, CallSNode* sn, VectorOfTypes& arg_types, std::vector<Entity*>& arg_entities);
     USemanticInfo
-    make_return_info(const CallNode& n, bool is_rvalue, SemanticInfo& retv, bool is_def_const, bool args_are_constant);
+    make_return_info(const ast::CallNode& n, bool is_rvalue, SemanticInfo& retv, bool is_def_const, bool args_are_constant);
     SNode* make_union_rvalue(SNode* value_snode, const TypeNode* unaliased_value_type,
                              const TypeNode* unaliased_target_type) const;
     SNode* make_option_rvalue(SNode* value_snode, const TypeNode* unaliased_value_type,

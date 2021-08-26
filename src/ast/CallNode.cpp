@@ -4,7 +4,7 @@
 
 #include "CallNode.h"
 #include "../json/json.hpp"
-
+using namespace ast;
 CallNode::CallNode(UNode& function, VectorOfNodesU& arguments, TextPosition start, TextPosition end) : Node(
         NodeType::CALL,
         start,

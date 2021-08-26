@@ -16,7 +16,7 @@
 #define LST(list) new ListNode(list)
 #define STR(str) new StringNode(str)
 #define TERNARY(a, b, c) new TernaryNode(a,b,c)
-#define CALL(function, arguments) new CallNode(function, arguments)
+#define CALL(function, arguments) new ast::CallNode(function, arguments)
 #define CLS(name, template_parameters, fields) new StructNode(name, template_parameters, fields)
 #define ASN(lvalue, rvalue) new AssignmentNode(lvalue, rvalue)
 #define FOR(var, exp, block) new ForNode(var, exp, block)
@@ -65,7 +65,7 @@
 #define TO_ID(x) dynamic_cast<ast::IdNode*> (x)
 #define TO_SUB(x) dynamic_cast<SubscriptNode*> (x)
 #define TO_MEMBER(x) dynamic_cast<MemberNode*>(x)
-#define TO_CALL(x) dynamic_cast<CallNode*>(x)
+#define TO_CALL(x) dynamic_cast<ast::CallNode*>(x)
 #define TO_BINOP(x) dynamic_cast<BinopNode*>(x)
 #define TO_NONE(x) dynamic_cast<NoneNode*>(x)
 
