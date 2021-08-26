@@ -11,8 +11,9 @@
 
 #include "Node.h"
 #include "../semantic/SymbolTable.h"
+#include "ast.h"
 
-class IdNode : public Node {
+class ast::IdNode : public Node {
 public:
     std::string _id;
     bool is_global_function;

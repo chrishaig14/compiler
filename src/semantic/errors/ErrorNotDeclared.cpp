@@ -17,5 +17,5 @@ std::string ErrorNotDeclared::to_str() const {
     return "Error not declared: " + this->idn._id;
 }
 
-ErrorNotDeclared::ErrorNotDeclared(const IdNode& idn) : idn(idn) {
+ErrorNotDeclared::ErrorNotDeclared(const ast::IdNode& idn) : idn(idn) {
 }

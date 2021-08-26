@@ -4,13 +4,17 @@
 
 #include "IdNode.h"
 #include "../json/json.hpp"
-IdNode::IdNode(std::string identifier, TextPosition start, TextPosition end) :Node(NodeType::ID, start, end), _id(identifier) {
+
+using namespace ast;
+
+IdNode::IdNode(std::string identifier, TextPosition start, TextPosition end) : Node(NodeType::ID, start, end),
+                                                                               _id(identifier) {
     this->is_global_function = false;
 }
 
 
 bool IdNode::equal(const Node& x) const {
-    const auto& other = (IdNode&)x;
+    const auto& other = (IdNode&) x;
     return this->_id == other._id;
 }
 

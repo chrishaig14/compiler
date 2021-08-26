@@ -47,7 +47,7 @@ TEST_CASE("nodes_boolean", "[boolean]") {
 }
 
 TEST_CASE("nodes_id", "[id]") {
-    IdNode n("foo", DUMMY_POS, DUMMY_POS);
+    ast::IdNode n("foo", DUMMY_POS, DUMMY_POS);
     nlohmann::json nj = n.to_json();
     nlohmann::json e = {{"type", "id"},
                         {"id",   {{"_id", "foo"}}}};
@@ -70,7 +70,7 @@ TEST_CASE("nodes_list", "[list]") {
 }
 
 TEST_CASE("nodes_call_no_args", "[call]") {
-    UNode f = IdNode::make("foo", DUMMY_POS, DUMMY_POS);
+    UNode f = ast::IdNode::make("foo", DUMMY_POS, DUMMY_POS);
     VectorOfNodesU vector;
     nlohmann::json e = {{"type", "call"},
                         {"call", {{"function", f->to_json()}, {"arguments", nlohmann::json::array()}}}};
@@ -81,8 +81,8 @@ TEST_CASE("nodes_call_no_args", "[call]") {
 }
 
 TEST_CASE("nodes_call", "[call]") {
-    UNode f = IdNode::make("foo", DUMMY_POS, DUMMY_POS);
-    UNode arg_0 = IdNode::make("bar", DUMMY_POS, DUMMY_POS);
+    UNode f = ast::IdNode::make("foo", DUMMY_POS, DUMMY_POS);
+    UNode arg_0 = ast::IdNode::make("bar", DUMMY_POS, DUMMY_POS);
     UNode arg_1 = NumberNode::make(NumberType::INTEGER, "3", DUMMY_POS, DUMMY_POS);
     nlohmann::json e = {{"type", "call"},
                         {"call", {{"function", f->to_json()}, {"arguments", {arg_0->to_json(), arg_1->to_json()}}}}};
@@ -95,7 +95,7 @@ TEST_CASE("nodes_call", "[call]") {
 }
 
 TEST_CASE("nodes_assignment", "[assignment]") {
-    UNode l = IdNode::make("foo", DUMMY_POS, DUMMY_POS);
+    UNode l = ast::IdNode::make("foo", DUMMY_POS, DUMMY_POS);
     UNode r = NumberNode::make(NumberType::INTEGER, "7", DUMMY_POS, DUMMY_POS);
 
     nlohmann::json e = {{"type",       "assignment"},
@@ -137,7 +137,7 @@ TEST_CASE("nodes_if_no_else", "[if]") {
 }
 
 TEST_CASE("nodes_if_with_else", "[if]") {
-    UNode c = IdNode::make("foo", DUMMY_POS, DUMMY_POS);
+    UNode c = ast::IdNode::make("foo", DUMMY_POS, DUMMY_POS);
     UNode n1 = NumberNode::make(NumberType::INTEGER, "7", DUMMY_POS, DUMMY_POS);
     std::unique_ptr<ast::DeclarationNode> d = std::make_unique<ast::DeclarationNode>("foo",
                                                                            nullptr,
@@ -163,7 +163,7 @@ TEST_CASE("nodes_if_with_else", "[if]") {
 }
 
 TEST_CASE("nodes_if_with_elif", "[if]") {
-    UNode c = IdNode::make("foo", DUMMY_POS, DUMMY_POS);
+    UNode c = ast::IdNode::make("foo", DUMMY_POS, DUMMY_POS);
     VectorOfNodesU v;
     UNode n1 = NumberNode::make(NumberType::INTEGER, "7", DUMMY_POS, DUMMY_POS);
     v.push_back(std::make_unique<ast::DeclarationNode>("foo", nullptr, n1, DUMMY_POS, DUMMY_POS, DUMMY_POS));
@@ -181,8 +181,8 @@ TEST_CASE("nodes_if_with_elif", "[if]") {
     v4.push_back(std::make_unique<ast::DeclarationNode>("foo", nullptr, n4, DUMMY_POS, DUMMY_POS, DUMMY_POS));
     BlockNode* elif_body_1 = new BlockNode(std::move(v4), DUMMY_POS, DUMMY_POS);
 
-    IdNode* elif_cond_0 = new IdNode("a", DUMMY_POS, DUMMY_POS);
-    IdNode* elif_cond_1 = new IdNode("b", DUMMY_POS, DUMMY_POS);
+    ast::IdNode* elif_cond_0 = new ast::IdNode("a", DUMMY_POS, DUMMY_POS);
+    ast::IdNode* elif_cond_1 = new ast::IdNode("b", DUMMY_POS, DUMMY_POS);
 
     nlohmann::json e = {{"type", "if"}};
     e["if"]["condition"] = c->to_json();
@@ -206,7 +206,7 @@ TEST_CASE("nodes_if_with_elif", "[if]") {
 TEST_CASE("nodes_for", "[for]") {
     VectorOfNodesU v;
     std::unique_ptr<BlockNode> b = BlockNode::make(std::move(v), DUMMY_POS, DUMMY_POS);
-    UNode exp = IdNode::make("bar", DUMMY_POS, DUMMY_POS);
+    UNode exp = ast::IdNode::make("bar", DUMMY_POS, DUMMY_POS);
     nlohmann::json e = {{"type", "for"},
                         {"for",  {{"var", "foo"}, {"exp", exp->to_json()}, {"body", b->to_json()}}}};
     ForNode n("foo", exp, b, DUMMY_POS, DUMMY_POS);
@@ -245,7 +245,7 @@ TEST_CASE("nodes_return_no_value", "[return]") {
 }
 
 TEST_CASE("nodes_return_with_value", "[return]") {
-    UNode exp = IdNode::make("foo", DUMMY_POS, DUMMY_POS);
+    UNode exp = ast::IdNode::make("foo", DUMMY_POS, DUMMY_POS);
     nlohmann::json e = {{"type",   "return"},
                         {"return", {{"expression", exp->to_json()}}}};
     ReturnNode n(exp, DUMMY_POS, DUMMY_POS);
@@ -255,7 +255,7 @@ TEST_CASE("nodes_return_with_value", "[return]") {
 }
 
 TEST_CASE("nodes_subscript", "[subscript]") {
-    UNode i = IdNode::make("foo", DUMMY_POS, DUMMY_POS);
+    UNode i = ast::IdNode::make("foo", DUMMY_POS, DUMMY_POS);
     UNode s = NumberNode::make(NumberType::INTEGER, "9", DUMMY_POS, DUMMY_POS);
     nlohmann::json e = {{"type",      "subscript"},
                         {"subscript", {{"parent", i->to_json()}, {"child", s->to_json()}}}};
@@ -268,7 +268,7 @@ TEST_CASE("nodes_subscript", "[subscript]") {
 }
 
 TEST_CASE("nodes_binop", "[binop]") {
-    UNode a = IdNode::make("foo", DUMMY_POS, DUMMY_POS);
+    UNode a = ast::IdNode::make("foo", DUMMY_POS, DUMMY_POS);
     UNode b = NumberNode::make(NumberType::INTEGER, "9", DUMMY_POS, DUMMY_POS);
     nlohmann::json e = {{"type",  "binop"},
                         {"binop", {{"left", a->to_json()}, {"right", b->to_json()}, {"op", op_to_string(OpType::ADD)}}}};
@@ -313,7 +313,7 @@ TEST_CASE("nodes_dict", "[dict]") {
 }
 
 TEST_CASE("nodes_member", "[member]") {
-    UNode p = IdNode::make("foo", DUMMY_POS, DUMMY_POS);
+    UNode p = ast::IdNode::make("foo", DUMMY_POS, DUMMY_POS);
     nlohmann::json e = {{"type",   "member"},
                         {"member", {{"parent", p->to_json()}, {"child", "bar"}}}};
     MemberNode n(p, Token(TokType::ID, "bar", DUMMY_POS));
@@ -350,8 +350,8 @@ TEST_CASE("nodes_function_args", "[function]") {
 
 TEST_CASE("nodes_while", "[while]") {
     std::unique_ptr<BlockNode> body = BlockNode::make(VectorOfNodesU{}, DUMMY_POS, DUMMY_POS);
-    UNode a = IdNode::make("bar", DUMMY_POS, DUMMY_POS);
-    UNode b = IdNode::make("baz", DUMMY_POS, DUMMY_POS);
+    UNode a = ast::IdNode::make("bar", DUMMY_POS, DUMMY_POS);
+    UNode b = ast::IdNode::make("baz", DUMMY_POS, DUMMY_POS);
     std::unique_ptr<Node> cond = std::make_unique<BoolOpNode>(BoolOp::EQ, a, b, DUMMY_POS, DUMMY_POS);
     nlohmann::json e = {{"type",  "while"},
                         {"while", {{"condition", cond->to_json()}, {"body", body->to_json()}}}};

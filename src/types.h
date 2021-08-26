@@ -23,14 +23,14 @@ class NumberNode;
 
 class Instruction;
 
-class IdNode;
+// class IdNode;
 
 class FunctionNode;
 
 typedef std::unique_ptr<TypeNode> UTypeNode;
 typedef std::unique_ptr<FunctionNode> UFunctionNode;
 typedef std::unique_ptr<ast::BinopNode> UBinopNode;
-typedef std::unique_ptr<IdNode> UIdNode;
+typedef std::unique_ptr<ast::IdNode> UIdNode;
 typedef std::unique_ptr<BlockNode> UBlockNode;
 typedef std::unique_ptr<NumberNode> UNumberNode;
 typedef std::unique_ptr<Node> UNode;

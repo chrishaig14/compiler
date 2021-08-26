@@ -8,6 +8,7 @@
 namespace ast {
     class BinopNode;
     class DeclarationNode;
+    class IdNode;
 }
 
 #endif //XLANG_AST_H

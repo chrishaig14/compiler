@@ -352,7 +352,7 @@ USemanticInfo Checker::dispatch_any(Node& n, bool is_rvalue) {
         case NodeType::FUNC:
             return this->visit_function((FunctionNode&) n);
         case NodeType::ID:
-            return this->visit_id((IdNode&) n);
+            return this->visit_id((ast::IdNode&) n);
         case NodeType::CAST:
             return this->visit_cast((CastNode&) n);
         case NodeType::IFF:

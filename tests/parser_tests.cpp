@@ -31,22 +31,22 @@ const TestTypeNode TYPE_1{"String", new ObjectType("String")};
 const TestTypeNode TYPE_2{"Integer", new ObjectType("Integer")};
 const TestTypeNode TYPE_3{"Boolean", new ObjectType("Boolean")};
 
-const TestNode EXP_ID_1{"foo", new IdNode("foo", DUMMY_POS, DUMMY_POS)};
-const TestNode EXP_ID_2{"bar", new IdNode("bar", DUMMY_POS, DUMMY_POS)};
+const TestNode EXP_ID_1{"foo", new ast::IdNode("foo", DUMMY_POS, DUMMY_POS)};
+const TestNode EXP_ID_2{"bar", new ast::IdNode("bar", DUMMY_POS, DUMMY_POS)};
 
 TestNodeU EXP_ID_1_U() {
-    return {"foo", IdNode::make("foo", DUMMY_POS, DUMMY_POS)};
+    return {"foo", ast::IdNode::make("foo", DUMMY_POS, DUMMY_POS)};
 }
 
 TestNodeU EXP_ID_2_U() {
-    return {"bar", IdNode::make("bar", DUMMY_POS, DUMMY_POS)};
+    return {"bar", ast::IdNode::make("bar", DUMMY_POS, DUMMY_POS)};
 }
 
 // const TestNode EXPRESSION{"x", new IdNode("x", DUMMY_POS, DUMMY_POS)};
 // const TestNode FACTOR_EXPRESSION = EXPRESSION;
 
 TestNodeU EXPRESSION_U() {
-    return {"x", IdNode::make("x", DUMMY_POS, DUMMY_POS)};
+    return {"x", ast::IdNode::make("x", DUMMY_POS, DUMMY_POS)};
 }
 
 TestNodeU FACTOR_U() {

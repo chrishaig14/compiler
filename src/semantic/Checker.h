@@ -129,7 +129,7 @@ public:
     USemanticInfo visit_unary(UnaryOpNode& n);
     USemanticInfo visit_for(ForNode& node);
     USemanticInfo visit_function(FunctionNode& n);
-    USemanticInfo visit_id(IdNode& n);
+    USemanticInfo visit_id(ast::IdNode& n);
     USemanticInfo visit_if(IfNode& n);
     USemanticInfo visit_list(ListNode& node);
     USemanticInfo visit_member(MemberNode& n);

@@ -10,13 +10,13 @@
 #include "../../ast/IdNode.h"
 
 class ErrorNotDeclared : public Error {
-    const IdNode& idn;
+    const ast::IdNode& idn;
 public:
     Error* clone() const override;
     bool equal(const Error& other) const override;
     std::string to_str() const override;
 
-    explicit ErrorNotDeclared(const IdNode& idn);
+    explicit ErrorNotDeclared(const ast::IdNode& idn);
 };
 
 

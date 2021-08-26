@@ -545,7 +545,7 @@ TEST_CASE("subscript_no_method_error", "[checker]") {
     Error& error = *checker.error_reporter.errors.back();
     StringNode left("Hello", _POS, _POS);
     StringNode right("Bye", _POS, _POS);
-    UNode p_node = IdNode::make("f", _POS, _POS);
+    UNode p_node = ast::IdNode::make("f", _POS, _POS);
     VectorOfNodesU v;
     v.push_back(NumberNode::make(NumberType::INTEGER, "1", _POS, _POS));
     SubscriptNode node(p_node, v, _POS, _POS);
@@ -737,7 +737,7 @@ TEST_CASE("enum_error", "[checker]") {
 
 
     Error& error = *checker.error_reporter.errors.back();
-    UNode u = IdNode::make("Foo", _POS, _POS);
+    UNode u = ast::IdNode::make("Foo", _POS, _POS);
     MemberNode node(u, Token(TokType::ID, "b", _POS));
     ObjectType expected("Boolean");
     ErrorEnumNoValue exp("Foo", "b", node, nullptr);

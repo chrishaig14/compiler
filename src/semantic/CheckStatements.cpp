@@ -63,7 +63,7 @@ USemanticInfo Checker::visit_lvalue_subscript(SubscriptNode& node) {
 
 USemanticInfo Checker::visit_assignment(AssignmentNode& n) {
     if (n.lvalue->ntype == NodeType::ID) {
-        if (((IdNode&) *n.lvalue)._id == "_") {
+        if (((ast::IdNode&) *n.lvalue)._id == "_") {
             USemanticInfo rv = this->dispatch_rvalue(*n.rvalue);
             return rv;
         }

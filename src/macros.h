@@ -7,7 +7,7 @@
 
 #include "units/Entity.h"
 
-#define ID(id) new IdNode(id)
+#define ID(id) new ast::IdNode(id)
 #define NUM(num) new NumberNode(num)
 #define BIN(op, left, right) new BinopNode(op, left, right)
 #define MEM(parent, child) new MemberNode(parent, child)
@@ -62,7 +62,7 @@
 #define NL(instruction) std::pair<std::string, Instruction*>("", instruction)
 #define TO_FUNCTION_TYPE(x) dynamic_cast<FunctionTypeNode*> (x)
 #define TO_OBJECT_TYPE(x) dynamic_cast<ObjectTypeNode*> (x)
-#define TO_ID(x) dynamic_cast<IdNode*> (x)
+#define TO_ID(x) dynamic_cast<ast::IdNode*> (x)
 #define TO_SUB(x) dynamic_cast<SubscriptNode*> (x)
 #define TO_MEMBER(x) dynamic_cast<MemberNode*>(x)
 #define TO_CALL(x) dynamic_cast<CallNode*>(x)
