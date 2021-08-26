@@ -106,66 +106,66 @@ public:
 
     USemanticInfo dispatch_rvalue(Node& nod);
 
-    USemanticInfo visit_assignment(AssignmentNode& n);
-    USemanticInfo visit_binop(ast::BinopNode& node);
-    USemanticInfo visit_block(BlockNode& node);
-    USemanticInfo visit_root(BlockNode& node);
-    USemanticInfo visit_boolean(BooleanNode& node);
+    USemanticInfo visit_assignment(ast::Assignment& n);
+    USemanticInfo visit_binop(ast::Binop& node);
+    USemanticInfo visit_block(ast::Block& node);
+    USemanticInfo visit_root(ast::Block& node);
+    USemanticInfo visit_boolean(ast::Boolean& node);
     USemanticInfo visit_boolop(BoolOpNode& n);
     USemanticInfo visit_break(BreakNode& node);
-    USemanticInfo visit_call(ast::CallNode& n, bool is_rvalue);
-    USemanticInfo visit_class(ast::ClassNode& node);
+    USemanticInfo visit_call(ast::Call& n, bool is_rvalue);
+    USemanticInfo visit_class(ast::Klass& node);
     USemanticInfo visit_continue(ContinueNode& node);
 
     USemanticInfo visit_lvalue_subscript(SubscriptNode& node);
 
-    USemanticInfo visit_declaration(ast::DeclarationNode& n);
-    USemanticInfo check_declaration_with_type(ast::DeclarationNode& n);
-    USemanticInfo check_declaration_without_type(ast::DeclarationNode& n);
+    USemanticInfo visit_declaration(ast::Declaration& n);
+    USemanticInfo check_declaration_with_type(ast::Declaration& n);
+    USemanticInfo check_declaration_without_type(ast::Declaration& n);
 
     USemanticInfo visit_dict(DictNode& node);
     USemanticInfo visit_emptydict(EmptyDictNode& node);
     USemanticInfo visit_emptylist(EmptyListNode& node);
     USemanticInfo visit_unary(UnaryOpNode& n);
     USemanticInfo visit_for(ForNode& node);
-    USemanticInfo visit_function(FunctionNode& n);
-    USemanticInfo visit_id(ast::IdNode& n);
+    USemanticInfo visit_function(ast::Function& n);
+    USemanticInfo visit_id(ast::Id& n);
     USemanticInfo visit_if(IfNode& n);
     USemanticInfo visit_list(ListNode& node);
-    USemanticInfo visit_member(MemberNode& n);
+    USemanticInfo visit_member(ast::Member& n);
     USemanticInfo visit_none(NoneNode& node);
     USemanticInfo visit_import(ImportNode& node);
     USemanticInfo visit_number(NumberNode& node);
     USemanticInfo visit_partial(PartialApplication& node);
-    USemanticInfo visit_return(ReturnNode& n);
+    USemanticInfo visit_return(ast::ReturnNode& n);
     USemanticInfo visit_string(StringNode& node);
     USemanticInfo visit_subscript(SubscriptNode& node);
     USemanticInfo visit_ternary(TernaryNode& node);
     USemanticInfo visit_tuple(TupleNode& node);
-    USemanticInfo visit_while(WhileNode& node);
+    USemanticInfo visit_while(ast::While& node);
     USemanticInfo visit_cast(CastNode& n);
     USemanticInfo visit_defconst(DefaultConstructorNode& node);
 
 
-    USemanticInfo object_member(SNode* object_snode, Value& p_value, const std::string& child, MemberNode& n);
-    USemanticInfo class_member(Class* cls, const std::string& child, MemberNode& n);
-    USemanticInfo package_member(Package& package, const std::string& child, MemberNode& n);
-    USemanticInfo module_member(Module& mod, const std::string& child, MemberNode& n);
+    USemanticInfo object_member(SNode* object_snode, Value& p_value, const std::string& child, ast::Member& n);
+    USemanticInfo class_member(Class* cls, const std::string& child, ast::Member& n);
+    USemanticInfo package_member(Package& package, const std::string& child, ast::Member& n);
+    USemanticInfo module_member(Module& mod, const std::string& child, ast::Member& n);
 
 
     USemanticInfo visit_match(MatchExpressionNode& node);
     USemanticInfo visit_alias(AliasNode& p_node);
-    USemanticInfo enum_member(Enum* enumm, const std::string& value, MemberNode& node);
+    USemanticInfo enum_member(Enum* enumm, const std::string& value, ast::Member& node);
     USemanticInfo visit_enum(EnumNode& p_node);
     SNode* make_rvalue(const Entity& value_entity, SNode* value_snode, const TypeNode& target);
     USemanticInfo dispatch(Node& nod);
     void fill_value(Value& value);
     std::unique_ptr<SemanticInfo> expect_rvalue_of_type(const TypeNode& target, Node& node);
-    void process_function_arguments(SemanticInfo& retv, std::vector<Entity*>& arg_entities, CallSNode* sn, ast::CallNode& n,
+    void process_function_arguments(SemanticInfo& retv, std::vector<Entity*>& arg_entities, CallSNode* sn, ast::Call& n,
                                     FunctionType* function_type, SemanticInfo* fun_info_p);
-    bool check_arguments(ast::CallNode& n, CallSNode* sn, VectorOfTypes& arg_types, std::vector<Entity*>& arg_entities);
+    bool check_arguments(ast::Call& n, CallSNode* sn, VectorOfTypes& arg_types, std::vector<Entity*>& arg_entities);
     USemanticInfo
-    make_return_info(const ast::CallNode& n, bool is_rvalue, SemanticInfo& retv, bool is_def_const, bool args_are_constant);
+    make_return_info(const ast::Call& n, bool is_rvalue, SemanticInfo& retv, bool is_def_const, bool args_are_constant);
     SNode* make_union_rvalue(SNode* value_snode, const TypeNode* unaliased_value_type,
                              const TypeNode* unaliased_target_type) const;
     SNode* make_option_rvalue(SNode* value_snode, const TypeNode* unaliased_value_type,

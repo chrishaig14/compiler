@@ -7,16 +7,16 @@
 
 
 #include "Node.h"
-#include "BlockNode.h"
+#include "Block.h"
 #include "../utils.h"
 
 class ForNode : public Node {
 public:
     std::string var;
     UNode exp;
-    std::unique_ptr<BlockNode> body;
+    std::unique_ptr<ast::Block> body;
     bool equal(const Node& other) const override;
-    ForNode(const std::string& var, UNode& exp, std::unique_ptr<BlockNode>& body, TextPosition start, TextPosition end);
+    ForNode(const std::string& var, UNode& exp, std::unique_ptr<ast::Block>& body, TextPosition start, TextPosition end);
     ~ForNode() override;
 
     nlohmann::json to_json() const override;

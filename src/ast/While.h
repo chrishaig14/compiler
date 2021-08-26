@@ -7,18 +7,19 @@
 
 
 #include "Node.h"
-#include "BlockNode.h"
+#include "Block.h"
+#include "ast.h"
 
-class WhileNode : public Node {
+class ast::While : public Node {
 public:
-    std::unique_ptr<BlockNode> body;
+    std::unique_ptr<ast::Block> body;
     UNode condition;
 
-    WhileNode(UNode& condition, std::unique_ptr<BlockNode>& body, TextPosition start, TextPosition end);
+    While(UNode& condition, std::unique_ptr<ast::Block>& body, TextPosition start, TextPosition end);
 
     bool equal(const Node& other) const override;
 
-    ~WhileNode() override;
+    ~While() override;
     nlohmann::json to_json() const override;
 
 };

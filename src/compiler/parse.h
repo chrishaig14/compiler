@@ -5,7 +5,7 @@
 #ifndef XLANG_PARSE_H
 #define XLANG_PARSE_H
 
-#include "../ast/BlockNode.h"
+#include "../ast/Block.h"
 #include "../scanner/Scanner.h"
 #include "../parser/Parser.h"
 

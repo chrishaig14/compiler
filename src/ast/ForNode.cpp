@@ -5,7 +5,7 @@
 #include <cassert>
 #include "ForNode.h"
 
-ForNode::ForNode(const std::string& var, UNode& exp, std::unique_ptr<BlockNode>& body,
+ForNode::ForNode(const std::string& var, UNode& exp, std::unique_ptr<ast::Block>& body,
                  TextPosition start, TextPosition end) : Node(NodeType::FORLOOP, start, end), var(var),
                                                          exp(std::move(exp)), body(std::move(body)) {
     // assert(exp != nullptr);

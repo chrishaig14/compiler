@@ -26,7 +26,7 @@ EntityValue& Checker::entity_value_from_actual_base_path_no_generic(const Path& 
     return *this->entity_values_no_generic.at(p.as_str());
 }
 
-USemanticInfo Checker::visit_id(ast::IdNode& n) {
+USemanticInfo Checker::visit_id(ast::Id& n) {
     // Logger::info("Checking id node " + n._id);
     Entity& entity = this->scope->get(n._id);
     if (entity.type == E_TYPE::NOT_FOUND) {
@@ -186,7 +186,7 @@ USemanticInfo Checker::visit_unary(UnaryOpNode& n) {
     return info_u;
 }
 
-USemanticInfo Checker::visit_binop(ast::BinopNode& n) {
+USemanticInfo Checker::visit_binop(ast::Binop& n) {
     USemanticInfo left_info_p = this->dispatch_rvalue(*n.left);
     if (left_info_p->is_error()) {
         return error_stub();

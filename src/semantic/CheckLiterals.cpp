@@ -10,7 +10,7 @@
 #include "errors/ErrorPartialWrongNumArgs.h"
 #include "errors/ErrorTypeMismatch.h"
 
-USemanticInfo Checker::visit_boolean(BooleanNode& node) {
+USemanticInfo Checker::visit_boolean(ast::Boolean& node) {
     USemanticInfo info_u = std::make_unique<SemanticInfo>(); SemanticInfo& info = *info_u;
     info.entity = this->entity_value_from_actual_base_path_no_generic(Path("core.core.Boolean"));
     info.snode = new BoolSNode(node.value);

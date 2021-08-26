@@ -4,7 +4,7 @@
 
 #include "MatchExpressionNode.h"
 
-MatchExpressionNode::MatchExpressionNode(Node* exp, std::vector<std::string> ids, std::vector<std::pair<TypeNode*, BlockNode*>> cases,
+MatchExpressionNode::MatchExpressionNode(Node* exp, std::vector<std::string> ids, std::vector<std::pair<TypeNode*, ast::Block*>> cases,
                                          TextPosition start, TextPosition end) : Node(NodeType::MATCH_EXP, start, end) {
     this->cases = cases;
     this->exp = exp;

@@ -8,16 +8,16 @@
 
 #include "Node.h"
 #include "TypeNode.h"
-#include "BlockNode.h"
+#include "Block.h"
 
 class TryCatchNode : public Node {
 public:
-    TryCatchNode(BlockNode* body, std::vector<std::pair<std::string, ObjectType*>> catches, VectorOfNodes catches_bodies,
+    TryCatchNode(ast::Block* body, std::vector<std::pair<std::string, ObjectType*>> catches, VectorOfNodes catches_bodies,
                  TextPosition start, TextPosition end);
 
     bool equal(const Node& other) const override;
 
-    BlockNode* body;
+    ast::Block* body;
     VectorOfNodes catches_bodies;
     std::vector<std::pair<std::string, ObjectType*>> catches;
 };

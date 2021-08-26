@@ -9,17 +9,17 @@
 #include <vector>
 #include "Node.h"
 
-#include "BlockNode.h"
+#include "Block.h"
 #include "Node.h"
 
 class IfNode : public Node {
 public:
     UNode condition;
-    std::unique_ptr<BlockNode> then;
-    std::unique_ptr<BlockNode> selse;
-    std::vector<std::pair<Node*, BlockNode*>> elifs;
-    IfNode(UNode& condition, std::unique_ptr<BlockNode>& then,
-           std::vector<std::pair<Node*, BlockNode*>> elifs, std::unique_ptr<BlockNode>& selse, TextPosition start,
+    std::unique_ptr<ast::Block> then;
+    std::unique_ptr<ast::Block> selse;
+    std::vector<std::pair<Node*, ast::Block*>> elifs;
+    IfNode(UNode& condition, std::unique_ptr<ast::Block>& then,
+           std::vector<std::pair<Node*, ast::Block*>> elifs, std::unique_ptr<ast::Block>& selse, TextPosition start,
            TextPosition end);
 
     bool equal(const Node& other) const override;

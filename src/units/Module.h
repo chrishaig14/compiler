@@ -7,7 +7,7 @@
 
 #include <string>
 #include "Entity.h"
-#include "../ast/BlockNode.h"
+#include "../ast/Block.h"
 #include "../scanner/CodeLines.h"
 #include "../simple_nodes/BlockSNode.h"
 #include "ConstFunction.h"

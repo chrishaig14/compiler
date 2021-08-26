@@ -11,11 +11,13 @@
 #include "TypeNode.h"
 #include "../scanner/Token.h"
 
+#include "ast.h"
+
 enum class MemberType {
     NUM, STR
 };
 
-class MemberNode : public Node {
+class ast::Member : public Node {
 public:
     MemberType type;
     UNode parent;
@@ -23,11 +25,11 @@ public:
     size_t n_child;
     TextPosition dot_pos;
     Token child_token;
-    MemberNode(UNode& parent, Token child_token);
+    Member(UNode& parent, Token child_token);
 
     bool equal(const Node& x) const override;
 
-    ~MemberNode() override;
+    ~Member() override;
     nlohmann::json to_json() const override;
 
 };

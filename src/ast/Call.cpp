@@ -2,17 +2,17 @@
 // Created by chris on 1/8/20.
 //
 
-#include "CallNode.h"
+#include "Call.h"
 #include "../json/json.hpp"
 using namespace ast;
-CallNode::CallNode(UNode& function, VectorOfNodesU& arguments, TextPosition start, TextPosition end) : Node(
+Call::Call(UNode& function, VectorOfNodesU& arguments, TextPosition start, TextPosition end) : Node(
         NodeType::CALL,
         start,
         end), function(std::move(function)), arguments(std::move(arguments)) {
 }
 
-bool CallNode::equal(const Node& x) const {
-    const auto& other = (CallNode&) x;
+bool Call::equal(const Node& x) const {
+    const auto& other = (Call&) x;
     if (this->arguments.size() != other.arguments.size()) {
         return false;
     }
@@ -24,7 +24,7 @@ bool CallNode::equal(const Node& x) const {
     return *this->function == *other.function;
 }
 
-CallNode::~CallNode() {
+Call::~Call() {
     // delete this->function;
     // for (auto* a: this->arguments) {
     //     delete a;
@@ -37,7 +37,7 @@ CallNode::~CallNode() {
     // }
 }
 
-nlohmann::json CallNode::to_json() const {
+nlohmann::json Call::to_json() const {
     nlohmann::json j;
     j["type"] = "call";
     j["call"]["function"] = this->function->to_json();

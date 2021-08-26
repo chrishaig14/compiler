@@ -191,7 +191,7 @@ std::unique_ptr<InstanceNode> Parser::parse_instance() {
     ObjectType* ot = this->parse_object_type().release();
     this->expect_token(TokType::RSQUARE);
     this->expect_token(TokType::LCURLY);
-    std::unordered_map<std::string, FunctionNode*> methods;
+    std::unordered_map<std::string, ast::Function*> methods;
     while (true) {
         if (!this->match(TokType::FUN)) {
             break;

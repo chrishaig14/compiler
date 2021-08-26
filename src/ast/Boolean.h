@@ -8,14 +8,15 @@
 
 #include "Node.h"
 #include "../json/json.hpp"
+#include "ast.h"
 
-class BooleanNode : public Node {
+class ast::Boolean : public Node {
 public:
     bool value;
 
-    BooleanNode(bool value, TextPosition start, TextPosition end);
+    Boolean(bool value, TextPosition start, TextPosition end);
 
-    bool operator!=(const BooleanNode& other) const;
+    bool operator!=(const Boolean& other) const;
 
     bool equal(const Node& x) const override;
 

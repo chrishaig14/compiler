@@ -3,10 +3,12 @@
 //
 
 #include <cassert>
-#include "FunctionNode.h"
+#include "Function.h"
 
-bool FunctionNode::equal(const Node& x) const {
-    const auto& other = (FunctionNode&) x;
+using namespace ast;
+
+bool Function::equal(const Node& x) const {
+    const auto& other = (Function&) x;
 //    return false;
     if (this->identifier != other.identifier) {
         return false;
@@ -30,8 +32,8 @@ bool FunctionNode::equal(const Node& x) const {
     return *this->body == *other.body;
 }
 
-FunctionNode::FunctionNode(std::string identifier, const VectorOfStrings& parameter_names,
-                           VectorOfUTypes& parameter_types, UTypeNode& return_type, std::unique_ptr<BlockNode>& body,
+Function::Function(std::string identifier, const VectorOfStrings& parameter_names,
+                           VectorOfUTypes& parameter_types, UTypeNode& return_type, std::unique_ptr<ast::Block>& body,
                            TextPosition start, TextPosition end) : Node(NodeType::FUNC, start, end),
                                                                    parameter_types(std::move(parameter_types)),
                                                                    body(std::move(body)),
@@ -47,7 +49,7 @@ FunctionNode::FunctionNode(std::string identifier, const VectorOfStrings& parame
     // this->parameter_types = parameter_types;
 }
 
-FunctionNode::~FunctionNode() {
+Function::~Function() {
     // for (auto* pt: this->parameter_types) {
     //     delete pt;
     // }
@@ -55,7 +57,7 @@ FunctionNode::~FunctionNode() {
     // delete this->return_type;
 }
 
-nlohmann::json FunctionNode::to_json() const {
+nlohmann::json Function::to_json() const {
     std::vector<nlohmann::json> params;
     for (size_t i = 0; i < this->parameter_names.size(); i++) {
         params.push_back({{"id",   this->parameter_names[i]},

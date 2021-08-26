@@ -15,8 +15,6 @@ class TypeNode;
 
 class Node;
 
-class BlockNode;
-
 class NumberNode;
 
 // class BinopNode;
@@ -25,13 +23,12 @@ class Instruction;
 
 // class IdNode;
 
-class FunctionNode;
 
 typedef std::unique_ptr<TypeNode> UTypeNode;
-typedef std::unique_ptr<FunctionNode> UFunctionNode;
-typedef std::unique_ptr<ast::BinopNode> UBinopNode;
-typedef std::unique_ptr<ast::IdNode> UIdNode;
-typedef std::unique_ptr<BlockNode> UBlockNode;
+typedef std::unique_ptr<ast::Function> UFunctionNode;
+typedef std::unique_ptr<ast::Binop> UBinopNode;
+typedef std::unique_ptr<ast::Id> UIdNode;
+typedef std::unique_ptr<ast::Block> UBlockNode;
 typedef std::unique_ptr<NumberNode> UNumberNode;
 typedef std::unique_ptr<Node> UNode;
 typedef std::vector<TypeNode*> VectorOfTypes;

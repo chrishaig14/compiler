@@ -9,8 +9,9 @@
 #include "Node.h"
 #include "../types.h"
 #include "TypeNode.h"
+#include "ast.h"
 
-class ReturnNode : public Node {
+class ast::ReturnNode : public Node {
 public:
     explicit ReturnNode(UNode& expression, TextPosition start, TextPosition end);
 

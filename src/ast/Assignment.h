@@ -10,19 +10,20 @@
 
 #include "Node.h"
 #include "TypeNode.h"
+#include "ast.h"
 
-class AssignmentNode : public Node {
+class ast::Assignment : public Node {
 public:
     UNode lvalue;
     UNode rvalue;
 
 
-    AssignmentNode(UNode& lvalue, UNode& rvalue, TextPosition start, TextPosition end);
+    Assignment(UNode& lvalue, UNode& rvalue, TextPosition start, TextPosition end);
 
     bool equal(const Node& x) const override;
 
 
-    ~AssignmentNode();
+    ~Assignment();
     nlohmann::json to_json() const override;
 
 };

@@ -5,7 +5,7 @@
 #include "InstanceNode.h"
 
 InstanceNode::InstanceNode(const std::string& id, ObjectType* base_type,
-                           const std::unordered_map<std::string, FunctionNode*>& methods, TextPosition start,
+                           const std::unordered_map<std::string, ast::Function*>& methods, TextPosition start,
                            TextPosition end) : Node(NodeType::INSTANCE, start, end), id(id), base_type(base_type),
                                                methods(methods) {
 

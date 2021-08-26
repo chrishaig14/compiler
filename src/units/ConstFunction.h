@@ -8,7 +8,7 @@
 #include "../ast/TypeNode.h"
 #include "../ast/Path.h"
 #include "../ast/FunctionType.h"
-#include "../ast/FunctionNode.h"
+#include "../ast/Function.h"
 
 class ConstFunction {
 public:

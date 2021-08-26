@@ -2,11 +2,11 @@
 // Created by chris on 1/8/20.
 //
 
-#include "BinopNode.h"
+#include "Binop.h"
 
 using namespace ast;
 
-BinopNode::BinopNode(OpType op, UNode& left, UNode& right, TextPosition start, TextPosition end) : Node(NodeType::BINOP,
+Binop::Binop(OpType op, UNode& left, UNode& right, TextPosition start, TextPosition end) : Node(NodeType::BINOP,
                                                                                                         start,
                                                                                                         end),
                                                                                                    left(std::move(left)),
@@ -14,17 +14,17 @@ BinopNode::BinopNode(OpType op, UNode& left, UNode& right, TextPosition start, T
                                                                                                    op(op) {
 }
 
-bool BinopNode::equal(const Node& x) const {
-    auto& other = (BinopNode&) x;
+bool Binop::equal(const Node& x) const {
+    auto& other = (Binop&) x;
     return this->op == other.op && *this->left == *other.left and *this->right == *other.right;
 }
 
-BinopNode::~BinopNode() {
+Binop::~Binop() {
     // delete this->left;
     // delete this->right;
 }
 
-nlohmann::json BinopNode::to_json() const {
+nlohmann::json Binop::to_json() const {
     nlohmann::json j;
     j["type"] = "binop";
     j["binop"]["op"] = op_to_string(this->op);

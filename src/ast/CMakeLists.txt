@@ -8,28 +8,28 @@ add_library(
         nodes
         AliasNode.cpp
         AliasNode.h
-        AssignmentNode.cpp
-        AssignmentNode.h
-        BinopNode.cpp
-        BinopNode.h
-        BlockNode.cpp
-        BlockNode.h
-        BooleanNode.cpp
-        BooleanNode.h
+        Assignment.cpp
+        Assignment.h
+        Binop.cpp
+        Binop.h
+        Block.cpp
+        Block.h
+        Boolean.cpp
+        Boolean.h
         BoolOpNode.cpp
         BoolOpNode.h
         BreakNode.cpp
         BreakNode.h
-        CallNode.cpp
-        CallNode.h
+        Call.cpp
+        Call.h
         CastNode.cpp
         CastNode.h
-        ClassNode.cpp
-        ClassNode.h
+        Klass.cpp
+        Klass.h
         ContinueNode.cpp
         ContinueNode.h
-        DeclarationNode.cpp
-        DeclarationNode.h
+        Declaration.cpp
+        Declaration.h
         DefaultConstructorNode.cpp
         DefaultConstructorNode.h
         DefaultConstructorNode.h
@@ -43,10 +43,10 @@ add_library(
         EnumNode.h
         ForNode.cpp
         ForNode.h
-        FunctionNode.cpp
-        FunctionNode.h
-        IdNode.cpp
-        IdNode.h
+        Function.cpp
+        Function.h
+        Id.cpp
+        Id.h
         IfNode.cpp
         IfNode.h
         ImportNode.cpp
@@ -57,10 +57,8 @@ add_library(
         ListNode.h
         MatchExpressionNode.cpp
         MatchExpressionNode.h
-        MemberNode.cpp
-        MemberNode.h
-        MethodNode.cpp
-        MethodNode.h
+        Member.cpp
+        Member.h
         Node.cpp
         Node.cpp
         Node.h
@@ -82,8 +80,6 @@ add_library(
         SubscriptNode.h
         TernaryNode.cpp
         TernaryNode.h
-        ThrowNode.cpp
-        ThrowNode.h
         TryCatchNode.cpp
         TryCatchNode.h
         TupleNode.cpp
@@ -94,7 +90,7 @@ add_library(
         TypeclassNode.h
         UnaryOpNode.cpp
         UnaryOpNode.h
-        WhileNode.cpp
-        WhileNode.h ObjectType.cpp ObjectType.h FunctionType.cpp FunctionType.h Path.cpp Path.h ast.h)
+        While.cpp
+        While.h ObjectType.cpp ObjectType.h FunctionType.cpp FunctionType.h Path.cpp Path.h ast.h)
 
 target_precompile_headers(nodes PUBLIC ../json/json.hpp)

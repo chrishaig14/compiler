@@ -36,25 +36,25 @@ public:
     UNode parse_top_level_statement();
 
     std::unique_ptr<ImportNode> parse_import();
-    std::unique_ptr<ast::ClassNode> parse_class_definition();
-    std::unique_ptr<FunctionNode> parse_function_definition();
+    std::unique_ptr<ast::Klass> parse_class_definition();
+    std::unique_ptr<ast::Function> parse_function_definition();
     std::unique_ptr<AliasNode> parse_alias();
     std::unique_ptr<EnumNode> parse_enum_definition();
 
     UNode parse_common_statement();
     UNode parse_assignment_or_expression();
-    std::unique_ptr<ast::DeclarationNode> parse_variable_declaration();
+    std::unique_ptr<ast::Declaration> parse_variable_declaration();
     std::unique_ptr<IfNode> parse_if();
-    std::unique_ptr<WhileNode> parse_while_loop();
+    std::unique_ptr<ast::While> parse_while_loop();
     std::unique_ptr<ForNode> parse_for_loop();
-    std::unique_ptr<ReturnNode> parse_return();
+    std::unique_ptr<ast::ReturnNode> parse_return();
     UNode parse_ternary();
     std::unique_ptr<MatchExpressionNode> parse_match_statement();
     // std::unique_ptr<ThrowNode> parse_throw();
     // std::unique_ptr<TryCatchNode> parse_try_catch();
 
-    std::unique_ptr<BlockNode> parse_possibly_empty_block();
-    std::unique_ptr<BlockNode> parse_program();
+    std::unique_ptr<ast::Block> parse_possibly_empty_block();
+    std::unique_ptr<ast::Block> parse_program();
 
     UNode parse_expression();
     UNode parse_tuple_literal();

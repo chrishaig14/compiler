@@ -2,11 +2,12 @@
 // Created by chris on 2/8/20.
 //
 
-#include "BlockNode.h"
+#include "Block.h"
 
 #include <utility>
+using namespace ast;
 
-BlockNode::~BlockNode() {
+Block::~Block() {
     // for (auto p: this->nodes) {
     //     delete p;
     // }
@@ -15,8 +16,8 @@ BlockNode::~BlockNode() {
     // }
 }
 
-bool BlockNode::equal(const Node& p) const {
-    auto& other = (BlockNode&) p;
+bool Block::equal(const Node& p) const {
+    auto& other = (Block&) p;
     if (this->nodes.size() != other.nodes.size()) {
         return false;
     }
@@ -28,12 +29,12 @@ bool BlockNode::equal(const Node& p) const {
     return true;
 }
 
-BlockNode::BlockNode(VectorOfNodesU nodes, TextPosition start, TextPosition end) : Node(NodeType::BLOCK, start, end),
+Block::Block(VectorOfNodesU nodes, TextPosition start, TextPosition end) : Node(NodeType::BLOCK, start, end),
                                                                                    nodes(std::move(nodes)) {
     ;
 }
 
-nlohmann::json BlockNode::to_json() const {
+nlohmann::json Block::to_json() const {
     std::vector<nlohmann::json> v;
     for (auto& s: this->nodes) {
         v.push_back(s->to_json());

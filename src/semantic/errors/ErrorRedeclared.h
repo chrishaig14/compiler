@@ -7,17 +7,17 @@
 
 
 #include "Error.h"
-#include "../../ast/DeclarationNode.h"
+#include "../../ast/Declaration.h"
 
 class ErrorRedeclared : public Error {
 public:
-    ErrorRedeclared(std::string name, const ast::DeclarationNode& node);
+    ErrorRedeclared(std::string name, const ast::Declaration& node);
     Error* clone() const override;
     bool equal(const Error& other) const override;
     std::string to_str() const override;
 
     std::string name;
-    const ast::DeclarationNode& node;
+    const ast::Declaration& node;
 };
 
 

@@ -6,15 +6,29 @@
 #define XLANG_AST_H
 
 namespace ast {
-    class BinopNode;
+    class Binop;
 
-    class DeclarationNode;
+    class Declaration;
 
-    class IdNode;
+    class Id;
 
-    class CallNode;
+    class Call;
 
-    class ClassNode;
+    class Klass;
+
+    class Block;
+
+    class While;
+
+    class Function;
+
+    class Member;
+
+    class Assignment;
+
+    class Boolean;
+
+    class ReturnNode;
 }
 
 #endif //XLANG_AST_H

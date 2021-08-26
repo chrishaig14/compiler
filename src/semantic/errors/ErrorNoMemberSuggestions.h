@@ -6,14 +6,14 @@
 #define XLANG_ERRORNOMEMBERSUGGESTIONS_H
 
 #include "Error.h"
-#include "../../ast/MemberNode.h"
+#include "../../ast/Member.h"
 
 class ErrorNoMemberSuggestions : public Error {
-    const MemberNode& m;
+    const ast::Member& m;
     const TypeNode& t;
     const Class& clazz;
 public:
-    ErrorNoMemberSuggestions(const TypeNode& t, const MemberNode& m, const Class& clazz);
+    ErrorNoMemberSuggestions(const TypeNode& t, const ast::Member& m, const Class& clazz);
 
     bool equal(const Error& other) const override;
 

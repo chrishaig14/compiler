@@ -3,9 +3,9 @@
 //
 
 #include <cassert>
-#include "WhileNode.h"
-
-WhileNode::WhileNode(UNode& condition, std::unique_ptr<BlockNode>& body, TextPosition start, TextPosition end) : Node(
+#include "While.h"
+using namespace ast;
+While::While(UNode& condition, std::unique_ptr<ast::Block>& body, TextPosition start, TextPosition end) : Node(
         NodeType::WHIL,
         start,
         end), body(std::move(body)), condition(std::move(condition)) {
@@ -13,8 +13,8 @@ WhileNode::WhileNode(UNode& condition, std::unique_ptr<BlockNode>& body, TextPos
     // assert(body != nullptr);
 }
 
-bool WhileNode::equal(const Node& x) const {
-    const auto& other = (WhileNode&) x;
+bool While::equal(const Node& x) const {
+    const auto& other = (While&) x;
     if ((this->body == nullptr && other.body != nullptr) || (this->body != nullptr && other.body == nullptr)) {
         return false;
     }
@@ -23,12 +23,12 @@ bool WhileNode::equal(const Node& x) const {
            ((this->body == nullptr && other.body == nullptr) || *this->body == *other.body);
 }
 
-WhileNode::~WhileNode() {
+While::~While() {
     // delete this->body;
     // delete this->condition;
 }
 
-nlohmann::json WhileNode::to_json() const {
+nlohmann::json While::to_json() const {
     return {{"type",  "while"},
             {"while", {{"condition", this->condition->to_json()}, {"body", this->body->to_json()}}}};
 }

@@ -16,6 +16,6 @@ std::string ErrorNotAFunction::to_str() const {
     return std::string();
 }
 
-ErrorNotAFunction::ErrorNotAFunction(const ast::CallNode& node) {
+ErrorNotAFunction::ErrorNotAFunction(const ast::Call& node) {
 
 }

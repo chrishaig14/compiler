@@ -8,15 +8,15 @@
 
 #include "Node.h"
 #include "ObjectType.h"
-#include "FunctionNode.h"
+#include "Function.h"
 
 class InstanceNode : public Node {
 public:
     std::string id;
     ObjectType* base_type;
-    std::unordered_map<std::string, FunctionNode*> methods;
+    std::unordered_map<std::string, ast::Function*> methods;
     InstanceNode(const std::string& id, ObjectType* base_type,
-                 const std::unordered_map<std::string, FunctionNode*>& methods, TextPosition start, TextPosition end);
+                 const std::unordered_map<std::string, ast::Function*>& methods, TextPosition start, TextPosition end);
     nlohmann::json to_json() const override;
     bool equal(const Node& other) const override;
 };

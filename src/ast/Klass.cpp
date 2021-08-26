@@ -2,11 +2,11 @@
 // Created by chris on 4/10/20.
 //
 
-#include "ClassNode.h"
+#include "Klass.h"
 
 using namespace ast;
 
-ClassNode::ClassNode(const std::string& className, VectorOfStrings type_parameters,
+Klass::Klass(const std::string& className, VectorOfStrings type_parameters,
                      std::vector<std::pair<std::string, UTypeNode>> members,
                      std::unordered_map<std::string, Method> functions,
                      std::map<std::string, std::pair<TypeNode*, Node*>> static_members,
@@ -17,12 +17,12 @@ ClassNode::ClassNode(const std::string& className, VectorOfStrings type_paramete
     this->type_parameters = type_parameters;
 }
 
-bool ClassNode::equal(const Node& other) const {
+bool Klass::equal(const Node& other) const {
     return false;
 }
 
 
-ClassNode::~ClassNode() {
+Klass::~Klass() {
     // for (const auto& mem: this->members) {
     //     delete mem.second;
     // }
@@ -31,7 +31,7 @@ ClassNode::~ClassNode() {
     // }
 }
 
-nlohmann::json ClassNode::to_json() const {
+nlohmann::json Klass::to_json() const {
     nlohmann::json j;
     j["type"] = "class";
     std::vector<nlohmann::json> memj;

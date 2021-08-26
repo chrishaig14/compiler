@@ -60,7 +60,7 @@ USemanticInfo Checker::visit_enum(EnumNode& p_node) {
     return info_u;
 }
 
-USemanticInfo Checker::visit_class(ast::ClassNode& node) {
+USemanticInfo Checker::visit_class(ast::Klass& node) {
     this->error_reporter.current_class = node.class_name;
     USemanticInfo info_u = std::make_unique<SemanticInfo>();
     SemanticInfo& info = *info_u;
@@ -142,12 +142,12 @@ void Checker::init() {
     }
 }
 
-USemanticInfo Checker::visit_root(BlockNode& node) {
+USemanticInfo Checker::visit_root(ast::Block& node) {
     this->init();
     return this->visit_block(node);
 }
 
-USemanticInfo Checker::visit_block(BlockNode& node) {
+USemanticInfo Checker::visit_block(ast::Block& node) {
     USemanticInfo info_u = std::make_unique<SemanticInfo>();
     SemanticInfo& info = *info_u;
     auto* sn = new BlockSNode();
@@ -159,7 +159,7 @@ USemanticInfo Checker::visit_block(BlockNode& node) {
         // sn->nodes.push_back(sinfo_p->snode);
 
         if (n->ntype == NodeType::BLOCK) {
-            for (auto& bnode: ((std::unique_ptr<BlockNode>&) n)->nodes) {
+            for (auto& bnode: ((std::unique_ptr<ast::Block>&) n)->nodes) {
                 vn.push_back(std::move(bnode));
             }
         } else {
@@ -193,7 +193,7 @@ USemanticInfo Checker::visit_block(BlockNode& node) {
     return info_u;
 }
 
-USemanticInfo Checker::visit_function(FunctionNode& n) {
+USemanticInfo Checker::visit_function(ast::Function& n) {
     this->error_reporter.current_function = n.identifier;
     USemanticInfo info_u = std::make_unique<SemanticInfo>();
     SemanticInfo& info = *info_u;

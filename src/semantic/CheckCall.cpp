@@ -8,7 +8,7 @@
 #include "errors/ErrorNotAFunction.h"
 #include "errors/ErrorFunctionCallNumArgs.h"
 
-USemanticInfo Checker::visit_call(ast::CallNode& n, bool is_rvalue) {
+USemanticInfo Checker::visit_call(ast::Call& n, bool is_rvalue) {
     SemanticInfo retv;
     auto* sn = new CallSNode(nullptr, std::vector<SNode*>());
     retv.snode = sn;
@@ -149,7 +149,7 @@ USemanticInfo Checker::visit_call(ast::CallNode& n, bool is_rvalue) {
     return make_return_info(n, is_rvalue, retv, is_def_const, args_are_constant);
 }
 
-USemanticInfo Checker::make_return_info(const ast::CallNode& n, bool is_rvalue, SemanticInfo& retv, bool is_def_const,
+USemanticInfo Checker::make_return_info(const ast::Call& n, bool is_rvalue, SemanticInfo& retv, bool is_def_const,
                                         bool args_are_constant) {
     if (retv.entity.get().type == E_TYPE::NOTHING) {
         if (is_rvalue) {
@@ -171,7 +171,7 @@ USemanticInfo Checker::make_return_info(const ast::CallNode& n, bool is_rvalue, 
 }
 
 bool
-Checker::check_arguments(ast::CallNode& n, CallSNode* sn, VectorOfTypes& arg_types, std::vector<Entity*>& arg_entities) {
+Checker::check_arguments(ast::Call& n, CallSNode* sn, VectorOfTypes& arg_types, std::vector<Entity*>& arg_entities) {
     bool has_error;
     for (auto& arg: n.arguments) {
         USemanticInfo arg_type_p = this->dispatch(*arg);
@@ -201,7 +201,7 @@ Checker::check_arguments(ast::CallNode& n, CallSNode* sn, VectorOfTypes& arg_typ
 }
 
 void
-Checker::process_function_arguments(SemanticInfo& retv, std::vector<Entity*>& arg_entities, CallSNode* sn, ast::CallNode& n,
+Checker::process_function_arguments(SemanticInfo& retv, std::vector<Entity*>& arg_entities, CallSNode* sn, ast::Call& n,
                                     FunctionType* function_type, SemanticInfo* fun_info_p) {
     retv.entity = *entity_from_type(*function_type->return_type);
     int sni = static_cast<int>(fun_info_p->this_arg != nullptr);

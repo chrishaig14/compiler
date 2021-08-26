@@ -8,7 +8,7 @@
 #include "../units/Entity.h"
 #include "../units/FunctionValue.h"
 #include "../units/ObjectValue.h"
-#include "../ast/FunctionNode.h"
+#include "../ast/Function.h"
 #include "../simple_nodes/SNode.h"
 #include "../simple_nodes/FunctionSNode.h"
 #include "../simple_nodes/NewObjectSNode.h"
@@ -32,9 +32,9 @@ int target_union_type(const ObjectType& target, const TypeNode& source);
 
 Entity* entity_from_type(const TypeNode& type);
 
-FunctionNode* generate_eq_method(std::string class_name, VectorOfTypes tp, VectorOfStrings members_ordered);
+ast::Function* generate_eq_method(std::string class_name, VectorOfTypes tp, VectorOfStrings members_ordered);
 
-FunctionNode* generate_str_method(std::string class_name);
+ast::Function* generate_str_method(std::string class_name);
 
 FunctionSNode* make_class_default_init(const std::string& class_path, const VectorOfStrings& members);
 

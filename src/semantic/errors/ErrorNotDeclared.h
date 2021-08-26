@@ -7,16 +7,16 @@
 
 
 #include "Error.h"
-#include "../../ast/IdNode.h"
+#include "../../ast/Id.h"
 
 class ErrorNotDeclared : public Error {
-    const ast::IdNode& idn;
+    const ast::Id& idn;
 public:
     Error* clone() const override;
     bool equal(const Error& other) const override;
     std::string to_str() const override;
 
-    explicit ErrorNotDeclared(const ast::IdNode& idn);
+    explicit ErrorNotDeclared(const ast::Id& idn);
 };
 
 

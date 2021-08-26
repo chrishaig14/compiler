@@ -13,15 +13,15 @@
 #include "../semantic/SymbolTable.h"
 #include "ast.h"
 
-class ast::IdNode : public Node {
+class ast::Id : public Node {
 public:
     std::string _id;
     bool is_global_function;
 
-    IdNode(std::string identifier, TextPosition start, TextPosition end);
+    Id(std::string identifier, TextPosition start, TextPosition end);
 
     static UIdNode make(std::string identifier, TextPosition start, TextPosition end) {
-        return std::make_unique<IdNode>(identifier, start, end);
+        return std::make_unique<Id>(identifier, start, end);
     }
 
     bool equal(const Node& other) const override;

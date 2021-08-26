@@ -7,13 +7,13 @@
 
 
 #include "Error.h"
-#include "../../ast/MemberNode.h"
+#include "../../ast/Member.h"
 
 class ErrorNoMember : public Error {
-    const MemberNode& m;
+    const ast::Member& m;
     const TypeNode& t;
 public:
-    ErrorNoMember(const TypeNode& t, const MemberNode& m);
+    ErrorNoMember(const TypeNode& t, const ast::Member& m);
 
     bool equal(const Error& other) const override;
 

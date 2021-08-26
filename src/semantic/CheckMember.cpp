@@ -10,7 +10,7 @@
 #include "errors/ErrorClassNoMember.h"
 #include "errors/ErrorPackageNoMember.h"
 
-USemanticInfo Checker::visit_member(MemberNode& n) {
+USemanticInfo Checker::visit_member(ast::Member& n) {
     USemanticInfo parent_info = this->dispatch(*n.parent);
     Entity& parent_entity = parent_info->entity.get();
     switch (parent_entity.type) {
@@ -40,7 +40,7 @@ USemanticInfo Checker::visit_member(MemberNode& n) {
     return error_stub();
 }
 
-USemanticInfo Checker::module_member(Module& mod, const std::string& child, MemberNode& n) {
+USemanticInfo Checker::module_member(Module& mod, const std::string& child, ast::Member& n) {
     if (mod.flirpins.count(child) == 0) {
         // this->error_reporter.error(ErrorNoMember())
         // this->error_reporter.module_no_member(&mod,
@@ -65,7 +65,7 @@ TextPosition add_one_col(TextPosition t) {
     return {t.line, t.column + 1};
 }
 
-USemanticInfo Checker::object_member(SNode* object_snode, Value& p_value, const std::string& child, MemberNode& n) {
+USemanticInfo Checker::object_member(SNode* object_snode, Value& p_value, const std::string& child, ast::Member& n) {
     Path object_type_path = p_value.type->object().actual_base_path;
     // if (object_type_path.as_str() == "") {
     //     // is a single type param, error
@@ -136,7 +136,7 @@ USemanticInfo Checker::object_member(SNode* object_snode, Value& p_value, const 
     return info_u;
 }
 
-USemanticInfo Checker::package_member(Package& package, const std::string& child, MemberNode& n) {
+USemanticInfo Checker::package_member(Package& package, const std::string& child, ast::Member& n) {
     if (package.units.count(child) == 0) {
         this->error_reporter.error(ErrorPackageNoMember(&package,
                                                         child,
@@ -152,7 +152,7 @@ USemanticInfo Checker::package_member(Package& package, const std::string& child
     return info_u;
 }
 
-USemanticInfo Checker::class_member(Class* cls, const std::string& child, MemberNode& n) {
+USemanticInfo Checker::class_member(Class* cls, const std::string& child, ast::Member& n) {
     USemanticInfo info_u = std::make_unique<SemanticInfo>(); SemanticInfo& info = *info_u;
     if (cls->methods.find(child) != cls->methods.end()) {
         ConstFunction* bound_method = cls->methods[child];

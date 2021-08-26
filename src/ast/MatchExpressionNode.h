@@ -8,14 +8,14 @@
 
 #include "Node.h"
 #include "TypeNode.h"
-#include "BlockNode.h"
+#include "Block.h"
 
 class MatchExpressionNode : public Node {
 public:
     Node* exp;
     std::vector<std::string> ids;
-    std::vector<std::pair<TypeNode*, BlockNode*>> cases;
-    MatchExpressionNode(Node* exp, std::vector<std::string> ids, std::vector<std::pair<TypeNode*, BlockNode*>> cases,
+    std::vector<std::pair<TypeNode*, ast::Block*>> cases;
+    MatchExpressionNode(Node* exp, std::vector<std::string> ids, std::vector<std::pair<TypeNode*, ast::Block*>> cases,
                         TextPosition start, TextPosition end);
 
     bool equal(const Node& other) const override;

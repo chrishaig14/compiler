@@ -11,21 +11,21 @@
 #include "TypeNode.h"
 #include "../utils.h"
 
-class ast::DeclarationNode : public Node {
+class ast::Declaration : public Node {
 public:
     std::string identifier;
     TypeNode* type;
     UNode expression;
     TextPosition eq_pos;
-    DeclarationNode(const std::string& identifier, TypeNode* type, UNode& expression, TextPosition start,
+    Declaration(const std::string& identifier, TypeNode* type, UNode& expression, TextPosition start,
                     TextPosition eq_pos, TextPosition end);
 
 
-    DeclarationNode(const std::string& identifier, TypeNode* type, Node* expression, TextPosition start);
+    Declaration(const std::string& identifier, TypeNode* type, Node* expression, TextPosition start);
 
     bool equal(const Node& other) const override;
 
-    ~DeclarationNode() override;
+    ~Declaration() override;
 
     nlohmann::json to_json() const override;
 

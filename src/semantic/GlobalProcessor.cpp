@@ -50,7 +50,7 @@ void GlobalProcessor::add_default_imports() {
 }
 
 
-void GlobalProcessor::visit_function(FunctionNode& node) {
+void GlobalProcessor::visit_function(ast::Function& node) {
     std::cout << "Global-processing function " << node.identifier << " in module " << this->module.name << std::endl;
     ConstFunction* const_function = this->module.flirpins[node.identifier].const_function;
 
@@ -78,7 +78,7 @@ void GlobalProcessor::visit_root() {
     // process imports first
     // process classes second
     // finally process functions
-    BlockNode& node = *this->module.ast;
+    ast::Block& node = *this->module.ast;
     check_duplicated_names(node);
 
     this->add_default_imports();
@@ -94,8 +94,8 @@ void GlobalProcessor::visit_root() {
         if (n.ntype == NodeType::CLS) {
             // this->dispatch(n);
             auto* class_info = new Class();
-            this->module.flirpins[((ast::ClassNode&) n).class_name] = Flirpin{.type=F_TYPE::CLASS, .clazz=class_info};
-            class_info->path = Path(this->module.path, ((ast::ClassNode&) n).class_name);
+            this->module.flirpins[((ast::Klass&) n).class_name] = Flirpin{.type=F_TYPE::CLASS, .clazz=class_info};
+            class_info->path = Path(this->module.path, ((ast::Klass&) n).class_name);
         } else if (n.ntype == NodeType::ENUM) {
             Enum* enumm = new Enum();
             enumm->enumm_name = ((EnumNode&) n).id;
@@ -111,7 +111,7 @@ void GlobalProcessor::visit_root() {
         if (n.ntype == NodeType::FUNC) {
             // this->dispatch(n);
             auto* const_function = new ConstFunction(Path(), nullptr);
-            this->module.flirpins[((FunctionNode&) n).identifier] = Flirpin{.type=F_TYPE::CONST_FUNCTION, .const_function=const_function};
+            this->module.flirpins[((ast::Function&) n).identifier] = Flirpin{.type=F_TYPE::CONST_FUNCTION, .const_function=const_function};
         }
     }
     for (auto& n: node.nodes) {
@@ -133,15 +133,15 @@ void GlobalProcessor::visit_root() {
 
 }
 
-void GlobalProcessor::check_duplicated_names(BlockNode& node) const {
+void GlobalProcessor::check_duplicated_names(ast::Block& node) const {
     std::map<std::string, void*> names;
     for (auto& np: node.nodes) {
         auto& n = *np;
         std::string name;
         if (n.ntype == NodeType::CLS) {
-            name = ((ast::ClassNode&) n).class_name;
+            name = ((ast::Klass&) n).class_name;
         } else if (n.ntype == NodeType::FUNC) {
-            name = ((FunctionNode&) n).identifier;
+            name = ((ast::Function&) n).identifier;
         } else if (n.ntype == NodeType::IMPORT) {
             if (((ImportNode&) n).has_alias) {
                 name = ((ImportNode&) n).alias;
@@ -162,13 +162,13 @@ void GlobalProcessor::check_duplicated_names(BlockNode& node) const {
 }
 
 
-void GlobalProcessor::visit_block(BlockNode& node) {
+void GlobalProcessor::visit_block(ast::Block& node) {
     for (auto& n: node.nodes) {
         this->dispatch(*n);
     }
 }
 
-void GlobalProcessor::visit_class(ast::ClassNode& node) {
+void GlobalProcessor::visit_class(ast::Klass& node) {
     Class* class_info = this->module.flirpins[node.class_name].clazz;
     //
     // if (this->imported_paths.count(node.class_name) == 1) {
@@ -190,7 +190,7 @@ void GlobalProcessor::visit_class(ast::ClassNode& node) {
         class_info->static_members[mn.first] = std::make_pair(mn.second.first->clone(), mn.second.second);
     }
     for (const auto& f: node.methods) {
-        FunctionNode& method = *f.second.method;
+        ast::Function& method = *f.second.method;
 
         VectorOfTypes x;
         for (auto& p: method.parameter_types) {
@@ -209,7 +209,7 @@ void GlobalProcessor::visit_class(ast::ClassNode& node) {
     }
 
     for (const auto& f: node.static_methods) {
-        FunctionNode& method = *f.second;
+        ast::Function& method = *f.second;
         VectorOfTypes x;
         for (auto& p: method.parameter_types) {
             this->module.fill_actual(*p);
@@ -233,10 +233,10 @@ void GlobalProcessor::visit_class(ast::ClassNode& node) {
 void GlobalProcessor::dispatch(Node& nod) {
     switch (nod.ntype) {
         case NodeType::CLS:
-            this->visit_class((ast::ClassNode&) nod);
+            this->visit_class((ast::Klass&) nod);
             break;
         case NodeType::FUNC:
-            this->visit_function((FunctionNode&) nod);
+            this->visit_function((ast::Function&) nod);
             break;
         case NodeType::IMPORT:
             this->visit_import((ImportNode&) nod);

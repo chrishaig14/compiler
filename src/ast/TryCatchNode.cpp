@@ -9,7 +9,7 @@ bool TryCatchNode::equal(const Node& other) const {
     return false;
 }
 
-TryCatchNode::TryCatchNode(BlockNode* body, std::vector<std::pair<std::string, ObjectType*>> catches,
+TryCatchNode::TryCatchNode(ast::Block* body, std::vector<std::pair<std::string, ObjectType*>> catches,
                            VectorOfNodes catches_bodies, TextPosition start, TextPosition end) : Node(NodeType::TRY_CATCH, start, end) {
     this->body = body;
     this->catches = catches;

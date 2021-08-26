@@ -13,14 +13,15 @@
 #include "../types.h"
 #include "TypeNode.h"
 #include "../units/Entity.h"
+#include "ast.h"
 
-class BlockNode : public Node {
+class ast::Block : public Node {
 public:
 
-    BlockNode(VectorOfNodesU nodes, TextPosition start, TextPosition end);
+    Block(VectorOfNodesU nodes, TextPosition start, TextPosition end);
 
     static UBlockNode make(VectorOfNodesU nodes, TextPosition start, TextPosition end) {
-        return std::make_unique<BlockNode>(std::move(nodes), start, end);
+        return std::make_unique<Block>(std::move(nodes), start, end);
     }
 
 
@@ -29,7 +30,7 @@ public:
     bool equal(const Node& p) const override;
 
 
-    ~BlockNode();
+    ~Block();
     nlohmann::json to_json() const override;
     std::vector<std::pair<std::string, TypeNode*>> local_vars;
 };

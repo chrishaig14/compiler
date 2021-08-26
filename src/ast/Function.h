@@ -11,8 +11,9 @@
 #include "Node.h"
 
 #include "TypeNode.h"
-#include "BlockNode.h"
+#include "Block.h"
 #include "Path.h"
+#include "ast.h"
 
 struct Implicit {
     std::string type;
@@ -21,20 +22,20 @@ struct Implicit {
     bool is_static;
 };
 
-class FunctionNode : public Node {
+class ast::Function : public Node {
 public:
     Implicit* implicit;
     std::string identifier;
     VectorOfStrings parameter_names;
     VectorOfUTypes parameter_types;
-    std::unique_ptr<BlockNode> body;
+    std::unique_ptr<ast::Block> body;
     UTypeNode return_type;
-    FunctionNode(std::string identifier, const VectorOfStrings& parameter_names, VectorOfUTypes& parameter_types,
-                 UTypeNode& return_type, std::unique_ptr<BlockNode>& body, TextPosition start, TextPosition end);
+    Function(std::string identifier, const VectorOfStrings& parameter_names, VectorOfUTypes& parameter_types,
+             UTypeNode& return_type, std::unique_ptr<ast::Block>& body, TextPosition start, TextPosition end);
 
     bool equal(const Node& x) const override;
 
-    ~FunctionNode() override;
+    ~Function() override;
     nlohmann::json to_json() const override;
 
     std::unordered_map<std::string, std::string> constraints;

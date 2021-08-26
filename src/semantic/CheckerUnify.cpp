@@ -178,7 +178,7 @@ USemanticInfo Checker::visit_alias(AliasNode& p_node) {
     return info_u;
 }
 
-USemanticInfo Checker::enum_member(Enum* enumm, const std::string& value, MemberNode& node) {
+USemanticInfo Checker::enum_member(Enum* enumm, const std::string& value, ast::Member& node) {
     USemanticInfo info_u = std::make_unique<SemanticInfo>();
     SemanticInfo& info = *info_u;
     for (size_t i = 0; i < enumm->values.size(); i++) {

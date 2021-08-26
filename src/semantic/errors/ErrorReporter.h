@@ -9,8 +9,8 @@
 #include <string>
 #include "../../scanner/TextPosition.h"
 #include "../../ast/TypeNode.h"
-#include "../../ast/MemberNode.h"
-#include "../../ast/CallNode.h"
+#include "../../ast/Member.h"
+#include "../../ast/Call.h"
 #include "../../scanner/CodeLines.h"
 #include "../../units/Entity.h"
 #include "Error.h"
@@ -93,7 +93,7 @@ public:
     //                      TextPosition member_start, TextPosition member_end);
     void module_no_member(const TypeNode& t, const std::string& member, TextPosition pos, Node& obj,
                           TextPosition member_start, TextPosition member_end);
-    void object_no_member(const TypeNode& t, const MemberNode& obj);
+    void object_no_member(const TypeNode& t, const ast::Member& obj);
     void module_no_member(std::string mod_name, const std::string& member, TextPosition pos, Node& obj,
                           TextPosition member_start, TextPosition member_end);
     void package_no_member(std::string pack_name, const std::string& member, TextPosition pos, Node& obj,

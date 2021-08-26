@@ -8,7 +8,7 @@ std::string ErrorNoMember::to_str() const {
     return "Error no member: " + this->m.s_child;
 }
 
-ErrorNoMember::ErrorNoMember(const TypeNode& t, const MemberNode& m) : m(m), t(t) {
+ErrorNoMember::ErrorNoMember(const TypeNode& t, const ast::Member& m) : m(m), t(t) {
 
 }
 

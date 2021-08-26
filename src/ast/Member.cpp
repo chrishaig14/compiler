@@ -2,23 +2,23 @@
 // Created by chris on 1/8/20.
 //
 
-#include "MemberNode.h"
+#include "Member.h"
 
-MemberNode::MemberNode(UNode& parent, Token child_token) : Node(NodeType::MEMBER,
-                                                                                parent->start,
-                                                                                child_token.end_pos),
-                                                                           parent(std::move(parent)) {
+using namespace ast;
+
+Member::Member(UNode& parent, Token child_token) : Node(NodeType::MEMBER, parent->start, child_token.end_pos),
+                                                           parent(std::move(parent)) {
     this->child_token = child_token;
     this->type = MemberType::STR;
     this->s_child = child_token.str;
 }
 
-MemberNode::~MemberNode() {
+Member::~Member() {
     // delete this->parent;
 }
 
-bool MemberNode::equal(const Node& x) const {
-    auto& other = (MemberNode&) x;
+bool Member::equal(const Node& x) const {
+    auto& other = (Member&) x;
     if (this->type != other.type) {
         return false;
     }
@@ -34,7 +34,7 @@ bool MemberNode::equal(const Node& x) const {
     return *this->parent == *other.parent;
 }
 
-nlohmann::json MemberNode::to_json() const {
+nlohmann::json Member::to_json() const {
     return {{"type",   "member"},
             {"member", {{"parent", this->parent->to_json()}, {"child", this->s_child}}}};
 }

@@ -61,9 +61,9 @@ USemanticInfo Checker::visit_lvalue_subscript(SubscriptNode& node) {
     return info_u;
 }
 
-USemanticInfo Checker::visit_assignment(AssignmentNode& n) {
+USemanticInfo Checker::visit_assignment(ast::Assignment& n) {
     if (n.lvalue->ntype == NodeType::ID) {
-        if (((ast::IdNode&) *n.lvalue)._id == "_") {
+        if (((ast::Id&) *n.lvalue)._id == "_") {
             USemanticInfo rv = this->dispatch_rvalue(*n.rvalue);
             return rv;
         }
@@ -157,7 +157,7 @@ USemanticInfo Checker::visit_assignment(AssignmentNode& n) {
     return info_u;
 }
 
-USemanticInfo Checker::visit_return(ReturnNode& n) {
+USemanticInfo Checker::visit_return(ast::ReturnNode& n) {
     Entity& return_entity = this->scope->get("__return__");
     if (return_entity.type == E_TYPE::NOTHING) {
         if (n.expression != nullptr) {
@@ -236,9 +236,9 @@ USemanticInfo Checker::visit_match(MatchExpressionNode& node) {
     std::string varname = "match_var";
     for (size_t i = 0; i < node.ids.size(); i++) {
         std::string case_id = node.ids[i];
-        std::pair<TypeNode*, BlockNode*> c = node.cases[i];
+        std::pair<TypeNode*, ast::Block*> c = node.cases[i];
         TypeNode* case_type = c.first;
-        BlockNode* case_node = c.second;
+        ast::Block* case_node = c.second;
 
         this->module.fill_actual(case_type);
 
@@ -358,7 +358,7 @@ USemanticInfo Checker::visit_break(BreakNode& node) {
     return info_u;
 }
 
-USemanticInfo Checker::visit_while(WhileNode& node) {
+USemanticInfo Checker::visit_while(ast::While& node) {
     USemanticInfo condition_sinfo = this->expect_rvalue_of_type(T_BOOL, *node.condition);
     if (condition_sinfo->is_error()) {
         return error_stub();

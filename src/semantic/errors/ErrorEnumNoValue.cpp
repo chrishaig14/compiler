@@ -20,7 +20,7 @@ std::string ErrorEnumNoValue::to_str() const {
     return "Error: enum " + this->enum_name + " has no value " + this->value_name;
 }
 
-ErrorEnumNoValue::ErrorEnumNoValue(std::string enum_name, const std::string value_name, const MemberNode& node,
+ErrorEnumNoValue::ErrorEnumNoValue(std::string enum_name, const std::string value_name, const ast::Member& node,
                                    Enum* p_enum)
         : enum_name(enum_name), value_name(value_name), node(node), p_enum(p_enum) {
 
