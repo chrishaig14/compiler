@@ -363,7 +363,7 @@ TEST_CASE("nodes_while", "[while]") {
 
 TEST_CASE("nodes_class_empty", "[class]") {
     std::unordered_map<std::string, UFunctionNode> v;
-    ClassNode n("MyClass", {}, {}, {}, {}, v, DUMMY_POS, DUMMY_POS);
+    ast::ClassNode n("MyClass", {}, {}, {}, {}, v, DUMMY_POS, DUMMY_POS);
     nlohmann::json nj = n.to_json();
     nlohmann::json members = nlohmann::json::array();
     nlohmann::json methods;
@@ -420,7 +420,7 @@ TEST_CASE("nodes_class_full", "[class]") {
                                      {"smethod2", smethod2->to_json()}};
     cstatic_methods["smethod1"] = std::move(smethod1);
     cstatic_methods["smethod2"] = std::move(smethod2);
-    ClassNode n("MyClass", {"k", "v"}, std::move(cmembers), cmethods, {}, cstatic_methods, DUMMY_POS, DUMMY_POS);
+    ast::ClassNode n("MyClass", {"k", "v"}, std::move(cmembers), cmethods, {}, cstatic_methods, DUMMY_POS, DUMMY_POS);
     n.members_ordered = members_ordered;
     nlohmann::json nj = n.to_json();
 

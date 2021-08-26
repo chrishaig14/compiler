@@ -36,7 +36,7 @@ public:
     UNode parse_top_level_statement();
 
     std::unique_ptr<ImportNode> parse_import();
-    std::unique_ptr<ClassNode> parse_class_definition();
+    std::unique_ptr<ast::ClassNode> parse_class_definition();
     std::unique_ptr<FunctionNode> parse_function_definition();
     std::unique_ptr<AliasNode> parse_alias();
     std::unique_ptr<EnumNode> parse_enum_definition();

@@ -13,6 +13,8 @@ namespace ast {
     class IdNode;
 
     class CallNode;
+
+    class ClassNode;
 }
 
 #endif //XLANG_AST_H

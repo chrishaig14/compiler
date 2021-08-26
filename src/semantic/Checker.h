@@ -114,7 +114,7 @@ public:
     USemanticInfo visit_boolop(BoolOpNode& n);
     USemanticInfo visit_break(BreakNode& node);
     USemanticInfo visit_call(ast::CallNode& n, bool is_rvalue);
-    USemanticInfo visit_class(ClassNode& node);
+    USemanticInfo visit_class(ast::ClassNode& node);
     USemanticInfo visit_continue(ContinueNode& node);
 
     USemanticInfo visit_lvalue_subscript(SubscriptNode& node);

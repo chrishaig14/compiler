@@ -12,13 +12,13 @@
 #include "TypeNode.h"
 #include "FunctionNode.h"
 #include "../macros.h"
-
+#include "ast.h"
 struct Method {
     Implicit* constraint;
     FunctionNode* method;
 };
 
-class ClassNode : public Node {
+class ast::ClassNode : public Node {
 public:
 
     bool equal(const Node& other) const override;

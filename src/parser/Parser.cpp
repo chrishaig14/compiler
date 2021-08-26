@@ -848,7 +848,7 @@ std::unique_ptr<WhileNode> Parser::parse_while_loop() {
     return whil;
 }
 
-std::unique_ptr<ClassNode> Parser::parse_class_definition() {
+std::unique_ptr<ast::ClassNode> Parser::parse_class_definition() {
     Token class_tok = this->expect_token(TokType::CLASS);
     Token class_name_tk = this->expect_token(TokType::ID);
     std::string& class_name = class_name_tk.str;
@@ -942,7 +942,7 @@ std::unique_ptr<ClassNode> Parser::parse_class_definition() {
         }
     }
     Token end = this->expect_token(TokType::RCURLY);
-    auto c = std::make_unique<ClassNode>(class_name,
+    auto c = std::make_unique<ast::ClassNode>(class_name,
                                          type_parameters,
                                          std::move(members),
                                          methods,

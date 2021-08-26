@@ -28,7 +28,7 @@ public:
     void visit_enum(EnumNode& node);
     void visit_alias(AliasNode& node);
     void visit_import(ImportNode& node);
-    void visit_class(ClassNode& node);
+    void visit_class(ast::ClassNode& node);
     void check_duplicated_names(BlockNode& node) const;
     void add_default_imports();
 };

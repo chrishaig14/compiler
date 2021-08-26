@@ -94,8 +94,8 @@ void GlobalProcessor::visit_root() {
         if (n.ntype == NodeType::CLS) {
             // this->dispatch(n);
             auto* class_info = new Class();
-            this->module.flirpins[((ClassNode&) n).class_name] = Flirpin{.type=F_TYPE::CLASS, .clazz=class_info};
-            class_info->path = Path(this->module.path, ((ClassNode&) n).class_name);
+            this->module.flirpins[((ast::ClassNode&) n).class_name] = Flirpin{.type=F_TYPE::CLASS, .clazz=class_info};
+            class_info->path = Path(this->module.path, ((ast::ClassNode&) n).class_name);
         } else if (n.ntype == NodeType::ENUM) {
             Enum* enumm = new Enum();
             enumm->enumm_name = ((EnumNode&) n).id;
@@ -139,7 +139,7 @@ void GlobalProcessor::check_duplicated_names(BlockNode& node) const {
         auto& n = *np;
         std::string name;
         if (n.ntype == NodeType::CLS) {
-            name = ((ClassNode&) n).class_name;
+            name = ((ast::ClassNode&) n).class_name;
         } else if (n.ntype == NodeType::FUNC) {
             name = ((FunctionNode&) n).identifier;
         } else if (n.ntype == NodeType::IMPORT) {
@@ -168,7 +168,7 @@ void GlobalProcessor::visit_block(BlockNode& node) {
     }
 }
 
-void GlobalProcessor::visit_class(ClassNode& node) {
+void GlobalProcessor::visit_class(ast::ClassNode& node) {
     Class* class_info = this->module.flirpins[node.class_name].clazz;
     //
     // if (this->imported_paths.count(node.class_name) == 1) {
@@ -233,7 +233,7 @@ void GlobalProcessor::visit_class(ClassNode& node) {
 void GlobalProcessor::dispatch(Node& nod) {
     switch (nod.ntype) {
         case NodeType::CLS:
-            this->visit_class((ClassNode&) nod);
+            this->visit_class((ast::ClassNode&) nod);
             break;
         case NodeType::FUNC:
             this->visit_function((FunctionNode&) nod);

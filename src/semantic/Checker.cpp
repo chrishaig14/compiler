@@ -340,7 +340,7 @@ USemanticInfo Checker::dispatch_any(Node& n, bool is_rvalue) {
         case NodeType::CALL:
             return this->visit_call((ast::CallNode&) n, is_rvalue);
         case NodeType::CLS:
-            return this->visit_class((ClassNode&) n);
+            return this->visit_class((ast::ClassNode&) n);
         case NodeType::CNTINUE:
             return this->visit_continue((ContinueNode&) n);
         case NodeType::DECL:

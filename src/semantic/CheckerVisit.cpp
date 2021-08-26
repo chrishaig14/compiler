@@ -60,7 +60,7 @@ USemanticInfo Checker::visit_enum(EnumNode& p_node) {
     return info_u;
 }
 
-USemanticInfo Checker::visit_class(ClassNode& node) {
+USemanticInfo Checker::visit_class(ast::ClassNode& node) {
     this->error_reporter.current_class = node.class_name;
     USemanticInfo info_u = std::make_unique<SemanticInfo>();
     SemanticInfo& info = *info_u;

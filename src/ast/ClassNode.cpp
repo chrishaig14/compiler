@@ -4,7 +4,10 @@
 
 #include "ClassNode.h"
 
-ClassNode::ClassNode(const std::string& className, VectorOfStrings type_parameters, std::vector<std::pair<std::string,UTypeNode>> members,
+using namespace ast;
+
+ClassNode::ClassNode(const std::string& className, VectorOfStrings type_parameters,
+                     std::vector<std::pair<std::string, UTypeNode>> members,
                      std::unordered_map<std::string, Method> functions,
                      std::map<std::string, std::pair<TypeNode*, Node*>> static_members,
                      std::unordered_map<std::string, UFunctionNode>& static_methods, TextPosition start,

@@ -384,10 +384,10 @@ TEST_CASE("parse_class_empty", "[parser]") {
     Parser parser("test", scanner.code_lines, tokens);
     parser.top_package_name = "main";
 
-    std::unique_ptr<ClassNode> ast = parser.parse_class_definition();
+    std::unique_ptr<ast::ClassNode> ast = parser.parse_class_definition();
 
     std::unordered_map<std::string, UFunctionNode> v;
-    REQUIRE(ast->to_json() == ClassNode(ID, {}, {}, {}, {}, v, DUMMY_POS, DUMMY_POS).to_json());
+    REQUIRE(ast->to_json() == ast::ClassNode(ID, {}, {}, {}, {}, v, DUMMY_POS, DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_class_one_member", "[parser]") {
@@ -398,11 +398,11 @@ TEST_CASE("parse_class_one_member", "[parser]") {
     Parser parser("test", scanner.code_lines, tokens);
     parser.top_package_name = "main";
 
-    std::unique_ptr<ClassNode> ast = parser.parse_class_definition();
+    std::unique_ptr<ast::ClassNode> ast = parser.parse_class_definition();
     std::unordered_map<std::string, UFunctionNode> v;
     std::vector<std::pair<std::string, UTypeNode >> members;
     members.emplace_back(ID_1, UTypeNode(TYPE_1.node->clone()));
-    REQUIRE(ast->to_json() == ClassNode(ID, {}, std::move(members), {}, {}, v, DUMMY_POS, DUMMY_POS).to_json());
+    REQUIRE(ast->to_json() == ast::ClassNode(ID, {}, std::move(members), {}, {}, v, DUMMY_POS, DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_class_mult_member", "[parser]") {
@@ -413,12 +413,12 @@ TEST_CASE("parse_class_mult_member", "[parser]") {
     Parser parser("test", scanner.code_lines, tokens);
     parser.top_package_name = "main";
 
-    std::unique_ptr<ClassNode> ast = parser.parse_class_definition();
+    std::unique_ptr<ast::ClassNode> ast = parser.parse_class_definition();
     std::unordered_map<std::string, UFunctionNode> v;
     std::vector<std::pair<std::string, UTypeNode >> members;
     members.emplace_back(ID_2, UTypeNode(TYPE_2.node->clone()));
     members.emplace_back(ID_1, UTypeNode(TYPE_1.node->clone()));
-    REQUIRE(ast->to_json() == ClassNode(ID, {}, std::move(members), {}, {}, v, DUMMY_POS, DUMMY_POS).to_json());
+    REQUIRE(ast->to_json() == ast::ClassNode(ID, {}, std::move(members), {}, {}, v, DUMMY_POS, DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_class_with_method", "[parser]") {
@@ -431,14 +431,14 @@ TEST_CASE("parse_class_with_method", "[parser]") {
     Parser parser("test", scanner.code_lines, tokens);
     parser.top_package_name = "main";
 
-    std::unique_ptr<ClassNode> ast = parser.parse_class_definition();
+    std::unique_ptr<ast::ClassNode> ast = parser.parse_class_definition();
 
     FunctionNode* fp = (FunctionNode*) function.node.release();
     std::unordered_map<std::string, UFunctionNode> v;
     std::vector<std::pair<std::string, UTypeNode >> members;
     members.emplace_back(ID_2, UTypeNode(TYPE_2.node->clone()));
     members.emplace_back(ID_1, UTypeNode(TYPE_1.node->clone()));
-    REQUIRE(ast->to_json() == ClassNode(ID,
+    REQUIRE(ast->to_json() == ast::ClassNode(ID,
                                         {},
                                         std::move(members),
                                         {{fp->identifier, Method{nullptr, fp}}},
@@ -458,11 +458,11 @@ TEST_CASE("parse_class_with_static_method", "[parser]") {
     Parser parser("test", scanner.code_lines, tokens);
     parser.top_package_name = "main";
 
-    std::unique_ptr<ClassNode> ast = parser.parse_class_definition();
+    std::unique_ptr<ast::ClassNode> ast = parser.parse_class_definition();
     std::unordered_map<std::string, UFunctionNode> v;
     std::string id = ((UFunctionNode&) function.node)->identifier;
     v[id] = std::move((UFunctionNode&) function.node);
-    REQUIRE(ast->to_json() == ClassNode(ID, {}, {}, {}, {}, v, DUMMY_POS, DUMMY_POS).to_json());
+    REQUIRE(ast->to_json() == ast::ClassNode(ID, {}, {}, {}, {}, v, DUMMY_POS, DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_return_nothing", "[parser]") {
