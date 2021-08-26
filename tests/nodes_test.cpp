@@ -1,8 +1,8 @@
 #include "catch.hpp"
-#include "../src/nodes/nodes.h"
-#include "../src/nodes/ObjectType.h"
-#include "../src/nodes/TypeclassNode.h"
-#include "../src/nodes/InstanceNode.h"
+#include "../src/ast/nodes.h"
+#include "../src/ast/ObjectType.h"
+#include "../src/ast/TypeclassNode.h"
+#include "../src/ast/InstanceNode.h"
 
 const TextPosition DUMMY_POS = {0, 0};
 
@@ -272,7 +272,7 @@ TEST_CASE("nodes_binop", "[binop]") {
     UNode b = NumberNode::make(NumberType::INTEGER, "9", DUMMY_POS, DUMMY_POS);
     nlohmann::json e = {{"type",  "binop"},
                         {"binop", {{"left", a->to_json()}, {"right", b->to_json()}, {"op", op_to_string(OpType::ADD)}}}};
-    BinopNode n(OpType::ADD, a, b, DUMMY_POS, DUMMY_POS);
+    ast::BinopNode n(OpType::ADD, a, b, DUMMY_POS, DUMMY_POS);
     nlohmann::json nj = n.to_json();
     REQUIRE(e == nj);
 }

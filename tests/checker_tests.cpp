@@ -1,7 +1,7 @@
 #include "catch.hpp"
 #include "../src/scanner/Scanner.h"
 #include "../src/parser/Parser.h"
-#include "../src/nodes/UnaryOpNode.h"
+#include "../src/ast/UnaryOpNode.h"
 #include "../src/semantic/GlobalProcessor.h"
 #include "../src/semantic/Checker.h"
 #include "../src/compiler/Compiler.h"
@@ -485,7 +485,7 @@ TEST_CASE("binop_error", "[checker]") {
     Error& error = *checker.error_reporter.errors.back();
     UNode left = std::make_unique<StringNode>("Hello", _POS, _POS);
     UNode right = std::make_unique<StringNode>("Bye", _POS, _POS);
-    BinopNode node(OpType::SUB, left, right, _POS, _POS);
+    ast::BinopNode node(OpType::SUB, left, right, _POS, _POS);
     ObjectType expected("Integer");
     ErrorClassNoMethodForOp exp("String", "__sub__", node);
     REQUIRE(error == exp);

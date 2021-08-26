@@ -1,7 +1,7 @@
 #include "catch.hpp"
 #include "../src/scanner/Scanner.h"
 #include "../src/parser/Parser.h"
-#include "../src/nodes/UnaryOpNode.h"
+#include "../src/ast/UnaryOpNode.h"
 #include "../src/semantic/GlobalProcessor.h"
 
 const ObjectType NO_TYPE(".None");

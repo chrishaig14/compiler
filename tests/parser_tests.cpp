@@ -1,9 +1,9 @@
 #include "catch.hpp"
 #include "../src/scanner/Scanner.h"
 #include "../src/parser/Parser.h"
-#include "../src/nodes/UnaryOpNode.h"
-#include "../src/nodes/TypeclassNode.h"
-#include "../src/nodes/InstanceNode.h"
+#include "../src/ast/UnaryOpNode.h"
+#include "../src/ast/TypeclassNode.h"
+#include "../src/ast/InstanceNode.h"
 
 const TextPosition DUMMY_POS = {0, 0};
 
@@ -69,14 +69,14 @@ TestNodeU EXPRESSION_1_U() {
     auto exp_id_1_u = EXP_ID_1_U();
     auto exp_id_2_u = EXP_ID_2_U();
     return {EXP_ID_1.text + "+" + EXP_ID_2.text,
-            BinopNode::make(OpType::ADD, exp_id_1_u.node, exp_id_2_u.node, DUMMY_POS, DUMMY_POS)};
+            ast::BinopNode::make(OpType::ADD, exp_id_1_u.node, exp_id_2_u.node, DUMMY_POS, DUMMY_POS)};
 }
 
 TestNodeU EXPRESSION_2_U() {
     auto exp_id_2_u = EXP_ID_2_U();
     auto exp_id_1_u = EXP_ID_1_U();
     return {exp_id_2_u.text + "*" + exp_id_1_u.text,
-            BinopNode::make(OpType::MUL, exp_id_2_u.node, exp_id_1_u.node, DUMMY_POS, DUMMY_POS)};
+            ast::BinopNode::make(OpType::MUL, exp_id_2_u.node, exp_id_1_u.node, DUMMY_POS, DUMMY_POS)};
 }
 
 // const TestNode ASSIGNMENT{EXP_ID_1.text + " = " + EXPRESSION_1_U.text,
