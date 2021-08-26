@@ -122,8 +122,8 @@ SNode* Checker::make_union_rvalue(SNode* value_snode, const TypeNode* unaliased_
     }
 }
 
-USemanticInfo Checker::visit_declaration(DeclarationNode& n) {
-    // Logger::info("Checking DeclarationNode for var: " + n.identifier);
+USemanticInfo Checker::visit_declaration(ast::DeclarationNode& n) {
+    // Logger::info("Checking ast::DeclarationNode for var: " + n.identifier);
     if (this->scope->declared(n.identifier)) {
         this->error_reporter.error(ErrorRedeclared(n.identifier, n));
     }
@@ -137,7 +137,7 @@ USemanticInfo Checker::visit_declaration(DeclarationNode& n) {
     return info_u;
 }
 
-USemanticInfo Checker::check_declaration_with_type(DeclarationNode& n) {
+USemanticInfo Checker::check_declaration_with_type(ast::DeclarationNode& n) {
     if (n.type->kind == Kind::OBJECT && this->module.aliased_types.count(n.type->object().id) == 1) {
         TypeNode* aliased_type = this->module.aliased_types.at(n.type->object().id);
         n.type = aliased_type;
@@ -157,7 +157,7 @@ USemanticInfo Checker::check_declaration_with_type(DeclarationNode& n) {
     return info_u;
 }
 
-USemanticInfo Checker::check_declaration_without_type(DeclarationNode& n) {
+USemanticInfo Checker::check_declaration_without_type(ast::DeclarationNode& n) {
     USemanticInfo exp_info_p = this->dispatch(*n.expression);
     if (exp_info_p->is_error()) {
         return error_stub();

@@ -11,13 +11,13 @@
 
 class ErrorRedeclared : public Error {
 public:
-    ErrorRedeclared(std::string name, const DeclarationNode& node);
+    ErrorRedeclared(std::string name, const ast::DeclarationNode& node);
     Error* clone() const override;
     bool equal(const Error& other) const override;
     std::string to_str() const override;
 
     std::string name;
-    const DeclarationNode& node;
+    const ast::DeclarationNode& node;
 };
 
 

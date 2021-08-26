@@ -44,7 +44,7 @@ public:
     // void generic_call_mismatch(const TypeNode& expected, const TypeNode& actual, int i);
     //
     // void call_bad_num_args();
-    // void redeclared(const std::string& name, const DeclarationNode& node);
+    // void redeclared(const std::string& name, const ast::DeclarationNode& node);
     // void tuple_assign(TextPosition pos);
     // void unused_return_value(TextPosition pos);
     // void variable_not_declared(const std::string& name, TextPosition pos);

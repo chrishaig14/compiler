@@ -43,7 +43,7 @@ public:
 
     UNode parse_common_statement();
     UNode parse_assignment_or_expression();
-    std::unique_ptr<DeclarationNode> parse_variable_declaration();
+    std::unique_ptr<ast::DeclarationNode> parse_variable_declaration();
     std::unique_ptr<IfNode> parse_if();
     std::unique_ptr<WhileNode> parse_while_loop();
     std::unique_ptr<ForNode> parse_for_loop();

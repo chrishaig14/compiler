@@ -11,7 +11,7 @@
 #include "TypeNode.h"
 #include "../utils.h"
 
-class DeclarationNode : public Node {
+class ast::DeclarationNode : public Node {
 public:
     std::string identifier;
     TypeNode* type;

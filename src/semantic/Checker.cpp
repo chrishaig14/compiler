@@ -344,7 +344,7 @@ USemanticInfo Checker::dispatch_any(Node& n, bool is_rvalue) {
         case NodeType::CNTINUE:
             return this->visit_continue((ContinueNode&) n);
         case NodeType::DECL:
-            return this->visit_declaration((DeclarationNode&) n);
+            return this->visit_declaration((ast::DeclarationNode&) n);
         case NodeType::EMPTYLST:
             return this->visit_emptylist((EmptyListNode&) n);
         case NodeType::FORLOOP:

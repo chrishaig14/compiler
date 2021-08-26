@@ -20,6 +20,6 @@ std::string ErrorRedeclared::to_str() const {
     return "error: redeclared " + this->name;
 }
 
-ErrorRedeclared::ErrorRedeclared(std::string name, const DeclarationNode& node) : name(name), node(node) {
+ErrorRedeclared::ErrorRedeclared(std::string name, const ast::DeclarationNode& node) : name(name), node(node) {
 
 }

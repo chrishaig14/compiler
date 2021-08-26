@@ -55,13 +55,13 @@ TestNodeU FACTOR_U() {
 
 
 // const TestNode DECLARATION{"var " + ID + " = " + EXPRESSION.text,
-//                            new DeclarationNode(ID, nullptr, EXPRESSION.node, DUMMY_POS, DUMMY_POS, DUMMY_POS)};
+//                            new ast::DeclarationNode(ID, nullptr, EXPRESSION.node, DUMMY_POS, DUMMY_POS, DUMMY_POS)};
 //
 
 TestNodeU DECLARATION_U() {
     auto EXPRESSION = EXPRESSION_U();
     return {"var " + ID + " = " + EXPRESSION.text,
-            std::make_unique<DeclarationNode>(ID, nullptr, EXPRESSION.node, DUMMY_POS, DUMMY_POS, DUMMY_POS)};
+            std::make_unique<ast::DeclarationNode>(ID, nullptr, EXPRESSION.node, DUMMY_POS, DUMMY_POS, DUMMY_POS)};
 }
 
 
@@ -174,7 +174,7 @@ TEST_CASE("parse_decl_simple", "[parser]") {
     Parser parser("test", scanner.code_lines, tokens);
     parser.top_package_name = "main";
 
-    std::unique_ptr<DeclarationNode> ast = parser.parse_variable_declaration();
+    std::unique_ptr<ast::DeclarationNode> ast = parser.parse_variable_declaration();
 
     REQUIRE(ast->to_json() == DECLARATION.node->to_json());
 }
@@ -188,7 +188,7 @@ TEST_CASE("parse_decl_with_type", "[parser]") {
     Parser parser("test", scanner.code_lines, tokens);
     parser.top_package_name = "main";
 
-    std::unique_ptr<DeclarationNode> ast = parser.parse_variable_declaration();
+    std::unique_ptr<ast::DeclarationNode> ast = parser.parse_variable_declaration();
 
     REQUIRE(ast->identifier == ID);
     REQUIRE(ast->type->to_json() == TYPE.node->to_json());

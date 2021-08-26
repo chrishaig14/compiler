@@ -179,7 +179,7 @@ void ErrorReporter::assignment(const TypeNode& expected, const TypeNode& actual,
 //     this->fail(msg, pos);
 // }
 //
-// void ErrorReporter::redeclared(const std::string& name, const DeclarationNode& node) {
+// void ErrorReporter::redeclared(const std::string& name, const ast::DeclarationNode& node) {
 //     std::string pre_msg = E_FMT("Variable ") + E_HLT(name) + E_FMT(" already declared ");
 //     this->fail_ok(pre_msg, highlight_one(node), node.start);
 // }

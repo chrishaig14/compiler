@@ -3,7 +3,7 @@
 //
 
 #include "DeclarationNode.h"
-
+using namespace ast;
 DeclarationNode::DeclarationNode(const std::string& identifier, TypeNode* type, UNode& expression,
                                  TextPosition start, TextPosition eq_pos, TextPosition end) : Node(NodeType::DECL,
                                                                                                    start,

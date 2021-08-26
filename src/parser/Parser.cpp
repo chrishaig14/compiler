@@ -528,7 +528,7 @@ UNode Parser::parse_call_or_subscript_chain(UNode& parent) {
     return node;
 }
 
-std::unique_ptr<DeclarationNode> Parser::parse_variable_declaration() {
+std::unique_ptr<ast::DeclarationNode> Parser::parse_variable_declaration() {
     Token var_token = this->expect_token(TokType::VAR);
     Token identifier = this->expect_token(TokType::ID);
     TypeNode* type = nullptr;
@@ -538,7 +538,7 @@ std::unique_ptr<DeclarationNode> Parser::parse_variable_declaration() {
     }
     Token eq_tok = this->expect_token(TokType::EQQ);
     auto expression = this->parse_expression();
-    return std::make_unique<DeclarationNode>(identifier.str,
+    return std::make_unique<ast::DeclarationNode>(identifier.str,
                                              type,
                                              expression,
                                              var_token.start,
@@ -552,7 +552,7 @@ UNode Parser::parse_common_statement() {
             return this->parse_if();
         }
         case TokType::VAR: {
-            std::unique_ptr<DeclarationNode> node = this->parse_variable_declaration();
+            std::unique_ptr<ast::DeclarationNode> node = this->parse_variable_declaration();
             this->expect_token(TokType::SEMICOLON);
             return node;
         }

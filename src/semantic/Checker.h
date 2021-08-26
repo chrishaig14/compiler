@@ -119,9 +119,9 @@ public:
 
     USemanticInfo visit_lvalue_subscript(SubscriptNode& node);
 
-    USemanticInfo visit_declaration(DeclarationNode& n);
-    USemanticInfo check_declaration_with_type(DeclarationNode& n);
-    USemanticInfo check_declaration_without_type(DeclarationNode& n);
+    USemanticInfo visit_declaration(ast::DeclarationNode& n);
+    USemanticInfo check_declaration_with_type(ast::DeclarationNode& n);
+    USemanticInfo check_declaration_without_type(ast::DeclarationNode& n);
 
     USemanticInfo visit_dict(DictNode& node);
     USemanticInfo visit_emptydict(EmptyDictNode& node);

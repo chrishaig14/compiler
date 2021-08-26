@@ -111,7 +111,7 @@ TEST_CASE("nodes_declaration_no_type", "[declaration]") {
     UNode r = NumberNode::make(NumberType::INTEGER, "7", DUMMY_POS, DUMMY_POS);
     nlohmann::json e = {{"type",        "declaration"},
                         {"declaration", {{"identifier", "foo"}, {"type", {}}, {"expression", r->to_json()}}}};
-    DeclarationNode n("foo", nullptr, r, DUMMY_POS, DUMMY_POS, DUMMY_POS);
+    ast::DeclarationNode n("foo", nullptr, r, DUMMY_POS, DUMMY_POS, DUMMY_POS);
     nlohmann::json nj = n.to_json();
     REQUIRE(e == nj);
 }
@@ -121,7 +121,7 @@ TEST_CASE("nodes_declaration_with_type", "[declaration]") {
     ObjectType* t = new ObjectType("Integer");
     nlohmann::json e = {{"type",        "declaration"},
                         {"declaration", {{"identifier", "foo"}, {"type", t->to_json()}, {"expression", r->to_json()}}}};
-    DeclarationNode n("foo", t, r, DUMMY_POS, DUMMY_POS, DUMMY_POS);
+    ast::DeclarationNode n("foo", t, r, DUMMY_POS, DUMMY_POS, DUMMY_POS);
     nlohmann::json nj = n.to_json();
     REQUIRE(e == nj);
 }
@@ -131,7 +131,7 @@ TEST_CASE("nodes_if_no_else", "[if]") {
     ObjectType* t = new ObjectType("Integer");
     nlohmann::json e = {{"type",        "declaration"},
                         {"declaration", {{"identifier", "foo"}, {"type", t->to_json()}, {"expression", r->to_json()}}}};
-    DeclarationNode n("foo", t, r, DUMMY_POS, DUMMY_POS, DUMMY_POS);
+    ast::DeclarationNode n("foo", t, r, DUMMY_POS, DUMMY_POS, DUMMY_POS);
     nlohmann::json nj = n.to_json();
     REQUIRE(e == nj);
 }
@@ -139,7 +139,7 @@ TEST_CASE("nodes_if_no_else", "[if]") {
 TEST_CASE("nodes_if_with_else", "[if]") {
     UNode c = IdNode::make("foo", DUMMY_POS, DUMMY_POS);
     UNode n1 = NumberNode::make(NumberType::INTEGER, "7", DUMMY_POS, DUMMY_POS);
-    std::unique_ptr<DeclarationNode> d = std::make_unique<DeclarationNode>("foo",
+    std::unique_ptr<ast::DeclarationNode> d = std::make_unique<ast::DeclarationNode>("foo",
                                                                            nullptr,
                                                                            n1,
                                                                            DUMMY_POS,
@@ -150,7 +150,7 @@ TEST_CASE("nodes_if_with_else", "[if]") {
     std::unique_ptr<BlockNode> t = BlockNode::make(std::move(vector), DUMMY_POS, DUMMY_POS);
     VectorOfNodesU v;
     UNode n2 = NumberNode::make(NumberType::INTEGER, "9", DUMMY_POS, DUMMY_POS);
-    v.push_back(std::make_unique<DeclarationNode>("bar", nullptr, n2, DUMMY_POS, DUMMY_POS, DUMMY_POS));
+    v.push_back(std::make_unique<ast::DeclarationNode>("bar", nullptr, n2, DUMMY_POS, DUMMY_POS, DUMMY_POS));
     std::unique_ptr<BlockNode> l = BlockNode::make(std::move(v), DUMMY_POS, DUMMY_POS);
     nlohmann::json e = {{"type", "if"}};
     e["if"]["condition"] = c->to_json();
@@ -166,19 +166,19 @@ TEST_CASE("nodes_if_with_elif", "[if]") {
     UNode c = IdNode::make("foo", DUMMY_POS, DUMMY_POS);
     VectorOfNodesU v;
     UNode n1 = NumberNode::make(NumberType::INTEGER, "7", DUMMY_POS, DUMMY_POS);
-    v.push_back(std::make_unique<DeclarationNode>("foo", nullptr, n1, DUMMY_POS, DUMMY_POS, DUMMY_POS));
+    v.push_back(std::make_unique<ast::DeclarationNode>("foo", nullptr, n1, DUMMY_POS, DUMMY_POS, DUMMY_POS));
     std::unique_ptr<BlockNode> t = BlockNode::make(std::move(v), DUMMY_POS, DUMMY_POS);
     VectorOfNodesU v2;
     UNode n2 = NumberNode::make(NumberType::INTEGER, "9", DUMMY_POS, DUMMY_POS);
-    v2.push_back(std::make_unique<DeclarationNode>("bar", nullptr, n2, DUMMY_POS, DUMMY_POS, DUMMY_POS));
+    v2.push_back(std::make_unique<ast::DeclarationNode>("bar", nullptr, n2, DUMMY_POS, DUMMY_POS, DUMMY_POS));
     std::unique_ptr<BlockNode> l = BlockNode::make(std::move(v2), DUMMY_POS, DUMMY_POS);
     VectorOfNodesU v3;
     UNode n3 = NumberNode::make(NumberType::INTEGER, "9", DUMMY_POS, DUMMY_POS);
-    v3.push_back(std::make_unique<DeclarationNode>("bar", nullptr, n3, DUMMY_POS, DUMMY_POS, DUMMY_POS));
+    v3.push_back(std::make_unique<ast::DeclarationNode>("bar", nullptr, n3, DUMMY_POS, DUMMY_POS, DUMMY_POS));
     BlockNode* elif_body_0 = new BlockNode(std::move(v3), DUMMY_POS, DUMMY_POS);
     VectorOfNodesU v4;
     UNode n4 = NumberNode::make(NumberType::INTEGER, "7", DUMMY_POS, DUMMY_POS);
-    v4.push_back(std::make_unique<DeclarationNode>("foo", nullptr, n4, DUMMY_POS, DUMMY_POS, DUMMY_POS));
+    v4.push_back(std::make_unique<ast::DeclarationNode>("foo", nullptr, n4, DUMMY_POS, DUMMY_POS, DUMMY_POS));
     BlockNode* elif_body_1 = new BlockNode(std::move(v4), DUMMY_POS, DUMMY_POS);
 
     IdNode* elif_cond_0 = new IdNode("a", DUMMY_POS, DUMMY_POS);
