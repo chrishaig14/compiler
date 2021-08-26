@@ -7,7 +7,7 @@
 
 
 #include "Error.h"
-#include "../../nodes/MemberNode.h"
+#include "../../ast/MemberNode.h"
 
 class ErrorNoMember : public Error {
     const MemberNode& m;

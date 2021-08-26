@@ -4,17 +4,17 @@
 
 #include "Parser.h"
 #include "../semantic/GlobalProcessor.h"
-#include "../nodes/PartialApplication.h"
-#include "../nodes/UnaryOpNode.h"
+#include "../ast/PartialApplication.h"
+#include "../ast/UnaryOpNode.h"
 #include "../logging/logging.h"
-#include "../nodes/DefaultConstructorNode.h"
-#include "../nodes/AliasNode.h"
-#include "../nodes/TryCatchNode.h"
+#include "../ast/DefaultConstructorNode.h"
+#include "../ast/AliasNode.h"
+#include "../ast/TryCatchNode.h"
 #include <fmt/core.h>
 #include <fmt/color.h>
 #include <exception>
 #include <set>
-#include "../nodes/ObjectType.h"
+#include "../ast/ObjectType.h"
 
 std::unordered_map<TokType, OpType> TOKEN_TO_OP = {{TokType::PLUS,  OpType::ADD},
                                                    {TokType::MINUS, OpType::SUB},
@@ -171,7 +171,7 @@ UNode Parser::parse_assignment_or_expression() {
                 } else if (op == TokType::MINUS_EQQ) {
                     opt = OpType::SUB;
                 }
-                auto bnode = BinopNode::make(opt, id_node, rvalue, id_node->start, rvalue->end);
+                auto bnode = ast::BinopNode::make(opt, id_node, rvalue, id_node->start, rvalue->end);
                 bnode->op_pos = op_pos;
                 rvalue = std::move(bnode);
             }
@@ -247,7 +247,7 @@ UNode Parser::parse_add_or_sub_expression() {
         Token op_token = this->token;
         this->next();
         auto right = this->parse_mul_div_or_mod_expression();
-        auto node = BinopNode::make(op, left, right, left->start, right->end);
+        auto node = ast::BinopNode::make(op, left, right, left->start, right->end);
         node->op_pos = op_token.start;
         left = std::move(node);
     }
@@ -262,7 +262,7 @@ UNode Parser::parse_mul_div_or_mod_expression() {
         Token op_token = this->token;
         this->next();
         auto right = this->parse_factor();
-        auto node = BinopNode::make(op, left, right, left->start, right->end);
+        auto node = ast::BinopNode::make(op, left, right, left->start, right->end);
         node->op_pos = op_token.start;
         left = std::move(node);
     }

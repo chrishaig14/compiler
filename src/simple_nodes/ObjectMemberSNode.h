@@ -8,8 +8,8 @@
 
 #include <string>
 #include "SNode.h"
-#include "../nodes/TypeNode.h"
-#include "../nodes/Path.h"
+#include "../ast/TypeNode.h"
+#include "../ast/Path.h"
 
 class ObjectMemberSNode : public SNode {
 public:

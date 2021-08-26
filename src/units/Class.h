@@ -10,7 +10,7 @@
 #include <string>
 #include <vector>
 #include <map>
-#include "../nodes/TypeNode.h"
+#include "../ast/TypeNode.h"
 #include "../macros.h"
 #include "Entity.h"
 #include "ConstFunction.h"

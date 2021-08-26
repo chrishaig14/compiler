@@ -11,9 +11,9 @@
 #include "Node.h"
 #include "../utils.h"
 #include "optypes.h"
+#include "ast.h"
 
-
-class BinopNode : public Node {
+class ast::BinopNode : public Node {
 public:
     UNode left;
     UNode right;

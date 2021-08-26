@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -g -O0 -Wall -pedantic -Werror")
 
 add_subdirectory(scanner)
-add_subdirectory(nodes)
+add_subdirectory(ast)
 add_subdirectory(parser)
 add_subdirectory(units)
 add_subdirectory(simple_nodes)

@@ -6,7 +6,7 @@
 #include "GlobalProcessor.h"
 #include "../scanner/Scanner.h"
 #include "../parser/Parser.h"
-#include "../nodes/ObjectType.h"
+#include "../ast/ObjectType.h"
 
 void GlobalProcessor::visit_import(ImportNode& node) {
     const Path& node_path = Path(node.path);

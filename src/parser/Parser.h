@@ -4,17 +4,17 @@
 
 #include <vector>
 #include "../scanner/Token.h"
-#include "../nodes/nodes.h"
+#include "../ast/nodes.h"
 #include "../utils.h"
 #include <iostream>
-#include "../nodes/ImportNode.h"
+#include "../ast/ImportNode.h"
 #include "../scanner/CodeLines.h"
-#include "../nodes/EnumNode.h"
-#include "../nodes/TryCatchNode.h"
-#include "../nodes/ObjectType.h"
-#include "../nodes/TypeclassNode.h"
-#include "../nodes/InstanceNode.h"
-#include "../nodes/AliasNode.h"
+#include "../ast/EnumNode.h"
+#include "../ast/TryCatchNode.h"
+#include "../ast/ObjectType.h"
+#include "../ast/TypeclassNode.h"
+#include "../ast/InstanceNode.h"
+#include "../ast/AliasNode.h"
 
 extern std::unordered_map<TokType, OpType> TOKEN_TO_OP;
 

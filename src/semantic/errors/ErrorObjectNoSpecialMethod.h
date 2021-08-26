@@ -7,7 +7,7 @@
 
 
 #include "Error.h"
-#include "../../nodes/SubscriptNode.h"
+#include "../../ast/SubscriptNode.h"
 
 class ErrorObjectNoSpecialMethod : public Error {
 public:

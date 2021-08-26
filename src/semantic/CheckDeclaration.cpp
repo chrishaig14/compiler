@@ -3,7 +3,7 @@
 //
 
 #include "CheckDeclaration.h"
-#include "../nodes/ObjectType.h"
+#include "../ast/ObjectType.h"
 #include "errors/ErrorTypeMismatch.h"
 #include "errors/ErrorRedeclared.h"
 #include "errors/ErrorExpectedExpression.h"

@@ -9,6 +9,8 @@
 #include <unordered_map>
 #include <memory>
 
+#include "ast/ast.h"
+
 class TypeNode;
 
 class Node;
@@ -17,7 +19,7 @@ class BlockNode;
 
 class NumberNode;
 
-class BinopNode;
+// class BinopNode;
 
 class Instruction;
 
@@ -27,7 +29,7 @@ class FunctionNode;
 
 typedef std::unique_ptr<TypeNode> UTypeNode;
 typedef std::unique_ptr<FunctionNode> UFunctionNode;
-typedef std::unique_ptr<BinopNode> UBinopNode;
+typedef std::unique_ptr<ast::BinopNode> UBinopNode;
 typedef std::unique_ptr<IdNode> UIdNode;
 typedef std::unique_ptr<BlockNode> UBlockNode;
 typedef std::unique_ptr<NumberNode> UNumberNode;

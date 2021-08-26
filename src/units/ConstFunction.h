@@ -5,10 +5,10 @@
 #define CONST_FUNCTION_H
 
 #include "Entity.h"
-#include "../nodes/TypeNode.h"
-#include "../nodes/Path.h"
-#include "../nodes/FunctionType.h"
-#include "../nodes/FunctionNode.h"
+#include "../ast/TypeNode.h"
+#include "../ast/Path.h"
+#include "../ast/FunctionType.h"
+#include "../ast/FunctionNode.h"
 
 class ConstFunction {
 public:

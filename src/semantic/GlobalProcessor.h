@@ -8,10 +8,10 @@
 
 #include <unordered_map>
 #include "SymbolTable.h"
-#include "../nodes/ImportNode.h"
-#include "../nodes/ClassNode.h"
-#include "../nodes/AliasNode.h"
-#include "../nodes/EnumNode.h"
+#include "../ast/ImportNode.h"
+#include "../ast/ClassNode.h"
+#include "../ast/AliasNode.h"
+#include "../ast/EnumNode.h"
 #include "../units/Enum.h"
 
 class GlobalProcessor {

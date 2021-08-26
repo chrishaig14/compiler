@@ -8,7 +8,7 @@
 #include <unordered_map>
 #include "GlobalProcessor.h"
 #include "../utils.h"
-#include "../nodes/nodes.h"
+#include "../ast/nodes.h"
 #include <set>
 #include "../scanner/CodeLines.h"
 #include <iostream>
@@ -18,7 +18,7 @@
 #include "../simple_nodes/BlockSNode.h"
 #include "../units/ObjectValue.h"
 #include "../units/FunctionValue.h"
-#include "../nodes/EnumNode.h"
+#include "../ast/EnumNode.h"
 #include "../simple_nodes/EnumSNode.h"
 #include "errors/ErrorReporter.h"
 #include "util.h"
@@ -45,9 +45,9 @@
 #include "../simple_nodes/ObjectMemberSNode.h"
 #include "../simple_nodes/MatchSNode.h"
 #include "CheckerUtils.h"
-#include "../nodes/UnaryOpNode.h"
-#include "../nodes/TryCatchNode.h"
-#include "../nodes/ObjectType.h"
+#include "../ast/UnaryOpNode.h"
+#include "../ast/TryCatchNode.h"
+#include "../ast/ObjectType.h"
 
 #define T_NONE ObjectType(".None")
 
@@ -107,7 +107,7 @@ public:
     USemanticInfo dispatch_rvalue(Node& nod);
 
     USemanticInfo visit_assignment(AssignmentNode& n);
-    USemanticInfo visit_binop(BinopNode& node);
+    USemanticInfo visit_binop(ast::BinopNode& node);
     USemanticInfo visit_block(BlockNode& node);
     USemanticInfo visit_root(BlockNode& node);
     USemanticInfo visit_boolean(BooleanNode& node);

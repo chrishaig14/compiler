@@ -7,7 +7,7 @@
 
 
 #include "Entity.h"
-#include "../nodes/TypeNode.h"
+#include "../ast/TypeNode.h"
 
 
 

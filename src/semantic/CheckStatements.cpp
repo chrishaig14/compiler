@@ -4,7 +4,7 @@
 
 #include "CheckStatements.h"
 
-#include "../nodes/ObjectType.h"
+#include "../ast/ObjectType.h"
 #include "../simple_nodes/ThrowSNode.h"
 #include "../simple_nodes/TryCatchSNode.h"
 #include "errors/ErrorTypeMismatch.h"

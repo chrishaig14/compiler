@@ -5,7 +5,7 @@
 #ifndef XLANG_UTIL_H
 #define XLANG_UTIL_H
 
-#include "../nodes/TypeNode.h"
+#include "../ast/TypeNode.h"
 
 UTypeNode parse_type(const std::string& s);
 

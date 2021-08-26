@@ -7,7 +7,7 @@
 
 
 #include "Error.h"
-#include "../../nodes/IdNode.h"
+#include "../../ast/IdNode.h"
 
 class ErrorNotDeclared : public Error {
     const IdNode& idn;

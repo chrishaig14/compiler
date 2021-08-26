@@ -5,9 +5,9 @@
 #ifndef XLANG_ERRORTYPEMISMATCH_H
 #define XLANG_ERRORTYPEMISMATCH_H
 
-#include "../../nodes/TypeNode.h"
+#include "../../ast/TypeNode.h"
 #include "../../units/Entity.h"
-#include "../../nodes/Node.h"
+#include "../../ast/Node.h"
 #include "Error.h"
 
 class ErrorTypeMismatch : public Error {

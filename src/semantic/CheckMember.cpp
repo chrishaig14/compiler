@@ -4,7 +4,7 @@
 
 #include <cassert>
 #include "CheckMember.h"
-#include "../nodes/ObjectType.h"
+#include "../ast/ObjectType.h"
 #include "errors/ErrorNoMember.h"
 #include "errors/ErrorNoMemberSuggestions.h"
 #include "errors/ErrorClassNoMember.h"

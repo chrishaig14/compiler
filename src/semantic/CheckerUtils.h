@@ -8,7 +8,7 @@
 #include "../units/Entity.h"
 #include "../units/FunctionValue.h"
 #include "../units/ObjectValue.h"
-#include "../nodes/FunctionNode.h"
+#include "../ast/FunctionNode.h"
 #include "../simple_nodes/SNode.h"
 #include "../simple_nodes/FunctionSNode.h"
 #include "../simple_nodes/NewObjectSNode.h"
@@ -17,9 +17,9 @@
 #include "../simple_nodes/IfSNode.h"
 #include "../simple_nodes/CallSNode.h"
 #include "../simple_nodes/ReturnSNode.h"
-#include "../nodes/nodes.h"
+#include "../ast/nodes.h"
 #include "SemanticInfo.h"
-#include "../nodes/ObjectType.h"
+#include "../ast/ObjectType.h"
 //
 // Created by chris on 2/5/21.
 //

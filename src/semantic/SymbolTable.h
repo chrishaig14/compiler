@@ -8,7 +8,7 @@
 #include <string>
 #include <vector>
 #include <unordered_map>
-#include "../nodes/TypeNode.h"
+#include "../ast/TypeNode.h"
 #include "../utils.h"
 #include "SemanticInfo.h"
 

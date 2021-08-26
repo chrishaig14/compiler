@@ -7,7 +7,7 @@
 
 #include <string>
 #include <vector>
-#include "../nodes/TypeNode.h"
+#include "../ast/TypeNode.h"
 #include "../units/Class.h"
 #include "../simple_nodes/SNode.h"
 #include "../units/Module.h"

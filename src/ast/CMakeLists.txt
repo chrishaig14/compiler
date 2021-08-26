@@ -95,6 +95,6 @@ add_library(
         UnaryOpNode.cpp
         UnaryOpNode.h
         WhileNode.cpp
-        WhileNode.h ObjectType.cpp ObjectType.h FunctionType.cpp FunctionType.h Path.cpp Path.h)
+        WhileNode.h ObjectType.cpp ObjectType.h FunctionType.cpp FunctionType.h Path.cpp Path.h ast.h)
 
 target_precompile_headers(nodes PUBLIC ../json/json.hpp)

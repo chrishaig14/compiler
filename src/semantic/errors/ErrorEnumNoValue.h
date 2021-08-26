@@ -7,7 +7,7 @@
 
 
 #include "Error.h"
-#include "../../nodes/MemberNode.h"
+#include "../../ast/MemberNode.h"
 
 class ErrorEnumNoValue : public Error {
 public:

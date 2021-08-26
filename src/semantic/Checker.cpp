@@ -5,7 +5,7 @@
 #include "../macros.h"
 #include "../logging/logging.h"
 #include "util.h"
-#include "../nodes/TryCatchNode.h"
+#include "../ast/TryCatchNode.h"
 
 bool function_is_generic(const FunctionType& ft) {
     for (auto* param_type: ft.param_types) {
@@ -326,7 +326,7 @@ USemanticInfo Checker::dispatch_any(Node& n, bool is_rvalue) {
         case NodeType::ENUM:
             return this->visit_enum((EnumNode&) n);
         case NodeType::BINOP: {
-            auto r = this->visit_binop((BinopNode&) n);
+            auto r = this->visit_binop((ast::BinopNode&) n);
             return r;
         }
         case NodeType::BOOLOP:
