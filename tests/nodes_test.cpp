@@ -31,7 +31,7 @@ TEST_CASE("nodes_number_double", "[number]") {
 }
 
 TEST_CASE("nodes_string", "[string]") {
-    StringNode n("hello", DUMMY_POS, DUMMY_POS);
+    ast::String n("hello", DUMMY_POS, DUMMY_POS);
     nlohmann::json nj = n.to_json();
     nlohmann::json e = {{"type",   "string"},
                         {"string", {{"str", "hello"}}}};
@@ -157,7 +157,7 @@ TEST_CASE("nodes_if_with_else", "[if]") {
     e["if"]["then"] = t->to_json();
     e["if"]["elifs"] = nlohmann::json::array();
     e["if"]["else"] = l->to_json();
-    IfNode n(c, t, {}, l, DUMMY_POS, DUMMY_POS);
+    ast::If n(c, t, {}, l, DUMMY_POS, DUMMY_POS);
     nlohmann::json nj = n.to_json();
     REQUIRE(e == nj);
 }
@@ -191,7 +191,7 @@ TEST_CASE("nodes_if_with_elif", "[if]") {
     e["if"]["then"] = t->to_json();
     e["if"]["else"] = l->to_json();
 
-    IfNode n(c,
+    ast::If n(c,
              t,
              {{elif_cond_0, elif_body_0},
               {elif_cond_1, elif_body_1}},
@@ -209,7 +209,7 @@ TEST_CASE("nodes_for", "[for]") {
     UNode exp = ast::Id::make("bar", DUMMY_POS, DUMMY_POS);
     nlohmann::json e = {{"type", "for"},
                         {"for",  {{"var", "foo"}, {"exp", exp->to_json()}, {"body", b->to_json()}}}};
-    ForNode n("foo", exp, b, DUMMY_POS, DUMMY_POS);
+    ast::For n("foo", exp, b, DUMMY_POS, DUMMY_POS);
     nlohmann::json nj = n.to_json();
     REQUIRE(e == nj);
 }
@@ -237,7 +237,7 @@ TEST_CASE("nodes_continue", "[continue]") {
 
 TEST_CASE("nodes_return_no_value", "[return]") {
     UNode ptr;
-    ast::ReturnNode n(ptr, DUMMY_POS, DUMMY_POS);
+    ast::Return n(ptr, DUMMY_POS, DUMMY_POS);
     nlohmann::json nj = n.to_json();
     nlohmann::json e = {{"type",   "return"},
                         {"return", {{"expression", {}}}}};
@@ -248,7 +248,7 @@ TEST_CASE("nodes_return_with_value", "[return]") {
     UNode exp = ast::Id::make("foo", DUMMY_POS, DUMMY_POS);
     nlohmann::json e = {{"type",   "return"},
                         {"return", {{"expression", exp->to_json()}}}};
-    ast::ReturnNode n(exp, DUMMY_POS, DUMMY_POS);
+    ast::Return n(exp, DUMMY_POS, DUMMY_POS);
     nlohmann::json nj = n.to_json();
 
     REQUIRE(e == nj);
@@ -297,9 +297,9 @@ TEST_CASE("nodes_empty_dict", "[empty_dict]") {
 }
 
 TEST_CASE("nodes_dict", "[dict]") {
-    UNode k1 = std::make_unique<StringNode>("foo", DUMMY_POS, DUMMY_POS);
+    UNode k1 = std::make_unique<ast::String>("foo", DUMMY_POS, DUMMY_POS);
     UNode v1 = NumberNode::make(NumberType::INTEGER, "9", DUMMY_POS, DUMMY_POS);
-    UNode k2 = std::make_unique<StringNode>("bar", DUMMY_POS, DUMMY_POS);
+    UNode k2 = std::make_unique<ast::String>("bar", DUMMY_POS, DUMMY_POS);
     UNode v2 = NumberNode::make(NumberType::INTEGER, "11", DUMMY_POS, DUMMY_POS);
     nlohmann::json e = {{"type", "dict"},
                         {"dict", {{"items", {{{"key", k1->to_json()}, {"value", v1->to_json()}}, {{"key", k2->to_json()}, {"value", v2->to_json()}}}}}}};

@@ -11,14 +11,14 @@
 #include "TypeNode.h"
 #include "ast.h"
 
-class ast::ReturnNode : public Node {
+class ast::Return : public Node {
 public:
-    explicit ReturnNode(UNode& expression, TextPosition start, TextPosition end);
+    explicit Return(UNode& expression, TextPosition start, TextPosition end);
 
 
     bool equal(const Node& other) const override;
 
-    ~ReturnNode();
+    ~Return();
     nlohmann::json to_json() const override;
 
     UNode expression;

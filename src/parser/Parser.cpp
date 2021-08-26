@@ -62,7 +62,7 @@ std::unique_ptr<ast::Block> Parser::parse_program() {
     return ast::Block::make(std::move(program), start, end);
 }
 
-std::unique_ptr<ast::ReturnNode> Parser::parse_return() {
+std::unique_ptr<ast::Return> Parser::parse_return() {
     Token ret_tok = this->expect_token(TokType::RETURN);
     UNode expression = nullptr;
     TextPosition end = ret_tok.end_pos;
@@ -70,10 +70,10 @@ std::unique_ptr<ast::ReturnNode> Parser::parse_return() {
         expression = this->parse_expression();
         end = expression->end;
     }
-    return std::make_unique<ast::ReturnNode>(expression, ret_tok.start, end);
+    return std::make_unique<ast::Return>(expression, ret_tok.start, end);
 }
 
-std::unique_ptr<IfNode> Parser::parse_if() {
+std::unique_ptr<ast::If> Parser::parse_if() {
     Token if_tok = this->expect_token(TokType::IF);
     auto condition = this->parse_expression();
     auto body = this->parse_possibly_empty_block();
@@ -89,7 +89,7 @@ std::unique_ptr<IfNode> Parser::parse_if() {
         this->next();
         _else = this->parse_possibly_empty_block();
     }
-    auto iff = std::make_unique<IfNode>(condition, body, elifs, _else, if_tok.start, if_tok.end_pos);
+    auto iff = std::make_unique<ast::If>(condition, body, elifs, _else, if_tok.start, if_tok.end_pos);
     iff->start = if_tok.start;
     return iff;
 }
@@ -401,7 +401,7 @@ UNode Parser::parse_id_or_literal() {
             break;
         }
         case TokType::STRING: {
-            node = std::make_unique<StringNode>(this->token.str, this->token.start, this->token.end_pos);
+            node = std::make_unique<ast::String>(this->token.str, this->token.start, this->token.end_pos);
             node->end = this->token.end_pos;
             this->next();
             break;
@@ -557,7 +557,7 @@ UNode Parser::parse_common_statement() {
             return node;
         }
         case TokType::RETURN: {
-            std::unique_ptr<ast::ReturnNode> node = this->parse_return();
+            std::unique_ptr<ast::Return> node = this->parse_return();
             this->expect_token(TokType::SEMICOLON);
             return node;
         }
@@ -801,7 +801,7 @@ UNode Parser::parse_top_level_statement() {
 }
 
 
-std::unique_ptr<ForNode> Parser::parse_for_loop() {
+std::unique_ptr<ast::For> Parser::parse_for_loop() {
     Token for_tok = this->expect_token(TokType::FOR);
     bool expect_paren = false;
     if (this->match(TokType::LPAREN)) {
@@ -818,7 +818,7 @@ std::unique_ptr<ForNode> Parser::parse_for_loop() {
     this->inside_loop = true;
     auto body = this->parse_possibly_empty_block();
     this->inside_loop = prev;
-    auto forloop = std::make_unique<ForNode>(var.str, exp, body, for_tok.start, body->end);
+    auto forloop = std::make_unique<ast::For>(var.str, exp, body, for_tok.start, body->end);
     forloop->start = for_tok.start;
     return forloop;
 }

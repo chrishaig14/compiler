@@ -2,19 +2,19 @@
 // Created by chris on 1/8/20.
 //
 
-#include "ReturnNode.h"
+#include "Return.h"
 
 using namespace ast;
 
-ReturnNode::ReturnNode(UNode& expression, TextPosition start, TextPosition end) : Node(NodeType::RETRN, start, end),
+Return::Return(UNode& expression, TextPosition start, TextPosition end) : Node(NodeType::RETRN, start, end),
                                                                                   expression(std::move(expression)) {
 }
 
-bool ReturnNode::equal(const Node& x) const {
-    return *((ReturnNode&) x).expression == *this->expression;
+bool Return::equal(const Node& x) const {
+    return *((Return&) x).expression == *this->expression;
 }
 
-ReturnNode::~ReturnNode() {
+Return::~Return() {
     // for (auto r: this->reachables) {
     //     delete r.second;
     // }
@@ -23,7 +23,7 @@ ReturnNode::~ReturnNode() {
     // }
 }
 
-nlohmann::json ReturnNode::to_json() const {
+nlohmann::json Return::to_json() const {
     nlohmann::json j;
     j["type"] = "return";
     j["return"] = {{"expression", this->expression != nullptr ? this->expression->to_json() : nlohmann::json()}};

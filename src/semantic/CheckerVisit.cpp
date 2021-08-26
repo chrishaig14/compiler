@@ -7,7 +7,7 @@
 #include "errors/ErrorUnusedReturnValue.h"
 
 
-SNode* make_for_snode(ForNode& node, USemanticInfo& binfo, USemanticInfo& exp_info_p, std::string loop_list_var_id,
+SNode* make_for_snode(ast::For& node, USemanticInfo& binfo, USemanticInfo& exp_info_p, std::string loop_list_var_id,
                       std::string loop_index_var_id, std::string loop_list_len_var_id, SNode* update_loop_index_snode) {
     auto* bbn = new BlockSNode();
 

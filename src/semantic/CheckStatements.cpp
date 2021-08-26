@@ -157,7 +157,7 @@ USemanticInfo Checker::visit_assignment(ast::Assignment& n) {
     return info_u;
 }
 
-USemanticInfo Checker::visit_return(ast::ReturnNode& n) {
+USemanticInfo Checker::visit_return(ast::Return& n) {
     Entity& return_entity = this->scope->get("__return__");
     if (return_entity.type == E_TYPE::NOTHING) {
         if (n.expression != nullptr) {
@@ -287,7 +287,7 @@ USemanticInfo Checker::visit_continue(ContinueNode& node) {
     return info_u;
 }
 
-USemanticInfo Checker::visit_for(ForNode& node) {
+USemanticInfo Checker::visit_for(ast::For& node) {
     USemanticInfo exp_info_p = this->dispatch_rvalue(*node.exp);
     if (exp_info_p->entity.get().type != E_TYPE::VALUE) {
         this->error_reporter.error(ErrorFor(exp_info_p->entity, node.exp->start));
@@ -386,7 +386,7 @@ USemanticInfo Checker::visit_while(ast::While& node) {
     return info_u;
 }
 
-USemanticInfo Checker::visit_if(IfNode& n) {
+USemanticInfo Checker::visit_if(ast::If& n) {
     USemanticInfo condition_sinfo = this->expect_rvalue_of_type(T_BOOL, *n.condition);
     if (condition_sinfo->is_error()) {
         return error_stub();

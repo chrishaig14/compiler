@@ -28,7 +28,13 @@ namespace ast {
 
     class Boolean;
 
-    class ReturnNode;
+    class Return;
+
+    class String;
+
+    class If;
+
+    class For;
 }
 
 #endif //XLANG_AST_H

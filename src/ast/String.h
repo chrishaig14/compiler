@@ -8,11 +8,12 @@
 
 #include <string>
 #include "Node.h"
+#include "ast.h"
 
-class StringNode : public Node {
+class ast::String : public Node {
 public:
     std::string str;
-    StringNode(const std::string& str, TextPosition start, TextPosition end);
+    String(const std::string& str, TextPosition start, TextPosition end);
 
     bool equal(const Node& x) const override;
 

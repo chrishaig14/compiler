@@ -78,7 +78,7 @@ USemanticInfo Checker::visit_emptylist(EmptyListNode& node) {
     return info_u;
 }
 
-USemanticInfo Checker::visit_string(StringNode& node) {
+USemanticInfo Checker::visit_string(ast::String& node) {
     USemanticInfo info_u = std::make_unique<SemanticInfo>(); SemanticInfo& info = *info_u;
     info.is_constant = true;
     auto* sn = new StringSNode(node.str);

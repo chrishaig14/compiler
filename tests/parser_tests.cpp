@@ -102,7 +102,7 @@ TestNodeU IF_U() {
     auto EXPRESSION = EXPRESSION_U();
     auto EMPTY_BLOCK = EMPTY_BLOCK_U();
     std::unique_ptr<ast::Block> u(nullptr);
-    return {"if(" + EXPRESSION.text + ")" + EMPTY_BLOCK.text, std::make_unique<IfNode>(EXPRESSION.node,
+    return {"if(" + EXPRESSION.text + ")" + EMPTY_BLOCK.text, std::make_unique<ast::If>(EXPRESSION.node,
                                                                                        (std::unique_ptr<ast::Block>&) EMPTY_BLOCK.node,
                                                                                        std::vector<std::pair<Node*, ast::Block*>>{},
                                                                                        u,
@@ -204,7 +204,7 @@ TEST_CASE("parse_if", "[parser]") {
     Parser parser("test", scanner.code_lines, tokens);
     parser.top_package_name = "main";
 
-    std::unique_ptr<IfNode> ast = parser.parse_if();
+    std::unique_ptr<ast::If> ast = parser.parse_if();
     REQUIRE(ast->to_json() == IF.node->to_json());
 }
 
@@ -219,8 +219,8 @@ TEST_CASE("parse_if_with_else", "[parser]") {
     Parser parser("test", scanner.code_lines, tokens);
     parser.top_package_name = "main";
 
-    std::unique_ptr<IfNode> ast = parser.parse_if();
-    REQUIRE(ast->to_json() == IfNode(EXPRESSION.node,
+    std::unique_ptr<ast::If> ast = parser.parse_if();
+    REQUIRE(ast->to_json() == ast::If(EXPRESSION.node,
                                      (std::unique_ptr<ast::Block>&) block.node,
                                      {},
                                      (std::unique_ptr<ast::Block>&) block_1.node,
@@ -288,9 +288,9 @@ TEST_CASE("parse_for", "[parser]") {
     Parser parser("test", scanner.code_lines, tokens);
     parser.top_package_name = "main";
 
-    std::unique_ptr<ForNode> ast = parser.parse_for_loop();
+    std::unique_ptr<ast::For> ast = parser.parse_for_loop();
     REQUIRE(ast->to_json() ==
-            ForNode(ID, EXPRESSION_1.node, (std::unique_ptr<ast::Block>&) BLOCK.node, DUMMY_POS, DUMMY_POS).to_json());
+            ast::For(ID, EXPRESSION_1.node, (std::unique_ptr<ast::Block>&) BLOCK.node, DUMMY_POS, DUMMY_POS).to_json());
 }
 
 
@@ -473,9 +473,9 @@ TEST_CASE("parse_return_nothing", "[parser]") {
     Parser parser("test", scanner.code_lines, tokens);
     parser.top_package_name = "main";
 
-    std::unique_ptr<ast::ReturnNode> ast = parser.parse_return();
+    std::unique_ptr<ast::Return> ast = parser.parse_return();
     UNode ptr;
-    REQUIRE(ast->to_json() == ast::ReturnNode(ptr, DUMMY_POS, DUMMY_POS).to_json());
+    REQUIRE(ast->to_json() == ast::Return(ptr, DUMMY_POS, DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_return_expression", "[parser]") {
@@ -487,9 +487,9 @@ TEST_CASE("parse_return_expression", "[parser]") {
     Parser parser("test", scanner.code_lines, tokens);
     parser.top_package_name = "main";
 
-    std::unique_ptr<ast::ReturnNode> ast = parser.parse_return();
+    std::unique_ptr<ast::Return> ast = parser.parse_return();
 
-    REQUIRE(ast->to_json() == ast::ReturnNode(EXPRESSION.node, DUMMY_POS, DUMMY_POS).to_json());
+    REQUIRE(ast->to_json() == ast::Return(EXPRESSION.node, DUMMY_POS, DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_list_empty", "[parser]") {
@@ -574,7 +574,7 @@ TEST_CASE("parse_empty_string", "[parser]") {
 
     UNode ast = parser.parse_id_or_literal();
 
-    REQUIRE(ast->to_json() == StringNode("", DUMMY_POS, DUMMY_POS).to_json());
+    REQUIRE(ast->to_json() == ast::String("", DUMMY_POS, DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_string", "[parser]") {
@@ -587,7 +587,7 @@ TEST_CASE("parse_string", "[parser]") {
 
     UNode ast = parser.parse_id_or_literal();
 
-    REQUIRE(ast->to_json() == StringNode("hello, world", DUMMY_POS, DUMMY_POS).to_json());
+    REQUIRE(ast->to_json() == ast::String("hello, world", DUMMY_POS, DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_none", "[parser]") {

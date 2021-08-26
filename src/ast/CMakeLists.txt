@@ -41,14 +41,14 @@ add_library(
         EmptyListNode.h
         EnumNode.cpp
         EnumNode.h
-        ForNode.cpp
-        ForNode.h
+        For.cpp
+        For.h
         Function.cpp
         Function.h
         Id.cpp
         Id.h
-        IfNode.cpp
-        IfNode.h
+        If.cpp
+        If.h
         ImportNode.cpp
         ImportNode.h
         InstanceNode.cpp
@@ -72,10 +72,10 @@ add_library(
         optypes.h
         PartialApplication.cpp
         PartialApplication.h
-        ReturnNode.cpp
-        ReturnNode.h
-        StringNode.cpp
-        StringNode.h
+        Return.cpp
+        Return.h
+        String.cpp
+        String.h
         SubscriptNode.cpp
         SubscriptNode.h
         TernaryNode.cpp

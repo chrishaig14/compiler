@@ -348,7 +348,7 @@ USemanticInfo Checker::dispatch_any(Node& n, bool is_rvalue) {
         case NodeType::EMPTYLST:
             return this->visit_emptylist((EmptyListNode&) n);
         case NodeType::FORLOOP:
-            return this->visit_for((ForNode&) n);
+            return this->visit_for((ast::For&) n);
         case NodeType::FUNC:
             return this->visit_function((ast::Function&) n);
         case NodeType::ID:
@@ -356,7 +356,7 @@ USemanticInfo Checker::dispatch_any(Node& n, bool is_rvalue) {
         case NodeType::CAST:
             return this->visit_cast((CastNode&) n);
         case NodeType::IFF:
-            return this->visit_if((IfNode&) n);
+            return this->visit_if((ast::If&) n);
         case NodeType::LST:
             return this->visit_list((ListNode&) n);
         case NodeType::MEMBER:
@@ -369,11 +369,11 @@ USemanticInfo Checker::dispatch_any(Node& n, bool is_rvalue) {
             return nullptr;
             // return this->visit_throw((ThrowNode&) n);
         case NodeType::RETRN:
-            return this->visit_return((ast::ReturnNode&) n);
+            return this->visit_return((ast::Return&) n);
         case NodeType::TRY_CATCH:
             return this->visit_try_catch((TryCatchNode&) n);
         case NodeType::STRNG:
-            return this->visit_string((StringNode&) n);
+            return this->visit_string((ast::String&) n);
         case NodeType::SUB:
             return this->visit_subscript((SubscriptNode&) n);
         case NodeType::TERNARY:

@@ -3,10 +3,12 @@
 //
 
 #include <cassert>
-#include "IfNode.h"
+#include "If.h"
 
-bool IfNode::equal(const Node& x) const {
-    const auto& other = (IfNode&) x;
+using namespace ast;
+
+bool If::equal(const Node& x) const {
+    const auto& other = (If&) x;
     if (*this->condition != *other.condition) {
         return false;
     }
@@ -31,15 +33,19 @@ bool IfNode::equal(const Node& x) const {
 
 }
 
-IfNode::IfNode(UNode& condition, std::unique_ptr<ast::Block>& then,
-               std::vector<std::pair<Node*, ast::Block*>> elifs, std::unique_ptr<ast::Block>& selse, TextPosition start,
-               TextPosition end) : Node(NodeType::IFF, start, end), condition(std::move(condition)),
-                                   then(std::move(then)), selse(std::move(selse)), elifs(elifs) {
+If::If(UNode& condition, std::unique_ptr<ast::Block>& then, std::vector<std::pair<Node*, ast::Block*>> elifs,
+               std::unique_ptr<ast::Block>& selse, TextPosition start, TextPosition end) : Node(NodeType::IFF,
+                                                                                                start,
+                                                                                                end),
+                                                                                           condition(std::move(condition)),
+                                                                                           then(std::move(then)),
+                                                                                           selse(std::move(selse)),
+                                                                                           elifs(elifs) {
     // assert(condition != nullptr);
     // assert(then != nullptr);
 }
 
-IfNode::~IfNode() {
+If::~If() {
     // delete this->condition;
     // delete this->then;
     //
@@ -51,7 +57,7 @@ IfNode::~IfNode() {
     // }
 }
 
-nlohmann::json IfNode::to_json() const {
+nlohmann::json If::to_json() const {
     std::vector<nlohmann::json> elifs;
     for (auto e: this->elifs) {
         elifs.push_back({{"condition", e.first->to_json()},

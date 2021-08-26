@@ -66,7 +66,7 @@ Flirpin map_unit_to_flirpin(Unit u);
 TextPosition add_one_col(TextPosition t);
 bool function_is_generic(const FunctionType& ft);
 
-SNode* make_for_snode(ForNode& node, USemanticInfo& binfo, USemanticInfo& exp_info_p, std::string loop_list_var_id,
+SNode* make_for_snode(ast::For& node, USemanticInfo& binfo, USemanticInfo& exp_info_p, std::string loop_list_var_id,
                       std::string loop_index_var_id, std::string loop_list_len_var_id, SNode* update_loop_index_snode);
 
 class Checker {
@@ -127,18 +127,18 @@ public:
     USemanticInfo visit_emptydict(EmptyDictNode& node);
     USemanticInfo visit_emptylist(EmptyListNode& node);
     USemanticInfo visit_unary(UnaryOpNode& n);
-    USemanticInfo visit_for(ForNode& node);
+    USemanticInfo visit_for(ast::For& node);
     USemanticInfo visit_function(ast::Function& n);
     USemanticInfo visit_id(ast::Id& n);
-    USemanticInfo visit_if(IfNode& n);
+    USemanticInfo visit_if(ast::If& n);
     USemanticInfo visit_list(ListNode& node);
     USemanticInfo visit_member(ast::Member& n);
     USemanticInfo visit_none(NoneNode& node);
     USemanticInfo visit_import(ImportNode& node);
     USemanticInfo visit_number(NumberNode& node);
     USemanticInfo visit_partial(PartialApplication& node);
-    USemanticInfo visit_return(ast::ReturnNode& n);
-    USemanticInfo visit_string(StringNode& node);
+    USemanticInfo visit_return(ast::Return& n);
+    USemanticInfo visit_string(ast::String& node);
     USemanticInfo visit_subscript(SubscriptNode& node);
     USemanticInfo visit_ternary(TernaryNode& node);
     USemanticInfo visit_tuple(TupleNode& node);

@@ -44,10 +44,10 @@ public:
     UNode parse_common_statement();
     UNode parse_assignment_or_expression();
     std::unique_ptr<ast::Declaration> parse_variable_declaration();
-    std::unique_ptr<IfNode> parse_if();
+    std::unique_ptr<ast::If> parse_if();
     std::unique_ptr<ast::While> parse_while_loop();
-    std::unique_ptr<ForNode> parse_for_loop();
-    std::unique_ptr<ast::ReturnNode> parse_return();
+    std::unique_ptr<ast::For> parse_for_loop();
+    std::unique_ptr<ast::Return> parse_return();
     UNode parse_ternary();
     std::unique_ptr<MatchExpressionNode> parse_match_statement();
     // std::unique_ptr<ThrowNode> parse_throw();
