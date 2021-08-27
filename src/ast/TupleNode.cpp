@@ -3,8 +3,8 @@
 //
 
 #include "TupleNode.h"
-
-bool TupleNode::equal(const Node& n) const {
+using namespace ast;
+bool TupleNode::equal(const ast::Node& n) const {
     auto& other = (TupleNode&)n;
     if (this->values.size() != other.values.size()) {
         return false;

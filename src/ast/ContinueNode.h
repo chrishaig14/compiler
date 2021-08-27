@@ -7,12 +7,12 @@
 
 
 #include "Node.h"
+#include "ast.h"
 
-
-class ContinueNode : public Node {
+class ast::ContinueNode : public ast::Node {
 public:
     ContinueNode(TextPosition start, TextPosition end);
-    bool equal(const Node& other) const override;
+    bool equal(const ast::Node& other) const override;
     nlohmann::json to_json() const override;
 };
 

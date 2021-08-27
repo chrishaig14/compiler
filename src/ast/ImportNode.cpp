@@ -3,8 +3,8 @@
 //
 
 #include "ImportNode.h"
-
-bool ImportNode::equal(const Node& other) const {
+using namespace ast;
+bool ImportNode::equal(const ast::Node& other) const {
     return false;
 }
 

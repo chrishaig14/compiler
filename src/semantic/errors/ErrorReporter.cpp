@@ -120,8 +120,8 @@ void init_styles() {
 //     this->fail(msg, pos);
 // }
 
-void ErrorReporter::assignment(const TypeNode& expected, const TypeNode& actual, TextPosition pos, const Node& lvalue,
-                               const Node& rvalue) {
+void ErrorReporter::assignment(const TypeNode& expected, const TypeNode& actual, TextPosition pos, const ast::Node& lvalue,
+                               const ast::Node& rvalue) {
     std::string pre_msg;
     pre_msg = E_FMT("Expected ") + E_HLT(expected.to_string()) + E_FMT("(alias for ") +
               E_HLT(expected.actual_to_string()) + E_FMT(")") + E_FMT(", got ") + E_HLT(actual.to_string()) +

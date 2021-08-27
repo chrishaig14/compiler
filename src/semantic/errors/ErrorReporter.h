@@ -26,8 +26,8 @@ public:
     ErrorReporter();
     std::vector<std::unique_ptr<Error>> errors;
     CodeLines code_lines;
-    void assignment(const TypeNode& expected, const TypeNode& actual, TextPosition pos, const Node& lvalue,
-                    const Node& rvalue);
+    void assignment(const TypeNode& expected, const TypeNode& actual, TextPosition pos, const ast::Node& lvalue,
+                    const ast::Node& rvalue);
     // void bad_return(TextPosition pos);
     // void binop(const TypeNode& left, const TypeNode& right, TextPosition position);
     // void bool_op(const TypeNode& left, const TypeNode& right, TextPosition position);
@@ -91,12 +91,12 @@ public:
     //                       TextPosition member_start, TextPosition member_end);
     // void class_no_member(const TypeNode& t, const std::string& member, TextPosition pos, Node& obj,
     //                      TextPosition member_start, TextPosition member_end);
-    void module_no_member(const TypeNode& t, const std::string& member, TextPosition pos, Node& obj,
+    void module_no_member(const TypeNode& t, const std::string& member, TextPosition pos, ast::Node& obj,
                           TextPosition member_start, TextPosition member_end);
     void object_no_member(const TypeNode& t, const ast::Member& obj);
-    void module_no_member(std::string mod_name, const std::string& member, TextPosition pos, Node& obj,
+    void module_no_member(std::string mod_name, const std::string& member, TextPosition pos, ast::Node& obj,
                           TextPosition member_start, TextPosition member_end);
-    void package_no_member(std::string pack_name, const std::string& member, TextPosition pos, Node& obj,
+    void package_no_member(std::string pack_name, const std::string& member, TextPosition pos, ast::Node& obj,
                            TextPosition member_start, TextPosition member_end);
     void error(const Error& error);
 
@@ -109,7 +109,7 @@ public:
     //                  TextPosition member_end);
     // void cant_assign(const Node& n);
     void
-    package_no_member(Package* pack, const std::string& member, TextPosition pos, Node& obj, TextPosition member_start,
+    package_no_member(Package* pack, const std::string& member, TextPosition pos, ast::Node& obj, TextPosition member_start,
                       TextPosition member_end);
     // void object_no_special_method(const TypeNode& type, const char* method_name, const SubscriptNode& node);
 };

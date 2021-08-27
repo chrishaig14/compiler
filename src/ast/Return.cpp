@@ -6,11 +6,11 @@
 
 using namespace ast;
 
-Return::Return(UNode& expression, TextPosition start, TextPosition end) : Node(NodeType::RETRN, start, end),
+Return::Return(UNode& expression, TextPosition start, TextPosition end) : ast::Node(NodeType::RETRN, start, end),
                                                                                   expression(std::move(expression)) {
 }
 
-bool Return::equal(const Node& x) const {
+bool Return::equal(const ast::Node& x) const {
     return *((Return&) x).expression == *this->expression;
 }
 

@@ -9,14 +9,14 @@
 #include <vector>
 #include "Node.h"
 #include "../types.h"
-
-class ListNode : public Node {
+#include "ast.h"
+class ast::ListNode : public ast::Node {
 public:
     VectorOfNodesU elements;
 
     ListNode(VectorOfNodesU& elements, TextPosition start, TextPosition end);
 
-    bool equal(const Node& other) const override;
+    bool equal(const ast::Node& other) const override;
 
     ~ListNode() override;
     nlohmann::json to_json() const override;

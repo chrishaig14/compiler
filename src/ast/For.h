@@ -11,12 +11,12 @@
 #include "../utils.h"
 #include "ast.h"
 
-class ast::For : public Node {
+class ast::For : public ast::Node {
 public:
     std::string var;
     UNode exp;
     std::unique_ptr<ast::Block> body;
-    bool equal(const Node& other) const override;
+    bool equal(const ast::Node& other) const override;
     For(const std::string& var, UNode& exp, std::unique_ptr<ast::Block>& body, TextPosition start, TextPosition end);
     ~For() override;
 

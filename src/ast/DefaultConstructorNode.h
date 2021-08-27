@@ -7,16 +7,16 @@
 
 
 #include "Node.h"
-
-class DefaultConstructorNode : public Node {
+#include "ast.h"
+class ast::DefaultConstructorNode : public ast::Node {
 public:
-    DefaultConstructorNode(Node* class_node, TextPosition start, TextPosition end) : Node(NodeType::DEF_CONST,
+    DefaultConstructorNode(Node* class_node, TextPosition start, TextPosition end) : ast::Node(NodeType::DEF_CONST,
                                                                                           start,
                                                                                           end) {
         this->class_node = class_node;
     }
 
-    bool equal(const Node& other) const override {
+    bool equal(const ast::Node& other) const override {
         return false;
     }
 

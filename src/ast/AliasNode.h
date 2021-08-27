@@ -8,11 +8,11 @@
 
 #include "Node.h"
 #include "TypeNode.h"
-
-class AliasNode : public Node {
+#include "ast.h"
+class ast::AliasNode : public ast::Node {
 public:
     AliasNode(std::string alias_id, TypeNode* aliased_type, TextPosition start, TextPosition end);
-    bool equal(const Node& other) const override;
+    bool equal(const ast::Node& other) const override;
     nlohmann::json to_json() const override;
 
     std::string alias_id;

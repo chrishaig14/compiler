@@ -5,7 +5,6 @@
 #include "../macros.h"
 #include "../logging/logging.h"
 #include "util.h"
-#include "../ast/TryCatchNode.h"
 
 bool function_is_generic(const FunctionType& ft) {
     for (auto* param_type: ft.param_types) {
@@ -311,42 +310,42 @@ bool Checker::is_variable(const ObjectType& a) {
     return a.type_params.empty() && (islower(a.id[0]) != 0);
 }
 
-USemanticInfo Checker::dispatch_rvalue(Node& nod) {
+USemanticInfo Checker::dispatch_rvalue(ast::Node& nod) {
     return this->dispatch_any(nod, true);
 }
 
-USemanticInfo Checker::dispatch(Node& nod) {
+USemanticInfo Checker::dispatch(ast::Node& nod) {
     return this->dispatch_any(nod, false);
 }
 
-USemanticInfo Checker::dispatch_any(Node& n, bool is_rvalue) {
+USemanticInfo Checker::dispatch_any(ast::Node& n, bool is_rvalue) {
     switch (n.ntype) {
         case NodeType::ASSIGN:
             return this->visit_assignment((ast::Assignment&) n);
         case NodeType::ENUM:
-            return this->visit_enum((EnumNode&) n);
+            return this->visit_enum((ast::EnumNode&) n);
         case NodeType::BINOP: {
             auto r = this->visit_binop((ast::Binop&) n);
             return r;
         }
         case NodeType::BOOLOP:
-            return this->visit_boolop((BoolOpNode&) n);
+            return this->visit_boolop((ast::BoolOpNode&) n);
         case NodeType::BLOCK:
             return this->visit_block((ast::Block&) n);
         case NodeType::BOOLEAN:
             return this->visit_boolean((ast::Boolean&) n);
         case NodeType::BRK:
-            return this->visit_break((BreakNode&) n);
+            return this->visit_break((ast::BreakNode&) n);
         case NodeType::CALL:
             return this->visit_call((ast::Call&) n, is_rvalue);
         case NodeType::CLS:
             return this->visit_class((ast::Klass&) n);
         case NodeType::CNTINUE:
-            return this->visit_continue((ContinueNode&) n);
+            return this->visit_continue((ast::ContinueNode&) n);
         case NodeType::DECL:
             return this->visit_declaration((ast::Declaration&) n);
         case NodeType::EMPTYLST:
-            return this->visit_emptylist((EmptyListNode&) n);
+            return this->visit_emptylist((ast::EmptyListNode&) n);
         case NodeType::FORLOOP:
             return this->visit_for((ast::For&) n);
         case NodeType::FUNC:
@@ -354,50 +353,48 @@ USemanticInfo Checker::dispatch_any(Node& n, bool is_rvalue) {
         case NodeType::ID:
             return this->visit_id((ast::Id&) n);
         case NodeType::CAST:
-            return this->visit_cast((CastNode&) n);
+            return this->visit_cast((ast::CastNode&) n);
         case NodeType::IFF:
             return this->visit_if((ast::If&) n);
         case NodeType::LST:
-            return this->visit_list((ListNode&) n);
+            return this->visit_list((ast::ListNode&) n);
         case NodeType::MEMBER:
             return this->visit_member((ast::Member&) n);
         case NodeType::NONE:
-            return this->visit_none((NoneNode&) n);
+            return this->visit_none((ast::NoneNode&) n);
         case NodeType::NUMBER:
-            return this->visit_number((NumberNode&) n);
+            return this->visit_number((ast::NumberNode&) n);
         case NodeType::THROW:
             return nullptr;
             // return this->visit_throw((ThrowNode&) n);
         case NodeType::RETRN:
             return this->visit_return((ast::Return&) n);
-        case NodeType::TRY_CATCH:
-            return this->visit_try_catch((TryCatchNode&) n);
         case NodeType::STRNG:
             return this->visit_string((ast::String&) n);
         case NodeType::SUB:
-            return this->visit_subscript((SubscriptNode&) n);
+            return this->visit_subscript((ast::SubscriptNode&) n);
         case NodeType::TERNARY:
-            return this->visit_ternary((TernaryNode&) n);
+            return this->visit_ternary((ast::TernaryNode&) n);
         case NodeType::TUPLE:
-            return this->visit_tuple((TupleNode&) n);
+            return this->visit_tuple((ast::TupleNode&) n);
         case NodeType::UNARY:
-            return this->visit_unary((UnaryOpNode&) n);
+            return this->visit_unary((ast::UnaryOpNode&) n);
         case NodeType::WHIL:
             return this->visit_while((ast::While&) n);
         case NodeType::PARTIAL:
-            return this->visit_partial((PartialApplication&) n);
+            return this->visit_partial((ast::PartialApplication&) n);
         case NodeType::DICT:
-            return this->visit_dict((DictNode&) n);
+            return this->visit_dict((ast::DictNode&) n);
         case NodeType::EMPTYDICT:
-            return this->visit_emptydict((EmptyDictNode&) n);
+            return this->visit_emptydict((ast::EmptyDictNode&) n);
         case NodeType::DEF_CONST:
-            return this->visit_defconst((DefaultConstructorNode&) n);
+            return this->visit_defconst((ast::DefaultConstructorNode&) n);
         case NodeType::IMPORT:
-            return this->visit_import((ImportNode&) n);
+            return this->visit_import((ast::ImportNode&) n);
         case NodeType::ALIAS:
-            return this->visit_alias((AliasNode&) n);
+            return this->visit_alias((ast::AliasNode&) n);
         case NodeType::MATCH_EXP:
-            return this->visit_match((MatchExpressionNode&) n);
+            return this->visit_match((ast::MatchExpressionNode&) n);
         default:
             this->error_reporter.fail("Don't know what to do!");
     }

@@ -6,7 +6,7 @@
 
 using namespace ast;
 
-Boolean::Boolean(bool value, TextPosition start, TextPosition end) : Node(NodeType::BOOLEAN, start, end),
+Boolean::Boolean(bool value, TextPosition start, TextPosition end) : ast::Node(NodeType::BOOLEAN, start, end),
                                                                              value(value) {
 }
 
@@ -14,7 +14,7 @@ bool Boolean::operator!=(const Boolean& other) const {
     return !(*this == other);
 }
 
-bool Boolean::equal(const Node& x) const {
+bool Boolean::equal(const ast::Node& x) const {
     auto& other = (Boolean&) x;
     return this->value == other.value;
 }

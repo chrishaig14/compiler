@@ -3,13 +3,13 @@
 //
 
 #include "SubscriptNode.h"
-
+using namespace ast;
 SubscriptNode::SubscriptNode(UNode& parent, VectorOfNodesU& child, TextPosition start, TextPosition end)
-        : Node(NodeType::SUB, start, end), parent(std::move(parent)), child(std::move(child)) {
+        : ast::Node(NodeType::SUB, start, end), parent(std::move(parent)), child(std::move(child)) {
 }
 
 
-bool SubscriptNode::equal(const Node& x) const {
+bool SubscriptNode::equal(const ast::Node& x) const {
     auto& other = (SubscriptNode&) x;
     if (this->child.size() != other.child.size()) {
         return false;

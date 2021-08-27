@@ -45,7 +45,7 @@ USemanticInfo Checker::visit_id(ast::Id& n) {
     return info_u;
 }
 
-USemanticInfo Checker::visit_cast(CastNode& n) {
+USemanticInfo Checker::visit_cast(ast::CastNode& n) {
     // USemanticInfo exp_info = this->dispatch_rvalue(*n.exp);
     // ObjectType cast_type(n.as_type, {});
     // const TypeNode& exp_type = *exp_info->entity.value->type;
@@ -65,7 +65,7 @@ USemanticInfo Checker::visit_cast(CastNode& n) {
     return info_u;
 }
 
-USemanticInfo Checker::visit_boolop(BoolOpNode& n) {
+USemanticInfo Checker::visit_boolop(ast::BoolOpNode& n) {
     USemanticInfo left_info_p = this->dispatch_rvalue(*n.left);
     USemanticInfo right_info_p = this->dispatch_rvalue(*n.right);
     if (left_info_p->is_error() || right_info_p->is_error()) {
@@ -157,7 +157,7 @@ USemanticInfo Checker::visit_boolop(BoolOpNode& n) {
     return info_u;
 }
 
-USemanticInfo Checker::visit_unary(UnaryOpNode& n) {
+USemanticInfo Checker::visit_unary(ast::UnaryOpNode& n) {
     USemanticInfo exp_info = this->expect_rvalue_of_type(T_BOOL, *n.exp);
     if (exp_info->is_error()) {
         return error_stub();
@@ -262,7 +262,7 @@ void Checker::fill_value(Value& value) {
     value.clazz = cls;
 }
 
-USemanticInfo Checker::visit_subscript(SubscriptNode& node) {
+USemanticInfo Checker::visit_subscript(ast::SubscriptNode& node) {
     USemanticInfo parent_p = this->dispatch(*node.parent);
     Entity& entity_parent = parent_p->entity;
     if (entity_parent.type != E_TYPE::VALUE || ((EntityValue&) entity_parent).value->type->kind == Kind::FUNCTION) {
@@ -310,7 +310,7 @@ USemanticInfo Checker::visit_subscript(SubscriptNode& node) {
     return info_u;
 }
 
-USemanticInfo Checker::visit_ternary(TernaryNode& node) {
+USemanticInfo Checker::visit_ternary(ast::TernaryNode& node) {
     USemanticInfo expression_info_p = this->dispatch_rvalue(*node.expression);
     SemanticInfo& expression_info = *expression_info_p;
     Entity& p_entity = expression_info.entity;

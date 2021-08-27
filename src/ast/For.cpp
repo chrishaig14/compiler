@@ -8,13 +8,13 @@
 using namespace ast;
 
 For::For(const std::string& var, UNode& exp, std::unique_ptr<ast::Block>& body, TextPosition start,
-         TextPosition end) : Node(NodeType::FORLOOP, start, end), var(var), exp(std::move(exp)),
+         TextPosition end) : ast::Node(NodeType::FORLOOP, start, end), var(var), exp(std::move(exp)),
                                      body(std::move(body)) {
     // assert(exp != nullptr);
     // assert(body != nullptr);
 }
 
-bool For::equal(const Node& x) const {
+bool For::equal(const ast::Node& x) const {
     const auto& other = (For&) x;
     return this->var == other.var && *this->exp == *other.exp && *this->body == *other.body;
 }

@@ -8,15 +8,16 @@
 #include "../types.h"
 #include "Node.h"
 #include "TypeNode.h"
+#include "ast.h"
 
-class PartialApplication : public Node {
+class ast::PartialApplication : public ast::Node {
 public:
     Node* function;
     VectorOfNodes args;
     FunctionType* complete_type;
     PartialApplication(Node* function, VectorOfNodes args, TextPosition start, TextPosition end);
 
-    bool equal(const Node& other) const override;
+    bool equal(const ast::Node& other) const override;
     nlohmann::json to_json() const override;
 
 };

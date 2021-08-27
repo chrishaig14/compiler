@@ -7,12 +7,13 @@
 
 
 #include "Node.h"
+#include "ast.h"
 
 enum class NumberType {
     INTEGER, FLOAT, DOUBLE
 };
 
-class NumberNode : public Node {
+class ast::NumberNode : public ast::Node {
 public:
     std::string str;
 
@@ -22,7 +23,7 @@ public:
         return std::make_unique<NumberNode>(num_type, str, start, end);
     }
 
-    bool equal(const Node& x) const override;
+    bool equal(const ast::Node& x) const override;
 
     NumberType num_type;
 

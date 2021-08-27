@@ -17,6 +17,6 @@ std::string ErrorClassNoMember::to_str() const {
 }
 
 ErrorClassNoMember::ErrorClassNoMember(const ObjectType& type, const std::string basic_string_1, TextPosition position,
-                                       const Node& node, TextPosition position_1, TextPosition position_2) {
+                                       const ast::Node& node, TextPosition position_1, TextPosition position_2) {
 
 }

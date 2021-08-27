@@ -13,7 +13,7 @@
 #include "errors/ErrorObjectNoSpecialMethod.h"
 #include "errors/ErrorFor.h"
 
-USemanticInfo Checker::visit_lvalue_subscript(SubscriptNode& node) {
+USemanticInfo Checker::visit_lvalue_subscript(ast::SubscriptNode& node) {
     USemanticInfo parent_p = this->dispatch_rvalue(*node.parent);
     Entity& entity_parent = parent_p->entity.get();
     if (entity_parent.type != E_TYPE::VALUE || ((EntityValue&) entity_parent).value->type->kind == Kind::FUNCTION) {
@@ -74,7 +74,7 @@ USemanticInfo Checker::visit_assignment(ast::Assignment& n) {
     CallSNode* csn = nullptr;
     if (n.lvalue->ntype == NodeType::SUB) {
         // special case
-        linfo_p = this->visit_lvalue_subscript((SubscriptNode&) *n.lvalue);
+        linfo_p = this->visit_lvalue_subscript((ast::SubscriptNode&) *n.lvalue);
         csn = (CallSNode*) linfo_p->snode;
         is_subscript = true;
     } else {
@@ -211,7 +211,7 @@ USemanticInfo Checker::visit_return(ast::Return& n) {
 //     return info_u;
 // }
 
-USemanticInfo Checker::visit_match(MatchExpressionNode& node) {
+USemanticInfo Checker::visit_match(ast::MatchExpressionNode& node) {
     USemanticInfo exp_info = this->dispatch_rvalue(*node.exp);
     if (exp_info->entity.get().type != E_TYPE::VALUE ||
         ((EntityValue&) exp_info->entity).value->type->kind != Kind::OBJECT) {
@@ -271,7 +271,7 @@ USemanticInfo Checker::visit_match(MatchExpressionNode& node) {
     return info_u;
 }
 
-USemanticInfo Checker::visit_continue(ContinueNode& node) {
+USemanticInfo Checker::visit_continue(ast::ContinueNode& node) {
     auto* bn = new BlockSNode();
     if (this->update_loop_index_snode != nullptr) {
         bn->nodes.push_back(this->update_loop_index_snode);
@@ -347,7 +347,7 @@ USemanticInfo Checker::visit_for(ast::For& node) {
     return std::make_unique<SemanticInfo>(rinfo);
 }
 
-USemanticInfo Checker::visit_break(BreakNode& node) {
+USemanticInfo Checker::visit_break(ast::BreakNode& node) {
     // node.loop_vars = this->scope->get_all_in_loop();
     USemanticInfo info_u = std::make_unique<SemanticInfo>(); SemanticInfo& info = *info_u;
     BreakSNode* bn = new BreakSNode();
@@ -429,35 +429,5 @@ USemanticInfo Checker::visit_if(ast::If& n) {
 
     USemanticInfo info_u = std::make_unique<SemanticInfo>(); SemanticInfo& info = *info_u;
     info.snode = new IfSNode(condition_snode, (BlockSNode*) body_info->snode, elifs, (BlockSNode*) else_snode);
-    return info_u;
-}
-
-USemanticInfo Checker::visit_try_catch(TryCatchNode& node) {
-    // this->enter_scope("try");
-    // USemanticInfo body_info = this->visit_block(*node.body);
-    // this->leave_scope();
-    // std::vector<std::pair<std::string, std::string>> e_names_types;
-    // std::vector<SNode*> catches_bodies_snodes;
-    // for (size_t i = 0; i < node.catches.size(); i++) {
-    //     this->enter_scope("catch");
-    //     ObjectType* et = node.catches[i].second;
-    //     std::string eid = node.catches[i].first;
-    //
-    //     Node* catch_body = node.catches_bodies[i];
-    //
-    //     USemanticInfo ex_info = this->dispatch(*new IdNode(et->id, {0, 0}, {0, 0}));
-    //     Entity& ex_class_entity = *ex_info->entity;
-    //     Entity& ex_entity = *entity_from_type(*et);
-    //     ex_entity.value->type->object().actual_base_path = ex_class_entity.clazz->path;
-    //     this->fill_value(ex_entity.value);
-    //     e_names_types.push_back(std::make_pair(eid, ex_class_entity.clazz->path.as_str()));
-    //
-    //     this->scope->set(eid, ex_entity);
-    //     USemanticInfo catch_body_info = this->visit_block(*((BlockNode*) catch_body));
-    //     catches_bodies_snodes.push_back(catch_body_info->snode);
-    //     this->leave_scope();
-    // }
-    USemanticInfo info_u = std::make_unique<SemanticInfo>();
-    // info.snode = new TryCatchSNode((BlockSNode*) body_info->snode, e_names_types, catches_bodies_snodes);
     return info_u;
 }

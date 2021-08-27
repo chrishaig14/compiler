@@ -13,7 +13,7 @@
 #include "Node.h"
 #include "ast.h"
 
-class ast::If : public Node {
+class ast::If : public ast::Node {
 public:
     UNode condition;
     std::unique_ptr<ast::Block> then;
@@ -22,7 +22,7 @@ public:
     If(UNode& condition, std::unique_ptr<ast::Block>& then, std::vector<std::pair<Node*, ast::Block*>> elifs,
            std::unique_ptr<ast::Block>& selse, TextPosition start, TextPosition end);
 
-    bool equal(const Node& other) const override;
+    bool equal(const ast::Node& other) const override;
 
     nlohmann::json to_json() const override;
 

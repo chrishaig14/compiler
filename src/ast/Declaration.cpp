@@ -5,7 +5,7 @@
 #include "Declaration.h"
 using namespace ast;
 Declaration::Declaration(const std::string& identifier, TypeNode* type, UNode& expression,
-                                 TextPosition start, TextPosition eq_pos, TextPosition end) : Node(NodeType::DECL,
+                                 TextPosition start, TextPosition eq_pos, TextPosition end) : ast::Node(NodeType::DECL,
                                                                                                    start,
                                                                                                    end),
                                                                                               identifier(identifier),
@@ -15,7 +15,7 @@ Declaration::Declaration(const std::string& identifier, TypeNode* type, UNode& e
     this->eq_pos = eq_pos;
 }
 
-bool Declaration::equal(const Node& x) const {
+bool Declaration::equal(const ast::Node& x) const {
     const auto& other = (Declaration&) x;
     return this->identifier == other.identifier && *this->expression == *other.expression &&
            ((this->type != nullptr && other.type != nullptr && *this->type == *other.type) ||

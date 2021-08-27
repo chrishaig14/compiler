@@ -8,8 +8,8 @@
 #include "Node.h"
 #include "optypes.h"
 #include "TypeNode.h"
-
-class CastNode : public Node {
+#include "ast.h"
+class ast::CastNode : public ast::Node {
 public:
     Node* exp;
     std::string as_type;
@@ -17,7 +17,7 @@ public:
 
     CastNode(Node* exp, std::string as_type, TextPosition start, TextPosition end);
 
-    bool equal(const Node& x) const override;
+    bool equal(const ast::Node& x) const override;
 
     ~CastNode();
 

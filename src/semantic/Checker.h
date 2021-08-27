@@ -46,7 +46,6 @@
 #include "../simple_nodes/MatchSNode.h"
 #include "CheckerUtils.h"
 #include "../ast/UnaryOpNode.h"
-#include "../ast/TryCatchNode.h"
 #include "../ast/ObjectType.h"
 
 #define T_NONE ObjectType(".None")
@@ -99,52 +98,52 @@ public:
     std::pair<std::string, TypeNode*>* get_first_substitution(TypeNode& a, TypeNode& b, bool is_top_level_arg);
     UTypeNode substitute(const TypeNode& t, const std::string& var, const TypeNode& replacement);
     std::unique_ptr<FunctionType> unify_function_call(const FunctionType& fun, VectorOfTypes& args,
-                                      std::map<std::string, TypeNode*>& all_substitutions);
+                                                      std::map<std::string, TypeNode*>& all_substitutions);
     std::unique_ptr<SemanticInfo> match_arguments_to_generic_function(const FunctionType& ft, VectorOfTypes arg_types,
                                                                       std::map<std::string, TypeNode*>& all_substitutions);
     void fail(std::string msg);
 
-    USemanticInfo dispatch_rvalue(Node& nod);
+    USemanticInfo dispatch_rvalue(ast::Node& nod);
 
     USemanticInfo visit_assignment(ast::Assignment& n);
     USemanticInfo visit_binop(ast::Binop& node);
     USemanticInfo visit_block(ast::Block& node);
     USemanticInfo visit_root(ast::Block& node);
     USemanticInfo visit_boolean(ast::Boolean& node);
-    USemanticInfo visit_boolop(BoolOpNode& n);
-    USemanticInfo visit_break(BreakNode& node);
+    USemanticInfo visit_boolop(ast::BoolOpNode& n);
+    USemanticInfo visit_break(ast::BreakNode& node);
     USemanticInfo visit_call(ast::Call& n, bool is_rvalue);
     USemanticInfo visit_class(ast::Klass& node);
-    USemanticInfo visit_continue(ContinueNode& node);
+    USemanticInfo visit_continue(ast::ContinueNode& node);
 
-    USemanticInfo visit_lvalue_subscript(SubscriptNode& node);
+    USemanticInfo visit_lvalue_subscript(ast::SubscriptNode& node);
 
     USemanticInfo visit_declaration(ast::Declaration& n);
     USemanticInfo check_declaration_with_type(ast::Declaration& n);
     USemanticInfo check_declaration_without_type(ast::Declaration& n);
 
-    USemanticInfo visit_dict(DictNode& node);
-    USemanticInfo visit_emptydict(EmptyDictNode& node);
-    USemanticInfo visit_emptylist(EmptyListNode& node);
-    USemanticInfo visit_unary(UnaryOpNode& n);
+    USemanticInfo visit_dict(ast::DictNode& node);
+    USemanticInfo visit_emptydict(ast::EmptyDictNode& node);
+    USemanticInfo visit_emptylist(ast::EmptyListNode& node);
+    USemanticInfo visit_unary(ast::UnaryOpNode& n);
     USemanticInfo visit_for(ast::For& node);
     USemanticInfo visit_function(ast::Function& n);
     USemanticInfo visit_id(ast::Id& n);
     USemanticInfo visit_if(ast::If& n);
-    USemanticInfo visit_list(ListNode& node);
+    USemanticInfo visit_list(ast::ListNode& node);
     USemanticInfo visit_member(ast::Member& n);
-    USemanticInfo visit_none(NoneNode& node);
-    USemanticInfo visit_import(ImportNode& node);
-    USemanticInfo visit_number(NumberNode& node);
-    USemanticInfo visit_partial(PartialApplication& node);
+    USemanticInfo visit_none(ast::NoneNode& node);
+    USemanticInfo visit_import(ast::ImportNode& node);
+    USemanticInfo visit_number(ast::NumberNode& node);
+    USemanticInfo visit_partial(ast::PartialApplication& node);
     USemanticInfo visit_return(ast::Return& n);
     USemanticInfo visit_string(ast::String& node);
-    USemanticInfo visit_subscript(SubscriptNode& node);
-    USemanticInfo visit_ternary(TernaryNode& node);
-    USemanticInfo visit_tuple(TupleNode& node);
+    USemanticInfo visit_subscript(ast::SubscriptNode& node);
+    USemanticInfo visit_ternary(ast::TernaryNode& node);
+    USemanticInfo visit_tuple(ast::TupleNode& node);
     USemanticInfo visit_while(ast::While& node);
-    USemanticInfo visit_cast(CastNode& n);
-    USemanticInfo visit_defconst(DefaultConstructorNode& node);
+    USemanticInfo visit_cast(ast::CastNode& n);
+    USemanticInfo visit_defconst(ast::DefaultConstructorNode& node);
 
 
     USemanticInfo object_member(SNode* object_snode, Value& p_value, const std::string& child, ast::Member& n);
@@ -153,14 +152,14 @@ public:
     USemanticInfo module_member(Module& mod, const std::string& child, ast::Member& n);
 
 
-    USemanticInfo visit_match(MatchExpressionNode& node);
-    USemanticInfo visit_alias(AliasNode& p_node);
+    USemanticInfo visit_match(ast::MatchExpressionNode& node);
+    USemanticInfo visit_alias(ast::AliasNode& p_node);
     USemanticInfo enum_member(Enum* enumm, const std::string& value, ast::Member& node);
-    USemanticInfo visit_enum(EnumNode& p_node);
+    USemanticInfo visit_enum(ast::EnumNode& p_node);
     SNode* make_rvalue(const Entity& value_entity, SNode* value_snode, const TypeNode& target);
-    USemanticInfo dispatch(Node& nod);
+    USemanticInfo dispatch(ast::Node& nod);
     void fill_value(Value& value);
-    std::unique_ptr<SemanticInfo> expect_rvalue_of_type(const TypeNode& target, Node& node);
+    std::unique_ptr<SemanticInfo> expect_rvalue_of_type(const TypeNode& target, ast::Node& node);
     void process_function_arguments(SemanticInfo& retv, std::vector<Entity*>& arg_entities, CallSNode* sn, ast::Call& n,
                                     FunctionType* function_type, SemanticInfo* fun_info_p);
     bool check_arguments(ast::Call& n, CallSNode* sn, VectorOfTypes& arg_types, std::vector<Entity*>& arg_entities);
@@ -170,10 +169,9 @@ public:
                              const TypeNode* unaliased_target_type) const;
     SNode* make_option_rvalue(SNode* value_snode, const TypeNode* unaliased_value_type,
                               const TypeNode* unaliased_target_type) const;
-    // USemanticInfo visit_throw(ThrowNode& n);
-    USemanticInfo visit_try_catch(TryCatchNode& node);
+    // USemanticInfo visit_throw(ast::ThrowNode& n);
     void init();
-    USemanticInfo dispatch_any(Node& n, bool is_rvalue);
+    USemanticInfo dispatch_any(ast::Node& n, bool is_rvalue);
     EntityValue& entity_value_from_actual_base_path_no_generic(const Path& p);
 };
 

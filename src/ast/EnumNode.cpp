@@ -3,8 +3,8 @@
 //
 
 #include "EnumNode.h"
-
-EnumNode::EnumNode(std::string id, VectorOfStrings values, TextPosition start, TextPosition end) : Node(NodeType::ENUM,
+using namespace ast;
+EnumNode::EnumNode(std::string id, VectorOfStrings values, TextPosition start, TextPosition end) : ast::Node(NodeType::ENUM,
                                                                                                         start,
                                                                                                         end) {
     this->id = id;
@@ -12,7 +12,7 @@ EnumNode::EnumNode(std::string id, VectorOfStrings values, TextPosition start, T
 
 }
 
-bool EnumNode::equal(const Node& other) const {
+bool EnumNode::equal(const ast::Node& other) const {
     return false;
 }
 

@@ -7,16 +7,17 @@
 
 
 #include "Node.h"
+#include "ast.h"
 
 enum UnaryOp {
     NOT
 };
 
-class UnaryOpNode : public Node {
+class ast::UnaryOpNode : public ast::Node {
 public:
-    bool equal(const Node& other) const override;
+    bool equal(const ast::Node& other) const override;
 
-    UnaryOpNode(UnaryOp op, Node* exp, TextPosition start, TextPosition end);
+    UnaryOpNode(UnaryOp op, ast::Node* exp, TextPosition start, TextPosition end);
     nlohmann::json to_json() const override;
     Node* exp;
     UnaryOp op;

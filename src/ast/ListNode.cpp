@@ -4,12 +4,12 @@
 
 #include "ListNode.h"
 #include "../json/json.hpp"
-
-ListNode::ListNode(VectorOfNodesU& elements, TextPosition start, TextPosition end) : Node(NodeType::LST, start, end),
+using namespace ast;
+ListNode::ListNode(VectorOfNodesU& elements, TextPosition start, TextPosition end) : ast::Node(NodeType::LST, start, end),
                                                                                      elements(std::move(elements)) {
 }
 
-bool ListNode::equal(const Node& other) const {
+bool ListNode::equal(const ast::Node& other) const {
     if (this->elements.size() != ((ListNode&) other).elements.size()) {
         return false;
     }

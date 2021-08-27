@@ -8,16 +8,16 @@
 
 #include "Node.h"
 #include "TypeNode.h"
-
-class EmptyDictNode : public Node {
+#include "ast.h"
+class ast::EmptyDictNode : public ast::Node {
 public:
     EmptyDictNode(UTypeNode& key_type, UTypeNode& value_type, TextPosition start, TextPosition end)
-            : Node(NodeType::EMPTYDICT, start, end),
+            : ast::Node(NodeType::EMPTYDICT, start, end),
 
               key_type(std::move(key_type)), value_type(std::move(value_type)) {
     }
 
-    bool equal(const Node& other) const override {
+    bool equal(const ast::Node& other) const override {
         const auto& o = (EmptyDictNode&) other;
         return *o.key_type == *this->key_type && *o.value_type == *this->value_type;
     }

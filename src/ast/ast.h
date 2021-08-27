@@ -6,6 +6,52 @@
 #define XLANG_AST_H
 
 namespace ast {
+    class ContinueNode;
+
+    class BreakNode;
+
+    class DefaultConstructorNode;
+
+    class EmptyDictNode;
+
+    class EmptyListNode;
+
+    class EnumNode;
+
+    class ImportNode;
+
+    class ListNode;
+
+    class InstanceNode;
+
+    class MatchExpressionNode;
+
+    class NumberNode;
+
+    class NoneNode;
+
+    class SubscriptNode;
+
+    class TupleNode;
+
+    class UnaryOpNode;
+
+    class BoolOpNode;
+
+    class CastNode;
+
+    class TernaryNode;
+
+    class PartialApplication;
+
+    class DictNode;
+
+    class Node;
+
+    class TypeclassNode;
+
+    class AliasNode;
+
     class Binop;
 
     class Declaration;

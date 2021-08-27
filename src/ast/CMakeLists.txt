@@ -80,8 +80,6 @@ add_library(
         SubscriptNode.h
         TernaryNode.cpp
         TernaryNode.h
-        TryCatchNode.cpp
-        TryCatchNode.h
         TupleNode.cpp
         TupleNode.h
         TypeNode.cpp

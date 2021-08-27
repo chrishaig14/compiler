@@ -5,7 +5,7 @@
 #include <cassert>
 #include "While.h"
 using namespace ast;
-While::While(UNode& condition, std::unique_ptr<ast::Block>& body, TextPosition start, TextPosition end) : Node(
+While::While(UNode& condition, std::unique_ptr<ast::Block>& body, TextPosition start, TextPosition end) : ast::Node(
         NodeType::WHIL,
         start,
         end), body(std::move(body)), condition(std::move(condition)) {
@@ -13,7 +13,7 @@ While::While(UNode& condition, std::unique_ptr<ast::Block>& body, TextPosition s
     // assert(body != nullptr);
 }
 
-bool While::equal(const Node& x) const {
+bool While::equal(const ast::Node& x) const {
     const auto& other = (While&) x;
     if ((this->body == nullptr && other.body != nullptr) || (this->body != nullptr && other.body == nullptr)) {
         return false;

@@ -8,12 +8,12 @@
 
 #include "Node.h"
 #include "TypeNode.h"
-
-class EmptyListNode : public Node {
+#include "ast.h"
+class ast::EmptyListNode : public ast::Node {
 public:
     EmptyListNode(TypeNode* type, TextPosition start, TextPosition end);
 
-    bool equal(const Node& other) const override;
+    bool equal(const ast::Node& other) const override;
 
     ~EmptyListNode() override;
     nlohmann::json to_json() const override;

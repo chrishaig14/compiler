@@ -4,9 +4,10 @@
 
 #include "PartialApplication.h"
 
+using namespace ast;
 
-bool PartialApplication::equal(const Node& other) const {
-    const PartialApplication& other_p = (PartialApplication&)other;
+bool PartialApplication::equal(const ast::Node& other) const {
+    const PartialApplication& other_p = (PartialApplication&) other;
     if ((*(this->function)) != (*(other_p.function))) {
         return false;
     }
@@ -27,7 +28,7 @@ bool PartialApplication::equal(const Node& other) const {
     return true;
 }
 
-PartialApplication::PartialApplication(Node* function, VectorOfNodes args, TextPosition start, TextPosition end) : Node(
+PartialApplication::PartialApplication(Node* function, VectorOfNodes args, TextPosition start, TextPosition end) : ast::Node(
         NodeType::PARTIAL,
         start,
         end) {

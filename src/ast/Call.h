@@ -12,14 +12,14 @@
 #include "TypeNode.h"
 #include "ast.h"
 
-class ast::Call : public Node {
+class ast::Call : public ast::Node {
 public:
     UNode function;
     VectorOfNodesU arguments;
 
     Call(UNode& function, VectorOfNodesU& arguments, TextPosition start, TextPosition end);
 
-    bool equal(const Node& other) const override;
+    bool equal(const ast::Node& other) const override;
 
     ~Call();
     nlohmann::json to_json() const override;

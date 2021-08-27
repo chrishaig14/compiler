@@ -11,12 +11,12 @@
 
 class ErrorObjectNoSpecialMethod : public Error {
 public:
-    ErrorObjectNoSpecialMethod(const TypeNode& type, const std::string& method_name, const SubscriptNode& node);
+    ErrorObjectNoSpecialMethod(const TypeNode& type, const std::string& method_name, const ast::SubscriptNode& node);
     Error* clone() const override;
     bool equal(const Error& other) const override;
     std::string to_str() const override;
 
-    const SubscriptNode& node;
+    const ast::SubscriptNode& node;
     std::string method_name;
     const TypeNode& type;
 };

@@ -9,11 +9,11 @@
 #include "Node.h"
 #include "../types.h"
 
-class TupleNode : public Node {
+class ast::TupleNode : public ast::Node {
 public:
     int tuple_index;
     VectorOfNodes values;
-    bool equal(const Node& other) const override;
+    bool equal(const ast::Node& other) const override;
     TupleNode(const VectorOfNodes& values, TextPosition start, TextPosition end);
     nlohmann::json to_json() const override;
 

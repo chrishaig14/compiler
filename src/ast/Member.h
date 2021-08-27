@@ -17,7 +17,7 @@ enum class MemberType {
     NUM, STR
 };
 
-class ast::Member : public Node {
+class ast::Member : public ast::Node {
 public:
     MemberType type;
     UNode parent;
@@ -27,7 +27,7 @@ public:
     Token child_token;
     Member(UNode& parent, Token child_token);
 
-    bool equal(const Node& x) const override;
+    bool equal(const ast::Node& x) const override;
 
     ~Member() override;
     nlohmann::json to_json() const override;

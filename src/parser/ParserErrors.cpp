@@ -164,7 +164,7 @@ void Parser::error_expected_statement(TextPosition pos) {
     this->error(msg, pos);
 }
 
-std::unique_ptr<EnumNode> Parser::parse_enum_definition() {
+std::unique_ptr<ast::EnumNode> Parser::parse_enum_definition() {
     this->expect_token(TokType::ENUM);
     Token enum_id = this->expect_token(TokType::ID);
     this->expect_token(TokType::LCURLY);
@@ -181,10 +181,10 @@ std::unique_ptr<EnumNode> Parser::parse_enum_definition() {
         this->next();
     }
     Token rcurly_tk = this->expect_token(TokType::RCURLY);
-    return std::make_unique<EnumNode>(enum_id.str, values, enum_id.start, rcurly_tk.end_pos);
+    return std::make_unique<ast::EnumNode>(enum_id.str, values, enum_id.start, rcurly_tk.end_pos);
 }
 
-std::unique_ptr<InstanceNode> Parser::parse_instance() {
+std::unique_ptr<ast::InstanceNode> Parser::parse_instance() {
     Token instance_tok = this->expect_token(TokType::INSTANCE);
     Token id_tok = this->expect_token(TokType::ID);
     this->expect_token(TokType::LSQUARE);
@@ -205,5 +205,5 @@ std::unique_ptr<InstanceNode> Parser::parse_instance() {
         }
     }
     Token f_curly = this->expect_token(TokType::RCURLY);
-    return std::make_unique<InstanceNode>(id_tok.str, ot, methods, instance_tok.start, f_curly.end_pos);
+    return std::make_unique<ast::InstanceNode>(id_tok.str, ot, methods, instance_tok.start, f_curly.end_pos);
 }

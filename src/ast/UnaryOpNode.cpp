@@ -3,12 +3,12 @@
 //
 
 #include "UnaryOpNode.h"
-
-bool UnaryOpNode::equal(const Node& other) const {
+using namespace ast;
+bool UnaryOpNode::equal(const ast::Node& other) const {
     return false;
 }
 
-UnaryOpNode::UnaryOpNode(UnaryOp op, Node* exp, TextPosition start, TextPosition end) : Node(NodeType::UNARY, start, end) {
+UnaryOpNode::UnaryOpNode(UnaryOp op, ast::Node* exp, TextPosition start, TextPosition end) : ast::Node(NodeType::UNARY, start, end) {
     this->op = op;
     this->exp = exp;
 }

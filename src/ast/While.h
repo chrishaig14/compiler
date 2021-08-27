@@ -10,14 +10,14 @@
 #include "Block.h"
 #include "ast.h"
 
-class ast::While : public Node {
+class ast::While : public ast::Node {
 public:
     std::unique_ptr<ast::Block> body;
     UNode condition;
 
     While(UNode& condition, std::unique_ptr<ast::Block>& body, TextPosition start, TextPosition end);
 
-    bool equal(const Node& other) const override;
+    bool equal(const ast::Node& other) const override;
 
     ~While() override;
     nlohmann::json to_json() const override;

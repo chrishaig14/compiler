@@ -8,12 +8,12 @@
 
 #include "Node.h"
 #include "../types.h"
-
-class EnumNode : public Node {
+#include "ast.h"
+class ast::EnumNode : public ast::Node {
 public:
 
     EnumNode(std::string id, VectorOfStrings values, TextPosition start, TextPosition end);
-    bool equal(const Node& other) const override;
+    bool equal(const ast::Node& other) const override;
     nlohmann::json to_json() const override;
 
     VectorOfStrings values;

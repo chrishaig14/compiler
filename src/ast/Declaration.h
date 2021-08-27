@@ -11,7 +11,7 @@
 #include "TypeNode.h"
 #include "../utils.h"
 
-class ast::Declaration : public Node {
+class ast::Declaration : public ast::Node {
 public:
     std::string identifier;
     TypeNode* type;
@@ -21,9 +21,9 @@ public:
                     TextPosition eq_pos, TextPosition end);
 
 
-    Declaration(const std::string& identifier, TypeNode* type, Node* expression, TextPosition start);
+    Declaration(const std::string& identifier, TypeNode* type, ast::Node* expression, TextPosition start);
 
-    bool equal(const Node& other) const override;
+    bool equal(const ast::Node& other) const override;
 
     ~Declaration() override;
 

@@ -13,7 +13,7 @@
 #include "optypes.h"
 #include "ast.h"
 
-class ast::Binop : public Node {
+class ast::Binop : public ast::Node {
 public:
     UNode left;
     UNode right;
@@ -26,7 +26,7 @@ public:
         return std::make_unique<Binop>(op, left, right, start, end);
     }
 
-    bool equal(const Node& x) const override;
+    bool equal(const ast::Node& x) const override;
 
     ~Binop();
     nlohmann::json to_json() const override;

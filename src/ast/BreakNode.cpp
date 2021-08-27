@@ -3,12 +3,12 @@
 //
 
 #include "BreakNode.h"
-
-bool BreakNode::equal(const Node& other) const {
+using namespace ast;
+bool BreakNode::equal(const ast::Node& other) const {
     return true;
 }
 
-BreakNode::BreakNode(TextPosition start, TextPosition end) : Node(NodeType::BRK, start, end) {
+BreakNode::BreakNode(TextPosition start, TextPosition end) : ast::Node(NodeType::BRK, start, end) {
 }
 
 nlohmann::json BreakNode::to_json() const {

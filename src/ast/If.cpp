@@ -7,7 +7,7 @@
 
 using namespace ast;
 
-bool If::equal(const Node& x) const {
+bool If::equal(const ast::Node& x) const {
     const auto& other = (If&) x;
     if (*this->condition != *other.condition) {
         return false;
@@ -34,7 +34,7 @@ bool If::equal(const Node& x) const {
 }
 
 If::If(UNode& condition, std::unique_ptr<ast::Block>& then, std::vector<std::pair<Node*, ast::Block*>> elifs,
-               std::unique_ptr<ast::Block>& selse, TextPosition start, TextPosition end) : Node(NodeType::IFF,
+               std::unique_ptr<ast::Block>& selse, TextPosition start, TextPosition end) : ast::Node(NodeType::IFF,
                                                                                                 start,
                                                                                                 end),
                                                                                            condition(std::move(condition)),

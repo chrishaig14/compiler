@@ -6,7 +6,7 @@
 
 using namespace ast;
 
-Binop::Binop(OpType op, UNode& left, UNode& right, TextPosition start, TextPosition end) : Node(NodeType::BINOP,
+Binop::Binop(OpType op, UNode& left, UNode& right, TextPosition start, TextPosition end) : ast::Node(NodeType::BINOP,
                                                                                                         start,
                                                                                                         end),
                                                                                                    left(std::move(left)),
@@ -14,7 +14,7 @@ Binop::Binop(OpType op, UNode& left, UNode& right, TextPosition start, TextPosit
                                                                                                    op(op) {
 }
 
-bool Binop::equal(const Node& x) const {
+bool Binop::equal(const ast::Node& x) const {
     auto& other = (Binop&) x;
     return this->op == other.op && *this->left == *other.left and *this->right == *other.right;
 }

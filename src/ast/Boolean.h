@@ -10,7 +10,7 @@
 #include "../json/json.hpp"
 #include "ast.h"
 
-class ast::Boolean : public Node {
+class ast::Boolean : public ast::Node {
 public:
     bool value;
 
@@ -18,7 +18,7 @@ public:
 
     bool operator!=(const Boolean& other) const;
 
-    bool equal(const Node& x) const override;
+    bool equal(const ast::Node& x) const override;
 
     nlohmann::json to_json() const override;
 };

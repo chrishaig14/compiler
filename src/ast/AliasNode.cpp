@@ -3,8 +3,8 @@
 //
 
 #include "AliasNode.h"
-
-bool AliasNode::equal(const Node& other) const {
+using namespace ast;
+bool AliasNode::equal(const ast::Node& other) const {
     return false;
 }
 

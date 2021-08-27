@@ -9,8 +9,8 @@
 #include "Node.h"
 #include "TypeNode.h"
 #include "Block.h"
-
-class MatchExpressionNode : public Node {
+#include "ast.h"
+class ast::MatchExpressionNode : public ast::Node {
 public:
     Node* exp;
     std::vector<std::string> ids;
@@ -18,7 +18,7 @@ public:
     MatchExpressionNode(Node* exp, std::vector<std::string> ids, std::vector<std::pair<TypeNode*, ast::Block*>> cases,
                         TextPosition start, TextPosition end);
 
-    bool equal(const Node& other) const override;
+    bool equal(const ast::Node& other) const override;
     nlohmann::json to_json() const override;
 };
 

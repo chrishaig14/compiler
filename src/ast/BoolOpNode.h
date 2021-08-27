@@ -8,8 +8,10 @@
 #include "Node.h"
 #include "optypes.h"
 #include "TypeNode.h"
+#include "ast.h"
 
-class BoolOpNode : public Node {
+
+class ast::BoolOpNode : public ast::Node {
 public:
     UNode left;
     UNode right;
@@ -17,7 +19,7 @@ public:
 
     BoolOpNode(BoolOp op, UNode& left, UNode& right, TextPosition start,
                TextPosition end);
-    bool equal(const Node& x) const override;
+    bool equal(const ast::Node& x) const override;
 
     ~BoolOpNode();
     nlohmann::json to_json() const override;

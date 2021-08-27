@@ -3,12 +3,12 @@
 //
 
 #include "NoneNode.h"
-
-bool NoneNode::equal(const Node& other) const {
+using namespace ast;
+bool NoneNode::equal(const ast::Node& other) const {
     return true;
 }
 
-NoneNode::NoneNode(TextPosition start, TextPosition end) : Node(NodeType::NONE, start, end) {
+NoneNode::NoneNode(TextPosition start, TextPosition end) : ast::Node(NodeType::NONE, start, end) {
 }
 
 nlohmann::json NoneNode::to_json() const {

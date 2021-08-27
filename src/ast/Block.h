@@ -15,7 +15,7 @@
 #include "../units/Entity.h"
 #include "ast.h"
 
-class ast::Block : public Node {
+class ast::Block : public ast::Node {
 public:
 
     Block(VectorOfNodesU nodes, TextPosition start, TextPosition end);
@@ -27,7 +27,7 @@ public:
 
     VectorOfNodesU nodes;
 
-    bool equal(const Node& p) const override;
+    bool equal(const ast::Node& p) const override;
 
 
     ~Block();

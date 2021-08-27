@@ -8,7 +8,7 @@
 #include "errors/ErrorRedeclared.h"
 #include "errors/ErrorExpectedExpression.h"
 
-std::unique_ptr<SemanticInfo> Checker::expect_rvalue_of_type(const TypeNode& target, Node& node) {
+std::unique_ptr<SemanticInfo> Checker::expect_rvalue_of_type(const TypeNode& target, ast::Node& node) {
     USemanticInfo rinfo = this->dispatch_rvalue(node);
     if (rinfo->is_error()) {
         return error_stub();

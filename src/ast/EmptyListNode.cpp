@@ -4,13 +4,13 @@
 
 #include "EmptyListNode.h"
 
-
-EmptyListNode::EmptyListNode(TypeNode* type, TextPosition start, TextPosition end) : Node(NodeType::EMPTYLST,
+using namespace ast;
+EmptyListNode::EmptyListNode(TypeNode* type, TextPosition start, TextPosition end) : ast::Node(NodeType::EMPTYLST,
                                                                                           start,
                                                                                           end), type(type) {
 }
 
-bool EmptyListNode::equal(const Node& other) const {
+bool EmptyListNode::equal(const ast::Node& other) const {
     return *((EmptyListNode&) other).type == *this->type;
 }
 

@@ -8,9 +8,9 @@
 
 #include "Node.h"
 #include <vector>
-
-class DictNode : public Node {
-    bool equal(const Node& other) const override;
+#include "ast.h"
+class ast::DictNode : public ast::Node {
+    bool equal(const ast::Node& other) const override;
 public:
     DictNode(std::vector<std::pair<UNode, UNode>>& items, TextPosition start,
              TextPosition end);

@@ -7,16 +7,17 @@
 
 
 #include "Node.h"
+#include "ast.h"
 
 
-class TernaryNode : public Node {
+class ast::TernaryNode : public ast::Node {
 public:
     Node* expression;
     Node* true_case;
     Node* false_case;
 
-    TernaryNode(Node* expression, Node* trueCase, Node* falseCase, TextPosition start, TextPosition end);
-    bool equal(const Node& other) const override;
+    TernaryNode(Node* expression, ast::Node* trueCase, ast::Node* falseCase, TextPosition start, TextPosition end);
+    bool equal(const ast::Node& other) const override;
 
     ~TernaryNode();
 

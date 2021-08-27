@@ -7,13 +7,13 @@
 
 using namespace ast;
 
-Id::Id(std::string identifier, TextPosition start, TextPosition end) : Node(NodeType::ID, start, end),
+Id::Id(std::string identifier, TextPosition start, TextPosition end) : ast::Node(NodeType::ID, start, end),
                                                                                _id(identifier) {
     this->is_global_function = false;
 }
 
 
-bool Id::equal(const Node& x) const {
+bool Id::equal(const ast::Node& x) const {
     const auto& other = (Id&) x;
     return this->_id == other._id;
 }

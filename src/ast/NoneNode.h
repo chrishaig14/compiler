@@ -8,11 +8,11 @@
 
 #include "Node.h"
 
-
-class NoneNode : public Node {
+#include "ast.h"
+class ast::NoneNode : public ast::Node {
 public:
     NoneNode(TextPosition start, TextPosition end);
-    bool equal(const Node& other) const override;
+    bool equal(const ast::Node& other) const override;
     nlohmann::json to_json() const override;
 
 };

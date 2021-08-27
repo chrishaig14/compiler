@@ -11,9 +11,9 @@
 #include "../json/json_fwd.hpp"
 #include <iostream>
 #include "../types.h"
+#include "ast.h"
 
-
-class Node {
+class ast::Node {
 public:
     const NodeType ntype;
 
@@ -24,10 +24,10 @@ public:
 
     virtual ~Node();
 
-    virtual bool equal(const Node& other) const;
+    virtual bool equal(const ast::Node& other) const;
 
-    bool operator==(const Node& other) const;
-    bool operator!=(const Node& other) const;
+    bool operator==(const ast::Node& other) const;
+    bool operator!=(const ast::Node& other) const;
 
     virtual nlohmann::json to_json() const = 0;
 };

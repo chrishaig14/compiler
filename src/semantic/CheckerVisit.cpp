@@ -49,7 +49,7 @@ SNode* make_for_snode(ast::For& node, USemanticInfo& binfo, USemanticInfo& exp_i
     return bbn;
 }
 
-USemanticInfo Checker::visit_enum(EnumNode& p_node) {
+USemanticInfo Checker::visit_enum(ast::EnumNode& p_node) {
     USemanticInfo info_u = std::make_unique<SemanticInfo>();
     SemanticInfo& info = *info_u;
     auto* esn = new EnumSNode();
@@ -263,7 +263,7 @@ USemanticInfo Checker::visit_function(ast::Function& n) {
     info.snode = sn;
     if (returnType != T_NONE) {
         if (!n.body->nodes.empty()) {
-            Node& last_node = *n.body->nodes.back();
+            ast:: Node& last_node = *n.body->nodes.back();
             if (last_node.ntype != NodeType::RETRN) {
                 // it's not a return statement, error
                 this->error_reporter.error(ErrorFunctionReturnLastStmt(function_name, returnType, last_node.start));

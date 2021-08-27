@@ -9,8 +9,8 @@
 #include "Node.h"
 #include "ObjectType.h"
 #include "Function.h"
-
-class InstanceNode : public Node {
+#include "ast.h"
+class ast::InstanceNode : public ast::Node {
 public:
     std::string id;
     ObjectType* base_type;
@@ -18,7 +18,7 @@ public:
     InstanceNode(const std::string& id, ObjectType* base_type,
                  const std::unordered_map<std::string, ast::Function*>& methods, TextPosition start, TextPosition end);
     nlohmann::json to_json() const override;
-    bool equal(const Node& other) const override;
+    bool equal(const ast::Node& other) const override;
 };
 
 

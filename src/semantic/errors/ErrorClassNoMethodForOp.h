@@ -10,14 +10,14 @@
 
 class ErrorClassNoMethodForOp : public Error {
 public:
-    ErrorClassNoMethodForOp(std::string class_name, std::string op, const Node& node);
+    ErrorClassNoMethodForOp(std::string class_name, std::string op, const ast::Node& node);
     Error* clone() const override;
     bool equal(const Error& other) const override;
     std::string to_str() const override;
 
     std::string class_name;
     std::string op;
-    const Node& node;
+    const ast::Node& node;
 };
 
 

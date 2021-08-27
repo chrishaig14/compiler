@@ -16,5 +16,5 @@ std::string ErrorCantAssign::to_str() const {
     return std::string();
 }
 
-ErrorCantAssign::ErrorCantAssign(const Node& n) : n(n) {
+ErrorCantAssign::ErrorCantAssign(const ast::Node& n) : n(n) {
 }

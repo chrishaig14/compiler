@@ -22,7 +22,7 @@ struct Implicit {
     bool is_static;
 };
 
-class ast::Function : public Node {
+class ast::Function : public ast::Node {
 public:
     Implicit* implicit;
     std::string identifier;
@@ -33,7 +33,7 @@ public:
     Function(std::string identifier, const VectorOfStrings& parameter_names, VectorOfUTypes& parameter_types,
              UTypeNode& return_type, std::unique_ptr<ast::Block>& body, TextPosition start, TextPosition end);
 
-    bool equal(const Node& x) const override;
+    bool equal(const ast::Node& x) const override;
 
     ~Function() override;
     nlohmann::json to_json() const override;

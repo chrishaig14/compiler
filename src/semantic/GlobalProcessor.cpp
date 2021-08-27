@@ -8,7 +8,7 @@
 #include "../parser/Parser.h"
 #include "../ast/ObjectType.h"
 
-void GlobalProcessor::visit_import(ImportNode& node) {
+void GlobalProcessor::visit_import(ast::ImportNode& node) {
     const Path& node_path = Path(node.path);
     if (node.has_alias) {
         if (this->module.imported_paths_with_alias.count(node.alias) != 0) {
@@ -98,8 +98,8 @@ void GlobalProcessor::visit_root() {
             class_info->path = Path(this->module.path, ((ast::Klass&) n).class_name);
         } else if (n.ntype == NodeType::ENUM) {
             Enum* enumm = new Enum();
-            enumm->enumm_name = ((EnumNode&) n).id;
-            enumm->values = ((EnumNode&) n).values;
+            enumm->enumm_name = ((ast::EnumNode&) n).id;
+            enumm->values = ((ast::EnumNode&) n).values;
             enumm->path = Path(this->module.path, enumm->enumm_name);
             enumm->functions["__eq__"] = new ConstFunction(Path(enumm->path, "__eq__"), nullptr);;
             enumm->functions["__ne__"] = new ConstFunction(Path(enumm->path, "__ne__"), nullptr);
@@ -143,15 +143,15 @@ void GlobalProcessor::check_duplicated_names(ast::Block& node) const {
         } else if (n.ntype == NodeType::FUNC) {
             name = ((ast::Function&) n).identifier;
         } else if (n.ntype == NodeType::IMPORT) {
-            if (((ImportNode&) n).has_alias) {
-                name = ((ImportNode&) n).alias;
+            if (((ast::ImportNode&) n).has_alias) {
+                name = ((ast::ImportNode&) n).alias;
             } else {
-                name = ((ImportNode&) n).path.back();
+                name = ((ast::ImportNode&) n).path.back();
             }
         } else if (n.ntype == NodeType::ALIAS) {
-            name = ((AliasNode&) (n)).alias_id;
+            name = ((ast::AliasNode&) (n)).alias_id;
         } else if (n.ntype == NodeType::ENUM) {
-            name = ((EnumNode&) (n)).id;
+            name = ((ast::EnumNode&) (n)).id;
         }
         if (names.count(name) == 0) {
             names[name] = nullptr;
@@ -230,7 +230,7 @@ void GlobalProcessor::visit_class(ast::Klass& node) {
     class_info->path = Path(this->module.path, class_info->class_name);
 }
 
-void GlobalProcessor::dispatch(Node& nod) {
+void GlobalProcessor::dispatch(ast::Node& nod) {
     switch (nod.ntype) {
         case NodeType::CLS:
             this->visit_class((ast::Klass&) nod);
@@ -239,22 +239,22 @@ void GlobalProcessor::dispatch(Node& nod) {
             this->visit_function((ast::Function&) nod);
             break;
         case NodeType::IMPORT:
-            this->visit_import((ImportNode&) nod);
+            this->visit_import((ast::ImportNode&) nod);
             break;
         case NodeType::ALIAS:
-            this->visit_alias((AliasNode&) nod);
+            this->visit_alias((ast::AliasNode&) nod);
             break;
         default:
             return;
     }
 }
 
-void GlobalProcessor::visit_alias(AliasNode& node) {
+void GlobalProcessor::visit_alias(ast::AliasNode& node) {
     this->module.fill_actual(node.aliased_type);
     this->module.aliased_types[node.alias_id] = node.aliased_type;
 }
 
-void GlobalProcessor::visit_enum(EnumNode& node) {
+void GlobalProcessor::visit_enum(ast::EnumNode& node) {
 
 }
 

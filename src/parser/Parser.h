@@ -10,7 +10,6 @@
 #include "../ast/ImportNode.h"
 #include "../scanner/CodeLines.h"
 #include "../ast/EnumNode.h"
-#include "../ast/TryCatchNode.h"
 #include "../ast/ObjectType.h"
 #include "../ast/TypeclassNode.h"
 #include "../ast/InstanceNode.h"
@@ -35,11 +34,11 @@ public:
 
     UNode parse_top_level_statement();
 
-    std::unique_ptr<ImportNode> parse_import();
+    std::unique_ptr<ast::ImportNode> parse_import();
     std::unique_ptr<ast::Klass> parse_class_definition();
     std::unique_ptr<ast::Function> parse_function_definition();
-    std::unique_ptr<AliasNode> parse_alias();
-    std::unique_ptr<EnumNode> parse_enum_definition();
+    std::unique_ptr<ast::AliasNode> parse_alias();
+    std::unique_ptr<ast::EnumNode> parse_enum_definition();
 
     UNode parse_common_statement();
     UNode parse_assignment_or_expression();
@@ -49,7 +48,7 @@ public:
     std::unique_ptr<ast::For> parse_for_loop();
     std::unique_ptr<ast::Return> parse_return();
     UNode parse_ternary();
-    std::unique_ptr<MatchExpressionNode> parse_match_statement();
+    std::unique_ptr<ast::MatchExpressionNode> parse_match_statement();
     // std::unique_ptr<ThrowNode> parse_throw();
     // std::unique_ptr<TryCatchNode> parse_try_catch();
 
@@ -103,8 +102,8 @@ public:
     void error_expected_type(Token tok);
 
     std::string top_package_name;
-    std::unique_ptr<TypeclassNode> parse_typeclass();
-    std::unique_ptr<InstanceNode> parse_instance();
+    std::unique_ptr<ast::TypeclassNode> parse_typeclass();
+    std::unique_ptr<ast::InstanceNode> parse_instance();
 };
 
 

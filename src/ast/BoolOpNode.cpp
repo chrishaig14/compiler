@@ -3,14 +3,14 @@
 //
 
 #include "BoolOpNode.h"
-
+using namespace ast;
 
 BoolOpNode::BoolOpNode(BoolOp op, UNode& left, UNode& right, TextPosition start,
-                       TextPosition end) : Node(NodeType::BOOLOP, start, end), left(std::move(left)),
+                       TextPosition end) : ast::Node(NodeType::BOOLOP, start, end), left(std::move(left)),
                                            right(std::move(right)), op(op) {
 }
 
-bool BoolOpNode::equal(const Node& x) const {
+bool BoolOpNode::equal(const ast::Node& x) const {
     auto& other = (BoolOpNode&) x;
     return this->op == other.op && *this->left == *other.left and *this->right == *other.right;
 }

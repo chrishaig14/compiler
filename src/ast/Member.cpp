@@ -6,7 +6,7 @@
 
 using namespace ast;
 
-Member::Member(UNode& parent, Token child_token) : Node(NodeType::MEMBER, parent->start, child_token.end_pos),
+Member::Member(UNode& parent, Token child_token) : ast::Node(NodeType::MEMBER, parent->start, child_token.end_pos),
                                                            parent(std::move(parent)) {
     this->child_token = child_token;
     this->type = MemberType::STR;
@@ -17,7 +17,7 @@ Member::~Member() {
     // delete this->parent;
 }
 
-bool Member::equal(const Node& x) const {
+bool Member::equal(const ast::Node& x) const {
     auto& other = (Member&) x;
     if (this->type != other.type) {
         return false;

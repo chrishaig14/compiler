@@ -11,8 +11,8 @@
 #include "Node.h"
 
 #include "../types.h"
-
-class SubscriptNode : public Node {
+#include "ast.h"
+class ast::SubscriptNode : public ast::Node {
 
 public:
     SubscriptNode(UNode& parent, VectorOfNodesU& child, TextPosition start, TextPosition end);
@@ -20,7 +20,7 @@ public:
     UNode parent;
     VectorOfNodesU child;
 
-    bool equal(const Node& other) const override;
+    bool equal(const ast::Node& other) const override;
 
     ~SubscriptNode();
     nlohmann::json to_json() const override;

@@ -12,7 +12,7 @@
 #include "TypeNode.h"
 #include "ast.h"
 
-class ast::Assignment : public Node {
+class ast::Assignment : public ast::Node {
 public:
     UNode lvalue;
     UNode rvalue;
@@ -20,7 +20,7 @@ public:
 
     Assignment(UNode& lvalue, UNode& rvalue, TextPosition start, TextPosition end);
 
-    bool equal(const Node& x) const override;
+    bool equal(const ast::Node& x) const override;
 
 
     ~Assignment();

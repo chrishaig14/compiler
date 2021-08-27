@@ -5,13 +5,13 @@
 #include "Call.h"
 #include "../json/json.hpp"
 using namespace ast;
-Call::Call(UNode& function, VectorOfNodesU& arguments, TextPosition start, TextPosition end) : Node(
+Call::Call(UNode& function, VectorOfNodesU& arguments, TextPosition start, TextPosition end) : ast::Node(
         NodeType::CALL,
         start,
         end), function(std::move(function)), arguments(std::move(arguments)) {
 }
 
-bool Call::equal(const Node& x) const {
+bool Call::equal(const ast::Node& x) const {
     const auto& other = (Call&) x;
     if (this->arguments.size() != other.arguments.size()) {
         return false;

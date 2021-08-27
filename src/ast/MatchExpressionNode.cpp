@@ -3,15 +3,15 @@
 //
 
 #include "MatchExpressionNode.h"
-
+using namespace ast;
 MatchExpressionNode::MatchExpressionNode(Node* exp, std::vector<std::string> ids, std::vector<std::pair<TypeNode*, ast::Block*>> cases,
-                                         TextPosition start, TextPosition end) : Node(NodeType::MATCH_EXP, start, end) {
+                                         TextPosition start, TextPosition end) : ast::Node(NodeType::MATCH_EXP, start, end) {
     this->cases = cases;
     this->exp = exp;
     this->ids = ids;
 }
 
-bool MatchExpressionNode::equal(const Node& other) const {
+bool MatchExpressionNode::equal(const ast::Node& other) const {
     return false;
 }
 
