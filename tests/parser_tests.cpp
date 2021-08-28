@@ -502,7 +502,7 @@ TEST_CASE("parse_list_empty", "[parser]") {
 
     UNode ast = parser.parse_list_literal();
 
-    REQUIRE(ast->to_json() == ast::EmptyList(TYPE.node->clone(), DUMMY_POS, DUMMY_POS).to_json());
+    REQUIRE(ast->to_json() == ast::EmptyList(UTypeNode(TYPE.node->clone()), DUMMY_POS, DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_list_one_element", "[parser]") {

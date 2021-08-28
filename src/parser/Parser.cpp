@@ -100,7 +100,7 @@ UNode Parser::parse_list_literal() {
         // parse required type annotation (cannot infer type of empty list
         this->expect_token(TokType::DOUBLE_COLON);
         auto type = this->parse_type_node();
-        auto node = std::make_unique<ast::EmptyList>(type.release(), list_start.start, list_start.end_pos);
+        auto node = std::make_unique<ast::EmptyList>(std::move(type), list_start.start, list_start.end_pos);
         return node;
     }
     while (true) {

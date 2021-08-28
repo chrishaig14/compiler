@@ -278,12 +278,11 @@ TEST_CASE("nodes_binop", "[binop]") {
 }
 
 TEST_CASE("nodes_empty_list", "[empty_list]") {
-    ObjectType to("Integer", {});
-    auto* t = &to;
-    ast::EmptyList n(t, DUMMY_POS, DUMMY_POS);
-    nlohmann::json nj = n.to_json();
+    auto t = std::make_unique<ObjectType>("Integer");
     nlohmann::json e = {{"type",       "empty_list"},
                         {"empty_list", {{"type", t->to_json()}}}};
+    ast::EmptyList n(std::move(t), DUMMY_POS, DUMMY_POS);
+    nlohmann::json nj = n.to_json();
     REQUIRE(e == nj);
 }
 

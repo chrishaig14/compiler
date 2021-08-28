@@ -69,8 +69,8 @@ USemanticInfo Checker::visit_none(ast::None& node) {
 USemanticInfo Checker::visit_emptylist(ast::EmptyList& node) {
     USemanticInfo info_u = std::make_unique<SemanticInfo>();
     SemanticInfo& info = *info_u;
-    this->module.fill_actual(node.type);
-    auto* otype = new ObjectType("List", {node.type});
+    this->module.fill_actual(*node.type);
+    auto* otype = new ObjectType("List", {node.type->clone()});
     auto ov = std::make_unique<Value>(otype);
     otype->actual_base_path = Path("core.core.List");
     this->fill_value(*ov);

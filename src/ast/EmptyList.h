@@ -12,14 +12,14 @@
 
 class ast::EmptyList : public ast::Node {
 public:
-    EmptyList(TypeNode* type, TextPosition start, TextPosition end);
+    EmptyList(UTypeNode type, TextPosition start, TextPosition end);
 
     bool equal(const ast::Node& other) const override;
 
     ~EmptyList() override;
     nlohmann::json to_json() const override;
 
-    TypeNode* type;
+    UTypeNode type;
 };
 
 

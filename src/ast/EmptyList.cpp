@@ -6,8 +6,8 @@
 
 using namespace ast;
 
-EmptyList::EmptyList(TypeNode* type, TextPosition start, TextPosition end) : ast::Node(NodeType::EMPTYLST, start, end),
-                                                                             type(type) {
+EmptyList::EmptyList(UTypeNode type, TextPosition start, TextPosition end) : ast::Node(NodeType::EMPTYLST, start, end),
+                                                                             type(std::move(type)) {
 }
 
 bool EmptyList::equal(const ast::Node& other) const {
