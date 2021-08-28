@@ -3,6 +3,5 @@
 //
 
 #include "ThrowSNode.h"
-
 ThrowSNode::ThrowSNode(SNode* expression) : SNode(SNodeType::THROW), expression(expression) {
 }

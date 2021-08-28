@@ -7,7 +7,7 @@
 using namespace ast;
 
 Return::Return(UNode& expression, TextPosition start, TextPosition end) : ast::Node(NodeType::RETRN, start, end),
-                                                                          expression(std::move(expression)) {
+                                                                                  expression(std::move(expression)) {
 }
 
 bool Return::equal(const ast::Node& x) const {

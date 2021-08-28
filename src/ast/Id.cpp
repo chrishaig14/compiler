@@ -8,7 +8,7 @@
 using namespace ast;
 
 Id::Id(std::string identifier, TextPosition start, TextPosition end) : ast::Node(NodeType::ID, start, end),
-                                                                       _id(identifier) {
+                                                                               _id(identifier) {
     this->is_global_function = false;
 }
 

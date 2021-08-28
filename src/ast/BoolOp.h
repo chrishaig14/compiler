@@ -17,7 +17,8 @@ public:
     UNode right;
     BoolOpType op;
 
-    BoolOp(BoolOpType op, UNode& left, UNode& right, TextPosition start, TextPosition end);
+    BoolOp(BoolOpType op, UNode& left, UNode& right, TextPosition start,
+               TextPosition end);
     bool equal(const ast::Node& x) const override;
 
     ~BoolOp();

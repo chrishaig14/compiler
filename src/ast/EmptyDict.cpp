@@ -3,5 +3,4 @@
 //
 
 #include "EmptyDict.h"
-
 using namespace ast;

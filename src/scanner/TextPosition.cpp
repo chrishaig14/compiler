@@ -5,7 +5,7 @@
 #include "TextPosition.h"
 
 std::string text_pos_to_string(const std::string& __file__, TextPosition t) {
-    return "" + __file__ + ":" + std::to_string(t.line + 1) + ":" + std::to_string(t.column + 1);
+    return ""+__file__ + ":" + std::to_string(t.line + 1) + ":" + std::to_string(t.column + 1);
 }
 
 bool operator==(const TextPosition& a, const TextPosition& b) {

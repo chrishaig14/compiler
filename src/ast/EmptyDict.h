@@ -9,7 +9,6 @@
 #include "Node.h"
 #include "TypeNode.h"
 #include "ast.h"
-
 class ast::EmptyDict : public ast::Node {
 public:
     EmptyDict(UTypeNode& key_type, UTypeNode& value_type, TextPosition start, TextPosition end)

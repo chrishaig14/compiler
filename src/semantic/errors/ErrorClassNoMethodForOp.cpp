@@ -20,7 +20,7 @@ std::string ErrorClassNoMethodForOp::to_str() const {
     return "Error: no method for op " + this->op + " in class " + this->class_name;
 }
 
-ErrorClassNoMethodForOp::ErrorClassNoMethodForOp(std::string class_name, std::string op, const ast::Node& node)
-        : class_name(class_name), op(op), node(node) {
+ErrorClassNoMethodForOp::ErrorClassNoMethodForOp(std::string class_name, std::string op, const ast::Node& node) : class_name(
+        class_name), op(op), node(node) {
 
 }

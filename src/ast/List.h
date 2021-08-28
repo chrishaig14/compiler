@@ -10,7 +10,6 @@
 #include "Node.h"
 #include "../types.h"
 #include "ast.h"
-
 class ast::List : public ast::Node {
 public:
     VectorOfNodesU elements;

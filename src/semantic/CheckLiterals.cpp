@@ -11,8 +11,7 @@
 #include "errors/ErrorTypeMismatch.h"
 
 USemanticInfo Checker::visit_boolean(ast::Boolean& node) {
-    USemanticInfo info_u = std::make_unique<SemanticInfo>();
-    SemanticInfo& info = *info_u;
+    USemanticInfo info_u = std::make_unique<SemanticInfo>(); SemanticInfo& info = *info_u;
     info.entity = this->entity_value_from_actual_base_path_no_generic(Path("core.core.Boolean"));
     info.snode = new BoolSNode(node.value);
     return info_u;
@@ -20,8 +19,7 @@ USemanticInfo Checker::visit_boolean(ast::Boolean& node) {
 
 
 USemanticInfo Checker::visit_number(ast::Number& node) {
-    USemanticInfo info_u = std::make_unique<SemanticInfo>();
-    SemanticInfo& info = *info_u;
+    USemanticInfo info_u = std::make_unique<SemanticInfo>(); SemanticInfo& info = *info_u;
     switch (node.num_type) {
         case NumberType::INTEGER: {
             info.entity = this->entity_value_from_actual_base_path_no_generic(Path("core.core.Integer"));
@@ -57,8 +55,7 @@ USemanticInfo Checker::visit_number(ast::Number& node) {
 }
 
 USemanticInfo Checker::visit_none(ast::None& node) {
-    USemanticInfo info_u = std::make_unique<SemanticInfo>();
-    SemanticInfo& info = *info_u;
+    USemanticInfo info_u = std::make_unique<SemanticInfo>(); SemanticInfo& info = *info_u;
     // info.set_type(ObjectType("NoneType"));
     auto v = std::make_unique<Value>(new ObjectType("NoneType"));
     info.entity = *new EntityValue(std::move(v));
@@ -67,8 +64,7 @@ USemanticInfo Checker::visit_none(ast::None& node) {
 }
 
 USemanticInfo Checker::visit_emptylist(ast::EmptyList& node) {
-    USemanticInfo info_u = std::make_unique<SemanticInfo>();
-    SemanticInfo& info = *info_u;
+    USemanticInfo info_u = std::make_unique<SemanticInfo>(); SemanticInfo& info = *info_u;
     this->module.fill_actual(node.type);
     auto* otype = new ObjectType("List", {node.type});
     auto ov = std::make_unique<Value>(otype);
@@ -83,8 +79,7 @@ USemanticInfo Checker::visit_emptylist(ast::EmptyList& node) {
 }
 
 USemanticInfo Checker::visit_string(ast::String& node) {
-    USemanticInfo info_u = std::make_unique<SemanticInfo>();
-    SemanticInfo& info = *info_u;
+    USemanticInfo info_u = std::make_unique<SemanticInfo>(); SemanticInfo& info = *info_u;
     info.is_constant = true;
     auto* sn = new StringSNode(node.str);
     info.snode = sn;
@@ -167,8 +162,7 @@ USemanticInfo Checker::visit_partial(ast::PartialApplication& node) {
     }
     node.complete_type = &fun_type->clone()->function();
     SemanticInfo s;
-    s.entity = *new EntityValue(std::make_unique<Value>(new FunctionType(partial_args,
-                                                                         fun_type->return_type->clone())));
+    s.entity = *new EntityValue(std::make_unique<Value>(new FunctionType(partial_args, fun_type->return_type->clone())));
     auto* non = new NewObjectSNode();
     non->class_name = "Partial" + std::to_string(npartial);
     non->args = snodes;
@@ -178,8 +172,7 @@ USemanticInfo Checker::visit_partial(ast::PartialApplication& node) {
 }
 
 USemanticInfo Checker::visit_dict(ast::DictNode& node) {
-    USemanticInfo info_u = std::make_unique<SemanticInfo>();
-    SemanticInfo& info = *info_u;
+    USemanticInfo info_u = std::make_unique<SemanticInfo>(); SemanticInfo& info = *info_u;
     USemanticInfo first_key_info = this->dispatch(*node.items[0].first);
     USemanticInfo first_value_info = this->dispatch(*node.items[0].second);
     EntityValue& first_key_entity = (EntityValue&) first_key_info->entity.get();
@@ -215,8 +208,7 @@ USemanticInfo Checker::visit_dict(ast::DictNode& node) {
 }
 
 USemanticInfo Checker::visit_emptydict(ast::EmptyDict& node) {
-    USemanticInfo info_u = std::make_unique<SemanticInfo>();
-    SemanticInfo& info = *info_u;
+    USemanticInfo info_u = std::make_unique<SemanticInfo>(); SemanticInfo& info = *info_u;
     ObjectType* ot = new ObjectType("Dict", {node.key_type->clone(), node.value_type->clone()});
     ot->actual_base_path = Path("core.core.Dict");
     auto ov = std::make_unique<Value>(ot);
@@ -233,8 +225,7 @@ USemanticInfo Checker::visit_emptydict(ast::EmptyDict& node) {
 
 USemanticInfo Checker::visit_defconst(ast::DefaultConstructor& node) {
     // this is a regular function
-    USemanticInfo info_u = std::make_unique<SemanticInfo>();
-    SemanticInfo& info = *info_u;
+    USemanticInfo info_u = std::make_unique<SemanticInfo>(); SemanticInfo& info = *info_u;
     VectorOfTypes t;
     Entity& entity = this->dispatch(*node.class_node)->entity;
     if (entity.type != E_TYPE::CLASS) {

@@ -5,7 +5,6 @@
 #include "Typeclass.h"
 
 using namespace ast;
-
 nlohmann::json Typeclass::to_json() const {
     nlohmann::json j;
     j["id"] = this->id;
@@ -20,9 +19,9 @@ nlohmann::json Typeclass::to_json() const {
 }
 
 Typeclass::Typeclass(const std::string& id, const std::string& base_type,
-                     const std::unordered_map<std::string, FunctionType*>& methods, TextPosition start,
-                     TextPosition end) : ast::Node(NodeType::TYPECLASS, start, end), id(id), base_type(base_type),
-                                         methods(methods) {
+                             const std::unordered_map<std::string, FunctionType*>& methods, TextPosition start,
+                             TextPosition end) : ast::Node(NodeType::TYPECLASS, start, end), id(id), base_type(base_type),
+                                                 methods(methods) {
 }
 
 bool Typeclass::equal(const ast::Node& other) const {

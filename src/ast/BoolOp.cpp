@@ -3,11 +3,11 @@
 //
 
 #include "BoolOp.h"
-
 using namespace ast;
 
-BoolOp::BoolOp(BoolOpType op, UNode& left, UNode& right, TextPosition start, TextPosition end)
-        : ast::Node(NodeType::BOOLOP, start, end), left(std::move(left)), right(std::move(right)), op(op) {
+BoolOp::BoolOp(BoolOpType op, UNode& left, UNode& right, TextPosition start,
+                       TextPosition end) : ast::Node(NodeType::BOOLOP, start, end), left(std::move(left)),
+                                           right(std::move(right)), op(op) {
 }
 
 bool BoolOp::equal(const ast::Node& x) const {

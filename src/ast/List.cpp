@@ -4,11 +4,9 @@
 
 #include "List.h"
 #include "../json/json.hpp"
-
 using namespace ast;
-
 List::List(VectorOfNodesU& elements, TextPosition start, TextPosition end) : ast::Node(NodeType::LST, start, end),
-                                                                             elements(std::move(elements)) {
+                                                                                     elements(std::move(elements)) {
 }
 
 bool List::equal(const ast::Node& other) const {

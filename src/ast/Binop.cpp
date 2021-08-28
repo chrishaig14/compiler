@@ -7,11 +7,11 @@
 using namespace ast;
 
 Binop::Binop(OpType op, UNode& left, UNode& right, TextPosition start, TextPosition end) : ast::Node(NodeType::BINOP,
-                                                                                                     start,
-                                                                                                     end),
-                                                                                           left(std::move(left)),
-                                                                                           right(std::move(right)),
-                                                                                           op(op) {
+                                                                                                        start,
+                                                                                                        end),
+                                                                                                   left(std::move(left)),
+                                                                                                   right(std::move(right)),
+                                                                                                   op(op) {
 }
 
 bool Binop::equal(const ast::Node& x) const {

@@ -4,9 +4,7 @@
 
 #include <cassert>
 #include "While.h"
-
 using namespace ast;
-
 While::While(UNode& condition, std::unique_ptr<ast::Block>& body, TextPosition start, TextPosition end) : ast::Node(
         NodeType::WHIL,
         start,

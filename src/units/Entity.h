@@ -120,6 +120,7 @@ public:
 };
 
 
+
 class EntityConstFunction : public Entity {
 public:
     explicit EntityConstFunction(ConstFunction* const_function)

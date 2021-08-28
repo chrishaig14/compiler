@@ -148,8 +148,7 @@ USemanticInfo Checker::check_declaration_with_type(ast::Declaration& n) {
     if (rvalue_sinfo->is_error()) {
         return error_stub();
     }
-    USemanticInfo info_u = std::make_unique<SemanticInfo>();
-    SemanticInfo& info = *info_u;
+    USemanticInfo info_u = std::make_unique<SemanticInfo>(); SemanticInfo& info = *info_u;
     USNode up(rvalue_sinfo->snode);
     info.snode = new DeclarationSNode(n.identifier, up);
     auto ov = std::make_unique<Value>(n.type->clone());
@@ -169,8 +168,7 @@ USemanticInfo Checker::check_declaration_without_type(ast::Declaration& n) {
         return error_stub();
     }
 
-    USemanticInfo info_u = std::make_unique<SemanticInfo>();
-    SemanticInfo& info = *info_u;
+    USemanticInfo info_u = std::make_unique<SemanticInfo>(); SemanticInfo& info = *info_u;
     USNode u(exp_info_p->snode);
     info.snode = new DeclarationSNode(n.identifier, u);
     info.entity = exp_info_p->entity;

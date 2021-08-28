@@ -21,7 +21,6 @@ std::string ErrorListLiteral::to_str() const {
 }
 
 ErrorListLiteral::ErrorListLiteral(const TypeNode& node, const ObjectType& type, TextPosition position,
-                                   const ast::Node& node_1)
-        : node(node), type(type), position(position), node_1(node_1) {
+                                   const ast::Node& node_1) : node(node), type(type), position(position), node_1(node_1) {
 
 }

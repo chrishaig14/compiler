@@ -263,7 +263,7 @@ USemanticInfo Checker::visit_function(ast::Function& n) {
     info.snode = sn;
     if (returnType != T_NONE) {
         if (!n.body->nodes.empty()) {
-            ast::Node& last_node = *n.body->nodes.back();
+            ast:: Node& last_node = *n.body->nodes.back();
             if (last_node.ntype != NodeType::RETRN) {
                 // it's not a return statement, error
                 this->error_reporter.error(ErrorFunctionReturnLastStmt(function_name, returnType, last_node.start));

@@ -7,11 +7,13 @@
 using namespace ast;
 
 Klass::Klass(const std::string& className, VectorOfStrings type_parameters,
-             std::vector<std::pair<std::string, UTypeNode>> members, std::unordered_map<std::string, Method> functions,
-             std::map<std::string, std::pair<TypeNode*, ast::Node*>> static_members,
-             std::unordered_map<std::string, UFunctionNode>& static_methods, TextPosition start, TextPosition end)
-        : ast::Node(NodeType::CLS, start, end), members(std::move(members)), static_members(static_members),
-          methods(functions), static_methods(std::move(static_methods)), class_name(className) {
+                     std::vector<std::pair<std::string, UTypeNode>> members,
+                     std::unordered_map<std::string, Method> functions,
+                     std::map<std::string, std::pair<TypeNode*, ast::Node*>> static_members,
+                     std::unordered_map<std::string, UFunctionNode>& static_methods, TextPosition start,
+                     TextPosition end) : ast::Node(NodeType::CLS, start, end), members(std::move(members)),
+                                         static_members(static_members), methods(functions),
+                                         static_methods(std::move(static_methods)), class_name(className) {
     this->type_parameters = type_parameters;
 }
 

@@ -3,11 +3,9 @@
 //
 
 #include "Tuple.h"
-
 using namespace ast;
-
 bool Tuple::equal(const ast::Node& n) const {
-    auto& other = (Tuple&) n;
+    auto& other = (Tuple&)n;
     if (this->values.size() != other.values.size()) {
         return false;
     }
@@ -19,7 +17,7 @@ bool Tuple::equal(const ast::Node& n) const {
     return true;
 }
 
-Tuple::Tuple(const VectorOfNodes& values, TextPosition start, TextPosition end) : Node(NodeType::TUPLE, start, end) {
+Tuple::Tuple(const VectorOfNodes& values, TextPosition start, TextPosition end):Node(NodeType::TUPLE, start, end) {
     this->values = values;
 }
 

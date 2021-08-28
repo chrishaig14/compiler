@@ -32,7 +32,7 @@ Class::~Class() {
     for (const auto& m: this->methods) {
         delete m.second;
     }
-    for (auto* m: this->member_types) {
+    for (auto *m: this->member_types) {
         delete m;
     }
 }

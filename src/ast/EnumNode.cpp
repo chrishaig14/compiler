@@ -3,11 +3,10 @@
 //
 
 #include "EnumNode.h"
-
 using namespace ast;
-
-EnumNode::EnumNode(std::string id, VectorOfStrings values, TextPosition start, TextPosition end)
-        : ast::Node(NodeType::ENUM, start, end) {
+EnumNode::EnumNode(std::string id, VectorOfStrings values, TextPosition start, TextPosition end) : ast::Node(NodeType::ENUM,
+                                                                                                        start,
+                                                                                                        end) {
     this->id = id;
     this->values = values;
 

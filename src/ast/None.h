@@ -9,7 +9,6 @@
 #include "Node.h"
 
 #include "ast.h"
-
 class ast::None : public ast::Node {
 public:
     None(TextPosition start, TextPosition end);

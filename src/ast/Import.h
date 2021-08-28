@@ -11,7 +11,6 @@
 #include <utility>
 #include "../types.h"
 #include "ast.h"
-
 class ast::Import : public ast::Node {
 public:
     bool has_alias;
@@ -24,9 +23,8 @@ public:
         this->has_alias = true;
     }
 
-    Import(const VectorOfStrings& path, TextPosition start, TextPosition end) : ast::Node(NodeType::IMPORT,
-                                                                                          start,
-                                                                                          end) {
+    Import(const VectorOfStrings& path, TextPosition start, TextPosition end)
+            : ast::Node(NodeType::IMPORT, start, end) {
         this->has_alias = false;
         this->path = path;
     }

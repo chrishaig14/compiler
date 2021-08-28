@@ -3,9 +3,7 @@
 //
 
 #include "None.h"
-
 using namespace ast;
-
 bool None::equal(const ast::Node& other) const {
     return true;
 }

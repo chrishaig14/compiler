@@ -3,7 +3,6 @@
 //
 
 #include "Continue.h"
-
 using namespace ast;
 using namespace ast;
 

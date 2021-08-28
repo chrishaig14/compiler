@@ -3,12 +3,11 @@
 //
 
 #include "Instance.h"
-
 using namespace ast;
-
 Instance::Instance(const std::string& id, ObjectType* base_type,
-                   const std::unordered_map<std::string, ast::Function*>& methods, TextPosition start, TextPosition end)
-        : ast::Node(NodeType::INSTANCE, start, end), id(id), base_type(base_type), methods(methods) {
+                           const std::unordered_map<std::string, ast::Function*>& methods, TextPosition start,
+                           TextPosition end) : ast::Node(NodeType::INSTANCE, start, end), id(id), base_type(base_type),
+                                               methods(methods) {
 
 }
 
