@@ -16,8 +16,6 @@ add_library(
         Block.h
         Boolean.cpp
         Boolean.h
-        BoolOp.cpp
-        BoolOp.h
         Break.cpp
         Break.h
         Call.cpp

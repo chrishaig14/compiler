@@ -65,97 +65,97 @@ USemanticInfo Checker::visit_cast(ast::Cast& n) {
     return info_u;
 }
 
-USemanticInfo Checker::visit_boolop(ast::BoolOp& n) {
-    USemanticInfo left_info_p = this->dispatch_rvalue(*n.left);
-    USemanticInfo right_info_p = this->dispatch_rvalue(*n.right);
-    if (left_info_p->is_error() || right_info_p->is_error()) {
-        return error_stub();
-    }
-    Entity& l_entity = left_info_p->entity;
-    Entity& r_entity = right_info_p->entity;
-    if (l_entity.type != E_TYPE::VALUE || r_entity.type != E_TYPE::VALUE) {
-
-        this->error_reporter.error(ErrorBoolOp(l_entity, r_entity, n.start));
-        // this->error_reporter.fail("Can't have binop between 2 non objects!");
-    }
-
-    const TypeNode& ltype = *get_entity_type(l_entity);
-    const TypeNode& rtype = *get_entity_type(r_entity);
-    if (ltype != rtype) {
-        this->error_reporter.error(ErrorTypeMismatch(ltype, *n.right, r_entity));
-        // this->error_reporter.error(ErrorTypeMismatch(*left_info_p->entity.value->type, *n.right, right_info_p->entity);
-        // this->error_reporter.binop(left_info_p->entity, right_info_p->entity, n.start, n.left, n.right);
-        return error_stub();
-    }
-
-    if (ltype == T_NONE) {
-        // this->error_reporter.function_doesnt_return_a_value(n.left->start, nullptr);
-        return error_stub();
-    }
-
-    if (rtype == T_NONE) {
-        // this->error_reporter.function_doesnt_return_a_value(n.right->start, nullptr);
-        return error_stub();
-    }
-
-    SemanticInfo& left_info = *left_info_p;
-    SemanticInfo& right_info = *right_info_p;
-
-
-    if (left_info.is_error() || right_info.is_error()) {
-        return error_stub();
-    }
-
-    USemanticInfo info_u = std::make_unique<SemanticInfo>();
-    SemanticInfo& info = *info_u;
-
-    if (left_info_p->is_constant && right_info_p->is_constant) {
-        info.is_constant = true;
-    }
-    std::string fun = map_boolop_to_method_name(n.op);
-
-    Entity& entity = this->scope->get(ltype.object().id);
-    if (entity.type != E_TYPE::CLASS && entity.type != E_TYPE::ENUM) {
-        this->error_reporter.fail("This should be a CLASS/ENUM, but it's not!");
-    }
-    if (entity.type == E_TYPE::ENUM) {
-        if (fun != "__eq__" && fun != "__ne__") {
-            this->error_reporter.fail("Error: enum type doesnt support this operator");
-        }
-        // auto* ot = new ObjectType("Boolean", {});
-        // ot->actual_base_path = Path("core.core.Boolean");
-        // TypeNode* rettype = ot;
-        //
-        // info.entity = new EntityValue(std::make_unique<Value>(rettype));
-        info.entity = this->entity_value_from_actual_base_path_no_generic(Path("core.core.Boolean"));
-        ConstFunction* opfun = (((EntityEnum&) entity).enumm)->functions[fun];
-        info.snode = make_boolop_snode(opfun, left_info, right_info);
-
-        // IdSNode* function_id = new IdSNode(opfun->path.as_str());
-        // CallSNode* sn = new CallSNode();
-        // sn->function = function_id;
-        // sn->arguments = {left_info.snode, right_info.snode};
-        //
-        // info.snode = sn;
-    } else {
-        Class* cls = ((EntityClass&) entity).clazz;
-        auto operator_fun_it = cls->static_methods.find(fun);
-        if (operator_fun_it == cls->static_methods.end()) {
-            this->error_reporter.error(ErrorClassNoMethodForOp(cls->class_name, fun, n));
-            return error_stub();
-        }
-
-        ConstFunction* operator_fun = operator_fun_it->second;
-        TypeNode* rettype = operator_fun->ft->return_type->clone();
-
-        auto v = std::make_unique<Value>(rettype);
-        this->fill_value(*v);
-        info.entity = *new EntityValue(std::move(v));
-        info.snode = make_boolop_snode(operator_fun, left_info, right_info);
-    }
-
-    return info_u;
-}
+// USemanticInfo Checker::visit_boolop(ast::BoolOp& n) {
+//     USemanticInfo left_info_p = this->dispatch_rvalue(*n.left);
+//     USemanticInfo right_info_p = this->dispatch_rvalue(*n.right);
+//     if (left_info_p->is_error() || right_info_p->is_error()) {
+//         return error_stub();
+//     }
+//     Entity& l_entity = left_info_p->entity;
+//     Entity& r_entity = right_info_p->entity;
+//     if (l_entity.type != E_TYPE::VALUE || r_entity.type != E_TYPE::VALUE) {
+//
+//         this->error_reporter.error(ErrorBoolOp(l_entity, r_entity, n.start));
+//         // this->error_reporter.fail("Can't have binop between 2 non objects!");
+//     }
+//
+//     const TypeNode& ltype = *get_entity_type(l_entity);
+//     const TypeNode& rtype = *get_entity_type(r_entity);
+//     if (ltype != rtype) {
+//         this->error_reporter.error(ErrorTypeMismatch(ltype, *n.right, r_entity));
+//         // this->error_reporter.error(ErrorTypeMismatch(*left_info_p->entity.value->type, *n.right, right_info_p->entity);
+//         // this->error_reporter.binop(left_info_p->entity, right_info_p->entity, n.start, n.left, n.right);
+//         return error_stub();
+//     }
+//
+//     if (ltype == T_NONE) {
+//         // this->error_reporter.function_doesnt_return_a_value(n.left->start, nullptr);
+//         return error_stub();
+//     }
+//
+//     if (rtype == T_NONE) {
+//         // this->error_reporter.function_doesnt_return_a_value(n.right->start, nullptr);
+//         return error_stub();
+//     }
+//
+//     SemanticInfo& left_info = *left_info_p;
+//     SemanticInfo& right_info = *right_info_p;
+//
+//
+//     if (left_info.is_error() || right_info.is_error()) {
+//         return error_stub();
+//     }
+//
+//     USemanticInfo info_u = std::make_unique<SemanticInfo>();
+//     SemanticInfo& info = *info_u;
+//
+//     if (left_info_p->is_constant && right_info_p->is_constant) {
+//         info.is_constant = true;
+//     }
+//     std::string fun = map_boolop_to_method_name(n.op);
+//
+//     Entity& entity = this->scope->get(ltype.object().id);
+//     if (entity.type != E_TYPE::CLASS && entity.type != E_TYPE::ENUM) {
+//         this->error_reporter.fail("This should be a CLASS/ENUM, but it's not!");
+//     }
+//     if (entity.type == E_TYPE::ENUM) {
+//         if (fun != "__eq__" && fun != "__ne__") {
+//             this->error_reporter.fail("Error: enum type doesnt support this operator");
+//         }
+//         // auto* ot = new ObjectType("Boolean", {});
+//         // ot->actual_base_path = Path("core.core.Boolean");
+//         // TypeNode* rettype = ot;
+//         //
+//         // info.entity = new EntityValue(std::make_unique<Value>(rettype));
+//         info.entity = this->entity_value_from_actual_base_path_no_generic(Path("core.core.Boolean"));
+//         ConstFunction* opfun = (((EntityEnum&) entity).enumm)->functions[fun];
+//         info.snode = make_boolop_snode(opfun, left_info, right_info);
+//
+//         // IdSNode* function_id = new IdSNode(opfun->path.as_str());
+//         // CallSNode* sn = new CallSNode();
+//         // sn->function = function_id;
+//         // sn->arguments = {left_info.snode, right_info.snode};
+//         //
+//         // info.snode = sn;
+//     } else {
+//         Class* cls = ((EntityClass&) entity).clazz;
+//         auto operator_fun_it = cls->static_methods.find(fun);
+//         if (operator_fun_it == cls->static_methods.end()) {
+//             this->error_reporter.error(ErrorClassNoMethodForOp(cls->class_name, fun, n));
+//             return error_stub();
+//         }
+//
+//         ConstFunction* operator_fun = operator_fun_it->second;
+//         TypeNode* rettype = operator_fun->ft->return_type->clone();
+//
+//         auto v = std::make_unique<Value>(rettype);
+//         this->fill_value(*v);
+//         info.entity = *new EntityValue(std::move(v));
+//         info.snode = make_boolop_snode(operator_fun, left_info, right_info);
+//     }
+//
+//     return info_u;
+// }
 
 USemanticInfo Checker::visit_unary(ast::UnaryOp& n) {
     USemanticInfo exp_info = this->expect_rvalue_of_type(T_BOOL, *n.exp);

@@ -48,10 +48,6 @@ void make_not_generic(FunctionType* ft);
 void make_not_generic(ObjectType* ft);
 void make_not_generic(TypeNode* ft);
 
-std::string map_boolop_to_method_name(BoolOpType op);
-std::string map_binop_to_method_name(OpType op);
-
-
 SNode* make_union_wrapper(int type_index, SNode* expression);
 
 

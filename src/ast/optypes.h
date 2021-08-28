@@ -6,13 +6,8 @@
 #define UNTITLED1_OPTYPES_H
 
 enum class OpType {
-    ADD, SUB, MUL, DIV, MOD
+    ADD, SUB, MUL, DIV, MOD, EQ,AND,OR,LE,GE,LT,GT,NE
 };
 std::string op_to_string(OpType op);
-
-enum class BoolOpType {
-    EQ, AND, OR, LE, GE, LT, GT, NE
-};
-std::string bool_op_to_string(BoolOpType op);
 
 #endif //UNTITLED1_OPTYPES_H

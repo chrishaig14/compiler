@@ -110,7 +110,6 @@ public:
     USemanticInfo visit_block(ast::Block& node);
     USemanticInfo visit_root(ast::Block& node);
     USemanticInfo visit_boolean(ast::Boolean& node);
-    USemanticInfo visit_boolop(ast::BoolOp& n);
     USemanticInfo visit_break(ast::Break& node);
     USemanticInfo visit_call(ast::Call& n, bool is_rvalue);
     USemanticInfo visit_class(ast::Klass& node);

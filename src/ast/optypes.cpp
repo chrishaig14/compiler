@@ -17,28 +17,22 @@ std::string op_to_string(OpType op) {
             return "DIV";
         case OpType::MOD:
             return "MOD";
-    }
-    throw std::runtime_error("Unknow op type");
-}
-
-std::string bool_op_to_string(BoolOpType op) {
-    switch (op) {
-        case BoolOpType::AND:
+        case OpType::AND:
             return "AND";
-        case BoolOpType::OR:
+        case OpType::OR:
             return "OR";
-        case BoolOpType::LE:
+        case OpType::LE:
             return "CMP <=";
-        case BoolOpType::GE:
+        case OpType::GE:
             return "CMP >=";
-        case BoolOpType::LT:
+        case OpType::LT:
             return "CMP <";
-        case BoolOpType::GT:
+        case OpType::GT:
             return "CMP >";
-        case BoolOpType::NE:
+        case OpType::NE:
             return "CMP !=";
-        case BoolOpType::EQ:
+        case OpType::EQ:
             return "==";
     }
-    throw std::runtime_error("Dont know whta to do with bool op");
+    throw std::runtime_error("Unknow op type");
 }

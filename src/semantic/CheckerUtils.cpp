@@ -12,6 +12,13 @@ std::string binoptype_to_str(OpType op) {
     funs[OpType::DIV] = "div";
     funs[OpType::MOD] = "mod";
 
+    funs[OpType::EQ] = "eq";
+    funs[OpType::LT] = "lt";
+    funs[OpType::GT] = "gt";
+    funs[OpType::LE] = "le";
+    funs[OpType::GE] = "ge";
+    funs[OpType::AND] = "and";
+    funs[OpType::OR] = "or";
     return "__" + funs.at(op) + "__";
 }
 
@@ -109,24 +116,6 @@ void make_not_generic(ObjectType* ot) {
         make_not_generic(tp);
     }
 }
-
-std::string map_boolop_to_method_name(BoolOpType op) {
-    std::map<BoolOpType, std::string> funs;
-
-    funs[BoolOpType::EQ] = "eq";
-    funs[BoolOpType::NE] = "ne";
-
-    funs[BoolOpType::AND] = "and";
-    funs[BoolOpType::OR] = "or";
-
-    funs[BoolOpType::LE] = "le";
-    funs[BoolOpType::GE] = "ge";
-    funs[BoolOpType::LT] = "lt";
-    funs[BoolOpType::GT] = "gt";
-
-    return "__" + funs[op] + "__";
-}
-
 
 SNode* make_union_wrapper(int type_index, SNode* expression) {
     auto* new_union = new NewObjectSNode();

@@ -18,16 +18,15 @@ std::unordered_map<TokType, OpType> TOKEN_TO_OP = {{TokType::PLUS,  OpType::ADD}
                                                    {TokType::MINUS, OpType::SUB},
                                                    {TokType::TIMES, OpType::MUL},
                                                    {TokType::DIV,   OpType::DIV},
-                                                   {TokType::MOD,   OpType::MOD}};
-
-std::unordered_map<TokType, BoolOpType> TOKEN_TO_BOOL_OP = {{TokType::AND, BoolOpType::AND},
-                                                            {TokType::OR,  BoolOpType::OR},
-                                                            {TokType::LT,  BoolOpType::LT},
-                                                            {TokType::GT,  BoolOpType::GT},
-                                                            {TokType::LEQ, BoolOpType::LE},
-                                                            {TokType::GEQ, BoolOpType::GE},
-                                                            {TokType::NEQ, BoolOpType::NE},
-                                                            {TokType::EQ,  BoolOpType::EQ}};
+                                                   {TokType::MOD,   OpType::MOD},
+                                                   {TokType::AND,   OpType::AND},
+                                                   {TokType::OR,    OpType::OR},
+                                                   {TokType::LT,    OpType::LT},
+                                                   {TokType::GT,    OpType::GT},
+                                                   {TokType::LEQ,   OpType::LE},
+                                                   {TokType::GEQ,   OpType::GE},
+                                                   {TokType::NEQ,   OpType::NE},
+                                                   {TokType::EQ,    OpType::EQ}};
 
 Parser::Parser(const std::string& __file__, CodeLines code_lines, std::vector<Token>& tokens) {
     this->__file__ = __file__;
@@ -195,7 +194,7 @@ UNode Parser::parse_or_expression() {
     while (this->match(TokType::OR)) {
         this->next();
         auto right = this->parse_and_expression();
-        auto node = std::make_unique<ast::BoolOp>(BoolOpType::OR, left, right, left->start, right->end);
+        auto node = std::make_unique<ast::Binop>(OpType::OR, left, right, left->start, right->end);
         left = std::move(node);
     }
     return left;
@@ -206,7 +205,7 @@ UNode Parser::parse_and_expression() {
     while (this->match(TokType::AND)) {
         this->next();
         auto right = this->parse_not_expression();
-        auto node = std::make_unique<ast::BoolOp>(BoolOpType::AND, left, right, left->start, right->end);
+        auto node = std::make_unique<ast::Binop>(OpType::AND, left, right, left->start, right->end);
         left = std::move(node);
     }
     return left;
@@ -224,16 +223,16 @@ UNode Parser::parse_not_expression() {
 
 UNode Parser::parse_bool_expression() {
     auto left = this->parse_add_or_sub_expression();
-    BoolOpType op;
+    OpType op;
     std::vector<TokType> boolean_tokens = {TokType::EQ, TokType::LT, TokType::GT, TokType::LEQ, TokType::GEQ,
                                            TokType::NEQ};
     if (!item_in_vec(this->token.type, boolean_tokens)) {
         return left;
     }
-    op = TOKEN_TO_BOOL_OP[this->token.type];
+    op = TOKEN_TO_OP[this->token.type];
     this->next();
     auto right = this->parse_add_or_sub_expression();
-    auto node = std::make_unique<ast::BoolOp>(op, left, right, left->start, right->end);
+    auto node = std::make_unique<ast::Binop>(op, left, right, left->start, right->end);
     return node;
 }
 

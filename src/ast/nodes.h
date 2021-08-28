@@ -19,7 +19,6 @@
 #include "Ternary.h"
 #include "None.h"
 #include "Cast.h"
-#include "BoolOp.h"
 #include "For.h"
 #include "Match.h"
 #include "While.h"
