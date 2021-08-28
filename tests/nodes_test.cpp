@@ -458,8 +458,10 @@ TEST_CASE("nodes_instance", "[instance]") {
     std::unique_ptr<ast::Block> b2 = ast::Block::make(VectorOfNodesU{}, DUMMY_POS, DUMMY_POS);
     VectorOfUTypes v1;
     VectorOfUTypes v2;
-    ast::Function* method1 = new ast::Function("method1", {}, v1, rt1, b1, DUMMY_POS, DUMMY_POS);
-    ast::Function* method2 = new ast::Function("method2", {}, v2, rt2, b2, DUMMY_POS, DUMMY_POS);
+    ast::Function o_method1("method1", {}, v1, rt1, b1, DUMMY_POS, DUMMY_POS);
+    ast::Function o_method2("method2", {}, v2, rt2, b2, DUMMY_POS, DUMMY_POS);
+    auto* method1 = &o_method1;
+    auto* method2 = &o_method2;
 
     std::unordered_map<std::string, ast::Function*> cmethods = {{"method1", method1},
                                                                 {"method2", method2}};
