@@ -967,7 +967,7 @@ TEST_CASE("parse_instance", "[parser]") {
     UTypeNode r1 = std::make_unique<ObjectType>("Boolean");
     UTypeNode r2 = std::make_unique<ObjectType>("Boolean");
     REQUIRE(ast->to_json() == ast::Instance("Comparable",
-                                            new ObjectType("Foo"),
+                                            std::make_unique<ObjectType>("Foo"),
                                             {{"eq", new ast::Function("eq",
                                                                       {"a", "b"},
                                                                       vt1,

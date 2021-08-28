@@ -465,12 +465,11 @@ TEST_CASE("nodes_instance", "[instance]") {
     std::unordered_map<std::string, ast::Function*> cmethods = {{"method1", method1},
                                                                 {"method2", method2}};
 
-    ObjectType bto("SomeType");
-    auto* bt = &bto;
-    ast::Instance n("Comparable", bt, cmethods, DUMMY_POS, DUMMY_POS);
-    nlohmann::json nj = n.to_json();
-
+    auto bt = std::make_unique<ObjectType>("SomeType");
     nlohmann::json e = {{"type",     "instance"},
                         {"instance", {{"id", "Comparable"}, {"base_type", bt->to_json()}, {"methods", {{"method1", method1->to_json()}, {"method2", method2->to_json()}}}}}};
+    ast::Instance n("Comparable", std::move(bt), cmethods, DUMMY_POS, DUMMY_POS);
+    nlohmann::json nj = n.to_json();
+
     REQUIRE(e == nj);
 }

@@ -13,6 +13,12 @@
 
 class TypeNode;
 
+class ObjectType;
+
+class FunctionType;
+
+typedef std::unique_ptr<FunctionType> UFunctionType;
+typedef std::unique_ptr<ObjectType> UObjectType;
 typedef std::unique_ptr<TypeNode> UTypeNode;
 typedef std::unique_ptr<ast::Function> UFunctionNode;
 typedef std::unique_ptr<ast::BinaryOp> UBinopNode;

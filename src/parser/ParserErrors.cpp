@@ -188,7 +188,7 @@ std::unique_ptr<ast::Instance> Parser::parse_instance() {
     Token instance_tok = this->expect_token(TokType::INSTANCE);
     Token id_tok = this->expect_token(TokType::ID);
     this->expect_token(TokType::LSQUARE);
-    ObjectType* ot = this->parse_object_type().release();
+    UObjectType ot = this->parse_object_type();
     this->expect_token(TokType::RSQUARE);
     this->expect_token(TokType::LCURLY);
     std::unordered_map<std::string, ast::Function*> methods;
@@ -205,5 +205,5 @@ std::unique_ptr<ast::Instance> Parser::parse_instance() {
         }
     }
     Token f_curly = this->expect_token(TokType::RCURLY);
-    return std::make_unique<ast::Instance>(id_tok.str, ot, methods, instance_tok.start, f_curly.end_pos);
+    return std::make_unique<ast::Instance>(id_tok.str, std::move(ot), methods, instance_tok.start, f_curly.end_pos);
 }
