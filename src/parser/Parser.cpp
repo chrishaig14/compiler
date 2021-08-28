@@ -5,9 +5,9 @@
 #include "Parser.h"
 #include "../semantic/GlobalProcessor.h"
 #include "../ast/PartialApplication.h"
-#include "../ast/UnaryOpNode.h"
+#include "../ast/UnaryOp.h"
 #include "../logging/logging.h"
-#include "../ast/DefaultConstructorNode.h"
+#include "../ast/DefaultConstructor.h"
 #include <fmt/core.h>
 #include <fmt/color.h>
 #include <exception>
@@ -20,14 +20,14 @@ std::unordered_map<TokType, OpType> TOKEN_TO_OP = {{TokType::PLUS,  OpType::ADD}
                                                    {TokType::DIV,   OpType::DIV},
                                                    {TokType::MOD,   OpType::MOD}};
 
-std::unordered_map<TokType, BoolOp> TOKEN_TO_BOOL_OP = {{TokType::AND, BoolOp::AND},
-                                                        {TokType::OR,  BoolOp::OR},
-                                                        {TokType::LT,  BoolOp::LT},
-                                                        {TokType::GT,  BoolOp::GT},
-                                                        {TokType::LEQ, BoolOp::LE},
-                                                        {TokType::GEQ, BoolOp::GE},
-                                                        {TokType::NEQ, BoolOp::NE},
-                                                        {TokType::EQ,  BoolOp::EQ}};
+std::unordered_map<TokType, BoolOpType> TOKEN_TO_BOOL_OP = {{TokType::AND, BoolOpType::AND},
+                                                            {TokType::OR,  BoolOpType::OR},
+                                                            {TokType::LT,  BoolOpType::LT},
+                                                            {TokType::GT,  BoolOpType::GT},
+                                                            {TokType::LEQ, BoolOpType::LE},
+                                                            {TokType::GEQ, BoolOpType::GE},
+                                                            {TokType::NEQ, BoolOpType::NE},
+                                                            {TokType::EQ,  BoolOpType::EQ}};
 
 Parser::Parser(const std::string& __file__, CodeLines code_lines, std::vector<Token>& tokens) {
     this->__file__ = __file__;
@@ -101,7 +101,7 @@ UNode Parser::parse_list_literal() {
         // parse required type annotation (cannot infer type of empty list
         this->expect_token(TokType::DOUBLE_COLON);
         auto type = this->parse_type_node();
-        auto node = std::make_unique<ast::EmptyListNode>(type.release(), list_start.start, list_start.end_pos);
+        auto node = std::make_unique<ast::EmptyList>(type.release(), list_start.start, list_start.end_pos);
         return node;
     }
     while (true) {
@@ -113,7 +113,7 @@ UNode Parser::parse_list_literal() {
         this->next();
     }
     Token list_end = this->expect_token(TokType::RSQUARE);
-    auto node = std::make_unique<ast::ListNode>(elements, list_start.start, list_end.start);
+    auto node = std::make_unique<ast::List>(elements, list_start.start, list_end.start);
     return node;
 }
 
@@ -195,7 +195,7 @@ UNode Parser::parse_or_expression() {
     while (this->match(TokType::OR)) {
         this->next();
         auto right = this->parse_and_expression();
-        auto node = std::make_unique<ast::BoolOpNode>(BoolOp::OR, left, right, left->start, right->end);
+        auto node = std::make_unique<ast::BoolOp>(BoolOpType::OR, left, right, left->start, right->end);
         left = std::move(node);
     }
     return left;
@@ -206,7 +206,7 @@ UNode Parser::parse_and_expression() {
     while (this->match(TokType::AND)) {
         this->next();
         auto right = this->parse_not_expression();
-        auto node = std::make_unique<ast::BoolOpNode>(BoolOp::AND, left, right, left->start, right->end);
+        auto node = std::make_unique<ast::BoolOp>(BoolOpType::AND, left, right, left->start, right->end);
         left = std::move(node);
     }
     return left;
@@ -216,7 +216,7 @@ UNode Parser::parse_not_expression() {
     if (this->match(TokType::NOT)) {
         Token not_tok = this->expect_token(TokType::NOT);
         auto left = this->parse_bool_expression();
-        left = std::make_unique<ast::UnaryOpNode>(UnaryOp::NOT, left.release(), not_tok.start, left->end);
+        left = std::make_unique<ast::UnaryOp>(UnaryOpType::NOT, left.release(), not_tok.start, left->end);
         return left;
     }
     return this->parse_bool_expression();
@@ -224,7 +224,7 @@ UNode Parser::parse_not_expression() {
 
 UNode Parser::parse_bool_expression() {
     auto left = this->parse_add_or_sub_expression();
-    BoolOp op;
+    BoolOpType op;
     std::vector<TokType> boolean_tokens = {TokType::EQ, TokType::LT, TokType::GT, TokType::LEQ, TokType::GEQ,
                                            TokType::NEQ};
     if (!item_in_vec(this->token.type, boolean_tokens)) {
@@ -233,7 +233,7 @@ UNode Parser::parse_bool_expression() {
     op = TOKEN_TO_BOOL_OP[this->token.type];
     this->next();
     auto right = this->parse_add_or_sub_expression();
-    auto node = std::make_unique<ast::BoolOpNode>(op, left, right, left->start, right->end);
+    auto node = std::make_unique<ast::BoolOp>(op, left, right, left->start, right->end);
     return node;
 }
 
@@ -317,7 +317,7 @@ UNode Parser::parse_dictionary() {
         this->expect_token(TokType::COMMA);
         UTypeNode value_type = this->parse_type_node();
         Token rsquare = this->expect_token(TokType::RSQUARE);
-        return std::make_unique<ast::EmptyDictNode>(key_type, value_type, lcurly.start, rsquare.end_pos);
+        return std::make_unique<ast::EmptyDict>(key_type, value_type, lcurly.start, rsquare.end_pos);
     }
     std::vector<std::pair<UNode, UNode>> items;
     Token rcurly;
@@ -381,19 +381,19 @@ UNode Parser::parse_id_or_literal() {
             break;
         }
         case TokType::INTEGER: {
-            node = ast::NumberNode::make(NumberType::INTEGER, this->token.str, this->token.start, this->token.end_pos);
+            node = ast::Number::make(NumberType::INTEGER, this->token.str, this->token.start, this->token.end_pos);
             node->end = this->token.end_pos;
             this->next();
             break;
         }
         case TokType::FLOAT: {
-            node =ast:: NumberNode::make(NumberType::FLOAT, this->token.str, this->token.start, this->token.end_pos);
+            node =ast:: Number::make(NumberType::FLOAT, this->token.str, this->token.start, this->token.end_pos);
             node->end = this->token.end_pos;
             this->next();
             break;
         }
         case TokType::DOUBLE: {
-            node = ast::NumberNode::make(NumberType::DOUBLE, this->token.str, this->token.start, this->token.end_pos);
+            node = ast::Number::make(NumberType::DOUBLE, this->token.str, this->token.start, this->token.end_pos);
             node->end = this->token.end_pos;
             this->next();
             break;
@@ -417,7 +417,7 @@ UNode Parser::parse_id_or_literal() {
         case TokType::LSQUARE:
             return this->parse_list_literal();
         case TokType::NONE: {
-            node = std::make_unique<ast::NoneNode>(this->token.start, this->token.end_pos);
+            node = std::make_unique<ast::None>(this->token.start, this->token.end_pos);
             this->next();
             return node;
         }
@@ -447,7 +447,7 @@ UNode Parser::parse_tuple_or_constructor() {
             idd = this->expect_token(TokType::ID);
             m = std::make_unique<ast::Member>(m, idd);
         }
-        parent = std::make_unique<ast::DefaultConstructorNode>(m.release(), hash_tok.start, m->end);
+        parent = std::make_unique<ast::DefaultConstructor>(m.release(), hash_tok.start, m->end);
     } else {
         parent = this->parse_tuple_literal();
         parent->start = hash_tok.start;
@@ -482,7 +482,7 @@ UNode Parser::parse_tuple_literal() {
         }
     }
     Token close = this->expect_token(TokType::RPAREN);
-    return std::make_unique<ast::TupleNode>(values, st.start, close.end_pos);
+    return std::make_unique<ast::Tuple>(values, st.start, close.end_pos);
 }
 
 UNode Parser::parse_id_or_class_literal() {
@@ -520,7 +520,7 @@ UNode Parser::parse_call_or_subscript_chain(UNode& parent) {
             UNode old_node = std::move(node);
             VectorOfNodesU v;
             v.push_back(std::move(value));
-            node = std::make_unique<ast::SubscriptNode>(old_node, v, old_node->start, close.end_pos);
+            node = std::make_unique<ast::Subscript>(old_node, v, old_node->start, close.end_pos);
         }
     }
     return node;
@@ -586,7 +586,7 @@ UNode Parser::parse_common_statement() {
             }
             Token tok = this->token;
             this->next();
-            return std::make_unique<ast::BreakNode>(tok.start, tok.end_pos);
+            return std::make_unique<ast::Break>(tok.start, tok.end_pos);
         }
         case TokType::CONTINUE: {
             if (!this->inside_loop) {
@@ -595,7 +595,7 @@ UNode Parser::parse_common_statement() {
             }
             Token tok = this->token;
             this->next();
-            return std::make_unique<ast::ContinueNode>(tok.start, tok.end_pos);
+            return std::make_unique<ast::Continue>(tok.start, tok.end_pos);
         }
         default: {
             auto node = this->parse_assignment_or_expression();
@@ -767,13 +767,13 @@ Token Parser::expect_token(TokType token_type) {
     return matched_token;
 }
 
-std::unique_ptr<ast::AliasNode> Parser::parse_alias() {
+std::unique_ptr<ast::Alias> Parser::parse_alias() {
     Token alias_tk = this->expect_token(TokType::ALIAS);
     Token alias_id = this->expect_token(TokType::ID);
     this->expect_token(TokType::EQQ);
     TypeNode* aliased_type = this->parse_type_node().release();
     Token semic_tk = this->expect_token(TokType::SEMICOLON);
-    auto node = std::make_unique<ast::AliasNode>(alias_id.str, aliased_type, alias_tk.start, semic_tk.end_pos);
+    auto node = std::make_unique<ast::Alias>(alias_id.str, aliased_type, alias_tk.start, semic_tk.end_pos);
     return node;
 }
 
@@ -953,7 +953,7 @@ std::unique_ptr<ast::Klass> Parser::parse_class_definition() {
     return c;
 }
 
-std::unique_ptr<ast::ImportNode> Parser::parse_import() {
+std::unique_ptr<ast::Import> Parser::parse_import() {
     Token import_tok = this->expect_token(TokType::IMPORT);
     VectorOfStrings path;
     // path.push_back("global");
@@ -977,13 +977,13 @@ std::unique_ptr<ast::ImportNode> Parser::parse_import() {
         this->next();
         Token alias = this->expect_token(TokType::ID);
         this->expect_token(TokType::SEMICOLON);
-        return std::make_unique<ast::ImportNode>(path, alias.str, import_tok.start, path_part.end_pos);
+        return std::make_unique<ast::Import>(path, alias.str, import_tok.start, path_part.end_pos);
     }
     this->expect_token(TokType::SEMICOLON);
-    return std::make_unique<ast::ImportNode>(path, import_tok.start, path_part.end_pos);
+    return std::make_unique<ast::Import>(path, import_tok.start, path_part.end_pos);
 }
 
-std::unique_ptr<ast::MatchExpressionNode> Parser::parse_match_statement() {
+std::unique_ptr<ast::Match> Parser::parse_match_statement() {
     Token mtk = this->expect_token(TokType::MATCH);
     auto exp = this->parse_expression();
     this->expect_token(TokType::LCURLY);
@@ -1002,11 +1002,11 @@ std::unique_ptr<ast::MatchExpressionNode> Parser::parse_match_statement() {
         }
     }
     Token lcurly = this->expect_token(TokType::RCURLY);
-    return std::make_unique<ast::MatchExpressionNode>(exp.release(), ids, cases, mtk.start, lcurly.end_pos);
+    return std::make_unique<ast::Match>(exp.release(), ids, cases, mtk.start, lcurly.end_pos);
 }
 
 
-std::unique_ptr<ast::TypeclassNode> Parser::parse_typeclass() {
+std::unique_ptr<ast::Typeclass> Parser::parse_typeclass() {
     this->expect_token(TokType::TYPECLASS);
     Token typeclass_id = this->expect_token(TokType::ID);
     this->expect_token(TokType::LSQUARE);
@@ -1058,7 +1058,7 @@ std::unique_ptr<ast::TypeclassNode> Parser::parse_typeclass() {
     }
 
     Token final_curly = this->expect_token(TokType::RCURLY);
-    auto n = std::make_unique<ast::TypeclassNode>(typeclass_id.str,
+    auto n = std::make_unique<ast::Typeclass>(typeclass_id.str,
                                              base_type.str,
                                              methods,
                                              typeclass_id.start,

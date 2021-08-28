@@ -110,19 +110,19 @@ void make_not_generic(ObjectType* ot) {
     }
 }
 
-std::string map_boolop_to_method_name(BoolOp op) {
-    std::map<BoolOp, std::string> funs;
+std::string map_boolop_to_method_name(BoolOpType op) {
+    std::map<BoolOpType, std::string> funs;
 
-    funs[BoolOp::EQ] = "eq";
-    funs[BoolOp::NE] = "ne";
+    funs[BoolOpType::EQ] = "eq";
+    funs[BoolOpType::NE] = "ne";
 
-    funs[BoolOp::AND] = "and";
-    funs[BoolOp::OR] = "or";
+    funs[BoolOpType::AND] = "and";
+    funs[BoolOpType::OR] = "or";
 
-    funs[BoolOp::LE] = "le";
-    funs[BoolOp::GE] = "ge";
-    funs[BoolOp::LT] = "lt";
-    funs[BoolOp::GT] = "gt";
+    funs[BoolOpType::LE] = "le";
+    funs[BoolOpType::GE] = "ge";
+    funs[BoolOpType::LT] = "lt";
+    funs[BoolOpType::GT] = "gt";
 
     return "__" + funs[op] + "__";
 }

@@ -45,7 +45,7 @@
 #include "../simple_nodes/ObjectMemberSNode.h"
 #include "../simple_nodes/MatchSNode.h"
 #include "CheckerUtils.h"
-#include "../ast/UnaryOpNode.h"
+#include "../ast/UnaryOp.h"
 #include "../ast/ObjectType.h"
 
 #define T_NONE ObjectType(".None")
@@ -110,40 +110,40 @@ public:
     USemanticInfo visit_block(ast::Block& node);
     USemanticInfo visit_root(ast::Block& node);
     USemanticInfo visit_boolean(ast::Boolean& node);
-    USemanticInfo visit_boolop(ast::BoolOpNode& n);
-    USemanticInfo visit_break(ast::BreakNode& node);
+    USemanticInfo visit_boolop(ast::BoolOp& n);
+    USemanticInfo visit_break(ast::Break& node);
     USemanticInfo visit_call(ast::Call& n, bool is_rvalue);
     USemanticInfo visit_class(ast::Klass& node);
-    USemanticInfo visit_continue(ast::ContinueNode& node);
+    USemanticInfo visit_continue(ast::Continue& node);
 
-    USemanticInfo visit_lvalue_subscript(ast::SubscriptNode& node);
+    USemanticInfo visit_lvalue_subscript(ast::Subscript& node);
 
     USemanticInfo visit_declaration(ast::Declaration& n);
     USemanticInfo check_declaration_with_type(ast::Declaration& n);
     USemanticInfo check_declaration_without_type(ast::Declaration& n);
 
     USemanticInfo visit_dict(ast::DictNode& node);
-    USemanticInfo visit_emptydict(ast::EmptyDictNode& node);
-    USemanticInfo visit_emptylist(ast::EmptyListNode& node);
-    USemanticInfo visit_unary(ast::UnaryOpNode& n);
+    USemanticInfo visit_emptydict(ast::EmptyDict& node);
+    USemanticInfo visit_emptylist(ast::EmptyList& node);
+    USemanticInfo visit_unary(ast::UnaryOp& n);
     USemanticInfo visit_for(ast::For& node);
     USemanticInfo visit_function(ast::Function& n);
     USemanticInfo visit_id(ast::Id& n);
     USemanticInfo visit_if(ast::If& n);
-    USemanticInfo visit_list(ast::ListNode& node);
+    USemanticInfo visit_list(ast::List& node);
     USemanticInfo visit_member(ast::Member& n);
-    USemanticInfo visit_none(ast::NoneNode& node);
-    USemanticInfo visit_import(ast::ImportNode& node);
-    USemanticInfo visit_number(ast::NumberNode& node);
+    USemanticInfo visit_none(ast::None& node);
+    USemanticInfo visit_import(ast::Import& node);
+    USemanticInfo visit_number(ast::Number& node);
     USemanticInfo visit_partial(ast::PartialApplication& node);
     USemanticInfo visit_return(ast::Return& n);
     USemanticInfo visit_string(ast::String& node);
-    USemanticInfo visit_subscript(ast::SubscriptNode& node);
-    USemanticInfo visit_ternary(ast::TernaryNode& node);
-    USemanticInfo visit_tuple(ast::TupleNode& node);
+    USemanticInfo visit_subscript(ast::Subscript& node);
+    USemanticInfo visit_ternary(ast::Ternary& node);
+    USemanticInfo visit_tuple(ast::Tuple& node);
     USemanticInfo visit_while(ast::While& node);
-    USemanticInfo visit_cast(ast::CastNode& n);
-    USemanticInfo visit_defconst(ast::DefaultConstructorNode& node);
+    USemanticInfo visit_cast(ast::Cast& n);
+    USemanticInfo visit_defconst(ast::DefaultConstructor& node);
 
 
     USemanticInfo object_member(SNode* object_snode, Value& p_value, const std::string& child, ast::Member& n);
@@ -152,8 +152,8 @@ public:
     USemanticInfo module_member(Module& mod, const std::string& child, ast::Member& n);
 
 
-    USemanticInfo visit_match(ast::MatchExpressionNode& node);
-    USemanticInfo visit_alias(ast::AliasNode& p_node);
+    USemanticInfo visit_match(ast::Match& node);
+    USemanticInfo visit_alias(ast::Alias& p_node);
     USemanticInfo enum_member(Enum* enumm, const std::string& value, ast::Member& node);
     USemanticInfo visit_enum(ast::EnumNode& p_node);
     SNode* make_rvalue(const Entity& value_entity, SNode* value_snode, const TypeNode& target);

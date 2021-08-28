@@ -1,7 +1,7 @@
 #include "catch.hpp"
 #include "../src/scanner/Scanner.h"
 #include "../src/parser/Parser.h"
-#include "../src/ast/UnaryOpNode.h"
+#include "../src/ast/UnaryOp.h"
 #include "../src/semantic/GlobalProcessor.h"
 #include "../src/semantic/Checker.h"
 #include "../src/compiler/Compiler.h"
@@ -95,7 +95,7 @@ TEST_CASE("basic_declaration_bad_type", "[checker]") {
     REQUIRE(checker.error_reporter.failed);
     REQUIRE(checker.error_reporter.errors.size() == 1);
     Error& error = *checker.error_reporter.errors.back();
-    ast::NumberNode node(NumberType::INTEGER, "9", _POS, _POS);
+    ast::Number node(NumberType::INTEGER, "9", _POS, _POS);
     ObjectType expected("Boolean");
     ErrorTypeMismatch exp(expected, node, *entity_from_type(ObjectType("Integer")));
     REQUIRE(error == exp);
@@ -113,7 +113,7 @@ TEST_CASE("error_redeclared", "[checker]") {
     REQUIRE(checker.error_reporter.failed);
     REQUIRE(checker.error_reporter.errors.size() == 1);
     Error& error = *checker.error_reporter.errors.back();
-    ast::NumberNode node(NumberType::INTEGER, "9", _POS, _POS);
+    ast::Number node(NumberType::INTEGER, "9", _POS, _POS);
     ObjectType expected("Boolean");
     ErrorRedeclared exp("x",
                         (ast::Declaration&) *((std::unique_ptr<ast::Function>&) module.ast->nodes[0])->body->nodes[1]);
@@ -547,8 +547,8 @@ TEST_CASE("subscript_no_method_error", "[checker]") {
     ast::String right("Bye", _POS, _POS);
     UNode p_node = ast::Id::make("f", _POS, _POS);
     VectorOfNodesU v;
-    v.push_back(ast::NumberNode::make(NumberType::INTEGER, "1", _POS, _POS));
-    ast::SubscriptNode node(p_node, v, _POS, _POS);
+    v.push_back(ast::Number::make(NumberType::INTEGER, "1", _POS, _POS));
+    ast::Subscript node(p_node, v, _POS, _POS);
     ObjectType expected("Integer");
     ObjectType type("Foo");
     ErrorObjectNoSpecialMethod exp(type, "__get_item__", node);
@@ -681,7 +681,7 @@ TEST_CASE("while_boolean_error", "[checker]") {
 
 
     Error& error = *checker.error_reporter.errors.back();
-    ast::NumberNode node(NumberType::INTEGER, "5", _POS, _POS);
+    ast::Number node(NumberType::INTEGER, "5", _POS, _POS);
     ObjectType expected("Boolean");
     ErrorTypeMismatch exp(expected, node, *entity_from_type(ObjectType("Integer")));
     REQUIRE(error == exp);
@@ -716,7 +716,7 @@ TEST_CASE("if_boolean_error", "[checker]") {
 
 
     Error& error = *checker.error_reporter.errors.back();
-    ast::NumberNode node(NumberType::INTEGER, "5", _POS, _POS);
+    ast::Number node(NumberType::INTEGER, "5", _POS, _POS);
     ObjectType expected("Boolean");
     ErrorTypeMismatch exp(expected, node, *entity_from_type(ObjectType("Integer")));
     REQUIRE(error == exp);

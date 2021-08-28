@@ -21,7 +21,7 @@ std::string ErrorObjectNoSpecialMethod::to_str() const {
 }
 
 ErrorObjectNoSpecialMethod::ErrorObjectNoSpecialMethod(const TypeNode& type, const std::string& method_name,
-                                                       const ast::SubscriptNode& node)
+                                                       const ast::Subscript& node)
         : node(node), method_name(method_name), type(type) {
 
 }

@@ -8,9 +8,9 @@
 
 #include <unordered_map>
 #include "SymbolTable.h"
-#include "../ast/ImportNode.h"
+#include "../ast/Import.h"
 #include "../ast/Klass.h"
-#include "../ast/AliasNode.h"
+#include "../ast/Alias.h"
 #include "../ast/EnumNode.h"
 #include "../units/Enum.h"
 
@@ -26,8 +26,8 @@ public:
     void visit_function(ast::Function& node);
     void visit_block(ast::Block& node);
     void visit_enum(ast::EnumNode& node);
-    void visit_alias(ast::AliasNode& node);
-    void visit_import(ast::ImportNode& node);
+    void visit_alias(ast::Alias& node);
+    void visit_import(ast::Import& node);
     void visit_class(ast::Klass& node);
     void check_duplicated_names(ast::Block& node) const;
     void add_default_imports();

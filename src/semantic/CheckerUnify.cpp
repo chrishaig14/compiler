@@ -150,7 +150,7 @@ std::pair<std::string, TypeNode*>* Checker::get_first_substitution(TypeNode& a, 
     }
 }
 
-USemanticInfo Checker::visit_import(ast::ImportNode& node) {
+USemanticInfo Checker::visit_import(ast::Import& node) {
 
     USemanticInfo info_u = std::make_unique<SemanticInfo>();
     return info_u;
@@ -173,7 +173,7 @@ Entity* map_flirpin_to_entity(Flirpin flirpin) {
 }
 
 
-USemanticInfo Checker::visit_alias(ast::AliasNode& p_node) {
+USemanticInfo Checker::visit_alias(ast::Alias& p_node) {
     USemanticInfo info_u = std::make_unique<SemanticInfo>();
     return info_u;
 }

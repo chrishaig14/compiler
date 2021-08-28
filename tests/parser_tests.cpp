@@ -1,9 +1,9 @@
 #include "catch.hpp"
 #include "../src/scanner/Scanner.h"
 #include "../src/parser/Parser.h"
-#include "../src/ast/UnaryOpNode.h"
-#include "../src/ast/TypeclassNode.h"
-#include "../src/ast/InstanceNode.h"
+#include "../src/ast/UnaryOp.h"
+#include "../src/ast/Typeclass.h"
+#include "../src/ast/Instance.h"
 
 const TextPosition DUMMY_POS = {0, 0};
 
@@ -502,7 +502,7 @@ TEST_CASE("parse_list_empty", "[parser]") {
 
     UNode ast = parser.parse_list_literal();
 
-    REQUIRE(ast->to_json() == ast::EmptyListNode(TYPE.node->clone(), DUMMY_POS, DUMMY_POS).to_json());
+    REQUIRE(ast->to_json() == ast::EmptyList(TYPE.node->clone(), DUMMY_POS, DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_list_one_element", "[parser]") {
@@ -518,7 +518,7 @@ TEST_CASE("parse_list_one_element", "[parser]") {
     UNode ast = parser.parse_list_literal();
     VectorOfNodesU v;
     v.push_back(std::move(EXPRESSION_1.node));
-    REQUIRE(ast->to_json() == ast::ListNode(v, DUMMY_POS, DUMMY_POS).to_json());
+    REQUIRE(ast->to_json() == ast::List(v, DUMMY_POS, DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_list_mult_elements", "[parser]") {
@@ -535,7 +535,7 @@ TEST_CASE("parse_list_mult_elements", "[parser]") {
     VectorOfNodesU v;
     v.push_back(std::move(EXPRESSION_1.node));
     v.push_back(std::move(EXPRESSION_2.node));
-    REQUIRE(ast->to_json() == ast::ListNode(v, DUMMY_POS, DUMMY_POS).to_json());
+    REQUIRE(ast->to_json() == ast::List(v, DUMMY_POS, DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_number_integer", "[parser]") {
@@ -548,7 +548,7 @@ TEST_CASE("parse_number_integer", "[parser]") {
 
     UNode ast = parser.parse_id_or_literal();
 
-    REQUIRE(ast->to_json() == ast::NumberNode(NumberType::INTEGER, "89", DUMMY_POS, DUMMY_POS).to_json());
+    REQUIRE(ast->to_json() == ast::Number(NumberType::INTEGER, "89", DUMMY_POS, DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_number_float", "[parser]") {
@@ -561,7 +561,7 @@ TEST_CASE("parse_number_float", "[parser]") {
 
     UNode ast = parser.parse_id_or_literal();
 
-    REQUIRE(ast->to_json() == ast::NumberNode(NumberType::FLOAT, "3.14", DUMMY_POS, DUMMY_POS).to_json());
+    REQUIRE(ast->to_json() == ast::Number(NumberType::FLOAT, "3.14", DUMMY_POS, DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_empty_string", "[parser]") {
@@ -600,7 +600,7 @@ TEST_CASE("parse_none", "[parser]") {
 
     UNode ast = parser.parse_id_or_literal();
 
-    REQUIRE(ast->to_json() == ast::NoneNode(DUMMY_POS, DUMMY_POS).to_json());
+    REQUIRE(ast->to_json() == ast::None(DUMMY_POS, DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_true", "[parser]") {
@@ -642,7 +642,7 @@ TEST_CASE("parse_and_exp", "[parser]") {
     UNode ast = parser.parse_and_expression();
 
     REQUIRE(ast->to_json() ==
-            ast::BoolOpNode(BoolOp::AND, EXPRESSION_1.node, EXPRESSION_2.node, DUMMY_POS, DUMMY_POS).to_json());
+            ast::BoolOp(BoolOpType::AND, EXPRESSION_1.node, EXPRESSION_2.node, DUMMY_POS, DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_or_exp", "[parser]") {
@@ -658,7 +658,7 @@ TEST_CASE("parse_or_exp", "[parser]") {
     UNode ast = parser.parse_or_expression();
 
     REQUIRE(ast->to_json() ==
-            ast::BoolOpNode(BoolOp::OR, EXPRESSION_1.node, EXPRESSION_2.node, DUMMY_POS, DUMMY_POS).to_json());
+            ast::BoolOp(BoolOpType::OR, EXPRESSION_1.node, EXPRESSION_2.node, DUMMY_POS, DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_eq_exp", "[parser]") {
@@ -674,7 +674,7 @@ TEST_CASE("parse_eq_exp", "[parser]") {
     UNode ast = parser.parse_and_expression();
 
     REQUIRE(ast->to_json() ==
-            ast::BoolOpNode(BoolOp::EQ, EXPRESSION_1.node, EXPRESSION_2.node, DUMMY_POS, DUMMY_POS).to_json());
+            ast::BoolOp(BoolOpType::EQ, EXPRESSION_1.node, EXPRESSION_2.node, DUMMY_POS, DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_ge_exp", "[parser]") {
@@ -690,7 +690,7 @@ TEST_CASE("parse_ge_exp", "[parser]") {
     UNode ast = parser.parse_and_expression();
 
     REQUIRE(ast->to_json() ==
-            ast::BoolOpNode(BoolOp::GE, EXPRESSION_1.node, EXPRESSION_2.node, DUMMY_POS, DUMMY_POS).to_json());
+            ast::BoolOp(BoolOpType::GE, EXPRESSION_1.node, EXPRESSION_2.node, DUMMY_POS, DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_le_exp", "[parser]") {
@@ -706,7 +706,7 @@ TEST_CASE("parse_le_exp", "[parser]") {
     UNode ast = parser.parse_and_expression();
 
     REQUIRE(ast->to_json() ==
-            ast::BoolOpNode(BoolOp::LE, EXPRESSION_1.node, EXPRESSION_2.node, DUMMY_POS, DUMMY_POS).to_json());
+            ast::BoolOp(BoolOpType::LE, EXPRESSION_1.node, EXPRESSION_2.node, DUMMY_POS, DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_gt_exp", "[parser]") {
@@ -722,7 +722,7 @@ TEST_CASE("parse_gt_exp", "[parser]") {
     UNode ast = parser.parse_and_expression();
 
     REQUIRE(ast->to_json() ==
-            ast::BoolOpNode(BoolOp::GT, EXPRESSION_1.node, EXPRESSION_2.node, DUMMY_POS, DUMMY_POS).to_json());
+            ast::BoolOp(BoolOpType::GT, EXPRESSION_1.node, EXPRESSION_2.node, DUMMY_POS, DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_lt_exp", "[parser]") {
@@ -738,7 +738,7 @@ TEST_CASE("parse_lt_exp", "[parser]") {
     UNode ast = parser.parse_and_expression();
 
     REQUIRE(ast->to_json() ==
-            ast::BoolOpNode(BoolOp::LT, EXPRESSION_1.node, EXPRESSION_2.node, DUMMY_POS, DUMMY_POS).to_json());
+            ast::BoolOp(BoolOpType::LT, EXPRESSION_1.node, EXPRESSION_2.node, DUMMY_POS, DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_ne_exp", "[parser]") {
@@ -754,7 +754,7 @@ TEST_CASE("parse_ne_exp", "[parser]") {
     UNode ast = parser.parse_and_expression();
 
     REQUIRE(ast->to_json() ==
-            ast::BoolOpNode(BoolOp::NE, EXPRESSION_1.node, EXPRESSION_2.node, DUMMY_POS, DUMMY_POS).to_json());
+            ast::BoolOp(BoolOpType::NE, EXPRESSION_1.node, EXPRESSION_2.node, DUMMY_POS, DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_not_exp", "[parser]") {
@@ -769,7 +769,7 @@ TEST_CASE("parse_not_exp", "[parser]") {
     UNode ast = parser.parse_and_expression();
 
     REQUIRE(ast->to_json() ==
-            ast::UnaryOpNode(UnaryOp::NOT, EXPRESSION.node.release(), DUMMY_POS, DUMMY_POS).to_json());
+            ast::UnaryOp(UnaryOpType::NOT, EXPRESSION.node.release(), DUMMY_POS, DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_tuple", "[parser]") {
@@ -786,7 +786,7 @@ TEST_CASE("parse_tuple", "[parser]") {
     // auto EXPRESSION_1 = EXPRESSION_1_U();
     // auto EXPRESSION_2 = EXPRESSION_2_U();
     REQUIRE(ast->to_json() ==
-            ast::TupleNode({EXPRESSION_1.node.release(), EXPRESSION_2.node.release()}, DUMMY_POS, DUMMY_POS).to_json());
+            ast::Tuple({EXPRESSION_1.node.release(), EXPRESSION_2.node.release()}, DUMMY_POS, DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_dict_empty", "[parser]") {
@@ -800,7 +800,7 @@ TEST_CASE("parse_dict_empty", "[parser]") {
     UNode ast = parser.parse_dictionary();
     UTypeNode u1(TYPE_1.node->clone());
     UTypeNode u2(TYPE_2.node->clone());
-    REQUIRE(ast->to_json() == ast::EmptyDictNode(u1, u2, DUMMY_POS, DUMMY_POS).to_json());
+    REQUIRE(ast->to_json() == ast::EmptyDict(u1, u2, DUMMY_POS, DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_dict_one_element", "[parser]") {
@@ -870,7 +870,7 @@ TEST_CASE("parse_subscript", "[parser]") {
     UNode ast = parser.parse_factor();
     VectorOfNodesU v;
     v.push_back(std::move(EXPRESSION_2.node));
-    REQUIRE(ast->to_json() == ast::SubscriptNode(EXPRESSION.node, v, DUMMY_POS, DUMMY_POS).to_json());
+    REQUIRE(ast->to_json() == ast::Subscript(EXPRESSION.node, v, DUMMY_POS, DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_partial_one_arg", "[parser]") {
@@ -935,8 +935,8 @@ TEST_CASE("parse_typeclass", "[parser]") {
     Parser parser("test", scanner.code_lines, tokens);
     parser.top_package_name = "main";
 
-    std::unique_ptr<ast::TypeclassNode> ast = parser.parse_typeclass();
-    REQUIRE(ast->to_json() == ast::TypeclassNode("Comparable",
+    std::unique_ptr<ast::Typeclass> ast = parser.parse_typeclass();
+    REQUIRE(ast->to_json() == ast::Typeclass("Comparable",
                                                  "t",
                                                  {{"eq", new FunctionType({new ObjectType("t"), new ObjectType("t")},
                                                                           new ObjectType("Boolean"))},
@@ -954,7 +954,7 @@ TEST_CASE("parse_instance", "[parser]") {
     Parser parser("test", scanner.code_lines, tokens);
     parser.top_package_name = "main";
 
-    std::unique_ptr<ast::InstanceNode> ast = parser.parse_instance();
+    std::unique_ptr<ast::Instance> ast = parser.parse_instance();
     std::unique_ptr<ast::Block> b2 = ast::Block::make(VectorOfNodesU{}, DUMMY_POS, DUMMY_POS);
     std::unique_ptr<ast::Block> b1 = ast::Block::make(VectorOfNodesU{}, DUMMY_POS, DUMMY_POS);
     VectorOfUTypes vt1;
@@ -966,7 +966,7 @@ TEST_CASE("parse_instance", "[parser]") {
     vt2.push_back(std::make_unique<ObjectType>("Foo"));
     UTypeNode r1 = std::make_unique<ObjectType>("Boolean");
     UTypeNode r2 = std::make_unique<ObjectType>("Boolean");
-    REQUIRE(ast->to_json() == ast::InstanceNode("Comparable",
+    REQUIRE(ast->to_json() == ast::Instance("Comparable",
                                                 new ObjectType("Foo"),
                                                 {{"eq", new ast::Function("eq",
                                                                           {"a", "b"},

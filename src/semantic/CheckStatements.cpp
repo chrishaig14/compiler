@@ -13,7 +13,7 @@
 #include "errors/ErrorObjectNoSpecialMethod.h"
 #include "errors/ErrorFor.h"
 
-USemanticInfo Checker::visit_lvalue_subscript(ast::SubscriptNode& node) {
+USemanticInfo Checker::visit_lvalue_subscript(ast::Subscript& node) {
     USemanticInfo parent_p = this->dispatch_rvalue(*node.parent);
     Entity& entity_parent = parent_p->entity.get();
     if (entity_parent.type != E_TYPE::VALUE || ((EntityValue&) entity_parent).value->type->kind == Kind::FUNCTION) {
@@ -74,7 +74,7 @@ USemanticInfo Checker::visit_assignment(ast::Assignment& n) {
     CallSNode* csn = nullptr;
     if (n.lvalue->ntype == NodeType::SUB) {
         // special case
-        linfo_p = this->visit_lvalue_subscript((ast::SubscriptNode&) *n.lvalue);
+        linfo_p = this->visit_lvalue_subscript((ast::Subscript&) *n.lvalue);
         csn = (CallSNode*) linfo_p->snode;
         is_subscript = true;
     } else {
@@ -211,7 +211,7 @@ USemanticInfo Checker::visit_return(ast::Return& n) {
 //     return info_u;
 // }
 
-USemanticInfo Checker::visit_match(ast::MatchExpressionNode& node) {
+USemanticInfo Checker::visit_match(ast::Match& node) {
     USemanticInfo exp_info = this->dispatch_rvalue(*node.exp);
     if (exp_info->entity.get().type != E_TYPE::VALUE ||
         ((EntityValue&) exp_info->entity).value->type->kind != Kind::OBJECT) {
@@ -271,7 +271,7 @@ USemanticInfo Checker::visit_match(ast::MatchExpressionNode& node) {
     return info_u;
 }
 
-USemanticInfo Checker::visit_continue(ast::ContinueNode& node) {
+USemanticInfo Checker::visit_continue(ast::Continue& node) {
     auto* bn = new BlockSNode();
     if (this->update_loop_index_snode != nullptr) {
         bn->nodes.push_back(this->update_loop_index_snode);
@@ -347,7 +347,7 @@ USemanticInfo Checker::visit_for(ast::For& node) {
     return std::make_unique<SemanticInfo>(rinfo);
 }
 
-USemanticInfo Checker::visit_break(ast::BreakNode& node) {
+USemanticInfo Checker::visit_break(ast::Break& node) {
     // node.loop_vars = this->scope->get_all_in_loop();
     USemanticInfo info_u = std::make_unique<SemanticInfo>(); SemanticInfo& info = *info_u;
     BreakSNode* bn = new BreakSNode();

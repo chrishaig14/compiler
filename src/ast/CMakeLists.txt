@@ -6,8 +6,8 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -g -O0 -Wall -pedantic -Werror")
 
 add_library(
         nodes
-        AliasNode.cpp
-        AliasNode.h
+        Alias.cpp
+        Alias.h
         Assignment.cpp
         Assignment.h
         Binop.cpp
@@ -16,29 +16,29 @@ add_library(
         Block.h
         Boolean.cpp
         Boolean.h
-        BoolOpNode.cpp
-        BoolOpNode.h
-        BreakNode.cpp
-        BreakNode.h
+        BoolOp.cpp
+        BoolOp.h
+        Break.cpp
+        Break.h
         Call.cpp
         Call.h
-        CastNode.cpp
-        CastNode.h
+        Cast.cpp
+        Cast.h
         Klass.cpp
         Klass.h
-        ContinueNode.cpp
-        ContinueNode.h
+        Continue.cpp
+        Continue.h
         Declaration.cpp
         Declaration.h
-        DefaultConstructorNode.cpp
-        DefaultConstructorNode.h
-        DefaultConstructorNode.h
+        DefaultConstructor.cpp
+        DefaultConstructor.h
+        DefaultConstructor.h
         DictNode.cpp
         DictNode.h
-        EmptyDictNode.cpp
-        EmptyDictNode.h
-        EmptyListNode.cpp
-        EmptyListNode.h
+        EmptyDict.cpp
+        EmptyDict.h
+        EmptyList.cpp
+        EmptyList.h
         EnumNode.cpp
         EnumNode.h
         For.cpp
@@ -49,14 +49,14 @@ add_library(
         Id.h
         If.cpp
         If.h
-        ImportNode.cpp
-        ImportNode.h
-        InstanceNode.cpp
-        InstanceNode.h
-        ListNode.cpp
-        ListNode.h
-        MatchExpressionNode.cpp
-        MatchExpressionNode.h
+        Import.cpp
+        Import.h
+        Instance.cpp
+        Instance.h
+        List.cpp
+        List.h
+        Match.cpp
+        Match.h
         Member.cpp
         Member.h
         Node.cpp
@@ -64,10 +64,10 @@ add_library(
         Node.h
         Node.h
         nodes.h
-        NoneNode.cpp
-        NoneNode.h
-        NumberNode.cpp
-        NumberNode.h
+        None.cpp
+        None.h
+        Number.cpp
+        Number.h
         optypes.cpp
         optypes.h
         PartialApplication.cpp
@@ -76,18 +76,18 @@ add_library(
         Return.h
         String.cpp
         String.h
-        SubscriptNode.cpp
-        SubscriptNode.h
-        TernaryNode.cpp
-        TernaryNode.h
-        TupleNode.cpp
-        TupleNode.h
+        Subscript.cpp
+        Subscript.h
+        Ternary.cpp
+        Ternary.h
+        Tuple.cpp
+        Tuple.h
         TypeNode.cpp
         TypeNode.h
-        TypeclassNode.cpp
-        TypeclassNode.h
-        UnaryOpNode.cpp
-        UnaryOpNode.h
+        Typeclass.cpp
+        Typeclass.h
+        UnaryOp.cpp
+        UnaryOp.h
         While.cpp
         While.h ObjectType.cpp ObjectType.h FunctionType.cpp FunctionType.h Path.cpp Path.h ast.h)
 

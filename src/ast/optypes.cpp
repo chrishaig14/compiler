@@ -21,23 +21,23 @@ std::string op_to_string(OpType op) {
     throw std::runtime_error("Unknow op type");
 }
 
-std::string bool_op_to_string(BoolOp op) {
+std::string bool_op_to_string(BoolOpType op) {
     switch (op) {
-        case BoolOp::AND:
+        case BoolOpType::AND:
             return "AND";
-        case BoolOp::OR:
+        case BoolOpType::OR:
             return "OR";
-        case BoolOp::LE:
+        case BoolOpType::LE:
             return "CMP <=";
-        case BoolOp::GE:
+        case BoolOpType::GE:
             return "CMP >=";
-        case BoolOp::LT:
+        case BoolOpType::LT:
             return "CMP <";
-        case BoolOp::GT:
+        case BoolOpType::GT:
             return "CMP >";
-        case BoolOp::NE:
+        case BoolOpType::NE:
             return "CMP !=";
-        case BoolOp::EQ:
+        case BoolOpType::EQ:
             return "==";
     }
     throw std::runtime_error("Dont know whta to do with bool op");

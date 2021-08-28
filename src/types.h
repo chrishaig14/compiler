@@ -18,7 +18,7 @@ typedef std::unique_ptr<ast::Function> UFunctionNode;
 typedef std::unique_ptr<ast::Binop> UBinopNode;
 typedef std::unique_ptr<ast::Id> UIdNode;
 typedef std::unique_ptr<ast::Block> UBlockNode;
-typedef std::unique_ptr<ast::NumberNode> UNumberNode;
+typedef std::unique_ptr<ast::Number> UNumberNode;
 typedef std::unique_ptr<ast::Node> UNode;
 typedef std::vector<TypeNode*> VectorOfTypes;
 typedef std::vector<UTypeNode> VectorOfUTypes;

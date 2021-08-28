@@ -10,9 +10,9 @@ enum class OpType {
 };
 std::string op_to_string(OpType op);
 
-enum class BoolOp {
+enum class BoolOpType {
     EQ, AND, OR, LE, GE, LT, GT, NE
 };
-std::string bool_op_to_string(BoolOp op);
+std::string bool_op_to_string(BoolOpType op);
 
 #endif //UNTITLED1_OPTYPES_H
