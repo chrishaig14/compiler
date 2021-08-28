@@ -200,271 +200,274 @@ TEST_CASE("nodes_if_with_elif", "[if]") {
     ast::If n(c, t, std::move(elifs), l, DUMMY_POS, DUMMY_POS);
     nlohmann::json nj = n.to_json();
 
-    REQUIRE(e == nj);}
+    REQUIRE(e == nj);
+}
 
-    TEST_CASE("nodes_for", "[for]") {
-        VectorOfNodesU v;
-        std::unique_ptr<ast::Block> b = ast::Block::make(std::move(v), DUMMY_POS, DUMMY_POS);
-        UNode exp = ast::Id::make("bar", DUMMY_POS, DUMMY_POS);
-        nlohmann::json e = {{"type", "for"},
-                            {"for",  {{"var", "foo"}, {"exp", exp->to_json()}, {"body", b->to_json()}}}};
-        ast::For n("foo", exp, b, DUMMY_POS, DUMMY_POS);
-        nlohmann::json nj = n.to_json();
-        REQUIRE(e == nj);
-    }
+TEST_CASE("nodes_for", "[for]") {
+    VectorOfNodesU v;
+    std::unique_ptr<ast::Block> b = ast::Block::make(std::move(v), DUMMY_POS, DUMMY_POS);
+    UNode exp = ast::Id::make("bar", DUMMY_POS, DUMMY_POS);
+    nlohmann::json e = {{"type", "for"},
+                        {"for",  {{"var", "foo"}, {"exp", exp->to_json()}, {"body", b->to_json()}}}};
+    ast::For n("foo", exp, b, DUMMY_POS, DUMMY_POS);
+    nlohmann::json nj = n.to_json();
+    REQUIRE(e == nj);
+}
 
-    TEST_CASE("nodes_none", "[none]") {
-        ast::None n(DUMMY_POS, DUMMY_POS);
-        nlohmann::json nj = n.to_json();
-        nlohmann::json e = {{"type", "none"}};
-        REQUIRE(e == nj);
-    }
+TEST_CASE("nodes_none", "[none]") {
+    ast::None n(DUMMY_POS, DUMMY_POS);
+    nlohmann::json nj = n.to_json();
+    nlohmann::json e = {{"type", "none"}};
+    REQUIRE(e == nj);
+}
 
-    TEST_CASE("nodes_break", "[break]") {
-        ast::Break n(DUMMY_POS, DUMMY_POS);
-        nlohmann::json nj = n.to_json();
-        nlohmann::json e = {{"type", "break"}};
-        REQUIRE(e == nj);
-    }
+TEST_CASE("nodes_break", "[break]") {
+    ast::Break n(DUMMY_POS, DUMMY_POS);
+    nlohmann::json nj = n.to_json();
+    nlohmann::json e = {{"type", "break"}};
+    REQUIRE(e == nj);
+}
 
-    TEST_CASE("nodes_continue", "[continue]") {
-        ast::Continue n(DUMMY_POS, DUMMY_POS);
-        nlohmann::json nj = n.to_json();
-        nlohmann::json e = {{"type", "continue"}};
-        REQUIRE(e == nj);
-    }
+TEST_CASE("nodes_continue", "[continue]") {
+    ast::Continue n(DUMMY_POS, DUMMY_POS);
+    nlohmann::json nj = n.to_json();
+    nlohmann::json e = {{"type", "continue"}};
+    REQUIRE(e == nj);
+}
 
-    TEST_CASE("nodes_return_no_value", "[return]") {
-        UNode ptr;
-        ast::Return n(ptr, DUMMY_POS, DUMMY_POS);
-        nlohmann::json nj = n.to_json();
-        nlohmann::json e = {{"type",   "return"},
-                            {"return", {{"expression", {}}}}};
-        REQUIRE(e == nj);
-    }
+TEST_CASE("nodes_return_no_value", "[return]") {
+    UNode ptr;
+    ast::Return n(ptr, DUMMY_POS, DUMMY_POS);
+    nlohmann::json nj = n.to_json();
+    nlohmann::json e = {{"type",   "return"},
+                        {"return", {{"expression", {}}}}};
+    REQUIRE(e == nj);
+}
 
-    TEST_CASE("nodes_return_with_value", "[return]") {
-        UNode exp = ast::Id::make("foo", DUMMY_POS, DUMMY_POS);
-        nlohmann::json e = {{"type",   "return"},
-                            {"return", {{"expression", exp->to_json()}}}};
-        ast::Return n(exp, DUMMY_POS, DUMMY_POS);
-        nlohmann::json nj = n.to_json();
+TEST_CASE("nodes_return_with_value", "[return]") {
+    UNode exp = ast::Id::make("foo", DUMMY_POS, DUMMY_POS);
+    nlohmann::json e = {{"type",   "return"},
+                        {"return", {{"expression", exp->to_json()}}}};
+    ast::Return n(exp, DUMMY_POS, DUMMY_POS);
+    nlohmann::json nj = n.to_json();
 
-        REQUIRE(e == nj);
-    }
+    REQUIRE(e == nj);
+}
 
-    TEST_CASE("nodes_subscript", "[subscript]") {
-        UNode i = ast::Id::make("foo", DUMMY_POS, DUMMY_POS);
-        UNode s = ast::Number::make(NumberType::INTEGER, "9", DUMMY_POS, DUMMY_POS);
-        nlohmann::json e = {{"type",      "subscript"},
-                            {"subscript", {{"parent", i->to_json()}, {"child", s->to_json()}}}};
-        VectorOfNodesU v;
-        v.push_back(std::move(s));
-        ast::Subscript n(i, v, DUMMY_POS, DUMMY_POS);
-        nlohmann::json nj = n.to_json();
+TEST_CASE("nodes_subscript", "[subscript]") {
+    UNode i = ast::Id::make("foo", DUMMY_POS, DUMMY_POS);
+    UNode s = ast::Number::make(NumberType::INTEGER, "9", DUMMY_POS, DUMMY_POS);
+    nlohmann::json e = {{"type",      "subscript"},
+                        {"subscript", {{"parent", i->to_json()}, {"child", s->to_json()}}}};
+    VectorOfNodesU v;
+    v.push_back(std::move(s));
+    ast::Subscript n(i, v, DUMMY_POS, DUMMY_POS);
+    nlohmann::json nj = n.to_json();
 
-        REQUIRE(e == nj);
-    }
+    REQUIRE(e == nj);
+}
 
-    TEST_CASE("nodes_binop", "[binop]") {
-        UNode a = ast::Id::make("foo", DUMMY_POS, DUMMY_POS);
-        UNode b = ast::Number::make(NumberType::INTEGER, "9", DUMMY_POS, DUMMY_POS);
-        nlohmann::json e = {{"type",  "binop"},
-                            {"binop", {{"left", a->to_json()}, {"right", b->to_json()}, {"op", op_to_string(OpType::ADD)}}}};
-        ast::BinaryOp n(OpType::ADD, a, b, DUMMY_POS, DUMMY_POS);
-        nlohmann::json nj = n.to_json();
-        REQUIRE(e == nj);
-    }
+TEST_CASE("nodes_binop", "[binop]") {
+    UNode a = ast::Id::make("foo", DUMMY_POS, DUMMY_POS);
+    UNode b = ast::Number::make(NumberType::INTEGER, "9", DUMMY_POS, DUMMY_POS);
+    nlohmann::json e = {{"type",  "binop"},
+                        {"binop", {{"left", a->to_json()}, {"right", b->to_json()}, {"op", op_to_string(OpType::ADD)}}}};
+    ast::BinaryOp n(OpType::ADD, a, b, DUMMY_POS, DUMMY_POS);
+    nlohmann::json nj = n.to_json();
+    REQUIRE(e == nj);
+}
 
-    TEST_CASE("nodes_empty_list", "[empty_list]") {
-        ObjectType to("Integer", {});
-        auto* t = &to;
-        ast::EmptyList n(t, DUMMY_POS, DUMMY_POS);
-        nlohmann::json nj = n.to_json();
-        nlohmann::json e = {{"type",       "empty_list"},
-                            {"empty_list", {{"type", t->to_json()}}}};
-        REQUIRE(e == nj);
-    }
+TEST_CASE("nodes_empty_list", "[empty_list]") {
+    ObjectType to("Integer", {});
+    auto* t = &to;
+    ast::EmptyList n(t, DUMMY_POS, DUMMY_POS);
+    nlohmann::json nj = n.to_json();
+    nlohmann::json e = {{"type",       "empty_list"},
+                        {"empty_list", {{"type", t->to_json()}}}};
+    REQUIRE(e == nj);
+}
 
-    TEST_CASE("nodes_empty_dict", "[empty_dict]") {
-        UTypeNode k = std::make_unique<ObjectType>("String");
-        UTypeNode v = std::make_unique<ObjectType>("Integer");
-        nlohmann::json e = {{"type",       "empty_dict"},
-                            {"empty_dict", {{"key_type", k->to_json()}, {"value_type", v->to_json()}}}};
-        ast::EmptyDict n(k, v, DUMMY_POS, DUMMY_POS);
-        nlohmann::json nj = n.to_json();
-        REQUIRE(e == nj);
-    }
+TEST_CASE("nodes_empty_dict", "[empty_dict]") {
+    UTypeNode k = std::make_unique<ObjectType>("String");
+    UTypeNode v = std::make_unique<ObjectType>("Integer");
+    nlohmann::json e = {{"type",       "empty_dict"},
+                        {"empty_dict", {{"key_type", k->to_json()}, {"value_type", v->to_json()}}}};
+    ast::EmptyDict n(k, v, DUMMY_POS, DUMMY_POS);
+    nlohmann::json nj = n.to_json();
+    REQUIRE(e == nj);
+}
 
-    TEST_CASE("nodes_dict", "[dict]") {
-        UNode k1 = std::make_unique<ast::String>("foo", DUMMY_POS, DUMMY_POS);
-        UNode v1 = ast::Number::make(NumberType::INTEGER, "9", DUMMY_POS, DUMMY_POS);
-        UNode k2 = std::make_unique<ast::String>("bar", DUMMY_POS, DUMMY_POS);
-        UNode v2 = ast::Number::make(NumberType::INTEGER, "11", DUMMY_POS, DUMMY_POS);
-        nlohmann::json e = {{"type", "dict"},
-                            {"dict", {{"items", {{{"key", k1->to_json()}, {"value", v1->to_json()}}, {{"key", k2->to_json()}, {"value", v2->to_json()}}}}}}};
-        std::vector<std::pair<UNode, UNode>> d;
-        d.emplace_back(std::move(k1), std::move(v1));
-        d.emplace_back(std::move(k2), std::move(v2));
-        ast::DictNode n(d, DUMMY_POS, DUMMY_POS);
-        nlohmann::json nj = n.to_json();
+TEST_CASE("nodes_dict", "[dict]") {
+    UNode k1 = std::make_unique<ast::String>("foo", DUMMY_POS, DUMMY_POS);
+    UNode v1 = ast::Number::make(NumberType::INTEGER, "9", DUMMY_POS, DUMMY_POS);
+    UNode k2 = std::make_unique<ast::String>("bar", DUMMY_POS, DUMMY_POS);
+    UNode v2 = ast::Number::make(NumberType::INTEGER, "11", DUMMY_POS, DUMMY_POS);
+    nlohmann::json e = {{"type", "dict"},
+                        {"dict", {{"items", {{{"key", k1->to_json()}, {"value", v1->to_json()}}, {{"key", k2->to_json()}, {"value", v2->to_json()}}}}}}};
+    std::vector<std::pair<UNode, UNode>> d;
+    d.emplace_back(std::move(k1), std::move(v1));
+    d.emplace_back(std::move(k2), std::move(v2));
+    ast::DictNode n(d, DUMMY_POS, DUMMY_POS);
+    nlohmann::json nj = n.to_json();
 
-        REQUIRE(e == nj);
-    }
+    REQUIRE(e == nj);
+}
 
-    TEST_CASE("nodes_member", "[member]") {
-        UNode p = ast::Id::make("foo", DUMMY_POS, DUMMY_POS);
-        nlohmann::json e = {{"type",   "member"},
-                            {"member", {{"parent", p->to_json()}, {"child", "bar"}}}};
-        ast::Member n(p, Token(TokType::ID, "bar", DUMMY_POS));
-        nlohmann::json nj = n.to_json();
-        REQUIRE(e == nj);
-    }
+TEST_CASE("nodes_member", "[member]") {
+    UNode p = ast::Id::make("foo", DUMMY_POS, DUMMY_POS);
+    nlohmann::json e = {{"type",   "member"},
+                        {"member", {{"parent", p->to_json()}, {"child", "bar"}}}};
+    ast::Member n(p, Token(TokType::ID, "bar", DUMMY_POS));
+    nlohmann::json nj = n.to_json();
+    REQUIRE(e == nj);
+}
 
-    TEST_CASE("nodes_function_no_args", "[function]") {
-        VectorOfNodesU v;
-        std::unique_ptr<ast::Block> b = ast::Block::make(std::move(v), DUMMY_POS, DUMMY_POS);
-        UTypeNode rt = std::make_unique<ObjectType>("Integer");
-        nlohmann::json e = {{"type",     "function"},
-                            {"function", {{"id", "foo"}, {"parameters", nlohmann::json::array()}, {"body", b->to_json()}, {"return_type", rt->to_json()}}}};
-        VectorOfUTypes vt;
-        ast::Function n("foo", {}, vt, rt, b, DUMMY_POS, DUMMY_POS);
-        nlohmann::json nj = n.to_json();
-        REQUIRE(e == nj);
-    }
+TEST_CASE("nodes_function_no_args", "[function]") {
+    VectorOfNodesU v;
+    std::unique_ptr<ast::Block> b = ast::Block::make(std::move(v), DUMMY_POS, DUMMY_POS);
+    UTypeNode rt = std::make_unique<ObjectType>("Integer");
+    nlohmann::json e = {{"type",     "function"},
+                        {"function", {{"id", "foo"}, {"parameters", nlohmann::json::array()}, {"body", b->to_json()}, {"return_type", rt->to_json()}}}};
+    VectorOfUTypes vt;
+    ast::Function n("foo", {}, vt, rt, b, DUMMY_POS, DUMMY_POS);
+    nlohmann::json nj = n.to_json();
+    REQUIRE(e == nj);
+}
 
-    TEST_CASE("nodes_function_args", "[function]") {
-        std::unique_ptr<ast::Block> body = ast::Block::make(VectorOfNodesU{}, DUMMY_POS, DUMMY_POS);
-        UTypeNode a = std::make_unique<ObjectType>("Integer", VectorOfTypes{});
-        UTypeNode b = std::make_unique<ObjectType>("String", VectorOfTypes{});
-        UTypeNode rt = std::make_unique<ObjectType>("Integer");
-        nlohmann::json e = {{"type",     "function"},
-                            {"function", {{"id", "foo"}, {"parameters", {{{"id", "bar"}, {"type", a->to_json()}}, {{"id", "baz"}, {"type", b->to_json()}}}}, {"body", body->to_json()}, {"return_type", rt->to_json()}}}};
-        VectorOfUTypes vt;
-        vt.push_back(std::move(a));
-        vt.push_back(std::move(b));
-        ast::Function n("foo", {"bar", "baz"}, vt, rt, body, DUMMY_POS, DUMMY_POS);
-        nlohmann::json nj = n.to_json();
-        REQUIRE(e == nj);
-    }
+TEST_CASE("nodes_function_args", "[function]") {
+    std::unique_ptr<ast::Block> body = ast::Block::make(VectorOfNodesU{}, DUMMY_POS, DUMMY_POS);
+    UTypeNode a = std::make_unique<ObjectType>("Integer", VectorOfTypes{});
+    UTypeNode b = std::make_unique<ObjectType>("String", VectorOfTypes{});
+    UTypeNode rt = std::make_unique<ObjectType>("Integer");
+    nlohmann::json e = {{"type",     "function"},
+                        {"function", {{"id", "foo"}, {"parameters", {{{"id", "bar"}, {"type", a->to_json()}}, {{"id", "baz"}, {"type", b->to_json()}}}}, {"body", body->to_json()}, {"return_type", rt->to_json()}}}};
+    VectorOfUTypes vt;
+    vt.push_back(std::move(a));
+    vt.push_back(std::move(b));
+    ast::Function n("foo", {"bar", "baz"}, vt, rt, body, DUMMY_POS, DUMMY_POS);
+    nlohmann::json nj = n.to_json();
+    REQUIRE(e == nj);
+}
 
-    TEST_CASE("nodes_while", "[while]") {
-        std::unique_ptr<ast::Block> body = ast::Block::make(VectorOfNodesU{}, DUMMY_POS, DUMMY_POS);
-        UNode a = ast::Id::make("bar", DUMMY_POS, DUMMY_POS);
-        UNode b = ast::Id::make("baz", DUMMY_POS, DUMMY_POS);
-        std::unique_ptr<ast::Node> cond = std::make_unique<ast::BinaryOp>(OpType::EQ, a, b, DUMMY_POS, DUMMY_POS);
-        nlohmann::json e = {{"type",  "while"},
-                            {"while", {{"condition", cond->to_json()}, {"body", body->to_json()}}}};
-        ast::While n(cond, body, DUMMY_POS, DUMMY_POS);
-        nlohmann::json nj = n.to_json();
+TEST_CASE("nodes_while", "[while]") {
+    std::unique_ptr<ast::Block> body = ast::Block::make(VectorOfNodesU{}, DUMMY_POS, DUMMY_POS);
+    UNode a = ast::Id::make("bar", DUMMY_POS, DUMMY_POS);
+    UNode b = ast::Id::make("baz", DUMMY_POS, DUMMY_POS);
+    std::unique_ptr<ast::Node> cond = std::make_unique<ast::BinaryOp>(OpType::EQ, a, b, DUMMY_POS, DUMMY_POS);
+    nlohmann::json e = {{"type",  "while"},
+                        {"while", {{"condition", cond->to_json()}, {"body", body->to_json()}}}};
+    ast::While n(cond, body, DUMMY_POS, DUMMY_POS);
+    nlohmann::json nj = n.to_json();
 
-        REQUIRE(e == nj);
-    }
+    REQUIRE(e == nj);
+}
 
-    TEST_CASE("nodes_class_empty", "[class]") {
-        std::unordered_map<std::string, UFunctionNode> v;
-        ast::Klass n("MyClass", {}, {}, {}, {}, v, DUMMY_POS, DUMMY_POS);
-        nlohmann::json nj = n.to_json();
-        nlohmann::json members = nlohmann::json::array();
-        nlohmann::json methods;
-        nlohmann::json static_methods;
-        nlohmann::json e = {{"type",  "class"},
-                            {"class", {{"id", "MyClass"}, {"members", members}, {"methods", methods}, {"static_methods", static_methods}}}};
-        REQUIRE(e == nj);
-    }
+TEST_CASE("nodes_class_empty", "[class]") {
+    std::unordered_map<std::string, UFunctionNode> v;
+    ast::Klass n("MyClass", {}, {}, {}, {}, v, DUMMY_POS, DUMMY_POS);
+    nlohmann::json nj = n.to_json();
+    nlohmann::json members = nlohmann::json::array();
+    nlohmann::json methods;
+    nlohmann::json static_methods;
+    nlohmann::json e = {{"type",  "class"},
+                        {"class", {{"id", "MyClass"}, {"members", members}, {"methods", methods}, {"static_methods", static_methods}}}};
+    REQUIRE(e == nj);
+}
 
-    TEST_CASE("nodes_class_full", "[class]") {
-        auto t1 = std::make_unique<ObjectType>("Integer");
-        auto t2 = std::make_unique<ObjectType>("String");
-        VectorOfStrings members_ordered = {"foo", "bar"};
-        UTypeNode rt1 = std::make_unique<ObjectType>("Integer");
-        UTypeNode rt2 = std::make_unique<ObjectType>("Integer");
-        UTypeNode rt3 = std::make_unique<ObjectType>("Integer");
-        UTypeNode rt4 = std::make_unique<ObjectType>("Integer");
-        std::unique_ptr<ast::Block> b1 = ast::Block::make(VectorOfNodesU{}, DUMMY_POS, DUMMY_POS);
-        std::unique_ptr<ast::Block> b2 = ast::Block::make(VectorOfNodesU{}, DUMMY_POS, DUMMY_POS);
-        std::unique_ptr<ast::Block> b3 = ast::Block::make(VectorOfNodesU{}, DUMMY_POS, DUMMY_POS);
-        std::unique_ptr<ast::Block> b4 = ast::Block::make(VectorOfNodesU{}, DUMMY_POS, DUMMY_POS);
-        VectorOfUTypes v1;
-        VectorOfUTypes v2;
-        ast::Function* method1 = new ast::Function("method1", {}, v1, rt1, b1, DUMMY_POS, DUMMY_POS);
-        ast::Function* method2 = new ast::Function("method2", {}, v2, rt2, b2, DUMMY_POS, DUMMY_POS);
-        std::unordered_map<std::string, Method> cmethods = {{"method1", {nullptr, method1}},
-                                                            {"method2", {nullptr, method2}}};
-        nlohmann::json members = {{{"id", "foo"}, {"type", t1->to_json()}},
-                                  {{"id", "bar"}, {"type", t2->to_json()}}};
-        std::vector<std::pair<std::string, UTypeNode>> cmembers;
-        cmembers.emplace_back("foo", std::move(t1));
-        cmembers.emplace_back("bar", std::move(t2));
+TEST_CASE("nodes_class_full", "[class]") {
+    auto t1 = std::make_unique<ObjectType>("Integer");
+    auto t2 = std::make_unique<ObjectType>("String");
+    VectorOfStrings members_ordered = {"foo", "bar"};
+    UTypeNode rt1 = std::make_unique<ObjectType>("Integer");
+    UTypeNode rt2 = std::make_unique<ObjectType>("Integer");
+    UTypeNode rt3 = std::make_unique<ObjectType>("Integer");
+    UTypeNode rt4 = std::make_unique<ObjectType>("Integer");
+    std::unique_ptr<ast::Block> b1 = ast::Block::make(VectorOfNodesU{}, DUMMY_POS, DUMMY_POS);
+    std::unique_ptr<ast::Block> b2 = ast::Block::make(VectorOfNodesU{}, DUMMY_POS, DUMMY_POS);
+    std::unique_ptr<ast::Block> b3 = ast::Block::make(VectorOfNodesU{}, DUMMY_POS, DUMMY_POS);
+    std::unique_ptr<ast::Block> b4 = ast::Block::make(VectorOfNodesU{}, DUMMY_POS, DUMMY_POS);
+    VectorOfUTypes v1;
+    VectorOfUTypes v2;
+    ast::Function* method1 = new ast::Function("method1", {}, v1, rt1, b1, DUMMY_POS, DUMMY_POS);
+    ast::Function* method2 = new ast::Function("method2", {}, v2, rt2, b2, DUMMY_POS, DUMMY_POS);
+    std::unordered_map<std::string, Method> cmethods = {{"method1", {nullptr, method1}},
+                                                        {"method2", {nullptr, method2}}};
+    nlohmann::json members = {{{"id", "foo"}, {"type", t1->to_json()}},
+                              {{"id", "bar"}, {"type", t2->to_json()}}};
+    std::vector<std::pair<std::string, UTypeNode>> cmembers;
+    cmembers.emplace_back("foo", std::move(t1));
+    cmembers.emplace_back("bar", std::move(t2));
 
-        nlohmann::json methods = {{"method2", method2->to_json()},
-                                  {"method1", method1->to_json()}};
+    nlohmann::json methods = {{"method2", method2->to_json()},
+                              {"method1", method1->to_json()}};
 
-        VectorOfUTypes vv1, vv2;
-        UFunctionNode smethod1 = std::make_unique<ast::Function>("smethod1",
-                                                                 VectorOfStrings{},
-                                                                 vv1,
-                                                                 rt3,
-                                                                 b3,
-                                                                 DUMMY_POS,
-                                                                 DUMMY_POS);
-        UFunctionNode smethod2 = std::make_unique<ast::Function>("smethod2",
-                                                                 VectorOfStrings{},
-                                                                 vv2,
-                                                                 rt4,
-                                                                 b4,
-                                                                 DUMMY_POS,
-                                                                 DUMMY_POS);
-        std::unordered_map<std::string, UFunctionNode> cstatic_methods;
-        nlohmann::json static_methods = {{"smethod1", smethod1->to_json()},
-                                         {"smethod2", smethod2->to_json()}};
-        cstatic_methods["smethod1"] = std::move(smethod1);
-        cstatic_methods["smethod2"] = std::move(smethod2);
-        ast::Klass n("MyClass", {"k", "v"}, std::move(cmembers), cmethods, {}, cstatic_methods, DUMMY_POS, DUMMY_POS);
-        n.members_ordered = members_ordered;
-        nlohmann::json nj = n.to_json();
+    VectorOfUTypes vv1, vv2;
+    UFunctionNode smethod1 = std::make_unique<ast::Function>("smethod1",
+                                                             VectorOfStrings{},
+                                                             vv1,
+                                                             rt3,
+                                                             b3,
+                                                             DUMMY_POS,
+                                                             DUMMY_POS);
+    UFunctionNode smethod2 = std::make_unique<ast::Function>("smethod2",
+                                                             VectorOfStrings{},
+                                                             vv2,
+                                                             rt4,
+                                                             b4,
+                                                             DUMMY_POS,
+                                                             DUMMY_POS);
+    std::unordered_map<std::string, UFunctionNode> cstatic_methods;
+    nlohmann::json static_methods = {{"smethod1", smethod1->to_json()},
+                                     {"smethod2", smethod2->to_json()}};
+    cstatic_methods["smethod1"] = std::move(smethod1);
+    cstatic_methods["smethod2"] = std::move(smethod2);
+    ast::Klass n("MyClass", {"k", "v"}, std::move(cmembers), cmethods, {}, cstatic_methods, DUMMY_POS, DUMMY_POS);
+    n.members_ordered = members_ordered;
+    nlohmann::json nj = n.to_json();
 
 
-        nlohmann::json e = {{"type",  "class"},
-                            {"class", {{"id", "MyClass"}, {"members", members}, {"methods", methods}, {"static_methods", static_methods}}}};
-        REQUIRE(e == nj);
-    }
+    nlohmann::json e = {{"type",  "class"},
+                        {"class", {{"id", "MyClass"}, {"members", members}, {"methods", methods}, {"static_methods", static_methods}}}};
+    REQUIRE(e == nj);
+}
 
-    TEST_CASE("nodes_typeclass", "[typeclass]") {
-        FunctionType* method1 = new FunctionType({new ObjectType("t"), new ObjectType("t")}, new ObjectType("Boolean"));
-        FunctionType* method2 = new FunctionType({new ObjectType("t"), new ObjectType("t")}, new ObjectType("Boolean"));
-        std::unordered_map<std::string, FunctionType*> cmethods = {{"method1", method1},
-                                                                   {"method2", method2}};
+TEST_CASE("nodes_typeclass", "[typeclass]") {
+    FunctionType o_method1({new ObjectType("t"), new ObjectType("t")}, new ObjectType("Boolean"));
+    FunctionType o_method2({new ObjectType("t"), new ObjectType("t")}, new ObjectType("Boolean"));
+    auto* method1 = &o_method1;
+    auto* method2 = &o_method2;
+    std::unordered_map<std::string, FunctionType*> cmethods = {{"method1", method1},
+                                                               {"method2", method2}};
 
-        ast::Typeclass n("Comparable", "t", cmethods, DUMMY_POS, DUMMY_POS);
-        nlohmann::json nj = n.to_json();
+    ast::Typeclass n("Comparable", "t", cmethods, DUMMY_POS, DUMMY_POS);
+    nlohmann::json nj = n.to_json();
 
-        nlohmann::json e = {{"type",      "typeclass"},
-                            {"typeclass", {{"id", "Comparable"}, {"base_type", "t"}, {"methods", {{"method1", method1->to_json()}, {"method2", method2->to_json()}}}}}};
-        REQUIRE(e == nj);
-    }
+    nlohmann::json e = {{"type",      "typeclass"},
+                        {"typeclass", {{"id", "Comparable"}, {"base_type", "t"}, {"methods", {{"method1", method1->to_json()}, {"method2", method2->to_json()}}}}}};
+    REQUIRE(e == nj);
+}
 
-    TEST_CASE("nodes_instance", "[instance]") {
-        // FunctionType* method1 = new FunctionType({new ObjectType("a"), new ObjectType("b")}, new ObjectType("Boolean"));
-        // FunctionType* method2 = new FunctionType({new ObjectType("c"), new ObjectType("c")}, new ObjectType("Boolean"));
-        UTypeNode rt1 = std::make_unique<ObjectType>("Integer");
-        UTypeNode rt2 = std::make_unique<ObjectType>("Integer");
-        std::unique_ptr<ast::Block> b1 = ast::Block::make(VectorOfNodesU{}, DUMMY_POS, DUMMY_POS);
-        std::unique_ptr<ast::Block> b2 = ast::Block::make(VectorOfNodesU{}, DUMMY_POS, DUMMY_POS);
-        VectorOfUTypes v1;
-        VectorOfUTypes v2;
-        ast::Function* method1 = new ast::Function("method1", {}, v1, rt1, b1, DUMMY_POS, DUMMY_POS);
-        ast::Function* method2 = new ast::Function("method2", {}, v2, rt2, b2, DUMMY_POS, DUMMY_POS);
+TEST_CASE("nodes_instance", "[instance]") {
+    // FunctionType* method1 = new FunctionType({new ObjectType("a"), new ObjectType("b")}, new ObjectType("Boolean"));
+    // FunctionType* method2 = new FunctionType({new ObjectType("c"), new ObjectType("c")}, new ObjectType("Boolean"));
+    UTypeNode rt1 = std::make_unique<ObjectType>("Integer");
+    UTypeNode rt2 = std::make_unique<ObjectType>("Integer");
+    std::unique_ptr<ast::Block> b1 = ast::Block::make(VectorOfNodesU{}, DUMMY_POS, DUMMY_POS);
+    std::unique_ptr<ast::Block> b2 = ast::Block::make(VectorOfNodesU{}, DUMMY_POS, DUMMY_POS);
+    VectorOfUTypes v1;
+    VectorOfUTypes v2;
+    ast::Function* method1 = new ast::Function("method1", {}, v1, rt1, b1, DUMMY_POS, DUMMY_POS);
+    ast::Function* method2 = new ast::Function("method2", {}, v2, rt2, b2, DUMMY_POS, DUMMY_POS);
 
-        std::unordered_map<std::string, ast::Function*> cmethods = {{"method1", method1},
-                                                                    {"method2", method2}};
+    std::unordered_map<std::string, ast::Function*> cmethods = {{"method1", method1},
+                                                                {"method2", method2}};
 
-        ObjectType bto("SomeType");
-        auto* bt = &bto;
-        ast::Instance n("Comparable", bt, cmethods, DUMMY_POS, DUMMY_POS);
-        nlohmann::json nj = n.to_json();
+    ObjectType bto("SomeType");
+    auto* bt = &bto;
+    ast::Instance n("Comparable", bt, cmethods, DUMMY_POS, DUMMY_POS);
+    nlohmann::json nj = n.to_json();
 
-        nlohmann::json e = {{"type",     "instance"},
-                            {"instance", {{"id", "Comparable"}, {"base_type", bt->to_json()}, {"methods", {{"method1", method1->to_json()}, {"method2", method2->to_json()}}}}}};
-        REQUIRE(e == nj);
-    }
+    nlohmann::json e = {{"type",     "instance"},
+                        {"instance", {{"id", "Comparable"}, {"base_type", bt->to_json()}, {"methods", {{"method1", method1->to_json()}, {"method2", method2->to_json()}}}}}};
+    REQUIRE(e == nj);
+}
