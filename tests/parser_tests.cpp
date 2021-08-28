@@ -104,7 +104,7 @@ TestNodeU IF_U() {
     std::unique_ptr<ast::Block> u(nullptr);
     return {"if(" + EXPRESSION.text + ")" + EMPTY_BLOCK.text, std::make_unique<ast::If>(EXPRESSION.node,
                                                                                         (std::unique_ptr<ast::Block>&) EMPTY_BLOCK.node,
-                                                                                        std::vector<std::pair<ast::Node*, ast::Block*>>{},
+                                                                                        std::vector<std::pair<UNode, UBlockNode>>{},
                                                                                         u,
                                                                                         DUMMY_POS,
                                                                                         DUMMY_POS)};
@@ -658,7 +658,7 @@ TEST_CASE("parse_or_exp", "[parser]") {
     UNode ast = parser.parse_or_expression();
 
     REQUIRE(ast->to_json() ==
-    ast::BinaryOp(OpType::OR, EXPRESSION_1.node, EXPRESSION_2.node, DUMMY_POS, DUMMY_POS).to_json());
+            ast::BinaryOp(OpType::OR, EXPRESSION_1.node, EXPRESSION_2.node, DUMMY_POS, DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_eq_exp", "[parser]") {
@@ -674,7 +674,7 @@ TEST_CASE("parse_eq_exp", "[parser]") {
     UNode ast = parser.parse_and_expression();
 
     REQUIRE(ast->to_json() ==
-    ast::BinaryOp(OpType::EQ, EXPRESSION_1.node, EXPRESSION_2.node, DUMMY_POS, DUMMY_POS).to_json());
+            ast::BinaryOp(OpType::EQ, EXPRESSION_1.node, EXPRESSION_2.node, DUMMY_POS, DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_ge_exp", "[parser]") {
@@ -690,7 +690,7 @@ TEST_CASE("parse_ge_exp", "[parser]") {
     UNode ast = parser.parse_and_expression();
 
     REQUIRE(ast->to_json() ==
-    ast::BinaryOp(OpType::GE, EXPRESSION_1.node, EXPRESSION_2.node, DUMMY_POS, DUMMY_POS).to_json());
+            ast::BinaryOp(OpType::GE, EXPRESSION_1.node, EXPRESSION_2.node, DUMMY_POS, DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_le_exp", "[parser]") {
@@ -706,7 +706,7 @@ TEST_CASE("parse_le_exp", "[parser]") {
     UNode ast = parser.parse_and_expression();
 
     REQUIRE(ast->to_json() ==
-    ast::BinaryOp(OpType::LE, EXPRESSION_1.node, EXPRESSION_2.node, DUMMY_POS, DUMMY_POS).to_json());
+            ast::BinaryOp(OpType::LE, EXPRESSION_1.node, EXPRESSION_2.node, DUMMY_POS, DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_gt_exp", "[parser]") {
@@ -722,7 +722,7 @@ TEST_CASE("parse_gt_exp", "[parser]") {
     UNode ast = parser.parse_and_expression();
 
     REQUIRE(ast->to_json() ==
-    ast::BinaryOp(OpType::GT, EXPRESSION_1.node, EXPRESSION_2.node, DUMMY_POS, DUMMY_POS).to_json());
+            ast::BinaryOp(OpType::GT, EXPRESSION_1.node, EXPRESSION_2.node, DUMMY_POS, DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_lt_exp", "[parser]") {
@@ -738,7 +738,7 @@ TEST_CASE("parse_lt_exp", "[parser]") {
     UNode ast = parser.parse_and_expression();
 
     REQUIRE(ast->to_json() ==
-    ast::BinaryOp(OpType::LT, EXPRESSION_1.node, EXPRESSION_2.node, DUMMY_POS, DUMMY_POS).to_json());
+            ast::BinaryOp(OpType::LT, EXPRESSION_1.node, EXPRESSION_2.node, DUMMY_POS, DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_ne_exp", "[parser]") {
@@ -754,7 +754,7 @@ TEST_CASE("parse_ne_exp", "[parser]") {
     UNode ast = parser.parse_and_expression();
 
     REQUIRE(ast->to_json() ==
-    ast::BinaryOp(OpType::NE, EXPRESSION_1.node, EXPRESSION_2.node, DUMMY_POS, DUMMY_POS).to_json());
+            ast::BinaryOp(OpType::NE, EXPRESSION_1.node, EXPRESSION_2.node, DUMMY_POS, DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_not_exp", "[parser]") {
@@ -937,13 +937,13 @@ TEST_CASE("parse_typeclass", "[parser]") {
 
     std::unique_ptr<ast::Typeclass> ast = parser.parse_typeclass();
     REQUIRE(ast->to_json() == ast::Typeclass("Comparable",
-                                                 "t",
-                                                 {{"eq", new FunctionType({new ObjectType("t"), new ObjectType("t")},
-                                                                          new ObjectType("Boolean"))},
-                                                  {"ne", new FunctionType({new ObjectType("t"), new ObjectType("t")},
-                                                                          new ObjectType("Boolean"))}},
-                                                 DUMMY_POS,
-                                                 DUMMY_POS).to_json());
+                                             "t",
+                                             {{"eq", new FunctionType({new ObjectType("t"), new ObjectType("t")},
+                                                                      new ObjectType("Boolean"))},
+                                              {"ne", new FunctionType({new ObjectType("t"), new ObjectType("t")},
+                                                                      new ObjectType("Boolean"))}},
+                                             DUMMY_POS,
+                                             DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_instance", "[parser]") {
@@ -967,21 +967,21 @@ TEST_CASE("parse_instance", "[parser]") {
     UTypeNode r1 = std::make_unique<ObjectType>("Boolean");
     UTypeNode r2 = std::make_unique<ObjectType>("Boolean");
     REQUIRE(ast->to_json() == ast::Instance("Comparable",
-                                                new ObjectType("Foo"),
-                                                {{"eq", new ast::Function("eq",
-                                                                          {"a", "b"},
-                                                                          vt1,
-                                                                          r1,
-                                                                          b1,
-                                                                          DUMMY_POS,
-                                                                          DUMMY_POS)},
-                                                 {"ne", new ast::Function("ne",
-                                                                          {"a", "b"},
-                                                                          vt2,
-                                                                          r2,
-                                                                          b2,
-                                                                          DUMMY_POS,
-                                                                          DUMMY_POS)}},
-                                                DUMMY_POS,
-                                                DUMMY_POS).to_json());
+                                            new ObjectType("Foo"),
+                                            {{"eq", new ast::Function("eq",
+                                                                      {"a", "b"},
+                                                                      vt1,
+                                                                      r1,
+                                                                      b1,
+                                                                      DUMMY_POS,
+                                                                      DUMMY_POS)},
+                                             {"ne", new ast::Function("ne",
+                                                                      {"a", "b"},
+                                                                      vt2,
+                                                                      r2,
+                                                                      b2,
+                                                                      DUMMY_POS,
+                                                                      DUMMY_POS)}},
+                                            DUMMY_POS,
+                                            DUMMY_POS).to_json());
 }

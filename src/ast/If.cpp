@@ -33,12 +33,12 @@ bool If::equal(const ast::Node& x) const {
 
 }
 
-If::If(UNode& condition, std::unique_ptr<ast::Block>& then, std::vector<std::pair<Node*, ast::Block*>> elifs,
+If::If(UNode& condition, std::unique_ptr<ast::Block>& then, std::vector<std::pair<UNode, UBlockNode>> elifs,
        std::unique_ptr<ast::Block>& selse, TextPosition start, TextPosition end) : ast::Node(NodeType::IFF, start, end),
                                                                                    condition(std::move(condition)),
                                                                                    then(std::move(then)),
                                                                                    selse(std::move(selse)),
-                                                                                   elifs(elifs) {
+                                                                                   elifs(std::move(elifs)) {
     // assert(condition != nullptr);
     // assert(then != nullptr);
 }
@@ -57,7 +57,7 @@ If::~If() {
 
 nlohmann::json If::to_json() const {
     std::vector<nlohmann::json> elifs;
-    for (auto e: this->elifs) {
+    for (auto& e: this->elifs) {
         elifs.push_back({{"condition", e.first->to_json()},
                          {"then",      e.second->to_json()}});
     }

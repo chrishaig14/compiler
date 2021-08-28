@@ -74,19 +74,19 @@ std::unique_ptr<ast::If> Parser::parse_if() {
     Token if_tok = this->expect_token(TokType::IF);
     auto condition = this->parse_expression();
     auto body = this->parse_possibly_empty_block();
-    std::vector<std::pair<ast::Node*, ast::Block*>> elifs;
+    std::vector<std::pair<UNode, UBlockNode>> elifs;
     while (this->match(TokType::ELIF)) {
         this->next();
         auto elif_condition = this->parse_expression();
         auto elif_body = this->parse_possibly_empty_block();
-        elifs.emplace_back(elif_condition.release(), elif_body.release());
+        elifs.emplace_back(std::move(elif_condition), std::move(elif_body));
     }
     std::unique_ptr<ast::Block> _else = nullptr;
     if (this->match(TokType::ELSE)) {
         this->next();
         _else = this->parse_possibly_empty_block();
     }
-    auto iff = std::make_unique<ast::If>(condition, body, elifs, _else, if_tok.start, if_tok.end_pos);
+    auto iff = std::make_unique<ast::If>(condition, body, std::move(elifs), _else, if_tok.start, if_tok.end_pos);
     iff->start = if_tok.start;
     return iff;
 }
