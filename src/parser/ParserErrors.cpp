@@ -191,19 +191,23 @@ std::unique_ptr<ast::Instance> Parser::parse_instance() {
     UObjectType ot = this->parse_object_type();
     this->expect_token(TokType::RSQUARE);
     this->expect_token(TokType::LCURLY);
-    std::unordered_map<std::string, ast::Function*> methods;
+    std::unordered_map<std::string, UFunctionNode> methods;
     while (true) {
         if (!this->match(TokType::FUN)) {
             break;
         }
         auto m = this->parse_function_definition();
         std::string id = m->identifier;
-        methods[id] = m.release();
+        methods[id] = std::move(m);
         this->expect_token(TokType::SEMICOLON);
         if (!this->match(TokType::FUN)) {
             break;
         }
     }
     Token f_curly = this->expect_token(TokType::RCURLY);
-    return std::make_unique<ast::Instance>(id_tok.str, std::move(ot), methods, instance_tok.start, f_curly.end_pos);
+    return std::make_unique<ast::Instance>(id_tok.str,
+                                           std::move(ot),
+                                           std::move(methods),
+                                           instance_tok.start,
+                                           f_curly.end_pos);
 }

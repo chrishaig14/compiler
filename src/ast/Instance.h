@@ -15,9 +15,9 @@ class ast::Instance : public ast::Node {
 public:
     std::string id;
     UObjectType base_type;
-    std::unordered_map<std::string, ast::Function*> methods;
+    std::unordered_map<std::string, UFunctionNode> methods;
     Instance(const std::string& id, UObjectType base_type,
-             const std::unordered_map<std::string, ast::Function*>& methods, TextPosition start, TextPosition end);
+             std::unordered_map<std::string, UFunctionNode> methods, TextPosition start, TextPosition end);
     nlohmann::json to_json() const override;
     bool equal(const ast::Node& other) const override;
 };

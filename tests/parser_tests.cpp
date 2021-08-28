@@ -965,22 +965,9 @@ TEST_CASE("parse_instance", "[parser]") {
     vt2.push_back(std::make_unique<ObjectType>("Foo"));
     UTypeNode r1 = std::make_unique<ObjectType>("Boolean");
     UTypeNode r2 = std::make_unique<ObjectType>("Boolean");
-    REQUIRE(ast->to_json() == ast::Instance("Comparable",
-                                            std::make_unique<ObjectType>("Foo"),
-                                            {{"eq", new ast::Function("eq",
-                                                                      {"a", "b"},
-                                                                      vt1,
-                                                                      r1,
-                                                                      b1,
-                                                                      DUMMY_POS,
-                                                                      DUMMY_POS)},
-                                             {"ne", new ast::Function("ne",
-                                                                      {"a", "b"},
-                                                                      vt2,
-                                                                      r2,
-                                                                      b2,
-                                                                      DUMMY_POS,
-                                                                      DUMMY_POS)}},
-                                            DUMMY_POS,
-                                            DUMMY_POS).to_json());
+    std::unordered_map<std::string, UFunctionNode> methods;
+    methods["eq"] = std::make_unique<ast::Function>("eq", VectorOfStrings{"a", "b"}, vt1, r1, b1, DUMMY_POS, DUMMY_POS);
+    methods["ne"] = std::make_unique<ast::Function>("ne", VectorOfStrings{"a", "b"}, vt2, r2, b2, DUMMY_POS, DUMMY_POS);
+    REQUIRE(ast->to_json() ==
+            ast::Instance("Comparable", std::make_unique<ObjectType>("Foo"), std::move(methods), DUMMY_POS, DUMMY_POS).to_json());
 }

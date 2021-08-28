@@ -6,9 +6,10 @@
 
 using namespace ast;
 
-Instance::Instance(const std::string& id, UObjectType base_type,
-                   const std::unordered_map<std::string, ast::Function*>& methods, TextPosition start, TextPosition end)
-        : ast::Node(NodeType::INSTANCE, start, end), id(id), base_type(std::move(base_type)), methods(methods) {
+Instance::Instance(const std::string& id, UObjectType base_type, std::unordered_map<std::string, UFunctionNode> methods,
+                   TextPosition start, TextPosition end) : ast::Node(NodeType::INSTANCE, start, end), id(id),
+                                                           base_type(std::move(base_type)),
+                                                           methods(std::move(methods)) {
 
 }
 
@@ -21,7 +22,7 @@ nlohmann::json Instance::to_json() const {
     j["id"] = this->id;
     j["base_type"] = this->base_type->to_json();
     nlohmann::json m_json;
-    for (auto m: this->methods) {
+    for (auto& m: this->methods) {
         m_json[m.first] = m.second->to_json();
     }
     j["methods"] = m_json;

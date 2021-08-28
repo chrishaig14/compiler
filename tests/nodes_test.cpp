@@ -458,18 +458,17 @@ TEST_CASE("nodes_instance", "[instance]") {
     std::unique_ptr<ast::Block> b2 = ast::Block::make(VectorOfNodesU{}, DUMMY_POS, DUMMY_POS);
     VectorOfUTypes v1;
     VectorOfUTypes v2;
-    ast::Function o_method1("method1", {}, v1, rt1, b1, DUMMY_POS, DUMMY_POS);
-    ast::Function o_method2("method2", {}, v2, rt2, b2, DUMMY_POS, DUMMY_POS);
-    auto* method1 = &o_method1;
-    auto* method2 = &o_method2;
+    auto method1 = std::make_unique<ast::Function>("method1", VectorOfStrings{}, v1, rt1, b1, DUMMY_POS, DUMMY_POS);
+    auto method2 = std::make_unique<ast::Function>("method2", VectorOfStrings{}, v2, rt2, b2, DUMMY_POS, DUMMY_POS);
 
-    std::unordered_map<std::string, ast::Function*> cmethods = {{"method1", method1},
-                                                                {"method2", method2}};
+    std::unordered_map<std::string, UFunctionNode> cmethods;
+    cmethods["method1"] = std::move(method1);
+    cmethods["method2"] = std::move(method2);
 
     auto bt = std::make_unique<ObjectType>("SomeType");
     nlohmann::json e = {{"type",     "instance"},
                         {"instance", {{"id", "Comparable"}, {"base_type", bt->to_json()}, {"methods", {{"method1", method1->to_json()}, {"method2", method2->to_json()}}}}}};
-    ast::Instance n("Comparable", std::move(bt), cmethods, DUMMY_POS, DUMMY_POS);
+    ast::Instance n("Comparable", std::move(bt), std::move(cmethods), DUMMY_POS, DUMMY_POS);
     nlohmann::json nj = n.to_json();
 
     REQUIRE(e == nj);
