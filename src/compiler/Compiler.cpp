@@ -6,8 +6,9 @@
 #include "Compiler.h"
 #include "../logging/logging.h"
 
-void write_cmakelists(const std::string& cmake_output_path, const std::string& output_name, const std::string& all_files,
-                      const std::string& all_libraries, bool is_lib) {
+void
+write_cmakelists(const std::string& cmake_output_path, const std::string& output_name, const std::string& all_files,
+                 const std::string& all_libraries, bool is_lib) {
     std::string cmakelists = "cmake_minimum_required(VERSION 3.16)\n"
                              "project(xlang)\n"
                              "set(CMAKE_CXX_STANDARD 14)\n"
@@ -56,8 +57,8 @@ std::map<std::string, std::string> read_requirements(const std::string& filepath
     return requirements;
 }
 
-Compiler::Compiler(const std::string& project_dir, const std::string& project_output_dir, const std::string& output_name,
-                   const std::string& lib_path, bool is_lib, const std::string& version)
+Compiler::Compiler(const std::string& project_dir, const std::string& project_output_dir,
+                   const std::string& output_name, const std::string& lib_path, bool is_lib, const std::string& version)
         : project_dir(project_dir), project_output_dir(project_output_dir), output_name(output_name),
           lib_path(lib_path), is_lib(is_lib), version(version) {
     this->root_package = new Package(Path(this->output_name), project_dir, "", false, "", "");;
@@ -65,7 +66,7 @@ Compiler::Compiler(const std::string& project_dir, const std::string& project_ou
     this->top_package->units[this->output_name] = Unit{.type=U_TYPE::PACKAGE, .package=root_package};
 }
 
-void Compiler::pre(){
+void Compiler::pre() {
     std::string req_file_path = path_join(this->project_dir, REQUIREMENTS_FILE);
 
     VectorOfStrings requirements = this->load_requirements(req_file_path);

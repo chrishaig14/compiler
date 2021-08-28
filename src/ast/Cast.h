@@ -9,6 +9,7 @@
 #include "optypes.h"
 #include "TypeNode.h"
 #include "ast.h"
+
 class ast::Cast : public ast::Node {
 public:
     Node* exp;

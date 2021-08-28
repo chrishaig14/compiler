@@ -4,5 +4,5 @@
 
 #include "BreakSNode.h"
 
-BreakSNode::BreakSNode() :SNode(SNodeType::BREAK) {
+BreakSNode::BreakSNode() : SNode(SNodeType::BREAK) {
 }

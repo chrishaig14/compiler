@@ -9,6 +9,7 @@
 #include "Node.h"
 #include "TypeNode.h"
 #include "ast.h"
+
 class ast::Alias : public ast::Node {
 public:
     Alias(std::string alias_id, TypeNode* aliased_type, TextPosition start, TextPosition end);

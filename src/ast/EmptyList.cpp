@@ -5,9 +5,9 @@
 #include "EmptyList.h"
 
 using namespace ast;
-EmptyList::EmptyList(TypeNode* type, TextPosition start, TextPosition end) : ast::Node(NodeType::EMPTYLST,
-                                                                                          start,
-                                                                                          end), type(type) {
+
+EmptyList::EmptyList(TypeNode* type, TextPosition start, TextPosition end) : ast::Node(NodeType::EMPTYLST, start, end),
+                                                                             type(type) {
 }
 
 bool EmptyList::equal(const ast::Node& other) const {

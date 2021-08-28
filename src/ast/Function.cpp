@@ -32,12 +32,10 @@ bool Function::equal(const ast::Node& x) const {
     return *this->body == *other.body;
 }
 
-Function::Function(std::string identifier, const VectorOfStrings& parameter_names,
-                           VectorOfUTypes& parameter_types, UTypeNode& return_type, std::unique_ptr<ast::Block>& body,
-                           TextPosition start, TextPosition end) : ast::Node(NodeType::FUNC, start, end),
-                                                                   parameter_types(std::move(parameter_types)),
-                                                                   body(std::move(body)),
-                                                                   return_type(std::move(return_type)) {
+Function::Function(std::string identifier, const VectorOfStrings& parameter_names, VectorOfUTypes& parameter_types,
+                   UTypeNode& return_type, std::unique_ptr<ast::Block>& body, TextPosition start, TextPosition end)
+        : ast::Node(NodeType::FUNC, start, end), parameter_types(std::move(parameter_types)), body(std::move(body)),
+          return_type(std::move(return_type)) {
     // for (auto p: parameter_types) {
     //     assert(p != nullptr);
     // }

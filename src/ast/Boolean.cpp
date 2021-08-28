@@ -7,7 +7,7 @@
 using namespace ast;
 
 Boolean::Boolean(bool value, TextPosition start, TextPosition end) : ast::Node(NodeType::BOOLEAN, start, end),
-                                                                             value(value) {
+                                                                     value(value) {
 }
 
 bool Boolean::operator!=(const Boolean& other) const {

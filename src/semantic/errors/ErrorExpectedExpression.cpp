@@ -19,6 +19,7 @@ std::string ErrorExpectedExpression::to_str() const {
     return "Error: expected expression, got " + entity_to_string(this->entity);
 }
 
-ErrorExpectedExpression::ErrorExpectedExpression(const Entity& entity, const ast::Node& node) : entity(entity), node(node) {
+ErrorExpectedExpression::ErrorExpectedExpression(const Entity& entity, const ast::Node& node)
+        : entity(entity), node(node) {
 
 }

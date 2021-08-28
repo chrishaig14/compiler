@@ -5,4 +5,5 @@
 #include "AssignmentSNode.h"
 
 AssignmentSNode::AssignmentSNode(USNode& lvalue, USNode& rvalue)
-        : SNode(SNodeType::ASSIGNMENT), lvalue(std::move(lvalue)), rvalue(std::move(rvalue)) {}
+        : SNode(SNodeType::ASSIGNMENT), lvalue(std::move(lvalue)), rvalue(std::move(rvalue)) {
+}

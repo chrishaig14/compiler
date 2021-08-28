@@ -52,7 +52,8 @@ USemanticInfo Checker::module_member(Module& mod, const std::string& child, ast:
         return error_stub();
     }
     Flirpin flirpin = mod.flirpins[child];
-    USemanticInfo info_u = std::make_unique<SemanticInfo>(); SemanticInfo& info = *info_u;
+    USemanticInfo info_u = std::make_unique<SemanticInfo>();
+    SemanticInfo& info = *info_u;
     info.entity = *map_flirpin_to_entity(flirpin);
     if (flirpin.type == F_TYPE::CONST_FUNCTION) {
         auto* idn = new IdSNode(flirpin.const_function->path.as_str());
@@ -82,7 +83,8 @@ USemanticInfo Checker::object_member(SNode* object_snode, Value& p_value, const 
         // this->error_reporter.object_no_member(*p_value.type, n);
         return error_stub();
     }
-    USemanticInfo info_u = std::make_unique<SemanticInfo>(); SemanticInfo& info = *info_u;
+    USemanticInfo info_u = std::make_unique<SemanticInfo>();
+    SemanticInfo& info = *info_u;
     if (p_value.type->kind == Kind::OBJECT && p_value.type->object().id == "Tuple") {
         info.is_tuple_member = true;
     }
@@ -147,13 +149,15 @@ USemanticInfo Checker::package_member(Package& package, const std::string& child
         return error_stub();
     }
     Unit unit = package.units[child];
-    USemanticInfo info_u = std::make_unique<SemanticInfo>(); SemanticInfo& info = *info_u;
+    USemanticInfo info_u = std::make_unique<SemanticInfo>();
+    SemanticInfo& info = *info_u;
     info.entity = *map_flirpin_to_entity(map_unit_to_flirpin(unit));
     return info_u;
 }
 
 USemanticInfo Checker::class_member(Class* cls, const std::string& child, ast::Member& n) {
-    USemanticInfo info_u = std::make_unique<SemanticInfo>(); SemanticInfo& info = *info_u;
+    USemanticInfo info_u = std::make_unique<SemanticInfo>();
+    SemanticInfo& info = *info_u;
     if (cls->methods.find(child) != cls->methods.end()) {
         ConstFunction* bound_method = cls->methods[child];
         auto* unbound_method = new ConstFunction(bound_method->path, bound_method->ft->clone());

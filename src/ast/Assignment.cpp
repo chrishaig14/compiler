@@ -7,8 +7,11 @@
 
 using namespace ast;
 
-Assignment::Assignment(UNode& lvalue, UNode& rvalue, TextPosition start, TextPosition end)
-        : ast::Node(NodeType::ASSIGN, start, end), lvalue(std::move(lvalue)), rvalue(std::move(rvalue)) {
+Assignment::Assignment(UNode& lvalue, UNode& rvalue, TextPosition start, TextPosition end) : ast::Node(NodeType::ASSIGN,
+                                                                                                       start,
+                                                                                                       end),
+                                                                                             lvalue(std::move(lvalue)),
+                                                                                             rvalue(std::move(rvalue)) {
 }
 
 bool Assignment::equal(const ast::Node& x) const {

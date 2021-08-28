@@ -14,7 +14,7 @@ Token::Token(TokType type, std::string str, TextPosition start) {
 
 std::string Token::to_string() {
     std::string st;
-    st = "["+this->pos_string() + "]\t";
+    st = "[" + this->pos_string() + "]\t";
     st += TOKEN_STRINGS[this->type];
     if (this->type == TokType::ID || this->type == TokType::STRING) {
         st += " \"" + this->str + "\"";

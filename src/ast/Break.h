@@ -10,9 +10,10 @@
 #include "TypeNode.h"
 
 #include "ast.h"
+
 class ast::Break : public ast::Node {
 public:
-    std::vector<std::pair<std::string,TypeNode*>> loop_vars;
+    std::vector<std::pair<std::string, TypeNode*>> loop_vars;
     Break(TextPosition start, TextPosition end);
     bool equal(const ast::Node& other) const override;
     nlohmann::json to_json() const override;

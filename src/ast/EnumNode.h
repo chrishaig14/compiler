@@ -9,6 +9,7 @@
 #include "Node.h"
 #include "../types.h"
 #include "ast.h"
+
 class ast::EnumNode : public ast::Node {
 public:
 

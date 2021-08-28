@@ -9,6 +9,7 @@
 #include "Node.h"
 #include "TypeNode.h"
 #include "ast.h"
+
 class ast::EmptyList : public ast::Node {
 public:
     EmptyList(TypeNode* type, TextPosition start, TextPosition end);

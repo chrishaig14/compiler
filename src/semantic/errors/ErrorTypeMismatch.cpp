@@ -5,8 +5,8 @@
 #include "ErrorTypeMismatch.h"
 #include "../../json/json.hpp"
 
-ErrorTypeMismatch::ErrorTypeMismatch(const TypeNode& expected, const ast::Node& value_node, const Entity& actual) : expected(
-        expected), value_node(value_node), actual(actual) {
+ErrorTypeMismatch::ErrorTypeMismatch(const TypeNode& expected, const ast::Node& value_node, const Entity& actual)
+        : expected(expected), value_node(value_node), actual(actual) {
 }
 
 std::string ErrorTypeMismatch::to_str() const {

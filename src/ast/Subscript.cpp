@@ -3,7 +3,9 @@
 //
 
 #include "Subscript.h"
+
 using namespace ast;
+
 Subscript::Subscript(UNode& parent, VectorOfNodesU& child, TextPosition start, TextPosition end)
         : ast::Node(NodeType::SUB, start, end), parent(std::move(parent)), child(std::move(child)) {
 }

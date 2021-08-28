@@ -34,13 +34,11 @@ bool If::equal(const ast::Node& x) const {
 }
 
 If::If(UNode& condition, std::unique_ptr<ast::Block>& then, std::vector<std::pair<Node*, ast::Block*>> elifs,
-               std::unique_ptr<ast::Block>& selse, TextPosition start, TextPosition end) : ast::Node(NodeType::IFF,
-                                                                                                start,
-                                                                                                end),
-                                                                                           condition(std::move(condition)),
-                                                                                           then(std::move(then)),
-                                                                                           selse(std::move(selse)),
-                                                                                           elifs(elifs) {
+       std::unique_ptr<ast::Block>& selse, TextPosition start, TextPosition end) : ast::Node(NodeType::IFF, start, end),
+                                                                                   condition(std::move(condition)),
+                                                                                   then(std::move(then)),
+                                                                                   selse(std::move(selse)),
+                                                                                   elifs(elifs) {
     // assert(condition != nullptr);
     // assert(then != nullptr);
 }

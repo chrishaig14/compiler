@@ -3,7 +3,9 @@
 //
 
 #include "Break.h"
+
 using namespace ast;
+
 bool Break::equal(const ast::Node& other) const {
     return true;
 }
