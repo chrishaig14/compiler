@@ -168,7 +168,7 @@ UNode Parser::parse_assignment_or_expression() {
                 } else if (op == TokType::MINUS_EQQ) {
                     opt = OpType::SUB;
                 }
-                auto bnode = ast::Binop::make(opt, id_node, rvalue, id_node->start, rvalue->end);
+                auto bnode = ast::BinaryOp::make(opt, id_node, rvalue, id_node->start, rvalue->end);
                 bnode->op_pos = op_pos;
                 rvalue = std::move(bnode);
             }
@@ -194,7 +194,7 @@ UNode Parser::parse_or_expression() {
     while (this->match(TokType::OR)) {
         this->next();
         auto right = this->parse_and_expression();
-        auto node = std::make_unique<ast::Binop>(OpType::OR, left, right, left->start, right->end);
+        auto node = std::make_unique<ast::BinaryOp>(OpType::OR, left, right, left->start, right->end);
         left = std::move(node);
     }
     return left;
@@ -205,7 +205,7 @@ UNode Parser::parse_and_expression() {
     while (this->match(TokType::AND)) {
         this->next();
         auto right = this->parse_not_expression();
-        auto node = std::make_unique<ast::Binop>(OpType::AND, left, right, left->start, right->end);
+        auto node = std::make_unique<ast::BinaryOp>(OpType::AND, left, right, left->start, right->end);
         left = std::move(node);
     }
     return left;
@@ -232,7 +232,7 @@ UNode Parser::parse_bool_expression() {
     op = TOKEN_TO_OP[this->token.type];
     this->next();
     auto right = this->parse_add_or_sub_expression();
-    auto node = std::make_unique<ast::Binop>(op, left, right, left->start, right->end);
+    auto node = std::make_unique<ast::BinaryOp>(op, left, right, left->start, right->end);
     return node;
 }
 
@@ -244,7 +244,7 @@ UNode Parser::parse_add_or_sub_expression() {
         Token op_token = this->token;
         this->next();
         auto right = this->parse_mul_div_or_mod_expression();
-        auto node = ast::Binop::make(op, left, right, left->start, right->end);
+        auto node = ast::BinaryOp::make(op, left, right, left->start, right->end);
         node->op_pos = op_token.start;
         left = std::move(node);
     }
@@ -259,7 +259,7 @@ UNode Parser::parse_mul_div_or_mod_expression() {
         Token op_token = this->token;
         this->next();
         auto right = this->parse_factor();
-        auto node = ast::Binop::make(op, left, right, left->start, right->end);
+        auto node = ast::BinaryOp::make(op, left, right, left->start, right->end);
         node->op_pos = op_token.start;
         left = std::move(node);
     }

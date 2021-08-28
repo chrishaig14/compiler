@@ -272,7 +272,7 @@ TEST_CASE("nodes_binop", "[binop]") {
     UNode b = ast::Number::make(NumberType::INTEGER, "9", DUMMY_POS, DUMMY_POS);
     nlohmann::json e = {{"type",  "binop"},
                         {"binop", {{"left", a->to_json()}, {"right", b->to_json()}, {"op", op_to_string(OpType::ADD)}}}};
-    ast::Binop n(OpType::ADD, a, b, DUMMY_POS, DUMMY_POS);
+    ast::BinaryOp n(OpType::ADD, a, b, DUMMY_POS, DUMMY_POS);
     nlohmann::json nj = n.to_json();
     REQUIRE(e == nj);
 }
@@ -352,7 +352,7 @@ TEST_CASE("nodes_while", "[while]") {
     std::unique_ptr<ast::Block> body = ast::Block::make(VectorOfNodesU{}, DUMMY_POS, DUMMY_POS);
     UNode a = ast::Id::make("bar", DUMMY_POS, DUMMY_POS);
     UNode b = ast::Id::make("baz", DUMMY_POS, DUMMY_POS);
-    std::unique_ptr<ast::Node> cond = std::make_unique<ast::Binop>(OpType::EQ, a, b, DUMMY_POS, DUMMY_POS);
+    std::unique_ptr<ast::Node> cond = std::make_unique<ast::BinaryOp>(OpType::EQ, a, b, DUMMY_POS, DUMMY_POS);
     nlohmann::json e = {{"type",  "while"},
                         {"while", {{"condition", cond->to_json()}, {"body", body->to_json()}}}};
     ast::While n(cond, body, DUMMY_POS, DUMMY_POS);

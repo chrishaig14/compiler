@@ -10,8 +10,8 @@ add_library(
         Alias.h
         Assignment.cpp
         Assignment.h
-        Binop.cpp
-        Binop.h
+        BinaryOp.cpp
+        BinaryOp.h
         Block.cpp
         Block.h
         Boolean.cpp

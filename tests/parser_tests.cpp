@@ -69,14 +69,14 @@ TestNodeU EXPRESSION_1_U() {
     auto exp_id_1_u = EXP_ID_1_U();
     auto exp_id_2_u = EXP_ID_2_U();
     return {EXP_ID_1.text + "+" + EXP_ID_2.text,
-            ast::Binop::make(OpType::ADD, exp_id_1_u.node, exp_id_2_u.node, DUMMY_POS, DUMMY_POS)};
+            ast::BinaryOp::make(OpType::ADD, exp_id_1_u.node, exp_id_2_u.node, DUMMY_POS, DUMMY_POS)};
 }
 
 TestNodeU EXPRESSION_2_U() {
     auto exp_id_2_u = EXP_ID_2_U();
     auto exp_id_1_u = EXP_ID_1_U();
     return {exp_id_2_u.text + "*" + exp_id_1_u.text,
-            ast::Binop::make(OpType::MUL, exp_id_2_u.node, exp_id_1_u.node, DUMMY_POS, DUMMY_POS)};
+            ast::BinaryOp::make(OpType::MUL, exp_id_2_u.node, exp_id_1_u.node, DUMMY_POS, DUMMY_POS)};
 }
 
 // const TestNode ASSIGNMENT{EXP_ID_1.text + " = " + EXPRESSION_1_U.text,
@@ -642,7 +642,7 @@ TEST_CASE("parse_and_exp", "[parser]") {
     UNode ast = parser.parse_and_expression();
 
     REQUIRE(ast->to_json() ==
-            ast::Binop(OpType::AND, EXPRESSION_1.node, EXPRESSION_2.node, DUMMY_POS, DUMMY_POS).to_json());
+            ast::BinaryOp(OpType::AND, EXPRESSION_1.node, EXPRESSION_2.node, DUMMY_POS, DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_or_exp", "[parser]") {
@@ -658,7 +658,7 @@ TEST_CASE("parse_or_exp", "[parser]") {
     UNode ast = parser.parse_or_expression();
 
     REQUIRE(ast->to_json() ==
-    ast::Binop(OpType::OR, EXPRESSION_1.node, EXPRESSION_2.node, DUMMY_POS, DUMMY_POS).to_json());
+    ast::BinaryOp(OpType::OR, EXPRESSION_1.node, EXPRESSION_2.node, DUMMY_POS, DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_eq_exp", "[parser]") {
@@ -674,7 +674,7 @@ TEST_CASE("parse_eq_exp", "[parser]") {
     UNode ast = parser.parse_and_expression();
 
     REQUIRE(ast->to_json() ==
-    ast::Binop(OpType::EQ, EXPRESSION_1.node, EXPRESSION_2.node, DUMMY_POS, DUMMY_POS).to_json());
+    ast::BinaryOp(OpType::EQ, EXPRESSION_1.node, EXPRESSION_2.node, DUMMY_POS, DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_ge_exp", "[parser]") {
@@ -690,7 +690,7 @@ TEST_CASE("parse_ge_exp", "[parser]") {
     UNode ast = parser.parse_and_expression();
 
     REQUIRE(ast->to_json() ==
-    ast::Binop(OpType::GE, EXPRESSION_1.node, EXPRESSION_2.node, DUMMY_POS, DUMMY_POS).to_json());
+    ast::BinaryOp(OpType::GE, EXPRESSION_1.node, EXPRESSION_2.node, DUMMY_POS, DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_le_exp", "[parser]") {
@@ -706,7 +706,7 @@ TEST_CASE("parse_le_exp", "[parser]") {
     UNode ast = parser.parse_and_expression();
 
     REQUIRE(ast->to_json() ==
-    ast::Binop(OpType::LE, EXPRESSION_1.node, EXPRESSION_2.node, DUMMY_POS, DUMMY_POS).to_json());
+    ast::BinaryOp(OpType::LE, EXPRESSION_1.node, EXPRESSION_2.node, DUMMY_POS, DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_gt_exp", "[parser]") {
@@ -722,7 +722,7 @@ TEST_CASE("parse_gt_exp", "[parser]") {
     UNode ast = parser.parse_and_expression();
 
     REQUIRE(ast->to_json() ==
-    ast::Binop(OpType::GT, EXPRESSION_1.node, EXPRESSION_2.node, DUMMY_POS, DUMMY_POS).to_json());
+    ast::BinaryOp(OpType::GT, EXPRESSION_1.node, EXPRESSION_2.node, DUMMY_POS, DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_lt_exp", "[parser]") {
@@ -738,7 +738,7 @@ TEST_CASE("parse_lt_exp", "[parser]") {
     UNode ast = parser.parse_and_expression();
 
     REQUIRE(ast->to_json() ==
-    ast::Binop(OpType::LT, EXPRESSION_1.node, EXPRESSION_2.node, DUMMY_POS, DUMMY_POS).to_json());
+    ast::BinaryOp(OpType::LT, EXPRESSION_1.node, EXPRESSION_2.node, DUMMY_POS, DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_ne_exp", "[parser]") {
@@ -754,7 +754,7 @@ TEST_CASE("parse_ne_exp", "[parser]") {
     UNode ast = parser.parse_and_expression();
 
     REQUIRE(ast->to_json() ==
-    ast::Binop(OpType::NE, EXPRESSION_1.node, EXPRESSION_2.node, DUMMY_POS, DUMMY_POS).to_json());
+    ast::BinaryOp(OpType::NE, EXPRESSION_1.node, EXPRESSION_2.node, DUMMY_POS, DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_not_exp", "[parser]") {

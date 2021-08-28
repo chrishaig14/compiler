@@ -106,7 +106,7 @@ public:
     USemanticInfo dispatch_rvalue(ast::Node& nod);
 
     USemanticInfo visit_assignment(ast::Assignment& n);
-    USemanticInfo visit_binop(ast::Binop& node);
+    USemanticInfo visit_binop(ast::BinaryOp& node);
     USemanticInfo visit_block(ast::Block& node);
     USemanticInfo visit_root(ast::Block& node);
     USemanticInfo visit_boolean(ast::Boolean& node);

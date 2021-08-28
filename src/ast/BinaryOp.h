@@ -13,22 +13,22 @@
 #include "optypes.h"
 #include "ast.h"
 
-class ast::Binop : public ast::Node {
+class ast::BinaryOp : public ast::Node {
 public:
     UNode left;
     UNode right;
     OpType op;
     TextPosition op_pos;
 
-    Binop(OpType op, UNode& left, UNode& right, TextPosition start, TextPosition end);
+    BinaryOp(OpType op, UNode& left, UNode& right, TextPosition start, TextPosition end);
 
     static UBinopNode make(OpType op, UNode& left, UNode& right, TextPosition start, TextPosition end) {
-        return std::make_unique<Binop>(op, left, right, start, end);
+        return std::make_unique<BinaryOp>(op, left, right, start, end);
     }
 
     bool equal(const ast::Node& x) const override;
 
-    ~Binop();
+    ~BinaryOp();
     nlohmann::json to_json() const override;
 
     TypeNode* ltype;

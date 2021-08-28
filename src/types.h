@@ -15,7 +15,7 @@ class TypeNode;
 
 typedef std::unique_ptr<TypeNode> UTypeNode;
 typedef std::unique_ptr<ast::Function> UFunctionNode;
-typedef std::unique_ptr<ast::Binop> UBinopNode;
+typedef std::unique_ptr<ast::BinaryOp> UBinopNode;
 typedef std::unique_ptr<ast::Id> UIdNode;
 typedef std::unique_ptr<ast::Block> UBlockNode;
 typedef std::unique_ptr<ast::Number> UNumberNode;

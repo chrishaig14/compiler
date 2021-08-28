@@ -52,7 +52,7 @@ namespace ast {
 
     class Alias;
 
-    class Binop;
+    class BinaryOp;
 
     class Declaration;
 

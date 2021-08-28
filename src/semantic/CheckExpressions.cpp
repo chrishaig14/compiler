@@ -186,7 +186,7 @@ USemanticInfo Checker::visit_unary(ast::UnaryOp& n) {
     return info_u;
 }
 
-USemanticInfo Checker::visit_binop(ast::Binop& n) {
+USemanticInfo Checker::visit_binop(ast::BinaryOp& n) {
     USemanticInfo left_info_p = this->dispatch_rvalue(*n.left);
     if (left_info_p->is_error()) {
         return error_stub();
