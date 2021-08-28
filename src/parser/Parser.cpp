@@ -356,9 +356,9 @@ UNode Parser::parse_partial_application() {
         }
     }
     Token close = this->expect_token(TokType::RPAREN);
-    auto partial = std::make_unique<ast::PartialApplication>(new ast::Id(total_function_tok.str,
-                                                                         total_function_tok.start,
-                                                                         total_function_tok.end_pos),
+    auto partial = std::make_unique<ast::PartialApplication>(std::make_unique<ast::Id>(total_function_tok.str,
+                                                                                       total_function_tok.start,
+                                                                                       total_function_tok.end_pos),
                                                              args,
                                                              dollar.start,
                                                              close.end_pos);

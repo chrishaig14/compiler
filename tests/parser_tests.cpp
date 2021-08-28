@@ -885,7 +885,7 @@ TEST_CASE("parse_partial_one_arg", "[parser]") {
     parser.top_package_name = "main";
 
     UNode ast = parser.parse_partial_application();
-    REQUIRE(ast->to_json() == ast::PartialApplication(FACTOR_EXPRESSION.node.release(),
+    REQUIRE(ast->to_json() == ast::PartialApplication(std::move(FACTOR_EXPRESSION.node),
                                                       {EXPRESSION_1.node.release()},
                                                       DUMMY_POS,
                                                       DUMMY_POS).to_json());
@@ -903,7 +903,7 @@ TEST_CASE("parse_partial_mult_arg_one", "[parser]") {
     parser.top_package_name = "main";
 
     UNode ast = parser.parse_partial_application();
-    REQUIRE(ast->to_json() == ast::PartialApplication(FACTOR_EXPRESSION.node.release(),
+    REQUIRE(ast->to_json() == ast::PartialApplication(std::move(FACTOR_EXPRESSION.node),
                                                       {EXPRESSION_1.node.release(), nullptr},
                                                       DUMMY_POS,
                                                       DUMMY_POS).to_json());
@@ -921,7 +921,7 @@ TEST_CASE("parse_partial_mult_arg_two", "[parser]") {
     parser.top_package_name = "main";
 
     UNode ast = parser.parse_partial_application();
-    REQUIRE(ast->to_json() == ast::PartialApplication(FACTOR_EXPRESSION.node.release(),
+    REQUIRE(ast->to_json() == ast::PartialApplication(std::move(FACTOR_EXPRESSION.node),
                                                       {EXPRESSION_1.node.release(), EXPRESSION_2.node.release()},
                                                       DUMMY_POS,
                                                       DUMMY_POS).to_json());
