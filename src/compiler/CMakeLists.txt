@@ -28,4 +28,4 @@ target_link_libraries(
         units
         nodes
         fmt::fmt
-    )
+)

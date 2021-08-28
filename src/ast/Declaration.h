@@ -18,7 +18,7 @@ public:
     UNode expression;
     TextPosition eq_pos;
     Declaration(const std::string& identifier, TypeNode* type, UNode& expression, TextPosition start,
-                    TextPosition eq_pos, TextPosition end);
+                TextPosition eq_pos, TextPosition end);
 
 
     Declaration(const std::string& identifier, TypeNode* type, ast::Node* expression, TextPosition start);

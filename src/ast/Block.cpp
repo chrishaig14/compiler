@@ -5,6 +5,7 @@
 #include "Block.h"
 
 #include <utility>
+
 using namespace ast;
 
 Block::~Block() {
@@ -30,7 +31,7 @@ bool Block::equal(const ast::Node& p) const {
 }
 
 Block::Block(VectorOfNodesU nodes, TextPosition start, TextPosition end) : ast::Node(NodeType::BLOCK, start, end),
-                                                                                   nodes(std::move(nodes)) {
+                                                                           nodes(std::move(nodes)) {
     ;
 }
 

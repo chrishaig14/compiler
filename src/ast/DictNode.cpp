@@ -3,7 +3,9 @@
 //
 
 #include "DictNode.h"
+
 using namespace ast;
+
 bool DictNode::equal(const ast::Node& other) const {
     const auto& o = (DictNode&) other;
     if (this->items.size() != o.items.size()) {
@@ -34,6 +36,8 @@ nlohmann::json DictNode::to_json() const {
     return j;
 }
 
-DictNode::DictNode(std::vector<std::pair<UNode, UNode>>& items, TextPosition start,
-                   TextPosition end) : ast::Node(NodeType::DICT, start, end), items(std::move(items)) {
+DictNode::DictNode(std::vector<std::pair<UNode, UNode>>& items, TextPosition start, TextPosition end) : ast::Node(
+        NodeType::DICT,
+        start,
+        end), items(std::move(items)) {
 }

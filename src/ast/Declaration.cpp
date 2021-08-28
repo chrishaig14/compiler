@@ -3,15 +3,13 @@
 //
 
 #include "Declaration.h"
+
 using namespace ast;
-Declaration::Declaration(const std::string& identifier, TypeNode* type, UNode& expression,
-                                 TextPosition start, TextPosition eq_pos, TextPosition end) : ast::Node(NodeType::DECL,
-                                                                                                   start,
-                                                                                                   end),
-                                                                                              identifier(identifier),
-                                                                                              type(type),
-                                                                                              expression(std::move(
-                                                                                                      expression)) {
+
+Declaration::Declaration(const std::string& identifier, TypeNode* type, UNode& expression, TextPosition start,
+                         TextPosition eq_pos, TextPosition end) : ast::Node(NodeType::DECL, start, end),
+                                                                  identifier(identifier), type(type),
+                                                                  expression(std::move(expression)) {
     this->eq_pos = eq_pos;
 }
 

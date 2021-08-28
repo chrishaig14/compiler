@@ -28,10 +28,8 @@ bool PartialApplication::equal(const ast::Node& other) const {
     return true;
 }
 
-PartialApplication::PartialApplication(Node* function, VectorOfNodes args, TextPosition start, TextPosition end) : ast::Node(
-        NodeType::PARTIAL,
-        start,
-        end) {
+PartialApplication::PartialApplication(Node* function, VectorOfNodes args, TextPosition start, TextPosition end)
+        : ast::Node(NodeType::PARTIAL, start, end) {
     this->function = function;
     this->args = args;
 }

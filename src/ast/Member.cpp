@@ -7,7 +7,7 @@
 using namespace ast;
 
 Member::Member(UNode& parent, Token child_token) : ast::Node(NodeType::MEMBER, parent->start, child_token.end_pos),
-                                                           parent(std::move(parent)) {
+                                                   parent(std::move(parent)) {
     this->child_token = child_token;
     this->type = MemberType::STR;
     this->s_child = child_token.str;

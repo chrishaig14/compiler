@@ -12,6 +12,7 @@
 
 #include "../types.h"
 #include "ast.h"
+
 class ast::Subscript : public ast::Node {
 
 public:

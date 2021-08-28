@@ -13,6 +13,7 @@
 #include "Function.h"
 #include "../macros.h"
 #include "ast.h"
+
 struct Method {
     Implicit* constraint;
     ast::Function* method;
@@ -23,9 +24,9 @@ public:
 
     bool equal(const ast::Node& other) const override;
     Klass(const std::string& className, VectorOfStrings type_parameters,
-              std::vector<std::pair<std::string, UTypeNode>> members, std::unordered_map<std::string, Method> functions,
-              std::map<std::string, std::pair<TypeNode*, ast::Node*>> static_members,
-              std::unordered_map<std::string, UFunctionNode>& static_methods, TextPosition start, TextPosition end);
+          std::vector<std::pair<std::string, UTypeNode>> members, std::unordered_map<std::string, Method> functions,
+          std::map<std::string, std::pair<TypeNode*, ast::Node*>> static_members,
+          std::unordered_map<std::string, UFunctionNode>& static_methods, TextPosition start, TextPosition end);
     ~Klass() override;
     nlohmann::json to_json() const override;
 

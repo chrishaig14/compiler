@@ -3,7 +3,9 @@
 //
 
 #include "Import.h"
+
 using namespace ast;
+
 bool Import::equal(const ast::Node& other) const {
     return false;
 }

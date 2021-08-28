@@ -8,11 +8,12 @@
 
 #include "Node.h"
 #include "ast.h"
+
 class ast::DefaultConstructor : public ast::Node {
 public:
     DefaultConstructor(Node* class_node, TextPosition start, TextPosition end) : ast::Node(NodeType::DEF_CONST,
-                                                                                          start,
-                                                                                          end) {
+                                                                                           start,
+                                                                                           end) {
         this->class_node = class_node;
     }
 

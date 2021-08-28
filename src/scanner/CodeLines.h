@@ -24,7 +24,7 @@ public:
             throw std::runtime_error("LINE OUT OF RANGE");
         }
         Range line_range = this->line_offsets[i];
-        return this->text.substr(line_range.offset, line_range.length-1);
+        return this->text.substr(line_range.offset, line_range.length - 1);
     }
 
     std::vector<Range> line_offsets;

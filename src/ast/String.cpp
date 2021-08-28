@@ -6,11 +6,13 @@
 #include "../json/json.hpp"
 
 using namespace ast;
-String::String(const std::string& str, TextPosition start, TextPosition end) : ast::Node(NodeType::STRNG, start, end), str(str) {
+
+String::String(const std::string& str, TextPosition start, TextPosition end) : ast::Node(NodeType::STRNG, start, end),
+                                                                               str(str) {
 }
 
 bool String::equal(const ast::Node& x) const {
-    const auto& other = (String&)x;
+    const auto& other = (String&) x;
     return this->str == other.str;
 }
 

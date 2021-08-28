@@ -358,11 +358,11 @@ UNode Parser::parse_partial_application() {
     }
     Token close = this->expect_token(TokType::RPAREN);
     auto partial = std::make_unique<ast::PartialApplication>(new ast::Id(total_function_tok.str,
-                                                                   total_function_tok.start,
-                                                                   total_function_tok.end_pos),
-                                                        args,
-                                                        dollar.start,
-                                                        close.end_pos);
+                                                                         total_function_tok.start,
+                                                                         total_function_tok.end_pos),
+                                                             args,
+                                                             dollar.start,
+                                                             close.end_pos);
     partial->start = total_function_tok.start;
     return partial;
 }
@@ -387,7 +387,7 @@ UNode Parser::parse_id_or_literal() {
             break;
         }
         case TokType::FLOAT: {
-            node =ast:: Number::make(NumberType::FLOAT, this->token.str, this->token.start, this->token.end_pos);
+            node = ast::Number::make(NumberType::FLOAT, this->token.str, this->token.start, this->token.end_pos);
             node->end = this->token.end_pos;
             this->next();
             break;
@@ -537,11 +537,11 @@ std::unique_ptr<ast::Declaration> Parser::parse_variable_declaration() {
     Token eq_tok = this->expect_token(TokType::EQQ);
     auto expression = this->parse_expression();
     return std::make_unique<ast::Declaration>(identifier.str,
-                                             type,
-                                             expression,
-                                             var_token.start,
-                                             eq_tok.start,
-                                             expression->end);
+                                              type,
+                                              expression,
+                                              var_token.start,
+                                              eq_tok.start,
+                                              expression->end);
 }
 
 UNode Parser::parse_common_statement() {
@@ -744,12 +744,12 @@ std::unique_ptr<ast::Function> Parser::parse_function_definition() {
     auto body = this->parse_possibly_empty_block();
 
     auto node = std::make_unique<ast::Function>(identifier,
-                                               parameter_names,
-                                               parameter_types,
-                                               return_type,
-                                               body,
-                                               fun_tok.start,
-                                               body->end);
+                                                parameter_names,
+                                                parameter_types,
+                                                return_type,
+                                                body,
+                                                fun_tok.start,
+                                                body->end);
     node->implicit = implicit;
     node->start = fun_tok.start;
     return node;
@@ -941,13 +941,13 @@ std::unique_ptr<ast::Klass> Parser::parse_class_definition() {
     }
     Token end = this->expect_token(TokType::RCURLY);
     auto c = std::make_unique<ast::Klass>(class_name,
-                                         type_parameters,
-                                         std::move(members),
-                                         methods,
-                                         static_members,
-                                         static_methods,
-                                         class_tok.start,
-                                         end.end_pos);
+                                          type_parameters,
+                                          std::move(members),
+                                          methods,
+                                          static_members,
+                                          static_methods,
+                                          class_tok.start,
+                                          end.end_pos);
     c->members_ordered = members_ordered;
     c->start = class_tok.start;
     return c;
@@ -1059,9 +1059,9 @@ std::unique_ptr<ast::Typeclass> Parser::parse_typeclass() {
 
     Token final_curly = this->expect_token(TokType::RCURLY);
     auto n = std::make_unique<ast::Typeclass>(typeclass_id.str,
-                                             base_type.str,
-                                             methods,
-                                             typeclass_id.start,
-                                             final_curly.end_pos);
+                                              base_type.str,
+                                              methods,
+                                              typeclass_id.start,
+                                              final_curly.end_pos);
     return n;
 }
