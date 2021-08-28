@@ -118,7 +118,8 @@ TEST_CASE("nodes_declaration_no_type", "[declaration]") {
 
 TEST_CASE("nodes_declaration_with_type", "[declaration]") {
     UNode r = ast::Number::make(NumberType::INTEGER, "7", DUMMY_POS, DUMMY_POS);
-    ObjectType* t = new ObjectType("Integer");
+    ObjectType to("Integer");
+    auto* t = &to;
     nlohmann::json e = {{"type",        "declaration"},
                         {"declaration", {{"identifier", "foo"}, {"type", t->to_json()}, {"expression", r->to_json()}}}};
     ast::Declaration n("foo", t, r, DUMMY_POS, DUMMY_POS, DUMMY_POS);
@@ -128,7 +129,8 @@ TEST_CASE("nodes_declaration_with_type", "[declaration]") {
 
 TEST_CASE("nodes_if_no_else", "[if]") {
     UNode r = ast::Number::make(NumberType::INTEGER, "7", DUMMY_POS, DUMMY_POS);
-    ObjectType* t = new ObjectType("Integer");
+    ObjectType to("Integer");
+    auto* t = &to;
     nlohmann::json e = {{"type",        "declaration"},
                         {"declaration", {{"identifier", "foo"}, {"type", t->to_json()}, {"expression", r->to_json()}}}};
     ast::Declaration n("foo", t, r, DUMMY_POS, DUMMY_POS, DUMMY_POS);
@@ -278,7 +280,8 @@ TEST_CASE("nodes_binop", "[binop]") {
 }
 
 TEST_CASE("nodes_empty_list", "[empty_list]") {
-    ObjectType* t = new ObjectType("Integer", {});
+    ObjectType to("Integer", {});
+    auto* t = &to;
     ast::EmptyList n(t, DUMMY_POS, DUMMY_POS);
     nlohmann::json nj = n.to_json();
     nlohmann::json e = {{"type",       "empty_list"},
@@ -459,7 +462,8 @@ TEST_CASE("nodes_instance", "[instance]") {
     std::unordered_map<std::string, ast::Function*> cmethods = {{"method1", method1},
                                                                 {"method2", method2}};
 
-    ObjectType* bt = new ObjectType("SomeType");
+    ObjectType bto("SomeType");
+    auto* bt = &bto;
     ast::Instance n("Comparable", bt, cmethods, DUMMY_POS, DUMMY_POS);
     nlohmann::json nj = n.to_json();
 
