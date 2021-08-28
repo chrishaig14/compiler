@@ -11,7 +11,7 @@ nlohmann::json Typeclass::to_json() const {
     j["id"] = this->id;
     j["base_type"] = this->base_type;
     nlohmann::json m_json;
-    for (auto m: this->methods) {
+    for (auto& m: this->methods) {
         m_json[m.first] = m.second->to_json();
     }
     j["methods"] = m_json;
@@ -20,9 +20,9 @@ nlohmann::json Typeclass::to_json() const {
 }
 
 Typeclass::Typeclass(const std::string& id, const std::string& base_type,
-                     const std::unordered_map<std::string, FunctionType*>& methods, TextPosition start,
+                     std::unordered_map<std::string, UFunctionType> methods, TextPosition start,
                      TextPosition end) : ast::Node(NodeType::TYPECLASS, start, end), id(id), base_type(base_type),
-                                         methods(methods) {
+                                         methods(std::move(methods)) {
 }
 
 bool Typeclass::equal(const ast::Node& other) const {

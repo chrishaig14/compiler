@@ -1013,7 +1013,7 @@ std::unique_ptr<ast::Typeclass> Parser::parse_typeclass() {
     this->expect_token(TokType::RSQUARE);
     this->expect_token(TokType::LCURLY);
 
-    std::unordered_map<std::string, FunctionType*> methods;
+    std::unordered_map<std::string, UFunctionType> methods;
 
     while (true) {
         if (!this->match(TokType::FUN)) {
@@ -1048,8 +1048,8 @@ std::unique_ptr<ast::Typeclass> Parser::parse_typeclass() {
             return_type = new ObjectType(".None");
         }
 
-        FunctionType* ft = new FunctionType(parameter_types, return_type);
-        methods[method_id.str] = ft;
+        auto ft = std::make_unique<FunctionType>(parameter_types, return_type);
+        methods[method_id.str] = std::move(ft);
         this->expect_token(TokType::SEMICOLON);
         if (!this->match(TokType::FUN)) {
             break;
@@ -1059,7 +1059,7 @@ std::unique_ptr<ast::Typeclass> Parser::parse_typeclass() {
     Token final_curly = this->expect_token(TokType::RCURLY);
     auto n = std::make_unique<ast::Typeclass>(typeclass_id.str,
                                               base_type.str,
-                                              methods,
+                                              std::move(methods),
                                               typeclass_id.start,
                                               final_curly.end_pos);
     return n;

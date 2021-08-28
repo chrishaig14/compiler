@@ -433,18 +433,19 @@ TEST_CASE("nodes_class_full", "[class]") {
 }
 
 TEST_CASE("nodes_typeclass", "[typeclass]") {
-    FunctionType o_method1({new ObjectType("t"), new ObjectType("t")}, new ObjectType("Boolean"));
-    FunctionType o_method2({new ObjectType("t"), new ObjectType("t")}, new ObjectType("Boolean"));
-    auto* method1 = &o_method1;
-    auto* method2 = &o_method2;
-    std::unordered_map<std::string, FunctionType*> cmethods = {{"method1", method1},
-                                                               {"method2", method2}};
-
-    ast::Typeclass n("Comparable", "t", cmethods, DUMMY_POS, DUMMY_POS);
-    nlohmann::json nj = n.to_json();
-
+    auto method1 = std::make_unique<FunctionType>(VectorOfTypes{new ObjectType("t"), new ObjectType("t")},
+                                                  new ObjectType("Boolean"));
+    auto method2 = std::make_unique<FunctionType>(VectorOfTypes{new ObjectType("t"), new ObjectType("t")},
+                                                  new ObjectType("Boolean"));
     nlohmann::json e = {{"type",      "typeclass"},
                         {"typeclass", {{"id", "Comparable"}, {"base_type", "t"}, {"methods", {{"method1", method1->to_json()}, {"method2", method2->to_json()}}}}}};
+    std::unordered_map<std::string, UFunctionType> cmethods;
+    cmethods["method1"] = std::move(method1);
+    cmethods["method2"] = std::move(method2);
+
+    ast::Typeclass n("Comparable", "t", std::move(cmethods), DUMMY_POS, DUMMY_POS);
+    nlohmann::json nj = n.to_json();
+
     REQUIRE(e == nj);
 }
 
