@@ -485,7 +485,7 @@ TEST_CASE("binop_error", "[checker]") {
     Error& error = *checker.error_reporter.errors.back();
     UNode left = std::make_unique<ast::String>("Hello", _POS, _POS);
     UNode right = std::make_unique<ast::String>("Bye", _POS, _POS);
-    ast::BinaryOp node(OpType::SUB, left, right, _POS, _POS);
+    ast::BinaryOp node(OpType::SUB, std::move(left), std::move(right), _POS, _POS);
     ObjectType expected("Integer");
     ErrorClassNoMethodForOp exp("String", "__sub__", node);
     REQUIRE(error == exp);

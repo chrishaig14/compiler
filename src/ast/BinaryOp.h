@@ -20,10 +20,10 @@ public:
     OpType op;
     TextPosition op_pos;
 
-    BinaryOp(OpType op, UNode& left, UNode& right, TextPosition start, TextPosition end);
+    BinaryOp(OpType op, UNode left, UNode right, TextPosition start, TextPosition end);
 
-    static UBinopNode make(OpType op, UNode& left, UNode& right, TextPosition start, TextPosition end) {
-        return std::make_unique<BinaryOp>(op, left, right, start, end);
+    static UBinopNode make(OpType op, UNode left, UNode right, TextPosition start, TextPosition end) {
+        return std::make_unique<BinaryOp>(op, std::move(left), std::move(right), start, end);
     }
 
     bool equal(const ast::Node& x) const override;
