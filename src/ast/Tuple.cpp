@@ -19,8 +19,8 @@ bool Tuple::equal(const ast::Node& n) const {
     return true;
 }
 
-Tuple::Tuple(const VectorOfNodes& values, TextPosition start, TextPosition end) : Node(NodeType::TUPLE, start, end) {
-    this->values = values;
+Tuple::Tuple(VectorOfNodesU values, TextPosition start, TextPosition end) : Node(NodeType::TUPLE, start, end),
+                                                                            values(std::move(values)) {
 }
 
 nlohmann::json Tuple::to_json() const {

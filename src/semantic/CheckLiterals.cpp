@@ -100,7 +100,7 @@ USemanticInfo Checker::visit_string(ast::String& node) {
 USemanticInfo Checker::visit_tuple(ast::Tuple& node) {
     VectorOfTypes types;
     std::vector<SNode*> values;
-    for (auto* n: node.values) {
+    for (auto& n: node.values) {
         USemanticInfo vtype = this->dispatch(*n);
         values.push_back(vtype->snode);
         types.emplace_back(((EntityValue&) vtype->entity).value->type->clone());

@@ -812,8 +812,10 @@ TEST_CASE("parse_tuple", "[parser]") {
     UNode ast = parser.parse_tuple_or_constructor();
     // auto EXPRESSION_1 = EXPRESSION_1_U();
     // auto EXPRESSION_2 = EXPRESSION_2_U();
-    REQUIRE(ast->to_json() ==
-            ast::Tuple({EXPRESSION_1.node.release(), EXPRESSION_2.node.release()}, DUMMY_POS, DUMMY_POS).to_json());
+    VectorOfNodesU args;
+    args.emplace_back(std::move(EXPRESSION_1.node));
+    args.emplace_back(std::move(EXPRESSION_2.node));
+    REQUIRE(ast->to_json() == ast::Tuple(std::move(args), DUMMY_POS, DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_dict_empty", "[parser]") {
@@ -936,8 +938,10 @@ TEST_CASE("parse_partial_mult_arg_one", "[parser]") {
     args.emplace_back(std::move(EXPRESSION_1.node));
     args.emplace_back(nullptr);
 
-    REQUIRE(ast->to_json() ==
-            ast::PartialApplication(std::move(FACTOR_EXPRESSION.node), std::move(args), DUMMY_POS, DUMMY_POS).to_json());
+    REQUIRE(ast->to_json() == ast::PartialApplication(std::move(FACTOR_EXPRESSION.node),
+                                                      std::move(args),
+                                                      DUMMY_POS,
+                                                      DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_partial_mult_arg_two", "[parser]") {
@@ -952,7 +956,7 @@ TEST_CASE("parse_partial_mult_arg_two", "[parser]") {
     parser.top_package_name = "main";
 
     UNode ast = parser.parse_partial_application();
-    VectorOfNodesU  args;
+    VectorOfNodesU args;
     args.emplace_back(std::move(EXPRESSION_1.node));
     args.emplace_back(std::move(EXPRESSION_2.node));
 

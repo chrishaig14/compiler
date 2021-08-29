@@ -461,7 +461,7 @@ UNode Parser::parse_tuple_literal() {
     Token st = this->expect_token(TokType::LPAREN);
     // it's a tuple
     // this->next();
-    VectorOfNodes values;
+    VectorOfNodesU values;
     if (this->match(TokType::RPAREN)) {
         // this->error_empty_tuple(POS_NONE);
         throw std::runtime_error("EMPTY TUPLE!");
@@ -470,7 +470,7 @@ UNode Parser::parse_tuple_literal() {
     bool first = true;
     while (true) {
         auto exp = this->parse_expression();
-        values.emplace_back(exp.release());
+        values.emplace_back(std::move(exp));
         if (this->match(TokType::COMMA)) {
             this->next();
             first = false;
@@ -483,7 +483,7 @@ UNode Parser::parse_tuple_literal() {
         }
     }
     Token close = this->expect_token(TokType::RPAREN);
-    return std::make_unique<ast::Tuple>(values, st.start, close.end_pos);
+    return std::make_unique<ast::Tuple>(std::move(values), st.start, close.end_pos);
 }
 
 UNode Parser::parse_id_or_class_literal() {
