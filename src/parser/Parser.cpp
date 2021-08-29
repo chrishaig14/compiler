@@ -530,15 +530,15 @@ UNode Parser::parse_call_or_subscript_chain(UNode& parent) {
 std::unique_ptr<ast::Declaration> Parser::parse_variable_declaration() {
     Token var_token = this->expect_token(TokType::VAR);
     Token identifier = this->expect_token(TokType::ID);
-    TypeNode* type = nullptr;
+    UTypeNode type = nullptr;
     if (this->match(TokType::COLON)) {
         this->next();
-        type = this->parse_type_node().release();
+        type = this->parse_type_node();
     }
     Token eq_tok = this->expect_token(TokType::EQQ);
     auto expression = this->parse_expression();
     return std::make_unique<ast::Declaration>(identifier.str,
-                                              type,
+                                              std::move(type),
                                               expression,
                                               var_token.start,
                                               eq_tok.start,

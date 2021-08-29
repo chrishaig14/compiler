@@ -14,14 +14,14 @@
 class ast::Declaration : public ast::Node {
 public:
     std::string identifier;
-    TypeNode* type;
+    UTypeNode type;
     UNode expression;
     TextPosition eq_pos;
-    Declaration(const std::string& identifier, TypeNode* type, UNode& expression, TextPosition start,
+    Declaration(const std::string& identifier, UTypeNode type, UNode& expression, TextPosition start,
                 TextPosition eq_pos, TextPosition end);
 
 
-    Declaration(const std::string& identifier, TypeNode* type, ast::Node* expression, TextPosition start);
+    Declaration(const std::string& identifier, UTypeNode type, ast::Node* expression, TextPosition start);
 
     bool equal(const ast::Node& other) const override;
 

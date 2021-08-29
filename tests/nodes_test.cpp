@@ -118,22 +118,20 @@ TEST_CASE("nodes_declaration_no_type", "[declaration]") {
 
 TEST_CASE("nodes_declaration_with_type", "[declaration]") {
     UNode r = ast::Number::make(NumberType::INTEGER, "7", DUMMY_POS, DUMMY_POS);
-    ObjectType to("Integer");
-    auto* t = &to;
+    UTypeNode t = std::make_unique<ObjectType>("Integer");
     nlohmann::json e = {{"type",        "declaration"},
                         {"declaration", {{"identifier", "foo"}, {"type", t->to_json()}, {"expression", r->to_json()}}}};
-    ast::Declaration n("foo", t, r, DUMMY_POS, DUMMY_POS, DUMMY_POS);
+    ast::Declaration n("foo", std::move(t), r, DUMMY_POS, DUMMY_POS, DUMMY_POS);
     nlohmann::json nj = n.to_json();
     REQUIRE(e == nj);
 }
 
 TEST_CASE("nodes_if_no_else", "[if]") {
     UNode r = ast::Number::make(NumberType::INTEGER, "7", DUMMY_POS, DUMMY_POS);
-    ObjectType to("Integer");
-    auto* t = &to;
+    UTypeNode t = std::make_unique<ObjectType>("Integer");
     nlohmann::json e = {{"type",        "declaration"},
                         {"declaration", {{"identifier", "foo"}, {"type", t->to_json()}, {"expression", r->to_json()}}}};
-    ast::Declaration n("foo", t, r, DUMMY_POS, DUMMY_POS, DUMMY_POS);
+    ast::Declaration n("foo", std::move(t), r, DUMMY_POS, DUMMY_POS, DUMMY_POS);
     nlohmann::json nj = n.to_json();
     REQUIRE(e == nj);
 }
@@ -352,7 +350,11 @@ TEST_CASE("nodes_while", "[while]") {
     std::unique_ptr<ast::Block> body = ast::Block::make(VectorOfNodesU{}, DUMMY_POS, DUMMY_POS);
     UNode a = ast::Id::make("bar", DUMMY_POS, DUMMY_POS);
     UNode b = ast::Id::make("baz", DUMMY_POS, DUMMY_POS);
-    std::unique_ptr<ast::Node> cond = std::make_unique<ast::BinaryOp>(OpType::EQ, std::move(a), std::move(b), DUMMY_POS, DUMMY_POS);
+    std::unique_ptr<ast::Node> cond = std::make_unique<ast::BinaryOp>(OpType::EQ,
+                                                                      std::move(a),
+                                                                      std::move(b),
+                                                                      DUMMY_POS,
+                                                                      DUMMY_POS);
     nlohmann::json e = {{"type",  "while"},
                         {"while", {{"condition", cond->to_json()}, {"body", body->to_json()}}}};
     ast::While n(cond, body, DUMMY_POS, DUMMY_POS);
@@ -387,8 +389,20 @@ TEST_CASE("nodes_class_full", "[class]") {
     std::unique_ptr<ast::Block> b4 = ast::Block::make(VectorOfNodesU{}, DUMMY_POS, DUMMY_POS);
     VectorOfUTypes v1;
     VectorOfUTypes v2;
-    UFunctionNode method1 = std::make_unique<ast::Function>("method1", VectorOfStrings {}, v1, rt1, b1, DUMMY_POS, DUMMY_POS);
-    UFunctionNode method2 = std::make_unique<ast::Function>("method2", VectorOfStrings {}, v2, rt2, b2, DUMMY_POS, DUMMY_POS);
+    UFunctionNode method1 = std::make_unique<ast::Function>("method1",
+                                                            VectorOfStrings{},
+                                                            v1,
+                                                            rt1,
+                                                            b1,
+                                                            DUMMY_POS,
+                                                            DUMMY_POS);
+    UFunctionNode method2 = std::make_unique<ast::Function>("method2",
+                                                            VectorOfStrings{},
+                                                            v2,
+                                                            rt2,
+                                                            b2,
+                                                            DUMMY_POS,
+                                                            DUMMY_POS);
     nlohmann::json methods = {{"method2", method2->to_json()},
                               {"method1", method1->to_json()}};
     std::unordered_map<std::string, std::unique_ptr<KMethod>> cmethods;
@@ -421,7 +435,14 @@ TEST_CASE("nodes_class_full", "[class]") {
                                      {"smethod2", smethod2->to_json()}};
     cstatic_methods["smethod1"] = std::move(smethod1);
     cstatic_methods["smethod2"] = std::move(smethod2);
-    ast::Klass n("MyClass", {"k", "v"}, std::move(cmembers), std::move(cmethods), {}, cstatic_methods, DUMMY_POS, DUMMY_POS);
+    ast::Klass n("MyClass",
+                 {"k", "v"},
+                 std::move(cmembers),
+                 std::move(cmethods),
+                 {},
+                 cstatic_methods,
+                 DUMMY_POS,
+                 DUMMY_POS);
     n.members_ordered = members_ordered;
     nlohmann::json nj = n.to_json();
 

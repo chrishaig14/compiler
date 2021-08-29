@@ -140,9 +140,9 @@ USemanticInfo Checker::visit_declaration(ast::Declaration& n) {
 USemanticInfo Checker::check_declaration_with_type(ast::Declaration& n) {
     if (n.type->kind == Kind::OBJECT && this->module.aliased_types.count(n.type->object().id) == 1) {
         TypeNode* aliased_type = this->module.aliased_types.at(n.type->object().id);
-        n.type = aliased_type;
+        n.type = UTypeNode(aliased_type->clone());
     } else {
-        this->module.fill_actual(n.type);
+        this->module.fill_actual(*n.type);
     }
     USemanticInfo rvalue_sinfo = this->expect_rvalue_of_type(*n.type, *n.expression);
     if (rvalue_sinfo->is_error()) {
