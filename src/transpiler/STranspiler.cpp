@@ -219,7 +219,7 @@ OutputCode STranspiler::transpile_float(sem::Float& node) {
     return OutputCode("", "MAKE_FLOAT(" + node.str + ")");
 }
 
-void STranspiler::transpile_class(sem::Klass& node) {
+void STranspiler::transpile_class(sem::KlassDef& node) {
     std::string out;
     std::string class_name = path_to_id(node.identifier);
     out += CLASS + SPACE + class_name + SPACE + ": public XObject {\n";

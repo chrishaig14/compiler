@@ -16,8 +16,8 @@ add_library(
         Break.h
         Call.cpp
         Call.h
-        Klass.cpp
-        Klass.h
+        KlassDef.cpp
+        KlassDef.h
         Continue.cpp
         Continue.h
         Declaration.cpp

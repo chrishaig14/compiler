@@ -36,7 +36,7 @@
 #include "../units/FunctionValue.h"
 #include "../simple_nodes/Bool.h"
 #include "../simple_nodes/Float.h"
-#include "../simple_nodes/Klass.h"
+#include "../simple_nodes/KlassDef.h"
 #include "../simple_nodes/NewObject.h"
 #include "../simple_nodes/While.h"
 #include "../simple_nodes/Break.h"

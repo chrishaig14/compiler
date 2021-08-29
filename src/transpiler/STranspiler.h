@@ -17,7 +17,7 @@
 #include "../simple_nodes/String.h"
 #include "../simple_nodes/Bool.h"
 #include "../simple_nodes/Float.h"
-#include "../simple_nodes/Klass.h"
+#include "../simple_nodes/KlassDef.h"
 #include "../simple_nodes/NewObject.h"
 #include "../simple_nodes/Match.h"
 #include "../simple_nodes/ObjectMember.h"
@@ -88,7 +88,7 @@ public:
 
     OutputCode transpile_return(sem::Return& node);
 
-    void transpile_class(sem::Klass& node);
+    void transpile_class(sem::KlassDef& node);
     void transpile_enum(sem::EnumDef& node);
 
     void dispatch_top(sem::SNode& node) {
@@ -100,7 +100,7 @@ public:
                 this->transpile_enum((sem::EnumDef&) node);
                 break;
             case SNodeType::CLASS:
-                this->transpile_class((sem::Klass&) node);
+                this->transpile_class((sem::KlassDef&) node);
                 break;
             default:
                 throw std::runtime_error("Don't know what to do with this SNode!");

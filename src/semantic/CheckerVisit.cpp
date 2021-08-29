@@ -82,7 +82,7 @@ USemanticInfo Checker::visit_class(ast::Klass& node) {
     }
 
     Class* clazz = ((EntityClass&) this->scope->get(node.class_name)).clazz;
-    auto* csn = new sem::Klass(clazz->path.as_str(), node.members_ordered);
+    auto* csn = new sem::KlassDef(clazz->path.as_str(), node.members_ordered);
     sn->nodes.push_back(csn);
     sn->nodes.push_back(make_class_default_init(clazz->path.as_str(), node.members_ordered));
 

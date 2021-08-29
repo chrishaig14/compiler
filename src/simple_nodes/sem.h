@@ -16,7 +16,7 @@ namespace sem {
 
     class Call;
 
-    class Klass;
+    class KlassDef;
 
     class Continue;
 

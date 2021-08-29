@@ -2,5 +2,5 @@
 // Created by chris on 11/4/21.
 //
 
-#include "Klass.h"
+#include "KlassDef.h"
 using namespace sem;
