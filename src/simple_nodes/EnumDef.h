@@ -16,6 +16,11 @@ public:
 
     std::string id;
     VectorOfStrings values;
+
+    bool equals(const SNode& o) const override {
+        auto& other = (const EnumDef&) o;
+        return this->id == other.id && this->values == other.values;
+    }
 };
 
 

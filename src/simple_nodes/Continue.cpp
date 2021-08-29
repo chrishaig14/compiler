@@ -3,6 +3,8 @@
 //
 
 #include "Continue.h"
+
 using namespace sem;
+
 Continue::Continue() : SNode(SNodeType::CONTINUE) {
 }

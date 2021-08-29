@@ -167,7 +167,7 @@ USemanticInfo Checker::visit_return(ast::Return& n) {
         }
         SemanticInfo info_r;
         USNode u;
-        info_r.snode = new sem::Return(u);
+        info_r.snode = new sem::Return(std::move(u));
         return std::make_unique<SemanticInfo>(info_r);
     }
     TypeNode* return_type = ((EntityValue&) return_entity).value->type;
@@ -187,7 +187,7 @@ USemanticInfo Checker::visit_return(ast::Return& n) {
         return error_stub();
     }
     auto u = USNode(expression_info_p->snode);
-    auto* sn = new sem::Return(u);
+    auto* sn = new sem::Return(std::move(u));
     for (auto l : this->scope->get_all()) {
         sn->reachables.push_back(l.first);
     }
@@ -260,13 +260,13 @@ USemanticInfo Checker::visit_match(ast::Match& node) {
         auto* bn = (sem::Block*) case_info->snode;
         auto* omn = new sem::ObjectMember(new sem::Id(varname), Path("core.core.Union"), "o");
         USNode u(omn);
-        auto* dn = new sem::Declaration(case_id, u);
+        auto* dn = new sem::Declaration(case_id, std::move(u));
         bn->nodes.insert(bn->nodes.begin(), dn);
         cas.emplace_back(union_index, (sem::Block*) case_info->snode);
         this->leave_scope();
     }
     USNode up(exp_info->snode);
-    auto* init = new sem::Declaration(varname, up);
+    auto* init = new sem::Declaration(varname, std::move(up));
     auto* mn = new sem::Match(init, varname, cas);
 
     USemanticInfo info_u = std::make_unique<SemanticInfo>();

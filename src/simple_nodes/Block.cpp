@@ -13,3 +13,16 @@ Block::Block(bool unwrap) : SNode(SNodeType::BLOCK) {
 Block::Block() : SNode(SNodeType::BLOCK) {
     this->unwrap = false;
 }
+
+bool Block::equals(const SNode& o) const {
+    auto& other = (const Block&) o;
+    if (this->nodes.size() != other.nodes.size()) {
+        return false;
+    }
+    for (size_t i = 0; i < this->nodes.size(); i++) {
+        if (*this->nodes[i] != *other.nodes[i]) {
+            return false;
+        }
+    }
+    return true;
+}

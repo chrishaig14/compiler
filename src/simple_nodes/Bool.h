@@ -13,6 +13,11 @@ class sem::Bool : public sem::SNode {
 public:
     explicit Bool(bool v);
     bool v;
+
+    bool equals(const SNode& o) const override {
+        auto& other = (const Bool&) o;
+        return this->v == other.v;
+    }
 };
 
 

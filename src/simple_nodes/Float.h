@@ -13,6 +13,11 @@ class sem::Float : public sem::SNode {
 public:
     Float();
     std::string str;
+
+    bool equals(const SNode& o) const override {
+        auto& other = (const Float&) o;
+        return this->str == other.str;
+    }
 };
 
 

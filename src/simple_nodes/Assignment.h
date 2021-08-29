@@ -12,6 +12,12 @@ public:
     USNode lvalue;
     USNode rvalue;
     Assignment(USNode& lvalue, USNode& rvalue);
+
+    bool equals(const SNode& o) const override {
+        // auto& other = (const Declaration&) o;
+        // return this->identifier == other.identifier && *this->expression == *other.expression;
+        return false;
+    }
 };
 
 

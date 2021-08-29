@@ -12,6 +12,7 @@
 class sem::Integer : public sem::SNode {
 public:
     explicit Integer(const std::string& str);
+    bool equals(const SNode& o) const override;
     std::string str;
 };
 

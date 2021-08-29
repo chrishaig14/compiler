@@ -3,6 +3,8 @@
 //
 
 #include "EnumDef.h"
+
 using namespace sem;
+
 EnumDef::EnumDef() : SNode(SNodeType::ENUM) {
 }

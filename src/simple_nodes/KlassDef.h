@@ -18,6 +18,12 @@ public:
     KlassDef(std::string identifier, VectorOfStrings members)
             : SNode(SNodeType::CLASS), identifier(identifier), members(members) {
     }
+
+    bool equals(const SNode& o) const override {
+        // auto& other = (const Declaration&) o;
+        // return this->identifier == other.identifier && *this->expression == *other.expression;
+        return false;
+    }
 };
 
 

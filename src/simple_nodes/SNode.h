@@ -42,6 +42,21 @@ class sem::SNode {
 public:
     SNodeType type;
     explicit SNode(SNodeType type);
+
+    virtual bool equals(const SNode& o) const = 0;
+
+    bool operator!=(const SNode& other) const {
+        return !(*this == other);
+    }
+
+    bool operator==(const SNode& other) const {
+        if (this->type != other.type) {
+            return false;
+        }
+        return this->equals(other);
+    }
+
+    virtual ~SNode() = default;
 };
 
 typedef std::unique_ptr<sem::SNode> USNode;

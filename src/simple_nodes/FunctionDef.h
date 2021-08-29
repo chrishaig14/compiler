@@ -17,6 +17,14 @@ public:
     Block* body;
 
     FunctionDef(std::string identifier, VectorOfStrings params, Block* body);
+
+    bool equals(const SNode& o) const override {
+        auto& other = (const FunctionDef&) o;
+        bool id_ok = this->identifier == other.identifier;
+        bool params_ok = this->params == other.params;
+        bool body_ok = *this->body == *other.body;
+        return id_ok && params_ok && body_ok;
+    }
 };
 
 

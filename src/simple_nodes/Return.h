@@ -14,7 +14,8 @@ class sem::Return : public sem::SNode {
 public:
     USNode expression;
     std::vector<std::string> reachables;
-    Return(USNode& expression);
+    explicit Return(USNode expression);
+    bool equals(const SNode& o) const override;
 };
 
 

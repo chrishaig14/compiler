@@ -14,6 +14,10 @@ class sem::Break : public sem::SNode {
 public:
     std::vector<std::string> reachables;
     Break();
+
+    bool equals(const SNode& o) const override {
+        return true;
+    }
 };
 
 

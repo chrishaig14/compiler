@@ -13,6 +13,7 @@ public:
     std::string identifier;
 
     explicit Id(const std::string& identifier);
+    bool equals(const SNode& o) const override;
 };
 
 

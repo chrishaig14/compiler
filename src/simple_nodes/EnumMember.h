@@ -12,6 +12,7 @@
 class sem::EnumMember : public sem::SNode {
 public:
     EnumMember(const std::string& enum_name, const std::string& value);
+    bool equals(const SNode& o) const override;
 
     std::string enum_name;
     std::string value;

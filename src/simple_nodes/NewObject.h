@@ -18,6 +18,10 @@ public:
     NewObject() : SNode(SNodeType::NEW) {
 
     }
+
+    bool equals(const SNode& o) const override {
+        return false;
+    }
 };
 
 

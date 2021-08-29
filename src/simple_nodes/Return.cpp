@@ -3,6 +3,22 @@
 //
 
 #include "Return.h"
+
 using namespace sem;
-Return::Return(USNode& expression) : SNode(SNodeType::RETURN), expression(std::move(expression)) {
+
+Return::Return(USNode expression) : SNode(SNodeType::RETURN), expression(std::move(expression)) {
+}
+
+bool Return::equals(const SNode& o) const {
+    auto& other = (const Return&) o;
+    if (this->expression == nullptr && other.expression != nullptr) {
+        return false;
+    }
+    if (this->expression != nullptr && other.expression == nullptr) {
+        return false;
+    }
+    if (this->expression == nullptr && other.expression == nullptr) {
+        return true;
+    }
+    return *this->expression == *other.expression;
 }

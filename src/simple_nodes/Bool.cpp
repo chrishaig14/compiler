@@ -3,7 +3,9 @@
 //
 
 #include "Bool.h"
+
 using namespace sem;
+
 Bool::Bool(bool v) : SNode(SNodeType::BOOLEAN) {
     this->v = v;
 }

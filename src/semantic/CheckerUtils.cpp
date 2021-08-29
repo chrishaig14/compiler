@@ -54,7 +54,7 @@ sem::FunctionDef* make_class_default_init(const std::string& class_path, const V
         auto* idn = new sem::Id(m);
         nn->args.push_back(idn);
     }
-    auto* rn = new sem::Return((USNode&) nn);
+    auto* rn = new sem::Return(std::move(nn));
     bn->nodes.push_back(rn);
     auto* fn = new sem::FunctionDef(class_path + ".__init__", members, bn);
     return fn;

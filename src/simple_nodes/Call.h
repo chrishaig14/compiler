@@ -14,6 +14,11 @@ public:
     SNode* function;
     std::vector<SNode*> arguments;
     Call(SNode* function, std::vector<SNode*> arguments);
+
+    bool equals(const SNode& o) const override {
+        auto& other = (const Call&) o;
+        return *this->function == *other.function && this->arguments == other.arguments;
+    }
 };
 
 

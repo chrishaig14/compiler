@@ -11,6 +11,11 @@
 class sem::None : public sem::SNode {
 public:
     None();
+
+    bool equals(const SNode& o) const override {
+        return true;
+    }
+
 };
 
 

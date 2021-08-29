@@ -13,7 +13,12 @@ public:
     std::string identifier;
     USNode expression;
 
-    Declaration(std::string identifier, USNode& expression);
+    Declaration(std::string identifier, USNode expression);
+
+    bool equals(const SNode& o) const override {
+        auto& other = (const Declaration&) o;
+        return this->identifier == other.identifier && *this->expression == *other.expression;
+    }
 };
 
 

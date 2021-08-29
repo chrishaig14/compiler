@@ -17,6 +17,12 @@ public:
     std::vector<std::pair<int, Block*>> cases;
     std::string varname;
     Match(SNode* exp, std::string varname, std::vector<std::pair<int, Block*>> cases);
+
+    bool equals(const SNode& o) const override {
+        // auto& other = (const Declaration&) o;
+        // return this->identifier == other.identifier && *this->expression == *other.expression;
+        return false;
+    }
 };
 
 

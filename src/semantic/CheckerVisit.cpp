@@ -13,17 +13,17 @@ make_for_snode(ast::For& node, USemanticInfo& binfo, USemanticInfo& exp_info_p, 
     auto* bbn = new sem::Block();
 
     USNode p_node(exp_info_p->snode);
-    auto* dsn = new sem::Declaration(loop_list_var_id, p_node);
+    auto* dsn = new sem::Declaration(loop_list_var_id, std::move(p_node));
     bbn->nodes.push_back(dsn);
     USNode init_idx = std::make_unique<sem::Integer>("0");
-    auto* lidx_decl = new sem::Declaration(loop_index_var_id, init_idx);
+    auto* lidx_decl = new sem::Declaration(loop_index_var_id, std::move(init_idx));
 
     bbn->nodes.push_back(lidx_decl);
 
     auto* list_len_fn = new sem::Id("core.core.List.len");
     auto* list_sn = new sem::Id(loop_list_var_id);
     USNode call_list_len_sn = std::make_unique<sem::Call>(list_len_fn, std::vector<sem::SNode*>{list_sn});
-    auto* lensn = new sem::Declaration(loop_list_len_var_id, call_list_len_sn);
+    auto* lensn = new sem::Declaration(loop_list_len_var_id, std::move(call_list_len_sn));
     bbn->nodes.push_back(lensn);
 
 
@@ -41,7 +41,7 @@ make_for_snode(ast::For& node, USemanticInfo& binfo, USemanticInfo& exp_info_p, 
                                            {new sem::Id(loop_list_var_id), new sem::Id(loop_index_var_id)});
 
     USNode ul(list_subscript_n);
-    auto* loop_elem_sn = new sem::Declaration(node.var, ul);
+    auto* loop_elem_sn = new sem::Declaration(node.var, std::move(ul));
     bn->nodes.insert(bn->nodes.begin(), loop_elem_sn);
 
     bn->nodes.push_back(update_loop_index_snode);

@@ -8,6 +8,7 @@
 #include "SNode.h"
 #include <vector>
 #include <string>
+
 class sem::Block : public sem::SNode {
 public:
     bool unwrap;
@@ -15,6 +16,7 @@ public:
     std::vector<SNode*> nodes;
     Block(bool unwrap);
     Block();
+    bool equals(const SNode& o) const override;
 };
 
 

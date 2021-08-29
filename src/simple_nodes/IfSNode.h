@@ -17,6 +17,11 @@ public:
     std::vector<std::pair<SNode*, Block*>> elifs;
 
     IfSNode(SNode* condition, Block* then, std::vector<std::pair<SNode*, Block*>> elifs, Block* _else);
+
+    bool equals(const SNode& o) const override {
+        auto& other = (const IfSNode&) o;
+        return *this->condition == *other.condition && *this->then == *other.then && *this->_else == *other._else;
+    }
 };
 
 

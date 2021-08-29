@@ -14,6 +14,10 @@ class sem::Continue : public sem::SNode {
 public:
     std::vector<std::string> reachables;
     Continue();
+
+    bool equals(const SNode& o) const override {
+        return true;
+    }
 };
 
 

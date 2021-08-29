@@ -3,6 +3,8 @@
 //
 
 #include "Float.h"
+
 using namespace sem;
+
 Float::Float() : SNode(SNodeType::FLOAT) {
 }

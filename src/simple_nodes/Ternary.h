@@ -15,6 +15,11 @@ public:
     SNode* ext;
     SNode* true_case;
     SNode* false_case;
+
+    bool equals(const SNode& o) const override {
+        // auto& other = (const Ternary&) o;
+        return false;
+    }
 };
 
 

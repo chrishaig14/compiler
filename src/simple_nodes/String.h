@@ -13,6 +13,12 @@ class sem::String : public sem::SNode {
 public:
     std::string s;
     String(const std::string& s);
+
+    bool equals(const SNode& o) const override {
+        auto& other = (const String&) o;
+        return this->s == other.s;
+    }
+
 };
 
 

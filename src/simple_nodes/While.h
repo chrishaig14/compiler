@@ -15,6 +15,12 @@ public:
     Block* body;
 
     While(USNode condition, Block* body);
+
+    bool equals(const SNode& o) const override {
+        auto& other = (const While&) o;
+        return *this->condition == *other.condition && *this->body == *other.body;
+    }
+
 };
 
 

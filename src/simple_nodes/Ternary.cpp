@@ -3,7 +3,9 @@
 //
 
 #include "Ternary.h"
+
 using namespace sem;
+
 Ternary::Ternary(SNode* ext, SNode* true_case, SNode* false_case) : SNode(SNodeType::TERNARY) {
     this->ext = ext;
     this->true_case = true_case;
