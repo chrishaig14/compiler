@@ -134,7 +134,7 @@ USemanticInfo Checker::visit_call(ast::Call& n, bool is_rvalue) {
                     exit(1);
                 }
 
-                sn->arguments.push_back(new sem::IdSNode(implicit_arg->path.as_str()));
+                sn->arguments.push_back(new sem::Id(implicit_arg->path.as_str()));
                 // assert(*(fff->ft) == *cf->ft);
             }
         }

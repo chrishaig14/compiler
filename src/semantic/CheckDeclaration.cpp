@@ -151,7 +151,7 @@ USemanticInfo Checker::check_declaration_with_type(ast::Declaration& n) {
     USemanticInfo info_u = std::make_unique<SemanticInfo>();
     SemanticInfo& info = *info_u;
     USNode up(rvalue_sinfo->snode);
-    info.snode = new sem::DeclarationSNode(n.identifier, up);
+    info.snode = new sem::Declaration(n.identifier, up);
     auto ov = std::make_unique<Value>(n.type->clone());
     this->fill_value(*ov);
     info.entity = *new EntityValue(std::move(ov));
@@ -172,7 +172,7 @@ USemanticInfo Checker::check_declaration_without_type(ast::Declaration& n) {
     USemanticInfo info_u = std::make_unique<SemanticInfo>();
     SemanticInfo& info = *info_u;
     USNode u(exp_info_p->snode);
-    info.snode = new sem::DeclarationSNode(n.identifier, u);
+    info.snode = new sem::Declaration(n.identifier, u);
     info.entity = exp_info_p->entity;
     if (info.entity.get().type == E_TYPE::CONST_FUNCTION) {
         EntityValue* value_entity = new EntityValue(std::make_unique<Value>(((EntityConstFunction&) exp_info_p->entity).const_function->ft->clone()));

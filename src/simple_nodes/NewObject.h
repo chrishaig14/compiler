@@ -1,0 +1,24 @@
+//
+// Created by chris on 11/4/21.
+//
+
+#ifndef XLANG_NEWOBJECT_H
+#define XLANG_NEWOBJECT_H
+
+
+#include <string>
+#include <vector>
+#include "SNode.h"
+
+class sem::NewObject : public sem::SNode {
+public:
+    std::string class_name;
+    std::vector<SNode*> args;
+
+    NewObject() : SNode(SNodeType::NEW) {
+
+    }
+};
+
+
+#endif //XLANG_NEWOBJECT_H

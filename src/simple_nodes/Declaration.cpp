@@ -2,8 +2,8 @@
 // Created by chris on 4/4/21.
 //
 
-#include "DeclarationSNode.h"
+#include "Declaration.h"
 using namespace sem;
-DeclarationSNode::DeclarationSNode(std::string identifier, USNode& expression)
+Declaration::Declaration(std::string identifier, USNode& expression)
         : SNode(SNodeType::DECLARATION), identifier(identifier), expression(std::move(expression)) {
 }

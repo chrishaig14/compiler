@@ -18,34 +18,34 @@ add_library(
         Call.h
         Klass.cpp
         Klass.h
-        ContinueSNode.cpp
-        ContinueSNode.h
-        DeclarationSNode.cpp
-        DeclarationSNode.h
-        DictSNode.cpp
-        DictSNode.h
-        EnumMemberSNode.cpp
-        EnumMemberSNode.h
-        EnumSNode.cpp
-        EnumSNode.h
-        FloatSNode.cpp
-        FloatSNode.h
-        FunctionSNode.cpp
-        FunctionSNode.cpp
-        FunctionSNode.h
-        FunctionSNode.h
-        IdSNode.cpp
-        IdSNode.h
+        Continue.cpp
+        Continue.h
+        Declaration.cpp
+        Declaration.h
+        Dict.cpp
+        Dict.h
+        EnumMember.cpp
+        EnumMember.h
+        EnumDef.cpp
+        EnumDef.h
+        Float.cpp
+        Float.h
+        Function.cpp
+        Function.cpp
+        Function.h
+        Function.h
+        Id.cpp
+        Id.h
         IfSNode.cpp
         IfSNode.h
-        IntegerSNode.cpp
-        IntegerSNode.h
+        Integer.cpp
+        Integer.h
         List.cpp
         List.h
         Match.cpp
         Match.h
-        NewObjectSNode.cpp
-        NewObjectSNode.h
+        NewObject.cpp
+        NewObject.h
         None.cpp
         None.h
         ObjectMember.cpp

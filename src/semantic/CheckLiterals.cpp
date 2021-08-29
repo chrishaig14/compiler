@@ -4,7 +4,7 @@
 
 #include "CheckLiterals.h"
 #include "../simple_nodes/None.h"
-#include "../simple_nodes/DictSNode.h"
+#include "../simple_nodes/Dict.h"
 #include "errors/ErrorExpectedExpression.h"
 #include "errors/ErrorListLiteral.h"
 #include "errors/ErrorPartialWrongNumArgs.h"
@@ -25,7 +25,7 @@ USemanticInfo Checker::visit_number(ast::Number& node) {
     switch (node.num_type) {
         case NumberType::INTEGER: {
             info.entity = this->entity_value_from_actual_base_path_no_generic(Path("core.core.Integer"));
-            auto* snode = new sem::IntegerSNode(std::string());
+            auto* snode = new sem::Integer(std::string());
             snode->str = node.str;
             info.snode = snode;
             break;
@@ -37,7 +37,7 @@ USemanticInfo Checker::visit_number(ast::Number& node) {
             // auto ov = std::make_unique<Value>(otype);
             // this->fill_value(*ov);
             // info.entity = new EntityValue(std::move(ov));
-            auto* snode = new sem::FloatSNode();
+            auto* snode = new sem::Float();
             snode->str = node.str;
             info.snode = snode;
             break;
@@ -125,7 +125,7 @@ USemanticInfo Checker::visit_tuple(ast::Tuple& node) {
     sinfo.entity = *new EntityValue(std::move(ov));
     unsigned long num_values = node.values.size();
     otype->actual_base_path = Path("core.Tuple" + std::to_string(num_values));
-    auto* nosn = new sem::NewObjectSNode();
+    auto* nosn = new sem::NewObject();
     sinfo.snode = nosn;
     nosn->class_name = otype->actual_base_path.as_str();
     nosn->args = values;
@@ -169,7 +169,7 @@ USemanticInfo Checker::visit_partial(ast::PartialApplication& node) {
     SemanticInfo s;
     s.entity = *new EntityValue(std::make_unique<Value>(new FunctionType(partial_args,
                                                                          fun_type->return_type->clone())));
-    auto* non = new sem::NewObjectSNode();
+    auto* non = new sem::NewObject();
     non->class_name = "Partial" + std::to_string(npartial);
     non->args = snodes;
     non->args.insert(non->args.begin(), func->snode);
@@ -209,7 +209,7 @@ USemanticInfo Checker::visit_dict(ast::DictNode& node) {
     this->fill_value(*ov);
     assert(ov->clazz != nullptr);
     info.entity = *new EntityValue(std::move(ov));
-    auto* nsn = new sem::DictSNode(items);
+    auto* nsn = new sem::Dict(items);
     info.snode = nsn;
     return info_u;
 }
@@ -224,7 +224,7 @@ USemanticInfo Checker::visit_emptydict(ast::EmptyDict& node) {
     this->fill_value(*ov);
     assert(ov->clazz != nullptr);
     info.entity = *new EntityValue(std::move(ov));
-    auto* nsn = new sem::DictSNode({});
+    auto* nsn = new sem::Dict({});
     info.snode = nsn;
     return info_u;
 
@@ -255,7 +255,7 @@ USemanticInfo Checker::visit_defconst(ast::DefaultConstructor& node) {
     auto* rt = new ObjectType(cls.class_name, tp);
     rt->actual_base_path = cls.path;
     info.entity = *new EntityConstFunction(new ConstFunction(Path(), new FunctionType(t, rt)));
-    auto* idn = new sem::IdSNode(cls.path.as_str() + "." + "__init__");
+    auto* idn = new sem::Id(cls.path.as_str() + "." + "__init__");
     info.snode = idn;
     return info_u;
 }

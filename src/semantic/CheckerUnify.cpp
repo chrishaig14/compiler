@@ -3,12 +3,12 @@
 //
 
 #include "Checker.h"
-#include "../simple_nodes/IdSNode.h"
+#include "../simple_nodes/Id.h"
 #include "../simple_nodes/ObjectMember.h"
 #include "../simple_nodes/Match.h"
-#include "../simple_nodes/NewObjectSNode.h"
+#include "../simple_nodes/NewObject.h"
 #include "../units/FunctionValue.h"
-#include "../simple_nodes/EnumMemberSNode.h"
+#include "../simple_nodes/EnumMember.h"
 #include "errors/ErrorFunctionCallNumArgs.h"
 #include "errors/ErrorEnumNoValue.h"
 
@@ -188,7 +188,7 @@ USemanticInfo Checker::enum_member(Enum* enumm, const std::string& value, ast::M
             auto ov = std::make_unique<Value>(otype);
             info.entity = *new EntityValue(std::move(ov));
             // this->fill_value(info.entity.value);
-            info.snode = new sem::EnumMemberSNode(enumm->path.as_str(), value);
+            info.snode = new sem::EnumMember(enumm->path.as_str(), value);
             return info_u;
         }
     }

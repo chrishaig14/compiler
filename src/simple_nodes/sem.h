@@ -18,31 +18,31 @@ namespace sem {
 
     class Klass;
 
-    class ContinueSNode;
+    class Continue;
 
-    class DeclarationSNode;
+    class Declaration;
 
-    class DictSNode;
+    class Dict;
 
-    class EnumMemberSNode;
+    class EnumMember;
 
-    class EnumSNode;
+    class EnumDef;
 
-    class FloatSNode;
+    class Float;
 
-    class FunctionSNode;
+    class Function;
 
-    class IdSNode;
+    class Id;
 
     class IfSNode;
 
-    class IntegerSNode;
+    class Integer;
 
     class List;
 
     class Match;
 
-    class NewObjectSNode;
+    class NewObject;
 
     class None;
 

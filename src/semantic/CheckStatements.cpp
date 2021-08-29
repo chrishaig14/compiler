@@ -56,7 +56,7 @@ USemanticInfo Checker::visit_lvalue_subscript(ast::Subscript& node) {
     this->fill_value(*value);
     info.entity = *new EntityValue(std::move(value));
 
-    auto* fsn = new sem::IdSNode(sub_fun_path);
+    auto* fsn = new sem::Id(sub_fun_path);
     auto* csn = new sem::Call(fsn, {parent_p->snode, child_snode});
     info.snode = csn;
     return info_u;
@@ -258,15 +258,15 @@ USemanticInfo Checker::visit_match(ast::Match& node) {
         this->scope->set(case_id, ent);
         USemanticInfo case_info = this->dispatch(*case_node);
         auto* bn = (sem::Block*) case_info->snode;
-        auto* omn = new sem::ObjectMember(new sem::IdSNode(varname), Path("core.core.Union"), "o");
+        auto* omn = new sem::ObjectMember(new sem::Id(varname), Path("core.core.Union"), "o");
         USNode u(omn);
-        auto* dn = new sem::DeclarationSNode(case_id, u);
+        auto* dn = new sem::Declaration(case_id, u);
         bn->nodes.insert(bn->nodes.begin(), dn);
         cas.emplace_back(union_index, (sem::Block*) case_info->snode);
         this->leave_scope();
     }
     USNode up(exp_info->snode);
-    auto* init = new sem::DeclarationSNode(varname, up);
+    auto* init = new sem::Declaration(varname, up);
     auto* mn = new sem::Match(init, varname, cas);
 
     USemanticInfo info_u = std::make_unique<SemanticInfo>();
@@ -280,7 +280,7 @@ USemanticInfo Checker::visit_continue(ast::Continue& node) {
     if (this->update_loop_index_snode != nullptr) {
         bn->nodes.push_back(this->update_loop_index_snode);
     }
-    auto* cn = new sem::ContinueSNode();
+    auto* cn = new sem::Continue();
     bn->nodes.push_back(cn);
 
     USemanticInfo info_u = std::make_unique<SemanticInfo>();
@@ -319,10 +319,10 @@ USemanticInfo Checker::visit_for(ast::For& node) {
     USNode eu;
     auto* increment_index_sn = new sem::Assignment(lu, eu);
     this->update_loop_index_snode = increment_index_sn;
-    increment_index_sn->lvalue = std::make_unique<sem::IdSNode>(loop_index_var_id);
-    auto inc_exp_node = std::make_unique<sem::Call>(new sem::IdSNode("core.core.Integer.__add__"),
-                                                    std::vector<sem::SNode*>{new sem::IdSNode(loop_index_var_id)});
-    auto* one_node = new sem::IntegerSNode(std::string());
+    increment_index_sn->lvalue = std::make_unique<sem::Id>(loop_index_var_id);
+    auto inc_exp_node = std::make_unique<sem::Call>(new sem::Id("core.core.Integer.__add__"),
+                                                    std::vector<sem::SNode*>{new sem::Id(loop_index_var_id)});
+    auto* one_node = new sem::Integer(std::string());
     one_node->str = "1";
     inc_exp_node->arguments.push_back(one_node);
     increment_index_sn->rvalue = std::move(inc_exp_node);

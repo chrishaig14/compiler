@@ -10,10 +10,10 @@
 #include "../units/ObjectValue.h"
 #include "../ast/Function.h"
 #include "../simple_nodes/SNode.h"
-#include "../simple_nodes/FunctionSNode.h"
-#include "../simple_nodes/NewObjectSNode.h"
-#include "../simple_nodes/IntegerSNode.h"
-#include "../simple_nodes/IdSNode.h"
+#include "../simple_nodes/Function.h"
+#include "../simple_nodes/NewObject.h"
+#include "../simple_nodes/Integer.h"
+#include "../simple_nodes/Id.h"
 #include "../simple_nodes/IfSNode.h"
 #include "../simple_nodes/Call.h"
 #include "../simple_nodes/Return.h"
@@ -36,7 +36,7 @@ ast::Function* generate_eq_method(std::string class_name, VectorOfTypes tp, Vect
 
 ast::Function* generate_str_method(std::string class_name);
 
-sem::FunctionSNode* make_class_default_init(const std::string& class_path, const VectorOfStrings& members);
+sem::Function* make_class_default_init(const std::string& class_path, const VectorOfStrings& members);
 
 TypeNode* get_entity_type(Entity& e);
 
