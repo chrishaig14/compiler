@@ -28,7 +28,7 @@
 #include "../simple_nodes/Return.h"
 #include "../simple_nodes/Continue.h"
 #include "../simple_nodes/Integer.h"
-#include "../simple_nodes/Function.h"
+#include "../simple_nodes/FunctionDef.h"
 #include "../simple_nodes/Declaration.h"
 #include "../simple_nodes/Id.h"
 #include "../simple_nodes/Call.h"

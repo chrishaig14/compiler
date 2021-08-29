@@ -260,7 +260,7 @@ USemanticInfo Checker::visit_function(ast::Function& n) {
         }
     }
     this->leave_scope();
-    auto* sn = new sem::Function(n.path.as_str(), params, bn);
+    auto* sn = new sem::FunctionDef(n.path.as_str(), params, bn);
     info.snode = sn;
     if (returnType != T_NONE) {
         if (!n.body->nodes.empty()) {

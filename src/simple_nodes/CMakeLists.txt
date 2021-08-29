@@ -30,10 +30,10 @@ add_library(
         EnumDef.h
         Float.cpp
         Float.h
-        Function.cpp
-        Function.cpp
-        Function.h
-        Function.h
+        FunctionDef.cpp
+        FunctionDef.cpp
+        FunctionDef.h
+        FunctionDef.h
         Id.cpp
         Id.h
         IfSNode.cpp

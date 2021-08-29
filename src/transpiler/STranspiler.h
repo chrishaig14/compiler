@@ -6,7 +6,7 @@
 #define XLANG_STRANSPILER_H
 
 #include "../simple_nodes/Block.h"
-#include "../simple_nodes/Function.h"
+#include "../simple_nodes/FunctionDef.h"
 #include "../simple_nodes/Assignment.h"
 #include "../simple_nodes/Declaration.h"
 #include "../simple_nodes/Integer.h"
@@ -75,7 +75,7 @@ public:
 
     OutputCode transpile_integer(sem::Integer& node);
 
-    void transpile_function(sem::Function& node);
+    void transpile_function(sem::FunctionDef& node);
 
     OutputCode transpile_declaration(sem::Declaration& node);
 
@@ -94,7 +94,7 @@ public:
     void dispatch_top(sem::SNode& node) {
         switch (node.type) {
             case SNodeType::FUNCTION:
-                this->transpile_function((sem::Function&) (node));
+                this->transpile_function((sem::FunctionDef&) (node));
                 break;
             case SNodeType::ENUM:
                 this->transpile_enum((sem::EnumDef&) node);

@@ -46,7 +46,7 @@ Entity* entity_from_type(const TypeNode& type) {
     return new EntityValue(std::move(fv));
 }
 
-sem::Function* make_class_default_init(const std::string& class_path, const VectorOfStrings& members) {
+sem::FunctionDef* make_class_default_init(const std::string& class_path, const VectorOfStrings& members) {
     auto* bn = new sem::Block();
     auto nn = std::make_unique<sem::NewObject>();
     nn->class_name = class_path;
@@ -56,7 +56,7 @@ sem::Function* make_class_default_init(const std::string& class_path, const Vect
     }
     auto* rn = new sem::Return((USNode&) nn);
     bn->nodes.push_back(rn);
-    auto* fn = new sem::Function(class_path + ".__init__", members, bn);
+    auto* fn = new sem::FunctionDef(class_path + ".__init__", members, bn);
     return fn;
 }
 

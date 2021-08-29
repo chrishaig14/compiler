@@ -75,7 +75,7 @@ OutputCode STranspiler::transpile_id(sem::Id& node) {
     return OutputCode("", out);
 }
 
-void STranspiler::transpile_function(sem::Function& node) {
+void STranspiler::transpile_function(sem::FunctionDef& node) {
     std::string parameters;
 
     for (auto& param : node.params) {

@@ -8,7 +8,7 @@
 
 #include <string>
 #include "SNode.h"
-#include "Function.h"
+#include "FunctionDef.h"
 
 class sem::KlassDef : public sem::SNode {
 public:

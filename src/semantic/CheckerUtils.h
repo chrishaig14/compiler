@@ -10,7 +10,7 @@
 #include "../units/ObjectValue.h"
 #include "../ast/Function.h"
 #include "../simple_nodes/SNode.h"
-#include "../simple_nodes/Function.h"
+#include "../simple_nodes/FunctionDef.h"
 #include "../simple_nodes/NewObject.h"
 #include "../simple_nodes/Integer.h"
 #include "../simple_nodes/Id.h"
@@ -36,7 +36,7 @@ ast::Function* generate_eq_method(std::string class_name, VectorOfTypes tp, Vect
 
 ast::Function* generate_str_method(std::string class_name);
 
-sem::Function* make_class_default_init(const std::string& class_path, const VectorOfStrings& members);
+sem::FunctionDef* make_class_default_init(const std::string& class_path, const VectorOfStrings& members);
 
 TypeNode* get_entity_type(Entity& e);
 

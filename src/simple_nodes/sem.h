@@ -30,7 +30,7 @@ namespace sem {
 
     class Float;
 
-    class Function;
+    class FunctionDef;
 
     class Id;
 
