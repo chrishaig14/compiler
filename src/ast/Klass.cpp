@@ -7,11 +7,12 @@
 using namespace ast;
 
 Klass::Klass(const std::string& className, VectorOfStrings type_parameters,
-             std::vector<std::pair<std::string, UTypeNode>> members, std::unordered_map<std::string, Method> functions,
+             std::vector<std::pair<std::string, UTypeNode>> members,
+             std::unordered_map<std::string, std::unique_ptr<KMethod>> functions,
              std::map<std::string, std::pair<TypeNode*, ast::Node*>> static_members,
              std::unordered_map<std::string, UFunctionNode>& static_methods, TextPosition start, TextPosition end)
         : ast::Node(NodeType::CLS, start, end), members(std::move(members)), static_members(static_members),
-          methods(functions), static_methods(std::move(static_methods)), class_name(className) {
+          methods(std::move(functions)), static_methods(std::move(static_methods)), class_name(className) {
     this->type_parameters = type_parameters;
 }
 
@@ -38,8 +39,8 @@ nlohmann::json Klass::to_json() const {
                         {"type", i.second->to_json()}});
     }
     nlohmann::json methj;
-    for (auto m: this->methods) {
-        methj[m.first] = m.second.method->to_json();
+    for (auto& m: this->methods) {
+        methj[m.first] = m.second->method->to_json();
     }
     nlohmann::json smethj;
     for (auto& m: this->static_methods) {
@@ -50,4 +51,7 @@ nlohmann::json Klass::to_json() const {
                   {"methods",        methj},
                   {"static_methods", smethj}};
     return j;
+}
+
+KMethod::KMethod(Implicit* constraint, UFunctionNode method) : constraint(constraint), method(std::move(method)) {
 }

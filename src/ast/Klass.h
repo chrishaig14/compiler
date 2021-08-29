@@ -14,9 +14,12 @@
 #include "../macros.h"
 #include "ast.h"
 
-struct Method {
+class KMethod {
+public:
     Implicit* constraint;
-    ast::Function* method;
+    UFunctionNode method;
+
+    KMethod(Implicit* constraint, UFunctionNode method);
 };
 
 class ast::Klass : public ast::Node {
@@ -24,7 +27,7 @@ public:
 
     bool equal(const ast::Node& other) const override;
     Klass(const std::string& className, VectorOfStrings type_parameters,
-          std::vector<std::pair<std::string, UTypeNode>> members, std::unordered_map<std::string, Method> functions,
+          std::vector<std::pair<std::string, UTypeNode>> members, std::unordered_map<std::string, std::unique_ptr<KMethod>> functions,
           std::map<std::string, std::pair<TypeNode*, ast::Node*>> static_members,
           std::unordered_map<std::string, UFunctionNode>& static_methods, TextPosition start, TextPosition end);
     ~Klass() override;
@@ -33,7 +36,7 @@ public:
     std::vector<std::pair<std::string, UTypeNode>> members;
     std::map<std::string, std::pair<TypeNode*, ast::Node*>> static_members;
     VectorOfStrings members_ordered;
-    std::unordered_map<std::string, Method> methods;
+    std::unordered_map<std::string, std::unique_ptr<KMethod>> methods;
     std::unordered_map<std::string, UFunctionNode> static_methods;
 
     std::string class_name;

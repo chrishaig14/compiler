@@ -9,6 +9,7 @@
 #include <string>
 #include "../scanner/TextPosition.h"
 #include "../json/json_fwd.hpp"
+#include "../json/json.hpp"
 #include <iostream>
 #include "../types.h"
 #include "ast.h"

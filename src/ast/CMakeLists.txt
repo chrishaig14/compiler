@@ -89,4 +89,3 @@ add_library(
         While.cpp
         While.h ObjectType.cpp ObjectType.h FunctionType.cpp FunctionType.h Path.cpp Path.h ast.h)
 
-target_precompile_headers(nodes PUBLIC ../json/json.hpp)

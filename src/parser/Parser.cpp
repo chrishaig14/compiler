@@ -865,7 +865,7 @@ std::unique_ptr<ast::Klass> Parser::parse_class_definition() {
         this->expect_token(TokType::RSQUARE);
     }
     this->expect_token(TokType::LCURLY);
-    std::unordered_map<std::string, Method> methods;
+    std::unordered_map<std::string, std::unique_ptr<KMethod>> methods;
     std::unordered_map<std::string, UFunctionNode> static_methods;
     std::vector<std::pair<std::string, UTypeNode>> members;
     std::set<std::string> member_names;
@@ -910,16 +910,16 @@ std::unique_ptr<ast::Klass> Parser::parse_class_definition() {
             std::cout << ft->to_json() << std::endl;
             Implicit* implicit = new Implicit{parent.str, child.str, ft, is_static};
 
-            auto method_node_u = this->parse_function_definition();
-            auto method_node = method_node_u.release();
+            auto method_node = this->parse_function_definition();
             std::string& method_name = method_node->identifier;
             if (member_names.find(method_name) != member_names.end() || methods.find(method_name) != methods.end()) {
                 this->error_class_member_redefined(class_name, method_name, method_node->start);
             }
             if (is_static) {
-                static_methods.insert(make_pair(method_name, method_node));
+                static_methods.insert(make_pair(method_name, std::move(method_node)));
             } else {
-                methods[method_name] = Method{implicit, method_node};
+                // methods[method_name] = KMethod{implicit, std::move(method_node)};
+                methods[method_name] = std::make_unique<KMethod>(implicit, std::move(method_node));
             }
 
         } else if (this->match(TokType::FUN)) {
@@ -931,8 +931,7 @@ std::unique_ptr<ast::Klass> Parser::parse_class_definition() {
             if (is_static) {
                 static_methods.insert(std::make_pair(method_name, std::move(method_node)));
             } else {
-                auto method_node_p = method_node.release();
-                methods[method_name] = Method{nullptr, method_node_p};
+                methods[method_name] = std::make_unique<KMethod>(nullptr, std::move(method_node));
             }
         } else {
             break;
@@ -942,7 +941,7 @@ std::unique_ptr<ast::Klass> Parser::parse_class_definition() {
     auto c = std::make_unique<ast::Klass>(class_name,
                                           type_parameters,
                                           std::move(members),
-                                          methods,
+                                          std::move(methods),
                                           static_members,
                                           static_methods,
                                           class_tok.start,

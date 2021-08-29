@@ -190,7 +190,7 @@ void GlobalProcessor::visit_class(ast::Klass& node) {
         class_info->static_members[mn.first] = std::make_pair(mn.second.first->clone(), mn.second.second);
     }
     for (const auto& f: node.methods) {
-        ast::Function& method = *f.second.method;
+        ast::Function& method = *f.second->method;
 
         VectorOfTypes x;
         for (auto& p: method.parameter_types) {
@@ -203,8 +203,8 @@ void GlobalProcessor::visit_class(ast::Klass& node) {
 
         auto* cf = new ConstFunction(Path(class_info->path, f.first), new FunctionType(x, method.return_type->clone()));
         method.path = cf->path;
-        cf->implicit = f.second.method->implicit;
-        f.second.method->const_function = cf;
+        cf->implicit = f.second->method->implicit;
+        f.second->method->const_function = cf;
         class_info->methods.insert(make_pair(f.first, cf));
     }
 

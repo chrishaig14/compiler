@@ -387,20 +387,19 @@ TEST_CASE("nodes_class_full", "[class]") {
     std::unique_ptr<ast::Block> b4 = ast::Block::make(VectorOfNodesU{}, DUMMY_POS, DUMMY_POS);
     VectorOfUTypes v1;
     VectorOfUTypes v2;
-    ast::Function o_method1("method1", {}, v1, rt1, b1, DUMMY_POS, DUMMY_POS);
-    ast::Function o_method2("method2", {}, v2, rt2, b2, DUMMY_POS, DUMMY_POS);
-    auto* method1 = &o_method1;
-    auto* method2 = &o_method2;
-    std::unordered_map<std::string, Method> cmethods = {{"method1", {nullptr, method1}},
-                                                        {"method2", {nullptr, method2}}};
+    UFunctionNode method1 = std::make_unique<ast::Function>("method1", VectorOfStrings {}, v1, rt1, b1, DUMMY_POS, DUMMY_POS);
+    UFunctionNode method2 = std::make_unique<ast::Function>("method2", VectorOfStrings {}, v2, rt2, b2, DUMMY_POS, DUMMY_POS);
+    nlohmann::json methods = {{"method2", method2->to_json()},
+                              {"method1", method1->to_json()}};
+    std::unordered_map<std::string, std::unique_ptr<KMethod>> cmethods;
+    cmethods["method1"] = std::make_unique<KMethod>(nullptr, std::move(method1));
+    cmethods["method2"] = std::make_unique<KMethod>(nullptr, std::move(method2));
     nlohmann::json members = {{{"id", "foo"}, {"type", t1->to_json()}},
                               {{"id", "bar"}, {"type", t2->to_json()}}};
     std::vector<std::pair<std::string, UTypeNode>> cmembers;
     cmembers.emplace_back("foo", std::move(t1));
     cmembers.emplace_back("bar", std::move(t2));
 
-    nlohmann::json methods = {{"method2", method2->to_json()},
-                              {"method1", method1->to_json()}};
 
     VectorOfUTypes vv1, vv2;
     UFunctionNode smethod1 = std::make_unique<ast::Function>("smethod1",
@@ -422,7 +421,7 @@ TEST_CASE("nodes_class_full", "[class]") {
                                      {"smethod2", smethod2->to_json()}};
     cstatic_methods["smethod1"] = std::move(smethod1);
     cstatic_methods["smethod2"] = std::move(smethod2);
-    ast::Klass n("MyClass", {"k", "v"}, std::move(cmembers), cmethods, {}, cstatic_methods, DUMMY_POS, DUMMY_POS);
+    ast::Klass n("MyClass", {"k", "v"}, std::move(cmembers), std::move(cmethods), {}, cstatic_methods, DUMMY_POS, DUMMY_POS);
     n.members_ordered = members_ordered;
     nlohmann::json nj = n.to_json();
 

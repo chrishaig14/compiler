@@ -109,7 +109,7 @@ USemanticInfo Checker::visit_class(ast::Klass& node) {
         val->metatype = Meta::CLASS;
         val->clazz = clazz;
         // method.second->path = clazz->path + "." + method.second->identifier;
-        USemanticInfo method_info = this->visit_function(*method.second.method);
+        USemanticInfo method_info = this->visit_function(*method.second->method);
         methods_snodes.push_back(method_info->snode);
     }
 
