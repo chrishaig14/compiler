@@ -47,14 +47,14 @@ Entity* entity_from_type(const TypeNode& type) {
 }
 
 FunctionSNode* make_class_default_init(const std::string& class_path, const VectorOfStrings& members) {
-    auto* bn = new BlockSNode();
+    auto* bn = new Block();
     auto nn = std::make_unique<NewObjectSNode>();
     nn->class_name = class_path;
     for (const auto& m: members) {
         auto* idn = new IdSNode(m);
         nn->args.push_back(idn);
     }
-    auto* rn = new ReturnSNode((USNode&) nn);
+    auto* rn = new Return((USNode&) nn);
     bn->nodes.push_back(rn);
     auto* fn = new FunctionSNode(class_path + ".__init__", members, bn);
     return fn;
@@ -129,7 +129,7 @@ SNode* make_union_wrapper(int type_index, SNode* expression) {
 
 SNode* make_boolop_snode(ConstFunction* operator_fun, SemanticInfo& left_info, SemanticInfo& right_info) {
     auto* function_id = new IdSNode(operator_fun->path.as_str());
-    auto* sn = new CallSNode(function_id, {left_info.snode, right_info.snode});
+    auto* sn = new Call(function_id, {left_info.snode, right_info.snode});
     return sn;
 }
 

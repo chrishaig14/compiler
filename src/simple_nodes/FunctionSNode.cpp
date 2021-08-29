@@ -4,6 +4,6 @@
 
 #include "FunctionSNode.h"
 
-FunctionSNode::FunctionSNode(std::string identifier, VectorOfStrings params, BlockSNode* body)
+FunctionSNode::FunctionSNode(std::string identifier, VectorOfStrings params, Block* body)
         : SNode(SNodeType::FUNCTION), identifier(identifier), params(params), body(body) {
 }

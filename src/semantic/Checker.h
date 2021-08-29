@@ -15,7 +15,7 @@
 #include <set>
 #include "../macros.h"
 #include "../logging/logging.h"
-#include "../simple_nodes/BlockSNode.h"
+#include "../simple_nodes/Block.h"
 #include "../units/ObjectValue.h"
 #include "../units/FunctionValue.h"
 #include "../ast/EnumNode.h"
@@ -23,27 +23,27 @@
 #include "errors/ErrorReporter.h"
 #include "util.h"
 // #include "../logger/Logger.h"
-#include "../simple_nodes/BlockSNode.h"
-#include "../simple_nodes/AssignmentSNode.h"
-#include "../simple_nodes/ReturnSNode.h"
+#include "../simple_nodes/Block.h"
+#include "../simple_nodes/Assignment.h"
+#include "../simple_nodes/Return.h"
 #include "../simple_nodes/ContinueSNode.h"
 #include "../simple_nodes/IntegerSNode.h"
 #include "../simple_nodes/FunctionSNode.h"
 #include "../simple_nodes/DeclarationSNode.h"
 #include "../simple_nodes/IdSNode.h"
-#include "../simple_nodes/CallSNode.h"
-#include "../simple_nodes/StringSNode.h"
+#include "../simple_nodes/Call.h"
+#include "../simple_nodes/String.h"
 #include "../units/FunctionValue.h"
-#include "../simple_nodes/BoolSNode.h"
+#include "../simple_nodes/Bool.h"
 #include "../simple_nodes/FloatSNode.h"
-#include "../simple_nodes/ClassSNode.h"
+#include "../simple_nodes/Klass.h"
 #include "../simple_nodes/NewObjectSNode.h"
-#include "../simple_nodes/WhileSNode.h"
-#include "../simple_nodes/BreakSNode.h"
-#include "../simple_nodes/ListSNode.h"
+#include "../simple_nodes/While.h"
+#include "../simple_nodes/Break.h"
+#include "../simple_nodes/List.h"
 #include "../simple_nodes/IfSNode.h"
-#include "../simple_nodes/ObjectMemberSNode.h"
-#include "../simple_nodes/MatchSNode.h"
+#include "../simple_nodes/ObjectMember.h"
+#include "../simple_nodes/Match.h"
 #include "CheckerUtils.h"
 #include "../ast/UnaryOp.h"
 #include "../ast/ObjectType.h"
@@ -159,9 +159,9 @@ public:
     USemanticInfo dispatch(ast::Node& nod);
     void fill_value(Value& value);
     std::unique_ptr<SemanticInfo> expect_rvalue_of_type(const TypeNode& target, ast::Node& node);
-    void process_function_arguments(SemanticInfo& retv, std::vector<Entity*>& arg_entities, CallSNode* sn, ast::Call& n,
+    void process_function_arguments(SemanticInfo& retv, std::vector<Entity*>& arg_entities, Call* sn, ast::Call& n,
                                     FunctionType* function_type, SemanticInfo* fun_info_p);
-    bool check_arguments(ast::Call& n, CallSNode* sn, VectorOfTypes& arg_types, std::vector<Entity*>& arg_entities);
+    bool check_arguments(ast::Call& n, Call* sn, VectorOfTypes& arg_types, std::vector<Entity*>& arg_entities);
     USemanticInfo
     make_return_info(const ast::Call& n, bool is_rvalue, SemanticInfo& retv, bool is_def_const, bool args_are_constant);
     SNode* make_union_rvalue(SNode* value_snode, const TypeNode* unaliased_value_type,

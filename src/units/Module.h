@@ -9,7 +9,7 @@
 #include "Entity.h"
 #include "../ast/Block.h"
 #include "../scanner/CodeLines.h"
-#include "../simple_nodes/BlockSNode.h"
+#include "../simple_nodes/Block.h"
 #include "ConstFunction.h"
 #include "Class.h"
 
@@ -19,7 +19,7 @@ public:
     std::string abs_path;
     CodeLines code_lines;
     UBlockNode ast;
-    BlockSNode* sast;
+    Block* sast;
 
     std::map<std::string, std::string> included_module_paths;
     bool is_lib;

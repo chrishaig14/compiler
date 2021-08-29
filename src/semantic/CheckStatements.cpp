@@ -5,8 +5,8 @@
 #include "CheckStatements.h"
 
 #include "../ast/ObjectType.h"
-#include "../simple_nodes/ThrowSNode.h"
-#include "../simple_nodes/TryCatchSNode.h"
+#include "../simple_nodes/Throw.h"
+#include "../simple_nodes/TryCatch.h"
 #include "errors/ErrorTypeMismatch.h"
 #include "errors/ErrorCantAssign.h"
 #include "errors/ErrorBadReturn.h"
@@ -57,7 +57,7 @@ USemanticInfo Checker::visit_lvalue_subscript(ast::Subscript& node) {
     info.entity = *new EntityValue(std::move(value));
 
     auto* fsn = new IdSNode(sub_fun_path);
-    auto* csn = new CallSNode(fsn, {parent_p->snode, child_snode});
+    auto* csn = new Call(fsn, {parent_p->snode, child_snode});
     info.snode = csn;
     return info_u;
 }
@@ -72,11 +72,11 @@ USemanticInfo Checker::visit_assignment(ast::Assignment& n) {
 
     USemanticInfo linfo_p;
     bool is_subscript = false;
-    CallSNode* csn = nullptr;
+    Call* csn = nullptr;
     if (n.lvalue->ntype == NodeType::SUB) {
         // special case
         linfo_p = this->visit_lvalue_subscript((ast::Subscript&) *n.lvalue);
-        csn = (CallSNode*) linfo_p->snode;
+        csn = (Call*) linfo_p->snode;
         is_subscript = true;
     } else {
         linfo_p = this->dispatch(*n.lvalue);
@@ -153,7 +153,7 @@ USemanticInfo Checker::visit_assignment(ast::Assignment& n) {
     } else {
         auto lu = USNode(linfo_p->snode);
         auto eu = USNode(expression_info_p->snode);
-        info.snode = new AssignmentSNode(lu, eu);
+        info.snode = new Assignment(lu, eu);
     }
 
     return info_u;
@@ -167,7 +167,7 @@ USemanticInfo Checker::visit_return(ast::Return& n) {
         }
         SemanticInfo info_r;
         USNode u;
-        info_r.snode = new ReturnSNode(u);
+        info_r.snode = new Return(u);
         return std::make_unique<SemanticInfo>(info_r);
     }
     TypeNode* return_type = ((EntityValue&) return_entity).value->type;
@@ -187,7 +187,7 @@ USemanticInfo Checker::visit_return(ast::Return& n) {
         return error_stub();
     }
     auto u = USNode(expression_info_p->snode);
-    auto* sn = new ReturnSNode(u);
+    auto* sn = new Return(u);
     for (auto l : this->scope->get_all()) {
         sn->reachables.push_back(l.first);
     }
@@ -235,7 +235,7 @@ USemanticInfo Checker::visit_match(ast::Match& node) {
                                                      exp_info->entity));
         return error_stub();
     }
-    std::vector<std::pair<int, BlockSNode*>> cas;
+    std::vector<std::pair<int, Block*>> cas;
     std::string varname = "match_var";
     for (size_t i = 0; i < node.ids.size(); i++) {
         std::string case_id = node.ids[i];
@@ -257,17 +257,17 @@ USemanticInfo Checker::visit_match(ast::Match& node) {
         assert(v->clazz != nullptr);
         this->scope->set(case_id, ent);
         USemanticInfo case_info = this->dispatch(*case_node);
-        auto* bn = (BlockSNode*) case_info->snode;
-        auto* omn = new ObjectMemberSNode(new IdSNode(varname), Path("core.core.Union"), "o");
+        auto* bn = (Block*) case_info->snode;
+        auto* omn = new ObjectMember(new IdSNode(varname), Path("core.core.Union"), "o");
         USNode u(omn);
         auto* dn = new DeclarationSNode(case_id, u);
         bn->nodes.insert(bn->nodes.begin(), dn);
-        cas.emplace_back(union_index, (BlockSNode*) case_info->snode);
+        cas.emplace_back(union_index, (Block*) case_info->snode);
         this->leave_scope();
     }
     USNode up(exp_info->snode);
     auto* init = new DeclarationSNode(varname, up);
-    auto* mn = new MatchSNode(init, varname, cas);
+    auto* mn = new Match(init, varname, cas);
 
     USemanticInfo info_u = std::make_unique<SemanticInfo>();
     SemanticInfo& info = *info_u;
@@ -276,7 +276,7 @@ USemanticInfo Checker::visit_match(ast::Match& node) {
 }
 
 USemanticInfo Checker::visit_continue(ast::Continue& node) {
-    auto* bn = new BlockSNode();
+    auto* bn = new Block();
     if (this->update_loop_index_snode != nullptr) {
         bn->nodes.push_back(this->update_loop_index_snode);
     }
@@ -317,10 +317,10 @@ USemanticInfo Checker::visit_for(ast::For& node) {
 
     USNode lu;
     USNode eu;
-    auto* increment_index_sn = new AssignmentSNode(lu, eu);
+    auto* increment_index_sn = new Assignment(lu, eu);
     this->update_loop_index_snode = increment_index_sn;
     increment_index_sn->lvalue = std::make_unique<IdSNode>(loop_index_var_id);
-    auto inc_exp_node = std::make_unique<CallSNode>(new IdSNode("core.core.Integer.__add__"),
+    auto inc_exp_node = std::make_unique<Call>(new IdSNode("core.core.Integer.__add__"),
                                                     std::vector<SNode*>{new IdSNode(loop_index_var_id)});
     auto* one_node = new IntegerSNode(std::string());
     one_node->str = "1";
@@ -330,7 +330,7 @@ USemanticInfo Checker::visit_for(ast::For& node) {
     this->scope->is_loop = true;
     USemanticInfo binfo = this->visit_block(*node.body);
     this->scope->is_loop = false;
-    BlockSNode* bn = (BlockSNode*) binfo->snode;
+    Block* bn = (Block*) binfo->snode;
     for (auto local_var : this->scope->table) {
         if (local_var.second->type == E_TYPE::VALUE) {
             bn->locals.push_back(local_var.first);
@@ -346,7 +346,7 @@ USemanticInfo Checker::visit_for(ast::For& node) {
                                  loop_index_var_id,
                                  loop_list_len_var_id,
                                  this->update_loop_index_snode);
-    BlockSNode* pn = (BlockSNode*) rinfo.snode;
+    Block* pn = (Block*) rinfo.snode;
     pn->locals.push_back(loop_list_var_id);
     this->update_loop_index_snode = nullptr;
     return std::make_unique<SemanticInfo>(rinfo);
@@ -356,7 +356,7 @@ USemanticInfo Checker::visit_break(ast::Break& node) {
     // node.loop_vars = this->scope->get_all_in_loop();
     USemanticInfo info_u = std::make_unique<SemanticInfo>();
     SemanticInfo& info = *info_u;
-    BreakSNode* bn = new BreakSNode();
+    Break* bn = new Break();
     info.snode = bn;
     for (auto reachable : this->scope->get_all_in_loop()) {
         bn->reachables.push_back(reachable.first);
@@ -385,7 +385,7 @@ USemanticInfo Checker::visit_while(ast::While& node) {
     }
     this->leave_scope();
 
-    auto* while_sn = new WhileSNode(std::move(condition_snode), (BlockSNode*) body_info_p->snode);
+    auto* while_sn = new While(std::move(condition_snode), (Block*) body_info_p->snode);
 
     USemanticInfo info_u = std::make_unique<SemanticInfo>();
     SemanticInfo& info = *info_u;
@@ -402,31 +402,31 @@ USemanticInfo Checker::visit_if(ast::If& n) {
 
     this->enter_scope("if");
     USemanticInfo body_info = this->visit_block(*n.then);
-    BlockSNode* bn = (BlockSNode*) body_info->snode;
+    Block* bn = (Block*) body_info->snode;
     for (const auto& local_var : this->scope->table) {
         bn->locals.push_back(local_var.first);
     }
     this->leave_scope();
 
-    std::vector<std::pair<SNode*, BlockSNode*>> elifs;
+    std::vector<std::pair<SNode*, Block*>> elifs;
 
     for (auto& elif : n.elifs) {
         USemanticInfo elif_condition_sinfo = this->expect_rvalue_of_type(T_BOOL, *elif.first);
         SNode* elif_condition_snode = elif_condition_sinfo->snode;
         this->enter_scope("elif");
         USemanticInfo elif_block_info = this->visit_block(*elif.second);
-        BlockSNode* bn1 = (BlockSNode*) elif_block_info->snode;
+        Block* bn1 = (Block*) elif_block_info->snode;
         for (const auto& local_var : this->scope->table) {
             bn1->locals.push_back(local_var.first);
         }
         this->leave_scope();
-        elifs.emplace_back(elif_condition_snode, (BlockSNode*) elif_block_info->snode);
+        elifs.emplace_back(elif_condition_snode, (Block*) elif_block_info->snode);
     }
     USemanticInfo else_info;
     if (n.selse != nullptr && !n.selse->nodes.empty()) {
         this->enter_scope("else");
         else_info = this->visit_block(*n.selse);
-        BlockSNode* bn2 = (BlockSNode*) else_info->snode;
+        Block* bn2 = (Block*) else_info->snode;
         for (const auto& local_var : this->scope->table) {
             bn2->locals.push_back(local_var.first);
         }
@@ -436,6 +436,6 @@ USemanticInfo Checker::visit_if(ast::If& n) {
 
     USemanticInfo info_u = std::make_unique<SemanticInfo>();
     SemanticInfo& info = *info_u;
-    info.snode = new IfSNode(condition_snode, (BlockSNode*) body_info->snode, elifs, (BlockSNode*) else_snode);
+    info.snode = new IfSNode(condition_snode, (Block*) body_info->snode, elifs, (Block*) else_snode);
     return info_u;
 }

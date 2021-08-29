@@ -4,7 +4,7 @@
 
 #include <cassert>
 #include "CheckExpressions.h"
-#include "../simple_nodes/TernarySNode.h"
+#include "../simple_nodes/Ternary.h"
 #include "errors/ErrorNotDeclared.h"
 #include "errors/ErrorTypeMismatch.h"
 #include "errors/ErrorExpectedExpression.h"
@@ -177,7 +177,7 @@ USemanticInfo Checker::visit_unary(ast::UnaryOp& n) {
     TypeNode* rtype = subscript_fun->ft->return_type->clone();
 
     auto* fsn = new IdSNode(sub_fun_path);
-    auto* csn = new CallSNode(fsn, {exp_snode});
+    auto* csn = new Call(fsn, {exp_snode});
 
     USemanticInfo info_u = std::make_unique<SemanticInfo>();
     SemanticInfo& info = *info_u;
@@ -216,7 +216,7 @@ USemanticInfo Checker::visit_binop(ast::BinaryOp& n) {
     }
     ConstFunction* operator_fun = operator_fun_it->second;
     auto* function_id = new IdSNode(operator_fun->path.as_str());
-    auto* sn = new CallSNode(function_id, {left_info_p->snode, right_snode});
+    auto* sn = new Call(function_id, {left_info_p->snode, right_snode});
     TypeNode* rettype = operator_fun->ft->return_type->clone();
 
     USemanticInfo info_u = std::make_unique<SemanticInfo>();
@@ -305,7 +305,7 @@ USemanticInfo Checker::visit_subscript(ast::Subscript& node) {
     info.entity = *new EntityValue(std::move(v));
 
     auto* fsn = new IdSNode(sub_fun_path);
-    auto* csn = new CallSNode(fsn, {parent_p->snode, child_snode});
+    auto* csn = new Call(fsn, {parent_p->snode, child_snode});
     info.snode = csn;
     return info_u;
 }
@@ -348,6 +348,6 @@ USemanticInfo Checker::visit_ternary(ast::Ternary& node) {
     USemanticInfo info_u = std::make_unique<SemanticInfo>();
     SemanticInfo& info = *info_u;
     info.entity = *new EntityValue(std::move(rv));
-    info.snode = new TernarySNode(expression_info_p->snode, true_case.snode, false_case_snode);
+    info.snode = new Ternary(expression_info_p->snode, true_case.snode, false_case_snode);
     return info_u;
 }

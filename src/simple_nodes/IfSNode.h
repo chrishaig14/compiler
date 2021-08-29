@@ -7,16 +7,16 @@
 
 
 #include "SNode.h"
-#include "BlockSNode.h"
+#include "Block.h"
 
 class IfSNode : public SNode {
 public:
     SNode* condition;
-    BlockSNode* then;
-    BlockSNode* _else;
-    std::vector<std::pair<SNode*, BlockSNode*>> elifs;
+    Block* then;
+    Block* _else;
+    std::vector<std::pair<SNode*, Block*>> elifs;
 
-    IfSNode(SNode* condition, BlockSNode* then, std::vector<std::pair<SNode*, BlockSNode*>> elifs, BlockSNode* _else);
+    IfSNode(SNode* condition, Block* then, std::vector<std::pair<SNode*, Block*>> elifs, Block* _else);
 };
 
 

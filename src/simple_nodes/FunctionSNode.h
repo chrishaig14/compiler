@@ -8,15 +8,15 @@
 #include <string>
 #include "SNode.h"
 #include "../types.h"
-#include "BlockSNode.h"
+#include "Block.h"
 
 class FunctionSNode : public SNode {
 public:
     std::string identifier;
     VectorOfStrings params;
-    BlockSNode* body;
+    Block* body;
 
-    FunctionSNode(std::string identifier, VectorOfStrings params, BlockSNode* body);
+    FunctionSNode(std::string identifier, VectorOfStrings params, Block* body);
 };
 
 

@@ -6,18 +6,18 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -g -O0 -Wall -pedantic -Werror")
 
 add_library(
         simple_nodes
-        AssignmentSNode.cpp
-        AssignmentSNode.h
-        BlockSNode.cpp
-        BlockSNode.h
-        BoolSNode.cpp
-        BoolSNode.h
-        BreakSNode.cpp
-        BreakSNode.h
-        CallSNode.cpp
-        CallSNode.h
-        ClassSNode.cpp
-        ClassSNode.h
+        Assignment.cpp
+        Assignment.h
+        Block.cpp
+        Block.h
+        Bool.cpp
+        Bool.h
+        Break.cpp
+        Break.h
+        Call.cpp
+        Call.h
+        Klass.cpp
+        Klass.h
         ContinueSNode.cpp
         ContinueSNode.h
         DeclarationSNode.cpp
@@ -40,26 +40,26 @@ add_library(
         IfSNode.h
         IntegerSNode.cpp
         IntegerSNode.h
-        ListSNode.cpp
-        ListSNode.h
-        MatchSNode.cpp
-        MatchSNode.h
+        List.cpp
+        List.h
+        Match.cpp
+        Match.h
         NewObjectSNode.cpp
         NewObjectSNode.h
-        NoneSNode.cpp
-        NoneSNode.h
-        ObjectMemberSNode.cpp
-        ObjectMemberSNode.h
-        ReturnSNode.cpp
-        ReturnSNode.h
+        None.cpp
+        None.h
+        ObjectMember.cpp
+        ObjectMember.h
+        Return.cpp
+        Return.h
         SNode.cpp
         SNode.h
-        StringSNode.cpp
-        StringSNode.h
-        TernarySNode.cpp
-        TernarySNode.h
-        ThrowSNode.cpp
-        ThrowSNode.h
-        TryCatchSNode.cpp
-        TryCatchSNode.h
-        WhileSNode.cpp)
+        String.cpp
+        String.h
+        Ternary.cpp
+        Ternary.h
+        Throw.cpp
+        Throw.h
+        TryCatch.cpp
+        TryCatch.h
+        While.cpp sem.h)

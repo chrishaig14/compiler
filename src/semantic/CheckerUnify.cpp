@@ -4,8 +4,8 @@
 
 #include "Checker.h"
 #include "../simple_nodes/IdSNode.h"
-#include "../simple_nodes/ObjectMemberSNode.h"
-#include "../simple_nodes/MatchSNode.h"
+#include "../simple_nodes/ObjectMember.h"
+#include "../simple_nodes/Match.h"
 #include "../simple_nodes/NewObjectSNode.h"
 #include "../units/FunctionValue.h"
 #include "../simple_nodes/EnumMemberSNode.h"

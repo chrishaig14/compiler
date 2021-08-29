@@ -99,7 +99,7 @@ USemanticInfo Checker::object_member(SNode* object_snode, Value& p_value, const 
             Value& vup = *(ev->value);
             this->fill_value(vup);
         }
-        auto* omn = new ObjectMemberSNode(object_snode, clazz->path, child);
+        auto* omn = new ObjectMember(object_snode, clazz->path, child);
         info.snode = omn;
     } else if (clazz->methods.count(child) != 0) {
         auto* idn = new IdSNode(clazz->methods[child]->path.as_str());

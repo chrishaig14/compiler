@@ -3,7 +3,7 @@
 //
 
 #include "CheckLiterals.h"
-#include "../simple_nodes/NoneSNode.h"
+#include "../simple_nodes/None.h"
 #include "../simple_nodes/DictSNode.h"
 #include "errors/ErrorExpectedExpression.h"
 #include "errors/ErrorListLiteral.h"
@@ -14,7 +14,7 @@ USemanticInfo Checker::visit_boolean(ast::Boolean& node) {
     USemanticInfo info_u = std::make_unique<SemanticInfo>();
     SemanticInfo& info = *info_u;
     info.entity = this->entity_value_from_actual_base_path_no_generic(Path("core.core.Boolean"));
-    info.snode = new BoolSNode(node.value);
+    info.snode = new Bool(node.value);
     return info_u;
 }
 
@@ -62,7 +62,7 @@ USemanticInfo Checker::visit_none(ast::None& node) {
     // info.set_type(ObjectType("NoneType"));
     auto v = std::make_unique<Value>(new ObjectType("NoneType"));
     info.entity = *new EntityValue(std::move(v));
-    info.snode = new NoneSNode();
+    info.snode = new None();
     return info_u;
 }
 
@@ -76,7 +76,7 @@ USemanticInfo Checker::visit_emptylist(ast::EmptyList& node) {
     this->fill_value(*ov);
     info.entity = *new EntityValue(std::move(ov));
     std::vector<USNode> v;
-    auto* lsn = new ListSNode(v);
+    auto* lsn = new List(v);
     info.snode = lsn;
     // non->class_name = "core.List";
     return info_u;
@@ -86,7 +86,7 @@ USemanticInfo Checker::visit_string(ast::String& node) {
     USemanticInfo info_u = std::make_unique<SemanticInfo>();
     SemanticInfo& info = *info_u;
     info.is_constant = true;
-    auto* sn = new StringSNode(node.str);
+    auto* sn = new String(node.str);
     info.snode = sn;
     // auto* otype = new ObjectType("String", {});
     // otype->actual_base_path = Path("core.core.String");
@@ -289,7 +289,7 @@ USemanticInfo Checker::visit_list(ast::List& node) {
     SemanticInfo return_info;
     return_info.is_constant = is_constant;
 
-    return_info.snode = new ListSNode(list_elements);
+    return_info.snode = new List(list_elements);
     auto* otype = new ObjectType("List", {element_type->clone()});
     auto p_value = std::make_unique<Value>(otype);
     otype->actual_base_path = Path("core.core.List");

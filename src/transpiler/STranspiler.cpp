@@ -3,7 +3,7 @@
 //
 
 #include "STranspiler.h"
-#include "../simple_nodes/ThrowSNode.h"
+#include "../simple_nodes/Throw.h"
 
 OutputCode STranspiler::transpile_declaration(DeclarationSNode& node) {
     OutputCode exp = this->dispatch(*node.expression);
@@ -14,7 +14,7 @@ OutputCode STranspiler::transpile_declaration(DeclarationSNode& node) {
     return OutputCode("", out);
 }
 
-OutputCode STranspiler::transpile_assignment(AssignmentSNode& node) {
+OutputCode STranspiler::transpile_assignment(Assignment& node) {
     std::string out;
     OutputCode lvalue = this->dispatch(*node.lvalue);
     out += lvalue.pre_code;
@@ -25,7 +25,7 @@ OutputCode STranspiler::transpile_assignment(AssignmentSNode& node) {
     return OutputCode("", out);
 }
 
-OutputCode STranspiler::transpile_return(ReturnSNode& node) {
+OutputCode STranspiler::transpile_return(Return& node) {
     if (node.expression == nullptr) {
         return OutputCode("", "return nullptr;");
     }
@@ -42,7 +42,7 @@ OutputCode STranspiler::transpile_return(ReturnSNode& node) {
     return OutputCode("", out);
 }
 
-OutputCode STranspiler::transpile_throw(ThrowSNode& node) {
+OutputCode STranspiler::transpile_throw(Throw& node) {
     OutputCode exp = this->dispatch(*node.expression);
     std::string out = exp.pre_code;
     out += RETURN_VAR + SPACE + ASSIGN + SPACE + "set_tag(" + LPAREN + SPACE + exp.code + RPAREN + ",EXCEPTION_TAG)" +
@@ -119,7 +119,7 @@ void STranspiler::transpile_function(FunctionSNode& node) {
     this->source += f_source;
 }
 
-OutputCode STranspiler::transpile_block(BlockSNode& node) {
+OutputCode STranspiler::transpile_block(Block& node) {
     std::string out;
     for (auto* n: node.nodes) {
         OutputCode nod = this->dispatch(*n);
@@ -149,7 +149,7 @@ OutputCode STranspiler::transpile_block(BlockSNode& node) {
     return OutputCode("", out);
 }
 
-void STranspiler::transpile_program(BlockSNode& node) {
+void STranspiler::transpile_program(Block& node) {
     for (auto* n: node.nodes) {
         this->dispatch_top(*n);
     }
@@ -159,7 +159,7 @@ OutputCode STranspiler::transpile_integer(IntegerSNode& node) {
     return OutputCode("", "MAKE_INT" + LPAREN + node.str + RPAREN);
 }
 
-OutputCode STranspiler::transpile_call(CallSNode& node) {
+OutputCode STranspiler::transpile_call(Call& node) {
     std::string pre_code;
     VectorOfStrings arg_names;
     std::string fofo;
@@ -207,11 +207,11 @@ OutputCode STranspiler::transpile_call(CallSNode& node) {
     // return out;
 }
 
-OutputCode STranspiler::transpile_string(StringSNode& node) {
+OutputCode STranspiler::transpile_string(String& node) {
     return OutputCode("", "MAKE_STRING" + LPAREN + QUOTE + node.s + QUOTE + RPAREN);
 }
 
-OutputCode STranspiler::transpile_boolean(BoolSNode& node) {
+OutputCode STranspiler::transpile_boolean(Bool& node) {
     return OutputCode("", node.v ? "TRUE" : "FALSE");
 }
 
@@ -219,7 +219,7 @@ OutputCode STranspiler::transpile_float(FloatSNode& pNode) {
     return OutputCode("", "MAKE_FLOAT(" + pNode.str + ")");
 }
 
-void STranspiler::transpile_class(ClassSNode& node) {
+void STranspiler::transpile_class(Klass& node) {
     std::string out;
     std::string class_name = path_to_id(node.identifier);
     out += CLASS + SPACE + class_name + SPACE + ": public XObject {\n";
@@ -297,7 +297,7 @@ OutputCode STranspiler::transpile_new(NewObjectSNode& node) {
     return OutputCode("", out);
 }
 
-OutputCode STranspiler::transpile_object_member(ObjectMemberSNode& node) {
+OutputCode STranspiler::transpile_object_member(ObjectMember& node) {
     std::string out;
     OutputCode object = this->dispatch(*node.object);
     out += object.pre_code;
@@ -306,7 +306,7 @@ OutputCode STranspiler::transpile_object_member(ObjectMemberSNode& node) {
     return OutputCode("", out);
 }
 
-OutputCode STranspiler::transpile_while(WhileSNode& node) {
+OutputCode STranspiler::transpile_while(While& node) {
     std::string out;
     OutputCode cond_out = this->dispatch(*node.condition);
     OutputCode body_out = this->transpile_block(*node.body);
@@ -318,7 +318,7 @@ OutputCode STranspiler::transpile_while(WhileSNode& node) {
     return OutputCode("", out);
 }
 
-OutputCode STranspiler::transpile_list(ListSNode& node) {
+OutputCode STranspiler::transpile_list(List& node) {
     std::string out;
     out = "NEW(XList,{";
     for (auto& e: node.elements) {
@@ -387,7 +387,7 @@ OutputCode STranspiler::transpile_if(IfSNode& node) {
     return OutputCode("", out);
 }
 
-OutputCode STranspiler::transpile_break(BreakSNode& node) {
+OutputCode STranspiler::transpile_break(Break& node) {
     std::string out;
     for (auto reachable: node.reachables) {
         if (reachable == "this") {
@@ -411,7 +411,7 @@ OutputCode STranspiler::transpile_continue(ContinueSNode& node) {
     return OutputCode("", out);
 }
 
-OutputCode STranspiler::transpile_match(MatchSNode& node) {
+OutputCode STranspiler::transpile_match(Match& node) {
     std::string out;
     OutputCode exp = this->dispatch(*node.exp);
     out += exp.pre_code;
@@ -466,7 +466,7 @@ OutputCode STranspiler::transpile_enum_member(EnumMemberSNode& node) {
     return OutputCode("", out);
 }
 
-OutputCode STranspiler::transpile_ternary(TernarySNode& node) {
+OutputCode STranspiler::transpile_ternary(Ternary& node) {
     std::string out;
     OutputCode tern = this->dispatch(*node.ext);
     out = tern.pre_code;
@@ -478,18 +478,18 @@ OutputCode STranspiler::transpile_ternary(TernarySNode& node) {
     return OutputCode("", out);
 }
 
-OutputCode STranspiler::transpile_none(NoneSNode& nn) {
+OutputCode STranspiler::transpile_none(None& nn) {
     return OutputCode("", "nullptr");
 }
 
-OutputCode STranspiler::transpile_try_catch(TryCatchSNode& node) {
+OutputCode STranspiler::transpile_try_catch(TryCatch& node) {
     this->in_try_catch = true;
     OutputCode body_out = this->transpile_block(*node.body);
     this->in_try_catch = false;
     std::string out = "TaggedObject* thrown_exception = nullptr;\n" + body_out.code;
     out += "if (thrown_exception!=nullptr){\n";
     for (size_t i = 0; i < node.catches_bodies.size(); i++) {
-        OutputCode catch_out = this->transpile_block((BlockSNode&) *node.catches_bodies[i]);
+        OutputCode catch_out = this->transpile_block((Block&) *node.catches_bodies[i]);
         out += "if (UNTAG(thrown_exception)->class_name==\"" + path_to_id(node.e_names_types[i].second) +
                "\"){TaggedObject*" + node.e_names_types[i].first + "=thrown_exception;\n" + catch_out.code + "} else ";
     }

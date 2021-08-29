@@ -1,0 +1,26 @@
+//
+// Created by chris on 19/6/21.
+//
+
+#ifndef XLANG_TRYCATCH_H
+#define XLANG_TRYCATCH_H
+
+#include "SNode.h"
+#include "Block.h"
+
+class TryCatch : public SNode {
+public:
+    TryCatch(Block* body, std::vector<std::pair<std::string, std::string>> e_names_types,
+                  std::vector<SNode*> catches_bodies) : SNode(SNodeType::TRY_CATCH) {
+        this->body = body;
+        this->catches_bodies = catches_bodies;
+        this->e_names_types = e_names_types;
+    }
+
+    std::vector<std::pair<std::string, std::string>> e_names_types;
+    Block* body;
+    std::vector<SNode*> catches_bodies;
+};
+
+
+#endif //XLANG_TRYCATCH_H

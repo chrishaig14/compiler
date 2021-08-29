@@ -9,7 +9,7 @@
 
 SNode* make_for_snode(ast::For& node, USemanticInfo& binfo, USemanticInfo& exp_info_p, std::string loop_list_var_id,
                       std::string loop_index_var_id, std::string loop_list_len_var_id, SNode* update_loop_index_snode) {
-    auto* bbn = new BlockSNode();
+    auto* bbn = new Block();
 
     USNode p_node(exp_info_p->snode);
     auto* dsn = new DeclarationSNode(loop_list_var_id, p_node);
@@ -21,7 +21,7 @@ SNode* make_for_snode(ast::For& node, USemanticInfo& binfo, USemanticInfo& exp_i
 
     auto* list_len_fn = new IdSNode("core.core.List.len");
     auto* list_sn = new IdSNode(loop_list_var_id);
-    USNode call_list_len_sn = std::make_unique<CallSNode>(list_len_fn, std::vector<SNode*>{list_sn});
+    USNode call_list_len_sn = std::make_unique<Call>(list_len_fn, std::vector<SNode*>{list_sn});
     auto* lensn = new DeclarationSNode(loop_list_len_var_id, call_list_len_sn);
     bbn->nodes.push_back(lensn);
 
@@ -32,11 +32,11 @@ SNode* make_for_snode(ast::For& node, USemanticInfo& binfo, USemanticInfo& exp_i
     auto* llensn = new IdSNode(loop_list_len_var_id);
 
 
-    auto cn = std::make_unique<CallSNode>(cmpfunsn, std::vector<SNode*>{idxsn, llensn});
+    auto cn = std::make_unique<Call>(cmpfunsn, std::vector<SNode*>{idxsn, llensn});
 
-    auto* bn = (BlockSNode*) (binfo->snode);
+    auto* bn = (Block*) (binfo->snode);
 
-    auto* list_subscript_n = new CallSNode(new IdSNode("core.core.List.__get_item__"),
+    auto* list_subscript_n = new Call(new IdSNode("core.core.List.__get_item__"),
                                            {new IdSNode(loop_list_var_id), new IdSNode(loop_index_var_id)});
 
     USNode ul(list_subscript_n);
@@ -44,7 +44,7 @@ SNode* make_for_snode(ast::For& node, USemanticInfo& binfo, USemanticInfo& exp_i
     bn->nodes.insert(bn->nodes.begin(), loop_elem_sn);
 
     bn->nodes.push_back(update_loop_index_snode);
-    auto* wsn = new WhileSNode(std::move(cn), bn);
+    auto* wsn = new While(std::move(cn), bn);
     bbn->nodes.push_back(wsn);
     return bbn;
 }
@@ -64,7 +64,7 @@ USemanticInfo Checker::visit_class(ast::Klass& node) {
     this->error_reporter.current_class = node.class_name;
     USemanticInfo info_u = std::make_unique<SemanticInfo>();
     SemanticInfo& info = *info_u;
-    auto* sn = new BlockSNode(true);
+    auto* sn = new Block(true);
     info.snode = sn;
     this->add_this = true;
     VectorOfTypes tp;
@@ -81,7 +81,7 @@ USemanticInfo Checker::visit_class(ast::Klass& node) {
     }
 
     Class* clazz = ((EntityClass&) this->scope->get(node.class_name)).clazz;
-    auto* csn = new ClassSNode(clazz->path.as_str(), node.members_ordered);
+    auto* csn = new Klass(clazz->path.as_str(), node.members_ordered);
     sn->nodes.push_back(csn);
     sn->nodes.push_back(make_class_default_init(clazz->path.as_str(), node.members_ordered));
 
@@ -150,7 +150,7 @@ USemanticInfo Checker::visit_root(ast::Block& node) {
 USemanticInfo Checker::visit_block(ast::Block& node) {
     USemanticInfo info_u = std::make_unique<SemanticInfo>();
     SemanticInfo& info = *info_u;
-    auto* sn = new BlockSNode();
+    auto* sn = new Block();
     info.snode = sn;
     VectorOfNodesU vn;
     for (auto& n: node.nodes) {
@@ -166,8 +166,8 @@ USemanticInfo Checker::visit_block(ast::Block& node) {
             vn.push_back(std::move(n));
             if (sinfo_p->snode != nullptr) {
                 if (sinfo_p->snode->type == SNodeType::BLOCK) {
-                    if (((BlockSNode*) sinfo_p->snode)->unwrap) {
-                        for (auto* nn : ((BlockSNode*) sinfo_p->snode)->nodes) {
+                    if (((Block*) sinfo_p->snode)->unwrap) {
+                        for (auto* nn : ((Block*) sinfo_p->snode)->nodes) {
                             sn->nodes.push_back(nn);
                         }
                     } else {
@@ -252,7 +252,7 @@ USemanticInfo Checker::visit_function(ast::Function& n) {
     this->assert_type_exists(returnType, n.start);
     this->scope->set("__return__", entity_from_type(returnType));
     USemanticInfo body_info = this->visit_block(*n.body);
-    BlockSNode* bn = (BlockSNode*) (body_info->snode);
+    Block* bn = (Block*) (body_info->snode);
     for (auto local_var: this->scope->table) {
         if (local_var.second->type == E_TYPE::VALUE) {
             bn->locals.push_back(local_var.first);
