@@ -8,7 +8,7 @@
 
 #include "SNode.h"
 
-class Ternary : public SNode {
+class sem::Ternary : public sem::SNode {
 
 public:
     Ternary(SNode* ext, SNode* true_case, SNode* false_case);

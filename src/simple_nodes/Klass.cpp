@@ -3,3 +3,4 @@
 //
 
 #include "Klass.h"
+using namespace sem;

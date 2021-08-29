@@ -4,6 +4,7 @@
 
 #include "While.h"
 
-While::While(USNode condition, Block* body)
-        : SNode(SNodeType::WHILE), condition(std::move(condition)), body(body) {
+using namespace sem;
+
+While::While(USNode condition, Block* body) : SNode(SNodeType::WHILE), condition(std::move(condition)), body(body) {
 }

@@ -8,7 +8,7 @@
 
 #include "SNode.h"
 
-class None : public SNode {
+class sem::None : public sem::SNode {
 public:
     None();
 };

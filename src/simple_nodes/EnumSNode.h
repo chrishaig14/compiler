@@ -10,7 +10,7 @@
 #include "SNode.h"
 #include "../types.h"
 
-class EnumSNode : public SNode {
+class sem::EnumSNode : public sem::SNode {
 public:
     EnumSNode();
 

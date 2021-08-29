@@ -8,7 +8,7 @@
 
 #include "SNode.h"
 
-class Bool : public SNode {
+class sem::Bool : public sem::SNode {
 
 public:
     explicit Bool(bool v);

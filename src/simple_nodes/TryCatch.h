@@ -8,7 +8,7 @@
 #include "SNode.h"
 #include "Block.h"
 
-class TryCatch : public SNode {
+class sem::TryCatch : public sem::SNode {
 public:
     TryCatch(Block* body, std::vector<std::pair<std::string, std::string>> e_names_types,
                   std::vector<SNode*> catches_bodies) : SNode(SNodeType::TRY_CATCH) {

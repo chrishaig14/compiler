@@ -10,7 +10,7 @@
 
 USemanticInfo Checker::visit_call(ast::Call& n, bool is_rvalue) {
     SemanticInfo retv;
-    auto* sn = new Call(nullptr, std::vector<SNode*>());
+    auto* sn = new sem::Call(nullptr, std::vector<sem::SNode*>());
     retv.snode = sn;
     // Logger::info("Checking CallNode");
     bool old_is_call = this->is_call;
@@ -134,7 +134,7 @@ USemanticInfo Checker::visit_call(ast::Call& n, bool is_rvalue) {
                     exit(1);
                 }
 
-                sn->arguments.push_back(new IdSNode(implicit_arg->path.as_str()));
+                sn->arguments.push_back(new sem::IdSNode(implicit_arg->path.as_str()));
                 // assert(*(fff->ft) == *cf->ft);
             }
         }
@@ -171,7 +171,7 @@ USemanticInfo Checker::make_return_info(const ast::Call& n, bool is_rvalue, Sema
 }
 
 bool
-Checker::check_arguments(ast::Call& n, Call* sn, VectorOfTypes& arg_types, std::vector<Entity*>& arg_entities) {
+Checker::check_arguments(ast::Call& n, sem::Call* sn, VectorOfTypes& arg_types, std::vector<Entity*>& arg_entities) {
     bool has_error;
     for (auto& arg: n.arguments) {
         USemanticInfo arg_type_p = this->dispatch(*arg);
@@ -201,7 +201,7 @@ Checker::check_arguments(ast::Call& n, Call* sn, VectorOfTypes& arg_types, std::
 }
 
 void
-Checker::process_function_arguments(SemanticInfo& retv, std::vector<Entity*>& arg_entities, Call* sn, ast::Call& n,
+Checker::process_function_arguments(SemanticInfo& retv, std::vector<Entity*>& arg_entities, sem::Call* sn, ast::Call& n,
                                     FunctionType* function_type, SemanticInfo* fun_info_p) {
     retv.entity = *entity_from_type(*function_type->return_type);
     int sni = static_cast<int>(fun_info_p->this_arg != nullptr);
@@ -209,7 +209,7 @@ Checker::process_function_arguments(SemanticInfo& retv, std::vector<Entity*>& ar
         // const TypeNode& arg_type = *arg_types[i];
         const TypeNode& param_type = *function_type->param_types[i];
 
-        SNode* arg_rvalue_snode = this->make_rvalue(*arg_entities[i], sn->arguments[sni], param_type);
+        sem::SNode* arg_rvalue_snode = this->make_rvalue(*arg_entities[i], sn->arguments[sni], param_type);
         if (arg_rvalue_snode == nullptr) {
             this->error_reporter.error(ErrorTypeMismatch(param_type, *n.arguments[i], *arg_entities[i]));
             continue;

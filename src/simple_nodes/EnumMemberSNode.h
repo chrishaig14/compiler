@@ -9,7 +9,7 @@
 #include <string>
 #include "SNode.h"
 
-class EnumMemberSNode : public SNode {
+class sem::EnumMemberSNode : public sem::SNode {
 public:
     EnumMemberSNode(const std::string& enum_name, const std::string& value);
 

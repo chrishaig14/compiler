@@ -3,6 +3,6 @@
 //
 
 #include "Break.h"
-
+using namespace sem;
 Break::Break() : SNode(SNodeType::BREAK) {
 }

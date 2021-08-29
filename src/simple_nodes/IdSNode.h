@@ -8,7 +8,7 @@
 #include <string>
 #include "SNode.h"
 
-class IdSNode : public SNode {
+class sem::IdSNode : public sem::SNode {
 public:
     std::string identifier;
 

@@ -10,7 +10,7 @@
 #include "SNode.h"
 #include "FunctionSNode.h"
 
-class Klass : public SNode {
+class sem::Klass : public sem::SNode {
 public:
     std::string identifier;
     VectorOfStrings members;

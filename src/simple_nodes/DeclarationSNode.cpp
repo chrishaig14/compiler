@@ -3,7 +3,7 @@
 //
 
 #include "DeclarationSNode.h"
-
+using namespace sem;
 DeclarationSNode::DeclarationSNode(std::string identifier, USNode& expression)
         : SNode(SNodeType::DECLARATION), identifier(identifier), expression(std::move(expression)) {
 }

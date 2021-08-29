@@ -9,7 +9,7 @@
 #include <string>
 #include "SNode.h"
 
-class String : public SNode {
+class sem::String : public sem::SNode {
 public:
     std::string s;
     String(const std::string& s);

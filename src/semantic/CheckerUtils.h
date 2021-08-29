@@ -36,7 +36,7 @@ ast::Function* generate_eq_method(std::string class_name, VectorOfTypes tp, Vect
 
 ast::Function* generate_str_method(std::string class_name);
 
-FunctionSNode* make_class_default_init(const std::string& class_path, const VectorOfStrings& members);
+sem::FunctionSNode* make_class_default_init(const std::string& class_path, const VectorOfStrings& members);
 
 TypeNode* get_entity_type(Entity& e);
 
@@ -48,10 +48,10 @@ void make_not_generic(FunctionType* ft);
 void make_not_generic(ObjectType* ft);
 void make_not_generic(TypeNode* ft);
 
-SNode* make_union_wrapper(int type_index, SNode* expression);
+sem::SNode* make_union_wrapper(int type_index, sem::SNode* expression);
 
 
-SNode* make_boolop_snode(ConstFunction* operator_fun, SemanticInfo& left_info, SemanticInfo& right_info);
+sem::SNode* make_boolop_snode(ConstFunction* operator_fun, SemanticInfo& left_info, SemanticInfo& right_info);
 
 
 #endif //XLANG_CHECKERUTILS_H

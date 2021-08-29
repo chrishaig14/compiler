@@ -9,7 +9,7 @@
 #include <string>
 #include "SNode.h"
 
-class IntegerSNode : public SNode {
+class sem::IntegerSNode : public sem::SNode {
 public:
     explicit IntegerSNode(const std::string& str);
     std::string str;

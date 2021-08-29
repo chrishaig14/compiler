@@ -8,8 +8,7 @@
 #include "SNode.h"
 #include <vector>
 #include <string>
-
-class Block : public SNode {
+class sem::Block : public sem::SNode {
 public:
     bool unwrap;
     std::vector<std::string> locals;

@@ -3,6 +3,6 @@
 //
 
 #include "Throw.h"
-
+using namespace sem;
 Throw::Throw(SNode* expression) : SNode(SNodeType::THROW), expression(expression) {
 }

@@ -7,7 +7,7 @@
 
 #include "SNode.h"
 
-class Assignment : public SNode {
+class sem::Assignment : public sem::SNode {
 public:
     USNode lvalue;
     USNode rvalue;

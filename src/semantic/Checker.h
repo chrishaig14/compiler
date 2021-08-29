@@ -65,8 +65,8 @@ Flirpin map_unit_to_flirpin(Unit u);
 TextPosition add_one_col(TextPosition t);
 bool function_is_generic(const FunctionType& ft);
 
-SNode* make_for_snode(ast::For& node, USemanticInfo& binfo, USemanticInfo& exp_info_p, std::string loop_list_var_id,
-                      std::string loop_index_var_id, std::string loop_list_len_var_id, SNode* update_loop_index_snode);
+sem::SNode* make_for_snode(ast::For& node, USemanticInfo& binfo, USemanticInfo& exp_info_p, std::string loop_list_var_id,
+                           std::string loop_index_var_id, std::string loop_list_len_var_id, sem::SNode* update_loop_index_snode);
 
 class Checker {
     int loop_count;
@@ -80,7 +80,7 @@ public:
     ErrorReporter error_reporter;
     Entity* this_entity;
     Package& top_package;
-    SNode* update_loop_index_snode;
+    sem::SNode* update_loop_index_snode;
 
     Checker(Package& top_package, Module& module);
     ~Checker();
@@ -145,7 +145,7 @@ public:
     USemanticInfo visit_defconst(ast::DefaultConstructor& node);
 
 
-    USemanticInfo object_member(SNode* object_snode, Value& p_value, const std::string& child, ast::Member& n);
+    USemanticInfo object_member(sem::SNode* object_snode, Value& p_value, const std::string& child, ast::Member& n);
     USemanticInfo class_member(Class* cls, const std::string& child, ast::Member& n);
     USemanticInfo package_member(Package& package, const std::string& child, ast::Member& n);
     USemanticInfo module_member(Module& mod, const std::string& child, ast::Member& n);
@@ -155,18 +155,18 @@ public:
     USemanticInfo visit_alias(ast::Alias& p_node);
     USemanticInfo enum_member(Enum* enumm, const std::string& value, ast::Member& node);
     USemanticInfo visit_enum(ast::EnumNode& p_node);
-    SNode* make_rvalue(const Entity& value_entity, SNode* value_snode, const TypeNode& target);
+    sem::SNode* make_rvalue(const Entity& value_entity, sem::SNode* value_snode, const TypeNode& target);
     USemanticInfo dispatch(ast::Node& nod);
     void fill_value(Value& value);
     std::unique_ptr<SemanticInfo> expect_rvalue_of_type(const TypeNode& target, ast::Node& node);
-    void process_function_arguments(SemanticInfo& retv, std::vector<Entity*>& arg_entities, Call* sn, ast::Call& n,
+    void process_function_arguments(SemanticInfo& retv, std::vector<Entity*>& arg_entities, sem::Call* sn, ast::Call& n,
                                     FunctionType* function_type, SemanticInfo* fun_info_p);
-    bool check_arguments(ast::Call& n, Call* sn, VectorOfTypes& arg_types, std::vector<Entity*>& arg_entities);
+    bool check_arguments(ast::Call& n, sem::Call* sn, VectorOfTypes& arg_types, std::vector<Entity*>& arg_entities);
     USemanticInfo
     make_return_info(const ast::Call& n, bool is_rvalue, SemanticInfo& retv, bool is_def_const, bool args_are_constant);
-    SNode* make_union_rvalue(SNode* value_snode, const TypeNode* unaliased_value_type,
+    sem::SNode* make_union_rvalue(sem::SNode* value_snode, const TypeNode* unaliased_value_type,
                              const TypeNode* unaliased_target_type) const;
-    SNode* make_option_rvalue(SNode* value_snode, const TypeNode* unaliased_value_type,
+    sem::SNode* make_option_rvalue(sem::SNode* value_snode, const TypeNode* unaliased_value_type,
                               const TypeNode* unaliased_target_type) const;
     // USemanticInfo visit_throw(ast::ThrowNode& n);
     void init();

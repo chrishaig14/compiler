@@ -10,7 +10,7 @@
 #include "../types.h"
 #include "Block.h"
 
-class FunctionSNode : public SNode {
+class sem::FunctionSNode : public sem::SNode {
 public:
     std::string identifier;
     VectorOfStrings params;

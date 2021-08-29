@@ -3,7 +3,7 @@
 //
 
 #include "Call.h"
-
+using namespace sem;
 Call::Call(SNode* function, std::vector<SNode*> arguments)
         : SNode(SNodeType::CALL), function(function), arguments(arguments) {
 }

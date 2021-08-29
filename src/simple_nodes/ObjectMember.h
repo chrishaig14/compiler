@@ -11,7 +11,7 @@
 #include "../ast/TypeNode.h"
 #include "../ast/Path.h"
 
-class ObjectMember : public SNode {
+class sem::ObjectMember : public sem::SNode {
 public:
     SNode* object;
     Path class_path;

@@ -8,7 +8,7 @@
 #include <string>
 #include "SNode.h"
 
-class DeclarationSNode : public SNode {
+class sem::DeclarationSNode : public sem::SNode {
 public:
     std::string identifier;
     USNode expression;

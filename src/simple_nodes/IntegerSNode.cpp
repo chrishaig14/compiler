@@ -4,6 +4,6 @@
 
 #include <iostream>
 #include "IntegerSNode.h"
-
+using namespace sem;
 IntegerSNode::IntegerSNode(const std::string& str) : SNode(SNodeType::INTEGER), str(str) {
 }

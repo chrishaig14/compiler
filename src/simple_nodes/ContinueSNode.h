@@ -10,7 +10,7 @@
 #include <vector>
 #include <string>
 
-class ContinueSNode : public SNode {
+class sem::ContinueSNode : public sem::SNode {
 public:
     std::vector<std::string> reachables;
     ContinueSNode();

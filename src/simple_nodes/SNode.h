@@ -6,6 +6,7 @@
 #define XLANG_SNODE_H
 
 #include <memory>
+#include "sem.h"
 
 enum class SNodeType {
     FUNCTION,
@@ -37,12 +38,12 @@ enum class SNodeType {
     TRY_CATCH
 };
 
-class SNode {
+class sem::SNode {
 public:
     SNodeType type;
     explicit SNode(SNodeType type);
 };
 
-typedef std::unique_ptr<SNode> USNode;
+typedef std::unique_ptr<sem::SNode> USNode;
 
 #endif //XLANG_SNODE_H

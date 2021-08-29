@@ -16,33 +16,33 @@ namespace sem {
 
     class Call;
 
-    class Class;
+    class Klass;
 
-    class Continue;
+    class ContinueSNode;
 
-    class Declaration;
+    class DeclarationSNode;
 
-    class Dict;
+    class DictSNode;
 
-    class EnumMember;
+    class EnumMemberSNode;
 
-    class Enum;
+    class EnumSNode;
 
-    class Float;
+    class FloatSNode;
 
-    class Function;
+    class FunctionSNode;
 
-    class Id;
+    class IdSNode;
 
-    class If;
+    class IfSNode;
 
-    class Integer;
+    class IntegerSNode;
 
     class List;
 
     class Match;
 
-    class NewObject;
+    class NewObjectSNode;
 
     class None;
 
@@ -59,6 +59,8 @@ namespace sem {
     class TryCatch;
 
     class While;
+
+    class SNode;
 
 }
 

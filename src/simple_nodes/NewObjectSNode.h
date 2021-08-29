@@ -10,7 +10,7 @@
 #include <vector>
 #include "SNode.h"
 
-class NewObjectSNode : public SNode {
+class sem::NewObjectSNode : public sem::SNode {
 public:
     std::string class_name;
     std::vector<SNode*> args;

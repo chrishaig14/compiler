@@ -3,6 +3,6 @@
 //
 
 #include "Return.h"
-
+using namespace sem;
 Return::Return(USNode& expression) : SNode(SNodeType::RETURN), expression(std::move(expression)) {
 }

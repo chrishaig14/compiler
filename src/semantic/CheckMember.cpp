@@ -56,7 +56,7 @@ USemanticInfo Checker::module_member(Module& mod, const std::string& child, ast:
     SemanticInfo& info = *info_u;
     info.entity = *map_flirpin_to_entity(flirpin);
     if (flirpin.type == F_TYPE::CONST_FUNCTION) {
-        auto* idn = new IdSNode(flirpin.const_function->path.as_str());
+        auto* idn = new sem::IdSNode(flirpin.const_function->path.as_str());
         info.snode = idn;
     }
     return info_u;
@@ -66,7 +66,7 @@ TextPosition add_one_col(TextPosition t) {
     return {t.line, t.column + 1};
 }
 
-USemanticInfo Checker::object_member(SNode* object_snode, Value& p_value, const std::string& child, ast::Member& n) {
+USemanticInfo Checker::object_member(sem::SNode* object_snode, Value& p_value, const std::string& child, ast::Member& n) {
     Path object_type_path = p_value.type->object().actual_base_path;
     // if (object_type_path.as_str() == "") {
     //     // is a single type param, error
@@ -99,10 +99,10 @@ USemanticInfo Checker::object_member(SNode* object_snode, Value& p_value, const 
             Value& vup = *(ev->value);
             this->fill_value(vup);
         }
-        auto* omn = new ObjectMember(object_snode, clazz->path, child);
+        auto* omn = new sem::ObjectMember(object_snode, clazz->path, child);
         info.snode = omn;
     } else if (clazz->methods.count(child) != 0) {
-        auto* idn = new IdSNode(clazz->methods[child]->path.as_str());
+        auto* idn = new sem::IdSNode(clazz->methods[child]->path.as_str());
         if (this->is_call) {
             // method call
             info.this_arg = object_snode;
@@ -111,9 +111,9 @@ USemanticInfo Checker::object_member(SNode* object_snode, Value& p_value, const 
         } else {
             // return partial
             size_t npartial = clazz->methods[child]->ft->param_types.size();
-            auto* non = new NewObjectSNode();
+            auto* non = new sem::NewObjectSNode();
             non->class_name = "Partial" + std::to_string(npartial);
-            auto* method_snode = new IdSNode(clazz->methods[child]->path.as_str());
+            auto* method_snode = new sem::IdSNode(clazz->methods[child]->path.as_str());
             non->args = {method_snode, object_snode};
             for (size_t i = 0; i < npartial; i++) {
                 non->args.push_back(nullptr);
@@ -170,10 +170,10 @@ USemanticInfo Checker::class_member(Class* cls, const std::string& child, ast::M
         ObjectType* ot = new ObjectType(cls->class_name, tp);
         unbound_method->ft->param_types.insert(unbound_method->ft->param_types.begin(), ot);
         info.entity = *new EntityConstFunction(unbound_method);
-        info.snode = new IdSNode(unbound_method->path.as_str());
+        info.snode = new sem::IdSNode(unbound_method->path.as_str());
     } else if (cls->static_methods.find(child) != cls->static_methods.end()) {
         info.entity = *new EntityConstFunction(cls->static_methods[child]);
-        info.snode = new IdSNode(cls->static_methods[child]->path.as_str());
+        info.snode = new sem::IdSNode(cls->static_methods[child]->path.as_str());
     } else if (cls->static_members.find(child) != cls->static_members.end()) {
         info.entity = *entity_from_type(*cls->static_members[child].first);
     } else {

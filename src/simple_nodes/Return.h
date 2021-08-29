@@ -10,7 +10,7 @@
 #include <vector>
 #include <string>
 
-class Return : public SNode {
+class sem::Return : public sem::SNode {
 public:
     USNode expression;
     std::vector<std::string> reachables;

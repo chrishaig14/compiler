@@ -3,3 +3,4 @@
 //
 
 #include "TryCatch.h"
+using namespace sem;

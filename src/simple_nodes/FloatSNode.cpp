@@ -3,6 +3,6 @@
 //
 
 #include "FloatSNode.h"
-
+using namespace sem;
 FloatSNode::FloatSNode() : SNode(SNodeType::FLOAT) {
 }

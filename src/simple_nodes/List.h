@@ -9,7 +9,7 @@
 #include <vector>
 #include "SNode.h"
 
-class List : public SNode {
+class sem::List : public sem::SNode {
 
 public:
     std::vector<USNode> elements;

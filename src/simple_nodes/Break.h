@@ -10,7 +10,7 @@
 #include <string>
 #include "SNode.h"
 
-class Break : public SNode {
+class sem::Break : public sem::SNode {
 public:
     std::vector<std::string> reachables;
     Break();

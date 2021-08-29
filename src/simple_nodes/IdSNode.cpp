@@ -3,7 +3,7 @@
 //
 
 #include "IdSNode.h"
-
+using namespace sem;
 IdSNode::IdSNode(const std::string& identifier) : SNode(SNodeType::ID) {
     this->identifier = identifier;
 }

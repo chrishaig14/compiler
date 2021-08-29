@@ -9,7 +9,7 @@
 #include <string>
 #include "SNode.h"
 
-class FloatSNode : public SNode {
+class sem::FloatSNode : public sem::SNode {
 public:
     FloatSNode();
     std::string str;

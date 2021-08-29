@@ -46,17 +46,17 @@ Entity* entity_from_type(const TypeNode& type) {
     return new EntityValue(std::move(fv));
 }
 
-FunctionSNode* make_class_default_init(const std::string& class_path, const VectorOfStrings& members) {
-    auto* bn = new Block();
-    auto nn = std::make_unique<NewObjectSNode>();
+sem::FunctionSNode* make_class_default_init(const std::string& class_path, const VectorOfStrings& members) {
+    auto* bn = new sem::Block();
+    auto nn = std::make_unique<sem::NewObjectSNode>();
     nn->class_name = class_path;
     for (const auto& m: members) {
-        auto* idn = new IdSNode(m);
+        auto* idn = new sem::IdSNode(m);
         nn->args.push_back(idn);
     }
-    auto* rn = new Return((USNode&) nn);
+    auto* rn = new sem::Return((USNode&) nn);
     bn->nodes.push_back(rn);
-    auto* fn = new FunctionSNode(class_path + ".__init__", members, bn);
+    auto* fn = new sem::FunctionSNode(class_path + ".__init__", members, bn);
     return fn;
 }
 
@@ -117,19 +117,19 @@ void make_not_generic(ObjectType* ot) {
     }
 }
 
-SNode* make_union_wrapper(int type_index, SNode* expression) {
-    auto* new_union = new NewObjectSNode();
+sem::SNode* make_union_wrapper(int type_index, sem::SNode* expression) {
+    auto* new_union = new sem::NewObjectSNode();
     new_union->class_name = "core_D_core_D_Union";
-    auto* in = new IntegerSNode(std::string());
+    auto* in = new sem::IntegerSNode(std::string());
     in->str = std::to_string(type_index); // FIXME, use int directly
     new_union->args = {expression, in};
     return new_union;
 }
 
 
-SNode* make_boolop_snode(ConstFunction* operator_fun, SemanticInfo& left_info, SemanticInfo& right_info) {
-    auto* function_id = new IdSNode(operator_fun->path.as_str());
-    auto* sn = new Call(function_id, {left_info.snode, right_info.snode});
+sem::SNode* make_boolop_snode(ConstFunction* operator_fun, SemanticInfo& left_info, SemanticInfo& right_info) {
+    auto* function_id = new sem::IdSNode(operator_fun->path.as_str());
+    auto* sn = new sem::Call(function_id, {left_info.snode, right_info.snode});
     return sn;
 }
 

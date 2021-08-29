@@ -9,7 +9,7 @@
 #include "SNode.h"
 #include "Block.h"
 
-class IfSNode : public SNode {
+class sem::IfSNode : public sem::SNode {
 public:
     SNode* condition;
     Block* then;

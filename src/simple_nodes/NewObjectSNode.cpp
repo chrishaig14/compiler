@@ -3,3 +3,4 @@
 //
 
 #include "NewObjectSNode.h"
+using namespace sem;

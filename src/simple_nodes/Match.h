@@ -11,7 +11,7 @@
 #include "Block.h"
 #include <string>
 
-class Match : public SNode {
+class sem::Match : public sem::SNode {
 public:
     SNode* exp;
     std::vector<std::pair<int, Block*>> cases;

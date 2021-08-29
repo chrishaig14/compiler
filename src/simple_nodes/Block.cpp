@@ -4,6 +4,8 @@
 
 #include "Block.h"
 
+using namespace sem;
+
 Block::Block(bool unwrap) : SNode(SNodeType::BLOCK) {
     this->unwrap = unwrap;
 }

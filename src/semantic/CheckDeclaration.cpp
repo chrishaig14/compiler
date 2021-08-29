@@ -18,7 +18,7 @@ std::unique_ptr<SemanticInfo> Checker::expect_rvalue_of_type(const TypeNode& tar
         this->error_reporter.error(ErrorTypeMismatch(*target.clone(), node, r_entity));
         return error_stub();
     }
-    SNode* snode = make_rvalue(r_entity, rinfo->snode, target);
+    sem::SNode* snode = make_rvalue(r_entity, rinfo->snode, target);
     if (snode == nullptr) {
         this->error_reporter.error(ErrorTypeMismatch(*target.clone(), node, r_entity));
         return error_stub();
@@ -27,7 +27,7 @@ std::unique_ptr<SemanticInfo> Checker::expect_rvalue_of_type(const TypeNode& tar
     return rinfo;
 }
 
-SNode* Checker::make_rvalue(const Entity& t_entity, SNode* value_snode, const TypeNode& target) {
+sem::SNode* Checker::make_rvalue(const Entity& t_entity, sem::SNode* value_snode, const TypeNode& target) {
     if (t_entity.type == E_TYPE::VALUE) {
         EntityValue& value_entity = (EntityValue&) t_entity;
         if (value_entity.value->type->kind != target.kind) {
@@ -86,7 +86,7 @@ SNode* Checker::make_rvalue(const Entity& t_entity, SNode* value_snode, const Ty
     return nullptr;
 }
 
-SNode* Checker::make_option_rvalue(SNode* value_snode, const TypeNode* unaliased_value_type,
+sem::SNode* Checker::make_option_rvalue(sem::SNode* value_snode, const TypeNode* unaliased_value_type,
                                    const TypeNode* unaliased_target_type) const {
     if (*unaliased_target_type->object().type_params[0] == *unaliased_value_type ||
         unaliased_value_type->object().id == "NoneType") {
@@ -95,7 +95,7 @@ SNode* Checker::make_option_rvalue(SNode* value_snode, const TypeNode* unaliased
     return nullptr;
 }
 
-SNode* Checker::make_union_rvalue(SNode* value_snode, const TypeNode* unaliased_value_type,
+sem::SNode* Checker::make_union_rvalue(sem::SNode* value_snode, const TypeNode* unaliased_value_type,
                                   const TypeNode* unaliased_target_type) const {
     int union_index = target_union_type(unaliased_target_type->object(), unaliased_value_type->object());
     if (union_index != -1) {
@@ -151,7 +151,7 @@ USemanticInfo Checker::check_declaration_with_type(ast::Declaration& n) {
     USemanticInfo info_u = std::make_unique<SemanticInfo>();
     SemanticInfo& info = *info_u;
     USNode up(rvalue_sinfo->snode);
-    info.snode = new DeclarationSNode(n.identifier, up);
+    info.snode = new sem::DeclarationSNode(n.identifier, up);
     auto ov = std::make_unique<Value>(n.type->clone());
     this->fill_value(*ov);
     info.entity = *new EntityValue(std::move(ov));
@@ -172,7 +172,7 @@ USemanticInfo Checker::check_declaration_without_type(ast::Declaration& n) {
     USemanticInfo info_u = std::make_unique<SemanticInfo>();
     SemanticInfo& info = *info_u;
     USNode u(exp_info_p->snode);
-    info.snode = new DeclarationSNode(n.identifier, u);
+    info.snode = new sem::DeclarationSNode(n.identifier, u);
     info.entity = exp_info_p->entity;
     if (info.entity.get().type == E_TYPE::CONST_FUNCTION) {
         EntityValue* value_entity = new EntityValue(std::make_unique<Value>(((EntityConstFunction&) exp_info_p->entity).const_function->ft->clone()));

@@ -9,7 +9,7 @@
 #include "SNode.h"
 #include "Block.h"
 
-class While : public SNode {
+class sem::While : public sem::SNode {
 public:
     USNode condition;
     Block* body;

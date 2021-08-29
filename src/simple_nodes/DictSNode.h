@@ -9,7 +9,7 @@
 #include <vector>
 #include "SNode.h"
 
-class DictSNode : public SNode {
+class sem::DictSNode : public sem::SNode {
 
 public:
     explicit DictSNode(const std::vector<std::pair<SNode*, SNode*>>& items);

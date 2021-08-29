@@ -3,7 +3,7 @@
 //
 
 #include "SNode.h"
-
+using namespace sem;
 SNode::SNode(SNodeType type) {
     this->type = type;
 }

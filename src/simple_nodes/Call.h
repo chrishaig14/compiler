@@ -9,7 +9,7 @@
 #include <vector>
 #include "SNode.h"
 
-class Call : public SNode {
+class sem::Call : public sem::SNode {
 public:
     SNode* function;
     std::vector<SNode*> arguments;

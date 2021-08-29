@@ -5,7 +5,7 @@
 #include "STranspiler.h"
 #include "../simple_nodes/Throw.h"
 
-OutputCode STranspiler::transpile_declaration(DeclarationSNode& node) {
+OutputCode STranspiler::transpile_declaration(sem::DeclarationSNode& node) {
     OutputCode exp = this->dispatch(*node.expression);
     std::string out;
     out += exp.pre_code;
@@ -14,7 +14,7 @@ OutputCode STranspiler::transpile_declaration(DeclarationSNode& node) {
     return OutputCode("", out);
 }
 
-OutputCode STranspiler::transpile_assignment(Assignment& node) {
+OutputCode STranspiler::transpile_assignment(sem::Assignment& node) {
     std::string out;
     OutputCode lvalue = this->dispatch(*node.lvalue);
     out += lvalue.pre_code;
@@ -25,7 +25,7 @@ OutputCode STranspiler::transpile_assignment(Assignment& node) {
     return OutputCode("", out);
 }
 
-OutputCode STranspiler::transpile_return(Return& node) {
+OutputCode STranspiler::transpile_return(sem::Return& node) {
     if (node.expression == nullptr) {
         return OutputCode("", "return nullptr;");
     }
@@ -42,7 +42,7 @@ OutputCode STranspiler::transpile_return(Return& node) {
     return OutputCode("", out);
 }
 
-OutputCode STranspiler::transpile_throw(Throw& node) {
+OutputCode STranspiler::transpile_throw(sem::Throw& node) {
     OutputCode exp = this->dispatch(*node.expression);
     std::string out = exp.pre_code;
     out += RETURN_VAR + SPACE + ASSIGN + SPACE + "set_tag(" + LPAREN + SPACE + exp.code + RPAREN + ",EXCEPTION_TAG)" +
@@ -63,7 +63,7 @@ std::string path_to_id(std::string p) {
     return out;
 }
 
-OutputCode STranspiler::transpile_id(IdSNode& node) {
+OutputCode STranspiler::transpile_id(sem::IdSNode& node) {
     if (node.identifier == "") {
         throw std::runtime_error("Error: tranpiling empty idnode!");
     }
@@ -75,7 +75,7 @@ OutputCode STranspiler::transpile_id(IdSNode& node) {
     return OutputCode("", out);
 }
 
-void STranspiler::transpile_function(FunctionSNode& node) {
+void STranspiler::transpile_function(sem::FunctionSNode& node) {
     std::string parameters;
 
     for (auto& param : node.params) {
@@ -119,7 +119,7 @@ void STranspiler::transpile_function(FunctionSNode& node) {
     this->source += f_source;
 }
 
-OutputCode STranspiler::transpile_block(Block& node) {
+OutputCode STranspiler::transpile_block(sem::Block& node) {
     std::string out;
     for (auto* n: node.nodes) {
         OutputCode nod = this->dispatch(*n);
@@ -149,17 +149,17 @@ OutputCode STranspiler::transpile_block(Block& node) {
     return OutputCode("", out);
 }
 
-void STranspiler::transpile_program(Block& node) {
+void STranspiler::transpile_program(sem::Block& node) {
     for (auto* n: node.nodes) {
         this->dispatch_top(*n);
     }
 }
 
-OutputCode STranspiler::transpile_integer(IntegerSNode& node) {
+OutputCode STranspiler::transpile_integer(sem::IntegerSNode& node) {
     return OutputCode("", "MAKE_INT" + LPAREN + node.str + RPAREN);
 }
 
-OutputCode STranspiler::transpile_call(Call& node) {
+OutputCode STranspiler::transpile_call(sem::Call& node) {
     std::string pre_code;
     VectorOfStrings arg_names;
     std::string fofo;
@@ -207,19 +207,19 @@ OutputCode STranspiler::transpile_call(Call& node) {
     // return out;
 }
 
-OutputCode STranspiler::transpile_string(String& node) {
+OutputCode STranspiler::transpile_string(sem::String& node) {
     return OutputCode("", "MAKE_STRING" + LPAREN + QUOTE + node.s + QUOTE + RPAREN);
 }
 
-OutputCode STranspiler::transpile_boolean(Bool& node) {
+OutputCode STranspiler::transpile_boolean(sem::Bool& node) {
     return OutputCode("", node.v ? "TRUE" : "FALSE");
 }
 
-OutputCode STranspiler::transpile_float(FloatSNode& pNode) {
-    return OutputCode("", "MAKE_FLOAT(" + pNode.str + ")");
+OutputCode STranspiler::transpile_float(sem::FloatSNode& node) {
+    return OutputCode("", "MAKE_FLOAT(" + node.str + ")");
 }
 
-void STranspiler::transpile_class(Klass& node) {
+void STranspiler::transpile_class(sem::Klass& node) {
     std::string out;
     std::string class_name = path_to_id(node.identifier);
     out += CLASS + SPACE + class_name + SPACE + ": public XObject {\n";
@@ -270,7 +270,7 @@ void STranspiler::transpile_class(Klass& node) {
     this->header += out;
 }
 
-OutputCode STranspiler::transpile_new(NewObjectSNode& node) {
+OutputCode STranspiler::transpile_new(sem::NewObjectSNode& node) {
     std::string out;
     std::string class_id = path_to_id(node.class_name);
     out += "NEW(" + class_id + COMMA + SPACE;
@@ -297,7 +297,7 @@ OutputCode STranspiler::transpile_new(NewObjectSNode& node) {
     return OutputCode("", out);
 }
 
-OutputCode STranspiler::transpile_object_member(ObjectMember& node) {
+OutputCode STranspiler::transpile_object_member(sem::ObjectMember& node) {
     std::string out;
     OutputCode object = this->dispatch(*node.object);
     out += object.pre_code;
@@ -306,7 +306,7 @@ OutputCode STranspiler::transpile_object_member(ObjectMember& node) {
     return OutputCode("", out);
 }
 
-OutputCode STranspiler::transpile_while(While& node) {
+OutputCode STranspiler::transpile_while(sem::While& node) {
     std::string out;
     OutputCode cond_out = this->dispatch(*node.condition);
     OutputCode body_out = this->transpile_block(*node.body);
@@ -318,7 +318,7 @@ OutputCode STranspiler::transpile_while(While& node) {
     return OutputCode("", out);
 }
 
-OutputCode STranspiler::transpile_list(List& node) {
+OutputCode STranspiler::transpile_list(sem::List& node) {
     std::string out;
     out = "NEW(XList,{";
     for (auto& e: node.elements) {
@@ -333,7 +333,7 @@ OutputCode STranspiler::transpile_list(List& node) {
     return OutputCode("", out);
 }
 
-OutputCode STranspiler::transpile_dict(DictSNode& node) {
+OutputCode STranspiler::transpile_dict(sem::DictSNode& node) {
     std::string out;
     out = "NEW(XDict,{";
     if (node.items.size() == 1) {
@@ -359,7 +359,7 @@ OutputCode STranspiler::transpile_dict(DictSNode& node) {
 }
 
 
-OutputCode STranspiler::transpile_if(IfSNode& node) {
+OutputCode STranspiler::transpile_if(sem::IfSNode& node) {
     std::string pre;
     std::string out;
     OutputCode cond = this->dispatch(*node.condition);
@@ -387,7 +387,7 @@ OutputCode STranspiler::transpile_if(IfSNode& node) {
     return OutputCode("", out);
 }
 
-OutputCode STranspiler::transpile_break(Break& node) {
+OutputCode STranspiler::transpile_break(sem::Break& node) {
     std::string out;
     for (auto reachable: node.reachables) {
         if (reachable == "this") {
@@ -399,7 +399,7 @@ OutputCode STranspiler::transpile_break(Break& node) {
     return OutputCode("", out);
 }
 
-OutputCode STranspiler::transpile_continue(ContinueSNode& node) {
+OutputCode STranspiler::transpile_continue(sem::ContinueSNode& node) {
     std::string out;
     for (auto reachable: node.reachables) {
         if (reachable == "this") {
@@ -411,7 +411,7 @@ OutputCode STranspiler::transpile_continue(ContinueSNode& node) {
     return OutputCode("", out);
 }
 
-OutputCode STranspiler::transpile_match(Match& node) {
+OutputCode STranspiler::transpile_match(sem::Match& node) {
     std::string out;
     OutputCode exp = this->dispatch(*node.exp);
     out += exp.pre_code;
@@ -427,7 +427,7 @@ OutputCode STranspiler::transpile_match(Match& node) {
     return OutputCode("", out);
 }
 
-void STranspiler::transpile_enum(EnumSNode& node) {
+void STranspiler::transpile_enum(sem::EnumSNode& node) {
     std::string out;
     std::string enum_name = path_to_id(node.id);
     // out += "enum class" + SPACE + enum_name + SPACE + " {\n";
@@ -460,13 +460,13 @@ void STranspiler::transpile_enum(EnumSNode& node) {
     this->header += out;
 }
 
-OutputCode STranspiler::transpile_enum_member(EnumMemberSNode& node) {
+OutputCode STranspiler::transpile_enum_member(sem::EnumMemberSNode& node) {
     std::string out;
     out += path_to_id(node.enum_name) + "_" + node.value;
     return OutputCode("", out);
 }
 
-OutputCode STranspiler::transpile_ternary(Ternary& node) {
+OutputCode STranspiler::transpile_ternary(sem::Ternary& node) {
     std::string out;
     OutputCode tern = this->dispatch(*node.ext);
     out = tern.pre_code;
@@ -478,18 +478,18 @@ OutputCode STranspiler::transpile_ternary(Ternary& node) {
     return OutputCode("", out);
 }
 
-OutputCode STranspiler::transpile_none(None& nn) {
+OutputCode STranspiler::transpile_none(sem::None& node) {
     return OutputCode("", "nullptr");
 }
 
-OutputCode STranspiler::transpile_try_catch(TryCatch& node) {
+OutputCode STranspiler::transpile_try_catch(sem::TryCatch& node) {
     this->in_try_catch = true;
     OutputCode body_out = this->transpile_block(*node.body);
     this->in_try_catch = false;
     std::string out = "TaggedObject* thrown_exception = nullptr;\n" + body_out.code;
     out += "if (thrown_exception!=nullptr){\n";
     for (size_t i = 0; i < node.catches_bodies.size(); i++) {
-        OutputCode catch_out = this->transpile_block((Block&) *node.catches_bodies[i]);
+        OutputCode catch_out = this->transpile_block((sem::Block&) *node.catches_bodies[i]);
         out += "if (UNTAG(thrown_exception)->class_name==\"" + path_to_id(node.e_names_types[i].second) +
                "\"){TaggedObject*" + node.e_names_types[i].first + "=thrown_exception;\n" + catch_out.code + "} else ";
     }
