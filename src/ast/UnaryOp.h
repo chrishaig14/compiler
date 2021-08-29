@@ -17,9 +17,9 @@ class ast::UnaryOp : public ast::Node {
 public:
     bool equal(const ast::Node& other) const override;
 
-    UnaryOp(UnaryOpType op, ast::Node* exp, TextPosition start, TextPosition end);
+    UnaryOp(UnaryOpType op, UNode exp, TextPosition start, TextPosition end);
     nlohmann::json to_json() const override;
-    Node* exp;
+    UNode exp;
     UnaryOpType op;
 };
 

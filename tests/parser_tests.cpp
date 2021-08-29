@@ -765,7 +765,7 @@ TEST_CASE("parse_not_exp", "[parser]") {
     UNode ast = parser.parse_and_expression();
 
     REQUIRE(ast->to_json() ==
-            ast::UnaryOp(UnaryOpType::NOT, EXPRESSION.node.release(), DUMMY_POS, DUMMY_POS).to_json());
+            ast::UnaryOp(UnaryOpType::NOT, std::move(EXPRESSION.node), DUMMY_POS, DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_tuple", "[parser]") {

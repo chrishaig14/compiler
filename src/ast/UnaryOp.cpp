@@ -10,11 +10,11 @@ bool UnaryOp::equal(const ast::Node& other) const {
     return false;
 }
 
-UnaryOp::UnaryOp(UnaryOpType op, ast::Node* exp, TextPosition start, TextPosition end) : ast::Node(NodeType::UNARY,
-                                                                                                   start,
-                                                                                                   end) {
+UnaryOp::UnaryOp(UnaryOpType op, UNode exp, TextPosition start, TextPosition end) : ast::Node(NodeType::UNARY,
+                                                                                              start,
+                                                                                              end),
+                                                                                    exp(std::move(exp)) {
     this->op = op;
-    this->exp = exp;
 }
 
 nlohmann::json UnaryOp::to_json() const {

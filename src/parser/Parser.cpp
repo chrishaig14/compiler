@@ -215,7 +215,7 @@ UNode Parser::parse_not_expression() {
     if (this->match(TokType::NOT)) {
         Token not_tok = this->expect_token(TokType::NOT);
         auto left = this->parse_bool_expression();
-        left = std::make_unique<ast::UnaryOp>(UnaryOpType::NOT, left.release(), not_tok.start, left->end);
+        left = std::make_unique<ast::UnaryOp>(UnaryOpType::NOT, std::move(left), not_tok.start, left->end);
         return left;
     }
     return this->parse_bool_expression();
