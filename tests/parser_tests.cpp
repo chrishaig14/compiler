@@ -68,15 +68,21 @@ TestNodeU DECLARATION_U() {
 TestNodeU EXPRESSION_1_U() {
     auto exp_id_1_u = EXP_ID_1_U();
     auto exp_id_2_u = EXP_ID_2_U();
-    return {EXP_ID_1.text + "+" + EXP_ID_2.text,
-            ast::BinaryOp::make(OpType::ADD, std::move(exp_id_1_u.node), std::move(exp_id_2_u.node), DUMMY_POS, DUMMY_POS)};
+    return {EXP_ID_1.text + "+" + EXP_ID_2.text, ast::BinaryOp::make(OpType::ADD,
+                                                                     std::move(exp_id_1_u.node),
+                                                                     std::move(exp_id_2_u.node),
+                                                                     DUMMY_POS,
+                                                                     DUMMY_POS)};
 }
 
 TestNodeU EXPRESSION_2_U() {
     auto exp_id_2_u = EXP_ID_2_U();
     auto exp_id_1_u = EXP_ID_1_U();
-    return {exp_id_2_u.text + "*" + exp_id_1_u.text,
-            ast::BinaryOp::make(OpType::MUL, std::move(exp_id_2_u.node), std::move(exp_id_1_u.node), DUMMY_POS, DUMMY_POS)};
+    return {exp_id_2_u.text + "*" + exp_id_1_u.text, ast::BinaryOp::make(OpType::MUL,
+                                                                         std::move(exp_id_2_u.node),
+                                                                         std::move(exp_id_1_u.node),
+                                                                         DUMMY_POS,
+                                                                         DUMMY_POS)};
 }
 
 // const TestNode ASSIGNMENT{EXP_ID_1.text + " = " + EXPRESSION_1_U.text,
@@ -444,6 +450,7 @@ TEST_CASE("parse_class_with_method", "[parser]") {
     //             ast::Klass(ID, {}, std::move(members), std::move(methods), {}, v, DUMMY_POS, DUMMY_POS).to_json());
     // }
 }
+
 TEST_CASE("parse_class_with_static_method", "[parser]") {
     Scanner scanner;
     auto function = FUNCTION();
@@ -637,8 +644,11 @@ TEST_CASE("parse_and_exp", "[parser]") {
 
     UNode ast = parser.parse_and_expression();
 
-    REQUIRE(ast->to_json() ==
-            ast::BinaryOp(OpType::AND, std::move(EXPRESSION_1.node), std::move(EXPRESSION_2.node), DUMMY_POS, DUMMY_POS).to_json());
+    REQUIRE(ast->to_json() == ast::BinaryOp(OpType::AND,
+                                            std::move(EXPRESSION_1.node),
+                                            std::move(EXPRESSION_2.node),
+                                            DUMMY_POS,
+                                            DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_or_exp", "[parser]") {
@@ -653,8 +663,11 @@ TEST_CASE("parse_or_exp", "[parser]") {
 
     UNode ast = parser.parse_or_expression();
 
-    REQUIRE(ast->to_json() ==
-            ast::BinaryOp(OpType::OR, std::move(EXPRESSION_1.node), std::move(EXPRESSION_2.node), DUMMY_POS, DUMMY_POS).to_json());
+    REQUIRE(ast->to_json() == ast::BinaryOp(OpType::OR,
+                                            std::move(EXPRESSION_1.node),
+                                            std::move(EXPRESSION_2.node),
+                                            DUMMY_POS,
+                                            DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_eq_exp", "[parser]") {
@@ -669,8 +682,11 @@ TEST_CASE("parse_eq_exp", "[parser]") {
 
     UNode ast = parser.parse_and_expression();
 
-    REQUIRE(ast->to_json() ==
-            ast::BinaryOp(OpType::EQ, std::move(EXPRESSION_1.node), std::move(EXPRESSION_2.node), DUMMY_POS, DUMMY_POS).to_json());
+    REQUIRE(ast->to_json() == ast::BinaryOp(OpType::EQ,
+                                            std::move(EXPRESSION_1.node),
+                                            std::move(EXPRESSION_2.node),
+                                            DUMMY_POS,
+                                            DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_ge_exp", "[parser]") {
@@ -685,8 +701,11 @@ TEST_CASE("parse_ge_exp", "[parser]") {
 
     UNode ast = parser.parse_and_expression();
 
-    REQUIRE(ast->to_json() ==
-            ast::BinaryOp(OpType::GE, std::move(EXPRESSION_1.node), std::move(EXPRESSION_2.node), DUMMY_POS, DUMMY_POS).to_json());
+    REQUIRE(ast->to_json() == ast::BinaryOp(OpType::GE,
+                                            std::move(EXPRESSION_1.node),
+                                            std::move(EXPRESSION_2.node),
+                                            DUMMY_POS,
+                                            DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_le_exp", "[parser]") {
@@ -701,8 +720,11 @@ TEST_CASE("parse_le_exp", "[parser]") {
 
     UNode ast = parser.parse_and_expression();
 
-    REQUIRE(ast->to_json() ==
-            ast::BinaryOp(OpType::LE, std::move(EXPRESSION_1.node), std::move(EXPRESSION_2.node), DUMMY_POS, DUMMY_POS).to_json());
+    REQUIRE(ast->to_json() == ast::BinaryOp(OpType::LE,
+                                            std::move(EXPRESSION_1.node),
+                                            std::move(EXPRESSION_2.node),
+                                            DUMMY_POS,
+                                            DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_gt_exp", "[parser]") {
@@ -717,8 +739,11 @@ TEST_CASE("parse_gt_exp", "[parser]") {
 
     UNode ast = parser.parse_and_expression();
 
-    REQUIRE(ast->to_json() ==
-            ast::BinaryOp(OpType::GT, std::move(EXPRESSION_1.node), std::move(EXPRESSION_2.node), DUMMY_POS, DUMMY_POS).to_json());
+    REQUIRE(ast->to_json() == ast::BinaryOp(OpType::GT,
+                                            std::move(EXPRESSION_1.node),
+                                            std::move(EXPRESSION_2.node),
+                                            DUMMY_POS,
+                                            DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_lt_exp", "[parser]") {
@@ -733,8 +758,11 @@ TEST_CASE("parse_lt_exp", "[parser]") {
 
     UNode ast = parser.parse_and_expression();
 
-    REQUIRE(ast->to_json() ==
-            ast::BinaryOp(OpType::LT, std::move(EXPRESSION_1.node), std::move(EXPRESSION_2.node), DUMMY_POS, DUMMY_POS).to_json());
+    REQUIRE(ast->to_json() == ast::BinaryOp(OpType::LT,
+                                            std::move(EXPRESSION_1.node),
+                                            std::move(EXPRESSION_2.node),
+                                            DUMMY_POS,
+                                            DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_ne_exp", "[parser]") {
@@ -749,8 +777,11 @@ TEST_CASE("parse_ne_exp", "[parser]") {
 
     UNode ast = parser.parse_and_expression();
 
-    REQUIRE(ast->to_json() ==
-            ast::BinaryOp(OpType::NE, std::move(EXPRESSION_1.node), std::move(EXPRESSION_2.node), DUMMY_POS, DUMMY_POS).to_json());
+    REQUIRE(ast->to_json() == ast::BinaryOp(OpType::NE,
+                                            std::move(EXPRESSION_1.node),
+                                            std::move(EXPRESSION_2.node),
+                                            DUMMY_POS,
+                                            DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_not_exp", "[parser]") {
@@ -881,8 +912,10 @@ TEST_CASE("parse_partial_one_arg", "[parser]") {
     parser.top_package_name = "main";
 
     UNode ast = parser.parse_partial_application();
+    VectorOfNodesU args;
+    args.emplace_back(std::move(EXPRESSION_1.node));
     REQUIRE(ast->to_json() == ast::PartialApplication(std::move(FACTOR_EXPRESSION.node),
-                                                      {EXPRESSION_1.node.release()},
+                                                      std::move(args),
                                                       DUMMY_POS,
                                                       DUMMY_POS).to_json());
 }
@@ -899,10 +932,12 @@ TEST_CASE("parse_partial_mult_arg_one", "[parser]") {
     parser.top_package_name = "main";
 
     UNode ast = parser.parse_partial_application();
-    REQUIRE(ast->to_json() == ast::PartialApplication(std::move(FACTOR_EXPRESSION.node),
-                                                      {EXPRESSION_1.node.release(), nullptr},
-                                                      DUMMY_POS,
-                                                      DUMMY_POS).to_json());
+    VectorOfNodesU args;
+    args.emplace_back(std::move(EXPRESSION_1.node));
+    args.emplace_back(nullptr);
+
+    REQUIRE(ast->to_json() ==
+            ast::PartialApplication(std::move(FACTOR_EXPRESSION.node), std::move(args), DUMMY_POS, DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_partial_mult_arg_two", "[parser]") {
@@ -917,8 +952,12 @@ TEST_CASE("parse_partial_mult_arg_two", "[parser]") {
     parser.top_package_name = "main";
 
     UNode ast = parser.parse_partial_application();
+    VectorOfNodesU  args;
+    args.emplace_back(std::move(EXPRESSION_1.node));
+    args.emplace_back(std::move(EXPRESSION_2.node));
+
     REQUIRE(ast->to_json() == ast::PartialApplication(std::move(FACTOR_EXPRESSION.node),
-                                                      {EXPRESSION_1.node.release(), EXPRESSION_2.node.release()},
+                                                      std::move(args),
                                                       DUMMY_POS,
                                                       DUMMY_POS).to_json());
 }

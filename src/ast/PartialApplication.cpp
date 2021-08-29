@@ -28,9 +28,8 @@ bool PartialApplication::equal(const ast::Node& other) const {
     return true;
 }
 
-PartialApplication::PartialApplication(UNode function, VectorOfNodes args, TextPosition start, TextPosition end)
-        : ast::Node(NodeType::PARTIAL, start, end), function(std::move(function)) {
-    this->args = args;
+PartialApplication::PartialApplication(UNode function, VectorOfNodesU args, TextPosition start, TextPosition end)
+        : ast::Node(NodeType::PARTIAL, start, end), function(std::move(function)), args(std::move(args)) {
 }
 
 nlohmann::json PartialApplication::to_json() const {

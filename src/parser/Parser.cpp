@@ -343,13 +343,13 @@ UNode Parser::parse_partial_application() {
     Token dollar = this->expect_token(TokType::DOLLAR_SIGN);
     Token total_function_tok = this->expect_token(TokType::ID);
     this->expect_token(TokType::LPAREN);
-    VectorOfNodes args;
+    VectorOfNodesU args;
     while (true) {
         if (this->match(TokType::TIMES)) {
             this->next();
             args.push_back(nullptr);
         } else {
-            args.push_back(this->parse_expression().release());
+            args.push_back(this->parse_expression());
         }
         if (this->match(TokType::COMMA)) {
             this->next();
@@ -361,7 +361,7 @@ UNode Parser::parse_partial_application() {
     auto partial = std::make_unique<ast::PartialApplication>(std::make_unique<ast::Id>(total_function_tok.str,
                                                                                        total_function_tok.start,
                                                                                        total_function_tok.end_pos),
-                                                             args,
+                                                             std::move(args),
                                                              dollar.start,
                                                              close.end_pos);
     partial->start = total_function_tok.start;
