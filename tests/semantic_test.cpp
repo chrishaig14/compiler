@@ -77,10 +77,13 @@ TEST_CASE("semantic_output_list", "[checker]") {
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
     Checker checker(*c.top_package, module);
-    checker.visit_function((ast::Function&) *module.ast->nodes[0]);
-
-    REQUIRE(!checker.error_reporter.failed);
-    REQUIRE(checker.error_reporter.errors.empty());
+    USemanticInfo info = checker.visit_declaration((ast::Declaration&) *((std::unique_ptr<ast::Function>&) module.ast->nodes[0])->body->nodes[0]);
+    REQUIRE(not checker.error_reporter.failed);
+    std::vector<USNode> e;
+    e.push_back(std::make_unique<sem::Integer>("4"));
+    e.push_back(std::make_unique<sem::Integer>("1"));
+    auto exp = sem::Declaration("x", std::make_unique<sem::List>(std::move(e)));
+    REQUIRE(*info->snode == exp);
 }
 
 
@@ -91,10 +94,11 @@ TEST_CASE("semantic_output_empty_dict", "[checker]") {
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
     Checker checker(*c.top_package, module);
-    checker.visit_function((ast::Function&) *module.ast->nodes[0]);
-
-    REQUIRE(!checker.error_reporter.failed);
-    REQUIRE(checker.error_reporter.errors.empty());
+    USemanticInfo info = checker.visit_declaration((ast::Declaration&) *((std::unique_ptr<ast::Function>&) module.ast->nodes[0])->body->nodes[0]);
+    REQUIRE(not checker.error_reporter.failed);
+    std::vector<std::pair<USNode, USNode>> e;
+    auto exp = sem::Declaration("x", std::make_unique<sem::Dict>(std::move(e)));
+    REQUIRE(*info->snode == exp);
 }
 
 TEST_CASE("semantic_output_dict", "[checker]") {
@@ -104,10 +108,13 @@ TEST_CASE("semantic_output_dict", "[checker]") {
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
     Checker checker(*c.top_package, module);
-    checker.visit_function((ast::Function&) *module.ast->nodes[0]);
-
-    REQUIRE(!checker.error_reporter.failed);
-    REQUIRE(checker.error_reporter.errors.empty());
+    USemanticInfo info = checker.visit_declaration((ast::Declaration&) *((std::unique_ptr<ast::Function>&) module.ast->nodes[0])->body->nodes[0]);
+    REQUIRE(not checker.error_reporter.failed);
+    std::vector<std::pair<USNode, USNode>> e;
+    e.emplace_back(std::make_unique<sem::Integer>("7"), std::make_unique<sem::String>("seven"));
+    e.emplace_back(std::make_unique<sem::Integer>("9"), std::make_unique<sem::String>("nine"));
+    auto exp = sem::Declaration("x", std::make_unique<sem::Dict>(std::move(e)));
+    REQUIRE(*info->snode == exp);
 }
 
 TEST_CASE("semantic_output_int_literal", "[checker]") {
@@ -117,14 +124,10 @@ TEST_CASE("semantic_output_int_literal", "[checker]") {
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
     Checker checker(*c.top_package, module);
-    ast::Node& expression = *((ast::Declaration&) *((ast::Function&) *module.ast->nodes[0]).body->nodes[0]).expression;
-    USemanticInfo info = checker.dispatch_rvalue(expression);
-
-    REQUIRE(!checker.error_reporter.failed);
-    REQUIRE(checker.error_reporter.errors.size() == 0);
-    REQUIRE(info->entity.get().type == E_TYPE::VALUE);
-    REQUIRE(((EntityValue&) (info->entity.get())).value->metatype == Meta::CLASS);
-    REQUIRE(*((EntityValue&) (info->entity.get())).value->type == ObjectType("Integer"));
+    USemanticInfo info = checker.visit_declaration((ast::Declaration&) *((std::unique_ptr<ast::Function>&) module.ast->nodes[0])->body->nodes[0]);
+    REQUIRE(not checker.error_reporter.failed);
+    auto exp = sem::Declaration("x", std::make_unique<sem::Integer>("9"));
+    REQUIRE(*info->snode == exp);
 }
 
 TEST_CASE("semantic_output_bool_literal", "[checker]") {
@@ -134,31 +137,10 @@ TEST_CASE("semantic_output_bool_literal", "[checker]") {
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
     Checker checker(*c.top_package, module);
-    ast::Node& expression = *((ast::Declaration&) *((ast::Function&) *module.ast->nodes[0]).body->nodes[0]).expression;
-    USemanticInfo info = checker.dispatch_rvalue(expression);
-
-    REQUIRE(!checker.error_reporter.failed);
-    REQUIRE(checker.error_reporter.errors.size() == 0);
-    REQUIRE(info->entity.get().type == E_TYPE::VALUE);
-    REQUIRE(((EntityValue&) (info->entity.get())).value->metatype == Meta::CLASS);
-    REQUIRE(*((EntityValue&) (info->entity.get())).value->type == ObjectType("Boolean"));
-}
-
-TEST_CASE("semantic_output_list_literal", "[checker]") {
-    std::string code = "fun foo()->Integer{var x = [4,1];return 0;}";
-
-    Compiler c = c_analyze(code);
-    Module& module = *c.root_package->units["tmp"].module;
-    analyze_module_result(module, *c.top_package);
-    Checker checker(*c.top_package, module);
-    ast::Node& expression = *((ast::Declaration&) *((ast::Function&) *module.ast->nodes[0]).body->nodes[0]).expression;
-    USemanticInfo info = checker.dispatch_rvalue(expression);
-
-    REQUIRE(!checker.error_reporter.failed);
-    REQUIRE(checker.error_reporter.errors.size() == 0);
-    REQUIRE(info->entity.get().type == E_TYPE::VALUE);
-    REQUIRE(((EntityValue&) (info->entity.get())).value->metatype == Meta::CLASS);
-    REQUIRE(*((EntityValue&) (info->entity.get())).value->type == ObjectType("List", {new ObjectType("Integer")}));
+    USemanticInfo info = checker.visit_declaration((ast::Declaration&) *((std::unique_ptr<ast::Function>&) module.ast->nodes[0])->body->nodes[0]);
+    REQUIRE(not checker.error_reporter.failed);
+    auto exp = sem::Declaration("x", std::make_unique<sem::Bool>(false));
+    REQUIRE(*info->snode == exp);
 }
 
 TEST_CASE("semantic_output_empty_list_literal", "[checker]") {
@@ -168,51 +150,11 @@ TEST_CASE("semantic_output_empty_list_literal", "[checker]") {
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
     Checker checker(*c.top_package, module);
-    ast::Node& expression = *((ast::Declaration&) *((ast::Function&) *module.ast->nodes[0]).body->nodes[0]).expression;
-    USemanticInfo info = checker.dispatch_rvalue(expression);
-
-    REQUIRE(!checker.error_reporter.failed);
-    REQUIRE(checker.error_reporter.errors.size() == 0);
-    REQUIRE(info->entity.get().type == E_TYPE::VALUE);
-    REQUIRE(((EntityValue&) (info->entity.get())).value->metatype == Meta::CLASS);
-    REQUIRE(*((EntityValue&) (info->entity.get())).value->type == ObjectType("List", {new ObjectType("String")}));
-}
-
-TEST_CASE("semantic_output_empty_dict_literal", "[checker]") {
-    std::string code = "fun foo()->Integer{var x = {}::[Integer,String];return 0;}";
-
-    Compiler c = c_analyze(code);
-    Module& module = *c.root_package->units["tmp"].module;
-    analyze_module_result(module, *c.top_package);
-    Checker checker(*c.top_package, module);
-    ast::Node& expression = *((ast::Declaration&) *((ast::Function&) *module.ast->nodes[0]).body->nodes[0]).expression;
-    USemanticInfo info = checker.dispatch_rvalue(expression);
-
-    REQUIRE(!checker.error_reporter.failed);
-    REQUIRE(checker.error_reporter.errors.size() == 0);
-    REQUIRE(info->entity.get().type == E_TYPE::VALUE);
-    REQUIRE(((EntityValue&) (info->entity.get())).value->metatype == Meta::CLASS);
-    REQUIRE(*((EntityValue&) (info->entity.get())).value->type ==
-            ObjectType("Dict", {new ObjectType("Integer"), new ObjectType("String")}));
-}
-
-
-TEST_CASE("semantic_output_dict_literal", "[checker]") {
-    std::string code = "fun foo()->Integer{var x = {\"one\":1,\"two\":2};return 0;}";
-
-    Compiler c = c_analyze(code);
-    Module& module = *c.root_package->units["tmp"].module;
-    analyze_module_result(module, *c.top_package);
-    Checker checker(*c.top_package, module);
-    ast::Node& expression = *((ast::Declaration&) *((ast::Function&) *module.ast->nodes[0]).body->nodes[0]).expression;
-    USemanticInfo info = checker.dispatch_rvalue(expression);
-
-    REQUIRE(!checker.error_reporter.failed);
-    REQUIRE(checker.error_reporter.errors.size() == 0);
-    REQUIRE(info->entity.get().type == E_TYPE::VALUE);
-    REQUIRE(((EntityValue&) (info->entity.get())).value->metatype == Meta::CLASS);
-    REQUIRE(*((EntityValue&) (info->entity.get())).value->type ==
-            ObjectType("Dict", {new ObjectType("String"), new ObjectType("Integer")}));
+    USemanticInfo info = checker.visit_declaration((ast::Declaration&) *((std::unique_ptr<ast::Function>&) module.ast->nodes[0])->body->nodes[0]);
+    REQUIRE(not checker.error_reporter.failed);
+    std::vector<USNode> e;
+    auto exp = sem::Declaration("x", std::make_unique<sem::List>(std::move(e)));
+    REQUIRE(*info->snode == exp);
 }
 
 TEST_CASE("semantic_output_float_literal", "[checker]") {

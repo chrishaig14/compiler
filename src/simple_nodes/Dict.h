@@ -12,12 +12,21 @@
 class sem::Dict : public sem::SNode {
 
 public:
-    explicit Dict(const std::vector<std::pair<SNode*, SNode*>>& items);
-    std::vector<std::pair<SNode*, SNode*>> items;
+    explicit Dict(std::vector<std::pair<USNode, USNode>> items);
+    std::vector<std::pair<USNode, USNode>> items;
+
     bool equals(const SNode& o) const override {
-        // auto& other = (const Declaration&) o;
+        auto& other = (const Dict&) o;
         // return this->identifier == other.identifier && *this->expression == *other.expression;
-        return false;
+        if (this->items.size() != other.items.size()) {
+            return false;
+        }
+        for (size_t i = 0; i < this->items.size(); i++) {
+            if (*this->items[i].first != *other.items[i].first || *this->items[i].second != *other.items[i].second) {
+                return false;
+            }
+        }
+        return true;
     }
 };
 

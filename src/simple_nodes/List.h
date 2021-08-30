@@ -13,7 +13,7 @@ class sem::List : public sem::SNode {
 
 public:
     std::vector<USNode> elements;
-    explicit List(std::vector<USNode>& elements);
+    explicit List(std::vector<USNode> elements);
 
     bool equals(const SNode& o) const override {
         auto& other = (const List&) o;
@@ -21,7 +21,7 @@ public:
             return false;
         }
         for (size_t i = 0; i < this->elements.size(); i++) {
-            if (this->elements[i] != other.elements[i]) {
+            if (*this->elements[i] != *other.elements[i]) {
                 return false;
             }
         }

@@ -35,6 +35,7 @@
 #include "../simple_nodes/String.h"
 #include "../units/FunctionValue.h"
 #include "../simple_nodes/Bool.h"
+#include "../simple_nodes/Dict.h"
 #include "../simple_nodes/Float.h"
 #include "../simple_nodes/KlassDef.h"
 #include "../simple_nodes/NewObject.h"

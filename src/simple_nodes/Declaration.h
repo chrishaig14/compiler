@@ -17,7 +17,9 @@ public:
 
     bool equals(const SNode& o) const override {
         auto& other = (const Declaration&) o;
-        return this->identifier == other.identifier && *this->expression == *other.expression;
+        bool id_ok = this->identifier == other.identifier;
+        bool exp_ok = *this->expression == *other.expression;
+        return id_ok && exp_ok;
     }
 };
 

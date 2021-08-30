@@ -337,7 +337,7 @@ OutputCode STranspiler::transpile_dict(sem::Dict& node) {
     std::string out;
     out = "NEW(XDict,{";
     if (node.items.size() == 1) {
-        auto e = node.items[0];
+        auto& e = node.items[0];
         OutputCode key = this->dispatch(*e.first);
         OutputCode value = this->dispatch(*e.second);
         out += key.pre_code;
@@ -345,7 +345,7 @@ OutputCode STranspiler::transpile_dict(sem::Dict& node) {
         out += "std::make_pair(" + key.code + ", " + value.code + ")" + SPACE;
     }
     if (node.items.size() > 1) {
-        for (auto e: node.items) {
+        for (auto& e: node.items) {
             OutputCode key = this->dispatch(*e.first);
             OutputCode value = this->dispatch(*e.second);
             out += key.pre_code;

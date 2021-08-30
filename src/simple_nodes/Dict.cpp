@@ -3,7 +3,8 @@
 //
 
 #include "Dict.h"
+
 using namespace sem;
-Dict::Dict(const std::vector<std::pair<SNode*, SNode*>>& items) : SNode(SNodeType::DICT) {
-    this->items = items;
+
+Dict::Dict(std::vector<std::pair<USNode, USNode>> items) : SNode(SNodeType::DICT), items(std::move(items)) {
 }

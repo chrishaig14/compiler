@@ -76,7 +76,7 @@ USemanticInfo Checker::visit_emptylist(ast::EmptyList& node) {
     this->fill_value(*ov);
     info.entity = *new EntityValue(std::move(ov));
     std::vector<USNode> v;
-    auto* lsn = new sem::List(v);
+    auto* lsn = new sem::List(std::move(v));
     info.snode = lsn;
     // non->class_name = "core.List";
     return info_u;
@@ -157,7 +157,7 @@ USemanticInfo Checker::visit_partial(ast::PartialApplication& node) {
             if (arg_sinfo->is_error()) {
                 return error_stub();
             }
-            sem:: SNode* arg_snode = arg_sinfo->snode;
+            sem::SNode* arg_snode = arg_sinfo->snode;
             snodes.push_back(arg_snode);
         } else {
             partial_args.push_back(param_type->clone());
@@ -187,8 +187,8 @@ USemanticInfo Checker::visit_dict(ast::DictNode& node) {
     ObjectType& first_key_type = first_key_entity.value->type->object();
     ObjectType& first_value_type = first_value_entity.value->type->object();
 
-    std::vector<std::pair<sem::SNode*, sem::SNode*>> items;
-    items = {{first_key_info->snode, first_value_info->snode}};
+    std::vector<std::pair<USNode, USNode>> items;
+    items.emplace_back(std::move(first_key_info->snode), std::move(first_value_info->snode));
     bool has_error = false;
     for (size_t i = 1; i < node.items.size(); i++) {
         USemanticInfo key_sinfo = this->expect_rvalue_of_type(first_key_type, *node.items[i].first);
@@ -209,7 +209,7 @@ USemanticInfo Checker::visit_dict(ast::DictNode& node) {
     this->fill_value(*ov);
     assert(ov->clazz != nullptr);
     info.entity = *new EntityValue(std::move(ov));
-    auto* nsn = new sem::Dict(items);
+    auto* nsn = new sem::Dict(std::move(items));
     info.snode = nsn;
     return info_u;
 }
@@ -289,7 +289,7 @@ USemanticInfo Checker::visit_list(ast::List& node) {
     SemanticInfo return_info;
     return_info.is_constant = is_constant;
 
-    return_info.snode = new sem::List(list_elements);
+    return_info.snode = new sem::List(std::move(list_elements));
     auto* otype = new ObjectType("List", {element_type->clone()});
     auto p_value = std::make_unique<Value>(otype);
     otype->actual_base_path = Path("core.core.List");
