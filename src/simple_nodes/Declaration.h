@@ -7,6 +7,7 @@
 
 #include <string>
 #include "SNode.h"
+#include <cassert>
 
 class sem::Declaration : public sem::SNode {
 public:
@@ -16,6 +17,7 @@ public:
     Declaration(std::string identifier, USNode expression);
 
     bool equals(const SNode& o) const override {
+        assert(this->type == o.type);
         auto& other = (const Declaration&) o;
         bool id_ok = this->identifier == other.identifier;
         bool exp_ok = *this->expression == *other.expression;

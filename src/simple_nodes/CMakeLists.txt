@@ -62,4 +62,4 @@ add_library(
         Throw.h
         TryCatch.cpp
         TryCatch.h
-        While.cpp sem.h)
+        While.cpp sem.h ObjectMethodCall.cpp ObjectMethodCall.h ObjectMethod.cpp ObjectMethod.h)

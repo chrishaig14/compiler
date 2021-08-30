@@ -33,6 +33,7 @@
 #include "../simple_nodes/Id.h"
 #include "../simple_nodes/Call.h"
 #include "../simple_nodes/String.h"
+#include "../simple_nodes/ObjectMethod.h"
 #include "../units/FunctionValue.h"
 #include "../simple_nodes/Bool.h"
 #include "../simple_nodes/Dict.h"
@@ -44,6 +45,7 @@
 #include "../simple_nodes/List.h"
 #include "../simple_nodes/IfSNode.h"
 #include "../simple_nodes/ObjectMember.h"
+#include "../simple_nodes/ObjectMethodCall.h"
 #include "../simple_nodes/Match.h"
 #include "CheckerUtils.h"
 #include "../ast/UnaryOp.h"
@@ -146,7 +148,7 @@ public:
     USemanticInfo visit_defconst(ast::DefaultConstructor& node);
 
 
-    USemanticInfo object_member(sem::SNode* object_snode, Value& p_value, const std::string& child, ast::Member& n);
+    USemanticInfo object_member(USNode object_snode, Value& p_value, const std::string& child, ast::Member& n);
     USemanticInfo class_member(Class* cls, const std::string& child, ast::Member& n);
     USemanticInfo package_member(Package& package, const std::string& child, ast::Member& n);
     USemanticInfo module_member(Module& mod, const std::string& child, ast::Member& n);
@@ -160,9 +162,9 @@ public:
     USemanticInfo dispatch(ast::Node& nod);
     void fill_value(Value& value);
     std::unique_ptr<SemanticInfo> expect_rvalue_of_type(const TypeNode& target, ast::Node& node);
-    void process_function_arguments(SemanticInfo& retv, std::vector<Entity*>& arg_entities, sem::Call* sn, ast::Call& n,
+    void process_function_arguments(SemanticInfo& retv, std::vector<Entity*>& arg_entities, std::vector<sem::SNode*>& sn, ast::Call& n,
                                     FunctionType* function_type, SemanticInfo* fun_info_p);
-    bool check_arguments(ast::Call& n, sem::Call* sn, VectorOfTypes& arg_types, std::vector<Entity*>& arg_entities);
+    bool check_arguments(ast::Call& n, std::vector<sem::SNode*>& sn, VectorOfTypes& arg_types, std::vector<Entity*>& arg_entities);
     USemanticInfo
     make_return_info(const ast::Call& n, bool is_rvalue, SemanticInfo& retv, bool is_def_const, bool args_are_constant);
     sem::SNode* make_union_rvalue(sem::SNode* value_snode, const TypeNode* unaliased_value_type,

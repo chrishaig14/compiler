@@ -8,6 +8,7 @@
 
 #include <vector>
 #include "SNode.h"
+#include <cassert>
 
 class sem::List : public sem::SNode {
 
@@ -16,6 +17,7 @@ public:
     explicit List(std::vector<USNode> elements);
 
     bool equals(const SNode& o) const override {
+        assert(this->type == o.type);
         auto& other = (const List&) o;
         if (this->elements.size() != other.elements.size()) {
             return false;

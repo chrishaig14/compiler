@@ -12,6 +12,10 @@ namespace sem {
 
     class Bool;
 
+    class ObjectMethod;
+
+    class ObjectMethodCall;
+
     class Break;
 
     class Call;

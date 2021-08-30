@@ -157,6 +157,49 @@ TEST_CASE("semantic_output_empty_list_literal", "[checker]") {
     REQUIRE(*info->snode == exp);
 }
 
+TEST_CASE("semantic_output_object_member", "[checker]") {
+    std::string code = "class Foo {bar: Integer;} fun foo(f:Foo)->Integer{var x = f.bar;return 0;}";
+
+    Compiler c = c_analyze(code);
+    Module& module = *c.root_package->units["tmp"].module;
+    analyze_module_result(module, *c.top_package);
+    Checker checker(*c.top_package, module);
+    USemanticInfo info = checker.visit_function((ast::Function&) *module.ast->nodes[1]);
+    REQUIRE(not checker.error_reporter.failed);
+    std::vector<USNode> e;
+    auto exp = sem::Declaration("x", std::make_unique<sem::ObjectMember>(std::make_unique<sem::Id>("f"), Path("test.tmp.Foo"), "bar"));
+    REQUIRE(*(*(std::unique_ptr<sem::FunctionDef>&) info->snode).body->nodes[0] == exp);
+}
+
+TEST_CASE("semantic_output_object_method_call", "[checker]") {
+    std::string code = "class Foo {bar: Integer;fun get_foo()->Integer{return 0;}} fun foo(f:Foo)->Integer{var x = f.get_foo();return 0;}";
+
+    Compiler c = c_analyze(code);
+    Module& module = *c.root_package->units["tmp"].module;
+    analyze_module_result(module, *c.top_package);
+    Checker checker(*c.top_package, module);
+    USemanticInfo info = checker.visit_function((ast::Function&) *module.ast->nodes[1]);
+    REQUIRE(not checker.error_reporter.failed);
+    std::vector<USNode> e;
+    auto exp = sem::Declaration("x", std::make_unique<sem::ObjectMethodCall>(std::make_unique<sem::Id>("f"), Path("test.tmp.Foo"), "get_foo", std::vector<USNode>()));
+    REQUIRE(*(*(std::unique_ptr<sem::FunctionDef>&) info->snode).body->nodes[0] == exp);
+}
+
+TEST_CASE("semantic_output_object_method", "[checker]") {
+    std::string code = "class Foo {bar: Integer;fun get_foo()->Integer{return 0;}} fun foo(f:Foo)->Integer{var x = f.get_foo;return 0;}";
+
+    Compiler c = c_analyze(code);
+    Module& module = *c.root_package->units["tmp"].module;
+    analyze_module_result(module, *c.top_package);
+    Checker checker(*c.top_package, module);
+    USemanticInfo info = checker.visit_function((ast::Function&) *module.ast->nodes[1]);
+    REQUIRE(not checker.error_reporter.failed);
+    std::vector<USNode> e;
+    auto exp = sem::Declaration("x", std::make_unique<sem::ObjectMethod>(std::make_unique<sem::Id>("f"), Path("test.tmp.Foo"), "get_foo"));
+    REQUIRE(*(*(std::unique_ptr<sem::FunctionDef>&) info->snode).body->nodes[0] == exp);
+}
+
+
 TEST_CASE("semantic_output_float_literal", "[checker]") {
     std::string code = "fun foo()->Integer{var x = 9.5;return 0;}";
 

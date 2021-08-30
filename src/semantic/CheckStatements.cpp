@@ -258,7 +258,7 @@ USemanticInfo Checker::visit_match(ast::Match& node) {
         this->scope->set(case_id, ent);
         USemanticInfo case_info = this->dispatch(*case_node);
         auto* bn = (sem::Block*) case_info->snode;
-        auto* omn = new sem::ObjectMember(new sem::Id(varname), Path("core.core.Union"), "o");
+        auto* omn = new sem::ObjectMember(std::make_unique<sem::Id>(varname), Path("core.core.Union"), "o");
         USNode u(omn);
         auto* dn = new sem::Declaration(case_id, std::move(u));
         bn->nodes.insert(bn->nodes.begin(), dn);

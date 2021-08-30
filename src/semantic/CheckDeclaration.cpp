@@ -87,7 +87,7 @@ sem::SNode* Checker::make_rvalue(const Entity& t_entity, sem::SNode* value_snode
 }
 
 sem::SNode* Checker::make_option_rvalue(sem::SNode* value_snode, const TypeNode* unaliased_value_type,
-                                   const TypeNode* unaliased_target_type) const {
+                                        const TypeNode* unaliased_target_type) const {
     if (*unaliased_target_type->object().type_params[0] == *unaliased_value_type ||
         unaliased_value_type->object().id == "NoneType") {
         return value_snode;
@@ -96,7 +96,7 @@ sem::SNode* Checker::make_option_rvalue(sem::SNode* value_snode, const TypeNode*
 }
 
 sem::SNode* Checker::make_union_rvalue(sem::SNode* value_snode, const TypeNode* unaliased_value_type,
-                                  const TypeNode* unaliased_target_type) const {
+                                       const TypeNode* unaliased_target_type) const {
     int union_index = target_union_type(unaliased_target_type->object(), unaliased_value_type->object());
     if (union_index != -1) {
         return make_union_wrapper(union_index, value_snode);
@@ -175,7 +175,9 @@ USemanticInfo Checker::check_declaration_without_type(ast::Declaration& n) {
     info.snode = new sem::Declaration(n.identifier, std::move(u));
     info.entity = exp_info_p->entity;
     if (info.entity.get().type == E_TYPE::CONST_FUNCTION) {
-        EntityValue* value_entity = new EntityValue(std::make_unique<Value>(((EntityConstFunction&) exp_info_p->entity).const_function->ft->clone()));
+        Entity& entity_const_function = exp_info_p->entity;
+        ConstFunction* const_function = ((EntityConstFunction&) entity_const_function).const_function;
+        EntityValue* value_entity = new EntityValue(std::make_unique<Value>(const_function->ft->clone()));
         info.entity = *value_entity;
 
         if (value_entity->value->type->is_generic()) {

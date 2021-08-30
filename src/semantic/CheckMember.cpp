@@ -5,6 +5,9 @@
 #include <cassert>
 #include "CheckMember.h"
 #include "../ast/ObjectType.h"
+#include "../simple_nodes/ObjectMember.h"
+#include "../simple_nodes/ObjectMethodCall.h"
+#include "../simple_nodes/ObjectMethod.h"
 #include "errors/ErrorNoMember.h"
 #include "errors/ErrorNoMemberSuggestions.h"
 #include "errors/ErrorClassNoMember.h"
@@ -27,7 +30,7 @@ USemanticInfo Checker::visit_member(ast::Member& n) {
                 // this->error_reporter.object_no_member(*parent_entity.value->type, n);
                 return error_stub();
             }
-            return this->object_member(parent_info->snode, *((EntityValue&) parent_entity).value, n.s_child, n);
+            return this->object_member(USNode(parent_info->snode), *((EntityValue&) parent_entity).value, n.s_child, n);
         case E_TYPE::PACKAGE:
             return this->package_member(*((EntityPackage&) parent_entity).package, n.s_child, n);
         case E_TYPE::MODULE:
@@ -66,7 +69,7 @@ TextPosition add_one_col(TextPosition t) {
     return {t.line, t.column + 1};
 }
 
-USemanticInfo Checker::object_member(sem::SNode* object_snode, Value& p_value, const std::string& child, ast::Member& n) {
+USemanticInfo Checker::object_member(USNode object_snode, Value& p_value, const std::string& child, ast::Member& n) {
     Path object_type_path = p_value.type->object().actual_base_path;
     // if (object_type_path.as_str() == "") {
     //     // is a single type param, error
@@ -99,29 +102,32 @@ USemanticInfo Checker::object_member(sem::SNode* object_snode, Value& p_value, c
             Value& vup = *(ev->value);
             this->fill_value(vup);
         }
-        auto* omn = new sem::ObjectMember(object_snode, clazz->path, child);
+        auto* omn = new sem::ObjectMember(std::move(object_snode), clazz->path, child);
         info.snode = omn;
     } else if (clazz->methods.count(child) != 0) {
-        auto* idn = new sem::Id(clazz->methods[child]->path.as_str());
-        if (this->is_call) {
+        // auto* idn = new sem::Id(clazz->methods[child]->path.as_str());
+        info.snode = new sem::ObjectMethod(std::move(object_snode), clazz->path, child);
+        info.entity = *new EntityConstFunction(clazz->methods[child]);
+        // if (this->is_call) {
             // method call
-            info.this_arg = object_snode;
-            info.snode = idn;
-            info.entity = *new EntityConstFunction(clazz->methods[child]);
-        } else {
+            // info.this_arg = object_snode.release();
+            // info.snode = idn;
+            // info.snode = new sem::ObjectMethod(std::move(object_snode), clazz->path, child);
+            // info.entity = *new EntityValue(std::make_unique<Value>(clazz->methods[child]->ft->clone()));
+        // } else {
             // return partial
-            size_t npartial = clazz->methods[child]->ft->param_types.size();
-            auto* non = new sem::NewObject();
-            non->class_name = "Partial" + std::to_string(npartial);
-            auto* method_snode = new sem::Id(clazz->methods[child]->path.as_str());
-            non->args = {method_snode, object_snode};
-            for (size_t i = 0; i < npartial; i++) {
-                non->args.push_back(nullptr);
-            }
-            info.snode = non;
-            auto fv = std::make_unique<Value>(clazz->methods[child]->ft->clone());
-            info.entity = *new EntityValue(std::move(fv));
-        }
+            // size_t npartial = clazz->methods[child]->ft->param_types.size();
+            // auto* non = new sem::NewObject();
+            // non->class_name = "Partial" + std::to_string(npartial);
+            // auto* method_snode = new sem::Id(clazz->methods[child]->path.as_str());
+            // non->args = {method_snode, object_snode.release()};
+            // for (size_t i = 0; i < npartial; i++) {
+            //     non->args.push_back(nullptr);
+            // }
+            // info.snode = non;
+            // auto fv = std::make_unique<Value>(clazz->methods[child]->ft->clone());
+            // info.entity = *new EntityValue(std::move(fv));
+        // }
 
     } else {
         this->error_reporter.error(ErrorNoMemberSuggestions(*p_value.type, n, *clazz));

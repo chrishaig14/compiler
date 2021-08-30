@@ -35,7 +35,7 @@ enum class SNodeType {
     TERNARY,
     DICT,
     THROW,
-    TRY_CATCH
+    TRY_CATCH, OBJECT_METHOD_CALL, OBJECT_METHOD
 };
 
 class sem::SNode {
