@@ -148,7 +148,7 @@ PythonOutputCode PythonTranspiler::transpile_call(sem::Call& node) {
     std::string pre_code;
     VectorOfStrings arg_names;
     std::string fofo;
-    for (auto* arg: node.arguments) {
+    for (auto& arg: node.arguments) {
         std::string afofo;
         PythonOutputCode arg_code = this->dispatch(*arg);
         if (arg->type == SNodeType::CALL) {

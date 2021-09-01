@@ -11,9 +11,9 @@
 
 class sem::Call : public sem::SNode {
 public:
-    SNode* function;
-    std::vector<SNode*> arguments;
-    Call(SNode* function, std::vector<SNode*> arguments);
+    USNode function;
+    std::vector<USNode> arguments;
+    Call(USNode function, std::vector<USNode> arguments);
 
     bool equals(const SNode& o) const override {
         auto& other = (const Call&) o;

@@ -10,7 +10,7 @@
 
 USemanticInfo Checker::visit_call(ast::Call& n, bool is_rvalue) {
     SemanticInfo retv;
-    sem::SNode* snode = new sem::Call(nullptr, std::vector<sem::SNode*>());
+    sem::SNode* snode = new sem::Call(nullptr, std::vector<USNode>());
     retv.snode = snode;
     // Logger::info("Checking CallNode");
     bool old_is_call = this->is_call;
@@ -28,7 +28,7 @@ USemanticInfo Checker::visit_call(ast::Call& n, bool is_rvalue) {
     // Node* object_node;
 
     sem::Call* callsn = (sem::Call*) snode;
-    callsn->function = fun_info.snode;
+    callsn->function = USNode(fun_info.snode);
     FunctionType* function_type = nullptr;
     if (fun_info.entity.get().type == E_TYPE::CONST_FUNCTION) {
         function_type = ((EntityConstFunction&) fun_info.entity.get()).const_function->ft->clone();

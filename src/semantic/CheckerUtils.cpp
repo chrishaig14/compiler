@@ -128,8 +128,11 @@ sem::SNode* make_union_wrapper(int type_index, sem::SNode* expression) {
 
 
 sem::SNode* make_boolop_snode(ConstFunction* operator_fun, SemanticInfo& left_info, SemanticInfo& right_info) {
-    auto* function_id = new sem::Id(operator_fun->path.as_str());
-    auto* sn = new sem::Call(function_id, {left_info.snode, right_info.snode});
+    auto function_id = std::make_unique<sem::Id>(operator_fun->path.as_str());
+    std::vector<USNode> v;
+    v.emplace_back(USNode(left_info.snode));
+    v.emplace_back(USNode(right_info.snode));
+    auto* sn = new sem::Call(std::move(function_id), std::move(v));
     return sn;
 }
 

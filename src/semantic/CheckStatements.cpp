@@ -56,8 +56,11 @@ USemanticInfo Checker::visit_lvalue_subscript(ast::Subscript& node) {
     this->fill_value(*value);
     info.entity = *new EntityValue(std::move(value));
 
-    auto* fsn = new sem::Id(sub_fun_path);
-    auto* csn = new sem::Call(fsn, {parent_p->snode, child_snode});
+    auto fsn = std::make_unique<sem::Id>(sub_fun_path);
+    std::vector<USNode> v;
+    v.push_back(USNode(parent_p->snode));
+    v.push_back(USNode(child_snode));
+    auto* csn = new sem::Call(std::move(fsn), std::move(v));
     info.snode = csn;
     return info_u;
 }
@@ -136,8 +139,8 @@ USemanticInfo Checker::visit_assignment(ast::Assignment& n) {
 
     if (l_entity_value.type == E_TYPE::VALUE && expression_info_p->entity.get().type == E_TYPE::VALUE) {
         sem::SNode* rvalue_snode = this->make_rvalue(expression_info_p->entity,
-                                                expression_info_p->snode,
-                                                *l_entity_value.value->type);
+                                                     expression_info_p->snode,
+                                                     *l_entity_value.value->type);
         if (rvalue_snode == nullptr) {
             this->error_reporter.error(ErrorTypeMismatch(l_type, *n.rvalue, expression_info_p->entity));
             return error_stub();
@@ -149,7 +152,7 @@ USemanticInfo Checker::visit_assignment(ast::Assignment& n) {
     SemanticInfo& info = *info_u;
     if (is_subscript) {
         info.snode = linfo_p->snode;
-        csn->arguments.push_back(expression_info_p->snode);
+        csn->arguments.push_back(USNode(expression_info_p->snode));
     } else {
         auto lu = USNode(linfo_p->snode);
         auto eu = USNode(expression_info_p->snode);
@@ -320,17 +323,19 @@ USemanticInfo Checker::visit_for(ast::For& node) {
     auto* increment_index_sn = new sem::Assignment(std::move(lu), std::move(eu));
     this->update_loop_index_snode = increment_index_sn;
     increment_index_sn->lvalue = std::make_unique<sem::Id>(loop_index_var_id);
-    auto inc_exp_node = std::make_unique<sem::Call>(new sem::Id("core.core.Integer.__add__"),
-                                                    std::vector<sem::SNode*>{new sem::Id(loop_index_var_id)});
-    auto* one_node = new sem::Integer(std::string());
+    std::vector<USNode> vv;
+    vv.push_back(std::make_unique<sem::Id>(loop_index_var_id));
+    auto inc_exp_node = std::make_unique<sem::Call>(std::make_unique<sem::Id>("core.core.Integer.__add__"),
+                                                    std::move(vv));
+    auto one_node = std::make_unique<sem::Integer>(std::string());
     one_node->str = "1";
-    inc_exp_node->arguments.push_back(one_node);
+    inc_exp_node->arguments.push_back(std::move(one_node));
     increment_index_sn->rvalue = std::move(inc_exp_node);
 
     this->scope->is_loop = true;
     USemanticInfo binfo = this->visit_block(*node.body);
     this->scope->is_loop = false;
-    sem:: Block* bn = (sem::Block*) binfo->snode;
+    sem::Block* bn = (sem::Block*) binfo->snode;
     for (auto local_var : this->scope->table) {
         if (local_var.second->type == E_TYPE::VALUE) {
             bn->locals.push_back(local_var.first);
@@ -402,7 +407,7 @@ USemanticInfo Checker::visit_if(ast::If& n) {
 
     this->enter_scope("if");
     USemanticInfo body_info = this->visit_block(*n.then);
-    sem:: Block* bn = (sem::Block*) body_info->snode;
+    sem::Block* bn = (sem::Block*) body_info->snode;
     for (const auto& local_var : this->scope->table) {
         bn->locals.push_back(local_var.first);
     }

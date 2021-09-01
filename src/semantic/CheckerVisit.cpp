@@ -20,25 +20,32 @@ make_for_snode(ast::For& node, USemanticInfo& binfo, USemanticInfo& exp_info_p, 
 
     bbn->nodes.push_back(lidx_decl);
 
-    auto* list_len_fn = new sem::Id("core.core.List.len");
-    auto* list_sn = new sem::Id(loop_list_var_id);
-    USNode call_list_len_sn = std::make_unique<sem::Call>(list_len_fn, std::vector<sem::SNode*>{list_sn});
+    auto list_len_fn = std::make_unique<sem::Id>("core.core.List.len");
+    auto list_sn = std::make_unique<sem::Id>(loop_list_var_id);
+    std::vector<USNode> v;
+    v.emplace_back(std::move(list_sn));
+    USNode call_list_len_sn = std::make_unique<sem::Call>(std::move(list_len_fn), std::move(v));
     auto* lensn = new sem::Declaration(loop_list_len_var_id, std::move(call_list_len_sn));
     bbn->nodes.push_back(lensn);
 
 
-    auto* idxsn = new sem::Id(loop_index_var_id);
-    auto* cmpfunsn = new sem::Id("core.core.Integer.__lt__");
+    auto idxsn = std::make_unique<sem::Id>(loop_index_var_id);
+    auto cmpfunsn = std::make_unique<sem::Id>("core.core.Integer.__lt__");
 
-    auto* llensn = new sem::Id(loop_list_len_var_id);
+    auto llensn = std::make_unique<sem::Id>(loop_list_len_var_id);
 
 
-    auto cn = std::make_unique<sem::Call>(cmpfunsn, std::vector<sem::SNode*>{idxsn, llensn});
+    std::vector<USNode> vv;
+    vv.push_back(std::move(idxsn));
+    vv.push_back(std::move(llensn));
+    auto cn = std::make_unique<sem::Call>(std::move(cmpfunsn), std::move(vv));
 
     auto* bn = (sem::Block*) (binfo->snode);
 
-    auto* list_subscript_n = new sem::Call(new sem::Id("core.core.List.__get_item__"),
-                                           {new sem::Id(loop_list_var_id), new sem::Id(loop_index_var_id)});
+    std::vector<USNode> vvv;
+    vvv.push_back(std::make_unique<sem::Id>(loop_list_var_id));
+    vvv.push_back(std::make_unique<sem::Id>(loop_index_var_id));
+    auto* list_subscript_n = new sem::Call(std::make_unique<sem::Id>("core.core.List.__get_item__"), std::move(vvv));
 
     USNode ul(list_subscript_n);
     auto* loop_elem_sn = new sem::Declaration(node.var, std::move(ul));
