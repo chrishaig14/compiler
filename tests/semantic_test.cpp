@@ -248,6 +248,27 @@ TEST_CASE("semantic_output_const_function_call", "[checker]") {
     REQUIRE(*(*(std::unique_ptr<sem::FunctionDef>&) info->snode).body->nodes[0] == exp);
 }
 
+TEST_CASE("semantic_output_while", "[checker]") {
+    std::string code = "fun foo()->Integer{while true {var x = 1;} return 0;}";
+
+    Compiler c = c_analyze(code);
+    Module& module = *c.root_package->units["tmp"].module;
+    analyze_module_result(module, *c.top_package);
+    analyze_module_result(module, *c.top_package);
+    for (auto& e: module.flirpins) {
+        std::cout << e.first << std::endl;
+    }
+    Checker checker(*c.top_package, module);
+    checker.init();
+    USemanticInfo info = checker.visit_function((ast::Function&) *module.ast->nodes[0]);
+    REQUIRE(not checker.error_reporter.failed);
+    std::vector<USNode> e;
+    auto* block = new sem::Block();
+    block->nodes = std::vector<sem::SNode*>{new sem::Declaration("x", std::make_unique<sem::Integer>("1"))};
+    auto exp = sem::While(std::make_unique<sem::Bool>(true), block);
+    REQUIRE(*(*(std::unique_ptr<sem::FunctionDef>&) info->snode).body->nodes[0] == exp);
+}
+
 
 TEST_CASE("semantic_output_float_literal", "[checker]") {
     std::string code = "fun foo()->Integer{var x = 9.5;return 0;}";
@@ -400,20 +421,6 @@ TEST_CASE("semantic_output_union_ok_1", "[checker]") {
 
 TEST_CASE("semantic_output_union_ok_2", "[checker]") {
     std::string code = "fun foo()->Integer{var x : Union[Integer, String] = \"String\";return 0;}";
-
-    Compiler c = c_analyze(code);
-    Module& module = *c.root_package->units["tmp"].module;
-    analyze_module_result(module, *c.top_package);
-    Checker checker(*c.top_package, module);
-    checker.init();
-    checker.visit_root(*module.ast);
-
-    REQUIRE(!checker.error_reporter.failed);
-    REQUIRE(checker.error_reporter.errors.empty());
-}
-
-TEST_CASE("semantic_output_while", "[checker]") {
-    std::string code = "fun foo()->Integer{while true {var x = 1;}return 0;}";
 
     Compiler c = c_analyze(code);
     Module& module = *c.root_package->units["tmp"].module;

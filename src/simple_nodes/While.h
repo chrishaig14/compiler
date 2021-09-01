@@ -18,7 +18,9 @@ public:
 
     bool equals(const SNode& o) const override {
         auto& other = (const While&) o;
-        return *this->condition == *other.condition && *this->body == *other.body;
+        bool cond_ok = *this->condition == *other.condition;
+        bool body_ok = *this->body == *other.body;
+        return cond_ok && body_ok;
     }
 
 };
