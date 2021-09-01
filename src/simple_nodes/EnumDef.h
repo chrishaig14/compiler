@@ -12,14 +12,16 @@
 
 class sem::EnumDef : public sem::SNode {
 public:
-    EnumDef();
+    EnumDef(const std::string& id, VectorOfStrings values);
 
     std::string id;
     VectorOfStrings values;
 
     bool equals(const SNode& o) const override {
         auto& other = (const EnumDef&) o;
-        return this->id == other.id && this->values == other.values;
+        bool id_ok = this->id == other.id;
+        bool values_ok = this->values == other.values;
+        return id_ok && values_ok;
     }
 };
 

@@ -6,5 +6,7 @@
 
 using namespace sem;
 
-EnumDef::EnumDef() : SNode(SNodeType::ENUM) {
+EnumDef::EnumDef(const std::string& id, VectorOfStrings values) : SNode(SNodeType::ENUM) {
+    this->id = id;
+    this->values = values;
 }

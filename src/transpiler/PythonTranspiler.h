@@ -1,9 +1,9 @@
 //
-// Created by chris on 4/4/21.
+// Created by chris on 31/8/21.
 //
 
-#ifndef XLANG_STRANSPILER_H
-#define XLANG_STRANSPILER_H
+#ifndef XLANG_PYTHONTRANSPILER_H
+#define XLANG_PYTHONTRANSPILER_H
 
 #include "../simple_nodes/Block.h"
 #include "../simple_nodes/FunctionDef.h"
@@ -53,19 +53,16 @@ const std::string RETURN = "return";
 const std::string CLASS = "class";
 const std::string RETURN_VAR = "__return__";
 
-
-#define GASSIGN(exp, new_value) "GC::assign(" exp, new_value ")"
-
-class CppOutputCode {
+class PythonOutputCode {
 public:
-    CppOutputCode(const std::string& pre_code, const std::string& code);
+    PythonOutputCode(const std::string& pre_code, const std::string& code);
 public:
     std::string pre_code;
     std::string code;
-
 };
 
-class STranspiler {
+
+class PythonTranspiler {
 
 public:
     std::string source;
@@ -73,20 +70,20 @@ public:
     std::string static_initializations;
     std::string static_cleanups;
 
-    CppOutputCode transpile_integer(sem::Integer& node);
+    PythonOutputCode transpile_integer(const sem::Integer& node);
 
-    void transpile_function(sem::FunctionDef& node);
+    PythonOutputCode transpile_function(const sem::FunctionDef& node);
 
-    CppOutputCode transpile_declaration(sem::Declaration& node);
+    PythonOutputCode transpile_declaration(sem::Declaration& node);
 
-    CppOutputCode transpile_assignment(sem::Assignment& node);
-    CppOutputCode transpile_block(sem::Block& node);
+    PythonOutputCode transpile_assignment(const sem::Assignment& node);
+    PythonOutputCode transpile_block(sem::Block& node);
     void transpile_program(sem::Block& node);
-    CppOutputCode transpile_id(sem::Id& node);
+    PythonOutputCode transpile_id(sem::Id& node);
 
-    CppOutputCode transpile_new(sem::NewObject& node);
+    PythonOutputCode transpile_new(sem::NewObject& node);
 
-    CppOutputCode transpile_return(sem::Return& node);
+    PythonOutputCode transpile_return(sem::Return& node);
 
     void transpile_class(sem::KlassDef& node);
     void transpile_enum(sem::EnumDef& node);
@@ -107,38 +104,38 @@ public:
         }
     }
 
-    CppOutputCode transpile_call(sem::Call& node);
+    PythonOutputCode transpile_call(sem::Call& node);
 
-    CppOutputCode transpile_string(sem::String& node);
+    PythonOutputCode transpile_string(const sem::String& node);
 
-    CppOutputCode transpile_boolean(sem::Bool& pNode);
+    PythonOutputCode transpile_boolean(const sem::Bool& node);
 
-    CppOutputCode transpile_float(sem::Float& node);
+    PythonOutputCode transpile_float(sem::Float& node);
 
-    CppOutputCode transpile_object_member(sem::ObjectMember& node);
+    PythonOutputCode transpile_object_member(sem::ObjectMember& node);
 
-    CppOutputCode transpile_while(sem::While& node);
+    PythonOutputCode transpile_while(const sem::While& node);
 
-    CppOutputCode transpile_list(sem::List& node);
+    PythonOutputCode transpile_list(sem::List& node);
 
-    CppOutputCode transpile_if(sem::IfSNode& node);
+    PythonOutputCode transpile_if(const sem::IfSNode& node);
 
-    CppOutputCode transpile_break(sem::Break& node);
+    PythonOutputCode transpile_break(sem::Break& node);
 
-    CppOutputCode transpile_continue(sem::Continue& node);
+    PythonOutputCode transpile_continue(sem::Continue& node);
 
-    CppOutputCode transpile_match(sem::Match& node);
+    PythonOutputCode transpile_match(sem::Match& node);
 
-    CppOutputCode transpile_enum_member(sem::EnumMember& node);
+    PythonOutputCode transpile_enum_member(sem::EnumMember& node);
 
-    CppOutputCode transpile_ternary(sem::Ternary& node);
+    PythonOutputCode transpile_ternary(sem::Ternary& node);
 
-    CppOutputCode transpile_none(sem::None& node);
+    PythonOutputCode transpile_none(sem::None& node);
 
-    CppOutputCode transpile_dict(sem::Dict& node);
-    CppOutputCode transpile_try_catch(sem::TryCatch& node);
+    PythonOutputCode transpile_dict(sem::Dict& node);
+    PythonOutputCode transpile_try_catch(sem::TryCatch& node);
 
-    CppOutputCode dispatch(sem::SNode& node) {
+    PythonOutputCode dispatch(sem::SNode& node) {
         switch (node.type) {
             case SNodeType::BLOCK:
                 return this->transpile_block((sem::Block&) node);
@@ -195,9 +192,9 @@ public:
         }
     }
 
-    CppOutputCode transpile_throw(sem::Throw& node);
+    PythonOutputCode transpile_throw(sem::Throw& node);
     bool in_try_catch;
 };
 
 
-#endif //XLANG_STRANSPILER_H
+#endif //XLANG_PYTHONTRANSPILER_H

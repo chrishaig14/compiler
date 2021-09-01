@@ -153,7 +153,7 @@ USemanticInfo Checker::visit_assignment(ast::Assignment& n) {
     } else {
         auto lu = USNode(linfo_p->snode);
         auto eu = USNode(expression_info_p->snode);
-        info.snode = new sem::Assignment(lu, eu);
+        info.snode = new sem::Assignment(std::move(lu), std::move(eu));
     }
 
     return info_u;
@@ -317,7 +317,7 @@ USemanticInfo Checker::visit_for(ast::For& node) {
 
     USNode lu;
     USNode eu;
-    auto* increment_index_sn = new sem::Assignment(lu, eu);
+    auto* increment_index_sn = new sem::Assignment(std::move(lu), std::move(eu));
     this->update_loop_index_snode = increment_index_sn;
     increment_index_sn->lvalue = std::make_unique<sem::Id>(loop_index_var_id);
     auto inc_exp_node = std::make_unique<sem::Call>(new sem::Id("core.core.Integer.__add__"),

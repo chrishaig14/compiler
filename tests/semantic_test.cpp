@@ -447,16 +447,19 @@ TEST_CASE("semantic_output_if", "[checker]") {
     REQUIRE(checker.error_reporter.errors.empty());
 }
 
-TEST_CASE("semantic_output_enum", "[checker]") {
-    std::string code = "enum Foo {a, c}\n fun foo()->Integer{var x = Foo.a; var y = Foo.c; return 0;}";
+TEST_CASE("semantic_output_enum_def", "[checker]") {
+    std::string code = "enum Foo {a, c}\n";
 
     Compiler c = c_analyze(code);
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
     Checker checker(*c.top_package, module);
     checker.init();
-    checker.visit_root(*module.ast);
+    USemanticInfo info = checker.visit_root(*module.ast);
 
     REQUIRE(!checker.error_reporter.failed);
     REQUIRE(checker.error_reporter.errors.empty());
+
+    REQUIRE(*(((sem::Block*) info->snode)->nodes[0]) == sem::EnumDef("test.tmp.Foo", {"a", "c"}));
+
 }

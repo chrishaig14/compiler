@@ -53,10 +53,8 @@ make_for_snode(ast::For& node, USemanticInfo& binfo, USemanticInfo& exp_info_p, 
 USemanticInfo Checker::visit_enum(ast::EnumNode& p_node) {
     USemanticInfo info_u = std::make_unique<SemanticInfo>();
     SemanticInfo& info = *info_u;
-    auto* esn = new sem::EnumDef();
     Enum* enumm = ((EntityEnum&) this->scope->get(p_node.id)).enumm;
-    esn->id = enumm->path.as_str();
-    esn->values = p_node.values;
+    auto* esn = new sem::EnumDef(enumm->path.as_str(), p_node.values);
     info.snode = esn;
     return info_u;
 }
