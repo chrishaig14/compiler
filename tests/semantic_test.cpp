@@ -167,7 +167,10 @@ TEST_CASE("semantic_output_object_member", "[checker]") {
     USemanticInfo info = checker.visit_function((ast::Function&) *module.ast->nodes[1]);
     REQUIRE(not checker.error_reporter.failed);
     std::vector<USNode> e;
-    auto exp = sem::Declaration("x", std::make_unique<sem::ObjectMember>(std::make_unique<sem::Id>("f"), Path("test.tmp.Foo"), "bar"));
+    auto exp = sem::Declaration("x",
+                                std::make_unique<sem::ObjectMember>(std::make_unique<sem::Id>("f"),
+                                                                    Path("test.tmp.Foo"),
+                                                                    "bar"));
     REQUIRE(*(*(std::unique_ptr<sem::FunctionDef>&) info->snode).body->nodes[0] == exp);
 }
 
@@ -181,7 +184,11 @@ TEST_CASE("semantic_output_object_method_call", "[checker]") {
     USemanticInfo info = checker.visit_function((ast::Function&) *module.ast->nodes[1]);
     REQUIRE(not checker.error_reporter.failed);
     std::vector<USNode> e;
-    auto exp = sem::Declaration("x", std::make_unique<sem::ObjectMethodCall>(std::make_unique<sem::Id>("f"), Path("test.tmp.Foo"), "get_foo", std::vector<USNode>()));
+    auto exp = sem::Declaration("x",
+                                std::make_unique<sem::ObjectMethodCall>(std::make_unique<sem::Id>("f"),
+                                                                        Path("test.tmp.Foo"),
+                                                                        "get_foo",
+                                                                        std::vector<USNode>()));
     REQUIRE(*(*(std::unique_ptr<sem::FunctionDef>&) info->snode).body->nodes[0] == exp);
 }
 
@@ -195,7 +202,49 @@ TEST_CASE("semantic_output_object_method", "[checker]") {
     USemanticInfo info = checker.visit_function((ast::Function&) *module.ast->nodes[1]);
     REQUIRE(not checker.error_reporter.failed);
     std::vector<USNode> e;
-    auto exp = sem::Declaration("x", std::make_unique<sem::ObjectMethod>(std::make_unique<sem::Id>("f"), Path("test.tmp.Foo"), "get_foo"));
+    auto exp = sem::Declaration("x",
+                                std::make_unique<sem::ObjectMethod>(std::make_unique<sem::Id>("f"),
+                                                                    Path("test.tmp.Foo"),
+                                                                    "get_foo"));
+    REQUIRE(*(*(std::unique_ptr<sem::FunctionDef>&) info->snode).body->nodes[0] == exp);
+}
+
+TEST_CASE("semantic_output_assign_const_function", "[checker]") {
+    std::string code = "fun bar()->Integer{return 0;} fun foo()->Integer{var x = bar;return 0;}";
+
+    Compiler c = c_analyze(code);
+    Module& module = *c.root_package->units["tmp"].module;
+    analyze_module_result(module, *c.top_package);
+    analyze_module_result(module, *c.top_package);
+    for (auto& e: module.flirpins) {
+        std::cout << e.first << std::endl;
+    }
+    Checker checker(*c.top_package, module);
+    checker.init();
+    USemanticInfo info = checker.visit_function((ast::Function&) *module.ast->nodes[1]);
+    REQUIRE(not checker.error_reporter.failed);
+    std::vector<USNode> e;
+    auto exp = sem::Declaration("x", std::make_unique<sem::ConstFunction>(Path("test.tmp.bar")));
+    REQUIRE(*(*(std::unique_ptr<sem::FunctionDef>&) info->snode).body->nodes[0] == exp);
+}
+
+TEST_CASE("semantic_output_const_function_call", "[checker]") {
+    std::string code = "fun bar()->Integer{return 0;} fun foo()->Integer{var x = bar();return 0;}";
+
+    Compiler c = c_analyze(code);
+    Module& module = *c.root_package->units["tmp"].module;
+    analyze_module_result(module, *c.top_package);
+    analyze_module_result(module, *c.top_package);
+    for (auto& e: module.flirpins) {
+        std::cout << e.first << std::endl;
+    }
+    Checker checker(*c.top_package, module);
+    checker.init();
+    USemanticInfo info = checker.visit_function((ast::Function&) *module.ast->nodes[1]);
+    REQUIRE(not checker.error_reporter.failed);
+    std::vector<USNode> e;
+    auto exp = sem::Declaration("x",
+                                std::make_unique<sem::ConstFunctionCall>(Path("test.tmp.bar"), std::vector<USNode>{}));
     REQUIRE(*(*(std::unique_ptr<sem::FunctionDef>&) info->snode).body->nodes[0] == exp);
 }
 

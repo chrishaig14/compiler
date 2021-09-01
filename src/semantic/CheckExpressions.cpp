@@ -34,10 +34,16 @@ USemanticInfo Checker::visit_id(ast::Id& n) {
         this->scope->set(n._id, new EntityError());
         return error_stub();
     }
-    std::string id =
-            entity.type == E_TYPE::CONST_FUNCTION ? ((EntityConstFunction&) entity).const_function->path.as_str()
-                                                  : n._id;
-    auto* sn = new sem::Id(id);
+    // std::string id =
+    //         entity.type == E_TYPE::CONST_FUNCTION ? ((EntityConstFunction&) entity).const_function->path.as_str()
+    //                                               : n._id;
+    sem::SNode* sn;
+    if (entity.type == E_TYPE::CONST_FUNCTION) {
+        sn = new sem::ConstFunction(((EntityConstFunction&) entity).const_function->path);
+    } else {
+        std::string id = n._id;
+        sn = new sem::Id(id);
+    }
     USemanticInfo info_u = std::make_unique<SemanticInfo>();
     SemanticInfo& info = *info_u;
     info.entity = entity;
@@ -295,7 +301,7 @@ USemanticInfo Checker::visit_subscript(ast::Subscript& node) {
     if (child_sinfo->is_error()) {
         return error_stub();
     }
-    sem:: SNode* child_snode = child_sinfo->snode;
+    sem::SNode* child_snode = child_sinfo->snode;
 
     USemanticInfo info_u = std::make_unique<SemanticInfo>();
     SemanticInfo& info = *info_u;

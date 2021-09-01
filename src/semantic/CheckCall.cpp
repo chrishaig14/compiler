@@ -68,6 +68,16 @@ USemanticInfo Checker::visit_call(ast::Call& n, bool is_rvalue) {
         snode = new sem::ObjectMethodCall(std::move(om->object), om->class_path, om->method_name, std::move(args));
         retv.snode = snode;
     }
+
+    if (fun_info_p->snode->type == SNodeType::CONST_FUNCTION) {
+        auto& om = (std::unique_ptr<sem::ConstFunction>&) fun_info_p->snode;
+        std::vector<USNode> args;
+        for (auto* s: arguments) {
+            args.push_back(USNode(s));
+        }
+        snode = new sem::ConstFunctionCall(om->path, std::move(args));
+        retv.snode = snode;
+    }
     /*
     if (function_type->is_generic()) {
         // mangle the generic types in function_type to prevent collisions
