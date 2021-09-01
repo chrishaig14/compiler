@@ -10,9 +10,6 @@
 
 USemanticInfo Checker::visit_call(ast::Call& n, bool is_rvalue) {
     SemanticInfo retv;
-    sem::SNode* snode = new sem::Call(nullptr, std::vector<USNode>());
-    retv.snode = snode;
-    // Logger::info("Checking CallNode");
     bool old_is_call = this->is_call;
     this->is_call = true;
     USemanticInfo fun_info_p = this->dispatch(*n.function);
@@ -27,8 +24,6 @@ USemanticInfo Checker::visit_call(ast::Call& n, bool is_rvalue) {
     // bool is_a_method = false;
     // Node* object_node;
 
-    sem::Call* callsn = (sem::Call*) snode;
-    callsn->function = USNode(fun_info.snode);
     FunctionType* function_type = nullptr;
     if (fun_info.entity.get().type == E_TYPE::CONST_FUNCTION) {
         function_type = ((EntityConstFunction&) fun_info.entity.get()).const_function->ft->clone();
@@ -65,8 +60,7 @@ USemanticInfo Checker::visit_call(ast::Call& n, bool is_rvalue) {
         for (auto* s: arguments) {
             args.push_back(USNode(s));
         }
-        snode = new sem::ObjectMethodCall(std::move(om->object), om->class_path, om->method_name, std::move(args));
-        retv.snode = snode;
+        retv.snode = new sem::ObjectMethodCall(std::move(om->object), om->class_path, om->method_name, std::move(args));
     }
 
     if (fun_info_p->snode->type == SNodeType::CONST_FUNCTION) {
@@ -75,8 +69,7 @@ USemanticInfo Checker::visit_call(ast::Call& n, bool is_rvalue) {
         for (auto* s: arguments) {
             args.push_back(USNode(s));
         }
-        snode = new sem::ConstFunctionCall(om->path, std::move(args));
-        retv.snode = snode;
+        retv.snode = new sem::ConstFunctionCall(om->path, std::move(args));
     }
     /*
     if (function_type->is_generic()) {
