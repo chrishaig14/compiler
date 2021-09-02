@@ -3,8 +3,8 @@
 //
 
 #include "CheckLiterals.h"
-#include "../simple_nodes/None.h"
-#include "../simple_nodes/Dict.h"
+#include "../simple_nodes/with_unique/None.h"
+#include "../simple_nodes/with_unique/Dict.h"
 #include "errors/ErrorExpectedExpression.h"
 #include "errors/ErrorListLiteral.h"
 #include "errors/ErrorPartialWrongNumArgs.h"

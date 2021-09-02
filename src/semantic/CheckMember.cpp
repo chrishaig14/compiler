@@ -5,9 +5,9 @@
 #include <cassert>
 #include "CheckMember.h"
 #include "../ast/ObjectType.h"
-#include "../simple_nodes/ObjectMember.h"
-#include "../simple_nodes/ObjectMethodCall.h"
-#include "../simple_nodes/ObjectMethod.h"
+#include "../simple_nodes/with_unique/ObjectMember.h"
+#include "../simple_nodes/with_unique/ObjectMethodCall.h"
+#include "../simple_nodes/with_unique/ObjectMethod.h"
 #include "errors/ErrorNoMember.h"
 #include "errors/ErrorNoMemberSuggestions.h"
 #include "errors/ErrorClassNoMember.h"

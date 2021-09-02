@@ -6,7 +6,7 @@
 #define XLANG_NONE_H
 
 
-#include "SNode.h"
+#include "../SNode.h"
 
 class sem::None : public sem::SNode {
 public:

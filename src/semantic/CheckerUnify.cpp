@@ -3,12 +3,12 @@
 //
 
 #include "Checker.h"
-#include "../simple_nodes/Id.h"
-#include "../simple_nodes/ObjectMember.h"
+#include "../simple_nodes/with_unique/Id.h"
+#include "../simple_nodes/with_unique/ObjectMember.h"
 #include "../simple_nodes/Match.h"
 #include "../simple_nodes/NewObject.h"
 #include "../units/FunctionValue.h"
-#include "../simple_nodes/EnumMember.h"
+#include "../simple_nodes/with_unique/EnumMember.h"
 #include "errors/ErrorFunctionCallNumArgs.h"
 #include "errors/ErrorEnumNoValue.h"
 

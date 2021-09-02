@@ -6,7 +6,7 @@
 #define XLANG_ID_H
 
 #include <string>
-#include "SNode.h"
+#include "../SNode.h"
 
 class sem::Id : public sem::SNode {
 public:

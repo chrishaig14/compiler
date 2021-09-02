@@ -7,7 +7,7 @@
 
 
 #include <vector>
-#include "SNode.h"
+#include "../SNode.h"
 #include <cassert>
 
 class sem::List : public sem::SNode {

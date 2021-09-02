@@ -6,9 +6,9 @@
 #define XLANG_OBJECTMETHOD_H
 
 #include <string>
-#include "SNode.h"
-#include "../ast/TypeNode.h"
-#include "../ast/Path.h"
+#include "../SNode.h"
+#include "../../ast/TypeNode.h"
+#include "../../ast/Path.h"
 
 class sem::ObjectMethod : public sem::SNode {
 public:

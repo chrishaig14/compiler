@@ -7,7 +7,7 @@
 
 
 #include <string>
-#include "SNode.h"
+#include "../SNode.h"
 
 class sem::String : public sem::SNode {
 public:

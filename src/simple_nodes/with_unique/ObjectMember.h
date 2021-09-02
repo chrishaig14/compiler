@@ -7,9 +7,9 @@
 
 
 #include <string>
-#include "SNode.h"
-#include "../ast/TypeNode.h"
-#include "../ast/Path.h"
+#include "../SNode.h"
+#include "../../ast/TypeNode.h"
+#include "../../ast/Path.h"
 
 class sem::ObjectMember : public sem::SNode {
 public:

@@ -6,60 +6,60 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -g -O0 -Wall -pedantic -Werror")
 
 add_library(
         simple_nodes
-        Assignment.cpp
-        Assignment.h
+        with_unique/Assignment.cpp
+        with_unique/Assignment.h
         Block.cpp
         Block.h
-        Bool.cpp
-        Bool.h
-        Break.cpp
-        Break.h
-        Call.cpp
-        Call.h
+        with_unique/Bool.cpp
+        with_unique/Bool.h
+        with_unique/Break.cpp
+        with_unique/Break.h
+        with_unique/Call.cpp
+        with_unique/Call.h
         KlassDef.cpp
         KlassDef.h
-        Continue.cpp
-        Continue.h
+        with_unique/Continue.cpp
+        with_unique/Continue.h
         Declaration.cpp
         Declaration.h
-        Dict.cpp
-        Dict.h
-        EnumMember.cpp
-        EnumMember.h
-        EnumDef.cpp
-        EnumDef.h
-        Float.cpp
-        Float.h
+        with_unique/Dict.cpp
+        with_unique/Dict.h
+        with_unique/EnumMember.cpp
+        with_unique/EnumMember.h
+        with_unique/EnumDef.cpp
+        with_unique/EnumDef.h
+        with_unique/Float.cpp
+        with_unique/Float.h
         FunctionDef.cpp
         FunctionDef.cpp
         FunctionDef.h
         FunctionDef.h
-        Id.cpp
-        Id.h
+        with_unique/Id.cpp
+        with_unique/Id.h
         IfSNode.cpp
         IfSNode.h
-        Integer.cpp
-        Integer.h
-        List.cpp
-        List.h
+        with_unique/Integer.cpp
+        with_unique/Integer.h
+        with_unique/List.cpp
+        with_unique/List.h
         Match.cpp
         Match.h
         NewObject.cpp
         NewObject.h
-        None.cpp
-        None.h
-        ObjectMember.cpp
-        ObjectMember.h
-        Return.cpp
-        Return.h
+        with_unique/None.cpp
+        with_unique/None.h
+        with_unique/ObjectMember.cpp
+        with_unique/ObjectMember.h
+        with_unique/Return.cpp
+        with_unique/Return.h
         SNode.cpp
         SNode.h
-        String.cpp
-        String.h
+        with_unique/String.cpp
+        with_unique/String.h
         Ternary.cpp
         Ternary.h
         Throw.cpp
         Throw.h
         TryCatch.cpp
         TryCatch.h
-        While.cpp sem.h ObjectMethodCall.cpp ObjectMethodCall.h ObjectMethod.cpp ObjectMethod.h ConstFunctionCall.cpp ConstFunctionCall.h ConstFunction.cpp ConstFunction.h)
+        While.cpp sem.h with_unique/ObjectMethodCall.cpp with_unique/ObjectMethodCall.h with_unique/ObjectMethod.cpp with_unique/ObjectMethod.h with_unique/ConstFunctionCall.cpp with_unique/ConstFunctionCall.h with_unique/ConstFunction.cpp with_unique/ConstFunction.h)

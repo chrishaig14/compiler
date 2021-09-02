@@ -6,9 +6,9 @@
 #define XLANG_OBJECTMETHODCALL_H
 
 #include <string>
-#include "SNode.h"
-#include "../ast/TypeNode.h"
-#include "../ast/Path.h"
+#include "../SNode.h"
+#include "../../ast/TypeNode.h"
+#include "../../ast/Path.h"
 
 class sem::ObjectMethodCall : public sem::SNode {
 public:

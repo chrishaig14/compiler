@@ -6,7 +6,7 @@
 #define XLANG_CONTINUE_H
 
 
-#include "SNode.h"
+#include "../SNode.h"
 #include <vector>
 #include <string>
 
