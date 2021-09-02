@@ -6,5 +6,5 @@
 
 using namespace sem;
 
-While::While(USNode condition, Block* body) : SNode(SNodeType::WHILE), condition(std::move(condition)), body(body) {
+While::While(USNode condition, std::unique_ptr<Block> body) : SNode(SNodeType::WHILE), condition(std::move(condition)), body(std::move(body)) {
 }

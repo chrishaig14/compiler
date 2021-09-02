@@ -40,7 +40,7 @@ make_for_snode(ast::For& node, USemanticInfo& binfo, USemanticInfo& exp_info_p, 
     vv.push_back(std::move(llensn));
     auto cn = std::make_unique<sem::Call>(std::move(cmpfunsn), std::move(vv));
 
-    auto* bn = (sem::Block*) (binfo->snode);
+    auto& bn = (std::unique_ptr<sem::Block>&) (binfo->snode);
 
     std::vector<USNode> vvv;
     vvv.push_back(std::make_unique<sem::Id>(loop_list_var_id));
@@ -52,7 +52,7 @@ make_for_snode(ast::For& node, USemanticInfo& binfo, USemanticInfo& exp_info_p, 
     bn->nodes.insert(bn->nodes.begin(), std::move(loop_elem_sn));
 
     bn->nodes.push_back(USNode(update_loop_index_snode));
-    auto wsn = std::make_unique<sem::While>(std::move(cn), bn);
+    auto wsn = std::make_unique<sem::While>(std::move(cn), std::move(bn));
     bbn->nodes.push_back(std::move(wsn));
     return bbn;
 }

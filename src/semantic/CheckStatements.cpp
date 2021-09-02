@@ -390,7 +390,8 @@ USemanticInfo Checker::visit_while(ast::While& node) {
     }
     this->leave_scope();
 
-    auto* while_sn = new sem::While(std::move(condition_snode), (sem::Block*) body_info_p->snode);
+    auto* while_sn = new sem::While(std::move(condition_snode),
+                                    std::move((std::unique_ptr<sem::Block>&) body_info_p->snode));
 
     USemanticInfo info_u = std::make_unique<SemanticInfo>();
     SemanticInfo& info = *info_u;
@@ -441,6 +442,9 @@ USemanticInfo Checker::visit_if(ast::If& n) {
 
     USemanticInfo info_u = std::make_unique<SemanticInfo>();
     SemanticInfo& info = *info_u;
-    info.snode = new sem::IfSNode(condition_snode, (sem::Block*) body_info->snode, elifs, (sem::Block*) else_snode);
+    info.snode = new sem::IfSNode(condition_snode,
+                                  std::move((std::unique_ptr<sem::Block>&) body_info->snode),
+                                  elifs,
+                                  (sem::Block*) else_snode);
     return info_u;
 }

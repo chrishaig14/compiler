@@ -12,9 +12,9 @@
 class sem::While : public sem::SNode {
 public:
     USNode condition;
-    Block* body;
+    std::unique_ptr<Block> body;
 
-    While(USNode condition, Block* body);
+    While(USNode condition, std::unique_ptr<Block> body);
 
     bool equals(const SNode& o) const override {
         auto& other = (const While&) o;
