@@ -13,11 +13,11 @@ class sem::IfSNode : public sem::SNode {
 public:
     USNode condition;
     std::unique_ptr<Block> then;
-    Block* _else;
+    std::unique_ptr<Block> _else;
     std::vector<std::pair<USNode, std::unique_ptr<Block>>> elifs;
 
     IfSNode(USNode condition, std::unique_ptr<Block> then, std::vector<std::pair<USNode, std::unique_ptr<Block>>> elifs,
-            Block* _else);
+            std::unique_ptr<Block> _else);
 
     bool equals(const SNode& o) const override {
         auto& other = (const IfSNode&) o;
