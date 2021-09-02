@@ -442,7 +442,7 @@ USemanticInfo Checker::visit_if(ast::If& n) {
 
     USemanticInfo info_u = std::make_unique<SemanticInfo>();
     SemanticInfo& info = *info_u;
-    info.snode = std::make_unique<sem::IfSNode>(condition_snode.release(),
+    info.snode = std::make_unique<sem::IfSNode>(std::move(condition_snode),
                                                 std::move((std::unique_ptr<sem::Block>&) body_info->snode),
                                                 elifs,
                                                 else_snode.release());
