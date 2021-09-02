@@ -56,6 +56,7 @@
 #define T_NONE ObjectType(".None")
 
 typedef std::unique_ptr<SemanticInfo> USemanticInfo;
+typedef std::unique_ptr<SemanticInfoBlock> USemanticInfoBlock;
 
 bool type_matches(TypeNode* a, TypeNode* b);
 bool is_generic(const TypeNode& t);
@@ -71,7 +72,7 @@ TextPosition add_one_col(TextPosition t);
 bool function_is_generic(const FunctionType& ft);
 
 sem::SNode*
-make_for_snode(ast::For& node, USemanticInfo& binfo, USemanticInfo& exp_info_p, std::string loop_list_var_id,
+make_for_snode(ast::For& node, USemanticInfoBlock& binfo, USemanticInfo& exp_info_p, std::string loop_list_var_id,
                std::string loop_index_var_id, std::string loop_list_len_var_id, sem::SNode* update_loop_index_snode);
 
 class Checker {
@@ -113,8 +114,8 @@ public:
 
     USemanticInfo visit_assignment(ast::Assignment& n);
     USemanticInfo visit_binop(ast::BinaryOp& node);
-    USemanticInfo visit_block(ast::Block& node);
-    USemanticInfo visit_root(ast::Block& node);
+    USemanticInfoBlock visit_block(ast::Block& node);
+    USemanticInfoBlock visit_root(ast::Block& node);
     USemanticInfo visit_boolean(ast::Boolean& node);
     USemanticInfo visit_break(ast::Break& node);
     USemanticInfo visit_call(ast::Call& n, bool is_rvalue);

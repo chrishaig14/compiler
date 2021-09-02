@@ -28,6 +28,11 @@ public:
     bool is_error();
 };
 
+class SemanticInfoBlock {
+public:
+    std::unique_ptr<sem::Block> snode;
+};
+
 class ErrorStub : public SemanticInfo {
 public:
     ErrorStub();

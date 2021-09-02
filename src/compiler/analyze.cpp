@@ -17,8 +17,8 @@ void analyze_module(Module& module, Package& top_package) {
         add_path_with_alias_to_module(module, i.first, i.second, top_package);
     }
     Checker checker(top_package, module);
-    USemanticInfo check_info = checker.visit_root(*module.ast);
-    module.sast = std::move((std::unique_ptr<sem::Block>&) check_info->snode);
+    USemanticInfoBlock check_info = checker.visit_root(*module.ast);
+    module.sast = std::move(check_info->snode);
     if (checker.error_reporter.failed) {
         // global_fail = true;
         throw std::runtime_error("Semantic analysis failed for module " + module.abs_path);

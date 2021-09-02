@@ -8,7 +8,7 @@
 
 
 sem::SNode*
-make_for_snode(ast::For& node, USemanticInfo& binfo, USemanticInfo& exp_info_p, std::string loop_list_var_id,
+make_for_snode(ast::For& node, USemanticInfoBlock& binfo, USemanticInfo& exp_info_p, std::string loop_list_var_id,
                std::string loop_index_var_id, std::string loop_list_len_var_id, sem::SNode* update_loop_index_snode) {
     auto* bbn = new sem::Block();
 
@@ -40,7 +40,7 @@ make_for_snode(ast::For& node, USemanticInfo& binfo, USemanticInfo& exp_info_p, 
     vv.push_back(std::move(llensn));
     auto cn = std::make_unique<sem::Call>(std::move(cmpfunsn), std::move(vv));
 
-    auto& bn = (std::unique_ptr<sem::Block>&) (binfo->snode);
+    auto& bn = (binfo->snode);
 
     std::vector<USNode> vvv;
     vvv.push_back(std::make_unique<sem::Id>(loop_list_var_id));
@@ -148,14 +148,14 @@ void Checker::init() {
     }
 }
 
-USemanticInfo Checker::visit_root(ast::Block& node) {
+USemanticInfoBlock Checker::visit_root(ast::Block& node) {
     this->init();
     return this->visit_block(node);
 }
 
-USemanticInfo Checker::visit_block(ast::Block& node) {
-    USemanticInfo info_u = std::make_unique<SemanticInfo>();
-    SemanticInfo& info = *info_u;
+USemanticInfoBlock Checker::visit_block(ast::Block& node) {
+    USemanticInfoBlock info_u = std::make_unique<SemanticInfoBlock>();
+    SemanticInfoBlock& info = *info_u;
     auto sn = std::make_unique<sem::Block>();
     VectorOfNodesU vn;
     for (auto& n: node.nodes) {
@@ -257,8 +257,8 @@ USemanticInfo Checker::visit_function(ast::Function& n) {
     TypeNode& returnType = *n.return_type;
     this->assert_type_exists(returnType, n.start);
     this->scope->set("__return__", entity_from_type(returnType));
-    USemanticInfo body_info = this->visit_block(*n.body);
-    auto& bn = (std::unique_ptr<sem::Block>&) (body_info->snode);
+    USemanticInfoBlock body_info = this->visit_block(*n.body);
+    auto& bn = body_info->snode;
     for (auto local_var: this->scope->table) {
         if (local_var.second->type == E_TYPE::VALUE) {
             bn->locals.push_back(local_var.first);

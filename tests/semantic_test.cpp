@@ -455,11 +455,11 @@ TEST_CASE("semantic_output_enum_def", "[checker]") {
     analyze_module_result(module, *c.top_package);
     Checker checker(*c.top_package, module);
     checker.init();
-    USemanticInfo info = checker.visit_root(*module.ast);
+    USemanticInfoBlock info = checker.visit_root(*module.ast);
 
     REQUIRE(!checker.error_reporter.failed);
     REQUIRE(checker.error_reporter.errors.empty());
 
-    REQUIRE(*(((std::unique_ptr<sem::Block>&) info->snode)->nodes[0]) == sem::EnumDef("test.tmp.Foo", {"a", "c"}));
+    REQUIRE(*((info->snode)->nodes[0]) == sem::EnumDef("test.tmp.Foo", {"a", "c"}));
 
 }

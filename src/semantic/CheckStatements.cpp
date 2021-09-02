@@ -333,9 +333,9 @@ USemanticInfo Checker::visit_for(ast::For& node) {
     increment_index_sn->rvalue = std::move(inc_exp_node);
 
     this->scope->is_loop = true;
-    USemanticInfo binfo = this->visit_block(*node.body);
+    USemanticInfoBlock binfo = this->visit_block(*node.body);
     this->scope->is_loop = false;
-    sem::Block* bn = ((std::unique_ptr<sem::Block>&) binfo->snode).release();
+    sem::Block* bn = (binfo->snode).release();
     for (auto local_var : this->scope->table) {
         if (local_var.second->type == E_TYPE::VALUE) {
             bn->locals.push_back(local_var.first);
@@ -379,7 +379,7 @@ USemanticInfo Checker::visit_while(ast::While& node) {
 
     this->enter_scope("while");
     this->scope->is_loop = true;
-    USemanticInfo body_info_p = this->visit_block(*node.body);
+    USemanticInfoBlock body_info_p = this->visit_block(*node.body);
     this->scope->is_loop = false;
     for (auto v : this->scope->table) {
         // if (v.second->type == E_TYPE::OBJECT_VALUE) {
@@ -391,8 +391,7 @@ USemanticInfo Checker::visit_while(ast::While& node) {
     }
     this->leave_scope();
 
-    auto while_sn = std::make_unique<sem::While>(std::move(condition_snode),
-                                                 std::move((std::unique_ptr<sem::Block>&) body_info_p->snode));
+    auto while_sn = std::make_unique<sem::While>(std::move(condition_snode), std::move(body_info_p->snode));
 
     USemanticInfo info_u = std::make_unique<SemanticInfo>();
     SemanticInfo& info = *info_u;
@@ -408,8 +407,8 @@ USemanticInfo Checker::visit_if(ast::If& n) {
     auto& condition_snode = condition_sinfo->snode;
 
     this->enter_scope("if");
-    USemanticInfo body_info = this->visit_block(*n.then);
-    sem::Block* bn = ((std::unique_ptr<sem::Block>&) body_info->snode).release();
+    USemanticInfoBlock body_info = this->visit_block(*n.then);
+    sem::Block* bn = (body_info->snode).release();
     for (const auto& local_var : this->scope->table) {
         bn->locals.push_back(local_var.first);
     }
@@ -421,16 +420,15 @@ USemanticInfo Checker::visit_if(ast::If& n) {
         USemanticInfo elif_condition_sinfo = this->expect_rvalue_of_type(T_BOOL, *elif.first);
         auto& elif_condition_snode = elif_condition_sinfo->snode;
         this->enter_scope("elif");
-        USemanticInfo elif_block_info = this->visit_block(*elif.second);
-        sem::Block* bn1 = ((std::unique_ptr<sem::Block>&) elif_block_info->snode).release();
+        USemanticInfoBlock elif_block_info = this->visit_block(*elif.second);
+        sem::Block* bn1 = (elif_block_info->snode).release();
         for (const auto& local_var : this->scope->table) {
             bn1->locals.push_back(local_var.first);
         }
         this->leave_scope();
-        elifs.emplace_back(elif_condition_snode.release(),
-                           ((std::unique_ptr<sem::Block>&) elif_block_info->snode).release());
+        elifs.emplace_back(elif_condition_snode.release(), (elif_block_info->snode).release());
     }
-    USemanticInfo else_info;
+    USemanticInfoBlock else_info;
     if (n.selse != nullptr && !n.selse->nodes.empty()) {
         this->enter_scope("else");
         else_info = this->visit_block(*n.selse);
@@ -440,13 +438,13 @@ USemanticInfo Checker::visit_if(ast::If& n) {
         }
         this->leave_scope();
     }
-    USNode else_snode = else_info == nullptr ? nullptr : std::move(else_info->snode);
+    std::unique_ptr<sem::Block> else_snode = else_info == nullptr ? nullptr : std::move(else_info->snode);
 
     USemanticInfo info_u = std::make_unique<SemanticInfo>();
     SemanticInfo& info = *info_u;
     info.snode = std::make_unique<sem::IfSNode>(condition_snode.release(),
                                                 std::move((std::unique_ptr<sem::Block>&) body_info->snode),
                                                 elifs,
-                                                ((std::unique_ptr<sem::Block>&) else_snode).release());
+                                                else_snode.release());
     return info_u;
 }

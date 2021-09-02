@@ -329,8 +329,8 @@ USemanticInfo Checker::dispatch_any(ast::Node& n, bool is_rvalue) {
             auto r = this->visit_binop((ast::BinaryOp&) n);
             return r;
         }
-        case NodeType::BLOCK:
-            return this->visit_block((ast::Block&) n);
+        // case NodeType::BLOCK:
+        //     return this->visit_block((ast::Block&) n);
         case NodeType::BOOLEAN:
             return this->visit_boolean((ast::Boolean&) n);
         case NodeType::BRK:
