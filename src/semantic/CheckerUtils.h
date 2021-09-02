@@ -48,7 +48,7 @@ void make_not_generic(FunctionType* ft);
 void make_not_generic(ObjectType* ft);
 void make_not_generic(TypeNode* ft);
 
-sem::SNode* make_union_wrapper(int type_index, sem::SNode* expression);
+USNode make_union_wrapper(int type_index, USNode expression);
 
 
 sem::SNode* make_boolop_snode(ConstFunction* operator_fun, SemanticInfo& left_info, SemanticInfo& right_info);

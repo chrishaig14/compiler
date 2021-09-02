@@ -117,12 +117,13 @@ void make_not_generic(ObjectType* ot) {
     }
 }
 
-sem::SNode* make_union_wrapper(int type_index, sem::SNode* expression) {
-    auto* new_union = new sem::NewObject();
+USNode make_union_wrapper(int type_index, USNode expression) {
+    auto new_union = std::make_unique<sem::NewObject>();
     new_union->class_name = "core_D_core_D_Union";
     auto* in = new sem::Integer(std::string());
     in->str = std::to_string(type_index); // FIXME, use int directly
-    new_union->args = {expression, in};
+    new_union->args.push_back(expression.release());
+    new_union->args.push_back(in);
     return new_union;
 }
 

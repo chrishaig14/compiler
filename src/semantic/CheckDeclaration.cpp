@@ -99,7 +99,7 @@ USNode Checker::make_union_rvalue(USNode value_snode, const TypeNode* unaliased_
                                   const TypeNode* unaliased_target_type) const {
     int union_index = target_union_type(unaliased_target_type->object(), unaliased_value_type->object());
     if (union_index != -1) {
-        return USNode(make_union_wrapper(union_index, value_snode.release()));
+        return USNode(make_union_wrapper(union_index, std::move(value_snode)));
     } else {
         if (unaliased_value_type->object().id == "Union") {
             if (unaliased_value_type->object().type_params.size() <=
