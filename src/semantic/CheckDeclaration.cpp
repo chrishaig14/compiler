@@ -95,11 +95,11 @@ sem::SNode* Checker::make_option_rvalue(sem::SNode* value_snode, const TypeNode*
     return nullptr;
 }
 
-sem::SNode* Checker::make_union_rvalue(sem::SNode* value_snode, const TypeNode* unaliased_value_type,
-                                       const TypeNode* unaliased_target_type) const {
+USNode Checker::make_union_rvalue(sem::SNode* value_snode, const TypeNode* unaliased_value_type,
+                                  const TypeNode* unaliased_target_type) const {
     int union_index = target_union_type(unaliased_target_type->object(), unaliased_value_type->object());
     if (union_index != -1) {
-        return make_union_wrapper(union_index, value_snode);
+        return USNode(make_union_wrapper(union_index, value_snode));
     } else {
         if (unaliased_value_type->object().id == "Union") {
             if (unaliased_value_type->object().type_params.size() <=
@@ -115,7 +115,7 @@ sem::SNode* Checker::make_union_rvalue(sem::SNode* value_snode, const TypeNode* 
                         return nullptr;
                     }
                 }
-                return value_snode;
+                return USNode(value_snode);
             }
         }
         return nullptr;

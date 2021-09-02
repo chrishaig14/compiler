@@ -173,7 +173,7 @@ public:
                          std::vector<Entity*>& arg_entities);
     USemanticInfo
     make_return_info(const ast::Call& n, bool is_rvalue, USemanticInfo retv, bool is_def_const, bool args_are_constant);
-    sem::SNode* make_union_rvalue(sem::SNode* value_snode, const TypeNode* unaliased_value_type,
+    USNode make_union_rvalue(sem::SNode* value_snode, const TypeNode* unaliased_value_type,
                                   const TypeNode* unaliased_target_type) const;
     sem::SNode* make_option_rvalue(sem::SNode* value_snode, const TypeNode* unaliased_value_type,
                                    const TypeNode* unaliased_target_type) const;
