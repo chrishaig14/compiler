@@ -408,9 +408,9 @@ USemanticInfo Checker::visit_if(ast::If& n) {
 
     this->enter_scope("if");
     USemanticInfoBlock body_info = this->visit_block(*n.then);
-    sem::Block* bn = (body_info->snode).release();
+    sem::Block& bn = *body_info->snode;
     for (const auto& local_var : this->scope->table) {
-        bn->locals.push_back(local_var.first);
+        bn.locals.push_back(local_var.first);
     }
     this->leave_scope();
 
@@ -443,7 +443,7 @@ USemanticInfo Checker::visit_if(ast::If& n) {
     USemanticInfo info_u = std::make_unique<SemanticInfo>();
     SemanticInfo& info = *info_u;
     info.snode = std::make_unique<sem::IfSNode>(std::move(condition_snode),
-                                                std::move((std::unique_ptr<sem::Block>&) body_info->snode),
+                                                std::move(body_info->snode),
                                                 std::move(elifs),
                                                 std::move(else_snode));
     return info_u;
