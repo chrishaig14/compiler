@@ -13,7 +13,7 @@
 class sem::NewObject : public sem::SNode {
 public:
     std::string class_name;
-    std::vector<SNode*> args;
+    std::vector<USNode> args;
 
     NewObject() : SNode(SNodeType::NEW) {
 

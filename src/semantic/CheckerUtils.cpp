@@ -36,8 +36,8 @@ sem::FunctionDef* make_class_default_init(const std::string& class_path, const V
     auto nn = std::make_unique<sem::NewObject>();
     nn->class_name = class_path;
     for (const auto& m: members) {
-        auto* idn = new sem::Id(m);
-        nn->args.push_back(idn);
+        auto idn = std::make_unique<sem::Id>(m);
+        nn->args.push_back(std::move(idn));
     }
     auto rn = std::make_unique<sem::Return>(std::move(nn));
     auto bn = std::make_unique<sem::Block>();
@@ -106,10 +106,10 @@ void make_not_generic(ObjectType* ot) {
 USNode make_union_wrapper(int type_index, USNode expression) {
     auto new_union = std::make_unique<sem::NewObject>();
     new_union->class_name = "core_D_core_D_Union";
-    auto* in = new sem::Integer(std::string());
+    auto in = std::make_unique<sem::Integer>(std::string());
     in->str = std::to_string(type_index); // FIXME, use int directly
-    new_union->args.push_back(expression.release());
-    new_union->args.push_back(in);
+    new_union->args.push_back(std::move(expression));
+    new_union->args.push_back(std::move(in));
     return new_union;
 }
 

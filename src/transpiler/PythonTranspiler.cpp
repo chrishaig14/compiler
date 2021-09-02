@@ -262,7 +262,7 @@ PythonOutputCode PythonTranspiler::transpile_new(sem::NewObject& node) {
     if (class_id == "core_D_core_D_List") {
         out += "-------{";
     }
-    for (auto* m: node.args) {
+    for (auto& m: node.args) {
         if (m != nullptr) {
 
             PythonOutputCode arg_code = this->dispatch(*m);

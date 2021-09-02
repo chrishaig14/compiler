@@ -99,10 +99,10 @@ USemanticInfo Checker::visit_string(ast::String& node) {
 
 USemanticInfo Checker::visit_tuple(ast::Tuple& node) {
     VectorOfTypes types;
-    std::vector<sem::SNode*> values;
+    std::vector<USNode> values;
     for (auto& n: node.values) {
         USemanticInfo vtype = this->dispatch(*n);
-        values.push_back(vtype->snode.release());
+        values.push_back(std::move(vtype->snode));
         types.emplace_back(((EntityValue&) vtype->entity).value->type->clone());
         // if (!this->is_immutable(vtype->type())) {
         //     this->error_reporter.tuple_member_not_immutable(vtype->type(), node.start);
@@ -128,7 +128,7 @@ USemanticInfo Checker::visit_tuple(ast::Tuple& node) {
     otype->actual_base_path = Path("core.Tuple" + std::to_string(num_values));
     auto nosn = std::make_unique<sem::NewObject>();
     nosn->class_name = otype->actual_base_path.as_str();
-    nosn->args = values;
+    nosn->args = std::move(values);
     sinfo.snode = std::move(nosn);
     return sinfo_p;
 }
@@ -149,7 +149,7 @@ USemanticInfo Checker::visit_partial(ast::PartialApplication& node) {
         this->error_reporter.error(ErrorPartialWrongNumArgs(node.start));
         return error_stub();
     }
-    std::vector<sem::SNode*> snodes;
+    std::vector<USNode> snodes;
     int npartial = 0;
     for (size_t i = 0; i < node.args.size(); i++) {
         TypeNode*& param_type = fun_type->param_types[i];
@@ -158,8 +158,8 @@ USemanticInfo Checker::visit_partial(ast::PartialApplication& node) {
             if (arg_sinfo->is_error()) {
                 return error_stub();
             }
-            sem::SNode* arg_snode = arg_sinfo->snode.release();
-            snodes.push_back(arg_snode);
+            auto arg_snode = std::move(arg_sinfo->snode);
+            snodes.push_back(std::move(arg_snode));
         } else {
             partial_args.push_back(param_type->clone());
             snodes.push_back(nullptr);
@@ -173,8 +173,8 @@ USemanticInfo Checker::visit_partial(ast::PartialApplication& node) {
                                                                          fun_type->return_type->clone())));
     auto non = std::make_unique<sem::NewObject>();
     non->class_name = "Partial" + std::to_string(npartial);
-    non->args = snodes;
-    non->args.insert(non->args.begin(), func->snode.release());
+    non->args = std::move(snodes);
+    non->args.insert(non->args.begin(), std::move(func->snode));
     s.snode = std::move(non);
     return s_p;
 }
