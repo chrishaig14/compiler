@@ -52,7 +52,7 @@ TEST_CASE("semantic_output_basic_function", "[checker]") {
     USemanticInfo info = checker.visit_function((ast::Function&) *module.ast->nodes[0]);
     REQUIRE(not checker.error_reporter.failed);
     std::unique_ptr<sem::Block> b = std::make_unique<sem::Block>();
-    b->nodes = std::vector<sem::SNode*>{new sem::Return(std::make_unique<sem::Integer>("0"))};
+    b->nodes.emplace_back(std::make_unique<sem::Return>(std::make_unique<sem::Integer>("0")));
     auto exp = sem::FunctionDef("test.tmp.foo", VectorOfStrings{}, b.release());
     REQUIRE(*info->snode == exp);
 }
@@ -264,7 +264,7 @@ TEST_CASE("semantic_output_while", "[checker]") {
     REQUIRE(not checker.error_reporter.failed);
     std::vector<USNode> e;
     auto* block = new sem::Block();
-    block->nodes = std::vector<sem::SNode*>{new sem::Declaration("x", std::make_unique<sem::Integer>("1"))};
+    block->nodes.emplace_back(new sem::Declaration("x", std::make_unique<sem::Integer>("1")));
     auto exp = sem::While(std::make_unique<sem::Bool>(true), block);
     REQUIRE(*(*(std::unique_ptr<sem::FunctionDef>&) info->snode).body->nodes[0] == exp);
 }

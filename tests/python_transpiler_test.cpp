@@ -38,7 +38,7 @@ TEST_CASE("python_transpile_boolean", "[checker]") {
 TEST_CASE("python_transpile_if", "[checker]") {
     PythonTranspiler pt;
     sem::Block* then = new sem::Block();
-    then->nodes = {new sem::Assignment(std::make_unique<sem::Id>("x"), std::make_unique<sem::Integer>("99"))};
+    then->nodes.emplace_back(new sem::Assignment(std::make_unique<sem::Id>("x"), std::make_unique<sem::Integer>("99")));
     PythonOutputCode poc = pt.transpile_if(sem::IfSNode(new sem::Bool(false), then, {}, nullptr));
     REQUIRE(poc.code == "if (False):\n\tx = 99\n");
 }
@@ -53,7 +53,7 @@ TEST_CASE("python_transpile_assignment", "[checker]") {
 TEST_CASE("python_transpile_while", "[checker]") {
     PythonTranspiler pt;
     sem::Block* then = new sem::Block();
-    then->nodes = {new sem::Assignment(std::make_unique<sem::Id>("x"), std::make_unique<sem::Integer>("99"))};
+    then->nodes.emplace_back(new sem::Assignment(std::make_unique<sem::Id>("x"), std::make_unique<sem::Integer>("99")));
     PythonOutputCode poc = pt.transpile_while(sem::While(std::make_unique<sem::Bool>(false), then));
     REQUIRE(poc.code == "while (False):\n\tx = 99\n");
 }
@@ -61,9 +61,9 @@ TEST_CASE("python_transpile_while", "[checker]") {
 TEST_CASE("python_transpile_function_def", "[checker]") {
     PythonTranspiler pt;
     sem::Block* then = new sem::Block();
-    then->nodes = {new sem::Assignment(std::make_unique<sem::Id>("x"), std::make_unique<sem::Integer>("99"))};
+    then->nodes.emplace_back(new sem::Assignment(std::make_unique<sem::Id>("x"), std::make_unique<sem::Integer>("99")));
     auto* body = new sem::Block();
-    body->nodes = {new sem::Assignment(std::make_unique<sem::Id>("x"), std::make_unique<sem::Integer>("99"))};
+    body->nodes.emplace_back(new sem::Assignment(std::make_unique<sem::Id>("x"), std::make_unique<sem::Integer>("99")));
     PythonOutputCode poc = pt.transpile_function(sem::FunctionDef("myfoo", {"a", "b"}, body));
     REQUIRE(poc.code == "def myfoo(a, b):\n\tx = 99\n");
 }

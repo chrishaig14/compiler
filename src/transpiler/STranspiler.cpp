@@ -121,7 +121,7 @@ void STranspiler::transpile_function(sem::FunctionDef& node) {
 
 CppOutputCode STranspiler::transpile_block(sem::Block& node) {
     std::string out;
-    for (auto* n: node.nodes) {
+    for (auto& n: node.nodes) {
         CppOutputCode nod = this->dispatch(*n);
         out += nod.pre_code;
         if (n->type == SNodeType::CALL) {
@@ -150,7 +150,7 @@ CppOutputCode STranspiler::transpile_block(sem::Block& node) {
 }
 
 void STranspiler::transpile_program(sem::Block& node) {
-    for (auto* n: node.nodes) {
+    for (auto& n: node.nodes) {
         this->dispatch_top(*n);
     }
 }

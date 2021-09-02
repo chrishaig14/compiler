@@ -13,7 +13,7 @@ class sem::Block : public sem::SNode {
 public:
     bool unwrap;
     std::vector<std::string> locals;
-    std::vector<SNode*> nodes;
+    std::vector<USNode> nodes;
     Block(bool unwrap);
     Block();
     bool equals(const SNode& o) const override;

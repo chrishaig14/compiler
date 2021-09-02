@@ -263,8 +263,8 @@ USemanticInfo Checker::visit_match(ast::Match& node) {
         auto* bn = (sem::Block*) case_info->snode;
         auto* omn = new sem::ObjectMember(std::make_unique<sem::Id>(varname), Path("core.core.Union"), "o");
         USNode u(omn);
-        auto* dn = new sem::Declaration(case_id, std::move(u));
-        bn->nodes.insert(bn->nodes.begin(), dn);
+        auto dn = std::make_unique<sem::Declaration>(case_id, std::move(u));
+        bn->nodes.insert(bn->nodes.begin(), std::move(dn));
         cas.emplace_back(union_index, (sem::Block*) case_info->snode);
         this->leave_scope();
     }
@@ -281,10 +281,10 @@ USemanticInfo Checker::visit_match(ast::Match& node) {
 USemanticInfo Checker::visit_continue(ast::Continue& node) {
     auto* bn = new sem::Block();
     if (this->update_loop_index_snode != nullptr) {
-        bn->nodes.push_back(this->update_loop_index_snode);
+        bn->nodes.push_back(USNode(this->update_loop_index_snode));
     }
-    auto* cn = new sem::Continue();
-    bn->nodes.push_back(cn);
+    auto cn = std::make_unique<sem::Continue>();
+    bn->nodes.push_back(std::move(cn));
 
     USemanticInfo info_u = std::make_unique<SemanticInfo>();
     SemanticInfo& info = *info_u;

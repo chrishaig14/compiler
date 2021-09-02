@@ -13,20 +13,20 @@ make_for_snode(ast::For& node, USemanticInfo& binfo, USemanticInfo& exp_info_p, 
     auto* bbn = new sem::Block();
 
     USNode p_node(exp_info_p->snode);
-    auto* dsn = new sem::Declaration(loop_list_var_id, std::move(p_node));
-    bbn->nodes.push_back(dsn);
+    auto dsn = std::make_unique<sem::Declaration>(loop_list_var_id, std::move(p_node));
+    bbn->nodes.push_back(std::move(dsn));
     USNode init_idx = std::make_unique<sem::Integer>("0");
-    auto* lidx_decl = new sem::Declaration(loop_index_var_id, std::move(init_idx));
+    auto lidx_decl = std::make_unique<sem::Declaration>(loop_index_var_id, std::move(init_idx));
 
-    bbn->nodes.push_back(lidx_decl);
+    bbn->nodes.push_back(std::move(lidx_decl));
 
     auto list_len_fn = std::make_unique<sem::Id>("core.core.List.len");
     auto list_sn = std::make_unique<sem::Id>(loop_list_var_id);
     std::vector<USNode> v;
     v.emplace_back(std::move(list_sn));
     USNode call_list_len_sn = std::make_unique<sem::Call>(std::move(list_len_fn), std::move(v));
-    auto* lensn = new sem::Declaration(loop_list_len_var_id, std::move(call_list_len_sn));
-    bbn->nodes.push_back(lensn);
+    auto lensn = std::make_unique<sem::Declaration>(loop_list_len_var_id, std::move(call_list_len_sn));
+    bbn->nodes.push_back(std::move(lensn));
 
 
     auto idxsn = std::make_unique<sem::Id>(loop_index_var_id);
@@ -48,12 +48,12 @@ make_for_snode(ast::For& node, USemanticInfo& binfo, USemanticInfo& exp_info_p, 
     auto* list_subscript_n = new sem::Call(std::make_unique<sem::Id>("core.core.List.__get_item__"), std::move(vvv));
 
     USNode ul(list_subscript_n);
-    auto* loop_elem_sn = new sem::Declaration(node.var, std::move(ul));
-    bn->nodes.insert(bn->nodes.begin(), loop_elem_sn);
+    auto loop_elem_sn = std::make_unique<sem::Declaration>(node.var, std::move(ul));
+    bn->nodes.insert(bn->nodes.begin(), std::move(loop_elem_sn));
 
-    bn->nodes.push_back(update_loop_index_snode);
-    auto* wsn = new sem::While(std::move(cn), bn);
-    bbn->nodes.push_back(wsn);
+    bn->nodes.push_back(USNode(update_loop_index_snode));
+    auto wsn = std::make_unique<sem::While>(std::move(cn), bn);
+    bbn->nodes.push_back(std::move(wsn));
     return bbn;
 }
 
@@ -87,9 +87,9 @@ USemanticInfo Checker::visit_class(ast::Klass& node) {
     }
 
     Class* clazz = ((EntityClass&) this->scope->get(node.class_name)).clazz;
-    auto* csn = new sem::KlassDef(clazz->path.as_str(), node.members_ordered);
-    sn->nodes.push_back(csn);
-    sn->nodes.push_back(make_class_default_init(clazz->path.as_str(), node.members_ordered));
+    auto csn = std::make_unique<sem::KlassDef>(clazz->path.as_str(), node.members_ordered);
+    sn->nodes.push_back(std::move(csn));
+    sn->nodes.push_back(USNode(make_class_default_init(clazz->path.as_str(), node.members_ordered)));
 
     for (const auto& sm: node.static_members) {
         USemanticInfo sm_exp_info = this->dispatch(*sm.second.second);
@@ -126,10 +126,10 @@ USemanticInfo Checker::visit_class(ast::Klass& node) {
     }
 
     for (auto* m: methods_snodes) {
-        sn->nodes.push_back(m);
+        sn->nodes.push_back(USNode(m));
     }
     for (auto* m: static_methods_snodes) {
-        sn->nodes.push_back(m);
+        sn->nodes.push_back(USNode(m));
     }
 
     this->add_this = true;
@@ -173,15 +173,15 @@ USemanticInfo Checker::visit_block(ast::Block& node) {
             if (sinfo_p->snode != nullptr) {
                 if (sinfo_p->snode->type == SNodeType::BLOCK) {
                     if (((sem::Block*) sinfo_p->snode)->unwrap) {
-                        for (auto* nn : ((sem::Block*) sinfo_p->snode)->nodes) {
-                            sn->nodes.push_back(nn);
+                        for (auto& nn : ((sem::Block*) sinfo_p->snode)->nodes) {
+                            sn->nodes.push_back(std::move(nn));
                         }
                     } else {
-                        sn->nodes.push_back(sinfo_p->snode);
+                        sn->nodes.push_back(USNode(sinfo_p->snode));
                     }
 
                 } else {
-                    sn->nodes.push_back(sinfo_p->snode);
+                    sn->nodes.push_back(USNode(sinfo_p->snode));
                 }
             }
         }
