@@ -362,7 +362,8 @@ TEST_CASE("decl_error_expected_expression", "[checker]") {
     REQUIRE(checker.error_reporter.errors.size() == 1);
 
     Error& error = *checker.error_reporter.errors.back();
-    ErrorExpectedExpression exp(*new EntityClass(new Class()), *declaration_node.expression);
+    EntityClass ec (new Class());
+    ErrorExpectedExpression exp(ec, *declaration_node.expression);
     REQUIRE(error == exp);
 }
 
