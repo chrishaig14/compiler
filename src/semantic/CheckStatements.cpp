@@ -139,7 +139,7 @@ USemanticInfo Checker::visit_assignment(ast::Assignment& n) {
 
     if (l_entity_value.type == E_TYPE::VALUE && expression_info_p->entity.get().type == E_TYPE::VALUE) {
         USNode rvalue_snode = this->make_rvalue(expression_info_p->entity,
-                                                expression_info_p->snode.release(),
+                                                std::move(expression_info_p->snode),
                                                 *l_entity_value.value->type);
         if (rvalue_snode == nullptr) {
             this->error_reporter.error(ErrorTypeMismatch(l_type, *n.rvalue, expression_info_p->entity));

@@ -162,7 +162,7 @@ public:
     USemanticInfo visit_alias(ast::Alias& p_node);
     USemanticInfo enum_member(Enum* enumm, const std::string& value, ast::Member& node);
     USemanticInfo visit_enum(ast::EnumNode& p_node);
-    USNode make_rvalue(const Entity& t_entity, sem::SNode* value_snode, const TypeNode& target);
+    USNode make_rvalue(const Entity& t_entity, USNode value_snode, const TypeNode& target);
     USemanticInfo dispatch(ast::Node& nod);
     void fill_value(Value& value);
     std::unique_ptr<SemanticInfo> expect_rvalue_of_type(const TypeNode& target, ast::Node& node);
