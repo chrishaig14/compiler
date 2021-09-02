@@ -138,14 +138,14 @@ USemanticInfo Checker::visit_assignment(ast::Assignment& n) {
     const TypeNode& l_type = *l_entity_value.value->type;
 
     if (l_entity_value.type == E_TYPE::VALUE && expression_info_p->entity.get().type == E_TYPE::VALUE) {
-        sem::SNode* rvalue_snode = this->make_rvalue(expression_info_p->entity,
-                                                     expression_info_p->snode.release(),
-                                                     *l_entity_value.value->type);
+        USNode rvalue_snode = this->make_rvalue(expression_info_p->entity,
+                                                expression_info_p->snode.release(),
+                                                *l_entity_value.value->type);
         if (rvalue_snode == nullptr) {
             this->error_reporter.error(ErrorTypeMismatch(l_type, *n.rvalue, expression_info_p->entity));
             return error_stub();
         }
-        expression_info_p->snode = USNode(rvalue_snode);
+        expression_info_p->snode = std::move(rvalue_snode);
     }
 
     USemanticInfo info_u = std::make_unique<SemanticInfo>();

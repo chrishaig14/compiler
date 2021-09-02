@@ -18,16 +18,16 @@ std::unique_ptr<SemanticInfo> Checker::expect_rvalue_of_type(const TypeNode& tar
         this->error_reporter.error(ErrorTypeMismatch(*target.clone(), node, r_entity));
         return error_stub();
     }
-    sem::SNode* snode = make_rvalue(r_entity, rinfo->snode.release(), target);
+    USNode snode = make_rvalue(r_entity, rinfo->snode.release(), target);
     if (snode == nullptr) {
         this->error_reporter.error(ErrorTypeMismatch(*target.clone(), node, r_entity));
         return error_stub();
     }
-    rinfo->snode = USNode(snode);
+    rinfo->snode = std::move(snode);
     return rinfo;
 }
 
-sem::SNode* Checker::make_rvalue(const Entity& t_entity, sem::SNode* value_snode, const TypeNode& target) {
+USNode Checker::make_rvalue(const Entity& t_entity, sem::SNode* value_snode, const TypeNode& target) {
     if (t_entity.type == E_TYPE::VALUE) {
         EntityValue& value_entity = (EntityValue&) t_entity;
         if (value_entity.value->type->kind != target.kind) {
@@ -35,7 +35,7 @@ sem::SNode* Checker::make_rvalue(const Entity& t_entity, sem::SNode* value_snode
         }
         if (value_entity.value->type->kind == Kind::FUNCTION) {
             if (*value_entity.value->type == target) {
-                return value_snode;
+                return USNode(value_snode);
             } else {
                 return nullptr;
                 // throw std::runtime_error("Error cannot make function rvalue");
@@ -59,27 +59,27 @@ sem::SNode* Checker::make_rvalue(const Entity& t_entity, sem::SNode* value_snode
         }
 
         if (unaliased_value_type->object() == unaliased_target_type->object()) {
-            return value_snode;
+            return USNode(value_snode);
         }
 
         const std::string& unaliased_target_type_id = unaliased_target_type->object().id;
         if (unaliased_target_type_id == "Union") {
-            return make_union_rvalue(value_snode, unaliased_value_type, unaliased_target_type);
+            return USNode(make_union_rvalue(value_snode, unaliased_value_type, unaliased_target_type));
         }
 
         if (unaliased_target_type_id == "Option") {
-            return make_option_rvalue(value_snode, unaliased_value_type, unaliased_target_type);
+            return USNode(make_option_rvalue(value_snode, unaliased_value_type, unaliased_target_type));
         }
 
     } else if (t_entity.type == E_TYPE::CONST_FUNCTION) {
         EntityConstFunction& const_function_entity = (EntityConstFunction&) t_entity;
         if (*const_function_entity.const_function->ft == target) {
-            return value_snode;
+            return USNode(value_snode);
         } else {
             return nullptr;
             throw std::runtime_error("Error cannot make function rvalue");
         }
-        return value_snode;
+        return USNode(value_snode);
         this->error_reporter.fail("MAKE RVALUE OF FUNCTION!");
         return nullptr;
     }
