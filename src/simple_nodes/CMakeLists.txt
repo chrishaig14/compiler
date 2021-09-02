@@ -30,14 +30,14 @@ add_library(
         with_unique/EnumDef.h
         with_unique/Float.cpp
         with_unique/Float.h
-        FunctionDef.cpp
-        FunctionDef.cpp
-        FunctionDef.h
-        FunctionDef.h
+        with_unique/FunctionDef.cpp
+        with_unique/FunctionDef.cpp
+        with_unique/FunctionDef.h
+        with_unique/FunctionDef.h
         with_unique/Id.cpp
         with_unique/Id.h
-        IfSNode.cpp
-        IfSNode.h
+        with_unique/IfSNode.cpp
+        with_unique/IfSNode.h
         with_unique/Integer.cpp
         with_unique/Integer.h
         with_unique/List.cpp
@@ -62,4 +62,4 @@ add_library(
         Throw.h
         TryCatch.cpp
         TryCatch.h
-        While.cpp sem.h with_unique/ObjectMethodCall.cpp with_unique/ObjectMethodCall.h with_unique/ObjectMethod.cpp with_unique/ObjectMethod.h with_unique/ConstFunctionCall.cpp with_unique/ConstFunctionCall.h with_unique/ConstFunction.cpp with_unique/ConstFunction.h)
+        with_unique/While.cpp sem.h with_unique/ObjectMethodCall.cpp with_unique/ObjectMethodCall.h with_unique/ObjectMethod.cpp with_unique/ObjectMethod.h with_unique/ConstFunctionCall.cpp with_unique/ConstFunctionCall.h with_unique/ConstFunction.cpp with_unique/ConstFunction.h)

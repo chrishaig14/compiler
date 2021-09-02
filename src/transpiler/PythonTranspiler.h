@@ -6,7 +6,7 @@
 #define XLANG_PYTHONTRANSPILER_H
 
 #include "../simple_nodes/Block.h"
-#include "../simple_nodes/FunctionDef.h"
+#include "../simple_nodes/with_unique/FunctionDef.h"
 #include "../simple_nodes/with_unique/Assignment.h"
 #include "../simple_nodes/Declaration.h"
 #include "../simple_nodes/with_unique/Integer.h"
@@ -21,9 +21,9 @@
 #include "../simple_nodes/NewObject.h"
 #include "../simple_nodes/Match.h"
 #include "../simple_nodes/with_unique/ObjectMember.h"
-#include "../simple_nodes/While.h"
+#include "../simple_nodes/with_unique/While.h"
 #include "../simple_nodes/with_unique/List.h"
-#include "../simple_nodes/IfSNode.h"
+#include "../simple_nodes/with_unique/IfSNode.h"
 #include "../simple_nodes/with_unique/Break.h"
 #include "../simple_nodes/with_unique/Continue.h"
 #include "../simple_nodes/with_unique/EnumMember.h"

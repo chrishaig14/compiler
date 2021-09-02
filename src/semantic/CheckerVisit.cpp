@@ -258,14 +258,14 @@ USemanticInfo Checker::visit_function(ast::Function& n) {
     this->assert_type_exists(returnType, n.start);
     this->scope->set("__return__", entity_from_type(returnType));
     USemanticInfo body_info = this->visit_block(*n.body);
-    sem::Block* bn = (sem::Block*) (body_info->snode);
+    auto& bn = (std::unique_ptr<sem::Block>&) (body_info->snode);
     for (auto local_var: this->scope->table) {
         if (local_var.second->type == E_TYPE::VALUE) {
             bn->locals.push_back(local_var.first);
         }
     }
     this->leave_scope();
-    auto* sn = new sem::FunctionDef(n.path.as_str(), params, bn);
+    auto* sn = new sem::FunctionDef(n.path.as_str(), params, std::move(bn));
     info.snode = sn;
     if (returnType != T_NONE) {
         if (!n.body->nodes.empty()) {

@@ -53,7 +53,7 @@ TEST_CASE("semantic_output_basic_function", "[checker]") {
     REQUIRE(not checker.error_reporter.failed);
     std::unique_ptr<sem::Block> b = std::make_unique<sem::Block>();
     b->nodes.emplace_back(std::make_unique<sem::Return>(std::make_unique<sem::Integer>("0")));
-    auto exp = sem::FunctionDef("test.tmp.foo", VectorOfStrings{}, b.release());
+    auto exp = sem::FunctionDef("test.tmp.foo", VectorOfStrings{}, std::move(b));
     REQUIRE(*info->snode == exp);
 }
 
