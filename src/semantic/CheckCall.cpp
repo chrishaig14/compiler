@@ -48,33 +48,14 @@ USemanticInfo Checker::visit_call(ast::Call& n, bool is_rvalue) {
     VectorOfTypes arg_types;
 
     std::vector<Entity*> arg_entities;
-    std::vector<sem::SNode*> arguments;
+    std::vector<USNode> arguments;
     bool has_error = check_arguments(n, arguments, arg_types, arg_entities);
     if (has_error) {
         return error_stub();
     }
     std::cout << "Calling function of type: " << function_type->to_string() << std::endl;
 
-    if (fun_info_p->snode->type == SNodeType::OBJECT_METHOD) {
-        auto& om = (std::unique_ptr<sem::ObjectMethod>&) fun_info_p->snode;
-        std::vector<USNode> args;
-        for (auto* s: arguments) {
-            args.push_back(USNode(s));
-        }
-        retv.snode = std::make_unique<sem::ObjectMethodCall>(std::move(om->object),
-                                                             om->class_path,
-                                                             om->method_name,
-                                                             std::move(args));
-    }
 
-    if (fun_info_p->snode->type == SNodeType::CONST_FUNCTION) {
-        auto& om = (std::unique_ptr<sem::ConstFunction>&) fun_info_p->snode;
-        std::vector<USNode> args;
-        for (auto* s: arguments) {
-            args.push_back(USNode(s));
-        }
-        retv.snode = std::make_unique<sem::ConstFunctionCall>(om->path, std::move(args));
-    }
     /*
     if (function_type->is_generic()) {
         // mangle the generic types in function_type to prevent collisions
@@ -163,7 +144,16 @@ USemanticInfo Checker::visit_call(ast::Call& n, bool is_rvalue) {
         retv.entity = inf->entity;
     } else {*/
     this->process_function_arguments(retv, arg_entities, arguments, n, function_type, fun_info_p.get());
-
+    if (fun_info_p->snode->type == SNodeType::OBJECT_METHOD) {
+        auto& om = (std::unique_ptr<sem::ObjectMethod>&) fun_info_p->snode;
+        retv.snode = std::make_unique<sem::ObjectMethodCall>(std::move(om->object),
+                                                             om->class_path,
+                                                             om->method_name,
+                                                             std::move(arguments));
+    } else if (fun_info_p->snode->type == SNodeType::CONST_FUNCTION) {
+        auto& om = (std::unique_ptr<sem::ConstFunction>&) fun_info_p->snode;
+        retv.snode = std::make_unique<sem::ConstFunctionCall>(om->path, std::move(arguments));
+    }
     // }
     return make_return_info(n, is_rvalue, std::move(retv_p), is_def_const, args_are_constant);
 }
@@ -190,7 +180,7 @@ USemanticInfo Checker::make_return_info(const ast::Call& n, bool is_rvalue, USem
     return retv_p;
 }
 
-bool Checker::check_arguments(ast::Call& n, std::vector<sem::SNode*>& arguments, VectorOfTypes& arg_types,
+bool Checker::check_arguments(ast::Call& n, std::vector<USNode>& arguments, VectorOfTypes& arg_types,
                               std::vector<Entity*>& arg_entities) {
     bool has_error;
     for (auto& arg: n.arguments) {
@@ -201,7 +191,7 @@ bool Checker::check_arguments(ast::Call& n, std::vector<sem::SNode*>& arguments,
         }
 
         arg_entities.push_back(&arg_type_p->entity.get());
-        arguments.push_back(arg_type_p->snode.release());
+        arguments.push_back(std::move(arg_type_p->snode));
         Entity* arg_entity_p = &arg_type_p->entity.get();
         Entity& arg_entity = *arg_entity_p;
         if (arg_entity.type == E_TYPE::CLASS || arg_entity.type == E_TYPE::PACKAGE ||
@@ -221,7 +211,7 @@ bool Checker::check_arguments(ast::Call& n, std::vector<sem::SNode*>& arguments,
 }
 
 void Checker::process_function_arguments(SemanticInfo& retv, std::vector<Entity*>& arg_entities,
-                                         std::vector<sem::SNode*>& arguments, ast::Call& n, FunctionType* function_type,
+                                         std::vector<USNode>& arguments, ast::Call& n, FunctionType* function_type,
                                          SemanticInfo* fun_info_p) {
     retv.entity = *entity_from_type(*function_type->return_type);
     int sni = static_cast<int>(fun_info_p->this_arg != nullptr);
@@ -229,12 +219,12 @@ void Checker::process_function_arguments(SemanticInfo& retv, std::vector<Entity*
         // const TypeNode& arg_type = *arg_types[i];
         const TypeNode& param_type = *function_type->param_types[i];
 
-        sem::SNode* arg_rvalue_snode = this->make_rvalue(*arg_entities[i], arguments[sni], param_type);
+        sem::SNode* arg_rvalue_snode = this->make_rvalue(*arg_entities[i], arguments[sni].release(), param_type);
         if (arg_rvalue_snode == nullptr) {
             this->error_reporter.error(ErrorTypeMismatch(param_type, *n.arguments[i], *arg_entities[i]));
             continue;
         }
-        arguments[sni] = arg_rvalue_snode;
+        arguments[sni] = USNode(arg_rvalue_snode);
         sni++;
     }
 }
