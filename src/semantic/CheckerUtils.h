@@ -51,7 +51,7 @@ void make_not_generic(TypeNode* ft);
 USNode make_union_wrapper(int type_index, USNode expression);
 
 
-sem::SNode* make_boolop_snode(ConstFunction* operator_fun, SemanticInfo& left_info, SemanticInfo& right_info);
+USNode make_boolop_snode(ConstFunction* operator_fun, SemanticInfo& left_info, SemanticInfo& right_info);
 
 
 #endif //XLANG_CHECKERUTILS_H
