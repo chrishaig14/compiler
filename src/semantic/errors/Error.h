@@ -18,6 +18,7 @@ std::string entity_to_string(const Entity& entity);
 
 class Error {
 public:
+    virtual ~Error() = default;
     virtual Error* clone() const = 0;
     virtual bool equal(const Error& other) const = 0;
 
