@@ -414,7 +414,7 @@ USemanticInfo Checker::visit_if(ast::If& n) {
     }
     this->leave_scope();
 
-    std::vector<std::pair<sem::SNode*, sem::Block*>> elifs;
+    std::vector<std::pair<USNode, std::unique_ptr<sem::Block>>> elifs;
 
     for (auto& elif : n.elifs) {
         USemanticInfo elif_condition_sinfo = this->expect_rvalue_of_type(T_BOOL, *elif.first);
@@ -426,7 +426,7 @@ USemanticInfo Checker::visit_if(ast::If& n) {
             bn1->locals.push_back(local_var.first);
         }
         this->leave_scope();
-        elifs.emplace_back(elif_condition_snode.release(), (elif_block_info->snode).release());
+        elifs.emplace_back(std::move(elif_condition_snode), std::move(elif_block_info->snode));
     }
     USemanticInfoBlock else_info;
     if (n.selse != nullptr && !n.selse->nodes.empty()) {
@@ -444,7 +444,7 @@ USemanticInfo Checker::visit_if(ast::If& n) {
     SemanticInfo& info = *info_u;
     info.snode = std::make_unique<sem::IfSNode>(std::move(condition_snode),
                                                 std::move((std::unique_ptr<sem::Block>&) body_info->snode),
-                                                elifs,
+                                                std::move(elifs),
                                                 else_snode.release());
     return info_u;
 }

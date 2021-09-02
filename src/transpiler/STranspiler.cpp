@@ -371,7 +371,7 @@ CppOutputCode STranspiler::transpile_if(sem::IfSNode& node) {
     CppOutputCode thenc = this->transpile_block(*node.then);
     out += "if" + SPACE + LPAREN + "GET_BOOL" + LPAREN + condition_name + RPAREN + RPAREN + LCURLY + NEWLINE +
            thenc.code + RCURLY;
-    for (auto elif: node.elifs) {
+    for (auto& elif: node.elifs) {
         CppOutputCode elifc = this->dispatch(*elif.first);
         out += elifc.pre_code;
         CppOutputCode elifb = this->transpile_block(*elif.second);
