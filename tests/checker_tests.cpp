@@ -67,7 +67,7 @@ TEST_CASE("basic_function_bad_return_type", "[checker]") {
     Error& error = *checker.error_reporter.errors.back();
     ast::Boolean node(false, _POS, _POS);
     ObjectType expected("Integer");
-    ErrorTypeMismatch exp(expected, node, *entity_from_type(ObjectType("Boolean")));
+    ErrorTypeMismatch exp(expected, node, *checker.entity_from_type(ObjectType("Boolean")));
     REQUIRE(error == exp);
 
 }
@@ -97,7 +97,7 @@ TEST_CASE("basic_declaration_bad_type", "[checker]") {
     Error& error = *checker.error_reporter.errors.back();
     ast::Number node(NumberType::INTEGER, "9", _POS, _POS);
     ObjectType expected("Boolean");
-    ErrorTypeMismatch exp(expected, node, *entity_from_type(ObjectType("Integer")));
+    ErrorTypeMismatch exp(expected, node, *checker.entity_from_type(ObjectType("Integer")));
     REQUIRE(error == exp);
 }
 
@@ -149,7 +149,7 @@ TEST_CASE("list_bad", "[checker]") {
 
     ast::String node("a", _POS, _POS);
     ObjectType expected("Integer");
-    ErrorTypeMismatch exp(expected, node, *entity_from_type(ObjectType("String")));
+    ErrorTypeMismatch exp(expected, node, *checker.entity_from_type(ObjectType("String")));
 
     REQUIRE(error == exp);
 }
@@ -363,7 +363,7 @@ TEST_CASE("decl_error_expected_expression", "[checker]") {
 
     Error& error = *checker.error_reporter.errors.back();
     Class cl;
-    EntityClass ec (&cl);
+    EntityClass ec(&cl);
     ErrorExpectedExpression exp(ec, *declaration_node.expression);
     REQUIRE(error == exp);
 }
@@ -464,7 +464,7 @@ TEST_CASE("binop_type_error", "[checker]") {
     Error& error = *checker.error_reporter.errors.back();
     ast::String node("Hello", _POS, _POS);
     ObjectType expected("Integer");
-    ErrorTypeMismatch exp(expected, node, *entity_from_type(ObjectType("String")));
+    ErrorTypeMismatch exp(expected, node, *checker.entity_from_type(ObjectType("String")));
     REQUIRE(error == exp);
 }
 
@@ -527,7 +527,7 @@ TEST_CASE("subscript_index_type_error", "[checker]") {
     Error& error = *checker.error_reporter.errors.back();
     ast::String node("foo", _POS, _POS);
     ObjectType expected("Integer");
-    ErrorTypeMismatch exp(expected, node, *entity_from_type(ObjectType("String")));
+    ErrorTypeMismatch exp(expected, node, *checker.entity_from_type(ObjectType("String")));
     REQUIRE(error == exp);
 }
 
@@ -602,7 +602,7 @@ TEST_CASE("call_args_type_error", "[checker]") {
     Error& error = *checker.error_reporter.errors.back();
     ast::String node("Hello", _POS, _POS);
     ObjectType expected("Integer");
-    ErrorTypeMismatch exp(expected, node, *entity_from_type(ObjectType("String")));
+    ErrorTypeMismatch exp(expected, node, *checker.entity_from_type(ObjectType("String")));
     REQUIRE(error == exp);
 }
 
@@ -650,7 +650,7 @@ TEST_CASE("union_error", "[checker]") {
     Error& error = *checker.error_reporter.errors.back();
     ast::Boolean node(false, _POS, _POS);
     ObjectType expected("Union", {new ObjectType("Integer"), new ObjectType("String")});
-    ErrorTypeMismatch exp(expected, node, *entity_from_type(ObjectType("Boolean")));
+    ErrorTypeMismatch exp(expected, node, *checker.entity_from_type(ObjectType("Boolean")));
     REQUIRE(error == exp);
 }
 
@@ -685,7 +685,7 @@ TEST_CASE("while_boolean_error", "[checker]") {
     Error& error = *checker.error_reporter.errors.back();
     ast::Number node(NumberType::INTEGER, "5", _POS, _POS);
     ObjectType expected("Boolean");
-    ErrorTypeMismatch exp(expected, node, *entity_from_type(ObjectType("Integer")));
+    ErrorTypeMismatch exp(expected, node, *checker.entity_from_type(ObjectType("Integer")));
     REQUIRE(error == exp);
 }
 
@@ -720,7 +720,7 @@ TEST_CASE("if_boolean_error", "[checker]") {
     Error& error = *checker.error_reporter.errors.back();
     ast::Number node(NumberType::INTEGER, "5", _POS, _POS);
     ObjectType expected("Boolean");
-    ErrorTypeMismatch exp(expected, node, *entity_from_type(ObjectType("Integer")));
+    ErrorTypeMismatch exp(expected, node, *checker.entity_from_type(ObjectType("Integer")));
     REQUIRE(error == exp);
 }
 

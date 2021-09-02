@@ -81,6 +81,7 @@ class Checker {
     std::map<std::string, std::unique_ptr<EntityValue>> entity_values_no_generic;
     std::unordered_map<std::string, SymbolTable*> scopes;
     SymbolTable* scope;
+    std::map<std::string, Entity*> entities;
 public:
     Module& module;
     bool is_call;
@@ -91,6 +92,8 @@ public:
 
     Checker(Package& top_package, Module& module);
     ~Checker();
+
+    Entity* entity_from_type(const TypeNode& type);
 
     bool is_immutable(const TypeNode& node);
     void enter_scope(const std::string& name);
@@ -166,15 +169,14 @@ public:
     USemanticInfo dispatch(ast::Node& nod);
     void fill_value(Value& value);
     std::unique_ptr<SemanticInfo> expect_rvalue_of_type(const TypeNode& target, ast::Node& node);
-    void
-    process_function_arguments(SemanticInfo& retv, std::vector<Entity*>& arg_entities, std::vector<USNode>& sn,
-                               ast::Call& n, FunctionType* function_type, SemanticInfo* fun_info_p);
+    void process_function_arguments(SemanticInfo& retv, std::vector<Entity*>& arg_entities, std::vector<USNode>& sn,
+                                    ast::Call& n, FunctionType* function_type, SemanticInfo* fun_info_p);
     bool check_arguments(ast::Call& n, std::vector<USNode>& sn, VectorOfTypes& arg_types,
                          std::vector<Entity*>& arg_entities);
     USemanticInfo
     make_return_info(const ast::Call& n, bool is_rvalue, USemanticInfo retv, bool is_def_const, bool args_are_constant);
     USNode make_union_rvalue(USNode value_snode, const TypeNode* unaliased_value_type,
-                                  const TypeNode* unaliased_target_type) const;
+                             const TypeNode* unaliased_target_type) const;
     sem::SNode* make_option_rvalue(sem::SNode* value_snode, const TypeNode* unaliased_value_type,
                                    const TypeNode* unaliased_target_type) const;
     // USemanticInfo visit_throw(ast::ThrowNode& n);

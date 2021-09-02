@@ -59,6 +59,7 @@ protected:
     }
 
 public:
+    virtual ~Entity() = default;
     const E_TYPE type;
     virtual bool equal(const Entity& other) const = 0;
 

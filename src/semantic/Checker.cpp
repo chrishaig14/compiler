@@ -305,6 +305,9 @@ Checker::~Checker() {
     for (const auto& s: this->scopes) {
         delete s.second;
     }
+    for (auto& e: this->entities) {
+        delete e.second;
+    }
 }
 
 bool Checker::is_variable(const ObjectType& a) {
@@ -329,8 +332,8 @@ USemanticInfo Checker::dispatch_any(ast::Node& n, bool is_rvalue) {
             auto r = this->visit_binop((ast::BinaryOp&) n);
             return r;
         }
-        // case NodeType::BLOCK:
-        //     return this->visit_block((ast::Block&) n);
+            // case NodeType::BLOCK:
+            //     return this->visit_block((ast::Block&) n);
         case NodeType::BOOLEAN:
             return this->visit_boolean((ast::Boolean&) n);
         case NodeType::BRK:
