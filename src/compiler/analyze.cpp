@@ -18,7 +18,7 @@ void analyze_module(Module& module, Package& top_package) {
     }
     Checker checker(top_package, module);
     USemanticInfo check_info = checker.visit_root(*module.ast);
-    module.sast = (sem::Block*) (check_info->snode);
+    module.sast = std::move((std::unique_ptr<sem::Block>&) check_info->snode);
     if (checker.error_reporter.failed) {
         // global_fail = true;
         throw std::runtime_error("Semantic analysis failed for module " + module.abs_path);

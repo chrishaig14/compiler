@@ -16,12 +16,8 @@
 class SemanticInfo {
 public:
     std::reference_wrapper<Entity> entity;
-    sem::SNode* snode;
+    USNode snode;
     bool is_tuple_member;
-    SemanticInfo& operator=(const SemanticInfo& other);
-
-    SemanticInfo(const SemanticInfo& other);
-
     ~SemanticInfo();
 
     SemanticInfo();

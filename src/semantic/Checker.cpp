@@ -130,10 +130,11 @@ Checker::match_arguments_to_generic_function(const FunctionType& ft, VectorOfTyp
     for (auto* at: arg_types) {
         delete at;
     }
-    SemanticInfo rv;
+    USemanticInfo rv_p = std::make_unique<SemanticInfo>();
+    auto& rv = *rv_p;
     rv.entity = *new EntityValue(std::make_unique<Value>(f->return_type->clone()));
     // delete f;
-    return std::make_unique<SemanticInfo>(rv);
+    return rv_p;
 }
 
 UTypeNode make_type_from_object_pattern(const ObjectType& object_type, const MapStringType& replacements) {
@@ -270,7 +271,7 @@ Class* Checker::instantiate_generic(Class* generic, const ObjectType& instance) 
 }
 
 USemanticInfo error_stub() {
-    return std::make_unique<SemanticInfo>(ErrorStub());
+    return std::make_unique<ErrorStub>();
 }
 
 Flirpin map_unit_to_flirpin(Unit u) {

@@ -30,7 +30,7 @@ USemanticInfo Checker::visit_member(ast::Member& n) {
                 // this->error_reporter.object_no_member(*parent_entity.value->type, n);
                 return error_stub();
             }
-            return this->object_member(USNode(parent_info->snode), *((EntityValue&) parent_entity).value, n.s_child, n);
+            return this->object_member(std::move(parent_info->snode), *((EntityValue&) parent_entity).value, n.s_child, n);
         case E_TYPE::PACKAGE:
             return this->package_member(*((EntityPackage&) parent_entity).package, n.s_child, n);
         case E_TYPE::MODULE:
@@ -59,8 +59,8 @@ USemanticInfo Checker::module_member(Module& mod, const std::string& child, ast:
     SemanticInfo& info = *info_u;
     info.entity = *map_flirpin_to_entity(flirpin);
     if (flirpin.type == F_TYPE::CONST_FUNCTION) {
-        auto* idn = new sem::Id(flirpin.const_function->path.as_str());
-        info.snode = idn;
+        auto idn = std::make_unique<sem::Id>(flirpin.const_function->path.as_str());
+        info.snode = std::move(idn);
     }
     return info_u;
 }
@@ -102,11 +102,11 @@ USemanticInfo Checker::object_member(USNode object_snode, Value& p_value, const 
             Value& vup = *(ev->value);
             this->fill_value(vup);
         }
-        auto* omn = new sem::ObjectMember(std::move(object_snode), clazz->path, child);
-        info.snode = omn;
+        auto omn = std::make_unique<sem::ObjectMember>(std::move(object_snode), clazz->path, child);
+        info.snode = std::move(omn);
     } else if (clazz->methods.count(child) != 0) {
         // auto* idn = new sem::Id(clazz->methods[child]->path.as_str());
-        info.snode = new sem::ObjectMethod(std::move(object_snode), clazz->path, child);
+        info.snode = std::make_unique<sem::ObjectMethod>(std::move(object_snode), clazz->path, child);
         info.entity = *new EntityConstFunction(clazz->methods[child]);
         // if (this->is_call) {
             // method call
@@ -176,10 +176,10 @@ USemanticInfo Checker::class_member(Class* cls, const std::string& child, ast::M
         ObjectType* ot = new ObjectType(cls->class_name, tp);
         unbound_method->ft->param_types.insert(unbound_method->ft->param_types.begin(), ot);
         info.entity = *new EntityConstFunction(unbound_method);
-        info.snode = new sem::Id(unbound_method->path.as_str());
+        info.snode = std::make_unique<sem::Id>(unbound_method->path.as_str());
     } else if (cls->static_methods.find(child) != cls->static_methods.end()) {
         info.entity = *new EntityConstFunction(cls->static_methods[child]);
-        info.snode = new sem::Id(cls->static_methods[child]->path.as_str());
+        info.snode = std::make_unique<sem::Id>(cls->static_methods[child]->path.as_str());
     } else if (cls->static_members.find(child) != cls->static_members.end()) {
         info.entity = *entity_from_type(*cls->static_members[child].first);
     } else {

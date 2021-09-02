@@ -14,16 +14,6 @@ SemanticInfo::SemanticInfo() : entity(nothing) {
     this->is_tuple_member = false;
 }
 
-SemanticInfo& SemanticInfo::operator=(const SemanticInfo& other) = default;
-
-SemanticInfo::SemanticInfo(const SemanticInfo& other) : entity(nothing) {
-    this->entity = other.entity;
-    this->this_arg = other.this_arg;
-    this->is_constant = other.is_constant;
-    this->is_tuple_member = other.is_tuple_member;
-    this->snode = other.snode;
-}
-
 SemanticInfo::~SemanticInfo() {
 }
 

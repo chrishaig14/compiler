@@ -9,7 +9,8 @@
 #include "errors/ErrorFunctionCallNumArgs.h"
 
 USemanticInfo Checker::visit_call(ast::Call& n, bool is_rvalue) {
-    SemanticInfo retv;
+    auto retv_p = std::make_unique<SemanticInfo>();
+    auto& retv = *retv_p;
     bool old_is_call = this->is_call;
     this->is_call = true;
     USemanticInfo fun_info_p = this->dispatch(*n.function);
@@ -39,7 +40,7 @@ USemanticInfo Checker::visit_call(ast::Call& n, bool is_rvalue) {
         this->error_reporter.error(ErrorFunctionCallNumArgs(*function_type, n.start));
         if (!function_is_generic(*function_type)) {
             retv.entity = *entity_from_type(*function_type->return_type);
-            return std::make_unique<SemanticInfo>(retv);
+            return retv_p;
         } else {
             return error_stub();
         }
@@ -60,7 +61,10 @@ USemanticInfo Checker::visit_call(ast::Call& n, bool is_rvalue) {
         for (auto* s: arguments) {
             args.push_back(USNode(s));
         }
-        retv.snode = new sem::ObjectMethodCall(std::move(om->object), om->class_path, om->method_name, std::move(args));
+        retv.snode = std::make_unique<sem::ObjectMethodCall>(std::move(om->object),
+                                                             om->class_path,
+                                                             om->method_name,
+                                                             std::move(args));
     }
 
     if (fun_info_p->snode->type == SNodeType::CONST_FUNCTION) {
@@ -69,7 +73,7 @@ USemanticInfo Checker::visit_call(ast::Call& n, bool is_rvalue) {
         for (auto* s: arguments) {
             args.push_back(USNode(s));
         }
-        retv.snode = new sem::ConstFunctionCall(om->path, std::move(args));
+        retv.snode = std::make_unique<sem::ConstFunctionCall>(om->path, std::move(args));
     }
     /*
     if (function_type->is_generic()) {
@@ -161,11 +165,12 @@ USemanticInfo Checker::visit_call(ast::Call& n, bool is_rvalue) {
     this->process_function_arguments(retv, arg_entities, arguments, n, function_type, fun_info_p.get());
 
     // }
-    return make_return_info(n, is_rvalue, retv, is_def_const, args_are_constant);
+    return make_return_info(n, is_rvalue, std::move(retv_p), is_def_const, args_are_constant);
 }
 
-USemanticInfo Checker::make_return_info(const ast::Call& n, bool is_rvalue, SemanticInfo& retv, bool is_def_const,
+USemanticInfo Checker::make_return_info(const ast::Call& n, bool is_rvalue, USemanticInfo retv_p, bool is_def_const,
                                         bool args_are_constant) {
+    auto& retv = *retv_p;
     if (retv.entity.get().type == E_TYPE::NOTHING) {
         if (is_rvalue) {
             this->error_reporter.error(ErrorExpectedExpression(retv.entity, n));
@@ -182,7 +187,7 @@ USemanticInfo Checker::make_return_info(const ast::Call& n, bool is_rvalue, Sema
         }
     }
     retv.is_constant = is_def_const && args_are_constant;
-    return std::make_unique<SemanticInfo>(retv);
+    return retv_p;
 }
 
 bool Checker::check_arguments(ast::Call& n, std::vector<sem::SNode*>& arguments, VectorOfTypes& arg_types,
@@ -196,7 +201,7 @@ bool Checker::check_arguments(ast::Call& n, std::vector<sem::SNode*>& arguments,
         }
 
         arg_entities.push_back(&arg_type_p->entity.get());
-        arguments.push_back(arg_type_p->snode);
+        arguments.push_back(arg_type_p->snode.release());
         Entity* arg_entity_p = &arg_type_p->entity.get();
         Entity& arg_entity = *arg_entity_p;
         if (arg_entity.type == E_TYPE::CLASS || arg_entity.type == E_TYPE::PACKAGE ||

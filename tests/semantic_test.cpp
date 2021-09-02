@@ -460,6 +460,6 @@ TEST_CASE("semantic_output_enum_def", "[checker]") {
     REQUIRE(!checker.error_reporter.failed);
     REQUIRE(checker.error_reporter.errors.empty());
 
-    REQUIRE(*(((sem::Block*) info->snode)->nodes[0]) == sem::EnumDef("test.tmp.Foo", {"a", "c"}));
+    REQUIRE(*(((std::unique_ptr<sem::Block>&) info->snode)->nodes[0]) == sem::EnumDef("test.tmp.Foo", {"a", "c"}));
 
 }

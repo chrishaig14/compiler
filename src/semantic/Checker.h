@@ -70,8 +70,9 @@ Flirpin map_unit_to_flirpin(Unit u);
 TextPosition add_one_col(TextPosition t);
 bool function_is_generic(const FunctionType& ft);
 
-sem::SNode* make_for_snode(ast::For& node, USemanticInfo& binfo, USemanticInfo& exp_info_p, std::string loop_list_var_id,
-                           std::string loop_index_var_id, std::string loop_list_len_var_id, sem::SNode* update_loop_index_snode);
+sem::SNode*
+make_for_snode(ast::For& node, USemanticInfo& binfo, USemanticInfo& exp_info_p, std::string loop_list_var_id,
+               std::string loop_index_var_id, std::string loop_list_len_var_id, sem::SNode* update_loop_index_snode);
 
 class Checker {
     int loop_count;
@@ -164,15 +165,17 @@ public:
     USemanticInfo dispatch(ast::Node& nod);
     void fill_value(Value& value);
     std::unique_ptr<SemanticInfo> expect_rvalue_of_type(const TypeNode& target, ast::Node& node);
-    void process_function_arguments(SemanticInfo& retv, std::vector<Entity*>& arg_entities, std::vector<sem::SNode*>& sn, ast::Call& n,
-                                    FunctionType* function_type, SemanticInfo* fun_info_p);
-    bool check_arguments(ast::Call& n, std::vector<sem::SNode*>& sn, VectorOfTypes& arg_types, std::vector<Entity*>& arg_entities);
+    void
+    process_function_arguments(SemanticInfo& retv, std::vector<Entity*>& arg_entities, std::vector<sem::SNode*>& sn,
+                               ast::Call& n, FunctionType* function_type, SemanticInfo* fun_info_p);
+    bool check_arguments(ast::Call& n, std::vector<sem::SNode*>& sn, VectorOfTypes& arg_types,
+                         std::vector<Entity*>& arg_entities);
     USemanticInfo
-    make_return_info(const ast::Call& n, bool is_rvalue, SemanticInfo& retv, bool is_def_const, bool args_are_constant);
+    make_return_info(const ast::Call& n, bool is_rvalue, USemanticInfo retv, bool is_def_const, bool args_are_constant);
     sem::SNode* make_union_rvalue(sem::SNode* value_snode, const TypeNode* unaliased_value_type,
-                             const TypeNode* unaliased_target_type) const;
+                                  const TypeNode* unaliased_target_type) const;
     sem::SNode* make_option_rvalue(sem::SNode* value_snode, const TypeNode* unaliased_value_type,
-                              const TypeNode* unaliased_target_type) const;
+                                   const TypeNode* unaliased_target_type) const;
     // USemanticInfo visit_throw(ast::ThrowNode& n);
     void init();
     USemanticInfo dispatch_any(ast::Node& n, bool is_rvalue);

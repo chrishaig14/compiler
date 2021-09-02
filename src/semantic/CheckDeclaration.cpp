@@ -18,12 +18,12 @@ std::unique_ptr<SemanticInfo> Checker::expect_rvalue_of_type(const TypeNode& tar
         this->error_reporter.error(ErrorTypeMismatch(*target.clone(), node, r_entity));
         return error_stub();
     }
-    sem::SNode* snode = make_rvalue(r_entity, rinfo->snode, target);
+    sem::SNode* snode = make_rvalue(r_entity, rinfo->snode.release(), target);
     if (snode == nullptr) {
         this->error_reporter.error(ErrorTypeMismatch(*target.clone(), node, r_entity));
         return error_stub();
     }
-    rinfo->snode = snode;
+    rinfo->snode = USNode(snode);
     return rinfo;
 }
 
@@ -150,8 +150,8 @@ USemanticInfo Checker::check_declaration_with_type(ast::Declaration& n) {
     }
     USemanticInfo info_u = std::make_unique<SemanticInfo>();
     SemanticInfo& info = *info_u;
-    USNode up(rvalue_sinfo->snode);
-    info.snode = new sem::Declaration(n.identifier, std::move(up));
+    USNode up = std::move(rvalue_sinfo->snode);
+    info.snode = std::make_unique<sem::Declaration>(n.identifier, std::move(up));
     auto ov = std::make_unique<Value>(n.type->clone());
     this->fill_value(*ov);
     info.entity = *new EntityValue(std::move(ov));
@@ -171,8 +171,8 @@ USemanticInfo Checker::check_declaration_without_type(ast::Declaration& n) {
 
     USemanticInfo info_u = std::make_unique<SemanticInfo>();
     SemanticInfo& info = *info_u;
-    USNode u(exp_info_p->snode);
-    info.snode = new sem::Declaration(n.identifier, std::move(u));
+    USNode u = std::move(exp_info_p->snode);
+    info.snode = std::make_unique<sem::Declaration>(n.identifier, std::move(u));
     info.entity = exp_info_p->entity;
     if (info.entity.get().type == E_TYPE::CONST_FUNCTION) {
         Entity& entity_const_function = exp_info_p->entity;
