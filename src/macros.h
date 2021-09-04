@@ -28,7 +28,7 @@
 #define T_DICT(k, v) TYPE("Dict", ast::VectorOfTypes({k,v}))
 #define FUN(a, b, c, d, e) new ast::FunctionNode(a,b,c,d,e)
 #define WHILE(condition, body) new ast::WhileNode(condition, body)
-#define FUNCTION_TYPE(parameters, return_type) new FunctionType(parameters, return_type)
+#define FUNCTION_TYPE(parameters, return_type) new ast::FunctionType(parameters, return_type)
 #define RET(x) new ast::ReturnNode(x)
 #define I_ENTER(x) new EnterScope(x)
 #define I_LEAVE(x) new LeaveScope(x)

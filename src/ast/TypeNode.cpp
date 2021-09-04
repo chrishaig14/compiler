@@ -22,11 +22,11 @@ ast::ObjectType& TypeNode::object() {
     throw std::runtime_error("Getting wrong type!");
 }
 
-FunctionType& TypeNode::function() {
+ast::FunctionType& TypeNode::function() {
     throw std::runtime_error("Getting wrong type!");
 }
 
-const FunctionType& TypeNode::function() const {
+const ast::FunctionType& TypeNode::function() const {
     throw std::runtime_error("Getting wrong type!");
 }
 

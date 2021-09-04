@@ -28,7 +28,7 @@ USemanticInfo Checker::visit_call(ast::Call& n, bool is_rvalue) {
         this->error_reporter.error(std::make_unique<ErrorNotAFunction>(n));
         return error_stub();
     }
-    const FunctionType* function_type = nullptr;
+    const ast::FunctionType* function_type = nullptr;
     if (fun_info.entity.get().type == E_TYPE::CONST_FUNCTION) {
         function_type = ((EntityConstFunction&) fun_info.entity.get()).const_function->ft;
     } else if (fun_info.entity.get().type == E_TYPE::VALUE &&
@@ -211,7 +211,7 @@ bool Checker::check_arguments(ast::Call& n, std::vector<USNode>& arguments, ast:
 }
 
 void Checker::process_function_arguments(SemanticInfo& retv, std::vector<Entity*>& arg_entities,
-                                         std::vector<USNode>& arguments, ast::Call& n, const FunctionType& function_type,
+                                         std::vector<USNode>& arguments, ast::Call& n, const ast::FunctionType& function_type,
                                          SemanticInfo* fun_info_p) {
     retv.entity = *entity_from_type(*function_type.return_type);
     int sni = static_cast<int>(fun_info_p->this_arg != nullptr);

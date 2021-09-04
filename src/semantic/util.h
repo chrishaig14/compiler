@@ -9,5 +9,5 @@
 
 ast::UTypeNode parse_type(const std::string& s);
 
-FunctionType* parse_function_type(const std::string& s);
+ast::FunctionType* parse_function_type(const std::string& s);
 #endif //XLANG_UTIL_H

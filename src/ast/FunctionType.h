@@ -8,7 +8,7 @@
 
 #include "TypeNode.h"
 
-class FunctionType : public ast::TypeNode {
+class ast::FunctionType : public ast::TypeNode {
 public:
     FunctionType(ast::VectorOfTypes parameterTypes, ast::UTypeNode returnType);
 

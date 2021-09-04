@@ -18,7 +18,7 @@
 struct Implicit {
     std::string type;
     std::string method;
-    FunctionType* ft;
+    ast::FunctionType* ft;
     bool is_static;
 };
 

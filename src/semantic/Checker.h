@@ -60,14 +60,14 @@ typedef std::unique_ptr<SemanticInfoBlock> USemanticInfoBlock;
 
 bool is_generic(const ast::TypeNode& t);
 ast::UTypeNode make_type_from_object_pattern(const ast::ObjectType& object_type, const MapStringType& replacements);
-ast::UTypeNode make_type_from_function_pattern(const FunctionType& ftn, const MapStringType& replacements);
+ast::UTypeNode make_type_from_function_pattern(const ast::FunctionType& ftn, const MapStringType& replacements);
 ast::UTypeNode make_type(const ast::TypeNode& original, const MapStringType& replacements);
-SemanticInfo match_arguments_to_generic_function(const FunctionType& function_type, ast::VectorOfTypes arg_types);
+SemanticInfo match_arguments_to_generic_function(const ast::FunctionType& function_type, ast::VectorOfTypes arg_types);
 USemanticInfo error_stub();
 Entity* map_flirpin_to_entity(Flirpin flirpin);
 Flirpin map_unit_to_flirpin(Unit u);
 TextPosition add_one_col(TextPosition t);
-bool function_is_generic(const FunctionType& ft);
+bool function_is_generic(const ast::FunctionType& ft);
 
 sem::SNode*
 make_for_snode(ast::For& node, USemanticInfoBlock& binfo, USemanticInfo& exp_info_p, std::string loop_list_var_id,
@@ -100,14 +100,14 @@ public:
     Class* instantiate_generic(Class* generic, const ast::ObjectType& instance);
     bool is_variable(const ast::ObjectType& a);
     std::pair<std::string, ast::TypeNode*>*
-    get_first_substitution_function(FunctionType& a, FunctionType& b, bool is_top_level_arg);
+    get_first_substitution_function(ast::FunctionType& a, ast::FunctionType& b, bool is_top_level_arg);
     std::pair<std::string, ast::TypeNode*>*
     get_first_substitution_object(ast::ObjectType& a, ast::ObjectType& b, bool is_top_level_arg);
     std::pair<std::string, ast::TypeNode*>* get_first_substitution(ast::TypeNode& a, ast::TypeNode& b, bool is_top_level_arg);
     ast::UTypeNode substitute(const ast::TypeNode& t, const std::string& var, const ast::TypeNode& replacement);
-    std::unique_ptr<FunctionType> unify_function_call(const FunctionType& fun, ast::VectorOfTypes& args,
+    std::unique_ptr<ast::FunctionType> unify_function_call(const ast::FunctionType& fun, ast::VectorOfTypes& args,
                                                       std::map<std::string, ast::TypeNode*>& all_substitutions);
-    std::unique_ptr<SemanticInfo> match_arguments_to_generic_function(const FunctionType& ft, ast::VectorOfTypes arg_types,
+    std::unique_ptr<SemanticInfo> match_arguments_to_generic_function(const ast::FunctionType& ft, ast::VectorOfTypes arg_types,
                                                                       std::map<std::string, ast::TypeNode*>& all_substitutions);
     void fail(std::string msg);
 
@@ -168,7 +168,7 @@ public:
     void fill_value(Value& value);
     std::unique_ptr<SemanticInfo> expect_rvalue_of_type(const ast::TypeNode& target, ast::Node& node);
     void process_function_arguments(SemanticInfo& retv, std::vector<Entity*>& arg_entities, std::vector<USNode>& arguments,
-                                    ast::Call& n, const FunctionType& function_type, SemanticInfo* fun_info_p);
+                                    ast::Call& n, const ast::FunctionType& function_type, SemanticInfo* fun_info_p);
     bool check_arguments(ast::Call& n, std::vector<USNode>& sn, ast::VectorOfTypes& arg_types,
                          std::vector<Entity*>& arg_entities);
     USemanticInfo

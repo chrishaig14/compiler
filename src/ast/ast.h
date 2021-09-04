@@ -86,6 +86,8 @@ namespace ast {
 
     class ObjectType;
 
+    class FunctionType;
+
     typedef std::unique_ptr<Function> UFunctionNode;
     typedef std::unique_ptr<BinaryOp> UBinaryOp;
     typedef std::unique_ptr<Id> UId;
@@ -96,6 +98,8 @@ namespace ast {
     typedef std::vector<UNode> VectorOfNodesU;
     typedef std::unique_ptr<ObjectType> UObjectType;
 
+
+    typedef std::unique_ptr<FunctionType> UFunctionType;
     typedef std::unique_ptr<TypeNode> UTypeNode;
     typedef std::vector<UTypeNode> VectorOfUTypes;
     typedef std::vector<ast::TypeNode*> VectorOfTypes;

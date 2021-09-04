@@ -10,7 +10,7 @@
 
 class ErrorFunctionCallNumArgs : public Error {
 public:
-    ErrorFunctionCallNumArgs(FunctionType* type, TextPosition position);
+    ErrorFunctionCallNumArgs(ast::FunctionType* type, TextPosition position);
     Error* clone() const override;
     bool equal(const Error& other) const override;
     std::string to_str() const override;

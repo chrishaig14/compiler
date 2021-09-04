@@ -605,7 +605,7 @@ ast::UNode Parser::parse_common_statement() {
     }
 }
 
-std::unique_ptr<FunctionType> Parser::parse_function_type() {
+std::unique_ptr<ast::FunctionType> Parser::parse_function_type() {
     this->expect_token(TokType::FUN);
     this->expect_token(TokType::LPAREN);
     ast::VectorOfTypes parameter_types;
@@ -628,7 +628,7 @@ std::unique_ptr<FunctionType> Parser::parse_function_type() {
     } else {
         return_type = new ast::ObjectType(".None");
     }
-    return std::make_unique<FunctionType>(parameter_types, ast::UTypeNode(return_type));
+    return std::make_unique<ast::FunctionType>(parameter_types, ast::UTypeNode(return_type));
 }
 
 std::unique_ptr<ast::ObjectType> Parser::parse_object_type() {
@@ -724,7 +724,7 @@ std::unique_ptr<ast::Function> Parser::parse_function_definition() {
                 this->next();
                 is_static = true;
             }
-            FunctionType* ft = this->parse_function_type().release();
+            ast::FunctionType* ft = this->parse_function_type().release();
             std::cout << is_static << std::endl;
             std::cout << ft->to_json() << std::endl;
             implicit = new Implicit{parent.str, child.str, ft, is_static};
@@ -905,7 +905,7 @@ std::unique_ptr<ast::Klass> Parser::parse_class_definition() {
                 this->next();
                 is_static = true;
             }
-            FunctionType* ft = this->parse_function_type().release();
+            ast::FunctionType* ft = this->parse_function_type().release();
             this->expect_token(TokType::SEMICOLON);
             std::cout << is_static << std::endl;
             std::cout << ft->to_json() << std::endl;
@@ -1013,7 +1013,7 @@ std::unique_ptr<ast::Typeclass> Parser::parse_typeclass() {
     this->expect_token(TokType::RSQUARE);
     this->expect_token(TokType::LCURLY);
 
-    std::unordered_map<std::string, UFunctionType> methods;
+    std::unordered_map<std::string, ast::UFunctionType> methods;
 
     while (true) {
         if (!this->match(TokType::FUN)) {
@@ -1048,7 +1048,7 @@ std::unique_ptr<ast::Typeclass> Parser::parse_typeclass() {
             return_type = new ast::ObjectType(".None");
         }
 
-        auto ft = std::make_unique<FunctionType>(parameter_types, ast::UTypeNode(return_type));
+        auto ft = std::make_unique<ast::FunctionType>(parameter_types, ast::UTypeNode(return_type));
         methods[method_id.str] = std::move(ft);
         this->expect_token(TokType::SEMICOLON);
         if (!this->match(TokType::FUN)) {

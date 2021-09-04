@@ -989,10 +989,10 @@ TEST_CASE("parse_typeclass", "[parser]") {
     parser.top_package_name = "main";
 
     std::unique_ptr<ast::Typeclass> ast = parser.parse_typeclass();
-    std::unordered_map<std::string, UFunctionType> cmethods;
-    cmethods["eq"] = std::make_unique<FunctionType>(ast::VectorOfTypes{new ast::ObjectType("t"), new ast::ObjectType("t")},
+    std::unordered_map<std::string, ast::UFunctionType> cmethods;
+    cmethods["eq"] = std::make_unique<ast::FunctionType>(ast::VectorOfTypes{new ast::ObjectType("t"), new ast::ObjectType("t")},
                                                     std::make_unique<ast::ObjectType>("Boolean"));
-    cmethods["ne"] = std::make_unique<FunctionType>(ast::VectorOfTypes{new ast::ObjectType("t"), new ast::ObjectType("t")},
+    cmethods["ne"] = std::make_unique<ast::FunctionType>(ast::VectorOfTypes{new ast::ObjectType("t"), new ast::ObjectType("t")},
                                                     std::make_unique<ast::ObjectType>("Boolean"));
 
     REQUIRE(ast->to_json() == ast::Typeclass("Comparable", "t", std::move(cmethods), DUMMY_POS, DUMMY_POS).to_json());

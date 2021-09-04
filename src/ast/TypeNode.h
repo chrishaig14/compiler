@@ -18,8 +18,6 @@ enum class Kind {
     OBJECT, FUNCTION, UNKNOWN
 };
 
-class FunctionType;
-
 class UnknownTypeNode;
 
 class Class;
@@ -37,9 +35,9 @@ public:
 
     virtual ast::ObjectType& object();
 
-    virtual FunctionType& function();
+    virtual ast::FunctionType& function();
 
-    virtual const FunctionType& function() const;
+    virtual const ast::FunctionType& function() const;
 
     virtual const ast::ObjectType& object() const;
 

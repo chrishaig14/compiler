@@ -70,7 +70,7 @@ ast::UTypeNode Checker::substitute(const ast::TypeNode& t, const std::string& va
 }
 
 std::pair<std::string, ast::TypeNode*>*
-Checker::get_first_substitution_function(FunctionType& a, FunctionType& b, bool is_top_level_arg) {
+Checker::get_first_substitution_function(ast::FunctionType& a, ast::FunctionType& b, bool is_top_level_arg) {
     if (a.param_types.size() != b.param_types.size()) {
         this->error_reporter.fail(
                 "Error: trying to unify two functions with different parameter count: " + a.to_string() + " and " +
@@ -89,9 +89,9 @@ Checker::get_first_substitution_function(FunctionType& a, FunctionType& b, bool 
     return nullptr;
 }
 
-std::unique_ptr<FunctionType> Checker::unify_function_call(const FunctionType& f, ast::VectorOfTypes& args,
+std::unique_ptr<ast::FunctionType> Checker::unify_function_call(const ast::FunctionType& f, ast::VectorOfTypes& args,
                                                            std::map<std::string, ast::TypeNode*>& all_substitutions) {
-    FunctionType& fun = *f.clone();
+    ast::FunctionType& fun = *f.clone();
     if (args.size() != fun.param_types.size()) {
         this->error_reporter.error(std::make_unique<ErrorFunctionCallNumArgs>(fun.clone(), TextPosition{1, 1}));
         return nullptr;
@@ -124,7 +124,7 @@ std::unique_ptr<FunctionType> Checker::unify_function_call(const FunctionType& f
             delete old_s;
         }
     }
-    return std::unique_ptr<FunctionType>(&fun);
+    return std::unique_ptr<ast::FunctionType>(&fun);
 }
 
 std::pair<std::string, ast::TypeNode*>* Checker::get_first_substitution(ast::TypeNode& a, ast::TypeNode& b, bool is_top_level_arg) {

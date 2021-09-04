@@ -136,7 +136,7 @@ USemanticInfo Checker::visit_tuple(ast::Tuple& node) {
 USemanticInfo Checker::visit_partial(ast::PartialApplication& node) {
     USemanticInfo func = this->dispatch(*node.function);
     ast::VectorOfTypes partial_args;
-    FunctionType* fun_type = nullptr;
+    ast::FunctionType* fun_type = nullptr;
     Entity& f_entity = func->entity;
     if (f_entity.type == E_TYPE::CONST_FUNCTION ||
         (f_entity.type == E_TYPE::VALUE && ((EntityValue&) f_entity).value->type->kind == Kind::FUNCTION)) {
@@ -169,7 +169,7 @@ USemanticInfo Checker::visit_partial(ast::PartialApplication& node) {
     node.complete_type = &fun_type->clone()->function();
     USemanticInfo s_p = std::make_unique<SemanticInfo>();
     auto& s = *s_p;
-    s.entity = *new EntityValue(std::make_unique<Value>(new FunctionType(partial_args,
+    s.entity = *new EntityValue(std::make_unique<Value>(new ast::FunctionType(partial_args,
                                                                          ast::UTypeNode(fun_type->return_type->clone()))));
     auto non = std::make_unique<sem::NewObject>();
     non->class_name = "Partial" + std::to_string(npartial);
@@ -256,7 +256,7 @@ USemanticInfo Checker::visit_defconst(ast::DefaultConstructor& node) {
     }
     auto* rt = new ast::ObjectType(cls.class_name, tp);
     rt->actual_base_path = cls.path;
-    info.entity = *new EntityConstFunction(new ConstFunction(Path(), new FunctionType(t, ast::UTypeNode(rt))));
+    info.entity = *new EntityConstFunction(new ConstFunction(Path(), new ast::FunctionType(t, ast::UTypeNode(rt))));
     auto idn = std::make_unique<sem::Id>(cls.path.as_str() + "." + "__init__");
     info.snode = std::move(idn);
     return info_u;

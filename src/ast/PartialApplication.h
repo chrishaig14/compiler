@@ -14,7 +14,7 @@ class ast::PartialApplication : public ast::Node {
 public:
     ast::UNode function;
     ast::VectorOfNodesU args;
-    FunctionType* complete_type;
+    ast::FunctionType* complete_type;
     PartialApplication(ast::UNode function, ast::VectorOfNodesU args, TextPosition start, TextPosition end);
 
     bool equal(const ast::Node& other) const override;

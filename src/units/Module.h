@@ -39,7 +39,7 @@ public:
     Path get_actual_path(const std::string& id);
     void fill_actual(ast::TypeNode& t);
     void fill_actual(ast::ObjectType& t);
-    void fill_actual(FunctionType& t);
+    void fill_actual(ast::FunctionType& t);
 };
 
 

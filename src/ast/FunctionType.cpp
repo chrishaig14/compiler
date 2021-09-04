@@ -5,7 +5,10 @@
 #include "FunctionType.h"
 #include "ObjectType.h"
 
-FunctionType::FunctionType(ast::VectorOfTypes parameterTypes, ast::UTypeNode returnType):return_type(std::move(returnType)) {
+using namespace ast;
+
+FunctionType::FunctionType(ast::VectorOfTypes parameterTypes, ast::UTypeNode returnType) : return_type(std::move(
+        returnType)) {
 
     for (auto* p: parameterTypes) {
         assert(p != nullptr);
@@ -18,12 +21,12 @@ FunctionType::FunctionType(ast::VectorOfTypes parameterTypes, ast::UTypeNode ret
     this->kind = Kind::FUNCTION;
 }
 
-FunctionType* FunctionType::clone() const {
+ast::FunctionType* ast::FunctionType::clone() const {
     ast::VectorOfTypes aux;
     for (auto& p: this->param_types) {
         aux.emplace_back(p->clone());
     }
-    return new FunctionType(aux, ast::UTypeNode(this->return_type->clone()));
+    return new ast::FunctionType(aux, ast::UTypeNode(this->return_type->clone()));
 }
 
 FunctionType::~FunctionType() {
@@ -48,7 +51,7 @@ std::string FunctionType::to_string() const {
     return "fun (" + parameters + ")" + (*ftype.return_type == ast::ObjectType(".None") ? "" : (" -> " + ret));
 }
 
-std::string FunctionType::actual_to_string() const {
+std::string ast::FunctionType::actual_to_string() const {
     const auto& ftype = *this;
     std::string parameters;
     std::string ret;
@@ -63,7 +66,7 @@ std::string FunctionType::actual_to_string() const {
     return "fun (" + parameters + ")" + (*ftype.return_type == ast::ObjectType(".None") ? "" : (" -> " + ret));
 }
 
-bool FunctionType::equal(const ast::TypeNode& other) const {
+bool ast::FunctionType::equal(const ast::TypeNode& other) const {
     const auto& a = *this;
     const auto& b = other.function();
     if (a.param_types.size() != b.param_types.size()) {
@@ -77,15 +80,15 @@ bool FunctionType::equal(const ast::TypeNode& other) const {
     return *a.return_type == *b.return_type;
 }
 
-FunctionType& FunctionType::function() {
+ast::FunctionType& ast::FunctionType::function() {
     return *this;
 }
 
-const FunctionType& FunctionType::function() const {
+const ast::FunctionType& ast::FunctionType::function() const {
     return *this;
 }
 
-bool FunctionType::is_generic() const {
+bool ast::FunctionType::is_generic() const {
     for (auto& t: this->param_types) {
         if (t->is_generic()) {
             return true;
@@ -94,7 +97,7 @@ bool FunctionType::is_generic() const {
     return this->return_type->is_generic();
 }
 
-nlohmann::json FunctionType::to_json() const {
+nlohmann::json ast::FunctionType::to_json() const {
     nlohmann::json j;
     j["kind"] = "function";
     std::vector<nlohmann::json> v;

@@ -64,7 +64,7 @@ void mangle_generic_names(ast::TypeNode& t) {
     return mangle_generic_names(t.function());
 }
 
-void mangle_generic_names(FunctionType& t) {
+void mangle_generic_names(ast::FunctionType& t) {
     for (auto& pt: t.param_types) {
         mangle_generic_names(*pt);
     }
@@ -89,7 +89,7 @@ void make_not_generic(ast::TypeNode& t) {
     return make_not_generic(t.object());
 }
 
-void make_not_generic(FunctionType& ft) {
+void make_not_generic(ast::FunctionType& ft) {
     for (auto& pt: ft.param_types) {
         make_not_generic(*pt);
     }

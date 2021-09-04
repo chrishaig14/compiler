@@ -12,7 +12,7 @@
 
 class ConstFunction {
 public:
-    ConstFunction(Path path, FunctionType* ft) {
+    ConstFunction(Path path, ast::FunctionType* ft) {
         this->path = path;
         this->ft = ft;
         this->implicit = nullptr;
@@ -28,7 +28,7 @@ public:
     }
 
     Implicit* implicit;
-    FunctionType* ft;
+    ast::FunctionType* ft;
     Path path;
 };
 

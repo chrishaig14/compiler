@@ -73,7 +73,7 @@ public:
     ast::UNode parse_partial_application();
 
     ast::UTypeNode parse_type_node();
-    std::unique_ptr<FunctionType> parse_function_type();
+    std::unique_ptr<ast::FunctionType> parse_function_type();
     std::unique_ptr<ast::ObjectType> parse_object_type();
 
     ast::VectorOfNodesU parse_list_of_arguments();
