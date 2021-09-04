@@ -20,7 +20,7 @@ std::string ErrorObjectNoSpecialMethod::to_str() const {
     return "Error: object of type " + this->type.to_string() + " has no special method " + this->method_name;
 }
 
-ErrorObjectNoSpecialMethod::ErrorObjectNoSpecialMethod(const TypeNode& type, const std::string& method_name,
+ErrorObjectNoSpecialMethod::ErrorObjectNoSpecialMethod(const ast::TypeNode& type, const std::string& method_name,
                                                        const ast::Subscript& node)
         : node(node), method_name(method_name), type(type) {
 

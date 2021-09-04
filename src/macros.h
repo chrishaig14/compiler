@@ -25,7 +25,7 @@
 #define TYPE(parent, type_parameters) new ObjectType(parent, type_parameters)
 #define BOOL(x) new ast::BooleanNode(x)
 
-#define T_DICT(k, v) TYPE("Dict", VectorOfTypes({k,v}))
+#define T_DICT(k, v) TYPE("Dict", ast::VectorOfTypes({k,v}))
 #define FUN(a, b, c, d, e) new ast::FunctionNode(a,b,c,d,e)
 #define WHILE(condition, body) new ast::WhileNode(condition, body)
 #define FUNCTION_TYPE(parameters, return_type) new FunctionType(parameters, return_type)
@@ -60,8 +60,8 @@
 #define NBREAK new BreakNode()
 #define NCONTINUE new ContinueNode()
 #define NL(instruction) std::pair<std::string, Instruction*>("", instruction)
-#define TO_FUNCTION_TYPE(x) dynamic_cast<FunctionTypeNode*> (x)
-#define TO_OBJECT_TYPE(x) dynamic_cast<ObjectTypeNode*> (x)
+#define TO_FUNCTION_TYPE(x) dynamic_cast<Functionast::TypeNode*> (x)
+#define TO_OBJECT_TYPE(x) dynamic_cast<Objectast::TypeNode*> (x)
 #define TO_ID(x) dynamic_cast<ast::IdNode*> (x)
 #define TO_SUB(x) dynamic_cast<SubscriptNode*> (x)
 #define TO_MEMBER(x) dynamic_cast<ast::MemberNode*>(x)
@@ -79,6 +79,6 @@
 #define T_DOUBLE ObjectType("Double")
 
 typedef std::unordered_map<std::string, Entity*> MapStringEntity;
-typedef std::unordered_map<std::string, TypeNode*> MapStringType;
+typedef std::unordered_map<std::string, ast::TypeNode*> MapStringType;
 
 #endif //UNTITLED1_MACROS_H

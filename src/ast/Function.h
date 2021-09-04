@@ -27,11 +27,11 @@ public:
     Implicit* implicit;
     std::string identifier;
     VectorOfStrings parameter_names;
-    VectorOfUTypes parameter_types;
+    ast::VectorOfUTypes parameter_types;
     std::unique_ptr<ast::Block> body;
-    UTypeNode return_type;
-    Function(std::string identifier, const VectorOfStrings& parameter_names, VectorOfUTypes& parameter_types,
-             UTypeNode& return_type, std::unique_ptr<ast::Block>& body, TextPosition start, TextPosition end);
+    ast::UTypeNode return_type;
+    Function(std::string identifier, const VectorOfStrings& parameter_names, ast::VectorOfUTypes& parameter_types,
+             ast::UTypeNode& return_type, std::unique_ptr<ast::Block>& body, TextPosition start, TextPosition end);
 
     bool equal(const ast::Node& x) const override;
 

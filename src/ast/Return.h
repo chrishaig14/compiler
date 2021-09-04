@@ -22,7 +22,7 @@ public:
     nlohmann::json to_json() const override;
 
     ast::UNode expression;
-    std::vector<std::pair<std::string, TypeNode*>> reachables;
+    std::vector<std::pair<std::string, ast::TypeNode*>> reachables;
 };
 
 #endif //RETURNNODE_H

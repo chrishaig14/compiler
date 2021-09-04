@@ -12,7 +12,7 @@ std::string ErrorNoMemberSuggestions::to_str() const {
     return s;
 }
 
-ErrorNoMemberSuggestions::ErrorNoMemberSuggestions(const TypeNode& t, const ast::Member& m, const Class& clazz)
+ErrorNoMemberSuggestions::ErrorNoMemberSuggestions(const ast::TypeNode& t, const ast::Member& m, const Class& clazz)
         : m(m), t(t), clazz(clazz) {
 
 }

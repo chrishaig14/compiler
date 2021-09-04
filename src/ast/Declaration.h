@@ -16,13 +16,13 @@ class ast::Declaration : public ast::Node {
 public:
     Node& expression;
     std::string identifier;
-    UTypeNode type;
+    ast::UTypeNode type;
     TextPosition eq_pos;
-    Declaration(const std::string& identifier, UTypeNode type, ast::UNode expression, TextPosition start,
+    Declaration(const std::string& identifier, ast::UTypeNode type, ast::UNode expression, TextPosition start,
                 TextPosition eq_pos, TextPosition end);
 
 
-    Declaration(const std::string& identifier, UTypeNode type, ast::Node* expression, TextPosition start);
+    Declaration(const std::string& identifier, ast::UTypeNode type, ast::Node* expression, TextPosition start);
 
     bool equal(const ast::Node& other) const override;
 

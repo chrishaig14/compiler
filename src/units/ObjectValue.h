@@ -17,14 +17,14 @@ enum class Meta {
 class Value {
 
 public:
-    TypeNode* type;
+    ast::TypeNode* type;
     union {
         Class* clazz;
         Enum* enumm;
     };
     Meta metatype;
 
-    Value(TypeNode* type) {
+    Value(ast::TypeNode* type) {
         this->clazz = nullptr;
         this->enumm = nullptr;
         assert(type != nullptr);

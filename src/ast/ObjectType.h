@@ -8,18 +8,18 @@
 #include "TypeNode.h"
 #include "Path.h"
 
-class ObjectType : public TypeNode {
+class ObjectType : public ast::TypeNode {
 public:
-    ObjectType(const std::string& identifier, const VectorOfTypes& typeParameters);
+    ObjectType(const std::string& identifier, const ast::VectorOfTypes& typeParameters);
 
     explicit ObjectType(const std::string& identifier);
 
-    bool equal(const TypeNode& other) const override;
+    bool equal(const ast::TypeNode& other) const override;
 
     std::string to_string() const override;
     std::string actual_to_string() const override;
 
-    TypeNode* clone() const override;
+    ast::TypeNode* clone() const override;
 
     ObjectType& object() override;
 
@@ -31,9 +31,9 @@ public:
 
     Path actual_base_path;
     std::string id;
-    VectorOfTypes type_params;
+    ast::VectorOfTypes type_params;
     bool is_generic() const override;
-    TypeNode* aliased_type;
+    ast::TypeNode* aliased_type;
 };
 
 #endif //XLANG_OBJECTTYPE_H

@@ -19,13 +19,13 @@ class Class {
 public:
     Class();
     VectorOfStrings member_names;
-    std::vector<TypeNode*> member_types;
+    std::vector<ast::TypeNode*> member_types;
     std::unordered_map<std::string, Entity*> member_entities;
 
     MapStringType members;
     std::unordered_map<std::string, ConstFunction*> methods;
 
-    std::map<std::string, std::pair<TypeNode*, ast::Node*>> static_members;
+    std::map<std::string, std::pair<ast::TypeNode*, ast::Node*>> static_members;
     std::unordered_map<std::string, ConstFunction*> static_methods;
 
     std::string class_name;

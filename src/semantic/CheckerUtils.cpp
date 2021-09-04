@@ -23,7 +23,7 @@ std::string binoptype_to_str(OpType op) {
 }
 
 
-int target_union_type(const ObjectType& target, const TypeNode& source) {
+int target_union_type(const ObjectType& target, const ast::TypeNode& source) {
     for (size_t ti = 0; ti < target.type_params.size(); ti++) {
         if (target.type_params[ti]->actual_to_string() == source.actual_to_string()) {
             return ti;
@@ -47,7 +47,7 @@ sem::FunctionDef* make_class_default_init(const std::string& class_path, const V
 }
 
 
-TypeNode* get_entity_type(Entity& e) {
+ast::TypeNode* get_entity_type(Entity& e) {
     if (e.type == E_TYPE::CONST_FUNCTION) {
         return ((EntityConstFunction&) e).const_function->ft->clone();
     } else if (e.type == E_TYPE::VALUE) {
@@ -57,7 +57,7 @@ TypeNode* get_entity_type(Entity& e) {
 }
 
 
-void mangle_generic_names(TypeNode& t) {
+void mangle_generic_names(ast::TypeNode& t) {
     if (t.kind == Kind::OBJECT) {
         return mangle_generic_names(t.object());
     }
@@ -82,7 +82,7 @@ void mangle_generic_names(ObjectType& t) {
 }
 
 
-void make_not_generic(TypeNode& t) {
+void make_not_generic(ast::TypeNode& t) {
     if (t.kind == Kind::FUNCTION) {
         return make_not_generic(t.function());
     }

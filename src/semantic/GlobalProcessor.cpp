@@ -54,15 +54,15 @@ void GlobalProcessor::visit_function(ast::Function& node) {
     std::cout << "Global-processing function " << node.identifier << " in module " << this->module.name << std::endl;
     ConstFunction* const_function = this->module.flirpins[node.identifier].const_function;
 
-    VectorOfTypes x;
+    ast::VectorOfTypes x;
     for (auto& p: node.parameter_types) {
-        TypeNode& type_node = *p;
+        ast::TypeNode& type_node = *p;
         this->module.fill_actual(type_node);
         x.emplace_back(p->clone());
     }
-    TypeNode& p = *node.return_type;
+    ast::TypeNode& p = *node.return_type;
     this->module.fill_actual(p);
-    FunctionType function_info(x, UTypeNode(node.return_type->clone()));
+    FunctionType function_info(x, ast::UTypeNode(node.return_type->clone()));
     Path function_path = Path(this->module.path, node.identifier);
     const_function->ft = function_info.clone();
     const_function->path = Path(this->module.path, node.identifier);
@@ -193,7 +193,7 @@ void GlobalProcessor::visit_class(ast::Klass& node) {
     for (const auto& f: node.methods) {
         ast::Function& method = *f.second->method;
 
-        VectorOfTypes x;
+        ast::VectorOfTypes x;
         for (auto& p: method.parameter_types) {
             this->module.fill_actual(*p);
             // p->object().actual_base_path = this->get_actual_path(p->object().id);
@@ -203,7 +203,7 @@ void GlobalProcessor::visit_class(ast::Klass& node) {
         // method.return_type->object().actual_base_path = this->get_actual_path(method.return_type->object().id);
 
         auto* cf = new ConstFunction(Path(class_info->path, f.first),
-                                     new FunctionType(x, UTypeNode(method.return_type->clone())));
+                                     new FunctionType(x, ast::UTypeNode(method.return_type->clone())));
         method.path = cf->path;
         cf->implicit = f.second->method->implicit;
         f.second->method->const_function = cf;
@@ -212,7 +212,7 @@ void GlobalProcessor::visit_class(ast::Klass& node) {
 
     for (const auto& f: node.static_methods) {
         ast::Function& method = *f.second;
-        VectorOfTypes x;
+        ast::VectorOfTypes x;
         for (auto& p: method.parameter_types) {
             this->module.fill_actual(*p);
             // p->object().actual_base_path = this->get_actual_path(p->object().id);
@@ -222,7 +222,7 @@ void GlobalProcessor::visit_class(ast::Klass& node) {
         // method.return_type->object().actual_base_path = this->get_actual_path(method.return_type->object().id);
 
         auto* cf = new ConstFunction(Path(class_info->path, f.first),
-                                     new FunctionType(x, UTypeNode(method.return_type->clone())));
+                                     new FunctionType(x, ast::UTypeNode(method.return_type->clone())));
         method.path = cf->path;
         f.second->const_function = cf;
         class_info->static_methods.insert(make_pair(f.first, cf));
@@ -287,7 +287,7 @@ Path Module::get_actual_path(const std::string& id) {
     throw std::runtime_error("Error: type " + id + " not found");
 }
 
-void Module::fill_actual(TypeNode& t) {
+void Module::fill_actual(ast::TypeNode& t) {
     if (t.kind == Kind::OBJECT) {
         if (this->aliased_types.count(t.object().id) != 0) {
             t.object().aliased_type = this->aliased_types[t.object().id];

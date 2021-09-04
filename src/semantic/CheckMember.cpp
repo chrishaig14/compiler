@@ -170,14 +170,14 @@ USemanticInfo Checker::class_member(Class* cls, const std::string& child, ast::M
     if (cls->methods.find(child) != cls->methods.end()) {
         ConstFunction* bound_method = cls->methods[child];
         auto* unbound_method = new ConstFunction(bound_method->path, bound_method->ft->clone());
-        VectorOfTypes tp;
+        ast::VectorOfTypes tp;
         for (auto tt: cls->type_params) {
             ObjectType* t = new ObjectType(tt);
             t->is_generic_param = true;
             tp.push_back(t);
         }
         ObjectType* ot = new ObjectType(cls->class_name, tp);
-        unbound_method->ft->param_types.insert(unbound_method->ft->param_types.begin(), UTypeNode(ot));
+        unbound_method->ft->param_types.insert(unbound_method->ft->param_types.begin(), ast::UTypeNode(ot));
         info.entity = *new EntityConstFunction(unbound_method);
         info.snode = std::make_unique<sem::Id>(unbound_method->path.as_str());
     } else if (cls->static_methods.find(child) != cls->static_methods.end()) {

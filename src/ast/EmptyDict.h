@@ -12,7 +12,7 @@
 
 class ast::EmptyDict : public ast::Node {
 public:
-    EmptyDict(UTypeNode& key_type, UTypeNode& value_type, TextPosition start, TextPosition end)
+    EmptyDict(ast::UTypeNode& key_type, ast::UTypeNode& value_type, TextPosition start, TextPosition end)
             : ast::Node(NodeType::EMPTYDICT, start, end),
 
               key_type(std::move(key_type)), value_type(std::move(value_type)) {
@@ -28,8 +28,8 @@ public:
                 {"empty_dict", {{"key_type", this->key_type->to_json()}, {"value_type", this->value_type->to_json()}}}};
     }
 
-    UTypeNode key_type;
-    UTypeNode value_type;
+    ast::UTypeNode key_type;
+    ast::UTypeNode value_type;
 };
 
 

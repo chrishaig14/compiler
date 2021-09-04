@@ -98,7 +98,7 @@ USemanticInfo Checker::visit_string(ast::String& node) {
 }
 
 USemanticInfo Checker::visit_tuple(ast::Tuple& node) {
-    VectorOfTypes types;
+    ast::VectorOfTypes types;
     std::vector<USNode> values;
     for (auto& n: node.values) {
         USemanticInfo vtype = this->dispatch(*n);
@@ -135,7 +135,7 @@ USemanticInfo Checker::visit_tuple(ast::Tuple& node) {
 
 USemanticInfo Checker::visit_partial(ast::PartialApplication& node) {
     USemanticInfo func = this->dispatch(*node.function);
-    VectorOfTypes partial_args;
+    ast::VectorOfTypes partial_args;
     FunctionType* fun_type = nullptr;
     Entity& f_entity = func->entity;
     if (f_entity.type == E_TYPE::CONST_FUNCTION ||
@@ -152,7 +152,7 @@ USemanticInfo Checker::visit_partial(ast::PartialApplication& node) {
     std::vector<USNode> snodes;
     int npartial = 0;
     for (size_t i = 0; i < node.args.size(); i++) {
-        UTypeNode& param_type = fun_type->param_types[i];
+        ast::UTypeNode& param_type = fun_type->param_types[i];
         if (node.args[i] != nullptr) {
             USemanticInfo arg_sinfo = this->expect_rvalue_of_type(*param_type, *node.args[i]);
             if (arg_sinfo->is_error()) {
@@ -170,7 +170,7 @@ USemanticInfo Checker::visit_partial(ast::PartialApplication& node) {
     USemanticInfo s_p = std::make_unique<SemanticInfo>();
     auto& s = *s_p;
     s.entity = *new EntityValue(std::make_unique<Value>(new FunctionType(partial_args,
-                                                                         UTypeNode(fun_type->return_type->clone()))));
+                                                                         ast::UTypeNode(fun_type->return_type->clone()))));
     auto non = std::make_unique<sem::NewObject>();
     non->class_name = "Partial" + std::to_string(npartial);
     non->args = std::move(snodes);
@@ -237,7 +237,7 @@ USemanticInfo Checker::visit_defconst(ast::DefaultConstructor& node) {
     // this is a regular function
     USemanticInfo info_u = std::make_unique<SemanticInfo>();
     SemanticInfo& info = *info_u;
-    VectorOfTypes t;
+    ast::VectorOfTypes t;
     Entity& entity = this->dispatch(*node.class_node)->entity;
     if (entity.type != E_TYPE::CLASS) {
         this->error_reporter.fail("Error not a class");
@@ -248,7 +248,7 @@ USemanticInfo Checker::visit_defconst(ast::DefaultConstructor& node) {
     for (auto* pt: cls.member_types) {
         t.push_back(pt->clone());
     }
-    VectorOfTypes tp;
+    ast::VectorOfTypes tp;
     for (const auto& tt: cls.type_params) {
         auto* ot = new ObjectType(tt);
         tp.push_back(ot);
@@ -256,7 +256,7 @@ USemanticInfo Checker::visit_defconst(ast::DefaultConstructor& node) {
     }
     auto* rt = new ObjectType(cls.class_name, tp);
     rt->actual_base_path = cls.path;
-    info.entity = *new EntityConstFunction(new ConstFunction(Path(), new FunctionType(t, UTypeNode(rt))));
+    info.entity = *new EntityConstFunction(new ConstFunction(Path(), new FunctionType(t, ast::UTypeNode(rt))));
     auto idn = std::make_unique<sem::Id>(cls.path.as_str() + "." + "__init__");
     info.snode = std::move(idn);
     return info_u;
@@ -269,14 +269,14 @@ USemanticInfo Checker::visit_list(ast::List& node) {
         return error_stub();
     }
     EntityValue& entity_value = (EntityValue&) element_type_p->entity.get();
-    TypeNode* element_type = entity_value.value->type->clone();
+    ast::TypeNode* element_type = entity_value.value->type->clone();
     bool is_constant = true;
     std::vector<USNode> list_elements;
     list_elements.push_back(std::move(element_type_p->snode));
 
     for (size_t i = 1; i < node.elements.size(); i++) {
         USemanticInfo current_type_p = this->dispatch(node.elements[i]);
-        // const TypeNode& current_type = current_type_p->type();
+        // const ast::TypeNode& current_type = current_type_p->type();
         // if (!current_type_p->is_constant) {
         //     is_constant = false;
         // }

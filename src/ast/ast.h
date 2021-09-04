@@ -82,6 +82,8 @@ namespace ast {
 
     class For;
 
+    class TypeNode;
+
     typedef std::unique_ptr<Function> UFunctionNode;
     typedef std::unique_ptr<BinaryOp> UBinaryOp;
     typedef std::unique_ptr<Id> UId;
@@ -90,6 +92,11 @@ namespace ast {
     typedef std::unique_ptr<Node> UNode;
     typedef std::reference_wrapper<Node> RNode;
     typedef std::vector<UNode> VectorOfNodesU;
+
+    typedef std::unique_ptr<TypeNode> UTypeNode;
+    typedef std::vector<UTypeNode> VectorOfUTypes;
+    typedef std::vector<ast::TypeNode*> VectorOfTypes;
+
 }
 
 #endif //XLANG_AST_H

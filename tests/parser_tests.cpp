@@ -19,7 +19,7 @@ struct TestNodeU {
 
 struct TestTypeNode {
     std::string text;
-    TypeNode* node;
+    ast::TypeNode* node;
 };
 
 const std::string& ID = "baz";
@@ -147,10 +147,10 @@ TestNodeU BLOCK_1() {
 
 TestNodeU FUNCTION() {
     auto block = BLOCK_U();
-    VectorOfUTypes vt;
-    vt.push_back(UTypeNode(TYPE_1.node->clone()));
-    vt.push_back(UTypeNode(TYPE_2.node->clone()));
-    UTypeNode u(TYPE_3.node->clone());
+    ast::VectorOfUTypes vt;
+    vt.push_back(ast::UTypeNode(TYPE_1.node->clone()));
+    vt.push_back(ast::UTypeNode(TYPE_2.node->clone()));
+    ast::UTypeNode u(TYPE_3.node->clone());
     return {"fun " + ID + "(" + ID_1 + ":" + TYPE_1.text + "," + ID_2 + ":" + TYPE_2.text + ")->" + TYPE_3.text +
             block.text, std::make_unique<ast::Function>(ID,
                                                         VectorOfStrings{ID_1, ID_2},
@@ -341,8 +341,8 @@ TEST_CASE("parse_fun_simple", "[parser]") {
 
     std::unique_ptr<ast::Function> ast = parser.parse_function_definition();
 
-    VectorOfUTypes vt;
-    UTypeNode u(NO_TYPE.clone());
+    ast::VectorOfUTypes vt;
+    ast::UTypeNode u(NO_TYPE.clone());
     REQUIRE(ast->to_json() == ast::Function(ID,
                                             VectorOfStrings{},
                                             vt,
@@ -363,9 +363,9 @@ TEST_CASE("parse_fun_one_arg", "[parser]") {
 
     std::unique_ptr<ast::Function> ast = parser.parse_function_definition();
 
-    VectorOfUTypes vt;
-    vt.push_back(UTypeNode(TYPE.node->clone()));
-    UTypeNode u(NO_TYPE.clone());
+    ast::VectorOfUTypes vt;
+    vt.push_back(ast::UTypeNode(TYPE.node->clone()));
+    ast::UTypeNode u(NO_TYPE.clone());
     REQUIRE(ast->to_json() == ast::Function(ID, {ID_1}, vt, u, (std::unique_ptr<ast::Block>&) BLOCK.node,
 
                                             DUMMY_POS, DUMMY_POS).to_json());
@@ -382,10 +382,10 @@ TEST_CASE("parse_fun_mult_arg", "[parser]") {
 
     std::unique_ptr<ast::Function> ast = parser.parse_function_definition();
 
-    VectorOfUTypes vt;
-    vt.push_back(UTypeNode(TYPE_1.node->clone()));
-    vt.push_back(UTypeNode(TYPE_2.node->clone()));
-    UTypeNode u(NO_TYPE.clone());
+    ast::VectorOfUTypes vt;
+    vt.push_back(ast::UTypeNode(TYPE_1.node->clone()));
+    vt.push_back(ast::UTypeNode(TYPE_2.node->clone()));
+    ast::UTypeNode u(NO_TYPE.clone());
     REQUIRE(ast->to_json() == ast::Function(ID,
                                             {ID_1, ID_2},
                                             vt,
@@ -419,8 +419,8 @@ TEST_CASE("parse_class_one_member", "[parser]") {
 
     std::unique_ptr<ast::Klass> ast = parser.parse_class_definition();
     std::unordered_map<std::string, ast::UFunctionNode> v;
-    std::vector<std::pair<std::string, UTypeNode >> members;
-    members.emplace_back(ID_1, UTypeNode(TYPE_1.node->clone()));
+    std::vector<std::pair<std::string, ast::UTypeNode >> members;
+    members.emplace_back(ID_1, ast::UTypeNode(TYPE_1.node->clone()));
     REQUIRE(ast->to_json() == ast::Klass(ID, {}, std::move(members), {}, {}, v, DUMMY_POS, DUMMY_POS).to_json());
 }
 
@@ -434,9 +434,9 @@ TEST_CASE("parse_class_mult_member", "[parser]") {
 
     std::unique_ptr<ast::Klass> ast = parser.parse_class_definition();
     std::unordered_map<std::string, ast::UFunctionNode> v;
-    std::vector<std::pair<std::string, UTypeNode >> members;
-    members.emplace_back(ID_2, UTypeNode(TYPE_2.node->clone()));
-    members.emplace_back(ID_1, UTypeNode(TYPE_1.node->clone()));
+    std::vector<std::pair<std::string, ast::UTypeNode >> members;
+    members.emplace_back(ID_2, ast::UTypeNode(TYPE_2.node->clone()));
+    members.emplace_back(ID_1, ast::UTypeNode(TYPE_1.node->clone()));
     REQUIRE(ast->to_json() == ast::Klass(ID, {}, std::move(members), {}, {}, v, DUMMY_POS, DUMMY_POS).to_json());
 }
 
@@ -454,9 +454,9 @@ TEST_CASE("parse_class_with_method", "[parser]") {
 
     ast::UFunctionNode fp = std::move((ast::UFunctionNode&) function.node);
     std::unordered_map<std::string, ast::UFunctionNode> v;
-    std::vector<std::pair<std::string, UTypeNode >> members;
-    members.emplace_back(ID_2, UTypeNode(TYPE_2.node->clone()));
-    members.emplace_back(ID_1, UTypeNode(TYPE_1.node->clone()));
+    std::vector<std::pair<std::string, ast::UTypeNode >> members;
+    members.emplace_back(ID_2, ast::UTypeNode(TYPE_2.node->clone()));
+    members.emplace_back(ID_1, ast::UTypeNode(TYPE_1.node->clone()));
     //     std::unordered_map<std::string, std::unique_ptr<KMethod>> methods;
     //     methods[fp->identifier] = std::make_unique<KMethod>(nullptr, std::move(fp));
     //     REQUIRE(ast->to_json() ==
@@ -518,7 +518,7 @@ TEST_CASE("parse_list_empty", "[parser]") {
 
     ast::UNode ast = parser.parse_list_literal();
 
-    REQUIRE(ast->to_json() == ast::EmptyList(UTypeNode(TYPE.node->clone()), DUMMY_POS, DUMMY_POS).to_json());
+    REQUIRE(ast->to_json() == ast::EmptyList(ast::UTypeNode(TYPE.node->clone()), DUMMY_POS, DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_list_one_element", "[parser]") {
@@ -840,8 +840,8 @@ TEST_CASE("parse_dict_empty", "[parser]") {
     parser.top_package_name = "main";
 
     ast::UNode ast = parser.parse_dictionary();
-    UTypeNode u1(TYPE_1.node->clone());
-    UTypeNode u2(TYPE_2.node->clone());
+    ast::UTypeNode u1(TYPE_1.node->clone());
+    ast::UTypeNode u2(TYPE_2.node->clone());
     REQUIRE(ast->to_json() == ast::EmptyDict(u1, u2, DUMMY_POS, DUMMY_POS).to_json());
 }
 
@@ -990,9 +990,9 @@ TEST_CASE("parse_typeclass", "[parser]") {
 
     std::unique_ptr<ast::Typeclass> ast = parser.parse_typeclass();
     std::unordered_map<std::string, UFunctionType> cmethods;
-    cmethods["eq"] = std::make_unique<FunctionType>(VectorOfTypes{new ObjectType("t"), new ObjectType("t")},
+    cmethods["eq"] = std::make_unique<FunctionType>(ast::VectorOfTypes{new ObjectType("t"), new ObjectType("t")},
                                                     std::make_unique<ObjectType>("Boolean"));
-    cmethods["ne"] = std::make_unique<FunctionType>(VectorOfTypes{new ObjectType("t"), new ObjectType("t")},
+    cmethods["ne"] = std::make_unique<FunctionType>(ast::VectorOfTypes{new ObjectType("t"), new ObjectType("t")},
                                                     std::make_unique<ObjectType>("Boolean"));
 
     REQUIRE(ast->to_json() == ast::Typeclass("Comparable", "t", std::move(cmethods), DUMMY_POS, DUMMY_POS).to_json());
@@ -1009,15 +1009,15 @@ TEST_CASE("parse_instance", "[parser]") {
     std::unique_ptr<ast::Instance> ast = parser.parse_instance();
     std::unique_ptr<ast::Block> b2 = ast::Block::make(ast::VectorOfNodesU{}, DUMMY_POS, DUMMY_POS);
     std::unique_ptr<ast::Block> b1 = ast::Block::make(ast::VectorOfNodesU{}, DUMMY_POS, DUMMY_POS);
-    VectorOfUTypes vt1;
+    ast::VectorOfUTypes vt1;
     vt1.push_back(std::make_unique<ObjectType>("Foo"));
     vt1.push_back(std::make_unique<ObjectType>("Foo"));
 
-    VectorOfUTypes vt2;
+    ast::VectorOfUTypes vt2;
     vt2.push_back(std::make_unique<ObjectType>("Foo"));
     vt2.push_back(std::make_unique<ObjectType>("Foo"));
-    UTypeNode r1 = std::make_unique<ObjectType>("Boolean");
-    UTypeNode r2 = std::make_unique<ObjectType>("Boolean");
+    ast::UTypeNode r1 = std::make_unique<ObjectType>("Boolean");
+    ast::UTypeNode r2 = std::make_unique<ObjectType>("Boolean");
     std::unordered_map<std::string, ast::UFunctionNode> methods;
     methods["eq"] = std::make_unique<ast::Function>("eq", VectorOfStrings{"a", "b"}, vt1, r1, b1, DUMMY_POS, DUMMY_POS);
     methods["ne"] = std::make_unique<ast::Function>("ne", VectorOfStrings{"a", "b"}, vt2, r2, b2, DUMMY_POS, DUMMY_POS);

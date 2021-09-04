@@ -313,9 +313,9 @@ ast::UNode Parser::parse_dictionary() {
         this->next();
         this->expect_token(TokType::DOUBLE_COLON);
         this->expect_token(TokType::LSQUARE);
-        UTypeNode key_type = this->parse_type_node();
+        ast::UTypeNode key_type = this->parse_type_node();
         this->expect_token(TokType::COMMA);
-        UTypeNode value_type = this->parse_type_node();
+        ast::UTypeNode value_type = this->parse_type_node();
         Token rsquare = this->expect_token(TokType::RSQUARE);
         return std::make_unique<ast::EmptyDict>(key_type, value_type, lcurly.start, rsquare.end_pos);
     }
@@ -529,7 +529,7 @@ ast::UNode Parser::parse_call_or_subscript_chain(ast::UNode& parent) {
 std::unique_ptr<ast::Declaration> Parser::parse_variable_declaration() {
     Token var_token = this->expect_token(TokType::VAR);
     Token identifier = this->expect_token(TokType::ID);
-    UTypeNode type = nullptr;
+    ast::UTypeNode type = nullptr;
     if (this->match(TokType::COLON)) {
         this->next();
         type = this->parse_type_node();
@@ -608,10 +608,10 @@ ast::UNode Parser::parse_common_statement() {
 std::unique_ptr<FunctionType> Parser::parse_function_type() {
     this->expect_token(TokType::FUN);
     this->expect_token(TokType::LPAREN);
-    VectorOfTypes parameter_types;
+    ast::VectorOfTypes parameter_types;
     if (!this->match(TokType::RPAREN)) {
         while (true) {
-            TypeNode* parameter_type = this->parse_type_node().release();
+            ast::TypeNode* parameter_type = this->parse_type_node().release();
             parameter_types.push_back(parameter_type);
             if (this->match(TokType::COMMA)) {
                 this->next();
@@ -621,23 +621,23 @@ std::unique_ptr<FunctionType> Parser::parse_function_type() {
         }
     }
     this->expect_token(TokType::RPAREN);
-    TypeNode* return_type;
+    ast::TypeNode* return_type;
     if (this->match(TokType::RARROW)) {
         this->expect_token(TokType::RARROW);
         return_type = this->parse_type_node().release();
     } else {
         return_type = new ObjectType(".None");
     }
-    return std::make_unique<FunctionType>(parameter_types, UTypeNode(return_type));
+    return std::make_unique<FunctionType>(parameter_types, ast::UTypeNode(return_type));
 }
 
 std::unique_ptr<ObjectType> Parser::parse_object_type() {
     Token identifier = this->expect_token(TokType::ID);
-    VectorOfTypes type_parameters;
+    ast::VectorOfTypes type_parameters;
     if (this->match(TokType::LSQUARE)) {
         this->next();
         while (true) {
-            TypeNode* type_parameter = this->parse_type_node().release();
+            ast::TypeNode* type_parameter = this->parse_type_node().release();
             type_parameters.push_back(type_parameter);
             if (this->match(TokType::COMMA)) {
                 this->next();
@@ -654,7 +654,7 @@ std::unique_ptr<ObjectType> Parser::parse_object_type() {
     return ot;
 }
 
-std::unique_ptr<TypeNode> Parser::parse_type_node() {
+ast::UTypeNode Parser::parse_type_node() {
     if (this->match(TokType::FUN)) {
         return this->parse_function_type();
     } else if (this->match(TokType::ID)) {
@@ -685,7 +685,7 @@ std::unique_ptr<ast::Function> Parser::parse_function_definition() {
     Token matched_token = this->expect_token(TokType::ID);
     std::string identifier = matched_token.str;
     this->expect_token(TokType::LPAREN);
-    VectorOfUTypes parameter_types;
+    ast::VectorOfUTypes parameter_types;
     VectorOfStrings parameter_names;
 
     if (!this->match(TokType::RPAREN) && !this->match(TokType::ID)) {
@@ -702,7 +702,7 @@ std::unique_ptr<ast::Function> Parser::parse_function_definition() {
             while (true) {
                 Token parameter_identifier = this->expect_token(TokType::ID);
                 this->expect_token(TokType::COLON);
-                UTypeNode parameter_type = this->parse_type_node();
+                ast::UTypeNode parameter_type = this->parse_type_node();
                 parameter_types.push_back(std::move(parameter_type));
                 parameter_names.push_back(parameter_identifier.str);
                 if (this->match(TokType::COMMA)) {
@@ -732,7 +732,7 @@ std::unique_ptr<ast::Function> Parser::parse_function_definition() {
         this->expect_token(TokType::RPAREN);
     }
     // Parse return
-    UTypeNode return_type;
+    ast::UTypeNode return_type;
     if (this->match(TokType::RARROW)) {
         // function with return value
         this->expect_token(TokType::RARROW);
@@ -771,7 +771,7 @@ std::unique_ptr<ast::Alias> Parser::parse_alias() {
     Token alias_tk = this->expect_token(TokType::ALIAS);
     Token alias_id = this->expect_token(TokType::ID);
     this->expect_token(TokType::EQQ);
-    TypeNode* aliased_type = this->parse_type_node().release();
+    ast::TypeNode* aliased_type = this->parse_type_node().release();
     Token semic_tk = this->expect_token(TokType::SEMICOLON);
     auto node = std::make_unique<ast::Alias>(alias_id.str, aliased_type, alias_tk.start, semic_tk.end_pos);
     return node;
@@ -868,9 +868,9 @@ std::unique_ptr<ast::Klass> Parser::parse_class_definition() {
     this->expect_token(TokType::LCURLY);
     std::unordered_map<std::string, std::unique_ptr<KMethod>> methods;
     std::unordered_map<std::string, ast::UFunctionNode> static_methods;
-    std::vector<std::pair<std::string, UTypeNode>> members;
+    std::vector<std::pair<std::string, ast::UTypeNode>> members;
     std::set<std::string> member_names;
-    std::map<std::string, std::pair<TypeNode*, ast::Node*>> static_members;
+    std::map<std::string, std::pair<ast::TypeNode*, ast::Node*>> static_members;
     VectorOfStrings members_ordered;
     while (true) {
         bool is_static = false;
@@ -881,7 +881,7 @@ std::unique_ptr<ast::Klass> Parser::parse_class_definition() {
         if (this->match(TokType::ID)) {
             Token member_name_tk = this->expect_token(TokType::ID);
             this->expect_token(TokType::COLON);
-            UTypeNode member_type = this->parse_type_node();
+            ast::UTypeNode member_type = this->parse_type_node();
             std::string& member_name = member_name_tk.str;
             if (member_names.find(member_name) != member_names.end() || methods.find(member_name) != methods.end()) {
                 this->error_class_member_redefined(class_name, member_name, member_name_tk.start);
@@ -988,11 +988,11 @@ std::unique_ptr<ast::Match> Parser::parse_match_statement() {
     this->expect_token(TokType::LCURLY);
 
     std::vector<std::string> ids;
-    std::vector<std::pair<UTypeNode , ast::UBlock>> cases;
+    std::vector<std::pair<ast::UTypeNode , ast::UBlock>> cases;
     while (true) {
         Token id = this->expect_token(TokType::ID);
         this->expect_token(TokType::COLON);
-        UTypeNode type = this->parse_type_node();
+        ast::UTypeNode type = this->parse_type_node();
         auto body = this->parse_possibly_empty_block();
         ids.push_back(id.str);
         cases.emplace_back(std::move(type), std::move(body));
@@ -1021,7 +1021,7 @@ std::unique_ptr<ast::Typeclass> Parser::parse_typeclass() {
         }
         this->expect_token(TokType::FUN);
         Token method_id = this->expect_token(TokType::ID);
-        VectorOfTypes parameter_types;
+        ast::VectorOfTypes parameter_types;
         // VectorOfStrings parameter_names;
         this->expect_token(TokType::LPAREN);
         while (true) {
@@ -1030,7 +1030,7 @@ std::unique_ptr<ast::Typeclass> Parser::parse_typeclass() {
             }
             Token parameter_identifier = this->expect_token(TokType::ID);
             this->expect_token(TokType::COLON);
-            std::unique_ptr<TypeNode> parameter_type = this->parse_type_node();
+            ast::UTypeNode parameter_type = this->parse_type_node();
             parameter_types.push_back(parameter_type.release());
             // parameter_names.push_back(parameter_identifier.str);
             if (this->match(TokType::COMMA)) {
@@ -1040,7 +1040,7 @@ std::unique_ptr<ast::Typeclass> Parser::parse_typeclass() {
             }
         }
         this->expect_token(TokType::RPAREN);
-        TypeNode* return_type;
+        ast::TypeNode* return_type;
         if (this->match(TokType::RARROW)) {
             this->expect_token(TokType::RARROW);
             return_type = this->parse_type_node().release();
@@ -1048,7 +1048,7 @@ std::unique_ptr<ast::Typeclass> Parser::parse_typeclass() {
             return_type = new ObjectType(".None");
         }
 
-        auto ft = std::make_unique<FunctionType>(parameter_types, UTypeNode(return_type));
+        auto ft = std::make_unique<FunctionType>(parameter_types, ast::UTypeNode(return_type));
         methods[method_id.str] = std::move(ft);
         this->expect_token(TokType::SEMICOLON);
         if (!this->match(TokType::FUN)) {

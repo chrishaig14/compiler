@@ -32,7 +32,7 @@ public:
 
     ~Block();
     nlohmann::json to_json() const override;
-    std::vector<std::pair<std::string, TypeNode*>> local_vars;
+    std::vector<std::pair<std::string, ast::TypeNode*>> local_vars;
 };
 
 

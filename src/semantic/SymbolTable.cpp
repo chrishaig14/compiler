@@ -51,12 +51,12 @@ void SymbolTable::set(const std::string& name, Entity* info) {
     this->table[name] = info;
 }
 
-std::vector<std::pair<std::string, TypeNode*>> SymbolTable::get_all_in_loop() {
+std::vector<std::pair<std::string, ast::TypeNode*>> SymbolTable::get_all_in_loop() {
     if (this->is_loop) {
-        std::vector<std::pair<std::string, TypeNode*>> r;
+        std::vector<std::pair<std::string, ast::TypeNode*>> r;
 
         for (auto v: this->table) {
-            TypeNode* t;
+            ast::TypeNode* t;
             // if (v.second->type == E_TYPE::FUNCTION_VALUE) {
             //     t = ((FunctionValue*) v.second)->ft;
             // }
@@ -67,12 +67,12 @@ std::vector<std::pair<std::string, TypeNode*>> SymbolTable::get_all_in_loop() {
         }
         return r;
     } else {
-        std::vector<std::pair<std::string, TypeNode*>> r;
+        std::vector<std::pair<std::string, ast::TypeNode*>> r;
 
         auto p = this->parent->get_all_in_loop();
         r.insert(r.end(), p.begin(), p.end());
         for (auto v: this->table) {
-            TypeNode* t;
+            ast::TypeNode* t;
             // if (v.second->type == E_TYPE::FUNCTION_VALUE) {
             //     t = ((FunctionValue*) v.second)->ft;
             // }
@@ -85,16 +85,16 @@ std::vector<std::pair<std::string, TypeNode*>> SymbolTable::get_all_in_loop() {
     }
 }
 
-std::vector<std::pair<std::string, TypeNode*>> SymbolTable::get_all() {
+std::vector<std::pair<std::string, ast::TypeNode*>> SymbolTable::get_all() {
     if (this->is_function) {
-        std::vector<std::pair<std::string, TypeNode*>> r;
+        std::vector<std::pair<std::string, ast::TypeNode*>> r;
 
         for (auto& v: this->table) {
             Entity& e = *v.second;
-            TypeNode* t;
+            ast::TypeNode* t;
             if (e.type == E_TYPE::VALUE) {
                 EntityValue& ev = (EntityValue&) e;
-                TypeNode& type = *ev.value->type;
+                ast::TypeNode& type = *ev.value->type;
                 t = type.clone();
                 if (e.type == E_TYPE::VALUE) {
                     r.push_back(std::make_pair(v.first, t));
@@ -104,7 +104,7 @@ std::vector<std::pair<std::string, TypeNode*>> SymbolTable::get_all() {
         }
         return r;
     } else {
-        std::vector<std::pair<std::string, TypeNode*>> r;
+        std::vector<std::pair<std::string, ast::TypeNode*>> r;
 
         auto p = this->parent->get_all();
         r.insert(r.end(), p.begin(), p.end());

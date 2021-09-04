@@ -51,7 +51,7 @@ void init_styles() {
 // }
 
 
-// void ErrorReporter::object_no_member(const TypeNode& t, const MemberNode& m) {
+// void ErrorReporter::object_no_member(const ast::TypeNode& t, const MemberNode& m) {
 //     this->entity_no_member(E_FMT("Object of type ") + E_HLT(t.to_string()),
 //                            m.s_child,
 //                            m.dot_pos,
@@ -61,7 +61,7 @@ void init_styles() {
 // }
 
 
-// void ErrorReporter::class_no_member(const TypeNode& t, const std::string& member, TextPosition pos, Node& obj,
+// void ErrorReporter::class_no_member(const ast::TypeNode& t, const std::string& member, TextPosition pos, Node& obj,
 //                                     TextPosition member_start, TextPosition member_end) {
 //     this->entity_no_member(E_FMT("Class ") + E_HLT(t.to_string()), member, pos, obj, member_start, member_end);
 // }
@@ -121,7 +121,7 @@ void init_styles() {
 // }
 
 void
-ErrorReporter::assignment(const TypeNode& expected, const TypeNode& actual, TextPosition pos, const ast::Node& lvalue,
+ErrorReporter::assignment(const ast::TypeNode& expected, const ast::TypeNode& actual, TextPosition pos, const ast::Node& lvalue,
                           const ast::Node& rvalue) {
     std::string pre_msg;
     pre_msg = E_FMT("Expected ") + E_HLT(expected.to_string()) + E_FMT("(alias for ") +
@@ -143,13 +143,13 @@ ErrorReporter::assignment(const TypeNode& expected, const TypeNode& actual, Text
     // this->fail(msg, pos);
 }
 
-// void ErrorReporter::no_return(const TypeNode& t, TextPosition pos) {
+// void ErrorReporter::no_return(const ast::TypeNode& t, TextPosition pos) {
 //     std::string msg;
 //     msg = E_FMT(" Expected to return ") + E_HLT(t.to_string()) + E_FMT(" but not returning anything");
 //     this->fail(msg, pos);
 // }
 //
-// void ErrorReporter::function_doesnt_return_a_value(TextPosition pos, const TypeNode* expected_type) {
+// void ErrorReporter::function_doesnt_return_a_value(TextPosition pos, const ast::TypeNode* expected_type) {
 //     std::string msg;
 //     msg = E_FMT(" Function doesn't return a value but its being used as an expression") +
 //           (expected_type != nullptr ? E_FMT(", expected ") + E_HLT(expected_type->to_string()) : "");
@@ -234,7 +234,7 @@ ErrorReporter::assignment(const TypeNode& expected, const TypeNode& actual, Text
 //     this->fail_ok(pre_msg, msg, node.start);
 // }
 //
-// void ErrorReporter::list_literal(const TypeNode& lt, const TypeNode& et, TextPosition pos, const Node& ell) {
+// void ErrorReporter::list_literal(const ast::TypeNode& lt, const ast::TypeNode& et, TextPosition pos, const Node& ell) {
 //     std::string pre_msg;
 //     pre_msg = E_FMT("List literal with element of wrong type, expected ") + E_HLT(lt.to_string()) + E_FMT(" got ") +
 //               E_HLT(et.to_string());
@@ -242,7 +242,7 @@ ErrorReporter::assignment(const TypeNode& expected, const TypeNode& actual, Text
 //     this->fail_ok(pre_msg, msg, pos);
 // }
 //
-// void ErrorReporter::function_return_last_stmt(const std::string& function_name, const TypeNode& et, TextPosition pos) {
+// void ErrorReporter::function_return_last_stmt(const std::string& function_name, const ast::TypeNode& et, TextPosition pos) {
 //     std::string msg;
 //     msg = E_FMT("Error in function ") + E_HLT(function_name) +
 //           E_FMT(": The last statement must be a return <EXPRESSION> of type ") + E_HLT(et.to_string());
@@ -328,7 +328,7 @@ ErrorReporter::ErrorReporter() {
 //
 // }
 
-// void ErrorReporter::object_no_member_with_suggestions(const TypeNode& t, const std::string& member, TextPosition pos,
+// void ErrorReporter::object_no_member_with_suggestions(const ast::TypeNode& t, const std::string& member, TextPosition pos,
 //                                                       Node& obj, TextPosition member_start, TextPosition member_end,
 //                                                       Class* clazz) {
 //     std::string pre_msg = E_FMT("Object of type ") + E_HLT(t.to_string());
@@ -355,7 +355,7 @@ ErrorReporter::ErrorReporter() {
 //     this->fail_ok(pre_msg + E_FMT(" has no member ") + E_HLT("'" + member + "'"), msg, pos);
 // }
 
-// void ErrorReporter::object_no_special_method(const TypeNode& type, const char* method_name, const SubscriptNode& node) {
+// void ErrorReporter::object_no_special_method(const ast::TypeNode& type, const char* method_name, const SubscriptNode& node) {
 //     std::string pre_msg =
 //             E_FMT("Object of type ") + E_HLT(type.to_string()) + " does not implement method " + E_HLT(method_name);
 //

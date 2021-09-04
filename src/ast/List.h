@@ -22,7 +22,7 @@ public:
     ~List() override;
     nlohmann::json to_json() const override;
 
-    TypeNode* type;
+    ast::TypeNode* type;
 };
 
 

@@ -22,8 +22,8 @@ public:
 
     ~Cast();
 
-    TypeNode* exp_type;
-    TypeNode* rtype;
+    ast::TypeNode* exp_type;
+    ast::TypeNode* rtype;
 };
 
 

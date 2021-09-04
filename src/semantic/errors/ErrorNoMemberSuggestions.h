@@ -10,10 +10,10 @@
 
 class ErrorNoMemberSuggestions : public Error {
     const ast::Member& m;
-    const TypeNode& t;
+    const ast::TypeNode& t;
     const Class& clazz;
 public:
-    ErrorNoMemberSuggestions(const TypeNode& t, const ast::Member& m, const Class& clazz);
+    ErrorNoMemberSuggestions(const ast::TypeNode& t, const ast::Member& m, const Class& clazz);
 
     bool equal(const Error& other) const override;
 

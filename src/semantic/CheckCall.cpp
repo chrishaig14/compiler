@@ -45,7 +45,7 @@ USemanticInfo Checker::visit_call(ast::Call& n, bool is_rvalue) {
             return error_stub();
         }
     }
-    VectorOfTypes arg_types;
+    ast::VectorOfTypes arg_types;
 
     std::vector<Entity*> arg_entities;
     std::vector<USNode> arguments;
@@ -180,7 +180,7 @@ USemanticInfo Checker::make_return_info(const ast::Call& n, bool is_rvalue, USem
     return retv_p;
 }
 
-bool Checker::check_arguments(ast::Call& n, std::vector<USNode>& arguments, VectorOfTypes& arg_types,
+bool Checker::check_arguments(ast::Call& n, std::vector<USNode>& arguments, ast::VectorOfTypes& arg_types,
                               std::vector<Entity*>& arg_entities) {
     bool has_error;
     for (auto& arg: n.arguments) {
@@ -203,7 +203,7 @@ bool Checker::check_arguments(ast::Call& n, std::vector<USNode>& arguments, Vect
         }
 
 
-        TypeNode& arg_type = *get_entity_type(arg_entity);
+        ast::TypeNode& arg_type = *get_entity_type(arg_entity);
         arg_types.push_back(arg_type.clone());
         n.arg_types.push_back(arg_type.clone());
     }
@@ -216,8 +216,8 @@ void Checker::process_function_arguments(SemanticInfo& retv, std::vector<Entity*
     retv.entity = *entity_from_type(*function_type.return_type);
     int sni = static_cast<int>(fun_info_p->this_arg != nullptr);
     for (size_t i = 0; i < n.arguments.size(); i++) {
-        // const TypeNode& arg_type = *arg_types[i];
-        const TypeNode& param_type = *function_type.param_types[i];
+        // const ast::TypeNode& arg_type = *arg_types[i];
+        const ast::TypeNode& param_type = *function_type.param_types[i];
 
         USNode arg_rvalue_snode = this->make_rvalue(*arg_entities[i], std::move(arguments[sni]), param_type);
         if (arg_rvalue_snode == nullptr) {

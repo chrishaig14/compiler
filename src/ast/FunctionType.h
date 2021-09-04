@@ -8,11 +8,11 @@
 
 #include "TypeNode.h"
 
-class FunctionType : public TypeNode {
+class FunctionType : public ast::TypeNode {
 public:
-    FunctionType(VectorOfTypes parameterTypes, UTypeNode returnType);
+    FunctionType(ast::VectorOfTypes parameterTypes, ast::UTypeNode returnType);
 
-    bool equal(const TypeNode& other) const override;
+    bool equal(const ast::TypeNode& other) const override;
 
     std::string to_string() const override;
     std::string actual_to_string() const override;
@@ -26,9 +26,9 @@ public:
     const FunctionType& function() const override;
 
     // VectorOfTypes param_types;
-    VectorOfUTypes param_types;
-    // UTypeNode t;
-    UTypeNode return_type;
+    ast::VectorOfUTypes param_types;
+    // ast::UTypeNode t;
+    ast::UTypeNode return_type;
 
     bool is_generic() const override;
 

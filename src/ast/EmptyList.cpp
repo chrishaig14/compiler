@@ -6,7 +6,7 @@
 
 using namespace ast;
 
-EmptyList::EmptyList(UTypeNode type, TextPosition start, TextPosition end) : ast::Node(NodeType::EMPTYLST, start, end),
+EmptyList::EmptyList(ast::UTypeNode type, TextPosition start, TextPosition end) : ast::Node(NodeType::EMPTYLST, start, end),
                                                                              type(std::move(type)) {
 }
 

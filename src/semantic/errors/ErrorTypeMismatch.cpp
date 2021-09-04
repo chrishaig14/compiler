@@ -5,7 +5,7 @@
 #include "ErrorTypeMismatch.h"
 #include "../../json/json.hpp"
 
-ErrorTypeMismatch::ErrorTypeMismatch(const TypeNode& expected, const ast::Node& value_node, const Entity& actual)
+ErrorTypeMismatch::ErrorTypeMismatch(const ast::TypeNode& expected, const ast::Node& value_node, const Entity& actual)
         : expected(expected), value_node(value_node), actual(actual) {
 }
 

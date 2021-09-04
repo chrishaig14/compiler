@@ -26,16 +26,16 @@ class UnknownTypeNode;
 
 class Class;
 
-class TypeNode {
+class ast::TypeNode {
 public:
     Kind kind;
 
     virtual std::string to_string() const = 0;
     virtual std::string actual_to_string() const = 0;
 
-    virtual bool equal(const TypeNode& other) const = 0;
+    virtual bool equal(const ast::TypeNode& other) const = 0;
 
-    virtual TypeNode* clone() const = 0;
+    virtual ast::TypeNode* clone() const = 0;
 
     virtual ObjectType& object();
 
@@ -45,9 +45,9 @@ public:
 
     virtual const ObjectType& object() const;
 
-    bool operator==(const TypeNode& other) const;
+    bool operator==(const ast::TypeNode& other) const;
 
-    bool operator!=(const TypeNode& other) const;
+    bool operator!=(const ast::TypeNode& other) const;
 
     virtual ~TypeNode() = default;
 
@@ -59,6 +59,6 @@ public:
     virtual bool is_generic() const;
 };
 
-std::ostream& operator<<(std::ostream& o, const TypeNode& t);
+std::ostream& operator<<(std::ostream& o, const ast::TypeNode& t);
 
 #endif //TypeNode_H

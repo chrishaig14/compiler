@@ -54,7 +54,7 @@ USemanticInfo Checker::visit_id(ast::Id& n) {
 USemanticInfo Checker::visit_cast(ast::Cast& n) {
     // USemanticInfo exp_info = this->dispatch_rvalue(*n.exp);
     // ObjectType cast_type(n.as_type, {});
-    // const TypeNode& exp_type = *exp_info->entity.value->type;
+    // const ast::TypeNode& exp_type = *exp_info->entity.value->type;
     // if (exp_type == T_INT || exp_type == T_FLOAT || exp_type == T_DOUBLE || exp_type == T_BOOL) {
     //     if (cast_type != T_BOOL && cast_type != T_FLOAT && cast_type != T_DOUBLE && cast_type != T_INT) {
     //         this->error_reporter.fail("Can't cast " + exp_type.to_string() + " to " + cast_type.to_string());
@@ -85,8 +85,8 @@ USemanticInfo Checker::visit_cast(ast::Cast& n) {
 //         // this->error_reporter.fail("Can't have binop between 2 non objects!");
 //     }
 //
-//     const TypeNode& ltype = *get_entity_type(l_entity);
-//     const TypeNode& rtype = *get_entity_type(r_entity);
+//     const ast::TypeNode& ltype = *get_entity_type(l_entity);
+//     const ast::TypeNode& rtype = *get_entity_type(r_entity);
 //     if (ltype != rtype) {
 //         this->error_reporter.error(std::make_unique<ErrorTypeMismatch>(ltype, *n.right, r_entity));
 //         // this->error_reporter.error(std::make_unique<ErrorTypeMismatch>(*left_info_p->entity.value->type, *n.right, right_info_p->entity);
@@ -180,7 +180,7 @@ USemanticInfo Checker::visit_unary(ast::UnaryOp& n) {
 
     ConstFunction* subscript_fun = subscript_it->second;
     std::string sub_fun_path = subscript_fun->path.as_str();
-    TypeNode* rtype = subscript_fun->ft->return_type->clone();
+    ast::TypeNode* rtype = subscript_fun->ft->return_type->clone();
 
     auto fsn = std::make_unique<sem::Id>(sub_fun_path);
     std::vector<USNode> v;
@@ -228,7 +228,7 @@ USemanticInfo Checker::visit_binop(ast::BinaryOp& n) {
     vv.push_back(std::move(left_info_p->snode));
     vv.push_back(std::move(right_snode));
     auto sn = std::make_unique<sem::Call>(std::move(function_id), std::move(vv));
-    TypeNode* rettype = operator_fun->ft->return_type->clone();
+    ast::TypeNode* rettype = operator_fun->ft->return_type->clone();
 
     USemanticInfo info_u = std::make_unique<SemanticInfo>();
     SemanticInfo& info = *info_u;
@@ -295,7 +295,7 @@ USemanticInfo Checker::visit_subscript(ast::Subscript& node) {
     }
     ConstFunction* subscript_fun = subscript_it->second;
     std::string sub_fun_path = subscript_fun->path.as_str();
-    TypeNode* rtype = subscript_fun->ft->return_type->clone();
+    ast::TypeNode* rtype = subscript_fun->ft->return_type->clone();
 
     // VectorOfTypes children;
     if (node.child.size() > 1) {
@@ -344,7 +344,7 @@ USemanticInfo Checker::visit_ternary(ast::Ternary& node) {
         return error_stub();
     }
     this->enter_scope("true_case");
-    TypeNode*& inner_type = expression_type.type_params[0];
+    ast::TypeNode*& inner_type = expression_type.type_params[0];
     auto v = std::make_unique<Value>(inner_type);
     this->scope->set("it", new EntityValue(std::move(v)));
     USemanticInfo true_case_p = this->dispatch_rvalue(*node.true_case);

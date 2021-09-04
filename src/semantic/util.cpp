@@ -6,7 +6,7 @@
 #include "../scanner/Scanner.h"
 #include "../parser/Parser.h"
 
-UTypeNode parse_type(const std::string& s) {
+ast::UTypeNode parse_type(const std::string& s) {
     Scanner scanner;
     scanner.load_text(s);
     std::vector<Token> tokens = scanner.scan_all();

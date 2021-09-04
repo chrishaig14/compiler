@@ -5,7 +5,7 @@
 #include "FunctionType.h"
 #include "ObjectType.h"
 
-FunctionType::FunctionType(VectorOfTypes parameterTypes, UTypeNode returnType):return_type(std::move(returnType)) {
+FunctionType::FunctionType(ast::VectorOfTypes parameterTypes, ast::UTypeNode returnType):return_type(std::move(returnType)) {
 
     for (auto* p: parameterTypes) {
         assert(p != nullptr);
@@ -13,17 +13,17 @@ FunctionType::FunctionType(VectorOfTypes parameterTypes, UTypeNode returnType):r
     // assert(returnType != nullptr);
     // this->param_types = parameterTypes;
     for (auto* p: parameterTypes) {
-        this->param_types.push_back(UTypeNode(p));
+        this->param_types.push_back(ast::UTypeNode(p));
     }
     this->kind = Kind::FUNCTION;
 }
 
 FunctionType* FunctionType::clone() const {
-    VectorOfTypes aux;
+    ast::VectorOfTypes aux;
     for (auto& p: this->param_types) {
         aux.emplace_back(p->clone());
     }
-    return new FunctionType(aux, UTypeNode(this->return_type->clone()));
+    return new FunctionType(aux, ast::UTypeNode(this->return_type->clone()));
 }
 
 FunctionType::~FunctionType() {
@@ -63,7 +63,7 @@ std::string FunctionType::actual_to_string() const {
     return "fun (" + parameters + ")" + (*ftype.return_type == ObjectType(".None") ? "" : (" -> " + ret));
 }
 
-bool FunctionType::equal(const TypeNode& other) const {
+bool FunctionType::equal(const ast::TypeNode& other) const {
     const auto& a = *this;
     const auto& b = other.function();
     if (a.param_types.size() != b.param_types.size()) {

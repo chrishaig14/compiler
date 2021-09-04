@@ -5,12 +5,13 @@
 #include <cassert>
 #include "TypeNode.h"
 
+using namespace ast;
 
-bool TypeNode::operator!=(const TypeNode& other) const {
+bool TypeNode::operator!=(const ast::TypeNode& other) const {
     return !(*this == other);
 }
 
-bool TypeNode::operator==(const TypeNode& other) const {
+bool TypeNode::operator==(const ast::TypeNode& other) const {
     if (this->kind != other.kind) {
         return false;
     }
@@ -37,7 +38,7 @@ bool TypeNode::is_generic() const {
     return false;
 }
 
-std::ostream& operator<<(std::ostream& o, const TypeNode& t) {
+std::ostream& operator<<(std::ostream& o, const ast::TypeNode& t) {
     o << t.to_string();
     return o;
 }

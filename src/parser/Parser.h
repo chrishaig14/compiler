@@ -72,7 +72,7 @@ public:
     ast::UNode parse_tuple_or_constructor();
     ast::UNode parse_partial_application();
 
-    std::unique_ptr<TypeNode> parse_type_node();
+    ast::UTypeNode parse_type_node();
     std::unique_ptr<FunctionType> parse_function_type();
     std::unique_ptr<ObjectType> parse_object_type();
 

@@ -12,12 +12,12 @@
 
 class ast::Alias : public ast::Node {
 public:
-    Alias(std::string alias_id, TypeNode* aliased_type, TextPosition start, TextPosition end);
+    Alias(std::string alias_id, ast::TypeNode* aliased_type, TextPosition start, TextPosition end);
     bool equal(const ast::Node& other) const override;
     nlohmann::json to_json() const override;
 
     std::string alias_id;
-    TypeNode* aliased_type;
+    ast::TypeNode* aliased_type;
 };
 
 

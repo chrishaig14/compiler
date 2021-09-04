@@ -26,7 +26,7 @@ public:
     bool is_lib;
     std::map<std::string, Path> imported_paths_no_alias;
     std::map<std::string, Path> imported_paths_with_alias;
-    std::map<std::string, TypeNode*> aliased_types;
+    std::map<std::string, ast::TypeNode*> aliased_types;
     std::vector<std::pair<std::string, Path>> imported_paths_no_alias_v;
     std::vector<std::pair<std::string, Path>> imported_paths_with_alias_v;
     std::map<std::string, Entity*> imports;
@@ -37,7 +37,7 @@ public:
     Flirpin get(Path p);
     Module(Path path, std::string abs_path, std::string rel_path, bool is_lib, std::string full_header_path);
     Path get_actual_path(const std::string& id);
-    void fill_actual(TypeNode& t);
+    void fill_actual(ast::TypeNode& t);
     void fill_actual(ObjectType& t);
     void fill_actual(FunctionType& t);
 };

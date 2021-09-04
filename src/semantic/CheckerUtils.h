@@ -28,25 +28,25 @@
 
 std::string binoptype_to_str(OpType op);
 
-int target_union_type(const ObjectType& target, const TypeNode& source);
+int target_union_type(const ObjectType& target, const ast::TypeNode& source);
 
-Entity* entity_from_type(const TypeNode& type);
+Entity* entity_from_type(const ast::TypeNode& type);
 
-ast::Function* generate_eq_method(std::string class_name, VectorOfTypes tp, VectorOfStrings members_ordered);
+ast::Function* generate_eq_method(std::string class_name, ast::VectorOfTypes tp, VectorOfStrings members_ordered);
 
 ast::Function* generate_str_method(std::string class_name);
 
 sem::FunctionDef* make_class_default_init(const std::string& class_path, const VectorOfStrings& members);
 
-TypeNode* get_entity_type(Entity& e);
+ast::TypeNode* get_entity_type(Entity& e);
 
-void mangle_generic_names(TypeNode& t);
+void mangle_generic_names(ast::TypeNode& t);
 void mangle_generic_names(FunctionType& t);
 void mangle_generic_names(ObjectType& t);
 
 void make_not_generic(FunctionType& ft);
 void make_not_generic(ObjectType& ot);
-void make_not_generic(TypeNode& t);
+void make_not_generic(ast::TypeNode& t);
 
 USNode make_union_wrapper(int type_index, USNode expression);
 

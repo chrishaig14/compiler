@@ -4,7 +4,7 @@
 
 #include "ObjectType.h"
 
-ObjectType::ObjectType(const std::string& identifier, const VectorOfTypes& typeParameters)
+ObjectType::ObjectType(const std::string& identifier, const ast::VectorOfTypes& typeParameters)
         : id(identifier), type_params(typeParameters) {
     for (auto* p: typeParameters) {
         assert(p != nullptr);
@@ -14,8 +14,8 @@ ObjectType::ObjectType(const std::string& identifier, const VectorOfTypes& typeP
     this->is_generic_param = false;
 }
 
-TypeNode* ObjectType::clone() const {
-    VectorOfTypes aux;
+ast::TypeNode* ObjectType::clone() const {
+    ast::VectorOfTypes aux;
     for (auto* p: this->type_params) {
         aux.emplace_back(p->clone());
     }
@@ -61,7 +61,7 @@ std::string ObjectType::actual_to_string() const {
     return this->actual_base_path.as_str();
 }
 
-bool ObjectType::equal(const TypeNode& other) const {
+bool ObjectType::equal(const ast::TypeNode& other) const {
     const auto& a = *this;
     const auto& b = other.object();
     if (a.id != b.id) {

@@ -11,11 +11,11 @@
 #include "Error.h"
 
 class ErrorTypeMismatch : public Error {
-    const TypeNode& expected;
+    const ast::TypeNode& expected;
     const ast::Node& value_node;
     const Entity& actual;
 public:
-    ErrorTypeMismatch(const TypeNode& expected, const ast::Node& value_node, const Entity& actual);
+    ErrorTypeMismatch(const ast::TypeNode& expected, const ast::Node& value_node, const Entity& actual);
 
     std::string to_str() const override;
     bool equal(const Error& other) const override;

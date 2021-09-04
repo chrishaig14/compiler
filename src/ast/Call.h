@@ -26,8 +26,8 @@ public:
     ~Call();
     nlohmann::json to_json() const override;
 
-    VectorOfTypes ftype;
-    VectorOfTypes arg_types;
+    ast::VectorOfTypes ftype;
+    ast::VectorOfTypes arg_types;
 };
 
 
