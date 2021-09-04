@@ -170,7 +170,7 @@ USemanticInfo Checker::visit_partial(ast::PartialApplication& node) {
     USemanticInfo s_p = std::make_unique<SemanticInfo>();
     auto& s = *s_p;
     s.entity = *new EntityValue(std::make_unique<Value>(new FunctionType(partial_args,
-                                                                         fun_type->return_type->clone())));
+                                                                         UTypeNode(fun_type->return_type->clone()))));
     auto non = std::make_unique<sem::NewObject>();
     non->class_name = "Partial" + std::to_string(npartial);
     non->args = std::move(snodes);
@@ -256,7 +256,7 @@ USemanticInfo Checker::visit_defconst(ast::DefaultConstructor& node) {
     }
     auto* rt = new ObjectType(cls.class_name, tp);
     rt->actual_base_path = cls.path;
-    info.entity = *new EntityConstFunction(new ConstFunction(Path(), new FunctionType(t, rt)));
+    info.entity = *new EntityConstFunction(new ConstFunction(Path(), new FunctionType(t, UTypeNode(rt))));
     auto idn = std::make_unique<sem::Id>(cls.path.as_str() + "." + "__init__");
     info.snode = std::move(idn);
     return info_u;

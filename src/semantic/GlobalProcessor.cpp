@@ -62,7 +62,7 @@ void GlobalProcessor::visit_function(ast::Function& node) {
     }
     TypeNode& p = *node.return_type;
     this->module.fill_actual(p);
-    FunctionType function_info(x, node.return_type->clone());
+    FunctionType function_info(x, UTypeNode(node.return_type->clone()));
     Path function_path = Path(this->module.path, node.identifier);
     const_function->ft = function_info.clone();
     const_function->path = Path(this->module.path, node.identifier);
@@ -201,7 +201,7 @@ void GlobalProcessor::visit_class(ast::Klass& node) {
         this->module.fill_actual(*method.return_type);
         // method.return_type->object().actual_base_path = this->get_actual_path(method.return_type->object().id);
 
-        auto* cf = new ConstFunction(Path(class_info->path, f.first), new FunctionType(x, method.return_type->clone()));
+        auto* cf = new ConstFunction(Path(class_info->path, f.first), new FunctionType(x, UTypeNode (method.return_type->clone())));
         method.path = cf->path;
         cf->implicit = f.second->method->implicit;
         f.second->method->const_function = cf;
@@ -219,7 +219,7 @@ void GlobalProcessor::visit_class(ast::Klass& node) {
         this->module.fill_actual(*method.return_type);
         // method.return_type->object().actual_base_path = this->get_actual_path(method.return_type->object().id);
 
-        auto* cf = new ConstFunction(Path(class_info->path, f.first), new FunctionType(x, method.return_type->clone()));
+        auto* cf = new ConstFunction(Path(class_info->path, f.first), new FunctionType(x, UTypeNode (method.return_type->clone())));
         method.path = cf->path;
         f.second->const_function = cf;
         class_info->static_methods.insert(make_pair(f.first, cf));

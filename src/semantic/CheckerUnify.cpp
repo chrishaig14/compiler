@@ -63,7 +63,7 @@ UTypeNode Checker::substitute(const TypeNode& t, const std::string& var, const T
         for (size_t i = 0; i < t.function().param_types.size(); i++) {
             c->function().param_types[i] = substitute(*t.function().param_types[i], var, replacement);
         }
-        c->function().return_type = substitute(*c->function().return_type, var, replacement).release();
+        c->function().return_type = substitute(*c->function().return_type, var, replacement);
         return UTypeNode(c);
     }
     return nullptr;
@@ -115,9 +115,7 @@ std::unique_ptr<FunctionType> Checker::unify_function_call(const FunctionType& f
                 all_substitutions[substitution->first] = substitution->second->clone();
                 // delete old;
             }
-            auto* old = fun.return_type;
-            fun.return_type = substitute(*fun.return_type, substitution->first, *substitution->second).release();
-            delete old;
+            fun.return_type = substitute(*fun.return_type, substitution->first, *substitution->second);
             std::cout << "Simple substitution: " << fun.to_string() << std::endl;
             arg = args[i];
             auto* old_s = substitution;

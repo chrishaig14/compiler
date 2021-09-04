@@ -10,7 +10,7 @@
 
 class FunctionType : public TypeNode {
 public:
-    FunctionType(VectorOfTypes parameterTypes, TypeNode* returnType);
+    FunctionType(VectorOfTypes parameterTypes, UTypeNode returnType);
 
     bool equal(const TypeNode& other) const override;
 
@@ -28,7 +28,7 @@ public:
     // VectorOfTypes param_types;
     VectorOfUTypes param_types;
     // UTypeNode t;
-    TypeNode* return_type;
+    UTypeNode return_type;
 
     bool is_generic() const override;
 

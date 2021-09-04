@@ -173,8 +173,8 @@ UTypeNode make_type_from_function_pattern(const FunctionType& ftn, const MapStri
         TypeNode* new_pt = make_type(*pt, replacements).release();
         new_param_types.push_back(new_pt);
     }
-    TypeNode* new_return_type = make_type(*ftn.return_type, replacements).release();
-    return std::make_unique<FunctionType>(new_param_types, new_return_type);
+    UTypeNode new_return_type = make_type(*ftn.return_type, replacements);
+    return std::make_unique<FunctionType>(new_param_types, std::move(new_return_type));
 }
 
 UTypeNode make_type(const TypeNode& original, const MapStringType& replacements) {

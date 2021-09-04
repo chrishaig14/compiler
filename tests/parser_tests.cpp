@@ -977,9 +977,9 @@ TEST_CASE("parse_typeclass", "[parser]") {
     std::unique_ptr<ast::Typeclass> ast = parser.parse_typeclass();
     std::unordered_map<std::string, UFunctionType> cmethods;
     cmethods["eq"] = std::make_unique<FunctionType>(VectorOfTypes{new ObjectType("t"), new ObjectType("t")},
-                                                    new ObjectType("Boolean"));
+                                                    std::make_unique<ObjectType>("Boolean"));
     cmethods["ne"] = std::make_unique<FunctionType>(VectorOfTypes{new ObjectType("t"), new ObjectType("t")},
-                                                    new ObjectType("Boolean"));
+                                                    std::make_unique<ObjectType>("Boolean"));
 
     REQUIRE(ast->to_json() == ast::Typeclass("Comparable", "t", std::move(cmethods), DUMMY_POS, DUMMY_POS).to_json());
 }

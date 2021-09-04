@@ -454,9 +454,9 @@ TEST_CASE("nodes_class_full", "[class]") {
 
 TEST_CASE("nodes_typeclass", "[typeclass]") {
     auto method1 = std::make_unique<FunctionType>(VectorOfTypes{new ObjectType("t"), new ObjectType("t")},
-                                                  new ObjectType("Boolean"));
+                                                  std::make_unique<ObjectType>("Boolean"));
     auto method2 = std::make_unique<FunctionType>(VectorOfTypes{new ObjectType("t"), new ObjectType("t")},
-                                                  new ObjectType("Boolean"));
+                                                  std::make_unique<ObjectType>("Boolean"));
     nlohmann::json e = {{"type",      "typeclass"},
                         {"typeclass", {{"id", "Comparable"}, {"base_type", "t"}, {"methods", {{"method1", method1->to_json()}, {"method2", method2->to_json()}}}}}};
     std::unordered_map<std::string, UFunctionType> cmethods;

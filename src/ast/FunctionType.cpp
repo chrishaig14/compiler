@@ -5,17 +5,16 @@
 #include "FunctionType.h"
 #include "ObjectType.h"
 
-FunctionType::FunctionType(VectorOfTypes parameterTypes, TypeNode* returnType) {
+FunctionType::FunctionType(VectorOfTypes parameterTypes, UTypeNode returnType):return_type(std::move(returnType)) {
 
     for (auto* p: parameterTypes) {
         assert(p != nullptr);
     }
-    assert(returnType != nullptr);
+    // assert(returnType != nullptr);
     // this->param_types = parameterTypes;
     for (auto* p: parameterTypes) {
         this->param_types.push_back(UTypeNode(p));
     }
-    this->return_type = returnType;
     this->kind = Kind::FUNCTION;
 }
 
@@ -24,11 +23,11 @@ FunctionType* FunctionType::clone() const {
     for (auto& p: this->param_types) {
         aux.emplace_back(p->clone());
     }
-    return new FunctionType(aux, this->return_type->clone());
+    return new FunctionType(aux, UTypeNode(this->return_type->clone()));
 }
 
 FunctionType::~FunctionType() {
-    delete this->return_type;
+    // delete this->return_type;
     // for (auto& p: this->param_types) {
     //     delete p;
     // }

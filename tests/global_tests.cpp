@@ -23,7 +23,7 @@ TEST_CASE("global_main", "[parser]") {
     REQUIRE(module.flirpins["main"].type == F_TYPE::CONST_FUNCTION);
     ConstFunction* const_function = module.flirpins["main"].const_function;
 
-    REQUIRE(*const_function->ft == FunctionType({}, new ObjectType("Integer")));
+    REQUIRE(*const_function->ft == FunctionType({},std::make_unique<ObjectType>("Integer")));
     REQUIRE(const_function->implicit == nullptr);
     REQUIRE(const_function->path.as_str() == "main.foo.main");
 }
@@ -92,7 +92,7 @@ TEST_CASE("global_multiple", "[parser]") {
 
     REQUIRE(module.flirpins["main"].type == F_TYPE::CONST_FUNCTION);
     ConstFunction* const_function = module.flirpins["main"].const_function;
-    REQUIRE(*const_function->ft == FunctionType({}, new ObjectType("Integer")));
+    REQUIRE(*const_function->ft == FunctionType({}, std::make_unique<ObjectType>("Integer")));
     REQUIRE(const_function->implicit == nullptr);
     REQUIRE(const_function->path.as_str() == "main.foo.main");
 

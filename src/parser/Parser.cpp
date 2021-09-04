@@ -155,7 +155,11 @@ UNode Parser::parse_assignment_or_expression() {
                 } else if (op == TokType::MINUS_EQQ) {
                     opt = OpType::SUB;
                 }
-                auto bnode = ast::BinaryOp::make(opt, std::move(id_node), std::move(rvalue), id_node->start, rvalue->end);
+                auto bnode = ast::BinaryOp::make(opt,
+                                                 std::move(id_node),
+                                                 std::move(rvalue),
+                                                 id_node->start,
+                                                 rvalue->end);
                 bnode->op_pos = op_pos;
                 rvalue = std::move(bnode);
             }
@@ -181,7 +185,11 @@ UNode Parser::parse_or_expression() {
     while (this->match(TokType::OR)) {
         this->next();
         auto right = this->parse_and_expression();
-        auto node = std::make_unique<ast::BinaryOp>(OpType::OR, std::move(left), std::move(right), left->start, right->end);
+        auto node = std::make_unique<ast::BinaryOp>(OpType::OR,
+                                                    std::move(left),
+                                                    std::move(right),
+                                                    left->start,
+                                                    right->end);
         left = std::move(node);
     }
     return left;
@@ -192,7 +200,11 @@ UNode Parser::parse_and_expression() {
     while (this->match(TokType::AND)) {
         this->next();
         auto right = this->parse_not_expression();
-        auto node = std::make_unique<ast::BinaryOp>(OpType::AND, std::move(left), std::move(right), left->start, right->end);
+        auto node = std::make_unique<ast::BinaryOp>(OpType::AND,
+                                                    std::move(left),
+                                                    std::move(right),
+                                                    left->start,
+                                                    right->end);
         left = std::move(node);
     }
     return left;
@@ -616,7 +628,7 @@ std::unique_ptr<FunctionType> Parser::parse_function_type() {
     } else {
         return_type = new ObjectType(".None");
     }
-    return std::make_unique<FunctionType>(parameter_types, return_type);
+    return std::make_unique<FunctionType>(parameter_types, UTypeNode(return_type));
 }
 
 std::unique_ptr<ObjectType> Parser::parse_object_type() {
@@ -1036,7 +1048,7 @@ std::unique_ptr<ast::Typeclass> Parser::parse_typeclass() {
             return_type = new ObjectType(".None");
         }
 
-        auto ft = std::make_unique<FunctionType>(parameter_types, return_type);
+        auto ft = std::make_unique<FunctionType>(parameter_types, UTypeNode(return_type));
         methods[method_id.str] = std::move(ft);
         this->expect_token(TokType::SEMICOLON);
         if (!this->match(TokType::FUN)) {
