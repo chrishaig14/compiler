@@ -19,7 +19,7 @@ public:
 
     Number(NumberType num_type, std::string str, TextPosition start, TextPosition end);
 
-    static UNumberNode make(NumberType num_type, std::string str, TextPosition start, TextPosition end) {
+    static UNumber make(NumberType num_type, std::string str, TextPosition start, TextPosition end) {
         return std::make_unique<Number>(num_type, str, start, end);
     }
 

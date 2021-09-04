@@ -191,7 +191,7 @@ TEST_CASE("nodes_if_with_elif", "[if]") {
     e["if"]["then"] = t->to_json();
     e["if"]["else"] = l->to_json();
 
-    std::vector<std::pair<UNode, UBlockNode>> elifs;
+    std::vector<std::pair<UNode, UBlock>> elifs;
     elifs.emplace_back(std::move(elif_cond_0), std::move(elif_body_0));
     elifs.emplace_back(std::move(elif_cond_1), std::move(elif_body_1));
 

@@ -19,7 +19,7 @@ public:
     std::vector<std::unique_ptr<ConstFunction>> const_functions;
     std::string abs_path;
     CodeLines code_lines;
-    UBlockNode ast;
+    UBlock ast;
     std::unique_ptr<sem::Block> sast;
 
     std::map<std::string, std::string> included_module_paths;

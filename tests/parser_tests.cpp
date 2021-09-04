@@ -115,9 +115,9 @@ TestNodeU IF_U() {
     auto EMPTY_BLOCK = EMPTY_BLOCK_U();
     std::unique_ptr<ast::Block> u(nullptr);
     return {"if(" + EXPRESSION.text + ")" + EMPTY_BLOCK.text, std::make_unique<ast::If>(std::move(EXPRESSION.node),
-                                                                                        std::move((UBlockNode&) EMPTY_BLOCK.node),
-                                                                                        std::vector<std::pair<UNode, UBlockNode>>{},
-                                                                                        std::move((UBlockNode&) u),
+                                                                                        std::move((UBlock&) EMPTY_BLOCK.node),
+                                                                                        std::vector<std::pair<UNode, UBlock>>{},
+                                                                                        std::move((UBlock&) u),
                                                                                         DUMMY_POS,
                                                                                         DUMMY_POS)};
 }
@@ -232,11 +232,11 @@ TEST_CASE("parse_if_with_else", "[parser]") {
     parser.top_package_name = "main";
 
     std::unique_ptr<ast::If> ast = parser.parse_if();
-    std::vector<std::pair<UNode, UBlockNode>> v;
+    std::vector<std::pair<UNode, UBlock>> v;
     REQUIRE(ast->to_json() == ast::If(std::move(EXPRESSION.node),
-                                      std::move((UBlockNode&) block.node),
-                                      std::vector<std::pair<UNode, UBlockNode>>{},
-                                      std::move((UBlockNode&) block_1.node),
+                                      std::move((UBlock&) block.node),
+                                      std::vector<std::pair<UNode, UBlock>>{},
+                                      std::move((UBlock&) block_1.node),
                                       DUMMY_POS,
                                       DUMMY_POS).to_json());
 }
@@ -307,7 +307,7 @@ TEST_CASE("parse_for", "[parser]") {
     std::unique_ptr<ast::For> ast = parser.parse_for_loop();
     REQUIRE(ast->to_json() == ast::For(ID,
                                        std::move(EXPRESSION_1.node),
-                                       std::move((UBlockNode&) BLOCK.node),
+                                       std::move((UBlock&) BLOCK.node),
                                        DUMMY_POS,
                                        DUMMY_POS).to_json());
 }

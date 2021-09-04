@@ -33,7 +33,7 @@ bool If::equal(const ast::Node& x) const {
 
 }
 
-If::If(UNode condition, std::unique_ptr<ast::Block> then, std::vector<std::pair<UNode, UBlockNode>> elifs,
+If::If(UNode condition, std::unique_ptr<ast::Block> then, std::vector<std::pair<UNode, UBlock>> elifs,
        std::unique_ptr<ast::Block> selse, TextPosition start, TextPosition end) : ast::Node(NodeType::IFF, start, end),
                                                                                    _condition(std::move(condition)),
                                                                                    _then(std::move(then)),

@@ -6,7 +6,7 @@
 
 using namespace ast;
 
-Match::Match(Node* exp, std::vector<std::string> ids, std::vector<std::pair<UTypeNode, UBlockNode>> cases,
+Match::Match(Node* exp, std::vector<std::string> ids, std::vector<std::pair<UTypeNode, UBlock>> cases,
              TextPosition start, TextPosition end) : ast::Node(NodeType::MATCH_EXP, start, end),
                                                      cases(std::move(cases)) {
     // this->cases = cases;

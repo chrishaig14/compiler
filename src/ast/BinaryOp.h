@@ -24,7 +24,7 @@ public:
 
     BinaryOp(OpType op, UNode left, UNode right, TextPosition start, TextPosition end);
 
-    static UBinopNode make(OpType op, UNode left, UNode right, TextPosition start, TextPosition end) {
+    static UBinaryOp make(OpType op, UNode left, UNode right, TextPosition start, TextPosition end) {
         return std::make_unique<BinaryOp>(op, std::move(left), std::move(right), start, end);
     }
 

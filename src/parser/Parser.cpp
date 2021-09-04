@@ -74,7 +74,7 @@ std::unique_ptr<ast::If> Parser::parse_if() {
     Token if_tok = this->expect_token(TokType::IF);
     auto condition = this->parse_expression();
     auto body = this->parse_possibly_empty_block();
-    std::vector<std::pair<UNode, UBlockNode>> elifs;
+    std::vector<std::pair<UNode, UBlock>> elifs;
     while (this->match(TokType::ELIF)) {
         this->next();
         auto elif_condition = this->parse_expression();
@@ -988,7 +988,7 @@ std::unique_ptr<ast::Match> Parser::parse_match_statement() {
     this->expect_token(TokType::LCURLY);
 
     std::vector<std::string> ids;
-    std::vector<std::pair<UTypeNode , UBlockNode>> cases;
+    std::vector<std::pair<UTypeNode , UBlock>> cases;
     while (true) {
         Token id = this->expect_token(TokType::ID);
         this->expect_token(TokType::COLON);

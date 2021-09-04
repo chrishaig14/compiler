@@ -15,14 +15,14 @@
 
 class ast::If : public ast::Node {
     UNode _condition;
-    UBlockNode _then;
-    std::vector<std::pair<UNode, UBlockNode>> _elifs;
+    UBlock _then;
+    std::vector<std::pair<UNode, UBlock>> _elifs;
 public:
-    UBlockNode selse;
+    UBlock selse;
     ast::Block& then;
     Node& condition;
     std::vector<std::pair<RNode, std::reference_wrapper<ast::Block>>> elifs;
-    If(UNode condition, std::unique_ptr<ast::Block> then, std::vector<std::pair<UNode, UBlockNode>> elifs,
+    If(UNode condition, std::unique_ptr<ast::Block> then, std::vector<std::pair<UNode, UBlock>> elifs,
        std::unique_ptr<ast::Block> selse, TextPosition start, TextPosition end);
 
     bool equal(const ast::Node& other) const override;

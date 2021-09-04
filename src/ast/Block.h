@@ -20,7 +20,7 @@ public:
 
     Block(VectorOfNodesU nodes, TextPosition start, TextPosition end);
 
-    static UBlockNode make(VectorOfNodesU nodes, TextPosition start, TextPosition end) {
+    static UBlock make(VectorOfNodesU nodes, TextPosition start, TextPosition end) {
         return std::make_unique<Block>(std::move(nodes), start, end);
     }
 

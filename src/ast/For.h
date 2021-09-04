@@ -13,13 +13,13 @@
 
 class ast::For : public ast::Node {
     UNode _exp;
-    UBlockNode _body;
+    UBlock _body;
 public:
     Node& exp;
     std::string var;
     ast::Block& body;
     bool equal(const ast::Node& other) const override;
-    For(const std::string& var, UNode exp, UBlockNode body, TextPosition start, TextPosition end);
+    For(const std::string& var, UNode exp, UBlock body, TextPosition start, TextPosition end);
     ~For() override;
 
     nlohmann::json to_json() const override;

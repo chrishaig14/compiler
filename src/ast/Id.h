@@ -20,7 +20,7 @@ public:
 
     Id(std::string identifier, TextPosition start, TextPosition end);
 
-    static UIdNode make(std::string identifier, TextPosition start, TextPosition end) {
+    static UId make(std::string identifier, TextPosition start, TextPosition end) {
         return std::make_unique<Id>(identifier, start, end);
     }
 
