@@ -59,7 +59,6 @@ typedef std::unique_ptr<SemanticInfo> USemanticInfo;
 typedef std::unique_ptr<SemanticInfoBlock> USemanticInfoBlock;
 
 bool is_generic(const TypeNode& t);
-MapStringType make_replacements(TypeNode* a, TypeNode* b);
 UTypeNode make_type_from_object_pattern(const ObjectType& object_type, const MapStringType& replacements);
 UTypeNode make_type_from_function_pattern(const FunctionType& ftn, const MapStringType& replacements);
 UTypeNode make_type(const TypeNode& original, const MapStringType& replacements);
