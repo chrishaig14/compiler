@@ -44,9 +44,9 @@ void mangle_generic_names(TypeNode& t);
 void mangle_generic_names(FunctionType& t);
 void mangle_generic_names(ObjectType& t);
 
-void make_not_generic(FunctionType* ft);
-void make_not_generic(ObjectType* ft);
-void make_not_generic(TypeNode* ft);
+void make_not_generic(FunctionType& ft);
+void make_not_generic(ObjectType& ot);
+void make_not_generic(TypeNode& t);
 
 USNode make_union_wrapper(int type_index, USNode expression);
 

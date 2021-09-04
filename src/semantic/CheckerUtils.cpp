@@ -82,24 +82,24 @@ void mangle_generic_names(ObjectType& t) {
 }
 
 
-void make_not_generic(TypeNode* t) {
-    if (t->kind == Kind::FUNCTION) {
-        return make_not_generic(&t->function());
+void make_not_generic(TypeNode& t) {
+    if (t.kind == Kind::FUNCTION) {
+        return make_not_generic(t.function());
     }
-    return make_not_generic(&t->object());
+    return make_not_generic(t.object());
 }
 
-void make_not_generic(FunctionType* ft) {
-    for (auto* pt: ft->param_types) {
-        make_not_generic(pt);
+void make_not_generic(FunctionType& ft) {
+    for (auto* pt: ft.param_types) {
+        make_not_generic(*pt);
     }
-    make_not_generic(ft->return_type);
+    make_not_generic(*ft.return_type);
 }
 
-void make_not_generic(ObjectType* ot) {
-    ot->is_generic_param = false;
-    for (auto* tp: ot->type_params) {
-        make_not_generic(tp);
+void make_not_generic(ObjectType& ot) {
+    ot.is_generic_param = false;
+    for (auto* tp: ot.type_params) {
+        make_not_generic(*tp);
     }
 }
 

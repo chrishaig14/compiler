@@ -230,7 +230,7 @@ USemanticInfo Checker::visit_function(ast::Function& n) {
     for (size_t i = 0; i < n.parameter_names.size(); i++) {
         TypeNode& type = *n.parameter_types[i];
         TypeNode* cl = type.clone();
-        make_not_generic(cl);
+        make_not_generic(*cl);
         auto te = entity_from_type(*cl);
         this->fill_value(*((EntityValue*) te)->value);
         this->scope->set(n.parameter_names[i], te);
