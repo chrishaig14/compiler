@@ -37,7 +37,7 @@ USemanticInfo Checker::visit_call(ast::Call& n, bool is_rvalue) {
     }
     // ok
     if (n.arguments.size() != function_type->param_types.size()) {
-        this->error_reporter.error(ErrorFunctionCallNumArgs(*function_type, n.start));
+        this->error_reporter.error(ErrorFunctionCallNumArgs(function_type->clone(), n.start));
         if (!function_is_generic(*function_type)) {
             retv.entity = *entity_from_type(*function_type->return_type);
             return retv_p;

@@ -93,7 +93,7 @@ std::unique_ptr<FunctionType> Checker::unify_function_call(const FunctionType& f
                                                            std::map<std::string, TypeNode*>& all_substitutions) {
     FunctionType& fun = *f.clone();
     if (args.size() != fun.param_types.size()) {
-        this->error_reporter.error(ErrorFunctionCallNumArgs(fun, {1, 1}));
+        this->error_reporter.error(ErrorFunctionCallNumArgs(fun.clone(), {1, 1}));
         return nullptr;
     }
 

@@ -12,6 +12,9 @@ FunctionType::FunctionType(VectorOfTypes parameterTypes, TypeNode* returnType) {
     }
     assert(returnType != nullptr);
     this->param_types = parameterTypes;
+    // for (auto* p: parameterTypes) {
+    //     this->u_param_types.push_back(UTypeNode(p));
+    // }
     this->return_type = returnType;
     this->kind = Kind::FUNCTION;
 }
