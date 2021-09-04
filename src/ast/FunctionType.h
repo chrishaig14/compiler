@@ -10,7 +10,7 @@
 
 class FunctionType : public TypeNode {
 public:
-    FunctionType(const VectorOfTypes& parameterTypes, TypeNode* returnType);
+    FunctionType(VectorOfTypes parameterTypes, TypeNode* returnType);
 
     bool equal(const TypeNode& other) const override;
 

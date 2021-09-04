@@ -5,7 +5,7 @@
 #include "FunctionType.h"
 #include "ObjectType.h"
 
-FunctionType::FunctionType(const VectorOfTypes& parameterTypes, TypeNode* returnType) {
+FunctionType::FunctionType(VectorOfTypes parameterTypes, TypeNode* returnType) {
 
     for (auto* p: parameterTypes) {
         assert(p != nullptr);
