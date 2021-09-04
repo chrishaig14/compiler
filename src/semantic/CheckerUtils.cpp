@@ -23,7 +23,7 @@ std::string binoptype_to_str(OpType op) {
 }
 
 
-int target_union_type(const ObjectType& target, const ast::TypeNode& source) {
+int target_union_type(const ast::ObjectType& target, const ast::TypeNode& source) {
     for (size_t ti = 0; ti < target.type_params.size(); ti++) {
         if (target.type_params[ti]->actual_to_string() == source.actual_to_string()) {
             return ti;
@@ -71,7 +71,7 @@ void mangle_generic_names(FunctionType& t) {
     mangle_generic_names(*t.return_type);
 }
 
-void mangle_generic_names(ObjectType& t) {
+void mangle_generic_names(ast::ObjectType& t) {
     if (t.is_generic_param) {
         t.id = t.id + "0";
     } else {
@@ -96,7 +96,7 @@ void make_not_generic(FunctionType& ft) {
     make_not_generic(*ft.return_type);
 }
 
-void make_not_generic(ObjectType& ot) {
+void make_not_generic(ast::ObjectType& ot) {
     ot.is_generic_param = false;
     for (auto* tp: ot.type_params) {
         make_not_generic(*tp);

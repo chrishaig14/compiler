@@ -22,7 +22,7 @@
 #define FOR(var, exp, block) new ast::ForNode(var, exp, block)
 #define SUB(parent, child) new SubscriptNode(parent, child)
 #define DECL(id, type, exp) new ast::DeclarationNode(id, type, exp)
-#define TYPE(parent, type_parameters) new ObjectType(parent, type_parameters)
+#define TYPE(parent, type_parameters) new ast::ObjectType(parent, type_parameters)
 #define BOOL(x) new ast::BooleanNode(x)
 
 #define T_DICT(k, v) TYPE("Dict", ast::VectorOfTypes({k,v}))
@@ -71,12 +71,12 @@
 
 // Builtin primitive types
 
-#define T_BOOL  ObjectType("Boolean")
-#define T_INT  ObjectType("Integer")
-#define T_STRING  ObjectType("String")
-#define T_LIST(e) ObjectType("List", {e})
-#define T_FLOAT ObjectType("Float")
-#define T_DOUBLE ObjectType("Double")
+#define T_BOOL  ast::ObjectType("Boolean")
+#define T_INT  ast::ObjectType("Integer")
+#define T_STRING  ast::ObjectType("String")
+#define T_LIST(e) ast::ObjectType("List", {e})
+#define T_FLOAT ast::ObjectType("Float")
+#define T_DOUBLE ast::ObjectType("Double")
 
 typedef std::unordered_map<std::string, Entity*> MapStringEntity;
 typedef std::unordered_map<std::string, ast::TypeNode*> MapStringType;

@@ -11,13 +11,13 @@
 
 class ErrorListLiteral : public Error {
 public:
-    ErrorListLiteral(const ast::TypeNode& node, const ObjectType& type, TextPosition position, const ast::Node& node_1);
+    ErrorListLiteral(const ast::TypeNode& node, const ast::ObjectType& type, TextPosition position, const ast::Node& node_1);
     Error* clone() const override;
     bool equal(const Error& other) const override;
     std::string to_str() const override;
 
     const ast::TypeNode& node;
-    const ObjectType& type;
+    const ast::ObjectType& type;
     TextPosition position;
     const ast::Node& node_1;
 };

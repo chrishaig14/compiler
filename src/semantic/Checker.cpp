@@ -79,7 +79,7 @@ bool Checker::assert_type_exists(const ast::TypeNode& type, TextPosition pos) {
 
 bool is_generic(const ast::TypeNode& t) {
     if (t.kind == Kind::OBJECT) {
-        const ObjectType& o = t.object();
+        const ast::ObjectType& o = t.object();
         if (o.id.size() == 1 && (islower(o.id[0]) != 0)) {
             // a is generic
             assert(o.type_params.empty());
@@ -137,7 +137,7 @@ Checker::match_arguments_to_generic_function(const FunctionType& ft, ast::Vector
     return rv_p;
 }
 
-ast::UTypeNode make_type_from_object_pattern(const ObjectType& object_type, const MapStringType& replacements) {
+ast::UTypeNode make_type_from_object_pattern(const ast::ObjectType& object_type, const MapStringType& replacements) {
     std::string type_identifier = object_type.id;
     for (const auto& r: replacements) {
         if (type_identifier == r.first) {
@@ -159,7 +159,7 @@ ast::UTypeNode make_type_from_object_pattern(const ObjectType& object_type, cons
             nt->object().is_generic_param = true;
         }
     }
-    auto ot = std::make_unique<ObjectType>(type_identifier, new_type_params);
+    auto ot = std::make_unique<ast::ObjectType>(type_identifier, new_type_params);
     if (type_identifier.size() == 1 && (islower(type_identifier.c_str()[0]) != 0)) {
         ot->object().is_generic_param = true;
     }
@@ -185,7 +185,7 @@ ast::UTypeNode make_type(const ast::TypeNode& original, const MapStringType& rep
     }
 }
 
-Class* Checker::instantiate_generic(Class* generic, const ObjectType& instance) {
+Class* Checker::instantiate_generic(Class* generic, const ast::ObjectType& instance) {
     std::cout << "******* Instantiating type: " << instance.to_string() << std::endl;
     MapStringType replacements;
     for (size_t i = 0; i < generic->type_params.size(); i++) {
@@ -310,7 +310,7 @@ Checker::~Checker() {
     }
 }
 
-bool Checker::is_variable(const ObjectType& a) {
+bool Checker::is_variable(const ast::ObjectType& a) {
     return a.type_params.empty() && (islower(a.id[0]) != 0);
 }
 

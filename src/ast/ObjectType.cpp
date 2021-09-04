@@ -4,6 +4,8 @@
 
 #include "ObjectType.h"
 
+using namespace ast;
+
 ObjectType::ObjectType(const std::string& identifier, const ast::VectorOfTypes& typeParameters)
         : id(identifier), type_params(typeParameters) {
     for (auto* p: typeParameters) {
@@ -20,7 +22,7 @@ ast::TypeNode* ObjectType::clone() const {
         aux.emplace_back(p->clone());
     }
 
-    auto* n = new ObjectType(this->id, aux);
+    auto* n = new ast::ObjectType(this->id, aux);
     n->actual_base_path = this->actual_base_path;
     n->is_generic_param = this->is_generic_param;
     n->aliased_type = this->aliased_type;
@@ -78,11 +80,11 @@ bool ObjectType::equal(const ast::TypeNode& other) const {
     return true;
 }
 
-const ObjectType& ObjectType::object() const {
+const ast::ObjectType& ObjectType::object() const {
     return *this;
 }
 
-ObjectType& ObjectType::object() {
+ast::ObjectType& ObjectType::object() {
     return *this;
 }
 

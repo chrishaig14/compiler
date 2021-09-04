@@ -52,7 +52,7 @@ USemanticInfo Checker::visit_lvalue_subscript(ast::Subscript& node) {
 
     USemanticInfo info_u = std::make_unique<SemanticInfo>();
     SemanticInfo& info = *info_u;
-    auto value = std::make_unique<Value>((ObjectType*) rtype);
+    auto value = std::make_unique<Value>((ast::ObjectType*) rtype);
     this->fill_value(*value);
     info.entity = *new EntityValue(std::move(value));
 
@@ -222,18 +222,18 @@ USemanticInfo Checker::visit_match(ast::Match& node) {
     if (exp_info->entity.get().type != E_TYPE::VALUE ||
         ((EntityValue&) exp_info->entity).value->type->kind != Kind::OBJECT) {
 
-        this->error_reporter.error(std::make_unique<ErrorTypeMismatch>(*new ObjectType("Union", {new ObjectType("...", {})}),
+        this->error_reporter.error(std::make_unique<ErrorTypeMismatch>(*new ast::ObjectType("Union", {new ast::ObjectType("...", {})}),
                                                      *node.exp,
                                                      exp_info->entity));
         return error_stub();
     }
 
-    ObjectType* ot = &((EntityValue&) exp_info->entity).value->type->object();
+    ast::ObjectType* ot = &((EntityValue&) exp_info->entity).value->type->object();
     if (ot->aliased_type != nullptr) {
-        ot = (ObjectType*) ot->aliased_type;
+        ot = (ast::ObjectType*) ot->aliased_type;
     }
     if (ot->id != "Union") {
-        this->error_reporter.error(std::make_unique<ErrorTypeMismatch>(*new ObjectType("Union", {new ObjectType("...", {})}),
+        this->error_reporter.error(std::make_unique<ErrorTypeMismatch>(*new ast::ObjectType("Union", {new ast::ObjectType("...", {})}),
                                                      *node.exp,
                                                      exp_info->entity));
         return error_stub();
@@ -301,7 +301,7 @@ USemanticInfo Checker::visit_for(ast::For& node) {
         this->error_reporter.error(std::make_unique<ErrorFor>(exp_info_p->entity, node.exp.start));
     }
     EntityValue& exp_entity_value = (EntityValue&) exp_info_p->entity;
-    ObjectType* exp_ot = &exp_entity_value.value->type->object();
+    ast::ObjectType* exp_ot = &exp_entity_value.value->type->object();
     if (exp_ot->id != "List") {
         this->error_reporter.error(std::make_unique<ErrorFor>(exp_entity_value, node.exp.start));
     }

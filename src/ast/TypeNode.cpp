@@ -18,7 +18,7 @@ bool TypeNode::operator==(const ast::TypeNode& other) const {
     return this->equal(other);
 }
 
-ObjectType& TypeNode::object() {
+ast::ObjectType& TypeNode::object() {
     throw std::runtime_error("Getting wrong type!");
 }
 
@@ -30,7 +30,7 @@ const FunctionType& TypeNode::function() const {
     throw std::runtime_error("Getting wrong type!");
 }
 
-const ObjectType& TypeNode::object() const {
+const ast::ObjectType& TypeNode::object() const {
     throw std::runtime_error("Getting wrong type!");
 }
 

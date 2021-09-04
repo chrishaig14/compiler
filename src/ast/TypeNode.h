@@ -18,8 +18,6 @@ enum class Kind {
     OBJECT, FUNCTION, UNKNOWN
 };
 
-class ObjectType;
-
 class FunctionType;
 
 class UnknownTypeNode;
@@ -37,13 +35,13 @@ public:
 
     virtual ast::TypeNode* clone() const = 0;
 
-    virtual ObjectType& object();
+    virtual ast::ObjectType& object();
 
     virtual FunctionType& function();
 
     virtual const FunctionType& function() const;
 
-    virtual const ObjectType& object() const;
+    virtual const ast::ObjectType& object() const;
 
     bool operator==(const ast::TypeNode& other) const;
 

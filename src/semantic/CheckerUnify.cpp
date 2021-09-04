@@ -13,7 +13,7 @@
 #include "errors/ErrorEnumNoValue.h"
 
 std::pair<std::string, ast::TypeNode*>*
-Checker::get_first_substitution_object(ObjectType& a, ObjectType& b, bool is_top_level_arg) {
+Checker::get_first_substitution_object(ast::ObjectType& a, ast::ObjectType& b, bool is_top_level_arg) {
     if (is_variable(a) && is_variable(b) && a.object().id == b.object().id) {
         return nullptr;
     }
@@ -178,7 +178,7 @@ USemanticInfo Checker::enum_member(Enum* enumm, const std::string& value, ast::M
     SemanticInfo& info = *info_u;
     for (size_t i = 0; i < enumm->values.size(); i++) {
         if (value == enumm->values[i]) {
-            auto* otype = new ObjectType(enumm->enumm_name, {});
+            auto* otype = new ast::ObjectType(enumm->enumm_name, {});
             otype->actual_base_path = enumm->path;
             auto ov = std::make_unique<Value>(otype);
             info.entity = *new EntityValue(std::move(ov));

@@ -32,7 +32,7 @@ USemanticInfo Checker::visit_number(ast::Number& node) {
         }
         case NumberType::FLOAT: {
             info.entity = this->entity_value_from_actual_base_path_no_generic(Path("core.core.Float"));
-            // auto* otype = new ObjectType("Float", {});
+            // auto* otype = new ast::ObjectType("Float", {});
             // otype->actual_base_path = Path("core.core.Float");
             // auto ov = std::make_unique<Value>(otype);
             // this->fill_value(*ov);
@@ -45,7 +45,7 @@ USemanticInfo Checker::visit_number(ast::Number& node) {
         case NumberType::DOUBLE: {
             // ObjectValue* ov = new ObjectValue();
             // info.entity = Entity{.type=E_TYPE::OBJECT_VALUE, .object_value=ov};
-            // ov->ot = new ObjectType("Double", {});
+            // ov->ot = new ast::ObjectType("Double", {});
             // IntegerSNode* snode = new IntegerSNode();
             // snode->str = node.str;
             // info.snode = snode;
@@ -60,7 +60,7 @@ USemanticInfo Checker::visit_none(ast::None& node) {
     USemanticInfo info_u = std::make_unique<SemanticInfo>();
     SemanticInfo& info = *info_u;
     // info.set_type(ObjectType("NoneType"));
-    auto v = std::make_unique<Value>(new ObjectType("NoneType"));
+    auto v = std::make_unique<Value>(new ast::ObjectType("NoneType"));
     info.entity = *new EntityValue(std::move(v));
     info.snode = std::make_unique<sem::None>();
     return info_u;
@@ -70,7 +70,7 @@ USemanticInfo Checker::visit_emptylist(ast::EmptyList& node) {
     USemanticInfo info_u = std::make_unique<SemanticInfo>();
     SemanticInfo& info = *info_u;
     this->module.fill_actual(*node.type);
-    auto* otype = new ObjectType("List", {node.type->clone()});
+    auto* otype = new ast::ObjectType("List", {node.type->clone()});
     auto ov = std::make_unique<Value>(otype);
     otype->actual_base_path = Path("core.core.List");
     this->fill_value(*ov);
@@ -88,7 +88,7 @@ USemanticInfo Checker::visit_string(ast::String& node) {
     info.is_constant = true;
     auto sn = std::make_unique<sem::String>(node.str);
     info.snode = std::move(sn);
-    // auto* otype = new ObjectType("String", {});
+    // auto* otype = new ast::ObjectType("String", {});
     // otype->actual_base_path = Path("core.core.String");
     // auto ov = std::make_unique<Value>(otype);
     // this->fill_value(*ov);
@@ -111,7 +111,7 @@ USemanticInfo Checker::visit_tuple(ast::Tuple& node) {
     }
     USemanticInfo sinfo_p = std::make_unique<SemanticInfo>();
     auto& sinfo = *sinfo_p;
-    auto* otype = new ObjectType("Tuple", types);
+    auto* otype = new ast::ObjectType("Tuple", types);
     auto ov = std::make_unique<Value>(otype);
     ov->metatype = Meta::CLASS;
 
@@ -186,8 +186,8 @@ USemanticInfo Checker::visit_dict(ast::DictNode& node) {
     USemanticInfo first_value_info = this->dispatch(node.items[0].second);
     EntityValue& first_key_entity = (EntityValue&) first_key_info->entity.get();
     EntityValue& first_value_entity = (EntityValue&) first_value_info->entity.get();
-    ObjectType& first_key_type = first_key_entity.value->type->object();
-    ObjectType& first_value_type = first_value_entity.value->type->object();
+    ast::ObjectType& first_key_type = first_key_entity.value->type->object();
+    ast::ObjectType& first_value_type = first_value_entity.value->type->object();
 
     std::vector<std::pair<USNode, USNode>> items;
     items.emplace_back(std::move(first_key_info->snode), std::move(first_value_info->snode));
@@ -206,7 +206,7 @@ USemanticInfo Checker::visit_dict(ast::DictNode& node) {
     if (has_error) {
         return error_stub();
     }
-    auto ov = std::make_unique<Value>(new ObjectType("Dict", {first_key_type.clone(), first_value_type.clone()}));
+    auto ov = std::make_unique<Value>(new ast::ObjectType("Dict", {first_key_type.clone(), first_value_type.clone()}));
     this->module.fill_actual(*ov->type);
     this->fill_value(*ov);
     assert(ov->clazz != nullptr);
@@ -219,7 +219,7 @@ USemanticInfo Checker::visit_dict(ast::DictNode& node) {
 USemanticInfo Checker::visit_emptydict(ast::EmptyDict& node) {
     USemanticInfo info_u = std::make_unique<SemanticInfo>();
     SemanticInfo& info = *info_u;
-    ObjectType* ot = new ObjectType("Dict", {node.key_type->clone(), node.value_type->clone()});
+    ast::ObjectType* ot = new ast::ObjectType("Dict", {node.key_type->clone(), node.value_type->clone()});
     ot->actual_base_path = Path("core.core.Dict");
     auto ov = std::make_unique<Value>(ot);
     this->module.fill_actual(*ov->type);
@@ -250,11 +250,11 @@ USemanticInfo Checker::visit_defconst(ast::DefaultConstructor& node) {
     }
     ast::VectorOfTypes tp;
     for (const auto& tt: cls.type_params) {
-        auto* ot = new ObjectType(tt);
+        auto* ot = new ast::ObjectType(tt);
         tp.push_back(ot);
         ot->is_generic_param = true;
     }
-    auto* rt = new ObjectType(cls.class_name, tp);
+    auto* rt = new ast::ObjectType(cls.class_name, tp);
     rt->actual_base_path = cls.path;
     info.entity = *new EntityConstFunction(new ConstFunction(Path(), new FunctionType(t, ast::UTypeNode(rt))));
     auto idn = std::make_unique<sem::Id>(cls.path.as_str() + "." + "__init__");
@@ -281,7 +281,7 @@ USemanticInfo Checker::visit_list(ast::List& node) {
         //     is_constant = false;
         // }
         EntityValue& p_entity = (EntityValue&) current_type_p->entity.get();
-        ObjectType* ctype = &p_entity.value->type->object();
+        ast::ObjectType* ctype = &p_entity.value->type->object();
         if (*ctype != *element_type) {
             this->error_reporter.error(std::make_unique<ErrorTypeMismatch>(*element_type, node.elements[i], p_entity));
         }
@@ -293,7 +293,7 @@ USemanticInfo Checker::visit_list(ast::List& node) {
     return_info.is_constant = is_constant;
 
     return_info.snode = std::make_unique<sem::List>(std::move(list_elements));
-    auto* otype = new ObjectType("List", {element_type->clone()});
+    auto* otype = new ast::ObjectType("List", {element_type->clone()});
     auto p_value = std::make_unique<Value>(otype);
     otype->actual_base_path = Path("core.core.List");
     this->fill_value(*p_value);

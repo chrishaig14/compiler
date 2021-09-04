@@ -16,7 +16,7 @@
 #include "../src/semantic/errors/ErrorObjectNoSpecialMethod.h"
 #include "../src/semantic/errors/ErrorEnumNoValue.h"
 
-const ObjectType NO_TYPE(".None");
+const ast::ObjectType NO_TYPE(".None");
 
 const TextPosition& _POS = {1, 1};
 
@@ -68,8 +68,8 @@ TEST_CASE("basic_function_bad_return_type", "[checker]") {
     REQUIRE(checker.error_reporter.errors.size() == 1);
     Error& error = *checker.error_reporter.errors.back();
     ast::Boolean node(false, _POS, _POS);
-    ObjectType expected("Integer");
-    ErrorTypeMismatch exp(expected, node, *checker.entity_from_type(ObjectType("Boolean")));
+    ast::ObjectType expected("Integer");
+    ErrorTypeMismatch exp(expected, node, *checker.entity_from_type(ast::ObjectType("Boolean")));
     REQUIRE(error == exp);
 
 }
@@ -100,8 +100,8 @@ TEST_CASE("basic_declaration_bad_type", "[checker]") {
     REQUIRE(checker.error_reporter.errors.size() == 1);
     Error& error = *checker.error_reporter.errors.back();
     ast::Number node(NumberType::INTEGER, "9", _POS, _POS);
-    ObjectType expected("Boolean");
-    ErrorTypeMismatch exp(expected, node, *checker.entity_from_type(ObjectType("Integer")));
+    ast::ObjectType expected("Boolean");
+    ErrorTypeMismatch exp(expected, node, *checker.entity_from_type(ast::ObjectType("Integer")));
     REQUIRE(error == exp);
 }
 
@@ -119,7 +119,7 @@ TEST_CASE("error_redeclared", "[checker]") {
     REQUIRE(checker.error_reporter.errors.size() == 1);
     Error& error = *checker.error_reporter.errors.back();
     ast::Number node(NumberType::INTEGER, "9", _POS, _POS);
-    ObjectType expected("Boolean");
+    ast::ObjectType expected("Boolean");
     ErrorRedeclared exp("x",
                         (ast::Declaration&) *((std::unique_ptr<ast::Function>&) module.ast->nodes[0])->body->nodes[1]);
     REQUIRE(error == exp);
@@ -155,8 +155,8 @@ TEST_CASE("list_bad", "[checker]") {
 
 
     ast::String node("a", _POS, _POS);
-    ObjectType expected("Integer");
-    ErrorTypeMismatch exp(expected, node, *checker.entity_from_type(ObjectType("String")));
+    ast::ObjectType expected("Integer");
+    ErrorTypeMismatch exp(expected, node, *checker.entity_from_type(ast::ObjectType("String")));
 
     REQUIRE(error == exp);
 }
@@ -233,7 +233,7 @@ TEST_CASE("int_literal", "[checker]") {
     REQUIRE(checker.error_reporter.errors.size() == 0);
     REQUIRE(info->entity.get().type == E_TYPE::VALUE);
     REQUIRE(((EntityValue&) (info->entity.get())).value->metatype == Meta::CLASS);
-    REQUIRE(*((EntityValue&) (info->entity.get())).value->type == ObjectType("Integer"));
+    REQUIRE(*((EntityValue&) (info->entity.get())).value->type == ast::ObjectType("Integer"));
 }
 
 TEST_CASE("bool_literal", "[checker]") {
@@ -251,7 +251,7 @@ TEST_CASE("bool_literal", "[checker]") {
     REQUIRE(checker.error_reporter.errors.size() == 0);
     REQUIRE(info->entity.get().type == E_TYPE::VALUE);
     REQUIRE(((EntityValue&) (info->entity.get())).value->metatype == Meta::CLASS);
-    REQUIRE(*((EntityValue&) (info->entity.get())).value->type == ObjectType("Boolean"));
+    REQUIRE(*((EntityValue&) (info->entity.get())).value->type == ast::ObjectType("Boolean"));
 }
 
 TEST_CASE("list_literal", "[checker]") {
@@ -269,7 +269,7 @@ TEST_CASE("list_literal", "[checker]") {
     REQUIRE(checker.error_reporter.errors.size() == 0);
     REQUIRE(info->entity.get().type == E_TYPE::VALUE);
     REQUIRE(((EntityValue&) (info->entity.get())).value->metatype == Meta::CLASS);
-    REQUIRE(*((EntityValue&) (info->entity.get())).value->type == ObjectType("List", {new ObjectType("Integer")}));
+    REQUIRE(*((EntityValue&) (info->entity.get())).value->type == ast::ObjectType("List", {new ast::ObjectType("Integer")}));
 }
 
 TEST_CASE("empty_list_literal", "[checker]") {
@@ -287,7 +287,7 @@ TEST_CASE("empty_list_literal", "[checker]") {
     REQUIRE(checker.error_reporter.errors.size() == 0);
     REQUIRE(info->entity.get().type == E_TYPE::VALUE);
     REQUIRE(((EntityValue&) (info->entity.get())).value->metatype == Meta::CLASS);
-    REQUIRE(*((EntityValue&) (info->entity.get())).value->type == ObjectType("List", {new ObjectType("String")}));
+    REQUIRE(*((EntityValue&) (info->entity.get())).value->type == ast::ObjectType("List", {new ast::ObjectType("String")}));
 }
 
 TEST_CASE("empty_dict_literal", "[checker]") {
@@ -306,7 +306,7 @@ TEST_CASE("empty_dict_literal", "[checker]") {
     REQUIRE(info->entity.get().type == E_TYPE::VALUE);
     REQUIRE(((EntityValue&) (info->entity.get())).value->metatype == Meta::CLASS);
     REQUIRE(*((EntityValue&) (info->entity.get())).value->type ==
-            ObjectType("Dict", {new ObjectType("Integer"), new ObjectType("String")}));
+            ast::ObjectType("Dict", {new ast::ObjectType("Integer"), new ast::ObjectType("String")}));
 }
 
 
@@ -326,7 +326,7 @@ TEST_CASE("dict_literal", "[checker]") {
     REQUIRE(info->entity.get().type == E_TYPE::VALUE);
     REQUIRE(((EntityValue&) (info->entity.get())).value->metatype == Meta::CLASS);
     REQUIRE(*((EntityValue&) (info->entity.get())).value->type ==
-            ObjectType("Dict", {new ObjectType("String"), new ObjectType("Integer")}));
+            ast::ObjectType("Dict", {new ast::ObjectType("String"), new ast::ObjectType("Integer")}));
 }
 
 TEST_CASE("float_literal", "[checker]") {
@@ -344,7 +344,7 @@ TEST_CASE("float_literal", "[checker]") {
     REQUIRE(checker.error_reporter.errors.size() == 0);
     REQUIRE(info->entity.get().type == E_TYPE::VALUE);
     REQUIRE(((EntityValue&) (info->entity.get())).value->metatype == Meta::CLASS);
-    REQUIRE(*((EntityValue&) (info->entity.get())).value->type == ObjectType("Float"));
+    REQUIRE(*((EntityValue&) (info->entity.get())).value->type == ast::ObjectType("Float"));
 }
 
 // TEST_CASE("none_literal", "[checker]") {
@@ -361,7 +361,7 @@ TEST_CASE("float_literal", "[checker]") {
 //     REQUIRE(checker.error_reporter.errors.size() == 0);
 //     REQUIRE(info->entity.get().type == E_TYPE::VALUE);
 //     REQUIRE(((EntityValue*)(info->entity))->value->metatype == Meta::CLASS);
-//     REQUIRE(*((EntityValue*)(info->entity))->value->type == ObjectType("NoneType"));
+//     REQUIRE(*((EntityValue*)(info->entity))->value->type == ast::ObjectType("NoneType"));
 // }
 
 TEST_CASE("decl_error_expected_expression", "[checker]") {
@@ -406,7 +406,7 @@ TEST_CASE("error_no_member", "[checker]") {
     Error& error = *checker.error_reporter.errors.back();
     Flirpin clazz_flirpin = module.get(Path("Foo"));
     REQUIRE(clazz_flirpin.type == F_TYPE::CLASS);
-    ObjectType type = ObjectType("Foo");
+    ast::ObjectType type = ast::ObjectType("Foo");
     ErrorNoMemberSuggestions exp(type, (ast::Member&) declaration_node.expression, *clazz_flirpin.clazz);
     REQUIRE(error == exp);
 }
@@ -444,7 +444,7 @@ TEST_CASE("binop_ok", "[checker]") {
     CHECK(info->entity.get().type == E_TYPE::VALUE);
     EntityValue& entity_value = (EntityValue&) (info->entity.get());
     CHECK(entity_value.value->metatype == Meta::CLASS);
-    CHECK(*entity_value.value->type == ObjectType("Integer"));
+    CHECK(*entity_value.value->type == ast::ObjectType("Integer"));
 }
 
 TEST_CASE("boolop_ok", "[checker]") {
@@ -465,7 +465,7 @@ TEST_CASE("boolop_ok", "[checker]") {
     CHECK(info->entity.get().type == E_TYPE::VALUE);
     EntityValue& entity_value = (EntityValue&) (info->entity.get());
     CHECK(entity_value.value->metatype == Meta::CLASS);
-    CHECK(*entity_value.value->type == ObjectType("Boolean"));
+    CHECK(*entity_value.value->type == ast::ObjectType("Boolean"));
 }
 
 
@@ -487,8 +487,8 @@ TEST_CASE("binop_type_error", "[checker]") {
 
     Error& error = *checker.error_reporter.errors.back();
     ast::String node("Hello", _POS, _POS);
-    ObjectType expected("Integer");
-    ErrorTypeMismatch exp(expected, node, *checker.entity_from_type(ObjectType("String")));
+    ast::ObjectType expected("Integer");
+    ErrorTypeMismatch exp(expected, node, *checker.entity_from_type(ast::ObjectType("String")));
     REQUIRE(error == exp);
 }
 
@@ -513,7 +513,7 @@ TEST_CASE("binop_error", "[checker]") {
     ast::UNode left = std::make_unique<ast::String>("Hello", _POS, _POS);
     ast::UNode right = std::make_unique<ast::String>("Bye", _POS, _POS);
     ast::BinaryOp node(OpType::SUB, std::move(left), std::move(right), _POS, _POS);
-    ObjectType expected("Integer");
+    ast::ObjectType expected("Integer");
     ErrorClassNoMethodForOp exp("String", "__sub__", node);
     REQUIRE(error == exp);
 }
@@ -553,8 +553,8 @@ TEST_CASE("subscript_index_type_error", "[checker]") {
 
     Error& error = *checker.error_reporter.errors.back();
     ast::String node("foo", _POS, _POS);
-    ObjectType expected("Integer");
-    ErrorTypeMismatch exp(expected, node, *checker.entity_from_type(ObjectType("String")));
+    ast::ObjectType expected("Integer");
+    ErrorTypeMismatch exp(expected, node, *checker.entity_from_type(ast::ObjectType("String")));
     REQUIRE(error == exp);
 }
 
@@ -579,8 +579,8 @@ TEST_CASE("subscript_no_method_error", "[checker]") {
     ast::VectorOfNodesU v;
     v.push_back(ast::Number::make(NumberType::INTEGER, "1", _POS, _POS));
     ast::Subscript node(p_node, v, _POS, _POS);
-    ObjectType expected("Integer");
-    ObjectType type("Foo");
+    ast::ObjectType expected("Integer");
+    ast::ObjectType type("Foo");
     ErrorObjectNoSpecialMethod exp(type, "__get_item__", node);
     REQUIRE(error == exp);
 }
@@ -632,8 +632,8 @@ TEST_CASE("call_args_type_error", "[checker]") {
 
     Error& error = *checker.error_reporter.errors.back();
     ast::String node("Hello", _POS, _POS);
-    ObjectType expected("Integer");
-    ErrorTypeMismatch exp(expected, node, *checker.entity_from_type(ObjectType("String")));
+    ast::ObjectType expected("Integer");
+    ErrorTypeMismatch exp(expected, node, *checker.entity_from_type(ast::ObjectType("String")));
     REQUIRE(error == exp);
 }
 
@@ -683,8 +683,8 @@ TEST_CASE("union_error", "[checker]") {
 
     Error& error = *checker.error_reporter.errors.back();
     ast::Boolean node(false, _POS, _POS);
-    ObjectType expected("Union", {new ObjectType("Integer"), new ObjectType("String")});
-    ErrorTypeMismatch exp(expected, node, *checker.entity_from_type(ObjectType("Boolean")));
+    ast::ObjectType expected("Union", {new ast::ObjectType("Integer"), new ast::ObjectType("String")});
+    ErrorTypeMismatch exp(expected, node, *checker.entity_from_type(ast::ObjectType("Boolean")));
     REQUIRE(error == exp);
 }
 
@@ -720,8 +720,8 @@ TEST_CASE("while_boolean_error", "[checker]") {
 
     Error& error = *checker.error_reporter.errors.back();
     ast::Number node(NumberType::INTEGER, "5", _POS, _POS);
-    ObjectType expected("Boolean");
-    ErrorTypeMismatch exp(expected, node, *checker.entity_from_type(ObjectType("Integer")));
+    ast::ObjectType expected("Boolean");
+    ErrorTypeMismatch exp(expected, node, *checker.entity_from_type(ast::ObjectType("Integer")));
     REQUIRE(error == exp);
 }
 
@@ -757,8 +757,8 @@ TEST_CASE("if_boolean_error", "[checker]") {
 
     Error& error = *checker.error_reporter.errors.back();
     ast::Number node(NumberType::INTEGER, "5", _POS, _POS);
-    ObjectType expected("Boolean");
-    ErrorTypeMismatch exp(expected, node, *checker.entity_from_type(ObjectType("Integer")));
+    ast::ObjectType expected("Boolean");
+    ErrorTypeMismatch exp(expected, node, *checker.entity_from_type(ast::ObjectType("Integer")));
     REQUIRE(error == exp);
 }
 
@@ -780,7 +780,7 @@ TEST_CASE("enum_error", "[checker]") {
     Error& error = *checker.error_reporter.errors.back();
     ast::UNode u = ast::Id::make("Foo", _POS, _POS);
     ast::Member node(std::move(u), Token(TokType::ID, "b", _POS));
-    ObjectType expected("Boolean");
+    ast::ObjectType expected("Boolean");
     ErrorEnumNoValue exp("Foo", "b", node, nullptr);
     REQUIRE(error == exp);
 }

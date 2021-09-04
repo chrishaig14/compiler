@@ -4,7 +4,7 @@
 #include "../src/ast/UnaryOp.h"
 #include "../src/semantic/GlobalProcessor.h"
 
-const ObjectType NO_TYPE(".None");
+const ast::ObjectType NO_TYPE(".None");
 
 TEST_CASE("global_main", "[parser]") {
     Scanner scanner;
@@ -23,7 +23,7 @@ TEST_CASE("global_main", "[parser]") {
     REQUIRE(module.flirpins["main"].type == F_TYPE::CONST_FUNCTION);
     ConstFunction* const_function = module.flirpins["main"].const_function;
 
-    REQUIRE(*const_function->ft == FunctionType({},std::make_unique<ObjectType>("Integer")));
+    REQUIRE(*const_function->ft == FunctionType({},std::make_unique<ast::ObjectType>("Integer")));
     REQUIRE(const_function->implicit == nullptr);
     REQUIRE(const_function->path.as_str() == "main.foo.main");
 }
@@ -51,9 +51,9 @@ TEST_CASE("global_class", "[parser]") {
 
     REQUIRE(clazz->members.size() == 2);
     REQUIRE(clazz->members.count("x") == 1);
-    REQUIRE(*clazz->members["x"] == ObjectType("Integer"));
+    REQUIRE(*clazz->members["x"] == ast::ObjectType("Integer"));
     REQUIRE(clazz->members.count("y") == 1);
-    REQUIRE(*clazz->members["y"] == ObjectType("String"));
+    REQUIRE(*clazz->members["y"] == ast::ObjectType("String"));
 
     REQUIRE(clazz->member_entities.size() == 2);
     REQUIRE(clazz->member_entities.count("x") == 1);
@@ -65,8 +65,8 @@ TEST_CASE("global_class", "[parser]") {
     REQUIRE(clazz->member_names[1] == "y");
 
     REQUIRE(clazz->member_types.size() == 2);
-    REQUIRE(*clazz->member_types[0] == ObjectType("Integer"));
-    REQUIRE(*clazz->member_types[1] == ObjectType("String"));
+    REQUIRE(*clazz->member_types[0] == ast::ObjectType("Integer"));
+    REQUIRE(*clazz->member_types[1] == ast::ObjectType("String"));
 
     REQUIRE(clazz->static_members.empty());
 
@@ -92,7 +92,7 @@ TEST_CASE("global_multiple", "[parser]") {
 
     REQUIRE(module.flirpins["main"].type == F_TYPE::CONST_FUNCTION);
     ConstFunction* const_function = module.flirpins["main"].const_function;
-    REQUIRE(*const_function->ft == FunctionType({}, std::make_unique<ObjectType>("Integer")));
+    REQUIRE(*const_function->ft == FunctionType({}, std::make_unique<ast::ObjectType>("Integer")));
     REQUIRE(const_function->implicit == nullptr);
     REQUIRE(const_function->path.as_str() == "main.foo.main");
 
@@ -105,7 +105,7 @@ TEST_CASE("global_multiple", "[parser]") {
 
     REQUIRE(clazz->members.size() == 1);
     REQUIRE(clazz->members.count("x") == 1);
-    REQUIRE(*clazz->members["x"] == ObjectType("Integer"));
+    REQUIRE(*clazz->members["x"] == ast::ObjectType("Integer"));
 
     REQUIRE(clazz->member_entities.size() == 1);
     REQUIRE(clazz->member_entities.count("x") == 1);
@@ -115,7 +115,7 @@ TEST_CASE("global_multiple", "[parser]") {
     REQUIRE(clazz->member_names[0] == "x");
 
     REQUIRE(clazz->member_types.size() == 1);
-    REQUIRE(*clazz->member_types[0] == ObjectType("Integer"));
+    REQUIRE(*clazz->member_types[0] == ast::ObjectType("Integer"));
 
     REQUIRE(clazz->static_members.empty());
 

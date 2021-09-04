@@ -8,7 +8,7 @@
 #include "TypeNode.h"
 #include "Path.h"
 
-class ObjectType : public ast::TypeNode {
+class ast::ObjectType : public ast::TypeNode {
 public:
     ObjectType(const std::string& identifier, const ast::VectorOfTypes& typeParameters);
 
@@ -21,9 +21,9 @@ public:
 
     ast::TypeNode* clone() const override;
 
-    ObjectType& object() override;
+    ast::ObjectType& object() override;
 
-    const ObjectType& object() const override;
+    const ast::ObjectType& object() const override;
 
     nlohmann::json to_json() const override;
 

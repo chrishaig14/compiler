@@ -41,8 +41,8 @@ USNode Checker::make_rvalue(const Entity& t_entity, USNode value_snode, const as
                 // throw std::runtime_error("Error cannot make function rvalue");
             }
         }
-        const ObjectType& value_ot = value_entity.value->type->object();
-        const ObjectType& target_ot = target.object();
+        const ast::ObjectType& value_ot = value_entity.value->type->object();
+        const ast::ObjectType& target_ot = target.object();
 
         const ast::TypeNode* unaliased_value_type = &value_ot;
         if (value_ot.aliased_type != nullptr) {

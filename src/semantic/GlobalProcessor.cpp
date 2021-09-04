@@ -301,7 +301,7 @@ void Module::fill_actual(ast::TypeNode& t) {
     }
 }
 
-void Module::fill_actual(ObjectType& t) {
+void Module::fill_actual(ast::ObjectType& t) {
     if (t.id.size() == 1) {
         return;
     }

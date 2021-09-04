@@ -38,7 +38,7 @@ public:
     Module(Path path, std::string abs_path, std::string rel_path, bool is_lib, std::string full_header_path);
     Path get_actual_path(const std::string& id);
     void fill_actual(ast::TypeNode& t);
-    void fill_actual(ObjectType& t);
+    void fill_actual(ast::ObjectType& t);
     void fill_actual(FunctionType& t);
 };
 

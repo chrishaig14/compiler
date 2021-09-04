@@ -106,7 +106,7 @@ USemanticInfo Checker::visit_class(ast::Klass& node) {
     std::vector<sem::SNode*> static_methods_snodes;
 
     for (const auto& method: node.methods) {
-        auto* vt = new ObjectType(node.class_name);
+        auto* vt = new ast::ObjectType(node.class_name);
         vt->actual_base_path = clazz->path;
         auto val = std::make_unique<Value>(vt);
         this->add_this = true;
@@ -236,7 +236,7 @@ USemanticInfo Checker::visit_function(ast::Function& n) {
         this->scope->set(n.parameter_names[i], te);
         // if (!param_type.is_generic()) {
         //     if (param_type.kind == Kind::OBJECT) {
-        //         ObjectType& o_type = param_type.object();
+        //         ast::ObjectType& o_type = param_type.object();
         //         Entity pt = this->scope->get(o_type.id);
         //         o_type.actual_base_path = pt.clazz->path;
         //         if (type.kind == Kind::OBJECT) {

@@ -45,7 +45,7 @@ std::string FunctionType::to_string() const {
         parameters = parameters.substr(0, parameters.size() - 2);
     }
     ret = ftype.return_type->to_string();
-    return "fun (" + parameters + ")" + (*ftype.return_type == ObjectType(".None") ? "" : (" -> " + ret));
+    return "fun (" + parameters + ")" + (*ftype.return_type == ast::ObjectType(".None") ? "" : (" -> " + ret));
 }
 
 std::string FunctionType::actual_to_string() const {
@@ -60,7 +60,7 @@ std::string FunctionType::actual_to_string() const {
         parameters = parameters.substr(0, parameters.size() - 2);
     }
     ret = ftype.return_type->actual_to_string();
-    return "fun (" + parameters + ")" + (*ftype.return_type == ObjectType(".None") ? "" : (" -> " + ret));
+    return "fun (" + parameters + ")" + (*ftype.return_type == ast::ObjectType(".None") ? "" : (" -> " + ret));
 }
 
 bool FunctionType::equal(const ast::TypeNode& other) const {

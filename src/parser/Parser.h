@@ -74,7 +74,7 @@ public:
 
     ast::UTypeNode parse_type_node();
     std::unique_ptr<FunctionType> parse_function_type();
-    std::unique_ptr<ObjectType> parse_object_type();
+    std::unique_ptr<ast::ObjectType> parse_object_type();
 
     ast::VectorOfNodesU parse_list_of_arguments();
 

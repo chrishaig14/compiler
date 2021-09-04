@@ -16,7 +16,7 @@
 #include "../src/semantic/errors/ErrorObjectNoSpecialMethod.h"
 #include "../src/semantic/errors/ErrorEnumNoValue.h"
 
-static const ObjectType NO_TYPE(".None");
+static const ast::ObjectType NO_TYPE(".None");
 
 static const TextPosition& _POS = {1, 1};
 
@@ -299,7 +299,7 @@ TEST_CASE("semantic_output_float_literal", "[checker]") {
     REQUIRE(checker.error_reporter.errors.size() == 0);
     REQUIRE(info->entity.get().type == E_TYPE::VALUE);
     REQUIRE(((EntityValue&) (info->entity.get())).value->metatype == Meta::CLASS);
-    REQUIRE(*((EntityValue&) (info->entity.get())).value->type == ObjectType("Float"));
+    REQUIRE(*((EntityValue&) (info->entity.get())).value->type == ast::ObjectType("Float"));
 }
 
 // TEST_CASE("semantic_output_none_literal", "[checker]") {
@@ -355,7 +355,7 @@ TEST_CASE("semantic_output_binop", "[checker]") {
     CHECK(info->entity.get().type == E_TYPE::VALUE);
     EntityValue& entity_value = (EntityValue&) (info->entity.get());
     CHECK(entity_value.value->metatype == Meta::CLASS);
-    CHECK(*entity_value.value->type == ObjectType("Integer"));
+    CHECK(*entity_value.value->type == ast::ObjectType("Integer"));
 }
 
 TEST_CASE("semantic_output_boolop", "[checker]") {
@@ -376,7 +376,7 @@ TEST_CASE("semantic_output_boolop", "[checker]") {
     CHECK(info->entity.get().type == E_TYPE::VALUE);
     EntityValue& entity_value = (EntityValue&) (info->entity.get());
     CHECK(entity_value.value->metatype == Meta::CLASS);
-    CHECK(*entity_value.value->type == ObjectType("Boolean"));
+    CHECK(*entity_value.value->type == ast::ObjectType("Boolean"));
 }
 
 TEST_CASE("semantic_output_subscript", "[checker]") {

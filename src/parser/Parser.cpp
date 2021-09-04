@@ -626,12 +626,12 @@ std::unique_ptr<FunctionType> Parser::parse_function_type() {
         this->expect_token(TokType::RARROW);
         return_type = this->parse_type_node().release();
     } else {
-        return_type = new ObjectType(".None");
+        return_type = new ast::ObjectType(".None");
     }
     return std::make_unique<FunctionType>(parameter_types, ast::UTypeNode(return_type));
 }
 
-std::unique_ptr<ObjectType> Parser::parse_object_type() {
+std::unique_ptr<ast::ObjectType> Parser::parse_object_type() {
     Token identifier = this->expect_token(TokType::ID);
     ast::VectorOfTypes type_parameters;
     if (this->match(TokType::LSQUARE)) {
@@ -647,7 +647,7 @@ std::unique_ptr<ObjectType> Parser::parse_object_type() {
         }
         this->expect_token(TokType::RSQUARE);
     }
-    auto ot = std::make_unique<ObjectType>(identifier.str, type_parameters);
+    auto ot = std::make_unique<ast::ObjectType>(identifier.str, type_parameters);
     if (ot->id.size() == 1 && (islower(ot->id[0]) != 0)) {
         ot->is_generic_param = true;
     }
@@ -738,7 +738,7 @@ std::unique_ptr<ast::Function> Parser::parse_function_definition() {
         this->expect_token(TokType::RARROW);
         return_type = this->parse_type_node();
     } else {
-        return_type = std::make_unique<ObjectType>(".None");
+        return_type = std::make_unique<ast::ObjectType>(".None");
     }
     // Parse function body
     auto body = this->parse_possibly_empty_block();
@@ -1045,7 +1045,7 @@ std::unique_ptr<ast::Typeclass> Parser::parse_typeclass() {
             this->expect_token(TokType::RARROW);
             return_type = this->parse_type_node().release();
         } else {
-            return_type = new ObjectType(".None");
+            return_type = new ast::ObjectType(".None");
         }
 
         auto ft = std::make_unique<FunctionType>(parameter_types, ast::UTypeNode(return_type));

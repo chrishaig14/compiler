@@ -172,11 +172,11 @@ USemanticInfo Checker::class_member(Class* cls, const std::string& child, ast::M
         auto* unbound_method = new ConstFunction(bound_method->path, bound_method->ft->clone());
         ast::VectorOfTypes tp;
         for (auto tt: cls->type_params) {
-            ObjectType* t = new ObjectType(tt);
+            ast::ObjectType* t = new ast::ObjectType(tt);
             t->is_generic_param = true;
             tp.push_back(t);
         }
-        ObjectType* ot = new ObjectType(cls->class_name, tp);
+        ast::ObjectType* ot = new ast::ObjectType(cls->class_name, tp);
         unbound_method->ft->param_types.insert(unbound_method->ft->param_types.begin(), ast::UTypeNode(ot));
         info.entity = *new EntityConstFunction(unbound_method);
         info.snode = std::make_unique<sem::Id>(unbound_method->path.as_str());
@@ -186,7 +186,7 @@ USemanticInfo Checker::class_member(Class* cls, const std::string& child, ast::M
     } else if (cls->static_members.find(child) != cls->static_members.end()) {
         info.entity = *entity_from_type(*cls->static_members[child].first);
     } else {
-        this->error_reporter.error(std::make_unique<ErrorClassNoMember>(ObjectType(cls->class_name, {}),
+        this->error_reporter.error(std::make_unique<ErrorClassNoMember>(ast::ObjectType(cls->class_name, {}),
                                                       child,
                                                       n.dot_pos,
                                                       n.parent,

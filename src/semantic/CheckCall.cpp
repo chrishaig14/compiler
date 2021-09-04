@@ -79,7 +79,7 @@ USemanticInfo Checker::visit_call(ast::Call& n, bool is_rvalue) {
         if (fun_info.entity.get().type == E_TYPE::CONST_FUNCTION) {
             ConstFunction* full_function = ((EntityConstFunction&) fun_info.entity.get()).const_function;
             if (full_function->implicit != nullptr) {
-                ObjectType* it = new ObjectType(full_function->implicit->type);
+                ast::ObjectType* it = new ast::ObjectType(full_function->implicit->type);
                 it->is_generic_param = true;
                 mangle_generic_names(it);
                 TypeNode* tt = all_substitutions.at(it->id);

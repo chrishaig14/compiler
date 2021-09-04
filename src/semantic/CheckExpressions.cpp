@@ -14,7 +14,7 @@
 
 EntityValue& Checker::entity_value_from_actual_base_path_no_generic(const Path& p) {
     if (this->entity_values_no_generic.count(p.as_str()) == 0) {
-        auto* ot = new ObjectType(p.as_vec().back());
+        auto* ot = new ast::ObjectType(p.as_vec().back());
         ot->actual_base_path = p;
         auto v = std::make_unique<Value>(ot);
         this->fill_value(*v);
@@ -128,7 +128,7 @@ USemanticInfo Checker::visit_cast(ast::Cast& n) {
 //         if (fun != "__eq__" && fun != "__ne__") {
 //             this->error_reporter.fail("Error: enum type doesnt support this operator");
 //         }
-//         // auto* ot = new ObjectType("Boolean", {});
+//         // auto* ot = new ast::ObjectType("Boolean", {});
 //         // ot->actual_base_path = Path("core.core.Boolean");
 //         // TypeNode* rettype = ot;
 //         //
@@ -330,15 +330,15 @@ USemanticInfo Checker::visit_ternary(ast::Ternary& node) {
     Entity& p_entity = expression_info.entity;
     if (p_entity.type != E_TYPE::VALUE ||
         ((EntityValue&) expression_info_p->entity).value->type->kind == Kind::FUNCTION) {
-        this->error_reporter.error(std::make_unique<ErrorTypeMismatch>(*new ObjectType("Option", {new ObjectType("t")}),
+        this->error_reporter.error(std::make_unique<ErrorTypeMismatch>(*new ast::ObjectType("Option", {new ast::ObjectType("t")}),
                                                      *node.expression,
                                                      expression_info_p->entity));
         return error_stub();
     }
-    ObjectType& expression_type = ((EntityValue&) p_entity).value->type->object();
+    ast::ObjectType& expression_type = ((EntityValue&) p_entity).value->type->object();
 
     if (expression_type.id != "Option") {
-        this->error_reporter.error(std::make_unique<ErrorTypeMismatch>(*new ObjectType("Option", {new ObjectType("t")}),
+        this->error_reporter.error(std::make_unique<ErrorTypeMismatch>(*new ast::ObjectType("Option", {new ast::ObjectType("t")}),
                                                      *node.expression,
                                                      expression_info_p->entity));
         return error_stub();

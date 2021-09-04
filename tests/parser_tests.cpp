@@ -26,10 +26,10 @@ const std::string& ID = "baz";
 const std::string& ID_1 = "foo";
 const std::string& ID_2 = "bar";
 
-const TestTypeNode TYPE{"Integer", new ObjectType("Integer")};
-const TestTypeNode TYPE_1{"String", new ObjectType("String")};
-const TestTypeNode TYPE_2{"Integer", new ObjectType("Integer")};
-const TestTypeNode TYPE_3{"Boolean", new ObjectType("Boolean")};
+const TestTypeNode TYPE{"Integer", new ast::ObjectType("Integer")};
+const TestTypeNode TYPE_1{"String", new ast::ObjectType("String")};
+const TestTypeNode TYPE_2{"Integer", new ast::ObjectType("Integer")};
+const TestTypeNode TYPE_3{"Boolean", new ast::ObjectType("Boolean")};
 
 const TestNode EXP_ID_1{"foo", new ast::Id("foo", DUMMY_POS, DUMMY_POS)};
 const TestNode EXP_ID_2{"bar", new ast::Id("bar", DUMMY_POS, DUMMY_POS)};
@@ -161,7 +161,7 @@ TestNodeU FUNCTION() {
                                                         DUMMY_POS)};
 }
 
-const ObjectType NO_TYPE(".None");
+const ast::ObjectType NO_TYPE(".None");
 
 TEST_CASE("parse_assignment", "[parser]") {
     Scanner scanner;
@@ -990,10 +990,10 @@ TEST_CASE("parse_typeclass", "[parser]") {
 
     std::unique_ptr<ast::Typeclass> ast = parser.parse_typeclass();
     std::unordered_map<std::string, UFunctionType> cmethods;
-    cmethods["eq"] = std::make_unique<FunctionType>(ast::VectorOfTypes{new ObjectType("t"), new ObjectType("t")},
-                                                    std::make_unique<ObjectType>("Boolean"));
-    cmethods["ne"] = std::make_unique<FunctionType>(ast::VectorOfTypes{new ObjectType("t"), new ObjectType("t")},
-                                                    std::make_unique<ObjectType>("Boolean"));
+    cmethods["eq"] = std::make_unique<FunctionType>(ast::VectorOfTypes{new ast::ObjectType("t"), new ast::ObjectType("t")},
+                                                    std::make_unique<ast::ObjectType>("Boolean"));
+    cmethods["ne"] = std::make_unique<FunctionType>(ast::VectorOfTypes{new ast::ObjectType("t"), new ast::ObjectType("t")},
+                                                    std::make_unique<ast::ObjectType>("Boolean"));
 
     REQUIRE(ast->to_json() == ast::Typeclass("Comparable", "t", std::move(cmethods), DUMMY_POS, DUMMY_POS).to_json());
 }
@@ -1010,19 +1010,19 @@ TEST_CASE("parse_instance", "[parser]") {
     std::unique_ptr<ast::Block> b2 = ast::Block::make(ast::VectorOfNodesU{}, DUMMY_POS, DUMMY_POS);
     std::unique_ptr<ast::Block> b1 = ast::Block::make(ast::VectorOfNodesU{}, DUMMY_POS, DUMMY_POS);
     ast::VectorOfUTypes vt1;
-    vt1.push_back(std::make_unique<ObjectType>("Foo"));
-    vt1.push_back(std::make_unique<ObjectType>("Foo"));
+    vt1.push_back(std::make_unique<ast::ObjectType>("Foo"));
+    vt1.push_back(std::make_unique<ast::ObjectType>("Foo"));
 
     ast::VectorOfUTypes vt2;
-    vt2.push_back(std::make_unique<ObjectType>("Foo"));
-    vt2.push_back(std::make_unique<ObjectType>("Foo"));
-    ast::UTypeNode r1 = std::make_unique<ObjectType>("Boolean");
-    ast::UTypeNode r2 = std::make_unique<ObjectType>("Boolean");
+    vt2.push_back(std::make_unique<ast::ObjectType>("Foo"));
+    vt2.push_back(std::make_unique<ast::ObjectType>("Foo"));
+    ast::UTypeNode r1 = std::make_unique<ast::ObjectType>("Boolean");
+    ast::UTypeNode r2 = std::make_unique<ast::ObjectType>("Boolean");
     std::unordered_map<std::string, ast::UFunctionNode> methods;
     methods["eq"] = std::make_unique<ast::Function>("eq", VectorOfStrings{"a", "b"}, vt1, r1, b1, DUMMY_POS, DUMMY_POS);
     methods["ne"] = std::make_unique<ast::Function>("ne", VectorOfStrings{"a", "b"}, vt2, r2, b2, DUMMY_POS, DUMMY_POS);
     REQUIRE(ast->to_json() == ast::Instance("Comparable",
-                                            std::make_unique<ObjectType>("Foo"),
+                                            std::make_unique<ast::ObjectType>("Foo"),
                                             std::move(methods),
                                             DUMMY_POS,
                                             DUMMY_POS).to_json());

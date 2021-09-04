@@ -11,12 +11,9 @@
 
 #include "ast/ast.h"
 
-class ObjectType;
-
 class FunctionType;
 
 typedef std::unique_ptr<FunctionType> UFunctionType;
-typedef std::unique_ptr<ObjectType> UObjectType;
 
 typedef std::vector<ast::Node*> VectorOfNodes;
 typedef std::vector<std::string> VectorOfStrings;

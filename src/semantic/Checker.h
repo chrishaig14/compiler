@@ -53,13 +53,13 @@
 #include "../ast/UnaryOp.h"
 #include "../ast/ObjectType.h"
 
-#define T_NONE ObjectType(".None")
+#define T_NONE ast::ObjectType(".None")
 
 typedef std::unique_ptr<SemanticInfo> USemanticInfo;
 typedef std::unique_ptr<SemanticInfoBlock> USemanticInfoBlock;
 
 bool is_generic(const ast::TypeNode& t);
-ast::UTypeNode make_type_from_object_pattern(const ObjectType& object_type, const MapStringType& replacements);
+ast::UTypeNode make_type_from_object_pattern(const ast::ObjectType& object_type, const MapStringType& replacements);
 ast::UTypeNode make_type_from_function_pattern(const FunctionType& ftn, const MapStringType& replacements);
 ast::UTypeNode make_type(const ast::TypeNode& original, const MapStringType& replacements);
 SemanticInfo match_arguments_to_generic_function(const FunctionType& function_type, ast::VectorOfTypes arg_types);
@@ -97,12 +97,12 @@ public:
     void enter_scope(const std::string& name);
     void leave_scope();
     bool assert_type_exists(const ast::TypeNode& type, TextPosition pos);
-    Class* instantiate_generic(Class* generic, const ObjectType& instance);
-    bool is_variable(const ObjectType& a);
+    Class* instantiate_generic(Class* generic, const ast::ObjectType& instance);
+    bool is_variable(const ast::ObjectType& a);
     std::pair<std::string, ast::TypeNode*>*
     get_first_substitution_function(FunctionType& a, FunctionType& b, bool is_top_level_arg);
     std::pair<std::string, ast::TypeNode*>*
-    get_first_substitution_object(ObjectType& a, ObjectType& b, bool is_top_level_arg);
+    get_first_substitution_object(ast::ObjectType& a, ast::ObjectType& b, bool is_top_level_arg);
     std::pair<std::string, ast::TypeNode*>* get_first_substitution(ast::TypeNode& a, ast::TypeNode& b, bool is_top_level_arg);
     ast::UTypeNode substitute(const ast::TypeNode& t, const std::string& var, const ast::TypeNode& replacement);
     std::unique_ptr<FunctionType> unify_function_call(const FunctionType& fun, ast::VectorOfTypes& args,
