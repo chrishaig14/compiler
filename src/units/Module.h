@@ -16,6 +16,7 @@
 class Module {
 public:
     std::string name;
+    std::vector<std::unique_ptr<ConstFunction>> const_functions;
     std::string abs_path;
     CodeLines code_lines;
     UBlockNode ast;

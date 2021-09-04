@@ -29,6 +29,8 @@ class Compiler {
     std::string project_output_dir;
     std::string output_name;
 
+    std::vector<std::unique_ptr<Module>> my_modules;
+
     std::string lib_path;
 
     std::map<std::string, bool> loaded_top_units;

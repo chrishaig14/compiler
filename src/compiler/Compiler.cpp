@@ -141,6 +141,7 @@ void Compiler::load_module(Package& package, const std::string& d_name) {
                               module_rel_path,
                               package.is_lib,
                               path_join(package.header_parent_path, module_name + ".h"));
+    this->my_modules.push_back(std::unique_ptr<Module>(module));
     package.units[module_name] = Unit{.type=U_TYPE::MODULE, .module=module};
 }
 

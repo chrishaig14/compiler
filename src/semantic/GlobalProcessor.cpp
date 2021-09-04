@@ -111,6 +111,7 @@ void GlobalProcessor::visit_root() {
         if (n.ntype == NodeType::FUNC) {
             // this->dispatch(n);
             auto* const_function = new ConstFunction(Path(), nullptr);
+            this->module.const_functions.push_back(std::unique_ptr<ConstFunction>(const_function));
             this->module.flirpins[((ast::Function&) n).identifier] = Flirpin{.type=F_TYPE::CONST_FUNCTION, .const_function=const_function};
         }
     }
@@ -201,7 +202,8 @@ void GlobalProcessor::visit_class(ast::Klass& node) {
         this->module.fill_actual(*method.return_type);
         // method.return_type->object().actual_base_path = this->get_actual_path(method.return_type->object().id);
 
-        auto* cf = new ConstFunction(Path(class_info->path, f.first), new FunctionType(x, UTypeNode (method.return_type->clone())));
+        auto* cf = new ConstFunction(Path(class_info->path, f.first),
+                                     new FunctionType(x, UTypeNode(method.return_type->clone())));
         method.path = cf->path;
         cf->implicit = f.second->method->implicit;
         f.second->method->const_function = cf;
@@ -219,7 +221,8 @@ void GlobalProcessor::visit_class(ast::Klass& node) {
         this->module.fill_actual(*method.return_type);
         // method.return_type->object().actual_base_path = this->get_actual_path(method.return_type->object().id);
 
-        auto* cf = new ConstFunction(Path(class_info->path, f.first), new FunctionType(x, UTypeNode (method.return_type->clone())));
+        auto* cf = new ConstFunction(Path(class_info->path, f.first),
+                                     new FunctionType(x, UTypeNode(method.return_type->clone())));
         method.path = cf->path;
         f.second->const_function = cf;
         class_info->static_methods.insert(make_pair(f.first, cf));

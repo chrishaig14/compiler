@@ -20,7 +20,7 @@ const ObjectType NO_TYPE(".None");
 
 const TextPosition& _POS = {1, 1};
 
-Compiler analyze(std::string code) {
+std::unique_ptr<Compiler> analyze(std::string code) {
     const std::string& tmp_in = "tmp_in";
     mkdir(tmp_in.c_str(), 0700);
     const std::string& tmp_out = "tmp_out";
@@ -37,15 +37,16 @@ Compiler analyze(std::string code) {
     std::string lib_path = "/home/chris/CLionProjects/compiler/lib";
     bool is_lib = false;
     std::string version = "1.0.0";
-    Compiler c(project_dir, project_output_dir, output_name, lib_path, is_lib, version);
-    c.pre();
+    auto c = std::make_unique<Compiler>(project_dir, project_output_dir, output_name, lib_path, is_lib, version);
+    c->pre();
     return c;
 }
 
 TEST_CASE("basic_function", "[checker]") {
     std::string code = "fun foo()->Integer{return 0;}";
 
-    Compiler c = analyze(code);
+    std::unique_ptr<Compiler> cp = analyze(code);
+    Compiler& c = *cp;
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
     Checker checker(*c.top_package, module);
@@ -56,7 +57,8 @@ TEST_CASE("basic_function", "[checker]") {
 TEST_CASE("basic_function_bad_return_type", "[checker]") {
     std::string code = "fun foo()->Integer{return false;}";
 
-    Compiler c = analyze(code);
+    std::unique_ptr<Compiler> cp = analyze(code);
+    Compiler& c = *cp;
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
     Checker checker(*c.top_package, module);
@@ -75,7 +77,8 @@ TEST_CASE("basic_function_bad_return_type", "[checker]") {
 TEST_CASE("basic_declaration", "[checker]") {
     std::string code = "fun main()->Integer{var x = 9;return 0;}";
 
-    Compiler c = analyze(code);
+    std::unique_ptr<Compiler> cp = analyze(code);
+    Compiler& c = *cp;
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
     Checker checker(*c.top_package, module);
@@ -86,7 +89,8 @@ TEST_CASE("basic_declaration", "[checker]") {
 TEST_CASE("basic_declaration_bad_type", "[checker]") {
     std::string code = "fun foo()->Integer{var x: Boolean = 9;return 0;}";
 
-    Compiler c = analyze(code);
+    std::unique_ptr<Compiler> cp = analyze(code);
+    Compiler& c = *cp;
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
     Checker checker(*c.top_package, module);
@@ -104,7 +108,8 @@ TEST_CASE("basic_declaration_bad_type", "[checker]") {
 TEST_CASE("error_redeclared", "[checker]") {
     std::string code = "fun foo()->Integer{var x = 9; var x = 10;return 0;}";
 
-    Compiler c = analyze(code);
+    std::unique_ptr<Compiler> cp = analyze(code);
+    Compiler& c = *cp;
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
     Checker checker(*c.top_package, module);
@@ -123,7 +128,8 @@ TEST_CASE("error_redeclared", "[checker]") {
 TEST_CASE("list_ok", "[checker]") {
     std::string code = "fun foo()->Integer{var x = [4,1];return 0;}";
 
-    Compiler c = analyze(code);
+    std::unique_ptr<Compiler> cp = analyze(code);
+    Compiler& c = *cp;
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
     Checker checker(*c.top_package, module);
@@ -136,7 +142,8 @@ TEST_CASE("list_ok", "[checker]") {
 TEST_CASE("list_bad", "[checker]") {
     std::string code = "fun foo()->Integer{var x = [4,\"a\"];return 0;}";
 
-    Compiler c = analyze(code);
+    std::unique_ptr<Compiler> cp = analyze(code);
+    Compiler& c = *cp;
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
     Checker checker(*c.top_package, module);
@@ -157,7 +164,8 @@ TEST_CASE("list_bad", "[checker]") {
 TEST_CASE("empty_dict_ok", "[checker]") {
     std::string code = "fun foo()->Integer{var x = {}::[Integer,String];return 0;}";
 
-    Compiler c = analyze(code);
+    std::unique_ptr<Compiler> cp = analyze(code);
+    Compiler& c = *cp;
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
     Checker checker(*c.top_package, module);
@@ -170,7 +178,8 @@ TEST_CASE("empty_dict_ok", "[checker]") {
 TEST_CASE("dict_ok", "[checker]") {
     std::string code = "fun foo()->Integer{var x = {7:\"seven\",9:\"nine\"};return 0;}";
 
-    Compiler c = analyze(code);
+    std::unique_ptr<Compiler> cp = analyze(code);
+    Compiler& c = *cp;
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
     Checker checker(*c.top_package, module);
@@ -183,7 +192,8 @@ TEST_CASE("dict_ok", "[checker]") {
 TEST_CASE("dict_key_type_error", "[checker]") {
     std::string code = "fun foo()->Integer{var x = {7:\"seven\",\"nine\":\"ten\"};return 0;}";
 
-    Compiler c = analyze(code);
+    std::unique_ptr<Compiler> cp = analyze(code);
+    Compiler& c = *cp;
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
     Checker checker(*c.top_package, module);
@@ -196,7 +206,8 @@ TEST_CASE("dict_key_type_error", "[checker]") {
 TEST_CASE("dict_value_type_error", "[checker]") {
     std::string code = "fun foo()->Integer{var x = {7:\"seven\",9:false};return 0;}";
 
-    Compiler c = analyze(code);
+    std::unique_ptr<Compiler> cp = analyze(code);
+    Compiler& c = *cp;
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
     Checker checker(*c.top_package, module);
@@ -210,7 +221,8 @@ TEST_CASE("dict_value_type_error", "[checker]") {
 TEST_CASE("int_literal", "[checker]") {
     std::string code = "fun foo()->Integer{var x = 9;return 0;}";
 
-    Compiler c = analyze(code);
+    std::unique_ptr<Compiler> cp = analyze(code);
+    Compiler& c = *cp;
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
     Checker checker(*c.top_package, module);
@@ -227,7 +239,8 @@ TEST_CASE("int_literal", "[checker]") {
 TEST_CASE("bool_literal", "[checker]") {
     std::string code = "fun foo()->Integer{var x = false;return 0;}";
 
-    Compiler c = analyze(code);
+    std::unique_ptr<Compiler> cp = analyze(code);
+    Compiler& c = *cp;
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
     Checker checker(*c.top_package, module);
@@ -244,7 +257,8 @@ TEST_CASE("bool_literal", "[checker]") {
 TEST_CASE("list_literal", "[checker]") {
     std::string code = "fun foo()->Integer{var x = [4,1];return 0;}";
 
-    Compiler c = analyze(code);
+    std::unique_ptr<Compiler> cp = analyze(code);
+    Compiler& c = *cp;
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
     Checker checker(*c.top_package, module);
@@ -261,7 +275,8 @@ TEST_CASE("list_literal", "[checker]") {
 TEST_CASE("empty_list_literal", "[checker]") {
     std::string code = "fun foo()->Integer{var x = []::String;return 0;}";
 
-    Compiler c = analyze(code);
+    std::unique_ptr<Compiler> cp = analyze(code);
+    Compiler& c = *cp;
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
     Checker checker(*c.top_package, module);
@@ -278,7 +293,8 @@ TEST_CASE("empty_list_literal", "[checker]") {
 TEST_CASE("empty_dict_literal", "[checker]") {
     std::string code = "fun foo()->Integer{var x = {}::[Integer,String];return 0;}";
 
-    Compiler c = analyze(code);
+    std::unique_ptr<Compiler> cp = analyze(code);
+    Compiler& c = *cp;
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
     Checker checker(*c.top_package, module);
@@ -297,7 +313,8 @@ TEST_CASE("empty_dict_literal", "[checker]") {
 TEST_CASE("dict_literal", "[checker]") {
     std::string code = "fun foo()->Integer{var x = {\"one\":1,\"two\":2};return 0;}";
 
-    Compiler c = analyze(code);
+    std::unique_ptr<Compiler> cp = analyze(code);
+    Compiler& c = *cp;
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
     Checker checker(*c.top_package, module);
@@ -315,7 +332,8 @@ TEST_CASE("dict_literal", "[checker]") {
 TEST_CASE("float_literal", "[checker]") {
     std::string code = "fun foo()->Integer{var x = 9.5;return 0;}";
 
-    Compiler c = analyze(code);
+    std::unique_ptr<Compiler> cp = analyze(code);
+    Compiler& c = *cp;
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
     Checker checker(*c.top_package, module);
@@ -332,7 +350,7 @@ TEST_CASE("float_literal", "[checker]") {
 // TEST_CASE("none_literal", "[checker]") {
 //     std::string code = "fun foo()->Integer{var x = none;return 0;}";
 //
-//     Compiler c = analyze(code);
+//     std::unique_ptr<Compiler> cp =  analyze(code);Compiler& c = *cp;
 //     Module& module = *c.root_package->units["tmp"].module;
 //     analyze_module_result(module, *c.top_package);
 //     Checker checker(*c.top_package,module);
@@ -349,7 +367,8 @@ TEST_CASE("float_literal", "[checker]") {
 TEST_CASE("decl_error_expected_expression", "[checker]") {
     std::string code = "fun foo()->Integer{var x = Integer;return 0;}";
 
-    Compiler c = analyze(code);
+    std::unique_ptr<Compiler> cp = analyze(code);
+    Compiler& c = *cp;
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
     Checker checker(*c.top_package, module);
@@ -371,7 +390,8 @@ TEST_CASE("decl_error_expected_expression", "[checker]") {
 TEST_CASE("error_no_member", "[checker]") {
     std::string code = "class Foo{foo: Integer;}\nfun bar(f: Foo)->Integer{var x = f.lala;return 0;}";
 
-    Compiler c = analyze(code);
+    std::unique_ptr<Compiler> cp = analyze(code);
+    Compiler& c = *cp;
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
     Checker checker(*c.top_package, module);
@@ -394,7 +414,8 @@ TEST_CASE("error_no_member", "[checker]") {
 TEST_CASE("member_ok", "[checker]") {
     std::string code = "class Foo{foo: String;}\nfun bar(f: Foo)->Integer{var x : String = f.foo;return 0;}";
 
-    Compiler c = analyze(code);
+    std::unique_ptr<Compiler> cp = analyze(code);
+    Compiler& c = *cp;
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
     Checker checker(*c.top_package, module);
@@ -408,7 +429,8 @@ TEST_CASE("member_ok", "[checker]") {
 TEST_CASE("binop_ok", "[checker]") {
     std::string code = "fun bar()->Integer{var x = 2 + 5;return 0;}";
 
-    Compiler c = analyze(code);
+    std::unique_ptr<Compiler> cp = analyze(code);
+    Compiler& c = *cp;
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
     Checker checker(*c.top_package, module);
@@ -428,7 +450,8 @@ TEST_CASE("binop_ok", "[checker]") {
 TEST_CASE("boolop_ok", "[checker]") {
     std::string code = "fun bar()->Integer{var x = 2 < 5;return 0;}";
 
-    Compiler c = analyze(code);
+    std::unique_ptr<Compiler> cp = analyze(code);
+    Compiler& c = *cp;
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
     Checker checker(*c.top_package, module);
@@ -449,7 +472,8 @@ TEST_CASE("boolop_ok", "[checker]") {
 TEST_CASE("binop_type_error", "[checker]") {
     std::string code = "fun bar()->Integer{var x = 2 + \"Hello\";return 0;}";
 
-    Compiler c = analyze(code);
+    std::unique_ptr<Compiler> cp = analyze(code);
+    Compiler& c = *cp;
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
     Checker checker(*c.top_package, module);
@@ -472,7 +496,8 @@ TEST_CASE("binop_type_error", "[checker]") {
 TEST_CASE("binop_error", "[checker]") {
     std::string code = "fun bar()->Integer{var x = \"Hello\" - \"Bye\" ;return 0;}";
 
-    Compiler c = analyze(code);
+    std::unique_ptr<Compiler> cp = analyze(code);
+    Compiler& c = *cp;
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
     Checker checker(*c.top_package, module);
@@ -496,7 +521,8 @@ TEST_CASE("binop_error", "[checker]") {
 TEST_CASE("subscript_ok", "[checker]") {
     std::string code = "fun bar()->Integer{var x = [1,3,4][2] ;return 0;}";
 
-    Compiler c = analyze(code);
+    std::unique_ptr<Compiler> cp = analyze(code);
+    Compiler& c = *cp;
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
     Checker checker(*c.top_package, module);
@@ -512,7 +538,8 @@ TEST_CASE("subscript_ok", "[checker]") {
 TEST_CASE("subscript_index_type_error", "[checker]") {
     std::string code = "fun bar()->Integer{var x = [1,3,4][\"foo\"] ;return 0;}";
 
-    Compiler c = analyze(code);
+    std::unique_ptr<Compiler> cp = analyze(code);
+    Compiler& c = *cp;
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
     Checker checker(*c.top_package, module);
@@ -534,7 +561,8 @@ TEST_CASE("subscript_index_type_error", "[checker]") {
 TEST_CASE("subscript_no_method_error", "[checker]") {
     std::string code = "class Foo{foo: String;}\nfun bar(f: Foo)->Integer{var x = f[1];return 0;}";
 
-    Compiler c = analyze(code);
+    std::unique_ptr<Compiler> cp = analyze(code);
+    Compiler& c = *cp;
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
     Checker checker(*c.top_package, module);
@@ -560,7 +588,8 @@ TEST_CASE("subscript_no_method_error", "[checker]") {
 TEST_CASE("call_no_args_ok", "[checker]") {
     std::string code = "fun bar()->Integer{return 0;}\nfun foo()->Integer{var x : Integer = bar();return 0;}";
 
-    Compiler c = analyze(code);
+    std::unique_ptr<Compiler> cp = analyze(code);
+    Compiler& c = *cp;
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
     Checker checker(*c.top_package, module);
@@ -574,7 +603,8 @@ TEST_CASE("call_no_args_ok", "[checker]") {
 TEST_CASE("call_args_ok", "[checker]") {
     std::string code = "fun bar(a: Integer, b: String)->Integer{return 0;}\nfun foo()->Integer{var x : Integer = bar(8, \"Hello\");return 0;}";
 
-    Compiler c = analyze(code);
+    std::unique_ptr<Compiler> cp = analyze(code);
+    Compiler& c = *cp;
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
     Checker checker(*c.top_package, module);
@@ -588,7 +618,8 @@ TEST_CASE("call_args_ok", "[checker]") {
 TEST_CASE("call_args_type_error", "[checker]") {
     std::string code = "fun bar(a: Integer, b: String)->Integer{return 0;}\nfun foo()->Integer{var x : Integer = bar(\"Hello\",\"Bye\");return 0;}";
 
-    Compiler c = analyze(code);
+    std::unique_ptr<Compiler> cp = analyze(code);
+    Compiler& c = *cp;
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
     Checker checker(*c.top_package, module);
@@ -609,7 +640,8 @@ TEST_CASE("call_args_type_error", "[checker]") {
 TEST_CASE("union_ok_1", "[checker]") {
     std::string code = "fun foo()->Integer{var x : Union[Integer, String] = 3;return 0;}";
 
-    Compiler c = analyze(code);
+    std::unique_ptr<Compiler> cp = analyze(code);
+    Compiler& c = *cp;
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
     Checker checker(*c.top_package, module);
@@ -623,7 +655,8 @@ TEST_CASE("union_ok_1", "[checker]") {
 TEST_CASE("union_ok_2", "[checker]") {
     std::string code = "fun foo()->Integer{var x : Union[Integer, String] = \"String\";return 0;}";
 
-    Compiler c = analyze(code);
+    std::unique_ptr<Compiler> cp = analyze(code);
+    Compiler& c = *cp;
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
     Checker checker(*c.top_package, module);
@@ -637,7 +670,8 @@ TEST_CASE("union_ok_2", "[checker]") {
 TEST_CASE("union_error", "[checker]") {
     std::string code = "fun foo()->Integer{var x : Union[Integer, String] = false;return 0;}";
 
-    Compiler c = analyze(code);
+    std::unique_ptr<Compiler> cp = analyze(code);
+    Compiler& c = *cp;
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
     Checker checker(*c.top_package, module);
@@ -657,7 +691,8 @@ TEST_CASE("union_error", "[checker]") {
 TEST_CASE("while_ok", "[checker]") {
     std::string code = "fun foo()->Integer{while true {var x = 1;}return 0;}";
 
-    Compiler c = analyze(code);
+    std::unique_ptr<Compiler> cp = analyze(code);
+    Compiler& c = *cp;
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
     Checker checker(*c.top_package, module);
@@ -671,7 +706,8 @@ TEST_CASE("while_ok", "[checker]") {
 TEST_CASE("while_boolean_error", "[checker]") {
     std::string code = "fun foo()->Integer{while 5 {var x = 1;}return 0;}";
 
-    Compiler c = analyze(code);
+    std::unique_ptr<Compiler> cp = analyze(code);
+    Compiler& c = *cp;
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
     Checker checker(*c.top_package, module);
@@ -692,7 +728,8 @@ TEST_CASE("while_boolean_error", "[checker]") {
 TEST_CASE("if_ok", "[checker]") {
     std::string code = "fun foo()->Integer{if true {var x = 1;}return 0;}";
 
-    Compiler c = analyze(code);
+    std::unique_ptr<Compiler> cp = analyze(code);
+    Compiler& c = *cp;
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
     Checker checker(*c.top_package, module);
@@ -706,7 +743,8 @@ TEST_CASE("if_ok", "[checker]") {
 TEST_CASE("if_boolean_error", "[checker]") {
     std::string code = "fun foo()->Integer{if 5 {var x = 1;}return 0;}";
 
-    Compiler c = analyze(code);
+    std::unique_ptr<Compiler> cp = analyze(code);
+    Compiler& c = *cp;
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
     Checker checker(*c.top_package, module);
@@ -727,7 +765,8 @@ TEST_CASE("if_boolean_error", "[checker]") {
 TEST_CASE("enum_error", "[checker]") {
     std::string code = "enum Foo {a, c}\n fun foo()->Integer{var x = Foo.b;return 0;}";
 
-    Compiler c = analyze(code);
+    std::unique_ptr<Compiler> cp = analyze(code);
+    Compiler& c = *cp;
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
     Checker checker(*c.top_package, module);
@@ -750,7 +789,8 @@ TEST_CASE("enum_error", "[checker]") {
 TEST_CASE("enum_ok", "[checker]") {
     std::string code = "enum Foo {a, c}\n fun foo()->Integer{var x = Foo.a; var y = Foo.c; return 0;}";
 
-    Compiler c = analyze(code);
+    std::unique_ptr<Compiler> cp = analyze(code);
+    Compiler& c = *cp;
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
     Checker checker(*c.top_package, module);
