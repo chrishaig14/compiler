@@ -68,7 +68,7 @@ void GlobalProcessor::visit_function(ast::Function& node) {
     const_function->path = Path(this->module.path, node.identifier);
     if (node.implicit != nullptr) {
         const_function->implicit = node.implicit;
-        this->module.fill_actual(node.implicit->ft);
+        this->module.fill_actual(*node.implicit->ft);
     }
     node.path = const_function->path;
     node.const_function = const_function;
@@ -250,7 +250,7 @@ void GlobalProcessor::dispatch(ast::Node& nod) {
 }
 
 void GlobalProcessor::visit_alias(ast::Alias& node) {
-    this->module.fill_actual(node.aliased_type);
+    this->module.fill_actual(*node.aliased_type);
     this->module.aliased_types[node.alias_id] = node.aliased_type;
 }
 
@@ -285,39 +285,35 @@ Path Module::get_actual_path(const std::string& id) {
 }
 
 void Module::fill_actual(TypeNode& t) {
-    return this->fill_actual(&t);
-}
-
-void Module::fill_actual(TypeNode* t) {
-    if (t->kind == Kind::OBJECT) {
-        if (this->aliased_types.count(t->object().id) != 0) {
-            t->object().aliased_type = this->aliased_types[t->object().id];
+    if (t.kind == Kind::OBJECT) {
+        if (this->aliased_types.count(t.object().id) != 0) {
+            t.object().aliased_type = this->aliased_types[t.object().id];
             return;
         }
-        fill_actual(&t->object());
+        this->fill_actual(t.object());
     }
-    if (t->kind == Kind::FUNCTION) {
-        fill_actual(&t->function());
+    if (t.kind == Kind::FUNCTION) {
+        this->fill_actual(t.function());
         return;
     }
 }
 
-void Module::fill_actual(ObjectType* t) {
-    if (t->id.size() == 1) {
+void Module::fill_actual(ObjectType& t) {
+    if (t.id.size() == 1) {
         return;
     }
-    if (t->is_generic_param) {
+    if (t.is_generic_param) {
         return;
     }
-    t->actual_base_path = this->get_actual_path(t->id);
-    for (auto* tp: t->type_params) {
-        this->fill_actual(tp);
+    t.actual_base_path = this->get_actual_path(t.id);
+    for (auto* tp: t.type_params) {
+        this->fill_actual(*tp);
     }
 }
 
-void Module::fill_actual(FunctionType* t) {
-    for (auto* pt: t->param_types) {
-        this->fill_actual(pt);
+void Module::fill_actual(FunctionType& t) {
+    for (auto* pt: t.param_types) {
+        this->fill_actual(*pt);
     }
-    this->fill_actual(t->return_type);
+    this->fill_actual(*t.return_type);
 }

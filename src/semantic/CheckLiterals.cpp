@@ -207,7 +207,7 @@ USemanticInfo Checker::visit_dict(ast::DictNode& node) {
         return error_stub();
     }
     auto ov = std::make_unique<Value>(new ObjectType("Dict", {first_key_type.clone(), first_value_type.clone()}));
-    this->module.fill_actual(ov->type);
+    this->module.fill_actual(*ov->type);
     this->fill_value(*ov);
     assert(ov->clazz != nullptr);
     info.entity = *new EntityValue(std::move(ov));
@@ -222,7 +222,7 @@ USemanticInfo Checker::visit_emptydict(ast::EmptyDict& node) {
     ObjectType* ot = new ObjectType("Dict", {node.key_type->clone(), node.value_type->clone()});
     ot->actual_base_path = Path("core.core.Dict");
     auto ov = std::make_unique<Value>(ot);
-    this->module.fill_actual(ov->type);
+    this->module.fill_actual(*ov->type);
     this->fill_value(*ov);
     assert(ov->clazz != nullptr);
     info.entity = *new EntityValue(std::move(ov));

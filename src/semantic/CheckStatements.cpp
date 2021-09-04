@@ -178,7 +178,7 @@ USemanticInfo Checker::visit_return(ast::Return& n) {
         TypeNode* aliased_type = this->module.aliased_types.at(return_type->object().id);
         return_type = aliased_type;
     } else {
-        this->module.fill_actual(return_type);
+        this->module.fill_actual(*return_type);
     }
     if (n.expression == nullptr) {
         // this->error_reporter.no_return(*return_type, n.start);
@@ -246,7 +246,7 @@ USemanticInfo Checker::visit_match(ast::Match& node) {
         TypeNode* case_type = c.first;
         ast::Block* case_node = c.second;
 
-        this->module.fill_actual(case_type);
+        this->module.fill_actual(*case_type);
 
         int union_index = target_union_type(*ot, *case_type);
         if (union_index == -1) {
