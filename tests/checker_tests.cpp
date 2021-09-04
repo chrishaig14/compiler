@@ -226,7 +226,7 @@ TEST_CASE("int_literal", "[checker]") {
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
     Checker checker(*c.top_package, module);
-    ast::Node& expression = *((ast::Declaration&) *((ast::Function&) *module.ast->nodes[0]).body->nodes[0]).expression;
+    ast::Node& expression = ((ast::Declaration&) *((ast::Function&) *module.ast->nodes[0]).body->nodes[0]).expression;
     USemanticInfo info = checker.dispatch_rvalue(expression);
 
     REQUIRE(!checker.error_reporter.failed);
@@ -244,7 +244,7 @@ TEST_CASE("bool_literal", "[checker]") {
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
     Checker checker(*c.top_package, module);
-    ast::Node& expression = *((ast::Declaration&) *((ast::Function&) *module.ast->nodes[0]).body->nodes[0]).expression;
+    ast::Node& expression = ((ast::Declaration&) *((ast::Function&) *module.ast->nodes[0]).body->nodes[0]).expression;
     USemanticInfo info = checker.dispatch_rvalue(expression);
 
     REQUIRE(!checker.error_reporter.failed);
@@ -262,7 +262,7 @@ TEST_CASE("list_literal", "[checker]") {
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
     Checker checker(*c.top_package, module);
-    ast::Node& expression = *((ast::Declaration&) *((ast::Function&) *module.ast->nodes[0]).body->nodes[0]).expression;
+    ast::Node& expression = ((ast::Declaration&) *((ast::Function&) *module.ast->nodes[0]).body->nodes[0]).expression;
     USemanticInfo info = checker.dispatch_rvalue(expression);
 
     REQUIRE(!checker.error_reporter.failed);
@@ -280,7 +280,7 @@ TEST_CASE("empty_list_literal", "[checker]") {
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
     Checker checker(*c.top_package, module);
-    ast::Node& expression = *((ast::Declaration&) *((ast::Function&) *module.ast->nodes[0]).body->nodes[0]).expression;
+    ast::Node& expression = ((ast::Declaration&) *((ast::Function&) *module.ast->nodes[0]).body->nodes[0]).expression;
     USemanticInfo info = checker.dispatch_rvalue(expression);
 
     REQUIRE(!checker.error_reporter.failed);
@@ -298,7 +298,7 @@ TEST_CASE("empty_dict_literal", "[checker]") {
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
     Checker checker(*c.top_package, module);
-    ast::Node& expression = *((ast::Declaration&) *((ast::Function&) *module.ast->nodes[0]).body->nodes[0]).expression;
+    ast::Node& expression = ((ast::Declaration&) *((ast::Function&) *module.ast->nodes[0]).body->nodes[0]).expression;
     USemanticInfo info = checker.dispatch_rvalue(expression);
 
     REQUIRE(!checker.error_reporter.failed);
@@ -318,7 +318,7 @@ TEST_CASE("dict_literal", "[checker]") {
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
     Checker checker(*c.top_package, module);
-    ast::Node& expression = *((ast::Declaration&) *((ast::Function&) *module.ast->nodes[0]).body->nodes[0]).expression;
+    ast::Node& expression = ((ast::Declaration&) *((ast::Function&) *module.ast->nodes[0]).body->nodes[0]).expression;
     USemanticInfo info = checker.dispatch_rvalue(expression);
 
     REQUIRE(!checker.error_reporter.failed);
@@ -337,7 +337,7 @@ TEST_CASE("float_literal", "[checker]") {
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
     Checker checker(*c.top_package, module);
-    ast::Node& expression = *((ast::Declaration&) *((ast::Function&) *module.ast->nodes[0]).body->nodes[0]).expression;
+    ast::Node& expression = ((ast::Declaration&) *((ast::Function&) *module.ast->nodes[0]).body->nodes[0]).expression;
     USemanticInfo info = checker.dispatch_rvalue(expression);
 
     REQUIRE(!checker.error_reporter.failed);
@@ -383,7 +383,7 @@ TEST_CASE("decl_error_expected_expression", "[checker]") {
     Error& error = *checker.error_reporter.errors.back();
     Class cl;
     EntityClass ec(&cl);
-    ErrorExpectedExpression exp(ec, *declaration_node.expression);
+    ErrorExpectedExpression exp(ec, declaration_node.expression);
     REQUIRE(error == exp);
 }
 
@@ -407,7 +407,7 @@ TEST_CASE("error_no_member", "[checker]") {
     Flirpin clazz_flirpin = module.get(Path("Foo"));
     REQUIRE(clazz_flirpin.type == F_TYPE::CLASS);
     ObjectType type = ObjectType("Foo");
-    ErrorNoMemberSuggestions exp(type, (ast::Member&) *declaration_node.expression, *clazz_flirpin.clazz);
+    ErrorNoMemberSuggestions exp(type, (ast::Member&) declaration_node.expression, *clazz_flirpin.clazz);
     REQUIRE(error == exp);
 }
 
@@ -436,7 +436,7 @@ TEST_CASE("binop_ok", "[checker]") {
     Checker checker(*c.top_package, module);
     checker.init();
 
-    ast::Node& expression = *((ast::Declaration&) *((ast::Function&) *module.ast->nodes[0]).body->nodes[0]).expression;
+    ast::Node& expression = ((ast::Declaration&) *((ast::Function&) *module.ast->nodes[0]).body->nodes[0]).expression;
     USemanticInfo info = checker.dispatch_rvalue(expression);
 
     REQUIRE(!checker.error_reporter.failed);
@@ -457,7 +457,7 @@ TEST_CASE("boolop_ok", "[checker]") {
     Checker checker(*c.top_package, module);
     checker.init();
 
-    ast::Node& expression = *((ast::Declaration&) *((ast::Function&) *module.ast->nodes[0]).body->nodes[0]).expression;
+    ast::Node& expression = ((ast::Declaration&) *((ast::Function&) *module.ast->nodes[0]).body->nodes[0]).expression;
     USemanticInfo info = checker.dispatch_rvalue(expression);
 
     REQUIRE(!checker.error_reporter.failed);
@@ -479,7 +479,7 @@ TEST_CASE("binop_type_error", "[checker]") {
     Checker checker(*c.top_package, module);
     checker.init();
 
-    ast::Node& expression = *((ast::Declaration&) *((ast::Function&) *module.ast->nodes[0]).body->nodes[0]).expression;
+    ast::Node& expression = ((ast::Declaration&) *((ast::Function&) *module.ast->nodes[0]).body->nodes[0]).expression;
     USemanticInfo info = checker.dispatch_rvalue(expression);
 
     REQUIRE(checker.error_reporter.failed);
@@ -503,7 +503,7 @@ TEST_CASE("binop_error", "[checker]") {
     Checker checker(*c.top_package, module);
     checker.init();
 
-    ast::Node& expression = *((ast::Declaration&) *((ast::Function&) *module.ast->nodes[0]).body->nodes[0]).expression;
+    ast::Node& expression = ((ast::Declaration&) *((ast::Function&) *module.ast->nodes[0]).body->nodes[0]).expression;
     USemanticInfo info = checker.dispatch_rvalue(expression);
 
     REQUIRE(checker.error_reporter.failed);
@@ -528,7 +528,7 @@ TEST_CASE("subscript_ok", "[checker]") {
     Checker checker(*c.top_package, module);
     checker.init();
 
-    ast::Node& expression = *((ast::Declaration&) *((ast::Function&) *module.ast->nodes[0]).body->nodes[0]).expression;
+    ast::Node& expression = ((ast::Declaration&) *((ast::Function&) *module.ast->nodes[0]).body->nodes[0]).expression;
     USemanticInfo info = checker.dispatch_rvalue(expression);
 
     REQUIRE(!checker.error_reporter.failed);
@@ -545,7 +545,7 @@ TEST_CASE("subscript_index_type_error", "[checker]") {
     Checker checker(*c.top_package, module);
     checker.init();
 
-    ast::Node& expression = *((ast::Declaration&) *((ast::Function&) *module.ast->nodes[0]).body->nodes[0]).expression;
+    ast::Node& expression = ((ast::Declaration&) *((ast::Function&) *module.ast->nodes[0]).body->nodes[0]).expression;
     USemanticInfo info = checker.dispatch_rvalue(expression);
 
     REQUIRE(checker.error_reporter.failed);

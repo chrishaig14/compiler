@@ -12,10 +12,11 @@
 #include "../utils.h"
 
 class ast::Declaration : public ast::Node {
+    UNode _expression;
 public:
+    Node& expression;
     std::string identifier;
     UTypeNode type;
-    UNode expression;
     TextPosition eq_pos;
     Declaration(const std::string& identifier, UTypeNode type, UNode expression, TextPosition start,
                 TextPosition eq_pos, TextPosition end);

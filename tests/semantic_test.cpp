@@ -292,7 +292,7 @@ TEST_CASE("semantic_output_float_literal", "[checker]") {
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
     Checker checker(*c.top_package, module);
-    ast::Node& expression = *((ast::Declaration&) *((ast::Function&) *module.ast->nodes[0]).body->nodes[0]).expression;
+    ast::Node& expression = ((ast::Declaration&) *((ast::Function&) *module.ast->nodes[0]).body->nodes[0]).expression;
     USemanticInfo info = checker.dispatch_rvalue(expression);
 
     REQUIRE(!checker.error_reporter.failed);
@@ -347,7 +347,7 @@ TEST_CASE("semantic_output_binop", "[checker]") {
     Checker checker(*c.top_package, module);
     checker.init();
 
-    ast::Node& expression = *((ast::Declaration&) *((ast::Function&) *module.ast->nodes[0]).body->nodes[0]).expression;
+    ast::Node& expression = ((ast::Declaration&) *((ast::Function&) *module.ast->nodes[0]).body->nodes[0]).expression;
     USemanticInfo info = checker.dispatch_rvalue(expression);
 
     REQUIRE(!checker.error_reporter.failed);
@@ -368,7 +368,7 @@ TEST_CASE("semantic_output_boolop", "[checker]") {
     Checker checker(*c.top_package, module);
     checker.init();
 
-    ast::Node& expression = *((ast::Declaration&) *((ast::Function&) *module.ast->nodes[0]).body->nodes[0]).expression;
+    ast::Node& expression = ((ast::Declaration&) *((ast::Function&) *module.ast->nodes[0]).body->nodes[0]).expression;
     USemanticInfo info = checker.dispatch_rvalue(expression);
 
     REQUIRE(!checker.error_reporter.failed);
@@ -389,7 +389,7 @@ TEST_CASE("semantic_output_subscript", "[checker]") {
     Checker checker(*c.top_package, module);
     checker.init();
 
-    ast::Node& expression = *((ast::Declaration&) *((ast::Function&) *module.ast->nodes[0]).body->nodes[0]).expression;
+    ast::Node& expression = ((ast::Declaration&) *((ast::Function&) *module.ast->nodes[0]).body->nodes[0]).expression;
     USemanticInfo info = checker.dispatch_rvalue(expression);
 
     REQUIRE(!checker.error_reporter.failed);

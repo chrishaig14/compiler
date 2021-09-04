@@ -144,7 +144,7 @@ USemanticInfo Checker::check_declaration_with_type(ast::Declaration& n) {
     } else {
         this->module.fill_actual(*n.type);
     }
-    USemanticInfo rvalue_sinfo = this->expect_rvalue_of_type(*n.type, *n.expression);
+    USemanticInfo rvalue_sinfo = this->expect_rvalue_of_type(*n.type, n.expression);
     if (rvalue_sinfo->is_error()) {
         return error_stub();
     }
@@ -159,13 +159,13 @@ USemanticInfo Checker::check_declaration_with_type(ast::Declaration& n) {
 }
 
 USemanticInfo Checker::check_declaration_without_type(ast::Declaration& n) {
-    USemanticInfo exp_info_p = this->dispatch(*n.expression);
+    USemanticInfo exp_info_p = this->dispatch(n.expression);
     if (exp_info_p->is_error()) {
         return error_stub();
     }
     E_TYPE entity_type = exp_info_p->entity.get().type;
     if (entity_type != E_TYPE::CONST_FUNCTION && entity_type != E_TYPE::VALUE) {
-        this->error_reporter.error(ErrorExpectedExpression(exp_info_p->entity, *n.expression));
+        this->error_reporter.error(ErrorExpectedExpression(exp_info_p->entity, n.expression));
         return error_stub();
     }
 

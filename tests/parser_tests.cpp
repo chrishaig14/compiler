@@ -198,7 +198,7 @@ TEST_CASE("parse_decl_with_type", "[parser]") {
 
     REQUIRE(ast->identifier == ID);
     REQUIRE(ast->type->to_json() == TYPE.node->to_json());
-    REQUIRE(ast->expression->to_json() == EXPRESSION.node->to_json());
+    REQUIRE(ast->expression.to_json() == EXPRESSION.node->to_json());
 }
 
 TEST_CASE("parse_if", "[parser]") {
