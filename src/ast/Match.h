@@ -15,8 +15,8 @@ class ast::Match : public ast::Node {
 public:
     Node* exp;
     std::vector<std::string> ids;
-    std::vector<std::pair<TypeNode*, ast::Block*>> cases;
-    Match(Node* exp, std::vector<std::string> ids, std::vector<std::pair<TypeNode*, ast::Block*>> cases,
+    std::vector<std::pair<UTypeNode , UBlockNode>> cases;
+    Match(Node* exp, std::vector<std::string> ids, std::vector<std::pair<UTypeNode, UBlockNode>> cases,
           TextPosition start, TextPosition end);
 
     bool equal(const ast::Node& other) const override;

@@ -242,24 +242,24 @@ USemanticInfo Checker::visit_match(ast::Match& node) {
     std::string varname = "match_var";
     for (size_t i = 0; i < node.ids.size(); i++) {
         std::string case_id = node.ids[i];
-        std::pair<TypeNode*, ast::Block*> c = node.cases[i];
-        TypeNode* case_type = c.first;
-        ast::Block* case_node = c.second;
+        std::pair<UTypeNode, UBlockNode>& c = node.cases[i];
+        TypeNode& case_type = *c.first;
+        ast::Block& case_node = *c.second;
 
-        this->module.fill_actual(*case_type);
+        this->module.fill_actual(case_type);
 
-        int union_index = target_union_type(*ot, *case_type);
+        int union_index = target_union_type(*ot, case_type);
         if (union_index == -1) {
-            this->error_reporter.fail("Error, type " + case_type->to_string() + " not part of " + ot->to_string());
+            this->error_reporter.fail("Error, type " + case_type.to_string() + " not part of " + ot->to_string());
             return error_stub();
         }
         this->enter_scope("case");
-        auto v = std::make_unique<Value>(case_type);
+        auto v = std::make_unique<Value>(case_type.clone());
         this->fill_value(*v);
         Entity* ent = new EntityValue(std::move(v));
         assert(v->clazz != nullptr);
         this->scope->set(case_id, ent);
-        USemanticInfo case_info = this->dispatch(*case_node);
+        USemanticInfo case_info = this->dispatch(case_node);
         auto& bn = (std::unique_ptr<sem::Block>&) case_info->snode;
         auto* omn = new sem::ObjectMember(std::make_unique<sem::Id>(varname), Path("core.core.Union"), "o");
         USNode u(omn);

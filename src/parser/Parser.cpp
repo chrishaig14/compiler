@@ -988,20 +988,20 @@ std::unique_ptr<ast::Match> Parser::parse_match_statement() {
     this->expect_token(TokType::LCURLY);
 
     std::vector<std::string> ids;
-    std::vector<std::pair<TypeNode*, ast::Block*>> cases;
+    std::vector<std::pair<UTypeNode , UBlockNode>> cases;
     while (true) {
         Token id = this->expect_token(TokType::ID);
         this->expect_token(TokType::COLON);
-        TypeNode* type = this->parse_type_node().release();
+        UTypeNode type = this->parse_type_node();
         auto body = this->parse_possibly_empty_block();
         ids.push_back(id.str);
-        cases.emplace_back(type, body.release());
+        cases.emplace_back(std::move(type), std::move(body));
         if (this->match(TokType::RCURLY)) {
             break;
         }
     }
     Token lcurly = this->expect_token(TokType::RCURLY);
-    return std::make_unique<ast::Match>(exp.release(), ids, cases, mtk.start, lcurly.end_pos);
+    return std::make_unique<ast::Match>(exp.release(), ids, std::move(cases), mtk.start, lcurly.end_pos);
 }
 
 

@@ -6,9 +6,10 @@
 
 using namespace ast;
 
-Match::Match(Node* exp, std::vector<std::string> ids, std::vector<std::pair<TypeNode*, ast::Block*>> cases,
-             TextPosition start, TextPosition end) : ast::Node(NodeType::MATCH_EXP, start, end) {
-    this->cases = cases;
+Match::Match(Node* exp, std::vector<std::string> ids, std::vector<std::pair<UTypeNode, UBlockNode>> cases,
+             TextPosition start, TextPosition end) : ast::Node(NodeType::MATCH_EXP, start, end),
+                                                     cases(std::move(cases)) {
+    // this->cases = cases;
     this->exp = exp;
     this->ids = ids;
 }
