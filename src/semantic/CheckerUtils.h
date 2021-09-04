@@ -40,9 +40,9 @@ sem::FunctionDef* make_class_default_init(const std::string& class_path, const V
 
 TypeNode* get_entity_type(Entity& e);
 
-void mangle_generic_names(TypeNode* t);
-void mangle_generic_names(FunctionType* t);
-void mangle_generic_names(ObjectType* t);
+void mangle_generic_names(TypeNode& t);
+void mangle_generic_names(FunctionType& t);
+void mangle_generic_names(ObjectType& t);
 
 void make_not_generic(FunctionType* ft);
 void make_not_generic(ObjectType* ft);

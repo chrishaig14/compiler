@@ -57,26 +57,26 @@ TypeNode* get_entity_type(Entity& e) {
 }
 
 
-void mangle_generic_names(TypeNode* t) {
-    if (t->kind == Kind::OBJECT) {
-        return mangle_generic_names(&t->object());
+void mangle_generic_names(TypeNode& t) {
+    if (t.kind == Kind::OBJECT) {
+        return mangle_generic_names(t.object());
     }
-    return mangle_generic_names(&t->function());
+    return mangle_generic_names(t.function());
 }
 
-void mangle_generic_names(FunctionType* t) {
-    for (auto* pt: t->param_types) {
-        mangle_generic_names(pt);
+void mangle_generic_names(FunctionType& t) {
+    for (auto* pt: t.param_types) {
+        mangle_generic_names(*pt);
     }
-    mangle_generic_names(t->return_type);
+    mangle_generic_names(*t.return_type);
 }
 
-void mangle_generic_names(ObjectType* t) {
-    if (t->is_generic_param) {
-        t->id = t->id + "0";
+void mangle_generic_names(ObjectType& t) {
+    if (t.is_generic_param) {
+        t.id = t.id + "0";
     } else {
-        for (auto* tp: t->type_params) {
-            mangle_generic_names(tp);
+        for (auto* tp: t.type_params) {
+            mangle_generic_names(*tp);
         }
     }
 }
