@@ -14,7 +14,7 @@
 class ast::List : public ast::Node {
     VectorOfNodesU _elements;
 public:
-    std::vector<std::reference_wrapper<Node>> elements;
+    std::vector<RNode> elements;
     List(VectorOfNodesU elements, TextPosition start, TextPosition end);
 
     bool equal(const ast::Node& other) const override;

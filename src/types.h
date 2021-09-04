@@ -26,6 +26,7 @@ typedef std::unique_ptr<ast::Id> UIdNode;
 typedef std::unique_ptr<ast::Block> UBlockNode;
 typedef std::unique_ptr<ast::Number> UNumberNode;
 typedef std::unique_ptr<ast::Node> UNode;
+typedef std::reference_wrapper<ast::Node> RNode;
 typedef std::vector<TypeNode*> VectorOfTypes;
 typedef std::vector<UTypeNode> VectorOfUTypes;
 typedef std::vector<ast::Node*> VectorOfNodes;

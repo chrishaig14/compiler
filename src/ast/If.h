@@ -21,7 +21,7 @@ public:
     UBlockNode selse;
     ast::Block& then;
     Node& condition;
-    std::vector<std::pair<std::reference_wrapper<Node>, std::reference_wrapper<ast::Block>>> elifs;
+    std::vector<std::pair<RNode, std::reference_wrapper<ast::Block>>> elifs;
     If(UNode condition, std::unique_ptr<ast::Block> then, std::vector<std::pair<UNode, UBlockNode>> elifs,
        std::unique_ptr<ast::Block> selse, TextPosition start, TextPosition end);
 

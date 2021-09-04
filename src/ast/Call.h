@@ -17,7 +17,7 @@ class ast::Call : public ast::Node {
     VectorOfNodesU _arguments;
 public:
     Node& function;
-    std::vector<std::reference_wrapper<Node>> arguments;
+    std::vector<RNode> arguments;
 
     Call(UNode function, VectorOfNodesU arguments, TextPosition start, TextPosition end);
 
