@@ -86,7 +86,7 @@ std::unique_ptr<ast::If> Parser::parse_if() {
         this->next();
         _else = this->parse_possibly_empty_block();
     }
-    auto iff = std::make_unique<ast::If>(condition, body, std::move(elifs), _else, if_tok.start, if_tok.end_pos);
+    auto iff = std::make_unique<ast::If>(std::move(condition), std::move(body), std::move(elifs), std::move(_else), if_tok.start, if_tok.end_pos);
     iff->start = if_tok.start;
     return iff;
 }

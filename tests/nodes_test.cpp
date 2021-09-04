@@ -157,7 +157,7 @@ TEST_CASE("nodes_if_with_else", "[if]") {
     e["if"]["then"] = t->to_json();
     e["if"]["elifs"] = nlohmann::json::array();
     e["if"]["else"] = l->to_json();
-    ast::If n(c, t, {}, l, DUMMY_POS, DUMMY_POS);
+    ast::If n(std::move(c), std::move(t), {}, std::move(l), DUMMY_POS, DUMMY_POS);
     nlohmann::json nj = n.to_json();
     REQUIRE(e == nj);
 }
@@ -195,7 +195,7 @@ TEST_CASE("nodes_if_with_elif", "[if]") {
     elifs.emplace_back(std::move(elif_cond_0), std::move(elif_body_0));
     elifs.emplace_back(std::move(elif_cond_1), std::move(elif_body_1));
 
-    ast::If n(c, t, std::move(elifs), l, DUMMY_POS, DUMMY_POS);
+    ast::If n(std::move(c), std::move(t), std::move(elifs), std::move(l), DUMMY_POS, DUMMY_POS);
     nlohmann::json nj = n.to_json();
 
     REQUIRE(e == nj);

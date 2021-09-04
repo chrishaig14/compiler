@@ -400,14 +400,14 @@ USemanticInfo Checker::visit_while(ast::While& node) {
 }
 
 USemanticInfo Checker::visit_if(ast::If& n) {
-    USemanticInfo condition_sinfo = this->expect_rvalue_of_type(T_BOOL, *n.condition);
+    USemanticInfo condition_sinfo = this->expect_rvalue_of_type(T_BOOL, n.condition);
     if (condition_sinfo->is_error()) {
         return error_stub();
     }
     auto& condition_snode = condition_sinfo->snode;
 
     this->enter_scope("if");
-    USemanticInfoBlock body_info = this->visit_block(*n.then);
+    USemanticInfoBlock body_info = this->visit_block(n.then);
     sem::Block& bn = *body_info->snode;
     for (const auto& local_var : this->scope->table) {
         bn.locals.push_back(local_var.first);
@@ -417,10 +417,10 @@ USemanticInfo Checker::visit_if(ast::If& n) {
     std::vector<std::pair<USNode, std::unique_ptr<sem::Block>>> elifs;
 
     for (auto& elif : n.elifs) {
-        USemanticInfo elif_condition_sinfo = this->expect_rvalue_of_type(T_BOOL, *elif.first);
+        USemanticInfo elif_condition_sinfo = this->expect_rvalue_of_type(T_BOOL, elif.first);
         auto& elif_condition_snode = elif_condition_sinfo->snode;
         this->enter_scope("elif");
-        USemanticInfoBlock elif_block_info = this->visit_block(*elif.second);
+        USemanticInfoBlock elif_block_info = this->visit_block(elif.second);
         sem::Block* bn1 = (elif_block_info->snode).release();
         for (const auto& local_var : this->scope->table) {
             bn1->locals.push_back(local_var.first);

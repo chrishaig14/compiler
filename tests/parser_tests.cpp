@@ -60,8 +60,12 @@ TestNodeU FACTOR_U() {
 
 TestNodeU DECLARATION_U() {
     auto EXPRESSION = EXPRESSION_U();
-    return {"var " + ID + " = " + EXPRESSION.text,
-            std::make_unique<ast::Declaration>(ID, nullptr, std::move(EXPRESSION.node), DUMMY_POS, DUMMY_POS, DUMMY_POS)};
+    return {"var " + ID + " = " + EXPRESSION.text, std::make_unique<ast::Declaration>(ID,
+                                                                                      nullptr,
+                                                                                      std::move(EXPRESSION.node),
+                                                                                      DUMMY_POS,
+                                                                                      DUMMY_POS,
+                                                                                      DUMMY_POS)};
 }
 
 
@@ -91,8 +95,10 @@ TestNodeU EXPRESSION_2_U() {
 TestNodeU ASSIGNMENT() {
     auto expression_1_U = EXPRESSION_1_U();
     auto exp_id_1_U = EXP_ID_1_U();
-    return {EXP_ID_1.text + " = " + expression_1_U.text,
-            std::make_unique<ast::Assignment>(std::move(exp_id_1_U.node), std::move(expression_1_U.node), DUMMY_POS, DUMMY_POS)};
+    return {EXP_ID_1.text + " = " + expression_1_U.text, std::make_unique<ast::Assignment>(std::move(exp_id_1_U.node),
+                                                                                           std::move(expression_1_U.node),
+                                                                                           DUMMY_POS,
+                                                                                           DUMMY_POS)};
 }
 
 // const TestNode EMPTY_BLOCK{"{}", new BlockNode(VectorOfNodesU{}, DUMMY_POS, DUMMY_POS)};
@@ -108,10 +114,10 @@ TestNodeU IF_U() {
     auto EXPRESSION = EXPRESSION_U();
     auto EMPTY_BLOCK = EMPTY_BLOCK_U();
     std::unique_ptr<ast::Block> u(nullptr);
-    return {"if(" + EXPRESSION.text + ")" + EMPTY_BLOCK.text, std::make_unique<ast::If>(EXPRESSION.node,
-                                                                                        (std::unique_ptr<ast::Block>&) EMPTY_BLOCK.node,
+    return {"if(" + EXPRESSION.text + ")" + EMPTY_BLOCK.text, std::make_unique<ast::If>(std::move(EXPRESSION.node),
+                                                                                        std::move((UBlockNode&) EMPTY_BLOCK.node),
                                                                                         std::vector<std::pair<UNode, UBlockNode>>{},
-                                                                                        u,
+                                                                                        std::move((UBlockNode&) u),
                                                                                         DUMMY_POS,
                                                                                         DUMMY_POS)};
 }
@@ -226,10 +232,11 @@ TEST_CASE("parse_if_with_else", "[parser]") {
     parser.top_package_name = "main";
 
     std::unique_ptr<ast::If> ast = parser.parse_if();
-    REQUIRE(ast->to_json() == ast::If(EXPRESSION.node,
-                                      (std::unique_ptr<ast::Block>&) block.node,
-                                      {},
-                                      (std::unique_ptr<ast::Block>&) block_1.node,
+    std::vector<std::pair<UNode, UBlockNode>> v;
+    REQUIRE(ast->to_json() == ast::If(std::move(EXPRESSION.node),
+                                      std::move((UBlockNode&) block.node),
+                                      std::vector<std::pair<UNode, UBlockNode>>{},
+                                      std::move((UBlockNode&) block_1.node),
                                       DUMMY_POS,
                                       DUMMY_POS).to_json());
 }
@@ -882,7 +889,8 @@ TEST_CASE("parse_member", "[parser]") {
 
     UNode ast = parser.parse_factor();
 
-    REQUIRE(ast->to_json() == ast::Member(std::move(EXPRESSION.node), Token(TokType::ID, ID, DUMMY_POS, DUMMY_POS)).to_json());
+    REQUIRE(ast->to_json() ==
+            ast::Member(std::move(EXPRESSION.node), Token(TokType::ID, ID, DUMMY_POS, DUMMY_POS)).to_json());
 }
 
 TEST_CASE("parse_subscript", "[parser]") {

@@ -14,13 +14,16 @@
 #include "ast.h"
 
 class ast::If : public ast::Node {
+    UNode _condition;
+    UBlockNode _then;
+    std::vector<std::pair<UNode, UBlockNode>> _elifs;
 public:
-    UNode condition;
-    std::unique_ptr<ast::Block> then;
-    std::unique_ptr<ast::Block> selse;
-    std::vector<std::pair<UNode, UBlockNode>> elifs;
-    If(UNode& condition, std::unique_ptr<ast::Block>& then, std::vector<std::pair<UNode, UBlockNode>> elifs,
-       std::unique_ptr<ast::Block>& selse, TextPosition start, TextPosition end);
+    UBlockNode selse;
+    ast::Block& then;
+    Node& condition;
+    std::vector<std::pair<std::reference_wrapper<Node>, std::reference_wrapper<ast::Block>>> elifs;
+    If(UNode condition, std::unique_ptr<ast::Block> then, std::vector<std::pair<UNode, UBlockNode>> elifs,
+       std::unique_ptr<ast::Block> selse, TextPosition start, TextPosition end);
 
     bool equal(const ast::Node& other) const override;
 

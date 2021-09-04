@@ -9,20 +9,20 @@ using namespace ast;
 
 bool If::equal(const ast::Node& x) const {
     const auto& other = (If&) x;
-    if (*this->condition != *other.condition) {
+    if (this->condition != other.condition) {
         return false;
     }
-    if (*this->then != *other.then) {
+    if (this->then != other.then) {
         return false;
     }
     if (this->elifs.size() != other.elifs.size()) {
         return false;
     }
     for (size_t i = 0; i < this->elifs.size(); i++) {
-        if (*this->elifs[i].first != *other.elifs[i].first) {
+        if (this->elifs[i].first.get() != other.elifs[i].first.get()) {
             return false;
         }
-        if (*this->elifs[i].second != *other.elifs[i].second) {
+        if (this->elifs[i].second.get() != other.elifs[i].second.get()) {
             return false;
         }
     }
@@ -33,14 +33,17 @@ bool If::equal(const ast::Node& x) const {
 
 }
 
-If::If(UNode& condition, std::unique_ptr<ast::Block>& then, std::vector<std::pair<UNode, UBlockNode>> elifs,
-       std::unique_ptr<ast::Block>& selse, TextPosition start, TextPosition end) : ast::Node(NodeType::IFF, start, end),
-                                                                                   condition(std::move(condition)),
-                                                                                   then(std::move(then)),
+If::If(UNode condition, std::unique_ptr<ast::Block> then, std::vector<std::pair<UNode, UBlockNode>> elifs,
+       std::unique_ptr<ast::Block> selse, TextPosition start, TextPosition end) : ast::Node(NodeType::IFF, start, end),
+                                                                                   _condition(std::move(condition)),
+                                                                                   _then(std::move(then)),
+                                                                                   _elifs(std::move(elifs)),
                                                                                    selse(std::move(selse)),
-                                                                                   elifs(std::move(elifs)) {
-    // assert(condition != nullptr);
-    // assert(then != nullptr);
+                                                                                   then(*_then),
+                                                                                   condition(*_condition) {
+    for (auto& e: this->_elifs) {
+        this->elifs.emplace_back(*e.first, *e.second);
+    }
 }
 
 If::~If() {
@@ -56,15 +59,15 @@ If::~If() {
 }
 
 nlohmann::json If::to_json() const {
-    std::vector<nlohmann::json> elifs;
+    std::vector<nlohmann::json> elifs_j;
     for (auto& e: this->elifs) {
-        elifs.push_back({{"condition", e.first->to_json()},
-                         {"then",      e.second->to_json()}});
+        elifs_j.push_back({{"condition", e.first.get().to_json()},
+                         {"then",      e.second.get().to_json()}});
     }
     nlohmann::json j = {{"type", "if"}};
-    j["if"]["condition"] = this->condition->to_json();
-    j["if"]["then"] = this->then->to_json();
-    j["if"]["elifs"] = elifs;
+    j["if"]["condition"] = this->condition.to_json();
+    j["if"]["then"] = this->then.to_json();
+    j["if"]["elifs"] = elifs_j;
     j["if"]["else"] = this->selse != nullptr ? this->selse->to_json() : nlohmann::json();
     return j;
 }
