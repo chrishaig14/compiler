@@ -304,7 +304,7 @@ TEST_CASE("nodes_dict", "[dict]") {
     std::vector<std::pair<UNode, UNode>> d;
     d.emplace_back(std::move(k1), std::move(v1));
     d.emplace_back(std::move(k2), std::move(v2));
-    ast::DictNode n(d, DUMMY_POS, DUMMY_POS);
+    ast::DictNode n(std::move(d), DUMMY_POS, DUMMY_POS);
     nlohmann::json nj = n.to_json();
 
     REQUIRE(e == nj);

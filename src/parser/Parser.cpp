@@ -333,7 +333,7 @@ UNode Parser::parse_dictionary() {
             break;
         }
     }
-    auto dict = std::make_unique<ast::DictNode>(items, lcurly.start, rcurly.end_pos);
+    auto dict = std::make_unique<ast::DictNode>(std::move(items), lcurly.start, rcurly.end_pos);
     return dict;
 }
 

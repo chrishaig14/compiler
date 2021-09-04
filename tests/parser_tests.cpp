@@ -858,7 +858,7 @@ TEST_CASE("parse_dict_one_element", "[parser]") {
     UNode ast = parser.parse_dictionary();
     std::vector<std::pair<UNode, UNode>> d;
     d.emplace_back(std::move(EXPRESSION_1.node), std::move(EXPRESSION_2.node));
-    REQUIRE(ast->to_json() == ast::DictNode(d, DUMMY_POS, DUMMY_POS).to_json());
+    REQUIRE(ast->to_json() == ast::DictNode(std::move(d), DUMMY_POS, DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_dict_mult_elements", "[parser]") {
@@ -881,7 +881,7 @@ TEST_CASE("parse_dict_mult_elements", "[parser]") {
     d.emplace_back(std::move(EXPRESSION.node), std::move(EXPRESSION_1_V.node));
     // {{EXPRESSION_1.node.release(), EXPRESSION_2.node.release()},
     //  {EXPRESSION.node.release(),   EXPRESSION_1_V.node.release()}}
-    REQUIRE(ast->to_json() == ast::DictNode(d, DUMMY_POS, DUMMY_POS).to_json());
+    REQUIRE(ast->to_json() == ast::DictNode(std::move(d), DUMMY_POS, DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_member", "[parser]") {

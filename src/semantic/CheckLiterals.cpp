@@ -182,8 +182,8 @@ USemanticInfo Checker::visit_partial(ast::PartialApplication& node) {
 USemanticInfo Checker::visit_dict(ast::DictNode& node) {
     USemanticInfo info_u = std::make_unique<SemanticInfo>();
     SemanticInfo& info = *info_u;
-    USemanticInfo first_key_info = this->dispatch(*node.items[0].first);
-    USemanticInfo first_value_info = this->dispatch(*node.items[0].second);
+    USemanticInfo first_key_info = this->dispatch(node.items[0].first);
+    USemanticInfo first_value_info = this->dispatch(node.items[0].second);
     EntityValue& first_key_entity = (EntityValue&) first_key_info->entity.get();
     EntityValue& first_value_entity = (EntityValue&) first_value_info->entity.get();
     ObjectType& first_key_type = first_key_entity.value->type->object();
@@ -193,11 +193,11 @@ USemanticInfo Checker::visit_dict(ast::DictNode& node) {
     items.emplace_back(std::move(first_key_info->snode), std::move(first_value_info->snode));
     bool has_error = false;
     for (size_t i = 1; i < node.items.size(); i++) {
-        USemanticInfo key_sinfo = this->expect_rvalue_of_type(first_key_type, *node.items[i].first);
+        USemanticInfo key_sinfo = this->expect_rvalue_of_type(first_key_type, node.items[i].first);
         if (key_sinfo->is_error()) {
             has_error = true;
         }
-        USemanticInfo value_sinfo = this->expect_rvalue_of_type(first_value_type, *node.items[i].second);
+        USemanticInfo value_sinfo = this->expect_rvalue_of_type(first_value_type, node.items[i].second);
         if (value_sinfo->is_error()) {
             has_error = true;
         }

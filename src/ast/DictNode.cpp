@@ -14,10 +14,10 @@ bool DictNode::equal(const ast::Node& other) const {
     for (size_t i = 0; i < this->items.size(); i++) {
         auto& p = this->items[i];
         auto& op = o.items[i];
-        if (*p.first != *op.first) {
+        if (p.first.get() != op.first.get()) {
             return false;
         }
-        if (*p.second != *op.second) {
+        if (p.second.get() != op.second.get()) {
             return false;
         }
     }
@@ -29,15 +29,18 @@ nlohmann::json DictNode::to_json() const {
     j["type"] = "dict";
     std::vector<nlohmann::json> v;
     for (auto& i: this->items) {
-        v.push_back({{"key",   i.first->to_json()},
-                     {"value", i.second->to_json()}});
+        v.push_back({{"key",   i.first.get().to_json()},
+                     {"value", i.second.get().to_json()}});
     }
     j["dict"]["items"] = v;
     return j;
 }
 
-DictNode::DictNode(std::vector<std::pair<UNode, UNode>>& items, TextPosition start, TextPosition end) : ast::Node(
+DictNode::DictNode(std::vector<std::pair<UNode, UNode>> items, TextPosition start, TextPosition end) : ast::Node(
         NodeType::DICT,
         start,
-        end), items(std::move(items)) {
+        end), _items(std::move(items)) {
+    for (auto& i: this->_items) {
+        this->items.emplace_back(*i.first, *i.second);
+    }
 }

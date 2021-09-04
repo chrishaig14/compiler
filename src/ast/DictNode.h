@@ -12,12 +12,12 @@
 
 class ast::DictNode : public ast::Node {
     bool equal(const ast::Node& other) const override;
+    std::vector<std::pair<UNode, UNode>> _items;
 public:
-    DictNode(std::vector<std::pair<UNode, UNode>>& items, TextPosition start, TextPosition end);
+    std::vector<std::pair<std::reference_wrapper<Node>, std::reference_wrapper<Node>>> items;
+    DictNode(std::vector<std::pair<UNode, UNode>> items, TextPosition start, TextPosition end);
 
     nlohmann::json to_json() const override;
-
-    std::vector<std::pair<UNode, UNode>> items;
 };
 
 
