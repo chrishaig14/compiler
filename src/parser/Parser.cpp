@@ -116,19 +116,6 @@ UNode Parser::parse_list_literal() {
     return node;
 }
 
-VectorOfNodes Parser::parse_list_of_expressions() {
-    VectorOfNodes result;
-    while (true) {
-        result.push_back(this->parse_expression().release());
-        if (this->match(TokType::COMMA)) {
-            this->next();
-        } else {
-            break;
-        }
-    }
-    return result;
-}
-
 VectorOfNodesU Parser::parse_list_of_arguments() {
     VectorOfNodesU result;
     while (true) {

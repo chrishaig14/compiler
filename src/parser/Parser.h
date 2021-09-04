@@ -76,7 +76,6 @@ public:
     std::unique_ptr<FunctionType> parse_function_type();
     std::unique_ptr<ObjectType> parse_object_type();
 
-    VectorOfNodes parse_list_of_expressions();
     VectorOfNodesU parse_list_of_arguments();
 
     std::string code_context_string(TextPosition position);
