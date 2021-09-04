@@ -7,7 +7,7 @@
 #include "util.h"
 
 bool function_is_generic(const FunctionType& ft) {
-    for (auto* param_type: ft.param_types) {
+    for (auto& param_type: ft.param_types) {
         if (is_generic(*param_type)) {
             return true;
             break;
@@ -66,7 +66,7 @@ bool Checker::assert_type_exists(const TypeNode& type, TextPosition pos) {
         // }
     } else {
         bool error = false;
-        for (auto* t: type.function().param_types) {
+        for (auto& t: type.function().param_types) {
             if (!this->assert_type_exists(*t, pos)) {
                 error = true;
             }
@@ -92,7 +92,7 @@ bool is_generic(const TypeNode& t) {
         }
     } else {
         const FunctionType& fo = t.function();
-        for (auto* param_type: fo.param_types) {
+        for (auto& param_type: fo.param_types) {
             if (is_generic(*param_type)) {
                 return true;
             }
@@ -169,7 +169,7 @@ UTypeNode make_type_from_object_pattern(const ObjectType& object_type, const Map
 
 UTypeNode make_type_from_function_pattern(const FunctionType& ftn, const MapStringType& replacements) {
     VectorOfTypes new_param_types;
-    for (auto* pt: ftn.param_types) {
+    for (auto& pt: ftn.param_types) {
         TypeNode* new_pt = make_type(*pt, replacements).release();
         new_param_types.push_back(new_pt);
     }

@@ -11,17 +11,17 @@ FunctionType::FunctionType(VectorOfTypes parameterTypes, TypeNode* returnType) {
         assert(p != nullptr);
     }
     assert(returnType != nullptr);
-    this->param_types = parameterTypes;
-    // for (auto* p: parameterTypes) {
-    //     this->u_param_types.push_back(UTypeNode(p));
-    // }
+    // this->param_types = parameterTypes;
+    for (auto* p: parameterTypes) {
+        this->param_types.push_back(UTypeNode(p));
+    }
     this->return_type = returnType;
     this->kind = Kind::FUNCTION;
 }
 
 FunctionType* FunctionType::clone() const {
     VectorOfTypes aux;
-    for (auto* p: this->param_types) {
+    for (auto& p: this->param_types) {
         aux.emplace_back(p->clone());
     }
     return new FunctionType(aux, this->return_type->clone());
@@ -29,16 +29,16 @@ FunctionType* FunctionType::clone() const {
 
 FunctionType::~FunctionType() {
     delete this->return_type;
-    for (auto* p: this->param_types) {
-        delete p;
-    }
+    // for (auto& p: this->param_types) {
+    //     delete p;
+    // }
 }
 
 std::string FunctionType::to_string() const {
     const auto& ftype = *this;
     std::string parameters;
     std::string ret;
-    for (auto* ptr: ftype.param_types) {
+    for (auto& ptr: ftype.param_types) {
         auto& p = *ptr;
         parameters += p.to_string() + ", ";
     }
@@ -53,7 +53,7 @@ std::string FunctionType::actual_to_string() const {
     const auto& ftype = *this;
     std::string parameters;
     std::string ret;
-    for (auto* ptr: ftype.param_types) {
+    for (auto& ptr: ftype.param_types) {
         auto& p = *ptr;
         parameters += p.actual_to_string() + ", ";
     }
@@ -87,7 +87,7 @@ const FunctionType& FunctionType::function() const {
 }
 
 bool FunctionType::is_generic() const {
-    for (auto* t: this->param_types) {
+    for (auto& t: this->param_types) {
         if (t->is_generic()) {
             return true;
         }
@@ -99,7 +99,7 @@ nlohmann::json FunctionType::to_json() const {
     nlohmann::json j;
     j["kind"] = "function";
     std::vector<nlohmann::json> v;
-    for (auto t: this->param_types) {
+    for (auto& t: this->param_types) {
         v.push_back(t->to_json());
     }
     j["parameter_types"] = v;

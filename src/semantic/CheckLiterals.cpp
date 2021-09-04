@@ -152,7 +152,7 @@ USemanticInfo Checker::visit_partial(ast::PartialApplication& node) {
     std::vector<USNode> snodes;
     int npartial = 0;
     for (size_t i = 0; i < node.args.size(); i++) {
-        TypeNode*& param_type = fun_type->param_types[i];
+        UTypeNode& param_type = fun_type->param_types[i];
         if (node.args[i] != nullptr) {
             USemanticInfo arg_sinfo = this->expect_rvalue_of_type(*param_type, *node.args[i]);
             if (arg_sinfo->is_error()) {

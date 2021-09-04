@@ -312,7 +312,7 @@ void Module::fill_actual(ObjectType& t) {
 }
 
 void Module::fill_actual(FunctionType& t) {
-    for (auto* pt: t.param_types) {
+    for (auto& pt: t.param_types) {
         this->fill_actual(*pt);
     }
     this->fill_actual(*t.return_type);

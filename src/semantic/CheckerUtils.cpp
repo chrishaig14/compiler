@@ -65,7 +65,7 @@ void mangle_generic_names(TypeNode& t) {
 }
 
 void mangle_generic_names(FunctionType& t) {
-    for (auto* pt: t.param_types) {
+    for (auto& pt: t.param_types) {
         mangle_generic_names(*pt);
     }
     mangle_generic_names(*t.return_type);
@@ -90,7 +90,7 @@ void make_not_generic(TypeNode& t) {
 }
 
 void make_not_generic(FunctionType& ft) {
-    for (auto* pt: ft.param_types) {
+    for (auto& pt: ft.param_types) {
         make_not_generic(*pt);
     }
     make_not_generic(*ft.return_type);

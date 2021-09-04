@@ -25,9 +25,9 @@ public:
 
     const FunctionType& function() const override;
 
-    VectorOfTypes param_types;
-    // VectorOfUTypes u_param_types;
-    UTypeNode t;
+    // VectorOfTypes param_types;
+    VectorOfUTypes param_types;
+    // UTypeNode t;
     TypeNode* return_type;
 
     bool is_generic() const override;
