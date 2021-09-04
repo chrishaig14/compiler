@@ -207,7 +207,7 @@ TEST_CASE("nodes_for", "[for]") {
     UNode exp = ast::Id::make("bar", DUMMY_POS, DUMMY_POS);
     nlohmann::json e = {{"type", "for"},
                         {"for",  {{"var", "foo"}, {"exp", exp->to_json()}, {"body", b->to_json()}}}};
-    ast::For n("foo", exp, b, DUMMY_POS, DUMMY_POS);
+    ast::For n("foo", std::move(exp), std::move(b), DUMMY_POS, DUMMY_POS);
     nlohmann::json nj = n.to_json();
     REQUIRE(e == nj);
 }

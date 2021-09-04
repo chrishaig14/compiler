@@ -816,7 +816,7 @@ std::unique_ptr<ast::For> Parser::parse_for_loop() {
     this->inside_loop = true;
     auto body = this->parse_possibly_empty_block();
     this->inside_loop = prev;
-    auto forloop = std::make_unique<ast::For>(var.str, exp, body, for_tok.start, body->end);
+    auto forloop = std::make_unique<ast::For>(var.str, std::move(exp), std::move(body), for_tok.start, body->end);
     forloop->start = for_tok.start;
     return forloop;
 }

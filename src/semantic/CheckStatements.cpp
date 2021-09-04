@@ -296,14 +296,14 @@ USemanticInfo Checker::visit_continue(ast::Continue& node) {
 }
 
 USemanticInfo Checker::visit_for(ast::For& node) {
-    USemanticInfo exp_info_p = this->dispatch_rvalue(*node.exp);
+    USemanticInfo exp_info_p = this->dispatch_rvalue(node.exp);
     if (exp_info_p->entity.get().type != E_TYPE::VALUE) {
-        this->error_reporter.error(ErrorFor(exp_info_p->entity, node.exp->start));
+        this->error_reporter.error(ErrorFor(exp_info_p->entity, node.exp.start));
     }
     EntityValue& exp_entity_value = (EntityValue&) exp_info_p->entity;
     ObjectType* exp_ot = &exp_entity_value.value->type->object();
     if (exp_ot->id != "List") {
-        this->error_reporter.error(ErrorFor(exp_entity_value, node.exp->start));
+        this->error_reporter.error(ErrorFor(exp_entity_value, node.exp.start));
     }
 
     TypeNode* elem_type = exp_ot->type_params[0];
@@ -333,7 +333,7 @@ USemanticInfo Checker::visit_for(ast::For& node) {
     increment_index_sn->rvalue = std::move(inc_exp_node);
 
     this->scope->is_loop = true;
-    USemanticInfoBlock binfo = this->visit_block(*node.body);
+    USemanticInfoBlock binfo = this->visit_block(node.body);
     this->scope->is_loop = false;
     sem::Block* bn = (binfo->snode).release();
     for (auto local_var : this->scope->table) {

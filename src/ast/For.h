@@ -12,12 +12,14 @@
 #include "ast.h"
 
 class ast::For : public ast::Node {
+    UNode _exp;
+    UBlockNode _body;
 public:
+    Node& exp;
     std::string var;
-    UNode exp;
-    std::unique_ptr<ast::Block> body;
+    ast::Block& body;
     bool equal(const ast::Node& other) const override;
-    For(const std::string& var, UNode& exp, std::unique_ptr<ast::Block>& body, TextPosition start, TextPosition end);
+    For(const std::string& var, UNode exp, UBlockNode body, TextPosition start, TextPosition end);
     ~For() override;
 
     nlohmann::json to_json() const override;

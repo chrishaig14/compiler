@@ -252,7 +252,8 @@ TEST_CASE("parse_call_no_args", "[parser]") {
 
     UNode ast = parser.parse_expression();
     VectorOfNodesU v;
-    REQUIRE(ast->to_json() == ast::Call(std::move(FACTOR_EXPRESSION.node), std::move(v), DUMMY_POS, DUMMY_POS).to_json());
+    REQUIRE(ast->to_json() ==
+            ast::Call(std::move(FACTOR_EXPRESSION.node), std::move(v), DUMMY_POS, DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_call_one_arg", "[parser]") {
@@ -268,7 +269,8 @@ TEST_CASE("parse_call_one_arg", "[parser]") {
     UNode ast = parser.parse_expression();
     VectorOfNodesU v;
     v.push_back(std::move(EXPRESSION_1.node));
-    REQUIRE(ast->to_json() == ast::Call(std::move(FACTOR_EXPRESSION.node), std::move(v), DUMMY_POS, DUMMY_POS).to_json());
+    REQUIRE(ast->to_json() ==
+            ast::Call(std::move(FACTOR_EXPRESSION.node), std::move(v), DUMMY_POS, DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_call_mult_arg", "[parser]") {
@@ -286,7 +288,8 @@ TEST_CASE("parse_call_mult_arg", "[parser]") {
     VectorOfNodesU v;
     v.push_back(std::move(EXPRESSION_1.node));
     v.push_back(std::move(EXPRESSION_2.node));
-    REQUIRE(ast->to_json() == ast::Call(std::move(FACTOR_EXPRESSION.node), std::move(v), DUMMY_POS, DUMMY_POS).to_json());
+    REQUIRE(ast->to_json() ==
+            ast::Call(std::move(FACTOR_EXPRESSION.node), std::move(v), DUMMY_POS, DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_for", "[parser]") {
@@ -302,8 +305,11 @@ TEST_CASE("parse_for", "[parser]") {
     parser.top_package_name = "main";
 
     std::unique_ptr<ast::For> ast = parser.parse_for_loop();
-    REQUIRE(ast->to_json() ==
-            ast::For(ID, EXPRESSION_1.node, (std::unique_ptr<ast::Block>&) BLOCK.node, DUMMY_POS, DUMMY_POS).to_json());
+    REQUIRE(ast->to_json() == ast::For(ID,
+                                       std::move(EXPRESSION_1.node),
+                                       std::move((UBlockNode&) BLOCK.node),
+                                       DUMMY_POS,
+                                       DUMMY_POS).to_json());
 }
 
 
