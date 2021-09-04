@@ -14,9 +14,11 @@
 #include "ast.h"
 
 class ast::BinaryOp : public ast::Node {
+    UNode _left;
+    UNode _right;
 public:
-    UNode left;
-    UNode right;
+    Node& left;
+    Node& right;
     OpType op;
     TextPosition op_pos;
 

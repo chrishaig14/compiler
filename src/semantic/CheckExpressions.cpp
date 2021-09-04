@@ -195,17 +195,17 @@ USemanticInfo Checker::visit_unary(ast::UnaryOp& n) {
 }
 
 USemanticInfo Checker::visit_binop(ast::BinaryOp& n) {
-    USemanticInfo left_info_p = this->dispatch_rvalue(*n.left);
+    USemanticInfo left_info_p = this->dispatch_rvalue(n.left);
     if (left_info_p->is_error()) {
         return error_stub();
     }
     Entity& l_entity = left_info_p->entity.get();
     if (l_entity.type != E_TYPE::VALUE) {
-        this->error_reporter.error(ErrorExpectedExpression(l_entity, *n.left));
+        this->error_reporter.error(ErrorExpectedExpression(l_entity, n.left));
         return error_stub();
     }
     EntityValue& l_entity_v = (EntityValue&) l_entity;
-    USemanticInfo right_sinfo = this->expect_rvalue_of_type(*l_entity_v.value->type, *n.right);
+    USemanticInfo right_sinfo = this->expect_rvalue_of_type(*l_entity_v.value->type, n.right);
     if (right_sinfo->is_error()) {
         return error_stub();
     }
