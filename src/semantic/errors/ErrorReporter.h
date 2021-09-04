@@ -98,7 +98,7 @@ public:
                           TextPosition member_start, TextPosition member_end);
     void package_no_member(std::string pack_name, const std::string& member, TextPosition pos, ast::Node& obj,
                            TextPosition member_start, TextPosition member_end);
-    void error(const Error& error);
+    void error(std::unique_ptr<Error> error);
 
     // void class_no_method_for_op(const std::string& class_name, const std::string& method_name, const Node& node);
     // void enum_no_value(const std::string& enum_name, const std::string& value, MemberNode& node, Enum* enumm);

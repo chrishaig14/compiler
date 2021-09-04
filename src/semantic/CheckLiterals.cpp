@@ -146,7 +146,7 @@ USemanticInfo Checker::visit_partial(ast::PartialApplication& node) {
         return error_stub();
     }
     if (node.args.size() != fun_type->param_types.size()) {
-        this->error_reporter.error(ErrorPartialWrongNumArgs(node.start));
+        this->error_reporter.error(std::make_unique<ErrorPartialWrongNumArgs>(node.start));
         return error_stub();
     }
     std::vector<USNode> snodes;
@@ -265,7 +265,7 @@ USemanticInfo Checker::visit_defconst(ast::DefaultConstructor& node) {
 USemanticInfo Checker::visit_list(ast::List& node) {
     USemanticInfo element_type_p = this->dispatch(node.elements[0]);
     if (element_type_p->entity.get().type != E_TYPE::VALUE) {
-        this->error_reporter.error(ErrorExpectedExpression(element_type_p->entity, node.elements[0]));
+        this->error_reporter.error(std::make_unique<ErrorExpectedExpression>(element_type_p->entity, node.elements[0]));
         return error_stub();
     }
     EntityValue& entity_value = (EntityValue&) element_type_p->entity.get();
@@ -283,7 +283,7 @@ USemanticInfo Checker::visit_list(ast::List& node) {
         EntityValue& p_entity = (EntityValue&) current_type_p->entity.get();
         ObjectType* ctype = &p_entity.value->type->object();
         if (*ctype != *element_type) {
-            this->error_reporter.error(ErrorTypeMismatch(*element_type, node.elements[i], p_entity));
+            this->error_reporter.error(std::make_unique<ErrorTypeMismatch>(*element_type, node.elements[i], p_entity));
         }
         list_elements.push_back(std::move(current_type_p->snode));
     }

@@ -33,7 +33,7 @@ USemanticInfo Checker::visit_lvalue_subscript(ast::Subscript& node) {
 
     auto subscript_it = cls->methods.find("__set_item__");
     if (subscript_it == cls->methods.end()) {
-        this->error_reporter.error(ErrorObjectNoSpecialMethod(*entity_parent_value.value->type, "__set_item__", node));
+        this->error_reporter.error(std::make_unique<ErrorObjectNoSpecialMethod>(*entity_parent_value.value->type, "__set_item__", node));
         return error_stub();
     }
     ConstFunction* subscript_fun = subscript_it->second;
@@ -95,7 +95,7 @@ USemanticInfo Checker::visit_assignment(ast::Assignment& n) {
     }
 
     if (linfo_p->entity.get().type != E_TYPE::VALUE) {
-        this->error_reporter.error(ErrorCantAssign(n.lvalue));
+        this->error_reporter.error(std::make_unique<ErrorCantAssign>(n.lvalue));
         // this->error_reporter.fail("Cannot assign to this thing!");
         return error_stub();
     }
@@ -104,7 +104,7 @@ USemanticInfo Checker::visit_assignment(ast::Assignment& n) {
     if (e_value.value->type->kind == Kind::OBJECT) {
         // bool ff = n.lvalue->ntype == NodeType::MEMBER;
         if (linfo_p->is_tuple_member) {
-            this->error_reporter.error(ErrorCantAssign(n.lvalue));
+            this->error_reporter.error(std::make_unique<ErrorCantAssign>(n.lvalue));
             return error_stub();
         }
     }
@@ -142,7 +142,7 @@ USemanticInfo Checker::visit_assignment(ast::Assignment& n) {
                                                 std::move(expression_info_p->snode),
                                                 *l_entity_value.value->type);
         if (rvalue_snode == nullptr) {
-            this->error_reporter.error(ErrorTypeMismatch(l_type, n.rvalue, expression_info_p->entity));
+            this->error_reporter.error(std::make_unique<ErrorTypeMismatch>(l_type, n.rvalue, expression_info_p->entity));
             return error_stub();
         }
         expression_info_p->snode = std::move(rvalue_snode);
@@ -166,7 +166,7 @@ USemanticInfo Checker::visit_return(ast::Return& n) {
     Entity& return_entity = this->scope->get("__return__");
     if (return_entity.type == E_TYPE::NOTHING) {
         if (n.expression != nullptr) {
-            this->error_reporter.error(ErrorBadReturn(n.start));
+            this->error_reporter.error(std::make_unique<ErrorBadReturn>(n.start));
         }
         USemanticInfo info_r = std::make_unique<SemanticInfo>();
         USNode u;
@@ -222,7 +222,7 @@ USemanticInfo Checker::visit_match(ast::Match& node) {
     if (exp_info->entity.get().type != E_TYPE::VALUE ||
         ((EntityValue&) exp_info->entity).value->type->kind != Kind::OBJECT) {
 
-        this->error_reporter.error(ErrorTypeMismatch(*new ObjectType("Union", {new ObjectType("...", {})}),
+        this->error_reporter.error(std::make_unique<ErrorTypeMismatch>(*new ObjectType("Union", {new ObjectType("...", {})}),
                                                      *node.exp,
                                                      exp_info->entity));
         return error_stub();
@@ -233,7 +233,7 @@ USemanticInfo Checker::visit_match(ast::Match& node) {
         ot = (ObjectType*) ot->aliased_type;
     }
     if (ot->id != "Union") {
-        this->error_reporter.error(ErrorTypeMismatch(*new ObjectType("Union", {new ObjectType("...", {})}),
+        this->error_reporter.error(std::make_unique<ErrorTypeMismatch>(*new ObjectType("Union", {new ObjectType("...", {})}),
                                                      *node.exp,
                                                      exp_info->entity));
         return error_stub();
@@ -298,12 +298,12 @@ USemanticInfo Checker::visit_continue(ast::Continue& node) {
 USemanticInfo Checker::visit_for(ast::For& node) {
     USemanticInfo exp_info_p = this->dispatch_rvalue(node.exp);
     if (exp_info_p->entity.get().type != E_TYPE::VALUE) {
-        this->error_reporter.error(ErrorFor(exp_info_p->entity, node.exp.start));
+        this->error_reporter.error(std::make_unique<ErrorFor>(exp_info_p->entity, node.exp.start));
     }
     EntityValue& exp_entity_value = (EntityValue&) exp_info_p->entity;
     ObjectType* exp_ot = &exp_entity_value.value->type->object();
     if (exp_ot->id != "List") {
-        this->error_reporter.error(ErrorFor(exp_entity_value, node.exp.start));
+        this->error_reporter.error(std::make_unique<ErrorFor>(exp_entity_value, node.exp.start));
     }
 
     TypeNode* elem_type = exp_ot->type_params[0];

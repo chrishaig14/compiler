@@ -93,7 +93,7 @@ std::unique_ptr<FunctionType> Checker::unify_function_call(const FunctionType& f
                                                            std::map<std::string, TypeNode*>& all_substitutions) {
     FunctionType& fun = *f.clone();
     if (args.size() != fun.param_types.size()) {
-        this->error_reporter.error(ErrorFunctionCallNumArgs(fun.clone(), {1, 1}));
+        this->error_reporter.error(std::make_unique<ErrorFunctionCallNumArgs>(fun.clone(), TextPosition{1, 1}));
         return nullptr;
     }
 
@@ -187,7 +187,7 @@ USemanticInfo Checker::enum_member(Enum* enumm, const std::string& value, ast::M
             return info_u;
         }
     }
-    this->error_reporter.error(ErrorEnumNoValue(enumm->enumm_name, value, node, enumm));
+    this->error_reporter.error(std::make_unique<ErrorEnumNoValue>(enumm->enumm_name, value, node, enumm));
     return error_stub();
 }
 

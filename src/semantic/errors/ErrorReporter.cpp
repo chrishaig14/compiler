@@ -376,7 +376,7 @@ ErrorReporter::ErrorReporter() {
 //     this->fail_ok(pre_msg, msg, node.start);
 // }
 
-void ErrorReporter::error(const Error& error) {
+void ErrorReporter::error(std::unique_ptr<Error> error) {
     // std::string as;
     // if (actual.type == E_TYPE::VALUE) {
     //     as = actual.value->type->to_string();
@@ -386,10 +386,10 @@ void ErrorReporter::error(const Error& error) {
     // std::string pre_msg = "Expected " + E_HLT(expected.to_string()) + ", got " + E_HLT(as);
     // std::string msg = highlight_one(value_node);
     // this->fail_ok(pre_msg, msg, value_node.start);
-    this->errors.emplace_back(std::unique_ptr<Error>(error.clone()));
-    assert(this->errors.back() != nullptr);
     this->failed = true;
     std::cout << "---- Semantic Error ----" << std::endl;
-    std::cout << error.to_str() << std::endl;
+    std::cout << error->to_str() << std::endl;
+    this->errors.emplace_back(std::move(error));
+    assert(this->errors.back() != nullptr);
     std::cout << "------------------------" << std::endl;
 }

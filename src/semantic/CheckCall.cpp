@@ -25,7 +25,7 @@ USemanticInfo Checker::visit_call(ast::Call& n, bool is_rvalue) {
     // bool is_a_method = false;
     // Node* object_node;
     if (fun_info.entity.get().type != E_TYPE::CONST_FUNCTION && fun_info_p->entity.get().type != E_TYPE::VALUE) {
-        this->error_reporter.error(ErrorNotAFunction(n));
+        this->error_reporter.error(std::make_unique<ErrorNotAFunction>(n));
         return error_stub();
     }
     const FunctionType* function_type = nullptr;
@@ -37,7 +37,7 @@ USemanticInfo Checker::visit_call(ast::Call& n, bool is_rvalue) {
     }
     // ok
     if (n.arguments.size() != function_type->param_types.size()) {
-        this->error_reporter.error(ErrorFunctionCallNumArgs(function_type->clone(), n.start));
+        this->error_reporter.error(std::make_unique<ErrorFunctionCallNumArgs>(function_type->clone(), n.start));
         if (!function_is_generic(*function_type)) {
             retv.entity = *entity_from_type(*function_type->return_type);
             return retv_p;
@@ -163,7 +163,7 @@ USemanticInfo Checker::make_return_info(const ast::Call& n, bool is_rvalue, USem
     auto& retv = *retv_p;
     if (retv.entity.get().type == E_TYPE::NOTHING) {
         if (is_rvalue) {
-            this->error_reporter.error(ErrorExpectedExpression(retv.entity, n));
+            this->error_reporter.error(std::make_unique<ErrorExpectedExpression>(retv.entity, n));
             return error_stub();
         }
     } else if (retv.entity.get().type == E_TYPE::VALUE) {
@@ -198,7 +198,7 @@ bool Checker::check_arguments(ast::Call& n, std::vector<USNode>& arguments, Vect
             arg_entity.type == E_TYPE::MODULE || arg_entity.type == E_TYPE::ENUM ||
             arg_entity.type == E_TYPE::NOTHING) {
             has_error = true;
-            this->error_reporter.error(ErrorExpectedExpression(arg_entity, arg));
+            this->error_reporter.error(std::make_unique<ErrorExpectedExpression>(arg_entity, arg));
             continue;
         }
 
@@ -221,7 +221,7 @@ void Checker::process_function_arguments(SemanticInfo& retv, std::vector<Entity*
 
         USNode arg_rvalue_snode = this->make_rvalue(*arg_entities[i], std::move(arguments[sni]), param_type);
         if (arg_rvalue_snode == nullptr) {
-            this->error_reporter.error(ErrorTypeMismatch(param_type, n.arguments[i], *arg_entities[i]));
+            this->error_reporter.error(std::make_unique<ErrorTypeMismatch>(param_type, n.arguments[i], *arg_entities[i]));
             continue;
         }
         arguments[sni] = std::move(arg_rvalue_snode);

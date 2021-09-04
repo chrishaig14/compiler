@@ -20,12 +20,12 @@ USemanticInfo Checker::visit_member(ast::Member& n) {
         case E_TYPE::CLASS:
             return this->class_member(((EntityClass&) parent_entity).clazz, n.s_child, n);
         case E_TYPE::CONST_FUNCTION:
-            this->error_reporter.error(ErrorNoMember(*((EntityConstFunction&) parent_entity).const_function->ft, n));
+            this->error_reporter.error(std::make_unique<ErrorNoMember>(*((EntityConstFunction&) parent_entity).const_function->ft, n));
             // this->error_reporter.object_no_member(*parent_entity.const_function->ft, n);
             break;
         case E_TYPE::VALUE:
             if (((EntityValue&) parent_entity).value->type->kind == Kind::FUNCTION) {
-                this->error_reporter.error(ErrorNoMember(*((EntityConstFunction&) parent_entity).const_function->ft,
+                this->error_reporter.error(std::make_unique<ErrorNoMember>(*((EntityConstFunction&) parent_entity).const_function->ft,
                                                          n));
                 // this->error_reporter.object_no_member(*parent_entity.value->type, n);
                 return error_stub();
@@ -48,7 +48,7 @@ USemanticInfo Checker::visit_member(ast::Member& n) {
 
 USemanticInfo Checker::module_member(Module& mod, const std::string& child, ast::Member& n) {
     if (mod.flirpins.count(child) == 0) {
-        // this->error_reporter.error(ErrorNoMember())
+        // this->error_reporter.error(std::make_unique<ErrorNoMember>())
         // this->error_reporter.module_no_member(&mod,
         //                                       child,
         //                                       n.dot_pos,
@@ -80,12 +80,12 @@ USemanticInfo Checker::object_member(USNode object_snode, Value& p_value, const 
     //     return error_stub();
     // }
     if (object_type_path.as_str() == "core.core.Union") {
-        this->error_reporter.error(ErrorNoMember(*p_value.type, n));
+        this->error_reporter.error(std::make_unique<ErrorNoMember>(*p_value.type, n));
         // this->error_reporter.object_no_member(*p_value.type, n);
         return error_stub();
     }
     if (p_value.metatype == Meta::ENUM) {
-        this->error_reporter.error(ErrorNoMember(*p_value.type, n));
+        this->error_reporter.error(std::make_unique<ErrorNoMember>(*p_value.type, n));
         // this->error_reporter.object_no_member(*p_value.type, n);
         return error_stub();
     }
@@ -133,7 +133,7 @@ USemanticInfo Checker::object_member(USNode object_snode, Value& p_value, const 
         // }
 
     } else {
-        this->error_reporter.error(ErrorNoMemberSuggestions(*p_value.type, n, *clazz));
+        this->error_reporter.error(std::make_unique<ErrorNoMemberSuggestions>(*p_value.type, n, *clazz));
         // this->error_reporter.object_no_member_with_suggestions(*p_value.type,
         //                                                        child,
         //                                                        n.dot_pos,
@@ -149,7 +149,7 @@ USemanticInfo Checker::object_member(USNode object_snode, Value& p_value, const 
 
 USemanticInfo Checker::package_member(Package& package, const std::string& child, ast::Member& n) {
     if (package.units.count(child) == 0) {
-        this->error_reporter.error(ErrorPackageNoMember(&package,
+        this->error_reporter.error(std::make_unique<ErrorPackageNoMember>(&package,
                                                         child,
                                                         n.dot_pos,
                                                         n.parent,
@@ -186,7 +186,7 @@ USemanticInfo Checker::class_member(Class* cls, const std::string& child, ast::M
     } else if (cls->static_members.find(child) != cls->static_members.end()) {
         info.entity = *entity_from_type(*cls->static_members[child].first);
     } else {
-        this->error_reporter.error(ErrorClassNoMember(ObjectType(cls->class_name, {}),
+        this->error_reporter.error(std::make_unique<ErrorClassNoMember>(ObjectType(cls->class_name, {}),
                                                       child,
                                                       n.dot_pos,
                                                       n.parent,

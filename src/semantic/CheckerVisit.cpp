@@ -190,7 +190,7 @@ USemanticInfoBlock Checker::visit_block(ast::Block& node) {
         //     // if return value != NoneType, then force the return value
         //
         //     if (!sinfo.is_error() && sinfo_p->entity.type != E_TYPE::NOTHING) {
-        //         this->error_reporter.error(ErrorUnusedReturnValue(n->start));
+        //         this->error_reporter.error(std::make_unique<ErrorUnusedReturnValue>(n->start));
         //     }
         // }
     }
@@ -272,11 +272,11 @@ USemanticInfo Checker::visit_function(ast::Function& n) {
             ast::Node& last_node = *n.body->nodes.back();
             if (last_node.ntype != NodeType::RETRN) {
                 // it's not a return statement, error
-                this->error_reporter.error(ErrorFunctionReturnLastStmt(function_name, returnType, last_node.start));
+                this->error_reporter.error(std::make_unique<ErrorFunctionReturnLastStmt>(function_name, returnType, last_node.start));
                 return error_stub();
             }
         } else {
-            this->error_reporter.error(ErrorFunctionReturnLastStmt(function_name, returnType, n.start));
+            this->error_reporter.error(std::make_unique<ErrorFunctionReturnLastStmt>(function_name, returnType, n.start));
             return error_stub();
         }
     }

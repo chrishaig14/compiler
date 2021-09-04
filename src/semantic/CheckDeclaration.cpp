@@ -15,12 +15,12 @@ std::unique_ptr<SemanticInfo> Checker::expect_rvalue_of_type(const TypeNode& tar
     }
     Entity& r_entity = rinfo->entity.get();
     if (r_entity.type != E_TYPE::VALUE && r_entity.type != E_TYPE::CONST_FUNCTION) {
-        this->error_reporter.error(ErrorTypeMismatch(*target.clone(), node, r_entity));
+        this->error_reporter.error(std::make_unique<ErrorTypeMismatch>(*target.clone(), node, r_entity));
         return error_stub();
     }
     USNode snode = make_rvalue(r_entity, std::move(rinfo->snode), target);
     if (snode == nullptr) {
-        this->error_reporter.error(ErrorTypeMismatch(*target.clone(), node, r_entity));
+        this->error_reporter.error(std::make_unique<ErrorTypeMismatch>(*target.clone(), node, r_entity));
         return error_stub();
     }
     rinfo->snode = std::move(snode);
@@ -125,7 +125,7 @@ USNode Checker::make_union_rvalue(USNode value_snode, const TypeNode* unaliased_
 USemanticInfo Checker::visit_declaration(ast::Declaration& n) {
     // Logger::info("Checking ast::DeclarationNode for var: " + n.identifier);
     if (this->scope->declared(n.identifier)) {
-        this->error_reporter.error(ErrorRedeclared(n.identifier, n));
+        this->error_reporter.error(std::make_unique<ErrorRedeclared>(n.identifier, n));
     }
     USemanticInfo info_u;
     if (n.type != nullptr) {
@@ -165,7 +165,7 @@ USemanticInfo Checker::check_declaration_without_type(ast::Declaration& n) {
     }
     E_TYPE entity_type = exp_info_p->entity.get().type;
     if (entity_type != E_TYPE::CONST_FUNCTION && entity_type != E_TYPE::VALUE) {
-        this->error_reporter.error(ErrorExpectedExpression(exp_info_p->entity, n.expression));
+        this->error_reporter.error(std::make_unique<ErrorExpectedExpression>(exp_info_p->entity, n.expression));
         return error_stub();
     }
 

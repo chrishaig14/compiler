@@ -30,7 +30,7 @@ USemanticInfo Checker::visit_id(ast::Id& n) {
     // Logger::info("Checking id node " + n._id);
     Entity& entity = this->scope->get(n._id);
     if (entity.type == E_TYPE::NOT_FOUND) {
-        this->error_reporter.error(ErrorNotDeclared(n));
+        this->error_reporter.error(std::make_unique<ErrorNotDeclared>(n));
         this->scope->set(n._id, new EntityError());
         return error_stub();
     }
@@ -81,15 +81,15 @@ USemanticInfo Checker::visit_cast(ast::Cast& n) {
 //     Entity& r_entity = right_info_p->entity;
 //     if (l_entity.type != E_TYPE::VALUE || r_entity.type != E_TYPE::VALUE) {
 //
-//         this->error_reporter.error(ErrorBoolOp(l_entity, r_entity, n.start));
+//         this->error_reporter.error(std::make_unique<ErrorBoolOp>(l_entity, r_entity, n.start));
 //         // this->error_reporter.fail("Can't have binop between 2 non objects!");
 //     }
 //
 //     const TypeNode& ltype = *get_entity_type(l_entity);
 //     const TypeNode& rtype = *get_entity_type(r_entity);
 //     if (ltype != rtype) {
-//         this->error_reporter.error(ErrorTypeMismatch(ltype, *n.right, r_entity));
-//         // this->error_reporter.error(ErrorTypeMismatch(*left_info_p->entity.value->type, *n.right, right_info_p->entity);
+//         this->error_reporter.error(std::make_unique<ErrorTypeMismatch>(ltype, *n.right, r_entity));
+//         // this->error_reporter.error(std::make_unique<ErrorTypeMismatch>(*left_info_p->entity.value->type, *n.right, right_info_p->entity);
 //         // this->error_reporter.binop(left_info_p->entity, right_info_p->entity, n.start, n.left, n.right);
 //         return error_stub();
 //     }
@@ -147,7 +147,7 @@ USemanticInfo Checker::visit_cast(ast::Cast& n) {
 //         Class* cls = ((EntityClass&) entity).clazz;
 //         auto operator_fun_it = cls->static_methods.find(fun);
 //         if (operator_fun_it == cls->static_methods.end()) {
-//             this->error_reporter.error(ErrorClassNoMethodForOp(cls->class_name, fun, n));
+//             this->error_reporter.error(std::make_unique<ErrorClassNoMethodForOp>(cls->class_name, fun, n));
 //             return error_stub();
 //         }
 //
@@ -201,7 +201,7 @@ USemanticInfo Checker::visit_binop(ast::BinaryOp& n) {
     }
     Entity& l_entity = left_info_p->entity.get();
     if (l_entity.type != E_TYPE::VALUE) {
-        this->error_reporter.error(ErrorExpectedExpression(l_entity, n.left));
+        this->error_reporter.error(std::make_unique<ErrorExpectedExpression>(l_entity, n.left));
         return error_stub();
     }
     EntityValue& l_entity_v = (EntityValue&) l_entity;
@@ -219,7 +219,7 @@ USemanticInfo Checker::visit_binop(ast::BinaryOp& n) {
     assert(cls != nullptr);
     auto operator_fun_it = cls->static_methods.find(fun);
     if (operator_fun_it == cls->static_methods.end()) {
-        this->error_reporter.error(ErrorClassNoMethodForOp(cls->class_name, fun, n));
+        this->error_reporter.error(std::make_unique<ErrorClassNoMethodForOp>(cls->class_name, fun, n));
         return error_stub();
     }
     ConstFunction* operator_fun = operator_fun_it->second;
@@ -284,13 +284,13 @@ USemanticInfo Checker::visit_subscript(ast::Subscript& node) {
     Class* cls = value.clazz;
     if (cls == nullptr) {
         // its totally generic, fail
-        this->error_reporter.error(ErrorObjectNoSpecialMethod(*value.type, "__get_item__", node));
+        this->error_reporter.error(std::make_unique<ErrorObjectNoSpecialMethod>(*value.type, "__get_item__", node));
         return error_stub();
     }
     assert(cls != nullptr);
     auto subscript_it = cls->methods.find("__get_item__");
     if (subscript_it == cls->methods.end()) {
-        this->error_reporter.error(ErrorObjectNoSpecialMethod(*value.type, "__get_item__", node));
+        this->error_reporter.error(std::make_unique<ErrorObjectNoSpecialMethod>(*value.type, "__get_item__", node));
         return error_stub();
     }
     ConstFunction* subscript_fun = subscript_it->second;
@@ -330,7 +330,7 @@ USemanticInfo Checker::visit_ternary(ast::Ternary& node) {
     Entity& p_entity = expression_info.entity;
     if (p_entity.type != E_TYPE::VALUE ||
         ((EntityValue&) expression_info_p->entity).value->type->kind == Kind::FUNCTION) {
-        this->error_reporter.error(ErrorTypeMismatch(*new ObjectType("Option", {new ObjectType("t")}),
+        this->error_reporter.error(std::make_unique<ErrorTypeMismatch>(*new ObjectType("Option", {new ObjectType("t")}),
                                                      *node.expression,
                                                      expression_info_p->entity));
         return error_stub();
@@ -338,7 +338,7 @@ USemanticInfo Checker::visit_ternary(ast::Ternary& node) {
     ObjectType& expression_type = ((EntityValue&) p_entity).value->type->object();
 
     if (expression_type.id != "Option") {
-        this->error_reporter.error(ErrorTypeMismatch(*new ObjectType("Option", {new ObjectType("t")}),
+        this->error_reporter.error(std::make_unique<ErrorTypeMismatch>(*new ObjectType("Option", {new ObjectType("t")}),
                                                      *node.expression,
                                                      expression_info_p->entity));
         return error_stub();
