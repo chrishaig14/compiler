@@ -64,7 +64,7 @@ TEST_CASE("nodes_list", "[list]") {
     v.push_back(std::move(a));
     v.push_back(std::move(b));
     v.push_back(std::move(c));
-    ast::List n(v, DUMMY_POS, DUMMY_POS);
+    ast::List n(std::move(v), DUMMY_POS, DUMMY_POS);
     nlohmann::json nj = n.to_json();
     REQUIRE(e == nj);
 }

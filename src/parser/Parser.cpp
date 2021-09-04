@@ -112,7 +112,7 @@ UNode Parser::parse_list_literal() {
         this->next();
     }
     Token list_end = this->expect_token(TokType::RSQUARE);
-    auto node = std::make_unique<ast::List>(elements, list_start.start, list_end.start);
+    auto node = std::make_unique<ast::List>(std::move(elements), list_start.start, list_end.start);
     return node;
 }
 

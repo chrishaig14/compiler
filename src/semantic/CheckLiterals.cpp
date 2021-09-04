@@ -263,9 +263,9 @@ USemanticInfo Checker::visit_defconst(ast::DefaultConstructor& node) {
 }
 
 USemanticInfo Checker::visit_list(ast::List& node) {
-    USemanticInfo element_type_p = this->dispatch(*node.elements[0]);
+    USemanticInfo element_type_p = this->dispatch(node.elements[0]);
     if (element_type_p->entity.get().type != E_TYPE::VALUE) {
-        this->error_reporter.error(ErrorExpectedExpression(element_type_p->entity, *node.elements[0]));
+        this->error_reporter.error(ErrorExpectedExpression(element_type_p->entity, node.elements[0]));
         return error_stub();
     }
     EntityValue& entity_value = (EntityValue&) element_type_p->entity.get();
@@ -275,7 +275,7 @@ USemanticInfo Checker::visit_list(ast::List& node) {
     list_elements.push_back(std::move(element_type_p->snode));
 
     for (size_t i = 1; i < node.elements.size(); i++) {
-        USemanticInfo current_type_p = this->dispatch(*node.elements[i]);
+        USemanticInfo current_type_p = this->dispatch(node.elements[i]);
         // const TypeNode& current_type = current_type_p->type();
         // if (!current_type_p->is_constant) {
         //     is_constant = false;
@@ -283,7 +283,7 @@ USemanticInfo Checker::visit_list(ast::List& node) {
         EntityValue& p_entity = (EntityValue&) current_type_p->entity.get();
         ObjectType* ctype = &p_entity.value->type->object();
         if (*ctype != *element_type) {
-            this->error_reporter.error(ErrorTypeMismatch(*element_type, *node.elements[i], p_entity));
+            this->error_reporter.error(ErrorTypeMismatch(*element_type, node.elements[i], p_entity));
         }
         list_elements.push_back(std::move(current_type_p->snode));
     }

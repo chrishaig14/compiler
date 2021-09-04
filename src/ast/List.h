@@ -12,10 +12,10 @@
 #include "ast.h"
 
 class ast::List : public ast::Node {
+    VectorOfNodesU _elements;
 public:
-    VectorOfNodesU elements;
-
-    List(VectorOfNodesU& elements, TextPosition start, TextPosition end);
+    std::vector<std::reference_wrapper<Node>> elements;
+    List(VectorOfNodesU elements, TextPosition start, TextPosition end);
 
     bool equal(const ast::Node& other) const override;
 

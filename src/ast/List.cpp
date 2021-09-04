@@ -7,8 +7,11 @@
 
 using namespace ast;
 
-List::List(VectorOfNodesU& elements, TextPosition start, TextPosition end) : ast::Node(NodeType::LST, start, end),
-                                                                             elements(std::move(elements)) {
+List::List(VectorOfNodesU elements, TextPosition start, TextPosition end) : ast::Node(NodeType::LST, start, end),
+                                                                            _elements(std::move(elements)) {
+    for (auto& e: this->_elements) {
+        this->elements.push_back(*e);
+    }
 }
 
 bool List::equal(const ast::Node& other) const {
@@ -16,7 +19,7 @@ bool List::equal(const ast::Node& other) const {
         return false;
     }
     for (size_t i = 0; i < this->elements.size(); ++i) {
-        if (*this->elements[i] != *((List&) other).elements[i]) {
+        if (this->elements[i].get() != ((List&) other).elements[i].get()) {
             return false;
         }
     }
@@ -34,7 +37,7 @@ nlohmann::json List::to_json() const {
     j["type"] = "list";
     std::vector<nlohmann::json> v;
     for (auto& x: this->elements) {
-        v.push_back(x->to_json());
+        v.push_back(x.get().to_json());
     }
     j["list"]["elements"] = v;
     return j;

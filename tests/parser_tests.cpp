@@ -528,7 +528,7 @@ TEST_CASE("parse_list_one_element", "[parser]") {
     UNode ast = parser.parse_list_literal();
     VectorOfNodesU v;
     v.push_back(std::move(EXPRESSION_1.node));
-    REQUIRE(ast->to_json() == ast::List(v, DUMMY_POS, DUMMY_POS).to_json());
+    REQUIRE(ast->to_json() == ast::List(std::move(v), DUMMY_POS, DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_list_mult_elements", "[parser]") {
@@ -545,7 +545,7 @@ TEST_CASE("parse_list_mult_elements", "[parser]") {
     VectorOfNodesU v;
     v.push_back(std::move(EXPRESSION_1.node));
     v.push_back(std::move(EXPRESSION_2.node));
-    REQUIRE(ast->to_json() == ast::List(v, DUMMY_POS, DUMMY_POS).to_json());
+    REQUIRE(ast->to_json() == ast::List(std::move(v), DUMMY_POS, DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_number_integer", "[parser]") {
