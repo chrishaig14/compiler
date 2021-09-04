@@ -882,7 +882,7 @@ TEST_CASE("parse_member", "[parser]") {
 
     UNode ast = parser.parse_factor();
 
-    REQUIRE(ast->to_json() == ast::Member(EXPRESSION.node, Token(TokType::ID, ID, DUMMY_POS, DUMMY_POS)).to_json());
+    REQUIRE(ast->to_json() == ast::Member(std::move(EXPRESSION.node), Token(TokType::ID, ID, DUMMY_POS, DUMMY_POS)).to_json());
 }
 
 TEST_CASE("parse_subscript", "[parser]") {

@@ -779,7 +779,7 @@ TEST_CASE("enum_error", "[checker]") {
 
     Error& error = *checker.error_reporter.errors.back();
     UNode u = ast::Id::make("Foo", _POS, _POS);
-    ast::Member node(u, Token(TokType::ID, "b", _POS));
+    ast::Member node(std::move(u), Token(TokType::ID, "b", _POS));
     ObjectType expected("Boolean");
     ErrorEnumNoValue exp("Foo", "b", node, nullptr);
     REQUIRE(error == exp);

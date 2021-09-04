@@ -314,7 +314,7 @@ TEST_CASE("nodes_member", "[member]") {
     UNode p = ast::Id::make("foo", DUMMY_POS, DUMMY_POS);
     nlohmann::json e = {{"type",   "member"},
                         {"member", {{"parent", p->to_json()}, {"child", "bar"}}}};
-    ast::Member n(p, Token(TokType::ID, "bar", DUMMY_POS));
+    ast::Member n(std::move(p), Token(TokType::ID, "bar", DUMMY_POS));
     nlohmann::json nj = n.to_json();
     REQUIRE(e == nj);
 }

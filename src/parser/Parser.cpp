@@ -286,12 +286,12 @@ UNode Parser::parse_factor() {
         Token tok;
         if (this->match(TokType::INTEGER)) {
             tok = this->expect_token(TokType::INTEGER);
-            auto mn = std::make_unique<ast::Member>(parent, tok);
+            auto mn = std::make_unique<ast::Member>(std::move(parent), tok);
             mn->dot_pos = dot_pos;
             parent = std::move(mn);
         } else {
             tok = this->expect_token(TokType::ID);
-            auto mn = std::make_unique<ast::Member>(parent, tok);
+            auto mn = std::make_unique<ast::Member>(std::move(parent), tok);
             mn->dot_pos = dot_pos;
             parent = std::move(mn);
         }
@@ -445,7 +445,7 @@ UNode Parser::parse_tuple_or_constructor() {
         while (this->match(TokType::DOT)) {
             this->next();
             idd = this->expect_token(TokType::ID);
-            m = std::make_unique<ast::Member>(m, idd);
+            m = std::make_unique<ast::Member>(std::move(m), idd);
         }
         parent = std::make_unique<ast::DefaultConstructor>(m.release(), hash_tok.start, m->end);
     } else {

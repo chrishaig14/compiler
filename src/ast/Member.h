@@ -25,7 +25,7 @@ public:
     size_t n_child;
     TextPosition dot_pos;
     Token child_token;
-    Member(UNode& parent, Token child_token);
+    Member(UNode parent, Token child_token);
 
     bool equal(const ast::Node& x) const override;
 
