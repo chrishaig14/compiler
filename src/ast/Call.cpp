@@ -7,13 +7,17 @@
 
 using namespace ast;
 
-Call::Call(UNode& function, VectorOfNodesU& arguments, TextPosition start, TextPosition end) : ast::Node(NodeType::CALL,
-                                                                                                         start,
-                                                                                                         end),
-                                                                                               function(std::move(
-                                                                                                       function)),
-                                                                                               arguments(std::move(
-                                                                                                       arguments)) {
+Call::Call(UNode function, VectorOfNodesU arguments, TextPosition start, TextPosition end) : ast::Node(NodeType::CALL,
+                                                                                                       start,
+                                                                                                       end),
+                                                                                             _function(std::move(
+                                                                                                     function)),
+                                                                                             _arguments(std::move(
+                                                                                                     arguments)),
+                                                                                             function(*_function) {
+    for (auto& a: this->_arguments) {
+        this->arguments.push_back(*a);
+    }
 }
 
 bool Call::equal(const ast::Node& x) const {
@@ -22,11 +26,11 @@ bool Call::equal(const ast::Node& x) const {
         return false;
     }
     for (size_t i = 0; i < this->arguments.size(); ++i) {
-        if (*this->arguments[i] != *other.arguments[i]) {
+        if (this->arguments[i].get() != other.arguments[i].get()) {
             return false;
         }
     }
-    return *this->function == *other.function;
+    return this->function == other.function;
 }
 
 Call::~Call() {
@@ -45,10 +49,10 @@ Call::~Call() {
 nlohmann::json Call::to_json() const {
     nlohmann::json j;
     j["type"] = "call";
-    j["call"]["function"] = this->function->to_json();
+    j["call"]["function"] = this->function.to_json();
     std::vector<nlohmann::json> v;
     for (auto& e: this->arguments) {
-        v.push_back(e->to_json());
+        v.push_back(e.get().to_json());
     }
     j["call"]["arguments"] = v;
     return j;

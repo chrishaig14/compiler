@@ -252,7 +252,7 @@ TEST_CASE("parse_call_no_args", "[parser]") {
 
     UNode ast = parser.parse_expression();
     VectorOfNodesU v;
-    REQUIRE(ast->to_json() == ast::Call(FACTOR_EXPRESSION.node, v, DUMMY_POS, DUMMY_POS).to_json());
+    REQUIRE(ast->to_json() == ast::Call(std::move(FACTOR_EXPRESSION.node), std::move(v), DUMMY_POS, DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_call_one_arg", "[parser]") {
@@ -268,7 +268,7 @@ TEST_CASE("parse_call_one_arg", "[parser]") {
     UNode ast = parser.parse_expression();
     VectorOfNodesU v;
     v.push_back(std::move(EXPRESSION_1.node));
-    REQUIRE(ast->to_json() == ast::Call(FACTOR_EXPRESSION.node, v, DUMMY_POS, DUMMY_POS).to_json());
+    REQUIRE(ast->to_json() == ast::Call(std::move(FACTOR_EXPRESSION.node), std::move(v), DUMMY_POS, DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_call_mult_arg", "[parser]") {
@@ -286,7 +286,7 @@ TEST_CASE("parse_call_mult_arg", "[parser]") {
     VectorOfNodesU v;
     v.push_back(std::move(EXPRESSION_1.node));
     v.push_back(std::move(EXPRESSION_2.node));
-    REQUIRE(ast->to_json() == ast::Call(FACTOR_EXPRESSION.node, v, DUMMY_POS, DUMMY_POS).to_json());
+    REQUIRE(ast->to_json() == ast::Call(std::move(FACTOR_EXPRESSION.node), std::move(v), DUMMY_POS, DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_for", "[parser]") {

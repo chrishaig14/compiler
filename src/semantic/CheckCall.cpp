@@ -13,13 +13,13 @@ USemanticInfo Checker::visit_call(ast::Call& n, bool is_rvalue) {
     auto& retv = *retv_p;
     bool old_is_call = this->is_call;
     this->is_call = true;
-    USemanticInfo fun_info_p = this->dispatch(*n.function);
+    USemanticInfo fun_info_p = this->dispatch(n.function);
     this->is_call = old_is_call;
     if (fun_info_p->is_error()) {
         return error_stub();
     }
 
-    bool is_def_const = n.function->ntype == NodeType::DEF_CONST;
+    bool is_def_const = n.function.ntype == NodeType::DEF_CONST;
     bool args_are_constant = true;
     SemanticInfo& fun_info = *fun_info_p;
     // bool is_a_method = false;
@@ -184,7 +184,7 @@ bool Checker::check_arguments(ast::Call& n, std::vector<USNode>& arguments, Vect
                               std::vector<Entity*>& arg_entities) {
     bool has_error;
     for (auto& arg: n.arguments) {
-        USemanticInfo arg_type_p = this->dispatch(*arg);
+        USemanticInfo arg_type_p = this->dispatch(arg);
         if (arg_type_p->is_error()) {
             has_error = true;
             continue;
@@ -198,7 +198,7 @@ bool Checker::check_arguments(ast::Call& n, std::vector<USNode>& arguments, Vect
             arg_entity.type == E_TYPE::MODULE || arg_entity.type == E_TYPE::ENUM ||
             arg_entity.type == E_TYPE::NOTHING) {
             has_error = true;
-            this->error_reporter.error(ErrorExpectedExpression(arg_entity, *arg));
+            this->error_reporter.error(ErrorExpectedExpression(arg_entity, arg));
             continue;
         }
 
@@ -221,7 +221,7 @@ void Checker::process_function_arguments(SemanticInfo& retv, std::vector<Entity*
 
         USNode arg_rvalue_snode = this->make_rvalue(*arg_entities[i], std::move(arguments[sni]), param_type);
         if (arg_rvalue_snode == nullptr) {
-            this->error_reporter.error(ErrorTypeMismatch(param_type, *n.arguments[i], *arg_entities[i]));
+            this->error_reporter.error(ErrorTypeMismatch(param_type, n.arguments[i], *arg_entities[i]));
             continue;
         }
         arguments[sni] = std::move(arg_rvalue_snode);

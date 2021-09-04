@@ -74,7 +74,7 @@ TEST_CASE("nodes_call_no_args", "[call]") {
     VectorOfNodesU vector;
     nlohmann::json e = {{"type", "call"},
                         {"call", {{"function", f->to_json()}, {"arguments", nlohmann::json::array()}}}};
-    ast::Call n(f, vector, DUMMY_POS, DUMMY_POS);
+    ast::Call n(std::move(f), std::move(vector), DUMMY_POS, DUMMY_POS);
     nlohmann::json nj = n.to_json();
 
     REQUIRE(e == nj);
@@ -89,7 +89,7 @@ TEST_CASE("nodes_call", "[call]") {
     VectorOfNodesU v;
     v.push_back(std::move(arg_0));
     v.push_back(std::move(arg_1));
-    ast::Call n(f, v, DUMMY_POS, DUMMY_POS);
+    ast::Call n(std::move(f), std::move(v), DUMMY_POS, DUMMY_POS);
     nlohmann::json nj = n.to_json();
     REQUIRE(e == nj);
 }
