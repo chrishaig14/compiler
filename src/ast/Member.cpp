@@ -7,7 +7,7 @@
 using namespace ast;
 
 Member::Member(UNode parent, Token child_token) : ast::Node(NodeType::MEMBER, parent->start, child_token.end_pos),
-                                                   parent(std::move(parent)) {
+                                                  _parent(std::move(parent)), parent(*_parent) {
     this->child_token = child_token;
     this->type = MemberType::STR;
     this->s_child = child_token.str;
@@ -31,11 +31,11 @@ bool Member::equal(const ast::Node& x) const {
             return false;
         }
     };
-    return *this->parent == *other.parent;
+    return this->parent == other.parent;
 }
 
 nlohmann::json Member::to_json() const {
     return {{"type",   "member"},
-            {"member", {{"parent", this->parent->to_json()}, {"child", this->s_child}}}};
+            {"member", {{"parent", this->parent.to_json()}, {"child", this->s_child}}}};
 }
 

@@ -18,9 +18,10 @@ enum class MemberType {
 };
 
 class ast::Member : public ast::Node {
+    UNode _parent;
 public:
+    Node& parent;
     MemberType type;
-    UNode parent;
     std::string s_child;
     size_t n_child;
     TextPosition dot_pos;

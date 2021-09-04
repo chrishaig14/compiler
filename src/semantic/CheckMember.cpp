@@ -14,7 +14,7 @@
 #include "errors/ErrorPackageNoMember.h"
 
 USemanticInfo Checker::visit_member(ast::Member& n) {
-    USemanticInfo parent_info = this->dispatch(*n.parent);
+    USemanticInfo parent_info = this->dispatch(n.parent);
     Entity& parent_entity = parent_info->entity.get();
     switch (parent_entity.type) {
         case E_TYPE::CLASS:
@@ -30,7 +30,10 @@ USemanticInfo Checker::visit_member(ast::Member& n) {
                 // this->error_reporter.object_no_member(*parent_entity.value->type, n);
                 return error_stub();
             }
-            return this->object_member(std::move(parent_info->snode), *((EntityValue&) parent_entity).value, n.s_child, n);
+            return this->object_member(std::move(parent_info->snode),
+                                       *((EntityValue&) parent_entity).value,
+                                       n.s_child,
+                                       n);
         case E_TYPE::PACKAGE:
             return this->package_member(*((EntityPackage&) parent_entity).package, n.s_child, n);
         case E_TYPE::MODULE:
@@ -109,24 +112,24 @@ USemanticInfo Checker::object_member(USNode object_snode, Value& p_value, const 
         info.snode = std::make_unique<sem::ObjectMethod>(std::move(object_snode), clazz->path, child);
         info.entity = *new EntityConstFunction(clazz->methods[child]);
         // if (this->is_call) {
-            // method call
-            // info.this_arg = object_snode.release();
-            // info.snode = idn;
-            // info.snode = new sem::ObjectMethod(std::move(object_snode), clazz->path, child);
-            // info.entity = *new EntityValue(std::make_unique<Value>(clazz->methods[child]->ft->clone()));
+        // method call
+        // info.this_arg = object_snode.release();
+        // info.snode = idn;
+        // info.snode = new sem::ObjectMethod(std::move(object_snode), clazz->path, child);
+        // info.entity = *new EntityValue(std::make_unique<Value>(clazz->methods[child]->ft->clone()));
         // } else {
-            // return partial
-            // size_t npartial = clazz->methods[child]->ft->param_types.size();
-            // auto* non = new sem::NewObject();
-            // non->class_name = "Partial" + std::to_string(npartial);
-            // auto* method_snode = new sem::Id(clazz->methods[child]->path.as_str());
-            // non->args = {method_snode, object_snode.release()};
-            // for (size_t i = 0; i < npartial; i++) {
-            //     non->args.push_back(nullptr);
-            // }
-            // info.snode = non;
-            // auto fv = std::make_unique<Value>(clazz->methods[child]->ft->clone());
-            // info.entity = *new EntityValue(std::move(fv));
+        // return partial
+        // size_t npartial = clazz->methods[child]->ft->param_types.size();
+        // auto* non = new sem::NewObject();
+        // non->class_name = "Partial" + std::to_string(npartial);
+        // auto* method_snode = new sem::Id(clazz->methods[child]->path.as_str());
+        // non->args = {method_snode, object_snode.release()};
+        // for (size_t i = 0; i < npartial; i++) {
+        //     non->args.push_back(nullptr);
+        // }
+        // info.snode = non;
+        // auto fv = std::make_unique<Value>(clazz->methods[child]->ft->clone());
+        // info.entity = *new EntityValue(std::move(fv));
         // }
 
     } else {
@@ -149,7 +152,7 @@ USemanticInfo Checker::package_member(Package& package, const std::string& child
         this->error_reporter.error(ErrorPackageNoMember(&package,
                                                         child,
                                                         n.dot_pos,
-                                                        *n.parent,
+                                                        n.parent,
                                                         n.child_token.start,
                                                         n.child_token.end_pos));
         return error_stub();
@@ -186,7 +189,7 @@ USemanticInfo Checker::class_member(Class* cls, const std::string& child, ast::M
         this->error_reporter.error(ErrorClassNoMember(ObjectType(cls->class_name, {}),
                                                       child,
                                                       n.dot_pos,
-                                                      *n.parent,
+                                                      n.parent,
                                                       add_one_col(n.dot_pos),
                                                       n.end));
         return error_stub();
