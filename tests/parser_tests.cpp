@@ -61,7 +61,7 @@ TestNodeU FACTOR_U() {
 TestNodeU DECLARATION_U() {
     auto EXPRESSION = EXPRESSION_U();
     return {"var " + ID + " = " + EXPRESSION.text,
-            std::make_unique<ast::Declaration>(ID, nullptr, EXPRESSION.node, DUMMY_POS, DUMMY_POS, DUMMY_POS)};
+            std::make_unique<ast::Declaration>(ID, nullptr, std::move(EXPRESSION.node), DUMMY_POS, DUMMY_POS, DUMMY_POS)};
 }
 
 

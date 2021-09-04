@@ -538,7 +538,7 @@ std::unique_ptr<ast::Declaration> Parser::parse_variable_declaration() {
     auto expression = this->parse_expression();
     return std::make_unique<ast::Declaration>(identifier.str,
                                               std::move(type),
-                                              expression,
+                                              std::move(expression),
                                               var_token.start,
                                               eq_tok.start,
                                               expression->end);

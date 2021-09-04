@@ -17,7 +17,7 @@ public:
     UTypeNode type;
     UNode expression;
     TextPosition eq_pos;
-    Declaration(const std::string& identifier, UTypeNode type, UNode& expression, TextPosition start,
+    Declaration(const std::string& identifier, UTypeNode type, UNode expression, TextPosition start,
                 TextPosition eq_pos, TextPosition end);
 
 
