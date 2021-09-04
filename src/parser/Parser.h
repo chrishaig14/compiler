@@ -32,7 +32,7 @@ public:
     void next();
     Token expect_token(TokType token_type);
 
-    UNode parse_top_level_statement();
+    ast::UNode parse_top_level_statement();
 
     std::unique_ptr<ast::Import> parse_import();
     std::unique_ptr<ast::Klass> parse_class_definition();
@@ -40,14 +40,14 @@ public:
     std::unique_ptr<ast::Alias> parse_alias();
     std::unique_ptr<ast::EnumNode> parse_enum_definition();
 
-    UNode parse_common_statement();
-    UNode parse_assignment_or_expression();
+    ast::UNode parse_common_statement();
+    ast::UNode parse_assignment_or_expression();
     std::unique_ptr<ast::Declaration> parse_variable_declaration();
     std::unique_ptr<ast::If> parse_if();
     std::unique_ptr<ast::While> parse_while_loop();
     std::unique_ptr<ast::For> parse_for_loop();
     std::unique_ptr<ast::Return> parse_return();
-    UNode parse_ternary();
+    ast::UNode parse_ternary();
     std::unique_ptr<ast::Match> parse_match_statement();
     // std::unique_ptr<ThrowNode> parse_throw();
     // std::unique_ptr<TryCatchNode> parse_try_catch();
@@ -55,28 +55,28 @@ public:
     std::unique_ptr<ast::Block> parse_possibly_empty_block();
     std::unique_ptr<ast::Block> parse_program();
 
-    UNode parse_expression();
-    UNode parse_tuple_literal();
-    UNode parse_not_expression();
-    UNode parse_id_or_class_literal();
-    UNode parse_list_literal();
-    UNode parse_add_or_sub_expression();
-    UNode parse_and_expression();
-    UNode parse_bool_expression();
-    UNode parse_factor();
-    UNode parse_id_or_literal();
-    UNode parse_mul_div_or_mod_expression();
-    UNode parse_or_expression();
-    UNode parse_call_or_subscript_chain(UNode& parent);
-    UNode parse_dictionary();
-    UNode parse_tuple_or_constructor();
-    UNode parse_partial_application();
+    ast::UNode parse_expression();
+    ast::UNode parse_tuple_literal();
+    ast::UNode parse_not_expression();
+    ast::UNode parse_id_or_class_literal();
+    ast::UNode parse_list_literal();
+    ast::UNode parse_add_or_sub_expression();
+    ast::UNode parse_and_expression();
+    ast::UNode parse_bool_expression();
+    ast::UNode parse_factor();
+    ast::UNode parse_id_or_literal();
+    ast::UNode parse_mul_div_or_mod_expression();
+    ast::UNode parse_or_expression();
+    ast::UNode parse_call_or_subscript_chain(ast::UNode& parent);
+    ast::UNode parse_dictionary();
+    ast::UNode parse_tuple_or_constructor();
+    ast::UNode parse_partial_application();
 
     std::unique_ptr<TypeNode> parse_type_node();
     std::unique_ptr<FunctionType> parse_function_type();
     std::unique_ptr<ObjectType> parse_object_type();
 
-    VectorOfNodesU parse_list_of_arguments();
+    ast::VectorOfNodesU parse_list_of_arguments();
 
     std::string code_context_string(TextPosition position);
     std::string code_error_string(TextPosition start, TextPosition end);

@@ -10,7 +10,7 @@ bool UnaryOp::equal(const ast::Node& other) const {
     return false;
 }
 
-UnaryOp::UnaryOp(UnaryOpType op, UNode exp, TextPosition start, TextPosition end) : ast::Node(NodeType::UNARY,
+UnaryOp::UnaryOp(UnaryOpType op, ast::UNode exp, TextPosition start, TextPosition end) : ast::Node(NodeType::UNARY,
                                                                                               start,
                                                                                               end),
                                                                                     exp(std::move(exp)) {

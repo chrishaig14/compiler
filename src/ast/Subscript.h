@@ -16,10 +16,10 @@
 class ast::Subscript : public ast::Node {
 
 public:
-    Subscript(UNode& parent, VectorOfNodesU& child, TextPosition start, TextPosition end);
+    Subscript(ast::UNode& parent, ast::VectorOfNodesU& child, TextPosition start, TextPosition end);
     TypeNode* parent_t;
-    UNode parent;
-    VectorOfNodesU child;
+    ast::UNode parent;
+    ast::VectorOfNodesU child;
 
     bool equal(const ast::Node& other) const override;
 

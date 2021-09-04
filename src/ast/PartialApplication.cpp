@@ -28,7 +28,7 @@ bool PartialApplication::equal(const ast::Node& other) const {
     return true;
 }
 
-PartialApplication::PartialApplication(UNode function, VectorOfNodesU args, TextPosition start, TextPosition end)
+PartialApplication::PartialApplication(ast::UNode function, ast::VectorOfNodesU args, TextPosition start, TextPosition end)
         : ast::Node(NodeType::PARTIAL, start, end), function(std::move(function)), args(std::move(args)) {
 }
 

@@ -17,9 +17,9 @@
 class KMethod {
 public:
     Implicit* constraint;
-    UFunctionNode method;
+    ast::UFunctionNode method;
 
-    KMethod(Implicit* constraint, UFunctionNode method);
+    KMethod(Implicit* constraint, ast::UFunctionNode method);
 };
 
 class ast::Klass : public ast::Node {
@@ -29,7 +29,7 @@ public:
     Klass(const std::string& className, VectorOfStrings type_parameters,
           std::vector<std::pair<std::string, UTypeNode>> members, std::unordered_map<std::string, std::unique_ptr<KMethod>> functions,
           std::map<std::string, std::pair<TypeNode*, ast::Node*>> static_members,
-          std::unordered_map<std::string, UFunctionNode>& static_methods, TextPosition start, TextPosition end);
+          std::unordered_map<std::string, ast::UFunctionNode>& static_methods, TextPosition start, TextPosition end);
     ~Klass() override;
     nlohmann::json to_json() const override;
 
@@ -37,7 +37,7 @@ public:
     std::map<std::string, std::pair<TypeNode*, ast::Node*>> static_members;
     VectorOfStrings members_ordered;
     std::unordered_map<std::string, std::unique_ptr<KMethod>> methods;
-    std::unordered_map<std::string, UFunctionNode> static_methods;
+    std::unordered_map<std::string, ast::UFunctionNode> static_methods;
 
     std::string class_name;
     VectorOfStrings type_parameters;

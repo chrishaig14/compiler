@@ -12,9 +12,9 @@
 class ast::Tuple : public ast::Node {
 public:
     int tuple_index;
-    VectorOfNodesU values;
+    ast::VectorOfNodesU values;
     bool equal(const ast::Node& other) const override;
-    Tuple(VectorOfNodesU values, TextPosition start, TextPosition end);
+    Tuple(ast::VectorOfNodesU values, TextPosition start, TextPosition end);
     nlohmann::json to_json() const override;
 
 };

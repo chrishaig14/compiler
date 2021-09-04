@@ -191,7 +191,7 @@ std::unique_ptr<ast::Instance> Parser::parse_instance() {
     UObjectType ot = this->parse_object_type();
     this->expect_token(TokType::RSQUARE);
     this->expect_token(TokType::LCURLY);
-    std::unordered_map<std::string, UFunctionNode> methods;
+    std::unordered_map<std::string, ast::UFunctionNode> methods;
     while (true) {
         if (!this->match(TokType::FUN)) {
             break;

@@ -242,7 +242,7 @@ USemanticInfo Checker::visit_match(ast::Match& node) {
     std::string varname = "match_var";
     for (size_t i = 0; i < node.ids.size(); i++) {
         std::string case_id = node.ids[i];
-        std::pair<UTypeNode, UBlock>& c = node.cases[i];
+        std::pair<UTypeNode, ast::UBlock>& c = node.cases[i];
         TypeNode& case_type = *c.first;
         ast::Block& case_node = *c.second;
 

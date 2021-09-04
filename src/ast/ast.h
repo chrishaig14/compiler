@@ -81,6 +81,15 @@ namespace ast {
     class If;
 
     class For;
+
+    typedef std::unique_ptr<Function> UFunctionNode;
+    typedef std::unique_ptr<BinaryOp> UBinaryOp;
+    typedef std::unique_ptr<Id> UId;
+    typedef std::unique_ptr<Block> UBlock;
+    typedef std::unique_ptr<Number> UNumber;
+    typedef std::unique_ptr<Node> UNode;
+    typedef std::reference_wrapper<Node> RNode;
+    typedef std::vector<UNode> VectorOfNodesU;
 }
 
 #endif //XLANG_AST_H

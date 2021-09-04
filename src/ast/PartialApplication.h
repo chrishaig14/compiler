@@ -12,10 +12,10 @@
 
 class ast::PartialApplication : public ast::Node {
 public:
-    UNode function;
-    VectorOfNodesU args;
+    ast::UNode function;
+    ast::VectorOfNodesU args;
     FunctionType* complete_type;
-    PartialApplication(UNode function, VectorOfNodesU args, TextPosition start, TextPosition end);
+    PartialApplication(ast::UNode function, ast::VectorOfNodesU args, TextPosition start, TextPosition end);
 
     bool equal(const ast::Node& other) const override;
     nlohmann::json to_json() const override;

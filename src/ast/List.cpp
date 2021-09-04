@@ -7,7 +7,7 @@
 
 using namespace ast;
 
-List::List(VectorOfNodesU elements, TextPosition start, TextPosition end) : ast::Node(NodeType::LST, start, end),
+List::List(ast::VectorOfNodesU elements, TextPosition start, TextPosition end) : ast::Node(NodeType::LST, start, end),
                                                                             _elements(std::move(elements)) {
     for (auto& e: this->_elements) {
         this->elements.push_back(*e);

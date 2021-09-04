@@ -6,7 +6,7 @@
 
 using namespace ast;
 
-Instance::Instance(const std::string& id, UObjectType base_type, std::unordered_map<std::string, UFunctionNode> methods,
+Instance::Instance(const std::string& id, UObjectType base_type, std::unordered_map<std::string, ast::UFunctionNode> methods,
                    TextPosition start, TextPosition end) : ast::Node(NodeType::INSTANCE, start, end), id(id),
                                                            base_type(std::move(base_type)),
                                                            methods(std::move(methods)) {

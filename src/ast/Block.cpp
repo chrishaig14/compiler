@@ -30,7 +30,7 @@ bool Block::equal(const ast::Node& p) const {
     return true;
 }
 
-Block::Block(VectorOfNodesU nodes, TextPosition start, TextPosition end) : ast::Node(NodeType::BLOCK, start, end),
+Block::Block(ast::VectorOfNodesU nodes, TextPosition start, TextPosition end) : ast::Node(NodeType::BLOCK, start, end),
                                                                            nodes(std::move(nodes)) {
     ;
 }

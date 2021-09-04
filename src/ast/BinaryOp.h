@@ -14,17 +14,17 @@
 #include "ast.h"
 
 class ast::BinaryOp : public ast::Node {
-    UNode _left;
-    UNode _right;
+    ast::UNode _left;
+    ast::UNode _right;
 public:
     Node& left;
     Node& right;
     OpType op;
     TextPosition op_pos;
 
-    BinaryOp(OpType op, UNode left, UNode right, TextPosition start, TextPosition end);
+    BinaryOp(OpType op, ast::UNode left, ast::UNode right, TextPosition start, TextPosition end);
 
-    static UBinaryOp make(OpType op, UNode left, UNode right, TextPosition start, TextPosition end) {
+    static UBinaryOp make(OpType op, ast::UNode left, ast::UNode right, TextPosition start, TextPosition end) {
         return std::make_unique<BinaryOp>(op, std::move(left), std::move(right), start, end);
     }
 

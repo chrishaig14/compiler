@@ -6,7 +6,7 @@
 
 using namespace ast;
 
-BinaryOp::BinaryOp(OpType op, UNode left, UNode right, TextPosition start, TextPosition end)
+BinaryOp::BinaryOp(OpType op, ast::UNode left, ast::UNode right, TextPosition start, TextPosition end)
         : ast::Node(NodeType::BINOP, start, end), _left(std::move(left)), _right(std::move(right)), left(*_left),
           right(*_right), op(op) {
 }

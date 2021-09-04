@@ -7,7 +7,7 @@
 
 using namespace ast;
 
-Assignment::Assignment(UNode lvalue, UNode rvalue, TextPosition start, TextPosition end) : ast::Node(NodeType::ASSIGN,
+Assignment::Assignment(ast::UNode lvalue, ast::UNode rvalue, TextPosition start, TextPosition end) : ast::Node(NodeType::ASSIGN,
                                                                                                        start,
                                                                                                        end),
                                                                                              _lvalue(std::move(lvalue)),

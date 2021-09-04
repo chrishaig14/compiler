@@ -10,7 +10,7 @@ Klass::Klass(const std::string& className, VectorOfStrings type_parameters,
              std::vector<std::pair<std::string, UTypeNode>> members,
              std::unordered_map<std::string, std::unique_ptr<KMethod>> functions,
              std::map<std::string, std::pair<TypeNode*, ast::Node*>> static_members,
-             std::unordered_map<std::string, UFunctionNode>& static_methods, TextPosition start, TextPosition end)
+             std::unordered_map<std::string, ast::UFunctionNode>& static_methods, TextPosition start, TextPosition end)
         : ast::Node(NodeType::CLS, start, end), members(std::move(members)), static_members(static_members),
           methods(std::move(functions)), static_methods(std::move(static_methods)), class_name(className) {
     this->type_parameters = type_parameters;
@@ -53,5 +53,5 @@ nlohmann::json Klass::to_json() const {
     return j;
 }
 
-KMethod::KMethod(Implicit* constraint, UFunctionNode method) : constraint(constraint), method(std::move(method)) {
+KMethod::KMethod(Implicit* constraint, ast::UFunctionNode method) : constraint(constraint), method(std::move(method)) {
 }

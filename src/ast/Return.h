@@ -13,7 +13,7 @@
 
 class ast::Return : public ast::Node {
 public:
-    explicit Return(UNode& expression, TextPosition start, TextPosition end);
+    explicit Return(ast::UNode& expression, TextPosition start, TextPosition end);
 
 
     bool equal(const ast::Node& other) const override;
@@ -21,7 +21,7 @@ public:
     ~Return();
     nlohmann::json to_json() const override;
 
-    UNode expression;
+    ast::UNode expression;
     std::vector<std::pair<std::string, TypeNode*>> reachables;
 };
 

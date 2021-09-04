@@ -7,7 +7,7 @@
 
 using namespace ast;
 
-Call::Call(UNode function, VectorOfNodesU arguments, TextPosition start, TextPosition end) : ast::Node(NodeType::CALL,
+Call::Call(ast::UNode function, ast::VectorOfNodesU arguments, TextPosition start, TextPosition end) : ast::Node(NodeType::CALL,
                                                                                                        start,
                                                                                                        end),
                                                                                              _function(std::move(

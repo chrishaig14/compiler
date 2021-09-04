@@ -7,7 +7,7 @@
 
 using namespace ast;
 
-While::While(UNode& condition, std::unique_ptr<ast::Block>& body, TextPosition start, TextPosition end) : ast::Node(
+While::While(ast::UNode& condition, std::unique_ptr<ast::Block>& body, TextPosition start, TextPosition end) : ast::Node(
         NodeType::WHIL,
         start,
         end), body(std::move(body)), condition(std::move(condition)) {

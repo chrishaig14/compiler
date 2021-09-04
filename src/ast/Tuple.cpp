@@ -19,7 +19,7 @@ bool Tuple::equal(const ast::Node& n) const {
     return true;
 }
 
-Tuple::Tuple(VectorOfNodesU values, TextPosition start, TextPosition end) : Node(NodeType::TUPLE, start, end),
+Tuple::Tuple(ast::VectorOfNodesU values, TextPosition start, TextPosition end) : Node(NodeType::TUPLE, start, end),
                                                                             values(std::move(values)) {
 }
 

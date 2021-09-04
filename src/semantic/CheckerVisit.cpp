@@ -157,7 +157,7 @@ USemanticInfoBlock Checker::visit_block(ast::Block& node) {
     USemanticInfoBlock info_u = std::make_unique<SemanticInfoBlock>();
     SemanticInfoBlock& info = *info_u;
     auto sn = std::make_unique<sem::Block>();
-    VectorOfNodesU vn;
+    ast::VectorOfNodesU vn;
     for (auto& n: node.nodes) {
         USemanticInfo sinfo_p = this->dispatch(*n);
 

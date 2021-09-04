@@ -18,7 +18,7 @@ enum class MemberType {
 };
 
 class ast::Member : public ast::Node {
-    UNode _parent;
+    ast::UNode _parent;
 public:
     Node& parent;
     MemberType type;
@@ -26,7 +26,7 @@ public:
     size_t n_child;
     TextPosition dot_pos;
     Token child_token;
-    Member(UNode parent, Token child_token);
+    Member(ast::UNode parent, Token child_token);
 
     bool equal(const ast::Node& x) const override;
 

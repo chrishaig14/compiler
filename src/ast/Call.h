@@ -13,13 +13,13 @@
 #include "ast.h"
 
 class ast::Call : public ast::Node {
-    UNode _function;
-    VectorOfNodesU _arguments;
+    ast::UNode _function;
+    ast::VectorOfNodesU _arguments;
 public:
     Node& function;
     std::vector<RNode> arguments;
 
-    Call(UNode function, VectorOfNodesU arguments, TextPosition start, TextPosition end);
+    Call(ast::UNode function, ast::VectorOfNodesU arguments, TextPosition start, TextPosition end);
 
     bool equal(const ast::Node& other) const override;
 

@@ -13,9 +13,9 @@
 class ast::While : public ast::Node {
 public:
     std::unique_ptr<ast::Block> body;
-    UNode condition;
+    ast::UNode condition;
 
-    While(UNode& condition, std::unique_ptr<ast::Block>& body, TextPosition start, TextPosition end);
+    While(ast::UNode& condition, std::unique_ptr<ast::Block>& body, TextPosition start, TextPosition end);
 
     bool equal(const ast::Node& other) const override;
 

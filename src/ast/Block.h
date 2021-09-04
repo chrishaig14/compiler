@@ -18,14 +18,14 @@
 class ast::Block : public ast::Node {
 public:
 
-    Block(VectorOfNodesU nodes, TextPosition start, TextPosition end);
+    Block(ast::VectorOfNodesU nodes, TextPosition start, TextPosition end);
 
-    static UBlock make(VectorOfNodesU nodes, TextPosition start, TextPosition end) {
+    static ast::UBlock make(ast::VectorOfNodesU nodes, TextPosition start, TextPosition end) {
         return std::make_unique<Block>(std::move(nodes), start, end);
     }
 
 
-    VectorOfNodesU nodes;
+    ast::VectorOfNodesU nodes;
 
     bool equal(const ast::Node& p) const override;
 

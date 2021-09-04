@@ -510,8 +510,8 @@ TEST_CASE("binop_error", "[checker]") {
     REQUIRE(checker.error_reporter.errors.size() == 1);
 
     Error& error = *checker.error_reporter.errors.back();
-    UNode left = std::make_unique<ast::String>("Hello", _POS, _POS);
-    UNode right = std::make_unique<ast::String>("Bye", _POS, _POS);
+    ast::UNode left = std::make_unique<ast::String>("Hello", _POS, _POS);
+    ast::UNode right = std::make_unique<ast::String>("Bye", _POS, _POS);
     ast::BinaryOp node(OpType::SUB, std::move(left), std::move(right), _POS, _POS);
     ObjectType expected("Integer");
     ErrorClassNoMethodForOp exp("String", "__sub__", node);
@@ -575,8 +575,8 @@ TEST_CASE("subscript_no_method_error", "[checker]") {
     Error& error = *checker.error_reporter.errors.back();
     ast::String left("Hello", _POS, _POS);
     ast::String right("Bye", _POS, _POS);
-    UNode p_node = ast::Id::make("f", _POS, _POS);
-    VectorOfNodesU v;
+    ast::UNode p_node = ast::Id::make("f", _POS, _POS);
+    ast::VectorOfNodesU v;
     v.push_back(ast::Number::make(NumberType::INTEGER, "1", _POS, _POS));
     ast::Subscript node(p_node, v, _POS, _POS);
     ObjectType expected("Integer");
@@ -778,7 +778,7 @@ TEST_CASE("enum_error", "[checker]") {
 
 
     Error& error = *checker.error_reporter.errors.back();
-    UNode u = ast::Id::make("Foo", _POS, _POS);
+    ast::UNode u = ast::Id::make("Foo", _POS, _POS);
     ast::Member node(std::move(u), Token(TokType::ID, "b", _POS));
     ObjectType expected("Boolean");
     ErrorEnumNoValue exp("Foo", "b", node, nullptr);
