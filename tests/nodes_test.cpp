@@ -101,7 +101,7 @@ TEST_CASE("nodes_assignment", "[assignment]") {
     nlohmann::json e = {{"type",       "assignment"},
                         {"assignment", {{"lvalue", l->to_json()}, {"rvalue", r->to_json()}}}};
 
-    ast::Assignment n(l, r, DUMMY_POS, DUMMY_POS);
+    ast::Assignment n(std::move(l), std::move(r), DUMMY_POS, DUMMY_POS);
     nlohmann::json nj = n.to_json();
 
     REQUIRE(e == nj);

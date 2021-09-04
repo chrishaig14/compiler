@@ -92,7 +92,7 @@ TestNodeU ASSIGNMENT() {
     auto expression_1_U = EXPRESSION_1_U();
     auto exp_id_1_U = EXP_ID_1_U();
     return {EXP_ID_1.text + " = " + expression_1_U.text,
-            std::make_unique<ast::Assignment>(exp_id_1_U.node, expression_1_U.node, DUMMY_POS, DUMMY_POS)};
+            std::make_unique<ast::Assignment>(std::move(exp_id_1_U.node), std::move(expression_1_U.node), DUMMY_POS, DUMMY_POS)};
 }
 
 // const TestNode EMPTY_BLOCK{"{}", new BlockNode(VectorOfNodesU{}, DUMMY_POS, DUMMY_POS)};

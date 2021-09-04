@@ -66,9 +66,9 @@ USemanticInfo Checker::visit_lvalue_subscript(ast::Subscript& node) {
 }
 
 USemanticInfo Checker::visit_assignment(ast::Assignment& n) {
-    if (n.lvalue->ntype == NodeType::ID) {
-        if (((ast::Id&) *n.lvalue)._id == "_") {
-            USemanticInfo rv = this->dispatch_rvalue(*n.rvalue);
+    if (n.lvalue.ntype == NodeType::ID) {
+        if (((ast::Id&) n.lvalue)._id == "_") {
+            USemanticInfo rv = this->dispatch_rvalue(n.rvalue);
             return rv;
         }
     }
@@ -76,16 +76,16 @@ USemanticInfo Checker::visit_assignment(ast::Assignment& n) {
     USemanticInfo linfo_p;
     bool is_subscript = false;
     std::unique_ptr<sem::Call> csn = nullptr;
-    if (n.lvalue->ntype == NodeType::SUB) {
+    if (n.lvalue.ntype == NodeType::SUB) {
         // special case
-        linfo_p = this->visit_lvalue_subscript((ast::Subscript&) *n.lvalue);
+        linfo_p = this->visit_lvalue_subscript((ast::Subscript&) n.lvalue);
         csn = std::move((std::unique_ptr<sem::Call>&) linfo_p->snode);
         is_subscript = true;
     } else {
-        linfo_p = this->dispatch(*n.lvalue);
+        linfo_p = this->dispatch(n.lvalue);
     }
 
-    USemanticInfo expression_info_p = this->dispatch_rvalue(*n.rvalue);
+    USemanticInfo expression_info_p = this->dispatch_rvalue(n.rvalue);
 
     if (linfo_p->is_error()) {
         return error_stub();
@@ -95,7 +95,7 @@ USemanticInfo Checker::visit_assignment(ast::Assignment& n) {
     }
 
     if (linfo_p->entity.get().type != E_TYPE::VALUE) {
-        this->error_reporter.error(ErrorCantAssign(*n.lvalue));
+        this->error_reporter.error(ErrorCantAssign(n.lvalue));
         // this->error_reporter.fail("Cannot assign to this thing!");
         return error_stub();
     }
@@ -104,7 +104,7 @@ USemanticInfo Checker::visit_assignment(ast::Assignment& n) {
     if (e_value.value->type->kind == Kind::OBJECT) {
         // bool ff = n.lvalue->ntype == NodeType::MEMBER;
         if (linfo_p->is_tuple_member) {
-            this->error_reporter.error(ErrorCantAssign(*n.lvalue));
+            this->error_reporter.error(ErrorCantAssign(n.lvalue));
             return error_stub();
         }
     }
@@ -142,7 +142,7 @@ USemanticInfo Checker::visit_assignment(ast::Assignment& n) {
                                                 std::move(expression_info_p->snode),
                                                 *l_entity_value.value->type);
         if (rvalue_snode == nullptr) {
-            this->error_reporter.error(ErrorTypeMismatch(l_type, *n.rvalue, expression_info_p->entity));
+            this->error_reporter.error(ErrorTypeMismatch(l_type, n.rvalue, expression_info_p->entity));
             return error_stub();
         }
         expression_info_p->snode = std::move(rvalue_snode);

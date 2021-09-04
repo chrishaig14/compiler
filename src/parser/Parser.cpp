@@ -165,7 +165,7 @@ UNode Parser::parse_assignment_or_expression() {
             }
 
         }
-        auto node = std::make_unique<ast::Assignment>(lvalue, rvalue, lvalue->start, rvalue->end);
+        auto node = std::make_unique<ast::Assignment>(std::move(lvalue), std::move(rvalue), lvalue->start, rvalue->end);
         node->start = op_pos;
         return node;
     } else {

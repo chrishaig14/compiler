@@ -7,16 +7,18 @@
 
 using namespace ast;
 
-Assignment::Assignment(UNode& lvalue, UNode& rvalue, TextPosition start, TextPosition end) : ast::Node(NodeType::ASSIGN,
+Assignment::Assignment(UNode lvalue, UNode rvalue, TextPosition start, TextPosition end) : ast::Node(NodeType::ASSIGN,
                                                                                                        start,
                                                                                                        end),
-                                                                                             lvalue(std::move(lvalue)),
-                                                                                             rvalue(std::move(rvalue)) {
+                                                                                             _lvalue(std::move(lvalue)),
+                                                                                             _rvalue(std::move(rvalue)),
+                                                                                             lvalue(*_lvalue),
+                                                                                             rvalue(*_rvalue) {
 }
 
 bool Assignment::equal(const ast::Node& x) const {
     auto& other = (Assignment&) x;
-    return *this->lvalue == *other.lvalue && *this->rvalue == *other.rvalue;
+    return this->lvalue == other.lvalue && this->rvalue == other.rvalue;
 }
 
 Assignment::~Assignment() {
@@ -27,8 +29,8 @@ Assignment::~Assignment() {
 nlohmann::json Assignment::to_json() const {
     nlohmann::json j;
     j["type"] = "assignment";
-    j["assignment"]["lvalue"] = this->lvalue->to_json();
-    j["assignment"]["rvalue"] = this->rvalue->to_json();
+    j["assignment"]["lvalue"] = this->lvalue.to_json();
+    j["assignment"]["rvalue"] = this->rvalue.to_json();
     return j;
 }
 
