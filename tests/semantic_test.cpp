@@ -298,8 +298,8 @@ TEST_CASE("semantic_output_float_literal", "[checker]") {
     REQUIRE(!checker.error_reporter.failed);
     REQUIRE(checker.error_reporter.errors.size() == 0);
     REQUIRE(info->entity.get().type == E_TYPE::VALUE);
-    REQUIRE(((EntityValue&) (info->entity.get())).value->metatype == Meta::CLASS);
-    REQUIRE(*((EntityValue&) (info->entity.get())).value->type == ast::ObjectType("Float"));
+    REQUIRE(((Value&) (info->entity.get())).metatype == Meta::CLASS);
+    REQUIRE(*((Value&) (info->entity.get())).type == ast::ObjectType("Float"));
 }
 
 // TEST_CASE("semantic_output_none_literal", "[checker]") {
@@ -353,9 +353,9 @@ TEST_CASE("semantic_output_binop", "[checker]") {
     REQUIRE(!checker.error_reporter.failed);
     REQUIRE(checker.error_reporter.errors.empty());
     CHECK(info->entity.get().type == E_TYPE::VALUE);
-    EntityValue& entity_value = (EntityValue&) (info->entity.get());
-    CHECK(entity_value.value->metatype == Meta::CLASS);
-    CHECK(*entity_value.value->type == ast::ObjectType("Integer"));
+    Value& entity_value = (Value&) (info->entity.get());
+    CHECK(entity_value.metatype == Meta::CLASS);
+    CHECK(*entity_value.type == ast::ObjectType("Integer"));
 }
 
 TEST_CASE("semantic_output_boolop", "[checker]") {
@@ -375,9 +375,9 @@ TEST_CASE("semantic_output_boolop", "[checker]") {
     REQUIRE(!checker.error_reporter.failed);
     REQUIRE(checker.error_reporter.errors.empty());
     CHECK(info->entity.get().type == E_TYPE::VALUE);
-    EntityValue& entity_value = (EntityValue&) (info->entity.get());
-    CHECK(entity_value.value->metatype == Meta::CLASS);
-    CHECK(*entity_value.value->type == ast::ObjectType("Boolean"));
+    Value& entity_value = (Value&) (info->entity.get());
+    CHECK(entity_value.metatype == Meta::CLASS);
+    CHECK(*entity_value.type == ast::ObjectType("Boolean"));
 }
 
 TEST_CASE("semantic_output_subscript", "[checker]") {

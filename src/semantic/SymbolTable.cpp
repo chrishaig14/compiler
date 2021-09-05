@@ -93,8 +93,8 @@ std::vector<std::pair<std::string, ast::Type*>> SymbolTable::get_all() {
             Entity& e = *v.second;
             ast::Type* t;
             if (e.type == E_TYPE::VALUE) {
-                EntityValue& ev = (EntityValue&) e;
-                ast::Type& type = *ev.value->type;
+                Value& ev = (Value&) e;
+                ast::Type& type = *ev.type;
                 t = type.clone();
                 if (e.type == E_TYPE::VALUE) {
                     r.push_back(std::make_pair(v.first, t));

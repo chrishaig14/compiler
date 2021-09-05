@@ -57,7 +57,7 @@ USemanticInfo Checker::visit_none(ast::None& node) {
     SemanticInfo& info = *info_u;
     // info.set_type(ObjectType("NoneType"));
     auto v = std::make_unique<Value>(new ast::ObjectType("NoneType"));
-    info.set_entity(new EntityValue(std::move(v)));
+    info.set_entity(v.release());
     info.snode = std::make_unique<sem::None>();
     return info_u;
 }
@@ -70,7 +70,7 @@ USemanticInfo Checker::visit_emptylist(ast::EmptyList& node) {
     auto ov = std::make_unique<Value>(otype);
     otype->data.actual_base_path = Path("core.core.List");
     this->fill_value(*ov);
-    info.set_entity(new EntityValue(std::move(ov)));
+    info.set_entity(ov.release());
     std::vector<USNode> v;
     info.snode = std::make_unique<sem::List>(std::move(v));
     // non->class_name = "core.List";
@@ -97,7 +97,7 @@ USemanticInfo Checker::visit_tuple(ast::Tuple& node) {
     for (auto& n: node.values) {
         USemanticInfo vtype = this->dispatch(*n);
         values.push_back(std::move(vtype->snode));
-        types.emplace_back(((EntityValue&) vtype->entity).value->type->clone());
+        types.emplace_back(((Value&) vtype->entity).type->clone());
         // if (!this->is_immutable(vtype->type())) {
         //     this->error_reporter.tuple_member_not_immutable(vtype->type(), node.start);
         //     return error_stub();
@@ -115,9 +115,9 @@ USemanticInfo Checker::visit_tuple(ast::Tuple& node) {
         this->fill_value(*tv);
         const std::string& mem_name = std::to_string(i + 1);
         ov->clazz->members[mem_name] = tv->type->clone();
-        ov->clazz->member_entities[mem_name] = new EntityValue(std::move(tv));
+        ov->clazz->member_entities[mem_name] = tv.release();
     }
-    sinfo.set_entity(new EntityValue(std::move(ov)));
+    sinfo.set_entity(ov.release());
     unsigned long num_values = node.values.size();
     otype->data.actual_base_path = Path("core.Tuple" + std::to_string(num_values));
     auto nosn = std::make_unique<sem::NewObject>();
@@ -133,7 +133,7 @@ USemanticInfo Checker::visit_partial(ast::PartialApplication& node) {
     ast::FunctionType* fun_type = nullptr;
     Entity& f_entity = func->entity;
     if (f_entity.type == E_TYPE::CONST_FUNCTION ||
-        (f_entity.type == E_TYPE::VALUE && ((EntityValue&) f_entity).value->type->kind == Kind::FUNCTION)) {
+        (f_entity.type == E_TYPE::VALUE && ((Value&) f_entity).type->kind == Kind::FUNCTION)) {
         fun_type = ((EntityConstFunction&) f_entity).const_function->ft->clone();
     } else {
         this->error_reporter.fail("Error: expected a function for partial application");
@@ -163,8 +163,8 @@ USemanticInfo Checker::visit_partial(ast::PartialApplication& node) {
     node.complete_type = &fun_type->clone()->function();
     USemanticInfo s_p = std::make_unique<SemanticInfo>();
     auto& s = *s_p;
-    s.entity = *new EntityValue(std::make_unique<Value>(new ast::FunctionType(partial_args,
-                                                                              ast::UTypeNode(fun_type->return_type->clone()))));
+    s.entity = *std::make_unique<Value>(new ast::FunctionType(partial_args,
+                                                              ast::UTypeNode(fun_type->return_type->clone())));
     auto non = std::make_unique<sem::NewObject>();
     non->class_name = "Partial" + std::to_string(npartial);
     non->args = std::move(snodes);
@@ -178,10 +178,10 @@ USemanticInfo Checker::visit_dict(ast::DictNode& node) {
     SemanticInfo& info = *info_u;
     USemanticInfo first_key_info = this->dispatch(node.items[0].first);
     USemanticInfo first_value_info = this->dispatch(node.items[0].second);
-    EntityValue& first_key_entity = (EntityValue&) first_key_info->entity.get();
-    EntityValue& first_value_entity = (EntityValue&) first_value_info->entity.get();
-    ast::ObjectType& first_key_type = first_key_entity.value->type->object();
-    ast::ObjectType& first_value_type = first_value_entity.value->type->object();
+    Value& first_key_entity = (Value&) first_key_info->entity.get();
+    Value& first_value_entity = (Value&) first_value_info->entity.get();
+    ast::ObjectType& first_key_type = first_key_entity.type->object();
+    ast::ObjectType& first_value_type = first_value_entity.type->object();
 
     std::vector<std::pair<USNode, USNode>> items;
     items.emplace_back(std::move(first_key_info->snode), std::move(first_value_info->snode));
@@ -204,7 +204,7 @@ USemanticInfo Checker::visit_dict(ast::DictNode& node) {
     this->module.fill_actual(*ov->type);
     this->fill_value(*ov);
     assert(ov->clazz != nullptr);
-    info.set_entity(new EntityValue(std::move(ov)));
+    info.set_entity(ov.release());
     info.snode = std::make_unique<sem::Dict>(std::move(items));
     return info_u;
 }
@@ -218,7 +218,7 @@ USemanticInfo Checker::visit_emptydict(ast::EmptyDict& node) {
     this->module.fill_actual(*ov->type);
     this->fill_value(*ov);
     assert(ov->clazz != nullptr);
-    info.set_entity(new EntityValue(std::move(ov)));
+    info.set_entity(ov.release());
     info.snode = std::make_unique<sem::Dict>(std::vector<std::pair<USNode, USNode>>{});
     return info_u;
 }
@@ -257,8 +257,8 @@ USemanticInfo Checker::visit_list(ast::List& node) {
         this->error_reporter.error(std::make_unique<ErrorExpectedExpression>(element_type_p->entity, node.elements[0]));
         return error_stub();
     }
-    EntityValue& entity_value = (EntityValue&) element_type_p->entity.get();
-    ast::Type* element_type = entity_value.value->type->clone();
+    Value& entity_value = (Value&) element_type_p->entity.get();
+    ast::Type* element_type = entity_value.type->clone();
     bool is_constant = true;
     std::vector<USNode> list_elements;
     list_elements.push_back(std::move(element_type_p->snode));
@@ -269,8 +269,8 @@ USemanticInfo Checker::visit_list(ast::List& node) {
         // if (!current_type_p->is_constant) {
         //     is_constant = false;
         // }
-        EntityValue& p_entity = (EntityValue&) current_type_p->entity.get();
-        ast::ObjectType* ctype = &p_entity.value->type->object();
+        Value& p_entity = (Value&) current_type_p->entity.get();
+        ast::ObjectType* ctype = &p_entity.type->object();
         if (*ctype != *element_type) {
             this->error_reporter.error(std::make_unique<ErrorTypeMismatch>(*element_type, node.elements[i], p_entity));
         }
@@ -286,6 +286,6 @@ USemanticInfo Checker::visit_list(ast::List& node) {
     auto p_value = std::make_unique<Value>(otype);
     otype->data.actual_base_path = Path("core.core.List");
     this->fill_value(*p_value);
-    return_info.set_entity(new EntityValue(std::move(p_value)));
+    return_info.set_entity(p_value.release());
     return return_info_p;
 }

@@ -90,7 +90,7 @@ Checker::get_first_substitution_function(ast::FunctionType& a, ast::FunctionType
 }
 
 std::unique_ptr<ast::FunctionType> Checker::unify_function_call(const ast::FunctionType& f, ast::VectorOfTypes& args,
-                                                           std::map<std::string, ast::Type*>& all_substitutions) {
+                                                                std::map<std::string, ast::Type*>& all_substitutions) {
     ast::FunctionType& fun = *f.clone();
     if (args.size() != fun.param_types.size()) {
         this->error_reporter.error(std::make_unique<ErrorFunctionCallNumArgs>(fun.clone(), TextPosition{1, 1}));
@@ -181,7 +181,7 @@ USemanticInfo Checker::enum_member(Enum* enumm, const std::string& value, ast::M
             auto* otype = new ast::ObjectType(enumm->enumm_name, {});
             otype->data.actual_base_path = enumm->path;
             auto ov = std::make_unique<Value>(otype);
-            info.set_entity(new EntityValue(std::move(ov)));
+            info.set_entity(ov.release());
             // this->fill_value(info.entity.value);
             info.snode = std::make_unique<sem::EnumMember>(enumm->path.as_str(), value);
             return info_u;
@@ -198,9 +198,9 @@ Entity* Checker::entity_from_type(const ast::Type& type) {
     }
     if (type.kind == Kind::FUNCTION) {
         auto fv = std::make_unique<Value>(type.clone());
-        auto* e = new EntityValue(std::move(fv));
-        this->entities[type.to_string()] = e;
-        return e;
+        auto* vp = fv.release();
+        this->entities[type.to_string()] = vp;
+        return vp;
     }
     if (type.kind == Kind::OBJECT) {
         if (type.object().id == ".None") {
@@ -210,7 +210,7 @@ Entity* Checker::entity_from_type(const ast::Type& type) {
         }
     }
     auto fv = std::make_unique<Value>(type.clone());
-    auto* e = new EntityValue(std::move(fv));
+    auto* e = fv.release();
     this->entities[type.to_string()] = e;
     return e;
 }

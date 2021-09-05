@@ -21,7 +21,7 @@ std::string ErrorTypeMismatch::to_str() const {
 bool ErrorTypeMismatch::equal(const Error& other) const {
     const auto& o = (const ErrorTypeMismatch&) other;
     bool act = *o.actual == *this->actual &&
-               (*((EntityValue&) *o.actual).value->type == *((EntityValue&) *this->actual).value->type);
+               (*((Value&) *o.actual).type == *((Value&) *this->actual).type);
     bool exp = o.expected == this->expected;
     bool val = o.value_node == this->value_node;
     return act && exp && val;

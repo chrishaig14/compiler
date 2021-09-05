@@ -20,20 +20,18 @@ USemanticInfo Checker::visit_member(ast::Member& n) {
         case E_TYPE::CLASS:
             return this->class_member(((EntityClass&) parent_entity).clazz, n.s_child, n);
         case E_TYPE::CONST_FUNCTION:
-            this->error_reporter.error(std::make_unique<ErrorNoMember>(*((EntityConstFunction&) parent_entity).const_function->ft, n));
+            this->error_reporter.error(std::make_unique<ErrorNoMember>(*((EntityConstFunction&) parent_entity).const_function->ft,
+                                                                       n));
             // this->error_reporter.object_no_member(*parent_entity.const_function->ft, n);
             break;
         case E_TYPE::VALUE:
-            if (((EntityValue&) parent_entity).value->type->kind == Kind::FUNCTION) {
+            if (((Value&) parent_entity).type->kind == Kind::FUNCTION) {
                 this->error_reporter.error(std::make_unique<ErrorNoMember>(*((EntityConstFunction&) parent_entity).const_function->ft,
-                                                         n));
+                                                                           n));
                 // this->error_reporter.object_no_member(*parent_entity.value->type, n);
                 return error_stub();
             }
-            return this->object_member(std::move(parent_info->snode),
-                                       *((EntityValue&) parent_entity).value,
-                                       n.s_child,
-                                       n);
+            return this->object_member(std::move(parent_info->snode), ((Value&) parent_entity), n.s_child, n);
         case E_TYPE::PACKAGE:
             return this->package_member(*((EntityPackage&) parent_entity).package, n.s_child, n);
         case E_TYPE::MODULE:
@@ -101,9 +99,8 @@ USemanticInfo Checker::object_member(USNode object_snode, Value& p_value, const 
         if (info.entity.get().type == E_TYPE::NOTHING) {
             info.set_entity(entity_from_type(*clazz->members.at(child)));
             clazz->member_entities[child] = &info.entity.get();
-            auto* ev = &(EntityValue&) info.entity.get();
-            Value& vup = *(ev->value);
-            this->fill_value(vup);
+            Value& ev = (Value&) info.entity.get();
+            this->fill_value(ev);
         }
         auto omn = std::make_unique<sem::ObjectMember>(std::move(object_snode), clazz->path, child);
         info.snode = std::move(omn);
@@ -150,11 +147,11 @@ USemanticInfo Checker::object_member(USNode object_snode, Value& p_value, const 
 USemanticInfo Checker::package_member(Package& package, const std::string& child, ast::Member& n) {
     if (package.units.count(child) == 0) {
         this->error_reporter.error(std::make_unique<ErrorPackageNoMember>(&package,
-                                                        child,
-                                                        n.dot_pos,
-                                                        n.parent,
-                                                        n.child_token.start,
-                                                        n.child_token.end_pos));
+                                                                          child,
+                                                                          n.dot_pos,
+                                                                          n.parent,
+                                                                          n.child_token.start,
+                                                                          n.child_token.end_pos));
         return error_stub();
     }
     Unit unit = package.units[child];
@@ -187,11 +184,11 @@ USemanticInfo Checker::class_member(Class* cls, const std::string& child, ast::M
         info.set_entity(entity_from_type(*cls->static_members[child].first));
     } else {
         this->error_reporter.error(std::make_unique<ErrorClassNoMember>(ast::ObjectType(cls->class_name, {}),
-                                                      child,
-                                                      n.dot_pos,
-                                                      n.parent,
-                                                      add_one_col(n.dot_pos),
-                                                      n.end));
+                                                                        child,
+                                                                        n.dot_pos,
+                                                                        n.parent,
+                                                                        add_one_col(n.dot_pos),
+                                                                        n.end));
         return error_stub();
     }
     return info_u;

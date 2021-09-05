@@ -16,24 +16,26 @@
 USemanticInfo Checker::visit_lvalue_subscript(ast::Subscript& node) {
     USemanticInfo parent_p = this->dispatch_rvalue(*node.parent);
     Entity& entity_parent = parent_p->entity.get();
-    if (entity_parent.type != E_TYPE::VALUE || ((EntityValue&) entity_parent).value->type->kind == Kind::FUNCTION) {
+    if (entity_parent.type != E_TYPE::VALUE || ((Value&) entity_parent).type->kind == Kind::FUNCTION) {
         this->error_reporter.fail("Error subscript of something that is not an object!");
         return error_stub();
     }
-    auto& entity_parent_value = (EntityValue&) entity_parent;
-    if (entity_parent_value.value->metatype == Meta::ENUM) {
+    auto& entity_parent_value = (Value&) entity_parent;
+    if (entity_parent_value.metatype == Meta::ENUM) {
         this->error_reporter.fail("Error: no subscript in enum");
         return error_stub();
     }
-    Class* cls = entity_parent_value.value->clazz;
+    Class* cls = entity_parent_value.clazz;
     assert(cls != nullptr);
     if (!cls->type_params.empty()) {
-        cls = instantiate_generic(cls, entity_parent_value.value->type->object());
+        cls = instantiate_generic(cls, entity_parent_value.type->object());
     }
 
     auto subscript_it = cls->methods.find("__set_item__");
     if (subscript_it == cls->methods.end()) {
-        this->error_reporter.error(std::make_unique<ErrorObjectNoSpecialMethod>(*entity_parent_value.value->type, "__set_item__", node));
+        this->error_reporter.error(std::make_unique<ErrorObjectNoSpecialMethod>(*entity_parent_value.type,
+                                                                                "__set_item__",
+                                                                                node));
         return error_stub();
     }
     ConstFunction* subscript_fun = subscript_it->second;
@@ -54,7 +56,7 @@ USemanticInfo Checker::visit_lvalue_subscript(ast::Subscript& node) {
     SemanticInfo& info = *info_u;
     auto value = std::make_unique<Value>((ast::ObjectType*) rtype);
     this->fill_value(*value);
-    info.set_entity(new EntityValue(std::move(value)));
+    info.set_entity(value.release());
 
     auto fsn = std::make_unique<sem::Id>(sub_fun_path);
     std::vector<USNode> v;
@@ -99,9 +101,9 @@ USemanticInfo Checker::visit_assignment(ast::Assignment& n) {
         // this->error_reporter.fail("Cannot assign to this thing!");
         return error_stub();
     }
-    EntityValue& e_value = (EntityValue&) linfo_p->entity;
+    Value& e_value = (Value&) linfo_p->entity;
 
-    if (e_value.value->type->kind == Kind::OBJECT) {
+    if (e_value.type->kind == Kind::OBJECT) {
         // bool ff = n.lvalue->ntype == NodeType::MEMBER;
         if (linfo_p->is_tuple_member) {
             this->error_reporter.error(std::make_unique<ErrorCantAssign>(n.lvalue));
@@ -109,7 +111,7 @@ USemanticInfo Checker::visit_assignment(ast::Assignment& n) {
         }
     }
 
-    if (e_value.value->type->kind == Kind::OBJECT && expression_info_p->entity.get().type == E_TYPE::CONST_FUNCTION) {
+    if (e_value.type->kind == Kind::OBJECT && expression_info_p->entity.get().type == E_TYPE::CONST_FUNCTION) {
         std::cerr << "assignment error" << std::endl;
         exit(111);
         // this->error_reporter.assignment(*e_value.value->type,
@@ -118,7 +120,7 @@ USemanticInfo Checker::visit_assignment(ast::Assignment& n) {
         //                                 *n.lvalue,
         //                                 *n.rvalue);
     }
-    ast::Type* exp_type = ((EntityValue&) expression_info_p->entity).value->type;
+    ast::Type* exp_type = ((Value&) expression_info_p->entity).type;
 
     if (exp_type->kind == Kind::OBJECT && this->module.aliased_types.count(exp_type->object().id) == 1) {
         ast::Type* aliased_type = this->module.aliased_types.at(exp_type->object().id);
@@ -134,15 +136,17 @@ USemanticInfo Checker::visit_assignment(ast::Assignment& n) {
     }
     SemanticInfo& linfo = *linfo_p;
 
-    EntityValue& l_entity_value = (EntityValue&) linfo.entity;
-    const ast::Type& l_type = *l_entity_value.value->type;
+    Value& l_entity_value = (Value&) linfo.entity;
+    const ast::Type& l_type = *l_entity_value.type;
 
-    if (l_entity_value.type == E_TYPE::VALUE && expression_info_p->entity.get().type == E_TYPE::VALUE) {
+    if (expression_info_p->entity.get().type == E_TYPE::VALUE) {
         USNode rvalue_snode = this->make_rvalue(expression_info_p->entity,
                                                 std::move(expression_info_p->snode),
-                                                *l_entity_value.value->type);
+                                                *l_entity_value.type);
         if (rvalue_snode == nullptr) {
-            this->error_reporter.error(std::make_unique<ErrorTypeMismatch>(l_type, n.rvalue, expression_info_p->entity));
+            this->error_reporter.error(std::make_unique<ErrorTypeMismatch>(l_type,
+                                                                           n.rvalue,
+                                                                           expression_info_p->entity));
             return error_stub();
         }
         expression_info_p->snode = std::move(rvalue_snode);
@@ -173,7 +177,7 @@ USemanticInfo Checker::visit_return(ast::Return& n) {
         info_r->snode = std::make_unique<sem::Return>(std::move(u));
         return info_r;
     }
-    ast::Type* return_type = ((EntityValue&) return_entity).value->type;
+    ast::Type* return_type = ((Value&) return_entity).type;
     if (return_type->kind == Kind::OBJECT && this->module.aliased_types.count(return_type->object().id) == 1) {
         ast::Type* aliased_type = this->module.aliased_types.at(return_type->object().id);
         return_type = aliased_type;
@@ -220,22 +224,26 @@ USemanticInfo Checker::visit_return(ast::Return& n) {
 USemanticInfo Checker::visit_match(ast::Match& node) {
     USemanticInfo exp_info = this->dispatch_rvalue(*node.exp);
     if (exp_info->entity.get().type != E_TYPE::VALUE ||
-        ((EntityValue&) exp_info->entity).value->type->kind != Kind::OBJECT) {
+        ((Value&) exp_info->entity).type->kind != Kind::OBJECT) {
 
-        this->error_reporter.error(std::make_unique<ErrorTypeMismatch>(*new ast::ObjectType("Union", {new ast::ObjectType("...", {})}),
-                                                     *node.exp,
-                                                     exp_info->entity));
+        this->error_reporter.error(std::make_unique<ErrorTypeMismatch>(*new ast::ObjectType("Union",
+                                                                                            {new ast::ObjectType("...",
+                                                                                                                 {})}),
+                                                                       *node.exp,
+                                                                       exp_info->entity));
         return error_stub();
     }
 
-    ast::ObjectType* ot = &((EntityValue&) exp_info->entity).value->type->object();
+    ast::ObjectType* ot = &((Value&) exp_info->entity).type->object();
     if (ot->data.aliased_type != nullptr) {
         ot = (ast::ObjectType*) ot->data.aliased_type;
     }
     if (ot->id != "Union") {
-        this->error_reporter.error(std::make_unique<ErrorTypeMismatch>(*new ast::ObjectType("Union", {new ast::ObjectType("...", {})}),
-                                                     *node.exp,
-                                                     exp_info->entity));
+        this->error_reporter.error(std::make_unique<ErrorTypeMismatch>(*new ast::ObjectType("Union",
+                                                                                            {new ast::ObjectType("...",
+                                                                                                                 {})}),
+                                                                       *node.exp,
+                                                                       exp_info->entity));
         return error_stub();
     }
     std::vector<std::pair<int, sem::Block*>> cas;
@@ -256,7 +264,7 @@ USemanticInfo Checker::visit_match(ast::Match& node) {
         this->enter_scope("case");
         auto v = std::make_unique<Value>(case_type.clone());
         this->fill_value(*v);
-        Entity* ent = new EntityValue(std::move(v));
+        Entity* ent = v.release();
         assert(v->clazz != nullptr);
         this->scope->set(case_id, ent);
         USemanticInfo case_info = this->dispatch(case_node);
@@ -300,8 +308,8 @@ USemanticInfo Checker::visit_for(ast::For& node) {
     if (exp_info_p->entity.get().type != E_TYPE::VALUE) {
         this->error_reporter.error(std::make_unique<ErrorFor>(exp_info_p->entity, node.exp.start));
     }
-    EntityValue& exp_entity_value = (EntityValue&) exp_info_p->entity;
-    ast::ObjectType* exp_ot = &exp_entity_value.value->type->object();
+    Value& exp_entity_value = (Value&) exp_info_p->entity;
+    ast::ObjectType* exp_ot = &exp_entity_value.type->object();
     if (exp_ot->id != "List") {
         this->error_reporter.error(std::make_unique<ErrorFor>(exp_entity_value, node.exp.start));
     }
@@ -309,7 +317,7 @@ USemanticInfo Checker::visit_for(ast::For& node) {
     ast::Type* elem_type = exp_ot->type_params[0];
     auto v = std::make_unique<Value>(elem_type);
     this->fill_value(*v);
-    Entity* elem_entity = new EntityValue(std::move(v));
+    Entity* elem_entity = v.release();
     this->enter_scope("for");
     this->scope->set(node.var, elem_entity);
 

@@ -29,19 +29,19 @@ std::unique_ptr<SemanticInfo> Checker::expect_rvalue_of_type(const ast::Type& ta
 
 USNode Checker::make_rvalue(const Entity& t_entity, USNode value_snode, const ast::Type& target) {
     if (t_entity.type == E_TYPE::VALUE) {
-        EntityValue& value_entity = (EntityValue&) t_entity;
-        if (value_entity.value->type->kind != target.kind) {
+        Value& value_entity = (Value&) t_entity;
+        if (value_entity.type->kind != target.kind) {
             return nullptr;
         }
-        if (value_entity.value->type->kind == Kind::FUNCTION) {
-            if (*value_entity.value->type == target) {
+        if (value_entity.type->kind == Kind::FUNCTION) {
+            if (*value_entity.type == target) {
                 return value_snode;
             } else {
                 return nullptr;
                 // throw std::runtime_error("Error cannot make function rvalue");
             }
         }
-        const ast::ObjectType& value_ot = value_entity.value->type->object();
+        const ast::ObjectType& value_ot = value_entity.type->object();
         const ast::ObjectType& target_ot = target.object();
 
         const ast::Type* unaliased_value_type = &value_ot;
@@ -154,7 +154,7 @@ USemanticInfo Checker::check_declaration_with_type(ast::Declaration& n) {
     info.snode = std::make_unique<sem::Declaration>(n.identifier, std::move(up));
     auto ov = std::make_unique<Value>(n.type->clone());
     this->fill_value(*ov);
-    info.set_entity(new EntityValue(std::move(ov)));
+    info.set_entity(ov.release());
     return info_u;
 }
 
@@ -177,12 +177,12 @@ USemanticInfo Checker::check_declaration_without_type(ast::Declaration& n) {
     if (info.entity.get().type == E_TYPE::CONST_FUNCTION) {
         Entity& entity_const_function = exp_info_p->entity;
         ConstFunction* const_function = ((EntityConstFunction&) entity_const_function).const_function;
-        EntityValue* value_entity = new EntityValue(std::make_unique<Value>(const_function->ft->clone()));
+        Value* value_entity = std::make_unique<Value>(const_function->ft->clone()).release();
         info.set_entity(value_entity);
 
-        if (value_entity->value->type->is_generic()) {
+        if (value_entity->type->is_generic()) {
             this->error_reporter.fail("Error: you need to specialize the generic function of type " +
-                                      value_entity->value->type->to_string() +
+                                      value_entity->type->to_string() +
                                       " to be able to use it without calling it");
         }
     }

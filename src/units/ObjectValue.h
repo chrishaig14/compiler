@@ -14,7 +14,7 @@ enum class Meta {
     ENUM, CLASS
 };
 
-class Value {
+class Value : public Entity {
 
 public:
     ast::Type* type;
@@ -24,14 +24,14 @@ public:
     };
     Meta metatype;
 
-    Value(ast::Type* type) {
+    Value(ast::Type* type) : Entity(E_TYPE::VALUE) {
         this->clazz = nullptr;
         this->enumm = nullptr;
         assert(type != nullptr);
         this->type = type;
     }
 
-    Value* clone() const {
+    Entity* clone() const override {
         auto* v = new Value(type);
         v->metatype = this->metatype;
         switch (this->metatype) {
@@ -46,23 +46,28 @@ public:
         }
         return v;
     }
-};
-
-
-class EntityValue : public Entity {
-public:
-    explicit EntityValue(std::unique_ptr<Value> value) : Entity(E_TYPE::VALUE), value(std::move(value)) {
-    }
-
-    std::unique_ptr<Value> value;
 
     bool equal(const Entity& other) const override {
-        return false;
-    }
-
-    Entity* clone() const override {
-        return new EntityValue(std::unique_ptr<Value>(this->value->clone()));
+        auto& o = (const Value&) other;
+        return this->metatype == o.metatype && *this->type == *o.type && this->clazz == o.clazz;
     }
 };
+
+
+// class EntityValue : public Entity {
+// public:
+//     explicit EntityValue(std::unique_ptr<Value> value) : Entity(E_TYPE::VALUE), value(std::move(value)) {
+//     }
+//
+//     std::unique_ptr<Value> value;
+//
+//     bool equal(const Entity& other) const override {
+//         return false;
+//     }
+//
+//     Entity* clone() const override {
+//         return new EntityValue(std::unique_ptr<Value>(this->value->clone()));
+//     }
+// };
 
 #endif //XLANG_OBJECTVALUE_H

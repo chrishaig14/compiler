@@ -77,7 +77,7 @@ make_for_snode(ast::For& node, USemanticInfoBlock& binfo, USemanticInfo& exp_inf
 class Checker {
     int loop_count;
     bool add_this;
-    std::map<std::string, std::unique_ptr<EntityValue>> entity_values_no_generic;
+    std::map<std::string, std::unique_ptr<Value>> entity_values_no_generic;
     std::unordered_map<std::string, SymbolTable*> scopes;
     SymbolTable* scope;
     std::map<std::string, Entity*> entities;
@@ -181,7 +181,7 @@ public:
     // USemanticInfo visit_throw(ast::ThrowNode& n);
     void init();
     USemanticInfo dispatch_any(ast::Node& n, bool is_rvalue);
-    EntityValue& entity_value_from_actual_base_path_no_generic(const Path& p);
+    Value& entity_value_from_actual_base_path_no_generic(const Path& p);
 };
 
 #endif //CHECKER_H
