@@ -219,10 +219,7 @@ USemanticInfo Checker::visit_emptydict(ast::EmptyDict& node) {
     this->fill_value(*ov);
     assert(ov->clazz != nullptr);
     info.set_entity(new EntityValue(std::move(ov)));
-    auto nsn = std::make_unique<sem::Dict>(std::vector<std::pair<USNode, USNode>>{});
-    info.snode = std::move(nsn);
-    return info_u;
-
+    info.snode = std::make_unique<sem::Dict>(std::vector<std::pair<USNode, USNode>>{});
     return info_u;
 }
 
