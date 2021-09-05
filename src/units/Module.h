@@ -18,11 +18,12 @@ public:
     const std::string name;
     const std::string abs_path;
     const bool is_lib;
-    const Path path;
-    
-    std::vector<std::unique_ptr<ConstFunction>> const_functions;
-    CodeLines code_lines;
+    const std::string full_header_path;
 
+    const Path path;
+    std::vector<std::unique_ptr<ConstFunction>> const_functions;
+
+    CodeLines code_lines;
     ast::UBlock ast;
     std::unique_ptr<sem::Block> sast;
     std::map<std::string, std::string> included_module_paths;
@@ -33,7 +34,6 @@ public:
     std::vector<std::pair<std::string, Path>> imported_paths_with_alias_v;
     std::map<std::string, Entity*> imports;
     std::map<std::string, Flirpin> flirpins;
-    std::string full_header_path;
 
     Flirpin get(Path p);
     Module(Path path, std::string abs_path, std::string rel_path, bool is_lib, std::string full_header_path);
