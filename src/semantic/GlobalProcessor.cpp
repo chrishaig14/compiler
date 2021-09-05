@@ -73,6 +73,13 @@ void GlobalProcessor::visit_function(ast::Function& node) {
     node.const_function = const_function;
 }
 
+Enum* make_enum(ast::EnumNode& n, Path module_path) {
+    Enum* enumm = new Enum(n.id, Path(module_path, n.id), n.values);
+    enumm->functions["__eq__"] = new ConstFunction(Path(enumm->path, "__eq__"), nullptr);;
+    enumm->functions["__ne__"] = new ConstFunction(Path(enumm->path, "__ne__"), nullptr);
+    return enumm;
+}
+
 void GlobalProcessor::visit_root() {
     // process imports first
     // process classes second
@@ -96,12 +103,7 @@ void GlobalProcessor::visit_root() {
                                          Path(this->module.path, ((ast::Klass&) n).class_name));
             this->module.flirpins[((ast::Klass&) n).class_name] = Flirpin{.type=F_TYPE::CLASS, .clazz=class_info};
         } else if (n.ntype == NodeType::ENUM) {
-            Enum* enumm = new Enum();
-            enumm->enumm_name = ((ast::EnumNode&) n).id;
-            enumm->values = ((ast::EnumNode&) n).values;
-            enumm->path = Path(this->module.path, enumm->enumm_name);
-            enumm->functions["__eq__"] = new ConstFunction(Path(enumm->path, "__eq__"), nullptr);;
-            enumm->functions["__ne__"] = new ConstFunction(Path(enumm->path, "__ne__"), nullptr);
+            Enum* enumm = make_enum((ast::EnumNode&) n, this->module.path);
             this->module.flirpins[enumm->enumm_name] = Flirpin{.type=F_TYPE::ENUM, .enumm=enumm};
         }
     }

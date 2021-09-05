@@ -10,9 +10,14 @@
 
 class Enum {
 public:
-    VectorOfStrings values;
-    std::string enumm_name;
-    Path path;
+    const VectorOfStrings values;
+    const std::string enumm_name;
+    const Path path;
+
+    Enum(std::string enumm_name, Path path, VectorOfStrings values)
+            : values(values), enumm_name(enumm_name), path(path) {
+    }
+
     std::map<std::string, ConstFunction*> functions;
 };
 
