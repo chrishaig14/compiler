@@ -92,9 +92,9 @@ void GlobalProcessor::visit_root() {
         auto& n = *np;
         if (n.ntype == NodeType::CLS) {
             // this->dispatch(n);
-            auto* class_info = new Class();
+            auto* class_info = new Class(((ast::Klass&) n).class_name,
+                                         Path(this->module.path, ((ast::Klass&) n).class_name));
             this->module.flirpins[((ast::Klass&) n).class_name] = Flirpin{.type=F_TYPE::CLASS, .clazz=class_info};
-            class_info->path = Path(this->module.path, ((ast::Klass&) n).class_name);
         } else if (n.ntype == NodeType::ENUM) {
             Enum* enumm = new Enum();
             enumm->enumm_name = ((ast::EnumNode&) n).id;
@@ -227,9 +227,9 @@ void GlobalProcessor::visit_class(ast::Klass& node) {
         class_info->static_methods.insert(make_pair(f.first, cf));
     }
 
-    class_info->class_name = node.class_name;
+    // class_info->class_name = node.class_name;
     class_info->type_params = node.type_parameters;
-    class_info->path = Path(this->module.path, class_info->class_name);
+    // class_info->path = Path(this->module.path, class_info->class_name);
 }
 
 void GlobalProcessor::dispatch(ast::Node& nod) {

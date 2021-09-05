@@ -214,8 +214,8 @@ USemanticInfo Checker::visit_function(ast::Function& n) {
         params.insert(params.begin(), "this");
     }
     if (n.implicit != nullptr) {
-        Class* clazz = new Class();
-        clazz->class_name = n.implicit->type;
+        Class* clazz = new Class(n.implicit->type, Path("core.implicits." + n.implicit->type));
+        // clazz->class_name = ;
         ConstFunction* c = new ConstFunction(Path("implicit_a"), n.implicit->ft);
         this->module.fill_actual(*c->ft);
         if (n.implicit->is_static) {
@@ -272,11 +272,15 @@ USemanticInfo Checker::visit_function(ast::Function& n) {
             ast::Node& last_node = *n.body->nodes.back();
             if (last_node.ntype != NodeType::RETRN) {
                 // it's not a return statement, error
-                this->error_reporter.error(std::make_unique<ErrorFunctionReturnLastStmt>(function_name, returnType, last_node.start));
+                this->error_reporter.error(std::make_unique<ErrorFunctionReturnLastStmt>(function_name,
+                                                                                         returnType,
+                                                                                         last_node.start));
                 return error_stub();
             }
         } else {
-            this->error_reporter.error(std::make_unique<ErrorFunctionReturnLastStmt>(function_name, returnType, n.start));
+            this->error_reporter.error(std::make_unique<ErrorFunctionReturnLastStmt>(function_name,
+                                                                                     returnType,
+                                                                                     n.start));
             return error_stub();
         }
     }

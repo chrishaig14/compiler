@@ -109,7 +109,7 @@ USemanticInfo Checker::visit_tuple(ast::Tuple& node) {
     auto ov = std::make_unique<Value>(otype);
     ov->metatype = Meta::CLASS;
 
-    ov->clazz = new Class();
+    ov->clazz = new Class("Tuple", Path("core.core.Tuple"));
     for (size_t i = 0; i < ov->type->object().type_params.size(); i++) {
         auto tv = std::make_unique<Value>(ov->type->object().type_params[i]->clone());
         this->fill_value(*tv);

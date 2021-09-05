@@ -247,8 +247,8 @@ void Checker::fill_value(Value& value) {
         Entity& e = this->scope->get(value.type->object().id);
         Class* clazz;
         if (e.type == E_TYPE::NOT_FOUND) {
-            clazz = new Class();
-            clazz->class_name = value.type->object().id;
+            clazz = new Class(value.type->object().id, Path("core.generics" + value.type->object().id));
+            // clazz->class_name = value.type->object().id;
         } else {
             clazz = ((EntityClass&) e).clazz;
         }
@@ -330,17 +330,19 @@ USemanticInfo Checker::visit_ternary(ast::Ternary& node) {
     Entity& p_entity = expression_info.entity;
     if (p_entity.type != E_TYPE::VALUE ||
         ((EntityValue&) expression_info_p->entity).value->type->kind == Kind::FUNCTION) {
-        this->error_reporter.error(std::make_unique<ErrorTypeMismatch>(*new ast::ObjectType("Option", {new ast::ObjectType("t")}),
-                                                     *node.expression,
-                                                     expression_info_p->entity));
+        this->error_reporter.error(std::make_unique<ErrorTypeMismatch>(*new ast::ObjectType("Option",
+                                                                                            {new ast::ObjectType("t")}),
+                                                                       *node.expression,
+                                                                       expression_info_p->entity));
         return error_stub();
     }
     ast::ObjectType& expression_type = ((EntityValue&) p_entity).value->type->object();
 
     if (expression_type.id != "Option") {
-        this->error_reporter.error(std::make_unique<ErrorTypeMismatch>(*new ast::ObjectType("Option", {new ast::ObjectType("t")}),
-                                                     *node.expression,
-                                                     expression_info_p->entity));
+        this->error_reporter.error(std::make_unique<ErrorTypeMismatch>(*new ast::ObjectType("Option",
+                                                                                            {new ast::ObjectType("t")}),
+                                                                       *node.expression,
+                                                                       expression_info_p->entity));
         return error_stub();
     }
     this->enter_scope("true_case");
@@ -362,6 +364,8 @@ USemanticInfo Checker::visit_ternary(ast::Ternary& node) {
     USemanticInfo info_u = std::make_unique<SemanticInfo>();
     SemanticInfo& info = *info_u;
     info.set_entity(new EntityValue(std::move(rv)));
-    info.snode = std::make_unique<sem::Ternary>(expression_info_p->snode.release(), true_case.snode.release(), false_case_snode.release());
+    info.snode = std::make_unique<sem::Ternary>(expression_info_p->snode.release(),
+                                                true_case.snode.release(),
+                                                false_case_snode.release());
     return info_u;
 }

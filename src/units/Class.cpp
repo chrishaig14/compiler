@@ -37,4 +37,3 @@ Class::~Class() {
     }
 }
 
-Class::Class() = default;

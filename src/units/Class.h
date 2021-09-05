@@ -17,7 +17,9 @@
 
 class Class {
 public:
-    Class();
+    Class(const std::string& class_name, Path path) : path(path), class_name(class_name) {
+    }
+
     VectorOfStrings member_names;
     std::vector<ast::Type*> member_types;
     std::unordered_map<std::string, Entity*> member_entities;
@@ -28,16 +30,15 @@ public:
     std::map<std::string, std::pair<ast::Type*, ast::Node*>> static_members;
     std::unordered_map<std::string, ConstFunction*> static_methods;
 
-    std::string class_name;
+    const Path path;
+    const std::string class_name;
 
     ~Class();
 
     bool operator!=(const Class& b) const;
 
     bool operator==(const Class& b) const;
-
     VectorOfStrings type_params;
-    Path path;
 };
 
 #endif //CLASSINFO_H

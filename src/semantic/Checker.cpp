@@ -255,13 +255,13 @@ Class* Checker::instantiate_generic(Class* generic, const ast::ObjectType& insta
         concrete_static_methods[m.first] = cf;
     }
 
-    auto* concrete = new Class();
-    concrete->class_name = generic->class_name;
+    auto* concrete = new Class(generic->class_name, generic->path);
+    // concrete->class_name = ;
     concrete->methods = concrete_methods;
     concrete->static_methods = concrete_static_methods;
     concrete->member_names = generic->member_names;
     concrete->member_types = concrete_field_types;
-    concrete->path = generic->path;
+    // concrete->path = generic->path;
     for (size_t i = 0; i < generic->member_names.size(); i++) {
         std::string mn = generic->member_names[i];
         concrete->members[mn] = concrete_field_types[i];
