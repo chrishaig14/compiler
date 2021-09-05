@@ -179,7 +179,7 @@ USemanticInfo Checker::enum_member(Enum* enumm, const std::string& value, ast::M
     for (size_t i = 0; i < enumm->values.size(); i++) {
         if (value == enumm->values[i]) {
             auto* otype = new ast::ObjectType(enumm->enumm_name, {});
-            otype->actual_base_path = enumm->path;
+            otype->data.actual_base_path = enumm->path;
             auto ov = std::make_unique<Value>(otype);
             info.entity = *new EntityValue(std::move(ov));
             // this->fill_value(info.entity.value);

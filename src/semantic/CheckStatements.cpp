@@ -229,8 +229,8 @@ USemanticInfo Checker::visit_match(ast::Match& node) {
     }
 
     ast::ObjectType* ot = &((EntityValue&) exp_info->entity).value->type->object();
-    if (ot->aliased_type != nullptr) {
-        ot = (ast::ObjectType*) ot->aliased_type;
+    if (ot->data.aliased_type != nullptr) {
+        ot = (ast::ObjectType*) ot->data.aliased_type;
     }
     if (ot->id != "Union") {
         this->error_reporter.error(std::make_unique<ErrorTypeMismatch>(*new ast::ObjectType("Union", {new ast::ObjectType("...", {})}),

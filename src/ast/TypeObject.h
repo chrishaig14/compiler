@@ -8,32 +8,29 @@
 #include "Type.h"
 #include "Path.h"
 
+class ObjectTypeData {
+public:
+    Path actual_base_path;
+    ast::Type* aliased_type;
+};
+
 class ast::ObjectType : public ast::Type {
 public:
-    ObjectType(const std::string& identifier, const ast::VectorOfTypes& typeParameters);
-
-    explicit ObjectType(const std::string& identifier);
-
-    bool equal(const ast::Type& other) const override;
-
-    std::string to_string() const override;
-    std::string actual_to_string() const override;
-
-    ast::Type* clone() const override;
-
-    ast::ObjectType& object() override;
-
-    const ast::ObjectType& object() const override;
-
-    nlohmann::json to_json() const override;
-
-    ~ObjectType() override;
-
-    Path actual_base_path;
     std::string id;
     ast::VectorOfTypes type_params;
+    ObjectTypeData data;
+
+    ObjectType(const std::string& identifier, const ast::VectorOfTypes& typeParameters);
+    explicit ObjectType(const std::string& identifier);
+    bool equal(const ast::Type& other) const override;
+    std::string to_string() const override;
+    std::string actual_to_string() const override;
+    ast::Type* clone() const override;
+    ast::ObjectType& object() override;
+    const ast::ObjectType& object() const override;
+    nlohmann::json to_json() const override;
+    ~ObjectType() override;
     bool is_generic() const override;
-    ast::Type* aliased_type;
 };
 
 #endif //XLANG_TYPEOBJECT_H

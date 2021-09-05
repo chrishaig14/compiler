@@ -290,7 +290,7 @@ Path Module::get_actual_path(const std::string& id) {
 void Module::fill_actual(ast::Type& t) {
     if (t.kind == Kind::OBJECT) {
         if (this->aliased_types.count(t.object().id) != 0) {
-            t.object().aliased_type = this->aliased_types[t.object().id];
+            t.object().data.aliased_type = this->aliased_types[t.object().id];
             return;
         }
         this->fill_actual(t.object());
@@ -308,7 +308,7 @@ void Module::fill_actual(ast::ObjectType& t) {
     if (t.is_generic_param) {
         return;
     }
-    t.actual_base_path = this->get_actual_path(t.id);
+    t.data.actual_base_path = this->get_actual_path(t.id);
     for (auto* tp: t.type_params) {
         this->fill_actual(*tp);
     }

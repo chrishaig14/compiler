@@ -12,7 +12,7 @@ ObjectType::ObjectType(const std::string& identifier, const ast::VectorOfTypes& 
         assert(p != nullptr);
     }
     this->kind = Kind::OBJECT;
-    this->aliased_type = nullptr;
+    this->data.aliased_type = nullptr;
     this->is_generic_param = false;
 }
 
@@ -23,9 +23,9 @@ ast::Type* ObjectType::clone() const {
     }
 
     auto* n = new ast::ObjectType(this->id, aux);
-    n->actual_base_path = this->actual_base_path;
+    n->data.actual_base_path = this->data.actual_base_path;
     n->is_generic_param = this->is_generic_param;
-    n->aliased_type = this->aliased_type;
+    n->data.aliased_type = this->data.aliased_type;
     return n;
 }
 
@@ -58,9 +58,9 @@ std::string ObjectType::actual_to_string() const {
     }
     if (!parameters.empty()) {
         parameters = parameters.substr(0, parameters.size() - 2);
-        return this->actual_base_path.as_str() + "[" + parameters + "]";
+        return this->data.actual_base_path.as_str() + "[" + parameters + "]";
     }
-    return this->actual_base_path.as_str();
+    return this->data.actual_base_path.as_str();
 }
 
 bool ObjectType::equal(const ast::Type& other) const {

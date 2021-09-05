@@ -45,13 +45,13 @@ USNode Checker::make_rvalue(const Entity& t_entity, USNode value_snode, const as
         const ast::ObjectType& target_ot = target.object();
 
         const ast::Type* unaliased_value_type = &value_ot;
-        if (value_ot.aliased_type != nullptr) {
-            unaliased_value_type = value_ot.aliased_type;
+        if (value_ot.data.aliased_type != nullptr) {
+            unaliased_value_type = value_ot.data.aliased_type;
         }
 
         const ast::Type* unaliased_target_type = &target_ot;
-        if (target_ot.aliased_type != nullptr) {
-            unaliased_target_type = target_ot.aliased_type;
+        if (target_ot.data.aliased_type != nullptr) {
+            unaliased_target_type = target_ot.data.aliased_type;
         }
 
         if (unaliased_value_type->kind != Kind::OBJECT || unaliased_target_type->kind != Kind::OBJECT) {

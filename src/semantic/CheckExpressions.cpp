@@ -15,7 +15,7 @@
 EntityValue& Checker::entity_value_from_actual_base_path_no_generic(const Path& p) {
     if (this->entity_values_no_generic.count(p.as_str()) == 0) {
         auto* ot = new ast::ObjectType(p.as_vec().back());
-        ot->actual_base_path = p;
+        ot->data.actual_base_path = p;
         auto v = std::make_unique<Value>(ot);
         this->fill_value(*v);
         auto entity = std::make_unique<EntityValue>(std::move(v));
@@ -257,7 +257,7 @@ void Checker::fill_value(Value& value) {
         value.metatype = Meta::CLASS;
         return;
     }
-    Flirpin flirpin = this->top_package.get(value.type->object().actual_base_path);
+    Flirpin flirpin = this->top_package.get(value.type->object().data.actual_base_path);
     if (flirpin.type == F_TYPE::ENUM) {
         value.enumm = flirpin.enumm;
         value.metatype = Meta::ENUM;

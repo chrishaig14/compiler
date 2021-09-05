@@ -107,7 +107,7 @@ USemanticInfo Checker::visit_class(ast::Klass& node) {
 
     for (const auto& method: node.methods) {
         auto* vt = new ast::ObjectType(node.class_name);
-        vt->actual_base_path = clazz->path;
+        vt->data.actual_base_path = clazz->path;
         auto val = std::make_unique<Value>(vt);
         this->add_this = true;
         this->this_entity = new EntityValue(std::move(val));
