@@ -247,8 +247,7 @@ USemanticInfo Checker::visit_defconst(ast::DefaultConstructor& node) {
     auto* rt = new ast::ObjectType(cls.class_name, tp);
     rt->data.actual_base_path = cls.path;
     info.set_entity(new EntityConstFunction(new ConstFunction(Path(), new ast::FunctionType(t, ast::UTypeNode(rt)))));
-    auto idn = std::make_unique<sem::Id>(cls.path.as_str() + "." + "__init__");
-    info.snode = std::move(idn);
+    info.snode = std::make_unique<sem::Id>(cls.path.as_str() + "." + "__init__");
     return info_u;
 }
 
