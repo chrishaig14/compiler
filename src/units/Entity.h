@@ -81,7 +81,8 @@ public:
     }
 
     bool equal(const Entity& other) const override {
-        return false;
+
+        return this->clazz == ((const EntityClass&) other).clazz;
     }
 
     Entity* clone() const override {

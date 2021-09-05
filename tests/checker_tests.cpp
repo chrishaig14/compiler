@@ -269,7 +269,8 @@ TEST_CASE("list_literal", "[checker]") {
     REQUIRE(checker.error_reporter.errors.size() == 0);
     REQUIRE(info->entity.get().type == E_TYPE::VALUE);
     REQUIRE(((EntityValue&) (info->entity.get())).value->metatype == Meta::CLASS);
-    REQUIRE(*((EntityValue&) (info->entity.get())).value->type == ast::ObjectType("List", {new ast::ObjectType("Integer")}));
+    REQUIRE(*((EntityValue&) (info->entity.get())).value->type ==
+            ast::ObjectType("List", {new ast::ObjectType("Integer")}));
 }
 
 TEST_CASE("empty_list_literal", "[checker]") {
@@ -287,7 +288,8 @@ TEST_CASE("empty_list_literal", "[checker]") {
     REQUIRE(checker.error_reporter.errors.size() == 0);
     REQUIRE(info->entity.get().type == E_TYPE::VALUE);
     REQUIRE(((EntityValue&) (info->entity.get())).value->metatype == Meta::CLASS);
-    REQUIRE(*((EntityValue&) (info->entity.get())).value->type == ast::ObjectType("List", {new ast::ObjectType("String")}));
+    REQUIRE(*((EntityValue&) (info->entity.get())).value->type ==
+            ast::ObjectType("List", {new ast::ObjectType("String")}));
 }
 
 TEST_CASE("empty_dict_literal", "[checker]") {
@@ -381,8 +383,9 @@ TEST_CASE("decl_error_expected_expression", "[checker]") {
     REQUIRE(checker.error_reporter.errors.size() == 1);
 
     Error& error = *checker.error_reporter.errors.back();
-    Class cl;
-    EntityClass ec(&cl);
+    // Class cl;
+    Class* cl = module.get(Path("Integer")).clazz;
+    EntityClass ec(cl);
     ErrorExpectedExpression exp(ec, declaration_node.expression);
     REQUIRE(error == exp);
 }

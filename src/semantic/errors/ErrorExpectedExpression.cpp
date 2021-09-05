@@ -5,7 +5,7 @@
 #include "ErrorExpectedExpression.h"
 
 Error* ErrorExpectedExpression::clone() const {
-    return new ErrorExpectedExpression(this->entity, this->node);
+    return new ErrorExpectedExpression(*this->entity, this->node);
 }
 
 bool ErrorExpectedExpression::equal(const Error& other) const {
@@ -16,10 +16,10 @@ bool ErrorExpectedExpression::equal(const Error& other) const {
 }
 
 std::string ErrorExpectedExpression::to_str() const {
-    return "Error: expected expression, got " + entity_to_string(this->entity);
+    return "Error: expected expression, got " + entity_to_string(*this->entity);
 }
 
 ErrorExpectedExpression::ErrorExpectedExpression(const Entity& entity, const ast::Node& node)
-        : entity(entity), node(node) {
+        : entity(entity.clone()), node(node) {
 
 }

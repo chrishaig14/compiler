@@ -55,10 +55,9 @@ void GlobalProcessor::visit_function(ast::Function& node) {
     ConstFunction* const_function = this->module.flirpins[node.identifier].const_function;
 
     ast::VectorOfTypes x;
-    for (auto& p: node.parameter_types) {
-        ast::Type& type_node = *p;
+    for (ast::Type& type_node: node.parameter_types) {
         this->module.fill_actual(type_node);
-        x.emplace_back(p->clone());
+        x.emplace_back(type_node.clone());
     }
     ast::Type& p = *node.return_type;
     this->module.fill_actual(p);
@@ -194,10 +193,10 @@ void GlobalProcessor::visit_class(ast::Klass& node) {
         ast::Function& method = *f.second->method;
 
         ast::VectorOfTypes x;
-        for (auto& p: method.parameter_types) {
-            this->module.fill_actual(*p);
+        for (ast::Type& p: method.parameter_types) {
+            this->module.fill_actual(p);
             // p->object().actual_base_path = this->get_actual_path(p->object().id);
-            x.emplace_back(p->clone());
+            x.emplace_back(p.clone());
         }
         this->module.fill_actual(*method.return_type);
         // method.return_type->object().actual_base_path = this->get_actual_path(method.return_type->object().id);
@@ -213,10 +212,10 @@ void GlobalProcessor::visit_class(ast::Klass& node) {
     for (const auto& f: node.static_methods) {
         ast::Function& method = *f.second;
         ast::VectorOfTypes x;
-        for (auto& p: method.parameter_types) {
-            this->module.fill_actual(*p);
+        for (ast::Type& p: method.parameter_types) {
+            this->module.fill_actual(p);
             // p->object().actual_base_path = this->get_actual_path(p->object().id);
-            x.emplace_back(p->clone());
+            x.emplace_back(p.clone());
         }
         this->module.fill_actual(*method.return_type);
         // method.return_type->object().actual_base_path = this->get_actual_path(method.return_type->object().id);

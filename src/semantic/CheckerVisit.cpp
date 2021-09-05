@@ -228,7 +228,7 @@ USemanticInfo Checker::visit_function(ast::Function& n) {
         params.push_back("implicit_a");
     }
     for (size_t i = 0; i < n.parameter_names.size(); i++) {
-        ast::Type& type = *n.parameter_types[i];
+        ast::Type& type = n.parameter_types[i];
         ast::Type* cl = type.clone();
         make_not_generic(*cl);
         auto te = entity_from_type(*cl);

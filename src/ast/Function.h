@@ -23,11 +23,12 @@ struct Implicit {
 };
 
 class ast::Function : public ast::Node {
+    ast::VectorOfUTypes _parameter_types;
 public:
+    std::vector<std::reference_wrapper<ast::Type>> parameter_types;
     Implicit* implicit;
     std::string identifier;
     VectorOfStrings parameter_names;
-    ast::VectorOfUTypes parameter_types;
     std::unique_ptr<ast::Block> body;
     ast::UTypeNode return_type;
     Function(std::string identifier, const VectorOfStrings& parameter_names, ast::VectorOfUTypes& parameter_types,
