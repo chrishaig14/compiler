@@ -72,8 +72,7 @@ USemanticInfo Checker::visit_emptylist(ast::EmptyList& node) {
     this->fill_value(*ov);
     info.set_entity(new EntityValue(std::move(ov)));
     std::vector<USNode> v;
-    auto lsn = std::make_unique<sem::List>(std::move(v));
-    info.snode = std::move(lsn);
+    info.snode = std::make_unique<sem::List>(std::move(v));
     // non->class_name = "core.List";
     return info_u;
 }
