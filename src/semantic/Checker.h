@@ -51,17 +51,17 @@
 #include "../simple_nodes/Match.h"
 #include "CheckerUtils.h"
 #include "../ast/UnaryOp.h"
-#include "../ast/ObjectType.h"
+#include "../ast/TypeObject.h"
 
 #define T_NONE ast::ObjectType(".None")
 
 typedef std::unique_ptr<SemanticInfo> USemanticInfo;
 typedef std::unique_ptr<SemanticInfoBlock> USemanticInfoBlock;
 
-bool is_generic(const ast::TypeNode& t);
+bool is_generic(const ast::Type& t);
 ast::UTypeNode make_type_from_object_pattern(const ast::ObjectType& object_type, const MapStringType& replacements);
 ast::UTypeNode make_type_from_function_pattern(const ast::FunctionType& ftn, const MapStringType& replacements);
-ast::UTypeNode make_type(const ast::TypeNode& original, const MapStringType& replacements);
+ast::UTypeNode make_type(const ast::Type& original, const MapStringType& replacements);
 SemanticInfo match_arguments_to_generic_function(const ast::FunctionType& function_type, ast::VectorOfTypes arg_types);
 USemanticInfo error_stub();
 Entity* map_flirpin_to_entity(Flirpin flirpin);
@@ -91,24 +91,24 @@ public:
     Checker(Package& top_package, Module& module);
     ~Checker();
 
-    Entity* entity_from_type(const ast::TypeNode& type);
+    Entity* entity_from_type(const ast::Type& type);
 
-    bool is_immutable(const ast::TypeNode& node);
+    bool is_immutable(const ast::Type& node);
     void enter_scope(const std::string& name);
     void leave_scope();
-    bool assert_type_exists(const ast::TypeNode& type, TextPosition pos);
+    bool assert_type_exists(const ast::Type& type, TextPosition pos);
     Class* instantiate_generic(Class* generic, const ast::ObjectType& instance);
     bool is_variable(const ast::ObjectType& a);
-    std::pair<std::string, ast::TypeNode*>*
+    std::pair<std::string, ast::Type*>*
     get_first_substitution_function(ast::FunctionType& a, ast::FunctionType& b, bool is_top_level_arg);
-    std::pair<std::string, ast::TypeNode*>*
+    std::pair<std::string, ast::Type*>*
     get_first_substitution_object(ast::ObjectType& a, ast::ObjectType& b, bool is_top_level_arg);
-    std::pair<std::string, ast::TypeNode*>* get_first_substitution(ast::TypeNode& a, ast::TypeNode& b, bool is_top_level_arg);
-    ast::UTypeNode substitute(const ast::TypeNode& t, const std::string& var, const ast::TypeNode& replacement);
+    std::pair<std::string, ast::Type*>* get_first_substitution(ast::Type& a, ast::Type& b, bool is_top_level_arg);
+    ast::UTypeNode substitute(const ast::Type& t, const std::string& var, const ast::Type& replacement);
     std::unique_ptr<ast::FunctionType> unify_function_call(const ast::FunctionType& fun, ast::VectorOfTypes& args,
-                                                      std::map<std::string, ast::TypeNode*>& all_substitutions);
+                                                      std::map<std::string, ast::Type*>& all_substitutions);
     std::unique_ptr<SemanticInfo> match_arguments_to_generic_function(const ast::FunctionType& ft, ast::VectorOfTypes arg_types,
-                                                                      std::map<std::string, ast::TypeNode*>& all_substitutions);
+                                                                      std::map<std::string, ast::Type*>& all_substitutions);
     void fail(std::string msg);
 
     USemanticInfo dispatch_rvalue(ast::Node& nod);
@@ -163,20 +163,20 @@ public:
     USemanticInfo visit_alias(ast::Alias& p_node);
     USemanticInfo enum_member(Enum* enumm, const std::string& value, ast::Member& node);
     USemanticInfo visit_enum(ast::EnumNode& p_node);
-    USNode make_rvalue(const Entity& t_entity, USNode value_snode, const ast::TypeNode& target);
+    USNode make_rvalue(const Entity& t_entity, USNode value_snode, const ast::Type& target);
     USemanticInfo dispatch(ast::Node& nod);
     void fill_value(Value& value);
-    std::unique_ptr<SemanticInfo> expect_rvalue_of_type(const ast::TypeNode& target, ast::Node& node);
+    std::unique_ptr<SemanticInfo> expect_rvalue_of_type(const ast::Type& target, ast::Node& node);
     void process_function_arguments(SemanticInfo& retv, std::vector<Entity*>& arg_entities, std::vector<USNode>& arguments,
                                     ast::Call& n, const ast::FunctionType& function_type, SemanticInfo* fun_info_p);
     bool check_arguments(ast::Call& n, std::vector<USNode>& sn, ast::VectorOfTypes& arg_types,
                          std::vector<Entity*>& arg_entities);
     USemanticInfo
     make_return_info(const ast::Call& n, bool is_rvalue, USemanticInfo retv, bool is_def_const, bool args_are_constant);
-    USNode make_union_rvalue(USNode value_snode, const ast::TypeNode* unaliased_value_type,
-                             const ast::TypeNode* unaliased_target_type) const;
-    sem::SNode* make_option_rvalue(sem::SNode* value_snode, const ast::TypeNode* unaliased_value_type,
-                                   const ast::TypeNode* unaliased_target_type) const;
+    USNode make_union_rvalue(USNode value_snode, const ast::Type* unaliased_value_type,
+                             const ast::Type* unaliased_target_type) const;
+    sem::SNode* make_option_rvalue(sem::SNode* value_snode, const ast::Type* unaliased_value_type,
+                                   const ast::Type* unaliased_target_type) const;
     // USemanticInfo visit_throw(ast::ThrowNode& n);
     void init();
     USemanticInfo dispatch_any(ast::Node& n, bool is_rvalue);

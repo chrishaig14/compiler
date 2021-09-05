@@ -19,7 +19,7 @@
 #include "../simple_nodes/with_unique/Return.h"
 #include "../ast/nodes.h"
 #include "SemanticInfo.h"
-#include "../ast/ObjectType.h"
+#include "../ast/TypeObject.h"
 //
 // Created by chris on 2/5/21.
 //
@@ -28,9 +28,9 @@
 
 std::string binoptype_to_str(OpType op);
 
-int target_union_type(const ast::ObjectType& target, const ast::TypeNode& source);
+int target_union_type(const ast::ObjectType& target, const ast::Type& source);
 
-Entity* entity_from_type(const ast::TypeNode& type);
+Entity* entity_from_type(const ast::Type& type);
 
 ast::Function* generate_eq_method(std::string class_name, ast::VectorOfTypes tp, VectorOfStrings members_ordered);
 
@@ -38,15 +38,15 @@ ast::Function* generate_str_method(std::string class_name);
 
 sem::FunctionDef* make_class_default_init(const std::string& class_path, const VectorOfStrings& members);
 
-ast::TypeNode* get_entity_type(Entity& e);
+ast::Type* get_entity_type(Entity& e);
 
-void mangle_generic_names(ast::TypeNode& t);
+void mangle_generic_names(ast::Type& t);
 void mangle_generic_names(ast::FunctionType& t);
 void mangle_generic_names(ast::ObjectType& t);
 
 void make_not_generic(ast::FunctionType& ft);
 void make_not_generic(ast::ObjectType& ot);
-void make_not_generic(ast::TypeNode& t);
+void make_not_generic(ast::Type& t);
 
 USNode make_union_wrapper(int type_index, USNode expression);
 

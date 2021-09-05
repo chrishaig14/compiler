@@ -12,19 +12,19 @@
 #include "errors/ErrorFunctionCallNumArgs.h"
 #include "errors/ErrorEnumNoValue.h"
 
-std::pair<std::string, ast::TypeNode*>*
+std::pair<std::string, ast::Type*>*
 Checker::get_first_substitution_object(ast::ObjectType& a, ast::ObjectType& b, bool is_top_level_arg) {
     if (is_variable(a) && is_variable(b) && a.object().id == b.object().id) {
         return nullptr;
     }
     if (is_variable(a)) {
-        return new std::pair<std::string, ast::TypeNode*>(a.object().id, b.clone());
+        return new std::pair<std::string, ast::Type*>(a.object().id, b.clone());
     }
     if (is_variable(b)) {
         if (is_top_level_arg) {
             this->error_reporter.fail("trying to replace var with concrete type at top level!");
         }
-        return new std::pair<std::string, ast::TypeNode*>(b.object().id, a.clone());
+        return new std::pair<std::string, ast::Type*>(b.object().id, a.clone());
     }
     if (a.id != b.id) {
         throw std::runtime_error("Error trying to unify object types" + a.to_string() + " and " + b.to_string());
@@ -35,9 +35,9 @@ Checker::get_first_substitution_object(ast::ObjectType& a, ast::ObjectType& b, b
         // this->error_reporter.fail("Error trying to unify object types " + a.to_string() + " and " + b.to_string());
     }
     for (size_t i = 0; i < a.type_params.size(); i++) {
-        std::pair<std::string, ast::TypeNode*>* u = get_first_substitution(*a.type_params[i],
-                                                                      *b.type_params[i],
-                                                                      is_top_level_arg);
+        std::pair<std::string, ast::Type*>* u = get_first_substitution(*a.type_params[i],
+                                                                       *b.type_params[i],
+                                                                       is_top_level_arg);
         if (u != nullptr) {
             return u;
         }
@@ -45,12 +45,12 @@ Checker::get_first_substitution_object(ast::ObjectType& a, ast::ObjectType& b, b
     return nullptr;
 }
 
-ast::UTypeNode Checker::substitute(const ast::TypeNode& t, const std::string& var, const ast::TypeNode& replacement) {
+ast::UTypeNode Checker::substitute(const ast::Type& t, const std::string& var, const ast::Type& replacement) {
     if (t.kind == Kind::OBJECT) {
         if (is_variable(t.object()) && t.object().id == var) {
             return ast::UTypeNode(replacement.clone());
         } else {
-            ast::TypeNode* c = t.clone();
+            ast::Type* c = t.clone();
             for (size_t i = 0; i < t.object().type_params.size(); i++) {
                 // auto old = c->object().type_params[i];
                 c->object().type_params[i] = substitute(*t.object().type_params[i], var, replacement).release();
@@ -59,7 +59,7 @@ ast::UTypeNode Checker::substitute(const ast::TypeNode& t, const std::string& va
             return ast::UTypeNode(c);
         }
     } else {
-        ast::TypeNode* c = t.clone();
+        ast::Type* c = t.clone();
         for (size_t i = 0; i < t.function().param_types.size(); i++) {
             c->function().param_types[i] = substitute(*t.function().param_types[i], var, replacement);
         }
@@ -69,7 +69,7 @@ ast::UTypeNode Checker::substitute(const ast::TypeNode& t, const std::string& va
     return nullptr;
 }
 
-std::pair<std::string, ast::TypeNode*>*
+std::pair<std::string, ast::Type*>*
 Checker::get_first_substitution_function(ast::FunctionType& a, ast::FunctionType& b, bool is_top_level_arg) {
     if (a.param_types.size() != b.param_types.size()) {
         this->error_reporter.fail(
@@ -77,12 +77,12 @@ Checker::get_first_substitution_function(ast::FunctionType& a, ast::FunctionType
                 b.to_string());
     }
     for (size_t i = 0; i < a.param_types.size(); i++) {
-        std::pair<std::string, ast::TypeNode*>* u = get_first_substitution(*a.param_types[i], *b.param_types[i], false);
+        std::pair<std::string, ast::Type*>* u = get_first_substitution(*a.param_types[i], *b.param_types[i], false);
         if (u != nullptr) {
             return u;
         }
     }
-    std::pair<std::string, ast::TypeNode*>* u = get_first_substitution(*a.return_type, *b.return_type, false);
+    std::pair<std::string, ast::Type*>* u = get_first_substitution(*a.return_type, *b.return_type, false);
     if (u != nullptr) {
         return u;
     }
@@ -90,7 +90,7 @@ Checker::get_first_substitution_function(ast::FunctionType& a, ast::FunctionType
 }
 
 std::unique_ptr<ast::FunctionType> Checker::unify_function_call(const ast::FunctionType& f, ast::VectorOfTypes& args,
-                                                           std::map<std::string, ast::TypeNode*>& all_substitutions) {
+                                                           std::map<std::string, ast::Type*>& all_substitutions) {
     ast::FunctionType& fun = *f.clone();
     if (args.size() != fun.param_types.size()) {
         this->error_reporter.error(std::make_unique<ErrorFunctionCallNumArgs>(fun.clone(), TextPosition{1, 1}));
@@ -101,7 +101,7 @@ std::unique_ptr<ast::FunctionType> Checker::unify_function_call(const ast::Funct
     for (size_t i = 0; i < args.size(); i++) {
         auto& param = fun.param_types[i];
         auto* arg = args[i];
-        std::pair<std::string, ast::TypeNode*>* substitution = get_first_substitution(*param, *arg, true);
+        std::pair<std::string, ast::Type*>* substitution = get_first_substitution(*param, *arg, true);
         while (substitution != nullptr) {
             for (size_t j = 0; j < args.size(); j++) {
                 // if (j == i) {
@@ -127,7 +127,7 @@ std::unique_ptr<ast::FunctionType> Checker::unify_function_call(const ast::Funct
     return std::unique_ptr<ast::FunctionType>(&fun);
 }
 
-std::pair<std::string, ast::TypeNode*>* Checker::get_first_substitution(ast::TypeNode& a, ast::TypeNode& b, bool is_top_level_arg) {
+std::pair<std::string, ast::Type*>* Checker::get_first_substitution(ast::Type& a, ast::Type& b, bool is_top_level_arg) {
     if (a.kind == Kind::FUNCTION && b.kind == Kind::OBJECT) {
         this->error_reporter.fail(
                 "Error trying to unify types of different kind" + a.to_string() + " and " + b.to_string());
@@ -136,7 +136,7 @@ std::pair<std::string, ast::TypeNode*>* Checker::get_first_substitution(ast::Typ
         if (!a.is_generic_param) {
             this->error_reporter.fail("Error trying to unify " + a.to_string() + " and " + b.to_string());
         }
-        return new std::pair<std::string, ast::TypeNode*>(a.object().id, b.clone());
+        return new std::pair<std::string, ast::Type*>(a.object().id, b.clone());
     }
     if (a.kind == Kind::FUNCTION) {
         return get_first_substitution_function(a.function(), b.function(), is_top_level_arg);
@@ -191,7 +191,7 @@ USemanticInfo Checker::enum_member(Enum* enumm, const std::string& value, ast::M
     return error_stub();
 }
 
-Entity* Checker::entity_from_type(const ast::TypeNode& type) {
+Entity* Checker::entity_from_type(const ast::Type& type) {
     if (this->entities.count(type.to_string()) == 1) {
         std::cout << "Entity already found, not copying!!!" << std::endl;
         return this->entities[type.to_string()];

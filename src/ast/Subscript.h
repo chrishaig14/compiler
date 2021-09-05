@@ -17,7 +17,7 @@ class ast::Subscript : public ast::Node {
 
 public:
     Subscript(ast::UNode& parent, ast::VectorOfNodesU& child, TextPosition start, TextPosition end);
-    ast::TypeNode* parent_t;
+    ast::Type* parent_t;
     ast::UNode parent;
     ast::VectorOfNodesU child;
 

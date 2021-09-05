@@ -8,7 +8,7 @@
 #include <string>
 #include <vector>
 #include <unordered_map>
-#include "../ast/TypeNode.h"
+#include "../ast/Type.h"
 #include "../utils.h"
 #include "SemanticInfo.h"
 
@@ -19,7 +19,7 @@ class SymbolTable {
 public:
     SymbolTable(const std::string& name, SymbolTable* parent);
 
-    std::vector<std::pair<std::string, ast::TypeNode*>> get_all();
+    std::vector<std::pair<std::string, ast::Type*>> get_all();
 
     Entity& get(const std::string& name);
 
@@ -44,7 +44,7 @@ public:
     bool is_function;
 
     bool is_loop;
-    std::vector<std::pair<std::string, ast::TypeNode*>> get_all_in_loop();
+    std::vector<std::pair<std::string, ast::Type*>> get_all_in_loop();
 };
 
 #endif //SYMBOLTABLE_H

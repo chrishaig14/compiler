@@ -19,7 +19,7 @@ struct TestNodeU {
 
 struct TestTypeNode {
     std::string text;
-    ast::TypeNode* node;
+    ast::Type* node;
 };
 
 const std::string& ID = "baz";

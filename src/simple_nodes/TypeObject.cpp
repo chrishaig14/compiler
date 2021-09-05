@@ -2,11 +2,12 @@
 // Created by chris on 3/7/21.
 //
 
+#include <cassert>
 #include "TypeObject.h"
 
-using namespace ast;
+using namespace sem;
 
-ObjectType::ObjectType(const std::string& identifier, const ast::VectorOfTypes& typeParameters)
+TypeObject::TypeObject(const std::string& identifier, const sem::VectorOfTypes& typeParameters)
         : id(identifier), type_params(typeParameters) {
     for (auto* p: typeParameters) {
         assert(p != nullptr);
@@ -16,26 +17,26 @@ ObjectType::ObjectType(const std::string& identifier, const ast::VectorOfTypes& 
     this->is_generic_param = false;
 }
 
-ast::Type* ObjectType::clone() const {
-    ast::VectorOfTypes aux;
+sem::Type* TypeObject::clone() const {
+    sem::VectorOfTypes aux;
     for (auto* p: this->type_params) {
         aux.emplace_back(p->clone());
     }
 
-    auto* n = new ast::ObjectType(this->id, aux);
+    auto* n = new sem::TypeObject(this->id, aux);
     n->actual_base_path = this->actual_base_path;
     n->is_generic_param = this->is_generic_param;
     n->aliased_type = this->aliased_type;
     return n;
 }
 
-ObjectType::~ObjectType() {
+TypeObject::~TypeObject() {
     for (auto* p: this->type_params) {
         delete p;
     }
 }
 
-std::string ObjectType::to_string() const {
+std::string TypeObject::to_string() const {
     const auto& otype = *this;
     std::string parameters;
     for (auto* ptr: otype.type_params) {
@@ -49,7 +50,7 @@ std::string ObjectType::to_string() const {
     return otype.id + (this->is_generic_param ? "(gen)" : "");
 }
 
-std::string ObjectType::actual_to_string() const {
+std::string TypeObject::actual_to_string() const {
     const auto& otype = *this;
     std::string parameters;
     for (auto* ptr: otype.type_params) {
@@ -63,7 +64,7 @@ std::string ObjectType::actual_to_string() const {
     return this->actual_base_path.as_str();
 }
 
-bool ObjectType::equal(const ast::Type& other) const {
+bool TypeObject::equal(const sem::Type& other) const {
     const auto& a = *this;
     const auto& b = other.object();
     if (a.id != b.id) {
@@ -80,19 +81,19 @@ bool ObjectType::equal(const ast::Type& other) const {
     return true;
 }
 
-const ast::ObjectType& ObjectType::object() const {
+const sem::TypeObject& TypeObject::object() const {
     return *this;
 }
 
-ast::ObjectType& ObjectType::object() {
+sem::TypeObject& TypeObject::object() {
     return *this;
 }
 
-ObjectType::ObjectType(const std::string& identifier) : ObjectType(identifier, {}) {
+TypeObject::TypeObject(const std::string& identifier) : TypeObject(identifier, {}) {
     this->is_generic_param = false;
 }
 
-bool ObjectType::is_generic() const {
+bool TypeObject::is_generic() const {
     if (this->is_generic_param) {
         return true;
     }
@@ -104,7 +105,7 @@ bool ObjectType::is_generic() const {
     return false;
 }
 
-nlohmann::json ObjectType::to_json() const {
+nlohmann::json TypeObject::to_json() const {
     nlohmann::json j;
     j["kind"] = "object";
     j["id"] = this->id;

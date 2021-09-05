@@ -180,7 +180,7 @@ USemanticInfo Checker::visit_unary(ast::UnaryOp& n) {
 
     ConstFunction* subscript_fun = subscript_it->second;
     std::string sub_fun_path = subscript_fun->path.as_str();
-    ast::TypeNode* rtype = subscript_fun->ft->return_type->clone();
+    ast::Type* rtype = subscript_fun->ft->return_type->clone();
 
     auto fsn = std::make_unique<sem::Id>(sub_fun_path);
     std::vector<USNode> v;
@@ -228,7 +228,7 @@ USemanticInfo Checker::visit_binop(ast::BinaryOp& n) {
     vv.push_back(std::move(left_info_p->snode));
     vv.push_back(std::move(right_snode));
     auto sn = std::make_unique<sem::Call>(std::move(function_id), std::move(vv));
-    ast::TypeNode* rettype = operator_fun->ft->return_type->clone();
+    ast::Type* rettype = operator_fun->ft->return_type->clone();
 
     USemanticInfo info_u = std::make_unique<SemanticInfo>();
     SemanticInfo& info = *info_u;
@@ -295,7 +295,7 @@ USemanticInfo Checker::visit_subscript(ast::Subscript& node) {
     }
     ConstFunction* subscript_fun = subscript_it->second;
     std::string sub_fun_path = subscript_fun->path.as_str();
-    ast::TypeNode* rtype = subscript_fun->ft->return_type->clone();
+    ast::Type* rtype = subscript_fun->ft->return_type->clone();
 
     // VectorOfTypes children;
     if (node.child.size() > 1) {
@@ -344,7 +344,7 @@ USemanticInfo Checker::visit_ternary(ast::Ternary& node) {
         return error_stub();
     }
     this->enter_scope("true_case");
-    ast::TypeNode*& inner_type = expression_type.type_params[0];
+    ast::Type*& inner_type = expression_type.type_params[0];
     auto v = std::make_unique<Value>(inner_type);
     this->scope->set("it", new EntityValue(std::move(v)));
     USemanticInfo true_case_p = this->dispatch_rvalue(*node.true_case);

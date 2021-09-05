@@ -82,7 +82,7 @@ namespace ast {
 
     class For;
 
-    class TypeNode;
+    class Type;
 
     class ObjectType;
 
@@ -96,13 +96,12 @@ namespace ast {
     typedef std::unique_ptr<Node> UNode;
     typedef std::reference_wrapper<Node> RNode;
     typedef std::vector<UNode> VectorOfNodesU;
+
     typedef std::unique_ptr<ObjectType> UObjectType;
-
-
     typedef std::unique_ptr<FunctionType> UFunctionType;
-    typedef std::unique_ptr<TypeNode> UTypeNode;
+    typedef std::unique_ptr<Type> UTypeNode;
     typedef std::vector<UTypeNode> VectorOfUTypes;
-    typedef std::vector<ast::TypeNode*> VectorOfTypes;
+    typedef std::vector<ast::Type*> VectorOfTypes;
 
 }
 

@@ -9,7 +9,7 @@
 #include <vector>
 #include "Node.h"
 #include "../types.h"
-#include "TypeNode.h"
+#include "Type.h"
 #include "ast.h"
 
 class ast::Call : public ast::Node {

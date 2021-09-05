@@ -8,7 +8,7 @@
 
 #include <cassert>
 #include "Entity.h"
-#include "../ast/TypeNode.h"
+#include "../ast/Type.h"
 
 enum class Meta {
     ENUM, CLASS
@@ -17,14 +17,14 @@ enum class Meta {
 class Value {
 
 public:
-    ast::TypeNode* type;
+    ast::Type* type;
     union {
         Class* clazz;
         Enum* enumm;
     };
     Meta metatype;
 
-    Value(ast::TypeNode* type) {
+    Value(ast::Type* type) {
         this->clazz = nullptr;
         this->enumm = nullptr;
         assert(type != nullptr);

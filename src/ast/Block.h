@@ -11,7 +11,7 @@
 
 #include "Node.h"
 #include "../types.h"
-#include "TypeNode.h"
+#include "Type.h"
 #include "../units/Entity.h"
 #include "ast.h"
 
@@ -32,7 +32,7 @@ public:
 
     ~Block();
     nlohmann::json to_json() const override;
-    std::vector<std::pair<std::string, ast::TypeNode*>> local_vars;
+    std::vector<std::pair<std::string, ast::Type*>> local_vars;
 };
 
 

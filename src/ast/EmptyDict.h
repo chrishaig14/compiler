@@ -7,7 +7,7 @@
 
 
 #include "Node.h"
-#include "TypeNode.h"
+#include "Type.h"
 #include "ast.h"
 
 class ast::EmptyDict : public ast::Node {

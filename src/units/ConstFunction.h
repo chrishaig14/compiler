@@ -5,9 +5,9 @@
 #define CONST_FUNCTION_H
 
 #include "Entity.h"
-#include "../ast/TypeNode.h"
+#include "../ast/Type.h"
 #include "../ast/Path.h"
-#include "../ast/FunctionType.h"
+#include "../ast/TypeFunction.h"
 #include "../ast/Function.h"
 
 class ConstFunction {

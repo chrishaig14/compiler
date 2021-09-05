@@ -5,10 +5,10 @@
 #include "TypeFunction.h"
 #include "TypeObject.h"
 
-using namespace ast;
+using namespace sem;
 
-FunctionType::FunctionType(ast::VectorOfTypes parameterTypes, ast::UTypeNode returnType) : return_type(std::move(
-        returnType)) {
+TypeFunction::TypeFunction(sem::VectorOfTypes parameterTypes, sem::UType returnType)
+        : return_type(std::move(returnType)) {
 
     for (auto* p: parameterTypes) {
         assert(p != nullptr);
@@ -16,27 +16,27 @@ FunctionType::FunctionType(ast::VectorOfTypes parameterTypes, ast::UTypeNode ret
     // assert(returnType != nullptr);
     // this->param_types = parameterTypes;
     for (auto* p: parameterTypes) {
-        this->param_types.push_back(ast::UTypeNode(p));
+        this->param_types.push_back(sem::UType(p));
     }
     this->kind = Kind::FUNCTION;
 }
 
-ast::FunctionType* ast::FunctionType::clone() const {
-    ast::VectorOfTypes aux;
+sem::TypeFunction* sem::TypeFunction::clone() const {
+    sem::VectorOfTypes aux;
     for (auto& p: this->param_types) {
         aux.emplace_back(p->clone());
     }
-    return new ast::FunctionType(aux, ast::UTypeNode(this->return_type->clone()));
+    return new sem::TypeFunction(aux, sem::UType(this->return_type->clone()));
 }
 
-FunctionType::~FunctionType() {
+TypeFunction::~TypeFunction() {
     // delete this->return_type;
     // for (auto& p: this->param_types) {
     //     delete p;
     // }
 }
 
-std::string FunctionType::to_string() const {
+std::string TypeFunction::to_string() const {
     const auto& ftype = *this;
     std::string parameters;
     std::string ret;
@@ -48,10 +48,10 @@ std::string FunctionType::to_string() const {
         parameters = parameters.substr(0, parameters.size() - 2);
     }
     ret = ftype.return_type->to_string();
-    return "fun (" + parameters + ")" + (*ftype.return_type == ast::ObjectType(".None") ? "" : (" -> " + ret));
+    return "fun (" + parameters + ")" + (*ftype.return_type == sem::TypeObject(".None") ? "" : (" -> " + ret));
 }
 
-std::string ast::FunctionType::actual_to_string() const {
+std::string sem::TypeFunction::actual_to_string() const {
     const auto& ftype = *this;
     std::string parameters;
     std::string ret;
@@ -63,10 +63,10 @@ std::string ast::FunctionType::actual_to_string() const {
         parameters = parameters.substr(0, parameters.size() - 2);
     }
     ret = ftype.return_type->actual_to_string();
-    return "fun (" + parameters + ")" + (*ftype.return_type == ast::ObjectType(".None") ? "" : (" -> " + ret));
+    return "fun (" + parameters + ")" + (*ftype.return_type == sem::TypeObject(".None") ? "" : (" -> " + ret));
 }
 
-bool ast::FunctionType::equal(const ast::Type& other) const {
+bool sem::TypeFunction::equal(const sem::Type& other) const {
     const auto& a = *this;
     const auto& b = other.function();
     if (a.param_types.size() != b.param_types.size()) {
@@ -80,15 +80,15 @@ bool ast::FunctionType::equal(const ast::Type& other) const {
     return *a.return_type == *b.return_type;
 }
 
-ast::FunctionType& ast::FunctionType::function() {
+sem::TypeFunction& sem::TypeFunction::function() {
     return *this;
 }
 
-const ast::FunctionType& ast::FunctionType::function() const {
+const sem::TypeFunction& sem::TypeFunction::function() const {
     return *this;
 }
 
-bool ast::FunctionType::is_generic() const {
+bool sem::TypeFunction::is_generic() const {
     for (auto& t: this->param_types) {
         if (t->is_generic()) {
             return true;
@@ -97,7 +97,7 @@ bool ast::FunctionType::is_generic() const {
     return this->return_type->is_generic();
 }
 
-nlohmann::json ast::FunctionType::to_json() const {
+nlohmann::json sem::TypeFunction::to_json() const {
     nlohmann::json j;
     j["kind"] = "function";
     std::vector<nlohmann::json> v;

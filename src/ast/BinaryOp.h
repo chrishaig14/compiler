@@ -33,7 +33,7 @@ public:
     ~BinaryOp();
     nlohmann::json to_json() const override;
 
-    ast::TypeNode* ltype;
+    ast::Type* ltype;
 };
 
 

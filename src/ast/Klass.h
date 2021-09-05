@@ -9,7 +9,7 @@
 #include <map>
 #include "Node.h"
 
-#include "TypeNode.h"
+#include "Type.h"
 #include "Function.h"
 #include "../macros.h"
 #include "ast.h"
@@ -28,13 +28,13 @@ public:
     bool equal(const ast::Node& other) const override;
     Klass(const std::string& className, VectorOfStrings type_parameters,
           std::vector<std::pair<std::string, ast::UTypeNode>> members, std::unordered_map<std::string, std::unique_ptr<KMethod>> functions,
-          std::map<std::string, std::pair<ast::TypeNode*, ast::Node*>> static_members,
+          std::map<std::string, std::pair<ast::Type*, ast::Node*>> static_members,
           std::unordered_map<std::string, ast::UFunctionNode>& static_methods, TextPosition start, TextPosition end);
     ~Klass() override;
     nlohmann::json to_json() const override;
 
     std::vector<std::pair<std::string, ast::UTypeNode>> members;
-    std::map<std::string, std::pair<ast::TypeNode*, ast::Node*>> static_members;
+    std::map<std::string, std::pair<ast::Type*, ast::Node*>> static_members;
     VectorOfStrings members_ordered;
     std::unordered_map<std::string, std::unique_ptr<KMethod>> methods;
     std::unordered_map<std::string, ast::UFunctionNode> static_methods;

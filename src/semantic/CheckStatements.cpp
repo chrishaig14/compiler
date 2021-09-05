@@ -4,7 +4,7 @@
 
 #include "CheckStatements.h"
 
-#include "../ast/ObjectType.h"
+#include "../ast/TypeObject.h"
 #include "../simple_nodes/Throw.h"
 #include "../simple_nodes/TryCatch.h"
 #include "errors/ErrorTypeMismatch.h"
@@ -38,7 +38,7 @@ USemanticInfo Checker::visit_lvalue_subscript(ast::Subscript& node) {
     }
     ConstFunction* subscript_fun = subscript_it->second;
     std::string sub_fun_path = subscript_fun->path.as_str();
-    ast::TypeNode* rtype = subscript_fun->ft->return_type->clone();
+    ast::Type* rtype = subscript_fun->ft->return_type->clone();
 
     ast::VectorOfTypes children;
     if (node.child.size() > 1) {
@@ -118,10 +118,10 @@ USemanticInfo Checker::visit_assignment(ast::Assignment& n) {
         //                                 *n.lvalue,
         //                                 *n.rvalue);
     }
-    ast::TypeNode* exp_type = ((EntityValue&) expression_info_p->entity).value->type;
+    ast::Type* exp_type = ((EntityValue&) expression_info_p->entity).value->type;
 
     if (exp_type->kind == Kind::OBJECT && this->module.aliased_types.count(exp_type->object().id) == 1) {
-        ast::TypeNode* aliased_type = this->module.aliased_types.at(exp_type->object().id);
+        ast::Type* aliased_type = this->module.aliased_types.at(exp_type->object().id);
         exp_type = aliased_type;
     } else {
         // if (exp_type->kind == Kind::OBJECT && exp_type->object().id.size() != 1) {
@@ -135,7 +135,7 @@ USemanticInfo Checker::visit_assignment(ast::Assignment& n) {
     SemanticInfo& linfo = *linfo_p;
 
     EntityValue& l_entity_value = (EntityValue&) linfo.entity;
-    const ast::TypeNode& l_type = *l_entity_value.value->type;
+    const ast::Type& l_type = *l_entity_value.value->type;
 
     if (l_entity_value.type == E_TYPE::VALUE && expression_info_p->entity.get().type == E_TYPE::VALUE) {
         USNode rvalue_snode = this->make_rvalue(expression_info_p->entity,
@@ -173,9 +173,9 @@ USemanticInfo Checker::visit_return(ast::Return& n) {
         info_r->snode = std::make_unique<sem::Return>(std::move(u));
         return info_r;
     }
-    ast::TypeNode* return_type = ((EntityValue&) return_entity).value->type;
+    ast::Type* return_type = ((EntityValue&) return_entity).value->type;
     if (return_type->kind == Kind::OBJECT && this->module.aliased_types.count(return_type->object().id) == 1) {
-        ast::TypeNode* aliased_type = this->module.aliased_types.at(return_type->object().id);
+        ast::Type* aliased_type = this->module.aliased_types.at(return_type->object().id);
         return_type = aliased_type;
     } else {
         this->module.fill_actual(*return_type);
@@ -243,7 +243,7 @@ USemanticInfo Checker::visit_match(ast::Match& node) {
     for (size_t i = 0; i < node.ids.size(); i++) {
         std::string case_id = node.ids[i];
         std::pair<ast::UTypeNode, ast::UBlock>& c = node.cases[i];
-        ast::TypeNode& case_type = *c.first;
+        ast::Type& case_type = *c.first;
         ast::Block& case_node = *c.second;
 
         this->module.fill_actual(case_type);
@@ -306,7 +306,7 @@ USemanticInfo Checker::visit_for(ast::For& node) {
         this->error_reporter.error(std::make_unique<ErrorFor>(exp_entity_value, node.exp.start));
     }
 
-    ast::TypeNode* elem_type = exp_ot->type_params[0];
+    ast::Type* elem_type = exp_ot->type_params[0];
     auto v = std::make_unique<Value>(elem_type);
     this->fill_value(*v);
     Entity* elem_entity = new EntityValue(std::move(v));

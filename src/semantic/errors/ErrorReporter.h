@@ -8,7 +8,7 @@
 
 #include <string>
 #include "../../scanner/TextPosition.h"
-#include "../../ast/TypeNode.h"
+#include "../../ast/Type.h"
 #include "../../ast/Member.h"
 #include "../../ast/Call.h"
 #include "../../scanner/CodeLines.h"
@@ -26,7 +26,7 @@ public:
     ErrorReporter();
     std::vector<std::unique_ptr<Error>> errors;
     CodeLines code_lines;
-    void assignment(const ast::TypeNode& expected, const ast::TypeNode& actual, TextPosition pos, const ast::Node& lvalue,
+    void assignment(const ast::Type& expected, const ast::Type& actual, TextPosition pos, const ast::Node& lvalue,
                     const ast::Node& rvalue);
     // void bad_return(TextPosition pos);
     // void binop(const ast::TypeNode& left, const ast::TypeNode& right, TextPosition position);
@@ -91,9 +91,9 @@ public:
     //                       TextPosition member_start, TextPosition member_end);
     // void class_no_member(const ast::TypeNode& t, const std::string& member, TextPosition pos, Node& obj,
     //                      TextPosition member_start, TextPosition member_end);
-    void module_no_member(const ast::TypeNode& t, const std::string& member, TextPosition pos, ast::Node& obj,
+    void module_no_member(const ast::Type& t, const std::string& member, TextPosition pos, ast::Node& obj,
                           TextPosition member_start, TextPosition member_end);
-    void object_no_member(const ast::TypeNode& t, const ast::Member& obj);
+    void object_no_member(const ast::Type& t, const ast::Member& obj);
     void module_no_member(std::string mod_name, const std::string& member, TextPosition pos, ast::Node& obj,
                           TextPosition member_start, TextPosition member_end);
     void package_no_member(std::string pack_name, const std::string& member, TextPosition pos, ast::Node& obj,

@@ -12,7 +12,7 @@
 #include <fmt/color.h>
 #include <exception>
 #include <set>
-#include "../ast/ObjectType.h"
+#include "../ast/TypeObject.h"
 
 std::unordered_map<TokType, OpType> TOKEN_TO_OP = {{TokType::PLUS,  OpType::ADD},
                                                    {TokType::MINUS, OpType::SUB},
@@ -611,7 +611,7 @@ std::unique_ptr<ast::FunctionType> Parser::parse_function_type() {
     ast::VectorOfTypes parameter_types;
     if (!this->match(TokType::RPAREN)) {
         while (true) {
-            ast::TypeNode* parameter_type = this->parse_type_node().release();
+            ast::Type* parameter_type = this->parse_type_node().release();
             parameter_types.push_back(parameter_type);
             if (this->match(TokType::COMMA)) {
                 this->next();
@@ -621,7 +621,7 @@ std::unique_ptr<ast::FunctionType> Parser::parse_function_type() {
         }
     }
     this->expect_token(TokType::RPAREN);
-    ast::TypeNode* return_type;
+    ast::Type* return_type;
     if (this->match(TokType::RARROW)) {
         this->expect_token(TokType::RARROW);
         return_type = this->parse_type_node().release();
@@ -637,7 +637,7 @@ std::unique_ptr<ast::ObjectType> Parser::parse_object_type() {
     if (this->match(TokType::LSQUARE)) {
         this->next();
         while (true) {
-            ast::TypeNode* type_parameter = this->parse_type_node().release();
+            ast::Type* type_parameter = this->parse_type_node().release();
             type_parameters.push_back(type_parameter);
             if (this->match(TokType::COMMA)) {
                 this->next();
@@ -771,7 +771,7 @@ std::unique_ptr<ast::Alias> Parser::parse_alias() {
     Token alias_tk = this->expect_token(TokType::ALIAS);
     Token alias_id = this->expect_token(TokType::ID);
     this->expect_token(TokType::EQQ);
-    ast::TypeNode* aliased_type = this->parse_type_node().release();
+    ast::Type* aliased_type = this->parse_type_node().release();
     Token semic_tk = this->expect_token(TokType::SEMICOLON);
     auto node = std::make_unique<ast::Alias>(alias_id.str, aliased_type, alias_tk.start, semic_tk.end_pos);
     return node;
@@ -870,7 +870,7 @@ std::unique_ptr<ast::Klass> Parser::parse_class_definition() {
     std::unordered_map<std::string, ast::UFunctionNode> static_methods;
     std::vector<std::pair<std::string, ast::UTypeNode>> members;
     std::set<std::string> member_names;
-    std::map<std::string, std::pair<ast::TypeNode*, ast::Node*>> static_members;
+    std::map<std::string, std::pair<ast::Type*, ast::Node*>> static_members;
     VectorOfStrings members_ordered;
     while (true) {
         bool is_static = false;
@@ -1040,7 +1040,7 @@ std::unique_ptr<ast::Typeclass> Parser::parse_typeclass() {
             }
         }
         this->expect_token(TokType::RPAREN);
-        ast::TypeNode* return_type;
+        ast::Type* return_type;
         if (this->match(TokType::RARROW)) {
             this->expect_token(TokType::RARROW);
             return_type = this->parse_type_node().release();

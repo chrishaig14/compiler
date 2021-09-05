@@ -11,9 +11,9 @@
 
 class ErrorNoMember : public Error {
     const ast::Member& m;
-    const ast::TypeNode& t;
+    const ast::Type& t;
 public:
-    ErrorNoMember(const ast::TypeNode& t, const ast::Member& m);
+    ErrorNoMember(const ast::Type& t, const ast::Member& m);
 
     bool equal(const Error& other) const override;
 

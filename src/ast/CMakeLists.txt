@@ -81,11 +81,11 @@ add_library(
         Tuple.cpp
         Tuple.h
         TypeNode.cpp
-        TypeNode.h
+        Type.h
         Typeclass.cpp
         Typeclass.h
         UnaryOp.cpp
         UnaryOp.h
         While.cpp
-        While.h ObjectType.cpp ObjectType.h FunctionType.cpp FunctionType.h Path.cpp Path.h ast.h)
+        While.h ObjectType.cpp TypeObject.h FunctionType.cpp TypeFunction.h Path.cpp Path.h ast.h)
 

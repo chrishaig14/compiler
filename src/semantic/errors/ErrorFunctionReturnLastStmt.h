@@ -10,7 +10,7 @@
 
 class ErrorFunctionReturnLastStmt : public Error {
 public:
-    ErrorFunctionReturnLastStmt(std::string name, const ast::TypeNode& node, TextPosition position);
+    ErrorFunctionReturnLastStmt(std::string name, const ast::Type& node, TextPosition position);
     Error* clone() const override;
     bool equal(const Error& other) const override;
     std::string to_str() const override;

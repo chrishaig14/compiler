@@ -4,7 +4,8 @@
 
 #ifndef XLANG_SEM_H
 #define XLANG_SEM_H
-
+#include <vector>
+#include <memory>
 namespace sem {
     class Assignment;
 
@@ -69,6 +70,18 @@ namespace sem {
     class While;
 
     class SNode;
+
+    class TypeObject;
+
+    class TypeFunction;
+
+    class Type;
+
+    typedef std::unique_ptr<TypeObject> UTypeObject;
+    typedef std::unique_ptr<TypeFunction> UTypeFunction;
+    typedef std::unique_ptr<Type> UType;
+    typedef std::vector<UType> VectorOfUTypes;
+    typedef std::vector<Type*> VectorOfTypes;
 
 }
 

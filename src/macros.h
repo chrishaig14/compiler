@@ -79,6 +79,6 @@
 #define T_DOUBLE ast::ObjectType("Double")
 
 typedef std::unordered_map<std::string, Entity*> MapStringEntity;
-typedef std::unordered_map<std::string, ast::TypeNode*> MapStringType;
+typedef std::unordered_map<std::string, ast::Type*> MapStringType;
 
 #endif //UNTITLED1_MACROS_H

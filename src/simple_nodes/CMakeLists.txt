@@ -62,4 +62,5 @@ add_library(
         Throw.h
         TryCatch.cpp
         TryCatch.h
+        Type.cpp Type.h TypeFunction.cpp TypeFunction.h TypeObject.h TypeObject.cpp
         with_unique/While.cpp sem.h with_unique/ObjectMethodCall.cpp with_unique/ObjectMethodCall.h with_unique/ObjectMethod.cpp with_unique/ObjectMethod.h with_unique/ConstFunctionCall.cpp with_unique/ConstFunctionCall.h with_unique/ConstFunction.cpp with_unique/ConstFunction.h)

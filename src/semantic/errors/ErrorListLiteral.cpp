@@ -20,7 +20,7 @@ std::string ErrorListLiteral::to_str() const {
     return std::string();
 }
 
-ErrorListLiteral::ErrorListLiteral(const ast::TypeNode& node, const ast::ObjectType& type, TextPosition position,
+ErrorListLiteral::ErrorListLiteral(const ast::Type& node, const ast::ObjectType& type, TextPosition position,
                                    const ast::Node& node_1)
         : node(node), type(type), position(position), node_1(node_1) {
 

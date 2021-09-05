@@ -3,12 +3,12 @@
 //
 
 #include "CheckDeclaration.h"
-#include "../ast/ObjectType.h"
+#include "../ast/TypeObject.h"
 #include "errors/ErrorTypeMismatch.h"
 #include "errors/ErrorRedeclared.h"
 #include "errors/ErrorExpectedExpression.h"
 
-std::unique_ptr<SemanticInfo> Checker::expect_rvalue_of_type(const ast::TypeNode& target, ast::Node& node) {
+std::unique_ptr<SemanticInfo> Checker::expect_rvalue_of_type(const ast::Type& target, ast::Node& node) {
     USemanticInfo rinfo = this->dispatch_rvalue(node);
     if (rinfo->is_error()) {
         return error_stub();
@@ -27,7 +27,7 @@ std::unique_ptr<SemanticInfo> Checker::expect_rvalue_of_type(const ast::TypeNode
     return rinfo;
 }
 
-USNode Checker::make_rvalue(const Entity& t_entity, USNode value_snode, const ast::TypeNode& target) {
+USNode Checker::make_rvalue(const Entity& t_entity, USNode value_snode, const ast::Type& target) {
     if (t_entity.type == E_TYPE::VALUE) {
         EntityValue& value_entity = (EntityValue&) t_entity;
         if (value_entity.value->type->kind != target.kind) {
@@ -44,12 +44,12 @@ USNode Checker::make_rvalue(const Entity& t_entity, USNode value_snode, const as
         const ast::ObjectType& value_ot = value_entity.value->type->object();
         const ast::ObjectType& target_ot = target.object();
 
-        const ast::TypeNode* unaliased_value_type = &value_ot;
+        const ast::Type* unaliased_value_type = &value_ot;
         if (value_ot.aliased_type != nullptr) {
             unaliased_value_type = value_ot.aliased_type;
         }
 
-        const ast::TypeNode* unaliased_target_type = &target_ot;
+        const ast::Type* unaliased_target_type = &target_ot;
         if (target_ot.aliased_type != nullptr) {
             unaliased_target_type = target_ot.aliased_type;
         }
@@ -86,8 +86,8 @@ USNode Checker::make_rvalue(const Entity& t_entity, USNode value_snode, const as
     return nullptr;
 }
 
-sem::SNode* Checker::make_option_rvalue(sem::SNode* value_snode, const ast::TypeNode* unaliased_value_type,
-                                        const ast::TypeNode* unaliased_target_type) const {
+sem::SNode* Checker::make_option_rvalue(sem::SNode* value_snode, const ast::Type* unaliased_value_type,
+                                        const ast::Type* unaliased_target_type) const {
     if (*unaliased_target_type->object().type_params[0] == *unaliased_value_type ||
         unaliased_value_type->object().id == "NoneType") {
         return value_snode;
@@ -95,8 +95,8 @@ sem::SNode* Checker::make_option_rvalue(sem::SNode* value_snode, const ast::Type
     return nullptr;
 }
 
-USNode Checker::make_union_rvalue(USNode value_snode, const ast::TypeNode* unaliased_value_type,
-                                  const ast::TypeNode* unaliased_target_type) const {
+USNode Checker::make_union_rvalue(USNode value_snode, const ast::Type* unaliased_value_type,
+                                  const ast::Type* unaliased_target_type) const {
     int union_index = target_union_type(unaliased_target_type->object(), unaliased_value_type->object());
     if (union_index != -1) {
         return USNode(make_union_wrapper(union_index, std::move(value_snode)));
@@ -139,7 +139,7 @@ USemanticInfo Checker::visit_declaration(ast::Declaration& n) {
 
 USemanticInfo Checker::check_declaration_with_type(ast::Declaration& n) {
     if (n.type->kind == Kind::OBJECT && this->module.aliased_types.count(n.type->object().id) == 1) {
-        ast::TypeNode* aliased_type = this->module.aliased_types.at(n.type->object().id);
+        ast::Type* aliased_type = this->module.aliased_types.at(n.type->object().id);
         n.type = ast::UTypeNode(aliased_type->clone());
     } else {
         this->module.fill_actual(*n.type);

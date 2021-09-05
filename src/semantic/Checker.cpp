@@ -38,7 +38,7 @@ void Checker::leave_scope() {
     this->scope = this->scope->parent;
 }
 
-bool Checker::assert_type_exists(const ast::TypeNode& type, TextPosition pos) {
+bool Checker::assert_type_exists(const ast::Type& type, TextPosition pos) {
     if (type.kind == Kind::OBJECT) {
         if (type.object().id == ".None") {
             return true;
@@ -77,7 +77,7 @@ bool Checker::assert_type_exists(const ast::TypeNode& type, TextPosition pos) {
     return false;
 }
 
-bool is_generic(const ast::TypeNode& t) {
+bool is_generic(const ast::Type& t) {
     if (t.kind == Kind::OBJECT) {
         const ast::ObjectType& o = t.object();
         if (o.id.size() == 1 && (islower(o.id[0]) != 0)) {
@@ -106,7 +106,7 @@ bool is_generic(const ast::TypeNode& t) {
 
 std::unique_ptr<SemanticInfo>
 Checker::match_arguments_to_generic_function(const ast::FunctionType& ft, ast::VectorOfTypes arg_types,
-                                             std::map<std::string, ast::TypeNode*>& all_substitutions) {
+                                             std::map<std::string, ast::Type*>& all_substitutions) {
     std::unique_ptr<ast::FunctionType> f;
     // = ft.clone();
     try {
@@ -151,7 +151,7 @@ ast::UTypeNode make_type_from_object_pattern(const ast::ObjectType& object_type,
     // It's not the top level type
     ast::VectorOfTypes new_type_params;
     for (auto* tp: object_type.type_params) {
-        ast::TypeNode* new_tp = make_type(*tp, replacements).release();
+        ast::Type* new_tp = make_type(*tp, replacements).release();
         new_type_params.push_back(new_tp);
     }
     for (auto* nt: new_type_params) {
@@ -170,14 +170,14 @@ ast::UTypeNode make_type_from_object_pattern(const ast::ObjectType& object_type,
 ast::UTypeNode make_type_from_function_pattern(const ast::FunctionType& ftn, const MapStringType& replacements) {
     ast::VectorOfTypes new_param_types;
     for (auto& pt: ftn.param_types) {
-        ast::TypeNode* new_pt = make_type(*pt, replacements).release();
+        ast::Type* new_pt = make_type(*pt, replacements).release();
         new_param_types.push_back(new_pt);
     }
     ast::UTypeNode new_return_type = make_type(*ftn.return_type, replacements);
     return std::make_unique<ast::FunctionType>(new_param_types, std::move(new_return_type));
 }
 
-ast::UTypeNode make_type(const ast::TypeNode& original, const MapStringType& replacements) {
+ast::UTypeNode make_type(const ast::Type& original, const MapStringType& replacements) {
     if (original.kind == Kind::OBJECT) {
         return make_type_from_object_pattern(original.object(), replacements);
     } else {
@@ -190,13 +190,13 @@ Class* Checker::instantiate_generic(Class* generic, const ast::ObjectType& insta
     MapStringType replacements;
     for (size_t i = 0; i < generic->type_params.size(); i++) {
         std::string tp = generic->type_params[i];
-        ast::TypeNode& type_replacement = *instance.type_params[i];
+        ast::Type& type_replacement = *instance.type_params[i];
         replacements[tp] = &type_replacement;
     }
     auto field_names = generic->member_names;
     ast::VectorOfTypes concrete_field_types;
     for (auto* f: generic->member_types) {
-        ast::TypeNode& concrete_type = *make_type(*f, replacements).release();
+        ast::Type& concrete_type = *make_type(*f, replacements).release();
         concrete_field_types.push_back(&concrete_type);
         this->module.fill_actual(concrete_type);
     }
@@ -217,8 +217,8 @@ Class* Checker::instantiate_generic(Class* generic, const ast::ObjectType& insta
                     std::cout << "Not found in instance's type parameter, so skipping" << std::endl;
                 } else {
                     std::cout << "Found implicit in instance's type parameter" << std::endl;
-                    ast::TypeNode* t = (method_cf.second)->ft;
-                    ast::TypeNode& concrete_type = *make_type(*t, replacements).release();
+                    ast::Type* t = (method_cf.second)->ft;
+                    ast::Type& concrete_type = *make_type(*t, replacements).release();
                     this->module.fill_actual(concrete_type);
                     auto* cf = new ConstFunction(method_cf.second->path, (ast::FunctionType*) concrete_type.clone());
                     std::cout << "Instantiated generic method " << method_cf.first << " : " << cf->ft->to_string()
@@ -228,8 +228,8 @@ Class* Checker::instantiate_generic(Class* generic, const ast::ObjectType& insta
 
             } else {
                 std::cout << "----------- Normal generic function: r" << method_cf.first << std::endl;
-                ast::TypeNode* t = (method_cf.second)->ft;
-                ast::TypeNode& concrete_type = *make_type(*t, replacements).release();
+                ast::Type* t = (method_cf.second)->ft;
+                ast::Type& concrete_type = *make_type(*t, replacements).release();
                 this->module.fill_actual(concrete_type);
                 auto* cf = new ConstFunction(method_cf.second->path, (ast::FunctionType*) concrete_type.clone());
                 std::cout << "Instantiated generic method " << method_cf.first << " : " << cf->ft->to_string()
@@ -237,8 +237,8 @@ Class* Checker::instantiate_generic(Class* generic, const ast::ObjectType& insta
                 concrete_methods[method_cf.first] = cf;
             }
         } else {
-            ast::TypeNode* t = (method_cf.second)->ft;
-            ast::TypeNode& concrete_type = *make_type(*t, replacements).release();
+            ast::Type* t = (method_cf.second)->ft;
+            ast::Type& concrete_type = *make_type(*t, replacements).release();
             this->module.fill_actual(concrete_type);
             auto* cf = new ConstFunction(method_cf.second->path, (ast::FunctionType*) concrete_type.clone());
             std::cout << "Instantiated generic method " << method_cf.first << " : " << cf->ft->to_string() << std::endl;
@@ -248,8 +248,8 @@ Class* Checker::instantiate_generic(Class* generic, const ast::ObjectType& insta
 
     std::unordered_map<std::string, ConstFunction*> concrete_static_methods;
     for (const auto& m: generic->static_methods) {
-        ast::TypeNode* t = (m.second)->ft;
-        ast::TypeNode& concrete_type = *make_type(*t, replacements).release();
+        ast::Type* t = (m.second)->ft;
+        ast::Type& concrete_type = *make_type(*t, replacements).release();
         this->module.fill_actual(concrete_type);
         auto* cf = new ConstFunction(m.second->path, (ast::FunctionType*) concrete_type.clone());
         concrete_static_methods[m.first] = cf;
@@ -284,7 +284,7 @@ Flirpin map_unit_to_flirpin(Unit u) {
     return Flirpin{};
 }
 
-bool Checker::is_immutable(const ast::TypeNode& node) {
+bool Checker::is_immutable(const ast::Type& node) {
     if (node == T_STRING) {
         return true;
     }

@@ -7,7 +7,7 @@
 
 #include "../types.h"
 #include "Node.h"
-#include "TypeNode.h"
+#include "Type.h"
 #include "ast.h"
 
 class ast::PartialApplication : public ast::Node {

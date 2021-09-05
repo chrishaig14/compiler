@@ -9,7 +9,7 @@
 #include "Node.h"
 
 #include "Node.h"
-#include "TypeNode.h"
+#include "Type.h"
 #include "ast.h"
 
 class ast::Assignment : public ast::Node {

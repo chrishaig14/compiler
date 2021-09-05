@@ -7,7 +7,7 @@
 
 #include "Node.h"
 #include "optypes.h"
-#include "TypeNode.h"
+#include "Type.h"
 #include "ast.h"
 
 class ast::Cast : public ast::Node {
@@ -22,8 +22,8 @@ public:
 
     ~Cast();
 
-    ast::TypeNode* exp_type;
-    ast::TypeNode* rtype;
+    ast::Type* exp_type;
+    ast::Type* rtype;
 };
 
 

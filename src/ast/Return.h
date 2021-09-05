@@ -8,7 +8,7 @@
 
 #include "Node.h"
 #include "../types.h"
-#include "TypeNode.h"
+#include "Type.h"
 #include "ast.h"
 
 class ast::Return : public ast::Node {
@@ -22,7 +22,7 @@ public:
     nlohmann::json to_json() const override;
 
     ast::UNode expression;
-    std::vector<std::pair<std::string, ast::TypeNode*>> reachables;
+    std::vector<std::pair<std::string, ast::Type*>> reachables;
 };
 
 #endif //RETURNNODE_H

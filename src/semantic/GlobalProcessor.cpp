@@ -6,7 +6,7 @@
 #include "GlobalProcessor.h"
 #include "../scanner/Scanner.h"
 #include "../parser/Parser.h"
-#include "../ast/ObjectType.h"
+#include "../ast/TypeObject.h"
 
 void GlobalProcessor::visit_import(ast::Import& node) {
     const Path& node_path = Path(node.path);
@@ -56,11 +56,11 @@ void GlobalProcessor::visit_function(ast::Function& node) {
 
     ast::VectorOfTypes x;
     for (auto& p: node.parameter_types) {
-        ast::TypeNode& type_node = *p;
+        ast::Type& type_node = *p;
         this->module.fill_actual(type_node);
         x.emplace_back(p->clone());
     }
-    ast::TypeNode& p = *node.return_type;
+    ast::Type& p = *node.return_type;
     this->module.fill_actual(p);
     ast::FunctionType function_info(x, ast::UTypeNode(node.return_type->clone()));
     Path function_path = Path(this->module.path, node.identifier);
@@ -287,7 +287,7 @@ Path Module::get_actual_path(const std::string& id) {
     throw std::runtime_error("Error: type " + id + " not found");
 }
 
-void Module::fill_actual(ast::TypeNode& t) {
+void Module::fill_actual(ast::Type& t) {
     if (t.kind == Kind::OBJECT) {
         if (this->aliased_types.count(t.object().id) != 0) {
             t.object().aliased_type = this->aliased_types[t.object().id];

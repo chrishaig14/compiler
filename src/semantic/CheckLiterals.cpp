@@ -269,7 +269,7 @@ USemanticInfo Checker::visit_list(ast::List& node) {
         return error_stub();
     }
     EntityValue& entity_value = (EntityValue&) element_type_p->entity.get();
-    ast::TypeNode* element_type = entity_value.value->type->clone();
+    ast::Type* element_type = entity_value.value->type->clone();
     bool is_constant = true;
     std::vector<USNode> list_elements;
     list_elements.push_back(std::move(element_type_p->snode));

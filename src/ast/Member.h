@@ -8,7 +8,7 @@
 
 #include <string>
 #include "Node.h"
-#include "TypeNode.h"
+#include "Type.h"
 #include "../scanner/Token.h"
 
 #include "ast.h"

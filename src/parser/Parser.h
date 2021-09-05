@@ -10,7 +10,7 @@
 #include "../ast/Import.h"
 #include "../scanner/CodeLines.h"
 #include "../ast/EnumNode.h"
-#include "../ast/ObjectType.h"
+#include "../ast/TypeObject.h"
 #include "../ast/Typeclass.h"
 #include "../ast/Instance.h"
 #include "../ast/Alias.h"

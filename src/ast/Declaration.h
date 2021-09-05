@@ -8,7 +8,7 @@
 
 #include <string>
 #include "Node.h"
-#include "TypeNode.h"
+#include "Type.h"
 #include "../utils.h"
 
 class ast::Declaration : public ast::Node {

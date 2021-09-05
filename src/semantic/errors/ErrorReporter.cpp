@@ -121,7 +121,7 @@ void init_styles() {
 // }
 
 void
-ErrorReporter::assignment(const ast::TypeNode& expected, const ast::TypeNode& actual, TextPosition pos, const ast::Node& lvalue,
+ErrorReporter::assignment(const ast::Type& expected, const ast::Type& actual, TextPosition pos, const ast::Node& lvalue,
                           const ast::Node& rvalue) {
     std::string pre_msg;
     pre_msg = E_FMT("Expected ") + E_HLT(expected.to_string()) + E_FMT("(alias for ") +

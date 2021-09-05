@@ -80,7 +80,7 @@ USemanticInfo Checker::visit_class(ast::Klass& node) {
     ast::VectorOfTypes members_ordered_types;
 
     for (const auto& mt: node.members) {
-        ast::TypeNode& t = *mt.second;
+        ast::Type& t = *mt.second;
         members_ordered_types.push_back(&t);
         this->assert_type_exists(t, node.start);
     }
@@ -228,8 +228,8 @@ USemanticInfo Checker::visit_function(ast::Function& n) {
         params.push_back("implicit_a");
     }
     for (size_t i = 0; i < n.parameter_names.size(); i++) {
-        ast::TypeNode& type = *n.parameter_types[i];
-        ast::TypeNode* cl = type.clone();
+        ast::Type& type = *n.parameter_types[i];
+        ast::Type* cl = type.clone();
         make_not_generic(*cl);
         auto te = entity_from_type(*cl);
         this->fill_value(*((EntityValue*) te)->value);
@@ -254,7 +254,7 @@ USemanticInfo Checker::visit_function(ast::Function& n) {
     }
     // std::cout << "FINISH " << std::endl;
 
-    ast::TypeNode& returnType = *n.return_type;
+    ast::Type& returnType = *n.return_type;
     this->assert_type_exists(returnType, n.start);
     this->scope->set("__return__", entity_from_type(returnType));
     USemanticInfoBlock body_info = this->visit_block(*n.body);

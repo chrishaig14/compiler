@@ -203,7 +203,7 @@ bool Checker::check_arguments(ast::Call& n, std::vector<USNode>& arguments, ast:
         }
 
 
-        ast::TypeNode& arg_type = *get_entity_type(arg_entity);
+        ast::Type& arg_type = *get_entity_type(arg_entity);
         arg_types.push_back(arg_type.clone());
         n.arg_types.push_back(arg_type.clone());
     }
@@ -217,7 +217,7 @@ void Checker::process_function_arguments(SemanticInfo& retv, std::vector<Entity*
     int sni = static_cast<int>(fun_info_p->this_arg != nullptr);
     for (size_t i = 0; i < n.arguments.size(); i++) {
         // const ast::TypeNode& arg_type = *arg_types[i];
-        const ast::TypeNode& param_type = *function_type.param_types[i];
+        const ast::Type& param_type = *function_type.param_types[i];
 
         USNode arg_rvalue_snode = this->make_rvalue(*arg_entities[i], std::move(arguments[sni]), param_type);
         if (arg_rvalue_snode == nullptr) {

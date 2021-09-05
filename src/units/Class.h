@@ -10,7 +10,7 @@
 #include <string>
 #include <vector>
 #include <map>
-#include "../ast/TypeNode.h"
+#include "../ast/Type.h"
 #include "../macros.h"
 #include "Entity.h"
 #include "ConstFunction.h"
@@ -19,13 +19,13 @@ class Class {
 public:
     Class();
     VectorOfStrings member_names;
-    std::vector<ast::TypeNode*> member_types;
+    std::vector<ast::Type*> member_types;
     std::unordered_map<std::string, Entity*> member_entities;
 
     MapStringType members;
     std::unordered_map<std::string, ConstFunction*> methods;
 
-    std::map<std::string, std::pair<ast::TypeNode*, ast::Node*>> static_members;
+    std::map<std::string, std::pair<ast::Type*, ast::Node*>> static_members;
     std::unordered_map<std::string, ConstFunction*> static_methods;
 
     std::string class_name;

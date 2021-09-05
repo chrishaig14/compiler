@@ -7,7 +7,7 @@
 
 
 #include "Node.h"
-#include "TypeNode.h"
+#include "Type.h"
 #include "Block.h"
 #include "ast.h"
 

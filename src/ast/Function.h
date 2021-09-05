@@ -10,7 +10,7 @@
 #include <vector>
 #include "Node.h"
 
-#include "TypeNode.h"
+#include "Type.h"
 #include "Block.h"
 #include "Path.h"
 #include "ast.h"

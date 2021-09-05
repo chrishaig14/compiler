@@ -7,16 +7,16 @@
 
 
 #include "Error.h"
-#include "../../ast/ObjectType.h"
+#include "../../ast/TypeObject.h"
 
 class ErrorListLiteral : public Error {
 public:
-    ErrorListLiteral(const ast::TypeNode& node, const ast::ObjectType& type, TextPosition position, const ast::Node& node_1);
+    ErrorListLiteral(const ast::Type& node, const ast::ObjectType& type, TextPosition position, const ast::Node& node_1);
     Error* clone() const override;
     bool equal(const Error& other) const override;
     std::string to_str() const override;
 
-    const ast::TypeNode& node;
+    const ast::Type& node;
     const ast::ObjectType& type;
     TextPosition position;
     const ast::Node& node_1;

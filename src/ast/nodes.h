@@ -36,6 +36,6 @@
 #include "Tuple.h"
 #include "String.h"
 #include "Subscript.h"
-#include "TypeNode.h"
+#include "Type.h"
 
 #endif //NODES_H
