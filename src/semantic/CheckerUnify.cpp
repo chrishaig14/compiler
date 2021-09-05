@@ -181,7 +181,7 @@ USemanticInfo Checker::enum_member(Enum* enumm, const std::string& value, ast::M
             auto* otype = new ast::ObjectType(enumm->enumm_name, {});
             otype->data.actual_base_path = enumm->path;
             auto ov = std::make_unique<Value>(otype);
-            info.entity = *new EntityValue(std::move(ov));
+            info.set_entity(new EntityValue(std::move(ov)));
             // this->fill_value(info.entity.value);
             info.snode = std::make_unique<sem::EnumMember>(enumm->path.as_str(), value);
             return info_u;
@@ -194,7 +194,7 @@ USemanticInfo Checker::enum_member(Enum* enumm, const std::string& value, ast::M
 Entity* Checker::entity_from_type(const ast::Type& type) {
     if (this->entities.count(type.to_string()) == 1) {
         std::cout << "Entity already found, not copying!!!" << std::endl;
-        return this->entities[type.to_string()];
+        return this->entities[type.to_string()]->clone();
     }
     if (type.kind == Kind::FUNCTION) {
         auto fv = std::make_unique<Value>(type.clone());

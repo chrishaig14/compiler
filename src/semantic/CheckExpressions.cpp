@@ -46,7 +46,7 @@ USemanticInfo Checker::visit_id(ast::Id& n) {
     }
     USemanticInfo info_u = std::make_unique<SemanticInfo>();
     SemanticInfo& info = *info_u;
-    info.entity = entity;
+    info.set_entity(entity.clone());
     info.snode = std::move(sn);
     return info_u;
 }
@@ -189,7 +189,7 @@ USemanticInfo Checker::visit_unary(ast::UnaryOp& n) {
 
     USemanticInfo info_u = std::make_unique<SemanticInfo>();
     SemanticInfo& info = *info_u;
-    info.entity = *new EntityValue(std::make_unique<Value>(rtype));
+    info.set_entity(new EntityValue(std::make_unique<Value>(rtype)));
     info.snode = std::move(csn);
     return info_u;
 }
@@ -234,7 +234,7 @@ USemanticInfo Checker::visit_binop(ast::BinaryOp& n) {
     SemanticInfo& info = *info_u;
     auto v = std::make_unique<Value>(rettype);
     this->fill_value(*v);
-    info.entity = *new EntityValue(std::move(v));
+    info.set_entity(new EntityValue(std::move(v)));
     info.snode = std::move(sn);
     return info_u;
 }
@@ -313,7 +313,7 @@ USemanticInfo Checker::visit_subscript(ast::Subscript& node) {
 
     auto v = std::make_unique<Value>(rtype);
     this->fill_value(*v);
-    info.entity = *new EntityValue(std::move(v));
+    info.set_entity(new EntityValue(std::move(v)));
 
     auto fsn = std::make_unique<sem::Id>(sub_fun_path);
     std::vector<USNode> vv;
@@ -361,7 +361,7 @@ USemanticInfo Checker::visit_ternary(ast::Ternary& node) {
     this->fill_value(*rv);
     USemanticInfo info_u = std::make_unique<SemanticInfo>();
     SemanticInfo& info = *info_u;
-    info.entity = *new EntityValue(std::move(rv));
+    info.set_entity(new EntityValue(std::move(rv)));
     info.snode = std::make_unique<sem::Ternary>(expression_info_p->snode.release(), true_case.snode.release(), false_case_snode.release());
     return info_u;
 }

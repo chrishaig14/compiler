@@ -30,6 +30,22 @@ public:
         assert(type != nullptr);
         this->type = type;
     }
+
+    Value* clone() const {
+        auto* v = new Value(type);
+        v->metatype = this->metatype;
+        switch (this->metatype) {
+            case Meta::CLASS: {
+                v->clazz = this->clazz;
+                break;
+            }
+            case Meta::ENUM: {
+                v->enumm = this->enumm;
+                break;
+            }
+        }
+        return v;
+    }
 };
 
 
@@ -42,6 +58,10 @@ public:
 
     bool equal(const Entity& other) const override {
         return false;
+    }
+
+    Entity* clone() const override {
+        return new EntityValue(std::unique_ptr<Value>(this->value->clone()));
     }
 };
 

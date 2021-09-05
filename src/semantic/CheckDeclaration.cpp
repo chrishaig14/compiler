@@ -154,7 +154,7 @@ USemanticInfo Checker::check_declaration_with_type(ast::Declaration& n) {
     info.snode = std::make_unique<sem::Declaration>(n.identifier, std::move(up));
     auto ov = std::make_unique<Value>(n.type->clone());
     this->fill_value(*ov);
-    info.entity = *new EntityValue(std::move(ov));
+    info.set_entity(new EntityValue(std::move(ov)));
     return info_u;
 }
 
@@ -173,12 +173,12 @@ USemanticInfo Checker::check_declaration_without_type(ast::Declaration& n) {
     SemanticInfo& info = *info_u;
     USNode u = std::move(exp_info_p->snode);
     info.snode = std::make_unique<sem::Declaration>(n.identifier, std::move(u));
-    info.entity = exp_info_p->entity;
+    info.set_entity(exp_info_p->entity.get().clone());
     if (info.entity.get().type == E_TYPE::CONST_FUNCTION) {
         Entity& entity_const_function = exp_info_p->entity;
         ConstFunction* const_function = ((EntityConstFunction&) entity_const_function).const_function;
         EntityValue* value_entity = new EntityValue(std::make_unique<Value>(const_function->ft->clone()));
-        info.entity = *value_entity;
+        info.set_entity(value_entity);
 
         if (value_entity->value->type->is_generic()) {
             this->error_reporter.fail("Error: you need to specialize the generic function of type " +

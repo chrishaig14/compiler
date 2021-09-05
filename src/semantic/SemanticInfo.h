@@ -16,6 +16,13 @@
 class SemanticInfo {
 public:
     std::reference_wrapper<Entity> entity;
+    std::unique_ptr<Entity> _entity;
+
+    void set_entity(Entity* e) {
+        this->_entity = std::unique_ptr<Entity>(e);
+        this->entity = *e;
+    }
+
     USNode snode;
     bool is_tuple_member;
     ~SemanticInfo();

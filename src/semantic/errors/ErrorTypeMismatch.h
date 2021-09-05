@@ -13,7 +13,7 @@
 class ErrorTypeMismatch : public Error {
     const ast::Type& expected;
     const ast::Node& value_node;
-    const Entity& actual;
+    std::unique_ptr<Entity> actual;
 public:
     ErrorTypeMismatch(const ast::Type& expected, const ast::Node& value_node, const Entity& actual);
 

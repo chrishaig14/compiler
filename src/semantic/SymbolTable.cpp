@@ -45,10 +45,10 @@ bool SymbolTable::declared(const std::string& name) {
 
 void SymbolTable::set(const std::string& name, Entity* info) {
     if (name == "__return__") {
-        this->ret = info;
+        this->ret = info->clone();
         return;
     }
-    this->table[name] = info;
+    this->table[name] = info->clone();
 }
 
 std::vector<std::pair<std::string, ast::Type*>> SymbolTable::get_all_in_loop() {

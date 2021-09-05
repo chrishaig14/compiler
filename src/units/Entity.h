@@ -59,6 +59,7 @@ protected:
     }
 
 public:
+    virtual Entity* clone() const = 0;
     virtual ~Entity() = default;
     const E_TYPE type;
     virtual bool equal(const Entity& other) const = 0;
@@ -83,6 +84,10 @@ public:
         return false;
     }
 
+    Entity* clone() const override {
+        return new EntityClass(this->clazz);
+    }
+
     Class* clazz;
 };
 
@@ -93,6 +98,10 @@ public:
 
     bool equal(const Entity& other) const override {
         return false;
+    }
+
+    Entity* clone() const override {
+        return new EntityPackage(this->package);
     }
 
     Package* package;
@@ -106,6 +115,11 @@ public:
     bool equal(const Entity& other) const override {
         return false;
     }
+
+
+    Entity* clone() const override {
+        return new EntityNothing();
+    }
 };
 
 class EntityModule : public Entity {
@@ -115,6 +129,10 @@ public:
 
     bool equal(const Entity& other) const override {
         return false;
+    }
+
+    Entity* clone() const override {
+        return new EntityModule(this->module);
     }
 
     Module* module;
@@ -132,6 +150,10 @@ public:
     bool equal(const Entity& other) const override {
         return false;
     }
+
+    Entity* clone() const override {
+        return new EntityConstFunction(this->const_function);
+    }
 };
 
 class EntityEnum : public Entity {
@@ -141,6 +163,10 @@ public:
 
     bool equal(const Entity& other) const override {
         return false;
+    }
+
+    Entity* clone() const override {
+        return new EntityEnum(this->enumm);
     }
 
     Enum* enumm;
@@ -154,6 +180,10 @@ public:
     bool equal(const Entity& other) const override {
         return false;
     }
+
+    EntityNotFound* clone() const override {
+        return new EntityNotFound();
+    }
 };
 
 class EntityError : public Entity {
@@ -163,6 +193,10 @@ public:
 
     bool equal(const Entity& other) const override {
         return false;
+    }
+
+    EntityError* clone() const override {
+        return new EntityError();
     }
 };
 

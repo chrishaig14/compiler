@@ -39,7 +39,7 @@ USemanticInfo Checker::visit_call(ast::Call& n, bool is_rvalue) {
     if (n.arguments.size() != function_type->param_types.size()) {
         this->error_reporter.error(std::make_unique<ErrorFunctionCallNumArgs>(function_type->clone(), n.start));
         if (!function_is_generic(*function_type)) {
-            retv.entity = *entity_from_type(*function_type->return_type);
+            retv.set_entity(entity_from_type(*function_type->return_type));
             return retv_p;
         } else {
             return error_stub();
@@ -170,7 +170,7 @@ USemanticInfo Checker::make_return_info(const ast::Call& n, bool is_rvalue, USem
         Value& value = *((EntityValue&) retv.entity.get()).value;
         if (value.type->kind == Kind::OBJECT) {
             if (value.type->object().id == ".None") {
-                retv.entity = *new EntityNothing();
+                retv.set_entity(new EntityNothing());
             } else {
                 fill_value(value);
             }
@@ -190,10 +190,10 @@ bool Checker::check_arguments(ast::Call& n, std::vector<USNode>& arguments, ast:
             continue;
         }
 
-        arg_entities.push_back(&arg_type_p->entity.get());
+        Entity* x = arg_type_p->entity.get().clone();
+        arg_entities.push_back(x);
         arguments.push_back(std::move(arg_type_p->snode));
-        Entity* arg_entity_p = &arg_type_p->entity.get();
-        Entity& arg_entity = *arg_entity_p;
+        Entity& arg_entity = *x;
         if (arg_entity.type == E_TYPE::CLASS || arg_entity.type == E_TYPE::PACKAGE ||
             arg_entity.type == E_TYPE::MODULE || arg_entity.type == E_TYPE::ENUM ||
             arg_entity.type == E_TYPE::NOTHING) {
@@ -211,9 +211,9 @@ bool Checker::check_arguments(ast::Call& n, std::vector<USNode>& arguments, ast:
 }
 
 void Checker::process_function_arguments(SemanticInfo& retv, std::vector<Entity*>& arg_entities,
-                                         std::vector<USNode>& arguments, ast::Call& n, const ast::FunctionType& function_type,
-                                         SemanticInfo* fun_info_p) {
-    retv.entity = *entity_from_type(*function_type.return_type);
+                                         std::vector<USNode>& arguments, ast::Call& n,
+                                         const ast::FunctionType& function_type, SemanticInfo* fun_info_p) {
+    retv.set_entity(entity_from_type(*function_type.return_type));
     int sni = static_cast<int>(fun_info_p->this_arg != nullptr);
     for (size_t i = 0; i < n.arguments.size(); i++) {
         // const ast::TypeNode& arg_type = *arg_types[i];
@@ -221,7 +221,9 @@ void Checker::process_function_arguments(SemanticInfo& retv, std::vector<Entity*
 
         USNode arg_rvalue_snode = this->make_rvalue(*arg_entities[i], std::move(arguments[sni]), param_type);
         if (arg_rvalue_snode == nullptr) {
-            this->error_reporter.error(std::make_unique<ErrorTypeMismatch>(param_type, n.arguments[i], *arg_entities[i]));
+            this->error_reporter.error(std::make_unique<ErrorTypeMismatch>(param_type,
+                                                                           n.arguments[i],
+                                                                           *arg_entities[i]));
             continue;
         }
         arguments[sni] = std::move(arg_rvalue_snode);

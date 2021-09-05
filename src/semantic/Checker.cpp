@@ -132,7 +132,7 @@ Checker::match_arguments_to_generic_function(const ast::FunctionType& ft, ast::V
     }
     USemanticInfo rv_p = std::make_unique<SemanticInfo>();
     auto& rv = *rv_p;
-    rv.entity = *new EntityValue(std::make_unique<Value>(f->return_type->clone()));
+    rv.set_entity(new EntityValue(std::make_unique<Value>(f->return_type->clone())));
     // delete f;
     return rv_p;
 }
@@ -305,9 +305,9 @@ Checker::~Checker() {
     for (const auto& s: this->scopes) {
         delete s.second;
     }
-    for (auto& e: this->entities) {
-        delete e.second;
-    }
+    // for (auto& e: this->entities) {
+    //     delete e.second;
+    // }
 }
 
 bool Checker::is_variable(const ast::ObjectType& a) {

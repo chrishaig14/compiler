@@ -60,7 +60,7 @@ USemanticInfo Checker::module_member(Module& mod, const std::string& child, ast:
     Flirpin flirpin = mod.flirpins[child];
     USemanticInfo info_u = std::make_unique<SemanticInfo>();
     SemanticInfo& info = *info_u;
-    info.entity = *map_flirpin_to_entity(flirpin);
+    info.set_entity(map_flirpin_to_entity(flirpin));
     if (flirpin.type == F_TYPE::CONST_FUNCTION) {
         auto idn = std::make_unique<sem::Id>(flirpin.const_function->path.as_str());
         info.snode = std::move(idn);
@@ -97,9 +97,9 @@ USemanticInfo Checker::object_member(USNode object_snode, Value& p_value, const 
     Class* clazz = p_value.clazz;
     assert(clazz != nullptr);
     if (clazz->members.count(child) != 0) {
-        info.entity = *clazz->member_entities.at(child);
+        info.set_entity(clazz->member_entities.at(child));
         if (info.entity.get().type == E_TYPE::NOTHING) {
-            info.entity = *entity_from_type(*clazz->members.at(child));
+            info.set_entity(entity_from_type(*clazz->members.at(child)));
             clazz->member_entities[child] = &info.entity.get();
             auto* ev = &(EntityValue&) info.entity.get();
             Value& vup = *(ev->value);
@@ -110,7 +110,7 @@ USemanticInfo Checker::object_member(USNode object_snode, Value& p_value, const 
     } else if (clazz->methods.count(child) != 0) {
         // auto* idn = new sem::Id(clazz->methods[child]->path.as_str());
         info.snode = std::make_unique<sem::ObjectMethod>(std::move(object_snode), clazz->path, child);
-        info.entity = *new EntityConstFunction(clazz->methods[child]);
+        info.set_entity(new EntityConstFunction(clazz->methods[child]));
         // if (this->is_call) {
         // method call
         // info.this_arg = object_snode.release();
@@ -160,7 +160,7 @@ USemanticInfo Checker::package_member(Package& package, const std::string& child
     Unit unit = package.units[child];
     USemanticInfo info_u = std::make_unique<SemanticInfo>();
     SemanticInfo& info = *info_u;
-    info.entity = *map_flirpin_to_entity(map_unit_to_flirpin(unit));
+    info.set_entity(map_flirpin_to_entity(map_unit_to_flirpin(unit)));
     return info_u;
 }
 
@@ -178,13 +178,13 @@ USemanticInfo Checker::class_member(Class* cls, const std::string& child, ast::M
         }
         ast::ObjectType* ot = new ast::ObjectType(cls->class_name, tp);
         unbound_method->ft->param_types.insert(unbound_method->ft->param_types.begin(), ast::UTypeNode(ot));
-        info.entity = *new EntityConstFunction(unbound_method);
+        info.set_entity(new EntityConstFunction(unbound_method));
         info.snode = std::make_unique<sem::Id>(unbound_method->path.as_str());
     } else if (cls->static_methods.find(child) != cls->static_methods.end()) {
-        info.entity = *new EntityConstFunction(cls->static_methods[child]);
+        info.set_entity(new EntityConstFunction(cls->static_methods[child]));
         info.snode = std::make_unique<sem::Id>(cls->static_methods[child]->path.as_str());
     } else if (cls->static_members.find(child) != cls->static_members.end()) {
-        info.entity = *entity_from_type(*cls->static_members[child].first);
+        info.set_entity(entity_from_type(*cls->static_members[child].first));
     } else {
         this->error_reporter.error(std::make_unique<ErrorClassNoMember>(ast::ObjectType(cls->class_name, {}),
                                                       child,
