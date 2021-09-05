@@ -25,9 +25,7 @@ USemanticInfo Checker::visit_number(ast::Number& node) {
     switch (node.num_type) {
         case NumberType::INTEGER: {
             info.set_entity(this->entity_value_from_actual_base_path_no_generic(Path("core.core.Integer")).clone());
-            auto snode = std::make_unique<sem::Integer>(std::string());
-            snode->str = node.str;
-            info.snode = std::move(snode);
+            info.snode = std::make_unique<sem::Integer>(node.str);
             break;
         }
         case NumberType::FLOAT: {
@@ -170,7 +168,7 @@ USemanticInfo Checker::visit_partial(ast::PartialApplication& node) {
     USemanticInfo s_p = std::make_unique<SemanticInfo>();
     auto& s = *s_p;
     s.entity = *new EntityValue(std::make_unique<Value>(new ast::FunctionType(partial_args,
-                                                                         ast::UTypeNode(fun_type->return_type->clone()))));
+                                                                              ast::UTypeNode(fun_type->return_type->clone()))));
     auto non = std::make_unique<sem::NewObject>();
     non->class_name = "Partial" + std::to_string(npartial);
     non->args = std::move(snodes);
