@@ -82,8 +82,7 @@ USemanticInfo Checker::visit_string(ast::String& node) {
     USemanticInfo info_u = std::make_unique<SemanticInfo>();
     SemanticInfo& info = *info_u;
     info.is_constant = true;
-    auto sn = std::make_unique<sem::String>(node.str);
-    info.snode = std::move(sn);
+    info.snode = std::make_unique<sem::String>(node.str);
     // auto* otype = new ast::ObjectType("String", {});
     // otype->actual_base_path = Path("core.core.String");
     // auto ov = std::make_unique<Value>(otype);
