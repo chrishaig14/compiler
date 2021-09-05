@@ -205,8 +205,7 @@ USemanticInfo Checker::visit_dict(ast::DictNode& node) {
     this->fill_value(*ov);
     assert(ov->clazz != nullptr);
     info.set_entity(new EntityValue(std::move(ov)));
-    auto nsn = std::make_unique<sem::Dict>(std::move(items));
-    info.snode = std::move(nsn);
+    info.snode = std::make_unique<sem::Dict>(std::move(items));
     return info_u;
 }
 
