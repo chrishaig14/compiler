@@ -101,19 +101,19 @@ void GlobalProcessor::visit_root() {
             // this->dispatch(n);
             auto* class_info = new Class(((ast::Klass&) n).class_name,
                                          Path(this->module.path, ((ast::Klass&) n).class_name));
-            this->module.flirpins[((ast::Klass&) n).class_name] = Flirpin{.type=F_TYPE::CLASS, .clazz=class_info};
+            this->module.add_class_definition(class_info);
         } else if (n.ntype == NodeType::ENUM) {
             Enum* enumm = make_enum((ast::EnumNode&) n, this->module.path);
-            this->module.flirpins[enumm->enumm_name] = Flirpin{.type=F_TYPE::ENUM, .enumm=enumm};
+            this->module.add_enum_definition(enumm);
         }
     }
     for (auto& np: node.nodes) {
         auto& n = *np;
         if (n.ntype == NodeType::FUNC) {
             // this->dispatch(n);
-            auto* const_function = new ConstFunction(Path(), nullptr);
-            this->module.const_functions.push_back(std::unique_ptr<ConstFunction>(const_function));
-            this->module.flirpins[((ast::Function&) n).identifier] = Flirpin{.type=F_TYPE::CONST_FUNCTION, .const_function=const_function};
+            ConstFunction* const_function = new ConstFunction(Path(this->module.path, ((ast::Function&) n).identifier),
+                                                              nullptr);
+            this->module.add_func_definition(const_function);
         }
     }
     for (auto& n: node.nodes) {
