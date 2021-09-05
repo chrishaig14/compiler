@@ -15,24 +15,24 @@ enum class Meta {
 };
 
 class Value : public Entity {
-
+    ast::Type* _type;
 public:
-    ast::Type* type;
+    ast::Type& type;
     union {
         Class* clazz;
         Enum* enumm;
     };
     Meta metatype;
 
-    Value(ast::Type* type) : Entity(E_TYPE::VALUE) {
+    Value(ast::Type* type) : Entity(E_TYPE::VALUE), type(*type) {
         this->clazz = nullptr;
         this->enumm = nullptr;
         assert(type != nullptr);
-        this->type = type;
+        this->_type = type;
     }
 
     Entity* clone() const override {
-        auto* v = new Value(type);
+        auto* v = new Value(this->type.clone());
         v->metatype = this->metatype;
         switch (this->metatype) {
             case Meta::CLASS: {
@@ -49,7 +49,7 @@ public:
 
     bool equal(const Entity& other) const override {
         auto& o = (const Value&) other;
-        return this->metatype == o.metatype && *this->type == *o.type && this->clazz == o.clazz;
+        return this->metatype == o.metatype && this->type == o.type && this->clazz == o.clazz;
     }
 };
 

@@ -97,7 +97,7 @@ USemanticInfo Checker::visit_tuple(ast::Tuple& node) {
     for (auto& n: node.values) {
         USemanticInfo vtype = this->dispatch(*n);
         values.push_back(std::move(vtype->snode));
-        types.emplace_back(((Value&) vtype->entity).type->clone());
+        types.emplace_back(((Value&) vtype->entity).type.clone());
         // if (!this->is_immutable(vtype->type())) {
         //     this->error_reporter.tuple_member_not_immutable(vtype->type(), node.start);
         //     return error_stub();
@@ -110,11 +110,11 @@ USemanticInfo Checker::visit_tuple(ast::Tuple& node) {
     ov->metatype = Meta::CLASS;
 
     ov->clazz = new Class("Tuple", Path("core.core.Tuple"));
-    for (size_t i = 0; i < ov->type->object().type_params.size(); i++) {
-        auto tv = std::make_unique<Value>(ov->type->object().type_params[i]->clone());
+    for (size_t i = 0; i < ov->type.object().type_params.size(); i++) {
+        auto tv = std::make_unique<Value>(ov->type.object().type_params[i]->clone());
         this->fill_value(*tv);
         const std::string& mem_name = std::to_string(i + 1);
-        ov->clazz->members[mem_name] = tv->type->clone();
+        ov->clazz->members[mem_name] = tv->type.clone();
         ov->clazz->member_entities[mem_name] = tv.release();
     }
     sinfo.set_entity(ov.release());
@@ -133,7 +133,7 @@ USemanticInfo Checker::visit_partial(ast::PartialApplication& node) {
     ast::FunctionType* fun_type = nullptr;
     Entity& f_entity = func->entity;
     if (f_entity.type == E_TYPE::CONST_FUNCTION ||
-        (f_entity.type == E_TYPE::VALUE && ((Value&) f_entity).type->kind == Kind::FUNCTION)) {
+        (f_entity.type == E_TYPE::VALUE && ((Value&) f_entity).type.kind == Kind::FUNCTION)) {
         fun_type = ((EntityConstFunction&) f_entity).const_function->ft->clone();
     } else {
         this->error_reporter.fail("Error: expected a function for partial application");
@@ -180,8 +180,8 @@ USemanticInfo Checker::visit_dict(ast::DictNode& node) {
     USemanticInfo first_value_info = this->dispatch(node.items[0].second);
     Value& first_key_entity = (Value&) first_key_info->entity.get();
     Value& first_value_entity = (Value&) first_value_info->entity.get();
-    ast::ObjectType& first_key_type = first_key_entity.type->object();
-    ast::ObjectType& first_value_type = first_value_entity.type->object();
+    ast::ObjectType& first_key_type = first_key_entity.type.object();
+    ast::ObjectType& first_value_type = first_value_entity.type.object();
 
     std::vector<std::pair<USNode, USNode>> items;
     items.emplace_back(std::move(first_key_info->snode), std::move(first_value_info->snode));
@@ -201,7 +201,7 @@ USemanticInfo Checker::visit_dict(ast::DictNode& node) {
         return error_stub();
     }
     auto ov = std::make_unique<Value>(new ast::ObjectType("Dict", {first_key_type.clone(), first_value_type.clone()}));
-    this->module.fill_actual(*ov->type);
+    this->module.fill_actual(ov->type);
     this->fill_value(*ov);
     assert(ov->clazz != nullptr);
     info.set_entity(ov.release());
@@ -215,7 +215,7 @@ USemanticInfo Checker::visit_emptydict(ast::EmptyDict& node) {
     ast::ObjectType* ot = new ast::ObjectType("Dict", {node.key_type->clone(), node.value_type->clone()});
     ot->data.actual_base_path = Path("core.core.Dict");
     auto ov = std::make_unique<Value>(ot);
-    this->module.fill_actual(*ov->type);
+    this->module.fill_actual(ov->type);
     this->fill_value(*ov);
     assert(ov->clazz != nullptr);
     info.set_entity(ov.release());
@@ -258,7 +258,7 @@ USemanticInfo Checker::visit_list(ast::List& node) {
         return error_stub();
     }
     Value& entity_value = (Value&) element_type_p->entity.get();
-    ast::Type* element_type = entity_value.type->clone();
+    ast::Type* element_type = entity_value.type.clone();
     bool is_constant = true;
     std::vector<USNode> list_elements;
     list_elements.push_back(std::move(element_type_p->snode));
@@ -270,7 +270,7 @@ USemanticInfo Checker::visit_list(ast::List& node) {
         //     is_constant = false;
         // }
         Value& p_entity = (Value&) current_type_p->entity.get();
-        ast::ObjectType* ctype = &p_entity.type->object();
+        ast::ObjectType* ctype = &p_entity.type.object();
         if (*ctype != *element_type) {
             this->error_reporter.error(std::make_unique<ErrorTypeMismatch>(*element_type, node.elements[i], p_entity));
         }

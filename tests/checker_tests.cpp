@@ -233,7 +233,7 @@ TEST_CASE("int_literal", "[checker]") {
     REQUIRE(checker.error_reporter.errors.size() == 0);
     REQUIRE(info->entity.get().type == E_TYPE::VALUE);
     REQUIRE(((Value&) (info->entity.get())).metatype == Meta::CLASS);
-    REQUIRE(*((Value&) (info->entity.get())).type == ast::ObjectType("Integer"));
+    REQUIRE(((Value&) (info->entity.get())).type == ast::ObjectType("Integer"));
 }
 
 TEST_CASE("bool_literal", "[checker]") {
@@ -251,7 +251,7 @@ TEST_CASE("bool_literal", "[checker]") {
     REQUIRE(checker.error_reporter.errors.size() == 0);
     REQUIRE(info->entity.get().type == E_TYPE::VALUE);
     REQUIRE(((Value&) (info->entity.get())).metatype == Meta::CLASS);
-    REQUIRE(*((Value&) (info->entity.get())).type == ast::ObjectType("Boolean"));
+    REQUIRE(((Value&) (info->entity.get())).type == ast::ObjectType("Boolean"));
 }
 
 TEST_CASE("list_literal", "[checker]") {
@@ -269,7 +269,7 @@ TEST_CASE("list_literal", "[checker]") {
     REQUIRE(checker.error_reporter.errors.size() == 0);
     REQUIRE(info->entity.get().type == E_TYPE::VALUE);
     REQUIRE(((Value&) (info->entity.get())).metatype == Meta::CLASS);
-    REQUIRE(*((Value&) (info->entity.get())).type ==
+    REQUIRE(((Value&) (info->entity.get())).type ==
             ast::ObjectType("List", {new ast::ObjectType("Integer")}));
 }
 
@@ -288,7 +288,7 @@ TEST_CASE("empty_list_literal", "[checker]") {
     REQUIRE(checker.error_reporter.errors.size() == 0);
     REQUIRE(info->entity.get().type == E_TYPE::VALUE);
     REQUIRE(((Value&) (info->entity.get())).metatype == Meta::CLASS);
-    REQUIRE(*((Value&) (info->entity.get())).type ==
+    REQUIRE(((Value&) (info->entity.get())).type ==
             ast::ObjectType("List", {new ast::ObjectType("String")}));
 }
 
@@ -307,7 +307,7 @@ TEST_CASE("empty_dict_literal", "[checker]") {
     REQUIRE(checker.error_reporter.errors.size() == 0);
     REQUIRE(info->entity.get().type == E_TYPE::VALUE);
     REQUIRE(((Value&) (info->entity.get())).metatype == Meta::CLASS);
-    REQUIRE(*((Value&) (info->entity.get())).type ==
+    REQUIRE(((Value&) (info->entity.get())).type ==
             ast::ObjectType("Dict", {new ast::ObjectType("Integer"), new ast::ObjectType("String")}));
 }
 
@@ -327,7 +327,7 @@ TEST_CASE("dict_literal", "[checker]") {
     REQUIRE(checker.error_reporter.errors.size() == 0);
     REQUIRE(info->entity.get().type == E_TYPE::VALUE);
     REQUIRE(((Value&) (info->entity.get())).metatype == Meta::CLASS);
-    REQUIRE(*((Value&) (info->entity.get())).type ==
+    REQUIRE(((Value&) (info->entity.get())).type ==
             ast::ObjectType("Dict", {new ast::ObjectType("String"), new ast::ObjectType("Integer")}));
 }
 
@@ -346,7 +346,7 @@ TEST_CASE("float_literal", "[checker]") {
     REQUIRE(checker.error_reporter.errors.size() == 0);
     REQUIRE(info->entity.get().type == E_TYPE::VALUE);
     REQUIRE(((Value&) (info->entity.get())).metatype == Meta::CLASS);
-    REQUIRE(*((Value&) (info->entity.get())).type == ast::ObjectType("Float"));
+    REQUIRE(((Value&) (info->entity.get())).type == ast::ObjectType("Float"));
 }
 
 // TEST_CASE("none_literal", "[checker]") {
@@ -449,7 +449,7 @@ TEST_CASE("binop_ok", "[checker]") {
     CHECK(info->entity.get().type == E_TYPE::VALUE);
     Value& entity_value = (Value&) (info->entity.get());
     CHECK(entity_value.metatype == Meta::CLASS);
-    CHECK(*entity_value.type == ast::ObjectType("Integer"));
+    CHECK(entity_value.type == ast::ObjectType("Integer"));
 }
 
 TEST_CASE("boolop_ok", "[checker]") {
@@ -470,7 +470,7 @@ TEST_CASE("boolop_ok", "[checker]") {
     CHECK(info->entity.get().type == E_TYPE::VALUE);
     Value& entity_value = (Value&) (info->entity.get());
     CHECK(entity_value.metatype == Meta::CLASS);
-    CHECK(*entity_value.type == ast::ObjectType("Boolean"));
+    CHECK(entity_value.type == ast::ObjectType("Boolean"));
 }
 
 

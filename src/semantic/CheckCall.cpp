@@ -32,8 +32,8 @@ USemanticInfo Checker::visit_call(ast::Call& n, bool is_rvalue) {
     if (fun_info.entity.get().type == E_TYPE::CONST_FUNCTION) {
         function_type = ((EntityConstFunction&) fun_info.entity.get()).const_function->ft;
     } else if (fun_info.entity.get().type == E_TYPE::VALUE &&
-               ((Value&) fun_info.entity).type->kind == Kind::FUNCTION) {
-        function_type = &((Value&) fun_info.entity.get()).type->function();
+               ((Value&) fun_info.entity).type.kind == Kind::FUNCTION) {
+        function_type = &((Value&) fun_info.entity.get()).type.function();
     }
     // ok
     if (n.arguments.size() != function_type->param_types.size()) {
@@ -168,8 +168,8 @@ USemanticInfo Checker::make_return_info(const ast::Call& n, bool is_rvalue, USem
         }
     } else if (retv.entity.get().type == E_TYPE::VALUE) {
         Value& value = ((Value&) retv.entity.get());
-        if (value.type->kind == Kind::OBJECT) {
-            if (value.type->object().id == ".None") {
+        if (value.type.kind == Kind::OBJECT) {
+            if (value.type.object().id == ".None") {
                 retv.set_entity(new EntityNothing());
             } else {
                 fill_value(value);

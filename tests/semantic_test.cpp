@@ -299,7 +299,7 @@ TEST_CASE("semantic_output_float_literal", "[checker]") {
     REQUIRE(checker.error_reporter.errors.size() == 0);
     REQUIRE(info->entity.get().type == E_TYPE::VALUE);
     REQUIRE(((Value&) (info->entity.get())).metatype == Meta::CLASS);
-    REQUIRE(*((Value&) (info->entity.get())).type == ast::ObjectType("Float"));
+    REQUIRE(((Value&) (info->entity.get())).type == ast::ObjectType("Float"));
 }
 
 // TEST_CASE("semantic_output_none_literal", "[checker]") {
@@ -355,7 +355,7 @@ TEST_CASE("semantic_output_binop", "[checker]") {
     CHECK(info->entity.get().type == E_TYPE::VALUE);
     Value& entity_value = (Value&) (info->entity.get());
     CHECK(entity_value.metatype == Meta::CLASS);
-    CHECK(*entity_value.type == ast::ObjectType("Integer"));
+    CHECK(entity_value.type == ast::ObjectType("Integer"));
 }
 
 TEST_CASE("semantic_output_boolop", "[checker]") {
@@ -377,7 +377,7 @@ TEST_CASE("semantic_output_boolop", "[checker]") {
     CHECK(info->entity.get().type == E_TYPE::VALUE);
     Value& entity_value = (Value&) (info->entity.get());
     CHECK(entity_value.metatype == Meta::CLASS);
-    CHECK(*entity_value.type == ast::ObjectType("Boolean"));
+    CHECK(entity_value.type == ast::ObjectType("Boolean"));
 }
 
 TEST_CASE("semantic_output_subscript", "[checker]") {

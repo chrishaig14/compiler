@@ -30,18 +30,18 @@ std::unique_ptr<SemanticInfo> Checker::expect_rvalue_of_type(const ast::Type& ta
 USNode Checker::make_rvalue(const Entity& t_entity, USNode value_snode, const ast::Type& target) {
     if (t_entity.type == E_TYPE::VALUE) {
         Value& value_entity = (Value&) t_entity;
-        if (value_entity.type->kind != target.kind) {
+        if (value_entity.type.kind != target.kind) {
             return nullptr;
         }
-        if (value_entity.type->kind == Kind::FUNCTION) {
-            if (*value_entity.type == target) {
+        if (value_entity.type.kind == Kind::FUNCTION) {
+            if (value_entity.type == target) {
                 return value_snode;
             } else {
                 return nullptr;
                 // throw std::runtime_error("Error cannot make function rvalue");
             }
         }
-        const ast::ObjectType& value_ot = value_entity.type->object();
+        const ast::ObjectType& value_ot = value_entity.type.object();
         const ast::ObjectType& target_ot = target.object();
 
         const ast::Type* unaliased_value_type = &value_ot;
@@ -180,9 +180,9 @@ USemanticInfo Checker::check_declaration_without_type(ast::Declaration& n) {
         Value* value_entity = std::make_unique<Value>(const_function->ft->clone()).release();
         info.set_entity(value_entity);
 
-        if (value_entity->type->is_generic()) {
+        if (value_entity->type.is_generic()) {
             this->error_reporter.fail("Error: you need to specialize the generic function of type " +
-                                      value_entity->type->to_string() +
+                                      value_entity->type.to_string() +
                                       " to be able to use it without calling it");
         }
     }
