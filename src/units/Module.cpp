@@ -4,11 +4,8 @@
 
 #include "Module.h"
 
-Module::Module(Path path, std::string abs_path, std::string rel_path, bool is_lib, std::string full_header_path) {
-    this->path = path;
-    this->name = path.as_vec().back();
-    this->abs_path = abs_path;
-    this->is_lib = is_lib;
+Module::Module(Path path, std::string abs_path, std::string rel_path, bool is_lib, std::string full_header_path) : name(
+        path.as_vec().back()), abs_path(abs_path), is_lib(is_lib), path(path) {
     this->full_header_path = full_header_path;
 }
 

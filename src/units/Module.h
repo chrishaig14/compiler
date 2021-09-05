@@ -15,22 +15,23 @@
 
 class Module {
 public:
-    std::string name;
+    const std::string name;
+    const std::string abs_path;
+    const bool is_lib;
+    const Path path;
+    
     std::vector<std::unique_ptr<ConstFunction>> const_functions;
-    std::string abs_path;
     CodeLines code_lines;
+
     ast::UBlock ast;
     std::unique_ptr<sem::Block> sast;
-
     std::map<std::string, std::string> included_module_paths;
-    bool is_lib;
     std::map<std::string, Path> imported_paths_no_alias;
     std::map<std::string, Path> imported_paths_with_alias;
     std::map<std::string, ast::Type*> aliased_types;
     std::vector<std::pair<std::string, Path>> imported_paths_no_alias_v;
     std::vector<std::pair<std::string, Path>> imported_paths_with_alias_v;
     std::map<std::string, Entity*> imports;
-    Path path;
     std::map<std::string, Flirpin> flirpins;
     std::string full_header_path;
 
