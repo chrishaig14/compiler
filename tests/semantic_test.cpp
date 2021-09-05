@@ -50,7 +50,7 @@ TEST_CASE("semantic_output_basic_function", "[checker]") {
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
     Checker checker(*c.top_package, module);
-    USemanticInfo info = checker.visit_function((ast::Function&) *module.ast->nodes[0]);
+    USemanticInfo info = checker.visit_function(module.ast->functions[0]);
     REQUIRE(not checker.error_reporter.failed);
     std::unique_ptr<sem::Block> b = std::make_unique<sem::Block>();
     b->nodes.emplace_back(std::make_unique<sem::Return>(std::make_unique<sem::Integer>("0")));
@@ -66,7 +66,7 @@ TEST_CASE("semantic_output_basic_declaration", "[checker]") {
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
     Checker checker(*c.top_package, module);
-    USemanticInfo info = checker.visit_declaration((ast::Declaration&) *((std::unique_ptr<ast::Function>&) module.ast->nodes[0])->body->nodes[0]);
+    USemanticInfo info = checker.visit_declaration((ast::Declaration&) *module.ast->functions[0].get().body->nodes[0]);
     REQUIRE(not checker.error_reporter.failed);
     auto exp = sem::Declaration("x", std::make_unique<sem::Integer>("9"));
     REQUIRE(*info->snode == exp);
@@ -80,7 +80,7 @@ TEST_CASE("semantic_output_list", "[checker]") {
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
     Checker checker(*c.top_package, module);
-    USemanticInfo info = checker.visit_declaration((ast::Declaration&) *((std::unique_ptr<ast::Function>&) module.ast->nodes[0])->body->nodes[0]);
+    USemanticInfo info = checker.visit_declaration((ast::Declaration&) *module.ast->functions[0].get().body->nodes[0]);
     REQUIRE(not checker.error_reporter.failed);
     std::vector<USNode> e;
     e.push_back(std::make_unique<sem::Integer>("4"));
@@ -98,7 +98,7 @@ TEST_CASE("semantic_output_empty_dict", "[checker]") {
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
     Checker checker(*c.top_package, module);
-    USemanticInfo info = checker.visit_declaration((ast::Declaration&) *((std::unique_ptr<ast::Function>&) module.ast->nodes[0])->body->nodes[0]);
+    USemanticInfo info = checker.visit_declaration((ast::Declaration&) *module.ast->functions[0].get().body->nodes[0]);
     REQUIRE(not checker.error_reporter.failed);
     std::vector<std::pair<USNode, USNode>> e;
     auto exp = sem::Declaration("x", std::make_unique<sem::Dict>(std::move(e)));
@@ -113,7 +113,7 @@ TEST_CASE("semantic_output_dict", "[checker]") {
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
     Checker checker(*c.top_package, module);
-    USemanticInfo info = checker.visit_declaration((ast::Declaration&) *((std::unique_ptr<ast::Function>&) module.ast->nodes[0])->body->nodes[0]);
+    USemanticInfo info = checker.visit_declaration((ast::Declaration&) *module.ast->functions[0].get().body->nodes[0]);
     REQUIRE(not checker.error_reporter.failed);
     std::vector<std::pair<USNode, USNode>> e;
     e.emplace_back(std::make_unique<sem::Integer>("7"), std::make_unique<sem::String>("seven"));
@@ -130,7 +130,7 @@ TEST_CASE("semantic_output_int_literal", "[checker]") {
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
     Checker checker(*c.top_package, module);
-    USemanticInfo info = checker.visit_declaration((ast::Declaration&) *((std::unique_ptr<ast::Function>&) module.ast->nodes[0])->body->nodes[0]);
+    USemanticInfo info = checker.visit_declaration((ast::Declaration&) *module.ast->functions[0].get().body->nodes[0]);
     REQUIRE(not checker.error_reporter.failed);
     auto exp = sem::Declaration("x", std::make_unique<sem::Integer>("9"));
     REQUIRE(*info->snode == exp);
@@ -144,7 +144,7 @@ TEST_CASE("semantic_output_bool_literal", "[checker]") {
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
     Checker checker(*c.top_package, module);
-    USemanticInfo info = checker.visit_declaration((ast::Declaration&) *((std::unique_ptr<ast::Function>&) module.ast->nodes[0])->body->nodes[0]);
+    USemanticInfo info = checker.visit_declaration((ast::Declaration&) *module.ast->functions[0].get().body->nodes[0]);
     REQUIRE(not checker.error_reporter.failed);
     auto exp = sem::Declaration("x", std::make_unique<sem::Bool>(false));
     REQUIRE(*info->snode == exp);
@@ -158,7 +158,7 @@ TEST_CASE("semantic_output_empty_list_literal", "[checker]") {
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
     Checker checker(*c.top_package, module);
-    USemanticInfo info = checker.visit_declaration((ast::Declaration&) *((std::unique_ptr<ast::Function>&) module.ast->nodes[0])->body->nodes[0]);
+    USemanticInfo info = checker.visit_declaration((ast::Declaration&) *module.ast->functions[0].get().body->nodes[0]);
     REQUIRE(not checker.error_reporter.failed);
     std::vector<USNode> e;
     auto exp = sem::Declaration("x", std::make_unique<sem::List>(std::move(e)));
@@ -173,7 +173,7 @@ TEST_CASE("semantic_output_object_member", "[checker]") {
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
     Checker checker(*c.top_package, module);
-    USemanticInfo info = checker.visit_function((ast::Function&) *module.ast->nodes[1]);
+    USemanticInfo info = checker.visit_function(module.ast->functions[0]);
     REQUIRE(not checker.error_reporter.failed);
     std::vector<USNode> e;
     auto exp = sem::Declaration("x",
@@ -191,7 +191,7 @@ TEST_CASE("semantic_output_object_method_call", "[checker]") {
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
     Checker checker(*c.top_package, module);
-    USemanticInfo info = checker.visit_function((ast::Function&) *module.ast->nodes[1]);
+    USemanticInfo info = checker.visit_function(module.ast->functions[0]);
     REQUIRE(not checker.error_reporter.failed);
     std::vector<USNode> e;
     auto exp = sem::Declaration("x",
@@ -210,7 +210,7 @@ TEST_CASE("semantic_output_object_method", "[checker]") {
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
     Checker checker(*c.top_package, module);
-    USemanticInfo info = checker.visit_function((ast::Function&) *module.ast->nodes[1]);
+    USemanticInfo info = checker.visit_function(module.ast->functions[0]);
     REQUIRE(not checker.error_reporter.failed);
     std::vector<USNode> e;
     auto exp = sem::Declaration("x",
@@ -233,7 +233,7 @@ TEST_CASE("semantic_output_assign_const_function", "[checker]") {
     }
     Checker checker(*c.top_package, module);
     checker.init();
-    USemanticInfo info = checker.visit_function((ast::Function&) *module.ast->nodes[1]);
+    USemanticInfo info = checker.visit_function(module.ast->functions[1]);
     REQUIRE(not checker.error_reporter.failed);
     std::vector<USNode> e;
     auto exp = sem::Declaration("x", std::make_unique<sem::ConstFunction>(Path("test.tmp.bar")));
@@ -253,7 +253,7 @@ TEST_CASE("semantic_output_const_function_call", "[checker]") {
     }
     Checker checker(*c.top_package, module);
     checker.init();
-    USemanticInfo info = checker.visit_function((ast::Function&) *module.ast->nodes[1]);
+    USemanticInfo info = checker.visit_function(module.ast->functions[1]);
     REQUIRE(not checker.error_reporter.failed);
     std::vector<USNode> e;
     auto exp = sem::Declaration("x",
@@ -274,7 +274,7 @@ TEST_CASE("semantic_output_while", "[checker]") {
     }
     Checker checker(*c.top_package, module);
     checker.init();
-    USemanticInfo info = checker.visit_function((ast::Function&) *module.ast->nodes[0]);
+    USemanticInfo info = checker.visit_function(module.ast->functions[0]);
     REQUIRE(not checker.error_reporter.failed);
     std::vector<USNode> e;
     auto block = std::make_unique<sem::Block>();
@@ -292,7 +292,7 @@ TEST_CASE("semantic_output_float_literal", "[checker]") {
     Module& module = *c.root_package->units["tmp"].module;
     analyze_module_result(module, *c.top_package);
     Checker checker(*c.top_package, module);
-    ast::Node& expression = ((ast::Declaration&) *((ast::Function&) *module.ast->nodes[0]).body->nodes[0]).expression;
+    ast::Node& expression = ((ast::Declaration&) *(module.ast->functions[0].get().body->nodes[0])).expression;
     USemanticInfo info = checker.dispatch_rvalue(expression);
 
     REQUIRE(!checker.error_reporter.failed);
@@ -347,7 +347,7 @@ TEST_CASE("semantic_output_binop", "[checker]") {
     Checker checker(*c.top_package, module);
     checker.init();
 
-    ast::Node& expression = ((ast::Declaration&) *((ast::Function&) *module.ast->nodes[0]).body->nodes[0]).expression;
+    ast::Node& expression = ((ast::Declaration&) *(module.ast->functions[0].get().body->nodes[0])).expression;
     USemanticInfo info = checker.dispatch_rvalue(expression);
 
     REQUIRE(!checker.error_reporter.failed);
@@ -368,7 +368,8 @@ TEST_CASE("semantic_output_boolop", "[checker]") {
     Checker checker(*c.top_package, module);
     checker.init();
 
-    ast::Node& expression = ((ast::Declaration&) *((ast::Function&) *module.ast->nodes[0]).body->nodes[0]).expression;
+    ast::Node& expression = ((ast::Declaration&) *(module.ast->functions[0].get().body->nodes[0])).expression;
+
     USemanticInfo info = checker.dispatch_rvalue(expression);
 
     REQUIRE(!checker.error_reporter.failed);
@@ -389,7 +390,8 @@ TEST_CASE("semantic_output_subscript", "[checker]") {
     Checker checker(*c.top_package, module);
     checker.init();
 
-    ast::Node& expression = ((ast::Declaration&) *((ast::Function&) *module.ast->nodes[0]).body->nodes[0]).expression;
+    ast::Node& expression = ((ast::Declaration&) *(module.ast->functions[0].get().body->nodes[0])).expression;
+
     USemanticInfo info = checker.dispatch_rvalue(expression);
 
     REQUIRE(!checker.error_reporter.failed);

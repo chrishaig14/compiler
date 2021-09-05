@@ -81,63 +81,39 @@ Enum* make_enum(ast::EnumNode& n, Path module_path) {
 }
 
 void GlobalProcessor::visit_root() {
-    // process imports first
-    // process classes second
-    // finally process functions
-    ast::Block& node = *this->module.ast;
+    ast::Module& node = *this->module.ast;
     check_duplicated_names(node);
-
     this->add_default_imports();
 
-    for (auto& n: node.nodes) {
-        if (n->ntype == NodeType::IMPORT) {
-            this->dispatch(*n);
-        }
-
+    for (ast::Import& n: node.imports) {
+        this->visit_import(n);
     }
-    for (auto& np: node.nodes) {
-        auto& n = *np;
-        if (n.ntype == NodeType::CLS) {
-            // this->dispatch(n);
-            auto* class_info = new Class(((ast::Klass&) n).class_name,
-                                         Path(this->module.path, ((ast::Klass&) n).class_name));
-            this->module.add_class_definition(class_info);
-        } else if (n.ntype == NodeType::ENUM) {
-            Enum* enumm = make_enum((ast::EnumNode&) n, this->module.path);
-            this->module.add_enum_definition(enumm);
-        }
+    for (ast::Klass& n: node.classes) {
+        auto* class_info = new Class(n.class_name, Path(this->module.path, n.class_name));
+        this->module.add_class_definition(class_info);
     }
-    for (auto& np: node.nodes) {
-        auto& n = *np;
-        if (n.ntype == NodeType::FUNC) {
-            // this->dispatch(n);
-            ConstFunction* const_function = new ConstFunction(Path(this->module.path, ((ast::Function&) n).identifier),
-                                                              nullptr);
-            this->module.add_func_definition(const_function);
-        }
-    }
-    for (auto& n: node.nodes) {
-        if (n->ntype == NodeType::ALIAS) {
-            this->dispatch(*n);
-        }
+    for (ast::EnumNode& n: node.enums) {
+        Enum* enumm = make_enum(n, this->module.path);
+        this->module.add_enum_definition(enumm);
     }
 
-    for (auto& n: node.nodes) {
-        if (n->ntype == NodeType::CLS) {
-            this->dispatch(*n);
-        }
+    for (ast::Function& n: node.functions) {
+        ConstFunction* const_function = new ConstFunction(Path(this->module.path, n.identifier), nullptr);
+        this->module.add_func_definition(const_function);
     }
-    for (auto& n: node.nodes) {
-        if (n->ntype == NodeType::FUNC) {
-            this->dispatch(*n);
-        }
+
+    for (ast::Klass& n: node.classes) {
+        this->visit_class(n);
+    }
+    for (ast::Function& n: node.functions) {
+        this->visit_function(n);
     }
 
 }
 
-void GlobalProcessor::check_duplicated_names(ast::Block& node) const {
+void GlobalProcessor::check_duplicated_names(ast::Module& node) const {
     std::map<std::string, void*> names;
-    for (auto& np: node.nodes) {
+    for (auto& np: node.all) {
         auto& n = *np;
         std::string name;
         if (n.ntype == NodeType::CLS) {

@@ -13,13 +13,7 @@ void Compiler::parse_single_module(Module& module) {
     Parser parser(__file__, scanner.code_lines, tokens);
     parser.top_package_name = this->top_package_name;
     module.code_lines = scanner.code_lines;
-    ast::UBlock ast;
-    // try {
-    ast = parser.parse_program();
-    // } catch (const std::runtime_error& e) {
-    //     std::cout << e.what() << std::endl;
-    // exit(1);
-    // }
+    std::unique_ptr<ast::Module> ast = parser.parse_module();
     module.ast = std::move(ast);
 }
 

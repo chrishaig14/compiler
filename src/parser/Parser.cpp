@@ -6,6 +6,7 @@
 #include "../semantic/GlobalProcessor.h"
 #include "../ast/PartialApplication.h"
 #include "../ast/UnaryOp.h"
+#include "../ast/Module.h"
 #include "../logging/logging.h"
 #include "../ast/DefaultConstructor.h"
 #include <fmt/core.h>
@@ -48,15 +49,59 @@ bool Parser::match(TokType type) const {
     return this->token.type == type;
 }
 
-std::unique_ptr<ast::Block> Parser::parse_program() {
-    ast::VectorOfNodesU program;
-    TextPosition start = this->token.start;
+std::unique_ptr<ast::Module> Parser::parse_module() {
+    // ast::VectorOfNodesU program;
+    // TextPosition start = this->token.start;
+
+    std::vector<std::reference_wrapper<ast::Import>> imports;
+    std::vector<std::reference_wrapper<ast::Klass>> classes;
+    std::vector<std::reference_wrapper<ast::EnumNode>> enums;
+    std::vector<std::reference_wrapper<ast::Function>> functions;
+
+    std::vector<std::unique_ptr<ast::Node>> all;
+
     while (this->token.type != TokType::END) {
-        program.push_back(this->parse_top_level_statement());
+        switch (this->token.type) {
+            case TokType::FUN: {
+                auto fp = this->parse_function_definition();
+                functions.emplace_back(*fp);
+                all.push_back(std::move(fp));
+                break;
+            }
+            case TokType::CLASS: {
+                auto cp = this->parse_class_definition();
+                classes.emplace_back(*cp);
+                all.push_back(std::move(cp));
+                break;
+            }
+            case TokType::TYPECLASS:
+                break;
+                // return this->parse_typeclass();
+            case TokType::INSTANCE:
+                break;
+                // return this->parse_instance();
+            case TokType::ENUM: {
+                auto ep = this->parse_enum_definition();
+                enums.emplace_back(*ep);
+                all.push_back(std::move(ep));
+                break;
+            }
+                // return this->parse_enum_definition();
+            case TokType::IMPORT: {
+                auto ip = this->parse_import();
+                imports.emplace_back(*ip);
+                all.push_back(std::move(ip));
+                break;
+            }
+            default: {
+                throw std::runtime_error("Expected import, class, enum or fun");
+            }
+        }
     }
-    TextPosition end = this->token.end_pos;
+    // TextPosition end = this->token.end_pos;
     std::cout << "--------------- FINISHED PARSING -----------------" << std::endl;
-    return ast::Block::make(std::move(program), start, end);
+    auto module_ast = std::make_unique<ast::Module>(std::move(all), imports, classes, enums, functions);
+    return module_ast;
 }
 
 std::unique_ptr<ast::Return> Parser::parse_return() {
@@ -86,7 +131,12 @@ std::unique_ptr<ast::If> Parser::parse_if() {
         this->next();
         _else = this->parse_possibly_empty_block();
     }
-    auto iff = std::make_unique<ast::If>(std::move(condition), std::move(body), std::move(elifs), std::move(_else), if_tok.start, if_tok.end_pos);
+    auto iff = std::make_unique<ast::If>(std::move(condition),
+                                         std::move(body),
+                                         std::move(elifs),
+                                         std::move(_else),
+                                         if_tok.start,
+                                         if_tok.end_pos);
     iff->start = if_tok.start;
     return iff;
 }
@@ -509,7 +559,10 @@ ast::UNode Parser::parse_call_or_subscript_chain(ast::UNode& parent) {
             }
             ast::UNode old_node = std::move(node);
             TextPosition o_start = old_node->start;
-            node = std::make_unique<ast::Call>(std::move(old_node), std::move(arguments), old_node->start, close.end_pos);
+            node = std::make_unique<ast::Call>(std::move(old_node),
+                                               std::move(arguments),
+                                               old_node->start,
+                                               close.end_pos);
             node->start = o_start;
         } else if (this->match(TokType::LSQUARE)) {
 //                subscript
@@ -777,28 +830,6 @@ std::unique_ptr<ast::Alias> Parser::parse_alias() {
     return node;
 }
 
-ast::UNode Parser::parse_top_level_statement() {
-    switch (this->token.type) {
-        case TokType::FUN:
-            return this->parse_function_definition();
-        case TokType::CLASS:
-            return this->parse_class_definition();
-        case TokType::TYPECLASS:
-            return this->parse_typeclass();
-        case TokType::INSTANCE:
-            return this->parse_instance();
-        case TokType::ENUM:
-            return this->parse_enum_definition();
-        case TokType::IMPORT:
-            return this->parse_import();
-        case TokType::ALIAS:
-            return this->parse_alias();
-        default:
-            return this->parse_common_statement();
-    }
-}
-
-
 std::unique_ptr<ast::For> Parser::parse_for_loop() {
     Token for_tok = this->expect_token(TokType::FOR);
     bool expect_paren = false;
@@ -988,7 +1019,7 @@ std::unique_ptr<ast::Match> Parser::parse_match_statement() {
     this->expect_token(TokType::LCURLY);
 
     std::vector<std::string> ids;
-    std::vector<std::pair<ast::UTypeNode , ast::UBlock>> cases;
+    std::vector<std::pair<ast::UTypeNode, ast::UBlock>> cases;
     while (true) {
         Token id = this->expect_token(TokType::ID);
         this->expect_token(TokType::COLON);

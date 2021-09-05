@@ -13,6 +13,7 @@
 #include "../ast/TypeObject.h"
 #include "../ast/Typeclass.h"
 #include "../ast/Instance.h"
+#include "../ast/Module.h"
 #include "../ast/Alias.h"
 
 extern std::unordered_map<TokType, OpType> TOKEN_TO_OP;
@@ -31,8 +32,6 @@ public:
     bool match(TokType type) const;
     void next();
     Token expect_token(TokType token_type);
-
-    ast::UNode parse_top_level_statement();
 
     std::unique_ptr<ast::Import> parse_import();
     std::unique_ptr<ast::Klass> parse_class_definition();
@@ -53,7 +52,7 @@ public:
     // std::unique_ptr<TryCatchNode> parse_try_catch();
 
     std::unique_ptr<ast::Block> parse_possibly_empty_block();
-    std::unique_ptr<ast::Block> parse_program();
+    std::unique_ptr<ast::Module> parse_module();
 
     ast::UNode parse_expression();
     ast::UNode parse_tuple_literal();

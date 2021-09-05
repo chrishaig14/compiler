@@ -87,5 +87,5 @@ add_library(
         UnaryOp.cpp
         UnaryOp.h
         While.cpp
-        While.h ObjectType.cpp TypeObject.h FunctionType.cpp TypeFunction.h Path.cpp Path.h ast.h)
+        While.h ObjectType.cpp TypeObject.h FunctionType.cpp TypeFunction.h Path.cpp Path.h ast.h Module.cpp Module.h)
 

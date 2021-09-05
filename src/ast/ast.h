@@ -5,7 +5,12 @@
 #ifndef XLANG_AST_H
 #define XLANG_AST_H
 
+#include <memory>
+#include <vector>
+
 namespace ast {
+    class Module;
+
     class Continue;
 
     class Break;

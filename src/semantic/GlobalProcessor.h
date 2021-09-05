@@ -29,7 +29,7 @@ public:
     void visit_alias(ast::Alias& node);
     void visit_import(ast::Import& node);
     void visit_class(ast::Klass& node);
-    void check_duplicated_names(ast::Block& node) const;
+    void check_duplicated_names(ast::Module& node) const;
     void add_default_imports();
 };
 

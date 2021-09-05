@@ -52,6 +52,7 @@
 #include "CheckerUtils.h"
 #include "../ast/UnaryOp.h"
 #include "../ast/TypeObject.h"
+#include "../ast/Module.h"
 
 #define T_NONE ast::ObjectType(".None")
 
@@ -116,7 +117,7 @@ public:
     USemanticInfo visit_assignment(ast::Assignment& n);
     USemanticInfo visit_binop(ast::BinaryOp& node);
     USemanticInfoBlock visit_block(ast::Block& node);
-    USemanticInfoBlock visit_root(ast::Block& node);
+    USemanticInfoBlock visit_root(ast::Module& node);
     USemanticInfo visit_boolean(ast::Boolean& node);
     USemanticInfo visit_break(ast::Break& node);
     USemanticInfo visit_call(ast::Call& n, bool is_rvalue);

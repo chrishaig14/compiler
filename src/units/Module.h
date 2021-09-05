@@ -9,6 +9,10 @@
 #include "Entity.h"
 #include "../ast/Block.h"
 #include "../scanner/CodeLines.h"
+#include "../ast/Module.h"
+#include "../ast/Import.h"
+#include "../ast/Klass.h"
+#include "../ast/EnumNode.h"
 #include "../simple_nodes/Block.h"
 #include "ConstFunction.h"
 #include "Class.h"
@@ -27,7 +31,7 @@ public:
     std::vector<std::unique_ptr<Class>> classes;
 
     CodeLines code_lines;
-    ast::UBlock ast;
+    std::unique_ptr<ast::Module> ast;
     std::unique_ptr<sem::Block> sast;
     std::map<std::string, std::string> included_module_paths;
     std::map<std::string, Path> imported_paths_no_alias;
@@ -40,6 +44,11 @@ public:
 
     Flirpin get(Path p);
     Module(Path path, std::string abs_path, std::string rel_path, bool is_lib, std::string full_header_path);
+
+    ~Module() {
+        std::cout << "CALLING MODULE DESTRUCTOR!!!" << std::endl;
+    }
+
     Path get_actual_path(const std::string& id);
     void fill_actual(ast::Type& t);
     void fill_actual(ast::ObjectType& t);

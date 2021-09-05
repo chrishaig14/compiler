@@ -45,6 +45,7 @@ class Compiler {
 
 public:
     ~Compiler() {
+        std::cout << "Called compiler destructor " << std::endl;
         delete this->top_package; // TODO this should not be allocated on the heap
         delete this->root_package; // TODO this should not be allocated on the heap
     }
