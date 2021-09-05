@@ -35,9 +35,7 @@ USemanticInfo Checker::visit_number(ast::Number& node) {
             // auto ov = std::make_unique<Value>(otype);
             // this->fill_value(*ov);
             // info.entity = new EntityValue(std::move(ov));
-            auto* snode = new sem::Float();
-            snode->str = node.str;
-            info.snode = USNode(snode);
+            info.snode = std::make_unique<sem::Float>(node.str);
             break;
         }
         case NumberType::DOUBLE: {

@@ -11,7 +11,8 @@
 
 class sem::Float : public sem::SNode {
 public:
-    Float();
+    Float(const std::string& s);
+
     std::string str;
 
     bool equals(const SNode& o) const override {

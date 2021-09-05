@@ -6,5 +6,6 @@
 
 using namespace sem;
 
-Float::Float() : SNode(SNodeType::FLOAT) {
+Float::Float(const std::string& s) : sem::SNode(SNodeType::FLOAT) {
+    this->str = s;
 }
