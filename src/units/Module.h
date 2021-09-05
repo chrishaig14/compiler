@@ -23,6 +23,8 @@ public:
 
     const Path path;
     std::vector<std::unique_ptr<ConstFunction>> const_functions;
+    std::vector<std::unique_ptr<Enum>> enums;
+    std::vector<std::unique_ptr<Class>> classes;
 
     CodeLines code_lines;
     ast::UBlock ast;
