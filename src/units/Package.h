@@ -10,17 +10,18 @@
 
 class Package {
 public:
-    std::string name;
-    std::string abs_path;
+    const std::string name;
+    const std::string abs_path;
+    const bool is_lib;
+    const Path path;
+
     std::string rel_path;
     std::string full_header_path;
     std::string header_parent_path;
-    bool is_lib;
-    std::map<std::string, Unit> units;
 
+    std::map<std::string, Unit> units;
     Package(Path path, std::string abs_path, std::string rel_path, bool is_lib, std::string full_header_path,
             std::string header_parent_path);
-    Path path;
 
     Flirpin get(Path p);
 };

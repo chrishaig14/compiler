@@ -7,12 +7,13 @@
 
 Package::Package(Path path, std::string abs_path, std::string rel_path, bool is_lib, std::string full_header_path,
                  std::string header_parent_path)
-        : full_header_path(full_header_path), header_parent_path(header_parent_path) {
-    this->path = path;
-    this->name = path.as_vec().back();
-    this->abs_path = abs_path;
+        : name(path.as_vec().back()), abs_path(abs_path), is_lib(is_lib), path(path),
+          full_header_path(full_header_path), header_parent_path(header_parent_path) {
+    // this->path = path;
+    // this->name = path.as_vec().back();
+    // this->abs_path = abs_path;
     this->rel_path = rel_path;
-    this->is_lib = is_lib;
+    // this->is_lib = is_lib;
 }
 
 Flirpin Package::get(Path p) {
