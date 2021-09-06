@@ -12,20 +12,11 @@
 
 class ConstFunction {
 public:
-    ConstFunction(Path path, ast::FunctionType* ft) {
-        this->path = path;
-        this->ft = ft;
-        this->implicit = nullptr;
-    }
+    ConstFunction(Path path, ast::FunctionType* ft);
 
-    ConstFunction(const ConstFunction& other) {
-        this->ft = other.ft->clone();
-        this->implicit = other.implicit;
-    }
+    ConstFunction(const ConstFunction& other);
 
-    ~ConstFunction() {
-        std::cout << "Destroyinh CONST FUnction!" << std::endl;
-    }
+    ~ConstFunction();
 
     Implicit* implicit;
     ast::FunctionType* ft;
