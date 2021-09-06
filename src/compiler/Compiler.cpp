@@ -61,9 +61,9 @@ Compiler::Compiler(const std::string& project_dir, const std::string& project_ou
                    const std::string& output_name, const std::string& lib_path, bool is_lib, const std::string& version)
         : project_dir(project_dir), project_output_dir(project_output_dir), output_name(output_name),
           lib_path(lib_path), is_lib(is_lib), version(version),
-          root_package(Path(this->output_name), project_dir, "", false, "", "") {
-    this->top_package = new Package(Path("global"), "", "", false, "", "");
-    this->top_package->units[this->output_name] = Unit{.type=U_TYPE::PACKAGE, .package=&root_package};
+          root_package(Path(this->output_name), project_dir, "", false, "", ""),
+          top_package(Path("global"), "", "", false, "", "") {
+    this->top_package.units[this->output_name] = Unit{.type=U_TYPE::PACKAGE, .package=&root_package};
 }
 
 void Compiler::pre() {
@@ -81,7 +81,7 @@ void Compiler::main() {
 
 
     try {
-        analyze_all_modules(root_package, *top_package);
+        analyze_all_modules(root_package, top_package);
     } catch (const std::runtime_error& e) {
         std::cout << "ERROR: " << e.what() << std::endl;
         // exit(1);
@@ -236,7 +236,7 @@ void Compiler::load_library(const std::string& name, const std::string& version)
     this->top_package_name = library_top_package->name;
     parse_all_modules(*library_top_package);
     process_global_all_modules(*library_top_package);
-    top_package->units[name] = Unit{.type=U_TYPE::PACKAGE, .package=library_top_package};
+    top_package.units[name] = Unit{.type=U_TYPE::PACKAGE, .package=library_top_package};
     std::cout << "Finished loading top unit: " << E_HLT(lib_rel_top_unit_path) << std::endl;
     this->loaded_top_units[lib_rel_top_unit_path] = true;
 }
@@ -271,7 +271,7 @@ void Compiler::load_top_unit(const std::string& name, const std::string& version
     this->top_package_name = top_unit_package->name;
     parse_all_modules(*top_unit_package);
     process_global_all_modules(*top_unit_package);
-    top_package->units[name] = Unit{.type=U_TYPE::PACKAGE, .package=top_unit_package};
+    top_package.units[name] = Unit{.type=U_TYPE::PACKAGE, .package=top_unit_package};
     std::cout << "Finished loading top unit: " << E_HLT(lib_rel_top_unit_path) << std::endl;
     this->loaded_top_units[lib_rel_top_unit_path] = true;
 }
