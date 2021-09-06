@@ -52,7 +52,7 @@ void GlobalProcessor::add_default_imports() {
 
 void GlobalProcessor::visit_function(ast::Function& node) {
     std::cout << "Global-processing function " << node.identifier << " in module " << this->module.name << std::endl;
-    ConstFunction* const_function = this->module.flirpins[node.identifier].const_function;
+
 
     ast::VectorOfTypes x;
     for (ast::Type& type_node: node.parameter_types) {
@@ -63,14 +63,15 @@ void GlobalProcessor::visit_function(ast::Function& node) {
     this->module.fill_actual(p);
     ast::FunctionType function_info(x, ast::UTypeNode(node.return_type->clone()));
     Path function_path = Path(this->module.path, node.identifier);
-    const_function->ft = function_info.clone();
-    const_function->path = Path(this->module.path, node.identifier);
+    ConstFunction* const_function = new ConstFunction(Path(this->module.path, node.identifier), function_info.clone());
     if (node.implicit != nullptr) {
         const_function->implicit = node.implicit;
         this->module.fill_actual(*node.implicit->ft);
     }
     node.path = const_function->path;
     node.const_function = const_function;
+
+    this->module.add_func_definition(const_function);
 }
 
 Enum* make_enum(ast::EnumNode& n, Path module_path) {
@@ -95,11 +96,6 @@ void GlobalProcessor::visit_root() {
     for (ast::EnumNode& n: node.enums) {
         Enum* enumm = make_enum(n, this->module.path);
         this->module.add_enum_definition(enumm);
-    }
-
-    for (ast::Function& n: node.functions) {
-        ConstFunction* const_function = new ConstFunction(Path(this->module.path, n.identifier), nullptr);
-        this->module.add_func_definition(const_function);
     }
 
     for (ast::Klass& n: node.classes) {
