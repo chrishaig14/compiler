@@ -266,7 +266,7 @@ USemanticInfo Checker::visit_function(ast::Function& n) {
         Class* clazz = new Class(n.implicit->type, Path("core.implicits." + n.implicit->type));
         // clazz->class_name = ;
         ConstFunction* c = new ConstFunction(Path("implicit_a"), n.implicit->ft);
-        this->module.fill_actual(*c->ft);
+        this->module.fill_actual(c->const_function_ft);
         if (n.implicit->is_static) {
             clazz->static_methods[n.implicit->method] = c;
         } else {

@@ -3,14 +3,14 @@
 //
 #include "ConstFunction.h"
 
-ConstFunction::ConstFunction(Path path, ast::FunctionType* ft) {
+ConstFunction::ConstFunction(Path path, ast::FunctionType* ft) : const_function_ft(*ft) {
     this->path = path;
-    this->ft = ft;
+    this->const_function_ft_p = ft;
     this->implicit = nullptr;
 }
 
-ConstFunction::ConstFunction(const ConstFunction& other) {
-    this->ft = other.ft->clone();
+ConstFunction::ConstFunction(const ConstFunction& other)
+        : const_function_ft_p(other.const_function_ft.clone()), const_function_ft(*const_function_ft_p) {
     this->implicit = other.implicit;
 }
 

@@ -19,7 +19,8 @@ public:
     ~ConstFunction();
 
     Implicit* implicit;
-    ast::FunctionType* ft;
+    ast::FunctionType* const_function_ft_p;
+    ast::FunctionType& const_function_ft;
     Path path;
 };
 

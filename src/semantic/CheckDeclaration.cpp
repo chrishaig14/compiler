@@ -73,7 +73,7 @@ USNode Checker::make_rvalue(const Entity& t_entity, USNode value_snode, const as
 
     } else if (t_entity.type == E_TYPE::CONST_FUNCTION) {
         EntityConstFunction& const_function_entity = (EntityConstFunction&) t_entity;
-        if (*const_function_entity.const_function->ft == target) {
+        if (const_function_entity.const_function->const_function_ft == target) {
             return value_snode;
         } else {
             return nullptr;
@@ -177,7 +177,7 @@ USemanticInfo Checker::check_declaration_without_type(ast::Declaration& n) {
     if (info.entity.get().type == E_TYPE::CONST_FUNCTION) {
         Entity& entity_const_function = exp_info_p->entity;
         ConstFunction* const_function = ((EntityConstFunction&) entity_const_function).const_function;
-        Value* value_entity = std::make_unique<Value>(const_function->ft->clone()).release();
+        Value* value_entity = std::make_unique<Value>(const_function->const_function_ft.clone()).release();
         info.set_entity(value_entity);
 
         if (value_entity->type.is_generic()) {

@@ -40,13 +40,13 @@ USemanticInfo Checker::visit_lvalue_subscript(ast::Subscript& node) {
     }
     ConstFunction* subscript_fun = subscript_it->second;
     std::string sub_fun_path = subscript_fun->path.as_str();
-    ast::Type* rtype = subscript_fun->ft->return_type->clone();
+    ast::Type* rtype = subscript_fun->const_function_ft.return_type->clone();
 
     ast::VectorOfTypes children;
     if (node.child.size() > 1) {
         this->error_reporter.fail("Error subscript with more than one child!");
     }
-    USemanticInfo child_sinfo = this->expect_rvalue_of_type(*subscript_fun->ft->param_types[0], *node.child[0]);
+    USemanticInfo child_sinfo = this->expect_rvalue_of_type(*subscript_fun->const_function_ft.param_types[0], *node.child[0]);
     if (child_sinfo->is_error()) {
         return error_stub();
     }

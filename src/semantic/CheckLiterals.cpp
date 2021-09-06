@@ -134,7 +134,7 @@ USemanticInfo Checker::visit_partial(ast::PartialApplication& node) {
     Entity& f_entity = func->entity;
     if (f_entity.type == E_TYPE::CONST_FUNCTION ||
         (f_entity.type == E_TYPE::VALUE && ((Value&) f_entity).type.kind == Kind::FUNCTION)) {
-        fun_type = ((EntityConstFunction&) f_entity).const_function->ft->clone();
+        fun_type = ((EntityConstFunction&) f_entity).const_function->const_function_ft.clone();
     } else {
         this->error_reporter.fail("Error: expected a function for partial application");
         return error_stub();
