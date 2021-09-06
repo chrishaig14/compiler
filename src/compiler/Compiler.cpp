@@ -60,10 +60,10 @@ std::map<std::string, std::string> read_requirements(const std::string& filepath
 Compiler::Compiler(const std::string& project_dir, const std::string& project_output_dir,
                    const std::string& output_name, const std::string& lib_path, bool is_lib, const std::string& version)
         : project_dir(project_dir), project_output_dir(project_output_dir), output_name(output_name),
-          lib_path(lib_path), is_lib(is_lib), version(version) {
-    this->root_package = new Package(Path(this->output_name), project_dir, "", false, "", "");;
+          lib_path(lib_path), is_lib(is_lib), version(version),
+          root_package(Path(this->output_name), project_dir, "", false, "", "") {
     this->top_package = new Package(Path("global"), "", "", false, "", "");
-    this->top_package->units[this->output_name] = Unit{.type=U_TYPE::PACKAGE, .package=root_package};
+    this->top_package->units[this->output_name] = Unit{.type=U_TYPE::PACKAGE, .package=&root_package};
 }
 
 void Compiler::pre() {
@@ -71,17 +71,17 @@ void Compiler::pre() {
 
     VectorOfStrings requirements = this->load_requirements(req_file_path);
 
-    this->load_package(*root_package, 1);
-    this->parse_all_modules(*root_package);
+    this->load_package(root_package, 1);
+    this->parse_all_modules(root_package);
 
-    this->process_global_all_modules(*root_package);
+    this->process_global_all_modules(root_package);
 }
 
 void Compiler::main() {
 
 
     try {
-        analyze_all_modules(*root_package, *top_package);
+        analyze_all_modules(root_package, *top_package);
     } catch (const std::runtime_error& e) {
         std::cout << "ERROR: " << e.what() << std::endl;
         // exit(1);

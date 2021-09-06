@@ -47,7 +47,7 @@ TEST_CASE("semantic_output_basic_function", "[checker]") {
 
     std::unique_ptr<Compiler> cp = c_analyze(code);
     Compiler& c = *cp;
-    Module& module = *c.root_package->units["tmp"].module;
+    Module& module = *c.root_package.units["tmp"].module;
     analyze_module_result(module, *c.top_package);
     Checker checker(*c.top_package, module);
     USemanticInfo info = checker.visit_function(module.ast->functions[0]);
@@ -63,7 +63,7 @@ TEST_CASE("semantic_output_basic_declaration", "[checker]") {
 
     std::unique_ptr<Compiler> cp = c_analyze(code);
     Compiler& c = *cp;
-    Module& module = *c.root_package->units["tmp"].module;
+    Module& module = *c.root_package.units["tmp"].module;
     analyze_module_result(module, *c.top_package);
     Checker checker(*c.top_package, module);
     USemanticInfo info = checker.visit_declaration((ast::Declaration&) *module.ast->functions[0].get().body->nodes[0]);
@@ -77,7 +77,7 @@ TEST_CASE("semantic_output_list", "[checker]") {
 
     std::unique_ptr<Compiler> cp = c_analyze(code);
     Compiler& c = *cp;
-    Module& module = *c.root_package->units["tmp"].module;
+    Module& module = *c.root_package.units["tmp"].module;
     analyze_module_result(module, *c.top_package);
     Checker checker(*c.top_package, module);
     USemanticInfo info = checker.visit_declaration((ast::Declaration&) *module.ast->functions[0].get().body->nodes[0]);
@@ -95,7 +95,7 @@ TEST_CASE("semantic_output_empty_dict", "[checker]") {
 
     std::unique_ptr<Compiler> cp = c_analyze(code);
     Compiler& c = *cp;
-    Module& module = *c.root_package->units["tmp"].module;
+    Module& module = *c.root_package.units["tmp"].module;
     analyze_module_result(module, *c.top_package);
     Checker checker(*c.top_package, module);
     USemanticInfo info = checker.visit_declaration((ast::Declaration&) *module.ast->functions[0].get().body->nodes[0]);
@@ -110,7 +110,7 @@ TEST_CASE("semantic_output_dict", "[checker]") {
 
     std::unique_ptr<Compiler> cp = c_analyze(code);
     Compiler& c = *cp;
-    Module& module = *c.root_package->units["tmp"].module;
+    Module& module = *c.root_package.units["tmp"].module;
     analyze_module_result(module, *c.top_package);
     Checker checker(*c.top_package, module);
     USemanticInfo info = checker.visit_declaration((ast::Declaration&) *module.ast->functions[0].get().body->nodes[0]);
@@ -127,7 +127,7 @@ TEST_CASE("semantic_output_int_literal", "[checker]") {
 
     std::unique_ptr<Compiler> cp = c_analyze(code);
     Compiler& c = *cp;
-    Module& module = *c.root_package->units["tmp"].module;
+    Module& module = *c.root_package.units["tmp"].module;
     analyze_module_result(module, *c.top_package);
     Checker checker(*c.top_package, module);
     USemanticInfo info = checker.visit_declaration((ast::Declaration&) *module.ast->functions[0].get().body->nodes[0]);
@@ -141,7 +141,7 @@ TEST_CASE("semantic_output_bool_literal", "[checker]") {
 
     std::unique_ptr<Compiler> cp = c_analyze(code);
     Compiler& c = *cp;
-    Module& module = *c.root_package->units["tmp"].module;
+    Module& module = *c.root_package.units["tmp"].module;
     analyze_module_result(module, *c.top_package);
     Checker checker(*c.top_package, module);
     USemanticInfo info = checker.visit_declaration((ast::Declaration&) *module.ast->functions[0].get().body->nodes[0]);
@@ -155,7 +155,7 @@ TEST_CASE("semantic_output_empty_list_literal", "[checker]") {
 
     std::unique_ptr<Compiler> cp = c_analyze(code);
     Compiler& c = *cp;
-    Module& module = *c.root_package->units["tmp"].module;
+    Module& module = *c.root_package.units["tmp"].module;
     analyze_module_result(module, *c.top_package);
     Checker checker(*c.top_package, module);
     USemanticInfo info = checker.visit_declaration((ast::Declaration&) *module.ast->functions[0].get().body->nodes[0]);
@@ -170,7 +170,7 @@ TEST_CASE("semantic_output_object_member", "[checker]") {
 
     std::unique_ptr<Compiler> cp = c_analyze(code);
     Compiler& c = *cp;
-    Module& module = *c.root_package->units["tmp"].module;
+    Module& module = *c.root_package.units["tmp"].module;
     analyze_module_result(module, *c.top_package);
     Checker checker(*c.top_package, module);
     USemanticInfo info = checker.visit_function(module.ast->functions[0]);
@@ -188,7 +188,7 @@ TEST_CASE("semantic_output_object_method_call", "[checker]") {
 
     std::unique_ptr<Compiler> cp = c_analyze(code);
     Compiler& c = *cp;
-    Module& module = *c.root_package->units["tmp"].module;
+    Module& module = *c.root_package.units["tmp"].module;
     analyze_module_result(module, *c.top_package);
     Checker checker(*c.top_package, module);
     USemanticInfo info = checker.visit_function(module.ast->functions[0]);
@@ -207,7 +207,7 @@ TEST_CASE("semantic_output_object_method", "[checker]") {
 
     std::unique_ptr<Compiler> cp = c_analyze(code);
     Compiler& c = *cp;
-    Module& module = *c.root_package->units["tmp"].module;
+    Module& module = *c.root_package.units["tmp"].module;
     analyze_module_result(module, *c.top_package);
     Checker checker(*c.top_package, module);
     USemanticInfo info = checker.visit_function(module.ast->functions[0]);
@@ -225,7 +225,7 @@ TEST_CASE("semantic_output_assign_const_function", "[checker]") {
 
     std::unique_ptr<Compiler> cp = c_analyze(code);
     Compiler& c = *cp;
-    Module& module = *c.root_package->units["tmp"].module;
+    Module& module = *c.root_package.units["tmp"].module;
     analyze_module_result(module, *c.top_package);
     analyze_module_result(module, *c.top_package);
     for (auto& e: module.flirpins) {
@@ -245,7 +245,7 @@ TEST_CASE("semantic_output_const_function_call", "[checker]") {
 
     std::unique_ptr<Compiler> cp = c_analyze(code);
     Compiler& c = *cp;
-    Module& module = *c.root_package->units["tmp"].module;
+    Module& module = *c.root_package.units["tmp"].module;
     analyze_module_result(module, *c.top_package);
     analyze_module_result(module, *c.top_package);
     for (auto& e: module.flirpins) {
@@ -266,7 +266,7 @@ TEST_CASE("semantic_output_while", "[checker]") {
 
     std::unique_ptr<Compiler> cp = c_analyze(code);
     Compiler& c = *cp;
-    Module& module = *c.root_package->units["tmp"].module;
+    Module& module = *c.root_package.units["tmp"].module;
     analyze_module_result(module, *c.top_package);
     analyze_module_result(module, *c.top_package);
     for (auto& e: module.flirpins) {
@@ -289,7 +289,7 @@ TEST_CASE("semantic_output_float_literal", "[checker]") {
 
     std::unique_ptr<Compiler> cp = c_analyze(code);
     Compiler& c = *cp;
-    Module& module = *c.root_package->units["tmp"].module;
+    Module& module = *c.root_package.units["tmp"].module;
     analyze_module_result(module, *c.top_package);
     Checker checker(*c.top_package, module);
     ast::Node& expression = ((ast::Declaration&) *(module.ast->functions[0].get().body->nodes[0])).expression;
@@ -306,7 +306,7 @@ TEST_CASE("semantic_output_float_literal", "[checker]") {
 //     std::string code = "fun foo()->Integer{var x = none;return 0;}";
 //
 //     std::unique_ptr<Compiler> cp =  c_analyze(code);Compiler& c = *cp;
-//     Module& module = *c.root_package->units["tmp"].module;
+//     Module& module = *c.root_package.units["tmp"].module;
 //     analyze_module_result(module, *c.top_package);
 //     Checker checker(*c.top_package,module);
 //     ast::Node* expression = ((ast::DeclarationNode*) ((FunctionNode&)* module.ast->nodes[0]).body->nodes[0])->expression;
@@ -327,7 +327,7 @@ TEST_CASE("semantic_output_member", "[checker]") {
 
     std::unique_ptr<Compiler> cp = c_analyze(code);
     Compiler& c = *cp;
-    Module& module = *c.root_package->units["tmp"].module;
+    Module& module = *c.root_package.units["tmp"].module;
     analyze_module_result(module, *c.top_package);
     Checker checker(*c.top_package, module);
     checker.init();
@@ -342,7 +342,7 @@ TEST_CASE("semantic_output_binop", "[checker]") {
 
     std::unique_ptr<Compiler> cp = c_analyze(code);
     Compiler& c = *cp;
-    Module& module = *c.root_package->units["tmp"].module;
+    Module& module = *c.root_package.units["tmp"].module;
     analyze_module_result(module, *c.top_package);
     Checker checker(*c.top_package, module);
     checker.init();
@@ -363,7 +363,7 @@ TEST_CASE("semantic_output_boolop", "[checker]") {
 
     std::unique_ptr<Compiler> cp = c_analyze(code);
     Compiler& c = *cp;
-    Module& module = *c.root_package->units["tmp"].module;
+    Module& module = *c.root_package.units["tmp"].module;
     analyze_module_result(module, *c.top_package);
     Checker checker(*c.top_package, module);
     checker.init();
@@ -385,7 +385,7 @@ TEST_CASE("semantic_output_subscript", "[checker]") {
 
     std::unique_ptr<Compiler> cp = c_analyze(code);
     Compiler& c = *cp;
-    Module& module = *c.root_package->units["tmp"].module;
+    Module& module = *c.root_package.units["tmp"].module;
     analyze_module_result(module, *c.top_package);
     Checker checker(*c.top_package, module);
     checker.init();
@@ -403,7 +403,7 @@ TEST_CASE("semantic_output_call_no_args", "[checker]") {
 
     std::unique_ptr<Compiler> cp = c_analyze(code);
     Compiler& c = *cp;
-    Module& module = *c.root_package->units["tmp"].module;
+    Module& module = *c.root_package.units["tmp"].module;
     analyze_module_result(module, *c.top_package);
     Checker checker(*c.top_package, module);
     checker.init();
@@ -418,7 +418,7 @@ TEST_CASE("semantic_output_call_args", "[checker]") {
 
     std::unique_ptr<Compiler> cp = c_analyze(code);
     Compiler& c = *cp;
-    Module& module = *c.root_package->units["tmp"].module;
+    Module& module = *c.root_package.units["tmp"].module;
     analyze_module_result(module, *c.top_package);
     Checker checker(*c.top_package, module);
     checker.init();
@@ -433,7 +433,7 @@ TEST_CASE("semantic_output_union_ok_1", "[checker]") {
 
     std::unique_ptr<Compiler> cp = c_analyze(code);
     Compiler& c = *cp;
-    Module& module = *c.root_package->units["tmp"].module;
+    Module& module = *c.root_package.units["tmp"].module;
     analyze_module_result(module, *c.top_package);
     Checker checker(*c.top_package, module);
     checker.init();
@@ -448,7 +448,7 @@ TEST_CASE("semantic_output_union_ok_2", "[checker]") {
 
     std::unique_ptr<Compiler> cp = c_analyze(code);
     Compiler& c = *cp;
-    Module& module = *c.root_package->units["tmp"].module;
+    Module& module = *c.root_package.units["tmp"].module;
     analyze_module_result(module, *c.top_package);
     Checker checker(*c.top_package, module);
     checker.init();
@@ -463,7 +463,7 @@ TEST_CASE("semantic_output_if", "[checker]") {
 
     std::unique_ptr<Compiler> cp = c_analyze(code);
     Compiler& c = *cp;
-    Module& module = *c.root_package->units["tmp"].module;
+    Module& module = *c.root_package.units["tmp"].module;
     analyze_module_result(module, *c.top_package);
     Checker checker(*c.top_package, module);
     checker.init();
@@ -478,7 +478,7 @@ TEST_CASE("semantic_output_enum_def", "[checker]") {
 
     std::unique_ptr<Compiler> cp = c_analyze(code);
     Compiler& c = *cp;
-    Module& module = *c.root_package->units["tmp"].module;
+    Module& module = *c.root_package.units["tmp"].module;
     analyze_module_result(module, *c.top_package);
     Checker checker(*c.top_package, module);
     checker.init();

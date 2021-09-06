@@ -47,7 +47,7 @@ public:
     ~Compiler() {
         std::cout << "Called compiler destructor " << std::endl;
         delete this->top_package; // TODO this should not be allocated on the heap
-        delete this->root_package; // TODO this should not be allocated on the heap
+        // delete this->root_package; // TODO this should not be allocated on the heap
     }
 
     Compiler(const std::string& project_dir, const std::string& project_output_dir, const std::string& output_name,
@@ -74,7 +74,7 @@ public:
     void main();
     std::string top_package_name;
     void pre();
-    Package* root_package;
+    Package root_package;
     Package* top_package;
 };
 
