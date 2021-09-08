@@ -180,8 +180,7 @@ USemanticInfo Checker::enum_member(Enum* enumm, const std::string& value, ast::M
     SemanticInfo& info = *info_u;
     for (size_t i = 0; i < enumm->values.size(); i++) {
         if (value == enumm->values[i]) {
-            auto* otype = new sem::TypeObject(enumm->enumm_name, {});
-            otype->data.actual_base_path = enumm->path;
+            auto* otype = new sem::TypeObject(enumm->enumm_name, enumm->path);
             auto ov = std::make_unique<Value>(otype);
             info.set_entity(ov.release());
             // this->fill_value(info.entity.value);

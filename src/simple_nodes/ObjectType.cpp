@@ -103,8 +103,13 @@ sem::TypeObject& TypeObject::object() {
     return *this;
 }
 
-TypeObject::TypeObject(const std::string& identifier) : TypeObject(identifier, {}) {
+TypeObject::TypeObject(const std::string& identifier) : TypeObject(identifier, sem::VectorOfTypes{}) {
     this->is_generic_param = false;
+}
+
+TypeObject::TypeObject(const std::string& identifier, Path p) : TypeObject(identifier, sem::VectorOfTypes{}) {
+    this->is_generic_param = false;
+    this->data.actual_base_path = p;
 }
 
 bool TypeObject::is_generic() const {

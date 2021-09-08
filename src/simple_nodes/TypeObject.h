@@ -19,6 +19,7 @@ public:
 
 class sem::TypeObject : public sem::Type {
 public:
+    TypeObject(const std::string& identifier, Path p);
     ObjectTypeData data;
     TypeObject(const std::string& identifier, const sem::VectorOfTypes& typeParameters);
 
