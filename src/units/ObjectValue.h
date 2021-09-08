@@ -15,16 +15,16 @@ enum class Meta {
 };
 
 class Value : public Entity {
-    ast::Type* _type;
+    sem::Type* _type;
 public:
-    ast::Type& type;
+    sem::Type& type;
     union {
         Class* clazz;
         Enum* enumm;
     };
     Meta metatype;
 
-    Value(ast::Type* type) : Entity(E_TYPE::VALUE), type(*type) {
+    Value(sem::Type* type) : Entity(E_TYPE::VALUE), type(*type) {
         this->clazz = nullptr;
         this->enumm = nullptr;
         assert(type != nullptr);

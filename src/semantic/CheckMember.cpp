@@ -8,6 +8,8 @@
 #include "../simple_nodes/with_unique/ObjectMember.h"
 #include "../simple_nodes/with_unique/ObjectMethodCall.h"
 #include "../simple_nodes/with_unique/ObjectMethod.h"
+#include "../simple_nodes/TypeObject.h"
+#include "../simple_nodes/TypeFunction.h"
 #include "errors/ErrorNoMember.h"
 #include "errors/ErrorNoMemberSuggestions.h"
 #include "errors/ErrorClassNoMember.h"
@@ -25,7 +27,7 @@ USemanticInfo Checker::visit_member(ast::Member& n) {
             // this->error_reporter.object_no_member(*parent_entity.const_function->ft, n);
             break;
         case E_TYPE::VALUE:
-            if (((Value&) parent_entity).type.kind == Kind::FUNCTION) {
+            if (((Value&) parent_entity).type.kind == sem::Kind::FUNCTION) {
                 this->error_reporter.error(std::make_unique<ErrorNoMember>(*((EntityConstFunction&) parent_entity).const_function->const_function_ft.to_ast(),
                                                                            n));
                 // this->error_reporter.object_no_member(*parent_entity.value->type, n);
@@ -78,18 +80,18 @@ USemanticInfo Checker::object_member(USNode object_snode, Value& p_value, const 
     //     return error_stub();
     // }
     if (object_type_path.as_str() == "core.core.Union") {
-        this->error_reporter.error(std::make_unique<ErrorNoMember>(p_value.type, n));
+        this->error_reporter.error(std::make_unique<ErrorNoMember>(*p_value.type.to_ast(), n));
         // this->error_reporter.object_no_member(*p_value.type, n);
         return error_stub();
     }
     if (p_value.metatype == Meta::ENUM) {
-        this->error_reporter.error(std::make_unique<ErrorNoMember>(p_value.type, n));
+        this->error_reporter.error(std::make_unique<ErrorNoMember>(*p_value.type.to_ast(), n));
         // this->error_reporter.object_no_member(*p_value.type, n);
         return error_stub();
     }
     USemanticInfo info_u = std::make_unique<SemanticInfo>();
     SemanticInfo& info = *info_u;
-    if (p_value.type.kind == Kind::OBJECT && p_value.type.object().id == "Tuple") {
+    if (p_value.type.kind == sem::Kind::OBJECT && p_value.type.object().id == "Tuple") {
         info.is_tuple_member = true;
     }
     Class* clazz = p_value.clazz;
@@ -130,7 +132,7 @@ USemanticInfo Checker::object_member(USNode object_snode, Value& p_value, const 
         // }
 
     } else {
-        this->error_reporter.error(std::make_unique<ErrorNoMemberSuggestions>(p_value.type, n, *clazz));
+        this->error_reporter.error(std::make_unique<ErrorNoMemberSuggestions>(*p_value.type.to_ast(), n, *clazz));
         // this->error_reporter.object_no_member_with_suggestions(*p_value.type,
         //                                                        child,
         //                                                        n.dot_pos,
@@ -174,7 +176,8 @@ USemanticInfo Checker::class_member(Class* cls, const std::string& child, ast::M
             tp.push_back(t);
         }
         ast::ObjectType* ot = new ast::ObjectType(cls->class_name, tp);
-        unbound_method->const_function_ft.param_types.insert(unbound_method->const_function_ft.param_types.begin(), sem::UType(ot->to_sem()));
+        unbound_method->const_function_ft.param_types.insert(unbound_method->const_function_ft.param_types.begin(),
+                                                             sem::UType(ot->to_sem()));
         info.set_entity(new EntityConstFunction(unbound_method));
         info.snode = std::make_unique<sem::Id>(unbound_method->path.as_str());
     } else if (cls->static_methods.find(child) != cls->static_methods.end()) {

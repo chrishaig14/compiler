@@ -132,7 +132,7 @@ Checker::match_arguments_to_generic_function(const ast::FunctionType& ft, ast::V
     }
     USemanticInfo rv_p = std::make_unique<SemanticInfo>();
     auto& rv = *rv_p;
-    rv.set_entity(std::make_unique<Value>(f->return_type->clone()).release());
+    rv.set_entity(std::make_unique<Value>(f->return_type->to_sem()).release());
     // delete f;
     return rv_p;
 }

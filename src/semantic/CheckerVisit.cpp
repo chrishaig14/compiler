@@ -3,6 +3,8 @@
 //
 
 #include "Checker.h"
+#include "../simple_nodes/TypeObject.h"
+#include "../simple_nodes/TypeFunction.h"
 #include "errors/ErrorFunctionReturnLastStmt.h"
 #include "errors/ErrorUnusedReturnValue.h"
 
@@ -91,7 +93,7 @@ USemanticInfo Checker::visit_class(ast::Klass& node) {
 
     for (const auto& sm: node.static_members) {
         USemanticInfo sm_exp_info = this->dispatch(*sm.second.second);
-        if (*sm.second.first != ((Value&) sm_exp_info->entity).type) {
+        if (*sm.second.first != *(ast::Type*)((Value&) sm_exp_info->entity).type.to_ast()) {
             this->error_reporter.fail("Err: cannt initialize static member of type " + sm.second.first->to_string() +
                                       " with expression of type " + ((Value&) sm_exp_info->entity).type.to_string());
         }
@@ -104,7 +106,7 @@ USemanticInfo Checker::visit_class(ast::Klass& node) {
     std::vector<sem::SNode*> static_methods_snodes;
 
     for (const auto& method: node.methods) {
-        auto* vt = new ast::ObjectType(node.class_name);
+        auto* vt = new sem::TypeObject(node.class_name);
         vt->data.actual_base_path = clazz->path;
         auto val = std::make_unique<Value>(vt);
         this->add_this = true;

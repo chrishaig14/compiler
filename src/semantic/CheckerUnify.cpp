@@ -6,6 +6,8 @@
 #include "../simple_nodes/with_unique/Id.h"
 #include "../simple_nodes/with_unique/ObjectMember.h"
 #include "../simple_nodes/Match.h"
+#include "../simple_nodes/TypeFunction.h"
+#include "../simple_nodes/TypeObject.h"
 #include "../simple_nodes/NewObject.h"
 #include "../units/FunctionValue.h"
 #include "../simple_nodes/with_unique/EnumMember.h"
@@ -178,7 +180,7 @@ USemanticInfo Checker::enum_member(Enum* enumm, const std::string& value, ast::M
     SemanticInfo& info = *info_u;
     for (size_t i = 0; i < enumm->values.size(); i++) {
         if (value == enumm->values[i]) {
-            auto* otype = new ast::ObjectType(enumm->enumm_name, {});
+            auto* otype = new sem::TypeObject(enumm->enumm_name, {});
             otype->data.actual_base_path = enumm->path;
             auto ov = std::make_unique<Value>(otype);
             info.set_entity(ov.release());
@@ -197,7 +199,7 @@ Entity* Checker::entity_from_type(const ast::Type& type) {
         return this->entities[type.to_string()]->clone();
     }
     if (type.kind == Kind::FUNCTION) {
-        auto fv = std::make_unique<Value>(type.clone());
+        auto fv = std::make_unique<Value>(type.to_sem());
         auto* vp = fv.release();
         this->entities[type.to_string()] = vp;
         return vp;
@@ -209,7 +211,7 @@ Entity* Checker::entity_from_type(const ast::Type& type) {
             return e;
         }
     }
-    auto fv = std::make_unique<Value>(type.clone());
+    auto fv = std::make_unique<Value>(type.to_sem());
     auto* e = fv.release();
     this->entities[type.to_string()] = e;
     return e;

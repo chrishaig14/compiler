@@ -7,6 +7,8 @@
 #include "errors/ErrorExpectedExpression.h"
 #include "errors/ErrorNotAFunction.h"
 #include "errors/ErrorFunctionCallNumArgs.h"
+#include "../simple_nodes/TypeObject.h"
+#include "../simple_nodes/TypeFunction.h"
 
 USemanticInfo Checker::visit_call(ast::Call& n, bool is_rvalue) {
     auto retv_p = std::make_unique<SemanticInfo>();
@@ -31,8 +33,9 @@ USemanticInfo Checker::visit_call(ast::Call& n, bool is_rvalue) {
     const ast::FunctionType* function_type = nullptr;
     if (fun_info.entity.get().type == E_TYPE::CONST_FUNCTION) {
         function_type = (ast::FunctionType*) ((EntityConstFunction&) fun_info.entity.get()).const_function->const_function_ft_p->to_ast();
-    } else if (fun_info.entity.get().type == E_TYPE::VALUE && ((Value&) fun_info.entity).type.kind == Kind::FUNCTION) {
-        function_type = &((Value&) fun_info.entity.get()).type.function();
+    } else if (fun_info.entity.get().type == E_TYPE::VALUE &&
+               ((Value&) fun_info.entity).type.kind == sem::Kind::FUNCTION) {
+        function_type = (ast::FunctionType*) ((Value&) fun_info.entity.get()).type.to_ast();
     }
     // ok
     if (n.arguments.size() != function_type->param_types.size()) {
@@ -167,7 +170,7 @@ USemanticInfo Checker::make_return_info(const ast::Call& n, bool is_rvalue, USem
         }
     } else if (retv.entity.get().type == E_TYPE::VALUE) {
         Value& value = ((Value&) retv.entity.get());
-        if (value.type.kind == Kind::OBJECT) {
+        if (value.type.kind == sem::Kind::OBJECT) {
             if (value.type.object().id == ".None") {
                 retv.set_entity(new EntityNothing());
             } else {
