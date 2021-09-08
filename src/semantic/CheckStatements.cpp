@@ -30,7 +30,7 @@ USemanticInfo Checker::visit_lvalue_subscript(ast::Subscript& node) {
     Class* cls = entity_parent_value.clazz;
     assert(cls != nullptr);
     if (!cls->type_params.empty()) {
-        cls = instantiate_generic(cls, *(ast::ObjectType*) entity_parent_value.type.object().to_ast());
+        cls = instantiate_generic(*cls, *(ast::ObjectType*) entity_parent_value.type.object().to_ast());
     }
 
     auto subscript_it = cls->methods.find("__set_item__");

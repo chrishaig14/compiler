@@ -185,17 +185,17 @@ ast::UTypeNode make_type(const ast::Type& original, const MapStringType& replace
     }
 }
 
-Class* Checker::instantiate_generic(Class* generic, const ast::ObjectType& instance) {
+Class* Checker::instantiate_generic(const Class& generic, const ast::ObjectType& instance) {
     std::cout << "******* Instantiating type: " << instance.to_string() << std::endl;
     MapStringType replacements;
-    for (size_t i = 0; i < generic->type_params.size(); i++) {
-        std::string tp = generic->type_params[i];
+    for (size_t i = 0; i < generic.type_params.size(); i++) {
+        std::string tp = generic.type_params[i];
         ast::Type& type_replacement = *instance.type_params[i];
         replacements[tp] = &type_replacement;
     }
-    auto field_names = generic->member_names;
+    auto field_names = generic.member_names;
     ast::VectorOfTypes concrete_field_types;
-    for (auto* f: generic->member_types) {
+    for (auto* f: generic.member_types) {
         ast::Type& concrete_type = *make_type(*f, replacements).release();
         concrete_field_types.push_back(&concrete_type);
         this->module.fill_actual(concrete_type);
@@ -203,10 +203,10 @@ Class* Checker::instantiate_generic(Class* generic, const ast::ObjectType& insta
 
 
     std::unordered_map<std::string, ConstFunction*> concrete_methods;
-    for (const auto& method_cf: generic->methods) {
+    for (const auto& method_cf: generic.methods) {
         if (method_cf.second->implicit != nullptr) {
             Implicit* implicit = method_cf.second->implicit;
-            if (implicit->type == generic->type_params[0]) {
+            if (implicit->type == generic.type_params[0]) {
                 std::cout << "----------- Generic with implicit which is class parameter: " << method_cf.first
                           << std::endl;
                 Value& e = *(Value*) entity_from_type(*instance.type_params[0]);
@@ -248,7 +248,7 @@ Class* Checker::instantiate_generic(Class* generic, const ast::ObjectType& insta
     }
 
     std::unordered_map<std::string, ConstFunction*> concrete_static_methods;
-    for (const auto& m: generic->static_methods) {
+    for (const auto& m: generic.static_methods) {
         ast::Type* t = (m.second)->const_function_ft_p->to_ast();
         ast::Type& concrete_type = *make_type(*t, replacements).release();
         this->module.fill_actual(concrete_type);
@@ -256,15 +256,15 @@ Class* Checker::instantiate_generic(Class* generic, const ast::ObjectType& insta
         concrete_static_methods[m.first] = cf;
     }
 
-    auto* concrete = new Class(generic->class_name, generic->path);
+    auto* concrete = new Class(generic.class_name, generic.path);
     // concrete->class_name = ;
     concrete->methods = concrete_methods;
     concrete->static_methods = concrete_static_methods;
-    concrete->member_names = generic->member_names;
+    concrete->member_names = generic.member_names;
     concrete->member_types = concrete_field_types;
-    // concrete->path = generic->path;
-    for (size_t i = 0; i < generic->member_names.size(); i++) {
-        std::string mn = generic->member_names[i];
+    // concrete->path = generic.path;
+    for (size_t i = 0; i < generic.member_names.size(); i++) {
+        std::string mn = generic.member_names[i];
         concrete->members[mn] = concrete_field_types[i];
         concrete->member_entities[mn] = new EntityNothing();
     }

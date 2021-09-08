@@ -98,7 +98,7 @@ public:
     void enter_scope(const std::string& name);
     void leave_scope();
     bool assert_type_exists(const ast::Type& type, TextPosition pos);
-    Class* instantiate_generic(Class* generic, const ast::ObjectType& instance);
+    Class* instantiate_generic(const Class& generic_p, const ast::ObjectType& instance);
     bool is_variable(const ast::ObjectType& a);
     std::pair<std::string, ast::Type*>*
     get_first_substitution_function(ast::FunctionType& a, ast::FunctionType& b, bool is_top_level_arg);
