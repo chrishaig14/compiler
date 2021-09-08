@@ -30,9 +30,8 @@ USemanticInfo Checker::visit_call(ast::Call& n, bool is_rvalue) {
     }
     const ast::FunctionType* function_type = nullptr;
     if (fun_info.entity.get().type == E_TYPE::CONST_FUNCTION) {
-        function_type = ((EntityConstFunction&) fun_info.entity.get()).const_function->const_function_ft_p;
-    } else if (fun_info.entity.get().type == E_TYPE::VALUE &&
-               ((Value&) fun_info.entity).type.kind == Kind::FUNCTION) {
+        function_type = (ast::FunctionType*) ((EntityConstFunction&) fun_info.entity.get()).const_function->const_function_ft_p->to_ast();
+    } else if (fun_info.entity.get().type == E_TYPE::VALUE && ((Value&) fun_info.entity).type.kind == Kind::FUNCTION) {
         function_type = &((Value&) fun_info.entity.get()).type.function();
     }
     // ok

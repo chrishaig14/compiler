@@ -3,7 +3,7 @@
 //
 #include "ConstFunction.h"
 
-ConstFunction::ConstFunction(Path path, ast::FunctionType* ft) : const_function_ft(*ft) {
+ConstFunction::ConstFunction(Path path, sem::TypeFunction* ft) : const_function_ft(*ft) {
     this->path = path;
     this->const_function_ft_p = ft;
     this->implicit = nullptr;

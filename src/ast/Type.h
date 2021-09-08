@@ -11,6 +11,7 @@
 #include "Node.h"
 
 #include "../types.h"
+#include "../simple_nodes/Type.h"
 #include <iostream>
 
 
@@ -32,6 +33,8 @@ public:
     virtual bool equal(const ast::Type& other) const = 0;
 
     virtual ast::Type* clone() const = 0;
+
+    virtual sem::Type* to_sem() const = 0;
 
     virtual ast::ObjectType& object();
 

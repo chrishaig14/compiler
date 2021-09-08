@@ -2,8 +2,8 @@
 // Created by chris on 3/7/21.
 //
 
-#include "TypeFunction.h"
-#include "TypeObject.h"
+#include "FunctionType.h"
+#include "ObjectType.h"
 
 using namespace ast;
 
@@ -107,4 +107,12 @@ nlohmann::json ast::FunctionType::to_json() const {
     j["parameter_types"] = v;
     j["return_type"] = this->return_type->to_json();
     return j;
+}
+
+sem::Type* FunctionType::to_sem() const {
+    sem::VectorOfTypes aux;
+    for (auto& p: this->param_types) {
+        aux.emplace_back(p->to_sem());
+    }
+    return new sem::TypeFunction(aux, sem::UType(this->return_type->to_sem()));
 }

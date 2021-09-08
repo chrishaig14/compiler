@@ -217,41 +217,42 @@ Class* Checker::instantiate_generic(Class* generic, const ast::ObjectType& insta
                     std::cout << "Not found in instance's type parameter, so skipping" << std::endl;
                 } else {
                     std::cout << "Found implicit in instance's type parameter" << std::endl;
-                    ast::Type* t = (method_cf.second)->const_function_ft_p;
+                    ast::Type* t = (method_cf.second)->const_function_ft_p->to_ast();
                     ast::Type& concrete_type = *make_type(*t, replacements).release();
                     this->module.fill_actual(concrete_type);
-                    auto* cf = new ConstFunction(method_cf.second->path, (ast::FunctionType*) concrete_type.clone());
-                    std::cout << "Instantiated generic method " << method_cf.first << " : " << cf->const_function_ft.to_string()
-                              << std::endl;
+                    auto* cf = new ConstFunction(method_cf.second->path, (sem::TypeFunction*) concrete_type.to_sem());
+                    std::cout << "Instantiated generic method " << method_cf.first << " : "
+                              << cf->const_function_ft.to_string() << std::endl;
                     concrete_methods[method_cf.first] = cf;
                 }
 
             } else {
                 std::cout << "----------- Normal generic function: r" << method_cf.first << std::endl;
-                ast::Type* t = (method_cf.second)->const_function_ft_p;
+                ast::Type* t = (method_cf.second)->const_function_ft_p->to_ast();
                 ast::Type& concrete_type = *make_type(*t, replacements).release();
                 this->module.fill_actual(concrete_type);
-                auto* cf = new ConstFunction(method_cf.second->path, (ast::FunctionType*) concrete_type.clone());
-                std::cout << "Instantiated generic method " << method_cf.first << " : " << cf->const_function_ft.to_string()
-                          << std::endl;
+                auto* cf = new ConstFunction(method_cf.second->path, (sem::TypeFunction*) concrete_type.to_sem());
+                std::cout << "Instantiated generic method " << method_cf.first << " : "
+                          << cf->const_function_ft.to_string() << std::endl;
                 concrete_methods[method_cf.first] = cf;
             }
         } else {
-            ast::Type* t = (method_cf.second)->const_function_ft_p;
+            ast::Type* t = (method_cf.second)->const_function_ft_p->to_ast();
             ast::Type& concrete_type = *make_type(*t, replacements).release();
             this->module.fill_actual(concrete_type);
-            auto* cf = new ConstFunction(method_cf.second->path, (ast::FunctionType*) concrete_type.clone());
-            std::cout << "Instantiated generic method " << method_cf.first << " : " << cf->const_function_ft.to_string() << std::endl;
+            auto* cf = new ConstFunction(method_cf.second->path, (sem::TypeFunction*) concrete_type.to_sem());
+            std::cout << "Instantiated generic method " << method_cf.first << " : " << cf->const_function_ft.to_string()
+                      << std::endl;
             concrete_methods[method_cf.first] = cf;
         }
     }
 
     std::unordered_map<std::string, ConstFunction*> concrete_static_methods;
     for (const auto& m: generic->static_methods) {
-        ast::Type* t = (m.second)->const_function_ft_p;
+        ast::Type* t = (m.second)->const_function_ft_p->to_ast();
         ast::Type& concrete_type = *make_type(*t, replacements).release();
         this->module.fill_actual(concrete_type);
-        auto* cf = new ConstFunction(m.second->path, (ast::FunctionType*) concrete_type.clone());
+        auto* cf = new ConstFunction(m.second->path, (sem::TypeFunction*) concrete_type.to_sem());
         concrete_static_methods[m.first] = cf;
     }
 

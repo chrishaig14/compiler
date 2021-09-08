@@ -7,7 +7,7 @@
 
 
 #include "Error.h"
-#include "../../ast/TypeObject.h"
+#include "../../ast/ObjectType.h"
 
 class ErrorListLiteral : public Error {
 public:

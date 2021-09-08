@@ -2,17 +2,20 @@
 // Created by chris on 3/7/21.
 //
 
-#ifndef XLANG_TYPEFUNCTION_H
-#define XLANG_TYPEFUNCTION_H
+#ifndef XLANG_FUNCTIONTYPE_H
+#define XLANG_FUNCTIONTYPE_H
 
 
 #include "Type.h"
+#include "../simple_nodes/TypeFunction.h"
 
 class ast::FunctionType : public ast::Type {
 public:
     FunctionType(ast::VectorOfTypes parameterTypes, ast::UTypeNode returnType);
 
     bool equal(const ast::Type& other) const override;
+
+    sem::Type* to_sem() const override;
 
     std::string to_string() const override;
     std::string actual_to_string() const override;
@@ -35,4 +38,4 @@ public:
     nlohmann::json to_json() const override;
 };
 
-#endif //XLANG_TYPEFUNCTION_H
+#endif //XLANG_FUNCTIONTYPE_H

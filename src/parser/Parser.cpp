@@ -13,7 +13,7 @@
 #include <fmt/color.h>
 #include <exception>
 #include <set>
-#include "../ast/TypeObject.h"
+#include "../ast/ObjectType.h"
 
 std::unordered_map<TokType, OpType> TOKEN_TO_OP = {{TokType::PLUS,  OpType::ADD},
                                                    {TokType::MINUS, OpType::SUB},

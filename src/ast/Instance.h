@@ -7,7 +7,7 @@
 
 
 #include "Node.h"
-#include "TypeObject.h"
+#include "ObjectType.h"
 #include "Function.h"
 #include "ast.h"
 

@@ -19,7 +19,7 @@
 #include "../simple_nodes/with_unique/Return.h"
 #include "../ast/nodes.h"
 #include "SemanticInfo.h"
-#include "../ast/TypeObject.h"
+#include "../ast/ObjectType.h"
 //
 // Created by chris on 2/5/21.
 //

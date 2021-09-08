@@ -4,7 +4,7 @@
 
 #include <cassert>
 #include "CheckMember.h"
-#include "../ast/TypeObject.h"
+#include "../ast/ObjectType.h"
 #include "../simple_nodes/with_unique/ObjectMember.h"
 #include "../simple_nodes/with_unique/ObjectMethodCall.h"
 #include "../simple_nodes/with_unique/ObjectMethod.h"
@@ -20,13 +20,13 @@ USemanticInfo Checker::visit_member(ast::Member& n) {
         case E_TYPE::CLASS:
             return this->class_member(((EntityClass&) parent_entity).clazz, n.s_child, n);
         case E_TYPE::CONST_FUNCTION:
-            this->error_reporter.error(std::make_unique<ErrorNoMember>(((EntityConstFunction&) parent_entity).const_function->const_function_ft,
+            this->error_reporter.error(std::make_unique<ErrorNoMember>(*((EntityConstFunction&) parent_entity).const_function->const_function_ft.to_ast(),
                                                                        n));
             // this->error_reporter.object_no_member(*parent_entity.const_function->ft, n);
             break;
         case E_TYPE::VALUE:
             if (((Value&) parent_entity).type.kind == Kind::FUNCTION) {
-                this->error_reporter.error(std::make_unique<ErrorNoMember>(((EntityConstFunction&) parent_entity).const_function->const_function_ft,
+                this->error_reporter.error(std::make_unique<ErrorNoMember>(*((EntityConstFunction&) parent_entity).const_function->const_function_ft.to_ast(),
                                                                            n));
                 // this->error_reporter.object_no_member(*parent_entity.value->type, n);
                 return error_stub();
@@ -174,7 +174,7 @@ USemanticInfo Checker::class_member(Class* cls, const std::string& child, ast::M
             tp.push_back(t);
         }
         ast::ObjectType* ot = new ast::ObjectType(cls->class_name, tp);
-        unbound_method->const_function_ft.param_types.insert(unbound_method->const_function_ft.param_types.begin(), ast::UTypeNode(ot));
+        unbound_method->const_function_ft.param_types.insert(unbound_method->const_function_ft.param_types.begin(), sem::UType(ot->to_sem()));
         info.set_entity(new EntityConstFunction(unbound_method));
         info.snode = std::make_unique<sem::Id>(unbound_method->path.as_str());
     } else if (cls->static_methods.find(child) != cls->static_methods.end()) {

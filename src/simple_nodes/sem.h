@@ -4,8 +4,10 @@
 
 #ifndef XLANG_SEM_H
 #define XLANG_SEM_H
+
 #include <vector>
 #include <memory>
+
 namespace sem {
     class Assignment;
 
@@ -74,6 +76,10 @@ namespace sem {
     class TypeObject;
 
     class TypeFunction;
+
+    enum class Kind;
+
+    class ObjectTypeData;
 
     class Type;
 

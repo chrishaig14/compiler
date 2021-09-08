@@ -4,6 +4,7 @@
 
 #include <cassert>
 #include "TypeObject.h"
+#include "../ast/ObjectType.h"
 
 using namespace sem;
 
@@ -13,7 +14,7 @@ TypeObject::TypeObject(const std::string& identifier, const sem::VectorOfTypes& 
         assert(p != nullptr);
     }
     this->kind = Kind::OBJECT;
-    this->aliased_type = nullptr;
+    this->data.aliased_type = nullptr;
     this->is_generic_param = false;
 }
 
@@ -24,9 +25,22 @@ sem::Type* TypeObject::clone() const {
     }
 
     auto* n = new sem::TypeObject(this->id, aux);
-    n->actual_base_path = this->actual_base_path;
+    n->data.actual_base_path = this->data.actual_base_path;
     n->is_generic_param = this->is_generic_param;
-    n->aliased_type = this->aliased_type;
+    n->data.aliased_type = this->data.aliased_type;
+    return n;
+}
+
+ast::Type* TypeObject::to_ast() const {
+    ast::VectorOfTypes aux;
+    for (auto* p: this->type_params) {
+        aux.emplace_back(p->to_ast());
+    }
+
+    auto* n = new ast::ObjectType(this->id, aux);
+    n->data.actual_base_path = this->data.actual_base_path;
+    n->is_generic_param = this->is_generic_param;
+    n->data.aliased_type = this->data.aliased_type != nullptr ? this->data.aliased_type->to_ast() : nullptr;
     return n;
 }
 
@@ -59,9 +73,9 @@ std::string TypeObject::actual_to_string() const {
     }
     if (!parameters.empty()) {
         parameters = parameters.substr(0, parameters.size() - 2);
-        return this->actual_base_path.as_str() + "[" + parameters + "]";
+        return this->data.actual_base_path.as_str() + "[" + parameters + "]";
     }
-    return this->actual_base_path.as_str();
+    return this->data.actual_base_path.as_str();
 }
 
 bool TypeObject::equal(const sem::Type& other) const {

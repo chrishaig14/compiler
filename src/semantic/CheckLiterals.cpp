@@ -134,7 +134,7 @@ USemanticInfo Checker::visit_partial(ast::PartialApplication& node) {
     Entity& f_entity = func->entity;
     if (f_entity.type == E_TYPE::CONST_FUNCTION ||
         (f_entity.type == E_TYPE::VALUE && ((Value&) f_entity).type.kind == Kind::FUNCTION)) {
-        fun_type = ((EntityConstFunction&) f_entity).const_function->const_function_ft.clone();
+        fun_type = (ast::FunctionType*) ((EntityConstFunction&) f_entity).const_function->const_function_ft.to_ast();
     } else {
         this->error_reporter.fail("Error: expected a function for partial application");
         return error_stub();
@@ -227,7 +227,6 @@ USemanticInfo Checker::visit_defconst(ast::DefaultConstructor& node) {
     // this is a regular function
     USemanticInfo info_u = std::make_unique<SemanticInfo>();
     SemanticInfo& info = *info_u;
-    ast::VectorOfTypes t;
     Entity& entity = this->dispatch(*node.class_node)->entity;
     if (entity.type != E_TYPE::CLASS) {
         this->error_reporter.fail("Error not a class");
@@ -235,8 +234,9 @@ USemanticInfo Checker::visit_defconst(ast::DefaultConstructor& node) {
         return info_u;
     }
     Class& cls = *((EntityClass&) entity).clazz;
+    sem::VectorOfTypes t;
     for (auto* pt: cls.member_types) {
-        t.push_back(pt->clone());
+        t.push_back(pt->to_sem());
     }
     ast::VectorOfTypes tp;
     for (const auto& tt: cls.type_params) {
@@ -246,7 +246,8 @@ USemanticInfo Checker::visit_defconst(ast::DefaultConstructor& node) {
     }
     auto* rt = new ast::ObjectType(cls.class_name, tp);
     rt->data.actual_base_path = cls.path;
-    info.set_entity(new EntityConstFunction(new ConstFunction(Path(), new ast::FunctionType(t, ast::UTypeNode(rt)))));
+    info.set_entity(new EntityConstFunction(new ConstFunction(Path(),
+                                                              new sem::TypeFunction(t, sem::UType(rt->to_sem())))));
     info.snode = std::make_unique<sem::Id>(cls.path.as_str() + "." + "__init__");
     return info_u;
 }

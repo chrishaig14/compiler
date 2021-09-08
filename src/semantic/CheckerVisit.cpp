@@ -93,8 +93,7 @@ USemanticInfo Checker::visit_class(ast::Klass& node) {
         USemanticInfo sm_exp_info = this->dispatch(*sm.second.second);
         if (*sm.second.first != ((Value&) sm_exp_info->entity).type) {
             this->error_reporter.fail("Err: cannt initialize static member of type " + sm.second.first->to_string() +
-                                      " with expression of type " +
-                                      ((Value&) sm_exp_info->entity).type.to_string());
+                                      " with expression of type " + ((Value&) sm_exp_info->entity).type.to_string());
         }
         if (!sm_exp_info->is_constant) {
             this->error_reporter.fail("Error: cannot initialize static member with non constant expression!");
@@ -265,7 +264,7 @@ USemanticInfo Checker::visit_function(ast::Function& n) {
     if (n.implicit != nullptr) {
         Class* clazz = new Class(n.implicit->type, Path("core.implicits." + n.implicit->type));
         // clazz->class_name = ;
-        ConstFunction* c = new ConstFunction(Path("implicit_a"), n.implicit->ft);
+        ConstFunction* c = new ConstFunction(Path("implicit_a"), (sem::TypeFunction*) n.implicit->ft->to_sem());
         this->module.fill_actual(c->const_function_ft);
         if (n.implicit->is_static) {
             clazz->static_methods[n.implicit->method] = c;

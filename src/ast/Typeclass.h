@@ -3,7 +3,7 @@
 
 
 #include "Node.h"
-#include "TypeFunction.h"
+#include "FunctionType.h"
 #include "ast.h"
 
 class ast::Typeclass : public ast::Node {

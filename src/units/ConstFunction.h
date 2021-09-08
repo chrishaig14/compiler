@@ -7,20 +7,22 @@
 #include "Entity.h"
 #include "../ast/Type.h"
 #include "../ast/Path.h"
-#include "../ast/TypeFunction.h"
+#include "../ast/FunctionType.h"
 #include "../ast/Function.h"
+#include "../simple_nodes/sem.h"
+#include "../simple_nodes/TypeFunction.h"
 
 class ConstFunction {
 public:
-    ConstFunction(Path path, ast::FunctionType* ft);
+    ConstFunction(Path path, sem::TypeFunction* ft);
 
     ConstFunction(const ConstFunction& other);
 
     ~ConstFunction();
 
     Implicit* implicit;
-    ast::FunctionType* const_function_ft_p;
-    ast::FunctionType& const_function_ft;
+    sem::TypeFunction* const_function_ft_p;
+    sem::TypeFunction& const_function_ft;
     Path path;
 };
 

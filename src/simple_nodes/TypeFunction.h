@@ -20,6 +20,7 @@ public:
 
     TypeFunction* clone() const override;
 
+    ast::Type* to_ast() const override;
     TypeFunction& function() override;
 
     ~TypeFunction() override;

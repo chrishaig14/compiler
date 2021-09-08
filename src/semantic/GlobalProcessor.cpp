@@ -6,7 +6,10 @@
 #include "GlobalProcessor.h"
 #include "../scanner/Scanner.h"
 #include "../parser/Parser.h"
-#include "../ast/TypeObject.h"
+#include "../ast/ObjectType.h"
+#include "../simple_nodes/TypeObject.h"
+#include "../simple_nodes/TypeFunction.h"
+#include "../simple_nodes/Type.h"
 
 void GlobalProcessor::visit_import(ast::Import& node) {
     const Path& node_path = Path(node.path);
@@ -63,7 +66,8 @@ void GlobalProcessor::visit_function(ast::Function& node) {
     this->module.fill_actual(p);
     ast::FunctionType function_info(x, ast::UTypeNode(node.return_type->clone()));
     Path function_path = Path(this->module.path, node.identifier);
-    ConstFunction* const_function = new ConstFunction(Path(this->module.path, node.identifier), function_info.clone());
+    ConstFunction* const_function = new ConstFunction(Path(this->module.path, node.identifier),
+                                                      (sem::TypeFunction*) function_info.to_sem());
     if (node.implicit != nullptr) {
         const_function->implicit = node.implicit;
         this->module.fill_actual(*node.implicit->ft);
@@ -166,17 +170,17 @@ void GlobalProcessor::visit_class(ast::Klass& node) {
     for (const auto& f: node.methods) {
         ast::Function& method = *f.second->method;
 
-        ast::VectorOfTypes x;
+        sem::VectorOfTypes x;
         for (ast::Type& p: method.parameter_types) {
             this->module.fill_actual(p);
             // p->object().actual_base_path = this->get_actual_path(p->object().id);
-            x.emplace_back(p.clone());
+            x.emplace_back(p.to_sem());
         }
         this->module.fill_actual(*method.return_type);
         // method.return_type->object().actual_base_path = this->get_actual_path(method.return_type->object().id);
 
         auto* cf = new ConstFunction(Path(class_info->path, f.first),
-                                     new ast::FunctionType(x, ast::UTypeNode(method.return_type->clone())));
+                                     new sem::TypeFunction(x, sem::UType(method.return_type->to_sem())));
         method.path = cf->path;
         cf->implicit = f.second->method->implicit;
         f.second->method->const_function = cf;
@@ -185,17 +189,17 @@ void GlobalProcessor::visit_class(ast::Klass& node) {
 
     for (const auto& f: node.static_methods) {
         ast::Function& method = *f.second;
-        ast::VectorOfTypes x;
+        sem::VectorOfTypes x;
         for (ast::Type& p: method.parameter_types) {
             this->module.fill_actual(p);
             // p->object().actual_base_path = this->get_actual_path(p->object().id);
-            x.emplace_back(p.clone());
+            x.emplace_back(p.to_sem());
         }
         this->module.fill_actual(*method.return_type);
         // method.return_type->object().actual_base_path = this->get_actual_path(method.return_type->object().id);
 
         auto* cf = new ConstFunction(Path(class_info->path, f.first),
-                                     new ast::FunctionType(x, ast::UTypeNode(method.return_type->clone())));
+                                     new sem::TypeFunction(x, sem::UType(method.return_type->to_sem())));
         method.path = cf->path;
         f.second->const_function = cf;
         class_info->static_methods.insert(make_pair(f.first, cf));
@@ -288,6 +292,40 @@ void Module::fill_actual(ast::ObjectType& t) {
 }
 
 void Module::fill_actual(ast::FunctionType& t) {
+    for (auto& pt: t.param_types) {
+        this->fill_actual(*pt);
+    }
+    this->fill_actual(*t.return_type);
+}
+
+void Module::fill_actual(sem::Type& t) {
+    if (t.kind == sem::Kind::OBJECT) {
+        if (this->aliased_types.count(t.object().id) != 0) {
+            t.object().data.aliased_type = this->aliased_types[t.object().id]->to_sem();
+            return;
+        }
+        this->fill_actual(t.object());
+    }
+    if (t.kind == sem::Kind::FUNCTION) {
+        this->fill_actual(t.function());
+        return;
+    }
+}
+
+void Module::fill_actual(sem::TypeObject& t) {
+    if (t.id.size() == 1) {
+        return;
+    }
+    if (t.is_generic_param) {
+        return;
+    }
+    t.data.actual_base_path = this->get_actual_path(t.id);
+    for (auto* tp: t.type_params) {
+        this->fill_actual(*tp);
+    }
+}
+
+void Module::fill_actual(sem::TypeFunction& t) {
     for (auto& pt: t.param_types) {
         this->fill_actual(*pt);
     }

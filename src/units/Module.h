@@ -53,6 +53,9 @@ public:
     void fill_actual(ast::Type& t);
     void fill_actual(ast::ObjectType& t);
     void fill_actual(ast::FunctionType& t);
+    void fill_actual(sem::Type& t);
+    void fill_actual(sem::TypeObject& t);
+    void fill_actual(sem::TypeFunction& t);
     void add_class_definition(Class* p_class);
     void add_enum_definition(Enum* p_enum);
     void add_func_definition(ConstFunction* p_function);

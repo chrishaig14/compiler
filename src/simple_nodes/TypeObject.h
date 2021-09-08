@@ -10,8 +10,16 @@
 #include "../ast/Path.h"
 #include "../json/json.hpp"
 
+class sem::ObjectTypeData {
+public:
+    Path actual_base_path;
+    sem::Type* aliased_type;
+};
+
+
 class sem::TypeObject : public sem::Type {
 public:
+    ObjectTypeData data;
     TypeObject(const std::string& identifier, const sem::VectorOfTypes& typeParameters);
 
     explicit TypeObject(const std::string& identifier);
@@ -22,6 +30,7 @@ public:
     std::string actual_to_string() const override;
 
     sem::Type* clone() const override;
+    ast::Type* to_ast() const override;
 
     sem::TypeObject& object() override;
 
@@ -31,11 +40,11 @@ public:
 
     ~TypeObject() override;
 
-    Path actual_base_path;
+    // Path actual_base_path;
     std::string id;
     sem::VectorOfTypes type_params;
     bool is_generic() const override;
-    sem::Type* aliased_type;
+    // sem::Type* aliased_type;
 };
 
 #endif //XLANG_TypeObject_H

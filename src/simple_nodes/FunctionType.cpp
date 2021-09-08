@@ -4,6 +4,8 @@
 
 #include "TypeFunction.h"
 #include "TypeObject.h"
+#include "../ast/FunctionType.h"
+#include "TypeObject.h"
 
 using namespace sem;
 
@@ -27,6 +29,15 @@ sem::TypeFunction* sem::TypeFunction::clone() const {
         aux.emplace_back(p->clone());
     }
     return new sem::TypeFunction(aux, sem::UType(this->return_type->clone()));
+}
+
+
+ast::Type* sem::TypeFunction::to_ast() const {
+    ast::VectorOfTypes aux;
+    for (auto& p: this->param_types) {
+        aux.emplace_back(p->to_ast());
+    }
+    return new ast::FunctionType(aux, ast::UTypeNode(this->return_type->to_ast()));
 }
 
 TypeFunction::~TypeFunction() {

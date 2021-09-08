@@ -14,7 +14,7 @@
 #include "sem.h"
 #include "../json/json_fwd.hpp"
 
-enum class Kind {
+enum class sem::Kind {
     OBJECT, FUNCTION, UNKNOWN
 };
 
@@ -32,6 +32,8 @@ public:
     virtual bool equal(const sem::Type& other) const = 0;
 
     virtual Type* clone() const = 0;
+
+    virtual ast::Type* to_ast() const = 0;
 
     virtual TypeObject& object();
 

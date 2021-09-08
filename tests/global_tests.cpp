@@ -3,6 +3,7 @@
 #include "../src/parser/Parser.h"
 #include "../src/ast/UnaryOp.h"
 #include "../src/semantic/GlobalProcessor.h"
+#include "../src/simple_nodes/TypeObject.h"
 
 const ast::ObjectType NO_TYPE(".None");
 
@@ -22,8 +23,9 @@ TEST_CASE("global_main", "[parser]") {
     REQUIRE(module.flirpins.count("main") == 1);
     REQUIRE(module.flirpins["main"].type == F_TYPE::CONST_FUNCTION);
     ConstFunction* const_function = module.flirpins["main"].const_function;
-
-    REQUIRE(const_function->const_function_ft == ast::FunctionType({}, std::make_unique<ast::ObjectType>("Integer")));
+    // sem::Type* p = (sem::TypeObject*) nullptr;
+    std::unique_ptr<sem::Type> u = std::make_unique<sem::TypeObject>("Integer");
+    REQUIRE(const_function->const_function_ft == sem::TypeFunction({}, std::move(u)));
     REQUIRE(const_function->implicit == nullptr);
     REQUIRE(const_function->path.as_str() == "main.foo.main");
 }
@@ -92,7 +94,7 @@ TEST_CASE("global_multiple", "[parser]") {
 
     REQUIRE(module.flirpins["main"].type == F_TYPE::CONST_FUNCTION);
     ConstFunction* const_function = module.flirpins["main"].const_function;
-    REQUIRE(const_function->const_function_ft == ast::FunctionType({}, std::make_unique<ast::ObjectType>("Integer")));
+    REQUIRE(const_function->const_function_ft == sem::TypeFunction({}, std::make_unique<sem::TypeObject>("Integer")));
     REQUIRE(const_function->implicit == nullptr);
     REQUIRE(const_function->path.as_str() == "main.foo.main");
 

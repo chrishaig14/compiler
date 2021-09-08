@@ -179,7 +179,7 @@ USemanticInfo Checker::visit_unary(ast::UnaryOp& n) {
 
     ConstFunction* subscript_fun = subscript_it->second;
     std::string sub_fun_path = subscript_fun->path.as_str();
-    ast::Type* rtype = subscript_fun->const_function_ft.return_type->clone();
+    ast::Type* rtype = subscript_fun->const_function_ft.return_type->to_ast();
 
     auto fsn = std::make_unique<sem::Id>(sub_fun_path);
     std::vector<USNode> v;
@@ -227,7 +227,7 @@ USemanticInfo Checker::visit_binop(ast::BinaryOp& n) {
     vv.push_back(std::move(left_info_p->snode));
     vv.push_back(std::move(right_snode));
     auto sn = std::make_unique<sem::Call>(std::move(function_id), std::move(vv));
-    ast::Type* rettype = operator_fun->const_function_ft.return_type->clone();
+    ast::Type* rettype = operator_fun->const_function_ft.return_type->to_ast();
 
     USemanticInfo info_u = std::make_unique<SemanticInfo>();
     SemanticInfo& info = *info_u;
@@ -294,14 +294,16 @@ USemanticInfo Checker::visit_subscript(ast::Subscript& node) {
     }
     ConstFunction* subscript_fun = subscript_it->second;
     std::string sub_fun_path = subscript_fun->path.as_str();
-    ast::Type* rtype = subscript_fun->const_function_ft.return_type->clone();
+    ast::Type* rtype = subscript_fun->const_function_ft.return_type->to_ast();
 
     // VectorOfTypes children;
     if (node.child.size() > 1) {
         this->error_reporter.fail("Error subscript with more than one child!");
         return error_stub();
     }
-    USemanticInfo child_sinfo = this->expect_rvalue_of_type(*subscript_fun->const_function_ft.param_types[0], *node.child[0]);
+    USemanticInfo child_sinfo = this->expect_rvalue_of_type(*subscript_fun->const_function_ft.param_types[0]->to_ast(),
+                                                            *node.child[0]);
+
     if (child_sinfo->is_error()) {
         return error_stub();
     }
@@ -327,8 +329,7 @@ USemanticInfo Checker::visit_ternary(ast::Ternary& node) {
     USemanticInfo expression_info_p = this->dispatch_rvalue(*node.expression);
     SemanticInfo& expression_info = *expression_info_p;
     Entity& p_entity = expression_info.entity;
-    if (p_entity.type != E_TYPE::VALUE ||
-        ((Value&) expression_info_p->entity).type.kind == Kind::FUNCTION) {
+    if (p_entity.type != E_TYPE::VALUE || ((Value&) expression_info_p->entity).type.kind == Kind::FUNCTION) {
         this->error_reporter.error(std::make_unique<ErrorTypeMismatch>(*new ast::ObjectType("Option",
                                                                                             {new ast::ObjectType("t")}),
                                                                        *node.expression,

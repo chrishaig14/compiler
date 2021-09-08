@@ -2,7 +2,8 @@
 // Created by chris on 3/7/21.
 //
 
-#include "TypeObject.h"
+#include "ObjectType.h"
+#include "../simple_nodes/TypeObject.h"
 
 using namespace ast;
 
@@ -25,7 +26,21 @@ ast::Type* ObjectType::clone() const {
     auto* n = new ast::ObjectType(this->id, aux);
     n->data.actual_base_path = this->data.actual_base_path;
     n->is_generic_param = this->is_generic_param;
-    n->data.aliased_type = this->data.aliased_type;
+    // n->data.aliased_type = this->data.aliased_type->clone();
+    n->data.aliased_type = this->data.aliased_type != nullptr ? this->data.aliased_type->clone() : nullptr;
+    return n;
+}
+
+sem::Type* ObjectType::to_sem() const {
+    sem::VectorOfTypes aux;
+    for (auto* p: this->type_params) {
+        aux.emplace_back(p->to_sem());
+    }
+
+    auto* n = new sem::TypeObject(this->id, aux);
+    n->data.actual_base_path = this->data.actual_base_path;
+    n->is_generic_param = this->is_generic_param;
+    n->data.aliased_type = this->data.aliased_type != nullptr ? this->data.aliased_type->to_sem() : nullptr;
     return n;
 }
 

@@ -2,8 +2,8 @@
 // Created by chris on 3/7/21.
 //
 
-#ifndef XLANG_TYPEOBJECT_H
-#define XLANG_TYPEOBJECT_H
+#ifndef XLANG_OBJECTTYPE_H
+#define XLANG_OBJECTTYPE_H
 
 #include "Type.h"
 #include "Path.h"
@@ -31,6 +31,7 @@ public:
     nlohmann::json to_json() const override;
     ~ObjectType() override;
     bool is_generic() const override;
+    sem::Type* to_sem() const override;
 };
 
-#endif //XLANG_TYPEOBJECT_H
+#endif //XLANG_OBJECTTYPE_H

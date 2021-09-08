@@ -51,7 +51,7 @@
 #include "../simple_nodes/Match.h"
 #include "CheckerUtils.h"
 #include "../ast/UnaryOp.h"
-#include "../ast/TypeObject.h"
+#include "../ast/ObjectType.h"
 #include "../ast/Module.h"
 
 #define T_NONE ast::ObjectType(".None")

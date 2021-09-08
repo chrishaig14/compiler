@@ -4,7 +4,7 @@
 
 #include "CheckStatements.h"
 
-#include "../ast/TypeObject.h"
+#include "../ast/ObjectType.h"
 #include "../simple_nodes/Throw.h"
 #include "../simple_nodes/TryCatch.h"
 #include "errors/ErrorTypeMismatch.h"
@@ -40,13 +40,14 @@ USemanticInfo Checker::visit_lvalue_subscript(ast::Subscript& node) {
     }
     ConstFunction* subscript_fun = subscript_it->second;
     std::string sub_fun_path = subscript_fun->path.as_str();
-    ast::Type* rtype = subscript_fun->const_function_ft.return_type->clone();
+    ast::Type* rtype = subscript_fun->const_function_ft.return_type->to_ast();
 
     ast::VectorOfTypes children;
     if (node.child.size() > 1) {
         this->error_reporter.fail("Error subscript with more than one child!");
     }
-    USemanticInfo child_sinfo = this->expect_rvalue_of_type(*subscript_fun->const_function_ft.param_types[0], *node.child[0]);
+    USemanticInfo child_sinfo = this->expect_rvalue_of_type(*subscript_fun->const_function_ft.param_types[0]->to_ast(),
+                                                            *node.child[0]);
     if (child_sinfo->is_error()) {
         return error_stub();
     }
@@ -120,7 +121,7 @@ USemanticInfo Checker::visit_assignment(ast::Assignment& n) {
         //                                 *n.lvalue,
         //                                 *n.rvalue);
     }
-    ast::Type* exp_type =&((Value&) expression_info_p->entity).type;
+    ast::Type* exp_type = &((Value&) expression_info_p->entity).type;
 
     if (exp_type->kind == Kind::OBJECT && this->module.aliased_types.count(exp_type->object().id) == 1) {
         ast::Type* aliased_type = this->module.aliased_types.at(exp_type->object().id);
@@ -223,8 +224,7 @@ USemanticInfo Checker::visit_return(ast::Return& n) {
 
 USemanticInfo Checker::visit_match(ast::Match& node) {
     USemanticInfo exp_info = this->dispatch_rvalue(*node.exp);
-    if (exp_info->entity.get().type != E_TYPE::VALUE ||
-        ((Value&) exp_info->entity).type.kind != Kind::OBJECT) {
+    if (exp_info->entity.get().type != E_TYPE::VALUE || ((Value&) exp_info->entity).type.kind != Kind::OBJECT) {
 
         this->error_reporter.error(std::make_unique<ErrorTypeMismatch>(*new ast::ObjectType("Union",
                                                                                             {new ast::ObjectType("...",

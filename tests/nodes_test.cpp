@@ -1,6 +1,6 @@
 #include "catch.hpp"
 #include "../src/ast/nodes.h"
-#include "../src/ast/TypeObject.h"
+#include "../src/ast/ObjectType.h"
 #include "../src/ast/Typeclass.h"
 #include "../src/ast/Instance.h"
 
