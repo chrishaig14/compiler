@@ -68,9 +68,8 @@ USemanticInfo Checker::visit_emptylist(ast::EmptyList& node) {
     USemanticInfo info_u = std::make_unique<SemanticInfo>();
     SemanticInfo& info = *info_u;
     this->module.fill_actual(*node.type);
-    auto* otype = new sem::TypeObject("List", {node.type->to_sem()});
+    auto* otype = new sem::TypeObject("List", {node.type->to_sem()}, Path("core.core.List"));
     auto ov = std::make_unique<Value>(otype);
-    otype->data.actual_base_path = Path("core.core.List");
     this->fill_value(*ov);
     info.set_entity(ov.release());
     std::vector<USNode> v;
@@ -107,7 +106,8 @@ USemanticInfo Checker::visit_tuple(ast::Tuple& node) {
     }
     USemanticInfo sinfo_p = std::make_unique<SemanticInfo>();
     auto& sinfo = *sinfo_p;
-    auto* otype = new sem::TypeObject("Tuple", types);
+    unsigned long num_values = node.values.size();
+    auto* otype = new sem::TypeObject("Tuple", types, Path("core.Tuple" + std::to_string(num_values)));
     auto ov = std::make_unique<Value>(otype);
     ov->metatype = Meta::CLASS;
 
@@ -120,8 +120,6 @@ USemanticInfo Checker::visit_tuple(ast::Tuple& node) {
         ov->clazz->member_entities[mem_name] = tv.release();
     }
     sinfo.set_entity(ov.release());
-    unsigned long num_values = node.values.size();
-    otype->data.actual_base_path = Path("core.Tuple" + std::to_string(num_values));
     auto nosn = std::make_unique<sem::NewObject>();
     nosn->class_name = otype->data.actual_base_path.as_str();
     nosn->args = std::move(values);
@@ -214,8 +212,10 @@ USemanticInfo Checker::visit_dict(ast::DictNode& node) {
 USemanticInfo Checker::visit_emptydict(ast::EmptyDict& node) {
     USemanticInfo info_u = std::make_unique<SemanticInfo>();
     SemanticInfo& info = *info_u;
-    sem::TypeObject* ot = new sem::TypeObject("Dict", {node.key_type->to_sem(), node.value_type->to_sem()});
-    ot->data.actual_base_path = Path("core.core.Dict");
+    sem::TypeObject* ot = new sem::TypeObject("Dict",
+                                              {node.key_type->to_sem(), node.value_type->to_sem()},
+                                              Path("core.core.Dict"));
+    // ot->data.actual_base_path = Path("core.core.Dict");
     auto ov = std::make_unique<Value>(ot);
     this->module.fill_actual(ov->type);
     this->fill_value(*ov);
@@ -240,16 +240,14 @@ USemanticInfo Checker::visit_defconst(ast::DefaultConstructor& node) {
     for (auto* pt: cls.member_types) {
         t.push_back(pt->to_sem());
     }
-    ast::VectorOfTypes tp;
+    sem::VectorOfTypes tp;
     for (const auto& tt: cls.type_params) {
-        auto* ot = new ast::ObjectType(tt);
+        auto* ot = new sem::TypeObject(tt);
         tp.push_back(ot);
         ot->is_generic_param = true;
     }
-    auto* rt = new ast::ObjectType(cls.class_name, tp);
-    rt->data.actual_base_path = cls.path;
-    info.set_entity(new EntityConstFunction(new ConstFunction(Path(),
-                                                              new sem::TypeFunction(t, sem::UType(rt->to_sem())))));
+    auto* rt = new sem::TypeObject(cls.class_name, tp, cls.path);
+    info.set_entity(new EntityConstFunction(new ConstFunction(Path(), new sem::TypeFunction(t, sem::UType(rt)))));
     info.snode = std::make_unique<sem::Id>(cls.path.as_str() + "." + "__init__");
     return info_u;
 }
@@ -275,7 +273,9 @@ USemanticInfo Checker::visit_list(ast::List& node) {
         Value& p_entity = (Value&) current_type_p->entity.get();
         sem::TypeObject* ctype = &p_entity.type.object();
         if (*ctype != *element_type) {
-            this->error_reporter.error(std::make_unique<ErrorTypeMismatch>(*element_type->to_ast(), node.elements[i], p_entity));
+            this->error_reporter.error(std::make_unique<ErrorTypeMismatch>(*element_type->to_ast(),
+                                                                           node.elements[i],
+                                                                           p_entity));
         }
         list_elements.push_back(std::move(current_type_p->snode));
     }
@@ -285,9 +285,8 @@ USemanticInfo Checker::visit_list(ast::List& node) {
     return_info.is_constant = is_constant;
 
     return_info.snode = std::make_unique<sem::List>(std::move(list_elements));
-    auto* otype = new sem::TypeObject("List", {element_type->clone()});
+    auto* otype = new sem::TypeObject("List", {element_type->clone()}, Path("core.core.List"));
     auto p_value = std::make_unique<Value>(otype);
-    otype->data.actual_base_path = Path("core.core.List");
     this->fill_value(*p_value);
     return_info.set_entity(p_value.release());
     return return_info_p;

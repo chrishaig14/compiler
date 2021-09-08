@@ -18,6 +18,17 @@ TypeObject::TypeObject(const std::string& identifier, const sem::VectorOfTypes& 
     this->is_generic_param = false;
 }
 
+TypeObject::TypeObject(const std::string& identifier, const sem::VectorOfTypes& typeParameters, Path actual_base_path)
+: id(identifier), type_params(typeParameters) {
+    for (auto* p: typeParameters) {
+        assert(p != nullptr);
+    }
+    this->kind = Kind::OBJECT;
+    this->data.aliased_type = nullptr;
+    this->is_generic_param = false;
+    this->data.actual_base_path = actual_base_path;
+}
+
 sem::Type* TypeObject::clone() const {
     sem::VectorOfTypes aux;
     for (auto* p: this->type_params) {
