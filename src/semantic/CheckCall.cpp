@@ -156,7 +156,7 @@ USemanticInfo Checker::visit_call(ast::Call& n, bool is_rvalue) {
 
 const sem::TypeFunction& get_function_type(const SemanticInfo& fun_info) {
     if (fun_info.entity.get().type == E_TYPE::CONST_FUNCTION) {
-        return ((EntityConstFunction&) fun_info.entity.get()).const_function->const_function_ft;
+        return ((EntityConstFunction&) fun_info.entity.get()).const_function.const_function_ft;
     } else {
         // value & kind = function
         return (sem::TypeFunction&) ((Value&) fun_info.entity.get()).type;

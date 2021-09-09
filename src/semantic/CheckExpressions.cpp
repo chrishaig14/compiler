@@ -39,7 +39,7 @@ USemanticInfo Checker::visit_id(ast::Id& n) {
     //                                               : n._id;
     USNode sn;
     if (entity.type == E_TYPE::CONST_FUNCTION) {
-        sn = std::make_unique<sem::ConstFunction>(((EntityConstFunction&) entity).const_function->path);
+        sn = std::make_unique<sem::ConstFunction>(((EntityConstFunction&) entity).const_function.path);
     } else {
         std::string id = n._id;
         sn = std::make_unique<sem::Id>(id);
@@ -222,13 +222,13 @@ USemanticInfo Checker::visit_binop(ast::BinaryOp& n) {
         this->error_reporter.error(std::make_unique<ErrorClassNoMethodForOp>(cls->class_name, fun, n));
         return error_stub();
     }
-    ConstFunction* operator_fun = operator_fun_it->second;
-    auto function_id = std::make_unique<sem::Id>(operator_fun->path.as_str());
+    ConstFunction& operator_fun = *operator_fun_it->second;
+    auto function_id = std::make_unique<sem::Id>(operator_fun.path.as_str());
     std::vector<USNode> vv;
     vv.push_back(std::move(left_info_p->snode));
     vv.push_back(std::move(right_snode));
     auto sn = std::make_unique<sem::Call>(std::move(function_id), std::move(vv));
-    sem::Type* rettype = operator_fun->const_function_ft.return_type->clone();
+    sem::Type* rettype = operator_fun.const_function_ft.return_type->clone();
 
     USemanticInfo info_u = std::make_unique<SemanticInfo>();
     SemanticInfo& info = *info_u;

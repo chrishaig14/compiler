@@ -252,19 +252,19 @@ Class* Checker::instantiate_generic(const Class& generic, const ast::ObjectType&
         }
     }
 
-    std::unordered_map<std::string, ConstFunction*> concrete_static_methods;
+    std::unordered_map<std::string, std::unique_ptr<ConstFunction>> concrete_static_methods;
     for (const auto& m: generic.static_methods) {
         ast::Type* t = (m.second)->const_function_ft.to_ast();
         ast::Type& concrete_type = *make_type(*t, replacements).release();
         this->module.fill_actual(concrete_type);
-        auto* cf = new ConstFunction(m.second->path, sem::UTypeFunction((sem::TypeFunction*) concrete_type.to_sem()));
-        concrete_static_methods[m.first] = cf;
+        concrete_static_methods[m.first] = std::make_unique<ConstFunction>(m.second->path,
+                                                                           sem::UTypeFunction((sem::TypeFunction*) concrete_type.to_sem()));;
     }
 
     auto* concrete = new Class(generic.class_name, generic.path);
     // concrete->class_name = ;
     concrete->methods = concrete_methods;
-    concrete->static_methods = concrete_static_methods;
+    concrete->static_methods = std::move(concrete_static_methods);
     concrete->member_names = generic.member_names;
     concrete->member_types = concrete_field_types;
     // concrete->path = generic.path;

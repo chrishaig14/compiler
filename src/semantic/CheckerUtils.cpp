@@ -50,7 +50,7 @@ sem::FunctionDef* make_class_default_init(const std::string& class_path, const V
 
 ast::Type* get_entity_type(Entity& e) {
     if (e.type == E_TYPE::CONST_FUNCTION) {
-        return ((EntityConstFunction&) e).const_function->const_function_ft.to_ast();
+        return ((EntityConstFunction&) e).const_function.const_function_ft.to_ast();
     } else if (e.type == E_TYPE::VALUE) {
         return ((Value&) e).type.to_ast();
     }

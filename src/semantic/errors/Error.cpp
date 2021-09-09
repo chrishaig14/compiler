@@ -17,7 +17,7 @@ std::string entity_to_string(const Entity& entity) {
         case E_TYPE::VALUE:
             return E_HLT(((Value&) entity).type.to_string());
         case E_TYPE::CONST_FUNCTION:
-            return E_HLT(((EntityConstFunction&) entity).const_function->const_function_ft.to_string());
+            return E_HLT(((EntityConstFunction&) entity).const_function.const_function_ft.to_string());
             // return "function " + E_HLT(entity.const_function->path.as_vec().back());
         case E_TYPE::ERROR:
             return "ERROR";

@@ -142,11 +142,11 @@ public:
 
 class EntityConstFunction : public Entity {
 public:
-    explicit EntityConstFunction(ConstFunction* const_function)
+    explicit EntityConstFunction(ConstFunction& const_function)
             : Entity(E_TYPE::CONST_FUNCTION), const_function(const_function) {
     }
 
-    ConstFunction* const_function;
+    ConstFunction& const_function;
 
     bool equal(const Entity& other) const override {
         return false;

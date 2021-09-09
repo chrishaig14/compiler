@@ -28,7 +28,7 @@ public:
     std::unordered_map<std::string, ConstFunction*> methods;
 
     std::map<std::string, std::pair<ast::Type*, ast::Node*>> static_members;
-    std::unordered_map<std::string, ConstFunction*> static_methods;
+    std::unordered_map<std::string, std::unique_ptr<ConstFunction>> static_methods;
 
     const Path path;
     const std::string class_name;

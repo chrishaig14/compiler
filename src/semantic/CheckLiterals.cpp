@@ -134,7 +134,7 @@ USemanticInfo Checker::visit_partial(ast::PartialApplication& node) {
     Entity& f_entity = func->entity;
     if (f_entity.type == E_TYPE::CONST_FUNCTION ||
         (f_entity.type == E_TYPE::VALUE && ((Value&) f_entity).type.kind == sem::Kind::FUNCTION)) {
-        fun_type = (ast::FunctionType*) ((EntityConstFunction&) f_entity).const_function->const_function_ft.to_ast();
+        fun_type = (ast::FunctionType*) ((EntityConstFunction&) f_entity).const_function.const_function_ft.to_ast();
     } else {
         this->error_reporter.fail("Error: expected a function for partial application");
         return error_stub();
@@ -247,7 +247,7 @@ USemanticInfo Checker::visit_defconst(ast::DefaultConstructor& node) {
         ot->is_generic_param = true;
     }
     auto* rt = new sem::TypeObject(cls.class_name, tp, cls.path);
-    info.set_entity(new EntityConstFunction(new ConstFunction(Path(),  std::make_unique<sem::TypeFunction>(t, sem::UType(rt)))));
+    info.set_entity(new EntityConstFunction(*new ConstFunction(Path(),  std::make_unique<sem::TypeFunction>(t, sem::UType(rt)))));
     info.snode = std::make_unique<sem::Id>(cls.path.as_str() + "." + "__init__");
     return info_u;
 }

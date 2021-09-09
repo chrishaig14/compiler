@@ -269,7 +269,7 @@ USemanticInfo Checker::visit_function(ast::Function& n) {
                                              sem::UTypeFunction((sem::TypeFunction*) n.implicit->ft->to_sem()));
         this->module.fill_actual(c->const_function_ft);
         if (n.implicit->is_static) {
-            clazz->static_methods[n.implicit->method] = c;
+            clazz->static_methods[n.implicit->method] = std::unique_ptr<ConstFunction>(c);
         } else {
             clazz->methods[n.implicit->method] = c;
         }

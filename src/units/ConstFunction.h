@@ -19,7 +19,7 @@ public:
 
     ConstFunction(Path path, sem::UTypeFunction ft);
 
-    ConstFunction(const ConstFunction& other);
+    // ConstFunction(const ConstFunction& other);
 
     ~ConstFunction();
     Implicit* implicit;
