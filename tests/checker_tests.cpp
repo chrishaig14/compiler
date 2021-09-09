@@ -89,6 +89,18 @@ TEST_CASE("basic_declaration", "[checker]") {
     REQUIRE(not checker.error_reporter.failed);
 }
 
+TEST_CASE("basic_declaration_type_ok", "[checker]") {
+    std::string code = "fun main()->Integer{var x : Integer = 9;return 0;}";
+
+    std::unique_ptr<Compiler> cp = analyze(code);
+    Compiler& c = *cp;
+    Module& module = *c.root_package.units["tmp"].module;
+    analyze_module_result(module, c.top_package);
+    Checker checker(c.top_package, module);
+    checker.visit_declaration((ast::Declaration&) *((std::unique_ptr<ast::Function>&) module.ast->functions[0])->body->nodes[0]);
+    REQUIRE(not checker.error_reporter.failed);
+}
+
 TEST_CASE("basic_declaration_bad_type", "[checker]") {
     std::string code = "fun foo()->Integer{var x: Boolean = 9;return 0;}";
 
