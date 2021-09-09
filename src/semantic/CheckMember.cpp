@@ -22,13 +22,13 @@ USemanticInfo Checker::visit_member(ast::Member& n) {
         case E_TYPE::CLASS:
             return this->class_member(((EntityClass&) parent_entity).clazz, n.s_child, n);
         case E_TYPE::CONST_FUNCTION:
-            this->error_reporter.error(std::make_unique<ErrorNoMember>(*((EntityConstFunction&) parent_entity).const_function->const_function_ft.to_ast(),
+            this->error_reporter.error(std::make_unique<ErrorNoMember>(((EntityConstFunction&) parent_entity).const_function->const_function_ft,
                                                                        n));
             // this->error_reporter.object_no_member(*parent_entity.const_function->ft, n);
             break;
         case E_TYPE::VALUE:
             if (((Value&) parent_entity).type.kind == sem::Kind::FUNCTION) {
-                this->error_reporter.error(std::make_unique<ErrorNoMember>(*((EntityConstFunction&) parent_entity).const_function->const_function_ft.to_ast(),
+                this->error_reporter.error(std::make_unique<ErrorNoMember>(((EntityConstFunction&) parent_entity).const_function->const_function_ft,
                                                                            n));
                 // this->error_reporter.object_no_member(*parent_entity.value->type, n);
                 return error_stub();
@@ -80,12 +80,12 @@ USemanticInfo Checker::object_member(USNode object_snode, Value& p_value, const 
     //     return error_stub();
     // }
     if (object_type_path.as_str() == "core.core.Union") {
-        this->error_reporter.error(std::make_unique<ErrorNoMember>(*p_value.type.to_ast(), n));
+        this->error_reporter.error(std::make_unique<ErrorNoMember>(p_value.type, n));
         // this->error_reporter.object_no_member(*p_value.type, n);
         return error_stub();
     }
     if (p_value.metatype == Meta::ENUM) {
-        this->error_reporter.error(std::make_unique<ErrorNoMember>(*p_value.type.to_ast(), n));
+        this->error_reporter.error(std::make_unique<ErrorNoMember>(p_value.type, n));
         // this->error_reporter.object_no_member(*p_value.type, n);
         return error_stub();
     }
