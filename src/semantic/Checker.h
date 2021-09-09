@@ -167,7 +167,7 @@ public:
     USNode make_rvalue(const Entity& t_entity, USNode value_snode, const ast::Type& target);
     USemanticInfo dispatch(ast::Node& nod);
     void fill_value(Value& value);
-    std::unique_ptr<SemanticInfo> expect_rvalue_of_type(const ast::Type& target, ast::Node& node);
+    std::unique_ptr<SemanticInfo> expect_rvalue_of_type(const sem::Type& target, ast::Node& node);
     void process_function_arguments(SemanticInfo& retv, std::vector<Entity*>& arg_entities, std::vector<USNode>& arguments,
                                     ast::Call& n, const ast::FunctionType& function_type, SemanticInfo* fun_info_p);
     bool check_arguments(ast::Call& n, std::vector<USNode>& sn, ast::VectorOfTypes& arg_types,

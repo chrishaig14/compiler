@@ -48,7 +48,7 @@ USemanticInfo Checker::visit_lvalue_subscript(ast::Subscript& node) {
     if (node.child.size() > 1) {
         this->error_reporter.fail("Error subscript with more than one child!");
     }
-    USemanticInfo child_sinfo = this->expect_rvalue_of_type(*subscript_fun->const_function_ft.param_types[0]->to_ast(),
+    USemanticInfo child_sinfo = this->expect_rvalue_of_type(*subscript_fun->const_function_ft.param_types[0],
                                                             *node.child[0]);
     if (child_sinfo->is_error()) {
         return error_stub();
@@ -192,7 +192,7 @@ USemanticInfo Checker::visit_return(ast::Return& n) {
         return error_stub();
     }
 
-    USemanticInfo expression_info_p = this->expect_rvalue_of_type(*return_type, *n.expression);
+    USemanticInfo expression_info_p = this->expect_rvalue_of_type(*return_type->to_sem(), *n.expression);
     if (expression_info_p->is_error()) {
         return error_stub();
     }
@@ -381,7 +381,7 @@ USemanticInfo Checker::visit_break(ast::Break& node) {
 }
 
 USemanticInfo Checker::visit_while(ast::While& node) {
-    USemanticInfo condition_sinfo = this->expect_rvalue_of_type(T_BOOL, *node.condition);
+    USemanticInfo condition_sinfo = this->expect_rvalue_of_type(*T_BOOL.to_sem(), *node.condition);
     if (condition_sinfo->is_error()) {
         return error_stub();
     }
@@ -410,7 +410,7 @@ USemanticInfo Checker::visit_while(ast::While& node) {
 }
 
 USemanticInfo Checker::visit_if(ast::If& n) {
-    USemanticInfo condition_sinfo = this->expect_rvalue_of_type(T_BOOL, n.condition);
+    USemanticInfo condition_sinfo = this->expect_rvalue_of_type(*T_BOOL.to_sem(), n.condition);
     if (condition_sinfo->is_error()) {
         return error_stub();
     }
@@ -427,7 +427,7 @@ USemanticInfo Checker::visit_if(ast::If& n) {
     std::vector<std::pair<USNode, std::unique_ptr<sem::Block>>> elifs;
 
     for (auto& elif : n.elifs) {
-        USemanticInfo elif_condition_sinfo = this->expect_rvalue_of_type(T_BOOL, elif.first);
+        USemanticInfo elif_condition_sinfo = this->expect_rvalue_of_type(*T_BOOL.to_sem(), elif.first);
         auto& elif_condition_snode = elif_condition_sinfo->snode;
         this->enter_scope("elif");
         USemanticInfoBlock elif_block_info = this->visit_block(elif.second);

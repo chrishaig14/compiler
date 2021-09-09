@@ -8,19 +8,19 @@
 #include "errors/ErrorRedeclared.h"
 #include "errors/ErrorExpectedExpression.h"
 
-std::unique_ptr<SemanticInfo> Checker::expect_rvalue_of_type(const ast::Type& target, ast::Node& node) {
+std::unique_ptr<SemanticInfo> Checker::expect_rvalue_of_type(const sem::Type& target, ast::Node& node) {
     USemanticInfo rinfo = this->dispatch_rvalue(node);
     if (rinfo->is_error()) {
         return error_stub();
     }
     Entity& r_entity = rinfo->entity.get();
     if (r_entity.type != E_TYPE::VALUE && r_entity.type != E_TYPE::CONST_FUNCTION) {
-        this->error_reporter.error(std::make_unique<ErrorTypeMismatch>(*target.clone(), node, r_entity));
+        this->error_reporter.error(std::make_unique<ErrorTypeMismatch>(*target.to_ast(), node, r_entity));
         return error_stub();
     }
-    USNode snode = make_rvalue(r_entity, std::move(rinfo->snode), target);
+    USNode snode = make_rvalue(r_entity, std::move(rinfo->snode), *target.to_ast());
     if (snode == nullptr) {
-        this->error_reporter.error(std::make_unique<ErrorTypeMismatch>(*target.clone(), node, r_entity));
+        this->error_reporter.error(std::make_unique<ErrorTypeMismatch>(*target.to_ast(), node, r_entity));
         return error_stub();
     }
     rinfo->snode = std::move(snode);
@@ -144,7 +144,7 @@ USemanticInfo Checker::check_declaration_with_type(ast::Declaration& n) {
     } else {
         this->module.fill_actual(*n.type);
     }
-    USemanticInfo rvalue_sinfo = this->expect_rvalue_of_type(*n.type, n.expression);
+    USemanticInfo rvalue_sinfo = this->expect_rvalue_of_type(*n.type->to_sem(), n.expression);
     if (rvalue_sinfo->is_error()) {
         return error_stub();
     }

@@ -164,7 +164,7 @@ USemanticInfo Checker::visit_cast(ast::Cast& n) {
 // }
 
 USemanticInfo Checker::visit_unary(ast::UnaryOp& n) {
-    USemanticInfo exp_info = this->expect_rvalue_of_type(T_BOOL, *n.exp);
+    USemanticInfo exp_info = this->expect_rvalue_of_type(*T_BOOL.to_sem(), *n.exp);
     if (exp_info->is_error()) {
         return error_stub();
     }
@@ -205,7 +205,7 @@ USemanticInfo Checker::visit_binop(ast::BinaryOp& n) {
         return error_stub();
     }
     Value& l_entity_v = (Value&) l_entity;
-    USemanticInfo right_sinfo = this->expect_rvalue_of_type(*l_entity_v.type.to_ast(), n.right);
+    USemanticInfo right_sinfo = this->expect_rvalue_of_type(l_entity_v.type, n.right);
     if (right_sinfo->is_error()) {
         return error_stub();
     }
@@ -306,7 +306,7 @@ USemanticInfo Checker::visit_subscript(ast::Subscript& node) {
         this->error_reporter.fail("Error subscript with more than one child!");
         return error_stub();
     }
-    USemanticInfo child_sinfo = this->expect_rvalue_of_type(*subscript_fun->const_function_ft.param_types[0]->to_ast(),
+    USemanticInfo child_sinfo = this->expect_rvalue_of_type(*subscript_fun->const_function_ft.param_types[0],
                                                             *node.child[0]);
 
     if (child_sinfo->is_error()) {
@@ -358,7 +358,7 @@ USemanticInfo Checker::visit_ternary(ast::Ternary& node) {
     SemanticInfo& true_case = *true_case_p;
     this->leave_scope();
     Value& true_value = (Value&) true_case.entity;
-    USemanticInfo false_case_sinfo = this->expect_rvalue_of_type(*true_value.type.to_ast(), *node.false_case);
+    USemanticInfo false_case_sinfo = this->expect_rvalue_of_type(true_value.type, *node.false_case);
     if (false_case_sinfo->is_error()) {
         return error_stub();
     }
