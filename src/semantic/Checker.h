@@ -31,6 +31,8 @@
 #include "../simple_nodes/with_unique/FunctionDef.h"
 #include "../simple_nodes/Declaration.h"
 #include "../simple_nodes/with_unique/Id.h"
+#include "../simple_nodes/TypeObject.h"
+#include "../simple_nodes/TypeFunction.h"
 #include "../simple_nodes/with_unique/Call.h"
 #include "../simple_nodes/with_unique/String.h"
 #include "../simple_nodes/with_unique/ObjectMethod.h"
@@ -59,7 +61,7 @@
 typedef std::unique_ptr<SemanticInfo> USemanticInfo;
 typedef std::unique_ptr<SemanticInfoBlock> USemanticInfoBlock;
 
-bool is_generic(const ast::Type& t);
+bool is_generic(const sem::Type& t);
 ast::UTypeNode make_type_from_object_pattern(const ast::ObjectType& object_type, const MapStringType& replacements);
 ast::UTypeNode make_type_from_function_pattern(const ast::FunctionType& ftn, const MapStringType& replacements);
 ast::UTypeNode make_type(const ast::Type& original, const MapStringType& replacements);
@@ -68,7 +70,7 @@ USemanticInfo error_stub();
 Entity* map_flirpin_to_entity(Flirpin flirpin);
 Flirpin map_unit_to_flirpin(Unit u);
 TextPosition add_one_col(TextPosition t);
-bool function_is_generic(const ast::FunctionType& ft);
+bool function_is_generic(const sem::TypeFunction& ft);
 
 sem::SNode*
 make_for_snode(ast::For& node, USemanticInfoBlock& binfo, USemanticInfo& exp_info_p, std::string loop_list_var_id,

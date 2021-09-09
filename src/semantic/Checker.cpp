@@ -4,9 +4,11 @@
 #include "Checker.h"
 #include "../macros.h"
 #include "../logging/logging.h"
+#include "../simple_nodes/TypeObject.h"
+#include "../simple_nodes/TypeFunction.h"
 #include "util.h"
 
-bool function_is_generic(const ast::FunctionType& ft) {
+bool function_is_generic(const sem::TypeFunction& ft) {
     for (auto& param_type: ft.param_types) {
         if (is_generic(*param_type)) {
             return true;
@@ -44,7 +46,7 @@ bool Checker::assert_type_exists(const ast::Type& type, TextPosition pos) {
             return true;
         }
         if (type.object().type_params.empty()) {
-            if (!is_generic(type)) {
+            if (!is_generic(*type.to_sem())) {
                 // if (this->imported_paths.count(type.object().id) == 0) {
                 //     this->error_class_not_found(type, {1, 1});
                 //     return false;
@@ -77,9 +79,9 @@ bool Checker::assert_type_exists(const ast::Type& type, TextPosition pos) {
     return false;
 }
 
-bool is_generic(const ast::Type& t) {
-    if (t.kind == Kind::OBJECT) {
-        const ast::ObjectType& o = t.object();
+bool is_generic(const sem::Type& t) {
+    if (t.kind == sem::Kind::OBJECT) {
+        const sem::TypeObject& o = t.object();
         if (o.id.size() == 1 && (islower(o.id[0]) != 0)) {
             // a is generic
             assert(o.type_params.empty());
@@ -91,7 +93,7 @@ bool is_generic(const ast::Type& t) {
             }
         }
     } else {
-        const ast::FunctionType& fo = t.function();
+        const sem::TypeFunction& fo = t.function();
         for (auto& param_type: fo.param_types) {
             if (is_generic(*param_type)) {
                 return true;
