@@ -80,8 +80,8 @@ void GlobalProcessor::visit_function(ast::Function& node) {
 
 Enum* make_enum(ast::EnumNode& n, Path module_path) {
     Enum* enumm = new Enum(n.id, Path(module_path, n.id), n.values);
-    enumm->functions["__eq__"] = new ConstFunction(Path(enumm->path, "__eq__"), nullptr);;
-    enumm->functions["__ne__"] = new ConstFunction(Path(enumm->path, "__ne__"), nullptr);
+    enumm->functions["__eq__"] = std::make_unique<ConstFunction>(Path(enumm->path, "__eq__"), nullptr);
+    enumm->functions["__ne__"] = std::make_unique<ConstFunction>(Path(enumm->path, "__ne__"), nullptr);
     return enumm;
 }
 

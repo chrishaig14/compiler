@@ -18,7 +18,7 @@ public:
             : values(values), enumm_name(enumm_name), path(path) {
     }
 
-    std::map<std::string, ConstFunction*> functions;
+    std::map<std::string, std::unique_ptr<ConstFunction>> functions;
 };
 
 
