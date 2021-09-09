@@ -42,7 +42,7 @@ USemanticInfo Checker::visit_lvalue_subscript(ast::Subscript& node) {
     }
     ConstFunction* subscript_fun = subscript_it->second;
     std::string sub_fun_path = subscript_fun->path.as_str();
-    ast::Type* rtype = subscript_fun->const_function_ft.return_type->to_ast();
+    sem::Type& rtype = *subscript_fun->const_function_ft.return_type;
 
     ast::VectorOfTypes children;
     if (node.child.size() > 1) {
@@ -57,7 +57,7 @@ USemanticInfo Checker::visit_lvalue_subscript(ast::Subscript& node) {
 
     USemanticInfo info_u = std::make_unique<SemanticInfo>();
     SemanticInfo& info = *info_u;
-    auto value = std::make_unique<Value>(rtype->to_sem());
+    auto value = std::make_unique<Value>(rtype.clone());
     this->fill_value(*value);
     info.set_entity(value.release());
 
