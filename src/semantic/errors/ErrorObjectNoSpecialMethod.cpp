@@ -3,6 +3,7 @@
 //
 
 #include "ErrorObjectNoSpecialMethod.h"
+#include "../../simple_nodes/TypeObject.h"
 
 Error* ErrorObjectNoSpecialMethod::clone() const {
     return new ErrorObjectNoSpecialMethod(this->type, this->method_name, this->node);
@@ -20,7 +21,7 @@ std::string ErrorObjectNoSpecialMethod::to_str() const {
     return "Error: object of type " + this->type.to_string() + " has no special method " + this->method_name;
 }
 
-ErrorObjectNoSpecialMethod::ErrorObjectNoSpecialMethod(const ast::Type& type, const std::string& method_name,
+ErrorObjectNoSpecialMethod::ErrorObjectNoSpecialMethod(const sem::Type& type, const std::string& method_name,
                                                        const ast::Subscript& node)
         : node(node), method_name(method_name), type(type) {
 

@@ -598,7 +598,7 @@ TEST_CASE("subscript_no_method_error", "[checker]") {
     v.push_back(ast::Number::make(NumberType::INTEGER, "1", _POS, _POS));
     ast::Subscript node(p_node, v, _POS, _POS);
     ast::ObjectType expected("Integer");
-    ast::ObjectType type("Foo");
+    sem::TypeObject type("Foo");
     ErrorObjectNoSpecialMethod exp(type, "__get_item__", node);
     REQUIRE(error == exp);
 }

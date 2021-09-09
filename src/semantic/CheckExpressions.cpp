@@ -284,15 +284,13 @@ USemanticInfo Checker::visit_subscript(ast::Subscript& node) {
     Class* cls = value.clazz;
     if (cls == nullptr) {
         // its totally generic, fail
-        this->error_reporter.error(std::make_unique<ErrorObjectNoSpecialMethod>(*value.type.to_ast(),
-                                                                                "__get_item__",
-                                                                                node));
+        this->error_reporter.error(std::make_unique<ErrorObjectNoSpecialMethod>(value.type, "__get_item__", node));
         return error_stub();
     }
     assert(cls != nullptr);
     auto subscript_it = cls->methods.find("__get_item__");
     if (subscript_it == cls->methods.end()) {
-        this->error_reporter.error(std::make_unique<ErrorObjectNoSpecialMethod>(*value.type.to_ast(),
+        this->error_reporter.error(std::make_unique<ErrorObjectNoSpecialMethod>(value.type,
                                                                                 "__get_item__",
                                                                                 node));
         return error_stub();

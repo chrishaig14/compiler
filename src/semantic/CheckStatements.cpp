@@ -35,7 +35,7 @@ USemanticInfo Checker::visit_lvalue_subscript(ast::Subscript& node) {
 
     auto subscript_it = cls->methods.find("__set_item__");
     if (subscript_it == cls->methods.end()) {
-        this->error_reporter.error(std::make_unique<ErrorObjectNoSpecialMethod>(*entity_parent_value.type.to_ast(),
+        this->error_reporter.error(std::make_unique<ErrorObjectNoSpecialMethod>(entity_parent_value.type,
                                                                                 "__set_item__",
                                                                                 node));
         return error_stub();
