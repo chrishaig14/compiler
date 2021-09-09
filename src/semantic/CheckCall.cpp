@@ -41,11 +41,10 @@ USemanticInfo Checker::visit_call(ast::Call& n, bool is_rvalue) {
             return error_stub();
         }
     }
-    ast::VectorOfTypes arg_types;
 
     std::vector<Entity*> arg_entities;
     std::vector<USNode> arguments;
-    bool has_error = check_arguments(n, arguments, arg_types, arg_entities);
+    bool has_error = check_arguments(n, arguments, arg_entities);
     if (has_error) {
         return error_stub();
     }
@@ -185,8 +184,7 @@ USemanticInfo Checker::make_return_info(const ast::Call& n, bool is_rvalue, USem
     return retv_p;
 }
 
-bool Checker::check_arguments(ast::Call& n, std::vector<USNode>& arguments, ast::VectorOfTypes& arg_types,
-                              std::vector<Entity*>& arg_entities) {
+bool Checker::check_arguments(ast::Call& n, std::vector<USNode>& arguments, std::vector<Entity*>& arg_entities) {
     bool has_error;
     for (auto& arg: n.arguments) {
         USemanticInfo arg_type_p = this->dispatch(arg);
@@ -206,11 +204,6 @@ bool Checker::check_arguments(ast::Call& n, std::vector<USNode>& arguments, ast:
             this->error_reporter.error(std::make_unique<ErrorExpectedExpression>(arg_entity, arg));
             continue;
         }
-
-
-        ast::Type* arg_type = get_entity_type(arg_entity);
-        arg_types.push_back(arg_type);
-        // n.arg_types.push_back(arg_type.clone());
     }
     return has_error;
 }
