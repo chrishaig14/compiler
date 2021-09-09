@@ -28,7 +28,7 @@
 
 std::string binoptype_to_str(OpType op);
 
-int target_union_type(const ast::ObjectType& target, const ast::Type& source);
+int target_union_type(const sem::TypeObject& target, const sem::Type& source);
 
 Entity* entity_from_type(const ast::Type& type);
 

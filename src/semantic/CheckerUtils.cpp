@@ -3,6 +3,7 @@
 //
 
 #include "CheckerUtils.h"
+#include "../simple_nodes/TypeObject.h"
 
 std::string binoptype_to_str(OpType op) {
     std::map<OpType, std::string> funs;
@@ -23,7 +24,7 @@ std::string binoptype_to_str(OpType op) {
 }
 
 
-int target_union_type(const ast::ObjectType& target, const ast::Type& source) {
+int target_union_type(const sem::TypeObject& target, const sem::Type& source) {
     for (size_t ti = 0; ti < target.type_params.size(); ti++) {
         if (target.type_params[ti]->actual_to_string() == source.actual_to_string()) {
             return ti;

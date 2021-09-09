@@ -65,11 +65,15 @@ USNode Checker::make_rvalue(const Entity& t_entity, USNode value_snode, const se
 
         const std::string& unaliased_target_type_id = unaliased_target_type->object().id;
         if (unaliased_target_type_id == "Union") {
-            return USNode(make_union_rvalue(std::move(value_snode), unaliased_value_type->to_ast(), unaliased_target_type->to_ast()));
+            return USNode(make_union_rvalue(std::move(value_snode),
+                                            unaliased_value_type->to_ast(),
+                                            unaliased_target_type->to_ast()));
         }
 
         if (unaliased_target_type_id == "Option") {
-            return USNode(make_option_rvalue(value_snode.release(), unaliased_value_type->to_ast(), unaliased_target_type->to_ast()));
+            return USNode(make_option_rvalue(value_snode.release(),
+                                             unaliased_value_type->to_ast(),
+                                             unaliased_target_type->to_ast()));
         }
 
     } else if (t_entity.type == E_TYPE::CONST_FUNCTION) {
@@ -98,7 +102,8 @@ sem::SNode* Checker::make_option_rvalue(sem::SNode* value_snode, const ast::Type
 
 USNode Checker::make_union_rvalue(USNode value_snode, const ast::Type* unaliased_value_type,
                                   const ast::Type* unaliased_target_type) const {
-    int union_index = target_union_type(unaliased_target_type->object(), unaliased_value_type->object());
+    int union_index = target_union_type(unaliased_target_type->to_sem()->object(),
+                                        unaliased_value_type->to_sem()->object());
     if (union_index != -1) {
         return USNode(make_union_wrapper(union_index, std::move(value_snode)));
     } else {
@@ -184,9 +189,9 @@ USemanticInfo Checker::check_declaration_without_type(ast::Declaration& n) {
         info.set_entity(value_entity);
 
         if (value_entity->type.is_generic()) {
-            this->error_reporter.fail("Error: you need to specialize the generic function of type " +
-                                      value_entity->type.to_string() +
-                                      " to be able to use it without calling it");
+            this->error_reporter.fail(
+                    "Error: you need to specialize the generic function of type " + value_entity->type.to_string() +
+                    " to be able to use it without calling it");
         }
     }
     return info_u;

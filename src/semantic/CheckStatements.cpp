@@ -235,11 +235,11 @@ USemanticInfo Checker::visit_match(ast::Match& node) {
         return error_stub();
     }
 
-    ast::ObjectType* ot = (ast::ObjectType*) ((Value&) exp_info->entity).type.object().to_ast();
-    if (ot->data.aliased_type != nullptr) {
-        ot = (ast::ObjectType*) ot->data.aliased_type;
-    }
-    if (ot->id != "Union") {
+    sem::TypeObject& ot = ((Value&) exp_info->entity).type.object();
+    // if (ot.data.aliased_type != nullptr) {
+    //     ot = (ast::ObjectType*) ot->data.aliased_type;
+    // }
+    if (ot.id != "Union") {
         this->error_reporter.error(std::make_unique<ErrorTypeMismatch>(*new sem::TypeObject("Union",
                                                                                             {new sem::TypeObject("...",
                                                                                                                  sem::VectorOfTypes{})}),
@@ -257,9 +257,9 @@ USemanticInfo Checker::visit_match(ast::Match& node) {
 
         this->module.fill_actual(case_type);
 
-        int union_index = target_union_type(*ot, case_type);
+        int union_index = target_union_type(ot, *case_type.to_sem());
         if (union_index == -1) {
-            this->error_reporter.fail("Error, type " + case_type.to_string() + " not part of " + ot->to_string());
+            this->error_reporter.fail("Error, type " + case_type.to_string() + " not part of " + ot.to_string());
             return error_stub();
         }
         this->enter_scope("case");
