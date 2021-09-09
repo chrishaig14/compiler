@@ -228,11 +228,11 @@ USemanticInfo Checker::visit_binop(ast::BinaryOp& n) {
     vv.push_back(std::move(left_info_p->snode));
     vv.push_back(std::move(right_snode));
     auto sn = std::make_unique<sem::Call>(std::move(function_id), std::move(vv));
-    ast::Type* rettype = operator_fun->const_function_ft.return_type->to_ast();
+    sem::Type* rettype = operator_fun->const_function_ft.return_type->clone();
 
     USemanticInfo info_u = std::make_unique<SemanticInfo>();
     SemanticInfo& info = *info_u;
-    auto v = std::make_unique<Value>(rettype->to_sem());
+    auto v = std::make_unique<Value>(rettype);
     this->fill_value(*v);
     info.set_entity(v.release());
     info.snode = std::move(sn);

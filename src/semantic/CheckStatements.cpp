@@ -310,13 +310,13 @@ USemanticInfo Checker::visit_for(ast::For& node) {
         this->error_reporter.error(std::make_unique<ErrorFor>(exp_info_p->entity, node.exp.start));
     }
     Value& exp_entity_value = (Value&) exp_info_p->entity;
-    ast::ObjectType* exp_ot = (ast::ObjectType*) exp_entity_value.type.object().to_ast();
-    if (exp_ot->id != "List") {
+    sem::TypeObject& exp_ot = exp_entity_value.type.object();
+    if (exp_ot.id != "List") {
         this->error_reporter.error(std::make_unique<ErrorFor>(exp_entity_value, node.exp.start));
     }
 
-    ast::Type* elem_type = exp_ot->type_params[0];
-    auto v = std::make_unique<Value>(elem_type->to_sem());
+    sem::Type* elem_type = exp_ot.type_params[0];
+    auto v = std::make_unique<Value>(elem_type->clone());
     this->fill_value(*v);
     Entity* elem_entity = v.release();
     this->enter_scope("for");
