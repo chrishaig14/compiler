@@ -4,6 +4,7 @@
 
 #include "CheckDeclaration.h"
 #include "../ast/ObjectType.h"
+#include "../simple_nodes/TypeObject.h"
 #include "errors/ErrorTypeMismatch.h"
 #include "errors/ErrorRedeclared.h"
 #include "errors/ErrorExpectedExpression.h"
@@ -18,7 +19,7 @@ std::unique_ptr<SemanticInfo> Checker::expect_rvalue_of_type(const sem::Type& ta
         this->error_reporter.error(std::make_unique<ErrorTypeMismatch>(*target.to_ast(), node, r_entity));
         return error_stub();
     }
-    USNode snode = make_rvalue(r_entity, std::move(rinfo->snode), *target.to_ast());
+    USNode snode = make_rvalue(r_entity, std::move(rinfo->snode), target);
     if (snode == nullptr) {
         this->error_reporter.error(std::make_unique<ErrorTypeMismatch>(*target.to_ast(), node, r_entity));
         return error_stub();
@@ -27,34 +28,34 @@ std::unique_ptr<SemanticInfo> Checker::expect_rvalue_of_type(const sem::Type& ta
     return rinfo;
 }
 
-USNode Checker::make_rvalue(const Entity& t_entity, USNode value_snode, const ast::Type& target) {
+USNode Checker::make_rvalue(const Entity& t_entity, USNode value_snode, const sem::Type& target) {
     if (t_entity.type == E_TYPE::VALUE) {
         Value& value_entity = (Value&) t_entity;
-        if (value_entity.type.kind != target.to_sem()->kind) {
+        if (value_entity.type.kind != target.kind) {
             return nullptr;
         }
         if (value_entity.type.kind == sem::Kind::FUNCTION) {
-            if (value_entity.type == *target.to_sem()) {
+            if (value_entity.type == target) {
                 return value_snode;
             } else {
                 return nullptr;
                 // throw std::runtime_error("Error cannot make function rvalue");
             }
         }
-        const ast::ObjectType& value_ot = value_entity.type.to_ast()->object();
-        const ast::ObjectType& target_ot = target.object();
+        const sem::TypeObject& value_ot = value_entity.type.object();
+        const sem::TypeObject& target_ot = target.object();
 
-        const ast::Type* unaliased_value_type = &value_ot;
+        const sem::Type* unaliased_value_type = &value_ot;
         if (value_ot.data.aliased_type != nullptr) {
             unaliased_value_type = value_ot.data.aliased_type;
         }
 
-        const ast::Type* unaliased_target_type = &target_ot;
+        const sem::Type* unaliased_target_type = &target_ot;
         if (target_ot.data.aliased_type != nullptr) {
             unaliased_target_type = target_ot.data.aliased_type;
         }
 
-        if (unaliased_value_type->kind != Kind::OBJECT || unaliased_target_type->kind != Kind::OBJECT) {
+        if (unaliased_value_type->kind != sem::Kind::OBJECT || unaliased_target_type->kind != sem::Kind::OBJECT) {
             return nullptr;
         }
 
@@ -64,16 +65,16 @@ USNode Checker::make_rvalue(const Entity& t_entity, USNode value_snode, const as
 
         const std::string& unaliased_target_type_id = unaliased_target_type->object().id;
         if (unaliased_target_type_id == "Union") {
-            return USNode(make_union_rvalue(std::move(value_snode), unaliased_value_type, unaliased_target_type));
+            return USNode(make_union_rvalue(std::move(value_snode), unaliased_value_type->to_ast(), unaliased_target_type->to_ast()));
         }
 
         if (unaliased_target_type_id == "Option") {
-            return USNode(make_option_rvalue(value_snode.release(), unaliased_value_type, unaliased_target_type));
+            return USNode(make_option_rvalue(value_snode.release(), unaliased_value_type->to_ast(), unaliased_target_type->to_ast()));
         }
 
     } else if (t_entity.type == E_TYPE::CONST_FUNCTION) {
         EntityConstFunction& const_function_entity = (EntityConstFunction&) t_entity;
-        if (const_function_entity.const_function->const_function_ft == *target.to_sem()) {
+        if (const_function_entity.const_function->const_function_ft == target) {
             return value_snode;
         } else {
             return nullptr;
