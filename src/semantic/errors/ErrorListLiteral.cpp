@@ -3,6 +3,7 @@
 //
 
 #include "ErrorListLiteral.h"
+#include "../../simple_nodes/TypeObject.h"
 
 Error* ErrorListLiteral::clone() const {
     return new ErrorListLiteral(this->node, this->type, this->position, this->node_1);
@@ -20,7 +21,7 @@ std::string ErrorListLiteral::to_str() const {
     return std::string();
 }
 
-ErrorListLiteral::ErrorListLiteral(const ast::Type& node, const ast::ObjectType& type, TextPosition position,
+ErrorListLiteral::ErrorListLiteral(const sem::Type& node, const sem::TypeObject& type, TextPosition position,
                                    const ast::Node& node_1)
         : node(node), type(type), position(position), node_1(node_1) {
 
