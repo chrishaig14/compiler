@@ -73,6 +73,7 @@ bool function_is_generic(const ast::FunctionType& ft);
 sem::SNode*
 make_for_snode(ast::For& node, USemanticInfoBlock& binfo, USemanticInfo& exp_info_p, std::string loop_list_var_id,
                std::string loop_index_var_id, std::string loop_list_len_var_id, sem::SNode* update_loop_index_snode);
+const sem::TypeFunction& get_function_type(const SemanticInfo& fun_info);
 
 class Checker {
     int loop_count;
@@ -107,9 +108,10 @@ public:
     std::pair<std::string, ast::Type*>* get_first_substitution(ast::Type& a, ast::Type& b, bool is_top_level_arg);
     ast::UTypeNode substitute(const ast::Type& t, const std::string& var, const ast::Type& replacement);
     std::unique_ptr<ast::FunctionType> unify_function_call(const ast::FunctionType& fun, ast::VectorOfTypes& args,
-                                                      std::map<std::string, ast::Type*>& all_substitutions);
-    std::unique_ptr<SemanticInfo> match_arguments_to_generic_function(const ast::FunctionType& ft, ast::VectorOfTypes arg_types,
-                                                                      std::map<std::string, ast::Type*>& all_substitutions);
+                                                           std::map<std::string, ast::Type*>& all_substitutions);
+    std::unique_ptr<SemanticInfo>
+    match_arguments_to_generic_function(const ast::FunctionType& ft, ast::VectorOfTypes arg_types,
+                                        std::map<std::string, ast::Type*>& all_substitutions);
     void fail(std::string msg);
 
     USemanticInfo dispatch_rvalue(ast::Node& nod);
@@ -168,8 +170,9 @@ public:
     USemanticInfo dispatch(ast::Node& nod);
     void fill_value(Value& value);
     std::unique_ptr<SemanticInfo> expect_rvalue_of_type(const sem::Type& target, ast::Node& node);
-    void process_function_arguments(SemanticInfo& retv, std::vector<Entity*>& arg_entities, std::vector<USNode>& arguments,
-                                    ast::Call& n, const ast::FunctionType& function_type, SemanticInfo* fun_info_p);
+    void
+    process_function_arguments(SemanticInfo& retv, std::vector<Entity*>& arg_entities, std::vector<USNode>& arguments,
+                               ast::Call& n, const ast::FunctionType& function_type, SemanticInfo* fun_info_p);
     bool check_arguments(ast::Call& n, std::vector<USNode>& sn, ast::VectorOfTypes& arg_types,
                          std::vector<Entity*>& arg_entities);
     USemanticInfo
@@ -182,6 +185,7 @@ public:
     void init();
     USemanticInfo dispatch_any(ast::Node& n, bool is_rvalue);
     Value& entity_value_from_actual_base_path_no_generic(const Path& p);
+
 };
 
 #endif //CHECKER_H

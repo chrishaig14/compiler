@@ -26,22 +26,17 @@ USemanticInfo Checker::visit_call(ast::Call& n, bool is_rvalue) {
     SemanticInfo& fun_info = *fun_info_p;
     // bool is_a_method = false;
     // Node* object_node;
-    if (fun_info.entity.get().type != E_TYPE::CONST_FUNCTION && fun_info_p->entity.get().type != E_TYPE::VALUE) {
+    if ((fun_info.entity.get().type != E_TYPE::CONST_FUNCTION && fun_info_p->entity.get().type != E_TYPE::VALUE)) {
         this->error_reporter.error(std::make_unique<ErrorNotAFunction>(n));
         return error_stub();
     }
-    const ast::FunctionType* function_type = nullptr;
-    if (fun_info.entity.get().type == E_TYPE::CONST_FUNCTION) {
-        function_type = (ast::FunctionType*) ((EntityConstFunction&) fun_info.entity.get()).const_function->const_function_ft_p->to_ast();
-    } else if (fun_info.entity.get().type == E_TYPE::VALUE &&
-               ((Value&) fun_info.entity).type.kind == sem::Kind::FUNCTION) {
-        function_type = (ast::FunctionType*) ((Value&) fun_info.entity.get()).type.to_ast();
-    }
+    const sem::TypeFunction& function_type = get_function_type(fun_info);
     // ok
-    if (n.arguments.size() != function_type->param_types.size()) {
-        this->error_reporter.error(std::make_unique<ErrorFunctionCallNumArgs>(function_type->clone(), n.start));
-        if (!function_is_generic(*function_type)) {
-            retv.set_entity(entity_from_type(*function_type->return_type));
+    if (n.arguments.size() != function_type.param_types.size()) {
+        this->error_reporter.error(std::make_unique<ErrorFunctionCallNumArgs>((ast::FunctionType*) function_type.to_ast(),
+                                                                              n.start));
+        if (!function_is_generic((ast::FunctionType&) *function_type.to_ast())) {
+            retv.set_entity(entity_from_type(*function_type.return_type->to_ast()));
             return retv_p;
         } else {
             return error_stub();
@@ -55,7 +50,7 @@ USemanticInfo Checker::visit_call(ast::Call& n, bool is_rvalue) {
     if (has_error) {
         return error_stub();
     }
-    std::cout << "Calling function of type: " << function_type->to_string() << std::endl;
+    std::cout << "Calling function of type: " << function_type.to_string() << std::endl;
 
 
     /*
@@ -145,7 +140,12 @@ USemanticInfo Checker::visit_call(ast::Call& n, bool is_rvalue) {
         }
         retv.entity = inf->entity;
     } else {*/
-    this->process_function_arguments(retv, arg_entities, arguments, n, *function_type, fun_info_p.get());
+    this->process_function_arguments(retv,
+                                     arg_entities,
+                                     arguments,
+                                     n,
+                                     (ast::FunctionType&) *function_type.to_ast(),
+                                     fun_info_p.get());
     if (fun_info_p->snode->type == SNodeType::OBJECT_METHOD) {
         auto& om = (std::unique_ptr<sem::ObjectMethod>&) fun_info_p->snode;
         retv.snode = std::make_unique<sem::ObjectMethodCall>(std::move(om->object),
@@ -158,6 +158,15 @@ USemanticInfo Checker::visit_call(ast::Call& n, bool is_rvalue) {
     }
     // }
     return make_return_info(n, is_rvalue, std::move(retv_p), is_def_const, args_are_constant);
+}
+
+const sem::TypeFunction& get_function_type(const SemanticInfo& fun_info) {
+    if (fun_info.entity.get().type == E_TYPE::CONST_FUNCTION) {
+        return ((EntityConstFunction&) fun_info.entity.get()).const_function->const_function_ft;
+    } else {
+        // value & kind = function
+        return (sem::TypeFunction&) ((Value&) fun_info.entity.get()).type;
+    }
 }
 
 USemanticInfo Checker::make_return_info(const ast::Call& n, bool is_rvalue, USemanticInfo retv_p, bool is_def_const,
