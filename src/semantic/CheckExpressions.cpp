@@ -341,7 +341,7 @@ USemanticInfo Checker::visit_ternary(ast::Ternary& node) {
                                                                        expression_info_p->entity));
         return error_stub();
     }
-    ast::ObjectType& expression_type = *(ast::ObjectType*) ((Value&) p_entity).type.object().to_ast();
+    sem::TypeObject& expression_type = ((Value&) p_entity).type.object();
 
     if (expression_type.id != "Option") {
         this->error_reporter.error(std::make_unique<ErrorTypeMismatch>(*new sem::TypeObject("Option",
@@ -351,8 +351,8 @@ USemanticInfo Checker::visit_ternary(ast::Ternary& node) {
         return error_stub();
     }
     this->enter_scope("true_case");
-    ast::Type*& inner_type = expression_type.type_params[0];
-    auto v = std::make_unique<Value>(inner_type->to_sem());
+    sem::Type& inner_type = *expression_type.type_params[0];
+    auto v = std::make_unique<Value>(inner_type.clone());
     this->scope->set("it", v.release());
     USemanticInfo true_case_p = this->dispatch_rvalue(*node.true_case);
     SemanticInfo& true_case = *true_case_p;
