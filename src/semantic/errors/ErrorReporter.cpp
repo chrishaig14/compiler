@@ -120,28 +120,6 @@ void init_styles() {
 //     this->fail(msg, pos);
 // }
 
-void
-ErrorReporter::assignment(const ast::Type& expected, const ast::Type& actual, TextPosition pos, const ast::Node& lvalue,
-                          const ast::Node& rvalue) {
-    std::string pre_msg;
-    pre_msg = E_FMT("Expected ") + E_HLT(expected.to_string()) + E_FMT("(alias for ") +
-              E_HLT(expected.actual_to_string()) + E_FMT(")") + E_FMT(", got ") + E_HLT(actual.to_string()) +
-              E_FMT(" (alias for ") + E_HLT(actual.actual_to_string()) + E_FMT(")");
-
-    std::string code_s = this->code_lines.get_line(pos.line);
-    std::string pre_s = substring(code_s, TextPosition{lvalue.start.line, 0}, lvalue.start);
-    std::string left_s = substring(code_s, lvalue.start, lvalue.end);
-    std::string middle_s = substring(code_s, lvalue.end, rvalue.start);
-    std::string right_s = substring(code_s, rvalue.start, rvalue.end);
-    std::string post_s = substring(code_s, rvalue.end, TextPosition{rvalue.end.line, code_s.size()});
-
-    std::string msg = pre_s + fmt::format(styles[ErrorElement::BinopLeft], left_s) +
-                      fmt::format(styles[ErrorElement::BinopOperator], middle_s) +
-                      fmt::format(styles[ErrorElement::BinopRight], right_s) + post_s;
-    this->fail_ok(pre_msg, msg, pos);
-
-    // this->fail(msg, pos);
-}
 
 // void ErrorReporter::no_return(const ast::TypeNode& t, TextPosition pos) {
 //     std::string msg;
