@@ -138,13 +138,15 @@ USemanticInfo Checker::visit_declaration(ast::Declaration& n) {
 }
 
 USemanticInfo Checker::check_declaration_with_type(ast::Declaration& n) {
-    if (n.type->kind == Kind::OBJECT && this->module.aliased_types.count(n.type->object().id) == 1) {
-        ast::Type* aliased_type = this->module.aliased_types.at(n.type->object().id);
-        n.type = ast::UTypeNode(aliased_type->clone());
+    ast::UTypeNode& type = n.type;
+    if (type->kind == Kind::OBJECT && this->module.aliased_types.count(type->object().id) == 1) {
+        ast::Type* aliased_type = this->module.aliased_types.at(type->object().id);
+        type = ast::UTypeNode(aliased_type->clone());
     } else {
-        this->module.fill_actual(*n.type);
+        this->module.fill_actual(*type);
     }
-    USemanticInfo rvalue_sinfo = this->expect_rvalue_of_type(*n.type->to_sem(), n.expression);
+    sem::Type* sem_type = type->to_sem();
+    USemanticInfo rvalue_sinfo = this->expect_rvalue_of_type(*sem_type, n.expression);
     if (rvalue_sinfo->is_error()) {
         return error_stub();
     }
@@ -152,7 +154,7 @@ USemanticInfo Checker::check_declaration_with_type(ast::Declaration& n) {
     SemanticInfo& info = *info_u;
     USNode up = std::move(rvalue_sinfo->snode);
     info.snode = std::make_unique<sem::Declaration>(n.identifier, std::move(up));
-    auto ov = std::make_unique<Value>(n.type->to_sem());
+    auto ov = std::make_unique<Value>(sem_type);
     this->fill_value(*ov);
     info.set_entity(ov.release());
     return info_u;
