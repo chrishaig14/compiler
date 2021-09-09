@@ -41,7 +41,7 @@ public:
 
     std::unordered_map<std::string, std::string> constraints;
     Path path;
-    ConstFunction* const_function;
+    // ConstFunction* const_function;
 };
 
 

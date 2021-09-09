@@ -73,7 +73,7 @@ void GlobalProcessor::visit_function(ast::Function& node) {
         this->module.fill_actual(*node.implicit->ft);
     }
     node.path = const_function->path;
-    node.const_function = const_function;
+    // node.const_function = const_function;
 
     this->module.add_func_definition(const_function);
 }
@@ -183,7 +183,7 @@ void GlobalProcessor::visit_class(ast::Klass& node) {
                                      std::make_unique<sem::TypeFunction>(x, sem::UType(method.return_type->to_sem())));
         method.path = cf->path;
         cf->implicit = f.second->method->implicit;
-        f.second->method->const_function = cf;
+        // f.second->method->const_function = cf;
         class_info->methods.insert(make_pair(f.first, cf));
     }
 
@@ -201,7 +201,7 @@ void GlobalProcessor::visit_class(ast::Klass& node) {
         auto* cf = new ConstFunction(Path(class_info->path, f.first),
                                      std::make_unique<sem::TypeFunction>(x, sem::UType(method.return_type->to_sem())));
         method.path = cf->path;
-        f.second->const_function = cf;
+        // f.second->const_function = cf;
         class_info->static_methods.insert(make_pair(f.first, cf));
     }
 
