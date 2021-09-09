@@ -16,6 +16,6 @@ std::string ErrorFunctionCallNumArgs::to_str() const {
     return std::string();
 }
 
-ErrorFunctionCallNumArgs::ErrorFunctionCallNumArgs(ast::FunctionType* type, TextPosition position) {
+ErrorFunctionCallNumArgs::ErrorFunctionCallNumArgs(const sem::TypeFunction* type, TextPosition position) {
 
 }
