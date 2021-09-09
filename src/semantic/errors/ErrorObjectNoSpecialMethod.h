@@ -18,7 +18,7 @@ public:
 
     const ast::Subscript& node;
     std::string method_name;
-    const sem::Type& type;
+    sem::UType type;
 };
 
 

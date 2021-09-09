@@ -13,18 +13,18 @@ std::string ErrorNoMemberSuggestions::to_str() const {
 }
 
 ErrorNoMemberSuggestions::ErrorNoMemberSuggestions(const sem::Type& t, const ast::Member& m, const Class& clazz)
-        : m(m), t(t), clazz(clazz) {
+        : m(m), t(t.clone()), clazz(clazz) {
 
 }
 
 bool ErrorNoMemberSuggestions::equal(const Error& other) const {
     const auto& o = (const ErrorNoMemberSuggestions&) other;
     bool act = o.m == this->m;
-    bool exp = o.t == this->t;
+    bool exp = *o.t == *this->t;
     bool clz = &o.clazz == &this->clazz;
     return act && exp && clz;
 }
 
 Error* ErrorNoMemberSuggestions::clone() const {
-    return new ErrorNoMemberSuggestions(this->t, this->m, this->clazz);
+    return new ErrorNoMemberSuggestions(*this->t, this->m, this->clazz);
 }

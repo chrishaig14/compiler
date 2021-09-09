@@ -11,7 +11,7 @@
 #include "Error.h"
 
 class ErrorTypeMismatch : public Error {
-    const sem::Type& expected;
+    sem::UType expected;
     const ast::Node& value_node;
     std::unique_ptr<Entity> actual;
 public:

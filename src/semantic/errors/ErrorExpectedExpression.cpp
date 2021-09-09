@@ -10,7 +10,7 @@ Error* ErrorExpectedExpression::clone() const {
 
 bool ErrorExpectedExpression::equal(const Error& other) const {
     auto& o = (const ErrorExpectedExpression&) other;
-    bool entity_ok = this->entity == o.entity;
+    bool entity_ok = *this->entity == *o.entity;
     bool node_ok = this->node == o.node;
     return entity_ok and node_ok;
 }

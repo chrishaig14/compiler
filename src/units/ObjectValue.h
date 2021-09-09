@@ -15,7 +15,7 @@ enum class Meta {
 };
 
 class Value : public Entity {
-    sem::Type* _type;
+    sem::UType _type;
 public:
     sem::Type& type;
     union {
@@ -28,7 +28,7 @@ public:
         this->clazz = nullptr;
         this->enumm = nullptr;
         assert(type != nullptr);
-        this->_type = type;
+        this->_type = sem::UType(type);
     }
 
     Entity* clone() const override {

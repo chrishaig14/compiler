@@ -11,7 +11,7 @@
 
 class ErrorNoMemberSuggestions : public Error {
     const ast::Member& m;
-    const sem::Type& t;
+    sem::UType t;
     const Class& clazz;
 public:
     ErrorNoMemberSuggestions(const sem::Type& t, const ast::Member& m, const Class& clazz);
