@@ -321,7 +321,7 @@ TEST_CASE("empty_dict_literal", "[checker]") {
     REQUIRE(info->entity.get().type == E_TYPE::VALUE);
     REQUIRE(((Value&) (info->entity.get())).metatype == Meta::CLASS);
     REQUIRE(((Value&) (info->entity.get())).type ==
-    sem::TypeObject("Dict", {new sem::TypeObject("Integer"), new sem::TypeObject("String")}));
+            sem::TypeObject("Dict", {new sem::TypeObject("Integer"), new sem::TypeObject("String")}));
 }
 
 
@@ -423,7 +423,7 @@ TEST_CASE("error_no_member", "[checker]") {
     Error& error = *checker.error_reporter.errors.back();
     Flirpin clazz_flirpin = module.get(Path("Foo"));
     REQUIRE(clazz_flirpin.type == F_TYPE::CLASS);
-    ast::ObjectType type = ast::ObjectType("Foo");
+    sem::TypeObject type("Foo");
     std::cout << "Making error: " << &declaration_node.expression << std::endl;
     ErrorNoMemberSuggestions exp(type, (ast::Member&) declaration_node.expression, *clazz_flirpin.clazz);
     REQUIRE(error == exp);

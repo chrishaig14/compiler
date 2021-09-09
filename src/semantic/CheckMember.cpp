@@ -132,7 +132,7 @@ USemanticInfo Checker::object_member(USNode object_snode, Value& p_value, const 
         // }
 
     } else {
-        this->error_reporter.error(std::make_unique<ErrorNoMemberSuggestions>(*p_value.type.to_ast(), n, *clazz));
+        this->error_reporter.error(std::make_unique<ErrorNoMemberSuggestions>(p_value.type, n, *clazz));
         // this->error_reporter.object_no_member_with_suggestions(*p_value.type,
         //                                                        child,
         //                                                        n.dot_pos,
