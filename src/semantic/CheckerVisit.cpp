@@ -143,7 +143,8 @@ void Checker::init() {
     this->error_reporter.code_lines = this->module.code_lines;
     // Initialize module level Scope
     for (const auto& f: this->module.flirpins) {
-        this->scope->set(f.first, *map_flirpin_to_entity(f.second));
+        std::unique_ptr<Entity> e(map_flirpin_to_entity(f.second));
+        this->scope->set(f.first, *e);
     }
 }
 
