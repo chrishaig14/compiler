@@ -164,7 +164,7 @@ USemanticInfo Checker::visit_cast(ast::Cast& n) {
 // }
 
 USemanticInfo Checker::visit_unary(ast::UnaryOp& n) {
-    USemanticInfo exp_info = this->expect_rvalue_of_type(*T_BOOL.to_sem(), *n.exp);
+    USemanticInfo exp_info = this->expect_rvalue_of_type(sem::TypeObject("Boolean"), *n.exp);
     if (exp_info->is_error()) {
         return error_stub();
     }

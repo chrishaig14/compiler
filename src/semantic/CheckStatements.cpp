@@ -380,7 +380,7 @@ USemanticInfo Checker::visit_break(ast::Break& node) {
 }
 
 USemanticInfo Checker::visit_while(ast::While& node) {
-    USemanticInfo condition_sinfo = this->expect_rvalue_of_type(*T_BOOL.to_sem(), *node.condition);
+    USemanticInfo condition_sinfo = this->expect_rvalue_of_type(sem::TypeObject("Boolean"), *node.condition);
     if (condition_sinfo->is_error()) {
         return error_stub();
     }
@@ -409,7 +409,7 @@ USemanticInfo Checker::visit_while(ast::While& node) {
 }
 
 USemanticInfo Checker::visit_if(ast::If& n) {
-    USemanticInfo condition_sinfo = this->expect_rvalue_of_type(*T_BOOL.to_sem(), n.condition);
+    USemanticInfo condition_sinfo = this->expect_rvalue_of_type(sem::TypeObject("Boolean"), n.condition);
     if (condition_sinfo->is_error()) {
         return error_stub();
     }
@@ -426,7 +426,7 @@ USemanticInfo Checker::visit_if(ast::If& n) {
     std::vector < std::pair < USNode, std::unique_ptr < sem::Block>>> elifs;
 
     for (auto& elif : n.elifs) {
-        USemanticInfo elif_condition_sinfo = this->expect_rvalue_of_type(*T_BOOL.to_sem(), elif.first);
+        USemanticInfo elif_condition_sinfo = this->expect_rvalue_of_type(sem::TypeObject("Boolean"), elif.first);
         auto& elif_condition_snode = elif_condition_sinfo->snode;
         this->enter_scope("elif");
         USemanticInfoBlock elif_block_info = this->visit_block(elif.second);
