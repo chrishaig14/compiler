@@ -273,7 +273,7 @@ USemanticInfo Checker::visit_list(ast::List& node) {
         Value& p_entity = (Value&) current_type_p->entity.get();
         sem::TypeObject* ctype = &p_entity.type.object();
         if (*ctype != *element_type) {
-            this->error_reporter.error(std::make_unique<ErrorTypeMismatch>(*element_type->to_ast(),
+            this->error_reporter.error(std::make_unique<ErrorTypeMismatch>(*element_type,
                                                                            node.elements[i],
                                                                            p_entity));
         }

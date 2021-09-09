@@ -335,8 +335,8 @@ USemanticInfo Checker::visit_ternary(ast::Ternary& node) {
     SemanticInfo& expression_info = *expression_info_p;
     Entity& p_entity = expression_info.entity;
     if (p_entity.type != E_TYPE::VALUE || ((Value&) expression_info_p->entity).type.kind == sem::Kind::FUNCTION) {
-        this->error_reporter.error(std::make_unique<ErrorTypeMismatch>(*new ast::ObjectType("Option",
-                                                                                            {new ast::ObjectType("t")}),
+        this->error_reporter.error(std::make_unique<ErrorTypeMismatch>(*new sem::TypeObject("Option",
+                                                                                            {new sem::TypeObject("t")}),
                                                                        *node.expression,
                                                                        expression_info_p->entity));
         return error_stub();
@@ -344,8 +344,8 @@ USemanticInfo Checker::visit_ternary(ast::Ternary& node) {
     ast::ObjectType& expression_type = *(ast::ObjectType*) ((Value&) p_entity).type.object().to_ast();
 
     if (expression_type.id != "Option") {
-        this->error_reporter.error(std::make_unique<ErrorTypeMismatch>(*new ast::ObjectType("Option",
-                                                                                            {new ast::ObjectType("t")}),
+        this->error_reporter.error(std::make_unique<ErrorTypeMismatch>(*new sem::TypeObject("Option",
+                                                                                            {new sem::TypeObject("t")}),
                                                                        *node.expression,
                                                                        expression_info_p->entity));
         return error_stub();

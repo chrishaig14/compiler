@@ -140,14 +140,13 @@ USemanticInfo Checker::visit_assignment(ast::Assignment& n) {
     SemanticInfo& linfo = *linfo_p;
 
     Value& l_entity_value = (Value&) linfo.entity;
-    const ast::Type& l_type = *l_entity_value.type.to_ast();
 
     if (expression_info_p->entity.get().type == E_TYPE::VALUE) {
         USNode rvalue_snode = this->make_rvalue(expression_info_p->entity,
                                                 std::move(expression_info_p->snode),
                                                 l_entity_value.type);
         if (rvalue_snode == nullptr) {
-            this->error_reporter.error(std::make_unique<ErrorTypeMismatch>(l_type,
+            this->error_reporter.error(std::make_unique<ErrorTypeMismatch>(l_entity_value.type,
                                                                            n.rvalue,
                                                                            expression_info_p->entity));
             return error_stub();
@@ -228,9 +227,9 @@ USemanticInfo Checker::visit_match(ast::Match& node) {
     USemanticInfo exp_info = this->dispatch_rvalue(*node.exp);
     if (exp_info->entity.get().type != E_TYPE::VALUE || ((Value&) exp_info->entity).type.kind != sem::Kind::OBJECT) {
 
-        this->error_reporter.error(std::make_unique<ErrorTypeMismatch>(*new ast::ObjectType("Union",
-                                                                                            {new ast::ObjectType("...",
-                                                                                                                 {})}),
+        this->error_reporter.error(std::make_unique<ErrorTypeMismatch>(*new sem::TypeObject("Union",
+                                                                                            {new sem::TypeObject("...",
+                                                                                                                 sem::VectorOfTypes{})}),
                                                                        *node.exp,
                                                                        exp_info->entity));
         return error_stub();
@@ -241,9 +240,9 @@ USemanticInfo Checker::visit_match(ast::Match& node) {
         ot = (ast::ObjectType*) ot->data.aliased_type;
     }
     if (ot->id != "Union") {
-        this->error_reporter.error(std::make_unique<ErrorTypeMismatch>(*new ast::ObjectType("Union",
-                                                                                            {new ast::ObjectType("...",
-                                                                                                                 {})}),
+        this->error_reporter.error(std::make_unique<ErrorTypeMismatch>(*new sem::TypeObject("Union",
+                                                                                            {new sem::TypeObject("...",
+                                                                                                                 sem::VectorOfTypes{})}),
                                                                        *node.exp,
                                                                        exp_info->entity));
         return error_stub();

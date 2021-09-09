@@ -71,7 +71,7 @@ TEST_CASE("basic_function_bad_return_type", "[checker]") {
     REQUIRE(checker.error_reporter.errors.size() == 1);
     Error& error = *checker.error_reporter.errors.back();
     ast::Boolean node(false, _POS, _POS);
-    ast::ObjectType expected("Integer");
+    sem::TypeObject expected("Integer");
     ErrorTypeMismatch exp(expected, node, *checker.entity_from_type(ast::ObjectType("Boolean")));
     REQUIRE(error == exp);
 
@@ -115,7 +115,7 @@ TEST_CASE("basic_declaration_bad_type", "[checker]") {
     REQUIRE(checker.error_reporter.errors.size() == 1);
     Error& error = *checker.error_reporter.errors.back();
     ast::Number node(NumberType::INTEGER, "9", _POS, _POS);
-    ast::ObjectType expected("Boolean");
+    sem::TypeObject expected("Boolean");
     ErrorTypeMismatch exp(expected, node, *checker.entity_from_type(ast::ObjectType("Integer")));
     REQUIRE(error == exp);
 }
@@ -170,7 +170,7 @@ TEST_CASE("list_bad", "[checker]") {
 
 
     ast::String node("a", _POS, _POS);
-    ast::ObjectType expected("Integer");
+    sem::TypeObject expected("Integer");
     ErrorTypeMismatch exp(expected, node, *checker.entity_from_type(ast::ObjectType("String")));
 
     REQUIRE(error == exp);
@@ -505,7 +505,7 @@ TEST_CASE("binop_type_error", "[checker]") {
 
     Error& error = *checker.error_reporter.errors.back();
     ast::String node("Hello", _POS, _POS);
-    ast::ObjectType expected("Integer");
+    sem::TypeObject expected("Integer");
     ErrorTypeMismatch exp(expected, node, *checker.entity_from_type(ast::ObjectType("String")));
     REQUIRE(error == exp);
 }
@@ -571,7 +571,7 @@ TEST_CASE("subscript_index_type_error", "[checker]") {
 
     Error& error = *checker.error_reporter.errors.back();
     ast::String node("foo", _POS, _POS);
-    ast::ObjectType expected("Integer");
+    sem::TypeObject expected("Integer");
     ErrorTypeMismatch exp(expected, node, *checker.entity_from_type(ast::ObjectType("String")));
     REQUIRE(error == exp);
 }
@@ -650,7 +650,7 @@ TEST_CASE("call_args_type_error", "[checker]") {
 
     Error& error = *checker.error_reporter.errors.back();
     ast::String node("Hello", _POS, _POS);
-    ast::ObjectType expected("Integer");
+    sem::TypeObject expected("Integer");
     ErrorTypeMismatch exp(expected, node, *checker.entity_from_type(ast::ObjectType("String")));
     REQUIRE(error == exp);
 }
@@ -701,7 +701,7 @@ TEST_CASE("union_error", "[checker]") {
 
     Error& error = *checker.error_reporter.errors.back();
     ast::Boolean node(false, _POS, _POS);
-    ast::ObjectType expected("Union", {new ast::ObjectType("Integer"), new ast::ObjectType("String")});
+    sem::TypeObject expected("Union", {new sem::TypeObject("Integer"), new sem::TypeObject("String")});
     ErrorTypeMismatch exp(expected, node, *checker.entity_from_type(ast::ObjectType("Boolean")));
     REQUIRE(error == exp);
 }
@@ -738,7 +738,7 @@ TEST_CASE("while_boolean_error", "[checker]") {
 
     Error& error = *checker.error_reporter.errors.back();
     ast::Number node(NumberType::INTEGER, "5", _POS, _POS);
-    ast::ObjectType expected("Boolean");
+    sem::TypeObject expected("Boolean");
     ErrorTypeMismatch exp(expected, node, *checker.entity_from_type(ast::ObjectType("Integer")));
     REQUIRE(error == exp);
 }
@@ -775,7 +775,7 @@ TEST_CASE("if_boolean_error", "[checker]") {
 
     Error& error = *checker.error_reporter.errors.back();
     ast::Number node(NumberType::INTEGER, "5", _POS, _POS);
-    ast::ObjectType expected("Boolean");
+    sem::TypeObject expected("Boolean");
     ErrorTypeMismatch exp(expected, node, *checker.entity_from_type(ast::ObjectType("Integer")));
     REQUIRE(error == exp);
 }

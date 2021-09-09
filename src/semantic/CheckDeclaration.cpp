@@ -16,12 +16,12 @@ std::unique_ptr<SemanticInfo> Checker::expect_rvalue_of_type(const sem::Type& ta
     }
     Entity& r_entity = rinfo->entity.get();
     if (r_entity.type != E_TYPE::VALUE && r_entity.type != E_TYPE::CONST_FUNCTION) {
-        this->error_reporter.error(std::make_unique<ErrorTypeMismatch>(*target.to_ast(), node, r_entity));
+        this->error_reporter.error(std::make_unique<ErrorTypeMismatch>(target, node, r_entity));
         return error_stub();
     }
     USNode snode = make_rvalue(r_entity, std::move(rinfo->snode), target);
     if (snode == nullptr) {
-        this->error_reporter.error(std::make_unique<ErrorTypeMismatch>(*target.to_ast(), node, r_entity));
+        this->error_reporter.error(std::make_unique<ErrorTypeMismatch>(target, node, r_entity));
         return error_stub();
     }
     rinfo->snode = std::move(snode);

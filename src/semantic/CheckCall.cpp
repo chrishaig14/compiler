@@ -223,7 +223,7 @@ void Checker::process_function_arguments(SemanticInfo& retv, std::vector<Entity*
 
         USNode arg_rvalue_snode = this->make_rvalue(*arg_entities[i], std::move(arguments[sni]), *param_type.to_sem());
         if (arg_rvalue_snode == nullptr) {
-            this->error_reporter.error(std::make_unique<ErrorTypeMismatch>(param_type,
+            this->error_reporter.error(std::make_unique<ErrorTypeMismatch>(*param_type.to_sem(),
                                                                            n.arguments[i],
                                                                            *arg_entities[i]));
             continue;
