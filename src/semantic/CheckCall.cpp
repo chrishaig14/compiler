@@ -139,12 +139,7 @@ USemanticInfo Checker::visit_call(ast::Call& n, bool is_rvalue) {
         }
         retv.entity = inf->entity;
     } else {*/
-    this->process_function_arguments(retv,
-                                     arg_entities,
-                                     arguments,
-                                     n,
-                                     (ast::FunctionType&) *function_type.to_ast(),
-                                     fun_info_p.get());
+    this->process_function_arguments(retv, arg_entities, arguments, n, function_type, fun_info_p.get());
     if (fun_info_p->snode->type == SNodeType::OBJECT_METHOD) {
         auto& om = (std::unique_ptr<sem::ObjectMethod>&) fun_info_p->snode;
         retv.snode = std::make_unique<sem::ObjectMethodCall>(std::move(om->object),
@@ -222,16 +217,16 @@ bool Checker::check_arguments(ast::Call& n, std::vector<USNode>& arguments, ast:
 
 void Checker::process_function_arguments(SemanticInfo& retv, std::vector<Entity*>& arg_entities,
                                          std::vector<USNode>& arguments, ast::Call& n,
-                                         const ast::FunctionType& function_type, SemanticInfo* fun_info_p) {
-    retv.set_entity(entity_from_type(*function_type.return_type));
+                                         const sem::TypeFunction& function_type, SemanticInfo* fun_info_p) {
+    retv.set_entity(entity_from_type(*function_type.return_type->to_ast()));
     int sni = static_cast<int>(fun_info_p->this_arg != nullptr);
     for (size_t i = 0; i < n.arguments.size(); i++) {
         // const ast::TypeNode& arg_type = *arg_types[i];
-        const ast::Type& param_type = *function_type.param_types[i];
+        const sem::Type& param_type = *function_type.param_types[i];
 
-        USNode arg_rvalue_snode = this->make_rvalue(*arg_entities[i], std::move(arguments[sni]), *param_type.to_sem());
+        USNode arg_rvalue_snode = this->make_rvalue(*arg_entities[i], std::move(arguments[sni]), param_type);
         if (arg_rvalue_snode == nullptr) {
-            this->error_reporter.error(std::make_unique<ErrorTypeMismatch>(*param_type.to_sem(),
+            this->error_reporter.error(std::make_unique<ErrorTypeMismatch>(param_type,
                                                                            n.arguments[i],
                                                                            *arg_entities[i]));
             continue;

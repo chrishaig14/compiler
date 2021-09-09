@@ -174,7 +174,7 @@ public:
     std::unique_ptr<SemanticInfo> expect_rvalue_of_type(const sem::Type& target, ast::Node& node);
     void
     process_function_arguments(SemanticInfo& retv, std::vector<Entity*>& arg_entities, std::vector<USNode>& arguments,
-                               ast::Call& n, const ast::FunctionType& function_type, SemanticInfo* fun_info_p);
+                               ast::Call& n, const sem::TypeFunction& function_type, SemanticInfo* fun_info_p);
     bool check_arguments(ast::Call& n, std::vector<USNode>& sn, ast::VectorOfTypes& arg_types,
                          std::vector<Entity*>& arg_entities);
     USemanticInfo
