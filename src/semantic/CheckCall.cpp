@@ -208,8 +208,8 @@ bool Checker::check_arguments(ast::Call& n, std::vector<USNode>& arguments, ast:
         }
 
 
-        ast::Type& arg_type = *get_entity_type(arg_entity);
-        arg_types.push_back(arg_type.clone());
+        ast::Type* arg_type = get_entity_type(arg_entity);
+        arg_types.push_back(arg_type);
         // n.arg_types.push_back(arg_type.clone());
     }
     return has_error;
