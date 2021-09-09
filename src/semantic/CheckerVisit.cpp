@@ -143,7 +143,7 @@ void Checker::init() {
     this->error_reporter.code_lines = this->module.code_lines;
     // Initialize module level Scope
     for (const auto& f: this->module.flirpins) {
-        this->scope->set(f.first, map_flirpin_to_entity(f.second));
+        this->scope->set(f.first, *map_flirpin_to_entity(f.second));
     }
 }
 
@@ -259,7 +259,7 @@ USemanticInfo Checker::visit_function(ast::Function& n) {
 
     VectorOfStrings params = n.parameter_names;
     if (this->add_this) {
-        this->scope->set("this", this->this_entity);
+        this->scope->set("this", *this->this_entity);
         params.insert(params.begin(), "this");
     }
     if (n.implicit != nullptr) {
@@ -274,7 +274,7 @@ USemanticInfo Checker::visit_function(ast::Function& n) {
             clazz->methods[n.implicit->method] = c;
         }
         Entity* generic_type = new EntityClass(clazz);
-        this->scope->set(n.implicit->type, generic_type);
+        this->scope->set(n.implicit->type, *generic_type);
         params.push_back("implicit_a");
     }
     for (size_t i = 0; i < n.parameter_names.size(); i++) {
@@ -283,7 +283,7 @@ USemanticInfo Checker::visit_function(ast::Function& n) {
         make_not_generic(*cl);
         auto te = entity_from_type(*cl);
         this->fill_value(*((Value*) te));
-        this->scope->set(n.parameter_names[i], te);
+        this->scope->set(n.parameter_names[i], *te);
         // if (!param_type.is_generic()) {
         //     if (param_type.kind == Kind::OBJECT) {
         //         ast::ObjectType& o_type = param_type.object();
@@ -306,7 +306,7 @@ USemanticInfo Checker::visit_function(ast::Function& n) {
 
     ast::Type& returnType = *n.return_type;
     this->assert_type_exists(returnType, n.start);
-    this->scope->set("__return__", entity_from_type(returnType));
+    this->scope->set("__return__", *entity_from_type(returnType));
     USemanticInfoBlock body_info = this->visit_block(*n.body);
     auto& bn = body_info->snode;
     for (auto local_var: this->scope->table) {

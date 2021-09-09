@@ -25,7 +25,7 @@ public:
 
     bool declared(const std::string& name);
 
-    void set(const std::string& name, Entity* info);
+    void set(const std::string& name, const Entity& info);
 
     ~SymbolTable() {
         // for (auto e: this->table) {

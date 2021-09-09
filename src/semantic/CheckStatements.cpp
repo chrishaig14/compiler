@@ -267,7 +267,7 @@ USemanticInfo Checker::visit_match(ast::Match& node) {
         this->fill_value(*v);
         Entity* ent = v.release();
         assert(v->clazz != nullptr);
-        this->scope->set(case_id, ent);
+        this->scope->set(case_id, *ent);
         USemanticInfo case_info = this->dispatch(case_node);
         auto& bn = (std::unique_ptr <sem::Block>&) case_info->snode;
         auto* omn = new sem::ObjectMember(std::make_unique<sem::Id>(varname), Path("core.core.Union"), "o");
@@ -320,7 +320,7 @@ USemanticInfo Checker::visit_for(ast::For& node) {
     this->fill_value(*v);
     Entity* elem_entity = v.release();
     this->enter_scope("for");
-    this->scope->set(node.var, elem_entity);
+    this->scope->set(node.var, *elem_entity);
 
     std::string loop_c = std::to_string(this->loop_count++);
     std::string loop_list_var_id = "__loop_list__" + loop_c;

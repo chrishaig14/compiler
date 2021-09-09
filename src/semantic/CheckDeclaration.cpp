@@ -136,7 +136,7 @@ USemanticInfo Checker::visit_declaration(ast::Declaration& n) {
     } else {
         info_u = this->check_declaration_without_type(n);
     }
-    this->scope->set(n.identifier, &info_u->entity.get());
+    this->scope->set(n.identifier, info_u->entity.get());
     return info_u;
 }
 

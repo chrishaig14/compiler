@@ -31,7 +31,7 @@ USemanticInfo Checker::visit_id(ast::Id& n) {
     Entity& entity = this->scope->get(n._id);
     if (entity.type == E_TYPE::NOT_FOUND) {
         this->error_reporter.error(std::make_unique<ErrorNotDeclared>(n));
-        this->scope->set(n._id, new EntityError());
+        this->scope->set(n._id, EntityError());
         return error_stub();
     }
     // std::string id =
@@ -351,7 +351,7 @@ USemanticInfo Checker::visit_ternary(ast::Ternary& node) {
     this->enter_scope("true_case");
     sem::Type& inner_type = *expression_type.type_params[0];
     auto v = std::make_unique<Value>(inner_type.clone());
-    this->scope->set("it", v.release());
+    this->scope->set("it", *v);
     USemanticInfo true_case_p = this->dispatch_rvalue(*node.true_case);
     SemanticInfo& true_case = *true_case_p;
     this->leave_scope();
