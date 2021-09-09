@@ -16,7 +16,7 @@ std::string ErrorFunctionReturnLastStmt::to_str() const {
     return std::string();
 }
 
-ErrorFunctionReturnLastStmt::ErrorFunctionReturnLastStmt(std::string name, const ast::Type& node,
+ErrorFunctionReturnLastStmt::ErrorFunctionReturnLastStmt(std::string name, const sem::Type& node,
                                                          TextPosition position) {
 
 }

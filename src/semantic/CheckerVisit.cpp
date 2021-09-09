@@ -322,13 +322,13 @@ USemanticInfo Checker::visit_function(ast::Function& n) {
             if (last_node.ntype != NodeType::RETRN) {
                 // it's not a return statement, error
                 this->error_reporter.error(std::make_unique<ErrorFunctionReturnLastStmt>(function_name,
-                                                                                         returnType,
+                                                                                         *returnType.to_sem(),
                                                                                          last_node.start));
                 return error_stub();
             }
         } else {
             this->error_reporter.error(std::make_unique<ErrorFunctionReturnLastStmt>(function_name,
-                                                                                     returnType,
+                                                                                     *returnType.to_sem(),
                                                                                      n.start));
             return error_stub();
         }
