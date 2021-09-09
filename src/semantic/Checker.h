@@ -177,8 +177,8 @@ public:
                          std::vector<Entity*>& arg_entities);
     USemanticInfo
     make_return_info(const ast::Call& n, bool is_rvalue, USemanticInfo retv, bool is_def_const, bool args_are_constant);
-    USNode make_union_rvalue(USNode value_snode, const ast::Type* unaliased_value_type,
-                             const ast::Type* unaliased_target_type) const;
+    USNode make_union_rvalue(USNode value_snode, const sem::Type* unaliased_value_type,
+                             const sem::Type* unaliased_target_type) const;
     sem::SNode* make_option_rvalue(sem::SNode* value_snode, const ast::Type* unaliased_value_type,
                                    const ast::Type* unaliased_target_type) const;
     // USemanticInfo visit_throw(ast::ThrowNode& n);
