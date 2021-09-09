@@ -67,7 +67,7 @@ void GlobalProcessor::visit_function(ast::Function& node) {
     ast::FunctionType function_info(x, ast::UTypeNode(node.return_type->clone()));
     Path function_path = Path(this->module.path, node.identifier);
     ConstFunction* const_function = new ConstFunction(Path(this->module.path, node.identifier),
-                                                      (sem::TypeFunction*) function_info.to_sem());
+                                                      sem::UTypeFunction((sem::TypeFunction*) function_info.to_sem()));
     if (node.implicit != nullptr) {
         const_function->implicit = node.implicit;
         this->module.fill_actual(*node.implicit->ft);
@@ -180,7 +180,7 @@ void GlobalProcessor::visit_class(ast::Klass& node) {
         // method.return_type->object().actual_base_path = this->get_actual_path(method.return_type->object().id);
 
         auto* cf = new ConstFunction(Path(class_info->path, f.first),
-                                     new sem::TypeFunction(x, sem::UType(method.return_type->to_sem())));
+                                     std::make_unique<sem::TypeFunction>(x, sem::UType(method.return_type->to_sem())));
         method.path = cf->path;
         cf->implicit = f.second->method->implicit;
         f.second->method->const_function = cf;
@@ -199,7 +199,7 @@ void GlobalProcessor::visit_class(ast::Klass& node) {
         // method.return_type->object().actual_base_path = this->get_actual_path(method.return_type->object().id);
 
         auto* cf = new ConstFunction(Path(class_info->path, f.first),
-                                     new sem::TypeFunction(x, sem::UType(method.return_type->to_sem())));
+                                     std::make_unique<sem::TypeFunction>(x, sem::UType(method.return_type->to_sem())));
         method.path = cf->path;
         f.second->const_function = cf;
         class_info->static_methods.insert(make_pair(f.first, cf));

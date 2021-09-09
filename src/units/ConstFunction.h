@@ -13,15 +13,16 @@
 #include "../simple_nodes/TypeFunction.h"
 
 class ConstFunction {
+private:
+    sem::UTypeFunction const_function_ft_p;
 public:
-    ConstFunction(Path path, sem::TypeFunction* ft);
+
+    ConstFunction(Path path, sem::UTypeFunction ft);
 
     ConstFunction(const ConstFunction& other);
 
     ~ConstFunction();
-
     Implicit* implicit;
-    sem::TypeFunction* const_function_ft_p;
     sem::TypeFunction& const_function_ft;
     Path path;
 };

@@ -247,7 +247,7 @@ USemanticInfo Checker::visit_defconst(ast::DefaultConstructor& node) {
         ot->is_generic_param = true;
     }
     auto* rt = new sem::TypeObject(cls.class_name, tp, cls.path);
-    info.set_entity(new EntityConstFunction(new ConstFunction(Path(), new sem::TypeFunction(t, sem::UType(rt)))));
+    info.set_entity(new EntityConstFunction(new ConstFunction(Path(),  std::make_unique<sem::TypeFunction>(t, sem::UType(rt)))));
     info.snode = std::make_unique<sem::Id>(cls.path.as_str() + "." + "__init__");
     return info_u;
 }
