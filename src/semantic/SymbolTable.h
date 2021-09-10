@@ -19,7 +19,7 @@ class SymbolTable {
 public:
     SymbolTable(const std::string& name, SymbolTable* parent);
 
-    std::vector<std::pair<std::string, ast::Type*>> get_all();
+    std::vector<std::pair<std::string, sem::UType>> get_all();
 
     Entity& get(const std::string& name);
 

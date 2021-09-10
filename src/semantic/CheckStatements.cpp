@@ -197,7 +197,7 @@ USemanticInfo Checker::visit_return(ast::Return& n) {
     }
     auto& u = expression_info_p->snode;
     auto sn = std::make_unique<sem::Return>(std::move(u));
-    for (auto l : this->scope->get_all()) {
+    for (auto& l : this->scope->get_all()) {
         sn->reachables.push_back(l.first);
     }
 

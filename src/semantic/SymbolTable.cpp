@@ -85,26 +85,24 @@ std::vector<std::pair<std::string, ast::Type*>> SymbolTable::get_all_in_loop() {
     }
 }
 
-std::vector<std::pair<std::string, ast::Type*>> SymbolTable::get_all() {
+std::vector<std::pair<std::string, sem::UType>> SymbolTable::get_all() {
     if (this->is_function) {
-        std::vector<std::pair<std::string, ast::Type*>> r;
+        std::vector<std::pair<std::string, sem::UType>> r;
 
         for (auto& v: this->table) {
             Entity& e = *v.second;
-            ast::Type* t;
             if (e.type == E_TYPE::VALUE) {
-                Value& ev = (Value&) e;
-                t = ev.type.to_ast();
-                r.push_back(std::make_pair(v.first, t));
+                auto& ev = (Value&) e;
+                r.emplace_back(v.first, sem::UType(ev.type.clone()));
             }
 
         }
         return r;
     } else {
-        std::vector<std::pair<std::string, ast::Type*>> r;
+        std::vector<std::pair<std::string, sem::UType>> r;
 
-        auto p = this->parent->get_all();
-        r.insert(r.end(), p.begin(), p.end());
+        // auto p = this->parent->get_all();
+        // r.insert(r.end(), p.begin(), p.end());
         // for (auto v: this->table) {
         //     TypeNode* t;
         //     if (v.second->type == E_TYPE::FUNCTION_VALUE) {
