@@ -178,9 +178,9 @@ USemanticInfo Checker::visit_unary(ast::UnaryOp& n) {
         this->error_reporter.fail("Error class " + cls->class_name + " does not define the __not__ operator!");
     }
 
-    ConstFunction* subscript_fun = subscript_it->second;
-    std::string sub_fun_path = subscript_fun->path.as_str();
-    sem::Type* rtype = subscript_fun->const_function_ft.return_type->clone();
+    ConstFunction& subscript_fun = *subscript_it->second;
+    std::string sub_fun_path = subscript_fun.path.as_str();
+    sem::Type* rtype = subscript_fun.const_function_ft.return_type->clone();
 
     auto fsn = std::make_unique<sem::Id>(sub_fun_path);
     std::vector<USNode> v;
@@ -296,15 +296,15 @@ USemanticInfo Checker::visit_subscript(ast::Subscript& node) {
                                                                                 node));
         return error_stub();
     }
-    ConstFunction* subscript_fun = subscript_it->second;
-    std::string sub_fun_path = subscript_fun->path.as_str();
+    ConstFunction& subscript_fun = *subscript_it->second;
+    std::string sub_fun_path = subscript_fun.path.as_str();
 
     // VectorOfTypes children;
     if (node.child.size() > 1) {
         this->error_reporter.fail("Error subscript with more than one child!");
         return error_stub();
     }
-    USemanticInfo child_sinfo = this->expect_rvalue_of_type(*subscript_fun->const_function_ft.param_types[0],
+    USemanticInfo child_sinfo = this->expect_rvalue_of_type(*subscript_fun.const_function_ft.param_types[0],
                                                             *node.child[0]);
 
     if (child_sinfo->is_error()) {
@@ -315,7 +315,7 @@ USemanticInfo Checker::visit_subscript(ast::Subscript& node) {
     USemanticInfo info_u = std::make_unique<SemanticInfo>();
     SemanticInfo& info = *info_u;
 
-    sem::Type& rtype = *subscript_fun->const_function_ft.return_type;
+    sem::Type& rtype = *subscript_fun.const_function_ft.return_type;
     auto v = std::make_unique<Value>(rtype.clone());
     this->fill_value(*v);
     info.set_entity(v.release());

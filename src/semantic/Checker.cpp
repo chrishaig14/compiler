@@ -205,7 +205,7 @@ Class* Checker::instantiate_generic(const Class& generic, const ast::ObjectType&
     }
 
 
-    std::unordered_map<std::string, ConstFunction*> concrete_methods;
+    std::unordered_map<std::string, std::unique_ptr<ConstFunction>> concrete_methods;
     for (const auto& method_cf: generic.methods) {
         if (method_cf.second->implicit != nullptr) {
             Implicit* implicit = method_cf.second->implicit;
@@ -224,11 +224,11 @@ Class* Checker::instantiate_generic(const Class& generic, const ast::ObjectType&
                     ast::Type* t = (method_cf.second)->const_function_ft.to_ast();
                     ast::Type& concrete_type = *make_type(*t, replacements).release();
                     this->module.fill_actual(concrete_type);
-                    auto* cf = new ConstFunction(method_cf.second->path,
-                                                 sem::UTypeFunction((sem::TypeFunction*) concrete_type.to_sem()));
+                    auto cf = std::make_unique<ConstFunction>(method_cf.second->path,
+                                                              sem::UTypeFunction((sem::TypeFunction*) concrete_type.to_sem()));
                     std::cout << "Instantiated generic method " << method_cf.first << " : "
                               << cf->const_function_ft.to_string() << std::endl;
-                    concrete_methods[method_cf.first] = cf;
+                    concrete_methods[method_cf.first] = std::move(cf);
                 }
 
             } else {
@@ -236,21 +236,21 @@ Class* Checker::instantiate_generic(const Class& generic, const ast::ObjectType&
                 ast::Type* t = (method_cf.second)->const_function_ft.to_ast();
                 ast::Type& concrete_type = *make_type(*t, replacements).release();
                 this->module.fill_actual(concrete_type);
-                auto* cf = new ConstFunction(method_cf.second->path,
-                                             sem::UTypeFunction((sem::TypeFunction*) concrete_type.to_sem()));
+                auto cf = std::make_unique<ConstFunction>(method_cf.second->path,
+                                                          sem::UTypeFunction((sem::TypeFunction*) concrete_type.to_sem()));
                 std::cout << "Instantiated generic method " << method_cf.first << " : "
                           << cf->const_function_ft.to_string() << std::endl;
-                concrete_methods[method_cf.first] = cf;
+                concrete_methods[method_cf.first] = std::move(cf);
             }
         } else {
             ast::UTypeNode t((method_cf.second)->const_function_ft.to_ast());
             ast::UTypeNode concrete_type = make_type(*t, replacements);
             this->module.fill_actual(*concrete_type);
-            auto* cf = new ConstFunction(method_cf.second->path,
-                                         sem::UTypeFunction((sem::TypeFunction*) concrete_type->to_sem()));
+            auto cf = std::make_unique<ConstFunction>(method_cf.second->path,
+                                                       sem::UTypeFunction((sem::TypeFunction*) concrete_type->to_sem()));
             std::cout << "Instantiated generic method " << method_cf.first << " : " << cf->const_function_ft.to_string()
                       << std::endl;
-            concrete_methods[method_cf.first] = cf;
+            concrete_methods[method_cf.first] = std::move(cf);
         }
     }
 
@@ -265,7 +265,7 @@ Class* Checker::instantiate_generic(const Class& generic, const ast::ObjectType&
 
     auto* concrete = new Class(generic.class_name, generic.path);
     // concrete->class_name = ;
-    concrete->methods = concrete_methods;
+    concrete->methods = std::move(concrete_methods);
     concrete->static_methods = std::move(concrete_static_methods);
     concrete->member_names = generic.member_names;
     concrete->member_types = concrete_field_types;

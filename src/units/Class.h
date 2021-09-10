@@ -25,7 +25,7 @@ public:
     std::unordered_map<std::string, std::unique_ptr<Entity>> member_entities;
 
     MapStringType members;
-    std::unordered_map<std::string, ConstFunction*> methods;
+    std::unordered_map<std::string, std::unique_ptr<ConstFunction>> methods;
 
     std::map<std::string, std::pair<ast::Type*, ast::Node*>> static_members;
     std::unordered_map<std::string, std::unique_ptr<ConstFunction>> static_methods;
