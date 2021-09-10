@@ -273,7 +273,7 @@ Class* Checker::instantiate_generic(const Class& generic, const ast::ObjectType&
     for (size_t i = 0; i < generic.member_names.size(); i++) {
         std::string mn = generic.member_names[i];
         concrete->members[mn] = concrete_field_types[i];
-        concrete->member_entities[mn] = new EntityNothing();
+        concrete->member_entities[mn] = std::make_unique<EntityNothing>();
     }
     return concrete;
 }

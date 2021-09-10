@@ -22,7 +22,7 @@ public:
 
     VectorOfStrings member_names;
     std::vector<ast::Type*> member_types;
-    std::unordered_map<std::string, Entity*> member_entities;
+    std::unordered_map<std::string, std::unique_ptr<Entity>> member_entities;
 
     MapStringType members;
     std::unordered_map<std::string, ConstFunction*> methods;

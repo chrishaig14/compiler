@@ -97,11 +97,11 @@ USemanticInfo Checker::object_member(USNode object_snode, Value& p_value, const 
     Class* clazz = p_value.clazz;
     assert(clazz != nullptr);
     if (clazz->members.count(child) != 0) {
-        info.set_entity(clazz->member_entities.at(child));
+        info.set_entity(clazz->member_entities.at(child)->clone());
         if (info.entity.get().type == E_TYPE::NOTHING) {
             info.set_entity(entity_from_type(*clazz->members.at(child)));
-            clazz->member_entities[child] = &info.entity.get();
-            Value& ev = (Value&) info.entity.get();
+            clazz->member_entities[child] = std::unique_ptr<Entity>(info.entity.get().clone());
+            Value& ev = (Value&) *clazz->member_entities[child];
             this->fill_value(ev);
         }
         auto omn = std::make_unique<sem::ObjectMember>(std::move(object_snode), clazz->path, child);

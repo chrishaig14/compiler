@@ -117,7 +117,7 @@ USemanticInfo Checker::visit_tuple(ast::Tuple& node) {
         this->fill_value(*tv);
         const std::string& mem_name = std::to_string(i + 1);
         ov->clazz->members[mem_name] = tv->type.to_ast();
-        ov->clazz->member_entities[mem_name] = tv.release();
+        ov->clazz->member_entities[mem_name] = std::move(tv);
     }
     sinfo.set_entity(ov.release());
     auto nosn = std::make_unique<sem::NewObject>();
