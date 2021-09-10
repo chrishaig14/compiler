@@ -173,9 +173,9 @@ public:
     void fill_value(Value& value);
     std::unique_ptr<SemanticInfo> expect_rvalue_of_type(const sem::Type& target, ast::Node& node);
     void
-    process_function_arguments(SemanticInfo& retv, std::vector<Entity*>& arg_entities, std::vector<USNode>& arguments,
+    process_function_arguments(SemanticInfo& retv, std::vector<std::unique_ptr<Entity>>& arg_entities, std::vector<USNode>& arguments,
                                ast::Call& n, const sem::TypeFunction& function_type, SemanticInfo* fun_info_p);
-    bool check_arguments(ast::Call& n, std::vector<USNode>& arguments, std::vector<Entity*>& arg_entities);
+    bool check_arguments(ast::Call& n, std::vector<USNode>& arguments, std::vector<std::unique_ptr<Entity>>& arg_entities);
     USemanticInfo
     make_return_info(const ast::Call& n, bool is_rvalue, USemanticInfo retv, bool is_def_const, bool args_are_constant);
     USNode make_union_rvalue(USNode value_snode, const sem::Type* unaliased_value_type,

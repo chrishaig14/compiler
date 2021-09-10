@@ -42,7 +42,7 @@ USemanticInfo Checker::visit_call(ast::Call& n, bool is_rvalue) {
         }
     }
 
-    std::vector<Entity*> arg_entities;
+    std::vector<std::unique_ptr<Entity>> arg_entities;
     std::vector<USNode> arguments;
     bool has_error = check_arguments(n, arguments, arg_entities);
     if (has_error) {
@@ -184,7 +184,8 @@ USemanticInfo Checker::make_return_info(const ast::Call& n, bool is_rvalue, USem
     return retv_p;
 }
 
-bool Checker::check_arguments(ast::Call& n, std::vector<USNode>& arguments, std::vector<Entity*>& arg_entities) {
+bool Checker::check_arguments(ast::Call& n, std::vector<USNode>& arguments,
+                              std::vector<std::unique_ptr<Entity>>& arg_entities) {
     bool has_error;
     for (auto& arg: n.arguments) {
         USemanticInfo arg_type_p = this->dispatch(arg);
@@ -193,10 +194,10 @@ bool Checker::check_arguments(ast::Call& n, std::vector<USNode>& arguments, std:
             continue;
         }
 
-        Entity* x = arg_type_p->entity.get().clone();
-        arg_entities.push_back(x);
-        arguments.push_back(std::move(arg_type_p->snode));
+        std::unique_ptr<Entity> x(arg_type_p->entity.get().clone());
         Entity& arg_entity = *x;
+        arg_entities.push_back(std::move(x));
+        arguments.push_back(std::move(arg_type_p->snode));
         if (arg_entity.type == E_TYPE::CLASS || arg_entity.type == E_TYPE::PACKAGE ||
             arg_entity.type == E_TYPE::MODULE || arg_entity.type == E_TYPE::ENUM ||
             arg_entity.type == E_TYPE::NOTHING) {
@@ -208,7 +209,7 @@ bool Checker::check_arguments(ast::Call& n, std::vector<USNode>& arguments, std:
     return has_error;
 }
 
-void Checker::process_function_arguments(SemanticInfo& retv, std::vector<Entity*>& arg_entities,
+void Checker::process_function_arguments(SemanticInfo& retv, std::vector<std::unique_ptr<Entity>>& arg_entities,
                                          std::vector<USNode>& arguments, ast::Call& n,
                                          const sem::TypeFunction& function_type, SemanticInfo* fun_info_p) {
     retv.set_entity(entity_from_type(*function_type.return_type->to_ast()));
