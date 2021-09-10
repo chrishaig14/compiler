@@ -212,7 +212,8 @@ bool Checker::check_arguments(ast::Call& n, std::vector<USNode>& arguments,
 void Checker::process_function_arguments(SemanticInfo& retv, std::vector<std::unique_ptr<Entity>>& arg_entities,
                                          std::vector<USNode>& arguments, ast::Call& n,
                                          const sem::TypeFunction& function_type, SemanticInfo* fun_info_p) {
-    retv.set_entity(entity_from_type(*function_type.return_type->to_ast()));
+    ast::UTypeNode rtype(function_type.return_type->to_ast());
+    retv.set_entity(entity_from_type(*rtype));
     int sni = static_cast<int>(fun_info_p->this_arg != nullptr);
     for (size_t i = 0; i < n.arguments.size(); i++) {
         // const ast::TypeNode& arg_type = *arg_types[i];
