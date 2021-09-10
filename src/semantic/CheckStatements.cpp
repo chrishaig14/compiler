@@ -345,7 +345,7 @@ USemanticInfo Checker::visit_for(ast::For& node) {
     USemanticInfoBlock binfo = this->visit_block(node.body);
     this->scope->is_loop = false;
     sem::Block* bn = (binfo->snode).release();
-    for (auto local_var : this->scope->table) {
+    for (auto& local_var : this->scope->table) {
         if (local_var.second->type == E_TYPE::VALUE) {
             bn->locals.push_back(local_var.first);
         }
@@ -390,14 +390,14 @@ USemanticInfo Checker::visit_while(ast::While& node) {
     this->scope->is_loop = true;
     USemanticInfoBlock body_info_p = this->visit_block(*node.body);
     this->scope->is_loop = false;
-    for (auto v : this->scope->table) {
+    // for (auto& v : this->scope->table) {
         // if (v.second->type == E_TYPE::OBJECT_VALUE) {
         //     node.body->local_vars.push_back(std::make_pair(v.first, ((ObjectValue*) v.second)->ot));
         // }
         // if (v.second->type == E_TYPE::FUNCTION_VALUE) {
         //     node.body->local_vars.push_back(std::make_pair(v.first, ((FunctionValue*) v.second)->ft));
         // }
-    }
+    // }
     this->leave_scope();
 
     auto while_sn = std::make_unique<sem::While>(std::move(condition_snode), std::move(body_info_p->snode));

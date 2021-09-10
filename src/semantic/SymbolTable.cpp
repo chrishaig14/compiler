@@ -48,14 +48,14 @@ void SymbolTable::set(const std::string& name, const Entity& info) {
         this->ret = info.clone();
         return;
     }
-    this->table[name] = info.clone();
+    this->table[name] = std::unique_ptr<Entity>(info.clone());
 }
 
 std::vector<std::pair<std::string, ast::Type*>> SymbolTable::get_all_in_loop() {
     if (this->is_loop) {
         std::vector<std::pair<std::string, ast::Type*>> r;
 
-        for (auto v: this->table) {
+        for (auto& v: this->table) {
             ast::Type* t;
             // if (v.second->type == E_TYPE::FUNCTION_VALUE) {
             //     t = ((FunctionValue*) v.second)->ft;
@@ -71,7 +71,7 @@ std::vector<std::pair<std::string, ast::Type*>> SymbolTable::get_all_in_loop() {
 
         auto p = this->parent->get_all_in_loop();
         r.insert(r.end(), p.begin(), p.end());
-        for (auto v: this->table) {
+        for (auto& v: this->table) {
             ast::Type* t;
             // if (v.second->type == E_TYPE::FUNCTION_VALUE) {
             //     t = ((FunctionValue*) v.second)->ft;

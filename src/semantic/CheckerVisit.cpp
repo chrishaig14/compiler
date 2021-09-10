@@ -310,7 +310,7 @@ USemanticInfo Checker::visit_function(ast::Function& n) {
     this->scope->set("__return__", *entity_from_type(returnType));
     USemanticInfoBlock body_info = this->visit_block(*n.body);
     auto& bn = body_info->snode;
-    for (auto local_var: this->scope->table) {
+    for (auto& local_var: this->scope->table) {
         if (local_var.second->type == E_TYPE::VALUE) {
             bn->locals.push_back(local_var.first);
         }
