@@ -46,7 +46,8 @@ bool Checker::assert_type_exists(const ast::Type& type, TextPosition pos) {
             return true;
         }
         if (type.object().type_params.empty()) {
-            if (!is_generic(*type.to_sem())) {
+            sem::UType p_type(type.to_sem());
+            if (!is_generic(*p_type)) {
                 // if (this->imported_paths.count(type.object().id) == 0) {
                 //     this->error_class_not_found(type, {1, 1});
                 //     return false;
