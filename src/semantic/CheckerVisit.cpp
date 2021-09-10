@@ -307,7 +307,11 @@ USemanticInfo Checker::visit_function(ast::Function& n) {
 
     ast::Type& returnType = *n.return_type;
     this->assert_type_exists(returnType, n.start);
-    this->scope->set("__return__", *entity_from_type(returnType));
+    std::cout << "here" << std::endl;
+    Entity* w = entity_from_type(returnType);
+    std::unique_ptr<Entity> e(w);
+    std::cout << "there" << std::endl;
+    this->scope->set("__return__", *e);
     USemanticInfoBlock body_info = this->visit_block(*n.body);
     auto& bn = body_info->snode;
     for (auto& local_var: this->scope->table) {

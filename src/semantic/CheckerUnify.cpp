@@ -200,19 +200,16 @@ Entity* Checker::entity_from_type(const ast::Type& type) {
     }
     if (type.kind == Kind::FUNCTION) {
         auto fv = std::make_unique<Value>(type.to_sem());
-        auto* vp = fv.release();
-        this->entities[type.to_string()] = vp;
-        return vp;
+        this->entities[type.to_string()] = std::unique_ptr<Entity>(fv->clone());
+        return fv.release();
     }
     if (type.kind == Kind::OBJECT) {
         if (type.object().id == ".None") {
-            auto* e = new EntityNothing();
-            this->entities[type.to_string()] = e;
-            return e;
+            this->entities[type.to_string()] = std::make_unique<EntityNothing>();
+            return new EntityNothing();
         }
     }
     auto fv = std::make_unique<Value>(type.to_sem());
-    auto* e = fv.release();
-    this->entities[type.to_string()] = e;
-    return e;
+    this->entities[type.to_string()] = std::unique_ptr<Entity>(fv->clone());
+    return fv.release();
 }

@@ -83,7 +83,7 @@ class Checker {
     std::map<std::string, std::unique_ptr<Value>> entity_values_no_generic;
     std::unordered_map<std::string, SymbolTable*> scopes;
     SymbolTable* scope;
-    std::map<std::string, Entity*> entities;
+    std::map<std::string, std::unique_ptr<Entity>> entities;
 public:
     Module& module;
     bool is_call;
