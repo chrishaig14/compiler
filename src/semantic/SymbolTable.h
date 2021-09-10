@@ -14,7 +14,7 @@
 
 
 class SymbolTable {
-    Entity* ret;
+    std::unique_ptr<Entity> ret;
 
 public:
     SymbolTable(const std::string& name, SymbolTable* parent);

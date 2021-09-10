@@ -45,7 +45,7 @@ bool SymbolTable::declared(const std::string& name) {
 
 void SymbolTable::set(const std::string& name, const Entity& info) {
     if (name == "__return__") {
-        this->ret = info.clone();
+        this->ret = std::unique_ptr<Entity>(info.clone());
         return;
     }
     this->table[name] = std::unique_ptr<Entity>(info.clone());
