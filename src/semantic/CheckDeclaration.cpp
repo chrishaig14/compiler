@@ -148,7 +148,7 @@ USemanticInfo Checker::check_declaration_with_type(ast::Declaration& n) {
     } else {
         this->module.fill_actual(*type);
     }
-    sem::Type* sem_type = type->to_sem();
+    sem::UType sem_type(type->to_sem());
     USemanticInfo rvalue_sinfo = this->expect_rvalue_of_type(*sem_type, n.expression);
     if (rvalue_sinfo->is_error()) {
         return error_stub();
@@ -157,7 +157,7 @@ USemanticInfo Checker::check_declaration_with_type(ast::Declaration& n) {
     SemanticInfo& info = *info_u;
     USNode up = std::move(rvalue_sinfo->snode);
     info.snode = std::make_unique<sem::Declaration>(n.identifier, std::move(up));
-    auto ov = std::make_unique<Value>(sem_type);
+    auto ov = std::make_unique<Value>(sem_type.release());
     this->fill_value(*ov);
     info.set_entity(ov.release());
     return info_u;
