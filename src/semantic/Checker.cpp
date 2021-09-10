@@ -241,7 +241,7 @@ Class* Checker::instantiate_generic(const Class& generic, const ast::ObjectType&
                 concrete_methods[method_cf.first] = cf;
             }
         } else {
-            ast::Type* t = (method_cf.second)->const_function_ft.to_ast();
+            ast::UTypeNode t((method_cf.second)->const_function_ft.to_ast());
             ast::Type& concrete_type = *make_type(*t, replacements).release();
             this->module.fill_actual(concrete_type);
             auto* cf = new ConstFunction(method_cf.second->path,
