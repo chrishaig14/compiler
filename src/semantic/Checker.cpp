@@ -242,10 +242,10 @@ Class* Checker::instantiate_generic(const Class& generic, const ast::ObjectType&
             }
         } else {
             ast::UTypeNode t((method_cf.second)->const_function_ft.to_ast());
-            ast::Type& concrete_type = *make_type(*t, replacements).release();
-            this->module.fill_actual(concrete_type);
+            ast::UTypeNode concrete_type = make_type(*t, replacements);
+            this->module.fill_actual(*concrete_type);
             auto* cf = new ConstFunction(method_cf.second->path,
-                                         sem::UTypeFunction((sem::TypeFunction*) concrete_type.to_sem()));
+                                         sem::UTypeFunction((sem::TypeFunction*) concrete_type->to_sem()));
             std::cout << "Instantiated generic method " << method_cf.first << " : " << cf->const_function_ft.to_string()
                       << std::endl;
             concrete_methods[method_cf.first] = cf;
