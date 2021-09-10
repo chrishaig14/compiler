@@ -23,6 +23,11 @@ public:
         this->entity = *e;
     }
 
+    void set_entity(std::unique_ptr<Entity> e) {
+        this->_entity = std::move(e);
+        this->entity = *this->_entity;
+    }
+
     USNode snode;
     bool is_tuple_member;
     ~SemanticInfo();

@@ -95,7 +95,7 @@ public:
     Checker(Package& top_package, Module& module);
     ~Checker();
 
-    Entity* entity_from_type(const ast::Type& type);
+    std::unique_ptr<Entity> entity_from_type(const ast::Type& type);
 
     bool is_immutable(const ast::Type& node);
     void enter_scope(const std::string& name);

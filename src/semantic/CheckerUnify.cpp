@@ -193,23 +193,23 @@ USemanticInfo Checker::enum_member(Enum* enumm, const std::string& value, ast::M
     return error_stub();
 }
 
-Entity* Checker::entity_from_type(const ast::Type& type) {
+std::unique_ptr<Entity> Checker::entity_from_type(const ast::Type& type) {
     if (this->entities.count(type.to_string()) == 1) {
         std::cout << "Entity already found, not copying!!!" << std::endl;
-        return this->entities[type.to_string()]->clone();
+        return std::unique_ptr<Entity>(this->entities[type.to_string()]->clone());
     }
     if (type.kind == Kind::FUNCTION) {
         auto fv = std::make_unique<Value>(type.to_sem());
         this->entities[type.to_string()] = std::unique_ptr<Entity>(fv->clone());
-        return fv.release();
+        return fv;
     }
     if (type.kind == Kind::OBJECT) {
         if (type.object().id == ".None") {
             this->entities[type.to_string()] = std::make_unique<EntityNothing>();
-            return new EntityNothing();
+            return std::make_unique<EntityNothing>();
         }
     }
     auto fv = std::make_unique<Value>(type.to_sem());
     this->entities[type.to_string()] = std::unique_ptr<Entity>(fv->clone());
-    return fv.release();
+    return fv;
 }

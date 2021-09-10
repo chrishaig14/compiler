@@ -283,7 +283,7 @@ USemanticInfo Checker::visit_function(ast::Function& n) {
         ast::UTypeNode cl(type.clone());
         make_not_generic(*cl);
         auto te = entity_from_type(*cl);
-        this->fill_value(*((Value*) te));
+        this->fill_value(*((std::unique_ptr<Value>&) te));
         this->scope->set(n.parameter_names[i], *te);
         // if (!param_type.is_generic()) {
         //     if (param_type.kind == Kind::OBJECT) {
@@ -308,8 +308,7 @@ USemanticInfo Checker::visit_function(ast::Function& n) {
     ast::Type& returnType = *n.return_type;
     this->assert_type_exists(returnType, n.start);
     std::cout << "here" << std::endl;
-    Entity* w = entity_from_type(returnType);
-    std::unique_ptr<Entity> e(w);
+    std::unique_ptr<Entity> e = entity_from_type(returnType);
     std::cout << "there" << std::endl;
     this->scope->set("__return__", *e);
     USemanticInfoBlock body_info = this->visit_block(*n.body);
