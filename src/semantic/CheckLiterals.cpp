@@ -259,7 +259,7 @@ USemanticInfo Checker::visit_list(ast::List& node) {
         return error_stub();
     }
     Value& entity_value = (Value&) element_type_p->entity.get();
-    sem::Type* element_type = entity_value.type.clone();
+    sem::Type& element_type = entity_value.type;
     bool is_constant = true;
     std::vector<USNode> list_elements;
     list_elements.push_back(std::move(element_type_p->snode));
@@ -272,8 +272,8 @@ USemanticInfo Checker::visit_list(ast::List& node) {
         // }
         Value& p_entity = (Value&) current_type_p->entity.get();
         sem::TypeObject* ctype = &p_entity.type.object();
-        if (*ctype != *element_type) {
-            this->error_reporter.error(std::make_unique<ErrorTypeMismatch>(*element_type,
+        if (*ctype != element_type) {
+            this->error_reporter.error(std::make_unique<ErrorTypeMismatch>(element_type,
                                                                            node.elements[i],
                                                                            p_entity));
         }
@@ -285,7 +285,7 @@ USemanticInfo Checker::visit_list(ast::List& node) {
     return_info.is_constant = is_constant;
 
     return_info.snode = std::make_unique<sem::List>(std::move(list_elements));
-    auto* otype = new sem::TypeObject("List", {element_type->clone()}, Path("core.core.List"));
+    auto* otype = new sem::TypeObject("List", {element_type.clone()}, Path("core.core.List"));
     auto p_value = std::make_unique<Value>(otype);
     this->fill_value(*p_value);
     return_info.set_entity(p_value.release());
