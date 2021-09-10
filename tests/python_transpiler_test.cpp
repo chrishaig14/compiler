@@ -60,8 +60,6 @@ TEST_CASE("python_transpile_while", "[checker]") {
 
 TEST_CASE("python_transpile_function_def", "[checker]") {
     PythonTranspiler pt;
-    sem::Block* then = new sem::Block();
-    then->nodes.emplace_back(new sem::Assignment(std::make_unique<sem::Id>("x"), std::make_unique<sem::Integer>("99")));
     auto body = std::make_unique<sem::Block>();
     body->nodes.emplace_back(new sem::Assignment(std::make_unique<sem::Id>("x"), std::make_unique<sem::Integer>("99")));
     PythonOutputCode poc = pt.transpile_function(sem::FunctionDef("myfoo", {"a", "b"}, std::move(body)));
