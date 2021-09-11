@@ -10,5 +10,5 @@ ConstFunction::ConstFunction(Path path, sem::UTypeFunction ft)
 }
 
 ConstFunction::~ConstFunction() {
-    std::cout << "Destroyinh CONST FUnction!" << std::endl;
+    // std::cout << "Destroyinh CONST FUnction!" << std::endl;
 }
