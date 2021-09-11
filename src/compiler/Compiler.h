@@ -57,8 +57,8 @@ public:
     void add_global_path_to_module(Module& module, Path path);
 
 
-    void parse_single_module(Module& module);
-    void parse_all_modules(Package& package);
+    void parse_module(Module& module);
+    void parse_package(Package& package);
     void transpile_all_modules(Package& package, const std::string& output_dir, bool is_top);
     void transpile_one_module(Module& module, std::string& package_header, const std::string& output_package_dir,
                               Package& package, std::string static_initializations, std::string& static_cleanups);
