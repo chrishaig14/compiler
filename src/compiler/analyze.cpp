@@ -135,15 +135,6 @@ void add_local_path_to_module(Module& module, Path path, Package& top_package) {
         }
         path_so_far += "." + path_part;
     }
-
-    std::string included_header;
-    if (last_flirpin.type == F_TYPE::PACKAGE) {
-        included_header = last_flirpin.package->full_header_path;
-        module.included_module_paths[last_flirpin.package->name] = included_header;
-    } else {
-        included_header = last_flirpin.module->full_header_path;
-        module.included_module_paths[last_flirpin.module->name] = included_header;
-    }
     module.flirpins[path.as_vec().back()] = current_flirpin;
 }
 

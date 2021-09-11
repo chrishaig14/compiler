@@ -13,7 +13,7 @@ TEST_CASE("global_main", "[parser]") {
     scanner.load_text(code);
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser("test", scanner.code_lines, tokens, "main");
-    Module module(Path("main.foo"), "foo.xl", ".", false, "main.h");
+    Module module(Path("main.foo"), "foo.xl", ".", false);
     module.ast = parser.parse_module();
     GlobalProcessor gp(module);
     gp.visit_root();
@@ -35,7 +35,7 @@ TEST_CASE("global_class", "[parser]") {
     scanner.load_text(code);
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser("test", scanner.code_lines, tokens, "main");
-    Module module(Path("main.foo"), "foo.xl", ".", false, "main.h");
+    Module module(Path("main.foo"), "foo.xl", ".", false);
     module.ast = parser.parse_module();
     GlobalProcessor gp(module);
     gp.visit_root();
@@ -80,7 +80,7 @@ TEST_CASE("global_multiple", "[parser]") {
     scanner.load_text(code);
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser("test", scanner.code_lines, tokens, "main");
-    Module module(Path("main.foo"), "foo.xl", ".", false, "main.h");
+    Module module(Path("main.foo"), "foo.xl", ".", false);
     module.ast = parser.parse_module();
     GlobalProcessor gp(module);
     gp.visit_root();

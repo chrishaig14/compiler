@@ -136,11 +136,7 @@ void Compiler::load_module(Package& package, const std::string& d_name) {
         all_modules.push_back(module_rel_path);
     }
     std::string module_name = d_name.substr(0, d_name.size() - 3);
-    auto* module = new Module(Path(package.path, module_name),
-                              module_abs_path,
-                              module_rel_path,
-                              package.is_lib,
-                              path_join(package.header_parent_path, module_name + ".h"));
+    auto* module = new Module(Path(package.path, module_name), module_abs_path, module_rel_path, package.is_lib);
     this->my_modules.push_back(std::unique_ptr<Module>(module));
     package.units[module_name] = Unit{.type=U_TYPE::MODULE, .module=module};
 }

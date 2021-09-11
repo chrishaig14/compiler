@@ -23,7 +23,6 @@ public:
     const std::string name;
     const std::string abs_path;
     const bool is_lib;
-    const std::string full_header_path;
 
     const Path path;
     std::vector<std::unique_ptr<ConstFunction>> const_functions;
@@ -43,7 +42,7 @@ public:
     std::map<std::string, Flirpin> flirpins;
 
     Flirpin get(Path p);
-    Module(Path path, std::string abs_path, std::string rel_path, bool is_lib, std::string full_header_path);
+    Module(Path path, std::string abs_path, std::string rel_path, bool is_lib);
 
     ~Module() {
         std::cout << "CALLING MODULE DESTRUCTOR!!!" << std::endl;
