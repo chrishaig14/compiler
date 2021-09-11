@@ -287,8 +287,9 @@ USemanticInfo Checker::visit_list(ast::List& node) {
 
     return_info.snode = std::make_unique<sem::List>(std::move(list_elements));
     auto* otype = new sem::TypeObject("List", {element_type.clone()}, Path("core.core.List"));
-    auto p_value = std::make_unique<Value>(otype);
-    this->fill_value(*p_value);
+    // auto p_value = std::make_unique<Value>(otype);
+    // this->fill_value(*p_value);
+    auto p_value = this->make_value(otype);
     return_info.set_entity(p_value.release());
     return return_info_p;
 }
