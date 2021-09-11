@@ -400,8 +400,9 @@ USemanticInfo Checker::visit_ternary(ast::Ternary& node) {
     }
     auto false_case_snode = std::move(false_case_sinfo->snode);
 
-    auto rv = std::make_unique<Value>(true_value.type.clone());
-    this->fill_value(*rv);
+    // auto rv = std::make_unique<Value>(true_value.type.clone());
+    // this->fill_value(*rv);
+    auto rv = this->make_value(true_value.type.clone());
     USemanticInfo info_u = std::make_unique<SemanticInfo>();
     SemanticInfo& info = *info_u;
     info.set_entity(rv.release());
