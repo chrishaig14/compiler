@@ -114,8 +114,9 @@ USemanticInfo Checker::visit_tuple(ast::Tuple& node) {
 
     ov->clazz = new Class("Tuple", Path("core.core.Tuple"));
     for (size_t i = 0; i < ov->type.object().type_params.size(); i++) {
-        auto tv = std::make_unique<Value>(ov->type.object().type_params[i]->clone());
-        this->fill_value(*tv);
+        // auto tv = std::make_unique<Value>(ov->type.object().type_params[i]->clone());
+        // this->fill_value(*tv);
+        auto tv = this->make_value(ov->type.object().type_params[i]->clone());
         const std::string& mem_name = std::to_string(i + 1);
         ov->clazz->members[mem_name] = tv->type.to_ast();
         ov->clazz->member_entities[mem_name] = std::move(tv);
