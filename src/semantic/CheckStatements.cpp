@@ -262,7 +262,8 @@ USemanticInfo Checker::visit_match(ast::Match& node) {
 
         this->module.fill_actual(case_type);
 
-        int union_index = target_union_type(ot, *case_type.to_sem());
+        sem::Type* p_type = case_type.to_sem();
+        int union_index = target_union_type(ot, *p_type);
         if (union_index == -1) {
             this->error_reporter.fail("Error, type " + case_type.to_string() + " not part of " + ot.to_string());
             return error_stub();
@@ -270,7 +271,7 @@ USemanticInfo Checker::visit_match(ast::Match& node) {
         this->enter_scope("case");
         // auto v = std::make_unique<Value>(case_type.to_sem());
         // this->fill_value(*v);
-        auto v = this->make_value(case_type.to_sem());
+        auto v = this->make_value(p_type);
         assert(v->clazz != nullptr);
         Entity* ent = v.release();
         this->scope->set(case_id, *ent);
