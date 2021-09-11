@@ -38,6 +38,10 @@ bool Type::is_generic() const {
     return false;
 }
 
+Type::Type(Kind kind) : kind(kind) {
+
+}
+
 std::ostream& operator<<(std::ostream& o, const ast::Type& t) {
     o << t.to_string();
     return o;

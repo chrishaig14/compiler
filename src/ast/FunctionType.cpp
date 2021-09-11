@@ -7,8 +7,8 @@
 
 using namespace ast;
 
-FunctionType::FunctionType(ast::VectorOfTypes parameterTypes, ast::UTypeNode returnType) : return_type(std::move(
-        returnType)) {
+FunctionType::FunctionType(ast::VectorOfTypes parameterTypes, ast::UTypeNode returnType)
+        : Type(Kind::FUNCTION), return_type(std::move(returnType)) {
 
     for (auto* p: parameterTypes) {
         assert(p != nullptr);
@@ -18,7 +18,6 @@ FunctionType::FunctionType(ast::VectorOfTypes parameterTypes, ast::UTypeNode ret
     for (auto* p: parameterTypes) {
         this->param_types.push_back(ast::UTypeNode(p));
     }
-    this->kind = Kind::FUNCTION;
 }
 
 ast::FunctionType* ast::FunctionType::clone() const {
