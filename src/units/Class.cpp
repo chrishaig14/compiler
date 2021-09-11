@@ -26,7 +26,7 @@ bool Class::operator==(const Class& b) const {
 }
 
 Class::~Class() {
-    std::cout << "CALLING CLASS DESTRUCTOR!" << std::endl;
+    // std::cout << "CALLING CLASS DESTRUCTOR!" << std::endl;
     for (const auto& m: this->members) {
         delete m.second;
     }
