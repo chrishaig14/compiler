@@ -233,8 +233,9 @@ USemanticInfo Checker::visit_binop(ast::BinaryOp& n) {
 
     USemanticInfo info_u = std::make_unique<SemanticInfo>();
     SemanticInfo& info = *info_u;
-    auto v = std::make_unique<Value>(rettype);
-    this->fill_value(*v);
+    // auto v = std::make_unique<Value>(rettype);
+    // this->fill_value(*v);
+    auto v = this->make_value(rettype);
     info.set_entity(v.release());
     info.snode = std::move(sn);
     return info_u;
