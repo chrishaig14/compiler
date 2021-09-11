@@ -57,8 +57,9 @@ USemanticInfo Checker::visit_lvalue_subscript(ast::Subscript& node) {
 
     USemanticInfo info_u = std::make_unique<SemanticInfo>();
     SemanticInfo& info = *info_u;
-    auto value = std::make_unique<Value>(rtype.clone());
-    this->fill_value(*value);
+    // auto value = std::make_unique<Value>(rtype.clone());
+    // this->fill_value(*value);
+    auto value = this->make_value(rtype.clone());
     info.set_entity(value.release());
 
     auto fsn = std::make_unique<sem::Id>(sub_fun_path);
