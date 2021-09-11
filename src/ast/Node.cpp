@@ -19,11 +19,11 @@ bool ast::Node::operator!=(const ast::Node& other) const {
 }
 
 Node::~Node() {
-    std::cout << "Destructor for " << this << " called" << std::endl;
+    // std::cout << "Destructor for " << this << " called" << std::endl;
 }
 
 bool ast::Node::equal(const ast::Node& other) const {
-    std::cout << "BASE NODE for " << this << " EQUAL CALLED!" << std::endl;
+    // std::cout << "BASE NODE for " << this << " EQUAL CALLED!" << std::endl;
     return false;
 }
 
