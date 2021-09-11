@@ -202,9 +202,11 @@ USemanticInfo Checker::visit_dict(ast::DictNode& node) {
     if (has_error) {
         return error_stub();
     }
-    auto ov = std::make_unique<Value>(new sem::TypeObject("Dict", {first_key_type.clone(), first_value_type.clone()}));
-    this->module.fill_actual(ov->type);
-    this->fill_value(*ov);
+    sem::TypeObject* type = new sem::TypeObject("Dict", {first_key_type.clone(), first_value_type.clone()});
+    this->module.fill_actual(*type);
+    // auto ov = std::make_unique<Value>(type);
+    // this->fill_value(*ov);
+    auto ov = this->make_value(type);
     assert(ov->clazz != nullptr);
     info.set_entity(ov.release());
     info.snode = std::make_unique<sem::Dict>(std::move(items));
