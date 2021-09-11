@@ -207,9 +207,9 @@ void Compiler::load_package(Package& package, int level) {
     }
 }
 
-void Compiler::load_library(const std::string& name, const std::string& version) {
-    std::string lib_rel_out_path = path_join(path_join(path_join(name, version), "out"), name);
-    std::string lib_rel_top_unit_path = path_join(path_join(name, version), "src");
+void Compiler::load_library(const std::string& name, const std::string& lib_version) {
+    std::string lib_rel_out_path = path_join(path_join(path_join(name, lib_version), "out"), name);
+    std::string lib_rel_top_unit_path = path_join(path_join(name, lib_version), "src");
     std::string abs_top_unit_path = path_join(lib_path, lib_rel_top_unit_path);
     if (loaded_top_units.count(lib_rel_top_unit_path) != 0) {
         // skip, already loaded
@@ -217,7 +217,7 @@ void Compiler::load_library(const std::string& name, const std::string& version)
     }
     DIR* dir = opendir(abs_top_unit_path.c_str());
     if (dir == nullptr) {
-        std::cout << "Top unit " << name + "==" + version << " NOT FOUND" << std::endl;
+        std::cout << "Top unit " << name + "==" + lib_version << " NOT FOUND" << std::endl;
         return;
     }
     closedir(dir);
@@ -241,8 +241,8 @@ void Compiler::load_library(const std::string& name, const std::string& version)
     this->loaded_top_units[lib_rel_top_unit_path] = true;
 }
 
-void Compiler::load_top_unit(const std::string& name, const std::string& version, bool is_lib) {
-    std::string lib_rel_top_unit_path = path_join(name, version);
+void Compiler::load_top_unit(const std::string& name, const std::string& m_version, bool m_is_lib) {
+    std::string lib_rel_top_unit_path = path_join(name, m_version);
     std::string abs_top_unit_path = path_join(lib_path, lib_rel_top_unit_path);
     if (loaded_top_units.count(lib_rel_top_unit_path) != 0) {
         // skip, already loaded
@@ -250,7 +250,7 @@ void Compiler::load_top_unit(const std::string& name, const std::string& version
     }
     DIR* dir = opendir(abs_top_unit_path.c_str());
     if (dir == nullptr) {
-        std::cout << "Top unit " << name + "==" + version << " NOT FOUND" << std::endl;
+        std::cout << "Top unit " << name + "==" + m_version << " NOT FOUND" << std::endl;
         return;
     }
     std::cout << "Loading top unit: " << E_HLT(name) << " at path: " << E_HLT(abs_top_unit_path) << std::endl;
@@ -263,7 +263,7 @@ void Compiler::load_top_unit(const std::string& name, const std::string& version
     auto* top_unit_package = new Package(Path(name),
                                          abs_top_unit_path,
                                          lib_rel_top_unit_path,
-                                         is_lib,
+                                         m_is_lib,
                                          path_join(path_join(path_join(lib_rel_top_unit_path, "out"), name),
                                                    "__package__.h"),
                                          path_join(path_join(lib_rel_top_unit_path, "out"), name));

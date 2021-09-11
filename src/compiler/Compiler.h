@@ -66,8 +66,8 @@ public:
     void load_module(Package& package, const std::string& d_name);
 
     void load_package(Package& package, int level);
-    void load_library(const std::string& name, const std::string& version);
-    void load_top_unit(const std::string& name, const std::string& version, bool is_lib);
+    void load_library(const std::string& name, const std::string& lib_version);
+    void load_top_unit(const std::string& name, const std::string& m_version, bool m_is_lib);
     void transpile_one_module(Module& module, std::string& package_header, const std::string& output_package_dir,
                               Package& package);
 
