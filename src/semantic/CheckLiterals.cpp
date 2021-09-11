@@ -220,9 +220,10 @@ USemanticInfo Checker::visit_emptydict(ast::EmptyDict& node) {
                                               {node.key_type->to_sem(), node.value_type->to_sem()},
                                               Path("core.core.Dict"));
     // ot->data.actual_base_path = Path("core.core.Dict");
-    auto ov = std::make_unique<Value>(ot);
-    this->module.fill_actual(ov->type);
-    this->fill_value(*ov);
+    this->module.fill_actual(*ot);
+    // auto ov = std::make_unique<Value>(ot);
+    // this->fill_value(*ov);
+    auto ov = this->make_value(ot);
     assert(ov->clazz != nullptr);
     info.set_entity(ov.release());
     info.snode = std::make_unique<sem::Dict>(std::vector<std::pair<USNode, USNode>>{});
