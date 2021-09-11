@@ -352,8 +352,9 @@ USemanticInfo Checker::visit_subscript(ast::Subscript& node) {
     SemanticInfo& info = *info_u;
 
     sem::Type& rtype = *subscript_fun.const_function_ft.return_type;
-    auto v = std::make_unique<Value>(rtype.clone());
-    this->fill_value(*v);
+    // auto v = std::make_unique<Value>(rtype.clone());
+    // this->fill_value(*v);
+    auto v = this->make_value(rtype.clone());
     info.set_entity(v.release());
 
     auto fsn = std::make_unique<sem::Id>(sub_fun_path);
