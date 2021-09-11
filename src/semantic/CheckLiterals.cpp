@@ -69,8 +69,9 @@ USemanticInfo Checker::visit_emptylist(ast::EmptyList& node) {
     SemanticInfo& info = *info_u;
     this->module.fill_actual(*node.type);
     auto* otype = new sem::TypeObject("List", {node.type->to_sem()}, Path("core.core.List"));
-    auto ov = std::make_unique<Value>(otype);
-    this->fill_value(*ov);
+    // auto ov = std::make_unique<Value>(otype);
+    // this->fill_value(*ov)
+    auto ov = this->make_value(otype);
     info.set_entity(ov.release());
     std::vector<USNode> v;
     info.snode = std::make_unique<sem::List>(std::move(v));

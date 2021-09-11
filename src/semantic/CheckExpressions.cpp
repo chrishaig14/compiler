@@ -239,6 +239,43 @@ USemanticInfo Checker::visit_binop(ast::BinaryOp& n) {
     return info_u;
 }
 
+std::unique_ptr<Value> Checker::make_value(sem::Type* type) {
+    if (type->kind != sem::Kind::OBJECT) {
+        return nullptr;
+    }
+    if (type->object().id.size() == 1) {
+        Entity& e = this->scope->get(type->object().id);
+        Class* clazz;
+        if (e.type == E_TYPE::NOT_FOUND) {
+            clazz = new Class(type->object().id, Path("core.generics" + type->object().id));
+            // clazz->class_name = value.type->object().id;
+        } else {
+            clazz = ((EntityClass&) e).clazz;
+        }
+        // assert(e.type == E_TYPE::CLASS);
+        // value.clazz = clazz;
+        // value.metatype = Meta::CLASS;
+        return std::make_unique<Value>(type, clazz);
+    }
+    Flirpin flirpin = this->top_package.get(type->object().data.actual_base_path);
+    if (flirpin.type == F_TYPE::ENUM) {
+        auto value = std::make_unique<Value>(type);
+        value->enumm = flirpin.enumm;
+        value->metatype = Meta::ENUM;
+        return value;
+    }
+    Class* cls = flirpin.clazz;
+    if (!cls->type_params.empty()) {
+        std::cout << "Instantiating type " << type->object().to_string() << std::endl;
+        ast::UObjectType o(&type->object().to_ast()->object());
+        cls = instantiate_generic(*cls, *o);
+        std::cout << "Done instantiating" << std::endl;
+    }
+    // value.metatype = Meta::CLASS;
+    // value.clazz = cls;
+    return std::make_unique<Value>(type, cls);
+}
+
 void Checker::fill_value(Value& value) {
     if (value.type.kind != sem::Kind::OBJECT) {
         return;
@@ -291,9 +328,7 @@ USemanticInfo Checker::visit_subscript(ast::Subscript& node) {
     assert(cls != nullptr);
     auto subscript_it = cls->methods.find("__get_item__");
     if (subscript_it == cls->methods.end()) {
-        this->error_reporter.error(std::make_unique<ErrorObjectNoSpecialMethod>(value.type,
-                                                                                "__get_item__",
-                                                                                node));
+        this->error_reporter.error(std::make_unique<ErrorObjectNoSpecialMethod>(value.type, "__get_item__", node));
         return error_stub();
     }
     ConstFunction& subscript_fun = *subscript_it->second;

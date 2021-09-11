@@ -189,6 +189,7 @@ public:
     Value& entity_value_from_actual_base_path_no_generic(const Path& p);
 
     std::map<std::string, std::unique_ptr<Class>> classes;
+    std::unique_ptr<Value> make_value(sem::Type* type);
 };
 
 #endif //CHECKER_H

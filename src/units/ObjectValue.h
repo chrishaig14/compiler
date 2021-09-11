@@ -31,6 +31,13 @@ public:
         this->_type = sem::UType(type);
     }
 
+    Value(sem::Type* type, Class* cls) : Entity(E_TYPE::VALUE), type(*type) {
+        this->clazz = cls;
+        assert(type != nullptr);
+        this->_type = sem::UType(type);
+        this->metatype = Meta::CLASS;
+    }
+
     Entity* clone() const override {
         auto* v = new Value(this->type.clone());
         v->metatype = this->metatype;
