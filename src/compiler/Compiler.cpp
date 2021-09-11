@@ -61,8 +61,7 @@ Compiler::Compiler(const std::string& project_dir, const std::string& project_ou
                    const std::string& output_name, const std::string& lib_path, bool is_lib, const std::string& version)
         : project_dir(project_dir), project_output_dir(project_output_dir), output_name(output_name),
           lib_path(lib_path), is_lib(is_lib), version(version),
-          root_package(Path(this->output_name), project_dir, "", false, "", ""),
-          top_package(Path("global"), "", "", false, "", "") {
+          root_package(Path(this->output_name), project_dir, "", false), top_package(Path("global"), "", "", false) {
     this->top_package.units[this->output_name] = Unit{.type=U_TYPE::PACKAGE, .package=&root_package};
 }
 
@@ -189,15 +188,11 @@ void Compiler::load_package(Package& package, int level) {
 
         std::string subpackage_abs_path = path_join(package.abs_path, subpackage_name);
         std::string subpackage_rel_path = path_join(package.rel_path, subpackage_name);
-        const std::string& subpackage_header_parent_path = path_join(package.header_parent_path, subpackage_name);
-        const std::string& subpackage_full_header_path = path_join(subpackage_header_parent_path, "__package__.h");
 
         auto* subpackage = new Package(Path(package.path, subpackage_name),
                                        subpackage_abs_path,
                                        subpackage_rel_path,
-                                       package.is_lib,
-                                       subpackage_full_header_path,
-                                       subpackage_header_parent_path);
+                                       package.is_lib);
         load_package(*subpackage, level + 1);
         package.units[subpackage_name] = Unit{.type=U_TYPE::PACKAGE, .package=subpackage};
     }
@@ -222,12 +217,7 @@ void Compiler::load_library(const std::string& name, const std::string& lib_vers
     std::string library_requirements_file = path_join(abs_top_unit_path, REQUIREMENTS_FILE);
     load_requirements(library_requirements_file);
 
-    auto* library_top_package = new Package(Path(name),
-                                            abs_top_unit_path,
-                                            lib_rel_top_unit_path,
-                                            true,
-                                            path_join(lib_rel_out_path, "__package__.h"),
-                                            lib_rel_out_path);
+    auto* library_top_package = new Package(Path(name), abs_top_unit_path, lib_rel_top_unit_path, true);
     load_package(*library_top_package, 1);
     this->top_package_name = library_top_package->name;
     parse_package(*library_top_package);
@@ -256,13 +246,7 @@ void Compiler::load_top_unit(const std::string& name, const std::string& m_versi
         load_top_unit(req.first, req.second, true);
     }
 
-    auto* top_unit_package = new Package(Path(name),
-                                         abs_top_unit_path,
-                                         lib_rel_top_unit_path,
-                                         m_is_lib,
-                                         path_join(path_join(path_join(lib_rel_top_unit_path, "out"), name),
-                                                   "__package__.h"),
-                                         path_join(path_join(lib_rel_top_unit_path, "out"), name));
+    auto* top_unit_package = new Package(Path(name), abs_top_unit_path, lib_rel_top_unit_path, m_is_lib);
     load_package(*top_unit_package, 1);
     this->top_package_name = top_unit_package->name;
     parse_package(*top_unit_package);

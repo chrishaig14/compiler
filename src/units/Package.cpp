@@ -5,10 +5,8 @@
 #include <cassert>
 #include "Package.h"
 
-Package::Package(Path path, std::string abs_path, std::string rel_path, bool is_lib, std::string full_header_path,
-                 std::string header_parent_path)
-        : name(path.as_vec().back()), abs_path(abs_path), is_lib(is_lib), path(path),
-          full_header_path(full_header_path), header_parent_path(header_parent_path) {
+Package::Package(Path path, std::string abs_path, std::string rel_path, bool is_lib)
+        : name(path.as_vec().back()), abs_path(abs_path), is_lib(is_lib), path(path) {
     // this->path = path;
     // this->name = path.as_vec().back();
     // this->abs_path = abs_path;

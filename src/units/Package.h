@@ -16,12 +16,9 @@ public:
     const Path path;
 
     std::string rel_path;
-    std::string full_header_path;
-    std::string header_parent_path;
 
     std::map<std::string, Unit> units;
-    Package(Path path, std::string abs_path, std::string rel_path, bool is_lib, std::string full_header_path,
-            std::string header_parent_path);
+    Package(Path path, std::string abs_path, std::string rel_path, bool is_lib);
 
     Flirpin get(Path p);
 };
