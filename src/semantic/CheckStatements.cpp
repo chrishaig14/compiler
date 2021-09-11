@@ -264,8 +264,9 @@ USemanticInfo Checker::visit_match(ast::Match& node) {
             return error_stub();
         }
         this->enter_scope("case");
-        auto v = std::make_unique<Value>(case_type.to_sem());
-        this->fill_value(*v);
+        // auto v = std::make_unique<Value>(case_type.to_sem());
+        // this->fill_value(*v);
+        auto v = this->make_value(case_type.to_sem());
         Entity* ent = v.release();
         assert(v->clazz != nullptr);
         this->scope->set(case_id, *ent);
