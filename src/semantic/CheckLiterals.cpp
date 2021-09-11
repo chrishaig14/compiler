@@ -99,7 +99,7 @@ USemanticInfo Checker::visit_tuple(ast::Tuple& node) {
     for (auto& n: node.values) {
         USemanticInfo vtype = this->dispatch(*n);
         values.push_back(std::move(vtype->snode));
-        types.emplace_back(((Value&) vtype->entity).type.clone());
+        types.emplace_back(((Value&) vtype->entity.get()).type.clone());
         // if (!this->is_immutable(vtype->type())) {
         //     this->error_reporter.tuple_member_not_immutable(vtype->type(), node.start);
         //     return error_stub();

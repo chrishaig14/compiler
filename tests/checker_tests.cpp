@@ -758,6 +758,21 @@ TEST_CASE("match_ok", "[checker]") {
     REQUIRE(checker.error_reporter.errors.empty());
 }
 
+// TEST_CASE("tuple_ok", "[checker]") {
+//     std::string code = "fun foo()->Integer{var x: Tuple[Integer,String] = #(8, \"Hello\");return 0;}";
+//
+//     std::unique_ptr<Compiler> cp = analyze(code);
+//     Compiler& c = *cp;
+//     Module& module = *c.root_package.units["tmp"].module;
+//     analyze_module_result(module, c.top_package);
+//     Checker checker(c.top_package, module);
+//     checker.init();
+//     checker.visit_root(*module.ast);
+//
+//     REQUIRE(!checker.error_reporter.failed);
+//     REQUIRE(checker.error_reporter.errors.empty());
+// }
+
 TEST_CASE("union_ok", "[checker]") {
     std::string code = "fun foo()->Integer{var x: Union[Integer,String] = 8;return 0;}";
 

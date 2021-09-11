@@ -248,6 +248,9 @@ Path Module::get_actual_path(const std::string& id) {
     if (id == "Union") {
         return Path("core.core.Union");
     }
+    if (id == "Tuple") {
+        return Path("core.core.Tuple");
+    }
     if (this->flirpins.count(id) == 1) {
         if (this->flirpins[id].type == F_TYPE::CLASS) {
             return this->flirpins[id].clazz->path;
