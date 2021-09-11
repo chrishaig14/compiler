@@ -59,17 +59,17 @@ public:
 
     void parse_module(Module& module);
     void parse_package(Package& package);
-    void transpile_all_modules(Package& package, const std::string& output_dir, bool is_top);
-    void transpile_one_module(Module& module, std::string& package_header, const std::string& output_package_dir,
-                              Package& package, std::string static_initializations, std::string& static_cleanups);
+    // void transpile_all_modules(Package& package, const std::string& output_dir, bool is_top);
+    // void transpile_one_module(Module& module, std::string& package_header, const std::string& output_package_dir,
+    //                           Package& package, std::string static_initializations, std::string& static_cleanups);
 
     void load_module(Package& package, const std::string& d_name);
 
     void load_package(Package& package, int level);
     void load_library(const std::string& name, const std::string& lib_version);
     void load_top_unit(const std::string& name, const std::string& m_version, bool m_is_lib);
-    void transpile_one_module(Module& module, std::string& package_header, const std::string& output_package_dir,
-                              Package& package);
+    // void transpile_one_module(Module& module, std::string& package_header, const std::string& output_package_dir,
+    //                           Package& package);
 
     void main();
     std::string top_package_name;
