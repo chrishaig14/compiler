@@ -6,8 +6,8 @@
 
 using namespace sem;
 
-Match::Match(SNode* exp, std::string varname, std::vector<std::pair<int, Block*>> cases) : SNode(SNodeType::MATCH) {
-    this->exp = exp;
+Match::Match(USNode exp, std::string varname, std::vector<std::pair<int, Block*>> cases)
+        : SNode(SNodeType::MATCH), exp(std::move(exp)) {
     this->cases = cases;
     this->varname = varname;
 }

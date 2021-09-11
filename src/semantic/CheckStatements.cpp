@@ -285,8 +285,8 @@ USemanticInfo Checker::visit_match(ast::Match& node) {
         this->leave_scope();
     }
     USNode up = std::move(exp_info->snode);
-    auto* init = new sem::Declaration(varname, std::move(up));
-    auto mn = std::make_unique<sem::Match>(init, varname, cas);
+    auto init = std::make_unique<sem::Declaration>(varname, std::move(up));
+    auto mn = std::make_unique<sem::Match>(std::move(init), varname, cas);
 
     USemanticInfo info_u = std::make_unique<SemanticInfo>();
     SemanticInfo& info = *info_u;
