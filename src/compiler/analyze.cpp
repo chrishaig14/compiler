@@ -147,11 +147,11 @@ void add_local_path_to_module(Module& module, Path path, Package& top_package) {
     module.flirpins[path.as_vec().back()] = current_flirpin;
 }
 
-void Compiler::process_global_all_modules(Package& package) {
+void Compiler::preprocess_package(Package& package) {
     for (const auto& ep: package.units) {
         if (ep.second.type == U_TYPE::PACKAGE) {
             Package* subpackage = ep.second.package;
-            process_global_all_modules(*subpackage);
+            preprocess_package(*subpackage);
         } else if (ep.second.type == U_TYPE::MODULE) {
             Module* module = ep.second.module;
             GlobalProcessor gp(*module);

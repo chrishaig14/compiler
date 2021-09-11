@@ -74,7 +74,7 @@ void Compiler::pre() {
     this->load_package(root_package, 1);
     this->parse_all_modules(root_package);
 
-    this->process_global_all_modules(root_package);
+    this->preprocess_package(root_package);
 }
 
 void Compiler::main() {
@@ -235,7 +235,7 @@ void Compiler::load_library(const std::string& name, const std::string& lib_vers
     load_package(*library_top_package, 1);
     this->top_package_name = library_top_package->name;
     parse_all_modules(*library_top_package);
-    process_global_all_modules(*library_top_package);
+    preprocess_package(*library_top_package);
     top_package.units[name] = Unit{.type=U_TYPE::PACKAGE, .package=library_top_package};
     std::cout << "Finished loading top unit: " << E_HLT(lib_rel_top_unit_path) << std::endl;
     this->loaded_top_units[lib_rel_top_unit_path] = true;
@@ -270,7 +270,7 @@ void Compiler::load_top_unit(const std::string& name, const std::string& m_versi
     load_package(*top_unit_package, 1);
     this->top_package_name = top_unit_package->name;
     parse_all_modules(*top_unit_package);
-    process_global_all_modules(*top_unit_package);
+    this->preprocess_package(*top_unit_package);
     top_package.units[name] = Unit{.type=U_TYPE::PACKAGE, .package=top_unit_package};
     std::cout << "Finished loading top unit: " << E_HLT(lib_rel_top_unit_path) << std::endl;
     this->loaded_top_units[lib_rel_top_unit_path] = true;

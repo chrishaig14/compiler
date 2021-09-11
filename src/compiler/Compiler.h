@@ -53,7 +53,7 @@ public:
     Compiler(const std::string& project_dir, const std::string& project_output_dir, const std::string& output_name,
              const std::string& lib_path, bool is_lib, const std::string& version);
     VectorOfStrings load_requirements(const std::string& filepath);
-    void process_global_all_modules(Package& package);
+    void preprocess_package(Package& package);
     void add_global_path_to_module(Module& module, Path path);
 
 
