@@ -28,7 +28,7 @@ class Parser {
 
 public:
 
-    Parser(const std::string& __file__, CodeLines code_lines, std::vector<Token>& tokens);
+    Parser(const std::string& __file__, CodeLines code_lines, std::vector<Token>& tokens, const std::string& top_package_name);
     bool match(TokType type) const;
     void next();
     Token expect_token(TokType token_type);

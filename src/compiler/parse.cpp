@@ -10,8 +10,7 @@ void Compiler::parse_module(Module& module) {
     Scanner scanner;
     scanner.load_file(__file__);
     std::vector<Token> tokens = scanner.scan_all();
-    Parser parser(__file__, scanner.code_lines, tokens);
-    parser.top_package_name = this->top_package_name;
+    Parser parser(__file__, scanner.code_lines, tokens, this->top_package_name);
     module.code_lines = scanner.code_lines;
     std::unique_ptr<ast::Module> ast = parser.parse_module();
     module.ast = std::move(ast);
