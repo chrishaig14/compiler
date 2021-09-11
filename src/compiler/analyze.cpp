@@ -151,7 +151,7 @@ void Compiler::preprocess_package(Package& package) {
     for (const auto& ep: package.units) {
         if (ep.second.type == U_TYPE::PACKAGE) {
             Package* subpackage = ep.second.package;
-            preprocess_package(*subpackage);
+            this->preprocess_package(*subpackage);
         } else if (ep.second.type == U_TYPE::MODULE) {
             Module* module = ep.second.module;
             GlobalProcessor gp(*module);
