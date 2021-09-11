@@ -157,8 +157,9 @@ USemanticInfo Checker::check_declaration_with_type(ast::Declaration& n) {
     SemanticInfo& info = *info_u;
     USNode up = std::move(rvalue_sinfo->snode);
     info.snode = std::make_unique<sem::Declaration>(n.identifier, std::move(up));
-    auto ov = std::make_unique<Value>(sem_type.release());
-    this->fill_value(*ov);
+    // auto ov = std::make_unique<Value>(sem_type.release());
+    // this->fill_value(*ov);
+    auto ov = this->make_value(sem_type.release());
     info.set_entity(ov.release());
     return info_u;
 }
