@@ -17,8 +17,9 @@
 Value& Checker::entity_value_from_actual_base_path_no_generic(const Path& p) {
     if (this->entity_values_no_generic.count(p.as_str()) == 0) {
         auto* ot = new sem::TypeObject(p.as_vec().back(), p);
-        auto v = std::make_unique<Value>(ot);
-        this->fill_value(*v);
+        // auto v = std::make_unique<Value>(ot);
+        // this->fill_value(*v);
+        auto v = this->make_value(ot);
         auto& vv = *v;
         this->entity_values_no_generic[p.as_str()] = std::move(v);
         return vv;
