@@ -45,7 +45,7 @@ public:
     Module(Path path, std::string abs_path, std::string rel_path, bool is_lib);
 
     ~Module() {
-        std::cout << "CALLING MODULE DESTRUCTOR!!!" << std::endl;
+        // std::cout << "CALLING MODULE DESTRUCTOR!!!" << std::endl;
     }
 
     Path get_actual_path(const std::string& id);
