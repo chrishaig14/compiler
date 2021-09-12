@@ -56,7 +56,9 @@ TEST_CASE("load_project_test", "[compiler]") {
         REQUIRE(u.package->units.count("main") == 1);
         Unit m = u.package->units["main"];
         REQUIRE(m.type == U_TYPE::MODULE);
-    }SECTION("multiple modules") {
+    }
+
+    SECTION("multiple modules") {
         write_file(path_join(IN_DIR, "main.xl"), "fun foo()->Integer{return 0;}");
         write_file(path_join(IN_DIR, "module.xl"), "fun bar()->Integer{return 0;}");
         c.load_project();
@@ -113,7 +115,7 @@ TEST_CASE("load_project_test", "[compiler]") {
         REQUIRE(subpackage->units.count("moduleB") == 1);
         Unit moduleB_unit = subpackage->units["moduleB"];
         CHECK(moduleB_unit.type == U_TYPE::MODULE);
-        
+
     }
     cleanup_dirs();
 }
