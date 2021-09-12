@@ -49,34 +49,35 @@ public:
         // delete this->root_package; // TODO this should not be allocated on the heap
     }
 
-    void load_project() {
-        // std::string req_file_path = path_join(this->project_dir, REQUIREMENTS_FILE);
+    // void load_project() {
+    // std::string req_file_path = path_join(this->project_dir, REQUIREMENTS_FILE);
 
-        // VectorOfStrings requirements = this->load_requirements(req_file_path);
+    // VectorOfStrings requirements = this->load_requirements(req_file_path);
 
-        this->load_package(root_package, 1);
-    }
-
-    // void all() {
-    //     // load package/module structure (including external packages, i.e. requirements)
-    //     ProjectLoader project_loader;
-    //     Package* top_package = project_loader.load(this->project_dir, this->project_name);
-    //     // parse everything (loads ast for each module)
-    //     GlobalParser global_parser;
-    //     global_parser.parse();
-    //     // load parsed functions/classes/enums with GlobalProcessor for each module
-    //     GlobalGlobalProcessor global_global_processor;
-    //     global_global_processor.load();
-    //     // load imports for each module. check if imported package/module/etc. exists or not, aliases, etc.
-    //     ImportResolver import_resolver;
-    //     import_resolver.resolve();
-    //     // semantic analyze for each module. outputs semantic tree
-    //     GlobalChecker global_checker;
-    //     global_checker.check_all();
-    //     // transpile
-    //     Transpiler transpiler;
-    //     transpiler.transpile_all();
+    // this->load_package(root_package, 1);
     // }
+
+    void load_project() {
+        //     // load package/module structure (including external packages, i.e. requirements)
+        //     ProjectLoader project_loader;
+        //     Package* top_package = project_loader.load(this->project_dir, this->project_name);
+        this->load_package(root_package, 1);
+        //     // parse everything (loads ast for each module)
+        //     GlobalParser global_parser;
+        //     global_parser.parse();
+        //     // load parsed functions/classes/enums with GlobalProcessor for each module
+        //     GlobalGlobalProcessor global_global_processor;
+        //     global_global_processor.load();
+        //     // load imports for each module. check if imported package/module/etc. exists or not, aliases, etc.
+        //     ImportResolver import_resolver;
+        //     import_resolver.resolve();
+        //     // semantic analyze for each module. outputs semantic tree
+        //     GlobalChecker global_checker;
+        //     global_checker.check_all();
+        //     // transpile
+        //     Transpiler transpiler;
+        //     transpiler.transpile_all();
+    }
 
     Compiler(const std::string& project_dir, const std::string& project_output_dir, const std::string& output_name,
              const std::string& lib_path, bool is_lib, const std::string& version);

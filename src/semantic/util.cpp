@@ -10,7 +10,7 @@ ast::UTypeNode parse_type(const std::string& s) {
     Scanner scanner;
     scanner.load_text(s);
     std::vector<Token> tokens = scanner.scan_all();
-    Parser parser("", scanner.code_lines, tokens, "main");
+    Parser parser("", scanner.code_lines, tokens);
     return parser.parse_type_node();
 }
 
@@ -18,6 +18,6 @@ ast::FunctionType* parse_function_type(const std::string& s) {
     Scanner scanner;
     scanner.load_text(s);
     std::vector<Token> tokens = scanner.scan_all();
-    Parser parser("", scanner.code_lines, tokens, "main");
+    Parser parser("", scanner.code_lines, tokens);
     return parser.parse_function_type().release();
 }

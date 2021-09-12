@@ -29,15 +29,14 @@ std::unordered_map<TokType, OpType> TOKEN_TO_OP = {{TokType::PLUS,  OpType::ADD}
                                                    {TokType::NEQ,   OpType::NE},
                                                    {TokType::EQ,    OpType::EQ}};
 
-Parser::Parser(const std::string& __file__, CodeLines code_lines, std::vector<Token>& tokens,
-               const std::string& top_package_name) {
+Parser::Parser(const std::string& __file__, CodeLines code_lines, std::vector<Token>& tokens) {
     this->__file__ = __file__;
     this->code_lines = code_lines;
     this->tokens = tokens;
     this->token = this->tokens[0];
     this->current = 0;
     this->inside_loop = false;
-    this->top_package_name = top_package_name;
+    // this->top_package_name = top_package_name;
 }
 
 void Parser::next() {
@@ -989,11 +988,11 @@ std::unique_ptr<ast::Import> Parser::parse_import() {
     Token import_tok = this->expect_token(TokType::IMPORT);
     VectorOfStrings path;
     // path.push_back("global");
-    if (this->match(TokType::DOT)) {
-        // it's a local import
-        this->next();
-        path.push_back(this->top_package_name);
-    }
+    // if (this->match(TokType::DOT)) {
+    // it's a local import
+    // this->next();
+    // path.push_back(this->top_package_name);
+    // }
     Token path_part;
     while (true) {
         path_part = this->expect_token(TokType::ID);

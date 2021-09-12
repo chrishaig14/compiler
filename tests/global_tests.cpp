@@ -12,7 +12,7 @@ TEST_CASE("global_main", "[parser]") {
     std::string code = "fun main()->Integer{return 0;}";
     scanner.load_text(code);
     std::vector<Token> tokens = scanner.scan_all();
-    Parser parser("test", scanner.code_lines, tokens, "main");
+    Parser parser("test", scanner.code_lines, tokens);
     Module module(Path("main.foo"), "foo.xl", false);
     module.ast = parser.parse_module();
     GlobalProcessor gp(module);
@@ -34,7 +34,7 @@ TEST_CASE("global_class", "[parser]") {
     std::string code = "class Foo {x:Integer;y: String; fun foo(w: String)->Integer{return 0;} static fun static_foo(x: Boolean)->String{return \"Hello\";}}";
     scanner.load_text(code);
     std::vector<Token> tokens = scanner.scan_all();
-    Parser parser("test", scanner.code_lines, tokens, "main");
+    Parser parser("test", scanner.code_lines, tokens);
     Module module(Path("main.foo"), "foo.xl", false);
     module.ast = parser.parse_module();
     GlobalProcessor gp(module);
@@ -79,7 +79,7 @@ TEST_CASE("global_multiple", "[parser]") {
     std::string code = "fun main()->Integer{return 0;}\nclass Foo {x: Integer;}";
     scanner.load_text(code);
     std::vector<Token> tokens = scanner.scan_all();
-    Parser parser("test", scanner.code_lines, tokens, "main");
+    Parser parser("test", scanner.code_lines, tokens);
     Module module(Path("main.foo"), "foo.xl", false);
     module.ast = parser.parse_module();
     GlobalProcessor gp(module);

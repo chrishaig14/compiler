@@ -169,7 +169,7 @@ TEST_CASE("parse_assignment", "[parser]") {
     std::string code = assignment.text;
     scanner.load_text(code);
     std::vector<Token> tokens = scanner.scan_all();
-    Parser parser("test", scanner.code_lines, tokens, "main");
+    Parser parser("test", scanner.code_lines, tokens);
 
     ast::UNode ast = parser.parse_assignment_or_expression();
 
@@ -182,7 +182,7 @@ TEST_CASE("parse_decl_simple", "[parser]") {
     std::string code = DECLARATION.text;
     scanner.load_text(code);
     std::vector<Token> tokens = scanner.scan_all();
-    Parser parser("test", scanner.code_lines, tokens, "main");
+    Parser parser("test", scanner.code_lines, tokens);
 
     std::unique_ptr<ast::Declaration> ast = parser.parse_variable_declaration();
 
@@ -195,7 +195,7 @@ TEST_CASE("parse_decl_with_type", "[parser]") {
     std::string code = "var " + ID + " : " + TYPE.text + " = " + EXPRESSION.text;
     scanner.load_text(code);
     std::vector<Token> tokens = scanner.scan_all();
-    Parser parser("test", scanner.code_lines, tokens, "main");
+    Parser parser("test", scanner.code_lines, tokens);
 
     std::unique_ptr<ast::Declaration> ast = parser.parse_variable_declaration();
 
@@ -210,7 +210,7 @@ TEST_CASE("parse_if", "[parser]") {
     std::string code = IF.text;
     scanner.load_text(code);
     std::vector<Token> tokens = scanner.scan_all();
-    Parser parser("test", scanner.code_lines, tokens, "main");
+    Parser parser("test", scanner.code_lines, tokens);
 
     std::unique_ptr<ast::If> ast = parser.parse_if();
     REQUIRE(ast->to_json() == IF.node->to_json());
@@ -224,7 +224,7 @@ TEST_CASE("parse_if_with_else", "[parser]") {
     std::string code = "if " + EXPRESSION.text + block.text + "else " + block_1.text;
     scanner.load_text(code);
     std::vector<Token> tokens = scanner.scan_all();
-    Parser parser("test", scanner.code_lines, tokens, "main");
+    Parser parser("test", scanner.code_lines, tokens);
 
     std::unique_ptr<ast::If> ast = parser.parse_if();
     std::vector<std::pair<ast::UNode, ast::UBlock>> v;
@@ -242,7 +242,7 @@ TEST_CASE("parse_call_no_args", "[parser]") {
     std::string code = FACTOR_EXPRESSION.text + "()";
     scanner.load_text(code);
     std::vector<Token> tokens = scanner.scan_all();
-    Parser parser("test", scanner.code_lines, tokens, "main");
+    Parser parser("test", scanner.code_lines, tokens);
 
     ast::UNode ast = parser.parse_expression();
     ast::VectorOfNodesU v;
@@ -257,7 +257,7 @@ TEST_CASE("parse_call_one_arg", "[parser]") {
     std::string code = FACTOR_EXPRESSION.text + "(" + EXPRESSION_1.text + ")";
     scanner.load_text(code);
     std::vector<Token> tokens = scanner.scan_all();
-    Parser parser("test", scanner.code_lines, tokens, "main");
+    Parser parser("test", scanner.code_lines, tokens);
 
     ast::UNode ast = parser.parse_expression();
     ast::VectorOfNodesU v;
@@ -274,7 +274,7 @@ TEST_CASE("parse_call_mult_arg", "[parser]") {
     std::string code = FACTOR_EXPRESSION.text + "(" + EXPRESSION_1.text + "," + EXPRESSION_2.text + ")";
     scanner.load_text(code);
     std::vector<Token> tokens = scanner.scan_all();
-    Parser parser("test", scanner.code_lines, tokens, "main");
+    Parser parser("test", scanner.code_lines, tokens);
 
     ast::UNode ast = parser.parse_expression();
     ast::VectorOfNodesU v;
@@ -293,7 +293,7 @@ TEST_CASE("parse_for", "[parser]") {
     std::string code = "for " + ID + " @ " + EXPRESSION_1.text + BLOCK.text;
     scanner.load_text(code);
     std::vector<Token> tokens = scanner.scan_all();
-    Parser parser("test", scanner.code_lines, tokens, "main");
+    Parser parser("test", scanner.code_lines, tokens);
 
     std::unique_ptr<ast::For> ast = parser.parse_for_loop();
     REQUIRE(ast->to_json() == ast::For(ID,
@@ -312,7 +312,7 @@ TEST_CASE("parse_while", "[parser]") {
     std::string code = "while " + EXPRESSION_1.text + BLOCK.text;
     scanner.load_text(code);
     std::vector<Token> tokens = scanner.scan_all();
-    Parser parser("test", scanner.code_lines, tokens, "main");
+    Parser parser("test", scanner.code_lines, tokens);
 
     std::unique_ptr<ast::While> ast = parser.parse_while_loop();
 
@@ -326,7 +326,7 @@ TEST_CASE("parse_fun_simple", "[parser]") {
     std::string code = "fun " + ID + "()" + BLOCK.text;
     scanner.load_text(code);
     std::vector<Token> tokens = scanner.scan_all();
-    Parser parser("test", scanner.code_lines, tokens, "main");
+    Parser parser("test", scanner.code_lines, tokens);
 
     std::unique_ptr<ast::Function> ast = parser.parse_function_definition();
 
@@ -347,7 +347,7 @@ TEST_CASE("parse_fun_one_arg", "[parser]") {
     std::string code = "fun " + ID + "(" + ID_1 + ":" + TYPE.text + ")" + BLOCK.text;
     scanner.load_text(code);
     std::vector<Token> tokens = scanner.scan_all();
-    Parser parser("test", scanner.code_lines, tokens, "main");
+    Parser parser("test", scanner.code_lines, tokens);
 
     std::unique_ptr<ast::Function> ast = parser.parse_function_definition();
 
@@ -365,7 +365,7 @@ TEST_CASE("parse_fun_mult_arg", "[parser]") {
     std::string code = "fun " + ID + "(" + ID_1 + ":" + TYPE_1.text + "," + ID_2 + ":" + TYPE_2.text + ")" + BLOCK.text;
     scanner.load_text(code);
     std::vector<Token> tokens = scanner.scan_all();
-    Parser parser("test", scanner.code_lines, tokens, "main");
+    Parser parser("test", scanner.code_lines, tokens);
 
     std::unique_ptr<ast::Function> ast = parser.parse_function_definition();
 
@@ -387,7 +387,7 @@ TEST_CASE("parse_class_empty", "[parser]") {
     std::string code = "class " + ID + "{}";
     scanner.load_text(code);
     std::vector<Token> tokens = scanner.scan_all();
-    Parser parser("test", scanner.code_lines, tokens, "main");
+    Parser parser("test", scanner.code_lines, tokens);
 
     std::unique_ptr<ast::Klass> ast = parser.parse_class_definition();
 
@@ -400,7 +400,7 @@ TEST_CASE("parse_class_one_member", "[parser]") {
     std::string code = "class " + ID + "{" + ID_1 + ":" + TYPE_1.text + ";}";
     scanner.load_text(code);
     std::vector<Token> tokens = scanner.scan_all();
-    Parser parser("test", scanner.code_lines, tokens, "main");
+    Parser parser("test", scanner.code_lines, tokens);
 
     std::unique_ptr<ast::Klass> ast = parser.parse_class_definition();
     std::unordered_map<std::string, ast::UFunctionNode> v;
@@ -414,7 +414,7 @@ TEST_CASE("parse_class_mult_member", "[parser]") {
     std::string code = "class " + ID + "{" + ID_2 + ":" + TYPE_2.text + ";" + ID_1 + ":" + TYPE_1.text + ";}";
     scanner.load_text(code);
     std::vector<Token> tokens = scanner.scan_all();
-    Parser parser("test", scanner.code_lines, tokens, "main");
+    Parser parser("test", scanner.code_lines, tokens);
 
     std::unique_ptr<ast::Klass> ast = parser.parse_class_definition();
     std::unordered_map<std::string, ast::UFunctionNode> v;
@@ -431,7 +431,7 @@ TEST_CASE("parse_class_with_method", "[parser]") {
             "class " + ID + "{" + ID_2 + ":" + TYPE_2.text + ";" + ID_1 + ":" + TYPE_1.text + ";" + function.text + "}";
     scanner.load_text(code);
     std::vector<Token> tokens = scanner.scan_all();
-    Parser parser("test", scanner.code_lines, tokens, "main");
+    Parser parser("test", scanner.code_lines, tokens);
 
     std::unique_ptr<ast::Klass> ast = parser.parse_class_definition();
 
@@ -454,7 +454,7 @@ TEST_CASE("parse_class_with_static_method", "[parser]") {
     std::string code = "class " + ID + "{ static " + function.text + "}";
     scanner.load_text(code);
     std::vector<Token> tokens = scanner.scan_all();
-    Parser parser("test", scanner.code_lines, tokens, "main");
+    Parser parser("test", scanner.code_lines, tokens);
 
     std::unique_ptr<ast::Klass> ast = parser.parse_class_definition();
     std::unordered_map<std::string, ast::UFunctionNode> v;
@@ -468,7 +468,7 @@ TEST_CASE("parse_return_nothing", "[parser]") {
     std::string code = "return;";
     scanner.load_text(code);
     std::vector<Token> tokens = scanner.scan_all();
-    Parser parser("test", scanner.code_lines, tokens, "main");
+    Parser parser("test", scanner.code_lines, tokens);
 
     std::unique_ptr<ast::Return> ast = parser.parse_return();
     ast::UNode ptr;
@@ -481,7 +481,7 @@ TEST_CASE("parse_return_expression", "[parser]") {
     std::string code = "return " + EXPRESSION.text;
     scanner.load_text(code);
     std::vector<Token> tokens = scanner.scan_all();
-    Parser parser("test", scanner.code_lines, tokens, "main");
+    Parser parser("test", scanner.code_lines, tokens);
 
     std::unique_ptr<ast::Return> ast = parser.parse_return();
 
@@ -493,7 +493,7 @@ TEST_CASE("parse_list_empty", "[parser]") {
     std::string code = "[]::" + TYPE.text;
     scanner.load_text(code);
     std::vector<Token> tokens = scanner.scan_all();
-    Parser parser("test", scanner.code_lines, tokens, "main");
+    Parser parser("test", scanner.code_lines, tokens);
 
     ast::UNode ast = parser.parse_list_literal();
 
@@ -507,7 +507,7 @@ TEST_CASE("parse_list_one_element", "[parser]") {
     std::string code = "[" + EXPRESSION_1.text + "]";
     scanner.load_text(code);
     std::vector<Token> tokens = scanner.scan_all();
-    Parser parser("test", scanner.code_lines, tokens, "main");
+    Parser parser("test", scanner.code_lines, tokens);
 
     ast::UNode ast = parser.parse_list_literal();
     ast::VectorOfNodesU v;
@@ -522,7 +522,7 @@ TEST_CASE("parse_list_mult_elements", "[parser]") {
     std::string code = "[" + EXPRESSION_1.text + "," + EXPRESSION_2.text + "]";
     scanner.load_text(code);
     std::vector<Token> tokens = scanner.scan_all();
-    Parser parser("test", scanner.code_lines, tokens, "main");
+    Parser parser("test", scanner.code_lines, tokens);
 
     ast::UNode ast = parser.parse_list_literal();
     ast::VectorOfNodesU v;
@@ -536,7 +536,7 @@ TEST_CASE("parse_number_integer", "[parser]") {
     std::string code = "89";
     scanner.load_text(code);
     std::vector<Token> tokens = scanner.scan_all();
-    Parser parser("test", scanner.code_lines, tokens, "main");
+    Parser parser("test", scanner.code_lines, tokens);
 
     ast::UNode ast = parser.parse_id_or_literal();
 
@@ -548,7 +548,7 @@ TEST_CASE("parse_number_float", "[parser]") {
     std::string code = "3.14";
     scanner.load_text(code);
     std::vector<Token> tokens = scanner.scan_all();
-    Parser parser("test", scanner.code_lines, tokens, "main");
+    Parser parser("test", scanner.code_lines, tokens);
 
     ast::UNode ast = parser.parse_id_or_literal();
 
@@ -560,7 +560,7 @@ TEST_CASE("parse_empty_string", "[parser]") {
     std::string code = "\"\"";
     scanner.load_text(code);
     std::vector<Token> tokens = scanner.scan_all();
-    Parser parser("test", scanner.code_lines, tokens, "main");
+    Parser parser("test", scanner.code_lines, tokens);
 
     ast::UNode ast = parser.parse_id_or_literal();
 
@@ -572,7 +572,7 @@ TEST_CASE("parse_string", "[parser]") {
     std::string code = "\"hello, world\"";
     scanner.load_text(code);
     std::vector<Token> tokens = scanner.scan_all();
-    Parser parser("test", scanner.code_lines, tokens, "main");
+    Parser parser("test", scanner.code_lines, tokens);
 
     ast::UNode ast = parser.parse_id_or_literal();
 
@@ -584,7 +584,7 @@ TEST_CASE("parse_none", "[parser]") {
     std::string code = "none";
     scanner.load_text(code);
     std::vector<Token> tokens = scanner.scan_all();
-    Parser parser("test", scanner.code_lines, tokens, "main");
+    Parser parser("test", scanner.code_lines, tokens);
 
     ast::UNode ast = parser.parse_id_or_literal();
 
@@ -596,7 +596,7 @@ TEST_CASE("parse_true", "[parser]") {
     std::string code = "true";
     scanner.load_text(code);
     std::vector<Token> tokens = scanner.scan_all();
-    Parser parser("test", scanner.code_lines, tokens, "main");
+    Parser parser("test", scanner.code_lines, tokens);
 
     ast::UNode ast = parser.parse_id_or_literal();
 
@@ -608,7 +608,7 @@ TEST_CASE("parse_false", "[parser]") {
     std::string code = "false";
     scanner.load_text(code);
     std::vector<Token> tokens = scanner.scan_all();
-    Parser parser("test", scanner.code_lines, tokens, "main");
+    Parser parser("test", scanner.code_lines, tokens);
 
     ast::UNode ast = parser.parse_id_or_literal();
 
@@ -622,7 +622,7 @@ TEST_CASE("parse_and_exp", "[parser]") {
     std::string code = EXPRESSION_1.text + " and " + EXPRESSION_2.text;
     scanner.load_text(code);
     std::vector<Token> tokens = scanner.scan_all();
-    Parser parser("test", scanner.code_lines, tokens, "main");
+    Parser parser("test", scanner.code_lines, tokens);
 
     ast::UNode ast = parser.parse_and_expression();
 
@@ -640,7 +640,7 @@ TEST_CASE("parse_or_exp", "[parser]") {
     std::string code = EXPRESSION_1.text + " or " + EXPRESSION_2.text;
     scanner.load_text(code);
     std::vector<Token> tokens = scanner.scan_all();
-    Parser parser("test", scanner.code_lines, tokens, "main");
+    Parser parser("test", scanner.code_lines, tokens);
 
     ast::UNode ast = parser.parse_or_expression();
 
@@ -658,7 +658,7 @@ TEST_CASE("parse_eq_exp", "[parser]") {
     std::string code = EXPRESSION_1.text + " == " + EXPRESSION_2.text;
     scanner.load_text(code);
     std::vector<Token> tokens = scanner.scan_all();
-    Parser parser("test", scanner.code_lines, tokens, "main");
+    Parser parser("test", scanner.code_lines, tokens);
 
     ast::UNode ast = parser.parse_and_expression();
 
@@ -676,7 +676,7 @@ TEST_CASE("parse_ge_exp", "[parser]") {
     std::string code = EXPRESSION_1.text + " >= " + EXPRESSION_2.text;
     scanner.load_text(code);
     std::vector<Token> tokens = scanner.scan_all();
-    Parser parser("test", scanner.code_lines, tokens, "main");
+    Parser parser("test", scanner.code_lines, tokens);
 
     ast::UNode ast = parser.parse_and_expression();
 
@@ -694,7 +694,7 @@ TEST_CASE("parse_le_exp", "[parser]") {
     std::string code = EXPRESSION_1.text + " <= " + EXPRESSION_2.text;
     scanner.load_text(code);
     std::vector<Token> tokens = scanner.scan_all();
-    Parser parser("test", scanner.code_lines, tokens, "main");
+    Parser parser("test", scanner.code_lines, tokens);
 
     ast::UNode ast = parser.parse_and_expression();
 
@@ -712,7 +712,7 @@ TEST_CASE("parse_gt_exp", "[parser]") {
     std::string code = EXPRESSION_1.text + " > " + EXPRESSION_2.text;
     scanner.load_text(code);
     std::vector<Token> tokens = scanner.scan_all();
-    Parser parser("test", scanner.code_lines, tokens, "main");
+    Parser parser("test", scanner.code_lines, tokens);
 
     ast::UNode ast = parser.parse_and_expression();
 
@@ -730,7 +730,7 @@ TEST_CASE("parse_lt_exp", "[parser]") {
     std::string code = EXPRESSION_1.text + " < " + EXPRESSION_2.text;
     scanner.load_text(code);
     std::vector<Token> tokens = scanner.scan_all();
-    Parser parser("test", scanner.code_lines, tokens, "main");
+    Parser parser("test", scanner.code_lines, tokens);
 
     ast::UNode ast = parser.parse_and_expression();
 
@@ -748,7 +748,7 @@ TEST_CASE("parse_ne_exp", "[parser]") {
     std::string code = EXPRESSION_1.text + " != " + EXPRESSION_2.text;
     scanner.load_text(code);
     std::vector<Token> tokens = scanner.scan_all();
-    Parser parser("test", scanner.code_lines, tokens, "main");
+    Parser parser("test", scanner.code_lines, tokens);
 
     ast::UNode ast = parser.parse_and_expression();
 
@@ -765,7 +765,7 @@ TEST_CASE("parse_not_exp", "[parser]") {
     std::string code = "not " + EXPRESSION.text;
     scanner.load_text(code);
     std::vector<Token> tokens = scanner.scan_all();
-    Parser parser("test", scanner.code_lines, tokens, "main");
+    Parser parser("test", scanner.code_lines, tokens);
 
     ast::UNode ast = parser.parse_and_expression();
 
@@ -780,7 +780,7 @@ TEST_CASE("parse_tuple", "[parser]") {
     std::string code = "#(" + EXPRESSION_1.text + "," + EXPRESSION_2.text + ")";
     scanner.load_text(code);
     std::vector<Token> tokens = scanner.scan_all();
-    Parser parser("test", scanner.code_lines, tokens, "main");
+    Parser parser("test", scanner.code_lines, tokens);
 
     ast::UNode ast = parser.parse_tuple_or_constructor();
     // auto EXPRESSION_1 = EXPRESSION_1_U();
@@ -796,7 +796,7 @@ TEST_CASE("parse_dict_empty", "[parser]") {
     std::string code = "{}::[" + TYPE_1.text + "," + TYPE_2.text + "]";
     scanner.load_text(code);
     std::vector<Token> tokens = scanner.scan_all();
-    Parser parser("test", scanner.code_lines, tokens, "main");
+    Parser parser("test", scanner.code_lines, tokens);
 
     ast::UNode ast = parser.parse_dictionary();
     ast::UTypeNode u1(TYPE_1.node->clone());
@@ -811,7 +811,7 @@ TEST_CASE("parse_dict_one_element", "[parser]") {
     std::string code = "{" + EXPRESSION_1.text + ":" + EXPRESSION_2.text + "}";
     scanner.load_text(code);
     std::vector<Token> tokens = scanner.scan_all();
-    Parser parser("test", scanner.code_lines, tokens, "main");
+    Parser parser("test", scanner.code_lines, tokens);
 
     ast::UNode ast = parser.parse_dictionary();
     std::vector<std::pair<ast::UNode, ast::UNode>> d;
@@ -829,7 +829,7 @@ TEST_CASE("parse_dict_mult_elements", "[parser]") {
             "{" + EXPRESSION_1.text + ":" + EXPRESSION_2.text + "," + EXPRESSION.text + ":" + EXPRESSION_1_V.text + "}";
     scanner.load_text(code);
     std::vector<Token> tokens = scanner.scan_all();
-    Parser parser("test", scanner.code_lines, tokens, "main");
+    Parser parser("test", scanner.code_lines, tokens);
 
     ast::UNode ast = parser.parse_dictionary();
 
@@ -847,7 +847,7 @@ TEST_CASE("parse_member", "[parser]") {
     std::string code = EXPRESSION.text + "." + ID;
     scanner.load_text(code);
     std::vector<Token> tokens = scanner.scan_all();
-    Parser parser("test", scanner.code_lines, tokens, "main");
+    Parser parser("test", scanner.code_lines, tokens);
 
     ast::UNode ast = parser.parse_factor();
 
@@ -863,7 +863,7 @@ TEST_CASE("parse_subscript", "[parser]") {
     std::string code = EXPRESSION.text + "[" + EXPRESSION_2.text + "]";
     scanner.load_text(code);
     std::vector<Token> tokens = scanner.scan_all();
-    Parser parser("test", scanner.code_lines, tokens, "main");
+    Parser parser("test", scanner.code_lines, tokens);
 
     ast::UNode ast = parser.parse_factor();
     ast::VectorOfNodesU v;
@@ -879,7 +879,7 @@ TEST_CASE("parse_partial_one_arg", "[parser]") {
     std::string code = "$" + FACTOR_EXPRESSION.text + "(" + EXPRESSION_1.text + ")";
     scanner.load_text(code);
     std::vector<Token> tokens = scanner.scan_all();
-    Parser parser("test", scanner.code_lines, tokens, "main");
+    Parser parser("test", scanner.code_lines, tokens);
 
     ast::UNode ast = parser.parse_partial_application();
     ast::VectorOfNodesU args;
@@ -898,7 +898,7 @@ TEST_CASE("parse_partial_mult_arg_one", "[parser]") {
     std::string code = "$" + FACTOR_EXPRESSION.text + "(" + EXPRESSION_1.text + ",*)";
     scanner.load_text(code);
     std::vector<Token> tokens = scanner.scan_all();
-    Parser parser("test", scanner.code_lines, tokens, "main");
+    Parser parser("test", scanner.code_lines, tokens);
 
     ast::UNode ast = parser.parse_partial_application();
     ast::VectorOfNodesU args;
@@ -919,7 +919,7 @@ TEST_CASE("parse_partial_mult_arg_two", "[parser]") {
     std::string code = "$" + FACTOR_EXPRESSION.text + "(" + EXPRESSION_1.text + "," + EXPRESSION_2.text + ")";
     scanner.load_text(code);
     std::vector<Token> tokens = scanner.scan_all();
-    Parser parser("test", scanner.code_lines, tokens, "main");
+    Parser parser("test", scanner.code_lines, tokens);
 
     ast::UNode ast = parser.parse_partial_application();
     ast::VectorOfNodesU args;
@@ -937,7 +937,7 @@ TEST_CASE("parse_typeclass", "[parser]") {
     std::string code = "typeclass Comparable[t] {fun eq(a:t, b:t)->Boolean;fun ne(a: t, b:t)->Boolean;} ";
     scanner.load_text(code);
     std::vector<Token> tokens = scanner.scan_all();
-    Parser parser("test", scanner.code_lines, tokens, "main");
+    Parser parser("test", scanner.code_lines, tokens);
 
     std::unique_ptr<ast::Typeclass> ast = parser.parse_typeclass();
     std::unordered_map<std::string, ast::UFunctionType> cmethods;
@@ -956,7 +956,7 @@ TEST_CASE("parse_instance", "[parser]") {
     std::string code = "instance Comparable[Foo] {fun eq(a:Foo, b:Foo)->Boolean {};fun ne(a: Foo, b:Foo)->Boolean {};} ";
     scanner.load_text(code);
     std::vector<Token> tokens = scanner.scan_all();
-    Parser parser("test", scanner.code_lines, tokens, "main");
+    Parser parser("test", scanner.code_lines, tokens);
 
     std::unique_ptr<ast::Instance> ast = parser.parse_instance();
     std::unique_ptr<ast::Block> b2 = ast::Block::make(ast::VectorOfNodesU{}, DUMMY_POS, DUMMY_POS);
