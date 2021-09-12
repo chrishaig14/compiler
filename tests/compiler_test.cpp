@@ -44,6 +44,7 @@ TEST_CASE("load_project_test", "[compiler]") {
     setup_dirs();
     write_file(path_join(IN_DIR, "requirements.txt"), "core==1.0.0");
     Compiler c(IN_DIR, OUT_DIR, OUT_NAME, LIB_PATH, IS_LIB, VERSION);
+
     SECTION("only one module") {
         write_file(path_join(IN_DIR, "main.xl"), "fun foo()->Integer{return 0;}");
         c.load_project();
