@@ -42,7 +42,7 @@ public:
     std::map<std::string, Flirpin> flirpins;
 
     Flirpin get(Path p);
-    Module(Path path, std::string abs_path, std::string rel_path, bool is_lib);
+    Module(Path path, std::string abs_path, bool is_lib);
 
     ~Module() {
         // std::cout << "CALLING MODULE DESTRUCTOR!!!" << std::endl;

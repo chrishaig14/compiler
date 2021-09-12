@@ -4,7 +4,7 @@
 
 #include "Module.h"
 
-Module::Module(Path path, std::string abs_path, std::string rel_path, bool is_lib)
+Module::Module(Path path, std::string abs_path, bool is_lib)
         : name(path.as_vec().back()), abs_path(abs_path), is_lib(is_lib), path(path) {
 }
 

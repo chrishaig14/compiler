@@ -35,7 +35,7 @@ Compiler::Compiler(const std::string& project_dir, const std::string& project_ou
                    const std::string& output_name, const std::string& lib_path, bool is_lib, const std::string& version)
         : project_dir(project_dir), project_output_dir(project_output_dir), output_name(output_name),
           lib_path(lib_path), is_lib(is_lib), version(version),
-          root_package(Path(this->output_name), project_dir, "", false), top_package(Path("global"), "", "", false) {
+          root_package(Path(this->output_name), project_dir, false), top_package(Path("global"), "", false) {
     this->top_package.units[this->output_name] = Unit{.type=U_TYPE::PACKAGE, .package=&root_package};
 }
 
@@ -77,14 +77,13 @@ VectorOfStrings Compiler::load_requirements(const std::string& filepath) {
     return reqs;
 }
 
-void Compiler::load_module(Package& package, const std::string& d_name) {
-    std::string module_abs_path = path_join(package.abs_path, d_name);
-    std::string module_rel_path = path_join(package.rel_path, d_name);
+void Compiler::load_module(Package& package, const std::string& module_name) {
+    std::string module_abs_path = path_join(package.abs_path, module_name + ".xl");
+    std::string module_rel_path = path_join(package.rel_path, module_name);
     if (!package.is_lib) {
         all_modules.push_back(module_rel_path);
     }
-    std::string module_name = d_name.substr(0, d_name.size() - 3);
-    auto* module = new Module(Path(package.path, module_name), module_abs_path, module_rel_path, package.is_lib);
+    auto* module = new Module(Path(package.path, module_name), module_abs_path, package.is_lib);
     this->my_modules.push_back(std::unique_ptr<Module>(module));
     package.units[module_name] = Unit{.type=U_TYPE::MODULE, .module=module};
 }
@@ -111,7 +110,10 @@ void Compiler::load_package(Package& package, int level) {
             if (d_type == DT_REG) {
                 std::string ext = d_name.substr(d_name.size() - 3, 3);
                 if (ext == ".xl") {
-                    modules.emplace_back(d_name);
+                    std::string module_name = d_name.substr(0, d_name.size() - 3);
+                    std::cout << std::string(level + 1, '-') << " Found module " << module_name << std::endl;
+                    load_module(package, module_name);
+                    modules.emplace_back(module_name);
                 }
             } else if (d_type == DT_DIR) {
                 subpackages.emplace_back(d_name);
@@ -126,22 +128,13 @@ void Compiler::load_package(Package& package, int level) {
         exit(1);
     }
 
-    for (const auto& module_name: modules) {
-        std::cout << std::string(level + 1, '-') << " Found module " << module_name << std::endl;
-
-        load_module(package, module_name);
-    }
-
     for (const auto& subpackage_name:subpackages) {
         std::cout << std::string(level + 1, '-') << " Found subpackage " << subpackage_name << std::endl;
 
         std::string subpackage_abs_path = path_join(package.abs_path, subpackage_name);
         std::string subpackage_rel_path = path_join(package.rel_path, subpackage_name);
 
-        auto* subpackage = new Package(Path(package.path, subpackage_name),
-                                       subpackage_abs_path,
-                                       subpackage_rel_path,
-                                       package.is_lib);
+        auto* subpackage = new Package(Path(package.path, subpackage_name), subpackage_abs_path, package.is_lib);
         load_package(*subpackage, level + 1);
         package.units[subpackage_name] = Unit{.type=U_TYPE::PACKAGE, .package=subpackage};
     }
@@ -166,7 +159,7 @@ void Compiler::load_library(const std::string& name, const std::string& lib_vers
     std::string library_requirements_file = path_join(abs_top_unit_path, REQUIREMENTS_FILE);
     load_requirements(library_requirements_file);
 
-    auto* library_top_package = new Package(Path(name), abs_top_unit_path, lib_rel_top_unit_path, true);
+    auto* library_top_package = new Package(Path(name), abs_top_unit_path, true);
     load_package(*library_top_package, 1);
     this->top_package_name = library_top_package->name;
     parse_package(*library_top_package);
@@ -195,7 +188,7 @@ void Compiler::load_top_unit(const std::string& name, const std::string& m_versi
         load_top_unit(req.package, req.version, true);
     }
 
-    auto* top_unit_package = new Package(Path(name), abs_top_unit_path, lib_rel_top_unit_path, m_is_lib);
+    auto* top_unit_package = new Package(Path(name), abs_top_unit_path, m_is_lib);
     load_package(*top_unit_package, 1);
     this->top_package_name = top_unit_package->name;
     parse_package(*top_unit_package);

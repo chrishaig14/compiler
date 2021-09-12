@@ -18,7 +18,7 @@ public:
     std::map<std::string, Unit> units;
 
     std::string rel_path;
-    Package(Path path, std::string abs_path, std::string rel_path, bool is_lib);
+    Package(Path path, std::string abs_path, bool is_lib);
 
     Flirpin get(Path p);
 };
