@@ -5,6 +5,7 @@
 #include <dirent.h>
 #include "Compiler.h"
 #include "../logging/logging.h"
+#include "utils.h"
 
 void
 write_cmakelists(const std::string& cmake_output_path, const std::string& output_name, const std::string& all_files,
@@ -29,33 +30,6 @@ write_cmakelists(const std::string& cmake_output_path, const std::string& output
     cmakelists_file << cmakelists;
 }
 
-std::map<std::string, std::string> read_requirements(const std::string& filepath) {
-    std::string line;
-    std::map<std::string, std::string> requirements;
-    std::ifstream infile(filepath);
-    if (!infile.is_open()) {
-        std::cerr << "No requirements file at " << filepath << std::endl;
-        return requirements;
-    }
-    while (std::getline(infile, line)) {
-        std::string op;
-        std::string first;
-        std::string second;
-        for (char i : line) {
-            if (i == '=') {
-                op += '=';
-            } else {
-                if (op == "") {
-                    first += i;
-                } else {
-                    second += i;
-                }
-            }
-        }
-        requirements[first] = second;
-    }
-    return requirements;
-}
 
 Compiler::Compiler(const std::string& project_dir, const std::string& project_output_dir,
                    const std::string& output_name, const std::string& lib_path, bool is_lib, const std::string& version)
@@ -77,36 +51,11 @@ void Compiler::pre() {
 }
 
 void Compiler::main() {
-
-
     try {
-        analyze_all_modules(root_package, top_package);
+        check_package(root_package, top_package);
     } catch (const std::runtime_error& e) {
         std::cout << "ERROR: " << e.what() << std::endl;
-        // exit(1);
     }
-
-    // this->transpile_all_modules(*root_package, project_output_dir, true);
-    // std::string all_files;
-    // for (auto f: this->all_modules) {
-    //     if (f == "core.xl") {
-    //         continue;
-    //     }
-    //     f = path_join(this->output_name, f.substr(0, f.size() - 3) + ".cpp");
-    //     all_files += f + " ";
-    // }
-    //
-    // std::string cmake_output_path = project_output_dir + "/CMakeLists.txt";
-    //
-    // std::string all_libraries;
-    // for (const auto& req: requirements) {
-    //     all_libraries += req + " ";
-    // }
-    // std::string final_output_name = this->output_name;
-    // if (is_lib) {
-    //     final_output_name += "-" + this->version;
-    // }
-    // write_cmakelists(cmake_output_path, final_output_name, all_files, all_libraries, is_lib);
 }
 
 VectorOfStrings Compiler::load_requirements(const std::string& filepath) {
@@ -118,8 +67,8 @@ VectorOfStrings Compiler::load_requirements(const std::string& filepath) {
 
     VectorOfStrings reqs;
     for (const auto& r: requirements) {
-        load_library(r.first, r.second);
-        reqs.push_back(r.first + "-" + r.second);
+        load_library(r.package, r.version);
+        reqs.push_back(r.package + "-" + r.version);
     }
     if (has_error) {
         std::cerr << "Error loading requirements" << std::endl;
@@ -243,7 +192,7 @@ void Compiler::load_top_unit(const std::string& name, const std::string& m_versi
     std::string unit_requirements_file = path_join(abs_top_unit_path, REQUIREMENTS_FILE);
     auto requirements = read_requirements(unit_requirements_file);
     for (const auto& req: requirements) {
-        load_top_unit(req.first, req.second, true);
+        load_top_unit(req.package, req.version, true);
     }
 
     auto* top_unit_package = new Package(Path(name), abs_top_unit_path, lib_rel_top_unit_path, m_is_lib);

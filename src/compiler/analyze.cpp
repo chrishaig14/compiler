@@ -5,7 +5,7 @@
 #include "Compiler.h"
 #include "../semantic/Checker.h"
 
-void analyze_module(Module& module, Package& top_package) {
+void check_module(Module& module, Package& top_package) {
     for (const auto& path: module.imported_paths_no_alias_v) {
         add_path_to_module(module, path.second, top_package);
     }
@@ -38,15 +38,15 @@ void analyze_module_result(Module& module, Package& top_package) {
     }
 }
 
-void analyze_all_modules(Package& package, Package& top_package) {
+void check_package(Package& package, Package& top_package) {
     // std::cout << "Analyzing package " << package->name << std::endl;
     for (const auto& ep: package.units) {
         if (ep.second.type == U_TYPE::PACKAGE) {
             Package& subpackage = *ep.second.package;
-            analyze_all_modules(subpackage, top_package);
+            check_package(subpackage, top_package);
         } else if (ep.second.type == U_TYPE::MODULE) {
             Module& module = *ep.second.module;
-            analyze_module(module, top_package);
+            check_module(module, top_package);
         }
     }
 }

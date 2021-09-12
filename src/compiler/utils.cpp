@@ -5,7 +5,36 @@
 #include <iostream>
 #include <getopt.h>
 #include <sys/stat.h>
+#include <fstream>
 #include "utils.h"
+
+std::vector<Requirement> read_requirements(const std::string& filepath) {
+    std::string line;
+    std::vector<Requirement> requirements;
+    std::ifstream in_file(filepath);
+    if (!in_file.is_open()) {
+        std::cerr << "No requirements file at " << filepath << std::endl;
+        return requirements;
+    }
+    while (std::getline(in_file, line)) {
+        std::string op;
+        std::string package_name;
+        std::string package_version;
+        for (char i : line) {
+            if (i == '=') {
+                op += '=';
+            } else {
+                if (op == "") {
+                    package_name += i;
+                } else {
+                    package_version += i;
+                }
+            }
+        }
+        requirements.push_back(Requirement{package_name, package_version});
+    }
+    return requirements;
+}
 
 
 void parse_args(int argc, char** argv, bool& is_lib, std::string& project_dir, std::string& project_output_dir,

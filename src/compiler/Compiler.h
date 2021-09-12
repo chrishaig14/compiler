@@ -17,12 +17,11 @@
 void
 write_cmakelists(const std::string& cmake_output_path, const std::string& output_name, const std::string& all_files,
                  const std::string& all_libraries, bool is_lib);
-std::map<std::string, std::string> read_requirements(const std::string& filepath);
 void add_local_path_to_module(Module& module, Path path, Package& top_package);
 void add_path_to_module(Module& module, Path path, Package& top_package);
 void add_path_with_alias_to_module(Module& module, const std::string& alias, Path path, Package& root_package);
-void analyze_module(Module& module, Package& top_package);
-void analyze_all_modules(Package& package, Package& top_package);
+void check_module(Module& module, Package& top_package);
+void check_package(Package& package, Package& top_package);
 
 class Compiler {
     std::string project_dir;
