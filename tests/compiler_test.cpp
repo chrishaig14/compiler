@@ -47,7 +47,9 @@ TEST_CASE("load_project_test", "[compiler]") {
 
     SECTION("only one module") {
         write_file(path_join(IN_DIR, "main.xl"), "fun foo()->Integer{return 0;}");
-        c.load_project();
+
+        load_package(c.root_package, 1);
+
         REQUIRE(c.top_package.units.count(OUT_NAME) == 1);
         Unit u = c.top_package.units[OUT_NAME];
         REQUIRE(u.type == U_TYPE::PACKAGE);
@@ -62,7 +64,9 @@ TEST_CASE("load_project_test", "[compiler]") {
     SECTION("multiple modules") {
         write_file(path_join(IN_DIR, "main.xl"), "fun foo()->Integer{return 0;}");
         write_file(path_join(IN_DIR, "module.xl"), "fun bar()->Integer{return 0;}");
-        c.load_project();
+
+        load_package(c.root_package, 1);
+
         REQUIRE(c.top_package.units.count(OUT_NAME) == 1);
         Unit u = c.top_package.units[OUT_NAME];
         REQUIRE(u.type == U_TYPE::PACKAGE);
@@ -78,18 +82,17 @@ TEST_CASE("load_project_test", "[compiler]") {
         REQUIRE(module_module.type == U_TYPE::MODULE);
     }
 
-    SECTION("one subpackage no modules") {
+    SECTION("one subpackage") {
         write_file(path_join(IN_DIR, "main.xl"), "fun foo()->Integer{return 0;}");
         write_file(path_join(IN_DIR, "module.xl"), "fun bar()->Integer{return 0;}");
 
-
         const std::string& SUBPACKAGE_PATH = path_join(IN_DIR, "subpackage");
         make_dir(SUBPACKAGE_PATH);
-
         write_file(path_join(SUBPACKAGE_PATH, "moduleA.xl"), "fun baz()->Integer{return 0;}");
         write_file(path_join(SUBPACKAGE_PATH, "moduleB.xl"), "fun foobar()->Integer{return 0;}");
 
-        c.load_project();
+        load_package(c.root_package, 1);
+
         REQUIRE(c.top_package.units.count(OUT_NAME) == 1);
         Unit u = c.top_package.units[OUT_NAME];
         REQUIRE(u.type == U_TYPE::PACKAGE);
@@ -126,78 +129,106 @@ TEST_CASE("project_parse_test", "[compiler]") {
     write_file(path_join(IN_DIR, "requirements.txt"), "core==1.0.0");
     Compiler c(IN_DIR, OUT_DIR, OUT_NAME, LIB_PATH, IS_LIB, VERSION);
 
-    SECTION("only one module") {
+    SECTION("parse one module ok") {
         write_file(path_join(IN_DIR, "main.xl"), "fun foo()->Integer{return 0;}");
-        c.load_project();
-        REQUIRE(c.top_package.units.count(OUT_NAME) == 1);
-        Unit u = c.top_package.units[OUT_NAME];
-        REQUIRE(u.type == U_TYPE::PACKAGE);
 
-        REQUIRE(u.package->units.size() == 1);
-
-        REQUIRE(u.package->units.count("main") == 1);
-        Unit m = u.package->units["main"];
-        REQUIRE(m.type == U_TYPE::MODULE);
+        load_package(c.root_package, 1);
+        bool parse_ok = parse_module(*c.root_package.units["main"].module);
+        REQUIRE(parse_ok);
     }
 
-    SECTION("multiple modules") {
-        write_file(path_join(IN_DIR, "main.xl"), "fun foo()->Integer{return 0;}");
-        write_file(path_join(IN_DIR, "module.xl"), "fun bar()->Integer{return 0;}");
-        c.load_project();
-        REQUIRE(c.top_package.units.count(OUT_NAME) == 1);
-        Unit u = c.top_package.units[OUT_NAME];
-        REQUIRE(u.type == U_TYPE::PACKAGE);
+    SECTION("parse one module error") {
+        write_file(path_join(IN_DIR, "main.xl"), "fun foo()->Integer{return1 0;}");
 
-        REQUIRE(u.package->units.size() == 2);
-
-        REQUIRE(u.package->units.count("main") == 1);
-        Unit main_module = u.package->units["main"];
-        REQUIRE(main_module.type == U_TYPE::MODULE);
-
-        REQUIRE(u.package->units.count("module") == 1);
-        Unit module_module = u.package->units["module"];
-        REQUIRE(module_module.type == U_TYPE::MODULE);
+        load_package(c.root_package, 1);
+        bool parse_ok = parse_module(*c.root_package.units["main"].module);
+        REQUIRE(not parse_ok);
     }
 
-    SECTION("one subpackage no modules") {
+    SECTION("parse with subpackage ok") {
         write_file(path_join(IN_DIR, "main.xl"), "fun foo()->Integer{return 0;}");
         write_file(path_join(IN_DIR, "module.xl"), "fun bar()->Integer{return 0;}");
-
 
         const std::string& SUBPACKAGE_PATH = path_join(IN_DIR, "subpackage");
         make_dir(SUBPACKAGE_PATH);
-
         write_file(path_join(SUBPACKAGE_PATH, "moduleA.xl"), "fun baz()->Integer{return 0;}");
         write_file(path_join(SUBPACKAGE_PATH, "moduleB.xl"), "fun foobar()->Integer{return 0;}");
 
-        c.load_project();
-        REQUIRE(c.top_package.units.count(OUT_NAME) == 1);
-        Unit u = c.top_package.units[OUT_NAME];
-        REQUIRE(u.type == U_TYPE::PACKAGE);
+        load_package(c.root_package, 1);
 
-        REQUIRE(u.package->units.size() == 3);
+        bool parse_ok = parse_package(c.root_package);
+        REQUIRE(parse_ok);
+    }
 
-        REQUIRE(u.package->units.count("main") == 1);
-        Unit main_unit = u.package->units["main"];
-        REQUIRE(main_unit.type == U_TYPE::MODULE);
+    SECTION("parse with subpackage error") {
+        write_file(path_join(IN_DIR, "main.xl"), "fun foo()->Integer{return 0;}");
+        write_file(path_join(IN_DIR, "module.xl"), "fun bar()->Integer{return 0;}");
 
-        REQUIRE(u.package->units.count("module") == 1);
-        Unit module_unit = u.package->units["module"];
-        REQUIRE(module_unit.type == U_TYPE::MODULE);
+        const std::string& SUBPACKAGE_PATH = path_join(IN_DIR, "subpackage");
+        make_dir(SUBPACKAGE_PATH);
+        write_file(path_join(SUBPACKAGE_PATH, "moduleA.xl"), "fun baz()->Integer{return1 0;}");
+        write_file(path_join(SUBPACKAGE_PATH, "moduleB.xl"), "fun foobar()->Integer{return 0;}");
 
-        REQUIRE(u.package->units.count("subpackage") == 1);
-        Unit subpackage_unit = u.package->units["subpackage"];
-        REQUIRE(subpackage_unit.type == U_TYPE::PACKAGE);
+        load_package(c.root_package, 1);
 
-        Package* subpackage = subpackage_unit.package;
-        REQUIRE(subpackage->units.count("moduleA") == 1);
-        Unit moduleA_unit = subpackage->units["moduleA"];
-        CHECK(moduleA_unit.type == U_TYPE::MODULE);
+        bool parse_ok = parse_package(c.root_package);
+        REQUIRE(not parse_ok);
+    }
+    cleanup_dirs();
+}
 
-        REQUIRE(subpackage->units.count("moduleB") == 1);
-        Unit moduleB_unit = subpackage->units["moduleB"];
-        CHECK(moduleB_unit.type == U_TYPE::MODULE);
 
+TEST_CASE("project_preprocess_test", "[compiler]") {
+    setup_dirs();
+    write_file(path_join(IN_DIR, "requirements.txt"), "core==1.0.0");
+    Compiler c(IN_DIR, OUT_DIR, OUT_NAME, LIB_PATH, IS_LIB, VERSION);
+
+    SECTION("preprocess one module ok") {
+        write_file(path_join(IN_DIR, "main.xl"), "fun foo()->Integer{return 0;}");
+
+        load_package(c.root_package, 1);
+        REQUIRE(parse_package(c.root_package));
+
+        REQUIRE(preprocess_package(c.root_package));
+    }
+
+    SECTION("parse one module error") {
+        write_file(path_join(IN_DIR, "main.xl"), "fun foo()->Integer{return 0;}fun foo()->Integer{}");
+
+        load_package(c.root_package, 1);
+        REQUIRE(parse_package(c.root_package));
+
+        REQUIRE(not preprocess_package(c.root_package));
+    }
+
+    SECTION("preprocess with subpackage ok") {
+        write_file(path_join(IN_DIR, "main.xl"), "fun foo()->Integer{return 0;}");
+        write_file(path_join(IN_DIR, "module.xl"), "fun bar()->Integer{return 0;}");
+
+        const std::string& SUBPACKAGE_PATH = path_join(IN_DIR, "subpackage");
+        make_dir(SUBPACKAGE_PATH);
+        write_file(path_join(SUBPACKAGE_PATH, "moduleA.xl"), "fun baz()->Integer{return 0;}");
+        write_file(path_join(SUBPACKAGE_PATH, "moduleB.xl"), "fun foobar()->Integer{return 0;}");
+
+        load_package(c.root_package, 1);
+        REQUIRE(parse_package(c.root_package));
+
+        REQUIRE(preprocess_package(c.root_package));
+    }
+
+    SECTION("preprocess with subpackage error") {
+        write_file(path_join(IN_DIR, "main.xl"), "fun foo()->Integer{return 0;}");
+        write_file(path_join(IN_DIR, "module.xl"), "fun bar()->Integer{return 0;}");
+
+        const std::string& SUBPACKAGE_PATH = path_join(IN_DIR, "subpackage");
+        make_dir(SUBPACKAGE_PATH);
+        write_file(path_join(SUBPACKAGE_PATH, "moduleA.xl"), "fun baz()->Integer{return 0;}");
+        write_file(path_join(SUBPACKAGE_PATH, "moduleB.xl"), "fun foobar()->Integer{return 0;} fun foobar()->Integer{}");
+
+        load_package(c.root_package, 1);
+        REQUIRE(parse_package(c.root_package));
+
+        REQUIRE(not preprocess_package(c.root_package));
     }
     cleanup_dirs();
 }

@@ -20,9 +20,14 @@ write_cmakelists(const std::string& cmake_output_path, const std::string& output
 void add_local_path_to_module(Module& module, Path path, Package& top_package);
 void add_path_to_module(Module& module, Path path, Package& top_package);
 void add_path_with_alias_to_module(Module& module, const std::string& alias, Path path, Package& root_package);
-void check_module(Module& module, Package& top_package);
-void check_package(Package& package, Package& top_package);
+bool check_module(Module& module, Package& top_package);
+bool check_package(Package& package, Package& top_package);
+bool preprocess_package(Package& package);
+void load_module(Package& package, const std::string& module_name);
+bool parse_module(Module& module);
+bool parse_package(Package& package);
 
+void load_package(Package& package, int level);
 class Compiler {
     std::string project_dir;
     std::string project_output_dir;
@@ -41,7 +46,7 @@ class Compiler {
 
     bool is_lib;
     std::string version;
-
+    bool ok;
 public:
     ~Compiler() {
         std::cout << "Called compiler destructor " << std::endl;
@@ -61,7 +66,21 @@ public:
         //     // load package/module structure (including external packages, i.e. requirements)
         //     ProjectLoader project_loader;
         //     Package* top_package = project_loader.load(this->project_dir, this->project_name);
-        this->load_package(root_package, 1);
+        std::string req_file_path = path_join(this->project_dir, REQUIREMENTS_FILE);
+        VectorOfStrings requirements = this->load_requirements(req_file_path);
+
+        load_package(root_package, 1);
+        parse_package(root_package);
+        bool global_ok = preprocess_package(root_package);
+        if (!global_ok) {
+            this->ok = false;
+            return;
+        }
+        bool check_ok = check_package(root_package, top_package);
+        if (!check_ok) {
+            this->ok = false;
+            return;
+        }
         //     // parse everything (loads ast for each module)
         //     GlobalParser global_parser;
         //     global_parser.parse();
@@ -82,19 +101,14 @@ public:
     Compiler(const std::string& project_dir, const std::string& project_output_dir, const std::string& output_name,
              const std::string& lib_path, bool is_lib, const std::string& version);
     VectorOfStrings load_requirements(const std::string& filepath);
-    void preprocess_package(Package& package);
     void add_global_path_to_module(Module& module, Path path);
 
 
-    void parse_module(Module& module);
-    void parse_package(Package& package);
     // void transpile_all_modules(Package& package, const std::string& output_dir, bool is_top);
     // void transpile_one_module(Module& module, std::string& package_header, const std::string& output_package_dir,
     //                           Package& package, std::string static_initializations, std::string& static_cleanups);
 
-    void load_module(Package& package, const std::string& module_name);
 
-    void load_package(Package& package, int level);
     void load_library(const std::string& name, const std::string& lib_version);
     void load_top_unit(const std::string& name, const std::string& m_version, bool m_is_lib);
     // void transpile_one_module(Module& module, std::string& package_header, const std::string& output_package_dir,

@@ -188,6 +188,17 @@ TEST_CASE("parse_decl_simple", "[parser]") {
 
     REQUIRE(ast->to_json() == DECLARATION.node->to_json());
 }
+//
+// TEST_CASE("parse_error", "[parser]") {
+//     Scanner scanner;
+//     std::string code = "fun foo()->Integer{return1 0;}";
+//     scanner.load_text(code);
+//     std::vector<Token> tokens = scanner.scan_all();
+//     Parser parser("test", scanner.code_lines, tokens);
+//
+//     std::unique_ptr<ast::Function> ast = parser.parse_function_definition();
+// }
+
 
 TEST_CASE("parse_decl_with_type", "[parser]") {
     Scanner scanner;

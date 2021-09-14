@@ -5,7 +5,7 @@
 #include "Compiler.h"
 #include "../semantic/Checker.h"
 
-void check_module(Module& module, Package& top_package) {
+bool check_module(Module& module, Package& top_package) {
     for (const auto& path: module.imported_paths_no_alias_v) {
         add_path_to_module(module, path.second, top_package);
     }
@@ -19,10 +19,7 @@ void check_module(Module& module, Package& top_package) {
     Checker checker(top_package, module);
     USemanticInfoBlock check_info = checker.visit_root(*module.ast);
     module.sast = std::move(check_info->snode);
-    if (checker.error_reporter.failed) {
-        // global_fail = true;
-        throw std::runtime_error("Semantic analysis failed for module " + module.abs_path);
-    }
+    return checker.error_reporter.failed;
 }
 
 void analyze_module_result(Module& module, Package& top_package) {
@@ -38,17 +35,19 @@ void analyze_module_result(Module& module, Package& top_package) {
     }
 }
 
-void check_package(Package& package, Package& top_package) {
+bool check_package(Package& package, Package& top_package) {
     // std::cout << "Analyzing package " << package->name << std::endl;
+    bool ok = true;
     for (const auto& ep: package.units) {
         if (ep.second.type == U_TYPE::PACKAGE) {
             Package& subpackage = *ep.second.package;
             check_package(subpackage, top_package);
         } else if (ep.second.type == U_TYPE::MODULE) {
             Module& module = *ep.second.module;
-            check_module(module, top_package);
+            ok |= check_module(module, top_package);
         }
     }
+    return ok;
 }
 
 void add_path_with_alias_to_module(Module& module, const std::string& alias, Path path, Package& root_package) {
@@ -138,16 +137,32 @@ void add_local_path_to_module(Module& module, Path path, Package& top_package) {
     module.flirpins[path.as_vec().back()] = current_flirpin;
 }
 
-void Compiler::preprocess_package(Package& package) {
+bool preprocess_module(Module& module) {
+    GlobalProcessor gp(module);
+    std::cout << "Global-processing module " << module.name << " at path: " << module.abs_path << std::endl;
+    try {
+        gp.visit_root();
+    } catch (std::runtime_error& e) {
+        std::cout << "Error global processing module " << module.abs_path << " : " << e.what() << std::endl;
+        return false;
+    }
+    return true;
+}
+
+bool preprocess_package(Package& package) {
+    bool ok = true;
     for (const auto& ep: package.units) {
         if (ep.second.type == U_TYPE::PACKAGE) {
             Package* subpackage = ep.second.package;
-            this->preprocess_package(*subpackage);
+            if (not preprocess_package(*subpackage)) {
+                ok = false;
+            }
         } else if (ep.second.type == U_TYPE::MODULE) {
             Module* module = ep.second.module;
-            GlobalProcessor gp(*module);
-            std::cout << "Global-processing module " << module->name << " at path: " << module->abs_path << std::endl;
-            gp.visit_root();
+            if (not preprocess_module(*module)) {
+                ok = false;
+            }
         }
     }
+    return ok;
 }

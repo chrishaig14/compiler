@@ -44,10 +44,10 @@ void Compiler::pre() {
 
     VectorOfStrings requirements = this->load_requirements(req_file_path);
 
-    this->load_package(root_package, 1);
-    this->parse_package(root_package);
+    load_package(root_package, 1);
+    parse_package(root_package);
 
-    this->preprocess_package(root_package);
+    preprocess_package(root_package);
 }
 
 void Compiler::main() {
@@ -77,18 +77,18 @@ VectorOfStrings Compiler::load_requirements(const std::string& filepath) {
     return reqs;
 }
 
-void Compiler::load_module(Package& package, const std::string& module_name) {
+void load_module(Package& package, const std::string& module_name) {
     std::string module_abs_path = path_join(package.abs_path, module_name + ".xl");
     std::string module_rel_path = path_join(package.rel_path, module_name);
-    if (!package.is_lib) {
-        all_modules.push_back(module_rel_path);
-    }
+    // if (!package.is_lib) {
+    //     all_modules.push_back(module_rel_path);
+    // }
     auto* module = new Module(Path(package.path, module_name), module_abs_path, package.is_lib);
-    this->my_modules.push_back(std::unique_ptr<Module>(module));
+    // this->my_modules.push_back(std::unique_ptr<Module>(module));
     package.units[module_name] = Unit{.type=U_TYPE::MODULE, .module=module};
 }
 
-void Compiler::load_package(Package& package, int level) {
+void load_package(Package& package, int level) {
     std::string abs_path = package.abs_path;
     DIR* dir = opendir(abs_path.c_str());
     if (dir == nullptr) {
@@ -192,7 +192,7 @@ void Compiler::load_top_unit(const std::string& name, const std::string& m_versi
     load_package(*top_unit_package, 1);
     this->top_package_name = top_unit_package->name;
     parse_package(*top_unit_package);
-    this->preprocess_package(*top_unit_package);
+    preprocess_package(*top_unit_package);
     top_package.units[name] = Unit{.type=U_TYPE::PACKAGE, .package=top_unit_package};
     std::cout << "Finished loading top unit: " << E_HLT(lib_rel_top_unit_path) << std::endl;
     this->loaded_top_units[lib_rel_top_unit_path] = true;
