@@ -22,7 +22,7 @@ bool check_module(Module& module, Package& top_package) {
     return checker.error_reporter.failed;
 }
 
-void analyze_module_result(Module& module, Package& top_package) {
+void resolve_module_imports(Module& module, Package& top_package) {
     for (const auto& path: module.imported_paths_no_alias_v) {
         add_path_to_module(module, path.second, top_package);
     }
@@ -41,10 +41,14 @@ bool check_package(Package& package, Package& top_package) {
     for (const auto& ep: package.units) {
         if (ep.second.type == U_TYPE::PACKAGE) {
             Package& subpackage = *ep.second.package;
-            check_package(subpackage, top_package);
+            if (not check_package(subpackage, top_package)) {
+                ok = false;
+            }
         } else if (ep.second.type == U_TYPE::MODULE) {
             Module& module = *ep.second.module;
-            ok |= check_module(module, top_package);
+            if (not check_module(module, top_package)) {
+                ok = false;
+            }
         }
     }
     return ok;

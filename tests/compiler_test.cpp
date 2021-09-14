@@ -232,3 +232,60 @@ TEST_CASE("project_preprocess_test", "[compiler]") {
     }
     cleanup_dirs();
 }
+
+TEST_CASE("import_test", "[compiler]") {
+    setup_dirs();
+    write_file(path_join(IN_DIR, "requirements.txt"), "core==1.0.0");
+    Compiler c(IN_DIR, OUT_DIR, OUT_NAME, LIB_PATH, IS_LIB, VERSION);
+
+    SECTION("import module ok") {
+        write_file(path_join(IN_DIR, "main.xl"), "import moduleA; fun foo()->Integer{return 0;}");
+        write_file(path_join(IN_DIR, "moduleA.xl"), "fun bar()->Integer{return 0;}");
+
+        load_package(c.root_package, 1);
+        REQUIRE(parse_package(c.root_package));
+        REQUIRE(preprocess_package(c.root_package));
+        std::cout << 2 << std::endl;
+        // REQUIRE(resolve_package_imports(c.root_package));
+    }
+
+    SECTION("parse one module error") {
+        write_file(path_join(IN_DIR, "main.xl"), "fun foo()->Integer{return 0;}fun foo()->Integer{}");
+
+        load_package(c.root_package, 1);
+        REQUIRE(parse_package(c.root_package));
+
+        REQUIRE(not preprocess_package(c.root_package));
+    }
+
+    SECTION("preprocess with subpackage ok") {
+        write_file(path_join(IN_DIR, "main.xl"), "fun foo()->Integer{return 0;}");
+        write_file(path_join(IN_DIR, "module.xl"), "fun bar()->Integer{return 0;}");
+
+        const std::string& SUBPACKAGE_PATH = path_join(IN_DIR, "subpackage");
+        make_dir(SUBPACKAGE_PATH);
+        write_file(path_join(SUBPACKAGE_PATH, "moduleA.xl"), "fun baz()->Integer{return 0;}");
+        write_file(path_join(SUBPACKAGE_PATH, "moduleB.xl"), "fun foobar()->Integer{return 0;}");
+
+        load_package(c.root_package, 1);
+        REQUIRE(parse_package(c.root_package));
+
+        REQUIRE(preprocess_package(c.root_package));
+    }
+
+    SECTION("preprocess with subpackage error") {
+        write_file(path_join(IN_DIR, "main.xl"), "fun foo()->Integer{return 0;}");
+        write_file(path_join(IN_DIR, "module.xl"), "fun bar()->Integer{return 0;}");
+
+        const std::string& SUBPACKAGE_PATH = path_join(IN_DIR, "subpackage");
+        make_dir(SUBPACKAGE_PATH);
+        write_file(path_join(SUBPACKAGE_PATH, "moduleA.xl"), "fun baz()->Integer{return 0;}");
+        write_file(path_join(SUBPACKAGE_PATH, "moduleB.xl"), "fun foobar()->Integer{return 0;} fun foobar()->Integer{}");
+
+        load_package(c.root_package, 1);
+        REQUIRE(parse_package(c.root_package));
+
+        REQUIRE(not preprocess_package(c.root_package));
+    }
+    cleanup_dirs();
+}

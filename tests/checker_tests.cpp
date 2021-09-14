@@ -51,7 +51,7 @@ TEST_CASE("basic_function", "[checker]") {
     std::unique_ptr<Compiler> cp = analyze(code);
     Compiler& c = *cp;
     Module& module = *c.root_package.units["tmp"].module;
-    analyze_module_result(module, c.top_package);
+    resolve_module_imports(module, c.top_package);
     Checker checker(c.top_package, module);
     checker.visit_function(module.ast->functions[0]);
     REQUIRE(not checker.error_reporter.failed);
@@ -63,7 +63,7 @@ TEST_CASE("basic_function_bad_return_type", "[checker]") {
     std::unique_ptr<Compiler> cp = analyze(code);
     Compiler& c = *cp;
     Module& module = *c.root_package.units["tmp"].module;
-    analyze_module_result(module, c.top_package);
+    resolve_module_imports(module, c.top_package);
     Checker checker(c.top_package, module);
     checker.visit_function((ast::Function&) module.ast->functions[0]);
 
@@ -83,7 +83,7 @@ TEST_CASE("basic_declaration", "[checker]") {
     std::unique_ptr<Compiler> cp = analyze(code);
     Compiler& c = *cp;
     Module& module = *c.root_package.units["tmp"].module;
-    analyze_module_result(module, c.top_package);
+    resolve_module_imports(module, c.top_package);
     Checker checker(c.top_package, module);
     checker.visit_declaration((ast::Declaration&) *((std::unique_ptr<ast::Function>&) module.ast->functions[0])->body->nodes[0]);
     REQUIRE(not checker.error_reporter.failed);
@@ -95,7 +95,7 @@ TEST_CASE("basic_declaration_type_ok", "[checker]") {
     std::unique_ptr<Compiler> cp = analyze(code);
     Compiler& c = *cp;
     Module& module = *c.root_package.units["tmp"].module;
-    analyze_module_result(module, c.top_package);
+    resolve_module_imports(module, c.top_package);
     Checker checker(c.top_package, module);
     checker.visit_declaration((ast::Declaration&) *((std::unique_ptr<ast::Function>&) module.ast->functions[0])->body->nodes[0]);
     REQUIRE(not checker.error_reporter.failed);
@@ -107,7 +107,7 @@ TEST_CASE("basic_declaration_bad_type", "[checker]") {
     std::unique_ptr<Compiler> cp = analyze(code);
     Compiler& c = *cp;
     Module& module = *c.root_package.units["tmp"].module;
-    analyze_module_result(module, c.top_package);
+    resolve_module_imports(module, c.top_package);
     Checker checker(c.top_package, module);
     checker.visit_declaration((ast::Declaration&) *((std::unique_ptr<ast::Function>&) module.ast->functions[0])->body->nodes[0]);
 
@@ -126,7 +126,7 @@ TEST_CASE("error_redeclared", "[checker]") {
     std::unique_ptr<Compiler> cp = analyze(code);
     Compiler& c = *cp;
     Module& module = *c.root_package.units["tmp"].module;
-    analyze_module_result(module, c.top_package);
+    resolve_module_imports(module, c.top_package);
     Checker checker(c.top_package, module);
     checker.visit_function(module.ast->functions[0]);
 
@@ -146,7 +146,7 @@ TEST_CASE("list_ok", "[checker]") {
     std::unique_ptr<Compiler> cp = analyze(code);
     Compiler& c = *cp;
     Module& module = *c.root_package.units["tmp"].module;
-    analyze_module_result(module, c.top_package);
+    resolve_module_imports(module, c.top_package);
     Checker checker(c.top_package, module);
     checker.visit_function(module.ast->functions[0]);
 
@@ -160,7 +160,7 @@ TEST_CASE("list_bad", "[checker]") {
     std::unique_ptr<Compiler> cp = analyze(code);
     Compiler& c = *cp;
     Module& module = *c.root_package.units["tmp"].module;
-    analyze_module_result(module, c.top_package);
+    resolve_module_imports(module, c.top_package);
     Checker checker(c.top_package, module);
     checker.visit_function(module.ast->functions[0]);
 
@@ -182,7 +182,7 @@ TEST_CASE("empty_dict_ok", "[checker]") {
     std::unique_ptr<Compiler> cp = analyze(code);
     Compiler& c = *cp;
     Module& module = *c.root_package.units["tmp"].module;
-    analyze_module_result(module, c.top_package);
+    resolve_module_imports(module, c.top_package);
     Checker checker(c.top_package, module);
     checker.visit_function(module.ast->functions[0]);
 
@@ -196,7 +196,7 @@ TEST_CASE("dict_ok", "[checker]") {
     std::unique_ptr<Compiler> cp = analyze(code);
     Compiler& c = *cp;
     Module& module = *c.root_package.units["tmp"].module;
-    analyze_module_result(module, c.top_package);
+    resolve_module_imports(module, c.top_package);
     Checker checker(c.top_package, module);
     checker.visit_function(module.ast->functions[0]);
 
@@ -210,7 +210,7 @@ TEST_CASE("dict_key_type_error", "[checker]") {
     std::unique_ptr<Compiler> cp = analyze(code);
     Compiler& c = *cp;
     Module& module = *c.root_package.units["tmp"].module;
-    analyze_module_result(module, c.top_package);
+    resolve_module_imports(module, c.top_package);
     Checker checker(c.top_package, module);
     checker.visit_function(module.ast->functions[0]);
 
@@ -224,7 +224,7 @@ TEST_CASE("dict_value_type_error", "[checker]") {
     std::unique_ptr<Compiler> cp = analyze(code);
     Compiler& c = *cp;
     Module& module = *c.root_package.units["tmp"].module;
-    analyze_module_result(module, c.top_package);
+    resolve_module_imports(module, c.top_package);
     Checker checker(c.top_package, module);
     checker.visit_function(module.ast->functions[0]);
 
@@ -239,7 +239,7 @@ TEST_CASE("int_literal", "[checker]") {
     std::unique_ptr<Compiler> cp = analyze(code);
     Compiler& c = *cp;
     Module& module = *c.root_package.units["tmp"].module;
-    analyze_module_result(module, c.top_package);
+    resolve_module_imports(module, c.top_package);
     Checker checker(c.top_package, module);
     ast::Node& expression = ((ast::Declaration&) *(module.ast->functions[0].get().body->nodes[0])).expression;
     USemanticInfo info = checker.dispatch_rvalue(expression);
@@ -257,7 +257,7 @@ TEST_CASE("bool_literal", "[checker]") {
     std::unique_ptr<Compiler> cp = analyze(code);
     Compiler& c = *cp;
     Module& module = *c.root_package.units["tmp"].module;
-    analyze_module_result(module, c.top_package);
+    resolve_module_imports(module, c.top_package);
     Checker checker(c.top_package, module);
     ast::Node& expression = ((ast::Declaration&) *(module.ast->functions[0].get().body->nodes[0])).expression;
     USemanticInfo info = checker.dispatch_rvalue(expression);
@@ -275,7 +275,7 @@ TEST_CASE("list_literal", "[checker]") {
     std::unique_ptr<Compiler> cp = analyze(code);
     Compiler& c = *cp;
     Module& module = *c.root_package.units["tmp"].module;
-    analyze_module_result(module, c.top_package);
+    resolve_module_imports(module, c.top_package);
     Checker checker(c.top_package, module);
     ast::Node& expression = ((ast::Declaration&) *(module.ast->functions[0].get().body->nodes[0])).expression;
     USemanticInfo info = checker.dispatch_rvalue(expression);
@@ -293,7 +293,7 @@ TEST_CASE("empty_list_literal", "[checker]") {
     std::unique_ptr<Compiler> cp = analyze(code);
     Compiler& c = *cp;
     Module& module = *c.root_package.units["tmp"].module;
-    analyze_module_result(module, c.top_package);
+    resolve_module_imports(module, c.top_package);
     Checker checker(c.top_package, module);
     ast::Node& expression = ((ast::Declaration&) *(module.ast->functions[0].get().body->nodes[0])).expression;
     USemanticInfo info = checker.dispatch_rvalue(expression);
@@ -311,7 +311,7 @@ TEST_CASE("empty_dict_literal", "[checker]") {
     std::unique_ptr<Compiler> cp = analyze(code);
     Compiler& c = *cp;
     Module& module = *c.root_package.units["tmp"].module;
-    analyze_module_result(module, c.top_package);
+    resolve_module_imports(module, c.top_package);
     Checker checker(c.top_package, module);
     ast::Node& expression = ((ast::Declaration&) *(module.ast->functions[0].get().body->nodes[0])).expression;
     USemanticInfo info = checker.dispatch_rvalue(expression);
@@ -331,7 +331,7 @@ TEST_CASE("dict_literal", "[checker]") {
     std::unique_ptr<Compiler> cp = analyze(code);
     Compiler& c = *cp;
     Module& module = *c.root_package.units["tmp"].module;
-    analyze_module_result(module, c.top_package);
+    resolve_module_imports(module, c.top_package);
     Checker checker(c.top_package, module);
     ast::Node& expression = ((ast::Declaration&) *(module.ast->functions[0].get().body->nodes[0])).expression;
     USemanticInfo info = checker.dispatch_rvalue(expression);
@@ -350,7 +350,7 @@ TEST_CASE("float_literal", "[checker]") {
     std::unique_ptr<Compiler> cp = analyze(code);
     Compiler& c = *cp;
     Module& module = *c.root_package.units["tmp"].module;
-    analyze_module_result(module, c.top_package);
+    resolve_module_imports(module, c.top_package);
     Checker checker(c.top_package, module);
     ast::Node& expression = ((ast::Declaration&) *(module.ast->functions[0].get().body->nodes[0])).expression;
     USemanticInfo info = checker.dispatch_rvalue(expression);
@@ -385,7 +385,7 @@ TEST_CASE("decl_error_expected_expression", "[checker]") {
     std::unique_ptr<Compiler> cp = analyze(code);
     Compiler& c = *cp;
     Module& module = *c.root_package.units["tmp"].module;
-    analyze_module_result(module, c.top_package);
+    resolve_module_imports(module, c.top_package);
     Checker checker(c.top_package, module);
     checker.init();
     ast::Function& function_node = module.ast->functions[0];
@@ -409,7 +409,7 @@ TEST_CASE("error_no_member", "[checker]") {
     Compiler* cp = analyze(code).release();
     Compiler& c = *cp;
     Module& module = *c.root_package.units["tmp"].module;
-    analyze_module_result(module, c.top_package);
+    resolve_module_imports(module, c.top_package);
     Checker checker(c.top_package, module);
     std::cout << "Starting checker" << std::endl;
     checker.init();
@@ -435,7 +435,7 @@ TEST_CASE("member_ok", "[checker]") {
     std::unique_ptr<Compiler> cp = analyze(code);
     Compiler& c = *cp;
     Module& module = *c.root_package.units["tmp"].module;
-    analyze_module_result(module, c.top_package);
+    resolve_module_imports(module, c.top_package);
     Checker checker(c.top_package, module);
     checker.init();
     checker.visit_root(*module.ast);
@@ -450,7 +450,7 @@ TEST_CASE("binop_ok", "[checker]") {
     std::unique_ptr<Compiler> cp = analyze(code);
     Compiler& c = *cp;
     Module& module = *c.root_package.units["tmp"].module;
-    analyze_module_result(module, c.top_package);
+    resolve_module_imports(module, c.top_package);
     Checker checker(c.top_package, module);
     checker.init();
 
@@ -471,7 +471,7 @@ TEST_CASE("boolop_ok", "[checker]") {
     std::unique_ptr<Compiler> cp = analyze(code);
     Compiler& c = *cp;
     Module& module = *c.root_package.units["tmp"].module;
-    analyze_module_result(module, c.top_package);
+    resolve_module_imports(module, c.top_package);
     Checker checker(c.top_package, module);
     checker.init();
 
@@ -493,7 +493,7 @@ TEST_CASE("binop_type_error", "[checker]") {
     std::unique_ptr<Compiler> cp = analyze(code);
     Compiler& c = *cp;
     Module& module = *c.root_package.units["tmp"].module;
-    analyze_module_result(module, c.top_package);
+    resolve_module_imports(module, c.top_package);
     Checker checker(c.top_package, module);
     checker.init();
 
@@ -517,7 +517,7 @@ TEST_CASE("binop_error", "[checker]") {
     std::unique_ptr<Compiler> cp = analyze(code);
     Compiler& c = *cp;
     Module& module = *c.root_package.units["tmp"].module;
-    analyze_module_result(module, c.top_package);
+    resolve_module_imports(module, c.top_package);
     Checker checker(c.top_package, module);
     checker.init();
 
@@ -542,7 +542,7 @@ TEST_CASE("subscript_ok", "[checker]") {
     std::unique_ptr<Compiler> cp = analyze(code);
     Compiler& c = *cp;
     Module& module = *c.root_package.units["tmp"].module;
-    analyze_module_result(module, c.top_package);
+    resolve_module_imports(module, c.top_package);
     Checker checker(c.top_package, module);
     checker.init();
 
@@ -559,7 +559,7 @@ TEST_CASE("subscript_index_type_error", "[checker]") {
     std::unique_ptr<Compiler> cp = analyze(code);
     Compiler& c = *cp;
     Module& module = *c.root_package.units["tmp"].module;
-    analyze_module_result(module, c.top_package);
+    resolve_module_imports(module, c.top_package);
     Checker checker(c.top_package, module);
     checker.init();
 
@@ -582,7 +582,7 @@ TEST_CASE("subscript_no_method_error", "[checker]") {
     std::unique_ptr<Compiler> cp = analyze(code);
     Compiler& c = *cp;
     Module& module = *c.root_package.units["tmp"].module;
-    analyze_module_result(module, c.top_package);
+    resolve_module_imports(module, c.top_package);
     Checker checker(c.top_package, module);
     checker.init();
     checker.visit_root(*module.ast);
@@ -609,7 +609,7 @@ TEST_CASE("call_no_args_ok", "[checker]") {
     std::unique_ptr<Compiler> cp = analyze(code);
     Compiler& c = *cp;
     Module& module = *c.root_package.units["tmp"].module;
-    analyze_module_result(module, c.top_package);
+    resolve_module_imports(module, c.top_package);
     Checker checker(c.top_package, module);
     checker.init();
     checker.visit_root(*module.ast);
@@ -624,7 +624,7 @@ TEST_CASE("call_args_ok", "[checker]") {
     std::unique_ptr<Compiler> cp = analyze(code);
     Compiler& c = *cp;
     Module& module = *c.root_package.units["tmp"].module;
-    analyze_module_result(module, c.top_package);
+    resolve_module_imports(module, c.top_package);
     Checker checker(c.top_package, module);
     checker.init();
     checker.visit_root(*module.ast);
@@ -639,7 +639,7 @@ TEST_CASE("call_args_type_error", "[checker]") {
     std::unique_ptr<Compiler> cp = analyze(code);
     Compiler& c = *cp;
     Module& module = *c.root_package.units["tmp"].module;
-    analyze_module_result(module, c.top_package);
+    resolve_module_imports(module, c.top_package);
     Checker checker(c.top_package, module);
     checker.init();
     checker.visit_root(*module.ast);
@@ -661,7 +661,7 @@ TEST_CASE("union_ok_1", "[checker]") {
     std::unique_ptr<Compiler> cp = analyze(code);
     Compiler& c = *cp;
     Module& module = *c.root_package.units["tmp"].module;
-    analyze_module_result(module, c.top_package);
+    resolve_module_imports(module, c.top_package);
     Checker checker(c.top_package, module);
     checker.init();
     checker.visit_root(*module.ast);
@@ -676,7 +676,7 @@ TEST_CASE("union_ok_2", "[checker]") {
     std::unique_ptr<Compiler> cp = analyze(code);
     Compiler& c = *cp;
     Module& module = *c.root_package.units["tmp"].module;
-    analyze_module_result(module, c.top_package);
+    resolve_module_imports(module, c.top_package);
     Checker checker(c.top_package, module);
     checker.init();
     checker.visit_root(*module.ast);
@@ -691,7 +691,7 @@ TEST_CASE("union_error", "[checker]") {
     std::unique_ptr<Compiler> cp = analyze(code);
     Compiler& c = *cp;
     Module& module = *c.root_package.units["tmp"].module;
-    analyze_module_result(module, c.top_package);
+    resolve_module_imports(module, c.top_package);
     Checker checker(c.top_package, module);
     checker.init();
     checker.visit_root(*module.ast);
@@ -712,7 +712,7 @@ TEST_CASE("while_ok", "[checker]") {
     std::unique_ptr<Compiler> cp = analyze(code);
     Compiler& c = *cp;
     Module& module = *c.root_package.units["tmp"].module;
-    analyze_module_result(module, c.top_package);
+    resolve_module_imports(module, c.top_package);
     Checker checker(c.top_package, module);
     checker.init();
     checker.visit_root(*module.ast);
@@ -727,7 +727,7 @@ TEST_CASE("while_boolean_error", "[checker]") {
     std::unique_ptr<Compiler> cp = analyze(code);
     Compiler& c = *cp;
     Module& module = *c.root_package.units["tmp"].module;
-    analyze_module_result(module, c.top_package);
+    resolve_module_imports(module, c.top_package);
     Checker checker(c.top_package, module);
     checker.init();
     checker.visit_root(*module.ast);
@@ -749,7 +749,7 @@ TEST_CASE("match_ok", "[checker]") {
     std::unique_ptr<Compiler> cp = analyze(code);
     Compiler& c = *cp;
     Module& module = *c.root_package.units["tmp"].module;
-    analyze_module_result(module, c.top_package);
+    resolve_module_imports(module, c.top_package);
     Checker checker(c.top_package, module);
     checker.init();
     checker.visit_root(*module.ast);
@@ -779,7 +779,7 @@ TEST_CASE("union_ok", "[checker]") {
     std::unique_ptr<Compiler> cp = analyze(code);
     Compiler& c = *cp;
     Module& module = *c.root_package.units["tmp"].module;
-    analyze_module_result(module, c.top_package);
+    resolve_module_imports(module, c.top_package);
     Checker checker(c.top_package, module);
     checker.init();
     checker.visit_root(*module.ast);
@@ -794,7 +794,7 @@ TEST_CASE("if_ok", "[checker]") {
     std::unique_ptr<Compiler> cp = analyze(code);
     Compiler& c = *cp;
     Module& module = *c.root_package.units["tmp"].module;
-    analyze_module_result(module, c.top_package);
+    resolve_module_imports(module, c.top_package);
     Checker checker(c.top_package, module);
     checker.init();
     checker.visit_root(*module.ast);
@@ -809,7 +809,7 @@ TEST_CASE("if_boolean_error", "[checker]") {
     std::unique_ptr<Compiler> cp = analyze(code);
     Compiler& c = *cp;
     Module& module = *c.root_package.units["tmp"].module;
-    analyze_module_result(module, c.top_package);
+    resolve_module_imports(module, c.top_package);
     Checker checker(c.top_package, module);
     checker.init();
     checker.visit_root(*module.ast);
@@ -831,7 +831,7 @@ TEST_CASE("enum_error", "[checker]") {
     std::unique_ptr<Compiler> cp = analyze(code);
     Compiler& c = *cp;
     Module& module = *c.root_package.units["tmp"].module;
-    analyze_module_result(module, c.top_package);
+    resolve_module_imports(module, c.top_package);
     Checker checker(c.top_package, module);
     checker.init();
     checker.visit_root(*module.ast);
@@ -855,7 +855,7 @@ TEST_CASE("enum_ok", "[checker]") {
     std::unique_ptr<Compiler> cp = analyze(code);
     Compiler& c = *cp;
     Module& module = *c.root_package.units["tmp"].module;
-    analyze_module_result(module, c.top_package);
+    resolve_module_imports(module, c.top_package);
     Checker checker(c.top_package, module);
     checker.init();
     checker.visit_root(*module.ast);

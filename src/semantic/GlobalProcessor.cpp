@@ -87,8 +87,8 @@ Enum* make_enum(ast::EnumNode& n, Path module_path) {
 
 void GlobalProcessor::visit_root() {
     ast::Module& node = *this->module.ast;
-    check_duplicated_names(node);
     this->add_default_imports();
+    check_duplicated_names(node);
 
     for (ast::Import& n: node.imports) {
         this->visit_import(n);

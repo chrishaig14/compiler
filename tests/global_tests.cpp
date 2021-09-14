@@ -76,7 +76,7 @@ TEST_CASE("global_class", "[parser]") {
 
 TEST_CASE("global_multiple", "[parser]") {
     Scanner scanner;
-    std::string code = "fun main()->Integer{return 0;}\nclass Foo {x: Integer;}";
+    std::string code = "import moduleA; fun main()->Integer{return 0;}\nclass Foo {x: Integer;}\n";
     scanner.load_text(code);
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser("test", scanner.code_lines, tokens);
