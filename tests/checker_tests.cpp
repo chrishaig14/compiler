@@ -421,11 +421,11 @@ TEST_CASE("error_no_member", "[checker]") {
     REQUIRE(checker.error_reporter.errors.size() == 1);
 
     Error& error = *checker.error_reporter.errors.back();
-    ModuleMember clazz_flirpin = module.get(Path("Foo"));
-    REQUIRE(clazz_flirpin.type == F_TYPE::CLASS);
+    ModuleMember module_member = module.get(Path("Foo"));
+    REQUIRE(module_member.type == ModuleMemberType::CLASS);
     sem::TypeObject type("Foo");
     std::cout << "Making error: " << &declaration_node.expression << std::endl;
-    ErrorNoMemberSuggestions exp(type, (ast::Member&) declaration_node.expression, *clazz_flirpin.clazz);
+    ErrorNoMemberSuggestions exp(type, (ast::Member&) declaration_node.expression, *module_member.clazz);
     REQUIRE(error == exp);
 }
 

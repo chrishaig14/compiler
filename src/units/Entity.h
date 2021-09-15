@@ -33,13 +33,13 @@ struct Unit {
     };
 };
 
-enum class F_TYPE {
+enum class ModuleMemberType {
     CONST_FUNCTION, CLASS, PACKAGE, MODULE, ENUM
 };
-std::ostream& operator<<(std::ostream& o, F_TYPE f);
+std::ostream& operator<<(std::ostream& o, ModuleMemberType f);
 
 struct ModuleMember {
-    F_TYPE type;
+    ModuleMemberType type;
     union {
         ConstFunction* const_function;
         Class* clazz;
@@ -202,6 +202,6 @@ public:
 };
 
 
-std::string flirpintype_to_str(F_TYPE flirpintype);
+std::string module_member_type_to_str(ModuleMemberType member_type);
 
 #endif //XLANG_ENTITY_H

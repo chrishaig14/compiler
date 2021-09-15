@@ -154,18 +154,18 @@ USemanticInfo Checker::visit_import(ast::Import& node) {
     return info_u;
 }
 
-Entity* map_flirpin_to_entity(ModuleMember flirpin) {
-    switch (flirpin.type) {
-        case F_TYPE::CONST_FUNCTION:
-            return new EntityConstFunction(*flirpin.const_function);
-        case F_TYPE::CLASS:
-            return new EntityClass(flirpin.clazz);
-        case F_TYPE::PACKAGE:
-            return new EntityPackage(flirpin.package);
-        case F_TYPE::MODULE:
-            return new EntityModule(flirpin.module);
-        case F_TYPE::ENUM:
-            return new EntityEnum(flirpin.enumm);
+Entity* map_module_member_to_entity(ModuleMember module_member) {
+    switch (module_member.type) {
+        case ModuleMemberType::CONST_FUNCTION:
+            return new EntityConstFunction(*module_member.const_function);
+        case ModuleMemberType::CLASS:
+            return new EntityClass(module_member.clazz);
+        case ModuleMemberType::PACKAGE:
+            return new EntityPackage(module_member.package);
+        case ModuleMemberType::MODULE:
+            return new EntityModule(module_member.module);
+        case ModuleMemberType::ENUM:
+            return new EntityEnum(module_member.enumm);
     }
     return nullptr;
 }

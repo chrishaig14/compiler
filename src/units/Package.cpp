@@ -16,7 +16,7 @@ Package::Package(Path path, std::string abs_path, bool is_lib)
 
 ModuleMember Package::get(Path p) {
     if (p.as_str() == "core.core.Union") {
-        return ModuleMember{.type=F_TYPE::CLASS, .clazz=new Class("Union", p)};
+        return ModuleMember{.type=ModuleMemberType::CLASS, .clazz=new Class("Union", p)};
     }
     VectorOfStrings pt = p.as_vec();
     assert(this->units.count(pt[0]) == 1);

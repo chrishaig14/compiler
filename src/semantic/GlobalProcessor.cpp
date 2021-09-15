@@ -252,9 +252,9 @@ Path Module::get_actual_path(const std::string& id) {
         return Path("core.core.Tuple");
     }
     if (this->members.count(id) == 1) {
-        if (this->members[id].type == F_TYPE::CLASS) {
+        if (this->members[id].type == ModuleMemberType::CLASS) {
             return this->members[id].clazz->path;
-        } else if (this->members[id].type == F_TYPE::ENUM) {
+        } else if (this->members[id].type == ModuleMemberType::ENUM) {
             return this->members[id].enumm->path;
         }
     }

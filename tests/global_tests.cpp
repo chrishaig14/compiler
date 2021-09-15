@@ -20,7 +20,7 @@ TEST_CASE("global_main", "[parser]") {
 
     REQUIRE(module.members.size() == 1);
     REQUIRE(module.members.count("main") == 1);
-    REQUIRE(module.members["main"].type == F_TYPE::CONST_FUNCTION);
+    REQUIRE(module.members["main"].type == ModuleMemberType::CONST_FUNCTION);
     ConstFunction* const_function = module.members["main"].const_function;
     // sem::Type* p = (sem::TypeObject*) nullptr;
     std::unique_ptr<sem::Type> u = std::make_unique<sem::TypeObject>("Integer");
@@ -42,7 +42,7 @@ TEST_CASE("global_class", "[parser]") {
 
     REQUIRE(module.members.size() == 1);
     REQUIRE(module.members.count("Foo") == 1);
-    REQUIRE(module.members["Foo"].type == F_TYPE::CLASS);
+    REQUIRE(module.members["Foo"].type == ModuleMemberType::CLASS);
     Class* clazz = module.members["Foo"].clazz;
 
     REQUIRE(clazz->class_name == "Foo");
@@ -89,7 +89,7 @@ TEST_CASE("global_multiple", "[parser]") {
     REQUIRE(module.members.count("main") == 1);
     REQUIRE(module.members.count("Foo") == 1);
 
-    REQUIRE(module.members["main"].type == F_TYPE::CONST_FUNCTION);
+    REQUIRE(module.members["main"].type == ModuleMemberType::CONST_FUNCTION);
     ConstFunction* const_function = module.members["main"].const_function;
     REQUIRE(const_function->const_function_ft == sem::TypeFunction({}, std::make_unique<sem::TypeObject>("Integer")));
     REQUIRE(const_function->implicit == nullptr);

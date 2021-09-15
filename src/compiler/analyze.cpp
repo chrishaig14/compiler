@@ -116,29 +116,29 @@ void Compiler::add_global_path_to_module(Module& module, Path path) {
 }
 
 void add_local_path_to_module(Module& module, Path path, Package& top_package) {
-    auto current_flirpin = ModuleMember{.type=F_TYPE::PACKAGE, .package=&top_package};
+    auto current_member = ModuleMember{.type=ModuleMemberType::PACKAGE, .package=&top_package};
     std::string path_so_far = "global";
-    ModuleMember last_flirpin;
+    ModuleMember last_member;
 
     for (const auto& path_part: path.as_vec()) {
-        if (current_flirpin.type == F_TYPE::PACKAGE) {
-            Package* package = current_flirpin.package;
+        if (current_member.type == ModuleMemberType::PACKAGE) {
+            Package* package = current_member.package;
             auto unit = package->units.find(path_part);
             if (unit == package->units.end()) {
                 throw std::runtime_error("Error '" + path_part + "' not found in package '" + path_so_far + "'");
             }
-            current_flirpin = map_unit_to_flirpin(unit->second);
-            last_flirpin = current_flirpin;
-        } else if (current_flirpin.type == F_TYPE::MODULE) {
-            auto flirpin = current_flirpin.module->members.find(path_part);
-            if (flirpin == current_flirpin.module->members.end()) {
+            current_member = map_unit_to_module_member(unit->second);
+            last_member = current_member;
+        } else if (current_member.type == ModuleMemberType::MODULE) {
+            auto member = current_member.module->members.find(path_part);
+            if (member == current_member.module->members.end()) {
                 throw std::runtime_error("Error '" + path_part + "' not found in module '" + path_so_far + "'");
             }
-            current_flirpin = flirpin->second;
+            current_member = member->second;
         }
         path_so_far += "." + path_part;
     }
-    module.members[path.as_vec().back()] = current_flirpin;
+    module.members[path.as_vec().back()] = current_member;
 }
 
 bool preprocess_module(Module& module) {

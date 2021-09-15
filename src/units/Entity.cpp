@@ -5,32 +5,32 @@
 #include <string>
 #include "Entity.h"
 
-std::ostream& operator<<(std::ostream& o, F_TYPE f) {
-    std::map<F_TYPE, std::string> str;
-    str[F_TYPE::CONST_FUNCTION] = "const function";
-    str[F_TYPE::CLASS] = "class";
-    str[F_TYPE::ENUM] = "enum";
-    str[F_TYPE::MODULE] = "module";
-    str[F_TYPE::PACKAGE] = "package";
+std::ostream& operator<<(std::ostream& o, ModuleMemberType f) {
+    std::map<ModuleMemberType, std::string> str;
+    str[ModuleMemberType::CONST_FUNCTION] = "const function";
+    str[ModuleMemberType::CLASS] = "class";
+    str[ModuleMemberType::ENUM] = "enum";
+    str[ModuleMemberType::MODULE] = "module";
+    str[ModuleMemberType::PACKAGE] = "package";
     return o << str[f];
 }
 
-std::string flirpintype_to_str(F_TYPE flirpintype) {
+std::string module_member_type_to_str(ModuleMemberType member_type) {
     std::string lt;
-    switch (flirpintype) {
-        case F_TYPE::CONST_FUNCTION:
+    switch (member_type) {
+        case ModuleMemberType::CONST_FUNCTION:
             lt = "const function";
             break;
-        case F_TYPE::CLASS:
+        case ModuleMemberType::CLASS:
             lt = "class";
             break;
-        case F_TYPE::PACKAGE:
+        case ModuleMemberType::PACKAGE:
             lt = "package";
             break;
-        case F_TYPE::MODULE:
+        case ModuleMemberType::MODULE:
             lt = "module";
             break;
-        case F_TYPE::ENUM:
+        case ModuleMemberType::ENUM:
             lt = "enum";
             break;
     }

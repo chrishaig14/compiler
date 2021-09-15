@@ -259,14 +259,14 @@ std::unique_ptr<Value> Checker::make_value(sem::Type* type) {
         // value.metatype = Meta::CLASS;
         return std::make_unique<Value>(type, clazz);
     }
-    ModuleMember flirpin = this->top_package.get(type->object().data.actual_base_path);
-    if (flirpin.type == F_TYPE::ENUM) {
+    ModuleMember module_member = this->top_package.get(type->object().data.actual_base_path);
+    if (module_member.type == ModuleMemberType::ENUM) {
         auto value = std::make_unique<Value>(type);
-        value->enumm = flirpin.enumm;
+        value->enumm = module_member.enumm;
         value->metatype = Meta::ENUM;
         return value;
     }
-    Class* cls = flirpin.clazz;
+    Class* cls = module_member.clazz;
     if (!cls->type_params.empty()) {
         std::cout << "Instantiating type " << type->object().to_string() << std::endl;
         ast::UObjectType o(&type->object().to_ast()->object());
@@ -296,13 +296,13 @@ void Checker::fill_value(Value& value) {
         value.metatype = Meta::CLASS;
         return;
     }
-    ModuleMember flirpin = this->top_package.get(value.type.object().data.actual_base_path);
-    if (flirpin.type == F_TYPE::ENUM) {
-        value.enumm = flirpin.enumm;
+    ModuleMember module_member = this->top_package.get(value.type.object().data.actual_base_path);
+    if (module_member.type == ModuleMemberType::ENUM) {
+        value.enumm = module_member.enumm;
         value.metatype = Meta::ENUM;
         return;
     }
-    Class* cls = flirpin.clazz;
+    Class* cls = module_member.clazz;
     if (!cls->type_params.empty()) {
         std::cout << "Instantiating type " << value.type.object().to_string() << std::endl;
         ast::UObjectType o(&value.type.object().to_ast()->object());

@@ -283,12 +283,12 @@ USemanticInfo error_stub() {
     return std::make_unique<ErrorStub>();
 }
 
-ModuleMember map_unit_to_flirpin(Unit u) {
+ModuleMember map_unit_to_module_member(Unit u) {
     switch (u.type) {
         case U_TYPE::PACKAGE:
-            return ModuleMember{.type=F_TYPE::PACKAGE, .package=u.package};
+            return ModuleMember{.type=ModuleMemberType::PACKAGE, .package=u.package};
         case U_TYPE::MODULE:
-            return ModuleMember{.type=F_TYPE::MODULE, .module=u.module};
+            return ModuleMember{.type=ModuleMemberType::MODULE, .module=u.module};
     }
     return ModuleMember{};
 }

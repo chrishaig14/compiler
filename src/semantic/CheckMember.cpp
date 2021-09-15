@@ -57,12 +57,12 @@ USemanticInfo Checker::module_member(Module& mod, const std::string& child, ast:
         //                                       n.child_token.end_pos);
         return error_stub();
     }
-    ModuleMember flirpin = mod.members[child];
+    ModuleMember member = mod.members[child];
     USemanticInfo info_u = std::make_unique<SemanticInfo>();
     SemanticInfo& info = *info_u;
-    info.set_entity(map_flirpin_to_entity(flirpin));
-    if (flirpin.type == F_TYPE::CONST_FUNCTION) {
-        auto idn = std::make_unique<sem::Id>(flirpin.const_function->path.as_str());
+    info.set_entity(map_module_member_to_entity(member));
+    if (member.type == ModuleMemberType::CONST_FUNCTION) {
+        auto idn = std::make_unique<sem::Id>(member.const_function->path.as_str());
         info.snode = std::move(idn);
     }
     return info_u;
@@ -159,7 +159,7 @@ USemanticInfo Checker::package_member(Package& package, const std::string& child
     Unit unit = package.units[child];
     USemanticInfo info_u = std::make_unique<SemanticInfo>();
     SemanticInfo& info = *info_u;
-    info.set_entity(map_flirpin_to_entity(map_unit_to_flirpin(unit)));
+    info.set_entity(map_module_member_to_entity(map_unit_to_module_member(unit)));
     return info_u;
 }
 
