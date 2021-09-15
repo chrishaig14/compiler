@@ -5,34 +5,22 @@
 #include "Compiler.h"
 #include "../semantic/Checker.h"
 
-bool check_module(Module& module, Package& top_package) {
-    for (const auto& path: module.imported_paths_no_alias_v) {
-        add_path_to_module(module, path.second, top_package);
-    }
-    // std::vector<Path> default_imports = {Path("core.core.String")};
-    // for (const auto& path:default_imports) {
-    //     this->add_path_to_module(module, path, top_package);
-    // }
-    for (const auto& i: module.imported_paths_with_alias_v) {
-        add_path_with_alias_to_module(module, i.first, i.second, top_package);
-    }
-    Checker checker(top_package, module);
-    USemanticInfoBlock check_info = checker.visit_root(*module.ast);
-    module.sast = std::move(check_info->snode);
-    return checker.error_reporter.failed;
-}
 
 void resolve_module_imports(Module& module, Package& top_package) {
     for (const auto& path: module.imported_paths_no_alias_v) {
         add_path_to_module(module, path.second, top_package);
     }
-    // std::vector<Path> default_imports = {Path("core.core.String")};
-    // for (const auto& path:default_imports) {
-    //     this->add_path_to_module(module, path, top_package);
-    // }
     for (const auto& i: module.imported_paths_with_alias_v) {
         add_path_with_alias_to_module(module, i.first, i.second, top_package);
     }
+}
+
+bool check_module(Module& module, Package& top_package) {
+    resolve_module_imports(module, top_package);
+    Checker checker(top_package, module);
+    USemanticInfoBlock check_info = checker.visit_root(*module.ast);
+    module.sast = std::move(check_info->snode);
+    return checker.error_reporter.failed;
 }
 
 bool check_package(Package& package, Package& top_package) {
