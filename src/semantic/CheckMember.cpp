@@ -47,7 +47,7 @@ USemanticInfo Checker::visit_member(ast::Member& n) {
 }
 
 USemanticInfo Checker::module_member(Module& mod, const std::string& child, ast::Member& n) {
-    if (mod.flirpins.count(child) == 0) {
+    if (mod.members.count(child) == 0) {
         // this->error_reporter.error(std::make_unique<ErrorNoMember>())
         // this->error_reporter.module_no_member(&mod,
         //                                       child,
@@ -57,7 +57,7 @@ USemanticInfo Checker::module_member(Module& mod, const std::string& child, ast:
         //                                       n.child_token.end_pos);
         return error_stub();
     }
-    Flirpin flirpin = mod.flirpins[child];
+    ModuleMember flirpin = mod.members[child];
     USemanticInfo info_u = std::make_unique<SemanticInfo>();
     SemanticInfo& info = *info_u;
     info.set_entity(map_flirpin_to_entity(flirpin));

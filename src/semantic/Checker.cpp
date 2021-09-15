@@ -283,14 +283,14 @@ USemanticInfo error_stub() {
     return std::make_unique<ErrorStub>();
 }
 
-Flirpin map_unit_to_flirpin(Unit u) {
+ModuleMember map_unit_to_flirpin(Unit u) {
     switch (u.type) {
         case U_TYPE::PACKAGE:
-            return Flirpin{.type=F_TYPE::PACKAGE, .package=u.package};
+            return ModuleMember{.type=F_TYPE::PACKAGE, .package=u.package};
         case U_TYPE::MODULE:
-            return Flirpin{.type=F_TYPE::MODULE, .module=u.module};
+            return ModuleMember{.type=F_TYPE::MODULE, .module=u.module};
     }
-    return Flirpin{};
+    return ModuleMember{};
 }
 
 bool Checker::is_immutable(const ast::Type& node) {

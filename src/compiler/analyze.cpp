@@ -116,9 +116,9 @@ void Compiler::add_global_path_to_module(Module& module, Path path) {
 }
 
 void add_local_path_to_module(Module& module, Path path, Package& top_package) {
-    auto current_flirpin = Flirpin{.type=F_TYPE::PACKAGE, .package=&top_package};
+    auto current_flirpin = ModuleMember{.type=F_TYPE::PACKAGE, .package=&top_package};
     std::string path_so_far = "global";
-    Flirpin last_flirpin;
+    ModuleMember last_flirpin;
 
     for (const auto& path_part: path.as_vec()) {
         if (current_flirpin.type == F_TYPE::PACKAGE) {
@@ -130,15 +130,15 @@ void add_local_path_to_module(Module& module, Path path, Package& top_package) {
             current_flirpin = map_unit_to_flirpin(unit->second);
             last_flirpin = current_flirpin;
         } else if (current_flirpin.type == F_TYPE::MODULE) {
-            auto flirpin = current_flirpin.module->flirpins.find(path_part);
-            if (flirpin == current_flirpin.module->flirpins.end()) {
+            auto flirpin = current_flirpin.module->members.find(path_part);
+            if (flirpin == current_flirpin.module->members.end()) {
                 throw std::runtime_error("Error '" + path_part + "' not found in module '" + path_so_far + "'");
             }
             current_flirpin = flirpin->second;
         }
         path_so_far += "." + path_part;
     }
-    module.flirpins[path.as_vec().back()] = current_flirpin;
+    module.members[path.as_vec().back()] = current_flirpin;
 }
 
 bool preprocess_module(Module& module) {

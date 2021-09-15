@@ -14,9 +14,9 @@ Package::Package(Path path, std::string abs_path, bool is_lib)
     // this->is_lib = is_lib;
 }
 
-Flirpin Package::get(Path p) {
+ModuleMember Package::get(Path p) {
     if (p.as_str() == "core.core.Union") {
-        return Flirpin{.type=F_TYPE::CLASS, .clazz=new Class("Union", p)};
+        return ModuleMember{.type=F_TYPE::CLASS, .clazz=new Class("Union", p)};
     }
     VectorOfStrings pt = p.as_vec();
     assert(this->units.count(pt[0]) == 1);
@@ -27,5 +27,5 @@ Flirpin Package::get(Path p) {
         case U_TYPE::PACKAGE:
             return u.package->get(Path(VectorOfStrings(pt.begin() + 1, pt.end())));
     }
-    return Flirpin{};
+    return ModuleMember{};
 }

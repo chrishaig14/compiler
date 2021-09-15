@@ -421,7 +421,7 @@ TEST_CASE("error_no_member", "[checker]") {
     REQUIRE(checker.error_reporter.errors.size() == 1);
 
     Error& error = *checker.error_reporter.errors.back();
-    Flirpin clazz_flirpin = module.get(Path("Foo"));
+    ModuleMember clazz_flirpin = module.get(Path("Foo"));
     REQUIRE(clazz_flirpin.type == F_TYPE::CLASS);
     sem::TypeObject type("Foo");
     std::cout << "Making error: " << &declaration_node.expression << std::endl;

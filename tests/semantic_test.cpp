@@ -230,7 +230,7 @@ TEST_CASE("semantic_output_assign_const_function", "[checker]") {
     Module& module = *c.root_package.units["tmp"].module;
     resolve_module_imports(module, c.top_package);
     resolve_module_imports(module, c.top_package);
-    for (auto& e: module.flirpins) {
+    for (auto& e: module.members) {
         std::cout << e.first << std::endl;
     }
     Checker checker(c.top_package, module);
@@ -250,7 +250,7 @@ TEST_CASE("semantic_output_const_function_call", "[checker]") {
     Module& module = *c.root_package.units["tmp"].module;
     resolve_module_imports(module, c.top_package);
     resolve_module_imports(module, c.top_package);
-    for (auto& e: module.flirpins) {
+    for (auto& e: module.members) {
         std::cout << e.first << std::endl;
     }
     Checker checker(c.top_package, module);
@@ -271,7 +271,7 @@ TEST_CASE("semantic_output_while", "[checker]") {
     Module& module = *c.root_package.units["tmp"].module;
     resolve_module_imports(module, c.top_package);
     resolve_module_imports(module, c.top_package);
-    for (auto& e: module.flirpins) {
+    for (auto& e: module.members) {
         std::cout << e.first << std::endl;
     }
     Checker checker(c.top_package, module);

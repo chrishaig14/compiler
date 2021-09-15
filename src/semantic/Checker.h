@@ -67,8 +67,8 @@ ast::UTypeNode make_type_from_function_pattern(const ast::FunctionType& ftn, con
 ast::UTypeNode make_type(const ast::Type& original, const MapStringType& replacements);
 SemanticInfo match_arguments_to_generic_function(const ast::FunctionType& function_type, ast::VectorOfTypes arg_types);
 USemanticInfo error_stub();
-Entity* map_flirpin_to_entity(Flirpin flirpin);
-Flirpin map_unit_to_flirpin(Unit u);
+Entity* map_flirpin_to_entity(ModuleMember flirpin);
+ModuleMember map_unit_to_flirpin(Unit u);
 TextPosition add_one_col(TextPosition t);
 bool function_is_generic(const sem::TypeFunction& ft);
 

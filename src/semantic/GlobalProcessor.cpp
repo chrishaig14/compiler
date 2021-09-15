@@ -147,7 +147,7 @@ void GlobalProcessor::visit_block(ast::Block& node) {
 }
 
 void GlobalProcessor::visit_class(ast::Klass& node) {
-    Class* class_info = this->module.flirpins[node.class_name].clazz;
+    Class* class_info = this->module.members[node.class_name].clazz;
     //
     // if (this->imported_paths.count(node.class_name) == 1) {
     //     throw std::runtime_error("Name \"" + node.class_name + "\" already used as an alias for " +
@@ -251,11 +251,11 @@ Path Module::get_actual_path(const std::string& id) {
     if (id == "Tuple") {
         return Path("core.core.Tuple");
     }
-    if (this->flirpins.count(id) == 1) {
-        if (this->flirpins[id].type == F_TYPE::CLASS) {
-            return this->flirpins[id].clazz->path;
-        } else if (this->flirpins[id].type == F_TYPE::ENUM) {
-            return this->flirpins[id].enumm->path;
+    if (this->members.count(id) == 1) {
+        if (this->members[id].type == F_TYPE::CLASS) {
+            return this->members[id].clazz->path;
+        } else if (this->members[id].type == F_TYPE::ENUM) {
+            return this->members[id].enumm->path;
         }
     }
     if (this->imported_paths_with_alias.count(id) == 1) {

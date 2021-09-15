@@ -18,10 +18,10 @@ TEST_CASE("global_main", "[parser]") {
     GlobalProcessor gp(module);
     gp.visit_root();
 
-    REQUIRE(module.flirpins.size() == 1);
-    REQUIRE(module.flirpins.count("main") == 1);
-    REQUIRE(module.flirpins["main"].type == F_TYPE::CONST_FUNCTION);
-    ConstFunction* const_function = module.flirpins["main"].const_function;
+    REQUIRE(module.members.size() == 1);
+    REQUIRE(module.members.count("main") == 1);
+    REQUIRE(module.members["main"].type == F_TYPE::CONST_FUNCTION);
+    ConstFunction* const_function = module.members["main"].const_function;
     // sem::Type* p = (sem::TypeObject*) nullptr;
     std::unique_ptr<sem::Type> u = std::make_unique<sem::TypeObject>("Integer");
     REQUIRE(const_function->const_function_ft == sem::TypeFunction({}, std::move(u)));
@@ -40,10 +40,10 @@ TEST_CASE("global_class", "[parser]") {
     GlobalProcessor gp(module);
     gp.visit_root();
 
-    REQUIRE(module.flirpins.size() == 1);
-    REQUIRE(module.flirpins.count("Foo") == 1);
-    REQUIRE(module.flirpins["Foo"].type == F_TYPE::CLASS);
-    Class* clazz = module.flirpins["Foo"].clazz;
+    REQUIRE(module.members.size() == 1);
+    REQUIRE(module.members.count("Foo") == 1);
+    REQUIRE(module.members["Foo"].type == F_TYPE::CLASS);
+    Class* clazz = module.members["Foo"].clazz;
 
     REQUIRE(clazz->class_name == "Foo");
     REQUIRE(clazz->path.as_str() == "main.foo.Foo");
@@ -85,18 +85,18 @@ TEST_CASE("global_multiple", "[parser]") {
     GlobalProcessor gp(module);
     gp.visit_root();
 
-    REQUIRE(module.flirpins.size() == 2);
-    REQUIRE(module.flirpins.count("main") == 1);
-    REQUIRE(module.flirpins.count("Foo") == 1);
+    REQUIRE(module.members.size() == 2);
+    REQUIRE(module.members.count("main") == 1);
+    REQUIRE(module.members.count("Foo") == 1);
 
-    REQUIRE(module.flirpins["main"].type == F_TYPE::CONST_FUNCTION);
-    ConstFunction* const_function = module.flirpins["main"].const_function;
+    REQUIRE(module.members["main"].type == F_TYPE::CONST_FUNCTION);
+    ConstFunction* const_function = module.members["main"].const_function;
     REQUIRE(const_function->const_function_ft == sem::TypeFunction({}, std::make_unique<sem::TypeObject>("Integer")));
     REQUIRE(const_function->implicit == nullptr);
     REQUIRE(const_function->path.as_str() == "main.foo.main");
 
 
-    Class* clazz = module.flirpins["Foo"].clazz;
+    Class* clazz = module.members["Foo"].clazz;
 
     REQUIRE(clazz->class_name == "Foo");
     REQUIRE(clazz->path.as_str() == "main.foo.Foo");

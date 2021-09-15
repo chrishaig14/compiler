@@ -38,7 +38,7 @@ enum class F_TYPE {
 };
 std::ostream& operator<<(std::ostream& o, F_TYPE f);
 
-struct Flirpin {
+struct ModuleMember {
     F_TYPE type;
     union {
         ConstFunction* const_function;

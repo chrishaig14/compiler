@@ -246,7 +246,7 @@ TEST_CASE("import_test", "[compiler]") {
         REQUIRE(parse_package(c.root_package));
         REQUIRE(preprocess_package(c.root_package));
         std::cout << 2 << std::endl;
-        // REQUIRE(resolve_package_imports(c.root_package));
+        // REQUIRE(resol(c.root_package));
     }
 
     SECTION("parse one module error") {

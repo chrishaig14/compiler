@@ -154,7 +154,7 @@ USemanticInfo Checker::visit_import(ast::Import& node) {
     return info_u;
 }
 
-Entity* map_flirpin_to_entity(Flirpin flirpin) {
+Entity* map_flirpin_to_entity(ModuleMember flirpin) {
     switch (flirpin.type) {
         case F_TYPE::CONST_FUNCTION:
             return new EntityConstFunction(*flirpin.const_function);

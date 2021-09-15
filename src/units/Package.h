@@ -20,7 +20,7 @@ public:
     std::string rel_path;
     Package(Path path, std::string abs_path, bool is_lib);
 
-    Flirpin get(Path p);
+    ModuleMember get(Path p);
 };
 
 
