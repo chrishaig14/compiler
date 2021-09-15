@@ -236,58 +236,96 @@ TEST_CASE("project_preprocess_test", "[compiler]") {
 
 TEST_CASE("import_test", "[compiler]") {
     setup_dirs();
-    write_file(path_join(IN_DIR, "requirements.txt"), "core==1.0.0");
+    const std::string& REQUIREMENTS_PATH = path_join(IN_DIR, "requirements.txt");
+    write_file(REQUIREMENTS_PATH, "core==1.0.0");
     Compiler c(IN_DIR, OUT_DIR, OUT_NAME, LIB_PATH, IS_LIB, VERSION);
 
     SECTION("import module ok") {
-        write_file(path_join(IN_DIR, "main.xl"), "import moduleA; fun foo()->Integer{return 0;}");
+        write_file(path_join(IN_DIR, "main.xl"), "import test_program.moduleA; fun foo()->Integer{return 0;}");
         write_file(path_join(IN_DIR, "moduleA.xl"), "fun bar()->Integer{return 0;}");
 
         load_package(c.root_package, 1);
         REQUIRE(parse_package(c.root_package));
         REQUIRE(preprocess_package(c.root_package));
-        std::cout << 2 << std::endl;
-        REQUIRE_NOTHROW(resolve_module_imports(*c.root_package.units["main"].module, c.root_package));
+        c.load_requirements(REQUIREMENTS_PATH);
+        REQUIRE_NOTHROW(resolve_module_imports(*c.root_package.units["main"].module, c.top_package));
     }
 
-    SECTION("parse one module error") {
-        write_file(path_join(IN_DIR, "main.xl"), "fun foo()->Integer{return 0;}fun foo()->Integer{}");
+    SECTION("import module error") {
+        write_file(path_join(IN_DIR, "main.xl"), "import test_program.moduleB; fun foo()->Integer{return 0;}");
+        write_file(path_join(IN_DIR, "moduleA.xl"), "fun bar()->Integer{return 0;}");
 
         load_package(c.root_package, 1);
         REQUIRE(parse_package(c.root_package));
-
-        REQUIRE(not preprocess_package(c.root_package));
-    }
-
-    SECTION("preprocess with subpackage ok") {
-        write_file(path_join(IN_DIR, "main.xl"), "fun foo()->Integer{return 0;}");
-        write_file(path_join(IN_DIR, "module.xl"), "fun bar()->Integer{return 0;}");
-
-        const std::string& SUBPACKAGE_PATH = path_join(IN_DIR, "subpackage");
-        make_dir(SUBPACKAGE_PATH);
-        write_file(path_join(SUBPACKAGE_PATH, "moduleA.xl"), "fun baz()->Integer{return 0;}");
-        write_file(path_join(SUBPACKAGE_PATH, "moduleB.xl"), "fun foobar()->Integer{return 0;}");
-
-        load_package(c.root_package, 1);
-        REQUIRE(parse_package(c.root_package));
-
         REQUIRE(preprocess_package(c.root_package));
+        c.load_requirements(REQUIREMENTS_PATH);
+        REQUIRE_THROWS(resolve_module_imports(*c.root_package.units["main"].module, c.top_package));
     }
 
-    SECTION("preprocess with subpackage error") {
-        write_file(path_join(IN_DIR, "main.xl"), "fun foo()->Integer{return 0;}");
-        write_file(path_join(IN_DIR, "module.xl"), "fun bar()->Integer{return 0;}");
-
-        const std::string& SUBPACKAGE_PATH = path_join(IN_DIR, "subpackage");
-        make_dir(SUBPACKAGE_PATH);
-        write_file(path_join(SUBPACKAGE_PATH, "moduleA.xl"), "fun baz()->Integer{return 0;}");
-        write_file(path_join(SUBPACKAGE_PATH, "moduleB.xl"),
-                   "fun foobar()->Integer{return 0;} fun foobar()->Integer{}");
+    SECTION("import function ok") {
+        write_file(path_join(IN_DIR, "main.xl"), "import test_program.moduleA.bar; fun foo()->Integer{return 0;}");
+        write_file(path_join(IN_DIR, "moduleA.xl"), "fun bar()->Integer{return 0;}");
 
         load_package(c.root_package, 1);
         REQUIRE(parse_package(c.root_package));
+        REQUIRE(preprocess_package(c.root_package));
+        c.load_requirements(REQUIREMENTS_PATH);
+        REQUIRE_NOTHROW(resolve_module_imports(*c.root_package.units["main"].module, c.top_package));
+    }
 
-        REQUIRE(not preprocess_package(c.root_package));
+    SECTION("import function not found") {
+        write_file(path_join(IN_DIR, "main.xl"), "import test_program.moduleA.foobar; fun foo()->Integer{return 0;}");
+        write_file(path_join(IN_DIR, "moduleA.xl"), "fun bar()->Integer{return 0;}");
+
+        load_package(c.root_package, 1);
+        REQUIRE(parse_package(c.root_package));
+        REQUIRE(preprocess_package(c.root_package));
+        c.load_requirements(REQUIREMENTS_PATH);
+        REQUIRE_THROWS(resolve_module_imports(*c.root_package.units["main"].module, c.top_package));
+    }
+
+    SECTION("import class ok") {
+        write_file(path_join(IN_DIR, "main.xl"), "import test_program.moduleA.Bar; fun foo()->Integer{return 0;}");
+        write_file(path_join(IN_DIR, "moduleA.xl"), "class Bar{x: Integer;}");
+
+        load_package(c.root_package, 1);
+        REQUIRE(parse_package(c.root_package));
+        REQUIRE(preprocess_package(c.root_package));
+        c.load_requirements(REQUIREMENTS_PATH);
+        REQUIRE_NOTHROW(resolve_module_imports(*c.root_package.units["main"].module, c.top_package));
+    }
+
+    SECTION("import class error") {
+        write_file(path_join(IN_DIR, "main.xl"), "import test_program.moduleA.FooBar; fun foo()->Integer{return 0;}");
+        write_file(path_join(IN_DIR, "moduleA.xl"), "class Bar{x: Integer;}");
+
+        load_package(c.root_package, 1);
+        REQUIRE(parse_package(c.root_package));
+        REQUIRE(preprocess_package(c.root_package));
+        c.load_requirements(REQUIREMENTS_PATH);
+        REQUIRE_THROWS(resolve_module_imports(*c.root_package.units["main"].module, c.top_package));
+    }
+
+    SECTION("import package error") {
+        write_file(path_join(IN_DIR, "main.xl"), "import foo_package; fun foo()->Integer{return 0;}");
+        write_file(path_join(IN_DIR, "moduleA.xl"), "class Bar{x: Integer;}");
+
+        load_package(c.root_package, 1);
+        REQUIRE(parse_package(c.root_package));
+        REQUIRE(preprocess_package(c.root_package));
+        c.load_requirements(REQUIREMENTS_PATH);
+        REQUIRE_THROWS(resolve_module_imports(*c.root_package.units["main"].module, c.top_package));
+    }
+
+    SECTION("import package ok") {
+        write_file(path_join(IN_DIR, "main.xl"), "import test_program; fun foo()->Integer{return 0;}");
+        write_file(path_join(IN_DIR, "moduleA.xl"), "class Bar{x: Integer;}");
+
+        load_package(c.root_package, 1);
+        REQUIRE(parse_package(c.root_package));
+        REQUIRE(preprocess_package(c.root_package));
+        c.load_requirements(REQUIREMENTS_PATH);
+        REQUIRE_NOTHROW(resolve_module_imports(*c.root_package.units["main"].module, c.top_package));
     }
     cleanup_dirs();
 }
