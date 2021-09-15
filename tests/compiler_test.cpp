@@ -223,7 +223,8 @@ TEST_CASE("project_preprocess_test", "[compiler]") {
         const std::string& SUBPACKAGE_PATH = path_join(IN_DIR, "subpackage");
         make_dir(SUBPACKAGE_PATH);
         write_file(path_join(SUBPACKAGE_PATH, "moduleA.xl"), "fun baz()->Integer{return 0;}");
-        write_file(path_join(SUBPACKAGE_PATH, "moduleB.xl"), "fun foobar()->Integer{return 0;} fun foobar()->Integer{}");
+        write_file(path_join(SUBPACKAGE_PATH, "moduleB.xl"),
+                   "fun foobar()->Integer{return 0;} fun foobar()->Integer{}");
 
         load_package(c.root_package, 1);
         REQUIRE(parse_package(c.root_package));
@@ -246,7 +247,7 @@ TEST_CASE("import_test", "[compiler]") {
         REQUIRE(parse_package(c.root_package));
         REQUIRE(preprocess_package(c.root_package));
         std::cout << 2 << std::endl;
-        // REQUIRE(resol(c.root_package));
+        REQUIRE_NOTHROW(resolve_module_imports(*c.root_package.units["main"].module, c.root_package));
     }
 
     SECTION("parse one module error") {
@@ -280,7 +281,8 @@ TEST_CASE("import_test", "[compiler]") {
         const std::string& SUBPACKAGE_PATH = path_join(IN_DIR, "subpackage");
         make_dir(SUBPACKAGE_PATH);
         write_file(path_join(SUBPACKAGE_PATH, "moduleA.xl"), "fun baz()->Integer{return 0;}");
-        write_file(path_join(SUBPACKAGE_PATH, "moduleB.xl"), "fun foobar()->Integer{return 0;} fun foobar()->Integer{}");
+        write_file(path_join(SUBPACKAGE_PATH, "moduleB.xl"),
+                   "fun foobar()->Integer{return 0;} fun foobar()->Integer{}");
 
         load_package(c.root_package, 1);
         REQUIRE(parse_package(c.root_package));

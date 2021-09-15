@@ -27,7 +27,10 @@ void load_module(Package& package, const std::string& module_name);
 bool parse_module(Module& module);
 bool parse_package(Package& package);
 
+void resolve_module_imports(Module& module, Package& top_package);
+
 void load_package(Package& package, int level);
+
 class Compiler {
     std::string project_dir;
     std::string project_output_dir;
@@ -115,7 +118,6 @@ public:
     //                           Package& package);
 
     void main();
-    std::string top_package_name;
     void pre();
     Package root_package;
     Package top_package;

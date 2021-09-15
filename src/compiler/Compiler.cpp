@@ -67,7 +67,7 @@ VectorOfStrings Compiler::load_requirements(const std::string& filepath) {
 
     VectorOfStrings reqs;
     for (const auto& r: requirements) {
-        load_library(r.package, r.version);
+        this->load_library(r.package, r.version);
         reqs.push_back(r.package + "-" + r.version);
     }
     if (has_error) {
@@ -161,7 +161,6 @@ void Compiler::load_library(const std::string& name, const std::string& lib_vers
 
     auto* library_top_package = new Package(Path(name), abs_top_unit_path, true);
     load_package(*library_top_package, 1);
-    this->top_package_name = library_top_package->name;
     parse_package(*library_top_package);
     preprocess_package(*library_top_package);
     top_package.units[name] = Unit{.type=U_TYPE::PACKAGE, .package=library_top_package};
@@ -190,7 +189,6 @@ void Compiler::load_top_unit(const std::string& name, const std::string& m_versi
 
     auto* top_unit_package = new Package(Path(name), abs_top_unit_path, m_is_lib);
     load_package(*top_unit_package, 1);
-    this->top_package_name = top_unit_package->name;
     parse_package(*top_unit_package);
     preprocess_package(*top_unit_package);
     top_package.units[name] = Unit{.type=U_TYPE::PACKAGE, .package=top_unit_package};
