@@ -3,6 +3,10 @@
 //
 
 #include "PythonTranspiler.h"
+#include "PythonTranspiler.h"
+#include "../simple_nodes/Throw.h"
+#include "../simple_nodes/with_unique/ObjectMethodCall.h"
+#include "../simple_nodes/with_unique/ConstFunctionCall.h"
 
 PythonOutputCode::PythonOutputCode(const std::string& pre_code, const std::string& code)
         : pre_code(pre_code), code(code) {
@@ -12,8 +16,7 @@ PythonOutputCode::PythonOutputCode(const std::string& pre_code, const std::strin
 // Created by chris on 4/4/21.
 //
 
-#include "PythonTranspiler.h"
-#include "../simple_nodes/Throw.h"
+
 
 PythonOutputCode PythonTranspiler::transpile_declaration(sem::Declaration& node) {
     PythonOutputCode exp = this->dispatch(*node.expression);
@@ -25,13 +28,18 @@ PythonOutputCode PythonTranspiler::transpile_declaration(sem::Declaration& node)
 }
 
 PythonOutputCode PythonTranspiler::transpile_assignment(const sem::Assignment& node) {
-    std::string out;
+    std::string code;
     PythonOutputCode lvalue = this->dispatch(*node.lvalue);
-    out += lvalue.pre_code;
+    std::string pre_code;
+    if (not lvalue.pre_code.empty()) {
+        pre_code = lvalue.pre_code;
+    }
     PythonOutputCode rvalue = this->dispatch(*node.rvalue);
-    out += rvalue.pre_code;
-    out += lvalue.code + SPACE + ASSIGN + SPACE + rvalue.code + NEWLINE;
-    return PythonOutputCode("", out);
+    if (not rvalue.pre_code.empty()) {
+        pre_code += rvalue.pre_code;
+    }
+    code += lvalue.code + SPACE + ASSIGN + SPACE + rvalue.code + NEWLINE;
+    return PythonOutputCode(pre_code, code);
 }
 
 PythonOutputCode PythonTranspiler::transpile_return(sem::Return& node) {
@@ -193,7 +201,7 @@ PythonOutputCode PythonTranspiler::transpile_call(sem::Call& node) {
 }
 
 PythonOutputCode PythonTranspiler::transpile_string(const sem::String& node) {
-    return PythonOutputCode("", QUOTE + node.s + QUOTE);
+    return PythonOutputCode("", "String" + LPAREN + QUOTE + node.s + QUOTE + RPAREN);
 }
 
 PythonOutputCode PythonTranspiler::transpile_boolean(const sem::Bool& node) {
@@ -362,33 +370,15 @@ PythonOutputCode PythonTranspiler::transpile_dict(sem::Dict& node) {
 
 
 PythonOutputCode PythonTranspiler::transpile_if(const sem::IfSNode& node) {
-    std::string pre;
-    std::string out;
+    std::string pre_code;
+    std::string code;
     PythonOutputCode cond = this->dispatch(*node.condition);
-    std::string condition_name = "cond_" + std::to_string(rand());
     PythonOutputCode thenc = this->transpile_block(*node.then);
-    if (cond.pre_code != "") {
-        out += cond.pre_code;
-        if (node.condition->type == SNodeType::CALL) {
-            out += TOBJECT + SPACE + condition_name + SPACE + ASSIGN + cond.code + SEMIC + NEWLINE;
-            out += "if" + SPACE + LPAREN + condition_name + RPAREN + ":" + NEWLINE + "\t" + thenc.code;
-        }
-    } else {
-        out += "if" + SPACE + LPAREN + cond.code + RPAREN + ":" + NEWLINE + "\t" + thenc.code;
-    }
-    // for (auto elif: node.elifs) {
-    //     PythonOutputCode elifc = this->dispatch(*elif.first);
-    //     out += elifc.pre_code;
-    //     PythonOutputCode elifb = this->transpile_block(*elif.second);
-    //     out += "else if" + SPACE + LPAREN + "GET_BOOL" + LPAREN + elifc.code + RPAREN + RPAREN + LCURLY + NEWLINE +
-    //            elifb.code + RCURLY;
-    // }
-    // if (node._else != nullptr) {
-    //     PythonOutputCode _else = this->transpile_block(*node._else);
-    //     out += _else.pre_code;
-    //     out += "else" + SPACE + LCURLY + NEWLINE + _else.code + NEWLINE + RCURLY;
-    // }
-    return PythonOutputCode("", out);
+    pre_code += cond.pre_code.empty() ? "" : cond.pre_code + "\n";
+    pre_code += "condition = " + cond.code;
+    code += "if" + SPACE + "condition:" + NEWLINE + "    " + thenc.code;
+
+    return PythonOutputCode(pre_code, code);
 }
 
 PythonOutputCode PythonTranspiler::transpile_break(sem::Break& node) {
@@ -502,5 +492,46 @@ PythonOutputCode PythonTranspiler::transpile_try_catch(sem::TryCatch& node) {
     // out = out.substr(0, out.size() - 5);
     out += "\n}";
     return PythonOutputCode("", out);
+}
+
+PythonOutputCode PythonTranspiler::transpile_object_method_call(const sem::ObjectMethodCall& call) {
+    PythonOutputCode object_code = this->dispatch(*call.object);
+    std::string pre_code;
+    std::string args_list;
+    for (size_t i = 0; i < call.args.size(); i++) {
+        PythonOutputCode arg_code = this->dispatch(*call.args[i]);
+        if (not arg_code.pre_code.empty()) {
+            pre_code += arg_code.pre_code.empty() ? "" : (arg_code.pre_code + "\n");
+        }
+        args_list += "arg" + std::to_string(i) + ", ";
+        pre_code += "arg" + std::to_string(i) + " = " + arg_code.code + "\n";
+    }
+    pre_code = (object_code.pre_code.empty() ? "" : (object_code.pre_code + "\n")) + "object = " + object_code.code +
+               "\n" + pre_code;
+    pre_code = pre_code.substr(0, pre_code.size() - 1);
+    std::string global_function_name = call.class_path.as_str() + "." + call.method_name;
+    std::string code = global_function_name + LPAREN + "object" + COMMA + SPACE + args_list;
+    code = code.substr(0, code.size() - 2);
+    code += RPAREN;
+    return PythonOutputCode(pre_code, code);
+}
+
+PythonOutputCode PythonTranspiler::transpile_const_function_call(const sem::ConstFunctionCall& call) {
+    std::string pre_code;
+    std::string args_list;
+    for (size_t i = 0; i < call.args.size(); i++) {
+        PythonOutputCode arg_code = this->dispatch(*call.args[i]);
+        if (not arg_code.pre_code.empty()) {
+            pre_code += arg_code.pre_code.empty() ? "" : (arg_code.pre_code + "\n");
+        }
+        pre_code += "arg" + std::to_string(i) + " = " + arg_code.code + "\n";
+        args_list += "arg" + std::to_string(i) + ", ";
+    }
+    pre_code = pre_code.substr(0, pre_code.size() - 1);
+    std::string global_function_name = call.path.as_str();
+    std::string code = global_function_name + LPAREN + args_list;
+    code = code.substr(0, code.size() - 2);
+    code += RPAREN;
+    return PythonOutputCode(pre_code, code);
 }
 

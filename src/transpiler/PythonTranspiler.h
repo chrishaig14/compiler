@@ -135,6 +135,8 @@ public:
     PythonOutputCode transpile_dict(sem::Dict& node);
     PythonOutputCode transpile_try_catch(sem::TryCatch& node);
 
+    PythonOutputCode transpile_const_function_call(const sem::ConstFunctionCall& call);
+
     PythonOutputCode dispatch(sem::SNode& node) {
         switch (node.type) {
             case SNodeType::BLOCK:
@@ -157,6 +159,10 @@ public:
                 return this->transpile_string((sem::String&) node);
             case SNodeType::CALL:
                 return this->transpile_call((sem::Call&) node);
+            case SNodeType::OBJECT_METHOD_CALL:
+                return this->transpile_object_method_call((sem::ObjectMethodCall&) node);
+                case SNodeType::CONST_FUNCTION_CALL:
+                    return this->transpile_const_function_call((sem::ConstFunctionCall&) node);
             case SNodeType::NEW:
                 return this->transpile_new((sem::NewObject&) node);
             case SNodeType::DICT:
@@ -194,6 +200,7 @@ public:
 
     PythonOutputCode transpile_throw(sem::Throw& node);
     bool in_try_catch;
+    PythonOutputCode transpile_object_method_call(const sem::ObjectMethodCall& call);
 };
 
 
