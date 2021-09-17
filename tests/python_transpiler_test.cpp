@@ -42,11 +42,11 @@ TEST_CASE("python_transpile_object_method_call_no_args", "[checker]") {
     PythonTranspiler pt;
     // 19.to_str()
     PythonOutputCode poc = pt.transpile_object_method_call(sem::ObjectMethodCall(std::make_unique<sem::Integer>("19"),
-                                                                                 Path("core.core.Integer"),
+                                                                                 Path("libcore.libcore.Integer"),
                                                                                  "to_str",
                                                                                  {}));
     REQUIRE(poc.pre_code == "object = 19");
-    REQUIRE(poc.code == "core.core.Integer.to_str(object)");
+    REQUIRE(poc.code == "libcore.libcore.Integer.to_str(object)");
 }
 
 TEST_CASE("python_transpile_object_method_one_arg", "[checker]") {
@@ -55,11 +55,11 @@ TEST_CASE("python_transpile_object_method_one_arg", "[checker]") {
     args_vec.push_back(std::make_unique<sem::Integer>("23"));
     // 19.to_str(23)
     PythonOutputCode poc = pt.transpile_object_method_call(sem::ObjectMethodCall(std::make_unique<sem::Integer>("19"),
-                                                                                 Path("core.core.Integer"),
+                                                                                 Path("libcore.libcore.Integer"),
                                                                                  "to_str",
                                                                                  std::move(args_vec)));
     REQUIRE(poc.pre_code == "object = 19\narg0 = 23");
-    REQUIRE(poc.code == "core.core.Integer.to_str(object, arg0)");
+    REQUIRE(poc.code == "libcore.libcore.Integer.to_str(object, arg0)");
 }
 
 TEST_CASE("python_transpile_object_method_with_args", "[checker]") {
@@ -69,11 +69,11 @@ TEST_CASE("python_transpile_object_method_with_args", "[checker]") {
     args_vec.push_back(std::make_unique<sem::Integer>("87"));
     //
     PythonOutputCode poc = pt.transpile_object_method_call(sem::ObjectMethodCall(std::make_unique<sem::Integer>("19"),
-                                                                                 Path("core.core.Integer"),
+                                                                                 Path("libcore.libcore.Integer"),
                                                                                  "to_str",
                                                                                  std::move(args_vec)));
     REQUIRE(poc.pre_code == "object = 19\narg0 = 23\narg1 = 87");
-    REQUIRE(poc.code == "core.core.Integer.to_str(object, arg0, arg1)");
+    REQUIRE(poc.code == "libcore.libcore.Integer.to_str(object, arg0, arg1)");
 }
 
 TEST_CASE("python_transpile_object_method_with_complex_args", "[checker]") {
@@ -82,20 +82,20 @@ TEST_CASE("python_transpile_object_method_with_complex_args", "[checker]") {
     std::vector<USNode> complex_arg_vec;
     complex_arg_vec.push_back(std::make_unique<sem::Integer>("45"));
     args_vec.push_back(std::make_unique<sem::ObjectMethodCall>(std::make_unique<sem::Integer>("65"),
-                                                               Path("core.core.Integer"),
+                                                               Path("libcore.libcore.Integer"),
                                                                "add",
                                                                std::move(complex_arg_vec)));
     args_vec.push_back(std::make_unique<sem::Integer>("87"));
     PythonOutputCode poc = pt.transpile_object_method_call(sem::ObjectMethodCall(std::make_unique<sem::Integer>("19"),
-                                                                                 Path("core.core.Integer"),
+                                                                                 Path("libcore.libcore.Integer"),
                                                                                  "mul",
                                                                                  std::move(args_vec)));
     REQUIRE(poc.pre_code == R"(object = 19
 object = 65
 arg0 = 45
-arg0 = core.core.Integer.add(object, arg0)
+arg0 = libcore.libcore.Integer.add(object, arg0)
 arg1 = 87)");
-    REQUIRE(poc.code == "core.core.Integer.mul(object, arg0, arg1)");
+    REQUIRE(poc.code == "libcore.libcore.Integer.mul(object, arg0, arg1)");
 }
 
 TEST_CASE("python_transpile_const_function_call_with_complex_args", "[checker]") {
@@ -104,7 +104,7 @@ TEST_CASE("python_transpile_const_function_call_with_complex_args", "[checker]")
     std::vector<USNode> complex_arg_vec;
     complex_arg_vec.push_back(std::make_unique<sem::Integer>("45"));
     args_vec.push_back(std::make_unique<sem::ObjectMethodCall>(std::make_unique<sem::Integer>("65"),
-                                                               Path("core.core.Integer"),
+                                                               Path("libcore.libcore.Integer"),
                                                                "add",
                                                                std::move(complex_arg_vec)));
     args_vec.push_back(std::make_unique<sem::Integer>("87"));
@@ -112,7 +112,7 @@ TEST_CASE("python_transpile_const_function_call_with_complex_args", "[checker]")
                                                                                    std::move(args_vec)));
     REQUIRE(poc.pre_code == R"(object = 65
 arg0 = 45
-arg0 = core.core.Integer.add(object, arg0)
+arg0 = libcore.libcore.Integer.add(object, arg0)
 arg1 = 87)");
     REQUIRE(poc.code == "mymodule.myfunction(arg0, arg1)");
 }
@@ -125,10 +125,10 @@ TEST_CASE("python_transpile_if", "[checker]") {
     then->nodes.emplace_back(new sem::Assignment(std::make_unique<sem::Id>("x"), std::make_unique<sem::Integer>("99")));
     // if(8.gt(78)){x=99}
     PythonOutputCode poc = pt.transpile_if(sem::IfSNode(std::make_unique<sem::ObjectMethodCall>(std::make_unique<sem::Integer>(
-            "8"), Path("core.core.Integer"), "gt", std::move(arg_vec)), std::move(then), {}, nullptr));
+            "8"), Path("libcore.libcore.Integer"), "gt", std::move(arg_vec)), std::move(then), {}, nullptr));
     REQUIRE(poc.pre_code == R"(object = 8
 arg0 = 78
-condition = core.core.Integer.gt(object, arg0))");
+condition = libcore.libcore.Integer.gt(object, arg0))");
     REQUIRE(poc.code == R"(if condition:
     x = 99
 )");

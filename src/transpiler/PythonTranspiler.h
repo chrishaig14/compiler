@@ -53,6 +53,8 @@ const std::string RETURN = "return";
 const std::string CLASS = "class";
 const std::string RETURN_VAR = "__return__";
 
+std::string indent_paragraph(std::string s, size_t level);
+
 class PythonOutputCode {
 public:
     PythonOutputCode(const std::string& pre_code, const std::string& code);
@@ -61,7 +63,6 @@ public:
     std::string code;
 };
 
-
 class PythonTranspiler {
 
 public:
@@ -69,129 +70,146 @@ public:
     std::string header;
     std::string static_initializations;
     std::string static_cleanups;
+    size_t indent_level;
+
+    void indent() {
+        this->indent_level += 4;
+    }
+
+    std::string indentation() {
+        return std::string(this->indent_level, ' ');
+    }
+
+    void unindent() {
+        this->indent_level -= 4;
+    }
+
+    PythonTranspiler() {
+        this->indent_level = 0;
+    }
 
     PythonOutputCode transpile_integer(const sem::Integer& node);
 
     PythonOutputCode transpile_function(const sem::FunctionDef& node);
 
-    PythonOutputCode transpile_declaration(sem::Declaration& node);
+    PythonOutputCode transpile_declaration(const sem::Declaration& node);
 
     PythonOutputCode transpile_assignment(const sem::Assignment& node);
-    PythonOutputCode transpile_block(sem::Block& node);
-    void transpile_program(sem::Block& node);
-    PythonOutputCode transpile_id(sem::Id& node);
+    PythonOutputCode transpile_block(const sem::Block& node);
+    void transpile_program(const sem::Block& node);
+    PythonOutputCode transpile_id(const sem::Id& node);
 
-    PythonOutputCode transpile_new(sem::NewObject& node);
+    PythonOutputCode transpile_new(const sem::NewObject& node);
 
-    PythonOutputCode transpile_return(sem::Return& node);
+    PythonOutputCode transpile_return(const sem::Return& node);
 
-    void transpile_class(sem::KlassDef& node);
-    void transpile_enum(sem::EnumDef& node);
+    void transpile_class(const sem::KlassDef& node);
+    void transpile_enum(const sem::EnumDef& node);
 
-    void dispatch_top(sem::SNode& node) {
+    PythonOutputCode dispatch_top(const sem::SNode& node) {
         switch (node.type) {
             case SNodeType::FUNCTION:
-                this->transpile_function((sem::FunctionDef&) (node));
+                return this->transpile_function((const sem::FunctionDef&) (node));
                 break;
-            case SNodeType::ENUM:
-                this->transpile_enum((sem::EnumDef&) node);
-                break;
-            case SNodeType::CLASS:
-                this->transpile_class((sem::KlassDef&) node);
-                break;
+                // case SNodeType::ENUM:
+                //     return this->transpile_enum((const sem::EnumDef&) node);
+                //     break;
+                // case SNodeType::CLASS:
+                //     return this->transpile_class((const sem::KlassDef&) node);
+                //     break;
             default:
                 throw std::runtime_error("Don't know what to do with this SNode!");
         }
     }
 
-    PythonOutputCode transpile_call(sem::Call& node);
+    PythonOutputCode transpile_call(const sem::Call& node);
 
     PythonOutputCode transpile_string(const sem::String& node);
 
     PythonOutputCode transpile_boolean(const sem::Bool& node);
 
-    PythonOutputCode transpile_float(sem::Float& node);
+    PythonOutputCode transpile_float(const sem::Float& node);
 
-    PythonOutputCode transpile_object_member(sem::ObjectMember& node);
+    PythonOutputCode transpile_object_member(const sem::ObjectMember& node);
 
     PythonOutputCode transpile_while(const sem::While& node);
 
-    PythonOutputCode transpile_list(sem::List& node);
+    PythonOutputCode transpile_list(const sem::List& node);
 
     PythonOutputCode transpile_if(const sem::IfSNode& node);
 
-    PythonOutputCode transpile_break(sem::Break& node);
+    PythonOutputCode transpile_break(const sem::Break& node);
 
-    PythonOutputCode transpile_continue(sem::Continue& node);
+    PythonOutputCode transpile_continue(const sem::Continue& node);
 
-    PythonOutputCode transpile_match(sem::Match& node);
+    PythonOutputCode transpile_match(const sem::Match& node);
 
-    PythonOutputCode transpile_enum_member(sem::EnumMember& node);
+    PythonOutputCode transpile_enum_member(const sem::EnumMember& node);
 
-    PythonOutputCode transpile_ternary(sem::Ternary& node);
+    PythonOutputCode transpile_ternary(const sem::Ternary& node);
 
-    PythonOutputCode transpile_none(sem::None& node);
+    PythonOutputCode transpile_none(const sem::None& node);
 
-    PythonOutputCode transpile_dict(sem::Dict& node);
-    PythonOutputCode transpile_try_catch(sem::TryCatch& node);
+    PythonOutputCode transpile_dict(const sem::Dict& node);
+    PythonOutputCode transpile_try_catch(const sem::TryCatch& node);
 
     PythonOutputCode transpile_const_function_call(const sem::ConstFunctionCall& call);
 
-    PythonOutputCode dispatch(sem::SNode& node) {
+    PythonOutputCode dispatch(const sem::SNode& node) {
         switch (node.type) {
             case SNodeType::BLOCK:
-                return this->transpile_block((sem::Block&) node);
+                return this->transpile_block((const sem::Block&) node);
             case SNodeType::ENUM_MEMBER:
-                return this->transpile_enum_member((sem::EnumMember&) node);
+                return this->transpile_enum_member((const sem::EnumMember&) node);
             case SNodeType::BOOLEAN:
-                return this->transpile_boolean((sem::Bool&) node);
+                return this->transpile_boolean((const sem::Bool&) node);
             case SNodeType::MATCH:
-                return this->transpile_match((sem::Match&) node);
+                return this->transpile_match((const sem::Match&) node);
             case SNodeType::IF:
-                return this->transpile_if((sem::IfSNode&) node);
+                return this->transpile_if((const sem::IfSNode&) node);
             case SNodeType::BREAK:
-                return this->transpile_break((sem::Break&) node);
+                return this->transpile_break((const sem::Break&) node);
             case SNodeType::CONTINUE:
-                return this->transpile_continue((sem::Continue&) node);
+                return this->transpile_continue((const sem::Continue&) node);
             case SNodeType::ID:
-                return this->transpile_id((sem::Id&) node);
+                return this->transpile_id((const sem::Id&) node);
             case SNodeType::STRING:
-                return this->transpile_string((sem::String&) node);
+                return this->transpile_string((const sem::String&) node);
             case SNodeType::CALL:
-                return this->transpile_call((sem::Call&) node);
+                return this->transpile_call((const sem::Call&) node);
             case SNodeType::OBJECT_METHOD_CALL:
-                return this->transpile_object_method_call((sem::ObjectMethodCall&) node);
-                case SNodeType::CONST_FUNCTION_CALL:
-                    return this->transpile_const_function_call((sem::ConstFunctionCall&) node);
+                return this->transpile_object_method_call((const sem::ObjectMethodCall&) node);
+            case SNodeType::CONST_FUNCTION_CALL:
+                return this->transpile_const_function_call((const sem::ConstFunctionCall&) node);
             case SNodeType::NEW:
-                return this->transpile_new((sem::NewObject&) node);
+                return this->transpile_new((const sem::NewObject&) node);
             case SNodeType::DICT:
-                return this->transpile_dict((sem::Dict&) node);
+                return this->transpile_dict((const sem::Dict&) node);
             case SNodeType::LIST:
-                return this->transpile_list((sem::List&) node);
+                return this->transpile_list((const sem::List&) node);
             case SNodeType::OBJECT_MEMBER:
-                return this->transpile_object_member((sem::ObjectMember&) node);
+                return this->transpile_object_member((const sem::ObjectMember&) node);
             case SNodeType::DECLARATION:
-                return this->transpile_declaration((sem::Declaration&) node);
+                return this->transpile_declaration((const sem::Declaration&) node);
             case SNodeType::WHILE:
-                return this->transpile_while((sem::While&) node);
+                return this->transpile_while((const sem::While&) node);
             case SNodeType::ASSIGNMENT:
-                return this->transpile_assignment((sem::Assignment&) node);
+                return this->transpile_assignment((const sem::Assignment&) node);
             case SNodeType::RETURN:
-                return this->transpile_return((sem::Return&) node);
+                return this->transpile_return((const sem::Return&) node);
             case SNodeType::TRY_CATCH:
-                return this->transpile_try_catch((sem::TryCatch&) node);
-            case SNodeType::THROW:
-                return this->transpile_throw((sem::Throw&) node);
-                break;
+                return this->transpile_try_catch((const sem::TryCatch&) node);
+                // case SNodeType::THROW:
+                //     return this->transpile_throw((const sem::Throw&) node);
+                //     break;
             case SNodeType::FLOAT:
-                return this->transpile_float((sem::Float&) node);
+                return this->transpile_float((const sem::Float&) node);
             case SNodeType::NONE:
-                return this->transpile_none((sem::None&) node);
+                return this->transpile_none((const sem::None&) node);
             case SNodeType::TERNARY:
-                return this->transpile_ternary((sem::Ternary&) node);
+                return this->transpile_ternary((const sem::Ternary&) node);
             case SNodeType::INTEGER:
-                return this->transpile_integer((sem::Integer&) node);
+                return this->transpile_integer((const sem::Integer&) node);
                 break;
             default:
                 throw std::runtime_error("Don't know what to do with this SNode!");
@@ -201,6 +219,7 @@ public:
     PythonOutputCode transpile_throw(sem::Throw& node);
     bool in_try_catch;
     PythonOutputCode transpile_object_method_call(const sem::ObjectMethodCall& call);
+    std::string transpile_module(const sem::Block& block);
 };
 
 

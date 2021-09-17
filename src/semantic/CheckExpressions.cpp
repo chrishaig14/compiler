@@ -224,11 +224,11 @@ USemanticInfo Checker::visit_binop(ast::BinaryOp& n) {
         return error_stub();
     }
     ConstFunction& operator_fun = *operator_fun_it->second;
-    auto function_id = std::make_unique<sem::Id>(operator_fun.path.as_str());
+    // auto function_id = std::make_unique<sem::Id>(operator_fun.path.as_str());
     std::vector<USNode> vv;
     vv.push_back(std::move(left_info_p->snode));
     vv.push_back(std::move(right_snode));
-    auto sn = std::make_unique<sem::Call>(std::move(function_id), std::move(vv));
+    auto sn = std::make_unique<sem::ConstFunctionCall>(operator_fun.path, std::move(vv));
     sem::Type* rettype = operator_fun.const_function_ft.return_type->clone();
 
     USemanticInfo info_u = std::make_unique<SemanticInfo>();

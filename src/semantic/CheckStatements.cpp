@@ -277,7 +277,7 @@ USemanticInfo Checker::visit_match(ast::Match& node) {
         this->scope->set(case_id, *ent);
         USemanticInfoBlock case_info = this->visit_block(case_node);
         auto& bn = (std::unique_ptr<sem::Block>&) case_info->snode;
-        auto* omn = new sem::ObjectMember(std::make_unique<sem::Id>(varname), Path("core.core.Union"), "o");
+        auto* omn = new sem::ObjectMember(std::make_unique<sem::Id>(varname), Path("libcore.libcore.Union"), "o");
         USNode u(omn);
         auto dn = std::make_unique<sem::Declaration>(case_id, std::move(u));
         bn->nodes.insert(bn->nodes.begin(), std::move(dn));
@@ -341,7 +341,7 @@ USemanticInfo Checker::visit_for(ast::For& node) {
     increment_index_sn->lvalue = std::make_unique<sem::Id>(loop_index_var_id);
     std::vector<USNode> vv;
     vv.push_back(std::make_unique<sem::Id>(loop_index_var_id));
-    auto inc_exp_node = std::make_unique<sem::Call>(std::make_unique<sem::Id>("core.core.Integer.__add__"),
+    auto inc_exp_node = std::make_unique<sem::Call>(std::make_unique<sem::Id>("libcore.libcore.Integer.__add__"),
                                                     std::move(vv));
     auto one_node = std::make_unique<sem::Integer>(std::string());
     one_node->str = "1";

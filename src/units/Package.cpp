@@ -15,7 +15,7 @@ Package::Package(Path path, std::string abs_path, bool is_lib)
 }
 
 ModuleMember Package::get(Path p) {
-    if (p.as_str() == "core.core.Union") {
+    if (p.as_str() == "libcore.libcore.Union") {
         return ModuleMember{.type=ModuleMemberType::CLASS, .clazz=new Class("Union", p)};
     }
     VectorOfStrings pt = p.as_vec();

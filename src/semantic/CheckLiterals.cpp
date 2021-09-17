@@ -15,7 +15,7 @@
 USemanticInfo Checker::visit_boolean(ast::Boolean& node) {
     USemanticInfo info_u = std::make_unique<SemanticInfo>();
     SemanticInfo& info = *info_u;
-    info.set_entity(this->entity_value_from_actual_base_path_no_generic(Path("core.core.Boolean")).clone());
+    info.set_entity(this->entity_value_from_actual_base_path_no_generic(Path("libcore.libcore.Boolean")).clone());
     info.snode = std::make_unique<sem::Bool>(node.value);
     return info_u;
 }
@@ -26,12 +26,12 @@ USemanticInfo Checker::visit_number(ast::Number& node) {
     SemanticInfo& info = *info_u;
     switch (node.num_type) {
         case NumberType::INTEGER: {
-            info.set_entity(this->entity_value_from_actual_base_path_no_generic(Path("core.core.Integer")).clone());
+            info.set_entity(this->entity_value_from_actual_base_path_no_generic(Path("libcore.libcore.Integer")).clone());
             info.snode = std::make_unique<sem::Integer>(node.str);
             break;
         }
         case NumberType::FLOAT: {
-            info.set_entity(this->entity_value_from_actual_base_path_no_generic(Path("core.core.Float")).clone());
+            info.set_entity(this->entity_value_from_actual_base_path_no_generic(Path("libcore.libcore.Float")).clone());
             // auto* otype = new ast::ObjectType("Float", {});
             // otype->actual_base_path = Path("core.core.Float");
             // auto ov = std::make_unique<Value>(otype);
@@ -68,7 +68,7 @@ USemanticInfo Checker::visit_emptylist(ast::EmptyList& node) {
     USemanticInfo info_u = std::make_unique<SemanticInfo>();
     SemanticInfo& info = *info_u;
     this->module.fill_actual(*node.type);
-    auto* otype = new sem::TypeObject("List", {node.type->to_sem()}, Path("core.core.List"));
+    auto* otype = new sem::TypeObject("List", {node.type->to_sem()}, Path("libcore.libcore.List"));
     // auto ov = std::make_unique<Value>(otype);
     // this->fill_value(*ov)
     auto ov = this->make_value(otype);
@@ -89,7 +89,7 @@ USemanticInfo Checker::visit_string(ast::String& node) {
     // auto ov = std::make_unique<Value>(otype);
     // this->fill_value(*ov);
     // info.entity = new EntityValue(std::move(ov));
-    info.set_entity(this->entity_value_from_actual_base_path_no_generic(Path("core.core.String")).clone());
+    info.set_entity(this->entity_value_from_actual_base_path_no_generic(Path("libcore.libcore.String")).clone());
     return info_u;
 }
 
@@ -112,7 +112,7 @@ USemanticInfo Checker::visit_tuple(ast::Tuple& node) {
     auto ov = std::make_unique<Value>(otype);
     ov->metatype = Meta::CLASS;
 
-    ov->clazz = new Class("Tuple", Path("core.core.Tuple"));
+    ov->clazz = new Class("Tuple", Path("libcore.libcore.Tuple"));
     for (size_t i = 0; i < ov->type.object().type_params.size(); i++) {
         // auto tv = std::make_unique<Value>(ov->type.object().type_params[i]->clone());
         // this->fill_value(*tv);
@@ -218,7 +218,7 @@ USemanticInfo Checker::visit_emptydict(ast::EmptyDict& node) {
     SemanticInfo& info = *info_u;
     sem::TypeObject* ot = new sem::TypeObject("Dict",
                                               {node.key_type->to_sem(), node.value_type->to_sem()},
-                                              Path("core.core.Dict"));
+                                              Path("libcore.libcore.Dict"));
     // ot->data.actual_base_path = Path("core.core.Dict");
     this->module.fill_actual(*ot);
     // auto ov = std::make_unique<Value>(ot);
@@ -290,7 +290,7 @@ USemanticInfo Checker::visit_list(ast::List& node) {
     return_info.is_constant = is_constant;
 
     return_info.snode = std::make_unique<sem::List>(std::move(list_elements));
-    auto* otype = new sem::TypeObject("List", {element_type.clone()}, Path("core.core.List"));
+    auto* otype = new sem::TypeObject("List", {element_type.clone()}, Path("libcore.libcore.List"));
     // auto p_value = std::make_unique<Value>(otype);
     // this->fill_value(*p_value);
     auto p_value = this->make_value(otype);

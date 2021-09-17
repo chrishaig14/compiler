@@ -35,9 +35,9 @@ void GlobalProcessor::visit_import(ast::Import& node) {
 }
 
 void GlobalProcessor::add_default_imports() {
-    std::vector<Path> default_paths = {Path("core.core.String"), Path("core.core.Integer"), Path("core.core.List"),
-                                       Path("core.core.Double"), Path("core.core.Boolean"), Path("core.core.Float"),
-                                       Path("core.core.Option"), Path("core.core.print"), Path("core.core.Dict")};
+    std::vector<Path> default_paths = {Path("libcore.libcore.String"), Path("libcore.libcore.Integer"), Path("libcore.libcore.List"),
+                                       Path("libcore.libcore.Double"), Path("libcore.libcore.Boolean"), Path("libcore.libcore.Float"),
+                                       Path("libcore.libcore.Option"), Path("libcore.libcore.print"), Path("libcore.libcore.Dict")};
     for (auto path: default_paths) {
         if (this->module.imported_paths_with_alias.count(path.as_vec().back()) != 0) {
             std::cout << this->module.abs_path << std::endl;
@@ -246,10 +246,10 @@ Path Module::get_actual_path(const std::string& id) {
         return Path(VectorOfStrings({".None"}));
     }
     if (id == "Union") {
-        return Path("core.core.Union");
+        return Path("libcore.libcore.Union");
     }
     if (id == "Tuple") {
-        return Path("core.core.Tuple");
+        return Path("libcore.libcore.Tuple");
     }
     if (this->members.count(id) == 1) {
         if (this->members[id].type == ModuleMemberType::CLASS) {

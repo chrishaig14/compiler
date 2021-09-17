@@ -1,7 +1,0 @@
-class Foo {
-    x: Integer
-}
-fun main()->Integer {
-    var w = #Foo(9) == 2
-    return 0
-}

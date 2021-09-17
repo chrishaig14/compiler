@@ -21,7 +21,7 @@ make_for_snode(ast::For& node, USemanticInfoBlock& binfo, USemanticInfo& exp_inf
 
     bbn->nodes.push_back(std::move(lidx_decl));
 
-    auto list_len_fn = std::make_unique<sem::Id>("core.core.List.len");
+    auto list_len_fn = std::make_unique<sem::Id>("libcore.libcore.List.len");
     auto list_sn = std::make_unique<sem::Id>(loop_list_var_id);
     std::vector<USNode> v;
     v.emplace_back(std::move(list_sn));
@@ -31,7 +31,7 @@ make_for_snode(ast::For& node, USemanticInfoBlock& binfo, USemanticInfo& exp_inf
 
 
     auto idxsn = std::make_unique<sem::Id>(loop_index_var_id);
-    auto cmpfunsn = std::make_unique<sem::Id>("core.core.Integer.__lt__");
+    auto cmpfunsn = std::make_unique<sem::Id>("libcore.libcore.Integer.__lt__");
 
     auto llensn = std::make_unique<sem::Id>(loop_list_len_var_id);
 
@@ -46,7 +46,7 @@ make_for_snode(ast::For& node, USemanticInfoBlock& binfo, USemanticInfo& exp_inf
     std::vector<USNode> vvv;
     vvv.push_back(std::make_unique<sem::Id>(loop_list_var_id));
     vvv.push_back(std::make_unique<sem::Id>(loop_index_var_id));
-    auto* list_subscript_n = new sem::Call(std::make_unique<sem::Id>("core.core.List.__get_item__"), std::move(vvv));
+    auto* list_subscript_n = new sem::Call(std::make_unique<sem::Id>("libcore.libcore.List.__get_item__"), std::move(vvv));
 
     USNode ul(list_subscript_n);
     auto loop_elem_sn = std::make_unique<sem::Declaration>(node.var, std::move(ul));
@@ -319,7 +319,7 @@ USemanticInfo Checker::visit_function(ast::Function& n) {
         }
     }
     this->leave_scope();
-    auto sn = std::make_unique<sem::FunctionDef>(n.path.as_str(), params, std::move(bn));
+    auto sn = std::make_unique<sem::FunctionDef>(n.path.as_vec().back(), params, std::move(bn));
     info.snode = std::move(sn);
     if (returnType != T_NONE) {
         if (!n.body->nodes.empty()) {

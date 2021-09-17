@@ -29,7 +29,7 @@ std::unique_ptr<Compiler> analyze(std::string code) {
     const std::string& tmp_out = "tmp_out";
     mkdir(tmp_out.c_str(), 0700);
     std::ofstream tmp_req(tmp_in + "/requirements.txt");
-    tmp_req << "core==1.0.0";
+    tmp_req << "libcore==1.0.0";
     tmp_req.flush();
     std::ofstream tmp(tmp_in + "/tmp.xl");
     tmp << code;

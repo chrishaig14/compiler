@@ -6,6 +6,7 @@
 #include "Compiler.h"
 #include "../logging/logging.h"
 #include "utils.h"
+#include "../transpiler/PythonTranspiler.h"
 
 void
 write_cmakelists(const std::string& cmake_output_path, const std::string& output_name, const std::string& all_files,
