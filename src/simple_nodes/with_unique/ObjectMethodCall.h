@@ -6,7 +6,7 @@
 #define XLANG_OBJECTMETHODCALL_H
 
 #include <string>
-#include "../common/SNode.h"
+#include "../common/include/SNode.h"
 #include "../../ast/Type.h"
 #include "../../ast/Path.h"
 

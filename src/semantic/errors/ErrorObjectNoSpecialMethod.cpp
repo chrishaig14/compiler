@@ -3,7 +3,7 @@
 //
 
 #include "ErrorObjectNoSpecialMethod.h"
-#include "../../simple_nodes/common/TypeObject.h"
+#include "../../simple_nodes/common/include/TypeObject.h"
 
 Error* ErrorObjectNoSpecialMethod::clone() const {
     return new ErrorObjectNoSpecialMethod(*this->type, this->method_name, this->node);

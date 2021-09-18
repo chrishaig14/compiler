@@ -5,8 +5,8 @@
 #ifndef XLANG_CONSTFUNCTION_H
 #define XLANG_CONSTFUNCTION_H
 
-#include "../common/sem.h"
-#include "../common/SNode.h"
+#include "../common/include/sem.h"
+#include "../common/include/SNode.h"
 #include "../../ast/Path.h"
 
 class sem::ConstFunction : public sem::SNode {

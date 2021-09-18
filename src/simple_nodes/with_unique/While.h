@@ -6,8 +6,8 @@
 #define XLANG_WHILE_H
 
 
-#include "../common/SNode.h"
-#include "../common/Block.h"
+#include "../common/include/SNode.h"
+#include "../common/include/Block.h"
 
 class sem::While : public sem::SNode {
 public:

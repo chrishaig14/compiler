@@ -8,7 +8,7 @@
 
 #include <vector>
 #include <string>
-#include "../common/SNode.h"
+#include "../common/include/SNode.h"
 
 class sem::Break : public sem::SNode {
 public:

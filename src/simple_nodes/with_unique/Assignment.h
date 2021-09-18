@@ -5,7 +5,7 @@
 #ifndef XLANG_ASSIGNMENT_H
 #define XLANG_ASSIGNMENT_H
 
-#include "../common/SNode.h"
+#include "../common/include/SNode.h"
 
 class sem::Assignment : public sem::SNode {
 public:

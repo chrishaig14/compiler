@@ -8,78 +8,78 @@ add_library(
         simple_nodes
         with_unique/Assignment.cpp
         with_unique/Assignment.h
-        common/Block.cpp
-        common/Block.h
-        expressions/Bool.cpp
-        expressions/Bool.h
+        common/src/Block.cpp
+        common/include/Block.h
+        expressions/src/Bool.cpp
+        expressions/include/Bool.h
         with_unique/Break.cpp
         with_unique/Break.h
         with_unique/Call.cpp
         with_unique/Call.h
-        common/KlassDef.cpp
-        common/KlassDef.h
+        common/src/KlassDef.cpp
+        common/include/KlassDef.h
         with_unique/Continue.cpp
         with_unique/Continue.h
-        common/Declaration.cpp
-        common/Declaration.h
-        expressions/Dict.cpp
-        expressions/Dict.h
-        expressions/EnumMember.cpp
-        expressions/EnumMember.h
+        common/src/Declaration.cpp
+        common/include/Declaration.h
+        expressions/src/Dict.cpp
+        expressions/include/Dict.h
+        expressions/src/EnumMember.cpp
+        expressions/include/EnumMember.h
         with_unique/EnumDef.cpp
         with_unique/EnumDef.h
-        expressions/Float.cpp
-        expressions/Float.h
+        expressions/src/Float.cpp
+        expressions/include/Float.h
         with_unique/FunctionDef.cpp
         with_unique/FunctionDef.cpp
         with_unique/FunctionDef.h
         with_unique/FunctionDef.h
-        expressions/Id.cpp
-        expressions/Id.h
+        expressions/src/Id.cpp
+        expressions/include/Id.h
         with_unique/IfSNode.cpp
         with_unique/IfSNode.h
-        expressions/Integer.cpp
-        expressions/Integer.h
-        expressions/List.cpp
-        expressions/List.h
-        common/Match.cpp
-        common/Match.h
-        common/NewObject.cpp
-        common/NewObject.h
-        expressions/None.cpp
-        expressions/None.h
-        expressions/ObjectMember.cpp
-        expressions/ObjectMember.h
+        expressions/src/Integer.cpp
+        expressions/include/Integer.h
+        expressions/src/List.cpp
+        expressions/include/List.h
+        common/src/Match.cpp
+        common/include/Match.h
+        common/src/NewObject.cpp
+        common/include/NewObject.h
+        expressions/src/None.cpp
+        expressions/include/None.h
+        expressions/src/ObjectMember.cpp
+        expressions/include/ObjectMember.h
         with_unique/Return.cpp
         with_unique/Return.h
-        common/SNode.cpp
-        common/SNode.h
-        expressions/String.cpp
-        expressions/String.h
-        expressions/Ternary.cpp
-        expressions/Ternary.h
-        common/Throw.cpp
-        common/Throw.h
-        common/TryCatch.cpp
-        common/TryCatch.h
-        common/Type.cpp
-        common/Type.h
-        common/FunctionType.cpp
-        common/TypeFunction.h
-        common/TypeObject.h
-        common/ObjectType.cpp
+        common/src/SNode.cpp
+        common/include/SNode.h
+        expressions/src/String.cpp
+        expressions/include/String.h
+        expressions/src/Ternary.cpp
+        expressions/include/Ternary.h
+        common/src/Throw.cpp
+        common/include/Throw.h
+        common/src/TryCatch.cpp
+        common/include/TryCatch.h
+        common/src/Type.cpp
+        common/include/Type.h
+        common/src/FunctionType.cpp
+        common/src/TypeFunction.h
+        common/include/TypeObject.h
+        common/src/ObjectType.cpp
         with_unique/While.cpp
-        common/sem.h
+        common/include/sem.h
         with_unique/ObjectMethodCall.cpp
         with_unique/ObjectMethodCall.h
-        expressions/ObjectMethod.cpp
-        expressions/ObjectMethod.h
+        expressions/src/ObjectMethod.cpp
+        expressions/include/ObjectMethod.h
         with_unique/ConstFunctionCall.cpp
         with_unique/ConstFunctionCall.h
         with_unique/ConstFunction.cpp
         with_unique/ConstFunction.h
-        expressions/ObjectConstructor.cpp
-        expressions/ObjectConstructor.h
-        expressions/ObjectConstructorCall.cpp
-        expressions/ObjectConstructorCall.h
+        expressions/src/ObjectConstructor.cpp
+        expressions/include/ObjectConstructor.h
+        expressions/src/ObjectConstructorCall.cpp
+        expressions/include/ObjectConstructorCall.h
 )

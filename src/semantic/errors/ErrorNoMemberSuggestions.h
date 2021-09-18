@@ -7,7 +7,7 @@
 
 #include "Error.h"
 #include "../../ast/Member.h"
-#include "../../simple_nodes/common/TypeObject.h"
+#include "../../simple_nodes/common/include/TypeObject.h"
 
 class ErrorNoMemberSuggestions : public Error {
     const ast::Member& m;

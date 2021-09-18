@@ -6,7 +6,7 @@
 #define XLANG_RETURN_H
 
 
-#include "../common/SNode.h"
+#include "../common/include/SNode.h"
 #include <vector>
 #include <string>
 

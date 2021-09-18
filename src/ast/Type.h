@@ -11,7 +11,7 @@
 #include "Node.h"
 
 #include "../types.h"
-#include "../simple_nodes/common/Type.h"
+#include "../simple_nodes/common/include/Type.h"
 #include <iostream>
 
 

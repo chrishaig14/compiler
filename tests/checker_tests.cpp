@@ -6,8 +6,8 @@
 #include "../src/semantic/Checker.h"
 #include "../src/compiler/Compiler.h"
 #include "../src/compiler/analyze.h"
-#include "../src/simple_nodes/common/TypeObject.h"
-#include "../src/simple_nodes/common/TypeFunction.h"
+#include "../src/simple_nodes/common/include/TypeObject.h"
+#include "../src/simple_nodes/common/src/TypeFunction.h"
 
 #include "../src/semantic/errors/ErrorTypeMismatch.h"
 #include "../src/semantic/errors/ErrorRedeclared.h"

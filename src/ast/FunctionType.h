@@ -7,7 +7,7 @@
 
 
 #include "Type.h"
-#include "../simple_nodes/common/TypeFunction.h"
+#include "../simple_nodes/common/src/TypeFunction.h"
 
 class ast::FunctionType : public ast::Type {
 public:

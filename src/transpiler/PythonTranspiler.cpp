@@ -4,7 +4,7 @@
 
 #include "PythonTranspiler.h"
 #include "PythonTranspiler.h"
-#include "../simple_nodes/common/Throw.h"
+#include "../simple_nodes/common/include/Throw.h"
 #include "../simple_nodes/with_unique/ObjectMethodCall.h"
 #include "../simple_nodes/with_unique/ConstFunctionCall.h"
 

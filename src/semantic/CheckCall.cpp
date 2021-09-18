@@ -7,10 +7,10 @@
 #include "errors/ErrorExpectedExpression.h"
 #include "errors/ErrorNotAFunction.h"
 #include "errors/ErrorFunctionCallNumArgs.h"
-#include "../simple_nodes/common/TypeObject.h"
-#include "../simple_nodes/expressions/ObjectConstructor.h"
-#include "../simple_nodes/expressions/ObjectConstructorCall.h"
-#include "../simple_nodes/common/TypeFunction.h"
+#include "../simple_nodes/common/include/TypeObject.h"
+#include "../simple_nodes/expressions/include/ObjectConstructor.h"
+#include "../simple_nodes/expressions/include/ObjectConstructorCall.h"
+#include "../simple_nodes/common/src/TypeFunction.h"
 
 USemanticInfo Checker::visit_call(ast::Call& n, bool is_rvalue) {
     auto retv_p = std::make_unique<SemanticInfo>();

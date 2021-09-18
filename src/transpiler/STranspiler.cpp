@@ -3,7 +3,7 @@
 //
 
 #include "STranspiler.h"
-#include "../simple_nodes/common/Throw.h"
+#include "../simple_nodes/common/include/Throw.h"
 
 CppOutputCode STranspiler::transpile_declaration(sem::Declaration& node) {
     CppOutputCode exp = this->dispatch(node.expression);
