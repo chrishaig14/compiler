@@ -10,19 +10,14 @@
 #include <cassert>
 
 class sem::Declaration : public sem::SNode {
+    USNode _expression;
 public:
     std::string identifier;
-    USNode expression;
+    sem::SNode& expression;
 
-    Declaration(std::string identifier, USNode expression);
+    Declaration(const std::string& identifier, USNode _expression);
 
-    bool equals(const SNode& o) const override {
-        assert(this->type == o.type);
-        auto& other = (const Declaration&) o;
-        bool id_ok = this->identifier == other.identifier;
-        bool exp_ok = *this->expression == *other.expression;
-        return id_ok && exp_ok;
-    }
+    bool equals(const SNode& o) const override;
 };
 
 

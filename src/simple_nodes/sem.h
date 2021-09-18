@@ -41,6 +41,9 @@ namespace sem {
 
     class Float;
 
+    class ObjectConstructor;
+    class ObjectConstructorCall;
+
     class FunctionDef;
 
     class Id;

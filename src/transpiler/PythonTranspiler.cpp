@@ -19,7 +19,7 @@ PythonOutputCode::PythonOutputCode(const std::string& pre_code, const std::strin
 
 
 PythonOutputCode PythonTranspiler::transpile_declaration(const sem::Declaration& node) {
-    PythonOutputCode exp_out = this->dispatch(*node.expression);
+    PythonOutputCode exp_out = this->dispatch(node.expression);
     std::string code = exp_out.pre_code.empty() ? "" : exp_out.pre_code + "\n";
     code += this->indentation() + node.identifier + " = " + exp_out.code + "\n";
     return PythonOutputCode("", code);

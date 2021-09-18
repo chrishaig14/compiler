@@ -6,6 +6,8 @@
 #include "../simple_nodes/with_unique/None.h"
 #include "../simple_nodes/with_unique/Dict.h"
 #include "../simple_nodes/TypeObject.h"
+#include "../simple_nodes/with_unique/ObjectConstructor.h"
+#include "../simple_nodes/with_unique/ObjectConstructorCall.h"
 #include "../simple_nodes/TypeFunction.h"
 #include "errors/ErrorExpectedExpression.h"
 #include "errors/ErrorListLiteral.h"
@@ -253,8 +255,10 @@ USemanticInfo Checker::visit_defconst(ast::DefaultConstructor& node) {
         ot->is_generic_param = true;
     }
     auto* rt = new sem::TypeObject(cls.class_name, tp, cls.path);
-    info.set_entity(new EntityConstFunction(*new ConstFunction(Path(),  std::make_unique<sem::TypeFunction>(t, sem::UType(rt)))));
-    info.snode = std::make_unique<sem::Id>(cls.path.as_str() + "." + "__init__");
+    info.set_entity(new EntityConstFunction(*new ConstFunction(Path(),
+                                                               std::make_unique<sem::TypeFunction>(t,
+                                                                                                   sem::UType(rt)))));
+    info.snode = std::make_unique<sem::ObjectConstructor>(cls.path);
     return info_u;
 }
 
@@ -279,9 +283,7 @@ USemanticInfo Checker::visit_list(ast::List& node) {
         Value& p_entity = (Value&) current_type_p->entity.get();
         sem::TypeObject* ctype = &p_entity.type.object();
         if (*ctype != element_type) {
-            this->error_reporter.error(std::make_unique<ErrorTypeMismatch>(element_type,
-                                                                           node.elements[i],
-                                                                           p_entity));
+            this->error_reporter.error(std::make_unique<ErrorTypeMismatch>(element_type, node.elements[i], p_entity));
         }
         list_elements.push_back(std::move(current_type_p->snode));
     }

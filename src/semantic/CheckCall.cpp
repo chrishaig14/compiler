@@ -8,6 +8,8 @@
 #include "errors/ErrorNotAFunction.h"
 #include "errors/ErrorFunctionCallNumArgs.h"
 #include "../simple_nodes/TypeObject.h"
+#include "../simple_nodes/with_unique/ObjectConstructor.h"
+#include "../simple_nodes/with_unique/ObjectConstructorCall.h"
 #include "../simple_nodes/TypeFunction.h"
 
 USemanticInfo Checker::visit_call(ast::Call& n, bool is_rvalue) {
@@ -148,6 +150,9 @@ USemanticInfo Checker::visit_call(ast::Call& n, bool is_rvalue) {
     } else if (fun_info_p->snode->type == SNodeType::CONST_FUNCTION) {
         auto& om = (std::unique_ptr<sem::ConstFunction>&) fun_info_p->snode;
         retv.snode = std::make_unique<sem::ConstFunctionCall>(om->path, std::move(arguments));
+    } else if (fun_info_p->snode->type == SNodeType::OBJECT_CONSTRUCTOR) {
+        auto& om = (std::unique_ptr<sem::ObjectConstructor>&) fun_info_p->snode;
+        retv.snode = std::make_unique<sem::ObjectConstructorCall>(om->class_path, std::move(arguments));
     }
     // }
     return make_return_info(n, is_rvalue, std::move(retv_p), is_def_const, args_are_constant);

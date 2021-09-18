@@ -6,7 +6,7 @@
 #include "../simple_nodes/Throw.h"
 
 CppOutputCode STranspiler::transpile_declaration(sem::Declaration& node) {
-    CppOutputCode exp = this->dispatch(*node.expression);
+    CppOutputCode exp = this->dispatch(node.expression);
     std::string out;
     out += exp.pre_code;
     out += TOBJECT + SPACE + node.identifier + SPACE + ASSIGN + SPACE + GCDECLARE + LPAREN + exp.code + RPAREN + SEMIC +

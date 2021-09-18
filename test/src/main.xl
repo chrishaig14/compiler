@@ -7,6 +7,6 @@ class MyClass {
 }
 
 fun main()->Integer{
-    var x = #MyClass(6, 8)
+    var x = #MyClass(6, "HEllo")
     return 0
 }
