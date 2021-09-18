@@ -14,8 +14,10 @@ bool parse_module(Module& module) {
     module.code_lines = scanner.code_lines;
     try {
         std::unique_ptr<ast::Module> ast = parser.parse_module();
+        assert(ast != nullptr);
         module.ast = std::move(ast);
-    } catch (...) {
+    } catch (std::runtime_error& e) {
+        std::cout << "Error: " << e.what() << std::endl;
         std::cout << "Parsing for module " << module.name << " failed" << std::endl;
         return false;
     }

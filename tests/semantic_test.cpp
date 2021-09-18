@@ -492,3 +492,21 @@ TEST_CASE("semantic_output_enum_def", "[checker]") {
     REQUIRE(*((info->snode)->nodes[0]) == sem::EnumDef("test.tmp.Foo", {"a", "c"}));
 
 }
+
+TEST_CASE("semantic_output_class_ok", "[checker]") {
+    std::string code = "class Foo {\nx: Integer;\n y: String;\n}\n fun foo()->Integer{return 0;}";
+
+    std::unique_ptr<Compiler> cp = c_analyze(code);
+    Compiler& c = *cp;
+    Module& module = *c.root_package.units["tmp"].module;
+    resolve_module_imports(module, c.top_package);
+    Checker checker(c.top_package, module);
+    checker.init();
+    USemanticInfoBlock info = checker.visit_root(*module.ast);
+
+    REQUIRE(!checker.error_reporter.failed);
+    REQUIRE(checker.error_reporter.errors.empty());
+
+    REQUIRE(*((info->snode)->nodes[0]) == sem::KlassDef("Foo", {"x", "y"}));
+
+}

@@ -882,6 +882,7 @@ std::unique_ptr<ast::Klass> Parser::parse_class_definition() {
     Token class_tok = this->expect_token(TokType::CLASS);
     Token class_name_tk = this->expect_token(TokType::ID);
     std::string& class_name = class_name_tk.str;
+    std::cout << class_name << std::endl;
     VectorOfStrings type_parameters;
     if (this->match(TokType::LSQUARE)) {
         this->next();
@@ -924,6 +925,7 @@ std::unique_ptr<ast::Klass> Parser::parse_class_definition() {
                 static_members[member_name] = std::make_pair(member_type.release(), init_expression.release());
             } else {
                 members.push_back({member_name, std::move(member_type)});
+                members_ordered.push_back(member_name);
             }
             this->expect_token(TokType::SEMICOLON);
         } else if (this->match(TokType::WHERE)) {
@@ -981,6 +983,7 @@ std::unique_ptr<ast::Klass> Parser::parse_class_definition() {
                                           end.end_pos);
     c->members_ordered = members_ordered;
     c->start = class_tok.start;
+    std::cout << "Done parsing class " << class_name << std::endl;
     return c;
 }
 

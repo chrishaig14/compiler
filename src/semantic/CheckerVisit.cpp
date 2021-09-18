@@ -46,7 +46,8 @@ make_for_snode(ast::For& node, USemanticInfoBlock& binfo, USemanticInfo& exp_inf
     std::vector<USNode> vvv;
     vvv.push_back(std::make_unique<sem::Id>(loop_list_var_id));
     vvv.push_back(std::make_unique<sem::Id>(loop_index_var_id));
-    auto* list_subscript_n = new sem::Call(std::make_unique<sem::Id>("libcore.libcore.List.__get_item__"), std::move(vvv));
+    auto* list_subscript_n = new sem::Call(std::make_unique<sem::Id>("libcore.libcore.List.__get_item__"),
+                                           std::move(vvv));
 
     USNode ul(list_subscript_n);
     auto loop_elem_sn = std::make_unique<sem::Declaration>(node.var, std::move(ul));
@@ -71,69 +72,75 @@ USemanticInfo Checker::visit_class(ast::Klass& node) {
     this->error_reporter.current_class = node.class_name;
     USemanticInfo info_u = std::make_unique<SemanticInfo>();
     SemanticInfo& info = *info_u;
-    auto sn = std::make_unique<sem::Block>(true);
     this->add_this = true;
     ast::VectorOfTypes tp;
+    std::string cn = node.class_name;
     for (const auto& type_param: node.type_parameters) {
         tp.push_back(TYPE(type_param, {}));
     }
 
     ast::VectorOfTypes members_ordered_types;
-
     for (const auto& mt: node.members) {
         ast::Type& t = *mt.second;
         members_ordered_types.push_back(&t);
         this->assert_type_exists(t, node.start);
     }
-
-    Class* clazz = ((EntityClass&) this->scope->get(node.class_name)).clazz;
-    auto csn = std::make_unique<sem::KlassDef>(clazz->path.as_str(), node.members_ordered);
-    sn->nodes.push_back(std::move(csn));
-    sn->nodes.push_back(USNode(make_class_default_init(clazz->path.as_str(), node.members_ordered)));
-
-    for (const auto& sm: node.static_members) {
-        USemanticInfo sm_exp_info = this->dispatch(*sm.second.second);
-        if (*sm.second.first != *(ast::Type*) ((Value&) sm_exp_info->entity).type.to_ast()) {
-            this->error_reporter.fail("Err: cannt initialize static member of type " + sm.second.first->to_string() +
-                                      " with expression of type " + ((Value&) sm_exp_info->entity).type.to_string());
-        }
-        if (!sm_exp_info->is_constant) {
-            this->error_reporter.fail("Error: cannot initialize static member with non constant expression!");
-        }
-    }
-
-    std::vector<sem::SNode*> methods_snodes;
-    std::vector<sem::SNode*> static_methods_snodes;
-
-    for (const auto& method: node.methods) {
-        auto* vt = new sem::TypeObject(node.class_name, clazz->path);
-        auto val = std::make_unique<Value>(vt);
-        this->add_this = true;
-        this->this_entity = val.release();
-        val->metatype = Meta::CLASS;
-        val->clazz = clazz;
-        // method.second->path = clazz->path + "." + method.second->identifier;
-        USemanticInfo method_info = this->visit_function(*method.second->method);
-        methods_snodes.push_back(method_info->snode.release());
-    }
-
-    for (const auto& method: node.static_methods) {
-        this->add_this = false;
-        USemanticInfo method_info = this->visit_function(*method.second);
-        static_methods_snodes.push_back(method_info->snode.release());
-    }
-
-    for (auto* m: methods_snodes) {
-        sn->nodes.push_back(USNode(m));
-    }
-    for (auto* m: static_methods_snodes) {
-        sn->nodes.push_back(USNode(m));
-    }
-
-    this->add_this = true;
-
     this->add_this = false;
-    this->error_reporter.current_class = "";
+    auto sn = std::make_unique<sem::KlassDef>(node.class_name, node.members_ordered);
+    for (auto& m: node.methods) {
+        USNode ms = std::move(this->visit_function(*m.second->method)->snode);
+        std::unique_ptr<sem::FunctionDef> sf((sem::FunctionDef*) ms.release());
+        sn->methods.emplace_back(std::move(sf));
+    }
+    //
+    // Class* clazz = ((EntityClass&) this->scope->get(node.class_name)).clazz;
+    // auto csn = std::make_unique<sem::KlassDef>(clazz->path.as_str(), node.members_ordered);
+    // sn->nodes.push_back(std::move(csn));
+    // sn->nodes.push_back(USNode(make_class_default_init(clazz->path.as_str(), node.members_ordered)));
+    //
+    // for (const auto& sm: node.static_members) {
+    //     USemanticInfo sm_exp_info = this->dispatch(*sm.second.second);
+    //     if (*sm.second.first != *(ast::Type*) ((Value&) sm_exp_info->entity).type.to_ast()) {
+    //         this->error_reporter.fail("Err: cannt initialize static member of type " + sm.second.first->to_string() +
+    //                                   " with expression of type " + ((Value&) sm_exp_info->entity).type.to_string());
+    //     }
+    //     if (!sm_exp_info->is_constant) {
+    //         this->error_reporter.fail("Error: cannot initialize static member with non constant expression!");
+    //     }
+    // }
+    //
+    // std::vector<sem::SNode*> methods_snodes;
+    // std::vector<sem::SNode*> static_methods_snodes;
+    //
+    // for (const auto& method: node.methods) {
+    //     auto* vt = new sem::TypeObject(node.class_name, clazz->path);
+    //     auto val = std::make_unique<Value>(vt);
+    //     this->add_this = true;
+    //     this->this_entity = val.release();
+    //     val->metatype = Meta::CLASS;
+    //     val->clazz = clazz;
+    //     // method.second->path = clazz->path + "." + method.second->identifier;
+    //     USemanticInfo method_info = this->visit_function(*method.second->method);
+    //     methods_snodes.push_back(method_info->snode.release());
+    // }
+    //
+    // for (const auto& method: node.static_methods) {
+    //     this->add_this = false;
+    //     USemanticInfo method_info = this->visit_function(*method.second);
+    //     static_methods_snodes.push_back(method_info->snode.release());
+    // }
+    //
+    // for (auto* m: methods_snodes) {
+    //     sn->nodes.push_back(USNode(m));
+    // }
+    // for (auto* m: static_methods_snodes) {
+    //     sn->nodes.push_back(USNode(m));
+    // }
+    //
+    // this->add_this = true;
+    //
+    // this->add_this = false;
+    // this->error_reporter.current_class = "";
     info.snode = std::move(sn);
     return info_u;
 }

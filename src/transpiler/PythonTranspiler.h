@@ -103,7 +103,7 @@ public:
 
     PythonOutputCode transpile_return(const sem::Return& node);
 
-    void transpile_class(const sem::KlassDef& node);
+    PythonOutputCode transpile_class(const sem::KlassDef& node);
     void transpile_enum(const sem::EnumDef& node);
 
     PythonOutputCode dispatch_top(const sem::SNode& node) {
@@ -114,9 +114,9 @@ public:
                 // case SNodeType::ENUM:
                 //     return this->transpile_enum((const sem::EnumDef&) node);
                 //     break;
-                // case SNodeType::CLASS:
-                //     return this->transpile_class((const sem::KlassDef&) node);
-                //     break;
+            case SNodeType::CLASS:
+                return this->transpile_class((const sem::KlassDef&) node);
+                break;
             default:
                 throw std::runtime_error("Don't know what to do with this SNode!");
         }
@@ -220,6 +220,7 @@ public:
     bool in_try_catch;
     PythonOutputCode transpile_object_method_call(const sem::ObjectMethodCall& call);
     std::string transpile_module(const sem::Block& block);
+    bool add_self;
 };
 
 

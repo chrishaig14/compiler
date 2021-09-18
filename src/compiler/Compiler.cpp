@@ -46,8 +46,18 @@ void Compiler::pre() {
     VectorOfStrings requirements = this->load_requirements(req_file_path);
 
     load_package(root_package, 1);
-    parse_package(root_package);
 
+    if (not parse_package(root_package)) {
+        throw std::runtime_error("Parse Error");
+    }
+    for (auto& p: root_package.units) {
+        if (p.second.type == U_TYPE::MODULE) {
+            std::cout << p.second.module << std::endl;
+            Module& m = *p.second.module;
+            std::cout << "Hello" << m.ast.get() << std::endl;
+            assert(m.ast.get() != nullptr);
+        }
+    }
     preprocess_package(root_package);
 }
 

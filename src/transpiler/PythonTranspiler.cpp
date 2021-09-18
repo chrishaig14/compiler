@@ -92,7 +92,9 @@ PythonOutputCode PythonTranspiler::transpile_function(const sem::FunctionDef& no
     //         param = "this_obj";
     //     }
     // }
-
+    if (this->add_self) {
+        parameters += "self, ";
+    }
     for (const auto& pn: node.params) {
         parameters += pn + COMMA + SPACE;
     }
@@ -190,57 +192,6 @@ PythonOutputCode PythonTranspiler::transpile_float(const sem::Float& node) {
     return PythonOutputCode("", "MAKE_FLOAT(" + node.str + ")");
 }
 
-void PythonTranspiler::transpile_class(const sem::KlassDef& node) {
-    std::string out;
-    std::string class_name = (node.identifier);
-    out += CLASS + SPACE + class_name + SPACE + ": public XObject {\n";
-    out += "public: \n";
-    for (const auto& m: node.members) {
-        out += TOBJECT + SPACE + m + SEMIC + NEWLINE;
-    }
-
-    out += class_name + LPAREN;
-    for (const auto& m: node.members) {
-        out += TOBJECT + SPACE + m + COMMA + SPACE;
-    }
-    out = out.substr(0, out.size() - 2);
-    out += RPAREN + SPACE + ":" + SPACE + "XObject" + LPAREN + QUOTE + class_name + QUOTE + RPAREN + SPACE + LCURLY +
-           NEWLINE;
-    for (const auto& m: node.members) {
-        out += "this->" + m + " = " + m + SEMIC + NEWLINE;
-    }
-    out += RCURLY + NEWLINE;
-
-    out += "~" + class_name + LPAREN + RPAREN + LCURLY + NEWLINE;
-    out += "if (!GC::collecting){\n";
-    for (const auto& m: node.members) {
-        out += GCOUTOFSCOPE + LPAREN + "this->" + m + RPAREN + SEMIC + NEWLINE;
-    }
-    out += RCURLY;
-    out += RCURLY + NEWLINE;
-
-    out += "std::vector<XObject*> get_all_members() override {\n";
-    out += "std::vector<XObject*> r;\n";
-    for (const auto& m: node.members) {
-        out += "if (has_tag(this->" + m + ",OBJECT_TAG)){r.push_back(UNTAG(this->" + m + "));}";
-    }
-    out += "return r;";
-    out += RCURLY + NEWLINE;
-
-    out += "TaggedObject* str() override {\n";
-    out += "TaggedObject* r = MAKE_STRING(\"\");\n";
-    out += "XString* _r = CAST(r, XString);\n";
-    for (const auto& m: node.members) {
-        out += "if (has_tag(this->" + m + ",OBJECT_TAG)){_r->s+=CAST(CAST(this->" + m +
-               ", XObject)->str(),XString)->s;}";
-    }
-    out += "return r;";
-    out += RCURLY + NEWLINE;
-
-    out += RCURLY + SEMIC + NEWLINE;
-    this->header += out;
-}
-
 PythonOutputCode PythonTranspiler::transpile_new(const sem::NewObject& node) {
     std::string out;
     std::string class_id = (node.class_name);
@@ -266,6 +217,35 @@ PythonOutputCode PythonTranspiler::transpile_new(const sem::NewObject& node) {
     }
     out += RPAREN;
     return PythonOutputCode("", out);
+}
+
+PythonOutputCode PythonTranspiler::transpile_class(const sem::KlassDef& node) {
+    std::string class_name = node.identifier;
+    std::string code;
+    code += "class " + class_name + ":\n";
+    std::string def = "def __init__(self, ";
+    for (const auto& m: node.members) {
+        def += m + ", ";
+    }
+    def += "):\n";
+    std::string block;
+    for (const auto& m: node.members) {
+        block += "self." + m + " = " + m + "\n";
+    }
+    block = indent_paragraph(block, 4);
+
+    def += block;
+    code += indent_paragraph(def, 4) + "\n";
+
+    for (auto& m: node.methods) {
+        this->add_self = true;
+        PythonOutputCode fcode = this->transpile_function(*m);
+        this->add_self = false;
+        code += indent_paragraph(fcode.code, 4) + "\n";
+        // std::cout << fcode.code << std::endl;
+    }
+
+    return PythonOutputCode("", code);
 }
 
 PythonOutputCode PythonTranspiler::transpile_object_member(const sem::ObjectMember& node) {
