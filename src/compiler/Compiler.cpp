@@ -61,12 +61,8 @@ void Compiler::pre() {
     preprocess_package(root_package);
 }
 
-void Compiler::main() {
-    try {
-        check_package(root_package, top_package);
-    } catch (const std::runtime_error& e) {
-        std::cout << "ERROR: " << e.what() << std::endl;
-    }
+bool Compiler::main() {
+    return check_package(root_package, top_package);
 }
 
 VectorOfStrings Compiler::load_requirements(const std::string& filepath) {

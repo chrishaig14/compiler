@@ -20,7 +20,7 @@ bool check_module(Module& module, Package& top_package) {
     Checker checker(top_package, module);
     USemanticInfoBlock check_info = checker.visit_root(*module.ast);
     module.sast = std::move(check_info->snode);
-    return checker.error_reporter.failed;
+    return not checker.error_reporter.failed;
 }
 
 bool check_package(Package& package, Package& top_package) {

@@ -28,7 +28,9 @@ int main(int argc, char* argv[]) {
 
     Compiler compiler(project_dir, project_output_dir, output_name, lib_path, is_lib, version);
     compiler.pre();
-    compiler.main();
+    if (not compiler.main()) {
+        exit(1);
+    }
     PythonTranspiler transpiler;
     Module& module = *compiler.root_package.units.at("main").module;
     std::string module_code = transpiler.transpile_module(*module.sast);

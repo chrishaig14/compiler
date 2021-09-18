@@ -117,7 +117,7 @@ public:
     // void transpile_one_module(Module& module, std::string& package_header, const std::string& output_package_dir,
     //                           Package& package);
 
-    void main();
+    bool main();
     void pre();
     Package root_package;
     Package top_package;
