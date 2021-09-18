@@ -234,7 +234,8 @@ USemanticInfo Checker::visit_defconst(ast::DefaultConstructor& node) {
     // this is a regular function
     USemanticInfo info_u = std::make_unique<SemanticInfo>();
     SemanticInfo& info = *info_u;
-    Entity& entity = this->dispatch(*node.class_node)->entity;
+    USemanticInfo class_info = this->dispatch(*node.class_node);
+    Entity& entity = class_info->entity;
     if (entity.type != E_TYPE::CLASS) {
         this->error_reporter.fail("Error not a class");
         info.set_entity(new EntityError());
