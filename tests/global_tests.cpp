@@ -3,7 +3,7 @@
 #include "../src/parser/Parser.h"
 #include "../src/ast/UnaryOp.h"
 #include "../src/semantic/GlobalProcessor.h"
-#include "../src/simple_nodes/TypeObject.h"
+#include "../src/simple_nodes/common/TypeObject.h"
 
 const ast::ObjectType NO_TYPE(".None");
 

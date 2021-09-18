@@ -6,7 +6,7 @@
 #define XLANG_OBJECTCONSTRUCTORCALL_H
 
 
-#include "../SNode.h"
+#include "../common/SNode.h"
 #include "../../ast/Path.h"
 
 class sem::ObjectConstructorCall : public sem::SNode {

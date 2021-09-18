@@ -7,7 +7,7 @@
 
 
 #include <string>
-#include "../SNode.h"
+#include "../common/SNode.h"
 
 class sem::Float : public sem::SNode {
 public:

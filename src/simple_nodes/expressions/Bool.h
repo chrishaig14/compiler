@@ -6,7 +6,7 @@
 #define XLANG_BOOL_H
 
 
-#include "../SNode.h"
+#include "../common/SNode.h"
 
 class sem::Bool : public sem::SNode {
 

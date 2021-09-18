@@ -3,8 +3,8 @@
 //
 
 #include "Checker.h"
-#include "../simple_nodes/TypeObject.h"
-#include "../simple_nodes/TypeFunction.h"
+#include "../simple_nodes/common/TypeObject.h"
+#include "../simple_nodes/common/TypeFunction.h"
 #include "errors/ErrorFunctionReturnLastStmt.h"
 #include "errors/ErrorUnusedReturnValue.h"
 

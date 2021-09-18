@@ -3,12 +3,12 @@
 //
 
 #include "CheckLiterals.h"
-#include "../simple_nodes/with_unique/None.h"
-#include "../simple_nodes/with_unique/Dict.h"
-#include "../simple_nodes/TypeObject.h"
-#include "../simple_nodes/with_unique/ObjectConstructor.h"
-#include "../simple_nodes/with_unique/ObjectConstructorCall.h"
-#include "../simple_nodes/TypeFunction.h"
+#include "../simple_nodes/expressions/None.h"
+#include "../simple_nodes/expressions/Dict.h"
+#include "../simple_nodes/common/TypeObject.h"
+#include "../simple_nodes/expressions/ObjectConstructor.h"
+#include "../simple_nodes/expressions/ObjectConstructorCall.h"
+#include "../simple_nodes/common/TypeFunction.h"
 #include "errors/ErrorExpectedExpression.h"
 #include "errors/ErrorListLiteral.h"
 #include "errors/ErrorPartialWrongNumArgs.h"

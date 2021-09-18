@@ -7,7 +7,7 @@
 
 
 #include <vector>
-#include "../SNode.h"
+#include "../common/SNode.h"
 
 class sem::Dict : public sem::SNode {
 

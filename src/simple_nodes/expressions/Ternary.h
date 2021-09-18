@@ -6,7 +6,7 @@
 #define XLANG_TERNARY_H
 
 
-#include "SNode.h"
+#include "../common/SNode.h"
 
 class sem::Ternary : public sem::SNode {
 

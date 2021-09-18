@@ -13,7 +13,7 @@
 #include "../ast/Import.h"
 #include "../ast/Klass.h"
 #include "../ast/EnumNode.h"
-#include "../simple_nodes/Block.h"
+#include "../simple_nodes/common/Block.h"
 #include "ConstFunction.h"
 #include "Class.h"
 #include "Enum.h"

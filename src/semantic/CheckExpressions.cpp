@@ -4,9 +4,9 @@
 
 #include <cassert>
 #include "CheckExpressions.h"
-#include "../simple_nodes/Ternary.h"
-#include "../simple_nodes/TypeObject.h"
-#include "../simple_nodes/TypeFunction.h"
+#include "../simple_nodes/expressions/Ternary.h"
+#include "../simple_nodes/common/TypeObject.h"
+#include "../simple_nodes/common/TypeFunction.h"
 #include "errors/ErrorNotDeclared.h"
 #include "errors/ErrorTypeMismatch.h"
 #include "errors/ErrorExpectedExpression.h"

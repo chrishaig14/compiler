@@ -7,7 +7,7 @@
 
 
 #include <string>
-#include "../SNode.h"
+#include "../common/SNode.h"
 #include "../../types.h"
 
 class sem::EnumDef : public sem::SNode {

@@ -3,7 +3,7 @@
 //
 
 #include "ErrorListLiteral.h"
-#include "../../simple_nodes/TypeObject.h"
+#include "../../simple_nodes/common/TypeObject.h"
 
 Error* ErrorListLiteral::clone() const {
     return new ErrorListLiteral(this->node, this->type, this->position, this->node_1);

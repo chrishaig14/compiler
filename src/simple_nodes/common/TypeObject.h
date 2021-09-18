@@ -7,8 +7,8 @@
 
 #include "Type.h"
 #include "sem.h"
-#include "../ast/Path.h"
-#include "../json/json.hpp"
+#include "../../ast/Path.h"
+#include "../../json/json.hpp"
 
 class sem::ObjectTypeData {
 public:

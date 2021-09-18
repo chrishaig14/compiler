@@ -7,9 +7,9 @@
 #include "../scanner/Scanner.h"
 #include "../parser/Parser.h"
 #include "../ast/ObjectType.h"
-#include "../simple_nodes/TypeObject.h"
-#include "../simple_nodes/TypeFunction.h"
-#include "../simple_nodes/Type.h"
+#include "../simple_nodes/common/TypeObject.h"
+#include "../simple_nodes/common/TypeFunction.h"
+#include "../simple_nodes/common/Type.h"
 
 void GlobalProcessor::visit_import(ast::Import& node) {
     const Path& node_path = Path(node.path);

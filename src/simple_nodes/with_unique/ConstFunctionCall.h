@@ -6,8 +6,8 @@
 #define XLANG_CONSTFUNCTIONCALL_H
 
 #include <vector>
-#include "../sem.h"
-#include "../SNode.h"
+#include "../common/sem.h"
+#include "../common/SNode.h"
 #include "../../ast/Path.h"
 
 class sem::ConstFunctionCall : public sem::SNode {

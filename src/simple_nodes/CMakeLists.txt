@@ -8,78 +8,78 @@ add_library(
         simple_nodes
         with_unique/Assignment.cpp
         with_unique/Assignment.h
-        Block.cpp
-        Block.h
-        with_unique/Bool.cpp
-        with_unique/Bool.h
+        common/Block.cpp
+        common/Block.h
+        expressions/Bool.cpp
+        expressions/Bool.h
         with_unique/Break.cpp
         with_unique/Break.h
         with_unique/Call.cpp
         with_unique/Call.h
-        KlassDef.cpp
-        KlassDef.h
+        common/KlassDef.cpp
+        common/KlassDef.h
         with_unique/Continue.cpp
         with_unique/Continue.h
-        Declaration.cpp
-        Declaration.h
-        with_unique/Dict.cpp
-        with_unique/Dict.h
-        with_unique/EnumMember.cpp
-        with_unique/EnumMember.h
+        common/Declaration.cpp
+        common/Declaration.h
+        expressions/Dict.cpp
+        expressions/Dict.h
+        expressions/EnumMember.cpp
+        expressions/EnumMember.h
         with_unique/EnumDef.cpp
         with_unique/EnumDef.h
-        with_unique/Float.cpp
-        with_unique/Float.h
+        expressions/Float.cpp
+        expressions/Float.h
         with_unique/FunctionDef.cpp
         with_unique/FunctionDef.cpp
         with_unique/FunctionDef.h
         with_unique/FunctionDef.h
-        with_unique/Id.cpp
-        with_unique/Id.h
+        expressions/Id.cpp
+        expressions/Id.h
         with_unique/IfSNode.cpp
         with_unique/IfSNode.h
-        with_unique/Integer.cpp
-        with_unique/Integer.h
-        with_unique/List.cpp
-        with_unique/List.h
-        Match.cpp
-        Match.h
-        NewObject.cpp
-        NewObject.h
-        with_unique/None.cpp
-        with_unique/None.h
-        with_unique/ObjectMember.cpp
-        with_unique/ObjectMember.h
+        expressions/Integer.cpp
+        expressions/Integer.h
+        expressions/List.cpp
+        expressions/List.h
+        common/Match.cpp
+        common/Match.h
+        common/NewObject.cpp
+        common/NewObject.h
+        expressions/None.cpp
+        expressions/None.h
+        expressions/ObjectMember.cpp
+        expressions/ObjectMember.h
         with_unique/Return.cpp
         with_unique/Return.h
-        SNode.cpp
-        SNode.h
-        with_unique/String.cpp
-        with_unique/String.h
-        Ternary.cpp
-        Ternary.h
-        Throw.cpp
-        Throw.h
-        TryCatch.cpp
-        TryCatch.h
-        Type.cpp
-        Type.h
-        FunctionType.cpp
-        TypeFunction.h
-        TypeObject.h
-        ObjectType.cpp
+        common/SNode.cpp
+        common/SNode.h
+        expressions/String.cpp
+        expressions/String.h
+        expressions/Ternary.cpp
+        expressions/Ternary.h
+        common/Throw.cpp
+        common/Throw.h
+        common/TryCatch.cpp
+        common/TryCatch.h
+        common/Type.cpp
+        common/Type.h
+        common/FunctionType.cpp
+        common/TypeFunction.h
+        common/TypeObject.h
+        common/ObjectType.cpp
         with_unique/While.cpp
-        sem.h
+        common/sem.h
         with_unique/ObjectMethodCall.cpp
         with_unique/ObjectMethodCall.h
-        with_unique/ObjectMethod.cpp
-        with_unique/ObjectMethod.h
+        expressions/ObjectMethod.cpp
+        expressions/ObjectMethod.h
         with_unique/ConstFunctionCall.cpp
         with_unique/ConstFunctionCall.h
         with_unique/ConstFunction.cpp
         with_unique/ConstFunction.h
-        with_unique/ObjectConstructor.cpp
-        with_unique/ObjectConstructor.h
-        with_unique/ObjectConstructorCall.cpp
-        with_unique/ObjectConstructorCall.h
+        expressions/ObjectConstructor.cpp
+        expressions/ObjectConstructor.h
+        expressions/ObjectConstructorCall.cpp
+        expressions/ObjectConstructorCall.h
 )

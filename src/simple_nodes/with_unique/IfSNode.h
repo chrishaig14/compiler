@@ -6,8 +6,8 @@
 #define XLANG_IFSNODE_H
 
 
-#include "../SNode.h"
-#include "../Block.h"
+#include "../common/SNode.h"
+#include "../common/Block.h"
 
 class sem::IfSNode : public sem::SNode {
 public:

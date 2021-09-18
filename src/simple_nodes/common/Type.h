@@ -9,10 +9,10 @@
 #include <string>
 #include <vector>
 
-#include "../types.h"
+#include "../../types.h"
 #include <iostream>
 #include "sem.h"
-#include "../json/json_fwd.hpp"
+#include "../../json/json_fwd.hpp"
 
 enum class sem::Kind {
     OBJECT, FUNCTION, UNKNOWN

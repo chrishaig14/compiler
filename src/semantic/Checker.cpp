@@ -4,8 +4,8 @@
 #include "Checker.h"
 #include "../macros.h"
 #include "../logging/logging.h"
-#include "../simple_nodes/TypeObject.h"
-#include "../simple_nodes/TypeFunction.h"
+#include "../simple_nodes/common/TypeObject.h"
+#include "../simple_nodes/common/TypeFunction.h"
 #include "util.h"
 
 bool function_is_generic(const sem::TypeFunction& ft) {

@@ -9,8 +9,8 @@
 #include "../ast/Path.h"
 #include "../ast/FunctionType.h"
 #include "../ast/Function.h"
-#include "../simple_nodes/sem.h"
-#include "../simple_nodes/TypeFunction.h"
+#include "../simple_nodes/common/sem.h"
+#include "../simple_nodes/common/TypeFunction.h"
 
 class ConstFunction {
 private:

@@ -4,7 +4,7 @@
 
 #include "CheckDeclaration.h"
 #include "../ast/ObjectType.h"
-#include "../simple_nodes/TypeObject.h"
+#include "../simple_nodes/common/TypeObject.h"
 #include "errors/ErrorTypeMismatch.h"
 #include "errors/ErrorRedeclared.h"
 #include "errors/ErrorExpectedExpression.h"

@@ -3,14 +3,14 @@
 //
 
 #include "Checker.h"
-#include "../simple_nodes/with_unique/Id.h"
-#include "../simple_nodes/with_unique/ObjectMember.h"
-#include "../simple_nodes/Match.h"
-#include "../simple_nodes/TypeFunction.h"
-#include "../simple_nodes/TypeObject.h"
-#include "../simple_nodes/NewObject.h"
+#include "../simple_nodes/expressions/Id.h"
+#include "../simple_nodes/expressions/ObjectMember.h"
+#include "../simple_nodes/common/Match.h"
+#include "../simple_nodes/common/TypeFunction.h"
+#include "../simple_nodes/common/TypeObject.h"
+#include "../simple_nodes/common/NewObject.h"
 #include "../units/FunctionValue.h"
-#include "../simple_nodes/with_unique/EnumMember.h"
+#include "../simple_nodes/expressions/EnumMember.h"
 #include "errors/ErrorFunctionCallNumArgs.h"
 #include "errors/ErrorEnumNoValue.h"
 

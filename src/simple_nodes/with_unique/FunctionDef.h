@@ -6,9 +6,9 @@
 #define XLANG_FUNCTIONDEF_H
 
 #include <string>
-#include "../SNode.h"
+#include "../common/SNode.h"
 #include "../../types.h"
-#include "../Block.h"
+#include "../common/Block.h"
 
 class sem::FunctionDef : public sem::SNode {
 public:

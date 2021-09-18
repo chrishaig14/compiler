@@ -7,7 +7,7 @@
 
 
 #include <vector>
-#include "../SNode.h"
+#include "../common/SNode.h"
 
 class sem::Call : public sem::SNode {
 public:
