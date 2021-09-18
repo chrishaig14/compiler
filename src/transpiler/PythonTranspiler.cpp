@@ -101,7 +101,7 @@ PythonOutputCode PythonTranspiler::transpile_function(const sem::FunctionDef& no
     parameters = parameters.substr(0, parameters.size() - 2);
     f_source += (node.identifier) + LPAREN + parameters + RPAREN + ":" + NEWLINE;
     // this->source += f_source;
-    f_source += this->transpile_block(*node.body).code;
+    f_source += indent_paragraph(this->transpile_block(*node.body).code, 4);
     return PythonOutputCode("", f_source);
 }
 
@@ -117,6 +117,9 @@ PythonOutputCode PythonTranspiler::transpile_block(const sem::Block& node) {
         } else {
             code += statement_out.code;
         }
+    }
+    if (code.back() == '\n') {
+        code = code.substr(0, code.size() - 1);
     }
     this->unindent();
     return PythonOutputCode("", code);
@@ -334,7 +337,7 @@ PythonOutputCode PythonTranspiler::transpile_if(const sem::IfSNode& node) {
     PythonOutputCode thenc = this->transpile_block(*node.then);
     code += cond.pre_code.empty() ? "" : cond.pre_code + "\n";
     code += this->indentation() + "condition = " + cond.code + "\n";
-    code += this->indentation() + "if" + SPACE + "condition:" + NEWLINE + thenc.code;
+    code += this->indentation() + "if" + SPACE + "condition:" + NEWLINE + indent_paragraph(thenc.code, 4);
 
     return PythonOutputCode(pre_code, code);
 }
