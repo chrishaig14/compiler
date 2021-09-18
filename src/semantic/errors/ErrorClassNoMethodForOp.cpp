@@ -16,7 +16,7 @@ bool ErrorClassNoMethodForOp::equal(const Error& other) const {
     return class_ok and op_ok and node_ok;
 }
 
-std::string ErrorClassNoMethodForOp::to_str() const {
+std::string ErrorClassNoMethodForOp::to_str(const CodeLines& code) const {
     return "Error: no method for op " + this->op + " in class " + this->class_name;
 }
 

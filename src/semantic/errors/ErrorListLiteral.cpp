@@ -17,7 +17,7 @@ bool ErrorListLiteral::equal(const Error& other) const {
     return node_ok and type_ok and node_1_ok;
 }
 
-std::string ErrorListLiteral::to_str() const {
+std::string ErrorListLiteral::to_str(const CodeLines& code) const {
     return std::string();
 }
 

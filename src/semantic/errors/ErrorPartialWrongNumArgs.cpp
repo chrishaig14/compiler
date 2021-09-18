@@ -12,7 +12,7 @@ bool ErrorPartialWrongNumArgs::equal(const Error& other) const {
     return false;
 }
 
-std::string ErrorPartialWrongNumArgs::to_str() const {
+std::string ErrorPartialWrongNumArgs::to_str(const CodeLines& code) const {
     return std::string();
 }
 

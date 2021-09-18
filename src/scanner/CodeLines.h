@@ -19,13 +19,7 @@ class CodeLines {
 public:
     std::string text;
 
-    std::string get_line(size_t i) {
-        if (i > this->line_offsets.size()) {
-            throw std::runtime_error("LINE OUT OF RANGE");
-        }
-        Range line_range = this->line_offsets[i];
-        return this->text.substr(line_range.offset, line_range.length - 1);
-    }
+    std::string get_line(size_t i) const;
 
     std::vector<Range> line_offsets;
 };

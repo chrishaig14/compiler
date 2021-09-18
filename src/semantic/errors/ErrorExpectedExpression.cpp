@@ -15,7 +15,7 @@ bool ErrorExpectedExpression::equal(const Error& other) const {
     return entity_ok and node_ok;
 }
 
-std::string ErrorExpectedExpression::to_str() const {
+std::string ErrorExpectedExpression::to_str(const CodeLines& code) const {
     return "Error: expected expression, got " + entity_to_string(*this->entity);
 }
 

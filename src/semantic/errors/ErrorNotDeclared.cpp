@@ -13,7 +13,7 @@ bool ErrorNotDeclared::equal(const Error& other) const {
     return this->idn == o.idn;
 }
 
-std::string ErrorNotDeclared::to_str() const {
+std::string ErrorNotDeclared::to_str(const CodeLines& code) const {
     return "Error not declared: " + this->idn._id;
 }
 

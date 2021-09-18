@@ -14,7 +14,7 @@ public:
     ErrorListLiteral(const sem::Type& node, const sem::TypeObject& type, TextPosition position, const ast::Node& node_1);
     Error* clone() const override;
     bool equal(const Error& other) const override;
-    std::string to_str() const override;
+    std::string to_str(const CodeLines& code) const override;
 
     const sem::Type& node;
     const sem::TypeObject& type;

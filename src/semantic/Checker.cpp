@@ -18,7 +18,7 @@ bool function_is_generic(const sem::TypeFunction& ft) {
     return false;
 }
 
-Checker::Checker(Package& top_package, Module& module) : module(module), top_package(top_package) {
+Checker::Checker(Package& top_package, Module& module) : module(module), error_reporter(module.code_lines), top_package(top_package) {
     this->is_call = false;
     this->scope = new SymbolTable("global", nullptr);
     this->scopes["global"] = this->scope;

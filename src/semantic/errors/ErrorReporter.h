@@ -23,9 +23,10 @@ enum class ErrorElement {
 
 class ErrorReporter {
 public:
-    ErrorReporter();
+    ErrorReporter(const CodeLines& code_lines);
+
     std::vector<std::unique_ptr<Error>> errors;
-    CodeLines code_lines;
+    const CodeLines& code_lines;
     bool failed;
     std::string context_string(TextPosition position);
     std::string code_context_string(TextPosition position);

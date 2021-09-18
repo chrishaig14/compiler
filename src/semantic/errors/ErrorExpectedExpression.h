@@ -13,7 +13,7 @@ public:
     ErrorExpectedExpression(const Entity& entity, const ast::Node& node);
     Error* clone() const override;
     bool equal(const Error& other) const override;
-    std::string to_str() const override;
+    std::string to_str(const CodeLines& code) const override;
 
     std::unique_ptr<Entity> entity;
     const ast::Node& node;

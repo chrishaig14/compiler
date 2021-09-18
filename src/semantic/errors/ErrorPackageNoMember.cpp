@@ -12,7 +12,7 @@ bool ErrorPackageNoMember::equal(const Error& other) const {
     return false;
 }
 
-std::string ErrorPackageNoMember::to_str() const {
+std::string ErrorPackageNoMember::to_str(const CodeLines& code) const {
     return std::string();
 }
 

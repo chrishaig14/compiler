@@ -4,7 +4,7 @@
 
 #include "ErrorNoMemberSuggestions.h"
 
-std::string ErrorNoMemberSuggestions::to_str() const {
+std::string ErrorNoMemberSuggestions::to_str(const CodeLines& code) const {
     std::string s = "Error no member: " + this->m.s_child + " candidates are: ";
     for (auto mm: this->clazz.members) {
         s += mm.first + ", ";

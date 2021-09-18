@@ -12,7 +12,7 @@ bool ErrorNotAFunction::equal(const Error& other) const {
     return false;
 }
 
-std::string ErrorNotAFunction::to_str() const {
+std::string ErrorNotAFunction::to_str(const CodeLines& code) const {
     return std::string();
 }
 

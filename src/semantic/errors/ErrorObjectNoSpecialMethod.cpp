@@ -17,7 +17,7 @@ bool ErrorObjectNoSpecialMethod::equal(const Error& other) const {
     return type_ok and method_ok and node_ok;
 }
 
-std::string ErrorObjectNoSpecialMethod::to_str() const {
+std::string ErrorObjectNoSpecialMethod::to_str(const CodeLines& code) const {
     return "Error: object of type " + this->type->to_string() + " has no special method " + this->method_name;
 }
 

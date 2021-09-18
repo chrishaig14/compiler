@@ -16,7 +16,7 @@ bool ErrorRedeclared::equal(const Error& other) const {
     return name_eq && node_eq;
 }
 
-std::string ErrorRedeclared::to_str() const {
+std::string ErrorRedeclared::to_str(const CodeLines& code) const {
     return "error: redeclared " + this->name;
 }
 

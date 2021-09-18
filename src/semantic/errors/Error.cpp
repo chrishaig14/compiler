@@ -31,11 +31,6 @@ std::string entity_to_string(const Entity& entity) {
     return out;
 }
 
-std::ostream& operator<<(std::ostream& o, const Error& e) {
-    o << e.to_str();
-    return o;
-}
-
 bool Error::operator==(const Error& other) const {
     if (typeid(*this) != typeid(other)) {
         std::cout << "Types are different!" << std::endl;

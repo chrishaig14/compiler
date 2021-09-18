@@ -13,7 +13,7 @@ public:
     const ast::Node& n;
     Error* clone() const override;
     bool equal(const Error& other) const override;
-    std::string to_str() const override;
+    std::string to_str(const CodeLines& code) const override;
 
     ErrorCantAssign(const ast::Node& n);
 

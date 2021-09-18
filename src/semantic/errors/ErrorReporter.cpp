@@ -260,10 +260,6 @@ std::string ErrorReporter::code_error_string(TextPosition start, TextPosition en
 //     this->fail(msg, pos);
 // }
 
-ErrorReporter::ErrorReporter() {
-    this->failed = false;
-    init_styles();
-}
 
 // void ErrorReporter::expected_expression(const Entity& entity, const Node& pos) {
 //     std::string pre_msg;
@@ -366,8 +362,13 @@ void ErrorReporter::error(std::unique_ptr<Error> error) {
     // this->fail_ok(pre_msg, msg, value_node.start);
     this->failed = true;
     std::cout << "---- Semantic Error ----" << std::endl;
-    std::cout << error->to_str() << std::endl;
+    std::cout << error->to_str(this->code_lines) << std::endl;
     this->errors.emplace_back(std::move(error));
     assert(this->errors.back() != nullptr);
     std::cout << "------------------------" << std::endl;
+}
+
+ErrorReporter::ErrorReporter(const CodeLines& code_lines) : code_lines(code_lines) {
+    this->failed = false;
+    init_styles();
 }

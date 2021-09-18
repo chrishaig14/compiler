@@ -456,17 +456,16 @@ PythonOutputCode PythonTranspiler::transpile_object_method_call(const sem::Objec
     PythonOutputCode object_code = this->dispatch(*call.object);
     std::string pre_code;
     std::string args_list;
-    std::string call_id = std::to_string(rand());
+    std::string object_id = "obj_" + std::to_string(this->next_arg_n());
     for (size_t i = 0; i < call.args.size(); i++) {
         PythonOutputCode arg_code = this->dispatch(*call.args[i]);
         if (not arg_code.pre_code.empty()) {
             pre_code += arg_code.pre_code.empty() ? "" : (arg_code.pre_code + "\n");
         }
-        std::string arg_id = "arg" + call_id + "_" + std::to_string(i);
+        std::string arg_id = "arg_" + std::to_string(this->next_arg_n());
         args_list += arg_id + ", ";
         pre_code += arg_id + " = " + arg_code.code + "\n";
     }
-    std::string object_id = "object_" + std::to_string(rand());
     pre_code =
             (object_code.pre_code.empty() ? "" : (object_code.pre_code + "\n")) + object_id + " = " + object_code.code +
             "\n" + pre_code;
@@ -481,13 +480,12 @@ PythonOutputCode PythonTranspiler::transpile_object_method_call(const sem::Objec
 PythonOutputCode PythonTranspiler::transpile_const_function_call(const sem::ConstFunctionCall& call) {
     std::string pre_code;
     std::string args_list;
-    std::string call_id = std::to_string(rand());
     for (size_t i = 0; i < call.args.size(); i++) {
         PythonOutputCode arg_code = this->dispatch(*call.args[i]);
         if (not arg_code.pre_code.empty()) {
             pre_code += arg_code.pre_code.empty() ? "" : (arg_code.pre_code + "\n");
         }
-        std::string arg_id = "arg" + call_id + "_" + std::to_string(i);
+        std::string arg_id = "arg_" + std::to_string(this->next_arg_n());
         pre_code += arg_id + " = " + arg_code.code + "\n";
         args_list += arg_id + ", ";
     }

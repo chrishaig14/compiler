@@ -12,7 +12,7 @@ bool ErrorBoolOp::equal(const Error& other) const {
     return false;
 }
 
-std::string ErrorBoolOp::to_str() const {
+std::string ErrorBoolOp::to_str(const CodeLines& code) const {
     return std::string();
 }
 

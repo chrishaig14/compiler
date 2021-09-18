@@ -184,12 +184,13 @@ public:
     sem::SNode* make_option_rvalue(sem::SNode* value_snode, const ast::Type* unaliased_value_type,
                                    const ast::Type* unaliased_target_type) const;
     // USemanticInfo visit_throw(ast::ThrowNode& n);
-    void init();
+
     USemanticInfo dispatch_any(ast::Node& n, bool is_rvalue);
     Value& entity_value_from_actual_base_path_no_generic(const Path& p);
 
     std::map<std::string, std::unique_ptr<Class>> classes;
     std::unique_ptr<Value> make_value(sem::Type* type);
+    void init();
 };
 
 #endif //CHECKER_H

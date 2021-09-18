@@ -65,14 +65,17 @@ TEST_CASE("basic_function_bad_return_type", "[checker]") {
     Module& module = *c.root_package.units["tmp"].module;
     resolve_module_imports(module, c.top_package);
     Checker checker(c.top_package, module);
-    checker.visit_function((ast::Function&) module.ast->functions[0]);
+    ast::Function& ast_func = (ast::Function&) module.ast->functions[0];
+    ast::Return& ast_ret = (ast::Return&) *ast_func.body->nodes[0];
+    ast::Node& ast_exp = *ast_ret.expression;
+    checker.visit_function(ast_func);
 
     REQUIRE(checker.error_reporter.failed);
     REQUIRE(checker.error_reporter.errors.size() == 1);
     Error& error = *checker.error_reporter.errors.back();
     ast::Boolean node(false, _POS, _POS);
     sem::TypeObject expected("Integer");
-    ErrorTypeMismatch exp(expected, node, *checker.entity_from_type(ast::ObjectType("Boolean")));
+    ErrorTypeMismatch exp(expected, ast_exp, *checker.entity_from_type(ast::ObjectType("Boolean")));
     REQUIRE(error == exp);
 
 }
@@ -109,14 +112,16 @@ TEST_CASE("basic_declaration_bad_type", "[checker]") {
     Module& module = *c.root_package.units["tmp"].module;
     resolve_module_imports(module, c.top_package);
     Checker checker(c.top_package, module);
-    checker.visit_declaration((ast::Declaration&) *((std::unique_ptr<ast::Function>&) module.ast->functions[0])->body->nodes[0]);
+    ast::Declaration& ast_decl = (ast::Declaration&) *((std::unique_ptr<ast::Function>&) module.ast->functions[0])->body->nodes[0];
+    ast::Node& ast_exp = ast_decl.expression;
+    checker.visit_declaration(ast_decl);
 
     REQUIRE(checker.error_reporter.failed);
     REQUIRE(checker.error_reporter.errors.size() == 1);
     Error& error = *checker.error_reporter.errors.back();
-    ast::Number node(NumberType::INTEGER, "9", _POS, _POS);
+    // ast::Number node(NumberType::INTEGER, "9", _POS, _POS);
     sem::TypeObject expected("Boolean");
-    ErrorTypeMismatch exp(expected, node, *checker.entity_from_type(ast::ObjectType("Integer")));
+    ErrorTypeMismatch exp(expected, ast_exp, *checker.entity_from_type(ast::ObjectType("Integer")));
     REQUIRE(error == exp);
 }
 
@@ -162,16 +167,17 @@ TEST_CASE("list_bad", "[checker]") {
     Module& module = *c.root_package.units["tmp"].module;
     resolve_module_imports(module, c.top_package);
     Checker checker(c.top_package, module);
+    ast::Function& ast_func = module.ast->functions[0];
+    ast::Declaration& ast_decl = (ast::Declaration&) *ast_func.body->nodes[0];
+    ast::List& ast_list = (ast::List&) ast_decl.expression;
     checker.visit_function(module.ast->functions[0]);
 
     REQUIRE(checker.error_reporter.failed);
     REQUIRE(checker.error_reporter.errors.size() == 1);
     Error& error = *checker.error_reporter.errors.back();
 
-
-    ast::String node("a", _POS, _POS);
     sem::TypeObject expected("Integer");
-    ErrorTypeMismatch exp(expected, node, *checker.entity_from_type(ast::ObjectType("String")));
+    ErrorTypeMismatch exp(expected, ast_list.elements[1], *checker.entity_from_type(ast::ObjectType("String")));
 
     REQUIRE(error == exp);
 }
@@ -497,16 +503,16 @@ TEST_CASE("binop_type_error", "[checker]") {
     Checker checker(c.top_package, module);
     checker.init();
 
-    ast::Node& expression = ((ast::Declaration&) *(module.ast->functions[0].get().body->nodes[0])).expression;
-    USemanticInfo info = checker.dispatch_rvalue(expression);
+    ast::Declaration& ast_decl = (ast::Declaration&) *(module.ast->functions[0].get().body->nodes[0]);
+    ast::BinaryOp& ast_binop = (ast::BinaryOp&) ast_decl.expression;
+    USemanticInfo info = checker.dispatch_rvalue(ast_binop);
 
     REQUIRE(checker.error_reporter.failed);
     REQUIRE(checker.error_reporter.errors.size() == 1);
 
     Error& error = *checker.error_reporter.errors.back();
-    ast::String node("Hello", _POS, _POS);
     sem::TypeObject expected("Integer");
-    ErrorTypeMismatch exp(expected, node, *checker.entity_from_type(ast::ObjectType("String")));
+    ErrorTypeMismatch exp(expected, ast_binop.right, *checker.entity_from_type(ast::ObjectType("String")));
     REQUIRE(error == exp);
 }
 
@@ -563,16 +569,16 @@ TEST_CASE("subscript_index_type_error", "[checker]") {
     Checker checker(c.top_package, module);
     checker.init();
 
-    ast::Node& expression = ((ast::Declaration&) *(module.ast->functions[0].get().body->nodes[0])).expression;
-    USemanticInfo info = checker.dispatch_rvalue(expression);
+    ast::Declaration& ast_decl = (ast::Declaration&) *(module.ast->functions[0].get().body->nodes[0]);
+    ast::Subscript& ast_subs = (ast::Subscript&) ast_decl.expression;
+    USemanticInfo info = checker.dispatch_rvalue(ast_subs);
 
     REQUIRE(checker.error_reporter.failed);
     REQUIRE(checker.error_reporter.errors.size() == 1);
 
     Error& error = *checker.error_reporter.errors.back();
-    ast::String node("foo", _POS, _POS);
     sem::TypeObject expected("Integer");
-    ErrorTypeMismatch exp(expected, node, *checker.entity_from_type(ast::ObjectType("String")));
+    ErrorTypeMismatch exp(expected, *ast_subs.child[0], *checker.entity_from_type(ast::ObjectType("String")));
     REQUIRE(error == exp);
 }
 
@@ -694,15 +700,16 @@ TEST_CASE("union_error", "[checker]") {
     resolve_module_imports(module, c.top_package);
     Checker checker(c.top_package, module);
     checker.init();
-    checker.visit_root(*module.ast);
+    ast::Function& ast_func = module.ast->functions[0];
+    ast::Declaration& ast_decl = (ast::Declaration&) *ast_func.body->nodes[0];
+    checker.visit_function(ast_func);
 
     REQUIRE(checker.error_reporter.failed);
     REQUIRE(checker.error_reporter.errors.size() == 1);
 
     Error& error = *checker.error_reporter.errors.back();
-    ast::Boolean node(false, _POS, _POS);
     sem::TypeObject expected("Union", {new sem::TypeObject("Integer"), new sem::TypeObject("String")});
-    ErrorTypeMismatch exp(expected, node, *checker.entity_from_type(ast::ObjectType("Boolean")));
+    ErrorTypeMismatch exp(expected, ast_decl.expression, *checker.entity_from_type(ast::ObjectType("Boolean")));
     REQUIRE(error == exp);
 }
 
@@ -730,16 +737,17 @@ TEST_CASE("while_boolean_error", "[checker]") {
     resolve_module_imports(module, c.top_package);
     Checker checker(c.top_package, module);
     checker.init();
-    checker.visit_root(*module.ast);
+    ast::Function& ast_func = module.ast->functions[0];
+    ast::While& ast_while = (ast::While&) *ast_func.body->nodes[0];
+    checker.visit_function(ast_func);
 
     REQUIRE(checker.error_reporter.failed);
     REQUIRE(checker.error_reporter.errors.size() == 1);
 
 
     Error& error = *checker.error_reporter.errors.back();
-    ast::Number node(NumberType::INTEGER, "5", _POS, _POS);
     sem::TypeObject expected("Boolean");
-    ErrorTypeMismatch exp(expected, node, *checker.entity_from_type(ast::ObjectType("Integer")));
+    ErrorTypeMismatch exp(expected, *ast_while.condition, *checker.entity_from_type(ast::ObjectType("Integer")));
     REQUIRE(error == exp);
 }
 
@@ -812,16 +820,16 @@ TEST_CASE("if_boolean_error", "[checker]") {
     resolve_module_imports(module, c.top_package);
     Checker checker(c.top_package, module);
     checker.init();
-    checker.visit_root(*module.ast);
+    ast::Function& ast_func = module.ast->functions[0];
+    ast::If& ast_if = (ast::If&) *ast_func.body->nodes[0];
+    checker.visit_function(ast_func);
 
     REQUIRE(checker.error_reporter.failed);
     REQUIRE(checker.error_reporter.errors.size() == 1);
 
-
     Error& error = *checker.error_reporter.errors.back();
-    ast::Number node(NumberType::INTEGER, "5", _POS, _POS);
     sem::TypeObject expected("Boolean");
-    ErrorTypeMismatch exp(expected, node, *checker.entity_from_type(ast::ObjectType("Integer")));
+    ErrorTypeMismatch exp(expected, ast_if.condition, *checker.entity_from_type(ast::ObjectType("Integer")));
     REQUIRE(error == exp);
 }
 

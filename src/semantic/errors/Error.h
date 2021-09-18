@@ -24,12 +24,10 @@ public:
 
     bool operator==(const Error& other) const;
 
-    virtual std::string to_str() const = 0;
+    virtual std::string to_str(const CodeLines& code) const = 0;
 
 
 };
-
-std::ostream& operator<<(std::ostream& o, const Error& e);
 
 
 #endif //XLANG_ERROR_H

@@ -64,13 +64,17 @@ public:
 };
 
 class PythonTranspiler {
-
+    size_t arg_n;
 public:
     std::string source;
     std::string header;
     std::string static_initializations;
     std::string static_cleanups;
     size_t indent_level;
+
+    size_t next_arg_n() {
+        return this->arg_n++;
+    }
 
     void indent() {
         this->indent_level += 4;
@@ -86,6 +90,7 @@ public:
 
     PythonTranspiler() {
         this->indent_level = 0;
+        this->arg_n = 0;
     }
 
     PythonOutputCode transpile_integer(const sem::Integer& node);

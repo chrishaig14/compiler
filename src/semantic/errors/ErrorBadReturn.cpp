@@ -12,7 +12,7 @@ bool ErrorBadReturn::equal(const Error& other) const {
     return false;
 }
 
-std::string ErrorBadReturn::to_str() const {
+std::string ErrorBadReturn::to_str(const CodeLines& code) const {
     return std::string();
 }
 

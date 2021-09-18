@@ -12,7 +12,7 @@ bool ErrorCantAssign::equal(const Error& other) const {
     return false;
 }
 
-std::string ErrorCantAssign::to_str() const {
+std::string ErrorCantAssign::to_str(const CodeLines& code) const {
     return std::string();
 }
 

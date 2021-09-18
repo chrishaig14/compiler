@@ -12,7 +12,7 @@ bool ErrorFunctionCallNumArgs::equal(const Error& other) const {
     return false;
 }
 
-std::string ErrorFunctionCallNumArgs::to_str() const {
+std::string ErrorFunctionCallNumArgs::to_str(const CodeLines& code) const {
     return std::string();
 }
 

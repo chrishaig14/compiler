@@ -16,7 +16,7 @@ bool ErrorEnumNoValue::equal(const Error& other) const {
     return enum_ok and value_ok and node_ok;
 }
 
-std::string ErrorEnumNoValue::to_str() const {
+std::string ErrorEnumNoValue::to_str(const CodeLines& code) const {
     return "Error: enum " + this->enum_name + " has no value " + this->value_name;
 }
 

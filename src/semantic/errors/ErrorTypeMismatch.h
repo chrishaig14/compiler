@@ -11,13 +11,15 @@
 #include "Error.h"
 
 class ErrorTypeMismatch : public Error {
+    ErrorTypeMismatch(const sem::Type& expected, TextPosition start, TextPosition end, const Entity& actual);
     sem::UType expected;
-    const ast::Node& value_node;
     std::unique_ptr<Entity> actual;
 public:
+    const TextPosition start;
+    const TextPosition end;
     ErrorTypeMismatch(const sem::Type& expected, const ast::Node& value_node, const Entity& actual);
 
-    std::string to_str() const override;
+    std::string to_str(const CodeLines& code) const override;
     bool equal(const Error& other) const override;
     Error* clone() const override;
 };

@@ -4,7 +4,7 @@
 
 #include "ErrorNoMember.h"
 
-std::string ErrorNoMember::to_str() const {
+std::string ErrorNoMember::to_str(const CodeLines& code) const {
     return "Error no member: " + this->m.s_child;
 }
 

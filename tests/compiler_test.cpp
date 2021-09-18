@@ -237,7 +237,7 @@ TEST_CASE("project_preprocess_test", "[compiler]") {
 TEST_CASE("import_test", "[compiler]") {
     setup_dirs();
     const std::string& REQUIREMENTS_PATH = path_join(IN_DIR, "requirements.txt");
-    write_file(REQUIREMENTS_PATH, "core==1.0.0");
+    write_file(REQUIREMENTS_PATH, "libcore==1.0.0");
     Compiler c(IN_DIR, OUT_DIR, OUT_NAME, LIB_PATH, IS_LIB, VERSION);
 
     SECTION("import module ok") {

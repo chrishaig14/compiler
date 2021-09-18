@@ -13,7 +13,7 @@ public:
     ErrorFunctionReturnLastStmt(std::string name, const sem::Type& node, TextPosition position);
     Error* clone() const override;
     bool equal(const Error& other) const override;
-    std::string to_str() const override;
+    std::string to_str(const CodeLines& code) const override;
 
 };
 

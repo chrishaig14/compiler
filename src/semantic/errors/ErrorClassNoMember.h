@@ -14,7 +14,7 @@ public:
                        const ast::Node& node, TextPosition position_1, TextPosition position_2);
     Error* clone() const override;
     bool equal(const Error& other) const override;
-    std::string to_str() const override;
+    std::string to_str(const CodeLines& code) const override;
 
 };
 

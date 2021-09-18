@@ -146,8 +146,6 @@ USemanticInfo Checker::visit_class(ast::Klass& node) {
 }
 
 void Checker::init() {
-    this->error_reporter.__file__ = this->module.abs_path;
-    this->error_reporter.code_lines = this->module.code_lines;
     // Initialize module level Scope
     for (const auto& f: this->module.members) {
         std::unique_ptr<Entity> e(map_module_member_to_entity(f.second));

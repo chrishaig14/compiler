@@ -12,7 +12,7 @@ bool ErrorFunctionReturnLastStmt::equal(const Error& other) const {
     return false;
 }
 
-std::string ErrorFunctionReturnLastStmt::to_str() const {
+std::string ErrorFunctionReturnLastStmt::to_str(const CodeLines& code) const {
     return std::string();
 }
 

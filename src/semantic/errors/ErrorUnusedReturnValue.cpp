@@ -12,7 +12,7 @@ bool ErrorUnusedReturnValue::equal(const Error& other) const {
     return false;
 }
 
-std::string ErrorUnusedReturnValue::to_str() const {
+std::string ErrorUnusedReturnValue::to_str(const CodeLines& code) const {
     return std::string();
 }
 

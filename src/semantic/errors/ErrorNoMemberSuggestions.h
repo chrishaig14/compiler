@@ -18,7 +18,7 @@ public:
 
     bool equal(const Error& other) const override;
 
-    std::string to_str() const override;
+    std::string to_str(const CodeLines& code) const override;
     Error* clone() const override;
 };
 

@@ -12,7 +12,7 @@ bool ErrorClassNoMember::equal(const Error& other) const {
     return false;
 }
 
-std::string ErrorClassNoMember::to_str() const {
+std::string ErrorClassNoMember::to_str(const CodeLines& code) const {
     return std::string();
 }
 
