@@ -540,8 +540,8 @@ PythonOutputCode PythonTranspiler::dispatch_expression(const sem::Exp& node) {
             return this->transpile_enum_member((const sem::EnumMember&) node);
         case sem::ExpType::BOOLEAN:
             return this->transpile_boolean((const sem::Bool&) node);
-        case sem::ExpType::MATCH:
-            return this->transpile_match((const sem::Match&) node);
+        // case sem::ExpType::MATCH:
+        //     return this->transpile_match((const sem::Match&) node);
         // case sem::ExpType::IF:
         //     return this->transpile_if((const sem::IfExp&) node);
         case sem::ExpType::ID:

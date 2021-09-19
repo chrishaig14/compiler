@@ -116,14 +116,11 @@ namespace sem {
         NEW,
         OBJECT_MEMBER,
         LIST,
-        MATCH,
         ENUM_MEMBER,
         NONE,
         TERNARY,
         DICT,
-        OBJECT_METHOD_CALL,
         OBJECT_METHOD,
-        CONST_FUNCTION_CALL,
         CONST_FUNCTION,
         OBJECT_CONSTRUCTOR
     };
