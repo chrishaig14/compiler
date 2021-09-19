@@ -89,37 +89,20 @@ namespace sem {
 
     enum class CommonType {
         FUNCTION,
-        ID,
         DECLARATION,
         BLOCK,
         ASSIGNMENT,
         RETURN,
-        INTEGER,
         CALL,
-        STRING,
-        BOOLEAN,
-        FLOAT,
         CLASS,
-        NEW,
-        OBJECT_MEMBER,
         WHILE,
-        LIST,
         IF,
         BREAK,
         CONTINUE,
         MATCH,
         ENUM,
-        ENUM_MEMBER,
-        NONE,
-        TERNARY,
-        DICT,
         THROW,
         TRY_CATCH,
-        OBJECT_METHOD_CALL,
-        OBJECT_METHOD,
-        CONST_FUNCTION_CALL,
-        CONST_FUNCTION,
-        OBJECT_CONSTRUCTOR
     };
 
     enum class ExpType {
