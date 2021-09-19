@@ -276,11 +276,10 @@ TEST_CASE("semantic_output_while", "[checker]") {
     checker.init();
     USemanticInfo info = checker.visit_function(module.ast->functions[0]);
     REQUIRE(not checker.error_reporter.failed);
-    // std::vector<USNode> e;
-    // auto block = std::make_unique<sem::Block>();
-    // block->nodes.emplace_back(new sem::Declaration("x", std::make_unique<sem::Integer>("1")));
-    // auto exp = sem::While(std::make_unique<sem::Bool>(true), std::move(block));
-    // REQUIRE(*(*(std::unique_ptr<sem::FunctionDef>&) info->snode).body->nodes[0] == exp);
+    auto block = std::make_unique<sem::Block>();
+    block->nodes.emplace_back(new sem::Declaration("x", std::make_unique<sem::Integer>("1")));
+    auto exp = sem::While(std::make_unique<sem::Bool>(true), std::move(block));
+    REQUIRE(*(*(std::unique_ptr<sem::FunctionDef>&) info->snode).body->nodes[0] == exp);
 }
 
 
@@ -318,7 +317,7 @@ TEST_CASE("semantic_output_float_literal", "[checker]") {
 //     REQUIRE(((EntityValue*)(info->entity))->value->metatype == Meta::CLASS);
 //     REQUIRE(*((EntityValue*)(info->entity))->value->type == ObjectType("NoneType"));
 // }
-
+//
 
 
 
