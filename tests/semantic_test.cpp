@@ -382,11 +382,11 @@ TEST_CASE("semantic_output_enum_def", "[checker]") {
 
     CHECKER()
     checker.init();
-    USemanticInfoModule info = checker.visit_root(*module.ast);
+    auto sem_module = checker.visit_root(*module.ast);
 
     REQUIRE_CHECKER_OK()
 
-    REQUIRE(*((info->snode)->nodes[0]) == sem::EnumDef("test.tmp.Foo", {"a", "c"}));
+    REQUIRE(*sem_module->nodes[0] == sem::EnumDef("test.tmp.Foo", {"a", "c"}));
 }
 
 TEST_CASE("semantic_output_class_ok", "[checker]") {
@@ -394,10 +394,9 @@ TEST_CASE("semantic_output_class_ok", "[checker]") {
 
     CHECKER()
     checker.init();
-    USemanticInfoModule info = checker.visit_root(*module.ast);
+    auto sem_module = checker.visit_root(*module.ast);
 
     REQUIRE_CHECKER_OK();
-    sem::Module& m = *info->snode;
-    REQUIRE(m.nodes.size() == 2);
-    REQUIRE(*((info->snode)->nodes[0]) == sem::KlassDef("Foo", {"x", "y"}));
+    REQUIRE(sem_module->nodes.size() == 2);
+    REQUIRE(*sem_module->nodes[0] == sem::KlassDef("Foo", {"x", "y"}));
 }

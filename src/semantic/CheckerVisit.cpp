@@ -147,7 +147,7 @@ void Checker::init() {
     }
 }
 
-USemanticInfoModule Checker::visit_root(ast::Module& node) {
+std::unique_ptr<sem::Module> Checker::visit_root(ast::Module& node) {
     this->init();
     // for (auto& import: node.imports) {
     //     this->visit_import(import);
@@ -162,8 +162,6 @@ USemanticInfoModule Checker::visit_root(ast::Module& node) {
     //     this->visit_function(function);
     // }
 
-    USemanticInfoModule info_u = std::make_unique<SemanticInfoModule>();
-    SemanticInfoModule& info = *info_u;
     auto sn = std::make_unique<sem::Module>();
     for (auto& n: node.all) {
         std::unique_ptr<sem::Top> sinfo_p = this->dispatch_top(*n);
@@ -197,9 +195,7 @@ USemanticInfoModule Checker::visit_root(ast::Module& node) {
         //     }
         // }
     }
-    info.snode = std::move(sn);
-    // node.nodes = std::move(vn);
-    return info_u;
+    return sn;
 }
 
 USemanticInfoBlock Checker::visit_block(ast::Block& node) {
