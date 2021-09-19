@@ -6,9 +6,9 @@
 #define XLANG_IFSNODE_H
 
 
-#include "../common/include/SNode.h"
-#include "../common/include/Block.h"
-#include "../expressions/include/Exp.h"
+#include "SNode.h"
+#include "Block.h"
+#include "../../expressions/include/Exp.h"
 
 class sem::IfSNode : public sem::SNode {
     UExp _condition;

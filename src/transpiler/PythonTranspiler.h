@@ -10,7 +10,7 @@
 #include "../simple_nodes/common/include/Declaration.h"
 #include "../simple_nodes/common/include/KlassDef.h"
 #include "../simple_nodes/common/include/Match.h"
-#include "../simple_nodes/common/include/NewObject.h"
+#include "../simple_nodes/expressions/include/NewObject.h"
 #include "../simple_nodes/common/include/Return.h"
 #include "../simple_nodes/common/include/SNode.h"
 #include "../simple_nodes/common/include/Throw.h"
@@ -19,10 +19,10 @@
 #include "../simple_nodes/common/include/Assignment.h"
 #include "../simple_nodes/common/include/Break.h"
 #include "../simple_nodes/common/include/Continue.h"
-#include "../simple_nodes/with_unique/EnumDef.h"
-#include "../simple_nodes/with_unique/FunctionDef.h"
-#include "../simple_nodes/with_unique/IfSNode.h"
-#include "../simple_nodes/with_unique/While.h"
+#include "../simple_nodes/common/include/EnumDef.h"
+#include "../simple_nodes/common/include/FunctionDef.h"
+#include "../simple_nodes/common/include/IfSNode.h"
+#include "../simple_nodes/common/include/While.h"
 
 const std::string TOBJECT = "TaggedObject*";
 const std::string GCDECLARE = "GC::declare";

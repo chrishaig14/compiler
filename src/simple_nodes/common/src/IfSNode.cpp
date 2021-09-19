@@ -3,7 +3,7 @@
 //
 
 #include <cassert>
-#include "IfSNode.h"
+#include "../include/IfSNode.h"
 
 using namespace sem;
 

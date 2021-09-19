@@ -4,7 +4,7 @@
 
 #include "Checker.h"
 #include "../simple_nodes/common/include/Match.h"
-#include "../simple_nodes/common/include/NewObject.h"
+#include "../simple_nodes/expressions/include/NewObject.h"
 #include "../simple_nodes/common/include/TypeObject.h"
 #include "../simple_nodes/common/src/TypeFunction.h"
 #include "../simple_nodes/expressions/include/EnumMember.h"

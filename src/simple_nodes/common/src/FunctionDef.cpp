@@ -2,7 +2,7 @@
 // Created by chris on 4/4/21.
 //
 
-#include "FunctionDef.h"
+#include "../include/FunctionDef.h"
 
 using namespace sem;
 

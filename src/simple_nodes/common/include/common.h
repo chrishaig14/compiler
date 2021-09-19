@@ -9,7 +9,7 @@
 #include "Call.h"
 #include "Declaration.h"
 #include "Match.h"
-#include "NewObject.h"
+#include "../../expressions/include/NewObject.h"
 #include "Return.h"
 #include "SNode.h"
 #include "Throw.h"

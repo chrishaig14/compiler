@@ -2,7 +2,7 @@
 // Created by chris on 10/4/21.
 //
 
-#include "While.h"
+#include "../include/While.h"
 
 using namespace sem;
 

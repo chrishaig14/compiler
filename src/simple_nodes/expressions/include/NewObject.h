@@ -8,7 +8,7 @@
 
 #include <string>
 #include <vector>
-#include "../../expressions/include/Exp.h"
+#include "Exp.h"
 
 class sem::NewObject : public sem::Exp {
 public:

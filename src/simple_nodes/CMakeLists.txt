@@ -26,26 +26,26 @@ add_library(
     expressions/include/Dict.h
     expressions/src/EnumMember.cpp
     expressions/include/EnumMember.h
-    with_unique/EnumDef.cpp
-    with_unique/EnumDef.h
+    common/src/EnumDef.cpp
+    common/include/EnumDef.h
     expressions/src/Float.cpp
     expressions/include/Float.h
-    with_unique/FunctionDef.cpp
-    with_unique/FunctionDef.cpp
-    with_unique/FunctionDef.h
-    with_unique/FunctionDef.h
+    common/src/FunctionDef.cpp
+    common/src/FunctionDef.cpp
+    common/include/FunctionDef.h
+    common/include/FunctionDef.h
     expressions/src/Id.cpp
     expressions/include/Id.h
-    with_unique/IfSNode.cpp
-    with_unique/IfSNode.h
+    common/src/IfSNode.cpp
+    common/include/IfSNode.h
     expressions/src/Integer.cpp
     expressions/include/Integer.h
     expressions/src/List.cpp
     expressions/include/List.h
     common/src/Match.cpp
     common/include/Match.h
-    common/src/NewObject.cpp
-    common/include/NewObject.h
+    expressions/src/NewObject.cpp
+    expressions/include/NewObject.h
     expressions/src/None.cpp
     expressions/include/None.h
     expressions/src/ObjectMember.cpp
@@ -70,7 +70,7 @@ add_library(
     common/src/TypeFunction.h
     common/include/TypeObject.h
     common/src/ObjectType.cpp
-    with_unique/While.cpp
+    common/src/While.cpp
     sem.h
     expressions/src/ObjectMethod.cpp
     expressions/include/ObjectMethod.h
