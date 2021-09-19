@@ -52,6 +52,8 @@
 
 typedef std::unique_ptr<SemanticInfo> USemanticInfo;
 typedef std::unique_ptr<SemanticInfoBlock> USemanticInfoBlock;
+typedef std::unique_ptr<SemanticInfoModule> USemanticInfoModule;
+
 
 bool is_generic(const sem::Type& t);
 ast::UTypeNode make_type_from_object_pattern(const ast::ObjectType& object_type, const MapStringType& replacements);
@@ -113,7 +115,7 @@ public:
     USemanticInfo visit_assignment(ast::Assignment& n);
     USemanticInfo visit_binop(ast::BinaryOp& node);
     USemanticInfoBlock visit_block(ast::Block& node);
-    USemanticInfoBlock visit_root(ast::Module& node);
+    USemanticInfoModule visit_root(ast::Module& node);
     USemanticInfo visit_boolean(ast::Boolean& node);
     USemanticInfo visit_break(ast::Break& node);
     USemanticInfo visit_call(ast::Call& n, bool is_rvalue);

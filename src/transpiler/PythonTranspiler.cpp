@@ -122,7 +122,7 @@ PythonOutputCode PythonTranspiler::transpile_block(const sem::Block& node) {
     return PythonOutputCode("", code);
 }
 
-void PythonTranspiler::transpile_program(const sem::Block& node) {
+void PythonTranspiler::transpile_program(const sem::Module& node) {
     for (auto& n: node.nodes) {
         this->dispatch_top(*n);
     }
@@ -453,7 +453,7 @@ PythonOutputCode PythonTranspiler::transpile_try_catch(const sem::TryCatch& node
     return PythonOutputCode("", out);
 }
 
-std::string PythonTranspiler::transpile_module(const sem::Block& block) {
+std::string PythonTranspiler::transpile_module(const sem::Module& block) {
     std::string code;
     for (auto& n: block.nodes) {
         PythonOutputCode definition_output = this->dispatch_top(*n);
@@ -462,20 +462,16 @@ std::string PythonTranspiler::transpile_module(const sem::Block& block) {
     return code;
 }
 
-PythonOutputCode PythonTranspiler::dispatch_top(const sem::Common& node) {
+PythonOutputCode PythonTranspiler::dispatch_top(const sem::Top& node) {
     switch (node.type) {
-        case sem::CommonType::FUNCTION:
+        case sem::TopType::FUNCTION:
             return this->transpile_function((const sem::FunctionDef&) (node));
-            break;
-        case sem::CommonType::ENUM:
+        case sem::TopType::ENUM:
             return this->transpile_enum((const sem::EnumDef&) node);
-            break;
-        case sem::CommonType::CLASS:
+        case sem::TopType::CLASS:
             return this->transpile_class((const sem::KlassDef&) node);
-            break;
-        default:
-            throw std::runtime_error("Don't know what to do with this SNode!");
     }
+    __builtin_unreachable();
 }
 
 PythonOutputCode PythonTranspiler::dispatch_common(const sem::Common& node) {

@@ -62,7 +62,7 @@ USemanticInfo Checker::visit_enum(ast::EnumNode& p_node) {
     SemanticInfo& info = *info_u;
     Enum* enumm = ((EntityEnum&) this->scope->get(p_node.id)).enumm;
     auto esn = std::make_unique<sem::EnumDef>(enumm->path.as_str(), p_node.values);
-    info.snode = std::move(esn);
+    info.top_snode = std::move(esn);
     return info_u;
 }
 
@@ -139,7 +139,7 @@ USemanticInfo Checker::visit_class(ast::Klass& node) {
     //
     // this->add_this = false;
     // this->error_reporter.current_class = "";
-    info.snode = std::move(sn);
+    info.top_snode = std::move(sn);
     return info_u;
 }
 
@@ -151,7 +151,7 @@ void Checker::init() {
     }
 }
 
-USemanticInfoBlock Checker::visit_root(ast::Module& node) {
+USemanticInfoModule Checker::visit_root(ast::Module& node) {
     this->init();
     // for (auto& import: node.imports) {
     //     this->visit_import(import);
@@ -166,31 +166,31 @@ USemanticInfoBlock Checker::visit_root(ast::Module& node) {
     //     this->visit_function(function);
     // }
 
-    USemanticInfoBlock info_u = std::make_unique<SemanticInfoBlock>();
-    SemanticInfoBlock& info = *info_u;
-    auto sn = std::make_unique<sem::Block>();
+    USemanticInfoModule info_u = std::make_unique<SemanticInfoModule>();
+    SemanticInfoModule& info = *info_u;
+    auto sn = std::make_unique<sem::Module>();
     for (auto& n: node.all) {
         USemanticInfo sinfo_p = this->dispatch(*n);
 
-        // sn->nodes.push_back(sinfo_p->snode);
+        sn->nodes.push_back(std::move(sinfo_p->top_snode));
 
-        if (n->ntype == NodeType::BLOCK) {
-        } else {
-            if (sinfo_p->snode != nullptr) {
-                if (sinfo_p->snode->type == sem::CommonType::BLOCK) {
-                    if (((std::unique_ptr<sem::Block>&) sinfo_p->snode)->unwrap) {
-                        for (auto& nn : ((std::unique_ptr<sem::Block>&) sinfo_p->snode)->nodes) {
-                            sn->nodes.push_back(std::move(nn));
-                        }
-                    } else {
-                        sn->nodes.push_back(std::move(sinfo_p->snode));
-                    }
-
-                } else {
-                    sn->nodes.push_back(std::move(sinfo_p->snode));
-                }
-            }
-        }
+        // if (n->ntype == NodeType::BLOCK) {
+        // } else {
+        //     if (sinfo_p->snode != nullptr) {
+        //         if (sinfo_p->snode->type == sem::CommonType::BLOCK) {
+        //             if (((std::unique_ptr<sem::Block>&) sinfo_p->snode)->unwrap) {
+        //                 for (auto& nn : ((std::unique_ptr<sem::Block>&) sinfo_p->top_snode)->nodes) {
+        //                     sn->nodes.push_back(std::move(nn));
+        //                 }
+        //             } else {
+        //                 sn->nodes.push_back(std::move(sinfo_p->snode));
+        //             }
+        //
+        //         } else {
+        //             sn->nodes.push_back(std::move(sinfo_p->snode));
+        //         }
+        //     }
+        // }
         // SemanticInfo& sinfo = *sinfo_p;
         // if (n->ntype == NodeType::CALL) {
         //     // it's a function call
@@ -323,7 +323,7 @@ USemanticInfo Checker::visit_function(ast::Function& n) {
     }
     this->leave_scope();
     auto sn = std::make_unique<sem::FunctionDef>(n.path.as_vec().back(), params, std::move(bn));
-    info.snode = std::move(sn);
+    info.top_snode = std::move(sn);
     if (returnType != T_NONE) {
         if (!n.body->nodes.empty()) {
             ast::Node& last_node = *n.body->nodes.back();

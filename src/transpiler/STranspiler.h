@@ -92,19 +92,19 @@ public:
     void transpile_enum(sem::EnumDef& node);
 
     void dispatch_top(sem::Common& node) {
-        switch (node.type) {
-            case sem::CommonType::FUNCTION:
-                this->transpile_function((sem::FunctionDef&) (node));
-                break;
-            case sem::CommonType::ENUM:
-                this->transpile_enum((sem::EnumDef&) node);
-                break;
-            case sem::CommonType::CLASS:
-                this->transpile_class((sem::KlassDef&) node);
-                break;
-            default:
-                throw std::runtime_error("Don't know what to do with this SNode!");
-        }
+        // switch (node.type) {
+        //     case sem::CommonType::FUNCTION:
+        //         this->transpile_function((sem::FunctionDef&) (node));
+        //         break;
+        //     case sem::CommonType::ENUM:
+        //         this->transpile_enum((sem::EnumDef&) node);
+        //         break;
+        //     case sem::CommonType::CLASS:
+        //         this->transpile_class((sem::KlassDef&) node);
+        //         break;
+        //     default:
+        //         throw std::runtime_error("Don't know what to do with this SNode!");
+        // }
     }
 
     CppOutputCode transpile_call(sem::Call& node);

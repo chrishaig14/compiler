@@ -6,81 +6,84 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -g -O0 -Wall -pedantic -Werror")
 
 add_library(
     simple_nodes
-    common/src/Assignment.cpp
     common/include/Assignment.h
-    common/src/Block.cpp
     common/include/Block.h
-    expressions/src/Bool.cpp
-    expressions/include/Bool.h
-    common/src/Break.cpp
     common/include/Break.h
-    common/src/Call.cpp
     common/include/Call.h
-    top/src/KlassDef.cpp
-    top/include/KlassDef.h
-    common/src/Continue.cpp
-    common/include/Continue.h
-    common/src/Declaration.cpp
-    common/include/Declaration.h
-    expressions/src/Dict.cpp
-    expressions/include/Dict.h
-    expressions/src/EnumMember.cpp
-    expressions/include/EnumMember.h
-    top/src/EnumDef.cpp
-    top/include/EnumDef.h
-    expressions/src/Float.cpp
-    expressions/include/Float.h
-    top/src/FunctionDef.cpp
-    top/src/FunctionDef.cpp
-    top/include/FunctionDef.h
-    top/include/FunctionDef.h
-    expressions/src/Id.cpp
-    expressions/include/Id.h
-    common/src/If.cpp
-    common/include/If.h
-    expressions/src/Integer.cpp
-    expressions/include/Integer.h
-    expressions/src/List.cpp
-    expressions/include/List.h
-    common/src/Match.cpp
-    common/include/Match.h
-    expressions/src/NewObject.cpp
-    expressions/include/NewObject.h
-    expressions/src/None.cpp
-    expressions/include/None.h
-    expressions/src/ObjectMember.cpp
-    expressions/include/ObjectMember.h
-    common/src/Return.cpp
-    common/include/Return.h
-    common/src/Common.cpp
     common/include/Common.h
-    expressions/src/String.cpp
-    expressions/include/String.h
-    expressions/src/CallExp.cpp
-    expressions/include/CallExp.h
-    expressions/src/Ternary.cpp
-    expressions/include/Ternary.h
-    common/src/Throw.cpp
+    common/include/common.h
+    common/include/Continue.h
+    common/include/Declaration.h
+    common/include/If.h
+    common/include/Match.h
+    common/include/Return.h
     common/include/Throw.h
-    common/src/TryCatch.cpp
     common/include/TryCatch.h
-    common/src/Type.cpp
     common/include/Type.h
-    common/src/FunctionType.cpp
-    common/src/TypeFunction.h
     common/include/TypeObject.h
+    common/src/Assignment.cpp
+    common/src/Block.cpp
+    common/src/Break.cpp
+    common/src/Call.cpp
+    common/src/Continue.cpp
+    common/src/Declaration.cpp
+    common/src/FunctionType.cpp
+    common/src/If.cpp
+    common/src/Match.cpp
     common/src/ObjectType.cpp
+    common/src/Return.cpp
+    common/src/Throw.cpp
+    common/src/Top.cpp
+    common/src/TryCatch.cpp
+    common/src/Type.cpp
+    common/src/TypeFunction.h
     common/src/While.cpp
-    sem.h
-    expressions/src/ObjectMethod.cpp
-    expressions/include/ObjectMethod.h
-    expressions/src/ConstFunction.cpp
+    expressions/include/Bool.h
+    expressions/include/CallExp.h
     expressions/include/ConstFunction.h
-    expressions/src/ObjectConstructor.cpp
-    expressions/include/ObjectConstructor.h
-    expressions/src/ObjectConstructor.cpp
-    expressions/include/ObjectConstructor.h
-    expressions/src/Exp.cpp
+    expressions/include/Dict.h
+    expressions/include/EnumMember.h
     expressions/include/Exp.h
     expressions/include/expressions.h
-    common/include/common.h)
+    expressions/include/Float.h
+    expressions/include/Id.h
+    expressions/include/Integer.h
+    expressions/include/List.h
+    expressions/include/NewObject.h
+    expressions/include/None.h
+    expressions/include/ObjectConstructor.h
+    expressions/include/ObjectConstructor.h
+    expressions/include/ObjectMember.h
+    expressions/include/ObjectMethod.h
+    expressions/include/String.h
+    expressions/include/Ternary.h
+    expressions/src/Bool.cpp
+    expressions/src/CallExp.cpp
+    expressions/src/ConstFunction.cpp
+    expressions/src/Dict.cpp
+    expressions/src/EnumMember.cpp
+    expressions/src/Exp.cpp
+    expressions/src/Float.cpp
+    expressions/src/Id.cpp
+    expressions/src/Integer.cpp
+    expressions/src/List.cpp
+    expressions/src/NewObject.cpp
+    expressions/src/None.cpp
+    expressions/src/ObjectConstructor.cpp
+    expressions/src/ObjectConstructor.cpp
+    expressions/src/ObjectMember.cpp
+    expressions/src/ObjectMethod.cpp
+    expressions/src/String.cpp
+    expressions/src/Ternary.cpp
+    sem.h
+    top/include/EnumDef.h
+    top/include/FunctionDef.h
+    top/include/KlassDef.h
+    top/include/Module.h
+    top/include/Top.h
+    top/src/EnumDef.cpp
+    top/src/FunctionDef.cpp
+    top/src/KlassDef.cpp
+    top/src/Module.cpp
+    top/src/Top.cpp
+)

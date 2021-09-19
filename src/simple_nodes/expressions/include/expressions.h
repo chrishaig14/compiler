@@ -14,6 +14,7 @@
 #include "Float.h"
 #include "Id.h"
 #include "None.h"
+#include "NewObject.h"
 #include "List.h"
 #include "ObjectConstructor.h"
 #include "ObjectMember.h"

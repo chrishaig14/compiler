@@ -5,24 +5,9 @@
 #ifndef XLANG_PYTHONTRANSPILER_H
 #define XLANG_PYTHONTRANSPILER_H
 
-#include "../simple_nodes/common/include/Block.h"
-#include "../simple_nodes/common/include/Call.h"
-#include "../simple_nodes/common/include/Declaration.h"
-#include "../simple_nodes/top/include/KlassDef.h"
-#include "../simple_nodes/common/include/Match.h"
-#include "../simple_nodes/expressions/include/NewObject.h"
-#include "../simple_nodes/common/include/Return.h"
-#include "../simple_nodes/common/include/Common.h"
-#include "../simple_nodes/common/include/Throw.h"
-#include "../simple_nodes/common/include/TryCatch.h"
+#include "../simple_nodes/top/include/top.h"
+#include "../simple_nodes/common/include/common.h"
 #include "../simple_nodes/expressions/include/expressions.h"
-#include "../simple_nodes/common/include/Assignment.h"
-#include "../simple_nodes/common/include/Break.h"
-#include "../simple_nodes/common/include/Continue.h"
-#include "../simple_nodes/top/include/EnumDef.h"
-#include "../simple_nodes/top/include/FunctionDef.h"
-#include "../simple_nodes/common/include/If.h"
-#include "../simple_nodes/common/include/While.h"
 
 const std::string TOBJECT = "TaggedObject*";
 const std::string GCDECLARE = "GC::declare";
@@ -62,7 +47,7 @@ public:
     PythonOutputCode dispatch(const sem::Common& node);
     PythonOutputCode dispatch_common(const sem::Common& node);
     PythonOutputCode dispatch_expression(const sem::Exp& node);
-    PythonOutputCode dispatch_top(const sem::Common& node);
+    PythonOutputCode dispatch_top(const sem::Top& node);
     PythonOutputCode transpile_assignment(const sem::Assignment& node);
     PythonOutputCode transpile_block(const sem::Block& node);
     PythonOutputCode transpile_boolean(const sem::Bool& node);
@@ -101,11 +86,11 @@ public:
     std::string source;
     std::string static_cleanups;
     std::string static_initializations;
-    std::string transpile_module(const sem::Block& block);
+    std::string transpile_module(const sem::Module& block);
 
     void indent();
     PythonOutputCode transpile_enum(const sem::EnumDef& node);
-    void transpile_program(const sem::Block& node);
+    void transpile_program(const sem::Module& node);
     void unindent();
 };
 

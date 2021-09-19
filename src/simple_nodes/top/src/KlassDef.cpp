@@ -6,7 +6,7 @@
 
 using namespace sem;
 
-bool KlassDef::equals(const Common& o) const {
+bool KlassDef::equals(const Top& o) const {
     auto& other = (const KlassDef&) o;
     if (this->identifier != other.identifier) {
         return false;
@@ -23,5 +23,5 @@ bool KlassDef::equals(const Common& o) const {
 }
 
 KlassDef::KlassDef(std::string identifier, VectorOfStrings members)
-        : Common(CommonType::CLASS), identifier(identifier), members(members) {
+        : Top(TopType::CLASS), identifier(identifier), members(members) {
 }

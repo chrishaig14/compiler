@@ -8,8 +8,6 @@
 #include <memory>
 #include "../../sem.h"
 
-
-
 class sem::Common {
 public:
     CommonType type;

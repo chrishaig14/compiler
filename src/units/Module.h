@@ -10,6 +10,7 @@
 #include "../ast/Block.h"
 #include "../scanner/CodeLines.h"
 #include "../ast/Module.h"
+#include "../simple_nodes/top/include/top.h"
 #include "../ast/Import.h"
 #include "../ast/Klass.h"
 #include "../ast/EnumNode.h"
@@ -31,7 +32,7 @@ public:
 
     CodeLines code_lines;
     std::unique_ptr<ast::Module> ast;
-    std::unique_ptr<sem::Block> sast;
+    std::unique_ptr<sem::Module> sast;
     std::map<std::string, std::string> included_module_paths;
     std::map<std::string, Path> imported_paths_no_alias;
     std::map<std::string, Path> imported_paths_with_alias;

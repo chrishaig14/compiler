@@ -18,7 +18,7 @@ void resolve_module_imports(Module& module, Package& top_package) {
 bool check_module(Module& module, Package& top_package) {
     resolve_module_imports(module, top_package);
     Checker checker(top_package, module);
-    USemanticInfoBlock check_info = checker.visit_root(*module.ast);
+    USemanticInfoModule check_info = checker.visit_root(*module.ast);
     module.sast = std::move(check_info->snode);
     return not checker.error_reporter.failed;
 }

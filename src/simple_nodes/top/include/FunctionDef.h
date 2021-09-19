@@ -6,11 +6,11 @@
 #define XLANG_FUNCTIONDEF_H
 
 #include <string>
-#include "../../common/include/Common.h"
+#include "Top.h"
 #include "../../../types.h"
 #include "../../common/include/Block.h"
 
-class sem::FunctionDef : public sem::Common {
+class sem::FunctionDef : public sem::Top {
 public:
     std::string identifier;
     VectorOfStrings params;
@@ -18,7 +18,7 @@ public:
 
     FunctionDef(std::string identifier, VectorOfStrings params, std::unique_ptr<Block> body);
 
-    bool equals(const Common& o) const override;
+    bool equals(const Top& o) const override;
 };
 
 

@@ -46,7 +46,7 @@ TEST_CASE("semantic_output_basic_function", "[checker]") {
     std::unique_ptr<sem::Block> b = std::make_unique<sem::Block>();
     b->nodes.emplace_back(std::make_unique<sem::Return>(std::make_unique<sem::Integer>("0")));
     auto exp = sem::FunctionDef("foo", VectorOfStrings{}, std::move(b));
-    REQUIRE(*info->snode == exp);
+    REQUIRE(*info->top_snode == exp);
 }
 
 TEST_CASE("semantic_output_basic_declaration", "[checker]") {
@@ -137,7 +137,7 @@ TEST_CASE("semantic_output_object_member", "[checker]") {
                                 std::make_unique<sem::ObjectMember>(std::make_unique<sem::Id>("f"),
                                                                     Path("test.tmp.Foo"),
                                                                     "bar"));
-    REQUIRE(*(*(std::unique_ptr<sem::FunctionDef>&) info->snode).body->nodes[0] == exp);
+    REQUIRE(*(*(std::unique_ptr<sem::FunctionDef>&) info->top_snode).body->nodes[0] == exp);
 }
 
 TEST_CASE("semantic_output_object_method_call", "[checker]") {
@@ -150,7 +150,7 @@ TEST_CASE("semantic_output_object_method_call", "[checker]") {
     auto exp = sem::Declaration("x",
                                 std::make_unique<sem::CallExp>(std::make_unique<sem::ObjectMethod>(std::make_unique<sem::Id>(
                                         "f"), Path("test.tmp.Foo"), "get_foo"), std::vector<sem::UExp>()));
-    REQUIRE(*(*(std::unique_ptr<sem::FunctionDef>&) info->snode).body->nodes[0] == exp);
+    REQUIRE(*(static_cast<sem::FunctionDef&>(*info->top_snode)).body->nodes[0] == exp);
 }
 
 TEST_CASE("semantic_output_object_method", "[checker]") {
@@ -163,7 +163,7 @@ TEST_CASE("semantic_output_object_method", "[checker]") {
                                 std::make_unique<sem::ObjectMethod>(std::make_unique<sem::Id>("f"),
                                                                     Path("test.tmp.Foo"),
                                                                     "get_foo"));
-    REQUIRE(*(*(std::unique_ptr<sem::FunctionDef>&) info->snode).body->nodes[0] == exp);
+    REQUIRE(*(*(std::unique_ptr<sem::FunctionDef>&) info->top_snode).body->nodes[0] == exp);
 }
 
 TEST_CASE("semantic_output_assign_const_function", "[checker]") {
@@ -182,7 +182,7 @@ TEST_CASE("semantic_output_assign_const_function", "[checker]") {
     USemanticInfo info = checker.visit_function(module.ast->functions[1]);
     REQUIRE_CHECKER_OK();
     auto exp = sem::Declaration("x", std::make_unique<sem::ConstFunction>(Path("test.tmp.bar")));
-    REQUIRE(*(*(std::unique_ptr<sem::FunctionDef>&) info->snode).body->nodes[0] == exp);
+    REQUIRE(*(*(std::unique_ptr<sem::FunctionDef>&) info->top_snode).body->nodes[0] == exp);
 }
 
 TEST_CASE("semantic_output_const_function_call", "[checker]") {
@@ -204,7 +204,7 @@ TEST_CASE("semantic_output_const_function_call", "[checker]") {
     auto exp = sem::Declaration("x",
                                 std::make_unique<sem::CallExp>(std::make_unique<sem::ConstFunction>(Path("test.tmp.bar")),
                                                                std::vector<sem::UExp>{}));
-    REQUIRE(*(*(std::unique_ptr<sem::FunctionDef>&) info->snode).body->nodes[0] == exp);
+    REQUIRE(*(*(std::unique_ptr<sem::FunctionDef>&) info->top_snode).body->nodes[0] == exp);
 }
 
 TEST_CASE("semantic_output_while", "[checker]") {
@@ -225,7 +225,7 @@ TEST_CASE("semantic_output_while", "[checker]") {
     auto block = std::make_unique<sem::Block>();
     block->nodes.emplace_back(new sem::Declaration("x", std::make_unique<sem::Integer>("1")));
     auto exp = sem::While(std::make_unique<sem::Bool>(true), std::move(block));
-    REQUIRE(*(*(std::unique_ptr<sem::FunctionDef>&) info->snode).body->nodes[0] == exp);
+    REQUIRE(*static_cast<sem::FunctionDef&>(*info->top_snode).body->nodes[0] == exp);
 }
 
 
@@ -367,7 +367,7 @@ TEST_CASE("semantic_output_if", "[checker]") {
     checker.init();
     ast::Function& ast_func = module.ast->functions[0];
     USemanticInfo info = checker.visit_function(ast_func);
-    sem::FunctionDef& sem_func = (sem::FunctionDef&) *info->snode;
+    sem::FunctionDef& sem_func = (sem::FunctionDef&) *info->top_snode;
 
     REQUIRE_CHECKER_OK()
 
@@ -381,7 +381,7 @@ TEST_CASE("semantic_output_enum_def", "[checker]") {
 
     CHECKER()
     checker.init();
-    USemanticInfoBlock info = checker.visit_root(*module.ast);
+    USemanticInfoModule info = checker.visit_root(*module.ast);
 
     REQUIRE_CHECKER_OK()
 
@@ -393,9 +393,10 @@ TEST_CASE("semantic_output_class_ok", "[checker]") {
 
     CHECKER()
     checker.init();
-    USemanticInfoBlock info = checker.visit_root(*module.ast);
+    USemanticInfoModule info = checker.visit_root(*module.ast);
 
     REQUIRE_CHECKER_OK();
-
+    sem::Module& m = *info->snode;
+    REQUIRE(m.nodes.size() == 2);
     REQUIRE(*((info->snode)->nodes[0]) == sem::KlassDef("Foo", {"x", "y"}));
 }

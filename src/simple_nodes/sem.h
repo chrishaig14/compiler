@@ -71,8 +71,6 @@ namespace sem {
 
     class While;
 
-    class Common;
-
     class TypeObject;
 
     class TypeFunction;
@@ -87,22 +85,14 @@ namespace sem {
 
     class Exp;
 
+    class Common;
+
+    class Top;
+
+    class Module;
+
     enum class CommonType {
-        FUNCTION,
-        DECLARATION,
-        BLOCK,
-        ASSIGNMENT,
-        RETURN,
-        CALL,
-        CLASS,
-        WHILE,
-        IF,
-        BREAK,
-        CONTINUE,
-        MATCH,
-        ENUM,
-        THROW,
-        TRY_CATCH,
+        DECLARATION, BLOCK, ASSIGNMENT, RETURN, CALL, WHILE, IF, BREAK, CONTINUE, MATCH, THROW, TRY_CATCH,
     };
 
     enum class ExpType {
@@ -124,8 +114,13 @@ namespace sem {
         OBJECT_CONSTRUCTOR
     };
 
+    enum class TopType {
+        CLASS, ENUM, FUNCTION
+    };
+
     typedef std::unique_ptr<Common> UCommon;
     typedef std::unique_ptr<Exp> UExp;
+    typedef std::unique_ptr<Top> UTop;
 
     typedef std::unique_ptr<TypeObject> UTypeObject;
     typedef std::unique_ptr<TypeFunction> UTypeFunction;

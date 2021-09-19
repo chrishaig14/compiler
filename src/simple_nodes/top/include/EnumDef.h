@@ -7,17 +7,17 @@
 
 
 #include <string>
-#include "../../common/include/Common.h"
+#include "Top.h"
 #include "../../../types.h"
 
-class sem::EnumDef : public sem::Common {
+class sem::EnumDef : public sem::Top {
 public:
     EnumDef(const std::string& id, VectorOfStrings values);
 
     std::string id;
     VectorOfStrings values;
 
-    bool equals(const Common& o) const override;
+    bool equals(const Top& o) const override;
 };
 
 

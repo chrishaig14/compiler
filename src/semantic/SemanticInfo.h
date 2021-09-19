@@ -30,6 +30,7 @@ public:
 
     sem::UCommon snode;
     sem::UExp exp_snode;
+    sem::UTop top_snode;
     bool is_tuple_member;
     ~SemanticInfo();
 
@@ -45,6 +46,12 @@ class SemanticInfoBlock {
 public:
     std::unique_ptr<sem::Block> snode;
 };
+
+class SemanticInfoModule {
+public:
+    std::unique_ptr<sem::Module> snode;
+};
+
 
 class ErrorStub : public SemanticInfo {
 public:
