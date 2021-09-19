@@ -132,6 +132,9 @@ public:
     bool add_self;
     PythonOutputCode dispatch_expression(const sem::Exp& node);
     PythonOutputCode dispatch_common(const sem::Common& node);
+    PythonOutputCode transpile_object_method(const sem::ObjectMethod& method);
+    PythonOutputCode transpile_const_function(const sem::ConstFunction& function);
+    PythonOutputCode transpile_object_constructor(const sem::ObjectConstructor& constructor);
 };
 
 

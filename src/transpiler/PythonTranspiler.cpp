@@ -481,10 +481,10 @@ PythonOutputCode PythonTranspiler::dispatch_common(const sem::Common& node) {
     switch (node.type) {
         case sem::CommonType::BLOCK:
             return this->transpile_block((const sem::Block&) node);
-        // case sem::CommonType::ENUM_MEMBER:
-        //     return this->transpile_enum_member((const sem::EnumMember&) node);
-        // case sem::CommonType::BOOLEAN:
-        //     return this->transpile_boolean((const sem::Bool&) node);
+            // case sem::CommonType::ENUM_MEMBER:
+            //     return this->transpile_enum_member((const sem::EnumMember&) node);
+            // case sem::CommonType::BOOLEAN:
+            //     return this->transpile_boolean((const sem::Bool&) node);
         case sem::CommonType::MATCH:
             return this->transpile_match((const sem::Match&) node);
         case sem::CommonType::IF:
@@ -493,20 +493,20 @@ PythonOutputCode PythonTranspiler::dispatch_common(const sem::Common& node) {
             return this->transpile_break((const sem::Break&) node);
         case sem::CommonType::CONTINUE:
             return this->transpile_continue((const sem::Continue&) node);
-        // case sem::CommonType::ID:
-        //     return this->transpile_id((const sem::Id&) node);
-        // case sem::CommonType::STRING:
-        //     return this->transpile_string((const sem::String&) node);
+            // case sem::CommonType::ID:
+            //     return this->transpile_id((const sem::Id&) node);
+            // case sem::CommonType::STRING:
+            //     return this->transpile_string((const sem::String&) node);
         case sem::CommonType::CALL:
             return this->transpile_call((const sem::Call&) node);
-        // case sem::CommonType::NEW:
-        //     return this->transpile_new((const sem::NewObject&) node);
-        // case sem::CommonType::DICT:
-        //     return this->transpile_dict((const sem::Dict&) node);
-        // case sem::CommonType::LIST:
-        //     return this->transpile_list((const sem::List&) node);
-        // case sem::CommonType::OBJECT_MEMBER:
-        //     return this->transpile_object_member((const sem::ObjectMember&) node);
+            // case sem::CommonType::NEW:
+            //     return this->transpile_new((const sem::NewObject&) node);
+            // case sem::CommonType::DICT:
+            //     return this->transpile_dict((const sem::Dict&) node);
+            // case sem::CommonType::LIST:
+            //     return this->transpile_list((const sem::List&) node);
+            // case sem::CommonType::OBJECT_MEMBER:
+            //     return this->transpile_object_member((const sem::ObjectMember&) node);
         case sem::CommonType::DECLARATION:
             return this->transpile_declaration((const sem::Declaration&) node);
         case sem::CommonType::WHILE:
@@ -520,15 +520,15 @@ PythonOutputCode PythonTranspiler::dispatch_common(const sem::Common& node) {
             // case sem::SNodeType::THROW:
             //     return this->transpile_throw((const sem::Throw&) node);
             //     break;
-        // case sem::CommonType::FLOAT:
-        //     return this->transpile_float((const sem::Float&) node);
-        // case sem::CommonType::NONE:
-        //     return this->transpile_none((const sem::None&) node);
-        // case sem::CommonType::TERNARY:
-        //     return this->transpile_ternary((const sem::Ternary&) node);
-        // case sem::CommonType::INTEGER:
-        //     return this->transpile_integer((const sem::Integer&) node);
-        //     break;
+            // case sem::CommonType::FLOAT:
+            //     return this->transpile_float((const sem::Float&) node);
+            // case sem::CommonType::NONE:
+            //     return this->transpile_none((const sem::None&) node);
+            // case sem::CommonType::TERNARY:
+            //     return this->transpile_ternary((const sem::Ternary&) node);
+            // case sem::CommonType::INTEGER:
+            //     return this->transpile_integer((const sem::Integer&) node);
+            //     break;
         default:
             throw std::runtime_error("Don't know what to do with this SNode!");
     }
@@ -540,10 +540,6 @@ PythonOutputCode PythonTranspiler::dispatch_expression(const sem::Exp& node) {
             return this->transpile_enum_member((const sem::EnumMember&) node);
         case sem::ExpType::BOOLEAN:
             return this->transpile_boolean((const sem::Bool&) node);
-        // case sem::ExpType::MATCH:
-        //     return this->transpile_match((const sem::Match&) node);
-        // case sem::ExpType::IF:
-        //     return this->transpile_if((const sem::IfExp&) node);
         case sem::ExpType::ID:
             return this->transpile_id((const sem::Id&) node);
         case sem::ExpType::STRING:
@@ -566,10 +562,14 @@ PythonOutputCode PythonTranspiler::dispatch_expression(const sem::Exp& node) {
             return this->transpile_ternary((const sem::Ternary&) node);
         case sem::ExpType::INTEGER:
             return this->transpile_integer((const sem::Integer&) node);
-            break;
-        default:
-            throw std::runtime_error("Don't know what to do with this Exp!");
+        case sem::ExpType::OBJECT_METHOD:
+            return this->transpile_object_method((const sem::ObjectMethod&) node);
+        case sem::ExpType::CONST_FUNCTION:
+            return this->transpile_const_function((const sem::ConstFunction&) node);
+        case sem::ExpType::OBJECT_CONSTRUCTOR:
+            return this->transpile_object_constructor((const sem::ObjectConstructor&) node);
     }
+    __builtin_unreachable();
 }
 
 size_t PythonTranspiler::next_arg_n() {
@@ -591,6 +591,18 @@ void PythonTranspiler::unindent() {
 PythonTranspiler::PythonTranspiler() {
     this->indent_level = 0;
     this->arg_n = 0;
+}
+
+PythonOutputCode PythonTranspiler::transpile_object_method(const sem::ObjectMethod& method) {
+    return PythonOutputCode("", "");
+}
+
+PythonOutputCode PythonTranspiler::transpile_const_function(const sem::ConstFunction& function) {
+    return PythonOutputCode("", "");
+}
+
+PythonOutputCode PythonTranspiler::transpile_object_constructor(const sem::ObjectConstructor& constructor) {
+    return PythonOutputCode("", "");
 }
 
 std::string indent_paragraph(std::string s, size_t level) {

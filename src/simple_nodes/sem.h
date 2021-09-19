@@ -106,7 +106,6 @@ namespace sem {
     };
 
     enum class ExpType {
-        FUNCTION,
         ID,
         INTEGER,
         CALL,
