@@ -67,7 +67,7 @@ TextPosition add_one_col(TextPosition t);
 bool function_is_generic(const sem::TypeFunction& ft);
 
 sem::Common*
-make_for_snode(ast::For& node, USemanticInfoBlock& binfo, USemanticInfo& exp_info_p, std::string loop_list_var_id,
+make_for_snode(ast::For& node, std::unique_ptr<sem::Block>& binfo, USemanticInfo& exp_info_p, std::string loop_list_var_id,
                std::string loop_index_var_id, std::string loop_list_len_var_id, sem::Common* update_loop_index_snode);
 const sem::TypeFunction& get_function_type(const SemanticInfo& fun_info);
 
@@ -114,7 +114,7 @@ public:
 
     USemanticInfo visit_assignment(ast::Assignment& n);
     USemanticInfo visit_binop(ast::BinaryOp& node);
-    USemanticInfoBlock visit_block(ast::Block& node);
+    std::unique_ptr<sem::Block> visit_block(ast::Block& node);
     std::unique_ptr<sem::Module> visit_root(ast::Module& node);
     USemanticInfo visit_boolean(ast::Boolean& node);
     USemanticInfo visit_break(ast::Break& node);

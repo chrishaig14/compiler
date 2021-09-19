@@ -7,9 +7,9 @@
 #include "../simple_nodes/common/src/TypeFunction.h"
 #include "../simple_nodes/expressions/include/CallExp.h"
 
-sem::Common*
-make_for_snode(ast::For& node, USemanticInfoBlock& binfo, USemanticInfo& exp_info_p, std::string loop_list_var_id,
-               std::string loop_index_var_id, std::string loop_list_len_var_id, sem::Common* update_loop_index_snode) {
+sem::Common* make_for_snode(ast::For& node, std::unique_ptr<sem::Block>& binfo, USemanticInfo& exp_info_p,
+                            std::string loop_list_var_id, std::string loop_index_var_id,
+                            std::string loop_list_len_var_id, sem::Common* update_loop_index_snode) {
     auto* bbn = new sem::Block();
 
     sem::UExp p_node = std::move(exp_info_p->exp_snode);
@@ -40,7 +40,7 @@ make_for_snode(ast::For& node, USemanticInfoBlock& binfo, USemanticInfo& exp_inf
     vv.push_back(std::move(llensn));
     auto cn = std::make_unique<sem::CallExp>(std::move(cmpfunsn), std::move(vv));
 
-    auto& bn = (binfo->snode);
+    auto& bn = binfo;
 
     std::vector<sem::UExp> vvv;
     vvv.push_back(std::make_unique<sem::Id>(loop_list_var_id));
@@ -198,9 +198,7 @@ std::unique_ptr<sem::Module> Checker::visit_root(ast::Module& node) {
     return sn;
 }
 
-USemanticInfoBlock Checker::visit_block(ast::Block& node) {
-    USemanticInfoBlock info_u = std::make_unique<SemanticInfoBlock>();
-    SemanticInfoBlock& info = *info_u;
+std::unique_ptr<sem::Block> Checker::visit_block(ast::Block& node) {
     auto sn = std::make_unique<sem::Block>();
     ast::VectorOfNodesU vn;
     for (auto& n: node.nodes) {
@@ -239,9 +237,8 @@ USemanticInfoBlock Checker::visit_block(ast::Block& node) {
         //     }
         // }
     }
-    info.snode = std::move(sn);
     node.nodes = std::move(vn);
-    return info_u;
+    return sn;
 }
 
 std::unique_ptr<sem::FunctionDef> Checker::visit_function(ast::Function& n) {
@@ -304,8 +301,7 @@ std::unique_ptr<sem::FunctionDef> Checker::visit_function(ast::Function& n) {
     std::unique_ptr<Entity> e = entity_from_type(returnType);
     std::cout << "there" << std::endl;
     this->scope->set("__return__", *e);
-    USemanticInfoBlock body_info = this->visit_block(*n.body);
-    auto& bn = body_info->snode;
+    auto bn = this->visit_block(*n.body);
     for (auto& local_var: this->scope->table) {
         if (local_var.second->type == E_TYPE::VALUE) {
             bn->locals.push_back(local_var.first);

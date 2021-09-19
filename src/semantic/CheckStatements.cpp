@@ -272,8 +272,7 @@ USemanticInfo Checker::visit_match(ast::Match& node) {
         assert(v->clazz != nullptr);
         Entity* ent = v.release();
         this->scope->set(case_id, *ent);
-        USemanticInfoBlock case_info = this->visit_block(case_node);
-        auto& bn = (std::unique_ptr<sem::Block>&) case_info->snode;
+        auto bn = this->visit_block(case_node);
         auto* omn = new sem::ObjectMember(std::make_unique<sem::Id>(varname), Path("libcore.libcore.Union"), "o");
         sem::UExp u(omn);
         auto dn = std::make_unique<sem::Declaration>(case_id, std::move(u));
@@ -346,9 +345,9 @@ USemanticInfo Checker::visit_for(ast::For& node) {
     increment_index_sn->rvalue = std::move(inc_exp_node);
 
     this->scope->is_loop = true;
-    USemanticInfoBlock binfo = this->visit_block(node.body);
+    auto binfo = this->visit_block(node.body);
     this->scope->is_loop = false;
-    sem::Block* bn = (binfo->snode).release();
+    sem::Block* bn = binfo.release();
     for (auto& local_var : this->scope->table) {
         if (local_var.second->type == E_TYPE::VALUE) {
             bn->locals.push_back(local_var.first);
@@ -392,7 +391,7 @@ USemanticInfo Checker::visit_while(ast::While& node) {
 
     this->enter_scope("while");
     this->scope->is_loop = true;
-    USemanticInfoBlock body_info_p = this->visit_block(*node.body);
+    auto body_snode = this->visit_block(*node.body);
     this->scope->is_loop = false;
     // for (auto& v : this->scope->table) {
     // if (v.second->type == E_TYPE::OBJECT_VALUE) {
@@ -404,7 +403,7 @@ USemanticInfo Checker::visit_while(ast::While& node) {
     // }
     this->leave_scope();
 
-    auto while_sn = std::make_unique<sem::While>(std::move(condition_snode), std::move(body_info_p->snode));
+    auto while_sn = std::make_unique<sem::While>(std::move(condition_snode), std::move(body_snode));
 
     USemanticInfo info_u = std::make_unique<SemanticInfo>();
     SemanticInfo& info = *info_u;
@@ -420,8 +419,8 @@ USemanticInfo Checker::visit_if(ast::If& n) {
     auto& condition_snode = condition_sinfo->exp_snode;
 
     this->enter_scope("if");
-    USemanticInfoBlock body_info = this->visit_block(n.then);
-    sem::Block& bn = *body_info->snode;
+    auto body_info = this->visit_block(n.then);
+    sem::Block& bn = *body_info;
     for (const auto& local_var : this->scope->table) {
         bn.locals.push_back(local_var.first);
     }
@@ -433,30 +432,30 @@ USemanticInfo Checker::visit_if(ast::If& n) {
         USemanticInfo elif_condition_sinfo = this->expect_rvalue_of_type(sem::TypeObject("Boolean"), elif.first);
         auto& elif_condition_snode = elif_condition_sinfo->exp_snode;
         this->enter_scope("elif");
-        USemanticInfoBlock elif_block_info = this->visit_block(elif.second);
-        sem::Block* bn1 = (elif_block_info->snode).release();
+        auto elif_block_info = this->visit_block(elif.second);
+        sem::Block* bn1 = elif_block_info.release();
         for (const auto& local_var : this->scope->table) {
             bn1->locals.push_back(local_var.first);
         }
         this->leave_scope();
-        elifs.emplace_back(std::move(elif_condition_snode), std::move(elif_block_info->snode));
+        elifs.emplace_back(std::move(elif_condition_snode), std::move(elif_block_info));
     }
-    USemanticInfoBlock else_info;
+    std::unique_ptr<sem::Block> else_info;
     if (n.selse != nullptr && !n.selse->nodes.empty()) {
         this->enter_scope("else");
         else_info = this->visit_block(*n.selse);
-        auto& bn2 = (std::unique_ptr<sem::Block>&) else_info->snode;
+        auto& bn2 = else_info;
         for (const auto& local_var : this->scope->table) {
             bn2->locals.push_back(local_var.first);
         }
         this->leave_scope();
     }
-    std::unique_ptr<sem::Block> else_snode = else_info == nullptr ? nullptr : std::move(else_info->snode);
+    std::unique_ptr<sem::Block> else_snode = else_info == nullptr ? nullptr : std::move(else_info);
 
     USemanticInfo info_u = std::make_unique<SemanticInfo>();
     SemanticInfo& info = *info_u;
     info.snode = std::make_unique<sem::If>(std::move(condition_snode),
-                                           std::move(body_info->snode),
+                                           std::move(body_info),
                                            std::move(elifs),
                                            std::move(else_snode));
     return info_u;
