@@ -11,7 +11,7 @@
 #include "../src/simple_nodes/expressions/include/expressions.h"
 
 #define CHECKER() std::unique_ptr<Compiler> cp = c_analyze(code);Compiler& c = *cp;Module& module = *c.root_package.units["tmp"].module;resolve_module_imports(module, c.top_package);Checker checker(c.top_package, module);
-
+#define REQUIRE_CHECKER_OK() REQUIRE(!checker.error_reporter.failed);REQUIRE(checker.error_reporter.errors.empty());
 static const ast::ObjectType NO_TYPE(".None");
 
 static const TextPosition& _POS = {1, 1};
@@ -283,8 +283,7 @@ TEST_CASE("semantic_output_binop", "[checker]") {
     ast::Node& expression = ((ast::Declaration&) *(module.ast->functions[0].get().body->nodes[0])).expression;
     USemanticInfo info = checker.dispatch_rvalue(expression);
 
-    REQUIRE(!checker.error_reporter.failed);
-    REQUIRE(checker.error_reporter.errors.empty());
+    REQUIRE_CHECKER_OK()
     CHECK(info->entity.get().type == E_TYPE::VALUE);
     Value& entity_value = (Value&) (info->entity.get());
     CHECK(entity_value.metatype == Meta::CLASS);
@@ -301,8 +300,7 @@ TEST_CASE("semantic_output_boolop", "[checker]") {
 
     USemanticInfo info = checker.dispatch_rvalue(expression);
 
-    REQUIRE(!checker.error_reporter.failed);
-    REQUIRE(checker.error_reporter.errors.empty());
+    REQUIRE_CHECKER_OK()
     CHECK(info->entity.get().type == E_TYPE::VALUE);
     Value& entity_value = (Value&) (info->entity.get());
     CHECK(entity_value.metatype == Meta::CLASS);
@@ -319,8 +317,7 @@ TEST_CASE("semantic_output_subscript", "[checker]") {
 
     USemanticInfo info = checker.dispatch_rvalue(expression);
 
-    REQUIRE(!checker.error_reporter.failed);
-    REQUIRE(checker.error_reporter.errors.empty());
+    REQUIRE_CHECKER_OK()
 }
 
 TEST_CASE("semantic_output_call_no_args", "[checker]") {
@@ -330,8 +327,7 @@ TEST_CASE("semantic_output_call_no_args", "[checker]") {
     checker.init();
     checker.visit_root(*module.ast);
 
-    REQUIRE(!checker.error_reporter.failed);
-    REQUIRE(checker.error_reporter.errors.empty());
+    REQUIRE_CHECKER_OK()
 }
 
 TEST_CASE("semantic_output_call_args", "[checker]") {
@@ -341,8 +337,7 @@ TEST_CASE("semantic_output_call_args", "[checker]") {
     checker.init();
     checker.visit_root(*module.ast);
 
-    REQUIRE(!checker.error_reporter.failed);
-    REQUIRE(checker.error_reporter.errors.empty());
+    REQUIRE_CHECKER_OK()
 }
 
 TEST_CASE("semantic_output_union_ok_1", "[checker]") {
@@ -352,8 +347,7 @@ TEST_CASE("semantic_output_union_ok_1", "[checker]") {
     checker.init();
     checker.visit_root(*module.ast);
 
-    REQUIRE(!checker.error_reporter.failed);
-    REQUIRE(checker.error_reporter.errors.empty());
+    REQUIRE_CHECKER_OK()
 }
 
 TEST_CASE("semantic_output_union_ok_2", "[checker]") {
@@ -363,8 +357,7 @@ TEST_CASE("semantic_output_union_ok_2", "[checker]") {
     checker.init();
     checker.visit_root(*module.ast);
 
-    REQUIRE(!checker.error_reporter.failed);
-    REQUIRE(checker.error_reporter.errors.empty());
+    REQUIRE_CHECKER_OK()
 }
 
 TEST_CASE("semantic_output_if", "[checker]") {
@@ -376,8 +369,7 @@ TEST_CASE("semantic_output_if", "[checker]") {
     USemanticInfo info = checker.visit_function(ast_func);
     sem::FunctionDef& sem_func = (sem::FunctionDef&) *info->snode;
 
-    REQUIRE(!checker.error_reporter.failed);
-    REQUIRE(checker.error_reporter.errors.empty());
+    REQUIRE_CHECKER_OK()
 
     auto block = std::make_unique<sem::Block>();
     block->nodes.push_back(std::make_unique<sem::Declaration>("x", std::make_unique<sem::Integer>("1")));
@@ -391,11 +383,9 @@ TEST_CASE("semantic_output_enum_def", "[checker]") {
     checker.init();
     USemanticInfoBlock info = checker.visit_root(*module.ast);
 
-    REQUIRE(!checker.error_reporter.failed);
-    REQUIRE(checker.error_reporter.errors.empty());
+    REQUIRE_CHECKER_OK()
 
     REQUIRE(*((info->snode)->nodes[0]) == sem::EnumDef("test.tmp.Foo", {"a", "c"}));
-
 }
 
 TEST_CASE("semantic_output_class_ok", "[checker]") {
@@ -405,9 +395,7 @@ TEST_CASE("semantic_output_class_ok", "[checker]") {
     checker.init();
     USemanticInfoBlock info = checker.visit_root(*module.ast);
 
-    REQUIRE(!checker.error_reporter.failed);
-    REQUIRE(checker.error_reporter.errors.empty());
+    REQUIRE_CHECKER_OK();
 
     REQUIRE(*((info->snode)->nodes[0]) == sem::KlassDef("Foo", {"x", "y"}));
-
 }
