@@ -17,7 +17,7 @@ const TextPosition& _POS = {1, 1};
 
 #define CHECKER() std::unique_ptr<Compiler> cp = analyze(code);Compiler& c = *cp;Module& module = *c.root_package.units["tmp"].module;resolve_module_imports(module, c.top_package);Checker checker(c.top_package, module);
 #define REQUIRE_CHECKER_ONE_ERROR() REQUIRE(checker.error_reporter.failed);REQUIRE(checker.error_reporter.errors.size() == 1);
-
+#define REQUIRE_CHECKER_OK() REQUIRE(not checker.error_reporter.failed);REQUIRE(checker.error_reporter.errors.empty());
 std::unique_ptr<Compiler> analyze(std::string code) {
     const std::string& tmp_in = "tmp_in";
     mkdir(tmp_in.c_str(), 0700);
@@ -119,8 +119,7 @@ TEST_CASE("list_ok", "[checker]") {
     CHECKER();
     checker.visit_function(module.ast->functions[0]);
 
-    REQUIRE(!checker.error_reporter.failed);
-    REQUIRE(checker.error_reporter.errors.empty());
+    REQUIRE_CHECKER_OK();
 }
 
 TEST_CASE("list_bad", "[checker]") {
@@ -147,8 +146,7 @@ TEST_CASE("empty_dict_ok", "[checker]") {
     CHECKER();
     checker.visit_function(module.ast->functions[0]);
 
-    REQUIRE(!checker.error_reporter.failed);
-    REQUIRE(checker.error_reporter.errors.empty());
+    REQUIRE_CHECKER_OK();
 }
 
 TEST_CASE("dict_ok", "[checker]") {
@@ -157,8 +155,7 @@ TEST_CASE("dict_ok", "[checker]") {
     CHECKER();
     checker.visit_function(module.ast->functions[0]);
 
-    REQUIRE(!checker.error_reporter.failed);
-    REQUIRE(checker.error_reporter.errors.empty());
+    REQUIRE_CHECKER_OK();
 }
 
 TEST_CASE("dict_key_type_error", "[checker]") {
@@ -362,8 +359,7 @@ TEST_CASE("binop_ok", "[checker]") {
     ast::Node& expression = ((ast::Declaration&) *(module.ast->functions[0].get().body->nodes[0])).expression;
     USemanticInfo info = checker.dispatch_rvalue(expression);
 
-    REQUIRE(!checker.error_reporter.failed);
-    REQUIRE(checker.error_reporter.errors.empty());
+    REQUIRE_CHECKER_OK();
     CHECK(info->entity.get().type == E_TYPE::VALUE);
     Value& entity_value = (Value&) (info->entity.get());
     CHECK(entity_value.metatype == Meta::CLASS);
@@ -379,8 +375,7 @@ TEST_CASE("boolop_ok", "[checker]") {
     ast::Node& expression = ((ast::Declaration&) *(module.ast->functions[0].get().body->nodes[0])).expression;
     USemanticInfo info = checker.dispatch_rvalue(expression);
 
-    REQUIRE(!checker.error_reporter.failed);
-    REQUIRE(checker.error_reporter.errors.empty());
+    REQUIRE_CHECKER_OK();
     CHECK(info->entity.get().type == E_TYPE::VALUE);
     Value& entity_value = (Value&) (info->entity.get());
     CHECK(entity_value.metatype == Meta::CLASS);
@@ -436,8 +431,7 @@ TEST_CASE("subscript_ok", "[checker]") {
     ast::Node& expression = ((ast::Declaration&) *(module.ast->functions[0].get().body->nodes[0])).expression;
     USemanticInfo info = checker.dispatch_rvalue(expression);
 
-    REQUIRE(!checker.error_reporter.failed);
-    REQUIRE(checker.error_reporter.errors.empty());
+    REQUIRE_CHECKER_OK();
 }
 
 TEST_CASE("subscript_index_type_error", "[checker]") {
@@ -487,8 +481,7 @@ TEST_CASE("call_no_args_ok", "[checker]") {
     checker.init();
     checker.visit_root(*module.ast);
 
-    REQUIRE(!checker.error_reporter.failed);
-    REQUIRE(checker.error_reporter.errors.empty());
+    REQUIRE_CHECKER_OK();
 }
 
 TEST_CASE("call_args_ok", "[checker]") {
@@ -498,8 +491,7 @@ TEST_CASE("call_args_ok", "[checker]") {
     checker.init();
     checker.visit_root(*module.ast);
 
-    REQUIRE(!checker.error_reporter.failed);
-    REQUIRE(checker.error_reporter.errors.empty());
+    REQUIRE_CHECKER_OK();
 }
 
 TEST_CASE("call_args_type_error", "[checker]") {
@@ -526,8 +518,7 @@ TEST_CASE("union_ok_1", "[checker]") {
     checker.init();
     checker.visit_root(*module.ast);
 
-    REQUIRE(!checker.error_reporter.failed);
-    REQUIRE(checker.error_reporter.errors.empty());
+    REQUIRE_CHECKER_OK();
 }
 
 TEST_CASE("union_ok_2", "[checker]") {
@@ -537,8 +528,7 @@ TEST_CASE("union_ok_2", "[checker]") {
     checker.init();
     checker.visit_root(*module.ast);
 
-    REQUIRE(!checker.error_reporter.failed);
-    REQUIRE(checker.error_reporter.errors.empty());
+    REQUIRE_CHECKER_OK();
 }
 
 TEST_CASE("union_error", "[checker]") {
@@ -565,8 +555,7 @@ TEST_CASE("while_ok", "[checker]") {
     checker.init();
     checker.visit_root(*module.ast);
 
-    REQUIRE(!checker.error_reporter.failed);
-    REQUIRE(checker.error_reporter.errors.empty());
+    REQUIRE_CHECKER_OK();
 }
 
 TEST_CASE("while_boolean_error", "[checker]") {
@@ -594,8 +583,7 @@ TEST_CASE("match_ok", "[checker]") {
     checker.init();
     checker.visit_root(*module.ast);
 
-    REQUIRE(!checker.error_reporter.failed);
-    REQUIRE(checker.error_reporter.errors.empty());
+    REQUIRE_CHECKER_OK();
 }
 
 // TEST_CASE("tuple_ok", "[checker]") {
@@ -620,8 +608,7 @@ TEST_CASE("union_ok", "[checker]") {
     checker.init();
     checker.visit_root(*module.ast);
 
-    REQUIRE(!checker.error_reporter.failed);
-    REQUIRE(checker.error_reporter.errors.empty());
+    REQUIRE_CHECKER_OK();
 }
 
 TEST_CASE("if_ok", "[checker]") {
@@ -631,8 +618,7 @@ TEST_CASE("if_ok", "[checker]") {
     checker.init();
     checker.visit_root(*module.ast);
 
-    REQUIRE(!checker.error_reporter.failed);
-    REQUIRE(checker.error_reporter.errors.empty());
+    REQUIRE_CHECKER_OK();
 }
 
 TEST_CASE("if_boolean_error", "[checker]") {
@@ -678,6 +664,5 @@ TEST_CASE("enum_ok", "[checker]") {
     checker.init();
     checker.visit_root(*module.ast);
 
-    REQUIRE(!checker.error_reporter.failed);
-    REQUIRE(checker.error_reporter.errors.empty());
+    REQUIRE_CHECKER_OK();
 }
