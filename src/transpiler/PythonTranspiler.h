@@ -16,9 +16,9 @@
 #include "../simple_nodes/common/include/Throw.h"
 #include "../simple_nodes/common/include/TryCatch.h"
 #include "../simple_nodes/expressions/include/expressions.h"
-#include "../simple_nodes/with_unique/Assignment.h"
-#include "../simple_nodes/with_unique/Break.h"
-#include "../simple_nodes/with_unique/Continue.h"
+#include "../simple_nodes/common/include/Assignment.h"
+#include "../simple_nodes/common/include/Break.h"
+#include "../simple_nodes/common/include/Continue.h"
 #include "../simple_nodes/with_unique/EnumDef.h"
 #include "../simple_nodes/with_unique/FunctionDef.h"
 #include "../simple_nodes/with_unique/IfSNode.h"
@@ -123,8 +123,6 @@ public:
 
     PythonOutputCode transpile_dict(const sem::Dict& node);
     PythonOutputCode transpile_try_catch(const sem::TryCatch& node);
-
-    PythonOutputCode transpile_const_function_call(const sem::ConstFunctionCall& call);
 
     PythonOutputCode dispatch(const sem::SNode& node);
 

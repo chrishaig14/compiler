@@ -4,7 +4,6 @@
 
 #include "PythonTranspiler.h"
 #include "../simple_nodes/common/include/Throw.h"
-#include "../simple_nodes/with_unique/ConstFunctionCall.h"
 
 PythonOutputCode::PythonOutputCode(const std::string& pre_code, const std::string& code)
         : pre_code(pre_code), code(code) {
@@ -453,26 +452,6 @@ PythonOutputCode PythonTranspiler::transpile_try_catch(const sem::TryCatch& node
     return PythonOutputCode("", out);
 }
 
-PythonOutputCode PythonTranspiler::transpile_const_function_call(const sem::ConstFunctionCall& call) {
-    std::string pre_code;
-    std::string args_list;
-    for (size_t i = 0; i < call.args.size(); i++) {
-        PythonOutputCode arg_code = this->dispatch_expression(*call.args[i]);
-        if (not arg_code.pre_code.empty()) {
-            pre_code += arg_code.pre_code.empty() ? "" : (arg_code.pre_code + "\n");
-        }
-        std::string arg_id = "arg_" + std::to_string(this->next_arg_n());
-        pre_code += arg_id + " = " + arg_code.code + "\n";
-        args_list += arg_id + ", ";
-    }
-    pre_code = indent_paragraph(pre_code.substr(0, pre_code.size() - 1), this->indent_level);
-    std::string global_function_name = (call.path.as_str());
-    std::string code = global_function_name + LPAREN + args_list;
-    code = code.substr(0, code.size() - 2);
-    code += RPAREN;
-    return PythonOutputCode(pre_code, code);
-}
-
 std::string PythonTranspiler::transpile_module(const sem::Block& block) {
     std::string code;
     for (auto& n: block.nodes) {
@@ -520,8 +499,6 @@ PythonOutputCode PythonTranspiler::dispatch_common(const sem::SNode& node) {
             return this->transpile_string((const sem::String&) node);
         case sem::SNodeType::CALL:
             return this->transpile_call((const sem::Call&) node);
-        case sem::SNodeType::CONST_FUNCTION_CALL:
-            return this->transpile_const_function_call((const sem::ConstFunctionCall&) node);
         case sem::SNodeType::NEW:
             return this->transpile_new((const sem::NewObject&) node);
         case sem::SNodeType::DICT:
@@ -573,8 +550,6 @@ PythonOutputCode PythonTranspiler::dispatch_expression(const sem::Exp& node) {
             return this->transpile_string((const sem::String&) node);
         case sem::ExpType::CALL:
             return this->transpile_call((const sem::Call&) node);
-        case sem::ExpType::CONST_FUNCTION_CALL:
-            return this->transpile_const_function_call((const sem::ConstFunctionCall&) node);
         case sem::ExpType::NEW:
             return this->transpile_new((const sem::NewObject&) node);
         case sem::ExpType::DICT:

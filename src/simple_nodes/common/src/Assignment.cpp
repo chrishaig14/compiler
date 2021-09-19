@@ -2,7 +2,7 @@
 // Created by chris on 4/4/21.
 //
 
-#include "Assignment.h"
+#include "../include/Assignment.h"
 
 using namespace sem;
 

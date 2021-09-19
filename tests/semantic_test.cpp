@@ -213,12 +213,11 @@ TEST_CASE("semantic_output_object_method", "[checker]") {
     Checker checker(c.top_package, module);
     USemanticInfo info = checker.visit_function(module.ast->functions[0]);
     REQUIRE(not checker.error_reporter.failed);
-    // std::vector<USNode> e;
-    // auto exp = sem::Declaration("x",
-    //                             std::make_unique<sem::ObjectMethod>(std::make_unique<sem::Id>("f"),
-    //                                                                 Path("test.tmp.Foo"),
-    //                                                                 "get_foo"));
-    // REQUIRE(*(*(std::unique_ptr<sem::FunctionDef>&) info->snode).body->nodes[0] == exp);
+    auto exp = sem::Declaration("x",
+                                std::make_unique<sem::ObjectMethod>(std::make_unique<sem::Id>("f"),
+                                                                    Path("test.tmp.Foo"),
+                                                                    "get_foo"));
+    REQUIRE(*(*(std::unique_ptr<sem::FunctionDef>&) info->snode).body->nodes[0] == exp);
 }
 
 TEST_CASE("semantic_output_assign_const_function", "[checker]") {
@@ -236,9 +235,8 @@ TEST_CASE("semantic_output_assign_const_function", "[checker]") {
     checker.init();
     USemanticInfo info = checker.visit_function(module.ast->functions[1]);
     REQUIRE(not checker.error_reporter.failed);
-    // std::vector<USNode> e;
-    // auto exp = sem::Declaration("x", std::make_unique<sem::ConstFunction>(Path("test.tmp.bar")));
-    // REQUIRE(*(*(std::unique_ptr<sem::FunctionDef>&) info->snode).body->nodes[0] == exp);
+    auto exp = sem::Declaration("x", std::make_unique<sem::ConstFunction>(Path("test.tmp.bar")));
+    REQUIRE(*(*(std::unique_ptr<sem::FunctionDef>&) info->snode).body->nodes[0] == exp);
 }
 
 TEST_CASE("semantic_output_const_function_call", "[checker]") {
@@ -257,10 +255,10 @@ TEST_CASE("semantic_output_const_function_call", "[checker]") {
     USemanticInfo info = checker.visit_function(module.ast->functions[1]);
     REQUIRE(not checker.error_reporter.failed);
     std::vector<sem::UExp> e;
-    // auto exp = sem::Declaration("x",
-    //                             std::make_unique<sem::ConstFunctionCall>(Path("test.tmp.bar"),
-    //                                                                      std::vector<sem::UExp>{}));
-    // REQUIRE(*(*(std::unique_ptr<sem::FunctionDef>&) info->snode).body->nodes[0] == exp);
+    auto exp = sem::Declaration("x",
+                                std::make_unique<sem::CallExp>(std::make_unique<sem::ConstFunction>(Path("test.tmp.bar")),
+                                                               std::vector<sem::UExp>{}));
+    REQUIRE(*(*(std::unique_ptr<sem::FunctionDef>&) info->snode).body->nodes[0] == exp);
 }
 
 TEST_CASE("semantic_output_while", "[checker]") {

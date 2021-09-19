@@ -15,8 +15,6 @@ namespace sem {
 
     class Bool;
 
-    class ConstFunctionCall;
-
     class ConstFunction;
 
     class ObjectMethod;
