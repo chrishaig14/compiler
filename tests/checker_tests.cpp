@@ -9,15 +9,7 @@
 #include "../src/simple_nodes/common/include/TypeObject.h"
 #include "../src/simple_nodes/common/src/TypeFunction.h"
 
-#include "../src/semantic/errors/include/ErrorTypeMismatch.h"
-#include "../src/semantic/errors/include/ErrorRedeclared.h"
-#include "../src/semantic/errors/include/ErrorExpectedExpression.h"
-#include "../src/semantic/errors/include/ErrorNoMember.h"
-#include "../src/semantic/errors/include/ErrorClassNoMember.h"
-#include "../src/semantic/errors/include/ErrorNoMemberSuggestions.h"
-#include "../src/semantic/errors/include/ErrorClassNoMethodForOp.h"
-#include "../src/semantic/errors/include/ErrorObjectNoSpecialMethod.h"
-#include "../src/semantic/errors/include/ErrorEnumNoValue.h"
+#include "../src/semantic/errors/include/errors.h"
 
 const ast::ObjectType NO_TYPE(".None");
 

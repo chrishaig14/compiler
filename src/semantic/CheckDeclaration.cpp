@@ -5,9 +5,6 @@
 #include "CheckDeclaration.h"
 #include "../ast/ObjectType.h"
 #include "../simple_nodes/common/include/TypeObject.h"
-#include "errors/include/ErrorTypeMismatch.h"
-#include "errors/include/ErrorRedeclared.h"
-#include "errors/include/ErrorExpectedExpression.h"
 
 std::unique_ptr<SemanticInfo> Checker::expect_rvalue_of_type(const sem::Type& target, ast::Node& node) {
     USemanticInfo rinfo = this->dispatch_rvalue(node);

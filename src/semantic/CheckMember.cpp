@@ -9,10 +9,6 @@
 #include "../simple_nodes/expressions/include/ObjectMethod.h"
 #include "../simple_nodes/common/include/TypeObject.h"
 #include "../simple_nodes/common/src/TypeFunction.h"
-#include "errors/include/ErrorNoMember.h"
-#include "errors/include/ErrorNoMemberSuggestions.h"
-#include "errors/include/ErrorClassNoMember.h"
-#include "errors/include/ErrorPackageNoMember.h"
 
 USemanticInfo Checker::visit_member(ast::Member& n) {
     USemanticInfo parent_info = this->dispatch(n.parent);

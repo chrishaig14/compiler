@@ -3,14 +3,7 @@
 //
 
 #include "CheckCall.h"
-#include "errors/include/ErrorTypeMismatch.h"
-#include "errors/include/ErrorExpectedExpression.h"
-#include "errors/include/ErrorNotAFunction.h"
-#include "errors/include/ErrorFunctionCallNumArgs.h"
 #include "../simple_nodes/common/include/TypeObject.h"
-#include "../simple_nodes/expressions/include/ObjectConstructor.h"
-#include "../simple_nodes/expressions/include/CallExp.h"
-#include "../simple_nodes/expressions/include/ObjectConstructor.h"
 #include "../simple_nodes/common/src/TypeFunction.h"
 
 USemanticInfo Checker::visit_call(ast::Call& n, bool is_rvalue) {
