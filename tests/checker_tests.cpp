@@ -16,6 +16,7 @@ const ast::ObjectType NO_TYPE(".None");
 const TextPosition& _POS = {1, 1};
 
 #define CHECKER() std::unique_ptr<Compiler> cp = analyze(code);Compiler& c = *cp;Module& module = *c.root_package.units["tmp"].module;resolve_module_imports(module, c.top_package);Checker checker(c.top_package, module);
+#define REQUIRE_CHECKER_ONE_ERROR() REQUIRE(checker.error_reporter.failed);REQUIRE(checker.error_reporter.errors.size() == 1);
 
 std::unique_ptr<Compiler> analyze(std::string code) {
     const std::string& tmp_in = "tmp_in";
@@ -56,8 +57,7 @@ TEST_CASE("basic_function_bad_return_type", "[checker]") {
     ast::Node& ast_exp = *ast_ret.expression;
     checker.visit_function(ast_func);
 
-    REQUIRE(checker.error_reporter.failed);
-    REQUIRE(checker.error_reporter.errors.size() == 1);
+    REQUIRE_CHECKER_ONE_ERROR();
     Error& error = *checker.error_reporter.errors.back();
     ast::Boolean node(false, _POS, _POS);
     sem::TypeObject expected("Integer");
@@ -90,8 +90,7 @@ TEST_CASE("basic_declaration_bad_type", "[checker]") {
     ast::Node& ast_exp = ast_decl.expression;
     checker.visit_declaration(ast_decl);
 
-    REQUIRE(checker.error_reporter.failed);
-    REQUIRE(checker.error_reporter.errors.size() == 1);
+    REQUIRE_CHECKER_ONE_ERROR();
     Error& error = *checker.error_reporter.errors.back();
     // ast::Number node(NumberType::INTEGER, "9", _POS, _POS);
     sem::TypeObject expected("Boolean");
@@ -105,8 +104,7 @@ TEST_CASE("error_redeclared", "[checker]") {
     CHECKER();
     checker.visit_function(module.ast->functions[0]);
 
-    REQUIRE(checker.error_reporter.failed);
-    REQUIRE(checker.error_reporter.errors.size() == 1);
+    REQUIRE_CHECKER_ONE_ERROR();
     Error& error = *checker.error_reporter.errors.back();
     ast::Number node(NumberType::INTEGER, "9", _POS, _POS);
     ast::ObjectType expected("Boolean");
@@ -134,8 +132,7 @@ TEST_CASE("list_bad", "[checker]") {
     ast::List& ast_list = (ast::List&) ast_decl.expression;
     checker.visit_function(module.ast->functions[0]);
 
-    REQUIRE(checker.error_reporter.failed);
-    REQUIRE(checker.error_reporter.errors.size() == 1);
+    REQUIRE_CHECKER_ONE_ERROR();
     Error& error = *checker.error_reporter.errors.back();
 
     sem::TypeObject expected("Integer");
@@ -170,8 +167,7 @@ TEST_CASE("dict_key_type_error", "[checker]") {
     CHECKER();
     checker.visit_function(module.ast->functions[0]);
 
-    REQUIRE(checker.error_reporter.failed);
-    REQUIRE(checker.error_reporter.errors.size() == 1);
+    REQUIRE_CHECKER_ONE_ERROR();
 }
 
 TEST_CASE("dict_value_type_error", "[checker]") {
@@ -180,8 +176,7 @@ TEST_CASE("dict_value_type_error", "[checker]") {
     CHECKER();
     checker.visit_function(module.ast->functions[0]);
 
-    REQUIRE(checker.error_reporter.failed);
-    REQUIRE(checker.error_reporter.errors.size() == 1);
+    REQUIRE_CHECKER_ONE_ERROR();
 }
 
 
@@ -312,8 +307,7 @@ TEST_CASE("decl_error_expected_expression", "[checker]") {
     ast::Declaration& declaration_node = (ast::Declaration&) *function_node.body->nodes[0];
     checker.visit_function(function_node);
 
-    REQUIRE(checker.error_reporter.failed);
-    REQUIRE(checker.error_reporter.errors.size() == 1);
+    REQUIRE_CHECKER_ONE_ERROR();
 
     Error& error = *checker.error_reporter.errors.back();
     // Class cl;
@@ -337,8 +331,7 @@ TEST_CASE("error_no_member", "[checker]") {
     ast::Declaration& declaration_node = (ast::Declaration&) *function_node.body->nodes[0];
     checker.visit_root(*module.ast);
 
-    REQUIRE(checker.error_reporter.failed);
-    REQUIRE(checker.error_reporter.errors.size() == 1);
+    REQUIRE_CHECKER_ONE_ERROR();
 
     Error& error = *checker.error_reporter.errors.back();
     ModuleMember module_member = module.get(Path("Foo"));
@@ -405,8 +398,7 @@ TEST_CASE("binop_type_error", "[checker]") {
     ast::BinaryOp& ast_binop = (ast::BinaryOp&) ast_decl.expression;
     USemanticInfo info = checker.dispatch_rvalue(ast_binop);
 
-    REQUIRE(checker.error_reporter.failed);
-    REQUIRE(checker.error_reporter.errors.size() == 1);
+    REQUIRE_CHECKER_ONE_ERROR();
 
     Error& error = *checker.error_reporter.errors.back();
     sem::TypeObject expected("Integer");
@@ -424,8 +416,7 @@ TEST_CASE("binop_error", "[checker]") {
     ast::Node& expression = ((ast::Declaration&) *(module.ast->functions[0].get().body->nodes[0])).expression;
     USemanticInfo info = checker.dispatch_rvalue(expression);
 
-    REQUIRE(checker.error_reporter.failed);
-    REQUIRE(checker.error_reporter.errors.size() == 1);
+    REQUIRE_CHECKER_ONE_ERROR();
 
     Error& error = *checker.error_reporter.errors.back();
     ast::UNode left = std::make_unique<ast::String>("Hello", _POS, _POS);
@@ -459,8 +450,7 @@ TEST_CASE("subscript_index_type_error", "[checker]") {
     ast::Subscript& ast_subs = (ast::Subscript&) ast_decl.expression;
     USemanticInfo info = checker.dispatch_rvalue(ast_subs);
 
-    REQUIRE(checker.error_reporter.failed);
-    REQUIRE(checker.error_reporter.errors.size() == 1);
+    REQUIRE_CHECKER_ONE_ERROR();
 
     Error& error = *checker.error_reporter.errors.back();
     sem::TypeObject expected("Integer");
@@ -475,8 +465,7 @@ TEST_CASE("subscript_no_method_error", "[checker]") {
     checker.init();
     checker.visit_root(*module.ast);
 
-    REQUIRE(checker.error_reporter.failed);
-    REQUIRE(checker.error_reporter.errors.size() == 1);
+    REQUIRE_CHECKER_ONE_ERROR();
 
     Error& error = *checker.error_reporter.errors.back();
     ast::String left("Hello", _POS, _POS);
@@ -520,8 +509,7 @@ TEST_CASE("call_args_type_error", "[checker]") {
     checker.init();
     checker.visit_root(*module.ast);
 
-    REQUIRE(checker.error_reporter.failed);
-    REQUIRE(checker.error_reporter.errors.size() == 1);
+    REQUIRE_CHECKER_ONE_ERROR();
 
 
     Error& error = *checker.error_reporter.errors.back();
@@ -562,8 +550,7 @@ TEST_CASE("union_error", "[checker]") {
     ast::Declaration& ast_decl = (ast::Declaration&) *ast_func.body->nodes[0];
     checker.visit_function(ast_func);
 
-    REQUIRE(checker.error_reporter.failed);
-    REQUIRE(checker.error_reporter.errors.size() == 1);
+    REQUIRE_CHECKER_ONE_ERROR();
 
     Error& error = *checker.error_reporter.errors.back();
     sem::TypeObject expected("Union", {new sem::TypeObject("Integer"), new sem::TypeObject("String")});
@@ -591,8 +578,7 @@ TEST_CASE("while_boolean_error", "[checker]") {
     ast::While& ast_while = (ast::While&) *ast_func.body->nodes[0];
     checker.visit_function(ast_func);
 
-    REQUIRE(checker.error_reporter.failed);
-    REQUIRE(checker.error_reporter.errors.size() == 1);
+    REQUIRE_CHECKER_ONE_ERROR();
 
 
     Error& error = *checker.error_reporter.errors.back();
@@ -658,8 +644,7 @@ TEST_CASE("if_boolean_error", "[checker]") {
     ast::If& ast_if = (ast::If&) *ast_func.body->nodes[0];
     checker.visit_function(ast_func);
 
-    REQUIRE(checker.error_reporter.failed);
-    REQUIRE(checker.error_reporter.errors.size() == 1);
+    REQUIRE_CHECKER_ONE_ERROR();
 
     Error& error = *checker.error_reporter.errors.back();
     sem::TypeObject expected("Boolean");
@@ -674,8 +659,7 @@ TEST_CASE("enum_error", "[checker]") {
     checker.init();
     checker.visit_root(*module.ast);
 
-    REQUIRE(checker.error_reporter.failed);
-    REQUIRE(checker.error_reporter.errors.size() == 1);
+    REQUIRE_CHECKER_ONE_ERROR();
 
 
     Error& error = *checker.error_reporter.errors.back();
