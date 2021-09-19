@@ -45,7 +45,8 @@ make_for_snode(ast::For& node, USemanticInfoBlock& binfo, USemanticInfo& exp_inf
     std::vector<sem::UExp> vvv;
     vvv.push_back(std::make_unique<sem::Id>(loop_list_var_id));
     vvv.push_back(std::make_unique<sem::Id>(loop_index_var_id));
-    auto* list_subscript_n = new sem::CallExp(std::make_unique<sem::Id>("libcore.libcore.List.__get_item__"),std::move(vvv));
+    auto* list_subscript_n = new sem::CallExp(std::make_unique<sem::Id>("libcore.libcore.List.__get_item__"),
+                                              std::move(vvv));
 
     sem::UExp ul(list_subscript_n);
     auto loop_elem_sn = std::make_unique<sem::Declaration>(node.var, std::move(ul));
@@ -57,19 +58,15 @@ make_for_snode(ast::For& node, USemanticInfoBlock& binfo, USemanticInfo& exp_inf
     return bbn;
 }
 
-USemanticInfo Checker::visit_enum(ast::EnumNode& p_node) {
+std::unique_ptr<sem::EnumDef> Checker::visit_enum(ast::EnumNode& p_node) {
     USemanticInfo info_u = std::make_unique<SemanticInfo>();
-    SemanticInfo& info = *info_u;
     Enum* enumm = ((EntityEnum&) this->scope->get(p_node.id)).enumm;
     auto esn = std::make_unique<sem::EnumDef>(enumm->path.as_str(), p_node.values);
-    info.top_snode = std::move(esn);
-    return info_u;
+    return esn;
 }
 
-USemanticInfo Checker::visit_class(ast::Klass& node) {
+std::unique_ptr<sem::KlassDef> Checker::visit_class(ast::Klass& node) {
     this->error_reporter.current_class = node.class_name;
-    USemanticInfo info_u = std::make_unique<SemanticInfo>();
-    SemanticInfo& info = *info_u;
     this->add_this = true;
     ast::VectorOfTypes tp;
     std::string cn = node.class_name;
@@ -86,7 +83,7 @@ USemanticInfo Checker::visit_class(ast::Klass& node) {
     this->add_this = false;
     auto sn = std::make_unique<sem::KlassDef>(node.class_name, node.members_ordered);
     for (auto& m: node.methods) {
-        sem::UCommon ms = std::move(this->visit_function(*m.second->method)->snode);
+        auto ms = this->visit_function(*m.second->method);
         std::unique_ptr<sem::FunctionDef> sf((sem::FunctionDef*) ms.release());
         sn->methods.emplace_back(std::move(sf));
     }
@@ -139,8 +136,7 @@ USemanticInfo Checker::visit_class(ast::Klass& node) {
     //
     // this->add_this = false;
     // this->error_reporter.current_class = "";
-    info.top_snode = std::move(sn);
-    return info_u;
+    return sn;
 }
 
 void Checker::init() {
@@ -170,9 +166,9 @@ USemanticInfoModule Checker::visit_root(ast::Module& node) {
     SemanticInfoModule& info = *info_u;
     auto sn = std::make_unique<sem::Module>();
     for (auto& n: node.all) {
-        USemanticInfo sinfo_p = this->dispatch(*n);
+        std::unique_ptr<sem::Top> sinfo_p = this->dispatch_top(*n);
 
-        sn->nodes.push_back(std::move(sinfo_p->top_snode));
+        sn->nodes.push_back(std::move(sinfo_p));
 
         // if (n->ntype == NodeType::BLOCK) {
         // } else {
@@ -252,10 +248,8 @@ USemanticInfoBlock Checker::visit_block(ast::Block& node) {
     return info_u;
 }
 
-USemanticInfo Checker::visit_function(ast::Function& n) {
+std::unique_ptr<sem::FunctionDef> Checker::visit_function(ast::Function& n) {
     this->error_reporter.current_function = n.identifier;
-    USemanticInfo info_u = std::make_unique<SemanticInfo>();
-    SemanticInfo& info = *info_u;
     // Logger::info("Checking FunctionNode " + n.identifier);
     std::string& function_name = n.identifier;
     this->enter_scope(function_name);
@@ -323,7 +317,6 @@ USemanticInfo Checker::visit_function(ast::Function& n) {
     }
     this->leave_scope();
     auto sn = std::make_unique<sem::FunctionDef>(n.path.as_vec().back(), params, std::move(bn));
-    info.top_snode = std::move(sn);
     if (returnType != T_NONE) {
         if (!n.body->nodes.empty()) {
             ast::Node& last_node = *n.body->nodes.back();
@@ -332,14 +325,16 @@ USemanticInfo Checker::visit_function(ast::Function& n) {
                 this->error_reporter.error(std::make_unique<ErrorFunctionReturnLastStmt>(function_name,
                                                                                          *returnType.to_sem(),
                                                                                          last_node.start));
-                return error_stub();
+                return nullptr;
+                // return error_stub();
             }
         } else {
             this->error_reporter.error(std::make_unique<ErrorFunctionReturnLastStmt>(function_name,
                                                                                      *returnType.to_sem(),
                                                                                      n.start));
-            return error_stub();
+            // return error_stub();
+            return nullptr;
         }
     }
-    return info_u;
+    return sn;
 }

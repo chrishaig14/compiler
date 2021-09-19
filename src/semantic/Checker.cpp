@@ -18,7 +18,8 @@ bool function_is_generic(const sem::TypeFunction& ft) {
     return false;
 }
 
-Checker::Checker(Package& top_package, Module& module) : module(module), error_reporter(module.code_lines), top_package(top_package) {
+Checker::Checker(Package& top_package, Module& module)
+        : module(module), error_reporter(module.code_lines), top_package(top_package) {
     this->is_call = false;
     this->scope = new SymbolTable("global", nullptr);
     this->scopes["global"] = this->scope;
@@ -247,7 +248,7 @@ Class* Checker::instantiate_generic(const Class& generic, const ast::ObjectType&
             ast::UTypeNode concrete_type = make_type(*t, replacements);
             this->module.fill_actual(*concrete_type);
             auto cf = std::make_unique<ConstFunction>(method_cf.second->path,
-                                                       sem::UTypeFunction((sem::TypeFunction*) concrete_type->to_sem()));
+                                                      sem::UTypeFunction((sem::TypeFunction*) concrete_type->to_sem()));
             std::cout << "Instantiated generic method " << method_cf.first << " : " << cf->const_function_ft.to_string()
                       << std::endl;
             concrete_methods[method_cf.first] = std::move(cf);
@@ -331,12 +332,23 @@ USemanticInfo Checker::dispatch(ast::Node& nod) {
     return this->dispatch_any(nod, false);
 }
 
+std::unique_ptr<sem::Top> Checker::dispatch_top(ast::Node& n) {
+    switch (n.ntype) {
+        case NodeType::CLS:
+            return this->visit_class((ast::Klass&) n);
+        case NodeType::FUNC:
+            return this->visit_function((ast::Function&) n);
+        case NodeType::ENUM:
+            return this->visit_enum((ast::EnumNode&) n);
+        default:
+            throw std::runtime_error("Unexpected top!");
+    }
+}
+
 USemanticInfo Checker::dispatch_any(ast::Node& n, bool is_rvalue) {
     switch (n.ntype) {
         case NodeType::ASSIGN:
             return this->visit_assignment((ast::Assignment&) n);
-        case NodeType::ENUM:
-            return this->visit_enum((ast::EnumNode&) n);
         case NodeType::BINOP: {
             auto r = this->visit_binop((ast::BinaryOp&) n);
             return r;
@@ -349,8 +361,6 @@ USemanticInfo Checker::dispatch_any(ast::Node& n, bool is_rvalue) {
             return this->visit_break((ast::Break&) n);
         case NodeType::CALL:
             return this->visit_call((ast::Call&) n, is_rvalue);
-        case NodeType::CLS:
-            return this->visit_class((ast::Klass&) n);
         case NodeType::CNTINUE:
             return this->visit_continue((ast::Continue&) n);
         case NodeType::DECL:
@@ -359,8 +369,6 @@ USemanticInfo Checker::dispatch_any(ast::Node& n, bool is_rvalue) {
             return this->visit_emptylist((ast::EmptyList&) n);
         case NodeType::FORLOOP:
             return this->visit_for((ast::For&) n);
-        case NodeType::FUNC:
-            return this->visit_function((ast::Function&) n);
         case NodeType::ID:
             return this->visit_id((ast::Id&) n);
         case NodeType::CAST:

@@ -119,7 +119,6 @@ public:
     USemanticInfo visit_boolean(ast::Boolean& node);
     USemanticInfo visit_break(ast::Break& node);
     USemanticInfo visit_call(ast::Call& n, bool is_rvalue);
-    USemanticInfo visit_class(ast::Klass& node);
     USemanticInfo visit_continue(ast::Continue& node);
 
     USemanticInfo visit_lvalue_subscript(ast::Subscript& node);
@@ -133,7 +132,6 @@ public:
     USemanticInfo visit_emptylist(ast::EmptyList& node);
     USemanticInfo visit_unary(ast::UnaryOp& n);
     USemanticInfo visit_for(ast::For& node);
-    USemanticInfo visit_function(ast::Function& n);
     USemanticInfo visit_id(ast::Id& n);
     USemanticInfo visit_if(ast::If& n);
     USemanticInfo visit_list(ast::List& node);
@@ -151,6 +149,10 @@ public:
     USemanticInfo visit_cast(ast::Cast& n);
     USemanticInfo visit_defconst(ast::DefaultConstructor& node);
 
+    std::unique_ptr<sem::FunctionDef> visit_function(ast::Function& n);
+    std::unique_ptr<sem::KlassDef> visit_class(ast::Klass& node);
+    std::unique_ptr<sem::EnumDef> visit_enum(ast::EnumNode& p_node);
+
 
     USemanticInfo object_member(sem::UExp object_snode, Value& p_value, const std::string& child, ast::Member& n);
     USemanticInfo class_member(Class* cls, const std::string& child, ast::Member& n);
@@ -161,7 +163,6 @@ public:
     USemanticInfo visit_match(ast::Match& node);
     USemanticInfo visit_alias(ast::Alias& p_node);
     USemanticInfo enum_member(Enum* enumm, const std::string& value, ast::Member& node);
-    USemanticInfo visit_enum(ast::EnumNode& p_node);
     sem::UExp make_rvalue(const Entity& t_entity, sem::UExp value_snode, const sem::Type& target);
     USemanticInfo dispatch(ast::Node& nod);
     void fill_value(Value& value);
@@ -176,7 +177,7 @@ public:
     sem::UExp make_union_rvalue(sem::UExp value_snode, const sem::Type* unaliased_value_type,
                                 const sem::Type* unaliased_target_type) const;
     sem::Common* make_option_rvalue(sem::Common* value_snode, const ast::Type* unaliased_value_type,
-                                   const ast::Type* unaliased_target_type) const;
+                                    const ast::Type* unaliased_target_type) const;
     // USemanticInfo visit_throw(ast::ThrowNode& n);
 
     USemanticInfo dispatch_any(ast::Node& n, bool is_rvalue);
@@ -187,6 +188,7 @@ public:
     void init();
     sem::Exp* make_option_rvalue(sem::Exp* value_snode, const ast::Type* unaliased_value_type,
                                  const ast::Type* unaliased_target_type) const;
+    std::unique_ptr<sem::Top> dispatch_top(ast::Node& n);
 };
 
 #endif //CHECKER_H

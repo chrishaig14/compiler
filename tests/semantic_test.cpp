@@ -41,12 +41,12 @@ std::unique_ptr<Compiler> c_analyze(std::string code) {
 TEST_CASE("semantic_output_basic_function", "[checker]") {
     std::string code = "fun foo()->Integer{return 0;}";
     CHECKER();
-    USemanticInfo info = checker.visit_function(module.ast->functions[0]);
+    auto sem_func = checker.visit_function(module.ast->functions[0]);
     REQUIRE_CHECKER_OK();
     std::unique_ptr<sem::Block> b = std::make_unique<sem::Block>();
     b->nodes.emplace_back(std::make_unique<sem::Return>(std::make_unique<sem::Integer>("0")));
     auto exp = sem::FunctionDef("foo", VectorOfStrings{}, std::move(b));
-    REQUIRE(*info->top_snode == exp);
+    REQUIRE(*sem_func == exp);
 }
 
 TEST_CASE("semantic_output_basic_declaration", "[checker]") {
@@ -130,40 +130,42 @@ TEST_CASE("semantic_output_object_member", "[checker]") {
     std::string code = "class Foo {bar: Integer;} fun foo(f:Foo)->Integer{var x = f.bar;return 0;}";
 
     CHECKER()
-    USemanticInfo info = checker.visit_function(module.ast->functions[0]);
+    auto sem_func = checker.visit_function(module.ast->functions[0]);
+
     REQUIRE_CHECKER_OK();
     std::vector<sem::UExp> e;
     auto exp = sem::Declaration("x",
                                 std::make_unique<sem::ObjectMember>(std::make_unique<sem::Id>("f"),
                                                                     Path("test.tmp.Foo"),
                                                                     "bar"));
-    REQUIRE(*(*(std::unique_ptr<sem::FunctionDef>&) info->top_snode).body->nodes[0] == exp);
+    REQUIRE(*sem_func->body->nodes[0] == exp);
 }
 
 TEST_CASE("semantic_output_object_method_call", "[checker]") {
     std::string code = "class Foo {bar: Integer;fun get_foo()->Integer{return 0;}} fun foo(f:Foo)->Integer{var x = f.get_foo();return 0;}";
 
     CHECKER()
-    USemanticInfo info = checker.visit_function(module.ast->functions[0]);
+    auto sem_func = checker.visit_function(module.ast->functions[0]);
+
     REQUIRE_CHECKER_OK();
     std::vector<sem::UExp> e;
     auto exp = sem::Declaration("x",
                                 std::make_unique<sem::CallExp>(std::make_unique<sem::ObjectMethod>(std::make_unique<sem::Id>(
                                         "f"), Path("test.tmp.Foo"), "get_foo"), std::vector<sem::UExp>()));
-    REQUIRE(*(static_cast<sem::FunctionDef&>(*info->top_snode)).body->nodes[0] == exp);
+    REQUIRE(*sem_func->body->nodes[0] == exp);
 }
 
 TEST_CASE("semantic_output_object_method", "[checker]") {
     std::string code = "class Foo {bar: Integer;fun get_foo()->Integer{return 0;}} fun foo(f:Foo)->Integer{var x = f.get_foo;return 0;}";
 
     CHECKER()
-    USemanticInfo info = checker.visit_function(module.ast->functions[0]);
+    auto sem_func = checker.visit_function(module.ast->functions[0]);
     REQUIRE_CHECKER_OK();
     auto exp = sem::Declaration("x",
                                 std::make_unique<sem::ObjectMethod>(std::make_unique<sem::Id>("f"),
                                                                     Path("test.tmp.Foo"),
                                                                     "get_foo"));
-    REQUIRE(*(*(std::unique_ptr<sem::FunctionDef>&) info->top_snode).body->nodes[0] == exp);
+    REQUIRE(*sem_func->body->nodes[0] == exp);
 }
 
 TEST_CASE("semantic_output_assign_const_function", "[checker]") {
@@ -179,10 +181,10 @@ TEST_CASE("semantic_output_assign_const_function", "[checker]") {
     }
     Checker checker(c.top_package, module);
     checker.init();
-    USemanticInfo info = checker.visit_function(module.ast->functions[1]);
+    auto sem_func = checker.visit_function(module.ast->functions[1]);
     REQUIRE_CHECKER_OK();
     auto exp = sem::Declaration("x", std::make_unique<sem::ConstFunction>(Path("test.tmp.bar")));
-    REQUIRE(*(*(std::unique_ptr<sem::FunctionDef>&) info->top_snode).body->nodes[0] == exp);
+    REQUIRE(*sem_func->body->nodes[0] == exp);
 }
 
 TEST_CASE("semantic_output_const_function_call", "[checker]") {
@@ -198,13 +200,13 @@ TEST_CASE("semantic_output_const_function_call", "[checker]") {
     }
     Checker checker(c.top_package, module);
     checker.init();
-    USemanticInfo info = checker.visit_function(module.ast->functions[1]);
+    auto sem_func = checker.visit_function(module.ast->functions[1]);
     REQUIRE_CHECKER_OK();
     std::vector<sem::UExp> e;
     auto exp = sem::Declaration("x",
                                 std::make_unique<sem::CallExp>(std::make_unique<sem::ConstFunction>(Path("test.tmp.bar")),
                                                                std::vector<sem::UExp>{}));
-    REQUIRE(*(*(std::unique_ptr<sem::FunctionDef>&) info->top_snode).body->nodes[0] == exp);
+    REQUIRE(*sem_func->body->nodes[0] == exp);
 }
 
 TEST_CASE("semantic_output_while", "[checker]") {
@@ -220,12 +222,12 @@ TEST_CASE("semantic_output_while", "[checker]") {
     }
     Checker checker(c.top_package, module);
     checker.init();
-    USemanticInfo info = checker.visit_function(module.ast->functions[0]);
+    auto sem_func = checker.visit_function(module.ast->functions[0]);
     REQUIRE_CHECKER_OK();
     auto block = std::make_unique<sem::Block>();
     block->nodes.emplace_back(new sem::Declaration("x", std::make_unique<sem::Integer>("1")));
     auto exp = sem::While(std::make_unique<sem::Bool>(true), std::move(block));
-    REQUIRE(*static_cast<sem::FunctionDef&>(*info->top_snode).body->nodes[0] == exp);
+    REQUIRE(*sem_func->body->nodes[0] == exp);
 }
 
 
@@ -366,14 +368,13 @@ TEST_CASE("semantic_output_if", "[checker]") {
     CHECKER()
     checker.init();
     ast::Function& ast_func = module.ast->functions[0];
-    USemanticInfo info = checker.visit_function(ast_func);
-    sem::FunctionDef& sem_func = (sem::FunctionDef&) *info->top_snode;
+    auto sem_func = checker.visit_function(ast_func);
 
     REQUIRE_CHECKER_OK()
 
     auto block = std::make_unique<sem::Block>();
     block->nodes.push_back(std::make_unique<sem::Declaration>("x", std::make_unique<sem::Integer>("1")));
-    REQUIRE(*sem_func.body->nodes[0] == sem::If(std::make_unique<sem::Bool>(true), std::move(block), {}, nullptr));
+    REQUIRE(*sem_func->body->nodes[0] == sem::If(std::make_unique<sem::Bool>(true), std::move(block), {}, nullptr));
 }
 
 TEST_CASE("semantic_output_enum_def", "[checker]") {
