@@ -6,7 +6,7 @@
 #define XLANG_TERNARY_H
 
 
-#include "../../expressions/include/Exp.h"
+#include "Exp.h"
 
 class sem::Ternary : public sem::Exp {
 

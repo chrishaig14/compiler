@@ -7,7 +7,8 @@
 
 
 #include <string>
-#include "../../expressions/include/Exp.h"
+#include "Exp.h"
+
 
 class sem::String : public sem::Exp {
 public:

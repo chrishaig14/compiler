@@ -7,7 +7,7 @@
 
 
 #include <string>
-#include "../../expressions/include/Exp.h"
+#include "Exp.h"
 
 class sem::EnumMember : public sem::Exp {
 public:

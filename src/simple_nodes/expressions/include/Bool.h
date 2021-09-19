@@ -6,7 +6,7 @@
 #define XLANG_BOOL_H
 
 
-#include "../../expressions/include/Exp.h"
+#include "Exp.h"
 
 class sem::Bool : public sem::Exp {
 

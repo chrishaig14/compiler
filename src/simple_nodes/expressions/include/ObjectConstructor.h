@@ -6,7 +6,7 @@
 #define XLANG_OBJECTCONSTRUCTOR_H
 
 
-#include "../../expressions/include/Exp.h"
+#include "Exp.h"
 #include "../../../ast/Path.h"
 
 class sem::ObjectConstructor : public sem::Exp {

@@ -7,7 +7,7 @@
 
 
 #include <vector>
-#include "../../expressions/include/Exp.h"
+#include "Exp.h"
 #include <cassert>
 
 class sem::List : public sem::Exp {

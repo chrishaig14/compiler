@@ -6,7 +6,7 @@
 #define XLANG_NONE_H
 
 
-#include "../../expressions/include/Exp.h"
+#include "Exp.h"
 
 class sem::None : public sem::Exp {
 public:

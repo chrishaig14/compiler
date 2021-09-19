@@ -6,7 +6,7 @@
 #define XLANG_OBJECTMETHOD_H
 
 #include <string>
-#include "../../expressions/include/Exp.h"
+#include "Exp.h"
 #include "../../../ast/Type.h"
 #include "../../../ast/Path.h"
 
