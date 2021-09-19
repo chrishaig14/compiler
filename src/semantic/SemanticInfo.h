@@ -41,17 +41,6 @@ public:
     bool is_error();
 };
 
-class SemanticInfoBlock {
-public:
-    std::unique_ptr<sem::Block> snode;
-};
-
-class SemanticInfoModule {
-public:
-    std::unique_ptr<sem::Module> snode;
-};
-
-
 class ErrorStub : public SemanticInfo {
 public:
     ErrorStub();

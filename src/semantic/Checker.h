@@ -51,8 +51,6 @@
 #define T_NONE ast::ObjectType(".None")
 
 typedef std::unique_ptr<SemanticInfo> USemanticInfo;
-typedef std::unique_ptr<SemanticInfoBlock> USemanticInfoBlock;
-typedef std::unique_ptr<SemanticInfoModule> USemanticInfoModule;
 
 
 bool is_generic(const sem::Type& t);
