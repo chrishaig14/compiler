@@ -17,12 +17,7 @@ public:
     std::string id;
     VectorOfStrings values;
 
-    bool equals(const SNode& o) const override {
-        auto& other = (const EnumDef&) o;
-        bool id_ok = this->id == other.id;
-        bool values_ok = this->values == other.values;
-        return id_ok && values_ok;
-    }
+    bool equals(const SNode& o) const override;
 };
 
 

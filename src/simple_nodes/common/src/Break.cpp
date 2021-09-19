@@ -8,3 +8,7 @@ using namespace sem;
 
 Break::Break() : SNode(SNodeType::BREAK) {
 }
+
+bool Break::equals(const SNode& o) const {
+    return true;
+}

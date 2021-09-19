@@ -15,9 +15,7 @@ public:
     std::vector<std::string> reachables;
     Break();
 
-    bool equals(const SNode& o) const override {
-        return true;
-    }
+    bool equals(const SNode& o) const override;
 };
 
 

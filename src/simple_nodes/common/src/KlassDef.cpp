@@ -4,3 +4,22 @@
 
 #include "../include/KlassDef.h"
 using namespace sem;
+
+bool KlassDef::equals(const SNode& o) const {
+    auto& other = (const KlassDef&) o;
+    if (this->identifier != other.identifier) {
+        return false;
+    }
+    if (this->members.size() != other.members.size()) {
+        return false;
+    }
+    for (size_t i = 0; i < this->members.size(); i++) {
+        if (this->members[i] != other.members[i]) {
+            return false;
+        }
+    }
+    return true;
+}
+
+KlassDef::KlassDef(std::string identifier, VectorOfStrings members) : SNode(SNodeType::CLASS), identifier(identifier), members(members) {
+}

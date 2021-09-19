@@ -8,3 +8,7 @@ using namespace sem;
 
 Continue::Continue() : SNode(SNodeType::CONTINUE) {
 }
+
+bool Continue::equals(const SNode& o) const {
+    return true;
+}

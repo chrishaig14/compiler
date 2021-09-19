@@ -4,3 +4,10 @@
 
 #include "../include/TryCatch.h"
 using namespace sem;
+
+TryCatch::TryCatch(Block* body, std::vector<std::pair<std::string, std::string>> e_names_types,
+                   std::vector<SNode*> catches_bodies) : SNode(SNodeType::TRY_CATCH) {
+    this->body = body;
+    this->catches_bodies = catches_bodies;
+    this->e_names_types = e_names_types;
+}

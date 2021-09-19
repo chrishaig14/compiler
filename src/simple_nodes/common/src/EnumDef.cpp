@@ -10,3 +10,10 @@ EnumDef::EnumDef(const std::string& id, VectorOfStrings values) : SNode(SNodeTyp
     this->id = id;
     this->values = values;
 }
+
+bool EnumDef::equals(const SNode& o) const {
+    auto& other = (const EnumDef&) o;
+    bool id_ok = this->id == other.id;
+    bool values_ok = this->values == other.values;
+    return id_ok && values_ok;
+}

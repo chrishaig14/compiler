@@ -14,11 +14,7 @@ public:
     UExp rvalue;
     Assignment(UExp lvalue, UExp rvalue);
 
-    bool equals(const SNode& o) const override {
-        // auto& other = (const Declaration&) o;
-        // return this->identifier == other.identifier && *this->expression == *other.expression;
-        return false;
-    }
+    bool equals(const SNode& o) const override;
 };
 
 

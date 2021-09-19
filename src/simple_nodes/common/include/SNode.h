@@ -17,16 +17,9 @@ public:
 
     virtual bool equals(const SNode& o) const = 0;
 
-    bool operator!=(const SNode& other) const {
-        return !(*this == other);
-    }
+    bool operator!=(const SNode& other) const;
 
-    bool operator==(const SNode& other) const {
-        if (this->type != other.type) {
-            return false;
-        }
-        return this->equals(other);
-    }
+    bool operator==(const SNode& other) const;
 
     virtual ~SNode() = default;
 };
