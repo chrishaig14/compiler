@@ -6,9 +6,9 @@
 #define XLANG_FUNCTIONDEF_H
 
 #include <string>
-#include "Common.h"
+#include "../../common/include/Common.h"
 #include "../../../types.h"
-#include "Block.h"
+#include "../../common/include/Block.h"
 
 class sem::FunctionDef : public sem::Common {
 public:

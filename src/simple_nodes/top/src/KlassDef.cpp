@@ -3,6 +3,7 @@
 //
 
 #include "../include/KlassDef.h"
+
 using namespace sem;
 
 bool KlassDef::equals(const Common& o) const {
@@ -21,5 +22,6 @@ bool KlassDef::equals(const Common& o) const {
     return true;
 }
 
-KlassDef::KlassDef(std::string identifier, VectorOfStrings members) : Common(CommonType::CLASS), identifier(identifier), members(members) {
+KlassDef::KlassDef(std::string identifier, VectorOfStrings members)
+        : Common(CommonType::CLASS), identifier(identifier), members(members) {
 }

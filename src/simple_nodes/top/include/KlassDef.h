@@ -7,7 +7,7 @@
 
 
 #include <string>
-#include "Common.h"
+#include "../../common/include/Common.h"
 #include "FunctionDef.h"
 
 class sem::KlassDef : public sem::Common {

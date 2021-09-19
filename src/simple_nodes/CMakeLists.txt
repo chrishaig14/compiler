@@ -16,8 +16,8 @@ add_library(
     common/include/Break.h
     common/src/Call.cpp
     common/include/Call.h
-    common/src/KlassDef.cpp
-    common/include/KlassDef.h
+    top/src/KlassDef.cpp
+    top/include/KlassDef.h
     common/src/Continue.cpp
     common/include/Continue.h
     common/src/Declaration.cpp
@@ -26,14 +26,14 @@ add_library(
     expressions/include/Dict.h
     expressions/src/EnumMember.cpp
     expressions/include/EnumMember.h
-    common/src/EnumDef.cpp
-    common/include/EnumDef.h
+    top/src/EnumDef.cpp
+    top/include/EnumDef.h
     expressions/src/Float.cpp
     expressions/include/Float.h
-    common/src/FunctionDef.cpp
-    common/src/FunctionDef.cpp
-    common/include/FunctionDef.h
-    common/include/FunctionDef.h
+    top/src/FunctionDef.cpp
+    top/src/FunctionDef.cpp
+    top/include/FunctionDef.h
+    top/include/FunctionDef.h
     expressions/src/Id.cpp
     expressions/include/Id.h
     common/src/If.cpp

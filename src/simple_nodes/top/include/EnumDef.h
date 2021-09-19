@@ -7,7 +7,7 @@
 
 
 #include <string>
-#include "Common.h"
+#include "../../common/include/Common.h"
 #include "../../../types.h"
 
 class sem::EnumDef : public sem::Common {
