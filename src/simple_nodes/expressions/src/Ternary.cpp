@@ -11,3 +11,8 @@ Ternary::Ternary(Exp* ext, Exp* true_case, Exp* false_case) : Exp(ExpType::TERNA
     this->true_case = true_case;
     this->false_case = false_case;
 }
+
+bool Ternary::equals(const Exp& o) const {
+    // auto& other = (const Ternary&) o;
+    return false;
+}

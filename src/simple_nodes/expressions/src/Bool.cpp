@@ -9,3 +9,8 @@ using namespace sem;
 Bool::Bool(bool v) : Exp(ExpType::BOOLEAN) {
     this->v = v;
 }
+
+bool Bool::equals(const Exp& o) const {
+    auto& other = (const Bool&) o;
+    return this->v == other.v;
+}

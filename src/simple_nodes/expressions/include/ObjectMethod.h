@@ -16,18 +16,9 @@ public:
     Path class_path;
     std::string method_name;
 
-    ObjectMethod(UExp object, Path class_path, std::string method_name)
-            : Exp(ExpType::OBJECT_METHOD), object(std::move(object)), class_path(class_path),
-              method_name(method_name) {
-    }
+    ObjectMethod(UExp object, Path class_path, std::string method_name);
 
-    bool equals(const Exp& o) const override {
-        auto& other = (const ObjectMethod&) o;
-        bool obj_ok = *this->object == *other.object;
-        bool class_ok = this->class_path.as_str() == other.class_path.as_str();
-        bool member_ok = this->method_name == other.method_name;
-        return obj_ok && class_ok && member_ok;
-    }
+    bool equals(const Exp& o) const override;
 
 };
 

@@ -16,19 +16,7 @@ public:
     std::vector<UExp> elements;
     explicit List(std::vector<UExp> elements);
 
-    bool equals(const Exp& o) const override {
-        assert(this->type == o.type);
-        auto& other = (const List&) o;
-        if (this->elements.size() != other.elements.size()) {
-            return false;
-        }
-        for (size_t i = 0; i < this->elements.size(); i++) {
-            if (*this->elements[i] != *other.elements[i]) {
-                return false;
-            }
-        }
-        return true;
-    }
+    bool equals(const Exp& o) const override;
 };
 
 

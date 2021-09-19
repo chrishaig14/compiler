@@ -9,3 +9,8 @@ using namespace sem;
 Float::Float(const std::string& s) : sem::Exp(ExpType::FLOAT) {
     this->str = s;
 }
+
+bool Float::equals(const Exp& o) const {
+    auto& other = (const Float&) o;
+    return this->str == other.str;
+}

@@ -14,10 +14,7 @@ public:
     explicit Bool(bool v);
     bool v;
 
-    bool equals(const Exp& o) const override {
-        auto& other = (const Bool&) o;
-        return this->v == other.v;
-    }
+    bool equals(const Exp& o) const override;
 };
 
 

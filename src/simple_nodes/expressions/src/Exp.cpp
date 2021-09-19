@@ -2,7 +2,7 @@
 // Created by chris on 18/9/21.
 //
 
-#include "Exp.h"
+#include "../include/Exp.h"
 
 bool sem::Exp::operator==(const sem::Exp& other) const {
     if (this->type != other.type) {

@@ -80,7 +80,7 @@ add_library(
     expressions/include/ObjectConstructor.h
     expressions/src/ObjectConstructor.cpp
     expressions/include/ObjectConstructor.h
-    expressions/include/Exp.cpp
+    expressions/src/Exp.cpp
     expressions/include/Exp.h
     expressions/include/expressions.h
     common/include/common.h)

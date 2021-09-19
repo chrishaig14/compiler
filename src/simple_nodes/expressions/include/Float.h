@@ -15,10 +15,7 @@ public:
 
     std::string str;
 
-    bool equals(const Exp& o) const override {
-        auto& other = (const Float&) o;
-        return this->str == other.str;
-    }
+    bool equals(const Exp& o) const override;
 };
 
 

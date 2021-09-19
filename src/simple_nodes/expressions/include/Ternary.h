@@ -16,10 +16,7 @@ public:
     Exp* true_case;
     Exp* false_case;
 
-    bool equals(const Exp& o) const override {
-        // auto& other = (const Ternary&) o;
-        return false;
-    }
+    bool equals(const Exp& o) const override;
 };
 
 

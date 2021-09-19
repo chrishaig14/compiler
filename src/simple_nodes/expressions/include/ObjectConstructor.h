@@ -14,7 +14,7 @@ public:
     Path class_path;
 
     explicit ObjectConstructor(Path class_path);
-    [[nodiscard]] bool equals(const Exp& o) const override;
+    bool equals(const Exp& o) const override;
 };
 
 
