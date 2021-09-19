@@ -6,10 +6,9 @@
 
 using namespace sem;
 
-ObjectConstructorCall::ObjectConstructorCall(Path class_path, std::vector<UExp> arguments)
-        : Exp(ExpType::OBJECT_CONSTRUCTOR), class_path(class_path), arguments(std::move(arguments)) {
+ObjectConstructor::ObjectConstructor(Path class_path) : Exp(ExpType::OBJECT_CONSTRUCTOR), class_path(class_path) {
 }
 
-bool ObjectConstructorCall::equals(const Exp& o) const {
-    return this->class_path.as_str() == ((const ObjectConstructorCall&) o).class_path.as_str();
+bool ObjectConstructor::equals(const Exp& o) const {
+    return this->class_path.as_str() == ((const ObjectConstructor&) o).class_path.as_str();
 }

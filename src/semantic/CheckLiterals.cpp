@@ -3,11 +3,8 @@
 //
 
 #include "CheckLiterals.h"
-#include "../simple_nodes/expressions/include/None.h"
-#include "../simple_nodes/expressions/include/Dict.h"
+#include "../simple_nodes/expressions/include/expressions.h"
 #include "../simple_nodes/common/include/TypeObject.h"
-#include "../simple_nodes/expressions/include/ObjectConstructor.h"
-#include "../simple_nodes/expressions/include/ObjectConstructorCall.h"
 #include "../simple_nodes/common/src/TypeFunction.h"
 #include "errors/ErrorExpectedExpression.h"
 #include "errors/ErrorListLiteral.h"

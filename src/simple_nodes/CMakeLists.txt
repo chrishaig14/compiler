@@ -80,7 +80,7 @@ add_library(
         expressions/include/ConstFunction.h
         expressions/src/ObjectConstructor.cpp
         expressions/include/ObjectConstructor.h
-        expressions/src/ObjectConstructorCall.cpp
-        expressions/include/ObjectConstructorCall.h
+        expressions/src/ObjectConstructor.cpp
+        expressions/include/ObjectConstructor.h
         expressions/include/Exp.cpp
-        expressions/include/Exp.h)
+        expressions/include/Exp.h expressions/include/expressions.h)
