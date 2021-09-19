@@ -41,7 +41,7 @@
 #include "../units/ObjectValue.h"
 #include "../utils.h"
 #include "CheckerUtils.h"
-#include "errors/ErrorReporter.h"
+#include "errors/include/ErrorReporter.h"
 #include "GlobalProcessor.h"
 #include "util.h"
 

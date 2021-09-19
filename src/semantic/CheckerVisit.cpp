@@ -6,8 +6,8 @@
 #include "../simple_nodes/common/include/TypeObject.h"
 #include "../simple_nodes/common/src/TypeFunction.h"
 #include "../simple_nodes/expressions/include/CallExp.h"
-#include "errors/ErrorFunctionReturnLastStmt.h"
-#include "errors/ErrorUnusedReturnValue.h"
+#include "errors/include/ErrorFunctionReturnLastStmt.h"
+#include "errors/include/ErrorUnusedReturnValue.h"
 
 sem::SNode*
 make_for_snode(ast::For& node, USemanticInfoBlock& binfo, USemanticInfo& exp_info_p, std::string loop_list_var_id,

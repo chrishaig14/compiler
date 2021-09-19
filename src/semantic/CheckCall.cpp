@@ -3,10 +3,10 @@
 //
 
 #include "CheckCall.h"
-#include "errors/ErrorTypeMismatch.h"
-#include "errors/ErrorExpectedExpression.h"
-#include "errors/ErrorNotAFunction.h"
-#include "errors/ErrorFunctionCallNumArgs.h"
+#include "errors/include/ErrorTypeMismatch.h"
+#include "errors/include/ErrorExpectedExpression.h"
+#include "errors/include/ErrorNotAFunction.h"
+#include "errors/include/ErrorFunctionCallNumArgs.h"
 #include "../simple_nodes/common/include/TypeObject.h"
 #include "../simple_nodes/expressions/include/ObjectConstructor.h"
 #include "../simple_nodes/expressions/include/CallExp.h"

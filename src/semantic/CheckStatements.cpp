@@ -10,11 +10,11 @@
 #include "../simple_nodes/common/include/TypeObject.h"
 #include "../simple_nodes/expressions/include/CallExp.h"
 #include "../simple_nodes/common/src/TypeFunction.h"
-#include "errors/ErrorTypeMismatch.h"
-#include "errors/ErrorCantAssign.h"
-#include "errors/ErrorBadReturn.h"
-#include "errors/ErrorObjectNoSpecialMethod.h"
-#include "errors/ErrorFor.h"
+#include "errors/include/ErrorTypeMismatch.h"
+#include "errors/include/ErrorCantAssign.h"
+#include "errors/include/ErrorBadReturn.h"
+#include "errors/include/ErrorObjectNoSpecialMethod.h"
+#include "errors/include/ErrorFor.h"
 
 USemanticInfo Checker::visit_lvalue_subscript(ast::Subscript& node) {
     USemanticInfo parent_p = this->dispatch_rvalue(*node.parent);

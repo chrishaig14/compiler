@@ -6,10 +6,10 @@
 #include "../simple_nodes/expressions/include/expressions.h"
 #include "../simple_nodes/common/include/TypeObject.h"
 #include "../simple_nodes/common/src/TypeFunction.h"
-#include "errors/ErrorExpectedExpression.h"
-#include "errors/ErrorListLiteral.h"
-#include "errors/ErrorPartialWrongNumArgs.h"
-#include "errors/ErrorTypeMismatch.h"
+#include "errors/include/ErrorExpectedExpression.h"
+#include "errors/include/ErrorListLiteral.h"
+#include "errors/include/ErrorPartialWrongNumArgs.h"
+#include "errors/include/ErrorTypeMismatch.h"
 
 USemanticInfo Checker::visit_boolean(ast::Boolean& node) {
     USemanticInfo info_u = std::make_unique<SemanticInfo>();

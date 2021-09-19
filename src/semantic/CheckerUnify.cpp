@@ -11,8 +11,8 @@
 #include "../simple_nodes/common/include/NewObject.h"
 #include "../units/FunctionValue.h"
 #include "../simple_nodes/expressions/include/EnumMember.h"
-#include "errors/ErrorFunctionCallNumArgs.h"
-#include "errors/ErrorEnumNoValue.h"
+#include "errors/include/ErrorFunctionCallNumArgs.h"
+#include "errors/include/ErrorEnumNoValue.h"
 
 std::pair<std::string, ast::Type*>*
 Checker::get_first_substitution_object(ast::ObjectType& a, ast::ObjectType& b, bool is_top_level_arg) {

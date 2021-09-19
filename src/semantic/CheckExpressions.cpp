@@ -8,12 +8,7 @@
 #include "../simple_nodes/expressions/include/CallExp.h"
 #include "../simple_nodes/common/include/TypeObject.h"
 #include "../simple_nodes/common/src/TypeFunction.h"
-#include "errors/ErrorNotDeclared.h"
-#include "errors/ErrorTypeMismatch.h"
-#include "errors/ErrorExpectedExpression.h"
-#include "errors/ErrorBoolOp.h"
-#include "errors/ErrorObjectNoSpecialMethod.h"
-#include "errors/ErrorClassNoMethodForOp.h"
+#include "errors/include/errors.h"
 
 Value& Checker::entity_value_from_actual_base_path_no_generic(const Path& p) {
     if (this->entity_values_no_generic.count(p.as_str()) == 0) {
