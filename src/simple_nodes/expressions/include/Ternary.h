@@ -6,17 +6,17 @@
 #define XLANG_TERNARY_H
 
 
-#include "../../common/include/SNode.h"
+#include "../../expressions/include/Exp.h"
 
-class sem::Ternary : public sem::SNode {
+class sem::Ternary : public sem::Exp {
 
 public:
-    Ternary(SNode* ext, SNode* true_case, SNode* false_case);
-    SNode* ext;
-    SNode* true_case;
-    SNode* false_case;
+    Ternary(Exp* ext, Exp* true_case, Exp* false_case);
+    Exp* ext;
+    Exp* true_case;
+    Exp* false_case;
 
-    bool equals(const SNode& o) const override {
+    bool equals(const Exp& o) const override {
         // auto& other = (const Ternary&) o;
         return false;
     }

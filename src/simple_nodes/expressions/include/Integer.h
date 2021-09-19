@@ -7,12 +7,12 @@
 
 
 #include <string>
-#include "../../common/include/SNode.h"
+#include "../../expressions/include/Exp.h"
 
-class sem::Integer : public sem::SNode {
+class sem::Integer : public sem::Exp {
 public:
     explicit Integer(const std::string& str);
-    bool equals(const SNode& o) const override;
+    bool equals(const Exp& o) const override;
     std::string str;
 };
 

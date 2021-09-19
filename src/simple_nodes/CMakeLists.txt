@@ -14,8 +14,8 @@ add_library(
         expressions/include/Bool.h
         with_unique/Break.cpp
         with_unique/Break.h
-        with_unique/Call.cpp
-        with_unique/Call.h
+        common/src/Call.cpp
+        common/include/Call.h
         common/src/KlassDef.cpp
         common/include/KlassDef.h
         with_unique/Continue.cpp
@@ -50,12 +50,14 @@ add_library(
         expressions/include/None.h
         expressions/src/ObjectMember.cpp
         expressions/include/ObjectMember.h
-        with_unique/Return.cpp
-        with_unique/Return.h
+        common/src/Return.cpp
+        common/include/Return.h
         common/src/SNode.cpp
         common/include/SNode.h
         expressions/src/String.cpp
         expressions/include/String.h
+        expressions/src/CallExp.cpp
+        expressions/include/CallExp.h
         expressions/src/Ternary.cpp
         expressions/include/Ternary.h
         common/src/Throw.cpp
@@ -69,17 +71,16 @@ add_library(
         common/include/TypeObject.h
         common/src/ObjectType.cpp
         with_unique/While.cpp
-        common/include/sem.h
-        with_unique/ObjectMethodCall.cpp
-        with_unique/ObjectMethodCall.h
+        sem.h
         expressions/src/ObjectMethod.cpp
         expressions/include/ObjectMethod.h
         with_unique/ConstFunctionCall.cpp
         with_unique/ConstFunctionCall.h
-        with_unique/ConstFunction.cpp
-        with_unique/ConstFunction.h
+        expressions/src/ConstFunction.cpp
+        expressions/include/ConstFunction.h
         expressions/src/ObjectConstructor.cpp
         expressions/include/ObjectConstructor.h
         expressions/src/ObjectConstructorCall.cpp
         expressions/include/ObjectConstructorCall.h
-)
+        expressions/include/Exp.cpp
+        expressions/include/Exp.h)

@@ -8,6 +8,7 @@
 #include "../simple_nodes/common/include/Throw.h"
 #include "../simple_nodes/common/include/TryCatch.h"
 #include "../simple_nodes/common/include/TypeObject.h"
+#include "../simple_nodes/expressions/include/CallExp.h"
 #include "../simple_nodes/common/src/TypeFunction.h"
 #include "errors/ErrorTypeMismatch.h"
 #include "errors/ErrorCantAssign.h"
@@ -53,7 +54,7 @@ USemanticInfo Checker::visit_lvalue_subscript(ast::Subscript& node) {
     if (child_sinfo->is_error()) {
         return error_stub();
     }
-    auto& child_snode = child_sinfo->snode;
+    auto& child_snode = child_sinfo->exp_snode;
 
     USemanticInfo info_u = std::make_unique<SemanticInfo>();
     SemanticInfo& info = *info_u;
@@ -63,8 +64,8 @@ USemanticInfo Checker::visit_lvalue_subscript(ast::Subscript& node) {
     info.set_entity(value.release());
 
     auto fsn = std::make_unique<sem::Id>(sub_fun_path);
-    std::vector<USNode> v;
-    v.push_back(std::move(parent_p->snode));
+    std::vector<sem::UExp> v;
+    v.push_back(std::move(parent_p->exp_snode));
     v.push_back(std::move(child_snode));
     auto csn = std::make_unique<sem::Call>(std::move(fsn), std::move(v));
     info.snode = std::move(csn);
@@ -143,26 +144,26 @@ USemanticInfo Checker::visit_assignment(ast::Assignment& n) {
     Value& l_entity_value = (Value&) linfo.entity;
 
     if (expression_info_p->entity.get().type == E_TYPE::VALUE) {
-        USNode rvalue_snode = this->make_rvalue(expression_info_p->entity,
-                                                std::move(expression_info_p->snode),
-                                                l_entity_value.type);
+        sem::UExp rvalue_snode = this->make_rvalue(expression_info_p->entity,
+                                                   std::move(expression_info_p->exp_snode),
+                                                   l_entity_value.type);
         if (rvalue_snode == nullptr) {
             this->error_reporter.error(std::make_unique<ErrorTypeMismatch>(l_entity_value.type,
                                                                            n.rvalue,
                                                                            expression_info_p->entity));
             return error_stub();
         }
-        expression_info_p->snode = std::move(rvalue_snode);
+        expression_info_p->exp_snode = std::move(rvalue_snode);
     }
 
     USemanticInfo info_u = std::make_unique<SemanticInfo>();
     SemanticInfo& info = *info_u;
     if (is_subscript) {
         info.snode = std::move(linfo_p->snode);
-        csn->arguments.push_back(std::move(expression_info_p->snode));
+        csn->arguments.push_back(std::move(expression_info_p->exp_snode));
     } else {
-        auto lu = std::move(linfo_p->snode);
-        auto eu = std::move(expression_info_p->snode);
+        auto lu = std::move(linfo_p->exp_snode);
+        auto eu = std::move(expression_info_p->exp_snode);
         info.snode = std::make_unique<sem::Assignment>(std::move(lu), std::move(eu));
     }
 
@@ -176,7 +177,7 @@ USemanticInfo Checker::visit_return(ast::Return& n) {
             this->error_reporter.error(std::make_unique<ErrorBadReturn>(n.start));
         }
         USemanticInfo info_r = std::make_unique<SemanticInfo>();
-        USNode u;
+        sem::UExp u;
         info_r->snode = std::make_unique<sem::Return>(std::move(u));
         return info_r;
     }
@@ -196,7 +197,7 @@ USemanticInfo Checker::visit_return(ast::Return& n) {
     if (expression_info_p->is_error()) {
         return error_stub();
     }
-    auto& u = expression_info_p->snode;
+    auto& u = expression_info_p->exp_snode;
     auto sn = std::make_unique<sem::Return>(std::move(u));
     for (auto& l : this->scope->get_all()) {
         sn->reachables.push_back(l.first);
@@ -278,26 +279,26 @@ USemanticInfo Checker::visit_match(ast::Match& node) {
         USemanticInfoBlock case_info = this->visit_block(case_node);
         auto& bn = (std::unique_ptr<sem::Block>&) case_info->snode;
         auto* omn = new sem::ObjectMember(std::make_unique<sem::Id>(varname), Path("libcore.libcore.Union"), "o");
-        USNode u(omn);
+        sem::UExp u(omn);
         auto dn = std::make_unique<sem::Declaration>(case_id, std::move(u));
         bn->nodes.insert(bn->nodes.begin(), std::move(dn));
         cas.emplace_back(union_index, bn.release());
         this->leave_scope();
     }
-    USNode up = std::move(exp_info->snode);
+    sem::UExp up = std::move(exp_info->exp_snode);
     auto init = std::make_unique<sem::Declaration>(varname, std::move(up));
-    auto mn = std::make_unique<sem::Match>(std::move(init), varname, cas);
-
+    // auto mn = std::make_unique<sem::Match>(std::move(init), varname, cas);
+    //
     USemanticInfo info_u = std::make_unique<SemanticInfo>();
-    SemanticInfo& info = *info_u;
-    info.snode = std::move(mn);
+    // SemanticInfo& info = *info_u;
+    // info.snode = std::move(mn);
     return info_u;
 }
 
 USemanticInfo Checker::visit_continue(ast::Continue& node) {
     auto bn = std::make_unique<sem::Block>();
     if (this->update_loop_index_snode != nullptr) {
-        bn->nodes.push_back(USNode(this->update_loop_index_snode));
+        bn->nodes.push_back(sem::USNode(this->update_loop_index_snode));
     }
     auto cn = std::make_unique<sem::Continue>();
     bn->nodes.push_back(std::move(cn));
@@ -334,15 +335,15 @@ USemanticInfo Checker::visit_for(ast::For& node) {
     std::string loop_index_var_id = "__loop_index__" + loop_c;
     std::string loop_list_len_var_id = "__loop_list_len__" + loop_c;
 
-    USNode lu;
-    USNode eu;
+    sem::UExp lu;
+    sem::UExp eu;
     auto* increment_index_sn = new sem::Assignment(std::move(lu), std::move(eu));
     this->update_loop_index_snode = increment_index_sn;
     increment_index_sn->lvalue = std::make_unique<sem::Id>(loop_index_var_id);
-    std::vector<USNode> vv;
+    std::vector<sem::UExp> vv;
     vv.push_back(std::make_unique<sem::Id>(loop_index_var_id));
-    auto inc_exp_node = std::make_unique<sem::Call>(std::make_unique<sem::Id>("libcore.libcore.Integer.__add__"),
-                                                    std::move(vv));
+    auto inc_exp_node = std::make_unique<sem::CallExp>(std::make_unique<sem::Id>("libcore.libcore.Integer.__add__"),
+                                                       std::move(vv));
     auto one_node = std::make_unique<sem::Integer>(std::string());
     one_node->str = "1";
     inc_exp_node->arguments.push_back(std::move(one_node));
@@ -361,13 +362,13 @@ USemanticInfo Checker::visit_for(ast::For& node) {
 
     USemanticInfo rinfo_p = std::make_unique<SemanticInfo>();
     auto& rinfo = *rinfo_p;
-    rinfo.snode = USNode(make_for_snode(node,
-                                        binfo,
-                                        exp_info_p,
-                                        loop_list_var_id,
-                                        loop_index_var_id,
-                                        loop_list_len_var_id,
-                                        this->update_loop_index_snode));
+    rinfo.snode = sem::USNode(make_for_snode(node,
+                                             binfo,
+                                             exp_info_p,
+                                             loop_list_var_id,
+                                             loop_index_var_id,
+                                             loop_list_len_var_id,
+                                             this->update_loop_index_snode));
     auto& pn = (std::unique_ptr<sem::Block>&) rinfo.snode;
     pn->locals.push_back(loop_list_var_id);
     this->update_loop_index_snode = nullptr;
@@ -391,7 +392,7 @@ USemanticInfo Checker::visit_while(ast::While& node) {
     if (condition_sinfo->is_error()) {
         return error_stub();
     }
-    USNode condition_snode = std::move(condition_sinfo->snode);
+    sem::UExp condition_snode = std::move(condition_sinfo->exp_snode);
 
     this->enter_scope("while");
     this->scope->is_loop = true;
@@ -420,7 +421,7 @@ USemanticInfo Checker::visit_if(ast::If& n) {
     if (condition_sinfo->is_error()) {
         return error_stub();
     }
-    auto& condition_snode = condition_sinfo->snode;
+    auto& condition_snode = condition_sinfo->exp_snode;
 
     this->enter_scope("if");
     USemanticInfoBlock body_info = this->visit_block(n.then);
@@ -430,11 +431,11 @@ USemanticInfo Checker::visit_if(ast::If& n) {
     }
     this->leave_scope();
 
-    std::vector<std::pair<USNode, std::unique_ptr<sem::Block>>> elifs;
+    std::vector<std::pair<sem::UExp, std::unique_ptr<sem::Block>>> elifs;
 
     for (auto& elif : n.elifs) {
         USemanticInfo elif_condition_sinfo = this->expect_rvalue_of_type(sem::TypeObject("Boolean"), elif.first);
-        auto& elif_condition_snode = elif_condition_sinfo->snode;
+        auto& elif_condition_snode = elif_condition_sinfo->exp_snode;
         this->enter_scope("elif");
         USemanticInfoBlock elif_block_info = this->visit_block(elif.second);
         sem::Block* bn1 = (elif_block_info->snode).release();

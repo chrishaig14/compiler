@@ -6,6 +6,6 @@
 
 using namespace sem;
 
-Bool::Bool(bool v) : SNode(SNodeType::BOOLEAN) {
+Bool::Bool(bool v) : Exp(ExpType::BOOLEAN) {
     this->v = v;
 }

@@ -6,15 +6,15 @@
 #define XLANG_OBJECTCONSTRUCTOR_H
 
 
-#include "../../common/include/SNode.h"
+#include "../../expressions/include/Exp.h"
 #include "../../../ast/Path.h"
 
-class sem::ObjectConstructor : public sem::SNode {
+class sem::ObjectConstructor : public sem::Exp {
 public:
     Path class_path;
 
     explicit ObjectConstructor(Path class_path);
-    [[nodiscard]] bool equals(const SNode& o) const override;
+    [[nodiscard]] bool equals(const Exp& o) const override;
 };
 
 

@@ -7,15 +7,15 @@
 
 
 #include <string>
-#include "../../common/include/SNode.h"
+#include "../../expressions/include/Exp.h"
 
-class sem::Float : public sem::SNode {
+class sem::Float : public sem::Exp {
 public:
     Float(const std::string& s);
 
     std::string str;
 
-    bool equals(const SNode& o) const override {
+    bool equals(const Exp& o) const override {
         auto& other = (const Float&) o;
         return this->str == other.str;
     }

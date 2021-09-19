@@ -7,16 +7,16 @@
 
 
 #include <vector>
-#include "../../common/include/SNode.h"
+#include "../../expressions/include/Exp.h"
 #include <cassert>
 
-class sem::List : public sem::SNode {
+class sem::List : public sem::Exp {
 
 public:
-    std::vector<USNode> elements;
-    explicit List(std::vector<USNode> elements);
+    std::vector<UExp> elements;
+    explicit List(std::vector<UExp> elements);
 
-    bool equals(const SNode& o) const override {
+    bool equals(const Exp& o) const override {
         assert(this->type == o.type);
         auto& other = (const List&) o;
         if (this->elements.size() != other.elements.size()) {

@@ -21,8 +21,6 @@ namespace sem {
 
     class ObjectMethod;
 
-    class ObjectMethodCall;
-
     class Break;
 
     class Call;
@@ -42,6 +40,7 @@ namespace sem {
     class Float;
 
     class ObjectConstructor;
+
     class ObjectConstructorCall;
 
     class FunctionDef;
@@ -80,16 +79,82 @@ namespace sem {
 
     class TypeFunction;
 
+    class CallExp;
+
     enum class Kind;
 
     class ObjectTypeData;
 
     class Type;
 
+    class Exp;
+
+    enum class SNodeType {
+        FUNCTION,
+        ID,
+        DECLARATION,
+        BLOCK,
+        ASSIGNMENT,
+        RETURN,
+        INTEGER,
+        CALL,
+        STRING,
+        BOOLEAN,
+        FLOAT,
+        CLASS,
+        NEW,
+        OBJECT_MEMBER,
+        WHILE,
+        LIST,
+        IF,
+        BREAK,
+        CONTINUE,
+        MATCH,
+        ENUM,
+        ENUM_MEMBER,
+        NONE,
+        TERNARY,
+        DICT,
+        THROW,
+        TRY_CATCH,
+        OBJECT_METHOD_CALL,
+        OBJECT_METHOD,
+        CONST_FUNCTION_CALL,
+        CONST_FUNCTION,
+        OBJECT_CONSTRUCTOR
+    };
+
+    enum class ExpType {
+        FUNCTION,
+        ID,
+        INTEGER,
+        CALL,
+        STRING,
+        BOOLEAN,
+        FLOAT,
+        NEW,
+        OBJECT_MEMBER,
+        LIST,
+        MATCH,
+        ENUM_MEMBER,
+        NONE,
+        TERNARY,
+        DICT,
+        OBJECT_METHOD_CALL,
+        OBJECT_METHOD,
+        CONST_FUNCTION_CALL,
+        CONST_FUNCTION,
+        OBJECT_CONSTRUCTOR
+    };
+
+    typedef std::unique_ptr<SNode> USNode;
+    typedef std::unique_ptr<Exp> UExp;
+
     typedef std::unique_ptr<TypeObject> UTypeObject;
     typedef std::unique_ptr<TypeFunction> UTypeFunction;
     typedef std::unique_ptr<Type> UType;
     typedef std::vector<UType> VectorOfUTypes;
+
     typedef std::vector<Type*> VectorOfTypes;
 
 }

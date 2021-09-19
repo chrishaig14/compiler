@@ -8,20 +8,16 @@
 
 #include <string>
 #include <vector>
-#include "SNode.h"
+#include "../../expressions/include/Exp.h"
 
-class sem::NewObject : public sem::SNode {
+class sem::NewObject : public sem::Exp {
 public:
     std::string class_name;
-    std::vector<USNode> args;
+    std::vector<UExp> args;
 
-    NewObject() : SNode(SNodeType::NEW) {
+    NewObject();
 
-    }
-
-    bool equals(const SNode& o) const override {
-        return false;
-    }
+    bool equals(const Exp& o) const override;
 };
 
 

@@ -11,9 +11,9 @@
 #include "../simple_nodes/common/include/Declaration.h"
 #include "../simple_nodes/expressions/include/Integer.h"
 #include "../simple_nodes/expressions/include/Id.h"
-#include "../simple_nodes/with_unique/Return.h"
+#include "../simple_nodes/common/include/Return.h"
 #include "../simple_nodes/with_unique/EnumDef.h"
-#include "../simple_nodes/with_unique/Call.h"
+#include "../simple_nodes/common/include/Call.h"
 #include "../simple_nodes/expressions/include/String.h"
 #include "../simple_nodes/expressions/include/Bool.h"
 #include "../simple_nodes/expressions/include/Float.h"
@@ -93,13 +93,13 @@ public:
 
     void dispatch_top(sem::SNode& node) {
         switch (node.type) {
-            case SNodeType::FUNCTION:
+            case sem::SNodeType::FUNCTION:
                 this->transpile_function((sem::FunctionDef&) (node));
                 break;
-            case SNodeType::ENUM:
+            case sem::SNodeType::ENUM:
                 this->transpile_enum((sem::EnumDef&) node);
                 break;
-            case SNodeType::CLASS:
+            case sem::SNodeType::CLASS:
                 this->transpile_class((sem::KlassDef&) node);
                 break;
             default:
@@ -138,62 +138,7 @@ public:
     CppOutputCode transpile_dict(sem::Dict& node);
     CppOutputCode transpile_try_catch(sem::TryCatch& node);
 
-    CppOutputCode dispatch(sem::SNode& node) {
-        switch (node.type) {
-            case SNodeType::BLOCK:
-                return this->transpile_block((sem::Block&) node);
-            case SNodeType::ENUM_MEMBER:
-                return this->transpile_enum_member((sem::EnumMember&) node);
-            case SNodeType::BOOLEAN:
-                return this->transpile_boolean((sem::Bool&) node);
-            case SNodeType::MATCH:
-                return this->transpile_match((sem::Match&) node);
-            case SNodeType::IF:
-                return this->transpile_if((sem::IfSNode&) node);
-            case SNodeType::BREAK:
-                return this->transpile_break((sem::Break&) node);
-            case SNodeType::CONTINUE:
-                return this->transpile_continue((sem::Continue&) node);
-            case SNodeType::ID:
-                return this->transpile_id((sem::Id&) node);
-            case SNodeType::STRING:
-                return this->transpile_string((sem::String&) node);
-            case SNodeType::CALL:
-                return this->transpile_call((sem::Call&) node);
-            case SNodeType::NEW:
-                return this->transpile_new((sem::NewObject&) node);
-            case SNodeType::DICT:
-                return this->transpile_dict((sem::Dict&) node);
-            case SNodeType::LIST:
-                return this->transpile_list((sem::List&) node);
-            case SNodeType::OBJECT_MEMBER:
-                return this->transpile_object_member((sem::ObjectMember&) node);
-            case SNodeType::DECLARATION:
-                return this->transpile_declaration((sem::Declaration&) node);
-            case SNodeType::WHILE:
-                return this->transpile_while((sem::While&) node);
-            case SNodeType::ASSIGNMENT:
-                return this->transpile_assignment((sem::Assignment&) node);
-            case SNodeType::RETURN:
-                return this->transpile_return((sem::Return&) node);
-            case SNodeType::TRY_CATCH:
-                return this->transpile_try_catch((sem::TryCatch&) node);
-            case SNodeType::THROW:
-                return this->transpile_throw((sem::Throw&) node);
-                break;
-            case SNodeType::FLOAT:
-                return this->transpile_float((sem::Float&) node);
-            case SNodeType::NONE:
-                return this->transpile_none((sem::None&) node);
-            case SNodeType::TERNARY:
-                return this->transpile_ternary((sem::Ternary&) node);
-            case SNodeType::INTEGER:
-                return this->transpile_integer((sem::Integer&) node);
-                break;
-            default:
-                throw std::runtime_error("Don't know what to do with this SNode!");
-        }
-    }
+    CppOutputCode dispatch(sem::SNode& node);
 
     CppOutputCode transpile_throw(sem::Throw& node);
     bool in_try_catch;

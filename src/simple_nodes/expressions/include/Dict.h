@@ -7,15 +7,15 @@
 
 
 #include <vector>
-#include "../../common/include/SNode.h"
+#include "../../expressions/include/Exp.h"
 
-class sem::Dict : public sem::SNode {
+class sem::Dict : public sem::Exp {
 
 public:
-    explicit Dict(std::vector<std::pair<USNode, USNode>> items);
-    std::vector<std::pair<USNode, USNode>> items;
+    explicit Dict(std::vector<std::pair<UExp, UExp>> items);
+    std::vector<std::pair<UExp, UExp>> items;
 
-    bool equals(const SNode& o) const override {
+    bool equals(const Exp& o) const override {
         auto& other = (const Dict&) o;
         // return this->identifier == other.identifier && *this->expression == *other.expression;
         if (this->items.size() != other.items.size()) {

@@ -6,15 +6,15 @@
 #define XLANG_RETURN_H
 
 
-#include "../common/include/SNode.h"
+#include "SNode.h"
 #include <vector>
 #include <string>
 
 class sem::Return : public sem::SNode {
 public:
-    USNode expression;
+    UExp expression;
     std::vector<std::string> reachables;
-    explicit Return(USNode expression);
+    explicit Return(UExp expression);
     bool equals(const SNode& o) const override;
 };
 

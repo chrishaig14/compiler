@@ -34,17 +34,18 @@ int target_union_type(const sem::TypeObject& target, const sem::Type& source) {
 }
 
 sem::FunctionDef* make_class_default_init(const std::string& class_path, const VectorOfStrings& members) {
-    auto nn = std::make_unique<sem::NewObject>();
-    nn->class_name = class_path;
-    for (const auto& m: members) {
-        auto idn = std::make_unique<sem::Id>(m);
-        nn->args.push_back(std::move(idn));
-    }
-    auto rn = std::make_unique<sem::Return>(std::move(nn));
-    auto bn = std::make_unique<sem::Block>();
-    bn->nodes.push_back(std::move(rn));
-    auto* fn = new sem::FunctionDef(class_path + ".__init__", members, std::move(bn));
-    return fn;
+    // auto nn = std::make_unique<sem::NewObject>();
+    // nn->class_name = class_path;
+    // for (const auto& m: members) {
+    //     auto idn = std::make_unique<sem::Id>(m);
+    //     nn->args.push_back(std::move(idn));
+    // }
+    // auto rn = std::make_unique<sem::Return>(std::move(nn));
+    // auto bn = std::make_unique<sem::Block>();
+    // bn->nodes.push_back(std::move(rn));
+    // auto* fn = new sem::FunctionDef(class_path + ".__init__", members, std::move(bn));
+    // return fn;
+    return nullptr;
 }
 
 
@@ -104,7 +105,7 @@ void make_not_generic(ast::ObjectType& ot) {
     }
 }
 
-USNode make_union_wrapper(int type_index, USNode expression) {
+sem::UExp make_union_wrapper(int type_index, sem::UExp expression) {
     auto new_union = std::make_unique<sem::NewObject>();
     new_union->class_name = "core_D_core_D_Union";
     auto in = std::make_unique<sem::Integer>(std::string());
@@ -115,12 +116,13 @@ USNode make_union_wrapper(int type_index, USNode expression) {
 }
 
 
-USNode make_boolop_snode(ConstFunction* operator_fun, SemanticInfo& left_info, SemanticInfo& right_info) {
-    auto function_id = std::make_unique<sem::Id>(operator_fun->path.as_str());
-    std::vector<USNode> v;
-    v.emplace_back(std::move(left_info.snode));
-    v.emplace_back(std::move(right_info.snode));
-    auto sn = std::make_unique<sem::Call>(std::move(function_id), std::move(v));
-    return sn;
+sem::UExp make_boolop_snode(ConstFunction* operator_fun, SemanticInfo& left_info, SemanticInfo& right_info) {
+    // auto function_id = std::make_unique<sem::Id>(operator_fun->path.as_str());
+    // std::vector<sem::UExp> v;
+    // v.emplace_back(std::move(left_info.snode));
+    // v.emplace_back(std::move(right_info.snode));
+    // auto sn = std::make_unique<sem::Call>(std::move(function_id), std::move(v));
+    // return sn;
+    return nullptr;
 }
 

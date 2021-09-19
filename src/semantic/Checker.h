@@ -25,7 +25,7 @@
 // #include "../logger/Logger.h"
 #include "../simple_nodes/common/include/Block.h"
 #include "../simple_nodes/with_unique/Assignment.h"
-#include "../simple_nodes/with_unique/Return.h"
+#include "../simple_nodes/common/include/Return.h"
 #include "../simple_nodes/with_unique/Continue.h"
 #include "../simple_nodes/expressions/include/Integer.h"
 #include "../simple_nodes/with_unique/FunctionDef.h"
@@ -33,12 +33,12 @@
 #include "../simple_nodes/expressions/include/Id.h"
 #include "../simple_nodes/common/include/TypeObject.h"
 #include "../simple_nodes/common/src/TypeFunction.h"
-#include "../simple_nodes/with_unique/Call.h"
+#include "../simple_nodes/common/include/Call.h"
 #include "../simple_nodes/expressions/include/String.h"
 #include "../simple_nodes/expressions/include/ObjectMethod.h"
 #include "../units/FunctionValue.h"
 #include "../simple_nodes/expressions/include/Bool.h"
-#include "../simple_nodes/with_unique/ConstFunction.h"
+#include "../simple_nodes/expressions/include/ConstFunction.h"
 #include "../simple_nodes/expressions/include/Dict.h"
 #include "../simple_nodes/expressions/include/Float.h"
 #include "../simple_nodes/common/include/KlassDef.h"
@@ -48,8 +48,6 @@
 #include "../simple_nodes/expressions/include/List.h"
 #include "../simple_nodes/with_unique/IfSNode.h"
 #include "../simple_nodes/expressions/include/ObjectMember.h"
-#include "../simple_nodes/with_unique/ObjectMethodCall.h"
-#include "../simple_nodes/with_unique/ConstFunctionCall.h"
 #include "../simple_nodes/common/include/Match.h"
 #include "CheckerUtils.h"
 #include "../ast/UnaryOp.h"
@@ -158,7 +156,7 @@ public:
     USemanticInfo visit_defconst(ast::DefaultConstructor& node);
 
 
-    USemanticInfo object_member(USNode object_snode, Value& p_value, const std::string& child, ast::Member& n);
+    USemanticInfo object_member(sem::UExp object_snode, Value& p_value, const std::string& child, ast::Member& n);
     USemanticInfo class_member(Class* cls, const std::string& child, ast::Member& n);
     USemanticInfo package_member(Package& package, const std::string& child, ast::Member& n);
     USemanticInfo module_member(Module& mod, const std::string& child, ast::Member& n);
@@ -168,19 +166,19 @@ public:
     USemanticInfo visit_alias(ast::Alias& p_node);
     USemanticInfo enum_member(Enum* enumm, const std::string& value, ast::Member& node);
     USemanticInfo visit_enum(ast::EnumNode& p_node);
-    USNode make_rvalue(const Entity& t_entity, USNode value_snode, const sem::Type& target);
+    sem::UExp make_rvalue(const Entity& t_entity, sem::UExp value_snode, const sem::Type& target);
     USemanticInfo dispatch(ast::Node& nod);
     void fill_value(Value& value);
     std::unique_ptr<SemanticInfo> expect_rvalue_of_type(const sem::Type& target, ast::Node& node);
     void process_function_arguments(SemanticInfo& retv, std::vector<std::unique_ptr<Entity>>& arg_entities,
-                                    std::vector<USNode>& arguments, ast::Call& n,
+                                    std::vector<sem::UExp>& arguments, ast::Call& n,
                                     const sem::TypeFunction& function_type, SemanticInfo* fun_info_p);
-    bool
-    check_arguments(ast::Call& n, std::vector<USNode>& arguments, std::vector<std::unique_ptr<Entity>>& arg_entities);
+    bool check_arguments(ast::Call& n, std::vector<sem::UExp>& arguments,
+                         std::vector<std::unique_ptr<Entity>>& arg_entities);
     USemanticInfo
     make_return_info(const ast::Call& n, bool is_rvalue, USemanticInfo retv, bool is_def_const, bool args_are_constant);
-    USNode make_union_rvalue(USNode value_snode, const sem::Type* unaliased_value_type,
-                             const sem::Type* unaliased_target_type) const;
+    sem::UExp make_union_rvalue(sem::UExp value_snode, const sem::Type* unaliased_value_type,
+                                const sem::Type* unaliased_target_type) const;
     sem::SNode* make_option_rvalue(sem::SNode* value_snode, const ast::Type* unaliased_value_type,
                                    const ast::Type* unaliased_target_type) const;
     // USemanticInfo visit_throw(ast::ThrowNode& n);
@@ -191,6 +189,8 @@ public:
     std::map<std::string, std::unique_ptr<Class>> classes;
     std::unique_ptr<Value> make_value(sem::Type* type);
     void init();
+    sem::Exp* make_option_rvalue(sem::Exp* value_snode, const ast::Type* unaliased_value_type,
+                                 const ast::Type* unaliased_target_type) const;
 };
 
 #endif //CHECKER_H

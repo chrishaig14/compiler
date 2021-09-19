@@ -6,14 +6,14 @@
 #define XLANG_ID_H
 
 #include <string>
-#include "../../common/include/SNode.h"
+#include "../../expressions/include/Exp.h"
 
-class sem::Id : public sem::SNode {
+class sem::Id : public sem::Exp {
 public:
     std::string identifier;
 
     explicit Id(const std::string& identifier);
-    bool equals(const SNode& o) const override;
+    bool equals(const Exp& o) const override;
 };
 
 

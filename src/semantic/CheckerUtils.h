@@ -15,8 +15,8 @@
 #include "../simple_nodes/expressions/include/Integer.h"
 #include "../simple_nodes/expressions/include/Id.h"
 #include "../simple_nodes/with_unique/IfSNode.h"
-#include "../simple_nodes/with_unique/Call.h"
-#include "../simple_nodes/with_unique/Return.h"
+#include "../simple_nodes/common/include/Call.h"
+#include "../simple_nodes/common/include/Return.h"
 #include "../ast/nodes.h"
 #include "SemanticInfo.h"
 #include "../ast/ObjectType.h"
@@ -48,10 +48,10 @@ void make_not_generic(ast::FunctionType& ft);
 void make_not_generic(ast::ObjectType& ot);
 void make_not_generic(ast::Type& t);
 
-USNode make_union_wrapper(int type_index, USNode expression);
+sem::UExp make_union_wrapper(int type_index, sem::UExp expression);
 
 
-USNode make_boolop_snode(ConstFunction* operator_fun, SemanticInfo& left_info, SemanticInfo& right_info);
+sem::UExp make_boolop_snode(ConstFunction* operator_fun, SemanticInfo& left_info, SemanticInfo& right_info);
 
 
 #endif //XLANG_CHECKERUTILS_H

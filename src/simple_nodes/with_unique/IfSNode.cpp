@@ -6,9 +6,9 @@
 
 using namespace sem;
 
-IfSNode::IfSNode(USNode condition, std::unique_ptr<Block> then,
-                 std::vector<std::pair<USNode, std::unique_ptr<Block>>> elifs, std::unique_ptr<Block> _else) : SNode(
+IfSNode::IfSNode(UExp condition, std::unique_ptr<Block> then,
+                 std::vector<std::pair<UExp, std::unique_ptr<Block>>> elifs, std::unique_ptr<Block> _else) : SNode(
         SNodeType::IF), condition(std::move(condition)), then(std::move(then)), _else(std::move(_else)),
-                                                                                                               elifs(std::move(
-                                                                                                                       elifs)) {
+                                                                                                             elifs(std::move(
+                                                                                                                     elifs)) {
 }

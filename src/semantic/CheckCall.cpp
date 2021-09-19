@@ -9,6 +9,7 @@
 #include "errors/ErrorFunctionCallNumArgs.h"
 #include "../simple_nodes/common/include/TypeObject.h"
 #include "../simple_nodes/expressions/include/ObjectConstructor.h"
+#include "../simple_nodes/expressions/include/CallExp.h"
 #include "../simple_nodes/expressions/include/ObjectConstructorCall.h"
 #include "../simple_nodes/common/src/TypeFunction.h"
 
@@ -45,7 +46,7 @@ USemanticInfo Checker::visit_call(ast::Call& n, bool is_rvalue) {
     }
 
     std::vector<std::unique_ptr<Entity>> arg_entities;
-    std::vector<USNode> arguments;
+    std::vector<sem::UExp> arguments;
     bool has_error = check_arguments(n, arguments, arg_entities);
     if (has_error) {
         return error_stub();
@@ -141,20 +142,21 @@ USemanticInfo Checker::visit_call(ast::Call& n, bool is_rvalue) {
         retv.entity = inf->entity;
     } else {*/
     this->process_function_arguments(retv, arg_entities, arguments, n, function_type, fun_info_p.get());
-    if (fun_info_p->snode->type == SNodeType::OBJECT_METHOD) {
-        auto& om = (std::unique_ptr<sem::ObjectMethod>&) fun_info_p->snode;
-        retv.snode = std::make_unique<sem::ObjectMethodCall>(std::move(om->object),
-                                                             om->class_path,
-                                                             om->method_name,
-                                                             std::move(arguments));
-    } else if (fun_info_p->snode->type == SNodeType::CONST_FUNCTION) {
-        auto& om = (std::unique_ptr<sem::ConstFunction>&) fun_info_p->snode;
-        retv.snode = std::make_unique<sem::ConstFunctionCall>(om->path, std::move(arguments));
-    } else if (fun_info_p->snode->type == SNodeType::OBJECT_CONSTRUCTOR) {
-        auto& om = (std::unique_ptr<sem::ObjectConstructor>&) fun_info_p->snode;
-        retv.snode = std::make_unique<sem::ObjectConstructorCall>(om->class_path, std::move(arguments));
-    }
+    // if (fun_info_p->exp_snode->type == sem::ExpType::OBJECT_METHOD) {
+    //     auto& om = (std::unique_ptr<sem::ObjectMethod>&) fun_info_p->snode;
+    //     retv.exp_snode = std::make_unique<sem::ObjectMethodCallExp>(std::move(om->object),
+    //                                                             om->class_path,
+    //                                                             om->method_name,
+    //                                                             std::move(arguments));
+    // } else if (fun_info_p->exp_snode->type == sem::ExpType::CONST_FUNCTION) {
+    //     auto& om = (std::unique_ptr<sem::ConstFunction>&) fun_info_p->snode;
+    //     retv.snode = std::make_unique<sem::ConstFunctionCall>(om->path, std::move(arguments));
+    // } else if (fun_info_p->exp_snode->type == sem::ExpType::OBJECT_CONSTRUCTOR) {
+    //     auto& om = (std::unique_ptr<sem::ObjectConstructor>&) fun_info_p->snode;
+    //     retv.exp_snode = std::make_unique<sem::ObjectConstructorCall>(om->class_path, std::move(arguments));
     // }
+    // }
+    retv.exp_snode = std::make_unique<sem::CallExp>(std::move(fun_info_p->exp_snode), std::move(arguments));
     return make_return_info(n, is_rvalue, std::move(retv_p), is_def_const, args_are_constant);
 }
 
@@ -189,7 +191,7 @@ USemanticInfo Checker::make_return_info(const ast::Call& n, bool is_rvalue, USem
     return retv_p;
 }
 
-bool Checker::check_arguments(ast::Call& n, std::vector<USNode>& arguments,
+bool Checker::check_arguments(ast::Call& n, std::vector<sem::UExp>& arguments,
                               std::vector<std::unique_ptr<Entity>>& arg_entities) {
     bool has_error;
     for (auto& arg: n.arguments) {
@@ -202,7 +204,7 @@ bool Checker::check_arguments(ast::Call& n, std::vector<USNode>& arguments,
         std::unique_ptr<Entity> x(arg_type_p->entity.get().clone());
         Entity& arg_entity = *x;
         arg_entities.push_back(std::move(x));
-        arguments.push_back(std::move(arg_type_p->snode));
+        arguments.push_back(std::move(arg_type_p->exp_snode));
         if (arg_entity.type == E_TYPE::CLASS || arg_entity.type == E_TYPE::PACKAGE ||
             arg_entity.type == E_TYPE::MODULE || arg_entity.type == E_TYPE::ENUM ||
             arg_entity.type == E_TYPE::NOTHING) {
@@ -215,7 +217,7 @@ bool Checker::check_arguments(ast::Call& n, std::vector<USNode>& arguments,
 }
 
 void Checker::process_function_arguments(SemanticInfo& retv, std::vector<std::unique_ptr<Entity>>& arg_entities,
-                                         std::vector<USNode>& arguments, ast::Call& n,
+                                         std::vector<sem::UExp>& arguments, ast::Call& n,
                                          const sem::TypeFunction& function_type, SemanticInfo* fun_info_p) {
     ast::UTypeNode rtype(function_type.return_type->to_ast());
     retv.set_entity(entity_from_type(*rtype));
@@ -224,7 +226,7 @@ void Checker::process_function_arguments(SemanticInfo& retv, std::vector<std::un
         // const ast::TypeNode& arg_type = *arg_types[i];
         const sem::Type& param_type = *function_type.param_types[i];
 
-        USNode arg_rvalue_snode = this->make_rvalue(*arg_entities[i], std::move(arguments[sni]), param_type);
+        sem::UExp arg_rvalue_snode = this->make_rvalue(*arg_entities[i], std::move(arguments[sni]), param_type);
         if (arg_rvalue_snode == nullptr) {
             this->error_reporter.error(std::make_unique<ErrorTypeMismatch>(param_type,
                                                                            n.arguments[i],

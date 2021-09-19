@@ -7,14 +7,14 @@
 
 
 #include <string>
-#include "../../common/include/SNode.h"
+#include "../../expressions/include/Exp.h"
 
-class sem::String : public sem::SNode {
+class sem::String : public sem::Exp {
 public:
     std::string s;
     String(const std::string& s);
 
-    bool equals(const SNode& o) const override {
+    bool equals(const Exp& o) const override {
         auto& other = (const String&) o;
         return this->s == other.s;
     }

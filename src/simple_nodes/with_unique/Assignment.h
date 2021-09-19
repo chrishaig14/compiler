@@ -6,12 +6,13 @@
 #define XLANG_ASSIGNMENT_H
 
 #include "../common/include/SNode.h"
+#include "../expressions/include/Exp.h"
 
 class sem::Assignment : public sem::SNode {
 public:
-    USNode lvalue;
-    USNode rvalue;
-    Assignment(USNode lvalue, USNode rvalue);
+    UExp lvalue;
+    UExp rvalue;
+    Assignment(UExp lvalue, UExp rvalue);
 
     bool equals(const SNode& o) const override {
         // auto& other = (const Declaration&) o;

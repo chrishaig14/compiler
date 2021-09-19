@@ -6,15 +6,15 @@
 #define XLANG_OBJECTCONSTRUCTORCALL_H
 
 
-#include "../../common/include/SNode.h"
+#include "../../expressions/include/Exp.h"
 #include "../../../ast/Path.h"
 
-class sem::ObjectConstructorCall : public sem::SNode {
+class sem::ObjectConstructorCall : public sem::Exp {
 public:
     Path class_path;
-    std::vector<USNode> arguments;
-    ObjectConstructorCall(Path class_path, std::vector<USNode> arguments);
-    bool equals(const SNode& o) const override;
+    std::vector<UExp> arguments;
+    ObjectConstructorCall(Path class_path, std::vector<UExp> arguments);
+    bool equals(const Exp& o) const override;
 };
 
 

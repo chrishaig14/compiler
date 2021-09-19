@@ -10,12 +10,12 @@
 #include <cassert>
 
 class sem::Declaration : public sem::SNode {
-    USNode _expression;
+    UExp _expression;
 public:
     std::string identifier;
-    sem::SNode& expression;
+    Exp& expression;
 
-    Declaration(const std::string& identifier, USNode _expression);
+    Declaration(const std::string& identifier, UExp _expression);
 
     bool equals(const SNode& o) const override;
 };

@@ -6,5 +6,5 @@
 
 using namespace sem;
 
-Dict::Dict(std::vector<std::pair<USNode, USNode>> items) : SNode(SNodeType::DICT), items(std::move(items)) {
+Dict::Dict(std::vector<std::pair<UExp, UExp>> items) : Exp(ExpType::DICT), items(std::move(items)) {
 }

@@ -6,7 +6,7 @@
 #define XLANG_TypeObject_H
 
 #include "Type.h"
-#include "sem.h"
+#include "../../sem.h"
 #include "../../../ast/Path.h"
 #include "../../../json/json.hpp"
 

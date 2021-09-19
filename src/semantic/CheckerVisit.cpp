@@ -5,6 +5,7 @@
 #include "Checker.h"
 #include "../simple_nodes/common/include/TypeObject.h"
 #include "../simple_nodes/common/src/TypeFunction.h"
+#include "../simple_nodes/expressions/include/CallExp.h"
 #include "errors/ErrorFunctionReturnLastStmt.h"
 #include "errors/ErrorUnusedReturnValue.h"
 
@@ -13,19 +14,19 @@ make_for_snode(ast::For& node, USemanticInfoBlock& binfo, USemanticInfo& exp_inf
                std::string loop_index_var_id, std::string loop_list_len_var_id, sem::SNode* update_loop_index_snode) {
     auto* bbn = new sem::Block();
 
-    USNode p_node = std::move(exp_info_p->snode);
+    sem::UExp p_node = std::move(exp_info_p->exp_snode);
     auto dsn = std::make_unique<sem::Declaration>(loop_list_var_id, std::move(p_node));
     bbn->nodes.push_back(std::move(dsn));
-    USNode init_idx = std::make_unique<sem::Integer>("0");
+    sem::UExp init_idx = std::make_unique<sem::Integer>("0");
     auto lidx_decl = std::make_unique<sem::Declaration>(loop_index_var_id, std::move(init_idx));
 
     bbn->nodes.push_back(std::move(lidx_decl));
 
     auto list_len_fn = std::make_unique<sem::Id>("libcore.libcore.List.len");
     auto list_sn = std::make_unique<sem::Id>(loop_list_var_id);
-    std::vector<USNode> v;
+    std::vector<sem::UExp> v;
     v.emplace_back(std::move(list_sn));
-    USNode call_list_len_sn = std::make_unique<sem::Call>(std::move(list_len_fn), std::move(v));
+    sem::UExp call_list_len_sn = std::make_unique<sem::CallExp>(std::move(list_len_fn), std::move(v));
     auto lensn = std::make_unique<sem::Declaration>(loop_list_len_var_id, std::move(call_list_len_sn));
     bbn->nodes.push_back(std::move(lensn));
 
@@ -36,24 +37,23 @@ make_for_snode(ast::For& node, USemanticInfoBlock& binfo, USemanticInfo& exp_inf
     auto llensn = std::make_unique<sem::Id>(loop_list_len_var_id);
 
 
-    std::vector<USNode> vv;
+    std::vector<sem::UExp> vv;
     vv.push_back(std::move(idxsn));
     vv.push_back(std::move(llensn));
-    auto cn = std::make_unique<sem::Call>(std::move(cmpfunsn), std::move(vv));
+    auto cn = std::make_unique<sem::CallExp>(std::move(cmpfunsn), std::move(vv));
 
     auto& bn = (binfo->snode);
 
-    std::vector<USNode> vvv;
+    std::vector<sem::UExp> vvv;
     vvv.push_back(std::make_unique<sem::Id>(loop_list_var_id));
     vvv.push_back(std::make_unique<sem::Id>(loop_index_var_id));
-    auto* list_subscript_n = new sem::Call(std::make_unique<sem::Id>("libcore.libcore.List.__get_item__"),
-                                           std::move(vvv));
+    auto* list_subscript_n = new sem::CallExp(std::make_unique<sem::Id>("libcore.libcore.List.__get_item__"),std::move(vvv));
 
-    USNode ul(list_subscript_n);
+    sem::UExp ul(list_subscript_n);
     auto loop_elem_sn = std::make_unique<sem::Declaration>(node.var, std::move(ul));
     bn->nodes.insert(bn->nodes.begin(), std::move(loop_elem_sn));
 
-    bn->nodes.push_back(USNode(update_loop_index_snode));
+    bn->nodes.push_back(sem::USNode(update_loop_index_snode));
     auto wsn = std::make_unique<sem::While>(std::move(cn), std::move(bn));
     bbn->nodes.push_back(std::move(wsn));
     return bbn;
@@ -88,7 +88,7 @@ USemanticInfo Checker::visit_class(ast::Klass& node) {
     this->add_this = false;
     auto sn = std::make_unique<sem::KlassDef>(node.class_name, node.members_ordered);
     for (auto& m: node.methods) {
-        USNode ms = std::move(this->visit_function(*m.second->method)->snode);
+        sem::USNode ms = std::move(this->visit_function(*m.second->method)->snode);
         std::unique_ptr<sem::FunctionDef> sf((sem::FunctionDef*) ms.release());
         sn->methods.emplace_back(std::move(sf));
     }
@@ -179,7 +179,7 @@ USemanticInfoBlock Checker::visit_root(ast::Module& node) {
         if (n->ntype == NodeType::BLOCK) {
         } else {
             if (sinfo_p->snode != nullptr) {
-                if (sinfo_p->snode->type == SNodeType::BLOCK) {
+                if (sinfo_p->snode->type == sem::SNodeType::BLOCK) {
                     if (((std::unique_ptr<sem::Block>&) sinfo_p->snode)->unwrap) {
                         for (auto& nn : ((std::unique_ptr<sem::Block>&) sinfo_p->snode)->nodes) {
                             sn->nodes.push_back(std::move(nn));
@@ -225,7 +225,7 @@ USemanticInfoBlock Checker::visit_block(ast::Block& node) {
         } else {
             vn.push_back(std::move(n));
             if (sinfo_p->snode != nullptr) {
-                if (sinfo_p->snode->type == SNodeType::BLOCK) {
+                if (sinfo_p->snode->type == sem::SNodeType::BLOCK) {
                     if (((std::unique_ptr<sem::Block>&) sinfo_p->snode)->unwrap) {
                         for (auto& nn : ((std::unique_ptr<sem::Block>&) sinfo_p->snode)->nodes) {
                             sn->nodes.push_back(std::move(nn));

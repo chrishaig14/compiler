@@ -4,5 +4,5 @@
 
 #include "../include/List.h"
 using namespace sem;
-List::List(std::vector<USNode> elements) : SNode(SNodeType::LIST), elements(std::move(elements)) {
+List::List(std::vector<UExp> elements) : Exp(ExpType::LIST), elements(std::move(elements)) {
 }

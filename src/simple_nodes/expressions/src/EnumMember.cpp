@@ -6,13 +6,13 @@
 
 using namespace sem;
 
-EnumMember::EnumMember(const std::string& enum_name, const std::string& value) : SNode(SNodeType::ENUM_MEMBER) {
+EnumMember::EnumMember(const std::string& enum_name, const std::string& value) : Exp(ExpType::ENUM_MEMBER) {
     this->enum_name = enum_name;
     this->value = value;
 }
 
 
-bool EnumMember::equals(const SNode& o) const {
+bool EnumMember::equals(const Exp& o) const {
     auto& other = (const EnumMember&) o;
     return this->enum_name == other.enum_name && this->value == other.value;
 }

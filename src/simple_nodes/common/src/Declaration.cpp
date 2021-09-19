@@ -3,10 +3,11 @@
 //
 
 #include "../include/Declaration.h"
+#include "../../expressions/include/Exp.h"
 
 using namespace sem;
 
-Declaration::Declaration(const std::string& identifier, USNode _expression)
+Declaration::Declaration(const std::string& identifier, UExp _expression)
         : SNode(SNodeType::DECLARATION), _expression(std::move(_expression)), identifier(identifier),
           expression(*this->_expression) {
     assert(this->_expression != nullptr);

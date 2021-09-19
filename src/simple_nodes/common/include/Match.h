@@ -10,19 +10,16 @@
 #include "SNode.h"
 #include "Block.h"
 #include <string>
+#include "../../expressions/include/Exp.h"
 
 class sem::Match : public sem::SNode {
 public:
-    USNode exp;
+    UExp exp;
     std::vector<std::pair<int, Block*>> cases;
     std::string varname;
-    Match(USNode exp, std::string varname, std::vector<std::pair<int, Block*>> cases);
+    Match(UExp exp, std::string varname, std::vector<std::pair<int, Block*>> cases);
 
-    bool equals(const SNode& o) const override {
-        // auto& other = (const Declaration&) o;
-        // return this->identifier == other.identifier && *this->expression == *other.expression;
-        return false;
-    }
+    bool equals(const SNode& o) const override;
 };
 
 

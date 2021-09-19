@@ -4,5 +4,5 @@
 
 #include "../include/None.h"
 using namespace sem;
-None::None() : SNode(SNodeType::NONE) {
+None::None() : Exp(ExpType::NONE) {
 }

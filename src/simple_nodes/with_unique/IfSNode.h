@@ -8,15 +8,16 @@
 
 #include "../common/include/SNode.h"
 #include "../common/include/Block.h"
+#include "../expressions/include/Exp.h"
 
 class sem::IfSNode : public sem::SNode {
 public:
-    USNode condition;
+    UExp condition;
     std::unique_ptr<Block> then;
     std::unique_ptr<Block> _else;
-    std::vector<std::pair<USNode, std::unique_ptr<Block>>> elifs;
+    std::vector<std::pair<UExp, std::unique_ptr<Block>>> elifs;
 
-    IfSNode(USNode condition, std::unique_ptr<Block> then, std::vector<std::pair<USNode, std::unique_ptr<Block>>> elifs,
+    IfSNode(UExp condition, std::unique_ptr<Block> then, std::vector<std::pair<UExp, std::unique_ptr<Block>>> elifs,
             std::unique_ptr<Block> _else);
 
     bool equals(const SNode& o) const override {

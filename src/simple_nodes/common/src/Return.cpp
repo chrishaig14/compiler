@@ -2,11 +2,12 @@
 // Created by chris on 4/4/21.
 //
 
-#include "Return.h"
+#include "../include/Return.h"
+#include "../../expressions/include/Exp.h"
 
 using namespace sem;
 
-Return::Return(USNode expression) : SNode(SNodeType::RETURN), expression(std::move(expression)) {
+Return::Return(UExp expression) : SNode(SNodeType::RETURN), expression(std::move(expression)) {
 }
 
 bool Return::equals(const SNode& o) const {

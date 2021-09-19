@@ -7,7 +7,7 @@
 
 
 #include "../include/Type.h"
-#include "../include/sem.h"
+#include "../../sem.h"
 
 class sem::TypeFunction : public sem::Type {
 public:

@@ -6,15 +6,15 @@
 #define XLANG_BOOL_H
 
 
-#include "../../common/include/SNode.h"
+#include "../../expressions/include/Exp.h"
 
-class sem::Bool : public sem::SNode {
+class sem::Bool : public sem::Exp {
 
 public:
     explicit Bool(bool v);
     bool v;
 
-    bool equals(const SNode& o) const override {
+    bool equals(const Exp& o) const override {
         auto& other = (const Bool&) o;
         return this->v == other.v;
     }

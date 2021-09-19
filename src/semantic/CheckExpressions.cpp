@@ -5,6 +5,7 @@
 #include <cassert>
 #include "CheckExpressions.h"
 #include "../simple_nodes/expressions/include/Ternary.h"
+#include "../simple_nodes/expressions/include/CallExp.h"
 #include "../simple_nodes/common/include/TypeObject.h"
 #include "../simple_nodes/common/src/TypeFunction.h"
 #include "errors/ErrorNotDeclared.h"
@@ -38,7 +39,7 @@ USemanticInfo Checker::visit_id(ast::Id& n) {
     // std::string id =
     //         entity.type == E_TYPE::CONST_FUNCTION ? ((EntityConstFunction&) entity).const_function->path.as_str()
     //                                               : n._id;
-    USNode sn;
+    sem::UExp sn;
     if (entity.type == E_TYPE::CONST_FUNCTION) {
         sn = std::make_unique<sem::ConstFunction>(((EntityConstFunction&) entity).const_function.path);
     } else {
@@ -48,7 +49,7 @@ USemanticInfo Checker::visit_id(ast::Id& n) {
     USemanticInfo info_u = std::make_unique<SemanticInfo>();
     SemanticInfo& info = *info_u;
     info.set_entity(entity.clone());
-    info.snode = std::move(sn);
+    info.exp_snode = std::move(sn);
     return info_u;
 }
 
@@ -169,7 +170,7 @@ USemanticInfo Checker::visit_unary(ast::UnaryOp& n) {
     if (exp_info->is_error()) {
         return error_stub();
     }
-    USNode exp_snode = std::move(exp_info->snode);
+    sem::UExp exp_snode = std::move(exp_info->exp_snode);
 
     Value& entity_parent = (Value&) exp_info->entity.get();
     Class* cls = entity_parent.clazz;
@@ -184,7 +185,7 @@ USemanticInfo Checker::visit_unary(ast::UnaryOp& n) {
     sem::Type* rtype = subscript_fun.const_function_ft.return_type->clone();
 
     auto fsn = std::make_unique<sem::Id>(sub_fun_path);
-    std::vector<USNode> v;
+    std::vector<sem::UExp> v;
     v.emplace_back(std::move(exp_snode));
     auto csn = std::make_unique<sem::Call>(std::move(fsn), std::move(v));
 
@@ -210,7 +211,7 @@ USemanticInfo Checker::visit_binop(ast::BinaryOp& n) {
     if (right_sinfo->is_error()) {
         return error_stub();
     }
-    auto& right_snode = right_sinfo->snode;
+    auto& right_snode = right_sinfo->exp_snode;
 
     std::string fun = binoptype_to_str(n.op);
 
@@ -225,10 +226,10 @@ USemanticInfo Checker::visit_binop(ast::BinaryOp& n) {
     }
     ConstFunction& operator_fun = *operator_fun_it->second;
     // auto function_id = std::make_unique<sem::Id>(operator_fun.path.as_str());
-    std::vector<USNode> vv;
-    vv.push_back(std::move(left_info_p->snode));
+    std::vector<sem::UExp> vv;
+    vv.push_back(std::move(left_info_p->exp_snode));
     vv.push_back(std::move(right_snode));
-    auto sn = std::make_unique<sem::ConstFunctionCall>(operator_fun.path, std::move(vv));
+    auto sn = std::make_unique<sem::CallExp>(std::make_unique<sem::ConstFunction>(operator_fun.path), std::move(vv));
     sem::Type* rettype = operator_fun.const_function_ft.return_type->clone();
 
     USemanticInfo info_u = std::make_unique<SemanticInfo>();
@@ -237,7 +238,7 @@ USemanticInfo Checker::visit_binop(ast::BinaryOp& n) {
     // this->fill_value(*v);
     auto v = this->make_value(rettype);
     info.set_entity(v.release());
-    info.snode = std::move(sn);
+    info.exp_snode = std::move(sn);
     return info_u;
 }
 
@@ -347,7 +348,7 @@ USemanticInfo Checker::visit_subscript(ast::Subscript& node) {
     if (child_sinfo->is_error()) {
         return error_stub();
     }
-    auto& child_snode = child_sinfo->snode;
+    auto& child_snode = child_sinfo->exp_snode;
 
     USemanticInfo info_u = std::make_unique<SemanticInfo>();
     SemanticInfo& info = *info_u;
@@ -359,8 +360,8 @@ USemanticInfo Checker::visit_subscript(ast::Subscript& node) {
     info.set_entity(v.release());
 
     auto fsn = std::make_unique<sem::Id>(sub_fun_path);
-    std::vector<USNode> vv;
-    vv.push_back(std::move(parent_p->snode));
+    std::vector<sem::UExp> vv;
+    vv.push_back(std::move(parent_p->exp_snode));
     vv.push_back(std::move(child_snode));
     auto csn = std::make_unique<sem::Call>(std::move(fsn), std::move(vv));
     info.snode = std::move(csn);
@@ -399,7 +400,7 @@ USemanticInfo Checker::visit_ternary(ast::Ternary& node) {
     if (false_case_sinfo->is_error()) {
         return error_stub();
     }
-    auto false_case_snode = std::move(false_case_sinfo->snode);
+    auto false_case_snode = std::move(false_case_sinfo->exp_snode);
 
     // auto rv = std::make_unique<Value>(true_value.type.clone());
     // this->fill_value(*rv);
@@ -407,8 +408,8 @@ USemanticInfo Checker::visit_ternary(ast::Ternary& node) {
     USemanticInfo info_u = std::make_unique<SemanticInfo>();
     SemanticInfo& info = *info_u;
     info.set_entity(rv.release());
-    info.snode = std::make_unique<sem::Ternary>(expression_info_p->snode.release(),
-                                                true_case.snode.release(),
-                                                false_case_snode.release());
+    info.exp_snode = std::make_unique<sem::Ternary>(expression_info_p->exp_snode.release(),
+                                                    true_case.exp_snode.release(),
+                                                    false_case_snode.release());
     return info_u;
 }

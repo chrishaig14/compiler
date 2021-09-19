@@ -6,8 +6,14 @@
 
 using namespace sem;
 
-Match::Match(USNode exp, std::string varname, std::vector<std::pair<int, Block*>> cases)
+Match::Match(UExp exp, std::string varname, std::vector<std::pair<int, Block*>> cases)
         : SNode(SNodeType::MATCH), exp(std::move(exp)) {
     this->cases = cases;
     this->varname = varname;
+}
+
+bool Match::equals(const sem::SNode& o) const {
+    // auto& other = (const Declaration&) o;
+    // return this->identifier == other.identifier && *this->expression == *other.expression;
+    return false;
 }

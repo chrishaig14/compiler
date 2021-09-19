@@ -6,11 +6,11 @@
 
 using namespace sem;
 
-Id::Id(const std::string& identifier) : SNode(SNodeType::ID) {
+Id::Id(const std::string& identifier) : Exp(ExpType::ID) {
     this->identifier = identifier;
 }
 
-bool Id::equals(const SNode& o) const {
+bool Id::equals(const Exp& o) const {
     auto& other = (const Id&) o;
     return this->identifier == other.identifier;
 }

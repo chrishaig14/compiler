@@ -9,7 +9,7 @@
 #include "../ast/Path.h"
 #include "../ast/FunctionType.h"
 #include "../ast/Function.h"
-#include "../simple_nodes/common/include/sem.h"
+#include "../simple_nodes/sem.h"
 #include "../simple_nodes/common/src/TypeFunction.h"
 
 class ConstFunction {

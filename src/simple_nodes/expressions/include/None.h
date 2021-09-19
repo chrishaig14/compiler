@@ -6,13 +6,13 @@
 #define XLANG_NONE_H
 
 
-#include "../../common/include/SNode.h"
+#include "../../expressions/include/Exp.h"
 
-class sem::None : public sem::SNode {
+class sem::None : public sem::Exp {
 public:
     None();
 
-    bool equals(const SNode& o) const override {
+    bool equals(const Exp& o) const override {
         return true;
     }
 

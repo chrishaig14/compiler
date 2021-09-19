@@ -7,12 +7,12 @@
 
 
 #include <string>
-#include "../../common/include/SNode.h"
+#include "../../expressions/include/Exp.h"
 
-class sem::EnumMember : public sem::SNode {
+class sem::EnumMember : public sem::Exp {
 public:
     EnumMember(const std::string& enum_name, const std::string& value);
-    bool equals(const SNode& o) const override;
+    bool equals(const Exp& o) const override;
 
     std::string enum_name;
     std::string value;

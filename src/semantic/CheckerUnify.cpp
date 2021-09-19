@@ -185,7 +185,7 @@ USemanticInfo Checker::enum_member(Enum* enumm, const std::string& value, ast::M
             auto ov = std::make_unique<Value>(otype);
             info.set_entity(ov.release());
             // this->fill_value(info.entity.value);
-            info.snode = std::make_unique<sem::EnumMember>(enumm->path.as_str(), value);
+            info.exp_snode = std::make_unique<sem::EnumMember>(enumm->path.as_str(), value);
             return info_u;
         }
     }

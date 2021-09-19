@@ -8,20 +8,16 @@
 
 #include "../common/include/SNode.h"
 #include "../common/include/Block.h"
+#include "../expressions/include/Exp.h"
 
 class sem::While : public sem::SNode {
 public:
-    USNode condition;
+    UExp condition;
     std::unique_ptr<Block> body;
 
-    While(USNode condition, std::unique_ptr<Block> body);
+    While(UExp condition, std::unique_ptr<Block> body);
 
-    bool equals(const SNode& o) const override {
-        auto& other = (const While&) o;
-        bool cond_ok = *this->condition == *other.condition;
-        bool body_ok = *this->body == *other.body;
-        return cond_ok && body_ok;
-    }
+    bool equals(const SNode& o) const override;
 
 };
 

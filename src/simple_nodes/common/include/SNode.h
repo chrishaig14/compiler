@@ -6,37 +6,9 @@
 #define XLANG_SNODE_H
 
 #include <memory>
-#include "sem.h"
+#include "../../sem.h"
 
-enum class SNodeType {
-    FUNCTION,
-    ID,
-    DECLARATION,
-    BLOCK,
-    ASSIGNMENT,
-    RETURN,
-    INTEGER,
-    CALL,
-    STRING,
-    BOOLEAN,
-    FLOAT,
-    CLASS,
-    NEW,
-    OBJECT_MEMBER,
-    WHILE,
-    LIST,
-    IF,
-    BREAK,
-    CONTINUE,
-    MATCH,
-    ENUM,
-    ENUM_MEMBER,
-    NONE,
-    TERNARY,
-    DICT,
-    THROW,
-    TRY_CATCH, OBJECT_METHOD_CALL, OBJECT_METHOD, CONST_FUNCTION_CALL, CONST_FUNCTION, OBJECT_CONSTRUCTOR
-};
+
 
 class sem::SNode {
 public:
@@ -58,7 +30,5 @@ public:
 
     virtual ~SNode() = default;
 };
-
-typedef std::unique_ptr<sem::SNode> USNode;
 
 #endif //XLANG_SNODE_H

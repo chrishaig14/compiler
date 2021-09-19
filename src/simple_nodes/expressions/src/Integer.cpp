@@ -7,10 +7,10 @@
 
 using namespace sem;
 
-Integer::Integer(const std::string& str) : SNode(SNodeType::INTEGER), str(str) {
+Integer::Integer(const std::string& str) : Exp(ExpType::INTEGER), str(str) {
 }
 
-bool Integer::equals(const SNode& o) const {
+bool Integer::equals(const Exp& o) const {
     auto& other = (const Integer&) o;
     return this->str == other.str;
 }

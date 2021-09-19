@@ -6,7 +6,7 @@
 
 using namespace sem;
 
-Ternary::Ternary(SNode* ext, SNode* true_case, SNode* false_case) : SNode(SNodeType::TERNARY) {
+Ternary::Ternary(Exp* ext, Exp* true_case, Exp* false_case) : Exp(ExpType::TERNARY) {
     this->ext = ext;
     this->true_case = true_case;
     this->false_case = false_case;

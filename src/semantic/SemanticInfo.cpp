@@ -3,6 +3,7 @@
 //
 
 #include "SemanticInfo.h"
+#include "../simple_nodes/expressions/include/Exp.h"
 
 EntityNothing nothing;
 EntityError error;

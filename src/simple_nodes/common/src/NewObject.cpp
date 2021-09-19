@@ -4,3 +4,11 @@
 
 #include "../include/NewObject.h"
 using namespace sem;
+
+NewObject::NewObject() : Exp(ExpType::NEW) {
+
+}
+
+bool NewObject::equals(const Exp& o) const {
+    return false;
+}

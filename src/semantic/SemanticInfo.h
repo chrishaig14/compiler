@@ -28,7 +28,8 @@ public:
         this->entity = *this->_entity;
     }
 
-    USNode snode;
+    sem::USNode snode;
+    sem::UExp exp_snode;
     bool is_tuple_member;
     ~SemanticInfo();
 
