@@ -57,84 +57,56 @@ public:
 class PythonTranspiler {
     size_t arg_n;
 public:
-    std::string source;
-    std::string header;
-    std::string static_initializations;
-    std::string static_cleanups;
-    size_t indent_level;
-
-    size_t next_arg_n();
-
-    void indent();
-
-    std::string indentation();
-
-    void unindent();
-
-    PythonTranspiler();
-
-    PythonOutputCode transpile_integer(const sem::Integer& node);
-
-    PythonOutputCode transpile_function(const sem::FunctionDef& node);
-
-    PythonOutputCode transpile_declaration(const sem::Declaration& node);
-
+    bool add_self;
+    bool in_try_catch;
+    PythonOutputCode dispatch(const sem::Common& node);
+    PythonOutputCode dispatch_common(const sem::Common& node);
+    PythonOutputCode dispatch_expression(const sem::Exp& node);
+    PythonOutputCode dispatch_top(const sem::Common& node);
     PythonOutputCode transpile_assignment(const sem::Assignment& node);
     PythonOutputCode transpile_block(const sem::Block& node);
-    void transpile_program(const sem::Block& node);
-    PythonOutputCode transpile_id(const sem::Id& node);
-
-    PythonOutputCode transpile_new(const sem::NewObject& node);
-
-    PythonOutputCode transpile_return(const sem::Return& node);
-
-    PythonOutputCode transpile_class(const sem::KlassDef& node);
-    void transpile_enum(const sem::EnumDef& node);
-
-    PythonOutputCode dispatch_top(const sem::Common& node);
-
-    PythonOutputCode transpile_call(const sem::Call& node);
-
-    PythonOutputCode transpile_string(const sem::String& node);
-
     PythonOutputCode transpile_boolean(const sem::Bool& node);
-
-    PythonOutputCode transpile_float(const sem::Float& node);
-
-    PythonOutputCode transpile_object_member(const sem::ObjectMember& node);
-
-    PythonOutputCode transpile_while(const sem::While& node);
-
-    PythonOutputCode transpile_list(const sem::List& node);
-
-    PythonOutputCode transpile_if(const sem::If& node);
-
     PythonOutputCode transpile_break(const sem::Break& node);
-
-    PythonOutputCode transpile_continue(const sem::Continue& node);
-
-    PythonOutputCode transpile_match(const sem::Match& node);
-
-    PythonOutputCode transpile_enum_member(const sem::EnumMember& node);
-
-    PythonOutputCode transpile_ternary(const sem::Ternary& node);
-
-    PythonOutputCode transpile_none(const sem::None& node);
-
-    PythonOutputCode transpile_dict(const sem::Dict& node);
-    PythonOutputCode transpile_try_catch(const sem::TryCatch& node);
-
-    PythonOutputCode dispatch(const sem::Common& node);
-
-    PythonOutputCode transpile_throw(sem::Throw& node);
-    bool in_try_catch;
-    std::string transpile_module(const sem::Block& block);
-    bool add_self;
-    PythonOutputCode dispatch_expression(const sem::Exp& node);
-    PythonOutputCode dispatch_common(const sem::Common& node);
-    PythonOutputCode transpile_object_method(const sem::ObjectMethod& method);
+    PythonOutputCode transpile_call(const sem::Call& node);
+    PythonOutputCode transpile_class(const sem::KlassDef& node);
     PythonOutputCode transpile_const_function(const sem::ConstFunction& function);
+    PythonOutputCode transpile_continue(const sem::Continue& node);
+    PythonOutputCode transpile_declaration(const sem::Declaration& node);
+    PythonOutputCode transpile_dict(const sem::Dict& node);
+    PythonOutputCode transpile_enum_member(const sem::EnumMember& node);
+    PythonOutputCode transpile_float(const sem::Float& node);
+    PythonOutputCode transpile_function(const sem::FunctionDef& node);
+    PythonOutputCode transpile_id(const sem::Id& node);
+    PythonOutputCode transpile_if(const sem::If& node);
+    PythonOutputCode transpile_integer(const sem::Integer& node);
+    PythonOutputCode transpile_list(const sem::List& node);
+    PythonOutputCode transpile_match(const sem::Match& node);
+    PythonOutputCode transpile_new(const sem::NewObject& node);
+    PythonOutputCode transpile_none(const sem::None& node);
     PythonOutputCode transpile_object_constructor(const sem::ObjectConstructor& constructor);
+    PythonOutputCode transpile_object_member(const sem::ObjectMember& node);
+    PythonOutputCode transpile_object_method(const sem::ObjectMethod& method);
+    PythonOutputCode transpile_return(const sem::Return& node);
+    PythonOutputCode transpile_string(const sem::String& node);
+    PythonOutputCode transpile_ternary(const sem::Ternary& node);
+    PythonOutputCode transpile_throw(sem::Throw& node);
+    PythonOutputCode transpile_try_catch(const sem::TryCatch& node);
+    PythonOutputCode transpile_while(const sem::While& node);
+    PythonTranspiler();
+
+    size_t indent_level;
+    size_t next_arg_n();
+    std::string header;
+    std::string indentation();
+    std::string source;
+    std::string static_cleanups;
+    std::string static_initializations;
+    std::string transpile_module(const sem::Block& block);
+
+    void indent();
+    PythonOutputCode transpile_enum(const sem::EnumDef& node);
+    void transpile_program(const sem::Block& node);
+    void unindent();
 };
 
 

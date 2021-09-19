@@ -379,7 +379,7 @@ PythonOutputCode PythonTranspiler::transpile_match(const sem::Match& node) {
     return PythonOutputCode("", out);
 }
 
-void PythonTranspiler::transpile_enum(const sem::EnumDef& node) {
+PythonOutputCode PythonTranspiler::transpile_enum(const sem::EnumDef& node) {
     std::string out;
     std::string enum_name = (node.id);
     // out += "enum class" + SPACE + enum_name + SPACE + " {\n";
@@ -410,6 +410,7 @@ void PythonTranspiler::transpile_enum(const sem::EnumDef& node) {
 
     this->source += TOBJECT + SPACE + ne_name + ASSIGN + "nullptr" + SEMIC + NEWLINE;
     this->header += out;
+    return PythonOutputCode("", "");
 }
 
 PythonOutputCode PythonTranspiler::transpile_enum_member(const sem::EnumMember& node) {
@@ -466,9 +467,9 @@ PythonOutputCode PythonTranspiler::dispatch_top(const sem::Common& node) {
         case sem::CommonType::FUNCTION:
             return this->transpile_function((const sem::FunctionDef&) (node));
             break;
-            // case SNodeType::ENUM:
-            //     return this->transpile_enum((const sem::EnumDef&) node);
-            //     break;
+        case sem::CommonType::ENUM:
+            return this->transpile_enum((const sem::EnumDef&) node);
+            break;
         case sem::CommonType::CLASS:
             return this->transpile_class((const sem::KlassDef&) node);
             break;
