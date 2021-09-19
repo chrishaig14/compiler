@@ -330,8 +330,8 @@ PythonOutputCode PythonTranspiler::transpile_dict(const sem::Dict& node) {
 PythonOutputCode PythonTranspiler::transpile_if(const sem::IfSNode& node) {
     std::string pre_code;
     std::string code;
-    PythonOutputCode cond = this->dispatch_expression(*node.condition);
-    PythonOutputCode thenc = this->transpile_block(*node.then);
+    PythonOutputCode cond = this->dispatch_expression(node.condition);
+    PythonOutputCode thenc = this->transpile_block(node.then);
     code += cond.pre_code.empty() ? "" : cond.pre_code + "\n";
     code += this->indentation() + "condition = " + cond.code + "\n";
     code += this->indentation() + "if" + SPACE + "condition:" + NEWLINE + indent_paragraph(thenc.code, 4);

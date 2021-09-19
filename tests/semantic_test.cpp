@@ -6,7 +6,7 @@
 #include "../src/scanner/Scanner.h"
 #include "../src/semantic/Checker.h"
 #include "../src/semantic/GlobalProcessor.h"
-#include "../src/simple_nodes/common/include/TypeObject.h"
+#include "../src/simple_nodes/common/include/common.h"
 #include "../src/simple_nodes/common/src/TypeFunction.h"
 #include "../src/simple_nodes/expressions/include/expressions.h"
 
@@ -457,10 +457,16 @@ TEST_CASE("semantic_output_if", "[checker]") {
     resolve_module_imports(module, c.top_package);
     Checker checker(c.top_package, module);
     checker.init();
-    checker.visit_root(*module.ast);
+    ast::Function& ast_func = module.ast->functions[0];
+    USemanticInfo info = checker.visit_function(ast_func);
+    sem::FunctionDef& sem_func = (sem::FunctionDef&) *info->snode;
 
     REQUIRE(!checker.error_reporter.failed);
     REQUIRE(checker.error_reporter.errors.empty());
+
+    auto block = std::make_unique<sem::Block>();
+    block->nodes.push_back(std::make_unique<sem::Declaration>("x", std::make_unique<sem::Integer>("1")));
+    REQUIRE(*sem_func.body->nodes[0] == sem::IfSNode(std::make_unique<sem::Bool>(true), std::move(block), {}, nullptr));
 }
 
 TEST_CASE("semantic_output_enum_def", "[checker]") {

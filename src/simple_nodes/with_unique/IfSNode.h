@@ -11,19 +11,18 @@
 #include "../expressions/include/Exp.h"
 
 class sem::IfSNode : public sem::SNode {
+    UExp _condition;
+    std::unique_ptr<Block> _then;
 public:
-    UExp condition;
-    std::unique_ptr<Block> then;
+    Exp& condition;
+    Block& then;
     std::unique_ptr<Block> _else;
     std::vector<std::pair<UExp, std::unique_ptr<Block>>> elifs;
 
     IfSNode(UExp condition, std::unique_ptr<Block> then, std::vector<std::pair<UExp, std::unique_ptr<Block>>> elifs,
             std::unique_ptr<Block> _else);
 
-    bool equals(const SNode& o) const override {
-        auto& other = (const IfSNode&) o;
-        return *this->condition == *other.condition && *this->then == *other.then && *this->_else == *other._else;
-    }
+    bool equals(const SNode& o) const override;
 };
 
 

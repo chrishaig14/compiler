@@ -2,13 +2,30 @@
 // Created by chris on 13/4/21.
 //
 
+#include <cassert>
 #include "IfSNode.h"
 
 using namespace sem;
 
-IfSNode::IfSNode(UExp condition, std::unique_ptr<Block> then,
+IfSNode::IfSNode(UExp _condition, std::unique_ptr<Block> _then,
                  std::vector<std::pair<UExp, std::unique_ptr<Block>>> elifs, std::unique_ptr<Block> _else) : SNode(
-        SNodeType::IF), condition(std::move(condition)), then(std::move(then)), _else(std::move(_else)),
+        SNodeType::IF), _condition(std::move(_condition)), _then(std::move(_then)),
+
+                                                                                                             condition(*this->_condition),
+                                                                                                             then(*this->_then),
+                                                                                                             _else(std::move(
+                                                                                                                     _else)),
                                                                                                              elifs(std::move(
                                                                                                                      elifs)) {
+    assert(this->_condition != nullptr);
+    assert(this->_then != nullptr);
+}
+
+bool IfSNode::equals(const SNode& o) const {
+    auto& other = (const IfSNode&) o;
+    bool cond_ok = this->condition == other.condition;
+    bool then_ok = this->then == other.then;
+    bool else_ok = (this->_else == nullptr and other._else == nullptr) or
+                   ((this->_else != nullptr and other._else != nullptr) and *this->_else == *other._else);
+    return cond_ok && then_ok && else_ok;
 }
