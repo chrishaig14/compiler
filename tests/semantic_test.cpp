@@ -12,6 +12,7 @@
 #include "../src/semantic/errors/ErrorNoMember.h"
 #include "../src/simple_nodes/common/include/TypeObject.h"
 #include "../src/simple_nodes/common/src/TypeFunction.h"
+#include "../src/simple_nodes/expressions/include/CallExp.h"
 #include "../src/semantic/errors/ErrorClassNoMember.h"
 #include "../src/semantic/errors/ErrorNoMemberSuggestions.h"
 #include "../src/semantic/errors/ErrorClassNoMethodForOp.h"
@@ -196,11 +197,10 @@ TEST_CASE("semantic_output_object_method_call", "[checker]") {
     USemanticInfo info = checker.visit_function(module.ast->functions[0]);
     REQUIRE(not checker.error_reporter.failed);
     std::vector<sem::UExp> e;
-    // auto exp = sem::Declaration("x",
-    //                             std::make_unique<sem::CallExp>(std::make_unique<sem::ObjectMethodCallExp>(std::make_unique<sem::Id>(
-    //                                     "f"), Path("test.tmp.Foo"), "get_foo")
-    // std::vector<USNode>()));
-    // REQUIRE(*(*(std::unique_ptr<sem::FunctionDef>&) info->snode).body->nodes[0] == exp);
+    auto exp = sem::Declaration("x",
+                                std::make_unique<sem::CallExp>(std::make_unique<sem::ObjectMethod>(std::make_unique<sem::Id>(
+                                        "f"), Path("test.tmp.Foo"), "get_foo"), std::vector<sem::UExp>()));
+    REQUIRE(*(*(std::unique_ptr<sem::FunctionDef>&) info->snode).body->nodes[0] == exp);
 }
 
 TEST_CASE("semantic_output_object_method", "[checker]") {
