@@ -6,15 +6,15 @@
 #define XLANG_THROW_H
 
 
-#include "SNode.h"
+#include "Common.h"
 #include <vector>
 #include <string>
 
-class sem::Throw : public sem::SNode {
+class sem::Throw : public sem::Common {
 public:
-    SNode* expression;
+    Common* expression;
     std::vector<std::string> reachables;
-    Throw(SNode* expression);
+    Throw(Common* expression);
 };
 
 

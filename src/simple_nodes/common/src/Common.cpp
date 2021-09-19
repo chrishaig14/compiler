@@ -2,17 +2,17 @@
 // Created by chris on 4/4/21.
 //
 
-#include "../include/SNode.h"
+#include "../include/Common.h"
 using namespace sem;
-SNode::SNode(SNodeType type) {
+Common::Common(CommonType type) {
     this->type = type;
 }
 
-bool SNode::operator!=(const SNode& other) const {
+bool Common::operator!=(const Common& other) const {
     return !(*this == other);
 }
 
-bool SNode::operator==(const SNode& other) const {
+bool Common::operator==(const Common& other) const {
     if (this->type != other.type) {
         return false;
     }

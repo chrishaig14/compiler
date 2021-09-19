@@ -6,16 +6,16 @@
 #define XLANG_CONTINUE_H
 
 
-#include "SNode.h"
+#include "Common.h"
 #include <vector>
 #include <string>
 
-class sem::Continue : public sem::SNode {
+class sem::Continue : public sem::Common {
 public:
     std::vector<std::string> reachables;
     Continue();
 
-    bool equals(const SNode& o) const override;
+    bool equals(const Common& o) const override;
 };
 
 

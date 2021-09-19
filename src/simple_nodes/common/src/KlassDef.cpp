@@ -5,7 +5,7 @@
 #include "../include/KlassDef.h"
 using namespace sem;
 
-bool KlassDef::equals(const SNode& o) const {
+bool KlassDef::equals(const Common& o) const {
     auto& other = (const KlassDef&) o;
     if (this->identifier != other.identifier) {
         return false;
@@ -21,5 +21,5 @@ bool KlassDef::equals(const SNode& o) const {
     return true;
 }
 
-KlassDef::KlassDef(std::string identifier, VectorOfStrings members) : SNode(SNodeType::CLASS), identifier(identifier), members(members) {
+KlassDef::KlassDef(std::string identifier, VectorOfStrings members) : Common(CommonType::CLASS), identifier(identifier), members(members) {
 }

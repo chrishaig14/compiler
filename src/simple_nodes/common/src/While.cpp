@@ -6,10 +6,10 @@
 
 using namespace sem;
 
-While::While(UExp condition, std::unique_ptr<Block> body) : SNode(SNodeType::WHILE), condition(std::move(condition)), body(std::move(body)) {
+While::While(UExp condition, std::unique_ptr<Block> body) : Common(CommonType::WHILE), condition(std::move(condition)), body(std::move(body)) {
 }
 
-bool While::equals(const SNode& o) const {
+bool While::equals(const Common& o) const {
     auto& other = (const While&) o;
     bool cond_ok = *this->condition == *other.condition;
     bool body_ok = *this->body == *other.body;

@@ -6,10 +6,10 @@
 #define XLANG_DECLARATION_H
 
 #include <string>
-#include "SNode.h"
+#include "Common.h"
 #include <cassert>
 
-class sem::Declaration : public sem::SNode {
+class sem::Declaration : public sem::Common {
     UExp _expression;
 public:
     std::string identifier;
@@ -17,7 +17,7 @@ public:
 
     Declaration(const std::string& identifier, UExp _expression);
 
-    bool equals(const SNode& o) const override;
+    bool equals(const Common& o) const override;
 };
 
 

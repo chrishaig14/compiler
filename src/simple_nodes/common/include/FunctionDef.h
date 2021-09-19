@@ -6,11 +6,11 @@
 #define XLANG_FUNCTIONDEF_H
 
 #include <string>
-#include "SNode.h"
+#include "Common.h"
 #include "../../../types.h"
 #include "Block.h"
 
-class sem::FunctionDef : public sem::SNode {
+class sem::FunctionDef : public sem::Common {
 public:
     std::string identifier;
     VectorOfStrings params;
@@ -18,7 +18,7 @@ public:
 
     FunctionDef(std::string identifier, VectorOfStrings params, std::unique_ptr<Block> body);
 
-    bool equals(const SNode& o) const override;
+    bool equals(const Common& o) const override;
 };
 
 

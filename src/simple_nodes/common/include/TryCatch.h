@@ -5,17 +5,17 @@
 #ifndef XLANG_TRYCATCH_H
 #define XLANG_TRYCATCH_H
 
-#include "SNode.h"
+#include "Common.h"
 #include "Block.h"
 
-class sem::TryCatch : public sem::SNode {
+class sem::TryCatch : public sem::Common {
 public:
     TryCatch(Block* body, std::vector<std::pair<std::string, std::string>> e_names_types,
-                  std::vector<SNode*> catches_bodies);
+                  std::vector<Common*> catches_bodies);
 
     std::vector<std::pair<std::string, std::string>> e_names_types;
     Block* body;
-    std::vector<SNode*> catches_bodies;
+    std::vector<Common*> catches_bodies;
 };
 
 

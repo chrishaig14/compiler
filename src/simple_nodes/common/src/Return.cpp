@@ -7,10 +7,10 @@
 
 using namespace sem;
 
-Return::Return(UExp expression) : SNode(SNodeType::RETURN), expression(std::move(expression)) {
+Return::Return(UExp expression) : Common(CommonType::RETURN), expression(std::move(expression)) {
 }
 
-bool Return::equals(const SNode& o) const {
+bool Return::equals(const Common& o) const {
     auto& other = (const Return&) o;
     if (this->expression == nullptr && other.expression != nullptr) {
         return false;

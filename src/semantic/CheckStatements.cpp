@@ -294,7 +294,7 @@ USemanticInfo Checker::visit_match(ast::Match& node) {
 USemanticInfo Checker::visit_continue(ast::Continue& node) {
     auto bn = std::make_unique<sem::Block>();
     if (this->update_loop_index_snode != nullptr) {
-        bn->nodes.push_back(sem::USNode(this->update_loop_index_snode));
+        bn->nodes.push_back(sem::UCommon(this->update_loop_index_snode));
     }
     auto cn = std::make_unique<sem::Continue>();
     bn->nodes.push_back(std::move(cn));
@@ -358,13 +358,13 @@ USemanticInfo Checker::visit_for(ast::For& node) {
 
     USemanticInfo rinfo_p = std::make_unique<SemanticInfo>();
     auto& rinfo = *rinfo_p;
-    rinfo.snode = sem::USNode(make_for_snode(node,
-                                             binfo,
-                                             exp_info_p,
-                                             loop_list_var_id,
-                                             loop_index_var_id,
-                                             loop_list_len_var_id,
-                                             this->update_loop_index_snode));
+    rinfo.snode = sem::UCommon(make_for_snode(node,
+                                              binfo,
+                                              exp_info_p,
+                                              loop_list_var_id,
+                                              loop_index_var_id,
+                                              loop_list_len_var_id,
+                                              this->update_loop_index_snode));
     auto& pn = (std::unique_ptr<sem::Block>&) rinfo.snode;
     pn->locals.push_back(loop_list_var_id);
     this->update_loop_index_snode = nullptr;
@@ -455,9 +455,9 @@ USemanticInfo Checker::visit_if(ast::If& n) {
 
     USemanticInfo info_u = std::make_unique<SemanticInfo>();
     SemanticInfo& info = *info_u;
-    info.snode = std::make_unique<sem::IfSNode>(std::move(condition_snode),
-                                                std::move(body_info->snode),
-                                                std::move(elifs),
-                                                std::move(else_snode));
+    info.snode = std::make_unique<sem::If>(std::move(condition_snode),
+                                           std::move(body_info->snode),
+                                           std::move(elifs),
+                                           std::move(else_snode));
     return info_u;
 }

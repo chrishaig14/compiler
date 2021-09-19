@@ -8,10 +8,10 @@
 using namespace sem;
 
 Call::Call(UExp function, std::vector<UExp> arguments)
-        : SNode(SNodeType::CALL), function(std::move(function)), arguments(std::move(arguments)) {
+        : Common(CommonType::CALL), function(std::move(function)), arguments(std::move(arguments)) {
 }
 
-bool Call::equals(const SNode& o) const {
+bool Call::equals(const Common& o) const {
     auto& other = (const Call&) o;
     return *this->function == *other.function && this->arguments == other.arguments;
 }

@@ -7,12 +7,12 @@
 using namespace sem;
 
 Match::Match(UExp exp, std::string varname, std::vector<std::pair<int, Block*>> cases)
-        : SNode(SNodeType::MATCH), exp(std::move(exp)) {
+        : Common(CommonType::MATCH), exp(std::move(exp)) {
     this->cases = cases;
     this->varname = varname;
 }
 
-bool Match::equals(const sem::SNode& o) const {
+bool Match::equals(const sem::Common& o) const {
     // auto& other = (const Declaration&) o;
     // return this->identifier == other.identifier && *this->expression == *other.expression;
     return false;

@@ -23,7 +23,7 @@
 #include "../simple_nodes/expressions/include/ObjectMember.h"
 #include "../simple_nodes/common/include/While.h"
 #include "../simple_nodes/expressions/include/List.h"
-#include "../simple_nodes/common/include/IfSNode.h"
+#include "../simple_nodes/common/include/If.h"
 #include "../simple_nodes/common/include/Break.h"
 #include "../simple_nodes/common/include/Continue.h"
 #include "../simple_nodes/expressions/include/EnumMember.h"
@@ -91,15 +91,15 @@ public:
     void transpile_class(sem::KlassDef& node);
     void transpile_enum(sem::EnumDef& node);
 
-    void dispatch_top(sem::SNode& node) {
+    void dispatch_top(sem::Common& node) {
         switch (node.type) {
-            case sem::SNodeType::FUNCTION:
+            case sem::CommonType::FUNCTION:
                 this->transpile_function((sem::FunctionDef&) (node));
                 break;
-            case sem::SNodeType::ENUM:
+            case sem::CommonType::ENUM:
                 this->transpile_enum((sem::EnumDef&) node);
                 break;
-            case sem::SNodeType::CLASS:
+            case sem::CommonType::CLASS:
                 this->transpile_class((sem::KlassDef&) node);
                 break;
             default:
@@ -121,7 +121,7 @@ public:
 
     CppOutputCode transpile_list(sem::List& node);
 
-    CppOutputCode transpile_if(sem::IfSNode& node);
+    CppOutputCode transpile_if(sem::If& node);
 
     CppOutputCode transpile_break(sem::Break& node);
 
@@ -138,7 +138,7 @@ public:
     CppOutputCode transpile_dict(sem::Dict& node);
     CppOutputCode transpile_try_catch(sem::TryCatch& node);
 
-    CppOutputCode dispatch(sem::SNode& node);
+    CppOutputCode dispatch(sem::Common& node);
 
     CppOutputCode transpile_throw(sem::Throw& node);
     bool in_try_catch;

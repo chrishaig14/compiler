@@ -7,9 +7,9 @@
 #include "../simple_nodes/common/src/TypeFunction.h"
 #include "../simple_nodes/expressions/include/CallExp.h"
 
-sem::SNode*
+sem::Common*
 make_for_snode(ast::For& node, USemanticInfoBlock& binfo, USemanticInfo& exp_info_p, std::string loop_list_var_id,
-               std::string loop_index_var_id, std::string loop_list_len_var_id, sem::SNode* update_loop_index_snode) {
+               std::string loop_index_var_id, std::string loop_list_len_var_id, sem::Common* update_loop_index_snode) {
     auto* bbn = new sem::Block();
 
     sem::UExp p_node = std::move(exp_info_p->exp_snode);
@@ -51,7 +51,7 @@ make_for_snode(ast::For& node, USemanticInfoBlock& binfo, USemanticInfo& exp_inf
     auto loop_elem_sn = std::make_unique<sem::Declaration>(node.var, std::move(ul));
     bn->nodes.insert(bn->nodes.begin(), std::move(loop_elem_sn));
 
-    bn->nodes.push_back(sem::USNode(update_loop_index_snode));
+    bn->nodes.push_back(sem::UCommon(update_loop_index_snode));
     auto wsn = std::make_unique<sem::While>(std::move(cn), std::move(bn));
     bbn->nodes.push_back(std::move(wsn));
     return bbn;
@@ -86,7 +86,7 @@ USemanticInfo Checker::visit_class(ast::Klass& node) {
     this->add_this = false;
     auto sn = std::make_unique<sem::KlassDef>(node.class_name, node.members_ordered);
     for (auto& m: node.methods) {
-        sem::USNode ms = std::move(this->visit_function(*m.second->method)->snode);
+        sem::UCommon ms = std::move(this->visit_function(*m.second->method)->snode);
         std::unique_ptr<sem::FunctionDef> sf((sem::FunctionDef*) ms.release());
         sn->methods.emplace_back(std::move(sf));
     }
@@ -177,7 +177,7 @@ USemanticInfoBlock Checker::visit_root(ast::Module& node) {
         if (n->ntype == NodeType::BLOCK) {
         } else {
             if (sinfo_p->snode != nullptr) {
-                if (sinfo_p->snode->type == sem::SNodeType::BLOCK) {
+                if (sinfo_p->snode->type == sem::CommonType::BLOCK) {
                     if (((std::unique_ptr<sem::Block>&) sinfo_p->snode)->unwrap) {
                         for (auto& nn : ((std::unique_ptr<sem::Block>&) sinfo_p->snode)->nodes) {
                             sn->nodes.push_back(std::move(nn));
@@ -223,7 +223,7 @@ USemanticInfoBlock Checker::visit_block(ast::Block& node) {
         } else {
             vn.push_back(std::move(n));
             if (sinfo_p->snode != nullptr) {
-                if (sinfo_p->snode->type == sem::SNodeType::BLOCK) {
+                if (sinfo_p->snode->type == sem::CommonType::BLOCK) {
                     if (((std::unique_ptr<sem::Block>&) sinfo_p->snode)->unwrap) {
                         for (auto& nn : ((std::unique_ptr<sem::Block>&) sinfo_p->snode)->nodes) {
                             sn->nodes.push_back(std::move(nn));

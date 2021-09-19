@@ -11,7 +11,7 @@
 #include "Match.h"
 #include "../../expressions/include/NewObject.h"
 #include "Return.h"
-#include "SNode.h"
+#include "Common.h"
 #include "Throw.h"
 #include "TryCatch.h"
 #include "Type.h"

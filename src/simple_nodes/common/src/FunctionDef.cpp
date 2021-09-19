@@ -7,10 +7,10 @@
 using namespace sem;
 
 FunctionDef::FunctionDef(std::string identifier, VectorOfStrings params, std::unique_ptr<Block> body)
-        : SNode(SNodeType::FUNCTION), identifier(identifier), params(params), body(std::move(body)) {
+        : Common(CommonType::FUNCTION), identifier(identifier), params(params), body(std::move(body)) {
 }
 
-bool FunctionDef::equals(const SNode& o) const {
+bool FunctionDef::equals(const Common& o) const {
     auto& other = (const FunctionDef&) o;
     bool id_ok = this->identifier == other.identifier;
     bool params_ok = this->params == other.params;

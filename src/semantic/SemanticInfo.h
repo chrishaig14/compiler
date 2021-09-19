@@ -9,7 +9,7 @@
 #include <vector>
 #include "../ast/Type.h"
 #include "../units/Class.h"
-#include "../simple_nodes/common/include/SNode.h"
+#include "../simple_nodes/common/include/Common.h"
 #include "../units/Module.h"
 #include "../units/Package.h"
 
@@ -28,7 +28,7 @@ public:
         this->entity = *this->_entity;
     }
 
-    sem::USNode snode;
+    sem::UCommon snode;
     sem::UExp exp_snode;
     bool is_tuple_member;
     ~SemanticInfo();
@@ -36,7 +36,7 @@ public:
     SemanticInfo();
 
     bool is_constant;
-    sem::SNode* this_arg;
+    sem::Common* this_arg;
 
     bool is_error();
 };

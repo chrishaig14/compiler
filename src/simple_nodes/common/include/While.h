@@ -6,18 +6,18 @@
 #define XLANG_WHILE_H
 
 
-#include "SNode.h"
+#include "Common.h"
 #include "Block.h"
 #include "../../expressions/include/Exp.h"
 
-class sem::While : public sem::SNode {
+class sem::While : public sem::Common {
 public:
     UExp condition;
     std::unique_ptr<Block> body;
 
     While(UExp condition, std::unique_ptr<Block> body);
 
-    bool equals(const SNode& o) const override;
+    bool equals(const Common& o) const override;
 
 };
 

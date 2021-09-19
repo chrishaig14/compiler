@@ -108,7 +108,7 @@ PythonOutputCode PythonTranspiler::transpile_block(const sem::Block& node) {
     this->indent();
     for (auto& n: node.nodes) {
         PythonOutputCode statement_out = this->dispatch_common(*n);
-        if (n->type == sem::SNodeType::CONST_FUNCTION_CALL || n->type == sem::SNodeType::OBJECT_METHOD_CALL) {
+        if (n->type == sem::CommonType::CONST_FUNCTION_CALL || n->type == sem::CommonType::OBJECT_METHOD_CALL) {
             code += statement_out.pre_code + "\n";
             code += this->indentation() + statement_out.code + "\n";
         } else {
@@ -327,7 +327,7 @@ PythonOutputCode PythonTranspiler::transpile_dict(const sem::Dict& node) {
 }
 
 
-PythonOutputCode PythonTranspiler::transpile_if(const sem::IfSNode& node) {
+PythonOutputCode PythonTranspiler::transpile_if(const sem::If& node) {
     std::string pre_code;
     std::string code;
     PythonOutputCode cond = this->dispatch_expression(node.condition);
@@ -461,15 +461,15 @@ std::string PythonTranspiler::transpile_module(const sem::Block& block) {
     return code;
 }
 
-PythonOutputCode PythonTranspiler::dispatch_top(const sem::SNode& node) {
+PythonOutputCode PythonTranspiler::dispatch_top(const sem::Common& node) {
     switch (node.type) {
-        case sem::SNodeType::FUNCTION:
+        case sem::CommonType::FUNCTION:
             return this->transpile_function((const sem::FunctionDef&) (node));
             break;
             // case SNodeType::ENUM:
             //     return this->transpile_enum((const sem::EnumDef&) node);
             //     break;
-        case sem::SNodeType::CLASS:
+        case sem::CommonType::CLASS:
             return this->transpile_class((const sem::KlassDef&) node);
             break;
         default:
@@ -477,56 +477,56 @@ PythonOutputCode PythonTranspiler::dispatch_top(const sem::SNode& node) {
     }
 }
 
-PythonOutputCode PythonTranspiler::dispatch_common(const sem::SNode& node) {
+PythonOutputCode PythonTranspiler::dispatch_common(const sem::Common& node) {
     switch (node.type) {
-        case sem::SNodeType::BLOCK:
+        case sem::CommonType::BLOCK:
             return this->transpile_block((const sem::Block&) node);
-        case sem::SNodeType::ENUM_MEMBER:
+        case sem::CommonType::ENUM_MEMBER:
             return this->transpile_enum_member((const sem::EnumMember&) node);
-        case sem::SNodeType::BOOLEAN:
+        case sem::CommonType::BOOLEAN:
             return this->transpile_boolean((const sem::Bool&) node);
-        case sem::SNodeType::MATCH:
+        case sem::CommonType::MATCH:
             return this->transpile_match((const sem::Match&) node);
-        case sem::SNodeType::IF:
-            return this->transpile_if((const sem::IfSNode&) node);
-        case sem::SNodeType::BREAK:
+        case sem::CommonType::IF:
+            return this->transpile_if((const sem::If&) node);
+        case sem::CommonType::BREAK:
             return this->transpile_break((const sem::Break&) node);
-        case sem::SNodeType::CONTINUE:
+        case sem::CommonType::CONTINUE:
             return this->transpile_continue((const sem::Continue&) node);
-        case sem::SNodeType::ID:
+        case sem::CommonType::ID:
             return this->transpile_id((const sem::Id&) node);
-        case sem::SNodeType::STRING:
+        case sem::CommonType::STRING:
             return this->transpile_string((const sem::String&) node);
-        case sem::SNodeType::CALL:
+        case sem::CommonType::CALL:
             return this->transpile_call((const sem::Call&) node);
-        case sem::SNodeType::NEW:
+        case sem::CommonType::NEW:
             return this->transpile_new((const sem::NewObject&) node);
-        case sem::SNodeType::DICT:
+        case sem::CommonType::DICT:
             return this->transpile_dict((const sem::Dict&) node);
-        case sem::SNodeType::LIST:
+        case sem::CommonType::LIST:
             return this->transpile_list((const sem::List&) node);
-        case sem::SNodeType::OBJECT_MEMBER:
+        case sem::CommonType::OBJECT_MEMBER:
             return this->transpile_object_member((const sem::ObjectMember&) node);
-        case sem::SNodeType::DECLARATION:
+        case sem::CommonType::DECLARATION:
             return this->transpile_declaration((const sem::Declaration&) node);
-        case sem::SNodeType::WHILE:
+        case sem::CommonType::WHILE:
             return this->transpile_while((const sem::While&) node);
-        case sem::SNodeType::ASSIGNMENT:
+        case sem::CommonType::ASSIGNMENT:
             return this->transpile_assignment((const sem::Assignment&) node);
-        case sem::SNodeType::RETURN:
+        case sem::CommonType::RETURN:
             return this->transpile_return((const sem::Return&) node);
-        case sem::SNodeType::TRY_CATCH:
+        case sem::CommonType::TRY_CATCH:
             return this->transpile_try_catch((const sem::TryCatch&) node);
             // case sem::SNodeType::THROW:
             //     return this->transpile_throw((const sem::Throw&) node);
             //     break;
-        case sem::SNodeType::FLOAT:
+        case sem::CommonType::FLOAT:
             return this->transpile_float((const sem::Float&) node);
-        case sem::SNodeType::NONE:
+        case sem::CommonType::NONE:
             return this->transpile_none((const sem::None&) node);
-        case sem::SNodeType::TERNARY:
+        case sem::CommonType::TERNARY:
             return this->transpile_ternary((const sem::Ternary&) node);
-        case sem::SNodeType::INTEGER:
+        case sem::CommonType::INTEGER:
             return this->transpile_integer((const sem::Integer&) node);
             break;
         default:

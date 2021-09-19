@@ -359,7 +359,7 @@ CppOutputCode STranspiler::transpile_dict(sem::Dict& node) {
 }
 
 
-CppOutputCode STranspiler::transpile_if(sem::IfSNode& node) {
+CppOutputCode STranspiler::transpile_if(sem::If& node) {
     std::string pre;
     std::string out;
     CppOutputCode cond = this->dispatch(*node.condition);
@@ -500,7 +500,7 @@ CppOutputCode STranspiler::transpile_try_catch(sem::TryCatch& node) {
     return CppOutputCode("", out);
 }
 
-CppOutputCode STranspiler::dispatch(sem::SNode& node) {
+CppOutputCode STranspiler::dispatch(sem::Common& node) {
     switch (node.type) {
         case SNodeType::BLOCK:
             return this->transpile_block((sem::Block&) node);
@@ -511,7 +511,7 @@ CppOutputCode STranspiler::dispatch(sem::SNode& node) {
         case SNodeType::MATCH:
             return this->transpile_match((sem::Match&) node);
         case SNodeType::IF:
-            return this->transpile_if((sem::IfSNode&) node);
+            return this->transpile_if((sem::If&) node);
         case SNodeType::BREAK:
             return this->transpile_break((sem::Break&) node);
         case SNodeType::CONTINUE:

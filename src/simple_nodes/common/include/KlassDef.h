@@ -7,10 +7,10 @@
 
 
 #include <string>
-#include "SNode.h"
+#include "Common.h"
 #include "FunctionDef.h"
 
-class sem::KlassDef : public sem::SNode {
+class sem::KlassDef : public sem::Common {
 public:
     std::string identifier;
     VectorOfStrings members;
@@ -18,7 +18,7 @@ public:
 
     KlassDef(std::string identifier, VectorOfStrings members);
 
-    bool equals(const SNode& o) const override;
+    bool equals(const Common& o) const override;
 };
 
 

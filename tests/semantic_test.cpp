@@ -373,7 +373,7 @@ TEST_CASE("semantic_output_if", "[checker]") {
 
     auto block = std::make_unique<sem::Block>();
     block->nodes.push_back(std::make_unique<sem::Declaration>("x", std::make_unique<sem::Integer>("1")));
-    REQUIRE(*sem_func.body->nodes[0] == sem::IfSNode(std::make_unique<sem::Bool>(true), std::move(block), {}, nullptr));
+    REQUIRE(*sem_func.body->nodes[0] == sem::If(std::make_unique<sem::Bool>(true), std::move(block), {}, nullptr));
 }
 
 TEST_CASE("semantic_output_enum_def", "[checker]") {

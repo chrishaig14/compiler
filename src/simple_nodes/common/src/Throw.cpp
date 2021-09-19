@@ -4,5 +4,5 @@
 
 #include "../include/Throw.h"
 using namespace sem;
-Throw::Throw(SNode* expression) : SNode(SNodeType::THROW), expression(expression) {
+Throw::Throw(Common* expression) : Common(CommonType::THROW), expression(expression) {
 }

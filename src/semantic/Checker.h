@@ -34,7 +34,7 @@
 #include "../simple_nodes/expressions/include/expressions.h"
 #include "../simple_nodes/common/include/EnumDef.h"
 #include "../simple_nodes/common/include/FunctionDef.h"
-#include "../simple_nodes/common/include/IfSNode.h"
+#include "../simple_nodes/common/include/If.h"
 #include "../simple_nodes/common/include/While.h"
 #include "../units/FunctionValue.h"
 #include "../units/FunctionValue.h"
@@ -64,9 +64,9 @@ ModuleMember map_unit_to_module_member(Unit u);
 TextPosition add_one_col(TextPosition t);
 bool function_is_generic(const sem::TypeFunction& ft);
 
-sem::SNode*
+sem::Common*
 make_for_snode(ast::For& node, USemanticInfoBlock& binfo, USemanticInfo& exp_info_p, std::string loop_list_var_id,
-               std::string loop_index_var_id, std::string loop_list_len_var_id, sem::SNode* update_loop_index_snode);
+               std::string loop_index_var_id, std::string loop_list_len_var_id, sem::Common* update_loop_index_snode);
 const sem::TypeFunction& get_function_type(const SemanticInfo& fun_info);
 
 class Checker {
@@ -82,7 +82,7 @@ public:
     ErrorReporter error_reporter;
     Entity* this_entity;
     Package& top_package;
-    sem::SNode* update_loop_index_snode;
+    sem::Common* update_loop_index_snode;
 
     Checker(Package& top_package, Module& module);
     ~Checker();
@@ -173,7 +173,7 @@ public:
     make_return_info(const ast::Call& n, bool is_rvalue, USemanticInfo retv, bool is_def_const, bool args_are_constant);
     sem::UExp make_union_rvalue(sem::UExp value_snode, const sem::Type* unaliased_value_type,
                                 const sem::Type* unaliased_target_type) const;
-    sem::SNode* make_option_rvalue(sem::SNode* value_snode, const ast::Type* unaliased_value_type,
+    sem::Common* make_option_rvalue(sem::Common* value_snode, const ast::Type* unaliased_value_type,
                                    const ast::Type* unaliased_target_type) const;
     // USemanticInfo visit_throw(ast::ThrowNode& n);
 

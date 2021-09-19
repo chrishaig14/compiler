@@ -12,7 +12,7 @@
 #include "../simple_nodes/common/include/Match.h"
 #include "../simple_nodes/expressions/include/NewObject.h"
 #include "../simple_nodes/common/include/Return.h"
-#include "../simple_nodes/common/include/SNode.h"
+#include "../simple_nodes/common/include/Common.h"
 #include "../simple_nodes/common/include/Throw.h"
 #include "../simple_nodes/common/include/TryCatch.h"
 #include "../simple_nodes/expressions/include/expressions.h"
@@ -21,7 +21,7 @@
 #include "../simple_nodes/common/include/Continue.h"
 #include "../simple_nodes/common/include/EnumDef.h"
 #include "../simple_nodes/common/include/FunctionDef.h"
-#include "../simple_nodes/common/include/IfSNode.h"
+#include "../simple_nodes/common/include/If.h"
 #include "../simple_nodes/common/include/While.h"
 
 const std::string TOBJECT = "TaggedObject*";
@@ -91,7 +91,7 @@ public:
     PythonOutputCode transpile_class(const sem::KlassDef& node);
     void transpile_enum(const sem::EnumDef& node);
 
-    PythonOutputCode dispatch_top(const sem::SNode& node);
+    PythonOutputCode dispatch_top(const sem::Common& node);
 
     PythonOutputCode transpile_call(const sem::Call& node);
 
@@ -107,7 +107,7 @@ public:
 
     PythonOutputCode transpile_list(const sem::List& node);
 
-    PythonOutputCode transpile_if(const sem::IfSNode& node);
+    PythonOutputCode transpile_if(const sem::If& node);
 
     PythonOutputCode transpile_break(const sem::Break& node);
 
@@ -124,14 +124,14 @@ public:
     PythonOutputCode transpile_dict(const sem::Dict& node);
     PythonOutputCode transpile_try_catch(const sem::TryCatch& node);
 
-    PythonOutputCode dispatch(const sem::SNode& node);
+    PythonOutputCode dispatch(const sem::Common& node);
 
     PythonOutputCode transpile_throw(sem::Throw& node);
     bool in_try_catch;
     std::string transpile_module(const sem::Block& block);
     bool add_self;
     PythonOutputCode dispatch_expression(const sem::Exp& node);
-    PythonOutputCode dispatch_common(const sem::SNode& node);
+    PythonOutputCode dispatch_common(const sem::Common& node);
 };
 
 

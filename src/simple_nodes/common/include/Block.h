@@ -5,18 +5,18 @@
 #ifndef XLANG_BLOCK_H
 #define XLANG_BLOCK_H
 
-#include "SNode.h"
+#include "Common.h"
 #include <vector>
 #include <string>
 
-class sem::Block : public sem::SNode {
+class sem::Block : public sem::Common {
 public:
     bool unwrap;
     std::vector<std::string> locals;
-    std::vector<USNode> nodes;
+    std::vector<UCommon> nodes;
     Block(bool unwrap);
     Block();
-    bool equals(const SNode& o) const override;
+    bool equals(const Common& o) const override;
 };
 
 

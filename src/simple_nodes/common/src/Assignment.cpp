@@ -7,10 +7,10 @@
 using namespace sem;
 
 Assignment::Assignment(UExp lvalue, UExp rvalue)
-        : SNode(SNodeType::ASSIGNMENT), lvalue(std::move(lvalue)), rvalue(std::move(rvalue)) {
+        : Common(CommonType::ASSIGNMENT), lvalue(std::move(lvalue)), rvalue(std::move(rvalue)) {
 }
 
-bool Assignment::equals(const SNode& o) const {
+bool Assignment::equals(const Common& o) const {
     // auto& other = (const Declaration&) o;
     // return this->identifier == other.identifier && *this->expression == *other.expression;
     return false;

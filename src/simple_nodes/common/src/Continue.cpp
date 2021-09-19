@@ -6,9 +6,9 @@
 
 using namespace sem;
 
-Continue::Continue() : SNode(SNodeType::CONTINUE) {
+Continue::Continue() : Common(CommonType::CONTINUE) {
 }
 
-bool Continue::equals(const SNode& o) const {
+bool Continue::equals(const Common& o) const {
     return true;
 }

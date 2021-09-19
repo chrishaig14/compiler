@@ -8,14 +8,14 @@
 
 #include <vector>
 #include <string>
-#include "SNode.h"
+#include "Common.h"
 
-class sem::Break : public sem::SNode {
+class sem::Break : public sem::Common {
 public:
     std::vector<std::string> reachables;
     Break();
 
-    bool equals(const SNode& o) const override;
+    bool equals(const Common& o) const override;
 };
 
 

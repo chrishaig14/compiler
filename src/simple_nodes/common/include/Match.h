@@ -7,19 +7,19 @@
 
 
 #include <vector>
-#include "SNode.h"
+#include "Common.h"
 #include "Block.h"
 #include <string>
 #include "../../expressions/include/Exp.h"
 
-class sem::Match : public sem::SNode {
+class sem::Match : public sem::Common {
 public:
     UExp exp;
     std::vector<std::pair<int, Block*>> cases;
     std::string varname;
     Match(UExp exp, std::string varname, std::vector<std::pair<int, Block*>> cases);
 
-    bool equals(const SNode& o) const override;
+    bool equals(const Common& o) const override;
 };
 
 

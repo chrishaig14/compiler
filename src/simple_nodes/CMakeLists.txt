@@ -36,8 +36,8 @@ add_library(
     common/include/FunctionDef.h
     expressions/src/Id.cpp
     expressions/include/Id.h
-    common/src/IfSNode.cpp
-    common/include/IfSNode.h
+    common/src/If.cpp
+    common/include/If.h
     expressions/src/Integer.cpp
     expressions/include/Integer.h
     expressions/src/List.cpp
@@ -52,8 +52,8 @@ add_library(
     expressions/include/ObjectMember.h
     common/src/Return.cpp
     common/include/Return.h
-    common/src/SNode.cpp
-    common/include/SNode.h
+    common/src/Common.cpp
+    common/include/Common.h
     expressions/src/String.cpp
     expressions/include/String.h
     expressions/src/CallExp.cpp

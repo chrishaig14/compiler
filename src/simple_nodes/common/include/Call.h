@@ -7,15 +7,15 @@
 
 
 #include <vector>
-#include "SNode.h"
+#include "Common.h"
 
-class sem::Call : public sem::SNode {
+class sem::Call : public sem::Common {
 public:
     UExp function;
     std::vector<UExp> arguments;
     Call(UExp function, std::vector<UExp> arguments);
 
-    bool equals(const SNode& o) const override;
+    bool equals(const Common& o) const override;
 };
 
 

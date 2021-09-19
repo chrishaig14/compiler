@@ -6,15 +6,15 @@
 
 using namespace sem;
 
-Block::Block(bool unwrap) : SNode(SNodeType::BLOCK) {
+Block::Block(bool unwrap) : Common(CommonType::BLOCK) {
     this->unwrap = unwrap;
 }
 
-Block::Block() : SNode(SNodeType::BLOCK) {
+Block::Block() : Common(CommonType::BLOCK) {
     this->unwrap = false;
 }
 
-bool Block::equals(const SNode& o) const {
+bool Block::equals(const Common& o) const {
     auto& other = (const Block&) o;
     if (this->nodes.size() != other.nodes.size()) {
         return false;

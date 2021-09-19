@@ -45,7 +45,7 @@ namespace sem {
 
     class Id;
 
-    class IfSNode;
+    class If;
 
     class Integer;
 
@@ -71,7 +71,7 @@ namespace sem {
 
     class While;
 
-    class SNode;
+    class Common;
 
     class TypeObject;
 
@@ -87,7 +87,7 @@ namespace sem {
 
     class Exp;
 
-    enum class SNodeType {
+    enum class CommonType {
         FUNCTION,
         ID,
         DECLARATION,
@@ -145,7 +145,7 @@ namespace sem {
         OBJECT_CONSTRUCTOR
     };
 
-    typedef std::unique_ptr<SNode> USNode;
+    typedef std::unique_ptr<Common> UCommon;
     typedef std::unique_ptr<Exp> UExp;
 
     typedef std::unique_ptr<TypeObject> UTypeObject;

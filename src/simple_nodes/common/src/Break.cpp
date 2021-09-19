@@ -6,9 +6,9 @@
 
 using namespace sem;
 
-Break::Break() : SNode(SNodeType::BREAK) {
+Break::Break() : Common(CommonType::BREAK) {
 }
 
-bool Break::equals(const SNode& o) const {
+bool Break::equals(const Common& o) const {
     return true;
 }
