@@ -14,6 +14,7 @@
 #include "Block.h"
 #include "Path.h"
 #include "ast.h"
+#include "TopNode.h"
 
 struct Implicit {
     std::string type;
@@ -22,7 +23,7 @@ struct Implicit {
     bool is_static;
 };
 
-class ast::Function : public ast::Node {
+class ast::Function : public ast::TopNode {
     ast::VectorOfUTypes _parameter_types;
 public:
     std::vector<std::reference_wrapper<ast::Type>> parameter_types;
@@ -34,7 +35,7 @@ public:
     Function(std::string identifier, const VectorOfStrings& parameter_names, ast::VectorOfUTypes& parameter_types,
              ast::UTypeNode& return_type, std::unique_ptr<ast::Block>& body, TextPosition start, TextPosition end);
 
-    bool equal(const ast::Node& x) const override;
+    bool equal(const ast::TopNode& x) const override;
 
     ~Function() override;
     nlohmann::json to_json() const override;

@@ -78,6 +78,8 @@ add_library(
         Subscript.h
         Ternary.cpp
         Ternary.h
+        TopNode.cpp
+        TopNode.h
         Tuple.cpp
         Tuple.h
         TypeNode.cpp

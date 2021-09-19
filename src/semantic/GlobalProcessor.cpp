@@ -116,19 +116,19 @@ void GlobalProcessor::check_duplicated_names(ast::Module& node) const {
     for (auto& np: node.all) {
         auto& n = *np;
         std::string name;
-        if (n.ntype == NodeType::CLS) {
+        if (n.ntype == TopNodeType::CLS) {
             name = ((ast::Klass&) n).class_name;
-        } else if (n.ntype == NodeType::FUNC) {
+        } else if (n.ntype == TopNodeType::FUNC) {
             name = ((ast::Function&) n).identifier;
-        } else if (n.ntype == NodeType::IMPORT) {
+        } else if (n.ntype == TopNodeType::IMPORT) {
             if (((ast::Import&) n).has_alias) {
                 name = ((ast::Import&) n).alias;
             } else {
                 name = ((ast::Import&) n).path.back();
             }
-        } else if (n.ntype == NodeType::ALIAS) {
-            name = ((ast::Alias&) (n)).alias_id;
-        } else if (n.ntype == NodeType::ENUM) {
+        // } else if (n.ntype == TopNodeType::ALIAS) {
+        //     name = ((ast::Alias&) (n)).alias_id;
+        } else if (n.ntype == TopNodeType::ENUM) {
             name = ((ast::EnumNode&) (n)).id;
         }
         if (names.count(name) == 0) {

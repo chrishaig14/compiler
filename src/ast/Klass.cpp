@@ -11,12 +11,12 @@ Klass::Klass(const std::string& className, VectorOfStrings type_parameters,
              std::unordered_map<std::string, std::unique_ptr<KMethod>> functions,
              std::map<std::string, std::pair<ast::Type*, ast::Node*>> static_members,
              std::unordered_map<std::string, ast::UFunctionNode>& static_methods, TextPosition start, TextPosition end)
-        : ast::Node(NodeType::CLS, start, end), members(std::move(members)), static_members(static_members),
+        : ast::TopNode(TopNodeType::CLS, start, end), members(std::move(members)), static_members(static_members),
           methods(std::move(functions)), static_methods(std::move(static_methods)), class_name(className) {
     this->type_parameters = type_parameters;
 }
 
-bool Klass::equal(const ast::Node& other) const {
+bool Klass::equal(const ast::TopNode& other) const {
     return false;
 }
 

@@ -50,4 +50,8 @@ enum class NodeType {
     INSTANCE,
 };
 
+enum class TopNodeType {
+    IMPORT, CLS, FUNC, ENUM,
+};
+
 #endif //UNTITLED1_NODE_TYPES_H

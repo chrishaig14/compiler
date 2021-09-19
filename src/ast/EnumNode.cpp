@@ -6,14 +6,16 @@
 
 using namespace ast;
 
-EnumNode::EnumNode(std::string id, VectorOfStrings values, TextPosition start, TextPosition end)
-        : ast::Node(NodeType::ENUM, start, end) {
+EnumNode::EnumNode(std::string id, VectorOfStrings values, TextPosition start, TextPosition end) : ast::TopNode(
+        TopNodeType::ENUM,
+        start,
+        end) {
     this->id = id;
     this->values = values;
 
 }
 
-bool EnumNode::equal(const ast::Node& other) const {
+bool EnumNode::equal(const ast::TopNode& other) const {
     return false;
 }
 

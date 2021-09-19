@@ -11,25 +11,16 @@
 #include <utility>
 #include "../types.h"
 #include "ast.h"
+#include "TopNode.h"
 
-class ast::Import : public ast::Node {
+class ast::Import : public ast::TopNode {
 public:
     bool has_alias;
-    bool equal(const ast::Node& other) const override;
+    bool equal(const ast::TopNode& other) const override;
 
-    Import(const VectorOfStrings& path, std::string alias, TextPosition start, TextPosition end)
-            : ast::Node(NodeType::IMPORT, start, end) {
-        this->alias = std::move(alias);
-        this->path = path;
-        this->has_alias = true;
-    }
+    Import(const VectorOfStrings& path, std::string alias, TextPosition start, TextPosition end);
 
-    Import(const VectorOfStrings& path, TextPosition start, TextPosition end) : ast::Node(NodeType::IMPORT,
-                                                                                          start,
-                                                                                          end) {
-        this->has_alias = false;
-        this->path = path;
-    }
+    Import(const VectorOfStrings& path, TextPosition start, TextPosition end);
 
     nlohmann::json to_json() const override;
 

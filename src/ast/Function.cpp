@@ -7,7 +7,7 @@
 
 using namespace ast;
 
-bool Function::equal(const ast::Node& x) const {
+bool Function::equal(const ast::TopNode& x) const {
     const auto& other = (Function&) x;
 //    return false;
     if (this->identifier != other.identifier) {
@@ -34,7 +34,7 @@ bool Function::equal(const ast::Node& x) const {
 
 Function::Function(std::string identifier, const VectorOfStrings& parameter_names, ast::VectorOfUTypes& parameter_types,
                    ast::UTypeNode& return_type, std::unique_ptr<ast::Block>& body, TextPosition start, TextPosition end)
-        : ast::Node(NodeType::FUNC, start, end), _parameter_types(std::move(parameter_types)), body(std::move(body)),
+        : TopNode(TopNodeType::FUNC, start, end), _parameter_types(std::move(parameter_types)), body(std::move(body)),
           return_type(std::move(return_type)) {
     for (auto& t: this->_parameter_types) {
         this->parameter_types.emplace_back(*t);

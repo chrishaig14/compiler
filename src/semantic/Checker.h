@@ -188,7 +188,7 @@ public:
     void init();
     sem::Exp* make_option_rvalue(sem::Exp* value_snode, const ast::Type* unaliased_value_type,
                                  const ast::Type* unaliased_target_type) const;
-    std::unique_ptr<sem::Top> dispatch_top(ast::Node& n);
+    std::unique_ptr<sem::Top> dispatch_top(ast::TopNode& n);
 };
 
 #endif //CHECKER_H

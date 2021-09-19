@@ -9,12 +9,13 @@
 #include "Node.h"
 #include "../types.h"
 #include "ast.h"
+#include "TopNode.h"
 
-class ast::EnumNode : public ast::Node {
+class ast::EnumNode : public ast::TopNode {
 public:
 
     EnumNode(std::string id, VectorOfStrings values, TextPosition start, TextPosition end);
-    bool equal(const ast::Node& other) const override;
+    bool equal(const ast::TopNode& other) const override;
     nlohmann::json to_json() const override;
 
     VectorOfStrings values;

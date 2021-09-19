@@ -17,6 +17,11 @@ struct TestNodeU {
     ast::UNode node;
 };
 
+struct TestTopNodeU {
+    std::string text;
+    std::unique_ptr<ast::TopNode> node;
+};
+
 struct TestTypeNode {
     std::string text;
     ast::Type* node;
@@ -145,7 +150,7 @@ TestNodeU BLOCK_1() {
 // const TestNode block_1{"{" + assignment.text + ";}",
 //                        new BlockNode(ast::VectorOfNodesU{assignment.node}, DUMMY_POS, DUMMY_POS)};
 
-TestNodeU FUNCTION() {
+TestTopNodeU FUNCTION() {
     auto block = BLOCK_U();
     ast::VectorOfUTypes vt;
     vt.push_back(ast::UTypeNode(TYPE_1.node->clone()));

@@ -18,7 +18,7 @@ vector_of_unique_ptr_to_vector_of_reference_wrapper(const std::vector<std::uniqu
     return r;
 }
 
-ast::Module::Module(std::vector<std::unique_ptr<ast::Node>> all,
+ast::Module::Module(std::vector<std::unique_ptr<ast::TopNode>> all,
                     std::vector<std::reference_wrapper<ast::Import>> imports,
                     std::vector<std::reference_wrapper<ast::Klass>> classes,
                     std::vector<std::reference_wrapper<ast::EnumNode>> enums,

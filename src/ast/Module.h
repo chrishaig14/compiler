@@ -17,11 +17,11 @@ public:
     std::vector<std::reference_wrapper<ast::EnumNode>> enums;
     std::vector<std::reference_wrapper<ast::Function>> functions;
 
-    Module(std::vector<std::unique_ptr<ast::Node>> all, std::vector<std::reference_wrapper<ast::Import>> imports,
+    Module(std::vector<std::unique_ptr<ast::TopNode>> all, std::vector<std::reference_wrapper<ast::Import>> imports,
            std::vector<std::reference_wrapper<ast::Klass>> classes,
            std::vector<std::reference_wrapper<ast::EnumNode>> enums,
            std::vector<std::reference_wrapper<ast::Function>> functions);
-    std::vector<std::unique_ptr<ast::Node>> all;
+    std::vector<std::unique_ptr<ast::TopNode>> all;
 
     ~Module() {
         std::cout << "Calling ast::Module destructor" << std::endl;

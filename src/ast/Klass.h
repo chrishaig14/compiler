@@ -22,10 +22,10 @@ public:
     KMethod(Implicit* constraint, ast::UFunctionNode method);
 };
 
-class ast::Klass : public ast::Node {
+class ast::Klass : public ast::TopNode {
 public:
 
-    bool equal(const ast::Node& other) const override;
+    bool equal(const ast::TopNode& other) const override;
     Klass(const std::string& className, VectorOfStrings type_parameters,
           std::vector<std::pair<std::string, ast::UTypeNode>> members, std::unordered_map<std::string, std::unique_ptr<KMethod>> functions,
           std::map<std::string, std::pair<ast::Type*, ast::Node*>> static_members,

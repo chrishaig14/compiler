@@ -59,7 +59,7 @@ std::unique_ptr<ast::Module> Parser::parse_module() {
     std::vector<std::reference_wrapper<ast::EnumNode>> enums;
     std::vector<std::reference_wrapper<ast::Function>> functions;
 
-    std::vector<std::unique_ptr<ast::Node>> all;
+    std::vector<std::unique_ptr<ast::TopNode>> all;
 
     while (this->token.type != TokType::END) {
         switch (this->token.type) {

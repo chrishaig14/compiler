@@ -332,17 +332,19 @@ USemanticInfo Checker::dispatch(ast::Node& nod) {
     return this->dispatch_any(nod, false);
 }
 
-std::unique_ptr<sem::Top> Checker::dispatch_top(ast::Node& n) {
+std::unique_ptr<sem::Top> Checker::dispatch_top(ast::TopNode& n) {
     switch (n.ntype) {
-        case NodeType::CLS:
+        case TopNodeType::CLS:
             return this->visit_class((ast::Klass&) n);
-        case NodeType::FUNC:
+        case TopNodeType::FUNC:
             return this->visit_function((ast::Function&) n);
-        case NodeType::ENUM:
+        case TopNodeType::ENUM:
             return this->visit_enum((ast::EnumNode&) n);
-        default:
-            throw std::runtime_error("Unexpected top!");
+        case TopNodeType::IMPORT:
+            return nullptr;
+            // return this->visit_import((ast::Import&) n);
     }
+    __builtin_unreachable();
 }
 
 USemanticInfo Checker::dispatch_any(ast::Node& n, bool is_rvalue) {
