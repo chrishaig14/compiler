@@ -12,9 +12,7 @@ class sem::None : public sem::Exp {
 public:
     None();
 
-    bool equals(const Exp& o) const override {
-        return true;
-    }
+    bool equals(const Exp& o) const override;
 
 };
 

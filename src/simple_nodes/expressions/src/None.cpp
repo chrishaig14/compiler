@@ -3,6 +3,12 @@
 //
 
 #include "../include/None.h"
+
 using namespace sem;
+
 None::None() : Exp(ExpType::NONE) {
+}
+
+bool None::equals(const Exp& o) const {
+    return true;
 }

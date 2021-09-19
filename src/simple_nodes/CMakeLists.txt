@@ -83,4 +83,4 @@ add_library(
         expressions/src/ObjectConstructor.cpp
         expressions/include/ObjectConstructor.h
         expressions/include/Exp.cpp
-        expressions/include/Exp.h expressions/include/expressions.h)
+        expressions/include/Exp.h expressions/include/expressions.h common/include/common.h)
