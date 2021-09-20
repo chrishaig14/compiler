@@ -1,5 +1,5 @@
 #include "catch.hpp"
-#include "../src/ast/exp/include/UnaryOp.h"
+#include "../src/ast/expressions/include/UnaryOp.h"
 #include "../src/compiler/analyze.h"
 #include "../src/compiler/Compiler.h"
 #include "../src/parser/Parser.h"

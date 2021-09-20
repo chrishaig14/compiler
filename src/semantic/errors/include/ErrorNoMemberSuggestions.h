@@ -6,7 +6,7 @@
 #define XLANG_ERRORNOMEMBERSUGGESTIONS_H
 
 #include "Error.h"
-#include "../../../ast/exp/include/Member.h"
+#include "../../../ast/expressions/include/Member.h"
 #include "../../../simple_nodes/common/include/TypeObject.h"
 
 class ErrorNoMemberSuggestions : public Error {

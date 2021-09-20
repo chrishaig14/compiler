@@ -6,7 +6,7 @@
 #define UNTITLED1_IMPORTNODE_H
 
 
-#include "../common/CommonNode.h"
+#include "TopNode.h"
 
 #include <utility>
 #include "../../util/types.h"

@@ -1,0 +1,36 @@
+//
+// Created by chris on 1/8/20.
+//
+
+#include "Assignment.h"
+#include "../../json/json.hpp"
+
+using namespace ast;
+
+Assignment::Assignment(ast::UExpNode lvalue, ast::UExpNode rvalue, TextPosition start, TextPosition end) : ast::Statement(StatementType::ASSIGN,
+                                                                                                                          start,
+                                                                                                                          end),
+                                                                                             _lvalue(std::move(lvalue)),
+                                                                                             _rvalue(std::move(rvalue)),
+                                                                                             lvalue(*_lvalue),
+                                                                                             rvalue(*_rvalue) {
+}
+
+bool Assignment::equal(const ast::Statement& x) const {
+    auto& other = (Assignment&) x;
+    return this->lvalue == other.lvalue && this->rvalue == other.rvalue;
+}
+
+Assignment::~Assignment() {
+    // delete this->lvalue;
+    // delete this->rvalue;
+}
+
+nlohmann::json Assignment::to_json() const {
+    nlohmann::json j;
+    j["type"] = "assignment";
+    j["assignment"]["lvalue"] = this->lvalue.to_json();
+    j["assignment"]["rvalue"] = this->rvalue.to_json();
+    return j;
+}
+

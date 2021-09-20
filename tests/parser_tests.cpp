@@ -1,9 +1,9 @@
 #include "catch.hpp"
 #include "../src/scanner/Scanner.h"
 #include "../src/parser/Parser.h"
-#include "../src/ast/exp/include/UnaryOp.h"
-#include "../src/ast/exp/include/ExpNode.h"
-#include "../src/ast/exp/include/CallExp.h"
+#include "../src/ast/expressions/include/UnaryOp.h"
+#include "../src/ast/expressions/include/ExpNode.h"
+#include "../src/ast/expressions/include/CallExp.h"
 #include "../src/ast/top/Typeclass.h"
 #include "../src/ast/top/Instance.h"
 
@@ -11,7 +11,7 @@ const TextPosition DUMMY_POS = {0, 0};
 
 struct TestNode {
     std::string text;
-    ast::CommonNode* node;
+    ast::Statement* node;
 };
 
 struct TestExpNode {

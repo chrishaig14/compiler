@@ -375,7 +375,7 @@ UExpressionInfo Checker::dispatch_rvalue(ast::ExpNode& n) {
     __builtin_unreachable();
 }
 
-USemanticInfo Checker::dispatch(ast::CommonNode& nod) {
+USemanticInfo Checker::dispatch(ast::Statement& nod) {
     return this->dispatch_statement(nod, false);
 }
 
@@ -394,36 +394,36 @@ std::unique_ptr<sem::Top> Checker::dispatch_top(ast::TopNode& n) {
     __builtin_unreachable();
 }
 
-USemanticInfo Checker::dispatch_statement(ast::CommonNode& n, bool is_rvalue) {
+USemanticInfo Checker::dispatch_statement(ast::Statement& n, bool is_rvalue) {
     switch (n.ntype) {
-        case CommonNodeType::ASSIGN:
+        case StatementType::ASSIGN:
             return this->visit_assignment((ast::Assignment&) n);
-        case CommonNodeType::BRK:
+        case StatementType::BRK:
             return this->visit_break((ast::Break&) n);
-        case CommonNodeType::CALL:
+        case StatementType::CALL:
             return this->visit_call((ast::Call&) n, is_rvalue);
-        case CommonNodeType::CNTINUE:
+        case StatementType::CNTINUE:
             return this->visit_continue((ast::Continue&) n);
-        case CommonNodeType::DECL:
+        case StatementType::DECL:
             return this->visit_declaration((ast::Declaration&) n);
-        case CommonNodeType::FORLOOP:
+        case StatementType::FORLOOP:
             return this->visit_for((ast::For&) n);
-        case CommonNodeType::CAST:
+        case StatementType::CAST:
             return this->visit_cast((ast::Cast&) n);
-        case CommonNodeType::IFF:
+        case StatementType::IFF:
             return this->visit_if((ast::If&) n);
-        case CommonNodeType::THROW:
+        case StatementType::THROW:
             return nullptr;
             // return this->visit_throw((ThrowNode&) n);
-        case CommonNodeType::RETRN:
+        case StatementType::RETRN:
             return this->visit_return((ast::Return&) n);
-        case CommonNodeType::WHIL:
+        case StatementType::WHIL:
             return this->visit_while((ast::While&) n);
-        case CommonNodeType::IMPORT:
+        case StatementType::IMPORT:
             return this->visit_import((ast::Import&) n);
-        case CommonNodeType::ALIAS:
+        case StatementType::ALIAS:
             return this->visit_alias((ast::Alias&) n);
-        case CommonNodeType::MATCH_EXP:
+        case StatementType::MATCH_EXP:
             return this->visit_match((ast::Match&) n);
         default:
             this->error_reporter.fail("Don't know what to do!");

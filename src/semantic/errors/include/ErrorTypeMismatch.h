@@ -7,7 +7,7 @@
 
 #include "../../../ast/general/Type.h"
 #include "../../../units/Entity.h"
-#include "../../../ast/exp/include/ExpNode.h"
+#include "../../../ast/expressions/include/ExpNode.h"
 #include "Error.h"
 
 class ErrorTypeMismatch : public Error {

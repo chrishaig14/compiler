@@ -16,5 +16,5 @@ std::string ErrorCantAssign::to_str(const CodeLines& code) const {
     return std::string();
 }
 
-ErrorCantAssign::ErrorCantAssign(const ast::CommonNode& n) : n(n) {
+ErrorCantAssign::ErrorCantAssign(const ast::Statement& n) : n(n) {
 }

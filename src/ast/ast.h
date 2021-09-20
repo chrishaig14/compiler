@@ -53,7 +53,7 @@ namespace ast {
 
     class DictNode;
 
-    class CommonNode;
+    class Statement;
 
     class Typeclass;
 
@@ -104,9 +104,9 @@ namespace ast {
     typedef std::unique_ptr<Id> UId;
     typedef std::unique_ptr<Block> UBlock;
     typedef std::unique_ptr<Number> UNumber;
-    typedef std::unique_ptr<CommonNode> UNode;
+    typedef std::unique_ptr<Statement> UNode;
     typedef std::unique_ptr<ExpNode> UExpNode;
-    typedef std::reference_wrapper<CommonNode> RNode;
+    typedef std::reference_wrapper<Statement> RNode;
     typedef std::reference_wrapper<ExpNode> RExpNode;
     typedef std::vector<UNode> VectorOfNodesU;
     typedef std::vector<UExpNode> VectorOfExpNodesU;

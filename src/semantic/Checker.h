@@ -14,7 +14,7 @@
 #include "../ast/top/Module.h"
 #include "../ast/nodes.h"
 #include "../ast/general/ObjectType.h"
-#include "../ast/exp/include/UnaryOp.h"
+#include "../ast/expressions/include/UnaryOp.h"
 #include "../logging/logging.h"
 #include "../util/macros.h"
 #include "../scanner/CodeLines.h"
@@ -169,7 +169,7 @@ public:
     USemanticInfo visit_match(ast::Match& node);
     USemanticInfo visit_alias(ast::Alias& p_node);
     sem::UExp make_rvalue(const Entity& t_entity, sem::UExp value_snode, const sem::Type& target);
-    USemanticInfo dispatch(ast::CommonNode& nod);
+    USemanticInfo dispatch(ast::Statement& nod);
     void fill_value(Value& value);
     void process_function_arguments(SemanticInfo& retv, std::vector<std::unique_ptr<Entity>>& arg_entities,
                                     std::vector<sem::UExp>& arguments, ast::Call& n,
@@ -184,7 +184,7 @@ public:
                                     const ast::Type* unaliased_target_type) const;
     // USemanticInfo visit_throw(ast::ThrowNode& n);
 
-    USemanticInfo dispatch_statement(ast::CommonNode& n, bool is_rvalue);
+    USemanticInfo dispatch_statement(ast::Statement& n, bool is_rvalue);
     Value& entity_value_from_actual_base_path_no_generic(const Path& p);
 
     std::map<std::string, std::unique_ptr<Class>> classes;

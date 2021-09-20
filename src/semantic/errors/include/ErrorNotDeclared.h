@@ -7,7 +7,7 @@
 
 
 #include "Error.h"
-#include "../../../ast/exp/include/Id.h"
+#include "../../../ast/expressions/include/Id.h"
 
 class ErrorNotDeclared : public Error {
     const ast::Id& idn;

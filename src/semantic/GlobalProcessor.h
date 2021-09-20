@@ -22,7 +22,7 @@ public:
 
     void visit_root();
 
-    void dispatch(ast::CommonNode& nod);
+    void dispatch(ast::Statement& nod);
     void visit_function(ast::Function& node);
     void visit_block(ast::Block& node);
     void visit_enum(ast::EnumNode& node);

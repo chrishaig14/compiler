@@ -8,7 +8,6 @@
 
 #include <string>
 #include <vector>
-#include "../common/CommonNode.h"
 
 #include "../../util/types.h"
 #include "../../simple_nodes/common/include/Type.h"

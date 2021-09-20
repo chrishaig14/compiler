@@ -2,6 +2,7 @@
 // Created by chris on 3/7/21.
 //
 
+#include <cassert>
 #include "FunctionType.h"
 #include "ObjectType.h"
 

@@ -8,10 +8,10 @@
 
 #include <string>
 #include <vector>
-#include "../common/CommonNode.h"
+#include "../statements/Statement.h"
 
 #include "../general/Type.h"
-#include "../common/Block.h"
+#include "../statements/Block.h"
 #include "../../util/Path.h"
 #include "../ast.h"
 #include "TopNode.h"

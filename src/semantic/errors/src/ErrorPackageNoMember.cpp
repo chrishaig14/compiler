@@ -17,6 +17,6 @@ std::string ErrorPackageNoMember::to_str(const CodeLines& code) const {
 }
 
 ErrorPackageNoMember::ErrorPackageNoMember(Package* p_package, const std::string basic_string_1, TextPosition position,
-                                           const ast::CommonNode& node, TextPosition position_1, TextPosition position_2) {
+                                           const ast::Statement& node, TextPosition position_1, TextPosition position_2) {
 
 }

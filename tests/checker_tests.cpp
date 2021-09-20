@@ -1,7 +1,7 @@
 #include "catch.hpp"
 #include "../src/scanner/Scanner.h"
 #include "../src/parser/Parser.h"
-#include "../src/ast/exp/include/UnaryOp.h"
+#include "../src/ast/expressions/include/UnaryOp.h"
 #include "../src/semantic/GlobalProcessor.h"
 #include "../src/semantic/Checker.h"
 #include "../src/compiler/Compiler.h"

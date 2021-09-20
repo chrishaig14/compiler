@@ -8,6 +8,8 @@
 
 #include "Type.h"
 #include "../../simple_nodes/common/src/TypeFunction.h"
+#include "../../ast/statements/Statement.h"
+
 
 class ast::FunctionType : public ast::Type {
 public:

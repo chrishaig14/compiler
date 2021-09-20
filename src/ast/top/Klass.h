@@ -7,7 +7,7 @@
 
 
 #include <map>
-#include "../common/CommonNode.h"
+#include "../statements/Statement.h"
 
 #include "../general/Type.h"
 #include "Function.h"

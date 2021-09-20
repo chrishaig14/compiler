@@ -6,13 +6,13 @@
 
 using namespace ast;
 
-bool Alias::equal(const ast::CommonNode& other) const {
+bool Alias::equal(const ast::Statement& other) const {
     return false;
 }
 
-Alias::Alias(std::string alias_id, ast::Type* aliased_type, TextPosition start, TextPosition end) : CommonNode(CommonNodeType::ALIAS,
-                                                                                                               start,
-                                                                                                               end) {
+Alias::Alias(std::string alias_id, ast::Type* aliased_type, TextPosition start, TextPosition end) : Statement(StatementType::ALIAS,
+                                                                                                              start,
+                                                                                                              end) {
     this->alias_id = alias_id;
     this->aliased_type = aliased_type;
 }

@@ -7,7 +7,7 @@
 
 #include <string>
 #include "Entity.h"
-#include "../ast/common/Block.h"
+#include "../ast/statements/Block.h"
 #include "../scanner/CodeLines.h"
 #include "../ast/top/Module.h"
 #include "../simple_nodes/top/include/top.h"

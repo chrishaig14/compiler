@@ -8,76 +8,76 @@ add_library(
     nodes
     top/Alias.cpp
     top/Alias.h
-    common/Assignment.cpp
-    common/Assignment.h
+    statements/Assignment.cpp
+    statements/Assignment.h
     ast.h
-    common/Block.cpp
-    common/Block.h
-    common/Break.cpp
-    common/Break.h
-    common/Call.cpp
-    common/Call.h
-    exp/Cast.cpp
-    exp/Cast.h
-    common/Continue.cpp
-    common/Continue.h
-    common/Declaration.cpp
-    common/Declaration.h
-    exp/src/BinaryOp.cpp
-    exp/include/BinaryOp.h
-    exp/src/Boolean.cpp
-    exp/include/Boolean.h
-    exp/src/CallExp.cpp
-    exp/include/CallExp.h
-    exp/src/DefaultConstructor.cpp
-    exp/include/DefaultConstructor.h
-    exp/include/DefaultConstructor.h
-    exp/src/DictNode.cpp
-    exp/include/DictNode.h
-    exp/src/EmptyDict.cpp
-    exp/include/EmptyDict.h
-    exp/src/EmptyList.cpp
-    exp/include/EmptyList.h
-    exp/src/ExpNode.cpp
-    exp/include/ExpNode.h
-    exp/src/Id.cpp
-    exp/include/Id.h
-    exp/src/List.cpp
-    exp/include/List.h
-    exp/src/Member.cpp
-    exp/include/Member.h
-    exp/src/None.cpp
-    exp/include/None.h
-    exp/src/Number.cpp
-    exp/include/Number.h
-    exp/src/PartialApplication.cpp
-    exp/include/PartialApplication.h
-    exp/src/String.cpp
-    exp/include/String.h
-    exp/src/Subscript.cpp
-    exp/include/Subscript.h
-    exp/src/Ternary.cpp
-    exp/include/Ternary.h
-    exp/src/Tuple.cpp
-    exp/include/Tuple.h
-    exp/src/UnaryOp.cpp
-    exp/include/UnaryOp.h
-    common/For.cpp
-    common/For.h
+    statements/Block.cpp
+    statements/Block.h
+    statements/Break.cpp
+    statements/Break.h
+    statements/Call.cpp
+    statements/Call.h
+    expressions/src/Cast.cpp
+    expressions/Cast.h
+    statements/Continue.cpp
+    statements/Continue.h
+    statements/Declaration.cpp
+    statements/Declaration.h
+    expressions/src/BinaryOp.cpp
+    expressions/include/BinaryOp.h
+    expressions/src/Boolean.cpp
+    expressions/include/Boolean.h
+    expressions/src/CallExp.cpp
+    expressions/include/CallExp.h
+    expressions/src/DefaultConstructor.cpp
+    expressions/include/DefaultConstructor.h
+    expressions/include/DefaultConstructor.h
+    expressions/src/DictNode.cpp
+    expressions/include/DictNode.h
+    expressions/src/EmptyDict.cpp
+    expressions/include/EmptyDict.h
+    expressions/src/EmptyList.cpp
+    expressions/include/EmptyList.h
+    expressions/src/ExpNode.cpp
+    expressions/include/ExpNode.h
+    expressions/src/Id.cpp
+    expressions/include/Id.h
+    expressions/src/List.cpp
+    expressions/include/List.h
+    expressions/src/Member.cpp
+    expressions/include/Member.h
+    expressions/src/None.cpp
+    expressions/include/None.h
+    expressions/src/Number.cpp
+    expressions/include/Number.h
+    expressions/src/PartialApplication.cpp
+    expressions/include/PartialApplication.h
+    expressions/src/String.cpp
+    expressions/include/String.h
+    expressions/src/Subscript.cpp
+    expressions/include/Subscript.h
+    expressions/src/Ternary.cpp
+    expressions/include/Ternary.h
+    expressions/src/Tuple.cpp
+    expressions/include/Tuple.h
+    expressions/src/UnaryOp.cpp
+    expressions/include/UnaryOp.h
+    statements/For.cpp
+    statements/For.h
     general/FunctionType.cpp
     general/FunctionType.h
-    common/If.cpp
-    common/If.h
+    statements/If.cpp
+    statements/If.h
     top/Import.cpp
     top/Import.h
     top/Instance.cpp
     top/Instance.h
-    common/Match.cpp
-    common/Match.h
-    common/CommonNode.cpp
-    common/CommonNode.cpp
-    common/CommonNode.h
-    common/CommonNode.h
+    statements/Match.cpp
+    statements/Match.h
+    statements/Statement.cpp
+    statements/Statement.cpp
+    statements/Statement.h
+    statements/Statement.h
     nodes.h
     general/ObjectType.cpp
     general/ObjectType.h
@@ -85,8 +85,8 @@ add_library(
     optypes.h
     ../util/Path.cpp
     ../util/Path.h
-    common/Return.cpp
-    common/Return.h
+    statements/Return.cpp
+    statements/Return.h
     top/EnumNode.cpp
     top/EnumNode.h
     top/Function.cpp
@@ -101,6 +101,6 @@ add_library(
     top/Typeclass.cpp
     top/Typeclass.h
     general/TypeNode.cpp
-    common/While.cpp
-    common/While.h
+    statements/While.cpp
+    statements/While.h
 )
