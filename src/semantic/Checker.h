@@ -132,12 +132,7 @@ public:
     UExpressionInfo visit_binop(ast::BinaryOp& node);
     UExpressionInfo visit_boolean(ast::Boolean& node);
 
-    UExpressionInfo visit_call_exp(ast::Call& n) {
-        auto s = this->visit_call(n, true);
-        UExpressionInfo u = std::make_unique<ExpressionInfo>();
-        u->exp_snode = std::move(s->exp_snode);
-        return u;
-    }
+    UExpressionInfo visit_call_exp(ast::CallExp& n);
 
     UExpressionInfo visit_lvalue_subscript(ast::Subscript& node);
     UExpressionInfo visit_dict(ast::DictNode& node);
@@ -171,13 +166,13 @@ public:
     sem::UExp make_rvalue(const Entity& t_entity, sem::UExp value_snode, const sem::Type& target);
     USemanticInfo dispatch(ast::Statement& nod);
     void fill_value(Value& value);
-    void process_function_arguments(SemanticInfo& retv, std::vector<std::unique_ptr<Entity>>& arg_entities,
-                                    std::vector<sem::UExp>& arguments, ast::Call& n,
+    void process_function_arguments(ExpressionInfo& retv, std::vector<std::unique_ptr<Entity>>& arg_entities,
+                                    std::vector<sem::UExp>& arguments, ast::CallExp& n,
                                     const sem::TypeFunction& function_type, ExpressionInfo* fun_info_p);
-    bool check_arguments(ast::Call& n, std::vector<sem::UExp>& arguments,
+    bool check_arguments(ast::CallExp& n, std::vector<sem::UExp>& arguments,
                          std::vector<std::unique_ptr<Entity>>& arg_entities);
-    USemanticInfo
-    make_return_info(const ast::Call& n, bool is_rvalue, USemanticInfo retv, bool is_def_const, bool args_are_constant);
+    UExpressionInfo
+    make_return_info(const ast::CallExp& n, bool is_rvalue, UExpressionInfo retv_p, bool is_def_const, bool args_are_constant);
     sem::UExp make_union_rvalue(sem::UExp value_snode, const sem::Type* unaliased_value_type,
                                 const sem::Type* unaliased_target_type) const;
     sem::Common* make_option_rvalue(sem::Common* value_snode, const ast::Type* unaliased_value_type,
@@ -193,6 +188,8 @@ public:
     sem::Exp* make_option_rvalue(sem::Exp* value_snode, const ast::Type* unaliased_value_type,
                                  const ast::Type* unaliased_target_type) const;
     std::unique_ptr<sem::Top> dispatch_top(ast::TopNode& n);
+    UExpressionInfo visit_callexp(ast::CallExp& n, bool is_rvalue);
+    USemanticInfo visit_call(ast::Call& n);
 };
 
 #endif //CHECKER_H

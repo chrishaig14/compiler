@@ -337,7 +337,7 @@ UExpressionInfo Checker::dispatch_rvalue(ast::ExpNode& n) {
         case ExpNodeType::BOOLEAN:
             return this->visit_boolean((ast::Boolean&) n);
         case ExpNodeType::CALL:
-            return this->visit_call_exp((ast::Call&) n);
+            return this->visit_callexp((ast::CallExp&) n, true);
         case ExpNodeType::EMPTYLST:
             return this->visit_emptylist((ast::EmptyList&) n);
         case ExpNodeType::ID:
@@ -400,7 +400,7 @@ USemanticInfo Checker::dispatch_statement(ast::Statement& n, bool is_rvalue) {
         case StatementType::BRK:
             return this->visit_break((ast::Break&) n);
         case StatementType::CALL:
-            return this->visit_call((ast::Call&) n, is_rvalue);
+            return this->visit_call((ast::Call&) n);
         case StatementType::CNTINUE:
             return this->visit_continue((ast::Continue&) n);
         case StatementType::DECL:

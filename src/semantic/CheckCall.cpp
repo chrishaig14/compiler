@@ -4,17 +4,27 @@
 
 #include "CheckCall.h"
 #include "../simple_nodes/common/include/TypeObject.h"
+#include "../ast/expressions/include/CallExp.h"
+#include "../ast/statements/Call.h"
 #include "../simple_nodes/common/src/TypeFunction.h"
 
-USemanticInfo Checker::visit_call(ast::Call& n, bool is_rvalue) {
-    auto retv_p = std::make_unique<SemanticInfo>();
+USemanticInfo Checker::visit_call(ast::Call& n) {
+    // auto s = this->visit_callexp(n, false);
+    // UExpressionInfo u = std::make_unique<ExpressionInfo>();
+    // u->exp_snode = std::move(s->exp_snode);
+    // return u;
+    return nullptr;
+}
+
+UExpressionInfo Checker::visit_callexp(ast::CallExp& n, bool is_rvalue) {
+    auto retv_p = std::make_unique<ExpressionInfo>();
     auto& retv = *retv_p;
     bool old_is_call = this->is_call;
     this->is_call = true;
     UExpressionInfo fun_info_p = this->dispatch_rvalue(n.function);
     this->is_call = old_is_call;
     if (fun_info_p->is_error()) {
-        return error_stub();
+        return exp_error_stub();
     }
 
     bool is_def_const = n.function.ntype == ExpNodeType::DEF_CONST;
@@ -23,8 +33,8 @@ USemanticInfo Checker::visit_call(ast::Call& n, bool is_rvalue) {
     // bool is_a_method = false;
     // Node* object_node;
     if ((fun_info.entity.get().type != E_TYPE::CONST_FUNCTION && fun_info_p->entity.get().type != E_TYPE::VALUE)) {
-        this->error_reporter.error(std::make_unique<ErrorNotAFunction>(n));
-        return error_stub();
+        // this->error_reporter.error(std::make_unique<ErrorNotAFunction>(n));
+        return exp_error_stub();
     }
     const sem::TypeFunction& function_type = get_function_type(fun_info);
     // ok
@@ -34,7 +44,7 @@ USemanticInfo Checker::visit_call(ast::Call& n, bool is_rvalue) {
             retv.set_entity(entity_from_type(*function_type.return_type->to_ast()));
             return retv_p;
         } else {
-            return error_stub();
+            return exp_error_stub();
         }
     }
 
@@ -42,7 +52,7 @@ USemanticInfo Checker::visit_call(ast::Call& n, bool is_rvalue) {
     std::vector<sem::UExp> arguments;
     bool has_error = check_arguments(n, arguments, arg_entities);
     if (has_error) {
-        return error_stub();
+        return exp_error_stub();
     }
     std::cout << "Calling function of type: " << function_type.to_string() << std::endl;
 
@@ -150,7 +160,8 @@ USemanticInfo Checker::visit_call(ast::Call& n, bool is_rvalue) {
     // }
     // }
     retv.exp_snode = std::make_unique<sem::CallExp>(std::move(fun_info_p->exp_snode), std::move(arguments));
-    return make_return_info(n, is_rvalue, std::move(retv_p), is_def_const, args_are_constant);
+    auto f = make_return_info(n, is_rvalue, std::move(retv_p), is_def_const, args_are_constant);
+    return f;
 }
 
 const sem::TypeFunction& get_function_type(const ExpressionInfo& fun_info) {
@@ -162,13 +173,15 @@ const sem::TypeFunction& get_function_type(const ExpressionInfo& fun_info) {
     }
 }
 
-USemanticInfo Checker::make_return_info(const ast::Call& n, bool is_rvalue, USemanticInfo retv_p, bool is_def_const,
-                                        bool args_are_constant) {
-    auto& retv = *retv_p;
+UExpressionInfo Checker::make_return_info(const ast::CallExp& n, bool is_rvalue, UExpressionInfo retv_p, bool is_def_const,
+                                          bool args_are_constant) {
+    UExpressionInfo retvp = std::move(retv_p);
+    auto& retv = *retvp;
     if (retv.entity.get().type == E_TYPE::NOTHING) {
         if (is_rvalue) {
-            this->error_reporter.error(std::make_unique<ErrorExpectedExpression>(retv.entity, n));
-            return error_stub();
+            // this->error_reporter.error(std::make_unique<ErrorExpectedExpression>(retv.entity, n));
+            throw std::runtime_error("Error expected expression!");
+            return exp_error_stub();
         }
     } else if (retv.entity.get().type == E_TYPE::VALUE) {
         Value& value = ((Value&) retv.entity.get());
@@ -181,10 +194,10 @@ USemanticInfo Checker::make_return_info(const ast::Call& n, bool is_rvalue, USem
         }
     }
     retv.is_constant = is_def_const && args_are_constant;
-    return retv_p;
+    return retvp;
 }
 
-bool Checker::check_arguments(ast::Call& n, std::vector<sem::UExp>& arguments,
+bool Checker::check_arguments(ast::CallExp& n, std::vector<sem::UExp>& arguments,
                               std::vector<std::unique_ptr<Entity>>& arg_entities) {
     bool has_error;
     for (auto& arg: n.arguments) {
@@ -210,8 +223,8 @@ bool Checker::check_arguments(ast::Call& n, std::vector<sem::UExp>& arguments,
     return has_error;
 }
 
-void Checker::process_function_arguments(SemanticInfo& retv, std::vector<std::unique_ptr<Entity>>& arg_entities,
-                                         std::vector<sem::UExp>& arguments, ast::Call& n,
+void Checker::process_function_arguments(ExpressionInfo& retv, std::vector<std::unique_ptr<Entity>>& arg_entities,
+                                         std::vector<sem::UExp>& arguments, ast::CallExp& n,
                                          const sem::TypeFunction& function_type, ExpressionInfo* fun_info_p) {
     ast::UTypeNode rtype(function_type.return_type->to_ast());
     retv.set_entity(entity_from_type(*rtype));
