@@ -1,0 +1,38 @@
+//
+// Created by chris on 7/12/20.
+//
+
+#include "../include/PartialApplication.h"
+
+using namespace ast;
+
+bool PartialApplication::equal(const ast::ExpNode& other) const {
+    const PartialApplication& other_p = (PartialApplication&) other;
+    if ((*(this->function)) != (*(other_p.function))) {
+        return false;
+    }
+    if (this->args.size() != other_p.args.size()) {
+        return false;
+    }
+    for (size_t i = 0; i < this->args.size(); i++) {
+        if (this->args[i] == nullptr && other_p.args[i] != nullptr) {
+            return false;
+        } else if (this->args[i] != nullptr && other_p.args[i] == nullptr) {
+            return false;
+        } else if (this->args[i] != nullptr && other_p.args[i] != nullptr) {
+            if (*this->args[i] != *other_p.args[i]) {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+PartialApplication::PartialApplication(ast::UExpNode function, ast::VectorOfExpNodesU args, TextPosition start, TextPosition end)
+        : ast::ExpNode(ExpNodeType::PARTIAL, start, end), function(std::move(function)), args(std::move(args)) {
+}
+
+nlohmann::json PartialApplication::to_json() const {
+    return nlohmann::json();
+}
+

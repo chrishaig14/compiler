@@ -8,7 +8,7 @@
 
 #include <string>
 #include "Node.h"
-#include "exp/ExpNode.h"
+#include "exp/include/ExpNode.h"
 #include "Type.h"
 #include "../utils.h"
 

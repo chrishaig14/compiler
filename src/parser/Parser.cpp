@@ -4,17 +4,17 @@
 
 #include "Parser.h"
 #include "../semantic/GlobalProcessor.h"
-#include "../ast/exp/PartialApplication.h"
-#include "../ast/exp/UnaryOp.h"
+#include "../ast/exp/include/PartialApplication.h"
+#include "../ast/exp/include/UnaryOp.h"
 #include "../ast/top/Module.h"
 #include "../logging/logging.h"
-#include "../ast/exp/DefaultConstructor.h"
+#include "../ast/exp/include/DefaultConstructor.h"
 #include <fmt/core.h>
 #include <fmt/color.h>
 #include <exception>
 #include <set>
 #include "../ast/ObjectType.h"
-#include "../ast/exp/CallExp.h"
+#include "../ast/exp/include/CallExp.h"
 
 std::unordered_map<TokType, OpType> TOKEN_TO_OP = {{TokType::PLUS,  OpType::ADD},
                                                    {TokType::MINUS, OpType::SUB},

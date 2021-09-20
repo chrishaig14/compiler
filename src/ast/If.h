@@ -11,7 +11,7 @@
 
 #include "Block.h"
 #include "Node.h"
-#include "exp/ExpNode.h"
+#include "exp/include/ExpNode.h"
 #include "ast.h"
 
 class ast::If : public ast::Node {

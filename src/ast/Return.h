@@ -10,7 +10,7 @@
 #include "../types.h"
 #include "Type.h"
 #include "ast.h"
-#include "exp/ExpNode.h"
+#include "exp/include/ExpNode.h"
 
 class ast::Return : public ast::Node {
 public:

@@ -1,9 +1,9 @@
 #include "catch.hpp"
 #include "../src/scanner/Scanner.h"
 #include "../src/parser/Parser.h"
-#include "../src/ast/exp/UnaryOp.h"
-#include "../src/ast/exp/ExpNode.h"
-#include "../src/ast/exp/CallExp.h"
+#include "../src/ast/exp/include/UnaryOp.h"
+#include "../src/ast/exp/include/ExpNode.h"
+#include "../src/ast/exp/include/CallExp.h"
 #include "../src/ast/Typeclass.h"
 #include "../src/ast/Instance.h"
 

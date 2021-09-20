@@ -14,7 +14,7 @@
 #include "../ast/top/Module.h"
 #include "../ast/nodes.h"
 #include "../ast/ObjectType.h"
-#include "../ast/exp/UnaryOp.h"
+#include "../ast/exp/include/UnaryOp.h"
 #include "../logging/logging.h"
 #include "../macros.h"
 #include "../scanner/CodeLines.h"
