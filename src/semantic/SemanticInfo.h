@@ -13,6 +13,34 @@
 #include "../units/Module.h"
 #include "../units/Package.h"
 
+class ExpressionInfo {
+public:
+
+    std::reference_wrapper<Entity> entity;
+    std::unique_ptr<Entity> _entity;
+
+    void set_entity(Entity* e) {
+        this->_entity = std::unique_ptr<Entity>(e);
+        this->entity = *e;
+    }
+
+    void set_entity(std::unique_ptr<Entity> e) {
+        this->_entity = std::move(e);
+        this->entity = *this->_entity;
+    }
+
+    bool is_tuple_member;
+    ~ExpressionInfo();
+
+    ExpressionInfo();
+
+    bool is_constant;
+    sem::Common* this_arg;
+
+    bool is_error();
+    sem::UExp exp_snode;
+};
+
 class SemanticInfo {
 public:
     std::reference_wrapper<Entity> entity;
@@ -44,6 +72,11 @@ public:
 class ErrorStub : public SemanticInfo {
 public:
     ErrorStub();
+};
+
+class ExpErrorStub : public ExpressionInfo {
+public:
+    ExpErrorStub();
 };
 
 

@@ -50,6 +50,34 @@ enum class NodeType {
     INSTANCE,
 };
 
+enum class ExpNodeType {
+    BINOP,
+    PARTIAL,
+    BOOLEAN,
+    DEF_CONST,
+    CALL,
+    METHOD,
+    CAST,
+    DICT,
+    EMPTYDICT,
+    CLS,
+    EMPTYLST,
+    ID,
+    LST,
+    MEMBER,
+    NONE,
+    NUMBER,
+    STRNG,
+    SUB,
+    TERNARY,
+    TUPLE,
+    BOOLOP,
+    MATCH_EXP,
+    ALIAS,
+    UNARY,
+};
+
+
 enum class TopNodeType {
     IMPORT, CLS, FUNC, ENUM,
 };

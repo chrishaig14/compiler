@@ -6,20 +6,20 @@
 #include "../ast/ObjectType.h"
 #include "../simple_nodes/common/include/TypeObject.h"
 
-std::unique_ptr<SemanticInfo> Checker::expect_rvalue_of_type(const sem::Type& target, ast::Node& node) {
-    USemanticInfo rinfo = this->dispatch_rvalue(node);
+UExpressionInfo Checker::expect_rvalue_of_type(const sem::Type& target, ast::Node& node) {
+    UExpressionInfo rinfo = this->dispatch_rvalue(node);
     if (rinfo->is_error()) {
-        return error_stub();
+        return exp_error_stub();
     }
     Entity& r_entity = rinfo->entity.get();
     if (r_entity.type != E_TYPE::VALUE && r_entity.type != E_TYPE::CONST_FUNCTION) {
         this->error_reporter.error(std::make_unique<ErrorTypeMismatch>(target, node, r_entity));
-        return error_stub();
+        return exp_error_stub();
     }
     sem::UExp snode = make_rvalue(r_entity, std::move(rinfo->exp_snode), target);
     if (snode == nullptr) {
         this->error_reporter.error(std::make_unique<ErrorTypeMismatch>(target, node, r_entity));
-        return error_stub();
+        return exp_error_stub();
     }
     rinfo->exp_snode = std::move(snode);
     return rinfo;
@@ -146,7 +146,7 @@ USemanticInfo Checker::check_declaration_with_type(ast::Declaration& n) {
         this->module.fill_actual(*type);
     }
     sem::UType sem_type(type->to_sem());
-    USemanticInfo rvalue_sinfo = this->expect_rvalue_of_type(*sem_type, n.expression);
+    UExpressionInfo rvalue_sinfo = this->expect_rvalue_of_type(*sem_type, n.expression);
     if (rvalue_sinfo->is_error()) {
         return error_stub();
     }
@@ -162,7 +162,7 @@ USemanticInfo Checker::check_declaration_with_type(ast::Declaration& n) {
 }
 
 USemanticInfo Checker::check_declaration_without_type(ast::Declaration& n) {
-    USemanticInfo exp_info_p = this->dispatch(n.expression);
+    UExpressionInfo exp_info_p = this->dispatch_rvalue(n.expression);
     if (exp_info_p->is_error()) {
         return error_stub();
     }

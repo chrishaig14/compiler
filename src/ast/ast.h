@@ -93,6 +93,8 @@ namespace ast {
 
     class TopNode;
 
+    class ExpNode;
+
     class FunctionType;
 
     typedef std::unique_ptr<Function> UFunctionNode;

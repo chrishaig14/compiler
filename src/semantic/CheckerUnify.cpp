@@ -174,9 +174,9 @@ USemanticInfo Checker::visit_alias(ast::Alias& p_node) {
     return info_u;
 }
 
-USemanticInfo Checker::enum_member(Enum* enumm, const std::string& value, ast::Member& node) {
-    USemanticInfo info_u = std::make_unique<SemanticInfo>();
-    SemanticInfo& info = *info_u;
+UExpressionInfo Checker::enum_member(Enum* enumm, const std::string& value, ast::Member& node) {
+    UExpressionInfo info_u = std::make_unique<ExpressionInfo>();
+    ExpressionInfo& info = *info_u;
     for (size_t i = 0; i < enumm->values.size(); i++) {
         if (value == enumm->values[i]) {
             auto* otype = new sem::TypeObject(enumm->enumm_name, enumm->path);
@@ -188,7 +188,7 @@ USemanticInfo Checker::enum_member(Enum* enumm, const std::string& value, ast::M
         }
     }
     this->error_reporter.error(std::make_unique<ErrorEnumNoValue>(enumm->enumm_name, value, node, enumm));
-    return error_stub();
+    return exp_error_stub();
 }
 
 std::unique_ptr<Entity> Checker::entity_from_type(const ast::Type& type) {

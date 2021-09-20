@@ -236,7 +236,8 @@ TEST_CASE("semantic_output_float_literal", "[checker]") {
 
     CHECKER()
     ast::Node& expression = ((ast::Declaration&) *(module.ast->functions[0].get().body->nodes[0])).expression;
-    USemanticInfo info = checker.dispatch_rvalue(expression);
+    UExpressionInfo info = checker.dispatch_rvalue(expression);
+
 
     REQUIRE(!checker.error_reporter.failed);
     REQUIRE(checker.error_reporter.errors.size() == 0);
@@ -253,7 +254,8 @@ TEST_CASE("semantic_output_float_literal", "[checker]") {
 //     analyze_module_result(module, c.top_package);
 //     Checker checker(c.top_package,module);
 //     ast::Node* expression = ((ast::DeclarationNode*) ((FunctionNode&)* module.ast->nodes[0]).body->nodes[0])->expression;
-//     USemanticInfo info = checker.dispatch_rvalue(expression);
+//     UExpressionInfo info = checker.dispatch_rvalue(expression);
+
 //
 //     REQUIRE(!checker.error_reporter.failed);
 //     REQUIRE(checker.error_reporter.errors.size() == 0);
@@ -283,7 +285,8 @@ TEST_CASE("semantic_output_binop", "[checker]") {
     checker.init();
 
     ast::Node& expression = ((ast::Declaration&) *(module.ast->functions[0].get().body->nodes[0])).expression;
-    USemanticInfo info = checker.dispatch_rvalue(expression);
+    UExpressionInfo info = checker.dispatch_rvalue(expression);
+
 
     REQUIRE_CHECKER_OK()
     CHECK(info->entity.get().type == E_TYPE::VALUE);
@@ -300,7 +303,8 @@ TEST_CASE("semantic_output_boolop", "[checker]") {
 
     ast::Node& expression = ((ast::Declaration&) *(module.ast->functions[0].get().body->nodes[0])).expression;
 
-    USemanticInfo info = checker.dispatch_rvalue(expression);
+    UExpressionInfo info = checker.dispatch_rvalue(expression);
+
 
     REQUIRE_CHECKER_OK()
     CHECK(info->entity.get().type == E_TYPE::VALUE);
@@ -317,7 +321,8 @@ TEST_CASE("semantic_output_subscript", "[checker]") {
 
     ast::Node& expression = ((ast::Declaration&) *(module.ast->functions[0].get().body->nodes[0])).expression;
 
-    USemanticInfo info = checker.dispatch_rvalue(expression);
+    UExpressionInfo info = checker.dispatch_rvalue(expression);
+
 
     REQUIRE_CHECKER_OK()
 }

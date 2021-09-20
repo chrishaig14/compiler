@@ -8,6 +8,15 @@
 #include "../simple_nodes/common/src/TypeFunction.h"
 #include "util.h"
 
+USemanticInfo error_stub() {
+    return std::make_unique<ErrorStub>();
+}
+
+UExpressionInfo exp_error_stub() {
+    return std::make_unique<ExpErrorStub>();
+}
+
+
 bool function_is_generic(const sem::TypeFunction& ft) {
     for (auto& param_type: ft.param_types) {
         if (is_generic(*param_type)) {
@@ -280,10 +289,6 @@ Class* Checker::instantiate_generic(const Class& generic, const ast::ObjectType&
     return concrete;
 }
 
-USemanticInfo error_stub() {
-    return std::make_unique<ErrorStub>();
-}
-
 ModuleMember map_unit_to_module_member(Unit u) {
     switch (u.type) {
         case U_TYPE::PACKAGE:
@@ -324,12 +329,54 @@ bool Checker::is_variable(const ast::ObjectType& a) {
     return a.type_params.empty() && (islower(a.id[0]) != 0);
 }
 
-USemanticInfo Checker::dispatch_rvalue(ast::Node& nod) {
-    return this->dispatch_any(nod, true);
+UExpressionInfo Checker::dispatch_rvalue(ast::Node& n) {
+    switch (n.ntype) {
+        case NodeType::BINOP: {
+            auto r = this->visit_binop((ast::BinaryOp&) n);
+            return r;
+        }
+        case NodeType::BOOLEAN:
+            return this->visit_boolean((ast::Boolean&) n);
+        case NodeType::CALL:
+            return this->visit_call_exp((ast::Call&) n);
+        case NodeType::EMPTYLST:
+            return this->visit_emptylist((ast::EmptyList&) n);
+        case NodeType::ID:
+            return this->visit_id((ast::Id&) n);
+        case NodeType::LST:
+            return this->visit_list((ast::List&) n);
+        case NodeType::MEMBER:
+            return this->visit_member((ast::Member&) n);
+        case NodeType::NONE:
+            return this->visit_none((ast::None&) n);
+        case NodeType::NUMBER:
+            return this->visit_number((ast::Number&) n);
+        case NodeType::STRNG:
+            return this->visit_string((ast::String&) n);
+        case NodeType::SUB:
+            return this->visit_subscript((ast::Subscript&) n);
+        case NodeType::TERNARY:
+            return this->visit_ternary((ast::Ternary&) n);
+        case NodeType::TUPLE:
+            return this->visit_tuple((ast::Tuple&) n);
+        case NodeType::UNARY:
+            return this->visit_unary((ast::UnaryOp&) n);
+        case NodeType::PARTIAL:
+            return this->visit_partial((ast::PartialApplication&) n);
+        case NodeType::DICT:
+            return this->visit_dict((ast::DictNode&) n);
+        case NodeType::EMPTYDICT:
+            return this->visit_emptydict((ast::EmptyDict&) n);
+        case NodeType::DEF_CONST:
+            return this->visit_defconst((ast::DefaultConstructor&) n);
+        default:
+            this->error_reporter.fail("Don't know what to do!");
+    }
+    __builtin_unreachable();
 }
 
 USemanticInfo Checker::dispatch(ast::Node& nod) {
-    return this->dispatch_any(nod, false);
+    return this->dispatch_statement(nod, false);
 }
 
 std::unique_ptr<sem::Top> Checker::dispatch_top(ast::TopNode& n) {
@@ -347,18 +394,10 @@ std::unique_ptr<sem::Top> Checker::dispatch_top(ast::TopNode& n) {
     __builtin_unreachable();
 }
 
-USemanticInfo Checker::dispatch_any(ast::Node& n, bool is_rvalue) {
+USemanticInfo Checker::dispatch_statement(ast::Node& n, bool is_rvalue) {
     switch (n.ntype) {
         case NodeType::ASSIGN:
             return this->visit_assignment((ast::Assignment&) n);
-        case NodeType::BINOP: {
-            auto r = this->visit_binop((ast::BinaryOp&) n);
-            return r;
-        }
-            // case NodeType::BLOCK:
-            //     return this->visit_block((ast::Block&) n);
-        case NodeType::BOOLEAN:
-            return this->visit_boolean((ast::Boolean&) n);
         case NodeType::BRK:
             return this->visit_break((ast::Break&) n);
         case NodeType::CALL:
@@ -367,49 +406,19 @@ USemanticInfo Checker::dispatch_any(ast::Node& n, bool is_rvalue) {
             return this->visit_continue((ast::Continue&) n);
         case NodeType::DECL:
             return this->visit_declaration((ast::Declaration&) n);
-        case NodeType::EMPTYLST:
-            return this->visit_emptylist((ast::EmptyList&) n);
         case NodeType::FORLOOP:
             return this->visit_for((ast::For&) n);
-        case NodeType::ID:
-            return this->visit_id((ast::Id&) n);
         case NodeType::CAST:
             return this->visit_cast((ast::Cast&) n);
         case NodeType::IFF:
             return this->visit_if((ast::If&) n);
-        case NodeType::LST:
-            return this->visit_list((ast::List&) n);
-        case NodeType::MEMBER:
-            return this->visit_member((ast::Member&) n);
-        case NodeType::NONE:
-            return this->visit_none((ast::None&) n);
-        case NodeType::NUMBER:
-            return this->visit_number((ast::Number&) n);
         case NodeType::THROW:
             return nullptr;
             // return this->visit_throw((ThrowNode&) n);
         case NodeType::RETRN:
             return this->visit_return((ast::Return&) n);
-        case NodeType::STRNG:
-            return this->visit_string((ast::String&) n);
-        case NodeType::SUB:
-            return this->visit_subscript((ast::Subscript&) n);
-        case NodeType::TERNARY:
-            return this->visit_ternary((ast::Ternary&) n);
-        case NodeType::TUPLE:
-            return this->visit_tuple((ast::Tuple&) n);
-        case NodeType::UNARY:
-            return this->visit_unary((ast::UnaryOp&) n);
         case NodeType::WHIL:
             return this->visit_while((ast::While&) n);
-        case NodeType::PARTIAL:
-            return this->visit_partial((ast::PartialApplication&) n);
-        case NodeType::DICT:
-            return this->visit_dict((ast::DictNode&) n);
-        case NodeType::EMPTYDICT:
-            return this->visit_emptydict((ast::EmptyDict&) n);
-        case NodeType::DEF_CONST:
-            return this->visit_defconst((ast::DefaultConstructor&) n);
         case NodeType::IMPORT:
             return this->visit_import((ast::Import&) n);
         case NodeType::ALIAS:

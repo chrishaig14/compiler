@@ -7,18 +7,18 @@
 #include "../simple_nodes/common/include/TypeObject.h"
 #include "../simple_nodes/common/src/TypeFunction.h"
 
-USemanticInfo Checker::visit_boolean(ast::Boolean& node) {
-    USemanticInfo info_u = std::make_unique<SemanticInfo>();
-    SemanticInfo& info = *info_u;
+UExpressionInfo Checker::visit_boolean(ast::Boolean& node) {
+    UExpressionInfo info_u = std::make_unique<ExpressionInfo>();
+    ExpressionInfo& info = *info_u;
     info.set_entity(this->entity_value_from_actual_base_path_no_generic(Path("libcore.libcore.Boolean")).clone());
     info.exp_snode = std::make_unique<sem::Bool>(node.value);
     return info_u;
 }
 
 
-USemanticInfo Checker::visit_number(ast::Number& node) {
-    USemanticInfo info_u = std::make_unique<SemanticInfo>();
-    SemanticInfo& info = *info_u;
+UExpressionInfo Checker::visit_number(ast::Number& node) {
+    UExpressionInfo info_u = std::make_unique<ExpressionInfo>();
+    ExpressionInfo& info = *info_u;
     switch (node.num_type) {
         case NumberType::INTEGER: {
             info.set_entity(this->entity_value_from_actual_base_path_no_generic(Path("libcore.libcore.Integer")).clone());
@@ -49,9 +49,9 @@ USemanticInfo Checker::visit_number(ast::Number& node) {
     return info_u;
 }
 
-USemanticInfo Checker::visit_none(ast::None& node) {
-    USemanticInfo info_u = std::make_unique<SemanticInfo>();
-    SemanticInfo& info = *info_u;
+UExpressionInfo Checker::visit_none(ast::None& node) {
+    UExpressionInfo info_u = std::make_unique<ExpressionInfo>();
+    ExpressionInfo& info = *info_u;
     // info.set_type(ObjectType("NoneType"));
     auto v = std::make_unique<Value>(new sem::TypeObject("NoneType"));
     info.set_entity(v.release());
@@ -59,9 +59,9 @@ USemanticInfo Checker::visit_none(ast::None& node) {
     return info_u;
 }
 
-USemanticInfo Checker::visit_emptylist(ast::EmptyList& node) {
-    USemanticInfo info_u = std::make_unique<SemanticInfo>();
-    SemanticInfo& info = *info_u;
+UExpressionInfo Checker::visit_emptylist(ast::EmptyList& node) {
+    UExpressionInfo info_u = std::make_unique<ExpressionInfo>();
+    ExpressionInfo& info = *info_u;
     this->module.fill_actual(*node.type);
     auto* otype = new sem::TypeObject("List", {node.type->to_sem()}, Path("libcore.libcore.List"));
     // auto ov = std::make_unique<Value>(otype);
@@ -74,9 +74,9 @@ USemanticInfo Checker::visit_emptylist(ast::EmptyList& node) {
     return info_u;
 }
 
-USemanticInfo Checker::visit_string(ast::String& node) {
-    USemanticInfo info_u = std::make_unique<SemanticInfo>();
-    SemanticInfo& info = *info_u;
+UExpressionInfo Checker::visit_string(ast::String& node) {
+    UExpressionInfo info_u = std::make_unique<ExpressionInfo>();
+    ExpressionInfo& info = *info_u;
     info.is_constant = true;
     info.exp_snode = std::make_unique<sem::String>(node.str);
     // auto* otype = new ast::ObjectType("String", {});
@@ -88,7 +88,7 @@ USemanticInfo Checker::visit_string(ast::String& node) {
     return info_u;
 }
 
-USemanticInfo Checker::visit_tuple(ast::Tuple& node) {
+UExpressionInfo Checker::visit_tuple(ast::Tuple& node) {
     sem::VectorOfTypes types;
     std::vector<sem::UExp> values;
     for (auto& n: node.values) {
@@ -100,7 +100,7 @@ USemanticInfo Checker::visit_tuple(ast::Tuple& node) {
         //     return error_stub();
         // }
     }
-    USemanticInfo sinfo_p = std::make_unique<SemanticInfo>();
+    UExpressionInfo sinfo_p = std::make_unique<ExpressionInfo>();
     auto& sinfo = *sinfo_p;
     unsigned long num_values = node.values.size();
     auto* otype = new sem::TypeObject("Tuple", types, Path("core.Tuple" + std::to_string(num_values)));
@@ -124,8 +124,8 @@ USemanticInfo Checker::visit_tuple(ast::Tuple& node) {
     return sinfo_p;
 }
 
-USemanticInfo Checker::visit_partial(ast::PartialApplication& node) {
-    USemanticInfo func = this->dispatch(*node.function);
+UExpressionInfo Checker::visit_partial(ast::PartialApplication& node) {
+    UExpressionInfo func = this->dispatch_rvalue(*node.function);
     sem::VectorOfTypes partial_args;
     ast::FunctionType* fun_type = nullptr;
     Entity& f_entity = func->entity;
@@ -134,20 +134,20 @@ USemanticInfo Checker::visit_partial(ast::PartialApplication& node) {
         fun_type = (ast::FunctionType*) ((EntityConstFunction&) f_entity).const_function.const_function_ft.to_ast();
     } else {
         this->error_reporter.fail("Error: expected a function for partial application");
-        return error_stub();
+        return exp_error_stub();
     }
     if (node.args.size() != fun_type->param_types.size()) {
         this->error_reporter.error(std::make_unique<ErrorPartialWrongNumArgs>(node.start));
-        return error_stub();
+        return exp_error_stub();
     }
     std::vector<sem::UExp> snodes;
     int npartial = 0;
     for (size_t i = 0; i < node.args.size(); i++) {
         ast::UTypeNode& param_type = fun_type->param_types[i];
         if (node.args[i] != nullptr) {
-            USemanticInfo arg_sinfo = this->expect_rvalue_of_type(*param_type->to_sem(), *node.args[i]);
+            UExpressionInfo arg_sinfo = this->expect_rvalue_of_type(*param_type->to_sem(), *node.args[i]);
             if (arg_sinfo->is_error()) {
-                return error_stub();
+                return exp_error_stub();
             }
             auto arg_snode = std::move(arg_sinfo->exp_snode);
             snodes.push_back(std::move(arg_snode));
@@ -158,7 +158,7 @@ USemanticInfo Checker::visit_partial(ast::PartialApplication& node) {
         }
     }
     node.complete_type = &fun_type->clone()->function();
-    USemanticInfo s_p = std::make_unique<SemanticInfo>();
+    UExpressionInfo s_p = std::make_unique<ExpressionInfo>();
     auto& s = *s_p;
     s.entity = *std::make_unique<Value>(new sem::TypeFunction(partial_args,
                                                               sem::UType(fun_type->return_type->to_sem())));
@@ -170,32 +170,32 @@ USemanticInfo Checker::visit_partial(ast::PartialApplication& node) {
     return s_p;
 }
 
-USemanticInfo Checker::visit_dict(ast::DictNode& node) {
-    USemanticInfo info_u = std::make_unique<SemanticInfo>();
-    SemanticInfo& info = *info_u;
-    USemanticInfo first_key_info = this->dispatch(node.items[0].first);
-    USemanticInfo first_value_info = this->dispatch(node.items[0].second);
+UExpressionInfo Checker::visit_dict(ast::DictNode& node) {
+    UExpressionInfo info_u = std::make_unique<ExpressionInfo>();
+    ExpressionInfo& info = *info_u;
+    UExpressionInfo first_key_info = this->dispatch_rvalue(node.items[0].first);
+    UExpressionInfo first_value_info = this->dispatch_rvalue(node.items[0].second);
     Value& first_key_entity = (Value&) first_key_info->entity.get();
     Value& first_value_entity = (Value&) first_value_info->entity.get();
     sem::TypeObject& first_key_type = first_key_entity.type.object();
     sem::TypeObject& first_value_type = first_value_entity.type.object();
 
-    std::vector<std::pair<sem::UExp , sem::UExp>> items;
+    std::vector<std::pair<sem::UExp, sem::UExp>> items;
     items.emplace_back(std::move(first_key_info->exp_snode), std::move(first_value_info->exp_snode));
     bool has_error = false;
     for (size_t i = 1; i < node.items.size(); i++) {
-        USemanticInfo key_sinfo = this->expect_rvalue_of_type(first_key_type, node.items[i].first);
+        UExpressionInfo key_sinfo = this->expect_rvalue_of_type(first_key_type, node.items[i].first);
         if (key_sinfo->is_error()) {
             has_error = true;
         }
-        USemanticInfo value_sinfo = this->expect_rvalue_of_type(first_value_type, node.items[i].second);
+        UExpressionInfo value_sinfo = this->expect_rvalue_of_type(first_value_type, node.items[i].second);
         if (value_sinfo->is_error()) {
             has_error = true;
         }
         items.emplace_back(key_sinfo->exp_snode.release(), value_sinfo->exp_snode.release());
     }
     if (has_error) {
-        return error_stub();
+        return exp_error_stub();
     }
     sem::TypeObject* type = new sem::TypeObject("Dict", {first_key_type.clone(), first_value_type.clone()});
     this->module.fill_actual(*type);
@@ -208,9 +208,9 @@ USemanticInfo Checker::visit_dict(ast::DictNode& node) {
     return info_u;
 }
 
-USemanticInfo Checker::visit_emptydict(ast::EmptyDict& node) {
-    USemanticInfo info_u = std::make_unique<SemanticInfo>();
-    SemanticInfo& info = *info_u;
+UExpressionInfo Checker::visit_emptydict(ast::EmptyDict& node) {
+    UExpressionInfo info_u = std::make_unique<ExpressionInfo>();
+    ExpressionInfo& info = *info_u;
     sem::TypeObject* ot = new sem::TypeObject("Dict",
                                               {node.key_type->to_sem(), node.value_type->to_sem()},
                                               Path("libcore.libcore.Dict"));
@@ -221,15 +221,15 @@ USemanticInfo Checker::visit_emptydict(ast::EmptyDict& node) {
     auto ov = this->make_value(ot);
     assert(ov->clazz != nullptr);
     info.set_entity(ov.release());
-    info.exp_snode = std::make_unique<sem::Dict>(std::vector<std::pair<sem::UExp , sem::UExp>>{});
+    info.exp_snode = std::make_unique<sem::Dict>(std::vector<std::pair<sem::UExp, sem::UExp>>{});
     return info_u;
 }
 
-USemanticInfo Checker::visit_defconst(ast::DefaultConstructor& node) {
+UExpressionInfo Checker::visit_defconst(ast::DefaultConstructor& node) {
     // this is a regular function
-    USemanticInfo info_u = std::make_unique<SemanticInfo>();
-    SemanticInfo& info = *info_u;
-    USemanticInfo class_info = this->dispatch(*node.class_node);
+    UExpressionInfo info_u = std::make_unique<ExpressionInfo>();
+    ExpressionInfo& info = *info_u;
+    UExpressionInfo class_info = this->dispatch_rvalue(*node.class_node);
     Entity& entity = class_info->entity;
     if (entity.type != E_TYPE::CLASS) {
         this->error_reporter.fail("Error not a class");
@@ -255,11 +255,11 @@ USemanticInfo Checker::visit_defconst(ast::DefaultConstructor& node) {
     return info_u;
 }
 
-USemanticInfo Checker::visit_list(ast::List& node) {
-    USemanticInfo element_type_p = this->dispatch(node.elements[0]);
+UExpressionInfo Checker::visit_list(ast::List& node) {
+    UExpressionInfo element_type_p = this->dispatch_rvalue(node.elements[0]);
     if (element_type_p->entity.get().type != E_TYPE::VALUE) {
         this->error_reporter.error(std::make_unique<ErrorExpectedExpression>(element_type_p->entity, node.elements[0]));
-        return error_stub();
+        return exp_error_stub();
     }
     Value& entity_value = (Value&) element_type_p->entity.get();
     sem::Type& element_type = entity_value.type;
@@ -281,7 +281,7 @@ USemanticInfo Checker::visit_list(ast::List& node) {
         list_elements.push_back(std::move(current_type_p->exp_snode));
     }
     // node.type = element_type->clone();
-    USemanticInfo return_info_p = std::make_unique<SemanticInfo>();
+    UExpressionInfo return_info_p = std::make_unique<ExpressionInfo>();
     auto& return_info = *return_info_p;
     return_info.is_constant = is_constant;
 

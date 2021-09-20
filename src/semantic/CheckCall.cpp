@@ -11,7 +11,7 @@ USemanticInfo Checker::visit_call(ast::Call& n, bool is_rvalue) {
     auto& retv = *retv_p;
     bool old_is_call = this->is_call;
     this->is_call = true;
-    USemanticInfo fun_info_p = this->dispatch(n.function);
+    UExpressionInfo fun_info_p = this->dispatch_rvalue(n.function);
     this->is_call = old_is_call;
     if (fun_info_p->is_error()) {
         return error_stub();
@@ -19,7 +19,7 @@ USemanticInfo Checker::visit_call(ast::Call& n, bool is_rvalue) {
 
     bool is_def_const = n.function.ntype == NodeType::DEF_CONST;
     bool args_are_constant = true;
-    SemanticInfo& fun_info = *fun_info_p;
+    ExpressionInfo& fun_info = *fun_info_p;
     // bool is_a_method = false;
     // Node* object_node;
     if ((fun_info.entity.get().type != E_TYPE::CONST_FUNCTION && fun_info_p->entity.get().type != E_TYPE::VALUE)) {
@@ -153,7 +153,7 @@ USemanticInfo Checker::visit_call(ast::Call& n, bool is_rvalue) {
     return make_return_info(n, is_rvalue, std::move(retv_p), is_def_const, args_are_constant);
 }
 
-const sem::TypeFunction& get_function_type(const SemanticInfo& fun_info) {
+const sem::TypeFunction& get_function_type(const ExpressionInfo& fun_info) {
     if (fun_info.entity.get().type == E_TYPE::CONST_FUNCTION) {
         return ((EntityConstFunction&) fun_info.entity.get()).const_function.const_function_ft;
     } else {
@@ -188,7 +188,7 @@ bool Checker::check_arguments(ast::Call& n, std::vector<sem::UExp>& arguments,
                               std::vector<std::unique_ptr<Entity>>& arg_entities) {
     bool has_error;
     for (auto& arg: n.arguments) {
-        USemanticInfo arg_type_p = this->dispatch(arg);
+        UExpressionInfo arg_type_p = this->dispatch_rvalue(arg);
         if (arg_type_p->is_error()) {
             has_error = true;
             continue;
@@ -211,7 +211,7 @@ bool Checker::check_arguments(ast::Call& n, std::vector<sem::UExp>& arguments,
 
 void Checker::process_function_arguments(SemanticInfo& retv, std::vector<std::unique_ptr<Entity>>& arg_entities,
                                          std::vector<sem::UExp>& arguments, ast::Call& n,
-                                         const sem::TypeFunction& function_type, SemanticInfo* fun_info_p) {
+                                         const sem::TypeFunction& function_type, ExpressionInfo* fun_info_p) {
     ast::UTypeNode rtype(function_type.return_type->to_ast());
     retv.set_entity(entity_from_type(*rtype));
     int sni = static_cast<int>(fun_info_p->this_arg != nullptr);

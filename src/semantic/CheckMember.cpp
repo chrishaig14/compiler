@@ -10,8 +10,8 @@
 #include "../simple_nodes/common/include/TypeObject.h"
 #include "../simple_nodes/common/src/TypeFunction.h"
 
-USemanticInfo Checker::visit_member(ast::Member& n) {
-    USemanticInfo parent_info = this->dispatch(n.parent);
+UExpressionInfo Checker::visit_member(ast::Member& n) {
+    UExpressionInfo parent_info = this->dispatch_rvalue(n.parent);
     Entity& parent_entity = parent_info->entity.get();
     switch (parent_entity.type) {
         case E_TYPE::CLASS:
@@ -26,7 +26,7 @@ USemanticInfo Checker::visit_member(ast::Member& n) {
                 this->error_reporter.error(std::make_unique<ErrorNoMember>(((EntityConstFunction&) parent_entity).const_function.const_function_ft,
                                                                            n));
                 // this->error_reporter.object_no_member(*parent_entity.value->type, n);
-                return error_stub();
+                return exp_error_stub();
             }
             return this->object_member(std::move(parent_info->exp_snode), ((Value&) parent_entity), n.s_child, n);
         case E_TYPE::PACKAGE:
@@ -38,10 +38,10 @@ USemanticInfo Checker::visit_member(ast::Member& n) {
         default:
             break;
     }
-    return error_stub();
+    return exp_error_stub();
 }
 
-USemanticInfo Checker::module_member(Module& mod, const std::string& child, ast::Member& n) {
+UExpressionInfo Checker::module_member(Module& mod, const std::string& child, ast::Member& n) {
     if (mod.members.count(child) == 0) {
         // this->error_reporter.error(std::make_unique<ErrorNoMember>())
         // this->error_reporter.module_no_member(&mod,
@@ -50,11 +50,11 @@ USemanticInfo Checker::module_member(Module& mod, const std::string& child, ast:
         //                                       *n.parent,
         //                                       n.child_token.start,
         //                                       n.child_token.end_pos);
-        return error_stub();
+        return exp_error_stub();
     }
     ModuleMember member = mod.members[child];
-    USemanticInfo info_u = std::make_unique<SemanticInfo>();
-    SemanticInfo& info = *info_u;
+    UExpressionInfo info_u = std::make_unique<ExpressionInfo>();
+    ExpressionInfo& info = *info_u;
     info.set_entity(map_module_member_to_entity(member));
     if (member.type == ModuleMemberType::CONST_FUNCTION) {
         auto idn = std::make_unique<sem::ConstFunction>(member.const_function->path);
@@ -67,7 +67,8 @@ TextPosition add_one_col(TextPosition t) {
     return {t.line, t.column + 1};
 }
 
-USemanticInfo Checker::object_member(sem::UExp object_snode, Value& p_value, const std::string& child, ast::Member& n) {
+UExpressionInfo
+Checker::object_member(sem::UExp object_snode, Value& p_value, const std::string& child, ast::Member& n) {
     Path object_type_path = p_value.type.object().data.actual_base_path;
     // if (object_type_path.as_str() == "") {
     //     // is a single type param, error
@@ -77,15 +78,15 @@ USemanticInfo Checker::object_member(sem::UExp object_snode, Value& p_value, con
     if (object_type_path.as_str() == "libcore.libcore.Union") {
         this->error_reporter.error(std::make_unique<ErrorNoMember>(p_value.type, n));
         // this->error_reporter.object_no_member(*p_value.type, n);
-        return error_stub();
+        return exp_error_stub();
     }
     if (p_value.metatype == Meta::ENUM) {
         this->error_reporter.error(std::make_unique<ErrorNoMember>(p_value.type, n));
         // this->error_reporter.object_no_member(*p_value.type, n);
-        return error_stub();
+        return exp_error_stub();
     }
-    USemanticInfo info_u = std::make_unique<SemanticInfo>();
-    SemanticInfo& info = *info_u;
+    UExpressionInfo info_u = std::make_unique<ExpressionInfo>();
+    ExpressionInfo& info = *info_u;
     if (p_value.type.kind == sem::Kind::OBJECT && p_value.type.object().id == "Tuple") {
         info.is_tuple_member = true;
     }
@@ -136,12 +137,12 @@ USemanticInfo Checker::object_member(sem::UExp object_snode, Value& p_value, con
         //                                                        n.end,
         //                                                        clazz);
 
-        return error_stub();
+        return exp_error_stub();
     }
     return info_u;
 }
 
-USemanticInfo Checker::package_member(Package& package, const std::string& child, ast::Member& n) {
+UExpressionInfo Checker::package_member(Package& package, const std::string& child, ast::Member& n) {
     if (package.units.count(child) == 0) {
         this->error_reporter.error(std::make_unique<ErrorPackageNoMember>(&package,
                                                                           child,
@@ -149,18 +150,18 @@ USemanticInfo Checker::package_member(Package& package, const std::string& child
                                                                           n.parent,
                                                                           n.child_token.start,
                                                                           n.child_token.end_pos));
-        return error_stub();
+        return exp_error_stub();
     }
     Unit unit = package.units[child];
-    USemanticInfo info_u = std::make_unique<SemanticInfo>();
-    SemanticInfo& info = *info_u;
+    UExpressionInfo info_u = std::make_unique<ExpressionInfo>();
+    ExpressionInfo& info = *info_u;
     info.set_entity(map_module_member_to_entity(map_unit_to_module_member(unit)));
     return info_u;
 }
 
-USemanticInfo Checker::class_member(Class* cls, const std::string& child, ast::Member& n) {
-    USemanticInfo info_u = std::make_unique<SemanticInfo>();
-    SemanticInfo& info = *info_u;
+UExpressionInfo Checker::class_member(Class* cls, const std::string& child, ast::Member& n) {
+    UExpressionInfo info_u = std::make_unique<ExpressionInfo>();
+    ExpressionInfo& info = *info_u;
     if (cls->methods.find(child) != cls->methods.end()) {
         ConstFunction& bound_method = *cls->methods[child];
         auto* unbound_method = new ConstFunction(bound_method.path,
@@ -188,7 +189,7 @@ USemanticInfo Checker::class_member(Class* cls, const std::string& child, ast::M
                                                                         n.parent,
                                                                         add_one_col(n.dot_pos),
                                                                         n.end));
-        return error_stub();
+        return exp_error_stub();
     }
     return info_u;
 }

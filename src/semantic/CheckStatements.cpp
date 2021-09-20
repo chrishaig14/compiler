@@ -12,17 +12,17 @@
 #include "../simple_nodes/common/src/TypeFunction.h"
 
 
-USemanticInfo Checker::visit_lvalue_subscript(ast::Subscript& node) {
-    USemanticInfo parent_p = this->dispatch_rvalue(*node.parent);
+UExpressionInfo Checker::visit_lvalue_subscript(ast::Subscript& node) {
+    UExpressionInfo parent_p = this->dispatch_rvalue(*node.parent);
     Entity& entity_parent = parent_p->entity.get();
     if (entity_parent.type != E_TYPE::VALUE || ((Value&) entity_parent).type.kind == sem::Kind::FUNCTION) {
         this->error_reporter.fail("Error subscript of something that is not an object!");
-        return error_stub();
+        return exp_error_stub();
     }
     auto& entity_parent_value = (Value&) entity_parent;
     if (entity_parent_value.metatype == Meta::ENUM) {
         this->error_reporter.fail("Error: no subscript in enum");
-        return error_stub();
+        return exp_error_stub();
     }
     Class* cls = entity_parent_value.clazz;
     assert(cls != nullptr);
@@ -35,7 +35,7 @@ USemanticInfo Checker::visit_lvalue_subscript(ast::Subscript& node) {
         this->error_reporter.error(std::make_unique<ErrorObjectNoSpecialMethod>(entity_parent_value.type,
                                                                                 "__set_item__",
                                                                                 node));
-        return error_stub();
+        return exp_error_stub();
     }
     ConstFunction& subscript_fun = *subscript_it->second;
     std::string sub_fun_path = subscript_fun.path.as_str();
@@ -45,15 +45,15 @@ USemanticInfo Checker::visit_lvalue_subscript(ast::Subscript& node) {
     if (node.child.size() > 1) {
         this->error_reporter.fail("Error subscript with more than one child!");
     }
-    USemanticInfo child_sinfo = this->expect_rvalue_of_type(*subscript_fun.const_function_ft.param_types[0],
-                                                            *node.child[0]);
+    UExpressionInfo child_sinfo = this->expect_rvalue_of_type(*subscript_fun.const_function_ft.param_types[0],
+                                                              *node.child[0]);
     if (child_sinfo->is_error()) {
-        return error_stub();
+        return exp_error_stub();
     }
     auto& child_snode = child_sinfo->exp_snode;
 
-    USemanticInfo info_u = std::make_unique<SemanticInfo>();
-    SemanticInfo& info = *info_u;
+    UExpressionInfo info_u = std::make_unique<ExpressionInfo>();
+    ExpressionInfo& info = *info_u;
     // auto value = std::make_unique<Value>(rtype.clone());
     // this->fill_value(*value);
     auto value = this->make_value(rtype.clone());
@@ -63,32 +63,33 @@ USemanticInfo Checker::visit_lvalue_subscript(ast::Subscript& node) {
     std::vector<sem::UExp> v;
     v.push_back(std::move(parent_p->exp_snode));
     v.push_back(std::move(child_snode));
-    auto csn = std::make_unique<sem::Call>(std::move(fsn), std::move(v));
-    info.snode = std::move(csn);
+    auto csn = std::make_unique<sem::CallExp>(std::move(fsn), std::move(v));
+    info.exp_snode = std::move(csn);
     return info_u;
 }
 
 USemanticInfo Checker::visit_assignment(ast::Assignment& n) {
     if (n.lvalue.ntype == NodeType::ID) {
         if (((ast::Id&) n.lvalue)._id == "_") {
-            USemanticInfo rv = this->dispatch_rvalue(n.rvalue);
-            return rv;
+            // ExpressionInfo rv = this->dispatch_rvalue(n.rvalue);
+            // return rv;
+            return nullptr;
         }
     }
 
-    USemanticInfo linfo_p;
+    UExpressionInfo linfo_p;
     bool is_subscript = false;
     std::unique_ptr<sem::Call> csn = nullptr;
     if (n.lvalue.ntype == NodeType::SUB) {
         // special case
         linfo_p = this->visit_lvalue_subscript((ast::Subscript&) n.lvalue);
-        csn = std::move((std::unique_ptr<sem::Call>&) linfo_p->snode);
+        csn = std::move((std::unique_ptr<sem::Call>&) linfo_p->exp_snode);
         is_subscript = true;
     } else {
-        linfo_p = this->dispatch(n.lvalue);
+        linfo_p = this->dispatch_rvalue(n.lvalue);
     }
 
-    USemanticInfo expression_info_p = this->dispatch_rvalue(n.rvalue);
+    UExpressionInfo expression_info_p = this->dispatch_rvalue(n.rvalue);
 
     if (linfo_p->is_error()) {
         return error_stub();
@@ -135,7 +136,7 @@ USemanticInfo Checker::visit_assignment(ast::Assignment& n) {
     if (expression_info_p->is_error()) {
         return nullptr;
     }
-    SemanticInfo& linfo = *linfo_p;
+    ExpressionInfo& linfo = *linfo_p;
 
     Value& l_entity_value = (Value&) linfo.entity;
 
@@ -155,8 +156,8 @@ USemanticInfo Checker::visit_assignment(ast::Assignment& n) {
     USemanticInfo info_u = std::make_unique<SemanticInfo>();
     SemanticInfo& info = *info_u;
     if (is_subscript) {
-        info.snode = std::move(linfo_p->snode);
-        csn->arguments.push_back(std::move(expression_info_p->exp_snode));
+        // info.snode = std::move(linfo_p->snode);
+        // csn->arguments.push_back(std::move(expression_info_p->exp_snode));
     } else {
         auto lu = std::move(linfo_p->exp_snode);
         auto eu = std::move(expression_info_p->exp_snode);
@@ -189,7 +190,7 @@ USemanticInfo Checker::visit_return(ast::Return& n) {
         return error_stub();
     }
 
-    USemanticInfo expression_info_p = this->expect_rvalue_of_type(return_type, *n.expression);
+    UExpressionInfo expression_info_p = this->expect_rvalue_of_type(return_type, *n.expression);
     if (expression_info_p->is_error()) {
         return error_stub();
     }
@@ -222,7 +223,7 @@ USemanticInfo Checker::visit_return(ast::Return& n) {
 // }
 
 USemanticInfo Checker::visit_match(ast::Match& node) {
-    USemanticInfo exp_info = this->dispatch_rvalue(*node.exp);
+    UExpressionInfo exp_info = this->dispatch_rvalue(*node.exp);
     Entity& entity = exp_info->entity.get();
     bool a = entity.type != E_TYPE::VALUE;
     Value& value = (Value&) entity;
@@ -308,7 +309,7 @@ USemanticInfo Checker::visit_continue(ast::Continue& node) {
 }
 
 USemanticInfo Checker::visit_for(ast::For& node) {
-    USemanticInfo exp_info_p = this->dispatch_rvalue(node.exp);
+    UExpressionInfo exp_info_p = this->dispatch_rvalue(node.exp);
     if (exp_info_p->entity.get().type != E_TYPE::VALUE) {
         this->error_reporter.error(std::make_unique<ErrorFor>(exp_info_p->entity, node.exp.start));
     }
@@ -383,7 +384,7 @@ USemanticInfo Checker::visit_break(ast::Break& node) {
 }
 
 USemanticInfo Checker::visit_while(ast::While& node) {
-    USemanticInfo condition_sinfo = this->expect_rvalue_of_type(sem::TypeObject("Boolean"), *node.condition);
+    UExpressionInfo condition_sinfo = this->expect_rvalue_of_type(sem::TypeObject("Boolean"), *node.condition);
     if (condition_sinfo->is_error()) {
         return error_stub();
     }
@@ -412,7 +413,7 @@ USemanticInfo Checker::visit_while(ast::While& node) {
 }
 
 USemanticInfo Checker::visit_if(ast::If& n) {
-    USemanticInfo condition_sinfo = this->expect_rvalue_of_type(sem::TypeObject("Boolean"), n.condition);
+    UExpressionInfo condition_sinfo = this->expect_rvalue_of_type(sem::TypeObject("Boolean"), n.condition);
     if (condition_sinfo->is_error()) {
         return error_stub();
     }
@@ -429,7 +430,7 @@ USemanticInfo Checker::visit_if(ast::If& n) {
     std::vector<std::pair<sem::UExp, std::unique_ptr<sem::Block>>> elifs;
 
     for (auto& elif : n.elifs) {
-        USemanticInfo elif_condition_sinfo = this->expect_rvalue_of_type(sem::TypeObject("Boolean"), elif.first);
+        UExpressionInfo elif_condition_sinfo = this->expect_rvalue_of_type(sem::TypeObject("Boolean"), elif.first);
         auto& elif_condition_snode = elif_condition_sinfo->exp_snode;
         this->enter_scope("elif");
         auto elif_block_info = this->visit_block(elif.second);
