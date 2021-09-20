@@ -5,7 +5,7 @@
 #ifndef UNTITLED1_NODE_TYPES_H
 #define UNTITLED1_NODE_TYPES_H
 
-enum class NodeType {
+enum class CommonNodeType {
     ASSIGN,
     BINOP,
     BLOCK,

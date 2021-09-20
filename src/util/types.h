@@ -12,6 +12,6 @@
 #include "../ast/ast.h"
 
 
-typedef std::vector<ast::Node*> VectorOfNodes;
+typedef std::vector<ast::CommonNode*> VectorOfNodes;
 typedef std::vector<std::string> VectorOfStrings;
 #endif //UNTITLED1_TYPES_H

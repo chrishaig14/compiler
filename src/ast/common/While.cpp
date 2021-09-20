@@ -7,15 +7,15 @@
 
 using namespace ast;
 
-While::While(ast::UExpNode& condition, std::unique_ptr<ast::Block>& body, TextPosition start, TextPosition end) : ast::Node(
-        NodeType::WHIL,
+While::While(ast::UExpNode& condition, std::unique_ptr<ast::Block>& body, TextPosition start, TextPosition end) : ast::CommonNode(
+        CommonNodeType::WHIL,
         start,
         end), body(std::move(body)), condition(std::move(condition)) {
     // assert(condition != nullptr);
     // assert(body != nullptr);
 }
 
-bool While::equal(const ast::Node& x) const {
+bool While::equal(const ast::CommonNode& x) const {
     const auto& other = (While&) x;
     if ((this->body == nullptr && other.body != nullptr) || (this->body != nullptr && other.body == nullptr)) {
         return false;

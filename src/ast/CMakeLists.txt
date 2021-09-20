@@ -6,8 +6,8 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -g -O0 -Wall -pedantic -Werror")
 
 add_library(
     nodes
-    Alias.cpp
-    Alias.h
+    top/Alias.cpp
+    top/Alias.h
     common/Assignment.cpp
     common/Assignment.h
     ast.h
@@ -17,8 +17,8 @@ add_library(
     common/Break.h
     common/Call.cpp
     common/Call.h
-    Cast.cpp
-    Cast.h
+    exp/Cast.cpp
+    exp/Cast.h
     common/Continue.cpp
     common/Continue.h
     common/Declaration.cpp
@@ -74,10 +74,10 @@ add_library(
     top/Instance.h
     common/Match.cpp
     common/Match.h
-    Node.cpp
-    Node.cpp
-    Node.h
-    Node.h
+    common/CommonNode.cpp
+    common/CommonNode.cpp
+    common/CommonNode.h
+    common/CommonNode.h
     nodes.h
     general/ObjectType.cpp
     general/ObjectType.h

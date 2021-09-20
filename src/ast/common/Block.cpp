@@ -17,7 +17,7 @@ Block::~Block() {
     // }
 }
 
-bool Block::equal(const ast::Node& p) const {
+bool Block::equal(const ast::CommonNode& p) const {
     auto& other = (Block&) p;
     if (this->nodes.size() != other.nodes.size()) {
         return false;
@@ -30,7 +30,7 @@ bool Block::equal(const ast::Node& p) const {
     return true;
 }
 
-Block::Block(ast::VectorOfNodesU nodes, TextPosition start, TextPosition end) : ast::Node(NodeType::BLOCK, start, end),
+Block::Block(ast::VectorOfNodesU nodes, TextPosition start, TextPosition end) : ast::CommonNode(CommonNodeType::BLOCK, start, end),
                                                                            nodes(std::move(nodes)) {
     ;
 }

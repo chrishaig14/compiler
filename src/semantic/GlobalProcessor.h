@@ -10,7 +10,7 @@
 #include "SymbolTable.h"
 #include "../ast/top/Import.h"
 #include "../ast/top/Klass.h"
-#include "../ast/Alias.h"
+#include "../ast/top/Alias.h"
 #include "../ast/top/EnumNode.h"
 #include "../units/Enum.h"
 
@@ -22,7 +22,7 @@ public:
 
     void visit_root();
 
-    void dispatch(ast::Node& nod);
+    void dispatch(ast::CommonNode& nod);
     void visit_function(ast::Function& node);
     void visit_block(ast::Block& node);
     void visit_enum(ast::EnumNode& node);

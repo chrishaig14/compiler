@@ -7,14 +7,14 @@
 using namespace ast;
 
 Declaration::Declaration(const std::string& identifier, ast::UTypeNode type, ast::UExpNode expression, TextPosition start,
-                         TextPosition eq_pos, TextPosition end) : ast::Node(NodeType::DECL, start, end),
+                         TextPosition eq_pos, TextPosition end) : ast::CommonNode(CommonNodeType::DECL, start, end),
                                                                   _expression(std::move(expression)), expression(*_expression),
                                                                   identifier(identifier),
                                                                   type(std::move(type)) {
     this->eq_pos = eq_pos;
 }
 
-bool Declaration::equal(const ast::Node& x) const {
+bool Declaration::equal(const ast::CommonNode& x) const {
     const auto& other = (Declaration&) x;
     return this->identifier == other.identifier && this->expression == other.expression &&
            ((this->type != nullptr && other.type != nullptr && *this->type == *other.type) ||

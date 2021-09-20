@@ -7,14 +7,14 @@
 using namespace ast;
 
 Match::Match(ExpNode* exp, std::vector<std::string> ids, std::vector<std::pair<ast::UTypeNode, ast::UBlock>> cases,
-             TextPosition start, TextPosition end) : ast::Node(NodeType::MATCH_EXP, start, end),
+             TextPosition start, TextPosition end) : ast::CommonNode(CommonNodeType::MATCH_EXP, start, end),
                                                      cases(std::move(cases)) {
     // this->cases = cases;
     this->exp = exp;
     this->ids = ids;
 }
 
-bool Match::equal(const ast::Node& other) const {
+bool Match::equal(const ast::CommonNode& other) const {
     return false;
 }
 

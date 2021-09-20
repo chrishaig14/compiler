@@ -7,9 +7,9 @@
 
 using namespace ast;
 
-Call::Call(ast::UExpNode function, ast::VectorOfExpNodesU arguments, TextPosition start, TextPosition end) : ast::Node(NodeType::CALL,
-                                                                                                       start,
-                                                                                                       end),
+Call::Call(ast::UExpNode function, ast::VectorOfExpNodesU arguments, TextPosition start, TextPosition end) : ast::CommonNode(CommonNodeType::CALL,
+                                                                                                                             start,
+                                                                                                                             end),
                                                                                              _function(std::move(
                                                                                                      function)),
                                                                                              _arguments(std::move(
@@ -20,7 +20,7 @@ Call::Call(ast::UExpNode function, ast::VectorOfExpNodesU arguments, TextPositio
     }
 }
 
-bool Call::equal(const ast::Node& x) const {
+bool Call::equal(const ast::CommonNode& x) const {
     const auto& other = (Call&) x;
     if (this->arguments.size() != other.arguments.size()) {
         return false;

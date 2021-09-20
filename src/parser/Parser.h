@@ -14,7 +14,7 @@
 #include "../ast/top/Typeclass.h"
 #include "../ast/top/Instance.h"
 #include "../ast/top/Module.h"
-#include "../ast/Alias.h"
+#include "../ast/top/Alias.h"
 
 extern std::unordered_map<TokType, OpType> TOKEN_TO_OP;
 

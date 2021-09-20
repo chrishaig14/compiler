@@ -210,18 +210,18 @@ void GlobalProcessor::visit_class(ast::Klass& node) {
     // class_info->path = Path(this->module.path, class_info->class_name);
 }
 
-void GlobalProcessor::dispatch(ast::Node& nod) {
+void GlobalProcessor::dispatch(ast::CommonNode& nod) {
     switch (nod.ntype) {
-        case NodeType::CLS:
+        case CommonNodeType::CLS:
             this->visit_class((ast::Klass&) nod);
             break;
-        case NodeType::FUNC:
+        case CommonNodeType::FUNC:
             this->visit_function((ast::Function&) nod);
             break;
-        case NodeType::IMPORT:
+        case CommonNodeType::IMPORT:
             this->visit_import((ast::Import&) nod);
             break;
-        case NodeType::ALIAS:
+        case CommonNodeType::ALIAS:
             this->visit_alias((ast::Alias&) nod);
             break;
         default:

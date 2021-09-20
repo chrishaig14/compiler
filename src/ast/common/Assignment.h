@@ -6,13 +6,13 @@
 #define ASSIGNMENTNODE_H
 
 
-#include "../Node.h"
+#include "CommonNode.h"
 
-#include "../Node.h"
+#include "CommonNode.h"
 #include "../general/Type.h"
 #include "../ast.h"
 
-class ast::Assignment : public ast::Node {
+class ast::Assignment : public ast::CommonNode {
     ast::UExpNode _lvalue;
     ast::UExpNode _rvalue;
 public:
@@ -21,7 +21,7 @@ public:
 
     Assignment(ast::UExpNode lvalue, ast::UExpNode rvalue, TextPosition start, TextPosition end);
 
-    bool equal(const ast::Node& x) const override;
+    bool equal(const ast::CommonNode& x) const override;
 
 
     ~Assignment();

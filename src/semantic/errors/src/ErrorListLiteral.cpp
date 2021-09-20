@@ -22,7 +22,7 @@ std::string ErrorListLiteral::to_str(const CodeLines& code) const {
 }
 
 ErrorListLiteral::ErrorListLiteral(const sem::Type& node, const sem::TypeObject& type, TextPosition position,
-                                   const ast::Node& node_1)
+                                   const ast::CommonNode& node_1)
         : node(node), type(type), position(position), node_1(node_1) {
 
 }

@@ -7,16 +7,16 @@
 
 using namespace ast;
 
-Assignment::Assignment(ast::UExpNode lvalue, ast::UExpNode rvalue, TextPosition start, TextPosition end) : ast::Node(NodeType::ASSIGN,
-                                                                                                       start,
-                                                                                                       end),
+Assignment::Assignment(ast::UExpNode lvalue, ast::UExpNode rvalue, TextPosition start, TextPosition end) : ast::CommonNode(CommonNodeType::ASSIGN,
+                                                                                                                           start,
+                                                                                                                           end),
                                                                                              _lvalue(std::move(lvalue)),
                                                                                              _rvalue(std::move(rvalue)),
                                                                                              lvalue(*_lvalue),
                                                                                              rvalue(*_rvalue) {
 }
 
-bool Assignment::equal(const ast::Node& x) const {
+bool Assignment::equal(const ast::CommonNode& x) const {
     auto& other = (Assignment&) x;
     return this->lvalue == other.lvalue && this->rvalue == other.rvalue;
 }

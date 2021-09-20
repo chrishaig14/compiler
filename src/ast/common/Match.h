@@ -6,12 +6,12 @@
 #define XLANG_MATCH_H
 
 
-#include "../Node.h"
+#include "CommonNode.h"
 #include "../general/Type.h"
 #include "Block.h"
 #include "../ast.h"
 
-class ast::Match : public ast::Node {
+class ast::Match : public ast::CommonNode {
 public:
     ExpNode* exp;
     std::vector<std::string> ids;
@@ -19,7 +19,7 @@ public:
     Match(ExpNode* exp, std::vector<std::string> ids, std::vector<std::pair<ast::UTypeNode, ast::UBlock>> cases,
           TextPosition start, TextPosition end);
 
-    bool equal(const ast::Node& other) const override;
+    bool equal(const ast::CommonNode& other) const override;
     nlohmann::json to_json() const override;
 };
 

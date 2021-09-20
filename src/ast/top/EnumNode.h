@@ -6,7 +6,7 @@
 #define XLANG_ENUMNODE_H
 
 
-#include "../Node.h"
+#include "../common/CommonNode.h"
 #include "../../util/types.h"
 #include "../ast.h"
 #include "TopNode.h"

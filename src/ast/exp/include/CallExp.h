@@ -7,7 +7,7 @@
 
 
 #include <vector>
-#include "../../Node.h"
+#include "../../common/CommonNode.h"
 #include "../../../util/types.h"
 #include "../../general/Type.h"
 #include "../../ast.h"

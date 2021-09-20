@@ -6,18 +6,18 @@
 #define RETURNNODE_H
 
 
-#include "../Node.h"
+#include "CommonNode.h"
 #include "../../util/types.h"
 #include "../general/Type.h"
 #include "../ast.h"
 #include "../exp/include/ExpNode.h"
 
-class ast::Return : public ast::Node {
+class ast::Return : public ast::CommonNode {
 public:
     explicit Return(ast::UExpNode& expression, TextPosition start, TextPosition end);
 
 
-    bool equal(const ast::Node& other) const override;
+    bool equal(const ast::CommonNode& other) const override;
 
     ~Return();
     nlohmann::json to_json() const override;

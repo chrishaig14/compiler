@@ -6,11 +6,11 @@
 
 using namespace ast;
 
-bool Break::equal(const ast::Node& other) const {
+bool Break::equal(const ast::CommonNode& other) const {
     return true;
 }
 
-Break::Break(TextPosition start, TextPosition end) : ast::Node(NodeType::BRK, start, end) {
+Break::Break(TextPosition start, TextPosition end) : ast::CommonNode(CommonNodeType::BRK, start, end) {
 }
 
 nlohmann::json Break::to_json() const {

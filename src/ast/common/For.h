@@ -6,19 +6,19 @@
 #define FORNODE_H
 
 
-#include "../Node.h"
+#include "CommonNode.h"
 #include "Block.h"
 #include "../../util/utils.h"
 #include "../ast.h"
 
-class ast::For : public ast::Node {
+class ast::For : public ast::CommonNode {
     ast::UExpNode _exp;
     ast::UBlock _body;
 public:
     ExpNode& exp;
     std::string var;
     ast::Block& body;
-    bool equal(const ast::Node& other) const override;
+    bool equal(const ast::CommonNode& other) const override;
     For(const std::string& var, ast::UExpNode exp, ast::UBlock body, TextPosition start, TextPosition end);
     ~For() override;
 

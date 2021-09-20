@@ -7,12 +7,12 @@
 
 
 #include <string>
-#include "../Node.h"
+#include "CommonNode.h"
 #include "../exp/include/ExpNode.h"
 #include "../general/Type.h"
 #include "../../util/utils.h"
 
-class ast::Declaration : public ast::Node {
+class ast::Declaration : public ast::CommonNode {
     ast::UExpNode _expression;
 public:
     ExpNode& expression;
@@ -23,9 +23,9 @@ public:
                 TextPosition eq_pos, TextPosition end);
 
 
-    Declaration(const std::string& identifier, ast::UTypeNode type, ast::Node* expression, TextPosition start);
+    Declaration(const std::string& identifier, ast::UTypeNode type, ast::CommonNode* expression, TextPosition start);
 
-    bool equal(const ast::Node& other) const override;
+    bool equal(const ast::CommonNode& other) const override;
 
     ~Declaration() override;
 

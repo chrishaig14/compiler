@@ -11,7 +11,7 @@ const TextPosition DUMMY_POS = {0, 0};
 
 struct TestNode {
     std::string text;
-    ast::Node* node;
+    ast::CommonNode* node;
 };
 
 struct TestExpNode {

@@ -7,13 +7,13 @@
 
 
 #include <vector>
-#include "../Node.h"
+#include "CommonNode.h"
 #include "../../util/types.h"
 #include "../general/Type.h"
 #include "../ast.h"
 #include "../exp/include/ExpNode.h"
 
-class ast::Call : public ast::Node {
+class ast::Call : public ast::CommonNode {
     ast::UExpNode _function;
     ast::VectorOfExpNodesU _arguments;
 public:
@@ -22,7 +22,7 @@ public:
 
     Call(ast::UExpNode function, ast::VectorOfExpNodesU arguments, TextPosition start, TextPosition end);
 
-    bool equal(const ast::Node& other) const override;
+    bool equal(const ast::CommonNode& other) const override;
 
     ~Call();
     nlohmann::json to_json() const override;

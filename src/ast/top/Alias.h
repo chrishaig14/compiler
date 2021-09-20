@@ -6,14 +6,14 @@
 #define XLANG_ALIAS_H
 
 
-#include "Node.h"
-#include "general/Type.h"
-#include "ast.h"
+#include "../common/CommonNode.h"
+#include "../general/Type.h"
+#include "../ast.h"
 
-class ast::Alias : public ast::Node {
+class ast::Alias : public ast::CommonNode {
 public:
     Alias(std::string alias_id, ast::Type* aliased_type, TextPosition start, TextPosition end);
-    bool equal(const ast::Node& other) const override;
+    bool equal(const ast::CommonNode& other) const override;
     nlohmann::json to_json() const override;
 
     std::string alias_id;

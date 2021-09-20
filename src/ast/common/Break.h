@@ -6,16 +6,16 @@
 #define BREAKNODE_H
 
 
-#include "../Node.h"
+#include "CommonNode.h"
 #include "../general/Type.h"
 
 #include "../ast.h"
 
-class ast::Break : public ast::Node {
+class ast::Break : public ast::CommonNode {
 public:
     std::vector<std::pair<std::string, ast::Type*>> loop_vars;
     Break(TextPosition start, TextPosition end);
-    bool equal(const ast::Node& other) const override;
+    bool equal(const ast::CommonNode& other) const override;
     nlohmann::json to_json() const override;
 
 };

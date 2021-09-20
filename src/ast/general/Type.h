@@ -8,7 +8,7 @@
 
 #include <string>
 #include <vector>
-#include "../Node.h"
+#include "../common/CommonNode.h"
 
 #include "../../util/types.h"
 #include "../../simple_nodes/common/include/Type.h"

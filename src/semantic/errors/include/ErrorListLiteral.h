@@ -11,7 +11,7 @@
 
 class ErrorListLiteral : public Error {
 public:
-    ErrorListLiteral(const sem::Type& node, const sem::TypeObject& type, TextPosition position, const ast::Node& node_1);
+    ErrorListLiteral(const sem::Type& node, const sem::TypeObject& type, TextPosition position, const ast::CommonNode& node_1);
     Error* clone() const override;
     bool equal(const Error& other) const override;
     std::string to_str(const CodeLines& code) const override;
@@ -19,7 +19,7 @@ public:
     const sem::Type& node;
     const sem::TypeObject& type;
     TextPosition position;
-    const ast::Node& node_1;
+    const ast::CommonNode& node_1;
 };
 
 

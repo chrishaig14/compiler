@@ -7,11 +7,11 @@
 using namespace ast;
 using namespace ast;
 
-bool Continue::equal(const ast::Node& other) const {
+bool Continue::equal(const ast::CommonNode& other) const {
     return true;
 }
 
-Continue::Continue(TextPosition start, TextPosition end) : ast::Node(NodeType::CNTINUE, start, end) {
+Continue::Continue(TextPosition start, TextPosition end) : ast::CommonNode(CommonNodeType::CNTINUE, start, end) {
 }
 
 nlohmann::json Continue::to_json() const {

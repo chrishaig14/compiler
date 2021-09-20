@@ -6,13 +6,13 @@
 #define CONTINUENODE_H
 
 
-#include "../Node.h"
+#include "CommonNode.h"
 #include "../ast.h"
 
-class ast::Continue : public ast::Node {
+class ast::Continue : public ast::CommonNode {
 public:
     Continue(TextPosition start, TextPosition end);
-    bool equal(const ast::Node& other) const override;
+    bool equal(const ast::CommonNode& other) const override;
     nlohmann::json to_json() const override;
 };
 

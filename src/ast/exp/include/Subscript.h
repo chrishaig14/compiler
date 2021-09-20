@@ -6,9 +6,9 @@
 #define SUBSCRIPTNODE_H
 
 
-#include "../../Node.h"
+#include "../../common/CommonNode.h"
 
-#include "../../Node.h"
+#include "../../common/CommonNode.h"
 
 #include "../../../util/types.h"
 #include "../../ast.h"

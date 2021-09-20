@@ -206,7 +206,7 @@ std::unique_ptr<sem::Block> Checker::visit_block(ast::Block& node) {
 
         // sn->nodes.push_back(sinfo_p->snode);
 
-        if (n->ntype == NodeType::BLOCK) {
+        if (n->ntype == CommonNodeType::BLOCK) {
             for (auto& bnode: ((std::unique_ptr<ast::Block>&) n)->nodes) {
                 vn.push_back(std::move(bnode));
             }
@@ -311,8 +311,8 @@ std::unique_ptr<sem::FunctionDef> Checker::visit_function(ast::Function& n) {
     auto sn = std::make_unique<sem::FunctionDef>(n.path.as_vec().back(), params, std::move(bn));
     if (returnType != T_NONE) {
         if (!n.body->nodes.empty()) {
-            ast::Node& last_node = *n.body->nodes.back();
-            if (last_node.ntype != NodeType::RETRN) {
+            ast::CommonNode& last_node = *n.body->nodes.back();
+            if (last_node.ntype != CommonNodeType::RETRN) {
                 // it's not a return statement, error
                 this->error_reporter.error(std::make_unique<ErrorFunctionReturnLastStmt>(function_name,
                                                                                          *returnType.to_sem(),

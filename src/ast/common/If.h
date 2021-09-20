@@ -7,14 +7,14 @@
 
 
 #include <vector>
-#include "../Node.h"
+#include "CommonNode.h"
 
 #include "Block.h"
-#include "../Node.h"
+#include "CommonNode.h"
 #include "../exp/include/ExpNode.h"
 #include "../ast.h"
 
-class ast::If : public ast::Node {
+class ast::If : public ast::CommonNode {
     ast::UExpNode _condition;
     ast::UBlock _then;
     std::vector<std::pair<ast::UExpNode, ast::UBlock>> _elifs;
@@ -26,7 +26,7 @@ public:
     If(ast::UExpNode condition, std::unique_ptr<ast::Block> then, std::vector<std::pair<ast::UExpNode, ast::UBlock>> elifs,
        std::unique_ptr<ast::Block> selse, TextPosition start, TextPosition end);
 
-    bool equal(const ast::Node& other) const override;
+    bool equal(const ast::CommonNode& other) const override;
 
     nlohmann::json to_json() const override;
 

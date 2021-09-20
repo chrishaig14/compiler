@@ -7,15 +7,15 @@
 
 
 #include <vector>
-#include "../Node.h"
+#include "CommonNode.h"
 
-#include "../Node.h"
+#include "CommonNode.h"
 #include "../../util/types.h"
 #include "../general/Type.h"
 #include "../../units/Entity.h"
 #include "../ast.h"
 
-class ast::Block : public ast::Node {
+class ast::Block : public ast::CommonNode {
 public:
 
     Block(ast::VectorOfNodesU nodes, TextPosition start, TextPosition end);
@@ -27,7 +27,7 @@ public:
 
     ast::VectorOfNodesU nodes;
 
-    bool equal(const ast::Node& p) const override;
+    bool equal(const ast::CommonNode& p) const override;
 
 
     ~Block();

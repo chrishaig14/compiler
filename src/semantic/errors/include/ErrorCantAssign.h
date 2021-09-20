@@ -10,12 +10,12 @@
 
 class ErrorCantAssign : public Error {
 public:
-    const ast::Node& n;
+    const ast::CommonNode& n;
     Error* clone() const override;
     bool equal(const Error& other) const override;
     std::string to_str(const CodeLines& code) const override;
 
-    ErrorCantAssign(const ast::Node& n);
+    ErrorCantAssign(const ast::CommonNode& n);
 
 };
 
