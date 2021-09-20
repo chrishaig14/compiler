@@ -8,7 +8,7 @@
 
 #include "Node.h"
 #include "ObjectType.h"
-#include "Function.h"
+#include "top/Function.h"
 #include "ast.h"
 
 class ast::Instance : public ast::Node {

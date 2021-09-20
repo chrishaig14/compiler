@@ -11,7 +11,7 @@
 #include <utility>
 #include "../types.h"
 #include "ast.h"
-#include "TopNode.h"
+#include "top/TopNode.h"
 
 class ast::Import : public ast::TopNode {
 public:

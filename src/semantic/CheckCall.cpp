@@ -17,7 +17,7 @@ USemanticInfo Checker::visit_call(ast::Call& n, bool is_rvalue) {
         return error_stub();
     }
 
-    bool is_def_const = n.function.ntype == NodeType::DEF_CONST;
+    bool is_def_const = n.function.ntype == ExpNodeType::DEF_CONST;
     bool args_are_constant = true;
     ExpressionInfo& fun_info = *fun_info_p;
     // bool is_a_method = false;
@@ -202,7 +202,8 @@ bool Checker::check_arguments(ast::Call& n, std::vector<sem::UExp>& arguments,
             arg_entity.type == E_TYPE::MODULE || arg_entity.type == E_TYPE::ENUM ||
             arg_entity.type == E_TYPE::NOTHING) {
             has_error = true;
-            this->error_reporter.error(std::make_unique<ErrorExpectedExpression>(arg_entity, arg));
+            // this->error_reporter.error(std::make_unique<ErrorExpectedExpression>(arg_entity, arg));
+            throw std::runtime_error("Error, expected expression!");
             continue;
         }
     }

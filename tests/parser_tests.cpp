@@ -1,7 +1,9 @@
 #include "catch.hpp"
 #include "../src/scanner/Scanner.h"
 #include "../src/parser/Parser.h"
-#include "../src/ast/UnaryOp.h"
+#include "../src/ast/exp/UnaryOp.h"
+#include "../src/ast/exp/ExpNode.h"
+#include "../src/ast/exp/CallExp.h"
 #include "../src/ast/Typeclass.h"
 #include "../src/ast/Instance.h"
 
@@ -12,9 +14,20 @@ struct TestNode {
     ast::Node* node;
 };
 
+struct TestExpNode {
+    std::string text;
+    ast::ExpNode* node;
+};
+
+
 struct TestNodeU {
     std::string text;
     ast::UNode node;
+};
+
+struct TestExpNodeU {
+    std::string text;
+    ast::UExpNode node;
 };
 
 struct TestTopNodeU {
@@ -36,25 +49,25 @@ const TestTypeNode TYPE_1{"String", new ast::ObjectType("String")};
 const TestTypeNode TYPE_2{"Integer", new ast::ObjectType("Integer")};
 const TestTypeNode TYPE_3{"Boolean", new ast::ObjectType("Boolean")};
 
-const TestNode EXP_ID_1{"foo", new ast::Id("foo", DUMMY_POS, DUMMY_POS)};
-const TestNode EXP_ID_2{"bar", new ast::Id("bar", DUMMY_POS, DUMMY_POS)};
+const TestExpNode EXP_ID_1{"foo", new ast::Id("foo", DUMMY_POS, DUMMY_POS)};
+const TestExpNode EXP_ID_2{"bar", new ast::Id("bar", DUMMY_POS, DUMMY_POS)};
 
-TestNodeU EXP_ID_1_U() {
+TestExpNodeU EXP_ID_1_U() {
     return {"foo", ast::Id::make("foo", DUMMY_POS, DUMMY_POS)};
 }
 
-TestNodeU EXP_ID_2_U() {
+TestExpNodeU EXP_ID_2_U() {
     return {"bar", ast::Id::make("bar", DUMMY_POS, DUMMY_POS)};
 }
 
 // const TestNode EXPRESSION{"x", new IdNode("x", DUMMY_POS, DUMMY_POS)};
 // const TestNode FACTOR_EXPRESSION = EXPRESSION;
 
-TestNodeU EXPRESSION_U() {
+TestExpNodeU EXPRESSION_U() {
     return {"x", ast::Id::make("x", DUMMY_POS, DUMMY_POS)};
 }
 
-TestNodeU FACTOR_U() {
+TestExpNodeU FACTOR_U() {
     return EXPRESSION_U();
 }
 
@@ -74,7 +87,7 @@ TestNodeU DECLARATION_U() {
 }
 
 
-TestNodeU EXPRESSION_1_U() {
+TestExpNodeU EXPRESSION_1_U() {
     auto exp_id_1_u = EXP_ID_1_U();
     auto exp_id_2_u = EXP_ID_2_U();
     return {EXP_ID_1.text + "+" + EXP_ID_2.text, ast::BinaryOp::make(OpType::ADD,
@@ -84,7 +97,7 @@ TestNodeU EXPRESSION_1_U() {
                                                                      DUMMY_POS)};
 }
 
-TestNodeU EXPRESSION_2_U() {
+TestExpNodeU EXPRESSION_2_U() {
     auto exp_id_2_u = EXP_ID_2_U();
     auto exp_id_1_u = EXP_ID_1_U();
     return {exp_id_2_u.text + "*" + exp_id_1_u.text, ast::BinaryOp::make(OpType::MUL,
@@ -121,7 +134,7 @@ TestNodeU IF_U() {
     std::unique_ptr<ast::Block> u(nullptr);
     return {"if(" + EXPRESSION.text + ")" + EMPTY_BLOCK.text, std::make_unique<ast::If>(std::move(EXPRESSION.node),
                                                                                         std::move((ast::UBlock&) EMPTY_BLOCK.node),
-                                                                                        std::vector<std::pair<ast::UNode, ast::UBlock>>{},
+                                                                                        std::vector<std::pair<ast::UExpNode, ast::UBlock>>{},
                                                                                         std::move((ast::UBlock&) u),
                                                                                         DUMMY_POS,
                                                                                         DUMMY_POS)};
@@ -176,7 +189,7 @@ TEST_CASE("parse_assignment", "[parser]") {
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser("test", scanner.code_lines, tokens);
 
-    ast::UNode ast = parser.parse_assignment_or_expression();
+    ast::UNode ast = parser.parse_assignment_or_call();
 
     REQUIRE(ast->to_json() == assignment.node->to_json());
 }
@@ -243,10 +256,10 @@ TEST_CASE("parse_if_with_else", "[parser]") {
     Parser parser("test", scanner.code_lines, tokens);
 
     std::unique_ptr<ast::If> ast = parser.parse_if();
-    std::vector<std::pair<ast::UNode, ast::UBlock>> v;
+    std::vector<std::pair<ast::UExpNode, ast::UBlock>> v;
     REQUIRE(ast->to_json() == ast::If(std::move(EXPRESSION.node),
                                       std::move((ast::UBlock&) block.node),
-                                      std::vector<std::pair<ast::UNode, ast::UBlock>>{},
+                                      std::vector<std::pair<ast::UExpNode, ast::UBlock>>{},
                                       std::move((ast::UBlock&) block_1.node),
                                       DUMMY_POS,
                                       DUMMY_POS).to_json());
@@ -260,10 +273,10 @@ TEST_CASE("parse_call_no_args", "[parser]") {
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser("test", scanner.code_lines, tokens);
 
-    ast::UNode ast = parser.parse_expression();
-    ast::VectorOfNodesU v;
+    ast::UExpNode ast = parser.parse_expression();
+    ast::VectorOfExpNodesU v;
     REQUIRE(ast->to_json() ==
-            ast::Call(std::move(FACTOR_EXPRESSION.node), std::move(v), DUMMY_POS, DUMMY_POS).to_json());
+            ast::CallExp(std::move(FACTOR_EXPRESSION.node), std::move(v), DUMMY_POS, DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_call_one_arg", "[parser]") {
@@ -275,11 +288,11 @@ TEST_CASE("parse_call_one_arg", "[parser]") {
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser("test", scanner.code_lines, tokens);
 
-    ast::UNode ast = parser.parse_expression();
-    ast::VectorOfNodesU v;
+    ast::UExpNode ast = parser.parse_expression();
+    ast::VectorOfExpNodesU v;
     v.push_back(std::move(EXPRESSION_1.node));
     REQUIRE(ast->to_json() ==
-            ast::Call(std::move(FACTOR_EXPRESSION.node), std::move(v), DUMMY_POS, DUMMY_POS).to_json());
+            ast::CallExp(std::move(FACTOR_EXPRESSION.node), std::move(v), DUMMY_POS, DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_call_mult_arg", "[parser]") {
@@ -292,8 +305,8 @@ TEST_CASE("parse_call_mult_arg", "[parser]") {
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser("test", scanner.code_lines, tokens);
 
-    ast::UNode ast = parser.parse_expression();
-    ast::VectorOfNodesU v;
+    ast::UExpNode ast = parser.parse_expression();
+    ast::VectorOfExpNodesU v;
     v.push_back(std::move(EXPRESSION_1.node));
     v.push_back(std::move(EXPRESSION_2.node));
     REQUIRE(ast->to_json() ==
@@ -487,7 +500,7 @@ TEST_CASE("parse_return_nothing", "[parser]") {
     Parser parser("test", scanner.code_lines, tokens);
 
     std::unique_ptr<ast::Return> ast = parser.parse_return();
-    ast::UNode ptr;
+    ast::UExpNode ptr;
     REQUIRE(ast->to_json() == ast::Return(ptr, DUMMY_POS, DUMMY_POS).to_json());
 }
 
@@ -511,7 +524,7 @@ TEST_CASE("parse_list_empty", "[parser]") {
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser("test", scanner.code_lines, tokens);
 
-    ast::UNode ast = parser.parse_list_literal();
+    ast::UExpNode ast = parser.parse_list_literal();
 
     REQUIRE(ast->to_json() == ast::EmptyList(ast::UTypeNode(TYPE.node->clone()), DUMMY_POS, DUMMY_POS).to_json());
 }
@@ -525,8 +538,8 @@ TEST_CASE("parse_list_one_element", "[parser]") {
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser("test", scanner.code_lines, tokens);
 
-    ast::UNode ast = parser.parse_list_literal();
-    ast::VectorOfNodesU v;
+    ast::UExpNode ast = parser.parse_list_literal();
+    ast::VectorOfExpNodesU v;
     v.push_back(std::move(EXPRESSION_1.node));
     REQUIRE(ast->to_json() == ast::List(std::move(v), DUMMY_POS, DUMMY_POS).to_json());
 }
@@ -540,8 +553,8 @@ TEST_CASE("parse_list_mult_elements", "[parser]") {
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser("test", scanner.code_lines, tokens);
 
-    ast::UNode ast = parser.parse_list_literal();
-    ast::VectorOfNodesU v;
+    ast::UExpNode ast = parser.parse_list_literal();
+    ast::VectorOfExpNodesU v;
     v.push_back(std::move(EXPRESSION_1.node));
     v.push_back(std::move(EXPRESSION_2.node));
     REQUIRE(ast->to_json() == ast::List(std::move(v), DUMMY_POS, DUMMY_POS).to_json());
@@ -554,7 +567,7 @@ TEST_CASE("parse_number_integer", "[parser]") {
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser("test", scanner.code_lines, tokens);
 
-    ast::UNode ast = parser.parse_id_or_literal();
+    ast::UExpNode ast = parser.parse_id_or_literal();
 
     REQUIRE(ast->to_json() == ast::Number(NumberType::INTEGER, "89", DUMMY_POS, DUMMY_POS).to_json());
 }
@@ -566,7 +579,7 @@ TEST_CASE("parse_number_float", "[parser]") {
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser("test", scanner.code_lines, tokens);
 
-    ast::UNode ast = parser.parse_id_or_literal();
+    ast::UExpNode ast = parser.parse_id_or_literal();
 
     REQUIRE(ast->to_json() == ast::Number(NumberType::FLOAT, "3.14", DUMMY_POS, DUMMY_POS).to_json());
 }
@@ -578,7 +591,7 @@ TEST_CASE("parse_empty_string", "[parser]") {
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser("test", scanner.code_lines, tokens);
 
-    ast::UNode ast = parser.parse_id_or_literal();
+    ast::UExpNode ast = parser.parse_id_or_literal();
 
     REQUIRE(ast->to_json() == ast::String("", DUMMY_POS, DUMMY_POS).to_json());
 }
@@ -590,7 +603,7 @@ TEST_CASE("parse_string", "[parser]") {
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser("test", scanner.code_lines, tokens);
 
-    ast::UNode ast = parser.parse_id_or_literal();
+    ast::UExpNode ast = parser.parse_id_or_literal();
 
     REQUIRE(ast->to_json() == ast::String("hello, world", DUMMY_POS, DUMMY_POS).to_json());
 }
@@ -602,7 +615,7 @@ TEST_CASE("parse_none", "[parser]") {
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser("test", scanner.code_lines, tokens);
 
-    ast::UNode ast = parser.parse_id_or_literal();
+    ast::UExpNode ast = parser.parse_id_or_literal();
 
     REQUIRE(ast->to_json() == ast::None(DUMMY_POS, DUMMY_POS).to_json());
 }
@@ -614,7 +627,7 @@ TEST_CASE("parse_true", "[parser]") {
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser("test", scanner.code_lines, tokens);
 
-    ast::UNode ast = parser.parse_id_or_literal();
+    ast::UExpNode ast = parser.parse_id_or_literal();
 
     REQUIRE(ast->to_json() == ast::Boolean(true, DUMMY_POS, DUMMY_POS).to_json());
 }
@@ -626,7 +639,7 @@ TEST_CASE("parse_false", "[parser]") {
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser("test", scanner.code_lines, tokens);
 
-    ast::UNode ast = parser.parse_id_or_literal();
+    ast::UExpNode ast = parser.parse_id_or_literal();
 
     REQUIRE(ast->to_json() == ast::Boolean(false, DUMMY_POS, DUMMY_POS).to_json());
 }
@@ -640,7 +653,7 @@ TEST_CASE("parse_and_exp", "[parser]") {
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser("test", scanner.code_lines, tokens);
 
-    ast::UNode ast = parser.parse_and_expression();
+    ast::UExpNode ast = parser.parse_and_expression();
 
     REQUIRE(ast->to_json() == ast::BinaryOp(OpType::AND,
                                             std::move(EXPRESSION_1.node),
@@ -658,7 +671,7 @@ TEST_CASE("parse_or_exp", "[parser]") {
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser("test", scanner.code_lines, tokens);
 
-    ast::UNode ast = parser.parse_or_expression();
+    ast::UExpNode ast = parser.parse_or_expression();
 
     REQUIRE(ast->to_json() == ast::BinaryOp(OpType::OR,
                                             std::move(EXPRESSION_1.node),
@@ -676,7 +689,7 @@ TEST_CASE("parse_eq_exp", "[parser]") {
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser("test", scanner.code_lines, tokens);
 
-    ast::UNode ast = parser.parse_and_expression();
+    ast::UExpNode ast = parser.parse_and_expression();
 
     REQUIRE(ast->to_json() == ast::BinaryOp(OpType::EQ,
                                             std::move(EXPRESSION_1.node),
@@ -694,7 +707,7 @@ TEST_CASE("parse_ge_exp", "[parser]") {
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser("test", scanner.code_lines, tokens);
 
-    ast::UNode ast = parser.parse_and_expression();
+    ast::UExpNode ast = parser.parse_and_expression();
 
     REQUIRE(ast->to_json() == ast::BinaryOp(OpType::GE,
                                             std::move(EXPRESSION_1.node),
@@ -712,7 +725,7 @@ TEST_CASE("parse_le_exp", "[parser]") {
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser("test", scanner.code_lines, tokens);
 
-    ast::UNode ast = parser.parse_and_expression();
+    ast::UExpNode ast = parser.parse_and_expression();
 
     REQUIRE(ast->to_json() == ast::BinaryOp(OpType::LE,
                                             std::move(EXPRESSION_1.node),
@@ -730,7 +743,7 @@ TEST_CASE("parse_gt_exp", "[parser]") {
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser("test", scanner.code_lines, tokens);
 
-    ast::UNode ast = parser.parse_and_expression();
+    ast::UExpNode ast = parser.parse_and_expression();
 
     REQUIRE(ast->to_json() == ast::BinaryOp(OpType::GT,
                                             std::move(EXPRESSION_1.node),
@@ -748,7 +761,7 @@ TEST_CASE("parse_lt_exp", "[parser]") {
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser("test", scanner.code_lines, tokens);
 
-    ast::UNode ast = parser.parse_and_expression();
+    ast::UExpNode ast = parser.parse_and_expression();
 
     REQUIRE(ast->to_json() == ast::BinaryOp(OpType::LT,
                                             std::move(EXPRESSION_1.node),
@@ -766,7 +779,7 @@ TEST_CASE("parse_ne_exp", "[parser]") {
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser("test", scanner.code_lines, tokens);
 
-    ast::UNode ast = parser.parse_and_expression();
+    ast::UExpNode ast = parser.parse_and_expression();
 
     REQUIRE(ast->to_json() == ast::BinaryOp(OpType::NE,
                                             std::move(EXPRESSION_1.node),
@@ -783,7 +796,7 @@ TEST_CASE("parse_not_exp", "[parser]") {
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser("test", scanner.code_lines, tokens);
 
-    ast::UNode ast = parser.parse_and_expression();
+    ast::UExpNode ast = parser.parse_and_expression();
 
     REQUIRE(ast->to_json() ==
             ast::UnaryOp(UnaryOpType::NOT, std::move(EXPRESSION.node), DUMMY_POS, DUMMY_POS).to_json());
@@ -798,10 +811,10 @@ TEST_CASE("parse_tuple", "[parser]") {
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser("test", scanner.code_lines, tokens);
 
-    ast::UNode ast = parser.parse_tuple_or_constructor();
+    ast::UExpNode ast = parser.parse_tuple_or_constructor();
     // auto EXPRESSION_1 = EXPRESSION_1_U();
     // auto EXPRESSION_2 = EXPRESSION_2_U();
-    ast::VectorOfNodesU args;
+    ast::VectorOfExpNodesU args;
     args.emplace_back(std::move(EXPRESSION_1.node));
     args.emplace_back(std::move(EXPRESSION_2.node));
     REQUIRE(ast->to_json() == ast::Tuple(std::move(args), DUMMY_POS, DUMMY_POS).to_json());
@@ -814,7 +827,7 @@ TEST_CASE("parse_dict_empty", "[parser]") {
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser("test", scanner.code_lines, tokens);
 
-    ast::UNode ast = parser.parse_dictionary();
+    ast::UExpNode ast = parser.parse_dictionary();
     ast::UTypeNode u1(TYPE_1.node->clone());
     ast::UTypeNode u2(TYPE_2.node->clone());
     REQUIRE(ast->to_json() == ast::EmptyDict(u1, u2, DUMMY_POS, DUMMY_POS).to_json());
@@ -829,8 +842,8 @@ TEST_CASE("parse_dict_one_element", "[parser]") {
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser("test", scanner.code_lines, tokens);
 
-    ast::UNode ast = parser.parse_dictionary();
-    std::vector<std::pair<ast::UNode, ast::UNode>> d;
+    ast::UExpNode ast = parser.parse_dictionary();
+    std::vector<std::pair<ast::UExpNode, ast::UExpNode>> d;
     d.emplace_back(std::move(EXPRESSION_1.node), std::move(EXPRESSION_2.node));
     REQUIRE(ast->to_json() == ast::DictNode(std::move(d), DUMMY_POS, DUMMY_POS).to_json());
 }
@@ -847,9 +860,9 @@ TEST_CASE("parse_dict_mult_elements", "[parser]") {
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser("test", scanner.code_lines, tokens);
 
-    ast::UNode ast = parser.parse_dictionary();
+    ast::UExpNode ast = parser.parse_dictionary();
 
-    std::vector<std::pair<ast::UNode, ast::UNode>> d;
+    std::vector<std::pair<ast::UExpNode, ast::UExpNode>> d;
     d.emplace_back(std::move(EXPRESSION_1.node), std::move(EXPRESSION_2.node));
     d.emplace_back(std::move(EXPRESSION.node), std::move(EXPRESSION_1_V.node));
     // {{EXPRESSION_1.node.release(), EXPRESSION_2.node.release()},
@@ -865,7 +878,7 @@ TEST_CASE("parse_member", "[parser]") {
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser("test", scanner.code_lines, tokens);
 
-    ast::UNode ast = parser.parse_factor();
+    ast::UExpNode ast = parser.parse_factor();
 
     REQUIRE(ast->to_json() ==
             ast::Member(std::move(EXPRESSION.node), Token(TokType::ID, ID, DUMMY_POS, DUMMY_POS)).to_json());
@@ -881,8 +894,8 @@ TEST_CASE("parse_subscript", "[parser]") {
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser("test", scanner.code_lines, tokens);
 
-    ast::UNode ast = parser.parse_factor();
-    ast::VectorOfNodesU v;
+    ast::UExpNode ast = parser.parse_factor();
+    ast::VectorOfExpNodesU v;
     v.push_back(std::move(EXPRESSION_2.node));
     REQUIRE(ast->to_json() == ast::Subscript(EXPRESSION.node, v, DUMMY_POS, DUMMY_POS).to_json());
 }
@@ -897,8 +910,8 @@ TEST_CASE("parse_partial_one_arg", "[parser]") {
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser("test", scanner.code_lines, tokens);
 
-    ast::UNode ast = parser.parse_partial_application();
-    ast::VectorOfNodesU args;
+    ast::UExpNode ast = parser.parse_partial_application();
+    ast::VectorOfExpNodesU args;
     args.emplace_back(std::move(EXPRESSION_1.node));
     REQUIRE(ast->to_json() == ast::PartialApplication(std::move(FACTOR_EXPRESSION.node),
                                                       std::move(args),
@@ -916,8 +929,8 @@ TEST_CASE("parse_partial_mult_arg_one", "[parser]") {
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser("test", scanner.code_lines, tokens);
 
-    ast::UNode ast = parser.parse_partial_application();
-    ast::VectorOfNodesU args;
+    ast::UExpNode ast = parser.parse_partial_application();
+    ast::VectorOfExpNodesU args;
     args.emplace_back(std::move(EXPRESSION_1.node));
     args.emplace_back(nullptr);
 
@@ -937,8 +950,8 @@ TEST_CASE("parse_partial_mult_arg_two", "[parser]") {
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser("test", scanner.code_lines, tokens);
 
-    ast::UNode ast = parser.parse_partial_application();
-    ast::VectorOfNodesU args;
+    ast::UExpNode ast = parser.parse_partial_application();
+    ast::VectorOfExpNodesU args;
     args.emplace_back(std::move(EXPRESSION_1.node));
     args.emplace_back(std::move(EXPRESSION_2.node));
 

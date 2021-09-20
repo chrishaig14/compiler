@@ -9,11 +9,11 @@
 #include <iostream>
 #include "../ast/Import.h"
 #include "../scanner/CodeLines.h"
-#include "../ast/EnumNode.h"
+#include "../ast/top/EnumNode.h"
 #include "../ast/ObjectType.h"
 #include "../ast/Typeclass.h"
 #include "../ast/Instance.h"
-#include "../ast/Module.h"
+#include "../ast/top/Module.h"
 #include "../ast/Alias.h"
 
 extern std::unordered_map<TokType, OpType> TOKEN_TO_OP;
@@ -40,13 +40,13 @@ public:
     std::unique_ptr<ast::EnumNode> parse_enum_definition();
 
     ast::UNode parse_common_statement();
-    ast::UNode parse_assignment_or_expression();
+    ast::UNode parse_assignment_or_call();
     std::unique_ptr<ast::Declaration> parse_variable_declaration();
     std::unique_ptr<ast::If> parse_if();
     std::unique_ptr<ast::While> parse_while_loop();
     std::unique_ptr<ast::For> parse_for_loop();
     std::unique_ptr<ast::Return> parse_return();
-    ast::UNode parse_ternary();
+    ast::UExpNode parse_ternary();
     std::unique_ptr<ast::Match> parse_match_statement();
     // std::unique_ptr<ThrowNode> parse_throw();
     // std::unique_ptr<TryCatchNode> parse_try_catch();
@@ -54,28 +54,28 @@ public:
     std::unique_ptr<ast::Block> parse_possibly_empty_block();
     std::unique_ptr<ast::Module> parse_module();
 
-    ast::UNode parse_expression();
-    ast::UNode parse_tuple_literal();
-    ast::UNode parse_not_expression();
-    ast::UNode parse_id_or_class_literal();
-    ast::UNode parse_list_literal();
-    ast::UNode parse_add_or_sub_expression();
-    ast::UNode parse_and_expression();
-    ast::UNode parse_bool_expression();
-    ast::UNode parse_factor();
-    ast::UNode parse_id_or_literal();
-    ast::UNode parse_mul_div_or_mod_expression();
-    ast::UNode parse_or_expression();
-    ast::UNode parse_call_or_subscript_chain(ast::UNode& parent);
-    ast::UNode parse_dictionary();
-    ast::UNode parse_tuple_or_constructor();
-    ast::UNode parse_partial_application();
+    ast::UExpNode parse_expression();
+    ast::UExpNode parse_tuple_literal();
+    ast::UExpNode parse_not_expression();
+    ast::UExpNode parse_id_or_class_literal();
+    ast::UExpNode parse_list_literal();
+    ast::UExpNode parse_add_or_sub_expression();
+    ast::UExpNode parse_and_expression();
+    ast::UExpNode parse_bool_expression();
+    ast::UExpNode parse_factor();
+    ast::UExpNode parse_id_or_literal();
+    ast::UExpNode parse_mul_div_or_mod_expression();
+    ast::UExpNode parse_or_expression();
+    ast::UExpNode parse_call_or_subscript_chain(ast::UExpNode& parent);
+    ast::UExpNode parse_dictionary();
+    ast::UExpNode parse_tuple_or_constructor();
+    ast::UExpNode parse_partial_application();
 
     ast::UTypeNode parse_type_node();
     std::unique_ptr<ast::FunctionType> parse_function_type();
     std::unique_ptr<ast::ObjectType> parse_object_type();
 
-    ast::VectorOfNodesU parse_list_of_arguments();
+    ast::VectorOfExpNodesU parse_list_of_arguments();
 
     std::string code_context_string(TextPosition position);
     std::string code_error_string(TextPosition start, TextPosition end);

@@ -13,13 +13,13 @@
 #include "ast.h"
 
 class ast::Assignment : public ast::Node {
-    ast::UNode _lvalue;
-    ast::UNode _rvalue;
+    ast::UExpNode _lvalue;
+    ast::UExpNode _rvalue;
 public:
-    Node& lvalue;
-    Node& rvalue;
+    ExpNode& lvalue;
+    ExpNode& rvalue;
 
-    Assignment(ast::UNode lvalue, ast::UNode rvalue, TextPosition start, TextPosition end);
+    Assignment(ast::UExpNode lvalue, ast::UExpNode rvalue, TextPosition start, TextPosition end);
 
     bool equal(const ast::Node& x) const override;
 

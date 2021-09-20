@@ -10,10 +10,11 @@
 #include "../types.h"
 #include "Type.h"
 #include "ast.h"
+#include "exp/ExpNode.h"
 
 class ast::Return : public ast::Node {
 public:
-    explicit Return(ast::UNode& expression, TextPosition start, TextPosition end);
+    explicit Return(ast::UExpNode& expression, TextPosition start, TextPosition end);
 
 
     bool equal(const ast::Node& other) const override;
@@ -21,7 +22,7 @@ public:
     ~Return();
     nlohmann::json to_json() const override;
 
-    ast::UNode expression;
+    ast::UExpNode expression;
     std::vector<std::pair<std::string, ast::Type*>> reachables;
 };
 

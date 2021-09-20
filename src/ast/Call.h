@@ -11,15 +11,16 @@
 #include "../types.h"
 #include "Type.h"
 #include "ast.h"
+#include "exp/ExpNode.h"
 
 class ast::Call : public ast::Node {
-    ast::UNode _function;
-    ast::VectorOfNodesU _arguments;
+    ast::UExpNode _function;
+    ast::VectorOfExpNodesU _arguments;
 public:
-    Node& function;
-    std::vector<RNode> arguments;
+    ExpNode& function;
+    std::vector<RExpNode> arguments;
 
-    Call(ast::UNode function, ast::VectorOfNodesU arguments, TextPosition start, TextPosition end);
+    Call(ast::UExpNode function, ast::VectorOfExpNodesU arguments, TextPosition start, TextPosition end);
 
     bool equal(const ast::Node& other) const override;
 

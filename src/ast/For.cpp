@@ -7,7 +7,7 @@
 
 using namespace ast;
 
-For::For(const std::string& var, ast::UNode exp, ast::UBlock body, TextPosition start, TextPosition end)
+For::For(const std::string& var, ast::UExpNode exp, ast::UBlock body, TextPosition start, TextPosition end)
         : ast::Node(NodeType::FORLOOP, start, end), _exp(std::move(exp)), _body(std::move(body)), exp(*_exp),
           var(var), body(*_body) {
     // assert(exp != nullptr);

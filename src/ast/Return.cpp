@@ -6,7 +6,7 @@
 
 using namespace ast;
 
-Return::Return(ast::UNode& expression, TextPosition start, TextPosition end) : ast::Node(NodeType::RETRN, start, end),
+Return::Return(ast::UExpNode& expression, TextPosition start, TextPosition end) : ast::Node(NodeType::RETRN, start, end),
                                                                           expression(std::move(expression)) {
 }
 

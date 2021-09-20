@@ -144,12 +144,13 @@ Checker::object_member(sem::UExp object_snode, Value& p_value, const std::string
 
 UExpressionInfo Checker::package_member(Package& package, const std::string& child, ast::Member& n) {
     if (package.units.count(child) == 0) {
-        this->error_reporter.error(std::make_unique<ErrorPackageNoMember>(&package,
-                                                                          child,
-                                                                          n.dot_pos,
-                                                                          n.parent,
-                                                                          n.child_token.start,
-                                                                          n.child_token.end_pos));
+        // this->error_reporter.error(std::make_unique<ErrorPackageNoMember>(&package,
+        //                                                                   child,
+        //                                                                   n.dot_pos,
+        //                                                                   n.parent,
+        //                                                                   n.child_token.start,
+        //                                                                   n.child_token.end_pos));
+        throw std::runtime_error("Error package no member!");
         return exp_error_stub();
     }
     Unit unit = package.units[child];
@@ -183,13 +184,14 @@ UExpressionInfo Checker::class_member(Class* cls, const std::string& child, ast:
     } else if (cls->static_members.find(child) != cls->static_members.end()) {
         info.set_entity(entity_from_type(*cls->static_members[child].first));
     } else {
-        this->error_reporter.error(std::make_unique<ErrorClassNoMember>(ast::ObjectType(cls->class_name, {}),
-                                                                        child,
-                                                                        n.dot_pos,
-                                                                        n.parent,
-                                                                        add_one_col(n.dot_pos),
-                                                                        n.end));
-        return exp_error_stub();
+        throw std::runtime_error("Error class no member!");
+
+        // this->error_reporter.error(std::make_unique<ErrorClassNoMember>(ast::ObjectType(cls->class_name, {}),
+        //                                                                 child,
+        //                                                                 n.dot_pos,
+        //                                                                 n.parent,
+        //                                                                 add_one_col(n.dot_pos),
+        //                                                                 n.end));        return exp_error_stub();
     }
     return info_u;
 }

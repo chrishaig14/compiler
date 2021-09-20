@@ -4,16 +4,17 @@
 
 #include "Parser.h"
 #include "../semantic/GlobalProcessor.h"
-#include "../ast/PartialApplication.h"
-#include "../ast/UnaryOp.h"
-#include "../ast/Module.h"
+#include "../ast/exp/PartialApplication.h"
+#include "../ast/exp/UnaryOp.h"
+#include "../ast/top/Module.h"
 #include "../logging/logging.h"
-#include "../ast/DefaultConstructor.h"
+#include "../ast/exp/DefaultConstructor.h"
 #include <fmt/core.h>
 #include <fmt/color.h>
 #include <exception>
 #include <set>
 #include "../ast/ObjectType.h"
+#include "../ast/exp/CallExp.h"
 
 std::unordered_map<TokType, OpType> TOKEN_TO_OP = {{TokType::PLUS,  OpType::ADD},
                                                    {TokType::MINUS, OpType::SUB},
@@ -107,7 +108,7 @@ std::unique_ptr<ast::Module> Parser::parse_module() {
 
 std::unique_ptr<ast::Return> Parser::parse_return() {
     Token ret_tok = this->expect_token(TokType::RETURN);
-    ast::UNode expression = nullptr;
+    ast::UExpNode expression = nullptr;
     TextPosition end = ret_tok.end_pos;
     if (!this->match(TokType::SEMICOLON)) {
         expression = this->parse_expression();
@@ -120,7 +121,7 @@ std::unique_ptr<ast::If> Parser::parse_if() {
     Token if_tok = this->expect_token(TokType::IF);
     auto condition = this->parse_expression();
     auto body = this->parse_possibly_empty_block();
-    std::vector<std::pair<ast::UNode, ast::UBlock>> elifs;
+    std::vector<std::pair<ast::UExpNode, ast::UBlock>> elifs;
     while (this->match(TokType::ELIF)) {
         this->next();
         auto elif_condition = this->parse_expression();
@@ -142,9 +143,9 @@ std::unique_ptr<ast::If> Parser::parse_if() {
     return iff;
 }
 
-ast::UNode Parser::parse_list_literal() {
+ast::UExpNode Parser::parse_list_literal() {
     Token list_start = this->expect_token(TokType::LSQUARE);
-    ast::VectorOfNodesU elements;
+    ast::VectorOfExpNodesU elements;
     if (this->match(TokType::RSQUARE)) {
         // empty list
         this->next();
@@ -167,8 +168,8 @@ ast::UNode Parser::parse_list_literal() {
     return node;
 }
 
-ast::VectorOfNodesU Parser::parse_list_of_arguments() {
-    ast::VectorOfNodesU result;
+ast::VectorOfExpNodesU Parser::parse_list_of_arguments() {
+    ast::VectorOfExpNodesU result;
     while (true) {
         result.push_back(this->parse_expression());
         if (this->match(TokType::COMMA)) {
@@ -183,22 +184,21 @@ ast::VectorOfNodesU Parser::parse_list_of_arguments() {
     return result;
 }
 
-ast::UNode Parser::parse_assignment_or_expression() {
+ast::UNode Parser::parse_assignment_or_call() {
     auto lvalue = this->parse_expression();
     if (item_in_vec(this->token.type, {TokType::EQQ, TokType::PLUS_EQQ, TokType::MINUS_EQQ})) {
-        if (lvalue->ntype == NodeType::CALL) {
+        if (lvalue->ntype == ExpNodeType::CALL) {
             this->error_assign_call(this->token);
-
         }
         TokType op = this->token.type;
         TextPosition op_pos = this->token.start;
         this->next();
-        if (lvalue->ntype != NodeType::ID && item_in_vec(op, {TokType::PLUS_EQQ, TokType::MINUS_EQQ})) {
+        if (lvalue->ntype != ExpNodeType::ID && item_in_vec(op, {TokType::PLUS_EQQ, TokType::MINUS_EQQ})) {
             throw std::runtime_error("Error += or -= can only be used on ids!");
         }
         auto rvalue = this->parse_expression();
-        if (lvalue->ntype == NodeType::ID) {
-            ast::UNode id_node = ast::Id::make(((ast::Id&) *lvalue)._id, lvalue->start, lvalue->end);
+        if (lvalue->ntype == ExpNodeType::ID) {
+            ast::UExpNode id_node = ast::Id::make(((ast::Id&) *lvalue)._id, lvalue->start, lvalue->end);
             if (op == TokType::PLUS_EQQ || op == TokType::MINUS_EQQ) {
                 OpType opt;
                 if (op == TokType::PLUS_EQQ) {
@@ -219,19 +219,21 @@ ast::UNode Parser::parse_assignment_or_expression() {
         auto node = std::make_unique<ast::Assignment>(std::move(lvalue), std::move(rvalue), lvalue->start, rvalue->end);
         node->start = op_pos;
         return node;
-    } else {
-        if (lvalue->ntype != NodeType::CALL) {
-            this->error_expected_statement(this->token.start);
-        }
     }
-    return lvalue;
+    if (lvalue->ntype != ExpNodeType::CALL) {
+        this->error_expected_statement(this->token.start);
+        return nullptr;
+    }
+    std::unique_ptr<ast::CallExp> callexp(static_cast<ast::CallExp*>(lvalue.release()));
+    std::unique_ptr<ast::Call> call = callexp->to_call();
+    return call;
 }
 
-ast::UNode Parser::parse_expression() {
+ast::UExpNode Parser::parse_expression() {
     return this->parse_ternary();
 }
 
-ast::UNode Parser::parse_or_expression() {
+ast::UExpNode Parser::parse_or_expression() {
     auto left = this->parse_and_expression();
     while (this->match(TokType::OR)) {
         this->next();
@@ -246,7 +248,7 @@ ast::UNode Parser::parse_or_expression() {
     return left;
 }
 
-ast::UNode Parser::parse_and_expression() {
+ast::UExpNode Parser::parse_and_expression() {
     auto left = this->parse_not_expression();
     while (this->match(TokType::AND)) {
         this->next();
@@ -261,7 +263,7 @@ ast::UNode Parser::parse_and_expression() {
     return left;
 }
 
-ast::UNode Parser::parse_not_expression() {
+ast::UExpNode Parser::parse_not_expression() {
     if (this->match(TokType::NOT)) {
         Token not_tok = this->expect_token(TokType::NOT);
         auto left = this->parse_bool_expression();
@@ -271,7 +273,7 @@ ast::UNode Parser::parse_not_expression() {
     return this->parse_bool_expression();
 }
 
-ast::UNode Parser::parse_bool_expression() {
+ast::UExpNode Parser::parse_bool_expression() {
     auto left = this->parse_add_or_sub_expression();
     OpType op;
     std::vector<TokType> boolean_tokens = {TokType::EQ, TokType::LT, TokType::GT, TokType::LEQ, TokType::GEQ,
@@ -286,7 +288,7 @@ ast::UNode Parser::parse_bool_expression() {
     return node;
 }
 
-ast::UNode Parser::parse_add_or_sub_expression() {
+ast::UExpNode Parser::parse_add_or_sub_expression() {
     auto left = this->parse_mul_div_or_mod_expression();
     OpType op;
     while (item_in_vec(this->token.type, {TokType::PLUS, TokType::MINUS})) {
@@ -303,7 +305,7 @@ ast::UNode Parser::parse_add_or_sub_expression() {
     return left;
 }
 
-ast::UNode Parser::parse_mul_div_or_mod_expression() {
+ast::UExpNode Parser::parse_mul_div_or_mod_expression() {
     auto left = this->parse_factor();
     OpType op;
     while (item_in_vec(this->token.type, {TokType::TIMES, TokType::DIV, TokType::MOD})) {
@@ -318,14 +320,15 @@ ast::UNode Parser::parse_mul_div_or_mod_expression() {
     return left;
 }
 
-ast::UNode Parser::parse_factor() {
-    ast::UNode parent;
+ast::UExpNode Parser::parse_factor() {
+    ast::UExpNode parent;
     if (this->match(TokType::HASH)) {
         parent = this->parse_tuple_or_constructor();
     } else {
         parent = this->parse_id_or_literal();
     }
-    if (item_in_vec(parent->ntype, {NodeType::TUPLE, NodeType::NUMBER, NodeType::NONE, NodeType::BOOLEAN})) {
+    if (item_in_vec(parent->ntype,
+                    {ExpNodeType::TUPLE, ExpNodeType::NUMBER, ExpNodeType::NONE, ExpNodeType::BOOLEAN})) {
         if (item_in_vec(this->token.type, {TokType::LPAREN, TokType::LSQUARE})) {
             this->expect_token(TokType::RPAREN); // some random token
         }
@@ -357,7 +360,7 @@ ast::UNode Parser::parse_factor() {
     return parent;
 }
 
-ast::UNode Parser::parse_dictionary() {
+ast::UExpNode Parser::parse_dictionary() {
     Token lcurly = this->expect_token(TokType::LCURLY);
     if (this->match(TokType::RCURLY)) {
         // empty dict
@@ -370,7 +373,7 @@ ast::UNode Parser::parse_dictionary() {
         Token rsquare = this->expect_token(TokType::RSQUARE);
         return std::make_unique<ast::EmptyDict>(key_type, value_type, lcurly.start, rsquare.end_pos);
     }
-    std::vector<std::pair<ast::UNode, ast::UNode>> items;
+    std::vector<std::pair<ast::UExpNode, ast::UExpNode>> items;
     Token rcurly;
     while (true) {
         auto key = this->parse_expression();
@@ -389,11 +392,11 @@ ast::UNode Parser::parse_dictionary() {
 }
 
 
-ast::UNode Parser::parse_partial_application() {
+ast::UExpNode Parser::parse_partial_application() {
     Token dollar = this->expect_token(TokType::DOLLAR_SIGN);
     Token total_function_tok = this->expect_token(TokType::ID);
     this->expect_token(TokType::LPAREN);
-    ast::VectorOfNodesU args;
+    ast::VectorOfExpNodesU args;
     while (true) {
         if (this->match(TokType::TIMES)) {
             this->next();
@@ -418,8 +421,8 @@ ast::UNode Parser::parse_partial_application() {
     return partial;
 }
 
-ast::UNode Parser::parse_id_or_literal() {
-    ast::UNode node = nullptr;
+ast::UExpNode Parser::parse_id_or_literal() {
+    ast::UExpNode node = nullptr;
     switch (this->token.type) {
         case TokType::LPAREN: {
             this->next();
@@ -486,13 +489,13 @@ ast::UNode Parser::parse_id_or_literal() {
     return node;
 }
 
-ast::UNode Parser::parse_tuple_or_constructor() {
+ast::UExpNode Parser::parse_tuple_or_constructor() {
     Token hash_tok = this->token;
-    ast::UNode parent;
+    ast::UExpNode parent;
     this->next();
     if (this->match(TokType::ID)) {
         Token idd = this->expect_token(TokType::ID);
-        ast::UNode m = ast::Id::make(idd.str, this->token.start, this->token.end_pos);
+        ast::UExpNode m = ast::Id::make(idd.str, this->token.start, this->token.end_pos);
         while (this->match(TokType::DOT)) {
             this->next();
             idd = this->expect_token(TokType::ID);
@@ -506,12 +509,12 @@ ast::UNode Parser::parse_tuple_or_constructor() {
     return parent;
 }
 
-ast::UNode Parser::parse_tuple_literal() {
+ast::UExpNode Parser::parse_tuple_literal() {
     // Token hash_tok = this->expect_token(TokType::HASH);
     Token st = this->expect_token(TokType::LPAREN);
     // it's a tuple
     // this->next();
-    ast::VectorOfNodesU values;
+    ast::VectorOfExpNodesU values;
     if (this->match(TokType::RPAREN)) {
         // this->error_empty_tuple(POS_NONE);
         throw std::runtime_error("EMPTY TUPLE!");
@@ -536,20 +539,20 @@ ast::UNode Parser::parse_tuple_literal() {
     return std::make_unique<ast::Tuple>(std::move(values), st.start, close.end_pos);
 }
 
-ast::UNode Parser::parse_id_or_class_literal() {
+ast::UExpNode Parser::parse_id_or_class_literal() {
     std::string identifier = this->token.str;
     auto node = ast::Id::make(identifier, this->token.start, this->token.end_pos);
     this->next();
     return node;
 }
 
-ast::UNode Parser::parse_call_or_subscript_chain(ast::UNode& parent) {
-    ast::UNode node = std::move(parent);
+ast::UExpNode Parser::parse_call_or_subscript_chain(ast::UExpNode& parent) {
+    ast::UExpNode node = std::move(parent);
     while (item_in_vec(this->token.type, {TokType::LPAREN, TokType::LSQUARE})) {
         if (this->match(TokType::LPAREN)) {
 //                 function call
             this->next();
-            ast::VectorOfNodesU arguments;
+            ast::VectorOfExpNodesU arguments;
             Token close;
             if (this->match(TokType::RPAREN)) {
                 close = this->token;
@@ -558,12 +561,12 @@ ast::UNode Parser::parse_call_or_subscript_chain(ast::UNode& parent) {
                 arguments = this->parse_list_of_arguments();
                 close = this->expect_token(TokType::RPAREN);
             }
-            ast::UNode old_node = std::move(node);
+            ast::UExpNode old_node = std::move(node);
             TextPosition o_start = old_node->start;
-            node = std::make_unique<ast::Call>(std::move(old_node),
-                                               std::move(arguments),
-                                               old_node->start,
-                                               close.end_pos);
+            node = std::make_unique<ast::CallExp>(std::move(old_node),
+                                                  std::move(arguments),
+                                                  old_node->start,
+                                                  close.end_pos);
             node->start = o_start;
         } else if (this->match(TokType::LSQUARE)) {
 //                subscript
@@ -571,8 +574,8 @@ ast::UNode Parser::parse_call_or_subscript_chain(ast::UNode& parent) {
             this->next();
             auto value = this->parse_expression();
             Token close = this->expect_token(TokType::RSQUARE);
-            ast::UNode old_node = std::move(node);
-            ast::VectorOfNodesU v;
+            ast::UExpNode old_node = std::move(node);
+            ast::VectorOfExpNodesU v;
             v.push_back(std::move(value));
             node = std::make_unique<ast::Subscript>(old_node, v, old_node->start, close.end_pos);
         }
@@ -652,7 +655,7 @@ ast::UNode Parser::parse_common_statement() {
             return std::make_unique<ast::Continue>(tok.start, tok.end_pos);
         }
         default: {
-            auto node = this->parse_assignment_or_expression();
+            auto node = this->parse_assignment_or_call();
             this->expect_token(TokType::SEMICOLON);
             return node;
         }
@@ -853,7 +856,7 @@ std::unique_ptr<ast::For> Parser::parse_for_loop() {
     return forloop;
 }
 
-ast::UNode Parser::parse_ternary() {
+ast::UExpNode Parser::parse_ternary() {
     auto condition = this->parse_or_expression();
     if (this->match(TokType::QUESTION)) {
         this->next();
@@ -903,7 +906,7 @@ std::unique_ptr<ast::Klass> Parser::parse_class_definition() {
     std::unordered_map<std::string, ast::UFunctionNode> static_methods;
     std::vector<std::pair<std::string, ast::UTypeNode>> members;
     std::set<std::string> member_names;
-    std::map<std::string, std::pair<ast::Type*, ast::Node*>> static_members;
+    std::map<std::string, std::pair<ast::Type*, ast::ExpNode*>> static_members;
     VectorOfStrings members_ordered;
     while (true) {
         bool is_static = false;

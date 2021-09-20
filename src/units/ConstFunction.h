@@ -8,7 +8,7 @@
 #include "../ast/Type.h"
 #include "../ast/Path.h"
 #include "../ast/FunctionType.h"
-#include "../ast/Function.h"
+#include "../ast/top/Function.h"
 #include "../simple_nodes/sem.h"
 #include "../simple_nodes/common/src/TypeFunction.h"
 

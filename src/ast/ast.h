@@ -13,6 +13,8 @@ namespace ast {
 
     class Continue;
 
+    class CallExp;
+
     class Break;
 
     class DefaultConstructor;
@@ -103,8 +105,11 @@ namespace ast {
     typedef std::unique_ptr<Block> UBlock;
     typedef std::unique_ptr<Number> UNumber;
     typedef std::unique_ptr<Node> UNode;
+    typedef std::unique_ptr<ExpNode> UExpNode;
     typedef std::reference_wrapper<Node> RNode;
+    typedef std::reference_wrapper<ExpNode> RExpNode;
     typedef std::vector<UNode> VectorOfNodesU;
+    typedef std::vector<UExpNode> VectorOfExpNodesU;
 
     typedef std::unique_ptr<ObjectType> UObjectType;
     typedef std::unique_ptr<FunctionType> UFunctionType;

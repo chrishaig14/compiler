@@ -6,7 +6,7 @@
 #include "../ast/ObjectType.h"
 #include "../simple_nodes/common/include/TypeObject.h"
 
-UExpressionInfo Checker::expect_rvalue_of_type(const sem::Type& target, ast::Node& node) {
+UExpressionInfo Checker::expect_rvalue_of_type(const sem::Type& target, ast::ExpNode& node) {
     UExpressionInfo rinfo = this->dispatch_rvalue(node);
     if (rinfo->is_error()) {
         return exp_error_stub();
@@ -168,7 +168,8 @@ USemanticInfo Checker::check_declaration_without_type(ast::Declaration& n) {
     }
     E_TYPE entity_type = exp_info_p->entity.get().type;
     if (entity_type != E_TYPE::CONST_FUNCTION && entity_type != E_TYPE::VALUE) {
-        this->error_reporter.error(std::make_unique<ErrorExpectedExpression>(exp_info_p->entity, n.expression));
+        // this->error_reporter.error(std::make_unique<ErrorExpectedExpression>(exp_info_p->entity, n.expression));
+        throw std::runtime_error("NOT A FVALUE; EXPECTE D EXPRESSION");
         return error_stub();
     }
 

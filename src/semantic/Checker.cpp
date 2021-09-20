@@ -329,45 +329,45 @@ bool Checker::is_variable(const ast::ObjectType& a) {
     return a.type_params.empty() && (islower(a.id[0]) != 0);
 }
 
-UExpressionInfo Checker::dispatch_rvalue(ast::Node& n) {
+UExpressionInfo Checker::dispatch_rvalue(ast::ExpNode& n) {
     switch (n.ntype) {
-        case NodeType::BINOP: {
+        case ExpNodeType::BINOP: {
             auto r = this->visit_binop((ast::BinaryOp&) n);
             return r;
         }
-        case NodeType::BOOLEAN:
+        case ExpNodeType::BOOLEAN:
             return this->visit_boolean((ast::Boolean&) n);
-        case NodeType::CALL:
+        case ExpNodeType::CALL:
             return this->visit_call_exp((ast::Call&) n);
-        case NodeType::EMPTYLST:
+        case ExpNodeType::EMPTYLST:
             return this->visit_emptylist((ast::EmptyList&) n);
-        case NodeType::ID:
+        case ExpNodeType::ID:
             return this->visit_id((ast::Id&) n);
-        case NodeType::LST:
+        case ExpNodeType::LST:
             return this->visit_list((ast::List&) n);
-        case NodeType::MEMBER:
+        case ExpNodeType::MEMBER:
             return this->visit_member((ast::Member&) n);
-        case NodeType::NONE:
+        case ExpNodeType::NONE:
             return this->visit_none((ast::None&) n);
-        case NodeType::NUMBER:
+        case ExpNodeType::NUMBER:
             return this->visit_number((ast::Number&) n);
-        case NodeType::STRNG:
+        case ExpNodeType::STRNG:
             return this->visit_string((ast::String&) n);
-        case NodeType::SUB:
+        case ExpNodeType::SUB:
             return this->visit_subscript((ast::Subscript&) n);
-        case NodeType::TERNARY:
+        case ExpNodeType::TERNARY:
             return this->visit_ternary((ast::Ternary&) n);
-        case NodeType::TUPLE:
+        case ExpNodeType::TUPLE:
             return this->visit_tuple((ast::Tuple&) n);
-        case NodeType::UNARY:
+        case ExpNodeType::UNARY:
             return this->visit_unary((ast::UnaryOp&) n);
-        case NodeType::PARTIAL:
+        case ExpNodeType::PARTIAL:
             return this->visit_partial((ast::PartialApplication&) n);
-        case NodeType::DICT:
+        case ExpNodeType::DICT:
             return this->visit_dict((ast::DictNode&) n);
-        case NodeType::EMPTYDICT:
+        case ExpNodeType::EMPTYDICT:
             return this->visit_emptydict((ast::EmptyDict&) n);
-        case NodeType::DEF_CONST:
+        case ExpNodeType::DEF_CONST:
             return this->visit_defconst((ast::DefaultConstructor&) n);
         default:
             this->error_reporter.fail("Don't know what to do!");

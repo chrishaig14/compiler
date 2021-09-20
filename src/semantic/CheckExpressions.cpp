@@ -197,7 +197,7 @@ UExpressionInfo Checker::visit_binop(ast::BinaryOp& n) {
     }
     Entity& l_entity = left_info_p->entity.get();
     if (l_entity.type != E_TYPE::VALUE) {
-        this->error_reporter.error(std::make_unique<ErrorExpectedExpression>(l_entity, n.left));
+        // this->error_reporter.error(std::make_unique<ErrorExpectedExpression>(l_entity, n.left));
         return exp_error_stub();
     }
     Value& l_entity_v = (Value&) l_entity;
@@ -215,7 +215,7 @@ UExpressionInfo Checker::visit_binop(ast::BinaryOp& n) {
     assert(cls != nullptr);
     auto operator_fun_it = cls->static_methods.find(fun);
     if (operator_fun_it == cls->static_methods.end()) {
-        this->error_reporter.error(std::make_unique<ErrorClassNoMethodForOp>(cls->class_name, fun, n));
+        // this->error_reporter.error(std::make_unique<ErrorClassNoMethodForOp>(cls->class_name, fun, n));
         return exp_error_stub();
     }
     ConstFunction& operator_fun = *operator_fun_it->second;

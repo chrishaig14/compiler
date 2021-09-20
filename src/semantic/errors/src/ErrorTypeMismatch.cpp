@@ -16,7 +16,7 @@ std::string highlight_one(const std::string& s, size_t start_col, size_t end_col
     return s.substr(0, start_col) + E_HLT(s.substr(start_col, end_col - start_col)) + s.substr(end_col, s.size());
 }
 
-ErrorTypeMismatch::ErrorTypeMismatch(const sem::Type& expected, const ast::Node& value_node, const Entity& actual)
+ErrorTypeMismatch::ErrorTypeMismatch(const sem::Type& expected, const ast::ExpNode& value_node, const Entity& actual)
         : expected(expected.clone()), actual(actual.clone()), start(value_node.start), end(value_node.end) {
 }
 

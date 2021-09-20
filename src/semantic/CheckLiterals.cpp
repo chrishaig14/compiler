@@ -92,7 +92,7 @@ UExpressionInfo Checker::visit_tuple(ast::Tuple& node) {
     sem::VectorOfTypes types;
     std::vector<sem::UExp> values;
     for (auto& n: node.values) {
-        USemanticInfo vtype = this->dispatch(*n);
+        UExpressionInfo vtype = this->dispatch_rvalue(*n);
         values.push_back(std::move(vtype->exp_snode));
         types.emplace_back(((Value&) vtype->entity.get()).type.clone());
         // if (!this->is_immutable(vtype->type())) {
@@ -258,7 +258,8 @@ UExpressionInfo Checker::visit_defconst(ast::DefaultConstructor& node) {
 UExpressionInfo Checker::visit_list(ast::List& node) {
     UExpressionInfo element_type_p = this->dispatch_rvalue(node.elements[0]);
     if (element_type_p->entity.get().type != E_TYPE::VALUE) {
-        this->error_reporter.error(std::make_unique<ErrorExpectedExpression>(element_type_p->entity, node.elements[0]));
+        throw std::runtime_error("Expected expression");
+        // this->error_reporter.error(std::make_unique<ErrorExpectedExpression>(element_type_p->entity, node.elements[0]));
         return exp_error_stub();
     }
     Value& entity_value = (Value&) element_type_p->entity.get();
@@ -268,7 +269,7 @@ UExpressionInfo Checker::visit_list(ast::List& node) {
     list_elements.push_back(std::move(element_type_p->exp_snode));
 
     for (size_t i = 1; i < node.elements.size(); i++) {
-        USemanticInfo current_type_p = this->dispatch(node.elements[i]);
+        UExpressionInfo current_type_p = this->dispatch_rvalue(node.elements[i]);
         // const ast::TypeNode& current_type = current_type_p->type();
         // if (!current_type_p->is_constant) {
         //     is_constant = false;

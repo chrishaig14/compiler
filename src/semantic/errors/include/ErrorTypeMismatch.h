@@ -7,7 +7,7 @@
 
 #include "../../../ast/Type.h"
 #include "../../../units/Entity.h"
-#include "../../../ast/Node.h"
+#include "../../../ast/exp/ExpNode.h"
 #include "Error.h"
 
 class ErrorTypeMismatch : public Error {
@@ -17,7 +17,7 @@ class ErrorTypeMismatch : public Error {
 public:
     const TextPosition start;
     const TextPosition end;
-    ErrorTypeMismatch(const sem::Type& expected, const ast::Node& value_node, const Entity& actual);
+    ErrorTypeMismatch(const sem::Type& expected, const ast::ExpNode& value_node, const Entity& actual);
 
     std::string to_str(const CodeLines& code) const override;
     bool equal(const Error& other) const override;

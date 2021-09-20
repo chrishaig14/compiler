@@ -6,7 +6,7 @@
 
 using namespace ast;
 
-Declaration::Declaration(const std::string& identifier, ast::UTypeNode type, ast::UNode expression, TextPosition start,
+Declaration::Declaration(const std::string& identifier, ast::UTypeNode type, ast::UExpNode expression, TextPosition start,
                          TextPosition eq_pos, TextPosition end) : ast::Node(NodeType::DECL, start, end),
                                                                   _expression(std::move(expression)), expression(*_expression),
                                                                   identifier(identifier),

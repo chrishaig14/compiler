@@ -10,11 +10,11 @@
 #include <set>
 #include <unordered_map>
 
-#include "../ast/EnumNode.h"
-#include "../ast/Module.h"
+#include "../ast/top/EnumNode.h"
+#include "../ast/top/Module.h"
 #include "../ast/nodes.h"
 #include "../ast/ObjectType.h"
-#include "../ast/UnaryOp.h"
+#include "../ast/exp/UnaryOp.h"
 #include "../logging/logging.h"
 #include "../macros.h"
 #include "../scanner/CodeLines.h"
@@ -128,7 +128,7 @@ public:
     USemanticInfo visit_while(ast::While& node);
     USemanticInfo visit_cast(ast::Cast& n);
 
-    UExpressionInfo dispatch_rvalue(ast::Node& nod);
+    UExpressionInfo dispatch_rvalue(ast::ExpNode& n);
     UExpressionInfo visit_binop(ast::BinaryOp& node);
     UExpressionInfo visit_boolean(ast::Boolean& node);
 
@@ -160,7 +160,7 @@ public:
     UExpressionInfo package_member(Package& package, const std::string& child, ast::Member& n);
     UExpressionInfo module_member(Module& mod, const std::string& child, ast::Member& n);
     UExpressionInfo enum_member(Enum* enumm, const std::string& value, ast::Member& node);
-    UExpressionInfo expect_rvalue_of_type(const sem::Type& target, ast::Node& node);
+    UExpressionInfo expect_rvalue_of_type(const sem::Type& target, ast::ExpNode& node);
 
     std::unique_ptr<sem::FunctionDef> visit_function(ast::Function& n);
     std::unique_ptr<sem::KlassDef> visit_class(ast::Klass& node);

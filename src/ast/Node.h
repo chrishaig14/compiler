@@ -13,6 +13,7 @@
 #include <iostream>
 #include "../types.h"
 #include "ast.h"
+#include "exp/ExpNode.h"
 
 class ast::Node {
 public:

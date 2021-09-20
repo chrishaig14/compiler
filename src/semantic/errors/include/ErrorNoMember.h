@@ -7,7 +7,7 @@
 
 
 #include "Error.h"
-#include "../../../ast/Member.h"
+#include "../../../ast/exp/Member.h"
 
 class ErrorNoMember : public Error {
     const ast::Member& m;

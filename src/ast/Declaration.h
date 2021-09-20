@@ -8,17 +8,18 @@
 
 #include <string>
 #include "Node.h"
+#include "exp/ExpNode.h"
 #include "Type.h"
 #include "../utils.h"
 
 class ast::Declaration : public ast::Node {
-    ast::UNode _expression;
+    ast::UExpNode _expression;
 public:
-    Node& expression;
+    ExpNode& expression;
     std::string identifier;
     ast::UTypeNode type;
     TextPosition eq_pos;
-    Declaration(const std::string& identifier, ast::UTypeNode type, ast::UNode expression, TextPosition start,
+    Declaration(const std::string& identifier, ast::UTypeNode type, ast::UExpNode expression, TextPosition start,
                 TextPosition eq_pos, TextPosition end);
 
 

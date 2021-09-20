@@ -1,5 +1,5 @@
 #include "catch.hpp"
-#include "../src/ast/UnaryOp.h"
+#include "../src/ast/exp/UnaryOp.h"
 #include "../src/compiler/analyze.h"
 #include "../src/compiler/Compiler.h"
 #include "../src/parser/Parser.h"
@@ -235,7 +235,7 @@ TEST_CASE("semantic_output_float_literal", "[checker]") {
     std::string code = "fun foo()->Integer{var x = 9.5;return 0;}";
 
     CHECKER()
-    ast::Node& expression = ((ast::Declaration&) *(module.ast->functions[0].get().body->nodes[0])).expression;
+    ast::ExpNode& expression = ((ast::Declaration&) *(module.ast->functions[0].get().body->nodes[0])).expression;
     UExpressionInfo info = checker.dispatch_rvalue(expression);
 
 
@@ -284,7 +284,7 @@ TEST_CASE("semantic_output_binop", "[checker]") {
     CHECKER()
     checker.init();
 
-    ast::Node& expression = ((ast::Declaration&) *(module.ast->functions[0].get().body->nodes[0])).expression;
+    ast::ExpNode& expression = ((ast::Declaration&) *(module.ast->functions[0].get().body->nodes[0])).expression;
     UExpressionInfo info = checker.dispatch_rvalue(expression);
 
 
@@ -301,7 +301,7 @@ TEST_CASE("semantic_output_boolop", "[checker]") {
     CHECKER()
     checker.init();
 
-    ast::Node& expression = ((ast::Declaration&) *(module.ast->functions[0].get().body->nodes[0])).expression;
+    ast::ExpNode& expression = ((ast::Declaration&) *(module.ast->functions[0].get().body->nodes[0])).expression;
 
     UExpressionInfo info = checker.dispatch_rvalue(expression);
 
@@ -319,7 +319,7 @@ TEST_CASE("semantic_output_subscript", "[checker]") {
     CHECKER()
     checker.init();
 
-    ast::Node& expression = ((ast::Declaration&) *(module.ast->functions[0].get().body->nodes[0])).expression;
+    ast::ExpNode& expression = ((ast::Declaration&) *(module.ast->functions[0].get().body->nodes[0])).expression;
 
     UExpressionInfo info = checker.dispatch_rvalue(expression);
 

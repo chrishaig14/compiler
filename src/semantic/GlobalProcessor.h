@@ -9,9 +9,9 @@
 #include <unordered_map>
 #include "SymbolTable.h"
 #include "../ast/Import.h"
-#include "../ast/Klass.h"
+#include "../ast/top/Klass.h"
 #include "../ast/Alias.h"
-#include "../ast/EnumNode.h"
+#include "../ast/top/EnumNode.h"
 #include "../units/Enum.h"
 
 class GlobalProcessor {

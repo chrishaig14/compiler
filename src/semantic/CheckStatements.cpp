@@ -69,7 +69,7 @@ UExpressionInfo Checker::visit_lvalue_subscript(ast::Subscript& node) {
 }
 
 USemanticInfo Checker::visit_assignment(ast::Assignment& n) {
-    if (n.lvalue.ntype == NodeType::ID) {
+    if (n.lvalue.ntype == ExpNodeType::ID) {
         if (((ast::Id&) n.lvalue)._id == "_") {
             // ExpressionInfo rv = this->dispatch_rvalue(n.rvalue);
             // return rv;
@@ -80,7 +80,7 @@ USemanticInfo Checker::visit_assignment(ast::Assignment& n) {
     UExpressionInfo linfo_p;
     bool is_subscript = false;
     std::unique_ptr<sem::Call> csn = nullptr;
-    if (n.lvalue.ntype == NodeType::SUB) {
+    if (n.lvalue.ntype == ExpNodeType::SUB) {
         // special case
         linfo_p = this->visit_lvalue_subscript((ast::Subscript&) n.lvalue);
         csn = std::move((std::unique_ptr<sem::Call>&) linfo_p->exp_snode);
@@ -99,8 +99,9 @@ USemanticInfo Checker::visit_assignment(ast::Assignment& n) {
     }
 
     if (linfo_p->entity.get().type != E_TYPE::VALUE) {
-        this->error_reporter.error(std::make_unique<ErrorCantAssign>(n.lvalue));
+        // this->error_reporter.error(std::make_unique<ErrorCantAssign>(n.lvalue));
         // this->error_reporter.fail("Cannot assign to this thing!");
+        std::runtime_error("Error cant assignt to this thing!");
         return error_stub();
     }
     Value& e_value = (Value&) linfo_p->entity;
@@ -108,7 +109,9 @@ USemanticInfo Checker::visit_assignment(ast::Assignment& n) {
     if (e_value.type.kind == sem::Kind::OBJECT) {
         // bool ff = n.lvalue->ntype == NodeType::MEMBER;
         if (linfo_p->is_tuple_member) {
-            this->error_reporter.error(std::make_unique<ErrorCantAssign>(n.lvalue));
+            // this->error_reporter.error(std::make_unique<ErrorCantAssign>(n.lvalue));
+            std::runtime_error("Error cant assignt to this thing!");
+
             return error_stub();
         }
     }

@@ -9,7 +9,7 @@
 #include <string>
 #include "../../../scanner/TextPosition.h"
 #include "../../../ast/Type.h"
-#include "../../../ast/Member.h"
+#include "../../../ast/exp/Member.h"
 #include "../../../ast/Call.h"
 #include "../../../scanner/CodeLines.h"
 #include "../../../units/Entity.h"

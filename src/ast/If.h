@@ -11,18 +11,19 @@
 
 #include "Block.h"
 #include "Node.h"
+#include "exp/ExpNode.h"
 #include "ast.h"
 
 class ast::If : public ast::Node {
-    ast::UNode _condition;
+    ast::UExpNode _condition;
     ast::UBlock _then;
-    std::vector<std::pair<ast::UNode, ast::UBlock>> _elifs;
+    std::vector<std::pair<ast::UExpNode, ast::UBlock>> _elifs;
 public:
     ast::UBlock selse;
     ast::Block& then;
-    Node& condition;
-    std::vector<std::pair<RNode, std::reference_wrapper<ast::Block>>> elifs;
-    If(ast::UNode condition, std::unique_ptr<ast::Block> then, std::vector<std::pair<ast::UNode, ast::UBlock>> elifs,
+    ExpNode& condition;
+    std::vector<std::pair<RExpNode, std::reference_wrapper<ast::Block>>> elifs;
+    If(ast::UExpNode condition, std::unique_ptr<ast::Block> then, std::vector<std::pair<ast::UExpNode, ast::UBlock>> elifs,
        std::unique_ptr<ast::Block> selse, TextPosition start, TextPosition end);
 
     bool equal(const ast::Node& other) const override;
