@@ -412,7 +412,7 @@ TEST_CASE("binop_type_error", "[checker]") {
 
 
 TEST_CASE("binop_error", "[checker]") {
-    std::string code = "fun bar()->Integer{var x = \"Hello\" - \"Bye\" ;return 0;}";
+    std::string code = R"(fun bar()->Integer{var x = "Hello" - "Bye" ;return 0;})";
 
     CHECKER();
     checker.init();
