@@ -5,9 +5,9 @@
 #define CONST_FUNCTION_H
 
 #include "Entity.h"
-#include "../ast/Type.h"
-#include "../ast/Path.h"
-#include "../ast/FunctionType.h"
+#include "../ast/general/Type.h"
+#include "../util/Path.h"
+#include "../ast/general/FunctionType.h"
 #include "../ast/top/Function.h"
 #include "../simple_nodes/sem.h"
 #include "../simple_nodes/common/src/TypeFunction.h"

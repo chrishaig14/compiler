@@ -8,7 +8,7 @@
 
 #include <string>
 #include "ExpNode.h"
-#include "../../Type.h"
+#include "../../general/Type.h"
 #include "../../../scanner/Token.h"
 
 #include "../../ast.h"

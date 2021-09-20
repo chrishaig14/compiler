@@ -8,8 +8,8 @@
 
 #include <vector>
 #include "../../Node.h"
-#include "../../../types.h"
-#include "../../Type.h"
+#include "../../../util/types.h"
+#include "../../general/Type.h"
 #include "../../ast.h"
 #include "ExpNode.h"
 

@@ -6,9 +6,9 @@
 #define WHILENODE_H
 
 
-#include "Node.h"
+#include "../Node.h"
 #include "Block.h"
-#include "ast.h"
+#include "../ast.h"
 
 class ast::While : public ast::Node {
 public:

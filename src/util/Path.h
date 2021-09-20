@@ -6,7 +6,7 @@
 #define XLANG_PATH_H
 
 
-#include "../types.h"
+#include "types.h"
 
 class Path {
 private:

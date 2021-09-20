@@ -5,7 +5,7 @@
 #include <iostream>
 #include "Scanner.h"
 #include "../logging/logging.h"
-#include "../utils.h"
+#include "../util/utils.h"
 
 std::unordered_map<std::string, TokType> TOKEN_KEYWORDS;
 std::unordered_map<std::string, TokType> TOKEN_SPECIAL;

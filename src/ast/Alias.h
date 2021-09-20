@@ -7,7 +7,7 @@
 
 
 #include "Node.h"
-#include "Type.h"
+#include "general/Type.h"
 #include "ast.h"
 
 class ast::Alias : public ast::Node {

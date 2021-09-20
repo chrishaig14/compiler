@@ -10,7 +10,7 @@
 #include <fstream>
 #include "../units/Package.h"
 #include "../units/Module.h"
-#include "../utils.h"
+#include "../util/utils.h"
 
 #define REQUIREMENTS_FILE "requirements.txt"
 

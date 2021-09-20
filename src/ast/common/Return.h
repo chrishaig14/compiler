@@ -6,11 +6,11 @@
 #define RETURNNODE_H
 
 
-#include "Node.h"
-#include "../types.h"
-#include "Type.h"
-#include "ast.h"
-#include "exp/include/ExpNode.h"
+#include "../Node.h"
+#include "../../util/types.h"
+#include "../general/Type.h"
+#include "../ast.h"
+#include "../exp/include/ExpNode.h"
 
 class ast::Return : public ast::Node {
 public:

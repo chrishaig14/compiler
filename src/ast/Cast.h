@@ -7,7 +7,7 @@
 
 #include "Node.h"
 #include "optypes.h"
-#include "Type.h"
+#include "general/Type.h"
 #include "ast.h"
 
 class ast::Cast : public ast::Node {

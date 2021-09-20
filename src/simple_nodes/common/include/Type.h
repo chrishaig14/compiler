@@ -9,7 +9,7 @@
 #include <string>
 #include <vector>
 
-#include "../../../types.h"
+#include "../../../util/types.h"
 #include <iostream>
 #include "../../sem.h"
 #include "../../../json/json_fwd.hpp"

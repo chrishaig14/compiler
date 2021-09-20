@@ -4,8 +4,8 @@
 #include "../src/ast/exp/include/UnaryOp.h"
 #include "../src/ast/exp/include/ExpNode.h"
 #include "../src/ast/exp/include/CallExp.h"
-#include "../src/ast/Typeclass.h"
-#include "../src/ast/Instance.h"
+#include "../src/ast/top/Typeclass.h"
+#include "../src/ast/top/Instance.h"
 
 const TextPosition DUMMY_POS = {0, 0};
 

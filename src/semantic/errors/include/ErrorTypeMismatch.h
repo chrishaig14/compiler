@@ -5,7 +5,7 @@
 #ifndef XLANG_ERRORTYPEMISMATCH_H
 #define XLANG_ERRORTYPEMISMATCH_H
 
-#include "../../../ast/Type.h"
+#include "../../../ast/general/Type.h"
 #include "../../../units/Entity.h"
 #include "../../../ast/exp/include/ExpNode.h"
 #include "Error.h"

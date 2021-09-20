@@ -7,8 +7,8 @@
 
 #include <string>
 #include "Exp.h"
-#include "../../../ast/Type.h"
-#include "../../../ast/Path.h"
+#include "../../../ast/general/Type.h"
+#include "../../../util/Path.h"
 
 class sem::ObjectMethod : public sem::Exp {
 public:

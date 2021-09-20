@@ -14,6 +14,6 @@ add_library(
         TextPosition.h
         Token.cpp
         Token.h
-        ../utils.cpp
-        ../utils.h
+        ../util/utils.cpp
+        ../util/utils.h
 )

@@ -6,7 +6,7 @@
 #include "GlobalProcessor.h"
 #include "../scanner/Scanner.h"
 #include "../parser/Parser.h"
-#include "../ast/ObjectType.h"
+#include "../ast/general/ObjectType.h"
 #include "../simple_nodes/common/include/TypeObject.h"
 #include "../simple_nodes/common/src/TypeFunction.h"
 #include "../simple_nodes/common/include/Type.h"

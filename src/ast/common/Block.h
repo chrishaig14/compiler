@@ -7,13 +7,13 @@
 
 
 #include <vector>
-#include "Node.h"
+#include "../Node.h"
 
-#include "Node.h"
-#include "../types.h"
-#include "Type.h"
-#include "../units/Entity.h"
-#include "ast.h"
+#include "../Node.h"
+#include "../../util/types.h"
+#include "../general/Type.h"
+#include "../../units/Entity.h"
+#include "../ast.h"
 
 class ast::Block : public ast::Node {
 public:

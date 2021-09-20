@@ -10,7 +10,7 @@
 #include "../../../json/json_fwd.hpp"
 #include "../../../json/json.hpp"
 #include <iostream>
-#include "../../../types.h"
+#include "../../../util/types.h"
 #include "../../ast.h"
 #include "../../../scanner/TextPosition.h"
 

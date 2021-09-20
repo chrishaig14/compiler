@@ -6,10 +6,10 @@
 #define XLANG_MATCH_H
 
 
-#include "Node.h"
-#include "Type.h"
+#include "../Node.h"
+#include "../general/Type.h"
 #include "Block.h"
-#include "ast.h"
+#include "../ast.h"
 
 class ast::Match : public ast::Node {
 public:

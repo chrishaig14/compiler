@@ -4,7 +4,7 @@
 
 #include <cassert>
 #include "../include/TypeObject.h"
-#include "../../../ast/ObjectType.h"
+#include "../../../ast/general/ObjectType.h"
 
 using namespace sem;
 

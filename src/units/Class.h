@@ -10,8 +10,8 @@
 #include <string>
 #include <vector>
 #include <map>
-#include "../ast/Type.h"
-#include "../macros.h"
+#include "../ast/general/Type.h"
+#include "../util/macros.h"
 #include "Entity.h"
 #include "ConstFunction.h"
 

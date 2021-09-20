@@ -9,9 +9,9 @@
 #include <map>
 #include "../Node.h"
 
-#include "../Type.h"
+#include "../general/Type.h"
 #include "Function.h"
-#include "../../macros.h"
+#include "../../util/macros.h"
 #include "../ast.h"
 
 class KMethod {

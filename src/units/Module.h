@@ -7,11 +7,11 @@
 
 #include <string>
 #include "Entity.h"
-#include "../ast/Block.h"
+#include "../ast/common/Block.h"
 #include "../scanner/CodeLines.h"
 #include "../ast/top/Module.h"
 #include "../simple_nodes/top/include/top.h"
-#include "../ast/Import.h"
+#include "../ast/top/Import.h"
 #include "../ast/top/Klass.h"
 #include "../ast/top/EnumNode.h"
 #include "../simple_nodes/common/include/Block.h"

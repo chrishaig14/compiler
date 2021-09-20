@@ -7,7 +7,7 @@
 
 
 #include "ExpNode.h"
-#include "../../Type.h"
+#include "../../general/Type.h"
 #include "../../ast.h"
 
 class ast::EmptyDict : public ast::ExpNode {

@@ -10,7 +10,7 @@
 
 #include "../../Node.h"
 
-#include "../../../types.h"
+#include "../../../util/types.h"
 #include "../../ast.h"
 #include "ExpNode.h"
 

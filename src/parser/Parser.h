@@ -5,14 +5,14 @@
 #include <vector>
 #include "../scanner/Token.h"
 #include "../ast/nodes.h"
-#include "../utils.h"
+#include "../util/utils.h"
 #include <iostream>
-#include "../ast/Import.h"
+#include "../ast/top/Import.h"
 #include "../scanner/CodeLines.h"
 #include "../ast/top/EnumNode.h"
-#include "../ast/ObjectType.h"
-#include "../ast/Typeclass.h"
-#include "../ast/Instance.h"
+#include "../ast/general/ObjectType.h"
+#include "../ast/top/Typeclass.h"
+#include "../ast/top/Instance.h"
 #include "../ast/top/Module.h"
 #include "../ast/Alias.h"
 

@@ -6,11 +6,11 @@
 #define ASSIGNMENTNODE_H
 
 
-#include "Node.h"
+#include "../Node.h"
 
-#include "Node.h"
-#include "Type.h"
-#include "ast.h"
+#include "../Node.h"
+#include "../general/Type.h"
+#include "../ast.h"
 
 class ast::Assignment : public ast::Node {
     ast::UExpNode _lvalue;

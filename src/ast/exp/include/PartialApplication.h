@@ -5,9 +5,9 @@
 #ifndef UNTITLED1_PARTIALAPPLICATION_H
 #define UNTITLED1_PARTIALAPPLICATION_H
 
-#include "../../../types.h"
+#include "../../../util/types.h"
 #include "ExpNode.h"
-#include "../../Type.h"
+#include "../../general/Type.h"
 #include "../../ast.h"
 
 class ast::PartialApplication : public ast::ExpNode {

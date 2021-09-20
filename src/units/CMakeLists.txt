@@ -21,5 +21,5 @@ add_library(
         ObjectValue.h
         Package.cpp
         Package.h
-        ../macros.h
-        ../types.h)
+        ../util/macros.h
+        ../util/types.h)

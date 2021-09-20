@@ -3,7 +3,7 @@
 //
 
 #include "CheckDeclaration.h"
-#include "../ast/ObjectType.h"
+#include "../ast/general/ObjectType.h"
 #include "../simple_nodes/common/include/TypeObject.h"
 
 UExpressionInfo Checker::expect_rvalue_of_type(const sem::Type& target, ast::ExpNode& node) {

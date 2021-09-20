@@ -7,7 +7,7 @@
 
 
 #include "Error.h"
-#include "../../../ast/Declaration.h"
+#include "../../../ast/common/Declaration.h"
 
 class ErrorRedeclared : public Error {
 public:

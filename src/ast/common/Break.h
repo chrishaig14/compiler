@@ -6,10 +6,10 @@
 #define BREAKNODE_H
 
 
-#include "Node.h"
-#include "Type.h"
+#include "../Node.h"
+#include "../general/Type.h"
 
-#include "ast.h"
+#include "../ast.h"
 
 class ast::Break : public ast::Node {
 public:

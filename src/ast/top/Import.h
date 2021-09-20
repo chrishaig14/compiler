@@ -6,12 +6,12 @@
 #define UNTITLED1_IMPORTNODE_H
 
 
-#include "Node.h"
+#include "../Node.h"
 
 #include <utility>
-#include "../types.h"
-#include "ast.h"
-#include "top/TopNode.h"
+#include "../../util/types.h"
+#include "../ast.h"
+#include "TopNode.h"
 
 class ast::Import : public ast::TopNode {
 public:

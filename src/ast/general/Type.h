@@ -8,10 +8,10 @@
 
 #include <string>
 #include <vector>
-#include "Node.h"
+#include "../Node.h"
 
-#include "../types.h"
-#include "../simple_nodes/common/include/Type.h"
+#include "../../util/types.h"
+#include "../../simple_nodes/common/include/Type.h"
 #include <iostream>
 
 

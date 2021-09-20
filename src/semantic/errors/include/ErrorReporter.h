@@ -8,9 +8,9 @@
 
 #include <string>
 #include "../../../scanner/TextPosition.h"
-#include "../../../ast/Type.h"
+#include "../../../ast/general/Type.h"
 #include "../../../ast/exp/include/Member.h"
-#include "../../../ast/Call.h"
+#include "../../../ast/common/Call.h"
 #include "../../../scanner/CodeLines.h"
 #include "../../../units/Entity.h"
 #include "Error.h"

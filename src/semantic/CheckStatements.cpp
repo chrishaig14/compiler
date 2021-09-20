@@ -4,7 +4,7 @@
 
 #include "CheckStatements.h"
 
-#include "../ast/ObjectType.h"
+#include "../ast/general/ObjectType.h"
 #include "../simple_nodes/common/include/Throw.h"
 #include "../simple_nodes/common/include/TryCatch.h"
 #include "../simple_nodes/common/include/TypeObject.h"

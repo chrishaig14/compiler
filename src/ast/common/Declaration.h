@@ -7,10 +7,10 @@
 
 
 #include <string>
-#include "Node.h"
-#include "exp/include/ExpNode.h"
-#include "Type.h"
-#include "../utils.h"
+#include "../Node.h"
+#include "../exp/include/ExpNode.h"
+#include "../general/Type.h"
+#include "../../util/utils.h"
 
 class ast::Declaration : public ast::Node {
     ast::UExpNode _expression;

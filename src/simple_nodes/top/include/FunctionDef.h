@@ -7,7 +7,7 @@
 
 #include <string>
 #include "Top.h"
-#include "../../../types.h"
+#include "../../../util/types.h"
 #include "../../common/include/Block.h"
 
 class sem::FunctionDef : public sem::Top {

@@ -7,7 +7,7 @@
 
 
 #include "Exp.h"
-#include "../../../ast/Path.h"
+#include "../../../util/Path.h"
 
 class sem::ObjectConstructor : public sem::Exp {
 public:

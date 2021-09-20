@@ -7,12 +7,12 @@
 
 
 #include <vector>
-#include "Node.h"
+#include "../Node.h"
 
 #include "Block.h"
-#include "Node.h"
-#include "exp/include/ExpNode.h"
-#include "ast.h"
+#include "../Node.h"
+#include "../exp/include/ExpNode.h"
+#include "../ast.h"
 
 class ast::If : public ast::Node {
     ast::UExpNode _condition;

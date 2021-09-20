@@ -4,7 +4,7 @@
 
 #include <cassert>
 #include "CheckMember.h"
-#include "../ast/ObjectType.h"
+#include "../ast/general/ObjectType.h"
 #include "../simple_nodes/expressions/include/ObjectMember.h"
 #include "../simple_nodes/expressions/include/ObjectMethod.h"
 #include "../simple_nodes/common/include/TypeObject.h"

@@ -6,10 +6,10 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -g -O0 -Wall -pedantic -Werror")
 
 add_library(
         semantic
-        ../macros.h
-        ../types.h
-        ../utils.cpp
-        ../utils.h
+        ../util/macros.h
+        ../util/types.h
+        ../util/utils.cpp
+        ../util/utils.h
         CheckCall.cpp
         CheckCall.h
         CheckDeclaration.cpp

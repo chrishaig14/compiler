@@ -2,7 +2,7 @@
 #include <set>
 #include <cassert>
 #include "Checker.h"
-#include "../macros.h"
+#include "../util/macros.h"
 #include "../logging/logging.h"
 #include "../simple_nodes/common/include/TypeObject.h"
 #include "../simple_nodes/common/src/TypeFunction.h"

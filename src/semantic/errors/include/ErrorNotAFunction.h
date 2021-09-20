@@ -7,7 +7,7 @@
 
 
 #include "Error.h"
-#include "../../../ast/Call.h"
+#include "../../../ast/common/Call.h"
 
 class ErrorNotAFunction : public Error {
 public:

@@ -6,10 +6,10 @@
 #define FORNODE_H
 
 
-#include "Node.h"
+#include "../Node.h"
 #include "Block.h"
-#include "../utils.h"
-#include "ast.h"
+#include "../../util/utils.h"
+#include "../ast.h"
 
 class ast::For : public ast::Node {
     ast::UExpNode _exp;

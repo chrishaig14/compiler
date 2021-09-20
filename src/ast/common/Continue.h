@@ -6,8 +6,8 @@
 #define CONTINUENODE_H
 
 
-#include "Node.h"
-#include "ast.h"
+#include "../Node.h"
+#include "../ast.h"
 
 class ast::Continue : public ast::Node {
 public:

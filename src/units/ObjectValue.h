@@ -8,7 +8,7 @@
 
 #include <cassert>
 #include "Entity.h"
-#include "../ast/Type.h"
+#include "../ast/general/Type.h"
 
 enum class Meta {
     ENUM, CLASS

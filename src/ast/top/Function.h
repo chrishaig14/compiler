@@ -10,9 +10,9 @@
 #include <vector>
 #include "../Node.h"
 
-#include "../Type.h"
-#include "../Block.h"
-#include "../Path.h"
+#include "../general/Type.h"
+#include "../common/Block.h"
+#include "../../util/Path.h"
 #include "../ast.h"
 #include "TopNode.h"
 

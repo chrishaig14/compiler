@@ -4,7 +4,7 @@
 
 #include "TypeFunction.h"
 #include "../include/TypeObject.h"
-#include "../../../ast/FunctionType.h"
+#include "../../../ast/general/FunctionType.h"
 #include "../include/TypeObject.h"
 
 using namespace sem;

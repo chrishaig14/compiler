@@ -2,9 +2,9 @@
 #define XLANG_TYPECLASS_H
 
 
-#include "Node.h"
-#include "FunctionType.h"
-#include "ast.h"
+#include "../Node.h"
+#include "../general/FunctionType.h"
+#include "../ast.h"
 
 class ast::Typeclass : public ast::Node {
 public:

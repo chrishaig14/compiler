@@ -8,21 +8,21 @@ add_library(
     nodes
     Alias.cpp
     Alias.h
-    Assignment.cpp
-    Assignment.h
+    common/Assignment.cpp
+    common/Assignment.h
     ast.h
-    Block.cpp
-    Block.h
-    Break.cpp
-    Break.h
-    Call.cpp
-    Call.h
+    common/Block.cpp
+    common/Block.h
+    common/Break.cpp
+    common/Break.h
+    common/Call.cpp
+    common/Call.h
     Cast.cpp
     Cast.h
-    Continue.cpp
-    Continue.h
-    Declaration.cpp
-    Declaration.h
+    common/Continue.cpp
+    common/Continue.h
+    common/Declaration.cpp
+    common/Declaration.h
     exp/src/BinaryOp.cpp
     exp/include/BinaryOp.h
     exp/src/Boolean.cpp
@@ -62,31 +62,31 @@ add_library(
     exp/include/Tuple.h
     exp/src/UnaryOp.cpp
     exp/include/UnaryOp.h
-    For.cpp
-    For.h
-    FunctionType.cpp
-    FunctionType.h
-    If.cpp
-    If.h
-    Import.cpp
-    Import.h
-    Instance.cpp
-    Instance.h
-    Match.cpp
-    Match.h
+    common/For.cpp
+    common/For.h
+    general/FunctionType.cpp
+    general/FunctionType.h
+    common/If.cpp
+    common/If.h
+    top/Import.cpp
+    top/Import.h
+    top/Instance.cpp
+    top/Instance.h
+    common/Match.cpp
+    common/Match.h
     Node.cpp
     Node.cpp
     Node.h
     Node.h
     nodes.h
-    ObjectType.cpp
-    ObjectType.h
+    general/ObjectType.cpp
+    general/ObjectType.h
     optypes.cpp
     optypes.h
-    Path.cpp
-    Path.h
-    Return.cpp
-    Return.h
+    ../util/Path.cpp
+    ../util/Path.h
+    common/Return.cpp
+    common/Return.h
     top/EnumNode.cpp
     top/EnumNode.h
     top/Function.cpp
@@ -97,10 +97,10 @@ add_library(
     top/Module.h
     top/TopNode.cpp
     top/TopNode.h
-    Type.h
-    Typeclass.cpp
-    Typeclass.h
-    TypeNode.cpp
-    While.cpp
-    While.h
+    general/Type.h
+    top/Typeclass.cpp
+    top/Typeclass.h
+    general/TypeNode.cpp
+    common/While.cpp
+    common/While.h
 )

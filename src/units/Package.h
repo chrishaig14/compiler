@@ -6,7 +6,7 @@
 #define XLANG_PACKAGE_H
 
 #include "Module.h"
-#include "../ast/Path.h"
+#include "../util/Path.h"
 
 class Package {
 public:

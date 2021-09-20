@@ -3,7 +3,7 @@
 //
 
 #include "Module.h"
-#include "../Import.h"
+#include "Import.h"
 #include "Klass.h"
 #include "EnumNode.h"
 #include "Function.h"
