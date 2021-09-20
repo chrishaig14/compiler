@@ -332,8 +332,7 @@ bool Checker::is_variable(const ast::ObjectType& a) {
 UExpressionInfo Checker::dispatch_rvalue(ast::ExpNode& n) {
     switch (n.ntype) {
         case ExpNodeType::BINOP: {
-            auto r = this->visit_binop((ast::BinaryOp&) n);
-            return r;
+            return this->visit_binop((ast::BinaryOp&) n);
         }
         case ExpNodeType::BOOLEAN:
             return this->visit_boolean((ast::Boolean&) n);
