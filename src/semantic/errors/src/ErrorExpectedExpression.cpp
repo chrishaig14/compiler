@@ -19,7 +19,7 @@ std::string ErrorExpectedExpression::to_str(const CodeLines& code) const {
     return "Error: expected expression, got " + entity_to_string(*this->entity);
 }
 
-ErrorExpectedExpression::ErrorExpectedExpression(const Entity& entity, const ast::Statement& node)
+ErrorExpectedExpression::ErrorExpectedExpression(const Entity& entity, const ast::ExpNode& node)
         : entity(entity.clone()), node(node) {
 
 }

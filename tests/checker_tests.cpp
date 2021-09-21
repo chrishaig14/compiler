@@ -310,17 +310,16 @@ TEST_CASE("decl_error_expected_expression", "[checker]") {
     CHECKER();
     checker.init();
     ast::Function& function_node = module.ast->functions[0];
-    // ast::Declaration& declaration_node = (ast::Declaration&) *function_node.body->nodes[0];
+    ast::Declaration& declaration_node = (ast::Declaration&) *function_node.body->nodes[0];
     checker.visit_function(function_node);
 
     REQUIRE_CHECKER_ONE_ERROR();
 
-    // Error& error = *checker.error_reporter.errors.back();
-    // Class cl;
-    // Class* cl = module.get(Path("Integer")).clazz;
-    // EntityClass ec(cl);
-    // ErrorExpectedExpression exp(ec, declaration_node.expression);
-    // REQUIRE(error == exp);
+    Error& error = *checker.error_reporter.errors.back();
+    Class* cl = module.get(Path("Integer")).clazz;
+    EntityClass ec(cl);
+    ErrorExpectedExpression exp(ec, declaration_node.expression);
+    REQUIRE(error == exp);
 }
 
 TEST_CASE("error_no_member", "[checker]") {

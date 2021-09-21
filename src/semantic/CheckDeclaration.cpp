@@ -168,8 +168,8 @@ USemanticInfo Checker::check_declaration_without_type(ast::Declaration& n) {
     }
     E_TYPE entity_type = exp_info_p->entity.get().type;
     if (entity_type != E_TYPE::CONST_FUNCTION && entity_type != E_TYPE::VALUE) {
-        // this->error_reporter.error(std::make_unique<ErrorExpectedExpression>(exp_info_p->entity, n.expression));
-        throw std::runtime_error("NOT A FVALUE; EXPECTE D EXPRESSION");
+        this->error_reporter.error(std::make_unique<ErrorExpectedExpression>(exp_info_p->entity, n.expression));
+        // throw std::runtime_error("NOT A FVALUE; EXPECTE D EXPRESSION");
         return error_stub();
     }
 
