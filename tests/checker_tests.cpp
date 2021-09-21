@@ -2,6 +2,7 @@
 #include "../src/scanner/Scanner.h"
 #include "../src/parser/Parser.h"
 #include "../src/ast/expressions/include/UnaryOp.h"
+#include "../src/ast/expressions/include/CallExp.h"
 #include "../src/semantic/GlobalProcessor.h"
 #include "../src/semantic/Checker.h"
 #include "../src/compiler/Compiler.h"
@@ -18,6 +19,7 @@ const TextPosition& _POS = {1, 1};
 #define CHECKER() std::unique_ptr<Compiler> cp = analyze(code);Compiler& c = *cp;Module& module = *c.root_package.units["tmp"].module;resolve_module_imports(module, c.top_package);Checker checker(c.top_package, module);
 #define REQUIRE_CHECKER_ONE_ERROR() REQUIRE(checker.error_reporter.failed);REQUIRE(checker.error_reporter.errors.size() == 1);
 #define REQUIRE_CHECKER_OK() REQUIRE(not checker.error_reporter.failed);REQUIRE(checker.error_reporter.errors.empty());
+
 std::unique_ptr<Compiler> analyze(std::string code) {
     const std::string& tmp_in = "tmp_in";
     mkdir(tmp_in.c_str(), 0700);
@@ -513,10 +515,10 @@ TEST_CASE("call_args_type_error", "[checker]") {
     checker.visit_root(*module.ast);
 
     REQUIRE_CHECKER_ONE_ERROR();
-
-
+    ast::ExpNode& node = static_cast<ast::CallExp&>(static_cast<ast::Declaration&>(*module.ast->functions[1].get().body->nodes[0]).expression).arguments[0];
+    // std::cout << (2 == 2);
     Error& error = *checker.error_reporter.errors.back();
-    ast::String node("Hello", _POS, _POS);
+    // ast::String node("Hello", _POS, _POS);
     sem::TypeObject expected("Integer");
     ErrorTypeMismatch exp(expected, node, *checker.entity_from_type(ast::ObjectType("String")));
     REQUIRE(error == exp);

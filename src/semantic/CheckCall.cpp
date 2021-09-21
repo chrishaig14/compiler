@@ -238,6 +238,7 @@ void Checker::process_function_arguments(ExpressionInfo& retv, std::vector<std::
             this->error_reporter.error(std::make_unique<ErrorTypeMismatch>(param_type,
                                                                            n.arguments[i],
                                                                            *arg_entities[i]));
+            sni++;
             continue;
         }
         arguments[sni] = std::move(arg_rvalue_snode);
