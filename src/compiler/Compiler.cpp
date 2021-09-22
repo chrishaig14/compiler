@@ -8,30 +8,6 @@
 #include "utils.h"
 #include "../transpiler/PythonTranspiler.h"
 
-void
-write_cmakelists(const std::string& cmake_output_path, const std::string& output_name, const std::string& all_files,
-                 const std::string& all_libraries, bool is_lib) {
-    std::string cmakelists = "cmake_minimum_required(VERSION 3.16)\n"
-                             "project(xlang)\n"
-                             "set(CMAKE_CXX_STANDARD 14)\n"
-                             "include_directories(.)\n"
-                             "set(CMAKE_CXX_FLAGS \"-O0 -fverbose-asm -Winline\")\n";
-
-    cmakelists += "include_directories(/home/chris/CLionProjects/compiler/lib)\n";
-    if (is_lib) {
-        cmakelists += "add_library(" + output_name + " " + all_files + ")\n";
-    } else {
-        cmakelists += "add_executable(" + output_name + " " + all_files + ")\n";
-    }
-    cmakelists += "target_link_directories(" + output_name + " PUBLIC /home/chris/CLionProjects/compiler/lib/build)\n";
-    cmakelists += "target_link_libraries(" + output_name + " " + all_libraries + " pthread)\n";
-
-
-    std::ofstream cmakelists_file(cmake_output_path);
-    cmakelists_file << cmakelists;
-}
-
-
 Compiler::Compiler(const std::string& project_dir, const std::string& project_output_dir,
                    const std::string& output_name, const std::string& lib_path, bool is_lib, const std::string& version)
         : project_dir(project_dir), project_output_dir(project_output_dir), output_name(output_name),
