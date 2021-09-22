@@ -18,7 +18,7 @@ PythonOutputCode::PythonOutputCode(const std::string& pre_code, const std::strin
 PythonOutputCode PythonTranspiler::transpile_declaration(const sem::Declaration& node) {
     PythonOutputCode exp_out = this->dispatch_expression(node.expression);
     std::string code = exp_out.pre_code.empty() ? "" : exp_out.pre_code + "\n";
-    code += this->indentation() + node.identifier + " = " + exp_out.code + "\n";
+    code += this->indentation() + node.identifier + " = " + exp_out.code;
     return PythonOutputCode("", code);
 }
 
@@ -33,7 +33,7 @@ PythonOutputCode PythonTranspiler::transpile_assignment(const sem::Assignment& n
     if (not rvalue.pre_code.empty()) {
         pre_code += rvalue.pre_code;
     }
-    code += lvalue.code + SPACE + ASSIGN + SPACE + rvalue.code + NEWLINE;
+    code += lvalue.code + SPACE + ASSIGN + SPACE + rvalue.code;
     return PythonOutputCode(pre_code, code);
 }
 
@@ -108,12 +108,7 @@ PythonOutputCode PythonTranspiler::transpile_block(const sem::Block& node) {
     this->indent();
     for (auto& n: node.nodes) {
         PythonOutputCode statement_out = this->dispatch_common(*n);
-        // if (n->type == sem::CommonType::CONST_FUNCTION_CALL || n->type == sem::CommonType::OBJECT_METHOD_CALL) {
-        //     code += statement_out.pre_code + "\n";
-        //     code += this->indentation() + statement_out.code + "\n";
-        // } else {
-        //     code += statement_out.code;
-        // }
+        code += statement_out.code + "\n";
     }
     if (code.back() == '\n') {
         code = code.substr(0, code.size() - 1);
@@ -588,6 +583,7 @@ void PythonTranspiler::unindent() {
 PythonTranspiler::PythonTranspiler() {
     this->indent_level = 0;
     this->arg_n = 0;
+    this->add_self = false;
 }
 
 PythonOutputCode PythonTranspiler::transpile_object_method(const sem::ObjectMethod& method) {

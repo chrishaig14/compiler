@@ -44,13 +44,13 @@ CallExp::~CallExp() {
 
 nlohmann::json CallExp::to_json() const {
     nlohmann::json j;
-    j["type"] = "CallExp";
-    j["CallExp"]["function"] = this->function.to_json();
+    j["type"] = "callexp";
+    j["callexp"]["function"] = this->function.to_json();
     std::vector<nlohmann::json> v;
     for (auto& e: this->arguments) {
         v.push_back(e.get().to_json());
     }
-    j["CallExp"]["arguments"] = v;
+    j["callexp"]["arguments"] = v;
     return j;
 }
 

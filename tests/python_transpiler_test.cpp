@@ -131,7 +131,7 @@ TEST_CASE("python_transpile_assignment", "[checker]") {
     // x = 314
     PythonOutputCode poc = pt.transpile_assignment(sem::Assignment(std::make_unique<sem::Id>("x"),
                                                                    std::make_unique<sem::Integer>("314")));
-    REQUIRE(poc.code == "x = libcore.libcore.Integer(314)\n");
+    REQUIRE(poc.code == "x = libcore.libcore.Integer(314)");
 }
 
 // TEST_CASE("python_transpile_assignment_complex", "[checker]") {

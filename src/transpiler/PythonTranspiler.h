@@ -42,8 +42,8 @@ public:
 class PythonTranspiler {
     size_t arg_n;
 public:
-    bool add_self;
-    bool in_try_catch;
+    bool add_self{};
+    bool in_try_catch{};
     PythonOutputCode dispatch(const sem::Common& node);
     PythonOutputCode dispatch_common(const sem::Common& node);
     PythonOutputCode dispatch_expression(const sem::Exp& node);
