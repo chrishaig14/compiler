@@ -15,33 +15,29 @@ UExpressionInfo Checker::visit_member(ast::Member& n) {
     Entity& parent_entity = parent_info->entity.get();
     switch (parent_entity.type) {
         case E_TYPE::CLASS:
-            return this->class_member(((EntityClass&) parent_entity).clazz, n.s_child, n);
+            return this->class_member(n, std::move(parent_info), ((EntityClass&) parent_entity));
         case E_TYPE::CONST_FUNCTION:
-            this->error_reporter.error(std::make_unique<ErrorNoMember>(((EntityConstFunction&) parent_entity).const_function.const_function_ft,
-                                                                       n));
-            // this->error_reporter.object_no_member(*parent_entity.const_function->ft, n);
-            break;
+            return this->const_function_member(n, std::move(parent_info), ((EntityConstFunction&) parent_entity));
         case E_TYPE::VALUE:
-            if (((Value&) parent_entity).type.kind == sem::Kind::FUNCTION) {
-                this->error_reporter.error(std::make_unique<ErrorNoMember>(((EntityConstFunction&) parent_entity).const_function.const_function_ft,
-                                                                           n));
-                // this->error_reporter.object_no_member(*parent_entity.value->type, n);
-                return exp_error_stub();
-            }
-            return this->object_member(std::move(parent_info->exp_snode), ((Value&) parent_entity), n.s_child, n);
+            return this->value_member(n, std::move(parent_info), (Value&) parent_entity);
         case E_TYPE::PACKAGE:
-            return this->package_member(*((EntityPackage&) parent_entity).package, n.s_child, n);
+            return this->package_member(n, *((EntityPackage&) parent_entity).package);
         case E_TYPE::MODULE:
-            return this->module_member(*((EntityModule&) parent_entity).module, n.s_child, n);
+            return this->module_member(n, *((EntityModule&) parent_entity).module);
         case E_TYPE::ENUM:
-            return this->enum_member(((EntityEnum&) parent_entity).enumm, n.s_child, n);
-        default:
+            return this->enum_member(n, ((EntityEnum&) parent_entity).enumm);
+        case E_TYPE::ERROR:
+            break;
+        case E_TYPE::NOT_FOUND:
+            break;
+        case E_TYPE::NOTHING:
             break;
     }
     return exp_error_stub();
 }
 
-UExpressionInfo Checker::module_member(Module& mod, const std::string& child, ast::Member& n) {
+UExpressionInfo Checker::module_member(ast::Member& n, Module& mod) {
+    std::string child = n.s_child;
     if (mod.members.count(child) == 0) {
         // this->error_reporter.error(std::make_unique<ErrorNoMember>())
         // this->error_reporter.module_no_member(&mod,
@@ -142,7 +138,8 @@ Checker::object_member(sem::UExp object_snode, Value& p_value, const std::string
     return info_u;
 }
 
-UExpressionInfo Checker::package_member(Package& package, const std::string& child, ast::Member& n) {
+UExpressionInfo Checker::package_member(ast::Member& n, Package& package) {
+    std::string child = n.s_child;
     if (package.units.count(child) == 0) {
         // this->error_reporter.error(std::make_unique<ErrorPackageNoMember>(&package,
         //                                                                   child,
@@ -160,7 +157,9 @@ UExpressionInfo Checker::package_member(Package& package, const std::string& chi
     return info_u;
 }
 
-UExpressionInfo Checker::class_member(Class* cls, const std::string& child, ast::Member& n) {
+UExpressionInfo Checker::class_member(ast::Member& n, UExpressionInfo parent_info, EntityClass& ecls) {
+    Class* cls = ecls.clazz;
+    std::string child = n.s_child;
     UExpressionInfo info_u = std::make_unique<ExpressionInfo>();
     ExpressionInfo& info = *info_u;
     if (cls->methods.find(child) != cls->methods.end()) {

@@ -173,7 +173,8 @@ USemanticInfo Checker::visit_alias(ast::Alias& p_node) {
     return info_u;
 }
 
-UExpressionInfo Checker::enum_member(Enum* enumm, const std::string& value, ast::Member& node) {
+UExpressionInfo Checker::enum_member(ast::Member& node, Enum* enumm) {
+    std::string value = node.s_child;
     UExpressionInfo info_u = std::make_unique<ExpressionInfo>();
     ExpressionInfo& info = *info_u;
     for (size_t i = 0; i < enumm->values.size(); i++) {
@@ -209,4 +210,19 @@ std::unique_ptr<Entity> Checker::entity_from_type(const ast::Type& type) {
     auto fv = std::make_unique<Value>(type.to_sem());
     this->entities[type.to_string()] = std::unique_ptr<Entity>(fv->clone());
     return fv;
+}
+
+UExpressionInfo Checker::value_member(ast::Member& n, UExpressionInfo parent_info, Value& value) {
+    if (value.type.kind == sem::Kind::FUNCTION) {
+        this->error_reporter.error(std::make_unique<ErrorNoMember>(((EntityConstFunction&) value).const_function.const_function_ft,
+                                                                   n));
+        return exp_error_stub();
+    }
+    return this->object_member(std::move(parent_info->exp_snode), value, n.s_child, n);
+}
+
+UExpressionInfo
+Checker::const_function_member(ast::Member& n, UExpressionInfo unique_ptr_1, EntityConstFunction& function) {
+    this->error_reporter.error(std::make_unique<ErrorNoMember>(function.const_function.const_function_ft, n));
+    return exp_error_stub();
 }

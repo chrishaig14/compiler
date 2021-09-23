@@ -151,10 +151,9 @@ public:
     UExpressionInfo visit_member(ast::Member& n);
     UExpressionInfo visit_none(ast::None& node);
     UExpressionInfo object_member(sem::UExp object_snode, Value& p_value, const std::string& child, ast::Member& n);
-    UExpressionInfo class_member(Class* cls, const std::string& child, ast::Member& n);
-    UExpressionInfo package_member(Package& package, const std::string& child, ast::Member& n);
-    UExpressionInfo module_member(Module& mod, const std::string& child, ast::Member& n);
-    UExpressionInfo enum_member(Enum* enumm, const std::string& value, ast::Member& node);
+    UExpressionInfo package_member(ast::Member& n, Package& package);
+    UExpressionInfo module_member(ast::Member& n, Module& mod);
+    UExpressionInfo enum_member(ast::Member& node, Enum* enumm);
     UExpressionInfo expect_rvalue_of_type(const sem::Type& target, ast::ExpNode& node);
 
     std::unique_ptr<sem::FunctionDef> visit_function(ast::Function& n);
@@ -190,6 +189,10 @@ public:
     std::unique_ptr<sem::Top> dispatch_top(ast::TopNode& n);
     UExpressionInfo visit_callexp(ast::CallExp& n, bool is_rvalue);
     USemanticInfo visit_call(ast::Call& n);
+    UExpressionInfo
+    const_function_member(ast::Member& n, UExpressionInfo unique_ptr_1, EntityConstFunction& function);
+    UExpressionInfo class_member(ast::Member& n, UExpressionInfo parent_info, EntityClass& ecls);
+    UExpressionInfo value_member(ast::Member& n, UExpressionInfo parent_info, Value& value);
 };
 
 #endif //CHECKER_H
