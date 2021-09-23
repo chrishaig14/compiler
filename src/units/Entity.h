@@ -246,7 +246,7 @@ public:
 
 class EntityPackage : public Entity {
 public:
-    explicit EntityPackage(Package* package) : Entity(E_TYPE::PACKAGE), package(package) {
+    explicit EntityPackage(Package& package) : Entity(E_TYPE::PACKAGE), package(package) {
     }
 
     bool equal(const Entity& other) const override {
@@ -257,7 +257,7 @@ public:
         return new EntityPackage(this->package);
     }
 
-    Package* package;
+    Package& package;
 };
 
 class EntityNothing : public Entity {

@@ -156,7 +156,7 @@ Entity* map_module_member_to_entity(ModuleMember& module_member) {
     if (module_member.is_const_function()) {
         return new EntityConstFunction(module_member.const_function());
     } else if (module_member.is_package()) {
-        return new EntityPackage(&module_member.package());
+        return new EntityPackage(module_member.package());
     } else if (module_member.is_module()) {
         return new EntityModule(&module_member.module());
     } else if (module_member.is_klass()) {

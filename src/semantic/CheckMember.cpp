@@ -21,7 +21,7 @@ UExpressionInfo Checker::visit_member(ast::Member& n) {
         case E_TYPE::VALUE:
             return this->value_member(n, std::move(parent_info), (Value&) parent_entity);
         case E_TYPE::PACKAGE:
-            return this->package_member(n, *((EntityPackage&) parent_entity).package);
+            return this->package_member(n, ((EntityPackage&) parent_entity).package);
         case E_TYPE::MODULE:
             return this->module_member(n, *((EntityModule&) parent_entity).module);
         case E_TYPE::ENUM:
