@@ -11,7 +11,7 @@ std::string entity_to_string(const Entity& entity) {
         case E_TYPE::PACKAGE:
             return "package " + E_HLT(((EntityPackage&) entity).package.name);
         case E_TYPE::MODULE:
-            return "module " + E_HLT(((EntityModule&) entity).module->name);
+            return "module " + E_HLT(((EntityModule&) entity).module.name);
         case E_TYPE::CLASS:
             return "class " + E_HLT(((EntityClass&) entity).clazz->class_name);
         case E_TYPE::VALUE:

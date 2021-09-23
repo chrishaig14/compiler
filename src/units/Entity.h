@@ -277,7 +277,7 @@ public:
 
 class EntityModule : public Entity {
 public:
-    explicit EntityModule(Module* module) : Entity(E_TYPE::MODULE), module(module) {
+    explicit EntityModule(Module& module) : Entity(E_TYPE::MODULE), module(module) {
     }
 
     bool equal(const Entity& other) const override {
@@ -288,7 +288,7 @@ public:
         return new EntityModule(this->module);
     }
 
-    Module* module;
+    Module& module;
 };
 
 
