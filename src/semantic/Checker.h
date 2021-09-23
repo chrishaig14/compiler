@@ -60,7 +60,7 @@ ast::UTypeNode make_type(const ast::Type& original, const MapStringType& replace
 SemanticInfo match_arguments_to_generic_function(const ast::FunctionType& function_type, ast::VectorOfTypes arg_types);
 USemanticInfo error_stub();
 Entity* map_module_member_to_entity(ModuleMember module_member);
-ModuleMember map_unit_to_module_member(Unit u);
+ModuleMember map_unit_to_module_member(Unit& u);
 TextPosition add_one_col(TextPosition t);
 bool function_is_generic(const sem::TypeFunction& ft);
 

@@ -153,10 +153,10 @@ UExpressionInfo Checker::package_member(Package& package, const std::string& chi
         throw std::runtime_error("Error package no member!");
         return exp_error_stub();
     }
-    Unit unit = package.units[child];
+    Unit* unit = package.units[child];
     UExpressionInfo info_u = std::make_unique<ExpressionInfo>();
     ExpressionInfo& info = *info_u;
-    info.set_entity(map_module_member_to_entity(map_unit_to_module_member(unit)));
+    info.set_entity(map_module_member_to_entity(map_unit_to_module_member(*unit)));
     return info_u;
 }
 

@@ -15,7 +15,7 @@ public:
     const bool is_lib;
     const Path path;
 
-    std::map<std::string, Unit> units;
+    std::map<std::string, Unit*> units;
 
     std::string rel_path;
     Package(Path path, std::string abs_path, bool is_lib);

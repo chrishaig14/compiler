@@ -20,12 +20,11 @@ ModuleMember Package::get(Path p) {
     }
     VectorOfStrings pt = p.as_vec();
     assert(this->units.count(pt[0]) == 1);
-    Unit u = this->units.at(pt[0]);
-    switch (u.type) {
-        case U_TYPE::MODULE:
-            return u.module->get(Path(VectorOfStrings(pt.begin() + 1, pt.end())));
-        case U_TYPE::PACKAGE:
-            return u.package->get(Path(VectorOfStrings(pt.begin() + 1, pt.end())));
+    Unit* u = this->units.at(pt[0]);
+    if (u->is_module()) {
+        return u->module().get(Path(VectorOfStrings(pt.begin() + 1, pt.end())));
+    } else if (u->is_package()) {
+        return u->package().get(Path(VectorOfStrings(pt.begin() + 1, pt.end())));
     }
     return ModuleMember{};
 }

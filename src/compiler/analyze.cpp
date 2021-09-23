@@ -26,13 +26,14 @@ bool check_package(Package& package, Package& top_package) {
     // std::cout << "Analyzing package " << package->name << std::endl;
     bool ok = true;
     for (const auto& ep: package.units) {
-        if (ep.second.type == U_TYPE::PACKAGE) {
-            Package& subpackage = *ep.second.package;
+        Unit* uvalue = ep.second;
+        if (uvalue->is_package()) {
+            Package& subpackage = uvalue->package();
             if (not check_package(subpackage, top_package)) {
                 ok = false;
             }
-        } else if (ep.second.type == U_TYPE::MODULE) {
-            Module& module = *ep.second.module;
+        } else if (uvalue->is_module()) {
+            Module& module = uvalue->module();
             if (not check_module(module, top_package)) {
                 ok = false;
             }
@@ -114,7 +115,7 @@ void add_local_path_to_module(Module& module, Path path, Package& top_package) {
             if (unit == package->units.end()) {
                 throw std::runtime_error("Error '" + path_part + "' not found in package '" + path_so_far + "'");
             }
-            current_member = map_unit_to_module_member(unit->second);
+            current_member = map_unit_to_module_member(*unit->second);
             last_member = current_member;
         } else if (current_member.type == ModuleMemberType::MODULE) {
             auto member = current_member.module->members.find(path_part);
@@ -143,14 +144,15 @@ bool preprocess_module(Module& module) {
 bool preprocess_package(Package& package) {
     bool ok = true;
     for (const auto& ep: package.units) {
-        if (ep.second.type == U_TYPE::PACKAGE) {
-            Package* subpackage = ep.second.package;
-            if (not preprocess_package(*subpackage)) {
+        Unit* uvalue = ep.second;
+        if (uvalue->is_package()) {
+            Package& subpackage = uvalue->package();
+            if (not preprocess_package(subpackage)) {
                 ok = false;
             }
-        } else if (ep.second.type == U_TYPE::MODULE) {
-            Module* module = ep.second.module;
-            if (not preprocess_module(*module)) {
+        } else if (uvalue->is_module()) {
+            Module& module = uvalue->module();
+            if (not preprocess_module(module)) {
                 ok = false;
             }
         }

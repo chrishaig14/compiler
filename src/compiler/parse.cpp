@@ -31,10 +31,11 @@ bool parse_package(Package& package) {
         return ok;
     }
     for (const auto& unit: package.units) {
-        if (unit.second.type == U_TYPE::PACKAGE) {
-            ok &= parse_package(*unit.second.package);
-        } else if (unit.second.type == U_TYPE::MODULE) {
-            ok &= parse_module(*unit.second.module);
+        Unit* punit = unit.second;
+        if (punit->is_package()) {
+            ok &= parse_package(punit->package());
+        } else if (punit->is_module()) {
+            ok &= parse_module(punit->module());
         }
     }
     return ok;

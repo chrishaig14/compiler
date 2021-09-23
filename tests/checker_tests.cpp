@@ -16,7 +16,7 @@ const ast::ObjectType NO_TYPE(".None");
 
 const TextPosition& _POS = {1, 1};
 
-#define CHECKER() std::unique_ptr<Compiler> cp = analyze(code);Compiler& c = *cp;Module& module = *c.root_package.units["tmp"].module;resolve_module_imports(module, c.top_package);Checker checker(c.top_package, module);
+#define CHECKER() std::unique_ptr<Compiler> cp = analyze(code);Compiler& c = *cp;Module& module = c.root_package.units["tmp"]->module();resolve_module_imports(module, c.top_package);Checker checker(c.top_package, module);
 #define REQUIRE_CHECKER_ONE_ERROR() REQUIRE(checker.error_reporter.failed);REQUIRE(checker.error_reporter.errors.size() == 1);
 #define REQUIRE_CHECKER_OK() REQUIRE(not checker.error_reporter.failed);REQUIRE(checker.error_reporter.errors.empty());
 
@@ -327,7 +327,7 @@ TEST_CASE("error_no_member", "[checker]") {
 
     Compiler* cp = analyze(code).release();
     Compiler& c = *cp;
-    Module& module = *c.root_package.units["tmp"].module;
+    Module& module = c.root_package.units["tmp"]->module();
     resolve_module_imports(module, c.top_package);
     Checker checker(c.top_package, module);
     std::cout << "Starting checker" << std::endl;

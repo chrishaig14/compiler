@@ -289,12 +289,11 @@ Class* Checker::instantiate_generic(const Class& generic, const ast::ObjectType&
     return concrete;
 }
 
-ModuleMember map_unit_to_module_member(Unit u) {
-    switch (u.type) {
-        case U_TYPE::PACKAGE:
-            return ModuleMember{.type=ModuleMemberType::PACKAGE, .package=u.package};
-        case U_TYPE::MODULE:
-            return ModuleMember{.type=ModuleMemberType::MODULE, .module=u.module};
+ModuleMember map_unit_to_module_member(Unit& u) {
+    if (u.is_package()) {
+        return ModuleMember{.type=ModuleMemberType::PACKAGE, .package=&u.package()};
+    } else if (u.is_module()) {
+        return ModuleMember{.type=ModuleMemberType::MODULE, .module=&u.module()};
     }
     return ModuleMember{};
 }

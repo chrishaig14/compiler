@@ -10,7 +10,7 @@
 #include "../src/simple_nodes/common/src/TypeFunction.h"
 #include "../src/simple_nodes/expressions/include/expressions.h"
 
-#define CHECKER() std::unique_ptr<Compiler> cp = c_analyze(code);Compiler& c = *cp;Module& module = *c.root_package.units["tmp"].module;resolve_module_imports(module, c.top_package);Checker checker(c.top_package, module);
+#define CHECKER() std::unique_ptr<Compiler> cp = c_analyze(code);Compiler& c = *cp;Module& module = c.root_package.units["tmp"]->module();resolve_module_imports(module, c.top_package);Checker checker(c.top_package, module);
 #define REQUIRE_CHECKER_OK() REQUIRE(!checker.error_reporter.failed);REQUIRE(checker.error_reporter.errors.empty());
 static const ast::ObjectType NO_TYPE(".None");
 
@@ -173,7 +173,7 @@ TEST_CASE("semantic_output_assign_const_function", "[checker]") {
 
     std::unique_ptr<Compiler> cp = c_analyze(code);
     Compiler& c = *cp;
-    Module& module = *c.root_package.units["tmp"].module;
+    Module& module = c.root_package.units["tmp"]->module();
     resolve_module_imports(module, c.top_package);
     resolve_module_imports(module, c.top_package);
     for (auto& e: module.members) {
@@ -192,7 +192,7 @@ TEST_CASE("semantic_output_const_function_call", "[checker]") {
 
     std::unique_ptr<Compiler> cp = c_analyze(code);
     Compiler& c = *cp;
-    Module& module = *c.root_package.units["tmp"].module;
+    Module& module = c.root_package.units["tmp"]->module();
     resolve_module_imports(module, c.top_package);
     resolve_module_imports(module, c.top_package);
     for (auto& e: module.members) {
@@ -214,7 +214,7 @@ TEST_CASE("semantic_output_while", "[checker]") {
 
     std::unique_ptr<Compiler> cp = c_analyze(code);
     Compiler& c = *cp;
-    Module& module = *c.root_package.units["tmp"].module;
+    Module& module = c.root_package.units["tmp"]->module();
     resolve_module_imports(module, c.top_package);
     resolve_module_imports(module, c.top_package);
     for (auto& e: module.members) {

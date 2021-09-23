@@ -51,14 +51,14 @@ TEST_CASE("load_project_test", "[compiler]") {
         load_package(c.root_package, 1);
 
         REQUIRE(c.top_package.units.count(OUT_NAME) == 1);
-        Unit u = c.top_package.units[OUT_NAME];
-        REQUIRE(u.type == U_TYPE::PACKAGE);
+        Unit& u = *c.top_package.units[OUT_NAME];
+        REQUIRE(u.is_package());
 
-        REQUIRE(u.package->units.size() == 1);
+        REQUIRE(u.package().units.size() == 1);
 
-        REQUIRE(u.package->units.count("main") == 1);
-        Unit m = u.package->units["main"];
-        REQUIRE(m.type == U_TYPE::MODULE);
+        REQUIRE(u.package().units.count("main") == 1);
+        Unit& m = *u.package().units["main"];
+        REQUIRE(m.is_module());
     }
 
     SECTION("multiple modules") {
@@ -68,18 +68,18 @@ TEST_CASE("load_project_test", "[compiler]") {
         load_package(c.root_package, 1);
 
         REQUIRE(c.top_package.units.count(OUT_NAME) == 1);
-        Unit u = c.top_package.units[OUT_NAME];
-        REQUIRE(u.type == U_TYPE::PACKAGE);
+        Unit& u = *c.top_package.units[OUT_NAME];
+        REQUIRE(u.is_package());
 
-        REQUIRE(u.package->units.size() == 2);
+        REQUIRE(u.package().units.size() == 2);
 
-        REQUIRE(u.package->units.count("main") == 1);
-        Unit main_module = u.package->units["main"];
-        REQUIRE(main_module.type == U_TYPE::MODULE);
+        REQUIRE(u.package().units.count("main") == 1);
+        Unit& main_module = *u.package().units["main"];
+        REQUIRE(main_module.is_module());
 
-        REQUIRE(u.package->units.count("module") == 1);
-        Unit module_module = u.package->units["module"];
-        REQUIRE(module_module.type == U_TYPE::MODULE);
+        REQUIRE(u.package().units.count("module") == 1);
+        Unit& module_module = *u.package().units["module"];
+        REQUIRE(module_module.is_module());
     }
 
     SECTION("one subpackage") {
@@ -94,31 +94,31 @@ TEST_CASE("load_project_test", "[compiler]") {
         load_package(c.root_package, 1);
 
         REQUIRE(c.top_package.units.count(OUT_NAME) == 1);
-        Unit u = c.top_package.units[OUT_NAME];
-        REQUIRE(u.type == U_TYPE::PACKAGE);
+        Unit& u = *c.top_package.units[OUT_NAME];
+        REQUIRE(u.is_package());
 
-        REQUIRE(u.package->units.size() == 3);
+        REQUIRE(u.package().units.size() == 3);
 
-        REQUIRE(u.package->units.count("main") == 1);
-        Unit main_unit = u.package->units["main"];
-        REQUIRE(main_unit.type == U_TYPE::MODULE);
+        REQUIRE(u.package().units.count("main") == 1);
+        Unit&  main_unit = *u.package().units["main"];
+        REQUIRE(main_unit.is_module());
 
-        REQUIRE(u.package->units.count("module") == 1);
-        Unit module_unit = u.package->units["module"];
-        REQUIRE(module_unit.type == U_TYPE::MODULE);
+        REQUIRE(u.package().units.count("module") == 1);
+        Unit&  module_unit = *u.package().units["module"];
+        REQUIRE(module_unit.is_module());
 
-        REQUIRE(u.package->units.count("subpackage") == 1);
-        Unit subpackage_unit = u.package->units["subpackage"];
-        REQUIRE(subpackage_unit.type == U_TYPE::PACKAGE);
+        REQUIRE(u.package().units.count("subpackage") == 1);
+        Unit&  subpackage_unit = *u.package().units["subpackage"];
+        REQUIRE(subpackage_unit.is_package());
 
-        Package* subpackage = subpackage_unit.package;
-        REQUIRE(subpackage->units.count("moduleA") == 1);
-        Unit moduleA_unit = subpackage->units["moduleA"];
-        CHECK(moduleA_unit.type == U_TYPE::MODULE);
+        Package& subpackage = subpackage_unit.package();
+        REQUIRE(subpackage.units.count("moduleA") == 1);
+        Unit&  moduleA_unit = *subpackage.units["moduleA"];
+        CHECK(moduleA_unit.is_module());
 
-        REQUIRE(subpackage->units.count("moduleB") == 1);
-        Unit moduleB_unit = subpackage->units["moduleB"];
-        CHECK(moduleB_unit.type == U_TYPE::MODULE);
+        REQUIRE(subpackage.units.count("moduleB") == 1);
+        Unit&  moduleB_unit = *subpackage.units["moduleB"];
+        CHECK(moduleB_unit.is_module());
 
     }
     cleanup_dirs();
@@ -133,7 +133,7 @@ TEST_CASE("project_parse_test", "[compiler]") {
         write_file(path_join(IN_DIR, "main.xl"), "fun foo()->Integer{return 0;}");
 
         load_package(c.root_package, 1);
-        bool parse_ok = parse_module(*c.root_package.units["main"].module);
+        bool parse_ok = parse_module(c.root_package.units["main"]->module());
         REQUIRE(parse_ok);
     }
 
@@ -141,7 +141,7 @@ TEST_CASE("project_parse_test", "[compiler]") {
         write_file(path_join(IN_DIR, "main.xl"), "fun foo()->Integer{return1 0;}");
 
         load_package(c.root_package, 1);
-        bool parse_ok = parse_module(*c.root_package.units["main"].module);
+        bool parse_ok = parse_module(c.root_package.units["main"]->module());
         REQUIRE(not parse_ok);
     }
 
@@ -248,7 +248,7 @@ TEST_CASE("import_test", "[compiler]") {
         REQUIRE(parse_package(c.root_package));
         REQUIRE(preprocess_package(c.root_package));
         c.load_requirements(REQUIREMENTS_PATH);
-        REQUIRE_NOTHROW(resolve_module_imports(*c.root_package.units["main"].module, c.top_package));
+        REQUIRE_NOTHROW(resolve_module_imports(c.root_package.units["main"]->module(), c.top_package));
     }
 
     SECTION("import module error") {
@@ -259,7 +259,7 @@ TEST_CASE("import_test", "[compiler]") {
         REQUIRE(parse_package(c.root_package));
         REQUIRE(preprocess_package(c.root_package));
         c.load_requirements(REQUIREMENTS_PATH);
-        REQUIRE_THROWS(resolve_module_imports(*c.root_package.units["main"].module, c.top_package));
+        REQUIRE_THROWS(resolve_module_imports(c.root_package.units["main"]->module(), c.top_package));
     }
 
     SECTION("import function ok") {
@@ -270,7 +270,7 @@ TEST_CASE("import_test", "[compiler]") {
         REQUIRE(parse_package(c.root_package));
         REQUIRE(preprocess_package(c.root_package));
         c.load_requirements(REQUIREMENTS_PATH);
-        REQUIRE_NOTHROW(resolve_module_imports(*c.root_package.units["main"].module, c.top_package));
+        REQUIRE_NOTHROW(resolve_module_imports(c.root_package.units["main"]->module(), c.top_package));
     }
 
     SECTION("import function not found") {
@@ -281,7 +281,7 @@ TEST_CASE("import_test", "[compiler]") {
         REQUIRE(parse_package(c.root_package));
         REQUIRE(preprocess_package(c.root_package));
         c.load_requirements(REQUIREMENTS_PATH);
-        REQUIRE_THROWS(resolve_module_imports(*c.root_package.units["main"].module, c.top_package));
+        REQUIRE_THROWS(resolve_module_imports(c.root_package.units["main"]->module(), c.top_package));
     }
 
     SECTION("import class ok") {
@@ -292,7 +292,7 @@ TEST_CASE("import_test", "[compiler]") {
         REQUIRE(parse_package(c.root_package));
         REQUIRE(preprocess_package(c.root_package));
         c.load_requirements(REQUIREMENTS_PATH);
-        REQUIRE_NOTHROW(resolve_module_imports(*c.root_package.units["main"].module, c.top_package));
+        REQUIRE_NOTHROW(resolve_module_imports(c.root_package.units["main"]->module(), c.top_package));
     }
 
     SECTION("import class error") {
@@ -303,7 +303,7 @@ TEST_CASE("import_test", "[compiler]") {
         REQUIRE(parse_package(c.root_package));
         REQUIRE(preprocess_package(c.root_package));
         c.load_requirements(REQUIREMENTS_PATH);
-        REQUIRE_THROWS(resolve_module_imports(*c.root_package.units["main"].module, c.top_package));
+        REQUIRE_THROWS(resolve_module_imports(c.root_package.units["main"]->module(), c.top_package));
     }
 
     SECTION("import package error") {
@@ -314,7 +314,7 @@ TEST_CASE("import_test", "[compiler]") {
         REQUIRE(parse_package(c.root_package));
         REQUIRE(preprocess_package(c.root_package));
         c.load_requirements(REQUIREMENTS_PATH);
-        REQUIRE_THROWS(resolve_module_imports(*c.root_package.units["main"].module, c.top_package));
+        REQUIRE_THROWS(resolve_module_imports(c.root_package.units["main"]->module(), c.top_package));
     }
 
     SECTION("import package ok") {
@@ -325,7 +325,7 @@ TEST_CASE("import_test", "[compiler]") {
         REQUIRE(parse_package(c.root_package));
         REQUIRE(preprocess_package(c.root_package));
         c.load_requirements(REQUIREMENTS_PATH);
-        REQUIRE_NOTHROW(resolve_module_imports(*c.root_package.units["main"].module, c.top_package));
+        REQUIRE_NOTHROW(resolve_module_imports(c.root_package.units["main"]->module(), c.top_package));
     }
     cleanup_dirs();
 }
