@@ -20,8 +20,8 @@ TEST_CASE("global_main", "[parser]") {
 
     REQUIRE(module.members.size() == 1);
     REQUIRE(module.members.count("main") == 1);
-    REQUIRE(module.members["main"].type == ModuleMemberType::CONST_FUNCTION);
-    ConstFunction* const_function = module.members["main"].const_function;
+    REQUIRE(module.members["main"]->is_const_function());
+    ConstFunction* const_function = &module.members["main"]->const_function();
     // sem::Type* p = (sem::TypeObject*) nullptr;
     std::unique_ptr<sem::Type> u = std::make_unique<sem::TypeObject>("Integer");
     REQUIRE(const_function->const_function_ft == sem::TypeFunction({}, std::move(u)));
@@ -42,8 +42,8 @@ TEST_CASE("global_class", "[parser]") {
 
     REQUIRE(module.members.size() == 1);
     REQUIRE(module.members.count("Foo") == 1);
-    REQUIRE(module.members["Foo"].type == ModuleMemberType::CLASS);
-    Class* clazz = module.members["Foo"].clazz;
+    REQUIRE(module.members["Foo"]->is_klass());
+    Class* clazz = &module.members["Foo"]->klass();
 
     REQUIRE(clazz->class_name == "Foo");
     REQUIRE(clazz->path.as_str() == "main.foo.Foo");
@@ -89,14 +89,14 @@ TEST_CASE("global_multiple", "[parser]") {
     REQUIRE(module.members.count("main") == 1);
     REQUIRE(module.members.count("Foo") == 1);
 
-    REQUIRE(module.members["main"].type == ModuleMemberType::CONST_FUNCTION);
-    ConstFunction* const_function = module.members["main"].const_function;
+    REQUIRE(module.members["main"]->is_const_function());
+    ConstFunction* const_function = &module.members["main"]->const_function();
     REQUIRE(const_function->const_function_ft == sem::TypeFunction({}, std::make_unique<sem::TypeObject>("Integer")));
     REQUIRE(const_function->implicit == nullptr);
     REQUIRE(const_function->path.as_str() == "main.foo.main");
 
 
-    Class* clazz = module.members["Foo"].clazz;
+    Class* clazz = &module.members["Foo"]->klass();
 
     REQUIRE(clazz->class_name == "Foo");
     REQUIRE(clazz->path.as_str() == "main.foo.Foo");

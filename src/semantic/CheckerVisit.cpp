@@ -142,7 +142,7 @@ std::unique_ptr<sem::KlassDef> Checker::visit_class(ast::Klass& node) {
 void Checker::init() {
     // Initialize module level Scope
     for (const auto& f: this->module.members) {
-        std::unique_ptr<Entity> e(map_module_member_to_entity(f.second));
+        std::unique_ptr<Entity> e(map_module_member_to_entity(*f.second));
         this->scope->set(f.first, *e);
     }
 }

@@ -52,12 +52,12 @@ UExpressionInfo Checker::module_member(Module& mod, const std::string& child, as
         //                                       n.child_token.end_pos);
         return exp_error_stub();
     }
-    ModuleMember member = mod.members[child];
+    ModuleMember& member = *mod.members[child];
     UExpressionInfo info_u = std::make_unique<ExpressionInfo>();
     ExpressionInfo& info = *info_u;
     info.set_entity(map_module_member_to_entity(member));
-    if (member.type == ModuleMemberType::CONST_FUNCTION) {
-        auto idn = std::make_unique<sem::ConstFunction>(member.const_function->path);
+    if (member.is_const_function()) {
+        auto idn = std::make_unique<sem::ConstFunction>(member.const_function().path);
         info.exp_snode = std::move(idn);
     }
     return info_u;
@@ -156,7 +156,7 @@ UExpressionInfo Checker::package_member(Package& package, const std::string& chi
     Unit* unit = package.units[child];
     UExpressionInfo info_u = std::make_unique<ExpressionInfo>();
     ExpressionInfo& info = *info_u;
-    info.set_entity(map_module_member_to_entity(map_unit_to_module_member(*unit)));
+    info.set_entity(map_module_member_to_entity(*map_unit_to_module_member(*unit)));
     return info_u;
 }
 

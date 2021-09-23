@@ -289,13 +289,13 @@ Class* Checker::instantiate_generic(const Class& generic, const ast::ObjectType&
     return concrete;
 }
 
-ModuleMember map_unit_to_module_member(Unit& u) {
+ModuleMember* map_unit_to_module_member(Unit& u) {
     if (u.is_package()) {
-        return ModuleMember{.type=ModuleMemberType::PACKAGE, .package=&u.package()};
+        return new PackageModuleMember(&u.package());
     } else if (u.is_module()) {
-        return ModuleMember{.type=ModuleMemberType::MODULE, .module=&u.module()};
+        return new ModuleModuleMember(&u.module());
     }
-    return ModuleMember{};
+    return nullptr;
 }
 
 bool Checker::is_immutable(const ast::Type& node) {

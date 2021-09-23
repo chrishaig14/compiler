@@ -104,22 +104,23 @@ void Compiler::add_global_path_to_module(Module& module, Path path) {
 }
 
 void add_local_path_to_module(Module& module, Path path, Package& top_package) {
-    auto current_member = ModuleMember{.type=ModuleMemberType::PACKAGE, .package=&top_package};
+    ModuleMember* current_member = new PackageModuleMember(&top_package);
     std::string path_so_far = "global";
-    ModuleMember last_member;
+    // ModuleMember* last_member;
 
     for (const auto& path_part: path.as_vec()) {
-        if (current_member.type == ModuleMemberType::PACKAGE) {
-            Package* package = current_member.package;
-            auto unit = package->units.find(path_part);
-            if (unit == package->units.end()) {
+        if (current_member->is_package()) {
+            Package& package = current_member->package();
+            auto unit = package.units.find(path_part);
+            if (unit == package.units.end()) {
                 throw std::runtime_error("Error '" + path_part + "' not found in package '" + path_so_far + "'");
             }
             current_member = map_unit_to_module_member(*unit->second);
-            last_member = current_member;
-        } else if (current_member.type == ModuleMemberType::MODULE) {
-            auto member = current_member.module->members.find(path_part);
-            if (member == current_member.module->members.end()) {
+            // last_member = current_member;
+        } else if (current_member->is_module()) {
+            Module& module_ = current_member->module();
+            auto member = module_.members.find(path_part);
+            if (member == module_.members.end()) {
                 throw std::runtime_error("Error '" + path_part + "' not found in module '" + path_so_far + "'");
             }
             current_member = member->second;

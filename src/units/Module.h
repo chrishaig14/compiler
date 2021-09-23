@@ -40,9 +40,9 @@ public:
     std::vector<std::pair<std::string, Path>> imported_paths_no_alias_v;
     std::vector<std::pair<std::string, Path>> imported_paths_with_alias_v;
     std::map<std::string, Entity*> imports;
-    std::map<std::string, ModuleMember> members;
+    std::map<std::string, ModuleMember*> members;
 
-    ModuleMember get(Path p);
+    ModuleMember* get(Path p);
     Module(Path path, std::string abs_path, bool is_lib);
 
     ~Module() {

@@ -152,18 +152,17 @@ USemanticInfo Checker::visit_import(ast::Import& node) {
     return info_u;
 }
 
-Entity* map_module_member_to_entity(ModuleMember module_member) {
-    switch (module_member.type) {
-        case ModuleMemberType::CONST_FUNCTION:
-            return new EntityConstFunction(*module_member.const_function);
-        case ModuleMemberType::CLASS:
-            return new EntityClass(module_member.clazz);
-        case ModuleMemberType::PACKAGE:
-            return new EntityPackage(module_member.package);
-        case ModuleMemberType::MODULE:
-            return new EntityModule(module_member.module);
-        case ModuleMemberType::ENUM:
-            return new EntityEnum(module_member.enumm);
+Entity* map_module_member_to_entity(ModuleMember& module_member) {
+    if (module_member.is_const_function()) {
+        return new EntityConstFunction(module_member.const_function());
+    } else if (module_member.is_package()) {
+        return new EntityPackage(&module_member.package());
+    } else if (module_member.is_module()) {
+        return new EntityModule(&module_member.module());
+    } else if (module_member.is_klass()) {
+        return new EntityClass(&module_member.klass());
+    } else if (module_member.is_enumm()) {
+        return new EntityEnum(&module_member.enumm());
     }
     return nullptr;
 }

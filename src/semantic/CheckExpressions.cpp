@@ -254,14 +254,18 @@ std::unique_ptr<Value> Checker::make_value(sem::Type* type) {
         // value.metatype = Meta::CLASS;
         return std::make_unique<Value>(type, clazz);
     }
-    ModuleMember module_member = this->top_package.get(type->object().data.actual_base_path);
-    if (module_member.type == ModuleMemberType::ENUM) {
+    ModuleMember* module_member_p = this->top_package.get(type->object().data.actual_base_path);
+    if (module_member_p == nullptr) {
+        throw std::runtime_error("module_member should not be nullptr");
+    }
+    ModuleMember& module_member = *module_member_p;
+    if (module_member.is_enumm()) {
         auto value = std::make_unique<Value>(type);
-        value->enumm = module_member.enumm;
+        value->enumm = &module_member.enumm();
         value->metatype = Meta::ENUM;
         return value;
     }
-    Class* cls = module_member.clazz;
+    Class* cls = &module_member.klass();
     if (!cls->type_params.empty()) {
         std::cout << "Instantiating type " << type->object().to_string() << std::endl;
         ast::UObjectType o(&type->object().to_ast()->object());
@@ -291,13 +295,15 @@ void Checker::fill_value(Value& value) {
         value.metatype = Meta::CLASS;
         return;
     }
-    ModuleMember module_member = this->top_package.get(value.type.object().data.actual_base_path);
-    if (module_member.type == ModuleMemberType::ENUM) {
-        value.enumm = module_member.enumm;
+    ModuleMember* module_member_p = this->top_package.get(value.type.object().data.actual_base_path);
+    assert(module_member_p != nullptr);
+    ModuleMember& module_member = *module_member_p;
+    if (module_member.is_enumm()) {
+        value.enumm = &module_member.enumm();
         value.metatype = Meta::ENUM;
         return;
     }
-    Class* cls = module_member.clazz;
+    Class* cls = &module_member.klass();
     if (!cls->type_params.empty()) {
         std::cout << "Instantiating type " << value.type.object().to_string() << std::endl;
         ast::UObjectType o(&value.type.object().to_ast()->object());
@@ -337,7 +343,7 @@ UExpressionInfo Checker::visit_subscript(ast::Subscript& node) {
         return exp_error_stub();
     }
     UExpressionInfo child_sinfo = this->expect_rvalue_of_type(*subscript_fun.const_function_ft.param_types[0],
-                                                            *node.child[0]);
+                                                              *node.child[0]);
 
     if (child_sinfo->is_error()) {
         return exp_error_stub();

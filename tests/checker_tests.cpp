@@ -316,7 +316,7 @@ TEST_CASE("decl_error_expected_expression", "[checker]") {
     REQUIRE_CHECKER_ONE_ERROR();
 
     Error& error = *checker.error_reporter.errors.back();
-    Class* cl = module.get(Path("Integer")).clazz;
+    Class* cl = &module.get(Path("Integer"))->klass();
     EntityClass ec(cl);
     ErrorExpectedExpression exp(ec, declaration_node.expression);
     REQUIRE(error == exp);
@@ -339,11 +339,11 @@ TEST_CASE("error_no_member", "[checker]") {
     REQUIRE_CHECKER_ONE_ERROR();
 
     Error& error = *checker.error_reporter.errors.back();
-    ModuleMember module_member = module.get(Path("Foo"));
-    REQUIRE(module_member.type == ModuleMemberType::CLASS);
+    ModuleMember& module_member = *module.get(Path("Foo"));
+    REQUIRE(module_member.is_klass());
     sem::TypeObject type("Foo");
     std::cout << "Making error: " << &declaration_node.expression << std::endl;
-    ErrorNoMemberSuggestions exp(type, (ast::Member&) declaration_node.expression, *module_member.clazz);
+    ErrorNoMemberSuggestions exp(type, (ast::Member&) declaration_node.expression, module_member.klass());
     REQUIRE(error == exp);
 }
 

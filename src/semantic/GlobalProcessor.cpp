@@ -35,9 +35,11 @@ void GlobalProcessor::visit_import(ast::Import& node) {
 }
 
 void GlobalProcessor::add_default_imports() {
-    std::vector<Path> default_paths = {Path("libcore.libcore.String"), Path("libcore.libcore.Integer"), Path("libcore.libcore.List"),
-                                       Path("libcore.libcore.Double"), Path("libcore.libcore.Boolean"), Path("libcore.libcore.Float"),
-                                       Path("libcore.libcore.Option"), Path("libcore.libcore.print"), Path("libcore.libcore.Dict")};
+    std::vector<Path> default_paths = {Path("libcore.libcore.String"), Path("libcore.libcore.Integer"),
+                                       Path("libcore.libcore.List"), Path("libcore.libcore.Double"),
+                                       Path("libcore.libcore.Boolean"), Path("libcore.libcore.Float"),
+                                       Path("libcore.libcore.Option"), Path("libcore.libcore.print"),
+                                       Path("libcore.libcore.Dict")};
     for (auto path: default_paths) {
         if (this->module.imported_paths_with_alias.count(path.as_vec().back()) != 0) {
             std::cout << this->module.abs_path << std::endl;
@@ -126,8 +128,8 @@ void GlobalProcessor::check_duplicated_names(ast::Module& node) const {
             } else {
                 name = ((ast::Import&) n).path.back();
             }
-        // } else if (n.ntype == TopNodeType::ALIAS) {
-        //     name = ((ast::Alias&) (n)).alias_id;
+            // } else if (n.ntype == TopNodeType::ALIAS) {
+            //     name = ((ast::Alias&) (n)).alias_id;
         } else if (n.ntype == TopNodeType::ENUM) {
             name = ((ast::EnumNode&) (n)).id;
         }
@@ -147,7 +149,7 @@ void GlobalProcessor::visit_block(ast::Block& node) {
 }
 
 void GlobalProcessor::visit_class(ast::Klass& node) {
-    Class* class_info = this->module.members[node.class_name].clazz;
+    Class* class_info = &this->module.members[node.class_name]->klass();
     //
     // if (this->imported_paths.count(node.class_name) == 1) {
     //     throw std::runtime_error("Name \"" + node.class_name + "\" already used as an alias for " +
@@ -252,10 +254,10 @@ Path Module::get_actual_path(const std::string& id) {
         return Path("libcore.libcore.Tuple");
     }
     if (this->members.count(id) == 1) {
-        if (this->members[id].type == ModuleMemberType::CLASS) {
-            return this->members[id].clazz->path;
-        } else if (this->members[id].type == ModuleMemberType::ENUM) {
-            return this->members[id].enumm->path;
+        if (this->members[id]->is_klass()) {
+            return this->members[id]->klass().path;
+        } else if (this->members[id]->is_enumm()) {
+            return this->members[id]->enumm().path;
         }
     }
     if (this->imported_paths_with_alias.count(id) == 1) {
