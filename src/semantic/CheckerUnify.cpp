@@ -162,7 +162,7 @@ Entity* map_module_member_to_entity(ModuleMember& module_member) {
     } else if (module_member.is_klass()) {
         return new EntityClass(&module_member.klass());
     } else if (module_member.is_enumm()) {
-        return new EntityEnum(&module_member.enumm());
+        return new EntityEnum(module_member.enumm());
     }
     return nullptr;
 }
@@ -173,21 +173,21 @@ USemanticInfo Checker::visit_alias(ast::Alias& p_node) {
     return info_u;
 }
 
-UExpressionInfo Checker::enum_member(ast::Member& node, Enum* enumm) {
+UExpressionInfo Checker::enum_member(ast::Member& node, Enum& enumm) {
     std::string value = node.s_child;
     UExpressionInfo info_u = std::make_unique<ExpressionInfo>();
     ExpressionInfo& info = *info_u;
-    for (size_t i = 0; i < enumm->values.size(); i++) {
-        if (value == enumm->values[i]) {
-            auto* otype = new sem::TypeObject(enumm->enumm_name, enumm->path);
+    for (size_t i = 0; i < enumm.values.size(); i++) {
+        if (value == enumm.values[i]) {
+            auto* otype = new sem::TypeObject(enumm.enumm_name, enumm.path);
             auto ov = std::make_unique<Value>(otype);
             info.set_entity(ov.release());
             // this->fill_value(info.entity.value);
-            info.exp_snode = std::make_unique<sem::EnumMember>(enumm->path.as_str(), value);
+            info.exp_snode = std::make_unique<sem::EnumMember>(enumm.path.as_str(), value);
             return info_u;
         }
     }
-    this->error_reporter.error(std::make_unique<ErrorEnumNoValue>(enumm->enumm_name, value, node, enumm));
+    this->error_reporter.error(std::make_unique<ErrorEnumNoValue>(enumm.enumm_name, value, node, enumm));
     return exp_error_stub();
 }
 

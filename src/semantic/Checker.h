@@ -153,7 +153,7 @@ public:
     UExpressionInfo object_member(sem::UExp object_snode, Value& p_value, const std::string& child, ast::Member& n);
     UExpressionInfo package_member(ast::Member& n, Package& package);
     UExpressionInfo module_member(ast::Member& n, Module& mod);
-    UExpressionInfo enum_member(ast::Member& node, Enum* enumm);
+    UExpressionInfo enum_member(ast::Member& node, Enum& enumm);
     UExpressionInfo expect_rvalue_of_type(const sem::Type& target, ast::ExpNode& node);
 
     std::unique_ptr<sem::FunctionDef> visit_function(ast::Function& n);

@@ -664,7 +664,8 @@ TEST_CASE("enum_error", "[checker]") {
     ast::UExpNode u = ast::Id::make("Foo", _POS, _POS);
     ast::Member node(std::move(u), Token(TokType::ID, "b", _POS));
     ast::ObjectType expected("Boolean");
-    ErrorEnumNoValue exp("Foo", "b", node, nullptr);
+    Enum& enumm = module.members["Foo"]->enumm();
+    ErrorEnumNoValue exp("Foo", "b", node, enumm);
     REQUIRE(error == exp);
 }
 

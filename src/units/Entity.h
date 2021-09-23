@@ -311,7 +311,7 @@ public:
 
 class EntityEnum : public Entity {
 public:
-    explicit EntityEnum(Enum* enumm) : Entity(E_TYPE::ENUM), enumm(enumm) {
+    explicit EntityEnum(Enum& enumm) : Entity(E_TYPE::ENUM), enumm(enumm) {
     }
 
     bool equal(const Entity& other) const override {
@@ -322,7 +322,7 @@ public:
         return new EntityEnum(this->enumm);
     }
 
-    Enum* enumm;
+    Enum& enumm;
 };
 
 class EntityNotFound : public Entity {

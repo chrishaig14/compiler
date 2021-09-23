@@ -24,7 +24,7 @@ std::string entity_to_string(const Entity& entity) {
         case E_TYPE::NOT_FOUND:
             return "NOT FOUND";
         case E_TYPE::ENUM:
-            return "enum " + E_HLT(((EntityEnum&) entity).enumm->enumm_name);
+            return "enum " + E_HLT(((EntityEnum&) entity).enumm.enumm_name);
         case E_TYPE::NOTHING:
             return "NOTHING";
     }
