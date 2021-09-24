@@ -190,8 +190,8 @@ public:
     UExpressionInfo visit_callexp(ast::CallExp& n, bool is_rvalue);
     USemanticInfo visit_call(ast::Call& n);
     UExpressionInfo
-    const_function_member(ast::Member& n, UExpressionInfo unique_ptr_1, EntityConstFunction& function);
-    UExpressionInfo class_member(ast::Member& n, UExpressionInfo parent_info, EntityClass& ecls);
+    const_function_member(ast::Member& n, UExpressionInfo unique_ptr_1, ConstFunction& function);
+    UExpressionInfo class_member(ast::Member& n, UExpressionInfo parent_info, Class& cls);
     UExpressionInfo value_member(ast::Member& n, UExpressionInfo parent_info, Value& value);
 };
 

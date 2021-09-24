@@ -221,8 +221,7 @@ UExpressionInfo Checker::value_member(ast::Member& n, UExpressionInfo parent_inf
     return this->object_member(std::move(parent_info->exp_snode), value, n.s_child, n);
 }
 
-UExpressionInfo
-Checker::const_function_member(ast::Member& n, UExpressionInfo unique_ptr_1, EntityConstFunction& function) {
-    this->error_reporter.error(std::make_unique<ErrorNoMember>(function.const_function.const_function_ft, n));
+UExpressionInfo Checker::const_function_member(ast::Member& n, UExpressionInfo unique_ptr_1, ConstFunction& function) {
+    this->error_reporter.error(std::make_unique<ErrorNoMember>(function.const_function_ft, n));
     return exp_error_stub();
 }
