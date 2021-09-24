@@ -253,21 +253,21 @@ std::unique_ptr<sem::FunctionDef> Checker::visit_function(ast::Function& n) {
         this->scope->set("this", *this->this_entity);
         params.insert(params.begin(), "this");
     }
-    if (n.implicit != nullptr) {
-        Class* clazz = new Class(n.implicit->type, Path("core.implicits." + n.implicit->type));
-        // clazz->class_name = ;
-        auto c = std::make_unique<ConstFunction>(Path("implicit_a"),
-                                                 sem::UTypeFunction((sem::TypeFunction*) n.implicit->ft->to_sem()));
-        this->module.fill_actual(c->const_function_ft);
-        if (n.implicit->is_static) {
-            clazz->static_methods[n.implicit->method] = std::move(c);
-        } else {
-            clazz->methods[n.implicit->method] = std::move(c);
-        }
-        Entity* generic_type = new EntityClass(clazz);
-        this->scope->set(n.implicit->type, *generic_type);
-        params.push_back("implicit_a");
-    }
+    // if (n.implicit != nullptr) {
+    //     Class* clazz = new Class(n.implicit->type, Path("core.implicits." + n.implicit->type));
+    //     // clazz->class_name = ;
+    //     auto c = std::make_unique<ConstFunction>(Path("implicit_a"),
+    //                                              sem::UTypeFunction((sem::TypeFunction*) n.implicit->ft->to_sem()));
+    //     this->module.fill_actual(c->const_function_ft);
+    //     if (n.implicit->is_static) {
+    //         clazz->static_methods[n.implicit->method] = std::move(c);
+    //     } else {
+    //         clazz->methods[n.implicit->method] = std::move(c);
+    //     }
+    //     Entity* generic_type = new EntityClass(clazz);
+    //     this->scope->set(n.implicit->type, *generic_type);
+    //     params.push_back("implicit_a");
+    // }
     for (size_t i = 0; i < n.parameter_names.size(); i++) {
         ast::Type& type = n.parameter_types[i];
         ast::UTypeNode cl(type.clone());
