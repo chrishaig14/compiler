@@ -45,6 +45,7 @@
 #include "errors/include/errors.h"
 #include "GlobalProcessor.h"
 #include "util.h"
+#include "ExpressionInfo.h"
 
 // #include "../logger/Logger.h"
 

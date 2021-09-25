@@ -1,9 +1,9 @@
 //
-// Created by chris on 2/8/20.
+// Created by chris on 25/9/21.
 //
 
-#ifndef SYMBOLINFO_H
-#define SYMBOLINFO_H
+#ifndef XLANG_EXPRESSIONINFO_H
+#define XLANG_EXPRESSIONINFO_H
 
 #include <string>
 #include <vector>
@@ -13,8 +13,9 @@
 #include "../units/Module.h"
 #include "../units/Package.h"
 
-class SemanticInfo {
+class ExpressionInfo {
 public:
+
     std::reference_wrapper<Entity> entity;
     std::unique_ptr<Entity> _entity;
 
@@ -28,21 +29,22 @@ public:
         this->entity = *this->_entity;
     }
 
-    sem::UCommon snode;
     bool is_tuple_member;
-    ~SemanticInfo();
+    ~ExpressionInfo();
 
-    SemanticInfo();
+    ExpressionInfo();
 
     bool is_constant;
     sem::Common* this_arg;
 
     bool is_error();
+    sem::UExp exp_snode;
 };
 
-class ErrorStub : public SemanticInfo {
+class ExpErrorStub : public ExpressionInfo {
 public:
-    ErrorStub();
+    ExpErrorStub();
 };
 
-#endif //SYMBOLINFO_H
+
+#endif //XLANG_EXPRESSIONINFO_H
