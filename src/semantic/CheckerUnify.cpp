@@ -160,7 +160,7 @@ Entity* map_module_member_to_entity(ModuleMember& module_member) {
     } else if (module_member.is_module()) {
         return new EntityModule(module_member.module());
     } else if (module_member.is_klass()) {
-        return new EntityClass(&module_member.klass());
+        return new EntityClass(module_member.klass());
     } else if (module_member.is_enumm()) {
         return new EntityEnum(module_member.enumm());
     }

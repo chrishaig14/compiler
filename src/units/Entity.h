@@ -229,19 +229,19 @@ public:
 
 class EntityClass : public Entity {
 public:
-    explicit EntityClass(Class* clazz) : Entity(E_TYPE::CLASS), clazz(clazz) {
+    explicit EntityClass(Class& clazz) : Entity(E_TYPE::CLASS), clazz(clazz) {
     }
 
     bool equal(const Entity& other) const override {
 
-        return this->clazz == ((const EntityClass&) other).clazz;
+        return &this->clazz == &((const EntityClass&) other).clazz;
     }
 
     Entity* clone() const override {
         return new EntityClass(this->clazz);
     }
 
-    Class* clazz;
+    Class& clazz;
 };
 
 class EntityPackage : public Entity {

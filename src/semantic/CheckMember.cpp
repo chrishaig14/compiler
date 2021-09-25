@@ -15,7 +15,7 @@ UExpressionInfo Checker::visit_member(ast::Member& n) {
     Entity& parent_entity = parent_info->entity.get();
     switch (parent_entity.type) {
         case E_TYPE::CLASS:
-            return this->class_member(n, std::move(parent_info), *((EntityClass&) parent_entity).clazz);
+            return this->class_member(n, std::move(parent_info), ((EntityClass&) parent_entity).clazz);
         case E_TYPE::CONST_FUNCTION:
             return this->const_function_member(n, std::move(parent_info), ((EntityConstFunction&) parent_entity).const_function);
         case E_TYPE::VALUE:

@@ -247,7 +247,7 @@ std::unique_ptr<Value> Checker::make_value(sem::Type* type) {
             clazz = new Class(type->object().id, Path("core.generics" + type->object().id));
             // clazz->class_name = value.type->object().id;
         } else {
-            clazz = ((EntityClass&) e).clazz;
+            clazz = &((EntityClass&) e).clazz;
         }
         // assert(e.type == E_TYPE::CLASS);
         // value.clazz = clazz;
@@ -288,7 +288,7 @@ void Checker::fill_value(Value& value) {
             clazz = new Class(value.type.object().id, Path("core.generics" + value.type.object().id));
             // clazz->class_name = value.type->object().id;
         } else {
-            clazz = ((EntityClass&) e).clazz;
+            clazz = &((EntityClass&) e).clazz;
         }
         // assert(e.type == E_TYPE::CLASS);
         value.clazz = clazz;
