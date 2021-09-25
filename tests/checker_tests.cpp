@@ -188,7 +188,7 @@ TEST_CASE("int_literal", "[checker]") {
 
     REQUIRE(!checker.error_reporter.failed);
     REQUIRE(checker.error_reporter.errors.size() == 0);
-    REQUIRE(info->entity.get().e_type == E_TYPE::VALUE);
+    REQUIRE(info->entity.get().is_value());
     REQUIRE(info->entity.get().get_value().metatype == Meta::CLASS);
     REQUIRE(info->entity.get().get_value().type == sem::TypeObject("Integer"));
 }
@@ -203,7 +203,7 @@ TEST_CASE("bool_literal", "[checker]") {
 
     REQUIRE(!checker.error_reporter.failed);
     REQUIRE(checker.error_reporter.errors.size() == 0);
-    REQUIRE(info->entity.get().e_type == E_TYPE::VALUE);
+    REQUIRE(info->entity.get().is_value());
     REQUIRE(info->entity.get().get_value().metatype == Meta::CLASS);
     REQUIRE(info->entity.get().get_value().type == sem::TypeObject("Boolean"));
 }
@@ -218,7 +218,7 @@ TEST_CASE("list_literal", "[checker]") {
 
     REQUIRE(!checker.error_reporter.failed);
     REQUIRE(checker.error_reporter.errors.size() == 0);
-    REQUIRE(info->entity.get().e_type == E_TYPE::VALUE);
+    REQUIRE(info->entity.get().is_value());
     REQUIRE(info->entity.get().get_value().metatype == Meta::CLASS);
     REQUIRE(info->entity.get().get_value().type == sem::TypeObject("List", {new sem::TypeObject("Integer")}));
 }
@@ -233,7 +233,7 @@ TEST_CASE("empty_list_literal", "[checker]") {
 
     REQUIRE(!checker.error_reporter.failed);
     REQUIRE(checker.error_reporter.errors.size() == 0);
-    REQUIRE(info->entity.get().e_type == E_TYPE::VALUE);
+    REQUIRE(info->entity.get().is_value());
     REQUIRE(info->entity.get().get_value().metatype == Meta::CLASS);
     REQUIRE(info->entity.get().get_value().type == sem::TypeObject("List", {new sem::TypeObject("String")}));
 }
@@ -248,7 +248,7 @@ TEST_CASE("empty_dict_literal", "[checker]") {
 
     REQUIRE(!checker.error_reporter.failed);
     REQUIRE(checker.error_reporter.errors.size() == 0);
-    REQUIRE(info->entity.get().e_type == E_TYPE::VALUE);
+    REQUIRE(info->entity.get().is_value());
     REQUIRE(info->entity.get().get_value().metatype == Meta::CLASS);
     REQUIRE(info->entity.get().get_value().type ==
             sem::TypeObject("Dict", {new sem::TypeObject("Integer"), new sem::TypeObject("String")}));
@@ -265,7 +265,7 @@ TEST_CASE("dict_literal", "[checker]") {
 
     REQUIRE(!checker.error_reporter.failed);
     REQUIRE(checker.error_reporter.errors.size() == 0);
-    REQUIRE(info->entity.get().e_type == E_TYPE::VALUE);
+    REQUIRE(info->entity.get().is_value());
     REQUIRE(info->entity.get().get_value().metatype == Meta::CLASS);
     REQUIRE(info->entity.get().get_value().type ==
             sem::TypeObject("Dict", {new sem::TypeObject("String"), new sem::TypeObject("Integer")}));
@@ -281,7 +281,7 @@ TEST_CASE("float_literal", "[checker]") {
 
     REQUIRE(!checker.error_reporter.failed);
     REQUIRE(checker.error_reporter.errors.size() == 0);
-    REQUIRE(info->entity.get().e_type == E_TYPE::VALUE);
+    REQUIRE(info->entity.get().is_value());
     REQUIRE(info->entity.get().get_value().metatype == Meta::CLASS);
     REQUIRE(info->entity.get().get_value().type == sem::TypeObject("Float"));
 }
@@ -369,7 +369,7 @@ TEST_CASE("binop_ok", "[checker]") {
 
 
     REQUIRE_CHECKER_OK();
-    CHECK(info->entity.get().e_type == E_TYPE::VALUE);
+    CHECK(info->entity.get().is_value());
     EntityValue& entity_value = info->entity.get().get_value();
     CHECK(entity_value.metatype == Meta::CLASS);
     CHECK(entity_value.type == sem::TypeObject("Integer"));
@@ -386,7 +386,7 @@ TEST_CASE("boolop_ok", "[checker]") {
 
 
     REQUIRE_CHECKER_OK();
-    CHECK(info->entity.get().e_type == E_TYPE::VALUE);
+    CHECK(info->entity.get().is_value());
     EntityValue& entity_value = info->entity.get().get_value();
     CHECK(entity_value.metatype == Meta::CLASS);
     CHECK(entity_value.type == sem::TypeObject("Boolean"));

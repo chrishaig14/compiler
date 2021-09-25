@@ -241,7 +241,7 @@ TEST_CASE("semantic_output_float_literal", "[checker]") {
 
     REQUIRE(!checker.error_reporter.failed);
     REQUIRE(checker.error_reporter.errors.size() == 0);
-    REQUIRE(info->entity.get().e_type == E_TYPE::VALUE);
+    REQUIRE(info->entity.get().is_value());
     REQUIRE(info->entity.get().get_value().metatype == Meta::CLASS);
     REQUIRE(info->entity.get().get_value().type == sem::TypeObject("Float"));
 }
@@ -289,7 +289,7 @@ TEST_CASE("semantic_output_binop", "[checker]") {
 
 
     REQUIRE_CHECKER_OK()
-    CHECK(info->entity.get().e_type == E_TYPE::VALUE);
+    CHECK(info->entity.get().is_value());
     EntityValue& entity_value = info->entity.get().get_value();
     CHECK(entity_value.metatype == Meta::CLASS);
     CHECK(entity_value.type == sem::TypeObject("Integer"));
@@ -307,7 +307,7 @@ TEST_CASE("semantic_output_boolop", "[checker]") {
 
 
     REQUIRE_CHECKER_OK()
-    CHECK(info->entity.get().e_type == E_TYPE::VALUE);
+    CHECK(info->entity.get().is_value());
     EntityValue& entity_value = info->entity.get().get_value();
     CHECK(entity_value.metatype == Meta::CLASS);
     CHECK(entity_value.type == sem::TypeObject("Boolean"));

@@ -90,7 +90,7 @@ Checker::object_member(sem::UExp object_snode, EntityValue& p_value, const std::
     assert(clazz != nullptr);
     if (clazz->members.count(child) != 0) {
         info.set_entity(clazz->member_entities.at(child)->clone());
-        if (info.entity.get().e_type == E_TYPE::NOTHING) {
+        if (info.entity.get().is_nothing()) {
             info.set_entity(entity_from_type(*clazz->members.at(child)));
             clazz->member_entities[child] = std::unique_ptr<Entity>(info.entity.get().clone());
             EntityValue& ev = clazz->member_entities[child].get()->get_value();

@@ -25,7 +25,7 @@ EntityValue& Checker::entity_value_from_actual_base_path_no_generic(const Path& 
 UExpressionInfo Checker::visit_id(ast::Id& n) {
     // Logger::info("Checking id node " + n._id);
     Entity& entity = this->scope->get(n._id);
-    if (entity.e_type == E_TYPE::NOT_FOUND) {
+    if (entity.is_notfound()) {
         this->error_reporter.error(std::make_unique<ErrorNotDeclared>(n));
         this->scope->set(n._id, EntityError());
         return exp_error_stub();
@@ -34,7 +34,7 @@ UExpressionInfo Checker::visit_id(ast::Id& n) {
     //         entity.type == E_TYPE::CONST_FUNCTION ? ((EntityConstFunction&) entity).const_function->path.as_str()
     //                                               : n._id;
     sem::UExp sn;
-    if (entity.e_type == E_TYPE::CONST_FUNCTION) {
+    if (entity.is_constfun()) {
         sn = std::make_unique<sem::ConstFunction>(entity.get_constfun().const_function.path);
     } else {
         std::string id = n._id;
@@ -243,7 +243,7 @@ std::unique_ptr<EntityValue> Checker::make_value(sem::Type* type) {
     if (type->object().id.size() == 1) {
         Entity& e = this->scope->get(type->object().id);
         Class* clazz;
-        if (e.e_type == E_TYPE::NOT_FOUND) {
+        if (e.is_notfound()) {
             clazz = new Class(type->object().id, Path("core.generics" + type->object().id));
             // clazz->class_name = value.type->object().id;
         } else {
@@ -284,7 +284,7 @@ void Checker::fill_value(EntityValue& value) {
     if (value.type.object().id.size() == 1) {
         Entity& e = this->scope->get(value.type.object().id);
         Class* clazz;
-        if (e.e_type == E_TYPE::NOT_FOUND) {
+        if (e.is_notfound()) {
             clazz = new Class(value.type.object().id, Path("core.generics" + value.type.object().id));
             // clazz->class_name = value.type->object().id;
         } else {

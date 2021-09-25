@@ -303,7 +303,7 @@ std::unique_ptr<sem::FunctionDef> Checker::visit_function(ast::Function& n) {
     this->scope->set("__return__", *e);
     auto bn = this->visit_block(*n.body);
     for (auto& local_var: this->scope->table) {
-        if (local_var.second->e_type == E_TYPE::VALUE) {
+        if (local_var.second->is_value()) {
             bn->locals.push_back(local_var.first);
         }
     }

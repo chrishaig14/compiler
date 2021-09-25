@@ -122,32 +122,41 @@ public:
         return !(rhs == *this);
     }
 
-    virtual bool is_class() const {
-        return false;
+    bool is_enum() const {
+        return this->e_type == E_TYPE::ENUM;
     }
 
-    virtual bool is_package() const {
-        return false;
+    bool is_class() const {
+        return this->e_type == E_TYPE::CLASS;
     }
 
-    virtual bool is_module() const {
-        return false;
+    bool is_package() const {
+        return this->e_type == E_TYPE::PACKAGE;
     }
 
-    virtual bool is_nothing() const {
-        return false;
+    bool is_module() const {
+        return this->e_type == E_TYPE::MODULE;
     }
 
-    virtual bool is_constfun() const {
-        return false;
+    bool is_nothing() const {
+        return this->e_type == E_TYPE::NOTHING;
     }
 
-    virtual bool is_error() const {
-        return false;
+    bool is_constfun() const {
+        return this->e_type == E_TYPE::CONST_FUNCTION;
     }
 
-    virtual bool is_value() const {
-        return false;
+    bool is_notfound() const {
+        return this->e_type == E_TYPE::NOT_FOUND;
+    }
+
+    bool is_error() const {
+        return this->e_type == E_TYPE::ERROR;
+
+    }
+
+    bool is_value() const {
+        return this->e_type == E_TYPE::VALUE;
     }
 
     virtual EntityClass& get_class() {

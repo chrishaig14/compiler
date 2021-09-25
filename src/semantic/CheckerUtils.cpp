@@ -50,9 +50,9 @@ sem::FunctionDef* make_class_default_init(const std::string& class_path, const V
 
 
 ast::Type* get_entity_type(Entity& e) {
-    if (e.e_type == E_TYPE::CONST_FUNCTION) {
+    if (e.is_constfun()) {
         return e.get_constfun().const_function.const_function_ft.to_ast();
-    } else if (e.e_type == E_TYPE::VALUE) {
+    } else if (e.is_value()) {
         return e.get_value().type.to_ast();
     }
     throw std::runtime_error("Get type of non function/object!");

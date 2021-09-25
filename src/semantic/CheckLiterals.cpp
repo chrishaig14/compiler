@@ -129,8 +129,8 @@ UExpressionInfo Checker::visit_partial(ast::PartialApplication& node) {
     sem::VectorOfTypes partial_args;
     ast::FunctionType* fun_type = nullptr;
     Entity& f_entity = func->entity;
-    if (f_entity.e_type == E_TYPE::CONST_FUNCTION ||
-        (f_entity.e_type == E_TYPE::VALUE && (f_entity.get_value()).type.kind == sem::Kind::FUNCTION)) {
+    if (f_entity.is_constfun() ||
+        (f_entity.is_value() && (f_entity.get_value()).type.kind == sem::Kind::FUNCTION)) {
         fun_type = (ast::FunctionType*) f_entity.get_constfun().const_function.const_function_ft.to_ast();
     } else {
         this->error_reporter.fail("Error: expected a function for partial application");

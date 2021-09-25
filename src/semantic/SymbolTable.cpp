@@ -91,7 +91,7 @@ std::vector<std::pair<std::string, sem::UType>> SymbolTable::get_all() {
 
         for (auto& v: this->table) {
             Entity& e = *v.second;
-            if (e.e_type == E_TYPE::VALUE) {
+            if (e.is_value()) {
                 auto& ev = e.get_value();
                 r.emplace_back(v.first, sem::UType(ev.type.clone()));
             }

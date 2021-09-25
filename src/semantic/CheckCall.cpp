@@ -165,7 +165,7 @@ UExpressionInfo Checker::visit_callexp(ast::CallExp& n, bool is_rvalue) {
 }
 
 const sem::TypeFunction& get_function_type(const ExpressionInfo& fun_info) {
-    if (fun_info.entity.get().e_type == E_TYPE::CONST_FUNCTION) {
+    if (fun_info.entity.get().is_constfun()) {
         return fun_info.entity.get().get_constfun().const_function.const_function_ft;
     } else {
         // value & kind = function
@@ -178,13 +178,13 @@ Checker::make_return_info(const ast::CallExp& n, bool is_rvalue, UExpressionInfo
                           bool args_are_constant) {
     UExpressionInfo retvp = std::move(retv_p);
     auto& retv = *retvp;
-    if (retv.entity.get().e_type == E_TYPE::NOTHING) {
+    if (retv.entity.get().is_nothing()) {
         if (is_rvalue) {
             // this->error_reporter.error(std::make_unique<ErrorExpectedExpression>(retv.entity, n));
             throw std::runtime_error("Error expected expression!");
             return exp_error_stub();
         }
-    } else if (retv.entity.get().e_type == E_TYPE::VALUE) {
+    } else if (retv.entity.get().is_value()) {
         EntityValue& value = retv.entity.get().get_value();
         if (value.type.kind == sem::Kind::OBJECT) {
             if (value.type.object().id == ".None") {
@@ -212,9 +212,9 @@ bool Checker::check_arguments(ast::CallExp& n, std::vector<sem::UExp>& arguments
         Entity& arg_entity = *x;
         arg_entities.push_back(std::move(x));
         arguments.push_back(std::move(arg_type_p->exp_snode));
-        if (arg_entity.e_type == E_TYPE::CLASS || arg_entity.e_type == E_TYPE::PACKAGE ||
-            arg_entity.e_type == E_TYPE::MODULE || arg_entity.e_type == E_TYPE::ENUM ||
-            arg_entity.e_type == E_TYPE::NOTHING) {
+        if (arg_entity.is_class() || arg_entity.is_package() ||
+            arg_entity.is_module() || arg_entity.is_enum() ||
+            arg_entity.is_nothing()) {
             has_error = true;
             // this->error_reporter.error(std::make_unique<ErrorExpectedExpression>(arg_entity, arg));
             throw std::runtime_error("Error, expected expression!");

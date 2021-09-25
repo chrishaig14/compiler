@@ -116,7 +116,7 @@ USemanticInfo Checker::visit_assignment(ast::Assignment& n) {
         }
     }
 
-    if (e_value.type.kind == sem::Kind::OBJECT && expression_info_p->entity.get().e_type == E_TYPE::CONST_FUNCTION) {
+    if (e_value.type.kind == sem::Kind::OBJECT && expression_info_p->entity.get().is_constfun()) {
         std::cerr << "assignment error" << std::endl;
         exit(111);
         // this->error_reporter.assignment(*e_value.value->type,
@@ -143,7 +143,7 @@ USemanticInfo Checker::visit_assignment(ast::Assignment& n) {
 
     EntityValue& l_entity_value = linfo.entity.get().get_value();
 
-    if (expression_info_p->entity.get().e_type == E_TYPE::VALUE) {
+    if (expression_info_p->entity.get().is_value()) {
         sem::UExp rvalue_snode = this->make_rvalue(expression_info_p->entity,
                                                    std::move(expression_info_p->exp_snode),
                                                    l_entity_value.type);
@@ -172,7 +172,7 @@ USemanticInfo Checker::visit_assignment(ast::Assignment& n) {
 
 USemanticInfo Checker::visit_return(ast::Return& n) {
     Entity& return_entity = this->scope->get("__return__");
-    if (return_entity.e_type == E_TYPE::NOTHING) {
+    if (return_entity.is_nothing()) {
         if (n.expression != nullptr) {
             this->error_reporter.error(std::make_unique<ErrorBadReturn>(n.start));
         }
@@ -353,7 +353,7 @@ USemanticInfo Checker::visit_for(ast::For& node) {
     this->scope->is_loop = false;
     sem::Block* bn = binfo.release();
     for (auto& local_var : this->scope->table) {
-        if (local_var.second->e_type == E_TYPE::VALUE) {
+        if (local_var.second->is_value()) {
             bn->locals.push_back(local_var.first);
         }
     }

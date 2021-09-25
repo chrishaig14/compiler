@@ -26,7 +26,7 @@ UExpressionInfo Checker::expect_rvalue_of_type(const sem::Type& target, ast::Exp
 }
 
 sem::UExp Checker::make_rvalue(const Entity& t_entity, sem::UExp value_snode, const sem::Type& target) {
-    if (t_entity.e_type == E_TYPE::VALUE) {
+    if (t_entity.is_value()) {
         const EntityValue& value_entity = t_entity.get_value();
         if (value_entity.type.kind != target.kind) {
             return nullptr;
@@ -71,7 +71,7 @@ sem::UExp Checker::make_rvalue(const Entity& t_entity, sem::UExp value_snode, co
                                                 unaliased_target_type->to_ast()));
         }
 
-    } else if (t_entity.e_type == E_TYPE::CONST_FUNCTION) {
+    } else if (t_entity.is_constfun()) {
         if (t_entity.get_constfun().const_function.const_function_ft == target) {
             return value_snode;
         } else {
@@ -177,7 +177,7 @@ USemanticInfo Checker::check_declaration_without_type(ast::Declaration& n) {
     sem::UExp u = std::move(exp_info_p->exp_snode);
     info.snode = std::make_unique<sem::Declaration>(n.identifier, std::move(u));
     info.set_entity(exp_info_p->entity.get().clone());
-    if (info.entity.get().e_type == E_TYPE::CONST_FUNCTION) {
+    if (info.entity.get().is_constfun()) {
         Entity& entity_const_function = exp_info_p->entity;
         ConstFunction& const_function = entity_const_function.get_constfun().const_function;
         EntityValue* value_entity = std::make_unique<EntityValue>(const_function.const_function_ft.clone()).release();
