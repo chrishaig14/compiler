@@ -101,7 +101,7 @@ Checker::object_member(sem::UExp object_snode, Value& p_value, const std::string
     } else if (clazz->methods.count(child) != 0) {
         // auto* idn = new sem::Id(clazz->methods[child]->path.as_str());
         info.exp_snode = std::make_unique<sem::ObjectMethod>(std::move(object_snode), clazz->path, child);
-        info.set_constfun(*clazz->methods[child]);
+        info.set_entity(new EntityConstFunction(*clazz->methods[child]));
         // if (this->is_call) {
         // method call
         // info.this_arg = object_snode.release();
@@ -174,10 +174,10 @@ UExpressionInfo Checker::class_member(ast::Member& n, UExpressionInfo parent_inf
         ast::ObjectType* ot = new ast::ObjectType(cls.class_name, tp);
         unbound_method->const_function_ft.param_types.insert(unbound_method->const_function_ft.param_types.begin(),
                                                              sem::UType(ot->to_sem()));
-        info.set_constfun(*unbound_method);
+        info.set_entity(new EntityConstFunction(*unbound_method));
         info.exp_snode = std::make_unique<sem::Id>(unbound_method->path.as_str());
     } else if (cls.static_methods.find(child) != cls.static_methods.end()) {
-        info.set_constfun(*cls.static_methods[child]);
+        info.set_entity(new EntityConstFunction(*cls.static_methods[child]));
         info.exp_snode = std::make_unique<sem::Id>(cls.static_methods[child]->path.as_str());
     } else if (cls.static_members.find(child) != cls.static_members.end()) {
         info.set_entity(entity_from_type(*cls.static_members[child].first));

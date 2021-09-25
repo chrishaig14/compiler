@@ -247,7 +247,9 @@ UExpressionInfo Checker::visit_defconst(ast::DefaultConstructor& node) {
         ot->is_generic_param = true;
     }
     auto* rt = new sem::TypeObject(cls.class_name, tp, cls.path);
-    info.set_constfun(*new ConstFunction(Path(), std::make_unique<sem::TypeFunction>(t, sem::UType(rt))));
+    info.set_entity(new EntityConstFunction(*new ConstFunction(Path(),
+                                                               std::make_unique<sem::TypeFunction>(t,
+                                                                                                   sem::UType(rt)))));
     info.exp_snode = std::make_unique<sem::ObjectConstructor>(cls.path);
     return info_u;
 }
