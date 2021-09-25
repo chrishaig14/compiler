@@ -10,7 +10,7 @@
 #include <unordered_map>
 #include "../ast/general/Type.h"
 #include "../util/utils.h"
-#include "SemanticInfo.h"
+#include "../util/macros.h"
 
 
 class SymbolTable {
@@ -28,13 +28,6 @@ public:
     void set(const std::string& name, const Entity& info);
 
     ~SymbolTable() {
-        // for (auto e: this->table) {
-        //     delete e.second;
-        // }
-        // if (this->ret != nullptr) {
-        //     delete ret;
-        // }
-
     }
 
     std::string s_name;

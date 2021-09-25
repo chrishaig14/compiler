@@ -51,15 +51,12 @@
 
 #define T_NONE ast::ObjectType(".None")
 
-typedef std::unique_ptr<SemanticInfo> USemanticInfo;
-typedef std::unique_ptr<ExpressionInfo> UExpressionInfo;
 
 bool is_generic(const sem::Type& t);
 ast::UTypeNode make_type_from_object_pattern(const ast::ObjectType& object_type, const MapStringType& replacements);
 ast::UTypeNode make_type_from_function_pattern(const ast::FunctionType& ftn, const MapStringType& replacements);
 ast::UTypeNode make_type(const ast::Type& original, const MapStringType& replacements);
-SemanticInfo match_arguments_to_generic_function(const ast::FunctionType& function_type, ast::VectorOfTypes arg_types);
-USemanticInfo error_stub();
+sem::UCommon match_arguments_to_generic_function(const ast::FunctionType& function_type, ast::VectorOfTypes arg_types);
 Entity* map_module_member_to_entity(ModuleMember& module_member);
 ModuleMember* map_unit_to_module_member(Unit& u);
 TextPosition add_one_col(TextPosition t);
@@ -70,7 +67,6 @@ sem::Common* make_for_snode(ast::For& node, std::unique_ptr<sem::Block>& binfo, 
                             std::string loop_list_len_var_id, sem::Common* update_loop_index_snode);
 const sem::TypeFunction& get_function_type(const ExpressionInfo& fun_info);
 
-USemanticInfo error_stub();
 UExpressionInfo exp_error_stub();
 
 class Checker {
@@ -107,27 +103,26 @@ public:
     ast::UTypeNode substitute(const ast::Type& t, const std::string& var, const ast::Type& replacement);
     std::unique_ptr<ast::FunctionType> unify_function_call(const ast::FunctionType& fun, ast::VectorOfTypes& args,
                                                            std::map<std::string, ast::Type*>& all_substitutions);
-    UExpressionInfo
-    match_arguments_to_generic_function(const ast::FunctionType& ft, ast::VectorOfTypes arg_types,
-                                        std::map<std::string, ast::Type*>& all_substitutions);
+    UExpressionInfo match_arguments_to_generic_function(const ast::FunctionType& ft, ast::VectorOfTypes arg_types,
+                                                        std::map<std::string, ast::Type*>& all_substitutions);
     void fail(std::string msg);
 
     std::unique_ptr<sem::Block> visit_block(ast::Block& node);
     std::unique_ptr<sem::Module> visit_root(ast::Module& node);
 
-    USemanticInfo visit_assignment(ast::Assignment& n);
-    USemanticInfo visit_break(ast::Break& node);
-    USemanticInfo visit_call(ast::Call& n, bool is_rvalue);
-    USemanticInfo visit_continue(ast::Continue& node);
-    USemanticInfo visit_declaration(ast::Declaration& n);
-    USemanticInfo check_declaration_with_type(ast::Declaration& n);
-    USemanticInfo check_declaration_without_type(ast::Declaration& n);
-    USemanticInfo visit_for(ast::For& node);
-    USemanticInfo visit_if(ast::If& n);
-    USemanticInfo visit_import(ast::Import& node);
-    USemanticInfo visit_return(ast::Return& n);
-    USemanticInfo visit_while(ast::While& node);
-    USemanticInfo visit_cast(ast::Cast& n);
+    sem::UCommon visit_assignment(ast::Assignment& n);
+    sem::UCommon visit_break(ast::Break& node);
+    sem::UCommon visit_call(ast::Call& n, bool is_rvalue);
+    sem::UCommon visit_continue(ast::Continue& node);
+    sem::UCommon visit_declaration(ast::Declaration& n);
+    sem::UCommon check_declaration_with_type(ast::Declaration& n);
+    sem::UCommon check_declaration_without_type(ast::Declaration& n);
+    sem::UCommon visit_for(ast::For& node);
+    sem::UCommon visit_if(ast::If& n);
+    sem::UCommon visit_import(ast::Import& node);
+    sem::UCommon visit_return(ast::Return& n);
+    sem::UCommon visit_while(ast::While& node);
+    sem::UCommon visit_cast(ast::Cast& n);
 
     UExpressionInfo dispatch_rvalue(ast::ExpNode& n);
     UExpressionInfo visit_binop(ast::BinaryOp& node);
@@ -151,7 +146,8 @@ public:
     UExpressionInfo visit_list(ast::List& node);
     UExpressionInfo visit_member(ast::Member& n);
     UExpressionInfo visit_none(ast::None& node);
-    UExpressionInfo object_member(sem::UExp object_snode, EntityValue& p_value, const std::string& child, ast::Member& n);
+    UExpressionInfo
+    object_member(sem::UExp object_snode, EntityValue& p_value, const std::string& child, ast::Member& n);
     UExpressionInfo package_member(ast::Member& n, Package& package);
     UExpressionInfo module_member(ast::Member& n, Module& mod);
     UExpressionInfo enum_member(ast::Member& node, Enum& enumm);
@@ -161,25 +157,25 @@ public:
     std::unique_ptr<sem::KlassDef> visit_class(ast::Klass& node);
     std::unique_ptr<sem::EnumDef> visit_enum(ast::EnumNode& p_node);
 
-    USemanticInfo visit_match(ast::Match& node);
-    USemanticInfo visit_alias(ast::Alias& p_node);
+    sem::UCommon visit_match(ast::Match& node);
+    sem::UCommon visit_alias(ast::Alias& p_node);
     sem::UExp make_rvalue(const Entity& t_entity, sem::UExp value_snode, const sem::Type& target);
-    USemanticInfo dispatch(ast::Statement& nod);
+    sem::UCommon dispatch(ast::Statement& nod);
     void fill_value(EntityValue& value);
     void process_function_arguments(ExpressionInfo& retv, std::vector<std::unique_ptr<Entity>>& arg_entities,
                                     std::vector<sem::UExp>& arguments, ast::CallExp& n,
                                     const sem::TypeFunction& function_type, ExpressionInfo* fun_info_p);
     bool check_arguments(ast::CallExp& n, std::vector<sem::UExp>& arguments,
                          std::vector<std::unique_ptr<Entity>>& arg_entities);
-    UExpressionInfo
-    make_return_info(const ast::CallExp& n, bool is_rvalue, UExpressionInfo retv_p, bool is_def_const, bool args_are_constant);
+    UExpressionInfo make_return_info(const ast::CallExp& n, bool is_rvalue, UExpressionInfo retv_p, bool is_def_const,
+                                     bool args_are_constant);
     sem::UExp make_union_rvalue(sem::UExp value_snode, const sem::Type* unaliased_value_type,
                                 const sem::Type* unaliased_target_type) const;
     sem::Common* make_option_rvalue(sem::Common* value_snode, const ast::Type* unaliased_value_type,
                                     const ast::Type* unaliased_target_type) const;
-    // USemanticInfo visit_throw(ast::ThrowNode& n);
+    // sem::UCommon visit_throw(ast::ThrowNode& n);
 
-    USemanticInfo dispatch_statement(ast::Statement& n, bool is_rvalue);
+    sem::UCommon dispatch_statement(ast::Statement& n, bool is_rvalue);
     EntityValue& entity_value_from_actual_base_path_no_generic(const Path& p);
 
     std::map<std::string, std::unique_ptr<Class>> classes;
@@ -189,9 +185,8 @@ public:
                                  const ast::Type* unaliased_target_type) const;
     std::unique_ptr<sem::Top> dispatch_top(ast::TopNode& n);
     UExpressionInfo visit_callexp(ast::CallExp& n, bool is_rvalue);
-    USemanticInfo visit_call(ast::Call& n);
-    UExpressionInfo
-    const_function_member(ast::Member& n, UExpressionInfo unique_ptr_1, ConstFunction& function);
+    sem::UCommon visit_call(ast::Call& n);
+    UExpressionInfo const_function_member(ast::Member& n, UExpressionInfo unique_ptr_1, ConstFunction& function);
     UExpressionInfo class_member(ast::Member& n, UExpressionInfo parent_info, Class& cls);
     UExpressionInfo value_member(ast::Member& n, UExpressionInfo parent_info, EntityValue& value);
 };

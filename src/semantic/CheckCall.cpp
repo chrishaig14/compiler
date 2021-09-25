@@ -8,7 +8,7 @@
 #include "../ast/statements/Call.h"
 #include "../simple_nodes/common/src/TypeFunction.h"
 
-USemanticInfo Checker::visit_call(ast::Call& n) {
+sem::UCommon Checker::visit_call(ast::Call& n) {
     // auto s = this->visit_callexp(n, false);
     // UExpressionInfo u = std::make_unique<ExpressionInfo>();
     // u->exp_snode = std::move(s->exp_snode);
@@ -67,7 +67,7 @@ UExpressionInfo Checker::visit_callexp(ast::CallExp& n, bool is_rvalue) {
         for (auto x: arg_types) {
             copy_arg_types.push_back(x->clone());
         }
-        USemanticInfo inf = this->match_arguments_to_generic_function(*function_type,
+        sem::UCommon inf = this->match_arguments_to_generic_function(*function_type,
                                                                       copy_arg_types,
                                                                       all_substitutions);
         for (auto s: all_substitutions) {
@@ -124,10 +124,10 @@ UExpressionInfo Checker::visit_callexp(ast::CallExp& n, bool is_rvalue) {
                     with_implicit_arg.push_back(x->clone());
                 }
                 with_implicit_arg.push_back(implicit_arg->ft->clone());
-                USemanticInfo inf__ = this->match_arguments_to_generic_function(*with_implicit_param,
+                sem::UCommon inf__ = this->match_arguments_to_generic_function(*with_implicit_param,
                                                                                 with_implicit_arg,
                                                                                 all_substitutions);
-                // USemanticInfo inf__ = this->match_arguments_to_generic_function(*with_implicit_param,
+                // sem::UCommon inf__ = this->match_arguments_to_generic_function(*with_implicit_param,
                 //                                                                 implicit_arg->ft->param_types,
                 //                                                                 all_substitutions);
                 if (inf__->is_error()) {

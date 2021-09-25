@@ -47,8 +47,8 @@ UExpressionInfo Checker::visit_id(ast::Id& n) {
     return info_u;
 }
 
-USemanticInfo Checker::visit_cast(ast::Cast& n) {
-    // USemanticInfo exp_info = this->dispatch_rvalue(*n.exp);
+sem::UCommon Checker::visit_cast(ast::Cast& n) {
+    // sem::UCommon exp_info = this->dispatch_rvalue(*n.exp);
     // ObjectType cast_type(n.as_type, {});
     // const ast::TypeNode& exp_type = *exp_info->entity.type;
     // if (exp_type == T_INT || exp_type == T_FLOAT || exp_type == T_DOUBLE || exp_type == T_BOOL) {
@@ -63,13 +63,12 @@ USemanticInfo Checker::visit_cast(ast::Cast& n) {
     // }
     // n.exp_type = exp_type.clone();
 
-    USemanticInfo info_u = std::make_unique<SemanticInfo>();
-    return info_u;
+    return nullptr;
 }
 
-// USemanticInfo Checker::visit_boolop(ast::BoolOp& n) {
-//     USemanticInfo left_info_p = this->dispatch_rvalue(*n.left);
-//     USemanticInfo right_info_p = this->dispatch_rvalue(*n.right);
+// sem::UCommon Checker::visit_boolop(ast::BoolOp& n) {
+//     sem::UCommon left_info_p = this->dispatch_rvalue(*n.left);
+//     sem::UCommon right_info_p = this->dispatch_rvalue(*n.right);
 //     if (left_info_p->is_error() || right_info_p->is_error()) {
 //         return error_stub();
 //     }
@@ -108,7 +107,7 @@ USemanticInfo Checker::visit_cast(ast::Cast& n) {
 //         return error_stub();
 //     }
 //
-//     USemanticInfo info_u = std::make_unique<SemanticInfo>();
+//     sem::UCommon info_u;
 //     SemanticInfo& info = *info_u;
 //
 //     if (left_info_p->is_constant && right_info_p->is_constant) {

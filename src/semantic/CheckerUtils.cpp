@@ -4,6 +4,7 @@
 
 #include "CheckerUtils.h"
 #include "../simple_nodes/common/include/TypeObject.h"
+#include "Checker.h"
 
 std::string binoptype_to_str(OpType op) {
     std::map<OpType, std::string> funs;
@@ -116,7 +117,7 @@ sem::UExp make_union_wrapper(int type_index, sem::UExp expression) {
 }
 
 
-sem::UExp make_boolop_snode(ConstFunction* operator_fun, SemanticInfo& left_info, SemanticInfo& right_info) {
+sem::UExp make_boolop_snode(ConstFunction* operator_fun, UExpressionInfo& left_info, UExpressionInfo& right_info) {
     // auto function_id = std::make_unique<sem::Id>(operator_fun->path.as_str());
     // std::vector<sem::UExp> v;
     // v.emplace_back(std::move(left_info.snode));

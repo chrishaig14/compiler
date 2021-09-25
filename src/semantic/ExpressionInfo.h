@@ -46,5 +46,8 @@ public:
     ExpErrorStub();
 };
 
+typedef std::unique_ptr<ExpressionInfo> UExpressionInfo;
+
+
 
 #endif //XLANG_EXPRESSIONINFO_H

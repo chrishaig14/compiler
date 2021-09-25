@@ -59,7 +59,7 @@ sem::Common* make_for_snode(ast::For& node, std::unique_ptr<sem::Block>& binfo, 
 }
 
 std::unique_ptr<sem::EnumDef> Checker::visit_enum(ast::EnumNode& p_node) {
-    USemanticInfo info_u = std::make_unique<SemanticInfo>();
+    sem::UCommon info_u;
     Enum& enumm = this->scope->get(p_node.id).get_enum().enumm;
     auto esn = std::make_unique<sem::EnumDef>(enumm.path.as_str(), p_node.values);
     return esn;
@@ -94,7 +94,7 @@ std::unique_ptr<sem::KlassDef> Checker::visit_class(ast::Klass& node) {
     // sn->nodes.push_back(USNode(make_class_default_init(clazz->path.as_str(), node.members_ordered)));
     //
     // for (const auto& sm: node.static_members) {
-    //     USemanticInfo sm_exp_info = this->dispatch(*sm.second.second);
+    //     sem::UCommon sm_exp_info = this->dispatch(*sm.second.second);
     //     if (*sm.second.first != *(ast::Type*) ((Value&) sm_exp_info->entity).type.to_ast()) {
     //         this->error_reporter.fail("Err: cannt initialize static member of type " + sm.second.first->to_string() +
     //                                   " with expression of type " + ((Value&) sm_exp_info->entity).type.to_string());
@@ -115,13 +115,13 @@ std::unique_ptr<sem::KlassDef> Checker::visit_class(ast::Klass& node) {
     //     val->metatype = Meta::CLASS;
     //     val->clazz = clazz;
     //     // method.second->path = clazz->path + "." + method.second->identifier;
-    //     USemanticInfo method_info = this->visit_function(*method.second->method);
+    //     sem::UCommon method_info = this->visit_function(*method.second->method);
     //     methods_snodes.push_back(method_info->snode.release());
     // }
     //
     // for (const auto& method: node.static_methods) {
     //     this->add_this = false;
-    //     USemanticInfo method_info = this->visit_function(*method.second);
+    //     sem::UCommon method_info = this->visit_function(*method.second);
     //     static_methods_snodes.push_back(method_info->snode.release());
     // }
     //
@@ -202,7 +202,7 @@ std::unique_ptr<sem::Block> Checker::visit_block(ast::Block& node) {
     auto sn = std::make_unique<sem::Block>();
     ast::VectorOfNodesU vn;
     for (auto& n: node.nodes) {
-        USemanticInfo sinfo_p = this->dispatch(*n);
+        sem::UCommon sinfo_p = this->dispatch(*n);
 
         // sn->nodes.push_back(sinfo_p->snode);
 
@@ -212,18 +212,18 @@ std::unique_ptr<sem::Block> Checker::visit_block(ast::Block& node) {
             }
         } else {
             vn.push_back(std::move(n));
-            if (sinfo_p->snode != nullptr) {
-                if (sinfo_p->snode->type == sem::CommonType::BLOCK) {
-                    if (((std::unique_ptr<sem::Block>&) sinfo_p->snode)->unwrap) {
-                        for (auto& nn : ((std::unique_ptr<sem::Block>&) sinfo_p->snode)->nodes) {
+            if (sinfo_p != nullptr) {
+                if (sinfo_p->type == sem::CommonType::BLOCK) {
+                    if (((std::unique_ptr<sem::Block>&) sinfo_p)->unwrap) {
+                        for (auto& nn : ((std::unique_ptr<sem::Block>&) sinfo_p)->nodes) {
                             sn->nodes.push_back(std::move(nn));
                         }
                     } else {
-                        sn->nodes.push_back(std::move(sinfo_p->snode));
+                        sn->nodes.push_back(std::move(sinfo_p));
                     }
 
                 } else {
-                    sn->nodes.push_back(std::move(sinfo_p->snode));
+                    sn->nodes.push_back(std::move(sinfo_p));
                 }
             }
         }

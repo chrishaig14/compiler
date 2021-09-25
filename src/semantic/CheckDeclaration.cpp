@@ -121,12 +121,12 @@ sem::UExp Checker::make_union_rvalue(sem::UExp value_snode, const sem::Type* una
     }
 }
 
-USemanticInfo Checker::visit_declaration(ast::Declaration& n) {
+sem::UCommon Checker::visit_declaration(ast::Declaration& n) {
     // Logger::info("Checking ast::DeclarationNode for var: " + n.identifier);
     if (this->scope->declared(n.identifier)) {
         this->error_reporter.error(std::make_unique<ErrorRedeclared>(n.identifier, n));
     }
-    USemanticInfo info_u;
+    sem::UCommon info_u;
     if (n.type != nullptr) {
         info_u = this->check_declaration_with_type(n);
     } else {
@@ -135,7 +135,7 @@ USemanticInfo Checker::visit_declaration(ast::Declaration& n) {
     return info_u;
 }
 
-USemanticInfo Checker::check_declaration_with_type(ast::Declaration& n) {
+sem::UCommon Checker::check_declaration_with_type(ast::Declaration& n) {
     ast::UTypeNode& type = n.type;
     if (type->kind == Kind::OBJECT && this->module.aliased_types.count(type->object().id) == 1) {
         ast::Type* aliased_type = this->module.aliased_types.at(type->object().id);
@@ -146,12 +146,11 @@ USemanticInfo Checker::check_declaration_with_type(ast::Declaration& n) {
     sem::UType sem_type(type->to_sem());
     UExpressionInfo rvalue_sinfo = this->expect_rvalue_of_type(*sem_type, n.expression);
     if (rvalue_sinfo->is_error()) {
-        return std::make_unique<SemanticInfo>();
+        return nullptr;
     }
-    USemanticInfo info_u = std::make_unique<SemanticInfo>();
-    SemanticInfo& info = *info_u;
+
     sem::UExp up = std::move(rvalue_sinfo->exp_snode);
-    info.snode = std::make_unique<sem::Declaration>(n.identifier, std::move(up));
+    sem::UCommon info_u = std::make_unique<sem::Declaration>(n.identifier, std::move(up));
     // auto ov = std::make_unique<Value>(sem_type.release());
     // this->fill_value(*ov);
     auto ov = this->make_value(sem_type.release());
@@ -159,24 +158,22 @@ USemanticInfo Checker::check_declaration_with_type(ast::Declaration& n) {
     return info_u;
 }
 
-USemanticInfo Checker::check_declaration_without_type(ast::Declaration& n) {
+sem::UCommon Checker::check_declaration_without_type(ast::Declaration& n) {
     UExpressionInfo exp_info_p = this->dispatch_rvalue(n.expression);
     if (exp_info_p->is_error()) {
         // return error_stub();
-        return std::make_unique<SemanticInfo>();
+        return nullptr;
     }
     E_TYPE entity_type = exp_info_p->entity.get().e_type;
     if (entity_type != E_TYPE::CONST_FUNCTION && entity_type != E_TYPE::VALUE) {
         this->error_reporter.error(std::make_unique<ErrorExpectedExpression>(exp_info_p->entity, n.expression));
         // throw std::runtime_error("NOT A FVALUE; EXPECTE D EXPRESSION");
         // return error_stub();
-        return std::make_unique<SemanticInfo>();
+        return nullptr;
     }
 
-    USemanticInfo info_u = std::make_unique<SemanticInfo>();
-    SemanticInfo& info = *info_u;
     sem::UExp u = std::move(exp_info_p->exp_snode);
-    info.snode = std::make_unique<sem::Declaration>(n.identifier, std::move(u));
+    sem::UCommon info_u = std::make_unique<sem::Declaration>(n.identifier, std::move(u));
     this->scope->set(n.identifier, exp_info_p->entity);
     if (exp_info_p->entity.get().is_constfun()) {
         Entity& entity_const_function = exp_info_p->entity;

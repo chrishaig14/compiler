@@ -52,22 +52,22 @@ TEST_CASE("semantic_output_basic_function", "[checker]") {
 TEST_CASE("semantic_output_basic_declaration", "[checker]") {
     std::string code = "fun main()->Integer{var x = 9;return 0;}";
     CHECKER();
-    USemanticInfo info = checker.visit_declaration((ast::Declaration&) *module.ast->functions[0].get().body->nodes[0]);
+    sem::UCommon info = checker.visit_declaration((ast::Declaration&) *module.ast->functions[0].get().body->nodes[0]);
     REQUIRE_CHECKER_OK();
     auto exp = sem::Declaration("x", std::make_unique<sem::Integer>("9"));
-    REQUIRE(*info->snode == exp);
+    REQUIRE(*info == exp);
 }
 
 TEST_CASE("semantic_output_list", "[checker]") {
     std::string code = "fun foo()->Integer{var x = [4,1];return 0;}";
     CHECKER();
-    USemanticInfo info = checker.visit_declaration((ast::Declaration&) *module.ast->functions[0].get().body->nodes[0]);
+    sem::UCommon info = checker.visit_declaration((ast::Declaration&) *module.ast->functions[0].get().body->nodes[0]);
     REQUIRE_CHECKER_OK();
     std::vector<sem::UExp> e;
     e.push_back(std::make_unique<sem::Integer>("4"));
     e.push_back(std::make_unique<sem::Integer>("1"));
     auto exp = sem::Declaration("x", std::make_unique<sem::List>(std::move(e)));
-    REQUIRE(*info->snode == exp);
+    REQUIRE(*info == exp);
 }
 
 
@@ -75,55 +75,55 @@ TEST_CASE("semantic_output_empty_dict", "[checker]") {
     std::string code = "fun foo()->Integer{var x = {}::[Integer,String];return 0;}";
 
     CHECKER()
-    USemanticInfo info = checker.visit_declaration((ast::Declaration&) *module.ast->functions[0].get().body->nodes[0]);
+    sem::UCommon info = checker.visit_declaration((ast::Declaration&) *module.ast->functions[0].get().body->nodes[0]);
     REQUIRE_CHECKER_OK();
     std::vector<std::pair<sem::UExp, sem::UExp>> e;
     auto exp = sem::Declaration("x", std::make_unique<sem::Dict>(std::move(e)));
-    REQUIRE(*info->snode == exp);
+    REQUIRE(*info == exp);
 }
 
 TEST_CASE("semantic_output_dict", "[checker]") {
     std::string code = "fun foo()->Integer{var x = {7:\"seven\",9:\"nine\"};return 0;}";
 
     CHECKER()
-    USemanticInfo info = checker.visit_declaration((ast::Declaration&) *module.ast->functions[0].get().body->nodes[0]);
+    sem::UCommon info = checker.visit_declaration((ast::Declaration&) *module.ast->functions[0].get().body->nodes[0]);
     REQUIRE_CHECKER_OK();
     std::vector<std::pair<sem::UExp, sem::UExp>> e;
     e.emplace_back(std::make_unique<sem::Integer>("7"), std::make_unique<sem::String>("seven"));
     e.emplace_back(std::make_unique<sem::Integer>("9"), std::make_unique<sem::String>("nine"));
     auto exp = sem::Declaration("x", std::make_unique<sem::Dict>(std::move(e)));
-    REQUIRE(*info->snode == exp);
+    REQUIRE(*info == exp);
 }
 
 TEST_CASE("semantic_output_int_literal", "[checker]") {
     std::string code = "fun foo()->Integer{var x = 9;return 0;}";
 
     CHECKER()
-    USemanticInfo info = checker.visit_declaration((ast::Declaration&) *module.ast->functions[0].get().body->nodes[0]);
+    sem::UCommon info = checker.visit_declaration((ast::Declaration&) *module.ast->functions[0].get().body->nodes[0]);
     REQUIRE_CHECKER_OK();
     auto exp = sem::Declaration("x", std::make_unique<sem::Integer>("9"));
-    REQUIRE(*info->snode == exp);
+    REQUIRE(*info == exp);
 }
 
 TEST_CASE("semantic_output_bool_literal", "[checker]") {
     std::string code = "fun foo()->Integer{var x = false;return 0;}";
 
     CHECKER()
-    USemanticInfo info = checker.visit_declaration((ast::Declaration&) *module.ast->functions[0].get().body->nodes[0]);
+    sem::UCommon info = checker.visit_declaration((ast::Declaration&) *module.ast->functions[0].get().body->nodes[0]);
     REQUIRE_CHECKER_OK();
     auto exp = sem::Declaration("x", std::make_unique<sem::Bool>(false));
-    REQUIRE(*info->snode == exp);
+    REQUIRE(*info == exp);
 }
 
 TEST_CASE("semantic_output_empty_list_literal", "[checker]") {
     std::string code = "fun foo()->Integer{var x = []::String;return 0;}";
 
     CHECKER()
-    USemanticInfo info = checker.visit_declaration((ast::Declaration&) *module.ast->functions[0].get().body->nodes[0]);
+    sem::UCommon info = checker.visit_declaration((ast::Declaration&) *module.ast->functions[0].get().body->nodes[0]);
     REQUIRE_CHECKER_OK();
     std::vector<sem::UExp> e;
     auto exp = sem::Declaration("x", std::make_unique<sem::List>(std::move(e)));
-    REQUIRE(*info->snode == exp);
+    REQUIRE(*info == exp);
 }
 
 TEST_CASE("semantic_output_object_member", "[checker]") {

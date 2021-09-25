@@ -18,13 +18,8 @@
 #include "../simple_nodes/common/include/Call.h"
 #include "../simple_nodes/common/include/Return.h"
 #include "../ast/nodes.h"
-#include "SemanticInfo.h"
 #include "../ast/general/ObjectType.h"
-//
-// Created by chris on 2/5/21.
-//
-
-#include "CheckerUtils.h"
+#include "ExpressionInfo.h"
 
 std::string binoptype_to_str(OpType op);
 
@@ -51,7 +46,7 @@ void make_not_generic(ast::Type& t);
 sem::UExp make_union_wrapper(int type_index, sem::UExp expression);
 
 
-sem::UExp make_boolop_snode(ConstFunction* operator_fun, SemanticInfo& left_info, SemanticInfo& right_info);
+sem::UExp make_boolop_snode(ConstFunction* operator_fun, UExpressionInfo& left_info, UExpressionInfo& right_info);
 
 
 #endif //XLANG_CHECKERUTILS_H

@@ -13,6 +13,7 @@
 #include "../ast/top/Alias.h"
 #include "../ast/top/EnumNode.h"
 #include "../units/Enum.h"
+#include "../units/Module.h"
 
 class GlobalProcessor {
 public:

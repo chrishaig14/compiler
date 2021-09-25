@@ -33,8 +33,6 @@ add_library(
         errors/src/ErrorTypeMismatch.cpp
         errors/include/ErrorTypeMismatch.h
         GlobalProcessor.cpp
-        SemanticInfo.cpp
-        SemanticInfo.h
         SymbolTable.cpp
         SymbolTable.h
         util.cpp

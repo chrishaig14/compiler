@@ -8,7 +8,7 @@
 #include "../simple_nodes/common/src/TypeFunction.h"
 #include "util.h"
 
-// USemanticInfo error_stub() {
+// sem::UCommon error_stub() {
 //     return std::make_unique<ErrorStub>();
 // }
 
@@ -373,7 +373,7 @@ UExpressionInfo Checker::dispatch_rvalue(ast::ExpNode& n) {
     __builtin_unreachable();
 }
 
-USemanticInfo Checker::dispatch(ast::Statement& nod) {
+sem::UCommon Checker::dispatch(ast::Statement& nod) {
     return this->dispatch_statement(nod, false);
 }
 
@@ -392,7 +392,7 @@ std::unique_ptr<sem::Top> Checker::dispatch_top(ast::TopNode& n) {
     __builtin_unreachable();
 }
 
-USemanticInfo Checker::dispatch_statement(ast::Statement& n, bool is_rvalue) {
+sem::UCommon Checker::dispatch_statement(ast::Statement& n, bool is_rvalue) {
     switch (n.ntype) {
         case StatementType::ASSIGN:
             return this->visit_assignment((ast::Assignment&) n);

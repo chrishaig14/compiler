@@ -146,9 +146,9 @@ std::pair<std::string, ast::Type*>* Checker::get_first_substitution(ast::Type& a
     }
 }
 
-USemanticInfo Checker::visit_import(ast::Import& node) {
+sem::UCommon Checker::visit_import(ast::Import& node) {
 
-    USemanticInfo info_u = std::make_unique<SemanticInfo>();
+    sem::UCommon info_u;
     return info_u;
 }
 
@@ -168,8 +168,8 @@ Entity* map_module_member_to_entity(ModuleMember& module_member) {
 }
 
 
-USemanticInfo Checker::visit_alias(ast::Alias& p_node) {
-    USemanticInfo info_u = std::make_unique<SemanticInfo>();
+sem::UCommon Checker::visit_alias(ast::Alias& p_node) {
+    sem::UCommon info_u;
     return info_u;
 }
 
