@@ -8,9 +8,9 @@
 #include "../simple_nodes/common/src/TypeFunction.h"
 #include "util.h"
 
-USemanticInfo error_stub() {
-    return std::make_unique<ErrorStub>();
-}
+// USemanticInfo error_stub() {
+//     return std::make_unique<ErrorStub>();
+// }
 
 UExpressionInfo exp_error_stub() {
     return std::make_unique<ExpErrorStub>();
@@ -117,7 +117,7 @@ bool is_generic(const sem::Type& t) {
     return false;
 }
 
-std::unique_ptr<SemanticInfo>
+UExpressionInfo
 Checker::match_arguments_to_generic_function(const ast::FunctionType& ft, ast::VectorOfTypes arg_types,
                                              std::map<std::string, ast::Type*>& all_substitutions) {
     std::unique_ptr<ast::FunctionType> f;
@@ -138,12 +138,12 @@ Checker::match_arguments_to_generic_function(const ast::FunctionType& ft, ast::V
         }
         sss += E_HLT("(" + args_str + ")");
         this->error_reporter.fail(sss);
-        return error_stub();
+        return exp_error_stub();
     }
     for (auto* at: arg_types) {
         delete at;
     }
-    USemanticInfo rv_p = std::make_unique<SemanticInfo>();
+    UExpressionInfo rv_p = std::make_unique<ExpressionInfo>();
     auto& rv = *rv_p;
     rv.set_entity(std::make_unique<EntityValue>(f->return_type->to_sem()).release());
     // delete f;

@@ -132,7 +132,6 @@ USemanticInfo Checker::visit_declaration(ast::Declaration& n) {
     } else {
         info_u = this->check_declaration_without_type(n);
     }
-    this->scope->set(n.identifier, info_u->entity.get());
     return info_u;
 }
 
@@ -147,7 +146,7 @@ USemanticInfo Checker::check_declaration_with_type(ast::Declaration& n) {
     sem::UType sem_type(type->to_sem());
     UExpressionInfo rvalue_sinfo = this->expect_rvalue_of_type(*sem_type, n.expression);
     if (rvalue_sinfo->is_error()) {
-        return error_stub();
+        return std::make_unique<SemanticInfo>();
     }
     USemanticInfo info_u = std::make_unique<SemanticInfo>();
     SemanticInfo& info = *info_u;
@@ -156,32 +155,34 @@ USemanticInfo Checker::check_declaration_with_type(ast::Declaration& n) {
     // auto ov = std::make_unique<Value>(sem_type.release());
     // this->fill_value(*ov);
     auto ov = this->make_value(sem_type.release());
-    info.set_entity(ov.release());
+    this->scope->set(n.identifier, *ov);
     return info_u;
 }
 
 USemanticInfo Checker::check_declaration_without_type(ast::Declaration& n) {
     UExpressionInfo exp_info_p = this->dispatch_rvalue(n.expression);
     if (exp_info_p->is_error()) {
-        return error_stub();
+        // return error_stub();
+        return std::make_unique<SemanticInfo>();
     }
     E_TYPE entity_type = exp_info_p->entity.get().e_type;
     if (entity_type != E_TYPE::CONST_FUNCTION && entity_type != E_TYPE::VALUE) {
         this->error_reporter.error(std::make_unique<ErrorExpectedExpression>(exp_info_p->entity, n.expression));
         // throw std::runtime_error("NOT A FVALUE; EXPECTE D EXPRESSION");
-        return error_stub();
+        // return error_stub();
+        return std::make_unique<SemanticInfo>();
     }
 
     USemanticInfo info_u = std::make_unique<SemanticInfo>();
     SemanticInfo& info = *info_u;
     sem::UExp u = std::move(exp_info_p->exp_snode);
     info.snode = std::make_unique<sem::Declaration>(n.identifier, std::move(u));
-    info.set_entity(exp_info_p->entity.get().clone());
-    if (info.entity.get().is_constfun()) {
+    this->scope->set(n.identifier, exp_info_p->entity);
+    if (exp_info_p->entity.get().is_constfun()) {
         Entity& entity_const_function = exp_info_p->entity;
         ConstFunction& const_function = entity_const_function.get_constfun().const_function;
         EntityValue* value_entity = std::make_unique<EntityValue>(const_function.const_function_ft.clone()).release();
-        info.set_entity(value_entity);
+        this->scope->set(n.identifier, *value_entity);
 
         if (value_entity->type.is_generic()) {
             this->error_reporter.fail(

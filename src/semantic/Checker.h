@@ -107,7 +107,7 @@ public:
     ast::UTypeNode substitute(const ast::Type& t, const std::string& var, const ast::Type& replacement);
     std::unique_ptr<ast::FunctionType> unify_function_call(const ast::FunctionType& fun, ast::VectorOfTypes& args,
                                                            std::map<std::string, ast::Type*>& all_substitutions);
-    std::unique_ptr<SemanticInfo>
+    UExpressionInfo
     match_arguments_to_generic_function(const ast::FunctionType& ft, ast::VectorOfTypes arg_types,
                                         std::map<std::string, ast::Type*>& all_substitutions);
     void fail(std::string msg);

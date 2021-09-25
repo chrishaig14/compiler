@@ -92,17 +92,20 @@ USemanticInfo Checker::visit_assignment(ast::Assignment& n) {
     UExpressionInfo expression_info_p = this->dispatch_rvalue(n.rvalue);
 
     if (linfo_p->is_error()) {
-        return error_stub();
+        // return error_stub();
+        return std::make_unique<SemanticInfo>();
     }
     if (expression_info_p->is_error()) {
-        return error_stub();
+        // return error_stub();
+        return std::make_unique<SemanticInfo>();
     }
 
     if (linfo_p->entity.get().e_type != E_TYPE::VALUE) {
         // this->error_reporter.error(std::make_unique<ErrorCantAssign>(n.lvalue));
         // this->error_reporter.fail("Cannot assign to this thing!");
         std::runtime_error("Error cant assignt to this thing!");
-        return error_stub();
+        // return error_stub();
+        return std::make_unique<SemanticInfo>();
     }
     EntityValue& e_value = linfo_p->entity.get().get_value();
 
@@ -112,7 +115,8 @@ USemanticInfo Checker::visit_assignment(ast::Assignment& n) {
             // this->error_reporter.error(std::make_unique<ErrorCantAssign>(n.lvalue));
             std::runtime_error("Error cant assignt to this thing!");
 
-            return error_stub();
+            // return error_stub();
+            return std::make_unique<SemanticInfo>();
         }
     }
 
@@ -151,7 +155,8 @@ USemanticInfo Checker::visit_assignment(ast::Assignment& n) {
             this->error_reporter.error(std::make_unique<ErrorTypeMismatch>(l_entity_value.type,
                                                                            n.rvalue,
                                                                            expression_info_p->entity));
-            return error_stub();
+            // return error_stub();
+            return std::make_unique<SemanticInfo>();
         }
         expression_info_p->exp_snode = std::move(rvalue_snode);
     }
@@ -190,12 +195,14 @@ USemanticInfo Checker::visit_return(ast::Return& n) {
     // }
     if (n.expression == nullptr) {
         // this->error_reporter.no_return(*return_type, n.start);
-        return error_stub();
+        // return error_stub();
+        return std::make_unique<SemanticInfo>();
     }
 
     UExpressionInfo expression_info_p = this->expect_rvalue_of_type(return_type, *n.expression);
     if (expression_info_p->is_error()) {
-        return error_stub();
+        // return error_stub();
+        return std::make_unique<SemanticInfo>();
     }
     auto& u = expression_info_p->exp_snode;
     auto sn = std::make_unique<sem::Return>(std::move(u));
@@ -238,7 +245,8 @@ USemanticInfo Checker::visit_match(ast::Match& node) {
                                                                                                                  sem::VectorOfTypes{})}),
                                                                        *node.exp,
                                                                        exp_info->entity));
-        return error_stub();
+        // return error_stub();
+        return std::make_unique<SemanticInfo>();
     }
 
     sem::TypeObject& ot = value.type.object();
@@ -251,7 +259,8 @@ USemanticInfo Checker::visit_match(ast::Match& node) {
                                                                                                                  sem::VectorOfTypes{})}),
                                                                        *node.exp,
                                                                        exp_info->entity));
-        return error_stub();
+        // return error_stub();
+        return std::make_unique<SemanticInfo>();
     }
     std::vector<std::pair<int, sem::Block*>> cas;
     std::string varname = "match_var";
@@ -267,7 +276,8 @@ USemanticInfo Checker::visit_match(ast::Match& node) {
         int union_index = target_union_type(ot, *p_type);
         if (union_index == -1) {
             this->error_reporter.fail("Error, type " + case_type.to_string() + " not part of " + ot.to_string());
-            return error_stub();
+            // return error_stub();
+            return std::make_unique<SemanticInfo>();
         }
         this->enter_scope("case");
         // auto v = std::make_unique<Value>(case_type.to_sem());
@@ -389,7 +399,8 @@ USemanticInfo Checker::visit_break(ast::Break& node) {
 USemanticInfo Checker::visit_while(ast::While& node) {
     UExpressionInfo condition_sinfo = this->expect_rvalue_of_type(sem::TypeObject("Boolean"), *node.condition);
     if (condition_sinfo->is_error()) {
-        return error_stub();
+        // return error_stub();
+        return std::make_unique<SemanticInfo>();
     }
     sem::UExp condition_snode = std::move(condition_sinfo->exp_snode);
 
@@ -418,7 +429,8 @@ USemanticInfo Checker::visit_while(ast::While& node) {
 USemanticInfo Checker::visit_if(ast::If& n) {
     UExpressionInfo condition_sinfo = this->expect_rvalue_of_type(sem::TypeObject("Boolean"), n.condition);
     if (condition_sinfo->is_error()) {
-        return error_stub();
+        // return error_stub();
+        return std::make_unique<SemanticInfo>();
     }
     auto& condition_snode = condition_sinfo->exp_snode;
 

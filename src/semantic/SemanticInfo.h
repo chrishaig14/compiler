@@ -15,18 +15,18 @@
 
 class SemanticInfo {
 public:
-    std::reference_wrapper<Entity> entity;
-    std::unique_ptr<Entity> _entity;
-
-    void set_entity(Entity* e) {
-        this->_entity = std::unique_ptr<Entity>(e);
-        this->entity = *e;
-    }
-
-    void set_entity(std::unique_ptr<Entity> e) {
-        this->_entity = std::move(e);
-        this->entity = *this->_entity;
-    }
+    // std::reference_wrapper<Entity> entity;
+    // std::unique_ptr<Entity> _entity;
+    //
+    // void set_entity(Entity* e) {
+    //     this->_entity = std::unique_ptr<Entity>(e);
+    //     this->entity = *e;
+    // }
+    //
+    // void set_entity(std::unique_ptr<Entity> e) {
+    //     this->_entity = std::move(e);
+    //     this->entity = *this->_entity;
+    // }
 
     sem::UCommon snode;
     bool is_tuple_member;
@@ -40,9 +40,9 @@ public:
     bool is_error();
 };
 
-class ErrorStub : public SemanticInfo {
-public:
-    ErrorStub();
-};
+// class ErrorStub : public SemanticInfo {
+// public:
+//     ErrorStub();
+// };
 
 #endif //SYMBOLINFO_H
