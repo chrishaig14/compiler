@@ -233,8 +233,7 @@ UExpressionInfo Checker::visit_defconst(ast::DefaultConstructor& node) {
     Entity& entity = class_info->entity;
     if (entity.type != E_TYPE::CLASS) {
         this->error_reporter.fail("Error not a class");
-        info.set_entity(new EntityError());
-        return info_u;
+        return exp_error_stub();
     }
     Class& cls = *((EntityClass&) entity).clazz;
     sem::VectorOfTypes t;
