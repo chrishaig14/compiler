@@ -57,7 +57,6 @@ public:
     }
 
     sem::UCommon snode;
-    sem::UExp exp_snode;
     bool is_tuple_member;
     ~SemanticInfo();
 
