@@ -24,6 +24,11 @@ public:
         this->entity = *e;
     }
 
+    void set_constfun(ConstFunction& cf) {
+        this->_entity = std::make_unique<EntityConstFunction>(cf);
+        this->entity = *this->_entity;
+    }
+
     void set_entity(std::unique_ptr<Entity> e) {
         this->_entity = std::move(e);
         this->entity = *this->_entity;
