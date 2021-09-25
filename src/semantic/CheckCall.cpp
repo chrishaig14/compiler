@@ -32,7 +32,7 @@ UExpressionInfo Checker::visit_callexp(ast::CallExp& n, bool is_rvalue) {
     ExpressionInfo& fun_info = *fun_info_p;
     // bool is_a_method = false;
     // Node* object_node;
-    if ((fun_info.entity.get().type != E_TYPE::CONST_FUNCTION && fun_info_p->entity.get().type != E_TYPE::VALUE)) {
+    if ((fun_info.entity.get().e_type != E_TYPE::CONST_FUNCTION && fun_info_p->entity.get().e_type != E_TYPE::VALUE)) {
         // this->error_reporter.error(std::make_unique<ErrorNotAFunction>(n));
         return exp_error_stub();
     }
@@ -165,26 +165,27 @@ UExpressionInfo Checker::visit_callexp(ast::CallExp& n, bool is_rvalue) {
 }
 
 const sem::TypeFunction& get_function_type(const ExpressionInfo& fun_info) {
-    if (fun_info.entity.get().type == E_TYPE::CONST_FUNCTION) {
-        return ((EntityConstFunction&) fun_info.entity.get()).const_function.const_function_ft;
+    if (fun_info.entity.get().e_type == E_TYPE::CONST_FUNCTION) {
+        return fun_info.entity.get().get_constfun().const_function.const_function_ft;
     } else {
         // value & kind = function
-        return (sem::TypeFunction&) ((Value&) fun_info.entity.get()).type;
+        return (sem::TypeFunction&) (fun_info.entity.get().get_value()).type;
     }
 }
 
-UExpressionInfo Checker::make_return_info(const ast::CallExp& n, bool is_rvalue, UExpressionInfo retv_p, bool is_def_const,
-                                          bool args_are_constant) {
+UExpressionInfo
+Checker::make_return_info(const ast::CallExp& n, bool is_rvalue, UExpressionInfo retv_p, bool is_def_const,
+                          bool args_are_constant) {
     UExpressionInfo retvp = std::move(retv_p);
     auto& retv = *retvp;
-    if (retv.entity.get().type == E_TYPE::NOTHING) {
+    if (retv.entity.get().e_type == E_TYPE::NOTHING) {
         if (is_rvalue) {
             // this->error_reporter.error(std::make_unique<ErrorExpectedExpression>(retv.entity, n));
             throw std::runtime_error("Error expected expression!");
             return exp_error_stub();
         }
-    } else if (retv.entity.get().type == E_TYPE::VALUE) {
-        Value& value = ((Value&) retv.entity.get());
+    } else if (retv.entity.get().e_type == E_TYPE::VALUE) {
+        EntityValue& value = retv.entity.get().get_value();
         if (value.type.kind == sem::Kind::OBJECT) {
             if (value.type.object().id == ".None") {
                 retv.set_entity(new EntityNothing());
@@ -211,9 +212,9 @@ bool Checker::check_arguments(ast::CallExp& n, std::vector<sem::UExp>& arguments
         Entity& arg_entity = *x;
         arg_entities.push_back(std::move(x));
         arguments.push_back(std::move(arg_type_p->exp_snode));
-        if (arg_entity.type == E_TYPE::CLASS || arg_entity.type == E_TYPE::PACKAGE ||
-            arg_entity.type == E_TYPE::MODULE || arg_entity.type == E_TYPE::ENUM ||
-            arg_entity.type == E_TYPE::NOTHING) {
+        if (arg_entity.e_type == E_TYPE::CLASS || arg_entity.e_type == E_TYPE::PACKAGE ||
+            arg_entity.e_type == E_TYPE::MODULE || arg_entity.e_type == E_TYPE::ENUM ||
+            arg_entity.e_type == E_TYPE::NOTHING) {
             has_error = true;
             // this->error_reporter.error(std::make_unique<ErrorExpectedExpression>(arg_entity, arg));
             throw std::runtime_error("Error, expected expression!");

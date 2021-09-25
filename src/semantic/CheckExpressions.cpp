@@ -9,7 +9,7 @@
 #include "../simple_nodes/common/include/TypeObject.h"
 #include "../simple_nodes/common/src/TypeFunction.h"
 
-Value& Checker::entity_value_from_actual_base_path_no_generic(const Path& p) {
+EntityValue& Checker::entity_value_from_actual_base_path_no_generic(const Path& p) {
     if (this->entity_values_no_generic.count(p.as_str()) == 0) {
         auto* ot = new sem::TypeObject(p.as_vec().back(), p);
         // auto v = std::make_unique<Value>(ot);
@@ -25,7 +25,7 @@ Value& Checker::entity_value_from_actual_base_path_no_generic(const Path& p) {
 UExpressionInfo Checker::visit_id(ast::Id& n) {
     // Logger::info("Checking id node " + n._id);
     Entity& entity = this->scope->get(n._id);
-    if (entity.type == E_TYPE::NOT_FOUND) {
+    if (entity.e_type == E_TYPE::NOT_FOUND) {
         this->error_reporter.error(std::make_unique<ErrorNotDeclared>(n));
         this->scope->set(n._id, EntityError());
         return exp_error_stub();
@@ -34,8 +34,8 @@ UExpressionInfo Checker::visit_id(ast::Id& n) {
     //         entity.type == E_TYPE::CONST_FUNCTION ? ((EntityConstFunction&) entity).const_function->path.as_str()
     //                                               : n._id;
     sem::UExp sn;
-    if (entity.type == E_TYPE::CONST_FUNCTION) {
-        sn = std::make_unique<sem::ConstFunction>(((EntityConstFunction&) entity).const_function.path);
+    if (entity.e_type == E_TYPE::CONST_FUNCTION) {
+        sn = std::make_unique<sem::ConstFunction>(entity.get_constfun().const_function.path);
     } else {
         std::string id = n._id;
         sn = std::make_unique<sem::Id>(id);
@@ -166,7 +166,7 @@ UExpressionInfo Checker::visit_unary(ast::UnaryOp& n) {
     }
     sem::UExp exp_snode = std::move(exp_info->exp_snode);
 
-    Value& entity_parent = (Value&) exp_info->entity.get();
+    EntityValue& entity_parent = exp_info->entity.get().get_value();
     Class* cls = entity_parent.clazz;
 
     auto subscript_it = cls->methods.find("__not__");
@@ -185,7 +185,7 @@ UExpressionInfo Checker::visit_unary(ast::UnaryOp& n) {
 
     UExpressionInfo info_u = std::make_unique<ExpressionInfo>();
     ExpressionInfo& info = *info_u;
-    info.set_entity(std::make_unique<Value>(rtype).release());
+    info.set_entity(std::make_unique<EntityValue>(rtype).release());
     info.exp_snode = std::move(csn);
     return info_u;
 }
@@ -196,11 +196,11 @@ UExpressionInfo Checker::visit_binop(ast::BinaryOp& n) {
         return exp_error_stub();
     }
     Entity& l_entity = left_info_p->entity.get();
-    if (l_entity.type != E_TYPE::VALUE) {
+    if (l_entity.e_type != E_TYPE::VALUE) {
         // this->error_reporter.error(std::make_unique<ErrorExpectedExpression>(l_entity, n.left));
         return exp_error_stub();
     }
-    Value& l_entity_v = (Value&) l_entity;
+    EntityValue& l_entity_v = l_entity.get_value();
     UExpressionInfo right_sinfo = this->expect_rvalue_of_type(l_entity_v.type, n.right);
     if (right_sinfo->is_error()) {
         return exp_error_stub();
@@ -236,23 +236,23 @@ UExpressionInfo Checker::visit_binop(ast::BinaryOp& n) {
     return info_u;
 }
 
-std::unique_ptr<Value> Checker::make_value(sem::Type* type) {
+std::unique_ptr<EntityValue> Checker::make_value(sem::Type* type) {
     if (type->kind != sem::Kind::OBJECT) {
         return nullptr;
     }
     if (type->object().id.size() == 1) {
         Entity& e = this->scope->get(type->object().id);
         Class* clazz;
-        if (e.type == E_TYPE::NOT_FOUND) {
+        if (e.e_type == E_TYPE::NOT_FOUND) {
             clazz = new Class(type->object().id, Path("core.generics" + type->object().id));
             // clazz->class_name = value.type->object().id;
         } else {
-            clazz = &((EntityClass&) e).clazz;
+            clazz = &e.get_class().clazz;
         }
         // assert(e.type == E_TYPE::CLASS);
         // value.clazz = clazz;
         // value.metatype = Meta::CLASS;
-        return std::make_unique<Value>(type, clazz);
+        return std::make_unique<EntityValue>(type, clazz);
     }
     ModuleMember* module_member_p = this->top_package.get(type->object().data.actual_base_path);
     if (module_member_p == nullptr) {
@@ -260,7 +260,7 @@ std::unique_ptr<Value> Checker::make_value(sem::Type* type) {
     }
     ModuleMember& module_member = *module_member_p;
     if (module_member.is_enumm()) {
-        auto value = std::make_unique<Value>(type);
+        auto value = std::make_unique<EntityValue>(type);
         value->enumm = &module_member.enumm();
         value->metatype = Meta::ENUM;
         return value;
@@ -274,21 +274,21 @@ std::unique_ptr<Value> Checker::make_value(sem::Type* type) {
     }
     // value.metatype = Meta::CLASS;
     // value.clazz = cls;
-    return std::make_unique<Value>(type, cls);
+    return std::make_unique<EntityValue>(type, cls);
 }
 
-void Checker::fill_value(Value& value) {
+void Checker::fill_value(EntityValue& value) {
     if (value.type.kind != sem::Kind::OBJECT) {
         return;
     }
     if (value.type.object().id.size() == 1) {
         Entity& e = this->scope->get(value.type.object().id);
         Class* clazz;
-        if (e.type == E_TYPE::NOT_FOUND) {
+        if (e.e_type == E_TYPE::NOT_FOUND) {
             clazz = new Class(value.type.object().id, Path("core.generics" + value.type.object().id));
             // clazz->class_name = value.type->object().id;
         } else {
-            clazz = &((EntityClass&) e).clazz;
+            clazz = &e.get_class().clazz;
         }
         // assert(e.type == E_TYPE::CLASS);
         value.clazz = clazz;
@@ -317,11 +317,11 @@ void Checker::fill_value(Value& value) {
 UExpressionInfo Checker::visit_subscript(ast::Subscript& node) {
     UExpressionInfo parent_p = this->dispatch_rvalue(*node.parent);
     Entity& entity_parent = parent_p->entity;
-    if (entity_parent.type != E_TYPE::VALUE || ((Value&) entity_parent).type.kind == sem::Kind::FUNCTION) {
+    if (entity_parent.e_type != E_TYPE::VALUE || entity_parent.get_value().type.kind == sem::Kind::FUNCTION) {
         this->error_reporter.fail("Error subscript of something that is not an object!");
         return exp_error_stub();
     }
-    Value& value = ((Value&) entity_parent);
+    EntityValue& value = entity_parent.get_value();
     Class* cls = value.clazz;
     if (cls == nullptr) {
         // its totally generic, fail
@@ -372,14 +372,15 @@ UExpressionInfo Checker::visit_ternary(ast::Ternary& node) {
     UExpressionInfo expression_info_p = this->dispatch_rvalue(*node.expression);
     ExpressionInfo& expression_info = *expression_info_p;
     Entity& p_entity = expression_info.entity;
-    if (p_entity.type != E_TYPE::VALUE || ((Value&) expression_info_p->entity).type.kind == sem::Kind::FUNCTION) {
+    if (p_entity.e_type != E_TYPE::VALUE ||
+        expression_info_p->entity.get().get_value().type.kind == sem::Kind::FUNCTION) {
         this->error_reporter.error(std::make_unique<ErrorTypeMismatch>(*new sem::TypeObject("Option",
                                                                                             {new sem::TypeObject("t")}),
                                                                        *node.expression,
                                                                        expression_info_p->entity));
         return exp_error_stub();
     }
-    sem::TypeObject& expression_type = ((Value&) p_entity).type.object();
+    sem::TypeObject& expression_type = p_entity.get_value().type.object();
 
     if (expression_type.id != "Option") {
         this->error_reporter.error(std::make_unique<ErrorTypeMismatch>(*new sem::TypeObject("Option",
@@ -390,12 +391,12 @@ UExpressionInfo Checker::visit_ternary(ast::Ternary& node) {
     }
     this->enter_scope("true_case");
     sem::Type& inner_type = *expression_type.type_params[0];
-    auto v = std::make_unique<Value>(inner_type.clone());
+    auto v = std::make_unique<EntityValue>(inner_type.clone());
     this->scope->set("it", *v);
     UExpressionInfo true_case_p = this->dispatch_rvalue(*node.true_case);
     ExpressionInfo& true_case = *true_case_p;
     this->leave_scope();
-    Value& true_value = (Value&) true_case.entity;
+    EntityValue& true_value = true_case.entity.get().get_value();
     UExpressionInfo false_case_sinfo = this->expect_rvalue_of_type(true_value.type, *node.false_case);
     if (false_case_sinfo->is_error()) {
         return exp_error_stub();

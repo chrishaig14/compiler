@@ -365,7 +365,7 @@ CppOutputCode STranspiler::transpile_if(sem::If& node) {
     CppOutputCode cond = this->dispatch(*node.condition);
     out += cond.pre_code;
     std::string condition_name = "cond_" + std::to_string(rand());
-    if (node.condition->type == SNodeType::CALL) {
+    if (node.condition->e_type == SNodeType::CALL) {
         out += TOBJECT + SPACE + condition_name + SPACE + ASSIGN + cond.code + SEMIC + NEWLINE;
     }
     CppOutputCode thenc = this->transpile_block(*node.then);

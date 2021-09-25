@@ -75,7 +75,7 @@ UExpressionInfo exp_error_stub();
 class Checker {
     int loop_count;
     bool add_this;
-    std::map<std::string, std::unique_ptr<Value>> entity_values_no_generic;
+    std::map<std::string, std::unique_ptr<EntityValue>> entity_values_no_generic;
     std::unordered_map<std::string, SymbolTable*> scopes;
     SymbolTable* scope;
     std::map<std::string, std::unique_ptr<Entity>> entities;
@@ -150,7 +150,7 @@ public:
     UExpressionInfo visit_list(ast::List& node);
     UExpressionInfo visit_member(ast::Member& n);
     UExpressionInfo visit_none(ast::None& node);
-    UExpressionInfo object_member(sem::UExp object_snode, Value& p_value, const std::string& child, ast::Member& n);
+    UExpressionInfo object_member(sem::UExp object_snode, EntityValue& p_value, const std::string& child, ast::Member& n);
     UExpressionInfo package_member(ast::Member& n, Package& package);
     UExpressionInfo module_member(ast::Member& n, Module& mod);
     UExpressionInfo enum_member(ast::Member& node, Enum& enumm);
@@ -164,7 +164,7 @@ public:
     USemanticInfo visit_alias(ast::Alias& p_node);
     sem::UExp make_rvalue(const Entity& t_entity, sem::UExp value_snode, const sem::Type& target);
     USemanticInfo dispatch(ast::Statement& nod);
-    void fill_value(Value& value);
+    void fill_value(EntityValue& value);
     void process_function_arguments(ExpressionInfo& retv, std::vector<std::unique_ptr<Entity>>& arg_entities,
                                     std::vector<sem::UExp>& arguments, ast::CallExp& n,
                                     const sem::TypeFunction& function_type, ExpressionInfo* fun_info_p);
@@ -179,10 +179,10 @@ public:
     // USemanticInfo visit_throw(ast::ThrowNode& n);
 
     USemanticInfo dispatch_statement(ast::Statement& n, bool is_rvalue);
-    Value& entity_value_from_actual_base_path_no_generic(const Path& p);
+    EntityValue& entity_value_from_actual_base_path_no_generic(const Path& p);
 
     std::map<std::string, std::unique_ptr<Class>> classes;
-    std::unique_ptr<Value> make_value(sem::Type* type);
+    std::unique_ptr<EntityValue> make_value(sem::Type* type);
     void init();
     sem::Exp* make_option_rvalue(sem::Exp* value_snode, const ast::Type* unaliased_value_type,
                                  const ast::Type* unaliased_target_type) const;
@@ -192,7 +192,7 @@ public:
     UExpressionInfo
     const_function_member(ast::Member& n, UExpressionInfo unique_ptr_1, ConstFunction& function);
     UExpressionInfo class_member(ast::Member& n, UExpressionInfo parent_info, Class& cls);
-    UExpressionInfo value_member(ast::Member& n, UExpressionInfo parent_info, Value& value);
+    UExpressionInfo value_member(ast::Member& n, UExpressionInfo parent_info, EntityValue& value);
 };
 
 #endif //CHECKER_H

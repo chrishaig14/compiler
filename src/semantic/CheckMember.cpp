@@ -12,20 +12,20 @@
 
 UExpressionInfo Checker::visit_member(ast::Member& n) {
     UExpressionInfo parent_info = this->dispatch_rvalue(n.parent);
-    Entity& parent_entity = parent_info->entity.get();
-    switch (parent_entity.type) {
+    Entity& parent_ent = parent_info->entity.get();
+    switch (parent_ent.e_type) {
         case E_TYPE::CLASS:
-            return this->class_member(n, std::move(parent_info), ((EntityClass&) parent_entity).clazz);
+            return this->class_member(n, std::move(parent_info), parent_ent.get_class().clazz);
         case E_TYPE::CONST_FUNCTION:
-            return this->const_function_member(n, std::move(parent_info), ((EntityConstFunction&) parent_entity).const_function);
+            return this->const_function_member(n, std::move(parent_info), parent_ent.get_constfun().const_function);
         case E_TYPE::VALUE:
-            return this->value_member(n, std::move(parent_info), (Value&) parent_entity);
+            return this->value_member(n, std::move(parent_info), parent_ent.get_value());
         case E_TYPE::PACKAGE:
-            return this->package_member(n, ((EntityPackage&) parent_entity).package);
+            return this->package_member(n, parent_ent.get_package().package);
         case E_TYPE::MODULE:
-            return this->module_member(n, ((EntityModule&) parent_entity).module);
+            return this->module_member(n, parent_ent.get_module().module);
         case E_TYPE::ENUM:
-            return this->enum_member(n, ((EntityEnum&) parent_entity).enumm);
+            return this->enum_member(n, parent_ent.get_enum().enumm);
         case E_TYPE::ERROR:
             break;
         case E_TYPE::NOT_FOUND:
@@ -64,7 +64,7 @@ TextPosition add_one_col(TextPosition t) {
 }
 
 UExpressionInfo
-Checker::object_member(sem::UExp object_snode, Value& p_value, const std::string& child, ast::Member& n) {
+Checker::object_member(sem::UExp object_snode, EntityValue& p_value, const std::string& child, ast::Member& n) {
     Path object_type_path = p_value.type.object().data.actual_base_path;
     // if (object_type_path.as_str() == "") {
     //     // is a single type param, error
@@ -90,10 +90,10 @@ Checker::object_member(sem::UExp object_snode, Value& p_value, const std::string
     assert(clazz != nullptr);
     if (clazz->members.count(child) != 0) {
         info.set_entity(clazz->member_entities.at(child)->clone());
-        if (info.entity.get().type == E_TYPE::NOTHING) {
+        if (info.entity.get().e_type == E_TYPE::NOTHING) {
             info.set_entity(entity_from_type(*clazz->members.at(child)));
             clazz->member_entities[child] = std::unique_ptr<Entity>(info.entity.get().clone());
-            Value& ev = (Value&) *clazz->member_entities[child];
+            EntityValue& ev = clazz->member_entities[child].get()->get_value();
             this->fill_value(ev);
         }
         auto omn = std::make_unique<sem::ObjectMember>(std::move(object_snode), clazz->path, child);

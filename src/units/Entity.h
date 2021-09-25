@@ -8,6 +8,7 @@
 #include <string>
 #include <map>
 #include <memory>
+#include "modulemember/ModuleMember.h"
 
 class Package;
 
@@ -15,7 +16,7 @@ class Module;
 
 class Class;
 
-class Value;
+class EntityValue;
 
 class ConstFunction;
 
@@ -76,155 +77,154 @@ public:
     }
 };
 
-enum class ModuleMemberType {
-    CONST_FUNCTION, CLASS, PACKAGE, MODULE, ENUM
-};
-std::ostream& operator<<(std::ostream& o, ModuleMemberType f);
-
-class ModuleMember {
-public:
-    virtual bool is_klass() {
-        return false;
-    }
-
-    virtual Class& klass() {
-        throw std::runtime_error("ModuleMember is not a Class");
-    }
-
-    virtual bool is_const_function() {
-        return false;
-    }
-
-    virtual ConstFunction& const_function() {
-        throw std::runtime_error("ModuleMember is not a ConstFunction");
-    }
-
-    virtual bool is_module() {
-        return false;
-    }
-
-    virtual Module& module() {
-        throw std::runtime_error("ModuleMember is not a Module");
-    }
-
-    virtual bool is_package() {
-        return false;
-    }
-
-    virtual Package& package() {
-        throw std::runtime_error("ModuleMember is not a Package");
-    }
-
-    virtual bool is_enumm() {
-        return false;
-    }
-
-    virtual Enum& enumm() {
-        throw std::runtime_error("ModuleMember is not a Enum");
-    }
-};
-
-class ClassModuleMember : public ModuleMember {
-    Class* _klass;
-public:
-    ClassModuleMember(Class* _klass) : _klass(_klass) {
-    }
-
-    bool is_klass() override {
-        return true;
-    }
-
-    Class& klass() override {
-        return *this->_klass;
-    }
-};
-
-class ConstFunctionModuleMember : public ModuleMember {
-    ConstFunction* _const_function;
-public:
-    ConstFunctionModuleMember(ConstFunction* _const_function) : _const_function(_const_function) {
-    }
-
-    bool is_const_function() override {
-        return true;
-    }
-
-    ConstFunction& const_function() override {
-        return *this->_const_function;
-    }
-};
-
-class ModuleModuleMember : public ModuleMember {
-    Module* _module;
-public:
-    ModuleModuleMember(Module* _module) : _module(_module) {
-    }
-
-    bool is_module() override {
-        return true;
-    }
-
-    Module& module() override {
-        return *this->_module;
-    }
-};
-
-class EnumModuleMember : public ModuleMember {
-    Enum* _enumm;
-public:
-    EnumModuleMember(Enum* _enumm) : _enumm(_enumm) {
-    }
-
-    bool is_enumm() override {
-        return true;
-    }
-
-    Enum& enumm() override {
-        return *this->_enumm;
-    }
-};
-
-
-class PackageModuleMember : public ModuleMember {
-    Package* _package;
-public:
-    PackageModuleMember(Package* _package) : _package(_package) {
-    }
-
-    bool is_package() override {
-        return true;
-    }
-
-    Package& package() override {
-        return *this->_package;
-    }
-};
-
-
 enum class E_TYPE {
     PACKAGE, MODULE, CLASS, VALUE, CONST_FUNCTION, ERROR, NOT_FOUND, ENUM, NOTHING
 };
 
+class EntityClass;
+
+class EntityValue;
+
+class EntityModule;
+
+class EntityPackage;
+
+class EntityValue;
+
+class EntityNothing;
+
+class EntityNotFound;
+
+class EntityError;
+
+class EntityConstFunction;
+
+class EntityEnum;
+
 class Entity {
 protected:
-    explicit Entity(E_TYPE type) : type(type) {
+    explicit Entity(E_TYPE type) : e_type(type) {
     }
 
 public:
     virtual Entity* clone() const = 0;
     virtual ~Entity() = default;
-    const E_TYPE type;
+    const E_TYPE e_type;
     virtual bool equal(const Entity& other) const = 0;
 
     bool operator==(const Entity& rhs) const {
 
-        bool tp = type == rhs.type;
+        bool tp = e_type == rhs.e_type;
         return tp;
     }
 
     bool operator!=(const Entity& rhs) const {
         return !(rhs == *this);
     }
+
+    virtual bool is_class() const {
+        return false;
+    }
+
+    virtual bool is_package() const {
+        return false;
+    }
+
+    virtual bool is_module() const {
+        return false;
+    }
+
+    virtual bool is_nothing() const {
+        return false;
+    }
+
+    virtual bool is_constfun() const {
+        return false;
+    }
+
+    virtual bool is_error() const {
+        return false;
+    }
+
+    virtual bool is_value() const {
+        return false;
+    }
+
+    virtual EntityClass& get_class() {
+        throw std::runtime_error("Not an EntityClass");
+    }
+
+    virtual EntityPackage& get_package() {
+        throw std::runtime_error("Not an EntityPackage");
+    }
+
+    virtual EntityNothing& get_nothing() {
+        throw std::runtime_error("Not an EntityNothing");
+    }
+
+    virtual EntityModule& get_module() {
+        throw std::runtime_error("Not an EntityModule");
+    }
+
+    virtual EntityConstFunction& get_constfun() {
+        throw std::runtime_error("Not an EntityConstFunction");
+    }
+
+    virtual EntityNotFound& get_notfound() {
+        throw std::runtime_error("Not an EntityNotFound");
+    }
+
+    virtual EntityError& get_error() {
+        throw std::runtime_error("Not an EntityError");
+    }
+
+
+    virtual EntityEnum& get_enum() {
+        throw std::runtime_error("Not an EntityEnum");
+    }
+
+    virtual EntityValue& get_value() {
+        throw std::runtime_error("Not an EntityValue");
+    }
+
+
+    virtual const EntityClass& get_class() const {
+        throw std::runtime_error("Not an EntityClass");
+    }
+
+    virtual const EntityPackage& get_package() const {
+        throw std::runtime_error("Not an EntityPackage");
+    }
+
+    virtual const EntityNothing& get_nothing() const {
+        throw std::runtime_error("Not an EntityNothing");
+    }
+
+    virtual const EntityModule& get_module() const {
+        throw std::runtime_error("Not an EntityModule");
+    }
+
+    virtual const EntityConstFunction& get_constfun() const {
+        throw std::runtime_error("Not an EntityConstFunction");
+    }
+
+    virtual const EntityNotFound& get_notfound() const {
+        throw std::runtime_error("Not an EntityNotFound");
+    }
+
+    virtual const EntityError& get_error() const {
+        throw std::runtime_error("Not an EntityError");
+    }
+
+
+    virtual const EntityEnum& get_enum() const {
+        throw std::runtime_error("Not an EntityEnum");
+    }
+
+    virtual const EntityValue& get_value() const {
+        throw std::runtime_error("Not an EntityValue");
+    }
+
 };
 
 class EntityClass : public Entity {
@@ -242,6 +242,14 @@ public:
     }
 
     Class& clazz;
+
+    EntityClass& get_class() override {
+        return *this;
+    }
+
+    const EntityClass& get_class() const override {
+        return *this;
+    }
 };
 
 class EntityPackage : public Entity {
@@ -258,6 +266,14 @@ public:
     }
 
     Package& package;
+
+    EntityPackage& get_package() override {
+        return *this;
+    }
+
+    const EntityPackage& get_package() const override {
+        return *this;
+    }
 };
 
 class EntityNothing : public Entity {
@@ -272,6 +288,14 @@ public:
 
     Entity* clone() const override {
         return new EntityNothing();
+    }
+
+    EntityNothing& get_nothing() override {
+        return *this;
+    }
+
+    const EntityNothing& get_nothing() const override {
+        return *this;
     }
 };
 
@@ -289,6 +313,14 @@ public:
     }
 
     Module& module;
+
+    EntityModule& get_module() override {
+        return *this;
+    }
+
+    const EntityModule& get_module() const override {
+        return *this;
+    }
 };
 
 
@@ -307,6 +339,14 @@ public:
     Entity* clone() const override {
         return new EntityConstFunction(this->const_function);
     }
+
+    EntityConstFunction& get_constfun() override {
+        return *this;
+    }
+
+    const EntityConstFunction& get_constfun() const override {
+        return *this;
+    }
 };
 
 class EntityEnum : public Entity {
@@ -320,6 +360,14 @@ public:
 
     Entity* clone() const override {
         return new EntityEnum(this->enumm);
+    }
+
+    EntityEnum& get_enum() override {
+        return *this;
+    }
+
+    const EntityEnum& get_enum() const override {
+        return *this;
     }
 
     Enum& enumm;
@@ -337,6 +385,14 @@ public:
     EntityNotFound* clone() const override {
         return new EntityNotFound();
     }
+
+    EntityNotFound& get_notfound() override {
+        return *this;
+    }
+
+    const EntityNotFound& get_notfound() const override {
+        return *this;
+    }
 };
 
 class EntityError : public Entity {
@@ -350,6 +406,14 @@ public:
 
     EntityError* clone() const override {
         return new EntityError();
+    }
+
+    EntityError& get_error() override {
+        return *this;
+    }
+
+    const EntityError& get_error() const override {
+        return *this;
     }
 };
 

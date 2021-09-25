@@ -180,7 +180,7 @@ UExpressionInfo Checker::enum_member(ast::Member& node, Enum& enumm) {
     for (size_t i = 0; i < enumm.values.size(); i++) {
         if (value == enumm.values[i]) {
             auto* otype = new sem::TypeObject(enumm.enumm_name, enumm.path);
-            auto ov = std::make_unique<Value>(otype);
+            auto ov = std::make_unique<EntityValue>(otype);
             info.set_entity(ov.release());
             // this->fill_value(info.entity.value);
             info.exp_snode = std::make_unique<sem::EnumMember>(enumm.path.as_str(), value);
@@ -197,7 +197,7 @@ std::unique_ptr<Entity> Checker::entity_from_type(const ast::Type& type) {
         return std::unique_ptr<Entity>(this->entities[type.to_string()]->clone());
     }
     if (type.kind == Kind::FUNCTION) {
-        auto fv = std::make_unique<Value>(type.to_sem());
+        auto fv = std::make_unique<EntityValue>(type.to_sem());
         this->entities[type.to_string()] = std::unique_ptr<Entity>(fv->clone());
         return fv;
     }
@@ -207,14 +207,14 @@ std::unique_ptr<Entity> Checker::entity_from_type(const ast::Type& type) {
             return std::make_unique<EntityNothing>();
         }
     }
-    auto fv = std::make_unique<Value>(type.to_sem());
+    auto fv = std::make_unique<EntityValue>(type.to_sem());
     this->entities[type.to_string()] = std::unique_ptr<Entity>(fv->clone());
     return fv;
 }
 
-UExpressionInfo Checker::value_member(ast::Member& n, UExpressionInfo parent_info, Value& value) {
+UExpressionInfo Checker::value_member(ast::Member& n, UExpressionInfo parent_info, EntityValue& value) {
     if (value.type.kind == sem::Kind::FUNCTION) {
-        this->error_reporter.error(std::make_unique<ErrorNoMember>(((EntityConstFunction&) value).const_function.const_function_ft,
+        this->error_reporter.error(std::make_unique<ErrorNoMember>(value.get_constfun().const_function.const_function_ft,
                                                                    n));
         return exp_error_stub();
     }

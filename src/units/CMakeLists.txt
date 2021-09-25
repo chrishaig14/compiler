@@ -22,4 +22,4 @@ add_library(
         Package.cpp
         Package.h
         ../util/macros.h
-        ../util/types.h)
+        ../util/types.h modulemember/ModuleMember.cpp modulemember/ModuleMember.h)

@@ -53,7 +53,7 @@ UExpressionInfo Checker::visit_none(ast::None& node) {
     UExpressionInfo info_u = std::make_unique<ExpressionInfo>();
     ExpressionInfo& info = *info_u;
     // info.set_type(ObjectType("NoneType"));
-    auto v = std::make_unique<Value>(new sem::TypeObject("NoneType"));
+    auto v = std::make_unique<EntityValue>(new sem::TypeObject("NoneType"));
     info.set_entity(v.release());
     info.exp_snode = std::make_unique<sem::None>();
     return info_u;
@@ -94,7 +94,7 @@ UExpressionInfo Checker::visit_tuple(ast::Tuple& node) {
     for (auto& n: node.values) {
         UExpressionInfo vtype = this->dispatch_rvalue(*n);
         values.push_back(std::move(vtype->exp_snode));
-        types.emplace_back(((Value&) vtype->entity.get()).type.clone());
+        types.emplace_back(vtype->entity.get().get_value().type.clone());
         // if (!this->is_immutable(vtype->type())) {
         //     this->error_reporter.tuple_member_not_immutable(vtype->type(), node.start);
         //     return error_stub();
@@ -104,7 +104,7 @@ UExpressionInfo Checker::visit_tuple(ast::Tuple& node) {
     auto& sinfo = *sinfo_p;
     unsigned long num_values = node.values.size();
     auto* otype = new sem::TypeObject("Tuple", types, Path("core.Tuple" + std::to_string(num_values)));
-    auto ov = std::make_unique<Value>(otype);
+    auto ov = std::make_unique<EntityValue>(otype);
     ov->metatype = Meta::CLASS;
 
     ov->clazz = new Class("Tuple", Path("libcore.libcore.Tuple"));
@@ -129,9 +129,9 @@ UExpressionInfo Checker::visit_partial(ast::PartialApplication& node) {
     sem::VectorOfTypes partial_args;
     ast::FunctionType* fun_type = nullptr;
     Entity& f_entity = func->entity;
-    if (f_entity.type == E_TYPE::CONST_FUNCTION ||
-        (f_entity.type == E_TYPE::VALUE && ((Value&) f_entity).type.kind == sem::Kind::FUNCTION)) {
-        fun_type = (ast::FunctionType*) ((EntityConstFunction&) f_entity).const_function.const_function_ft.to_ast();
+    if (f_entity.e_type == E_TYPE::CONST_FUNCTION ||
+        (f_entity.e_type == E_TYPE::VALUE && (f_entity.get_value()).type.kind == sem::Kind::FUNCTION)) {
+        fun_type = (ast::FunctionType*) f_entity.get_constfun().const_function.const_function_ft.to_ast();
     } else {
         this->error_reporter.fail("Error: expected a function for partial application");
         return exp_error_stub();
@@ -160,8 +160,8 @@ UExpressionInfo Checker::visit_partial(ast::PartialApplication& node) {
     node.complete_type = &fun_type->clone()->function();
     UExpressionInfo s_p = std::make_unique<ExpressionInfo>();
     auto& s = *s_p;
-    s.entity = *std::make_unique<Value>(new sem::TypeFunction(partial_args,
-                                                              sem::UType(fun_type->return_type->to_sem())));
+    s.entity = *std::make_unique<EntityValue>(new sem::TypeFunction(partial_args,
+                                                                    sem::UType(fun_type->return_type->to_sem())));
     auto non = std::make_unique<sem::NewObject>();
     non->class_name = "Partial" + std::to_string(npartial);
     non->args = std::move(snodes);
@@ -175,8 +175,8 @@ UExpressionInfo Checker::visit_dict(ast::DictNode& node) {
     ExpressionInfo& info = *info_u;
     UExpressionInfo first_key_info = this->dispatch_rvalue(node.items[0].first);
     UExpressionInfo first_value_info = this->dispatch_rvalue(node.items[0].second);
-    Value& first_key_entity = (Value&) first_key_info->entity.get();
-    Value& first_value_entity = (Value&) first_value_info->entity.get();
+    EntityValue& first_key_entity = first_key_info->entity.get().get_value();
+    EntityValue& first_value_entity = first_value_info->entity.get().get_value();
     sem::TypeObject& first_key_type = first_key_entity.type.object();
     sem::TypeObject& first_value_type = first_value_entity.type.object();
 
@@ -231,11 +231,11 @@ UExpressionInfo Checker::visit_defconst(ast::DefaultConstructor& node) {
     ExpressionInfo& info = *info_u;
     UExpressionInfo class_info = this->dispatch_rvalue(*node.class_node);
     Entity& entity = class_info->entity;
-    if (entity.type != E_TYPE::CLASS) {
+    if (entity.e_type != E_TYPE::CLASS) {
         this->error_reporter.fail("Error not a class");
         return exp_error_stub();
     }
-    Class& cls = ((EntityClass&) entity).clazz;
+    Class& cls = entity.get_class().clazz;
     sem::VectorOfTypes t;
     for (auto* pt: cls.member_types) {
         t.push_back(pt->to_sem());
@@ -256,12 +256,12 @@ UExpressionInfo Checker::visit_defconst(ast::DefaultConstructor& node) {
 
 UExpressionInfo Checker::visit_list(ast::List& node) {
     UExpressionInfo element_type_p = this->dispatch_rvalue(node.elements[0]);
-    if (element_type_p->entity.get().type != E_TYPE::VALUE) {
+    if (element_type_p->entity.get().e_type != E_TYPE::VALUE) {
         throw std::runtime_error("Expected expression");
         // this->error_reporter.error(std::make_unique<ErrorExpectedExpression>(element_type_p->entity, node.elements[0]));
         return exp_error_stub();
     }
-    Value& entity_value = (Value&) element_type_p->entity.get();
+    EntityValue& entity_value = element_type_p->entity.get().get_value();
     sem::Type& element_type = entity_value.type;
     bool is_constant = true;
     std::vector<sem::UExp> list_elements;
@@ -273,7 +273,7 @@ UExpressionInfo Checker::visit_list(ast::List& node) {
         // if (!current_type_p->is_constant) {
         //     is_constant = false;
         // }
-        Value& p_entity = (Value&) current_type_p->entity.get();
+        EntityValue& p_entity = current_type_p->entity.get().get_value();
         sem::TypeObject* ctype = &p_entity.type.object();
         if (*ctype != element_type) {
             this->error_reporter.error(std::make_unique<ErrorTypeMismatch>(element_type, node.elements[i], p_entity));

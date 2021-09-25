@@ -19,7 +19,7 @@ SemanticInfo::~SemanticInfo() {
 }
 
 bool SemanticInfo::is_error() {
-    return this->entity.get().type == E_TYPE::ERROR;
+    return this->entity.get().e_type == E_TYPE::ERROR;
 }
 
 ExpressionInfo::ExpressionInfo() : entity(nothing) {
@@ -33,7 +33,7 @@ ExpressionInfo::~ExpressionInfo() {
 }
 
 bool ExpressionInfo::is_error() {
-    return this->entity.get().type == E_TYPE::ERROR;
+    return this->entity.get().e_type == E_TYPE::ERROR;
 }
 
 ErrorStub::ErrorStub() {

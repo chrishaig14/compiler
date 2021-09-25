@@ -145,7 +145,7 @@ Checker::match_arguments_to_generic_function(const ast::FunctionType& ft, ast::V
     }
     USemanticInfo rv_p = std::make_unique<SemanticInfo>();
     auto& rv = *rv_p;
-    rv.set_entity(std::make_unique<Value>(f->return_type->to_sem()).release());
+    rv.set_entity(std::make_unique<EntityValue>(f->return_type->to_sem()).release());
     // delete f;
     return rv_p;
 }
@@ -223,7 +223,7 @@ Class* Checker::instantiate_generic(const Class& generic, const ast::ObjectType&
                 std::cout << "----------- Generic with implicit which is class parameter: " << method_cf.first
                           << std::endl;
                 std::unique_ptr<Entity> e = entity_from_type(*instance.type_params[0]);
-                auto& v = (std::unique_ptr<Value>&) e;
+                auto& v = (std::unique_ptr<EntityValue>&) e;
                 this->fill_value(*v);
                 Class* clazz_t = v->clazz;
                 auto meth = clazz_t->methods.find(implicit->method);

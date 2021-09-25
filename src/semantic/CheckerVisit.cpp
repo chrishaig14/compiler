@@ -60,7 +60,7 @@ sem::Common* make_for_snode(ast::For& node, std::unique_ptr<sem::Block>& binfo, 
 
 std::unique_ptr<sem::EnumDef> Checker::visit_enum(ast::EnumNode& p_node) {
     USemanticInfo info_u = std::make_unique<SemanticInfo>();
-    Enum& enumm = ((EntityEnum&) this->scope->get(p_node.id)).enumm;
+    Enum& enumm = this->scope->get(p_node.id).get_enum().enumm;
     auto esn = std::make_unique<sem::EnumDef>(enumm.path.as_str(), p_node.values);
     return esn;
 }
@@ -273,7 +273,7 @@ std::unique_ptr<sem::FunctionDef> Checker::visit_function(ast::Function& n) {
         ast::UTypeNode cl(type.clone());
         make_not_generic(*cl);
         auto te = entity_from_type(*cl);
-        this->fill_value(*((std::unique_ptr<Value>&) te));
+        this->fill_value(*((std::unique_ptr<EntityValue>&) te));
         this->scope->set(n.parameter_names[i], *te);
         // if (!param_type.is_generic()) {
         //     if (param_type.kind == Kind::OBJECT) {
@@ -303,7 +303,7 @@ std::unique_ptr<sem::FunctionDef> Checker::visit_function(ast::Function& n) {
     this->scope->set("__return__", *e);
     auto bn = this->visit_block(*n.body);
     for (auto& local_var: this->scope->table) {
-        if (local_var.second->type == E_TYPE::VALUE) {
+        if (local_var.second->e_type == E_TYPE::VALUE) {
             bn->locals.push_back(local_var.first);
         }
     }

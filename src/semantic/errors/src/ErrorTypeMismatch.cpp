@@ -37,7 +37,7 @@ ErrorTypeMismatch::ErrorTypeMismatch(const sem::Type& expected, TextPosition sta
 
 bool ErrorTypeMismatch::equal(const Error& other) const {
     const auto& o = (const ErrorTypeMismatch&) other;
-    bool act = *o.actual == *this->actual && (((Value&) *o.actual).type == ((Value&) *this->actual).type);
+    bool act = *o.actual == *this->actual && o.actual->get_value().type == this->actual->get_value().type;
     bool exp = *o.expected == *this->expected;
     bool val = o.start == this->start && o.end == this->end;
     return act && exp && val;

@@ -12,7 +12,7 @@ UExpressionInfo Checker::expect_rvalue_of_type(const sem::Type& target, ast::Exp
         return exp_error_stub();
     }
     Entity& r_entity = rinfo->entity.get();
-    if (r_entity.type != E_TYPE::VALUE && r_entity.type != E_TYPE::CONST_FUNCTION) {
+    if (r_entity.e_type != E_TYPE::VALUE && r_entity.e_type != E_TYPE::CONST_FUNCTION) {
         this->error_reporter.error(std::make_unique<ErrorTypeMismatch>(target, node, r_entity));
         return exp_error_stub();
     }
@@ -26,8 +26,8 @@ UExpressionInfo Checker::expect_rvalue_of_type(const sem::Type& target, ast::Exp
 }
 
 sem::UExp Checker::make_rvalue(const Entity& t_entity, sem::UExp value_snode, const sem::Type& target) {
-    if (t_entity.type == E_TYPE::VALUE) {
-        Value& value_entity = (Value&) t_entity;
+    if (t_entity.e_type == E_TYPE::VALUE) {
+        const EntityValue& value_entity = t_entity.get_value();
         if (value_entity.type.kind != target.kind) {
             return nullptr;
         }
@@ -67,13 +67,12 @@ sem::UExp Checker::make_rvalue(const Entity& t_entity, sem::UExp value_snode, co
 
         if (unaliased_target_type_id == "Option") {
             return sem::UExp(make_option_rvalue(value_snode.release(),
-                                             unaliased_value_type->to_ast(),
-                                             unaliased_target_type->to_ast()));
+                                                unaliased_value_type->to_ast(),
+                                                unaliased_target_type->to_ast()));
         }
 
-    } else if (t_entity.type == E_TYPE::CONST_FUNCTION) {
-        EntityConstFunction& const_function_entity = (EntityConstFunction&) t_entity;
-        if (const_function_entity.const_function.const_function_ft == target) {
+    } else if (t_entity.e_type == E_TYPE::CONST_FUNCTION) {
+        if (t_entity.get_constfun().const_function.const_function_ft == target) {
             return value_snode;
         } else {
             return nullptr;
@@ -87,7 +86,7 @@ sem::UExp Checker::make_rvalue(const Entity& t_entity, sem::UExp value_snode, co
 }
 
 sem::Exp* Checker::make_option_rvalue(sem::Exp* value_snode, const ast::Type* unaliased_value_type,
-                                        const ast::Type* unaliased_target_type) const {
+                                      const ast::Type* unaliased_target_type) const {
     if (*unaliased_target_type->object().type_params[0] == *unaliased_value_type ||
         unaliased_value_type->object().id == "NoneType") {
         return value_snode;
@@ -96,7 +95,7 @@ sem::Exp* Checker::make_option_rvalue(sem::Exp* value_snode, const ast::Type* un
 }
 
 sem::UExp Checker::make_union_rvalue(sem::UExp value_snode, const sem::Type* unaliased_value_type,
-                                  const sem::Type* unaliased_target_type) const {
+                                     const sem::Type* unaliased_target_type) const {
     int union_index = target_union_type(unaliased_target_type->object(), unaliased_value_type->object());
     if (union_index != -1) {
         return sem::UExp(make_union_wrapper(union_index, std::move(value_snode)));
@@ -166,7 +165,7 @@ USemanticInfo Checker::check_declaration_without_type(ast::Declaration& n) {
     if (exp_info_p->is_error()) {
         return error_stub();
     }
-    E_TYPE entity_type = exp_info_p->entity.get().type;
+    E_TYPE entity_type = exp_info_p->entity.get().e_type;
     if (entity_type != E_TYPE::CONST_FUNCTION && entity_type != E_TYPE::VALUE) {
         this->error_reporter.error(std::make_unique<ErrorExpectedExpression>(exp_info_p->entity, n.expression));
         // throw std::runtime_error("NOT A FVALUE; EXPECTE D EXPRESSION");
@@ -178,10 +177,10 @@ USemanticInfo Checker::check_declaration_without_type(ast::Declaration& n) {
     sem::UExp u = std::move(exp_info_p->exp_snode);
     info.snode = std::make_unique<sem::Declaration>(n.identifier, std::move(u));
     info.set_entity(exp_info_p->entity.get().clone());
-    if (info.entity.get().type == E_TYPE::CONST_FUNCTION) {
+    if (info.entity.get().e_type == E_TYPE::CONST_FUNCTION) {
         Entity& entity_const_function = exp_info_p->entity;
-        ConstFunction& const_function = ((EntityConstFunction&) entity_const_function).const_function;
-        Value* value_entity = std::make_unique<Value>(const_function.const_function_ft.clone()).release();
+        ConstFunction& const_function = entity_const_function.get_constfun().const_function;
+        EntityValue* value_entity = std::make_unique<EntityValue>(const_function.const_function_ft.clone()).release();
         info.set_entity(value_entity);
 
         if (value_entity->type.is_generic()) {
