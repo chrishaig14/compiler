@@ -673,6 +673,51 @@ TEST_CASE("if_ok", "[checker]") {
     REQUIRE_CHECKER_OK();
 }
 
+TEST_CASE("for_ok", "[checker]") {
+    std::string code = R"(fun foo()->Integer{
+    for x @ [1,2,3,4] {
+        var i = x
+    }
+    return 0
+}
+)";
+
+    CHECKER();
+    checker.init();
+    auto sem_func = checker.visit_function(module.ast->functions[0]);
+
+    REQUIRE_CHECKER_OK();
+
+    std::vector<sem::UExp> e;
+    e.push_back(std::make_unique<sem::Integer>("1"));
+    e.push_back(std::make_unique<sem::Integer>("2"));
+    e.push_back(std::make_unique<sem::Integer>("3"));
+    e.push_back(std::make_unique<sem::Integer>("4"));
+    auto list = std::make_unique<sem::List>(std::move(e));
+    auto body = std::make_unique<sem::Block>();
+    body->nodes.push_back(std::make_unique<sem::Declaration>("i", std::make_unique<sem::Id>("x")));
+    REQUIRE(*sem_func.get()->body->nodes[0] == sem::For("x", std::move(list), std::move(body)));
+}
+
+TEST_CASE("for_error_no_list", "[checker]") {
+    std::string code = R"(fun foo()->Integer{
+    for x @ false {
+        var i = x
+    }
+    return 0
+}
+    )";
+
+    CHECKER();
+    checker.init();
+    checker.visit_root(*module.ast);
+    ast::ExpNode& exp = static_cast<ast::For&>(*module.ast->functions[0].get().body->nodes[0]).exp;
+
+    REQUIRE_CHECKER_ONE_ERROR();
+    Error& error = *checker.error_reporter.errors.back();
+    REQUIRE(error == ErrorFor(*checker.entity_from_type(ast::ObjectType("Boolean")), exp.start));
+}
+
 TEST_CASE("if_boolean_error", "[checker]") {
     std::string code = "fun foo()->Integer{if 5 {var x = 1;}return 0;}";
 
