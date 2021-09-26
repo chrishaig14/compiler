@@ -8,6 +8,8 @@ class Boolean:
 class String:
     def __init__(self, value):
         self.value = value
+    def len(self):
+        return Integer(len(self.value))
 
 
 class Integer:
