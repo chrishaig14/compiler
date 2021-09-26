@@ -215,12 +215,12 @@ PythonOutputCode PythonTranspiler::transpile_class(const sem::KlassDef& node) {
 }
 
 PythonOutputCode PythonTranspiler::transpile_object_member(const sem::ObjectMember& node) {
-    std::string out;
     PythonOutputCode object = this->dispatch_expression(*node.object, false);
-    out += object.pre_code;
-    out += "CAST" + LPAREN + object.code + COMMA + SPACE + (node.class_path.as_str()) + RPAREN + "->" +
-           node.member_name;
-    return PythonOutputCode("", out);
+    std::string obj_id = "obj_" + std::to_string(this->next_arg_n());
+    std::string pre_code =
+            (object.pre_code.empty() ? "" : object.pre_code + "\n") + obj_id + " = " + object.code + "\n";
+    std::string code = obj_id + "." + node.member_name;
+    return PythonOutputCode(pre_code, code);
 }
 
 PythonOutputCode PythonTranspiler::transpile_while(const sem::While& node) {
@@ -521,17 +521,21 @@ PythonOutputCode PythonTranspiler::transpile_object_method(const sem::ObjectMeth
     return PythonOutputCode(pre_code, code);
 }
 
-PythonOutputCode PythonTranspiler::transpile_const_function(const sem::ConstFunction& function) {
-    std::string fpath = function.path.as_str();
-    std::string ff = fpath.substr(0, this->module_path.as_str().size() + 1);
-    if (ff == this->module_path.as_str() + ".") {
-        fpath = function.path.as_vec().back();
+std::string clean_path(Path a, Path b) {
+    std::string ff = a.as_str().substr(0, b.as_str().size() + 1);
+    if (ff == b.as_str() + ".") {
+        return a.as_vec().back();
     }
-    return PythonOutputCode("", fpath);
+    return a.as_str();
+}
+
+PythonOutputCode PythonTranspiler::transpile_const_function(const sem::ConstFunction& function) {
+    return PythonOutputCode("", clean_path(function.path, this->module_path));
 }
 
 PythonOutputCode PythonTranspiler::transpile_object_constructor(const sem::ObjectConstructor& constructor) {
-    return PythonOutputCode("", "");
+    std::string code = clean_path(constructor.class_path, this->module_path);
+    return PythonOutputCode("", code);
 }
 
 PythonOutputCode PythonTranspiler::transpile_call_exp(const sem::CallExp& node) {
