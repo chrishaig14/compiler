@@ -80,13 +80,14 @@ public:
     std::string source;
     std::string static_cleanups;
     std::string static_initializations;
-    std::string transpile_module(const sem::Module& block);
+    std::string transpile_module(const sem::Module& block, Path module_path);
 
     void indent();
     PythonOutputCode transpile_enum(const sem::EnumDef& node);
     void transpile_program(const sem::Module& node);
     void unindent();
     PythonOutputCode transpile_call_exp(const sem::CallExp& exp);
+    Path module_path;
 };
 
 

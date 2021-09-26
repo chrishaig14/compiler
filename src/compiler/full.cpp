@@ -33,7 +33,7 @@ int main(int argc, char* argv[]) {
     }
     PythonTranspiler transpiler;
     Module& module = compiler.root_package.units.at("main")->module();
-    std::string module_code = transpiler.transpile_module(*module.sast);
+    std::string module_code = transpiler.transpile_module(*module.sast, module.path);
     std::cout << module_code << std::endl;
     std::ofstream out_module(path_join(project_output_dir, "out.py"));
     for (auto& import: module.imported_paths_no_alias) {

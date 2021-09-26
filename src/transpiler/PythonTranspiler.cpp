@@ -373,7 +373,8 @@ PythonOutputCode PythonTranspiler::transpile_try_catch(const sem::TryCatch& node
     return PythonOutputCode("", "");
 }
 
-std::string PythonTranspiler::transpile_module(const sem::Module& block) {
+std::string PythonTranspiler::transpile_module(const sem::Module& block, Path path) {
+    this->module_path = path;
     std::string code;
     for (auto& n: block.nodes) {
         PythonOutputCode definition_output = this->dispatch_top(*n);
@@ -521,7 +522,12 @@ PythonOutputCode PythonTranspiler::transpile_object_method(const sem::ObjectMeth
 }
 
 PythonOutputCode PythonTranspiler::transpile_const_function(const sem::ConstFunction& function) {
-    return PythonOutputCode("", function.path.as_str());
+    std::string fpath = function.path.as_str();
+    std::string ff = fpath.substr(0, this->module_path.as_str().size() + 1);
+    if (ff == this->module_path.as_str() + ".") {
+        fpath = function.path.as_vec().back();
+    }
+    return PythonOutputCode("", fpath);
 }
 
 PythonOutputCode PythonTranspiler::transpile_object_constructor(const sem::ObjectConstructor& constructor) {
