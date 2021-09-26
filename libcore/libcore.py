@@ -1,6 +1,7 @@
 class Boolean:
     def __init__(self, value):
         self.value = value
+
     def __bool__(self):
         return self.value
 
@@ -8,12 +9,21 @@ class Boolean:
 class String:
     def __init__(self, value):
         self.value = value
+
     def len(self):
         return Integer(len(self.value))
+
     @staticmethod
     def __add__(a, b):
         return String(a.value + b.value)
 
+
+class List:
+    def __init__(self, elems):
+        self.elems = elems
+
+    def len(self):
+        return Integer(len(self.elems))
 
 class Integer:
     def __init__(self, value):
