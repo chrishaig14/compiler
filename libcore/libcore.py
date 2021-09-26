@@ -10,6 +10,9 @@ class String:
         self.value = value
     def len(self):
         return Integer(len(self.value))
+    @staticmethod
+    def __add__(a, b):
+        return String(a.value + b.value)
 
 
 class Integer:
