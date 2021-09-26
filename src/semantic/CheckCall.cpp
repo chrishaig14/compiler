@@ -10,6 +10,10 @@
 
 sem::UCommon Checker::visit_call(ast::Call& n) {
     auto s = this->analyze_call(n.function, n.arguments, false, n.start, n.end);
+    if (s->is_error()){
+        // there was an error
+        return nullptr;
+    }
     auto& w = (sem::CallExp&) *s->exp_snode;
     return w.to_call();
 }
