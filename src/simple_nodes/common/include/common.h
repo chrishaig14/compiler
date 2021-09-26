@@ -15,6 +15,7 @@
 #include "Continue.h"
 #include "Match.h"
 #include "Return.h"
+#include "For.h"
 #include "Common.h"
 #include "Throw.h"
 #include "TryCatch.h"

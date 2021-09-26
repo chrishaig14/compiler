@@ -9,12 +9,13 @@
 using namespace sem;
 
 For::For(const std::string& varname, UExp expression, std::unique_ptr<Block> body)
-        : Common(CommonType::FOR), expression(std::move(expression)), body(std::move(body)) {
+        : Common(CommonType::FOR), varname(varname), expression(std::move(expression)), body(std::move(body)) {
 }
 
 bool For::equals(const Common& o) const {
     auto& other = (const For&) o;
+    bool var_ok = this->varname == other.varname;
     bool cond_ok = *this->expression == *other.expression;
     bool body_ok = *this->body == *other.body;
-    return cond_ok && body_ok;
+    return var_ok and cond_ok && body_ok;
 }
