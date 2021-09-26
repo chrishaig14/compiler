@@ -9,11 +9,6 @@
 #include "../simple_nodes/common/include/common.h"
 #include "../simple_nodes/expressions/include/expressions.h"
 
-const std::string TOBJECT = "TaggedObject*";
-const std::string GCDECLARE = "GC::declare";
-const std::string GCASSIGN = "GC::assign";
-const std::string GCRETURN = "GC::set_return";
-const std::string GCOUTOFSCOPE = "GC::out_of_scope";
 const std::string LPAREN = "(";
 const std::string RPAREN = ")";
 const std::string SEMIC = ";";
@@ -24,7 +19,6 @@ const std::string QUOTE = "\"";
 const std::string SPACE = " ";
 const std::string COMMA = ",";
 const std::string NEWLINE = "\n";
-const std::string EXTERN = "extern";
 const std::string RETURN = "return";
 const std::string CLASS = "class";
 const std::string RETURN_VAR = "__return__";
@@ -92,6 +86,7 @@ public:
     PythonOutputCode transpile_enum(const sem::EnumDef& node);
     void transpile_program(const sem::Module& node);
     void unindent();
+    PythonOutputCode transpile_call_exp(const sem::CallExp& exp);
 };
 
 

@@ -13,5 +13,16 @@ Call::Call(UExp function, std::vector<UExp> arguments)
 
 bool Call::equals(const Common& o) const {
     auto& other = (const Call&) o;
-    return *this->function == *other.function && this->arguments == other.arguments;
+    if (*this->function != *other.function) {
+        return false;
+    }
+    if (this->arguments.size() != other.arguments.size()) {
+        return false;
+    }
+    for (size_t i = 0; i < this->arguments.size(); i++) {
+        if (*this->arguments[i] != *other.arguments[i]) {
+            return false;
+        }
+    }
+    return true;
 }

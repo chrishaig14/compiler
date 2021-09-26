@@ -15,6 +15,8 @@ public:
     std::vector<UExp> arguments;
     CallExp(UExp function, std::vector<UExp> arguments);
 
+    std::unique_ptr<Call> to_call();
+
     bool equals(const Exp& o) const override;
     ~CallExp() = default;
 };

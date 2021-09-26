@@ -405,3 +405,22 @@ TEST_CASE("semantic_output_class_ok", "[checker]") {
     REQUIRE(sem_module->nodes.size() == 2);
     REQUIRE(*sem_module->nodes[0] == sem::KlassDef("Foo", {"x", "y"}));
 }
+
+TEST_CASE("semantic_output_main_ok", "[checker]") {
+    std::string code = R"(
+fun main()->Integer{
+    print("Hello")
+    return 0
+}
+    )";
+
+    CHECKER()
+    checker.init();
+    auto call_stmt = checker.dispatch(*module.ast->functions[0].get().body->nodes[0]);
+
+    REQUIRE_CHECKER_OK();
+    std::vector<sem::UExp> args;
+    args.push_back(std::make_unique<sem::String>("Hello"));
+    REQUIRE(*call_stmt ==
+            sem::Call(std::make_unique<sem::ConstFunction>(Path("libcore.libcore.print")), std::move(args)));
+}

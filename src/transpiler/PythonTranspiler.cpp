@@ -18,7 +18,7 @@ PythonOutputCode::PythonOutputCode(const std::string& pre_code, const std::strin
 PythonOutputCode PythonTranspiler::transpile_declaration(const sem::Declaration& node) {
     PythonOutputCode exp_out = this->dispatch_expression(node.expression);
     std::string code = exp_out.pre_code.empty() ? "" : exp_out.pre_code + "\n";
-    code += this->indentation() + node.identifier + " = " + exp_out.code;
+    code += node.identifier + " = " + exp_out.code;
     return PythonOutputCode("", code);
 }
 
@@ -43,7 +43,7 @@ PythonOutputCode PythonTranspiler::transpile_return(const sem::Return& node) {
     }
     PythonOutputCode exp = this->dispatch_expression(*node.expression);
     std::string pre_code = exp.pre_code;
-    std::string code = this->indentation() + "return " + exp.code + "\n";
+    std::string code = "return " + exp.code + "\n";
     return PythonOutputCode(pre_code, code);
 }
 
@@ -130,49 +130,20 @@ PythonOutputCode PythonTranspiler::transpile_integer(const sem::Integer& node) {
 PythonOutputCode PythonTranspiler::transpile_call(const sem::Call& node) {
     std::string pre_code;
     VectorOfStrings arg_names;
-    std::string fofo;
-    for (auto& arg: node.arguments) {
-        std::string afofo;
-        PythonOutputCode arg_code = this->dispatch_expression(*arg);
-        if (arg->type == sem::ExpType::CALL) {
-            afofo = "arg_" + std::to_string(rand());
-            arg_names.push_back(afofo);
-            pre_code += arg_code.pre_code;
-            pre_code += TOBJECT + SPACE + afofo + SPACE + ASSIGN + SPACE + arg_code.code + SEMIC + NEWLINE;
-        } else {
-            afofo = arg_code.code;
-        }
-        fofo += afofo + COMMA + SPACE;
-    }
-    // std::cout << "PRE CODE:" << std::endl;
-    // std::cout << pre_code << std::endl;
-
-    std::string post_code;
+    std::string arg_list;
     PythonOutputCode func = this->dispatch_expression(*node.function);
-    pre_code += func.pre_code;
-    post_code += "CALL" + std::to_string(node.arguments.size()) + "(" + func.code;
-    post_code += COMMA + SPACE;
-    post_code += fofo;
-    post_code = post_code.substr(0, post_code.size() - 2);
+    pre_code += (func.pre_code.empty() ? "" : func.pre_code + "\n") + "function_to_call = " + func.code + "\n";
+    for (auto& arg: node.arguments) {
+        PythonOutputCode arg_code = this->dispatch_expression(*arg);
+        std::string arg_id = "arg_" + std::to_string(this->next_arg_n());
+        pre_code += (arg_code.pre_code.empty() ? "" : arg_code.pre_code + "\n") + arg_id + " = " + arg_code.code + "\n";
+        arg_list += arg_id + ", ";
+    }
+    std::string post_code = pre_code;
+    post_code += "function_to_call(";
+    post_code += arg_list.empty() ? "" : arg_list.substr(0, arg_list.size() - 2);
     post_code += ")";
-    // std::cout << "POST CODE:" << std::endl;
-    // std::cout << post_code << std::endl;
-
-    return PythonOutputCode(pre_code, post_code);
-
-    // std::string out;
-    // std::string arguments;
-    // for (auto* arg: node.arguments) {
-    //     std::string arg_s = this->dispatch(arg);
-    //     arguments += arg_s + COMMA + SPACE;
-    // }
-    // arguments = arguments.substr(0, arguments.size() - 2);
-    // out += "CALL" + std::to_string(node.arguments.size()) + "(" + this->dispatch(node.function);
-    // if (!arguments.empty()) {
-    //     out += +", " + arguments;
-    // }
-    // out += ")";
-    // return out;
+    return PythonOutputCode("", post_code);
 }
 
 PythonOutputCode PythonTranspiler::transpile_string(const sem::String& node) {
@@ -271,7 +242,6 @@ PythonOutputCode PythonTranspiler::transpile_while(const sem::While& node) {
     if (cond.pre_code != "") {
         out += cond.pre_code;
         if (node.condition->type == sem::ExpType::CALL) {
-            out += TOBJECT + SPACE + condition_name + SPACE + ASSIGN + cond.code + SEMIC + NEWLINE;
             out += "while" + SPACE + LPAREN + condition_name + RPAREN + ":" + NEWLINE + "    " + thenc.code;
         }
     } else {
@@ -335,27 +305,11 @@ PythonOutputCode PythonTranspiler::transpile_if(const sem::If& node) {
 }
 
 PythonOutputCode PythonTranspiler::transpile_break(const sem::Break& node) {
-    std::string out;
-    for (auto reachable: node.reachables) {
-        if (reachable == "this") {
-            reachable = "this_obj";
-        }
-        out += GCOUTOFSCOPE + LPAREN + reachable + RPAREN + SEMIC + NEWLINE;
-    }
-    out += "break" + SEMIC + NEWLINE;
-    return PythonOutputCode("", out);
+    return PythonOutputCode("", "");
 }
 
 PythonOutputCode PythonTranspiler::transpile_continue(const sem::Continue& node) {
-    std::string out;
-    for (auto reachable: node.reachables) {
-        if (reachable == "this") {
-            reachable = "this_obj";
-        }
-        out += GCOUTOFSCOPE + LPAREN + reachable + RPAREN + SEMIC + NEWLINE;
-    }
-    out += "continue" + SEMIC + NEWLINE;
-    return PythonOutputCode("", out);
+    return PythonOutputCode("", "");
 }
 
 PythonOutputCode PythonTranspiler::transpile_match(const sem::Match& node) {
@@ -375,36 +329,6 @@ PythonOutputCode PythonTranspiler::transpile_match(const sem::Match& node) {
 }
 
 PythonOutputCode PythonTranspiler::transpile_enum(const sem::EnumDef& node) {
-    std::string out;
-    std::string enum_name = (node.id);
-    // out += "enum class" + SPACE + enum_name + SPACE + " {\n";
-    // out += "";
-    for (const auto& m: node.values) {
-        out += "extern" + SPACE + TOBJECT + enum_name + "_" + m + SEMIC + NEWLINE;
-    }
-    this->header += out;
-    int k = 0;
-    out = "";
-    for (const auto& m: node.values) {
-        out += TOBJECT + enum_name + "_" + m + ASSIGN + "MAKE_INT(" + std::to_string(k) + ")" + SEMIC + NEWLINE;
-        k++;
-    }
-    this->source += out;
-
-    // out += RCURLY + SEMIC + NEWLINE;
-    out = "";
-    std::string eq_name = enum_name + "_D___eq__";
-    out += "extern" + SPACE + TOBJECT + eq_name + SEMIC;
-    this->static_initializations += eq_name + SPACE + ASSIGN + SPACE + "core_D_core_D_Integer_D___eq__" + SEMIC;
-
-    this->source += TOBJECT + SPACE + eq_name + ASSIGN + "nullptr" + SEMIC + NEWLINE;
-
-    std::string ne_name = enum_name + "_D___ne__";
-    out += "extern" + SPACE + TOBJECT + ne_name + SEMIC;
-    this->static_initializations += ne_name + SPACE + ASSIGN + SPACE + "core_D_core_D_Integer_D___ne__" + SEMIC;
-
-    this->source += TOBJECT + SPACE + ne_name + ASSIGN + "nullptr" + SEMIC + NEWLINE;
-    this->header += out;
     return PythonOutputCode("", "");
 }
 
@@ -431,21 +355,22 @@ PythonOutputCode PythonTranspiler::transpile_none(const sem::None& node) {
 }
 
 PythonOutputCode PythonTranspiler::transpile_try_catch(const sem::TryCatch& node) {
-    this->in_try_catch = true;
-    PythonOutputCode body_out = this->transpile_block(*node.body);
-    this->in_try_catch = false;
-    std::string out = "TaggedObject* thrown_exception = nullptr;\n" + body_out.code;
-    out += "if (thrown_exception!=nullptr){\n";
-    for (size_t i = 0; i < node.catches_bodies.size(); i++) {
-        PythonOutputCode catch_out = this->transpile_block((const sem::Block&) *node.catches_bodies[i]);
-        out += "if (UNTAG(thrown_exception)->class_name==\"" + (node.e_names_types[i].second) + "\"){TaggedObject*" +
-               node.e_names_types[i].first + "=thrown_exception;\n" + catch_out.code + "} else ";
-    }
-    out += RETURN + SPACE + "CALL1(test_D_bootstrap_D_Exception_D___init__,test_D_bootstrap_D_Exception_D___init__)" +
-           SEMIC + NEWLINE;
-    // out = out.substr(0, out.size() - 5);
-    out += "\n}";
-    return PythonOutputCode("", out);
+    // this->in_try_catch = true;
+    // PythonOutputCode body_out = this->transpile_block(*node.body);
+    // this->in_try_catch = false;
+    // std::string out = "TaggedObject* thrown_exception = nullptr;\n" + body_out.code;
+    // out += "if (thrown_exception!=nullptr){\n";
+    // for (size_t i = 0; i < node.catches_bodies.size(); i++) {
+    //     PythonOutputCode catch_out = this->transpile_block((const sem::Block&) *node.catches_bodies[i]);
+    //     out += "if (UNTAG(thrown_exception)->class_name==\"" + (node.e_names_types[i].second) + "\"){TaggedObject*" +
+    //            node.e_names_types[i].first + "=thrown_exception;\n" + catch_out.code + "} else ";
+    // }
+    // out += RETURN + SPACE + "CALL1(test_D_bootstrap_D_Exception_D___init__,test_D_bootstrap_D_Exception_D___init__)" +
+    //        SEMIC + NEWLINE;
+    // // out = out.substr(0, out.size() - 5);
+    // out += "\n}";
+    // return PythonOutputCode("", out);
+    return PythonOutputCode("", "");
 }
 
 std::string PythonTranspiler::transpile_module(const sem::Module& block) {
@@ -591,11 +516,30 @@ PythonOutputCode PythonTranspiler::transpile_object_method(const sem::ObjectMeth
 }
 
 PythonOutputCode PythonTranspiler::transpile_const_function(const sem::ConstFunction& function) {
-    return PythonOutputCode("", "");
+    return PythonOutputCode("", function.path.as_str());
 }
 
 PythonOutputCode PythonTranspiler::transpile_object_constructor(const sem::ObjectConstructor& constructor) {
     return PythonOutputCode("", "");
+}
+
+PythonOutputCode PythonTranspiler::transpile_call_exp(const sem::CallExp& node) {
+    std::string pre_code;
+    VectorOfStrings arg_names;
+    std::string arg_list;
+    PythonOutputCode func = this->dispatch_expression(*node.function);
+    pre_code += (func.pre_code.empty() ? "" : func.pre_code + "\n") + "function_to_call = " + func.code + "\n";
+    for (auto& arg: node.arguments) {
+        PythonOutputCode arg_code = this->dispatch_expression(*arg);
+        std::string arg_id = "arg_" + std::to_string(this->next_arg_n());
+        pre_code += (arg_code.pre_code.empty() ? "" : arg_code.pre_code + "\n") + arg_id + " = " + arg_code.code + "\n";
+        arg_list += arg_id + ", ";
+    }
+    std::string post_code;
+    post_code += "function_to_call(";
+    post_code += arg_list.empty() ? "" : arg_list.substr(0, arg_list.size() - 2);
+    post_code += ")";
+    return PythonOutputCode(pre_code, post_code);
 }
 
 std::string indent_paragraph(std::string s, size_t level) {

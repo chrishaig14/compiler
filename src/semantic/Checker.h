@@ -173,8 +173,7 @@ public:
                                     const sem::TypeFunction& function_type, ExpressionInfo* fun_info_p);
     bool check_arguments(ast::CallExp& n, std::vector<sem::UExp>& arguments,
                          std::vector<std::unique_ptr<Entity>>& arg_entities);
-    UExpressionInfo make_return_info(const ast::CallExp& n, bool is_rvalue, UExpressionInfo retv_p, bool is_def_const,
-                                     bool args_are_constant);
+    UExpressionInfo make_return_info(bool is_rvalue, UExpressionInfo retv_p, bool is_def_const, bool args_are_constant);
     sem::UExp make_union_rvalue(sem::UExp value_snode, const sem::Type* unaliased_value_type,
                                 const sem::Type* unaliased_target_type) const;
     sem::Common* make_option_rvalue(sem::Common* value_snode, const ast::Type* unaliased_value_type,
@@ -195,6 +194,23 @@ public:
     UExpressionInfo const_function_member(ast::Member& n, UExpressionInfo unique_ptr_1, ConstFunction& function);
     UExpressionInfo class_member(ast::Member& n, UExpressionInfo parent_info, Class& cls);
     UExpressionInfo value_member(ast::Member& n, UExpressionInfo parent_info, EntityValue& value);
+    UExpressionInfo analyze_call(ast::ExpNode& function, ast::VectorOfExpNodesU arguments, bool is_rvalue, TextPosition start, TextPosition end);
+    bool check_arguments(ast::VectorOfExpNodesU& narguments, std::vector<sem::UExp>& arguments,
+                         std::vector<std::unique_ptr<Entity>>& arg_entities);
+    void process_function_arguments(ExpressionInfo& retv, std::vector<std::unique_ptr<Entity>>& arg_entities,
+                                    std::vector<sem::UExp>& arguments, ast::VectorOfExpNodesU& narguments,
+                                    const sem::TypeFunction& function_type, ExpressionInfo* fun_info_p);
+    UExpressionInfo
+    analyze_call(ast::ExpNode& function, ast::VectorOfExpNodesU& arguments, bool is_rvalue, TextPosition start,
+                 TextPosition end);
+    UExpressionInfo
+    analyze_call(ast::ExpNode& function, std::vector<ast::RExpNode>& arguments, bool is_rvalue, TextPosition start,
+                 TextPosition end);
+    bool check_arguments(std::vector<ast::RExpNode>& narguments, std::vector<sem::UExp>& arguments,
+                         std::vector<std::unique_ptr<Entity>>& arg_entities);
+    void process_function_arguments(ExpressionInfo& retv, std::vector<std::unique_ptr<Entity>>& arg_entities,
+                                    std::vector<sem::UExp>& arguments, std::vector<ast::RExpNode>& narguments,
+                                    const sem::TypeFunction& function_type, ExpressionInfo* fun_info_p);
 };
 
 #endif //CHECKER_H

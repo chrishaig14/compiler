@@ -1,12 +1,5 @@
-class MyClass {
-    x: Integer
-    y: String
-    fun foo() -> Integer {
-        return 5
-    }
-}
-
 fun main()->Integer{
-    var x = #MyClass(6, "HEllo")
+    var x = "hellosaw"
+    print(x)
     return 0
 }

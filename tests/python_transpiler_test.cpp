@@ -91,40 +91,30 @@ TEST_CASE("python_transpile_boolean", "[checker]") {
 //     REQUIRE(poc.code == "libcore.libcore.Integer.mul(obj_0, arg_3, arg_4)");
 // }
 //
-// TEST_CASE("python_transpile_const_function_call_with_complex_args", "[checker]") {
-//     PythonTranspiler pt;
-//     std::vector<sem::UExp> args_vec;
-//     std::vector<sem::UExp> complex_arg_vec;
-//     complex_arg_vec.push_back(std::make_unique<sem::Integer>("45"));
-//     args_vec.push_back(std::make_unique<sem::ObjectMethodCallExp>(std::make_unique<sem::Integer>("65"),
-//                                                                   Path("libcore.libcore.Integer"),
-//                                                                   "add",
-//                                                                   std::move(complex_arg_vec)));
-//     args_vec.push_back(std::make_unique<sem::Integer>("87"));
-//     PythonOutputCode poc = pt.transpile_const_function_call(sem::ConstFunctionCall(Path("mymodule.myfunction"),
-//                                                                                    std::move(args_vec)));
-//     REQUIRE(poc.pre_code == R"(obj_0 = libcore.libcore.Integer(65)
-// arg_1 = libcore.libcore.Integer(45)
-// arg_2 = libcore.libcore.Integer.add(obj_0, arg_1)
-// arg_3 = libcore.libcore.Integer(87))");
-//     REQUIRE(poc.code == "mymodule.myfunction(arg_2, arg_3)");
-// }
+TEST_CASE("python_transpile_const_function_call_with_complex_args", "[checker]") {
+    PythonTranspiler pt;
+    std::vector<sem::UExp> complex_arg_vec;
+    complex_arg_vec.push_back(std::make_unique<sem::Integer>("45"));
+    auto poc = pt.transpile_call_exp(sem::CallExp(std::make_unique<sem::ConstFunction>(Path("mymodule.myfunction")),
+                                                  std::move(complex_arg_vec)));
+    REQUIRE(poc.pre_code == R"(function_to_call = mymodule.myfunction
+arg_0 = libcore.libcore.Integer(45)
+)");
+    REQUIRE(poc.code == "function_to_call(arg_0)");
+}
 //
-// TEST_CASE("python_transpile_if", "[checker]") {
-//     PythonTranspiler pt;
-//     auto then = std::make_unique<sem::Block>();
-//     std::vector<sem::UExp> arg_vec;
-//     arg_vec.push_back(std::make_unique<sem::Integer>("78"));
-//     then->nodes.emplace_back(new sem::Assignment(std::make_unique<sem::Id>("x"), std::make_unique<sem::Integer>("99")));
-//     // if(8.gt(78)){x=99}
-//     PythonOutputCode poc = pt.transpile_if(sem::IfSNode(std::make_unique<sem::ObjectMethodCallExp>(std::make_unique<sem::Integer>(
-//             "8"), Path("libcore.libcore.Integer"), "gt", std::move(arg_vec)), std::move(then), {}, nullptr));
-//     REQUIRE(poc.code == R"(obj_0 = libcore.libcore.Integer(8)
-// arg_1 = libcore.libcore.Integer(78)
-// condition = libcore.libcore.Integer.gt(obj_0, arg_1)
-// if condition:
-//     x = libcore.libcore.Integer(99))");
-// }
+TEST_CASE("python_transpile_if", "[checker]") {
+    PythonTranspiler pt;
+    auto then = std::make_unique<sem::Block>();
+    std::vector<sem::UExp> arg_vec;
+    arg_vec.push_back(std::make_unique<sem::Integer>("78"));
+    then->nodes.emplace_back(new sem::Assignment(std::make_unique<sem::Id>("x"), std::make_unique<sem::Integer>("99")));
+    // if(8.gt(78)){x=99}
+    PythonOutputCode poc = pt.transpile_if(sem::If(std::make_unique<sem::Bool>(true), std::move(then), {}, nullptr));
+    REQUIRE(poc.code == R"(condition = True
+if condition:
+    x = libcore.libcore.Integer(99))");
+}
 
 TEST_CASE("python_transpile_assignment", "[checker]") {
     PythonTranspiler pt;

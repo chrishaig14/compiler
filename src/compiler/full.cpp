@@ -32,7 +32,7 @@ int main(int argc, char* argv[]) {
         exit(1);
     }
     PythonTranspiler transpiler;
-    Module& module = *compiler.root_package.units.at("main").module;
+    Module& module = compiler.root_package.units.at("main")->module();
     std::string module_code = transpiler.transpile_module(*module.sast);
     std::cout << module_code << std::endl;
     std::ofstream out_module(path_join(project_output_dir, "out.py"));
