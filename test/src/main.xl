@@ -1,5 +1,12 @@
+fun fibonacci(n: Integer) -> String {
+    if n <= 1 {
+        return n
+    }
+    return fibonacci(n-1) + fibonacci(n-2)
+}
+
 fun main()->Integer{
-    var x = "hellosaw"
-    print(x)
+    var r = fibonacci(20)
+    print(r.str())
     return 0
 }

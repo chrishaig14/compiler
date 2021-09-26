@@ -40,7 +40,7 @@ public:
     bool in_try_catch{};
     PythonOutputCode dispatch(const sem::Common& node);
     PythonOutputCode dispatch_common(const sem::Common& node);
-    PythonOutputCode dispatch_expression(const sem::Exp& node);
+    PythonOutputCode dispatch_expression(const sem::Exp& node, bool called_function);
     PythonOutputCode dispatch_top(const sem::Top& node);
     PythonOutputCode transpile_assignment(const sem::Assignment& node);
     PythonOutputCode transpile_block(const sem::Block& node);
@@ -64,7 +64,7 @@ public:
     PythonOutputCode transpile_none(const sem::None& node);
     PythonOutputCode transpile_object_constructor(const sem::ObjectConstructor& constructor);
     PythonOutputCode transpile_object_member(const sem::ObjectMember& node);
-    PythonOutputCode transpile_object_method(const sem::ObjectMethod& method);
+    PythonOutputCode transpile_object_method(const sem::ObjectMethod& method, bool called_function);
     PythonOutputCode transpile_return(const sem::Return& node);
     PythonOutputCode transpile_string(const sem::String& node);
     PythonOutputCode transpile_ternary(const sem::Ternary& node);
