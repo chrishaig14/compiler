@@ -228,18 +228,19 @@ PythonOutputCode PythonTranspiler::transpile_while(const sem::While& node) {
 }
 
 PythonOutputCode PythonTranspiler::transpile_list(const sem::List& node) {
-    std::string out;
-    out = "NEW(XList,{";
+    std::string pre_code;
+    std::string elem_ids;
     for (auto& e: node.elements) {
-        PythonOutputCode el = this->dispatch_expression(*e, false);
-        out += el.pre_code;
-        out += el.code + ", ";
+        PythonOutputCode element_code = this->dispatch_expression(*e, false);
+        std::string elem_id = "elem_" + std::to_string(this->next_arg_n());
+        pre_code += pre_if_any(element_code) + elem_id + " = " + element_code.code + "\n";
+        elem_ids += elem_id + ", ";
     }
-    if (!node.elements.empty()) {
-        out = out.substr(0, out.size() - 2);
+    if (not elem_ids.empty()) {
+        elem_ids = elem_ids.substr(0, elem_ids.size() - 2);
     }
-    out += "})";
-    return PythonOutputCode("", out);
+    std::string code = "libcore.libcore.List([" + elem_ids + "])";
+    return PythonOutputCode(pre_code, code);
 }
 
 PythonOutputCode PythonTranspiler::transpile_dict(const sem::Dict& node) {
