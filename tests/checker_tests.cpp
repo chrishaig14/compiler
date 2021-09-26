@@ -358,6 +358,46 @@ TEST_CASE("member_ok", "[checker]") {
     CHECK(checker.error_reporter.errors.empty());
 }
 
+TEST_CASE("method_ok", "[checker]") {
+    std::string code = R"(class Foo{
+    foo: String
+    fun method() -> String {
+        return "lorem ipsum"
+    }
+}
+fun bar(f: Foo)->Integer{
+    var x : String = f.method()
+    return 0
+})";
+
+    CHECKER();
+    checker.init();
+    checker.visit_root(*module.ast);
+
+    CHECK(!checker.error_reporter.failed);
+    CHECK(checker.error_reporter.errors.empty());
+}
+
+TEST_CASE("this_within_method_ok", "[checker]") {
+    std::string code = R"(class Foo{
+    foo: String
+    fun method() -> String {
+        return this.foo
+    }
+}
+fun bar(f: Foo)->Integer{
+    var x : String = f.method()
+    return 0
+    })";
+
+    CHECKER();
+    checker.init();
+    checker.visit_root(*module.ast);
+
+    CHECK(!checker.error_reporter.failed);
+    CHECK(checker.error_reporter.errors.empty());
+}
+
 TEST_CASE("binop_ok", "[checker]") {
     std::string code = "fun bar()->Integer{var x = 2 + 5;return 0;}";
 
