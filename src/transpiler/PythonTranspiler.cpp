@@ -64,12 +64,11 @@ PythonOutputCode PythonTranspiler::transpile_id(const sem::Id& node) {
     // if (node.identifier == "") {
     //     throw std::runtime_error("Error: tranpiling empty idnode!");
     // }
-    std::string out;
-    // if (node.identifier == "this") {
-    //     node.identifier = "this_obj";
-    // }
-    out += (node.identifier);
-    return PythonOutputCode("", out);
+    std::string id = node.identifier;
+    if (id == "this" && this->add_self) {
+        id = "self";
+    }
+    return PythonOutputCode("", id);
 }
 
 PythonOutputCode PythonTranspiler::transpile_function(const sem::FunctionDef& node) {
