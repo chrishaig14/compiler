@@ -67,7 +67,6 @@ std::unique_ptr<sem::EnumDef> Checker::visit_enum(ast::EnumNode& p_node) {
 
 std::unique_ptr<sem::KlassDef> Checker::visit_class(ast::Klass& node) {
     this->error_reporter.current_class = node.class_name;
-    this->add_this = true;
     ast::VectorOfTypes tp;
     std::string cn = node.class_name;
     for (const auto& type_param: node.type_parameters) {
@@ -80,13 +79,17 @@ std::unique_ptr<sem::KlassDef> Checker::visit_class(ast::Klass& node) {
         members_ordered_types.push_back(&t);
         this->assert_type_exists(t, node.start);
     }
-    this->add_this = false;
     auto sn = std::make_unique<sem::KlassDef>(node.class_name, node.members_ordered);
+    this->add_this = true;
+    this->this_entity = this->entity_value_from_actual_base_path_no_generic(Path(this->module.path,
+                                                                                 node.class_name)).clone();
+    this->fill_value(this->this_entity->get_value());
     for (auto& m: node.methods) {
         auto ms = this->visit_function(*m.second->method);
         std::unique_ptr<sem::FunctionDef> sf((sem::FunctionDef*) ms.release());
         sn->methods.emplace_back(std::move(sf));
     }
+    this->add_this = false;
     //
     // Class* clazz = ((EntityClass&) this->scope->get(node.class_name)).clazz;
     // auto csn = std::make_unique<sem::KlassDef>(clazz->path.as_str(), node.members_ordered);
@@ -248,10 +251,8 @@ std::unique_ptr<sem::FunctionDef> Checker::visit_function(ast::Function& n) {
     this->enter_scope(function_name);
     this->scope->is_function = true;
 
-    VectorOfStrings params = n.parameter_names;
     if (this->add_this) {
         this->scope->set("this", *this->this_entity);
-        params.insert(params.begin(), "this");
     }
     // if (n.implicit != nullptr) {
     //     Class* clazz = new Class(n.implicit->type, Path("core.implicits." + n.implicit->type));
@@ -308,7 +309,6 @@ std::unique_ptr<sem::FunctionDef> Checker::visit_function(ast::Function& n) {
         }
     }
     this->leave_scope();
-    auto sn = std::make_unique<sem::FunctionDef>(n.path.as_vec().back(), params, std::move(bn));
     if (returnType != T_NONE) {
         if (!n.body->nodes.empty()) {
             ast::Statement& last_node = *n.body->nodes.back();
@@ -328,5 +328,5 @@ std::unique_ptr<sem::FunctionDef> Checker::visit_function(ast::Function& n) {
             return nullptr;
         }
     }
-    return sn;
+    return std::make_unique<sem::FunctionDef>(n.path.as_vec().back(), n.parameter_names, std::move(bn));
 }
