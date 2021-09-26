@@ -13,6 +13,8 @@
 #include "../ast/top/Alias.h"
 #include "../ast/top/EnumNode.h"
 #include "../units/Enum.h"
+#include "../units/entities/EntityNothing.h"
+#include "../units/entities/EntityPackage.h"
 #include "../units/Module.h"
 
 class GlobalProcessor {

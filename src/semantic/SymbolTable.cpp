@@ -5,6 +5,8 @@
 #include "SymbolTable.h"
 #include "../units/FunctionValue.h"
 #include "../units/ObjectValue.h"
+#include "../units/entities/EntityNotFound.h"
+#include "../units/entities/EntityValue.h"
 
 SymbolTable::SymbolTable(const std::string& name, SymbolTable* parent) {
     this->s_name = name;

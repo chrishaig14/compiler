@@ -5,7 +5,7 @@
 #ifndef UNTITLED1_MACROS_H
 #define UNTITLED1_MACROS_H
 
-#include "../units/Entity.h"
+#include "../units/entities/Entity.h"
 
 #define ID(id) new ast::IdNode(id)
 #define NUM(num) new NumberNode(num)

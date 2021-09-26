@@ -6,7 +6,7 @@
 #define XLANG_MODULE_H
 
 #include <string>
-#include "Entity.h"
+#include "entities/Entity.h"
 #include "../ast/statements/Block.h"
 #include "../scanner/CodeLines.h"
 #include "../ast/top/Module.h"

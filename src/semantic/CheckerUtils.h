@@ -5,7 +5,7 @@
 #ifndef XLANG_CHECKERUTILS_H
 #define XLANG_CHECKERUTILS_H
 
-#include "../units/Entity.h"
+#include "../units/entities/Entity.h"
 #include "../units/FunctionValue.h"
 #include "../units/ObjectValue.h"
 #include "../ast/top/Function.h"

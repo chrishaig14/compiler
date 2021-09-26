@@ -6,7 +6,7 @@
 #define XLANG_FUNCTIONVALUE_H
 
 
-#include "Entity.h"
+#include "entities/Entity.h"
 #include "../ast/general/Type.h"
 
 

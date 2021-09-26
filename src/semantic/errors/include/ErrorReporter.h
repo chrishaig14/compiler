@@ -12,7 +12,7 @@
 #include "../../../ast/expressions/include/Member.h"
 #include "../../../ast/statements/Call.h"
 #include "../../../scanner/CodeLines.h"
-#include "../../../units/Entity.h"
+#include "../../../units/entities/Entity.h"
 #include "Error.h"
 
 #define FAIL_FIRST 0

@@ -8,7 +8,7 @@
 #include <string>
 #include <map>
 #include <memory>
-#include "modulemember/ModuleMember.h"
+#include "../modulemember/ModuleMember.h"
 
 class Package;
 
@@ -187,7 +187,6 @@ public:
         throw std::runtime_error("Not an EntityError");
     }
 
-
     virtual EntityEnum& get_enum() {
         throw std::runtime_error("Not an EntityEnum");
     }
@@ -235,197 +234,6 @@ public:
     }
 
 };
-
-class EntityClass : public Entity {
-public:
-    explicit EntityClass(Class& clazz) : Entity(E_TYPE::CLASS), clazz(clazz) {
-    }
-
-    bool equal(const Entity& other) const override {
-
-        return &this->clazz == &((const EntityClass&) other).clazz;
-    }
-
-    Entity* clone() const override {
-        return new EntityClass(this->clazz);
-    }
-
-    Class& clazz;
-
-    EntityClass& get_class() override {
-        return *this;
-    }
-
-    const EntityClass& get_class() const override {
-        return *this;
-    }
-};
-
-class EntityPackage : public Entity {
-public:
-    explicit EntityPackage(Package& package) : Entity(E_TYPE::PACKAGE), package(package) {
-    }
-
-    bool equal(const Entity& other) const override {
-        return false;
-    }
-
-    Entity* clone() const override {
-        return new EntityPackage(this->package);
-    }
-
-    Package& package;
-
-    EntityPackage& get_package() override {
-        return *this;
-    }
-
-    const EntityPackage& get_package() const override {
-        return *this;
-    }
-};
-
-class EntityNothing : public Entity {
-public:
-    explicit EntityNothing() : Entity(E_TYPE::NOTHING) {
-    }
-
-    bool equal(const Entity& other) const override {
-        return false;
-    }
-
-
-    Entity* clone() const override {
-        return new EntityNothing();
-    }
-
-    EntityNothing& get_nothing() override {
-        return *this;
-    }
-
-    const EntityNothing& get_nothing() const override {
-        return *this;
-    }
-};
-
-class EntityModule : public Entity {
-public:
-    explicit EntityModule(Module& module) : Entity(E_TYPE::MODULE), module(module) {
-    }
-
-    bool equal(const Entity& other) const override {
-        return false;
-    }
-
-    Entity* clone() const override {
-        return new EntityModule(this->module);
-    }
-
-    Module& module;
-
-    EntityModule& get_module() override {
-        return *this;
-    }
-
-    const EntityModule& get_module() const override {
-        return *this;
-    }
-};
-
-
-class EntityConstFunction : public Entity {
-public:
-    explicit EntityConstFunction(ConstFunction& const_function)
-            : Entity(E_TYPE::CONST_FUNCTION), const_function(const_function) {
-    }
-
-    ConstFunction& const_function;
-
-    bool equal(const Entity& other) const override {
-        return false;
-    }
-
-    Entity* clone() const override {
-        return new EntityConstFunction(this->const_function);
-    }
-
-    EntityConstFunction& get_constfun() override {
-        return *this;
-    }
-
-    const EntityConstFunction& get_constfun() const override {
-        return *this;
-    }
-};
-
-class EntityEnum : public Entity {
-public:
-    explicit EntityEnum(Enum& enumm) : Entity(E_TYPE::ENUM), enumm(enumm) {
-    }
-
-    bool equal(const Entity& other) const override {
-        return false;
-    }
-
-    Entity* clone() const override {
-        return new EntityEnum(this->enumm);
-    }
-
-    EntityEnum& get_enum() override {
-        return *this;
-    }
-
-    const EntityEnum& get_enum() const override {
-        return *this;
-    }
-
-    Enum& enumm;
-};
-
-class EntityNotFound : public Entity {
-public:
-    explicit EntityNotFound() : Entity(E_TYPE::NOT_FOUND) {
-    }
-
-    bool equal(const Entity& other) const override {
-        return false;
-    }
-
-    EntityNotFound* clone() const override {
-        return new EntityNotFound();
-    }
-
-    EntityNotFound& get_notfound() override {
-        return *this;
-    }
-
-    const EntityNotFound& get_notfound() const override {
-        return *this;
-    }
-};
-
-class EntityError : public Entity {
-public:
-    explicit EntityError() : Entity(E_TYPE::ERROR) {
-    }
-
-    bool equal(const Entity& other) const override {
-        return false;
-    }
-
-    EntityError* clone() const override {
-        return new EntityError();
-    }
-
-    EntityError& get_error() override {
-        return *this;
-    }
-
-    const EntityError& get_error() const override {
-        return *this;
-    }
-};
-
 
 std::string module_member_type_to_str(ModuleMemberType member_type);
 

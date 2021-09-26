@@ -3,7 +3,7 @@
 //
 
 #include "Class.h"
-#include "Entity.h"
+#include "entities/Entity.h"
 
 bool Class::operator!=(const Class& b) const {
     return !(*this == b);

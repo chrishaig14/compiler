@@ -12,7 +12,7 @@
 #include <map>
 #include "../ast/general/Type.h"
 #include "../util/macros.h"
-#include "Entity.h"
+#include "entities/Entity.h"
 #include "ConstFunction.h"
 
 class Class {

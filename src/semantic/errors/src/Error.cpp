@@ -3,7 +3,15 @@
 //
 
 #include "../include/Error.h"
-#include "../../../units/Entity.h"
+#include "../../../units/entities/Entity.h"
+#include "../../../units/entities/EntityPackage.h"
+#include "../../../units/entities/EntityModule.h"
+#include "../../../units/entities/EntityClass.h"
+#include "../../../units/entities/EntityValue.h"
+#include "../../../units/entities/EntityConstFunction.h"
+#include "../../../units/entities/EntityEnum.h"
+#include "../../../units/entities/EntityNothing.h"
+#include "../../../units/entities/EntityNotFound.h"
 
 std::string entity_to_string(const Entity& entity) {
     std::string out;

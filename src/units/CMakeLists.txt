@@ -9,8 +9,8 @@ add_library(
         Class.h
         ConstFunction.cpp
         ConstFunction.h
-        Entity.cpp
-        Entity.h
+        entities/Entity.cpp
+        entities/Entity.h
         Enum.cpp
         Enum.h
         FunctionValue.cpp
@@ -22,4 +22,4 @@ add_library(
         Package.cpp
         Package.h
         ../util/macros.h
-        ../util/types.h modulemember/ModuleMember.cpp modulemember/ModuleMember.h)
+        ../util/types.h modulemember/ModuleMember.cpp modulemember/ModuleMember.h entities/EntityClass.cpp entities/EntityClass.h entities/EntityModule.cpp entities/EntityModule.h entities/EntityConstFunction.cpp entities/EntityConstFunction.h entities/EntityEnum.cpp entities/EntityEnum.h entities/EntityNotFound.cpp entities/EntityNotFound.h entities/EntityError.cpp entities/EntityError.h entities/EntityNothing.cpp entities/EntityNothing.h entities/EntityPackage.cpp entities/EntityPackage.h entities/EntityValue.cpp entities/EntityValue.h)

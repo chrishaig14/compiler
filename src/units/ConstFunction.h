@@ -4,7 +4,7 @@
 #ifndef CONST_FUNCTION_H
 #define CONST_FUNCTION_H
 
-#include "Entity.h"
+#include "entities/Entity.h"
 #include "../ast/general/Type.h"
 #include "../util/Path.h"
 #include "../ast/general/FunctionType.h"
