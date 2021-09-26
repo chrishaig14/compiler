@@ -376,6 +376,8 @@ PythonOutputCode PythonTranspiler::dispatch_common(const sem::Common& node) {
     switch (node.type) {
         case sem::CommonType::BLOCK:
             return this->transpile_block((const sem::Block&) node);
+        case sem::CommonType::FOR:
+            return this->transpile_for((const sem::For&) node);
             // case sem::CommonType::ENUM_MEMBER:
             //     return this->transpile_enum_member((const sem::EnumMember&) node);
             // case sem::CommonType::BOOLEAN:
@@ -533,6 +535,16 @@ PythonOutputCode PythonTranspiler::transpile_call_exp(const sem::CallExp& node) 
     post_code += arg_list.empty() ? "" : arg_list.substr(0, arg_list.size() - 2);
     post_code += ")";
     return PythonOutputCode(pre_code, post_code);
+}
+
+PythonOutputCode PythonTranspiler::transpile_for(const sem::For& node) {
+    PythonOutputCode exp_code = this->dispatch_expression(*node.expression, false);
+    std::string exp_id = "exp_" + std::to_string(this->next_arg_n());
+    std::string code = pre_if_any(exp_code) + exp_id + " = " + exp_code.code + "\n";
+    code += "for " + node.varname + " in " + exp_id + ".elems:\n";
+    PythonOutputCode body_code = this->transpile_block(*node.body);
+    code += indent_paragraph(body_code.code, 4);
+    return PythonOutputCode("", code);
 }
 
 std::string indent_paragraph(std::string s, size_t level) {

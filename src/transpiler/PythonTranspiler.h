@@ -90,6 +90,7 @@ public:
     void unindent();
     PythonOutputCode transpile_call_exp(const sem::CallExp& exp);
     Path module_path;
+    PythonOutputCode transpile_for(const sem::For& node);
 };
 
 
