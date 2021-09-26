@@ -33,6 +33,8 @@ public:
     std::string code;
 };
 
+std::string pre_if_any(const PythonOutputCode& c);
+
 class PythonTranspiler {
     size_t arg_n;
 public:

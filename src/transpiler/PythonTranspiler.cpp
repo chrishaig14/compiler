@@ -23,18 +23,11 @@ PythonOutputCode PythonTranspiler::transpile_declaration(const sem::Declaration&
 }
 
 PythonOutputCode PythonTranspiler::transpile_assignment(const sem::Assignment& node) {
-    std::string code;
     PythonOutputCode lvalue = this->dispatch_expression(*node.lvalue, false);
-    std::string pre_code;
-    if (not lvalue.pre_code.empty()) {
-        pre_code = lvalue.pre_code;
-    }
     PythonOutputCode rvalue = this->dispatch_expression(*node.rvalue, false);
-    if (not rvalue.pre_code.empty()) {
-        pre_code += rvalue.pre_code;
-    }
+    std::string code = pre_if_any(lvalue) + pre_if_any(rvalue);
     code += lvalue.code + SPACE + ASSIGN + SPACE + rvalue.code;
-    return PythonOutputCode(pre_code, code);
+    return PythonOutputCode("", code);
 }
 
 PythonOutputCode PythonTranspiler::transpile_return(const sem::Return& node) {
@@ -224,29 +217,13 @@ PythonOutputCode PythonTranspiler::transpile_object_member(const sem::ObjectMemb
 }
 
 PythonOutputCode PythonTranspiler::transpile_while(const sem::While& node) {
-    // std::string out;
-    // PythonOutputCode cond_out = this->dispatch(*node.condition);
-    // PythonOutputCode body_out = this->transpile_block(*node.body);
-    // std::string condition_name = "cond_" + std::to_string(rand());
-    // out += cond_out.pre_code;
-    // out += TOBJECT + SPACE + condition_name + SPACE + ASSIGN + SPACE + cond_out.code + SEMIC + NEWLINE;
-    // out += "while" + SPACE + LPAREN + "GET_BOOL" + LPAREN + condition_name + RPAREN + RPAREN + SPACE + LCURLY +
-    //        body_out.code + condition_name + SPACE + ASSIGN + SPACE + cond_out.code + SEMIC + NEWLINE + RCURLY;
-    // return PythonOutputCode("", out);
-    //
-    std::string pre;
-    std::string out;
     PythonOutputCode cond = this->dispatch_expression(*node.condition, false);
-    std::string condition_name = "cond_" + std::to_string(rand());
+    std::string cond_id = "cond_" + std::to_string(this->next_arg_n());
     PythonOutputCode thenc = this->transpile_block(*node.body);
-    if (cond.pre_code != "") {
-        out += cond.pre_code;
-        if (node.condition->type == sem::ExpType::CALL) {
-            out += "while" + SPACE + LPAREN + condition_name + RPAREN + ":" + NEWLINE + "    " + thenc.code;
-        }
-    } else {
-        out += "while" + SPACE + LPAREN + cond.code + RPAREN + ":" + NEWLINE + "    " + thenc.code;
-    }
+    std::string out = pre_if_any(cond) + cond_id + " = " + cond.code + "\n";
+    out += "while " + cond_id + ":\n";
+    out += indent_paragraph(thenc.code, 4) + "\n";
+    out += indent_paragraph(pre_if_any(cond) + cond_id + " = " + cond.code + "\n", 4);
     return PythonOutputCode("", out);
 
 }
@@ -568,4 +545,8 @@ std::string indent_paragraph(std::string s, size_t level) {
         }
     }
     return r;
+}
+
+std::string pre_if_any(const PythonOutputCode& c) {
+    return c.pre_code.empty() ? "" : c.pre_code + "\n";
 }
