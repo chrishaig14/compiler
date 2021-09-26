@@ -12,10 +12,10 @@
 #include "../ast/top/Klass.h"
 #include "../ast/top/Alias.h"
 #include "../ast/top/EnumNode.h"
-#include "../units/Enum.h"
+#include "../units/infos/Enum.h"
 #include "../units/entities/EntityNothing.h"
 #include "../units/entities/EntityPackage.h"
-#include "../units/Module.h"
+#include "../units/infos/Module.h"
 
 class GlobalProcessor {
 public:

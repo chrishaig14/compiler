@@ -8,8 +8,8 @@
 
 #include <string>
 #include <fstream>
-#include "../units/Package.h"
-#include "../units/Module.h"
+#include "../units/infos/Package.h"
+#include "../units/infos/Module.h"
 #include "../util/utils.h"
 
 #define REQUIREMENTS_FILE "requirements.txt"

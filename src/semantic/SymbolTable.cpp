@@ -3,8 +3,6 @@
 //
 
 #include "SymbolTable.h"
-#include "../units/FunctionValue.h"
-#include "../units/ObjectValue.h"
 #include "../units/entities/EntityNotFound.h"
 #include "../units/entities/EntityValue.h"
 

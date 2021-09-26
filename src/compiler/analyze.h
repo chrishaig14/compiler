@@ -5,7 +5,7 @@
 #ifndef XLANG_ANALYZE_H
 #define XLANG_ANALYZE_H
 
-#include "../units/Module.h"
+#include "../units/infos/Module.h"
 #include "../semantic/Checker.h"
 
 

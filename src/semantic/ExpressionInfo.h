@@ -8,10 +8,10 @@
 #include <string>
 #include <vector>
 #include "../ast/general/Type.h"
-#include "../units/Class.h"
+#include "../units/infos/Class.h"
 #include "../simple_nodes/common/include/Common.h"
-#include "../units/Module.h"
-#include "../units/Package.h"
+#include "../units/infos/Module.h"
+#include "../units/infos/Package.h"
 
 class ExpressionInfo {
 public:

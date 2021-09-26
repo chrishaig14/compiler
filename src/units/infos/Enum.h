@@ -5,7 +5,7 @@
 #ifndef XLANG_ENUM_H
 #define XLANG_ENUM_H
 
-#include "../util/types.h"
+#include "../../util/types.h"
 #include "Class.h"
 
 class Enum {

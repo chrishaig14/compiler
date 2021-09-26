@@ -8,9 +8,8 @@
 
 #include <string>
 #include "../../../units/entities/Entity.h"
-#include "../../../units/Package.h"
-#include "../../../units/Enum.h"
-#include "../../../units/ObjectValue.h"
+#include "../../../units/infos/Package.h"
+#include "../../../units/infos/Enum.h"
 #include "../../../logging/logging.h"
 
 

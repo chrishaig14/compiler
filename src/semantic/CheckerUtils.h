@@ -6,8 +6,6 @@
 #define XLANG_CHECKERUTILS_H
 
 #include "../units/entities/Entity.h"
-#include "../units/FunctionValue.h"
-#include "../units/ObjectValue.h"
 #include "../ast/top/Function.h"
 #include "../simple_nodes/common/include/Common.h"
 #include "../simple_nodes/top/include/FunctionDef.h"

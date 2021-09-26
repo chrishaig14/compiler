@@ -10,7 +10,6 @@
 #include "../simple_nodes/expressions/include/EnumMember.h"
 #include "../simple_nodes/expressions/include/Id.h"
 #include "../simple_nodes/expressions/include/ObjectMember.h"
-#include "../units/FunctionValue.h"
 
 std::pair<std::string, ast::Type*>*
 Checker::get_first_substitution_object(ast::ObjectType& a, ast::ObjectType& b, bool is_top_level_arg) {
