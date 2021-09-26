@@ -37,6 +37,8 @@ namespace sem {
 
     class Float;
 
+    class For;
+
     class ObjectConstructor;
 
     class ObjectConstructorCall;
@@ -92,7 +94,7 @@ namespace sem {
     class Module;
 
     enum class CommonType {
-        DECLARATION, BLOCK, ASSIGNMENT, RETURN, CALL, WHILE, IF, BREAK, CONTINUE, MATCH, THROW, TRY_CATCH,
+        DECLARATION, BLOCK, ASSIGNMENT, RETURN, CALL, WHILE, IF, BREAK, CONTINUE, MATCH, THROW, TRY_CATCH, FOR
     };
 
     enum class ExpType {

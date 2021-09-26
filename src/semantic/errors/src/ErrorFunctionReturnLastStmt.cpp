@@ -13,7 +13,7 @@ bool ErrorFunctionReturnLastStmt::equal(const Error& other) const {
 }
 
 std::string ErrorFunctionReturnLastStmt::to_str(const CodeLines& code) const {
-    return std::string();
+    return "Error missing return in function";
 }
 
 ErrorFunctionReturnLastStmt::ErrorFunctionReturnLastStmt(std::string name, const sem::Type& node,

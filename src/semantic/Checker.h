@@ -20,6 +20,7 @@
 #include "../scanner/CodeLines.h"
 #include "../simple_nodes/common/include/Assignment.h"
 #include "../simple_nodes/common/include/Block.h"
+#include "../simple_nodes/common/include/For.h"
 #include "../simple_nodes/common/include/Block.h"
 #include "../simple_nodes/common/include/Break.h"
 #include "../simple_nodes/common/include/Call.h"

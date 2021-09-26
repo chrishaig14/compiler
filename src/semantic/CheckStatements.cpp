@@ -319,11 +319,13 @@ sem::UCommon Checker::visit_for(ast::For& node) {
     UExpressionInfo exp_info_p = this->dispatch_rvalue(node.exp);
     if (exp_info_p->entity.get().e_type != E_TYPE::VALUE) {
         this->error_reporter.error(std::make_unique<ErrorFor>(exp_info_p->entity, node.exp.start));
+        return nullptr;
     }
     EntityValue& exp_entity_value = exp_info_p->entity.get().get_value();
     sem::TypeObject& exp_ot = exp_entity_value.type.object();
     if (exp_ot.id != "List") {
         this->error_reporter.error(std::make_unique<ErrorFor>(exp_entity_value, node.exp.start));
+        return nullptr;
     }
 
     sem::Type* elem_type = exp_ot.type_params[0];
@@ -332,48 +334,41 @@ sem::UCommon Checker::visit_for(ast::For& node) {
     Entity* elem_entity = v.release();
     this->enter_scope("for");
     this->scope->set(node.var, *elem_entity);
-
-    std::string loop_c = std::to_string(this->loop_count++);
-    std::string loop_list_var_id = "__loop_list__" + loop_c;
-    std::string loop_index_var_id = "__loop_index__" + loop_c;
-    std::string loop_list_len_var_id = "__loop_list_len__" + loop_c;
-
-    sem::UExp lu;
-    sem::UExp eu;
-    auto* increment_index_sn = new sem::Assignment(std::move(lu), std::move(eu));
-    this->update_loop_index_snode = increment_index_sn;
-    increment_index_sn->lvalue = std::make_unique<sem::Id>(loop_index_var_id);
-    std::vector<sem::UExp> vv;
-    vv.push_back(std::make_unique<sem::Id>(loop_index_var_id));
-    auto inc_exp_node = std::make_unique<sem::CallExp>(std::make_unique<sem::Id>("libcore.libcore.Integer.__add__"),
-                                                       std::move(vv));
-    auto one_node = std::make_unique<sem::Integer>(std::string());
-    one_node->str = "1";
-    inc_exp_node->arguments.push_back(std::move(one_node));
-    increment_index_sn->rvalue = std::move(inc_exp_node);
+    //
+    // std::string loop_c = std::to_string(this->loop_count++);
+    // std::string loop_list_var_id = "__loop_list__" + loop_c;
+    // std::string loop_index_var_id = "__loop_index__" + loop_c;
+    // std::string loop_list_len_var_id = "__loop_list_len__" + loop_c;
+    //
+    // sem::UExp lu;
+    // sem::UExp eu;
+    // auto* increment_index_sn = new sem::Assignment(std::move(lu), std::move(eu));
+    // this->update_loop_index_snode = increment_index_sn;
+    // increment_index_sn->lvalue = std::make_unique<sem::Id>(loop_index_var_id);
+    // std::vector<sem::UExp> vv;
+    // vv.push_back(std::make_unique<sem::Id>(loop_index_var_id));
+    // auto inc_exp_node = std::make_unique<sem::CallExp>(std::make_unique<sem::Id>("libcore.libcore.Integer.__add__"),
+    //                                                    std::move(vv));
+    // auto one_node = std::make_unique<sem::Integer>(std::string());
+    // one_node->str = "1";
+    // inc_exp_node->arguments.push_back(std::move(one_node));
+    // increment_index_sn->rvalue = std::move(inc_exp_node);
 
     this->scope->is_loop = true;
     auto binfo = this->visit_block(node.body);
     this->scope->is_loop = false;
-    sem::Block* bn = binfo.release();
-    for (auto& local_var : this->scope->table) {
-        if (local_var.second->is_value()) {
-            bn->locals.push_back(local_var.first);
-        }
-    }
+    // sem::Block* bn = binfo.release();
+    // for (auto& local_var : this->scope->table) {
+    //     if (local_var.second->is_value()) {
+    //         bn->locals.push_back(local_var.first);
+    //     }
+    // }
     this->leave_scope();
 
-
-    sem::UCommon rinfo_p = sem::UCommon(make_for_snode(node,
-                                                       binfo,
-                                                       exp_info_p,
-                                                       loop_list_var_id,
-                                                       loop_index_var_id,
-                                                       loop_list_len_var_id,
-                                                       this->update_loop_index_snode));
-    auto& pn = (std::unique_ptr<sem::Block>&) rinfo_p;
-    pn->locals.push_back(loop_list_var_id);
-    this->update_loop_index_snode = nullptr;
+    if (binfo == nullptr) {
+        return nullptr;
+    }
+    sem::UCommon rinfo_p = std::make_unique<sem::For>(node.var, std::move(exp_info_p->exp_snode), std::move(binfo));
     return rinfo_p;
 }
 
