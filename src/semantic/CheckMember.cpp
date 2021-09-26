@@ -91,10 +91,10 @@ Checker::object_member(sem::UExp object_snode, EntityValue& p_value, const std::
     if (clazz->members.count(child) != 0) {
         info.set_entity(clazz->member_entities.at(child)->clone());
         if (info.entity.get().is_nothing()) {
-            info.set_entity(entity_from_type(*clazz->members.at(child)));
-            clazz->member_entities[child] = std::unique_ptr<Entity>(info.entity.get().clone());
-            EntityValue& ev = clazz->member_entities[child].get()->get_value();
-            this->fill_value(ev);
+            auto eee = entity_from_type(*clazz->members.at(child));
+            this->fill_value(eee->get_value());
+            info.set_entity(eee->clone());
+            clazz->member_entities[child] = std::move(eee);
         }
         auto omn = std::make_unique<sem::ObjectMember>(std::move(object_snode), clazz->path, child);
         info.exp_snode = std::move(omn);
