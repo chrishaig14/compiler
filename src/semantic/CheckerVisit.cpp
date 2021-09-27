@@ -152,51 +152,13 @@ void Checker::init() {
 
 std::unique_ptr<sem::Module> Checker::visit_root(ast::Module& node) {
     this->init();
-    // for (auto& import: node.imports) {
-    //     this->visit_import(import);
-    // }
-    // for (auto& klass: node.classes) {
-    //     this->visit_class(klass);
-    // }
-    // for (auto& enumm : node.enums) {
-    //     this->visit_enum(enumm);
-    // }
-    // for (auto& function: node.functions) {
-    //     this->visit_function(function);
-    // }
-
     auto sn = std::make_unique<sem::Module>();
     for (auto& n: node.all) {
+        if (n->ntype == TopNodeType::IMPORT) {
+            continue;
+        }
         std::unique_ptr<sem::Top> sinfo_p = this->dispatch_top(*n);
-
         sn->nodes.push_back(std::move(sinfo_p));
-
-        // if (n->ntype == NodeType::BLOCK) {
-        // } else {
-        //     if (sinfo_p->snode != nullptr) {
-        //         if (sinfo_p->snode->type == sem::CommonType::BLOCK) {
-        //             if (((std::unique_ptr<sem::Block>&) sinfo_p->snode)->unwrap) {
-        //                 for (auto& nn : ((std::unique_ptr<sem::Block>&) sinfo_p->top_snode)->nodes) {
-        //                     sn->nodes.push_back(std::move(nn));
-        //                 }
-        //             } else {
-        //                 sn->nodes.push_back(std::move(sinfo_p->snode));
-        //             }
-        //
-        //         } else {
-        //             sn->nodes.push_back(std::move(sinfo_p->snode));
-        //         }
-        //     }
-        // }
-        // SemanticInfo& sinfo = *sinfo_p;
-        // if (n->ntype == NodeType::CALL) {
-        //     // it's a function call
-        //     // if return value != NoneType, then force the return value
-        //
-        //     if (!sinfo.is_error() && sinfo_p->entity.type != E_TYPE::NOTHING) {
-        //         this->error_reporter.error(std::make_unique<ErrorUnusedReturnValue>(n->start));
-        //     }
-        // }
     }
     return sn;
 }

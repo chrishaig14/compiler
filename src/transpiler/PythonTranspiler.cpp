@@ -501,6 +501,7 @@ PythonOutputCode PythonTranspiler::transpile_object_method(const sem::ObjectMeth
 }
 
 std::string clean_path(Path a, Path b) {
+    return a.as_str();
     std::string ff = a.as_str().substr(0, b.as_str().size() + 1);
     if (ff == b.as_str() + ".") {
         return a.as_vec().back();

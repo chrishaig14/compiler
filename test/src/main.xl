@@ -1,5 +1,0 @@
-fun main()->Integer{
-    var r = 23
-    print(r.len())
-    return 0
-}

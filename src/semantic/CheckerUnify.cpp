@@ -146,7 +146,6 @@ std::pair<std::string, ast::Type*>* Checker::get_first_substitution(ast::Type& a
 }
 
 sem::UCommon Checker::visit_import(ast::Import& node) {
-
     sem::UCommon info_u;
     return info_u;
 }

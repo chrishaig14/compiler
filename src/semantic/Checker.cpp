@@ -417,8 +417,8 @@ sem::UCommon Checker::dispatch_statement(ast::Statement& n, bool is_rvalue) {
             return this->visit_return((ast::Return&) n);
         case StatementType::WHIL:
             return this->visit_while((ast::While&) n);
-        case StatementType::IMPORT:
-            return this->visit_import((ast::Import&) n);
+        // case StatementType::IMPORT:
+        //     return this->visit_import((ast::Import&) n);
         case StatementType::ALIAS:
             return this->visit_alias((ast::Alias&) n);
         case StatementType::MATCH_EXP:

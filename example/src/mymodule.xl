@@ -1,0 +1,7 @@
+fun say_hello() -> String {
+    return "Hello world!"
+}
+
+fun say_goodbye() -> String {
+    return "See ya!"
+}
