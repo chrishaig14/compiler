@@ -38,6 +38,14 @@ class Integer:
         return Boolean(a.value < b.value)
 
     @staticmethod
+    def __eq__(a, b):
+        return Boolean(a.value == b.value)
+
+    @staticmethod
+    def __ne__(a, b):
+        return Boolean(a.value != b.value)
+
+    @staticmethod
     def __ge__(a, b):
         return Boolean(a.value >= b.value)
 
