@@ -1,3 +1,5 @@
+import libcore
+
 class Boolean:
     def __init__(self, value):
         self.value = value
@@ -24,6 +26,10 @@ class List:
 
     def len(self):
         return Integer(len(self.elems))
+    def push(self, x):
+        self.elems.append(x)
+    def __get_item__(self, i):
+        return self.elems[i.value]
 
 class Integer:
     def __init__(self, value):
