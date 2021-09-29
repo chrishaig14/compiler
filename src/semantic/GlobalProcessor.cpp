@@ -10,6 +10,8 @@
 #include "../simple_nodes/common/include/TypeObject.h"
 #include "../simple_nodes/common/src/TypeFunction.h"
 #include "../simple_nodes/common/include/Type.h"
+#include "errors/include/ErrorRedeclared.h"
+#include "errors/include/ErrorGlobalRedeclared.h"
 
 void GlobalProcessor::visit_import(ast::Import& node) {
     const Path& node_path = Path(node.path);
@@ -110,7 +112,7 @@ void GlobalProcessor::visit_root() {
 
 }
 
-void GlobalProcessor::check_duplicated_names(ast::Module& node) const {
+void GlobalProcessor::check_duplicated_names(ast::Module& node) {
     std::map<std::string, void*> names;
     for (auto& np: node.all) {
         auto& n = *np;
@@ -131,7 +133,7 @@ void GlobalProcessor::check_duplicated_names(ast::Module& node) const {
         if (names.count(name) == 0) {
             names[name] = nullptr;
         } else {
-            throw std::runtime_error("Error: name \"" + name + "\" already defined");
+            this->error_reporter.error(std::make_unique<ErrorGlobalRedeclared>(name));
         }
     }
 }
@@ -235,7 +237,7 @@ void GlobalProcessor::visit_enum(ast::EnumNode& node) {
 
 }
 
-GlobalProcessor::GlobalProcessor(Module& module) : module(module) {
+GlobalProcessor::GlobalProcessor(Module& module) : module(module), error_reporter(module.code_lines) {
 }
 
 Path Module::get_actual_path(const std::string& id) {

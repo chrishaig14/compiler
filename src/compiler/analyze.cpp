@@ -136,12 +136,8 @@ bool preprocess_module(Module& module) {
     GlobalProcessor gp(module);
     std::cout << "** Global-processing module " << E_INFO(module.name) << " at path: " << E_INFO(module.abs_path)
               << std::endl;
-    try {
-        gp.visit_root();
-    } catch (std::runtime_error& e) {
-        return false;
-    }
-    return true;
+    gp.visit_root();
+    return gp.error_reporter.failed;
 }
 
 bool preprocess_package(Package& package) {

@@ -16,11 +16,12 @@
 #include "../units/entities/EntityNothing.h"
 #include "../units/entities/EntityPackage.h"
 #include "../units/infos/Module.h"
+#include "errors/include/ErrorReporter.h"
 
 class GlobalProcessor {
 public:
     Module& module;
-
+    ErrorReporter error_reporter;
     explicit GlobalProcessor(Module& module);
 
     void visit_root();
@@ -32,7 +33,7 @@ public:
     void visit_alias(ast::Alias& node);
     void visit_import(ast::Import& node);
     void visit_class(ast::Klass& node);
-    void check_duplicated_names(ast::Module& node) const;
+    void check_duplicated_names(ast::Module& node);
     void add_default_imports();
 };
 
