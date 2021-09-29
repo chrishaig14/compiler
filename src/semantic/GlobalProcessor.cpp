@@ -87,7 +87,7 @@ Enum* make_enum(ast::EnumNode& n, Path module_path) {
 void GlobalProcessor::visit_root() {
     ast::Module& node = *this->module.ast;
     this->add_default_imports();
-    check_duplicated_names(node);
+    this->check_duplicated_names(node);
 
     for (ast::Import& n: node.imports) {
         this->visit_import(n);
@@ -125,8 +125,6 @@ void GlobalProcessor::check_duplicated_names(ast::Module& node) const {
             } else {
                 name = ((ast::Import&) n).path.back();
             }
-            // } else if (n.ntype == TopNodeType::ALIAS) {
-            //     name = ((ast::Alias&) (n)).alias_id;
         } else if (n.ntype == TopNodeType::ENUM) {
             name = ((ast::EnumNode&) (n)).id;
         }
