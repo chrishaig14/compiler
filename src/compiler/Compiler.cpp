@@ -26,15 +26,15 @@ void Compiler::pre() {
     if (not parse_package(root_package)) {
         throw std::runtime_error("Parse Error");
     }
-    for (auto& p: root_package.units) {
-        Unit* uvalue = p.second;
-        if (uvalue->is_module()) {
-            // std::cout << p.second->module() << std::endl;
-            Module& m = uvalue->module();
-            std::cout << "Hello" << m.ast.get() << std::endl;
-            assert(m.ast.get() != nullptr);
-        }
-    }
+    // for (auto& p: root_package.units) {
+    //     Unit* uvalue = p.second;
+    //     if (uvalue->is_module()) {
+    //         // std::cout << p.second->module() << std::endl;
+    //         Module& m = uvalue->module();
+    //         std::cout << "Hello" << m.ast.get() << std::endl;
+    //         assert(m.ast.get() != nullptr);
+    //     }
+    // }
     preprocess_package(root_package);
 }
 
@@ -43,7 +43,7 @@ bool Compiler::main() {
 }
 
 VectorOfStrings Compiler::load_requirements(const std::string& filepath) {
-    std::cout << "Loading requirements from file " << filepath << std::endl;
+    std::cout << "Loading requirements from file " << E_INFO(filepath) << std::endl;
 
     auto requirements = read_requirements(filepath);
 
@@ -83,8 +83,8 @@ void load_package(Package& package, int level) {
     std::vector<std::string> modules;
     std::vector<std::string> subpackages;
 
-    std::cout << std::string(level, '-') << " Loading package " << package.name << " at path " << package.abs_path
-              << std::endl;
+    std::cout << std::string(level, '-') << " Loading package " << E_INFO(package.name) << " at path "
+    << E_INFO(package.abs_path) << std::endl;
 
     dirent* ent = readdir(dir);
     while (ent != nullptr) {
@@ -95,7 +95,7 @@ void load_package(Package& package, int level) {
                 std::string ext = d_name.substr(d_name.size() - 3, 3);
                 if (ext == ".xl") {
                     std::string module_name = d_name.substr(0, d_name.size() - 3);
-                    std::cout << std::string(level + 1, '-') << " Found module " << module_name << std::endl;
+                    std::cout << std::string(level + 1, '-') << " Found module " << E_INFO(module_name) << std::endl;
                     load_module(package, module_name);
                     modules.emplace_back(module_name);
                 }
@@ -138,7 +138,7 @@ void Compiler::load_library(const std::string& name, const std::string& lib_vers
         return;
     }
     closedir(dir);
-    std::cout << "Loading top unit: " << E_HLT(name) << " at path: " << E_HLT(abs_top_unit_path) << std::endl;
+    std::cout << "Loading top unit: " << E_INFO(name) << " at path: " << E_INFO(abs_top_unit_path) << std::endl;
 
     std::string library_requirements_file = path_join(abs_top_unit_path, REQUIREMENTS_FILE);
     load_requirements(library_requirements_file);
@@ -148,7 +148,7 @@ void Compiler::load_library(const std::string& name, const std::string& lib_vers
     parse_package(*library_top_package);
     preprocess_package(*library_top_package);
     top_package.units[name] = new SubpackageUnit(library_top_package);
-    std::cout << "Finished loading top unit: " << E_HLT(lib_rel_top_unit_path) << std::endl;
+    std::cout << "Finished loading top unit: " << E_INFO(lib_rel_top_unit_path) << std::endl;
     this->loaded_top_units[lib_rel_top_unit_path] = true;
 }
 
@@ -164,7 +164,7 @@ void Compiler::load_top_unit(const std::string& name, const std::string& m_versi
         std::cout << "Top unit " << name + "==" + m_version << " NOT FOUND" << std::endl;
         return;
     }
-    std::cout << "Loading top unit: " << E_HLT(name) << " at path: " << E_HLT(abs_top_unit_path) << std::endl;
+    std::cout << "Loading top unit: " << E_INFO(name) << " at path: " << E_INFO(abs_top_unit_path) << std::endl;
     std::string unit_requirements_file = path_join(abs_top_unit_path, REQUIREMENTS_FILE);
     auto requirements = read_requirements(unit_requirements_file);
     for (const auto& req: requirements) {
@@ -176,6 +176,6 @@ void Compiler::load_top_unit(const std::string& name, const std::string& m_versi
     parse_package(*top_unit_package);
     preprocess_package(*top_unit_package);
     top_package.units[name] = new SubpackageUnit(top_unit_package);
-    std::cout << "Finished loading top unit: " << E_HLT(lib_rel_top_unit_path) << std::endl;
+    std::cout << "Finished loading top unit: " << E_INFO(lib_rel_top_unit_path) << std::endl;
     this->loaded_top_units[lib_rel_top_unit_path] = true;
 }

@@ -132,7 +132,7 @@ void add_local_path_to_module(Module& module, Path path, Package& top_package) {
 
 bool preprocess_module(Module& module) {
     GlobalProcessor gp(module);
-    std::cout << "Global-processing module " << module.name << " at path: " << module.abs_path << std::endl;
+    std::cout << "** Global-processing module " << E_INFO(module.name) << " at path: " << E_INFO(module.abs_path) << std::endl;
     try {
         gp.visit_root();
     } catch (std::runtime_error& e) {
@@ -144,6 +144,7 @@ bool preprocess_module(Module& module) {
 
 bool preprocess_package(Package& package) {
     bool ok = true;
+    std::cout << "* Global-processing package " << E_INFO(package.name) << " at path: " << E_INFO(package.abs_path) << std::endl;
     for (const auto& ep: package.units) {
         Unit* uvalue = ep.second;
         if (uvalue->is_package()) {

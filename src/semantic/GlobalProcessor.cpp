@@ -56,9 +56,6 @@ void GlobalProcessor::add_default_imports() {
 
 
 void GlobalProcessor::visit_function(ast::Function& node) {
-    std::cout << "Global-processing function " << node.identifier << " in module " << this->module.name << std::endl;
-
-
     ast::VectorOfTypes x;
     for (ast::Type& type_node: node.parameter_types) {
         this->module.fill_actual(type_node);

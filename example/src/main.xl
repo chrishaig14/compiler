@@ -3,12 +3,10 @@ import example.mymodule
 import example.mymodule.say_goodbye
 import example
 
+class example {
+    i: Integer
+}
+
 fun main()->Integer{
-    print(say_hello())
-    print(say_goodbye())
-    print(mymodule.say_goodbye())
-    print(mymodule.say_hello())
-    print(example.mymodule.say_hello())
-    print(example.mymodule.say_goodbye())
     return 0
 }

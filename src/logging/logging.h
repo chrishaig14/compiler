@@ -37,5 +37,13 @@ inline std::string E_HLT(const std::string& x) {
 #endif
 }
 
+inline std::string E_INFO(const std::string& x) {
+#ifdef NO_COLOR
+    return fmt::format("{}", x);
+#else
+    return fmt::format(fmt::fg(fmt::terminal_color::blue), "{}", x);
+#endif
+}
+
 #define E_LINE(x) fmt::format(fmt::fg(fmt::terminal_color::white),"{}", x)
 #endif //UNTITLED1_LOGGING_H

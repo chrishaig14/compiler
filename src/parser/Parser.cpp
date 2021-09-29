@@ -101,7 +101,6 @@ std::unique_ptr<ast::Module> Parser::parse_module() {
         }
     }
     // TextPosition end = this->token.end_pos;
-    std::cout << "--------------- FINISHED PARSING -----------------" << std::endl;
     auto module_ast = std::make_unique<ast::Module>(std::move(all), imports, classes, enums, functions);
     return module_ast;
 }
@@ -885,7 +884,6 @@ std::unique_ptr<ast::Klass> Parser::parse_class_definition() {
     Token class_tok = this->expect_token(TokType::CLASS);
     Token class_name_tk = this->expect_token(TokType::ID);
     std::string& class_name = class_name_tk.str;
-    std::cout << class_name << std::endl;
     VectorOfStrings type_parameters;
     if (this->match(TokType::LSQUARE)) {
         this->next();
@@ -986,7 +984,6 @@ std::unique_ptr<ast::Klass> Parser::parse_class_definition() {
                                           end.end_pos);
     c->members_ordered = members_ordered;
     c->start = class_tok.start;
-    std::cout << "Done parsing class " << class_name << std::endl;
     return c;
 }
 
