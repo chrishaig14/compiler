@@ -19,7 +19,7 @@ bool check_module(Module& module, Package& top_package) {
     resolve_module_imports(module, top_package);
     Checker checker(top_package, module);
     module.sast = checker.visit_root(*module.ast);
-    return not checker.error_reporter.failed;
+    return checker.error_reporter.ok();
 }
 
 bool check_package(Package& package, Package& top_package) {
@@ -137,7 +137,7 @@ bool preprocess_module(Module& module) {
     std::cout << "** Global-processing module " << E_INFO(module.name) << " at path: " << E_INFO(module.abs_path)
               << std::endl;
     gp.visit_root();
-    return gp.error_reporter.failed;
+    return gp.error_reporter.ok();
 }
 
 bool preprocess_package(Package& package) {

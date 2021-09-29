@@ -17,8 +17,8 @@ const ast::ObjectType NO_TYPE(".None");
 const TextPosition& _POS = {1, 1};
 
 #define CHECKER() std::unique_ptr<Compiler> cp = analyze(code);Compiler& c = *cp;Module& module = c.root_package.units["tmp"]->module();resolve_module_imports(module, c.top_package);Checker checker(c.top_package, module);
-#define REQUIRE_CHECKER_ONE_ERROR() REQUIRE(checker.error_reporter.failed);REQUIRE(checker.error_reporter.errors.size() == 1);
-#define REQUIRE_CHECKER_OK() REQUIRE(not checker.error_reporter.failed);REQUIRE(checker.error_reporter.errors.empty());
+#define REQUIRE_CHECKER_ONE_ERROR() REQUIRE(not checker.error_reporter.ok());REQUIRE(checker.error_reporter.errors.size() == 1);
+#define REQUIRE_CHECKER_OK() REQUIRE(checker.error_reporter.ok());REQUIRE(checker.error_reporter.errors.empty());
 
 std::unique_ptr<Compiler> analyze(std::string code) {
     const std::string& tmp_in = "tmp_in";
@@ -47,7 +47,7 @@ TEST_CASE("basic_function", "[checker]") {
 
     CHECKER();
     checker.visit_function(module.ast->functions[0]);
-    REQUIRE(not checker.error_reporter.failed);
+    REQUIRE(checker.error_reporter.ok());
 }
 
 TEST_CASE("basic_function_bad_return_type", "[checker]") {
@@ -73,7 +73,7 @@ TEST_CASE("basic_declaration", "[checker]") {
 
     CHECKER();
     checker.visit_declaration((ast::Declaration&) *((std::unique_ptr<ast::Function>&) module.ast->functions[0])->body->nodes[0]);
-    REQUIRE(not checker.error_reporter.failed);
+    REQUIRE(checker.error_reporter.ok());
 }
 
 TEST_CASE("basic_declaration_type_ok", "[checker]") {
@@ -81,7 +81,7 @@ TEST_CASE("basic_declaration_type_ok", "[checker]") {
 
     CHECKER();
     checker.visit_declaration((ast::Declaration&) *((std::unique_ptr<ast::Function>&) module.ast->functions[0])->body->nodes[0]);
-    REQUIRE(not checker.error_reporter.failed);
+    REQUIRE(checker.error_reporter.ok());
 }
 
 TEST_CASE("basic_declaration_bad_type", "[checker]") {
@@ -186,7 +186,7 @@ TEST_CASE("int_literal", "[checker]") {
     ast::ExpNode& expression = ((ast::Declaration&) *(module.ast->functions[0].get().body->nodes[0])).expression;
     UExpressionInfo info = checker.dispatch_rvalue(expression);
 
-    REQUIRE(!checker.error_reporter.failed);
+    REQUIRE(!not checker.error_reporter.ok());
     REQUIRE(checker.error_reporter.errors.size() == 0);
     REQUIRE(info->entity.get().is_value());
     REQUIRE(info->entity.get().get_value().metatype == Meta::CLASS);
@@ -201,7 +201,7 @@ TEST_CASE("bool_literal", "[checker]") {
     UExpressionInfo info = checker.dispatch_rvalue(expression);
 
 
-    REQUIRE(!checker.error_reporter.failed);
+    REQUIRE(!not checker.error_reporter.ok());
     REQUIRE(checker.error_reporter.errors.size() == 0);
     REQUIRE(info->entity.get().is_value());
     REQUIRE(info->entity.get().get_value().metatype == Meta::CLASS);
@@ -216,7 +216,7 @@ TEST_CASE("list_literal", "[checker]") {
     UExpressionInfo info = checker.dispatch_rvalue(expression);
 
 
-    REQUIRE(!checker.error_reporter.failed);
+    REQUIRE(!not checker.error_reporter.ok());
     REQUIRE(checker.error_reporter.errors.size() == 0);
     REQUIRE(info->entity.get().is_value());
     REQUIRE(info->entity.get().get_value().metatype == Meta::CLASS);
@@ -231,7 +231,7 @@ TEST_CASE("empty_list_literal", "[checker]") {
     UExpressionInfo info = checker.dispatch_rvalue(expression);
 
 
-    REQUIRE(!checker.error_reporter.failed);
+    REQUIRE(!not checker.error_reporter.ok());
     REQUIRE(checker.error_reporter.errors.size() == 0);
     REQUIRE(info->entity.get().is_value());
     REQUIRE(info->entity.get().get_value().metatype == Meta::CLASS);
@@ -246,7 +246,7 @@ TEST_CASE("empty_dict_literal", "[checker]") {
     UExpressionInfo info = checker.dispatch_rvalue(expression);
 
 
-    REQUIRE(!checker.error_reporter.failed);
+    REQUIRE(!not checker.error_reporter.ok());
     REQUIRE(checker.error_reporter.errors.size() == 0);
     REQUIRE(info->entity.get().is_value());
     REQUIRE(info->entity.get().get_value().metatype == Meta::CLASS);
@@ -263,7 +263,7 @@ TEST_CASE("dict_literal", "[checker]") {
     UExpressionInfo info = checker.dispatch_rvalue(expression);
 
 
-    REQUIRE(!checker.error_reporter.failed);
+    REQUIRE(!not checker.error_reporter.ok());
     REQUIRE(checker.error_reporter.errors.size() == 0);
     REQUIRE(info->entity.get().is_value());
     REQUIRE(info->entity.get().get_value().metatype == Meta::CLASS);
@@ -279,7 +279,7 @@ TEST_CASE("float_literal", "[checker]") {
     UExpressionInfo info = checker.dispatch_rvalue(expression);
 
 
-    REQUIRE(!checker.error_reporter.failed);
+    REQUIRE(!not checker.error_reporter.ok());
     REQUIRE(checker.error_reporter.errors.size() == 0);
     REQUIRE(info->entity.get().is_value());
     REQUIRE(info->entity.get().get_value().metatype == Meta::CLASS);
@@ -297,7 +297,7 @@ TEST_CASE("float_literal", "[checker]") {
 //     UExpressionInfo info = checker.dispatch_rvalue(expression);
 
 //
-//     REQUIRE(!checker.error_reporter.failed);
+//     REQUIRE(!not checker.error_reporter.ok());
 //     REQUIRE(checker.error_reporter.errors.size() == 0);
 //     REQUIRE(info->entity.get().type == E_TYPE::VALUE);
 //     REQUIRE(((EntityValue*)(info->entity))->value->metatype == Meta::CLASS);
@@ -354,7 +354,7 @@ TEST_CASE("member_ok", "[checker]") {
     checker.init();
     checker.visit_root(*module.ast);
 
-    CHECK(!checker.error_reporter.failed);
+    CHECK(!not checker.error_reporter.ok());
     CHECK(checker.error_reporter.errors.empty());
 }
 
@@ -374,7 +374,7 @@ fun bar(f: Foo)->Integer{
     checker.init();
     checker.visit_root(*module.ast);
 
-    CHECK(!checker.error_reporter.failed);
+    CHECK(!not checker.error_reporter.ok());
     CHECK(checker.error_reporter.errors.empty());
 }
 
@@ -394,7 +394,7 @@ fun bar(f: Foo)->Integer{
     checker.init();
     checker.visit_root(*module.ast);
 
-    CHECK(!checker.error_reporter.failed);
+    CHECK(!not checker.error_reporter.ok());
     CHECK(checker.error_reporter.errors.empty());
 }
 
@@ -649,7 +649,7 @@ TEST_CASE("match_ok", "[checker]") {
 //     checker.init();
 //     checker.visit_root(*module.ast);
 //
-//     REQUIRE(!checker.error_reporter.failed);
+//     REQUIRE(!not checker.error_reporter.ok());
 //     REQUIRE(checker.error_reporter.errors.empty());
 // }
 

@@ -11,7 +11,7 @@
 #include "../src/simple_nodes/expressions/include/expressions.h"
 
 #define CHECKER() std::unique_ptr<Compiler> cp = c_analyze(code);Compiler& c = *cp;Module& module = c.root_package.units["tmp"]->module();resolve_module_imports(module, c.top_package);Checker checker(c.top_package, module);
-#define REQUIRE_CHECKER_OK() REQUIRE(!checker.error_reporter.failed);REQUIRE(checker.error_reporter.errors.empty());
+#define REQUIRE_CHECKER_OK() REQUIRE(checker.error_reporter.ok());REQUIRE(checker.error_reporter.errors.empty());
 static const ast::ObjectType NO_TYPE(".None");
 
 static const TextPosition& _POS = {1, 1};
@@ -239,7 +239,7 @@ TEST_CASE("semantic_output_float_literal", "[checker]") {
     UExpressionInfo info = checker.dispatch_rvalue(expression);
 
 
-    REQUIRE(!checker.error_reporter.failed);
+    REQUIRE(checker.error_reporter.ok());
     REQUIRE(checker.error_reporter.errors.size() == 0);
     REQUIRE(info->entity.get().is_value());
     REQUIRE(info->entity.get().get_value().metatype == Meta::CLASS);
@@ -257,7 +257,7 @@ TEST_CASE("semantic_output_float_literal", "[checker]") {
 //     UExpressionInfo info = checker.dispatch_rvalue(expression);
 
 //
-//     REQUIRE(!checker.error_reporter.failed);
+//     REQUIRE(checker.error_reporter.ok());
 //     REQUIRE(checker.error_reporter.errors.size() == 0);
 //     REQUIRE(info->entity.get().type == E_TYPE::VALUE);
 //     REQUIRE(((EntityValue*)(info->entity))->value->metatype == Meta::CLASS);
@@ -274,7 +274,7 @@ TEST_CASE("semantic_output_member", "[checker]") {
     checker.init();
     checker.visit_root(*module.ast);
 
-    CHECK(!checker.error_reporter.failed);
+    CHECK(checker.error_reporter.ok());
     CHECK(checker.error_reporter.errors.empty());
 }
 

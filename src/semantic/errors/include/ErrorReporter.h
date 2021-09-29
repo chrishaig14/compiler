@@ -22,12 +22,15 @@ enum class ErrorElement {
 };
 
 class ErrorReporter {
+    bool failed;
 public:
-    ErrorReporter(const CodeLines& code_lines);
+    bool ok() {
+        return not this->failed;
+    }
 
+    ErrorReporter(const CodeLines& code_lines);
     std::vector<std::unique_ptr<Error>> errors;
     const CodeLines& code_lines;
-    bool failed;
     void fail(const std::string& msg, TextPosition pos);
 
     void fail(const std::string& msg) {
