@@ -143,7 +143,7 @@ PythonOutputCode PythonTranspiler::transpile_string(const sem::String& node) {
 }
 
 PythonOutputCode PythonTranspiler::transpile_boolean(const sem::Bool& node) {
-    return PythonOutputCode("", node.v ? "True" : "False");
+    return PythonOutputCode("", std::string("libcore.libcore.Boolean(") + (node.v ? "True" : "False") + ")");
 }
 
 PythonOutputCode PythonTranspiler::transpile_float(const sem::Float& node) {
@@ -217,12 +217,12 @@ PythonOutputCode PythonTranspiler::transpile_object_member(const sem::ObjectMemb
 
 PythonOutputCode PythonTranspiler::transpile_while(const sem::While& node) {
     PythonOutputCode cond = this->dispatch_expression(*node.condition, false);
-    std::string cond_id = "cond_" + std::to_string(this->next_arg_n());
+    std::string cond_id = "condition_" + std::to_string(this->next_arg_n());
     PythonOutputCode thenc = this->transpile_block(*node.body);
     std::string out = pre_if_any(cond) + cond_id + " = " + cond.code + "\n";
     out += "while " + cond_id + ":\n";
     out += indent_paragraph(thenc.code, 4) + "\n";
-    out += indent_paragraph(pre_if_any(cond) + cond_id + " = " + cond.code + "\n", 4);
+    out += indent_paragraph(pre_if_any(cond) + cond_id + " = " + cond.code, 4);
     return PythonOutputCode("", out);
 
 }

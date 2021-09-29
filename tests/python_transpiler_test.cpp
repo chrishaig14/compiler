@@ -27,7 +27,7 @@ TEST_CASE("python_transpile_boolean", "[checker]") {
     PythonTranspiler pt;
     // false
     PythonOutputCode poc = pt.transpile_boolean(sem::Bool(false));
-    REQUIRE(poc.code == "False");
+    REQUIRE(poc.code == "libcore.libcore.Boolean(False)");
 }
 
 // TEST_CASE("python_transpile_object_method_call_no_args", "[checker]") {
@@ -97,10 +97,10 @@ TEST_CASE("python_transpile_const_function_call_with_complex_args", "[checker]")
     complex_arg_vec.push_back(std::make_unique<sem::Integer>("45"));
     auto poc = pt.transpile_call_exp(sem::CallExp(std::make_unique<sem::ConstFunction>(Path("mymodule.myfunction")),
                                                   std::move(complex_arg_vec)));
-    REQUIRE(poc.pre_code == R"(function_to_call = mymodule.myfunction
-arg_0 = libcore.libcore.Integer(45)
+    REQUIRE(poc.pre_code == R"(function_to_call_0 = mymodule.myfunction
+arg_1 = libcore.libcore.Integer(45)
 )");
-    REQUIRE(poc.code == "function_to_call(arg_0)");
+    REQUIRE(poc.code == "function_to_call_0(arg_1)");
 }
 //
 TEST_CASE("python_transpile_if", "[checker]") {
@@ -111,8 +111,8 @@ TEST_CASE("python_transpile_if", "[checker]") {
     then->nodes.emplace_back(new sem::Assignment(std::make_unique<sem::Id>("x"), std::make_unique<sem::Integer>("99")));
     // if(8.gt(78)){x=99}
     PythonOutputCode poc = pt.transpile_if(sem::If(std::make_unique<sem::Bool>(true), std::move(then), {}, nullptr));
-    REQUIRE(poc.code == R"(condition = True
-if condition:
+    REQUIRE(poc.code == R"(condition_0 = libcore.libcore.Boolean(True)
+if condition_0:
     x = libcore.libcore.Integer(99))");
 }
 
@@ -145,8 +145,10 @@ TEST_CASE("python_transpile_while", "[checker]") {
     then->nodes.emplace_back(new sem::Assignment(std::make_unique<sem::Id>("x"), std::make_unique<sem::Integer>("99")));
     // while(false){x=99}
     PythonOutputCode poc = pt.transpile_while(sem::While(std::make_unique<sem::Bool>(false), std::move(then)));
-    REQUIRE(poc.code == R"(while (False):
-    x = libcore.libcore.Integer(99))");
+    REQUIRE(poc.code == R"(condition_0 = libcore.libcore.Boolean(False)
+while condition_0:
+    x = libcore.libcore.Integer(99)
+    condition_0 = libcore.libcore.Boolean(False))");
 }
 
 TEST_CASE("python_transpile_function_def", "[checker]") {
