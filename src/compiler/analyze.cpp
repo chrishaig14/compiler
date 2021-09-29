@@ -31,10 +31,12 @@ bool check_package(Package& package, Package& top_package) {
             Package& subpackage = uvalue->package();
             if (not check_package(subpackage, top_package)) {
                 ok = false;
+                std::cout << E_HLT("Failed checking package ") << E_INFO(subpackage.name) << std::endl;
             }
         } else if (uvalue->is_module()) {
             Module& module = uvalue->module();
             if (not check_module(module, top_package)) {
+                std::cout << E_HLT("Failed checking module ") << E_INFO(module.name) << std::endl;
                 ok = false;
             }
         }
@@ -132,11 +134,11 @@ void add_local_path_to_module(Module& module, Path path, Package& top_package) {
 
 bool preprocess_module(Module& module) {
     GlobalProcessor gp(module);
-    std::cout << "** Global-processing module " << E_INFO(module.name) << " at path: " << E_INFO(module.abs_path) << std::endl;
+    std::cout << "** Global-processing module " << E_INFO(module.name) << " at path: " << E_INFO(module.abs_path)
+              << std::endl;
     try {
         gp.visit_root();
     } catch (std::runtime_error& e) {
-        std::cout << "Error global processing module " << module.abs_path << " : " << e.what() << std::endl;
         return false;
     }
     return true;
@@ -144,17 +146,20 @@ bool preprocess_module(Module& module) {
 
 bool preprocess_package(Package& package) {
     bool ok = true;
-    std::cout << "* Global-processing package " << E_INFO(package.name) << " at path: " << E_INFO(package.abs_path) << std::endl;
+    std::cout << "* Global-processing package " << E_INFO(package.name) << " at path: " << E_INFO(package.abs_path)
+              << std::endl;
     for (const auto& ep: package.units) {
         Unit* uvalue = ep.second;
         if (uvalue->is_package()) {
             Package& subpackage = uvalue->package();
             if (not preprocess_package(subpackage)) {
+                std::cout << E_HLT("Error global processing package ") << E_INFO(subpackage.abs_path) << std::endl;
                 ok = false;
             }
         } else if (uvalue->is_module()) {
             Module& module = uvalue->module();
             if (not preprocess_module(module)) {
+                std::cout << E_HLT("Error global processing module ") << E_INFO(module.abs_path) << std::endl;
                 ok = false;
             }
         }

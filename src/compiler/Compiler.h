@@ -118,7 +118,7 @@ public:
     //                           Package& package);
 
     bool main();
-    void pre();
+    bool pre();
     Package root_package;
     Package top_package;
 };

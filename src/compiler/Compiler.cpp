@@ -16,7 +16,7 @@ Compiler::Compiler(const std::string& project_dir, const std::string& project_ou
     this->top_package.units[this->output_name] = new SubpackageUnit(&root_package);
 }
 
-void Compiler::pre() {
+bool Compiler::pre() {
     std::string req_file_path = path_join(this->project_dir, REQUIREMENTS_FILE);
 
     VectorOfStrings requirements = this->load_requirements(req_file_path);
@@ -35,7 +35,7 @@ void Compiler::pre() {
     //         assert(m.ast.get() != nullptr);
     //     }
     // }
-    preprocess_package(root_package);
+    return preprocess_package(root_package);
 }
 
 bool Compiler::main() {
