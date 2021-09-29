@@ -105,10 +105,9 @@ void Compiler::add_global_path_to_module(Module& module, Path path) {
 
 }
 
-void add_local_path_to_module(Module& module, Path path, Package& top_package) {
+ModuleMember* find(Path path, Package& top_package) {
     ModuleMember* current_member = new PackageModuleMember(&top_package);
     std::string path_so_far = "global";
-    // ModuleMember* last_member;
 
     for (const auto& path_part: path.as_vec()) {
         if (current_member->is_package()) {
@@ -129,6 +128,11 @@ void add_local_path_to_module(Module& module, Path path, Package& top_package) {
         }
         path_so_far += "." + path_part;
     }
+    return current_member;
+}
+
+void add_local_path_to_module(Module& module, Path path, Package& top_package) {
+    ModuleMember* current_member = find(path, top_package);
     module.members[path.as_vec().back()] = current_member;
 }
 
