@@ -28,9 +28,6 @@ public:
     std::vector<std::unique_ptr<Error>> errors;
     const CodeLines& code_lines;
     bool failed;
-    std::string context_string(TextPosition position);
-    std::string code_context_string(TextPosition position);
-    std::string code_string(TextPosition start, TextPosition end);
     void fail(const std::string& msg, TextPosition pos);
 
     void fail(const std::string& msg) {
@@ -44,16 +41,9 @@ public:
     std::string __file__;
 
     void fail_ok(const std::string& pre_msg, const std::string& msg, TextPosition pos);
-    void module_no_member(const ast::Type& t, const std::string& member, TextPosition pos, ast::Statement& obj,
-                          TextPosition member_start, TextPosition member_end);
-    void object_no_member(const ast::Type& t, const ast::Member& obj);
-    void module_no_member(std::string mod_name, const std::string& member, TextPosition pos, ast::Statement& obj,
-                          TextPosition member_start, TextPosition member_end);
-    void package_no_member(std::string pack_name, const std::string& member, TextPosition pos, ast::Statement& obj,
-                           TextPosition member_start, TextPosition member_end);
     void error(std::unique_ptr<Error> error);
-    void package_no_member(Package* pack, const std::string& member, TextPosition pos, ast::Statement& obj,
-                           TextPosition member_start, TextPosition member_end);
+    std::string context_string(TextPosition position);
+    std::string code_context_string(TextPosition position);
 };
 
 
