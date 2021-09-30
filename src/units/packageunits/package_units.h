@@ -32,6 +32,8 @@ public:
     virtual Module& module() {
         throw std::runtime_error("Unit is not a module");
     }
+
+    virtual ~Unit() = default;
 };
 
 class SubpackageUnit : public Unit {

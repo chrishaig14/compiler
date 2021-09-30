@@ -26,7 +26,7 @@ bool check_package(Package& package, Package& top_package) {
     // std::cout << "Analyzing package " << package->name << std::endl;
     bool ok = true;
     for (const auto& ep: package.units) {
-        Unit* uvalue = ep.second;
+        Unit* uvalue = ep.second.get();
         if (uvalue->is_package()) {
             Package& subpackage = uvalue->package();
             if (not check_package(subpackage, top_package)) {
@@ -149,7 +149,7 @@ bool preprocess_package(Package& package) {
     std::cout << "* Global-processing package " << E_INFO(package.name) << " at path: " << E_INFO(package.abs_path)
               << std::endl;
     for (const auto& ep: package.units) {
-        Unit* uvalue = ep.second;
+        Unit* uvalue = ep.second.get();
         if (uvalue->is_package()) {
             Package& subpackage = uvalue->package();
             if (not preprocess_package(subpackage)) {

@@ -20,7 +20,7 @@ ModuleMember* Package::get(Path p) {
     }
     VectorOfStrings pt = p.as_vec();
     assert(this->units.count(pt[0]) == 1);
-    Unit* u = this->units.at(pt[0]);
+    Unit* u = this->units.at(pt[0]).get();
     if (u->is_module()) {
         return u->module().get(Path(VectorOfStrings(pt.begin() + 1, pt.end())));
     } else if (u->is_package()) {

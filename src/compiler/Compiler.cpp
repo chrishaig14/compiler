@@ -13,7 +13,7 @@ Compiler::Compiler(const std::string& project_dir, const std::string& project_ou
         : project_dir(project_dir), project_output_dir(project_output_dir), output_name(output_name),
           lib_path(lib_path), is_lib(is_lib), version(version),
           root_package(Path(this->output_name), project_dir, false), top_package(Path("global"), "", false) {
-    this->top_package.units[this->output_name] = new SubpackageUnit(&root_package);
+    this->top_package.units[this->output_name] = std::make_unique<SubpackageUnit>(&root_package);
 }
 
 bool Compiler::pre() {
@@ -69,7 +69,7 @@ void load_module(Package& package, const std::string& module_name) {
     // }
     auto* module = new Module(Path(package.path, module_name), module_abs_path, package.is_lib);
     // this->my_modules.push_back(std::unique_ptr<Module>(module));
-    package.units[module_name] = new ModuleUnit(module);
+    package.units[module_name] = std::make_unique<ModuleUnit>(module);
 }
 
 void load_package(Package& package, int level) {
@@ -120,7 +120,7 @@ void load_package(Package& package, int level) {
 
         auto* subpackage = new Package(Path(package.path, subpackage_name), subpackage_abs_path, package.is_lib);
         load_package(*subpackage, level + 1);
-        package.units[subpackage_name] = new SubpackageUnit(subpackage);
+        package.units[subpackage_name] = std::make_unique<SubpackageUnit>(subpackage);
     }
 }
 
@@ -147,7 +147,7 @@ void Compiler::load_library(const std::string& name, const std::string& lib_vers
     load_package(*library_top_package, 1);
     parse_package(*library_top_package);
     preprocess_package(*library_top_package);
-    top_package.units[name] = new SubpackageUnit(library_top_package);
+    top_package.units[name] = std::make_unique<SubpackageUnit>(library_top_package);
     std::cout << "Finished loading top unit: " << E_INFO(lib_rel_top_unit_path) << std::endl;
     this->loaded_top_units[lib_rel_top_unit_path] = true;
 }
@@ -175,7 +175,7 @@ void Compiler::load_top_unit(const std::string& name, const std::string& m_versi
     load_package(*top_unit_package, 1);
     parse_package(*top_unit_package);
     preprocess_package(*top_unit_package);
-    top_package.units[name] = new SubpackageUnit(top_unit_package);
+    top_package.units[name] = std::make_unique<SubpackageUnit>(top_unit_package);
     std::cout << "Finished loading top unit: " << E_INFO(lib_rel_top_unit_path) << std::endl;
     this->loaded_top_units[lib_rel_top_unit_path] = true;
 }

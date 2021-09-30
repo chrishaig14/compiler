@@ -31,7 +31,7 @@ bool parse_package(Package& package) {
         return ok;
     }
     for (const auto& unit: package.units) {
-        Unit* punit = unit.second;
+        Unit* punit = unit.second.get();
         if (punit->is_package()) {
             ok &= parse_package(punit->package());
         } else if (punit->is_module()) {
