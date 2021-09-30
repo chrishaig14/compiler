@@ -197,11 +197,11 @@ void GlobalProcessor::visit_class(ast::Klass& node) {
         this->module.fill_actual(*method.return_type);
         // method.return_type->object().actual_base_path = this->get_actual_path(method.return_type->object().id);
 
-        auto* cf = new ConstFunction(Path(class_info->path, f.first),
+        auto cf = std::make_unique<ConstFunction>(Path(class_info->path, f.first),
                                      std::make_unique<sem::TypeFunction>(x, sem::UType(method.return_type->to_sem())));
         method.path = cf->path;
         // f.second->const_function = cf;
-        class_info->static_methods.insert(make_pair(f.first, cf));
+        class_info->static_methods.insert(make_pair(f.first, std::move(cf)));
     }
 
     // class_info->class_name = node.class_name;
