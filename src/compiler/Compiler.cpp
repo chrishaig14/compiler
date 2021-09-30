@@ -69,6 +69,7 @@ void load_module(Package& package, const std::string& module_name) {
     // }
     auto* module = new Module(Path(package.path, module_name), module_abs_path, package.is_lib);
     // this->my_modules.push_back(std::unique_ptr<Module>(module));
+    package.modules.push_back(std::unique_ptr<Module>(module));
     package.units[module_name] = std::make_unique<ModuleUnit>(module);
 }
 
@@ -84,7 +85,7 @@ void load_package(Package& package, int level) {
     std::vector<std::string> subpackages;
 
     std::cout << std::string(level, '-') << " Loading package " << E_INFO(package.name) << " at path "
-    << E_INFO(package.abs_path) << std::endl;
+              << E_INFO(package.abs_path) << std::endl;
 
     dirent* ent = readdir(dir);
     while (ent != nullptr) {
@@ -120,6 +121,7 @@ void load_package(Package& package, int level) {
 
         auto* subpackage = new Package(Path(package.path, subpackage_name), subpackage_abs_path, package.is_lib);
         load_package(*subpackage, level + 1);
+        package.subpackages.push_back(std::unique_ptr<Package>(subpackage));
         package.units[subpackage_name] = std::make_unique<SubpackageUnit>(subpackage);
     }
 }
