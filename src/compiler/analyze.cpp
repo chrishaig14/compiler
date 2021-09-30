@@ -105,9 +105,8 @@ void Compiler::add_global_path_to_module(Module& module, Path path) {
 
 }
 
-ModuleMember* find(Path path, Package& top_package) {
-    PackageModuleMember p(&top_package);
-    ModuleMember* current_member = &p;
+std::unique_ptr<ModuleMember> find(Path path, Package& top_package) {
+    std::unique_ptr<ModuleMember> current_member = std::make_unique<PackageModuleMember>(&top_package);
     std::string path_so_far = "global";
 
     for (const auto& path_part: path.as_vec()) {
@@ -117,7 +116,7 @@ ModuleMember* find(Path path, Package& top_package) {
             if (unit == package.units.end()) {
                 throw std::runtime_error("Error '" + path_part + "' not found in package '" + path_so_far + "'");
             }
-            current_member = map_unit_to_module_member(*unit->second);
+            current_member = std::unique_ptr<ModuleMember>(map_unit_to_module_member(*unit->second));
             // last_member = current_member;
         } else if (current_member->is_module()) {
             Module& module_ = current_member->module();
@@ -125,7 +124,7 @@ ModuleMember* find(Path path, Package& top_package) {
             if (member == module_.members.end()) {
                 throw std::runtime_error("Error '" + path_part + "' not found in module '" + path_so_far + "'");
             }
-            current_member = member->second.get();
+            current_member = member->second.get()->clone();
         }
         path_so_far += "." + path_part;
     }
@@ -133,8 +132,8 @@ ModuleMember* find(Path path, Package& top_package) {
 }
 
 void add_local_path_to_module(Module& module, Path path, Package& top_package) {
-    ModuleMember* current_member = find(path, top_package);
-    module.members[path.as_vec().back()] = current_member->clone();
+    auto current_member = find(path, top_package);
+    module.members[path.as_vec().back()] = std::move(current_member);
 }
 
 bool preprocess_module(Module& module) {
