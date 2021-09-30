@@ -24,120 +24,86 @@ class Package;
 
 class ModuleMember {
 public:
-    virtual bool is_klass() {
-        return false;
-    }
+    virtual std::unique_ptr<ModuleMember> clone() = 0;
 
-    virtual Class& klass() {
-        throw std::runtime_error("ModuleMember is not a Class");
-    }
+    virtual bool is_klass();
 
-    virtual bool is_const_function() {
-        return false;
-    }
+    virtual Class& klass();
 
-    virtual ConstFunction& const_function() {
-        throw std::runtime_error("ModuleMember is not a ConstFunction");
-    }
+    virtual bool is_const_function();
 
-    virtual bool is_module() {
-        return false;
-    }
+    virtual ConstFunction& const_function();
 
-    virtual Module& module() {
-        throw std::runtime_error("ModuleMember is not a Module");
-    }
+    virtual bool is_module();
 
-    virtual bool is_package() {
-        return false;
-    }
+    virtual Module& module();
 
-    virtual Package& package() {
-        throw std::runtime_error("ModuleMember is not a Package");
-    }
+    virtual bool is_package();
 
-    virtual bool is_enumm() {
-        return false;
-    }
+    virtual Package& package();
 
-    virtual Enum& enumm() {
-        throw std::runtime_error("ModuleMember is not a Enum");
-    }
+    virtual bool is_enumm();
+
+    virtual Enum& enumm();
+
+    virtual ~ModuleMember() = default;
 };
 
 class ClassModuleMember : public ModuleMember {
-    Class* _klass;
+    Class* p_klass;
 public:
-    ClassModuleMember(Class* _klass) : _klass(_klass) {
-    }
+    explicit ClassModuleMember(Class* _klass);
 
-    bool is_klass() override {
-        return true;
-    }
 
-    Class& klass() override {
-        return *this->_klass;
-    }
+    bool is_klass() override;
+
+    Class& klass() override;
+
+    std::unique_ptr<ModuleMember> clone() override;
 };
 
 class ConstFunctionModuleMember : public ModuleMember {
-    ConstFunction* _const_function;
+    ConstFunction* p_const_function;
 public:
-    ConstFunctionModuleMember(ConstFunction* _const_function) : _const_function(_const_function) {
-    }
+    explicit ConstFunctionModuleMember(ConstFunction* _const_function);
 
-    bool is_const_function() override {
-        return true;
-    }
+    bool is_const_function() override;
 
-    ConstFunction& const_function() override {
-        return *this->_const_function;
-    }
+    ConstFunction& const_function() override;
+    std::unique_ptr<ModuleMember> clone() override;
 };
 
 class ModuleModuleMember : public ModuleMember {
-    Module* _module;
+    Module* p_module;
 public:
-    ModuleModuleMember(Module* _module) : _module(_module) {
-    }
+    explicit ModuleModuleMember(Module* _module);
 
-    bool is_module() override {
-        return true;
-    }
+    bool is_module() override;
 
-    Module& module() override {
-        return *this->_module;
-    }
+    Module& module() override;
+    std::unique_ptr<ModuleMember> clone() override;
 };
 
 class EnumModuleMember : public ModuleMember {
-    Enum* _enumm;
+    Enum* p_enum;
 public:
-    EnumModuleMember(Enum* _enumm) : _enumm(_enumm) {
-    }
+    explicit EnumModuleMember(Enum* _enumm);
 
-    bool is_enumm() override {
-        return true;
-    }
+    bool is_enumm() override;
 
-    Enum& enumm() override {
-        return *this->_enumm;
-    }
+    Enum& enumm() override;
+    std::unique_ptr<ModuleMember> clone() override;
 };
 
 class PackageModuleMember : public ModuleMember {
-    Package* _package;
+    Package* p_package;
 public:
-    PackageModuleMember(Package* _package) : _package(_package) {
-    }
+    explicit PackageModuleMember(Package* _package);
 
-    bool is_package() override {
-        return true;
-    }
+    bool is_package() override;
 
-    Package& package() override {
-        return *this->_package;
-    }
+    Package& package() override;
+    std::unique_ptr<ModuleMember> clone() override;
 };
 
 #endif //XLANG_MODULEMEMBER_H

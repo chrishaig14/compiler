@@ -124,7 +124,7 @@ ModuleMember* find(Path path, Package& top_package) {
             if (member == module_.members.end()) {
                 throw std::runtime_error("Error '" + path_part + "' not found in module '" + path_so_far + "'");
             }
-            current_member = member->second;
+            current_member = member->second.get();
         }
         path_so_far += "." + path_part;
     }
@@ -133,7 +133,7 @@ ModuleMember* find(Path path, Package& top_package) {
 
 void add_local_path_to_module(Module& module, Path path, Package& top_package) {
     ModuleMember* current_member = find(path, top_package);
-    module.members[path.as_vec().back()] = current_member;
+    module.members[path.as_vec().back()] = current_member->clone();
 }
 
 bool preprocess_module(Module& module) {
