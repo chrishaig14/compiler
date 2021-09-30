@@ -67,10 +67,10 @@ void load_module(Package& package, const std::string& module_name) {
     // if (!package.is_lib) {
     //     all_modules.push_back(module_rel_path);
     // }
-    auto* module = new Module(Path(package.path, module_name), module_abs_path, package.is_lib);
+    auto module = std::make_unique<Module>(Path(package.path, module_name), module_abs_path, package.is_lib);
     // this->my_modules.push_back(std::unique_ptr<Module>(module));
-    package.modules.push_back(std::unique_ptr<Module>(module));
-    package.units[module_name] = std::make_unique<ModuleUnit>(module);
+    package.units[module_name] = std::make_unique<ModuleUnit>(module.get());
+    package.modules.push_back(std::move(module));
 }
 
 void load_package(Package& package, int level) {
