@@ -145,11 +145,12 @@ void Compiler::load_library(const std::string& name, const std::string& lib_vers
     std::string library_requirements_file = path_join(abs_top_unit_path, REQUIREMENTS_FILE);
     load_requirements(library_requirements_file);
 
-    auto* library_top_package = new Package(Path(name), abs_top_unit_path, true);
+    auto library_top_package = std::make_unique<Package>(Path(name), abs_top_unit_path, true);
     load_package(*library_top_package, 1);
     parse_package(*library_top_package);
     preprocess_package(*library_top_package);
-    top_package.units[name] = std::make_unique<SubpackageUnit>(library_top_package);
+    top_package.units[name] = std::make_unique<SubpackageUnit>(library_top_package.get());
+    top_package.subpackages.push_back(std::move(library_top_package));
     std::cout << "Finished loading top unit: " << E_INFO(lib_rel_top_unit_path) << std::endl;
     this->loaded_top_units[lib_rel_top_unit_path] = true;
 }
