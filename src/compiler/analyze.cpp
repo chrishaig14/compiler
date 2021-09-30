@@ -106,7 +106,8 @@ void Compiler::add_global_path_to_module(Module& module, Path path) {
 }
 
 ModuleMember* find(Path path, Package& top_package) {
-    ModuleMember* current_member = new PackageModuleMember(&top_package);
+    PackageModuleMember p(&top_package);
+    ModuleMember* current_member = &p;
     std::string path_so_far = "global";
 
     for (const auto& path_part: path.as_vec()) {
