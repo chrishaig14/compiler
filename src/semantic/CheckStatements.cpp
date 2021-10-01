@@ -322,11 +322,10 @@ sem::UCommon Checker::visit_for(ast::For& node) {
     }
 
     sem::Type* elem_type = exp_ot.type_params[0];
-    auto v = std::make_unique<EntityValue>(elem_type->clone());
-    this->fill_value(*v);
-    Entity* elem_entity = v.release();
+    EntityValue v(elem_type->clone());
+    this->fill_value(v);
     this->enter_scope("for");
-    this->scope->set(node.var, *elem_entity);
+    this->scope->set(node.var, v);
     //
     // std::string loop_c = std::to_string(this->loop_count++);
     // std::string loop_list_var_id = "__loop_list__" + loop_c;
