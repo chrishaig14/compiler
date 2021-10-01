@@ -278,8 +278,7 @@ sem::UCommon Checker::visit_match(ast::Match& node) {
         // this->fill_value(*v);
         auto v = this->make_value(p_type);
         assert(v->clazz != nullptr);
-        Entity* ent = v.release();
-        this->scope->set(case_id, *ent);
+        this->scope->set(case_id, *v);
         auto bn = this->visit_block(case_node);
         auto* omn = new sem::ObjectMember(std::make_unique<sem::Id>(varname), Path("libcore.libcore.Union"), "o");
         sem::UExp u(omn);
