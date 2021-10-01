@@ -13,6 +13,9 @@ private:
     VectorOfStrings path_parts;
     std::string s;
 public:
+    Path(const Path& p) : path_parts(p.path_parts), s(p.s) {
+    }
+
     Path() = default;
 
     Path(Path p, const std::string& c);
