@@ -715,7 +715,8 @@ TEST_CASE("for_error_no_list", "[checker]") {
 
     REQUIRE_CHECKER_ONE_ERROR();
     Error& error = *checker.error_reporter.errors.back();
-    REQUIRE(error == ErrorFor(*checker.entity_from_type(ast::ObjectType("Boolean")), exp.start));
+    auto e = checker.entity_from_type(ast::ObjectType("Boolean"));
+    REQUIRE(error == ErrorFor(*e, exp.start));
 }
 
 TEST_CASE("if_boolean_error", "[checker]") {
