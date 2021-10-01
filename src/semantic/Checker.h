@@ -87,7 +87,7 @@ public:
     Module& module;
     bool is_call;
     ErrorReporter error_reporter;
-    Entity* this_entity;
+    std::unique_ptr<Entity> this_entity;
     Package& top_package;
     sem::Common* update_loop_index_snode;
 
