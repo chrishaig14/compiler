@@ -178,12 +178,12 @@ sem::UCommon Checker::check_declaration_without_type(ast::Declaration& n) {
     if (exp_info_p->entity.get().is_constfun()) {
         Entity& entity_const_function = exp_info_p->entity;
         ConstFunction& const_function = entity_const_function.get_constfun().const_function;
-        EntityValue* value_entity = std::make_unique<EntityValue>(const_function.const_function_ft.clone()).release();
-        this->scope->set(n.identifier, *value_entity);
+        EntityValue value_entity(const_function.const_function_ft.clone());
+        this->scope->set(n.identifier, value_entity);
 
-        if (value_entity->type.is_generic()) {
+        if (value_entity.type.is_generic()) {
             this->error_reporter.fail(
-                    "Error: you need to specialize the generic function of type " + value_entity->type.to_string() +
+                    "Error: you need to specialize the generic function of type " + value_entity.type.to_string() +
                     " to be able to use it without calling it");
         }
     }
