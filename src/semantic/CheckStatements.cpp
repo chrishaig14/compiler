@@ -256,7 +256,7 @@ sem::UCommon Checker::visit_match(ast::Match& node) {
         // return error_stub();
         return nullptr;
     }
-    std::vector<std::pair<int, sem::Block*>> cas;
+    std::vector<std::pair<int, std::unique_ptr<sem::Block>>> cas;
     std::string varname = "match_var";
     for (size_t i = 0; i < node.ids.size(); i++) {
         std::string case_id = node.ids[i];
@@ -285,17 +285,10 @@ sem::UCommon Checker::visit_match(ast::Match& node) {
         sem::UExp u(omn);
         auto dn = std::make_unique<sem::Declaration>(case_id, std::move(u));
         bn->nodes.insert(bn->nodes.begin(), std::move(dn));
-        cas.emplace_back(union_index, bn.release());
+        cas.emplace_back(union_index, std::move(bn));
         this->leave_scope();
     }
-    sem::UExp up = std::move(exp_info->exp_snode);
-    auto init = std::make_unique<sem::Declaration>(varname, std::move(up));
-    // auto mn = std::make_unique<sem::Match>(std::move(init), varname, cas);
-    //
-    sem::UCommon info_u;
-    // SemanticInfo& info = *info_u;
-    // info.snode = std::move(mn);
-    return info_u;
+    return std::make_unique<sem::Match>(std::move(exp_info->exp_snode), varname, std::move(cas));
 }
 
 sem::UCommon Checker::visit_continue(ast::Continue& node) {

@@ -296,7 +296,7 @@ PythonOutputCode PythonTranspiler::transpile_match(const sem::Match& node) {
     out += exp.code;
     out += "switch" + SPACE + LPAREN + "GET_INT(CAST(" + node.varname + ",core_D_core_D_Union" + RPAREN + "->type" +
            RPAREN + RPAREN + SPACE + LCURLY;
-    for (auto c: node.cases) {
+    for (auto& c: node.cases) {
         PythonOutputCode mc = this->transpile_block(*c.second);
         out += "case" + SPACE + "" + std::to_string(c.first) + "" + SPACE + ":" + SPACE + LCURLY + mc.code + "break" +
                SEMIC + RCURLY;

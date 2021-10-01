@@ -6,9 +6,8 @@
 
 using namespace sem;
 
-Match::Match(UExp exp, std::string varname, std::vector<std::pair<int, Block*>> cases)
-        : Common(CommonType::MATCH), exp(std::move(exp)) {
-    this->cases = cases;
+Match::Match(UExp exp, std::string varname, std::vector<std::pair<int, std::unique_ptr<sem::Block>>> cases) : Common(
+        CommonType::MATCH), exp(std::move(exp)), cases(std::move(cases)) {
     this->varname = varname;
 }
 

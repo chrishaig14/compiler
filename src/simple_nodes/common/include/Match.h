@@ -15,9 +15,9 @@
 class sem::Match : public sem::Common {
 public:
     UExp exp;
-    std::vector<std::pair<int, Block*>> cases;
+    std::vector<std::pair<int, std::unique_ptr<Block>>> cases;
     std::string varname;
-    Match(UExp exp, std::string varname, std::vector<std::pair<int, Block*>> cases);
+    Match(UExp exp, std::string varname, std::vector<std::pair<int, std::unique_ptr<Block>>> cases);
 
     bool equals(const Common& o) const override;
 };
