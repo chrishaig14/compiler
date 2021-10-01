@@ -222,9 +222,10 @@ Class* Checker::instantiate_generic(const Class& generic, const ast::ObjectType&
             if (implicit->type == generic.type_params[0]) {
                 std::cout << "----------- Generic with implicit which is class parameter: " << method_cf.first
                           << std::endl;
-                std::unique_ptr<Entity> e = entity_from_type(*instance.type_params[0]);
-                auto& v = (std::unique_ptr<EntityValue>&) e;
-                this->fill_value(*v);
+                // std::unique_ptr<Entity> e = entity_from_type(*instance.type_params[0]);
+                // auto& v = (std::unique_ptr<EntityValue>&) e;
+                // this->fill_value(*v);
+                auto v = this->make_entity_value(*instance.type_params[0]->to_sem());
                 Class* clazz_t = v->clazz;
                 auto meth = clazz_t->methods.find(implicit->method);
                 if (meth == clazz_t->methods.end()) {
