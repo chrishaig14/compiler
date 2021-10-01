@@ -212,6 +212,7 @@ public:
     void process_function_arguments(ExpressionInfo& retv, std::vector<std::unique_ptr<Entity>>& arg_entities,
                                     std::vector<sem::UExp>& arguments, std::vector<ast::RExpNode>& narguments,
                                     const sem::TypeFunction& function_type, ExpressionInfo* fun_info_p);
+    std::unique_ptr<EntityValue> make_entity_value(sem::Type& type);
 };
 
 #endif //CHECKER_H

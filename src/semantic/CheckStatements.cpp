@@ -307,6 +307,12 @@ sem::UCommon Checker::visit_continue(ast::Continue& node) {
     return bn;
 }
 
+std::unique_ptr<EntityValue> Checker::make_entity_value(sem::Type& type){
+    auto e = std::make_unique<EntityValue>(type.clone());
+    this->fill_value(*e);
+    return e;
+}
+
 sem::UCommon Checker::visit_for(ast::For& node) {
     UExpressionInfo exp_info_p = this->dispatch_rvalue(node.exp);
     if (exp_info_p->entity.get().e_type != E_TYPE::VALUE) {
@@ -321,10 +327,11 @@ sem::UCommon Checker::visit_for(ast::For& node) {
     }
 
     sem::Type* elem_type = exp_ot.type_params[0];
-    EntityValue v(elem_type->clone());
-    this->fill_value(v);
+    // EntityValue v(elem_type->clone());
+    // this->fill_value(v);
+    auto ev = this->make_entity_value(*elem_type);
     this->enter_scope("for");
-    this->scope->set(node.var, v);
+    this->scope->set(node.var, *ev);
     //
     // std::string loop_c = std::to_string(this->loop_count++);
     // std::string loop_list_var_id = "__loop_list__" + loop_c;

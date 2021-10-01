@@ -236,8 +236,9 @@ std::unique_ptr<sem::FunctionDef> Checker::visit_function(ast::Function& n) {
         ast::Type& type = n.parameter_types[i];
         ast::UTypeNode cl(type.clone());
         make_not_generic(*cl);
-        auto te = entity_from_type(*cl);
-        this->fill_value(*((std::unique_ptr<EntityValue>&) te));
+        // auto te = entity_from_type(*cl);
+        // this->fill_value(*((std::unique_ptr<EntityValue>&) te));
+        auto te = this->make_entity_value(*cl->to_sem());
         this->scope->set(n.parameter_names[i], *te);
         // if (!param_type.is_generic()) {
         //     if (param_type.kind == Kind::OBJECT) {
