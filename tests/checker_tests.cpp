@@ -325,7 +325,7 @@ TEST_CASE("decl_error_expected_expression", "[checker]") {
 TEST_CASE("error_no_member", "[checker]") {
     std::string code = "class Foo{foo: Integer;}\nfun bar(f: Foo)->Integer{var x = f.lala;return 0;}";
 
-    Compiler* cp = analyze(code).release();
+    auto cp = analyze(code);
     Compiler& c = *cp;
     Module& module = c.root_package.units["tmp"]->module();
     resolve_module_imports(module, c.top_package);
