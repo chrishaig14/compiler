@@ -5,8 +5,8 @@
 #include "PythonTranspiler.h"
 #include "../simple_nodes/common/include/Throw.h"
 
-PythonExpressionOutputCode::PythonExpressionOutputCode(const std::string& pre_code, const std::string& code)
-        : pre_code(pre_code), code(code) {
+PythonExpressionOutputCode::PythonExpressionOutputCode(const std::string& pre_code, const std::string& code) : pre_code(
+        pre_code), code(code) {
 }
 
 //
@@ -15,28 +15,28 @@ PythonExpressionOutputCode::PythonExpressionOutputCode(const std::string& pre_co
 
 
 
-PythonExpressionOutputCode PythonTranspiler::transpile_declaration(const sem::Declaration& node) {
+PythonOutputCode PythonTranspiler::transpile_declaration(const sem::Declaration& node) {
     PythonExpressionOutputCode exp_out = this->dispatch_expression(node.expression, false);
     std::string code = exp_out.pre_code.empty() ? "" : exp_out.pre_code + "\n";
     code += node.identifier + " = " + exp_out.code;
-    return PythonExpressionOutputCode("", code);
+    return code;
 }
 
-PythonExpressionOutputCode PythonTranspiler::transpile_assignment(const sem::Assignment& node) {
+PythonOutputCode PythonTranspiler::transpile_assignment(const sem::Assignment& node) {
     PythonExpressionOutputCode lvalue = this->dispatch_expression(*node.lvalue, false);
     PythonExpressionOutputCode rvalue = this->dispatch_expression(*node.rvalue, false);
     std::string code = pre_if_any(lvalue) + pre_if_any(rvalue);
     code += lvalue.code + SPACE + ASSIGN + SPACE + rvalue.code;
-    return PythonExpressionOutputCode("", code);
+    return code;
 }
 
-PythonExpressionOutputCode PythonTranspiler::transpile_return(const sem::Return& node) {
+PythonOutputCode PythonTranspiler::transpile_return(const sem::Return& node) {
     if (node.expression == nullptr) {
-        return PythonExpressionOutputCode("", "return None\n");
+        return "return None\n";
     }
     PythonExpressionOutputCode exp = this->dispatch_expression(*node.expression, false);
     std::string code = (exp.pre_code.empty() ? "" : exp.pre_code + "\n") + "rv = " + exp.code + "\n" + "return rv\n";
-    return PythonExpressionOutputCode("", code);
+    return code;
 }
 
 // PythonOutputCode PythonTranspiler::transpile_throw(const sem::Throw& node) {
@@ -71,7 +71,7 @@ PythonExpressionOutputCode PythonTranspiler::transpile_id(const sem::Id& node) {
     return PythonExpressionOutputCode("", id);
 }
 
-PythonExpressionOutputCode PythonTranspiler::transpile_function(const sem::FunctionDef& node) {
+PythonOutputCode PythonTranspiler::transpile_function(const sem::FunctionDef& node) {
     std::string f_source = "def ";
     std::string parameters;
 
@@ -89,23 +89,23 @@ PythonExpressionOutputCode PythonTranspiler::transpile_function(const sem::Funct
     parameters = parameters.substr(0, parameters.size() - 2);
     f_source += (node.identifier) + LPAREN + parameters + RPAREN + ":" + NEWLINE;
     // this->source += f_source;
-    f_source += indent_paragraph(this->transpile_block(*node.body).code, 4);
-    return PythonExpressionOutputCode("", f_source);
+    f_source += indent_paragraph(this->transpile_block(*node.body), 4);
+    return f_source;
 }
 
-PythonExpressionOutputCode PythonTranspiler::transpile_block(const sem::Block& node) {
+PythonOutputCode PythonTranspiler::transpile_block(const sem::Block& node) {
     std::string pre_code;
     std::string code;
     this->indent();
     for (auto& n: node.nodes) {
-        PythonExpressionOutputCode statement_out = this->dispatch_common(*n);
-        code += statement_out.code + "\n";
+        PythonOutputCode statement_out = this->dispatch_common(*n);
+        code += statement_out + "\n";
     }
     if (code.back() == '\n') {
         code = code.substr(0, code.size() - 1);
     }
     this->unindent();
-    return PythonExpressionOutputCode("", code);
+    return code;
 }
 
 void PythonTranspiler::transpile_program(const sem::Module& node) {
@@ -118,7 +118,7 @@ PythonExpressionOutputCode PythonTranspiler::transpile_integer(const sem::Intege
     return PythonExpressionOutputCode("", "libcore.libcore.Integer(" + node.str + ")");
 }
 
-PythonExpressionOutputCode PythonTranspiler::transpile_call(const sem::Call& node) {
+PythonOutputCode PythonTranspiler::transpile_call(const sem::Call& node) {
     std::string pre_code;
     VectorOfStrings arg_names;
     std::string arg_list;
@@ -135,7 +135,7 @@ PythonExpressionOutputCode PythonTranspiler::transpile_call(const sem::Call& nod
     post_code += fun_id + "(";
     post_code += arg_list.empty() ? "" : arg_list.substr(0, arg_list.size() - 2);
     post_code += ")";
-    return PythonExpressionOutputCode("", post_code);
+    return post_code;
 }
 
 PythonExpressionOutputCode PythonTranspiler::transpile_string(const sem::String& node) {
@@ -177,7 +177,7 @@ PythonExpressionOutputCode PythonTranspiler::transpile_new(const sem::NewObject&
     return PythonExpressionOutputCode("", out);
 }
 
-PythonExpressionOutputCode PythonTranspiler::transpile_class(const sem::KlassDef& node) {
+PythonOutputCode PythonTranspiler::transpile_class(const sem::KlassDef& node) {
     std::string class_name = node.identifier;
     std::string code;
     code += "class " + class_name + ":\n";
@@ -197,13 +197,13 @@ PythonExpressionOutputCode PythonTranspiler::transpile_class(const sem::KlassDef
 
     for (auto& m: node.methods) {
         this->add_self = true;
-        PythonExpressionOutputCode fcode = this->transpile_function(*m);
+        PythonOutputCode fcode = this->transpile_function(*m);
         this->add_self = false;
-        code += indent_paragraph(fcode.code, 4) + "\n";
+        code += indent_paragraph(fcode, 4) + "\n";
         // std::cout << fcode.code << std::endl;
     }
 
-    return PythonExpressionOutputCode("", code);
+    return code;
 }
 
 PythonExpressionOutputCode PythonTranspiler::transpile_object_member(const sem::ObjectMember& node) {
@@ -215,15 +215,15 @@ PythonExpressionOutputCode PythonTranspiler::transpile_object_member(const sem::
     return PythonExpressionOutputCode(pre_code, code);
 }
 
-PythonExpressionOutputCode PythonTranspiler::transpile_while(const sem::While& node) {
+PythonOutputCode PythonTranspiler::transpile_while(const sem::While& node) {
     PythonExpressionOutputCode cond = this->dispatch_expression(*node.condition, false);
     std::string cond_id = "condition_" + std::to_string(this->next_arg_n());
-    PythonExpressionOutputCode thenc = this->transpile_block(*node.body);
+    PythonOutputCode thenc = this->transpile_block(*node.body);
     std::string out = pre_if_any(cond) + cond_id + " = " + cond.code + "\n";
     out += "while " + cond_id + ":\n";
-    out += indent_paragraph(thenc.code, 4) + "\n";
+    out += indent_paragraph(thenc, 4) + "\n";
     out += indent_paragraph(pre_if_any(cond) + cond_id + " = " + cond.code, 4);
-    return PythonExpressionOutputCode("", out);
+    return out;
 
 }
 
@@ -269,27 +269,26 @@ PythonExpressionOutputCode PythonTranspiler::transpile_dict(const sem::Dict& nod
 }
 
 
-PythonExpressionOutputCode PythonTranspiler::transpile_if(const sem::If& node) {
+PythonOutputCode PythonTranspiler::transpile_if(const sem::If& node) {
     std::string code;
     PythonExpressionOutputCode cond = this->dispatch_expression(node.condition, false);
-    PythonExpressionOutputCode thenc = this->transpile_block(node.then);
+    PythonOutputCode thenc = this->transpile_block(node.then);
     std::string cond_id = "condition_" + std::to_string(this->next_arg_n());
     code += cond.pre_code.empty() ? "" : cond.pre_code + "\n";
     code += cond_id + " = " + cond.code + "\n";
-    code += "if" + SPACE + cond_id + ":" + NEWLINE + indent_paragraph(thenc.code, 4);
-
-    return PythonExpressionOutputCode("", code);
+    code += "if" + SPACE + cond_id + ":" + NEWLINE + indent_paragraph(thenc, 4);
+    return code;
 }
 
-PythonExpressionOutputCode PythonTranspiler::transpile_break(const sem::Break& node) {
-    return PythonExpressionOutputCode("", "");
+PythonOutputCode PythonTranspiler::transpile_break(const sem::Break& node) {
+    return "break";
 }
 
-PythonExpressionOutputCode PythonTranspiler::transpile_continue(const sem::Continue& node) {
-    return PythonExpressionOutputCode("", "");
+PythonOutputCode PythonTranspiler::transpile_continue(const sem::Continue& node) {
+    return "continue";
 }
 
-PythonExpressionOutputCode PythonTranspiler::transpile_match(const sem::Match& node) {
+PythonOutputCode PythonTranspiler::transpile_match(const sem::Match& node) {
     std::string out;
     PythonExpressionOutputCode exp = this->dispatch_expression(*node.exp, false);
     out += exp.pre_code;
@@ -297,16 +296,16 @@ PythonExpressionOutputCode PythonTranspiler::transpile_match(const sem::Match& n
     out += "switch" + SPACE + LPAREN + "GET_INT(CAST(" + node.varname + ",core_D_core_D_Union" + RPAREN + "->type" +
            RPAREN + RPAREN + SPACE + LCURLY;
     for (auto& c: node.cases) {
-        PythonExpressionOutputCode mc = this->transpile_block(*c.second);
-        out += "case" + SPACE + "" + std::to_string(c.first) + "" + SPACE + ":" + SPACE + LCURLY + mc.code + "break" +
+        PythonOutputCode mc = this->transpile_block(*c.second);
+        out += "case" + SPACE + "" + std::to_string(c.first) + "" + SPACE + ":" + SPACE + LCURLY + mc + "break" +
                SEMIC + RCURLY;
     }
     out += RCURLY;
-    return PythonExpressionOutputCode("", out);
+    return out;
 }
 
-PythonExpressionOutputCode PythonTranspiler::transpile_enum(const sem::EnumDef& node) {
-    return PythonExpressionOutputCode("", "");
+PythonOutputCode PythonTranspiler::transpile_enum(const sem::EnumDef& node) {
+    return "";
 }
 
 PythonExpressionOutputCode PythonTranspiler::transpile_enum_member(const sem::EnumMember& node) {
@@ -331,7 +330,7 @@ PythonExpressionOutputCode PythonTranspiler::transpile_none(const sem::None& nod
     return PythonExpressionOutputCode("", "nullptr");
 }
 
-PythonExpressionOutputCode PythonTranspiler::transpile_try_catch(const sem::TryCatch& node) {
+PythonOutputCode PythonTranspiler::transpile_try_catch(const sem::TryCatch& node) {
     // this->in_try_catch = true;
     // PythonOutputCode body_out = this->transpile_block(*node.body);
     // this->in_try_catch = false;
@@ -347,20 +346,20 @@ PythonExpressionOutputCode PythonTranspiler::transpile_try_catch(const sem::TryC
     // // out = out.substr(0, out.size() - 5);
     // out += "\n}";
     // return PythonOutputCode("", out);
-    return PythonExpressionOutputCode("", "");
+    return "";
 }
 
 std::string PythonTranspiler::transpile_module(const sem::Module& block, Path path) {
     this->module_path = path;
     std::string code;
     for (auto& n: block.nodes) {
-        PythonExpressionOutputCode definition_output = this->dispatch_top(*n);
-        code += definition_output.code + "\n";
+        PythonOutputCode definition_output = this->dispatch_top(*n);
+        code += definition_output + "\n";
     }
     return code;
 }
 
-PythonExpressionOutputCode PythonTranspiler::dispatch_top(const sem::Top& node) {
+PythonOutputCode PythonTranspiler::dispatch_top(const sem::Top& node) {
     switch (node.type) {
         case sem::TopType::FUNCTION:
             return this->transpile_function((const sem::FunctionDef&) (node));
@@ -372,7 +371,7 @@ PythonExpressionOutputCode PythonTranspiler::dispatch_top(const sem::Top& node) 
     __builtin_unreachable();
 }
 
-PythonExpressionOutputCode PythonTranspiler::dispatch_common(const sem::Common& node) {
+PythonOutputCode PythonTranspiler::dispatch_common(const sem::Common& node) {
     switch (node.type) {
         case sem::CommonType::BLOCK:
             return this->transpile_block((const sem::Block&) node);
@@ -491,7 +490,8 @@ PythonTranspiler::PythonTranspiler() {
     this->add_self = false;
 }
 
-PythonExpressionOutputCode PythonTranspiler::transpile_object_method(const sem::ObjectMethod& method, bool called_function) {
+PythonExpressionOutputCode
+PythonTranspiler::transpile_object_method(const sem::ObjectMethod& method, bool called_function) {
     std::string obj_id = "obj_" + std::to_string(this->next_arg_n());
     PythonExpressionOutputCode obj_code = this->dispatch_expression(*method.object, false);
     std::string pre_code =
@@ -538,14 +538,14 @@ PythonExpressionOutputCode PythonTranspiler::transpile_call_exp(const sem::CallE
     return PythonExpressionOutputCode(pre_code, post_code);
 }
 
-PythonExpressionOutputCode PythonTranspiler::transpile_for(const sem::For& node) {
+PythonOutputCode PythonTranspiler::transpile_for(const sem::For& node) {
     PythonExpressionOutputCode exp_code = this->dispatch_expression(*node.expression, false);
     std::string exp_id = "exp_" + std::to_string(this->next_arg_n());
     std::string code = pre_if_any(exp_code) + exp_id + " = " + exp_code.code + "\n";
     code += "for " + node.varname + " in " + exp_id + ".elems:\n";
-    PythonExpressionOutputCode body_code = this->transpile_block(*node.body);
-    code += indent_paragraph(body_code.code, 4);
-    return PythonExpressionOutputCode("", code);
+    PythonOutputCode body_code = this->transpile_block(*node.body);
+    code += indent_paragraph(body_code, 4);
+    return code;
 }
 
 std::string indent_paragraph(std::string s, size_t level) {
