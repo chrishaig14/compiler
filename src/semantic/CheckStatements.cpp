@@ -307,10 +307,11 @@ sem::UCommon Checker::visit_continue(ast::Continue& node) {
     return bn;
 }
 
-std::unique_ptr<EntityValue> Checker::make_entity_value(sem::Type& type){
-    auto e = std::make_unique<EntityValue>(type.clone());
-    this->fill_value(*e);
-    return e;
+std::unique_ptr<EntityValue> Checker::make_entity_value(sem::Type& type) {
+    return this->make_value(type.clone());
+    // auto e = std::make_unique<EntityValue>(type.clone());
+    // this->fill_value(*e);
+    // return e;
 }
 
 sem::UCommon Checker::visit_for(ast::For& node) {

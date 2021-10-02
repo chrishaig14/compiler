@@ -81,9 +81,15 @@ std::unique_ptr<sem::KlassDef> Checker::visit_class(ast::Klass& node) {
     }
     auto sn = std::make_unique<sem::KlassDef>(node.class_name, node.members_ordered);
     this->add_this = true;
-    this->this_entity = std::unique_ptr<Entity>(this->entity_value_from_actual_base_path_no_generic(Path(this->module.path,
-                                                                                                         node.class_name)).clone());
-    this->fill_value(this->this_entity->get_value());
+    // this->this_entity = std::unique_ptr<Entity>(this->entity_value_from_actual_base_path_no_generic(Path(this->module.path,
+    //                                                                                                      node.class_name)).clone());
+    // this->fill_value(this->this_entity->get_value());
+    Path p(this->module.path, node.class_name);
+    sem::TypeObject ot (p.as_vec().back(), p);
+    // auto v = std::make_unique<Value>(ot);
+    // this->fill_value(*v);
+    this->this_entity = this->make_entity_value(ot);
+
     for (auto& m: node.methods) {
         auto ms = this->visit_function(*m.second->method);
         std::unique_ptr<sem::FunctionDef> sf((sem::FunctionDef*) ms.release());
