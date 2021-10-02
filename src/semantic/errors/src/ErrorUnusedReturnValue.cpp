@@ -10,10 +10,10 @@ Error* ErrorUnusedReturnValue::clone() const {
 }
 
 bool ErrorUnusedReturnValue::equal(const Error& other) const {
-    auto o = static_cast<const ErrorUnusedReturnValue&>(other);
-    return this->entity == o.entity and this->node == o.node;
+    auto& o = static_cast<const ErrorUnusedReturnValue&>(other);
+    return *this->entity == *o.entity and this->node == o.node;
 }
 
 std::string ErrorUnusedReturnValue::to_str(const CodeLines& code) const {
-    return "Error: unused return value " + entity_to_string(this->entity);
+    return "Error: unused return value " + entity_to_string(*this->entity);
 }
