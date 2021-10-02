@@ -10,11 +10,14 @@
 
 class ErrorUnusedReturnValue : public Error {
 public:
-    ErrorUnusedReturnValue(TextPosition position);
+    ErrorUnusedReturnValue(const Entity& entity, const ast::Call& node) : node(node), entity(entity) {
+    }
+
     Error* clone() const override;
     bool equal(const Error& other) const override;
     std::string to_str(const CodeLines& code) const override;
-
+    const ast::Call& node;
+    const Entity& entity;
 };
 
 

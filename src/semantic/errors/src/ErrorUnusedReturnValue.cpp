@@ -3,19 +3,17 @@
 //
 
 #include "../include/ErrorUnusedReturnValue.h"
+#include "../../../ast/statements/Call.h"
 
 Error* ErrorUnusedReturnValue::clone() const {
     return nullptr;
 }
 
 bool ErrorUnusedReturnValue::equal(const Error& other) const {
-    return false;
+    auto o = static_cast<const ErrorUnusedReturnValue&>(other);
+    return this->entity == o.entity and this->node == o.node;
 }
 
 std::string ErrorUnusedReturnValue::to_str(const CodeLines& code) const {
-    return std::string();
-}
-
-ErrorUnusedReturnValue::ErrorUnusedReturnValue(TextPosition position) {
-
+    return "Error: unused return value " + entity_to_string(this->entity);
 }

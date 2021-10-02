@@ -14,7 +14,6 @@ public:
     bool unwrap;
     std::vector<std::string> locals;
     std::vector<UCommon> nodes;
-    Block(bool unwrap);
     Block();
     bool equals(const Common& o) const override;
 };

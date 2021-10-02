@@ -12,6 +12,10 @@ UExpressionInfo Checker::expect_rvalue_of_type(const sem::Type& target, ast::Exp
         return exp_error_stub();
     }
     Entity& r_entity = rinfo->entity.get();
+    if (r_entity.is_nothing()) {
+        this->error_reporter.error(std::make_unique<ErrorExpectedExpression>(r_entity, node));
+        return exp_error_stub();
+    }
     if (r_entity.e_type != E_TYPE::VALUE && r_entity.e_type != E_TYPE::CONST_FUNCTION) {
         this->error_reporter.error(std::make_unique<ErrorTypeMismatch>(target, node, r_entity));
         return exp_error_stub();

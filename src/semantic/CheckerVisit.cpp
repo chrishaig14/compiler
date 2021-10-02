@@ -166,44 +166,23 @@ std::unique_ptr<sem::Module> Checker::visit_root(ast::Module& node) {
 
 std::unique_ptr<sem::Block> Checker::visit_block(ast::Block& node) {
     auto sn = std::make_unique<sem::Block>();
-    ast::VectorOfNodesU vn;
     for (auto& n: node.nodes) {
         sem::UCommon sinfo_p = this->dispatch(*n);
-
-        // sn->nodes.push_back(sinfo_p->snode);
-
-        if (n->ntype == StatementType::BLOCK) {
-            for (auto& bnode: ((std::unique_ptr<ast::Block>&) n)->nodes) {
-                vn.push_back(std::move(bnode));
-            }
-        } else {
-            vn.push_back(std::move(n));
-            if (sinfo_p != nullptr) {
-                if (sinfo_p->type == sem::CommonType::BLOCK) {
-                    if (((std::unique_ptr<sem::Block>&) sinfo_p)->unwrap) {
-                        for (auto& nn : ((std::unique_ptr<sem::Block>&) sinfo_p)->nodes) {
-                            sn->nodes.push_back(std::move(nn));
-                        }
-                    } else {
-                        sn->nodes.push_back(std::move(sinfo_p));
+        if (sinfo_p != nullptr) {
+            if (sinfo_p->type == sem::CommonType::BLOCK) {
+                if (((std::unique_ptr<sem::Block>&) sinfo_p)->unwrap) {
+                    for (auto& nn : ((std::unique_ptr<sem::Block>&) sinfo_p)->nodes) {
+                        sn->nodes.push_back(std::move(nn));
                     }
-
                 } else {
                     sn->nodes.push_back(std::move(sinfo_p));
                 }
+
+            } else {
+                sn->nodes.push_back(std::move(sinfo_p));
             }
         }
-        // SemanticInfo& sinfo = *sinfo_p;
-        // if (n->ntype == NodeType::CALL) {
-        //     // it's a function call
-        //     // if return value != NoneType, then force the return value
-        //
-        //     if (!sinfo.is_error() && sinfo_p->entity.type != E_TYPE::NOTHING) {
-        //         this->error_reporter.error(std::make_unique<ErrorUnusedReturnValue>(n->start));
-        //     }
-        // }
     }
-    node.nodes = std::move(vn);
     return sn;
 }
 

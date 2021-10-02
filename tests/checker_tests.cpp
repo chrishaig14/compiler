@@ -65,7 +65,6 @@ TEST_CASE("basic_function_bad_return_type", "[checker]") {
     sem::TypeObject expected("Integer");
     ErrorTypeMismatch exp(expected, ast_exp, *checker.entity_from_type(ast::ObjectType("Boolean")));
     REQUIRE(error == exp);
-
 }
 
 TEST_CASE("basic_declaration", "[checker]") {
@@ -560,6 +559,51 @@ TEST_CASE("call_args_type_error", "[checker]") {
     // ast::String node("Hello", _POS, _POS);
     sem::TypeObject expected("Integer");
     ErrorTypeMismatch exp(expected, node, *checker.entity_from_type(ast::ObjectType("String")));
+    REQUIRE(error == exp);
+}
+
+TEST_CASE("function_no_return_as_exp_error", "[checker]") {
+    std::string code = R"(
+fun bar(a: Integer, b: String){
+    var c = a
+}
+fun foo()->Integer{
+    var x : Integer = bar(7,"Bye")
+    return 0
+}
+)";
+
+    CHECKER();
+    checker.init();
+    checker.visit_root(*module.ast);
+    REQUIRE_CHECKER_ONE_ERROR();
+    Error& error = *checker.error_reporter.errors.back();
+    sem::TypeObject expected("Integer");
+    ast::Function& ast_func = module.ast->functions[1];
+    ast::Declaration& ast_decl = (ast::Declaration&) *ast_func.body->nodes[0];
+    ErrorExpectedExpression exp(*new EntityNothing(), ast_decl.expression);
+    REQUIRE(error == exp);
+}
+
+TEST_CASE("function_no_exp_but_returns", "[checker]") {
+    std::string code = R"(
+fun bar(a: Integer, b: String)->Integer{
+    return a
+}
+fun foo()->Integer{
+    bar(9, "Hello")
+    return 0
+}
+    )";
+
+    CHECKER();
+    checker.init();
+    checker.visit_root(*module.ast);
+    REQUIRE_CHECKER_ONE_ERROR();
+    Error& error = *checker.error_reporter.errors.back();
+    ast::Function& ast_func = module.ast->functions[1];
+    ast::Call& ast_call = static_cast<ast::Call&>(*ast_func.body->nodes[0]);
+    ErrorUnusedReturnValue exp(*checker.entity_from_type(ast::ObjectType("Integer")), ast_call);
     REQUIRE(error == exp);
 }
 

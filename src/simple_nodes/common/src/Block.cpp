@@ -6,10 +6,6 @@
 
 using namespace sem;
 
-Block::Block(bool unwrap) : Common(CommonType::BLOCK) {
-    this->unwrap = unwrap;
-}
-
 Block::Block() : Common(CommonType::BLOCK) {
     this->unwrap = false;
 }

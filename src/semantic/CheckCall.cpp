@@ -10,8 +10,11 @@
 
 sem::UCommon Checker::visit_call(ast::Call& n) {
     auto s = this->analyze_call(n.function, n.arguments, false, n.start, n.end);
-    if (s->is_error()){
-        // there was an error
+    if (s->is_error()) {
+        return nullptr;
+    }
+    if (not s->entity.get().is_nothing()) {
+        this->error_reporter.error(std::make_unique<ErrorUnusedReturnValue>(s->entity, n));
         return nullptr;
     }
     auto& w = (sem::CallExp&) *s->exp_snode;
@@ -65,45 +68,6 @@ Checker::analyze_call(ast::ExpNode& function, std::vector<ast::RExpNode>& argume
 
 UExpressionInfo Checker::visit_callexp(ast::CallExp& n, bool is_rvalue) {
     return this->analyze_call(n.function, n.arguments, is_rvalue, n.start, n.end);
-    // auto retv_p = std::make_unique<ExpressionInfo>();
-    // auto& retv = *retv_p;
-    // bool old_is_call = this->is_call;
-    // this->is_call = true;
-    // UExpressionInfo fun_info_p = this->dispatch_rvalue(n.function);
-    // this->is_call = old_is_call;
-    // if (fun_info_p->is_error()) {
-    //     return exp_error_stub();
-    // }
-    //
-    // bool is_def_const = n.function.ntype == ExpNodeType::DEF_CONST;
-    // bool args_are_constant = true;
-    // ExpressionInfo& fun_info = *fun_info_p;
-    // if ((fun_info.entity.get().e_type != E_TYPE::CONST_FUNCTION && fun_info_p->entity.get().e_type != E_TYPE::VALUE)) {
-    //     // this->error_reporter.error(std::make_unique<ErrorNotAFunction>(n));
-    //     return exp_error_stub();
-    // }
-    // const sem::TypeFunction& function_type = get_function_type(fun_info);
-    // // ok
-    // if (n.arguments.size() != function_type.param_types.size()) {
-    //     this->error_reporter.error(std::make_unique<ErrorFunctionCallNumArgs>(&function_type, n.start));
-    //     if (!function_is_generic(function_type)) {
-    //         retv.set_entity(entity_from_type(*function_type.return_type->to_ast()));
-    //         return retv_p;
-    //     } else {
-    //         return exp_error_stub();
-    //     }
-    // }
-    //
-    // std::vector<std::unique_ptr<Entity>> arg_entities;
-    // std::vector<sem::UExp> arguments;
-    // bool has_error = check_arguments(n, arguments, arg_entities);
-    // if (has_error) {
-    //     return exp_error_stub();
-    // }
-    // std::cout << "Calling function of type: " << function_type.to_string() << std::endl;
-    // this->process_function_arguments(retv, arg_entities, arguments, n, function_type, fun_info_p.get());
-    // retv.exp_snode = std::make_unique<sem::CallExp>(std::move(fun_info_p->exp_snode), std::move(arguments));
-    // auto f = make_return_info(n, is_rvalue, std::move(retv_p), is_def_const, args_are_constant);
 }
 
 const sem::TypeFunction& get_function_type(const ExpressionInfo& fun_info) {
@@ -119,13 +83,7 @@ UExpressionInfo
 Checker::make_return_info(bool is_rvalue, UExpressionInfo retv_p, bool is_def_const, bool args_are_constant) {
     UExpressionInfo retvp = std::move(retv_p);
     auto& retv = *retvp;
-    if (retv.entity.get().is_nothing()) {
-        if (is_rvalue) {
-            // this->error_reporter.error(std::make_unique<ErrorExpectedExpression>(retv.entity, n));
-            throw std::runtime_error("Error expected expression!");
-            return exp_error_stub();
-        }
-    } else if (retv.entity.get().is_value()) {
+    if (retv.entity.get().is_value()) {
         EntityValue& value = retv.entity.get().get_value();
         if (value.type.kind == sem::Kind::OBJECT) {
             if (value.type.object().id == ".None") {
