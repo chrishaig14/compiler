@@ -88,8 +88,6 @@ Checker::make_return_info(bool is_rvalue, UExpressionInfo retv_p, bool is_def_co
         if (value.type.kind == sem::Kind::OBJECT) {
             if (value.type.object().id == ".None") {
                 retv.set_entity(new EntityNothing());
-            } else {
-                fill_value(value);
             }
         }
     }
