@@ -31,11 +31,16 @@ public:
         this->_type = sem::UType(type);
     }
 
-    EntityValue(sem::Type* type, Class* cls) : Entity(E_TYPE::VALUE), type(*type) {
+    EntityValue(sem::Type* type, Class* cls) : Entity(E_TYPE::VALUE), type(*type), metatype(Meta::CLASS) {
         this->clazz = cls;
         assert(type != nullptr);
         this->_type = sem::UType(type);
-        this->metatype = Meta::CLASS;
+    }
+
+    EntityValue(sem::Type* type, Enum* enumm) : Entity(E_TYPE::VALUE), type(*type), metatype(Meta::ENUM) {
+        this->enumm = enumm;
+        assert(type != nullptr);
+        this->_type = sem::UType(type);
     }
 
     Entity* clone() const override {

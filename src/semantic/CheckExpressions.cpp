@@ -259,10 +259,11 @@ std::unique_ptr<EntityValue> Checker::make_value(sem::Type* type) {
     }
     ModuleMember& module_member = *module_member_p;
     if (module_member.is_enumm()) {
-        auto value = std::make_unique<EntityValue>(type);
-        value->enumm = &module_member.enumm();
-        value->metatype = Meta::ENUM;
-        return value;
+        // auto value = std::make_unique<EntityValue>(type);
+        // value->enumm = &module_member.enumm();
+        // value->metatype = Meta::ENUM;
+        // return value;
+        return std::make_unique<EntityValue>(type, &module_member.enumm());
     }
     Class* cls = &module_member.klass();
     if (!cls->type_params.empty()) {
