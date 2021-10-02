@@ -93,7 +93,8 @@ Checker::object_member(sem::UExp object_snode, EntityValue& p_value, const std::
         if (info.entity.get().is_nothing()) {
             // auto eee = entity_from_type(*clazz->members.at(child));
             // this->fill_value(eee->get_value());
-            auto eee = this->make_entity_value(*clazz->members.at(child)->to_sem());
+            sem::UType p_type(clazz->members.at(child)->to_sem());
+            auto eee = this->make_entity_value(*p_type);
             info.set_entity(eee->clone());
             clazz->member_entities[child] = std::move(eee);
         }

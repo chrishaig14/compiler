@@ -581,7 +581,7 @@ fun foo()->Integer{
     sem::TypeObject expected("Integer");
     ast::Function& ast_func = module.ast->functions[1];
     ast::Declaration& ast_decl = (ast::Declaration&) *ast_func.body->nodes[0];
-    ErrorExpectedExpression exp(*new EntityNothing(), ast_decl.expression);
+    ErrorExpectedExpression exp(EntityNothing(), ast_decl.expression);
     REQUIRE(error == exp);
 }
 
