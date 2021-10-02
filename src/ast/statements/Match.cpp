@@ -6,11 +6,10 @@
 
 using namespace ast;
 
-Match::Match(ExpNode* exp, std::vector<std::string> ids, std::vector<std::pair<ast::UTypeNode, ast::UBlock>> cases,
+Match::Match(ast::UExpNode exp, std::vector<std::string> ids, std::vector<std::pair<ast::UTypeNode, ast::UBlock>> cases,
              TextPosition start, TextPosition end) : ast::Statement(StatementType::MATCH_EXP, start, end),
-                                                     cases(std::move(cases)) {
+                                                     exp(std::move(exp)), cases(std::move(cases)) {
     // this->cases = cases;
-    this->exp = exp;
     this->ids = ids;
 }
 

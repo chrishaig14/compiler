@@ -1036,7 +1036,7 @@ std::unique_ptr<ast::Match> Parser::parse_match_statement() {
         }
     }
     Token lcurly = this->expect_token(TokType::RCURLY);
-    return std::make_unique<ast::Match>(exp.release(), ids, std::move(cases), mtk.start, lcurly.end_pos);
+    return std::make_unique<ast::Match>(std::move(exp), ids, std::move(cases), mtk.start, lcurly.end_pos);
 }
 
 
