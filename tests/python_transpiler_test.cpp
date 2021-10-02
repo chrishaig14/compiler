@@ -12,21 +12,21 @@
 TEST_CASE("python_transpile_string", "[checker]") {
     PythonTranspiler pt;
     // "Hello"
-    PythonOutputCode poc = pt.transpile_string(sem::String("Hello"));
+    PythonExpressionOutputCode poc = pt.transpile_string(sem::String("Hello"));
     REQUIRE(poc.code == "libcore.libcore.String(\"Hello\")");
 }
 
 TEST_CASE("python_transpile_integer", "[checker]") {
     PythonTranspiler pt;
     // 781
-    PythonOutputCode poc = pt.transpile_integer(sem::Integer("781"));
+    PythonExpressionOutputCode poc = pt.transpile_integer(sem::Integer("781"));
     REQUIRE(poc.code == "libcore.libcore.Integer(781)");
 }
 
 TEST_CASE("python_transpile_boolean", "[checker]") {
     PythonTranspiler pt;
     // false
-    PythonOutputCode poc = pt.transpile_boolean(sem::Bool(false));
+    PythonExpressionOutputCode poc = pt.transpile_boolean(sem::Bool(false));
     REQUIRE(poc.code == "libcore.libcore.Boolean(False)");
 }
 
@@ -110,7 +110,7 @@ TEST_CASE("python_transpile_if", "[checker]") {
     arg_vec.push_back(std::make_unique<sem::Integer>("78"));
     then->nodes.emplace_back(new sem::Assignment(std::make_unique<sem::Id>("x"), std::make_unique<sem::Integer>("99")));
     // if(8.gt(78)){x=99}
-    PythonOutputCode poc = pt.transpile_if(sem::If(std::make_unique<sem::Bool>(true), std::move(then), {}, nullptr));
+    PythonExpressionOutputCode poc = pt.transpile_if(sem::If(std::make_unique<sem::Bool>(true), std::move(then), {}, nullptr));
     REQUIRE(poc.code == R"(condition_0 = libcore.libcore.Boolean(True)
 if condition_0:
     x = libcore.libcore.Integer(99))");
@@ -119,8 +119,8 @@ if condition_0:
 TEST_CASE("python_transpile_assignment", "[checker]") {
     PythonTranspiler pt;
     // x = 314
-    PythonOutputCode poc = pt.transpile_assignment(sem::Assignment(std::make_unique<sem::Id>("x"),
-                                                                   std::make_unique<sem::Integer>("314")));
+    PythonExpressionOutputCode poc = pt.transpile_assignment(sem::Assignment(std::make_unique<sem::Id>("x"),
+                                                                             std::make_unique<sem::Integer>("314")));
     REQUIRE(poc.code == "x = libcore.libcore.Integer(314)");
 }
 
@@ -144,7 +144,7 @@ TEST_CASE("python_transpile_while", "[checker]") {
     auto then = std::make_unique<sem::Block>();
     then->nodes.emplace_back(new sem::Assignment(std::make_unique<sem::Id>("x"), std::make_unique<sem::Integer>("99")));
     // while(false){x=99}
-    PythonOutputCode poc = pt.transpile_while(sem::While(std::make_unique<sem::Bool>(false), std::move(then)));
+    PythonExpressionOutputCode poc = pt.transpile_while(sem::While(std::make_unique<sem::Bool>(false), std::move(then)));
     REQUIRE(poc.code == R"(condition_0 = libcore.libcore.Boolean(False)
 while condition_0:
     x = libcore.libcore.Integer(99)
@@ -156,7 +156,7 @@ TEST_CASE("python_transpile_function_def", "[checker]") {
     auto body = std::make_unique<sem::Block>();
     body->nodes.emplace_back(new sem::Assignment(std::make_unique<sem::Id>("x"), std::make_unique<sem::Integer>("99")));
     // fun myfoo(a,b){x=99}
-    PythonOutputCode poc = pt.transpile_function(sem::FunctionDef("myfoo", {"a", "b"}, std::move(body)));
+    PythonExpressionOutputCode poc = pt.transpile_function(sem::FunctionDef("myfoo", {"a", "b"}, std::move(body)));
     REQUIRE(poc.code == R"(def myfoo(a, b):
     x = libcore.libcore.Integer(99))");
 }

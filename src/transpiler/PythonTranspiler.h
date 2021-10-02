@@ -25,54 +25,54 @@ const std::string RETURN_VAR = "__return__";
 
 std::string indent_paragraph(std::string s, size_t level);
 
-class PythonOutputCode {
+class PythonExpressionOutputCode {
 public:
-    PythonOutputCode(const std::string& pre_code, const std::string& code);
+    PythonExpressionOutputCode(const std::string& pre_code, const std::string& code);
 public:
     std::string pre_code;
     std::string code;
 };
 
-std::string pre_if_any(const PythonOutputCode& c);
+std::string pre_if_any(const PythonExpressionOutputCode& c);
 
 class PythonTranspiler {
     size_t arg_n;
 public:
     bool add_self{};
     bool in_try_catch{};
-    PythonOutputCode dispatch(const sem::Common& node);
-    PythonOutputCode dispatch_common(const sem::Common& node);
-    PythonOutputCode dispatch_expression(const sem::Exp& node, bool called_function);
-    PythonOutputCode dispatch_top(const sem::Top& node);
-    PythonOutputCode transpile_assignment(const sem::Assignment& node);
-    PythonOutputCode transpile_block(const sem::Block& node);
-    PythonOutputCode transpile_boolean(const sem::Bool& node);
-    PythonOutputCode transpile_break(const sem::Break& node);
-    PythonOutputCode transpile_call(const sem::Call& node);
-    PythonOutputCode transpile_class(const sem::KlassDef& node);
-    PythonOutputCode transpile_const_function(const sem::ConstFunction& function);
-    PythonOutputCode transpile_continue(const sem::Continue& node);
-    PythonOutputCode transpile_declaration(const sem::Declaration& node);
-    PythonOutputCode transpile_dict(const sem::Dict& node);
-    PythonOutputCode transpile_enum_member(const sem::EnumMember& node);
-    PythonOutputCode transpile_float(const sem::Float& node);
-    PythonOutputCode transpile_function(const sem::FunctionDef& node);
-    PythonOutputCode transpile_id(const sem::Id& node);
-    PythonOutputCode transpile_if(const sem::If& node);
-    PythonOutputCode transpile_integer(const sem::Integer& node);
-    PythonOutputCode transpile_list(const sem::List& node);
-    PythonOutputCode transpile_match(const sem::Match& node);
-    PythonOutputCode transpile_new(const sem::NewObject& node);
-    PythonOutputCode transpile_none(const sem::None& node);
-    PythonOutputCode transpile_object_constructor(const sem::ObjectConstructor& constructor);
-    PythonOutputCode transpile_object_member(const sem::ObjectMember& node);
-    PythonOutputCode transpile_object_method(const sem::ObjectMethod& method, bool called_function);
-    PythonOutputCode transpile_return(const sem::Return& node);
-    PythonOutputCode transpile_string(const sem::String& node);
-    PythonOutputCode transpile_ternary(const sem::Ternary& node);
-    PythonOutputCode transpile_throw(sem::Throw& node);
-    PythonOutputCode transpile_try_catch(const sem::TryCatch& node);
-    PythonOutputCode transpile_while(const sem::While& node);
+    PythonExpressionOutputCode dispatch(const sem::Common& node);
+    PythonExpressionOutputCode dispatch_common(const sem::Common& node);
+    PythonExpressionOutputCode dispatch_expression(const sem::Exp& node, bool called_function);
+    PythonExpressionOutputCode dispatch_top(const sem::Top& node);
+    PythonExpressionOutputCode transpile_assignment(const sem::Assignment& node);
+    PythonExpressionOutputCode transpile_block(const sem::Block& node);
+    PythonExpressionOutputCode transpile_boolean(const sem::Bool& node);
+    PythonExpressionOutputCode transpile_break(const sem::Break& node);
+    PythonExpressionOutputCode transpile_call(const sem::Call& node);
+    PythonExpressionOutputCode transpile_class(const sem::KlassDef& node);
+    PythonExpressionOutputCode transpile_const_function(const sem::ConstFunction& function);
+    PythonExpressionOutputCode transpile_continue(const sem::Continue& node);
+    PythonExpressionOutputCode transpile_declaration(const sem::Declaration& node);
+    PythonExpressionOutputCode transpile_dict(const sem::Dict& node);
+    PythonExpressionOutputCode transpile_enum_member(const sem::EnumMember& node);
+    PythonExpressionOutputCode transpile_float(const sem::Float& node);
+    PythonExpressionOutputCode transpile_function(const sem::FunctionDef& node);
+    PythonExpressionOutputCode transpile_id(const sem::Id& node);
+    PythonExpressionOutputCode transpile_if(const sem::If& node);
+    PythonExpressionOutputCode transpile_integer(const sem::Integer& node);
+    PythonExpressionOutputCode transpile_list(const sem::List& node);
+    PythonExpressionOutputCode transpile_match(const sem::Match& node);
+    PythonExpressionOutputCode transpile_new(const sem::NewObject& node);
+    PythonExpressionOutputCode transpile_none(const sem::None& node);
+    PythonExpressionOutputCode transpile_object_constructor(const sem::ObjectConstructor& constructor);
+    PythonExpressionOutputCode transpile_object_member(const sem::ObjectMember& node);
+    PythonExpressionOutputCode transpile_object_method(const sem::ObjectMethod& method, bool called_function);
+    PythonExpressionOutputCode transpile_return(const sem::Return& node);
+    PythonExpressionOutputCode transpile_string(const sem::String& node);
+    PythonExpressionOutputCode transpile_ternary(const sem::Ternary& node);
+    PythonExpressionOutputCode transpile_throw(sem::Throw& node);
+    PythonExpressionOutputCode transpile_try_catch(const sem::TryCatch& node);
+    PythonExpressionOutputCode transpile_while(const sem::While& node);
     PythonTranspiler();
 
     size_t indent_level;
@@ -85,12 +85,12 @@ public:
     std::string transpile_module(const sem::Module& block, Path module_path);
 
     void indent();
-    PythonOutputCode transpile_enum(const sem::EnumDef& node);
+    PythonExpressionOutputCode transpile_enum(const sem::EnumDef& node);
     void transpile_program(const sem::Module& node);
     void unindent();
-    PythonOutputCode transpile_call_exp(const sem::CallExp& exp);
+    PythonExpressionOutputCode transpile_call_exp(const sem::CallExp& exp);
     Path module_path;
-    PythonOutputCode transpile_for(const sem::For& node);
+    PythonExpressionOutputCode transpile_for(const sem::For& node);
 };
 
 
