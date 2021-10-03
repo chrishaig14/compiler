@@ -16,8 +16,8 @@ public:
         return false;
     }
 
-    Entity* clone() const override {
-        return new EntityModule(this->module);
+    std::unique_ptr<Entity> clone() const override {
+        return std::make_unique<EntityModule>(this->module);
     }
 
     Module& module;

@@ -16,8 +16,8 @@ public:
         return false;
     }
 
-    Entity* clone() const override {
-        return new EntityPackage(this->package);
+    std::unique_ptr<Entity> clone() const override {
+        return std::make_unique<EntityPackage>(this->package);
     }
 
     Package& package;

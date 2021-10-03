@@ -16,8 +16,8 @@ public:
         return false;
     }
 
-    Entity* clone() const override {
-        return new EntityEnum(this->enumm);
+    std::unique_ptr<Entity> clone() const override {
+        return std::make_unique<EntityEnum>(this->enumm);
     }
 
     EntityEnum& get_enum() override {

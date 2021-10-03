@@ -52,7 +52,7 @@ protected:
     }
 
 public:
-    virtual Entity* clone() const = 0;
+    virtual std::unique_ptr<Entity> clone() const = 0;
     virtual ~Entity() = default;
     const E_TYPE e_type;
     virtual bool equal(const Entity& other) const = 0;

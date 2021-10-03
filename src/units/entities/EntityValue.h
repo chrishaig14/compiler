@@ -43,8 +43,8 @@ public:
         this->_type = sem::UType(type);
     }
 
-    Entity* clone() const override {
-        auto* v = new EntityValue(this->type.clone());
+    std::unique_ptr<Entity> clone() const override {
+        auto v = std::make_unique<EntityValue>(this->type.clone());
         v->metatype = this->metatype;
         switch (this->metatype) {
             case Meta::CLASS: {

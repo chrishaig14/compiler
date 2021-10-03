@@ -16,8 +16,8 @@ public:
         return false;
     }
 
-    EntityError* clone() const override {
-        return new EntityError();
+    std::unique_ptr<Entity> clone() const override {
+        return std::make_unique<EntityError>();
     }
 
     EntityError& get_error() override {

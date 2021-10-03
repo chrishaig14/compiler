@@ -17,8 +17,8 @@ public:
     }
 
 
-    Entity* clone() const override {
-        return new EntityNothing();
+    std::unique_ptr<Entity> clone() const override {
+        return std::make_unique<EntityNothing>();
     }
 
     EntityNothing& get_nothing() override {

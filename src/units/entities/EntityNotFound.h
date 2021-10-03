@@ -16,8 +16,8 @@ public:
         return false;
     }
 
-    EntityNotFound* clone() const override {
-        return new EntityNotFound();
+    std::unique_ptr<Entity> clone() const override {
+        return std::make_unique<EntityNotFound>();
     }
 
     EntityNotFound& get_notfound() override {

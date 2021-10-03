@@ -17,8 +17,8 @@ public:
         return &this->clazz == &((const EntityClass&) other).clazz;
     }
 
-    Entity* clone() const override {
-        return new EntityClass(this->clazz);
+    std::unique_ptr<Entity> clone() const override {
+        return std::make_unique<EntityClass>(this->clazz);
     }
 
     Class& clazz;
