@@ -43,10 +43,12 @@ Checker::analyze_call(ast::ExpNode& function, std::vector<ast::RExpNode>& argume
     }
     const sem::TypeFunction& function_type = get_function_type(fun_info);
     // ok
+    ast::UTypeNode rtype(function_type.return_type->to_ast());
+    retv.set_entity(entity_from_type(*rtype));
+
     if (arguments.size() != function_type.param_types.size()) {
         this->error_reporter.error(std::make_unique<ErrorFunctionCallNumArgs>(&function_type, start));
         if (!function_is_generic(function_type)) {
-            retv.set_entity(entity_from_type(*function_type.return_type->to_ast()));
             return retv_p;
         } else {
             return exp_error_stub();
@@ -60,7 +62,7 @@ Checker::analyze_call(ast::ExpNode& function, std::vector<ast::RExpNode>& argume
         return exp_error_stub();
     }
     std::cout << "Calling function of type: " << function_type.to_string() << std::endl;
-    this->process_function_arguments(retv, arg_entities, arguments_, arguments, function_type, fun_info_p.get());
+    this->process_function_arguments(arg_entities, arguments_, arguments, function_type, fun_info_p.get());
     retv.exp_snode = std::make_unique<sem::CallExp>(std::move(fun_info_p->exp_snode), std::move(arguments_));
     auto f = make_return_info(is_rvalue, std::move(retv_p), is_def_const, args_are_constant);
     return f;
@@ -120,11 +122,9 @@ bool Checker::check_arguments(std::vector<ast::RExpNode>& narguments, std::vecto
     return has_error;
 }
 
-void Checker::process_function_arguments(ExpressionInfo& retv, std::vector<std::unique_ptr<Entity>>& arg_entities,
+void Checker::process_function_arguments(std::vector<std::unique_ptr<Entity>>& arg_entities,
                                          std::vector<sem::UExp>& arguments, std::vector<ast::RExpNode>& narguments,
                                          const sem::TypeFunction& function_type, ExpressionInfo* fun_info_p) {
-    ast::UTypeNode rtype(function_type.return_type->to_ast());
-    retv.set_entity(entity_from_type(*rtype));
     int sni = static_cast<int>(fun_info_p->this_arg != nullptr);
     for (size_t i = 0; i < narguments.size(); i++) {
         // const ast::TypeNode& arg_type = *arg_types[i];

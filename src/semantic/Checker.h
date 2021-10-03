@@ -209,9 +209,10 @@ public:
                  TextPosition end);
     bool check_arguments(std::vector<ast::RExpNode>& narguments, std::vector<sem::UExp>& arguments,
                          std::vector<std::unique_ptr<Entity>>& arg_entities);
-    void process_function_arguments(ExpressionInfo& retv, std::vector<std::unique_ptr<Entity>>& arg_entities,
-                                    std::vector<sem::UExp>& arguments, std::vector<ast::RExpNode>& narguments,
-                                    const sem::TypeFunction& function_type, ExpressionInfo* fun_info_p);
+    void
+    process_function_arguments(std::vector<std::unique_ptr<Entity>>& arg_entities, std::vector<sem::UExp>& arguments,
+                               std::vector<ast::RExpNode>& narguments, const sem::TypeFunction& function_type,
+                               ExpressionInfo* fun_info_p);
     std::unique_ptr<EntityValue> make_entity_value(sem::Type& type);
 };
 
