@@ -8,7 +8,7 @@
 #include "../parser/Parser.h"
 #include "../ast/general/ObjectType.h"
 #include "../simple_nodes/common/include/TypeObject.h"
-#include "../simple_nodes/common/src/TypeFunction.h"
+#include "../simple_nodes/common/include/TypeFunction.h"
 #include "../simple_nodes/common/include/Type.h"
 #include "errors/include/ErrorRedeclared.h"
 #include "errors/include/ErrorGlobalRedeclared.h"

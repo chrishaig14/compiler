@@ -8,7 +8,7 @@
 #include "../src/compiler/Compiler.h"
 #include "../src/compiler/analyze.h"
 #include "../src/simple_nodes/common/include/TypeObject.h"
-#include "../src/simple_nodes/common/src/TypeFunction.h"
+#include "../src/simple_nodes/common/include/TypeFunction.h"
 
 #include "../src/semantic/errors/include/errors.h"
 

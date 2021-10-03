@@ -31,7 +31,7 @@
 #include "../simple_nodes/expressions/include/NewObject.h"
 #include "../simple_nodes/common/include/Return.h"
 #include "../simple_nodes/common/include/TypeObject.h"
-#include "../simple_nodes/common/src/TypeFunction.h"
+#include "../simple_nodes/common/include/TypeFunction.h"
 #include "../simple_nodes/expressions/include/expressions.h"
 #include "../simple_nodes/top/include/EnumDef.h"
 #include "../simple_nodes/top/include/FunctionDef.h"

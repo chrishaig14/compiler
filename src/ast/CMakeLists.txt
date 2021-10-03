@@ -65,7 +65,7 @@ add_library(
     statements/For.cpp
     statements/For.h
     general/FunctionType.cpp
-    general/FunctionType.h
+    general/TypeFunction.h
     statements/If.cpp
     statements/If.h
     top/Import.cpp

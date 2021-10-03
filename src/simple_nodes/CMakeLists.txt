@@ -27,7 +27,7 @@ add_library(
         common/src/Call.cpp
         common/src/Continue.cpp
         common/src/Declaration.cpp
-        common/src/FunctionType.cpp
+        common/src/TypeFunction.cpp
         common/src/If.cpp
         common/src/Match.cpp
         common/src/ObjectType.cpp

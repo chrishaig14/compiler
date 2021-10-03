@@ -5,7 +5,7 @@
 #include "../util/macros.h"
 #include "../logging/logging.h"
 #include "../simple_nodes/common/include/TypeObject.h"
-#include "../simple_nodes/common/src/TypeFunction.h"
+#include "../simple_nodes/common/include/TypeFunction.h"
 #include "util.h"
 
 // sem::UCommon error_stub() {

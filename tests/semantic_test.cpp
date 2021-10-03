@@ -7,7 +7,7 @@
 #include "../src/semantic/Checker.h"
 #include "../src/semantic/GlobalProcessor.h"
 #include "../src/simple_nodes/common/include/common.h"
-#include "../src/simple_nodes/common/src/TypeFunction.h"
+#include "../src/simple_nodes/common/include/TypeFunction.h"
 #include "../src/simple_nodes/expressions/include/expressions.h"
 
 #define CHECKER() std::unique_ptr<Compiler> cp = c_analyze(code);Compiler& c = *cp;Module& module = c.root_package.units["tmp"]->module();resolve_module_imports(module, c.top_package);Checker checker(c.top_package, module);

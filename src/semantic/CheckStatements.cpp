@@ -9,7 +9,7 @@
 #include "../simple_nodes/common/include/TryCatch.h"
 #include "../simple_nodes/common/include/TypeObject.h"
 #include "../simple_nodes/expressions/include/CallExp.h"
-#include "../simple_nodes/common/src/TypeFunction.h"
+#include "../simple_nodes/common/include/TypeFunction.h"
 
 
 UExpressionInfo Checker::visit_lvalue_subscript(ast::Subscript& node) {

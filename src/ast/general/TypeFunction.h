@@ -2,12 +2,11 @@
 // Created by chris on 3/7/21.
 //
 
-#ifndef XLANG_FUNCTIONTYPE_H
-#define XLANG_FUNCTIONTYPE_H
+#ifndef XLANG_TYPEFUNCTION_H
+#define XLANG_TYPEFUNCTION_H
 
 
 #include "Type.h"
-#include "../../simple_nodes/common/src/TypeFunction.h"
 #include "../../ast/statements/Statement.h"
 
 
@@ -40,4 +39,4 @@ public:
     nlohmann::json to_json() const override;
 };
 
-#endif //XLANG_FUNCTIONTYPE_H
+#endif //XLANG_TYPEFUNCTION_H

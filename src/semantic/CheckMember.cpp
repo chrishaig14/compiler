@@ -8,7 +8,7 @@
 #include "../simple_nodes/expressions/include/ObjectMember.h"
 #include "../simple_nodes/expressions/include/ObjectMethod.h"
 #include "../simple_nodes/common/include/TypeObject.h"
-#include "../simple_nodes/common/src/TypeFunction.h"
+#include "../simple_nodes/common/include/TypeFunction.h"
 
 UExpressionInfo Checker::visit_member(ast::Member& n) {
     UExpressionInfo parent_info = this->dispatch_rvalue(n.parent);

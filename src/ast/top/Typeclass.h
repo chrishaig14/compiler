@@ -3,7 +3,7 @@
 
 
 #include "../statements/Statement.h"
-#include "../general/FunctionType.h"
+#include "../general/TypeFunction.h"
 #include "../ast.h"
 
 class ast::Typeclass : public ast::Statement {

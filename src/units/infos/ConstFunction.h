@@ -7,10 +7,10 @@
 #include "../entities/Entity.h"
 #include "../../ast/general/Type.h"
 #include "../../util/Path.h"
-#include "../../ast/general/FunctionType.h"
+#include "../../ast/general/TypeFunction.h"
 #include "../../ast/top/Function.h"
 #include "../../simple_nodes/sem.h"
-#include "../../simple_nodes/common/src/TypeFunction.h"
+#include "../../simple_nodes/common/include/TypeFunction.h"
 
 class ConstFunction {
 private:

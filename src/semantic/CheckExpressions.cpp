@@ -7,7 +7,7 @@
 #include "../simple_nodes/expressions/include/Ternary.h"
 #include "../simple_nodes/expressions/include/CallExp.h"
 #include "../simple_nodes/common/include/TypeObject.h"
-#include "../simple_nodes/common/src/TypeFunction.h"
+#include "../simple_nodes/common/include/TypeFunction.h"
 
 EntityValue& Checker::entity_value_from_actual_base_path_no_generic(const Path& p) {
     if (this->entity_values_no_generic.count(p.as_str()) == 0) {

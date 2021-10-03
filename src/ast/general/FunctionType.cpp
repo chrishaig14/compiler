@@ -3,7 +3,8 @@
 //
 
 #include <cassert>
-#include "FunctionType.h"
+#include "TypeFunction.h"
+#include "../../simple_nodes/common/include/TypeFunction.h"
 #include "ObjectType.h"
 
 using namespace ast;

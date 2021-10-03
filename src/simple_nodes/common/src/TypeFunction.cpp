@@ -2,9 +2,9 @@
 // Created by chris on 3/7/21.
 //
 
-#include "TypeFunction.h"
+#include "../include/TypeFunction.h"
 #include "../include/TypeObject.h"
-#include "../../../ast/general/FunctionType.h"
+#include "../../../ast/general/TypeFunction.h"
 #include "../include/TypeObject.h"
 
 using namespace sem;

@@ -5,7 +5,7 @@
 #include "CheckLiterals.h"
 #include "../simple_nodes/expressions/include/expressions.h"
 #include "../simple_nodes/common/include/TypeObject.h"
-#include "../simple_nodes/common/src/TypeFunction.h"
+#include "../simple_nodes/common/include/TypeFunction.h"
 
 UExpressionInfo Checker::visit_boolean(ast::Boolean& node) {
     UExpressionInfo info_u = std::make_unique<ExpressionInfo>();
