@@ -723,7 +723,6 @@ TEST_CASE("assign_const_fun_ok", "[checker]") {
 }
 fun bar() -> Integer {
     var x = foo
-    var y: Integer = x
     return 7
 }
 )";
