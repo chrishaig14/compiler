@@ -717,6 +717,25 @@ TEST_CASE("if_ok", "[checker]") {
     REQUIRE_CHECKER_OK();
 }
 
+TEST_CASE("assign_const_fun_ok", "[checker]") {
+    std::string code = R"(fun foo()->Integer{
+    return 0
+}
+fun bar() -> Integer {
+    var x = foo
+    var y: Integer = x
+    return 7
+}
+)";
+
+    CHECKER();
+    checker.init();
+    checker.visit_root(*module.ast);
+
+    REQUIRE_CHECKER_OK();
+}
+
+
 TEST_CASE("for_ok", "[checker]") {
     std::string code = R"(fun foo()->Integer{
     for x @ [1,2,3,4] {
