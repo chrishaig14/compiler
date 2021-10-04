@@ -168,7 +168,6 @@ public:
     sem::UCommon visit_alias(ast::Alias& p_node);
     sem::UExp make_rvalue(const Entity& t_entity, sem::UExp value_snode, const sem::Type& target);
     sem::UCommon dispatch(ast::Statement& nod);
-    void fill_value(EntityValue& value);
     void process_function_arguments(ExpressionInfo& retv, std::vector<std::unique_ptr<Entity>>& arg_entities,
                                     std::vector<sem::UExp>& arguments, ast::CallExp& n,
                                     const sem::TypeFunction& function_type, ExpressionInfo* fun_info_p);

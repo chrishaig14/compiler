@@ -277,43 +277,6 @@ std::unique_ptr<EntityValue> Checker::make_value(sem::Type* type) {
     return std::make_unique<EntityValue>(type, cls);
 }
 
-void Checker::fill_value(EntityValue& value) {
-    if (value.type.kind != sem::Kind::OBJECT) {
-        return;
-    }
-    if (value.type.object().id.size() == 1) {
-        Entity& e = this->scope->get(value.type.object().id);
-        Class* clazz;
-        if (e.is_notfound()) {
-            clazz = new Class(value.type.object().id, Path("core.generics" + value.type.object().id));
-            // clazz->class_name = value.type->object().id;
-        } else {
-            clazz = &e.get_class().clazz;
-        }
-        // assert(e.type == E_TYPE::CLASS);
-        value.clazz = clazz;
-        value.metatype = Meta::CLASS;
-        return;
-    }
-    ModuleMember* module_member_p = this->top_package.get(value.type.object().data.actual_base_path);
-    assert(module_member_p != nullptr);
-    ModuleMember& module_member = *module_member_p;
-    if (module_member.is_enumm()) {
-        value.enumm = &module_member.enumm();
-        value.metatype = Meta::ENUM;
-        return;
-    }
-    Class* cls = &module_member.klass();
-    if (!cls->type_params.empty()) {
-        std::cout << "Instantiating type " << value.type.object().to_string() << std::endl;
-        ast::UObjectType o(&value.type.object().to_ast()->object());
-        cls = instantiate_generic(*cls, *o);
-        std::cout << "Done instantiating" << std::endl;
-    }
-    value.metatype = Meta::CLASS;
-    value.clazz = cls;
-}
-
 UExpressionInfo Checker::visit_subscript(ast::Subscript& node) {
     UExpressionInfo parent_p = this->dispatch_rvalue(*node.parent);
     Entity& entity_parent = parent_p->entity;
