@@ -18,12 +18,7 @@ public:
 
     std::reference_wrapper<Entity> entity;
     std::unique_ptr<Entity> _entity;
-
-    void set_entity(Entity* e) {
-        this->_entity = std::unique_ptr<Entity>(e);
-        this->entity = *e;
-    }
-
+    
     void set_entity(std::unique_ptr<Entity> e) {
         this->_entity = std::move(e);
         this->entity = *this->_entity;

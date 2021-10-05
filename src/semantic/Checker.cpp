@@ -145,7 +145,7 @@ Checker::match_arguments_to_generic_function(const ast::FunctionType& ft, ast::V
     }
     UExpressionInfo rv_p = std::make_unique<ExpressionInfo>();
     auto& rv = *rv_p;
-    rv.set_entity(std::make_unique<EntityValue>(f->return_type->to_sem()).release());
+    rv.set_entity(std::make_unique<EntityValue>(f->return_type->to_sem()));
     // delete f;
     return rv_p;
 }

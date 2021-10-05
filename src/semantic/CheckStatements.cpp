@@ -56,8 +56,7 @@ UExpressionInfo Checker::visit_lvalue_subscript(ast::Subscript& node) {
     ExpressionInfo& info = *info_u;
     // auto value = std::make_unique<Value>(rtype.clone());
     // this->fill_value(*value);
-    auto value = this->make_value(rtype.clone());
-    info.set_entity(value.release());
+    info.set_entity(this->make_value(rtype.clone()));
 
     auto fsn = std::make_unique<sem::Id>(sub_fun_path);
     std::vector<sem::UExp> v;

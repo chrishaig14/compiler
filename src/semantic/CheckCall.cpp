@@ -89,7 +89,7 @@ Checker::make_return_info(bool is_rvalue, UExpressionInfo retv_p, bool is_def_co
         EntityValue& value = retv.entity.get().get_value();
         if (value.type.kind == sem::Kind::OBJECT) {
             if (value.type.object().id == ".None") {
-                retv.set_entity(new EntityNothing());
+                retv.set_entity(std::make_unique<EntityNothing>());
             }
         }
     }

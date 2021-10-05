@@ -150,17 +150,17 @@ sem::UCommon Checker::visit_import(ast::Import& node) {
     return info_u;
 }
 
-Entity* map_module_member_to_entity(ModuleMember& module_member) {
+std::unique_ptr<Entity> map_module_member_to_entity(ModuleMember& module_member) {
     if (module_member.is_const_function()) {
-        return new EntityConstFunction(module_member.const_function());
+        return std::make_unique<EntityConstFunction>(module_member.const_function());
     } else if (module_member.is_package()) {
-        return new EntityPackage(module_member.package());
+        return std::make_unique<EntityPackage>(module_member.package());
     } else if (module_member.is_module()) {
-        return new EntityModule(module_member.module());
+        return std::make_unique<EntityModule>(module_member.module());
     } else if (module_member.is_klass()) {
-        return new EntityClass(module_member.klass());
+        return std::make_unique<EntityClass>(module_member.klass());
     } else if (module_member.is_enumm()) {
-        return new EntityEnum(module_member.enumm());
+        return std::make_unique<EntityEnum>(module_member.enumm());
     }
     return nullptr;
 }
@@ -178,8 +178,7 @@ UExpressionInfo Checker::enum_member(ast::Member& node, Enum& enumm) {
     for (size_t i = 0; i < enumm.values.size(); i++) {
         if (value == enumm.values[i]) {
             auto* otype = new sem::TypeObject(enumm.enumm_name, enumm.path);
-            auto ov = std::make_unique<EntityValue>(otype);
-            info.set_entity(ov.release());
+            info.set_entity(std::make_unique<EntityValue>(otype));
             // this->fill_value(info.entity.value);
             info.exp_snode = std::make_unique<sem::EnumMember>(enumm.path.as_str(), value);
             return info_u;

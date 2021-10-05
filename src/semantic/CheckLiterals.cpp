@@ -53,8 +53,7 @@ UExpressionInfo Checker::visit_none(ast::None& node) {
     UExpressionInfo info_u = std::make_unique<ExpressionInfo>();
     ExpressionInfo& info = *info_u;
     // info.set_type(ObjectType("NoneType"));
-    auto v = std::make_unique<EntityValue>(new sem::TypeObject("NoneType"));
-    info.set_entity(v.release());
+    info.set_entity(std::make_unique<EntityValue>(new sem::TypeObject("NoneType")));
     info.exp_snode = std::make_unique<sem::None>();
     return info_u;
 }
@@ -66,8 +65,7 @@ UExpressionInfo Checker::visit_emptylist(ast::EmptyList& node) {
     auto* otype = new sem::TypeObject("List", {node.type->to_sem()}, Path("libcore.libcore.List"));
     // auto ov = std::make_unique<Value>(otype);
     // this->fill_value(*ov)
-    auto ov = this->make_value(otype);
-    info.set_entity(ov.release());
+    info.set_entity(this->make_value(otype));
     std::vector<sem::UExp> v;
     info.exp_snode = std::make_unique<sem::List>(std::move(v));
     // non->class_name = "core.List";
@@ -116,7 +114,7 @@ UExpressionInfo Checker::visit_tuple(ast::Tuple& node) {
         ov->clazz->members[mem_name] = tv->type.to_ast();
         ov->clazz->member_entities[mem_name] = std::move(tv);
     }
-    sinfo.set_entity(ov.release());
+    sinfo.set_entity(std::move(ov));
     auto nosn = std::make_unique<sem::NewObject>();
     nosn->class_name = otype->data.actual_base_path.as_str();
     nosn->args = std::move(values);
@@ -129,8 +127,7 @@ UExpressionInfo Checker::visit_partial(ast::PartialApplication& node) {
     sem::VectorOfTypes partial_args;
     ast::FunctionType* fun_type = nullptr;
     Entity& f_entity = func->entity;
-    if (f_entity.is_constfun() ||
-        (f_entity.is_value() && (f_entity.get_value()).type.kind == sem::Kind::FUNCTION)) {
+    if (f_entity.is_constfun() || (f_entity.is_value() && (f_entity.get_value()).type.kind == sem::Kind::FUNCTION)) {
         fun_type = (ast::FunctionType*) f_entity.get_constfun().const_function.const_function_ft.to_ast();
     } else {
         this->error_reporter.fail("Error: expected a function for partial application");
@@ -201,9 +198,7 @@ UExpressionInfo Checker::visit_dict(ast::DictNode& node) {
     this->module.fill_actual(*type);
     // auto ov = std::make_unique<Value>(type);
     // this->fill_value(*ov);
-    auto ov = this->make_value(type);
-    assert(ov->clazz != nullptr);
-    info.set_entity(ov.release());
+    info.set_entity(this->make_value(type));
     info.exp_snode = std::make_unique<sem::Dict>(std::move(items));
     return info_u;
 }
@@ -218,9 +213,7 @@ UExpressionInfo Checker::visit_emptydict(ast::EmptyDict& node) {
     this->module.fill_actual(*ot);
     // auto ov = std::make_unique<Value>(ot);
     // this->fill_value(*ov);
-    auto ov = this->make_value(ot);
-    assert(ov->clazz != nullptr);
-    info.set_entity(ov.release());
+    info.set_entity(this->make_value(ot));
     info.exp_snode = std::make_unique<sem::Dict>(std::vector<std::pair<sem::UExp, sem::UExp>>{});
     return info_u;
 }
@@ -247,7 +240,7 @@ UExpressionInfo Checker::visit_defconst(ast::DefaultConstructor& node) {
         ot->is_generic_param = true;
     }
     auto* rt = new sem::TypeObject(cls.class_name, tp, cls.path);
-    info.set_entity(new EntityConstFunction(*new ConstFunction(Path(),
+    info.set_entity(std::make_unique<EntityConstFunction>(*new ConstFunction(Path(),
                                                                std::make_unique<sem::TypeFunction>(t,
                                                                                                    sem::UType(rt)))));
     info.exp_snode = std::make_unique<sem::ObjectConstructor>(cls.path);
@@ -289,7 +282,6 @@ UExpressionInfo Checker::visit_list(ast::List& node) {
     auto* otype = new sem::TypeObject("List", {element_type.clone()}, Path("libcore.libcore.List"));
     // auto p_value = std::make_unique<Value>(otype);
     // this->fill_value(*p_value);
-    auto p_value = this->make_value(otype);
-    return_info.set_entity(p_value.release());
+    return_info.set_entity(this->make_value(otype));
     return return_info_p;
 }

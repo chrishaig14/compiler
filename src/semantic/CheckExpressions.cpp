@@ -184,7 +184,7 @@ UExpressionInfo Checker::visit_unary(ast::UnaryOp& n) {
 
     UExpressionInfo info_u = std::make_unique<ExpressionInfo>();
     ExpressionInfo& info = *info_u;
-    info.set_entity(std::make_unique<EntityValue>(rtype).release());
+    info.set_entity(std::make_unique<EntityValue>(rtype));
     info.exp_snode = std::move(csn);
     return info_u;
 }
@@ -229,8 +229,7 @@ UExpressionInfo Checker::visit_binop(ast::BinaryOp& n) {
     ExpressionInfo& info = *info_u;
     // auto v = std::make_unique<Value>(rettype);
     // this->fill_value(*v);
-    auto v = this->make_value(rettype);
-    info.set_entity(v.release());
+    info.set_entity(this->make_value(rettype));
     info.exp_snode = std::move(sn);
     return info_u;
 }
@@ -319,8 +318,7 @@ UExpressionInfo Checker::visit_subscript(ast::Subscript& node) {
     sem::Type& rtype = *subscript_fun.const_function_ft.return_type;
     // auto v = std::make_unique<Value>(rtype.clone());
     // this->fill_value(*v);
-    auto v = this->make_value(rtype.clone());
-    info.set_entity(v.release());
+    info.set_entity(this->make_value(rtype.clone()));
 
     auto fsn = std::make_unique<sem::Id>(sub_fun_path);
     std::vector<sem::UExp> vv;
@@ -368,10 +366,9 @@ UExpressionInfo Checker::visit_ternary(ast::Ternary& node) {
 
     // auto rv = std::make_unique<Value>(true_value.type.clone());
     // this->fill_value(*rv);
-    auto rv = this->make_value(true_value.type.clone());
     UExpressionInfo info_u = std::make_unique<ExpressionInfo>();
     ExpressionInfo& info = *info_u;
-    info.set_entity(rv.release());
+    info.set_entity(this->make_value(true_value.type.clone()));
     info.exp_snode = std::make_unique<sem::Ternary>(expression_info_p->exp_snode.release(),
                                                     true_case.exp_snode.release(),
                                                     false_case_snode.release());
