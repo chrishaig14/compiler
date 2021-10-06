@@ -3,10 +3,12 @@ import example.mymodule
 import example.mymodule.say_goodbye
 import example
 
-class example {
-    i: Integer
+fun get_seven() -> Integer {
+    return 7
 }
 
 fun main()->Integer{
+    var seven = get_seven()
+    print(seven.str())
     return 0
 }

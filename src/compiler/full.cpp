@@ -46,7 +46,7 @@ void transpile_package(Package& package, const std::string& output_dir) {
     mkdir(package_dir.c_str(), 0700);
     std::ofstream init_file(path_join(package_dir, "__init__.py"));
     init_file.close();
-    for (auto u: package.units) {
+    for (auto& u: package.units) {
         if (u.second->is_module()) {
             transpile_module(u.second->module(), package_dir);
         } else {

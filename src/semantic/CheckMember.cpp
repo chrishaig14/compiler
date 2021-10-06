@@ -72,11 +72,13 @@ Checker::object_member(sem::UExp object_snode, EntityValue& p_value, const std::
     //     return error_stub();
     // }
     if (object_type_path.as_str() == "libcore.libcore.Union") {
+        std::cout << "p_value is union" << std::endl;
         this->error_reporter.error(std::make_unique<ErrorNoMember>(p_value.type, n));
         // this->error_reporter.object_no_member(*p_value.type, n);
         return exp_error_stub();
     }
     if (p_value.metatype == Meta::ENUM) {
+        std::cout << "p_value is enum" << std::endl;
         this->error_reporter.error(std::make_unique<ErrorNoMember>(p_value.type, n));
         // this->error_reporter.object_no_member(*p_value.type, n);
         return exp_error_stub();
@@ -88,6 +90,10 @@ Checker::object_member(sem::UExp object_snode, EntityValue& p_value, const std::
     }
     Class* clazz = p_value.clazz;
     assert(clazz != nullptr);
+    std::cout << "Class "  << clazz->class_name << "'s members" << std::endl;
+    for(auto m: clazz->members){
+        std::cout << m.first << " : " << m.second->to_string() << std::endl;
+    }
     if (clazz->members.count(child) != 0) {
         info.set_entity(clazz->member_entities.at(child)->clone());
         if (info.entity.get().is_nothing()) {

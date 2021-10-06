@@ -36,7 +36,7 @@ add_library(
         common/src/Top.cpp
         common/src/TryCatch.cpp
         common/src/Type.cpp
-        common/src/TypeFunction.h
+        common/include/TypeFunction.h
         common/src/While.cpp
         expressions/include/Bool.h
         expressions/include/CallExp.h

@@ -248,9 +248,7 @@ std::unique_ptr<sem::FunctionDef> Checker::visit_function(ast::Function& n) {
 
     ast::Type& returnType = *n.return_type;
     this->assert_type_exists(returnType, n.start);
-    std::cout << "here" << std::endl;
     std::unique_ptr<Entity> e = entity_from_type(returnType);
-    std::cout << "there" << std::endl;
     this->scope->set("__return__", *e);
     auto bn = this->visit_block(*n.body);
     for (auto& local_var: this->scope->table) {
