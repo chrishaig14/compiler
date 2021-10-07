@@ -184,7 +184,7 @@ UExpressionInfo Checker::visit_unary(ast::UnaryOp& n) {
 
     UExpressionInfo info_u = std::make_unique<ExpressionInfo>();
     ExpressionInfo& info = *info_u;
-    info.set_entity(std::make_unique<EntityValue>(rtype));
+    info.set_entity(this->make_value(rtype));
     info.exp_snode = std::move(csn);
     return info_u;
 }
@@ -352,7 +352,7 @@ UExpressionInfo Checker::visit_ternary(ast::Ternary& node) {
     }
     this->enter_scope("true_case");
     sem::Type& inner_type = *expression_type.type_params[0];
-    auto v = std::make_unique<EntityValue>(inner_type.clone());
+    auto v = std::make_unique<EntityValue>(inner_type.clone(),(Class*)nullptr);
     this->scope->set("it", *v);
     UExpressionInfo true_case_p = this->dispatch_rvalue(*node.true_case);
     ExpressionInfo& true_case = *true_case_p;

@@ -117,9 +117,8 @@ bool is_generic(const sem::Type& t) {
     return false;
 }
 
-UExpressionInfo
-Checker::match_arguments_to_generic_function(const ast::FunctionType& ft, ast::VectorOfTypes arg_types,
-                                             std::map<std::string, ast::Type*>& all_substitutions) {
+UExpressionInfo Checker::match_arguments_to_generic_function(const ast::FunctionType& ft, ast::VectorOfTypes arg_types,
+                                                             std::map<std::string, ast::Type*>& all_substitutions) {
     std::unique_ptr<ast::FunctionType> f;
     // = ft.clone();
     try {
@@ -145,7 +144,7 @@ Checker::match_arguments_to_generic_function(const ast::FunctionType& ft, ast::V
     }
     UExpressionInfo rv_p = std::make_unique<ExpressionInfo>();
     auto& rv = *rv_p;
-    rv.set_entity(std::make_unique<EntityValue>(f->return_type->to_sem()));
+    rv.set_entity(std::make_unique<EntityValue>(f->return_type->to_sem(), (Class*) nullptr));
     // delete f;
     return rv_p;
 }
@@ -418,8 +417,8 @@ sem::UCommon Checker::dispatch_statement(ast::Statement& n, bool is_rvalue) {
             return this->visit_return((ast::Return&) n);
         case StatementType::WHIL:
             return this->visit_while((ast::While&) n);
-        // case StatementType::IMPORT:
-        //     return this->visit_import((ast::Import&) n);
+            // case StatementType::IMPORT:
+            //     return this->visit_import((ast::Import&) n);
         case StatementType::ALIAS:
             return this->visit_alias((ast::Alias&) n);
         case StatementType::MATCH_EXP:

@@ -169,7 +169,13 @@ TEST_CASE("semantic_output_object_method", "[checker]") {
 }
 
 TEST_CASE("semantic_output_assign_const_function", "[checker]") {
-    std::string code = "fun bar()->Integer{return 0;} fun foo()->Integer{var x = bar;return 0;}";
+    std::string code = R"(fun bar()->Integer{
+    return 0
+}
+fun foo()->Integer{
+    var x = bar
+    return 0
+})";
 
     std::unique_ptr<Compiler> cp = c_analyze(code);
     Compiler& c = *cp;

@@ -53,7 +53,7 @@ UExpressionInfo Checker::visit_none(ast::None& node) {
     UExpressionInfo info_u = std::make_unique<ExpressionInfo>();
     ExpressionInfo& info = *info_u;
     // info.set_type(ObjectType("NoneType"));
-    info.set_entity(std::make_unique<EntityValue>(new sem::TypeObject("NoneType")));
+    info.set_entity(std::make_unique<EntityValue>(new sem::TypeObject("NoneType"), (Class*) nullptr));
     info.exp_snode = std::make_unique<sem::None>();
     return info_u;
 }
@@ -102,18 +102,18 @@ UExpressionInfo Checker::visit_tuple(ast::Tuple& node) {
     auto& sinfo = *sinfo_p;
     unsigned long num_values = node.values.size();
     auto* otype = new sem::TypeObject("Tuple", types, Path("core.Tuple" + std::to_string(num_values)));
-    auto ov = std::make_unique<EntityValue>(otype);
-    ov->metatype = Meta::CLASS;
 
-    ov->clazz = new Class("Tuple", Path("libcore.libcore.Tuple"));
-    for (size_t i = 0; i < ov->type.object().type_params.size(); i++) {
+
+    Class* clazz = new Class("Tuple", Path("libcore.libcore.Tuple"));
+    for (size_t i = 0; i < otype->object().type_params.size(); i++) {
         // auto tv = std::make_unique<Value>(ov->type.object().type_params[i]->clone());
         // this->fill_value(*tv);
-        auto tv = this->make_value(ov->type.object().type_params[i]->clone());
+        auto tv = this->make_value(otype->object().type_params[i]->clone());
         const std::string& mem_name = std::to_string(i + 1);
-        ov->clazz->members[mem_name] = tv->type.to_ast();
-        ov->clazz->member_entities[mem_name] = std::move(tv);
+        clazz->members[mem_name] = tv->type.to_ast();
+        clazz->member_entities[mem_name] = std::move(tv);
     }
+    auto ov = std::make_unique<EntityValue>(otype, clazz);
     sinfo.set_entity(std::move(ov));
     auto nosn = std::make_unique<sem::NewObject>();
     nosn->class_name = otype->data.actual_base_path.as_str();
@@ -157,8 +157,8 @@ UExpressionInfo Checker::visit_partial(ast::PartialApplication& node) {
     node.complete_type = &fun_type->clone()->function();
     UExpressionInfo s_p = std::make_unique<ExpressionInfo>();
     auto& s = *s_p;
-    s.entity = *std::make_unique<EntityValue>(new sem::TypeFunction(partial_args,
-                                                                    sem::UType(fun_type->return_type->to_sem())));
+    s.entity = *EntityValue::function_value(new sem::TypeFunction(partial_args,
+                                                                  sem::UType(fun_type->return_type->to_sem())));
     auto non = std::make_unique<sem::NewObject>();
     non->class_name = "Partial" + std::to_string(npartial);
     non->args = std::move(snodes);
@@ -241,8 +241,9 @@ UExpressionInfo Checker::visit_defconst(ast::DefaultConstructor& node) {
     }
     auto* rt = new sem::TypeObject(cls.class_name, tp, cls.path);
     info.set_entity(std::make_unique<EntityConstFunction>(*new ConstFunction(Path(),
-                                                               std::make_unique<sem::TypeFunction>(t,
-                                                                                                   sem::UType(rt)))));
+                                                                             std::make_unique<sem::TypeFunction>(t,
+                                                                                                                 sem::UType(
+                                                                                                                         rt)))));
     info.exp_snode = std::make_unique<sem::ObjectConstructor>(cls.path);
     return info_u;
 }

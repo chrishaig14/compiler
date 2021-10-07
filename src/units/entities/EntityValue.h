@@ -11,25 +11,25 @@
 #include <cassert>
 
 enum class Meta {
-    ENUM, CLASS
+    ENUM, CLASS, FUNCTION
 };
 
 class EntityValue : public Entity {
     sem::UType _type;
+private:
+    EntityValue(sem::Type* type, Meta meta) : Entity(E_TYPE::VALUE), type(*type),metatype(meta) {
+        this->clazz = nullptr;
+        this->_type = sem::UType(type);
+    }
+
 public:
     sem::Type& type;
     union {
         Class* clazz;
         Enum* enumm;
     };
-    Meta metatype;
+    const Meta metatype;
 
-    EntityValue(sem::Type* type) : Entity(E_TYPE::VALUE), type(*type) {
-        this->clazz = nullptr;
-        this->enumm = nullptr;
-        assert(type != nullptr);
-        this->_type = sem::UType(type);
-    }
 
     EntityValue(sem::Type* type, Class* cls) : Entity(E_TYPE::VALUE), type(*type), metatype(Meta::CLASS) {
         this->clazz = cls;
@@ -43,20 +43,22 @@ public:
         this->_type = sem::UType(type);
     }
 
+    static std::unique_ptr<EntityValue> function_value(sem::Type* type) {
+        return std::unique_ptr<EntityValue>(new EntityValue(type, Meta::FUNCTION));
+    }
+
     std::unique_ptr<Entity> clone() const override {
-        auto v = std::make_unique<EntityValue>(this->type.clone());
-        v->metatype = this->metatype;
         switch (this->metatype) {
             case Meta::CLASS: {
-                v->clazz = this->clazz;
-                break;
+                return std::make_unique<EntityValue>(this->type.clone(), this->clazz);
             }
             case Meta::ENUM: {
-                v->enumm = this->enumm;
-                break;
+                return std::make_unique<EntityValue>(this->type.clone(), this->enumm);
             }
+            case Meta::FUNCTION:
+                return EntityValue::function_value(this->type.clone());
         }
-        return v;
+        return nullptr;
     }
 
     bool equal(const Entity& other) const override {
