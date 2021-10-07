@@ -45,7 +45,11 @@ Checker::analyze_call(ast::ExpNode& function, std::vector<ast::RExpNode>& argume
     // ok
     ast::UTypeNode rtype(function_type.return_type->to_ast());
     // retv.set_entity(entity_from_type(*rtype));
-    retv.set_entity(this->make_value(rtype->to_sem()));
+    if (rtype->kind == Kind::OBJECT and rtype->object().id == ".None") {
+        retv.set_entity(std::make_unique<EntityNothing>());
+    } else {
+        retv.set_entity(this->make_value(rtype->to_sem()));
+    }
 
     if (arguments.size() != function_type.param_types.size()) {
         this->error_reporter.error(std::make_unique<ErrorFunctionCallNumArgs>(&function_type, start));
