@@ -315,7 +315,7 @@ TEST_CASE("decl_error_expected_expression", "[checker]") {
     REQUIRE_CHECKER_ONE_ERROR();
 
     Error& error = *checker.error_reporter.errors.back();
-    Class* cl = &module.get(Path("Integer"))->klass();
+    ConcreteClass* cl = &module.get(Path("Integer"))->klass();
     EntityClass ec(*cl);
     ErrorExpectedExpression exp(ec, declaration_node.expression);
     REQUIRE(error == exp);

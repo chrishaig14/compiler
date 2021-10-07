@@ -43,7 +43,7 @@ TEST_CASE("global_class", "[parser]") {
     REQUIRE(module.members.size() == 1);
     REQUIRE(module.members.count("Foo") == 1);
     REQUIRE(module.members["Foo"]->is_klass());
-    Class* clazz = &module.members["Foo"]->klass();
+    ConcreteClass* clazz = &module.members["Foo"]->klass();
 
     REQUIRE(clazz->class_name == "Foo");
     REQUIRE(clazz->path.as_str() == "main.foo.Foo");
@@ -96,7 +96,7 @@ TEST_CASE("global_multiple", "[parser]") {
     REQUIRE(const_function->path.as_str() == "main.foo.main");
 
 
-    Class* clazz = &module.members["Foo"]->klass();
+    ConcreteClass* clazz = &module.members["Foo"]->klass();
 
     REQUIRE(clazz->class_name == "Foo");
     REQUIRE(clazz->path.as_str() == "main.foo.Foo");
