@@ -13,17 +13,17 @@ ModuleMember* Module::get(Path p) {
     return this->members.at(pt.back()).get();
 }
 
-void Module::add_class_definition(ConcreteClass* p_class) {
-    this->classes.push_back(std::unique_ptr<ConcreteClass>(p_class));
-    this->members[p_class->class_name] = std::make_unique<ClassModuleMember>(p_class);
+void Module::add_class_definition(std::unique_ptr<ConcreteClass> p_class) {
+    this->members[p_class->class_name] = std::make_unique<ClassModuleMember>(p_class.get());
+    this->classes.push_back(std::move(p_class));
 }
 
-void Module::add_enum_definition(Enum* enumm) {
-    this->enums.push_back(std::unique_ptr<Enum>(enumm));
-    this->members[enumm->enumm_name] = std::make_unique<EnumModuleMember>(enumm);
+void Module::add_enum_definition(std::unique_ptr<Enum> enumm) {
+    this->members[enumm->enumm_name] = std::make_unique<EnumModuleMember>(enumm.get());
+    this->enums.push_back(std::move(enumm));
 }
 
-void Module::add_func_definition(ConstFunction* const_function) {
-    this->const_functions.push_back(std::unique_ptr<ConstFunction>(const_function));
-    this->members[const_function->path.as_vec().back()] = std::make_unique<ConstFunctionModuleMember>(const_function);
+void Module::add_func_definition(std::unique_ptr<ConstFunction> const_function) {
+    this->members[const_function->path.as_vec().back()] = std::make_unique<ConstFunctionModuleMember>(const_function.get());
+    this->const_functions.push_back(std::move                                                                                                                                                           (const_function));
 }

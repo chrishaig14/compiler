@@ -20,15 +20,15 @@
 #include "Enum.h"
 
 class Module {
-public:
-    const std::string name;
-    const std::string abs_path;
-    const bool is_lib;
-
-    const Path path;
     std::vector<std::unique_ptr<ConstFunction>> const_functions;
     std::vector<std::unique_ptr<Enum>> enums;
     std::vector<std::unique_ptr<ConcreteClass>> classes;
+public:
+    const std::string name;
+    const std::string abs_path;
+
+    const bool is_lib;
+    const Path path;
 
     CodeLines code_lines;
     std::unique_ptr<ast::Module> ast;
@@ -56,9 +56,9 @@ public:
     void fill_actual(sem::Type& t);
     void fill_actual(sem::TypeObject& t);
     void fill_actual(sem::TypeFunction& t);
-    void add_class_definition(ConcreteClass* p_class);
-    void add_enum_definition(Enum* p_enum);
-    void add_func_definition(ConstFunction* p_function);
+    void add_class_definition(std::unique_ptr<ConcreteClass> p_class);
+    void add_enum_definition(std::unique_ptr<Enum> enumm);
+    void add_func_definition(std::unique_ptr<ConstFunction> const_function);
 };
 
 

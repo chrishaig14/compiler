@@ -67,8 +67,8 @@ void GlobalProcessor::visit_function(ast::Function& node) {
     this->module.fill_actual(p);
     ast::FunctionType function_info(x, ast::UTypeNode(node.return_type->clone()));
     Path function_path = Path(this->module.path, node.identifier);
-    ConstFunction* const_function = new ConstFunction(Path(this->module.path, node.identifier),
-                                                      sem::UTypeFunction((sem::TypeFunction*) function_info.to_sem()));
+    auto const_function = std::make_unique<ConstFunction>(Path(this->module.path, node.identifier),
+                                                          sem::UTypeFunction((sem::TypeFunction*) function_info.to_sem()));
     if (node.implicit != nullptr) {
         const_function->implicit = node.implicit;
         this->module.fill_actual(*node.implicit->ft);
@@ -76,11 +76,11 @@ void GlobalProcessor::visit_function(ast::Function& node) {
     node.path = const_function->path;
     // node.const_function = const_function;
 
-    this->module.add_func_definition(const_function);
+    this->module.add_func_definition(std::move(const_function));
 }
 
-Enum* make_enum(ast::EnumNode& n, Path module_path) {
-    Enum* enumm = new Enum(n.id, Path(module_path, n.id), n.values);
+std::unique_ptr<Enum> make_enum(ast::EnumNode& n, Path module_path) {
+    auto enumm = std::make_unique<Enum>(n.id, Path(module_path, n.id), n.values);
     enumm->functions["__eq__"] = std::make_unique<ConstFunction>(Path(enumm->path, "__eq__"), nullptr);
     enumm->functions["__ne__"] = std::make_unique<ConstFunction>(Path(enumm->path, "__ne__"), nullptr);
     return enumm;
@@ -95,12 +95,12 @@ void GlobalProcessor::visit_root() {
         this->visit_import(n);
     }
     for (ast::Klass& n: node.classes) {
-        auto* class_info = new ConcreteClass(n.class_name, Path(this->module.path, n.class_name));
-        this->module.add_class_definition(class_info);
+        auto class_info = std::make_unique<ConcreteClass>(n.class_name, Path(this->module.path, n.class_name));
+        this->module.add_class_definition(std::move(class_info));
     }
     for (ast::EnumNode& n: node.enums) {
-        Enum* enumm = make_enum(n, this->module.path);
-        this->module.add_enum_definition(enumm);
+        auto enumm = make_enum(n, this->module.path);
+        this->module.add_enum_definition(std::move(enumm));
     }
 
     for (ast::Klass& n: node.classes) {
@@ -179,7 +179,8 @@ void GlobalProcessor::visit_class(ast::Klass& node) {
         // method.return_type->object().actual_base_path = this->get_actual_path(method.return_type->object().id);
 
         auto cf = std::make_unique<ConstFunction>(Path(class_info->path, f.first),
-                                     std::make_unique<sem::TypeFunction>(x, sem::UType(method.return_type->to_sem())));
+                                                  std::make_unique<sem::TypeFunction>(x,
+                                                                                      sem::UType(method.return_type->to_sem())));
         method.path = cf->path;
         cf->implicit = f.second->method->implicit;
         // f.second->method->const_function = cf;
@@ -198,7 +199,8 @@ void GlobalProcessor::visit_class(ast::Klass& node) {
         // method.return_type->object().actual_base_path = this->get_actual_path(method.return_type->object().id);
 
         auto cf = std::make_unique<ConstFunction>(Path(class_info->path, f.first),
-                                     std::make_unique<sem::TypeFunction>(x, sem::UType(method.return_type->to_sem())));
+                                                  std::make_unique<sem::TypeFunction>(x,
+                                                                                      sem::UType(method.return_type->to_sem())));
         method.path = cf->path;
         // f.second->const_function = cf;
         class_info->static_methods.insert(make_pair(f.first, std::move(cf)));
