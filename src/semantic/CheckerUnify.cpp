@@ -204,7 +204,7 @@ std::unique_ptr<Entity> Checker::entity_from_type(const ast::Type& type) {
             return std::make_unique<EntityNothing>();
         }
     }
-    auto fv = std::make_unique<EntityValue>(type.to_sem(), (Class*) nullptr);
+    auto fv = std::make_unique<EntityValue>(type.to_sem(), (ConcreteClass*) nullptr);
     this->entities[type.to_string()] = std::unique_ptr<Entity>(fv->clone());
     return fv;
 }

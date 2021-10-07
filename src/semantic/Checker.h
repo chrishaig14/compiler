@@ -100,7 +100,7 @@ public:
     void enter_scope(const std::string& name);
     void leave_scope();
     bool assert_type_exists(const ast::Type& type, TextPosition pos);
-    Class* instantiate_generic(const Class& generic_p, const ast::ObjectType& instance);
+    ConcreteClass* instantiate_generic(const ConcreteClass& generic_p, const ast::ObjectType& instance);
     bool is_variable(const ast::ObjectType& a);
     std::pair<std::string, ast::Type*>*
     get_first_substitution_function(ast::FunctionType& a, ast::FunctionType& b, bool is_top_level_arg);
@@ -183,7 +183,7 @@ public:
     sem::UCommon dispatch_statement(ast::Statement& n, bool is_rvalue);
     EntityValue& entity_value_from_actual_base_path_no_generic(const Path& p);
 
-    std::map<std::string, std::unique_ptr<Class>> classes;
+    std::map<std::string, std::unique_ptr<ConcreteClass>> classes;
     std::unique_ptr<EntityValue> make_value(sem::Type* type);
     void init();
     sem::Exp* make_option_rvalue(sem::Exp* value_snode, const ast::Type* unaliased_value_type,
@@ -192,7 +192,7 @@ public:
     UExpressionInfo visit_callexp(ast::CallExp& n, bool is_rvalue);
     sem::UCommon visit_call(ast::Call& n);
     UExpressionInfo const_function_member(ast::Member& n, UExpressionInfo unique_ptr_1, ConstFunction& function);
-    UExpressionInfo class_member(ast::Member& n, UExpressionInfo parent_info, Class& cls);
+    UExpressionInfo class_member(ast::Member& n, UExpressionInfo parent_info, ConcreteClass& cls);
     UExpressionInfo value_member(ast::Member& n, UExpressionInfo parent_info, EntityValue& value);
     UExpressionInfo analyze_call(ast::ExpNode& function, ast::VectorOfExpNodesU arguments, bool is_rvalue, TextPosition start, TextPosition end);
     bool check_arguments(ast::VectorOfExpNodesU& narguments, std::vector<sem::UExp>& arguments,

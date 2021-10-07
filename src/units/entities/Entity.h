@@ -14,7 +14,7 @@ class Package;
 
 class Module;
 
-class Class;
+class ConcreteClass;
 
 class EntityValue;
 

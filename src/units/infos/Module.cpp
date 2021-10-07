@@ -13,8 +13,8 @@ ModuleMember* Module::get(Path p) {
     return this->members.at(pt.back()).get();
 }
 
-void Module::add_class_definition(Class* p_class) {
-    this->classes.push_back(std::unique_ptr<Class>(p_class));
+void Module::add_class_definition(ConcreteClass* p_class) {
+    this->classes.push_back(std::unique_ptr<ConcreteClass>(p_class));
     this->members[p_class->class_name] = std::make_unique<ClassModuleMember>(p_class);
 }
 

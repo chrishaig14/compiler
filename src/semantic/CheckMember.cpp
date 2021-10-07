@@ -88,7 +88,7 @@ Checker::object_member(sem::UExp object_snode, EntityValue& p_value, const std::
     if (p_value.type.kind == sem::Kind::OBJECT && p_value.type.object().id == "Tuple") {
         info.is_tuple_member = true;
     }
-    Class* clazz = p_value.clazz;
+    ConcreteClass* clazz = p_value.clazz;
     assert(clazz != nullptr);
     std::cout << "Class "  << clazz->class_name << "'s members" << std::endl;
     for(auto m: clazz->members){
@@ -165,7 +165,7 @@ UExpressionInfo Checker::package_member(ast::Member& n, Package& package) {
     return info_u;
 }
 
-UExpressionInfo Checker::class_member(ast::Member& n, UExpressionInfo parent_info, Class& cls) {
+UExpressionInfo Checker::class_member(ast::Member& n, UExpressionInfo parent_info, ConcreteClass& cls) {
     std::string child = n.s_child;
     UExpressionInfo info_u = std::make_unique<ExpressionInfo>();
     ExpressionInfo& info = *info_u;

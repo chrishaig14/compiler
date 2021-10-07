@@ -144,7 +144,7 @@ UExpressionInfo Checker::match_arguments_to_generic_function(const ast::Function
     }
     UExpressionInfo rv_p = std::make_unique<ExpressionInfo>();
     auto& rv = *rv_p;
-    rv.set_entity(std::make_unique<EntityValue>(f->return_type->to_sem(), (Class*) nullptr));
+    rv.set_entity(std::make_unique<EntityValue>(f->return_type->to_sem(), (ConcreteClass*) nullptr));
     // delete f;
     return rv_p;
 }
@@ -197,7 +197,8 @@ ast::UTypeNode make_type(const ast::Type& original, const MapStringType& replace
     }
 }
 
-Class* Checker::instantiate_generic(const Class& generic, const ast::ObjectType& instance) {
+ConcreteClass* Checker::instantiate_generic(const ConcreteClass& generic, const ast::ObjectType& instance) {
+
     std::cout << "******* Instantiating type: " << instance.to_string() << std::endl;
     MapStringType replacements;
     for (size_t i = 0; i < generic.type_params.size(); i++) {
@@ -225,7 +226,7 @@ Class* Checker::instantiate_generic(const Class& generic, const ast::ObjectType&
                 // auto& v = (std::unique_ptr<EntityValue>&) e;
                 // this->fill_value(*v);
                 auto v = this->make_entity_value(*instance.type_params[0]->to_sem());
-                Class* clazz_t = v->clazz;
+                ConcreteClass* clazz_t = v->clazz;
                 auto meth = clazz_t->methods.find(implicit->method);
                 if (meth == clazz_t->methods.end()) {
                     std::cout << "Not found in instance's type parameter, so skipping" << std::endl;
@@ -273,7 +274,7 @@ Class* Checker::instantiate_generic(const Class& generic, const ast::ObjectType&
                                                                            sem::UTypeFunction((sem::TypeFunction*) concrete_type->to_sem()));;
     }
 
-    auto* concrete = new Class(generic.class_name, generic.path);
+    auto* concrete = new ConcreteClass(generic.class_name, generic.path);
     // concrete->class_name = ;
     concrete->methods = std::move(concrete_methods);
     concrete->static_methods = std::move(concrete_static_methods);
@@ -285,7 +286,7 @@ Class* Checker::instantiate_generic(const Class& generic, const ast::ObjectType&
         concrete->members[mn] = concrete_field_types[i];
         concrete->member_entities[mn] = std::make_unique<EntityNothing>();
     }
-    this->classes[generic.class_name] = std::unique_ptr<Class>(concrete);
+    this->classes[generic.class_name] = std::unique_ptr<ConcreteClass>(concrete);
     return concrete;
 }
 

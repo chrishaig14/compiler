@@ -53,7 +53,7 @@ UExpressionInfo Checker::visit_none(ast::None& node) {
     UExpressionInfo info_u = std::make_unique<ExpressionInfo>();
     ExpressionInfo& info = *info_u;
     // info.set_type(ObjectType("NoneType"));
-    info.set_entity(std::make_unique<EntityValue>(new sem::TypeObject("NoneType"), (Class*) nullptr));
+    info.set_entity(std::make_unique<EntityValue>(new sem::TypeObject("NoneType"), (ConcreteClass*) nullptr));
     info.exp_snode = std::make_unique<sem::None>();
     return info_u;
 }
@@ -104,7 +104,7 @@ UExpressionInfo Checker::visit_tuple(ast::Tuple& node) {
     auto* otype = new sem::TypeObject("Tuple", types, Path("core.Tuple" + std::to_string(num_values)));
 
 
-    Class* clazz = new Class("Tuple", Path("libcore.libcore.Tuple"));
+    ConcreteClass* clazz = new ConcreteClass("Tuple", Path("libcore.libcore.Tuple"));
     for (size_t i = 0; i < otype->object().type_params.size(); i++) {
         // auto tv = std::make_unique<Value>(ov->type.object().type_params[i]->clone());
         // this->fill_value(*tv);
@@ -228,7 +228,7 @@ UExpressionInfo Checker::visit_defconst(ast::DefaultConstructor& node) {
         this->error_reporter.fail("Error not a class");
         return exp_error_stub();
     }
-    Class& cls = entity.get_class().clazz;
+    ConcreteClass& cls = entity.get_class().clazz;
     sem::VectorOfTypes t;
     for (auto* pt: cls.member_types) {
         t.push_back(pt->to_sem());

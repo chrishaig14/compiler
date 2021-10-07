@@ -20,7 +20,7 @@ enum class Kind {
 
 class UnknownTypeNode;
 
-class Class;
+class ConcreteClass;
 
 class ast::Type {
 protected:

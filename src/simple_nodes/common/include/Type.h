@@ -20,7 +20,7 @@ enum class sem::Kind {
 
 class UnknownType;
 
-class Class;
+class ConcreteClass;
 
 class sem::Type {
 public:

@@ -95,7 +95,7 @@ void GlobalProcessor::visit_root() {
         this->visit_import(n);
     }
     for (ast::Klass& n: node.classes) {
-        auto* class_info = new Class(n.class_name, Path(this->module.path, n.class_name));
+        auto* class_info = new ConcreteClass(n.class_name, Path(this->module.path, n.class_name));
         this->module.add_class_definition(class_info);
     }
     for (ast::EnumNode& n: node.enums) {
@@ -146,7 +146,7 @@ void GlobalProcessor::visit_block(ast::Block& node) {
 }
 
 void GlobalProcessor::visit_class(ast::Klass& node) {
-    Class* class_info = &this->module.members[node.class_name]->klass();
+    ConcreteClass* class_info = &this->module.members[node.class_name]->klass();
     //
     // if (this->imported_paths.count(node.class_name) == 1) {
     //     throw std::runtime_error("Name \"" + node.class_name + "\" already used as an alias for " +

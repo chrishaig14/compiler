@@ -12,7 +12,7 @@ enum class ModuleMemberType {
 };
 std::ostream& operator<<(std::ostream& o, ModuleMemberType f);
 
-class Class;
+class ConcreteClass;
 
 class Enum;
 
@@ -28,7 +28,7 @@ public:
 
     virtual bool is_klass();
 
-    virtual Class& klass();
+    virtual ConcreteClass& klass();
 
     virtual bool is_const_function();
 
@@ -50,14 +50,14 @@ public:
 };
 
 class ClassModuleMember : public ModuleMember {
-    Class* p_klass;
+    ConcreteClass* p_klass;
 public:
-    explicit ClassModuleMember(Class* _klass);
+    explicit ClassModuleMember(ConcreteClass* _klass);
 
 
     bool is_klass() override;
 
-    Class& klass() override;
+    ConcreteClass& klass() override;
 
     std::unique_ptr<ModuleMember> clone() override;
 };

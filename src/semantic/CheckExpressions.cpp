@@ -166,7 +166,7 @@ UExpressionInfo Checker::visit_unary(ast::UnaryOp& n) {
     sem::UExp exp_snode = std::move(exp_info->exp_snode);
 
     EntityValue& entity_parent = exp_info->entity.get().get_value();
-    Class* cls = entity_parent.clazz;
+    ConcreteClass* cls = entity_parent.clazz;
 
     auto subscript_it = cls->methods.find("__not__");
     if (subscript_it == cls->methods.end()) {
@@ -210,7 +210,7 @@ UExpressionInfo Checker::visit_binop(ast::BinaryOp& n) {
 
     // Entity entity(std::make_unique<Value>(left_info_p->entity.type->object().clone()));
     // this->fill_value(entity.value);
-    Class* cls = l_entity_v.clazz;
+    ConcreteClass* cls = l_entity_v.clazz;
     assert(cls != nullptr);
     auto operator_fun_it = cls->static_methods.find(fun);
     if (operator_fun_it == cls->static_methods.end()) {
@@ -240,9 +240,9 @@ std::unique_ptr<EntityValue> Checker::make_value(sem::Type* type) {
     }
     if (type->object().id.size() == 1) {
         Entity& e = this->scope->get(type->object().id);
-        Class* clazz;
+        ConcreteClass* clazz;
         if (e.is_notfound()) {
-            clazz = new Class(type->object().id, Path("core.generics" + type->object().id));
+            clazz = new ConcreteClass(type->object().id, Path("core.generics" + type->object().id));
             // clazz->class_name = value.type->object().id;
         } else {
             clazz = &e.get_class().clazz;
@@ -264,7 +264,7 @@ std::unique_ptr<EntityValue> Checker::make_value(sem::Type* type) {
         // return value;
         return std::make_unique<EntityValue>(type, &module_member.enumm());
     }
-    Class* cls = &module_member.klass();
+    ConcreteClass* cls = &module_member.klass();
     if (!cls->type_params.empty()) {
         std::cout << "Instantiating type " << type->object().to_string() << std::endl;
         ast::UObjectType o(&type->object().to_ast()->object());
@@ -284,7 +284,7 @@ UExpressionInfo Checker::visit_subscript(ast::Subscript& node) {
         return exp_error_stub();
     }
     EntityValue& value = entity_parent.get_value();
-    Class* cls = value.clazz;
+    ConcreteClass* cls = value.clazz;
     if (cls == nullptr) {
         // its totally generic, fail
         this->error_reporter.error(std::make_unique<ErrorObjectNoSpecialMethod>(value.type, "__get_item__", node));
@@ -352,7 +352,7 @@ UExpressionInfo Checker::visit_ternary(ast::Ternary& node) {
     }
     this->enter_scope("true_case");
     sem::Type& inner_type = *expression_type.type_params[0];
-    auto v = std::make_unique<EntityValue>(inner_type.clone(),(Class*)nullptr);
+    auto v = std::make_unique<EntityValue>(inner_type.clone(),(ConcreteClass*)nullptr);
     this->scope->set("it", *v);
     UExpressionInfo true_case_p = this->dispatch_rvalue(*node.true_case);
     ExpressionInfo& true_case = *true_case_p;

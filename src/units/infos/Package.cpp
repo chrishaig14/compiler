@@ -16,7 +16,7 @@ Package::Package(Path path, std::string abs_path, bool is_lib)
 
 ModuleMember* Package::get(Path p) {
     if (p.as_str() == "libcore.libcore.Union") {
-        return new ClassModuleMember(new Class("Union", p));
+        return new ClassModuleMember(new ConcreteClass("Union", p));
     }
     VectorOfStrings pt = p.as_vec();
     assert(this->units.count(pt[0]) == 1);

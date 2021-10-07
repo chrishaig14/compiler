@@ -16,7 +16,7 @@
 #include "../../ast/top/EnumNode.h"
 #include "../../simple_nodes/common/include/Block.h"
 #include "ConstFunction.h"
-#include "Class.h"
+#include "ConcreteClass.h"
 #include "Enum.h"
 
 class Module {
@@ -28,7 +28,7 @@ public:
     const Path path;
     std::vector<std::unique_ptr<ConstFunction>> const_functions;
     std::vector<std::unique_ptr<Enum>> enums;
-    std::vector<std::unique_ptr<Class>> classes;
+    std::vector<std::unique_ptr<ConcreteClass>> classes;
 
     CodeLines code_lines;
     std::unique_ptr<ast::Module> ast;
@@ -56,7 +56,7 @@ public:
     void fill_actual(sem::Type& t);
     void fill_actual(sem::TypeObject& t);
     void fill_actual(sem::TypeFunction& t);
-    void add_class_definition(Class* p_class);
+    void add_class_definition(ConcreteClass* p_class);
     void add_enum_definition(Enum* p_enum);
     void add_func_definition(ConstFunction* p_function);
 };

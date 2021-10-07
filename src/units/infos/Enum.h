@@ -6,7 +6,7 @@
 #define XLANG_ENUM_H
 
 #include "../../util/types.h"
-#include "Class.h"
+#include "ConcreteClass.h"
 
 class Enum {
 public:

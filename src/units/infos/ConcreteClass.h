@@ -15,9 +15,10 @@
 #include "../entities/Entity.h"
 #include "ConstFunction.h"
 
-class Class {
+class ConcreteClass {
 public:
-    Class(const std::string& class_name, Path path) : path(path), class_name(class_name) {
+    ConcreteClass(const std::string& class_name, Path path) : path(path), class_name(class_name) {
+        std::cout << "---- Instantiated class " << class_name << std::endl;
     }
 
     VectorOfStrings member_names;
@@ -33,11 +34,11 @@ public:
     const Path path;
     const std::string class_name;
 
-    ~Class();
+    ~ConcreteClass();
 
-    bool operator!=(const Class& b) const;
+    bool operator!=(const ConcreteClass& b) const;
 
-    bool operator==(const Class& b) const;
+    bool operator==(const ConcreteClass& b) const;
     VectorOfStrings type_params;
 };
 

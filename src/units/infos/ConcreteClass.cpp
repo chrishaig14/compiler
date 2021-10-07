@@ -2,14 +2,14 @@
 // Created by chris on 2/8/20.
 //
 
-#include "Class.h"
+#include "ConcreteClass.h"
 #include "../entities/Entity.h"
 
-bool Class::operator!=(const Class& b) const {
+bool ConcreteClass::operator!=(const ConcreteClass& b) const {
     return !(*this == b);
 }
 
-bool Class::operator==(const Class& b) const {
+bool ConcreteClass::operator==(const ConcreteClass& b) const {
     if (this->member_names != b.member_names) {
         return false;
     }
@@ -25,7 +25,7 @@ bool Class::operator==(const Class& b) const {
     return true;
 }
 
-Class::~Class() {
+ConcreteClass::~ConcreteClass() {
     // std::cout << "CALLING CLASS DESTRUCTOR!" << std::endl;
     for (const auto& m: this->members) {
         delete m.second;

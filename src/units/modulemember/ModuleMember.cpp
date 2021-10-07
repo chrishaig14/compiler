@@ -10,7 +10,7 @@ bool ModuleMember::is_klass() {
     return false;
 }
 
-Class& ModuleMember::klass() {
+ConcreteClass& ModuleMember::klass() {
     throw std::runtime_error("ModuleMember is not a Class");
 }
 
@@ -46,14 +46,14 @@ Enum& ModuleMember::enumm() {
     throw std::runtime_error("ModuleMember is not a Enum");
 }
 
-ClassModuleMember::ClassModuleMember(Class* _klass) : p_klass(_klass) {
+ClassModuleMember::ClassModuleMember(ConcreteClass* _klass) : p_klass(_klass) {
 }
 
 bool ClassModuleMember::is_klass() {
     return true;
 }
 
-Class& ClassModuleMember::klass() {
+ConcreteClass& ClassModuleMember::klass() {
     return *this->p_klass;
 }
 

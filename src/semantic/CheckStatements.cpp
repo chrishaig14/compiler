@@ -24,7 +24,7 @@ UExpressionInfo Checker::visit_lvalue_subscript(ast::Subscript& node) {
         this->error_reporter.fail("Error: no subscript in enum");
         return exp_error_stub();
     }
-    Class* cls = entity_parent_value.clazz;
+    ConcreteClass* cls = entity_parent_value.clazz;
     assert(cls != nullptr);
     if (!cls->type_params.empty()) {
         cls = instantiate_generic(*cls, *(ast::ObjectType*) entity_parent_value.type.object().to_ast());

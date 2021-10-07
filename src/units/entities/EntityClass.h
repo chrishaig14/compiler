@@ -9,7 +9,7 @@
 
 class EntityClass : public Entity {
 public:
-    explicit EntityClass(Class& clazz) : Entity(E_TYPE::CLASS), clazz(clazz) {
+    explicit EntityClass(ConcreteClass& clazz) : Entity(E_TYPE::CLASS), clazz(clazz) {
     }
 
     bool equal(const Entity& other) const override {
@@ -21,7 +21,7 @@ public:
         return std::make_unique<EntityClass>(this->clazz);
     }
 
-    Class& clazz;
+    ConcreteClass& clazz;
 
     EntityClass& get_class() override {
         return *this;
