@@ -25,5 +25,5 @@ void Module::add_enum_definition(std::unique_ptr<Enum> enumm) {
 
 void Module::add_func_definition(std::unique_ptr<ConstFunction> const_function) {
     this->members[const_function->path.as_vec().back()] = std::make_unique<ConstFunctionModuleMember>(*const_function);
-    this->const_functions.push_back(std::move                                                                                                                                                           (const_function));
+    this->const_functions.push_back(std::move(const_function));
 }
