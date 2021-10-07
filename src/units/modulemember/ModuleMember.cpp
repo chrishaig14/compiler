@@ -46,7 +46,7 @@ Enum& ModuleMember::enumm() {
     throw std::runtime_error("ModuleMember is not a Enum");
 }
 
-ClassModuleMember::ClassModuleMember(ConcreteClass* _klass) : p_klass(_klass) {
+ClassModuleMember::ClassModuleMember(ConcreteClass& _klass) : p_klass(_klass) {
 }
 
 bool ClassModuleMember::is_klass() {
@@ -54,14 +54,14 @@ bool ClassModuleMember::is_klass() {
 }
 
 ConcreteClass& ClassModuleMember::klass() {
-    return *this->p_klass;
+    return this->p_klass;
 }
 
 std::unique_ptr<ModuleMember> ClassModuleMember::clone() {
     return std::make_unique<ClassModuleMember>(this->p_klass);
 }
 
-ConstFunctionModuleMember::ConstFunctionModuleMember(ConstFunction* _const_function)
+ConstFunctionModuleMember::ConstFunctionModuleMember(ConstFunction& _const_function)
         : p_const_function(_const_function) {
 }
 
@@ -70,7 +70,7 @@ bool ConstFunctionModuleMember::is_const_function() {
 }
 
 ConstFunction& ConstFunctionModuleMember::const_function() {
-    return *this->p_const_function;
+    return this->p_const_function;
 }
 
 std::unique_ptr<ModuleMember> ConstFunctionModuleMember::clone() {

@@ -50,9 +50,9 @@ public:
 };
 
 class ClassModuleMember : public ModuleMember {
-    ConcreteClass* p_klass;
+    ConcreteClass& p_klass;
 public:
-    explicit ClassModuleMember(ConcreteClass* _klass);
+    explicit ClassModuleMember(ConcreteClass& _klass);
 
 
     bool is_klass() override;
@@ -63,9 +63,9 @@ public:
 };
 
 class ConstFunctionModuleMember : public ModuleMember {
-    ConstFunction* p_const_function;
+    ConstFunction& p_const_function;
 public:
-    explicit ConstFunctionModuleMember(ConstFunction* _const_function);
+    explicit ConstFunctionModuleMember(ConstFunction& _const_function);
 
     bool is_const_function() override;
 
