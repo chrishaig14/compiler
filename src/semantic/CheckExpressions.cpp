@@ -265,12 +265,27 @@ std::unique_ptr<EntityValue> Checker::make_value(sem::Type* type) {
         return std::make_unique<EntityValue>(type, &module_member.enumm());
     }
     ConcreteClass* cls = &module_member.klass();
-    if (!cls->type_params.empty()) {
-        std::cout << "Instantiating type " << type->object().to_string() << std::endl;
-        ast::UObjectType o(&type->object().to_ast()->object());
-        cls = instantiate_generic(*cls, *o);
-        std::cout << "Done instantiating" << std::endl;
+    if (not type->object().type_params.empty()) {
+        auto instance = cls->generic_instances.find(type->actual_to_string());
+        if (instance == cls->generic_instances.end()) {
+            ast::UObjectType o(&type->object().to_ast()->object());
+            ConcreteClass* bcls = cls;
+            std::cout << "       <<<<<<<<<<<<<<<< instantiating " << type->object().actual_to_string() << std::endl;
+            cls = instantiate_generic(*bcls, *o);
+            std::cout << "Done instantiating" << std::endl;
+            bcls->generic_instances[type->actual_to_string()] = std::unique_ptr<ConcreteClass>(cls);
+        } else {
+            std::cout << "       <<<<<<<<<<<<<<<< already instantiated " << type->object().actual_to_string() << std::endl;
+            cls = instance->second.get();
+        }
     }
+    // if (!cls->type_params.empty()) {
+    //     std::cout << "complete: " << type->object().actual_to_string() << std::endl;
+    //     std::cout << "Instantiating type " << type->object().to_string() << std::endl;
+    //     ast::UObjectType o(&type->object().to_ast()->object());
+    //     cls = instantiate_generic(*cls, *o);
+    //     std::cout << "Done instantiating" << std::endl;
+    // }
     // value.metatype = Meta::CLASS;
     // value.clazz = cls;
     return std::make_unique<EntityValue>(type, cls);
@@ -352,7 +367,7 @@ UExpressionInfo Checker::visit_ternary(ast::Ternary& node) {
     }
     this->enter_scope("true_case");
     sem::Type& inner_type = *expression_type.type_params[0];
-    auto v = std::make_unique<EntityValue>(inner_type.clone(),(ConcreteClass*)nullptr);
+    auto v = std::make_unique<EntityValue>(inner_type.clone(), (ConcreteClass*) nullptr);
     this->scope->set("it", *v);
     UExpressionInfo true_case_p = this->dispatch_rvalue(*node.true_case);
     ExpressionInfo& true_case = *true_case_p;

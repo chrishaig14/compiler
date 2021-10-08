@@ -17,9 +17,10 @@
 
 class ConcreteClass {
 public:
-    ConcreteClass(const std::string& class_name, Path path) : path(path), class_name(class_name) {
-        std::cout << "---- Instantiated class " << class_name << std::endl;
-    }
+
+    std::map<std::string, std::unique_ptr<ConcreteClass>> generic_instances;
+
+    ConcreteClass(const std::string& class_name, Path path);
 
     VectorOfStrings member_names;
     std::vector<ast::Type*> member_types;
