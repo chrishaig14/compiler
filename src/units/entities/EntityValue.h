@@ -17,10 +17,7 @@ enum class Meta {
 class EntityValue : public Entity {
     sem::UType _type;
 private:
-    EntityValue(sem::Type* type, Meta meta) : Entity(E_TYPE::VALUE), type(*type),metatype(meta) {
-        this->clazz = nullptr;
-        this->_type = sem::UType(type);
-    }
+    EntityValue(sem::Type* type, Meta meta);
 
 public:
     sem::Type& type;
@@ -31,48 +28,19 @@ public:
     const Meta metatype;
 
 
-    EntityValue(sem::Type* type, ConcreteClass* cls) : Entity(E_TYPE::VALUE), type(*type), metatype(Meta::CLASS) {
-        this->clazz = cls;
-        assert(type != nullptr);
-        this->_type = sem::UType(type);
-    }
+    EntityValue(sem::Type* type, ConcreteClass* cls);
 
-    EntityValue(sem::Type* type, Enum* enumm) : Entity(E_TYPE::VALUE), type(*type), metatype(Meta::ENUM) {
-        this->enumm = enumm;
-        assert(type != nullptr);
-        this->_type = sem::UType(type);
-    }
+    EntityValue(sem::Type* type, Enum* enumm);
 
-    static std::unique_ptr<EntityValue> function_value(sem::Type* type) {
-        return std::unique_ptr<EntityValue>(new EntityValue(type, Meta::FUNCTION));
-    }
+    static std::unique_ptr<EntityValue> function_value(sem::Type* type);
 
-    std::unique_ptr<Entity> clone() const override {
-        switch (this->metatype) {
-            case Meta::CLASS: {
-                return std::make_unique<EntityValue>(this->type.clone(), this->clazz);
-            }
-            case Meta::ENUM: {
-                return std::make_unique<EntityValue>(this->type.clone(), this->enumm);
-            }
-            case Meta::FUNCTION:
-                return EntityValue::function_value(this->type.clone());
-        }
-        return nullptr;
-    }
+    std::unique_ptr<Entity> clone() const override;
 
-    bool equal(const Entity& other) const override {
-        auto& o = (const EntityValue&) other;
-        return this->metatype == o.metatype && this->type == o.type && this->clazz == o.clazz;
-    }
+    bool equal(const Entity& other) const override;
 
-    EntityValue& get_value() override {
-        return *this;
-    }
+    EntityValue& get_value() override;
 
-    const EntityValue& get_value() const override {
-        return *this;
-    }
+    const EntityValue& get_value() const override;
 };
 
 #endif //XLANG_ENTITYVALUE_H
