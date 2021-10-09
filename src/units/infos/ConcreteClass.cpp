@@ -39,6 +39,5 @@ ConcreteClass::~ConcreteClass() {
 }
 
 ConcreteClass::ConcreteClass(const std::string& class_name, Path path) : path(path), class_name(class_name) {
-    std::cout << "---- Instantiated class " << class_name << std::endl;
 }
 

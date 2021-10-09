@@ -199,7 +199,6 @@ ast::UTypeNode make_type(const ast::Type& original, const MapStringType& replace
 
 ConcreteClass* Checker::instantiate_generic(const ConcreteClass& generic, const ast::ObjectType& instance) {
 
-    std::cout << "******* Instantiating type: " << instance.to_string() << std::endl;
     MapStringType replacements;
     for (size_t i = 0; i < generic.type_params.size(); i++) {
         std::string tp = generic.type_params[i];
@@ -220,8 +219,6 @@ ConcreteClass* Checker::instantiate_generic(const ConcreteClass& generic, const 
         if (method_cf.second->implicit != nullptr) {
             Implicit* implicit = method_cf.second->implicit;
             if (implicit->type == generic.type_params[0]) {
-                std::cout << "----------- Generic with implicit which is class parameter: " << method_cf.first
-                          << std::endl;
                 // std::unique_ptr<Entity> e = entity_from_type(*instance.type_params[0]);
                 // auto& v = (std::unique_ptr<EntityValue>&) e;
                 // this->fill_value(*v);
@@ -229,28 +226,21 @@ ConcreteClass* Checker::instantiate_generic(const ConcreteClass& generic, const 
                 ConcreteClass* clazz_t = v->clazz;
                 auto meth = clazz_t->methods.find(implicit->method);
                 if (meth == clazz_t->methods.end()) {
-                    std::cout << "Not found in instance's type parameter, so skipping" << std::endl;
                 } else {
-                    std::cout << "Found implicit in instance's type parameter" << std::endl;
                     ast::Type* t = (method_cf.second)->const_function_ft.to_ast();
                     ast::Type& concrete_type = *make_type(*t, replacements).release();
                     this->module.fill_actual(concrete_type);
                     auto cf = std::make_unique<ConstFunction>(method_cf.second->path,
                                                               sem::UTypeFunction((sem::TypeFunction*) concrete_type.to_sem()));
-                    std::cout << "Instantiated generic method " << method_cf.first << " : "
-                              << cf->const_function_ft.to_string() << std::endl;
                     concrete_methods[method_cf.first] = std::move(cf);
                 }
 
             } else {
-                std::cout << "----------- Normal generic function: r" << method_cf.first << std::endl;
                 ast::Type* t = (method_cf.second)->const_function_ft.to_ast();
                 ast::Type& concrete_type = *make_type(*t, replacements).release();
                 this->module.fill_actual(concrete_type);
                 auto cf = std::make_unique<ConstFunction>(method_cf.second->path,
                                                           sem::UTypeFunction((sem::TypeFunction*) concrete_type.to_sem()));
-                std::cout << "Instantiated generic method " << method_cf.first << " : "
-                          << cf->const_function_ft.to_string() << std::endl;
                 concrete_methods[method_cf.first] = std::move(cf);
             }
         } else {
@@ -259,8 +249,6 @@ ConcreteClass* Checker::instantiate_generic(const ConcreteClass& generic, const 
             this->module.fill_actual(*concrete_type);
             auto cf = std::make_unique<ConstFunction>(method_cf.second->path,
                                                       sem::UTypeFunction((sem::TypeFunction*) concrete_type->to_sem()));
-            std::cout << "Instantiated generic method " << method_cf.first << " : " << cf->const_function_ft.to_string()
-                      << std::endl;
             concrete_methods[method_cf.first] = std::move(cf);
         }
     }

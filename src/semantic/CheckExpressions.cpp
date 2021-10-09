@@ -270,12 +270,9 @@ std::unique_ptr<EntityValue> Checker::make_value(sem::Type* type) {
         if (instance == cls->generic_instances.end()) {
             ast::UObjectType o(&type->object().to_ast()->object());
             ConcreteClass* bcls = cls;
-            std::cout << "       <<<<<<<<<<<<<<<< instantiating " << type->object().actual_to_string() << std::endl;
             cls = instantiate_generic(*bcls, *o);
-            std::cout << "Done instantiating" << std::endl;
             bcls->generic_instances[type->actual_to_string()] = std::unique_ptr<ConcreteClass>(cls);
         } else {
-            std::cout << "       <<<<<<<<<<<<<<<< already instantiated " << type->object().actual_to_string() << std::endl;
             cls = instance->second.get();
         }
     }

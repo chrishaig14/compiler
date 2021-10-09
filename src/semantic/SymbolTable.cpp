@@ -27,12 +27,10 @@ Entity& SymbolTable::get(const std::string& name) {
     }
     auto it = this->table.find(name);
     if (it != this->table.end()) {
-        std::cout << "Found in scope" << name << std::endl;
         return *it->second;
     }
     // this->
     if (this->parent != nullptr) {
-        std::cout << "Going to parent scope: " << name << std::endl;
         return this->parent->get(name);
     }
     // throw std::runtime_error("Error path: " + name + " not found!");

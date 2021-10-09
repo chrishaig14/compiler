@@ -66,7 +66,6 @@ Checker::analyze_call(ast::ExpNode& function, std::vector<ast::RExpNode>& argume
     if (has_error) {
         return exp_error_stub();
     }
-    std::cout << "Calling function of type: " << function_type.to_string() << std::endl;
     this->process_function_arguments(arg_entities, arguments_, arguments, function_type, fun_info_p.get());
     retv.exp_snode = std::make_unique<sem::CallExp>(std::move(fun_info_p->exp_snode), std::move(arguments_));
     auto f = make_return_info(is_rvalue, std::move(retv_p), is_def_const, args_are_constant);

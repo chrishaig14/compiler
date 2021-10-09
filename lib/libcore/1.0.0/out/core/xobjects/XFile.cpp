@@ -42,8 +42,6 @@ TaggedObject* core_D_file_D_File_D_open_f(TaggedObject* o, TaggedObject* mode) {
 TaggedObject* core_D_file_D_File_D_write_f(TaggedObject* o, TaggedObject* w) {
     XFile* f = CAST(o, XFile);
     const std::string& s = CAST(w, XString)->s;
-    std::cout << "S: " << s << std::endl;
-    std::cout << "file: " << f->f.is_open() << std::endl;
     f->f << s;
     f->f.flush();
     return nullptr;

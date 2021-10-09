@@ -72,7 +72,6 @@ XList::~XList() {
             }
         }
     }
-    std::cout << "delete list of length " << this->l->size() << std::endl;
 }
 
 TaggedObject* core_D_core_D_List_D_len_f(TaggedObject* a) {

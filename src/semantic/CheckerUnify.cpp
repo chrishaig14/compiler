@@ -116,7 +116,6 @@ std::unique_ptr<ast::FunctionType> Checker::unify_function_call(const ast::Funct
                 // delete old;
             }
             fun.return_type = substitute(*fun.return_type, substitution->first, *substitution->second);
-            std::cout << "Simple substitution: " << fun.to_string() << std::endl;
             arg = args[i];
             auto* old_s = substitution;
             substitution = get_first_substitution(*fun.param_types[i], *arg, true);
@@ -190,7 +189,6 @@ UExpressionInfo Checker::enum_member(ast::Member& node, Enum& enumm) {
 
 std::unique_ptr<Entity> Checker::entity_from_type(const ast::Type& type) {
     if (this->entities.count(type.to_string()) == 1) {
-        std::cout << "Entity already found, not copying!!!" << std::endl;
         return std::unique_ptr<Entity>(this->entities[type.to_string()]->clone());
     }
     if (type.kind == Kind::FUNCTION) {

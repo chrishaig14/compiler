@@ -92,10 +92,6 @@ Checker::object_member(sem::UExp object_snode, EntityValue& p_value, const std::
     }
     ConcreteClass* clazz = p_value.clazz;
     assert(clazz != nullptr);
-    std::cout << "Class "  << clazz->class_name << "'s members" << std::endl;
-    for(auto m: clazz->members){
-        std::cout << m.first << " : " << m.second->to_string() << std::endl;
-    }
     if (clazz->members.count(child) != 0) {
         info.set_entity(clazz->member_entities.at(child)->clone());
         if (info.entity.get().is_nothing()) {
