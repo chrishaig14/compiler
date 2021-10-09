@@ -6,6 +6,7 @@
 #include "../simple_nodes/expressions/include/expressions.h"
 #include "../simple_nodes/common/include/TypeObject.h"
 #include "../simple_nodes/common/include/TypeFunction.h"
+#include "../units/entities/EntityNone.h"
 
 UExpressionInfo Checker::visit_boolean(ast::Boolean& node) {
     UExpressionInfo info_u = std::make_unique<ExpressionInfo>();
@@ -53,7 +54,7 @@ UExpressionInfo Checker::visit_none(ast::None& node) {
     UExpressionInfo info_u = std::make_unique<ExpressionInfo>();
     ExpressionInfo& info = *info_u;
     // info.set_type(ObjectType("NoneType"));
-    info.set_entity(std::make_unique<EntityValue>(new sem::TypeObject("NoneType"), (ConcreteClass*) nullptr));
+    info.set_entity(std::make_unique<EntityNone>());
     info.exp_snode = std::make_unique<sem::None>();
     return info_u;
 }

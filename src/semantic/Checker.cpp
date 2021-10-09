@@ -286,7 +286,7 @@ ConcreteClass* Checker::instantiate_generic(const ConcreteClass& generic, const 
         concrete->members[mn] = concrete_field_types[i];
         concrete->member_entities[mn] = std::make_unique<EntityNothing>();
     }
-    this->classes[generic.class_name] = std::unique_ptr<ConcreteClass>(concrete);
+    // this->classes[generic.class_name] = std::unique_ptr<ConcreteClass>(concrete);
     return concrete;
 }
 

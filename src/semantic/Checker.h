@@ -183,7 +183,7 @@ public:
     sem::UCommon dispatch_statement(ast::Statement& n, bool is_rvalue);
     EntityValue& entity_value_from_actual_base_path_no_generic(const Path& p);
 
-    std::map<std::string, std::unique_ptr<ConcreteClass>> classes;
+    // std::map<std::string, std::unique_ptr<ConcreteClass>> classes;
     std::unique_ptr<EntityValue> make_value(sem::Type* type);
     void init();
     sem::Exp* make_option_rvalue(sem::Exp* value_snode, const ast::Type* unaliased_value_type,

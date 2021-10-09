@@ -46,6 +46,8 @@ class EntityConstFunction;
 
 class EntityEnum;
 
+class EntityNone;
+
 class Entity {
 protected:
     explicit Entity(E_TYPE type) : e_type(type) {
@@ -73,6 +75,10 @@ public:
 
     bool is_class() const {
         return this->e_type == E_TYPE::CLASS;
+    }
+
+    bool is_none() const {
+        return this->e_type == E_TYPE::NONE;
     }
 
     bool is_package() const {
@@ -116,6 +122,10 @@ public:
         throw std::runtime_error("Not an EntityNothing");
     }
 
+    virtual EntityNone& get_none() {
+        throw std::runtime_error("Not an EntityNone");
+    }
+
     virtual EntityModule& get_module() {
         throw std::runtime_error("Not an EntityModule");
     }
@@ -143,6 +153,10 @@ public:
 
     virtual const EntityClass& get_class() const {
         throw std::runtime_error("Not an EntityClass");
+    }
+
+    virtual const EntityNone& get_none() const {
+        throw std::runtime_error("Not an EntityNone");
     }
 
     virtual const EntityPackage& get_package() const {

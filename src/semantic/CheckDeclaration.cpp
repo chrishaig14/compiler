@@ -16,7 +16,8 @@ UExpressionInfo Checker::expect_rvalue_of_type(const sem::Type& target, ast::Exp
         this->error_reporter.error(std::make_unique<ErrorExpectedExpression>(r_entity, node));
         return exp_error_stub();
     }
-    if (r_entity.e_type != E_TYPE::VALUE && r_entity.e_type != E_TYPE::CONST_FUNCTION) {
+    if (r_entity.e_type != E_TYPE::VALUE && r_entity.e_type != E_TYPE::CONST_FUNCTION &&
+        r_entity.e_type != E_TYPE::NONE) {
         this->error_reporter.error(std::make_unique<ErrorTypeMismatch>(target, node, r_entity));
         return exp_error_stub();
     }
@@ -85,6 +86,10 @@ sem::UExp Checker::make_rvalue(const Entity& t_entity, sem::UExp value_snode, co
         return value_snode;
         this->error_reporter.fail("MAKE RVALUE OF FUNCTION!");
         return nullptr;
+    } else if (t_entity.is_none()) {
+        if (target.object().id == "Option") {
+            return value_snode;
+        }
     }
     return nullptr;
 }
