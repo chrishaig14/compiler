@@ -31,6 +31,18 @@ class List:
     def __get_item__(self, i):
         return self.elems[i.value]
 
+class Dict:
+    pass
+
+class Double:
+    pass
+
+class Float:
+    pass
+
+class Option:
+    pass
+
 class Integer:
     def __init__(self, value):
         self.value = value
