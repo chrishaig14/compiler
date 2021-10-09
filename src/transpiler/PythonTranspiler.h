@@ -8,6 +8,7 @@
 #include "../simple_nodes/top/include/top.h"
 #include "../simple_nodes/common/include/common.h"
 #include "../simple_nodes/expressions/include/expressions.h"
+#include "../units/infos/Module.h"
 
 const std::string LPAREN = "(";
 const std::string RPAREN = ")";
@@ -75,8 +76,8 @@ public:
     PythonExpressionOutputCode transpile_throw(sem::Throw& node);
     PythonOutputCode transpile_try_catch(const sem::TryCatch& node);
     PythonOutputCode transpile_while(const sem::While& node);
-    PythonTranspiler();
 
+    PythonTranspiler(Module& module);
     size_t indent_level;
     size_t next_arg_n();
     std::string header;
@@ -85,7 +86,7 @@ public:
     std::string static_cleanups;
     std::string static_initializations;
     std::string transpile_module(const sem::Module& block, Path module_path);
-
+    Module& module;
     void indent();
     PythonOutputCode transpile_enum(const sem::EnumDef& node);
     void transpile_program(const sem::Module& node);

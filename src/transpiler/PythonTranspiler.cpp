@@ -4,6 +4,7 @@
 
 #include "PythonTranspiler.h"
 #include "../simple_nodes/common/include/Throw.h"
+#include "../units/infos/Module.h"
 
 PythonExpressionOutputCode::PythonExpressionOutputCode(const std::string& pre_code, const std::string& code) : pre_code(
         pre_code), code(code) {
@@ -115,7 +116,7 @@ void PythonTranspiler::transpile_program(const sem::Module& node) {
 }
 
 PythonExpressionOutputCode PythonTranspiler::transpile_integer(const sem::Integer& node) {
-    return PythonExpressionOutputCode("", "libcore.libcore.Integer(" + node.str + ")");
+    return PythonExpressionOutputCode("", "Integer(" + node.str + ")");
 }
 
 PythonOutputCode PythonTranspiler::transpile_call(const sem::Call& node) {
@@ -139,11 +140,11 @@ PythonOutputCode PythonTranspiler::transpile_call(const sem::Call& node) {
 }
 
 PythonExpressionOutputCode PythonTranspiler::transpile_string(const sem::String& node) {
-    return PythonExpressionOutputCode("", "libcore.libcore.String" + LPAREN + QUOTE + node.s + QUOTE + RPAREN);
+    return PythonExpressionOutputCode("", "String" + LPAREN + QUOTE + node.s + QUOTE + RPAREN);
 }
 
 PythonExpressionOutputCode PythonTranspiler::transpile_boolean(const sem::Bool& node) {
-    return PythonExpressionOutputCode("", std::string("libcore.libcore.Boolean(") + (node.v ? "True" : "False") + ")");
+    return PythonExpressionOutputCode("", std::string("Boolean(") + (node.v ? "True" : "False") + ")");
 }
 
 PythonExpressionOutputCode PythonTranspiler::transpile_float(const sem::Float& node) {
@@ -239,7 +240,7 @@ PythonExpressionOutputCode PythonTranspiler::transpile_list(const sem::List& nod
     if (not elem_ids.empty()) {
         elem_ids = elem_ids.substr(0, elem_ids.size() - 2);
     }
-    std::string code = "libcore.libcore.List([" + elem_ids + "])";
+    std::string code = "List([" + elem_ids + "])";
     return PythonExpressionOutputCode(pre_code, code);
 }
 
@@ -484,7 +485,7 @@ void PythonTranspiler::unindent() {
     this->indent_level -= 4;
 }
 
-PythonTranspiler::PythonTranspiler() {
+PythonTranspiler::PythonTranspiler(Module& module) : module(module) {
     this->indent_level = 0;
     this->arg_n = 0;
     this->add_self = false;
@@ -501,7 +502,7 @@ PythonTranspiler::transpile_object_method(const sem::ObjectMethod& method, bool 
 }
 
 std::string clean_path(Path a, Path b) {
-    return a.as_str();
+    // return a.as_str();
     std::string ff = a.as_str().substr(0, b.as_str().size() + 1);
     if (ff == b.as_str() + ".") {
         return a.as_vec().back();
@@ -510,11 +511,38 @@ std::string clean_path(Path a, Path b) {
 }
 
 PythonExpressionOutputCode PythonTranspiler::transpile_const_function(const sem::ConstFunction& function) {
-    return PythonExpressionOutputCode("", clean_path(function.path, this->module_path));
+    std::string code;
+    auto it = this->module.imported_paths_no_alias.find(function.path.as_vec().back());
+    if (it != this->module.imported_paths_no_alias.end()) {
+        code = function.path.as_vec().back();
+        return PythonExpressionOutputCode("", code);
+
+    } else {
+        auto v = function.path.as_vec();
+        v.pop_back();
+        it = this->module.imported_paths_no_alias.find(v.back());
+        if (it != this->module.imported_paths_no_alias.end()) {
+            code = v.back() + "." + function.path.as_vec().back();
+            return PythonExpressionOutputCode("", code);
+
+        }
+    }
+    auto p = function.path.as_vec();
+    p.pop_back();
+    if (p == this->module.path.as_vec()) {
+        code = function.path.as_vec().back();
+    }
+    return PythonExpressionOutputCode("", code);
+
 }
 
 PythonExpressionOutputCode PythonTranspiler::transpile_object_constructor(const sem::ObjectConstructor& constructor) {
-    std::string code = clean_path(constructor.class_path, this->module_path);
+    // std::string code = clean_path(constructor.class_path, this->module_path);
+    std::string code;
+    auto it = this->module.imported_paths_no_alias.find(constructor.class_path.as_vec().back());
+    if (it != this->module.imported_paths_no_alias.end()) {
+        code = constructor.class_path.as_vec().back();
+    }
     return PythonExpressionOutputCode("", code);
 }
 
