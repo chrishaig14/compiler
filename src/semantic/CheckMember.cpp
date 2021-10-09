@@ -32,6 +32,8 @@ UExpressionInfo Checker::visit_member(ast::Member& n) {
             break;
         case E_TYPE::NOTHING:
             break;
+        case E_TYPE::NONE:
+            break;
     }
     return exp_error_stub();
 }

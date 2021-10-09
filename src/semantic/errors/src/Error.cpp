@@ -35,6 +35,9 @@ std::string entity_to_string(const Entity& entity) {
             return "enum " + E_HLT(entity.get_enum().enumm.enumm_name);
         case E_TYPE::NOTHING:
             return "NOTHING";
+        case E_TYPE::NONE:
+            return "NONE";
+            break;
     }
     return out;
 }
