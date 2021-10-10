@@ -115,6 +115,7 @@ class Double {
 
 class String {
     fun len()->Integer{}
+    fun list() -> List[String]{}
     fun __get_item__(i: Integer)->String{}
     static fun __eq__(a: String, b:String)->Boolean {}
     static fun __ne__(a: String, b:String)->Boolean {}
@@ -143,6 +144,10 @@ class List[t] {
 }
 
 fun print(s: String){
+}
+
+fun input() -> String {
+
 }
 
 fun range(start: Integer, step: Integer, end: Integer)->List[Integer]{}
