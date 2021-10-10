@@ -271,6 +271,9 @@ PythonOutputCode PythonTranspiler::transpile_if(const sem::If& node) {
     code += cond.pre_code.empty() ? "" : cond.pre_code + "\n";
     code += cond_id + " = " + cond.code + "\n";
     code += "if" + SPACE + cond_id + ":" + NEWLINE + indent_paragraph(thenc, 4);
+    if (node._else != nullptr) {
+        code += NEWLINE + "else:" + NEWLINE + indent_paragraph(this->transpile_block(*node._else), 4);
+    }
     return code;
 }
 
