@@ -41,7 +41,9 @@ void GlobalProcessor::add_default_imports() {
                                        Path("libcore.libcore.List"), Path("libcore.libcore.Double"),
                                        Path("libcore.libcore.Boolean"), Path("libcore.libcore.Float"),
                                        Path("libcore.libcore.Option"), Path("libcore.libcore.print"),
-                                       Path("libcore.libcore.Dict")};
+                                       Path("libcore.libcore.Dict"),
+                                       Path("libcore.libcore.input")
+                                       };
     for (auto path: default_paths) {
         if (this->module.imported_paths_with_alias.count(path.as_vec().back()) != 0) {
             std::cout << this->module.abs_path << std::endl;
