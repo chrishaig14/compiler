@@ -6,6 +6,10 @@ class Boolean:
 
     def __bool__(self):
         return self.value
+    def __and__(self, other):
+        return Boolean(self.value and other.value)
+    def str(self):
+        return String(str(self.value))
 
 
 class String:
@@ -39,6 +43,8 @@ class List:
         self.elems.append(x)
     def __get_item__(self, i):
         return self.elems[i.value]
+    def slice(self, s, e):
+        return List(self.elems[s.value:e.value])
 
 class Dict:
     def __init__(self, d):
@@ -95,6 +101,10 @@ class Integer:
     @staticmethod
     def __add__(a, b):
         return Integer(a.value + b.value)
+
+    @staticmethod
+    def __div__(a, b):
+        return Integer(a.value // b.value)
 
     @staticmethod
     def __sub__(a, b):

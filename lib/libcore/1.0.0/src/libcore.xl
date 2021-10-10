@@ -140,6 +140,7 @@ class List[t] {
     fun push(x: t){}
     fun has(x: t)->Boolean{}
     fun map(f: fun(t)->u) -> List[u] {}
+    fun slice(s:Integer, e: Integer)->List[t]{}
     static fun __add__(a: List[t], b: List[t])->List[t]{}
 }
 
