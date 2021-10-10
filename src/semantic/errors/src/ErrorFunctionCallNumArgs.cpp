@@ -13,7 +13,7 @@ bool ErrorFunctionCallNumArgs::equal(const Error& other) const {
 }
 
 std::string ErrorFunctionCallNumArgs::to_str(const CodeLines& code) const {
-    return std::string();
+    return "Error, calling function with wrong number of arguments";
 }
 
 ErrorFunctionCallNumArgs::ErrorFunctionCallNumArgs(const sem::TypeFunction* type, TextPosition position) {

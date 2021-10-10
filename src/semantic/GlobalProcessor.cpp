@@ -42,7 +42,8 @@ void GlobalProcessor::add_default_imports() {
                                        Path("libcore.libcore.Boolean"), Path("libcore.libcore.Float"),
                                        Path("libcore.libcore.Option"), Path("libcore.libcore.print"),
                                        Path("libcore.libcore.Dict"),
-                                       Path("libcore.libcore.input")
+                                       Path("libcore.libcore.input"),
+                                       Path("libcore.libcore.File")
                                        };
     for (auto path: default_paths) {
         if (this->module.imported_paths_with_alias.count(path.as_vec().back()) != 0) {

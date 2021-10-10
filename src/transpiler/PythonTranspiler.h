@@ -94,6 +94,8 @@ public:
     PythonExpressionOutputCode transpile_call_exp(const sem::CallExp& exp);
     Path module_path;
     PythonOutputCode transpile_for(const sem::For& node);
+    PythonExpressionOutputCode transpile_static_method(const sem::StaticMethod& method, bool b);
+    std::string clean_path(Path path);
 };
 
 

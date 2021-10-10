@@ -181,9 +181,10 @@ sem::UCommon Checker::check_declaration_without_type(ast::Declaration& n) {
         return nullptr;
     }
 
-    sem::UExp u = std::move(exp_info_p->exp_snode);
-    sem::UCommon info_u = std::make_unique<sem::Declaration>(n.identifier, std::move(u));
     this->scope->set(n.identifier, exp_info_p->entity);
+    if (exp_info_p->exp_snode == nullptr) {
+        return nullptr;
+    }
     if (exp_info_p->entity.get().is_constfun()) {
         Entity& entity_const_function = exp_info_p->entity;
         ConstFunction& const_function = entity_const_function.get_constfun().const_function;
@@ -196,5 +197,7 @@ sem::UCommon Checker::check_declaration_without_type(ast::Declaration& n) {
                     " to be able to use it without calling it");
         }
     }
+    sem::UExp u = std::move(exp_info_p->exp_snode);
+    sem::UCommon info_u = std::make_unique<sem::Declaration>(n.identifier, std::move(u));
     return info_u;
 }

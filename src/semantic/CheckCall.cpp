@@ -53,6 +53,7 @@ Checker::analyze_call(ast::ExpNode& function, std::vector<ast::RExpNode>& argume
 
     if (arguments.size() != function_type.param_types.size()) {
         this->error_reporter.error(std::make_unique<ErrorFunctionCallNumArgs>(&function_type, start));
+        std::cout << function_type.to_string() << std::endl;
         if (!function_is_generic(function_type)) {
             return retv_p;
         } else {

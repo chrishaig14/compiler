@@ -116,6 +116,14 @@ class Integer:
     def __hash__(self):
         return self.value
 
+class File:
+    def __init__(self, path, mode):
+        self.file = open(path.value, mode.value)
+    @staticmethod
+    def open(path, mode):
+        return File(path, mode)
+    def write(self, str):
+        self.file.write(str.value)
 
 _print = print
 print = lambda s: _print(s.value)

@@ -97,6 +97,13 @@ std::unique_ptr<sem::KlassDef> Checker::visit_class(ast::Klass& node) {
     }
     this->this_entity.reset();
     this->add_this = false;
+
+    for (auto& m: node.static_methods) {
+        auto ms = this->visit_function(*m.second);
+        std::unique_ptr<sem::FunctionDef> sf((sem::FunctionDef*) ms.release());
+        sn->static_methods.emplace_back(std::move(sf));
+    }
+
     //
     // Class* clazz = ((EntityClass&) this->scope->get(node.class_name)).clazz;
     // auto csn = std::make_unique<sem::KlassDef>(clazz->path.as_str(), node.members_ordered);

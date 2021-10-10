@@ -93,6 +93,8 @@ namespace sem {
 
     class Module;
 
+    class StaticMethod;
+
     enum class CommonType {
         DECLARATION, BLOCK, ASSIGNMENT, RETURN, CALL, WHILE, IF, BREAK, CONTINUE, MATCH, THROW, TRY_CATCH, FOR
     };
@@ -113,7 +115,7 @@ namespace sem {
         DICT,
         OBJECT_METHOD,
         CONST_FUNCTION,
-        OBJECT_CONSTRUCTOR
+        OBJECT_CONSTRUCTOR, STATIC_METHOD
     };
 
     enum class TopType {

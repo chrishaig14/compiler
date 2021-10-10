@@ -19,6 +19,7 @@
 #include "ObjectConstructor.h"
 #include "ObjectMember.h"
 #include "ObjectMethod.h"
+#include "StaticMethod.h"
 #include "String.h"
 #include "Ternary.h"
 

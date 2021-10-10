@@ -7,6 +7,7 @@
 #include "../ast/general/ObjectType.h"
 #include "../simple_nodes/expressions/include/ObjectMember.h"
 #include "../simple_nodes/expressions/include/ObjectMethod.h"
+#include "../simple_nodes/expressions/include/StaticMethod.h"
 #include "../simple_nodes/common/include/TypeObject.h"
 #include "../simple_nodes/common/include/TypeFunction.h"
 
@@ -184,7 +185,7 @@ UExpressionInfo Checker::class_member(ast::Member& n, UExpressionInfo parent_inf
         info.exp_snode = std::make_unique<sem::Id>(unbound_method->path.as_str());
     } else if (cls.static_methods.find(child) != cls.static_methods.end()) {
         info.set_entity(std::make_unique<EntityConstFunction>(*cls.static_methods[child]));
-        info.exp_snode = std::make_unique<sem::Id>(cls.static_methods[child]->path.as_str());
+        info.exp_snode = std::make_unique<sem::StaticMethod>(cls.path, child);
     } else if (cls.static_members.find(child) != cls.static_members.end()) {
         info.set_entity(entity_from_type(*cls.static_members[child].first));
     } else {

@@ -204,6 +204,12 @@ PythonOutputCode PythonTranspiler::transpile_class(const sem::KlassDef& node) {
         // std::cout << fcode.code << std::endl;
     }
 
+    for (auto& m: node.static_methods) {
+        PythonOutputCode fcode = this->transpile_function(*m);
+        code += indent_paragraph(fcode, 4) + "\n";
+        // std::cout << fcode.code << std::endl;
+    }
+
     return code;
 }
 
@@ -461,6 +467,9 @@ PythonExpressionOutputCode PythonTranspiler::dispatch_expression(const sem::Exp&
             return this->transpile_const_function(static_cast<const sem::ConstFunction&>(node));
         case sem::ExpType::OBJECT_CONSTRUCTOR:
             return this->transpile_object_constructor(static_cast<const sem::ObjectConstructor&>(node));
+        case sem::ExpType::STATIC_METHOD:
+            return this->transpile_static_method(static_cast<const sem::StaticMethod&>(node), false);
+            break;
     }
     __builtin_unreachable();
 }
@@ -497,43 +506,38 @@ PythonTranspiler::transpile_object_method(const sem::ObjectMethod& method, bool 
     return PythonExpressionOutputCode(pre_code, code);
 }
 
-std::string clean_path(Path a, Path b) {
-    // return a.as_str();
-    std::string ff = a.as_str().substr(0, b.as_str().size() + 1);
-    if (ff == b.as_str() + ".") {
-        return a.as_vec().back();
-    }
-    return a.as_str();
+PythonExpressionOutputCode PythonTranspiler::transpile_static_method(const sem::StaticMethod& method, bool b) {
+    return PythonExpressionOutputCode("", this->clean_path(method.class_path) + "." + method.method_name);
 }
 
-PythonExpressionOutputCode PythonTranspiler::transpile_const_function(const sem::ConstFunction& function) {
+std::string PythonTranspiler::clean_path(Path path) {
     std::string code;
-    auto it = this->module.imported_paths_no_alias.find(function.path.as_vec().back());
+    auto it = this->module.imported_paths_no_alias.find(path.as_vec().back());
     if (it != this->module.imported_paths_no_alias.end()) {
-        code = function.path.as_vec().back();
-        return PythonExpressionOutputCode("", code);
-
+        code = path.as_vec().back();
+        return code;
     } else {
-        auto v = function.path.as_vec();
+        auto v = path.as_vec();
         v.pop_back();
         it = this->module.imported_paths_no_alias.find(v.back());
         if (it != this->module.imported_paths_no_alias.end()) {
-            code = v.back() + "." + function.path.as_vec().back();
-            return PythonExpressionOutputCode("", code);
-
+            code = v.back() + "." + path.as_vec().back();
+            return code;
         }
     }
-    auto p = function.path.as_vec();
+    auto p = path.as_vec();
     p.pop_back();
     if (p == this->module.path.as_vec()) {
-        code = function.path.as_vec().back();
+        code = path.as_vec().back();
     }
-    return PythonExpressionOutputCode("", code);
+    return code;
+}
 
+PythonExpressionOutputCode PythonTranspiler::transpile_const_function(const sem::ConstFunction& function) {
+    return PythonExpressionOutputCode("", this->clean_path(function.path));
 }
 
 PythonExpressionOutputCode PythonTranspiler::transpile_object_constructor(const sem::ObjectConstructor& constructor) {
-    // std::string code = clean_path(constructor.class_path, this->module_path);
     std::string code;
     auto it = this->module.imported_paths_no_alias.find(constructor.class_path.as_vec().back());
     if (it != this->module.imported_paths_no_alias.end()) {
@@ -571,6 +575,7 @@ PythonOutputCode PythonTranspiler::transpile_for(const sem::For& node) {
     code += indent_paragraph(body_code, 4);
     return code;
 }
+
 
 std::string indent_paragraph(std::string s, size_t level) {
 

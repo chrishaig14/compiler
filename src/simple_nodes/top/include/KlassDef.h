@@ -15,6 +15,7 @@ public:
     std::string identifier;
     VectorOfStrings members;
     std::vector<std::unique_ptr<sem::FunctionDef>> methods;
+    std::vector<std::unique_ptr<sem::FunctionDef>> static_methods;
 
     KlassDef(std::string identifier, VectorOfStrings members);
 
