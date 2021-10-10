@@ -137,7 +137,7 @@ public:
 
     UExpressionInfo visit_call_exp(ast::CallExp& n);
 
-    UExpressionInfo visit_lvalue_subscript(ast::Subscript& node);
+    sem::UCommon visit_lvalue_subscript(ast::Subscript& node);
     UExpressionInfo visit_dict(ast::DictNode& node);
     UExpressionInfo visit_unary(ast::UnaryOp& n);
     UExpressionInfo visit_emptydict(ast::EmptyDict& node);

@@ -12,17 +12,17 @@
 #include "../simple_nodes/common/include/TypeFunction.h"
 
 
-UExpressionInfo Checker::visit_lvalue_subscript(ast::Subscript& node) {
+sem::UCommon Checker::visit_lvalue_subscript(ast::Subscript& node) {
     UExpressionInfo parent_p = this->dispatch_rvalue(*node.parent);
     Entity& entity_parent = parent_p->entity.get();
     if (entity_parent.e_type != E_TYPE::VALUE || entity_parent.get_value().type.kind == sem::Kind::FUNCTION) {
         this->error_reporter.fail("Error subscript of something that is not an object!");
-        return exp_error_stub();
+        return nullptr;
     }
     auto& entity_parent_value = entity_parent.get_value();
     if (entity_parent_value.metatype == Meta::ENUM) {
         this->error_reporter.fail("Error: no subscript in enum");
-        return exp_error_stub();
+        return nullptr;
     }
     ConcreteClass* cls = entity_parent_value.clazz;
     assert(cls != nullptr);
@@ -35,7 +35,7 @@ UExpressionInfo Checker::visit_lvalue_subscript(ast::Subscript& node) {
         this->error_reporter.error(std::make_unique<ErrorObjectNoSpecialMethod>(entity_parent_value.type,
                                                                                 "__set_item__",
                                                                                 node));
-        return exp_error_stub();
+        return nullptr;
     }
     ConstFunction& subscript_fun = *subscript_it->second;
     std::string sub_fun_path = subscript_fun.path.as_str();
@@ -48,7 +48,7 @@ UExpressionInfo Checker::visit_lvalue_subscript(ast::Subscript& node) {
     UExpressionInfo child_sinfo = this->expect_rvalue_of_type(*subscript_fun.const_function_ft.param_types[0],
                                                               *node.child[0]);
     if (child_sinfo->is_error()) {
-        return exp_error_stub();
+        return nullptr;
     }
     auto& child_snode = child_sinfo->exp_snode;
 
@@ -58,13 +58,11 @@ UExpressionInfo Checker::visit_lvalue_subscript(ast::Subscript& node) {
     // this->fill_value(*value);
     info.set_entity(this->make_value(rtype.clone()));
 
-    auto fsn = std::make_unique<sem::Id>(sub_fun_path);
+    auto fsn = std::make_unique<sem::ObjectMethod>(std::move(parent_p->exp_snode), cls->path, "__set_item__");
     std::vector<sem::UExp> v;
-    v.push_back(std::move(parent_p->exp_snode));
     v.push_back(std::move(child_snode));
-    auto csn = std::make_unique<sem::CallExp>(std::move(fsn), std::move(v));
-    info.exp_snode = std::move(csn);
-    return info_u;
+    auto csn = std::make_unique<sem::Call>(std::move(fsn), std::move(v));
+    return csn;
 }
 
 sem::UCommon Checker::visit_assignment(ast::Assignment& n) {
@@ -79,10 +77,10 @@ sem::UCommon Checker::visit_assignment(ast::Assignment& n) {
     UExpressionInfo linfo_p;
     bool is_subscript = false;
     std::unique_ptr<sem::Call> csn = nullptr;
+    std::unique_ptr<sem::Call> lsub;
     if (n.lvalue.ntype == ExpNodeType::SUB) {
         // special case
-        linfo_p = this->visit_lvalue_subscript((ast::Subscript&) n.lvalue);
-        csn = std::move((std::unique_ptr<sem::Call>&) linfo_p->exp_snode);
+        lsub = std::unique_ptr<sem::Call>(static_cast<sem::Call*>(this->visit_lvalue_subscript((ast::Subscript&) n.lvalue).release()));
         is_subscript = true;
     } else {
         linfo_p = this->dispatch_rvalue(n.lvalue);
@@ -90,11 +88,19 @@ sem::UCommon Checker::visit_assignment(ast::Assignment& n) {
 
     UExpressionInfo expression_info_p = this->dispatch_rvalue(n.rvalue);
 
-    if (linfo_p->is_error()) {
+    if (expression_info_p->is_error()) {
         // return error_stub();
         return nullptr;
     }
-    if (expression_info_p->is_error()) {
+
+    if (is_subscript) {
+        // info.snode = std::move(linfo_p->snode);
+        // csn->arguments.push_back(std::move(expression_info_p->exp_snode));
+        lsub->arguments.push_back(std::move(expression_info_p->exp_snode));
+        return lsub;
+    }
+
+    if (linfo_p->is_error()) {
         // return error_stub();
         return nullptr;
     }
@@ -161,14 +167,11 @@ sem::UCommon Checker::visit_assignment(ast::Assignment& n) {
     }
 
     sem::UCommon info_u;
-    if (is_subscript) {
-        // info.snode = std::move(linfo_p->snode);
-        // csn->arguments.push_back(std::move(expression_info_p->exp_snode));
-    } else {
-        auto lu = std::move(linfo_p->exp_snode);
-        auto eu = std::move(expression_info_p->exp_snode);
-        info_u = std::make_unique<sem::Assignment>(std::move(lu), std::move(eu));
-    }
+
+    auto lu = std::move(linfo_p->exp_snode);
+    auto eu = std::move(expression_info_p->exp_snode);
+    info_u = std::make_unique<sem::Assignment>(std::move(lu), std::move(eu));
+
 
     return info_u;
 }

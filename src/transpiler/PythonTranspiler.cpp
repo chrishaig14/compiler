@@ -245,28 +245,21 @@ PythonExpressionOutputCode PythonTranspiler::transpile_list(const sem::List& nod
 }
 
 PythonExpressionOutputCode PythonTranspiler::transpile_dict(const sem::Dict& node) {
-    std::string out;
-    out = "NEW(XDict,{";
-    if (node.items.size() == 1) {
-        auto& e = node.items[0];
-        PythonExpressionOutputCode key = this->dispatch_expression(*e.first, false);
-        PythonExpressionOutputCode value = this->dispatch_expression(*e.second, false);
-        out += key.pre_code;
-        out += value.pre_code;
-        out += "std::make_pair(" + key.code + ", " + value.code + ")" + SPACE;
-    }
-    if (node.items.size() > 1) {
-        for (auto& e: node.items) {
-            PythonExpressionOutputCode key = this->dispatch_expression(*e.first, false);
-            PythonExpressionOutputCode value = this->dispatch_expression(*e.second, false);
-            out += key.pre_code;
-            out += value.pre_code;
-            out += "{" + key.code + ", " + value.code + "}" + COMMA + SPACE;
-        }
-        out = out.substr(0, out.size() - 2);
+    std::string pre;
+    std::string out = "Dict({";
+    for (auto& i: node.items) {
+        auto key = this->dispatch_expression(*i.first, false);
+        auto value = this->dispatch_expression(*i.second, false);
+        pre += key.pre_code + "\n";
+        std::string key_id = "key_" + std::to_string(this->next_arg_n());
+        std::string value_id = "value_" + std::to_string(this->next_arg_n());
+        pre += key_id + " = " + key.code + "\n";
+        pre += value.pre_code + "\n";
+        pre += value_id + " = " + value.code + "\n";
+        out += key_id + ":" + value_id + ", ";
     }
     out += "})";
-    return PythonExpressionOutputCode("", out);
+    return PythonExpressionOutputCode(pre, out);
 }
 
 

@@ -32,7 +32,12 @@ class List:
         return self.elems[i.value]
 
 class Dict:
-    pass
+    def __init__(self, d):
+        self.d = d
+    def __get_item__(self, i):
+        return self.d[i]
+    def __set_item__(self, k, v):
+        self.d[k] = v
 
 class Double:
     pass
@@ -56,8 +61,11 @@ class Integer:
         return Boolean(a.value < b.value)
 
     @staticmethod
-    def __eq__(a, b):
+    def eq(a, b):
         return Boolean(a.value == b.value)
+
+    def __eq__(self, o):
+        return Integer.eq(self, o)
 
     @staticmethod
     def __ne__(a, b):
@@ -81,6 +89,9 @@ class Integer:
 
     def str(o):
         return String(str(o.value))
+
+    def __hash__(self):
+        return self.value
 
 
 _print = print

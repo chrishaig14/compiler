@@ -332,9 +332,8 @@ UExpressionInfo Checker::visit_subscript(ast::Subscript& node) {
     // this->fill_value(*v);
     info.set_entity(this->make_value(rtype.clone()));
 
-    auto fsn = std::make_unique<sem::Id>(sub_fun_path);
+    auto fsn = std::make_unique<sem::ObjectMethod>(std::move(parent_p->exp_snode), cls->path, "__get_item__");
     std::vector<sem::UExp> vv;
-    vv.push_back(std::move(parent_p->exp_snode));
     vv.push_back(std::move(child_snode));
     auto csn = std::make_unique<sem::CallExp>(std::move(fsn), std::move(vv));
     info.exp_snode = std::move(csn);
