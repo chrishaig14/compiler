@@ -15,9 +15,18 @@ class String:
     def len(self):
         return Integer(len(self.value))
 
+    def list(self):
+        return List([String(c) for c in self.value])
+
     @staticmethod
     def __add__(a, b):
         return String(a.value + b.value)
+
+    def __hash__(self):
+        return self.value.__hash__()
+
+    def __eq__(self, o):
+        return self.value == o.value
 
 
 class List:
@@ -38,6 +47,10 @@ class Dict:
         return self.d[i]
     def __set_item__(self, k, v):
         self.d[k] = v
+    def has(self, k):
+        return Boolean(k in self.d)
+    def keys(self):
+        return List(list(self.d.keys()))
 
 class Double:
     pass
@@ -96,3 +109,5 @@ class Integer:
 
 _print = print
 print = lambda s: _print(s.value)
+_input = input
+input = lambda :String(_input())
