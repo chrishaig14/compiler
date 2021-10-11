@@ -278,7 +278,7 @@ TEST_CASE("semantic_output_member", "[checker]") {
 
     CHECKER()
     checker.init();
-    checker.check_module(*module.ast);
+    checker.check_module();
 
     CHECK(checker.error_reporter.ok());
     CHECK(checker.error_reporter.errors.empty());
@@ -338,7 +338,7 @@ TEST_CASE("semantic_output_call_no_args", "[checker]") {
 
     CHECKER()
     checker.init();
-    checker.check_module(*module.ast);
+    checker.check_module();
 
     REQUIRE_CHECKER_OK()
 }
@@ -348,7 +348,7 @@ TEST_CASE("semantic_output_call_args", "[checker]") {
 
     CHECKER()
     checker.init();
-    checker.check_module(*module.ast);
+    checker.check_module();
 
     REQUIRE_CHECKER_OK()
 }
@@ -358,7 +358,7 @@ TEST_CASE("semantic_output_union_ok_1", "[checker]") {
 
     CHECKER()
     checker.init();
-    checker.check_module(*module.ast);
+    checker.check_module();
 
     REQUIRE_CHECKER_OK()
 }
@@ -368,7 +368,7 @@ TEST_CASE("semantic_output_union_ok_2", "[checker]") {
 
     CHECKER()
     checker.init();
-    checker.check_module(*module.ast);
+    checker.check_module();
 
     REQUIRE_CHECKER_OK()
 }
@@ -393,7 +393,7 @@ TEST_CASE("semantic_output_enum_def", "[checker]") {
 
     CHECKER()
     checker.init();
-    auto sem_module = checker.check_module(*module.ast);
+    auto sem_module = checker.check_module();
 
     REQUIRE_CHECKER_OK()
 
@@ -405,7 +405,7 @@ TEST_CASE("semantic_output_class_ok", "[checker]") {
 
     CHECKER()
     checker.init();
-    auto sem_module = checker.check_module(*module.ast);
+    auto sem_module = checker.check_module();
 
     REQUIRE_CHECKER_OK();
     REQUIRE(sem_module->nodes.size() == 2);
