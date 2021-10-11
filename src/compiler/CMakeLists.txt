@@ -20,7 +20,7 @@ add_library(
 add_executable(compiler full.cpp)
 target_link_libraries(
         compiler
-        transpiler
+        python
         lcomp
         parser
         semantic

@@ -99,3 +99,12 @@ VariableLocation::VariableLocation() {
     this->depth = -1;
     this->index = -1;
 }
+
+std::string join(VectorOfStrings v, std::string s) {
+    std::string result;
+    for (auto& x: v) {
+        result += x + s;
+    }
+    result = result.substr(0, result.size() - s.size());
+    return result;
+}

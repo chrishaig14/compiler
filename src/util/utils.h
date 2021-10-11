@@ -57,4 +57,6 @@ std::string u_basename(const std::string& path);
 
 std::string u_dirname(const std::string& path);
 
+std::string join(VectorOfStrings v, std::string s);
+
 #endif //UTILS_H

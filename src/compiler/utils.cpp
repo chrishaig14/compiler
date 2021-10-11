@@ -90,3 +90,4 @@ void init(int argc, char** argv, bool& is_lib, std::string& project_dir, std::st
         exit(0);
     }
 }
+

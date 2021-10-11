@@ -4,5 +4,4 @@ project(xlang)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -g -O0 -Wall -pedantic -Werror")
 
-#STranspiler.cpp STranspiler.h
-add_subdirectory(python)
+add_library(python PythonModuleTranspiler.cpp PythonModuleTranspiler.h PythonProgramTranspiler.cpp PythonProgramTranspiler.h)

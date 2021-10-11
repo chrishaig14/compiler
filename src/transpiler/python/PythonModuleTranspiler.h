@@ -5,10 +5,10 @@
 #ifndef XLANG_PYTHONMODULETRANSPILER_H
 #define XLANG_PYTHONMODULETRANSPILER_H
 
-#include "../simple_nodes/top/include/top.h"
-#include "../simple_nodes/common/include/common.h"
-#include "../simple_nodes/expressions/include/expressions.h"
-#include "../units/infos/Module.h"
+#include "../../simple_nodes/top/include/top.h"
+#include "../../simple_nodes/common/include/common.h"
+#include "../../simple_nodes/expressions/include/expressions.h"
+#include "../../units/infos/Module.h"
 
 const std::string LPAREN = "(";
 const std::string RPAREN = ")";
