@@ -7,6 +7,7 @@
 #include "../logging/logging.h"
 #include "utils.h"
 #include "PackagePrechecker.h"
+#include "Loader.h"
 
 Compiler::Compiler(const std::string& project_dir, const std::string& project_output_dir,
                    const std::string& output_name, const std::string& lib_path, bool is_lib, const std::string& version)
@@ -20,8 +21,8 @@ bool Compiler::pre() {
     std::string req_file_path = path_join(this->project_dir, REQUIREMENTS_FILE);
 
     VectorOfStrings requirements = this->load_requirements(req_file_path);
-
-    load_package(root_package, 1);
+    Loader l;
+    l.load_package(root_package, 1);
 
     if (not parse_package(root_package)) {
         throw std::runtime_error("Parse Error");
@@ -53,66 +54,6 @@ VectorOfStrings Compiler::load_requirements(const std::string& filepath) {
     return reqs;
 }
 
-void load_module(Package& package, const std::string& module_name) {
-    std::string module_abs_path = path_join(package.abs_path, module_name + ".xl");
-    std::string module_rel_path = path_join(package.rel_path, module_name);
-    auto module = std::make_unique<Module>(Path(package.path, module_name), module_abs_path, package.is_lib);
-    package.units[module_name] = std::make_unique<ModuleUnit>(module.get());
-    package.modules.push_back(std::move(module));
-}
-
-void load_package(Package& package, int level) {
-    std::string abs_path = package.abs_path;
-    DIR* dir = opendir(abs_path.c_str());
-    if (dir == nullptr) {
-        std::cerr << "No such dir for package '" << package.name << "': " << "'" << abs_path << "'" << std::endl;
-        return;
-    }
-
-    std::vector<std::string> modules;
-    std::vector<std::string> subpackages;
-
-    std::cout << std::string(level, '-') << " Loading package " << E_INFO(package.name) << " at path "
-              << E_INFO(package.abs_path) << std::endl;
-
-    dirent* ent = readdir(dir);
-    while (ent != nullptr) {
-        std::string d_name = ent->d_name;
-        if (d_name != "." && d_name != "..") {
-            unsigned char d_type = ent->d_type;
-            if (d_type == DT_REG) {
-                std::string ext = d_name.substr(d_name.size() - 3, 3);
-                if (ext == ".xl") {
-                    std::string module_name = d_name.substr(0, d_name.size() - 3);
-                    std::cout << std::string(level + 1, '-') << " Found module " << E_INFO(module_name) << std::endl;
-                    load_module(package, module_name);
-                    modules.emplace_back(module_name);
-                }
-            } else if (d_type == DT_DIR) {
-                subpackages.emplace_back(d_name);
-            }
-        }
-        ent = readdir(dir);
-    }
-    closedir(dir);
-
-    if (modules.empty() && subpackages.empty()) {
-        std::cerr << "Package " << package.name << " is empty" << std::endl;
-        exit(1);
-    }
-
-    for (const auto& subpackage_name:subpackages) {
-        std::cout << std::string(level + 1, '-') << " Found subpackage " << subpackage_name << std::endl;
-
-        std::string subpackage_abs_path = path_join(package.abs_path, subpackage_name);
-        std::string subpackage_rel_path = path_join(package.rel_path, subpackage_name);
-
-        auto* subpackage = new Package(Path(package.path, subpackage_name), subpackage_abs_path, package.is_lib);
-        load_package(*subpackage, level + 1);
-        package.subpackages.push_back(std::unique_ptr<Package>(subpackage));
-        package.units[subpackage_name] = std::make_unique<SubpackageUnit>(subpackage);
-    }
-}
 
 void Compiler::load_library(const std::string& name, const std::string& lib_version) {
     std::string lib_rel_out_path = path_join(path_join(path_join(name, lib_version), "out"), name);
@@ -133,7 +74,8 @@ void Compiler::load_library(const std::string& name, const std::string& lib_vers
     load_requirements(library_requirements_file);
 
     auto library_top_package = std::make_unique<Package>(Path(name), abs_top_unit_path, true);
-    load_package(*library_top_package, 1);
+    Loader l;
+    l.load_package(*library_top_package, 1);
     parse_package(*library_top_package);
     PackagePrechecker pp;
     pp.preprocess_package(*library_top_package);
@@ -162,7 +104,8 @@ void Compiler::load_top_unit(const std::string& name, const std::string& m_versi
     }
 
     auto* top_unit_package = new Package(Path(name), abs_top_unit_path, m_is_lib);
-    load_package(*top_unit_package, 1);
+    Loader l;
+    l.load_package(*top_unit_package, 1);
     parse_package(*top_unit_package);
     PackagePrechecker pp;
     pp.preprocess_package(*top_unit_package);
@@ -175,7 +118,8 @@ void Compiler::load_project() {
     std::string req_file_path = path_join(this->project_dir, REQUIREMENTS_FILE);
     VectorOfStrings requirements = this->load_requirements(req_file_path);
 
-    load_package(root_package, 1);
+    Loader l;
+    l.load_package(root_package, 1);
     parse_package(root_package);
     PackagePrechecker pp;
     bool global_ok = pp.preprocess_package(root_package);
