@@ -8,7 +8,7 @@
 Package::Package(Path path, std::string abs_path, bool is_lib)
         : name(path.as_vec().back()), abs_path(abs_path), is_lib(is_lib), path(path) {
     // this->path = path;
-    // this->name = path.as_vec().back();
+    // this->name = path..basname();
     // this->abs_path = abs_path;
     // this->rel_path = rel_path;
     // this->is_lib = is_lib;

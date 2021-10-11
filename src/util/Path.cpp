@@ -42,3 +42,7 @@ std::string Path::as_str() const {
 VectorOfStrings Path::as_vec() const {
     return this->path_parts;
 }
+
+std::string Path::basname() const {
+    return path_parts.back();
+}

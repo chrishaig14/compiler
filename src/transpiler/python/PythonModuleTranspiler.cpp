@@ -518,24 +518,22 @@ PythonExpressionOutputCode PythonModuleTranspiler::transpile_static_method(const
 }
 
 std::string PythonModuleTranspiler::clean_path(Path path) {
-    std::string code;
-    auto it = this->module.imported_paths_no_alias.find(path.as_vec().back());
+    auto it = this->module.imported_paths_no_alias.find(path.basname());
     if (it != this->module.imported_paths_no_alias.end()) {
-        code = path.as_vec().back();
+        return path.basname();
+    }
+    std::string code;
+    auto v = path.as_vec();
+    v.pop_back();
+    it = this->module.imported_paths_no_alias.find(v.back());
+    if (it != this->module.imported_paths_no_alias.end()) {
+        code = v.back() + "." + path.basname();
         return code;
-    } else {
-        auto v = path.as_vec();
-        v.pop_back();
-        it = this->module.imported_paths_no_alias.find(v.back());
-        if (it != this->module.imported_paths_no_alias.end()) {
-            code = v.back() + "." + path.as_vec().back();
-            return code;
-        }
     }
     auto p = path.as_vec();
     p.pop_back();
     if (p == this->module.path.as_vec()) {
-        code = path.as_vec().back();
+        code = path.basname();
     }
     return code;
 }
@@ -544,11 +542,12 @@ PythonExpressionOutputCode PythonModuleTranspiler::transpile_const_function(cons
     return PythonExpressionOutputCode("", this->clean_path(function.path));
 }
 
-PythonExpressionOutputCode PythonModuleTranspiler::transpile_object_constructor(const sem::ObjectConstructor& constructor) {
+PythonExpressionOutputCode
+PythonModuleTranspiler::transpile_object_constructor(const sem::ObjectConstructor& constructor) {
     std::string code;
-    auto it = this->module.imported_paths_no_alias.find(constructor.class_path.as_vec().back());
+    auto it = this->module.imported_paths_no_alias.find(constructor.class_path.basname());
     if (it != this->module.imported_paths_no_alias.end()) {
-        code = constructor.class_path.as_vec().back();
+        code = constructor.class_path.basname();
     }
     return PythonExpressionOutputCode("", code);
 }

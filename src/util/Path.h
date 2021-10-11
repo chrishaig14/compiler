@@ -27,6 +27,8 @@ public:
     std::string as_str() const;
 
     VectorOfStrings as_vec() const;
+
+    std::string basname() const;
 };
 
 

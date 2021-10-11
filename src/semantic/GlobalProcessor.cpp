@@ -45,17 +45,17 @@ void GlobalProcessor::add_default_imports() {
                                        Path("libcore.libcore.input"),
                                        Path("libcore.libcore.File")
                                        };
-    for (auto path: default_paths) {
-        if (this->module.imported_paths_with_alias.count(path.as_vec().back()) != 0) {
+    for (auto& path: default_paths) {
+        if (this->module.imported_paths_with_alias.count(path.basname()) != 0) {
             std::cout << this->module.abs_path << std::endl;
             throw std::runtime_error("Path " + path.as_str() + " already imported!");
         }
-        if (this->module.imported_paths_no_alias.count(path.as_vec().back()) != 0) {
+        if (this->module.imported_paths_no_alias.count(path.basname()) != 0) {
             std::cout << this->module.abs_path << std::endl;
             throw std::runtime_error("Path " + path.as_str() + " already imported!");
         }
-        this->module.imported_paths_no_alias[path.as_vec().back()] = path;
-        this->module.imported_paths_no_alias_v.emplace_back(path.as_vec().back(), path);
+        this->module.imported_paths_no_alias[path.basname()] = path;
+        this->module.imported_paths_no_alias_v.emplace_back(path.basname(), path);
     }
 }
 

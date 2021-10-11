@@ -133,7 +133,7 @@ std::unique_ptr<ModuleMember> find(Path path, Package& top_package) {
 
 void add_local_path_to_module(Module& module, Path path, Package& top_package) {
     auto current_member = find(path, top_package);
-    module.members[path.as_vec().back()] = std::move(current_member);
+    module.members[path.basname()] = std::move(current_member);
 }
 
 bool preprocess_module(Module& module) {
