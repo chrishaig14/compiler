@@ -25,15 +25,6 @@ bool Compiler::pre() {
     if (not parse_package(root_package)) {
         throw std::runtime_error("Parse Error");
     }
-    // for (auto& p: root_package.units) {
-    //     Unit* uvalue = p.second;
-    //     if (uvalue->is_module()) {
-    //         // std::cout << p.second->module() << std::endl;
-    //         Module& m = uvalue->module();
-    //         std::cout << "Hello" << m.ast.get() << std::endl;
-    //         assert(m.ast.get() != nullptr);
-    //     }
-    // }
     return preprocess_package(root_package);
 }
 
@@ -63,11 +54,7 @@ VectorOfStrings Compiler::load_requirements(const std::string& filepath) {
 void load_module(Package& package, const std::string& module_name) {
     std::string module_abs_path = path_join(package.abs_path, module_name + ".xl");
     std::string module_rel_path = path_join(package.rel_path, module_name);
-    // if (!package.is_lib) {
-    //     all_modules.push_back(module_rel_path);
-    // }
     auto module = std::make_unique<Module>(Path(package.path, module_name), module_abs_path, package.is_lib);
-    // this->my_modules.push_back(std::unique_ptr<Module>(module));
     package.units[module_name] = std::make_unique<ModuleUnit>(module.get());
     package.modules.push_back(std::move(module));
 }
@@ -130,7 +117,6 @@ void Compiler::load_library(const std::string& name, const std::string& lib_vers
     std::string lib_rel_top_unit_path = path_join(path_join(name, lib_version), "src");
     std::string abs_top_unit_path = path_join(lib_path, lib_rel_top_unit_path);
     if (loaded_top_units.count(lib_rel_top_unit_path) != 0) {
-        // skip, already loaded
         return;
     }
     DIR* dir = opendir(abs_top_unit_path.c_str());
@@ -158,7 +144,6 @@ void Compiler::load_top_unit(const std::string& name, const std::string& m_versi
     std::string lib_rel_top_unit_path = path_join(name, m_version);
     std::string abs_top_unit_path = path_join(lib_path, lib_rel_top_unit_path);
     if (loaded_top_units.count(lib_rel_top_unit_path) != 0) {
-        // skip, already loaded
         return;
     }
     DIR* dir = opendir(abs_top_unit_path.c_str());
@@ -183,9 +168,6 @@ void Compiler::load_top_unit(const std::string& name, const std::string& m_versi
 }
 
 void Compiler::load_project() {
-    //     // load package/module structure (including external packages, i.e. requirements)
-    //     ProjectLoader project_loader;
-    //     Package* top_package = project_loader.load(this->project_dir, this->project_name);
     std::string req_file_path = path_join(this->project_dir, REQUIREMENTS_FILE);
     VectorOfStrings requirements = this->load_requirements(req_file_path);
 
@@ -201,19 +183,4 @@ void Compiler::load_project() {
         this->ok = false;
         return;
     }
-    //     // parse everything (loads ast for each module)
-    //     GlobalParser global_parser;
-    //     global_parser.parse();
-    //     // load parsed functions/classes/enums with GlobalProcessor for each module
-    //     GlobalGlobalProcessor global_global_processor;
-    //     global_global_processor.load();
-    //     // load imports for each module. check if imported package/module/etc. exists or not, aliases, etc.
-    //     ImportResolver import_resolver;
-    //     import_resolver.resolve();
-    //     // semantic analyze for each module. outputs semantic tree
-    //     GlobalChecker global_checker;
-    //     global_checker.check_all();
-    //     // transpile
-    //     Transpiler transpiler;
-    //     transpiler.transpile_all();
 }
