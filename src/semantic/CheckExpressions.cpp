@@ -48,21 +48,6 @@ UExpressionInfo ModuleChecker::visit_id(ast::Id& n) {
 }
 
 sem::UCommon ModuleChecker::visit_cast(ast::Cast& n) {
-    // sem::UCommon exp_info = this->dispatch_rvalue(*n.exp);
-    // ObjectType cast_type(n.as_type, {});
-    // const ast::TypeNode& exp_type = *exp_info->entity.type;
-    // if (exp_type == T_INT || exp_type == T_FLOAT || exp_type == T_DOUBLE || exp_type == T_BOOL) {
-    //     if (cast_type != T_BOOL && cast_type != T_FLOAT && cast_type != T_DOUBLE && cast_type != T_INT) {
-    //         this->error_reporter.fail("Can't cast " + exp_type.to_string() + " to " + cast_type.to_string());
-    //     }
-    //     if (exp_type == cast_type) {
-    //         this->error_reporter.fail("Casting to same type " + cast_type.to_string());
-    //     }
-    // } else {
-    //     this->error_reporter.fail("Can't cast " + exp_type.to_string() + " to " + cast_type.to_string());
-    // }
-    // n.exp_type = exp_type.clone();
-
     return nullptr;
 }
 
