@@ -20,11 +20,9 @@ void add_path_with_alias_to_module(Module& module, const std::string& alias, Pat
 bool check_module(Module& module, Package& top_package);
 bool check_package(Package& package, Package& top_package);
 bool preprocess_package(Package& package);
-void load_module(Package& package, const std::string& module_name);
 bool parse_module(Module& module);
 bool parse_package(Package& package);
 void resolve_module_imports(Module& module, Package& top_package);
-void load_package(Package& package, int level);
 
 class Compiler {
     std::string project_dir;
