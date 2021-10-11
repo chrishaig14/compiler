@@ -118,7 +118,6 @@ UExpressionInfo ModuleChecker::visit_binop(ast::BinaryOp& n) {
     UExpressionInfo info_u = std::make_unique<ExpressionInfo>();
     ExpressionInfo& info = *info_u;
     if (l_entity_v.metatype == Meta::ENUM) {
-        std::cout << "comparing enums!" << std::endl;
         std::vector<sem::UExp> v;
         v.push_back(std::move(left_info_p->exp_snode));
         v.push_back(std::move(right_sinfo->exp_snode));
