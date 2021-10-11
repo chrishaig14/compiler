@@ -45,10 +45,6 @@ public:
     ModuleMember* get(Path p);
     Module(Path path, std::string abs_path, bool is_lib);
 
-    ~Module() {
-        // std::cout << "CALLING MODULE DESTRUCTOR!!!" << std::endl;
-    }
-
     Path get_actual_path(const std::string& id);
     void fill_actual(ast::Type& t);
     void fill_actual(ast::ObjectType& t);

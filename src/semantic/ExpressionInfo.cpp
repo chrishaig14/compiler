@@ -24,6 +24,11 @@ bool ExpressionInfo::is_error() {
     return this->entity.get().is_error();
 }
 
+void ExpressionInfo::set_entity(std::unique_ptr<Entity> e) {
+    this->_entity = std::move(e);
+    this->entity = *this->_entity;
+}
+
 ExpErrorStub::ExpErrorStub() {
     this->entity = __error;
 }

@@ -17,3 +17,6 @@ bool ErrorUnusedReturnValue::equal(const Error& other) const {
 std::string ErrorUnusedReturnValue::to_str(const CodeLines& code) const {
     return "Error: unused return value " + entity_to_string(*this->entity);
 }
+
+ErrorUnusedReturnValue::ErrorUnusedReturnValue(const Entity& entity, const ast::Call& node) : node(node), entity(entity.clone()) {
+}

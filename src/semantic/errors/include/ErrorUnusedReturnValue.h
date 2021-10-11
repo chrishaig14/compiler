@@ -10,8 +10,7 @@
 
 class ErrorUnusedReturnValue : public Error {
 public:
-    ErrorUnusedReturnValue(const Entity& entity, const ast::Call& node) : node(node), entity(entity.clone()) {
-    }
+    ErrorUnusedReturnValue(const Entity& entity, const ast::Call& node);
 
     Error* clone() const override;
     bool equal(const Error& other) const override;
