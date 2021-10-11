@@ -15,7 +15,7 @@ add_library(
         parse.h
         utils.cpp
         utils.h)
-add_executable(compiler full.cpp)
+add_executable(compiler main.cpp)
 target_link_libraries(
         compiler
         python

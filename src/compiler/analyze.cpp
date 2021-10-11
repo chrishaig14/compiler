@@ -101,10 +101,6 @@ void add_path_to_module(Module& module, Path path, Package& top_package) {
     }
 }
 
-void Compiler::add_global_path_to_module(Module& module, Path path) {
-
-}
-
 std::unique_ptr<ModuleMember> find(Path path, Package& top_package) {
     std::unique_ptr<ModuleMember> current_member = std::make_unique<PackageModuleMember>(&top_package);
     std::string path_so_far = "global";

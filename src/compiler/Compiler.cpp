@@ -184,3 +184,7 @@ void Compiler::load_project() {
         return;
     }
 }
+
+void Compiler::add_global_path_to_module(Module& module, Path path) {
+
+}

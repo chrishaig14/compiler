@@ -14,9 +14,6 @@
 
 #define REQUIREMENTS_FILE "requirements.txt"
 
-void
-write_cmakelists(const std::string& cmake_output_path, const std::string& output_name, const std::string& all_files,
-                 const std::string& all_libraries, bool is_lib);
 void add_local_path_to_module(Module& module, Path path, Package& top_package);
 void add_path_to_module(Module& module, Path path, Package& top_package);
 void add_path_with_alias_to_module(Module& module, const std::string& alias, Path path, Package& root_package);
@@ -26,9 +23,7 @@ bool preprocess_package(Package& package);
 void load_module(Package& package, const std::string& module_name);
 bool parse_module(Module& module);
 bool parse_package(Package& package);
-
 void resolve_module_imports(Module& module, Package& top_package);
-
 void load_package(Package& package, int level);
 
 class Compiler {
