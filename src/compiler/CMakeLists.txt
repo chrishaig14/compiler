@@ -13,8 +13,6 @@ add_library(
         Compiler.h
         parse.cpp
         parse.h
-        transpile.cpp
-        transpile.h
         utils.cpp
         utils.h)
 add_executable(compiler full.cpp)
