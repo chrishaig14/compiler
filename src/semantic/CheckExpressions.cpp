@@ -12,8 +12,6 @@
 EntityValue& ModuleChecker::entity_value_from_actual_base_path_no_generic(const Path& p) {
     if (this->entity_values_no_generic.count(p.as_str()) == 0) {
         auto* ot = new sem::TypeObject(p.basname(), p);
-        // auto v = std::make_unique<Value>(ot);
-        // this->fill_value(*v);
         auto v = this->make_value(ot);
         auto& vv = *v;
         this->entity_values_no_generic[p.as_str()] = std::move(v);
@@ -23,16 +21,12 @@ EntityValue& ModuleChecker::entity_value_from_actual_base_path_no_generic(const 
 }
 
 UExpressionInfo ModuleChecker::visit_id(ast::Id& n) {
-    // Logger::info("Checking id node " + n._id);
     Entity& entity = this->scope->get(n._id);
     if (entity.is_notfound()) {
         this->error_reporter.error(std::make_unique<ErrorNotDeclared>(n));
         this->scope->set(n._id, EntityError());
         return exp_error_stub();
     }
-    // std::string id =
-    //         entity.type == E_TYPE::CONST_FUNCTION ? ((EntityConstFunction&) entity).const_function->path.as_str()
-    //                                               : n._id;
     sem::UExp sn;
     if (entity.is_constfun()) {
         sn = std::make_unique<sem::ConstFunction>(entity.get_constfun().const_function.path);
