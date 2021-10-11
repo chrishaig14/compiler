@@ -25,7 +25,6 @@ TEST_CASE("global_main", "[parser]") {
     // sem::Type* p = (sem::TypeObject*) nullptr;
     std::unique_ptr<sem::Type> u = std::make_unique<sem::TypeObject>("Integer");
     REQUIRE(const_function->const_function_ft == sem::TypeFunction({}, std::move(u)));
-    REQUIRE(const_function->implicit == nullptr);
     REQUIRE(const_function->path.as_str() == "main.foo.main");
 }
 
@@ -92,7 +91,6 @@ TEST_CASE("global_multiple", "[parser]") {
     REQUIRE(module.members["main"]->is_const_function());
     ConstFunction* const_function = &module.members["main"]->const_function();
     REQUIRE(const_function->const_function_ft == sem::TypeFunction({}, std::make_unique<sem::TypeObject>("Integer")));
-    REQUIRE(const_function->implicit == nullptr);
     REQUIRE(const_function->path.as_str() == "main.foo.main");
 
 
