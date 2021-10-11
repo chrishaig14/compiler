@@ -14,7 +14,7 @@ add_library(
         parse.cpp
         parse.h
         utils.cpp
-        utils.h)
+        utils.h PackagePrechecker.cpp PackagePrechecker.h)
 add_executable(compiler main.cpp)
 target_link_libraries(
         compiler
