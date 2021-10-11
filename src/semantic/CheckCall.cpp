@@ -8,7 +8,7 @@
 #include "../ast/statements/Call.h"
 #include "../simple_nodes/common/include/TypeFunction.h"
 
-sem::UCommon Checker::visit_call(ast::Call& n) {
+sem::UCommon ModuleChecker::visit_call(ast::Call& n) {
     auto s = this->analyze_call(n.function, n.arguments, false, n.start, n.end);
     if (s->is_error()) {
         return nullptr;
@@ -22,7 +22,7 @@ sem::UCommon Checker::visit_call(ast::Call& n) {
 }
 
 UExpressionInfo
-Checker::analyze_call(ast::ExpNode& function, std::vector<ast::RExpNode>& arguments, bool is_rvalue, TextPosition start,
+ModuleChecker::analyze_call(ast::ExpNode& function, std::vector<ast::RExpNode>& arguments, bool is_rvalue, TextPosition start,
                       TextPosition end) {
     auto retv_p = std::make_unique<ExpressionInfo>();
     auto& retv = *retv_p;
@@ -73,7 +73,7 @@ Checker::analyze_call(ast::ExpNode& function, std::vector<ast::RExpNode>& argume
     return f;
 }
 
-UExpressionInfo Checker::visit_callexp(ast::CallExp& n, bool is_rvalue) {
+UExpressionInfo ModuleChecker::visit_callexp(ast::CallExp& n, bool is_rvalue) {
     return this->analyze_call(n.function, n.arguments, is_rvalue, n.start, n.end);
 }
 
@@ -87,7 +87,7 @@ const sem::TypeFunction& get_function_type(const ExpressionInfo& fun_info) {
 }
 
 UExpressionInfo
-Checker::make_return_info(bool is_rvalue, UExpressionInfo retv_p, bool is_def_const, bool args_are_constant) {
+ModuleChecker::make_return_info(bool is_rvalue, UExpressionInfo retv_p, bool is_def_const, bool args_are_constant) {
     UExpressionInfo retvp = std::move(retv_p);
     auto& retv = *retvp;
     if (retv.entity.get().is_value()) {
@@ -102,7 +102,7 @@ Checker::make_return_info(bool is_rvalue, UExpressionInfo retv_p, bool is_def_co
     return retvp;
 }
 
-bool Checker::check_arguments(std::vector<ast::RExpNode>& narguments, std::vector<sem::UExp>& arguments,
+bool ModuleChecker::check_arguments(std::vector<ast::RExpNode>& narguments, std::vector<sem::UExp>& arguments,
                               std::vector<std::unique_ptr<Entity>>& arg_entities) {
     bool has_error;
     for (auto& arg: narguments) {
@@ -127,7 +127,7 @@ bool Checker::check_arguments(std::vector<ast::RExpNode>& narguments, std::vecto
     return has_error;
 }
 
-void Checker::process_function_arguments(std::vector<std::unique_ptr<Entity>>& arg_entities,
+void ModuleChecker::process_function_arguments(std::vector<std::unique_ptr<Entity>>& arg_entities,
                                          std::vector<sem::UExp>& arguments, std::vector<ast::RExpNode>& narguments,
                                          const sem::TypeFunction& function_type, ExpressionInfo* fun_info_p) {
     int sni = static_cast<int>(fun_info_p->this_arg != nullptr);

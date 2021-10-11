@@ -8,7 +8,7 @@
 #include "../simple_nodes/common/include/TypeFunction.h"
 #include "../units/entities/EntityNone.h"
 
-UExpressionInfo Checker::visit_boolean(ast::Boolean& node) {
+UExpressionInfo ModuleChecker::visit_boolean(ast::Boolean& node) {
     UExpressionInfo info_u = std::make_unique<ExpressionInfo>();
     ExpressionInfo& info = *info_u;
     info.set_entity(this->entity_value_from_actual_base_path_no_generic(Path("libcore.libcore.Boolean")).clone());
@@ -17,7 +17,7 @@ UExpressionInfo Checker::visit_boolean(ast::Boolean& node) {
 }
 
 
-UExpressionInfo Checker::visit_number(ast::Number& node) {
+UExpressionInfo ModuleChecker::visit_number(ast::Number& node) {
     UExpressionInfo info_u = std::make_unique<ExpressionInfo>();
     ExpressionInfo& info = *info_u;
     switch (node.num_type) {
@@ -50,7 +50,7 @@ UExpressionInfo Checker::visit_number(ast::Number& node) {
     return info_u;
 }
 
-UExpressionInfo Checker::visit_none(ast::None& node) {
+UExpressionInfo ModuleChecker::visit_none(ast::None& node) {
     UExpressionInfo info_u = std::make_unique<ExpressionInfo>();
     ExpressionInfo& info = *info_u;
     // info.set_type(ObjectType("NoneType"));
@@ -59,7 +59,7 @@ UExpressionInfo Checker::visit_none(ast::None& node) {
     return info_u;
 }
 
-UExpressionInfo Checker::visit_emptylist(ast::EmptyList& node) {
+UExpressionInfo ModuleChecker::visit_emptylist(ast::EmptyList& node) {
     UExpressionInfo info_u = std::make_unique<ExpressionInfo>();
     ExpressionInfo& info = *info_u;
     this->module.fill_actual(*node.type);
@@ -73,7 +73,7 @@ UExpressionInfo Checker::visit_emptylist(ast::EmptyList& node) {
     return info_u;
 }
 
-UExpressionInfo Checker::visit_string(ast::String& node) {
+UExpressionInfo ModuleChecker::visit_string(ast::String& node) {
     UExpressionInfo info_u = std::make_unique<ExpressionInfo>();
     ExpressionInfo& info = *info_u;
     info.is_constant = true;
@@ -87,7 +87,7 @@ UExpressionInfo Checker::visit_string(ast::String& node) {
     return info_u;
 }
 
-UExpressionInfo Checker::visit_tuple(ast::Tuple& node) {
+UExpressionInfo ModuleChecker::visit_tuple(ast::Tuple& node) {
     sem::VectorOfTypes types;
     std::vector<sem::UExp> values;
     for (auto& n: node.values) {
@@ -123,7 +123,7 @@ UExpressionInfo Checker::visit_tuple(ast::Tuple& node) {
     return sinfo_p;
 }
 
-UExpressionInfo Checker::visit_partial(ast::PartialApplication& node) {
+UExpressionInfo ModuleChecker::visit_partial(ast::PartialApplication& node) {
     UExpressionInfo func = this->dispatch_rvalue(*node.function);
     sem::VectorOfTypes partial_args;
     ast::FunctionType* fun_type = nullptr;
@@ -168,7 +168,7 @@ UExpressionInfo Checker::visit_partial(ast::PartialApplication& node) {
     return s_p;
 }
 
-UExpressionInfo Checker::visit_dict(ast::DictNode& node) {
+UExpressionInfo ModuleChecker::visit_dict(ast::DictNode& node) {
     UExpressionInfo info_u = std::make_unique<ExpressionInfo>();
     ExpressionInfo& info = *info_u;
     UExpressionInfo first_key_info = this->dispatch_rvalue(node.items[0].first);
@@ -204,7 +204,7 @@ UExpressionInfo Checker::visit_dict(ast::DictNode& node) {
     return info_u;
 }
 
-UExpressionInfo Checker::visit_emptydict(ast::EmptyDict& node) {
+UExpressionInfo ModuleChecker::visit_emptydict(ast::EmptyDict& node) {
     UExpressionInfo info_u = std::make_unique<ExpressionInfo>();
     ExpressionInfo& info = *info_u;
     sem::TypeObject* ot = new sem::TypeObject("Dict",
@@ -219,7 +219,7 @@ UExpressionInfo Checker::visit_emptydict(ast::EmptyDict& node) {
     return info_u;
 }
 
-UExpressionInfo Checker::visit_defconst(ast::DefaultConstructor& node) {
+UExpressionInfo ModuleChecker::visit_defconst(ast::DefaultConstructor& node) {
     // this is a regular function
     UExpressionInfo info_u = std::make_unique<ExpressionInfo>();
     ExpressionInfo& info = *info_u;
@@ -249,7 +249,7 @@ UExpressionInfo Checker::visit_defconst(ast::DefaultConstructor& node) {
     return info_u;
 }
 
-UExpressionInfo Checker::visit_list(ast::List& node) {
+UExpressionInfo ModuleChecker::visit_list(ast::List& node) {
     UExpressionInfo element_type_p = this->dispatch_rvalue(node.elements[0]);
     if (element_type_p->entity.get().e_type != E_TYPE::VALUE) {
         throw std::runtime_error("Expected expression");

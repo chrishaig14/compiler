@@ -6,7 +6,7 @@
 #include "../ast/general/ObjectType.h"
 #include "../simple_nodes/common/include/TypeObject.h"
 
-UExpressionInfo Checker::expect_rvalue_of_type(const sem::Type& target, ast::ExpNode& node) {
+UExpressionInfo ModuleChecker::expect_rvalue_of_type(const sem::Type& target, ast::ExpNode& node) {
     UExpressionInfo rinfo = this->dispatch_rvalue(node);
     if (rinfo->is_error()) {
         return exp_error_stub();
@@ -30,7 +30,7 @@ UExpressionInfo Checker::expect_rvalue_of_type(const sem::Type& target, ast::Exp
     return rinfo;
 }
 
-sem::UExp Checker::make_rvalue(const Entity& t_entity, sem::UExp value_snode, const sem::Type& target) {
+sem::UExp ModuleChecker::make_rvalue(const Entity& t_entity, sem::UExp value_snode, const sem::Type& target) {
     if (t_entity.is_value()) {
         const EntityValue& value_entity = t_entity.get_value();
         if (value_entity.type.kind != target.kind) {
@@ -94,7 +94,7 @@ sem::UExp Checker::make_rvalue(const Entity& t_entity, sem::UExp value_snode, co
     return nullptr;
 }
 
-sem::Exp* Checker::make_option_rvalue(sem::Exp* value_snode, const ast::Type* unaliased_value_type,
+sem::Exp* ModuleChecker::make_option_rvalue(sem::Exp* value_snode, const ast::Type* unaliased_value_type,
                                       const ast::Type* unaliased_target_type) const {
     if (*unaliased_target_type->object().type_params[0] == *unaliased_value_type ||
         unaliased_value_type->object().id == "NoneType") {
@@ -103,7 +103,7 @@ sem::Exp* Checker::make_option_rvalue(sem::Exp* value_snode, const ast::Type* un
     return nullptr;
 }
 
-sem::UExp Checker::make_union_rvalue(sem::UExp value_snode, const sem::Type* unaliased_value_type,
+sem::UExp ModuleChecker::make_union_rvalue(sem::UExp value_snode, const sem::Type* unaliased_value_type,
                                      const sem::Type* unaliased_target_type) const {
     int union_index = target_union_type(unaliased_target_type->object(), unaliased_value_type->object());
     if (union_index != -1) {
@@ -130,7 +130,7 @@ sem::UExp Checker::make_union_rvalue(sem::UExp value_snode, const sem::Type* una
     }
 }
 
-sem::UCommon Checker::visit_declaration(ast::Declaration& n) {
+sem::UCommon ModuleChecker::visit_declaration(ast::Declaration& n) {
     // Logger::info("Checking ast::DeclarationNode for var: " + n.identifier);
     if (this->scope->declared(n.identifier)) {
         this->error_reporter.error(std::make_unique<ErrorRedeclared>(n.identifier, n));
@@ -144,7 +144,7 @@ sem::UCommon Checker::visit_declaration(ast::Declaration& n) {
     return info_u;
 }
 
-sem::UCommon Checker::check_declaration_with_type(ast::Declaration& n) {
+sem::UCommon ModuleChecker::check_declaration_with_type(ast::Declaration& n) {
     ast::UTypeNode& type = n.type;
     if (type->kind == Kind::OBJECT && this->module.aliased_types.count(type->object().id) == 1) {
         ast::Type* aliased_type = this->module.aliased_types.at(type->object().id);
@@ -167,7 +167,7 @@ sem::UCommon Checker::check_declaration_with_type(ast::Declaration& n) {
     return info_u;
 }
 
-sem::UCommon Checker::check_declaration_without_type(ast::Declaration& n) {
+sem::UCommon ModuleChecker::check_declaration_without_type(ast::Declaration& n) {
     UExpressionInfo exp_info_p = this->dispatch_rvalue(n.expression);
     if (exp_info_p->is_error()) {
         // return error_stub();

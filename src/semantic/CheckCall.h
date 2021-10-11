@@ -5,6 +5,6 @@
 #ifndef XLANG_CHECKCALL_H
 #define XLANG_CHECKCALL_H
 
-#include "Checker.h"
+#include "ModuleChecker.h"
 
 #endif //XLANG_CHECKCALL_H

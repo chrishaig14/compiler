@@ -76,7 +76,7 @@ const sem::TypeFunction& get_function_type(const ExpressionInfo& fun_info);
 
 UExpressionInfo exp_error_stub();
 
-class Checker {
+class ModuleChecker {
     int loop_count;
     bool add_this;
     std::map<std::string, std::unique_ptr<EntityValue>> entity_values_no_generic;
@@ -91,8 +91,8 @@ public:
     Package& top_package;
     sem::Common* update_loop_index_snode;
 
-    Checker(Package& top_package, Module& module);
-    ~Checker();
+    ModuleChecker(Package& top_package, Module& module);
+    ~ModuleChecker();
 
     std::unique_ptr<Entity> entity_from_type(const ast::Type& type);
 

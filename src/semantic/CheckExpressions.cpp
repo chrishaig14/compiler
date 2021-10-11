@@ -9,7 +9,7 @@
 #include "../simple_nodes/common/include/TypeObject.h"
 #include "../simple_nodes/common/include/TypeFunction.h"
 
-EntityValue& Checker::entity_value_from_actual_base_path_no_generic(const Path& p) {
+EntityValue& ModuleChecker::entity_value_from_actual_base_path_no_generic(const Path& p) {
     if (this->entity_values_no_generic.count(p.as_str()) == 0) {
         auto* ot = new sem::TypeObject(p.basname(), p);
         // auto v = std::make_unique<Value>(ot);
@@ -22,7 +22,7 @@ EntityValue& Checker::entity_value_from_actual_base_path_no_generic(const Path& 
     return *this->entity_values_no_generic.at(p.as_str());
 }
 
-UExpressionInfo Checker::visit_id(ast::Id& n) {
+UExpressionInfo ModuleChecker::visit_id(ast::Id& n) {
     // Logger::info("Checking id node " + n._id);
     Entity& entity = this->scope->get(n._id);
     if (entity.is_notfound()) {
@@ -47,7 +47,7 @@ UExpressionInfo Checker::visit_id(ast::Id& n) {
     return info_u;
 }
 
-sem::UCommon Checker::visit_cast(ast::Cast& n) {
+sem::UCommon ModuleChecker::visit_cast(ast::Cast& n) {
     // sem::UCommon exp_info = this->dispatch_rvalue(*n.exp);
     // ObjectType cast_type(n.as_type, {});
     // const ast::TypeNode& exp_type = *exp_info->entity.type;
@@ -158,7 +158,7 @@ sem::UCommon Checker::visit_cast(ast::Cast& n) {
 //     return info_u;
 // }
 
-UExpressionInfo Checker::visit_unary(ast::UnaryOp& n) {
+UExpressionInfo ModuleChecker::visit_unary(ast::UnaryOp& n) {
     UExpressionInfo exp_info = this->expect_rvalue_of_type(sem::TypeObject("Boolean"), *n.exp);
     if (exp_info->is_error()) {
         return exp_error_stub();
@@ -189,7 +189,7 @@ UExpressionInfo Checker::visit_unary(ast::UnaryOp& n) {
     return info_u;
 }
 
-UExpressionInfo Checker::visit_binop(ast::BinaryOp& n) {
+UExpressionInfo ModuleChecker::visit_binop(ast::BinaryOp& n) {
     UExpressionInfo left_info_p = this->dispatch_rvalue(n.left);
     if (left_info_p->is_error()) {
         return exp_error_stub();
@@ -247,7 +247,7 @@ UExpressionInfo Checker::visit_binop(ast::BinaryOp& n) {
     return info_u;
 }
 
-std::unique_ptr<EntityValue> Checker::make_value(sem::Type* type) {
+std::unique_ptr<EntityValue> ModuleChecker::make_value(sem::Type* type) {
     if (type->kind != sem::Kind::OBJECT) {
         return nullptr;
     }
@@ -301,7 +301,7 @@ std::unique_ptr<EntityValue> Checker::make_value(sem::Type* type) {
     return std::make_unique<EntityValue>(type, cls);
 }
 
-UExpressionInfo Checker::visit_subscript(ast::Subscript& node) {
+UExpressionInfo ModuleChecker::visit_subscript(ast::Subscript& node) {
     UExpressionInfo parent_p = this->dispatch_rvalue(*node.parent);
     Entity& entity_parent = parent_p->entity;
     if (entity_parent.e_type != E_TYPE::VALUE || entity_parent.get_value().type.kind == sem::Kind::FUNCTION) {
@@ -353,7 +353,7 @@ UExpressionInfo Checker::visit_subscript(ast::Subscript& node) {
     return info_u;
 }
 
-UExpressionInfo Checker::visit_ternary(ast::Ternary& node) {
+UExpressionInfo ModuleChecker::visit_ternary(ast::Ternary& node) {
     UExpressionInfo expression_info_p = this->dispatch_rvalue(*node.expression);
     ExpressionInfo& expression_info = *expression_info_p;
     Entity& p_entity = expression_info.entity;

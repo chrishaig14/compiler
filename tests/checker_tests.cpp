@@ -4,7 +4,7 @@
 #include "../src/ast/expressions/include/UnaryOp.h"
 #include "../src/ast/expressions/include/CallExp.h"
 #include "../src/semantic/ModulePrechecker.h"
-#include "../src/semantic/Checker.h"
+#include "../src/semantic/ModuleChecker.h"
 #include "../src/compiler/Compiler.h"
 #include "../src/compiler/analyze.h"
 #include "../src/simple_nodes/common/include/TypeObject.h"
@@ -16,7 +16,7 @@ const ast::ObjectType NO_TYPE(".None");
 
 const TextPosition& _POS = {1, 1};
 
-#define CHECKER() std::unique_ptr<Compiler> cp = analyze(code);Compiler& c = *cp;Module& module = c.root_package.units["tmp"]->module();resolve_module_imports(module, c.top_package);Checker checker(c.top_package, module);
+#define CHECKER() std::unique_ptr<Compiler> cp = analyze(code);Compiler& c = *cp;Module& module = c.root_package.units["tmp"]->module();resolve_module_imports(module, c.top_package);ModuleChecker checker(c.top_package, module);
 #define REQUIRE_CHECKER_ONE_ERROR() REQUIRE(not checker.error_reporter.ok());REQUIRE(checker.error_reporter.errors.size() == 1);
 #define REQUIRE_CHECKER_OK() REQUIRE(checker.error_reporter.ok());REQUIRE(checker.error_reporter.errors.empty());
 
@@ -328,7 +328,7 @@ TEST_CASE("error_no_member", "[checker]") {
     Compiler& c = *cp;
     Module& module = c.root_package.units["tmp"]->module();
     resolve_module_imports(module, c.top_package);
-    Checker checker(c.top_package, module);
+    ModuleChecker checker(c.top_package, module);
     std::cout << "Starting checker" << std::endl;
     checker.init();
     ast::Function& function_node = module.ast->functions[0];

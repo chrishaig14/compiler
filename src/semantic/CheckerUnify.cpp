@@ -2,7 +2,7 @@
 // Created by chris on 17/1/21.
 //
 
-#include "Checker.h"
+#include "ModuleChecker.h"
 #include "../simple_nodes/common/include/Match.h"
 #include "../simple_nodes/expressions/include/NewObject.h"
 #include "../simple_nodes/common/include/TypeObject.h"
@@ -12,7 +12,7 @@
 #include "../simple_nodes/expressions/include/ObjectMember.h"
 
 std::pair<std::string, ast::Type*>*
-Checker::get_first_substitution_object(ast::ObjectType& a, ast::ObjectType& b, bool is_top_level_arg) {
+ModuleChecker::get_first_substitution_object(ast::ObjectType& a, ast::ObjectType& b, bool is_top_level_arg) {
     if (is_variable(a) && is_variable(b) && a.object().id == b.object().id) {
         return nullptr;
     }
@@ -44,7 +44,7 @@ Checker::get_first_substitution_object(ast::ObjectType& a, ast::ObjectType& b, b
     return nullptr;
 }
 
-ast::UTypeNode Checker::substitute(const ast::Type& t, const std::string& var, const ast::Type& replacement) {
+ast::UTypeNode ModuleChecker::substitute(const ast::Type& t, const std::string& var, const ast::Type& replacement) {
     if (t.kind == Kind::OBJECT) {
         if (is_variable(t.object()) && t.object().id == var) {
             return ast::UTypeNode(replacement.clone());
@@ -69,7 +69,7 @@ ast::UTypeNode Checker::substitute(const ast::Type& t, const std::string& var, c
 }
 
 std::pair<std::string, ast::Type*>*
-Checker::get_first_substitution_function(ast::FunctionType& a, ast::FunctionType& b, bool is_top_level_arg) {
+ModuleChecker::get_first_substitution_function(ast::FunctionType& a, ast::FunctionType& b, bool is_top_level_arg) {
     if (a.param_types.size() != b.param_types.size()) {
         this->error_reporter.fail(
                 "Error: trying to unify two functions with different parameter count: " + a.to_string() + " and " +
@@ -88,7 +88,7 @@ Checker::get_first_substitution_function(ast::FunctionType& a, ast::FunctionType
     return nullptr;
 }
 
-std::unique_ptr<ast::FunctionType> Checker::unify_function_call(const ast::FunctionType& f, ast::VectorOfTypes& args,
+std::unique_ptr<ast::FunctionType> ModuleChecker::unify_function_call(const ast::FunctionType& f, ast::VectorOfTypes& args,
                                                                 std::map<std::string, ast::Type*>& all_substitutions) {
     ast::FunctionType& fun = *f.clone();
     if (args.size() != fun.param_types.size()) {
@@ -126,7 +126,7 @@ std::unique_ptr<ast::FunctionType> Checker::unify_function_call(const ast::Funct
     return std::unique_ptr<ast::FunctionType>(&fun);
 }
 
-std::pair<std::string, ast::Type*>* Checker::get_first_substitution(ast::Type& a, ast::Type& b, bool is_top_level_arg) {
+std::pair<std::string, ast::Type*>* ModuleChecker::get_first_substitution(ast::Type& a, ast::Type& b, bool is_top_level_arg) {
     if (a.kind == Kind::FUNCTION && b.kind == Kind::OBJECT) {
         this->error_reporter.fail(
                 "Error trying to unify types of different kind" + a.to_string() + " and " + b.to_string());
@@ -144,7 +144,7 @@ std::pair<std::string, ast::Type*>* Checker::get_first_substitution(ast::Type& a
     }
 }
 
-sem::UCommon Checker::visit_import(ast::Import& node) {
+sem::UCommon ModuleChecker::visit_import(ast::Import& node) {
     sem::UCommon info_u;
     return info_u;
 }
@@ -165,12 +165,12 @@ std::unique_ptr<Entity> map_module_member_to_entity(ModuleMember& module_member)
 }
 
 
-sem::UCommon Checker::visit_alias(ast::Alias& p_node) {
+sem::UCommon ModuleChecker::visit_alias(ast::Alias& p_node) {
     sem::UCommon info_u;
     return info_u;
 }
 
-UExpressionInfo Checker::enum_member(ast::Member& node, Enum& enumm) {
+UExpressionInfo ModuleChecker::enum_member(ast::Member& node, Enum& enumm) {
     std::string value = node.s_child;
     UExpressionInfo info_u = std::make_unique<ExpressionInfo>();
     ExpressionInfo& info = *info_u;
@@ -187,7 +187,7 @@ UExpressionInfo Checker::enum_member(ast::Member& node, Enum& enumm) {
     return exp_error_stub();
 }
 
-std::unique_ptr<Entity> Checker::entity_from_type(const ast::Type& type) {
+std::unique_ptr<Entity> ModuleChecker::entity_from_type(const ast::Type& type) {
     if (this->entities.count(type.to_string()) == 1) {
         return std::unique_ptr<Entity>(this->entities[type.to_string()]->clone());
     }
@@ -207,7 +207,7 @@ std::unique_ptr<Entity> Checker::entity_from_type(const ast::Type& type) {
     return fv;
 }
 
-UExpressionInfo Checker::value_member(ast::Member& n, UExpressionInfo parent_info, EntityValue& value) {
+UExpressionInfo ModuleChecker::value_member(ast::Member& n, UExpressionInfo parent_info, EntityValue& value) {
     if (value.type.kind == sem::Kind::FUNCTION) {
         this->error_reporter.error(std::make_unique<ErrorNoMember>(value.get_constfun().const_function.const_function_ft,
                                                                    n));
@@ -216,7 +216,7 @@ UExpressionInfo Checker::value_member(ast::Member& n, UExpressionInfo parent_inf
     return this->object_member(std::move(parent_info->exp_snode), value, n.s_child, n);
 }
 
-UExpressionInfo Checker::const_function_member(ast::Member& n, UExpressionInfo unique_ptr_1, ConstFunction& function) {
+UExpressionInfo ModuleChecker::const_function_member(ast::Member& n, UExpressionInfo unique_ptr_1, ConstFunction& function) {
     this->error_reporter.error(std::make_unique<ErrorNoMember>(function.const_function_ft, n));
     return exp_error_stub();
 }

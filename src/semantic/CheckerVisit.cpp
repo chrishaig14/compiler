@@ -2,7 +2,7 @@
 // Created by chris on 17/1/21.
 //
 
-#include "Checker.h"
+#include "ModuleChecker.h"
 #include "../simple_nodes/common/include/TypeObject.h"
 #include "../simple_nodes/common/include/TypeFunction.h"
 #include "../simple_nodes/expressions/include/CallExp.h"
@@ -58,13 +58,13 @@ sem::Common* make_for_snode(ast::For& node, std::unique_ptr<sem::Block>& binfo, 
     return bbn;
 }
 
-std::unique_ptr<sem::EnumDef> Checker::visit_enum(ast::EnumNode& p_node) {
+std::unique_ptr<sem::EnumDef> ModuleChecker::visit_enum(ast::EnumNode& p_node) {
     sem::UCommon info_u;
     auto esn = std::make_unique<sem::EnumDef>(p_node.id, p_node.values);
     return esn;
 }
 
-std::unique_ptr<sem::KlassDef> Checker::visit_class(ast::Klass& node) {
+std::unique_ptr<sem::KlassDef> ModuleChecker::visit_class(ast::Klass& node) {
     this->error_reporter.current_class = node.class_name;
     ast::VectorOfTypes tp;
     std::string cn = node.class_name;
@@ -155,7 +155,7 @@ std::unique_ptr<sem::KlassDef> Checker::visit_class(ast::Klass& node) {
     return sn;
 }
 
-void Checker::init() {
+void ModuleChecker::init() {
     // Initialize module level Scope
     for (const auto& f: this->module.members) {
         std::unique_ptr<Entity> e(map_module_member_to_entity(*f.second));
@@ -163,7 +163,7 @@ void Checker::init() {
     }
 }
 
-std::unique_ptr<sem::Module> Checker::visit_root(ast::Module& node) {
+std::unique_ptr<sem::Module> ModuleChecker::visit_root(ast::Module& node) {
     this->init();
     auto sn = std::make_unique<sem::Module>();
     for (auto& n: node.all) {
@@ -176,7 +176,7 @@ std::unique_ptr<sem::Module> Checker::visit_root(ast::Module& node) {
     return sn;
 }
 
-std::unique_ptr<sem::Block> Checker::visit_block(ast::Block& node) {
+std::unique_ptr<sem::Block> ModuleChecker::visit_block(ast::Block& node) {
     auto sn = std::make_unique<sem::Block>();
     for (auto& n: node.nodes) {
         sem::UCommon sinfo_p = this->dispatch(*n);
@@ -198,7 +198,7 @@ std::unique_ptr<sem::Block> Checker::visit_block(ast::Block& node) {
     return sn;
 }
 
-std::unique_ptr<sem::FunctionDef> Checker::visit_function(ast::Function& n) {
+std::unique_ptr<sem::FunctionDef> ModuleChecker::visit_function(ast::Function& n) {
     this->error_reporter.current_function = n.identifier;
     // Logger::info("Checking FunctionNode " + n.identifier);
     std::string& function_name = n.identifier;

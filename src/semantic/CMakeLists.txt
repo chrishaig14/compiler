@@ -14,8 +14,8 @@ add_library(
     CheckCall.h
     CheckDeclaration.cpp
     CheckDeclaration.h
-    Checker.cpp
-    Checker.h
+    ModuleChecker.cpp
+    ModuleChecker.h
     CheckerUnify.cpp
     CheckerUtils.cpp
     CheckerUtils.h

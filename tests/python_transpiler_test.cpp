@@ -4,7 +4,7 @@
 #include "../src/compiler/Compiler.h"
 #include "../src/parser/Parser.h"
 #include "../src/scanner/Scanner.h"
-#include "../src/semantic/Checker.h"
+#include "../src/semantic/ModuleChecker.h"
 #include "../src/semantic/errors/include/errors.h"
 #include "../src/semantic/ModulePrechecker.h"
 #include "../src/transpiler/python/PythonModuleTranspiler.h"

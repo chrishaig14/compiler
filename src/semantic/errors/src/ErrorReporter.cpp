@@ -1,5 +1,5 @@
 #include "../include/ErrorReporter.h"
-#include "../../Checker.h"
+#include "../../ModuleChecker.h"
 
 
 void ErrorReporter::fail(const std::string& msg, TextPosition pos) {

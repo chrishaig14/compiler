@@ -11,7 +11,7 @@
 #include "../simple_nodes/common/include/TypeObject.h"
 #include "../simple_nodes/common/include/TypeFunction.h"
 
-UExpressionInfo Checker::visit_member(ast::Member& n) {
+UExpressionInfo ModuleChecker::visit_member(ast::Member& n) {
     UExpressionInfo parent_info = this->dispatch_rvalue(n.parent);
     Entity& parent_ent = parent_info->entity.get();
     switch (parent_ent.e_type) {
@@ -39,7 +39,7 @@ UExpressionInfo Checker::visit_member(ast::Member& n) {
     return exp_error_stub();
 }
 
-UExpressionInfo Checker::module_member(ast::Member& n, Module& mod) {
+UExpressionInfo ModuleChecker::module_member(ast::Member& n, Module& mod) {
     std::string child = n.s_child;
     if (mod.members.count(child) == 0) {
         // this->error_reporter.error(std::make_unique<ErrorNoMember>())
@@ -67,7 +67,7 @@ TextPosition add_one_col(TextPosition t) {
 }
 
 UExpressionInfo
-Checker::object_member(sem::UExp object_snode, EntityValue& p_value, const std::string& child, ast::Member& n) {
+ModuleChecker::object_member(sem::UExp object_snode, EntityValue& p_value, const std::string& child, ast::Member& n) {
     Path object_type_path = p_value.type.object().data.actual_base_path;
     // if (object_type_path.as_str() == "") {
     //     // is a single type param, error
@@ -145,7 +145,7 @@ Checker::object_member(sem::UExp object_snode, EntityValue& p_value, const std::
     return info_u;
 }
 
-UExpressionInfo Checker::package_member(ast::Member& n, Package& package) {
+UExpressionInfo ModuleChecker::package_member(ast::Member& n, Package& package) {
     std::string child = n.s_child;
     if (package.units.count(child) == 0) {
         // this->error_reporter.error(std::make_unique<ErrorPackageNoMember>(&package,
@@ -164,7 +164,7 @@ UExpressionInfo Checker::package_member(ast::Member& n, Package& package) {
     return info_u;
 }
 
-UExpressionInfo Checker::class_member(ast::Member& n, UExpressionInfo parent_info, ConcreteClass& cls) {
+UExpressionInfo ModuleChecker::class_member(ast::Member& n, UExpressionInfo parent_info, ConcreteClass& cls) {
     std::string child = n.s_child;
     UExpressionInfo info_u = std::make_unique<ExpressionInfo>();
     ExpressionInfo& info = *info_u;

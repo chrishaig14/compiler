@@ -1,7 +1,7 @@
 #include <iostream>
 #include <set>
 #include <cassert>
-#include "Checker.h"
+#include "ModuleChecker.h"
 #include "../util/macros.h"
 #include "../logging/logging.h"
 #include "../simple_nodes/common/include/TypeObject.h"
@@ -27,7 +27,7 @@ bool function_is_generic(const sem::TypeFunction& ft) {
     return false;
 }
 
-Checker::Checker(Package& top_package, Module& module)
+ModuleChecker::ModuleChecker(Package& top_package, Module& module)
         : module(module), error_reporter(module.code_lines), top_package(top_package) {
     this->is_call = false;
     this->scope = new SymbolTable("global", nullptr);
@@ -36,7 +36,7 @@ Checker::Checker(Package& top_package, Module& module)
     this->loop_count = 0;
 }
 
-void Checker::enter_scope(const std::string& name) {
+void ModuleChecker::enter_scope(const std::string& name) {
     std::string new_scope_name = this->scope->s_name + "." + name;
     if (this->scopes.find(new_scope_name) != this->scopes.end()) {
         delete this->scopes[new_scope_name];
@@ -46,11 +46,11 @@ void Checker::enter_scope(const std::string& name) {
     this->scopes[new_scope_name] = this->scope;
 }
 
-void Checker::leave_scope() {
+void ModuleChecker::leave_scope() {
     this->scope = this->scope->parent;
 }
 
-bool Checker::assert_type_exists(const ast::Type& type, TextPosition pos) {
+bool ModuleChecker::assert_type_exists(const ast::Type& type, TextPosition pos) {
     if (type.kind == Kind::OBJECT) {
         if (type.object().id == ".None") {
             return true;
@@ -117,7 +117,7 @@ bool is_generic(const sem::Type& t) {
     return false;
 }
 
-UExpressionInfo Checker::match_arguments_to_generic_function(const ast::FunctionType& ft, ast::VectorOfTypes arg_types,
+UExpressionInfo ModuleChecker::match_arguments_to_generic_function(const ast::FunctionType& ft, ast::VectorOfTypes arg_types,
                                                              std::map<std::string, ast::Type*>& all_substitutions) {
     std::unique_ptr<ast::FunctionType> f;
     // = ft.clone();
@@ -197,7 +197,7 @@ ast::UTypeNode make_type(const ast::Type& original, const MapStringType& replace
     }
 }
 
-ConcreteClass* Checker::instantiate_generic(const ConcreteClass& generic, const ast::ObjectType& instance) {
+ConcreteClass* ModuleChecker::instantiate_generic(const ConcreteClass& generic, const ast::ObjectType& instance) {
 
     MapStringType replacements;
     for (size_t i = 0; i < generic.type_params.size(); i++) {
@@ -258,7 +258,7 @@ ModuleMember* map_unit_to_module_member(Unit& u) {
     return nullptr;
 }
 
-bool Checker::is_immutable(const ast::Type& node) {
+bool ModuleChecker::is_immutable(const ast::Type& node) {
     if (node == T_STRING) {
         return true;
     }
@@ -275,7 +275,7 @@ bool Checker::is_immutable(const ast::Type& node) {
 }
 
 
-Checker::~Checker() {
+ModuleChecker::~ModuleChecker() {
     for (const auto& s: this->scopes) {
         delete s.second;
     }
@@ -284,11 +284,11 @@ Checker::~Checker() {
     // }
 }
 
-bool Checker::is_variable(const ast::ObjectType& a) {
+bool ModuleChecker::is_variable(const ast::ObjectType& a) {
     return a.type_params.empty() && (islower(a.id[0]) != 0);
 }
 
-UExpressionInfo Checker::dispatch_rvalue(ast::ExpNode& n) {
+UExpressionInfo ModuleChecker::dispatch_rvalue(ast::ExpNode& n) {
     switch (n.ntype) {
         case ExpNodeType::BINOP: {
             return this->visit_binop((ast::BinaryOp&) n);
@@ -333,11 +333,11 @@ UExpressionInfo Checker::dispatch_rvalue(ast::ExpNode& n) {
     __builtin_unreachable();
 }
 
-sem::UCommon Checker::dispatch(ast::Statement& nod) {
+sem::UCommon ModuleChecker::dispatch(ast::Statement& nod) {
     return this->dispatch_statement(nod, false);
 }
 
-std::unique_ptr<sem::Top> Checker::dispatch_top(ast::TopNode& n) {
+std::unique_ptr<sem::Top> ModuleChecker::dispatch_top(ast::TopNode& n) {
     switch (n.ntype) {
         case TopNodeType::CLS:
             return this->visit_class((ast::Klass&) n);
@@ -352,7 +352,7 @@ std::unique_ptr<sem::Top> Checker::dispatch_top(ast::TopNode& n) {
     __builtin_unreachable();
 }
 
-sem::UCommon Checker::dispatch_statement(ast::Statement& n, bool is_rvalue) {
+sem::UCommon ModuleChecker::dispatch_statement(ast::Statement& n, bool is_rvalue) {
     switch (n.ntype) {
         case StatementType::ASSIGN:
             return this->visit_assignment((ast::Assignment&) n);

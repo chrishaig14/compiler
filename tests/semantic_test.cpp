@@ -4,13 +4,13 @@
 #include "../src/compiler/Compiler.h"
 #include "../src/parser/Parser.h"
 #include "../src/scanner/Scanner.h"
-#include "../src/semantic/Checker.h"
+#include "../src/semantic/ModuleChecker.h"
 #include "../src/semantic/ModulePrechecker.h"
 #include "../src/simple_nodes/common/include/common.h"
 #include "../src/simple_nodes/common/include/TypeFunction.h"
 #include "../src/simple_nodes/expressions/include/expressions.h"
 
-#define CHECKER() std::unique_ptr<Compiler> cp = c_analyze(code);Compiler& c = *cp;Module& module = c.root_package.units["tmp"]->module();resolve_module_imports(module, c.top_package);Checker checker(c.top_package, module);
+#define CHECKER() std::unique_ptr<Compiler> cp = c_analyze(code);Compiler& c = *cp;Module& module = c.root_package.units["tmp"]->module();resolve_module_imports(module, c.top_package);ModuleChecker checker(c.top_package, module);
 #define REQUIRE_CHECKER_OK() REQUIRE(checker.error_reporter.ok());REQUIRE(checker.error_reporter.errors.empty());
 static const ast::ObjectType NO_TYPE(".None");
 
@@ -185,7 +185,7 @@ fun foo()->Integer{
     for (auto& e: module.members) {
         std::cout << e.first << std::endl;
     }
-    Checker checker(c.top_package, module);
+    ModuleChecker checker(c.top_package, module);
     checker.init();
     auto sem_func = checker.visit_function(module.ast->functions[1]);
     REQUIRE_CHECKER_OK();
@@ -204,7 +204,7 @@ TEST_CASE("semantic_output_const_function_call", "[checker]") {
     for (auto& e: module.members) {
         std::cout << e.first << std::endl;
     }
-    Checker checker(c.top_package, module);
+    ModuleChecker checker(c.top_package, module);
     checker.init();
     auto sem_func = checker.visit_function(module.ast->functions[1]);
     REQUIRE_CHECKER_OK();
@@ -226,7 +226,7 @@ TEST_CASE("semantic_output_while", "[checker]") {
     for (auto& e: module.members) {
         std::cout << e.first << std::endl;
     }
-    Checker checker(c.top_package, module);
+    ModuleChecker checker(c.top_package, module);
     checker.init();
     auto sem_func = checker.visit_function(module.ast->functions[0]);
     REQUIRE_CHECKER_OK();

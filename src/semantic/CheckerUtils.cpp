@@ -4,7 +4,7 @@
 
 #include "CheckerUtils.h"
 #include "../simple_nodes/common/include/TypeObject.h"
-#include "Checker.h"
+#include "ModuleChecker.h"
 
 std::string binoptype_to_str(OpType op) {
     std::map<OpType, std::string> funs;

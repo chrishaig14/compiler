@@ -3,7 +3,7 @@
 //
 
 #include "Compiler.h"
-#include "../semantic/Checker.h"
+#include "../semantic/ModuleChecker.h"
 
 
 void resolve_module_imports(Module& module, Package& top_package) {
@@ -17,7 +17,7 @@ void resolve_module_imports(Module& module, Package& top_package) {
 
 bool check_module(Module& module, Package& top_package) {
     resolve_module_imports(module, top_package);
-    Checker checker(top_package, module);
+    ModuleChecker checker(top_package, module);
     module.sast = checker.visit_root(*module.ast);
     return checker.error_reporter.ok();
 }
