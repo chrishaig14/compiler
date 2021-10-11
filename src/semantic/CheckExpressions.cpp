@@ -66,98 +66,6 @@ sem::UCommon ModuleChecker::visit_cast(ast::Cast& n) {
     return nullptr;
 }
 
-// sem::UCommon Checker::visit_boolop(ast::BoolOp& n) {
-//     sem::UCommon left_info_p = this->dispatch_rvalue(*n.left);
-//     sem::UCommon right_info_p = this->dispatch_rvalue(*n.right);
-//     if (left_info_p->is_error() || right_info_p->is_error()) {
-//         return error_stub();
-//     }
-//     Entity& l_entity = left_info_p->entity;
-//     Entity& r_entity = right_info_p->entity;
-//     if (l_entity.type != E_TYPE::VALUE || r_entity.type != E_TYPE::VALUE) {
-//
-//         this->error_reporter.error(std::make_unique<ErrorBoolOp>(l_entity, r_entity, n.start));
-//         // this->error_reporter.fail("Can't have binop between 2 non objects!");
-//     }
-//
-//     const ast::TypeNode& ltype = *get_entity_type(l_entity);
-//     const ast::TypeNode& rtype = *get_entity_type(r_entity);
-//     if (ltype != rtype) {
-//         this->error_reporter.error(std::make_unique<ErrorTypeMismatch>(ltype, *n.right, r_entity));
-//         // this->error_reporter.error(std::make_unique<ErrorTypeMismatch>(*left_info_p->entity.type, *n.right, right_info_p->entity);
-//         // this->error_reporter.binop(left_info_p->entity, right_info_p->entity, n.start, n.left, n.right);
-//         return error_stub();
-//     }
-//
-//     if (ltype == T_NONE) {
-//         // this->error_reporter.function_doesnt_return_a_value(n.left->start, nullptr);
-//         return error_stub();
-//     }
-//
-//     if (rtype == T_NONE) {
-//         // this->error_reporter.function_doesnt_return_a_value(n.right->start, nullptr);
-//         return error_stub();
-//     }
-//
-//     SemanticInfo& left_info = *left_info_p;
-//     SemanticInfo& right_info = *right_info_p;
-//
-//
-//     if (left_info.is_error() || right_info.is_error()) {
-//         return error_stub();
-//     }
-//
-//     sem::UCommon info_u;
-//     SemanticInfo& info = *info_u;
-//
-//     if (left_info_p->is_constant && right_info_p->is_constant) {
-//         info.is_constant = true;
-//     }
-//     std::string fun = map_boolop_to_method_name(n.op);
-//
-//     Entity& entity = this->scope->get(ltype.object().id);
-//     if (entity.type != E_TYPE::CLASS && entity.type != E_TYPE::ENUM) {
-//         this->error_reporter.fail("This should be a CLASS/ENUM, but it's not!");
-//     }
-//     if (entity.type == E_TYPE::ENUM) {
-//         if (fun != "__eq__" && fun != "__ne__") {
-//             this->error_reporter.fail("Error: enum type doesnt support this operator");
-//         }
-//         // auto* ot = new ast::ObjectType("Boolean", {});
-//         // ot->actual_base_path = Path("core.core.Boolean");
-//         // TypeNode* rettype = ot;
-//         //
-//         // info.entity = new Value(std::make_unique<Value>(rettype));
-//         info.entity = this->entity_value_from_actual_base_path_no_generic(Path("core.core.Boolean"));
-//         ConstFunction* opfun = (((EntityEnum&) entity).enumm)->functions[fun];
-//         info.snode = make_boolop_snode(opfun, left_info, right_info);
-//
-//         // IdSNode* function_id = new IdSNode(opfun->path.as_str());
-//         // CallSNode* sn = new CallSNode();
-//         // sn->function = function_id;
-//         // sn->arguments = {left_info.snode, right_info.snode};
-//         //
-//         // info.snode = sn;
-//     } else {
-//         Class* cls = ((EntityClass&) entity).clazz;
-//         auto operator_fun_it = cls->static_methods.find(fun);
-//         if (operator_fun_it == cls->static_methods.end()) {
-//             this->error_reporter.error(std::make_unique<ErrorClassNoMethodForOp>(cls->class_name, fun, n));
-//             return error_stub();
-//         }
-//
-//         ConstFunction* operator_fun = operator_fun_it->second;
-//         TypeNode* rettype = operator_fun->ft->return_type->clone();
-//
-//         auto v = std::make_unique<Value>(rettype);
-//         this->fill_value(*v);
-//         info.entity = *new Value(std::move(v));
-//         info.snode = make_boolop_snode(operator_fun, left_info, right_info);
-//     }
-//
-//     return info_u;
-// }
-
 UExpressionInfo ModuleChecker::visit_unary(ast::UnaryOp& n) {
     UExpressionInfo exp_info = this->expect_rvalue_of_type(sem::TypeObject("Boolean"), *n.exp);
     if (exp_info->is_error()) {
@@ -218,10 +126,6 @@ UExpressionInfo ModuleChecker::visit_binop(ast::BinaryOp& n) {
         info.exp_snode = std::make_unique<sem::CallExp>(std::make_unique<sem::StaticMethod>(l_entity_v.enumm->path,
                                                                                             "__eq__"), std::move(v));
     } else {
-
-
-        // Entity entity(std::make_unique<Value>(left_info_p->entity.type->object().clone()));
-        // this->fill_value(entity.value);
         ConcreteClass* cls = l_entity_v.clazz;
         assert(cls != nullptr);
         auto operator_fun_it = cls->static_methods.find(fun);
@@ -230,17 +134,12 @@ UExpressionInfo ModuleChecker::visit_binop(ast::BinaryOp& n) {
             return exp_error_stub();
         }
         ConstFunction& operator_fun = *operator_fun_it->second;
-        // auto function_id = std::make_unique<sem::Id>(operator_fun.path.as_str());
         std::vector<sem::UExp> vv;
         vv.push_back(std::move(left_info_p->exp_snode));
         vv.push_back(std::move(right_snode));
         auto sn = std::make_unique<sem::CallExp>(std::make_unique<sem::ConstFunction>(operator_fun.path),
                                                  std::move(vv));
         sem::Type* rettype = operator_fun.const_function_ft.return_type->clone();
-
-
-        // auto v = std::make_unique<Value>(rettype);
-        // this->fill_value(*v);
         info.set_entity(this->make_value(rettype));
         info.exp_snode = std::move(sn);
     }
@@ -256,13 +155,9 @@ std::unique_ptr<EntityValue> ModuleChecker::make_value(sem::Type* type) {
         ConcreteClass* clazz;
         if (e.is_notfound()) {
             clazz = new ConcreteClass(type->object().id, Path("core.generics" + type->object().id));
-            // clazz->class_name = value.type->object().id;
         } else {
             clazz = &e.get_class().clazz;
         }
-        // assert(e.type == E_TYPE::CLASS);
-        // value.clazz = clazz;
-        // value.metatype = Meta::CLASS;
         return std::make_unique<EntityValue>(type, clazz);
     }
     ModuleMember* module_member_p = this->top_package.get(type->object().data.actual_base_path);
@@ -271,10 +166,6 @@ std::unique_ptr<EntityValue> ModuleChecker::make_value(sem::Type* type) {
     }
     ModuleMember& module_member = *module_member_p;
     if (module_member.is_enumm()) {
-        // auto value = std::make_unique<EntityValue>(type);
-        // value->enumm = &module_member.enumm();
-        // value->metatype = Meta::ENUM;
-        // return value;
         return std::make_unique<EntityValue>(type, &module_member.enumm());
     }
     ConcreteClass* cls = &module_member.klass();
@@ -289,15 +180,6 @@ std::unique_ptr<EntityValue> ModuleChecker::make_value(sem::Type* type) {
             cls = instance->second.get();
         }
     }
-    // if (!cls->type_params.empty()) {
-    //     std::cout << "complete: " << type->object().actual_to_string() << std::endl;
-    //     std::cout << "Instantiating type " << type->object().to_string() << std::endl;
-    //     ast::UObjectType o(&type->object().to_ast()->object());
-    //     cls = instantiate_generic(*cls, *o);
-    //     std::cout << "Done instantiating" << std::endl;
-    // }
-    // value.metatype = Meta::CLASS;
-    // value.clazz = cls;
     return std::make_unique<EntityValue>(type, cls);
 }
 
@@ -324,7 +206,6 @@ UExpressionInfo ModuleChecker::visit_subscript(ast::Subscript& node) {
     ConstFunction& subscript_fun = *subscript_it->second;
     std::string sub_fun_path = subscript_fun.path.as_str();
 
-    // VectorOfTypes children;
     if (node.child.size() > 1) {
         this->error_reporter.fail("Error subscript with more than one child!");
         return exp_error_stub();
@@ -341,8 +222,6 @@ UExpressionInfo ModuleChecker::visit_subscript(ast::Subscript& node) {
     ExpressionInfo& info = *info_u;
 
     sem::Type& rtype = *subscript_fun.const_function_ft.return_type;
-    // auto v = std::make_unique<Value>(rtype.clone());
-    // this->fill_value(*v);
     info.set_entity(this->make_value(rtype.clone()));
 
     auto fsn = std::make_unique<sem::ObjectMethod>(std::move(parent_p->exp_snode), cls->path, "__get_item__");
@@ -387,9 +266,6 @@ UExpressionInfo ModuleChecker::visit_ternary(ast::Ternary& node) {
         return exp_error_stub();
     }
     auto false_case_snode = std::move(false_case_sinfo->exp_snode);
-
-    // auto rv = std::make_unique<Value>(true_value.type.clone());
-    // this->fill_value(*rv);
     UExpressionInfo info_u = std::make_unique<ExpressionInfo>();
     ExpressionInfo& info = *info_u;
     info.set_entity(this->make_value(true_value.type.clone()));

@@ -8,7 +8,6 @@
 
 #include "../units/infos/Package.h"
 #include "../util/utils.h"
-#include "../transpiler/STranspiler.h"
 
 
 #endif //XLANG_TRANSPILE_H

@@ -28,21 +28,10 @@ UExpressionInfo ModuleChecker::visit_number(ast::Number& node) {
         }
         case NumberType::FLOAT: {
             info.set_entity(this->entity_value_from_actual_base_path_no_generic(Path("libcore.libcore.Float")).clone());
-            // auto* otype = new ast::ObjectType("Float", {});
-            // otype->actual_base_path = Path("core.core.Float");
-            // auto ov = std::make_unique<Value>(otype);
-            // this->fill_value(*ov);
-            // info.entity = new EntityValue(std::move(ov));
             info.exp_snode = std::make_unique<sem::Float>(node.str);
             break;
         }
         case NumberType::DOUBLE: {
-            // ObjectValue* ov = new ObjectValue();
-            // info.entity = Entity{.type=E_TYPE::OBJECT_VALUE, .object_value=ov};
-            // ov->ot = new ast::ObjectType("Double", {});
-            // IntegerSNode* snode = new IntegerSNode();
-            // snode->str = node.str;
-            // info.snode = snode;
             break;
         }
     }
@@ -53,7 +42,6 @@ UExpressionInfo ModuleChecker::visit_number(ast::Number& node) {
 UExpressionInfo ModuleChecker::visit_none(ast::None& node) {
     UExpressionInfo info_u = std::make_unique<ExpressionInfo>();
     ExpressionInfo& info = *info_u;
-    // info.set_type(ObjectType("NoneType"));
     info.set_entity(std::make_unique<EntityNone>());
     info.exp_snode = std::make_unique<sem::None>();
     return info_u;
@@ -64,12 +52,9 @@ UExpressionInfo ModuleChecker::visit_emptylist(ast::EmptyList& node) {
     ExpressionInfo& info = *info_u;
     this->module.fill_actual(*node.type);
     auto* otype = new sem::TypeObject("List", {node.type->to_sem()}, Path("libcore.libcore.List"));
-    // auto ov = std::make_unique<Value>(otype);
-    // this->fill_value(*ov)
     info.set_entity(this->make_value(otype));
     std::vector<sem::UExp> v;
     info.exp_snode = std::make_unique<sem::List>(std::move(v));
-    // non->class_name = "core.List";
     return info_u;
 }
 
@@ -78,11 +63,6 @@ UExpressionInfo ModuleChecker::visit_string(ast::String& node) {
     ExpressionInfo& info = *info_u;
     info.is_constant = true;
     info.exp_snode = std::make_unique<sem::String>(node.str);
-    // auto* otype = new ast::ObjectType("String", {});
-    // otype->actual_base_path = Path("core.core.String");
-    // auto ov = std::make_unique<Value>(otype);
-    // this->fill_value(*ov);
-    // info.entity = new EntityValue(std::move(ov));
     info.set_entity(this->entity_value_from_actual_base_path_no_generic(Path("libcore.libcore.String")).clone());
     return info_u;
 }
@@ -94,10 +74,6 @@ UExpressionInfo ModuleChecker::visit_tuple(ast::Tuple& node) {
         UExpressionInfo vtype = this->dispatch_rvalue(*n);
         values.push_back(std::move(vtype->exp_snode));
         types.emplace_back(vtype->entity.get().get_value().type.clone());
-        // if (!this->is_immutable(vtype->type())) {
-        //     this->error_reporter.tuple_member_not_immutable(vtype->type(), node.start);
-        //     return error_stub();
-        // }
     }
     UExpressionInfo sinfo_p = std::make_unique<ExpressionInfo>();
     auto& sinfo = *sinfo_p;
@@ -107,8 +83,6 @@ UExpressionInfo ModuleChecker::visit_tuple(ast::Tuple& node) {
 
     ConcreteClass* clazz = new ConcreteClass("Tuple", Path("libcore.libcore.Tuple"));
     for (size_t i = 0; i < otype->object().type_params.size(); i++) {
-        // auto tv = std::make_unique<Value>(ov->type.object().type_params[i]->clone());
-        // this->fill_value(*tv);
         auto tv = this->make_value(otype->object().type_params[i]->clone());
         const std::string& mem_name = std::to_string(i + 1);
         clazz->members[mem_name] = tv->type.to_ast();
@@ -197,8 +171,6 @@ UExpressionInfo ModuleChecker::visit_dict(ast::DictNode& node) {
     }
     sem::TypeObject* type = new sem::TypeObject("Dict", {first_key_type.clone(), first_value_type.clone()});
     this->module.fill_actual(*type);
-    // auto ov = std::make_unique<Value>(type);
-    // this->fill_value(*ov);
     info.set_entity(this->make_value(type));
     info.exp_snode = std::make_unique<sem::Dict>(std::move(items));
     return info_u;
@@ -210,10 +182,7 @@ UExpressionInfo ModuleChecker::visit_emptydict(ast::EmptyDict& node) {
     sem::TypeObject* ot = new sem::TypeObject("Dict",
                                               {node.key_type->to_sem(), node.value_type->to_sem()},
                                               Path("libcore.libcore.Dict"));
-    // ot->data.actual_base_path = Path("core.core.Dict");
     this->module.fill_actual(*ot);
-    // auto ov = std::make_unique<Value>(ot);
-    // this->fill_value(*ov);
     info.set_entity(this->make_value(ot));
     info.exp_snode = std::make_unique<sem::Dict>(std::vector<std::pair<sem::UExp, sem::UExp>>{});
     return info_u;
@@ -253,7 +222,6 @@ UExpressionInfo ModuleChecker::visit_list(ast::List& node) {
     UExpressionInfo element_type_p = this->dispatch_rvalue(node.elements[0]);
     if (element_type_p->entity.get().e_type != E_TYPE::VALUE) {
         throw std::runtime_error("Expected expression");
-        // this->error_reporter.error(std::make_unique<ErrorExpectedExpression>(element_type_p->entity, node.elements[0]));
         return exp_error_stub();
     }
     EntityValue& entity_value = element_type_p->entity.get().get_value();
@@ -264,10 +232,6 @@ UExpressionInfo ModuleChecker::visit_list(ast::List& node) {
 
     for (size_t i = 1; i < node.elements.size(); i++) {
         UExpressionInfo current_type_p = this->dispatch_rvalue(node.elements[i]);
-        // const ast::TypeNode& current_type = current_type_p->type();
-        // if (!current_type_p->is_constant) {
-        //     is_constant = false;
-        // }
         EntityValue& p_entity = current_type_p->entity.get().get_value();
         sem::TypeObject* ctype = &p_entity.type.object();
         if (*ctype != element_type) {
@@ -275,15 +239,12 @@ UExpressionInfo ModuleChecker::visit_list(ast::List& node) {
         }
         list_elements.push_back(std::move(current_type_p->exp_snode));
     }
-    // node.type = element_type->clone();
     UExpressionInfo return_info_p = std::make_unique<ExpressionInfo>();
     auto& return_info = *return_info_p;
     return_info.is_constant = is_constant;
 
     return_info.exp_snode = std::make_unique<sem::List>(std::move(list_elements));
     auto* otype = new sem::TypeObject("List", {element_type.clone()}, Path("libcore.libcore.List"));
-    // auto p_value = std::make_unique<Value>(otype);
-    // this->fill_value(*p_value);
     return_info.set_entity(this->make_value(otype));
     return return_info_p;
 }

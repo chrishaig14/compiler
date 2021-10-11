@@ -41,7 +41,6 @@ sem::UExp ModuleChecker::make_rvalue(const Entity& t_entity, sem::UExp value_sno
                 return value_snode;
             } else {
                 return nullptr;
-                // throw std::runtime_error("Error cannot make function rvalue");
             }
         }
         const sem::TypeObject& value_ot = value_entity.type.object();
@@ -160,8 +159,6 @@ sem::UCommon ModuleChecker::check_declaration_with_type(ast::Declaration& n) {
 
     sem::UExp up = std::move(rvalue_sinfo->exp_snode);
     sem::UCommon info_u = std::make_unique<sem::Declaration>(n.identifier, std::move(up));
-    // auto ov = std::make_unique<Value>(sem_type.release());
-    // this->fill_value(*ov);
     auto ov = this->make_value(sem_type.release());
     this->scope->set(n.identifier, *ov);
     return info_u;
@@ -170,14 +167,11 @@ sem::UCommon ModuleChecker::check_declaration_with_type(ast::Declaration& n) {
 sem::UCommon ModuleChecker::check_declaration_without_type(ast::Declaration& n) {
     UExpressionInfo exp_info_p = this->dispatch_rvalue(n.expression);
     if (exp_info_p->is_error()) {
-        // return error_stub();
         return nullptr;
     }
     E_TYPE entity_type = exp_info_p->entity.get().e_type;
     if (entity_type != E_TYPE::CONST_FUNCTION && entity_type != E_TYPE::VALUE) {
         this->error_reporter.error(std::make_unique<ErrorExpectedExpression>(exp_info_p->entity, n.expression));
-        // throw std::runtime_error("NOT A FVALUE; EXPECTE D EXPRESSION");
-        // return error_stub();
         return nullptr;
     }
 

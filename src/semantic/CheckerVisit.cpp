@@ -208,50 +208,14 @@ std::unique_ptr<sem::FunctionDef> ModuleChecker::visit_function(ast::Function& n
     if (this->add_this) {
         this->scope->set("this", *this->this_entity);
     }
-    // if (n.implicit != nullptr) {
-    //     Class* clazz = new Class(n.implicit->type, Path("core.implicits." + n.implicit->type));
-    //     // clazz->class_name = ;
-    //     auto c = std::make_unique<ConstFunction>(Path("implicit_a"),
-    //                                              sem::UTypeFunction((sem::TypeFunction*) n.implicit->ft->to_sem()));
-    //     this->module.fill_actual(c->const_function_ft);
-    //     if (n.implicit->is_static) {
-    //         clazz->static_methods[n.implicit->method] = std::move(c);
-    //     } else {
-    //         clazz->methods[n.implicit->method] = std::move(c);
-    //     }
-    //     Entity* generic_type = new EntityClass(clazz);
-    //     this->scope->set(n.implicit->type, *generic_type);
-    //     params.push_back("implicit_a");
-    // }
     for (size_t i = 0; i < n.parameter_names.size(); i++) {
         ast::Type& type = n.parameter_types[i];
         ast::UTypeNode cl(type.clone());
         make_not_generic(*cl);
-        // auto te = entity_from_type(*cl);
-        // this->fill_value(*((std::unique_ptr<EntityValue>&) te));
         sem::UType p_type(cl->to_sem());
         auto te = this->make_entity_value(*p_type);
         this->scope->set(n.parameter_names[i], *te);
-        // if (!param_type.is_generic()) {
-        //     if (param_type.kind == Kind::OBJECT) {
-        //         ast::ObjectType& o_type = param_type.object();
-        //         Entity pt = this->scope->get(o_type.id);
-        //         o_type.actual_base_path = pt.clazz->path;
-        //         if (type.kind == Kind::OBJECT) {
-        //             std::cout << "START" << std::endl;
-        //             this->assert_type_exists(type, n.start);
-        //             std::cout << "END" << std::endl;
-        //         }
-        //         this->scope->set(n.parameter_names[i], entity_from_type(*cl));
-        //     } else {
-        //         this->scope->set(n.parameter_names[i], entity_from_type(type));
-        //     }
-        // } else {
-        //     this->scope->set(n.parameter_names[i], entity_from_type(param_type));
-        // }
     }
-    // std::cout << "FINISH " << std::endl;
-
     ast::Type& returnType = *n.return_type;
     this->assert_type_exists(returnType, n.start);
     std::unique_ptr<Entity> e = entity_from_type(returnType);
@@ -272,13 +236,11 @@ std::unique_ptr<sem::FunctionDef> ModuleChecker::visit_function(ast::Function& n
                                                                                          *returnType.to_sem(),
                                                                                          last_node.start));
                 return nullptr;
-                // return error_stub();
             }
         } else {
             this->error_reporter.error(std::make_unique<ErrorFunctionReturnLastStmt>(function_name,
                                                                                      *returnType.to_sem(),
                                                                                      n.start));
-            // return error_stub();
             return nullptr;
         }
     }

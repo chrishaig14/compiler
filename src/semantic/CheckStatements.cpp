@@ -68,8 +68,6 @@ sem::UCommon ModuleChecker::visit_lvalue_subscript(ast::Subscript& node) {
 sem::UCommon ModuleChecker::visit_assignment(ast::Assignment& n) {
     if (n.lvalue.ntype == ExpNodeType::ID) {
         if (((ast::Id&) n.lvalue)._id == "_") {
-            // ExpressionInfo rv = this->dispatch_rvalue(n.rvalue);
-            // return rv;
             return nullptr;
         }
     }
@@ -89,38 +87,27 @@ sem::UCommon ModuleChecker::visit_assignment(ast::Assignment& n) {
     UExpressionInfo expression_info_p = this->dispatch_rvalue(n.rvalue);
 
     if (expression_info_p->is_error()) {
-        // return error_stub();
         return nullptr;
     }
 
     if (is_subscript) {
-        // info.snode = std::move(linfo_p->snode);
-        // csn->arguments.push_back(std::move(expression_info_p->exp_snode));
         lsub->arguments.push_back(std::move(expression_info_p->exp_snode));
         return lsub;
     }
 
     if (linfo_p->is_error()) {
-        // return error_stub();
         return nullptr;
     }
 
     if (linfo_p->entity.get().e_type != E_TYPE::VALUE) {
-        // this->error_reporter.error(std::make_unique<ErrorCantAssign>(n.lvalue));
-        // this->error_reporter.fail("Cannot assign to this thing!");
         std::runtime_error("Error cant assignt to this thing!");
-        // return error_stub();
         return nullptr;
     }
     EntityValue& e_value = linfo_p->entity.get().get_value();
 
     if (e_value.type.kind == sem::Kind::OBJECT) {
-        // bool ff = n.lvalue->ntype == NodeType::MEMBER;
         if (linfo_p->is_tuple_member) {
-            // this->error_reporter.error(std::make_unique<ErrorCantAssign>(n.lvalue));
             std::runtime_error("Error cant assignt to this thing!");
-
-            // return error_stub();
             return nullptr;
         }
     }
@@ -128,23 +115,13 @@ sem::UCommon ModuleChecker::visit_assignment(ast::Assignment& n) {
     if (e_value.type.kind == sem::Kind::OBJECT && expression_info_p->entity.get().is_constfun()) {
         std::cerr << "assignment error" << std::endl;
         exit(111);
-        // this->error_reporter.assignment(*e_value.value->type,
-        //                                 *expression_info_p->entity.value->type,
-        //                                 n.rvalue->start,
-        //                                 *n.lvalue,
-        //                                 *n.rvalue);
     }
     ast::Type* exp_type = expression_info_p->entity.get().get_value().type.to_ast();
 
     if (exp_type->kind == Kind::OBJECT && this->module.aliased_types.count(exp_type->object().id) == 1) {
         ast::Type* aliased_type = this->module.aliased_types.at(exp_type->object().id);
         exp_type = aliased_type;
-    } else {
-        // if (exp_type->kind == Kind::OBJECT && exp_type->object().id.size() != 1) {
-        //     this->module.fill_actual(exp_type);
-        // }
     }
-
     if (expression_info_p->is_error()) {
         return nullptr;
     }
@@ -160,7 +137,6 @@ sem::UCommon ModuleChecker::visit_assignment(ast::Assignment& n) {
             this->error_reporter.error(std::make_unique<ErrorTypeMismatch>(l_entity_value.type,
                                                                            n.rvalue,
                                                                            expression_info_p->entity));
-            // return error_stub();
             return nullptr;
         }
         expression_info_p->exp_snode = std::move(rvalue_snode);
@@ -186,21 +162,13 @@ sem::UCommon ModuleChecker::visit_return(ast::Return& n) {
         return info_r;
     }
     sem::Type& return_type = return_entity.get_value().type;
-    // if (return_type.kind == sem::Kind::OBJECT && this->module.aliased_types.count(return_type.object().id) == 1) {
-    //     ast::Type* aliased_type = this->module.aliased_types.at(return_type.object().id);
-    //     return_type = aliased_type;
-    // } else {
     this->module.fill_actual(return_type);
-    // }
     if (n.expression == nullptr) {
-        // this->error_reporter.no_return(*return_type, n.start);
-        // return error_stub();
         return nullptr;
     }
 
     UExpressionInfo expression_info_p = this->expect_rvalue_of_type(return_type, *n.expression);
     if (expression_info_p->is_error()) {
-        // return error_stub();
         return nullptr;
     }
     auto& u = expression_info_p->exp_snode;
@@ -211,22 +179,6 @@ sem::UCommon ModuleChecker::visit_return(ast::Return& n) {
 
     return sn;
 }
-
-// sem::UCommon Checker::visit_throw(ThrowNode& n) {
-//     sem::UCommon expression_info_p = this->dispatch_rvalue(n.exp);
-//     if (expression_info_p->is_error()) {
-//         return error_stub();
-//     }
-//
-//     auto* sn = new ThrowSNode(expression_info_p->snode);
-//     for (auto l: this->scope->get_all()) {
-//         sn->reachables.push_back(l.first);
-//     }
-//
-//     sem::UCommon info_u; SemanticInfo& info = *info_u;
-//     info.snode = sn;
-//     return info_u;
-// }
 
 sem::UCommon ModuleChecker::visit_match(ast::Match& node) {
     UExpressionInfo exp_info = this->dispatch_rvalue(*node.exp);
@@ -241,21 +193,16 @@ sem::UCommon ModuleChecker::visit_match(ast::Match& node) {
                                                                                                                  sem::VectorOfTypes{})}),
                                                                        *node.exp,
                                                                        exp_info->entity));
-        // return error_stub();
         return nullptr;
     }
 
     sem::TypeObject& ot = value.type.object();
-    // if (ot.data.aliased_type != nullptr) {
-    //     ot = (ast::ObjectType*) ot->data.aliased_type;
-    // }
     if (ot.id != "Union") {
         this->error_reporter.error(std::make_unique<ErrorTypeMismatch>(*new sem::TypeObject("Union",
                                                                                             {new sem::TypeObject("...",
                                                                                                                  sem::VectorOfTypes{})}),
                                                                        *node.exp,
                                                                        exp_info->entity));
-        // return error_stub();
         return nullptr;
     }
     std::vector<std::pair<int, std::unique_ptr<sem::Block>>> cas;
@@ -276,8 +223,6 @@ sem::UCommon ModuleChecker::visit_match(ast::Match& node) {
             return nullptr;
         }
         this->enter_scope("case");
-        // auto v = std::make_unique<Value>(case_type.to_sem());
-        // this->fill_value(*v);
         auto v = this->make_value(p_type);
         assert(v->clazz != nullptr);
         this->scope->set(case_id, *v);
@@ -300,20 +245,14 @@ sem::UCommon ModuleChecker::visit_continue(ast::Continue& node) {
     auto cn = std::make_unique<sem::Continue>();
     bn->nodes.push_back(std::move(cn));
 
-    // sem::UCommon info_u;
-    // SemanticInfo& info = *info_u;
     for (auto reachable : this->scope->get_all_in_loop()) {
         cn->reachables.push_back(reachable.first);
     }
-    // info.snode = std::move(bn);
     return bn;
 }
 
 std::unique_ptr<EntityValue> ModuleChecker::make_entity_value(sem::Type& type) {
     return this->make_value(type.clone());
-    // auto e = std::make_unique<EntityValue>(type.clone());
-    // this->fill_value(*e);
-    // return e;
 }
 
 sem::UCommon ModuleChecker::visit_for(ast::For& node) {
@@ -330,40 +269,12 @@ sem::UCommon ModuleChecker::visit_for(ast::For& node) {
     }
 
     sem::Type* elem_type = exp_ot.type_params[0];
-    // EntityValue v(elem_type->clone());
-    // this->fill_value(v);
     auto ev = this->make_entity_value(*elem_type);
     this->enter_scope("for");
     this->scope->set(node.var, *ev);
-    //
-    // std::string loop_c = std::to_string(this->loop_count++);
-    // std::string loop_list_var_id = "__loop_list__" + loop_c;
-    // std::string loop_index_var_id = "__loop_index__" + loop_c;
-    // std::string loop_list_len_var_id = "__loop_list_len__" + loop_c;
-    //
-    // sem::UExp lu;
-    // sem::UExp eu;
-    // auto* increment_index_sn = new sem::Assignment(std::move(lu), std::move(eu));
-    // this->update_loop_index_snode = increment_index_sn;
-    // increment_index_sn->lvalue = std::make_unique<sem::Id>(loop_index_var_id);
-    // std::vector<sem::UExp> vv;
-    // vv.push_back(std::make_unique<sem::Id>(loop_index_var_id));
-    // auto inc_exp_node = std::make_unique<sem::CallExp>(std::make_unique<sem::Id>("libcore.libcore.Integer.__add__"),
-    //                                                    std::move(vv));
-    // auto one_node = std::make_unique<sem::Integer>(std::string());
-    // one_node->str = "1";
-    // inc_exp_node->arguments.push_back(std::move(one_node));
-    // increment_index_sn->rvalue = std::move(inc_exp_node);
-
     this->scope->is_loop = true;
     auto binfo = this->visit_block(node.body);
     this->scope->is_loop = false;
-    // sem::Block* bn = binfo.release();
-    // for (auto& local_var : this->scope->table) {
-    //     if (local_var.second->is_value()) {
-    //         bn->locals.push_back(local_var.first);
-    //     }
-    // }
     this->leave_scope();
 
     if (binfo == nullptr) {
@@ -374,7 +285,6 @@ sem::UCommon ModuleChecker::visit_for(ast::For& node) {
 }
 
 sem::UCommon ModuleChecker::visit_break(ast::Break& node) {
-    // node.loop_vars = this->scope->get_all_in_loop();
     auto bn = std::make_unique<sem::Break>();
     for (auto reachable : this->scope->get_all_in_loop()) {
         bn->reachables.push_back(reachable.first);
@@ -385,7 +295,6 @@ sem::UCommon ModuleChecker::visit_break(ast::Break& node) {
 sem::UCommon ModuleChecker::visit_while(ast::While& node) {
     UExpressionInfo condition_sinfo = this->expect_rvalue_of_type(sem::TypeObject("Boolean"), *node.condition);
     if (condition_sinfo->is_error()) {
-        // return error_stub();
         return nullptr;
     }
     sem::UExp condition_snode = std::move(condition_sinfo->exp_snode);
@@ -394,14 +303,6 @@ sem::UCommon ModuleChecker::visit_while(ast::While& node) {
     this->scope->is_loop = true;
     auto body_snode = this->visit_block(*node.body);
     this->scope->is_loop = false;
-    // for (auto& v : this->scope->table) {
-    // if (v.second->type == E_TYPE::OBJECT_VALUE) {
-    //     node.body->local_vars.push_back(std::make_pair(v.first, ((ObjectValue*) v.second)->ot));
-    // }
-    // if (v.second->type == E_TYPE::FUNCTION_VALUE) {
-    //     node.body->local_vars.push_back(std::make_pair(v.first, ((FunctionValue*) v.second)->ft));
-    // }
-    // }
     this->leave_scope();
 
     auto while_sn = std::make_unique<sem::While>(std::move(condition_snode), std::move(body_snode));
@@ -412,7 +313,6 @@ sem::UCommon ModuleChecker::visit_while(ast::While& node) {
 sem::UCommon ModuleChecker::visit_if(ast::If& n) {
     UExpressionInfo condition_sinfo = this->expect_rvalue_of_type(sem::TypeObject("Boolean"), n.condition);
     if (condition_sinfo->is_error()) {
-        // return error_stub();
         return nullptr;
     }
     auto& condition_snode = condition_sinfo->exp_snode;

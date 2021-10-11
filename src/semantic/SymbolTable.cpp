@@ -29,11 +29,9 @@ Entity& SymbolTable::get(const std::string& name) {
     if (it != this->table.end()) {
         return *it->second;
     }
-    // this->
     if (this->parent != nullptr) {
         return this->parent->get(name);
     }
-    // throw std::runtime_error("Error path: " + name + " not found!");
     return *new EntityNotFound();
 }
 
@@ -55,12 +53,6 @@ std::vector<std::pair<std::string, ast::Type*>> SymbolTable::get_all_in_loop() {
 
         for (auto& v: this->table) {
             ast::Type* t;
-            // if (v.second->type == E_TYPE::FUNCTION_VALUE) {
-            //     t = ((FunctionValue*) v.second)->ft;
-            // }
-            // if (v.second->type == E_TYPE::OBJECT_VALUE) {
-            //     t = ((ObjectValue*) v.second)->ot;
-            // }
             r.push_back(std::make_pair(v.first, t));
         }
         return r;
@@ -71,12 +63,6 @@ std::vector<std::pair<std::string, ast::Type*>> SymbolTable::get_all_in_loop() {
         r.insert(r.end(), p.begin(), p.end());
         for (auto& v: this->table) {
             ast::Type* t;
-            // if (v.second->type == E_TYPE::FUNCTION_VALUE) {
-            //     t = ((FunctionValue*) v.second)->ft;
-            // }
-            // if (v.second->type == E_TYPE::OBJECT_VALUE) {
-            //     t = ((ObjectValue*) v.second)->ot;
-            // }
             r.push_back(std::make_pair(v.first, t));
         }
         return r;
@@ -98,19 +84,6 @@ std::vector<std::pair<std::string, sem::UType>> SymbolTable::get_all() {
         return r;
     } else {
         std::vector<std::pair<std::string, sem::UType>> r;
-
-        // auto p = this->parent->get_all();
-        // r.insert(r.end(), p.begin(), p.end());
-        // for (auto v: this->table) {
-        //     TypeNode* t;
-        //     if (v.second->type == E_TYPE::FUNCTION_VALUE) {
-        //         t = ((FunctionValue*) v.second)->ft;
-        //     }
-        //     if (v.second->type == E_TYPE::OBJECT_VALUE) {
-        //         t = ((ObjectValue*) v.second)->ot;
-        //     }
-        //     r.push_back(std::make_pair(v.first, t));
-        // }
         return r;
     }
 }

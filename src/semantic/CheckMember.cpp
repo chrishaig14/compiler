@@ -83,7 +83,6 @@ ModuleChecker::object_member(sem::UExp object_snode, EntityValue& p_value, const
     if (p_value.metatype == Meta::ENUM) {
         std::cout << "p_value is enum" << std::endl;
         this->error_reporter.error(std::make_unique<ErrorNoMember>(p_value.type, n));
-        // this->error_reporter.object_no_member(*p_value.type, n);
         return exp_error_stub();
     }
     UExpressionInfo info_u = std::make_unique<ExpressionInfo>();
@@ -96,8 +95,6 @@ ModuleChecker::object_member(sem::UExp object_snode, EntityValue& p_value, const
     if (clazz->members.count(child) != 0) {
         info.set_entity(clazz->member_entities.at(child)->clone());
         if (info.entity.get().is_nothing()) {
-            // auto eee = entity_from_type(*clazz->members.at(child));
-            // this->fill_value(eee->get_value());
             sem::UType p_type(clazz->members.at(child)->to_sem());
             auto eee = this->make_entity_value(*p_type);
             info.set_entity(eee->clone());
@@ -106,40 +103,10 @@ ModuleChecker::object_member(sem::UExp object_snode, EntityValue& p_value, const
         auto omn = std::make_unique<sem::ObjectMember>(std::move(object_snode), clazz->path, child);
         info.exp_snode = std::move(omn);
     } else if (clazz->methods.count(child) != 0) {
-        // auto* idn = new sem::Id(clazz->methods[child]->path.as_str());
         info.exp_snode = std::make_unique<sem::ObjectMethod>(std::move(object_snode), clazz->path, child);
         info.set_entity(std::make_unique<EntityConstFunction>(*clazz->methods[child]));
-        // if (this->is_call) {
-        // method call
-        // info.this_arg = object_snode.release();
-        // info.snode = idn;
-        // info.snode = new sem::ObjectMethod(std::move(object_snode), clazz->path, child);
-        // info.entity = *new EntityValue(std::make_unique<Value>(clazz->methods[child]->ft->clone()));
-        // } else {
-        // return partial
-        // size_t npartial = clazz->methods[child]->ft->param_types.size();
-        // auto* non = new sem::NewObject();
-        // non->class_name = "Partial" + std::to_string(npartial);
-        // auto* method_snode = new sem::Id(clazz->methods[child]->path.as_str());
-        // non->args = {method_snode, object_snode.release()};
-        // for (size_t i = 0; i < npartial; i++) {
-        //     non->args.push_back(nullptr);
-        // }
-        // info.snode = non;
-        // auto fv = std::make_unique<Value>(clazz->methods[child]->ft->clone());
-        // info.entity = *new EntityValue(std::move(fv));
-        // }
-
     } else {
         this->error_reporter.error(std::make_unique<ErrorNoMemberSuggestions>(p_value.type, n, *clazz));
-        // this->error_reporter.object_no_member_with_suggestions(*p_value.type,
-        //                                                        child,
-        //                                                        n.dot_pos,
-        //                                                        *n.parent,
-        //                                                        add_one_col(n.dot_pos),
-        //                                                        n.end,
-        //                                                        clazz);
-
         return exp_error_stub();
     }
     return info_u;
@@ -148,12 +115,6 @@ ModuleChecker::object_member(sem::UExp object_snode, EntityValue& p_value, const
 UExpressionInfo ModuleChecker::package_member(ast::Member& n, Package& package) {
     std::string child = n.s_child;
     if (package.units.count(child) == 0) {
-        // this->error_reporter.error(std::make_unique<ErrorPackageNoMember>(&package,
-        //                                                                   child,
-        //                                                                   n.dot_pos,
-        //                                                                   n.parent,
-        //                                                                   n.child_token.start,
-        //                                                                   n.child_token.end_pos));
         throw std::runtime_error("Error package no member!");
         return exp_error_stub();
     }
@@ -190,13 +151,6 @@ UExpressionInfo ModuleChecker::class_member(ast::Member& n, UExpressionInfo pare
         info.set_entity(entity_from_type(*cls.static_members[child].first));
     } else {
         throw std::runtime_error("Error class no member!");
-
-        // this->error_reporter.error(std::make_unique<ErrorClassNoMember>(ast::ObjectType(cls->class_name, {}),
-        //                                                                 child,
-        //                                                                 n.dot_pos,
-        //                                                                 n.parent,
-        //                                                                 add_one_col(n.dot_pos),
-        //                                                                 n.end));        return exp_error_stub();
     }
     return info_u;
 }

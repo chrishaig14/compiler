@@ -8,10 +8,6 @@
 #include "../simple_nodes/common/include/TypeFunction.h"
 #include "util.h"
 
-// sem::UCommon error_stub() {
-//     return std::make_unique<ErrorStub>();
-// }
-
 UExpressionInfo exp_error_stub() {
     return std::make_unique<ExpErrorStub>();
 }
@@ -58,25 +54,9 @@ bool ModuleChecker::assert_type_exists(const ast::Type& type, TextPosition pos) 
         if (type.object().type_params.empty()) {
             sem::UType p_type(type.to_sem());
             if (!is_generic(*p_type)) {
-                // if (this->imported_paths.count(type.object().id) == 0) {
-                //     this->error_class_not_found(type, {1, 1});
-                //     return false;
-                // }
             }
             return true;
         }
-        // if (this->imported_paths.count(type.object().id) == 0) {
-        //     this->error_class_not_found(type, pos);
-        //     return false;
-        // } else {
-        //     bool error = false;
-        //     for (auto t: type.object().type_params) {
-        //         if (!this->assert_type_exists(*t, pos)) {
-        //             error = true;
-        //         }
-        //     }
-        //     return !error;
-        // }
     } else {
         bool error = false;
         for (auto& t: type.function().param_types) {
@@ -120,7 +100,6 @@ bool is_generic(const sem::Type& t) {
 UExpressionInfo ModuleChecker::match_arguments_to_generic_function(const ast::FunctionType& ft, ast::VectorOfTypes arg_types,
                                                              std::map<std::string, ast::Type*>& all_substitutions) {
     std::unique_ptr<ast::FunctionType> f;
-    // = ft.clone();
     try {
         f = unify_function_call(ft, arg_types, all_substitutions);
         if (f == nullptr) {
@@ -145,7 +124,6 @@ UExpressionInfo ModuleChecker::match_arguments_to_generic_function(const ast::Fu
     UExpressionInfo rv_p = std::make_unique<ExpressionInfo>();
     auto& rv = *rv_p;
     rv.set_entity(std::make_unique<EntityValue>(f->return_type->to_sem(), (ConcreteClass*) nullptr));
-    // delete f;
     return rv_p;
 }
 
@@ -234,18 +212,15 @@ ConcreteClass* ModuleChecker::instantiate_generic(const ConcreteClass& generic, 
     }
 
     auto* concrete = new ConcreteClass(generic.class_name, generic.path);
-    // concrete->class_name = ;
     concrete->methods = std::move(concrete_methods);
     concrete->static_methods = std::move(concrete_static_methods);
     concrete->member_names = generic.member_names;
     concrete->member_types = concrete_field_types;
-    // concrete->path = generic.path;
     for (size_t i = 0; i < generic.member_names.size(); i++) {
         std::string mn = generic.member_names[i];
         concrete->members[mn] = concrete_field_types[i];
         concrete->member_entities[mn] = std::make_unique<EntityNothing>();
     }
-    // this->classes[generic.class_name] = std::unique_ptr<ConcreteClass>(concrete);
     return concrete;
 }
 
@@ -279,9 +254,6 @@ ModuleChecker::~ModuleChecker() {
     for (const auto& s: this->scopes) {
         delete s.second;
     }
-    // for (auto& e: this->entities) {
-    //     delete e.second;
-    // }
 }
 
 bool ModuleChecker::is_variable(const ast::ObjectType& a) {
@@ -347,7 +319,6 @@ std::unique_ptr<sem::Top> ModuleChecker::dispatch_top(ast::TopNode& n) {
             return this->visit_enum((ast::EnumNode&) n);
         case TopNodeType::IMPORT:
             return nullptr;
-            // return this->visit_import((ast::Import&) n);
     }
     __builtin_unreachable();
 }
@@ -372,13 +343,10 @@ sem::UCommon ModuleChecker::dispatch_statement(ast::Statement& n, bool is_rvalue
             return this->visit_if((ast::If&) n);
         case StatementType::THROW:
             return nullptr;
-            // return this->visit_throw((ThrowNode&) n);
         case StatementType::RETRN:
             return this->visit_return((ast::Return&) n);
         case StatementType::WHIL:
             return this->visit_while((ast::While&) n);
-            // case StatementType::IMPORT:
-            //     return this->visit_import((ast::Import&) n);
         case StatementType::ALIAS:
             return this->visit_alias((ast::Alias&) n);
         case StatementType::MATCH_EXP:
