@@ -16,18 +16,10 @@
 #include "../ast.h"
 #include "TopNode.h"
 
-struct Implicit {
-    std::string type;
-    std::string method;
-    ast::FunctionType* ft;
-    bool is_static;
-};
-
 class ast::Function : public ast::TopNode {
     ast::VectorOfUTypes _parameter_types;
 public:
     std::vector<std::reference_wrapper<ast::Type>> parameter_types;
-    Implicit* implicit;
     std::string identifier;
     VectorOfStrings parameter_names;
     std::unique_ptr<ast::Block> body;

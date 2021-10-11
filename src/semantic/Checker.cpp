@@ -216,41 +216,12 @@ ConcreteClass* Checker::instantiate_generic(const ConcreteClass& generic, const 
 
     std::unordered_map<std::string, std::unique_ptr<ConstFunction>> concrete_methods;
     for (const auto& method_cf: generic.methods) {
-        if (method_cf.second->implicit != nullptr) {
-            Implicit* implicit = method_cf.second->implicit;
-            if (implicit->type == generic.type_params[0]) {
-                // std::unique_ptr<Entity> e = entity_from_type(*instance.type_params[0]);
-                // auto& v = (std::unique_ptr<EntityValue>&) e;
-                // this->fill_value(*v);
-                auto v = this->make_entity_value(*instance.type_params[0]->to_sem());
-                ConcreteClass* clazz_t = v->clazz;
-                auto meth = clazz_t->methods.find(implicit->method);
-                if (meth == clazz_t->methods.end()) {
-                } else {
-                    ast::Type* t = (method_cf.second)->const_function_ft.to_ast();
-                    ast::Type& concrete_type = *make_type(*t, replacements).release();
-                    this->module.fill_actual(concrete_type);
-                    auto cf = std::make_unique<ConstFunction>(method_cf.second->path,
-                                                              sem::UTypeFunction((sem::TypeFunction*) concrete_type.to_sem()));
-                    concrete_methods[method_cf.first] = std::move(cf);
-                }
-
-            } else {
-                ast::Type* t = (method_cf.second)->const_function_ft.to_ast();
-                ast::Type& concrete_type = *make_type(*t, replacements).release();
-                this->module.fill_actual(concrete_type);
-                auto cf = std::make_unique<ConstFunction>(method_cf.second->path,
-                                                          sem::UTypeFunction((sem::TypeFunction*) concrete_type.to_sem()));
-                concrete_methods[method_cf.first] = std::move(cf);
-            }
-        } else {
-            ast::UTypeNode t((method_cf.second)->const_function_ft.to_ast());
-            ast::UTypeNode concrete_type = make_type(*t, replacements);
-            this->module.fill_actual(*concrete_type);
-            auto cf = std::make_unique<ConstFunction>(method_cf.second->path,
-                                                      sem::UTypeFunction((sem::TypeFunction*) concrete_type->to_sem()));
-            concrete_methods[method_cf.first] = std::move(cf);
-        }
+        ast::UTypeNode t((method_cf.second)->const_function_ft.to_ast());
+        ast::UTypeNode concrete_type = make_type(*t, replacements);
+        this->module.fill_actual(*concrete_type);
+        auto cf = std::make_unique<ConstFunction>(method_cf.second->path,
+                                                  sem::UTypeFunction((sem::TypeFunction*) concrete_type->to_sem()));
+        concrete_methods[method_cf.first] = std::move(cf);
     }
 
     std::unordered_map<std::string, std::unique_ptr<ConstFunction>> concrete_static_methods;

@@ -42,7 +42,6 @@ Function::Function(std::string identifier, const VectorOfStrings& parameter_name
     // for (auto p: parameter_types) {
     //     assert(p != nullptr);
     // }
-    this->implicit = nullptr;
     // assert(return_type != nullptr);
     // assert(body != nullptr);
     this->identifier = identifier;

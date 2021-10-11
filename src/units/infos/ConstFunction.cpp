@@ -6,7 +6,6 @@
 ConstFunction::ConstFunction(Path path, sem::UTypeFunction ft)
         : const_function_ft_p(std::move(ft)), const_function_ft(*const_function_ft_p) {
     this->path = path;
-    this->implicit = nullptr;
 }
 
 ConstFunction::~ConstFunction() {

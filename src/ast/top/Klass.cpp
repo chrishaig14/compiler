@@ -53,5 +53,5 @@ nlohmann::json Klass::to_json() const {
     return j;
 }
 
-KMethod::KMethod(Implicit* constraint, ast::UFunctionNode method) : constraint(constraint), method(std::move(method)) {
+KMethod::KMethod(ast::UFunctionNode method) : method(std::move(method)) {
 }

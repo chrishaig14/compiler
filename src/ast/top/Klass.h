@@ -16,10 +16,9 @@
 
 class KMethod {
 public:
-    Implicit* constraint;
     ast::UFunctionNode method;
 
-    KMethod(Implicit* constraint, ast::UFunctionNode method);
+    KMethod(ast::UFunctionNode method);
 };
 
 class ast::Klass : public ast::TopNode {

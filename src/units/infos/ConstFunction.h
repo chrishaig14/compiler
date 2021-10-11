@@ -22,7 +22,6 @@ public:
     // ConstFunction(const ConstFunction& other);
 
     ~ConstFunction();
-    Implicit* implicit;
     sem::TypeFunction& const_function_ft;
     Path path;
 };
