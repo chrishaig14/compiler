@@ -22,10 +22,6 @@ public:
            std::vector<std::reference_wrapper<ast::EnumNode>> enums,
            std::vector<std::reference_wrapper<ast::Function>> functions);
     std::vector<std::unique_ptr<ast::TopNode>> all;
-
-    ~Module() {
-        std::cout << "Calling ast::Module destructor" << std::endl;
-    }
 };
 
 

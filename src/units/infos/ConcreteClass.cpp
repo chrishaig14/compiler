@@ -26,13 +26,9 @@ bool ConcreteClass::operator==(const ConcreteClass& b) const {
 }
 
 ConcreteClass::~ConcreteClass() {
-    // std::cout << "CALLING CLASS DESTRUCTOR!" << std::endl;
     for (const auto& m: this->members) {
         delete m.second;
     }
-    // for (const auto& m: this->methods) {
-    //     delete m.second;
-    // }
     for (auto* m: this->member_types) {
         delete m;
     }
