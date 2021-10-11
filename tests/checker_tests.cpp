@@ -333,7 +333,7 @@ TEST_CASE("error_no_member", "[checker]") {
     checker.init();
     ast::Function& function_node = module.ast->functions[0];
     ast::Declaration& declaration_node = (ast::Declaration&) *function_node.body->nodes[0];
-    checker.visit_root(*module.ast);
+    checker.check_module(*module.ast);
 
     REQUIRE_CHECKER_ONE_ERROR();
 
@@ -351,7 +351,7 @@ TEST_CASE("member_ok", "[checker]") {
 
     CHECKER();
     checker.init();
-    checker.visit_root(*module.ast);
+    checker.check_module(*module.ast);
 
     CHECK(!not checker.error_reporter.ok());
     CHECK(checker.error_reporter.errors.empty());
@@ -371,7 +371,7 @@ fun bar(f: Foo)->Integer{
 
     CHECKER();
     checker.init();
-    checker.visit_root(*module.ast);
+    checker.check_module(*module.ast);
 
     CHECK(!not checker.error_reporter.ok());
     CHECK(checker.error_reporter.errors.empty());
@@ -391,7 +391,7 @@ fun bar(f: Foo)->Integer{
 
     CHECKER();
     checker.init();
-    checker.visit_root(*module.ast);
+    checker.check_module(*module.ast);
 
     CHECK(!not checker.error_reporter.ok());
     CHECK(checker.error_reporter.errors.empty());
@@ -508,7 +508,7 @@ TEST_CASE("subscript_no_method_error", "[checker]") {
 
     CHECKER();
     checker.init();
-    checker.visit_root(*module.ast);
+    checker.check_module(*module.ast);
 
     REQUIRE_CHECKER_ONE_ERROR();
 
@@ -530,7 +530,7 @@ TEST_CASE("call_no_args_ok", "[checker]") {
 
     CHECKER();
     checker.init();
-    checker.visit_root(*module.ast);
+    checker.check_module(*module.ast);
 
     REQUIRE_CHECKER_OK();
 }
@@ -540,7 +540,7 @@ TEST_CASE("call_args_ok", "[checker]") {
 
     CHECKER();
     checker.init();
-    checker.visit_root(*module.ast);
+    checker.check_module(*module.ast);
 
     REQUIRE_CHECKER_OK();
 }
@@ -550,7 +550,7 @@ TEST_CASE("call_args_type_error", "[checker]") {
 
     CHECKER();
     checker.init();
-    checker.visit_root(*module.ast);
+    checker.check_module(*module.ast);
 
     REQUIRE_CHECKER_ONE_ERROR();
     ast::ExpNode& node = static_cast<ast::CallExp&>(static_cast<ast::Declaration&>(*module.ast->functions[1].get().body->nodes[0]).expression).arguments[0];
@@ -575,7 +575,7 @@ fun foo()->Integer{
 
     CHECKER();
     checker.init();
-    checker.visit_root(*module.ast);
+    checker.check_module(*module.ast);
     REQUIRE_CHECKER_ONE_ERROR();
     Error& error = *checker.error_reporter.errors.back();
     sem::TypeObject expected("Integer");
@@ -598,7 +598,7 @@ fun foo()->Integer{
 
     CHECKER();
     checker.init();
-    checker.visit_root(*module.ast);
+    checker.check_module(*module.ast);
     REQUIRE_CHECKER_ONE_ERROR();
     Error& error = *checker.error_reporter.errors.back();
     ast::Function& ast_func = module.ast->functions[1];
@@ -612,7 +612,7 @@ TEST_CASE("union_ok_1", "[checker]") {
 
     CHECKER();
     checker.init();
-    checker.visit_root(*module.ast);
+    checker.check_module(*module.ast);
 
     REQUIRE_CHECKER_OK();
 }
@@ -622,7 +622,7 @@ TEST_CASE("union_ok_2", "[checker]") {
 
     CHECKER();
     checker.init();
-    checker.visit_root(*module.ast);
+    checker.check_module(*module.ast);
 
     REQUIRE_CHECKER_OK();
 }
@@ -649,7 +649,7 @@ TEST_CASE("while_ok", "[checker]") {
 
     CHECKER();
     checker.init();
-    checker.visit_root(*module.ast);
+    checker.check_module(*module.ast);
 
     REQUIRE_CHECKER_OK();
 }
@@ -677,7 +677,7 @@ TEST_CASE("match_ok", "[checker]") {
 
     CHECKER();
     checker.init();
-    checker.visit_root(*module.ast);
+    checker.check_module(*module.ast);
 
     REQUIRE_CHECKER_OK();
 }
@@ -702,7 +702,7 @@ TEST_CASE("union_ok", "[checker]") {
 
     CHECKER();
     checker.init();
-    checker.visit_root(*module.ast);
+    checker.check_module(*module.ast);
 
     REQUIRE_CHECKER_OK();
 }
@@ -712,7 +712,7 @@ TEST_CASE("if_ok", "[checker]") {
 
     CHECKER();
     checker.init();
-    checker.visit_root(*module.ast);
+    checker.check_module(*module.ast);
 
     REQUIRE_CHECKER_OK();
 }
@@ -729,7 +729,7 @@ fun bar() -> Integer {
 
     CHECKER();
     checker.init();
-    checker.visit_root(*module.ast);
+    checker.check_module(*module.ast);
 
     REQUIRE_CHECKER_OK();
 }
@@ -747,7 +747,7 @@ fun bar() -> Integer {
 
     CHECKER();
     checker.init();
-    checker.visit_root(*module.ast);
+    checker.check_module(*module.ast);
 
     REQUIRE_CHECKER_OK();
 }
@@ -790,7 +790,7 @@ TEST_CASE("for_error_no_list", "[checker]") {
 
     CHECKER();
     checker.init();
-    checker.visit_root(*module.ast);
+    checker.check_module(*module.ast);
     ast::ExpNode& exp = static_cast<ast::For&>(*module.ast->functions[0].get().body->nodes[0]).exp;
 
     REQUIRE_CHECKER_ONE_ERROR();
@@ -821,7 +821,7 @@ TEST_CASE("enum_error", "[checker]") {
 
     CHECKER();
     checker.init();
-    checker.visit_root(*module.ast);
+    checker.check_module(*module.ast);
 
     REQUIRE_CHECKER_ONE_ERROR();
 
@@ -841,7 +841,7 @@ TEST_CASE("enum_ok", "[checker]") {
 
     CHECKER();
     checker.init();
-    checker.visit_root(*module.ast);
+    checker.check_module(*module.ast);
 
     REQUIRE_CHECKER_OK();
 }

@@ -115,7 +115,7 @@ class PackageChecker {
     bool check_module(Module& module) {
         resolve_module_imports(module, this->top_package);
         ModuleChecker checker(this->top_package, module);
-        module.sast = checker.visit_root(*module.ast);
+        module.sast = checker.check_module();
         return checker.error_reporter.ok();
     }
 

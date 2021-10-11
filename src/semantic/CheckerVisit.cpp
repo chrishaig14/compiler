@@ -84,7 +84,7 @@ std::unique_ptr<sem::KlassDef> ModuleChecker::visit_class(ast::Klass& node) {
     //                                                                                                      node.class_name)).clone());
     // this->fill_value(this->this_entity->get_value());
     Path p(this->module.path, node.class_name);
-    sem::TypeObject ot (p.basname(), p);
+    sem::TypeObject ot(p.basname(), p);
     // auto v = std::make_unique<Value>(ot);
     // this->fill_value(*v);
     this->this_entity = this->make_entity_value(ot);
@@ -163,10 +163,10 @@ void ModuleChecker::init() {
     }
 }
 
-std::unique_ptr<sem::Module> ModuleChecker::visit_root(ast::Module& node) {
+std::unique_ptr<sem::Module> ModuleChecker::check_module() {
     this->init();
     auto sn = std::make_unique<sem::Module>();
-    for (auto& n: node.all) {
+    for (auto& n: this->module.ast->all) {
         if (n->ntype == TopNodeType::IMPORT) {
             continue;
         }

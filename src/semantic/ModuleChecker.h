@@ -115,7 +115,7 @@ public:
     void fail(std::string msg);
 
     std::unique_ptr<sem::Block> visit_block(ast::Block& node);
-    std::unique_ptr<sem::Module> visit_root(ast::Module& node);
+    std::unique_ptr<sem::Module> check_module();
 
     sem::UCommon visit_assignment(ast::Assignment& n);
     sem::UCommon visit_break(ast::Break& node);
