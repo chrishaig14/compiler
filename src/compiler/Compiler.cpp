@@ -33,8 +33,8 @@ bool Compiler::pre() {
 }
 
 bool Compiler::main() {
-    PackageChecker pc;
-    return pc.check_package(root_package, top_package);
+    PackageChecker pc(top_package);
+    return pc.check_package(root_package);
 }
 
 VectorOfStrings Compiler::load_requirements(const std::string& filepath) {
@@ -129,8 +129,8 @@ void Compiler::load_project() {
         this->ok = false;
         return;
     }
-    PackageChecker pc;
-    bool check_ok = pc.check_package(root_package, top_package);
+    PackageChecker pc(top_package);
+    bool check_ok = pc.check_package(root_package);
     if (!check_ok) {
         this->ok = false;
         return;

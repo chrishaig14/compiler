@@ -112,31 +112,42 @@ void resolve_module_imports(Module& module, Package& top_package) {
 
 
 class PackageChecker {
-    bool check_module(Module& module, Package& top_package) {
-        resolve_module_imports(module, top_package);
-        ModuleChecker checker(top_package, module);
+    bool check_module(Module& module) {
+        resolve_module_imports(module, this->top_package);
+        ModuleChecker checker(this->top_package, module);
         module.sast = checker.visit_root(*module.ast);
         return checker.error_reporter.ok();
     }
 
+    bool check_unit(Unit& uvalue) {
+        bool ok = true;
+        if (uvalue.is_package()) {
+            Package& subpackage = uvalue.package();
+            if (not this->check_package(subpackage)) {
+                ok = false;
+                std::cout << E_HLT("Failed checking package ") << E_INFO(subpackage.name) << std::endl;
+            }
+        } else if (uvalue.is_module()) {
+            Module& module = uvalue.module();
+            if (not this->check_module(module)) {
+                std::cout << E_HLT("Failed checking module ") << E_INFO(module.name) << std::endl;
+                ok = false;
+            }
+        }
+        return ok;
+    }
+
+    Package& top_package;
 public:
-    bool check_package(Package& package, Package& top_package) {
+    PackageChecker(Package& top_package) : top_package(top_package) {
+    }
+
+    bool check_package(Package& package) {
         // std::cout << "Analyzing package " << package->name << std::endl;
         bool ok = true;
         for (const auto& ep: package.units) {
-            Unit* uvalue = ep.second.get();
-            if (uvalue->is_package()) {
-                Package& subpackage = uvalue->package();
-                if (not check_package(subpackage, top_package)) {
-                    ok = false;
-                    std::cout << E_HLT("Failed checking package ") << E_INFO(subpackage.name) << std::endl;
-                }
-            } else if (uvalue->is_module()) {
-                Module& module = uvalue->module();
-                if (not check_module(module, top_package)) {
-                    std::cout << E_HLT("Failed checking module ") << E_INFO(module.name) << std::endl;
-                    ok = false;
-                }
+            if (not this->check_unit(*ep.second)) {
+                ok = false;
             }
         }
         return ok;
