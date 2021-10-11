@@ -60,8 +60,7 @@ sem::Common* make_for_snode(ast::For& node, std::unique_ptr<sem::Block>& binfo, 
 
 std::unique_ptr<sem::EnumDef> Checker::visit_enum(ast::EnumNode& p_node) {
     sem::UCommon info_u;
-    Enum& enumm = this->scope->get(p_node.id).get_enum().enumm;
-    auto esn = std::make_unique<sem::EnumDef>(enumm.path.as_str(), p_node.values);
+    auto esn = std::make_unique<sem::EnumDef>(p_node.id, p_node.values);
     return esn;
 }
 

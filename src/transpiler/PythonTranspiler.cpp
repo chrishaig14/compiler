@@ -308,12 +308,19 @@ PythonOutputCode PythonTranspiler::transpile_match(const sem::Match& node) {
 }
 
 PythonOutputCode PythonTranspiler::transpile_enum(const sem::EnumDef& node) {
-    return "";
+    std::string values;
+    size_t i = 0;
+    for (auto v: node.values) {
+        values += v + " = " + std::to_string(i++) + "\n";
+    }
+    std::string code = "class " + node.id + ":\n";
+    std::string eq = "@staticmethod\ndef __eq__(a, b):\n    return a == b";
+    code += indent_paragraph(values + "\n" + eq, 4);
+    return code;
 }
 
 PythonExpressionOutputCode PythonTranspiler::transpile_enum_member(const sem::EnumMember& node) {
-    std::string out;
-    out += (node.enum_name) + "_" + node.value;
+    std::string out = this->clean_path(node.enum_path) + "." + node.value;
     return PythonExpressionOutputCode("", out);
 }
 

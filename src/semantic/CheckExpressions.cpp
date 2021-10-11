@@ -196,7 +196,7 @@ UExpressionInfo Checker::visit_binop(ast::BinaryOp& n) {
     }
     Entity& l_entity = left_info_p->entity.get();
     if (l_entity.e_type != E_TYPE::VALUE) {
-        // this->error_reporter.error(std::make_unique<ErrorExpectedExpression>(l_entity, n.left));
+        this->error_reporter.error(std::make_unique<ErrorExpectedExpression>(l_entity, n.left));
         return exp_error_stub();
     }
     EntityValue& l_entity_v = l_entity.get_value();
@@ -207,30 +207,43 @@ UExpressionInfo Checker::visit_binop(ast::BinaryOp& n) {
     auto& right_snode = right_sinfo->exp_snode;
 
     std::string fun = binoptype_to_str(n.op);
-
-    // Entity entity(std::make_unique<Value>(left_info_p->entity.type->object().clone()));
-    // this->fill_value(entity.value);
-    ConcreteClass* cls = l_entity_v.clazz;
-    assert(cls != nullptr);
-    auto operator_fun_it = cls->static_methods.find(fun);
-    if (operator_fun_it == cls->static_methods.end()) {
-        this->error_reporter.error(std::make_unique<ErrorClassNoMethodForOp>(cls->class_name, fun, n));
-        return exp_error_stub();
-    }
-    ConstFunction& operator_fun = *operator_fun_it->second;
-    // auto function_id = std::make_unique<sem::Id>(operator_fun.path.as_str());
-    std::vector<sem::UExp> vv;
-    vv.push_back(std::move(left_info_p->exp_snode));
-    vv.push_back(std::move(right_snode));
-    auto sn = std::make_unique<sem::CallExp>(std::make_unique<sem::ConstFunction>(operator_fun.path), std::move(vv));
-    sem::Type* rettype = operator_fun.const_function_ft.return_type->clone();
-
     UExpressionInfo info_u = std::make_unique<ExpressionInfo>();
     ExpressionInfo& info = *info_u;
-    // auto v = std::make_unique<Value>(rettype);
-    // this->fill_value(*v);
-    info.set_entity(this->make_value(rettype));
-    info.exp_snode = std::move(sn);
+    if (l_entity_v.metatype == Meta::ENUM) {
+        std::cout << "comparing enums!" << std::endl;
+        std::vector<sem::UExp> v;
+        v.push_back(std::move(left_info_p->exp_snode));
+        v.push_back(std::move(right_sinfo->exp_snode));
+        info.set_entity(this->entity_value_from_actual_base_path_no_generic(Path("libcore.libcore.Boolean")).clone());
+        info.exp_snode = std::make_unique<sem::CallExp>(std::make_unique<sem::StaticMethod>(l_entity_v.enumm->path,
+                                                                                            "__eq__"), std::move(v));
+    } else {
+
+
+        // Entity entity(std::make_unique<Value>(left_info_p->entity.type->object().clone()));
+        // this->fill_value(entity.value);
+        ConcreteClass* cls = l_entity_v.clazz;
+        assert(cls != nullptr);
+        auto operator_fun_it = cls->static_methods.find(fun);
+        if (operator_fun_it == cls->static_methods.end()) {
+            this->error_reporter.error(std::make_unique<ErrorClassNoMethodForOp>(cls->class_name, fun, n));
+            return exp_error_stub();
+        }
+        ConstFunction& operator_fun = *operator_fun_it->second;
+        // auto function_id = std::make_unique<sem::Id>(operator_fun.path.as_str());
+        std::vector<sem::UExp> vv;
+        vv.push_back(std::move(left_info_p->exp_snode));
+        vv.push_back(std::move(right_snode));
+        auto sn = std::make_unique<sem::CallExp>(std::make_unique<sem::ConstFunction>(operator_fun.path),
+                                                 std::move(vv));
+        sem::Type* rettype = operator_fun.const_function_ft.return_type->clone();
+
+
+        // auto v = std::make_unique<Value>(rettype);
+        // this->fill_value(*v);
+        info.set_entity(this->make_value(rettype));
+        info.exp_snode = std::move(sn);
+    }
     return info_u;
 }
 

@@ -8,13 +8,14 @@
 
 #include <string>
 #include "Exp.h"
+#include "../../../util/Path.h"
 
 class sem::EnumMember : public sem::Exp {
 public:
-    EnumMember(const std::string& enum_name, const std::string& value);
+    EnumMember(Path enum_path, const std::string& value);
     bool equals(const Exp& o) const override;
 
-    std::string enum_name;
+    Path enum_path;
     std::string value;
 };
 

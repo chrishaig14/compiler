@@ -179,7 +179,7 @@ UExpressionInfo Checker::enum_member(ast::Member& node, Enum& enumm) {
             auto* otype = new sem::TypeObject(enumm.enumm_name, enumm.path);
             info.set_entity(std::make_unique<EntityValue>(otype, &enumm));
             // this->fill_value(info.entity.value);
-            info.exp_snode = std::make_unique<sem::EnumMember>(enumm.path.as_str(), value);
+            info.exp_snode = std::make_unique<sem::EnumMember>(enumm.path, value);
             return info_u;
         }
     }
