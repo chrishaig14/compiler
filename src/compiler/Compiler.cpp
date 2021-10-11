@@ -6,7 +6,7 @@
 #include "Compiler.h"
 #include "../logging/logging.h"
 #include "utils.h"
-#include "../transpiler/PythonTranspiler.h"
+#include "../transpiler/PythonModuleTranspiler.h"
 
 Compiler::Compiler(const std::string& project_dir, const std::string& project_output_dir,
                    const std::string& output_name, const std::string& lib_path, bool is_lib, const std::string& version)

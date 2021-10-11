@@ -86,4 +86,4 @@ add_library(
         top/src/KlassDef.cpp
         top/src/Module.cpp
         top/src/Top.cpp
-        common/src/For.cpp common/include/For.h expressions/src/StaticMethod.cpp expressions/src/StaticMethod.h)
+        common/src/For.cpp common/include/For.h expressions/src/StaticMethod.cpp expressions/include/StaticMethod.h)

@@ -7,26 +7,26 @@
 #include "../src/semantic/Checker.h"
 #include "../src/semantic/errors/include/errors.h"
 #include "../src/semantic/GlobalProcessor.h"
-#include "../src/transpiler/PythonTranspiler.h"
+#include "../src/transpiler/PythonModuleTranspiler.h"
 
 Module m(Path(""), "", false);
 
 TEST_CASE("python_transpile_string", "[checker]") {
-    PythonTranspiler pt(m);
+    PythonModuleTranspiler pt(m);
     // "Hello"
     PythonExpressionOutputCode poc = pt.transpile_string(sem::String("Hello"));
     REQUIRE(poc.code == "String(\"Hello\")");
 }
 
 TEST_CASE("python_transpile_integer", "[checker]") {
-    PythonTranspiler pt(m);
+    PythonModuleTranspiler pt(m);
     // 781
     PythonExpressionOutputCode poc = pt.transpile_integer(sem::Integer("781"));
     REQUIRE(poc.code == "Integer(781)");
 }
 
 TEST_CASE("python_transpile_boolean", "[checker]") {
-    PythonTranspiler pt(m);
+    PythonModuleTranspiler pt(m);
     // false
     PythonExpressionOutputCode poc = pt.transpile_boolean(sem::Bool(false));
     REQUIRE(poc.code == "Boolean(False)");
@@ -94,7 +94,7 @@ TEST_CASE("python_transpile_boolean", "[checker]") {
 // }
 //
 TEST_CASE("python_transpile_const_function_call_with_complex_args", "[checker]") {
-    PythonTranspiler pt(m);
+    PythonModuleTranspiler pt(m);
     std::vector<sem::UExp> complex_arg_vec;
     complex_arg_vec.push_back(std::make_unique<sem::Integer>("45"));
     auto poc = pt.transpile_call_exp(sem::CallExp(std::make_unique<sem::ConstFunction>(Path("mymodule.myfunction")),
@@ -106,7 +106,7 @@ arg_1 = Integer(45)
 }
 //
 TEST_CASE("python_transpile_if", "[checker]") {
-    PythonTranspiler pt(m);
+    PythonModuleTranspiler pt(m);
     auto then = std::make_unique<sem::Block>();
     std::vector<sem::UExp> arg_vec;
     arg_vec.push_back(std::make_unique<sem::Integer>("78"));
@@ -119,7 +119,7 @@ if condition_0:
 }
 
 TEST_CASE("python_transpile_assignment", "[checker]") {
-    PythonTranspiler pt(m);
+    PythonModuleTranspiler pt(m);
     // x = 314
     PythonOutputCode poc = pt.transpile_assignment(sem::Assignment(std::make_unique<sem::Id>("x"),
                                                                    std::make_unique<sem::Integer>("314")));
@@ -142,7 +142,7 @@ TEST_CASE("python_transpile_assignment", "[checker]") {
 
 
 TEST_CASE("python_transpile_while", "[checker]") {
-    PythonTranspiler pt(m);
+    PythonModuleTranspiler pt(m);
     auto then = std::make_unique<sem::Block>();
     then->nodes.emplace_back(new sem::Assignment(std::make_unique<sem::Id>("x"), std::make_unique<sem::Integer>("99")));
     // while(false){x=99}
@@ -154,7 +154,7 @@ while condition_0:
 }
 
 TEST_CASE("python_transpile_function_def", "[checker]") {
-    PythonTranspiler pt(m);
+    PythonModuleTranspiler pt(m);
     auto body = std::make_unique<sem::Block>();
     body->nodes.emplace_back(new sem::Assignment(std::make_unique<sem::Id>("x"), std::make_unique<sem::Integer>("99")));
     // fun myfoo(a,b){x=99}

@@ -1,7 +1,7 @@
 #include <set>
 #include "utils.h"
 #include "Compiler.h"
-#include "../transpiler/PythonTranspiler.h"
+#include "../transpiler/PythonModuleTranspiler.h"
 
 std::string join(VectorOfStrings v, std::string s) {
     std::string result;
@@ -13,7 +13,7 @@ std::string join(VectorOfStrings v, std::string s) {
 }
 
 void transpile_module(Module& module, const std::string& output_dir) {
-    PythonTranspiler transpiler(module);
+    PythonModuleTranspiler transpiler(module);
     std::string module_code = transpiler.transpile_module(*module.sast, module.path);
     // std::cout << module_code << std::endl;
     const std::string& module_output_path = path_join(output_dir, module.name + ".py");

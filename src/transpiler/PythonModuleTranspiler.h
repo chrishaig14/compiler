@@ -2,8 +2,8 @@
 // Created by chris on 31/8/21.
 //
 
-#ifndef XLANG_PYTHONTRANSPILER_H
-#define XLANG_PYTHONTRANSPILER_H
+#ifndef XLANG_PYTHONMODULETRANSPILER_H
+#define XLANG_PYTHONMODULETRANSPILER_H
 
 #include "../simple_nodes/top/include/top.h"
 #include "../simple_nodes/common/include/common.h"
@@ -38,7 +38,7 @@ typedef std::string PythonOutputCode;
 
 std::string pre_if_any(const PythonExpressionOutputCode& c);
 
-class PythonTranspiler {
+class PythonModuleTranspiler {
     size_t arg_n;
 public:
     bool add_self{};
@@ -77,7 +77,7 @@ public:
     PythonOutputCode transpile_try_catch(const sem::TryCatch& node);
     PythonOutputCode transpile_while(const sem::While& node);
 
-    PythonTranspiler(Module& module);
+    PythonModuleTranspiler(Module& module);
     size_t indent_level;
     size_t next_arg_n();
     std::string header;
@@ -99,4 +99,4 @@ public:
 };
 
 
-#endif //XLANG_PYTHONTRANSPILER_H
+#endif //XLANG_PYTHONMODULETRANSPILER_H
