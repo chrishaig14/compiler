@@ -3,7 +3,7 @@
 #include "../src/parser/Parser.h"
 #include "../src/ast/expressions/include/UnaryOp.h"
 #include "../src/ast/expressions/include/CallExp.h"
-#include "../src/semantic/GlobalProcessor.h"
+#include "../src/semantic/ModulePrechecker.h"
 #include "../src/semantic/Checker.h"
 #include "../src/compiler/Compiler.h"
 #include "../src/compiler/analyze.h"

@@ -2,7 +2,7 @@
 #include "../src/scanner/Scanner.h"
 #include "../src/parser/Parser.h"
 #include "../src/ast/expressions/include/UnaryOp.h"
-#include "../src/semantic/GlobalProcessor.h"
+#include "../src/semantic/ModulePrechecker.h"
 #include "../src/simple_nodes/common/include/TypeObject.h"
 
 const ast::ObjectType NO_TYPE(".None");
@@ -15,7 +15,7 @@ TEST_CASE("global_main", "[parser]") {
     Parser parser("test", scanner.code_lines, tokens);
     Module module(Path("main.foo"), "foo.xl", false);
     module.ast = parser.parse_module();
-    GlobalProcessor gp(module);
+    ModulePrechecker gp(module);
     gp.visit_root();
 
     REQUIRE(module.members.size() == 1);
@@ -36,7 +36,7 @@ TEST_CASE("global_class", "[parser]") {
     Parser parser("test", scanner.code_lines, tokens);
     Module module(Path("main.foo"), "foo.xl", false);
     module.ast = parser.parse_module();
-    GlobalProcessor gp(module);
+    ModulePrechecker gp(module);
     gp.visit_root();
 
     REQUIRE(module.members.size() == 1);
@@ -81,7 +81,7 @@ TEST_CASE("global_multiple", "[parser]") {
     Parser parser("test", scanner.code_lines, tokens);
     Module module(Path("main.foo"), "foo.xl", false);
     module.ast = parser.parse_module();
-    GlobalProcessor gp(module);
+    ModulePrechecker gp(module);
     gp.visit_root();
 
     REQUIRE(module.members.size() == 2);

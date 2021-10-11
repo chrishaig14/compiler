@@ -3,7 +3,7 @@
 //
 
 #include <iostream>
-#include "GlobalProcessor.h"
+#include "ModulePrechecker.h"
 #include "../scanner/Scanner.h"
 #include "../parser/Parser.h"
 #include "../ast/general/ObjectType.h"
@@ -19,7 +19,7 @@ const VectorOfStrings default_imports = {"libcore.libcore.String", "libcore.libc
                                          "libcore.libcore.input", "libcore.libcore.File"};
 
 
-void GlobalProcessor::visit_import(ast::Import& node) {
+void ModulePrechecker::visit_import(ast::Import& node) {
     const Path& node_path = Path(node.path);
     if (node.has_alias) {
         if (this->module.imported_paths_with_alias.count(node.alias) != 0) {
@@ -42,7 +42,7 @@ void GlobalProcessor::visit_import(ast::Import& node) {
     }
 }
 
-void GlobalProcessor::add_default_imports() {
+void ModulePrechecker::add_default_imports() {
     for (auto& import_path: default_imports) {
         Path path(import_path);
         if (this->module.imported_paths_with_alias.count(path.basname()) != 0) {
@@ -59,7 +59,7 @@ void GlobalProcessor::add_default_imports() {
 }
 
 
-void GlobalProcessor::visit_function(ast::Function& node) {
+void ModulePrechecker::visit_function(ast::Function& node) {
     ast::VectorOfTypes x;
     for (ast::Type& type_node: node.parameter_types) {
         this->module.fill_actual(type_node);
@@ -84,7 +84,7 @@ std::unique_ptr<Enum> make_enum(ast::EnumNode& n, Path module_path) {
     return enumm;
 }
 
-void GlobalProcessor::visit_root() {
+void ModulePrechecker::visit_root() {
     ast::Module& node = *this->module.ast;
     this->add_default_imports();
     this->check_duplicated_names(node);
@@ -110,7 +110,7 @@ void GlobalProcessor::visit_root() {
 
 }
 
-void GlobalProcessor::check_duplicated_names(ast::Module& node) {
+void ModulePrechecker::check_duplicated_names(ast::Module& node) {
     std::map<std::string, void*> names;
     for (auto& np: node.all) {
         auto& n = *np;
@@ -137,13 +137,13 @@ void GlobalProcessor::check_duplicated_names(ast::Module& node) {
 }
 
 
-void GlobalProcessor::visit_block(ast::Block& node) {
+void ModulePrechecker::visit_block(ast::Block& node) {
     for (auto& n: node.nodes) {
         this->dispatch(*n);
     }
 }
 
-void GlobalProcessor::visit_class(ast::Klass& node) {
+void ModulePrechecker::visit_class(ast::Klass& node) {
     ConcreteClass* class_info = &this->module.members[node.class_name]->klass();
     //
     // if (this->imported_paths.count(node.class_name) == 1) {
@@ -208,7 +208,7 @@ void GlobalProcessor::visit_class(ast::Klass& node) {
     // class_info->path = Path(this->module.path, class_info->class_name);
 }
 
-void GlobalProcessor::dispatch(ast::Statement& nod) {
+void ModulePrechecker::dispatch(ast::Statement& nod) {
     switch (nod.ntype) {
         case StatementType::CLS:
             this->visit_class((ast::Klass&) nod);
@@ -227,14 +227,14 @@ void GlobalProcessor::dispatch(ast::Statement& nod) {
     }
 }
 
-void GlobalProcessor::visit_alias(ast::Alias& node) {
+void ModulePrechecker::visit_alias(ast::Alias& node) {
     this->module.fill_actual(*node.aliased_type);
     this->module.aliased_types[node.alias_id] = node.aliased_type;
 }
 
-void GlobalProcessor::visit_enum(ast::EnumNode& node) {
+void ModulePrechecker::visit_enum(ast::EnumNode& node) {
 
 }
 
-GlobalProcessor::GlobalProcessor(Module& module) : module(module), error_reporter(module.code_lines) {
+ModulePrechecker::ModulePrechecker(Module& module) : module(module), error_reporter(module.code_lines) {
 }

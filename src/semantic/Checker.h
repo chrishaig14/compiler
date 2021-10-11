@@ -41,7 +41,7 @@
 #include "CheckerUtils.h"
 #include "errors/include/ErrorReporter.h"
 #include "errors/include/errors.h"
-#include "GlobalProcessor.h"
+#include "ModulePrechecker.h"
 #include "util.h"
 #include "ExpressionInfo.h"
 #include "../units/entities/EntityConstFunction.h"

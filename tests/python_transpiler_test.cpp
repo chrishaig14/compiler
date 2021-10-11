@@ -6,7 +6,7 @@
 #include "../src/scanner/Scanner.h"
 #include "../src/semantic/Checker.h"
 #include "../src/semantic/errors/include/errors.h"
-#include "../src/semantic/GlobalProcessor.h"
+#include "../src/semantic/ModulePrechecker.h"
 #include "../src/transpiler/python/PythonModuleTranspiler.h"
 
 Module m(Path(""), "", false);

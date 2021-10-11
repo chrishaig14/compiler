@@ -2,7 +2,7 @@
 #include "../src/scanner/Scanner.h"
 #include "../src/parser/Parser.h"
 #include "../src/ast/expressions/include/UnaryOp.h"
-#include "../src/semantic/GlobalProcessor.h"
+#include "../src/semantic/ModulePrechecker.h"
 #include "../src/simple_nodes/common/include/TypeObject.h"
 #include "../src/compiler/Compiler.h"
 

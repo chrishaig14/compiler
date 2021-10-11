@@ -18,11 +18,11 @@
 #include "../units/infos/Module.h"
 #include "errors/include/ErrorReporter.h"
 
-class GlobalProcessor {
+class ModulePrechecker {
 public:
     Module& module;
     ErrorReporter error_reporter;
-    explicit GlobalProcessor(Module& module);
+    explicit ModulePrechecker(Module& module);
 
     void visit_root();
 

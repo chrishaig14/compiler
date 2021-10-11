@@ -137,7 +137,7 @@ void add_local_path_to_module(Module& module, Path path, Package& top_package) {
 }
 
 bool preprocess_module(Module& module) {
-    GlobalProcessor gp(module);
+    ModulePrechecker gp(module);
     std::cout << "** Global-processing module " << E_INFO(module.name) << " at path: " << E_INFO(module.abs_path)
               << std::endl;
     gp.visit_root();

@@ -79,7 +79,7 @@ add_library(
     errors/src/ErrorUnusedReturnValue.cpp
     ExpressionInfo.cpp
     ExpressionInfo.h
-    GlobalProcessor.cpp
+    ModulePrechecker.cpp
     SymbolTable.cpp
     SymbolTable.h
     util.cpp

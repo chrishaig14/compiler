@@ -5,7 +5,7 @@
 #include "../src/parser/Parser.h"
 #include "../src/scanner/Scanner.h"
 #include "../src/semantic/Checker.h"
-#include "../src/semantic/GlobalProcessor.h"
+#include "../src/semantic/ModulePrechecker.h"
 #include "../src/simple_nodes/common/include/common.h"
 #include "../src/simple_nodes/common/include/TypeFunction.h"
 #include "../src/simple_nodes/expressions/include/expressions.h"

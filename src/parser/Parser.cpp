@@ -3,7 +3,7 @@
 //
 
 #include "Parser.h"
-#include "../semantic/GlobalProcessor.h"
+#include "../semantic/ModulePrechecker.h"
 #include "../ast/expressions/include/PartialApplication.h"
 #include "../ast/expressions/include/UnaryOp.h"
 #include "../ast/top/Module.h"
