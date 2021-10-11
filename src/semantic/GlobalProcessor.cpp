@@ -13,6 +13,12 @@
 #include "errors/include/ErrorRedeclared.h"
 #include "errors/include/ErrorGlobalRedeclared.h"
 
+const VectorOfStrings default_imports = {"libcore.libcore.String", "libcore.libcore.Integer", "libcore.libcore.List",
+                                         "libcore.libcore.Double", "libcore.libcore.Boolean", "libcore.libcore.Float",
+                                         "libcore.libcore.Option", "libcore.libcore.print", "libcore.libcore.Dict",
+                                         "libcore.libcore.input", "libcore.libcore.File"};
+
+
 void GlobalProcessor::visit_import(ast::Import& node) {
     const Path& node_path = Path(node.path);
     if (node.has_alias) {
@@ -37,15 +43,8 @@ void GlobalProcessor::visit_import(ast::Import& node) {
 }
 
 void GlobalProcessor::add_default_imports() {
-    std::vector<Path> default_paths = {Path("libcore.libcore.String"), Path("libcore.libcore.Integer"),
-                                       Path("libcore.libcore.List"), Path("libcore.libcore.Double"),
-                                       Path("libcore.libcore.Boolean"), Path("libcore.libcore.Float"),
-                                       Path("libcore.libcore.Option"), Path("libcore.libcore.print"),
-                                       Path("libcore.libcore.Dict"),
-                                       Path("libcore.libcore.input"),
-                                       Path("libcore.libcore.File")
-                                       };
-    for (auto& path: default_paths) {
+    for (auto& import_path: default_imports) {
+        Path path(import_path);
         if (this->module.imported_paths_with_alias.count(path.basname()) != 0) {
             std::cout << this->module.abs_path << std::endl;
             throw std::runtime_error("Path " + path.as_str() + " already imported!");
