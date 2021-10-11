@@ -8,6 +8,7 @@
 #include "utils.h"
 #include "PackagePrechecker.h"
 #include "Loader.h"
+#include "PackageChecker.h"
 
 Compiler::Compiler(const std::string& project_dir, const std::string& project_output_dir,
                    const std::string& output_name, const std::string& lib_path, bool is_lib, const std::string& version)
@@ -32,7 +33,8 @@ bool Compiler::pre() {
 }
 
 bool Compiler::main() {
-    return check_package(root_package, top_package);
+    PackageChecker pc;
+    return pc.check_package(root_package, top_package);
 }
 
 VectorOfStrings Compiler::load_requirements(const std::string& filepath) {
@@ -127,7 +129,8 @@ void Compiler::load_project() {
         this->ok = false;
         return;
     }
-    bool check_ok = check_package(root_package, top_package);
+    PackageChecker pc;
+    bool check_ok = pc.check_package(root_package, top_package);
     if (!check_ok) {
         this->ok = false;
         return;
