@@ -181,3 +181,39 @@ void Compiler::load_top_unit(const std::string& name, const std::string& m_versi
     std::cout << "Finished loading top unit: " << E_INFO(lib_rel_top_unit_path) << std::endl;
     this->loaded_top_units[lib_rel_top_unit_path] = true;
 }
+
+void Compiler::load_project() {
+    //     // load package/module structure (including external packages, i.e. requirements)
+    //     ProjectLoader project_loader;
+    //     Package* top_package = project_loader.load(this->project_dir, this->project_name);
+    std::string req_file_path = path_join(this->project_dir, REQUIREMENTS_FILE);
+    VectorOfStrings requirements = this->load_requirements(req_file_path);
+
+    load_package(root_package, 1);
+    parse_package(root_package);
+    bool global_ok = preprocess_package(root_package);
+    if (!global_ok) {
+        this->ok = false;
+        return;
+    }
+    bool check_ok = check_package(root_package, top_package);
+    if (!check_ok) {
+        this->ok = false;
+        return;
+    }
+    //     // parse everything (loads ast for each module)
+    //     GlobalParser global_parser;
+    //     global_parser.parse();
+    //     // load parsed functions/classes/enums with GlobalProcessor for each module
+    //     GlobalGlobalProcessor global_global_processor;
+    //     global_global_processor.load();
+    //     // load imports for each module. check if imported package/module/etc. exists or not, aliases, etc.
+    //     ImportResolver import_resolver;
+    //     import_resolver.resolve();
+    //     // semantic analyze for each module. outputs semantic tree
+    //     GlobalChecker global_checker;
+    //     global_checker.check_all();
+    //     // transpile
+    //     Transpiler transpiler;
+    //     transpiler.transpile_all();
+}
