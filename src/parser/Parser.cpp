@@ -59,6 +59,7 @@ std::unique_ptr<ast::Module> Parser::parse_module() {
     std::vector<std::reference_wrapper<ast::Klass>> classes;
     std::vector<std::reference_wrapper<ast::EnumNode>> enums;
     std::vector<std::reference_wrapper<ast::Function>> functions;
+    std::vector<std::reference_wrapper<ast::TypeclassAst>> typeclasses;
 
     std::vector<std::unique_ptr<ast::TopNode>> all;
 
@@ -76,9 +77,12 @@ std::unique_ptr<ast::Module> Parser::parse_module() {
                 all.push_back(std::move(cp));
                 break;
             }
-            case TokType::TYPECLASS:
+            case TokType::TYPECLASS: {
+                auto tc = this->parse_typeclass();
+                typeclasses.emplace_back(*tc);
+                all.push_back(std::move(tc));
                 break;
-                // return this->parse_typeclass();
+            }
             case TokType::INSTANCE:
                 break;
                 // return this->parse_instance();
@@ -101,7 +105,7 @@ std::unique_ptr<ast::Module> Parser::parse_module() {
         }
     }
     // TextPosition end = this->token.end_pos;
-    auto module_ast = std::make_unique<ast::Module>(std::move(all), imports, classes, enums, functions);
+    auto module_ast = std::make_unique<ast::Module>(std::move(all), imports, classes, enums, functions, typeclasses);
     return module_ast;
 }
 
@@ -776,6 +780,19 @@ std::unique_ptr<ast::Function> Parser::parse_function_definition() {
     } else {
         return_type = std::make_unique<ast::ObjectType>(".None");
     }
+
+    std::string constraint_generic_type;
+    std::string constraint_typeclass_name;
+    if (this->match(TokType::WHERE)) {
+        // has a typeclass constraint!
+        // for now, just a single constraint, for a single generic type
+        this->next();
+        Token generic_type = this->expect_token(TokType::ID);
+        this->expect_token(TokType::DOUBLE_COLON);
+        Token typeclass_name = this->expect_token(TokType::ID);
+        constraint_generic_type = generic_type.str;
+        constraint_typeclass_name = typeclass_name.str;
+    }
     // Parse function body
     auto body = this->parse_possibly_empty_block();
 
@@ -786,6 +803,9 @@ std::unique_ptr<ast::Function> Parser::parse_function_definition() {
                                                 body,
                                                 fun_tok.start,
                                                 body->end);
+    if (not constraint_generic_type.empty()) {
+        node->set_constraint(constraint_generic_type, constraint_typeclass_name);
+    }
     node->start = fun_tok.start;
     return node;
 }
@@ -1017,7 +1037,7 @@ std::unique_ptr<ast::Match> Parser::parse_match_statement() {
 }
 
 
-std::unique_ptr<ast::Typeclass> Parser::parse_typeclass() {
+std::unique_ptr<ast::TypeclassAst> Parser::parse_typeclass() {
     this->expect_token(TokType::TYPECLASS);
     Token typeclass_id = this->expect_token(TokType::ID);
     this->expect_token(TokType::LSQUARE);
@@ -1069,7 +1089,7 @@ std::unique_ptr<ast::Typeclass> Parser::parse_typeclass() {
     }
 
     Token final_curly = this->expect_token(TokType::RCURLY);
-    auto n = std::make_unique<ast::Typeclass>(typeclass_id.str,
+    auto n = std::make_unique<ast::TypeclassAst>(typeclass_id.str,
                                               base_type.str,
                                               std::move(methods),
                                               typeclass_id.start,

@@ -98,8 +98,8 @@ add_library(
     top/TopNode.cpp
     top/TopNode.h
     general/Type.h
-    top/Typeclass.cpp
-    top/Typeclass.h
+    top/TypeclassAst.cpp
+    top/TypeclassAst.h
     general/TypeNode.cpp
     statements/While.cpp
     statements/While.h

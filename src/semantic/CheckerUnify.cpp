@@ -88,8 +88,9 @@ ModuleChecker::get_first_substitution_function(ast::FunctionType& a, ast::Functi
     return nullptr;
 }
 
-std::unique_ptr<ast::FunctionType> ModuleChecker::unify_function_call(const ast::FunctionType& f, ast::VectorOfTypes& args,
-                                                                std::map<std::string, ast::Type*>& all_substitutions) {
+std::unique_ptr<ast::FunctionType>
+ModuleChecker::unify_function_call(const ast::FunctionType& f, ast::VectorOfTypes& args,
+                                   std::map<std::string, ast::Type*>& all_substitutions) {
     ast::FunctionType& fun = *f.clone();
     if (args.size() != fun.param_types.size()) {
         this->error_reporter.error(std::make_unique<ErrorFunctionCallNumArgs>((sem::TypeFunction*) fun.to_sem(),
@@ -126,7 +127,8 @@ std::unique_ptr<ast::FunctionType> ModuleChecker::unify_function_call(const ast:
     return std::unique_ptr<ast::FunctionType>(&fun);
 }
 
-std::pair<std::string, ast::Type*>* ModuleChecker::get_first_substitution(ast::Type& a, ast::Type& b, bool is_top_level_arg) {
+std::pair<std::string, ast::Type*>*
+ModuleChecker::get_first_substitution(ast::Type& a, ast::Type& b, bool is_top_level_arg) {
     if (a.kind == Kind::FUNCTION && b.kind == Kind::OBJECT) {
         this->error_reporter.fail(
                 "Error trying to unify types of different kind" + a.to_string() + " and " + b.to_string());
@@ -216,7 +218,20 @@ UExpressionInfo ModuleChecker::value_member(ast::Member& n, UExpressionInfo pare
     return this->object_member(std::move(parent_info->exp_snode), value, n.s_child, n);
 }
 
-UExpressionInfo ModuleChecker::const_function_member(ast::Member& n, UExpressionInfo unique_ptr_1, ConstFunction& function) {
+UExpressionInfo
+ModuleChecker::const_function_member(ast::Member& n, UExpressionInfo unique_ptr_1, ConstFunction& function) {
     this->error_reporter.error(std::make_unique<ErrorNoMember>(function.const_function_ft, n));
     return exp_error_stub();
+}
+
+std::unique_ptr<sem::Top> ModuleChecker::visit_typeclass(ast::TypeclassAst& typeclass) {
+    return std::unique_ptr<sem::Top>();
+}
+
+void ModuleChecker::add_typeclasses_to_generic_type(sem::Type& type, std::string gen_type, std::string typeclass_name) {
+    if (type.kind == sem::Kind::OBJECT and type.object().id.size() == 1) {
+        if (type.object().id == gen_type) {
+            type.object().add_typeclass(typeclass_name);
+        }
+    }
 }

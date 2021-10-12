@@ -40,4 +40,4 @@ add_library(
         entities/EntityValue.cpp
         entities/EntityValue.h
         packageunits/package_units.cpp
-        packageunits/package_units.h entities/EntityNone.cpp entities/EntityNone.h)
+        packageunits/package_units.h entities/EntityNone.cpp entities/EntityNone.h infos/TypeclassFoo.cpp infos/TypeclassFoo.h)

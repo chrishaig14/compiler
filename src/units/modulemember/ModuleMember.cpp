@@ -46,6 +46,14 @@ Enum& ModuleMember::enumm() {
     throw std::runtime_error("ModuleMember is not a Enum");
 }
 
+bool ModuleMember::is_typeclass() {
+    return false;
+}
+
+TypeclassFoo& ModuleMember::typeclass() {
+    throw std::runtime_error("ModuleMember is not a Typeclass");
+}
+
 ClassModuleMember::ClassModuleMember(ConcreteClass& _klass) : p_klass(_klass) {
 }
 
@@ -120,4 +128,19 @@ Package& PackageModuleMember::package() {
 
 std::unique_ptr<ModuleMember> PackageModuleMember::clone() {
     return std::make_unique<PackageModuleMember>(this->p_package);
+}
+
+TypeclassFoo& TypeclassModuleMember::typeclass() {
+    return *this->p_typeclass;
+}
+
+bool TypeclassModuleMember::is_typeclass() {
+    return true;
+}
+
+std::unique_ptr<ModuleMember> TypeclassModuleMember::clone() {
+    return std::make_unique<TypeclassModuleMember>(this->p_typeclass);
+}
+
+TypeclassModuleMember::TypeclassModuleMember(TypeclassFoo* _enumm) : p_typeclass(_enumm) {
 }

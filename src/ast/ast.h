@@ -55,7 +55,7 @@ namespace ast {
 
     class Statement;
 
-    class Typeclass;
+    class TypeclassAst;
 
     class Alias;
 

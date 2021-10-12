@@ -67,3 +67,12 @@ nlohmann::json Function::to_json() const {
             {"function", {{"id", this->identifier}, {"parameters", params}, {"body", this->body->to_json()}, {"return_type", this->return_type->to_json()}}}};
 }
 
+bool Function::has_constraints() const {
+    return not this->gen_type.empty();
+}
+
+void Function::set_constraint(std::string gen_type_s, std::string typeclass_name_s) {
+    this->gen_type = gen_type_s;
+    this->typeclass_name = typeclass_name_s;
+}
+

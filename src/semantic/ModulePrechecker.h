@@ -7,14 +7,6 @@
 
 
 #include <unordered_map>
-#include "SymbolTable.h"
-#include "../ast/top/Import.h"
-#include "../ast/top/Klass.h"
-#include "../ast/top/Alias.h"
-#include "../ast/top/EnumNode.h"
-#include "../units/infos/Enum.h"
-#include "../units/entities/EntityNothing.h"
-#include "../units/entities/EntityPackage.h"
 #include "../units/infos/Module.h"
 #include "errors/include/ErrorReporter.h"
 
@@ -35,6 +27,7 @@ public:
     void visit_class(ast::Klass& node);
     void check_duplicated_names(ast::Module& node);
     void add_default_imports();
+    void visit_typeclass(ast::TypeclassAst& typeclass);
 };
 
 #endif //GLOBALPROCESSOR_H

@@ -79,7 +79,7 @@ enum class ExpNodeType {
 
 
 enum class TopNodeType {
-    IMPORT, CLS, FUNC, ENUM,
+    IMPORT, CLS, FUNC, ENUM, TYPECLASS,
 };
 
 #endif //UNTITLED1_NODE_TYPES_H

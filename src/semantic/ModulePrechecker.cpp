@@ -4,14 +4,17 @@
 
 #include <iostream>
 #include "ModulePrechecker.h"
-#include "../scanner/Scanner.h"
-#include "../parser/Parser.h"
-#include "../ast/general/ObjectType.h"
 #include "../simple_nodes/common/include/TypeObject.h"
 #include "../simple_nodes/common/include/TypeFunction.h"
 #include "../simple_nodes/common/include/Type.h"
 #include "errors/include/ErrorRedeclared.h"
+#include "../units/entities/EntityNothing.h"
 #include "errors/include/ErrorGlobalRedeclared.h"
+#include "../ast/top/Alias.h"
+#include "../ast/top/Import.h"
+#include "../ast/top/EnumNode.h"
+#include "../ast/top/Klass.h"
+#include "../ast/top/TypeclassAst.h"
 
 const VectorOfStrings default_imports = {"libcore.libcore.String", "libcore.libcore.Integer", "libcore.libcore.List",
                                          "libcore.libcore.Double", "libcore.libcore.Boolean", "libcore.libcore.Float",
@@ -102,6 +105,11 @@ void ModulePrechecker::visit_root() {
     for (ast::Klass& n: node.classes) {
         this->visit_class(n);
     }
+
+    for (ast::TypeclassAst& n: node.typeclasses) {
+        this->visit_typeclass(n);
+    }
+
     for (ast::Function& n: node.functions) {
         this->visit_function(n);
     }
@@ -217,4 +225,11 @@ void ModulePrechecker::visit_enum(ast::EnumNode& node) {
 }
 
 ModulePrechecker::ModulePrechecker(Module& module) : module(module), error_reporter(module.code_lines) {
+}
+
+
+
+void ModulePrechecker::visit_typeclass(ast::TypeclassAst& typeclass) {
+    auto tc = std::make_unique<TypeclassFoo>(typeclass.id, typeclass.base_type);
+    this->module.add_typeclass_definition(std::move(tc));
 }

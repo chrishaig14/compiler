@@ -11,7 +11,7 @@
 #include "../scanner/CodeLines.h"
 #include "../ast/top/EnumNode.h"
 #include "../ast/general/ObjectType.h"
-#include "../ast/top/Typeclass.h"
+#include "../ast/top/TypeclassAst.h"
 #include "../ast/top/Instance.h"
 #include "../ast/top/Module.h"
 #include "../ast/top/Alias.h"
@@ -99,7 +99,7 @@ public:
     void error_expected_statement(TextPosition pos);
     void error_expected_type(Token tok);
 
-    std::unique_ptr<ast::Typeclass> parse_typeclass();
+    std::unique_ptr<ast::TypeclassAst> parse_typeclass();
     std::unique_ptr<ast::Instance> parse_instance();
 };
 

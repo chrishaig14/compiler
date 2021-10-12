@@ -47,6 +47,8 @@ public:
     sem::VectorOfTypes type_params;
     bool is_generic() const override;
     // sem::Type* aliased_type;
+    void add_typeclass(std::string typeclass_name);
+    std::string typeclass;
 };
 
 #endif //XLANG_TypeObject_H

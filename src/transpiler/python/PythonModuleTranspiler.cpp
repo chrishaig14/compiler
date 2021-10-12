@@ -377,6 +377,8 @@ PythonOutputCode PythonModuleTranspiler::dispatch_top(const sem::Top& node) {
             return this->transpile_enum((const sem::EnumDef&) node);
         case sem::TopType::CLASS:
             return this->transpile_class((const sem::KlassDef&) node);
+        case sem::TopType::TYPECLASS:
+            break;
     }
     __builtin_unreachable();
 }

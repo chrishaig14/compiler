@@ -97,8 +97,9 @@ bool is_generic(const sem::Type& t) {
     return false;
 }
 
-UExpressionInfo ModuleChecker::match_arguments_to_generic_function(const ast::FunctionType& ft, ast::VectorOfTypes arg_types,
-                                                             std::map<std::string, ast::Type*>& all_substitutions) {
+UExpressionInfo
+ModuleChecker::match_arguments_to_generic_function(const ast::FunctionType& ft, ast::VectorOfTypes arg_types,
+                                                   std::map<std::string, ast::Type*>& all_substitutions) {
     std::unique_ptr<ast::FunctionType> f;
     try {
         f = unify_function_call(ft, arg_types, all_substitutions);
@@ -319,6 +320,8 @@ std::unique_ptr<sem::Top> ModuleChecker::dispatch_top(ast::TopNode& n) {
             return this->visit_enum((ast::EnumNode&) n);
         case TopNodeType::IMPORT:
             return nullptr;
+        case TopNodeType::TYPECLASS:
+            return this->visit_typeclass((ast::TypeclassAst&) n);
     }
     __builtin_unreachable();
 }

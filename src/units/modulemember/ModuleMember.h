@@ -16,6 +16,8 @@ class ConcreteClass;
 
 class Enum;
 
+class TypeclassFoo;
+
 class ConstFunction;
 
 class Module;
@@ -36,7 +38,11 @@ public:
 
     virtual bool is_module();
 
+    virtual bool is_typeclass();
+
     virtual Module& module();
+
+    virtual TypeclassFoo& typeclass();
 
     virtual bool is_package();
 
@@ -94,6 +100,19 @@ public:
     Enum& enumm() override;
     std::unique_ptr<ModuleMember> clone() override;
 };
+
+class TypeclassModuleMember : public ModuleMember {
+    TypeclassFoo* p_typeclass;
+public:
+    explicit TypeclassModuleMember(TypeclassFoo* _enumm);
+
+    bool is_typeclass() override;
+
+    TypeclassFoo& typeclass() override;
+
+    std::unique_ptr<ModuleMember> clone() override;
+};
+
 
 class PackageModuleMember : public ModuleMember {
     Package* p_package;

@@ -213,6 +213,8 @@ public:
                                std::vector<ast::RExpNode>& narguments, const sem::TypeFunction& function_type,
                                ExpressionInfo* fun_info_p);
     std::unique_ptr<EntityValue> make_entity_value(sem::Type& type);
+    std::unique_ptr<sem::Top> visit_typeclass(ast::TypeclassAst& typeclass);
+    void add_typeclasses_to_generic_type(sem::Type& type, std::string gen_type, std::string typeclass_name);
 };
 
 #endif //CHECKER_H

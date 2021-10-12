@@ -8,6 +8,8 @@
 #include "EnumNode.h"
 #include "Function.h"
 
+
+
 template<typename T>
 std::vector<std::reference_wrapper<T>>
 vector_of_unique_ptr_to_vector_of_reference_wrapper(const std::vector<std::unique_ptr<T>>& v) {
@@ -22,7 +24,9 @@ ast::Module::Module(std::vector<std::unique_ptr<ast::TopNode>> all,
                     std::vector<std::reference_wrapper<ast::Import>> imports,
                     std::vector<std::reference_wrapper<ast::Klass>> classes,
                     std::vector<std::reference_wrapper<ast::EnumNode>> enums,
-                    std::vector<std::reference_wrapper<ast::Function>> functions)
-        : imports(imports), classes(classes), enums(enums), functions(functions), all(std::move(all)) {
+                    std::vector<std::reference_wrapper<ast::Function>> functions,
+                    std::vector<std::reference_wrapper<ast::TypeclassAst>> typeclasses)
+        : imports(imports), classes(classes), enums(enums), functions(functions), typeclasses(typeclasses),
+          all(std::move(all)) {
 }
 

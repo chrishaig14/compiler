@@ -128,17 +128,27 @@ std::unique_ptr<EntityValue> ModuleChecker::make_value(sem::Type* type) {
     if (type->kind != sem::Kind::OBJECT) {
         return nullptr;
     }
-    if (type->object().id.size() == 1) {
-        Entity& e = this->scope->get(type->object().id);
+    sem::TypeObject& type_object = type->object();
+    if (type_object.id.size() == 1) {
+        std::cout << "found generic type " << type_object.id << std::endl;
+        Entity& e = this->scope->get(type_object.id);
         ConcreteClass* clazz;
         if (e.is_notfound()) {
-            clazz = new ConcreteClass(type->object().id, Path("core.generics" + type->object().id));
+            clazz = new ConcreteClass(type_object.id, Path("core.generics" + type_object.id));
+            if (not type_object.typeclass.empty()) {
+                Entity& tc = this->scope->get(type_object.typeclass);
+                if (tc.is_notfound()) {
+                    throw std::runtime_error("did not find typeclass " + type_object.typeclass);
+                } else {
+
+                }
+            }
         } else {
             clazz = &e.get_class().clazz;
         }
         return std::make_unique<EntityValue>(type, clazz);
     }
-    ModuleMember* module_member_p = this->top_package.get(type->object().data.actual_base_path);
+    ModuleMember* module_member_p = this->top_package.get(type_object.data.actual_base_path);
     if (module_member_p == nullptr) {
         throw std::runtime_error("module_member should not be nullptr");
     }
@@ -147,10 +157,10 @@ std::unique_ptr<EntityValue> ModuleChecker::make_value(sem::Type* type) {
         return std::make_unique<EntityValue>(type, &module_member.enumm());
     }
     ConcreteClass* cls = &module_member.klass();
-    if (not type->object().type_params.empty()) {
+    if (not type_object.type_params.empty()) {
         auto instance = cls->generic_instances.find(type->actual_to_string());
         if (instance == cls->generic_instances.end()) {
-            ast::UObjectType o(&type->object().to_ast()->object());
+            ast::UObjectType o(&type_object.to_ast()->object());
             ConcreteClass* bcls = cls;
             cls = instantiate_generic(*bcls, *o);
             bcls->generic_instances[type->actual_to_string()] = std::unique_ptr<ConcreteClass>(cls);

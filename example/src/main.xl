@@ -1,14 +1,15 @@
-import example.mymodule.say_hello
-import example.mymodule
-import example.mymodule.say_goodbye
-import example
-
-fun get_seven() -> Integer {
-    return 7
+typeclass Stringable[t] {
+    fun to_string() -> String
 }
 
-fun main()->Integer{
-    var seven = get_seven()
-    print(seven.str())
+//fun foo(a: t) -> String {
+//    return a.to_string()
+//}
+
+fun bar(a: t) -> String where t::Stringable {
+    return a.to_string()
+}
+
+fun main()->Integer {
     return 0
 }

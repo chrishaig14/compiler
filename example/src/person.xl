@@ -1,0 +1,5 @@
+class Person {
+    name: String
+    age: Integer
+    children: List[Person]
+}

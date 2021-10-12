@@ -61,10 +61,10 @@ Path Module::get_actual_path(const std::string& id) {
 
 void Module::fill_actual(ast::Type& t) {
     if (t.kind == Kind::OBJECT) {
-        if (this->aliased_types.count(t.object().id) != 0) {
-            t.object().data.aliased_type = this->aliased_types[t.object().id];
-            return;
-        }
+        // if (this->aliased_types.count(t.object().id) != 0) {
+        //     t.object().data.aliased_type = this->aliased_types[t.object().id];
+        //     return;
+        // }
         this->fill_actual(t.object());
     }
     if (t.kind == Kind::FUNCTION) {
@@ -125,4 +125,9 @@ void Module::fill_actual(sem::TypeFunction& t) {
         this->fill_actual(*pt);
     }
     this->fill_actual(*t.return_type);
+}
+
+void Module::add_typeclass_definition(std::unique_ptr<TypeclassFoo> typeclass) {
+    this->members[typeclass->path.basname()] = std::make_unique<TypeclassModuleMember>(typeclass.get());
+    this->typeclasses.push_back(std::move(typeclass));
 }

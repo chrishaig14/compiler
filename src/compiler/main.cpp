@@ -26,6 +26,6 @@ int main(int argc, char* argv[]) {
     if (not compiler.main()) {
         exit(1);
     }
-    PythonProgramTranspiler ppt;
-    ppt.transpile_package(compiler.root_package, project_output_dir);
+    // PythonProgramTranspiler ppt;
+    // ppt.transpile_package(compiler.root_package, project_output_dir);
 }

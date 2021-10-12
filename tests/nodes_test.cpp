@@ -1,7 +1,7 @@
 #include "catch.hpp"
 #include "../src/ast/nodes.h"
 #include "../src/ast/general/ObjectType.h"
-#include "../src/ast/top/Typeclass.h"
+#include "../src/ast/top/TypeclassAst.h"
 #include "../src/ast/top/Instance.h"
 
 const TextPosition DUMMY_POS = {0, 0};

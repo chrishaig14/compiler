@@ -210,9 +210,10 @@ std::unique_ptr<sem::FunctionDef> ModuleChecker::visit_function(ast::Function& n
     }
     for (size_t i = 0; i < n.parameter_names.size(); i++) {
         ast::Type& type = n.parameter_types[i];
-        ast::UTypeNode cl(type.clone());
-        make_not_generic(*cl);
-        sem::UType p_type(cl->to_sem());
+        // ast::UTypeNode cl(type.clone());
+        // make_not_generic(*cl);
+        sem::UType p_type(type.to_sem());
+        add_typeclasses_to_generic_type(*p_type, n.gen_type, n.typeclass_name);
         auto te = this->make_entity_value(*p_type);
         this->scope->set(n.parameter_names[i], *te);
     }

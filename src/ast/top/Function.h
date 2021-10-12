@@ -35,6 +35,13 @@ public:
     std::unordered_map<std::string, std::string> constraints;
     Path path;
     // ConstFunction* const_function;
+
+    void set_constraint(std::string gen_type_s, std::string typeclass_name_s);
+
+    bool has_constraints() const;
+
+    std::string gen_type;
+    std::string typeclass_name;
 };
 
 

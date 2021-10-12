@@ -119,7 +119,7 @@ namespace sem {
     };
 
     enum class TopType {
-        CLASS, ENUM, FUNCTION
+        CLASS, ENUM, FUNCTION, TYPECLASS
     };
 
     typedef std::unique_ptr<Common> UCommon;
