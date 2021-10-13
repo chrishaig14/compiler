@@ -29,7 +29,6 @@ ModuleChecker::ModuleChecker(Package& top_package, Module& module)
     this->scope = new SymbolTable("global", nullptr);
     this->scopes["global"] = this->scope;
     this->add_this = false;
-    this->loop_count = 0;
 }
 
 void ModuleChecker::enter_scope(const std::string& name) {
