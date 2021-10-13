@@ -8,7 +8,7 @@
 #include "../simple_nodes/common/include/TypeFunction.h"
 #include "../units/entities/EntityNone.h"
 
-UExpressionInfo ModuleChecker::visit_boolean(ast::Boolean& node) {
+UExpressionInfo ModuleChecker::visit_boolean(const ast::Boolean& node) {
     UExpressionInfo info_u = std::make_unique<ExpressionInfo>();
     ExpressionInfo& info = *info_u;
     info.set_entity(this->entity_value_from_actual_base_path_no_generic(Path("libcore.libcore.Boolean")).clone());
@@ -218,7 +218,7 @@ UExpressionInfo ModuleChecker::visit_defconst(const ast::DefaultConstructor& nod
     return info_u;
 }
 
-UExpressionInfo ModuleChecker::visit_list(ast::List& node) {
+UExpressionInfo ModuleChecker::visit_list(const ast::List& node) {
     UExpressionInfo element_type_p = this->dispatch_rvalue(node.elements[0]);
     if (element_type_p->entity.get().e_type != E_TYPE::VALUE) {
         throw std::runtime_error("Expected expression");

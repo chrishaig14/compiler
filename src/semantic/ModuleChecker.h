@@ -115,26 +115,26 @@ public:
                                                         std::map<std::string, ast::Type*>& all_substitutions);
     void fail(std::string msg);
 
-    std::unique_ptr<sem::Block> visit_block(ast::Block& node);
+    std::unique_ptr<sem::Block> visit_block(const ast::Block& node);
     std::unique_ptr<sem::Module> check_module();
 
     sem::UCommon visit_assignment(const ast::Assignment& n);
     sem::UCommon visit_break(const ast::Break& node);
-    sem::UCommon visit_call(ast::Call& n, bool is_rvalue);
+    sem::UCommon visit_call(const ast::Call& n, bool is_rvalue);
     sem::UCommon visit_continue(const ast::Continue& node);
     sem::UCommon visit_declaration(const ast::Declaration& n);
     sem::UCommon check_declaration_with_type(const ast::Declaration& n);
     sem::UCommon check_declaration_without_type(const ast::Declaration& n);
     sem::UCommon visit_for(const ast::For& node);
     sem::UCommon visit_if(const ast::If& n);
-    sem::UCommon visit_import(ast::Import& node);
+    sem::UCommon visit_import(const ast::Import& node);
     sem::UCommon visit_return(const ast::Return& n);
     sem::UCommon visit_while(const ast::While& node);
-    sem::UCommon visit_cast(ast::Cast& n);
+    sem::UCommon visit_cast(const ast::Cast& n);
 
-    UExpressionInfo dispatch_rvalue(ast::ExpNode& n);
+    UExpressionInfo dispatch_rvalue(const ast::ExpNode& n);
     UExpressionInfo visit_binop(const ast::BinaryOp& node);
-    UExpressionInfo visit_boolean(ast::Boolean& node);
+    UExpressionInfo visit_boolean(const ast::Boolean& node);
 
     UExpressionInfo visit_call_exp(ast::CallExp& n);
 
@@ -151,7 +151,7 @@ public:
     UExpressionInfo visit_ternary(const ast::Ternary& node);
     UExpressionInfo visit_tuple(const ast::Tuple& node);
     UExpressionInfo visit_defconst(const ast::DefaultConstructor& node);
-    UExpressionInfo visit_list(ast::List& node);
+    UExpressionInfo visit_list(const ast::List& node);
     UExpressionInfo visit_member(const ast::Member& n);
     UExpressionInfo visit_none(const ast::None& node);
     UExpressionInfo
@@ -166,7 +166,7 @@ public:
     std::unique_ptr<sem::EnumDef> visit_enum(ast::EnumNode& p_node);
 
     sem::UCommon visit_match(const ast::Match& node);
-    sem::UCommon visit_alias(ast::Alias& p_node);
+    sem::UCommon visit_alias(const ast::Alias& p_node);
     sem::UExp make_rvalue(const Entity& t_entity, sem::UExp value_snode, const sem::Type& target);
     sem::UCommon dispatch(ast::Statement& nod);
     void process_function_arguments(ExpressionInfo& retv, std::vector<std::unique_ptr<Entity>>& arg_entities,
@@ -181,7 +181,7 @@ public:
                                     const ast::Type* unaliased_target_type) const;
     // sem::UCommon visit_throw(ast::ThrowNode& n);
 
-    sem::UCommon dispatch_statement(ast::Statement& n, bool is_rvalue);
+    sem::UCommon dispatch_statement(const ast::Statement& n, bool is_rvalue);
     EntityValue& entity_value_from_actual_base_path_no_generic(const Path& p);
 
     // std::map<std::string, std::unique_ptr<ConcreteClass>> classes;
@@ -189,13 +189,13 @@ public:
     void init();
     sem::Exp* make_option_rvalue(sem::Exp* value_snode, const ast::Type* unaliased_value_type,
                                  const ast::Type* unaliased_target_type) const;
-    std::unique_ptr<sem::Top> dispatch_top(ast::TopNode& n);
+    std::unique_ptr<sem::Top> dispatch_top(const ast::TopNode& n);
     UExpressionInfo visit_callexp(ast::CallExp& n, bool is_rvalue);
     sem::UCommon visit_call(ast::Call& n);
     UExpressionInfo const_function_member(const ast::Member& n, UExpressionInfo unique_ptr_1, ConstFunction& function);
     UExpressionInfo class_member(const ast::Member& n, UExpressionInfo parent_info, ConcreteClass& cls);
     UExpressionInfo value_member(const ast::Member& n, UExpressionInfo parent_info, EntityValue& value);
-    UExpressionInfo analyze_call(ast::ExpNode& function, ast::VectorOfExpNodesU arguments, bool is_rvalue, TextPosition start, TextPosition end);
+    UExpressionInfo analyze_call(const ast::ExpNode& function, ast::VectorOfExpNodesU arguments, bool is_rvalue, TextPosition start, TextPosition end);
     bool check_arguments(ast::VectorOfExpNodesU& narguments, std::vector<sem::UExp>& arguments,
                          std::vector<std::unique_ptr<Entity>>& arg_entities);
     void process_function_arguments(ExpressionInfo& retv, std::vector<std::unique_ptr<Entity>>& arg_entities,
@@ -205,7 +205,7 @@ public:
     analyze_call(ast::ExpNode& function, ast::VectorOfExpNodesU& arguments, bool is_rvalue, TextPosition start,
                  TextPosition end);
     UExpressionInfo
-    analyze_call(ast::ExpNode& function, std::vector<ast::RExpNode>& arguments, bool is_rvalue, TextPosition start,
+    analyze_call(const ast::ExpNode& function, std::vector<ast::RExpNode>& arguments, bool is_rvalue, TextPosition start,
                  TextPosition end);
     bool check_arguments(std::vector<ast::RExpNode>& narguments, std::vector<sem::UExp>& arguments,
                          std::vector<std::unique_ptr<Entity>>& arg_entities);
@@ -214,7 +214,7 @@ public:
                                std::vector<ast::RExpNode>& narguments, const sem::TypeFunction& function_type,
                                ExpressionInfo* fun_info_p);
     std::unique_ptr<EntityValue> make_entity_value(sem::Type& type);
-    std::unique_ptr<sem::Top> visit_typeclass(ast::TypeclassAst& typeclass);
+    std::unique_ptr<sem::Top> visit_typeclass(const ast::TypeclassAst& typeclass);
     void add_typeclasses_to_generic_type(sem::Type& type, std::string gen_type, std::string typeclass_name);
 };
 

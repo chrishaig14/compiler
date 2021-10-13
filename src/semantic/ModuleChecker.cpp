@@ -262,7 +262,7 @@ bool ModuleChecker::is_variable(const ast::ObjectType& a) {
     return a.type_params.empty() && (islower(a.id[0]) != 0);
 }
 
-UExpressionInfo ModuleChecker::dispatch_rvalue(ast::ExpNode& n) {
+UExpressionInfo ModuleChecker::dispatch_rvalue(const ast::ExpNode& n) {
     switch (n.ntype) {
         case ExpNodeType::BINOP: {
             return this->visit_binop((ast::BinaryOp&) n);
@@ -311,7 +311,7 @@ sem::UCommon ModuleChecker::dispatch(ast::Statement& nod) {
     return this->dispatch_statement(nod, false);
 }
 
-std::unique_ptr<sem::Top> ModuleChecker::dispatch_top(ast::TopNode& n) {
+std::unique_ptr<sem::Top> ModuleChecker::dispatch_top(const ast::TopNode& n) {
     switch (n.ntype) {
         case TopNodeType::CLS:
             return this->visit_class((ast::Klass&) n);
@@ -327,7 +327,7 @@ std::unique_ptr<sem::Top> ModuleChecker::dispatch_top(ast::TopNode& n) {
     __builtin_unreachable();
 }
 
-sem::UCommon ModuleChecker::dispatch_statement(ast::Statement& n, bool is_rvalue) {
+sem::UCommon ModuleChecker::dispatch_statement(const ast::Statement& n, bool is_rvalue) {
     switch (n.ntype) {
         case StatementType::ASSIGN:
             return this->visit_assignment((ast::Assignment&) n);

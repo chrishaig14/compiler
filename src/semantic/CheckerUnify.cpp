@@ -146,7 +146,7 @@ ModuleChecker::get_first_substitution(ast::Type& a, ast::Type& b, bool is_top_le
     }
 }
 
-sem::UCommon ModuleChecker::visit_import(ast::Import& node) {
+sem::UCommon ModuleChecker::visit_import(const ast::Import& node) {
     sem::UCommon info_u;
     return info_u;
 }
@@ -170,7 +170,7 @@ std::unique_ptr<Entity> map_module_member_to_entity(ModuleMember& module_member)
 }
 
 
-sem::UCommon ModuleChecker::visit_alias(ast::Alias& p_node) {
+sem::UCommon ModuleChecker::visit_alias(const ast::Alias& p_node) {
     sem::UCommon info_u;
     return info_u;
 }
@@ -227,7 +227,7 @@ ModuleChecker::const_function_member(const ast::Member& n, UExpressionInfo uniqu
     return exp_error_stub();
 }
 
-std::unique_ptr<sem::Top> ModuleChecker::visit_typeclass(ast::TypeclassAst& typeclass) {
+std::unique_ptr<sem::Top> ModuleChecker::visit_typeclass(const ast::TypeclassAst& typeclass) {
     return nullptr;
 }
 

@@ -41,7 +41,7 @@ UExpressionInfo ModuleChecker::visit_id(const ast::Id& n) {
     return info_u;
 }
 
-sem::UCommon ModuleChecker::visit_cast(ast::Cast& n) {
+sem::UCommon ModuleChecker::visit_cast(const ast::Cast& n) {
     return nullptr;
 }
 

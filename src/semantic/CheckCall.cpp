@@ -22,8 +22,8 @@ sem::UCommon ModuleChecker::visit_call(ast::Call& n) {
 }
 
 UExpressionInfo
-ModuleChecker::analyze_call(ast::ExpNode& function, std::vector<ast::RExpNode>& arguments, bool is_rvalue, TextPosition start,
-                      TextPosition end) {
+ModuleChecker::analyze_call(const ast::ExpNode& function, std::vector<ast::RExpNode>& arguments, bool is_rvalue, TextPosition start,
+                            TextPosition end) {
     auto retv_p = std::make_unique<ExpressionInfo>();
     auto& retv = *retv_p;
     bool old_is_call = this->is_call;

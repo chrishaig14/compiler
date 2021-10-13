@@ -178,7 +178,7 @@ std::unique_ptr<sem::Module> ModuleChecker::check_module() {
     return sn;
 }
 
-std::unique_ptr<sem::Block> ModuleChecker::visit_block(ast::Block& node) {
+std::unique_ptr<sem::Block> ModuleChecker::visit_block(const ast::Block& node) {
     auto sn = std::make_unique<sem::Block>();
     for (auto& n: node.nodes) {
         sem::UCommon sinfo_p = this->dispatch(*n);
