@@ -162,7 +162,10 @@ std::unique_ptr<Entity> map_module_member_to_entity(ModuleMember& module_member)
         return std::make_unique<EntityClass>(module_member.klass());
     } else if (module_member.is_enumm()) {
         return std::make_unique<EntityEnum>(module_member.enumm());
+    } else if (module_member.is_typeclass()) {
+        return std::make_unique<EntityTypeclass>(module_member.typeclass());
     }
+    throw std::runtime_error("Error: returning nullptr for map_module_member_to_entity");
     return nullptr;
 }
 

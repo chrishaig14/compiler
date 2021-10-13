@@ -23,7 +23,7 @@ class ConstFunction;
 class Enum;
 
 enum class E_TYPE {
-    PACKAGE, MODULE, CLASS, VALUE, CONST_FUNCTION, ERROR, NOT_FOUND, ENUM, NOTHING, NONE
+    PACKAGE, MODULE, CLASS, VALUE, CONST_FUNCTION, ERROR, NOT_FOUND, ENUM, NOTHING, NONE, TYPECLASS
 };
 
 class EntityClass;
@@ -47,6 +47,8 @@ class EntityConstFunction;
 class EntityEnum;
 
 class EntityNone;
+
+class EntityTypeclass;
 
 class Entity {
 protected:
@@ -76,6 +78,11 @@ public:
     bool is_class() const {
         return this->e_type == E_TYPE::CLASS;
     }
+
+    bool is_typeclass() const {
+        return this->e_type == E_TYPE::TYPECLASS;
+    }
+
 
     bool is_none() const {
         return this->e_type == E_TYPE::NONE;
@@ -150,9 +157,17 @@ public:
         throw std::runtime_error("Not an EntityValue");
     }
 
+    virtual EntityTypeclass& get_typeclass() {
+        throw std::runtime_error("Not an EntityTypeclass");
+    }
+
 
     virtual const EntityClass& get_class() const {
         throw std::runtime_error("Not an EntityClass");
+    }
+
+    virtual const EntityTypeclass& get_typeclass() const {
+        throw std::runtime_error("Not an EntityTypeclass");
     }
 
     virtual const EntityNone& get_none() const {

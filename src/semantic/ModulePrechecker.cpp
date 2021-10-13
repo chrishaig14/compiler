@@ -228,8 +228,20 @@ ModulePrechecker::ModulePrechecker(Module& module) : module(module), error_repor
 }
 
 
-
 void ModulePrechecker::visit_typeclass(ast::TypeclassAst& typeclass) {
-    auto tc = std::make_unique<TypeclassFoo>(typeclass.id, typeclass.base_type);
+    auto tc = std::make_unique<TypeclassFoo>(typeclass.id, typeclass.base_type, Path(this->module.path, typeclass.id));
+    for (auto& m : typeclass.methods) {
+        ast::FunctionType& method = *m.second;
+
+        sem::VectorOfTypes x;
+        for (auto& p: method.param_types) {
+            this->module.fill_actual(*p);
+            x.emplace_back(p->to_sem());
+        }
+        this->module.fill_actual(*method.return_type);
+        auto cf = std::make_unique<sem::TypeFunction>(x, sem::UType(method.return_type->to_sem()));
+        tc->methods[m.first] = std::move(cf);
+    }
+
     this->module.add_typeclass_definition(std::move(tc));
 }

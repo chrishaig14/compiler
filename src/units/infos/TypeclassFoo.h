@@ -11,13 +11,16 @@
 #include <vector>
 #include <map>
 #include "../../util/Path.h"
+#include "../../simple_nodes/sem.h"
+#include "../../simple_nodes/common/include/TypeFunction.h"
 
 class TypeclassFoo {
 public:
-    Path path;
     const std::string& id;
     const std::string& gen_type;
-    TypeclassFoo(const std::string& id, const std::string& gen_type);
+    std::map<std::string, sem::UTypeFunction> methods;
+    Path path;
+    TypeclassFoo(const std::string& id, const std::string& gen_type, Path path);
 };
 
 

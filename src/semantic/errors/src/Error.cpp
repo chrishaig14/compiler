@@ -38,6 +38,9 @@ std::string entity_to_string(const Entity& entity) {
         case E_TYPE::NONE:
             return "NONE";
             break;
+        case E_TYPE::TYPECLASS:
+            return "typeclass";
+            break;
     }
     return out;
 }

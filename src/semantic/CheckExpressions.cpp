@@ -140,7 +140,12 @@ std::unique_ptr<EntityValue> ModuleChecker::make_value(sem::Type* type) {
                 if (tc.is_notfound()) {
                     throw std::runtime_error("did not find typeclass " + type_object.typeclass);
                 } else {
-
+                    EntityTypeclass& typec = tc.get_typeclass();
+                    TypeclassFoo& tcf = typec.clazz;
+                    for (auto& m:tcf.methods) {
+                        clazz->methods[m.first] = std::make_unique<ConstFunction>(Path(tcf.path, m.first),
+                                                                                  sem::UTypeFunction(m.second->clone()));
+                    }
                 }
             }
         } else {

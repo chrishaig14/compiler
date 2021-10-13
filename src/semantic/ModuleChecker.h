@@ -52,6 +52,7 @@
 #include "../units/entities/EntityValue.h"
 #include "../units/entities/EntityError.h"
 #include "../units/entities/EntityNotFound.h"
+#include "../units/entities/EntityTypeclass.h"
 #include "../units/entities/EntityNothing.h"
 
 // #include "../logger/Logger.h"
