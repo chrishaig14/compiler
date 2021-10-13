@@ -307,7 +307,7 @@ UExpressionInfo ModuleChecker::dispatch_rvalue(const ast::ExpNode& n) {
     __builtin_unreachable();
 }
 
-sem::UCommon ModuleChecker::dispatch(ast::Statement& nod) {
+sem::UCommon ModuleChecker::dispatch(const ast::Statement& nod) {
     return this->dispatch_statement(nod, false);
 }
 
