@@ -461,7 +461,7 @@ TEST_CASE("nodes_typeclass", "[typeclass]") {
     cmethods["method1"] = std::move(method1);
     cmethods["method2"] = std::move(method2);
 
-    ast::Typeclass n("Comparable", "t", std::move(cmethods), DUMMY_POS, DUMMY_POS);
+    ast::TypeclassAst n("Comparable", "t", std::move(cmethods), DUMMY_POS, DUMMY_POS);
     nlohmann::json nj = n.to_json();
 
     REQUIRE(e == nj);

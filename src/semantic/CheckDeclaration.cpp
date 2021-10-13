@@ -94,7 +94,7 @@ sem::UExp ModuleChecker::make_rvalue(const Entity& t_entity, sem::UExp value_sno
 }
 
 sem::Exp* ModuleChecker::make_option_rvalue(sem::Exp* value_snode, const ast::Type* unaliased_value_type,
-                                      const ast::Type* unaliased_target_type) const {
+                                            const ast::Type* unaliased_target_type) const {
     if (*unaliased_target_type->object().type_params[0] == *unaliased_value_type ||
         unaliased_value_type->object().id == "NoneType") {
         return value_snode;
@@ -103,7 +103,7 @@ sem::Exp* ModuleChecker::make_option_rvalue(sem::Exp* value_snode, const ast::Ty
 }
 
 sem::UExp ModuleChecker::make_union_rvalue(sem::UExp value_snode, const sem::Type* unaliased_value_type,
-                                     const sem::Type* unaliased_target_type) const {
+                                           const sem::Type* unaliased_target_type) const {
     int union_index = target_union_type(unaliased_target_type->object(), unaliased_value_type->object());
     if (union_index != -1) {
         return sem::UExp(make_union_wrapper(union_index, std::move(value_snode)));
@@ -145,13 +145,13 @@ sem::UCommon ModuleChecker::visit_declaration(ast::Declaration& n) {
 
 sem::UCommon ModuleChecker::check_declaration_with_type(ast::Declaration& n) {
     ast::UTypeNode& type = n.type;
-    if (type->kind == Kind::OBJECT && this->module.aliased_types.count(type->object().id) == 1) {
-        ast::Type* aliased_type = this->module.aliased_types.at(type->object().id);
-        type = ast::UTypeNode(aliased_type->clone());
-    } else {
-        this->module.fill_actual(*type);
-    }
+    // if (type->kind == Kind::OBJECT && this->module.aliased_types.count(type->object().id) == 1) {
+    //     ast::Type* aliased_type = this->module.aliased_types.at(type->object().id);
+    //     type = ast::UTypeNode(aliased_type->clone());
+    // } else {
+    // }
     sem::UType sem_type(type->to_sem());
+    this->module.fill_actual(*sem_type);
     UExpressionInfo rvalue_sinfo = this->expect_rvalue_of_type(*sem_type, n.expression);
     if (rvalue_sinfo->is_error()) {
         return nullptr;

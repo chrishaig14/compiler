@@ -44,9 +44,9 @@ public:
     Module(Path path, std::string abs_path, bool is_lib);
 
     Path get_actual_path(const std::string& id);
-    void fill_actual(ast::Type& t);
-    void fill_actual(ast::ObjectType& t);
-    void fill_actual(ast::FunctionType& t);
+    // void fill_actual(ast::Type& t);
+    // void fill_actual(ast::ObjectType& t);
+    // void fill_actual(ast::FunctionType& t);
     void fill_actual(sem::Type& t);
     void fill_actual(sem::TypeObject& t);
     void fill_actual(sem::TypeFunction& t);

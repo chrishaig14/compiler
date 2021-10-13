@@ -59,39 +59,39 @@ Path Module::get_actual_path(const std::string& id) {
     throw std::runtime_error("Error: type " + id + " not found");
 }
 
-void Module::fill_actual(ast::Type& t) {
-    if (t.kind == Kind::OBJECT) {
-        // if (this->aliased_types.count(t.object().id) != 0) {
-        //     t.object().data.aliased_type = this->aliased_types[t.object().id];
-        //     return;
-        // }
-        this->fill_actual(t.object());
-    }
-    if (t.kind == Kind::FUNCTION) {
-        this->fill_actual(t.function());
-        return;
-    }
-}
-
-void Module::fill_actual(ast::ObjectType& t) {
-    if (t.id.size() == 1) {
-        return;
-    }
-    if (t.is_generic_param) {
-        return;
-    }
-    t.data.actual_base_path = this->get_actual_path(t.id);
-    for (auto* tp: t.type_params) {
-        this->fill_actual(*tp);
-    }
-}
-
-void Module::fill_actual(ast::FunctionType& t) {
-    for (auto& pt: t.param_types) {
-        this->fill_actual(*pt);
-    }
-    this->fill_actual(*t.return_type);
-}
+// void Module::fill_actual(ast::Type& t) {
+//     if (t.kind == Kind::OBJECT) {
+//         // if (this->aliased_types.count(t.object().id) != 0) {
+//         //     t.object().data.aliased_type = this->aliased_types[t.object().id];
+//         //     return;
+//         // }
+//         this->fill_actual(t.object());
+//     }
+//     if (t.kind == Kind::FUNCTION) {
+//         this->fill_actual(t.function());
+//         return;
+//     }
+// }
+//
+// void Module::fill_actual(ast::ObjectType& t) {
+//     if (t.id.size() == 1) {
+//         return;
+//     }
+//     if (t.is_generic_param) {
+//         return;
+//     }
+//     t.data.actual_base_path = this->get_actual_path(t.id);
+//     for (auto* tp: t.type_params) {
+//         this->fill_actual(*tp);
+//     }
+// }
+//
+// void Module::fill_actual(ast::FunctionType& t) {
+//     for (auto& pt: t.param_types) {
+//         this->fill_actual(*pt);
+//     }
+//     this->fill_actual(*t.return_type);
+// }
 
 void Module::fill_actual(sem::Type& t) {
     if (t.kind == sem::Kind::OBJECT) {

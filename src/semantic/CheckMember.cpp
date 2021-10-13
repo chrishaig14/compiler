@@ -98,6 +98,7 @@ ModuleChecker::object_member(sem::UExp object_snode, EntityValue& p_value, const
         info.set_entity(clazz->member_entities.at(child)->clone());
         if (info.entity.get().is_nothing()) {
             sem::UType p_type(clazz->members.at(child)->to_sem());
+            this->module.fill_actual(*p_type);
             auto eee = this->make_entity_value(*p_type);
             info.set_entity(eee->clone());
             clazz->member_entities[child] = std::move(eee);

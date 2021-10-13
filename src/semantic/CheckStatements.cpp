@@ -213,9 +213,8 @@ sem::UCommon ModuleChecker::visit_match(ast::Match& node) {
         ast::Type& case_type = *c.first;
         ast::Block& case_node = *c.second;
 
-        this->module.fill_actual(case_type);
-
         sem::Type* p_type = case_type.to_sem();
+        this->module.fill_actual(*p_type);
         int union_index = target_union_type(ot, *p_type);
         if (union_index == -1) {
             this->error_reporter.fail("Error, type " + case_type.to_string() + " not part of " + ot.to_string());

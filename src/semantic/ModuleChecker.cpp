@@ -189,7 +189,7 @@ ConcreteClass* ModuleChecker::instantiate_generic(const ConcreteClass& generic, 
     for (auto* f: generic.member_types) {
         ast::Type& concrete_type = *make_type(*f, replacements).release();
         concrete_field_types.push_back(&concrete_type);
-        this->module.fill_actual(concrete_type);
+        // this->module.fill_actual(concrete_type);
     }
 
 
@@ -197,9 +197,9 @@ ConcreteClass* ModuleChecker::instantiate_generic(const ConcreteClass& generic, 
     for (const auto& method_cf: generic.methods) {
         ast::UTypeNode t((method_cf.second)->const_function_ft.to_ast());
         ast::UTypeNode concrete_type = make_type(*t, replacements);
-        this->module.fill_actual(*concrete_type);
-        auto cf = std::make_unique<ConstFunction>(method_cf.second->path,
-                                                  sem::UTypeFunction((sem::TypeFunction*) concrete_type->to_sem()));
+        auto tf = (sem::TypeFunction*) concrete_type->to_sem();
+        this->module.fill_actual(*tf);
+        auto cf = std::make_unique<ConstFunction>(method_cf.second->path, sem::UTypeFunction(tf));
         concrete_methods[method_cf.first] = std::move(cf);
     }
 
@@ -207,9 +207,10 @@ ConcreteClass* ModuleChecker::instantiate_generic(const ConcreteClass& generic, 
     for (const auto& m: generic.static_methods) {
         ast::UTypeNode t((m.second)->const_function_ft.to_ast());
         ast::UTypeNode concrete_type(make_type(*t, replacements));
-        this->module.fill_actual(*concrete_type);
+        sem::Type* p_type = concrete_type->to_sem();
+        this->module.fill_actual(*p_type);
         concrete_static_methods[m.first] = std::make_unique<ConstFunction>(m.second->path,
-                                                                           sem::UTypeFunction((sem::TypeFunction*) concrete_type->to_sem()));;
+                                                                           sem::UTypeFunction((sem::TypeFunction*) p_type));
     }
 
     auto* concrete = new ConcreteClass(generic.class_name, generic.path);

@@ -50,8 +50,9 @@ UExpressionInfo ModuleChecker::visit_none(ast::None& node) {
 UExpressionInfo ModuleChecker::visit_emptylist(ast::EmptyList& node) {
     UExpressionInfo info_u = std::make_unique<ExpressionInfo>();
     ExpressionInfo& info = *info_u;
-    this->module.fill_actual(*node.type);
-    auto* otype = new sem::TypeObject("List", {node.type->to_sem()}, Path("libcore.libcore.List"));
+    sem::Type* nt = node.type->to_sem();
+    this->module.fill_actual(*nt);
+    auto* otype = new sem::TypeObject("List", {nt}, Path("libcore.libcore.List"));
     info.set_entity(this->make_value(otype));
     std::vector<sem::UExp> v;
     info.exp_snode = std::make_unique<sem::List>(std::move(v));

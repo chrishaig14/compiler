@@ -968,7 +968,7 @@ TEST_CASE("parse_typeclass", "[parser]") {
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser("test", scanner.code_lines, tokens);
 
-    std::unique_ptr<ast::Typeclass> ast = parser.parse_typeclass();
+    std::unique_ptr<ast::TypeclassAst> ast = parser.parse_typeclass();
     std::unordered_map<std::string, ast::UFunctionType> cmethods;
     cmethods["eq"] = std::make_unique<ast::FunctionType>(ast::VectorOfTypes{new ast::ObjectType("t"),
                                                                             new ast::ObjectType("t")},
@@ -977,7 +977,7 @@ TEST_CASE("parse_typeclass", "[parser]") {
                                                                             new ast::ObjectType("t")},
                                                          std::make_unique<ast::ObjectType>("Boolean"));
 
-    REQUIRE(ast->to_json() == ast::Typeclass("Comparable", "t", std::move(cmethods), DUMMY_POS, DUMMY_POS).to_json());
+    REQUIRE(ast->to_json() == ast::TypeclassAst("Comparable", "t", std::move(cmethods), DUMMY_POS, DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_instance", "[parser]") {

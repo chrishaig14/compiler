@@ -210,11 +210,13 @@ std::unique_ptr<sem::FunctionDef> ModuleChecker::visit_function(ast::Function& n
     if (this->add_this) {
         this->scope->set("this", *this->this_entity);
     }
+    auto& e_const_function = this->scope->get(n.identifier);
+    auto& const_function = e_const_function.get_constfun().const_function;
     for (size_t i = 0; i < n.parameter_names.size(); i++) {
-        ast::Type& type = n.parameter_types[i];
+        // ast::Type& type = n.parameter_types[i];
         // ast::UTypeNode cl(type.clone());
         // make_not_generic(*cl);
-        sem::UType p_type(type.to_sem());
+        sem::UType p_type(const_function.const_function_ft.param_types[i]->clone());
         add_typeclasses_to_generic_type(*p_type, n.gen_type, n.typeclass_name);
         auto te = this->make_entity_value(*p_type);
         this->scope->set(n.parameter_names[i], *te);
