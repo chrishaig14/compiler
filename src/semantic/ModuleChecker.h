@@ -118,54 +118,54 @@ public:
     std::unique_ptr<sem::Block> visit_block(ast::Block& node);
     std::unique_ptr<sem::Module> check_module();
 
-    sem::UCommon visit_assignment(ast::Assignment& n);
-    sem::UCommon visit_break(ast::Break& node);
+    sem::UCommon visit_assignment(const ast::Assignment& n);
+    sem::UCommon visit_break(const ast::Break& node);
     sem::UCommon visit_call(ast::Call& n, bool is_rvalue);
-    sem::UCommon visit_continue(ast::Continue& node);
-    sem::UCommon visit_declaration(ast::Declaration& n);
-    sem::UCommon check_declaration_with_type(ast::Declaration& n);
-    sem::UCommon check_declaration_without_type(ast::Declaration& n);
-    sem::UCommon visit_for(ast::For& node);
-    sem::UCommon visit_if(ast::If& n);
+    sem::UCommon visit_continue(const ast::Continue& node);
+    sem::UCommon visit_declaration(const ast::Declaration& n);
+    sem::UCommon check_declaration_with_type(const ast::Declaration& n);
+    sem::UCommon check_declaration_without_type(const ast::Declaration& n);
+    sem::UCommon visit_for(const ast::For& node);
+    sem::UCommon visit_if(const ast::If& n);
     sem::UCommon visit_import(ast::Import& node);
-    sem::UCommon visit_return(ast::Return& n);
-    sem::UCommon visit_while(ast::While& node);
+    sem::UCommon visit_return(const ast::Return& n);
+    sem::UCommon visit_while(const ast::While& node);
     sem::UCommon visit_cast(ast::Cast& n);
 
     UExpressionInfo dispatch_rvalue(ast::ExpNode& n);
-    UExpressionInfo visit_binop(ast::BinaryOp& node);
+    UExpressionInfo visit_binop(const ast::BinaryOp& node);
     UExpressionInfo visit_boolean(ast::Boolean& node);
 
     UExpressionInfo visit_call_exp(ast::CallExp& n);
 
-    sem::UCommon visit_lvalue_subscript(ast::Subscript& node);
-    UExpressionInfo visit_dict(ast::DictNode& node);
-    UExpressionInfo visit_unary(ast::UnaryOp& n);
-    UExpressionInfo visit_emptydict(ast::EmptyDict& node);
-    UExpressionInfo visit_emptylist(ast::EmptyList& node);
-    UExpressionInfo visit_id(ast::Id& n);
-    UExpressionInfo visit_number(ast::Number& node);
-    UExpressionInfo visit_partial(ast::PartialApplication& node);
-    UExpressionInfo visit_string(ast::String& node);
-    UExpressionInfo visit_subscript(ast::Subscript& node);
-    UExpressionInfo visit_ternary(ast::Ternary& node);
-    UExpressionInfo visit_tuple(ast::Tuple& node);
-    UExpressionInfo visit_defconst(ast::DefaultConstructor& node);
+    sem::UCommon visit_lvalue_subscript(const ast::Subscript& node);
+    UExpressionInfo visit_dict(const ast::DictNode& node);
+    UExpressionInfo visit_unary(const ast::UnaryOp& n);
+    UExpressionInfo visit_emptydict(const ast::EmptyDict& node);
+    UExpressionInfo visit_emptylist(const ast::EmptyList& node);
+    UExpressionInfo visit_id(const ast::Id& n);
+    UExpressionInfo visit_number(const ast::Number& node);
+    UExpressionInfo visit_partial(const ast::PartialApplication& node);
+    UExpressionInfo visit_string(const ast::String& node);
+    UExpressionInfo visit_subscript(const ast::Subscript& node);
+    UExpressionInfo visit_ternary(const ast::Ternary& node);
+    UExpressionInfo visit_tuple(const ast::Tuple& node);
+    UExpressionInfo visit_defconst(const ast::DefaultConstructor& node);
     UExpressionInfo visit_list(ast::List& node);
-    UExpressionInfo visit_member(ast::Member& n);
-    UExpressionInfo visit_none(ast::None& node);
+    UExpressionInfo visit_member(const ast::Member& n);
+    UExpressionInfo visit_none(const ast::None& node);
     UExpressionInfo
-    object_member(sem::UExp object_snode, EntityValue& p_value, const std::string& child, ast::Member& n);
-    UExpressionInfo package_member(ast::Member& n, Package& package);
-    UExpressionInfo module_member(ast::Member& n, Module& mod);
-    UExpressionInfo enum_member(ast::Member& node, Enum& enumm);
+    object_member(sem::UExp object_snode, EntityValue& p_value, const std::string& child, const ast::Member& n);
+    UExpressionInfo package_member(const ast::Member& n, Package& package);
+    UExpressionInfo module_member(const ast::Member& n, Module& mod);
+    UExpressionInfo enum_member(const ast::Member& node, Enum& enumm);
     UExpressionInfo expect_rvalue_of_type(const sem::Type& target, ast::ExpNode& node);
 
     std::unique_ptr<sem::FunctionDef> visit_function(ast::Function& n);
     std::unique_ptr<sem::KlassDef> visit_class(ast::Klass& node);
     std::unique_ptr<sem::EnumDef> visit_enum(ast::EnumNode& p_node);
 
-    sem::UCommon visit_match(ast::Match& node);
+    sem::UCommon visit_match(const ast::Match& node);
     sem::UCommon visit_alias(ast::Alias& p_node);
     sem::UExp make_rvalue(const Entity& t_entity, sem::UExp value_snode, const sem::Type& target);
     sem::UCommon dispatch(ast::Statement& nod);
@@ -192,9 +192,9 @@ public:
     std::unique_ptr<sem::Top> dispatch_top(ast::TopNode& n);
     UExpressionInfo visit_callexp(ast::CallExp& n, bool is_rvalue);
     sem::UCommon visit_call(ast::Call& n);
-    UExpressionInfo const_function_member(ast::Member& n, UExpressionInfo unique_ptr_1, ConstFunction& function);
-    UExpressionInfo class_member(ast::Member& n, UExpressionInfo parent_info, ConcreteClass& cls);
-    UExpressionInfo value_member(ast::Member& n, UExpressionInfo parent_info, EntityValue& value);
+    UExpressionInfo const_function_member(const ast::Member& n, UExpressionInfo unique_ptr_1, ConstFunction& function);
+    UExpressionInfo class_member(const ast::Member& n, UExpressionInfo parent_info, ConcreteClass& cls);
+    UExpressionInfo value_member(const ast::Member& n, UExpressionInfo parent_info, EntityValue& value);
     UExpressionInfo analyze_call(ast::ExpNode& function, ast::VectorOfExpNodesU arguments, bool is_rvalue, TextPosition start, TextPosition end);
     bool check_arguments(ast::VectorOfExpNodesU& narguments, std::vector<sem::UExp>& arguments,
                          std::vector<std::unique_ptr<Entity>>& arg_entities);

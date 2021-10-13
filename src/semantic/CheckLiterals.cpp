@@ -17,7 +17,7 @@ UExpressionInfo ModuleChecker::visit_boolean(ast::Boolean& node) {
 }
 
 
-UExpressionInfo ModuleChecker::visit_number(ast::Number& node) {
+UExpressionInfo ModuleChecker::visit_number(const ast::Number& node) {
     UExpressionInfo info_u = std::make_unique<ExpressionInfo>();
     ExpressionInfo& info = *info_u;
     switch (node.num_type) {
@@ -39,7 +39,7 @@ UExpressionInfo ModuleChecker::visit_number(ast::Number& node) {
     return info_u;
 }
 
-UExpressionInfo ModuleChecker::visit_none(ast::None& node) {
+UExpressionInfo ModuleChecker::visit_none(const ast::None& node) {
     UExpressionInfo info_u = std::make_unique<ExpressionInfo>();
     ExpressionInfo& info = *info_u;
     info.set_entity(std::make_unique<EntityNone>());
@@ -47,7 +47,7 @@ UExpressionInfo ModuleChecker::visit_none(ast::None& node) {
     return info_u;
 }
 
-UExpressionInfo ModuleChecker::visit_emptylist(ast::EmptyList& node) {
+UExpressionInfo ModuleChecker::visit_emptylist(const ast::EmptyList& node) {
     UExpressionInfo info_u = std::make_unique<ExpressionInfo>();
     ExpressionInfo& info = *info_u;
     sem::Type* nt = node.type->to_sem();
@@ -59,7 +59,7 @@ UExpressionInfo ModuleChecker::visit_emptylist(ast::EmptyList& node) {
     return info_u;
 }
 
-UExpressionInfo ModuleChecker::visit_string(ast::String& node) {
+UExpressionInfo ModuleChecker::visit_string(const ast::String& node) {
     UExpressionInfo info_u = std::make_unique<ExpressionInfo>();
     ExpressionInfo& info = *info_u;
     info.is_constant = true;
@@ -68,7 +68,7 @@ UExpressionInfo ModuleChecker::visit_string(ast::String& node) {
     return info_u;
 }
 
-UExpressionInfo ModuleChecker::visit_tuple(ast::Tuple& node) {
+UExpressionInfo ModuleChecker::visit_tuple(const ast::Tuple& node) {
     sem::VectorOfTypes types;
     std::vector<sem::UExp> values;
     for (auto& n: node.values) {
@@ -98,7 +98,7 @@ UExpressionInfo ModuleChecker::visit_tuple(ast::Tuple& node) {
     return sinfo_p;
 }
 
-UExpressionInfo ModuleChecker::visit_partial(ast::PartialApplication& node) {
+UExpressionInfo ModuleChecker::visit_partial(const ast::PartialApplication& node) {
     UExpressionInfo func = this->dispatch_rvalue(*node.function);
     sem::VectorOfTypes partial_args;
     ast::FunctionType* fun_type = nullptr;
@@ -130,7 +130,6 @@ UExpressionInfo ModuleChecker::visit_partial(ast::PartialApplication& node) {
             npartial++;
         }
     }
-    node.complete_type = &fun_type->clone()->function();
     UExpressionInfo s_p = std::make_unique<ExpressionInfo>();
     auto& s = *s_p;
     s.entity = *EntityValue::function_value(new sem::TypeFunction(partial_args,
@@ -143,7 +142,7 @@ UExpressionInfo ModuleChecker::visit_partial(ast::PartialApplication& node) {
     return s_p;
 }
 
-UExpressionInfo ModuleChecker::visit_dict(ast::DictNode& node) {
+UExpressionInfo ModuleChecker::visit_dict(const ast::DictNode& node) {
     UExpressionInfo info_u = std::make_unique<ExpressionInfo>();
     ExpressionInfo& info = *info_u;
     UExpressionInfo first_key_info = this->dispatch_rvalue(node.items[0].first);
@@ -177,7 +176,7 @@ UExpressionInfo ModuleChecker::visit_dict(ast::DictNode& node) {
     return info_u;
 }
 
-UExpressionInfo ModuleChecker::visit_emptydict(ast::EmptyDict& node) {
+UExpressionInfo ModuleChecker::visit_emptydict(const ast::EmptyDict& node) {
     UExpressionInfo info_u = std::make_unique<ExpressionInfo>();
     ExpressionInfo& info = *info_u;
     sem::TypeObject* ot = new sem::TypeObject("Dict",
@@ -189,7 +188,7 @@ UExpressionInfo ModuleChecker::visit_emptydict(ast::EmptyDict& node) {
     return info_u;
 }
 
-UExpressionInfo ModuleChecker::visit_defconst(ast::DefaultConstructor& node) {
+UExpressionInfo ModuleChecker::visit_defconst(const ast::DefaultConstructor& node) {
     // this is a regular function
     UExpressionInfo info_u = std::make_unique<ExpressionInfo>();
     ExpressionInfo& info = *info_u;

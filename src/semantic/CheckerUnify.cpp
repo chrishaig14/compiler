@@ -175,7 +175,7 @@ sem::UCommon ModuleChecker::visit_alias(ast::Alias& p_node) {
     return info_u;
 }
 
-UExpressionInfo ModuleChecker::enum_member(ast::Member& node, Enum& enumm) {
+UExpressionInfo ModuleChecker::enum_member(const ast::Member& node, Enum& enumm) {
     std::string value = node.s_child;
     UExpressionInfo info_u = std::make_unique<ExpressionInfo>();
     ExpressionInfo& info = *info_u;
@@ -212,7 +212,7 @@ std::unique_ptr<Entity> ModuleChecker::entity_from_type(const ast::Type& type) {
     return fv;
 }
 
-UExpressionInfo ModuleChecker::value_member(ast::Member& n, UExpressionInfo parent_info, EntityValue& value) {
+UExpressionInfo ModuleChecker::value_member(const ast::Member& n, UExpressionInfo parent_info, EntityValue& value) {
     if (value.type.kind == sem::Kind::FUNCTION) {
         this->error_reporter.error(std::make_unique<ErrorNoMember>(value.get_constfun().const_function.const_function_ft,
                                                                    n));
@@ -222,7 +222,7 @@ UExpressionInfo ModuleChecker::value_member(ast::Member& n, UExpressionInfo pare
 }
 
 UExpressionInfo
-ModuleChecker::const_function_member(ast::Member& n, UExpressionInfo unique_ptr_1, ConstFunction& function) {
+ModuleChecker::const_function_member(const ast::Member& n, UExpressionInfo unique_ptr_1, ConstFunction& function) {
     this->error_reporter.error(std::make_unique<ErrorNoMember>(function.const_function_ft, n));
     return exp_error_stub();
 }

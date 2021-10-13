@@ -129,7 +129,7 @@ sem::UExp ModuleChecker::make_union_rvalue(sem::UExp value_snode, const sem::Typ
     }
 }
 
-sem::UCommon ModuleChecker::visit_declaration(ast::Declaration& n) {
+sem::UCommon ModuleChecker::visit_declaration(const ast::Declaration& n) {
     // Logger::info("Checking ast::DeclarationNode for var: " + n.identifier);
     if (this->scope->declared(n.identifier)) {
         this->error_reporter.error(std::make_unique<ErrorRedeclared>(n.identifier, n));
@@ -143,8 +143,8 @@ sem::UCommon ModuleChecker::visit_declaration(ast::Declaration& n) {
     return info_u;
 }
 
-sem::UCommon ModuleChecker::check_declaration_with_type(ast::Declaration& n) {
-    ast::UTypeNode& type = n.type;
+sem::UCommon ModuleChecker::check_declaration_with_type(const ast::Declaration& n) {
+    const ast::UTypeNode& type = n.type;
     // if (type->kind == Kind::OBJECT && this->module.aliased_types.count(type->object().id) == 1) {
     //     ast::Type* aliased_type = this->module.aliased_types.at(type->object().id);
     //     type = ast::UTypeNode(aliased_type->clone());
@@ -164,7 +164,7 @@ sem::UCommon ModuleChecker::check_declaration_with_type(ast::Declaration& n) {
     return info_u;
 }
 
-sem::UCommon ModuleChecker::check_declaration_without_type(ast::Declaration& n) {
+sem::UCommon ModuleChecker::check_declaration_without_type(const ast::Declaration& n) {
     UExpressionInfo exp_info_p = this->dispatch_rvalue(n.expression);
     if (exp_info_p->is_error()) {
         return nullptr;

@@ -12,7 +12,7 @@
 #include "../simple_nodes/common/include/TypeFunction.h"
 
 
-sem::UCommon ModuleChecker::visit_lvalue_subscript(ast::Subscript& node) {
+sem::UCommon ModuleChecker::visit_lvalue_subscript(const ast::Subscript& node) {
     UExpressionInfo parent_p = this->dispatch_rvalue(*node.parent);
     Entity& entity_parent = parent_p->entity.get();
     if (entity_parent.e_type != E_TYPE::VALUE || entity_parent.get_value().type.kind == sem::Kind::FUNCTION) {
@@ -65,7 +65,7 @@ sem::UCommon ModuleChecker::visit_lvalue_subscript(ast::Subscript& node) {
     return csn;
 }
 
-sem::UCommon ModuleChecker::visit_assignment(ast::Assignment& n) {
+sem::UCommon ModuleChecker::visit_assignment(const ast::Assignment& n) {
     if (n.lvalue.ntype == ExpNodeType::ID) {
         if (((ast::Id&) n.lvalue)._id == "_") {
             return nullptr;
@@ -152,7 +152,7 @@ sem::UCommon ModuleChecker::visit_assignment(ast::Assignment& n) {
     return info_u;
 }
 
-sem::UCommon ModuleChecker::visit_return(ast::Return& n) {
+sem::UCommon ModuleChecker::visit_return(const ast::Return& n) {
     Entity& return_entity = this->scope->get("__return__");
     if (return_entity.is_nothing()) {
         if (n.expression != nullptr) {
@@ -180,7 +180,7 @@ sem::UCommon ModuleChecker::visit_return(ast::Return& n) {
     return sn;
 }
 
-sem::UCommon ModuleChecker::visit_match(ast::Match& node) {
+sem::UCommon ModuleChecker::visit_match(const ast::Match& node) {
     UExpressionInfo exp_info = this->dispatch_rvalue(*node.exp);
     Entity& entity = exp_info->entity.get();
     bool a = entity.e_type != E_TYPE::VALUE;
@@ -209,7 +209,7 @@ sem::UCommon ModuleChecker::visit_match(ast::Match& node) {
     std::string varname = "match_var";
     for (size_t i = 0; i < node.ids.size(); i++) {
         std::string case_id = node.ids[i];
-        std::pair<ast::UTypeNode, ast::UBlock>& c = node.cases[i];
+        const std::pair<ast::UTypeNode, ast::UBlock>& c = node.cases[i];
         ast::Type& case_type = *c.first;
         ast::Block& case_node = *c.second;
 
@@ -236,7 +236,7 @@ sem::UCommon ModuleChecker::visit_match(ast::Match& node) {
     return std::make_unique<sem::Match>(std::move(exp_info->exp_snode), varname, std::move(cas));
 }
 
-sem::UCommon ModuleChecker::visit_continue(ast::Continue& node) {
+sem::UCommon ModuleChecker::visit_continue(const ast::Continue& node) {
     auto bn = std::make_unique<sem::Block>();
     if (this->update_loop_index_snode != nullptr) {
         bn->nodes.push_back(sem::UCommon(this->update_loop_index_snode));
@@ -254,7 +254,7 @@ std::unique_ptr<EntityValue> ModuleChecker::make_entity_value(sem::Type& type) {
     return this->make_value(type.clone());
 }
 
-sem::UCommon ModuleChecker::visit_for(ast::For& node) {
+sem::UCommon ModuleChecker::visit_for(const ast::For& node) {
     UExpressionInfo exp_info_p = this->dispatch_rvalue(node.exp);
     if (exp_info_p->entity.get().e_type != E_TYPE::VALUE) {
         this->error_reporter.error(std::make_unique<ErrorFor>(exp_info_p->entity, node.exp.start));
@@ -283,7 +283,7 @@ sem::UCommon ModuleChecker::visit_for(ast::For& node) {
     return rinfo_p;
 }
 
-sem::UCommon ModuleChecker::visit_break(ast::Break& node) {
+sem::UCommon ModuleChecker::visit_break(const ast::Break& node) {
     auto bn = std::make_unique<sem::Break>();
     for (auto reachable : this->scope->get_all_in_loop()) {
         bn->reachables.push_back(reachable.first);
@@ -291,7 +291,7 @@ sem::UCommon ModuleChecker::visit_break(ast::Break& node) {
     return bn;
 }
 
-sem::UCommon ModuleChecker::visit_while(ast::While& node) {
+sem::UCommon ModuleChecker::visit_while(const ast::While& node) {
     UExpressionInfo condition_sinfo = this->expect_rvalue_of_type(sem::TypeObject("Boolean"), *node.condition);
     if (condition_sinfo->is_error()) {
         return nullptr;
@@ -309,7 +309,7 @@ sem::UCommon ModuleChecker::visit_while(ast::While& node) {
     return while_sn;
 }
 
-sem::UCommon ModuleChecker::visit_if(ast::If& n) {
+sem::UCommon ModuleChecker::visit_if(const ast::If& n) {
     UExpressionInfo condition_sinfo = this->expect_rvalue_of_type(sem::TypeObject("Boolean"), n.condition);
     if (condition_sinfo->is_error()) {
         return nullptr;
