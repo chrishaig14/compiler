@@ -171,7 +171,9 @@ std::unique_ptr<sem::Module> ModuleChecker::check_module() {
             continue;
         }
         std::unique_ptr<sem::Top> sinfo_p = this->dispatch_top(*n);
-        sn->nodes.push_back(std::move(sinfo_p));
+        if (sinfo_p != nullptr) {
+            sn->nodes.push_back(std::move(sinfo_p));
+        }
     }
     return sn;
 }

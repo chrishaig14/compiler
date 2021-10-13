@@ -228,7 +228,7 @@ ModuleChecker::const_function_member(ast::Member& n, UExpressionInfo unique_ptr_
 }
 
 std::unique_ptr<sem::Top> ModuleChecker::visit_typeclass(ast::TypeclassAst& typeclass) {
-    return std::unique_ptr<sem::Top>();
+    return nullptr;
 }
 
 void ModuleChecker::add_typeclasses_to_generic_type(sem::Type& type, std::string gen_type, std::string typeclass_name) {

@@ -378,6 +378,7 @@ PythonOutputCode PythonModuleTranspiler::dispatch_top(const sem::Top& node) {
         case sem::TopType::CLASS:
             return this->transpile_class((const sem::KlassDef&) node);
         case sem::TopType::TYPECLASS:
+            return "";
             break;
     }
     __builtin_unreachable();
