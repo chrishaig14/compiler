@@ -90,7 +90,6 @@ public:
     ErrorReporter error_reporter;
     std::unique_ptr<Entity> this_entity;
     Package& top_package;
-    sem::Common* update_loop_index_snode;
 
     ModuleChecker(Package& top_package, Module& module);
     ~ModuleChecker();

@@ -238,9 +238,6 @@ sem::UCommon ModuleChecker::visit_match(const ast::Match& node) {
 
 sem::UCommon ModuleChecker::visit_continue(const ast::Continue& node) {
     auto bn = std::make_unique<sem::Block>();
-    if (this->update_loop_index_snode != nullptr) {
-        bn->nodes.push_back(sem::UCommon(this->update_loop_index_snode));
-    }
     auto cn = std::make_unique<sem::Continue>();
     bn->nodes.push_back(std::move(cn));
 
