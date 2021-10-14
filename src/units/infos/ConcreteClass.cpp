@@ -26,12 +26,12 @@ bool ConcreteClass::operator==(const ConcreteClass& b) const {
 }
 
 ConcreteClass::~ConcreteClass() {
-    for (const auto& m: this->members) {
-        delete m.second;
-    }
-    for (auto* m: this->member_types) {
-        delete m;
-    }
+    // for (const auto& m: this->members) {
+    //     delete m.second;
+    // }
+    // for (auto* m: this->member_types) {
+    //     delete m;
+    // }
 }
 
 ConcreteClass::ConcreteClass(const std::string& class_name, Path path) : path(path), class_name(class_name) {
