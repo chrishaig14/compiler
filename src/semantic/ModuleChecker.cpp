@@ -168,7 +168,7 @@ ast::UTypeNode make_type(const ast::Type& original, const MapStringType& replace
 }
 
 std::unique_ptr<ConcreteClass> ModuleChecker::instantiate_generic(const ConcreteClass& generic, const ast::ObjectType& instance) {
-
+    std::cout << "gonna instantiate generic: " << instance.actual_to_string() << std::endl;
     MapStringType replacements;
     for (size_t i = 0; i < generic.type_params.size(); i++) {
         std::string tp = generic.type_params[i];
