@@ -24,7 +24,7 @@ sem::UCommon ModuleChecker::visit_lvalue_subscript(const ast::Subscript& node) {
         this->error_reporter.fail("Error: no subscript in enum");
         return nullptr;
     }
-    ConcreteClass* cls = entity_parent_value.clazz;
+    const ConcreteClass* cls = entity_parent_value.clazz;
     assert(cls != nullptr);
     if (!cls->type_params.empty()) {
         cls = instantiate_generic(*cls, *(ast::ObjectType*) entity_parent_value.type.object().to_ast());

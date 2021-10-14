@@ -22,15 +22,15 @@ private:
 public:
     sem::Type& type;
     union {
-        ConcreteClass* clazz;
-        Enum* enumm;
+        const ConcreteClass* clazz;
+        const Enum* enumm;
     };
     const Meta metatype;
 
 
-    EntityValue(sem::Type* type, ConcreteClass* cls);
+    EntityValue(sem::Type* type, const ConcreteClass* cls);
 
-    EntityValue(sem::Type* type, Enum* enumm);
+    EntityValue(sem::Type* type, const Enum* enumm);
 
     static std::unique_ptr<EntityValue> function_value(sem::Type* type);
 

@@ -151,7 +151,7 @@ sem::UCommon ModuleChecker::visit_import(const ast::Import& node) {
     return info_u;
 }
 
-std::unique_ptr<Entity> map_module_member_to_entity(ModuleMember& module_member) {
+std::unique_ptr<Entity> map_module_member_to_entity(const ModuleMember& module_member) {
     if (module_member.is_const_function()) {
         return std::make_unique<EntityConstFunction>(module_member.const_function());
     } else if (module_member.is_package()) {
@@ -175,7 +175,7 @@ sem::UCommon ModuleChecker::visit_alias(const ast::Alias& p_node) {
     return info_u;
 }
 
-UExpressionInfo ModuleChecker::enum_member(const ast::Member& node, Enum& enumm) {
+UExpressionInfo ModuleChecker::enum_member(const ast::Member& node, const Enum& enumm) {
     std::string value = node.s_child;
     UExpressionInfo info_u = std::make_unique<ExpressionInfo>();
     ExpressionInfo& info = *info_u;

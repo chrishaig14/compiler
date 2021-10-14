@@ -4,13 +4,13 @@
 
 #include "EntityValue.h"
 
-EntityValue::EntityValue(sem::Type* type, ConcreteClass* cls) : Entity(E_TYPE::VALUE), type(*type), metatype(Meta::CLASS) {
+EntityValue::EntityValue(sem::Type* type, const ConcreteClass* cls) : Entity(E_TYPE::VALUE), type(*type), metatype(Meta::CLASS) {
     this->clazz = cls;
     assert(type != nullptr);
     this->_type = sem::UType(type);
 }
 
-EntityValue::EntityValue(sem::Type* type, Enum* enumm) : Entity(E_TYPE::VALUE), type(*type), metatype(Meta::ENUM) {
+EntityValue::EntityValue(sem::Type* type, const Enum* enumm) : Entity(E_TYPE::VALUE), type(*type), metatype(Meta::ENUM) {
     this->enumm = enumm;
     assert(type != nullptr);
     this->_type = sem::UType(type);

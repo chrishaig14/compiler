@@ -65,7 +65,7 @@ ast::UTypeNode make_type_from_object_pattern(const ast::ObjectType& object_type,
 ast::UTypeNode make_type_from_function_pattern(const ast::FunctionType& ftn, const MapStringType& replacements);
 ast::UTypeNode make_type(const ast::Type& original, const MapStringType& replacements);
 sem::UCommon match_arguments_to_generic_function(const ast::FunctionType& function_type, ast::VectorOfTypes arg_types);
-std::unique_ptr<Entity> map_module_member_to_entity(ModuleMember& module_member);
+std::unique_ptr<Entity> map_module_member_to_entity(const ModuleMember& module_member);
 ModuleMember* map_unit_to_module_member(Unit& u);
 TextPosition add_one_col(TextPosition t);
 bool function_is_generic(const sem::TypeFunction& ft);
@@ -154,9 +154,9 @@ public:
     UExpressionInfo visit_none(const ast::None& node);
     UExpressionInfo
     object_member(sem::UExp object_snode, EntityValue& p_value, const std::string& child, const ast::Member& n);
-    UExpressionInfo package_member(const ast::Member& n, Package& package);
-    UExpressionInfo module_member(const ast::Member& n, Module& mod);
-    UExpressionInfo enum_member(const ast::Member& node, Enum& enumm);
+    UExpressionInfo package_member(const ast::Member& n, const Package& package);
+    UExpressionInfo module_member(const ast::Member& n, const Module& mod);
+    UExpressionInfo enum_member(const ast::Member& node, const Enum& enumm);
     UExpressionInfo expect_rvalue_of_type(const sem::Type& target, ast::ExpNode& node);
 
     std::unique_ptr<sem::FunctionDef> visit_function(ast::Function& n);

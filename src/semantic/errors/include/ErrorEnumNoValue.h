@@ -11,7 +11,7 @@
 
 class ErrorEnumNoValue : public Error {
 public:
-    ErrorEnumNoValue(std::string a, const std::string b, const ast::Member& node, Enum& p_enum);
+    ErrorEnumNoValue(std::string a, const std::string b, const ast::Member& node, const Enum& p_enum);
     Error* clone() const override;
     bool equal(const Error& other) const override;
     std::string to_str(const CodeLines& code) const override;
@@ -19,7 +19,7 @@ public:
     std::string enum_name;
     const std::string value_name;
     const ast::Member& node;
-    Enum& p_enum;
+    const Enum& p_enum;
 };
 
 

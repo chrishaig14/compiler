@@ -41,7 +41,7 @@ UExpressionInfo ModuleChecker::visit_member(const ast::Member& n) {
     return exp_error_stub();
 }
 
-UExpressionInfo ModuleChecker::module_member(const ast::Member& n, Module& mod) {
+UExpressionInfo ModuleChecker::module_member(const ast::Member& n, const Module& mod) {
     std::string child = n.s_child;
     if (mod.members.count(child) == 0) {
         // this->error_reporter.error(std::make_unique<ErrorNoMember>())
@@ -53,7 +53,7 @@ UExpressionInfo ModuleChecker::module_member(const ast::Member& n, Module& mod) 
         //                                       n.child_token.end_pos);
         return exp_error_stub();
     }
-    ModuleMember& member = *mod.members[child];
+    const ModuleMember& member = *mod.members.at(child);
     UExpressionInfo info_u = std::make_unique<ExpressionInfo>();
     ExpressionInfo& info = *info_u;
     info.set_entity(map_module_member_to_entity(member));
@@ -68,8 +68,8 @@ TextPosition add_one_col(TextPosition t) {
     return {t.line, t.column + 1};
 }
 
-UExpressionInfo
-ModuleChecker::object_member(sem::UExp object_snode, EntityValue& p_value, const std::string& child, const ast::Member& n) {
+UExpressionInfo ModuleChecker::object_member(sem::UExp object_snode, EntityValue& p_value, const std::string& child,
+                                             const ast::Member& n) {
     Path object_type_path = p_value.type.object().data.actual_base_path;
     // if (object_type_path.as_str() == "") {
     //     // is a single type param, error
@@ -92,22 +92,23 @@ ModuleChecker::object_member(sem::UExp object_snode, EntityValue& p_value, const
     if (p_value.type.kind == sem::Kind::OBJECT && p_value.type.object().id == "Tuple") {
         info.is_tuple_member = true;
     }
-    ConcreteClass* clazz = p_value.clazz;
+    const ConcreteClass* clazz = p_value.clazz;
     assert(clazz != nullptr);
     if (clazz->members.count(child) != 0) {
         info.set_entity(clazz->member_entities.at(child)->clone());
         if (info.entity.get().is_nothing()) {
-            sem::UType p_type(clazz->members.at(child)->to_sem());
-            this->module.fill_actual(*p_type);
-            auto eee = this->make_entity_value(*p_type);
-            info.set_entity(eee->clone());
-            clazz->member_entities[child] = std::move(eee);
+            throw std::runtime_error("This shouldnt be nothing!");
+            // sem::UType p_type(clazz->members.at(child)->to_sem());
+            // this->module.fill_actual(*p_type);
+            // auto eee = this->make_entity_value(*p_type);
+            // info.set_entity(eee->clone());
+            // clazz->member_entities[child] = std::move(eee);
         }
         auto omn = std::make_unique<sem::ObjectMember>(std::move(object_snode), clazz->path, child);
         info.exp_snode = std::move(omn);
     } else if (clazz->methods.count(child) != 0) {
         info.exp_snode = std::make_unique<sem::ObjectMethod>(std::move(object_snode), clazz->path, child);
-        info.set_entity(std::make_unique<EntityConstFunction>(*clazz->methods[child]));
+        info.set_entity(std::make_unique<EntityConstFunction>(*clazz->methods.at(child)));
     } else {
         this->error_reporter.error(std::make_unique<ErrorNoMemberSuggestions>(p_value.type, n, *clazz));
         return exp_error_stub();
@@ -115,13 +116,13 @@ ModuleChecker::object_member(sem::UExp object_snode, EntityValue& p_value, const
     return info_u;
 }
 
-UExpressionInfo ModuleChecker::package_member(const ast::Member& n, Package& package) {
+UExpressionInfo ModuleChecker::package_member(const ast::Member& n, const Package& package) {
     std::string child = n.s_child;
     if (package.units.count(child) == 0) {
         throw std::runtime_error("Error package no member!");
         return exp_error_stub();
     }
-    Unit* unit = package.units[child].get();
+    Unit* unit = package.units.at(child).get();
     UExpressionInfo info_u = std::make_unique<ExpressionInfo>();
     ExpressionInfo& info = *info_u;
     info.set_entity(map_module_member_to_entity(*map_unit_to_module_member(*unit)));

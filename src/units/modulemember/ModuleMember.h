@@ -28,29 +28,29 @@ class ModuleMember {
 public:
     virtual std::unique_ptr<ModuleMember> clone() = 0;
 
-    virtual bool is_klass();
+    virtual bool is_klass() const;
 
-    virtual ConcreteClass& klass();
+    virtual ConcreteClass& klass() const;
 
-    virtual bool is_const_function();
+    virtual bool is_const_function() const;
 
-    virtual ConstFunction& const_function();
+    virtual ConstFunction& const_function() const;
 
-    virtual bool is_module();
+    virtual bool is_module() const;
 
-    virtual bool is_typeclass();
+    virtual bool is_typeclass() const;
 
-    virtual Module& module();
+    virtual Module& module() const;
 
-    virtual TypeclassFoo& typeclass();
+    virtual TypeclassFoo& typeclass() const;
 
-    virtual bool is_package();
+    virtual bool is_package() const;
 
-    virtual Package& package();
+    virtual Package& package() const;
 
-    virtual bool is_enumm();
+    virtual bool is_enumm() const;
 
-    virtual Enum& enumm();
+    virtual Enum& enumm() const;
 
     virtual ~ModuleMember() = default;
 };
@@ -61,9 +61,9 @@ public:
     explicit ClassModuleMember(ConcreteClass& _klass);
 
 
-    bool is_klass() override;
+    bool is_klass()  const override;
 
-    ConcreteClass& klass() override;
+    ConcreteClass& klass()  const override;
 
     std::unique_ptr<ModuleMember> clone() override;
 };
@@ -73,9 +73,9 @@ class ConstFunctionModuleMember : public ModuleMember {
 public:
     explicit ConstFunctionModuleMember(ConstFunction& _const_function);
 
-    bool is_const_function() override;
+    bool is_const_function() const  override;
 
-    ConstFunction& const_function() override;
+    ConstFunction& const_function()  const override;
     std::unique_ptr<ModuleMember> clone() override;
 };
 
@@ -84,9 +84,9 @@ class ModuleModuleMember : public ModuleMember {
 public:
     explicit ModuleModuleMember(Module* _module);
 
-    bool is_module() override;
+    bool is_module()  const override;
 
-    Module& module() override;
+    Module& module()  const override;
     std::unique_ptr<ModuleMember> clone() override;
 };
 
@@ -95,9 +95,9 @@ class EnumModuleMember : public ModuleMember {
 public:
     explicit EnumModuleMember(Enum* _enumm);
 
-    bool is_enumm() override;
+    bool is_enumm()  const override;
 
-    Enum& enumm() override;
+    Enum& enumm()  const override;
     std::unique_ptr<ModuleMember> clone() override;
 };
 
@@ -106,9 +106,9 @@ class TypeclassModuleMember : public ModuleMember {
 public:
     explicit TypeclassModuleMember(TypeclassFoo* _enumm);
 
-    bool is_typeclass() override;
+    bool is_typeclass()  const override;
 
-    TypeclassFoo& typeclass() override;
+    TypeclassFoo& typeclass()  const override;
 
     std::unique_ptr<ModuleMember> clone() override;
 };
@@ -119,9 +119,9 @@ class PackageModuleMember : public ModuleMember {
 public:
     explicit PackageModuleMember(Package* _package);
 
-    bool is_package() override;
+    bool is_package()  const override;
 
-    Package& package() override;
+    Package& package()  const override;
     std::unique_ptr<ModuleMember> clone() override;
 };
 

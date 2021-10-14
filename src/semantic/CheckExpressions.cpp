@@ -53,7 +53,7 @@ UExpressionInfo ModuleChecker::visit_unary(const ast::UnaryOp& n) {
     sem::UExp exp_snode = std::move(exp_info->exp_snode);
 
     EntityValue& entity_parent = exp_info->entity.get().get_value();
-    ConcreteClass* cls = entity_parent.clazz;
+    const ConcreteClass* cls = entity_parent.clazz;
 
     auto subscript_it = cls->methods.find("__not__");
     if (subscript_it == cls->methods.end()) {
@@ -104,7 +104,7 @@ UExpressionInfo ModuleChecker::visit_binop(const ast::BinaryOp& node) {
         info.exp_snode = std::make_unique<sem::CallExp>(std::make_unique<sem::StaticMethod>(l_entity_v.enumm->path,
                                                                                             "__eq__"), std::move(v));
     } else {
-        ConcreteClass* cls = l_entity_v.clazz;
+        const ConcreteClass* cls = l_entity_v.clazz;
         assert(cls != nullptr);
         auto operator_fun_it = cls->static_methods.find(fun);
         if (operator_fun_it == cls->static_methods.end()) {
@@ -184,7 +184,7 @@ UExpressionInfo ModuleChecker::visit_subscript(const ast::Subscript& node) {
         return exp_error_stub();
     }
     EntityValue& value = entity_parent.get_value();
-    ConcreteClass* cls = value.clazz;
+    const ConcreteClass* cls = value.clazz;
     if (cls == nullptr) {
         // its totally generic, fail
         this->error_reporter.error(std::make_unique<ErrorObjectNoSpecialMethod>(value.type, "__get_item__", node));
