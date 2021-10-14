@@ -6,8 +6,7 @@
 #include "../units/entities/EntityNotFound.h"
 #include "../units/entities/EntityValue.h"
 
-SymbolTable::SymbolTable(const std::string& name, SymbolTable* parent) {
-    this->s_name = name;
+SymbolTable::SymbolTable(SymbolTable* parent) {
     this->parent = parent;
     this->ret = nullptr;
     this->is_function = false;

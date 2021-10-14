@@ -25,19 +25,12 @@ bool function_is_generic(const sem::TypeFunction& ft) {
 
 ModuleChecker::ModuleChecker(Package& top_package, Module& module)
         : module(module), error_reporter(module.code_lines), top_package(top_package) {
-    this->scope = new SymbolTable("global", nullptr);
-    this->scopes["global"] = this->scope;
+    this->scope = new SymbolTable(nullptr);
     this->add_this = false;
 }
 
 void ModuleChecker::enter_scope(const std::string& name) {
-    std::string new_scope_name = this->scope->s_name + "." + name;
-    if (this->scopes.find(new_scope_name) != this->scopes.end()) {
-        delete this->scopes[new_scope_name];
-        this->scopes.erase(new_scope_name);
-    }
-    this->scope = new SymbolTable(new_scope_name, this->scope);
-    this->scopes[new_scope_name] = this->scope;
+    this->scope = new SymbolTable(this->scope);
 }
 
 void ModuleChecker::leave_scope() {
@@ -247,13 +240,6 @@ bool ModuleChecker::is_immutable(const ast::Type& node) {
         return true;
     }
     return false;
-}
-
-
-ModuleChecker::~ModuleChecker() {
-    for (const auto& s: this->scopes) {
-        delete s.second;
-    }
 }
 
 bool ModuleChecker::is_variable(const ast::ObjectType& a) {

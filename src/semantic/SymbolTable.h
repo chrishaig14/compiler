@@ -17,7 +17,7 @@ class SymbolTable {
     std::unique_ptr<Entity> ret;
 
 public:
-    SymbolTable(const std::string& name, SymbolTable* parent);
+    SymbolTable(SymbolTable* parent);
 
     std::vector<std::pair<std::string, sem::UType>> get_all();
 

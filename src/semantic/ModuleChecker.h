@@ -80,7 +80,6 @@ UExpressionInfo exp_error_stub();
 class ModuleChecker {
     bool add_this;
     std::map<std::string, std::unique_ptr<EntityValue>> entity_values_no_generic;
-    std::unordered_map<std::string, SymbolTable*> scopes;
     SymbolTable* scope;
     std::map<std::string, std::unique_ptr<Entity>> entities;
 public:
@@ -91,7 +90,6 @@ public:
     Package& top_package;
 
     ModuleChecker(Package& top_package, Module& module);
-    ~ModuleChecker();
 
     std::unique_ptr<Entity> entity_from_type(const ast::Type& type);
 
