@@ -134,7 +134,7 @@ public:
     UExpressionInfo visit_binop(const ast::BinaryOp& node);
     UExpressionInfo visit_boolean(const ast::Boolean& node);
 
-    UExpressionInfo visit_call_exp(ast::CallExp& n);
+    UExpressionInfo visit_call_exp(const ast::CallExp& n);
 
     sem::UCommon visit_lvalue_subscript(const ast::Subscript& node);
     UExpressionInfo visit_dict(const ast::DictNode& node);
