@@ -204,7 +204,7 @@ std::unique_ptr<sem::FunctionDef> ModuleChecker::visit_function(ast::Function& n
     this->error_reporter.current_function = n.identifier;
     // Logger::info("Checking FunctionNode " + n.identifier);
     std::string& function_name = n.identifier;
-    this->enter_scope(function_name);
+    this->enter_scope();
     this->scope->is_function = true;
 
     if (this->add_this) {

@@ -221,7 +221,7 @@ sem::UCommon ModuleChecker::visit_match(const ast::Match& node) {
             // return error_stub();
             return nullptr;
         }
-        this->enter_scope("case");
+        this->enter_scope();
         auto v = this->make_value(p_type);
         assert(v->clazz != nullptr);
         this->scope->set(case_id, *v);
@@ -266,7 +266,7 @@ sem::UCommon ModuleChecker::visit_for(const ast::For& node) {
 
     sem::Type* elem_type = exp_ot.type_params[0];
     auto ev = this->make_entity_value(*elem_type);
-    this->enter_scope("for");
+    this->enter_scope();
     this->scope->set(node.var, *ev);
     this->scope->is_loop = true;
     auto binfo = this->visit_block(node.body);
@@ -295,7 +295,7 @@ sem::UCommon ModuleChecker::visit_while(const ast::While& node) {
     }
     sem::UExp condition_snode = std::move(condition_sinfo->exp_snode);
 
-    this->enter_scope("while");
+    this->enter_scope();
     this->scope->is_loop = true;
     auto body_snode = this->visit_block(*node.body);
     this->scope->is_loop = false;
@@ -313,7 +313,7 @@ sem::UCommon ModuleChecker::visit_if(const ast::If& n) {
     }
     auto& condition_snode = condition_sinfo->exp_snode;
 
-    this->enter_scope("if");
+    this->enter_scope();
     auto body_info = this->visit_block(n.then);
     sem::Block& bn = *body_info;
     for (const auto& local_var : this->scope->table) {
@@ -326,7 +326,7 @@ sem::UCommon ModuleChecker::visit_if(const ast::If& n) {
     for (auto& elif : n.elifs) {
         UExpressionInfo elif_condition_sinfo = this->expect_rvalue_of_type(sem::TypeObject("Boolean"), elif.first);
         auto& elif_condition_snode = elif_condition_sinfo->exp_snode;
-        this->enter_scope("elif");
+        this->enter_scope();
         auto elif_block_info = this->visit_block(elif.second);
         sem::Block* bn1 = elif_block_info.release();
         for (const auto& local_var : this->scope->table) {
@@ -337,7 +337,7 @@ sem::UCommon ModuleChecker::visit_if(const ast::If& n) {
     }
     std::unique_ptr<sem::Block> else_info;
     if (n.selse != nullptr && !n.selse->nodes.empty()) {
-        this->enter_scope("else");
+        this->enter_scope();
         else_info = this->visit_block(*n.selse);
         auto& bn2 = else_info;
         for (const auto& local_var : this->scope->table) {

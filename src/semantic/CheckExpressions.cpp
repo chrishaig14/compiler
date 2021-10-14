@@ -246,7 +246,7 @@ UExpressionInfo ModuleChecker::visit_ternary(const ast::Ternary& node) {
                                                                        expression_info_p->entity));
         return exp_error_stub();
     }
-    this->enter_scope("true_case");
+    this->enter_scope();
     sem::Type& inner_type = *expression_type.type_params[0];
     auto v = std::make_unique<EntityValue>(inner_type.clone(), (ConcreteClass*) nullptr);
     this->scope->set("it", *v);

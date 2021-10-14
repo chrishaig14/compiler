@@ -94,7 +94,7 @@ public:
     std::unique_ptr<Entity> entity_from_type(const ast::Type& type);
 
     bool is_immutable(const ast::Type& node);
-    void enter_scope(const std::string& name);
+    void enter_scope();
     void leave_scope();
     bool assert_type_exists(const ast::Type& type, TextPosition pos);
     ConcreteClass* instantiate_generic(const ConcreteClass& generic_p, const ast::ObjectType& instance);

@@ -29,7 +29,7 @@ ModuleChecker::ModuleChecker(Package& top_package, Module& module)
     this->add_this = false;
 }
 
-void ModuleChecker::enter_scope(const std::string& name) {
+void ModuleChecker::enter_scope() {
     this->scope = new SymbolTable(this->scope);
 }
 
