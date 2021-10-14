@@ -183,15 +183,9 @@ public:
                                                            std::map<std::string, ast::Type*>& all_substitutions);
     UExpressionInfo match_arguments_to_generic_function(const ast::FunctionType& ft, ast::VectorOfTypes arg_types,
                                                         std::map<std::string, ast::Type*>& all_substitutions);
-    UExpressionInfo
-    analyze_call(const ast::ExpNode& function, ast::VectorOfExpNodesU arguments, bool is_rvalue, TextPosition start,
-                 TextPosition end);
     void process_function_arguments(ExpressionInfo& retv, std::vector<std::unique_ptr<Entity>>& arg_entities,
                                     std::vector<sem::UExp>& arguments, ast::VectorOfExpNodesU& narguments,
                                     const sem::TypeFunction& function_type, ExpressionInfo* fun_info_p);
-    UExpressionInfo
-    analyze_call(ast::ExpNode& function, ast::VectorOfExpNodesU& arguments, bool is_rvalue, TextPosition start,
-                 TextPosition end);
     UExpressionInfo analyze_call(const ast::ExpNode& function, std::vector<ast::RExpNode>& arguments, bool is_rvalue,
                                  TextPosition start, TextPosition end);
     bool check_arguments(std::vector<ast::RExpNode>& narguments, std::vector<sem::UExp>& arguments,
