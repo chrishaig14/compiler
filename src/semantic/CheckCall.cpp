@@ -26,10 +26,7 @@ ModuleChecker::analyze_call(const ast::ExpNode& function, std::vector<ast::RExpN
                             TextPosition end) {
     auto retv_p = std::make_unique<ExpressionInfo>();
     auto& retv = *retv_p;
-    bool old_is_call = this->is_call;
-    this->is_call = true;
     UExpressionInfo fun_info_p = this->dispatch_rvalue(function);
-    this->is_call = old_is_call;
     if (fun_info_p->is_error()) {
         return exp_error_stub();
     }

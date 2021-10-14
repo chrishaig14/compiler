@@ -25,7 +25,6 @@ bool function_is_generic(const sem::TypeFunction& ft) {
 
 ModuleChecker::ModuleChecker(Package& top_package, Module& module)
         : module(module), error_reporter(module.code_lines), top_package(top_package) {
-    this->is_call = false;
     this->scope = new SymbolTable("global", nullptr);
     this->scopes["global"] = this->scope;
     this->add_this = false;
