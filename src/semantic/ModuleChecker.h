@@ -84,7 +84,6 @@ class ModuleChecker {
     std::map<std::string, std::unique_ptr<Entity>> entities;
 public:
     Module& module;
-    bool is_call;
     ErrorReporter error_reporter;
     std::unique_ptr<Entity> this_entity;
     Package& top_package;
