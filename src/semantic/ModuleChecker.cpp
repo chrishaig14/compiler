@@ -167,7 +167,7 @@ ast::UTypeNode make_type(const ast::Type& original, const MapStringType& replace
     }
 }
 
-ConcreteClass* ModuleChecker::instantiate_generic(const ConcreteClass& generic, const ast::ObjectType& instance) {
+std::unique_ptr<ConcreteClass> ModuleChecker::instantiate_generic(const ConcreteClass& generic, const ast::ObjectType& instance) {
 
     MapStringType replacements;
     for (size_t i = 0; i < generic.type_params.size(); i++) {
@@ -204,7 +204,7 @@ ConcreteClass* ModuleChecker::instantiate_generic(const ConcreteClass& generic, 
                                                                            sem::UTypeFunction((sem::TypeFunction*) p_type));
     }
 
-    auto* concrete = new ConcreteClass(generic.class_name, generic.path);
+    auto concrete = std::make_unique<ConcreteClass>(generic.class_name, generic.path);
     concrete->methods = std::move(concrete_methods);
     concrete->static_methods = std::move(concrete_static_methods);
     concrete->member_names = generic.member_names;

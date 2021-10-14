@@ -96,7 +96,7 @@ public:
     void enter_scope();
     void leave_scope();
     bool assert_type_exists(const ast::Type& type, TextPosition pos);
-    ConcreteClass* instantiate_generic(const ConcreteClass& generic_p, const ast::ObjectType& instance);
+    std::unique_ptr<ConcreteClass> instantiate_generic(const ConcreteClass& generic, const ast::ObjectType& instance);
     bool is_variable(const ast::ObjectType& a);
     void fail(std::string msg);
     void init();

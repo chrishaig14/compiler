@@ -167,8 +167,9 @@ std::unique_ptr<EntityValue> ModuleChecker::make_value(sem::Type* type) {
         if (instance == cls->generic_instances.end()) {
             ast::UObjectType o(&type_object.to_ast()->object());
             ConcreteClass* bcls = cls;
-            cls = instantiate_generic(*bcls, *o);
-            bcls->generic_instances[type->actual_to_string()] = std::unique_ptr<ConcreteClass>(cls);
+            std::unique_ptr<ConcreteClass> instance_c = instantiate_generic(*bcls, *o);
+            cls = instance_c.get();
+            bcls->generic_instances[type->actual_to_string()] = std::move(instance_c);
         } else {
             cls = instance->second.get();
         }
