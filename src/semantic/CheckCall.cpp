@@ -22,8 +22,8 @@ sem::UCommon ModuleChecker::visit_call(ast::Call& n) {
 }
 
 UExpressionInfo
-ModuleChecker::analyze_call(const ast::ExpNode& function, std::vector<ast::RExpNode>& arguments, bool is_rvalue, TextPosition start,
-                            TextPosition end) {
+ModuleChecker::analyze_call(const ast::ExpNode& function, std::vector<ast::RExpNode>& arguments, bool is_rvalue,
+                            TextPosition start, TextPosition end) {
     auto retv_p = std::make_unique<ExpressionInfo>();
     auto& retv = *retv_p;
     UExpressionInfo fun_info_p = this->dispatch_rvalue(function);
@@ -64,6 +64,18 @@ ModuleChecker::analyze_call(const ast::ExpNode& function, std::vector<ast::RExpN
     if (has_error) {
         return exp_error_stub();
     }
+    ast::VectorOfTypes arg_types;
+    for (auto& at: arg_entities) {
+        sem::Type* p_type = at->get_value().type.clone();
+        arg_types.push_back(p_type->to_ast());
+    }
+    std::map<std::string, ast::Type*> a;
+    ast::FunctionType* ft = static_cast<ast::FunctionType*>(function_type.to_ast());
+    if (ft->is_generic()) {
+        retv_p = this->match_arguments_to_generic_function(*ft, arg_types, a);
+        retv_p->exp_snode = std::make_unique<sem::CallExp>(std::move(fun_info_p->exp_snode), std::move(arguments_));
+        return retv_p;
+    }
     this->process_function_arguments(arg_entities, arguments_, arguments, function_type, fun_info_p.get());
     retv.exp_snode = std::make_unique<sem::CallExp>(std::move(fun_info_p->exp_snode), std::move(arguments_));
     auto f = make_return_info(is_rvalue, std::move(retv_p), is_def_const, args_are_constant);
@@ -100,7 +112,7 @@ ModuleChecker::make_return_info(bool is_rvalue, UExpressionInfo retv_p, bool is_
 }
 
 bool ModuleChecker::check_arguments(std::vector<ast::RExpNode>& narguments, std::vector<sem::UExp>& arguments,
-                              std::vector<std::unique_ptr<Entity>>& arg_entities) {
+                                    std::vector<std::unique_ptr<Entity>>& arg_entities) {
     bool has_error;
     for (auto& arg: narguments) {
         UExpressionInfo arg_type_p = this->dispatch_rvalue(arg);
@@ -125,8 +137,9 @@ bool ModuleChecker::check_arguments(std::vector<ast::RExpNode>& narguments, std:
 }
 
 void ModuleChecker::process_function_arguments(std::vector<std::unique_ptr<Entity>>& arg_entities,
-                                         std::vector<sem::UExp>& arguments, std::vector<ast::RExpNode>& narguments,
-                                         const sem::TypeFunction& function_type, ExpressionInfo* fun_info_p) {
+                                               std::vector<sem::UExp>& arguments,
+                                               std::vector<ast::RExpNode>& narguments,
+                                               const sem::TypeFunction& function_type, ExpressionInfo* fun_info_p) {
     int sni = static_cast<int>(fun_info_p->this_arg != nullptr);
     for (size_t i = 0; i < narguments.size(); i++) {
         // const ast::TypeNode& arg_type = *arg_types[i];

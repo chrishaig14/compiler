@@ -1,19 +1,8 @@
-class Foo[t] {
-    value: t
-    fun get_value() -> t {
-        return this.value
-    }
-}
-
-class MyFoo {
-    name: String
-    age: Integer
-}
-
-fun baba(x: Foo[String]) -> String {
-    return x.get_value()
+fun first(a: t, b: u) -> u {
+    return b
 }
 
 fun main()->Integer {
+    print(first(9,"Hello"))
     return 0
 }

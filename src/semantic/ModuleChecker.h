@@ -66,7 +66,6 @@ bool is_generic(const sem::Type& t);
 ast::UTypeNode make_type_from_object_pattern(const ast::ObjectType& object_type, const MapStringType& replacements);
 ast::UTypeNode make_type_from_function_pattern(const ast::FunctionType& ftn, const MapStringType& replacements);
 ast::UTypeNode make_type(const ast::Type& original, const MapStringType& replacements);
-sem::UCommon match_arguments_to_generic_function(const ast::FunctionType& function_type, ast::VectorOfTypes arg_types);
 std::unique_ptr<Entity> map_module_member_to_entity(const ModuleMember& module_member);
 ModuleMember* map_unit_to_module_member(Unit& u);
 TextPosition add_one_col(TextPosition t);
