@@ -2,26 +2,26 @@
 // Created by chris on 4/10/20.
 //
 
-#include "Klass.h"
+#include "TemplateClassDef.h"
 
 using namespace ast;
 
-Klass::Klass(const std::string& className, VectorOfStrings type_parameters,
-             std::vector<std::pair<std::string, ast::UTypeNode>> members,
-             std::unordered_map<std::string, std::unique_ptr<KMethod>> functions,
-             std::map<std::string, std::pair<ast::Type*, ast::ExpNode*>> static_members,
-             std::unordered_map<std::string, ast::UFunctionNode>& static_methods, TextPosition start, TextPosition end)
-        : ast::TopNode(TopNodeType::CLS, start, end), members(std::move(members)), static_members(static_members),
+TemplateClassDef::TemplateClassDef(const std::string& className, VectorOfStrings type_parameters,
+                                   std::vector<std::pair<std::string, ast::UTypeNode>> members,
+                                   std::unordered_map<std::string, ast::UFunctionNode> functions,
+                                   std::map<std::string, std::pair<ast::Type*, ast::ExpNode*>> static_members,
+                                   std::unordered_map<std::string, ast::UFunctionNode>& static_methods, TextPosition start, TextPosition end)
+        : ast::TopNode(TopNodeType::TEMPLATE_CLS, start, end), members(std::move(members)), static_members(static_members),
           methods(std::move(functions)), static_methods(std::move(static_methods)), class_name(className) {
     this->type_parameters = type_parameters;
 }
 
-bool Klass::equal(const ast::TopNode& other) const {
+bool TemplateClassDef::equal(const ast::TopNode& other) const {
     return false;
 }
 
 
-Klass::~Klass() {
+TemplateClassDef::~TemplateClassDef() {
     // for (const auto& mem: this->members) {
     //     delete mem.second;
     // }
@@ -30,7 +30,7 @@ Klass::~Klass() {
     // }
 }
 
-nlohmann::json Klass::to_json() const {
+nlohmann::json TemplateClassDef::to_json() const {
     nlohmann::json j;
     j["type"] = "class";
     std::vector<nlohmann::json> memj;
@@ -40,7 +40,7 @@ nlohmann::json Klass::to_json() const {
     }
     nlohmann::json methj;
     for (auto& m: this->methods) {
-        methj[m.first] = m.second->method->to_json();
+        methj[m.first] = m.second->to_json();
     }
     nlohmann::json smethj;
     for (auto& m: this->static_methods) {
@@ -51,7 +51,4 @@ nlohmann::json Klass::to_json() const {
                   {"methods",        methj},
                   {"static_methods", smethj}};
     return j;
-}
-
-KMethod::KMethod(ast::UFunctionNode method) : method(std::move(method)) {
 }

@@ -91,8 +91,10 @@ add_library(
     top/EnumNode.h
     top/Function.cpp
     top/Function.h
-    top/Klass.cpp
-    top/Klass.h
+    top/TemplateClassDef.cpp
+    top/TemplateClassDef.h
+    top/ConcreteClassDef.cpp
+    top/ConcreteClassDef.h
     top/Module.cpp
     top/Module.h
     top/TopNode.cpp

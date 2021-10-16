@@ -7,6 +7,8 @@
 #include "../ast/expressions/include/PartialApplication.h"
 #include "../ast/expressions/include/UnaryOp.h"
 #include "../ast/top/Module.h"
+#include "../ast/top/TemplateClassDef.h"
+#include "../ast/top/ConcreteClassDef.h"
 #include "../logging/logging.h"
 #include "../ast/expressions/include/DefaultConstructor.h"
 #include <fmt/core.h>
@@ -56,7 +58,8 @@ std::unique_ptr<ast::Module> Parser::parse_module() {
     // TextPosition start = this->token.start;
 
     std::vector<std::reference_wrapper<ast::Import>> imports;
-    std::vector<std::reference_wrapper<ast::Klass>> classes;
+    std::vector<std::reference_wrapper<ast::ConcreteClassDef>> concrete_classes;
+    std::vector<std::reference_wrapper<ast::TemplateClassDef>> template_classes;
     std::vector<std::reference_wrapper<ast::EnumNode>> enums;
     std::vector<std::reference_wrapper<ast::Function>> functions;
     std::vector<std::reference_wrapper<ast::TypeclassAst>> typeclasses;
@@ -73,7 +76,12 @@ std::unique_ptr<ast::Module> Parser::parse_module() {
             }
             case TokType::CLASS: {
                 auto cp = this->parse_class_definition();
-                classes.emplace_back(*cp);
+                if (cp->ntype == TopNodeType::CONCRETE_CLS) {
+                    concrete_classes.emplace_back(static_cast<ast::ConcreteClassDef&>(*cp));
+                } else {
+                    assert(cp->ntype == TopNodeType::TEMPLATE_CLS);
+                    template_classes.emplace_back(static_cast<ast::TemplateClassDef&>(*cp));
+                }
                 all.push_back(std::move(cp));
                 break;
             }
@@ -105,7 +113,13 @@ std::unique_ptr<ast::Module> Parser::parse_module() {
         }
     }
     // TextPosition end = this->token.end_pos;
-    auto module_ast = std::make_unique<ast::Module>(std::move(all), imports, classes, enums, functions, typeclasses);
+    auto module_ast = std::make_unique<ast::Module>(std::move(all),
+                                                    imports,
+                                                    concrete_classes,
+                                                    template_classes,
+                                                    enums,
+                                                    functions,
+                                                    typeclasses);
     return module_ast;
 }
 
@@ -879,7 +893,7 @@ std::unique_ptr<ast::While> Parser::parse_while_loop() {
     return whil;
 }
 
-std::unique_ptr<ast::Klass> Parser::parse_class_definition() {
+std::unique_ptr<ast::TopNode> Parser::parse_class_definition() {
     Token class_tok = this->expect_token(TokType::CLASS);
     Token class_name_tk = this->expect_token(TokType::ID);
     std::string& class_name = class_name_tk.str;
@@ -899,7 +913,7 @@ std::unique_ptr<ast::Klass> Parser::parse_class_definition() {
         this->expect_token(TokType::RSQUARE);
     }
     this->expect_token(TokType::LCURLY);
-    std::unordered_map<std::string, std::unique_ptr<KMethod>> methods;
+    std::unordered_map<std::string, ast::UFunctionNode> methods;
     std::unordered_map<std::string, ast::UFunctionNode> static_methods;
     std::vector<std::pair<std::string, ast::UTypeNode>> members;
     std::set<std::string> member_names;
@@ -952,7 +966,7 @@ std::unique_ptr<ast::Klass> Parser::parse_class_definition() {
                 static_methods.insert(make_pair(method_name, std::move(method_node)));
             } else {
                 // methods[method_name] = KMethod{implicit, std::move(method_node)};
-                methods[method_name] = std::make_unique<KMethod>(std::move(method_node));
+                methods[method_name] = std::move(method_node);
             }
 
         } else if (this->match(TokType::FUN)) {
@@ -964,24 +978,40 @@ std::unique_ptr<ast::Klass> Parser::parse_class_definition() {
             if (is_static) {
                 static_methods.insert(std::make_pair(method_name, std::move(method_node)));
             } else {
-                methods[method_name] = std::make_unique<KMethod>(std::move(method_node));
+                methods[method_name] = std::move(method_node);
             }
         } else {
             break;
         }
     }
     Token end = this->expect_token(TokType::RCURLY);
-    auto c = std::make_unique<ast::Klass>(class_name,
-                                          type_parameters,
-                                          std::move(members),
-                                          std::move(methods),
-                                          static_members,
-                                          static_methods,
-                                          class_tok.start,
-                                          end.end_pos);
-    c->members_ordered = members_ordered;
-    c->start = class_tok.start;
-    return c;
+    if (not type_parameters.empty()) {
+        // it's a template class
+        auto d = std::make_unique<ast::TemplateClassDef>(class_name,
+                                                         type_parameters,
+                                                         std::move(members),
+                                                         std::move(methods),
+                                                         static_members,
+                                                         static_methods,
+                                                         class_tok.start,
+                                                         end.end_pos);
+        d->members_ordered = members_ordered;
+        d->start = class_tok.start;
+        return d;
+    } else {
+        // it's a concrete class
+        auto d = std::make_unique<ast::ConcreteClassDef>(class_name,
+                                                         std::move(members),
+                                                         std::move(methods),
+                                                         static_members,
+                                                         static_methods,
+                                                         class_tok.start,
+                                                         end.end_pos);
+        d->members_ordered = members_ordered;
+        d->start = class_tok.start;
+        return d;
+        return nullptr;
+    }
 }
 
 std::unique_ptr<ast::Import> Parser::parse_import() {
@@ -1090,9 +1120,9 @@ std::unique_ptr<ast::TypeclassAst> Parser::parse_typeclass() {
 
     Token final_curly = this->expect_token(TokType::RCURLY);
     auto n = std::make_unique<ast::TypeclassAst>(typeclass_id.str,
-                                              base_type.str,
-                                              std::move(methods),
-                                              typeclass_id.start,
-                                              final_curly.end_pos);
+                                                 base_type.str,
+                                                 std::move(methods),
+                                                 typeclass_id.start,
+                                                 final_curly.end_pos);
     return n;
 }

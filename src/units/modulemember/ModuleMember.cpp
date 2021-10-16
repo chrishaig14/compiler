@@ -54,6 +54,14 @@ TypeclassFoo& ModuleMember::typeclass() const  {
     throw std::runtime_error("ModuleMember is not a Typeclass");
 }
 
+bool ModuleMember::is_template_klass() const {
+    return false;
+}
+
+TemplateClassInfo& ModuleMember::template_klass() const {
+    throw std::runtime_error("ModuleMember is not a template_klass");
+}
+
 ClassModuleMember::ClassModuleMember(ConcreteClass& _klass) : p_klass(_klass) {
 }
 
@@ -67,6 +75,21 @@ ConcreteClass& ClassModuleMember::klass() const  {
 
 std::unique_ptr<ModuleMember> ClassModuleMember::clone() {
     return std::make_unique<ClassModuleMember>(this->p_klass);
+}
+
+TemplateClassModuleMember::TemplateClassModuleMember(TemplateClassInfo& _klass) : p_klass(_klass) {
+}
+
+bool TemplateClassModuleMember::is_template_klass() const  {
+    return true;
+}
+
+TemplateClassInfo& TemplateClassModuleMember::template_klass() const  {
+    return this->p_klass;
+}
+
+std::unique_ptr<ModuleMember> TemplateClassModuleMember::clone() {
+    return std::make_unique<TemplateClassModuleMember>(this->p_klass);
 }
 
 ConstFunctionModuleMember::ConstFunctionModuleMember(ConstFunction& _const_function)

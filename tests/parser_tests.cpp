@@ -418,10 +418,10 @@ TEST_CASE("parse_class_empty", "[parser]") {
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser("test", scanner.code_lines, tokens);
 
-    std::unique_ptr<ast::Klass> ast = parser.parse_class_definition();
+    std::unique_ptr<ast::ConcreteClassDef> ast = parser.parse_class_definition();
 
     std::unordered_map<std::string, ast::UFunctionNode> v;
-    REQUIRE(ast->to_json() == ast::Klass(ID, {}, {}, {}, {}, v, DUMMY_POS, DUMMY_POS).to_json());
+    REQUIRE(ast->to_json() == ast::ConcreteClassDef(ID, {}, {}, {}, {}, v, DUMMY_POS, DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_class_one_member", "[parser]") {
@@ -431,11 +431,11 @@ TEST_CASE("parse_class_one_member", "[parser]") {
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser("test", scanner.code_lines, tokens);
 
-    std::unique_ptr<ast::Klass> ast = parser.parse_class_definition();
+    std::unique_ptr<ast::ConcreteClassDef> ast = parser.parse_class_definition();
     std::unordered_map<std::string, ast::UFunctionNode> v;
     std::vector<std::pair<std::string, ast::UTypeNode >> members;
     members.emplace_back(ID_1, ast::UTypeNode(TYPE_1.node->clone()));
-    REQUIRE(ast->to_json() == ast::Klass(ID, {}, std::move(members), {}, {}, v, DUMMY_POS, DUMMY_POS).to_json());
+    REQUIRE(ast->to_json() == ast::ConcreteClassDef(ID, {}, std::move(members), {}, {}, v, DUMMY_POS, DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_class_mult_member", "[parser]") {
@@ -445,12 +445,12 @@ TEST_CASE("parse_class_mult_member", "[parser]") {
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser("test", scanner.code_lines, tokens);
 
-    std::unique_ptr<ast::Klass> ast = parser.parse_class_definition();
+    std::unique_ptr<ast::ConcreteClassDef> ast = parser.parse_class_definition();
     std::unordered_map<std::string, ast::UFunctionNode> v;
     std::vector<std::pair<std::string, ast::UTypeNode >> members;
     members.emplace_back(ID_2, ast::UTypeNode(TYPE_2.node->clone()));
     members.emplace_back(ID_1, ast::UTypeNode(TYPE_1.node->clone()));
-    REQUIRE(ast->to_json() == ast::Klass(ID, {}, std::move(members), {}, {}, v, DUMMY_POS, DUMMY_POS).to_json());
+    REQUIRE(ast->to_json() == ast::ConcreteClassDef(ID, {}, std::move(members), {}, {}, v, DUMMY_POS, DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_class_with_method", "[parser]") {
@@ -462,7 +462,7 @@ TEST_CASE("parse_class_with_method", "[parser]") {
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser("test", scanner.code_lines, tokens);
 
-    std::unique_ptr<ast::Klass> ast = parser.parse_class_definition();
+    std::unique_ptr<ast::ConcreteClassDef> ast = parser.parse_class_definition();
 
     ast::UFunctionNode fp = std::move((ast::UFunctionNode&) function.node);
     std::unordered_map<std::string, ast::UFunctionNode> v;
@@ -485,11 +485,11 @@ TEST_CASE("parse_class_with_static_method", "[parser]") {
     std::vector<Token> tokens = scanner.scan_all();
     Parser parser("test", scanner.code_lines, tokens);
 
-    std::unique_ptr<ast::Klass> ast = parser.parse_class_definition();
+    std::unique_ptr<ast::ConcreteClassDef> ast = parser.parse_class_definition();
     std::unordered_map<std::string, ast::UFunctionNode> v;
     std::string id = ((ast::UFunctionNode&) function.node)->identifier;
     v[id] = std::move((ast::UFunctionNode&) function.node);
-    REQUIRE(ast->to_json() == ast::Klass(ID, {}, {}, {}, {}, v, DUMMY_POS, DUMMY_POS).to_json());
+    REQUIRE(ast->to_json() == ast::ConcreteClassDef(ID, {}, {}, {}, {}, v, DUMMY_POS, DUMMY_POS).to_json());
 }
 
 TEST_CASE("parse_return_nothing", "[parser]") {

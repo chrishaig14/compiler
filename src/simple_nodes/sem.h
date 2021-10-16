@@ -35,6 +35,9 @@ namespace sem {
 
     class EnumDef;
 
+
+    class TemplateKlassDef;
+
     class Float;
 
     class For;
@@ -115,7 +118,8 @@ namespace sem {
         DICT,
         OBJECT_METHOD,
         CONST_FUNCTION,
-        OBJECT_CONSTRUCTOR, STATIC_METHOD
+        OBJECT_CONSTRUCTOR,
+        STATIC_METHOD
     };
 
     enum class TopType {

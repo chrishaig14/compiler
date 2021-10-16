@@ -13,8 +13,10 @@
 #include "../ast/top/Alias.h"
 #include "../ast/top/Import.h"
 #include "../ast/top/EnumNode.h"
-#include "../ast/top/Klass.h"
+#include "../ast/top/TemplateClassDef.h"
+#include "../ast/top/ConcreteClassDef.h"
 #include "../ast/top/TypeclassAst.h"
+#include "../units/infos/TemplateClass.h"
 
 const VectorOfStrings default_imports = {"libcore.libcore.String", "libcore.libcore.Integer", "libcore.libcore.List",
                                          "libcore.libcore.Double", "libcore.libcore.Boolean", "libcore.libcore.Float",
@@ -94,18 +96,31 @@ void ModulePrechecker::visit_root() {
     for (ast::Import& n: node.imports) {
         this->visit_import(n);
     }
-    for (ast::Klass& n: node.classes) {
+    for (ast::ConcreteClassDef& n: node.classes) {
         auto class_info = std::make_unique<ConcreteClass>(n.class_name, Path(this->module.path, n.class_name));
         this->module.add_class_definition(std::move(class_info));
     }
+
+    for (ast::TemplateClassDef& n: node.template_classes) {
+        auto class_info = std::make_unique<TemplateClassInfo>(n.class_name,
+                                                              Path(this->module.path, n.class_name),
+                                                              n.type_parameters);
+        this->module.add_template_class_definition(std::move(class_info));
+    }
+
     for (ast::EnumNode& n: node.enums) {
         auto enumm = make_enum(n, this->module.path);
         this->module.add_enum_definition(std::move(enumm));
     }
 
-    for (ast::Klass& n: node.classes) {
+    for (ast::ConcreteClassDef& n: node.classes) {
         this->visit_class(n);
     }
+
+    for (ast::TemplateClassDef& n: node.template_classes) {
+        this->visit_template_class(n);
+    }
+
 
     for (ast::TypeclassAst& n: node.typeclasses) {
         this->visit_typeclass(n);
@@ -122,8 +137,10 @@ void ModulePrechecker::check_duplicated_names(ast::Module& node) {
     for (auto& np: node.all) {
         auto& n = *np;
         std::string name;
-        if (n.ntype == TopNodeType::CLS) {
-            name = ((ast::Klass&) n).class_name;
+        if (n.ntype == TopNodeType::CONCRETE_CLS) {
+            name = ((ast::ConcreteClassDef&) n).class_name;
+        } else if (n.ntype == TopNodeType::TEMPLATE_CLS) {
+            name = ((ast::TemplateClassDef&) n).class_name;
         } else if (n.ntype == TopNodeType::FUNC) {
             name = ((ast::Function&) n).identifier;
         } else if (n.ntype == TopNodeType::IMPORT) {
@@ -143,16 +160,8 @@ void ModulePrechecker::check_duplicated_names(ast::Module& node) {
     }
 }
 
-
-void ModulePrechecker::visit_block(ast::Block& node) {
-    for (auto& n: node.nodes) {
-        this->dispatch(*n);
-    }
-}
-
-void ModulePrechecker::visit_class(ast::Klass& node) {
-    ConcreteClass* class_info = &this->module.members[node.class_name]->klass();
-    class_info->type_params = node.type_parameters;
+void ModulePrechecker::visit_class(ast::ConcreteClassDef& node) {
+    ConcreteClass* class_info = &this->module.members.at(node.class_name)->klass();
     for (const auto& mt: node.members) {
         // this->module.fill_actual(*mt.second);
         class_info->member_names.push_back(mt.first);
@@ -164,7 +173,7 @@ void ModulePrechecker::visit_class(ast::Klass& node) {
         class_info->static_members[mn.first] = std::make_pair(mn.second.first->clone(), mn.second.second);
     }
     for (const auto& f: node.methods) {
-        ast::Function& method = *f.second->method;
+        ast::Function& method = *f.second;
 
         sem::VectorOfTypes x;
         for (ast::Type& p: method.parameter_types) {
@@ -195,26 +204,52 @@ void ModulePrechecker::visit_class(ast::Klass& node) {
         method.path = cf->path;
         class_info->static_methods.insert(make_pair(f.first, std::move(cf)));
     }
-
-    class_info->type_params = node.type_parameters;
 }
 
-void ModulePrechecker::dispatch(ast::Statement& nod) {
-    switch (nod.ntype) {
-        case StatementType::CLS:
-            this->visit_class((ast::Klass&) nod);
-            break;
-        case StatementType::FUNC:
-            this->visit_function((ast::Function&) nod);
-            break;
-        case StatementType::IMPORT:
-            this->visit_import((ast::Import&) nod);
-            break;
-        case StatementType::ALIAS:
-            this->visit_alias((ast::Alias&) nod);
-            break;
-        default:
-            return;
+
+void ModulePrechecker::visit_template_class(ast::TemplateClassDef& node) {
+    TemplateClassInfo* class_info = &this->module.members.at(node.class_name)->template_klass();
+    for (const auto& mt: node.members) {
+        // this->module.fill_actual(*mt.second);
+        class_info->member_names.push_back(mt.first);
+        class_info->member_types.push_back(mt.second->clone());
+        class_info->members[mt.first] = mt.second->clone();
+        class_info->member_entities[mt.first] = std::make_unique<EntityNothing>();
+    }
+    for (const auto& mn: node.static_members) {
+        class_info->static_members[mn.first] = std::make_pair(mn.second.first->clone(), mn.second.second);
+    }
+    for (const auto& f: node.methods) {
+        ast::Function& method = *f.second;
+
+        sem::VectorOfTypes x;
+        for (ast::Type& p: method.parameter_types) {
+            sem::Type* args = p.to_sem();
+            this->module.fill_actual(*args);
+            x.emplace_back(args);
+        }
+        sem::Type* p_type = method.return_type->to_sem();
+        this->module.fill_actual(*p_type);
+        auto cf = std::make_unique<ConstFunction>(Path(class_info->path, f.first),
+                                                  std::make_unique<sem::TypeFunction>(x, sem::UType(p_type)));
+        method.path = cf->path;
+        class_info->methods.insert(make_pair(f.first, std::move(cf)));
+    }
+
+    for (const auto& f: node.static_methods) {
+        ast::Function& method = *f.second;
+        sem::VectorOfTypes x;
+        for (ast::Type& p: method.parameter_types) {
+            sem::Type* args = p.to_sem();
+            this->module.fill_actual(*args);
+            x.emplace_back(args);
+        }
+        sem::Type* p_type = method.return_type->to_sem();
+        this->module.fill_actual(*p_type);
+        auto cf = std::make_unique<ConstFunction>(Path(class_info->path, f.first),
+                                                  std::make_unique<sem::TypeFunction>(x, sem::UType(p_type)));
+        method.path = cf->path;
+        class_info->static_methods.insert(make_pair(f.first, std::move(cf)));
     }
 }
 

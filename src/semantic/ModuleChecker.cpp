@@ -167,8 +167,9 @@ ast::UTypeNode make_type(const ast::Type& original, const MapStringType& replace
     }
 }
 
-std::unique_ptr<ConcreteClass> ModuleChecker::instantiate_generic(const ConcreteClass& generic, const ast::ObjectType& instance) {
+std::unique_ptr<ConcreteClass> ModuleChecker::instantiate_generic(const TemplateClassInfo& generic, const ast::ObjectType& instance) {
     std::cout << "gonna instantiate generic: " << instance.actual_to_string() << std::endl;
+    assert(not generic.type_params.empty());
     MapStringType replacements;
     for (size_t i = 0; i < generic.type_params.size(); i++) {
         std::string tp = generic.type_params[i];
@@ -212,7 +213,10 @@ std::unique_ptr<ConcreteClass> ModuleChecker::instantiate_generic(const Concrete
     for (size_t i = 0; i < generic.member_names.size(); i++) {
         std::string mn = generic.member_names[i];
         concrete->members[mn] = concrete_field_types[i];
-        concrete->member_entities[mn] = std::make_unique<EntityNothing>();
+        sem::Type* u = concrete_field_types[i]->to_sem();
+        this->module.fill_actual(*u);
+        concrete->member_entities[mn] = this->make_value(u);
+                // std::make_unique<EntityNothing>();
     }
     return concrete;
 }
@@ -297,8 +301,6 @@ sem::UCommon ModuleChecker::dispatch(const ast::Statement& nod) {
 
 std::unique_ptr<sem::Top> ModuleChecker::dispatch_top(const ast::TopNode& n) {
     switch (n.ntype) {
-        case TopNodeType::CLS:
-            return this->visit_class((ast::Klass&) n);
         case TopNodeType::FUNC:
             return this->visit_function((ast::Function&) n);
         case TopNodeType::ENUM:
@@ -307,6 +309,12 @@ std::unique_ptr<sem::Top> ModuleChecker::dispatch_top(const ast::TopNode& n) {
             return nullptr;
         case TopNodeType::TYPECLASS:
             return this->visit_typeclass((ast::TypeclassAst&) n);
+        case TopNodeType::CONCRETE_CLS:
+            return this->visit_class((ast::ConcreteClassDef&) n);
+            break;
+        case TopNodeType::TEMPLATE_CLS:
+            return this->visit_template_class((ast::TemplateClassDef&) n);
+            break;
     }
     __builtin_unreachable();
 }

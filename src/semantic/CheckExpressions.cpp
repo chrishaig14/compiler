@@ -161,20 +161,27 @@ std::unique_ptr<EntityValue> ModuleChecker::make_value(sem::Type* type) {
     if (module_member.is_enumm()) {
         return std::make_unique<EntityValue>(type, &module_member.enumm());
     }
-    ConcreteClass* cls = &module_member.klass();
-    if (not type_object.type_params.empty()) {
-        auto instance = cls->generic_instances.find(type->actual_to_string());
-        if (instance == cls->generic_instances.end()) {
-            ast::UObjectType o(&type_object.to_ast()->object());
-            ConcreteClass* bcls = cls;
-            std::unique_ptr<ConcreteClass> instance_c = instantiate_generic(*bcls, *o);
-            cls = instance_c.get();
-            bcls->generic_instances[type->actual_to_string()] = std::move(instance_c);
-        } else {
-            cls = instance->second.get();
-        }
+    if (module_member.is_klass()) {
+        ConcreteClass* cls = &module_member.klass();
+        return std::make_unique<EntityValue>(type, cls);
     }
-    return std::make_unique<EntityValue>(type, cls);
+    TemplateClassInfo& cls = module_member.template_klass();
+    ConcreteClass* bcls;
+    if (not type_object.type_params.empty()) {
+        // auto instance = cls->generic_instances.find(type->actual_to_string());
+        // if (instance == cls->generic_instances.end()) {
+        ast::UObjectType o(&type_object.to_ast()->object());
+        std::unique_ptr<ConcreteClass> instance_c = instantiate_generic(cls, *o);
+        // cls = instance_c.get();
+        // bcls->generic_instances[type->actual_to_string()] = std::move(instance_c);
+        bcls = instance_c.get();
+        cls.generic_instances[o->actual_to_string()] = std::move(instance_c);
+        // } else {
+        //     cls = instance->second.get();
+        // }
+    }
+    return std::make_unique<EntityValue>(type, bcls);
+    // return nullptr;
 }
 
 UExpressionInfo ModuleChecker::visit_subscript(const ast::Subscript& node) {

@@ -64,21 +64,20 @@ std::unique_ptr<sem::EnumDef> ModuleChecker::visit_enum(ast::EnumNode& p_node) {
     return esn;
 }
 
-std::unique_ptr<sem::KlassDef> ModuleChecker::visit_class(ast::Klass& node) {
+std::unique_ptr<sem::KlassDef> ModuleChecker::visit_class(ast::ConcreteClassDef& node) {
     this->error_reporter.current_class = node.class_name;
     ast::VectorOfTypes tp;
     std::string cn = node.class_name;
-    for (const auto& type_param: node.type_parameters) {
-        tp.push_back(TYPE(type_param, {}));
-    }
-
     ast::VectorOfTypes members_ordered_types;
+    VectorOfStrings member_types;
     for (const auto& mt: node.members) {
         ast::Type& t = *mt.second;
         members_ordered_types.push_back(&t);
         this->assert_type_exists(t, node.start);
+        member_types.push_back(t.to_string());
     }
     auto sn = std::make_unique<sem::KlassDef>(node.class_name, node.members_ordered);
+    sn->member_types = member_types;
     this->add_this = true;
     // this->this_entity = std::unique_ptr<Entity>(this->entity_value_from_actual_base_path_no_generic(Path(this->module.path,
     //                                                                                                      node.class_name)).clone());
@@ -90,7 +89,7 @@ std::unique_ptr<sem::KlassDef> ModuleChecker::visit_class(ast::Klass& node) {
     this->this_entity = this->make_entity_value(ot);
 
     for (auto& m: node.methods) {
-        auto ms = this->visit_function(*m.second->method);
+        auto ms = this->visit_function(*m.second);
         std::unique_ptr<sem::FunctionDef> sf((sem::FunctionDef*) ms.release());
         sn->methods.emplace_back(std::move(sf));
     }
@@ -155,6 +154,51 @@ std::unique_ptr<sem::KlassDef> ModuleChecker::visit_class(ast::Klass& node) {
     return sn;
 }
 
+std::unique_ptr<sem::TemplateKlassDef> ModuleChecker::visit_template_class(ast::TemplateClassDef& node) {
+    this->error_reporter.current_class = node.class_name;
+    ast::VectorOfTypes tp;
+    std::string cn = node.class_name;
+    ast::VectorOfTypes members_ordered_types;
+    VectorOfStrings member_types;
+    for (const auto& mt: node.members) {
+        ast::Type& t = *mt.second;
+        members_ordered_types.push_back(&t);
+        this->assert_type_exists(t, node.start);
+        member_types.push_back(t.to_string());
+    }
+    auto sn = std::make_unique<sem::TemplateKlassDef>(node.class_name, node.members_ordered);
+    sn->member_types = member_types;
+    this->add_this = true;
+    // this->this_entity = std::unique_ptr<Entity>(this->entity_value_from_actual_base_path_no_generic(Path(this->module.path,
+    //                                                                                                      node.class_name)).clone());
+    // this->fill_value(this->this_entity->get_value());
+    Path p(this->module.path, node.class_name);
+    sem::VectorOfTypes tppp;
+    for (auto& type_p: node.type_parameters) {
+        tppp.push_back(new sem::TypeObject(type_p, Path("generics." + type_p)));
+    }
+    sem::TypeObject ot(p.basname(), tppp, p);
+    // auto v = std::make_unique<Value>(ot);
+    // this->fill_value(*v);
+    this->this_entity = this->make_entity_value(ot);
+
+    for (auto& m: node.methods) {
+        auto ms = this->visit_function(*m.second);
+        std::unique_ptr<sem::FunctionDef> sf((sem::FunctionDef*) ms.release());
+        sn->methods.emplace_back(std::move(sf));
+    }
+    this->this_entity.reset();
+    this->add_this = false;
+
+    for (auto& m: node.static_methods) {
+        auto ms = this->visit_function(*m.second);
+        std::unique_ptr<sem::FunctionDef> sf((sem::FunctionDef*) ms.release());
+        sn->static_methods.emplace_back(std::move(sf));
+    }
+    return sn;
+}
+
+
 void ModuleChecker::init() {
     // Initialize module level Scope
     for (const auto& f: this->module.members) {
@@ -167,6 +211,9 @@ std::unique_ptr<sem::Module> ModuleChecker::check_module() {
     this->init();
     auto sn = std::make_unique<sem::Module>();
     for (auto& n: this->module.ast->all) {
+        // if (n->ntype == TopNodeType::TEMPLATE_CLS) {
+        //     continue;
+        // }
         if (n->ntype == TopNodeType::IMPORT) {
             continue;
         }
@@ -210,15 +257,16 @@ std::unique_ptr<sem::FunctionDef> ModuleChecker::visit_function(ast::Function& n
     if (this->add_this) {
         this->scope->set("this", *this->this_entity);
     }
-    auto& e_const_function = this->scope->get(n.identifier);
-    auto& const_function = e_const_function.get_constfun().const_function;
+    // auto& e_const_function = this->scope->get(n.identifier);
+    // auto& const_function = e_const_function.get_constfun().const_function;
     for (size_t i = 0; i < n.parameter_names.size(); i++) {
         // ast::Type& type = n.parameter_types[i];
         // ast::UTypeNode cl(type.clone());
         // make_not_generic(*cl);
-        sem::UType p_type(const_function.const_function_ft.param_types[i]->clone());
-        add_typeclasses_to_generic_type(*p_type, n.gen_type, n.typeclass_name);
-        auto te = this->make_entity_value(*p_type);
+        sem::Type* semt = n.parameter_types[i].get().to_sem();
+        this->module.fill_actual(*semt);
+        add_typeclasses_to_generic_type(*semt, n.gen_type, n.typeclass_name);
+        auto te = this->make_entity_value(*semt);
         this->scope->set(n.parameter_names[i], *te);
     }
     ast::Type& returnType = *n.return_type;

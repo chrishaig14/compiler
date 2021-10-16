@@ -32,6 +32,7 @@
 #include "../simple_nodes/common/include/Return.h"
 #include "../simple_nodes/common/include/TypeObject.h"
 #include "../simple_nodes/common/include/TypeFunction.h"
+#include "../simple_nodes/top/include/TemplateKlassDef.h"
 #include "../simple_nodes/expressions/include/expressions.h"
 #include "../simple_nodes/top/include/EnumDef.h"
 #include "../simple_nodes/top/include/FunctionDef.h"
@@ -54,6 +55,7 @@
 #include "../units/entities/EntityNotFound.h"
 #include "../units/entities/EntityTypeclass.h"
 #include "../units/entities/EntityNothing.h"
+#include "../units/entities/EntityTemplateClass.h"
 
 // #include "../logger/Logger.h"
 
@@ -96,7 +98,7 @@ public:
     void enter_scope();
     void leave_scope();
     bool assert_type_exists(const ast::Type& type, TextPosition pos);
-    std::unique_ptr<ConcreteClass> instantiate_generic(const ConcreteClass& generic, const ast::ObjectType& instance);
+    std::unique_ptr<ConcreteClass> instantiate_generic(const TemplateClassInfo& generic, const ast::ObjectType& instance);
     bool is_variable(const ast::ObjectType& a);
     void fail(std::string msg);
     void init();
@@ -104,7 +106,8 @@ public:
     std::unique_ptr<sem::Module> check_module();
 
     std::unique_ptr<sem::FunctionDef> visit_function(ast::Function& n);
-    std::unique_ptr<sem::KlassDef> visit_class(ast::Klass& node);
+    std::unique_ptr<sem::KlassDef> visit_class(ast::ConcreteClassDef& node);
+    std::unique_ptr<sem::TemplateKlassDef> visit_template_class(ast::TemplateClassDef& node);
     std::unique_ptr<sem::EnumDef> visit_enum(ast::EnumNode& p_node);
     std::unique_ptr<sem::Top> visit_typeclass(const ast::TypeclassAst& typeclass);
 

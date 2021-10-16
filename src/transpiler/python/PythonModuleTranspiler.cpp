@@ -188,8 +188,9 @@ PythonOutputCode PythonModuleTranspiler::transpile_class(const sem::KlassDef& no
     }
     def += "):\n";
     std::string block;
-    for (const auto& m: node.members) {
-        block += "self." + m + " = " + m + "\n";
+    for (size_t i = 0; i < node.members.size(); i++) {
+        auto m = node.members[i];
+        block += "self." + m + " = " + m + " #" + node.member_types[i] + "\n";
     }
     block = indent_paragraph(block, 4);
 

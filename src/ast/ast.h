@@ -55,6 +55,8 @@ namespace ast {
 
     class Statement;
 
+    class TemplateClassDef;
+
     class TypeclassAst;
 
     class Alias;
@@ -67,7 +69,7 @@ namespace ast {
 
     class Call;
 
-    class Klass;
+    class ConcreteClassDef;
 
     class Block;
 

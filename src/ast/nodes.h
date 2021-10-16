@@ -36,6 +36,7 @@
 #include "general/Type.h"
 #include "top/Function.h"
 #include "top/Import.h"
-#include "top/Klass.h"
+#include "top/TemplateClassDef.h"
+#include "top/ConcreteClassDef.h"
 
 #endif //NODES_H

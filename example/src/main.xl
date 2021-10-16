@@ -1,13 +1,17 @@
-typeclass Stringable[t] {
-    fun to_string() -> String
+class Foo[t] {
+    value: t
+    fun get_value() -> t {
+        return this.value
+    }
 }
 
-//fun foo(a: t) -> String {
-//    return a.to_string()
-//}
+class MyFoo {
+    name: String
+    age: Integer
+}
 
-fun bar(a: t) -> String where t::Stringable {
-    return a.to_string()
+fun baba(x: Foo[String]) -> String {
+    return x.get_value()
 }
 
 fun main()->Integer {

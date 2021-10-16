@@ -37,6 +37,8 @@ UExpressionInfo ModuleChecker::visit_member(const ast::Member& n) {
             break;
         case E_TYPE::TYPECLASS:
             break;
+        case E_TYPE::TEMPLATE_CLASS:
+            break;
     }
     return exp_error_stub();
 }

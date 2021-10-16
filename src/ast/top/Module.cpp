@@ -4,10 +4,9 @@
 
 #include "Module.h"
 #include "Import.h"
-#include "Klass.h"
+#include "TemplateClassDef.h"
 #include "EnumNode.h"
 #include "Function.h"
-
 
 
 template<typename T>
@@ -22,11 +21,12 @@ vector_of_unique_ptr_to_vector_of_reference_wrapper(const std::vector<std::uniqu
 
 ast::Module::Module(std::vector<std::unique_ptr<ast::TopNode>> all,
                     std::vector<std::reference_wrapper<ast::Import>> imports,
-                    std::vector<std::reference_wrapper<ast::Klass>> classes,
+                    std::vector<std::reference_wrapper<ast::ConcreteClassDef>> classes,
+                    std::vector<std::reference_wrapper<ast::TemplateClassDef>> template_classes,
                     std::vector<std::reference_wrapper<ast::EnumNode>> enums,
                     std::vector<std::reference_wrapper<ast::Function>> functions,
                     std::vector<std::reference_wrapper<ast::TypeclassAst>> typeclasses)
-        : imports(imports), classes(classes), enums(enums), functions(functions), typeclasses(typeclasses),
-          all(std::move(all)) {
+        : imports(imports), classes(classes), template_classes(template_classes), enums(enums), functions(functions),
+          typeclasses(typeclasses), all(std::move(all)) {
 }
 

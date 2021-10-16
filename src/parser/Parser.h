@@ -34,7 +34,7 @@ public:
     Token expect_token(TokType token_type);
 
     std::unique_ptr<ast::Import> parse_import();
-    std::unique_ptr<ast::Klass> parse_class_definition();
+    std::unique_ptr<ast::TopNode> parse_class_definition();
     std::unique_ptr<ast::Function> parse_function_definition();
     std::unique_ptr<ast::Alias> parse_alias();
     std::unique_ptr<ast::EnumNode> parse_enum_definition();

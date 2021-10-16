@@ -26,10 +26,10 @@ sem::UCommon ModuleChecker::visit_lvalue_subscript(const ast::Subscript& node) {
     }
     const ConcreteClass* cls = entity_parent_value.clazz;
     assert(cls != nullptr);
-    if (!cls->type_params.empty()) {
-        auto ccls = instantiate_generic(*cls, *(ast::ObjectType*) entity_parent_value.type.object().to_ast());
-        cls = ccls.get();
-    }
+    // if (!cls->type_params.empty()) {
+    //     auto ccls = instantiate_generic(*cls, *(ast::ObjectType*) entity_parent_value.type.object().to_ast());
+    //     cls = ccls.get();
+    // }
 
     auto subscript_it = cls->methods.find("__set_item__");
     if (subscript_it == cls->methods.end()) {

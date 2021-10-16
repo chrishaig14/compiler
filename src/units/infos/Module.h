@@ -13,6 +13,7 @@
 #include "../../simple_nodes/common/include/Block.h"
 #include "ConstFunction.h"
 #include "ConcreteClass.h"
+#include "TemplateClass.h"
 #include "Enum.h"
 #include "TypeclassFoo.h"
 
@@ -20,6 +21,7 @@ class Module {
     std::vector<std::unique_ptr<ConstFunction>> const_functions;
     std::vector<std::unique_ptr<Enum>> enums;
     std::vector<std::unique_ptr<ConcreteClass>> classes;
+    std::vector<std::unique_ptr<TemplateClassInfo>> template_classes;
     std::vector<std::unique_ptr<TypeclassFoo>> typeclasses;
 public:
     const std::string name;
@@ -51,6 +53,7 @@ public:
     void fill_actual(sem::TypeObject& t);
     void fill_actual(sem::TypeFunction& t);
     void add_class_definition(std::unique_ptr<ConcreteClass> p_class);
+    void add_template_class_definition(std::unique_ptr<TemplateClassInfo> p_class);
     void add_enum_definition(std::unique_ptr<Enum> enumm);
     void add_func_definition(std::unique_ptr<ConstFunction> const_function);
     void add_typeclass_definition(std::unique_ptr<TypeclassFoo> typeclass);

@@ -23,6 +23,12 @@ void Module::add_class_definition(std::unique_ptr<ConcreteClass> p_class) {
     this->classes.push_back(std::move(p_class));
 }
 
+void Module::add_template_class_definition(std::unique_ptr<TemplateClassInfo> p_class) {
+    this->members[p_class->class_name] = std::make_unique<TemplateClassModuleMember>(*p_class);
+    this->template_classes.push_back(std::move(p_class));
+}
+
+
 void Module::add_enum_definition(std::unique_ptr<Enum> enumm) {
     this->members[enumm->enumm_name] = std::make_unique<EnumModuleMember>(enumm.get());
     this->enums.push_back(std::move(enumm));
@@ -48,6 +54,8 @@ Path Module::get_actual_path(const std::string& id) {
             return this->members[id]->klass().path;
         } else if (this->members[id]->is_enumm()) {
             return this->members[id]->enumm().path;
+        } else if (this->members[id]->is_template_klass()) {
+            return this->members[id]->template_klass().path;
         }
     }
     if (this->imported_paths_with_alias.count(id) == 1) {

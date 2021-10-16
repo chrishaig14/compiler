@@ -2,8 +2,8 @@
 // Created by chris on 2/8/20.
 //
 
-#ifndef CLASSINFO_H
-#define CLASSINFO_H
+#ifndef TEMPLATECLASSINFO_H
+#define TEMPLATECLASSINFO_H
 
 #include <string>
 #include <unordered_map>
@@ -14,11 +14,14 @@
 #include "../../util/macros.h"
 #include "../entities/Entity.h"
 #include "ConstFunction.h"
+#include "ConcreteClass.h"
 
-class ConcreteClass {
+class TemplateClassInfo {
 public:
 
-    ConcreteClass(const std::string& class_name, Path path);
+    std::map<std::string, std::unique_ptr<ConcreteClass>> generic_instances;
+
+    TemplateClassInfo(const std::string& class_name, Path path, VectorOfStrings type_params);
 
     VectorOfStrings member_names;
     std::vector<ast::Type*> member_types;
@@ -33,12 +36,12 @@ public:
     const Path path;
     const std::string class_name;
 
-    ~ConcreteClass();
+    ~TemplateClassInfo();
 
-    bool operator!=(const ConcreteClass& b) const;
+    bool operator!=(const TemplateClassInfo& b) const;
 
-    bool operator==(const ConcreteClass& b) const;
+    bool operator==(const TemplateClassInfo& b) const;
     VectorOfStrings type_params;
 };
 
-#endif //CLASSINFO_H
+#endif //TEMPLATECLASSINFO_H

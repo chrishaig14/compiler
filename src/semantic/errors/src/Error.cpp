@@ -41,6 +41,9 @@ std::string entity_to_string(const Entity& entity) {
         case E_TYPE::TYPECLASS:
             return "typeclass";
             break;
+        case E_TYPE::TEMPLATE_CLASS:
+            return "template class";
+            break;
     }
     return out;
 }
