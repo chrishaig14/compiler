@@ -548,12 +548,7 @@ PythonExpressionOutputCode PythonModuleTranspiler::transpile_const_function(cons
 
 PythonExpressionOutputCode
 PythonModuleTranspiler::transpile_object_constructor(const sem::ObjectConstructor& constructor) {
-    std::string code;
-    auto it = this->module.imported_paths_no_alias.find(constructor.class_path.basname());
-    if (it != this->module.imported_paths_no_alias.end()) {
-        code = constructor.class_path.basname();
-    }
-    return PythonExpressionOutputCode("", code);
+    return PythonExpressionOutputCode("", this->clean_path(constructor.class_path));
 }
 
 PythonExpressionOutputCode PythonModuleTranspiler::transpile_call_exp(const sem::CallExp& node) {

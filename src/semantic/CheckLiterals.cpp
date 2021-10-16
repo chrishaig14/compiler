@@ -190,31 +190,53 @@ UExpressionInfo ModuleChecker::visit_emptydict(const ast::EmptyDict& node) {
 
 UExpressionInfo ModuleChecker::visit_defconst(const ast::DefaultConstructor& node) {
     // this is a regular function
-    UExpressionInfo info_u = std::make_unique<ExpressionInfo>();
-    ExpressionInfo& info = *info_u;
     UExpressionInfo class_info = this->dispatch_rvalue(*node.class_node);
     Entity& entity = class_info->entity;
-    if (entity.e_type != E_TYPE::CLASS) {
+    if (entity.e_type != E_TYPE::CLASS and entity.e_type != E_TYPE::TEMPLATE_CLASS) {
         this->error_reporter.fail("Error not a class");
         return exp_error_stub();
     }
-    ConcreteClass& cls = entity.get_class().clazz;
-    sem::VectorOfTypes t;
-    for (auto* pt: cls.member_types) {
-        t.push_back(pt->to_sem());
+
+    UExpressionInfo info_u = std::make_unique<ExpressionInfo>();
+    ExpressionInfo& info = *info_u;
+    if (entity.is_class()) {
+
+        ConcreteClass& cls = entity.get_class().clazz;
+        sem::VectorOfTypes t;
+        for (auto* pt: cls.member_types) {
+            t.push_back(pt->to_sem());
+        }
+        sem::VectorOfTypes tp;
+        for (const auto& tt: cls.type_params) {
+            auto* ot = new sem::TypeObject(tt);
+            tp.push_back(ot);
+            ot->is_generic_param = true;
+        }
+        auto* rt = new sem::TypeObject(cls.class_name, tp, cls.path);
+        info.set_entity(std::make_unique<EntityConstFunction>(*new ConstFunction(Path(),
+                                                                                 std::make_unique<sem::TypeFunction>(t,
+                                                                                                                     sem::UType(
+                                                                                                                             rt)))));
+        info.exp_snode = std::make_unique<sem::ObjectConstructor>(cls.path);
+    } else {
+        TemplateClassInfo& tci = entity.get_template_class().clazz;
+        sem::VectorOfTypes t;
+        for (auto* pt: tci.member_types) {
+            t.push_back(pt->to_sem());
+        }
+        sem::VectorOfTypes tp;
+        for (const auto& tt: tci.type_params) {
+            auto* ot = new sem::TypeObject(tt);
+            tp.push_back(ot);
+            ot->is_generic_param = true;
+        }
+        auto* rt = new sem::TypeObject(tci.class_name, tp, tci.path);
+        info.set_entity(std::make_unique<EntityConstFunction>(*new ConstFunction(Path(),
+                                                                                 std::make_unique<sem::TypeFunction>(t,
+                                                                                                                     sem::UType(
+                                                                                                                             rt)))));
+        info.exp_snode = std::make_unique<sem::ObjectConstructor>(tci.path);
     }
-    sem::VectorOfTypes tp;
-    for (const auto& tt: cls.type_params) {
-        auto* ot = new sem::TypeObject(tt);
-        tp.push_back(ot);
-        ot->is_generic_param = true;
-    }
-    auto* rt = new sem::TypeObject(cls.class_name, tp, cls.path);
-    info.set_entity(std::make_unique<EntityConstFunction>(*new ConstFunction(Path(),
-                                                                             std::make_unique<sem::TypeFunction>(t,
-                                                                                                                 sem::UType(
-                                                                                                                         rt)))));
-    info.exp_snode = std::make_unique<sem::ObjectConstructor>(cls.path);
     return info_u;
 }
 
