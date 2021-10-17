@@ -5,10 +5,16 @@
 #include "../include/ErrorNoMemberSuggestions.h"
 
 std::string ErrorNoMemberSuggestions::to_str(const CodeLines& code) const {
-    std::string s = "Error no member: " + this->m.s_child + " candidates are: ";
-    for (auto mm: this->clazz.members) {
-        s += mm.first + ", ";
+    std::string s = "Error no member: " + this->m.s_child + " candidates are: \n";
+
+    for (auto& mm: this->clazz.members) {
+        s += mm.first + mm.second->to_string() + "\n";
     }
+
+    for (auto& mm: this->clazz.methods) {
+        s += mm.first + ": " + mm.second->const_function_ft.to_string() + "\n";
+    }
+
     return s;
 }
 
