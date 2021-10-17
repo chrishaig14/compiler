@@ -1,8 +1,17 @@
-fun first(a: t, b: u) -> u {
-    return b
+typeclass Stringable[t] {
+    fun as_string() -> String
 }
 
-fun main()->Integer {
-    print(first(9,"Hello"))
+class MyFoo {
+    str: String
+}
+
+fun get_string(a: t) -> String where t:: Stringable {
+    return "the string is " + a.as_string()
+}
+
+fun main() -> Integer {
+    var my_foo = #MyFoo("Hello Chris!")
+    print(get_string(6))
     return 0
 }

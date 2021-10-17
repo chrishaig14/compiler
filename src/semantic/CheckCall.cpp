@@ -72,7 +72,10 @@ ModuleChecker::analyze_call(const ast::ExpNode& function, std::vector<ast::RExpN
     std::map<std::string, ast::Type*> a;
     ast::FunctionType* ft = static_cast<ast::FunctionType*>(function_type.to_ast());
     if (ft->is_generic()) {
-        retv_p = this->match_arguments_to_generic_function(*ft, arg_types, a);
+        retv_p = this->match_arguments_to_generic_function(*ft,
+                                                           arg_types,
+                                                           a,
+                                                           fun_info.entity.get().get_constfun().const_function.constraints);
         retv_p->exp_snode = std::make_unique<sem::CallExp>(std::move(fun_info_p->exp_snode), std::move(arguments_));
         return retv_p;
     }

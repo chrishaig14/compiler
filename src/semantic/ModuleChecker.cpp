@@ -90,13 +90,15 @@ bool is_generic(const sem::Type& t) {
 
 UExpressionInfo
 ModuleChecker::match_arguments_to_generic_function(const ast::FunctionType& ft, ast::VectorOfTypes arg_types,
-                                                   std::map<std::string, ast::Type*>& all_substitutions) {
+                                                   std::map<std::string, ast::Type*>& all_substitutions,
+                                                   std::unordered_map<std::string, std::string> constraints) {
     std::unique_ptr<ast::FunctionType> f;
     try {
         f = unify_function_call(ft, arg_types, all_substitutions);
         if (f == nullptr) {
             throw std::runtime_error("unify error");
         }
+
     } catch (...) {
         std::string sss = "Error: cannot unify " + E_HLT(ft.to_string()) + " with args: ";
         std::string args_str;
@@ -110,6 +112,27 @@ ModuleChecker::match_arguments_to_generic_function(const ast::FunctionType& ft, 
         this->error_reporter.fail(sss);
         return exp_error_stub();
     }
+
+    for (auto& c: constraints) {
+        auto s = all_substitutions.at(c.first);
+        sem::Type* p_type = s->to_sem();
+        this->module.fill_actual(*p_type);
+        std::unique_ptr<EntityValue> v = this->make_value(p_type);
+        auto& clazz = *v->clazz;
+        bool ok = false;
+        for (auto& it: clazz.implemented_typeclasses) {
+            if (it == c.second) {
+                ok = true;
+                break;
+            }
+        }
+        if (!ok) {
+            throw std::runtime_error("function call with type substitution " + c.first + " -> " + p_type->to_string() +
+                                     " which doesn't implement required typeclass " + c.second);
+        }
+    }
+
+
     for (auto* at: arg_types) {
         delete at;
     }
@@ -167,7 +190,8 @@ ast::UTypeNode make_type(const ast::Type& original, const MapStringType& replace
     }
 }
 
-std::unique_ptr<ConcreteClass> ModuleChecker::instantiate_generic(const TemplateClassInfo& generic, const ast::ObjectType& instance) {
+std::unique_ptr<ConcreteClass>
+ModuleChecker::instantiate_generic(const TemplateClassInfo& generic, const ast::ObjectType& instance) {
     std::cout << "gonna instantiate generic: " << instance.actual_to_string() << std::endl;
     assert(not generic.type_params.empty());
     MapStringType replacements;
@@ -216,7 +240,7 @@ std::unique_ptr<ConcreteClass> ModuleChecker::instantiate_generic(const Template
         sem::Type* u = concrete_field_types[i]->to_sem();
         this->module.fill_actual(*u);
         concrete->member_entities[mn] = this->make_value(u);
-                // std::make_unique<EntityNothing>();
+        // std::make_unique<EntityNothing>();
     }
     return concrete;
 }

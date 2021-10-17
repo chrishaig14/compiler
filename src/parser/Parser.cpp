@@ -795,8 +795,9 @@ std::unique_ptr<ast::Function> Parser::parse_function_definition() {
         return_type = std::make_unique<ast::ObjectType>(".None");
     }
 
-    std::string constraint_generic_type;
-    std::string constraint_typeclass_name;
+    // std::string constraint_generic_type;
+    // std::string constraint_typeclass_name;
+    std::unordered_map<std::string, std::string> constraints;
     if (this->match(TokType::WHERE)) {
         // has a typeclass constraint!
         // for now, just a single constraint, for a single generic type
@@ -804,8 +805,9 @@ std::unique_ptr<ast::Function> Parser::parse_function_definition() {
         Token generic_type = this->expect_token(TokType::ID);
         this->expect_token(TokType::DOUBLE_COLON);
         Token typeclass_name = this->expect_token(TokType::ID);
-        constraint_generic_type = generic_type.str;
-        constraint_typeclass_name = typeclass_name.str;
+        // constraint_generic_type = generic_type.str;
+        // constraint_typeclass_name = typeclass_name.str;
+        constraints[generic_type.str] = typeclass_name.str;
     }
     // Parse function body
     auto body = this->parse_possibly_empty_block();
@@ -815,11 +817,9 @@ std::unique_ptr<ast::Function> Parser::parse_function_definition() {
                                                 parameter_types,
                                                 return_type,
                                                 body,
+                                                constraints,
                                                 fun_tok.start,
                                                 body->end);
-    if (not constraint_generic_type.empty()) {
-        node->set_constraint(constraint_generic_type, constraint_typeclass_name);
-    }
     node->start = fun_tok.start;
     return node;
 }

@@ -11,11 +11,13 @@
 #include "../../ast/top/Function.h"
 #include "../../simple_nodes/sem.h"
 #include "../../simple_nodes/common/include/TypeFunction.h"
+#include <unordered_map>
 
 class ConstFunction {
 private:
     sem::UTypeFunction const_function_ft_p;
 public:
+    std::unordered_map<std::string, std::string> constraints;
 
     ConstFunction(Path path, sem::UTypeFunction ft);
 

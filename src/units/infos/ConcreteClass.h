@@ -17,7 +17,7 @@
 
 class ConcreteClass {
 public:
-
+    std::vector<std::string> implemented_typeclasses;
     ConcreteClass(const std::string& class_name, Path path);
 
     VectorOfStrings member_names;
