@@ -15,7 +15,8 @@ TEST_CASE("global_main", "[parser]") {
     Parser parser("test", scanner.code_lines, tokens);
     Module module(Path("main.foo"), "foo.xl", false);
     module.ast = parser.parse_module();
-    ModulePrechecker gp(module);
+    std::map<std::string, std::string> instances;
+    ModulePrechecker gp(module, instances);
     gp.visit_root();
 
     REQUIRE(module.members.size() == 1);
@@ -36,7 +37,8 @@ TEST_CASE("global_class", "[parser]") {
     Parser parser("test", scanner.code_lines, tokens);
     Module module(Path("main.foo"), "foo.xl", false);
     module.ast = parser.parse_module();
-    ModulePrechecker gp(module);
+    std::map<std::string, std::string> instances;
+    ModulePrechecker gp(module,instances);
     gp.visit_root();
 
     REQUIRE(module.members.size() == 1);
@@ -81,7 +83,8 @@ TEST_CASE("global_multiple", "[parser]") {
     Parser parser("test", scanner.code_lines, tokens);
     Module module(Path("main.foo"), "foo.xl", false);
     module.ast = parser.parse_module();
-    ModulePrechecker gp(module);
+    std::map<std::string, std::string> instances;
+    ModulePrechecker gp(module,instances);
     gp.visit_root();
 
     REQUIRE(module.members.size() == 2);

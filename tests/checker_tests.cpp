@@ -16,7 +16,7 @@ const ast::ObjectType NO_TYPE(".None");
 
 const TextPosition& _POS = {1, 1};
 
-#define CHECKER() std::unique_ptr<Compiler> cp = analyze(code);Compiler& c = *cp;Module& module = c.root_package.units["tmp"]->module();resolve_module_imports(module, c.top_package);ModuleChecker checker(c.top_package, module);
+#define CHECKER() std::unique_ptr<Compiler> cp = analyze(code);Compiler& c = *cp;Module& module = c.root_package.units["tmp"]->module();resolve_module_imports(module, c.top_package);std::map<std::string,std::string> instances;ModuleChecker checker(c.top_package, module,instances);
 #define REQUIRE_CHECKER_ONE_ERROR() REQUIRE(not checker.error_reporter.ok());REQUIRE(checker.error_reporter.errors.size() == 1);
 #define REQUIRE_CHECKER_OK() REQUIRE(checker.error_reporter.ok());REQUIRE(checker.error_reporter.errors.empty());
 
@@ -328,7 +328,8 @@ TEST_CASE("error_no_member", "[checker]") {
     Compiler& c = *cp;
     Module& module = c.root_package.units["tmp"]->module();
     resolve_module_imports(module, c.top_package);
-    ModuleChecker checker(c.top_package, module, <#initializer#>);
+    std::map<std::string,std::string> instances;
+    ModuleChecker checker(c.top_package, module, instances);
     std::cout << "Starting checker" << std::endl;
     checker.init();
     ast::Function& function_node = module.ast->functions[0];

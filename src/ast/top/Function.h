@@ -25,7 +25,13 @@ public:
     std::unique_ptr<ast::Block> body;
     ast::UTypeNode return_type;
     Function(std::string identifier, const VectorOfStrings& parameter_names, ast::VectorOfUTypes& parameter_types,
-             ast::UTypeNode& return_type, std::unique_ptr<ast::Block>& body, std::unordered_map<std::string, std::string> constraints, TextPosition start, TextPosition end);
+             ast::UTypeNode& return_type, std::unique_ptr<ast::Block>& body,
+             std::unordered_map<std::string, std::string> constraints, TextPosition start, TextPosition end);
+
+    Function(std::string identifier, const VectorOfStrings& parameter_names, ast::VectorOfUTypes& parameter_types,
+             ast::UTypeNode& return_type, std::unique_ptr<ast::Block>& body, TextPosition start, TextPosition end)
+            : Function(identifier, parameter_names, parameter_types, return_type, body, {}, start, end) {
+    }
 
     bool equal(const ast::TopNode& x) const override;
 

@@ -361,7 +361,7 @@ TEST_CASE("nodes_while", "[while]") {
 
 TEST_CASE("nodes_class_empty", "[class]") {
     std::unordered_map<std::string, ast::UFunctionNode> v;
-    ast::ConcreteClassDef n("MyClass", {}, {}, {}, {}, v, DUMMY_POS, DUMMY_POS);
+    ast::ConcreteClassDef n("MyClass", {}, {}, {}, v, DUMMY_POS, DUMMY_POS);
     nlohmann::json nj = n.to_json();
     nlohmann::json members = nlohmann::json::array();
     nlohmann::json methods;
@@ -401,9 +401,9 @@ TEST_CASE("nodes_class_full", "[class]") {
                                                                  DUMMY_POS);
     nlohmann::json methods = {{"method2", method2->to_json()},
                               {"method1", method1->to_json()}};
-    std::unordered_map<std::string, std::unique_ptr<KMethod>> cmethods;
-    cmethods["method1"] = std::make_unique<KMethod>(std::move(method1));
-    cmethods["method2"] = std::make_unique<KMethod>(std::move(method2));
+    // std::unordered_map<std::string, std::unique_ptr<KMethod>> cmethods;
+    // cmethods["method1"] = std::make_unique<KMethod>(std::move(method1));
+    // cmethods["method2"] = std::make_unique<KMethod>(std::move(method2));
     nlohmann::json members = {{{"id", "foo"}, {"type", t1->to_json()}},
                               {{"id", "bar"}, {"type", t2->to_json()}}};
     std::vector<std::pair<std::string, ast::UTypeNode>> cmembers;
@@ -432,9 +432,8 @@ TEST_CASE("nodes_class_full", "[class]") {
     cstatic_methods["smethod1"] = std::move(smethod1);
     cstatic_methods["smethod2"] = std::move(smethod2);
     ast::ConcreteClassDef n("MyClass",
-                            {"k", "v"},
                             std::move(cmembers),
-                            std::move(cmethods),
+                            {},
                             {},
                             cstatic_methods,
                             DUMMY_POS,
