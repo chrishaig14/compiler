@@ -185,7 +185,7 @@ fun foo()->Integer{
     for (auto& e: module.members) {
         std::cout << e.first << std::endl;
     }
-    ModuleChecker checker(c.top_package, module);
+    ModuleChecker checker(c.top_package, module, <#initializer#>);
     checker.init();
     auto sem_func = checker.visit_function(module.ast->functions[1]);
     REQUIRE_CHECKER_OK();
@@ -204,7 +204,7 @@ TEST_CASE("semantic_output_const_function_call", "[checker]") {
     for (auto& e: module.members) {
         std::cout << e.first << std::endl;
     }
-    ModuleChecker checker(c.top_package, module);
+    ModuleChecker checker(c.top_package, module, <#initializer#>);
     checker.init();
     auto sem_func = checker.visit_function(module.ast->functions[1]);
     REQUIRE_CHECKER_OK();
@@ -226,7 +226,7 @@ TEST_CASE("semantic_output_while", "[checker]") {
     for (auto& e: module.members) {
         std::cout << e.first << std::endl;
     }
-    ModuleChecker checker(c.top_package, module);
+    ModuleChecker checker(c.top_package, module, <#initializer#>);
     checker.init();
     auto sem_func = checker.visit_function(module.ast->functions[0]);
     REQUIRE_CHECKER_OK();

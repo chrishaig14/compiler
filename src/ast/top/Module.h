@@ -18,13 +18,16 @@ public:
     std::vector<std::reference_wrapper<ast::EnumNode>> enums;
     std::vector<std::reference_wrapper<ast::Function>> functions;
     std::vector<std::reference_wrapper<ast::TypeclassAst>> typeclasses;
+    std::vector<std::reference_wrapper<ast::Instance>> instances;
 
     Module(std::vector<std::unique_ptr<ast::TopNode>> all, std::vector<std::reference_wrapper<ast::Import>> imports,
            std::vector<std::reference_wrapper<ast::ConcreteClassDef>> classes,
            std::vector<std::reference_wrapper<ast::TemplateClassDef>> template_classes,
            std::vector<std::reference_wrapper<ast::EnumNode>> enums,
            std::vector<std::reference_wrapper<ast::Function>> functions,
-           std::vector<std::reference_wrapper<ast::TypeclassAst>> typeclasses);
+           std::vector<std::reference_wrapper<ast::TypeclassAst>> typeclasses,
+           std::vector<std::reference_wrapper<ast::Instance>> instances
+           );
     std::vector<std::unique_ptr<ast::TopNode>> all;
 };
 

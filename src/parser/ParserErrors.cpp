@@ -184,30 +184,4 @@ std::unique_ptr<ast::EnumNode> Parser::parse_enum_definition() {
     return std::make_unique<ast::EnumNode>(enum_id.str, values, enum_id.start, rcurly_tk.end_pos);
 }
 
-std::unique_ptr<ast::Instance> Parser::parse_instance() {
-    Token instance_tok = this->expect_token(TokType::INSTANCE);
-    Token id_tok = this->expect_token(TokType::ID);
-    this->expect_token(TokType::LSQUARE);
-    ast::UObjectType ot = this->parse_object_type();
-    this->expect_token(TokType::RSQUARE);
-    this->expect_token(TokType::LCURLY);
-    std::unordered_map<std::string, ast::UFunctionNode> methods;
-    while (true) {
-        if (!this->match(TokType::FUN)) {
-            break;
-        }
-        auto m = this->parse_function_definition();
-        std::string id = m->identifier;
-        methods[id] = std::move(m);
-        this->expect_token(TokType::SEMICOLON);
-        if (!this->match(TokType::FUN)) {
-            break;
-        }
-    }
-    Token f_curly = this->expect_token(TokType::RCURLY);
-    return std::make_unique<ast::Instance>(id_tok.str,
-                                           std::move(ot),
-                                           std::move(methods),
-                                           instance_tok.start,
-                                           f_curly.end_pos);
-}
+

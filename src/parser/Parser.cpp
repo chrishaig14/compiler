@@ -63,6 +63,7 @@ std::unique_ptr<ast::Module> Parser::parse_module() {
     std::vector<std::reference_wrapper<ast::EnumNode>> enums;
     std::vector<std::reference_wrapper<ast::Function>> functions;
     std::vector<std::reference_wrapper<ast::TypeclassAst>> typeclasses;
+    std::vector<std::reference_wrapper<ast::Instance>> instances;
 
     std::vector<std::unique_ptr<ast::TopNode>> all;
 
@@ -91,9 +92,12 @@ std::unique_ptr<ast::Module> Parser::parse_module() {
                 all.push_back(std::move(tc));
                 break;
             }
-            case TokType::INSTANCE:
+            case TokType::INSTANCE: {
+                auto ins = this->parse_instance();
+                instances.emplace_back(*ins);
+                all.push_back(std::move(ins));
                 break;
-                // return this->parse_instance();
+            }
             case TokType::ENUM: {
                 auto ep = this->parse_enum_definition();
                 enums.emplace_back(*ep);
@@ -119,7 +123,8 @@ std::unique_ptr<ast::Module> Parser::parse_module() {
                                                     template_classes,
                                                     enums,
                                                     functions,
-                                                    typeclasses);
+                                                    typeclasses,
+                                                    instances);
     return module_ast;
 }
 
@@ -752,6 +757,33 @@ std::unique_ptr<ast::Block> Parser::parse_possibly_empty_block() {
         block.push_back(this->parse_common_statement());
     }
     return ast::Block::make(std::move(block), st.start, end.end_pos);
+}
+
+std::unique_ptr<ast::Instance> Parser::parse_instance() {
+    Token instance_tok = this->expect_token(TokType::INSTANCE);
+    Token id_tok = this->expect_token(TokType::ID);
+    this->expect_token(TokType::LSQUARE);
+    ast::UObjectType ot = this->parse_object_type();
+    this->expect_token(TokType::RSQUARE);
+    this->expect_token(TokType::LCURLY);
+    std::unordered_map<std::string, ast::UFunctionNode> methods;
+    while (true) {
+        if (!this->match(TokType::FUN)) {
+            break;
+        }
+        auto m = this->parse_function_definition();
+        std::string id = m->identifier;
+        methods[id] = std::move(m);
+        if (!this->match(TokType::FUN)) {
+            break;
+        }
+    }
+    Token f_curly = this->expect_token(TokType::RCURLY);
+    return std::make_unique<ast::Instance>(id_tok.str,
+                                           std::move(ot),
+                                           std::move(methods),
+                                           instance_tok.start,
+                                           f_curly.end_pos);
 }
 
 std::unique_ptr<ast::Function> Parser::parse_function_definition() {

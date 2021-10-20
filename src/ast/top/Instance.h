@@ -11,7 +11,7 @@
 #include "Function.h"
 #include "../ast.h"
 
-class ast::Instance : public ast::Statement {
+class ast::Instance : public ast::TopNode {
 public:
     std::string id;
     ast::UObjectType base_type;
@@ -19,7 +19,7 @@ public:
     Instance(const std::string& id, ast::UObjectType base_type,
              std::unordered_map<std::string, ast::UFunctionNode> methods, TextPosition start, TextPosition end);
     nlohmann::json to_json() const override;
-    bool equal(const ast::Statement& other) const override;
+    bool equal(const ast::TopNode& other) const override;
 };
 
 

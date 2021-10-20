@@ -328,7 +328,7 @@ TEST_CASE("error_no_member", "[checker]") {
     Compiler& c = *cp;
     Module& module = c.root_package.units["tmp"]->module();
     resolve_module_imports(module, c.top_package);
-    ModuleChecker checker(c.top_package, module);
+    ModuleChecker checker(c.top_package, module, <#initializer#>);
     std::cout << "Starting checker" << std::endl;
     checker.init();
     ast::Function& function_node = module.ast->functions[0];

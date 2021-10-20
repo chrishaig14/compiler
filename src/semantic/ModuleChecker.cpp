@@ -23,8 +23,8 @@ bool function_is_generic(const sem::TypeFunction& ft) {
     return false;
 }
 
-ModuleChecker::ModuleChecker(Package& top_package, Module& module)
-        : module(module), error_reporter(module.code_lines), top_package(top_package) {
+ModuleChecker::ModuleChecker(Package& top_package, Module& module, std::map<std::string, std::string>& instances)
+        : instances(instances), module(module), error_reporter(module.code_lines), top_package(top_package) {
     this->scope = new SymbolTable(nullptr);
     this->add_this = false;
 }
@@ -117,19 +117,29 @@ ModuleChecker::match_arguments_to_generic_function(const ast::FunctionType& ft, 
         auto s = all_substitutions.at(c.first);
         sem::Type* p_type = s->to_sem();
         this->module.fill_actual(*p_type);
-        std::unique_ptr<EntityValue> v = this->make_value(p_type);
-        auto& clazz = *v->clazz;
-        bool ok = false;
-        for (auto& it: clazz.implemented_typeclasses) {
-            if (it == c.second) {
-                ok = true;
-                break;
+        // std::unique_ptr<EntityValue> v = this->make_value(p_type);
+        // auto& clazz = *v->clazz;
+        // bool ok = false;
+        // for (auto& it: clazz.implemented_typeclasses) {
+        //     if (it == c.second) {
+        //         ok = true;
+        //         break;
+        //     }
+        // }
+        // if (p_type->is_generic()) {
+        if (this->instances.count(p_type->object().data.actual_base_path.as_str()) != 0) {
+            auto instance = this->instances.at(p_type->object().data.actual_base_path.as_str());
+            if (instance != c.second) {
+                throw std::runtime_error(
+                        "function call with type substitution " + c.first + " -> " + p_type->to_string() +
+                        " which doesn't implement required typeclass " + c.second);
             }
+        } else {
+            throw std::runtime_error(
+                    "function call with type substitution " + c.first + " -> " + p_type->to_string() +
+                    " which doesn't implement required typeclass " + c.second);
         }
-        if (!ok) {
-            throw std::runtime_error("function call with type substitution " + c.first + " -> " + p_type->to_string() +
-                                     " which doesn't implement required typeclass " + c.second);
-        }
+        // }
     }
 
 
@@ -338,6 +348,8 @@ std::unique_ptr<sem::Top> ModuleChecker::dispatch_top(const ast::TopNode& n) {
             break;
         case TopNodeType::TEMPLATE_CLS:
             return this->visit_template_class((ast::TemplateClassDef&) n);
+            break;
+        case TopNodeType::INSTANCE:
             break;
     }
     __builtin_unreachable();

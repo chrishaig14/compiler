@@ -29,11 +29,15 @@ bool Compiler::pre() {
         throw std::runtime_error("Parse Error");
     }
     PackagePrechecker pp;
-    return pp.preprocess_package(root_package);
+    if (not pp.preprocess_package(root_package)) {
+        throw std::runtime_error("Preprocess Error");
+    }
+    this->instances = pp.instances;
+    return true;
 }
 
 bool Compiler::main() {
-    PackageChecker pc(top_package);
+    PackageChecker pc(top_package, this->instances);
     return pc.check_package(root_package);
 }
 
@@ -129,7 +133,7 @@ void Compiler::load_project() {
         this->ok = false;
         return;
     }
-    PackageChecker pc(top_package);
+    PackageChecker pc(top_package, this->instances);
     bool check_ok = pc.check_package(root_package);
     if (!check_ok) {
         this->ok = false;

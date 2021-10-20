@@ -16,6 +16,7 @@
 #include "../ast/top/TemplateClassDef.h"
 #include "../ast/top/ConcreteClassDef.h"
 #include "../ast/top/TypeclassAst.h"
+#include "../ast/top/Instance.h"
 #include "../units/infos/TemplateClass.h"
 
 const VectorOfStrings default_imports = {"libcore.libcore.String", "libcore.libcore.Integer", "libcore.libcore.List",
@@ -118,6 +119,10 @@ void ModulePrechecker::visit_root() {
         this->visit_class(n);
     }
 
+    for (ast::Instance& n: node.instances) {
+        this->visit_instance(n);
+    }
+
     for (ast::TemplateClassDef& n: node.template_classes) {
         this->visit_template_class(n);
     }
@@ -138,21 +143,33 @@ void ModulePrechecker::check_duplicated_names(ast::Module& node) {
     for (auto& np: node.all) {
         auto& n = *np;
         std::string name;
-        if (n.ntype == TopNodeType::CONCRETE_CLS) {
-            name = ((ast::ConcreteClassDef&) n).class_name;
-        } else if (n.ntype == TopNodeType::TEMPLATE_CLS) {
-            name = ((ast::TemplateClassDef&) n).class_name;
-        } else if (n.ntype == TopNodeType::FUNC) {
-            name = ((ast::Function&) n).identifier;
-        } else if (n.ntype == TopNodeType::IMPORT) {
-            if (((ast::Import&) n).has_alias) {
-                name = ((ast::Import&) n).alias;
-            } else {
-                name = ((ast::Import&) n).path.back();
-            }
-        } else if (n.ntype == TopNodeType::ENUM) {
-            name = ((ast::EnumNode&) (n)).id;
+        switch (n.ntype) {
+            case TopNodeType::IMPORT:
+                if (((ast::Import&) n).has_alias) {
+                    name = ((ast::Import&) n).alias;
+                } else {
+                    name = ((ast::Import&) n).path.back();
+                }
+                break;
+            case TopNodeType::FUNC:
+                name = ((ast::Function&) n).identifier;
+                break;
+            case TopNodeType::ENUM:
+                name = ((ast::EnumNode&) (n)).id;
+                break;
+            case TopNodeType::TYPECLASS:
+                name = ((ast::TypeclassAst&) (n)).id;
+                break;
+            case TopNodeType::CONCRETE_CLS:
+                name = ((ast::ConcreteClassDef&) n).class_name;
+                break;
+            case TopNodeType::TEMPLATE_CLS:
+                name = ((ast::TemplateClassDef&) n).class_name;
+                break;
+            case TopNodeType::INSTANCE:
+                continue;
         }
+        assert(not name.empty());
         if (names.count(name) == 0) {
             names[name] = nullptr;
         } else {
@@ -263,7 +280,8 @@ void ModulePrechecker::visit_enum(ast::EnumNode& node) {
 
 }
 
-ModulePrechecker::ModulePrechecker(Module& module) : module(module), error_reporter(module.code_lines) {
+ModulePrechecker::ModulePrechecker(Module& module, std::map<std::string, std::string>& instances)
+        : module(module), error_reporter(module.code_lines), instances(instances) {
 }
 
 
@@ -285,4 +303,10 @@ void ModulePrechecker::visit_typeclass(ast::TypeclassAst& typeclass) {
     }
 
     this->module.add_typeclass_definition(std::move(tc));
+}
+
+void ModulePrechecker::visit_instance(ast::Instance& instance) {
+    auto ot = instance.base_type->to_sem();
+    this->module.fill_actual(*ot);
+    this->instances[ot->object().data.actual_base_path.as_str()] = instance.id;
 }

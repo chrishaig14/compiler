@@ -5,7 +5,7 @@
 #include "PackagePrechecker.h"
 
 bool PackagePrechecker::preprocess_module(Module& module) {
-    ModulePrechecker gp(module);
+    ModulePrechecker gp(module, this->instances);
     std::cout << "** Global-processing module " << E_INFO(module.name) << " at path: " << E_INFO(module.abs_path)
               << std::endl;
     gp.visit_root();

@@ -14,6 +14,7 @@
 
 class PackagePrechecker {
 public:
+    std::map<std::string, std::string> instances;
     bool preprocess_module(Module& module);
 
     bool preprocess_package(Package& package);

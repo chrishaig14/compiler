@@ -25,8 +25,9 @@ ast::Module::Module(std::vector<std::unique_ptr<ast::TopNode>> all,
                     std::vector<std::reference_wrapper<ast::TemplateClassDef>> template_classes,
                     std::vector<std::reference_wrapper<ast::EnumNode>> enums,
                     std::vector<std::reference_wrapper<ast::Function>> functions,
-                    std::vector<std::reference_wrapper<ast::TypeclassAst>> typeclasses)
+                    std::vector<std::reference_wrapper<ast::TypeclassAst>> typeclasses,
+                    std::vector<std::reference_wrapper<ast::Instance>> instances)
         : imports(imports), classes(classes), template_classes(template_classes), enums(enums), functions(functions),
-          typeclasses(typeclasses), all(std::move(all)) {
+          typeclasses(typeclasses), instances(instances),all(std::move(all)) {
 }
 

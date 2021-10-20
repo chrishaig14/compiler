@@ -6,12 +6,18 @@ class MyFoo {
     str: String
 }
 
+instance Stringable[MyFoo] {
+    fun as_string() -> String {
+        return "Hello my friend: " + this.str
+    }
+}
+
 fun get_string(a: t) -> String where t:: Stringable {
     return "the string is " + a.as_string()
 }
 
 fun main() -> Integer {
     var my_foo = #MyFoo("Hello Chris!")
-    print(get_string(6))
+    print(get_string("Hello"))
     return 0
 }

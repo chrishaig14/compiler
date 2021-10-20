@@ -83,13 +83,14 @@ class ModuleChecker {
     std::map<std::string, std::unique_ptr<EntityValue>> entity_values_no_generic;
     SymbolTable* scope;
     std::map<std::string, std::unique_ptr<Entity>> entities;
+    std::map<std::string,std::string>& instances;
 public:
     Module& module;
     ErrorReporter error_reporter;
     std::unique_ptr<Entity> this_entity;
     Package& top_package;
 
-    ModuleChecker(Package& top_package, Module& module);
+    ModuleChecker(Package& top_package, Module& module, std::map<std::string, std::string>& instances);
 
     std::unique_ptr<Entity> entity_from_type(const ast::Type& type);
 
@@ -104,7 +105,7 @@ public:
 
     std::unique_ptr<sem::Module> check_module();
 
-    std::unique_ptr<sem::FunctionDef> visit_function(ast::Function& n);
+    std::unique_ptr<sem::FunctionDef> visit_function(const ast::Function& n);
     std::unique_ptr<sem::KlassDef> visit_class(ast::ConcreteClassDef& node);
     std::unique_ptr<sem::TemplateKlassDef> visit_template_class(ast::TemplateClassDef& node);
     std::unique_ptr<sem::EnumDef> visit_enum(ast::EnumNode& p_node);

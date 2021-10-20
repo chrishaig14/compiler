@@ -247,10 +247,10 @@ std::unique_ptr<sem::Block> ModuleChecker::visit_block(const ast::Block& node) {
     return sn;
 }
 
-std::unique_ptr<sem::FunctionDef> ModuleChecker::visit_function(ast::Function& n) {
+std::unique_ptr<sem::FunctionDef> ModuleChecker::visit_function(const ast::Function& n) {
     this->error_reporter.current_function = n.identifier;
     // Logger::info("Checking FunctionNode " + n.identifier);
-    std::string& function_name = n.identifier;
+    std::string function_name = n.identifier;
     this->enter_scope();
     this->scope->is_function = true;
 
@@ -265,7 +265,9 @@ std::unique_ptr<sem::FunctionDef> ModuleChecker::visit_function(ast::Function& n
         // make_not_generic(*cl);
         sem::Type* semt = n.parameter_types[i].get().to_sem();
         this->module.fill_actual(*semt);
-        add_typeclasses_to_generic_type(*semt, n.gen_type, n.typeclass_name);
+        for (auto& c: n.constraints){
+            add_typeclasses_to_generic_type(*semt, c.first, c.second);
+        }
         auto te = this->make_entity_value(*semt);
         this->scope->set(n.parameter_names[i], *te);
     }

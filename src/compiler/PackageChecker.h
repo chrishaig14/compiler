@@ -22,10 +22,10 @@ class PackageChecker {
     bool check_module(Module& module);
 
     bool check_unit(Unit& uvalue);
-
+    std::map<std::string,std::string>& instances;
     Package& top_package;
 public:
-    explicit PackageChecker(Package& top_package);
+    explicit PackageChecker(Package& top_package, std::map<std::string,std::string>& instances);
 
     bool check_package(Package& package);
 };

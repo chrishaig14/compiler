@@ -42,7 +42,7 @@ void resolve_module_imports(Module& module, Package& top_package) {
 
 bool PackageChecker::check_module(Module& module) {
     resolve_module_imports(module, this->top_package);
-    ModuleChecker checker(this->top_package, module);
+    ModuleChecker checker(this->top_package, module, this->instances);
     module.sast = checker.check_module();
     return checker.error_reporter.ok();
 }
@@ -75,5 +75,6 @@ bool PackageChecker::check_package(Package& package) {
     return ok;
 }
 
-PackageChecker::PackageChecker(Package& top_package) : top_package(top_package) {
+PackageChecker::PackageChecker(Package& top_package, std::map<std::string, std::string>& instances) : instances(instances), top_package(
+        top_package) {
 }

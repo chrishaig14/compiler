@@ -49,6 +49,7 @@ public:
     bool pre();
     Package root_package;
     Package top_package;
+    std::map<std::string, std::string> instances;
 };
 
 

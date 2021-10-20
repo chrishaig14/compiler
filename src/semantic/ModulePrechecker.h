@@ -14,7 +14,8 @@ class ModulePrechecker {
 public:
     Module& module;
     ErrorReporter error_reporter;
-    explicit ModulePrechecker(Module& module);
+    std::map<std::string, std::string>& instances;
+    explicit ModulePrechecker(Module& module, std::map<std::string, std::string>& instances);
 
     void visit_root();
     void visit_function(ast::Function& node);
@@ -26,6 +27,7 @@ public:
     void check_duplicated_names(ast::Module& node);
     void add_default_imports();
     void visit_typeclass(ast::TypeclassAst& typeclass);
+    void visit_instance(ast::Instance& instance);
 };
 
 #endif //GLOBALPROCESSOR_H
