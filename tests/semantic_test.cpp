@@ -264,24 +264,38 @@ fun foo(f:Foo)->Integer{
 }
 
 TEST_CASE("semantic_output_assign_const_function", "[checker]") {
-    std::string code = R"(fun bar()->Integer{
+//     std::string code = R"(fun bar()->Integer{
+//     return 0
+// }
+// fun foo()->Integer{
+//     var x = bar
+//     return 0
+// })";
+//
+//
+//     std::unique_ptr<Compiler> cp = c_analyze(code);
+//     Compiler& c = *cp;
+//     Module& module = c.root_package.units["tmp"]->module();
+//     resolve_module_imports(module, c.top_package);
+//     resolve_module_imports(module, c.top_package);
+//     for (auto& e: module.members) {
+//         std::cout << e.first << std::endl;
+//     }
+//     std::map<std::string, std::string> instances;
+//     ModuleChecker checker(c.top_package, module, instances);
+//     checker.init();
+
+    ModuleCheckerTest ct(R"(
+fun bar()->Integer{
     return 0
 }
 fun foo()->Integer{
     var x = bar
     return 0
-})";
-
-    std::unique_ptr<Compiler> cp = c_analyze(code);
-    Compiler& c = *cp;
-    Module& module = c.root_package.units["tmp"]->module();
-    resolve_module_imports(module, c.top_package);
-    resolve_module_imports(module, c.top_package);
-    for (auto& e: module.members) {
-        std::cout << e.first << std::endl;
-    }
-    std::map<std::string, std::string> instances;
-    ModuleChecker checker(c.top_package, module, instances);
+}
+)");
+    ModuleChecker& checker = *ct.checker;
+    Module& module = *ct.module_;
     checker.init();
     auto sem_func = checker.visit_function(module.ast->functions[1]);
     REQUIRE_CHECKER_OK();
@@ -290,19 +304,33 @@ fun foo()->Integer{
 }
 
 TEST_CASE("semantic_output_const_function_call", "[checker]") {
-    std::string code = "fun bar()->Integer{return 0;} fun foo()->Integer{var x = bar();return 0;}";
+    // std::string code = "fun bar()->Integer{return 0;} fun foo()->Integer{var x = bar();return 0;}";
+    //
+    // std::unique_ptr<Compiler> cp = c_analyze(code);
+    // Compiler& c = *cp;
+    // Module& module = c.root_package.units["tmp"]->module();
+    // resolve_module_imports(module, c.top_package);
+    // resolve_module_imports(module, c.top_package);
+    // for (auto& e: module.members) {
+    //     std::cout << e.first << std::endl;
+    // }
+    // std::map<std::string, std::string> instances;
+    // ModuleChecker checker(c.top_package, module, instances);
+    // checker.init();
 
-    std::unique_ptr<Compiler> cp = c_analyze(code);
-    Compiler& c = *cp;
-    Module& module = c.root_package.units["tmp"]->module();
-    resolve_module_imports(module, c.top_package);
-    resolve_module_imports(module, c.top_package);
-    for (auto& e: module.members) {
-        std::cout << e.first << std::endl;
-    }
-    std::map<std::string, std::string> instances;
-    ModuleChecker checker(c.top_package, module, instances);
+    ModuleCheckerTest ct(R"(
+fun bar()->Integer {
+    return 0
+}
+fun foo()->Integer {
+    var x = bar()
+    return 0
+}
+)");
+    ModuleChecker& checker = *ct.checker;
+    Module& module = *ct.module_;
     checker.init();
+
     auto sem_func = checker.visit_function(module.ast->functions[1]);
     REQUIRE_CHECKER_OK();
     std::vector<sem::UExp> e;
@@ -313,19 +341,18 @@ TEST_CASE("semantic_output_const_function_call", "[checker]") {
 }
 
 TEST_CASE("semantic_output_while", "[checker]") {
-    std::string code = "fun foo()->Integer{while true {var x = 1;} return 0;}";
-
-    std::unique_ptr<Compiler> cp = c_analyze(code);
-    Compiler& c = *cp;
-    Module& module = c.root_package.units["tmp"]->module();
-    resolve_module_imports(module, c.top_package);
-    resolve_module_imports(module, c.top_package);
-    for (auto& e: module.members) {
-        std::cout << e.first << std::endl;
+    ModuleCheckerTest ct(R"(
+"fun foo()->Integer{
+    while true {
+        var x = 1
     }
-    std::map<std::string, std::string> instances;
-    ModuleChecker checker(c.top_package, module, instances);
+    return 0
+}
+)");
+    ModuleChecker& checker = *ct.checker;
+    Module& module = *ct.module_;
     checker.init();
+
     auto sem_func = checker.visit_function(module.ast->functions[0]);
     REQUIRE_CHECKER_OK();
     auto block = std::make_unique<sem::Block>();
@@ -336,9 +363,20 @@ TEST_CASE("semantic_output_while", "[checker]") {
 
 
 TEST_CASE("semantic_output_float_literal", "[checker]") {
-    std::string code = "fun foo()->Integer{var x = 9.5;return 0;}";
+    // std::string code = "fun foo()->Integer{var x = 9.5;return 0;}";
+    //
+    // CHECKER()
 
-    CHECKER()
+    ModuleCheckerTest ct(R"(
+fun foo()->Integer{
+    var x = 9.5;
+    return 0
+}
+)");
+    ModuleChecker& checker = *ct.checker;
+    Module& module = *ct.module_;
+    checker.init();
+
     ast::ExpNode& expression = ((ast::Declaration&) *(module.ast->functions[0].get().body->nodes[0])).expression;
     UExpressionInfo info = checker.dispatch_rvalue(expression);
 
@@ -373,8 +411,22 @@ TEST_CASE("semantic_output_float_literal", "[checker]") {
 
 TEST_CASE("semantic_output_member", "[checker]") {
     std::string code = "class Foo{foo: String;}\nfun bar(f: Foo)->Integer{var x : String = f.foo;return 0;}";
-
-    CHECKER()
+    //
+    // CHECKER()
+    // checker.init();
+    // checker.check_module();
+    //
+    ModuleCheckerTest ct(R"(
+class Foo{
+    foo: String
+}
+fun bar(f: Foo)->Integer{
+    var x : String = f.foo
+    return 0
+}
+)");
+    ModuleChecker& checker = *ct.checker;
+    // Module& module = *ct.module_;
     checker.init();
     checker.check_module();
 
@@ -383,9 +435,16 @@ TEST_CASE("semantic_output_member", "[checker]") {
 }
 
 TEST_CASE("semantic_output_binop", "[checker]") {
-    std::string code = "fun bar()->Integer{var x = 2 + 5;return 0;}";
-
-    CHECKER()
+    // std::string code = "fun bar()->Integer{var x = 2 + 5;return 0;}";
+    //
+    ModuleCheckerTest ct(R"(
+fun bar()->Integer{
+    var x = 2 + 5
+    return 0
+}
+)");
+    ModuleChecker& checker = *ct.checker;
+    Module& module = *ct.module_;
     checker.init();
 
     ast::ExpNode& expression = ((ast::Declaration&) *(module.ast->functions[0].get().body->nodes[0])).expression;
@@ -400,7 +459,11 @@ TEST_CASE("semantic_output_binop", "[checker]") {
 }
 
 TEST_CASE("semantic_output_boolop", "[checker]") {
-    std::string code = "fun bar()->Integer{var x = 2 < 5;return 0;}";
+    std::string code = R"(
+fun bar()->Integer{
+    var x = 2 < 5
+    return 0
+})";
 
     CHECKER()
     checker.init();
@@ -418,7 +481,12 @@ TEST_CASE("semantic_output_boolop", "[checker]") {
 }
 
 TEST_CASE("semantic_output_subscript", "[checker]") {
-    std::string code = "fun bar()->Integer{var x = [1,3,4][2] ;return 0;}";
+    std::string code = R"(
+fun bar()->Integer{
+    var x = [1,3,4][2]
+    return 0
+}
+)";
 
     CHECKER()
     checker.init();
@@ -432,7 +500,15 @@ TEST_CASE("semantic_output_subscript", "[checker]") {
 }
 
 TEST_CASE("semantic_output_call_no_args", "[checker]") {
-    std::string code = "fun bar()->Integer{return 0;}\nfun foo()->Integer{var x : Integer = bar();return 0;}";
+    std::string code = R"(
+fun bar()->Integer{
+    return 0
+}
+fun foo()->Integer{
+    var x : Integer = bar()
+    return 0
+}
+)";
 
     CHECKER()
     checker.init();
@@ -442,7 +518,15 @@ TEST_CASE("semantic_output_call_no_args", "[checker]") {
 }
 
 TEST_CASE("semantic_output_call_args", "[checker]") {
-    std::string code = "fun bar(a: Integer, b: String)->Integer{return 0;}\nfun foo()->Integer{var x : Integer = bar(8, \"Hello\");return 0;}";
+    std::string code = R"(
+fun bar(a: Integer, b: String)->Integer{
+    return 0
+}
+fun foo()->Integer{
+    var x : Integer = bar(8, "Hello")
+    return 0
+}
+)";
 
     CHECKER()
     checker.init();
@@ -452,7 +536,12 @@ TEST_CASE("semantic_output_call_args", "[checker]") {
 }
 
 TEST_CASE("semantic_output_union_ok_1", "[checker]") {
-    std::string code = "fun foo()->Integer{var x : Union[Integer, String] = 3;return 0;}";
+    std::string code = R"(
+fun foo()->Integer{
+    var x : Union[Integer, String] = 3
+    return 0
+}
+)";
 
     CHECKER()
     checker.init();
@@ -462,7 +551,11 @@ TEST_CASE("semantic_output_union_ok_1", "[checker]") {
 }
 
 TEST_CASE("semantic_output_union_ok_2", "[checker]") {
-    std::string code = "fun foo()->Integer{var x : Union[Integer, String] = \"String\";return 0;}";
+    std::string code = R"(
+fun foo()->Integer{
+    var x : Union[Integer, String] = "String"
+    return 0
+})";
 
     CHECKER()
     checker.init();
@@ -472,7 +565,14 @@ TEST_CASE("semantic_output_union_ok_2", "[checker]") {
 }
 
 TEST_CASE("semantic_output_if", "[checker]") {
-    std::string code = "fun foo()->Integer{if true {var x = 1;}return 0;}";
+    std::string code = R"(
+fun foo()->Integer{
+    if true {
+        var x = 1
+    }
+    return 0
+}
+)";
 
     CHECKER()
     checker.init();
@@ -487,7 +587,10 @@ TEST_CASE("semantic_output_if", "[checker]") {
 }
 
 TEST_CASE("semantic_output_enum_def", "[checker]") {
-    std::string code = "enum Foo {a, c}\n";
+    std::string code = R"(
+enum Foo {
+    a, c
+})";
 
     CHECKER()
     checker.init();
@@ -499,8 +602,15 @@ TEST_CASE("semantic_output_enum_def", "[checker]") {
 }
 
 TEST_CASE("semantic_output_class_ok", "[checker]") {
-    std::string code = "class Foo {\nx: Integer;\n y: String;\n}\n fun foo()->Integer{return 0;}";
-
+    std::string code = R"(
+class Foo {
+    x: Integer
+    y: String
+}
+fun foo()->Integer{
+    return 0
+}
+)";
     CHECKER()
     checker.init();
     auto sem_module = checker.check_module();
@@ -516,7 +626,7 @@ fun main()->Integer{
     print("Hello")
     return 0
 }
-    )";
+)";
 
     CHECKER()
     checker.init();
