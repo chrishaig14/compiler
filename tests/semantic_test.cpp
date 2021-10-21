@@ -459,14 +459,26 @@ fun bar()->Integer{
 }
 
 TEST_CASE("semantic_output_boolop", "[checker]") {
-    std::string code = R"(
+//     std::string code = R"(
+// fun bar()->Integer{
+//     var x = 2 < 5
+//     return 0
+// }
+// )";
+//
+//     CHECKER()
+//     checker.init();
+
+    ModuleCheckerTest ct(R"(
 fun bar()->Integer{
     var x = 2 < 5
     return 0
-})";
-
-    CHECKER()
+}
+)");
+    ModuleChecker& checker = *ct.checker;
+    Module& module = *ct.module_;
     checker.init();
+
 
     ast::ExpNode& expression = ((ast::Declaration&) *(module.ast->functions[0].get().body->nodes[0])).expression;
 
@@ -481,15 +493,26 @@ fun bar()->Integer{
 }
 
 TEST_CASE("semantic_output_subscript", "[checker]") {
-    std::string code = R"(
+//     std::string code = R"(
+// fun bar()->Integer{
+//     var x = [1,3,4][2]
+//     return 0
+// }
+// )";
+//
+//     CHECKER()
+//     checker.init();
+
+    ModuleCheckerTest ct(R"(
 fun bar()->Integer{
     var x = [1,3,4][2]
     return 0
 }
-)";
-
-    CHECKER()
+)");
+    ModuleChecker& checker = *ct.checker;
+    Module& module = *ct.module_;
     checker.init();
+
 
     ast::ExpNode& expression = ((ast::Declaration&) *(module.ast->functions[0].get().body->nodes[0])).expression;
 
@@ -500,7 +523,20 @@ fun bar()->Integer{
 }
 
 TEST_CASE("semantic_output_call_no_args", "[checker]") {
-    std::string code = R"(
+//     std::string code = R"(
+// fun bar()->Integer{
+//     return 0
+// }
+// fun foo()->Integer{
+//     var x : Integer = bar()
+//     return 0
+// }
+// )";
+//
+//     CHECKER()
+//     checker.init();
+
+    ModuleCheckerTest ct(R"(
 fun bar()->Integer{
     return 0
 }
@@ -508,17 +544,30 @@ fun foo()->Integer{
     var x : Integer = bar()
     return 0
 }
-)";
-
-    CHECKER()
+)");
+    ModuleChecker& checker = *ct.checker;
+    // Module& module = *ct.module_;
     checker.init();
+
     checker.check_module();
 
     REQUIRE_CHECKER_OK()
 }
 
 TEST_CASE("semantic_output_call_args", "[checker]") {
-    std::string code = R"(
+//     std::string code = R"(
+// fun bar(a: Integer, b: String)->Integer{
+//     return 0
+// }
+// fun foo()->Integer{
+//     var x : Integer = bar(8, "Hello")
+//     return 0
+// }
+// )";
+//
+//     CHECKER()
+//     checker.init();
+    ModuleCheckerTest ct(R"(
 fun bar(a: Integer, b: String)->Integer{
     return 0
 }
@@ -526,56 +575,94 @@ fun foo()->Integer{
     var x : Integer = bar(8, "Hello")
     return 0
 }
-)";
-
-    CHECKER()
+)");
+    ModuleChecker& checker = *ct.checker;
+    // Module& module = *ct.module_;
     checker.init();
+
     checker.check_module();
 
     REQUIRE_CHECKER_OK()
 }
 
 TEST_CASE("semantic_output_union_ok_1", "[checker]") {
-    std::string code = R"(
+//     std::string code = R"(
+// fun foo()->Integer{
+//     var x : Union[Integer, String] = 3
+//     return 0
+// }
+// )";
+//
+//
+//     CHECKER()
+//     checker.init();
+//
+    ModuleCheckerTest ct(R"(
 fun foo()->Integer{
     var x : Union[Integer, String] = 3
     return 0
 }
-)";
-
-    CHECKER()
+)");
+    ModuleChecker& checker = *ct.checker;
+    // Module& module = *ct.module_;
     checker.init();
+
     checker.check_module();
 
     REQUIRE_CHECKER_OK()
 }
 
 TEST_CASE("semantic_output_union_ok_2", "[checker]") {
-    std::string code = R"(
+//     std::string code = R"(
+// fun foo()->Integer{
+//     var x : Union[Integer, String] = "String"
+//     return 0
+// }
+// )";
+//
+//     CHECKER()
+//     checker.init();
+
+    ModuleCheckerTest ct(R"(
 fun foo()->Integer{
     var x : Union[Integer, String] = "String"
     return 0
-})";
-
-    CHECKER()
+}
+)");
+    ModuleChecker& checker = *ct.checker;
+    // Module& module = *ct.module_;
     checker.init();
-    checker.check_module();
+
+    // checker.check_module();
 
     REQUIRE_CHECKER_OK()
 }
 
 TEST_CASE("semantic_output_if", "[checker]") {
-    std::string code = R"(
+//     std::string code = R"(
+// fun foo()->Integer{
+//     if true {
+//         var x = 1
+//     }
+//     return 0
+// }
+// )";
+//
+//     CHECKER()
+//     checker.init();
+
+    ModuleCheckerTest ct(R"(
 fun foo()->Integer{
     if true {
         var x = 1
     }
     return 0
 }
-)";
-
-    CHECKER()
+)");
+    ModuleChecker& checker = *ct.checker;
+    Module& module = *ct.module_;
     checker.init();
+
     ast::Function& ast_func = module.ast->functions[0];
     auto sem_func = checker.visit_function(ast_func);
 
@@ -587,13 +674,24 @@ fun foo()->Integer{
 }
 
 TEST_CASE("semantic_output_enum_def", "[checker]") {
-    std::string code = R"(
+//     std::string code = R"(
+// enum Foo {
+//     a, c
+// }
+// )";
+//
+//     CHECKER()
+//     checker.init();
+
+    ModuleCheckerTest ct(R"(
 enum Foo {
     a, c
-})";
-
-    CHECKER()
+}
+)");
+    ModuleChecker& checker = *ct.checker;
+    // Module& module = *ct.module_;
     checker.init();
+
     auto sem_module = checker.check_module();
 
     REQUIRE_CHECKER_OK()
@@ -602,7 +700,9 @@ enum Foo {
 }
 
 TEST_CASE("semantic_output_class_ok", "[checker]") {
-    std::string code = R"(
+
+
+    ModuleCheckerTest ct(R"(
 class Foo {
     x: Integer
     y: String
@@ -610,9 +710,11 @@ class Foo {
 fun foo()->Integer{
     return 0
 }
-)";
-    CHECKER()
+)");
+    ModuleChecker& checker = *ct.checker;
+    // Module& module = *ct.module_;
     checker.init();
+
     auto sem_module = checker.check_module();
 
     REQUIRE_CHECKER_OK();
@@ -621,15 +723,16 @@ fun foo()->Integer{
 }
 
 TEST_CASE("semantic_output_main_ok", "[checker]") {
-    std::string code = R"(
+    ModuleCheckerTest ct(R"(
 fun main()->Integer{
     print("Hello")
     return 0
 }
-)";
-
-    CHECKER()
+)");
+    ModuleChecker& checker = *ct.checker;
+    Module& module = *ct.module_;
     checker.init();
+
     auto call_stmt = checker.dispatch(*module.ast->functions[0].get().body->nodes[0]);
 
     REQUIRE_CHECKER_OK();
