@@ -859,7 +859,7 @@ std::unique_ptr<ast::Function> Parser::parse_function_definition() {
 Token Parser::expect_token(TokType token_type) {
     if (not this->match(token_type)) {
         std::string msg =
-                this->context_string(this->token.start) + E_FMT("Unexpected token ") + E_HLT(this->token.to_string()) +
+                this->context_string(this->token.start) + E_FMT("Unexpected- token ") + E_HLT(this->token.to_string()) +
                 this->code_context_string(this->token.start);
         throw std::runtime_error(msg);
     }

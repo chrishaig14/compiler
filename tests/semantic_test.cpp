@@ -45,14 +45,12 @@ public:
     std::unique_ptr<ModuleChecker> checker;
     Module* module_;
     std::unique_ptr<Compiler> cp;
-
     ModuleCheckerTest(const std::string& code) {
         this->cp = c_analyze(code);
         Compiler& c = *this->cp;
         Module& module = c.root_package.units["tmp"]->module();
         resolve_module_imports(module, c.top_package);
-        std::map<std::string, std::string> instances;
-        checker = std::make_unique<ModuleChecker>(c.top_package, module, instances);
+        checker = std::make_unique<ModuleChecker>(c.top_package, module, c.instances);
         this->module_ = &module;
     }
 };
@@ -560,4 +558,60 @@ fun main()->Integer{
     args.push_back(std::make_unique<sem::String>("Hello"));
     REQUIRE(*call_stmt ==
             sem::Call(std::make_unique<sem::ConstFunction>(Path("libcore.libcore.print")), std::move(args)));
+}
+
+TEST_CASE("function_call_error_type_doesnt_implement_typeclass", "[typeclass]") {
+    ModuleCheckerTest ct(R"(
+class Foo {
+    x: Integer
+}
+typeclass MyTypeclass[t] {
+    fun get_x() -> Integer
+}
+
+fun needs_typeclass(u: t) -> Integer where t::MyTypeclass {
+    return 7
+}
+
+fun main()->Integer{
+    var w = needs_typeclass(#Foo(1))
+    return 0
+}
+    )");
+    ModuleChecker& checker = *ct.checker;
+    // Module& module = *ct.module_;
+    checker.init();
+    auto sem_module = checker.check_module();
+    REQUIRE_CHECKER_OK();
+}
+
+TEST_CASE("function_call_with_typeclass_ok", "[typeclass]") {
+    ModuleCheckerTest ct(R"(
+class Foo {
+    x: Integer
+}
+typeclass MyTypeclass[t] {
+    fun get_x() -> Integer
+}
+
+fun needs_typeclass(u: t) -> Integer where t::MyTypeclass {
+    return 7
+}
+
+instance MyTypeclass[Foo] {
+    fun get_x() -> Integer {
+        return 7
+    }
+}
+
+fun main()->Integer{
+    var w = needs_typeclass(#Foo(1))
+    return 0
+}
+    )");
+    ModuleChecker& checker = *ct.checker;
+    // Module& module = *ct.module_;
+    checker.init();
+    auto sem_module = checker.check_module();
+    REQUIRE_CHECKER_OK();
 }

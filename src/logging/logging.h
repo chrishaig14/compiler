@@ -30,11 +30,10 @@ inline std::string E_FMT(const std::string& x) {
 }
 
 inline std::string E_HLT(const std::string& x) {
-#ifdef NO_COLOR
-    return fmt::format("{}", x);
-#else
+    if (getenv("NO_COLOR") == nullptr){
+        return fmt::format("{}", x);
+    }
     return fmt::format(fmt::fg(fmt::terminal_color::red) | fmt::emphasis::bold, "{}", x);
-#endif
 }
 
 inline std::string E_INFO(const std::string& x) {

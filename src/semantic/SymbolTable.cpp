@@ -16,11 +16,8 @@ SymbolTable::SymbolTable(SymbolTable* parent) {
 Entity& SymbolTable::get(const std::string& name) {
     if (name == "__return__") {
         if (this->ret == nullptr) {
-            if (this->parent != nullptr) {
-                return this->parent->get(name);
-            } else {
-                throw std::runtime_error("ERROR: no parent but want __return__");
-            }
+            assert(this->parent!=nullptr);
+            return this->parent->get(name);
         }
         return *this->ret;
     }
