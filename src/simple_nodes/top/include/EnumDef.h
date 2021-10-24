@@ -8,7 +8,7 @@
 
 #include <string>
 #include "Top.h"
-#include "../../../util/types.h"
+#include <util/types.h>
 
 class sem::EnumDef : public sem::Top {
 public:

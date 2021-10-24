@@ -7,7 +7,7 @@
 
 #include "../../sem.h"
 #include "Exp.h"
-#include "../../../util/Path.h"
+#include <util/Path.h>
 
 class sem::ConstFunction : public sem::Exp {
 public:
