@@ -3,7 +3,7 @@
 //
 
 #include "../include/ErrorUnusedReturnValue.h"
-#include "../../../ast/statements/Call.h"
+#include <ast/statements/Call.h>
 
 Error* ErrorUnusedReturnValue::clone() const {
     return nullptr;

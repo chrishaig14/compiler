@@ -9,7 +9,7 @@
 #include "../entities/Entity.h"
 #include "../../scanner/CodeLines.h"
 #include <simple_nodes/top/include/top.h>
-#include "../../ast/top/Module.h"
+#include <ast/top/Module.h>
 #include <simple_nodes/common/include/Block.h>
 #include "ConstFunction.h"
 #include "ConcreteClass.h"

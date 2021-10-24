@@ -7,7 +7,7 @@
 #include <simple_nodes/common/include/TypeFunction.h>
 #include <simple_nodes/common/include/Type.h>
 #include "../../parser/Parser.h"
-#include "../../ast/general/ObjectType.h"
+#include <ast/general/ObjectType.h>
 
 Module::Module(Path path, std::string abs_path, bool is_lib)
         : name(path.as_vec().back()), abs_path(abs_path), is_lib(is_lib), path(path) {

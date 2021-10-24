@@ -10,7 +10,7 @@
 #include <string>
 #include <vector>
 #include <map>
-#include "../../ast/general/Type.h"
+#include <ast/general/Type.h>
 #include <util/macros.h>
 #include "../entities/Entity.h"
 #include "ConstFunction.h"

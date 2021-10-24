@@ -7,7 +7,7 @@
 
 #include <string>
 #include "Exp.h"
-#include "../../../ast/general/Type.h"
+#include <ast/general/Type.h>
 #include "../../../util/Path.h"
 
 class sem::StaticMethod : public sem::Exp {

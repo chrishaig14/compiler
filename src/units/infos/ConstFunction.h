@@ -5,10 +5,10 @@
 #define CONST_FUNCTION_H
 
 #include "../entities/Entity.h"
-#include "../../ast/general/Type.h"
+#include <ast/general/Type.h>
 #include <util/Path.h>
-#include "../../ast/general/TypeFunction.h"
-#include "../../ast/top/Function.h"
+#include <ast/general/TypeFunction.h>
+#include <ast/top/Function.h>
 #include <simple_nodes/sem.h>
 #include <simple_nodes/common/include/TypeFunction.h>
 #include <unordered_map>

@@ -5,10 +5,10 @@
 #ifndef XLANG_ERRORTYPEMISMATCH_H
 #define XLANG_ERRORTYPEMISMATCH_H
 
-#include "../../../ast/general/Type.h"
+#include <ast/general/Type.h>
 #include "../../../units/entities/Entity.h"
 #include "../../../units/entities/EntityValue.h"
-#include "../../../ast/expressions/include/ExpNode.h"
+#include <ast/expressions/include/ExpNode.h>
 #include "Error.h"
 
 class ErrorTypeMismatch : public Error {
