@@ -3,9 +3,9 @@
 //
 
 #include "PythonProgramTranspiler.h"
-#include "../../util/utils.h"
+#include <util/utils.h>
 #include <set>
-#include "../../units/infos/Package.h"
+#include <units/infos/Package.h>
 
 void PythonProgramTranspiler::transpile_module(Module& module, const std::string& output_dir) {
     PythonModuleTranspiler transpiler(module);

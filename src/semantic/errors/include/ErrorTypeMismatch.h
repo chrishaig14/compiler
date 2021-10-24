@@ -6,8 +6,8 @@
 #define XLANG_ERRORTYPEMISMATCH_H
 
 #include <ast/general/Type.h>
-#include "../../../units/entities/Entity.h"
-#include "../../../units/entities/EntityValue.h"
+#include <units/entities/Entity.h>
+#include <units/entities/EntityValue.h>
 #include <ast/expressions/include/ExpNode.h>
 #include "Error.h"
 

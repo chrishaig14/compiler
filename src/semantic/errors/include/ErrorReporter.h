@@ -7,12 +7,12 @@
 
 
 #include <string>
-#include "../../../scanner/TextPosition.h"
+#include <scanner/TextPosition.h>
 #include <ast/general/Type.h>
 #include <ast/expressions/include/Member.h>
 #include <ast/statements/Call.h>
-#include "../../../scanner/CodeLines.h"
-#include "../../../units/entities/Entity.h"
+#include <scanner/CodeLines.h>
+#include <units/entities/Entity.h>
 #include "Error.h"
 
 #define FAIL_FIRST 0

@@ -7,7 +7,7 @@
 
 #include "Module.h"
 #include <util/Path.h>
-#include "../../units/packageunits/package_units.h"
+#include "../packageunits/package_units.h"
 
 class Package {
 public:

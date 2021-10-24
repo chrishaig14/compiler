@@ -7,10 +7,10 @@
 
 
 #include <string>
-#include "../../../units/entities/Entity.h"
-#include "../../../units/infos/Package.h"
-#include "../../../units/infos/Enum.h"
-#include "../../../logging/logging.h"
+#include <units/entities/Entity.h>
+#include <units/infos/Package.h>
+#include <units/infos/Enum.h>
+#include <logging/logging.h>
 
 
 
