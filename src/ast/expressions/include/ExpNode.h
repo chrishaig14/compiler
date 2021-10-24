@@ -7,12 +7,12 @@
 
 #include "../../node_types.h"
 #include <string>
-#include "../../../json/json_fwd.hpp"
-#include "../../../json/json.hpp"
+#include <json/json_fwd.hpp>
+#include <json/json.hpp>
 #include <iostream>
-#include "../../../util/types.h"
+#include <util/types.h>
 #include "../../ast.h"
-#include "../../../scanner/TextPosition.h"
+#include <scanner/TextPosition.h>
 
 class ast::ExpNode {
 public:

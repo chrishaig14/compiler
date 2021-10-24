@@ -7,11 +7,11 @@
 
 #include "../node_types.h"
 #include <string>
-#include "../../scanner/TextPosition.h"
-#include "../../json/json_fwd.hpp"
-#include "../../json/json.hpp"
+#include <scanner/TextPosition.h>
+#include <json/json_fwd.hpp>
+#include <json/json.hpp>
 #include <iostream>
-#include "../../util/types.h"
+#include <util/types.h>
 #include "../ast.h"
 #include "../expressions/include/ExpNode.h"
 

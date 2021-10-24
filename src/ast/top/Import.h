@@ -9,7 +9,7 @@
 #include "TopNode.h"
 
 #include <utility>
-#include "../../util/types.h"
+#include <util/types.h>
 #include "../ast.h"
 #include "TopNode.h"
 

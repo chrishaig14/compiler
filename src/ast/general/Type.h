@@ -9,8 +9,8 @@
 #include <string>
 #include <vector>
 
-#include "../../util/types.h"
-#include "../../simple_nodes/common/include/Type.h"
+#include <util/types.h>
+#include <simple_nodes/common/include/Type.h>
 #include <iostream>
 
 

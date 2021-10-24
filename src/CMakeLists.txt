@@ -4,6 +4,7 @@ project(xlang)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -g -O0 -Wall -pedantic -Werror")
 
+include_directories(.)
 add_subdirectory(scanner)
 add_subdirectory(ast)
 add_subdirectory(parser)

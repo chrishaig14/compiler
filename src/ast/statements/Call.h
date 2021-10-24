@@ -8,7 +8,7 @@
 
 #include <vector>
 #include "Statement.h"
-#include "../../util/types.h"
+#include <util/types.h>
 #include "../general/Type.h"
 #include "../ast.h"
 #include "../expressions/include/ExpNode.h"

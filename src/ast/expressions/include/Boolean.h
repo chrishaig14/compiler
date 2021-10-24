@@ -7,7 +7,7 @@
 
 
 #include "ExpNode.h"
-#include "../../../json/json.hpp"
+#include <json/json.hpp>
 #include "../../ast.h"
 
 class ast::Boolean : public ast::ExpNode {

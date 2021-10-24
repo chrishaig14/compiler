@@ -12,7 +12,7 @@
 
 #include "../general/Type.h"
 #include "../statements/Block.h"
-#include "../../util/Path.h"
+#include <util/Path.h>
 #include "../ast.h"
 #include "TopNode.h"
 

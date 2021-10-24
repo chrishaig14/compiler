@@ -7,7 +7,7 @@
 
 
 #include "ExpNode.h"
-#include "../../../util/utils.h"
+#include <util/utils.h>
 #include "../../optypes.h"
 #include "../../ast.h"
 

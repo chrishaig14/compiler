@@ -7,7 +7,7 @@
 
 
 #include "../statements/Statement.h"
-#include "../../util/types.h"
+#include <util/types.h>
 #include "../ast.h"
 #include "TopNode.h"
 

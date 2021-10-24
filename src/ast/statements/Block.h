@@ -10,9 +10,9 @@
 #include "Statement.h"
 
 #include "Statement.h"
-#include "../../util/types.h"
+#include <util/types.h>
 #include "../general/Type.h"
-#include "../../units/entities/Entity.h"
+#include <units/entities/Entity.h>
 #include "../ast.h"
 
 class ast::Block : public ast::Statement {

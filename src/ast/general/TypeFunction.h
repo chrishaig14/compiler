@@ -7,7 +7,7 @@
 
 
 #include "Type.h"
-#include "../../ast/statements/Statement.h"
+#include "../statements/Statement.h"
 
 
 class ast::FunctionType : public ast::Type {

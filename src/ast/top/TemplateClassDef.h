@@ -11,7 +11,7 @@
 
 #include "../general/Type.h"
 #include "Function.h"
-#include "../../util/macros.h"
+#include <util/macros.h>
 #include "../ast.h"
 
 class ast::TemplateClassDef : public ast::TopNode {
