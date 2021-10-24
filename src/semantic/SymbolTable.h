@@ -9,8 +9,8 @@
 #include <vector>
 #include <unordered_map>
 #include <ast/general/Type.h>
-#include "../util/utils.h"
-#include "../util/macros.h"
+#include <util/utils.h>
+#include <util/macros.h>
 
 
 class SymbolTable {

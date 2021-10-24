@@ -15,9 +15,9 @@
 #include <ast/nodes.h>
 #include <ast/general/ObjectType.h>
 #include <ast/expressions/include/UnaryOp.h>
-#include "../logging/logging.h"
-#include "../util/macros.h"
-#include "../scanner/CodeLines.h"
+#include <logging/logging.h>
+#include <util/macros.h>
+#include <scanner/CodeLines.h>
 #include <simple_nodes/common/include/Assignment.h>
 #include <simple_nodes/common/include/Block.h>
 #include <simple_nodes/common/include/For.h>
@@ -38,7 +38,7 @@
 #include <simple_nodes/top/include/FunctionDef.h>
 #include <simple_nodes/common/include/If.h>
 #include <simple_nodes/common/include/While.h>
-#include "../util/utils.h"
+#include <util/utils.h>
 #include "CheckerUtils.h"
 #include "errors/include/ErrorReporter.h"
 #include "errors/include/errors.h"
@@ -57,7 +57,7 @@
 #include <units/entities/EntityNothing.h>
 #include <units/entities/EntityTemplateClass.h>
 
-// #include "../logger/Logger.h"
+// #include <logger/Logger.h>
 
 #define T_NONE ast::ObjectType(".None")
 

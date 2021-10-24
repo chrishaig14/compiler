@@ -3,8 +3,8 @@
 //
 
 #include "util.h"
-#include "../scanner/Scanner.h"
-#include "../parser/Parser.h"
+#include <scanner/Scanner.h>
+#include <parser/Parser.h>
 
 ast::UTypeNode parse_type(const std::string& s) {
     Scanner scanner;
