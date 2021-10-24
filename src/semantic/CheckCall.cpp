@@ -4,8 +4,8 @@
 
 #include "CheckCall.h"
 #include "../simple_nodes/common/include/TypeObject.h"
-#include "../ast/expressions/include/CallExp.h"
-#include "../ast/statements/Call.h"
+#include <ast/expressions/include/CallExp.h>
+#include <ast/statements/Call.h>
 #include "../simple_nodes/common/include/TypeFunction.h"
 
 sem::UCommon ModuleChecker::visit_call(ast::Call& n) {

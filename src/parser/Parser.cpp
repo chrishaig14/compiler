@@ -4,19 +4,19 @@
 
 #include "Parser.h"
 #include "../semantic/ModulePrechecker.h"
-#include "../ast/expressions/include/PartialApplication.h"
-#include "../ast/expressions/include/UnaryOp.h"
-#include "../ast/top/Module.h"
-#include "../ast/top/TemplateClassDef.h"
-#include "../ast/top/ConcreteClassDef.h"
+#include <ast/expressions/include/PartialApplication.h>
+#include <ast/expressions/include/UnaryOp.h>
+#include <ast/top/Module.h>
+#include <ast/top/TemplateClassDef.h>
+#include <ast/top/ConcreteClassDef.h>
 #include "../logging/logging.h"
-#include "../ast/expressions/include/DefaultConstructor.h"
+#include <ast/expressions/include/DefaultConstructor.h>
 #include <fmt/core.h>
 #include <fmt/color.h>
 #include <exception>
 #include <set>
-#include "../ast/general/ObjectType.h"
-#include "../ast/expressions/include/CallExp.h"
+#include <ast/general/ObjectType.h>
+#include <ast/expressions/include/CallExp.h>
 
 std::unordered_map<TokType, OpType> TOKEN_TO_OP = {{TokType::PLUS,  OpType::ADD},
                                                    {TokType::MINUS, OpType::SUB},

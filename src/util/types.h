@@ -9,7 +9,7 @@
 #include <unordered_map>
 #include <memory>
 
-#include "../ast/ast.h"
+#include <ast/ast.h>
 
 
 typedef std::vector<ast::Statement*> VectorOfNodes;

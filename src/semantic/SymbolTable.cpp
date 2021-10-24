@@ -3,8 +3,8 @@
 //
 
 #include "SymbolTable.h"
-#include "../units/entities/EntityNotFound.h"
-#include "../units/entities/EntityValue.h"
+#include <units/entities/EntityNotFound.h>
+#include <units/entities/EntityValue.h>
 
 SymbolTable::SymbolTable(SymbolTable* parent) {
     this->parent = parent;

@@ -6,7 +6,7 @@
 #include "../simple_nodes/expressions/include/expressions.h"
 #include "../simple_nodes/common/include/TypeObject.h"
 #include "../simple_nodes/common/include/TypeFunction.h"
-#include "../units/entities/EntityNone.h"
+#include <units/entities/EntityNone.h>
 
 UExpressionInfo ModuleChecker::visit_boolean(const ast::Boolean& node) {
     UExpressionInfo info_u = std::make_unique<ExpressionInfo>();

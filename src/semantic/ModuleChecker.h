@@ -10,11 +10,11 @@
 #include <set>
 #include <unordered_map>
 
-#include "../ast/top/EnumNode.h"
-#include "../ast/top/Module.h"
-#include "../ast/nodes.h"
-#include "../ast/general/ObjectType.h"
-#include "../ast/expressions/include/UnaryOp.h"
+#include <ast/top/EnumNode.h>
+#include <ast/top/Module.h>
+#include <ast/nodes.h>
+#include <ast/general/ObjectType.h>
+#include <ast/expressions/include/UnaryOp.h>
 #include "../logging/logging.h"
 #include "../util/macros.h"
 #include "../scanner/CodeLines.h"
@@ -45,17 +45,17 @@
 #include "ModulePrechecker.h"
 #include "util.h"
 #include "ExpressionInfo.h"
-#include "../units/entities/EntityConstFunction.h"
-#include "../units/entities/EntityModule.h"
-#include "../units/entities/EntityPackage.h"
-#include "../units/entities/EntityClass.h"
-#include "../units/entities/EntityEnum.h"
-#include "../units/entities/EntityValue.h"
-#include "../units/entities/EntityError.h"
-#include "../units/entities/EntityNotFound.h"
-#include "../units/entities/EntityTypeclass.h"
-#include "../units/entities/EntityNothing.h"
-#include "../units/entities/EntityTemplateClass.h"
+#include <units/entities/EntityConstFunction.h>
+#include <units/entities/EntityModule.h>
+#include <units/entities/EntityPackage.h>
+#include <units/entities/EntityClass.h>
+#include <units/entities/EntityEnum.h>
+#include <units/entities/EntityValue.h>
+#include <units/entities/EntityError.h>
+#include <units/entities/EntityNotFound.h>
+#include <units/entities/EntityTypeclass.h>
+#include <units/entities/EntityNothing.h>
+#include <units/entities/EntityTemplateClass.h>
 
 // #include "../logger/Logger.h"
 

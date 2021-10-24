@@ -8,16 +8,16 @@
 #include "../simple_nodes/common/include/TypeFunction.h"
 #include "../simple_nodes/common/include/Type.h"
 #include "errors/include/ErrorRedeclared.h"
-#include "../units/entities/EntityNothing.h"
+#include <units/entities/EntityNothing.h>
 #include "errors/include/ErrorGlobalRedeclared.h"
-#include "../ast/top/Alias.h"
-#include "../ast/top/Import.h"
-#include "../ast/top/EnumNode.h"
-#include "../ast/top/TemplateClassDef.h"
-#include "../ast/top/ConcreteClassDef.h"
-#include "../ast/top/TypeclassAst.h"
-#include "../ast/top/Instance.h"
-#include "../units/infos/TemplateClass.h"
+#include <ast/top/Alias.h>
+#include <ast/top/Import.h>
+#include <ast/top/EnumNode.h>
+#include <ast/top/TemplateClassDef.h>
+#include <ast/top/ConcreteClassDef.h>
+#include <ast/top/TypeclassAst.h>
+#include <ast/top/Instance.h>
+#include <units/infos/TemplateClass.h>
 
 const VectorOfStrings default_imports = {"libcore.libcore.String", "libcore.libcore.Integer", "libcore.libcore.List",
                                          "libcore.libcore.Double", "libcore.libcore.Boolean", "libcore.libcore.Float",
