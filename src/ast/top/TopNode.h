@@ -7,7 +7,7 @@
 
 #include "../node_types.h"
 #include <string>
-#include <scanner/TextPosition.h>
+#include <common/TextPosition.h>
 #include <json/json_fwd.hpp>
 #include <json/json.hpp>
 #include <iostream>

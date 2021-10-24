@@ -8,7 +8,7 @@
 #include <string>
 #include <unordered_map>
 #include <iostream>
-#include "TextPosition.h"
+#include <common/TextPosition.h>
 
 enum class TokType {
     COMMA,

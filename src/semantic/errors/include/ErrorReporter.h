@@ -7,7 +7,7 @@
 
 
 #include <string>
-#include <scanner/TextPosition.h>
+#include <common/TextPosition.h>
 #include <ast/general/Type.h>
 #include <ast/expressions/include/Member.h>
 #include <ast/statements/Call.h>

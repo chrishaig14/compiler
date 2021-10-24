@@ -12,7 +12,7 @@
 #include <iostream>
 #include <util/types.h>
 #include "../../ast.h"
-#include <scanner/TextPosition.h>
+#include <common/TextPosition.h>
 
 class ast::ExpNode {
 public:

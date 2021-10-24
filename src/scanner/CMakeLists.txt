@@ -10,10 +10,10 @@ add_library(
         CodeLines.h
         Scanner.cpp
         Scanner.h
-        TextPosition.cpp
-        TextPosition.h
         Token.cpp
         Token.h
         ../util/utils.cpp
         ../util/utils.h
 )
+
+target_link_libraries(scanner common)
