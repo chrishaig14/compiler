@@ -8,8 +8,6 @@ add_library(
         scanner
         Scanner.cpp
         Scanner.h
-        Token.cpp
-        Token.h
         ../util/utils.cpp
         ../util/utils.h
 )

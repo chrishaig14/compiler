@@ -7,7 +7,7 @@
 
 
 #include <string>
-#include "Token.h"
+#include <common/Token.h>
 #include <common/CodeLines.h>
 
 #include <vector>
