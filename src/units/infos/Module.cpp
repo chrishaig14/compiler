@@ -6,7 +6,7 @@
 #include <simple_nodes/common/include/TypeObject.h>
 #include <simple_nodes/common/include/TypeFunction.h>
 #include <simple_nodes/common/include/Type.h>
-#include "../../parser/Parser.h"
+#include <parser/Parser.h>
 #include <ast/general/ObjectType.h>
 
 Module::Module(Path path, std::string abs_path, bool is_lib)
