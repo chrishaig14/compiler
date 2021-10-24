@@ -11,7 +11,7 @@
 #include <ast/general/Type.h>
 #include <ast/expressions/include/Member.h>
 #include <ast/statements/Call.h>
-#include <scanner/CodeLines.h>
+#include <common/CodeLines.h>
 #include <units/entities/Entity.h>
 #include "Error.h"
 

@@ -17,7 +17,7 @@
 #include <ast/expressions/include/UnaryOp.h>
 #include <logging/logging.h>
 #include <util/macros.h>
-#include <scanner/CodeLines.h>
+#include <common/CodeLines.h>
 #include <simple_nodes/common/include/Assignment.h>
 #include <simple_nodes/common/include/Block.h>
 #include <simple_nodes/common/include/For.h>

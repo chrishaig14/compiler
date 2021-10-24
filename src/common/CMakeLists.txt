@@ -8,4 +8,6 @@ add_library(
         common
         TextPosition.h
         TextPosition.cpp
+        CodeLines.h
+        CodeLines.cpp
 )

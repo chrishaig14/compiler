@@ -8,7 +8,7 @@
 #include <util/utils.h>
 #include <iostream>
 #include <ast/top/Import.h>
-#include <scanner/CodeLines.h>
+#include <common/CodeLines.h>
 #include <ast/top/EnumNode.h>
 #include <ast/general/ObjectType.h>
 #include <ast/top/TypeclassAst.h>
