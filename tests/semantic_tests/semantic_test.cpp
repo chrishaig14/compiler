@@ -45,6 +45,7 @@ public:
     std::unique_ptr<ModuleChecker> checker;
     Module* module_;
     std::unique_ptr<Compiler> cp;
+
     ModuleCheckerTest(const std::string& code) {
         this->cp = c_analyze(code);
         Compiler& c = *this->cp;
@@ -561,6 +562,7 @@ fun main()->Integer{
 }
 
 TEST_CASE("function_call_error_type_doesnt_implement_typeclass", "[typeclass]") {
+// function call with argument that doesn't have an instance of typeclass should fail
     ModuleCheckerTest ct(R"(
 class Foo {
     x: Integer
@@ -586,6 +588,7 @@ fun main()->Integer{
 }
 
 TEST_CASE("function_call_with_typeclass_ok", "[typeclass]") {
+// function call with argument that does have an instance of typeclass should not fail
     ModuleCheckerTest ct(R"(
 class Foo {
     x: Integer
@@ -616,7 +619,8 @@ fun main()->Integer{
     REQUIRE_CHECKER_OK();
 }
 
-TEST_CASE("function_call_typeclass_bad_method_ok", "[typeclass]") {
+TEST_CASE("function_call_typeclass_instance_bad_method_ok", "[typeclass]") {
+// typeclass instance definition with method that's not part of the typeclass should fail
     ModuleCheckerTest ct(R"(
 class Foo {
     x: Integer
