@@ -4,7 +4,7 @@
 
 #include <expat.h>
 #include "Parser.h"
-#include "../logging/logging.h"
+#include <logging/logging.h>
 
 std::string Parser::code_context_string(TextPosition position) {
     std::string str = "\n" + this->code_lines.get_line(position.line) + "\n";

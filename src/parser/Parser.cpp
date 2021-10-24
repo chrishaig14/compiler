@@ -3,13 +3,13 @@
 //
 
 #include "Parser.h"
-#include "../semantic/ModulePrechecker.h"
+#include <semantic/ModulePrechecker.h>
 #include <ast/expressions/include/PartialApplication.h>
 #include <ast/expressions/include/UnaryOp.h>
 #include <ast/top/Module.h>
 #include <ast/top/TemplateClassDef.h>
 #include <ast/top/ConcreteClassDef.h>
-#include "../logging/logging.h"
+#include <logging/logging.h>
 #include <ast/expressions/include/DefaultConstructor.h>
 #include <fmt/core.h>
 #include <fmt/color.h>

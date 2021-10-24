@@ -3,12 +3,12 @@
 
 
 #include <vector>
-#include "../scanner/Token.h"
+#include <scanner/Token.h>
 #include <ast/nodes.h>
-#include "../util/utils.h"
+#include <util/utils.h>
 #include <iostream>
 #include <ast/top/Import.h>
-#include "../scanner/CodeLines.h"
+#include <scanner/CodeLines.h>
 #include <ast/top/EnumNode.h>
 #include <ast/general/ObjectType.h>
 #include <ast/top/TypeclassAst.h>
