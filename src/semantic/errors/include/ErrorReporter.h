@@ -24,29 +24,21 @@ enum class ErrorElement {
 class ErrorReporter {
     bool failed;
 public:
-    bool ok() {
-        return not this->failed;
-    }
-
-    ErrorReporter(const CodeLines& code_lines);
-    std::vector<std::unique_ptr<Error>> errors;
-    const CodeLines& code_lines;
-    void fail(const std::string& msg, TextPosition pos);
-
-    void fail(const std::string& msg) {
-        this->fail(msg, TextPosition{1, 1});
-    }
-
-    std::string code_error_string(TextPosition start, TextPosition end);
-
     std::string current_class;
     std::string current_function;
     std::string __file__;
+    std::vector<std::unique_ptr<Error>> errors;
+    const CodeLines& code_lines;
 
+    ErrorReporter(const CodeLines& code_lines);
+    void fail(const std::string& msg, TextPosition pos);
+    void fail(const std::string& msg);
+    std::string code_error_string(TextPosition start, TextPosition end);
     void fail_ok(const std::string& pre_msg, const std::string& msg, TextPosition pos);
     void error(std::unique_ptr<Error> error);
     std::string context_string(TextPosition position);
     std::string code_context_string(TextPosition position);
+    bool ok();
 };
 
 

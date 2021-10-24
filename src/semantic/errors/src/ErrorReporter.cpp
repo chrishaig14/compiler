@@ -59,3 +59,11 @@ ErrorReporter::ErrorReporter(const CodeLines& code_lines) : code_lines(code_line
     this->failed = false;
     init_styles();
 }
+
+void ErrorReporter::fail(const std::string& msg) {
+    this->fail(msg, TextPosition{1, 1});
+}
+
+bool ErrorReporter::ok() {
+    return not this->failed;
+}
