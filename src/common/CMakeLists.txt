@@ -10,4 +10,6 @@ add_library(
         TextPosition.cpp
         CodeLines.h
         CodeLines.cpp
+        Token.h
+        Token.cpp
 )

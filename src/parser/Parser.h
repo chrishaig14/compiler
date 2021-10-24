@@ -3,7 +3,7 @@
 
 
 #include <vector>
-#include <scanner/Token.h>
+#include <common/Token.h>
 #include <ast/nodes.h>
 #include <util/utils.h>
 #include <iostream>
