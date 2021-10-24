@@ -5,7 +5,7 @@
 #ifndef UNTITLED1_PARTIALAPPLICATION_H
 #define UNTITLED1_PARTIALAPPLICATION_H
 
-#include "../../../util/types.h"
+#include <util/types.h>
 #include "ExpNode.h"
 #include "../../general/Type.h"
 #include "../../ast.h"

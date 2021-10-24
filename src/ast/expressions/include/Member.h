@@ -9,7 +9,7 @@
 #include <string>
 #include "ExpNode.h"
 #include "../../general/Type.h"
-#include "../../../scanner/Token.h"
+#include <scanner/Token.h>
 
 #include "../../ast.h"
 

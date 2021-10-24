@@ -7,7 +7,7 @@
 
 
 #include "ExpNode.h"
-#include "../../../util/types.h"
+#include <util/types.h>
 
 class ast::Tuple : public ast::ExpNode {
 public:

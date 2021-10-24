@@ -3,7 +3,7 @@
 //
 
 #include "../include/Ternary.h"
-#include "../../../util/utils.h"
+#include <util/utils.h>
 
 using namespace ast;
 

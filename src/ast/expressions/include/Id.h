@@ -10,7 +10,7 @@
 #include "ExpNode.h"
 
 #include "ExpNode.h"
-#include "../../../semantic/SymbolTable.h"
+#include <semantic/SymbolTable.h>
 #include "../../ast.h"
 
 class ast::Id : public ast::ExpNode {

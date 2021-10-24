@@ -10,7 +10,7 @@
 #include "Statement.h"
 #include "../expressions/include/ExpNode.h"
 #include "../general/Type.h"
-#include "../../util/utils.h"
+#include <util/utils.h>
 
 class ast::Declaration : public ast::Statement {
     ast::UExpNode _expression;

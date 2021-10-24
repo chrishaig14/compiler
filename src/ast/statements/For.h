@@ -8,7 +8,7 @@
 
 #include "Statement.h"
 #include "Block.h"
-#include "../../util/utils.h"
+#include <util/utils.h>
 #include "../ast.h"
 
 class ast::For : public ast::Statement {

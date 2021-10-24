@@ -6,7 +6,7 @@
 #define SUBSCRIPTNODE_H
 
 
-#include "../../../util/types.h"
+#include <util/types.h>
 #include "../../ast.h"
 #include "ExpNode.h"
 
