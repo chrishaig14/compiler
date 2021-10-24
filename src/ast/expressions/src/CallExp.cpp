@@ -4,7 +4,7 @@
 
 #include "../include/CallExp.h"
 #include "../../statements/Call.h"
-#include "../../../json/json.hpp"
+#include <json/json.hpp>
 
 using namespace ast;
 

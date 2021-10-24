@@ -3,7 +3,7 @@
 //
 
 #include "../include/List.h"
-#include "../../../json/json.hpp"
+#include <json/json.hpp>
 
 using namespace ast;
 

@@ -3,7 +3,7 @@
 //
 
 #include "../include/ErrorTypeMismatch.h"
-#include "../../../json/json.hpp"
+#include <json/json.hpp>
 
 std::string mmmcode(const CodeLines& code_lines, TextPosition start, TextPosition end) {
     size_t length = end.column - start.column + 1;

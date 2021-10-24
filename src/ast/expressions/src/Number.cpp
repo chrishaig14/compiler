@@ -3,7 +3,7 @@
 //
 
 #include "../include/Number.h"
-#include "../../../json/json.hpp"
+#include <json/json.hpp>
 
 using namespace ast;
 
