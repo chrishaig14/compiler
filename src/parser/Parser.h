@@ -1,20 +1,20 @@
 #ifndef PARSER_H
 #define PARSER_H
 
-
-#include <vector>
-#include <common/Token.h>
-#include <ast/nodes.h>
-#include <util/utils.h>
 #include <iostream>
-#include <ast/top/Import.h>
-#include <common/CodeLines.h>
-#include <ast/top/EnumNode.h>
+#include <vector>
+
 #include <ast/general/ObjectType.h>
-#include <ast/top/TypeclassAst.h>
+#include <ast/nodes.h>
+#include <ast/top/Alias.h>
+#include <ast/top/EnumNode.h>
+#include <ast/top/Import.h>
 #include <ast/top/Instance.h>
 #include <ast/top/Module.h>
-#include <ast/top/Alias.h>
+#include <ast/top/TypeclassAst.h>
+#include <common/CodeLines.h>
+#include <common/Token.h>
+#include <util/utils.h>
 
 extern std::unordered_map<TokType, OpType> TOKEN_TO_OP;
 
