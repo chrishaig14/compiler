@@ -1,11 +1,11 @@
 #include "catch.hpp"
-#include "../src/scanner/Scanner.h"
-#include "../src/parser/Parser.h"
-#include "../src/ast/expressions/include/UnaryOp.h"
-#include "../src/ast/expressions/include/ExpNode.h"
-#include "../src/ast/expressions/include/CallExp.h"
-#include "../src/ast/top/TypeclassAst.h"
-#include "../src/ast/top/Instance.h"
+#include <scanner/Scanner.h>
+#include <parser/Parser.h>
+#include <ast/expressions/include/UnaryOp.h>
+#include <ast/expressions/include/ExpNode.h>
+#include <ast/expressions/include/CallExp.h>
+#include <ast/top/TypeclassAst.h>
+#include <ast/top/Instance.h>
 
 const TextPosition DUMMY_POS = {0, 0};
 

@@ -1,14 +1,14 @@
-#include "catch.hpp"
-#include "../src/ast/expressions/include/UnaryOp.h"
-#include "../src/compiler/analyze.h"
-#include "../src/compiler/Compiler.h"
-#include "../src/parser/Parser.h"
-#include "../src/scanner/Scanner.h"
-#include "../src/semantic/ModuleChecker.h"
-#include "../src/semantic/ModulePrechecker.h"
-#include "../src/simple_nodes/common/include/common.h"
-#include "../src/simple_nodes/common/include/TypeFunction.h"
-#include "../src/simple_nodes/expressions/include/expressions.h"
+#include "../catch.hpp"
+#include <ast/expressions/include/UnaryOp.h>
+#include <compiler/analyze.h>
+#include <compiler/Compiler.h>
+#include <parser/Parser.h>
+#include <scanner/Scanner.h>
+#include <semantic/ModuleChecker.h>
+#include <semantic/ModulePrechecker.h>
+#include <simple_nodes/common/include/common.h>
+#include <simple_nodes/common/include/TypeFunction.h>
+#include <simple_nodes/expressions/include/expressions.h>
 
 #define CHECKER() std::unique_ptr<Compiler> cp = c_analyze(code);Compiler& c = *cp;Module& module = c.root_package.units["tmp"]->module();resolve_module_imports(module, c.top_package);std::map<std::string,std::string> instances;ModuleChecker checker(c.top_package, module, instances);
 #define REQUIRE_CHECKER_OK() REQUIRE(checker.error_reporter.ok());REQUIRE(checker.error_reporter.errors.empty());
@@ -600,6 +600,37 @@ fun needs_typeclass(u: t) -> Integer where t::MyTypeclass {
 
 instance MyTypeclass[Foo] {
     fun get_x() -> Integer {
+        return 7
+    }
+}
+
+fun main()->Integer{
+    var w = needs_typeclass(#Foo(1))
+    return 0
+}
+    )");
+    ModuleChecker& checker = *ct.checker;
+    // Module& module = *ct.module_;
+    checker.init();
+    auto sem_module = checker.check_module();
+    REQUIRE_CHECKER_OK();
+}
+
+TEST_CASE("function_call_typeclass_bad_method_ok", "[typeclass]") {
+    ModuleCheckerTest ct(R"(
+class Foo {
+    x: Integer
+}
+typeclass MyTypeclass[t] {
+    fun get_x() -> Integer
+}
+
+fun needs_typeclass(u: t) -> Integer where t::MyTypeclass {
+    return 7
+}
+
+instance MyTypeclass[Foo] {
+    fun get_y() -> Integer {
         return 7
     }
 }

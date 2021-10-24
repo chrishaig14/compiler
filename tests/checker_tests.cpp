@@ -1,16 +1,16 @@
 #include "catch.hpp"
-#include "../src/scanner/Scanner.h"
-#include "../src/parser/Parser.h"
-#include "../src/ast/expressions/include/UnaryOp.h"
-#include "../src/ast/expressions/include/CallExp.h"
-#include "../src/semantic/ModulePrechecker.h"
-#include "../src/semantic/ModuleChecker.h"
-#include "../src/compiler/Compiler.h"
-#include "../src/compiler/analyze.h"
-#include "../src/simple_nodes/common/include/TypeObject.h"
-#include "../src/simple_nodes/common/include/TypeFunction.h"
+#include <scanner/Scanner.h>
+#include <parser/Parser.h>
+#include <ast/expressions/include/UnaryOp.h>
+#include <ast/expressions/include/CallExp.h>
+#include <semantic/ModulePrechecker.h>
+#include <semantic/ModuleChecker.h>
+#include <compiler/Compiler.h>
+#include <compiler/analyze.h>
+#include <simple_nodes/common/include/TypeObject.h>
+#include <simple_nodes/common/include/TypeFunction.h>
 
-#include "../src/semantic/errors/include/errors.h"
+#include <semantic/errors/include/errors.h>
 
 const ast::ObjectType NO_TYPE(".None");
 

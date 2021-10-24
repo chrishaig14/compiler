@@ -1,9 +1,9 @@
 #include "catch.hpp"
-#include "../src/scanner/Scanner.h"
-#include "../src/parser/Parser.h"
-#include "../src/ast/expressions/include/UnaryOp.h"
-#include "../src/semantic/ModulePrechecker.h"
-#include "../src/simple_nodes/common/include/TypeObject.h"
+#include <scanner/Scanner.h>
+#include <parser/Parser.h>
+#include <ast/expressions/include/UnaryOp.h>
+#include <semantic/ModulePrechecker.h>
+#include <simple_nodes/common/include/TypeObject.h>
 
 const ast::ObjectType NO_TYPE(".None");
 
