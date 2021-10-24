@@ -3,10 +3,10 @@
 //
 
 #include "CheckCall.h"
-#include "../simple_nodes/common/include/TypeObject.h"
+#include <simple_nodes/common/include/TypeObject.h>
 #include <ast/expressions/include/CallExp.h>
 #include <ast/statements/Call.h>
-#include "../simple_nodes/common/include/TypeFunction.h"
+#include <simple_nodes/common/include/TypeFunction.h>
 
 sem::UCommon ModuleChecker::visit_call(ast::Call& n) {
     auto s = this->analyze_call(n.function, n.arguments, false, n.start, n.end);

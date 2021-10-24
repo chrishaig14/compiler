@@ -4,7 +4,7 @@
 
 #include "CheckDeclaration.h"
 #include <ast/general/ObjectType.h>
-#include "../simple_nodes/common/include/TypeObject.h"
+#include <simple_nodes/common/include/TypeObject.h>
 
 UExpressionInfo ModuleChecker::expect_rvalue_of_type(const sem::Type& target, ast::ExpNode& node) {
     UExpressionInfo rinfo = this->dispatch_rvalue(node);

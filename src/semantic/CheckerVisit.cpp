@@ -3,9 +3,9 @@
 //
 
 #include "ModuleChecker.h"
-#include "../simple_nodes/common/include/TypeObject.h"
-#include "../simple_nodes/common/include/TypeFunction.h"
-#include "../simple_nodes/expressions/include/CallExp.h"
+#include <simple_nodes/common/include/TypeObject.h>
+#include <simple_nodes/common/include/TypeFunction.h>
+#include <simple_nodes/expressions/include/CallExp.h>
 
 sem::Common* make_for_snode(ast::For& node, std::unique_ptr<sem::Block>& binfo, UExpressionInfo& exp_info_p,
                             std::string loop_list_var_id, std::string loop_index_var_id,

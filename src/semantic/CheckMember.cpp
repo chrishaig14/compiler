@@ -5,11 +5,11 @@
 #include <cassert>
 #include "CheckMember.h"
 #include <ast/general/ObjectType.h>
-#include "../simple_nodes/expressions/include/ObjectMember.h"
-#include "../simple_nodes/expressions/include/ObjectMethod.h"
-#include "../simple_nodes/expressions/include/StaticMethod.h"
-#include "../simple_nodes/common/include/TypeObject.h"
-#include "../simple_nodes/common/include/TypeFunction.h"
+#include <simple_nodes/expressions/include/ObjectMember.h>
+#include <simple_nodes/expressions/include/ObjectMethod.h>
+#include <simple_nodes/expressions/include/StaticMethod.h>
+#include <simple_nodes/common/include/TypeObject.h>
+#include <simple_nodes/common/include/TypeFunction.h>
 
 UExpressionInfo ModuleChecker::visit_member(const ast::Member& n) {
     UExpressionInfo parent_info = this->dispatch_rvalue(n.parent);

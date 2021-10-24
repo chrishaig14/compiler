@@ -11,8 +11,8 @@
 #include <vector>
 #include <map>
 #include <util/Path.h>
-#include "../../simple_nodes/sem.h"
-#include "../../simple_nodes/common/include/TypeFunction.h"
+#include <simple_nodes/sem.h>
+#include <simple_nodes/common/include/TypeFunction.h>
 
 class TypeclassFoo {
 public:

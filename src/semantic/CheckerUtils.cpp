@@ -3,7 +3,7 @@
 //
 
 #include "CheckerUtils.h"
-#include "../simple_nodes/common/include/TypeObject.h"
+#include <simple_nodes/common/include/TypeObject.h>
 #include "ModuleChecker.h"
 
 std::string binoptype_to_str(OpType op) {

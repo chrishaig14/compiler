@@ -3,7 +3,7 @@
 //
 
 #include "PythonModuleTranspiler.h"
-#include "../../simple_nodes/common/include/Throw.h"
+#include <simple_nodes/common/include/Throw.h>
 #include "../../units/infos/Module.h"
 
 PythonExpressionOutputCode::PythonExpressionOutputCode(const std::string& pre_code, const std::string& code) : pre_code(

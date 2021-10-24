@@ -3,7 +3,7 @@
 //
 
 #include "ObjectType.h"
-#include "../../simple_nodes/common/include/TypeObject.h"
+#include <simple_nodes/common/include/TypeObject.h>
 
 using namespace ast;
 

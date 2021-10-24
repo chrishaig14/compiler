@@ -4,7 +4,7 @@
 
 #include <cassert>
 #include "TypeFunction.h"
-#include "../../simple_nodes/common/include/TypeFunction.h"
+#include <simple_nodes/common/include/TypeFunction.h>
 #include "ObjectType.h"
 
 using namespace ast;

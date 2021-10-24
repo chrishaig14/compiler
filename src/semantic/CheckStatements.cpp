@@ -5,11 +5,11 @@
 #include "CheckStatements.h"
 
 #include <ast/general/ObjectType.h>
-#include "../simple_nodes/common/include/Throw.h"
-#include "../simple_nodes/common/include/TryCatch.h"
-#include "../simple_nodes/common/include/TypeObject.h"
-#include "../simple_nodes/expressions/include/CallExp.h"
-#include "../simple_nodes/common/include/TypeFunction.h"
+#include <simple_nodes/common/include/Throw.h>
+#include <simple_nodes/common/include/TryCatch.h>
+#include <simple_nodes/common/include/TypeObject.h>
+#include <simple_nodes/expressions/include/CallExp.h>
+#include <simple_nodes/common/include/TypeFunction.h>
 
 
 sem::UCommon ModuleChecker::visit_lvalue_subscript(const ast::Subscript& node) {

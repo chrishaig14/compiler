@@ -6,8 +6,8 @@
 #define XLANG_ENTITYVALUE_H
 
 #include "Entity.h"
-#include "../../simple_nodes/sem.h"
-#include "../../simple_nodes/common/include/Type.h"
+#include <simple_nodes/sem.h>
+#include <simple_nodes/common/include/Type.h>
 #include <cassert>
 
 enum class Meta {

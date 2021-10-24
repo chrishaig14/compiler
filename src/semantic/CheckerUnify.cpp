@@ -3,13 +3,13 @@
 //
 
 #include "ModuleChecker.h"
-#include "../simple_nodes/common/include/Match.h"
-#include "../simple_nodes/expressions/include/NewObject.h"
-#include "../simple_nodes/common/include/TypeObject.h"
-#include "../simple_nodes/common/include/TypeFunction.h"
-#include "../simple_nodes/expressions/include/EnumMember.h"
-#include "../simple_nodes/expressions/include/Id.h"
-#include "../simple_nodes/expressions/include/ObjectMember.h"
+#include <simple_nodes/common/include/Match.h>
+#include <simple_nodes/expressions/include/NewObject.h>
+#include <simple_nodes/common/include/TypeObject.h>
+#include <simple_nodes/common/include/TypeFunction.h>
+#include <simple_nodes/expressions/include/EnumMember.h>
+#include <simple_nodes/expressions/include/Id.h>
+#include <simple_nodes/expressions/include/ObjectMember.h>
 
 std::pair<std::string, ast::Type*>*
 ModuleChecker::get_first_substitution_object(ast::ObjectType& a, ast::ObjectType& b, bool is_top_level_arg) {

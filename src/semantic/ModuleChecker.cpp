@@ -4,8 +4,8 @@
 #include "ModuleChecker.h"
 #include "../util/macros.h"
 #include "../logging/logging.h"
-#include "../simple_nodes/common/include/TypeObject.h"
-#include "../simple_nodes/common/include/TypeFunction.h"
+#include <simple_nodes/common/include/TypeObject.h>
+#include <simple_nodes/common/include/TypeFunction.h>
 #include "util.h"
 
 UExpressionInfo exp_error_stub() {

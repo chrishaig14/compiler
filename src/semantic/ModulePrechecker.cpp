@@ -4,9 +4,9 @@
 
 #include <iostream>
 #include "ModulePrechecker.h"
-#include "../simple_nodes/common/include/TypeObject.h"
-#include "../simple_nodes/common/include/TypeFunction.h"
-#include "../simple_nodes/common/include/Type.h"
+#include <simple_nodes/common/include/TypeObject.h>
+#include <simple_nodes/common/include/TypeFunction.h>
+#include <simple_nodes/common/include/Type.h>
 #include "errors/include/ErrorRedeclared.h"
 #include <units/entities/EntityNothing.h>
 #include "errors/include/ErrorGlobalRedeclared.h"

@@ -9,8 +9,8 @@
 #include <util/Path.h>
 #include "../../ast/general/TypeFunction.h"
 #include "../../ast/top/Function.h"
-#include "../../simple_nodes/sem.h"
-#include "../../simple_nodes/common/include/TypeFunction.h"
+#include <simple_nodes/sem.h>
+#include <simple_nodes/common/include/TypeFunction.h>
 #include <unordered_map>
 
 class ConstFunction {

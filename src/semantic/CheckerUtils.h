@@ -7,14 +7,14 @@
 
 #include <units/entities/Entity.h>
 #include <ast/top/Function.h>
-#include "../simple_nodes/common/include/Common.h"
-#include "../simple_nodes/top/include/FunctionDef.h"
-#include "../simple_nodes/expressions/include/NewObject.h"
-#include "../simple_nodes/expressions/include/Integer.h"
-#include "../simple_nodes/expressions/include/Id.h"
-#include "../simple_nodes/common/include/If.h"
-#include "../simple_nodes/common/include/Call.h"
-#include "../simple_nodes/common/include/Return.h"
+#include <simple_nodes/common/include/Common.h>
+#include <simple_nodes/top/include/FunctionDef.h>
+#include <simple_nodes/expressions/include/NewObject.h>
+#include <simple_nodes/expressions/include/Integer.h>
+#include <simple_nodes/expressions/include/Id.h>
+#include <simple_nodes/common/include/If.h>
+#include <simple_nodes/common/include/Call.h>
+#include <simple_nodes/common/include/Return.h>
 #include <ast/nodes.h>
 #include <ast/general/ObjectType.h>
 #include "ExpressionInfo.h"

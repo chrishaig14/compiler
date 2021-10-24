@@ -9,7 +9,7 @@
 #include <vector>
 #include <ast/general/Type.h>
 #include <units/infos/ConcreteClass.h>
-#include "../simple_nodes/common/include/Common.h"
+#include <simple_nodes/common/include/Common.h>
 #include <units/infos/Module.h>
 #include <units/infos/Package.h>
 
