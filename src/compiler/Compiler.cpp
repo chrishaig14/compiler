@@ -4,7 +4,7 @@
 
 #include <dirent.h>
 #include "Compiler.h"
-#include "../logging/logging.h"
+#include <logging/logging.h>
 #include "utils.h"
 #include "PackagePrechecker.h"
 #include "Loader.h"

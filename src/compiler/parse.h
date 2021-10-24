@@ -6,8 +6,8 @@
 #define XLANG_PARSE_H
 
 #include <ast/statements/Block.h>
-#include "../scanner/Scanner.h"
-#include "../parser/Parser.h"
+#include <scanner/Scanner.h>
+#include <parser/Parser.h>
 
 
 #endif //XLANG_PARSE_H

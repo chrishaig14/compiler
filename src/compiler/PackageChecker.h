@@ -9,8 +9,8 @@
 #include <fstream>
 #include <units/infos/Package.h>
 #include <units/infos/Module.h>
-#include "../util/utils.h"
-#include "../semantic/ModuleChecker.h"
+#include <util/utils.h>
+#include <semantic/ModuleChecker.h>
 
 std::unique_ptr<ModuleMember> find(Path path, Package& top_package);
 

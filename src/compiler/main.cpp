@@ -1,7 +1,7 @@
 #include <set>
 #include "utils.h"
 #include "Compiler.h"
-#include "../transpiler/python/PythonProgramTranspiler.h"
+#include <transpiler/python/PythonProgramTranspiler.h>
 
 int main(int argc, char* argv[]) {
     bool is_lib;

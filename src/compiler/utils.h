@@ -8,7 +8,7 @@
 #include <string>
 #include <map>
 #include <vector>
-#include "../util/types.h"
+#include <util/types.h>
 
 struct Requirement {
     std::string package;

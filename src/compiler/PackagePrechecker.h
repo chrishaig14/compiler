@@ -9,8 +9,8 @@
 #include <fstream>
 #include <units/infos/Package.h>
 #include <units/infos/Module.h>
-#include "../util/utils.h"
-#include "../semantic/ModulePrechecker.h"
+#include <util/utils.h>
+#include <semantic/ModulePrechecker.h>
 
 class PackagePrechecker {
 public:

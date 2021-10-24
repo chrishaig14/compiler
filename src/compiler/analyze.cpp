@@ -3,5 +3,5 @@
 //
 
 #include "Compiler.h"
-#include "../semantic/ModuleChecker.h"
+#include <semantic/ModuleChecker.h>
 
