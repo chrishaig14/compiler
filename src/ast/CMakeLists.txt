@@ -102,5 +102,4 @@ add_library(
     top/TypeclassAst.h
     general/TypeNode.cpp
     statements/While.cpp
-    statements/While.h
-)
+    statements/While.h)

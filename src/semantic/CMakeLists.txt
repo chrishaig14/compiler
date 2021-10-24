@@ -79,7 +79,6 @@ add_library(
     SymbolTable.cpp
     SymbolTable.h
     util.cpp
-    util.h
-)
+    util.h)
 
 target_link_libraries(semantic units simple_nodes)
