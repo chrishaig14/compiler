@@ -8,7 +8,7 @@
 
 #include <string>
 #include "Exp.h"
-#include <util/Path.h>
+#include <common/Path.h>
 
 class sem::EnumMember : public sem::Exp {
 public:

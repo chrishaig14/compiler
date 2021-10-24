@@ -7,7 +7,7 @@
 
 
 #include "Exp.h"
-#include <util/Path.h>
+#include <common/Path.h>
 
 class sem::ObjectConstructor : public sem::Exp {
 public:

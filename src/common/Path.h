@@ -5,8 +5,7 @@
 #ifndef XLANG_PATH_H
 #define XLANG_PATH_H
 
-
-#include "types.h"
+#include <util/types.h>
 
 class Path {
 private:

@@ -6,7 +6,7 @@
 #define XLANG_PACKAGE_H
 
 #include "Module.h"
-#include <util/Path.h>
+#include <common/Path.h>
 #include "../packageunits/package_units.h"
 
 class Package {

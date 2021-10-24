@@ -83,8 +83,6 @@ add_library(
     general/ObjectType.h
     optypes.cpp
     optypes.h
-    ../util/Path.cpp
-    ../util/Path.h
     statements/Return.cpp
     statements/Return.h
     top/EnumNode.cpp

@@ -6,7 +6,7 @@
 #define XLANG_OBJECTTYPE_H
 
 #include "Type.h"
-#include <util/Path.h>
+#include <common/Path.h>
 
 class ObjectTypeData {
 public:

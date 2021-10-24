@@ -12,4 +12,6 @@ add_library(
         CodeLines.cpp
         Token.h
         Token.cpp
+        Path.cpp
+        Path.h
 )

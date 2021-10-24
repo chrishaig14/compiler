@@ -19,8 +19,6 @@ add_library(
     infos/Module.h
     infos/Package.cpp
     infos/Package.h
-    ../util/macros.h
-    ../util/types.h
     modulemember/ModuleMember.cpp
     modulemember/ModuleMember.h
     entities/EntityClass.cpp

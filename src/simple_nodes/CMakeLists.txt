@@ -92,3 +92,5 @@ add_library(
     common/include/For.h
     expressions/src/StaticMethod.cpp
     expressions/include/StaticMethod.h)
+
+target_link_libraries(simple_nodes common util)

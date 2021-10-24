@@ -3,7 +3,7 @@
 //
 
 #include "../include/EnumMember.h"
-#include <util/Path.h>
+#include <common/Path.h>
 
 using namespace sem;
 
