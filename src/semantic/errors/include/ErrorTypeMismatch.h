@@ -11,7 +11,7 @@
 #include <ast/expressions/include/ExpNode.h>
 #include "Error.h"
 
-class ErrorTypeMismatch : public Error {
+class error::ErrorTypeMismatch : public error::Error {
     ErrorTypeMismatch(const sem::Type& expected, TextPosition start, TextPosition end, const Entity& actual);
     sem::UType expected;
     std::unique_ptr<Entity> actual;

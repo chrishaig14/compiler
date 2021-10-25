@@ -8,7 +8,7 @@
 
 #include "Error.h"
 
-class ErrorFunctionCallNumArgs : public Error {
+class error::ErrorFunctionCallNumArgs : public error::Error {
 public:
     ErrorFunctionCallNumArgs(const sem::TypeFunction* type, TextPosition position);
     Error* clone() const override;

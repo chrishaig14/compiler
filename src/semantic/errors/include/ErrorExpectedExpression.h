@@ -8,7 +8,7 @@
 
 #include "Error.h"
 
-class ErrorExpectedExpression : public Error {
+class error::ErrorExpectedExpression : public error::Error {
 public:
     ErrorExpectedExpression(const Entity& entity, const ast::ExpNode& node);
     Error* clone() const override;

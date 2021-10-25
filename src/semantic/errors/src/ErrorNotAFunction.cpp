@@ -4,6 +4,8 @@
 
 #include "../include/ErrorNotAFunction.h"
 
+using namespace error;
+
 Error* ErrorNotAFunction::clone() const {
     return nullptr;
 }

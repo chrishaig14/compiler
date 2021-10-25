@@ -14,7 +14,7 @@ sem::UCommon ModuleChecker::visit_call(ast::Call& n) {
         return nullptr;
     }
     if (not s->entity.get().is_nothing()) {
-        this->error_reporter.error(std::make_unique<ErrorUnusedReturnValue>(s->entity, n));
+        this->error_reporter.error(std::make_unique<error::ErrorUnusedReturnValue>(s->entity, n));
         return nullptr;
     }
     auto& w = (sem::CallExp&) *s->exp_snode;
@@ -35,7 +35,7 @@ ModuleChecker::analyze_call(const ast::ExpNode& function, std::vector<ast::RExpN
     bool args_are_constant = true;
     ExpressionInfo& fun_info = *fun_info_p;
     if ((fun_info.entity.get().e_type != E_TYPE::CONST_FUNCTION && fun_info_p->entity.get().e_type != E_TYPE::VALUE)) {
-        // this->error_reporter.error(std::make_unique<ErrorNotAFunction>(n));
+        // this->error_reporter.error(std::make_unique<error::ErrorNotAFunction>(n));
         return exp_error_stub();
     }
     const sem::TypeFunction& function_type = get_function_type(fun_info);
@@ -49,7 +49,7 @@ ModuleChecker::analyze_call(const ast::ExpNode& function, std::vector<ast::RExpN
     }
 
     if (arguments.size() != function_type.param_types.size()) {
-        this->error_reporter.error(std::make_unique<ErrorFunctionCallNumArgs>(&function_type, start));
+        this->error_reporter.error(std::make_unique<error::ErrorFunctionCallNumArgs>(&function_type, start));
         std::cout << function_type.to_string() << std::endl;
         if (!function_is_generic(function_type)) {
             return retv_p;
@@ -131,7 +131,7 @@ bool ModuleChecker::check_arguments(std::vector<ast::RExpNode>& narguments, std:
         if (arg_entity.is_class() || arg_entity.is_package() || arg_entity.is_module() || arg_entity.is_enum() ||
             arg_entity.is_nothing()) {
             has_error = true;
-            // this->error_reporter.error(std::make_unique<ErrorExpectedExpression>(arg_entity, arg));
+            // this->error_reporter.error(std::make_unique<error::ErrorExpectedExpression>(arg_entity, arg));
             throw std::runtime_error("Error, expected expression!");
             continue;
         }
@@ -150,7 +150,7 @@ void ModuleChecker::process_function_arguments(std::vector<std::unique_ptr<Entit
 
         sem::UExp arg_rvalue_snode = this->make_rvalue(*arg_entities[i], std::move(arguments[sni]), param_type);
         if (arg_rvalue_snode == nullptr) {
-            this->error_reporter.error(std::make_unique<ErrorTypeMismatch>(param_type,
+            this->error_reporter.error(std::make_unique<error::ErrorTypeMismatch>(param_type,
                                                                            narguments[i],
                                                                            *arg_entities[i]));
             sni++;

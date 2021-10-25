@@ -8,7 +8,7 @@
 
 #include "Error.h"
 
-class ErrorFor : public Error {
+class error::ErrorFor : public error::Error {
 public:
     ErrorFor(const Entity& entity, TextPosition position);
     Error* clone() const override;

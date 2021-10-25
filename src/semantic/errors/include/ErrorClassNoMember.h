@@ -8,7 +8,7 @@
 
 #include "Error.h"
 
-class ErrorClassNoMember : public Error {
+class error::ErrorClassNoMember : public error::Error {
 public:
     ErrorClassNoMember(const ast::ObjectType& type, const std::string basic_string_1, TextPosition position,
                        const ast::Statement& node, TextPosition position_1, TextPosition position_2);

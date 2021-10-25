@@ -8,7 +8,7 @@
 
 #include "Error.h"
 
-class ErrorFunctionReturnLastStmt : public Error {
+class error::ErrorFunctionReturnLastStmt : public error::Error {
 public:
     ErrorFunctionReturnLastStmt(std::string name, const sem::Type& node, TextPosition position);
     Error* clone() const override;

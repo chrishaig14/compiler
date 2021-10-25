@@ -8,7 +8,7 @@
 
 #include "Error.h"
 
-class ErrorBoolOp : public Error {
+class error::ErrorBoolOp : public error::Error {
 public:
     ErrorBoolOp(const Entity& left, const Entity& right, TextPosition position);
     Error* clone() const override;

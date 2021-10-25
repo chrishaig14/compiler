@@ -8,7 +8,7 @@
 
 #include "Error.h"
 
-class ErrorCantAssign : public Error {
+class error::ErrorCantAssign : public error::Error {
 public:
     const ast::Statement& n;
     Error* clone() const override;

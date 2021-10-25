@@ -4,6 +4,8 @@
 
 #include "../include/ErrorPartialWrongNumArgs.h"
 
+using namespace error;
+
 Error* ErrorPartialWrongNumArgs::clone() const {
     return nullptr;
 }

@@ -4,6 +4,8 @@
 
 #include "../include/ErrorBoolOp.h"
 
+using namespace error;
+
 Error* ErrorBoolOp::clone() const {
     return nullptr;
 }

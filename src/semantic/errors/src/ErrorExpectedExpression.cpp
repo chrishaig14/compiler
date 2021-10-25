@@ -4,6 +4,8 @@
 
 #include "../include/ErrorExpectedExpression.h"
 
+using namespace error;
+
 Error* ErrorExpectedExpression::clone() const {
     return new ErrorExpectedExpression(*this->entity, this->node);
 }

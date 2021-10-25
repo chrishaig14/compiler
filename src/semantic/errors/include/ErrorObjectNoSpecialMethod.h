@@ -9,7 +9,7 @@
 #include "Error.h"
 #include <ast/expressions/include/Subscript.h>
 
-class ErrorObjectNoSpecialMethod : public Error {
+class error::ErrorObjectNoSpecialMethod : public error::Error {
 public:
     ErrorObjectNoSpecialMethod(const sem::Type& type, const std::string& method_name, const ast::Subscript& node);
     Error* clone() const override;

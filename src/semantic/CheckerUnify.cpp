@@ -93,7 +93,7 @@ ModuleChecker::unify_function_call(const ast::FunctionType& f, ast::VectorOfType
                                    std::map<std::string, ast::Type*>& all_substitutions) {
     ast::FunctionType& fun = *f.clone();
     if (args.size() != fun.param_types.size()) {
-        this->error_reporter.error(std::make_unique<ErrorFunctionCallNumArgs>((sem::TypeFunction*) fun.to_sem(),
+        this->error_reporter.error(std::make_unique<error::ErrorFunctionCallNumArgs>((sem::TypeFunction*) fun.to_sem(),
                                                                               TextPosition{1, 1}));
         return nullptr;
     }
@@ -190,7 +190,7 @@ UExpressionInfo ModuleChecker::enum_member(const ast::Member& node, const Enum& 
             return info_u;
         }
     }
-    this->error_reporter.error(std::make_unique<ErrorEnumNoValue>(enumm.enumm_name, value, node, enumm));
+    this->error_reporter.error(std::make_unique<error::ErrorEnumNoValue>(enumm.enumm_name, value, node, enumm));
     return exp_error_stub();
 }
 
@@ -216,7 +216,7 @@ std::unique_ptr<Entity> ModuleChecker::entity_from_type(const ast::Type& type) {
 
 UExpressionInfo ModuleChecker::value_member(const ast::Member& n, UExpressionInfo parent_info, EntityValue& value) {
     if (value.type.kind == sem::Kind::FUNCTION) {
-        this->error_reporter.error(std::make_unique<ErrorNoMember>(value.get_constfun().const_function.const_function_ft,
+        this->error_reporter.error(std::make_unique<error::ErrorNoMember>(value.get_constfun().const_function.const_function_ft,
                                                                    n));
         return exp_error_stub();
     }
@@ -225,7 +225,7 @@ UExpressionInfo ModuleChecker::value_member(const ast::Member& n, UExpressionInf
 
 UExpressionInfo
 ModuleChecker::const_function_member(const ast::Member& n, UExpressionInfo unique_ptr_1, ConstFunction& function) {
-    this->error_reporter.error(std::make_unique<ErrorNoMember>(function.const_function_ft, n));
+    this->error_reporter.error(std::make_unique<error::ErrorNoMember>(function.const_function_ft, n));
     return exp_error_stub();
 }
 

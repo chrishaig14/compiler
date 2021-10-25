@@ -4,6 +4,8 @@
 
 #include "../include/ErrorRedeclared.h"
 
+using namespace error;
+
 Error* ErrorRedeclared::clone() const {
     return new ErrorRedeclared(this->name, this->node);
     return nullptr;

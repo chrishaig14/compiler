@@ -4,6 +4,8 @@
 
 #include "../include/ErrorFunctionReturnLastStmt.h"
 
+using namespace error;
+
 Error* ErrorFunctionReturnLastStmt::clone() const {
     return nullptr;
 }

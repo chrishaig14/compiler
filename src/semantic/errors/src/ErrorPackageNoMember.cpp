@@ -4,6 +4,8 @@
 
 #include "../include/ErrorPackageNoMember.h"
 
+using namespace error;
+
 Error* ErrorPackageNoMember::clone() const {
     return nullptr;
 }
@@ -17,6 +19,7 @@ std::string ErrorPackageNoMember::to_str(const CodeLines& code) const {
 }
 
 ErrorPackageNoMember::ErrorPackageNoMember(Package* p_package, const std::string basic_string_1, TextPosition position,
-                                           const ast::Statement& node, TextPosition position_1, TextPosition position_2) {
+                                           const ast::Statement& node, TextPosition position_1,
+                                           TextPosition position_2) {
 
 }

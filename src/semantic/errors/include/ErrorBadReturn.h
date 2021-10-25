@@ -8,7 +8,7 @@
 
 #include "Error.h"
 
-class ErrorBadReturn : public Error {
+class error::ErrorBadReturn : public error::Error::Error {
 public:
     ErrorBadReturn(TextPosition position);
     Error* clone() const override;

@@ -13,11 +13,13 @@
 #include <units/entities/EntityNothing.h>
 #include <units/entities/EntityNotFound.h>
 
+using namespace error;
+
 std::string entity_to_string(const Entity& entity) {
     std::string out;
     switch (entity.e_type) {
         case E_TYPE::PACKAGE:
-            return "package " + E_HLT( entity.get_package().package.name);
+            return "package " + E_HLT(entity.get_package().package.name);
         case E_TYPE::MODULE:
             return "module " + E_HLT(entity.get_module().module.name);
         case E_TYPE::CLASS:

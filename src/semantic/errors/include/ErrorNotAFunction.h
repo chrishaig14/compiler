@@ -9,7 +9,7 @@
 #include "Error.h"
 #include <ast/statements/Call.h>
 
-class ErrorNotAFunction : public Error {
+class error::ErrorNotAFunction : public error::Error {
 public:
     ErrorNotAFunction(const ast::Call& node);
     Error* clone() const override;

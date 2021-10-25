@@ -9,7 +9,7 @@
 #include "Error.h"
 #include <ast/expressions/include/Id.h>
 
-class ErrorNotDeclared : public Error {
+class error::ErrorNotDeclared : public error::Error {
     const ast::Id& idn;
 public:
     Error* clone() const override;

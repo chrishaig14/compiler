@@ -5,6 +5,8 @@
 #include "../include/ErrorTypeMismatch.h"
 #include <json/json.hpp>
 
+using namespace error;
+
 std::string mmmcode(const CodeLines& code_lines, TextPosition start, TextPosition end) {
     size_t length = end.column - start.column + 1;
     std::string str = "\n" + code_lines.get_line(start.line) + "\n";

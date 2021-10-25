@@ -4,6 +4,8 @@
 
 #include "../include/ErrorNotDeclared.h"
 
+using namespace error;
+
 Error* ErrorNotDeclared::clone() const {
     return new ErrorNotDeclared(this->idn);
 }

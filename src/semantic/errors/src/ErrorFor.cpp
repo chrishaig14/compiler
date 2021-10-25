@@ -4,6 +4,8 @@
 
 #include "../include/ErrorFor.h"
 
+using namespace error;
+
 Error* ErrorFor::clone() const {
     return nullptr;
 }

@@ -5,6 +5,8 @@
 #include "../include/ErrorListLiteral.h"
 #include <simple_nodes/common/include/TypeObject.h>
 
+using namespace error;
+
 Error* ErrorListLiteral::clone() const {
     return new ErrorListLiteral(this->node, this->type, this->position, this->node_1);
 }

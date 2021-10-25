@@ -9,7 +9,7 @@
 #include "Error.h"
 #include <ast/expressions/include/Member.h>
 
-class ErrorEnumNoValue : public Error {
+class error::ErrorEnumNoValue : public error::Error {
 public:
     ErrorEnumNoValue(std::string a, const std::string b, const ast::Member& node, const Enum& p_enum);
     Error* clone() const override;

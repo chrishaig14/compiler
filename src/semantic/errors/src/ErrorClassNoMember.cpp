@@ -4,6 +4,8 @@
 
 #include "../include/ErrorClassNoMember.h"
 
+using namespace error;
+
 Error* ErrorClassNoMember::clone() const {
     return nullptr;
 }
@@ -16,7 +18,8 @@ std::string ErrorClassNoMember::to_str(const CodeLines& code) const {
     return std::string();
 }
 
-ErrorClassNoMember::ErrorClassNoMember(const ast::ObjectType& type, const std::string basic_string_1, TextPosition position,
-                                       const ast::Statement& node, TextPosition position_1, TextPosition position_2) {
+ErrorClassNoMember::ErrorClassNoMember(const ast::ObjectType& type, const std::string basic_string_1,
+                                       TextPosition position, const ast::Statement& node, TextPosition position_1,
+                                       TextPosition position_2) {
 
 }

@@ -8,7 +8,7 @@
 
 #include "Error.h"
 
-class ErrorPartialWrongNumArgs : public Error {
+class error::ErrorPartialWrongNumArgs : public error::Error {
 public:
     ErrorPartialWrongNumArgs(TextPosition position);
     Error* clone() const override;

@@ -8,7 +8,7 @@
 
 #include "Error.h"
 
-class ErrorClassNoMethodForOp : public Error {
+class error::ErrorClassNoMethodForOp : public error::Error {
 public:
     ErrorClassNoMethodForOp(std::string class_name, std::string op, const ast::ExpNode& node);
     Error* clone() const override;

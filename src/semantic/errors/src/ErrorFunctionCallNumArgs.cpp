@@ -4,6 +4,8 @@
 
 #include "../include/ErrorFunctionCallNumArgs.h"
 
+using namespace error;
+
 Error* ErrorFunctionCallNumArgs::clone() const {
     return nullptr;
 }

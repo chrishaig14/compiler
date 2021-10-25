@@ -9,7 +9,7 @@
 #include <ast/expressions/include/Member.h>
 #include <simple_nodes/common/include/TypeObject.h>
 
-class ErrorNoMemberSuggestions : public Error {
+class error::ErrorNoMemberSuggestions : public error::Error {
     const ast::Member& m;
     sem::UType t;
     const ConcreteClass& clazz;

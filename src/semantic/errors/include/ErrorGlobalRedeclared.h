@@ -9,7 +9,7 @@
 #include "Error.h"
 #include <ast/statements/Declaration.h>
 
-class ErrorGlobalRedeclared : public Error {
+class error::ErrorGlobalRedeclared : public error::Error {
 public:
     ErrorGlobalRedeclared(std::string name);
     Error* clone() const override;

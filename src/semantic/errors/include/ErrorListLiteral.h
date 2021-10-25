@@ -9,7 +9,7 @@
 #include "Error.h"
 #include <ast/general/ObjectType.h>
 
-class ErrorListLiteral : public Error {
+class error::ErrorListLiteral : public error::Error {
 public:
     ErrorListLiteral(const sem::Type& node, const sem::TypeObject& type, TextPosition position, const ast::Statement& node_1);
     Error* clone() const override;

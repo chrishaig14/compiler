@@ -9,7 +9,7 @@
 #include "Error.h"
 #include <ast/statements/Declaration.h>
 
-class ErrorRedeclared : public Error {
+class error::ErrorRedeclared : public error::Error {
 public:
     ErrorRedeclared(std::string name, const ast::Declaration& node);
     Error* clone() const override;

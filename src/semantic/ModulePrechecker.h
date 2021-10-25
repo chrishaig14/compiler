@@ -13,7 +13,7 @@
 class ModulePrechecker {
 public:
     Module& module;
-    ErrorReporter error_reporter;
+    error::ErrorReporter error_reporter;
     std::map<std::string, std::string>& instances;
     explicit ModulePrechecker(Module& module, std::map<std::string, std::string>& instances);
 

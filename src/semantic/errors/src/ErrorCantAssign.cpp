@@ -4,6 +4,8 @@
 
 #include "../include/ErrorCantAssign.h"
 
+using namespace error;
+
 Error* ErrorCantAssign::clone() const {
     return nullptr;
 }

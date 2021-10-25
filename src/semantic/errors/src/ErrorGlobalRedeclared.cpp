@@ -4,6 +4,8 @@
 
 #include "../include/ErrorGlobalRedeclared.h"
 
+using namespace error;
+
 Error* ErrorGlobalRedeclared::clone() const {
     return new ErrorGlobalRedeclared(this->name);
     return nullptr;

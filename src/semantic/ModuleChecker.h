@@ -86,7 +86,7 @@ class ModuleChecker {
     std::map<std::string,std::string>& instances;
 public:
     Module& module;
-    ErrorReporter error_reporter;
+    error::ErrorReporter error_reporter;
     std::unique_ptr<Entity> this_entity;
     Package& top_package;
 

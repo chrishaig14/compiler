@@ -4,6 +4,8 @@
 
 #include "../include/ErrorNoMember.h"
 
+using namespace error;
+
 std::string ErrorNoMember::to_str(const CodeLines& code) const {
     return "Error no member: " + this->m.s_child;
 }

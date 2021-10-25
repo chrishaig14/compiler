@@ -4,6 +4,8 @@
 
 #include "../include/ErrorClassNoMethodForOp.h"
 
+using namespace error;
+
 Error* ErrorClassNoMethodForOp::clone() const {
     return new ErrorClassNoMethodForOp(this->class_name, this->op, this->node);
 }

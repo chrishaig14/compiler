@@ -1,6 +1,7 @@
 #include "../include/ErrorReporter.h"
 #include "../../ModuleChecker.h"
 
+using namespace error;
 
 void ErrorReporter::fail(const std::string& msg, TextPosition pos) {
     this->failed = true;

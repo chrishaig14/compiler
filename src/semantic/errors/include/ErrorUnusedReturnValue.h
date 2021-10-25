@@ -8,7 +8,7 @@
 
 #include "Error.h"
 
-class ErrorUnusedReturnValue : public Error {
+class error::ErrorUnusedReturnValue : public error::Error {
 public:
     ErrorUnusedReturnValue(const Entity& entity, const ast::Call& node);
 

@@ -9,7 +9,7 @@
 #include "Error.h"
 #include <ast/expressions/include/Member.h>
 
-class ErrorNoMember : public Error {
+class error::ErrorNoMember : public error::Error {
     const ast::Member& m;
     const sem::Type& t;
 public:

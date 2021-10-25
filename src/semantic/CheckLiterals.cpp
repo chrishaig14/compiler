@@ -110,7 +110,7 @@ UExpressionInfo ModuleChecker::visit_partial(const ast::PartialApplication& node
         return exp_error_stub();
     }
     if (node.args.size() != fun_type->param_types.size()) {
-        this->error_reporter.error(std::make_unique<ErrorPartialWrongNumArgs>(node.start));
+        this->error_reporter.error(std::make_unique<error::ErrorPartialWrongNumArgs>(node.start));
         return exp_error_stub();
     }
     std::vector<sem::UExp> snodes;
@@ -257,7 +257,7 @@ UExpressionInfo ModuleChecker::visit_list(const ast::List& node) {
         EntityValue& p_entity = current_type_p->entity.get().get_value();
         sem::TypeObject* ctype = &p_entity.type.object();
         if (*ctype != element_type) {
-            this->error_reporter.error(std::make_unique<ErrorTypeMismatch>(element_type, node.elements[i], p_entity));
+            this->error_reporter.error(std::make_unique<error::ErrorTypeMismatch>(element_type, node.elements[i], p_entity));
         }
         list_elements.push_back(std::move(current_type_p->exp_snode));
     }

@@ -4,6 +4,8 @@
 
 #include "../include/ErrorBadReturn.h"
 
+using namespace error;
+
 Error* ErrorBadReturn::clone() const {
     return nullptr;
 }

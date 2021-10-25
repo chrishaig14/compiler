@@ -5,6 +5,8 @@
 #include "../include/ErrorObjectNoSpecialMethod.h"
 #include <simple_nodes/common/include/TypeObject.h>
 
+using namespace error;
+
 Error* ErrorObjectNoSpecialMethod::clone() const {
     return new ErrorObjectNoSpecialMethod(*this->type, this->method_name, this->node);
 }

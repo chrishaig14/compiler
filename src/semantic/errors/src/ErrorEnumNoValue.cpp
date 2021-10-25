@@ -4,6 +4,8 @@
 
 #include "../include/ErrorEnumNoValue.h"
 
+using namespace error;
+
 Error* ErrorEnumNoValue::clone() const {
     return new ErrorEnumNoValue(this->enum_name, this->value_name, this->node, this->p_enum);
 }
@@ -20,8 +22,7 @@ std::string ErrorEnumNoValue::to_str(const CodeLines& code) const {
     return "Error: enum " + this->enum_name + " has no value " + this->value_name;
 }
 
-ErrorEnumNoValue::ErrorEnumNoValue(std::string a, const std::string b, const ast::Member& node,
-                                   const Enum& p_enum)
+ErrorEnumNoValue::ErrorEnumNoValue(std::string a, const std::string b, const ast::Member& node, const Enum& p_enum)
         : enum_name(a), value_name(b), node(node), p_enum(p_enum) {
 
 }

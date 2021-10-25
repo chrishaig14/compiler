@@ -8,7 +8,7 @@
 
 #include "Error.h"
 
-class ErrorPackageNoMember : public Error {
+class error::ErrorPackageNoMember : public error::Error {
 public:
     ErrorPackageNoMember(Package* p_package, const std::string basic_string_1, TextPosition position,
                          const ast::Statement& node, TextPosition position_1, TextPosition position_2);

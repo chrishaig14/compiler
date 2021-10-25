@@ -173,7 +173,7 @@ void ModulePrechecker::check_duplicated_names(ast::Module& node) {
         if (names.count(name) == 0) {
             names[name] = nullptr;
         } else {
-            this->error_reporter.error(std::make_unique<ErrorGlobalRedeclared>(name));
+            this->error_reporter.error(std::make_unique<error::ErrorGlobalRedeclared>(name));
         }
     }
 }

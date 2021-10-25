@@ -21,7 +21,7 @@ enum class ErrorElement {
     BinopLeft, BinopRight, BinopOperator,
 };
 
-class ErrorReporter {
+class error::ErrorReporter {
     bool failed;
 public:
     std::string current_class;

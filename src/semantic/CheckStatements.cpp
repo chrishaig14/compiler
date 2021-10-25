@@ -33,7 +33,7 @@ sem::UCommon ModuleChecker::visit_lvalue_subscript(const ast::Subscript& node) {
 
     auto subscript_it = cls->methods.find("__set_item__");
     if (subscript_it == cls->methods.end()) {
-        this->error_reporter.error(std::make_unique<ErrorObjectNoSpecialMethod>(entity_parent_value.type,
+        this->error_reporter.error(std::make_unique<error::ErrorObjectNoSpecialMethod>(entity_parent_value.type,
                                                                                 "__set_item__",
                                                                                 node));
         return nullptr;
@@ -135,7 +135,7 @@ sem::UCommon ModuleChecker::visit_assignment(const ast::Assignment& n) {
                                                    std::move(expression_info_p->exp_snode),
                                                    l_entity_value.type);
         if (rvalue_snode == nullptr) {
-            this->error_reporter.error(std::make_unique<ErrorTypeMismatch>(l_entity_value.type,
+            this->error_reporter.error(std::make_unique<error::ErrorTypeMismatch>(l_entity_value.type,
                                                                            n.rvalue,
                                                                            expression_info_p->entity));
             return nullptr;
@@ -157,7 +157,7 @@ sem::UCommon ModuleChecker::visit_return(const ast::Return& n) {
     Entity& return_entity = this->scope->get("__return__");
     if (return_entity.is_nothing()) {
         if (n.expression != nullptr) {
-            this->error_reporter.error(std::make_unique<ErrorBadReturn>(n.start));
+            this->error_reporter.error(std::make_unique<error::ErrorBadReturn>(n.start));
         }
         sem::UCommon info_r = std::make_unique<sem::Return>(nullptr);
         return info_r;
@@ -189,7 +189,7 @@ sem::UCommon ModuleChecker::visit_match(const ast::Match& node) {
     bool b = value.type.kind != sem::Kind::OBJECT;
     if (a || b) {
 
-        this->error_reporter.error(std::make_unique<ErrorTypeMismatch>(*new sem::TypeObject("Union",
+        this->error_reporter.error(std::make_unique<error::ErrorTypeMismatch>(*new sem::TypeObject("Union",
                                                                                             {new sem::TypeObject("...",
                                                                                                                  sem::VectorOfTypes{})}),
                                                                        *node.exp,
@@ -199,7 +199,7 @@ sem::UCommon ModuleChecker::visit_match(const ast::Match& node) {
 
     sem::TypeObject& ot = value.type.object();
     if (ot.id != "Union") {
-        this->error_reporter.error(std::make_unique<ErrorTypeMismatch>(*new sem::TypeObject("Union",
+        this->error_reporter.error(std::make_unique<error::ErrorTypeMismatch>(*new sem::TypeObject("Union",
                                                                                             {new sem::TypeObject("...",
                                                                                                                  sem::VectorOfTypes{})}),
                                                                        *node.exp,
@@ -255,13 +255,13 @@ std::unique_ptr<EntityValue> ModuleChecker::make_entity_value(sem::Type& type) {
 sem::UCommon ModuleChecker::visit_for(const ast::For& node) {
     UExpressionInfo exp_info_p = this->dispatch_rvalue(node.exp);
     if (exp_info_p->entity.get().e_type != E_TYPE::VALUE) {
-        this->error_reporter.error(std::make_unique<ErrorFor>(exp_info_p->entity, node.exp.start));
+        this->error_reporter.error(std::make_unique<error::ErrorFor>(exp_info_p->entity, node.exp.start));
         return nullptr;
     }
     EntityValue& exp_entity_value = exp_info_p->entity.get().get_value();
     sem::TypeObject& exp_ot = exp_entity_value.type.object();
     if (exp_ot.id != "List") {
-        this->error_reporter.error(std::make_unique<ErrorFor>(exp_entity_value, node.exp.start));
+        this->error_reporter.error(std::make_unique<error::ErrorFor>(exp_entity_value, node.exp.start));
         return nullptr;
     }
 
