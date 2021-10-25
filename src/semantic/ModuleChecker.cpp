@@ -6,6 +6,7 @@
 #include <logging/logging.h>
 #include <simple_nodes/common/include/TypeObject.h>
 #include <simple_nodes/common/include/TypeFunction.h>
+#include <semantic/my_error_formatter/MyErrorFormatter.h>
 #include "util.h"
 
 UExpressionInfo exp_error_stub() {
@@ -24,7 +25,7 @@ bool function_is_generic(const sem::TypeFunction& ft) {
 }
 
 ModuleChecker::ModuleChecker(Package& top_package, Module& module, std::map<std::string, std::string>& instances)
-        : instances(instances), module(module), error_reporter(module.code_lines), top_package(top_package) {
+        : instances(instances), module(module), error_reporter(module.code_lines, std::make_unique<MyErrorFormatter>()), top_package(top_package) {
     this->scope = new SymbolTable(nullptr);
     this->add_this = false;
 }

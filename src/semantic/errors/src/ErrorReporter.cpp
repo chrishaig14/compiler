@@ -56,7 +56,8 @@ void ErrorReporter::error(std::unique_ptr<Error> error) {
     std::cout << "------------------------" << std::endl;
 }
 
-ErrorReporter::ErrorReporter(const CodeLines& code_lines) : code_lines(code_lines) {
+ErrorReporter::ErrorReporter(const CodeLines& code_lines, std::unique_ptr<ErrorFormatter> formatter) : code_lines(
+        code_lines), formatter(std::move(formatter)) {
     this->failed = false;
     init_styles();
 }

@@ -73,12 +73,18 @@ add_library(
     errors/src/ErrorReporter.cpp
     errors/src/TypeMismatch.cpp
     errors/src/UnusedReturnValue.cpp
+    errors/src/ErrorFormatter.cpp
+    errors/include/ErrorFormatter.h
     ExpressionInfo.cpp
     ExpressionInfo.h
     ModulePrechecker.cpp
     SymbolTable.cpp
     SymbolTable.h
     util.cpp
-    util.h)
+    util.h
+    errors/src/ErrorFormatter.cpp
+    my_error_formatter/MyErrorFormatter.cpp
+    my_error_formatter/MyErrorFormatter.h
+    errors/include/all_errors.h)
 
 target_link_libraries(semantic units simple_nodes)

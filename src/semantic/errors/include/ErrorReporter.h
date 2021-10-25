@@ -14,6 +14,7 @@
 #include <common/CodeLines.h>
 #include <units/entities/Entity.h>
 #include "Error.h"
+#include "ErrorFormatter.h"
 
 #define FAIL_FIRST 0
 
@@ -29,8 +30,8 @@ public:
     std::string __file__;
     std::vector<std::unique_ptr<Error>> errors;
     const CodeLines& code_lines;
-
-    ErrorReporter(const CodeLines& code_lines);
+    std::unique_ptr<ErrorFormatter> formatter;
+    ErrorReporter(const CodeLines& code_lines, std::unique_ptr<ErrorFormatter> formatter);
     void fail(const std::string& msg, TextPosition pos);
     void fail(const std::string& msg);
     std::string code_error_string(TextPosition start, TextPosition end);

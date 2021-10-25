@@ -16,8 +16,21 @@
 std::string entity_to_string(const Entity& entity);
 
 namespace error {
+
+    enum class ErrorType {
+        bad_return, type_mismatch, missing
+    };
+
     class Error {
     public:
+        const ErrorType error_type;
+
+        Error(ErrorType error_type) : error_type(error_type) {
+        }
+
+        Error() : error_type(ErrorType::missing) {
+        }
+
         virtual ~Error() = default;
         virtual Error* clone() const = 0;
         virtual bool equal(const Error& other) const = 0;

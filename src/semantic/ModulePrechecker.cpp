@@ -18,6 +18,7 @@
 #include <ast/top/TypeclassAst.h>
 #include <ast/top/Instance.h>
 #include <units/infos/TemplateClass.h>
+#include <semantic/my_error_formatter/MyErrorFormatter.h>
 
 const VectorOfStrings default_imports = {"libcore.libcore.String", "libcore.libcore.Integer", "libcore.libcore.List",
                                          "libcore.libcore.Double", "libcore.libcore.Boolean", "libcore.libcore.Float",
@@ -281,7 +282,7 @@ void ModulePrechecker::visit_enum(ast::EnumNode& node) {
 }
 
 ModulePrechecker::ModulePrechecker(Module& module, std::map<std::string, std::string>& instances)
-        : module(module), error_reporter(module.code_lines), instances(instances) {
+        : module(module), error_reporter(module.code_lines, std::make_unique<MyErrorFormatter>()), instances(instances) {
 }
 
 
