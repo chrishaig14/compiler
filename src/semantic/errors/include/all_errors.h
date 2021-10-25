@@ -7,5 +7,6 @@
 
 #include "BadReturn.h"
 #include "TypeMismatch.h"
+#include "TypeclassNotFound.h"
 
 #endif //XLANG_ALL_ERRORS_H

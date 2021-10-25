@@ -87,6 +87,8 @@ namespace error {
     class TypeMismatch;
 
     class UnusedReturnValue;
+
+    class TypeclassNotFound;
 }
 
 

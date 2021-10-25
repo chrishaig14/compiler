@@ -650,3 +650,26 @@ fun main()->Integer{
     auto sem_module = checker.check_module();
     REQUIRE_CHECKER_OK();
 }
+
+TEST_CASE("typeclass_not_found", "[typeclass]") {
+    // typeclass instance definition with method that's not part of the typeclass should fail
+    ModuleCheckerTest ct(R"(
+typeclass BarTypeclass[t] {
+    fun get_x() -> Integer
+}
+
+fun needs_typeclass(u: t) -> Integer where t::FooTypeclass {
+    return 7
+}
+
+fun main()->Integer{
+    return 0
+}
+)");
+    ModuleChecker& checker = *ct.checker;
+    // Module& module = *ct.module_;
+    checker.init();
+    auto sem_module = checker.check_module();
+    REQUIRE(not checker.error_reporter.ok());
+    REQUIRE(not checker.error_reporter.errors.empty());
+}

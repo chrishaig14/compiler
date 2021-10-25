@@ -139,7 +139,7 @@ std::unique_ptr<EntityValue> ModuleChecker::make_value(sem::Type* type) {
                 for (auto& one_typeclass: type_object.typeclasses) {
                     Entity& tc = this->scope->get(one_typeclass);
                     if (tc.is_notfound()) {
-                        throw std::runtime_error("did not find typeclass " + one_typeclass);
+                        this->error_reporter.error(std::make_unique<error::TypeclassNotFound>(one_typeclass));
                     } else {
                         EntityTypeclass& typec = tc.get_typeclass();
                         TypeclassFoo& tcf = typec.clazz;
