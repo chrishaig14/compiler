@@ -63,7 +63,7 @@ TEST_CASE("basic_function_bad_return_type", "[checker]") {
     error::Error& errr = *checker.error_reporter.errors.back();
     ast::Boolean node(false, _POS, _POS);
     sem::TypeObject expected("Integer");
-    error::ErrorTypeMismatch exp(expected, ast_exp, *checker.entity_from_type(ast::ObjectType("Boolean")));
+    error::TypeMismatch exp(expected, ast_exp, *checker.entity_from_type(ast::ObjectType("Boolean")));
     REQUIRE(errr == exp);
 }
 
@@ -95,7 +95,7 @@ TEST_CASE("basic_declaration_bad_type", "[checker]") {
     error::Error& errr = *checker.error_reporter.errors.back();
     // ast::Number node(NumberType::INTEGER, "9", _POS, _POS);
     sem::TypeObject expected("Boolean");
-    error::ErrorTypeMismatch exp(expected, ast_exp, *checker.entity_from_type(ast::ObjectType("Integer")));
+    error::TypeMismatch exp(expected, ast_exp, *checker.entity_from_type(ast::ObjectType("Integer")));
     REQUIRE(errr == exp);
 }
 
@@ -109,8 +109,8 @@ TEST_CASE("error_redeclared", "[checker]") {
     error::Error& errr = *checker.error_reporter.errors.back();
     ast::Number node(NumberType::INTEGER, "9", _POS, _POS);
     ast::ObjectType expected("Boolean");
-    error::ErrorRedeclared exp("x",
-                        (ast::Declaration&) *((std::unique_ptr<ast::Function>&) module.ast->functions[0])->body->nodes[1]);
+    error::Redeclared exp("x",
+                          (ast::Declaration&) *((std::unique_ptr<ast::Function>&) module.ast->functions[0])->body->nodes[1]);
     REQUIRE(errr == exp);
 }
 
@@ -136,7 +136,7 @@ TEST_CASE("list_bad", "[checker]") {
     error::Error& errr = *checker.error_reporter.errors.back();
 
     sem::TypeObject expected("Integer");
-    error::ErrorTypeMismatch exp(expected, ast_list.elements[1], *checker.entity_from_type(ast::ObjectType("String")));
+    error::TypeMismatch exp(expected, ast_list.elements[1], *checker.entity_from_type(ast::ObjectType("String")));
 
     REQUIRE(errr == exp);
 }
@@ -317,7 +317,7 @@ TEST_CASE("decl_error_expected_expression", "[checker]") {
     error::Error& errr = *checker.error_reporter.errors.back();
     ConcreteClass* cl = &module.get(Path("Integer"))->klass();
     EntityClass ec(*cl);
-    error::ErrorExpectedExpression exp(ec, declaration_node.expression);
+    error::ExpectedExpression exp(ec, declaration_node.expression);
     REQUIRE(errr == exp);
 }
 
@@ -343,7 +343,7 @@ TEST_CASE("error_no_member", "[checker]") {
     REQUIRE(module_member.is_klass());
     sem::TypeObject type("Foo");
     std::cout << "Making error: " << &declaration_node.expression << std::endl;
-    error::ErrorNoMemberSuggestions exp(type, (ast::Member&) declaration_node.expression, module_member.klass());
+    error::NoMemberSuggestions exp(type, (ast::Member&) declaration_node.expression, module_member.klass());
     REQUIRE(errr == exp);
 }
 
@@ -447,7 +447,7 @@ TEST_CASE("binop_type_error", "[checker]") {
 
     error::Error& errr = *checker.error_reporter.errors.back();
     sem::TypeObject expected("Integer");
-    error::ErrorTypeMismatch exp(expected, ast_binop.right, *checker.entity_from_type(ast::ObjectType("String")));
+    error::TypeMismatch exp(expected, ast_binop.right, *checker.entity_from_type(ast::ObjectType("String")));
     REQUIRE(errr == exp);
 }
 
@@ -500,7 +500,7 @@ TEST_CASE("subscript_index_type_error", "[checker]") {
 
     error::Error& errr = *checker.error_reporter.errors.back();
     sem::TypeObject expected("Integer");
-    error::ErrorTypeMismatch exp(expected, *ast_subs.child[0], *checker.entity_from_type(ast::ObjectType("String")));
+    error::TypeMismatch exp(expected, *ast_subs.child[0], *checker.entity_from_type(ast::ObjectType("String")));
     REQUIRE(errr == exp);
 }
 
@@ -522,7 +522,7 @@ TEST_CASE("subscript_no_method_error", "[checker]") {
     ast::Subscript node(p_node, v, _POS, _POS);
     ast::ObjectType expected("Integer");
     sem::TypeObject type("Foo");
-    error::ErrorObjectNoSpecialMethod exp(type, "__get_item__", node);
+    error::ObjectNoSpecialMethod exp(type, "__get_item__", node);
     REQUIRE(errr == exp);
 }
 
@@ -559,7 +559,7 @@ TEST_CASE("call_args_type_error", "[checker]") {
     error::Error& errr = *checker.error_reporter.errors.back();
     // ast::String node("Hello", _POS, _POS);
     sem::TypeObject expected("Integer");
-    error::ErrorTypeMismatch exp(expected, node, *checker.entity_from_type(ast::ObjectType("String")));
+    error::TypeMismatch exp(expected, node, *checker.entity_from_type(ast::ObjectType("String")));
     REQUIRE(errr == exp);
 }
 
@@ -582,7 +582,7 @@ fun foo()->Integer{
     sem::TypeObject expected("Integer");
     ast::Function& ast_func = module.ast->functions[1];
     ast::Declaration& ast_decl = (ast::Declaration&) *ast_func.body->nodes[0];
-    error:: ErrorExpectedExpression exp(EntityNothing(), ast_decl.expression);
+    error:: ExpectedExpression exp(EntityNothing(), ast_decl.expression);
     REQUIRE(errr == exp);
 }
 
@@ -604,7 +604,7 @@ fun foo()->Integer{
     error::Error& errr = *checker.error_reporter.errors.back();
     ast::Function& ast_func = module.ast->functions[1];
     ast::Call& ast_call = static_cast<ast::Call&>(*ast_func.body->nodes[0]);
-    error::ErrorUnusedReturnValue exp(*checker.entity_from_type(ast::ObjectType("Integer")), ast_call);
+    error::UnusedReturnValue exp(*checker.entity_from_type(ast::ObjectType("Integer")), ast_call);
     REQUIRE(errr == exp);
 }
 
@@ -641,7 +641,7 @@ TEST_CASE("union_error", "[checker]") {
 
     error::Error& errr = *checker.error_reporter.errors.back();
     sem::TypeObject expected("Union", {new sem::TypeObject("Integer"), new sem::TypeObject("String")});
-    error::ErrorTypeMismatch exp(expected, ast_decl.expression, *checker.entity_from_type(ast::ObjectType("Boolean")));
+    error::TypeMismatch exp(expected, ast_decl.expression, *checker.entity_from_type(ast::ObjectType("Boolean")));
     REQUIRE(errr == exp);
 }
 
@@ -669,7 +669,7 @@ TEST_CASE("while_boolean_error", "[checker]") {
 
     error::Error& errr = *checker.error_reporter.errors.back();
     sem::TypeObject expected("Boolean");
-    error::ErrorTypeMismatch exp(expected, *ast_while.condition, *checker.entity_from_type(ast::ObjectType("Integer")));
+    error::TypeMismatch exp(expected, *ast_while.condition, *checker.entity_from_type(ast::ObjectType("Integer")));
     REQUIRE(errr == exp);
 }
 
@@ -797,7 +797,7 @@ TEST_CASE("for_error_no_list", "[checker]") {
     REQUIRE_CHECKER_ONE_ERROR();
     error::Error& errr = *checker.error_reporter.errors.back();
     auto e = checker.entity_from_type(ast::ObjectType("Boolean"));
-    REQUIRE(errr == error::ErrorFor(*e, exp.start));
+    REQUIRE(errr == error::For(*e, exp.start));
 }
 
 TEST_CASE("if_boolean_error", "[checker]") {
@@ -813,7 +813,7 @@ TEST_CASE("if_boolean_error", "[checker]") {
 
     error::Error& errr = *checker.error_reporter.errors.back();
     sem::TypeObject expected("Boolean");
-    error::ErrorTypeMismatch exp(expected, ast_if.condition, *checker.entity_from_type(ast::ObjectType("Integer")));
+    error::TypeMismatch exp(expected, ast_if.condition, *checker.entity_from_type(ast::ObjectType("Integer")));
     REQUIRE(errr == exp);
 }
 
@@ -832,7 +832,7 @@ TEST_CASE("enum_error", "[checker]") {
     ast::Member node(std::move(u), Token(TokType::ID, "b", _POS));
     ast::ObjectType expected("Boolean");
     Enum& enumm = module.members["Foo"]->enumm();
-    error::ErrorEnumNoValue exp("Foo", "b", node, enumm);
+    error::EnumNoValue exp("Foo", "b", node, enumm);
     REQUIRE(errr == exp);
 }
 

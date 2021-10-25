@@ -23,7 +23,7 @@ EntityValue& ModuleChecker::entity_value_from_actual_base_path_no_generic(const 
 UExpressionInfo ModuleChecker::visit_id(const ast::Id& n) {
     Entity& entity = this->scope->get(n._id);
     if (entity.is_notfound()) {
-        this->error_reporter.error(std::make_unique<error::ErrorNotDeclared>(n));
+        this->error_reporter.error(std::make_unique<error::NotDeclared>(n));
         this->scope->set(n._id, EntityError());
         return exp_error_stub();
     }
@@ -83,7 +83,7 @@ UExpressionInfo ModuleChecker::visit_binop(const ast::BinaryOp& node) {
     }
     Entity& l_entity = left_info_p->entity.get();
     if (l_entity.e_type != E_TYPE::VALUE) {
-        this->error_reporter.error(std::make_unique<error::ErrorExpectedExpression>(l_entity, node.left));
+        this->error_reporter.error(std::make_unique<error::ExpectedExpression>(l_entity, node.left));
         return exp_error_stub();
     }
     EntityValue& l_entity_v = l_entity.get_value();
@@ -108,7 +108,7 @@ UExpressionInfo ModuleChecker::visit_binop(const ast::BinaryOp& node) {
         assert(cls != nullptr);
         auto operator_fun_it = cls->static_methods.find(fun);
         if (operator_fun_it == cls->static_methods.end()) {
-            this->error_reporter.error(std::make_unique<error::ErrorClassNoMethodForOp>(cls->class_name, fun, node));
+            this->error_reporter.error(std::make_unique<error::ClassNoMethodForOp>(cls->class_name, fun, node));
             return exp_error_stub();
         }
         ConstFunction& operator_fun = *operator_fun_it->second;
@@ -195,13 +195,13 @@ UExpressionInfo ModuleChecker::visit_subscript(const ast::Subscript& node) {
     const ConcreteClass* cls = value.clazz;
     if (cls == nullptr) {
         // its totally generic, fail
-        this->error_reporter.error(std::make_unique<error::ErrorObjectNoSpecialMethod>(value.type, "__get_item__", node));
+        this->error_reporter.error(std::make_unique<error::ObjectNoSpecialMethod>(value.type, "__get_item__", node));
         return exp_error_stub();
     }
     assert(cls != nullptr);
     auto subscript_it = cls->methods.find("__get_item__");
     if (subscript_it == cls->methods.end()) {
-        this->error_reporter.error(std::make_unique<error::ErrorObjectNoSpecialMethod>(value.type, "__get_item__", node));
+        this->error_reporter.error(std::make_unique<error::ObjectNoSpecialMethod>(value.type, "__get_item__", node));
         return exp_error_stub();
     }
     ConstFunction& subscript_fun = *subscript_it->second;
@@ -239,19 +239,19 @@ UExpressionInfo ModuleChecker::visit_ternary(const ast::Ternary& node) {
     Entity& p_entity = expression_info.entity;
     if (p_entity.e_type != E_TYPE::VALUE ||
         expression_info_p->entity.get().get_value().type.kind == sem::Kind::FUNCTION) {
-        this->error_reporter.error(std::make_unique<error::ErrorTypeMismatch>(*new sem::TypeObject("Option",
-                                                                                            {new sem::TypeObject("t")}),
-                                                                       *node.expression,
-                                                                       expression_info_p->entity));
+        this->error_reporter.error(std::make_unique<error::TypeMismatch>(*new sem::TypeObject("Option",
+                                                                                              {new sem::TypeObject("t")}),
+                                                                         *node.expression,
+                                                                         expression_info_p->entity));
         return exp_error_stub();
     }
     sem::TypeObject& expression_type = p_entity.get_value().type.object();
 
     if (expression_type.id != "Option") {
-        this->error_reporter.error(std::make_unique<error::ErrorTypeMismatch>(*new sem::TypeObject("Option",
-                                                                                            {new sem::TypeObject("t")}),
-                                                                       *node.expression,
-                                                                       expression_info_p->entity));
+        this->error_reporter.error(std::make_unique<error::TypeMismatch>(*new sem::TypeObject("Option",
+                                                                                              {new sem::TypeObject("t")}),
+                                                                         *node.expression,
+                                                                         expression_info_p->entity));
         return exp_error_stub();
     }
     this->enter_scope();

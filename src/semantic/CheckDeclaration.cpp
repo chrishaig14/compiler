@@ -13,17 +13,17 @@ UExpressionInfo ModuleChecker::expect_rvalue_of_type(const sem::Type& target, as
     }
     Entity& r_entity = rinfo->entity.get();
     if (r_entity.is_nothing()) {
-        this->error_reporter.error(std::make_unique<error::ErrorExpectedExpression>(r_entity, node));
+        this->error_reporter.error(std::make_unique<error::ExpectedExpression>(r_entity, node));
         return exp_error_stub();
     }
     if (r_entity.e_type != E_TYPE::VALUE && r_entity.e_type != E_TYPE::CONST_FUNCTION &&
         r_entity.e_type != E_TYPE::NONE) {
-        this->error_reporter.error(std::make_unique<error::ErrorTypeMismatch>(target, node, r_entity));
+        this->error_reporter.error(std::make_unique<error::TypeMismatch>(target, node, r_entity));
         return exp_error_stub();
     }
     sem::UExp snode = make_rvalue(r_entity, std::move(rinfo->exp_snode), target);
     if (snode == nullptr) {
-        this->error_reporter.error(std::make_unique<error::ErrorTypeMismatch>(target, node, r_entity));
+        this->error_reporter.error(std::make_unique<error::TypeMismatch>(target, node, r_entity));
         return exp_error_stub();
     }
     rinfo->exp_snode = std::move(snode);
@@ -132,7 +132,7 @@ sem::UExp ModuleChecker::make_union_rvalue(sem::UExp value_snode, const sem::Typ
 sem::UCommon ModuleChecker::visit_declaration(const ast::Declaration& n) {
     // Logger::info("Checking ast::DeclarationNode for var: " + n.identifier);
     if (this->scope->declared(n.identifier)) {
-        this->error_reporter.error(std::make_unique<error::ErrorRedeclared>(n.identifier, n));
+        this->error_reporter.error(std::make_unique<error::Redeclared>(n.identifier, n));
     }
     sem::UCommon info_u;
     if (n.type != nullptr) {
@@ -171,7 +171,7 @@ sem::UCommon ModuleChecker::check_declaration_without_type(const ast::Declaratio
     }
     E_TYPE entity_type = exp_info_p->entity.get().e_type;
     if (entity_type != E_TYPE::CONST_FUNCTION && entity_type != E_TYPE::VALUE) {
-        this->error_reporter.error(std::make_unique<error::ErrorExpectedExpression>(exp_info_p->entity, n.expression));
+        this->error_reporter.error(std::make_unique<error::ExpectedExpression>(exp_info_p->entity, n.expression));
         return nullptr;
     }
 

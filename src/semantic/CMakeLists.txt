@@ -25,54 +25,54 @@ add_library(
     CheckStatements.cpp
     CheckStatements.h
     errors/include/Error.h
-    errors/include/ErrorBadReturn.h
-    errors/include/ErrorBoolOp.h
-    errors/include/ErrorCantAssign.h
-    errors/include/ErrorClassNoMember.h
-    errors/include/ErrorClassNoMethodForOp.h
-    errors/include/ErrorEnumNoValue.h
-    errors/include/ErrorExpectedExpression.h
-    errors/include/ErrorFor.h
-    errors/include/ErrorFunctionCallNumArgs.h
-    errors/include/ErrorFunctionReturnLastStmt.h
-    errors/include/ErrorListLiteral.h
-    errors/include/ErrorNoMember.h
-    errors/include/ErrorNoMemberSuggestions.h
-    errors/include/ErrorNotAFunction.h
-    errors/include/ErrorNotDeclared.h
-    errors/include/ErrorObjectNoSpecialMethod.h
-    errors/include/ErrorPackageNoMember.h
-    errors/include/ErrorPartialWrongNumArgs.h
-    errors/include/ErrorGlobalRedeclared.h
-    errors/include/ErrorRedeclared.h
+    errors/include/BadReturn.h
+    errors/include/BoolOp.h
+    errors/include/CantAssign.h
+    errors/include/ClassNoMember.h
+    errors/include/ClassNoMethodForOp.h
+    errors/include/EnumNoValue.h
+    errors/include/ExpectedExpression.h
+    errors/include/For.h
+    errors/include/FunctionCallNumArgs.h
+    errors/include/FunctionReturnLastStmt.h
+    errors/include/ListLiteral.h
+    errors/include/NoMember.h
+    errors/include/NoMemberSuggestions.h
+    errors/include/NotAFunction.h
+    errors/include/NotDeclared.h
+    errors/include/ObjectNoSpecialMethod.h
+    errors/include/PackageNoMember.h
+    errors/include/PartialWrongNumArgs.h
+    errors/include/GlobalRedeclared.h
+    errors/include/Redeclared.h
     errors/include/ErrorReporter.h
     errors/include/errors.h
-    errors/include/ErrorTypeMismatch.h
-    errors/include/ErrorUnusedReturnValue.h
+    errors/include/TypeMismatch.h
+    errors/include/UnusedReturnValue.h
     errors/src/Error.cpp
-    errors/src/ErrorBadReturn.cpp
-    errors/src/ErrorBoolOp.cpp
-    errors/src/ErrorCantAssign.cpp
-    errors/src/ErrorClassNoMember.cpp
-    errors/src/ErrorClassNoMethodForOp.cpp
-    errors/src/ErrorEnumNoValue.cpp
-    errors/src/ErrorExpectedExpression.cpp
-    errors/src/ErrorFor.cpp
-    errors/src/ErrorFunctionCallNumArgs.cpp
-    errors/src/ErrorFunctionReturnLastStmt.cpp
-    errors/src/ErrorListLiteral.cpp
-    errors/src/ErrorNoMember.cpp
-    errors/src/ErrorNoMemberSuggestions.cpp
-    errors/src/ErrorNotAFunction.cpp
-    errors/src/ErrorNotDeclared.cpp
-    errors/src/ErrorObjectNoSpecialMethod.cpp
-    errors/src/ErrorPackageNoMember.cpp
-    errors/src/ErrorPartialWrongNumArgs.cpp
-    errors/src/ErrorRedeclared.cpp
-    errors/src/ErrorGlobalRedeclared.cpp
+    errors/src/BadReturn.cpp
+    errors/src/BoolOp.cpp
+    errors/src/CantAssign.cpp
+    errors/src/ClassNoMember.cpp
+    errors/src/ClassNoMethodForOp.cpp
+    errors/src/EnumNoValue.cpp
+    errors/src/ExpectedExpression.cpp
+    errors/src/For.cpp
+    errors/src/FunctionCallNumArgs.cpp
+    errors/src/FunctionReturnLastStmt.cpp
+    errors/src/ListLiteral.cpp
+    errors/src/NoMember.cpp
+    errors/src/NoMemberSuggestions.cpp
+    errors/src/NotAFunction.cpp
+    errors/src/NotDeclared.cpp
+    errors/src/ObjectNoSpecialMethod.cpp
+    errors/src/PackageNoMember.cpp
+    errors/src/PartialWrongNumArgs.cpp
+    errors/src/Redeclared.cpp
+    errors/src/GlobalRedeclared.cpp
     errors/src/ErrorReporter.cpp
-    errors/src/ErrorTypeMismatch.cpp
-    errors/src/ErrorUnusedReturnValue.cpp
+    errors/src/TypeMismatch.cpp
+    errors/src/UnusedReturnValue.cpp
     ExpressionInfo.cpp
     ExpressionInfo.h
     ModulePrechecker.cpp

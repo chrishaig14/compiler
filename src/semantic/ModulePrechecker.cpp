@@ -7,9 +7,9 @@
 #include <simple_nodes/common/include/TypeObject.h>
 #include <simple_nodes/common/include/TypeFunction.h>
 #include <simple_nodes/common/include/Type.h>
-#include "errors/include/ErrorRedeclared.h"
+#include "errors/include/Redeclared.h"
 #include <units/entities/EntityNothing.h>
-#include "errors/include/ErrorGlobalRedeclared.h"
+#include "errors/include/GlobalRedeclared.h"
 #include <ast/top/Alias.h>
 #include <ast/top/Import.h>
 #include <ast/top/EnumNode.h>
@@ -173,7 +173,7 @@ void ModulePrechecker::check_duplicated_names(ast::Module& node) {
         if (names.count(name) == 0) {
             names[name] = nullptr;
         } else {
-            this->error_reporter.error(std::make_unique<error::ErrorGlobalRedeclared>(name));
+            this->error_reporter.error(std::make_unique<error::GlobalRedeclared>(name));
         }
     }
 }

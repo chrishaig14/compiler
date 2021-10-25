@@ -80,13 +80,13 @@ UExpressionInfo ModuleChecker::object_member(sem::UExp object_snode, EntityValue
     // }
     if (object_type_path.as_str() == "libcore.libcore.Union") {
         std::cout << "p_value is union" << std::endl;
-        this->error_reporter.error(std::make_unique<error::ErrorNoMember>(p_value.type, n));
+        this->error_reporter.error(std::make_unique<error::NoMember>(p_value.type, n));
         // this->error_reporter.object_no_member(*p_value.type, n);
         return exp_error_stub();
     }
     if (p_value.metatype == Meta::ENUM) {
         std::cout << "p_value is enum" << std::endl;
-        this->error_reporter.error(std::make_unique<error::ErrorNoMember>(p_value.type, n));
+        this->error_reporter.error(std::make_unique<error::NoMember>(p_value.type, n));
         return exp_error_stub();
     }
     UExpressionInfo info_u = std::make_unique<ExpressionInfo>();
@@ -114,7 +114,7 @@ UExpressionInfo ModuleChecker::object_member(sem::UExp object_snode, EntityValue
         info.exp_snode = std::make_unique<sem::ObjectMethod>(std::move(object_snode), clazz->path, child);
         info.set_entity(std::make_unique<EntityConstFunction>(*clazz->methods.at(child)));
     } else {
-        this->error_reporter.error(std::make_unique<error::ErrorNoMemberSuggestions>(p_value.type, n, *clazz));
+        this->error_reporter.error(std::make_unique<error::NoMemberSuggestions>(p_value.type, n, *clazz));
         return exp_error_stub();
     }
     return info_u;

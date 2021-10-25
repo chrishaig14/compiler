@@ -29,53 +29,51 @@ namespace error {
 
     };
 
-    class ErrorBadReturn;
-
-    class ErrorBoolOp;
-
-    class ErrorCantAssign;
-
-    class ErrorClassNoMember;
-
-    class ErrorClassNoMethodForOp;
-
-    class ErrorEnumNoValue;
-
-    class ErrorExpectedExpression;
-
-    class ErrorFor;
-
-    class ErrorFunctionCallNumArgs;
-
-    class ErrorFunctionReturnLastStmt;
-
-    class ErrorGlobalRedeclared;
-
-    class ErrorListLiteral;
-
-    class ErrorNoMember;
-
-    class ErrorNoMemberSuggestions;
-
-    class ErrorNotAFunction;
-
-    class ErrorNotDeclared;
-
-    class ErrorObjectNoSpecialMethod;
-
-    class ErrorPackageNoMember;
-
-    class ErrorPartialWrongNumArgs;
-
-    class ErrorRedeclared;
-
     class ErrorReporter;
 
-    class ErrorTypeMismatch;
+    class BadReturn;
 
-    class ErrorUnusedReturnValue;
+    class BoolOp;
 
-    class ErrorReporter;
+    class CantAssign;
+
+    class ClassNoMember;
+
+    class ClassNoMethodForOp;
+
+    class EnumNoValue;
+
+    class ExpectedExpression;
+
+    class For;
+
+    class FunctionCallNumArgs;
+
+    class FunctionReturnLastStmt;
+
+    class GlobalRedeclared;
+
+    class ListLiteral;
+
+    class NoMember;
+
+    class NoMemberSuggestions;
+
+    class NotAFunction;
+
+    class NotDeclared;
+
+    class ObjectNoSpecialMethod;
+
+    class PackageNoMember;
+
+    class PartialWrongNumArgs;
+
+    class Redeclared;
+
+    class TypeMismatch;
+
+    class UnusedReturnValue;
 }
 
 

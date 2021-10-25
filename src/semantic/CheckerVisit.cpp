@@ -287,15 +287,15 @@ std::unique_ptr<sem::FunctionDef> ModuleChecker::visit_function(const ast::Funct
             ast::Statement& last_node = *n.body->nodes.back();
             if (last_node.ntype != StatementType::RETRN) {
                 // it's not a return statement, error
-                this->error_reporter.error(std::make_unique<error::ErrorFunctionReturnLastStmt>(function_name,
-                                                                                         *returnType.to_sem(),
-                                                                                         last_node.start));
+                this->error_reporter.error(std::make_unique<error::FunctionReturnLastStmt>(function_name,
+                                                                                           *returnType.to_sem(),
+                                                                                           last_node.start));
                 return nullptr;
             }
         } else {
-            this->error_reporter.error(std::make_unique<error::ErrorFunctionReturnLastStmt>(function_name,
-                                                                                     *returnType.to_sem(),
-                                                                                     n.start));
+            this->error_reporter.error(std::make_unique<error::FunctionReturnLastStmt>(function_name,
+                                                                                       *returnType.to_sem(),
+                                                                                       n.start));
             return nullptr;
         }
     }
