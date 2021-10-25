@@ -39,7 +39,7 @@ sem::Type* TypeObject::clone() const {
     n->data.actual_base_path = this->data.actual_base_path;
     n->is_generic_param = this->is_generic_param;
     n->data.aliased_type = this->data.aliased_type;
-    n->typeclass = this->typeclass;
+    n->typeclasses = this->typeclasses;
     return n;
 }
 
@@ -149,9 +149,6 @@ nlohmann::json TypeObject::to_json() const {
 }
 
 void TypeObject::add_typeclass(std::string typeclass_name) {
-    if (not this->typeclass.empty()) {
-        throw std::runtime_error("This type already implements a typeclass, FIX this");
-    }
-    this->typeclass = typeclass_name;
+    this->typeclasses.insert(typeclass_name);
 }
 

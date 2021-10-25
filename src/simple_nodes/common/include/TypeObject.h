@@ -9,6 +9,7 @@
 #include "../../sem.h"
 #include <common/Path.h>
 #include <json/json.hpp>
+#include <set>
 
 class sem::ObjectTypeData {
 public:
@@ -48,7 +49,7 @@ public:
     bool is_generic() const override;
     // sem::Type* aliased_type;
     void add_typeclass(std::string typeclass_name);
-    std::string typeclass;
+    std::set<std::string> typeclasses;
 };
 
 #endif //XLANG_TypeObject_H

@@ -135,16 +135,18 @@ std::unique_ptr<EntityValue> ModuleChecker::make_value(sem::Type* type) {
         ConcreteClass* clazz;
         if (e.is_notfound()) {
             clazz = new ConcreteClass(type_object.id, Path("core.generics" + type_object.id));
-            if (not type_object.typeclass.empty()) {
-                Entity& tc = this->scope->get(type_object.typeclass);
-                if (tc.is_notfound()) {
-                    throw std::runtime_error("did not find typeclass " + type_object.typeclass);
-                } else {
-                    EntityTypeclass& typec = tc.get_typeclass();
-                    TypeclassFoo& tcf = typec.clazz;
-                    for (auto& m:tcf.methods) {
-                        clazz->methods[m.first] = std::make_unique<ConstFunction>(Path(tcf.path, m.first),
-                                                                                  sem::UTypeFunction(m.second->clone()));
+            if (not type_object.typeclasses.empty()) {
+                for (auto& one_typeclass: type_object.typeclasses) {
+                    Entity& tc = this->scope->get(one_typeclass);
+                    if (tc.is_notfound()) {
+                        throw std::runtime_error("did not find typeclass " + one_typeclass);
+                    } else {
+                        EntityTypeclass& typec = tc.get_typeclass();
+                        TypeclassFoo& tcf = typec.clazz;
+                        for (auto& m:tcf.methods) {
+                            clazz->methods[m.first] = std::make_unique<ConstFunction>(Path(tcf.path, m.first),
+                                                                                      sem::UTypeFunction(m.second->clone()));
+                        }
                     }
                 }
             }
