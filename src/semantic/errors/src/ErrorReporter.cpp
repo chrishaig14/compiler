@@ -50,7 +50,8 @@ std::string ErrorReporter::code_error_string(TextPosition start, TextPosition en
 void ErrorReporter::error(std::unique_ptr<Error> error) {
     this->failed = true;
     std::cout << "---- Semantic Error ----" << std::endl;
-    std::cout << error->to_str(this->code_lines) << std::endl;
+    // std::cout << error->to_str(this->code_lines) << std::endl;
+    std::cout << this->formatter->format(*error) << std::endl;
     this->errors.emplace_back(std::move(error));
     assert(this->errors.back() != nullptr);
     std::cout << "------------------------" << std::endl;

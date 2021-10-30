@@ -18,6 +18,6 @@ std::string NotAFunction::to_str(const CodeLines& code) const {
     return std::string();
 }
 
-NotAFunction::NotAFunction(const ast::Call& node) {
+NotAFunction::NotAFunction(const ast::Call& node):Error(ErrorType::not_a_function) {
 
 }

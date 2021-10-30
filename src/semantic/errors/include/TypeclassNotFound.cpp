@@ -4,7 +4,10 @@
 
 #include "TypeclassNotFound.h"
 
-error::TypeclassNotFound::TypeclassNotFound(const std::string& name) : name(name) {
+using namespace error;
+
+error::TypeclassNotFound::TypeclassNotFound(const std::string& name)
+        : Error(ErrorType::typeclass_not_found), name(name) {
 }
 
 bool error::TypeclassNotFound::equal(const error::Error& other) const {

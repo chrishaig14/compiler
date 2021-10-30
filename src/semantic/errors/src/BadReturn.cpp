@@ -18,6 +18,6 @@ std::string BadReturn::to_str(const CodeLines& code) const {
     return std::string();
 }
 
-BadReturn::BadReturn(TextPosition position) {
+BadReturn::BadReturn(TextPosition position):Error(ErrorType::bad_return) {
 
 }

@@ -22,6 +22,6 @@ std::string ExpectedExpression::to_str(const CodeLines& code) const {
 }
 
 ExpectedExpression::ExpectedExpression(const Entity& entity, const ast::ExpNode& node)
-        : entity(entity.clone()), node(node) {
+        :Error(ErrorType::expected_expression), entity(entity.clone()), node(node) {
 
 }

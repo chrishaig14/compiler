@@ -18,6 +18,6 @@ std::string BoolOp::to_str(const CodeLines& code) const {
     return std::string();
 }
 
-BoolOp::BoolOp(const Entity& left, const Entity& right, TextPosition position) {
+BoolOp::BoolOp(const Entity& left, const Entity& right, TextPosition position):Error(ErrorType::bool_op) {
 
 }

@@ -18,8 +18,9 @@ std::string highlight_one(const std::string& s, size_t start_col, size_t end_col
     return s.substr(0, start_col) + E_HLT(s.substr(start_col, end_col - start_col)) + s.substr(end_col, s.size());
 }
 
-TypeMismatch::TypeMismatch(const sem::Type& expected, const ast::ExpNode& value_node, const Entity& actual)
-        : expected(expected.clone()), actual(actual.clone()), start(value_node.start), end(value_node.end) {
+TypeMismatch::TypeMismatch(const sem::Type& expected, const ast::ExpNode& value_node, const Entity& actual) : Error(
+        ErrorType::type_mismatch), expected(expected.clone()), actual(actual.clone()), start(value_node.start),
+                                                                                                              end(value_node.end) {
 }
 
 std::string TypeMismatch::to_str(const CodeLines& code) const {
@@ -32,9 +33,8 @@ std::string TypeMismatch::to_str(const CodeLines& code) const {
     return pre_msg;
 }
 
-TypeMismatch::TypeMismatch(const sem::Type& expected, TextPosition start, TextPosition end,
-                           const Entity& actual)
-        : expected(expected.clone()), actual(actual.clone()), start(start), end(end) {
+TypeMismatch::TypeMismatch(const sem::Type& expected, TextPosition start, TextPosition end, const Entity& actual)
+        : Error(ErrorType::type_mismatch), expected(expected.clone()), actual(actual.clone()), start(start), end(end) {
 }
 
 bool TypeMismatch::equal(const Error& other) const {

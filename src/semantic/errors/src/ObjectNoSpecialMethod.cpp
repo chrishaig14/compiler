@@ -25,6 +25,6 @@ std::string ObjectNoSpecialMethod::to_str(const CodeLines& code) const {
 
 ObjectNoSpecialMethod::ObjectNoSpecialMethod(const sem::Type& type, const std::string& method_name,
                                              const ast::Subscript& node)
-        : node(node), method_name(method_name), type(type.clone()) {
+        : Error(ErrorType::object_no_special_method),node(node), method_name(method_name), type(type.clone()) {
 
 }

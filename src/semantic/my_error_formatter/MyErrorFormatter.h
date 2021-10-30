@@ -11,8 +11,8 @@
 class MyErrorFormatter : public ErrorFormatter {
 public:
     std::string format(const error::BadReturn& err) const override;
-
     std::string format(const error::TypeMismatch& err) const override;
+    std::string format(const error::TypeclassNotFound& err) const override;
 };
 
 #endif //XLANG_MYERRORFORMATTER_H

@@ -19,5 +19,5 @@ std::string NotDeclared::to_str(const CodeLines& code) const {
     return "Error not declared: " + this->idn._id;
 }
 
-NotDeclared::NotDeclared(const ast::Id& idn) : idn(idn) {
+NotDeclared::NotDeclared(const ast::Id& idn) : Error(ErrorType::not_declared),idn(idn) {
 }

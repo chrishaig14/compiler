@@ -18,6 +18,6 @@ std::string PartialWrongNumArgs::to_str(const CodeLines& code) const {
     return std::string();
 }
 
-PartialWrongNumArgs::PartialWrongNumArgs(TextPosition position) {
+PartialWrongNumArgs::PartialWrongNumArgs(TextPosition position): Error(ErrorType::partial_wrong_num_args) {
 
 }

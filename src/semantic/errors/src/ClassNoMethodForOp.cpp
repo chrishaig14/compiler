@@ -23,6 +23,6 @@ std::string ClassNoMethodForOp::to_str(const CodeLines& code) const {
 }
 
 ClassNoMethodForOp::ClassNoMethodForOp(std::string class_name, std::string op, const ast::ExpNode& node)
-        : class_name(class_name), op(op), node(node) {
+        :Error(ErrorType::class_no_method_for_op), class_name(class_name), op(op), node(node) {
 
 }

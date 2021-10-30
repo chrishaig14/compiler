@@ -9,5 +9,9 @@ std::string MyErrorFormatter::format(const error::BadReturn& err) const {
 }
 
 std::string MyErrorFormatter::format(const error::TypeMismatch& err) const {
-    return "Error::TypeMismatch";
+    return "Error::TypeMismatch: expected " + err.expected->to_string() + " but got " + entity_to_string(*err.actual);
+}
+
+std::string MyErrorFormatter::format(const error::TypeclassNotFound& err) const {
+    return "Error::TypeclassNotFound: " + err.name;
 }

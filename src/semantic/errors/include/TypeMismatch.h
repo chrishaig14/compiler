@@ -13,9 +13,9 @@
 
 class error::TypeMismatch : public error::Error {
     TypeMismatch(const sem::Type& expected, TextPosition start, TextPosition end, const Entity& actual);
+public:
     sem::UType expected;
     std::unique_ptr<Entity> actual;
-public:
     const TextPosition start;
     const TextPosition end;
     TypeMismatch(const sem::Type& expected, const ast::ExpNode& value_node, const Entity& actual);

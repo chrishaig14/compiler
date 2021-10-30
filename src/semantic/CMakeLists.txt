@@ -35,7 +35,6 @@ add_library(
         errors/include/For.h
         errors/include/FunctionCallNumArgs.h
         errors/include/FunctionReturnLastStmt.h
-        errors/include/ListLiteral.h
         errors/include/NoMember.h
         errors/include/NoMemberSuggestions.h
         errors/include/NotAFunction.h
@@ -60,7 +59,6 @@ add_library(
         errors/src/For.cpp
         errors/src/FunctionCallNumArgs.cpp
         errors/src/FunctionReturnLastStmt.cpp
-        errors/src/ListLiteral.cpp
         errors/src/NoMember.cpp
         errors/src/NoMemberSuggestions.cpp
         errors/src/NotAFunction.cpp

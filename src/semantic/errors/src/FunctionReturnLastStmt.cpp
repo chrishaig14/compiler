@@ -19,6 +19,6 @@ std::string FunctionReturnLastStmt::to_str(const CodeLines& code) const {
 }
 
 FunctionReturnLastStmt::FunctionReturnLastStmt(std::string name, const sem::Type& node,
-                                               TextPosition position) {
+                                               TextPosition position):Error(ErrorType::function_return_last_stmt) {
 
 }

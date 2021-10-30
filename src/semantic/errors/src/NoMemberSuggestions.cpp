@@ -20,8 +20,8 @@ std::string NoMemberSuggestions::to_str(const CodeLines& code) const {
     return s;
 }
 
-NoMemberSuggestions::NoMemberSuggestions(const sem::Type& t, const ast::Member& m, const ConcreteClass& clazz)
-        : m(m), t(t.clone()), clazz(clazz) {
+NoMemberSuggestions::NoMemberSuggestions(const sem::Type& t, const ast::Member& m, const ConcreteClass& clazz) : Error(
+        ErrorType::no_member_suggestion), m(m), t(t.clone()), clazz(clazz) {
 
 }
 

@@ -21,5 +21,5 @@ std::string UnusedReturnValue::to_str(const CodeLines& code) const {
 }
 
 UnusedReturnValue::UnusedReturnValue(const Entity& entity, const ast::Call& node)
-        : node(node), entity(entity.clone()) {
+        :Error(ErrorType::unused_return_value), node(node), entity(entity.clone()) {
 }

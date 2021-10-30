@@ -22,6 +22,6 @@ std::string Redeclared::to_str(const CodeLines& code) const {
     return "error: redeclared " + this->name;
 }
 
-Redeclared::Redeclared(std::string name, const ast::Declaration& node) : name(name), node(node) {
+Redeclared::Redeclared(std::string name, const ast::Declaration& node) : Error(ErrorType::redeclared),name(name), node(node) {
 
 }

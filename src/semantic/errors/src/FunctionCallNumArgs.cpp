@@ -18,6 +18,6 @@ std::string FunctionCallNumArgs::to_str(const CodeLines& code) const {
     return "Error, calling function with wrong number of arguments";
 }
 
-FunctionCallNumArgs::FunctionCallNumArgs(const sem::TypeFunction* type, TextPosition position) {
+FunctionCallNumArgs::FunctionCallNumArgs(const sem::TypeFunction* type, TextPosition position):Error(ErrorType::function_call_num_args) {
 
 }

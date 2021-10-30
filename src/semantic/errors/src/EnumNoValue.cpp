@@ -22,7 +22,7 @@ std::string EnumNoValue::to_str(const CodeLines& code) const {
     return "Error: enum " + this->enum_name + " has no value " + this->value_name;
 }
 
-EnumNoValue::EnumNoValue(std::string a, const std::string b, const ast::Member& node, const Enum& p_enum)
-        : enum_name(a), value_name(b), node(node), p_enum(p_enum) {
+EnumNoValue::EnumNoValue(std::string a, const std::string b, const ast::Member& node, const Enum& p_enum) : Error(
+        ErrorType::enum_no_value), enum_name(a), value_name(b), node(node), p_enum(p_enum) {
 
 }

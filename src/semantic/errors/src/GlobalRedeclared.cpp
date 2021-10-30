@@ -22,6 +22,6 @@ std::string GlobalRedeclared::to_str(const CodeLines& code) const {
     return E_HLT("Error: redeclared ") + E_INFO(this->name);
 }
 
-GlobalRedeclared::GlobalRedeclared(std::string name) : name(name) {
+GlobalRedeclared::GlobalRedeclared(std::string name) : Error(ErrorType::global_redeclared), name(name) {
 
 }

@@ -18,7 +18,10 @@ std::string entity_to_string(const Entity& entity);
 namespace error {
 
     enum class ErrorType {
-        bad_return, type_mismatch, missing
+        bad_return, type_mismatch, missing, typeclass_not_found, bool_op, function_call_num_args, cant_assign,
+        class_no_member, enum_no_value, class_no_method_for_op, function_return_last_stmt, expected_expression,
+        for_error, partial_wrong_num_args, no_member, not_a_function, no_member_suggestion, object_no_special_method,
+        not_declared, global_redeclared, package_no_member, redeclared, unused_return_value
     };
 
     class Error {
@@ -28,8 +31,8 @@ namespace error {
         Error(ErrorType error_type) : error_type(error_type) {
         }
 
-        Error() : error_type(ErrorType::missing) {
-        }
+        // Error() : error_type(ErrorType::missing) {
+        // }
 
         virtual ~Error() = default;
         virtual Error* clone() const = 0;
@@ -65,8 +68,6 @@ namespace error {
     class FunctionReturnLastStmt;
 
     class GlobalRedeclared;
-
-    class ListLiteral;
 
     class NoMember;
 

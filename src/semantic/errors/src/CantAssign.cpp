@@ -18,5 +18,5 @@ std::string CantAssign::to_str(const CodeLines& code) const {
     return std::string();
 }
 
-CantAssign::CantAssign(const ast::Statement& n) : n(n) {
+CantAssign::CantAssign(const ast::Statement& n) : Error(ErrorType::cant_assign),n(n) {
 }

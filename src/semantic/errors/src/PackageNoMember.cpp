@@ -20,6 +20,6 @@ std::string PackageNoMember::to_str(const CodeLines& code) const {
 
 PackageNoMember::PackageNoMember(Package* p_package, const std::string basic_string_1, TextPosition position,
                                  const ast::Statement& node, TextPosition position_1,
-                                 TextPosition position_2) {
+                                 TextPosition position_2):Error(ErrorType::package_no_member) {
 
 }

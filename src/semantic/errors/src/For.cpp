@@ -20,6 +20,6 @@ std::string For::to_str(const CodeLines& code) const {
     return "Error For";
 }
 
-For::For(const Entity& entity, TextPosition position) : entity(entity.clone()), position(position) {
+For::For(const Entity& entity, TextPosition position) : Error(ErrorType::for_error),entity(entity.clone()), position(position) {
 
 }

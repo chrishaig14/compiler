@@ -10,7 +10,7 @@ std::string NoMember::to_str(const CodeLines& code) const {
     return "Error no member: " + this->m.s_child;
 }
 
-NoMember::NoMember(const sem::Type& t, const ast::Member& m) : m(m), t(t) {
+NoMember::NoMember(const sem::Type& t, const ast::Member& m) : Error(ErrorType::no_member), m(m), t(t) {
 
 }
 
