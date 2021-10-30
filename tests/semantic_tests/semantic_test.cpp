@@ -306,7 +306,7 @@ fun foo()->Integer {
 
 TEST_CASE("semantic_output_while", "[checker]") {
     ModuleCheckerTest ct(R"(
-"fun foo()->Integer{
+fun foo()->Integer{
     while true {
         var x = 1
     }
