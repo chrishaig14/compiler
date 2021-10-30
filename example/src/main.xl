@@ -18,7 +18,13 @@ fun get_string(a: t) -> String where t:: Stringable {
 
 fun main() -> Integer {
     var x : Integer = "5"
+    var w = 7 + "g"
     var my_foo = #MyFoo("Hello Chris!")
+    if 8 {
+        print(q)
+    }
+    var r = 7.foo
+    var w = 1
     print(get_string("Hello"))
     return 0
 }

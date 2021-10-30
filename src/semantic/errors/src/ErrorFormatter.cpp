@@ -31,11 +31,11 @@ std::string ErrorFormatter::format(const error::Error& err) const {
         case error::ErrorType::partial_wrong_num_args:
             break;
         case error::ErrorType::no_member:
-            break;
+            return this->format(static_cast<const error::NoMember&>(err));
         case error::ErrorType::not_a_function:
             break;
         case error::ErrorType::no_member_suggestion:
-            break;
+            return this->format(static_cast<const error::NoMemberSuggestions&>(err));
         case error::ErrorType::object_no_special_method:
             break;
         case error::ErrorType::not_declared:
@@ -45,7 +45,7 @@ std::string ErrorFormatter::format(const error::Error& err) const {
         case error::ErrorType::package_no_member:
             break;
         case error::ErrorType::redeclared:
-            break;
+            return this->format(static_cast<const error::Redeclared&>(err));
         case error::ErrorType::unused_return_value:
             break;
         case error::ErrorType::generic_error:

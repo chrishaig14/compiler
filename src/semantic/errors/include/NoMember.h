@@ -10,9 +10,9 @@
 #include <ast/expressions/include/Member.h>
 
 class error::NoMember : public error::Error {
+public:
     const ast::Member& m;
     const sem::Type& t;
-public:
     NoMember(const sem::Type& t, const ast::Member& m);
 
     bool equal(const Error& other) const override;

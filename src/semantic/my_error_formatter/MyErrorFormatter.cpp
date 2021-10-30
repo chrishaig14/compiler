@@ -38,3 +38,18 @@ MyErrorFormatter::MyErrorFormatter(const std::string& __file__, const CodeLines&
 std::string MyErrorFormatter::format(const error::GenericError& err) const {
     return this->context_string(err.start) + "Error::GenericError: " + err.msg + this->code_context_string(err.start);
 }
+
+std::string MyErrorFormatter::format(const error::Redeclared& err) const {
+    return this->context_string(err.node.start) + "Error::Redeclared: '" + err.name + "'" +
+           this->code_context_string(err.node.start);
+}
+
+std::string MyErrorFormatter::format(const error::NoMember& err) const {
+    return this->context_string(err.m.start) + "Error::NoMember: '" + err.m.s_child + "'" +
+           this->code_context_string(err.m.start);
+}
+
+std::string MyErrorFormatter::format(const error::NoMemberSuggestions& err) const {
+    return this->context_string(err.m.start) + "Error::NoMember: '" + err.m.s_child + "'" +
+           this->code_context_string(err.m.start);
+}

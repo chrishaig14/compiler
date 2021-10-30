@@ -9,5 +9,8 @@
 #include "TypeMismatch.h"
 #include "GenericError.h"
 #include "TypeclassNotFound.h"
+#include "NoMemberSuggestions.h"
+#include "Redeclared.h"
+#include "NoMember.h"
 
 #endif //XLANG_ALL_ERRORS_H

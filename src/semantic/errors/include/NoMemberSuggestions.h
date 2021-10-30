@@ -10,10 +10,12 @@
 #include <simple_nodes/common/include/TypeObject.h>
 
 class error::NoMemberSuggestions : public error::Error {
+
+public:
     const ast::Member& m;
     sem::UType t;
     const ConcreteClass& clazz;
-public:
+
     NoMemberSuggestions(const sem::Type& t, const ast::Member& m, const ConcreteClass& clazz);
 
     bool equal(const Error& other) const override;
