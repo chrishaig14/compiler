@@ -282,7 +282,7 @@ void ModulePrechecker::visit_enum(ast::EnumNode& node) {
 }
 
 ModulePrechecker::ModulePrechecker(Module& module, std::map<std::string, std::string>& instances)
-        : module(module), error_reporter(module.code_lines, std::make_unique<MyErrorFormatter>()), instances(instances) {
+        : module(module), error_reporter(module.code_lines, std::make_unique<MyErrorFormatter>(module.abs_path, module.code_lines)), instances(instances) {
 }
 
 

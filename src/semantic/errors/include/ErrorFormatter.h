@@ -10,6 +10,7 @@ public:
     virtual std::string format(const error::BadReturn& err) const = 0;
     virtual std::string format(const error::TypeMismatch& err) const = 0;
     virtual std::string format(const error::TypeclassNotFound& err) const = 0;
+    virtual std::string format(const error::GenericError& err) const = 0;
     virtual ~ErrorFormatter() = default;
 };
 

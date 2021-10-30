@@ -83,6 +83,6 @@ add_library(
         errors/src/ErrorFormatter.cpp
         my_error_formatter/MyErrorFormatter.cpp
         my_error_formatter/MyErrorFormatter.h
-        errors/include/all_errors.h errors/include/TypeclassNotFound.cpp errors/include/TypeclassNotFound.h)
+        errors/include/all_errors.h errors/include/TypeclassNotFound.cpp errors/include/TypeclassNotFound.h errors/include/GenericError.cpp errors/include/GenericError.h)
 
 target_link_libraries(semantic units simple_nodes)

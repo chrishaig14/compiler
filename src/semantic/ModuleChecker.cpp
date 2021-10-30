@@ -25,7 +25,9 @@ bool function_is_generic(const sem::TypeFunction& ft) {
 }
 
 ModuleChecker::ModuleChecker(Package& top_package, Module& module, std::map<std::string, std::string>& instances)
-        : instances(instances), module(module), error_reporter(module.code_lines, std::make_unique<MyErrorFormatter>()), top_package(top_package) {
+        : instances(instances), module(module),
+          error_reporter(module.code_lines, std::make_unique<MyErrorFormatter>(module.abs_path, module.code_lines)),
+          top_package(top_package) {
     this->scope = new SymbolTable(nullptr);
     this->add_this = false;
 }
@@ -92,7 +94,8 @@ bool is_generic(const sem::Type& t) {
 UExpressionInfo
 ModuleChecker::match_arguments_to_generic_function(const ast::FunctionType& ft, ast::VectorOfTypes arg_types,
                                                    std::map<std::string, ast::Type*>& all_substitutions,
-                                                   std::unordered_map<std::string, std::string> constraints) {
+                                                   std::unordered_map<std::string, std::string> constraints,
+                                                   TextPosition start) {
     std::unique_ptr<ast::FunctionType> f;
     try {
         f = unify_function_call(ft, arg_types, all_substitutions);
@@ -133,14 +136,15 @@ ModuleChecker::match_arguments_to_generic_function(const ast::FunctionType& ft, 
         if (this->instances.count(x) != 0) {
             auto instance = this->instances.at(p_type->object().data.actual_base_path.as_str());
             if (instance != c.second) {
-                throw std::runtime_error(
+                this->error_reporter.error(std::make_unique<error::GenericError>(
                         "function call with type substitution " + c.first + " -> " + p_type->to_string() +
-                        " which doesn't implement required typeclass " + c.second);
+                        " which doesn't implement required typeclass '" + c.second+"'", start));
+
             }
         } else {
-            throw std::runtime_error(
+            this->error_reporter.error(std::make_unique<error::GenericError>(
                     "function call with type substitution " + c.first + " -> " + p_type->to_string() +
-                    " which doesn't implement required typeclass " + c.second);
+                    " which doesn't implement required typeclass '" + c.second+"'", start));
         }
         // }
     }

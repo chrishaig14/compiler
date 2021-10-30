@@ -75,7 +75,8 @@ ModuleChecker::analyze_call(const ast::ExpNode& function, std::vector<ast::RExpN
         retv_p = this->match_arguments_to_generic_function(*ft,
                                                            arg_types,
                                                            a,
-                                                           fun_info.entity.get().get_constfun().const_function.constraints);
+                                                           fun_info.entity.get().get_constfun().const_function.constraints,
+                                                           function.start);
         retv_p->exp_snode = std::make_unique<sem::CallExp>(std::move(fun_info_p->exp_snode), std::move(arguments_));
         return retv_p;
     }

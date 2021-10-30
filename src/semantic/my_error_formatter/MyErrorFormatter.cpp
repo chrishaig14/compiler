@@ -8,10 +8,33 @@ std::string MyErrorFormatter::format(const error::BadReturn& err) const {
     return "Error::BadReturn";
 }
 
+std::string MyErrorFormatter::context_string(TextPosition position) const {
+    std::string msg = E_HLT(text_pos_to_string(this->__file__, position)) + E_FMT(": ");
+    return msg;
+}
+
+std::string MyErrorFormatter::code_context_string(TextPosition position) const {
+    // return this->code_lines.get_line(position.line);
+    std::string str = "\n" + this->code_lines.get_line(position.line) + "\n";
+    str += fmt::format(fmt::fg(fmt::color::orange_red), std::string(position.column, ' ') + std::string(1, '^'));
+    return str;
+}
+
 std::string MyErrorFormatter::format(const error::TypeMismatch& err) const {
-    return "Error::TypeMismatch: expected " + err.expected->to_string() + " but got " + entity_to_string(*err.actual);
+    std::string out;
+    out += this->context_string(err.start) + "Error::TypeMismatch: expected '" + err.expected->to_string() +
+           "' but got '" + entity_to_string(*err.actual) + "'" + this->code_context_string(err.start);
+    return out;
 }
 
 std::string MyErrorFormatter::format(const error::TypeclassNotFound& err) const {
     return "Error::TypeclassNotFound: " + err.name;
+}
+
+MyErrorFormatter::MyErrorFormatter(const std::string& __file__, const CodeLines& code_lines)
+        : __file__(__file__), code_lines(code_lines) {
+}
+
+std::string MyErrorFormatter::format(const error::GenericError& err) const {
+    return this->context_string(err.start) + "Error::GenericError: " + err.msg + this->code_context_string(err.start);
 }

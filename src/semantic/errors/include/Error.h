@@ -21,7 +21,7 @@ namespace error {
         bad_return, type_mismatch, missing, typeclass_not_found, bool_op, function_call_num_args, cant_assign,
         class_no_member, enum_no_value, class_no_method_for_op, function_return_last_stmt, expected_expression,
         for_error, partial_wrong_num_args, no_member, not_a_function, no_member_suggestion, object_no_special_method,
-        not_declared, global_redeclared, package_no_member, redeclared, unused_return_value
+        not_declared, global_redeclared, package_no_member, redeclared, unused_return_value, generic_error
     };
 
     class Error {
@@ -76,6 +76,8 @@ namespace error {
     class NotAFunction;
 
     class NotDeclared;
+
+    class GenericError;
 
     class ObjectNoSpecialMethod;
 

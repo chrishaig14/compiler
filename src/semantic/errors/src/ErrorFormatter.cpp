@@ -48,6 +48,8 @@ std::string ErrorFormatter::format(const error::Error& err) const {
             break;
         case error::ErrorType::unused_return_value:
             break;
+        case error::ErrorType::generic_error:
+            return this->format(static_cast<const error::GenericError&>(err));
     }
     return "Error";
 }
