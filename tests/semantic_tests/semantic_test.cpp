@@ -517,7 +517,7 @@ enum Foo {
 
     REQUIRE_CHECKER_OK()
 
-    REQUIRE(*sem_module->nodes[0] == sem::EnumDef("test.tmp.Foo", {"a", "c"}));
+    REQUIRE(*sem_module->nodes[0] == sem::EnumDef("Foo", {"a", "c"}));
 }
 
 TEST_CASE("semantic_output_class_ok", "[checker]") {
