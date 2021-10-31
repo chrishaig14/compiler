@@ -131,7 +131,7 @@ ModuleChecker::match_arguments_to_generic_function(const ast::FunctionType& ft, 
         //     }
         // }
         // if (p_type->is_generic()) {
-        std::cout << this->instances.size() << std::endl;
+        // std::cout << this->instances.size() << std::endl;
         std::string x = p_type->object().data.actual_base_path.as_str();
         if (this->instances.count(x) != 0) {
             auto instance = this->instances.at(p_type->object().data.actual_base_path.as_str());

@@ -153,20 +153,22 @@ sem::UCommon ModuleChecker::check_declaration_with_type(const ast::Declaration& 
     sem::UType sem_type(type->to_sem());
     this->module.fill_actual(*sem_type);
     UExpressionInfo rvalue_sinfo = this->expect_rvalue_of_type(*sem_type, n.expression);
+
+    auto ov = this->make_value(sem_type.release());
+    this->scope->set(n.identifier, *ov);
     if (rvalue_sinfo->is_error()) {
         return nullptr;
     }
 
     sem::UExp up = std::move(rvalue_sinfo->exp_snode);
     sem::UCommon info_u = std::make_unique<sem::Declaration>(n.identifier, std::move(up));
-    auto ov = this->make_value(sem_type.release());
-    this->scope->set(n.identifier, *ov);
     return info_u;
 }
 
 sem::UCommon ModuleChecker::check_declaration_without_type(const ast::Declaration& n) {
     UExpressionInfo exp_info_p = this->dispatch_rvalue(n.expression);
     if (exp_info_p->is_error()) {
+        this->scope->set(n.identifier, exp_info_p->entity);
         return nullptr;
     }
     E_TYPE entity_type = exp_info_p->entity.get().e_type;

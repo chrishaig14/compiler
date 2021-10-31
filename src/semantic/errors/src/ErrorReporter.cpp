@@ -6,7 +6,7 @@ using namespace error;
 void ErrorReporter::fail(const std::string& msg, TextPosition pos) {
     this->failed = true;
     std::string out = this->context_string(pos) + msg + this->code_context_string(pos);
-    std::cout << out << std::endl;
+    std::cout << "failed:" << out << std::endl;
     if (FAIL_FIRST) {
         throw std::runtime_error("Error");
     }

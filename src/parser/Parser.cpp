@@ -985,10 +985,10 @@ std::unique_ptr<ast::TopNode> Parser::parse_class_definition() {
                 this->next();
                 is_static = true;
             }
-            ast::FunctionType* ft = this->parse_function_type().release();
+            // ast::FunctionType* ft = this->parse_function_type().release();
             this->expect_token(TokType::SEMICOLON);
-            std::cout << is_static << std::endl;
-            std::cout << ft->to_json() << std::endl;
+            // std::cout << is_static << std::endl;
+            // std::cout << ft->to_json() << std::endl;
             auto method_node = this->parse_function_definition();
             std::string& method_name = method_node->identifier;
             if (member_names.find(method_name) != member_names.end() || methods.find(method_name) != methods.end()) {

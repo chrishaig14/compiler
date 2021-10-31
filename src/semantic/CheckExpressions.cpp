@@ -130,7 +130,7 @@ std::unique_ptr<EntityValue> ModuleChecker::make_value(sem::Type* type) {
     }
     sem::TypeObject& type_object = type->object();
     if (type_object.id.size() == 1) {
-        std::cout << "found generic type " << type_object.id << std::endl;
+        // std::cout << "found generic type " << type_object.id << std::endl;
         Entity& e = this->scope->get(type_object.id);
         ConcreteClass* clazz;
         if (e.is_notfound()) {
