@@ -6,11 +6,12 @@
 #define XLANG_ALL_ERRORS_H
 
 #include "BadReturn.h"
-#include "TypeMismatch.h"
 #include "GenericError.h"
-#include "TypeclassNotFound.h"
-#include "NoMemberSuggestions.h"
-#include "Redeclared.h"
 #include "NoMember.h"
+#include "NoMemberSuggestions.h"
+#include "ObjectNoSpecialMethod.h"
+#include "Redeclared.h"
+#include "TypeclassNotFound.h"
+#include "TypeMismatch.h"
 
 #endif //XLANG_ALL_ERRORS_H

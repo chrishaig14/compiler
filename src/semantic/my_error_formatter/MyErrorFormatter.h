@@ -23,6 +23,7 @@ public:
     std::string format(const error::Redeclared& err) const override;
     std::string format(const error::NoMember& err) const override;
     std::string format(const error::NoMemberSuggestions& err) const override;
+    std::string format(const error::ObjectNoSpecialMethod& err) const override;
 };
 
 #endif //XLANG_MYERRORFORMATTER_H

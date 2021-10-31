@@ -37,7 +37,7 @@ std::string ErrorFormatter::format(const error::Error& err) const {
         case error::ErrorType::no_member_suggestion:
             return this->format(static_cast<const error::NoMemberSuggestions&>(err));
         case error::ErrorType::object_no_special_method:
-            break;
+            return this->format(static_cast<const error::ObjectNoSpecialMethod&>(err));
         case error::ErrorType::not_declared:
             break;
         case error::ErrorType::global_redeclared:

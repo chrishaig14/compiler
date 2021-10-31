@@ -1,30 +1,5 @@
-typeclass Stringable[t] {
-    fun as_string() -> String
-}
-
-class MyFoo {
-    str: String
-}
-
-instance Stringable[MyFoo] {
-    fun as_string() -> String {
-        return "Hello my friend: " + this.str
-    }
-}
-
-fun get_string(a: t) -> String where t:: Stringable {
-    return "the string is " + a.as_string()
-}
-
 fun main() -> Integer {
-    var x : Integer = "5"
-    var w = 7 + "g"
-    var my_foo = #MyFoo("Hello Chris!")
-    if 8 {
-        print(q)
-    }
-    var r = 7.foo
-    var w = 1
-    print(get_string("Hello"))
+    var b = false
+    var br = b[3]
     return 0
 }

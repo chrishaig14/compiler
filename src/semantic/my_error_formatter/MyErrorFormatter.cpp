@@ -53,3 +53,8 @@ std::string MyErrorFormatter::format(const error::NoMemberSuggestions& err) cons
     return this->context_string(err.m.start) + "Error::NoMember: '" + err.m.s_child + "'" +
            this->code_context_string(err.m.start);
 }
+
+std::string MyErrorFormatter::format(const error::ObjectNoSpecialMethod& err) const {
+    return this->context_string(err.node.start) + "Error::ObjectNoSpecialMethod: '" + err.method_name + "'" +
+    this->code_context_string(err.node.start);
+}
