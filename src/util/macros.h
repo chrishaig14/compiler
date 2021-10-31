@@ -14,7 +14,6 @@
 #define IF(condition, then, elifs, selse) new ast::IfNode(condition, then, elifs, selse)
 #define IFELSE(condition, then, _else) new ast::IfNode(condition, then, _else)
 #define LST(list) new ListNode(list)
-#define STR(str) new ast::StringNode(str)
 #define TERNARY(a, b, c) new TernaryNode(a,b,c)
 #define CALL(function, arguments) new ast::CallNode(function, arguments)
 #define CLS(name, template_parameters, fields) new StructNode(name, template_parameters, fields)

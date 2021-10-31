@@ -5,12 +5,12 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -g -O0 -Wall -pedantic -Werror")
 
 add_library(
-    common
-    TextPosition.h
-    TextPosition.cpp
-    CodeLines.h
-    CodeLines.cpp
-    Token.h
-    Token.cpp
-    Path.cpp
-    Path.h)
+        common
+        TextPosition.h
+        TextPosition.cpp
+        CodeLines.h
+        CodeLines.cpp
+        Token.h
+        Token.cpp
+        Path.cpp
+        Path.h ../log/log.cpp ../log/log.h)

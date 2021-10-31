@@ -12,6 +12,7 @@
 #include <util/utils.h>
 #include <dirent.h>
 #include <logging/logging.h>
+#include <log/log.h>
 #include "utils.h"
 
 class Loader {
@@ -39,8 +40,9 @@ public:
                     std::string ext = d_name.substr(d_name.size() - 3, 3);
                     if (ext == ".xl") {
                         std::string module_name = d_name.substr(0, d_name.size() - 3);
-                        std::cout << std::string(level + 1, '-') << " Found module " << E_INFO(module_name)
-                                  << std::endl;
+                        LOG_INFO("Loader", "Found module '" + module_name + "'");
+                        // std::cout << std::string(level + 1, '-') << " Found module " << E_INFO(module_name)
+                        //           << std::endl;
                         load_module(package, module_name);
                         modules.emplace_back(module_name);
                     }
