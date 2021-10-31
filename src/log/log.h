@@ -22,7 +22,7 @@ class Logger {
 
     static std::map<std::string, std::unique_ptr<Logger>> instances;
 
-    Logger();
+    Logger(const std::string& name);
 
 public:
     const std::string name;

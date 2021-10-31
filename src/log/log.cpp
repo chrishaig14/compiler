@@ -9,23 +9,23 @@ Logger& Logger::get(const std::string& name) {
     if (it != Logger::instances.end()) {
         return *it->second;
     }
-    Logger::instances[name] = std::unique_ptr<Logger>(new Logger());
+    Logger::instances[name] = std::unique_ptr<Logger>(new Logger(name));
     return *Logger::instances.at(name);
 }
 
 void Logger::info(const std::string& msg) {
     if (this->log_info) {
-        std::cout << this->name << " [info] " << msg << std::endl;
+        std::cout << "[" << this->name << "][info] " << msg << std::endl;
     }
 }
 
 void Logger::debug(const std::string& msg) {
     if (this->log_debug) {
-        std::cout << this->name << " [debug] " << msg << std::endl;
+        std::cout << "[" << this->name << "][debug] " << msg << std::endl;
     }
 }
 
-Logger::Logger() {
+Logger::Logger(const std::string& name) : name(name) {
     this->log_info = true;
     this->log_debug = false;
 }
