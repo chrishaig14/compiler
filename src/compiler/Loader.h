@@ -28,8 +28,8 @@ public:
         std::vector<std::string> modules;
         std::vector<std::string> subpackages;
 
-        std::cout << std::string(level, '-') << " Loading package " << E_INFO(package.name) << " at path "
-                  << E_INFO(package.abs_path) << std::endl;
+        LOG_INFO("Loader",
+                 std::string(level, '-') + " Loading package '" + package.name + "' at path " + package.abs_path);
 
         dirent* ent = readdir(dir);
         while (ent != nullptr) {

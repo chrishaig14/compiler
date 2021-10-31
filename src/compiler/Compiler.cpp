@@ -42,7 +42,7 @@ bool Compiler::main() {
 }
 
 VectorOfStrings Compiler::load_requirements(const std::string& filepath) {
-    std::cout << "Loading requirements from file " << E_INFO(filepath) << std::endl;
+    LOG_INFO("Compiler", "Loading requirements from file '" + filepath + "'");
 
     auto requirements = read_requirements(filepath);
 
@@ -74,7 +74,7 @@ void Compiler::load_library(const std::string& name, const std::string& lib_vers
         return;
     }
     closedir(dir);
-    std::cout << "Loading top unit: " << E_INFO(name) << " at path: " << E_INFO(abs_top_unit_path) << std::endl;
+    LOG_INFO("Compiler", "Loading top unit: '" + name + "' at path: '" + abs_top_unit_path);
 
     std::string library_requirements_file = path_join(abs_top_unit_path, REQUIREMENTS_FILE);
     load_requirements(library_requirements_file);
@@ -87,7 +87,7 @@ void Compiler::load_library(const std::string& name, const std::string& lib_vers
     pp.preprocess_package(*library_top_package);
     top_package.units[name] = std::make_unique<SubpackageUnit>(library_top_package.get());
     top_package.subpackages.push_back(std::move(library_top_package));
-    std::cout << "Finished loading top unit: " << E_INFO(lib_rel_top_unit_path) << std::endl;
+    LOG_INFO("Compiler", "Finished loading top unit: '" + lib_rel_top_unit_path + "'");
     this->loaded_top_units[lib_rel_top_unit_path] = true;
 }
 
