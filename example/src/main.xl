@@ -1,5 +1,4 @@
 fun main() -> Integer {
-    var b = false
-    var br = b[3]
+    var b = false + true
     return 0
 }

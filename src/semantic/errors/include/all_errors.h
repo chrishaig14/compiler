@@ -6,6 +6,7 @@
 #define XLANG_ALL_ERRORS_H
 
 #include "BadReturn.h"
+#include "ClassNoMethodForOp.h"
 #include "GenericError.h"
 #include "NoMember.h"
 #include "NoMemberSuggestions.h"

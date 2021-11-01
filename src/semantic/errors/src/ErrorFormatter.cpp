@@ -21,7 +21,7 @@ std::string ErrorFormatter::format(const error::Error& err) const {
         case error::ErrorType::enum_no_value:
             break;
         case error::ErrorType::class_no_method_for_op:
-            break;
+            return this->format(static_cast<const error::ClassNoMethodForOp&>(err));
         case error::ErrorType::function_return_last_stmt:
             break;
         case error::ErrorType::expected_expression:

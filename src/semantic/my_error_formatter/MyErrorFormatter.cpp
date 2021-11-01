@@ -58,3 +58,8 @@ std::string MyErrorFormatter::format(const error::ObjectNoSpecialMethod& err) co
     return this->context_string(err.node.start) + "Error::ObjectNoSpecialMethod: '" + err.method_name + "'" +
     this->code_context_string(err.node.start);
 }
+
+std::string MyErrorFormatter::format(const error::ClassNoMethodForOp& err) const {
+    return this->context_string(err.node.start) + "Error::ClassNoMethodForOp: static method '" + err.op + "' required for this operation" +
+    this->code_context_string(err.node.start);
+}
