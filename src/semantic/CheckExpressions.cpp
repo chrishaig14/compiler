@@ -79,8 +79,10 @@ UExpressionInfo ModuleChecker::visit_unary(const ast::UnaryOp& n) {
 UExpressionInfo ModuleChecker::visit_binop(const ast::BinaryOp& node) {
     UExpressionInfo left_info_p = this->dispatch_rvalue(node.left);
     if (left_info_p->is_error()) {
+        UExpressionInfo right_sinfo = this->dispatch_rvalue(node.right);
         return exp_error_stub();
     }
+
     Entity& l_entity = left_info_p->entity.get();
     if (l_entity.e_type != E_TYPE::VALUE) {
         this->error_reporter.error(std::make_unique<error::ExpectedExpression>(l_entity, node.left));
@@ -91,6 +93,8 @@ UExpressionInfo ModuleChecker::visit_binop(const ast::BinaryOp& node) {
     if (right_sinfo->is_error()) {
         return exp_error_stub();
     }
+
+
     auto& right_snode = right_sinfo->exp_snode;
 
     std::string fun = binoptype_to_str(node.op);

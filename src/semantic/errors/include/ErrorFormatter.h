@@ -16,6 +16,7 @@ public:
     virtual std::string format(const error::NoMemberSuggestions& err) const = 0;
     virtual std::string format(const error::ObjectNoSpecialMethod& err) const = 0;
     virtual std::string format(const error::ClassNoMethodForOp& err) const = 0;
+    virtual std::string format(const error::NotDeclared& err) const = 0;
     virtual ~ErrorFormatter() = default;
 };
 

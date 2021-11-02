@@ -56,10 +56,15 @@ std::string MyErrorFormatter::format(const error::NoMemberSuggestions& err) cons
 
 std::string MyErrorFormatter::format(const error::ObjectNoSpecialMethod& err) const {
     return this->context_string(err.node.start) + "Error::ObjectNoSpecialMethod: '" + err.method_name + "'" +
-    this->code_context_string(err.node.start);
+           this->code_context_string(err.node.start);
 }
 
 std::string MyErrorFormatter::format(const error::ClassNoMethodForOp& err) const {
-    return this->context_string(err.node.start) + "Error::ClassNoMethodForOp: static method '" + err.op + "' required for this operation" +
-    this->code_context_string(err.node.start);
+    return this->context_string(err.node.start) + "Error::ClassNoMethodForOp: static method '" + err.op +
+           "' required for this operation" + this->code_context_string(err.node.start);
+}
+
+std::string MyErrorFormatter::format(const error::NotDeclared& err) const {
+    return this->context_string(err.idn.start) + "Error::NotDeclared: '" + err.idn._id + "'" +
+           this->code_context_string(err.idn.start);
 }

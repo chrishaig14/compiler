@@ -10,6 +10,7 @@
 #include "GenericError.h"
 #include "NoMember.h"
 #include "NoMemberSuggestions.h"
+#include "NotDeclared.h"
 #include "ObjectNoSpecialMethod.h"
 #include "Redeclared.h"
 #include "TypeclassNotFound.h"
