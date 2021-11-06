@@ -11,8 +11,11 @@ public:
     std::string id;
     std::string base_type;
     std::unordered_map<std::string, ast::UFunctionType> methods;
+    std::unordered_map<std::string, ast::UFunctionType> static_methods;
     TypeclassAst(const std::string& id, const std::string& base_type,
-              std::unordered_map<std::string, ast::UFunctionType> methods, TextPosition start, TextPosition end);
+                 std::unordered_map<std::string, ast::UFunctionType> methods,
+                 std::unordered_map<std::string, ast::UFunctionType> static_methods, TextPosition start,
+                 TextPosition end);
     nlohmann::json to_json() const override;
 };
 

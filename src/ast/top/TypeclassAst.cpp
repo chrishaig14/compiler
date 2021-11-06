@@ -20,6 +20,6 @@ nlohmann::json TypeclassAst::to_json() const {
 }
 
 TypeclassAst::TypeclassAst(const std::string& id, const std::string& base_type,
-                     std::unordered_map<std::string, ast::UFunctionType> methods, TextPosition start, TextPosition end)
-        : ast::TopNode(TopNodeType::TYPECLASS, start, end), id(id), base_type(base_type), methods(std::move(methods)) {
+                           std::unordered_map<std::string, ast::UFunctionType> methods, std::unordered_map<std::string, ast::UFunctionType> static_methods,TextPosition start, TextPosition end)
+                           : ast::TopNode(TopNodeType::TYPECLASS, start, end), id(id), base_type(base_type), methods(std::move(methods)),static_methods(std::move(static_methods)) {
 }

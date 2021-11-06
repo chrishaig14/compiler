@@ -1108,8 +1108,15 @@ std::unique_ptr<ast::TypeclassAst> Parser::parse_typeclass() {
     this->expect_token(TokType::LCURLY);
 
     std::unordered_map<std::string, ast::UFunctionType> methods;
+    std::unordered_map<std::string, ast::UFunctionType> static_methods;
 
     while (true) {
+        bool is_static = false;
+        if (this->match(TokType::STATIC)) {
+            is_static = true;
+            this->next();
+            continue;
+        }
         if (!this->match(TokType::FUN)) {
             break;
         }
@@ -1143,7 +1150,11 @@ std::unique_ptr<ast::TypeclassAst> Parser::parse_typeclass() {
         }
 
         auto ft = std::make_unique<ast::FunctionType>(parameter_types, ast::UTypeNode(return_type));
-        methods[method_id.str] = std::move(ft);
+        if (is_static) {
+            static_methods[method_id.str] = std::move(ft);
+        } else {
+            methods[method_id.str] = std::move(ft);
+        }
         this->expect_token(TokType::SEMICOLON);
         if (!this->match(TokType::FUN)) {
             break;
@@ -1154,6 +1165,7 @@ std::unique_ptr<ast::TypeclassAst> Parser::parse_typeclass() {
     auto n = std::make_unique<ast::TypeclassAst>(typeclass_id.str,
                                                  base_type.str,
                                                  std::move(methods),
+                                                 std::move(static_methods),
                                                  typeclass_id.start,
                                                  final_curly.end_pos);
     return n;
