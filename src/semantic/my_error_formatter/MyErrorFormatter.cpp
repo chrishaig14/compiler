@@ -50,8 +50,16 @@ std::string MyErrorFormatter::format(const error::NoMember& err) const {
 }
 
 std::string MyErrorFormatter::format(const error::NoMemberSuggestions& err) const {
-    return this->context_string(err.m.start) + "Error::NoMember: '" + err.m.s_child + "'" +
-           this->code_context_string(err.m.start);
+    std::string msg = this->context_string(err.m.start) + "Error::NoMember: '" + err.m.s_child + "' in class " +
+                      err.clazz.class_name + "'" + this->code_context_string(err.m.start);
+    msg += "\ncandidates are:\n";
+    for (auto& m: err.clazz.members) {
+        msg += m.first + " : " + m.second->to_string() + "\n";
+    }
+    for (auto& m: err.clazz.methods) {
+        msg += m.first + " : " + m.second->const_function_ft.to_string() + "\n";
+    }
+    return msg;
 }
 
 std::string MyErrorFormatter::format(const error::ObjectNoSpecialMethod& err) const {
