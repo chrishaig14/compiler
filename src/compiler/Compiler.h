@@ -11,6 +11,7 @@
 #include <units/infos/Package.h>
 #include <units/infos/Module.h>
 #include <util/utils.h>
+#include <set>
 
 #define REQUIREMENTS_FILE "requirements.txt"
 
@@ -29,6 +30,7 @@ class Compiler {
     std::string project_output_dir;
     std::string output_name;
     std::vector<std::unique_ptr<Module>> my_modules;
+    std::vector<std::reference_wrapper<ConcreteClass>> all_classes;
     std::string lib_path;
     std::map<std::string, bool> loaded_top_units;
     std::string static_initializations;
@@ -49,7 +51,7 @@ public:
     bool pre();
     Package root_package;
     Package top_package;
-    std::map<std::string, std::string> instances;
+    std::map<std::string, std::set<std::string>> instances;
 };
 
 

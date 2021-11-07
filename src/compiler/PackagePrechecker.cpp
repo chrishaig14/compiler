@@ -6,7 +6,7 @@
 #include "PackagePrechecker.h"
 
 bool PackagePrechecker::preprocess_module(Module& module) {
-    ModulePrechecker gp(module, this->instances);
+    ModulePrechecker gp(module, this->instances, this->all_classes);
     LOG_INFO("precheck", "Pre checking module '" + module.name + "' at path: " + module.abs_path);
     gp.visit_root();
     return gp.error_reporter.ok();
@@ -32,4 +32,7 @@ bool PackagePrechecker::preprocess_package(Package& package) {
         }
     }
     return ok;
+}
+
+PackagePrechecker::PackagePrechecker(std::vector<std::reference_wrapper<ConcreteClass>>& all_classes) : all_classes(all_classes) {
 }

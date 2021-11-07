@@ -9,6 +9,7 @@
 #include "PackagePrechecker.h"
 #include "Loader.h"
 #include "PackageChecker.h"
+#include "GlobalInstancer.h"
 
 Compiler::Compiler(const std::string& project_dir, const std::string& project_output_dir,
                    const std::string& output_name, const std::string& lib_path, bool is_lib, const std::string& version)
@@ -28,11 +29,15 @@ bool Compiler::pre() {
     if (not parse_package(root_package)) {
         throw std::runtime_error("Parse Error");
     }
-    PackagePrechecker pp;
+    PackagePrechecker pp(all_classes);
     if (not pp.preprocess_package(root_package)) {
         throw std::runtime_error("Preprocess Error");
     }
     this->instances = pp.instances;
+
+    GlobalInstancer gi(this->top_package, this->instances, this->all_classes);
+    gi.apply();
+
     return true;
 }
 
@@ -83,7 +88,7 @@ void Compiler::load_library(const std::string& name, const std::string& lib_vers
     Loader l;
     l.load_package(*library_top_package, 1);
     parse_package(*library_top_package);
-    PackagePrechecker pp;
+    PackagePrechecker pp(this->all_classes);
     pp.preprocess_package(*library_top_package);
     top_package.units[name] = std::make_unique<SubpackageUnit>(library_top_package.get());
     top_package.subpackages.push_back(std::move(library_top_package));
@@ -113,7 +118,7 @@ void Compiler::load_top_unit(const std::string& name, const std::string& m_versi
     Loader l;
     l.load_package(*top_unit_package, 1);
     parse_package(*top_unit_package);
-    PackagePrechecker pp;
+    PackagePrechecker pp(this->all_classes);
     pp.preprocess_package(*top_unit_package);
     top_package.units[name] = std::make_unique<SubpackageUnit>(top_unit_package);
     std::cout << "Finished loading top unit: " << E_INFO(lib_rel_top_unit_path) << std::endl;
@@ -127,7 +132,7 @@ void Compiler::load_project() {
     Loader l;
     l.load_package(root_package, 1);
     parse_package(root_package);
-    PackagePrechecker pp;
+    PackagePrechecker pp(this->all_classes);
     bool global_ok = pp.preprocess_package(root_package);
     if (!global_ok) {
         this->ok = false;

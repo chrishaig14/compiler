@@ -14,8 +14,10 @@ class ModulePrechecker {
 public:
     Module& module;
     error::ErrorReporter error_reporter;
-    std::map<std::string, std::string>& instances;
-    explicit ModulePrechecker(Module& module, std::map<std::string, std::string>& instances);
+    std::vector<std::reference_wrapper<ConcreteClass>>& all_classes;
+    std::map<std::string, std::set<std::string>>& instances;
+    explicit ModulePrechecker(Module& module, std::map<std::string, std::set<std::string>>& instances,
+                              std::vector<std::reference_wrapper<ConcreteClass>>& all_classes);
 
     void visit_root();
     void visit_function(ast::Function& node);

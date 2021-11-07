@@ -101,6 +101,7 @@ void ModulePrechecker::visit_root() {
     }
     for (ast::ConcreteClassDef& n: node.classes) {
         auto class_info = std::make_unique<ConcreteClass>(n.class_name, Path(this->module.path, n.class_name));
+        this->all_classes.emplace_back(*class_info);
         this->module.add_class_definition(std::move(class_info));
     }
 
@@ -281,8 +282,11 @@ void ModulePrechecker::visit_enum(ast::EnumNode& node) {
 
 }
 
-ModulePrechecker::ModulePrechecker(Module& module, std::map<std::string, std::string>& instances)
-        : module(module), error_reporter(module.code_lines, std::make_unique<MyErrorFormatter>(module.abs_path, module.code_lines)), instances(instances) {
+ModulePrechecker::ModulePrechecker(Module& module, std::map<std::string, std::set<std::string>>& instances,
+                                   std::vector<std::reference_wrapper<ConcreteClass>>& all_classes)
+        : module(module),
+          error_reporter(module.code_lines, std::make_unique<MyErrorFormatter>(module.abs_path, module.code_lines)),
+          all_classes(all_classes), instances(instances) {
 }
 
 
@@ -309,5 +313,9 @@ void ModulePrechecker::visit_typeclass(ast::TypeclassAst& typeclass) {
 void ModulePrechecker::visit_instance(ast::Instance& instance) {
     auto ot = instance.base_type->to_sem();
     this->module.fill_actual(*ot);
-    this->instances[ot->object().data.actual_base_path.as_str()] = instance.id;
+    Path typeclass_path(this->module.path, instance.id);
+    if (this->instances[ot->object().data.actual_base_path.as_str()].contains(typeclass_path.as_str())) {
+        throw std::runtime_error("typeclass already implemented!");
+    }
+    this->instances[ot->object().data.actual_base_path.as_str()].insert(typeclass_path.as_str());
 }

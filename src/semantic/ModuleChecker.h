@@ -83,14 +83,14 @@ class ModuleChecker {
     std::map<std::string, std::unique_ptr<EntityValue>> entity_values_no_generic;
     SymbolTable* scope;
     std::map<std::string, std::unique_ptr<Entity>> entities;
-    std::map<std::string,std::string>& instances;
+    std::map<std::string, std::set<std::string>>& instances;
 public:
     Module& module;
     error::ErrorReporter error_reporter;
     std::unique_ptr<Entity> this_entity;
     Package& top_package;
 
-    ModuleChecker(Package& top_package, Module& module, std::map<std::string, std::string>& instances);
+    ModuleChecker(Package& top_package, Module& module, std::map<std::string, std::set<std::string>>& instances);
 
     std::unique_ptr<Entity> entity_from_type(const ast::Type& type);
 
@@ -98,7 +98,8 @@ public:
     void enter_scope();
     void leave_scope();
     bool assert_type_exists(const ast::Type& type, TextPosition pos);
-    std::unique_ptr<ConcreteClass> instantiate_generic(const TemplateClassInfo& generic, const ast::ObjectType& instance);
+    std::unique_ptr<ConcreteClass>
+    instantiate_generic(const TemplateClassInfo& generic, const ast::ObjectType& instance);
     bool is_variable(const ast::ObjectType& a);
     void fail(std::string msg);
     void init();

@@ -1,4 +1,24 @@
+typeclass Addable[t] {
+    fun add() -> Integer
+}
+
+class Foo {
+    i: Integer
+}
+
+instance Addable[Foo] {
+    fun add() -> Integer {
+        return 7
+    }
+}
+
+fun baba(x: t) -> Integer where t::Addable {
+    var r = x.add()
+    return 0
+}
+
 fun main() -> Integer {
-    var b = false + true
+    var foo = #Foo(7)
+    var r = foo.adde(4)
     return 0
 }

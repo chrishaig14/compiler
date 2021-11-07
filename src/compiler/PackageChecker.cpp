@@ -75,6 +75,6 @@ bool PackageChecker::check_package(Package& package) {
     return ok;
 }
 
-PackageChecker::PackageChecker(Package& top_package, std::map<std::string, std::string>& instances) : instances(instances), top_package(
+PackageChecker::PackageChecker(Package& top_package, std::map<std::string, std::set<std::string>>& instances) : instances(instances), top_package(
         top_package) {
 }

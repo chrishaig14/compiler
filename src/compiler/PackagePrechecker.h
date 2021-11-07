@@ -14,7 +14,11 @@
 
 class PackagePrechecker {
 public:
-    std::map<std::string, std::string> instances;
+    std::map<std::string, std::set<std::string>> instances;
+    std::vector<std::reference_wrapper<ConcreteClass>>& all_classes;
+
+    PackagePrechecker(std::vector<std::reference_wrapper<ConcreteClass>>& all_classes);
+
     bool preprocess_module(Module& module);
 
     bool preprocess_package(Package& package);

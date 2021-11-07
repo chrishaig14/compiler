@@ -24,7 +24,7 @@ bool function_is_generic(const sem::TypeFunction& ft) {
     return false;
 }
 
-ModuleChecker::ModuleChecker(Package& top_package, Module& module, std::map<std::string, std::string>& instances)
+ModuleChecker::ModuleChecker(Package& top_package, Module& module, std::map<std::string, std::set<std::string>>& instances)
         : instances(instances), module(module),
           error_reporter(module.code_lines, std::make_unique<MyErrorFormatter>(module.abs_path, module.code_lines)),
           top_package(top_package) {
@@ -134,17 +134,17 @@ ModuleChecker::match_arguments_to_generic_function(const ast::FunctionType& ft, 
         // std::cout << this->instances.size() << std::endl;
         std::string x = p_type->object().data.actual_base_path.as_str();
         if (this->instances.count(x) != 0) {
-            auto instance = this->instances.at(p_type->object().data.actual_base_path.as_str());
-            if (instance != c.second) {
+            auto all_instances = this->instances.at(p_type->object().data.actual_base_path.as_str());
+            if (not all_instances.contains(c.second)) {
                 this->error_reporter.error(std::make_unique<error::GenericError>(
                         "function call with type substitution " + c.first + " -> " + p_type->to_string() +
-                        " which doesn't implement required typeclass '" + c.second+"'", start));
+                        " which doesn't implement required typeclass '" + c.second + "'", start));
 
             }
         } else {
             this->error_reporter.error(std::make_unique<error::GenericError>(
                     "function call with type substitution " + c.first + " -> " + p_type->to_string() +
-                    " which doesn't implement required typeclass '" + c.second+"'", start));
+                    " which doesn't implement required typeclass '" + c.second + "'", start));
         }
         // }
     }
