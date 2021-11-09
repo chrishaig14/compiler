@@ -94,7 +94,7 @@ bool is_generic(const sem::Type& t) {
 UExpressionInfo
 ModuleChecker::match_arguments_to_generic_function(const ast::FunctionType& ft, ast::VectorOfTypes arg_types,
                                                    std::map<std::string, ast::Type*>& all_substitutions,
-                                                   std::unordered_map<std::string, std::string> constraints,
+                                                   std::unordered_map<std::string, Path> constraints,
                                                    TextPosition start) {
     std::unique_ptr<ast::FunctionType> f;
     try {
@@ -135,16 +135,16 @@ ModuleChecker::match_arguments_to_generic_function(const ast::FunctionType& ft, 
         std::string x = p_type->object().data.actual_base_path.as_str();
         if (this->instances.count(x) != 0) {
             auto all_instances = this->instances.at(p_type->object().data.actual_base_path.as_str());
-            if (not all_instances.contains(c.second)) {
+            if (not all_instances.contains(c.second.as_str())) {
                 this->error_reporter.error(std::make_unique<error::GenericError>(
                         "function call with type substitution " + c.first + " -> " + p_type->to_string() +
-                        " which doesn't implement required typeclass '" + c.second + "'", start));
+                        " which doesn't implement required typeclass '" + c.second.as_str() + "'", start));
 
             }
         } else {
             this->error_reporter.error(std::make_unique<error::GenericError>(
                     "function call with type substitution " + c.first + " -> " + p_type->to_string() +
-                    " which doesn't implement required typeclass '" + c.second + "'", start));
+                    " which doesn't implement required typeclass '" + c.second.as_str() + "'", start));
         }
         // }
     }

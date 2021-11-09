@@ -238,5 +238,9 @@ void ModuleChecker::add_typeclasses_to_generic_type(sem::Type& type, std::string
         if (type.object().id == gen_type) {
             type.object().add_typeclass(typeclass_name);
         }
+    } else if (type.kind == sem::Kind::OBJECT) {
+        for(auto& tp: type.object().type_params){
+            this->add_typeclasses_to_generic_type(*tp, gen_type, typeclass_name);
+        }
     }
 }

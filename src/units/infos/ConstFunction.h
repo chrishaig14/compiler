@@ -17,7 +17,7 @@ class ConstFunction {
 private:
     sem::UTypeFunction const_function_ft_p;
 public:
-    std::unordered_map<std::string, std::string> constraints;
+    std::unordered_map<std::string, Path> constraints;
 
     ConstFunction(Path path, sem::UTypeFunction ft);
 

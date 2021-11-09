@@ -17,8 +17,27 @@ fun baba(x: t) -> Integer where t::Addable {
     return 0
 }
 
+typeclass Stringable[t] {
+    fun to_string() -> String
+}
+
+fun list_to_string(l: List[t]) -> String where t::Stringable {
+    var s = "["
+    for x @ l {
+        s += x.to_string() + ", "
+    }
+    s += "]"
+    return s
+}
+
+instance Stringable[Foo] {
+    fun to_string() -> String {
+        return "Helloo!"
+    }
+}
+
 fun main() -> Integer {
-    var foo = #Foo(7)
-    var r = foo.adde(4)
+    var f : List[Foo] = [#Foo(9), #Foo(100)]
+    print(list_to_string(f))
     return 0
 }
