@@ -1,0 +1,178 @@
+class Integer {
+    static fun __add__(a: Integer, b: Integer) -> Integer {
+        return 0
+    }
+    static fun __sub__(a: Integer, b: Integer) -> Integer {
+        return 0
+    }
+    static fun __mul__(a: Integer, b: Integer) -> Integer {
+        return 0
+    }
+    static fun __div__(a: Integer, b: Integer) -> Integer {
+        return 0
+    }
+    static fun __mod__(a: Integer, b: Integer) -> Integer {
+        return 0
+    }
+    static fun __eq__(a: Integer, b: Integer) -> Boolean {
+        return false
+    }
+    static fun __ne__(a: Integer, b: Integer) -> Boolean {
+        return false
+    }
+    static fun __le__(a: Integer, b: Integer) -> Boolean {
+        return false
+    }
+    static fun __ge__(a: Integer, b: Integer) -> Boolean {
+        return false
+    }
+    static fun __lt__(a: Integer, b: Integer) -> Boolean {
+        return false
+    }
+    static fun __gt__(a: Integer, b: Integer) -> Boolean {
+        return false
+    }
+
+    static fun parse(a: String) -> Integer {
+        return ""
+    }
+    fun str() -> String {
+        return ""
+    }
+}
+
+class Float {
+    static fun __add__(a: Float, b: Float) -> Float {
+        return 0
+    }
+    static fun __sub__(a: Float, b: Float) -> Float {
+        return 0
+    }
+    static fun __mul__(a: Float, b: Float) -> Float {
+        return 0
+    }
+    static fun __div__(a: Float, b: Float) -> Float {
+        return 0
+    }
+    static fun __eq__(a: Float, b: Float) -> Boolean {
+        return false
+    }
+    static fun __ne__(a: Float, b: Float) -> Boolean {
+        return false
+    }
+    static fun __le__(a: Float, b: Float) -> Boolean {
+        return false
+    }
+    static fun __ge__(a: Float, b: Float) -> Boolean {
+        return false
+    }
+    static fun __lt__(a: Float, b: Float) -> Boolean {
+        return false
+    }
+    static fun __gt__(a: Float, b: Float) -> Boolean {
+        return false
+    }
+    fun str() -> String {
+        return ""
+    }
+}
+
+class Double {
+    static fun __add__(a: Double, b: Double) -> Double {
+        return 0
+    }
+    static fun __sub__(a: Double, b: Double) -> Double {
+        return 0
+    }
+    static fun __mul__(a: Double, b: Double) -> Double {
+        return 0
+    }
+    static fun __div__(a: Double, b: Double) -> Double {
+        return 0
+    }
+    static fun __eq__(a: Double, b: Double) -> Boolean {
+        return false
+    }
+    static fun __ne__(a: Double, b: Double) -> Boolean {
+        return false
+    }
+    static fun __le__(a: Double, b: Double) -> Boolean {
+        return false
+    }
+    static fun __ge__(a: Double, b: Double) -> Boolean {
+        return false
+    }
+    static fun __lt__(a: Double, b: Double) -> Boolean {
+        return false
+    }
+    static fun __gt__(a: Double, b: Double) -> Boolean {
+        return false
+    }
+    fun str() -> String {
+        return ""
+    }
+}
+
+class String {
+    fun len()->Integer{}
+    fun list() -> List[String]{}
+    fun __get_item__(i: Integer)->String{}
+    static fun __eq__(a: String, b:String)->Boolean {}
+    static fun __ne__(a: String, b:String)->Boolean {}
+    static fun __add__(a: String, b:String)->String {}
+    fun slice(s: Integer, e: Integer)->String {}
+    fun find_first(s: String)->Integer {}
+}
+
+class Boolean {
+    fun str()->String{}
+    fun __not__()->Boolean{}
+    static fun __or__(a: Boolean, b: Boolean) -> Boolean {}
+    static fun __and__(a: Boolean, b: Boolean) -> Boolean {}
+    static fun __eq__(a: Boolean, b: Boolean) -> Boolean {}
+    static fun __ne__(a: Boolean, b: Boolean) -> Boolean {}
+}
+
+class List[t] {
+    fun __get_item__(i: Integer)->t{}
+    fun __set_item__(i: Integer)->t{}
+    fun len()->Integer{}
+    fun push(x: t){}
+    fun has(x: t)->Boolean{}
+    fun map(f: fun(t)->u) -> List[u] {}
+    fun slice(s:Integer, e: Integer)->List[t]{}
+    static fun __add__(a: List[t], b: List[t])->List[t]{}
+}
+
+fun print(s: String){
+}
+
+fun input() -> String {
+
+}
+
+fun range(start: Integer, step: Integer, end: Integer)->List[Integer]{}
+
+class Dict[k,v] {
+    fun get(key: k, default: v) -> v {}
+    fun has(key: k) -> Boolean {}
+    fun keys() -> List[k] {}
+    fun __get_item__(key: k) -> v {}
+    fun __set_item__(key: k) -> v {}
+}
+
+class Option[t] {
+    fun get()->t {}
+}
+
+fun exit(c: Integer){}
+
+
+fun sleep(t: Integer){}
+
+fun time()->Double{}
+
+class File {
+    static fun open(path: String, mode: String) -> File {}
+    fun write(s: String){}
+}
