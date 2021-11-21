@@ -60,14 +60,15 @@ UExpressionInfo ModuleChecker::visit_unary(const ast::UnaryOp& n) {
         this->error_reporter.fail("Error class " + cls->class_name + " does not define the __not__ operator!");
     }
 
-    ConstFunction& subscript_fun = *subscript_it->second;
+    ConstFunction& subscript_fun = *subscript_it->second->func;
     std::string sub_fun_path = subscript_fun.path.as_str();
     sem::Type* rtype = subscript_fun.const_function_ft.return_type->clone();
 
     auto fsn = std::make_unique<sem::Id>(sub_fun_path);
     std::vector<sem::UExp> v;
     v.emplace_back(std::move(exp_snode));
-    auto csn = std::make_unique<sem::CallExp>(std::move(fsn), std::move(v));
+    std::vector<std::unique_ptr<sem::InstanceObject>> instances_v;
+    auto csn = std::make_unique<sem::CallExp>(std::move(fsn), std::move(v), std::move(instances_v));
 
     UExpressionInfo info_u = std::make_unique<ExpressionInfo>();
     ExpressionInfo& info = *info_u;
@@ -105,8 +106,12 @@ UExpressionInfo ModuleChecker::visit_binop(const ast::BinaryOp& node) {
         v.push_back(std::move(left_info_p->exp_snode));
         v.push_back(std::move(right_sinfo->exp_snode));
         info.set_entity(this->entity_value_from_actual_base_path_no_generic(Path("libcore.libcore.Boolean")).clone());
+        std::vector<std::unique_ptr<sem::InstanceObject>> instances_v;
+
         info.exp_snode = std::make_unique<sem::CallExp>(std::make_unique<sem::StaticMethod>(l_entity_v.enumm->path,
-                                                                                            "__eq__"), std::move(v));
+                                                                                            "__eq__"),
+                                                        std::move(v),
+                                                        std::move(instances_v));
     } else {
         const ConcreteClass* cls = l_entity_v.clazz;
         assert(cls != nullptr);
@@ -119,8 +124,11 @@ UExpressionInfo ModuleChecker::visit_binop(const ast::BinaryOp& node) {
         std::vector<sem::UExp> vv;
         vv.push_back(std::move(left_info_p->exp_snode));
         vv.push_back(std::move(right_snode));
+        std::vector<std::unique_ptr<sem::InstanceObject>> instances_v;
+
         auto sn = std::make_unique<sem::CallExp>(std::make_unique<sem::ConstFunction>(operator_fun.path),
-                                                 std::move(vv));
+                                                 std::move(vv),
+                                                 std::move(instances_v));
         sem::Type* rettype = operator_fun.const_function_ft.return_type->clone();
         info.set_entity(this->make_value(rettype));
         info.exp_snode = std::move(sn);
@@ -138,7 +146,7 @@ std::unique_ptr<EntityValue> ModuleChecker::make_value(sem::Type* type) {
         Entity& e = this->scope->get(type_object.id);
         ConcreteClass* clazz;
         if (e.is_notfound()) {
-            clazz = new ConcreteClass(type_object.id, Path("core.generics" + type_object.id));
+            clazz = new ConcreteClass(type_object.id, Path(this->module.path, type_object.id));
             if (not type_object.typeclasses.empty()) {
                 for (auto& one_typeclass: type_object.typeclasses) {
                     Entity& tc = this->scope->get(one_typeclass);
@@ -148,8 +156,10 @@ std::unique_ptr<EntityValue> ModuleChecker::make_value(sem::Type* type) {
                         EntityTypeclass& typec = tc.get_typeclass();
                         TypeclassFoo& tcf = typec.clazz;
                         for (auto& m:tcf.methods) {
-                            clazz->methods[m.first] = std::make_unique<ConstFunction>(Path(tcf.path, m.first),
-                                                                                      sem::UTypeFunction(m.second->clone()));
+                            clazz->methods[m.first] = std::make_unique<InstanceMethod>(tcf.path,
+                                                                                       std::make_unique<ConstFunction>(
+                                                                                               Path(tcf.path, m.first),
+                                                                                               sem::UTypeFunction(m.second->clone())));
                         }
                     }
                 }
@@ -210,7 +220,7 @@ UExpressionInfo ModuleChecker::visit_subscript(const ast::Subscript& node) {
         this->error_reporter.error(std::make_unique<error::ObjectNoSpecialMethod>(value.type, "__get_item__", node));
         return exp_error_stub();
     }
-    ConstFunction& subscript_fun = *subscript_it->second;
+    ConstFunction& subscript_fun = *subscript_it->second->func;
     std::string sub_fun_path = subscript_fun.path.as_str();
 
     if (node.child.size() > 1) {
@@ -234,7 +244,8 @@ UExpressionInfo ModuleChecker::visit_subscript(const ast::Subscript& node) {
     auto fsn = std::make_unique<sem::ObjectMethod>(std::move(parent_p->exp_snode), cls->path, "__get_item__");
     std::vector<sem::UExp> vv;
     vv.push_back(std::move(child_snode));
-    auto csn = std::make_unique<sem::CallExp>(std::move(fsn), std::move(vv));
+    std::vector<std::unique_ptr<sem::InstanceObject>> instances_v;
+    auto csn = std::make_unique<sem::CallExp>(std::move(fsn), std::move(vv), std::move(instances_v));
     info.exp_snode = std::move(csn);
     return info_u;
 }

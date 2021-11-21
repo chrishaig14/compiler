@@ -8,12 +8,14 @@
 
 #include <vector>
 #include "Exp.h"
+#include "InstanceObject.h"
 
 class sem::CallExp : public sem::Exp {
 public:
     UExp function;
     std::vector<UExp> arguments;
-    CallExp(UExp function, std::vector<UExp> arguments);
+    std::vector<std::unique_ptr<InstanceObject>> instances;
+    CallExp(UExp function, std::vector<UExp> arguments, std::vector<std::unique_ptr<InstanceObject>> instances);
 
     std::unique_ptr<Call> to_call();
 

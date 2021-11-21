@@ -24,7 +24,10 @@ sem::Common* make_for_snode(ast::For& node, std::unique_ptr<sem::Block>& binfo, 
     auto list_sn = std::make_unique<sem::Id>(loop_list_var_id);
     std::vector<sem::UExp> v;
     v.emplace_back(std::move(list_sn));
-    sem::UExp call_list_len_sn = std::make_unique<sem::CallExp>(std::move(list_len_fn), std::move(v));
+    std::vector<std::unique_ptr<sem::InstanceObject>> instances_v;
+    sem::UExp call_list_len_sn = std::make_unique<sem::CallExp>(std::move(list_len_fn),
+                                                                std::move(v),
+                                                                std::move(instances_v));
     auto lensn = std::make_unique<sem::Declaration>(loop_list_len_var_id, std::move(call_list_len_sn));
     bbn->nodes.push_back(std::move(lensn));
 
@@ -38,7 +41,8 @@ sem::Common* make_for_snode(ast::For& node, std::unique_ptr<sem::Block>& binfo, 
     std::vector<sem::UExp> vv;
     vv.push_back(std::move(idxsn));
     vv.push_back(std::move(llensn));
-    auto cn = std::make_unique<sem::CallExp>(std::move(cmpfunsn), std::move(vv));
+    std::vector<std::unique_ptr<sem::InstanceObject>> instances_v2;
+    auto cn = std::make_unique<sem::CallExp>(std::move(cmpfunsn), std::move(vv), std::move(instances_v2));
 
     auto& bn = binfo;
 
@@ -46,7 +50,8 @@ sem::Common* make_for_snode(ast::For& node, std::unique_ptr<sem::Block>& binfo, 
     vvv.push_back(std::make_unique<sem::Id>(loop_list_var_id));
     vvv.push_back(std::make_unique<sem::Id>(loop_index_var_id));
     auto* list_subscript_n = new sem::CallExp(std::make_unique<sem::Id>("libcore.libcore.List.__get_item__"),
-                                              std::move(vvv));
+                                              std::move(vvv),
+                                              {});
 
     sem::UExp ul(list_subscript_n);
     auto loop_elem_sn = std::make_unique<sem::Declaration>(node.var, std::move(ul));
@@ -259,14 +264,16 @@ std::unique_ptr<sem::FunctionDef> ModuleChecker::visit_function(const ast::Funct
     }
     // auto& e_const_function = this->scope->get(n.identifier);
     // auto& const_function = e_const_function.get_constfun().const_function;
+    std::vector<std::pair<Path, Path>> n_instances;
     for (size_t i = 0; i < n.parameter_names.size(); i++) {
         // ast::Type& type = n.parameter_types[i];
         // ast::UTypeNode cl(type.clone());
         // make_not_generic(*cl);
         sem::Type* semt = n.parameter_types[i].get().to_sem();
         this->module.fill_actual(*semt);
-        for (auto& c: n.constraints){
+        for (auto& c: n.constraints) {
             add_typeclasses_to_generic_type(*semt, c.first, c.second);
+            n_instances.emplace_back(Path(this->module.path, c.first), Path(this->module.path, c.second));
         }
         auto te = this->make_entity_value(*semt);
         this->scope->set(n.parameter_names[i], *te);
@@ -299,5 +306,5 @@ std::unique_ptr<sem::FunctionDef> ModuleChecker::visit_function(const ast::Funct
             return nullptr;
         }
     }
-    return std::make_unique<sem::FunctionDef>(n.path.basname(), n.parameter_names, std::move(bn));
+    return std::make_unique<sem::FunctionDef>(n.identifier, n.parameter_names, std::move(bn), n_instances);
 }

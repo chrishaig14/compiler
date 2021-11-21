@@ -12,6 +12,7 @@
 
 #include <ast/top/EnumNode.h>
 #include <ast/top/Module.h>
+#include <ast/top/Module.h>
 #include <ast/nodes.h>
 #include <ast/general/ObjectType.h>
 #include <ast/expressions/include/UnaryOp.h>
@@ -22,6 +23,7 @@
 #include <simple_nodes/common/include/Block.h>
 #include <simple_nodes/common/include/For.h>
 #include <simple_nodes/common/include/Block.h>
+#include <simple_nodes/top/include/InstanceDef.h>
 #include <simple_nodes/common/include/Break.h>
 #include <simple_nodes/common/include/Call.h>
 #include <simple_nodes/common/include/Continue.h>
@@ -112,6 +114,21 @@ public:
     std::unique_ptr<sem::EnumDef> visit_enum(ast::EnumNode& p_node);
     std::unique_ptr<sem::Top> visit_typeclass(const ast::TypeclassAst& typeclass);
 
+    std::unique_ptr<sem::InstanceDef> visit_instance(const ast::Instance& instance) {
+        std::vector<std::unique_ptr<sem::FunctionDef>> methods;
+        sem::Type* p_type = instance.base_type->to_sem();
+        this->module.fill_actual(*p_type);
+        this->this_entity = this->make_entity_value(*p_type);
+        this->add_this = true;
+        for (auto& m: instance.methods) {
+            auto method = this->visit_function(*m.second);
+            methods.push_back(std::move(method));
+        }
+        this->add_this = false;
+        this->this_entity.reset();
+        return std::make_unique<sem::InstanceDef>(Path(this->module.path, instance.id), Path(this->module.path, instance.base_type->id), std::move(methods));
+    }
+
     std::unique_ptr<sem::Block> visit_block(const ast::Block& node);
 
     // statements
@@ -185,7 +202,8 @@ public:
     UExpressionInfo match_arguments_to_generic_function(const ast::FunctionType& ft, ast::VectorOfTypes arg_types,
                                                         std::map<std::string, ast::Type*>& all_substitutions,
                                                         std::unordered_map<std::string, Path> constraints,
-                                                        TextPosition start);
+                                                        TextPosition start,
+                                                        std::map<std::string, std::vector<std::string>>& passed_instances);
     UExpressionInfo analyze_call(const ast::ExpNode& function, std::vector<ast::RExpNode>& arguments, bool is_rvalue,
                                  TextPosition start, TextPosition end);
     bool check_arguments(std::vector<ast::RExpNode>& narguments, std::vector<sem::UExp>& arguments,

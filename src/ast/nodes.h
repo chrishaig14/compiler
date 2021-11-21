@@ -38,5 +38,6 @@
 #include "top/Import.h"
 #include "top/TemplateClassDef.h"
 #include "top/ConcreteClassDef.h"
+#include "top/Instance.h"
 
 #endif //NODES_H

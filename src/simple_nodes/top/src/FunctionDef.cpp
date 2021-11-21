@@ -6,8 +6,9 @@
 
 using namespace sem;
 
-FunctionDef::FunctionDef(std::string identifier, VectorOfStrings params, std::unique_ptr<Block> body)
-        : Top(TopType::FUNCTION), identifier(identifier), params(params), body(std::move(body)) {
+FunctionDef::FunctionDef(std::string identifier, VectorOfStrings params, std::unique_ptr<Block> body,
+                         std::vector<std::pair<Path, Path>> instances)
+        : Top(TopType::FUNCTION), identifier(identifier), params(params), body(std::move(body)), instances(instances) {
 }
 
 bool FunctionDef::equals(const Top& o) const {

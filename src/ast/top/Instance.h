@@ -2,8 +2,8 @@
 // Created by chris on 1/8/21.
 //
 
-#ifndef XLANG_INSTANCE_H
-#define XLANG_INSTANCE_H
+#ifndef XLANG_INSTANCEAST_H
+#define XLANG_INSTANCEAST_H
 
 
 #include "../statements/Statement.h"
@@ -23,4 +23,4 @@ public:
 };
 
 
-#endif //XLANG_INSTANCE_H
+#endif //XLANG_INSTANCEAST_H

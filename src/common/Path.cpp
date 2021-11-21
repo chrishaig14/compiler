@@ -46,3 +46,7 @@ VectorOfStrings Path::as_vec() const {
 std::string Path::basname() const {
     return path_parts.back();
 }
+
+bool Path::operator==(const Path& other) const {
+    return this->as_str() == other.as_str();
+}

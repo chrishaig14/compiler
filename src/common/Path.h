@@ -17,6 +17,8 @@ public:
 
     Path() = default;
 
+    bool operator==(const Path& other) const;
+
     Path(Path p, const std::string& c);
 
     explicit Path(const std::string& s);

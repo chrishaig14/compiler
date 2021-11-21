@@ -96,6 +96,8 @@ public:
     PythonOutputCode transpile_for(const sem::For& node);
     PythonExpressionOutputCode transpile_static_method(const sem::StaticMethod& method, bool b);
     std::string clean_path(Path path);
+    std::string make_full_instance_name(Path instance_path, Path class_path);
+    PythonOutputCode transpile_instance(const sem::InstanceDef& def);
 };
 
 

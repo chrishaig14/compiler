@@ -18,6 +18,8 @@
 #include "List.h"
 #include "ObjectConstructor.h"
 #include "ObjectMember.h"
+#include "ObjectMethodFromInstance.h"
+#include "InstanceObject.h"
 #include "ObjectMethod.h"
 #include "StaticMethod.h"
 #include "String.h"

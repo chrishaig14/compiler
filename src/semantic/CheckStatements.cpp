@@ -38,7 +38,7 @@ sem::UCommon ModuleChecker::visit_lvalue_subscript(const ast::Subscript& node) {
                                                                                   node));
         return nullptr;
     }
-    ConstFunction& subscript_fun = *subscript_it->second;
+    ConstFunction& subscript_fun = *subscript_it->second->func;
     std::string sub_fun_path = subscript_fun.path.as_str();
     sem::Type& rtype = *subscript_fun.const_function_ft.return_type;
 

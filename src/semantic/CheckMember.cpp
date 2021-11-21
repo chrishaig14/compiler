@@ -5,6 +5,7 @@
 #include <cassert>
 #include "CheckMember.h"
 #include <ast/general/ObjectType.h>
+#include <simple_nodes/expressions/include/ObjectMethodFromInstance.h>
 #include <simple_nodes/expressions/include/ObjectMember.h>
 #include <simple_nodes/expressions/include/ObjectMethod.h>
 #include <simple_nodes/expressions/include/StaticMethod.h>
@@ -111,8 +112,21 @@ UExpressionInfo ModuleChecker::object_member(sem::UExp object_snode, EntityValue
         auto omn = std::make_unique<sem::ObjectMember>(std::move(object_snode), clazz->path, child);
         info.exp_snode = std::move(omn);
     } else if (clazz->methods.count(child) != 0) {
-        info.exp_snode = std::make_unique<sem::ObjectMethod>(std::move(object_snode), clazz->path, child);
-        info.set_entity(std::make_unique<EntityConstFunction>(*clazz->methods.at(child)));
+        InstanceMethod& im = *clazz->methods.at(child);
+
+        if (im.instance == Path("")) {
+            std::cout << "found method " << child << " for class " << clazz->class_name << " from base class "
+                      << std::endl;
+            info.exp_snode = std::make_unique<sem::ObjectMethod>(std::move(object_snode), clazz->path, child);
+        } else {
+            std::cout << "found method " << child << " for class " << clazz->class_name
+                      << " from instance of typeclass " << im.instance.as_str() << std::endl;
+            info.exp_snode = std::make_unique<sem::ObjectMethodFromInstance>(std::move(object_snode),
+                                                                             std::make_unique<sem::InstanceObject>(im.instance,
+                                                                                                                   clazz->path),
+                                                                             child);
+        }
+        info.set_entity(std::make_unique<EntityConstFunction>(*clazz->methods.at(child)->func));
     } else {
         this->error_reporter.error(std::make_unique<error::NoMemberSuggestions>(p_value.type, n, *clazz));
         return exp_error_stub();
@@ -138,7 +152,7 @@ UExpressionInfo ModuleChecker::class_member(const ast::Member& n, UExpressionInf
     UExpressionInfo info_u = std::make_unique<ExpressionInfo>();
     ExpressionInfo& info = *info_u;
     if (cls.methods.find(child) != cls.methods.end()) {
-        ConstFunction& bound_method = *cls.methods[child];
+        ConstFunction& bound_method = *cls.methods[child]->func;
         auto* unbound_method = new ConstFunction(bound_method.path,
                                                  sem::UTypeFunction((sem::TypeFunction*) bound_method.const_function_ft.clone()));
         ast::VectorOfTypes tp;

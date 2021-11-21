@@ -15,6 +15,15 @@
 #include "../entities/Entity.h"
 #include "ConstFunction.h"
 
+class InstanceMethod {
+public:
+    Path instance;
+    std::unique_ptr<ConstFunction> func;
+
+    InstanceMethod(Path instance, std::unique_ptr<ConstFunction> func) : instance(instance), func(std::move(func)) {
+    }
+};
+
 class ConcreteClass {
 public:
     std::vector<std::string> implemented_typeclasses;
@@ -25,7 +34,7 @@ public:
     std::unordered_map<std::string, std::unique_ptr<Entity>> member_entities;
 
     MapStringType members;
-    std::unordered_map<std::string, std::unique_ptr<ConstFunction>> methods;
+    std::unordered_map<std::string, std::unique_ptr<InstanceMethod>> methods;
 
     std::map<std::string, std::pair<ast::Type*, ast::ExpNode*>> static_members;
     std::unordered_map<std::string, std::unique_ptr<ConstFunction>> static_methods;

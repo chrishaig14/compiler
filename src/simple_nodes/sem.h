@@ -13,6 +13,8 @@ namespace sem {
 
     class Block;
 
+    class InstanceDef;
+
     class Bool;
 
     class ConstFunction;
@@ -24,6 +26,8 @@ namespace sem {
     class Call;
 
     class KlassDef;
+
+    class InstanceObject;
 
     class Continue;
 
@@ -92,6 +96,8 @@ namespace sem {
 
     class Common;
 
+    class ObjectMethodFromInstance;
+
     class Top;
 
     class Module;
@@ -119,11 +125,11 @@ namespace sem {
         OBJECT_METHOD,
         CONST_FUNCTION,
         OBJECT_CONSTRUCTOR,
-        STATIC_METHOD
+        STATIC_METHOD, INSTANCE_OBJECT, METHOD_FROM_INSTANCE
     };
 
     enum class TopType {
-        CLASS, ENUM, FUNCTION, TYPECLASS
+        CLASS, ENUM, FUNCTION, TYPECLASS, INSTANCE
     };
 
     typedef std::unique_ptr<Common> UCommon;

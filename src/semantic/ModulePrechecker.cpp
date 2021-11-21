@@ -208,7 +208,7 @@ void ModulePrechecker::visit_class(ast::ConcreteClassDef& node) {
         auto cf = std::make_unique<ConstFunction>(Path(class_info->path, f.first),
                                                   std::make_unique<sem::TypeFunction>(x, sem::UType(p_type)));
         method.path = cf->path;
-        class_info->methods.insert(make_pair(f.first, std::move(cf)));
+        class_info->methods.insert(make_pair(f.first, std::make_unique<InstanceMethod>(Path(""), std::move(cf))));
     }
 
     for (const auto& f: node.static_methods) {

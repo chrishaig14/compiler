@@ -24,7 +24,8 @@ bool function_is_generic(const sem::TypeFunction& ft) {
     return false;
 }
 
-ModuleChecker::ModuleChecker(Package& top_package, Module& module, std::map<std::string, std::set<std::string>>& instances)
+ModuleChecker::ModuleChecker(Package& top_package, Module& module,
+                             std::map<std::string, std::set<std::string>>& instances)
         : instances(instances), module(module),
           error_reporter(module.code_lines, std::make_unique<MyErrorFormatter>(module.abs_path, module.code_lines)),
           top_package(top_package) {
@@ -95,7 +96,8 @@ UExpressionInfo
 ModuleChecker::match_arguments_to_generic_function(const ast::FunctionType& ft, ast::VectorOfTypes arg_types,
                                                    std::map<std::string, ast::Type*>& all_substitutions,
                                                    std::unordered_map<std::string, Path> constraints,
-                                                   TextPosition start) {
+                                                   TextPosition start,
+                                                   std::map<std::string, std::vector<std::string>>& passed_instances) {
     std::unique_ptr<ast::FunctionType> f;
     try {
         f = unify_function_call(ft, arg_types, all_substitutions);
@@ -140,6 +142,8 @@ ModuleChecker::match_arguments_to_generic_function(const ast::FunctionType& ft, 
                         "function call with type substitution " + c.first + " -> " + p_type->to_string() +
                         " which doesn't implement required typeclass '" + c.second.as_str() + "'", start));
 
+            } else {
+                passed_instances[x].emplace_back(c.second.as_str());
             }
         } else {
             this->error_reporter.error(std::make_unique<error::GenericError>(
@@ -226,14 +230,14 @@ ModuleChecker::instantiate_generic(const TemplateClassInfo& generic, const ast::
     }
 
 
-    std::unordered_map<std::string, std::unique_ptr<ConstFunction>> concrete_methods;
+    std::unordered_map<std::string, std::unique_ptr<InstanceMethod>> concrete_methods;
     for (const auto& method_cf: generic.methods) {
         ast::UTypeNode t((method_cf.second)->const_function_ft.to_ast());
         ast::UTypeNode concrete_type = make_type(*t, replacements);
         auto tf = (sem::TypeFunction*) concrete_type->to_sem();
         this->module.fill_actual(*tf);
         auto cf = std::make_unique<ConstFunction>(method_cf.second->path, sem::UTypeFunction(tf));
-        concrete_methods[method_cf.first] = std::move(cf);
+        concrete_methods[method_cf.first] = std::make_unique<InstanceMethod>(Path(""), std::move(cf));
     }
 
     std::unordered_map<std::string, std::unique_ptr<ConstFunction>> concrete_static_methods;
@@ -357,7 +361,7 @@ std::unique_ptr<sem::Top> ModuleChecker::dispatch_top(const ast::TopNode& n) {
             return this->visit_template_class((ast::TemplateClassDef&) n);
             break;
         case TopNodeType::INSTANCE:
-            break;
+            return this->visit_instance((ast::Instance&) n);
     }
     __builtin_unreachable();
 }

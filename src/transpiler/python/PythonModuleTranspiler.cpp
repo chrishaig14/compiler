@@ -4,7 +4,12 @@
 
 #include "PythonModuleTranspiler.h"
 #include <simple_nodes/common/include/Throw.h>
+#include <simple_nodes/top/include/InstanceDef.h>
 #include <units/infos/Module.h>
+
+std::string PythonModuleTranspiler::make_full_instance_name(Path instance_path, Path class_path) {
+    return "T_" + this->clean_path(instance_path) + "_C_" + this->clean_path(class_path);
+}
 
 PythonExpressionOutputCode::PythonExpressionOutputCode(const std::string& pre_code, const std::string& code) : pre_code(
         pre_code), code(code) {
@@ -86,6 +91,9 @@ PythonOutputCode PythonModuleTranspiler::transpile_function(const sem::FunctionD
     }
     for (const auto& pn: node.params) {
         parameters += pn + COMMA + SPACE;
+    }
+    for (auto& i: node.instances) {
+        parameters += make_full_instance_name(i.second, i.first) + COMMA + SPACE;
     }
     parameters = parameters.substr(0, parameters.size() - 2);
     f_source += (node.identifier) + LPAREN + parameters + RPAREN + ":" + NEWLINE;
@@ -381,6 +389,8 @@ PythonOutputCode PythonModuleTranspiler::dispatch_top(const sem::Top& node) {
         case sem::TopType::TYPECLASS:
             return "";
             break;
+        case sem::TopType::INSTANCE:
+            return this->transpile_instance((const sem::InstanceDef&) node);
     }
     __builtin_unreachable();
 }
@@ -473,14 +483,22 @@ PythonExpressionOutputCode PythonModuleTranspiler::dispatch_expression(const sem
         case sem::ExpType::INTEGER:
             return this->transpile_integer(static_cast<const sem::Integer&>(node));
         case sem::ExpType::OBJECT_METHOD:
-            return this->transpile_object_method(static_cast<const sem::ObjectMethod&>(node), false);
+            return this->transpile_object_method(static_cast<const sem::ObjectMethod&>(node), called_function);
         case sem::ExpType::CONST_FUNCTION:
             return this->transpile_const_function(static_cast<const sem::ConstFunction&>(node));
         case sem::ExpType::OBJECT_CONSTRUCTOR:
             return this->transpile_object_constructor(static_cast<const sem::ObjectConstructor&>(node));
         case sem::ExpType::STATIC_METHOD:
-            return this->transpile_static_method(static_cast<const sem::StaticMethod&>(node), false);
+            return this->transpile_static_method(static_cast<const sem::StaticMethod&>(node), called_function);
             break;
+        case sem::ExpType::INSTANCE_OBJECT:
+            break;
+        case sem::ExpType::METHOD_FROM_INSTANCE:
+            auto& n = static_cast<const sem::ObjectMethodFromInstance&>(node);
+            PythonExpressionOutputCode object_out = this->dispatch_expression(*n.object, false);
+            std::string out_pre_code = object_out.pre_code + "\nobject = " + object_out.code;
+            std::string out_code = make_full_instance_name(n.instance->typeclass_path, n.instance->class_path);
+            return PythonExpressionOutputCode(out_pre_code, out_code);
     }
     __builtin_unreachable();
 }
@@ -556,13 +574,42 @@ PythonExpressionOutputCode PythonModuleTranspiler::transpile_call_exp(const sem:
     VectorOfStrings arg_names;
     std::string arg_list;
     std::string fun_id = "function_to_call_" + std::to_string(this->next_arg_n());
-    PythonExpressionOutputCode func = this->dispatch_expression(*node.function, true);
+    PythonExpressionOutputCode func("", "");
+    switch (node.function->type) {
+        case sem::ExpType::OBJECT_METHOD: {
+            auto& f = static_cast<sem::ObjectMethod&>(*node.function);
+            PythonExpressionOutputCode arg_code = this->dispatch_expression(*f.object, false);
+            std::string arg_id = "arg_" + std::to_string(this->next_arg_n());
+            pre_code +=
+                    (arg_code.pre_code.empty() ? "" : arg_code.pre_code + "\n") + arg_id + " = " + arg_code.code + "\n";
+            arg_list += arg_id + ", ";
+            func.code = f.class_path.as_str() + "." + f.method_name;
+            break;
+        }
+        case sem::ExpType::METHOD_FROM_INSTANCE: {
+            auto& f = static_cast<sem::ObjectMethodFromInstance&>(*node.function);
+            PythonExpressionOutputCode arg_code = this->dispatch_expression(*f.object, false);
+            std::string arg_id = "arg_" + std::to_string(this->next_arg_n());
+            pre_code +=
+                    (arg_code.pre_code.empty() ? "" : arg_code.pre_code + "\n") + arg_id + " = " + arg_code.code + "\n";
+            arg_list += arg_id + ", ";
+            func.code = make_full_instance_name(f.instance->class_path, f.instance->typeclass_path) + "[\"" + f.method +
+                        "\"]";
+            break;
+        }
+        default:
+            func = this->dispatch_expression(*node.function, true);
+            break;
+    }
     pre_code += (func.pre_code.empty() ? "" : func.pre_code + "\n") + fun_id + " = " + func.code + "\n";
     for (auto& arg: node.arguments) {
         PythonExpressionOutputCode arg_code = this->dispatch_expression(*arg, false);
         std::string arg_id = "arg_" + std::to_string(this->next_arg_n());
         pre_code += (arg_code.pre_code.empty() ? "" : arg_code.pre_code + "\n") + arg_id + " = " + arg_code.code + "\n";
         arg_list += arg_id + ", ";
+    }
+    for (auto& arg: node.instances) {
+        arg_list += make_full_instance_name(arg->typeclass_path, arg->class_path) + ", ";
     }
     std::string post_code;
     post_code += fun_id + "(";
@@ -578,6 +625,26 @@ PythonOutputCode PythonModuleTranspiler::transpile_for(const sem::For& node) {
     code += "for " + node.varname + " in " + exp_id + ".elems:\n";
     PythonOutputCode body_code = this->transpile_block(*node.body);
     code += indent_paragraph(body_code, 4);
+    return code;
+}
+
+PythonOutputCode PythonModuleTranspiler::transpile_instance(const sem::InstanceDef& def) {
+    std::string code;
+    std::string full_instance_name = make_full_instance_name(def.instance_path, def.base_type_path);
+    std::string post;
+    this->add_self = true;
+    for (auto& m: def.methods) {
+        std::string full_method_name = full_instance_name + "_M_" + m->identifier;
+        post += "\"" + m->identifier + "\": " + full_method_name + ",\n";
+        m->identifier = full_method_name;
+        code += this->transpile_function(*m);
+        code += "\n";
+    }
+    this->add_self = false;
+    code += full_instance_name;
+    code += " = {\n";
+    code += post;
+    code += "}";
     return code;
 }
 
