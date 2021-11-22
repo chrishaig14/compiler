@@ -10,14 +10,16 @@
 #include <util/types.h>
 #include <common/Path.h>
 #include "../../common/include/Block.h"
+#include <map>
+#include <set>
 
 class sem::FunctionDef : public sem::Top {
 public:
     std::string identifier;
     VectorOfStrings params;
     std::unique_ptr<Block> body;
-    std::vector<std::pair<Path,Path>> instances;
-    FunctionDef(std::string identifier, VectorOfStrings params, std::unique_ptr<Block> body, std::vector<std::pair<Path, Path>> instances);
+    std::map<std::string, std::set<std::string>> instances;
+    FunctionDef(std::string identifier, VectorOfStrings params, std::unique_ptr<Block> body, std::map<std::string, std::set<std::string>> instances);
     bool equals(const Top& o) const override;
 };
 

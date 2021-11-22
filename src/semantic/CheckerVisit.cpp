@@ -264,7 +264,7 @@ std::unique_ptr<sem::FunctionDef> ModuleChecker::visit_function(const ast::Funct
     }
     // auto& e_const_function = this->scope->get(n.identifier);
     // auto& const_function = e_const_function.get_constfun().const_function;
-    std::vector<std::pair<Path, Path>> n_instances;
+    std::map<std::string, std::set<std::string>> n_instances;
     for (size_t i = 0; i < n.parameter_names.size(); i++) {
         // ast::Type& type = n.parameter_types[i];
         // ast::UTypeNode cl(type.clone());
@@ -273,7 +273,7 @@ std::unique_ptr<sem::FunctionDef> ModuleChecker::visit_function(const ast::Funct
         this->module.fill_actual(*semt);
         for (auto& c: n.constraints) {
             add_typeclasses_to_generic_type(*semt, c.first, c.second);
-            n_instances.emplace_back(Path(this->module.path, c.first), Path(this->module.path, c.second));
+            n_instances[Path(this->module.path, c.first).as_str()].insert(Path(this->module.path, c.second).as_str());
         }
         auto te = this->make_entity_value(*semt);
         this->scope->set(n.parameter_names[i], *te);

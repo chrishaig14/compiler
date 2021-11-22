@@ -7,7 +7,7 @@
 using namespace sem;
 
 FunctionDef::FunctionDef(std::string identifier, VectorOfStrings params, std::unique_ptr<Block> body,
-                         std::vector<std::pair<Path, Path>> instances)
+                         std::map<std::string, std::set<std::string>> instances)
         : Top(TopType::FUNCTION), identifier(identifier), params(params), body(std::move(body)), instances(instances) {
 }
 

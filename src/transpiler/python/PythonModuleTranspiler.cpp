@@ -92,8 +92,10 @@ PythonOutputCode PythonModuleTranspiler::transpile_function(const sem::FunctionD
     for (const auto& pn: node.params) {
         parameters += pn + COMMA + SPACE;
     }
-    for (auto& i: node.instances) {
-        parameters += make_full_instance_name(i.second, i.first) + COMMA + SPACE;
+    for (auto& t: node.instances) {
+        for (auto& i: t.second) {
+            parameters += make_full_instance_name(Path(i), Path(t.first)) + COMMA + SPACE;
+        }
     }
     parameters = parameters.substr(0, parameters.size() - 2);
     f_source += (node.identifier) + LPAREN + parameters + RPAREN + ":" + NEWLINE;
