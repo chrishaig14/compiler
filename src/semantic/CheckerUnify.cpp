@@ -94,7 +94,9 @@ ModuleChecker::unify_function_call(const ast::FunctionType& f, ast::VectorOfType
     ast::FunctionType& fun = *f.clone();
     if (args.size() != fun.param_types.size()) {
         this->error_reporter.error(std::make_unique<error::FunctionCallNumArgs>((sem::TypeFunction*) fun.to_sem(),
-                                                                                TextPosition{1, 1}));
+                                                                                ast::Id("foo",
+                                                                                        TextPosition{1, 1},
+                                                                                        TextPosition{1, 1})));
         return nullptr;
     }
 
@@ -239,7 +241,7 @@ void ModuleChecker::add_typeclasses_to_generic_type(sem::Type& type, std::string
             type.object().add_typeclass(typeclass_name);
         }
     } else if (type.kind == sem::Kind::OBJECT) {
-        for(auto& tp: type.object().type_params){
+        for (auto& tp: type.object().type_params) {
             this->add_typeclasses_to_generic_type(*tp, gen_type, typeclass_name);
         }
     }

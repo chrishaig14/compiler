@@ -583,7 +583,7 @@ PythonExpressionOutputCode PythonModuleTranspiler::transpile_call_exp(const sem:
             pre_code +=
                     (arg_code.pre_code.empty() ? "" : arg_code.pre_code + "\n") + arg_id + " = " + arg_code.code + "\n";
             arg_list += arg_id + ", ";
-            func.code = f.class_path.as_str() + "." + f.method_name;
+            func.code = this->clean_path(f.class_path) + "." + f.method_name;
             break;
         }
         case sem::ExpType::METHOD_FROM_INSTANCE: {

@@ -13,6 +13,7 @@ std::string ErrorFormatter::format(const error::Error& err) const {
         case error::ErrorType::bool_op:
             break;
         case error::ErrorType::function_call_num_args:
+            return this->format(static_cast<const error::FunctionCallNumArgs&>(err));
             break;
         case error::ErrorType::cant_assign:
             break;

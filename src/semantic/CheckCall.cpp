@@ -49,8 +49,8 @@ ModuleChecker::analyze_call(const ast::ExpNode& function, std::vector<ast::RExpN
     }
 
     if (arguments.size() != function_type.param_types.size()) {
-        this->error_reporter.error(std::make_unique<error::FunctionCallNumArgs>(&function_type, start));
-        std::cout << function_type.to_string() << std::endl;
+        this->error_reporter.error(std::make_unique<error::FunctionCallNumArgs>(&function_type,
+                                                                                ast::Id("foo", start, end)));
         if (!function_is_generic(function_type)) {
             return retv_p;
         } else {

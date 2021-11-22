@@ -11,6 +11,7 @@ public:
     virtual std::string format(const error::TypeMismatch& err) const = 0;
     virtual std::string format(const error::TypeclassNotFound& err) const = 0;
     virtual std::string format(const error::GenericError& err) const = 0;
+    virtual std::string format(const error::FunctionCallNumArgs& err) const = 0;
     virtual std::string format(const error::Redeclared& err) const = 0;
     virtual std::string format(const error::NoMember& err) const = 0;
     virtual std::string format(const error::NoMemberSuggestions& err) const = 0;

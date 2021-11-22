@@ -10,11 +10,17 @@
 
 class error::FunctionCallNumArgs : public error::Error {
 public:
-    FunctionCallNumArgs(const sem::TypeFunction* type, TextPosition position);
+    TextPosition start;
+    TextPosition end;
+
+    const sem::TypeFunction* type;
+
+    FunctionCallNumArgs(const sem::TypeFunction* type, const ast::ExpNode& node);
+
     Error* clone() const override;
     bool equal(const Error& other) const override;
-    std::string to_str(const CodeLines& code) const override;
 
+    std::string to_str(const CodeLines& code) const override;
 };
 
 

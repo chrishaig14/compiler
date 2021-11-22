@@ -76,3 +76,8 @@ std::string MyErrorFormatter::format(const error::NotDeclared& err) const {
     return this->context_string(err.idn.start) + "Error::NotDeclared: '" + err.idn._id + "'" +
            this->code_context_string(err.idn.start);
 }
+
+std::string MyErrorFormatter::format(const error::FunctionCallNumArgs& err) const {
+    return this->context_string(err.start) + "Error::FunctionCallNumArgs:" +
+    this->code_context_string(err.start);
+}

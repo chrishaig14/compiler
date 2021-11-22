@@ -1,49 +1,28 @@
 typeclass Addable[t] {
-    fun add() -> Integer
+    fun add(x:t) -> t
 }
 
-class Foo {
-    i: Integer
-    fun some_random_method() -> Integer {
-        return 78 + this.i
-    }
-}
-
-instance Addable[Foo] {
-    fun add() -> Integer {
-        return 7
-    }
-}
-
-fun baba(x: t) -> Integer where t::Addable {
-    var r = x.add()
-    return 0
-}
-
-typeclass Stringable[t] {
-    fun to_string() -> String
-}
-
-fun list_to_string(l: List[t]) -> String where t::Stringable {
-    var s = "["
+fun add_list(l: List[t], zero: t) -> t where t::Addable{
+    var r = zero
     for x @ l {
-        s += x.to_string() + ", "
+        r = r.add(x)
     }
-    s += "]"
-    return s
+    return r
 }
 
+class Wrap {
+    i: Integer
+}
 
-
-instance Stringable[Foo] {
-    fun to_string() -> String {
-        return "Helloo!" + this.i.str()
+instance Addable[Wrap] {
+    fun add(other: Wrap) -> Wrap {
+        return #Wrap(this.i + other.i)
     }
 }
 
 fun main() -> Integer {
-    var f : List[Foo] = [#Foo(9), #Foo(100)]
-    print(list_to_string(f))
-    var x = f[0].some_random_method()
+    var l = [#Wrap(11),#Wrap(9)]
+    var r = add_list(l, #Wrap(5))
+    print(r.i.str())
     return 0
 }
