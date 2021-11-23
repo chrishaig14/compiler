@@ -7,7 +7,7 @@
 using namespace ast;
 
 TemplateClassDef::TemplateClassDef(const std::string& className, VectorOfStrings type_parameters,
-                                   std::vector<std::pair<std::string, ast::UTypeNode>> members,
+                                   std::vector<ast::ClassMember> members,
                                    std::unordered_map<std::string, ast::UFunctionNode> functions,
                                    std::map<std::string, std::pair<ast::Type*, ast::ExpNode*>> static_members,
                                    std::unordered_map<std::string, ast::UFunctionNode>& static_methods, TextPosition start, TextPosition end)
@@ -35,8 +35,8 @@ nlohmann::json TemplateClassDef::to_json() const {
     j["type"] = "class";
     std::vector<nlohmann::json> memj;
     for (auto& i : this->members) {
-        memj.push_back({{"id",   i.first},
-                        {"type", i.second->to_json()}});
+        memj.push_back({{"id",   i.id},
+                        {"type", i.type->to_json()}});
     }
     nlohmann::json methj;
     for (auto& m: this->methods) {

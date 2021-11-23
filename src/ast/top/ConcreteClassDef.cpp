@@ -13,7 +13,7 @@ using namespace ast;
 //                  TextPosition end);
 
 ConcreteClassDef::ConcreteClassDef(const std::string& className,
-                                   std::vector<std::pair<std::string, ast::UTypeNode>> members,
+                                   std::vector<ClassMember> members,
                                    std::unordered_map<std::string, ast::UFunctionNode> functions,
                                    std::map<std::string, std::pair<ast::Type*, ast::ExpNode*>> static_members,
                                    std::unordered_map<std::string, ast::UFunctionNode>& static_methods,
@@ -44,8 +44,8 @@ nlohmann::json ConcreteClassDef::to_json() const {
     j["type"] = "class";
     std::vector<nlohmann::json> memj;
     for (auto& i : this->members) {
-        memj.push_back({{"id",   i.first},
-                        {"type", i.second->to_json()}});
+        memj.push_back({{"id",   i.id},
+                        {"type", i.type->to_json()}});
     }
     nlohmann::json methj;
     for (auto& m: this->methods) {
@@ -62,3 +62,5 @@ nlohmann::json ConcreteClassDef::to_json() const {
     return j;
 }
 
+ClassMember::ClassMember(const std::string& id, ast::UTypeNode type) : id(id), type(std::move(type)) {
+}

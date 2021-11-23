@@ -970,7 +970,7 @@ std::unique_ptr<ast::TopNode> Parser::parse_class_definition() {
     this->expect_token(TokType::LCURLY);
     std::unordered_map<std::string, ast::UFunctionNode> methods;
     std::unordered_map<std::string, ast::UFunctionNode> static_methods;
-    std::vector<std::pair<std::string, ast::UTypeNode>> members;
+    std::vector<ast::ClassMember> members;
     std::set<std::string> member_names;
     std::map<std::string, std::pair<ast::Type*, ast::ExpNode*>> static_members;
     VectorOfStrings members_ordered;
@@ -993,7 +993,7 @@ std::unique_ptr<ast::TopNode> Parser::parse_class_definition() {
                 auto init_expression = this->parse_expression();
                 static_members[member_name] = std::make_pair(member_type.release(), init_expression.release());
             } else {
-                members.push_back({member_name, std::move(member_type)});
+                members.emplace_back(ast::ClassMember(member_name, std::move(member_type)));
                 members_ordered.push_back(member_name);
             }
             this->expect_token(TokType::SEMICOLON);

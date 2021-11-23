@@ -14,11 +14,12 @@
 #include <util/macros.h>
 #include "../ast.h"
 
+
 class ast::ConcreteClassDef : public ast::TopNode {
 public:
 
     bool equal(const ast::TopNode& other) const override;
-    ConcreteClassDef(const std::string& className, std::vector<std::pair<std::string, ast::UTypeNode>> members,
+    ConcreteClassDef(const std::string& className, std::vector<ClassMember> members,
                      std::unordered_map<std::string, ast::UFunctionNode> functions,
                      std::map<std::string, std::pair<ast::Type*, ast::ExpNode*>> static_members,
                      std::unordered_map<std::string, ast::UFunctionNode>& static_methods, TextPosition start,
@@ -26,7 +27,7 @@ public:
     ~ConcreteClassDef() override;
     nlohmann::json to_json() const override;
 
-    std::vector<std::pair<std::string, ast::UTypeNode>> members;
+    std::vector<ast::ClassMember> members;
     std::map<std::string, std::pair<ast::Type*, ast::ExpNode*>> static_members;
     VectorOfStrings members_ordered;
     std::unordered_map<std::string, ast::UFunctionNode> methods;

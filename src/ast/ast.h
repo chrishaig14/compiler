@@ -43,6 +43,8 @@ namespace ast {
 
     class UnaryOp;
 
+    class ClassMember;
+
     class BoolOp;
 
     class Cast;
@@ -120,5 +122,13 @@ namespace ast {
     typedef std::vector<ast::Type*> VectorOfTypes;
 
 }
+
+class ast::ClassMember {
+public:
+    std::string id;
+    ast::UTypeNode type;
+    ClassMember(const std::string& id, ast::UTypeNode type);
+};
+
 
 #endif //XLANG_AST_H

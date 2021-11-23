@@ -76,7 +76,7 @@ std::unique_ptr<sem::KlassDef> ModuleChecker::visit_class(ast::ConcreteClassDef&
     ast::VectorOfTypes members_ordered_types;
     VectorOfStrings member_types;
     for (const auto& mt: node.members) {
-        ast::Type& t = *mt.second;
+        ast::Type& t = *mt.type;
         members_ordered_types.push_back(&t);
         this->assert_type_exists(t, node.start);
         member_types.push_back(t.to_string());
@@ -166,7 +166,7 @@ std::unique_ptr<sem::TemplateKlassDef> ModuleChecker::visit_template_class(ast::
     ast::VectorOfTypes members_ordered_types;
     VectorOfStrings member_types;
     for (const auto& mt: node.members) {
-        ast::Type& t = *mt.second;
+        ast::Type& t = *mt.type;
         members_ordered_types.push_back(&t);
         this->assert_type_exists(t, node.start);
         member_types.push_back(t.to_string());
