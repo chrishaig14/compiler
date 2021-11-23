@@ -15,6 +15,7 @@
 #include <common/Path.h>
 #include "../ast.h"
 #include "TopNode.h"
+#include <set>
 
 class ast::Function : public ast::TopNode {
     ast::VectorOfUTypes _parameter_types;
@@ -26,7 +27,7 @@ public:
     ast::UTypeNode return_type;
     Function(std::string identifier, const VectorOfStrings& parameter_names, ast::VectorOfUTypes& parameter_types,
              ast::UTypeNode& return_type, std::unique_ptr<ast::Block>& body,
-             std::unordered_map<std::string, std::string> constraints, TextPosition start, TextPosition end);
+             std::unordered_map<std::string, std::set<std::string>> constraints, TextPosition start, TextPosition end);
 
     Function(std::string identifier, const VectorOfStrings& parameter_names, ast::VectorOfUTypes& parameter_types,
              ast::UTypeNode& return_type, std::unique_ptr<ast::Block>& body, TextPosition start, TextPosition end)
@@ -38,7 +39,7 @@ public:
     ~Function() override;
     nlohmann::json to_json() const override;
 
-    std::unordered_map<std::string, std::string> constraints;
+    std::unordered_map<std::string, std::set<std::string>> constraints;
     Path path;
     // ConstFunction* const_function;
 

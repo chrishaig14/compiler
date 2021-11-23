@@ -95,7 +95,7 @@ bool is_generic(const sem::Type& t) {
 UExpressionInfo
 ModuleChecker::match_arguments_to_generic_function(const ast::FunctionType& ft, ast::VectorOfTypes arg_types,
                                                    std::map<std::string, ast::Type*>& all_substitutions,
-                                                   std::unordered_map<std::string, Path> constraints,
+                                                   std::unordered_map<std::string, std::set<std::string>> constraints,
                                                    TextPosition start,
                                                    std::map<std::string, std::vector<std::string>>& passed_instances) {
     std::unique_ptr<ast::FunctionType> f;
@@ -135,22 +135,17 @@ ModuleChecker::match_arguments_to_generic_function(const ast::FunctionType& ft, 
         // if (p_type->is_generic()) {
         // std::cout << this->instances.size() << std::endl;
         std::string x = p_type->object().data.actual_base_path.as_str();
-        if (this->instances.count(x) != 0) {
-            auto all_instances = this->instances.at(p_type->object().data.actual_base_path.as_str());
-            if (not all_instances.contains(c.second.as_str())) {
+        auto all_instances = this->instances[p_type->object().data.actual_base_path.as_str()];
+        for (auto& t: c.second) {
+            if (not all_instances.contains(t)) {
                 this->error_reporter.error(std::make_unique<error::GenericError>(
                         "function call with type substitution " + c.first + " -> " + p_type->to_string() +
-                        " which doesn't implement required typeclass '" + c.second.as_str() + "'", start));
+                        " which doesn't implement required typeclass '" + t + "'", start));
 
             } else {
-                passed_instances[x].emplace_back(c.second.as_str());
+                passed_instances[x].emplace_back(t);
             }
-        } else {
-            this->error_reporter.error(std::make_unique<error::GenericError>(
-                    "function call with type substitution " + c.first + " -> " + p_type->to_string() +
-                    " which doesn't implement required typeclass '" + c.second.as_str() + "'", start));
         }
-        // }
     }
 
 

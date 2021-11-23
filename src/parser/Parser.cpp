@@ -829,17 +829,28 @@ std::unique_ptr<ast::Function> Parser::parse_function_definition() {
 
     // std::string constraint_generic_type;
     // std::string constraint_typeclass_name;
-    std::unordered_map<std::string, std::string> constraints;
+    std::unordered_map<std::string, std::set<std::string>> constraints;
     if (this->match(TokType::WHERE)) {
         // has a typeclass constraint!
         // for now, just a single constraint, for a single generic type
         this->next();
         Token generic_type = this->expect_token(TokType::ID);
         this->expect_token(TokType::DOUBLE_COLON);
-        Token typeclass_name = this->expect_token(TokType::ID);
-        // constraint_generic_type = generic_type.str;
-        // constraint_typeclass_name = typeclass_name.str;
-        constraints[generic_type.str] = typeclass_name.str;
+        if (this->match(TokType::LPAREN)) {
+            while (true) {
+                this->next();
+                Token typeclass_name = this->expect_token(TokType::ID);
+                constraints[generic_type.str].insert(typeclass_name.str);
+                if (!this->match(TokType::COMMA)) {
+                    break;
+                }
+            }
+            this->expect_token(TokType::RPAREN);
+        } else {
+            Token typeclass_name = this->expect_token(TokType::ID);
+            constraints[generic_type.str].insert(typeclass_name.str);
+        }
+
     }
     // Parse function body
     auto body = this->parse_possibly_empty_block();

@@ -80,7 +80,9 @@ void ModulePrechecker::visit_function(ast::Function& node) {
     auto const_function = std::make_unique<ConstFunction>(Path(this->module.path, node.identifier),
                                                           std::move(function_info));
     for (auto& c: node.constraints) {
-        const_function->constraints[c.first] = Path(this->module.path, c.second);
+        for (auto& t: c.second) {
+            const_function->constraints[c.first].insert(Path(this->module.path, t).as_str());
+        }
     }
     node.path = const_function->path;
     this->module.add_func_definition(std::move(const_function));

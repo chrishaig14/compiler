@@ -201,7 +201,7 @@ public:
                                                            std::map<std::string, ast::Type*>& all_substitutions);
     UExpressionInfo match_arguments_to_generic_function(const ast::FunctionType& ft, ast::VectorOfTypes arg_types,
                                                         std::map<std::string, ast::Type*>& all_substitutions,
-                                                        std::unordered_map<std::string, Path> constraints,
+                                                        std::unordered_map<std::string, std::set<std::string>> constraints,
                                                         TextPosition start,
                                                         std::map<std::string, std::vector<std::string>>& passed_instances);
     UExpressionInfo analyze_call(const ast::ExpNode& function, std::vector<ast::RExpNode>& arguments, bool is_rvalue,

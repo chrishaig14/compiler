@@ -272,8 +272,10 @@ std::unique_ptr<sem::FunctionDef> ModuleChecker::visit_function(const ast::Funct
         sem::Type* semt = n.parameter_types[i].get().to_sem();
         this->module.fill_actual(*semt);
         for (auto& c: n.constraints) {
-            add_typeclasses_to_generic_type(*semt, c.first, c.second);
-            n_instances[Path(this->module.path, c.first).as_str()].insert(Path(this->module.path, c.second).as_str());
+            for (auto& t: c.second) {
+                add_typeclasses_to_generic_type(*semt, c.first, t);
+                n_instances[Path(this->module.path, c.first).as_str()].insert(Path(this->module.path, t).as_str());
+            }
         }
         auto te = this->make_entity_value(*semt);
         this->scope->set(n.parameter_names[i], *te);

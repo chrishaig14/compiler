@@ -1,17 +1,26 @@
 typeclass Addable[t] {
     fun add(x:t) -> t
 }
-
-fun add_list(l: List[t], zero: t) -> t where t::Addable{
+typeclass Stringable[t] {
+    fun to_string()->String
+}
+fun add_list(l: List[t], zero: t) -> t where t::(Addable,Stringable) {
     var r = zero
     for x @ l {
         r = r.add(x)
+        print(r.to_string())
     }
     return r
 }
 
 class Wrap {
     i: Integer
+}
+
+instance Stringable[Wrap] {
+    fun to_string() -> String {
+        return "Wrap(" + this.i.str() + ")"
+    }
 }
 
 instance Addable[Wrap] {
