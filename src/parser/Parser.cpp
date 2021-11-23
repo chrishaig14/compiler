@@ -833,24 +833,36 @@ std::unique_ptr<ast::Function> Parser::parse_function_definition() {
     if (this->match(TokType::WHERE)) {
         // has a typeclass constraint!
         // for now, just a single constraint, for a single generic type
-        this->next();
-        Token generic_type = this->expect_token(TokType::ID);
-        this->expect_token(TokType::DOUBLE_COLON);
-        if (this->match(TokType::LPAREN)) {
-            while (true) {
-                this->next();
+        while (true) {
+            this->next();
+            Token generic_type = this->expect_token(TokType::ID);
+            if (constraints.count(generic_type.str)) {
+                throw std::runtime_error(
+                        std::string("Error: put all constraints for type variable ") + generic_type.str + " together");
+            }
+            this->expect_token(TokType::DOUBLE_COLON);
+            if (this->match(TokType::LPAREN)) {
+                while (true) {
+                    this->next();
+                    Token typeclass_name = this->expect_token(TokType::ID);
+                    if (constraints[generic_type.str].contains(typeclass_name.str)) {
+                        throw std::runtime_error(std::string("Error: repeated constraint: ") + generic_type.str + "::" +
+                                                 typeclass_name.str);
+                    }
+                    constraints[generic_type.str].insert(typeclass_name.str);
+                    if (!this->match(TokType::COMMA)) {
+                        break;
+                    }
+                }
+                this->expect_token(TokType::RPAREN);
+            } else {
                 Token typeclass_name = this->expect_token(TokType::ID);
                 constraints[generic_type.str].insert(typeclass_name.str);
-                if (!this->match(TokType::COMMA)) {
-                    break;
-                }
             }
-            this->expect_token(TokType::RPAREN);
-        } else {
-            Token typeclass_name = this->expect_token(TokType::ID);
-            constraints[generic_type.str].insert(typeclass_name.str);
+            if (!this->match(TokType::COMMA)) {
+                break;
+            }
         }
-
     }
     // Parse function body
     auto body = this->parse_possibly_empty_block();
