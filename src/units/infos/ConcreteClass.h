@@ -24,6 +24,11 @@ public:
     }
 };
 
+
+enum class ClassAttributeType {
+    member, static_member, method, static_method, not_found
+};
+
 class ConcreteClass {
 public:
     std::vector<std::string> implemented_typeclasses;
@@ -41,6 +46,28 @@ public:
 
     const Path path;
     const std::string class_name;
+
+    std::map<std::string, ClassAttributeType> all_attributes;
+
+    ClassAttributeType get_attribute(const std::string& name) {
+        auto attribute_type = this->all_attributes.find(name);
+        if (attribute_type == this->all_attributes.end()) {
+            return ClassAttributeType::not_found;
+        }
+        return attribute_type->second;
+    }
+
+    InstanceMethod& get_method(const std::string& name) {
+        return *this->methods[name];
+    }
+
+    ConstFunction& get_static_method(const std::string& name) {
+        return *this->static_methods[name];
+    }
+
+    Entity& get_member(const std::string& name) {
+        return *this->member_entities[name];
+    }
 
     ~ConcreteClass();
 

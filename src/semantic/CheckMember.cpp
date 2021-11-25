@@ -151,28 +151,40 @@ UExpressionInfo ModuleChecker::class_member(const ast::Member& n, UExpressionInf
     std::string child = n.s_child;
     UExpressionInfo info_u = std::make_unique<ExpressionInfo>();
     ExpressionInfo& info = *info_u;
-    if (cls.methods.find(child) != cls.methods.end()) {
-        ConstFunction& bound_method = *cls.methods[child]->func;
-        auto* unbound_method = new ConstFunction(bound_method.path,
-                                                 sem::UTypeFunction((sem::TypeFunction*) bound_method.const_function_ft.clone()));
-        ast::VectorOfTypes tp;
-        for (auto tt: cls.type_params) {
-            ast::ObjectType* t = new ast::ObjectType(tt);
-            t->is_generic_param = true;
-            tp.push_back(t);
+    ClassAttributeType att_type = cls.get_attribute(child);
+    switch (att_type) {
+        case ClassAttributeType::not_found: {
+            throw std::runtime_error("Error class no member!");
         }
-        ast::ObjectType* ot = new ast::ObjectType(cls.class_name, tp);
-        unbound_method->const_function_ft.param_types.insert(unbound_method->const_function_ft.param_types.begin(),
-                                                             sem::UType(ot->to_sem()));
-        info.set_entity(std::make_unique<EntityConstFunction>(*unbound_method));
-        info.exp_snode = std::make_unique<sem::Id>(unbound_method->path.as_str());
-    } else if (cls.static_methods.find(child) != cls.static_methods.end()) {
-        info.set_entity(std::make_unique<EntityConstFunction>(*cls.static_methods[child]));
-        info.exp_snode = std::make_unique<sem::StaticMethod>(cls.path, child);
-    } else if (cls.static_members.find(child) != cls.static_members.end()) {
-        info.set_entity(entity_from_type(*cls.static_members[child].first));
-    } else {
-        throw std::runtime_error("Error class no member!");
+        case ClassAttributeType::member: {
+            throw std::runtime_error("Error class no member (it's an instance variable)!");
+        }
+        case ClassAttributeType::static_member: {
+            info.set_entity(entity_from_type(*cls.static_members[child].first));
+            break;
+        }
+        case ClassAttributeType::method: {
+            ConstFunction& bound_method = *cls.methods[child]->func;
+            auto* unbound_method = new ConstFunction(bound_method.path,
+                                                     sem::UTypeFunction((sem::TypeFunction*) bound_method.const_function_ft.clone()));
+            ast::VectorOfTypes tp;
+            for (auto tt: cls.type_params) {
+                ast::ObjectType* t = new ast::ObjectType(tt);
+                t->is_generic_param = true;
+                tp.push_back(t);
+            }
+            ast::ObjectType* ot = new ast::ObjectType(cls.class_name, tp);
+            unbound_method->const_function_ft.param_types.insert(unbound_method->const_function_ft.param_types.begin(),
+                                                                 sem::UType(ot->to_sem()));
+            info.set_entity(std::make_unique<EntityConstFunction>(*unbound_method));
+            info.exp_snode = std::make_unique<sem::Id>(unbound_method->path.as_str());
+            break;
+        }
+        case ClassAttributeType::static_method: {
+            info.set_entity(std::make_unique<EntityConstFunction>(*cls.static_methods[child]));
+            info.exp_snode = std::make_unique<sem::StaticMethod>(cls.path, child);
+            break;
+        }
     }
     return info_u;
 }
