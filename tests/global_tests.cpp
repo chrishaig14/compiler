@@ -65,20 +65,20 @@ class Foo {
     REQUIRE(clazz->members.count("y") == 1);
     REQUIRE(*clazz->members["y"] == ast::ObjectType("String"));
 
-    REQUIRE(clazz->member_entities.size() == 2);
-    REQUIRE(clazz->member_entities.count("x") == 1);
-    REQUIRE(clazz->member_entities.count("y") == 1);
+    REQUIRE(clazz->attribute_entities.size() == 2);
+    REQUIRE(clazz->attribute_entities.count("x") == 1);
+    REQUIRE(clazz->attribute_entities.count("y") == 1);
     // REQUIRE(clazz->member_entities["x"]==z);
 
-    REQUIRE(clazz->member_names.size() == 2);
-    REQUIRE(clazz->member_names[0] == "x");
-    REQUIRE(clazz->member_names[1] == "y");
+    REQUIRE(clazz->attribute_names.size() == 2);
+    REQUIRE(clazz->attribute_names[0] == "x");
+    REQUIRE(clazz->attribute_names[1] == "y");
 
-    REQUIRE(clazz->member_types.size() == 2);
-    REQUIRE(*clazz->member_types[0] == ast::ObjectType("Integer"));
-    REQUIRE(*clazz->member_types[1] == ast::ObjectType("String"));
+    REQUIRE(clazz->attribute_types.size() == 2);
+    REQUIRE(*clazz->attribute_types[0] == ast::ObjectType("Integer"));
+    REQUIRE(*clazz->attribute_types[1] == ast::ObjectType("String"));
 
-    REQUIRE(clazz->static_members.empty());
+    REQUIRE(clazz->static_attributes.empty());
 
     REQUIRE(clazz->methods.size() == 1);
     REQUIRE(clazz->static_methods.size() == 1);
@@ -116,17 +116,17 @@ class Foo {
     REQUIRE(clazz->members.count("x") == 1);
     REQUIRE(*clazz->members["x"] == ast::ObjectType("Integer"));
 
-    REQUIRE(clazz->member_entities.size() == 1);
-    REQUIRE(clazz->member_entities.count("x") == 1);
+    REQUIRE(clazz->attribute_entities.size() == 1);
+    REQUIRE(clazz->attribute_entities.count("x") == 1);
     // REQUIRE(clazz->member_entities["x"]==z);
 
-    REQUIRE(clazz->member_names.size() == 1);
-    REQUIRE(clazz->member_names[0] == "x");
+    REQUIRE(clazz->attribute_names.size() == 1);
+    REQUIRE(clazz->attribute_names[0] == "x");
 
-    REQUIRE(clazz->member_types.size() == 1);
-    REQUIRE(*clazz->member_types[0] == ast::ObjectType("Integer"));
+    REQUIRE(clazz->attribute_types.size() == 1);
+    REQUIRE(*clazz->attribute_types[0] == ast::ObjectType("Integer"));
 
-    REQUIRE(clazz->static_members.empty());
+    REQUIRE(clazz->static_attributes.empty());
 
     REQUIRE(clazz->methods.empty());
     REQUIRE(clazz->static_methods.empty());

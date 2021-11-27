@@ -138,7 +138,7 @@ var boolean = t.3
 ----
 
 Tuples are also immutable, so their elements must also be immutable (i.e. you can't have a `Tuple[Integer, List[String]]` as `List[String]` is not immutable).
-Also, you can't reassign a tuple member. This is invalid:
+Also, you can't reassign a tuple attribute. This is invalid:
 
 [source]
 ----
