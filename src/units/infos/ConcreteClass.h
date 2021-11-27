@@ -25,8 +25,8 @@ public:
 };
 
 
-enum class ClassAttributeType {
-    member, static_member, method, static_method, not_found
+enum class ClassMemberCategory {
+    attribute, static_attribute, method, static_method, not_found
 };
 
 class ConcreteClass {
@@ -34,27 +34,27 @@ public:
     std::vector<std::string> implemented_typeclasses;
     ConcreteClass(const std::string& class_name, Path path);
 
-    VectorOfStrings member_names;
-    std::vector<ast::Type*> member_types;
-    std::unordered_map<std::string, std::unique_ptr<Entity>> member_entities;
+    VectorOfStrings attribute_names;
+    std::vector<ast::Type*> attribute_types;
+    std::unordered_map<std::string, std::unique_ptr<Entity>> attribute_entities;
 
     MapStringType members;
     std::unordered_map<std::string, std::unique_ptr<InstanceMethod>> methods;
 
-    std::map<std::string, std::pair<ast::Type*, ast::ExpNode*>> static_members;
+    std::map<std::string, std::pair<ast::Type*, ast::ExpNode*>> static_attributes;
     std::unordered_map<std::string, std::unique_ptr<ConstFunction>> static_methods;
 
     const Path path;
     const std::string class_name;
 
-    std::map<std::string, ClassAttributeType> all_attributes;
+    std::map<std::string, ClassMemberCategory> all_members;
 
-    ClassAttributeType get_attribute(const std::string& name) {
-        auto attribute_type = this->all_attributes.find(name);
-        if (attribute_type == this->all_attributes.end()) {
-            return ClassAttributeType::not_found;
+    ClassMemberCategory get_member(const std::string& name) {
+        auto member_cat = this->all_members.find(name);
+        if (member_cat == this->all_members.end()) {
+            return ClassMemberCategory::not_found;
         }
-        return attribute_type->second;
+        return member_cat->second;
     }
 
     InstanceMethod& get_method(const std::string& name) {
@@ -65,8 +65,8 @@ public:
         return *this->static_methods[name];
     }
 
-    Entity& get_member(const std::string& name) {
-        return *this->member_entities[name];
+    Entity& get_attribute(const std::string& name) {
+        return *this->attribute_entities[name];
     }
 
     ~ConcreteClass();

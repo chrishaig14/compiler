@@ -248,14 +248,14 @@ ModuleChecker::instantiate_generic(const TemplateClassInfo& generic, const ast::
     auto concrete = std::make_unique<ConcreteClass>(generic.class_name, generic.path);
     concrete->methods = std::move(concrete_methods);
     concrete->static_methods = std::move(concrete_static_methods);
-    concrete->member_names = generic.member_names;
-    concrete->member_types = concrete_field_types;
+    concrete->attribute_names = generic.member_names;
+    concrete->attribute_types = concrete_field_types;
     for (size_t i = 0; i < generic.member_names.size(); i++) {
         std::string mn = generic.member_names[i];
         concrete->members[mn] = concrete_field_types[i];
         sem::Type* u = concrete_field_types[i]->to_sem();
         this->module.fill_actual(*u);
-        concrete->member_entities[mn] = this->make_value(u);
+        concrete->attribute_entities[mn] = this->make_value(u);
         // std::make_unique<EntityNothing>();
     }
     return concrete;

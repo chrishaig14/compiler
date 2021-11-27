@@ -10,15 +10,15 @@ bool ConcreteClass::operator!=(const ConcreteClass& b) const {
 }
 
 bool ConcreteClass::operator==(const ConcreteClass& b) const {
-    if (this->member_names != b.member_names) {
+    if (this->attribute_names != b.attribute_names) {
         return false;
     }
-    if (this->member_types.size() != b.member_types.size()) {
+    if (this->attribute_types.size() != b.attribute_types.size()) {
         return false;
     }
 
-    for (size_t i = 0; i < this->member_types.size(); i++) {
-        if (this->member_types[i] != b.member_types[i]) {
+    for (size_t i = 0; i < this->attribute_types.size(); i++) {
+        if (this->attribute_types[i] != b.attribute_types[i]) {
             return false;
         }
     }

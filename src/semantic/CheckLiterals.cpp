@@ -87,7 +87,7 @@ UExpressionInfo ModuleChecker::visit_tuple(const ast::Tuple& node) {
         auto tv = this->make_value(otype->object().type_params[i]->clone());
         const std::string& mem_name = std::to_string(i + 1);
         clazz->members[mem_name] = tv->type.to_ast();
-        clazz->member_entities[mem_name] = std::move(tv);
+        clazz->attribute_entities[mem_name] = std::move(tv);
     }
     auto ov = std::make_unique<EntityValue>(otype, clazz);
     sinfo.set_entity(std::move(ov));
@@ -203,7 +203,7 @@ UExpressionInfo ModuleChecker::visit_defconst(const ast::DefaultConstructor& nod
 
         ConcreteClass& cls = entity.get_class().clazz;
         sem::VectorOfTypes t;
-        for (auto* pt: cls.member_types) {
+        for (auto* pt: cls.attribute_types) {
             t.push_back(pt->to_sem());
         }
         sem::VectorOfTypes tp;

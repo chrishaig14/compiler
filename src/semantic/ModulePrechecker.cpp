@@ -188,13 +188,13 @@ void ModulePrechecker::visit_class(ast::ConcreteClassDef& node) {
     ConcreteClass* class_info = &this->module.members.at(node.class_name)->klass();
     for (const auto& mt: node.members) {
         // this->module.fill_actual(*mt.second);
-        class_info->member_names.push_back(mt.id);
-        class_info->member_types.push_back(mt.type->clone());
+        class_info->attribute_names.push_back(mt.id);
+        class_info->attribute_types.push_back(mt.type->clone());
         class_info->members[mt.id] = mt.type->clone();
-        class_info->member_entities[mt.id] = std::make_unique<EntityNothing>();
+        class_info->attribute_entities[mt.id] = std::make_unique<EntityNothing>();
     }
     for (const auto& mn: node.static_members) {
-        class_info->static_members[mn.first] = std::make_pair(mn.second.first->clone(), mn.second.second);
+        class_info->static_attributes[mn.first] = std::make_pair(mn.second.first->clone(), mn.second.second);
     }
     for (const auto& f: node.methods) {
         ast::Function& method = *f.second;

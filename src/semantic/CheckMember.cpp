@@ -151,19 +151,19 @@ UExpressionInfo ModuleChecker::class_member(const ast::Member& n, UExpressionInf
     std::string child = n.s_child;
     UExpressionInfo info_u = std::make_unique<ExpressionInfo>();
     ExpressionInfo& info = *info_u;
-    ClassAttributeType att_type = cls.get_attribute(child);
-    switch (att_type) {
-        case ClassAttributeType::not_found: {
-            throw std::runtime_error("Error class no member!");
+    ClassMemberCategory member_cat = cls.get_member(child);
+    switch (member_cat) {
+        case ClassMemberCategory::not_found: {
+            throw std::runtime_error("Error class has no member '" + child + "'");
         }
-        case ClassAttributeType::member: {
-            throw std::runtime_error("Error class no member (it's an instance variable)!");
+        case ClassMemberCategory::attribute: {
+            throw std::runtime_error("Error class no member '" + child + "'(it's an instance variable)!");
         }
-        case ClassAttributeType::static_member: {
-            info.set_entity(entity_from_type(*cls.static_members[child].first));
+        case ClassMemberCategory::static_attribute: {
+            info.set_entity(entity_from_type(*cls.static_attributes[child].first));
             break;
         }
-        case ClassAttributeType::method: {
+        case ClassMemberCategory::method: {
             ConstFunction& bound_method = *cls.methods[child]->func;
             auto* unbound_method = new ConstFunction(bound_method.path,
                                                      sem::UTypeFunction((sem::TypeFunction*) bound_method.const_function_ft.clone()));
@@ -180,7 +180,7 @@ UExpressionInfo ModuleChecker::class_member(const ast::Member& n, UExpressionInf
             info.exp_snode = std::make_unique<sem::Id>(unbound_method->path.as_str());
             break;
         }
-        case ClassAttributeType::static_method: {
+        case ClassMemberCategory::static_method: {
             info.set_entity(std::make_unique<EntityConstFunction>(*cls.static_methods[child]));
             info.exp_snode = std::make_unique<sem::StaticMethod>(cls.path, child);
             break;
