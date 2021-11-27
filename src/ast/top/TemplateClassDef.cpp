@@ -7,12 +7,12 @@
 using namespace ast;
 
 TemplateClassDef::TemplateClassDef(const std::string& className, VectorOfStrings type_parameters,
-                                   std::vector<ast::ClassMember> members,
-                                   std::unordered_map<std::string, ast::UFunctionNode> functions,
-                                   std::map<std::string, std::pair<ast::Type*, ast::ExpNode*>> static_members,
+                                   std::vector<ast::ClassAttribute> attributes,
+                                   std::unordered_map<std::string, ast::UFunctionNode> methods,
+                                   std::map<std::string, std::pair<ast::Type*, ast::ExpNode*>> static_attributes,
                                    std::unordered_map<std::string, ast::UFunctionNode>& static_methods, TextPosition start, TextPosition end)
-        : ast::TopNode(TopNodeType::TEMPLATE_CLS, start, end), members(std::move(members)), static_members(static_members),
-          methods(std::move(functions)), static_methods(std::move(static_methods)), class_name(className) {
+        : ast::TopNode(TopNodeType::TEMPLATE_CLS, start, end), attributes(std::move(attributes)), static_attributes(static_attributes),
+          methods(std::move(methods)), static_methods(std::move(static_methods)), class_name(className) {
     this->type_parameters = type_parameters;
 }
 
@@ -34,20 +34,20 @@ nlohmann::json TemplateClassDef::to_json() const {
     nlohmann::json j;
     j["type"] = "class";
     std::vector<nlohmann::json> memj;
-    for (auto& i : this->members) {
-        memj.push_back({{"id",   i.id},
-                        {"type", i.type->to_json()}});
+    for (auto& attr : this->attributes) {
+        memj.push_back({{"id",   attr.id},
+                        {"type", attr.type->to_json()}});
     }
     nlohmann::json methj;
     for (auto& m: this->methods) {
         methj[m.first] = m.second->to_json();
     }
     nlohmann::json smethj;
-    for (auto& m: this->static_methods) {
-        smethj[m.first] = m.second->to_json();
+    for (auto& meth: this->static_methods) {
+        smethj[meth.first] = meth.second->to_json();
     }
     j["class"] = {{"id",             this->class_name},
-                  {"members",        memj},
+                  {"attributes",        memj},
                   {"methods",        methj},
                   {"static_methods", smethj}};
     return j;

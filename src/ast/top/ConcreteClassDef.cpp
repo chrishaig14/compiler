@@ -13,13 +13,13 @@ using namespace ast;
 //                  TextPosition end);
 
 ConcreteClassDef::ConcreteClassDef(const std::string& className,
-                                   std::vector<ClassMember> members,
+                                   std::vector<ClassAttribute> attributes,
                                    std::unordered_map<std::string, ast::UFunctionNode> functions,
-                                   std::map<std::string, std::pair<ast::Type*, ast::ExpNode*>> static_members,
+                                   std::map<std::string, std::pair<ast::Type*, ast::ExpNode*>> static_attributes,
                                    std::unordered_map<std::string, ast::UFunctionNode>& static_methods,
                                    TextPosition start, TextPosition end) : ast::TopNode(TopNodeType::CONCRETE_CLS, start, end),
-                                                                           members(std::move(members)),
-                                                                           static_members(static_members),
+                                                                           attributes(std::move(attributes)),
+                                                                           static_attributes(static_attributes),
                                                                            methods(std::move(functions)),
                                                                            static_methods(std::move(static_methods)),
                                                                            class_name(className) {
@@ -43,7 +43,7 @@ nlohmann::json ConcreteClassDef::to_json() const {
     nlohmann::json j;
     j["type"] = "class";
     std::vector<nlohmann::json> memj;
-    for (auto& i : this->members) {
+    for (auto& i : this->attributes) {
         memj.push_back({{"id",   i.id},
                         {"type", i.type->to_json()}});
     }
@@ -62,5 +62,5 @@ nlohmann::json ConcreteClassDef::to_json() const {
     return j;
 }
 
-ClassMember::ClassMember(const std::string& id, ast::UTypeNode type) : id(id), type(std::move(type)) {
+ClassAttribute::ClassAttribute(const std::string& id, ast::UTypeNode type) : id(id), type(std::move(type)) {
 }

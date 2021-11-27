@@ -59,11 +59,11 @@ class Foo {
     REQUIRE(clazz->path.as_str() == "main.foo.Foo");
     REQUIRE(clazz->type_params.empty());
 
-    REQUIRE(clazz->members.size() == 2);
-    REQUIRE(clazz->members.count("x") == 1);
-    REQUIRE(*clazz->members["x"] == ast::ObjectType("Integer"));
-    REQUIRE(clazz->members.count("y") == 1);
-    REQUIRE(*clazz->members["y"] == ast::ObjectType("String"));
+    REQUIRE(clazz->attributes.size() == 2);
+    REQUIRE(clazz->attributes.count("x") == 1);
+    REQUIRE(*clazz->attributes["x"] == ast::ObjectType("Integer"));
+    REQUIRE(clazz->attributes.count("y") == 1);
+    REQUIRE(*clazz->attributes["y"] == ast::ObjectType("String"));
 
     REQUIRE(clazz->attribute_entities.size() == 2);
     REQUIRE(clazz->attribute_entities.count("x") == 1);
@@ -112,9 +112,9 @@ class Foo {
     REQUIRE(clazz->path.as_str() == "main.foo.Foo");
     REQUIRE(clazz->type_params.empty());
 
-    REQUIRE(clazz->members.size() == 1);
-    REQUIRE(clazz->members.count("x") == 1);
-    REQUIRE(*clazz->members["x"] == ast::ObjectType("Integer"));
+    REQUIRE(clazz->attributes.size() == 1);
+    REQUIRE(clazz->attributes.count("x") == 1);
+    REQUIRE(*clazz->attributes["x"] == ast::ObjectType("Integer"));
 
     REQUIRE(clazz->attribute_entities.size() == 1);
     REQUIRE(clazz->attribute_entities.count("x") == 1);

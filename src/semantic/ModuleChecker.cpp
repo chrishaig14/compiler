@@ -252,7 +252,7 @@ ModuleChecker::instantiate_generic(const TemplateClassInfo& generic, const ast::
     concrete->attribute_types = concrete_field_types;
     for (size_t i = 0; i < generic.member_names.size(); i++) {
         std::string mn = generic.member_names[i];
-        concrete->members[mn] = concrete_field_types[i];
+        concrete->attributes[mn] = concrete_field_types[i];
         sem::Type* u = concrete_field_types[i]->to_sem();
         this->module.fill_actual(*u);
         concrete->attribute_entities[mn] = this->make_value(u);

@@ -19,17 +19,17 @@ class ast::ConcreteClassDef : public ast::TopNode {
 public:
 
     bool equal(const ast::TopNode& other) const override;
-    ConcreteClassDef(const std::string& className, std::vector<ClassMember> members,
+    ConcreteClassDef(const std::string& className, std::vector<ClassAttribute> attributes,
                      std::unordered_map<std::string, ast::UFunctionNode> functions,
-                     std::map<std::string, std::pair<ast::Type*, ast::ExpNode*>> static_members,
+                     std::map<std::string, std::pair<ast::Type*, ast::ExpNode*>> static_attributes,
                      std::unordered_map<std::string, ast::UFunctionNode>& static_methods, TextPosition start,
                      TextPosition end);
     ~ConcreteClassDef() override;
     nlohmann::json to_json() const override;
 
-    std::vector<ast::ClassMember> members;
-    std::map<std::string, std::pair<ast::Type*, ast::ExpNode*>> static_members;
-    VectorOfStrings members_ordered;
+    std::vector<ast::ClassAttribute> attributes;
+    std::map<std::string, std::pair<ast::Type*, ast::ExpNode*>> static_attributes;
+    VectorOfStrings attributes_ordered;
     std::unordered_map<std::string, ast::UFunctionNode> methods;
     std::unordered_map<std::string, ast::UFunctionNode> static_methods;
 

@@ -86,7 +86,7 @@ UExpressionInfo ModuleChecker::visit_tuple(const ast::Tuple& node) {
     for (size_t i = 0; i < otype->object().type_params.size(); i++) {
         auto tv = this->make_value(otype->object().type_params[i]->clone());
         const std::string& mem_name = std::to_string(i + 1);
-        clazz->members[mem_name] = tv->type.to_ast();
+        clazz->attributes[mem_name] = tv->type.to_ast();
         clazz->attribute_entities[mem_name] = std::move(tv);
     }
     auto ov = std::make_unique<EntityValue>(otype, clazz);

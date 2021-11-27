@@ -38,7 +38,7 @@ public:
     std::vector<ast::Type*> attribute_types;
     std::unordered_map<std::string, std::unique_ptr<Entity>> attribute_entities;
 
-    MapStringType members;
+    MapStringType attributes;
     std::unordered_map<std::string, std::unique_ptr<InstanceMethod>> methods;
 
     std::map<std::string, std::pair<ast::Type*, ast::ExpNode*>> static_attributes;

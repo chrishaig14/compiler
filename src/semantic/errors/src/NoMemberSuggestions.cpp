@@ -9,7 +9,7 @@ using namespace error;
 std::string NoMemberSuggestions::to_str(const CodeLines& code) const {
     std::string s = "Error no member: " + this->m.s_child + " candidates are: \n";
 
-    for (auto& mm: this->clazz.members) {
+    for (auto& mm: this->clazz.attributes) {
         s += mm.first + mm.second->to_string() + "\n";
     }
 

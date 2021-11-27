@@ -75,14 +75,14 @@ std::unique_ptr<sem::KlassDef> ModuleChecker::visit_class(ast::ConcreteClassDef&
     std::string cn = node.class_name;
     ast::VectorOfTypes members_ordered_types;
     VectorOfStrings member_types;
-    for (const auto& mt: node.members) {
+    for (const auto& mt: node.attributes) {
         ast::Type& t = *mt.type;
         members_ordered_types.push_back(&t);
         this->assert_type_exists(t, node.start);
         member_types.push_back(t.to_string());
     }
-    auto sn = std::make_unique<sem::KlassDef>(node.class_name, node.members_ordered);
-    sn->member_types = member_types;
+    auto sn = std::make_unique<sem::KlassDef>(node.class_name, node.attributes_ordered);
+    sn->attribute_types = member_types;
     this->add_this = true;
     // this->this_entity = std::unique_ptr<Entity>(this->entity_value_from_actual_base_path_no_generic(Path(this->module.path,
     //                                                                                                      node.class_name)).clone());
@@ -165,14 +165,14 @@ std::unique_ptr<sem::TemplateKlassDef> ModuleChecker::visit_template_class(ast::
     std::string cn = node.class_name;
     ast::VectorOfTypes members_ordered_types;
     VectorOfStrings member_types;
-    for (const auto& mt: node.members) {
+    for (const auto& mt: node.attributes) {
         ast::Type& t = *mt.type;
         members_ordered_types.push_back(&t);
         this->assert_type_exists(t, node.start);
         member_types.push_back(t.to_string());
     }
-    auto sn = std::make_unique<sem::TemplateKlassDef>(node.class_name, node.members_ordered);
-    sn->member_types = member_types;
+    auto sn = std::make_unique<sem::TemplateKlassDef>(node.class_name, node.aatributes_ordered);
+    sn->attribute_types = member_types;
     this->add_this = true;
     // this->this_entity = std::unique_ptr<Entity>(this->entity_value_from_actual_base_path_no_generic(Path(this->module.path,
     //                                                                                                      node.class_name)).clone());

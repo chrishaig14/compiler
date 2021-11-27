@@ -438,7 +438,7 @@ TEST_CASE("nodes_class_full", "[class]") {
                             cstatic_methods,
                             DUMMY_POS,
                             DUMMY_POS);
-    n.members_ordered = members_ordered;
+    n.attributes_ordered = members_ordered;
     nlohmann::json nj = n.to_json();
 
 

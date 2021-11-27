@@ -43,7 +43,7 @@ namespace ast {
 
     class UnaryOp;
 
-    class ClassMember;
+    class ClassAttribute;
 
     class BoolOp;
 
@@ -123,11 +123,11 @@ namespace ast {
 
 }
 
-class ast::ClassMember {
+class ast::ClassAttribute {
 public:
     std::string id;
     ast::UTypeNode type;
-    ClassMember(const std::string& id, ast::UTypeNode type);
+    ClassAttribute(const std::string& id, ast::UTypeNode type);
 };
 
 

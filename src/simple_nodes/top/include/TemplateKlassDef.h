@@ -13,12 +13,12 @@
 class sem::TemplateKlassDef : public sem::Top {
 public:
     std::string identifier;
-    VectorOfStrings members;
-    VectorOfStrings member_types;
+    VectorOfStrings attributes;
+    VectorOfStrings attribute_types;
     std::vector<std::unique_ptr<sem::FunctionDef>> methods;
     std::vector<std::unique_ptr<sem::FunctionDef>> static_methods;
 
-    TemplateKlassDef(std::string identifier, VectorOfStrings members);
+    TemplateKlassDef(std::string identifier, VectorOfStrings attributes);
 
     bool equals(const Top& o) const override;
 };

@@ -53,7 +53,7 @@ std::string MyErrorFormatter::format(const error::NoMemberSuggestions& err) cons
     std::string msg = this->context_string(err.m.start) + "Error::NoMember: '" + err.m.s_child + "' in class " +
                       err.clazz.class_name + "'" + this->code_context_string(err.m.start);
     msg += "\ncandidates are:\n";
-    for (auto& m: err.clazz.members) {
+    for (auto& m: err.clazz.attributes) {
         msg += m.first + " : " + m.second->to_string() + "\n";
     }
     for (auto& m: err.clazz.methods) {

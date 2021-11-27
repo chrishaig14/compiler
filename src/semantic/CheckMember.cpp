@@ -97,8 +97,8 @@ UExpressionInfo ModuleChecker::object_member(sem::UExp object_snode, EntityValue
     }
     const ConcreteClass* clazz = p_value.clazz;
     assert(clazz != nullptr);
-    if (clazz->members.count(child) != 0) {
-        sem::Type* type = clazz->members.at(child)->to_sem();
+    if (clazz->attributes.count(child) != 0) {
+        sem::Type* type = clazz->attributes.at(child)->to_sem();
         this->module.fill_actual(*type);
         info.set_entity(this->make_value(type));
         if (info.entity.get().is_nothing()) {

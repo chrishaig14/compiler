@@ -186,15 +186,15 @@ void ModulePrechecker::check_duplicated_names(ast::Module& node) {
 
 void ModulePrechecker::visit_class(ast::ConcreteClassDef& node) {
     ConcreteClass* class_info = &this->module.members.at(node.class_name)->klass();
-    for (const auto& mt: node.members) {
+    for (const auto& attr: node.attributes) {
         // this->module.fill_actual(*mt.second);
-        class_info->attribute_names.push_back(mt.id);
-        class_info->attribute_types.push_back(mt.type->clone());
-        class_info->members[mt.id] = mt.type->clone();
-        class_info->attribute_entities[mt.id] = std::make_unique<EntityNothing>();
+        class_info->attribute_names.push_back(attr.id);
+        class_info->attribute_types.push_back(attr.type->clone());
+        class_info->attributes[attr.id] = attr.type->clone();
+        class_info->attribute_entities[attr.id] = std::make_unique<EntityNothing>();
     }
-    for (const auto& mn: node.static_members) {
-        class_info->static_attributes[mn.first] = std::make_pair(mn.second.first->clone(), mn.second.second);
+    for (const auto& attr: node.static_attributes) {
+        class_info->static_attributes[attr.first] = std::make_pair(attr.second.first->clone(), attr.second.second);
     }
     for (const auto& f: node.methods) {
         ast::Function& method = *f.second;
@@ -233,14 +233,14 @@ void ModulePrechecker::visit_class(ast::ConcreteClassDef& node) {
 
 void ModulePrechecker::visit_template_class(ast::TemplateClassDef& node) {
     TemplateClassInfo* class_info = &this->module.members.at(node.class_name)->template_klass();
-    for (const auto& mt: node.members) {
+    for (const auto& mt: node.attributes) {
         // this->module.fill_actual(*mt.second);
         class_info->member_names.push_back(mt.id);
         class_info->member_types.push_back(mt.type->clone());
         class_info->members[mt.id] = mt.type->clone();
         class_info->member_entities[mt.id] = std::make_unique<EntityNothing>();
     }
-    for (const auto& mn: node.static_members) {
+    for (const auto& mn: node.static_attributes) {
         class_info->static_members[mn.first] = std::make_pair(mn.second.first->clone(), mn.second.second);
     }
     for (const auto& f: node.methods) {

@@ -193,14 +193,14 @@ PythonOutputCode PythonModuleTranspiler::transpile_class(const sem::KlassDef& no
     std::string code;
     code += "class " + class_name + ":\n";
     std::string def = "def __init__(self, ";
-    for (const auto& m: node.members) {
+    for (const auto& m: node.attributes) {
         def += m + ", ";
     }
     def += "):\n";
     std::string block;
-    for (size_t i = 0; i < node.members.size(); i++) {
-        auto m = node.members[i];
-        block += "self." + m + " = " + m + " #" + node.member_types[i] + "\n";
+    for (size_t i = 0; i < node.attributes.size(); i++) {
+        auto m = node.attributes[i];
+        block += "self." + m + " = " + m + " #" + node.attribute_types[i] + "\n";
     }
     block = indent_paragraph(block, 4);
 

@@ -970,10 +970,10 @@ std::unique_ptr<ast::TopNode> Parser::parse_class_definition() {
     this->expect_token(TokType::LCURLY);
     std::unordered_map<std::string, ast::UFunctionNode> methods;
     std::unordered_map<std::string, ast::UFunctionNode> static_methods;
-    std::vector<ast::ClassMember> members;
-    std::set<std::string> member_names;
-    std::map<std::string, std::pair<ast::Type*, ast::ExpNode*>> static_members;
-    VectorOfStrings members_ordered;
+    std::vector<ast::ClassAttribute> attributes;
+    std::set<std::string> attribute_names;
+    std::map<std::string, std::pair<ast::Type*, ast::ExpNode*>> static_attributes;
+    VectorOfStrings attributes_ordered;
     while (true) {
         bool is_static = false;
         if (this->match(TokType::STATIC)) {
@@ -981,20 +981,20 @@ std::unique_ptr<ast::TopNode> Parser::parse_class_definition() {
             is_static = true;
         }
         if (this->match(TokType::ID)) {
-            Token member_name_tk = this->expect_token(TokType::ID);
+            Token attribute_name_tk = this->expect_token(TokType::ID);
             this->expect_token(TokType::COLON);
-            ast::UTypeNode member_type = this->parse_type_node();
-            std::string& member_name = member_name_tk.str;
-            if (member_names.find(member_name) != member_names.end() || methods.find(member_name) != methods.end()) {
-                this->error_class_member_redefined(class_name, member_name, member_name_tk.start);
+            ast::UTypeNode attribute_type = this->parse_type_node();
+            std::string& attribute_name = attribute_name_tk.str;
+            if (attribute_names.find(attribute_name) != attribute_names.end() || methods.find(attribute_name) != methods.end()) {
+                this->error_class_member_redefined(class_name, attribute_name, attribute_name_tk.start);
             }
             if (is_static) {
                 this->expect_token(TokType::EQQ);
                 auto init_expression = this->parse_expression();
-                static_members[member_name] = std::make_pair(member_type.release(), init_expression.release());
+                static_attributes[attribute_name] = std::make_pair(attribute_type.release(), init_expression.release());
             } else {
-                members.emplace_back(ast::ClassMember(member_name, std::move(member_type)));
-                members_ordered.push_back(member_name);
+                attributes.emplace_back(ast::ClassAttribute(attribute_name, std::move(attribute_type)));
+                attributes_ordered.push_back(attribute_name);
             }
             this->expect_token(TokType::SEMICOLON);
         } else if (this->match(TokType::WHERE)) {
@@ -1014,7 +1014,7 @@ std::unique_ptr<ast::TopNode> Parser::parse_class_definition() {
             // std::cout << ft->to_json() << std::endl;
             auto method_node = this->parse_function_definition();
             std::string& method_name = method_node->identifier;
-            if (member_names.find(method_name) != member_names.end() || methods.find(method_name) != methods.end()) {
+            if (attribute_names.find(method_name) != attribute_names.end() || methods.find(method_name) != methods.end()) {
                 this->error_class_member_redefined(class_name, method_name, method_node->start);
             }
             if (is_static) {
@@ -1027,7 +1027,7 @@ std::unique_ptr<ast::TopNode> Parser::parse_class_definition() {
         } else if (this->match(TokType::FUN)) {
             auto method_node = this->parse_function_definition();
             std::string& method_name = method_node->identifier;
-            if (member_names.find(method_name) != member_names.end() || methods.find(method_name) != methods.end()) {
+            if (attribute_names.find(method_name) != attribute_names.end() || methods.find(method_name) != methods.end()) {
                 this->error_class_member_redefined(class_name, method_name, method_node->start);
             }
             if (is_static) {
@@ -1044,25 +1044,25 @@ std::unique_ptr<ast::TopNode> Parser::parse_class_definition() {
         // it's a template class
         auto d = std::make_unique<ast::TemplateClassDef>(class_name,
                                                          type_parameters,
-                                                         std::move(members),
+                                                         std::move(attributes),
                                                          std::move(methods),
-                                                         static_members,
+                                                         static_attributes,
                                                          static_methods,
                                                          class_tok.start,
                                                          end.end_pos);
-        d->members_ordered = members_ordered;
+        d->aatributes_ordered = attributes_ordered;
         d->start = class_tok.start;
         return d;
     } else {
         // it's a concrete class
         auto d = std::make_unique<ast::ConcreteClassDef>(class_name,
-                                                         std::move(members),
+                                                         std::move(attributes),
                                                          std::move(methods),
-                                                         static_members,
+                                                         static_attributes,
                                                          static_methods,
                                                          class_tok.start,
                                                          end.end_pos);
-        d->members_ordered = members_ordered;
+        d->attributes_ordered = attributes_ordered;
         d->start = class_tok.start;
         return d;
         return nullptr;

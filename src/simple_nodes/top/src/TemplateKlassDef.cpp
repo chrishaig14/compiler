@@ -11,17 +11,17 @@ bool TemplateKlassDef::equals(const Top& o) const {
     if (this->identifier != other.identifier) {
         return false;
     }
-    if (this->members.size() != other.members.size()) {
+    if (this->attributes.size() != other.attributes.size()) {
         return false;
     }
-    for (size_t i = 0; i < this->members.size(); i++) {
-        if (this->members[i] != other.members[i]) {
+    for (size_t i = 0; i < this->attributes.size(); i++) {
+        if (this->attributes[i] != other.attributes[i]) {
             return false;
         }
     }
     return true;
 }
 
-TemplateKlassDef::TemplateKlassDef(std::string identifier, VectorOfStrings members)
-        : Top(TopType::CLASS), identifier(identifier), members(members) {
+TemplateKlassDef::TemplateKlassDef(std::string identifier, VectorOfStrings attributes)
+        : Top(TopType::CLASS), identifier(identifier), attributes(attributes) {
 }

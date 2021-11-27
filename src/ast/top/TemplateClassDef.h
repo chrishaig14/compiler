@@ -19,17 +19,17 @@ public:
 
     bool equal(const ast::TopNode& other) const override;
     TemplateClassDef(const std::string& className, VectorOfStrings type_parameters,
-                     std::vector<ast::ClassMember> members,
-                     std::unordered_map<std::string, ast::UFunctionNode> functions,
-                     std::map<std::string, std::pair<ast::Type*, ast::ExpNode*>> static_members,
+                     std::vector<ast::ClassAttribute> attributes,
+                     std::unordered_map<std::string, ast::UFunctionNode> methods,
+                     std::map<std::string, std::pair<ast::Type*, ast::ExpNode*>> static_attributes,
                      std::unordered_map<std::string, ast::UFunctionNode>& static_methods, TextPosition start,
                      TextPosition end);
     ~TemplateClassDef() override;
     nlohmann::json to_json() const override;
 
-    std::vector<ast::ClassMember> members;
-    std::map<std::string, std::pair<ast::Type*, ast::ExpNode*>> static_members;
-    VectorOfStrings members_ordered;
+    std::vector<ast::ClassAttribute> attributes;
+    std::map<std::string, std::pair<ast::Type*, ast::ExpNode*>> static_attributes;
+    VectorOfStrings aatributes_ordered;
     std::unordered_map<std::string, ast::UFunctionNode> methods;
     std::unordered_map<std::string, ast::UFunctionNode> static_methods;
 
