@@ -6,10 +6,12 @@
 
 using namespace ast;
 
-Instance::Instance(const std::string& id, ast::UObjectType base_type, std::unordered_map<std::string, ast::UFunctionNode> methods,
-                   TextPosition start, TextPosition end) : ast::TopNode(TopNodeType::INSTANCE, start, end), id(id),
-                                                           base_type(std::move(base_type)),
-                                                           methods(std::move(methods)) {
+Instance::Instance(const std::string& id, ast::UObjectType base_type,
+                   std::unordered_map<std::string, ast::UFunctionNode> methods,
+                   std::unordered_map<std::string, ast::UFunctionNode> static_methods, TextPosition start,
+                   TextPosition end) : ast::TopNode(TopNodeType::INSTANCE, start, end), id(id),
+                                       base_type(std::move(base_type)), methods(std::move(methods)),
+                                       static_methods(std::move(static_methods)) {
 
 }
 

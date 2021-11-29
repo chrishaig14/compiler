@@ -6,6 +6,7 @@
 #include "CheckMember.h"
 #include <ast/general/ObjectType.h>
 #include <simple_nodes/expressions/include/ObjectMethodFromInstance.h>
+#include <simple_nodes/expressions/include/StaticMethodFromInstance.h>
 #include <simple_nodes/expressions/include/ObjectMember.h>
 #include <simple_nodes/expressions/include/ObjectMethod.h>
 #include <simple_nodes/expressions/include/StaticMethod.h>
@@ -97,40 +98,50 @@ UExpressionInfo ModuleChecker::object_member(sem::UExp object_snode, EntityValue
     }
     const ConcreteClass* clazz = p_value.clazz;
     assert(clazz != nullptr);
-    if (clazz->attributes.count(child) != 0) {
-        sem::Type* type = clazz->attributes.at(child)->to_sem();
-        this->module.fill_actual(*type);
-        info.set_entity(this->make_value(type));
-        if (info.entity.get().is_nothing()) {
-            throw std::runtime_error("This shouldnt be nothing!");
-            // sem::UType p_type(clazz->members.at(child)->to_sem());
-            // this->module.fill_actual(*p_type);
-            // auto eee = this->make_entity_value(*p_type);
-            // info.set_entity(eee->clone());
-            // clazz->member_entities[child] = std::move(eee);
+    auto member_cat = clazz->get_member(child);
+    switch (member_cat) {
+        case ClassMemberCategory::attribute: {
+            sem::Type* type = clazz->attributes.at(child)->to_sem();
+            this->module.fill_actual(*type);
+            info.set_entity(this->make_value(type));
+            if (info.entity.get().is_nothing()) {
+                throw std::runtime_error("This shouldnt be nothing!");
+                // sem::UType p_type(clazz->members.at(child)->to_sem());
+                // this->module.fill_actual(*p_type);
+                // auto eee = this->make_entity_value(*p_type);
+                // info.set_entity(eee->clone());
+                // clazz->member_entities[child] = std::move(eee);
+            }
+            auto omn = std::make_unique<sem::ObjectMember>(std::move(object_snode), clazz->path, child);
+            info.exp_snode = std::move(omn);
+            break;
         }
-        auto omn = std::make_unique<sem::ObjectMember>(std::move(object_snode), clazz->path, child);
-        info.exp_snode = std::move(omn);
-    } else if (clazz->methods.count(child) != 0) {
-        InstanceMethod& im = *clazz->methods.at(child);
+        case ClassMemberCategory::method: {
+            InstanceMethod& im = *clazz->methods.at(child);
 
-        if (im.instance == Path("")) {
-            std::cout << "found method " << child << " for class " << clazz->class_name << " from base class "
-                      << std::endl;
-            info.exp_snode = std::make_unique<sem::ObjectMethod>(std::move(object_snode), clazz->path, child);
-        } else {
-            std::cout << "found method " << child << " for class " << clazz->class_name
-                      << " from instance of typeclass " << im.instance.as_str() << std::endl;
-            info.exp_snode = std::make_unique<sem::ObjectMethodFromInstance>(std::move(object_snode),
-                                                                             std::make_unique<sem::InstanceObject>(im.instance,
-                                                                                                                   clazz->path),
-                                                                             child);
+            if (im.instance == Path("")) {
+                std::cout << "found method " << child << " for class " << clazz->class_name << " from base class "
+                          << std::endl;
+                info.exp_snode = std::make_unique<sem::ObjectMethod>(std::move(object_snode), clazz->path, child);
+                info.set_entity(std::make_unique<EntityConstFunction>(*im.func));
+            } else {
+                std::cout << "found method " << child << " for class " << clazz->class_name
+                          << " from instance of typeclass " << im.instance.as_str() << std::endl;
+                info.exp_snode = std::make_unique<sem::ObjectMethodFromInstance>(std::move(object_snode),
+                                                                                 std::make_unique<sem::InstanceObject>(
+                                                                                         clazz->path,
+                                                                                         im.instance),
+                                                                                 child);
+                info.set_entity(std::make_unique<EntityConstFunction>(*im.func));
+            }
+            break;
         }
-        info.set_entity(std::make_unique<EntityConstFunction>(*clazz->methods.at(child)->func));
-    } else {
-        this->error_reporter.error(std::make_unique<error::NoMemberSuggestions>(p_value.type, n, *clazz));
-        return exp_error_stub();
+        default: {
+            this->error_reporter.error(std::make_unique<error::NoMemberSuggestions>(p_value.type, n, *clazz));
+            return exp_error_stub();
+        }
     }
+
     return info_u;
 }
 
@@ -181,9 +192,26 @@ UExpressionInfo ModuleChecker::class_member(const ast::Member& n, UExpressionInf
             break;
         }
         case ClassMemberCategory::static_method: {
-            info.set_entity(std::make_unique<EntityConstFunction>(*cls.static_methods[child]));
-            info.exp_snode = std::make_unique<sem::StaticMethod>(cls.path, child);
+            InstanceMethod& im = *cls.static_methods.at(child);
+
+            if (im.instance == Path("")) {
+                std::cout << "found method " << child << " for class " << cls.class_name << " from base class "
+                          << std::endl;
+                info.exp_snode = std::make_unique<sem::StaticMethod>(cls.path, child);
+                info.set_entity(std::make_unique<EntityConstFunction>(*im.func));
+            } else {
+                std::cout << "found method " << child << " for class " << cls.class_name
+                          << " from instance of typeclass " << im.instance.as_str() << std::endl;
+                info.exp_snode = std::make_unique<sem::StaticMethodFromInstance>(std::make_unique<sem::InstanceObject>(
+                        cls.path,
+                        im.instance), child);
+                info.set_entity(std::make_unique<EntityConstFunction>(*im.func));
+            }
             break;
+
+            // info.set_entity(std::make_unique<EntityConstFunction>(*cls.static_methods[child]->func));
+            // info.exp_snode = std::make_unique<sem::StaticMethod>(cls.path, child);
+            // break;
         }
     }
     return info_u;

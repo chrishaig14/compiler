@@ -14,7 +14,8 @@ public:
     Path instance_path;
     Path base_type_path;
     std::vector<std::unique_ptr<sem::FunctionDef>> methods;
-    InstanceDef(Path instance_path, Path base_path, std::vector<std::unique_ptr<sem::FunctionDef>> methods);
+    std::vector<std::unique_ptr<sem::FunctionDef>> static_methods;
+    InstanceDef(Path instance_path, Path base_path, std::vector<std::unique_ptr<sem::FunctionDef>> methods,std::vector<std::unique_ptr<sem::FunctionDef>> static_methods);
     bool equals(const Top& o) const override;
 
 };

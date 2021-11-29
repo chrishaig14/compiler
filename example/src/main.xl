@@ -1,37 +1,33 @@
-typeclass Addable[t] {
-    fun add(x:t) -> t
+typeclass Foobar[t] {
+    static fun foobar() -> Integer
+    fun bb()->Integer
 }
-typeclass Stringable[t] {
-    fun to_string()->String
+
+class Baz {
+    value: String
 }
-fun add_list(l: List[t], zero: t) -> t where t::(Addable,Stringable) {
-    var r = zero
-    for x @ l {
-        r = r.add(x)
-        print(r.to_string())
+
+instance Foobar[Baz] {
+    static fun foobar() -> Integer {
+        return 17
     }
-    return r
-}
-
-class Wrap {
-    i: Integer
-}
-
-instance Stringable[Wrap] {
-    fun to_string() -> String {
-        return "Wrap(" + this.i.str() + ")"
+    fun bb() -> Integer{
+        return 11
     }
 }
 
-instance Addable[Wrap] {
-    fun add(other: Wrap) -> Wrap {
-        return #Wrap(this.i + other.i)
-    }
+fun ff(x: t) -> Integer where t::Foobar {
+    return 0
 }
 
 fun main() -> Integer {
-    var l = [#Wrap(11),#Wrap(9)]
-    var r = add_list(l, #Wrap(5))
-    print(r.i.str())
+    var s = Baz.foobar()
+    var b = #Baz("Hello")
+    var z = b.bb()
+    var r = ff(b)
+    print(z.str())
+    print(s.str())
+    print(r.str())
+    print("Hello")
     return 0
 }

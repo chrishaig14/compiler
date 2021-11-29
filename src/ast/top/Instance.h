@@ -16,8 +16,9 @@ public:
     std::string id;
     ast::UObjectType base_type;
     std::unordered_map<std::string, ast::UFunctionNode> methods;
+    std::unordered_map<std::string, ast::UFunctionNode> static_methods;
     Instance(const std::string& id, ast::UObjectType base_type,
-             std::unordered_map<std::string, ast::UFunctionNode> methods, TextPosition start, TextPosition end);
+             std::unordered_map<std::string, ast::UFunctionNode> methods,std::unordered_map<std::string, ast::UFunctionNode> static_methods, TextPosition start, TextPosition end);
     nlohmann::json to_json() const override;
     bool equal(const ast::TopNode& other) const override;
 };

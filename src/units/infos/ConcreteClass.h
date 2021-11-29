@@ -42,14 +42,14 @@ public:
     std::unordered_map<std::string, std::unique_ptr<InstanceMethod>> methods;
 
     std::map<std::string, std::pair<ast::Type*, ast::ExpNode*>> static_attributes;
-    std::unordered_map<std::string, std::unique_ptr<ConstFunction>> static_methods;
+    std::unordered_map<std::string, std::unique_ptr<InstanceMethod>> static_methods;
 
     const Path path;
     const std::string class_name;
 
     std::map<std::string, ClassMemberCategory> all_members;
 
-    ClassMemberCategory get_member(const std::string& name) {
+    ClassMemberCategory get_member(const std::string& name) const {
         auto member_cat = this->all_members.find(name);
         if (member_cat == this->all_members.end()) {
             return ClassMemberCategory::not_found;
@@ -61,7 +61,7 @@ public:
         return *this->methods[name];
     }
 
-    ConstFunction& get_static_method(const std::string& name) {
+    InstanceMethod& get_static_method(const std::string& name) {
         return *this->static_methods[name];
     }
 

@@ -15,6 +15,8 @@ namespace sem {
 
     class InstanceDef;
 
+    class StaticMethodFromInstance;
+
     class Bool;
 
     class ConstFunction;
@@ -125,7 +127,9 @@ namespace sem {
         OBJECT_METHOD,
         CONST_FUNCTION,
         OBJECT_CONSTRUCTOR,
-        STATIC_METHOD, INSTANCE_OBJECT, METHOD_FROM_INSTANCE
+        STATIC_METHOD,
+        INSTANCE_OBJECT,
+        METHOD_FROM_INSTANCE, STATIC_METHOD_FROM_INSTANCE
     };
 
     enum class TopType {

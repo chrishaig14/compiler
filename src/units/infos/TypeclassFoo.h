@@ -19,6 +19,7 @@ public:
     const std::string& id;
     const std::string& gen_type;
     std::map<std::string, sem::UTypeFunction> methods;
+    std::map<std::string, sem::UTypeFunction> static_methods;
     Path path;
     TypeclassFoo(const std::string& id, const std::string& gen_type, Path path);
 };

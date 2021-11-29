@@ -120,7 +120,7 @@ UExpressionInfo ModuleChecker::visit_binop(const ast::BinaryOp& node) {
             this->error_reporter.error(std::make_unique<error::ClassNoMethodForOp>(cls->class_name, fun, node));
             return exp_error_stub();
         }
-        ConstFunction& operator_fun = *operator_fun_it->second;
+        ConstFunction& operator_fun = *operator_fun_it->second->func;
         std::vector<sem::UExp> vv;
         vv.push_back(std::move(left_info_p->exp_snode));
         vv.push_back(std::move(right_snode));
@@ -160,6 +160,16 @@ std::unique_ptr<EntityValue> ModuleChecker::make_value(sem::Type* type) {
                                                                                        std::make_unique<ConstFunction>(
                                                                                                Path(tcf.path, m.first),
                                                                                                sem::UTypeFunction(m.second->clone())));
+                            clazz->all_members[m.first] = ClassMemberCategory::method;
+                        }
+                        for (auto& m:tcf.static_methods) {
+                            clazz->static_methods[m.first] = std::make_unique<InstanceMethod>(tcf.path,
+                                                                                              std::make_unique<ConstFunction>(
+                                                                                                      Path(tcf.path,
+                                                                                                           m.first),
+                                                                                                      sem::UTypeFunction(
+                                                                                                              m.second->clone())));
+                            clazz->all_members[m.first] = ClassMemberCategory::static_method;
                         }
                     }
                 }

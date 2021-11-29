@@ -767,13 +767,23 @@ std::unique_ptr<ast::Instance> Parser::parse_instance() {
     this->expect_token(TokType::RSQUARE);
     this->expect_token(TokType::LCURLY);
     std::unordered_map<std::string, ast::UFunctionNode> methods;
+    std::unordered_map<std::string, ast::UFunctionNode> static_methods;
     while (true) {
+        bool is_static = false;
+        if (this->match(TokType::STATIC)){
+            is_static = true;
+            this->next();
+        }
         if (!this->match(TokType::FUN)) {
             break;
         }
         auto m = this->parse_function_definition();
         std::string id = m->identifier;
-        methods[id] = std::move(m);
+        if (is_static){
+            static_methods[id] = std::move(m);
+        }else{
+            methods[id] = std::move(m);
+        }
         if (!this->match(TokType::FUN)) {
             break;
         }
@@ -782,6 +792,7 @@ std::unique_ptr<ast::Instance> Parser::parse_instance() {
     return std::make_unique<ast::Instance>(id_tok.str,
                                            std::move(ot),
                                            std::move(methods),
+                                           std::move(static_methods),
                                            instance_tok.start,
                                            f_curly.end_pos);
 }
@@ -1138,7 +1149,6 @@ std::unique_ptr<ast::TypeclassAst> Parser::parse_typeclass() {
         if (this->match(TokType::STATIC)) {
             is_static = true;
             this->next();
-            continue;
         }
         if (!this->match(TokType::FUN)) {
             break;

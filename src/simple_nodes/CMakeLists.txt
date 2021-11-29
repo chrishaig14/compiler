@@ -91,6 +91,6 @@ add_library(
         common/src/For.cpp
         common/include/For.h
         expressions/src/StaticMethod.cpp
-        expressions/include/StaticMethod.h expressions/include/InstanceObject.cpp expressions/include/InstanceObject.h expressions/include/ObjectMethodFromInstance.cpp expressions/include/ObjectMethodFromInstance.h top/include/InstanceDef.cpp top/include/InstanceDef.h)
+        expressions/include/StaticMethod.h expressions/include/InstanceObject.cpp expressions/include/InstanceObject.h expressions/include/ObjectMethodFromInstance.cpp expressions/include/ObjectMethodFromInstance.h top/include/InstanceDef.cpp top/include/InstanceDef.h expressions/include/StaticMethodFromInstance.cpp expressions/include/StaticMethodFromInstance.h)
 
 target_link_libraries(simple_nodes common util)

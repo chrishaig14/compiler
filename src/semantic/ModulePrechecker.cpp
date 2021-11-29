@@ -192,9 +192,11 @@ void ModulePrechecker::visit_class(ast::ConcreteClassDef& node) {
         class_info->attribute_types.push_back(attr.type->clone());
         class_info->attributes[attr.id] = attr.type->clone();
         class_info->attribute_entities[attr.id] = std::make_unique<EntityNothing>();
+        class_info->all_members[attr.id] = ClassMemberCategory::attribute;
     }
     for (const auto& attr: node.static_attributes) {
         class_info->static_attributes[attr.first] = std::make_pair(attr.second.first->clone(), attr.second.second);
+        class_info->all_members[attr.first] = ClassMemberCategory::static_attribute;
     }
     for (const auto& f: node.methods) {
         ast::Function& method = *f.second;
@@ -211,6 +213,7 @@ void ModulePrechecker::visit_class(ast::ConcreteClassDef& node) {
                                                   std::make_unique<sem::TypeFunction>(x, sem::UType(p_type)));
         method.path = cf->path;
         class_info->methods.insert(make_pair(f.first, std::make_unique<InstanceMethod>(Path(""), std::move(cf))));
+        class_info->all_members[f.first] = ClassMemberCategory::method;
     }
 
     for (const auto& f: node.static_methods) {
@@ -226,7 +229,9 @@ void ModulePrechecker::visit_class(ast::ConcreteClassDef& node) {
         auto cf = std::make_unique<ConstFunction>(Path(class_info->path, f.first),
                                                   std::make_unique<sem::TypeFunction>(x, sem::UType(p_type)));
         method.path = cf->path;
-        class_info->static_methods.insert(make_pair(f.first, std::move(cf)));
+        class_info->static_methods.insert(make_pair(f.first,
+                                                    std::make_unique<InstanceMethod>(Path(""), std::move(cf))));
+        class_info->all_members[f.first] = ClassMemberCategory::static_method;
     }
 }
 
@@ -309,6 +314,21 @@ void ModulePrechecker::visit_typeclass(ast::TypeclassAst& typeclass) {
         this->module.fill_actual(*p_type);
         auto cf = std::make_unique<sem::TypeFunction>(x, sem::UType(p_type));
         tc->methods[m.first] = std::move(cf);
+    }
+
+    for (auto& m : typeclass.static_methods) {
+        ast::FunctionType& method = *m.second;
+
+        sem::VectorOfTypes x;
+        for (auto& p: method.param_types) {
+            sem::Type* args = p->to_sem();
+            this->module.fill_actual(*args);
+            x.emplace_back(args);
+        }
+        sem::Type* p_type = method.return_type->to_sem();
+        this->module.fill_actual(*p_type);
+        auto cf = std::make_unique<sem::TypeFunction>(x, sem::UType(p_type));
+        tc->static_methods[m.first] = std::move(cf);
     }
 
     this->module.add_typeclass_definition(std::move(tc));
