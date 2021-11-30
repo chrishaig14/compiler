@@ -23,6 +23,8 @@ public:
 
     ConstFunction(const ConstFunction& other) = default;
 
+    ConstFunction& operator=(const ConstFunction& other) = default;
+
     // ConstFunction(const ConstFunction& other);
 
     ~ConstFunction();

@@ -117,7 +117,7 @@ UExpressionInfo ModuleChecker::object_member(sem::UExp object_snode, EntityValue
             break;
         }
         case ClassMemberCategory::method: {
-            InstanceMethod& im = *clazz->methods.at(child);
+            const InstanceMethod& im = clazz->methods.at(child);
 
             if (im.instance == Path("")) {
                 std::cout << "found method " << child << " for class " << clazz->class_name << " from base class "
@@ -175,7 +175,7 @@ UExpressionInfo ModuleChecker::class_member(const ast::Member& n, UExpressionInf
             break;
         }
         case ClassMemberCategory::method: {
-            InstanceMethod& im = *cls.methods[child];
+            InstanceMethod& im = cls.methods.at(child);
             if (im.base.is_static) {
                 if (im.instance == Path("")) {
                     std::cout << "found method " << child << " for class " << cls.class_name << " from base class "

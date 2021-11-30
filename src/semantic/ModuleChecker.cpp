@@ -225,14 +225,14 @@ ModuleChecker::instantiate_generic(const TemplateClassInfo& generic, const ast::
     }
 
 
-    std::unordered_map<std::string, std::unique_ptr<InstanceMethod>> concrete_methods;
+    std::unordered_map<std::string, InstanceMethod> concrete_methods;
     for (const auto& method_cf: generic.methods) {
         ast::UTypeNode t((method_cf.second)->const_function_ft.to_ast());
         ast::UTypeNode concrete_type = make_type(*t, replacements);
         auto tf = (sem::TypeFunction*) concrete_type->to_sem();
         this->module.fill_actual(*tf);
         auto cf = std::make_unique<ConstFunction>(method_cf.second->path, *tf);
-        concrete_methods[method_cf.first] = std::make_unique<InstanceMethod>(Path(""), BaseMethod(false, *cf));
+        concrete_methods.emplace(method_cf.first, InstanceMethod(Path(""), BaseMethod(false, *cf)));
     }
 
     std::unordered_map<std::string, std::unique_ptr<InstanceMethod>> concrete_static_methods;
@@ -241,10 +241,11 @@ ModuleChecker::instantiate_generic(const TemplateClassInfo& generic, const ast::
         ast::UTypeNode concrete_type(make_type(*t, replacements));
         sem::Type* p_type = concrete_type->to_sem();
         this->module.fill_actual(*p_type);
-        concrete_methods[m.first] = std::make_unique<InstanceMethod>(m.second->path,
-                                                                     BaseMethod(true,
-                                                                                ConstFunction(m.second->path,
-                                                                                              (sem::TypeFunction&) *p_type)));
+        concrete_methods.emplace(m.first,
+                                 InstanceMethod(m.second->path,
+                                                BaseMethod(true,
+                                                           ConstFunction(m.second->path,
+                                                                         (sem::TypeFunction&) *p_type))));
     }
 
     auto concrete = std::make_unique<ConcreteClass>(generic.class_name, generic.path);

@@ -14,7 +14,7 @@ std::string NoMemberSuggestions::to_str(const CodeLines& code) const {
     }
 
     for (auto& mm: this->clazz.methods) {
-        s += mm.first + ": " + mm.second->base.func.const_function_ft.to_string() + "\n";
+        s += mm.first + ": " + mm.second.base.func.const_function_ft.to_string() + "\n";
     }
 
     return s;

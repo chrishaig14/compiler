@@ -57,7 +57,7 @@ std::string MyErrorFormatter::format(const error::NoMemberSuggestions& err) cons
         msg += m.first + " : " + m.second->to_string() + "\n";
     }
     for (auto& m: err.clazz.methods) {
-        msg += m.first + " : " + m.second->base.func.const_function_ft.to_string() + "\n";
+        msg += m.first + " : " + m.second.base.func.const_function_ft.to_string() + "\n";
     }
     return msg;
 }

@@ -24,6 +24,12 @@ public:
     }
 
     BaseMethod(const BaseMethod& other) = default;
+
+    BaseMethod& operator=(const BaseMethod& other) {
+        BaseMethod temp(other);
+        std::swap(temp, *this);
+        return *this;
+    }
 };
 
 class InstanceMethod {
@@ -33,6 +39,9 @@ public:
 
     InstanceMethod(Path instance, const BaseMethod& func) : instance(instance), base(func) {
     }
+
+    InstanceMethod& operator=(const InstanceMethod& other) = default;
+    InstanceMethod(const InstanceMethod& other) = default;
 };
 
 
@@ -50,7 +59,7 @@ public:
     std::unordered_map<std::string, std::unique_ptr<Entity>> attribute_entities;
 
     MapStringType attributes;
-    std::unordered_map<std::string, std::unique_ptr<InstanceMethod>> methods;
+    std::unordered_map<std::string, InstanceMethod> methods;
 
     std::map<std::string, std::pair<ast::Type*, ast::ExpNode*>> static_attributes;
 
@@ -67,8 +76,8 @@ public:
         return member_cat->second;
     }
 
-    InstanceMethod& get_method(const std::string& name) {
-        return *this->methods[name];
+    InstanceMethod get_method(const std::string& name) {
+        return this->methods.at(name);
     }
 
     Entity& get_attribute(const std::string& name) {

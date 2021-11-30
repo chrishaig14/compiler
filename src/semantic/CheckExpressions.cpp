@@ -60,7 +60,7 @@ UExpressionInfo ModuleChecker::visit_unary(const ast::UnaryOp& n) {
         this->error_reporter.fail("Error class " + cls->class_name + " does not define the __not__ operator!");
     }
 
-    ConstFunction& subscript_fun = subscript_it->second->base.func;
+    const ConstFunction& subscript_fun = subscript_it->second.base.func;
     std::string sub_fun_path = subscript_fun.path.as_str();
     sem::Type* rtype = subscript_fun.const_function_ft.return_type->clone();
 
@@ -120,11 +120,11 @@ UExpressionInfo ModuleChecker::visit_binop(const ast::BinaryOp& node) {
             this->error_reporter.error(std::make_unique<error::ClassNoMethodForOp>(cls->class_name, fun, node));
             return exp_error_stub();
         }
-        if (not operator_fun_it->second->base.is_static) {
+        if (not operator_fun_it->second.base.is_static) {
             this->error_reporter.error(std::make_unique<error::ClassNoMethodForOp>(cls->class_name, fun, node));
             return exp_error_stub();
         }
-        ConstFunction& operator_fun = operator_fun_it->second->base.func;
+        const ConstFunction& operator_fun = operator_fun_it->second.base.func;
         std::vector<sem::UExp> vv;
         vv.push_back(std::move(left_info_p->exp_snode));
         vv.push_back(std::move(right_snode));
@@ -160,19 +160,19 @@ std::unique_ptr<EntityValue> ModuleChecker::make_value(sem::Type* type) {
                         EntityTypeclass& typec = tc.get_typeclass();
                         TypeclassFoo& tcf = typec.clazz;
                         for (auto& m:tcf.methods) {
-                            clazz->methods[m.first] = std::make_unique<InstanceMethod>(tcf.path,
-                                                                                       BaseMethod(false,
-                                                                                                  ConstFunction(Path(tcf.path,
-                                                                                                                     m.first),
-                                                                                                                *m.second)));
+                            clazz->methods.emplace(m.first,
+                                                   InstanceMethod(tcf.path,
+                                                                  BaseMethod(false,
+                                                                             ConstFunction(Path(tcf.path, m.first),
+                                                                                           *m.second))));
                             clazz->all_members[m.first] = ClassMemberCategory::method;
                         }
                         for (auto& m:tcf.static_methods) {
-                            clazz->methods[m.first] = std::make_unique<InstanceMethod>(tcf.path,
-                                                                                       BaseMethod(true,
-                                                                                                  ConstFunction(Path(tcf.path,
-                                                                                                                     m.first),
-                                                                                                                *m.second)));
+                            clazz->methods.emplace(m.first,
+                                                   InstanceMethod(tcf.path,
+                                                                  BaseMethod(true,
+                                                                             ConstFunction(Path(tcf.path, m.first),
+                                                                                           *m.second))));
                             clazz->all_members[m.first] = ClassMemberCategory::method;
                         }
                     }
@@ -234,7 +234,7 @@ UExpressionInfo ModuleChecker::visit_subscript(const ast::Subscript& node) {
         this->error_reporter.error(std::make_unique<error::ObjectNoSpecialMethod>(value.type, "__get_item__", node));
         return exp_error_stub();
     }
-    ConstFunction& subscript_fun = subscript_it->second->base.func;
+    auto& subscript_fun = subscript_it->second.base.func;
     std::string sub_fun_path = subscript_fun.path.as_str();
 
     if (node.child.size() > 1) {
