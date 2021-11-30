@@ -214,9 +214,8 @@ UExpressionInfo ModuleChecker::visit_defconst(const ast::DefaultConstructor& nod
         }
         auto* rt = new sem::TypeObject(cls.class_name, tp, cls.path);
         info.set_entity(std::make_unique<EntityConstFunction>(*new ConstFunction(Path(),
-                                                                                 std::make_unique<sem::TypeFunction>(t,
-                                                                                                                     sem::UType(
-                                                                                                                             rt)))));
+                                                                                 sem::TypeFunction(t,
+                                                                                                   sem::UType(rt)))));
         info.exp_snode = std::make_unique<sem::ObjectConstructor>(cls.path);
     } else {
         TemplateClassInfo& tci = entity.get_template_class().clazz;
@@ -232,9 +231,8 @@ UExpressionInfo ModuleChecker::visit_defconst(const ast::DefaultConstructor& nod
         }
         auto* rt = new sem::TypeObject(tci.class_name, tp, tci.path);
         info.set_entity(std::make_unique<EntityConstFunction>(*new ConstFunction(Path(),
-                                                                                 std::make_unique<sem::TypeFunction>(t,
-                                                                                                                     sem::UType(
-                                                                                                                             rt)))));
+                                                                                 sem::TypeFunction(t,
+                                                                                                   sem::UType(rt)))));
         info.exp_snode = std::make_unique<sem::ObjectConstructor>(tci.path);
     }
     return info_u;

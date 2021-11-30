@@ -13,6 +13,16 @@ class sem::TypeFunction : public sem::Type {
 public:
     TypeFunction(sem::VectorOfTypes parameterTypes, sem::UType returnType);
 
+    TypeFunction(const TypeFunction& other) : Type(other) {
+        this->return_type = sem::UType(other.return_type->clone());
+        this->kind = Kind::FUNCTION;
+        this->generic = other.generic;
+        this->is_generic_param = other.is_generic_param;
+        for (auto& pt: other.param_types) {
+            this->param_types.emplace_back(pt->clone());
+        }
+    }
+
     bool equal(const sem::Type& other) const override;
 
     std::string to_string() const override;

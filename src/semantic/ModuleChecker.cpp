@@ -231,7 +231,7 @@ ModuleChecker::instantiate_generic(const TemplateClassInfo& generic, const ast::
         ast::UTypeNode concrete_type = make_type(*t, replacements);
         auto tf = (sem::TypeFunction*) concrete_type->to_sem();
         this->module.fill_actual(*tf);
-        auto cf = std::make_unique<ConstFunction>(method_cf.second->path, sem::UTypeFunction(tf));
+        auto cf = std::make_unique<ConstFunction>(method_cf.second->path, *tf);
         concrete_methods[method_cf.first] = std::make_unique<InstanceMethod>(Path(""),
                                                                              std::make_unique<BaseMethod>(false,
                                                                                                           std::move(cf)));
@@ -247,8 +247,7 @@ ModuleChecker::instantiate_generic(const TemplateClassInfo& generic, const ast::
                                                                      std::make_unique<BaseMethod>(true,
                                                                                                   std::make_unique<ConstFunction>(
                                                                                                           m.second->path,
-                                                                                                          sem::UTypeFunction(
-                                                                                                                  (sem::TypeFunction*) p_type))));
+                                                                                                          (sem::TypeFunction&) *p_type)));
     }
 
     auto concrete = std::make_unique<ConcreteClass>(generic.class_name, generic.path);

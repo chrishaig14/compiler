@@ -192,8 +192,7 @@ UExpressionInfo ModuleChecker::class_member(const ast::Member& n, UExpressionInf
                 }
             } else {
                 ConstFunction& bound_method = *im.base->func;
-                auto* unbound_method = new ConstFunction(bound_method.path,
-                                                         sem::UTypeFunction((sem::TypeFunction*) bound_method.const_function_ft.clone()));
+                auto* unbound_method = new ConstFunction(bound_method.path, bound_method.const_function_ft);
                 ast::VectorOfTypes tp;
                 for (auto tt: cls.type_params) {
                     ast::ObjectType* t = new ast::ObjectType(tt);

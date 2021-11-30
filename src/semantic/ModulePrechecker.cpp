@@ -75,10 +75,9 @@ void ModulePrechecker::visit_function(ast::Function& node) {
     }
     auto rt = sem::UType(node.return_type->to_sem());
     this->module.fill_actual(*rt);
-    auto function_info = std::make_unique<sem::TypeFunction>(std::move(x), std::move(rt));
+    auto function_info = sem::TypeFunction(std::move(x), std::move(rt));
     Path function_path = Path(this->module.path, node.identifier);
-    auto const_function = std::make_unique<ConstFunction>(Path(this->module.path, node.identifier),
-                                                          std::move(function_info));
+    auto const_function = std::make_unique<ConstFunction>(Path(this->module.path, node.identifier), function_info);
     for (auto& c: node.constraints) {
         for (auto& t: c.second) {
             const_function->constraints[c.first].insert(Path(this->module.path, t).as_str());
@@ -90,8 +89,8 @@ void ModulePrechecker::visit_function(ast::Function& node) {
 
 std::unique_ptr<Enum> make_enum(ast::EnumNode& n, Path module_path) {
     auto enumm = std::make_unique<Enum>(n.id, Path(module_path, n.id), n.values);
-    enumm->functions["__eq__"] = std::make_unique<ConstFunction>(Path(enumm->path, "__eq__"), nullptr);
-    enumm->functions["__ne__"] = std::make_unique<ConstFunction>(Path(enumm->path, "__ne__"), nullptr);
+    // enumm->functions["__eq__"] = std::make_unique<ConstFunction>(Path(enumm->path, "__eq__"), sem::F);
+    // enumm->functions["__ne__"] = std::make_unique<ConstFunction>(Path(enumm->path, "__ne__"), nullptr);
     return enumm;
 }
 
@@ -210,7 +209,7 @@ void ModulePrechecker::visit_class(ast::ConcreteClassDef& node) {
         sem::Type* p_type = method.return_type->to_sem();
         this->module.fill_actual(*p_type);
         auto cf = std::make_unique<ConstFunction>(Path(class_info->path, f.first),
-                                                  std::make_unique<sem::TypeFunction>(x, sem::UType(p_type)));
+                                                  sem::TypeFunction(x, sem::UType(p_type)));
         method.path = cf->path;
         class_info->methods.insert(make_pair(f.first,
                                              std::make_unique<InstanceMethod>(Path(""),
@@ -230,7 +229,7 @@ void ModulePrechecker::visit_class(ast::ConcreteClassDef& node) {
         sem::Type* p_type = method.return_type->to_sem();
         this->module.fill_actual(*p_type);
         auto cf = std::make_unique<ConstFunction>(Path(class_info->path, f.first),
-                                                  std::make_unique<sem::TypeFunction>(x, sem::UType(p_type)));
+                                                  sem::TypeFunction(x, sem::UType(p_type)));
         method.path = cf->path;
         class_info->methods.insert(make_pair(f.first,
                                              std::make_unique<InstanceMethod>(Path(""),
@@ -265,7 +264,7 @@ void ModulePrechecker::visit_template_class(ast::TemplateClassDef& node) {
         sem::Type* p_type = method.return_type->to_sem();
         this->module.fill_actual(*p_type);
         auto cf = std::make_unique<ConstFunction>(Path(class_info->path, f.first),
-                                                  std::make_unique<sem::TypeFunction>(x, sem::UType(p_type)));
+                                                  sem::TypeFunction(x, sem::UType(p_type)));
         method.path = cf->path;
         class_info->methods.insert(make_pair(f.first, std::move(cf)));
     }
@@ -281,7 +280,7 @@ void ModulePrechecker::visit_template_class(ast::TemplateClassDef& node) {
         sem::Type* p_type = method.return_type->to_sem();
         this->module.fill_actual(*p_type);
         auto cf = std::make_unique<ConstFunction>(Path(class_info->path, f.first),
-                                                  std::make_unique<sem::TypeFunction>(x, sem::UType(p_type)));
+                                                  sem::TypeFunction(x, sem::UType(p_type)));
         method.path = cf->path;
         class_info->static_methods.insert(make_pair(f.first, std::move(cf)));
     }

@@ -27,10 +27,24 @@ public:
 
     explicit TypeObject(const std::string& identifier);
 
+    TypeObject(const TypeObject& other)  : Type(other) {
+        this->id = other.id;
+        this->typeclasses = other.typeclasses;
+        this->data.actual_base_path = other.data.actual_base_path;
+        this->data.aliased_type = other.data.aliased_type != nullptr ? other.data.aliased_type->clone() : nullptr;
+        for (auto& tp: other.type_params) {
+            this->type_params.push_back(tp->clone());
+        }
+        this->generic = other.generic;
+        this->is_generic_param = other.is_generic_param;
+        this->kind = Kind::OBJECT;
+    }
+
     bool equal(const sem::Type& other) const override;
 
     std::string to_string() const override;
     std::string actual_to_string() const override;
+
 
     sem::Type* clone() const override;
     ast::Type* to_ast() const override;

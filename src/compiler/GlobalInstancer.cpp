@@ -13,8 +13,7 @@ void GlobalInstancer::add_instance_to_class(ConcreteClass& clazz, Path instance)
                                                                                                std::make_unique<ConstFunction>(
                                                                                                        Path(typeclass.path,
                                                                                                             m.first),
-                                                                                                       sem::UTypeFunction(
-                                                                                                               m.second->clone()))));
+                                                                                                       *m.second)));
         clazz.all_members[m.first] = ClassMemberCategory::method;
     }
     for (auto& m: typeclass.static_methods) {
@@ -23,8 +22,7 @@ void GlobalInstancer::add_instance_to_class(ConcreteClass& clazz, Path instance)
                                                                                                std::make_unique<ConstFunction>(
                                                                                                        Path(typeclass.path,
                                                                                                             m.first),
-                                                                                                       sem::UTypeFunction(
-                                                                                                               m.second->clone()))));
+                                                                                                       *m.second)));
         clazz.all_members[m.first] = ClassMemberCategory::method;
     }
     // for (auto& m: ) {

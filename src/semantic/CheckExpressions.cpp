@@ -166,8 +166,7 @@ std::unique_ptr<EntityValue> ModuleChecker::make_value(sem::Type* type) {
                                                                                                std::make_unique<ConstFunction>(
                                                                                                        Path(tcf.path,
                                                                                                             m.first),
-                                                                                                       sem::UTypeFunction(
-                                                                                                               m.second->clone()))));
+                                                                                                       *m.second)));
                             clazz->all_members[m.first] = ClassMemberCategory::method;
                         }
                         for (auto& m:tcf.static_methods) {
@@ -176,8 +175,7 @@ std::unique_ptr<EntityValue> ModuleChecker::make_value(sem::Type* type) {
                                                                                                                     std::make_unique<ConstFunction>(
                                                                                                                             Path(tcf.path,
                                                                                                                                  m.first),
-                                                                                                                            sem::UTypeFunction(
-                                                                                                                                    m.second->clone()))));
+                                                                                                                            *m.second)));
                             clazz->all_members[m.first] = ClassMemberCategory::method;
                         }
                     }

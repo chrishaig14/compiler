@@ -15,16 +15,15 @@
 
 class ConstFunction {
 private:
-    sem::UTypeFunction const_function_ft_p;
 public:
+    sem::TypeFunction const_function_ft;
     std::unordered_map<std::string, std::set<std::string>> constraints;
 
-    ConstFunction(Path path, sem::UTypeFunction ft);
+    ConstFunction(Path path, const sem::TypeFunction& ft);
 
     // ConstFunction(const ConstFunction& other);
 
     ~ConstFunction();
-    sem::TypeFunction& const_function_ft;
     Path path;
 };
 
