@@ -212,7 +212,8 @@ void ModulePrechecker::visit_class(ast::ConcreteClassDef& node) {
         auto cf = std::make_unique<ConstFunction>(Path(class_info->path, f.first),
                                                   std::make_unique<sem::TypeFunction>(x, sem::UType(p_type)));
         method.path = cf->path;
-        class_info->methods.insert(make_pair(f.first, std::make_unique<InstanceMethod>(Path(""), std::move(cf))));
+        class_info->methods.insert(make_pair(f.first,
+                                             std::make_unique<InstanceMethod>(Path(""), false, std::move(cf))));
         class_info->all_members[f.first] = ClassMemberCategory::method;
     }
 
@@ -229,9 +230,8 @@ void ModulePrechecker::visit_class(ast::ConcreteClassDef& node) {
         auto cf = std::make_unique<ConstFunction>(Path(class_info->path, f.first),
                                                   std::make_unique<sem::TypeFunction>(x, sem::UType(p_type)));
         method.path = cf->path;
-        class_info->static_methods.insert(make_pair(f.first,
-                                                    std::make_unique<InstanceMethod>(Path(""), std::move(cf))));
-        class_info->all_members[f.first] = ClassMemberCategory::static_method;
+        class_info->methods.insert(make_pair(f.first, std::make_unique<InstanceMethod>(Path(""), true, std::move(cf))));
+        class_info->all_members[f.first] = ClassMemberCategory::method;
     }
 }
 

@@ -19,14 +19,16 @@ class InstanceMethod {
 public:
     Path instance;
     std::unique_ptr<ConstFunction> func;
+    const bool is_static;
 
-    InstanceMethod(Path instance, std::unique_ptr<ConstFunction> func) : instance(instance), func(std::move(func)) {
+    InstanceMethod(Path instance, bool is_static, std::unique_ptr<ConstFunction> func)
+            : instance(instance), func(std::move(func)), is_static(is_static) {
     }
 };
 
 
 enum class ClassMemberCategory {
-    attribute, static_attribute, method, static_method, not_found
+    attribute, static_attribute, method, not_found
 };
 
 class ConcreteClass {
@@ -42,7 +44,6 @@ public:
     std::unordered_map<std::string, std::unique_ptr<InstanceMethod>> methods;
 
     std::map<std::string, std::pair<ast::Type*, ast::ExpNode*>> static_attributes;
-    std::unordered_map<std::string, std::unique_ptr<InstanceMethod>> static_methods;
 
     const Path path;
     const std::string class_name;
@@ -59,10 +60,6 @@ public:
 
     InstanceMethod& get_method(const std::string& name) {
         return *this->methods[name];
-    }
-
-    InstanceMethod& get_static_method(const std::string& name) {
-        return *this->static_methods[name];
     }
 
     Entity& get_attribute(const std::string& name) {

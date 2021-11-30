@@ -232,7 +232,7 @@ ModuleChecker::instantiate_generic(const TemplateClassInfo& generic, const ast::
         auto tf = (sem::TypeFunction*) concrete_type->to_sem();
         this->module.fill_actual(*tf);
         auto cf = std::make_unique<ConstFunction>(method_cf.second->path, sem::UTypeFunction(tf));
-        concrete_methods[method_cf.first] = std::make_unique<InstanceMethod>(Path(""), std::move(cf));
+        concrete_methods[method_cf.first] = std::make_unique<InstanceMethod>(Path(""), false, std::move(cf));
     }
 
     std::unordered_map<std::string, std::unique_ptr<InstanceMethod>> concrete_static_methods;
@@ -241,15 +241,15 @@ ModuleChecker::instantiate_generic(const TemplateClassInfo& generic, const ast::
         ast::UTypeNode concrete_type(make_type(*t, replacements));
         sem::Type* p_type = concrete_type->to_sem();
         this->module.fill_actual(*p_type);
-        concrete_static_methods[m.first] = std::make_unique<InstanceMethod>(m.second->path,
-                                                                            std::make_unique<ConstFunction>(m.second->path,
-                                                                                                            sem::UTypeFunction(
-                                                                                                                    (sem::TypeFunction*) p_type)));
+        concrete_methods[m.first] = std::make_unique<InstanceMethod>(m.second->path,
+                                                                     true,
+                                                                     std::make_unique<ConstFunction>(m.second->path,
+                                                                                                     sem::UTypeFunction(
+                                                                                                             (sem::TypeFunction*) p_type)));
     }
 
     auto concrete = std::make_unique<ConcreteClass>(generic.class_name, generic.path);
     concrete->methods = std::move(concrete_methods);
-    concrete->static_methods = std::move(concrete_static_methods);
     concrete->attribute_names = generic.member_names;
     concrete->attribute_types = concrete_field_types;
     for (size_t i = 0; i < generic.member_names.size(); i++) {

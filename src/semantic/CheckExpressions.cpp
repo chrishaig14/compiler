@@ -115,8 +115,12 @@ UExpressionInfo ModuleChecker::visit_binop(const ast::BinaryOp& node) {
     } else {
         const ConcreteClass* cls = l_entity_v.clazz;
         assert(cls != nullptr);
-        auto operator_fun_it = cls->static_methods.find(fun);
-        if (operator_fun_it == cls->static_methods.end()) {
+        auto operator_fun_it = cls->methods.find(fun);
+        if (operator_fun_it == cls->methods.end()) {
+            this->error_reporter.error(std::make_unique<error::ClassNoMethodForOp>(cls->class_name, fun, node));
+            return exp_error_stub();
+        }
+        if (not operator_fun_it->second->is_static) {
             this->error_reporter.error(std::make_unique<error::ClassNoMethodForOp>(cls->class_name, fun, node));
             return exp_error_stub();
         }
@@ -157,19 +161,19 @@ std::unique_ptr<EntityValue> ModuleChecker::make_value(sem::Type* type) {
                         TypeclassFoo& tcf = typec.clazz;
                         for (auto& m:tcf.methods) {
                             clazz->methods[m.first] = std::make_unique<InstanceMethod>(tcf.path,
+                                                                                       false,
                                                                                        std::make_unique<ConstFunction>(
                                                                                                Path(tcf.path, m.first),
                                                                                                sem::UTypeFunction(m.second->clone())));
                             clazz->all_members[m.first] = ClassMemberCategory::method;
                         }
                         for (auto& m:tcf.static_methods) {
-                            clazz->static_methods[m.first] = std::make_unique<InstanceMethod>(tcf.path,
-                                                                                              std::make_unique<ConstFunction>(
-                                                                                                      Path(tcf.path,
-                                                                                                           m.first),
-                                                                                                      sem::UTypeFunction(
-                                                                                                              m.second->clone())));
-                            clazz->all_members[m.first] = ClassMemberCategory::static_method;
+                            clazz->methods[m.first] = std::make_unique<InstanceMethod>(tcf.path,
+                                                                                       true,
+                                                                                       std::make_unique<ConstFunction>(
+                                                                                               Path(tcf.path, m.first),
+                                                                                               sem::UTypeFunction(m.second->clone())));
+                            clazz->all_members[m.first] = ClassMemberCategory::method;
                         }
                     }
                 }

@@ -175,43 +175,38 @@ UExpressionInfo ModuleChecker::class_member(const ast::Member& n, UExpressionInf
             break;
         }
         case ClassMemberCategory::method: {
-            ConstFunction& bound_method = *cls.methods[child]->func;
-            auto* unbound_method = new ConstFunction(bound_method.path,
-                                                     sem::UTypeFunction((sem::TypeFunction*) bound_method.const_function_ft.clone()));
-            ast::VectorOfTypes tp;
-            for (auto tt: cls.type_params) {
-                ast::ObjectType* t = new ast::ObjectType(tt);
-                t->is_generic_param = true;
-                tp.push_back(t);
-            }
-            ast::ObjectType* ot = new ast::ObjectType(cls.class_name, tp);
-            unbound_method->const_function_ft.param_types.insert(unbound_method->const_function_ft.param_types.begin(),
-                                                                 sem::UType(ot->to_sem()));
-            info.set_entity(std::make_unique<EntityConstFunction>(*unbound_method));
-            info.exp_snode = std::make_unique<sem::Id>(unbound_method->path.as_str());
-            break;
-        }
-        case ClassMemberCategory::static_method: {
-            InstanceMethod& im = *cls.static_methods.at(child);
-
-            if (im.instance == Path("")) {
-                std::cout << "found method " << child << " for class " << cls.class_name << " from base class "
-                          << std::endl;
-                info.exp_snode = std::make_unique<sem::StaticMethod>(cls.path, child);
-                info.set_entity(std::make_unique<EntityConstFunction>(*im.func));
+            InstanceMethod& im = *cls.methods[child];
+            if (im.is_static) {
+                if (im.instance == Path("")) {
+                    std::cout << "found method " << child << " for class " << cls.class_name << " from base class "
+                              << std::endl;
+                    info.exp_snode = std::make_unique<sem::StaticMethod>(cls.path, child);
+                    info.set_entity(std::make_unique<EntityConstFunction>(*im.func));
+                } else {
+                    std::cout << "found method " << child << " for class " << cls.class_name
+                              << " from instance of typeclass " << im.instance.as_str() << std::endl;
+                    info.exp_snode = std::make_unique<sem::StaticMethodFromInstance>(std::make_unique<sem::InstanceObject>(
+                            cls.path,
+                            im.instance), child);
+                    info.set_entity(std::make_unique<EntityConstFunction>(*im.func));
+                }
             } else {
-                std::cout << "found method " << child << " for class " << cls.class_name
-                          << " from instance of typeclass " << im.instance.as_str() << std::endl;
-                info.exp_snode = std::make_unique<sem::StaticMethodFromInstance>(std::make_unique<sem::InstanceObject>(
-                        cls.path,
-                        im.instance), child);
-                info.set_entity(std::make_unique<EntityConstFunction>(*im.func));
+                ConstFunction& bound_method = *im.func;
+                auto* unbound_method = new ConstFunction(bound_method.path,
+                                                         sem::UTypeFunction((sem::TypeFunction*) bound_method.const_function_ft.clone()));
+                ast::VectorOfTypes tp;
+                for (auto tt: cls.type_params) {
+                    ast::ObjectType* t = new ast::ObjectType(tt);
+                    t->is_generic_param = true;
+                    tp.push_back(t);
+                }
+                ast::ObjectType* ot = new ast::ObjectType(cls.class_name, tp);
+                unbound_method->const_function_ft.param_types.insert(unbound_method->const_function_ft.param_types.begin(),
+                                                                     sem::UType(ot->to_sem()));
+                info.set_entity(std::make_unique<EntityConstFunction>(*unbound_method));
+                info.exp_snode = std::make_unique<sem::Id>(unbound_method->path.as_str());
             }
             break;
-
-            // info.set_entity(std::make_unique<EntityConstFunction>(*cls.static_methods[child]->func));
-            // info.exp_snode = std::make_unique<sem::StaticMethod>(cls.path, child);
-            // break;
         }
     }
     return info_u;
