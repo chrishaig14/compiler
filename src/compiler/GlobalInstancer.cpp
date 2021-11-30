@@ -9,20 +9,16 @@ void GlobalInstancer::add_instance_to_class(ConcreteClass& clazz, Path instance)
     auto& typeclass = mm->typeclass();
     for (auto& m: typeclass.methods) {
         clazz.methods[m.first] = std::make_unique<InstanceMethod>(instance,
-                                                                  std::make_unique<BaseMethod>(false,
-                                                                                               std::make_unique<ConstFunction>(
-                                                                                                       Path(typeclass.path,
-                                                                                                            m.first),
-                                                                                                       *m.second)));
+                                                                  BaseMethod(false,
+                                                                             ConstFunction(Path(typeclass.path,
+                                                                                                m.first), *m.second)));
         clazz.all_members[m.first] = ClassMemberCategory::method;
     }
     for (auto& m: typeclass.static_methods) {
         clazz.methods[m.first] = std::make_unique<InstanceMethod>(instance,
-                                                                  std::make_unique<BaseMethod>(true,
-                                                                                               std::make_unique<ConstFunction>(
-                                                                                                       Path(typeclass.path,
-                                                                                                            m.first),
-                                                                                                       *m.second)));
+                                                                  BaseMethod(true,
+                                                                             ConstFunction(Path(typeclass.path,
+                                                                                                m.first), *m.second)));
         clazz.all_members[m.first] = ClassMemberCategory::method;
     }
     // for (auto& m: ) {

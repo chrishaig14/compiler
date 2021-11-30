@@ -21,6 +21,8 @@ public:
 
     ConstFunction(Path path, const sem::TypeFunction& ft);
 
+    ConstFunction(const ConstFunction& other) = default;
+
     // ConstFunction(const ConstFunction& other);
 
     ~ConstFunction();

@@ -17,19 +17,21 @@
 
 class BaseMethod {
 public:
-    std::unique_ptr<ConstFunction> func;
+    ConstFunction func;
     const bool is_static;
 
-    BaseMethod(bool is_static, std::unique_ptr<ConstFunction> func) : func(std::move(func)), is_static(is_static) {
+    BaseMethod(bool is_static, const ConstFunction& func) : func(func), is_static(is_static) {
     }
+
+    BaseMethod(const BaseMethod& other) = default;
 };
 
 class InstanceMethod {
 public:
     Path instance;
-    std::unique_ptr<BaseMethod> base;
+    BaseMethod base;
 
-    InstanceMethod(Path instance, std::unique_ptr<BaseMethod> func) : instance(instance), base(std::move(func)) {
+    InstanceMethod(Path instance, const BaseMethod& func) : instance(instance), base(func) {
     }
 };
 

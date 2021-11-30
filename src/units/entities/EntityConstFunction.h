@@ -5,15 +5,16 @@
 #ifndef XLANG_ENTITYCONSTFUNCTION_H
 #define XLANG_ENTITYCONSTFUNCTION_H
 
+#include <units/infos/ConstFunction.h>
 #include "Entity.h"
 
 class EntityConstFunction : public Entity {
 public:
-    explicit EntityConstFunction(ConstFunction& const_function)
-    : Entity(E_TYPE::CONST_FUNCTION), const_function(const_function) {
+    explicit EntityConstFunction(const ConstFunction& const_function)
+            : Entity(E_TYPE::CONST_FUNCTION), const_function(const_function) {
     }
 
-    ConstFunction& const_function;
+    ConstFunction const_function;
 
     bool equal(const Entity& other) const override {
         return false;
