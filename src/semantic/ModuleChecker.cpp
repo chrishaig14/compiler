@@ -232,7 +232,9 @@ ModuleChecker::instantiate_generic(const TemplateClassInfo& generic, const ast::
         auto tf = (sem::TypeFunction*) concrete_type->to_sem();
         this->module.fill_actual(*tf);
         auto cf = std::make_unique<ConstFunction>(method_cf.second->path, sem::UTypeFunction(tf));
-        concrete_methods[method_cf.first] = std::make_unique<InstanceMethod>(Path(""), false, std::move(cf));
+        concrete_methods[method_cf.first] = std::make_unique<InstanceMethod>(Path(""),
+                                                                             std::make_unique<BaseMethod>(false,
+                                                                                                          std::move(cf)));
     }
 
     std::unordered_map<std::string, std::unique_ptr<InstanceMethod>> concrete_static_methods;
@@ -242,10 +244,11 @@ ModuleChecker::instantiate_generic(const TemplateClassInfo& generic, const ast::
         sem::Type* p_type = concrete_type->to_sem();
         this->module.fill_actual(*p_type);
         concrete_methods[m.first] = std::make_unique<InstanceMethod>(m.second->path,
-                                                                     true,
-                                                                     std::make_unique<ConstFunction>(m.second->path,
-                                                                                                     sem::UTypeFunction(
-                                                                                                             (sem::TypeFunction*) p_type)));
+                                                                     std::make_unique<BaseMethod>(true,
+                                                                                                  std::make_unique<ConstFunction>(
+                                                                                                          m.second->path,
+                                                                                                          sem::UTypeFunction(
+                                                                                                                  (sem::TypeFunction*) p_type))));
     }
 
     auto concrete = std::make_unique<ConcreteClass>(generic.class_name, generic.path);

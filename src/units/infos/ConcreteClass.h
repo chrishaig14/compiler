@@ -15,14 +15,21 @@
 #include "../entities/Entity.h"
 #include "ConstFunction.h"
 
-class InstanceMethod {
+class BaseMethod {
 public:
-    Path instance;
     std::unique_ptr<ConstFunction> func;
     const bool is_static;
 
-    InstanceMethod(Path instance, bool is_static, std::unique_ptr<ConstFunction> func)
-            : instance(instance), func(std::move(func)), is_static(is_static) {
+    BaseMethod(bool is_static, std::unique_ptr<ConstFunction> func) : func(std::move(func)), is_static(is_static) {
+    }
+};
+
+class InstanceMethod {
+public:
+    Path instance;
+    std::unique_ptr<BaseMethod> base;
+
+    InstanceMethod(Path instance, std::unique_ptr<BaseMethod> func) : instance(instance), base(std::move(func)) {
     }
 };
 
