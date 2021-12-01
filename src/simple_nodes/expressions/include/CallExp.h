@@ -14,9 +14,9 @@ class sem::CallExp : public sem::Exp {
 public:
     UExp function;
     std::vector<UExp> arguments;
-    std::vector<std::unique_ptr<InstanceObject>> instances;
+    std::vector<InstanceObject> instances;
     CallExp(const sem::Exp& function, std::vector<UExp> arguments,
-            std::vector<std::unique_ptr<InstanceObject>> instances);
+            std::vector<InstanceObject> instances);
 
     CallExp(const CallExp& other) : Exp(ExpType::CALL) {
         this->function = other.function->clone();
@@ -24,7 +24,7 @@ public:
             this->arguments.emplace_back(a->clone());
         }
         for (auto& i: other.instances) {
-            this->instances.emplace_back(std::make_unique<InstanceObject>(*i));
+            this->instances.emplace_back(i);
         }
     }
 

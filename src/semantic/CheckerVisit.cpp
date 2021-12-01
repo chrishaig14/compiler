@@ -24,10 +24,8 @@ sem::Common* make_for_snode(ast::For& node, std::unique_ptr<sem::Block>& binfo, 
     auto list_sn = std::make_unique<sem::Id>(loop_list_var_id);
     std::vector<sem::UExp> v;
     v.emplace_back(std::move(list_sn));
-    std::vector<std::unique_ptr<sem::InstanceObject>> instances_v;
-    sem::UExp call_list_len_sn = std::make_unique<sem::CallExp>(*list_len_fn,
-                                                                std::move(v),
-                                                                std::move(instances_v));
+    std::vector<sem::InstanceObject> instances_v;
+    sem::UExp call_list_len_sn = std::make_unique<sem::CallExp>(*list_len_fn, std::move(v), instances_v);
     auto lensn = std::make_unique<sem::Declaration>(loop_list_len_var_id, std::move(call_list_len_sn));
     bbn->nodes.push_back(std::move(lensn));
 
@@ -41,8 +39,8 @@ sem::Common* make_for_snode(ast::For& node, std::unique_ptr<sem::Block>& binfo, 
     std::vector<sem::UExp> vv;
     vv.push_back(std::move(idxsn));
     vv.push_back(std::move(llensn));
-    std::vector<std::unique_ptr<sem::InstanceObject>> instances_v2;
-    auto cn = std::make_unique<sem::CallExp>(*cmpfunsn, std::move(vv), std::move(instances_v2));
+    std::vector<sem::InstanceObject> instances_v2;
+    auto cn = std::make_unique<sem::CallExp>(*cmpfunsn, std::move(vv), instances_v2);
 
     auto& bn = binfo;
 

@@ -79,24 +79,20 @@ ModuleChecker::analyze_call(const ast::ExpNode& function, std::vector<ast::RExpN
                                                            fun_info.entity.get().get_constfun().const_function.constraints,
                                                            function.start,
                                                            passed_instances);
-        std::vector<std::unique_ptr<sem::InstanceObject>> instances_v;
+        std::vector<sem::InstanceObject> instances_v;
         for (auto& it: passed_instances) {
             std::cout << "for type: " << it.first << " passing instances of " << std::endl;
             for (auto& inst: it.second) {
                 std::cout << " - " << inst << std::endl;
-                instances_v.emplace_back(std::make_unique<sem::InstanceObject>(Path(it.first), Path(inst)));
+                instances_v.emplace_back(sem::InstanceObject(Path(it.first), Path(inst)));
             }
         }
-        retv_p->exp_snode = std::make_unique<sem::CallExp>(*fun_info_p->exp_snode,
-                                                           std::move(arguments_),
-                                                           std::move(instances_v));
+        retv_p->exp_snode = std::make_unique<sem::CallExp>(*fun_info_p->exp_snode, std::move(arguments_), instances_v);
         return retv_p;
     }
     this->process_function_arguments(arg_entities, arguments_, arguments, function_type, fun_info_p.get());
-    std::vector<std::unique_ptr<sem::InstanceObject>> instances_v;
-    retv.exp_snode = std::make_unique<sem::CallExp>(*fun_info_p->exp_snode,
-                                                    std::move(arguments_),
-                                                    std::move(instances_v));
+    std::vector<sem::InstanceObject> instances_v;
+    retv.exp_snode = std::make_unique<sem::CallExp>(*fun_info_p->exp_snode, std::move(arguments_), instances_v);
     auto f = make_return_info(is_rvalue, std::move(retv_p), is_def_const, args_are_constant);
     return f;
 }

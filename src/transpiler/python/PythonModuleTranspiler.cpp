@@ -623,7 +623,7 @@ PythonExpressionOutputCode PythonModuleTranspiler::transpile_call_exp(const sem:
         arg_list += arg_id + ", ";
     }
     for (auto& arg: node.instances) {
-        arg_list += make_full_instance_name(arg->typeclass_path, arg->class_path) + ", ";
+        arg_list += make_full_instance_name(arg.typeclass_path, arg.class_path) + ", ";
     }
     std::string post_code;
     post_code += fun_id + "(";

@@ -7,10 +7,8 @@
 
 using namespace sem;
 
-CallExp::CallExp(const sem::Exp& function, std::vector<UExp> arguments,
-                 std::vector<std::unique_ptr<InstanceObject>> instances)
-        : Exp(ExpType::CALL), function(function.clone()), arguments(std::move(arguments)),
-          instances(std::move(instances)) {
+CallExp::CallExp(const sem::Exp& function, std::vector<UExp> arguments, std::vector<InstanceObject> instances) : Exp(
+        ExpType::CALL), function(function.clone()), arguments(std::move(arguments)), instances(instances) {
 }
 
 bool CallExp::equals(const Exp& o) const {

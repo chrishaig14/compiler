@@ -67,8 +67,8 @@ UExpressionInfo ModuleChecker::visit_unary(const ast::UnaryOp& n) {
     auto fsn = std::make_unique<sem::Id>(sub_fun_path);
     std::vector<sem::UExp> v;
     v.emplace_back(std::move(exp_snode));
-    std::vector<std::unique_ptr<sem::InstanceObject>> instances_v;
-    auto csn = std::make_unique<sem::CallExp>(*fsn, std::move(v), std::move(instances_v));
+    std::vector<sem::InstanceObject> instances_v;
+    auto csn = std::make_unique<sem::CallExp>(*fsn, std::move(v), instances_v);
 
     UExpressionInfo info_u = std::make_unique<ExpressionInfo>();
     ExpressionInfo& info = *info_u;
@@ -106,14 +106,14 @@ UExpressionInfo ModuleChecker::visit_binop(const ast::BinaryOp& node) {
         v.push_back(std::move(left_info_p->exp_snode));
         v.push_back(std::move(right_sinfo->exp_snode));
         info.set_entity(this->entity_value_from_actual_base_path_no_generic(Path("libcore.libcore.Boolean")).clone());
-        std::vector<std::unique_ptr<sem::InstanceObject>> instances_v;
+        std::vector<sem::InstanceObject> instances_v;
 
         info.exp_snode = std::make_unique<sem::CallExp>(sem::StaticMethod(l_entity_v.enumm->path, "__eq__"),
                                                         std::move(v),
-                                                        std::move(instances_v));
+                                                        instances_v);
         info.exp_snode = std::make_unique<sem::CallExp>(sem::StaticMethod(l_entity_v.enumm->path, "__eq__"),
                                                         std::move(v),
-                                                        std::move(instances_v));
+                                                        instances_v);
     } else {
         const ConcreteClass* cls = l_entity_v.clazz;
         assert(cls != nullptr);
@@ -130,11 +130,9 @@ UExpressionInfo ModuleChecker::visit_binop(const ast::BinaryOp& node) {
         std::vector<sem::UExp> vv;
         vv.push_back(std::move(left_info_p->exp_snode));
         vv.push_back(std::move(right_snode));
-        std::vector<std::unique_ptr<sem::InstanceObject>> instances_v;
+        std::vector<sem::InstanceObject> instances_v;
 
-        auto sn = std::make_unique<sem::CallExp>(sem::ConstFunction(operator_fun.path),
-                                                 std::move(vv),
-                                                 std::move(instances_v));
+        auto sn = std::make_unique<sem::CallExp>(sem::ConstFunction(operator_fun.path), std::move(vv), instances_v);
         sem::Type* rettype = operator_fun.const_function_ft.return_type->clone();
         info.set_entity(this->make_value(rettype));
         info.exp_snode = std::move(sn);
@@ -260,8 +258,8 @@ UExpressionInfo ModuleChecker::visit_subscript(const ast::Subscript& node) {
     auto fsn = std::make_unique<sem::ObjectMethod>(std::move(parent_p->exp_snode), cls->path, "__get_item__");
     std::vector<sem::UExp> vv;
     vv.push_back(std::move(child_snode));
-    std::vector<std::unique_ptr<sem::InstanceObject>> instances_v;
-    auto csn = std::make_unique<sem::CallExp>(*fsn, std::move(vv), std::move(instances_v));
+    std::vector<sem::InstanceObject> instances_v;
+    auto csn = std::make_unique<sem::CallExp>(*fsn, std::move(vv), instances_v);
     info.exp_snode = std::move(csn);
     return info_u;
 }
