@@ -500,12 +500,12 @@ PythonExpressionOutputCode PythonModuleTranspiler::dispatch_expression(const sem
             auto& n = static_cast<const sem::ObjectMethodFromInstance&>(node);
             PythonExpressionOutputCode object_out = this->dispatch_expression(*n.object, false);
             std::string out_pre_code = object_out.pre_code + "\nobject = " + object_out.code;
-            std::string out_code = make_full_instance_name(n.instance->typeclass_path, n.instance->class_path);
+            std::string out_code = make_full_instance_name(n.instance.typeclass_path, n.instance.class_path);
             return PythonExpressionOutputCode(out_pre_code, out_code);
         }
         case sem::ExpType::STATIC_METHOD_FROM_INSTANCE:
             auto& n = static_cast<const sem::StaticMethodFromInstance&>(node);
-            std::string out_code = make_full_instance_name(n.instance->typeclass_path, n.instance->class_path);
+            std::string out_code = make_full_instance_name(n.instance.typeclass_path, n.instance.class_path);
             return PythonExpressionOutputCode("", out_code);
     }
     __builtin_unreachable();
@@ -601,13 +601,13 @@ PythonExpressionOutputCode PythonModuleTranspiler::transpile_call_exp(const sem:
             pre_code +=
                     (arg_code.pre_code.empty() ? "" : arg_code.pre_code + "\n") + arg_id + " = " + arg_code.code + "\n";
             arg_list += arg_id + ", ";
-            func.code = make_full_instance_name(f.instance->typeclass_path, f.instance->class_path) + "[\"" + f.method +
+            func.code = make_full_instance_name(f.instance.typeclass_path, f.instance.class_path) + "[\"" + f.method +
                         "\"]";
             break;
         }
         case sem::ExpType::STATIC_METHOD_FROM_INSTANCE: {
             auto& f = static_cast<sem::StaticMethodFromInstance&>(*node.function);
-            func.code = make_full_instance_name(f.instance->typeclass_path, f.instance->class_path) + "[\"" + f.method +
+            func.code = make_full_instance_name(f.instance.typeclass_path, f.instance.class_path) + "[\"" + f.method +
                         "\"]";
             break;
         }

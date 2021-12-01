@@ -19,7 +19,10 @@ public:
 
     ObjectMember(UExp object, Path class_path, std::string member_name);
 
+    ObjectMember(const ObjectMember& other);
+
     bool equals(const Exp& o) const override;
+    UExp clone() const override;
 
 };
 

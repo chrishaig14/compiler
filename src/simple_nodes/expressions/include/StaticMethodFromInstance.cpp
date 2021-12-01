@@ -8,6 +8,10 @@ bool sem::StaticMethodFromInstance::equals(const sem::Exp& o) const {
     return false;
 }
 
-sem::StaticMethodFromInstance::StaticMethodFromInstance(std::unique_ptr<InstanceObject> instance, std::string method)
-        : Exp(ExpType::STATIC_METHOD_FROM_INSTANCE), instance(std::move(instance)), method(method) {
+sem::StaticMethodFromInstance::StaticMethodFromInstance(const InstanceObject& instance, std::string method) : Exp(
+        ExpType::STATIC_METHOD_FROM_INSTANCE), instance(instance), method(method) {
+}
+
+sem::UExp sem::StaticMethodFromInstance::clone() const {
+    return std::make_unique<StaticMethodFromInstance>(*this);
 }

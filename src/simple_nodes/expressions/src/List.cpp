@@ -3,7 +3,9 @@
 //
 
 #include "../include/List.h"
+
 using namespace sem;
+
 List::List(std::vector<UExp> elements) : Exp(ExpType::LIST), elements(std::move(elements)) {
 }
 
@@ -19,4 +21,8 @@ bool List::equals(const Exp& o) const {
         }
     }
     return true;
+}
+
+UExp List::clone() const {
+    return std::make_unique<List>(*this);
 }

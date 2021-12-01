@@ -12,3 +12,7 @@ NewObject::NewObject() : Exp(ExpType::NEW) {
 bool NewObject::equals(const Exp& o) const {
     return false;
 }
+
+UExp NewObject::clone() const {
+    return std::make_unique<NewObject>(*this);
+}

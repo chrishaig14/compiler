@@ -16,3 +16,7 @@ bool Ternary::equals(const Exp& o) const {
     // auto& other = (const Ternary&) o;
     return false;
 }
+
+UExp Ternary::clone() const {
+    return sem::UExp();
+}

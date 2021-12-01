@@ -12,3 +12,7 @@ None::None() : Exp(ExpType::NONE) {
 bool None::equals(const Exp& o) const {
     return true;
 }
+
+UExp None::clone() const {
+    return std::make_unique<None>();
+}

@@ -14,6 +14,7 @@ public:
 
     explicit Id(const std::string& identifier);
     bool equals(const Exp& o) const override;
+    UExp clone() const override;
 };
 
 

@@ -10,12 +10,13 @@
 
 class sem::StaticMethodFromInstance : public sem::Exp {
 public:
-    std::unique_ptr<InstanceObject> instance;
+    InstanceObject instance;
     std::string method;
 
-    StaticMethodFromInstance(std::unique_ptr<InstanceObject> instance, std::string method);
+    StaticMethodFromInstance(const InstanceObject& instance, std::string method);
 
     bool equals(const Exp& o) const override;
+    UExp clone() const override;
 
 };
 

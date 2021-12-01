@@ -18,7 +18,10 @@ public:
 
     ObjectMethod(UExp object, Path class_path, std::string method_name);
 
+    ObjectMethod(const ObjectMethod& other);
+
     bool equals(const Exp& o) const override;
+    UExp clone() const override;
 
 };
 

@@ -14,3 +14,7 @@ bool Id::equals(const Exp& o) const {
     auto& other = (const Id&) o;
     return this->identifier == other.identifier;
 }
+
+UExp Id::clone() const {
+    return std::make_unique<Id>(*this);
+}

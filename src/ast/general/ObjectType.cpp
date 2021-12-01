@@ -9,9 +9,9 @@ using namespace ast;
 
 ObjectType::ObjectType(const std::string& identifier, const ast::VectorOfTypes& typeParameters)
         : Type(Kind::OBJECT), id(identifier), type_params(typeParameters) {
-    for (auto* p: typeParameters) {
-        assert(p != nullptr);
-    }
+    // for (auto* p: typeParameters) {
+    //     assert(p != nullptr);
+    // }
     this->data.aliased_type = nullptr;
     this->is_generic_param = false;
 }

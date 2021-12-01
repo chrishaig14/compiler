@@ -10,9 +10,9 @@ using namespace sem;
 
 TypeObject::TypeObject(const std::string& identifier, const sem::VectorOfTypes& typeParameters)
         : id(identifier), type_params(typeParameters) {
-    for (auto* p: typeParameters) {
-        assert(p != nullptr);
-    }
+    // for (auto* p: typeParameters) {
+    //     assert(p != nullptr);
+    // }
     this->kind = Kind::OBJECT;
     this->data.aliased_type = nullptr;
     this->is_generic_param = false;
@@ -20,9 +20,9 @@ TypeObject::TypeObject(const std::string& identifier, const sem::VectorOfTypes& 
 
 TypeObject::TypeObject(const std::string& identifier, const sem::VectorOfTypes& typeParameters, Path actual_base_path)
         : id(identifier), type_params(typeParameters) {
-    for (auto* p: typeParameters) {
-        assert(p != nullptr);
-    }
+    // for (auto* p: typeParameters) {
+    //     assert(p != nullptr);
+    // }
     this->kind = Kind::OBJECT;
     this->data.aliased_type = nullptr;
     this->is_generic_param = false;

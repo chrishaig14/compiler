@@ -17,7 +17,15 @@ public:
 
     NewObject();
 
+    NewObject(const NewObject& other) : sem::Exp(ExpType::NEW) {
+        this->class_name = other.class_name;
+        for (auto& a: other.args) {
+            this->args.emplace_back(a->clone());
+        }
+    }
+
     bool equals(const Exp& o) const override;
+    UExp clone() const override;
 };
 
 

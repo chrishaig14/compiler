@@ -11,12 +11,19 @@
 class sem::ObjectMethodFromInstance : public sem::Exp {
 public:
     UExp object;
-    std::unique_ptr<InstanceObject> instance;
+    InstanceObject instance;
     std::string method;
 
-    ObjectMethodFromInstance(UExp object, std::unique_ptr<InstanceObject> instance, std::string method);
+    ObjectMethodFromInstance(UExp object, const InstanceObject& instance, std::string method);
+
+    ObjectMethodFromInstance(const ObjectMethodFromInstance& other)
+            : sem::Exp(ExpType::METHOD_FROM_INSTANCE), instance(other.instance) {
+        this->object = other.object->clone();
+        this->method = other.method;
+    }
 
     bool equals(const Exp& o) const override;
+    UExp clone() const override;
 
 };
 

@@ -15,7 +15,10 @@ public:
     explicit Dict(std::vector<std::pair<UExp, UExp>> items);
     std::vector<std::pair<UExp, UExp>> items;
 
+    Dict(const Dict& other);
+
     bool equals(const Exp& o) const override;
+    UExp clone() const override;
 };
 
 

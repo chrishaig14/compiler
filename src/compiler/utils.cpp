@@ -82,7 +82,8 @@ void init(int argc, char** argv, bool& is_lib, std::string& project_dir, std::st
     }
 
     std::string command = "rm -rf " + project_output_dir;
-    system(command.c_str());
+    int r = system(command.c_str());
+    argc = r;
 
     int x = mkdir(project_output_dir.c_str(), 0700);
     if (x != 0) {

@@ -15,6 +15,7 @@ public:
     bool v;
 
     bool equals(const Exp& o) const override;
+    UExp clone() const override;
 };
 
 

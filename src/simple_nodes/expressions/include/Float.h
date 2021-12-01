@@ -16,6 +16,7 @@ public:
     std::string str;
 
     bool equals(const Exp& o) const override;
+    UExp clone() const override;
 };
 
 

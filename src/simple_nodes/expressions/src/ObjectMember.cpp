@@ -3,6 +3,7 @@
 //
 
 #include "../include/ObjectMember.h"
+
 using namespace sem;
 
 bool ObjectMember::equals(const Exp& o) const {
@@ -13,5 +14,16 @@ bool ObjectMember::equals(const Exp& o) const {
     return obj_ok && class_ok && member_ok;
 }
 
-ObjectMember::ObjectMember(UExp object, Path class_path, std::string member_name) : Exp(ExpType::OBJECT_MEMBER), object(std::move(object)), class_path(class_path), member_name(member_name) {
+ObjectMember::ObjectMember(UExp object, Path class_path, std::string member_name)
+        : Exp(ExpType::OBJECT_MEMBER), object(std::move(object)), class_path(class_path), member_name(member_name) {
+}
+
+UExp ObjectMember::clone() const {
+    return std::make_unique<ObjectMember>(*this);
+}
+
+ObjectMember::ObjectMember(const ObjectMember& other) : sem::Exp(ExpType::OBJECT_MEMBER) {
+    this->object = other.object->clone();
+    this->class_path = other.class_path;
+    this->member_name = other.member_name;
 }

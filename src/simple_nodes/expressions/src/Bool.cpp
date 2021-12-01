@@ -14,3 +14,7 @@ bool Bool::equals(const Exp& o) const {
     auto& other = (const Bool&) o;
     return this->v == other.v;
 }
+
+UExp Bool::clone() const {
+    return std::make_unique<Bool>(*this);
+}

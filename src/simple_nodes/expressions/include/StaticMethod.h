@@ -18,6 +18,7 @@ public:
     StaticMethod(Path class_path, std::string method_name);
 
     bool equals(const Exp& o) const override;
+    UExp clone() const override;
 
 };
 

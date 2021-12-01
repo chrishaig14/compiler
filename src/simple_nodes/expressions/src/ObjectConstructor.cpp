@@ -12,3 +12,7 @@ ObjectConstructor::ObjectConstructor(Path class_path) : Exp(ExpType::OBJECT_CONS
 bool ObjectConstructor::equals(const Exp& o) const {
     return this->class_path.as_str() == ((const ObjectConstructor&) o).class_path.as_str();
 }
+
+UExp ObjectConstructor::clone() const {
+    return std::make_unique<ObjectConstructor>(*this);
+}

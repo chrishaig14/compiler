@@ -12,9 +12,9 @@ using namespace sem;
 TypeFunction::TypeFunction(sem::VectorOfTypes parameterTypes, sem::UType returnType)
         : return_type(std::move(returnType)) {
 
-    for (auto* p: parameterTypes) {
-        assert(p != nullptr);
-    }
+    // for (auto* p: parameterTypes) {
+    //     assert(p != nullptr);
+    // }
     // assert(returnType != nullptr);
     // this->param_types = parameterTypes;
     for (auto* p: parameterTypes) {

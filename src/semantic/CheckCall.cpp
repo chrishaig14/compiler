@@ -87,14 +87,14 @@ ModuleChecker::analyze_call(const ast::ExpNode& function, std::vector<ast::RExpN
                 instances_v.emplace_back(std::make_unique<sem::InstanceObject>(Path(it.first), Path(inst)));
             }
         }
-        retv_p->exp_snode = std::make_unique<sem::CallExp>(std::move(fun_info_p->exp_snode),
+        retv_p->exp_snode = std::make_unique<sem::CallExp>(*fun_info_p->exp_snode,
                                                            std::move(arguments_),
                                                            std::move(instances_v));
         return retv_p;
     }
     this->process_function_arguments(arg_entities, arguments_, arguments, function_type, fun_info_p.get());
     std::vector<std::unique_ptr<sem::InstanceObject>> instances_v;
-    retv.exp_snode = std::make_unique<sem::CallExp>(std::move(fun_info_p->exp_snode),
+    retv.exp_snode = std::make_unique<sem::CallExp>(*fun_info_p->exp_snode,
                                                     std::move(arguments_),
                                                     std::move(instances_v));
     auto f = make_return_info(is_rvalue, std::move(retv_p), is_def_const, args_are_constant);

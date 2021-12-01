@@ -16,7 +16,14 @@ public:
     std::vector<UExp> elements;
     explicit List(std::vector<UExp> elements);
 
+    List(const List& other) : sem::Exp(ExpType::LIST) {
+        for (auto& e: other.elements) {
+            this->elements.emplace_back(e->clone());
+        }
+    }
+
     bool equals(const Exp& o) const override;
+    UExp clone() const override;
 };
 
 

@@ -14,3 +14,7 @@ bool sem::StaticMethod::equals(const sem::Exp& o) const {
     bool member_ok = this->method_name == other.method_name;
     return class_ok && member_ok;
 }
+
+sem::UExp sem::StaticMethod::clone() const {
+    return std::make_unique<StaticMethod>(*this);
+}

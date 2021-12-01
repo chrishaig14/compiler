@@ -14,6 +14,7 @@ class sem::EnumMember : public sem::Exp {
 public:
     EnumMember(Path enum_path, const std::string& value);
     bool equals(const Exp& o) const override;
+    UExp clone() const override;
 
     Path enum_path;
     std::string value;

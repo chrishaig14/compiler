@@ -15,6 +15,7 @@ public:
 
     explicit ObjectConstructor(Path class_path);
     bool equals(const Exp& o) const override;
+    UExp clone() const override;
 };
 
 

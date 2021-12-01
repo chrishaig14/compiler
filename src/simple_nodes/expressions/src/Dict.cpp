@@ -22,3 +22,13 @@ bool Dict::equals(const Exp& o) const {
     }
     return true;
 }
+
+UExp Dict::clone() const {
+    return std::make_unique<Dict>(*this);
+}
+
+Dict::Dict(const Dict& other) : sem::Exp(ExpType::DICT) {
+    for (auto& i : other.items) {
+        this->items.emplace_back(i.first->clone(), i.second->clone());
+    }
+}

@@ -7,7 +7,7 @@
 
 using namespace sem;
 
-EnumMember::EnumMember(Path enum_path, const std::string& value) : Exp(ExpType::ENUM_MEMBER),enum_path(enum_path) {
+EnumMember::EnumMember(Path enum_path, const std::string& value) : Exp(ExpType::ENUM_MEMBER), enum_path(enum_path) {
     this->value = value;
 }
 
@@ -15,4 +15,8 @@ EnumMember::EnumMember(Path enum_path, const std::string& value) : Exp(ExpType::
 bool EnumMember::equals(const Exp& o) const {
     auto& other = (const EnumMember&) o;
     return this->enum_path.as_str() == other.enum_path.as_str() && this->value == other.value;
+}
+
+UExp EnumMember::clone() const {
+    return std::make_unique<EnumMember>(*this);
 }

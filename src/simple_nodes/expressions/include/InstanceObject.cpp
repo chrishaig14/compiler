@@ -11,3 +11,7 @@ bool sem::InstanceObject::equals(const sem::Exp& o) const {
 sem::InstanceObject::InstanceObject(const Path& class_path, Path typeclass_path)
         : Exp(ExpType::INSTANCE_OBJECT), typeclass_path(typeclass_path), class_path(class_path) {
 }
+
+sem::UExp sem::InstanceObject::clone() const {
+    return std::make_unique<InstanceObject>(*this);
+}

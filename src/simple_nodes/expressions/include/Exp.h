@@ -13,6 +13,8 @@ public:
 
     explicit Exp(ExpType type);
 
+    virtual UExp clone() const = 0;
+
     virtual bool equals(const Exp& o) const = 0;
 
     bool operator!=(const Exp& other) const;

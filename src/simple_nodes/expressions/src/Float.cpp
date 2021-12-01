@@ -14,3 +14,7 @@ bool Float::equals(const Exp& o) const {
     auto& other = (const Float&) o;
     return this->str == other.str;
 }
+
+UExp Float::clone() const {
+    return std::make_unique<Float>(*this);
+}

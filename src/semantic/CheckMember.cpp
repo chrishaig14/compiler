@@ -128,9 +128,8 @@ UExpressionInfo ModuleChecker::object_member(sem::UExp object_snode, EntityValue
                 std::cout << "found method " << child << " for class " << clazz->class_name
                           << " from instance of typeclass " << im.instance.as_str() << std::endl;
                 info.exp_snode = std::make_unique<sem::ObjectMethodFromInstance>(std::move(object_snode),
-                                                                                 std::make_unique<sem::InstanceObject>(
-                                                                                         clazz->path,
-                                                                                         im.instance),
+                                                                                 sem::InstanceObject(clazz->path,
+                                                                                                     im.instance),
                                                                                  child);
                 info.set_entity(std::make_unique<EntityConstFunction>(im.base.func));
             }
@@ -185,9 +184,9 @@ UExpressionInfo ModuleChecker::class_member(const ast::Member& n, UExpressionInf
                 } else {
                     std::cout << "found method " << child << " for class " << cls.class_name
                               << " from instance of typeclass " << im.instance.as_str() << std::endl;
-                    info.exp_snode = std::make_unique<sem::StaticMethodFromInstance>(std::make_unique<sem::InstanceObject>(
-                            cls.path,
-                            im.instance), child);
+                    info.exp_snode = std::make_unique<sem::StaticMethodFromInstance>(sem::InstanceObject(cls.path,
+                                                                                                         im.instance),
+                                                                                     child);
                     info.set_entity(std::make_unique<EntityConstFunction>(im.base.func));
                 }
             } else {

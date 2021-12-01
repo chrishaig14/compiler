@@ -13,6 +13,7 @@ class sem::Integer : public sem::Exp {
 public:
     explicit Integer(const std::string& str);
     bool equals(const Exp& o) const override;
+    UExp clone() const override;
     std::string str;
 };
 

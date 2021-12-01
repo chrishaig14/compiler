@@ -12,3 +12,7 @@ bool sem::ConstFunction::equals(const sem::Exp& o) const {
 
 sem::ConstFunction::ConstFunction(Path path) : Exp(ExpType::CONST_FUNCTION), path(path) {
 }
+
+sem::UExp sem::ConstFunction::clone() const {
+    return std::make_unique<ConstFunction>(*this);
+}
