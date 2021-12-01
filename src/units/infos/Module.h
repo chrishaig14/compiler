@@ -18,7 +18,7 @@
 #include "TypeclassFoo.h"
 
 class Module {
-    std::vector<std::unique_ptr<ConstFunction>> const_functions;
+    std::vector<ConstFunction> const_functions;
     std::vector<std::unique_ptr<Enum>> enums;
     std::vector<std::unique_ptr<ConcreteClass>> classes;
     std::vector<std::unique_ptr<TemplateClassInfo>> template_classes;
@@ -55,7 +55,7 @@ public:
     void add_class_definition(std::unique_ptr<ConcreteClass> p_class);
     void add_template_class_definition(std::unique_ptr<TemplateClassInfo> p_class);
     void add_enum_definition(std::unique_ptr<Enum> enumm);
-    void add_func_definition(std::unique_ptr<ConstFunction> const_function);
+    void add_func_definition(const ConstFunction& const_function);
     void add_typeclass_definition(std::unique_ptr<TypeclassFoo> typeclass);
 };
 

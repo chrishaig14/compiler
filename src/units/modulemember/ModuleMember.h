@@ -6,6 +6,7 @@
 #define XLANG_MODULEMEMBER_H
 
 #include <ostream>
+#include <units/infos/ConstFunction.h>
 
 enum class ModuleMemberType {
     CONST_FUNCTION, CLASS, PACKAGE, MODULE, ENUM
@@ -40,7 +41,7 @@ public:
 
     virtual bool is_const_function() const;
 
-    virtual ConstFunction& const_function() const;
+    virtual const ConstFunction& const_function() const;
 
     virtual bool is_module() const;
 
@@ -88,13 +89,13 @@ public:
 
 
 class ConstFunctionModuleMember : public ModuleMember {
-    ConstFunction& p_const_function;
+    ConstFunction p_const_function;
 public:
-    explicit ConstFunctionModuleMember(ConstFunction& _const_function);
+    explicit ConstFunctionModuleMember(const ConstFunction& _const_function);
 
     bool is_const_function() const override;
 
-    ConstFunction& const_function() const override;
+    const ConstFunction& const_function() const override;
     std::unique_ptr<ModuleMember> clone() override;
 };
 

@@ -33,9 +33,9 @@ void Module::add_enum_definition(std::unique_ptr<Enum> enumm) {
     this->enums.push_back(std::move(enumm));
 }
 
-void Module::add_func_definition(std::unique_ptr<ConstFunction> const_function) {
-    this->members[const_function->path.basname()] = std::make_unique<ConstFunctionModuleMember>(*const_function);
-    this->const_functions.push_back(std::move(const_function));
+void Module::add_func_definition(const ConstFunction& const_function) {
+    this->members[const_function.path.basname()] = std::make_unique<ConstFunctionModuleMember>(const_function);
+    this->const_functions.push_back(const_function);
 }
 
 Path Module::get_actual_path(const std::string& id) {

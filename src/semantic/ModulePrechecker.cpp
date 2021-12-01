@@ -77,14 +77,14 @@ void ModulePrechecker::visit_function(ast::Function& node) {
     this->module.fill_actual(*rt);
     auto function_info = sem::TypeFunction(std::move(x), std::move(rt));
     Path function_path = Path(this->module.path, node.identifier);
-    auto const_function = std::make_unique<ConstFunction>(Path(this->module.path, node.identifier), function_info);
+    ConstFunction const_function(Path(this->module.path, node.identifier), function_info);
     for (auto& c: node.constraints) {
         for (auto& t: c.second) {
-            const_function->constraints[c.first].insert(Path(this->module.path, t).as_str());
+            const_function.constraints[c.first].insert(Path(this->module.path, t).as_str());
         }
     }
-    node.path = const_function->path;
-    this->module.add_func_definition(std::move(const_function));
+    node.path = const_function.path;
+    this->module.add_func_definition(const_function);
 }
 
 std::unique_ptr<Enum> make_enum(ast::EnumNode& n, Path module_path) {
@@ -208,10 +208,9 @@ void ModulePrechecker::visit_class(ast::ConcreteClassDef& node) {
         }
         sem::Type* p_type = method.return_type->to_sem();
         this->module.fill_actual(*p_type);
-        auto cf = std::make_unique<ConstFunction>(Path(class_info->path, f.first),
-                                                  sem::TypeFunction(x, sem::UType(p_type)));
-        method.path = cf->path;
-        class_info->methods.insert(make_pair(f.first, InstanceMethod(Path(""), BaseMethod(false, *cf))));
+        ConstFunction cf(Path(class_info->path, f.first), sem::TypeFunction(x, sem::UType(p_type)));
+        method.path = cf.path;
+        class_info->methods.insert(make_pair(f.first, InstanceMethod(Path(""), BaseMethod(false, cf))));
         class_info->all_members[f.first] = ClassMemberCategory::method;
     }
 
@@ -225,10 +224,9 @@ void ModulePrechecker::visit_class(ast::ConcreteClassDef& node) {
         }
         sem::Type* p_type = method.return_type->to_sem();
         this->module.fill_actual(*p_type);
-        auto cf = std::make_unique<ConstFunction>(Path(class_info->path, f.first),
-                                                  sem::TypeFunction(x, sem::UType(p_type)));
-        method.path = cf->path;
-        class_info->methods.insert(make_pair(f.first, InstanceMethod(Path(""), BaseMethod(true, *cf))));
+        ConstFunction cf(Path(class_info->path, f.first), sem::TypeFunction(x, sem::UType(p_type)));
+        method.path = cf.path;
+        class_info->methods.insert(make_pair(f.first, InstanceMethod(Path(""), BaseMethod(true, cf))));
         class_info->all_members[f.first] = ClassMemberCategory::method;
     }
 }

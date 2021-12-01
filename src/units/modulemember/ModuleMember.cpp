@@ -6,51 +6,51 @@
 #include "ModuleMember.h"
 
 
-bool ModuleMember::is_klass() const  {
+bool ModuleMember::is_klass() const {
     return false;
 }
 
-ConcreteClass& ModuleMember::klass()  const {
+ConcreteClass& ModuleMember::klass() const {
     throw std::runtime_error("ModuleMember is not a Class");
 }
 
-bool ModuleMember::is_const_function() const  {
+bool ModuleMember::is_const_function() const {
     return false;
 }
 
-ConstFunction& ModuleMember::const_function() const  {
+const ConstFunction& ModuleMember::const_function() const {
     throw std::runtime_error("ModuleMember is not a ConstFunction");
 }
 
-bool ModuleMember::is_module() const  {
+bool ModuleMember::is_module() const {
     return false;
 }
 
-Module& ModuleMember::module()  const {
+Module& ModuleMember::module() const {
     throw std::runtime_error("ModuleMember is not a Module");
 }
 
-bool ModuleMember::is_package()  const {
+bool ModuleMember::is_package() const {
     return false;
 }
 
-Package& ModuleMember::package() const  {
+Package& ModuleMember::package() const {
     throw std::runtime_error("ModuleMember is not a Package");
 }
 
-bool ModuleMember::is_enumm() const  {
+bool ModuleMember::is_enumm() const {
     return false;
 }
 
-Enum& ModuleMember::enumm() const  {
+Enum& ModuleMember::enumm() const {
     throw std::runtime_error("ModuleMember is not a Enum");
 }
 
-bool ModuleMember::is_typeclass()  const {
+bool ModuleMember::is_typeclass() const {
     return false;
 }
 
-TypeclassFoo& ModuleMember::typeclass() const  {
+TypeclassFoo& ModuleMember::typeclass() const {
     throw std::runtime_error("ModuleMember is not a Typeclass");
 }
 
@@ -65,11 +65,11 @@ TemplateClassInfo& ModuleMember::template_klass() const {
 ClassModuleMember::ClassModuleMember(ConcreteClass& _klass) : p_klass(_klass) {
 }
 
-bool ClassModuleMember::is_klass() const  {
+bool ClassModuleMember::is_klass() const {
     return true;
 }
 
-ConcreteClass& ClassModuleMember::klass() const  {
+ConcreteClass& ClassModuleMember::klass() const {
     return this->p_klass;
 }
 
@@ -80,11 +80,11 @@ std::unique_ptr<ModuleMember> ClassModuleMember::clone() {
 TemplateClassModuleMember::TemplateClassModuleMember(TemplateClassInfo& _klass) : p_klass(_klass) {
 }
 
-bool TemplateClassModuleMember::is_template_klass() const  {
+bool TemplateClassModuleMember::is_template_klass() const {
     return true;
 }
 
-TemplateClassInfo& TemplateClassModuleMember::template_klass() const  {
+TemplateClassInfo& TemplateClassModuleMember::template_klass() const {
     return this->p_klass;
 }
 
@@ -92,15 +92,15 @@ std::unique_ptr<ModuleMember> TemplateClassModuleMember::clone() {
     return std::make_unique<TemplateClassModuleMember>(this->p_klass);
 }
 
-ConstFunctionModuleMember::ConstFunctionModuleMember(ConstFunction& _const_function)
-        : p_const_function(_const_function) {
+ConstFunctionModuleMember::ConstFunctionModuleMember(const ConstFunction& _const_function) : p_const_function(
+        _const_function) {
 }
 
-bool ConstFunctionModuleMember::is_const_function() const  {
+bool ConstFunctionModuleMember::is_const_function() const {
     return true;
 }
 
-ConstFunction& ConstFunctionModuleMember::const_function() const  {
+const ConstFunction& ConstFunctionModuleMember::const_function() const {
     return this->p_const_function;
 }
 
@@ -111,11 +111,11 @@ std::unique_ptr<ModuleMember> ConstFunctionModuleMember::clone() {
 ModuleModuleMember::ModuleModuleMember(Module* _module) : p_module(_module) {
 }
 
-bool ModuleModuleMember::is_module() const  {
+bool ModuleModuleMember::is_module() const {
     return true;
 }
 
-Module& ModuleModuleMember::module() const  {
+Module& ModuleModuleMember::module() const {
     return *this->p_module;
 }
 
@@ -126,11 +126,11 @@ std::unique_ptr<ModuleMember> ModuleModuleMember::clone() {
 EnumModuleMember::EnumModuleMember(Enum* _enumm) : p_enum(_enumm) {
 }
 
-bool EnumModuleMember::is_enumm()  const {
+bool EnumModuleMember::is_enumm() const {
     return true;
 }
 
-Enum& EnumModuleMember::enumm() const  {
+Enum& EnumModuleMember::enumm() const {
     return *this->p_enum;
 }
 
@@ -141,11 +141,11 @@ std::unique_ptr<ModuleMember> EnumModuleMember::clone() {
 PackageModuleMember::PackageModuleMember(Package* _package) : p_package(_package) {
 }
 
-bool PackageModuleMember::is_package() const  {
+bool PackageModuleMember::is_package() const {
     return true;
 }
 
-Package& PackageModuleMember::package()  const {
+Package& PackageModuleMember::package() const {
     return *this->p_package;
 }
 
@@ -153,11 +153,11 @@ std::unique_ptr<ModuleMember> PackageModuleMember::clone() {
     return std::make_unique<PackageModuleMember>(this->p_package);
 }
 
-TypeclassFoo& TypeclassModuleMember::typeclass() const  {
+TypeclassFoo& TypeclassModuleMember::typeclass() const {
     return *this->p_typeclass;
 }
 
-bool TypeclassModuleMember::is_typeclass() const  {
+bool TypeclassModuleMember::is_typeclass() const {
     return true;
 }
 
