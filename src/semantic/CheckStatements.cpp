@@ -254,27 +254,38 @@ std::unique_ptr<EntityValue> ModuleChecker::make_entity_value(sem::Type& type) {
 
 sem::UCommon ModuleChecker::visit_for(const ast::For& node) {
     UExpressionInfo exp_info_p = this->dispatch_rvalue(node.exp);
+    bool has_error = false;
     if (exp_info_p->entity.get().e_type != E_TYPE::VALUE) {
         this->error_reporter.error(std::make_unique<error::For>(exp_info_p->entity, node.exp.start));
-        return nullptr;
+        has_error = true;
     }
-    EntityValue& exp_entity_value = exp_info_p->entity.get().get_value();
-    sem::TypeObject& exp_ot = exp_entity_value.type.object();
-    if (exp_ot.id != "List") {
-        this->error_reporter.error(std::make_unique<error::For>(exp_entity_value, node.exp.start));
-        return nullptr;
+    std::unique_ptr<Entity> ev;
+    if (not has_error) {
+        EntityValue& exp_entity_value = exp_info_p->entity.get().get_value();
+        sem::TypeObject& exp_ot = exp_entity_value.type.object();
+        if (exp_ot.id != "List") {
+            this->error_reporter.error(std::make_unique<error::For>(exp_entity_value, node.exp.start));
+            has_error = true;
+        } else {
+            sem::Type* elem_type = exp_ot.type_params[0];
+            ev = this->make_entity_value(*elem_type);
+        }
+    }
+    if (has_error) {
+        ev = std::make_unique<EntityError>();
     }
 
-    sem::Type* elem_type = exp_ot.type_params[0];
-    auto ev = this->make_entity_value(*elem_type);
     this->enter_scope();
     this->scope->set(node.var, *ev);
     this->scope->is_loop = true;
     auto binfo = this->visit_block(node.body);
+    if (binfo == nullptr) {
+        has_error = true;
+    }
     this->scope->is_loop = false;
     this->leave_scope();
 
-    if (binfo == nullptr) {
+    if (has_error) {
         return nullptr;
     }
     sem::UCommon rinfo_p = std::make_unique<sem::For>(node.var, std::move(exp_info_p->exp_snode), *binfo);
@@ -309,16 +320,23 @@ sem::UCommon ModuleChecker::visit_while(const ast::While& node) {
 
 sem::UCommon ModuleChecker::visit_if(const ast::If& n) {
     UExpressionInfo condition_sinfo = this->expect_rvalue_of_type(sem::TypeObject("Boolean"), n.condition);
+    bool has_error = false;
     if (condition_sinfo->is_error()) {
-        return nullptr;
+        has_error = true;
     }
     auto& condition_snode = condition_sinfo->exp_snode;
 
     this->enter_scope();
     auto body_info = this->visit_block(n.then);
-    sem::Block& bn = *body_info;
-    for (const auto& local_var : this->scope->table) {
-        bn.locals.push_back(local_var.first);
+    if (body_info == nullptr) {
+        // error
+        has_error = true;
+    }
+    if (not has_error) {
+        sem::Block& bn = *body_info;
+        for (const auto& local_var : this->scope->table) {
+            bn.locals.push_back(local_var.first);
+        }
     }
     this->leave_scope();
 
@@ -326,25 +344,44 @@ sem::UCommon ModuleChecker::visit_if(const ast::If& n) {
 
     for (auto& elif : n.elifs) {
         UExpressionInfo elif_condition_sinfo = this->expect_rvalue_of_type(sem::TypeObject("Boolean"), elif.first);
+        if (elif_condition_sinfo->is_error()) {
+            has_error = true;
+        }
         auto& elif_condition_snode = elif_condition_sinfo->exp_snode;
         this->enter_scope();
         auto elif_block_info = this->visit_block(elif.second);
-        sem::Block* bn1 = elif_block_info.release();
-        for (const auto& local_var : this->scope->table) {
-            bn1->locals.push_back(local_var.first);
+        if (elif_block_info == nullptr) {
+            has_error = true;
+        }
+        if (not has_error) {
+            sem::Block* bn1 = elif_block_info.release();
+            for (const auto& local_var : this->scope->table) {
+                bn1->locals.push_back(local_var.first);
+            }
         }
         this->leave_scope();
-        elifs.emplace_back(std::move(elif_condition_snode), *elif_block_info);
+        if (not has_error) {
+            elifs.emplace_back(std::move(elif_condition_snode), *elif_block_info);
+        }
     }
     std::unique_ptr<sem::Block> else_info;
     if (n.selse != nullptr && !n.selse->nodes.empty()) {
         this->enter_scope();
         else_info = this->visit_block(*n.selse);
-        auto& bn2 = else_info;
-        for (const auto& local_var : this->scope->table) {
-            bn2->locals.push_back(local_var.first);
+        if (else_info == nullptr) {
+            has_error = true;
+        }
+        if (not has_error) {
+            auto& bn2 = else_info;
+            for (const auto& local_var : this->scope->table) {
+                bn2->locals.push_back(local_var.first);
+            }
         }
         this->leave_scope();
+    }
+
+    if (has_error) {
+        return nullptr;
     }
     std::unique_ptr<sem::Block> else_snode = else_info == nullptr ? nullptr : std::move(else_info);
 

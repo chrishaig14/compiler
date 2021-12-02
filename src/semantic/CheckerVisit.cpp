@@ -173,9 +173,13 @@ std::unique_ptr<sem::Module> ModuleChecker::check_module() {
 
 std::unique_ptr<sem::Block> ModuleChecker::visit_block(const ast::Block& node) {
     auto sn = std::make_unique<sem::Block>();
+    bool has_error = false;
     for (auto& n: node.nodes) {
         sem::UCommon sinfo_p = this->dispatch(*n);
-        if (sinfo_p != nullptr) {
+        if (sinfo_p == nullptr) {
+            has_error = true;
+        }
+        if (not has_error) {
             if (sinfo_p->type == sem::CommonType::BLOCK) {
                 if (((std::unique_ptr<sem::Block>&) sinfo_p)->unwrap) {
                     for (auto& nn : ((std::unique_ptr<sem::Block>&) sinfo_p)->nodes) {
@@ -189,6 +193,9 @@ std::unique_ptr<sem::Block> ModuleChecker::visit_block(const ast::Block& node) {
                 sn->nodes.push_back(std::move(sinfo_p));
             }
         }
+    }
+    if (has_error) {
+        return nullptr;
     }
     return sn;
 }
@@ -226,9 +233,15 @@ std::unique_ptr<sem::FunctionDef> ModuleChecker::visit_function(const ast::Funct
     std::unique_ptr<Entity> e = entity_from_type(returnType);
     this->scope->set("__return__", *e);
     auto bn = this->visit_block(*n.body);
-    for (auto& local_var: this->scope->table) {
-        if (local_var.second->is_value()) {
-            bn->locals.push_back(local_var.first);
+    bool has_error = false;
+    if (bn == nullptr) {
+        has_error = true;
+    }
+    if (not has_error) {
+        for (auto& local_var: this->scope->table) {
+            if (local_var.second->is_value()) {
+                bn->locals.push_back(local_var.first);
+            }
         }
     }
     this->leave_scope();
@@ -240,14 +253,17 @@ std::unique_ptr<sem::FunctionDef> ModuleChecker::visit_function(const ast::Funct
                 this->error_reporter.error(std::make_unique<error::FunctionReturnLastStmt>(function_name,
                                                                                            *returnType.to_sem(),
                                                                                            last_node.start));
-                return nullptr;
+                has_error = true;
             }
         } else {
             this->error_reporter.error(std::make_unique<error::FunctionReturnLastStmt>(function_name,
                                                                                        *returnType.to_sem(),
                                                                                        n.start));
-            return nullptr;
+            has_error = true;
         }
+    }
+    if (has_error) {
+        return nullptr;
     }
     return std::make_unique<sem::FunctionDef>(n.identifier, n.parameter_names, *bn, n_instances);
 }
