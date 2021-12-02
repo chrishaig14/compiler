@@ -39,16 +39,14 @@ std::unique_ptr<sem::KlassDef> ModuleChecker::visit_class(ast::ConcreteClassDef&
 
     for (auto& m: node.methods) {
         auto ms = this->visit_function(*m.second);
-        std::unique_ptr<sem::FunctionDef> sf((sem::FunctionDef*) ms.release());
-        sn->methods.emplace_back(std::move(sf));
+        sn->methods.push_back(*ms);
     }
     this->this_entity.reset();
     this->add_this = false;
 
     for (auto& m: node.static_methods) {
         auto ms = this->visit_function(*m.second);
-        std::unique_ptr<sem::FunctionDef> sf((sem::FunctionDef*) ms.release());
-        sn->static_methods.emplace_back(std::move(sf));
+        sn->static_methods.push_back(*ms);
     }
 
     //
@@ -252,5 +250,5 @@ std::unique_ptr<sem::FunctionDef> ModuleChecker::visit_function(const ast::Funct
             return nullptr;
         }
     }
-    return std::make_unique<sem::FunctionDef>(n.identifier, n.parameter_names, std::move(bn), n_instances);
+    return std::make_unique<sem::FunctionDef>(n.identifier, n.parameter_names, *bn, n_instances);
 }

@@ -101,7 +101,7 @@ PythonOutputCode PythonModuleTranspiler::transpile_function(const sem::FunctionD
     parameters = parameters.substr(0, parameters.size() - 2);
     f_source += (node.identifier) + LPAREN + parameters + RPAREN + ":" + NEWLINE;
     // this->source += f_source;
-    f_source += indent_paragraph(this->transpile_block(*node.body), 4);
+    f_source += indent_paragraph(this->transpile_block(node.body), 4);
     return f_source;
 }
 
@@ -210,14 +210,14 @@ PythonOutputCode PythonModuleTranspiler::transpile_class(const sem::KlassDef& no
 
     for (auto& m: node.methods) {
         this->add_self = true;
-        PythonOutputCode fcode = this->transpile_function(*m);
+        PythonOutputCode fcode = this->transpile_function(m);
         this->add_self = false;
         code += indent_paragraph(fcode, 4) + "\n";
         // std::cout << fcode.code << std::endl;
     }
 
     for (auto& m: node.static_methods) {
-        PythonOutputCode fcode = this->transpile_function(*m);
+        PythonOutputCode fcode = this->transpile_function(m);
         code += indent_paragraph(fcode, 4) + "\n";
         // std::cout << fcode.code << std::endl;
     }

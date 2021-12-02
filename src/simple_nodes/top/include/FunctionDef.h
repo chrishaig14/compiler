@@ -17,9 +17,10 @@ class sem::FunctionDef : public sem::Top {
 public:
     std::string identifier;
     VectorOfStrings params;
-    std::unique_ptr<Block> body;
+    Block body;
     std::map<std::string, std::set<std::string>> instances;
-    FunctionDef(std::string identifier, VectorOfStrings params, std::unique_ptr<Block> body, std::map<std::string, std::set<std::string>> instances);
+    FunctionDef(std::string identifier, VectorOfStrings params, const Block& body,
+                std::map<std::string, std::set<std::string>> instances);
     bool equals(const Top& o) const override;
 };
 
