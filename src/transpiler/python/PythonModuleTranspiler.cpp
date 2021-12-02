@@ -648,19 +648,21 @@ PythonOutputCode PythonModuleTranspiler::transpile_instance(const sem::InstanceD
     std::string post;
     this->add_self = true;
     for (auto& m: def.methods) {
-        std::string full_method_name = full_instance_name + "_M_" + m->identifier;
-        post += "\"" + m->identifier + "\": " + full_method_name + ",\n";
-        m->identifier = full_method_name;
-        code += this->transpile_function(*m);
+        std::string full_method_name = full_instance_name + "_M_" + m.identifier;
+        post += "\"" + m.identifier + "\": " + full_method_name + ",\n";
+        auto renamed = m;
+        renamed.identifier = full_method_name;
+        code += this->transpile_function(renamed);
         code += "\n";
     }
     this->add_self = false;
 
     for (auto& m: def.static_methods) {
-        std::string full_method_name = full_instance_name + "_M_" + m->identifier;
-        post += "\"" + m->identifier + "\": " + full_method_name + ",\n";
-        m->identifier = full_method_name;
-        code += this->transpile_function(*m);
+        std::string full_method_name = full_instance_name + "_M_" + m.identifier;
+        post += "\"" + m.identifier + "\": " + full_method_name + ",\n";
+        auto renamed = m;
+        renamed.identifier = full_method_name;
+        code += this->transpile_function(renamed);
         code += "\n";
     }
 

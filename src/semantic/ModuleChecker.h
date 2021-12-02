@@ -112,28 +112,28 @@ public:
     std::unique_ptr<sem::Top> visit_typeclass(const ast::TypeclassAst& typeclass);
 
     std::unique_ptr<sem::InstanceDef> visit_instance(const ast::Instance& instance) {
-        std::vector<std::unique_ptr<sem::FunctionDef>> methods;
-        std::vector<std::unique_ptr<sem::FunctionDef>> static_methods;
+        std::vector<sem::FunctionDef> methods;
+        std::vector<sem::FunctionDef> static_methods;
         sem::Type* p_type = instance.base_type->to_sem();
         this->module.fill_actual(*p_type);
         this->this_entity = this->make_entity_value(*p_type);
         this->add_this = true;
         for (auto& m: instance.methods) {
             auto method = this->visit_function(*m.second);
-            methods.push_back(std::move(method));
+            methods.push_back(*method);
         }
 
         for (auto& m: instance.static_methods) {
             auto method = this->visit_function(*m.second);
-            static_methods.push_back(std::move(method));
+            static_methods.push_back(*method);
         }
 
         this->add_this = false;
         this->this_entity.reset();
         return std::make_unique<sem::InstanceDef>(Path(this->module.path, instance.id),
                                                   Path(this->module.path, instance.base_type->id),
-                                                  std::move(methods),
-                                                  std::move(static_methods));
+                                                  methods,
+                                                  static_methods);
     }
 
     std::unique_ptr<sem::Block> visit_block(const ast::Block& node);
