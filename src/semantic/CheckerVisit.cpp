@@ -7,58 +7,6 @@
 #include <simple_nodes/common/include/TypeFunction.h>
 #include <simple_nodes/expressions/include/CallExp.h>
 
-sem::Common* make_for_snode(ast::For& node, std::unique_ptr<sem::Block>& binfo, UExpressionInfo& exp_info_p,
-                            std::string loop_list_var_id, std::string loop_index_var_id,
-                            std::string loop_list_len_var_id, sem::Common* update_loop_index_snode) {
-    auto* bbn = new sem::Block();
-
-    sem::UExp p_node = std::move(exp_info_p->exp_snode);
-    auto dsn = std::make_unique<sem::Declaration>(loop_list_var_id, std::move(p_node));
-    bbn->nodes.push_back(std::move(dsn));
-    sem::UExp init_idx = std::make_unique<sem::Integer>("0");
-    auto lidx_decl = std::make_unique<sem::Declaration>(loop_index_var_id, std::move(init_idx));
-
-    bbn->nodes.push_back(std::move(lidx_decl));
-
-    auto list_len_fn = std::make_unique<sem::Id>("libcore.libcore.List.len");
-    auto list_sn = std::make_unique<sem::Id>(loop_list_var_id);
-    std::vector<sem::UExp> v;
-    v.emplace_back(std::move(list_sn));
-    std::vector<sem::InstanceObject> instances_v;
-    sem::UExp call_list_len_sn = std::make_unique<sem::CallExp>(*list_len_fn, std::move(v), instances_v);
-    auto lensn = std::make_unique<sem::Declaration>(loop_list_len_var_id, std::move(call_list_len_sn));
-    bbn->nodes.push_back(std::move(lensn));
-
-
-    auto idxsn = std::make_unique<sem::Id>(loop_index_var_id);
-    auto cmpfunsn = std::make_unique<sem::Id>("libcore.libcore.Integer.__lt__");
-
-    auto llensn = std::make_unique<sem::Id>(loop_list_len_var_id);
-
-
-    std::vector<sem::UExp> vv;
-    vv.push_back(std::move(idxsn));
-    vv.push_back(std::move(llensn));
-    std::vector<sem::InstanceObject> instances_v2;
-    auto cn = std::make_unique<sem::CallExp>(*cmpfunsn, std::move(vv), instances_v2);
-
-    auto& bn = binfo;
-
-    std::vector<sem::UExp> vvv;
-    vvv.push_back(std::make_unique<sem::Id>(loop_list_var_id));
-    vvv.push_back(std::make_unique<sem::Id>(loop_index_var_id));
-    auto* list_subscript_n = new sem::CallExp(sem::Id("libcore.libcore.List.__get_item__"), std::move(vvv), {});
-
-    sem::UExp ul(list_subscript_n);
-    auto loop_elem_sn = std::make_unique<sem::Declaration>(node.var, std::move(ul));
-    bn->nodes.insert(bn->nodes.begin(), std::move(loop_elem_sn));
-
-    bn->nodes.push_back(sem::UCommon(update_loop_index_snode));
-    auto wsn = std::make_unique<sem::While>(std::move(cn), *bn);
-    bbn->nodes.push_back(std::move(wsn));
-    return bbn;
-}
-
 std::unique_ptr<sem::EnumDef> ModuleChecker::visit_enum(ast::EnumNode& p_node) {
     sem::UCommon info_u;
     auto esn = std::make_unique<sem::EnumDef>(p_node.id, p_node.values);

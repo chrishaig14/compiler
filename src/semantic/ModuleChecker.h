@@ -73,9 +73,6 @@ ModuleMember* map_unit_to_module_member(Unit& u);
 TextPosition add_one_col(TextPosition t);
 bool function_is_generic(const sem::TypeFunction& ft);
 
-sem::Common* make_for_snode(ast::For& node, std::unique_ptr<sem::Block>& binfo, UExpressionInfo& exp_info_p,
-                            std::string loop_list_var_id, std::string loop_index_var_id,
-                            std::string loop_list_len_var_id, sem::Common* update_loop_index_snode);
 const sem::TypeFunction& get_function_type(const ExpressionInfo& fun_info);
 
 UExpressionInfo exp_error_stub();
