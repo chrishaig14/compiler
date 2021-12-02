@@ -18,7 +18,7 @@ public:
     bool operator!=(const Common& other) const;
 
     bool operator==(const Common& other) const;
-
+    virtual std::unique_ptr<Common> clone() const = 0;
     virtual ~Common() = default;
 };
 

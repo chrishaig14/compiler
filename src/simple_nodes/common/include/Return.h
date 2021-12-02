@@ -15,7 +15,11 @@ public:
     UExp expression;
     std::vector<std::string> reachables;
     explicit Return(UExp expression);
+
+    Return(const Return& other);
+
     bool equals(const Common& o) const override;
+    std::unique_ptr<Common> clone() const override;
 };
 
 

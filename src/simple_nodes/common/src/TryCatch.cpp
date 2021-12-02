@@ -11,3 +11,11 @@ TryCatch::TryCatch(Block* body, std::vector<std::pair<std::string, std::string>>
     this->catches_bodies = catches_bodies;
     this->e_names_types = e_names_types;
 }
+
+bool TryCatch::equals(const Common& o) const {
+    return false;
+}
+
+std::unique_ptr<Common> TryCatch::clone() const {
+    return std::unique_ptr<Common>();
+}

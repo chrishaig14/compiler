@@ -54,7 +54,7 @@ sem::Common* make_for_snode(ast::For& node, std::unique_ptr<sem::Block>& binfo, 
     bn->nodes.insert(bn->nodes.begin(), std::move(loop_elem_sn));
 
     bn->nodes.push_back(sem::UCommon(update_loop_index_snode));
-    auto wsn = std::make_unique<sem::While>(std::move(cn), std::move(bn));
+    auto wsn = std::make_unique<sem::While>(std::move(cn), *bn);
     bbn->nodes.push_back(std::move(wsn));
     return bbn;
 }

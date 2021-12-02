@@ -15,3 +15,12 @@ bool Assignment::equals(const Common& o) const {
     // return this->identifier == other.identifier && *this->expression == *other.expression;
     return false;
 }
+
+std::unique_ptr<Common> Assignment::clone() const {
+    return std::make_unique<Assignment>(*this);
+}
+
+Assignment::Assignment(const Assignment& other) : sem::Common(CommonType::ASSIGNMENT) {
+    this->lvalue = other.lvalue->clone();
+    this->rvalue = other.rvalue->clone();
+}

@@ -7,6 +7,7 @@
 
 #include <string>
 #include "Common.h"
+#include "../../expressions/include/Exp.h"
 #include <cassert>
 
 class sem::Declaration : public sem::Common {
@@ -17,7 +18,13 @@ public:
 
     Declaration(const std::string& identifier, UExp _expression);
 
+    Declaration(const Declaration& other)
+            : sem::Common(CommonType::DECLARATION), _expression(other.expression.clone()), identifier(other.identifier),
+              expression(*_expression) {
+    }
+
     bool equals(const Common& o) const override;
+    std::unique_ptr<Common> clone() const override;
 };
 
 

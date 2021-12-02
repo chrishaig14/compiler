@@ -23,3 +23,12 @@ bool Return::equals(const Common& o) const {
     }
     return *this->expression == *other.expression;
 }
+
+std::unique_ptr<Common> Return::clone() const {
+    return std::make_unique<Return>(*this);
+}
+
+Return::Return(const Return& other) : sem::Common(CommonType::RETURN) {
+    this->expression = other.expression->clone();
+    this->reachables = other.reachables;
+}

@@ -22,3 +22,17 @@ bool Block::equals(const Common& o) const {
     }
     return true;
 }
+
+std::unique_ptr<Common> Block::clone() const {
+    return std::make_unique<Block>(*this);
+}
+
+Block::Block(const Block& other) : sem::Common(CommonType::BLOCK) {
+    this->unwrap = other.unwrap;
+    for (auto& l: other.locals) {
+        this->locals.emplace_back(l);
+    }
+    for (auto& n: other.nodes) {
+        this->nodes.push_back(n->clone());
+    }
+}

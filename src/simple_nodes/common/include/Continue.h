@@ -16,6 +16,7 @@ public:
     Continue();
 
     bool equals(const Common& o) const override;
+    std::unique_ptr<Common> clone() const override;
 };
 
 

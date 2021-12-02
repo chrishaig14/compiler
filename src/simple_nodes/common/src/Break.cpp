@@ -12,3 +12,7 @@ Break::Break() : Common(CommonType::BREAK) {
 bool Break::equals(const Common& o) const {
     return true;
 }
+
+std::unique_ptr<Common> Break::clone() const {
+    return std::make_unique<Break>(*this);
+}

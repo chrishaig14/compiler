@@ -26,3 +26,14 @@ bool Call::equals(const Common& o) const {
     }
     return true;
 }
+
+std::unique_ptr<Common> Call::clone() const {
+    return std::make_unique<Call>(*this);
+}
+
+Call::Call(const Call& other) : sem::Common(CommonType::CALL) {
+    this->function = other.function->clone();
+    for (auto& a: other.arguments) {
+        this->arguments.emplace_back(a->clone());
+    }
+}

@@ -12,17 +12,25 @@
 
 class sem::If : public sem::Common {
     UExp _condition;
-    std::unique_ptr<Block> _then;
 public:
     Exp& condition;
-    Block& then;
+    Block then;
     std::unique_ptr<Block> _else;
-    std::vector<std::pair<UExp, std::unique_ptr<Block>>> elifs;
+    std::vector<std::pair<UExp, Block>> elifs;
 
-    If(UExp condition, std::unique_ptr<Block> then, std::vector<std::pair<UExp, std::unique_ptr<Block>>> elifs,
-       std::unique_ptr<Block> _else);
+    If(UExp condition, const Block& then, std::vector<std::pair<UExp, Block>> elifs, std::unique_ptr<Block> _else);
+
+    If(const If& other)
+            : sem::Common(CommonType::IF), _condition(other.condition.clone()), condition(*this->_condition),
+              then(other.then), _else(static_cast<Block*>(other._else->clone().release())) {
+        for (auto& e: other.elifs) {
+            this->elifs.emplace_back(nullptr, e.second);
+        }
+
+    }
 
     bool equals(const Common& o) const override;
+    std::unique_ptr<Common> clone() const override;
 };
 
 

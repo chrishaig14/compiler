@@ -15,7 +15,10 @@ public:
     std::vector<std::string> locals;
     std::vector<UCommon> nodes;
     Block();
+    Block(const Block& other);
+
     bool equals(const Common& o) const override;
+    std::unique_ptr<Common> clone() const override;
 };
 
 

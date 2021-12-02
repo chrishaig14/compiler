@@ -13,11 +13,14 @@
 class sem::While : public sem::Common {
 public:
     UExp condition;
-    std::unique_ptr<Block> body;
+    Block body;
 
-    While(UExp condition, std::unique_ptr<Block> body);
+    While(UExp condition, const Block& body);
+
+    While(const While& other);
 
     bool equals(const Common& o) const override;
+    std::unique_ptr<Common> clone() const override;
 
 };
 

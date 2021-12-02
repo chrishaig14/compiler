@@ -12,6 +12,8 @@ class sem::TryCatch : public sem::Common {
 public:
     TryCatch(Block* body, std::vector<std::pair<std::string, std::string>> e_names_types,
                   std::vector<Common*> catches_bodies);
+    bool equals(const Common& o) const override;
+    std::unique_ptr<Common> clone() const override;
 
     std::vector<std::pair<std::string, std::string>> e_names_types;
     Block* body;

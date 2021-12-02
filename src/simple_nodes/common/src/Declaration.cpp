@@ -20,3 +20,7 @@ bool Declaration::equals(const Common& o) const {
     bool exp_ok = this->expression == other.expression;
     return id_ok && exp_ok;
 }
+
+std::unique_ptr<Common> Declaration::clone() const {
+    return std::make_unique<Declaration>(*this);
+}

@@ -7,18 +7,11 @@
 
 using namespace sem;
 
-If::If(UExp _condition, std::unique_ptr<Block> _then,
-       std::vector<std::pair<UExp, std::unique_ptr<Block>>> elifs, std::unique_ptr<Block> _else) : Common(
-        CommonType::IF), _condition(std::move(_condition)), _then(std::move(_then)),
+If::If(UExp _condition, const Block& _then, std::vector<std::pair<UExp, Block>> elifs, std::unique_ptr<Block> _else)
+        : Common(CommonType::IF), _condition(std::move(_condition)),
 
-                                                                                                             condition(*this->_condition),
-                                                                                                             then(*this->_then),
-                                                                                                             _else(std::move(
-                                                                                                                     _else)),
-                                                                                                             elifs(std::move(
-                                                                                                                     elifs)) {
+          condition(*this->_condition), then(_then), _else(std::move(_else)), elifs(std::move(elifs)) {
     assert(this->_condition != nullptr);
-    assert(this->_then != nullptr);
 }
 
 bool If::equals(const Common& o) const {
@@ -28,4 +21,8 @@ bool If::equals(const Common& o) const {
     bool else_ok = (this->_else == nullptr and other._else == nullptr) or
                    ((this->_else != nullptr and other._else != nullptr) and *this->_else == *other._else);
     return cond_ok && then_ok && else_ok;
+}
+
+std::unique_ptr<Common> If::clone() const {
+    return std::make_unique<If>(*this);
 }

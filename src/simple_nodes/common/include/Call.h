@@ -13,9 +13,13 @@ class sem::Call : public sem::Common {
 public:
     UExp function;
     std::vector<UExp> arguments;
+
+    Call(const Call& other);
+
     Call(UExp function, std::vector<UExp> arguments);
 
     bool equals(const Common& o) const override;
+    std::unique_ptr<Common> clone() const override;
 };
 
 

@@ -191,7 +191,7 @@ sem::UCommon ModuleChecker::visit_match(const ast::Match& node) {
 
         this->error_reporter.error(std::make_unique<error::TypeMismatch>(*new sem::TypeObject("Union",
                                                                                               {new sem::TypeObject("...",
-                                                                                                                 sem::VectorOfTypes{})}),
+                                                                                                                   sem::VectorOfTypes{})}),
                                                                          *node.exp,
                                                                          exp_info->entity));
         return nullptr;
@@ -201,12 +201,12 @@ sem::UCommon ModuleChecker::visit_match(const ast::Match& node) {
     if (ot.id != "Union") {
         this->error_reporter.error(std::make_unique<error::TypeMismatch>(*new sem::TypeObject("Union",
                                                                                               {new sem::TypeObject("...",
-                                                                                                                 sem::VectorOfTypes{})}),
+                                                                                                                   sem::VectorOfTypes{})}),
                                                                          *node.exp,
                                                                          exp_info->entity));
         return nullptr;
     }
-    std::vector<std::pair<int, std::unique_ptr<sem::Block>>> cas;
+    std::vector<std::pair<int, sem::Block>> cas;
     std::string varname = "match_var";
     for (size_t i = 0; i < node.ids.size(); i++) {
         std::string case_id = node.ids[i];
@@ -231,7 +231,7 @@ sem::UCommon ModuleChecker::visit_match(const ast::Match& node) {
         sem::UExp u(omn);
         auto dn = std::make_unique<sem::Declaration>(case_id, std::move(u));
         bn->nodes.insert(bn->nodes.begin(), std::move(dn));
-        cas.emplace_back(union_index, std::move(bn));
+        cas.emplace_back(union_index, *bn);
         this->leave_scope();
     }
     return std::make_unique<sem::Match>(std::move(exp_info->exp_snode), varname, std::move(cas));
@@ -277,7 +277,7 @@ sem::UCommon ModuleChecker::visit_for(const ast::For& node) {
     if (binfo == nullptr) {
         return nullptr;
     }
-    sem::UCommon rinfo_p = std::make_unique<sem::For>(node.var, std::move(exp_info_p->exp_snode), std::move(binfo));
+    sem::UCommon rinfo_p = std::make_unique<sem::For>(node.var, std::move(exp_info_p->exp_snode), *binfo);
     return rinfo_p;
 }
 
@@ -302,7 +302,7 @@ sem::UCommon ModuleChecker::visit_while(const ast::While& node) {
     this->scope->is_loop = false;
     this->leave_scope();
 
-    auto while_sn = std::make_unique<sem::While>(std::move(condition_snode), std::move(body_snode));
+    auto while_sn = std::make_unique<sem::While>(std::move(condition_snode), *body_snode);
 
     return while_sn;
 }
@@ -322,7 +322,7 @@ sem::UCommon ModuleChecker::visit_if(const ast::If& n) {
     }
     this->leave_scope();
 
-    std::vector<std::pair<sem::UExp, std::unique_ptr<sem::Block>>> elifs;
+    std::vector<std::pair<sem::UExp, sem::Block>> elifs;
 
     for (auto& elif : n.elifs) {
         UExpressionInfo elif_condition_sinfo = this->expect_rvalue_of_type(sem::TypeObject("Boolean"), elif.first);
@@ -334,7 +334,7 @@ sem::UCommon ModuleChecker::visit_if(const ast::If& n) {
             bn1->locals.push_back(local_var.first);
         }
         this->leave_scope();
-        elifs.emplace_back(std::move(elif_condition_snode), std::move(elif_block_info));
+        elifs.emplace_back(std::move(elif_condition_snode), *elif_block_info);
     }
     std::unique_ptr<sem::Block> else_info;
     if (n.selse != nullptr && !n.selse->nodes.empty()) {
@@ -348,8 +348,5 @@ sem::UCommon ModuleChecker::visit_if(const ast::If& n) {
     }
     std::unique_ptr<sem::Block> else_snode = else_info == nullptr ? nullptr : std::move(else_info);
 
-    return std::make_unique<sem::If>(std::move(condition_snode),
-                                     std::move(body_info),
-                                     std::move(elifs),
-                                     std::move(else_snode));
+    return std::make_unique<sem::If>(std::move(condition_snode), *body_info, std::move(elifs), std::move(else_snode));
 }

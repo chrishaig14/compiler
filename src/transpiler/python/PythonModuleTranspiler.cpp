@@ -237,7 +237,7 @@ PythonExpressionOutputCode PythonModuleTranspiler::transpile_object_member(const
 PythonOutputCode PythonModuleTranspiler::transpile_while(const sem::While& node) {
     PythonExpressionOutputCode cond = this->dispatch_expression(*node.condition, false);
     std::string cond_id = "condition_" + std::to_string(this->next_arg_n());
-    PythonOutputCode thenc = this->transpile_block(*node.body);
+    PythonOutputCode thenc = this->transpile_block(node.body);
     std::string out = pre_if_any(cond) + cond_id + " = " + cond.code + "\n";
     out += "while " + cond_id + ":\n";
     out += indent_paragraph(thenc, 4) + "\n";
@@ -311,7 +311,7 @@ PythonOutputCode PythonModuleTranspiler::transpile_match(const sem::Match& node)
     out += "switch" + SPACE + LPAREN + "GET_INT(CAST(" + node.varname + ",core_D_core_D_Union" + RPAREN + "->type" +
            RPAREN + RPAREN + SPACE + LCURLY;
     for (auto& c: node.cases) {
-        PythonOutputCode mc = this->transpile_block(*c.second);
+        PythonOutputCode mc = this->transpile_block(c.second);
         out += "case" + SPACE + "" + std::to_string(c.first) + "" + SPACE + ":" + SPACE + LCURLY + mc + "break" +
                SEMIC + RCURLY;
     }
@@ -637,7 +637,7 @@ PythonOutputCode PythonModuleTranspiler::transpile_for(const sem::For& node) {
     std::string exp_id = "exp_" + std::to_string(this->next_arg_n());
     std::string code = pre_if_any(exp_code) + exp_id + " = " + exp_code.code + "\n";
     code += "for " + node.varname + " in " + exp_id + ".elems:\n";
-    PythonOutputCode body_code = this->transpile_block(*node.body);
+    PythonOutputCode body_code = this->transpile_block(node.body);
     code += indent_paragraph(body_code, 4);
     return code;
 }
