@@ -18,6 +18,7 @@ std::string ErrorFormatter::format(const error::Error& err) const {
         case error::ErrorType::cant_assign:
             break;
         case error::ErrorType::class_no_member:
+            return this->format(static_cast<const error::ClassNoMember&>(err));
             break;
         case error::ErrorType::enum_no_value:
             break;

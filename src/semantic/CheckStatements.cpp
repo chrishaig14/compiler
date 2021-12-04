@@ -183,28 +183,54 @@ sem::UCommon ModuleChecker::visit_return(const ast::Return& n) {
 
 sem::UCommon ModuleChecker::visit_match(const ast::Match& node) {
     UExpressionInfo exp_info = this->dispatch_rvalue(*node.exp);
-    Entity& entity = exp_info->entity.get();
-    bool a = entity.e_type != E_TYPE::VALUE;
-    EntityValue& value = entity.get_value();
-    bool b = value.type.kind != sem::Kind::OBJECT;
-    if (a || b) {
+    bool has_error = false;
+    bool exp_error = false;
 
-        this->error_reporter.error(std::make_unique<error::TypeMismatch>(*new sem::TypeObject("Union",
-                                                                                              {new sem::TypeObject("...",
-                                                                                                                   sem::VectorOfTypes{})}),
-                                                                         *node.exp,
-                                                                         exp_info->entity));
-        return nullptr;
+    if (exp_info->is_error()) {
+        has_error = true;
+        exp_error = true;
     }
+    sem::TypeObject* ot = nullptr;
+    if (not exp_error) {
+        Entity& entity = exp_info->entity.get();
+        if (entity.e_type != E_TYPE::VALUE) {
 
-    sem::TypeObject& ot = value.type.object();
-    if (ot.id != "Union") {
-        this->error_reporter.error(std::make_unique<error::TypeMismatch>(*new sem::TypeObject("Union",
-                                                                                              {new sem::TypeObject("...",
-                                                                                                                   sem::VectorOfTypes{})}),
-                                                                         *node.exp,
-                                                                         exp_info->entity));
-        return nullptr;
+            this->error_reporter.error(std::make_unique<error::TypeMismatch>(*new sem::TypeObject("Union",
+                                                                                                  {new sem::TypeObject(
+                                                                                                          "...",
+                                                                                                          sem::VectorOfTypes{})}),
+                                                                             *node.exp,
+                                                                             exp_info->entity));
+            has_error = true;
+            exp_error = true;
+        }
+        if (not has_error) {
+            if (entity.get_value().type.kind != sem::Kind::OBJECT) {
+
+                this->error_reporter.error(std::make_unique<error::TypeMismatch>(*new sem::TypeObject("Union",
+                                                                                                      {new sem::TypeObject(
+                                                                                                              "...",
+                                                                                                              sem::VectorOfTypes{})}),
+                                                                                 *node.exp,
+                                                                                 exp_info->entity));
+                has_error = true;
+                exp_error = true;
+            }
+        }
+        if (not has_error) {
+            EntityValue& value = entity.get_value();
+            ot = &value.type.object();
+            if (ot->id != "Union") {
+                this->error_reporter.error(std::make_unique<error::TypeMismatch>(*new sem::TypeObject("Union",
+                                                                                                      {new sem::TypeObject(
+                                                                                                              "...",
+                                                                                                              sem::VectorOfTypes{})}),
+                                                                                 *node.exp,
+                                                                                 exp_info->entity));
+                has_error = true;
+                exp_error = true;
+            }
+        }
     }
     std::vector<std::pair<int, sem::Block>> cas;
     std::string varname = "match_var";
@@ -216,23 +242,34 @@ sem::UCommon ModuleChecker::visit_match(const ast::Match& node) {
 
         sem::Type* p_type = case_type.to_sem();
         this->module.fill_actual(*p_type);
-        int union_index = target_union_type(ot, *p_type);
-        if (union_index == -1) {
-            this->error_reporter.fail("Error, type " + case_type.to_string() + " not part of " + ot.to_string());
-            // return error_stub();
-            return nullptr;
+        int union_index = -1;
+        if (not exp_error) {
+            union_index = target_union_type(*ot, *p_type);
+            if (union_index == -1) {
+                this->error_reporter.fail("Error, type " + case_type.to_string() + " not part of " + ot->to_string());
+                // return error_stub();
+                has_error = true;
+            }
         }
         this->enter_scope();
         auto v = this->make_value(p_type);
         assert(v->clazz != nullptr);
         this->scope->set(case_id, *v);
         auto bn = this->visit_block(case_node);
-        auto* omn = new sem::ObjectMember(std::make_unique<sem::Id>(varname), Path("libcore.libcore.Union"), "o");
-        sem::UExp u(omn);
-        auto dn = std::make_unique<sem::Declaration>(case_id, std::move(u));
-        bn->nodes.insert(bn->nodes.begin(), std::move(dn));
-        cas.emplace_back(union_index, *bn);
+        if (bn == nullptr) {
+            has_error = true;
+        }
+        if (not has_error) {
+            auto* omn = new sem::ObjectMember(std::make_unique<sem::Id>(varname), Path("libcore.libcore.Union"), "o");
+            sem::UExp u(omn);
+            auto dn = std::make_unique<sem::Declaration>(case_id, std::move(u));
+            bn->nodes.insert(bn->nodes.begin(), std::move(dn));
+            cas.emplace_back(union_index, *bn);
+        }
         this->leave_scope();
+    }
+    if (has_error){
+        return nullptr;
     }
     return std::make_unique<sem::Match>(std::move(exp_info->exp_snode), varname, std::move(cas));
 }
@@ -309,19 +346,23 @@ sem::UCommon ModuleChecker::visit_break(const ast::Break& node) {
 
 sem::UCommon ModuleChecker::visit_while(const ast::While& node) {
     UExpressionInfo condition_sinfo = this->expect_rvalue_of_type(sem::TypeObject("Boolean"), *node.condition);
+    bool has_error = false;
     if (condition_sinfo->is_error()) {
-        return nullptr;
+        has_error = true;
     }
-    sem::UExp condition_snode = std::move(condition_sinfo->exp_snode);
-
     this->enter_scope();
     this->scope->is_loop = true;
     auto body_snode = this->visit_block(*node.body);
+    if (body_snode == nullptr) {
+        has_error = true;
+    }
     this->scope->is_loop = false;
     this->leave_scope();
-
+    if (has_error) {
+        return nullptr;
+    }
+    sem::UExp condition_snode = std::move(condition_sinfo->exp_snode);
     auto while_sn = std::make_unique<sem::While>(std::move(condition_snode), *body_snode);
-
     return while_sn;
 }
 

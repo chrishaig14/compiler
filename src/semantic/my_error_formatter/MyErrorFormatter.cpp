@@ -85,3 +85,8 @@ std::string MyErrorFormatter::format(const error::NotDeclared& err) const {
 std::string MyErrorFormatter::format(const error::FunctionCallNumArgs& err) const {
     return this->context_string(err.start) + "Error::FunctionCallNumArgs:" + this->code_context_string(err.start);
 }
+
+std::string MyErrorFormatter::format(const error::ClassNoMember& err) const {
+    return this->context_string(err.position) + "Error::ClassNoMember: class'" + err.class_path.basname() +
+           "' has no member '" + err.member_name + "'" + this->code_context_string(err.position);
+}

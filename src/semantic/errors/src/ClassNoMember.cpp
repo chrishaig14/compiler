@@ -18,8 +18,9 @@ std::string ClassNoMember::to_str(const CodeLines& code) const {
     return std::string();
 }
 
-ClassNoMember::ClassNoMember(const ast::ObjectType& type, const std::string basic_string_1,
-                             TextPosition position, const ast::Statement& node, TextPosition position_1,
-                             TextPosition position_2):Error(ErrorType::class_no_member) {
-
+ClassNoMember::ClassNoMember(Path class_path, const std::string& member_name, TextPosition position) : error::Error(ErrorType::class_no_member) {
+    this->class_path = class_path;
+    this->member_name = member_name;
+    this->position = position;
 }
+

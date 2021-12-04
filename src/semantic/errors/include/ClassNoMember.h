@@ -10,12 +10,15 @@
 
 class error::ClassNoMember : public error::Error {
 public:
-    ClassNoMember(const ast::ObjectType& type, const std::string basic_string_1, TextPosition position,
-                  const ast::Statement& node, TextPosition position_1, TextPosition position_2);
+    ClassNoMember(Path class_path, const std::string& member_name, TextPosition position);
+
     Error* clone() const override;
     bool equal(const Error& other) const override;
     std::string to_str(const CodeLines& code) const override;
 
+    Path class_path;
+    std::string member_name;
+    TextPosition position;
 };
 
 

@@ -1,7 +1,15 @@
+class Foo {
+    x: Integer
+}
+
 fun main() -> Integer {
-    for l @ x + 2 {
-        var y = 2 + l
-        return z
+    match Foo.x {
+        x: Integer {
+            return d
+        }
+        y: String {
+            return f
+        }
     }
     return 2
 }

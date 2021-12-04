@@ -7,6 +7,7 @@
 
 #include "BadReturn.h"
 #include "ClassNoMethodForOp.h"
+#include "ClassNoMember.h"
 #include "For.h"
 #include "FunctionCallNumArgs.h"
 #include "GenericError.h"

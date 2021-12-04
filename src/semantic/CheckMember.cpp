@@ -164,10 +164,12 @@ UExpressionInfo ModuleChecker::class_member(const ast::Member& n, UExpressionInf
     ClassMemberCategory member_cat = cls.get_member(child);
     switch (member_cat) {
         case ClassMemberCategory::not_found: {
-            throw std::runtime_error("Error class has no member '" + child + "'");
+            this->error_reporter.error(std::make_unique<error::ClassNoMember>(cls.path, child, n.dot_pos));
+            return exp_error_stub();
         }
         case ClassMemberCategory::attribute: {
-            throw std::runtime_error("Error class no member '" + child + "'(it's an instance variable)!");
+            this->error_reporter.error(std::make_unique<error::ClassNoMember>(cls.path, child, n.dot_pos));
+            return exp_error_stub();
         }
         case ClassMemberCategory::static_attribute: {
             info.set_entity(entity_from_type(*cls.static_attributes[child].first));
