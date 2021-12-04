@@ -1,33 +1,7 @@
-typeclass Foobar[t] {
-    static fun foobar() -> Integer
-    fun bb()->Integer
-}
-
-class Baz {
-    value: String
-}
-
-instance Foobar[Baz] {
-    static fun foobar() -> Integer {
-        return 17
-    }
-    fun bb() -> Integer{
-        return 11
-    }
-}
-
-fun ff(x: t) -> Integer where t::Foobar {
-    return 0
-}
-
 fun main() -> Integer {
-    var s = Baz.foobar()
-    var b = #Baz("Hello")
-    var z = b.bb()
-    var r = ff(b)
-    print(z.str())
-    print(s.str())
-    print(r.str())
-    print("Hello")
-    return 0
+    for l @ x + 2 {
+        var y = 2 + l
+        return z
+    }
+    return 2
 }

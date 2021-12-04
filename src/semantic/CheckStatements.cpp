@@ -255,12 +255,19 @@ std::unique_ptr<EntityValue> ModuleChecker::make_entity_value(sem::Type& type) {
 sem::UCommon ModuleChecker::visit_for(const ast::For& node) {
     UExpressionInfo exp_info_p = this->dispatch_rvalue(node.exp);
     bool has_error = false;
-    if (exp_info_p->entity.get().e_type != E_TYPE::VALUE) {
-        this->error_reporter.error(std::make_unique<error::For>(exp_info_p->entity, node.exp.start));
+    if (exp_info_p->is_error()) {
         has_error = true;
+    }
+    if (not has_error) {
+        // not an error but it has to be a normal value
+        if (exp_info_p->entity.get().e_type != E_TYPE::VALUE) {
+            this->error_reporter.error(std::make_unique<error::For>(exp_info_p->entity, node.exp.start));
+            has_error = true;
+        }
     }
     std::unique_ptr<Entity> ev;
     if (not has_error) {
+        // not an error, but it has to be a list
         EntityValue& exp_entity_value = exp_info_p->entity.get().get_value();
         sem::TypeObject& exp_ot = exp_entity_value.type.object();
         if (exp_ot.id != "List") {

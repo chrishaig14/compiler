@@ -28,6 +28,7 @@ std::string ErrorFormatter::format(const error::Error& err) const {
         case error::ErrorType::expected_expression:
             break;
         case error::ErrorType::for_error:
+            return this->format(static_cast<const error::For&>(err));
             break;
         case error::ErrorType::partial_wrong_num_args:
             break;

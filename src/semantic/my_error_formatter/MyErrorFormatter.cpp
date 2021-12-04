@@ -44,6 +44,11 @@ std::string MyErrorFormatter::format(const error::Redeclared& err) const {
            this->code_context_string(err.node.start);
 }
 
+std::string MyErrorFormatter::format(const error::For& err) const {
+    return this->context_string(err.position) + "Error::For: expected a 'List'" +
+           this->code_context_string(err.position);
+}
+
 std::string MyErrorFormatter::format(const error::NoMember& err) const {
     return this->context_string(err.m.start) + "Error::NoMember: '" + err.m.s_child + "'" +
            this->code_context_string(err.m.start);
@@ -78,6 +83,5 @@ std::string MyErrorFormatter::format(const error::NotDeclared& err) const {
 }
 
 std::string MyErrorFormatter::format(const error::FunctionCallNumArgs& err) const {
-    return this->context_string(err.start) + "Error::FunctionCallNumArgs:" +
-    this->code_context_string(err.start);
+    return this->context_string(err.start) + "Error::FunctionCallNumArgs:" + this->code_context_string(err.start);
 }
