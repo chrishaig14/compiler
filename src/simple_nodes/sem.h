@@ -106,6 +106,8 @@ namespace sem {
 
     class StaticMethod;
 
+    class Union;
+
     enum class CommonType {
         DECLARATION, BLOCK, ASSIGNMENT, RETURN, CALL, WHILE, IF, BREAK, CONTINUE, MATCH, THROW, TRY_CATCH, FOR
     };
@@ -129,7 +131,9 @@ namespace sem {
         OBJECT_CONSTRUCTOR,
         STATIC_METHOD,
         INSTANCE_OBJECT,
-        METHOD_FROM_INSTANCE, STATIC_METHOD_FROM_INSTANCE
+        METHOD_FROM_INSTANCE,
+        STATIC_METHOD_FROM_INSTANCE,
+        UNION
     };
 
     enum class TopType {

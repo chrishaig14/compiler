@@ -2,14 +2,21 @@ class Foo {
     x: Integer
 }
 
+fun get_integer_or_string() -> Union[Integer, String]{
+    return 3
+}
+
 fun main() -> Integer {
-    match Foo.x {
+    var t = get_integer_or_string()
+    var w = ""
+    match t {
         x: Integer {
-            return d
+            w = x.str()
         }
         y: String {
-            return f
+            w = y
         }
     }
+    print(w)
     return 2
 }

@@ -12,12 +12,26 @@
 #include <string>
 #include "../../expressions/include/Exp.h"
 
+class MatchCase {
+public:
+    int index;
+    std::string var_name;
+    sem::Block body;
+
+    MatchCase(int index, std::string var_name, const sem::Block& body) : index(index), var_name(var_name), body(body) {
+    }
+
+    MatchCase(const MatchCase& other) : body(other.body) {
+        this->index = other.index;
+        this->var_name = other.var_name;
+    }
+};
+
 class sem::Match : public sem::Common {
 public:
     UExp exp;
-    std::vector<std::pair<int, Block>> cases;
-    std::string varname;
-    Match(UExp exp, std::string varname, std::vector<std::pair<int, Block>> cases);
+    std::vector<MatchCase> cases;
+    Match(UExp exp, std::vector<MatchCase> cases);
     Match(const Match& other);
     bool equals(const Common& o) const override;
     std::unique_ptr<Common> clone() const override;

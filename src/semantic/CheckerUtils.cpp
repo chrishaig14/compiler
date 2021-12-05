@@ -4,6 +4,8 @@
 
 #include "CheckerUtils.h"
 #include <simple_nodes/common/include/TypeObject.h>
+#include <simple_nodes/expressions/include/Union.h>
+
 #include "ModuleChecker.h"
 
 std::string binoptype_to_str(OpType op) {
@@ -107,13 +109,7 @@ void make_not_generic(ast::ObjectType& ot) {
 }
 
 sem::UExp make_union_wrapper(int type_index, sem::UExp expression) {
-    auto new_union = std::make_unique<sem::NewObject>();
-    new_union->class_name = "core_D_core_D_Union";
-    auto in = std::make_unique<sem::Integer>(std::string());
-    in->str = std::to_string(type_index); // FIXME, use int directly
-    new_union->args.push_back(std::move(expression));
-    new_union->args.push_back(std::move(in));
-    return new_union;
+    return std::make_unique<sem::Union>(std::move(expression), type_index);
 }
 
 

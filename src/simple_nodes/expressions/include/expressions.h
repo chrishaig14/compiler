@@ -24,5 +24,6 @@
 #include "StaticMethod.h"
 #include "String.h"
 #include "Ternary.h"
+#include "Union.h"
 
 #endif //XLANG_EXPRESSIONS_H

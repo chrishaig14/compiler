@@ -232,7 +232,7 @@ sem::UCommon ModuleChecker::visit_match(const ast::Match& node) {
             }
         }
     }
-    std::vector<std::pair<int, sem::Block>> cas;
+    std::vector<MatchCase> cas;
     std::string varname = "match_var";
     for (size_t i = 0; i < node.ids.size(); i++) {
         std::string case_id = node.ids[i];
@@ -260,18 +260,15 @@ sem::UCommon ModuleChecker::visit_match(const ast::Match& node) {
             has_error = true;
         }
         if (not has_error) {
-            auto* omn = new sem::ObjectMember(std::make_unique<sem::Id>(varname), Path("libcore.libcore.Union"), "o");
-            sem::UExp u(omn);
-            auto dn = std::make_unique<sem::Declaration>(case_id, std::move(u));
-            bn->nodes.insert(bn->nodes.begin(), std::move(dn));
-            cas.emplace_back(union_index, *bn);
+            MatchCase match_case(union_index, case_id, *bn);
+            cas.push_back(match_case);
         }
         this->leave_scope();
     }
     if (has_error){
         return nullptr;
     }
-    return std::make_unique<sem::Match>(std::move(exp_info->exp_snode), varname, std::move(cas));
+    return std::make_unique<sem::Match>(std::move(exp_info->exp_snode), cas);
 }
 
 sem::UCommon ModuleChecker::visit_continue(const ast::Continue& node) {

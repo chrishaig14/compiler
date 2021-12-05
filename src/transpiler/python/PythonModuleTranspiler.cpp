@@ -6,6 +6,7 @@
 #include <simple_nodes/common/include/Throw.h>
 #include <simple_nodes/top/include/InstanceDef.h>
 #include <simple_nodes/expressions/include/StaticMethodFromInstance.h>
+#include <simple_nodes/expressions/include/Union.h>
 #include <units/infos/Module.h>
 
 std::string PythonModuleTranspiler::make_full_instance_name(Path instance_path, Path class_path) {
@@ -305,17 +306,26 @@ PythonOutputCode PythonModuleTranspiler::transpile_continue(const sem::Continue&
 
 PythonOutputCode PythonModuleTranspiler::transpile_match(const sem::Match& node) {
     std::string out;
-    PythonExpressionOutputCode exp = this->dispatch_expression(*node.exp, false);
-    out += exp.pre_code;
-    out += exp.code;
-    out += "switch" + SPACE + LPAREN + "GET_INT(CAST(" + node.varname + ",core_D_core_D_Union" + RPAREN + "->type" +
-           RPAREN + RPAREN + SPACE + LCURLY;
-    for (auto& c: node.cases) {
-        PythonOutputCode mc = this->transpile_block(c.second);
-        out += "case" + SPACE + "" + std::to_string(c.first) + "" + SPACE + ":" + SPACE + LCURLY + mc + "break" +
-               SEMIC + RCURLY;
+    PythonExpressionOutputCode exp_out = this->dispatch_expression(*node.exp, false);
+    out += exp_out.pre_code;
+    out += "union_object = " + exp_out.code + NEWLINE;
+    out += "actual_union_type = union_object[0]" + NEWLINE;
+    out += "actual_union_object = union_object[1]" + NEWLINE;
+    out += "if actual_union_type == " + std::to_string(node.cases[0].index) + ":\n";
+    std::string first_case_body = this->transpile_block(node.cases[0].body);
+    out += indent_paragraph(node.cases[0].var_name + " = actual_union_object", 4) + NEWLINE;
+    out += indent_paragraph(first_case_body, 4);
+    bool first = true;
+    for (auto& kase: node.cases) {
+        if (first) {
+            first = false;
+            continue;
+        }
+        out += NEWLINE + "elif actual_union_type == " + std::to_string(kase.index) + ":\n";
+        std::string case_body = this->transpile_block(kase.body);
+        out += indent_paragraph(kase.var_name + " = actual_union_object", 4) + NEWLINE;
+        out += indent_paragraph(case_body, 4);
     }
-    out += RCURLY;
     return out;
 }
 
@@ -503,10 +513,13 @@ PythonExpressionOutputCode PythonModuleTranspiler::dispatch_expression(const sem
             std::string out_code = make_full_instance_name(n.instance.typeclass_path, n.instance.class_path);
             return PythonExpressionOutputCode(out_pre_code, out_code);
         }
-        case sem::ExpType::STATIC_METHOD_FROM_INSTANCE:
+        case sem::ExpType::STATIC_METHOD_FROM_INSTANCE: {
             auto& n = static_cast<const sem::StaticMethodFromInstance&>(node);
             std::string out_code = make_full_instance_name(n.instance.typeclass_path, n.instance.class_path);
             return PythonExpressionOutputCode("", out_code);
+        }
+        case sem::ExpType::UNION:
+            return this->transpile_union(static_cast<const sem::Union&>(node));
     }
     __builtin_unreachable();
 }
@@ -671,6 +684,13 @@ PythonOutputCode PythonModuleTranspiler::transpile_instance(const sem::InstanceD
     code += post;
     code += "}";
     return code;
+}
+
+PythonExpressionOutputCode PythonModuleTranspiler::transpile_union(const sem::Union& an_union) {
+    PythonExpressionOutputCode exp = this->dispatch_expression(*an_union.exp, false);
+    std::string pre_code = exp.pre_code + NEWLINE + "union_value = " + exp.code + NEWLINE;
+    std::string code = "(" + std::to_string(an_union.type_index) + ", union_value)";
+    return PythonExpressionOutputCode(pre_code, code);
 }
 
 
