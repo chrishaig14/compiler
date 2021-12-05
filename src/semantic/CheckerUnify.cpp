@@ -246,3 +246,4 @@ void ModuleChecker::add_typeclasses_to_generic_type(sem::Type& type, std::string
         }
     }
 }
+

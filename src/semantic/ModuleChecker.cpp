@@ -396,3 +396,28 @@ sem::UCommon ModuleChecker::dispatch_statement(const ast::Statement& n, bool is_
     }
     return nullptr;
 }
+
+std::unique_ptr<sem::InstanceDef> ModuleChecker::visit_instance(const ast::Instance& instance) {
+    std::vector<sem::FunctionDef> methods;
+    std::vector<sem::FunctionDef> static_methods;
+    sem::Type* p_type = instance.base_type->to_sem();
+    this->module.fill_actual(*p_type);
+    this->this_entity = this->make_entity_value(*p_type);
+    this->add_this = true;
+    for (auto& m: instance.methods) {
+        auto method = this->visit_function(*m.second);
+        methods.push_back(*method);
+    }
+
+    for (auto& m: instance.static_methods) {
+        auto method = this->visit_function(*m.second);
+        static_methods.push_back(*method);
+    }
+
+    this->add_this = false;
+    this->this_entity.reset();
+    return std::make_unique<sem::InstanceDef>(Path(this->module.path, instance.id),
+                                              Path(this->module.path, instance.base_type->id),
+                                              methods,
+                                              static_methods);
+}

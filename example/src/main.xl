@@ -2,21 +2,13 @@ class Foo {
     x: Integer
 }
 
-fun get_integer_or_string() -> Union[Integer, String]{
-    return 3
+fun get_integer_or_string() -> Option[Integer]{
+    return none
 }
 
 fun main() -> Integer {
-    var t = get_integer_or_string()
-    var w = ""
-    match t {
-        x: Integer {
-            w = x.str()
-        }
-        y: String {
-            w = y
-        }
-    }
-    print(w)
+    var s = get_integer_or_string()
+    var t = s? it : 0
+    print(t.str())
     return 2
 }

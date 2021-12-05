@@ -70,9 +70,7 @@ sem::UExp ModuleChecker::make_rvalue(const Entity& t_entity, sem::UExp value_sno
         }
 
         if (unaliased_target_type_id == "Option") {
-            return sem::UExp(make_option_rvalue(value_snode.release(),
-                                                unaliased_value_type->to_ast(),
-                                                unaliased_target_type->to_ast()));
+            return std::make_unique<sem::Option>(std::move(value_snode));
         }
 
     } else if (t_entity.is_constfun()) {
@@ -87,17 +85,8 @@ sem::UExp ModuleChecker::make_rvalue(const Entity& t_entity, sem::UExp value_sno
         return nullptr;
     } else if (t_entity.is_none()) {
         if (target.object().id == "Option") {
-            return value_snode;
+            return std::make_unique<sem::Option>(nullptr);
         }
-    }
-    return nullptr;
-}
-
-sem::Exp* ModuleChecker::make_option_rvalue(sem::Exp* value_snode, const ast::Type* unaliased_value_type,
-                                            const ast::Type* unaliased_target_type) const {
-    if (*unaliased_target_type->object().type_params[0] == *unaliased_value_type ||
-        unaliased_value_type->object().id == "NoneType") {
-        return value_snode;
     }
     return nullptr;
 }

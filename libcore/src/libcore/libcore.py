@@ -65,7 +65,22 @@ class Float:
     pass
 
 class Option:
-    pass
+    def __init__(self, value):
+        self.value = value
+    @staticmethod
+    def __eq__(a, b, t_Eq):
+        a = a.value is None
+        b = b.value is None
+        if a and b:
+            # both none
+            return True
+        elif not a and not b:
+            # both not none
+            return t_Eq(a.value, b.value)
+        else:
+            # one is none and the other is not
+            return False
+
 
 class Integer:
     def __init__(self, value):

@@ -22,7 +22,8 @@ public:
 
     If(const If& other)
             : sem::Common(CommonType::IF), _condition(other.condition.clone()), condition(*this->_condition),
-              then(other.then), _else(static_cast<Block*>(other._else->clone().release())) {
+              then(other.then),
+              _else(static_cast<Block*>(other._else != nullptr ? other._else->clone().release() : nullptr)) {
         for (auto& e: other.elifs) {
             this->elifs.emplace_back(nullptr, e.second);
         }

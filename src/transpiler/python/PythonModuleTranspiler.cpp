@@ -7,6 +7,7 @@
 #include <simple_nodes/top/include/InstanceDef.h>
 #include <simple_nodes/expressions/include/StaticMethodFromInstance.h>
 #include <simple_nodes/expressions/include/Union.h>
+#include <simple_nodes/expressions/include/Option.h>
 #include <units/infos/Module.h>
 
 std::string PythonModuleTranspiler::make_full_instance_name(Path instance_path, Path class_path) {
@@ -359,7 +360,7 @@ PythonExpressionOutputCode PythonModuleTranspiler::transpile_ternary(const sem::
 }
 
 PythonExpressionOutputCode PythonModuleTranspiler::transpile_none(const sem::None& node) {
-    return PythonExpressionOutputCode("", "nullptr");
+    return PythonExpressionOutputCode("", "None");
 }
 
 PythonOutputCode PythonModuleTranspiler::transpile_try_catch(const sem::TryCatch& node) {
@@ -520,6 +521,8 @@ PythonExpressionOutputCode PythonModuleTranspiler::dispatch_expression(const sem
         }
         case sem::ExpType::UNION:
             return this->transpile_union(static_cast<const sem::Union&>(node));
+        case sem::ExpType::OPTION:
+            return this->transpile_option(static_cast<const sem::Option&>(node));
     }
     __builtin_unreachable();
 }
@@ -691,6 +694,19 @@ PythonExpressionOutputCode PythonModuleTranspiler::transpile_union(const sem::Un
     std::string pre_code = exp.pre_code + NEWLINE + "union_value = " + exp.code + NEWLINE;
     std::string code = "(" + std::to_string(an_union.type_index) + ", union_value)";
     return PythonExpressionOutputCode(pre_code, code);
+}
+
+PythonExpressionOutputCode PythonModuleTranspiler::transpile_option(const sem::Option& option) {
+    PythonExpressionOutputCode out("", "");
+
+    if (option.exp != nullptr) {
+        auto exp = this->dispatch_expression(*option.exp, false);
+        out.pre_code = exp.pre_code;
+        out.code = "Option(" + exp.code + ")";
+    } else {
+        out.code = "Option(None)";
+    }
+    return out;
 }
 
 

@@ -55,6 +55,7 @@ add_library(
     expressions/include/ObjectConstructor.h
     expressions/include/ObjectMember.h
     expressions/include/ObjectMethod.h
+    expressions/include/Option.h
     expressions/include/String.h
     expressions/include/Ternary.h
     expressions/include/Union.h
@@ -74,6 +75,7 @@ add_library(
     expressions/src/ObjectConstructor.cpp
     expressions/src/ObjectMember.cpp
     expressions/src/ObjectMethod.cpp
+    expressions/src/Option.cpp
     expressions/src/String.cpp
     expressions/src/Ternary.cpp
     expressions/src/Union.cpp

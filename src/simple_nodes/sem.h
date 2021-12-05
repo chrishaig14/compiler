@@ -15,6 +15,8 @@ namespace sem {
 
     class InstanceDef;
 
+    class Option;
+
     class StaticMethodFromInstance;
 
     class Bool;
@@ -133,7 +135,8 @@ namespace sem {
         INSTANCE_OBJECT,
         METHOD_FROM_INSTANCE,
         STATIC_METHOD_FROM_INSTANCE,
-        UNION
+        UNION,
+        OPTION
     };
 
     enum class TopType {

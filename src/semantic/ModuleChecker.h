@@ -31,6 +31,7 @@
 #include <simple_nodes/top/include/KlassDef.h>
 #include <simple_nodes/common/include/Match.h>
 #include <simple_nodes/expressions/include/NewObject.h>
+#include <simple_nodes/expressions/include/Option.h>
 #include <simple_nodes/common/include/Return.h>
 #include <simple_nodes/common/include/TypeObject.h>
 #include <simple_nodes/common/include/TypeFunction.h>
@@ -111,30 +112,7 @@ public:
     std::unique_ptr<sem::EnumDef> visit_enum(ast::EnumNode& p_node);
     std::unique_ptr<sem::Top> visit_typeclass(const ast::TypeclassAst& typeclass);
 
-    std::unique_ptr<sem::InstanceDef> visit_instance(const ast::Instance& instance) {
-        std::vector<sem::FunctionDef> methods;
-        std::vector<sem::FunctionDef> static_methods;
-        sem::Type* p_type = instance.base_type->to_sem();
-        this->module.fill_actual(*p_type);
-        this->this_entity = this->make_entity_value(*p_type);
-        this->add_this = true;
-        for (auto& m: instance.methods) {
-            auto method = this->visit_function(*m.second);
-            methods.push_back(*method);
-        }
-
-        for (auto& m: instance.static_methods) {
-            auto method = this->visit_function(*m.second);
-            static_methods.push_back(*method);
-        }
-
-        this->add_this = false;
-        this->this_entity.reset();
-        return std::make_unique<sem::InstanceDef>(Path(this->module.path, instance.id),
-                                                  Path(this->module.path, instance.base_type->id),
-                                                  methods,
-                                                  static_methods);
-    }
+    std::unique_ptr<sem::InstanceDef> visit_instance(const ast::Instance& instance);
 
     std::unique_ptr<sem::Block> visit_block(const ast::Block& node);
 

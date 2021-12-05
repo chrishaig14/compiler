@@ -99,6 +99,7 @@ public:
     std::string make_full_instance_name(Path instance_path, Path class_path);
     PythonOutputCode transpile_instance(const sem::InstanceDef& def);
     PythonExpressionOutputCode transpile_union(const sem::Union& an_union);
+    PythonExpressionOutputCode transpile_option(const sem::Option& option);
 };
 
 

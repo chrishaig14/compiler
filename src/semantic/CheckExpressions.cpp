@@ -132,10 +132,16 @@ UExpressionInfo ModuleChecker::visit_binop(const ast::BinaryOp& node) {
         vv.push_back(std::move(right_snode));
         std::vector<sem::InstanceObject> instances_v;
 
-        auto sn = std::make_unique<sem::CallExp>(sem::ConstFunction(operator_fun.path), std::move(vv), instances_v);
+        // auto sn = std::make_unique<sem::CallExp>(sem::ConstFunction(operator_fun.path), std::move(vv), instances_v);
+
+        info.exp_snode = std::make_unique<sem::CallExp>(sem::StaticMethod(l_entity_v.clazz->path, "__eq__"),
+                                                        std::move(vv),
+                                                        instances_v);
+
+
         sem::Type* rettype = operator_fun.const_function_ft.return_type->clone();
         info.set_entity(this->make_value(rettype));
-        info.exp_snode = std::move(sn);
+        // info.exp_snode = std::move(sn);
     }
     return info_u;
 }
