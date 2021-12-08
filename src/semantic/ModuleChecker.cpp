@@ -397,16 +397,63 @@ sem::UCommon ModuleChecker::dispatch_statement(const ast::Statement& n, bool is_
     return nullptr;
 }
 
+std::map<std::string, sem::UTypeFunction>
+instantiate_typeclass_methods(TypeclassFoo& typeclass, const ast::ObjectType& type) {
+    std::map<std::string, sem::UTypeFunction> out_methods;
+    for (auto& method: typeclass.methods) {
+        std::unordered_map<std::string, ast::Type*> repl;
+        repl[typeclass.gen_type] = type.clone();
+        std::cout << "type is: " << type.to_string() << std::endl;
+        std::cout << "original is: " << method.second->to_string() << std::endl;
+        auto ret = make_type(*method.second->to_ast(), repl);
+        std::cout << "ret is: " << ret->to_string() << std::endl;
+        out_methods[method.first] = sem::UTypeFunction(static_cast<sem::TypeFunction*>(ret->to_sem()));
+    }
+    return out_methods;
+}
+
 std::unique_ptr<sem::InstanceDef> ModuleChecker::visit_instance(const ast::Instance& instance) {
     std::vector<sem::FunctionDef> methods;
     std::vector<sem::FunctionDef> static_methods;
+
+    ModuleMember* mm = this->module.get(Path(this->module.path, instance.id));
+    if (not mm->is_typeclass()) {
+        throw std::runtime_error("Error: " + instance.id + " is not a typeclass");
+    }
+    TypeclassFoo& typeclass = mm->typeclass();
+    auto out_methods = instantiate_typeclass_methods(typeclass, *instance.base_type);
     sem::Type* p_type = instance.base_type->to_sem();
     this->module.fill_actual(*p_type);
     this->this_entity = this->make_entity_value(*p_type);
     this->add_this = true;
+
     for (auto& m: instance.methods) {
-        auto method = this->visit_function(*m.second);
-        methods.push_back(*method);
+        auto& method = m.second;
+        sem::VectorOfTypes x;
+        for (ast::Type& p: method->parameter_types) {
+            sem::Type* args = p.to_sem();
+            this->module.fill_actual(*args);
+            x.emplace_back(args);
+        }
+        sem::Type* r_type = method->return_type->to_sem();
+        this->module.fill_actual(*r_type);
+
+        auto tf = sem::TypeFunction(x, sem::UType(r_type));
+        auto out_it = out_methods.find(m.first);
+        if (out_it == out_methods.end()) {
+            throw std::runtime_error("Method " + m.first + " not found in typeclass " + instance.id);
+        }
+        auto& out_m = out_methods.at(m.first);
+        if (*out_m != tf) {
+            throw std::runtime_error(
+                    "Instance method " + m.first + " should have signature " + out_m->to_string() + " but it's " +
+                    tf.to_string());
+        }
+        auto methodf = this->visit_function(*method);
+        methods.push_back(*methodf);
+    }
+    if (methods.size() != out_methods.size()) {
+        throw std::runtime_error("Not all method for typeclass " + instance.id + " implemented");
     }
 
     for (auto& m: instance.static_methods) {

@@ -2,27 +2,17 @@ class Foo {
     x: Integer
 }
 
-typeclass t::Duplicable {
-    fun double() -> Foo
+typeclass t::Id {
+    fun id(i: Integer) -> String
+    fun baboon() -> Integer
 }
 
-instance Foo::Duplicable {
-    fun double() -> Foo {
-        return #Foo(this.x*2)
+instance Foo::Id {
+    fun id(i: Integer) -> String {
+        return "Hello"
     }
 }
 
-fun print_double(x: t) -> Integer where t::Duplicable {
-    print(x.double().x.str())
-    return 0
-}
-
 fun main() -> Integer {
-    var s = #Foo(8)
-    var w = 8 * 7
-    print(w.str())
-    print(s.x.str())
-    print(s.double().x.str())
-    var r = print_double(s)
     return 2
 }
