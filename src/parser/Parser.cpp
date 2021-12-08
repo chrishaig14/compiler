@@ -761,10 +761,9 @@ std::unique_ptr<ast::Block> Parser::parse_possibly_empty_block() {
 
 std::unique_ptr<ast::Instance> Parser::parse_instance() {
     Token instance_tok = this->expect_token(TokType::INSTANCE);
-    Token id_tok = this->expect_token(TokType::ID);
-    this->expect_token(TokType::LSQUARE);
     ast::UObjectType ot = this->parse_object_type();
-    this->expect_token(TokType::RSQUARE);
+    this->expect_token(TokType::DOUBLE_COLON);
+    Token id_tok = this->expect_token(TokType::ID);
     this->expect_token(TokType::LCURLY);
     std::unordered_map<std::string, ast::UFunctionNode> methods;
     std::unordered_map<std::string, ast::UFunctionNode> static_methods;
@@ -1142,10 +1141,9 @@ std::unique_ptr<ast::Match> Parser::parse_match_statement() {
 
 std::unique_ptr<ast::TypeclassAst> Parser::parse_typeclass() {
     this->expect_token(TokType::TYPECLASS);
-    Token typeclass_id = this->expect_token(TokType::ID);
-    this->expect_token(TokType::LSQUARE);
     Token base_type = this->expect_token(TokType::ID);
-    this->expect_token(TokType::RSQUARE);
+    this->expect_token(TokType::DOUBLE_COLON);
+    Token typeclass_id = this->expect_token(TokType::ID);
     this->expect_token(TokType::LCURLY);
 
     std::unordered_map<std::string, ast::UFunctionType> methods;

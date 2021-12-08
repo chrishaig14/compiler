@@ -122,6 +122,11 @@ class Integer:
         return Integer(a.value // b.value)
 
     @staticmethod
+    def __mul__(a, b):
+        return Integer(a.value * b.value)
+
+
+    @staticmethod
     def __sub__(a, b):
         return Integer(a.value - b.value)
 

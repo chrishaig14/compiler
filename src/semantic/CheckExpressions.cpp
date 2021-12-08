@@ -134,7 +134,7 @@ UExpressionInfo ModuleChecker::visit_binop(const ast::BinaryOp& node) {
 
         // auto sn = std::make_unique<sem::CallExp>(sem::ConstFunction(operator_fun.path), std::move(vv), instances_v);
 
-        info.exp_snode = std::make_unique<sem::CallExp>(sem::StaticMethod(l_entity_v.clazz->path, "__eq__"),
+        info.exp_snode = std::make_unique<sem::CallExp>(sem::StaticMethod(l_entity_v.clazz->path, fun),
                                                         std::move(vv),
                                                         instances_v);
 

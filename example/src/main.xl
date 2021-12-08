@@ -2,13 +2,27 @@ class Foo {
     x: Integer
 }
 
-fun get_integer_or_string() -> Option[Integer]{
-    return none
+typeclass t::Duplicable {
+    fun double() -> Foo
+}
+
+instance Foo::Duplicable {
+    fun double() -> Foo {
+        return #Foo(this.x*2)
+    }
+}
+
+fun print_double(x: t) -> Integer where t::Duplicable {
+    print(x.double().x.str())
+    return 0
 }
 
 fun main() -> Integer {
-    var s = get_integer_or_string()
-    var t = s? it : 0
-    print(t.str())
+    var s = #Foo(8)
+    var w = 8 * 7
+    print(w.str())
+    print(s.x.str())
+    print(s.double().x.str())
+    var r = print_double(s)
     return 2
 }
