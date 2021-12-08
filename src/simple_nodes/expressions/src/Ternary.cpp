@@ -3,13 +3,14 @@
 //
 
 #include "../include/Ternary.h"
+#include <iostream>
 
 using namespace sem;
 
-Ternary::Ternary(Exp* ext, Exp* true_case, Exp* false_case) : Exp(ExpType::TERNARY) {
-    this->ext = ext;
-    this->true_case = true_case;
-    this->false_case = false_case;
+Ternary::Ternary(UExp exp, UExp true_case, UExp false_case) : Exp(ExpType::TERNARY) {
+    this->exp = std::move(exp);
+    this->true_case = std::move(true_case);
+    this->false_case = std::move(false_case);
 }
 
 bool Ternary::equals(const Exp& o) const {
@@ -18,5 +19,11 @@ bool Ternary::equals(const Exp& o) const {
 }
 
 UExp Ternary::clone() const {
-    return sem::UExp();
+    return std::make_unique<Ternary>(*this);
+}
+
+Ternary::Ternary(const Ternary& other) : sem::Exp(ExpType::TERNARY) {
+    this->exp = other.exp->clone();
+    this->true_case = other.true_case->clone();
+    this->false_case = other.false_case->clone();
 }

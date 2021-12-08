@@ -13,12 +13,13 @@ bool Ternary::equal(const ast::ExpNode& x) const {
            *this->false_case == *other.false_case;
 }
 
-Ternary::Ternary(ExpNode* expression, ast::ExpNode* trueCase, ast::ExpNode* falseCase, TextPosition start, TextPosition end)
-        : ast::ExpNode(ExpNodeType::TERNARY, start, end), expression(expression), true_case(trueCase), false_case(falseCase) {
+nlohmann::json Ternary::to_json() const {
+    return nlohmann::json();
 }
 
-Ternary::~Ternary() {
-    delete expression;
-    delete true_case;
-    delete false_case;
+Ternary::Ternary(ast::UExpNode expression, ast::UExpNode trueCase, ast::UExpNode falseCase, TextPosition start,
+                 TextPosition end) : ast::ExpNode(ExpNodeType::TERNARY, start, end) {
+    this->expression = std::move(expression);
+    this->true_case = std::move(trueCase);
+    this->false_case = std::move(falseCase);
 }

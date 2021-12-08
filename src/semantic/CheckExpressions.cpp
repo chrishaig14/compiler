@@ -307,8 +307,8 @@ UExpressionInfo ModuleChecker::visit_ternary(const ast::Ternary& node) {
     UExpressionInfo info_u = std::make_unique<ExpressionInfo>();
     ExpressionInfo& info = *info_u;
     info.set_entity(this->make_value(true_value.type.clone()));
-    info.exp_snode = std::make_unique<sem::Ternary>(expression_info_p->exp_snode.release(),
-                                                    true_case.exp_snode.release(),
-                                                    false_case_snode.release());
+    info.exp_snode = std::make_unique<sem::Ternary>(std::move(expression_info_p->exp_snode),
+                                                    std::move(true_case.exp_snode),
+                                                    std::move(false_case_snode));
     return info_u;
 }

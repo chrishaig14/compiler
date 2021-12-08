@@ -12,14 +12,16 @@
 
 class ast::Ternary : public ast::ExpNode {
 public:
-    ExpNode* expression;
-    ExpNode* true_case;
-    ExpNode* false_case;
+    ast::UExpNode expression;
+    ast::UExpNode true_case;
+    ast::UExpNode false_case;
 
-    Ternary(ExpNode* expression, ast::ExpNode* trueCase, ast::ExpNode* falseCase, TextPosition start, TextPosition end);
+    Ternary(ast::UExpNode expression, ast::UExpNode trueCase, ast::UExpNode falseCase, TextPosition start,
+            TextPosition end);
+
     bool equal(const ast::ExpNode& other) const override;
 
-    ~Ternary();
+    nlohmann::json to_json() const override;
 
 };
 

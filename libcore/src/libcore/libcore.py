@@ -126,6 +126,7 @@ class Integer:
         return Integer(a.value - b.value)
 
     def str(o):
+        _print("o: ", o)
         return String(str(o.value))
 
     def __hash__(self):

@@ -8,9 +8,7 @@
 using namespace sem;
 
 Declaration::Declaration(const std::string& identifier, UExp _expression)
-        : Common(CommonType::DECLARATION), _expression(std::move(_expression)), identifier(identifier),
-          expression(*this->_expression) {
-    assert(this->_expression != nullptr);
+        : Common(CommonType::DECLARATION), identifier(identifier), expression(std::move(_expression)) {
 }
 
 bool Declaration::equals(const Common& o) const {

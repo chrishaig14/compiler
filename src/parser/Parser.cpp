@@ -770,7 +770,7 @@ std::unique_ptr<ast::Instance> Parser::parse_instance() {
     std::unordered_map<std::string, ast::UFunctionNode> static_methods;
     while (true) {
         bool is_static = false;
-        if (this->match(TokType::STATIC)){
+        if (this->match(TokType::STATIC)) {
             is_static = true;
             this->next();
         }
@@ -779,9 +779,9 @@ std::unique_ptr<ast::Instance> Parser::parse_instance() {
         }
         auto m = this->parse_function_definition();
         std::string id = m->identifier;
-        if (is_static){
+        if (is_static) {
             static_methods[id] = std::move(m);
-        }else{
+        } else {
             methods[id] = std::move(m);
         }
         if (!this->match(TokType::FUN)) {
@@ -938,11 +938,15 @@ ast::UExpNode Parser::parse_ternary() {
     auto condition = this->parse_or_expression();
     if (this->match(TokType::QUESTION)) {
         this->next();
-        // auto true_case = this->parse_expression();
-        // this->expect_token(TokType::COLON);
-        // auto false_case = this->parse_expression();
-        // auto node = std::make_unique<TernaryNode>(condition, true_case, false_case, condition->start, false_case->end);
-        // return node;
+        auto true_case = this->parse_expression();
+        this->expect_token(TokType::COLON);
+        auto false_case = this->parse_expression();
+        auto node = std::make_unique<ast::Ternary>(std::move(condition),
+                                                   std::move(true_case),
+                                                   std::move(false_case),
+                                                   condition->start,
+                                                   false_case->end);
+        return node;
     }
     return condition;
 }
@@ -996,7 +1000,8 @@ std::unique_ptr<ast::TopNode> Parser::parse_class_definition() {
             this->expect_token(TokType::COLON);
             ast::UTypeNode attribute_type = this->parse_type_node();
             std::string& attribute_name = attribute_name_tk.str;
-            if (attribute_names.find(attribute_name) != attribute_names.end() || methods.find(attribute_name) != methods.end()) {
+            if (attribute_names.find(attribute_name) != attribute_names.end() ||
+                methods.find(attribute_name) != methods.end()) {
                 this->error_class_member_redefined(class_name, attribute_name, attribute_name_tk.start);
             }
             if (is_static) {
@@ -1025,7 +1030,8 @@ std::unique_ptr<ast::TopNode> Parser::parse_class_definition() {
             // std::cout << ft->to_json() << std::endl;
             auto method_node = this->parse_function_definition();
             std::string& method_name = method_node->identifier;
-            if (attribute_names.find(method_name) != attribute_names.end() || methods.find(method_name) != methods.end()) {
+            if (attribute_names.find(method_name) != attribute_names.end() ||
+                methods.find(method_name) != methods.end()) {
                 this->error_class_member_redefined(class_name, method_name, method_node->start);
             }
             if (is_static) {
@@ -1038,7 +1044,8 @@ std::unique_ptr<ast::TopNode> Parser::parse_class_definition() {
         } else if (this->match(TokType::FUN)) {
             auto method_node = this->parse_function_definition();
             std::string& method_name = method_node->identifier;
-            if (attribute_names.find(method_name) != attribute_names.end() || methods.find(method_name) != methods.end()) {
+            if (attribute_names.find(method_name) != attribute_names.end() ||
+                methods.find(method_name) != methods.end()) {
                 this->error_class_member_redefined(class_name, method_name, method_node->start);
             }
             if (is_static) {

@@ -11,10 +11,12 @@
 class sem::Ternary : public sem::Exp {
 
 public:
-    Ternary(Exp* ext, Exp* true_case, Exp* false_case);
-    Exp* ext;
-    Exp* true_case;
-    Exp* false_case;
+    Ternary(UExp exp, UExp true_case, UExp false_case);
+    UExp exp;
+    UExp true_case;
+    UExp false_case;
+
+    Ternary(const Ternary& other);
 
     bool equals(const Exp& o) const override;
     UExp clone() const override;

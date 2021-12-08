@@ -11,16 +11,15 @@
 #include <cassert>
 
 class sem::Declaration : public sem::Common {
-    UExp _expression;
 public:
     std::string identifier;
-    Exp& expression;
+    UExp expression;
 
     Declaration(const std::string& identifier, UExp _expression);
 
     Declaration(const Declaration& other)
-            : sem::Common(CommonType::DECLARATION), _expression(other.expression.clone()), identifier(other.identifier),
-              expression(*_expression) {
+            : sem::Common(CommonType::DECLARATION), identifier(other.identifier),
+              expression(other.expression->clone()) {
     }
 
     bool equals(const Common& o) const override;

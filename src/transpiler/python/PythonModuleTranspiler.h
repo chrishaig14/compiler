@@ -100,6 +100,7 @@ public:
     PythonOutputCode transpile_instance(const sem::InstanceDef& def);
     PythonExpressionOutputCode transpile_union(const sem::Union& an_union);
     PythonExpressionOutputCode transpile_option(const sem::Option& option);
+    bool replace_it;
 };
 
 

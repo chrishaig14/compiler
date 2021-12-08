@@ -25,7 +25,7 @@ PythonExpressionOutputCode::PythonExpressionOutputCode(const std::string& pre_co
 
 
 PythonOutputCode PythonModuleTranspiler::transpile_declaration(const sem::Declaration& node) {
-    PythonExpressionOutputCode exp_out = this->dispatch_expression(node.expression, false);
+    PythonExpressionOutputCode exp_out = this->dispatch_expression(*node.expression, false);
     std::string code = exp_out.pre_code.empty() ? "" : exp_out.pre_code + "\n";
     code += node.identifier + " = " + exp_out.code;
     return code;
@@ -76,6 +76,9 @@ PythonExpressionOutputCode PythonModuleTranspiler::transpile_id(const sem::Id& n
     std::string id = node.identifier;
     if (id == "this" && this->add_self) {
         id = "self";
+    }
+    if (id == "it" && this->replace_it) {
+        id = "tern.value";
     }
     return PythonExpressionOutputCode("", id);
 }
@@ -349,14 +352,17 @@ PythonExpressionOutputCode PythonModuleTranspiler::transpile_enum_member(const s
 
 PythonExpressionOutputCode PythonModuleTranspiler::transpile_ternary(const sem::Ternary& node) {
     std::string out;
-    PythonExpressionOutputCode tern = this->dispatch_expression(*node.ext, false);
+    PythonExpressionOutputCode tern = this->dispatch_expression(*node.exp, false);
     out = tern.pre_code;
+    std::string pre = "tern = " + tern.code + NEWLINE;
+    this->replace_it = true;
     PythonExpressionOutputCode truec = this->dispatch_expression(*node.true_case, false);
     out += truec.pre_code;
     PythonExpressionOutputCode falsec = this->dispatch_expression(*node.false_case, false);
+    this->replace_it = false;
     out += falsec.pre_code;
-    out += LPAREN + "(it=" + tern.code + ")!=nullptr? " + truec.code + SPACE + ":" + SPACE + falsec.code + RPAREN;
-    return PythonExpressionOutputCode("", out);
+    out += LPAREN + truec.code + " if tern.value is not None else " + falsec.code + RPAREN;
+    return PythonExpressionOutputCode(pre, out);
 }
 
 PythonExpressionOutputCode PythonModuleTranspiler::transpile_none(const sem::None& node) {
@@ -547,6 +553,7 @@ PythonModuleTranspiler::PythonModuleTranspiler(Module& module) : module(module) 
     this->indent_level = 0;
     this->arg_n = 0;
     this->add_self = false;
+    this->replace_it = false;
 }
 
 PythonExpressionOutputCode
