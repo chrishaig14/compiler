@@ -211,6 +211,9 @@ ModuleChecker::instantiate_generic(const TemplateClassInfo& generic, const ast::
     std::cout << "gonna instantiate generic: " << instance.actual_to_string() << std::endl;
     assert(not generic.type_params.empty());
     MapStringType replacements;
+    auto concrete = std::make_unique<ConcreteClass>(generic.class_name, generic.path);
+
+
     for (size_t i = 0; i < generic.type_params.size(); i++) {
         std::string tp = generic.type_params[i];
         ast::Type& type_replacement = *instance.type_params[i];
@@ -233,6 +236,7 @@ ModuleChecker::instantiate_generic(const TemplateClassInfo& generic, const ast::
         this->module.fill_actual(*tf);
         auto cf = std::make_unique<ConstFunction>(method_cf.second->path, *tf);
         concrete_methods.emplace(method_cf.first, InstanceMethod(Path(""), BaseMethod(false, *cf)));
+        concrete->all_members[method_cf.first] = ClassMemberCategory::method;
     }
 
     std::unordered_map<std::string, std::unique_ptr<InstanceMethod>> concrete_static_methods;
@@ -246,9 +250,9 @@ ModuleChecker::instantiate_generic(const TemplateClassInfo& generic, const ast::
                                                 BaseMethod(true,
                                                            ConstFunction(m.second->path,
                                                                          (sem::TypeFunction&) *p_type))));
+        concrete->all_members[m.first] = ClassMemberCategory::method;
     }
 
-    auto concrete = std::make_unique<ConcreteClass>(generic.class_name, generic.path);
     concrete->methods = std::move(concrete_methods);
     concrete->attribute_names = generic.member_names;
     concrete->attribute_types = concrete_field_types;
@@ -258,6 +262,7 @@ ModuleChecker::instantiate_generic(const TemplateClassInfo& generic, const ast::
         sem::Type* u = concrete_field_types[i]->to_sem();
         this->module.fill_actual(*u);
         concrete->attribute_entities[mn] = this->make_value(u);
+        concrete->all_members[mn] = ClassMemberCategory::attribute;
         // std::make_unique<EntityNothing>();
     }
     return concrete;
