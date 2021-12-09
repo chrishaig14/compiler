@@ -50,3 +50,7 @@ std::string Path::basname() const {
 bool Path::operator==(const Path& other) const {
     return this->as_str() == other.as_str();
 }
+
+Path Path::pathbase() const {
+    return Path(VectorOfStrings(this->path_parts.begin(), this->path_parts.end() - 1));
+}

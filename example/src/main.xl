@@ -1,16 +1,19 @@
-class Foo[t] {
-    x: t
-    fun foo() -> Integer {
-        return 34
+class Foo {
+    x: Integer
+}
+
+typeclass t::Foobar {
+    fun foobar() -> t
+}
+
+instance Foo::Foobar {
+    fun foobar() -> Foo {
+        return this
     }
 }
 
 fun main() -> Integer {
     var f = #Foo(7)
-    print(f.x.str())
-    print(f.foo().str())
-    var q = #Foo("Hello")
-    print(q.x)
-    print(q.foo().str())
+    print(f.foobar().str())
     return 2
 }

@@ -30,6 +30,8 @@ public:
     VectorOfStrings as_vec() const;
 
     std::string basname() const;
+
+    Path pathbase() const;
 };
 
 

@@ -28,3 +28,22 @@ ModuleMember* Package::get(Path p) {
     }
     return nullptr;
 }
+
+Module* Package::get_module(Path p) {
+    const VectorOfStrings& p_vec = p.as_vec();
+    if (p_vec.size() == 1) {
+        if (this->units.contains(p.basname())) {
+            return &this->units[p.basname()]->module();
+        }
+        return nullptr;
+    }
+    auto bbb = p.pathbase().as_vec()[0];
+    if (this->units.contains(bbb)) {
+        if (this->units[bbb]->is_module()) {
+            return nullptr;
+        }
+        VectorOfStrings v = VectorOfStrings(p_vec.begin() + 1, p_vec.end());
+        return this->units[bbb]->package().get_module(Path(v));
+    }
+    return nullptr;
+}

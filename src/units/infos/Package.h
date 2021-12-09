@@ -22,6 +22,9 @@ public:
     Package(Path path, std::string abs_path, bool is_lib);
 
     ModuleMember* get(Path p);
+
+    Module* get_module(Path p);
+
     std::vector<std::unique_ptr<Module>> modules;
     std::vector<std::unique_ptr<Package>> subpackages;
 };
