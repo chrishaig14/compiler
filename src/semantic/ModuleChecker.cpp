@@ -418,8 +418,7 @@ instantiate_typeclass_methods(TypeclassFoo& typeclass, const ast::ObjectType& ty
 }
 
 std::unique_ptr<sem::InstanceDef> ModuleChecker::visit_instance(const ast::Instance& instance) {
-    std::vector<sem::FunctionDef> methods;
-    std::vector<sem::FunctionDef> static_methods;
+    std::vector<SemMethod> methods;
 
     ModuleMember* mm = this->module.get(Path(this->module.path, instance.id));
     if (not mm->is_typeclass()) {
@@ -432,8 +431,10 @@ std::unique_ptr<sem::InstanceDef> ModuleChecker::visit_instance(const ast::Insta
     this->this_entity = this->make_entity_value(*p_type);
     this->add_this = true;
 
-    for (auto& m: instance.methods) {
-        auto& method = m.second;
+    for (auto& ast_meth: instance.methods) {
+        auto& method = ast_meth->func;
+        std::string method_name = method->identifier;
+
         sem::VectorOfTypes x;
         for (ast::Type& p: method->parameter_types) {
             sem::Type* args = p.to_sem();
@@ -444,32 +445,35 @@ std::unique_ptr<sem::InstanceDef> ModuleChecker::visit_instance(const ast::Insta
         this->module.fill_actual(*r_type);
 
         auto tf = sem::TypeFunction(x, sem::UType(r_type));
-        auto out_it = out_methods.find(m.first);
+        auto out_it = out_methods.find(method_name);
         if (out_it == out_methods.end()) {
-            throw std::runtime_error("Method " + m.first + " not found in typeclass " + instance.id);
+            throw std::runtime_error("Method " + method_name + " not found in typeclass " + instance.id);
         }
-        auto& out_m = out_methods.at(m.first);
+        auto& out_m = out_it->second;
         if (*out_m != tf) {
             throw std::runtime_error(
-                    "Instance method " + m.first + " should have signature " + out_m->to_string() + " but it's " +
+                    "Instance method " + method_name + " should have signature " + out_m->to_string() + " but it's " +
                     tf.to_string());
         }
+        if (not ast_meth->is_static) {
+            this->add_this = true;
+        }
         auto methodf = this->visit_function(*method);
-        methods.push_back(*methodf);
+        this->add_this = false;
+        methods.push_back(SemMethod(ast_meth->is_static, *methodf));
     }
     if (methods.size() != out_methods.size()) {
         throw std::runtime_error("Not all method for typeclass " + instance.id + " implemented");
     }
 
-    for (auto& m: instance.static_methods) {
-        auto method = this->visit_function(*m.second);
-        static_methods.push_back(*method);
-    }
+    // for (auto& m: instance.static_methods) {
+    //     auto method = this->visit_function(*m.second);
+    //     static_methods.push_back(*method);
+    // }
 
     this->add_this = false;
     this->this_entity.reset();
     return std::make_unique<sem::InstanceDef>(Path(this->module.path, instance.id),
                                               Path(this->module.path, instance.base_type->id),
-                                              methods,
-                                              static_methods);
+                                              methods);
 }

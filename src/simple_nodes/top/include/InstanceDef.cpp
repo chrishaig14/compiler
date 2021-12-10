@@ -8,8 +8,9 @@ bool sem::InstanceDef::equals(const sem::Top& o) const {
     return false;
 }
 
-sem::InstanceDef::InstanceDef(Path instance_name, Path base_type, std::vector<sem::FunctionDef> methods,
-                              std::vector<sem::FunctionDef> static_methods)
-        : Top(TopType::INSTANCE), instance_path(instance_name), base_type_path(base_type), methods(methods),
-          static_methods(static_methods) {
+sem::InstanceDef::InstanceDef(Path instance_name, Path base_type, std::vector<SemMethod> methods)
+        : Top(TopType::INSTANCE), instance_path(instance_name), base_type_path(base_type), methods(methods) {
+}
+
+SemMethod::SemMethod(bool is_static, sem::FunctionDef func) : is_static(is_static), func(func) {
 }

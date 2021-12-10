@@ -13,6 +13,7 @@
 #include "Function.h"
 #include <util/macros.h>
 #include "../ast.h"
+#include "AstMethod.h"
 
 
 class ast::ConcreteClassDef : public ast::TopNode {
@@ -20,9 +21,8 @@ public:
 
     bool equal(const ast::TopNode& other) const override;
     ConcreteClassDef(const std::string& className, std::vector<ClassAttribute> attributes,
-                     std::unordered_map<std::string, ast::UFunctionNode> functions,
-                     std::map<std::string, std::pair<ast::Type*, ast::ExpNode*>> static_attributes,
-                     std::unordered_map<std::string, ast::UFunctionNode>& static_methods, TextPosition start,
+                     std::vector<std::unique_ptr<AstMethod>> methods,
+                     std::map<std::string, std::pair<ast::Type*, ast::ExpNode*>> static_attributes, TextPosition start,
                      TextPosition end);
     ~ConcreteClassDef() override;
     nlohmann::json to_json() const override;
@@ -30,8 +30,7 @@ public:
     std::vector<ast::ClassAttribute> attributes;
     std::map<std::string, std::pair<ast::Type*, ast::ExpNode*>> static_attributes;
     VectorOfStrings attributes_ordered;
-    std::unordered_map<std::string, ast::UFunctionNode> methods;
-    std::unordered_map<std::string, ast::UFunctionNode> static_methods;
+    std::vector<std::unique_ptr<AstMethod>> methods;
 
     std::string class_name;
 };

@@ -12,16 +12,15 @@ using namespace ast;
 //                  std::unordered_map<std::string, ast::UFunctionNode>& static_methods, TextPosition start,
 //                  TextPosition end);
 
-ConcreteClassDef::ConcreteClassDef(const std::string& className,
-                                   std::vector<ClassAttribute> attributes,
-                                   std::unordered_map<std::string, ast::UFunctionNode> functions,
+ConcreteClassDef::ConcreteClassDef(const std::string& className, std::vector<ClassAttribute> attributes,
+                                   std::vector<std::unique_ptr<AstMethod>> methods,
                                    std::map<std::string, std::pair<ast::Type*, ast::ExpNode*>> static_attributes,
-                                   std::unordered_map<std::string, ast::UFunctionNode>& static_methods,
-                                   TextPosition start, TextPosition end) : ast::TopNode(TopNodeType::CONCRETE_CLS, start, end),
+                                   TextPosition start, TextPosition end) : ast::TopNode(TopNodeType::CONCRETE_CLS,
+                                                                                        start,
+                                                                                        end),
                                                                            attributes(std::move(attributes)),
                                                                            static_attributes(static_attributes),
-                                                                           methods(std::move(functions)),
-                                                                           static_methods(std::move(static_methods)),
+                                                                           methods(std::move(methods)),
                                                                            class_name(className) {
 }
 
@@ -48,17 +47,17 @@ nlohmann::json ConcreteClassDef::to_json() const {
                         {"type", i.type->to_json()}});
     }
     nlohmann::json methj;
-    for (auto& m: this->methods) {
-        methj[m.first] = m.second->to_json();
-    }
-    nlohmann::json smethj;
-    for (auto& m: this->static_methods) {
-        smethj[m.first] = m.second->to_json();
-    }
-    j["class"] = {{"id",             this->class_name},
-                  {"members",        memj},
-                  {"methods",        methj},
-                  {"static_methods", smethj}};
+    // for (auto& m: this->methods) {
+    //     methj[m.first] = m.second->to_json();
+    // }
+    // nlohmann::json smethj;
+    // for (auto& m: this->static_methods) {
+    //     smethj[m.first] = m.second->to_json();
+    // }
+    // j["class"] = {{"id",             this->class_name},
+    //               {"members",        memj},
+    //               {"methods",        methj},
+    //               {"static_methods", smethj}};
     return j;
 }
 

@@ -9,14 +9,20 @@
 #include "Top.h"
 #include "FunctionDef.h"
 
+class SemMethod {
+public:
+    bool is_static;
+    sem::FunctionDef func;
+
+    SemMethod(bool is_static, sem::FunctionDef func);
+};
+
 class sem::InstanceDef : public sem::Top {
 public:
     Path instance_path;
     Path base_type_path;
-    std::vector<sem::FunctionDef> methods;
-    std::vector<sem::FunctionDef> static_methods;
-    InstanceDef(Path instance_path, Path base_path, std::vector<sem::FunctionDef> methods,
-                std::vector<sem::FunctionDef> static_methods);
+    std::vector<SemMethod> methods;
+    InstanceDef(Path instance_path, Path base_path, std::vector<SemMethod> methods);
     bool equals(const Top& o) const override;
 
 };

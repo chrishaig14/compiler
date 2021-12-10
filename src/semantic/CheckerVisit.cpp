@@ -37,17 +37,15 @@ std::unique_ptr<sem::KlassDef> ModuleChecker::visit_class(ast::ConcreteClassDef&
     // this->fill_value(*v);
     this->this_entity = this->make_entity_value(ot);
 
-    for (auto& m: node.methods) {
-        auto ms = this->visit_function(*m.second);
+    for (auto& ast_meth: node.methods) {
+        if (not ast_meth->is_static) {
+            this->add_this = true;
+        }
+        auto ms = this->visit_function(*ast_meth->func);
+        this->add_this = false;
         sn->methods.push_back(*ms);
     }
     this->this_entity.reset();
-    this->add_this = false;
-
-    for (auto& m: node.static_methods) {
-        auto ms = this->visit_function(*m.second);
-        sn->static_methods.push_back(*ms);
-    }
 
     //
     // Class* clazz = ((EntityClass&) this->scope->get(node.class_name)).clazz;
@@ -129,18 +127,20 @@ std::unique_ptr<sem::TemplateKlassDef> ModuleChecker::visit_template_class(ast::
     // this->fill_value(*v);
     this->this_entity = this->make_entity_value(ot);
 
-    for (auto& m: node.methods) {
-        auto ms = this->visit_function(*m.second);
+    for (auto& ast_meth: node.methods) {
+        if (not ast_meth->is_static) {
+            this->add_this = true;
+        }
+        auto ms = this->visit_function(*ast_meth->func);
+        if (ast_meth->is_static) {
+            std::unique_ptr<sem::FunctionDef> sf((sem::FunctionDef*) ms.release());
+            sn->static_methods.push_back(*ms);
+        }
+        this->add_this = false;
         sn->methods.push_back(*ms);
     }
     this->this_entity.reset();
     this->add_this = false;
-
-    for (auto& m: node.static_methods) {
-        auto ms = this->visit_function(*m.second);
-        std::unique_ptr<sem::FunctionDef> sf((sem::FunctionDef*) ms.release());
-        sn->static_methods.push_back(*ms);
-    }
     return sn;
 }
 

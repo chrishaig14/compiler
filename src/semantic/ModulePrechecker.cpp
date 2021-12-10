@@ -197,8 +197,10 @@ void ModulePrechecker::visit_class(ast::ConcreteClassDef& node) {
         class_info->static_attributes[attr.first] = std::make_pair(attr.second.first->clone(), attr.second.second);
         class_info->all_members[attr.first] = ClassMemberCategory::static_attribute;
     }
-    for (const auto& f: node.methods) {
-        ast::Function& method = *f.second;
+    for (const auto& ast_meth: node.methods) {
+        ast::Function& method = *ast_meth->func;
+        std::string method_name = method.identifier;
+
 
         sem::VectorOfTypes x;
         for (ast::Type& p: method.parameter_types) {
@@ -208,27 +210,13 @@ void ModulePrechecker::visit_class(ast::ConcreteClassDef& node) {
         }
         sem::Type* p_type = method.return_type->to_sem();
         this->module.fill_actual(*p_type);
-        ConstFunction cf(Path(class_info->path, f.first), sem::TypeFunction(x, sem::UType(p_type)));
+        ConstFunction cf(Path(class_info->path, method_name), sem::TypeFunction(x, sem::UType(p_type)));
         method.path = cf.path;
-        class_info->methods.insert(make_pair(f.first, InstanceMethod(Path(""), BaseMethod(false, cf))));
-        class_info->all_members[f.first] = ClassMemberCategory::method;
+        class_info->methods.insert(make_pair(method_name,
+                                             InstanceMethod(Path(""), BaseMethod(ast_meth->is_static, cf))));
+        class_info->all_members[method_name] = ClassMemberCategory::method;
     }
 
-    for (const auto& f: node.static_methods) {
-        ast::Function& method = *f.second;
-        sem::VectorOfTypes x;
-        for (ast::Type& p: method.parameter_types) {
-            sem::Type* args = p.to_sem();
-            this->module.fill_actual(*args);
-            x.emplace_back(args);
-        }
-        sem::Type* p_type = method.return_type->to_sem();
-        this->module.fill_actual(*p_type);
-        ConstFunction cf(Path(class_info->path, f.first), sem::TypeFunction(x, sem::UType(p_type)));
-        method.path = cf.path;
-        class_info->methods.insert(make_pair(f.first, InstanceMethod(Path(""), BaseMethod(true, cf))));
-        class_info->all_members[f.first] = ClassMemberCategory::method;
-    }
 }
 
 
@@ -244,8 +232,9 @@ void ModulePrechecker::visit_template_class(ast::TemplateClassDef& node) {
     for (const auto& mn: node.static_attributes) {
         class_info->static_members[mn.first] = std::make_pair(mn.second.first->clone(), mn.second.second);
     }
-    for (const auto& f: node.methods) {
-        ast::Function& method = *f.second;
+    for (const auto& ast_meth: node.methods) {
+        ast::Function& method = *ast_meth->func;
+        std::string method_name = method.identifier;
 
         sem::VectorOfTypes x;
         for (ast::Type& p: method.parameter_types) {
@@ -255,27 +244,31 @@ void ModulePrechecker::visit_template_class(ast::TemplateClassDef& node) {
         }
         sem::Type* p_type = method.return_type->to_sem();
         this->module.fill_actual(*p_type);
-        auto cf = std::make_unique<ConstFunction>(Path(class_info->path, f.first),
+        auto cf = std::make_unique<ConstFunction>(Path(class_info->path, method_name),
                                                   sem::TypeFunction(x, sem::UType(p_type)));
         method.path = cf->path;
-        class_info->methods.insert(make_pair(f.first, std::move(cf)));
+        if (ast_meth->is_static) {
+            class_info->static_methods.insert(make_pair(method_name, std::move(cf)));
+        } else {
+            class_info->methods.insert(make_pair(method_name, std::move(cf)));
+        }
     }
 
-    for (const auto& f: node.static_methods) {
-        ast::Function& method = *f.second;
-        sem::VectorOfTypes x;
-        for (ast::Type& p: method.parameter_types) {
-            sem::Type* args = p.to_sem();
-            this->module.fill_actual(*args);
-            x.emplace_back(args);
-        }
-        sem::Type* p_type = method.return_type->to_sem();
-        this->module.fill_actual(*p_type);
-        auto cf = std::make_unique<ConstFunction>(Path(class_info->path, f.first),
-                                                  sem::TypeFunction(x, sem::UType(p_type)));
-        method.path = cf->path;
-        class_info->static_methods.insert(make_pair(f.first, std::move(cf)));
-    }
+    // for (const auto& f: node.static_methods) {
+    //     ast::Function& method = *f.second;
+    //     sem::VectorOfTypes x;
+    //     for (ast::Type& p: method.parameter_types) {
+    //         sem::Type* args = p.to_sem();
+    //         this->module.fill_actual(*args);
+    //         x.emplace_back(args);
+    //     }
+    //     sem::Type* p_type = method.return_type->to_sem();
+    //     this->module.fill_actual(*p_type);
+    //     auto cf = std::make_unique<ConstFunction>(Path(class_info->path, f.first),
+    //                                               sem::TypeFunction(x, sem::UType(p_type)));
+    //     method.path = cf->path;
+    //     class_info->static_methods.insert(make_pair(f.first, std::move(cf)));
+    // }
 }
 
 void ModulePrechecker::visit_alias(ast::Alias& node) {

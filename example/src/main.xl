@@ -3,12 +3,12 @@ class Foo {
 }
 
 typeclass t::Foobar {
-    fun foobar() -> t
+    fun foobar() -> Integer
 }
 
 instance Foo::Foobar {
-    fun foobar() -> Foo {
-        return this
+    fun foobar() -> Integer {
+        return this.x
     }
 }
 

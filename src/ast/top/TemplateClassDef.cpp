@@ -8,11 +8,15 @@ using namespace ast;
 
 TemplateClassDef::TemplateClassDef(const std::string& className, VectorOfStrings type_parameters,
                                    std::vector<ast::ClassAttribute> attributes,
-                                   std::unordered_map<std::string, ast::UFunctionNode> methods,
+                                   std::vector<std::unique_ptr<AstMethod>> methods,
                                    std::map<std::string, std::pair<ast::Type*, ast::ExpNode*>> static_attributes,
-                                   std::unordered_map<std::string, ast::UFunctionNode>& static_methods, TextPosition start, TextPosition end)
-        : ast::TopNode(TopNodeType::TEMPLATE_CLS, start, end), attributes(std::move(attributes)), static_attributes(static_attributes),
-          methods(std::move(methods)), static_methods(std::move(static_methods)), class_name(className) {
+                                   TextPosition start, TextPosition end) : ast::TopNode(TopNodeType::TEMPLATE_CLS,
+                                                                                        start,
+                                                                                        end),
+                                                                           attributes(std::move(attributes)),
+                                                                           static_attributes(static_attributes),
+                                                                           methods(std::move(methods)),
+                                                                           class_name(className) {
     this->type_parameters = type_parameters;
 }
 
@@ -39,15 +43,15 @@ nlohmann::json TemplateClassDef::to_json() const {
                         {"type", attr.type->to_json()}});
     }
     nlohmann::json methj;
-    for (auto& m: this->methods) {
-        methj[m.first] = m.second->to_json();
-    }
+    // for (auto& m: this->methods) {
+    //     methj[m.first] = m.second->to_json();
+    // }
     nlohmann::json smethj;
-    for (auto& meth: this->static_methods) {
-        smethj[meth.first] = meth.second->to_json();
-    }
+    // for (auto& meth: this->static_methods) {
+    //     smethj[meth.first] = meth.second->to_json();
+    // }
     j["class"] = {{"id",             this->class_name},
-                  {"attributes",        memj},
+                  {"attributes",     memj},
                   {"methods",        methj},
                   {"static_methods", smethj}};
     return j;
