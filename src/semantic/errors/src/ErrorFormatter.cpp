@@ -44,7 +44,7 @@ std::string ErrorFormatter::format(const error::Error& err) const {
         case error::ErrorType::not_declared:
             return this->format(static_cast<const error::NotDeclared&>(err));
         case error::ErrorType::global_redeclared:
-            break;
+            return this->format(static_cast<const error::GlobalRedeclared&>(err));
         case error::ErrorType::package_no_member:
             break;
         case error::ErrorType::redeclared:

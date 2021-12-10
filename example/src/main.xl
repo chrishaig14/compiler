@@ -1,5 +1,10 @@
+fun foo() -> Integer {
+    return 0
+}
+
+fun foo() -> Integer {
+    return 0
+}
+
 fun main() -> Integer {
-    var f = 234
-    var f = 123
-    return 2
 }

@@ -27,11 +27,13 @@ bool Compiler::pre() {
     l.load_package(root_package, 1);
 
     if (not parse_package(root_package)) {
-        throw std::runtime_error("Parse Error");
+        std::cerr << "Parse Error" << std::endl;
+        return false;
     }
     PackagePrechecker pp(all_classes);
     if (not pp.preprocess_package(root_package)) {
-        throw std::runtime_error("Preprocess Error");
+        std::cerr << "Preprocess Error" << std::endl;
+        return false;
     }
     this->instances = pp.instances;
 

@@ -90,3 +90,8 @@ std::string MyErrorFormatter::format(const error::ClassNoMember& err) const {
     return this->context_string(err.position) + "Error::ClassNoMember: class'" + err.class_path.basname() +
            "' has no member '" + err.member_name + "'" + this->code_context_string(err.position);
 }
+
+std::string MyErrorFormatter::format(const error::GlobalRedeclared& err) const {
+    return this->context_string(err.id.start) + "Error::GlobalRedeclared: '" + err.id.str + "'" +
+           this->code_context_string(err.id.start);
+}

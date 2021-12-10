@@ -10,7 +10,7 @@ using namespace ast;
 bool Function::equal(const ast::TopNode& x) const {
     const auto& other = (Function&) x;
 //    return false;
-    if (this->identifier != other.identifier) {
+    if (this->identifier.str != other.identifier.str) {
         return false;
     }
     if (this->parameter_types.size() != other.parameter_types.size()) {
@@ -32,11 +32,12 @@ bool Function::equal(const ast::TopNode& x) const {
     return *this->body == *other.body;
 }
 
-Function::Function(std::string identifier, const VectorOfStrings& parameter_names, ast::VectorOfUTypes& parameter_types,
+Function::Function(Token identifier, const VectorOfStrings& parameter_names, ast::VectorOfUTypes& parameter_types,
                    ast::UTypeNode& return_type, std::unique_ptr<ast::Block>& body,
-                   std::unordered_map<std::string, std::set<std::string>> constraints, TextPosition start, TextPosition end)
-        : TopNode(TopNodeType::FUNC, start, end), _parameter_types(std::move(parameter_types)), body(std::move(body)),
-          return_type(std::move(return_type)), constraints(constraints) {
+                   std::unordered_map<std::string, std::set<std::string>> constraints, TextPosition start,
+                   TextPosition end) : TopNode(TopNodeType::FUNC, start, end),
+                                       _parameter_types(std::move(parameter_types)), body(std::move(body)),
+                                       return_type(std::move(return_type)), constraints(constraints) {
     for (auto& t: this->_parameter_types) {
         this->parameter_types.emplace_back(*t);
     }
@@ -64,8 +65,9 @@ nlohmann::json Function::to_json() const {
         params.push_back({{"id",   this->parameter_names[i]},
                           {"type", this->parameter_types[i].get().to_json()}});
     }
-    return {{"type",     "function"},
-            {"function", {{"id", this->identifier}, {"parameters", params}, {"body", this->body->to_json()}, {"return_type", this->return_type->to_json()}}}};
+    // return {{"type",     "function"},
+    //         {"function", {{"id", this->identifier}, {"parameters", params}, {"body", this->body->to_json()}, {"return_type", this->return_type->to_json()}}}};
+    return {{"type", "function"}};
 }
 
 bool Function::has_constraints() const {

@@ -18,5 +18,7 @@
 #include "Redeclared.h"
 #include "TypeclassNotFound.h"
 #include "TypeMismatch.h"
+#include "GlobalRedeclared.h"
 
 #endif //XLANG_ALL_ERRORS_H
+

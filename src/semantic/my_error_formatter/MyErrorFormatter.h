@@ -21,6 +21,7 @@ public:
     std::string format(const error::GenericError& err) const override;
     std::string code_context_string(TextPosition position) const;
     std::string format(const error::Redeclared& err) const override;
+    std::string format(const error::GlobalRedeclared& err) const override;
     std::string format(const error::For& err) const override;
     std::string format(const error::NoMember& err) const override;
     std::string format(const error::NoMemberSuggestions& err) const override;

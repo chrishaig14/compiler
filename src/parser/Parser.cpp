@@ -776,7 +776,7 @@ std::unique_ptr<ast::Instance> Parser::parse_instance() {
             break;
         }
         auto m = this->parse_function_definition();
-        std::string id = m->identifier;
+        std::string id = m->identifier.str;
         methods.push_back(std::make_unique<AstMethod>(is_static, std::move(m)));
         if (!this->match(TokType::FUN)) {
             break;
@@ -792,8 +792,7 @@ std::unique_ptr<ast::Instance> Parser::parse_instance() {
 
 std::unique_ptr<ast::Function> Parser::parse_function_definition() {
     Token fun_tok = this->expect_token(TokType::FUN);
-    Token matched_token = this->expect_token(TokType::ID);
-    std::string identifier = matched_token.str;
+    Token identifier = this->expect_token(TokType::ID);
     this->expect_token(TokType::LPAREN);
     ast::VectorOfUTypes parameter_types;
     VectorOfStrings parameter_names;
@@ -1023,7 +1022,7 @@ std::unique_ptr<ast::TopNode> Parser::parse_class_definition() {
             // std::cout << is_static << std::endl;
             // std::cout << ft->to_json() << std::endl;
             auto method_node = this->parse_function_definition();
-            std::string& method_name = method_node->identifier;
+            std::string& method_name = method_node->identifier.str;
             if (attribute_names.find(method_name) != attribute_names.end() ||
                 methods_unique.find(method_name) != methods_unique.end()) {
                 this->error_class_member_redefined(class_name, method_name, method_node->start);
@@ -1033,7 +1032,7 @@ std::unique_ptr<ast::TopNode> Parser::parse_class_definition() {
 
         } else if (this->match(TokType::FUN)) {
             auto method_node = this->parse_function_definition();
-            std::string& method_name = method_node->identifier;
+            std::string& method_name = method_node->identifier.str;
             if (attribute_names.find(method_name) != attribute_names.end() ||
                 methods_unique.find(method_name) != methods_unique.end()) {
                 this->error_class_member_redefined(class_name, method_name, method_node->start);

@@ -433,7 +433,7 @@ std::unique_ptr<sem::InstanceDef> ModuleChecker::visit_instance(const ast::Insta
 
     for (auto& ast_meth: instance.methods) {
         auto& method = ast_meth->func;
-        std::string method_name = method->identifier;
+        std::string method_name = method->identifier.str;
 
         sem::VectorOfTypes x;
         for (ast::Type& p: method->parameter_types) {

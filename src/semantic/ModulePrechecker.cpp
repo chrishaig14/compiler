@@ -76,8 +76,9 @@ void ModulePrechecker::visit_function(ast::Function& node) {
     auto rt = sem::UType(node.return_type->to_sem());
     this->module.fill_actual(*rt);
     auto function_info = sem::TypeFunction(std::move(x), std::move(rt));
-    Path function_path = Path(this->module.path, node.identifier);
-    ConstFunction const_function(Path(this->module.path, node.identifier), function_info);
+    std::string function_name = node.identifier.str;
+    Path function_path = Path(this->module.path, function_name);
+    ConstFunction const_function(Path(this->module.path, function_name), function_info);
     for (auto& c: node.constraints) {
         for (auto& t: c.second) {
             const_function.constraints[c.first].insert(Path(this->module.path, t).as_str());
@@ -144,10 +145,11 @@ void ModulePrechecker::visit_root() {
 }
 
 void ModulePrechecker::check_duplicated_names(ast::Module& node) {
-    std::map<std::string, void*> names;
+    std::set<std::string> names;
     for (auto& np: node.all) {
         auto& n = *np;
         std::string name;
+        Token idtok;
         switch (n.ntype) {
             case TopNodeType::IMPORT:
                 if (((ast::Import&) n).has_alias) {
@@ -157,7 +159,7 @@ void ModulePrechecker::check_duplicated_names(ast::Module& node) {
                 }
                 break;
             case TopNodeType::FUNC:
-                name = ((ast::Function&) n).identifier;
+                idtok = ((ast::Function&) n).identifier;
                 break;
             case TopNodeType::ENUM:
                 name = ((ast::EnumNode&) (n)).id;
@@ -174,11 +176,14 @@ void ModulePrechecker::check_duplicated_names(ast::Module& node) {
             case TopNodeType::INSTANCE:
                 continue;
         }
-        assert(not name.empty());
-        if (names.count(name) == 0) {
-            names[name] = nullptr;
+        // assert(not name.empty());
+        if (idtok.str.empty()) {
+            continue;
+        }
+        if (not names.contains(idtok.str)) {
+            names.insert(idtok.str);
         } else {
-            this->error_reporter.error(std::make_unique<error::GlobalRedeclared>(name));
+            this->error_reporter.error(std::make_unique<error::GlobalRedeclared>(idtok));
         }
     }
 }
@@ -199,7 +204,7 @@ void ModulePrechecker::visit_class(ast::ConcreteClassDef& node) {
     }
     for (const auto& ast_meth: node.methods) {
         ast::Function& method = *ast_meth->func;
-        std::string method_name = method.identifier;
+        std::string method_name = method.identifier.str;
 
 
         sem::VectorOfTypes x;
@@ -234,7 +239,7 @@ void ModulePrechecker::visit_template_class(ast::TemplateClassDef& node) {
     }
     for (const auto& ast_meth: node.methods) {
         ast::Function& method = *ast_meth->func;
-        std::string method_name = method.identifier;
+        std::string method_name = method.identifier.str;
 
         sem::VectorOfTypes x;
         for (ast::Type& p: method.parameter_types) {

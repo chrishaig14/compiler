@@ -11,12 +11,11 @@
 
 class error::GlobalRedeclared : public error::Error {
 public:
-    GlobalRedeclared(std::string name);
+    Token id;
+    GlobalRedeclared(Token id);
     Error* clone() const override;
     bool equal(const Error& other) const override;
     std::string to_str(const CodeLines& code) const override;
-
-    std::string name;
 };
 
 

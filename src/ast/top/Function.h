@@ -16,20 +16,21 @@
 #include "../ast.h"
 #include "TopNode.h"
 #include <set>
+#include <common/Token.h>
 
 class ast::Function : public ast::TopNode {
     ast::VectorOfUTypes _parameter_types;
 public:
     std::vector<std::reference_wrapper<ast::Type>> parameter_types;
-    std::string identifier;
+    Token identifier;
     VectorOfStrings parameter_names;
     std::unique_ptr<ast::Block> body;
     ast::UTypeNode return_type;
-    Function(std::string identifier, const VectorOfStrings& parameter_names, ast::VectorOfUTypes& parameter_types,
+    Function(Token identifier, const VectorOfStrings& parameter_names, ast::VectorOfUTypes& parameter_types,
              ast::UTypeNode& return_type, std::unique_ptr<ast::Block>& body,
              std::unordered_map<std::string, std::set<std::string>> constraints, TextPosition start, TextPosition end);
 
-    Function(std::string identifier, const VectorOfStrings& parameter_names, ast::VectorOfUTypes& parameter_types,
+    Function(Token identifier, const VectorOfStrings& parameter_names, ast::VectorOfUTypes& parameter_types,
              ast::UTypeNode& return_type, std::unique_ptr<ast::Block>& body, TextPosition start, TextPosition end)
             : Function(identifier, parameter_names, parameter_types, return_type, body, {}, start, end) {
     }

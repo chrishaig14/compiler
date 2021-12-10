@@ -20,7 +20,6 @@ int main(int argc, char* argv[]) {
 
     Compiler compiler(project_dir, project_output_dir, output_name, lib_path, is_lib, version);
     if (not compiler.pre()) {
-        std::cout << "Global-processing failed" << std::endl;
         exit(1);
     }
     if (not compiler.main()) {

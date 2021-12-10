@@ -201,9 +201,9 @@ std::unique_ptr<sem::Block> ModuleChecker::visit_block(const ast::Block& node) {
 }
 
 std::unique_ptr<sem::FunctionDef> ModuleChecker::visit_function(const ast::Function& n) {
-    this->error_reporter.current_function = n.identifier;
+    this->error_reporter.current_function = n.identifier.str;
     // Logger::info("Checking FunctionNode " + n.identifier);
-    std::string function_name = n.identifier;
+    std::string function_name = n.identifier.str;
     this->enter_scope();
     this->scope->is_function = true;
 
@@ -265,5 +265,5 @@ std::unique_ptr<sem::FunctionDef> ModuleChecker::visit_function(const ast::Funct
     if (has_error) {
         return nullptr;
     }
-    return std::make_unique<sem::FunctionDef>(n.identifier, n.parameter_names, *bn, n_instances);
+    return std::make_unique<sem::FunctionDef>(n.identifier.str, n.parameter_names, *bn, n_instances);
 }
