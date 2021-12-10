@@ -36,25 +36,29 @@ void GlobalInstancer::add_instance_to_class(ConcreteClass& clazz, Path instance)
     cls_module.fill_actual(cls_type);
     auto out_methods = g_instantiate_typeclass_methods(typeclass, (const ast::ObjectType&) *cls_type.to_ast());
     for (auto& m: typeclass.methods) {
+        std::string method_name = m.first;
         sem::TypeFunction& ft = *m.second;
+
         std::unordered_map<std::string, ast::Type*> repl;
         repl[typeclass.gen_type] = cls_type.to_ast();
         auto cl = make_type(*ft.to_ast(), repl);
         auto cl_sem = cl->to_sem();
         module.fill_actual(*cl_sem);
-        clazz.methods.emplace(m.first,
-                              InstanceMethod(instance,
-                                             BaseMethod(false,
-                                                        ConstFunction(Path(typeclass.path, m.first),
-                                                                      static_cast<sem::TypeFunction&>(*cl_sem)))));
-        clazz.all_members[m.first] = ClassMemberCategory::method;
+        Path method_path = Path(typeclass.path, method_name);
+        sem::TypeFunction& type_function = static_cast<sem::TypeFunction&>(*cl_sem);
+        InstanceMethod instance_method(instance, BaseMethod(false, ConstFunction(method_path, type_function)));
+        clazz.methods.emplace(method_name, instance_method);
+
+        clazz.all_members[method_name] = ClassMemberCategory::method;
     }
     for (auto& m: typeclass.static_methods) {
+        std::string method_name = m.first;
         sem::TypeFunction& ft = *m.second;
-        clazz.methods.emplace(m.first,
-                              InstanceMethod(instance,
-                                             BaseMethod(true, ConstFunction(Path(typeclass.path, m.first), ft))));
-        clazz.all_members[m.first] = ClassMemberCategory::method;
+
+        Path method_path = Path(typeclass.path, method_name);
+        InstanceMethod instance_method(instance, BaseMethod(true, ConstFunction(method_path, ft)));
+        clazz.methods.emplace(method_name, instance_method);
+        clazz.all_members[method_name] = ClassMemberCategory::method;
     }
     // for (auto& m: ) {
     //     clazz.methods[m.first] = m.second;
