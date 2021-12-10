@@ -615,7 +615,7 @@ std::unique_ptr<ast::Declaration> Parser::parse_variable_declaration() {
     }
     Token eq_tok = this->expect_token(TokType::EQQ);
     auto expression = this->parse_expression();
-    return std::make_unique<ast::Declaration>(identifier.str,
+    return std::make_unique<ast::Declaration>(identifier,
                                               std::move(type),
                                               std::move(expression),
                                               var_token.start,

@@ -11,15 +11,16 @@
 #include "../expressions/include/ExpNode.h"
 #include "../general/Type.h"
 #include <util/utils.h>
+#include <common/Token.h>
 
 class ast::Declaration : public ast::Statement {
     ast::UExpNode _expression;
 public:
     ExpNode& expression;
-    std::string identifier;
+    Token identifier;
     ast::UTypeNode type;
     TextPosition eq_pos;
-    Declaration(const std::string& identifier, ast::UTypeNode type, ast::UExpNode expression, TextPosition start,
+    Declaration(Token identifier, ast::UTypeNode type, ast::UExpNode expression, TextPosition start,
                 TextPosition eq_pos, TextPosition end);
 
 

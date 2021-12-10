@@ -120,8 +120,8 @@ sem::UExp ModuleChecker::make_union_rvalue(sem::UExp value_snode, const sem::Typ
 
 sem::UCommon ModuleChecker::visit_declaration(const ast::Declaration& n) {
     // Logger::info("Checking ast::DeclarationNode for var: " + n.identifier);
-    if (this->scope->declared(n.identifier)) {
-        this->error_reporter.error(std::make_unique<error::Redeclared>(n.identifier, n));
+    if (this->scope->declared(n.identifier.str)) {
+        this->error_reporter.error(std::make_unique<error::Redeclared>(n));
     }
     sem::UCommon info_u;
     if (n.type != nullptr) {
@@ -144,20 +144,21 @@ sem::UCommon ModuleChecker::check_declaration_with_type(const ast::Declaration& 
     UExpressionInfo rvalue_sinfo = this->expect_rvalue_of_type(*sem_type, n.expression);
 
     auto ov = this->make_value(sem_type.release());
-    this->scope->set(n.identifier, *ov);
+    this->scope->set(n.identifier.str, *ov);
     if (rvalue_sinfo->is_error()) {
         return nullptr;
     }
 
     sem::UExp up = std::move(rvalue_sinfo->exp_snode);
-    sem::UCommon info_u = std::make_unique<sem::Declaration>(n.identifier, std::move(up));
+    sem::UCommon info_u = std::make_unique<sem::Declaration>(n.identifier.str, std::move(up));
     return info_u;
 }
 
 sem::UCommon ModuleChecker::check_declaration_without_type(const ast::Declaration& n) {
     UExpressionInfo exp_info_p = this->dispatch_rvalue(n.expression);
+    std::string identifier = n.identifier.str;
     if (exp_info_p->is_error()) {
-        this->scope->set(n.identifier, exp_info_p->entity);
+        this->scope->set(identifier, exp_info_p->entity);
         return nullptr;
     }
     E_TYPE entity_type = exp_info_p->entity.get().e_type;
@@ -166,7 +167,7 @@ sem::UCommon ModuleChecker::check_declaration_without_type(const ast::Declaratio
         return nullptr;
     }
 
-    this->scope->set(n.identifier, exp_info_p->entity);
+    this->scope->set(identifier, exp_info_p->entity);
     if (exp_info_p->exp_snode == nullptr) {
         return nullptr;
     }
@@ -174,7 +175,7 @@ sem::UCommon ModuleChecker::check_declaration_without_type(const ast::Declaratio
         Entity& entity_const_function = exp_info_p->entity;
         ConstFunction& const_function = entity_const_function.get_constfun().const_function;
         auto value_entity = EntityValue::function_value(const_function.const_function_ft.clone());
-        this->scope->set(n.identifier, *value_entity);
+        this->scope->set(identifier, *value_entity);
 
         if (value_entity->type.is_generic()) {
             this->error_reporter.fail(
@@ -183,6 +184,6 @@ sem::UCommon ModuleChecker::check_declaration_without_type(const ast::Declaratio
         }
     }
     sem::UExp u = std::move(exp_info_p->exp_snode);
-    sem::UCommon info_u = std::make_unique<sem::Declaration>(n.identifier, std::move(u));
+    sem::UCommon info_u = std::make_unique<sem::Declaration>(identifier, std::move(u));
     return info_u;
 }

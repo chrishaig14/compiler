@@ -6,7 +6,7 @@
 
 using namespace ast;
 
-Declaration::Declaration(const std::string& identifier, ast::UTypeNode type, ast::UExpNode expression, TextPosition start,
+Declaration::Declaration(Token identifier, ast::UTypeNode type, ast::UExpNode expression, TextPosition start,
                          TextPosition eq_pos, TextPosition end) : ast::Statement(StatementType::DECL, start, end),
                                                                   _expression(std::move(expression)), expression(*_expression),
                                                                   identifier(identifier),
@@ -33,7 +33,7 @@ Declaration::~Declaration() {
 nlohmann::json Declaration::to_json() const {
     nlohmann::json j;
     j["type"] = "declaration";
-    j["declaration"]["identifier"] = this->identifier;
+    // j["declaration"]["identifier"] = this->identifier;
     j["declaration"]["expression"] = this->expression.to_json();
     j["declaration"]["type"] = this->type != nullptr ? this->type->to_json() : nlohmann::json();
     return j;

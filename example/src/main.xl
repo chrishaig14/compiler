@@ -1,19 +1,5 @@
-class Foo {
-    x: Integer
-}
-
-typeclass t::Foobar {
-    fun foobar() -> Integer
-}
-
-instance Foo::Foobar {
-    fun foobar() -> Integer {
-        return this.x
-    }
-}
-
 fun main() -> Integer {
-    var f = #Foo(7)
-    print(f.foobar().str())
+    var f = 234
+    var f = 123
     return 2
 }

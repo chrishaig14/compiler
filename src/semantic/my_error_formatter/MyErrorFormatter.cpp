@@ -40,8 +40,8 @@ std::string MyErrorFormatter::format(const error::GenericError& err) const {
 }
 
 std::string MyErrorFormatter::format(const error::Redeclared& err) const {
-    return this->context_string(err.node.start) + "Error::Redeclared: '" + err.name + "'" +
-           this->code_context_string(err.node.start);
+    return this->context_string(err.node.start) + "Error::Redeclared: '" + err.node.identifier.str + "'" +
+           this->code_context_string(err.node.identifier.start);
 }
 
 std::string MyErrorFormatter::format(const error::For& err) const {
