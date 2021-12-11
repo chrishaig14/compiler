@@ -277,22 +277,6 @@ ModuleMember* map_unit_to_module_member(Unit& u) {
     return nullptr;
 }
 
-bool ModuleChecker::is_immutable(const ast::Type& node) {
-    if (node == T_STRING) {
-        return true;
-    }
-    if (node == T_INT) {
-        return true;
-    }
-    if (node == T_BOOL) {
-        return true;
-    }
-    if (node.kind == Kind::OBJECT && node.object().id == "Tuple") {
-        return true;
-    }
-    return false;
-}
-
 bool ModuleChecker::is_variable(const ast::ObjectType& a) {
     return a.type_params.empty() && (islower(a.id[0]) != 0);
 }

@@ -94,7 +94,6 @@ public:
 
     std::unique_ptr<Entity> entity_from_type(const ast::Type& type);
 
-    bool is_immutable(const ast::Type& node);
     void enter_scope();
     void leave_scope();
     bool assert_type_exists(const ast::Type& type, TextPosition pos);
