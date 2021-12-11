@@ -30,6 +30,7 @@ public:
     void add_default_imports();
     void visit_typeclass(ast::TypeclassAst& typeclass);
     void visit_instance(ast::Instance& instance);
+    sem::Type* make_sem_type(const ast::Type& t);
 };
 
 #endif //GLOBALPROCESSOR_H

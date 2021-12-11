@@ -70,12 +70,10 @@ void ModulePrechecker::add_default_imports() {
 void ModulePrechecker::visit_function(ast::Function& node) {
     sem::VectorOfTypes x;
     for (ast::Type& type_node: node.parameter_types) {
-        sem::Type* p_type = type_node.to_sem();
-        this->module.fill_actual(*p_type);
+        sem::Type* p_type = this->make_sem_type(type_node);
         x.emplace_back(p_type);
     }
-    auto rt = sem::UType(node.return_type->to_sem());
-    this->module.fill_actual(*rt);
+    auto rt = sem::UType(this->make_sem_type(*node.return_type));
     auto function_info = sem::TypeFunction(std::move(x), std::move(rt));
     std::string function_name = node.identifier.str;
     Path function_path = Path(this->module.path, function_name);
@@ -210,12 +208,10 @@ void ModulePrechecker::visit_class(ast::ConcreteClassDef& node) {
 
         sem::VectorOfTypes x;
         for (ast::Type& p: method.parameter_types) {
-            sem::Type* args = p.to_sem();
-            this->module.fill_actual(*args);
+            sem::Type* args = this->make_sem_type(p);
             x.emplace_back(args);
         }
-        sem::Type* p_type = method.return_type->to_sem();
-        this->module.fill_actual(*p_type);
+        sem::Type* p_type = this->make_sem_type(*method.return_type);
         ConstFunction cf(Path(class_info->path, method_name), sem::TypeFunction(x, sem::UType(p_type)));
         method.path = cf.path;
         class_info->methods.insert(make_pair(method_name,
@@ -225,11 +221,15 @@ void ModulePrechecker::visit_class(ast::ConcreteClassDef& node) {
 
 }
 
+sem::Type* ModulePrechecker::make_sem_type(const ast::Type& t) {
+    auto s = t.to_sem();
+    this->module.fill_actual(*s);
+    return s;
+}
 
 void ModulePrechecker::visit_template_class(ast::TemplateClassDef& node) {
     TemplateClassInfo* class_info = &this->module.members.at(node.class_name)->template_klass();
     for (const auto& mt: node.attributes) {
-        // this->module.fill_actual(*mt.second);
         class_info->member_names.push_back(mt.id);
         class_info->member_types.push_back(mt.type->clone());
         class_info->members[mt.id] = mt.type->clone();
@@ -244,12 +244,10 @@ void ModulePrechecker::visit_template_class(ast::TemplateClassDef& node) {
 
         sem::VectorOfTypes x;
         for (ast::Type& p: method.parameter_types) {
-            sem::Type* args = p.to_sem();
-            this->module.fill_actual(*args);
+            sem::Type* args = this->make_sem_type(p);
             x.emplace_back(args);
         }
-        sem::Type* p_type = method.return_type->to_sem();
-        this->module.fill_actual(*p_type);
+        sem::Type* p_type = this->make_sem_type(*method.return_type);
         auto cf = std::make_unique<ConstFunction>(Path(class_info->path, method_name),
                                                   sem::TypeFunction(x, sem::UType(p_type)));
         method.path = cf->path;
@@ -301,12 +299,10 @@ void ModulePrechecker::visit_typeclass(ast::TypeclassAst& typeclass) {
 
         sem::VectorOfTypes x;
         for (auto& p: method.param_types) {
-            sem::Type* args = p->to_sem();
-            this->module.fill_actual(*args);
+            sem::Type* args = this->make_sem_type(*p);
             x.emplace_back(args);
         }
-        sem::Type* p_type = method.return_type->to_sem();
-        this->module.fill_actual(*p_type);
+        sem::Type* p_type = this->make_sem_type(*method.return_type);
         auto cf = std::make_unique<sem::TypeFunction>(x, sem::UType(p_type));
         tc->methods[m.first] = std::move(cf);
     }
@@ -316,12 +312,10 @@ void ModulePrechecker::visit_typeclass(ast::TypeclassAst& typeclass) {
 
         sem::VectorOfTypes x;
         for (auto& p: method.param_types) {
-            sem::Type* args = p->to_sem();
-            this->module.fill_actual(*args);
+            sem::Type* args = this->make_sem_type(*p);
             x.emplace_back(args);
         }
-        sem::Type* p_type = method.return_type->to_sem();
-        this->module.fill_actual(*p_type);
+        sem::Type* p_type = this->make_sem_type(*method.return_type);
         auto cf = std::make_unique<sem::TypeFunction>(x, sem::UType(p_type));
         tc->static_methods[m.first] = std::move(cf);
     }
@@ -330,8 +324,7 @@ void ModulePrechecker::visit_typeclass(ast::TypeclassAst& typeclass) {
 }
 
 void ModulePrechecker::visit_instance(ast::Instance& instance) {
-    auto ot = instance.base_type->to_sem();
-    this->module.fill_actual(*ot);
+    auto ot = this->make_sem_type(*instance.base_type);
     Path typeclass_path(this->module.path, instance.id);
     const std::string& base_name = ot->object().actual_to_string();
     if (this->instances[base_name].contains(typeclass_path.as_str())) {
