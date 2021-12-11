@@ -139,11 +139,10 @@ sem::UCommon ModuleChecker::check_declaration_with_type(const ast::Declaration& 
     //     type = ast::UTypeNode(aliased_type->clone());
     // } else {
     // }
-    sem::UType sem_type(type->to_sem());
-    this->module.fill_actual(*sem_type);
+    sem::Type* sem_type =this->make_sem_type(*type);
     UExpressionInfo rvalue_sinfo = this->expect_rvalue_of_type(*sem_type, n.expression);
 
-    auto ov = this->make_value(sem_type.release());
+    auto ov = this->make_value(sem_type);
     this->scope->set(n.identifier.str, *ov);
     if (rvalue_sinfo->is_error()) {
         return nullptr;

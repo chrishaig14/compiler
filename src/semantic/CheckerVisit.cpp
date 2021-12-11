@@ -200,6 +200,12 @@ std::unique_ptr<sem::Block> ModuleChecker::visit_block(const ast::Block& node) {
     return sn;
 }
 
+sem::Type* ModuleChecker::make_sem_type(const ast::Type& t) {
+    auto s = t.to_sem();
+    this->module.fill_actual(*s);
+    return s;
+}
+
 std::unique_ptr<sem::FunctionDef> ModuleChecker::visit_function(const ast::Function& n) {
     this->error_reporter.current_function = n.identifier.str;
     // Logger::info("Checking FunctionNode " + n.identifier);
@@ -217,8 +223,7 @@ std::unique_ptr<sem::FunctionDef> ModuleChecker::visit_function(const ast::Funct
         // ast::Type& type = n.parameter_types[i];
         // ast::UTypeNode cl(type.clone());
         // make_not_generic(*cl);
-        sem::Type* semt = n.parameter_types[i].get().to_sem();
-        this->module.fill_actual(*semt);
+        sem::Type* semt = this->make_sem_type(n.parameter_types[i]);
         for (auto& c: n.constraints) {
             for (auto& t: c.second) {
                 add_typeclasses_to_generic_type(*semt, c.first, t);

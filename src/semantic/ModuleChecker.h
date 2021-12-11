@@ -206,6 +206,7 @@ public:
 
     std::unique_ptr<EntityValue> make_entity_value(sem::Type& type);
     void add_typeclasses_to_generic_type(sem::Type& type, std::string gen_type, std::string typeclass_name);
+    sem::Type* make_sem_type(const ast::Type& t);
 };
 
 #endif //CHECKER_H

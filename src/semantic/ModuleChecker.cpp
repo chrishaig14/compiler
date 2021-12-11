@@ -121,8 +121,7 @@ ModuleChecker::match_arguments_to_generic_function(const ast::FunctionType& ft, 
 
     for (auto& c: constraints) {
         auto s = all_substitutions.at(c.first);
-        sem::Type* p_type = s->to_sem();
-        this->module.fill_actual(*p_type);
+        sem::Type* p_type = this->make_sem_type(*s);
         // std::unique_ptr<EntityValue> v = this->make_value(p_type);
         // auto& clazz = *v->clazz;
         // bool ok = false;
@@ -224,7 +223,6 @@ ModuleChecker::instantiate_generic(const TemplateClassInfo& generic, const ast::
     for (auto* f: generic.member_types) {
         ast::Type& concrete_type = *make_type(*f, replacements).release();
         concrete_field_types.push_back(&concrete_type);
-        // this->module.fill_actual(concrete_type);
     }
 
 
@@ -232,8 +230,7 @@ ModuleChecker::instantiate_generic(const TemplateClassInfo& generic, const ast::
     for (const auto& method_cf: generic.methods) {
         ast::UTypeNode t((method_cf.second)->const_function_ft.to_ast());
         ast::UTypeNode concrete_type = make_type(*t, replacements);
-        auto tf = (sem::TypeFunction*) concrete_type->to_sem();
-        this->module.fill_actual(*tf);
+        auto tf = (sem::TypeFunction*) this->make_sem_type(*concrete_type);
         auto cf = std::make_unique<ConstFunction>(method_cf.second->path, *tf);
         concrete_methods.emplace(method_cf.first, InstanceMethod(Path(""), BaseMethod(false, *cf)));
         concrete->all_members[method_cf.first] = ClassMemberCategory::method;
@@ -243,8 +240,8 @@ ModuleChecker::instantiate_generic(const TemplateClassInfo& generic, const ast::
     for (const auto& m: generic.static_methods) {
         ast::UTypeNode t((m.second)->const_function_ft.to_ast());
         ast::UTypeNode concrete_type(make_type(*t, replacements));
-        sem::Type* p_type = concrete_type->to_sem();
-        this->module.fill_actual(*p_type);
+        sem::Type* p_type = this->make_sem_type(*concrete_type);
+
         concrete_methods.emplace(m.first,
                                  InstanceMethod(m.second->path,
                                                 BaseMethod(true,
@@ -259,8 +256,7 @@ ModuleChecker::instantiate_generic(const TemplateClassInfo& generic, const ast::
     for (size_t i = 0; i < generic.member_names.size(); i++) {
         std::string mn = generic.member_names[i];
         concrete->attributes[mn] = concrete_field_types[i];
-        sem::Type* u = concrete_field_types[i]->to_sem();
-        this->module.fill_actual(*u);
+        sem::Type* u = this->make_sem_type(*concrete_field_types[i]);
         concrete->attribute_entities[mn] = this->make_value(u);
         concrete->all_members[mn] = ClassMemberCategory::attribute;
         // std::make_unique<EntityNothing>();
@@ -410,8 +406,7 @@ std::unique_ptr<sem::InstanceDef> ModuleChecker::visit_instance(const ast::Insta
     }
     TypeclassFoo& typeclass = mm->typeclass();
     auto out_methods = instantiate_typeclass_methods(typeclass, *instance.base_type);
-    sem::Type* p_type = instance.base_type->to_sem();
-    this->module.fill_actual(*p_type);
+    sem::Type* p_type = this->make_sem_type(*instance.base_type);
     this->this_entity = this->make_entity_value(*p_type);
     this->add_this = true;
 
@@ -421,12 +416,10 @@ std::unique_ptr<sem::InstanceDef> ModuleChecker::visit_instance(const ast::Insta
 
         sem::VectorOfTypes x;
         for (ast::Type& p: method->parameter_types) {
-            sem::Type* args = p.to_sem();
-            this->module.fill_actual(*args);
+            sem::Type* args = this->make_sem_type(p);
             x.emplace_back(args);
         }
-        sem::Type* r_type = method->return_type->to_sem();
-        this->module.fill_actual(*r_type);
+        sem::Type* r_type = this->make_sem_type(*method->return_type);
 
         auto tf = sem::TypeFunction(x, sem::UType(r_type));
         auto out_it = out_methods.find(method_name);
