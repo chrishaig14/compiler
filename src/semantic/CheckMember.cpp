@@ -101,8 +101,8 @@ UExpressionInfo ModuleChecker::object_member(sem::UExp object_snode, EntityValue
     auto member_cat = clazz->get_member(child);
     switch (member_cat) {
         case ClassMemberCategory::attribute: {
-            sem::Type* type = this->make_sem_type(*clazz->attributes.at(child));
-            info.set_entity(this->make_value(type));
+            const sem::Type& type = *clazz->attributes.at(child);
+            info.set_entity(this->make_value(type.clone()));
             if (info.entity.get().is_nothing()) {
                 throw std::runtime_error("This shouldnt be nothing!");
                 // sem::UType p_type(clazz->members.at(child)->to_sem());

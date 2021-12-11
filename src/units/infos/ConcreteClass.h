@@ -55,10 +55,10 @@ public:
     ConcreteClass(const std::string& class_name, Path path);
 
     VectorOfStrings attribute_names;
-    std::vector<ast::Type*> attribute_types;
+    std::vector<sem::UType> attribute_types;
     std::unordered_map<std::string, std::unique_ptr<Entity>> attribute_entities;
 
-    MapStringType attributes;
+    std::unordered_map<std::string, sem::UType> attributes;
     std::unordered_map<std::string, InstanceMethod> methods;
 
     std::map<std::string, std::pair<ast::Type*, ast::ExpNode*>> static_attributes;

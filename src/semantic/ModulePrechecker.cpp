@@ -192,8 +192,9 @@ void ModulePrechecker::visit_class(ast::ConcreteClassDef& node) {
     for (const auto& attr: node.attributes) {
         // this->module.fill_actual(*mt.second);
         class_info->attribute_names.push_back(attr.id);
-        class_info->attribute_types.push_back(attr.type->clone());
-        class_info->attributes[attr.id] = attr.type->clone();
+        sem::UType attr_type(this->make_sem_type(*attr.type));
+        class_info->attribute_types.emplace_back(attr_type->clone());
+        class_info->attributes[attr.id] = std::move(attr_type);
         class_info->attribute_entities[attr.id] = std::make_unique<EntityNothing>();
         class_info->all_members[attr.id] = ClassMemberCategory::attribute;
     }

@@ -83,9 +83,10 @@ UExpressionInfo ModuleChecker::visit_tuple(const ast::Tuple& node) {
 
     ConcreteClass* clazz = new ConcreteClass("Tuple", Path("libcore.libcore.Tuple"));
     for (size_t i = 0; i < otype->object().type_params.size(); i++) {
-        auto tv = this->make_value(otype->object().type_params[i]->clone());
+        auto tv_type = otype->object().type_params[i]->clone();
+        auto tv = this->make_value(tv_type->clone());
         const std::string& mem_name = std::to_string(i + 1);
-        clazz->attributes[mem_name] = tv->type.to_ast();
+        clazz->attributes[mem_name] = sem::UType(tv_type);
         clazz->attribute_entities[mem_name] = std::move(tv);
     }
     auto ov = std::make_unique<EntityValue>(otype, clazz);
@@ -202,8 +203,8 @@ UExpressionInfo ModuleChecker::visit_defconst(const ast::DefaultConstructor& nod
 
         ConcreteClass& cls = entity.get_class().clazz;
         sem::VectorOfTypes t;
-        for (auto* pt: cls.attribute_types) {
-            t.push_back(pt->to_sem());
+        for (auto& pt: cls.attribute_types) {
+            t.push_back(pt->clone());
         }
         sem::VectorOfTypes tp;
         for (const auto& tt: cls.type_params) {
