@@ -240,8 +240,7 @@ sem::UCommon ModuleChecker::visit_match(const ast::Match& node) {
         ast::Type& case_type = *c.first;
         ast::Block& case_node = *c.second;
 
-        sem::Type* p_type = case_type.to_sem();
-        this->module.fill_actual(*p_type);
+        sem::Type* p_type = this->make_sem_type(case_type);
         int union_index = -1;
         if (not exp_error) {
             union_index = target_union_type(*ot, *p_type);
@@ -265,7 +264,7 @@ sem::UCommon ModuleChecker::visit_match(const ast::Match& node) {
         }
         this->leave_scope();
     }
-    if (has_error){
+    if (has_error) {
         return nullptr;
     }
     return std::make_unique<sem::Match>(std::move(exp_info->exp_snode), cas);
