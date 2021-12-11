@@ -29,7 +29,6 @@ public:
     const Kind kind;
 
     virtual std::string to_string() const = 0;
-    virtual std::string actual_to_string() const = 0;
 
     virtual bool equal(const ast::Type& other) const = 0;
 

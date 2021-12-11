@@ -19,7 +19,6 @@ public:
     sem::Type* to_sem() const override;
 
     std::string to_string() const override;
-    std::string actual_to_string() const override;
 
     FunctionType* clone() const override;
 

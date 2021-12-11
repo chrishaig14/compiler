@@ -1,10 +1,7 @@
-fun foo() -> Integer {
-    return 0
-}
-
-fun foo() -> Integer {
-    return 0
-}
-
 fun main() -> Integer {
+    var s = "Hasdk,h"
+    var w : Integer = 8
+    print("Hello my friend")
+    print(w.str())
+    return 0
 }

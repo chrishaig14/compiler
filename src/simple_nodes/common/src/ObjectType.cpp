@@ -50,9 +50,7 @@ ast::Type* TypeObject::to_ast() const {
     }
 
     auto* n = new ast::ObjectType(this->id, aux);
-    n->data.actual_base_path = this->data.actual_base_path;
     n->is_generic_param = this->is_generic_param;
-    n->data.aliased_type = this->data.aliased_type != nullptr ? this->data.aliased_type->to_ast() : nullptr;
     return n;
 }
 

@@ -12,7 +12,6 @@ ObjectType::ObjectType(const std::string& identifier, const ast::VectorOfTypes& 
     // for (auto* p: typeParameters) {
     //     assert(p != nullptr);
     // }
-    this->data.aliased_type = nullptr;
     this->is_generic_param = false;
 }
 
@@ -23,10 +22,8 @@ ast::Type* ObjectType::clone() const {
     }
 
     auto* n = new ast::ObjectType(this->id, aux);
-    n->data.actual_base_path = this->data.actual_base_path;
     n->is_generic_param = this->is_generic_param;
     // n->data.aliased_type = this->data.aliased_type->clone();
-    n->data.aliased_type = this->data.aliased_type != nullptr ? this->data.aliased_type->clone() : nullptr;
     return n;
 }
 
@@ -37,9 +34,7 @@ sem::Type* ObjectType::to_sem() const {
     }
 
     auto* n = new sem::TypeObject(this->id, aux);
-    n->data.actual_base_path = this->data.actual_base_path;
     n->is_generic_param = this->is_generic_param;
-    n->data.aliased_type = this->data.aliased_type != nullptr ? this->data.aliased_type->to_sem() : nullptr;
     return n;
 }
 
@@ -61,20 +56,6 @@ std::string ObjectType::to_string() const {
         return otype.id + "[" + parameters + "]";
     }
     return otype.id + (this->is_generic_param ? "(gen)" : "");
-}
-
-std::string ObjectType::actual_to_string() const {
-    const auto& otype = *this;
-    std::string parameters;
-    for (auto* ptr: otype.type_params) {
-        auto& p = *ptr;
-        parameters += p.actual_to_string() + ", ";
-    }
-    if (!parameters.empty()) {
-        parameters = parameters.substr(0, parameters.size() - 2);
-        return this->data.actual_base_path.as_str() + "[" + parameters + "]";
-    }
-    return this->data.actual_base_path.as_str();
 }
 
 bool ObjectType::equal(const ast::Type& other) const {

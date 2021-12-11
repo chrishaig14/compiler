@@ -52,21 +52,6 @@ std::string FunctionType::to_string() const {
     return "fun (" + parameters + ")" + (*ftype.return_type == ast::ObjectType(".None") ? "" : (" -> " + ret));
 }
 
-std::string ast::FunctionType::actual_to_string() const {
-    const auto& ftype = *this;
-    std::string parameters;
-    std::string ret;
-    for (auto& ptr: ftype.param_types) {
-        auto& p = *ptr;
-        parameters += p.actual_to_string() + ", ";
-    }
-    if (!ftype.param_types.empty()) {
-        parameters = parameters.substr(0, parameters.size() - 2);
-    }
-    ret = ftype.return_type->actual_to_string();
-    return "fun (" + parameters + ")" + (*ftype.return_type == ast::ObjectType(".None") ? "" : (" -> " + ret));
-}
-
 bool ast::FunctionType::equal(const ast::Type& other) const {
     const auto& a = *this;
     const auto& b = other.function();

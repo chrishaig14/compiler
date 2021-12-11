@@ -211,7 +211,7 @@ std::unique_ptr<EntityValue> ModuleChecker::make_value(sem::Type* type) {
         // cls = instance_c.get();
         // bcls->generic_instances[type->actual_to_string()] = std::move(instance_c);
         bcls = instance_c.get();
-        cls.generic_instances[o->actual_to_string()] = std::move(instance_c);
+        cls.generic_instances[type_object.actual_to_string()] = std::move(instance_c);
         // } else {
         //     cls = instance->second.get();
         // }

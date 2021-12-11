@@ -19,6 +19,7 @@
 #include <ast/top/Instance.h>
 #include <units/infos/TemplateClass.h>
 #include <semantic/my_error_formatter/MyErrorFormatter.h>
+#include <log/log.h>
 
 const VectorOfStrings default_imports = {"libcore.libcore.String", "libcore.libcore.Integer", "libcore.libcore.List",
                                          "libcore.libcore.Double", "libcore.libcore.Boolean", "libcore.libcore.Float",
@@ -332,8 +333,10 @@ void ModulePrechecker::visit_instance(ast::Instance& instance) {
     auto ot = instance.base_type->to_sem();
     this->module.fill_actual(*ot);
     Path typeclass_path(this->module.path, instance.id);
-    if (this->instances[ot->object().data.actual_base_path.as_str()].contains(typeclass_path.as_str())) {
+    const std::string& base_name = ot->object().actual_to_string();
+    if (this->instances[base_name].contains(typeclass_path.as_str())) {
         throw std::runtime_error("typeclass already implemented!");
     }
-    this->instances[ot->object().data.actual_base_path.as_str()].insert(typeclass_path.as_str());
+    this->instances[base_name].insert(typeclass_path.as_str());
+    LOG_INFO("precheck", "Added instance of '" + instance.id + "' to type " + base_name);
 }

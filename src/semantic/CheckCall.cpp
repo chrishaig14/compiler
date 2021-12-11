@@ -45,7 +45,9 @@ ModuleChecker::analyze_call(const ast::ExpNode& function, std::vector<ast::RExpN
     if (rtype->kind == Kind::OBJECT and rtype->object().id == ".None") {
         retv.set_entity(std::make_unique<EntityNothing>());
     } else {
-        retv.set_entity(this->make_value(rtype->to_sem()));
+        sem::Type* p_type = rtype->to_sem();
+        this->module.fill_actual(*p_type);
+        retv.set_entity(this->make_value(p_type));
     }
 
     if (arguments.size() != function_type.param_types.size()) {
