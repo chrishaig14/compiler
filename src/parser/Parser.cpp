@@ -1073,17 +1073,11 @@ std::unique_ptr<ast::TopNode> Parser::parse_class_definition() {
 
 std::unique_ptr<ast::Import> Parser::parse_import() {
     Token import_tok = this->expect_token(TokType::IMPORT);
-    VectorOfStrings path;
-    // path.push_back("global");
-    // if (this->match(TokType::DOT)) {
-    // it's a local import
-    // this->next();
-    // path.push_back(this->top_package_name);
-    // }
+    std::vector<Token> path_parts;
     Token path_part;
     while (true) {
         path_part = this->expect_token(TokType::ID);
-        path.push_back(path_part.str);
+        path_parts.push_back(path_part);
         if (this->match(TokType::DOT)) {
             this->next();
             continue;
@@ -1095,10 +1089,10 @@ std::unique_ptr<ast::Import> Parser::parse_import() {
         this->next();
         Token alias = this->expect_token(TokType::ID);
         this->expect_token(TokType::SEMICOLON);
-        return std::make_unique<ast::Import>(path, alias.str, import_tok.start, path_part.end_pos);
+        return std::make_unique<ast::Import>(path_parts);
     }
     this->expect_token(TokType::SEMICOLON);
-    return std::make_unique<ast::Import>(path, import_tok.start, path_part.end_pos);
+    return std::make_unique<ast::Import>(path_parts);
 }
 
 std::unique_ptr<ast::Match> Parser::parse_match_statement() {

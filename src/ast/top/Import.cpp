@@ -11,19 +11,21 @@ bool Import::equal(const ast::TopNode& other) const {
 }
 
 nlohmann::json Import::to_json() const {
-    return {{"type",   "import"},
-            {"import", this->path}};
+    // return {{"type",   "import"},
+    //         {"import", this->path}};
+    return "";
 }
 
-Import::Import(const VectorOfStrings& path, std::string alias, TextPosition start, TextPosition end) : ast::TopNode(TopNodeType::IMPORT, start, end) {
+Import::Import(std::vector<Token> path, std::string alias, TextPosition start, TextPosition end) : ast::TopNode(
+        TopNodeType::IMPORT,
+        start,
+        end) {
     this->alias = std::move(alias);
     this->path = path;
     this->has_alias = true;
 }
 
-Import::Import(const VectorOfStrings& path, TextPosition start, TextPosition end) : ast::TopNode(TopNodeType::IMPORT,
-                                                                                              start,
-                                                                                              end) {
+Import::Import(std::vector<Token> path) : ast::TopNode(TopNodeType::IMPORT, path.front().start, path.back().end_pos) {
     this->has_alias = false;
     this->path = path;
 }

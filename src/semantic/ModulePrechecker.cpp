@@ -32,9 +32,13 @@ void ModulePrechecker::visit_import(ast::Import& node) {
     if (node.has_alias) {
         name = node.alias;
     } else {
-        name = node.path.back();
+        name = node.path.back().str;
     }
-    this->module.imported_paths[name] = Path(node.path);
+    VectorOfStrings pp;
+    for (auto& p: node.path) {
+        pp.emplace_back(p.str);
+    }
+    // this->module.imported_paths[name] = Path(pp);
 }
 
 void ModulePrechecker::add_default_imports() {
@@ -132,7 +136,7 @@ void ModulePrechecker::check_duplicated_names(ast::Module& node) {
                 if (((ast::Import&) n).has_alias) {
                     name = ((ast::Import&) n).alias;
                 } else {
-                    name = ((ast::Import&) n).path.back();
+                    name = ((ast::Import&) n).path.back().str;
                 }
                 break;
             case TopNodeType::FUNC:

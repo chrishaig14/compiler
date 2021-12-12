@@ -1,4 +1,5 @@
-import gazoo.printa
+import libcore.libcore.printa
+
 fun main() -> Integer {
     var s = "Hasdk,h"
     var w : Integer = 8

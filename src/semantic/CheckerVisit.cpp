@@ -153,20 +153,18 @@ void ModuleChecker::init() {
     }
 }
 
-std::unique_ptr<ModuleMember> ModuleChecker::find(Path path) {
+std::unique_ptr<ModuleMember> ModuleChecker::find(std::vector<Token> path) {
     std::unique_ptr<ModuleMember> current_member = std::make_unique<PackageModuleMember>(&top_package);
     std::string path_so_far = "global";
 
-    for (const auto& path_part: path.as_vec()) {
+    for (const auto& path_part_tok: path) {
+        std::string path_part = path_part_tok.str;
         if (current_member->is_package()) {
             Package& package = current_member->package();
             auto unit = package.units.find(path_part);
             if (unit == package.units.end()) {
                 this->error_reporter.error(std::make_unique<error::ImportNotFound>(std::make_unique<SubpackageUnit>(&package),
-                                                                                   Token(TokType::ID,
-                                                                                         path_part,
-                                                                                         TextPosition{1, 1},
-                                                                                         TextPosition{1, 1})));
+                                                                                   path_part_tok));
                 return nullptr;
                 // throw std::runtime_error("Error '" + path_part + "' not found in package '" + path_so_far + "'");
             }
@@ -176,10 +174,7 @@ std::unique_ptr<ModuleMember> ModuleChecker::find(Path path) {
             auto member = module_.members.find(path_part);
             if (member == module_.members.end()) {
                 this->error_reporter.error(std::make_unique<error::ImportNotFound>(std::make_unique<ModuleUnit>(&module_),
-                                                                                   Token(TokType::ID,
-                                                                                         path_part,
-                                                                                         TextPosition{1, 1},
-                                                                                         TextPosition{1, 1})));
+                                                                                   path_part_tok));
                 return nullptr;
                 // throw std::runtime_error("Error '" + path_part + "' not found in module '" + path_so_far + "'");
             }
@@ -190,18 +185,28 @@ std::unique_ptr<ModuleMember> ModuleChecker::find(Path path) {
     return current_member;
 }
 
-void ModuleChecker::add_path_to_module(const std::string& alias, Path path) {
+void ModuleChecker::add_path_to_module(const std::string& alias, std::vector<Token> path) {
     auto current_member = this->find(path);
     this->module.members[alias] = std::move(current_member);
 }
 
 void ModuleChecker::resolve_module_imports() {
-    for (const auto& import: module.imported_paths) {
+    for (auto& import: this->module.ast->imports) {
         try {
-            this->add_path_to_module(import.first, import.second);
+            this->add_path_to_module(import.get().path.back().str, import.get().path);
         } catch (std::runtime_error& e) {
             std::cerr << "Import error: " << e.what() << std::endl;
         }
+    }
+    for (auto& i: this->module.imported_paths) {
+        std::vector<Token> path;
+        for (auto& pp: i.second.as_vec()) {
+            path.emplace_back(Token(TokType::ID, pp, TextPosition{1, 1}, TextPosition{1, 1}));
+        }
+
+        std::unique_ptr<ModuleMember> mm = this->find(path);
+        assert(mm != nullptr);
+        this->module.members[i.first] = std::move(mm);
     }
 }
 

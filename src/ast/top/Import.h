@@ -10,6 +10,7 @@
 
 #include <utility>
 #include <util/types.h>
+#include <common/Token.h>
 #include "../ast.h"
 #include "TopNode.h"
 
@@ -18,13 +19,13 @@ public:
     bool has_alias;
     bool equal(const ast::TopNode& other) const override;
 
-    Import(const VectorOfStrings& path, std::string alias, TextPosition start, TextPosition end);
+    Import(std::vector<Token> path_parts, std::string alias, TextPosition start, TextPosition end);
 
-    Import(const VectorOfStrings& path, TextPosition start, TextPosition end);
+    Import(std::vector<Token> path_parts);
 
     nlohmann::json to_json() const override;
 
-    VectorOfStrings path;
+    std::vector<Token> path;
     std::string alias;
 };
 
