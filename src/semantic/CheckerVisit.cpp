@@ -144,12 +144,69 @@ std::unique_ptr<sem::TemplateKlassDef> ModuleChecker::visit_template_class(ast::
 void ModuleChecker::init() {
     // Initialize module level Scope
     for (const auto& f: this->module.members) {
-        std::unique_ptr<Entity> e(map_module_member_to_entity(*f.second));
-        this->scope->set(f.first, *e);
+        if (f.second == nullptr) {
+            this->scope->set(f.first, EntityError());
+        } else {
+            std::unique_ptr<Entity> e(map_module_member_to_entity(*f.second));
+            this->scope->set(f.first, *e);
+        }
+    }
+}
+
+std::unique_ptr<ModuleMember> ModuleChecker::find(Path path) {
+    std::unique_ptr<ModuleMember> current_member = std::make_unique<PackageModuleMember>(&top_package);
+    std::string path_so_far = "global";
+
+    for (const auto& path_part: path.as_vec()) {
+        if (current_member->is_package()) {
+            Package& package = current_member->package();
+            auto unit = package.units.find(path_part);
+            if (unit == package.units.end()) {
+                this->error_reporter.error(std::make_unique<error::ImportNotFound>(std::make_unique<SubpackageUnit>(&package),
+                                                                                   Token(TokType::ID,
+                                                                                         path_part,
+                                                                                         TextPosition{1, 1},
+                                                                                         TextPosition{1, 1})));
+                return nullptr;
+                // throw std::runtime_error("Error '" + path_part + "' not found in package '" + path_so_far + "'");
+            }
+            current_member = std::unique_ptr<ModuleMember>(map_unit_to_module_member(*unit->second));
+        } else if (current_member->is_module()) {
+            Module& module_ = current_member->module();
+            auto member = module_.members.find(path_part);
+            if (member == module_.members.end()) {
+                this->error_reporter.error(std::make_unique<error::ImportNotFound>(std::make_unique<ModuleUnit>(&module_),
+                                                                                   Token(TokType::ID,
+                                                                                         path_part,
+                                                                                         TextPosition{1, 1},
+                                                                                         TextPosition{1, 1})));
+                return nullptr;
+                // throw std::runtime_error("Error '" + path_part + "' not found in module '" + path_so_far + "'");
+            }
+            current_member = member->second.get()->clone();
+        }
+        path_so_far += "." + path_part;
+    }
+    return current_member;
+}
+
+void ModuleChecker::add_path_to_module(const std::string& alias, Path path) {
+    auto current_member = this->find(path);
+    this->module.members[alias] = std::move(current_member);
+}
+
+void ModuleChecker::resolve_module_imports() {
+    for (const auto& import: module.imported_paths) {
+        try {
+            this->add_path_to_module(import.first, import.second);
+        } catch (std::runtime_error& e) {
+            std::cerr << "Import error: " << e.what() << std::endl;
+        }
     }
 }
 
 std::unique_ptr<sem::Module> ModuleChecker::check_module() {
+    this->resolve_module_imports();
     this->init();
     auto sn = std::make_unique<sem::Module>();
     for (auto& n: this->module.ast->all) {

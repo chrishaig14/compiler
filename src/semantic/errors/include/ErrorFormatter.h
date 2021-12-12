@@ -18,6 +18,7 @@ public:
     virtual std::string format(const error::ObjectNoSpecialMethod& err) const = 0;
     virtual std::string format(const error::ClassNoMethodForOp& err) const = 0;
     virtual std::string format(const error::ClassNoMember& err) const = 0;
+    virtual std::string format(const error::ImportNotFound& err) const = 0;
     virtual std::string format(const error::NotDeclared& err) const = 0;
     virtual std::string format(const error::GlobalRedeclared& err) const = 0;
     virtual std::string format(const error::For& err) const = 0;

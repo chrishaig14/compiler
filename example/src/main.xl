@@ -3,6 +3,7 @@ fun main() -> Integer {
     var s = "Hasdk,h"
     var w : Integer = 8
     print("Hello my friend")
+    var x = printa(3)
     print(w.str())
     return 0
 }

@@ -53,6 +53,9 @@ std::string ErrorFormatter::format(const error::Error& err) const {
             break;
         case error::ErrorType::generic_error:
             return this->format(static_cast<const error::GenericError&>(err));
+        case error::ErrorType::import_not_found:
+            return this->format(static_cast<const error::ImportNotFound&>(err));
+            break;
     }
     return "Error";
 }

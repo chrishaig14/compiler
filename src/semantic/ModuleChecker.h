@@ -207,6 +207,9 @@ public:
     sem::Type* make_sem_type(const ast::Type& t);
     std::unique_ptr<sem::FunctionDef> check_function(const ast::Function& n, std::unique_ptr<Entity> this_entity);
     std::unique_ptr<sem::FunctionDef> visit_method(const ast::Function& n, std::unique_ptr<Entity> this_entity);
+    std::unique_ptr<ModuleMember> find(Path path);
+    void add_path_to_module(const std::string& alias, Path path);
+    void resolve_module_imports();
 };
 
 #endif //CHECKER_H

@@ -13,6 +13,7 @@
 #include "GenericError.h"
 #include "NoMember.h"
 #include "NoMemberSuggestions.h"
+#include "ImportNotFound.h"
 #include "NotDeclared.h"
 #include "ObjectNoSpecialMethod.h"
 #include "Redeclared.h"

@@ -35,6 +35,8 @@ add_library(
         errors/include/For.h
         errors/include/FunctionCallNumArgs.h
         errors/include/FunctionReturnLastStmt.h
+        errors/include/ImportNotFound.h
+        errors/include/ImportNotFound.cpp
         errors/include/NoMember.h
         errors/include/NoMemberSuggestions.h
         errors/include/NotAFunction.h

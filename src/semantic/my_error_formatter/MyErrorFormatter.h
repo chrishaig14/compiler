@@ -30,6 +30,7 @@ public:
     std::string format(const error::NotDeclared& err) const override;
     std::string format(const error::FunctionCallNumArgs& err) const override;
     std::string format(const error::ClassNoMember& err) const override;
+    std::string format(const error::ImportNotFound& err) const override;
 };
 
 #endif //XLANG_MYERRORFORMATTER_H
