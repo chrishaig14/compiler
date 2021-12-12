@@ -101,11 +101,13 @@ std::string MyErrorFormatter::format(const error::ImportNotFound& err) const {
     if (err.base_unit->is_package()) {
         Package& p = err.base_unit->package();
         msg = this->context_string(err.path_part.start) + "Error::ImportError: package '" + p.name + "' ('" +
-              p.abs_path + "') has no member " + err.path_part.str + this->code_context_string(err.path_part.start);
+              p.abs_path + "') has no member '" + err.path_part.str + "'" +
+              this->code_context_string(err.path_part.start);
     } else {
         Module& p = err.base_unit->module();
         msg = this->context_string(err.path_part.start) + "Error::ImportError: module '" + p.name + "' ('" +
-              p.abs_path + "') has no member " + err.path_part.str + this->code_context_string(err.path_part.start);
+              p.abs_path + "') has no member '" + err.path_part.str + "'" +
+              this->code_context_string(err.path_part.start);
     }
     return msg;
 }
