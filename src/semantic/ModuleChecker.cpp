@@ -30,7 +30,6 @@ ModuleChecker::ModuleChecker(Package& top_package, Module& module,
           error_reporter(module.code_lines, std::make_unique<MyErrorFormatter>(module.abs_path, module.code_lines)),
           top_package(top_package) {
     this->scope = new SymbolTable(nullptr);
-    this->add_this = false;
 }
 
 void ModuleChecker::enter_scope() {
@@ -407,8 +406,7 @@ std::unique_ptr<sem::InstanceDef> ModuleChecker::visit_instance(const ast::Insta
     TypeclassFoo& typeclass = mm->typeclass();
     auto out_methods = instantiate_typeclass_methods(typeclass, *instance.base_type);
     sem::Type* p_type = this->make_sem_type(*instance.base_type);
-    this->this_entity = this->make_entity_value(*p_type);
-    this->add_this = true;
+    auto this_entity = this->make_entity_value(*p_type);
 
     for (auto& ast_meth: instance.methods) {
         auto& method = ast_meth->func;
@@ -432,11 +430,12 @@ std::unique_ptr<sem::InstanceDef> ModuleChecker::visit_instance(const ast::Insta
                     "Instance method " + method_name + " should have signature " + out_m->to_string() + " but it's " +
                     tf.to_string());
         }
-        if (not ast_meth->is_static) {
-            this->add_this = true;
+        std::unique_ptr<sem::FunctionDef> methodf;
+        if (ast_meth->is_static) {
+            methodf = this->visit_function(*method);
+        } else {
+            methodf = this->visit_method(*method, std::move(this_entity));
         }
-        auto methodf = this->visit_function(*method);
-        this->add_this = false;
         methods.push_back(SemMethod(ast_meth->is_static, *methodf));
     }
     if (methods.size() != out_methods.size()) {
@@ -448,8 +447,6 @@ std::unique_ptr<sem::InstanceDef> ModuleChecker::visit_instance(const ast::Insta
     //     static_methods.push_back(*method);
     // }
 
-    this->add_this = false;
-    this->this_entity.reset();
     return std::make_unique<sem::InstanceDef>(Path(this->module.path, instance.id),
                                               Path(this->module.path, instance.base_type->id),
                                               methods);

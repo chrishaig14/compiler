@@ -27,7 +27,6 @@ std::unique_ptr<sem::KlassDef> ModuleChecker::visit_class(ast::ConcreteClassDef&
     }
     auto sn = std::make_unique<sem::KlassDef>(node.class_name, node.attributes_ordered);
     sn->attribute_types = member_types;
-    this->add_this = true;
     // this->this_entity = std::unique_ptr<Entity>(this->entity_value_from_actual_base_path_no_generic(Path(this->module.path,
     //                                                                                                      node.class_name)).clone());
     // this->fill_value(this->this_entity->get_value());
@@ -35,17 +34,19 @@ std::unique_ptr<sem::KlassDef> ModuleChecker::visit_class(ast::ConcreteClassDef&
     sem::TypeObject ot(p.basname(), p);
     // auto v = std::make_unique<Value>(ot);
     // this->fill_value(*v);
-    this->this_entity = this->make_entity_value(ot);
+    auto this_entity = this->make_entity_value(ot);
 
     for (auto& ast_meth: node.methods) {
-        if (not ast_meth->is_static) {
-            this->add_this = true;
+        std::unique_ptr<sem::FunctionDef> ms;
+        if (ast_meth->is_static) {
+            // static method
+            ms = this->visit_function(*ast_meth->func);
+        } else {
+            // normal method
+            ms = this->visit_method(*ast_meth->func, std::move(this_entity));
         }
-        auto ms = this->visit_function(*ast_meth->func);
-        this->add_this = false;
         sn->methods.push_back(*ms);
     }
-    this->this_entity.reset();
 
     //
     // Class* clazz = ((EntityClass&) this->scope->get(node.class_name)).clazz;
@@ -113,7 +114,6 @@ std::unique_ptr<sem::TemplateKlassDef> ModuleChecker::visit_template_class(ast::
     }
     auto sn = std::make_unique<sem::TemplateKlassDef>(node.class_name, node.aatributes_ordered);
     sn->attribute_types = member_types;
-    this->add_this = true;
     // this->this_entity = std::unique_ptr<Entity>(this->entity_value_from_actual_base_path_no_generic(Path(this->module.path,
     //                                                                                                      node.class_name)).clone());
     // this->fill_value(this->this_entity->get_value());
@@ -125,22 +125,18 @@ std::unique_ptr<sem::TemplateKlassDef> ModuleChecker::visit_template_class(ast::
     sem::TypeObject ot(p.basname(), tppp, p);
     // auto v = std::make_unique<Value>(ot);
     // this->fill_value(*v);
-    this->this_entity = this->make_entity_value(ot);
+    auto this_entity = this->make_entity_value(ot);
 
     for (auto& ast_meth: node.methods) {
-        if (not ast_meth->is_static) {
-            this->add_this = true;
-        }
-        auto ms = this->visit_function(*ast_meth->func);
+        std::unique_ptr<sem::FunctionDef> ms;
         if (ast_meth->is_static) {
-            std::unique_ptr<sem::FunctionDef> sf((sem::FunctionDef*) ms.release());
+            ms = this->visit_function(*ast_meth->func);
             sn->static_methods.push_back(*ms);
+        } else {
+            ms = this->visit_method(*ast_meth->func, std::move(this_entity));
         }
-        this->add_this = false;
         sn->methods.push_back(*ms);
     }
-    this->this_entity.reset();
-    this->add_this = false;
     return sn;
 }
 
@@ -206,15 +202,25 @@ sem::Type* ModuleChecker::make_sem_type(const ast::Type& t) {
     return s;
 }
 
+std::unique_ptr<sem::FunctionDef>
+ModuleChecker::visit_method(const ast::Function& n, std::unique_ptr<Entity> this_entity) {
+    return this->check_function(n, std::move(this_entity));
+}
+
 std::unique_ptr<sem::FunctionDef> ModuleChecker::visit_function(const ast::Function& n) {
+    return this->check_function(n, nullptr);
+}
+
+std::unique_ptr<sem::FunctionDef>
+ModuleChecker::check_function(const ast::Function& n, std::unique_ptr<Entity> this_entity) {
     this->error_reporter.current_function = n.identifier.str;
     // Logger::info("Checking FunctionNode " + n.identifier);
     std::string function_name = n.identifier.str;
     this->enter_scope();
     this->scope->is_function = true;
 
-    if (this->add_this) {
-        this->scope->set("this", *this->this_entity);
+    if (this_entity != nullptr) {
+        this->scope->set("this", *this_entity);
     }
     // auto& e_const_function = this->scope->get(n.identifier);
     // auto& const_function = e_const_function.get_constfun().const_function;

@@ -79,7 +79,6 @@ const sem::TypeFunction& get_function_type(const ExpressionInfo& fun_info);
 UExpressionInfo exp_error_stub();
 
 class ModuleChecker {
-    bool add_this;
     std::map<std::string, std::unique_ptr<EntityValue>> entity_values_no_generic;
     SymbolTable* scope;
     std::map<std::string, std::unique_ptr<Entity>> entities;
@@ -87,7 +86,6 @@ class ModuleChecker {
 public:
     Module& module;
     error::ErrorReporter error_reporter;
-    std::unique_ptr<Entity> this_entity;
     Package& top_package;
 
     ModuleChecker(Package& top_package, Module& module, std::map<std::string, std::set<std::string>>& instances);
@@ -207,6 +205,8 @@ public:
     std::unique_ptr<EntityValue> make_entity_value(sem::Type& type);
     void add_typeclasses_to_generic_type(sem::Type& type, std::string gen_type, std::string typeclass_name);
     sem::Type* make_sem_type(const ast::Type& t);
+    std::unique_ptr<sem::FunctionDef> check_function(const ast::Function& n, std::unique_ptr<Entity> this_entity);
+    std::unique_ptr<sem::FunctionDef> visit_method(const ast::Function& n, std::unique_ptr<Entity> this_entity);
 };
 
 #endif //CHECKER_H
