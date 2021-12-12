@@ -57,12 +57,16 @@ Path Module::get_actual_path(const std::string& id) {
             return this->members[id]->template_klass().path;
         }
     }
-    if (this->imported_paths_with_alias.count(id) == 1) {
-        return this->imported_paths_with_alias[id];
+    auto it = this->imported_paths.find(id);
+    if (it != this->imported_paths.end()) {
+        return this->imported_paths[id];
     }
-    if (this->imported_paths_no_alias.count(id) == 1) {
-        return this->imported_paths_no_alias[id];
-    }
+    // if (this->imported_paths_with_alias.count(id) == 1) {
+    //     return this->imported_paths_with_alias[id];
+    // }
+    // if (this->imported_paths_no_alias.count(id) == 1) {
+    //     return this->imported_paths_no_alias[id];
+    // }
     throw std::runtime_error("Error: type " + id + " not found");
 }
 

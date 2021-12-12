@@ -16,7 +16,7 @@ std::unique_ptr<ModuleMember> find(Path path, Package& top_package);
 
 void add_path_to_module(Module& module, Path path, Package& top_package);
 
-void resolve_module_imports(Module& module, Package& top_package);
+bool resolve_module_imports(Module& module, Package& top_package);
 
 class PackageChecker {
     bool check_module(Module& module);

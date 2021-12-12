@@ -9,6 +9,6 @@
 #include <semantic/ModuleChecker.h>
 
 
-void resolve_module_imports(Module& module, Package& top_package);
+bool resolve_module_imports(Module& module, Package& top_package);
 
 #endif //XLANG_ANALYZE_H

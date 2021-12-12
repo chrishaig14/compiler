@@ -34,11 +34,8 @@ public:
     std::unique_ptr<ast::Module> ast;
     std::unique_ptr<sem::Module> sast;
     std::map<std::string, std::string> included_module_paths;
-    std::map<std::string, Path> imported_paths_no_alias;
-    std::map<std::string, Path> imported_paths_with_alias;
     std::map<std::string, ast::Type*> aliased_types;
-    std::vector<std::pair<std::string, Path>> imported_paths_no_alias_v;
-    std::vector<std::pair<std::string, Path>> imported_paths_with_alias_v;
+    std::map<std::string, Path> imported_paths;
     std::map<std::string, Entity*> imports;
     std::map<std::string, std::unique_ptr<ModuleMember>> members;
 

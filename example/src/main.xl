@@ -1,3 +1,4 @@
+import gazoo.printa
 fun main() -> Integer {
     var s = "Hasdk,h"
     var w : Integer = 8

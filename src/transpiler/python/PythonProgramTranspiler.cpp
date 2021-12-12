@@ -14,7 +14,7 @@ void PythonProgramTranspiler::transpile_module(Module& module, const std::string
     const std::string& module_output_path = path_join(output_dir, module.name + ".py");
     std::ofstream out_module(module_output_path);
     std::set<std::string> imports;
-    for (auto& import: module.imported_paths_no_alias) {
+    for (auto& import: module.imported_paths) {
         // auto v = import.second.as_vec();
         // if (v.size() > 1) {
         //     v.pop_back();

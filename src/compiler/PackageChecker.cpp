@@ -34,17 +34,24 @@ void add_path_to_module(Module& module, Path path, Package& top_package) {
     module.members[path.basname()] = std::move(current_member);
 }
 
-void resolve_module_imports(Module& module, Package& top_package) {
-    for (const auto& path: module.imported_paths_no_alias_v) {
-        add_path_to_module(module, path.second, top_package);
+bool resolve_module_imports(Module& module, Package& top_package) {
+    bool ok = true;
+    for (const auto& path: module.imported_paths) {
+        try {
+            add_path_to_module(module, path.second, top_package);
+        } catch (...) {
+            std::cerr << "Import error" << std::endl;
+            ok = false;
+        }
     }
+    return ok;
 }
 
 bool PackageChecker::check_module(Module& module) {
-    resolve_module_imports(module, this->top_package);
+    bool import_ok = resolve_module_imports(module, this->top_package);
     ModuleChecker checker(this->top_package, module, this->instances);
     module.sast = checker.check_module();
-    return checker.error_reporter.ok();
+    return checker.error_reporter.ok() and import_ok;
 }
 
 bool PackageChecker::check_unit(Unit& uvalue) {
@@ -75,6 +82,6 @@ bool PackageChecker::check_package(Package& package) {
     return ok;
 }
 
-PackageChecker::PackageChecker(Package& top_package, std::map<std::string, std::set<std::string>>& instances) : instances(instances), top_package(
-        top_package) {
+PackageChecker::PackageChecker(Package& top_package, std::map<std::string, std::set<std::string>>& instances)
+        : instances(instances), top_package(top_package) {
 }

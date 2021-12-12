@@ -571,15 +571,15 @@ PythonExpressionOutputCode PythonModuleTranspiler::transpile_static_method(const
 }
 
 std::string PythonModuleTranspiler::clean_path(Path path) {
-    auto it = this->module.imported_paths_no_alias.find(path.basname());
-    if (it != this->module.imported_paths_no_alias.end()) {
+    auto it = this->module.imported_paths.find(path.basname());
+    if (it != this->module.imported_paths.end()) {
         return path.basname();
     }
     std::string code;
     auto v = path.as_vec();
     v.pop_back();
-    it = this->module.imported_paths_no_alias.find(v.back());
-    if (it != this->module.imported_paths_no_alias.end()) {
+    it = this->module.imported_paths.find(v.back());
+    if (it != this->module.imported_paths.end()) {
         code = v.back() + "." + path.basname();
         return code;
     }

@@ -28,41 +28,19 @@ const VectorOfStrings default_imports = {"libcore.libcore.String", "libcore.libc
 
 
 void ModulePrechecker::visit_import(ast::Import& node) {
-    const Path& node_path = Path(node.path);
+    std::string name;
     if (node.has_alias) {
-        if (this->module.imported_paths_with_alias.count(node.alias) != 0) {
-            throw std::runtime_error("Import alias \"" + node.alias + "\" already defined for " +
-                                     this->module.imported_paths_with_alias[node.alias].as_str());
-        }
-        this->module.imported_paths_with_alias[node.alias] = node_path;
-        this->module.imported_paths_with_alias_v.emplace_back(node.alias, node_path);
+        name = node.alias;
     } else {
-        if (this->module.imported_paths_with_alias.count(node.path.back()) != 0) {
-            std::cout << this->module.abs_path << std::endl;
-            throw std::runtime_error("Path " + node_path.as_str() + " already imported!");
-        }
-        if (this->module.imported_paths_no_alias.count(node.path.back()) != 0) {
-            std::cout << this->module.abs_path << std::endl;
-            throw std::runtime_error("Path " + node_path.as_str() + " already imported!");
-        }
-        this->module.imported_paths_no_alias[node.path.back()] = node_path;
-        this->module.imported_paths_no_alias_v.emplace_back(node.path.back(), node_path);
+        name = node.path.back();
     }
+    this->module.imported_paths[name] = Path(node.path);
 }
 
 void ModulePrechecker::add_default_imports() {
-    for (auto& import_path: default_imports) {
-        Path path(import_path);
-        if (this->module.imported_paths_with_alias.count(path.basname()) != 0) {
-            std::cout << this->module.abs_path << std::endl;
-            throw std::runtime_error("Path " + path.as_str() + " already imported!");
-        }
-        if (this->module.imported_paths_no_alias.count(path.basname()) != 0) {
-            std::cout << this->module.abs_path << std::endl;
-            throw std::runtime_error("Path " + path.as_str() + " already imported!");
-        }
-        this->module.imported_paths_no_alias[path.basname()] = path;
-        this->module.imported_paths_no_alias_v.emplace_back(path.basname(), path);
+    for (auto& path_str: default_imports) {
+        Path path(path_str);
+        this->module.imported_paths[path.as_vec().back()] = path;
     }
 }
 

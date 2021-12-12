@@ -23,7 +23,7 @@ bool check_package(Package& package, Package& top_package);
 bool preprocess_package(Package& package);
 bool parse_module(Module& module);
 bool parse_package(Package& package);
-void resolve_module_imports(Module& module, Package& top_package);
+bool resolve_module_imports(Module& module, Package& top_package);
 
 class Compiler {
     std::string project_dir;
