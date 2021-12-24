@@ -152,7 +152,8 @@ ModuleChecker::match_arguments_to_generic_function(const ast::FunctionType& ft, 
     }
     UExpressionInfo rv_p = std::make_unique<ExpressionInfo>();
     auto& rv = *rv_p;
-    rv.set_entity(this->make_value(f->return_type->to_sem()));
+
+    rv.set_entity(this->make_value(this->make_sem_type(*f->return_type)));
     return rv_p;
 }
 
